@@ -1,0 +1,330 @@
+{
+	"extName": {
+		"message": "Violentmonkey", 
+		"description": "name of this extension"
+	}, 
+	"extAuthor": {
+		"description": "Designed by <a href=mailto:gera2ld@163.com>Gerald</a>", 
+		"message": ""
+	},
+	"extTranslator": {
+		"message": "Gerald <gera2ld@163.com>", 
+		"description": "information of the translator"
+	}, 
+	"extDescription": {
+		"message": "UserScript support for Opera.", 
+		"description": "description for this extension"
+	}, 
+	"css": {
+		"message": "html{font-family:Calibri,Arial;}", 
+		"description": "additional CSS for all pages"
+	}, 
+	"defaultSearch": {
+		"message": "http://www.google.com/search?q=*", 
+		"description": "URL for searching scripts, * stands for the keywords"
+	}, 
+	"msgUpdated": {
+		"message": "Script updated.", 
+		"description": ""
+	}, 
+	"msgErrorFetchingScript": {
+		"message": "Error fetching script!", 
+		"description": ""
+	}, 
+	"msgInstalled": {
+		"message": "Script installed.", 
+		"description": ""
+	}, 
+	"msgUpdating": {
+		"message": "Updating...", 
+		"description": ""
+	}, 
+	"msgNewVersion": {
+		"message": "New version found.", 
+		"description": ""
+	}, 
+	"msgCheckingForUpdate": {
+		"message": "Checking for updates...", 
+		"description": ""
+	}, 
+	"msgErrorFetchingUpdateInfo": {
+		"message": "Failed fetching update information.", 
+		"description": ""
+	}, 
+	"msgNoUpdate": {
+		"message": "No update found.", 
+		"description": ""
+	}, 
+	"labelInstall": {
+		"message": "Install script...", 
+		"description": ""
+	}, 
+	"buttonConfirmInstall": {
+		"message": "Confirm install", 
+		"description": ""
+	}, 
+	"buttonClose": {
+		"message": "Close", 
+		"description": ""
+	}, 
+	"anchorSupportPage": {
+		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki>Violentmonkey</a>", 
+		"description": ""
+	}, 
+	"labelAuthor": {
+		"message": "Author: ",
+		"description": ""
+	}, 
+	"msgNotJS": {
+		"message": "URL seems not to be a Javascript file. It will be reloaded directly in 3 seconds.", 
+		"description": ""
+	}, 
+	"msgLoadedJS": {
+		"message": "Javascript loaded: $1", 
+		"description": ""
+	}, 
+	"msgErrorLoadingURL": {
+		"message": "Error loading URL: $1", 
+		"description": ""
+	}, 
+	"msgLoadingURL": {
+		"message": "Loading URL: $1", 
+		"description": ""
+	}, 
+	"labelOptions": {
+		"message": "Options", 
+		"description": ""
+	}, 
+	"buttonNew": {
+		"message": "New", 
+		"description": ""
+	}, 
+	"anchorGetMoreScripts": {
+		"message": "<a href=http://userscripts.org target=_blank class=i18n>Get more scripts from userscripts.org</a>", 
+		"description": ""
+	}, 
+	"anchorUpdateAll": {
+		"message": "Check all for updates", 
+		"description": ""
+	}, 
+	"buttonAdvanced": {
+		"message": "Advanced", 
+		"description": ""
+	}, 
+	"labelInstalledScripts": {
+		"message": "Installed scripts", 
+		"description": ""
+	}, 
+	"labelShowDetails": {
+		"message": "Show details", 
+		"description": ""
+	}, 
+	"labelScriptEditor": {
+		"message": "Script Editor", 
+		"description": ""
+	}, 
+	"buttonCustomMeta": {
+		"message": "Custom meta data", 
+		"description": ""
+	}, 
+	"labelAllowUpdate": {
+		"message": "Allow update", 
+		"description": ""
+	}, 
+	"buttonSave": {
+		"message": "Save", 
+		"description": ""
+	}, 
+	"buttonSaveClose": {
+		"message": "Save & Close", 
+		"description": ""
+	}, 
+	"labelName": {
+		"message": "Name:", 
+		"description": ""
+	}, 
+	"labelRunAt": {
+		"message": "Run-At:", 
+		"description": ""
+	}, 
+	"labelRunAtDefault": {
+		"message": "(Default)", 
+		"description": ""
+	}, 
+	"labelHomepage": {
+		"message": "Homepage:", 
+		"description": ""
+	}, 
+	"labelUpdateURL": {
+		"message": "Update URL:", 
+		"description": ""
+	}, 
+	"labelDownloadURL": {
+		"message": "Download URL:", 
+		"description": ""
+	}, 
+	"labelInclude": {
+		"message": "Includes", 
+		"description": ""
+	}, 
+	"labelKeepInclude": {
+		"message": "Keep original include rules", 
+		"description": ""
+	}, 
+	"labelCustomInclude": {
+		"message": "Custom include rules: <em>(One per line)</em>", 
+		"description": ""
+	}, 
+	"labelMatch": {
+		"message": "Matches", 
+		"description": ""
+	}, 
+	"labelKeepMatch": {
+		"message": "Keep original match rules", 
+		"description": ""
+	}, 
+	"labelCustomMatch": {
+		"message": "Custom match rules: <em>(One per line)</em>", 
+		"description": ""
+	}, 
+	"labelExclude": {
+		"message": "Excludes", 
+		"description": ""
+	}, 
+	"labelKeepExclude": {
+		"message": "Keep original exclude rules", 
+		"description": ""
+	}, 
+	"labelCustomExclude": {
+		"message": "Custom exclude rules: <em>(One per line)</em>", 
+		"description": ""
+	}, 
+	"buttonOK": {
+		"message": "OK", 
+		"description": ""
+	}, 
+	"buttonCancel": {
+		"message": "Cancel", 
+		"description": ""
+	}, 
+	"labelExport": {
+		"message": "Export", 
+		"description": ""
+	}, 
+	"anchorExportOptions": {
+		"message": "Option", 
+		"description": ""
+	}, 
+	"labelExportScriptData": {
+		"message": "Export script data", 
+		"description": ""
+	}, 
+	"buttonAllNone": {
+		"message": "All/None", 
+		"description": ""
+	}, 
+	"labelAdvanced": {
+		"message": "Advanced", 
+		"description": ""
+	}, 
+	"labelAutoUpdate": {
+		"message": "Automatically check scripts for updates every day", 
+		"description": ""
+	}, 
+	"labelSearchLink": {
+		"message": "Search URL: ", 
+		"description": ""
+	}, 
+	"labelSearchHint": {
+		"message": "<a title='Search URL must be a URL including *. * stands for the key words generated by Violentmonkey.'>(?)</a>", 
+		"description": ""
+	}, 
+	"buttonDefault": {
+		"message": "Default", 
+		"description": ""
+	}, 
+	"labelData": {
+		"message": "Data", 
+		"description": ""
+	}, 
+	"buttonExport": {
+		"message": "Export to zip", 
+		"description": ""
+	}, 
+	"buttonImport": {
+		"message": "Import from zip", 
+		"description": ""
+	}, 
+	"buttonVacuum": {
+		"message": "Vacuum data", 
+		"description": ""
+	}, 
+	"labelVacuumHint": {
+		"message": "<a title='Discard the redundancy and try to reload the missing resources in cache.'>(?)</a>", 
+		"description": ""
+	}, 
+	"anchorUpdate": {
+		"message": "Check for updates", 
+		"description": ""
+	}, 
+	"buttonEdit": {
+		"message": "Edit", 
+		"description": ""
+	}, 
+	"buttonRemove": {
+		"message": "Remove", 
+		"description": ""
+	}, 
+	"labelNoName": {
+		"message": "No Name", 
+		"description": ""
+	}, 
+	"buttonDisable": {
+		"message": "Disable", 
+		"description": ""
+	}, 
+	"buttonEnable": {
+		"message": "Enable", 
+		"description": ""
+	}, 
+	"confirmNotSaved": {
+		"message": "Modifications are not saved!\nClick OK to discard them or cancel to stay.", 
+		"description": ""
+	}, 
+	"msgImported": {
+		"message": "$1 item(s) are imported.", 
+		"description": ""
+	}, 
+	"buttonVacuuming": {
+		"message": "Vacuuming data...", 
+		"description": ""
+	}, 
+	"labelExporting": {
+		"message": "Exporting data...", 
+		"description": ""
+	}, 
+	"buttonVacuumed": {
+		"message": "Data vacuumed", 
+		"description": ""
+	}, 
+	"menuManageScripts": {
+		"message": "Manage scripts", 
+		"description": ""
+	}, 
+	"menuFindScripts": {
+		"message": "Find scripts for this site", 
+		"description": ""
+	}, 
+	"menuScriptEnabled": {
+		"message": "Scripts enabled", 
+		"description": ""
+	}, 
+	"menuBack": {
+		"message": "Back", 
+		"description": ""
+	}, 
+	"menuCommands": {
+		"message": "Script commands...", 
+		"description": ""
+	}
+}

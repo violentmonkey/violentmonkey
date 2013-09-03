@@ -1,0 +1,32 @@
+{
+	"name": "Violent monkey",
+	"version" : "2.0",
+	"manifest_version" : 2,
+	"description" : "__MSG_extDescription__",
+	"developer": {"name" : "Gerald", "url" : "http://gleo.tk"},
+	"homepage_url":"http://github.com/gera2ld/Violentmonkey-nex",
+	"icons" : {
+		"16":"images/icon16.png",
+		"48":"images/icon48.png",
+		"128":"images/icon128.png"
+	},
+	"default_locale":"en",
+	"browser_action" : {
+		"default_icon":"images/icon19.png",
+		"default_title":"__MSG_extName__",
+		"default_popup":"popup.html"
+	},
+	"background" : {"page" : "background.html"},
+	"options_page" : "options.html",
+	"content_scripts": [{
+		"js": ["injected.js"],
+		"matches": ["<all_urls>"],
+		"include_globs": ["*"],
+		"exclude_globs": [],
+		"run_at": "document_start",
+		"all_frames" : true
+	}],
+	"web_accessible_resources" : [],
+	"permissions" : ["tabs", "<all_urls>", "storage", "webRequest", "webRequestBlocking"],
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'unsafe-eval';"
+}
