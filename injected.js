@@ -334,7 +334,7 @@ function initCommunicator(){
 	s.innerHTML='(function(){var comm='+objEncode(comm)+';comm.init("'+R+'","'+C+'");})();';
 	d.appendChild(s);d.removeChild(s);
 	comm.handleC=handleC;comm.init(C,R);
-	chrome.runtime.sendMessage({cmd:'FindScript'},loadScript);
+	chrome.runtime.sendMessage({cmd:'GetInjected'},loadScript);
 }
 function loadScript(o){
 	o.scripts.forEach(function(i){ids.push(i.id);});

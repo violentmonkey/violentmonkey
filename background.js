@@ -201,7 +201,7 @@ function getMetas(ids,src,callback) {	// for popup menu
 	}
 	getOne();
 }
-function findScript(o,src,callback) {	// for injected
+function getInjected(o,src,callback) {	// for injected
 	function getSettings(){
 		var o=db.transaction('settings').objectStore('settings');
 		o.get('isApplied').onsuccess=function(e){
@@ -564,7 +564,7 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 		},
 		RemoveScript: removeScript,
 		GetData: getData,
-		FindScript: findScript,
+		GetInjected: getInjected,
 		CheckUpdate: checkUpdate,
 		CheckUpdateAll: checkUpdateAll,
 		SaveScript: saveScript,
