@@ -4,8 +4,8 @@
 		"description": "name of this extension"
 	}, 
 	"extAuthor": {
-		"description": "Designed by <a href=mailto:gera2ld@163.com>Gerald</a>", 
-		"message": ""
+		"message": "Designed by <a href=mailto:gera2ld@163.com>Gerald</a>", 
+		"description": ""
 	},
 	"extTranslator": {
 		"message": "Gerald <gera2ld@163.com>", 
@@ -56,7 +56,7 @@
 		"description": ""
 	}, 
 	"labelInstall": {
-		"message": "Install script...", 
+		"message": "Installing script", 
 		"description": ""
 	}, 
 	"buttonConfirmInstall": {

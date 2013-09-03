@@ -53,7 +53,7 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 		var x=new XMLHttpRequest();
 		x.open('GET',data.url,true);
 		x.onloadend=function(){
-			if(this.status==200&&this.responseText) checkScript(this.responseText);
+			if((!this.status||this.status==200)&&this.responseText) checkScript(this.responseText);
 			else error();
 		};
 		x.send();
