@@ -4,7 +4,7 @@
 		"description": "Name of this extension."
 	}, 
 	"extDescription": {
-		"message": "Userscript support for Opera.", 
+		"message": "Wsparcie dla UserScriptów dla Opery.", 
 		"description": "Description for this extension."
 	}, 
 	"extTranslator": {
@@ -52,11 +52,11 @@
 		"description": "Additional CSS for all pages."
 	}, 
 	"labelInstall": {
-		"message": "Installing script", 
+		"message": "Instalowanie skryptu", 
 		"description": "Shown in the title of the confirm page while trying to install a script."
 	}, 
 	"buttonConfirmInstallation": {
-		"message": "Confirm installation", 
+		"message": "Potwierdź instalację", 
 		"description": "Button to confirm installation of a script."
 	}, 
 	"buttonClose": {
@@ -68,23 +68,23 @@
 		"description": "Link to the support page of Violentmonkey."
 	}, 
 	"anchorAuthor": {
-		"message": "Stworzone przez <a href=mailto:gera2ld@163.com>Gerald</a>", 
+		"message": "Stworzone przez <a href=mailto:gera2ld@163.com>Gerald</a>, tłumaczenie MISI90", 
 		"description": "Author shown in the footer of options page, translator information may be added."
 	}, 
 	"msgNotJS": {
-		"message": "URL seems not to be Javascript. It will be loaded directly in 3 seconds.", 
+		"message": "Adres URL nie wygląda na Javascript. Będzie załadowany bezpośrednio za 3 sekundy.", 
 		"description": "Message shown in the confirm page when loading a URL ends with .user.js but seems not to be Javascript. It will then be loaded again directly in 3 seconds."
 	}, 
 	"msgLoadedJS": {
-		"message": "Javascript loaded: $1", 
+		"message": "Javascript załadowany: $1", 
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	}, 
 	"msgErrorLoadingURL": {
-		"message": "Error loading URL: $1", 
+		"message": "Błąd ładowania URL: $1", 
 		"description": "Message shown in the confirm page when Violentmonkey failed to load the URL of a script."
 	}, 
 	"msgLoadingURL": {
-		"message": "Loading URL: $1", 
+		"message": "Ładowanie URL: $1", 
 		"description": "Message shown in the confirm page when a URL of a script is being loaded."
 	}, 
 	"labelOptions": {
@@ -140,7 +140,7 @@
 		"description": "Label of script name."
 	}, 
 	"labelRunAt": {
-		"message": "Uruchom gdy: ", 
+		"message": "Uruchom gdy:", 
 		"description": "Label of script @run-at properties in custom meta data."
 	}, 
 	"labelRunAtDefault": {
@@ -220,7 +220,7 @@
 		"description": "Button to select all scripts or none."
 	}, 
 	"labelAdvanced": {
-		"message": "Advanced", 
+		"message": "Zaawansowane", 
 		"description": "Label shown in the title of advanced dialog."
 	}, 
 	"labelAutoUpdate": {
@@ -296,7 +296,7 @@
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
 	}, 
 	"buttonVacuuming": {
-		"message": "Vacuuming data...", 
+		"message": "Czyszczenie danych...", 
 		"description": "Message shown when data vacuum is in progress."
 	}, 
 	"buttonExport": {
@@ -304,7 +304,7 @@
 		"description": "Button to confirm export."
 	}, 
 	"buttonExporting": {
-		"message": "Exporting data...", 
+		"message": "Eksportowanie danych...", 
 		"description": "Message shown when data export is in progress."
 	}, 
 	"buttonVacuumed": {
