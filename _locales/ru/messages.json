@@ -11,6 +11,10 @@
 		"message": "softovikk", 
 		"description": "Information of the translator."
 	}, 
+	"defaultSearch": {
+		"message": "http://www.google.com/search?q=*", 
+		"description": "URL for searching scripts, * stands for the keywords."
+	}, 
 	"msgUpdated": {
 		"message": "Скрипт обновлен.", 
 		"description": "Message shown when a script is updated/reinstalled."
@@ -55,6 +59,18 @@
 		"message": "Confirm installation", 
 		"description": "Button to confirm installation of a script."
 	}, 
+	"buttonClose": {
+		"message": "Закрыть", 
+		"description": "Button to close window."
+	}, 
+	"anchorSupportPage": {
+		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki>Violentmonkey</a>", 
+		"description": "Link to the support page of Violentmonkey."
+	}, 
+	"anchorAuthor": {
+		"message": "Разработано <a href=mailto:gera2ld@163.com>Gerald</a>", 
+		"description": "Author shown in the footer of options page, translator information may be added."
+	}, 
 	"msgNotJS": {
 		"message": "URL seems not to be Javascript. It will be loaded directly in 3 seconds.", 
 		"description": "Message shown in the confirm page when loading a URL ends with .user.js but seems not to be Javascript. It will then be loaded again directly in 3 seconds."
@@ -91,17 +107,13 @@
 		"message": "Дополнительные опции", 
 		"description": "Button to show the advanced options."
 	}, 
+	"labelInstalledScripts": {
+		"message": "Установленные скрипты", 
+		"description": "Label of the list of installed scripts."
+	}, 
 	"labelShowDetails": {
 		"message": "Показать детали", 
 		"description": "An option to show the details of scripts, such as author, description, etc."
-	}, 
-	"anchorSupportPage": {
-		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki>Violentmonkey</a>", 
-		"description": "Link to the support page of Violentmonkey."
-	}, 
-	"anchorAuthor": {
-		"message": "Разработано <a href=mailto:gera2ld@163.com>Gerald</a>", 
-		"description": "Author shown in the footer of options page, translator information may be added."
 	}, 
 	"labelScriptEditor": {
 		"message": "Редактор скриптов", 
@@ -195,10 +207,6 @@
 		"message": "Экспорт данных", 
 		"description": "Label shown in the title of export dialog."
 	}, 
-	"labelInstalledScripts": {
-		"message": "Установленные скрипты", 
-		"description": "Label of the list of installed scripts."
-	}, 
 	"anchorExportOptions": {
 		"message": "Параметры экспорта", 
 		"description": "Options of export."
@@ -251,10 +259,6 @@
 		"message": "<a title=\"Сбросить избыточность и попробовать перезагрузить недостающие ресурсы в кэше\">(?)</a>", 
 		"description": "Hint for vacuuming data."
 	}, 
-	"buttonClose": {
-		"message": "Закрыть", 
-		"description": "Button to close the confirm window."
-	}, 
 	"anchorUpdate": {
 		"message": "Проверить обновления", 
 		"description": "Check a script for updates."
@@ -266,6 +270,10 @@
 	"buttonRemove": {
 		"message": "Удалить", 
 		"description": "Button to remove a script."
+	}, 
+	"labelNoName": {
+		"message": "Null name", 
+		"description": "Text as the name of a script when no @name is assigned."
 	}, 
 	"labelAuthor": {
 		"message": "Автор: ", 
@@ -283,10 +291,6 @@
 		"message": "Изменения не сохранены!\nНажмите OK, чтобы продолжить или Отменить, чтобы вернуться.", 
 		"description": "Confirm message shown when there are unsaved script modifications."
 	}, 
-	"defaultSearch": {
-		"message": "http://www.google.com/search?q=*", 
-		"description": "URL for searching scripts, * stands for the keywords."
-	}, 
 	"msgImported": {
 		"message": "$1 пункт(ов) импортировано.", 
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
@@ -299,17 +303,13 @@
 		"message": "Экспорт", 
 		"description": "Button to confirm export."
 	}, 
-	"labelExporting": {
+	"buttonExporting": {
 		"message": "Exporting data...", 
 		"description": "Message shown when data export is in progress."
 	}, 
 	"buttonVacuumed": {
 		"message": "Сбросить кэш", 
 		"description": "Message shown when data is vacuumed."
-	}, 
-	"labelNoName": {
-		"message": "Null name", 
-		"description": "Text as the name of a script when no @name is assigned."
 	}, 
 	"menuManageScripts": {
 		"message": "Управление скриптами", 

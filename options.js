@@ -280,7 +280,7 @@ function exported(o){
 }
 xE.onclick=function(e){
 	e.preventDefault();
-	this.disabled=true;this.innerHTML=_('labelExporting');
+	this.disabled=true;this.innerHTML=_('buttonExporting');
 	var i,c=[];
 	for(i=0;i<ids.length;i++)
 		if(xL.childNodes[i].classList.contains('selected')) c.push(ids[i]);

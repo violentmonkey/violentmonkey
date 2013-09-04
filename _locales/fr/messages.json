@@ -11,6 +11,10 @@
 		"message": "10ours", 
 		"description": "Information of the translator."
 	}, 
+	"defaultSearch": {
+		"message": "http://www.google.com/search?q=*", 
+		"description": "URL for searching scripts, * stands for the keywords."
+	}, 
 	"msgUpdated": {
 		"message": "Script mis &agrave; jour.", 
 		"description": "Message shown when a script is updated/reinstalled."
@@ -55,6 +59,18 @@
 		"message": "Confirm installation", 
 		"description": "Button to confirm installation of a script."
 	}, 
+	"buttonClose": {
+		"message": "Fermer", 
+		"description": "Button to close window."
+	}, 
+	"anchorSupportPage": {
+		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki>Violentmonkey</a>", 
+		"description": "Link to the support page of Violentmonkey."
+	}, 
+	"anchorAuthor": {
+		"message": "Programm&eacute; par <a href=mailto:gera2ld@163.com>Gerald</a>  et traduit par 10ours", 
+		"description": "Author shown in the footer of options page, translator information may be added."
+	}, 
 	"msgNotJS": {
 		"message": "URL seems not to be Javascript. It will be loaded directly in 3 seconds.", 
 		"description": "Message shown in the confirm page when loading a URL ends with .user.js but seems not to be Javascript. It will then be loaded again directly in 3 seconds."
@@ -91,17 +107,13 @@
 		"message": "Avanc&eacute;", 
 		"description": "Button to show the advanced options."
 	}, 
+	"labelInstalledScripts": {
+		"message": "Scripts install&eacute;s", 
+		"description": "Label of the list of installed scripts."
+	}, 
 	"labelShowDetails": {
 		"message": "Montrer les d&eacute;tails", 
 		"description": "An option to show the details of scripts, such as author, description, etc."
-	}, 
-	"anchorSupportPage": {
-		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki>Violentmonkey</a>", 
-		"description": "Link to the support page of Violentmonkey."
-	}, 
-	"anchorAuthor": {
-		"message": "Programm&eacute; par <a href=mailto:gera2ld@163.com>Gerald</a>  et traduit par 10ours", 
-		"description": "Author shown in the footer of options page, translator information may be added."
 	}, 
 	"labelScriptEditor": {
 		"message": "Editeur de script", 
@@ -195,10 +207,6 @@
 		"message": "Exporter les donn&eacute;es", 
 		"description": "Label shown in the title of export dialog."
 	}, 
-	"labelInstalledScripts": {
-		"message": "Scripts install&eacute;s", 
-		"description": "Label of the list of installed scripts."
-	}, 
 	"anchorExportOptions": {
 		"message": "Options", 
 		"description": "Options of export."
@@ -251,10 +259,6 @@
 		"message": "<a title=\"Recharger les ressources en cache.\">(?)</a>", 
 		"description": "Hint for vacuuming data."
 	}, 
-	"buttonClose": {
-		"message": "Fermer", 
-		"description": "Button to close the confirm window."
-	}, 
 	"anchorUpdate": {
 		"message": "V&eacute;rifier les mises &agrave; jour", 
 		"description": "Check a script for updates."
@@ -266,6 +270,10 @@
 	"buttonRemove": {
 		"message": "Supprimer", 
 		"description": "Button to remove a script."
+	}, 
+	"labelNoName": {
+		"message": "Null name", 
+		"description": "Text as the name of a script when no @name is assigned."
 	}, 
 	"labelAuthor": {
 		"message": "Auteur : ", 
@@ -283,10 +291,6 @@
 		"message": "Les modifications ne sont pas enregistr&eacute;es !\n OK pour continuer ou annuler pour revenir.", 
 		"description": "Confirm message shown when there are unsaved script modifications."
 	}, 
-	"defaultSearch": {
-		"message": "http://www.google.com/search?q=*", 
-		"description": "URL for searching scripts, * stands for the keywords."
-	}, 
 	"msgImported": {
 		"message": "$1 item(s) are imported.", 
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
@@ -299,17 +303,13 @@
 		"message": "Exporter", 
 		"description": "Button to confirm export."
 	}, 
-	"labelExporting": {
+	"buttonExporting": {
 		"message": "Exporting data...", 
 		"description": "Message shown when data export is in progress."
 	}, 
 	"buttonVacuumed": {
 		"message": "Donn&eacute;es trait&eacute;es", 
 		"description": "Message shown when data is vacuumed."
-	}, 
-	"labelNoName": {
-		"message": "Null name", 
-		"description": "Text as the name of a script when no @name is assigned."
 	}, 
 	"menuManageScripts": {
 		"message": "G&eacute;rer les scripts", 
