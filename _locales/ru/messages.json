@@ -64,7 +64,7 @@
 		"description": "Button to close window."
 	}, 
 	"anchorSupportPage": {
-		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki>Violentmonkey</a>", 
+		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>", 
 		"description": "Link to the support page of Violentmonkey."
 	}, 
 	"anchorAuthor": {
@@ -88,7 +88,7 @@
 		"description": "Message shown in the confirm page when a URL of a script is being loaded."
 	}, 
 	"labelOptions": {
-		"message": "Options", 
+		"message": "Опции", 
 		"description": "Options of this extension."
 	}, 
 	"buttonNew": {
@@ -136,31 +136,31 @@
 		"description": "Button to save modifications of a script and then close the editing page."
 	}, 
 	"labelName": {
-		"message": "Name:", 
+		"message": "Имя:", 
 		"description": "Label of script name."
 	}, 
 	"labelRunAt": {
-		"message": "Run at (@run-at):", 
+		"message": "Запуск:", 
 		"description": "Label of script @run-at properties in custom meta data."
 	}, 
 	"labelRunAtDefault": {
-		"message": "(default)", 
+		"message": "(по умолчанию)", 
 		"description": "Shown when custom @run-at is not assigned."
 	}, 
 	"labelHomepage": {
-		"message": "Homepage:", 
+		"message": "Домашняя страница:", 
 		"description": "Label of script @homepage in custom meta data."
 	}, 
 	"labelUpdateURL": {
-		"message": "Update URL:", 
+		"message": "URL обновления:", 
 		"description": "Label of script @updateURL in custom meta data."
 	}, 
 	"labelDownloadURL": {
-		"message": "Download URL:", 
+		"message": "URL загрузки:", 
 		"description": "Label of script @downloadURL in custom meta data."
 	}, 
 	"labelInclude": {
-		"message": "Includes", 
+		"message": "Включения", 
 		"description": "Label of @include rules."
 	}, 
 	"labelKeepInclude": {
@@ -172,7 +172,7 @@
 		"description": "Label of custom @include rules."
 	}, 
 	"labelMatch": {
-		"message": "Matches", 
+		"message": "Соответствия", 
 		"description": "Label of @match rules."
 	}, 
 	"labelKeepMatch": {
@@ -184,7 +184,7 @@
 		"description": "Label of custom @match rules."
 	}, 
 	"labelExclude": {
-		"message": "Excludes", 
+		"message": "Исключения", 
 		"description": "Label of @exclude rules."
 	}, 
 	"labelKeepExclude": {
@@ -196,7 +196,7 @@
 		"description": "Label of custom @exclude rules."
 	}, 
 	"buttonOK": {
-		"message": "OK", 
+		"message": "ОК", 
 		"description": "Button to confirm modifications."
 	}, 
 	"buttonCancel": {
@@ -220,7 +220,7 @@
 		"description": "Button to select all scripts or none."
 	}, 
 	"labelAdvanced": {
-		"message": "Advanced", 
+		"message": "Дополнительно", 
 		"description": "Label shown in the title of advanced dialog."
 	}, 
 	"labelAutoUpdate": {
