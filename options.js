@@ -49,30 +49,25 @@ function addItem(o){
 	loadItem(o);
 	L.appendChild(o.div);
 }
-function moveUp(i,p){
-	var x=ids[i];
-	ids[i]=ids[i-1];
-	ids[i-1]=x;
-	L.insertBefore(p,p.previousSibling);
-}
-function getSource(e){
-	var o=e.target,p,i;
-	for(p=o;p&&p.parentNode!=L;p=p.parentNode);
-	i=Array.prototype.indexOf.call(L.childNodes,p);
-	return [i,p,o];
-}
-L.onmousedown=function(e){	// for ordering scripts
+(function(){
+	function getSource(e){
+		var o=e.target,p,i;
+		for(p=o;p&&p.parentNode!=L;p=p.parentNode);
+		i=Array.prototype.indexOf.call(L.childNodes,p);
+		return [i,p,o];
+	}
 	function moveItem(e){
 		var m=getSource(e);if(m[0]<0) return;
 		if(m[0]>=0&&m[0]!=t) {
-			c=m;m=c[1];if(c[0]>t) m=m.nextSibling;
+			e=m;m=e[1];if(e[0]>t) m=m.nextSibling;
 			L.insertBefore(o[1],m);
-			t=c[0];
+			t=e[0];
 		}
 	}
 	function movedItem(e){
+		if(!moving) return;moving=false;
 		o[1].classList.remove('moving');
-		L.onmousemove=L.onmouseup=null;
+		L.onmousemove=L.onmouseup=null;L.onmousedown=startMove;
 		if(o[0]!=t) {
 			chrome.runtime.sendMessage({cmd:'Move',data:{id:ids[o[0]],offset:t-o[0]}});
 			var s=t>o[0]?1:-1,i=o[0],x=ids[i];
@@ -80,16 +75,18 @@ L.onmousedown=function(e){	// for ordering scripts
 			ids[t]=x;
 		}
 	}
-	var o=getSource(e),d=o[2].getAttribute('data'),c=null,t=o[0];
-	if(d=='move') {
-		e.preventDefault();
-		o[1].classList.add('moving');
-		L.onmousemove=moveItem;
-		L.onmouseup=movedItem;
+	function startMove(e){
+		o=getSource(e);t=o[0];
+		if(o[2].getAttribute('data')=='move') {
+			if(moving) return;moving=true;
+			e.preventDefault();
+			o[1].classList.add('moving');
+			L.onmousedown=null;
+			L.onmousemove=moveItem;
+			L.onmouseup=movedItem;
+		}
 	}
-};
-L.onclick=function(e){
-	var o=getSource(e),maps={
+	var maps={
 		edit:function(i){
 			E.cur=map[ids[i]];
 			chrome.runtime.sendMessage({cmd:'GetScript',data:E.cur.obj.id},gotScript);
@@ -114,12 +111,16 @@ L.onclick=function(e){
 		update:function(i){
 			chrome.runtime.sendMessage({cmd:'CheckUpdate',data:ids[i]});
 		}
-	},d=o[2].getAttribute('data'),f=maps[d];
-	if(f) {
-		e.preventDefault();
-		f.apply(this,o);
-	}
-};
+	},o,t,moving=false;
+	L.onmousedown=startMove;
+	L.onclick=function(e){
+		var o=getSource(e),d=o[2].getAttribute('data'),f=maps[d];
+		if(f) {
+			e.preventDefault();
+			f.apply(this,o);
+		}
+	};
+})();
 $('bNew').onclick=function(){chrome.runtime.sendMessage({cmd:'NewScript'});};
 $('bUpdate').onclick=function(){chrome.runtime.sendMessage({cmd:'CheckUpdateAll'});};
 $('cDetail').onchange=function(){L.classList.toggle('simple');chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'showDetails',value:this.checked}});};
