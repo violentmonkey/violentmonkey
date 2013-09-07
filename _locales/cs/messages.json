@@ -4,7 +4,7 @@
 		"description": "Name of this extension."
 	}, 
 	"extDescription": {
-		"message": "Userscript support for Opera.", 
+		"message": "Podpora userscriptů pro Opera.", 
 		"description": "Description for this extension."
 	}, 
 	"extTranslator": {
@@ -32,7 +32,7 @@
 		"description": "Message shown when a new version of script is being fetched."
 	}, 
 	"msgNewVersion": {
-		"message": "New version found.", 
+		"message": "Nalezena nová verze.", 
 		"description": "Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided."
 	}, 
 	"msgCheckingForUpdate": {
@@ -52,11 +52,11 @@
 		"description": "Additional CSS for all pages."
 	}, 
 	"labelInstall": {
-		"message": "Installing script", 
+		"message": "Instaluji skript", 
 		"description": "Shown in the title of the confirm page while trying to install a script."
 	}, 
 	"buttonConfirmInstallation": {
-		"message": "Confirm installation", 
+		"message": "Potvrdit instalaci", 
 		"description": "Button to confirm installation of a script."
 	}, 
 	"buttonClose": {
@@ -64,27 +64,27 @@
 		"description": "Button to close window."
 	}, 
 	"anchorSupportPage": {
-		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki>Violentmonkey</a>", 
+		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>", 
 		"description": "Link to the support page of Violentmonkey."
 	}, 
 	"anchorAuthor": {
-		"message": "Design od <a href=mailto:gera2ld@163.com>Gerald</a>, Přeložil: <a href=http://my.opera.com/ahoj1234>ahoj1234</a>", 
+		"message": "Design od <a href=mailto:gera2ld@163.com>Gerald</a>, Přeložil: <a href=http://my.opera.com/ahoj1234 target=_blank>ahoj1234</a>", 
 		"description": "Author shown in the footer of options page, translator information may be added."
 	}, 
 	"msgNotJS": {
-		"message": "URL seems not to be Javascript. It will be loaded directly in 3 seconds.", 
+		"message": "URL vypadá, že není Javascript. Bude načteno přímo za 3 sekundy.", 
 		"description": "Message shown in the confirm page when loading a URL ends with .user.js but seems not to be Javascript. It will then be loaded again directly in 3 seconds."
 	}, 
 	"msgLoadedJS": {
-		"message": "Javascript loaded: $1", 
+		"message": "Javascript načten: $1", 
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	}, 
 	"msgErrorLoadingURL": {
-		"message": "Error loading URL: $1", 
+		"message": "Chyba načítání URL: $1", 
 		"description": "Message shown in the confirm page when Violentmonkey failed to load the URL of a script."
 	}, 
 	"msgLoadingURL": {
-		"message": "Loading URL: $1", 
+		"message": "Načítání URL: $1", 
 		"description": "Message shown in the confirm page when a URL of a script is being loaded."
 	}, 
 	"labelOptions": {
@@ -152,11 +152,11 @@
 		"description": "Label of script @homepage in custom meta data."
 	}, 
 	"labelUpdateURL": {
-		"message": "Update URL:", 
+		"message": "Aktualizovat URL:", 
 		"description": "Label of script @updateURL in custom meta data."
 	}, 
 	"labelDownloadURL": {
-		"message": "Download URL:", 
+		"message": "Stáhnout URL:", 
 		"description": "Label of script @downloadURL in custom meta data."
 	}, 
 	"labelInclude": {
@@ -212,7 +212,7 @@
 		"description": "Options of export."
 	}, 
 	"labelExportScriptData": {
-		"message": "Export script data", 
+		"message": "Export data skriptu", 
 		"description": "An option to export script data along with scripts."
 	}, 
 	"buttonAllNone": {
@@ -220,11 +220,11 @@
 		"description": "Button to select all scripts or none."
 	}, 
 	"labelAdvanced": {
-		"message": "Advanced", 
+		"message": "Pokročilé", 
 		"description": "Label shown in the title of advanced dialog."
 	}, 
 	"labelAutoUpdate": {
-		"message": "Automatically check scripts for updates every day", 
+		"message": "Automaticky kontrolovat aktualizace skriptu každý den", 
 		"description": "An option to allow automatically checking scripts for updates every 24 hours."
 	}, 
 	"labelSearchLink": {
@@ -248,7 +248,7 @@
 		"description": "Button to open the data export dialog."
 	}, 
 	"buttonImportData": {
-		"message": "Import from zip file", 
+		"message": "Importovat ze souboru zip", 
 		"description": "Button to choose a file for data import."
 	}, 
 	"buttonVacuumData": {
@@ -256,7 +256,7 @@
 		"description": "Button to vacuum extension data."
 	}, 
 	"labelVacuumHint": {
-		"message": "<a title=\"Zbavit se nadbytečného a zkusit znovu načíst chybějící zdroje v cache.\">(?)</a>", 
+		"message": "<a title='Zbavit se nadbytečného a zkusit znovu načíst chybějící zdroje v cache.'>(?)</a>", 
 		"description": "Hint for vacuuming data."
 	}, 
 	"anchorUpdate": {
@@ -292,11 +292,11 @@
 		"description": "Confirm message shown when there are unsaved script modifications."
 	}, 
 	"msgImported": {
-		"message": "$1 item(s) are imported.", 
+		"message": "$1 vec(i) jsou importovány.", 
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
 	}, 
 	"buttonVacuuming": {
-		"message": "Vacuuming data...", 
+		"message": "Čištení dat...", 
 		"description": "Message shown when data vacuum is in progress."
 	}, 
 	"buttonExport": {
@@ -304,7 +304,7 @@
 		"description": "Button to confirm export."
 	}, 
 	"buttonExporting": {
-		"message": "Exporting data...", 
+		"message": "Exportování dat...", 
 		"description": "Message shown when data export is in progress."
 	}, 
 	"buttonVacuumed": {
