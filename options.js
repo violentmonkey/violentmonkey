@@ -385,8 +385,9 @@ CodeMirror.commands.save=function(){if(!eS.disabled) setTimeout(eSave,0);};
 CodeMirror.commands.close=E.close=$('eClose').onclick=function(){if(confirmCancel(!eS.disabled)) eClose();};
 
 // Load at last
-var ids=[],map={},cache;
+var ids,map,cache;
 function loadOptions(o){
+	ids=[];map={};L.innerHTML='';
 	cache=o.cache;
 	o.scripts.forEach(function(i){
 		ids.push(i.id);addItem(map[i.id]={obj:i});
@@ -413,7 +414,10 @@ chrome.runtime.onMessage.addListener(function(req,src){
 		NewScript: function(o){
 			ids.push(o.id);addItem(map[o.id]={obj:o});o=map[o.id].div;
 		},
-		Vacuumed: function(){$('aVacuum').innerHTML=_('buttonVacuumed');},
+		Vacuumed: function(){
+			for(var i=0;i<ids.length;i++) map[ids[i]].obj.position=i+1;
+			$('aVacuum').innerHTML=_('buttonVacuumed');
+		},
 	},f=maps[req.cmd];
 	if(f) f(req.data,src);
 });
