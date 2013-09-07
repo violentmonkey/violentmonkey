@@ -110,11 +110,15 @@ function vacuum(o,src,callback) {
 			if(r) {
 				v=r.value;
 				if(!dic[v.uri]) o.delete(v.uri);
+				else dic[v.uri]++;	// stored
 				r.continue();
 			} else finish();
 		};
 	}
 	function finish(){
+		var i;
+		for(i in rq) if(rq[i]==1) fetchRequire(i);
+		for(i in cc) if(cc[i]==1) fetchCache(i);
 		if(!--w) chrome.tabs.sendMessage(src.tab.id,{cmd:'Vacuumed'});
 	}
 	vacuumPosition();
