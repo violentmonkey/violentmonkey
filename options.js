@@ -189,6 +189,8 @@ function importFile(e){
 					vm={};
 					console.log('Error parsing ViolentMonkey configuration.');
 				}
+				if(vm.values) for(z in vm.values) chrome.runtime.sendMessage({cmd:'SetValue',data:{uri:z,values:vm.values[z]}});
+				if(vm.settings) for(z in vm.settings) chrome.runtime.sendMessage({cmd:'SetOption',data:{key:z,value:vm.settings[z]}});
 				getFiles();
 			}); else getFiles();
 		});

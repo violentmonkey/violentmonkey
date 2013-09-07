@@ -95,7 +95,7 @@ function vacuum(o,src,callback) {
 				if(v.meta.icon) cc[v.meta.icon]=1;vl[v.uri]=1;
 				r.continue();
 			} else {
-				setOption('maxPosition',pos=p);
+				setOption({key:'maxPosition',value:pos=p});
 				vacuumDB('require',rq);
 				vacuumDB('cache',cc);
 				vacuumDB('values',vl);
@@ -614,7 +614,7 @@ initDb(function(){
 	getOption('isApplied',null,function(o){
 		chrome.browserAction.setIcon({path:'images/icon19'+(o?'':'w')+'.png'});
 	});
-	setTimeout(autoCheck,2e3);
+	setTimeout(autoCheck,2e4);
 });
 var directUrls={};
 function loadDirectly(o,src,callback){
