@@ -104,7 +104,7 @@
 		"description": "Check all scripts for updates."
 	}, 
 	"buttonAdvanced": {
-		"message": "高级选项", 
+		"message": "高级", 
 		"description": "Button to show the advanced options."
 	}, 
 	"labelInstalledScripts": {

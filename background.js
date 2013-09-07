@@ -95,6 +95,7 @@ function vacuum(o,src,callback) {
 				if(v.meta.icon) cc[v.meta.icon]=1;vl[v.uri]=1;
 				r.continue();
 			} else {
+				setOption('maxPosition',pos=p);
 				vacuumDB('require',rq);
 				vacuumDB('cache',cc);
 				vacuumDB('values',vl);
@@ -282,18 +283,23 @@ function fetchURL(url, cb, type) {
   if (cb) req.onloadend = cb;
   req.send();
 }
+var _cache={},_require={};
 function fetchCache(url) {
+	if(_cache[url]) return;
+	_cache[url]=1;
 	fetchURL(url, function() {
 		if (this.status!=200) return;
 		var o=db.transaction('cache','readwrite').objectStore('cache');
-		o.put({uri:url,data:this.response});
+		o.put({uri:url,data:this.response}).onsuccess=function(){delete _cache[url];};
 	}, 'arraybuffer');
 }
 function fetchRequire(url) {
+	if(_require[url]) return;
+	_require[url]=1;
 	fetchURL(url, function() {
 		if (this.status!=200) return;
 		var o=db.transaction('require','readwrite').objectStore('require');
-		o.put({uri:url,code:this.responseText});
+		o.put({uri:url,code:this.responseText}).onsuccess=function(){delete _require[url];};
 	});
 }
 function updateItem(r){
@@ -395,35 +401,37 @@ function enableScript(d,src,callback) {
 	};
 	if(callback) callback();
 }
+var _update={};
 function checkUpdateO(o) {
-  var r={id: o.id, hideUpdate: 1, status: 2};
+	if(_update[o.id]) return;_update[o.id]=1;
+	function finish(){delete _update[o.id];}
+  var r={id:o.id,hideUpdate:1,status:2};
   function update() {
-    var u = o.custom.downloadURL || o.meta.downloadURL;
-    if (u) {
-      r.message = _('msgUpdating');
-      fetchURL(u, function() {
+    var u=o.custom.downloadURL||o.meta.downloadURL;
+    if(u) {
+      r.message=_('msgUpdating');
+      fetchURL(u,function(){
         parseScript({
 					id: o.id,
           status: this.status,
           code: this.responseText
         });
       });
-    } else r.message = '<span class=new>' + _('msgNewVersion') + '</span>';
-    updateItem(r);
+    } else r.message='<span class=new>'+_('msgNewVersion')+'</span>';
+    updateItem(r);finish();
   }
-  var u = o.custom.updateURL || o.meta.updateURL;
-  if (u) {
-    r.message = _('msgCheckingForUpdate');
-    updateItem(r);
-    fetchURL(u, function() {
-      r.message = _('msgErrorFetchingUpdateInfo');
-      if (this.status == 200) try {
-        var m = parseMeta(this.responseText);
-        if (canUpdate(o.meta.version, m.version)) return update();
-        r.message = _('msgNoUpdate');
-      } catch (e) {}
+  var u=o.custom.updateURL||o.meta.updateURL;
+  if(u) {
+    r.message=_('msgCheckingForUpdate');updateItem(r);
+    fetchURL(u,function() {
+      r.message=_('msgErrorFetchingUpdateInfo');
+      if(this.status==200) try {
+        var m=parseMeta(this.responseText);
+        if(canUpdate(o.meta.version,m.version)) return update();
+        r.message=_('msgNoUpdate');
+      } catch(e){}
       delete r.hideUpdate;
-      updateItem(r);
+      updateItem(r);finish();
     });
   }
 }
@@ -514,13 +522,24 @@ function getData(data,src,callback) {
 	getSettings();
 }
 function exportZip(z,src,callback){
+	function getSettings(){
+		var o=db.transaction('settings').objectStore('settings');
+		o.openCursor().onsuccess=function(e){
+			var r=e.target.result,v;
+			if(r) {
+				v=r.value;
+				d.settings[v.key]=v.value;
+				r.continue();
+			} else getScripts();
+		};
+	}
 	function getScripts(){
 		function loop(){
 			var i=z.data.shift();
 			if(i) o.get(i).onsuccess=function(e){
 				var r=e.target.result;
 				if(r) {
-					d.data.push(r);
+					d.scripts.push(r);
 					if(z.values) values.push(r.uri);
 				}
 				loop();
@@ -544,8 +563,8 @@ function exportZip(z,src,callback){
 		} else finish();
 	}
 	function finish(){callback(d);}
-	var d={data:[]},values=[];
-	getScripts();
+	var d={scripts:[],settings:{}},values=[];
+	getSettings();
 }
 
 chrome.runtime.onConnect.addListener(function(p){

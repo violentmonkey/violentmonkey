@@ -3,7 +3,7 @@
 	"version" : "2.0",
 	"manifest_version" : 2,
 	"description" : "__MSG_extDescription__",
-	"developer": {"name" : "Gerald", "url" : "http://gleo.tk"},
+	"developer": {"name" : "Gerald", "url" : "http://gera2ld.blog.163.com"},
 	"homepage_url":"http://github.com/gera2ld/Violentmonkey-nex",
 	"icons" : {
 		"16":"images/icon16.png",

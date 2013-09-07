@@ -1,7 +1,8 @@
 Violentmonkey
 =============
 
-Violentmonkey provides userscripts support for Chromium-based Opera.
+Violentmonkey provides userscripts support for Chromium-based Opera.  
+Violentmonkey for Opera Presto: <https://github.com/gera2ld/Violentmonkey-oex>
 
 Multiple language
 ---

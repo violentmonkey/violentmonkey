@@ -32,7 +32,7 @@ fieldset{border-radius:5px;}
 #sList{overflow-x:hidden;overflow-y:auto;position:absolute;top:22px;left:0;right:0;bottom:10px;}
 #sList>div{display:block;padding:10px;border-top:1px dashed gray;overflow:hidden;height:80px;position:relative;}
 #sList>div:last-child{border-bottom:1px dashed gray;}
-#sList>div.moving{background:#bb6;border:1px outset gray;}
+#sList>div.moving{background:#bb6;border:1px outset gray;cursor:move;}
 #sList.simple>div{height:50px;}
 #sList .version,#sList .author{margin-left:20px;color:gray;font-style:italic;}
 #sList.simple .author{display:none;}

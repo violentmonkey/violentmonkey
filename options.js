@@ -106,7 +106,6 @@ function addItem(o){
 			chrome.runtime.sendMessage({cmd:'RemoveScript',data:ids[i]});
 			delete map[ids.splice(i,1)[0]];
 			L.removeChild(p);
-			if(i==L.childNodes.length) i--;
 		},
 		update:function(i){
 			chrome.runtime.sendMessage({cmd:'CheckUpdate',data:ids[i]});
@@ -268,7 +267,7 @@ function exported(o){
 	var writer=null,files=[],adding=false,
 			n,_n,names={},vm={scripts:{},settings:o.settings};
 	if(xD.checked) vm.values={};
-	o.data.forEach(function(c){
+	o.scripts.forEach(function(c){
 		var j=0;
 		n=_n=c.custom.name||c.meta.name||'Noname';
 		while(names[n]) n=_n+'_'+(++j);names[n]=1;
