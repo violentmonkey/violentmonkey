@@ -2,17 +2,10 @@
 <html class=fill>
 	<head>
 		<meta http-equiv="content-type" content="text/html;charset=utf-8">
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<link rel="stylesheet" type="text/css" href="lib/codemirror/codemirror.css" />
 		<link rel="shortcut icon" type="image/png" href="icons/icon_16.png" />
-		<script type="text/javascript" src="lib/codemirror/codemirror.js"></script>
-		<script type="text/javascript" src="lib/codemirror/javascript.js"></script>
-		<script type="text/javascript" src="lib/codemirror/continuecomment.js"></script>
-		<script type="text/javascript" src="lib/codemirror/matchbrackets.js"></script>
-		<script type="text/javascript" src="lib/codemirror/match-highlighter.js"></script>
-		<script type="text/javascript" src="lib/codemirror/search.js"></script>
-		<script type="text/javascript" src="lib/codemirror/searchcursor.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css" />
 		<script type="text/javascript" src="lib/zip.js/zip.js"></script>
+		<script type="text/javascript" src="lib/src-min-noconflict/ace.js"></script>
 		<title class=i18n>extName</title>
 	</head>
 	<body class=fill>
@@ -52,7 +45,7 @@
 				<td><h2 class=i18n>labelScriptEditor</h2></td>
 				<td class=buttons><button id=bcustom class=i18n>buttonCustomMeta</button></td>
 			</tr>
-			<tr class=expand><td colspan=2 class=expandr><textarea id=eCode class=expanda></textarea></td></tr>
+			<tr class=expand><td id=eCode colspan=2 class=expandr></td></tr>
 			<tr>
 				<td colspan=2>
 					<label class=left><input type=checkbox id=eUpdate><span class=i18n>labelAllowUpdate</span></label>

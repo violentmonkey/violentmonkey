@@ -93,14 +93,7 @@ function addItem(o){
 		},
 		enable:function(i,p,o){
 			var e=map[ids[i]].obj;
-			if(e.enabled=!e.enabled) {
-				p.classList.remove('disabled');
-				o.innerText=_('buttonDisable');
-			} else {
-				p.classList.add('disabled');
-				o.innerText=_('buttonEnable');
-			}
-			chrome.runtime.sendMessage({cmd:'EnableScript',data:{id:e.id,data:e.enabled}});
+			chrome.runtime.sendMessage({cmd:'EnableScript',data:{id:e.id,data:!e.enabled}});
 		},
 		remove:function(i,p){
 			chrome.runtime.sendMessage({cmd:'RemoveScript',data:ids[i]});
@@ -295,27 +288,14 @@ var E=$('editor'),U=$('eUpdate'),M=$('meta'),
 		mU=$('mUpdateURL'),mD=$('mDownloadURL'),
     mI=$('mInclude'),mE=$('mExclude'),mM=$('mMatch'),
     cI=$('cInclude'),cE=$('cExclude'),cM=$('cMatch'),
-		eS=$('eSave'),eSC=$('eSaveClose'),T;
-CodeMirror.keyMap.vm={
-	'Esc':'close',
-	'Ctrl-S':'save',
-	'fallthrough':'default'
-};
-T=CodeMirror.fromTextArea($('eCode'),{
-	lineNumbers:true,
-	matchBrackets:true,
-	mode:'text/typescript',
-	lineWrapping:true,
-	indentUnit:4,
-	indentWithTabs:true,
-	extraKeys:{"Enter":"newlineAndIndentContinueComment"},
-	keyMap:'vm'
-});
-T.on('change',function(){eS.disabled=eSC.disabled=T.isClean();});
+		eS=$('eSave'),eSC=$('eSaveClose'),T=ace.edit('eCode');
+function markClean(){
+	T.getSession().getUndoManager().reset();
+	eS.disabled=eSC.disabled=true;
+}
 function gotScript(o){
 	switchTo(E);E.scr=o;U.checked=o.update;
-	T.setValue(o.code);T.markClean();T.getDoc().clearHistory();
-	eS.disabled=eSC.disabled=true;T.focus();
+	T.setValue(o.code);markClean();T.focus();T.gotoLine(0,0);
 }
 function eSave(){
 	chrome.runtime.sendMessage({
@@ -329,7 +309,7 @@ function eSave(){
 			}
 		}
 	});
-	T.markClean();eS.disabled=eSC.disabled=true;
+	markClean();
 }
 function eClose(){T.setValue('');switchTo(N);}
 U.onchange=E.markDirty=function(){eS.disabled=eSC.disabled=false;};
@@ -383,8 +363,27 @@ $('mOK').onclick=function(){
 };
 eS.onclick=eSave;
 eSC.onclick=function(){eSave();eClose();};
-CodeMirror.commands.save=function(){if(!eS.disabled) setTimeout(eSave,0);};
-CodeMirror.commands.close=E.close=$('eClose').onclick=function(){if(confirmCancel(!eS.disabled)) eClose();};
+E.close=$('eClose').onclick=function(){if(confirmCancel(!eS.disabled)) eClose();};
+T.setTheme('ace/theme/github');
+(function(s){
+	s.setMode('ace/mode/javascript');
+	s.on('change',E.markDirty);
+	s.setUseSoftTabs(false);
+	s.setUseWrapMode(true);
+	s.setUseWorker(true);
+})(T.getSession());
+T.commands.addCommand({
+	name:'Save',
+	bindKey:{win:'Ctrl-S',mac:'Command-S'},
+	exec:eSave,
+	readOnly:false,
+});
+T.commands.addCommand({
+	name:'Exit',
+	bindKey:{win:'Esc'},
+	exec:E.close,
+	readOnly:true,
+});
 
 // Load at last
 var ids,map,cache;

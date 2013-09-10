@@ -17,8 +17,7 @@ div.right{float:right;}
 tr{vertical-align:top;padding:0;height:1px;}
 tr.expand{height:auto;}
 .expandr{position:relative;}
-.expanda,.frame .CodeMirror{position:absolute;width:100%;height:100%;}
-.CodeMirror{background:white;}
+.expanda{position:absolute;width:100%;height:100%;}
 textarea{width:100%;border:none;margin:0;padding:0;}
 fieldset{border-radius:5px;}
 #main{background:transparent;width:800px;margin:0 auto;border-spacing:0;}
