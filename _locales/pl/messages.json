@@ -119,6 +119,10 @@
 		"message": "Pokaż szczegóły", 
 		"description": "An option to show the details of scripts, such as author, description, etc."
 	}, 
+	"msgLoading": {
+		"message": "Loading...", 
+		"description": "Message shown in the options page before script list is loaded."
+	}, 
 	"labelScriptEditor": {
 		"message": "Edytor skryptów", 
 		"description": "Shown in the title of the script editing page."
@@ -271,6 +275,14 @@
 		"message": "Edytuj", 
 		"description": "Button to edit a script."
 	}, 
+	"buttonDisable": {
+		"message": "Wyłącz", 
+		"description": "Button to disable a script."
+	}, 
+	"buttonEnable": {
+		"message": "Włącz", 
+		"description": "Button to enable a script."
+	}, 
 	"buttonRemove": {
 		"message": "Usuń", 
 		"description": "Button to remove a script."
@@ -282,14 +294,6 @@
 	"labelAuthor": {
 		"message": "Autor: ", 
 		"description": "Label of author shown in the details of a script."
-	}, 
-	"buttonDisable": {
-		"message": "Wyłącz", 
-		"description": "Button to disable a script."
-	}, 
-	"buttonEnable": {
-		"message": "Włącz", 
-		"description": "Button to enable a script."
 	}, 
 	"confirmNotSaved": {
 		"message": "Modyfikacje nie zostały zapisane! Kliknij OK aby wyjść lub Anuluj aby zostać.", 

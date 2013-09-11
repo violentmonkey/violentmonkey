@@ -119,6 +119,10 @@
 		"message": "Zobrazit detaily", 
 		"description": "An option to show the details of scripts, such as author, description, etc."
 	}, 
+	"msgLoading": {
+		"message": "Nahrávám ...", 
+		"description": "Message shown in the options page before script list is loaded."
+	}, 
 	"labelScriptEditor": {
 		"message": "Editor skriptů", 
 		"description": "Shown in the title of the script editing page."
@@ -271,6 +275,14 @@
 		"message": "Editovat", 
 		"description": "Button to edit a script."
 	}, 
+	"buttonDisable": {
+		"message": "Vypnout", 
+		"description": "Button to disable a script."
+	}, 
+	"buttonEnable": {
+		"message": "Zapnout", 
+		"description": "Button to enable a script."
+	}, 
 	"buttonRemove": {
 		"message": "Odstranit", 
 		"description": "Button to remove a script."
@@ -282,14 +294,6 @@
 	"labelAuthor": {
 		"message": "Autor: ", 
 		"description": "Label of author shown in the details of a script."
-	}, 
-	"buttonDisable": {
-		"message": "Vypnout", 
-		"description": "Button to disable a script."
-	}, 
-	"buttonEnable": {
-		"message": "Zapnout", 
-		"description": "Button to enable a script."
 	}, 
 	"confirmNotSaved": {
 		"message": "Modifikace není uložena! Klikni na OK pro zbavení se jí, nebo na zrušit pro zůstání zde.", 

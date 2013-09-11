@@ -119,6 +119,10 @@
 		"message": "显示详情", 
 		"description": "An option to show the details of scripts, such as author, description, etc."
 	}, 
+	"msgLoading": {
+		"message": "加载中...", 
+		"description": "Message shown in the options page before script list is loaded."
+	}, 
 	"labelScriptEditor": {
 		"message": "脚本编辑器", 
 		"description": "Shown in the title of the script editing page."
@@ -271,6 +275,14 @@
 		"message": "编辑", 
 		"description": "Button to edit a script."
 	}, 
+	"buttonDisable": {
+		"message": "禁用", 
+		"description": "Button to disable a script."
+	}, 
+	"buttonEnable": {
+		"message": "启用", 
+		"description": "Button to enable a script."
+	}, 
 	"buttonRemove": {
 		"message": "移除", 
 		"description": "Button to remove a script."
@@ -282,14 +294,6 @@
 	"labelAuthor": {
 		"message": "作者：", 
 		"description": "Label of author shown in the details of a script."
-	}, 
-	"buttonDisable": {
-		"message": "禁用", 
-		"description": "Button to disable a script."
-	}, 
-	"buttonEnable": {
-		"message": "启用", 
-		"description": "Button to enable a script."
 	}, 
 	"confirmNotSaved": {
 		"message": "修改尚未保存！\n点击确定放弃修改或点击取消停留此页面。", 

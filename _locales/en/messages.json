@@ -119,6 +119,10 @@
 		"message": "Show details", 
 		"description": "An option to show the details of scripts, such as author, description, etc."
 	}, 
+	"msgLoading": {
+		"message": "Loading...", 
+		"description": "Message shown in the options page before script list is loaded."
+	}, 
 	"labelScriptEditor": {
 		"message": "Script Editor", 
 		"description": "Shown in the title of the script editing page."
@@ -271,6 +275,14 @@
 		"message": "Edit", 
 		"description": "Button to edit a script."
 	}, 
+	"buttonDisable": {
+		"message": "Disable", 
+		"description": "Button to disable a script."
+	}, 
+	"buttonEnable": {
+		"message": "Enable", 
+		"description": "Button to enable a script."
+	}, 
 	"buttonRemove": {
 		"message": "Remove", 
 		"description": "Button to remove a script."
@@ -282,14 +294,6 @@
 	"labelAuthor": {
 		"message": "Author: ", 
 		"description": "Label of author shown in the details of a script."
-	}, 
-	"buttonDisable": {
-		"message": "Disable", 
-		"description": "Button to disable a script."
-	}, 
-	"buttonEnable": {
-		"message": "Enable", 
-		"description": "Button to enable a script."
 	}, 
 	"confirmNotSaved": {
 		"message": "Modifications are not saved!\nClick OK to discard them or cancel to stay.", 

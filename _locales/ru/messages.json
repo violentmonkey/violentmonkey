@@ -119,6 +119,10 @@
 		"message": "Показать детали", 
 		"description": "An option to show the details of scripts, such as author, description, etc."
 	}, 
+	"msgLoading": {
+		"message": "Loading...", 
+		"description": "Message shown in the options page before script list is loaded."
+	}, 
 	"labelScriptEditor": {
 		"message": "Редактор скриптов", 
 		"description": "Shown in the title of the script editing page."
@@ -271,6 +275,14 @@
 		"message": "Изменить", 
 		"description": "Button to edit a script."
 	}, 
+	"buttonDisable": {
+		"message": "Выключить", 
+		"description": "Button to disable a script."
+	}, 
+	"buttonEnable": {
+		"message": "Включить", 
+		"description": "Button to enable a script."
+	}, 
 	"buttonRemove": {
 		"message": "Удалить", 
 		"description": "Button to remove a script."
@@ -282,14 +294,6 @@
 	"labelAuthor": {
 		"message": "Автор: ", 
 		"description": "Label of author shown in the details of a script."
-	}, 
-	"buttonDisable": {
-		"message": "Выключить", 
-		"description": "Button to disable a script."
-	}, 
-	"buttonEnable": {
-		"message": "Включить", 
-		"description": "Button to enable a script."
 	}, 
 	"confirmNotSaved": {
 		"message": "Изменения не сохранены!\nНажмите OK, чтобы продолжить или Отменить, чтобы вернуться.", 
