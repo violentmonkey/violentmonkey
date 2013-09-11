@@ -6,22 +6,24 @@ function checkScript(t){
 		});
 	} else {	// may be JS code
 		M.innerHTML=_('msgLoadedJS',[data.url]);
-		T.setValue(t);
+		T.setValue(t);T.gotoLine(0,0);
 		I.disabled=false;
 	}
 }
 var $=document.getElementById.bind(document),M=$('msg'),I=$('bInstall'),data={},
-		T=CodeMirror.fromTextArea($('eCode'),{
-			lineNumbers:true,
-			matchBrackets:true,
-			mode:'text/typescript',
-			lineWrapping:true,
-			indentUnit:4,
-			indentWithTabs:true,
-			readOnly:true,
-		});
+		C=$('cClose'),T=ace.edit('eCode');
+T.setTheme('ace/theme/github');
+T.setReadOnly(true);
+(function(s){
+	s.setMode('ace/mode/javascript');
+	s.setUseWrapMode(true);
+	s.setUseWorker(true);
+})(T.getSession());
 initCSS();initI18n();
 $('bClose').onclick=function(){window.close();};
+C.onchange=function(){
+	chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'closeAfterInstall',value:C.checked}});
+};
 I.onclick=function(){
 	chrome.runtime.sendMessage({
 		cmd:'ParseScript',
@@ -38,12 +40,15 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 		ShowMessage: function(o){
 			M.innerHTML=o.message;
 			if(callback) callback();
+			if(o.status>=0&&C.checked) window.close();
 		},
 	},f=maps[req.cmd];
 	if(f) f(req.data,src,callback);
 	return true;
 });
-(function(s){
+chrome.runtime.sendMessage({cmd:'GetOption',data:'closeAfterInstall'},function(o){
+	C.checked=!!o;
+	var s=location.search.slice(1);
 	s.split('&').forEach(function(i){
 		i.replace(/^([^=]*)=(.*)$/,function(r,g1,g2){data[g1]=decodeURIComponent(g2);});
 	});
@@ -58,4 +63,4 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 		};
 		x.send();
 	}
-})(location.search.slice(1));
+});

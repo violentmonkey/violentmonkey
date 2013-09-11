@@ -30,7 +30,7 @@ function loadItem(o,r){
 	+'<span class=message></span>'
 	+'<div class=panelB>'
 		+'<button data=edit>'+_('buttonEdit')+'</button> '
-		+'<button data=enable>'+_(n.enabled?'buttonDisable':'buttonEnable')+'</button> '
+		+'<button data=enable>'+(n.enabled?_('buttonDisable'):_('buttonEnable'))+'</button> '
 		+'<button data=remove>'+_('buttonRemove')+'</button>'
 	+'</div>';
 	d.className=n.enabled?'':'disabled';

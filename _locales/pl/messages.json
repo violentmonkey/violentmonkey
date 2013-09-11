@@ -55,6 +55,10 @@
 		"message": "Instalowanie skryptu", 
 		"description": "Shown in the title of the confirm page while trying to install a script."
 	}, 
+	"optionClose": {
+		"message": "Close after installation", 
+		"description": "Option to close confirm window after installation."
+	}, 
 	"buttonConfirmInstallation": {
 		"message": "Potwierdź instalację", 
 		"description": "Button to confirm installation of a script."

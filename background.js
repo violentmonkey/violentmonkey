@@ -15,6 +15,7 @@ function initDb(callback) {
 			{key:'showButton',value:true},
 			{key:'isApplied',value:true},
 			{key:'autoUpdate',value:true},
+			{key:'closeAfterInstall',value:false},
 			{key:'search',value:_('defaultSearch')},
 		].forEach(function(i){o.add(i);});
 		// scripts: id uri custom meta enabled update code position
@@ -384,7 +385,8 @@ function getOption(data,src,callback){
 	var o=db.transaction('settings').objectStore('settings');
 	o.get(data).onsuccess=function(e){
 		var r=e.target.result;
-		if(callback) callback(r.value);
+		if(r) r=r.value;
+		if(callback) callback(r);
 	};
 }
 function setOption(data,src,callback){

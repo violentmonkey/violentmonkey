@@ -55,6 +55,10 @@
 		"message": "安装脚本", 
 		"description": "Shown in the title of the confirm page while trying to install a script."
 	}, 
+	"optionClose": {
+		"message": "安装完成后关闭", 
+		"description": "Option to close confirm window after installation."
+	}, 
 	"buttonConfirmInstallation": {
 		"message": "确认安装", 
 		"description": "Button to confirm installation of a script."
