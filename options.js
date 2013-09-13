@@ -288,14 +288,15 @@ var E=$('editor'),U=$('eUpdate'),M=$('meta'),
 		mU=$('mUpdateURL'),mD=$('mDownloadURL'),
     mI=$('mInclude'),mE=$('mExclude'),mM=$('mMatch'),
     cI=$('cInclude'),cE=$('cExclude'),cM=$('cMatch'),
-		eS=$('eSave'),eSC=$('eSaveClose'),T=ace.edit('eCode');
+		eS=$('eSave'),eSC=$('eSaveClose'),T;
+initCodeMirror(function(o){T=o;});
 function markClean(){
-	T.getSession().getUndoManager().reset();
+	T.clearHistory();
 	eS.disabled=eSC.disabled=true;
 }
 function gotScript(o){
 	switchTo(E);E.scr=o;U.checked=o.update;
-	T.setValue(o.code);markClean();T.focus();T.gotoLine(0,0);
+	T.setValueAndFocus(o.code);markClean();
 }
 function eSave(){
 	chrome.runtime.sendMessage({
@@ -311,7 +312,7 @@ function eSave(){
 	});
 	markClean();
 }
-function eClose(){T.setValue('');switchTo(N);}
+function eClose(){switchTo(N);}
 U.onchange=E.markDirty=function(){eS.disabled=eSC.disabled=false;};
 function metaChange(){M.dirty=true;}
 [mN,mH,mR,mU,mD,mI,mM,mE,cI,cM,cE].forEach(function(i){i.onchange=metaChange;});
@@ -364,26 +365,6 @@ $('mOK').onclick=function(){
 eS.onclick=eSave;
 eSC.onclick=function(){eSave();eClose();};
 E.close=$('eClose').onclick=function(){if(confirmCancel(!eS.disabled)) eClose();};
-T.setTheme('ace/theme/github');
-(function(s){
-	s.setMode('ace/mode/javascript');
-	s.on('change',E.markDirty);
-	s.setUseSoftTabs(false);
-	s.setUseWrapMode(true);
-	s.setUseWorker(true);
-})(T.getSession());
-T.commands.addCommand({
-	name:'Save',
-	bindKey:{win:'Ctrl-S',mac:'Command-S'},
-	exec:eSave,
-	readOnly:false,
-});
-T.commands.addCommand({
-	name:'Exit',
-	bindKey:{win:'Esc'},
-	exec:E.close,
-	readOnly:true,
-});
 
 // Load at last
 var ids,map,cache;
