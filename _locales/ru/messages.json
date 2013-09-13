@@ -120,7 +120,7 @@
 		"description": "An option to show the details of scripts, such as author, description, etc."
 	}, 
 	"msgLoading": {
-		"message": "Loading...", 
+		"message": "Загрузка ...", 
 		"description": "Message shown in the options page before script list is loaded."
 	}, 
 	"labelScriptEditor": {

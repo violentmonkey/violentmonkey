@@ -1,3 +1,4 @@
+(function(){
 /**
 * http://www.webtoolkit.info/javascript-utf8.html
 */
@@ -46,6 +47,11 @@ var comm={
 	vmid:'VM'+Math.random(),
 	sid:null,
 	did:null,
+	prop1:Object.getOwnPropertyNames(window),
+	prop2:(function(n,p){
+		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
+		return p;
+	})(window,[]),
 	init:function(s,d){
 		comm.sid=comm.vmid+s;
 		comm.did=comm.vmid+d;
@@ -72,7 +78,7 @@ var comm={
 		if(f) f(o.data);
 	},
 	loadScript:function(o){
-		var start=[],body=[],end=[],cache,require,values,elements;
+		var start=[],body=[],end=[],cache,require,values,elements=[];
 		comm.command={};comm.requests={};comm.qrequests=[];
 		function wrapper(c){
 			var t=this,value=values[c.uri];if(!value) value={};
@@ -100,10 +106,8 @@ var comm={
 					});
 				}catch(e){}
 			}
-			var itemWrapper=null;
-			Object.getOwnPropertyNames(window).forEach(wrapItem);
-			itemWrapper=wrapFunction;
-			n=window;while(n=Object.getPrototypeOf(n)) Object.getOwnPropertyNames(n).forEach(wrapItem);
+			var itemWrapper=null;comm.prop1.forEach(wrapItem);
+			itemWrapper=wrapFunction;comm.prop2.forEach(wrapItem);
 
 			function getCache(name){for(var i in resources) if(name==i) return cache[resources[i]];}
 			function propertyToString(){return 'Property for Violentmonkey: designed by Gerald';}
@@ -114,8 +118,9 @@ var comm={
 				Object.defineProperty(obj,name,prop);
 				if(typeof obj[name]=='function') obj[name].toString=propertyToString;
 			}
-			var resources=c.meta.resources||{};elements=[];
+			var resources=c.meta.resources||{};
 			addProperty('unsafeWindow',{value:window});
+
 			// GM functions
 			// Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
 			addProperty('GM_info',{get:function(){
@@ -227,14 +232,17 @@ var comm={
 		}
 		function runEnd(){while(end.length) runCode(end.shift());}
 		function runCode(c){
-			var w=new wrapper(c),req=c.meta.require||[],i,r,f,code=[];
-			elements.forEach(function(i){code.push(i+'=window.'+i);});
-			code=['(function(){var '+code.join(',')+';'];
+			var req=c.meta.require||[],i,r=[],code=[];
+			elements.forEach(function(i){r.push(i+'=window.'+i);});
+			code=['(function(){'];
+			if(r.length) code.push('var '+r.join(',')+';');
 			for(i=0;i<req.length;i++) if(r=require[req[i]]) code.push(r);
-			code.push(c.code);code.push('})();');
+			code.push(c.code);code.push('}).call(window);');
 			code=code.join('\n');
-			f=new Function('w','with(w) eval('+JSON.stringify(code)+');');
-			try{f.call(w,w);}catch(e){
+			try{
+				r=new Function('w','with(w) '+code);
+				r(new wrapper(c));
+			}catch(e){
 				console.log('Error running script: '+(c.custom.name||c.meta.name||c.id)+'\n'+e);
 			}
 		}
@@ -341,3 +349,4 @@ function loadScript(o){
 	comm.post({cmd:'LoadScript',data:o});
 }
 initCommunicator();
+})();
