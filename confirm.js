@@ -6,21 +6,15 @@ function checkScript(t){
 		});
 	} else {	// may be JS code
 		M.innerHTML=_('msgLoadedJS',[data.url]);
-		T.setValue(t);T.gotoLine(0,0);
+		T.setValueAndFocus(t);
 		I.disabled=false;
 	}
 }
 var $=document.getElementById.bind(document),M=$('msg'),I=$('bInstall'),data={},
-		C=$('cClose'),T=ace.edit('eCode');
-T.setTheme('ace/theme/github');
-T.setReadOnly(true);
-(function(s){
-	s.setMode('ace/mode/javascript');
-	s.setUseWrapMode(true);
-	s.setUseWorker(true);
-})(T.getSession());
+		B=$('bClose'),C=$('cClose'),T;
 initCSS();initI18n();
-$('bClose').onclick=function(){window.close();};
+B.onclick=function(){window.close();};
+initEditor(function(o){T=o;},{exit:B.onclick,readonly:true});
 C.onchange=function(){
 	chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'closeAfterInstall',value:C.checked}});
 };

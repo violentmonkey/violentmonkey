@@ -1,4 +1,5 @@
-function initAce(callback){
+function initAce(callback,data){
+	data=data||{};
 	addScript({src:'lib/ace-min-noconflict/ace.js'},function(){
 		var T=ace.edit('eCode'),s=T.getSession();
 		T.setTheme('ace/theme/github');
@@ -6,28 +7,30 @@ function initAce(callback){
 			T.setValue(v);T.focus();T.gotoLine(0,0);
 		};
 		s.setMode('ace/mode/javascript');
-		s.on('change',E.markDirty);
 		s.setUseSoftTabs(false);
 		s.setUseWrapMode(true);
 		s.setUseWorker(true);
 		T.clearHistory=s.getUndoManager().reset;
-		T.commands.addCommand({
+		if(data.onchange) s.on('change',data.onchange);
+		if(data.save) T.commands.addCommand({
 			name:'Save',
 			bindKey:{win:'Ctrl-S',mac:'Command-S'},
-			exec:eSave,
+			exec:data.save,
 			readOnly:false,
 		});
-		T.commands.addCommand({
+		if(data.exit) T.commands.addCommand({
 			name:'Exit',
 			bindKey:{win:'Esc'},
-			exec:E.close,
+			exec:data.exit,
 			readOnly:true,
 		});
+		if(data.readonly) T.setReadOnly(data.readonly);
 		callback(T);
 	});
 }
 
-function initCodeMirror(callback){
+function initCodeMirror(callback,data){
+	data=data||{};
 	addCSS([
 		{href:'lib/CodeMirror/lib/codemirror.css'},
 	]);
@@ -41,13 +44,15 @@ function initCodeMirror(callback){
 			{src:'lib/CodeMirror/addon/search/searchcursor.js'},
 			{src:'lib/CodeMirror/addon/selection/active-line.js'},
 		],function(){
-			CodeMirror.keyMap.vm={
-				'Esc':'close',
-				'Ctrl-S':'save',
-				'fallthrough':'default'
-			};
-			CodeMirror.commands.save=eSave;
-			CodeMirror.commands.close=E.close;
+			CodeMirror.keyMap.vm={'fallthrough':'default'};
+			if(data.save) {
+				CodeMirror.keyMap.vm['Ctrl-S']='save';
+				CodeMirror.commands.save=data.save;
+			}
+			if(data.exit) {
+				CodeMirror.keyMap.vm['Esc']='exit';
+				CodeMirror.commands.exit=data.exit;
+			}
 			var T=CodeMirror($('eCode'),{
 				lineNumbers:true,
 				matchBrackets:true,
@@ -61,9 +66,12 @@ function initCodeMirror(callback){
 			});
 			T.clearHistory=function(){T.getDoc().clearHistory();};
 			T.setValueAndFocus=function(v){T.setValue(v);T.focus();};
-			T.on('change',E.markDirty);
 			T.getWrapperElement().setAttribute('style','position:absolute;height:100%;width:100%;');
+			if(data.onchange) T.on('change',data.onchange);
+			if(data.readonly) T.setOption('readOnly',data.readonly);
 			callback(T);
 		});
 	});
 }
+
+var initEditor=initCodeMirror;
