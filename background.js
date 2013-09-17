@@ -439,7 +439,7 @@ function checkUpdateO(o) {
       delete r.hideUpdate;
       updateItem(r);finish();
     });
-  }
+  } else finish();
 }
 function checkUpdate(id,src,callback) {
 	var o=db.transaction('scripts').objectStore('scripts');
@@ -610,7 +610,7 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 	return true;
 });
 initDb(function(){
-	getOption('maxPosition',function(p){
+	getOption('maxPosition',null,function(p){
 		if(p) pos=p;
 	});
 	getOption('isApplied',null,function(o){
