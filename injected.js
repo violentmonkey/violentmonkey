@@ -47,6 +47,7 @@ var comm={
 	vmid:'VM'+Math.random(),
 	sid:null,
 	did:null,
+	elements:null,
 	prop1:Object.getOwnPropertyNames(window),
 	prop2:(function(n,p){
 		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
@@ -78,7 +79,7 @@ var comm={
 		if(f) f(o.data);
 	},
 	loadScript:function(o){
-		var start=[],body=[],end=[],cache,require,values,elements=[];
+		var start=[],body=[],end=[],cache,require,values;
 		comm.command={};comm.requests={};comm.qrequests=[];
 		function wrapper(c){
 			var t=this,value=values[c.uri];if(!value) value={};
@@ -114,11 +115,11 @@ var comm={
 			function addProperty(name,prop,obj){
 				if('value' in prop) prop.writable=false;
 				prop.configurable=false;
-				if(!obj) {obj=t;elements.push(name);}
+				if(!obj) {obj=t;ele.push(name);}
 				Object.defineProperty(obj,name,prop);
 				if(typeof obj[name]=='function') obj[name].toString=propertyToString;
 			}
-			var resources=c.meta.resources||{};
+			var resources=c.meta.resources||{},ele=[];
 			addProperty('unsafeWindow',{value:window});
 
 			// GM functions
@@ -222,6 +223,7 @@ var comm={
 				var r=new Request(details);
 				return r.req;
 			}});
+			if(!comm.elements) comm.elements=ele;
 		}
 		function runStart(){while(start.length) runCode(start.shift());}
 		function runBody(){
@@ -232,16 +234,15 @@ var comm={
 		}
 		function runEnd(){while(end.length) runCode(end.shift());}
 		function runCode(c){
-			var req=c.meta.require||[],i,r=[],code=[];
-			elements.forEach(function(i){r.push(i+'=window.'+i);});
+			var req=c.meta.require||[],i,r=[],code=[],w=new wrapper(c);
+			comm.elements.forEach(function(i){r.push(i+'=window.'+i);});
 			code=['(function(){'];
 			if(r.length) code.push('var '+r.join(',')+';');
 			for(i=0;i<req.length;i++) if(r=require[req[i]]) code.push(r);
 			code.push(c.code);code.push('}).call(window);');
 			code=code.join('\n');
 			try{
-				r=new Function('w','with(w) '+code);
-				r(new wrapper(c));
+				(new Function('w','with(w) '+code)).call(this,w);
 			}catch(e){
 				console.log('Error running script: '+(c.custom.name||c.meta.name||c.id)+'\n'+e);
 			}
