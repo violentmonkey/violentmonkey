@@ -232,7 +232,7 @@
 		"description": "Label shown in the title of advanced dialog."
 	}, 
 	"labelAutoUpdate": {
-		"message": "每天自动检查脚本更新", 
+		"message": "每天自动更新脚本", 
 		"description": "An option to allow automatically checking scripts for updates every 24 hours."
 	}, 
 	"labelSearchLink": {
