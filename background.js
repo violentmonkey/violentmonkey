@@ -83,25 +83,34 @@ function saveScript(i,src,callback) {
 	return o.put(i);
 }
 function vacuum(o,src,callback) {
-	var cc={},rq={},vl={},w=0;
-	function vacuumPosition(){
-		var o=db.transaction('scripts','readwrite').objectStore('scripts'),p=0;
+	var ids=[],cc={},rq={},vl={},w=0,p=0;
+	function init(){
+		var o=db.transaction('scripts').objectStore('scripts');
 		o.index('position').openCursor().onsuccess=function(e){
 			var r=e.target.result,v,i;
 			if(r) {
-				v=r.value;p++;
-				if(v.position!=p) {v.position=p;o.put(v);}
+				v=r.value;ids.push(v.id);
 				v.meta.require.forEach(function(i){rq[i]=1;});
 				for(i in v.meta.resources) cc[i]=1;
 				if(v.meta.icon) cc[v.meta.icon]=1;vl[v.uri]=1;
 				r.continue();
-			} else {
-				setOption({key:'maxPosition',value:pos=p});
-				vacuumDB('require',rq);
-				vacuumDB('cache',cc);
-				vacuumDB('values',vl);
-			}
+			} else vacuumPosition();
 		};
+	}
+	function vacuumPosition(){
+		var i=ids.shift();
+		if(i) {
+			var o=db.transaction('scripts','readwrite').objectStore('scripts');
+			o.get(i).onsuccess=function(e){
+				var r=e.target.result;r.position=++p;
+				o.put(r).onsuccess=vacuumPosition;
+			};
+		} else {
+			setOption({key:'maxPosition',value:pos=p});
+			vacuumDB('require',rq);
+			vacuumDB('cache',cc);
+			vacuumDB('values',vl);
+		}
 	}
 	function vacuumDB(dbName,dic){
 		w++;
@@ -117,12 +126,14 @@ function vacuum(o,src,callback) {
 		};
 	}
 	function finish(){
-		var i;
-		for(i in rq) if(rq[i]==1) fetchRequire(i);
-		for(i in cc) if(cc[i]==1) fetchCache(i);
-		if(!--w) chrome.tabs.sendMessage(src.tab.id,{cmd:'Vacuumed'});
+		if(!--w) {
+			var i;
+			for(i in rq) if(rq[i]==1) fetchRequire(i);
+			for(i in cc) if(cc[i]==1) fetchCache(i);
+			chrome.tabs.sendMessage(src.tab.id,{cmd:'Vacuumed'});
+		}
 	}
-	vacuumPosition();
+	init();
 	if(callback) callback();
 }
 function move(data,src,callback){
@@ -579,14 +590,7 @@ chrome.runtime.onConnect.addListener(function(p){
 });
 chrome.runtime.onMessage.addListener(function(req,src,callback) {
 	var maps={
-		NewScript:function(o,src,callback){
-			o=newScript();
-			saveScript(o,src).onsuccess=function(e){
-				o.id=e.target.result;
-				chrome.tabs.sendMessage(src.tab.id,{cmd:'NewScript',data:o});
-			};
-			if(callback) callback();
-		},
+		NewScript:function(o,src,callback){callback(newScript());},
 		RemoveScript: removeScript,
 		GetData: getData,
 		GetInjected: getInjected,

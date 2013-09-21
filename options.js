@@ -113,12 +113,15 @@ function addItem(o){
 		}
 	};
 })();
-$('bNew').onclick=function(){chrome.runtime.sendMessage({cmd:'NewScript'});};
+$('bNew').onclick=function(){chrome.runtime.sendMessage({cmd:'NewScript'},function(o){
+	E.cur=null;gotScript(o);
+});};
 $('bUpdate').onclick=function(){chrome.runtime.sendMessage({cmd:'CheckUpdateAll'});};
 $('cDetail').onchange=function(){L.classList.toggle('simple');chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'showDetails',value:this.checked}});};
-var panel=N;
+var panel=null;
 function switchTo(D){
-	panel.classList.add('hide');D.classList.remove('hide');panel=D;
+	if(panel) panel.classList.add('hide');
+	D.classList.remove('hide');panel=D;
 }
 var dialogs=[];
 function showDialog(D,z){
@@ -147,7 +150,7 @@ O.onclick=function(){
 function confirmCancel(dirty){
 	return !dirty||confirm(_('confirmNotSaved'));
 }
-initCSS();initI18n();
+initCSS();initI18n(function(){switchTo(N);});
 
 // Advanced
 var A=$('advanced');
@@ -356,7 +359,7 @@ $('mOK').onclick=function(){
 		c.match=split(mM.value);
 		c._exclude=cE.checked;
 		c.exclude=split(mE.value);
-		loadItem(E.cur,E.scr);
+		if(E.cur) loadItem(E.cur,E.scr);
 		chrome.runtime.sendMessage({cmd:'SaveScript',data:E.scr});
 	}
 	closeDialog();
@@ -393,9 +396,6 @@ function updateItem(r){
 chrome.runtime.sendMessage({cmd:'GetData'},loadOptions);
 chrome.runtime.onMessage.addListener(function(req,src){
 	var maps={
-		NewScript: function(o){
-			ids.push(o.id);addItem(map[o.id]={obj:o});o=map[o.id].div;
-		},
 		Vacuumed: function(){
 			for(var i=0;i<ids.length;i++) map[ids[i]].obj.position=i+1;
 			$('aVacuum').innerHTML=_('buttonVacuumed');
