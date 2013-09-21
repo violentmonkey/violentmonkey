@@ -12,9 +12,7 @@ function checkScript(t){
 }
 var $=document.getElementById.bind(document),M=$('msg'),I=$('bInstall'),data={},
 		B=$('bClose'),C=$('cClose'),T;
-initCSS();initI18n();
 B.onclick=function(){window.close();};
-initEditor(function(o){T=o;},{exit:B.onclick,readonly:true});
 C.onchange=function(){
 	chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'closeAfterInstall',value:C.checked}});
 };
@@ -29,6 +27,8 @@ I.onclick=function(){
 	});
 	I.disabled=true;
 };
+initEditor(function(o){T=o;},{exit:B.onclick,readonly:true});
+initCSS();initI18n(function(){document.body.classList.remove('hide');});
 chrome.runtime.onMessage.addListener(function(req,src,callback) {
 	var maps={
 		ShowMessage: function(o){
