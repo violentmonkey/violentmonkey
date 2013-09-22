@@ -48,6 +48,8 @@ var comm={
 	sid:null,
 	did:null,
 	elements:null,
+	state:0,
+	load:function(){},
 	prop1:Object.getOwnPropertyNames(window),
 	prop2:(function(n,p){
 		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
@@ -79,7 +81,7 @@ var comm={
 		if(f) f(o.data);
 	},
 	loadScript:function(o){
-		var start=[],body=[],end=[],cache,require,values;
+		var start=[],idle=[],end=[],cache,require,values;
 		comm.command={};comm.requests={};comm.qrequests=[];
 		function wrapper(c){
 			var t=this,value=values[c.uri];if(!value) value={};
@@ -186,7 +188,7 @@ var comm={
 				document.head.appendChild(v);
 				return v;
 			}});
-			addProperty('GM_log',{value:console.log});
+			addProperty('GM_log',{value:function(d){console.log(d);}});
 			addProperty('GM_openInTab',{value:function(url){window.open(url);}});
 			addProperty('GM_registerMenuCommand',{value:function(cap,func,acc){
 				comm.command[cap]=func;comm.post({cmd:'RegisterMenu',data:[cap,acc]});
@@ -225,14 +227,7 @@ var comm={
 			}});
 			if(!comm.elements) comm.elements=ele;
 		}
-		function runStart(){while(start.length) runCode(start.shift());}
-		function runBody(){
-			if(document.body) {
-				window.removeEventListener('DOMNodeInserted',runBody,true);
-				while(body.length) runCode(body.shift());
-			}
-		}
-		function runEnd(){while(end.length) runCode(end.shift());}
+		function run(l){while(l.length) runCode(l.shift());}
 		function runCode(c){
 			var req=c.meta.require||[],i,r=[],code=[],w=new wrapper(c);
 			comm.elements.forEach(function(i){r.push(i+'=window.'+i);});
@@ -247,13 +242,17 @@ var comm={
 				console.log('Error running script: '+(c.custom.name||c.meta.name||c.id)+'\n'+e);
 			}
 		}
+		comm.load=function(){
+			if(comm.state>0) run(idle);
+			if(comm.state>1) run(end);
+		};
 
 		var l;
 		o.scripts.forEach(function(i){
 			if(i&&i.enabled) {
 				switch(i.custom['run-at']||i.meta['run-at']){
 					case 'document-start': l=start;break;
-					case 'document-body': l=body;break;
+					case 'document-idle': l=idle;break;
 					default: l=end;
 				}
 				l.push(i);
@@ -262,11 +261,7 @@ var comm={
 		require=o.require;
 		cache=o.cache;
 		values=o.values;
-		runStart();
-		window.addEventListener('DOMNodeInserted',runBody,true);
-		window.addEventListener('DOMContentLoaded',runEnd,false);
-		runBody();
-		if(document.readyState=='complete') runEnd();
+		run(start);comm.load();
 	},
 },menu=[],ids=[];
 function handleC(e){
@@ -340,7 +335,9 @@ function objEncode(o){
 }
 function initCommunicator(){
 	var s=document.createElement('script'),d=document.documentElement,C='C',R='R';
-	s.innerHTML='(function(){var comm='+objEncode(comm)+';comm.init("'+R+'","'+C+'");})();';
+	s.innerHTML='(function(){var comm='+objEncode(comm)+';comm.init("'+R+'","'+C+'");\
+document.addEventListener("readystatechange",function(){comm.state=["loading","interactive","complete"].indexOf(document.readyState);comm.load();},false);\
+document.addEventListener("DOMContentLoaded",function(){comm.state=2;comm.load();},false);})();';
 	d.appendChild(s);d.removeChild(s);
 	comm.handleC=handleC;comm.init(C,R);
 	chrome.runtime.sendMessage({cmd:'GetInjected'},loadScript);

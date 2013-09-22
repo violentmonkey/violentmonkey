@@ -327,7 +327,7 @@ $('bcustom').onclick=function(){
 	mD.value=c.downloadURL||'';
 	switch(c['run-at']){
 		case 'document-start':mR.value='start';break;
-		case 'document-body':mR.value='body';break;
+		case 'document-idle':mR.value='idle';break;
 		case 'document-end':mR.value='end';break;
 		default:mR.value='default';
 	}
@@ -349,7 +349,7 @@ $('mOK').onclick=function(){
 		c.downloadURL=mD.value;
 		switch(mR.value){
 			case 'start':c['run-at']='document-start';break;
-			case 'body':c['run-at']='document-body';break;
+			case 'idle':c['run-at']='document-idle';break;
 			case 'end':c['run-at']='document-end';break;
 			default:delete c['run-at'];
 		}
