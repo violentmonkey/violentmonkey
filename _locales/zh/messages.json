@@ -239,10 +239,6 @@
 		"message": "搜索网址：", 
 		"description": "Label of URL for searching scripts for a site."
 	}, 
-	"labelSearchHint": {
-		"message": "<a title='搜索网址必须包含*，*将替换为由<暴力猴>生成的关键字。'>(?)</a>", 
-		"description": "Hint for the search URL."
-	}, 
 	"buttonDefault": {
 		"message": "默认", 
 		"description": "Button to replace search URL with the default one."
@@ -262,10 +258,6 @@
 	"buttonVacuumData": {
 		"message": "整理数据", 
 		"description": "Button to vacuum extension data."
-	}, 
-	"labelVacuumHint": {
-		"message": "<a title='丢弃多余的数据，并尝试重新获取缺失的资源。'>(?)</a>", 
-		"description": "Hint for vacuuming data."
 	}, 
 	"anchorUpdate": {
 		"message": "查找更新", 
@@ -299,6 +291,10 @@
 		"message": "修改尚未保存！\n点击确定放弃修改或点击取消停留此页面。", 
 		"description": "Confirm message shown when there are unsaved script modifications."
 	}, 
+	"hintSearchLink": {
+		"message": "搜索网址必须包含*，*将替换为由<暴力猴>生成的关键字。", 
+		"description": "Hint for the search URL."
+	}, 
 	"msgImported": {
 		"message": "已导入$1个脚本。", 
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
@@ -306,6 +302,10 @@
 	"buttonVacuuming": {
 		"message": "正在整理...", 
 		"description": "Message shown when data vacuum is in progress."
+	}, 
+	"hintVacuumData": {
+		"message": "丢弃多余的数据，并尝试重新获取缺失的资源。", 
+		"description": "Hint for vacuuming data."
 	}, 
 	"buttonExport": {
 		"message": "导出", 

@@ -239,10 +239,6 @@
 		"message": "hledat URL: ", 
 		"description": "Label of URL for searching scripts for a site."
 	}, 
-	"labelSearchHint": {
-		"message": "<a title='Hledat URL musí být URL obsahující *. * má uplatnění pro klíčová slova generována Violentmonkey.'>(?)</a>", 
-		"description": "Hint for the search URL."
-	}, 
 	"buttonDefault": {
 		"message": "Výchozí", 
 		"description": "Button to replace search URL with the default one."
@@ -262,10 +258,6 @@
 	"buttonVacuumData": {
 		"message": "Vyprázdnit data", 
 		"description": "Button to vacuum extension data."
-	}, 
-	"labelVacuumHint": {
-		"message": "<a title='Zbavit se nadbytečného a zkusit znovu načíst chybějící zdroje v cache.'>(?)</a>", 
-		"description": "Hint for vacuuming data."
 	}, 
 	"anchorUpdate": {
 		"message": "Zkontrolovat aktualizace", 
@@ -299,6 +291,10 @@
 		"message": "Modifikace není uložena! Klikni na OK pro zbavení se jí, nebo na zrušit pro zůstání zde.", 
 		"description": "Confirm message shown when there are unsaved script modifications."
 	}, 
+	"hintSearchLink": {
+		"message": "Hledat URL musí být URL obsahující *. * má uplatnění pro klíčová slova generována Violentmonkey.", 
+		"description": "Hint for the search URL."
+	}, 
 	"msgImported": {
 		"message": "$1 vec(i) jsou importovány.", 
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
@@ -306,6 +302,10 @@
 	"buttonVacuuming": {
 		"message": "Čištení dat...", 
 		"description": "Message shown when data vacuum is in progress."
+	}, 
+	"hintVacuumData": {
+		"message": "Zbavit se nadbytečného a zkusit znovu načíst chybějící zdroje v cache.", 
+		"description": "Hint for vacuuming data."
 	}, 
 	"buttonExport": {
 		"message": "Exportovat", 

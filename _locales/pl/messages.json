@@ -239,10 +239,6 @@
 		"message": "Adres wyszukiwarki:", 
 		"description": "Label of URL for searching scripts for a site."
 	}, 
-	"labelSearchHint": {
-		"message": "<a title='Adres wyszukiwarki musi zawierać *. * oznacza słowa kluczowe generowane przez Violentmonkey.'>(?)</a>", 
-		"description": "Hint for the search URL."
-	}, 
 	"buttonDefault": {
 		"message": "Domyślne", 
 		"description": "Button to replace search URL with the default one."
@@ -262,10 +258,6 @@
 	"buttonVacuumData": {
 		"message": "Wyczyść dane", 
 		"description": "Button to vacuum extension data."
-	}, 
-	"labelVacuumHint": {
-		"message": "<a title=\"Usuń nadmiarowość i spróbuj przeładować brakujące dane w cache.\">(?)</a>", 
-		"description": "Hint for vacuuming data."
 	}, 
 	"anchorUpdate": {
 		"message": "Sprawdź aktualizacje", 
@@ -299,6 +291,10 @@
 		"message": "Modyfikacje nie zostały zapisane! Kliknij OK aby wyjść lub Anuluj aby zostać.", 
 		"description": "Confirm message shown when there are unsaved script modifications."
 	}, 
+	"hintSearchLink": {
+		"message": "Adres wyszukiwarki musi zawierać *. * oznacza słowa kluczowe generowane przez Violentmonkey.", 
+		"description": "Hint for the search URL."
+	}, 
 	"msgImported": {
 		"message": "$1 pozycja(e) zaimportowana(e).", 
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
@@ -306,6 +302,10 @@
 	"buttonVacuuming": {
 		"message": "Czyszczenie danych...", 
 		"description": "Message shown when data vacuum is in progress."
+	}, 
+	"hintVacuumData": {
+		"message": "Usuń nadmiarowość i spróbuj przeładować brakujące dane w cache.", 
+		"description": "Hint for vacuuming data."
 	}, 
 	"buttonExport": {
 		"message": "Eksportuj", 

@@ -239,10 +239,6 @@
 		"message": "Поисковый URL: ", 
 		"description": "Label of URL for searching scripts for a site."
 	}, 
-	"labelSearchHint": {
-		"message": "<a title='Поисковый URL должен включать *, где * - ключевые слова генерируемые Violentmonkey'>(?)</a>", 
-		"description": "Hint for the search URL."
-	}, 
 	"buttonDefault": {
 		"message": "По умолчанию", 
 		"description": "Button to replace search URL with the default one."
@@ -262,10 +258,6 @@
 	"buttonVacuumData": {
 		"message": "Сбросить кэш", 
 		"description": "Button to vacuum extension data."
-	}, 
-	"labelVacuumHint": {
-		"message": "<a title=\"Сбросить избыточность и попробовать перезагрузить недостающие ресурсы в кэше\">(?)</a>", 
-		"description": "Hint for vacuuming data."
 	}, 
 	"anchorUpdate": {
 		"message": "Проверить обновления", 
@@ -299,6 +291,10 @@
 		"message": "Изменения не сохранены!\nНажмите OK, чтобы продолжить или Отменить, чтобы вернуться.", 
 		"description": "Confirm message shown when there are unsaved script modifications."
 	}, 
+	"hintSearchLink": {
+		"message": "Поисковый URL должен включать *, где * - ключевые слова генерируемые Violentmonkey", 
+		"description": "Hint for the search URL."
+	}, 
 	"msgImported": {
 		"message": "$1 пункт(ов) импортировано.", 
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
@@ -306,6 +302,10 @@
 	"buttonVacuuming": {
 		"message": "Vacuuming data...", 
 		"description": "Message shown when data vacuum is in progress."
+	}, 
+	"hintVacuumData": {
+		"message": "Сбросить избыточность и попробовать перезагрузить недостающие ресурсы в кэше", 
+		"description": "Hint for vacuuming data."
 	}, 
 	"buttonExport": {
 		"message": "Экспорт", 

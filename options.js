@@ -157,6 +157,7 @@ var A=$('advanced');
 $('bAdvanced').onclick=function(){showDialog(A);};
 $('cUpdate').onchange=function(){chrome.runtime.sendMessage({cmd:'AutoUpdate',data:this.checked});};
 $('bDefSearch').onclick=function(){$('tSearch').value=_('defaultSearch');};
+$('tSearch').title=_('hintSearchLink');
 $('aExport').onclick=function(){showDialog(X);xLoad();};
 function importFile(e){
 	zip.createReader(new zip.BlobReader(e.target.files[0]),function(r){
@@ -203,6 +204,7 @@ $('aVacuum').onclick=function(){
 	this.innerHTML=_('buttonVacuuming');
 	chrome.runtime.sendMessage({cmd:'Vacuum'});
 };
+$('aVacuum').title=_('hintVacuumData');
 A.close=$('aClose').onclick=function(){
 	chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'search',value:$('tSearch').value}});
 	closeDialog();
