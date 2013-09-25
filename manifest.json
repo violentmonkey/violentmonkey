@@ -4,7 +4,7 @@
 	"manifest_version" : 2,
 	"description" : "__MSG_extDescription__",
 	"developer": {"name" : "Gerald", "url" : "http://gera2ld.blog.163.com"},
-	"homepage_url":"http://github.com/gera2ld/Violentmonkey-nex",
+	"homepage_url":"http://github.com/gera2ld/Violentmonkey/wiki",
 	"icons" : {
 		"16":"images/icon16.png",
 		"48":"images/icon48.png",

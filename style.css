@@ -35,8 +35,7 @@ fieldset{border-radius:5px;}
 #sList>div.moving{background:#bb6;border:1px outset gray;cursor:move;}
 #sList.simple>div{height:50px;}
 #sList .version,#sList .author{margin-left:20px;color:gray;font-style:italic;}
-#sList.simple .author{display:none;}
-#sList.simple .descrip{display:none;}
+#sList.simple .author,#sList.simple .descrip{display:none;}
 #sList .message{color:gray;position:absolute;bottom:10px;left:50px;}
 #sList .icon{width:32px;height:32px;margin:2px;position:absolute;}
 #sList .name{font-weight:bold;line-height:150%;display:inline-block;max-width:400px;margin-left:40px;}

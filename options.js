@@ -20,8 +20,8 @@ function loadItem(o,r){
 	var d=o.div,n=o.obj;
 	d.innerHTML='<img class=icon>'
 	+'<a class="name ellipsis" target=_blank></a>'
-	+'<span class=author></span>'
 	+'<span class=version>'+(n.meta.version?'v'+n.meta.version:'')+'</span>'
+	+'<span class=author></span>'
 	+'<div class=panelT>'
 		+(allowUpdate(n)?'<a data=update class=update href=#>'+_('anchorUpdate')+'</a> ':'')
 		+'<span class=move data=move>&equiv;</span>'
