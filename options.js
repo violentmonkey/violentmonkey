@@ -89,11 +89,11 @@ function addItem(o){
 	var maps={
 		edit:function(i){
 			E.cur=map[ids[i]];
-			chrome.runtime.sendMessage({cmd:'GetScript',data:E.cur.obj.id},gotScript);
+			chrome.runtime.sendMessage({cmd:'GetScript',data:ids[i]},gotScript);
 		},
 		enable:function(i,p,o){
 			var e=map[ids[i]].obj;
-			chrome.runtime.sendMessage({cmd:'EnableScript',data:{id:e.id,data:!e.enabled}});
+			chrome.runtime.sendMessage({cmd:'UpdateMeta',data:{id:e.id,enabled:!e.enabled?1:0}});
 		},
 		remove:function(i,p){
 			chrome.runtime.sendMessage({cmd:'RemoveScript',data:ids[i]});
@@ -310,6 +310,7 @@ function eSave(){
 			code:T.getValue(),
 			message:'',
 			more:{
+				custom:E.scr.custom,
 				update:E.scr.update=U.checked
 			}
 		}
@@ -361,8 +362,7 @@ $('mOK').onclick=function(){
 		c.match=split(mM.value);
 		c._exclude=cE.checked;
 		c.exclude=split(mE.value);
-		if(E.cur) loadItem(E.cur,E.scr);
-		chrome.runtime.sendMessage({cmd:'SaveScript',data:E.scr});
+		E.markDirty();
 	}
 	closeDialog();
 };

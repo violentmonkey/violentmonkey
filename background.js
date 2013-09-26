@@ -356,11 +356,11 @@ function parseScript(o,src,callback) {
 		queryScript(o.id,meta,function(c){
 			if(!c.id){r.status=1;r.message=_('msgInstalled');}
 			if(o.more) for(i in o.more) c[i]=o.more[i];	// for import and user edit
-			c.meta=meta;c.code=o.code;r.obj=getMeta(c);c.uri=getNameURI(c);
+			c.meta=meta;c.code=o.code;c.uri=getNameURI(c);
 			if(o.from&&!c.meta.homepage&&!c.custom.homepage&&!/^(file|data):/.test(o.from)) c.custom.homepage=o.from;
 			if(o.url&&!c.meta.downloadURL&&!c.custom.downloadURL) c.custom.downloadURL=o.url;
 			saveScript(c,src).onsuccess=function(e){
-				r.id=c.id=e.target.result;finish();
+				r.id=c.id=e.target.result;r.obj=getMeta(c);finish();
 			};
 		});
 		meta.require.forEach(fetchRequire);	// @require
@@ -405,14 +405,13 @@ function setOption(data,src,callback){
 	o.put({key:data.key,value:data.value});
 	if(callback) callback(data.value);
 }
-function enableScript(d,src,callback) {
+function updateMeta(d,src,callback) {
 	var o=db.transaction('scripts','readwrite').objectStore('scripts');
 	o.get(d.id).onsuccess=function(e){
-		var r=e.target.result;
+		var r=e.target.result,i;
 		if(!r) return;
-		r.enabled=d.data?1:0;
+		for(i in d) if(i in r) r[i]=d[i];
 		o.put(r).onsuccess=function(e){	// store script without another transaction
-		//saveScript(r,src).onsuccess=function(e){
 			updateItem({id:d.id,obj:getMeta(r),status:0});
 		};
 	};
@@ -597,7 +596,7 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 		CheckUpdate: checkUpdate,
 		CheckUpdateAll: checkUpdateAll,
 		SaveScript: saveScript,
-		EnableScript: enableScript,
+		UpdateMeta: updateMeta,
 		SetValue: setValue,
 		GetOption: getOption,
 		SetOption: setOption,

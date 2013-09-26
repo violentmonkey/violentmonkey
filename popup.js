@@ -36,7 +36,7 @@ function menuScript(s) {
 		symbol: '✓',
     title: s.meta.name,
     onclick: function(e){
-			chrome.runtime.sendMessage({cmd:'EnableScript',data:{id:s.id,data:loadItem(this,!this.data)}});
+			chrome.runtime.sendMessage({cmd:'UpdateMeta',data:{id:s.id,enabled:loadItem(this,!this.data)?1:0}});
     }
   }),s.enabled);
 }
