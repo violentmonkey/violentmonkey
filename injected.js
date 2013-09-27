@@ -56,18 +56,18 @@ var comm={
 		return p;
 	})(window,[]),
 	init:function(s,d){
-		comm.sid=comm.vmid+s;
-		comm.did=comm.vmid+d;
-		document.addEventListener(comm.sid,comm['handle'+s],false);
+		this.sid=this.vmid+s;
+		this.did=this.vmid+d;
+		document.addEventListener(this.sid,this['handle'+s].bind(this),false);
 	},
 	post:function(d){
 		var e=document.createEvent("MutationEvent");
-		e.initMutationEvent(comm.did,false,false,null,null,null,JSON.stringify(d),e.ADDITION);
+		e.initMutationEvent(this.did,false,false,null,null,null,JSON.stringify(d),e.ADDITION);
 		document.dispatchEvent(e);
 	},
 	handleR:function(e){
-		var o=JSON.parse(e.attrName),maps={
-			LoadScript:comm.loadScript,
+		var o=JSON.parse(e.attrName),comm=this,maps={
+			LoadScript:comm.loadScript.bind(comm),
 			Command:function(o){
 				var f=comm.command[o];
 				if(f) f();
@@ -81,7 +81,7 @@ var comm={
 		if(f) f(o.data);
 	},
 	loadScript:function(o){
-		var start=[],idle=[],end=[],cache,require,values;
+		var start=[],idle=[],end=[],cache,require,values,comm=this;
 		comm.command={};comm.requests={};comm.qrequests=[];
 		function wrapper(c){
 			var t=this,value=values[c.uri];if(!value) value={};
@@ -335,9 +335,9 @@ function objEncode(o){
 }
 function initCommunicator(){
 	var s=document.createElement('script'),d=document.documentElement,C='C',R='R';
-	s.innerHTML='(function(){var comm='+objEncode(comm)+';comm.init("'+R+'","'+C+'");\
-document.addEventListener("readystatechange",function(){comm.state=["loading","interactive","complete"].indexOf(document.readyState);comm.load();},false);\
-document.addEventListener("DOMContentLoaded",function(){comm.state=2;comm.load();},false);})();';
+	s.innerHTML='(function(){var c='+objEncode(comm)+';c.init("'+R+'","'+C+'");\
+document.addEventListener("readystatechange",function(){c.state=["loading","interactive","complete"].indexOf(document.readyState);c.load();},false);\
+document.addEventListener("DOMContentLoaded",function(){c.state=2;c.load();},false);})();';
 	d.appendChild(s);d.removeChild(s);
 	comm.handleC=handleC;comm.init(C,R);
 	chrome.runtime.sendMessage({cmd:'GetInjected'},loadScript);
