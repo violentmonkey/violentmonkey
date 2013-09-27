@@ -1,4 +1,4 @@
-function initAce(callback,data){
+/*function initAce(callback,data){
 	data=data||{};
 	addScript({src:'lib/ace-min-noconflict/ace.js'},function(){
 		var T=ace.edit('eCode'),s=T.getSession();
@@ -27,22 +27,28 @@ function initAce(callback,data){
 		if(data.readonly) T.setReadOnly(data.readonly);
 		callback(T);
 	});
-}
+}*/
 
-/*function initCodeMirror(callback,data){
+function initCodeMirror(callback,data){
 	data=data||{};
 	addCSS([
 		{href:'lib/CodeMirror/lib/codemirror.css'},
+		{href:'mylib/CodeMirror/fold.css'},
 	]);
 	addScript({src:'lib/CodeMirror/lib/codemirror.js'},function(){
 		addScript([
 			{src:'lib/CodeMirror/mode/javascript/javascript.js'},
 			{src:'lib/CodeMirror/addon/comment/continuecomment.js'},
 			{src:'lib/CodeMirror/addon/edit/matchbrackets.js'},
+			{src:'lib/CodeMirror/addon/edit/closebrackets.js'},
+			{src:'lib/CodeMirror/addon/fold/foldcode.js'},
+			{src:'lib/CodeMirror/addon/fold/foldgutter.js'},
+			{src:'lib/CodeMirror/addon/fold/brace-fold.js'},
+			{src:'lib/CodeMirror/addon/fold/comment-fold.js'},
 			{src:'lib/CodeMirror/addon/search/match-highlighter.js'},
-			{src:'lib/CodeMirror/addon/search/search.js'},
 			{src:'lib/CodeMirror/addon/search/searchcursor.js'},
 			{src:'lib/CodeMirror/addon/selection/active-line.js'},
+			{src:'mylib/CodeMirror/search.js'},
 		],function(){
 			CodeMirror.keyMap.vm={'fallthrough':'default'};
 			if(data.save) {
@@ -54,15 +60,19 @@ function initAce(callback,data){
 				CodeMirror.commands.exit=data.exit;
 			}
 			var T=CodeMirror($('eCode'),{
-				lineNumbers:true,
+				continueComments:true,
 				matchBrackets:true,
-				mode:'text/typescript',
+				autoCloseBrackets:true,
+				highlightSelectionMatches:true,
+				lineNumbers:true,
+				mode:'javascript',
 				lineWrapping:true,
 				indentUnit:4,
 				indentWithTabs:true,
-				extraKeys:{"Enter":"newlineAndIndentContinueComment"},
 				keyMap:'vm',
 				styleActiveLine:true,
+				foldGutter:true,
+				gutters:['CodeMirror-linenumbers','CodeMirror-foldgutter'],
 			});
 			T.clearHistory=function(){T.getDoc().clearHistory();};
 			T.setValueAndFocus=function(v){T.setValue(v);T.focus();};
@@ -72,6 +82,6 @@ function initAce(callback,data){
 			callback(T);
 		});
 	});
-}*/
+}
 
-var initEditor=initAce;
+var initEditor=initCodeMirror;
