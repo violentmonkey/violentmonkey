@@ -34,6 +34,7 @@ function initCodeMirror(callback,data){
 	addCSS([
 		{href:'lib/CodeMirror/lib/codemirror.css'},
 		{href:'mylib/CodeMirror/fold.css'},
+		{href:'mylib/CodeMirror/search.css'},
 	]);
 	addScript({src:'lib/CodeMirror/lib/codemirror.js'},function(){
 		addScript([
