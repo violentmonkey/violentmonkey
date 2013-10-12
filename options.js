@@ -379,10 +379,10 @@ function loadOptions(o){
 	o.scripts.forEach(function(i){
 		ids.push(i.id);addItem(map[i.id]={obj:i});
 	});
-	$('cUpdate').checked=o.autoUpdate;
-	$('tSearch').value=o.search;
-	if(!($('cDetail').checked=o.showDetails)) L.classList.add('simple');
-	xD.checked=o.withData;
+	$('cUpdate').checked=o.settings.autoUpdate;
+	$('tSearch').value=o.settings.search;
+	if(!($('cDetail').checked=o.settings.showDetails)) L.classList.add('simple');
+	xD.checked=o.settings.withData;
 }
 function updateItem(r){
 	if(!('id' in r)) return;

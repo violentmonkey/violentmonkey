@@ -2,22 +2,9 @@ var db,port=null,pos=0;
 function initDb(callback) {
 	var request=indexedDB.open('Violentmonkey',1);
 	request.onsuccess=function(e){db=request.result;if(callback) callback();};
-	request.onerror=function(e){console.log('IndexedDB error: '+e.target.webkitErrorMessage);};
+	request.onerror=function(e){console.log('IndexedDB error: '+e.target.error.message);};
 	request.onupgradeneeded=function(e){
-		var r=e.currentTarget.result,o,i;
-		// settings: key value
-		o=r.createObjectStore('settings',{keyPath:'key'});
-		[
-			{key:'showDetails',value:false},
-			{key:'lastUpdate',value:0},
-			{key:'maxPosition',value:0},
-			{key:'withData',value:true},
-			{key:'showButton',value:true},
-			{key:'isApplied',value:true},
-			{key:'autoUpdate',value:true},
-			{key:'closeAfterInstall',value:false},
-			{key:'search',value:_('defaultSearch')},
-		].forEach(function(i){o.add(i);});
+		var r=e.currentTarget.result,o;
 		// scripts: id uri custom meta enabled update code position
 		o=r.createObjectStore('scripts',{keyPath:'id',autoIncrement:true});
 		o.createIndex('uri','uri',{unique:true});
@@ -30,10 +17,6 @@ function initDb(callback) {
 		// values: uri values
 		o=r.createObjectStore('values',{keyPath:'uri'});
 	};
-}
-function newPosition(){
-	setOption({key:'maxPosition',value:++pos});
-	return pos;
 }
 function getNameURI(i) {
   var ns=i.meta.namespace||'',n=i.meta.name||'',k=escape(ns)+':'+escape(n)+':';
@@ -78,7 +61,7 @@ function saveScript(i,src,callback) {
 	var o=db.transaction('scripts','readwrite').objectStore('scripts');
 	i.enabled=i.enabled?1:0;
 	i.update=i.update?1:0;
-	if(!i.position) i.position=newPosition();
+	if(!i.position) i.position=++pos;
 	if(callback) callback();
 	return o.put(i);
 }
@@ -106,7 +89,7 @@ function vacuum(o,src,callback) {
 				o.put(r).onsuccess=vacuumPosition;
 			};
 		} else {
-			setOption({key:'maxPosition',value:pos=p});
+			pos=p;
 			vacuumDB('require',rq);
 			vacuumDB('cache',cc);
 			vacuumDB('values',vl);
@@ -149,11 +132,10 @@ function move(data,src,callback){
 			s='next';
 		}
 		o.index('position').openCursor(k,s).onsuccess=function(e){
-			var p=e.target.result,v,y;
+			var p=e.target.result,v;
 			if(p) {
 				data.offset--;
-				v=p.value;y=v.position;
-				v.position=x;o.put(v);x=y;
+				v=p.value;v.position=x;o.put(v);x=p.key;
 				if(data.offset) p.continue();
 				else {r.position=x;o.put(r);}
 			}
@@ -219,14 +201,6 @@ function getMetas(ids,src,callback) {	// for popup menu
 	getOne();
 }
 function getInjected(o,src,callback) {	// for injected
-	function getSettings(){
-		var o=db.transaction('settings').objectStore('settings');
-		o.get('isApplied').onsuccess=function(e){
-			var r=e.target.result;
-			if(data.isApplied=r.value) getScripts();
-			else finish();
-		};
-	}
 	function getScripts(){
 		function addCache(i,c,d){
 			if(!(i in d)) {c.push(i);d[i]=null;}
@@ -289,8 +263,8 @@ function getInjected(o,src,callback) {	// for injected
 		loop();
 	}
 	function finish(){callback(data);}
-	var data={isApplied:true,scripts:[],require:{},cache:{},values:{}},cache=[],values=[],require=[];
-	getSettings();
+	var data={scripts:[],require:{},cache:{},values:{}},cache=[],values=[],require=[];
+	if(data.isApplied=settings.isApplied) getScripts(); else finish();
 }
 function fetchURL(url, cb, type) {
   var req = new XMLHttpRequest();
@@ -392,18 +366,33 @@ function setValue(data,src,callback){
 	o.put({uri:data.uri,values:data.values});
 	if(callback) callback();	// it seems that CALLBACK does not work with READWRITE transaction
 }
-function getOption(data,src,callback){
-	var o=db.transaction('settings').objectStore('settings');
-	o.get(data).onsuccess=function(e){
-		var r=e.target.result;
-		if(r) r=r.value;
-		if(callback) callback(r);
-	};
+function getOption(k,src,callback){
+	var v=localStorage.getItem(k)||'';
+	try{
+		v=JSON.parse(v);
+	}catch(e){
+		return false;
+	}
+	settings[k]=v;
+	if(callback) callback(v);
+	return true;
 }
-function setOption(data,src,callback){
-	var o=db.transaction('settings','readwrite').objectStore('settings');
-	o.put({key:data.key,value:data.value});
-	if(callback) callback(data.value);
+function setOption(o,src,callback){
+	localStorage.setItem(o.key,JSON.stringify(o.value));
+	settings[o.key]=o.value;
+	if(callback) callback(o.value);
+}
+function initSettings(){
+	function init(k,v){
+		if(!getOption(k)) setOption({key:k,value:v});
+	}
+	init('isApplied',true);
+	init('autoUpdate',true);
+	init('lastUpdate',0);
+	init('showDetails',false);
+	init('withData',true);
+	init('closeAfterInstall',false);
+	init('search',_('defaultSearch'));
 }
 function updateMeta(d,src,callback) {
 	var o=db.transaction('scripts','readwrite').objectStore('scripts');
@@ -475,12 +464,10 @@ function checkUpdateAll(e,src,callback) {
 var checking=false;
 function autoCheck() {
   function check() {
-		getOption('autoUpdate',null,function(a){
-			if(a) getOption('lastUpdate',null,function(l){
-				if(Date.now()-l>=864e5) checkUpdateAll();
-				setTimeout(check,36e5);
-			}); else checking=false;
-		});
+		if(settings.autoUpdate) {
+			if(Date.now()-settings.lastUpdate>=864e5) checkUpdateAll();
+			setTimeout(check,36e5);
+		} else checking=false;
   }
   if(!checking) {checking=true;check();}
 }
@@ -489,29 +476,18 @@ function autoUpdate(o,src,callback){
 	setOption({key:'autoUpdate',value:o},src,autoCheck);
 	if(callback) callback(o);
 }
-function getData(data,src,callback) {
-	function getSettings(){
-		var o=db.transaction('settings').objectStore('settings');
-		o.openCursor().onsuccess=function(e){
-			var r=e.target.result,v;
-			if(r) {
-				v=r.value;
-				settings[v.key]=v.value;
-				r.continue();
-			} else getScripts();
-		};
-	}
+function getData(d,src,callback) {
 	function getScripts(){
 		var o=db.transaction('scripts').objectStore('scripts');
 		o.index('position').openCursor().onsuccess=function(e){
 			var r=e.target.result,v;
 			if(r) {
 				v=r.value;
-				if(v.meta.icon&&!(v.meta.icon in settings.cache)) {
+				if(v.meta.icon&&!(v.meta.icon in data.cache)) {
 					cache.push(v.meta.icon);
-					settings.cache[v.meta.icon]=null;
+					data.cache[v.meta.icon]=null;
 				}
-				settings.scripts.push(getMeta(v));
+				data.scripts.push(getMeta(v));
 				r.continue();
 			} else getCache();
 		};
@@ -525,30 +501,19 @@ function getData(data,src,callback) {
 					var r=e.target.result;
 					if(r) {
 						var b=new Blob([r.data],{type:'image/png'});
-						settings.cache[i]=URL.createObjectURL(b);
+						data.cache[i]=URL.createObjectURL(b);
 						URL.revokeObjectURL(b);
 					}
 					loop();
 				};
-			} else callback(settings);
+			} else callback(data);
 		}
 		loop();
 	}
-	var settings={scripts:[],cache:{}},cache=[];
-	getSettings();
+	var data={settings:settings,scripts:[],cache:{}},cache=[];
+	getScripts();
 }
 function exportZip(z,src,callback){
-	function getSettings(){
-		var o=db.transaction('settings').objectStore('settings');
-		o.openCursor().onsuccess=function(e){
-			var r=e.target.result,v;
-			if(r) {
-				v=r.value;
-				d.settings[v.key]=v.value;
-				r.continue();
-			} else getScripts();
-		};
-	}
 	function getScripts(){
 		function loop(){
 			var i=z.data.shift();
@@ -579,8 +544,8 @@ function exportZip(z,src,callback){
 		} else finish();
 	}
 	function finish(){callback(d);}
-	var d={scripts:[],settings:{}},values=[];
-	getSettings();
+	var d={scripts:[],settings:settings},values=[];
+	getScripts();
 }
 
 chrome.runtime.onConnect.addListener(function(p){
@@ -612,13 +577,14 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 	if(f) f(req.data,src,callback);
 	return true;
 });
+var settings={};
+initSettings();
 initDb(function(){
-	getOption('maxPosition',null,function(p){
-		if(p) pos=p;
-	});
-	getOption('isApplied',null,function(o){
-		chrome.browserAction.setIcon({path:'images/icon19'+(o?'':'w')+'.png'});
-	});
+	var o=db.transaction('scripts').objectStore('scripts');
+	o.index('position').openCursor(null,'prev').onsuccess=function(e){
+		var r=e.target.result;pos=r.key;
+	};
+	chrome.browserAction.setIcon({path:'images/icon19'+(settings.isApplied?'':'w')+'.png'});
 	setTimeout(autoCheck,2e4);
 });
 var directUrls={};
