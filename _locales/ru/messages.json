@@ -21,7 +21,7 @@
 	}, 
 	"msgErrorFetchingScript": {
 		"message": "Ошибка чтения скрипта!", 
-		"description": "Message shown when Violentmonkey failed fetching a new version of the script."
+		"description": "Message shown when Violentmonkey fails fetching a new version of the script."
 	}, 
 	"msgInstalled": {
 		"message": "Скрипт установлен.", 
@@ -41,7 +41,7 @@
 	}, 
 	"msgErrorFetchingUpdateInfo": {
 		"message": "Не удается найти обновления.", 
-		"description": "Message shown when Violentmonkey failed fetching version data of the script."
+		"description": "Message shown when Violentmonkey fails fetching version data of the script."
 	}, 
 	"msgNoUpdate": {
 		"message": "Обновления не найдены.", 
@@ -117,7 +117,7 @@
 	}, 
 	"labelShowDetails": {
 		"message": "Показать детали", 
-		"description": "An option to show the details of scripts, such as author, description, etc."
+		"description": "Option to show the details of scripts, such as author, description, etc."
 	}, 
 	"msgLoading": {
 		"message": "Загрузка ...", 
@@ -133,7 +133,7 @@
 	}, 
 	"labelAllowUpdate": {
 		"message": "Разрешить обновление", 
-		"description": "An option to allow checking updates for a script."
+		"description": "Option to allow checking updates for a script."
 	}, 
 	"buttonSave": {
 		"message": "Сохранить", 
@@ -173,7 +173,7 @@
 	}, 
 	"labelKeepInclude": {
 		"message": "Сохранять оригинальные правила include", 
-		"description": "An option to keep the original @include rules."
+		"description": "Option to keep the original @include rules."
 	}, 
 	"labelCustomInclude": {
 		"message": "Пользовательские правила include: <em>(По одному на строку)</em>", 
@@ -185,7 +185,7 @@
 	}, 
 	"labelKeepMatch": {
 		"message": "Сохранять оригинальные правила match", 
-		"description": "An option to keep the original @match rules."
+		"description": "Option to keep the original @match rules."
 	}, 
 	"labelCustomMatch": {
 		"message": "Пользовательские правила match: <em>(По одному на строку)</em>", 
@@ -197,7 +197,7 @@
 	}, 
 	"labelKeepExclude": {
 		"message": "Сохранять оригинальные правила exclude", 
-		"description": "An option to keep the original @exclude rules."
+		"description": "Option to keep the original @exclude rules."
 	}, 
 	"labelCustomExclude": {
 		"message": "Пользовательские правила exclude: <em>(По одному на строку)</em>", 
@@ -221,7 +221,7 @@
 	}, 
 	"labelExportScriptData": {
 		"message": "Экспортировать данные", 
-		"description": "An option to export script data along with scripts."
+		"description": "Option to export script data along with scripts."
 	}, 
 	"buttonAllNone": {
 		"message": "Всё/Ничего", 
@@ -233,7 +233,7 @@
 	}, 
 	"labelAutoUpdate": {
 		"message": "Ежедневно проверять обновления скриптов", 
-		"description": "An option to allow automatically checking scripts for updates every 24 hours."
+		"description": "Option to allow automatically checking scripts for updates every 24 hours."
 	}, 
 	"labelSearchLink": {
 		"message": "Поисковый URL: ", 
@@ -338,5 +338,21 @@
 	"menuCommands": {
 		"message": "Команды сценария...", 
 		"description": "Menu item to list script commands."
+	}, 
+	"labelSearch": {
+		"message": "Search for: ", 
+		"description": "Label for search input in search box."
+	}, 
+	"labelReplace": {
+		"message": "Replace with: ", 
+		"description": "Label for replace input in search box."
+	}, 
+	"buttonReplace": {
+		"message": "Replace", 
+		"description": "Button to replace the current match."
+	}, 
+	"buttonReplaceAll": {
+		"message": "All", 
+		"description": "Button to replace all matches."
 	}
 }

@@ -21,7 +21,7 @@
 	}, 
 	"msgErrorFetchingScript": {
 		"message": "获取脚本发生错误！", 
-		"description": "Message shown when Violentmonkey failed fetching a new version of the script."
+		"description": "Message shown when Violentmonkey fails fetching a new version of the script."
 	}, 
 	"msgInstalled": {
 		"message": "脚本已安装。", 
@@ -41,7 +41,7 @@
 	}, 
 	"msgErrorFetchingUpdateInfo": {
 		"message": "获取更新信息失败。", 
-		"description": "Message shown when Violentmonkey failed fetching version data of the script."
+		"description": "Message shown when Violentmonkey fails fetching version data of the script."
 	}, 
 	"msgNoUpdate": {
 		"message": "未发现新版本。", 
@@ -117,7 +117,7 @@
 	}, 
 	"labelShowDetails": {
 		"message": "显示详情", 
-		"description": "An option to show the details of scripts, such as author, description, etc."
+		"description": "Option to show the details of scripts, such as author, description, etc."
 	}, 
 	"msgLoading": {
 		"message": "加载中 ...", 
@@ -133,7 +133,7 @@
 	}, 
 	"labelAllowUpdate": {
 		"message": "允许更新", 
-		"description": "An option to allow checking updates for a script."
+		"description": "Option to allow checking updates for a script."
 	}, 
 	"buttonSave": {
 		"message": "保存", 
@@ -173,7 +173,7 @@
 	}, 
 	"labelKeepInclude": {
 		"message": "保留原有的包含规则", 
-		"description": "An option to keep the original @include rules."
+		"description": "Option to keep the original @include rules."
 	}, 
 	"labelCustomInclude": {
 		"message": "自定义包含规则：<em>（每行一个）</em>", 
@@ -185,7 +185,7 @@
 	}, 
 	"labelKeepMatch": {
 		"message": "保留原有的匹配规则", 
-		"description": "An option to keep the original @match rules."
+		"description": "Option to keep the original @match rules."
 	}, 
 	"labelCustomMatch": {
 		"message": "自定义匹配规则：<em>（每行一个）</em>", 
@@ -197,7 +197,7 @@
 	}, 
 	"labelKeepExclude": {
 		"message": "保留原有的排除规则", 
-		"description": "An option to keep the original @exclude rules."
+		"description": "Option to keep the original @exclude rules."
 	}, 
 	"labelCustomExclude": {
 		"message": "自定义排除规则：<em>（每行一个）</em>", 
@@ -221,7 +221,7 @@
 	}, 
 	"labelExportScriptData": {
 		"message": "导出脚本数据", 
-		"description": "An option to export script data along with scripts."
+		"description": "Option to export script data along with scripts."
 	}, 
 	"buttonAllNone": {
 		"message": "全选/不选", 
@@ -233,7 +233,7 @@
 	}, 
 	"labelAutoUpdate": {
 		"message": "每天自动更新脚本", 
-		"description": "An option to allow automatically checking scripts for updates every 24 hours."
+		"description": "Option to allow automatically checking scripts for updates every 24 hours."
 	}, 
 	"labelSearchLink": {
 		"message": "搜索网址：", 
@@ -338,5 +338,21 @@
 	"menuCommands": {
 		"message": "脚本命令...", 
 		"description": "Menu item to list script commands."
+	}, 
+	"labelSearch": {
+		"message": "查找：", 
+		"description": "Label for search input in search box."
+	}, 
+	"labelReplace": {
+		"message": "替换：", 
+		"description": "Label for replace input in search box."
+	}, 
+	"buttonReplace": {
+		"message": "替换", 
+		"description": "Button to replace the current match."
+	}, 
+	"buttonReplaceAll": {
+		"message": "所有", 
+		"description": "Button to replace all matches."
 	}
 }
