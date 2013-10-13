@@ -1,15 +1,3 @@
-function checkScript(t){
-	if(/^\s*</.test(t)) {	// seems to be HTML code
-		M.innerHTML=_('msgNotJS',[data.url]);
-		chrome.runtime.sendMessage({cmd:'LoadDirectly',data:data.url},function(){
-			setTimeout(function(){location.replace(data.url);},3000);
-		});
-	} else {	// may be JS code
-		M.innerHTML=_('msgLoadedJS',[data.url]);
-		T.setValueAndFocus(t);
-		I.disabled=false;
-	}
-}
 var $=document.getElementById.bind(document),M=$('msg'),I=$('bInstall'),data={},
 		B=$('bClose'),C=$('cClose'),T;
 B.onclick=function(){window.close();};
@@ -27,8 +15,6 @@ I.onclick=function(){
 	});
 	I.disabled=true;
 };
-initEditor(function(o){T=o;},{exit:B.onclick,readonly:true});
-initCSS();initI18n(function(){document.body.classList.remove('hide');});
 chrome.runtime.onMessage.addListener(function(req,src,callback) {
 	var maps={
 		ShowMessage: function(o){
@@ -40,10 +26,10 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 	if(f) f(req.data,src,callback);
 	return true;
 });
-chrome.runtime.sendMessage({cmd:'GetOption',data:'closeAfterInstall'},function(o){
-	C.checked=!!o;
-	var s=location.search.slice(1);
-	s.split('&').forEach(function(i){
+chrome.runtime.sendMessage({cmd:'GetOption',data:'closeAfterInstall'},function(o){C.checked=!!o;});
+initEditor(function(o){
+	T=o;o=location.search.slice(1);
+	o.split('&').forEach(function(i){
 		i.replace(/^([^=]*)=(.*)$/,function(r,g1,g2){data[g1]=decodeURIComponent(g2);});
 	});
 	function error(){M.innerHTML=_('msgErrorLoadingURL',[data.url]);}
@@ -52,9 +38,13 @@ chrome.runtime.sendMessage({cmd:'GetOption',data:'closeAfterInstall'},function(o
 		var x=new XMLHttpRequest();
 		x.open('GET',data.url,true);
 		x.onloadend=function(){
-			if((!this.status||this.status==200)&&this.responseText) checkScript(this.responseText);
-			else error();
+			if((!this.status||this.status==200)&&this.responseText) {
+				M.innerHTML=_('msgLoadedJS',[data.url]);
+				T.setValueAndFocus(this.responseText);
+				I.disabled=false;
+			} else error();
 		};
 		x.send();
 	}
-});
+},{exit:B.onclick,readonly:true});
+initCSS();initI18n(function(){document.body.classList.remove('hide');});

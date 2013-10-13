@@ -11,10 +11,6 @@
 		"message": "ahoj1234", 
 		"description": "Information of the translator."
 	}, 
-	"defaultSearch": {
-		"message": "http://www.google.com/search?q=*", 
-		"description": "URL for searching scripts, * stands for the keywords."
-	}, 
 	"msgUpdated": {
 		"message": "Skript aktualizován.", 
 		"description": "Message shown when a script is updated/reinstalled."
@@ -26,6 +22,10 @@
 	"msgInstalled": {
 		"message": "Skript nainstalován.", 
 		"description": "Message shown when a script is installed."
+	}, 
+	"defaultSearch": {
+		"message": "http://www.google.com/search?q=*", 
+		"description": "URL for searching scripts, * stands for the keywords."
 	}, 
 	"msgUpdating": {
 		"message": "Aktualizuji...", 
@@ -75,14 +75,6 @@
 		"message": "Design od <a href=mailto:gera2ld@163.com>Gerald</a>, Přeložil: <a href=http://my.opera.com/ahoj1234 target=_blank>ahoj1234</a>", 
 		"description": "Author shown in the footer of options page, translator information may be added."
 	}, 
-	"msgNotJS": {
-		"message": "URL vypadá, že není Javascript. Bude načteno přímo za 3 sekundy.", 
-		"description": "Message shown in the confirm page when loading a URL ends with .user.js but seems not to be Javascript. It will then be loaded again directly in 3 seconds."
-	}, 
-	"msgLoadedJS": {
-		"message": "Javascript načten: $1", 
-		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
-	}, 
 	"msgErrorLoadingURL": {
 		"message": "Chyba načítání URL: $1", 
 		"description": "Message shown in the confirm page when Violentmonkey failed to load the URL of a script."
@@ -90,6 +82,10 @@
 	"msgLoadingURL": {
 		"message": "Načítání URL: $1", 
 		"description": "Message shown in the confirm page when a URL of a script is being loaded."
+	}, 
+	"msgLoadedJS": {
+		"message": "Javascript načten: $1", 
+		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	}, 
 	"labelOptions": {
 		"message": "Možnosti", 

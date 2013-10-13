@@ -11,10 +11,6 @@
 		"message": "Gerald <gera2ld@163.com>", 
 		"description": "Information of the translator."
 	}, 
-	"defaultSearch": {
-		"message": "http://www.baidu.com/s?wd=*", 
-		"description": "URL for searching scripts, * stands for the keywords."
-	}, 
 	"msgUpdated": {
 		"message": "脚本已更新。", 
 		"description": "Message shown when a script is updated/reinstalled."
@@ -26,6 +22,10 @@
 	"msgInstalled": {
 		"message": "脚本已安装。", 
 		"description": "Message shown when a script is installed."
+	}, 
+	"defaultSearch": {
+		"message": "http://www.baidu.com/s?wd=*", 
+		"description": "URL for searching scripts, * stands for the keywords."
 	}, 
 	"msgUpdating": {
 		"message": "正在更新...", 
@@ -75,14 +75,6 @@
 		"message": "<a href=mailto:gera2ld@163.com>Gerald</a> 制作", 
 		"description": "Author shown in the footer of options page, translator information may be added."
 	}, 
-	"msgNotJS": {
-		"message": "链接似乎不是Javascript，将在3秒后直接打开。", 
-		"description": "Message shown in the confirm page when loading a URL ends with .user.js but seems not to be Javascript. It will then be loaded again directly in 3 seconds."
-	}, 
-	"msgLoadedJS": {
-		"message": "Javascript已加载：$1", 
-		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
-	}, 
 	"msgErrorLoadingURL": {
 		"message": "链接打开发生错误：$1", 
 		"description": "Message shown in the confirm page when Violentmonkey failed to load the URL of a script."
@@ -90,6 +82,10 @@
 	"msgLoadingURL": {
 		"message": "正在打开链接：$1", 
 		"description": "Message shown in the confirm page when a URL of a script is being loaded."
+	}, 
+	"msgLoadedJS": {
+		"message": "Javascript已加载：$1", 
+		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	}, 
 	"labelOptions": {
 		"message": "选项", 

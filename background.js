@@ -572,7 +572,6 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 		AutoUpdate: autoUpdate,
 		Vacuum: vacuum,
 		Move: move,
-		LoadDirectly:loadDirectly,
 	},f=maps[req.cmd];
 	if(f) f(req.data,src,callback);
 	return true;
@@ -587,19 +586,18 @@ initDb(function(){
 	chrome.browserAction.setIcon({path:'images/icon19'+(settings.isApplied?'':'w')+'.png'});
 	setTimeout(autoCheck,2e4);
 });
-var directUrls={};
-function loadDirectly(o,src,callback){
-	directUrls[o]=1;
-	if(callback) callback();
-}
 chrome.webRequest.onBeforeRequest.addListener(function(o){
-	if(directUrls[o.url]) delete directUrls[o.url];
-	else if(/\.user\.js(\?|$)/.test(o.url)) {
-		if(o.tabId<0) chrome.tabs.create({url:chrome.extension.getURL('/confirm.html')+'?url='+encodeURIComponent(o.url)});
-		else chrome.tabs.get(o.tabId,function(t){
-			chrome.tabs.create({url:chrome.extension.getURL('/confirm.html')+'?url='+encodeURIComponent(o.url)+'&from='+encodeURIComponent(t.url)});
-		});
-		return {redirectUrl:'javascript:history.back()'};
+	if(/\.user\.js(\?|$)/.test(o.url)) {
+		var x=new XMLHttpRequest();
+		x.open('GET',o.url,false);
+		x.send();
+		if((!x.status||x.status==200)&&/^\s*[^<]/.test(x.responseText)) {
+			if(o.tabId<0) chrome.tabs.create({url:chrome.extension.getURL('/confirm.html')+'?url='+encodeURIComponent(o.url)});
+			else chrome.tabs.get(o.tabId,function(t){
+				chrome.tabs.create({url:chrome.extension.getURL('/confirm.html')+'?url='+encodeURIComponent(o.url)+'&from='+encodeURIComponent(t.url)});
+			});
+			return {redirectUrl:'javascript:history.back()'};
+		}
 	}
 },{
 	urls:['*://*/*','file://*/*'],types:['main_frame']
