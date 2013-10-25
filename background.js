@@ -329,7 +329,7 @@ function parseScript(o,src,callback) {
 		var meta=parseMeta(o.code);
 		queryScript(o.id,meta,function(c){
 			if(!c.id){r.status=1;r.message=_('msgInstalled');}
-			if(o.more) for(i in o.more) c[i]=o.more[i];	// for import and user edit
+			if(o.more) for(i in o.more) if(i in c) c[i]=o.more[i];	// for import and user edit
 			c.meta=meta;c.code=o.code;c.uri=getNameURI(c);
 			if(o.from&&!c.meta.homepage&&!c.custom.homepage&&!/^(file|data):/.test(o.from)) c.custom.homepage=o.from;
 			if(o.url&&!c.meta.downloadURL&&!c.custom.downloadURL) c.custom.downloadURL=o.url;

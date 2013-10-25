@@ -10,6 +10,7 @@ If you'd like to help with a new translation, please download `_locales/en/messa
 
 Donate
 ---
-[![Donate](https://img.alipay.com/sys/personalprod/style/mc/btn-index.png)](http://me.alipay.com/gera2ld)
+* [![via PayPal](https://www.paypal.com/de_DE/DE/i/logo/paypal_logo.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=gera2ld@163.com&no_shipping=1&lc=US&currency_code=USD)
+* [![via Alipay](https://img.alipay.com/sys/personalprod/style/mc/btn-index.png)](http://me.alipay.com/gera2ld)
 
 Author: Gerald &lt;<gera2ld@163.com>&gt;

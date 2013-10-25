@@ -167,7 +167,7 @@ H.onchange=function(e){
 				if(i) i.getData(writer,function(t){
 					var c={code:t};
 					if(vm.scripts&&(v=vm.scripts[i.filename.slice(0,-8)])) {
-						c.id=v.id;c.more=v;
+						delete v.id;c.more=v;
 					}
 					chrome.runtime.sendMessage({cmd:'ParseScript',data:c});
 					count++;
