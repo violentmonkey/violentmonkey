@@ -153,13 +153,13 @@ function confirmCancel(dirty){
 initCSS();initI18n(function(){switchTo(N);});
 
 // Advanced
-var A=$('advanced');
+var A=$('advanced'),H=$('iImport');
 $('bAdvanced').onclick=function(){showDialog(A);};
 $('cUpdate').onchange=function(){chrome.runtime.sendMessage({cmd:'AutoUpdate',data:this.checked});};
 $('bDefSearch').onclick=function(){$('tSearch').value=_('defaultSearch');};
 $('tSearch').title=_('hintSearchLink');
 $('aExport').onclick=function(){showDialog(X);xLoad();};
-function importFile(e){
+H.onchange=function(e){
 	zip.createReader(new zip.BlobReader(e.target.files[0]),function(r){
 		r.getEntries(function(e){
 			function getFiles(){
@@ -187,17 +187,16 @@ function importFile(e){
 					console.log('Error parsing ViolentMonkey configuration.');
 				}
 				if(vm.values) for(z in vm.values) chrome.runtime.sendMessage({cmd:'SetValue',data:{uri:z,values:vm.values[z]}});
-				if(vm.settings) for(z in vm.settings) chrome.runtime.sendMessage({cmd:'SetOption',data:{key:z,value:vm.settings[z]}});
+				if(vm.settings) for(z in vm.settings) chrome.runtime.sendMessage({cmd:'SetOption',data:{key:z,value:vm.settings[z],check:true}});
 				getFiles();
 			}); else getFiles();
 		});
 	},function(e){console.log(e);});
-}
+};
 $('aImport').onclick=function(){
-	var e=document.createEvent('MouseEvent'),iH=document.createElement('input');
-	iH.setAttribute('type','file');iH.onchange=importFile;
+	var e=document.createEvent('MouseEvent');
 	e.initMouseEvent('click',true,true,window,0,0,0,0,0,false,false,false,false,0,null);
-	iH.dispatchEvent(e);
+	H.dispatchEvent(e);
 };
 $('aVacuum').onclick=function(){
 	this.disabled=true;

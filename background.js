@@ -378,8 +378,10 @@ function getOption(k,src,callback){
 	return true;
 }
 function setOption(o,src,callback){
-	localStorage.setItem(o.key,JSON.stringify(o.value));
-	settings[o.key]=o.value;
+	if(!o.check||(o.key in settings)) {
+		localStorage.setItem(o.key,JSON.stringify(o.value));
+		settings[o.key]=o.value;
+	}
 	if(callback) callback(o.value);
 }
 function initSettings(){
