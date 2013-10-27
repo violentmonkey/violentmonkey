@@ -340,7 +340,7 @@ document.addEventListener("readystatechange",function(){c.state=["loading","inte
 document.addEventListener("DOMContentLoaded",function(){c.state=2;c.load();},false);})();';
 	d.appendChild(s);d.removeChild(s);
 	comm.handleC=handleC;comm.init(C,R);
-	chrome.runtime.sendMessage({cmd:'GetInjected'},loadScript);
+	chrome.runtime.sendMessage({cmd:'GetInjected',data:location.href},loadScript);
 }
 function loadScript(o){
 	o.scripts.forEach(function(i){ids.push(i.id);});

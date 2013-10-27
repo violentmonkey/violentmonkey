@@ -1,6 +1,6 @@
 {
 	"name": "Violent monkey",
-	"version" : "2.0.0.5",
+	"version" : "2.0.0.6",
 	"manifest_version" : 2,
 	"description" : "__MSG_extDescription__",
 	"developer": {"name" : "Gerald", "url" : "http://gera2ld.blog.163.com"},

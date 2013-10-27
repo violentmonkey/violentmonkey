@@ -200,7 +200,7 @@ function getMetas(ids,src,callback) {	// for popup menu
 	}
 	getOne();
 }
-function getInjected(o,src,callback) {	// for injected
+function getInjected(url,src,callback) {	// for injected
 	function getScripts(){
 		function addCache(i,c,d){
 			if(!(i in d)) {c.push(i);d[i]=null;}
@@ -210,7 +210,7 @@ function getInjected(o,src,callback) {	// for injected
 			var i,r=e.target.result,v;
 			if(r) {
 				v=r.value;
-				if(testURL(src.tab.url,v)) {
+				if(testURL(url,v)) {
 					data.scripts.push(v);if(v.enabled) n++;
 					values.push(v.uri);
 					v.meta.require.forEach(function(i){addCache(i,require,data.require);});
