@@ -589,7 +589,7 @@ initDb(function(){
 	setTimeout(autoCheck,2e4);
 });
 chrome.webRequest.onBeforeRequest.addListener(function(o){
-	if(/\.user\.js(\?|$)/.test(o.url)) {
+	if(/\.user\.js([\?#]|$)/.test(o.url)) {
 		var x=new XMLHttpRequest();
 		x.open('GET',o.url,false);
 		x.send();
