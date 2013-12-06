@@ -150,7 +150,7 @@ O.onclick=function(){
 function confirmCancel(dirty){
 	return !dirty||confirm(_('confirmNotSaved'));
 }
-initCSS();initI18n(function(){switchTo(N);});
+initCSS();initI18n();
 
 // Advanced
 var A=$('advanced'),H=$('iImport');

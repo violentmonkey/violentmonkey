@@ -47,4 +47,4 @@ initEditor(function(o){
 		x.send();
 	}
 },{exit:B.onclick,readonly:true});
-initCSS();initI18n(function(){document.body.classList.remove('hide');});
+initCSS();initI18n();

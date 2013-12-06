@@ -6,20 +6,20 @@
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		<script type="text/javascript" src="lib/zip.js/zip.js"></script>
 		<script type="text/javascript" src="load.js"></script>
-		<title class=i18n>extName</title>
+		<title data-i18n=extName></title>
 	</head>
 	<body class=fill>
-		<table id=main class="frame hide">
-			<tr><td><h1 class=center><span class=i18n>labelOptions</span> - <span class=i18n>extName</span></h1></td></tr>
+		<table id=main class=frame>
+			<tr><td><h1 class=center><span data-i18n=labelOptions></span> - <span data-i18n=extName></span></h1></td></tr>
 			<tr>
 				<td>
 					<div class=left>
-						<button id=bNew class=i18n>buttonNew</button>
-						<span class=i18n>anchorGetMoreScripts</span>
+						<button id=bNew data-i18n=buttonNew></button>
+						<span data-i18n=anchorGetMoreScripts></span>
 					</div>
 					<div class=right>
-						<a id=bUpdate class=i18n href=#>anchorUpdateAll</a>
-						<button id=bAdvanced class=i18n>buttonAdvanced</button>
+						<a id=bUpdate href=# data-i18n=anchorUpdateAll></a>
+						<button id=bAdvanced data-i18n=buttonAdvanced></button>
 					</div>
 					<div class=x></div>
 				</td>
@@ -29,30 +29,30 @@
 					<div class=expanda>
 						<fieldset>
 							<legend>
-								<span class=i18n>labelInstalledScripts</span>
-								<label><input type=checkbox id=cDetail><span class=i18n>labelShowDetails</span></label>
+								<span data-i18n=labelInstalledScripts></span>
+								<label><input type=checkbox id=cDetail><span data-i18n=labelShowDetails></span></label>
 							</legend>
-							<div id=sList><span class="hint i18n">msgLoading</span></div>
+							<div id=sList><span class=hint data-i18n=msgLoading></span></div>
 						</fieldset>
 					</div>
 				</td>
 			</tr>
-			<tr><td class=center><span class=i18n>anchorSupportPage</span> - <span class=i18n>anchorAuthor</span> - 2013</td></tr>
+			<tr><td class=center><span data-i18n=anchorSupportPage></span> - <span data-i18n=anchorAuthor></span> - 2013</td></tr>
 		</table>
 		<div id=overlay class=hide></div>
 		<table id=editor class="frame hide">
 			<tr>
-				<td><h2 class=i18n>labelScriptEditor</h2></td>
-				<td class=buttons><button id=bcustom class=i18n>buttonCustomMeta</button></td>
+				<td><h2 data-i18n=labelScriptEditor></h2></td>
+				<td class=buttons><button id=bcustom data-i18n=buttonCustomMeta></button></td>
 			</tr>
 			<tr class=expand><td id=eCode colspan=2 class=expandr></td></tr>
 			<tr>
 				<td colspan=2>
-					<label><input type=checkbox id=eUpdate><span class=i18n>labelAllowUpdate</span></label>
+					<label><input type=checkbox id=eUpdate><span data-i18n=labelAllowUpdate></span></label>
 					<div class=right>
-						<button id=eSave class=i18n>buttonSave</button>
-						<button id=eSaveClose class=i18n>buttonSaveClose</button>
-						<button id=eClose class=i18n>buttonClose</button>
+						<button id=eSave data-i18n=buttonSave></button>
+						<button id=eSaveClose data-i18n=buttonSaveClose></button>
+						<button id=eClose data-i18n=buttonClose></button>
 					</div>
 				</td>
 			</tr>
@@ -60,72 +60,72 @@
 		<div id=meta class="float hide">
 			<table>
 				<tr>
-					<td title="@name" class=i18n>labelName</td><td class=expand><input type=text id=mName></td>
-					<td title="@run-at" class=i18n>labelRunAt</td><td>
+					<td title="@name" data-i18n=labelName></td><td class=expand><input type=text id=mName></td>
+					<td title="@run-at" data-i18n=labelRunAt></td><td>
 						<select id=mRunAt>
-							<option class=i18n value=default>labelRunAtDefault</option>
+							<option value=default data-i18n=labelRunAtDefault></option>
 							<option value=start>document-start</option>
 							<option value=idle>document-idle</option>
 							<option value=end>document-end</option>
 						</select>
 					</td>
 				</tr>
-				<tr title="@homepage"><td class=i18n>labelHomepage</td><td colspan=3 class=expand><input type=text id=mHomepage></td></tr>
+				<tr title="@homepage"><td data-i18n=labelHomepage></td><td colspan=3 class=expand><input type=text id=mHomepage></td></tr>
 			</table>
 			<table>
-				<tr title="@updateURL"><td class=i18n>labelUpdateURL</td><td class=expand><input type=text id=mUpdateURL></td></tr>
-				<tr title="@downloadURL"><td class=i18n>labelDownloadURL</td><td class=expand><input type=text id=mDownloadURL></td></tr>
+				<tr title="@updateURL"><td data-i18n=labelUpdateURL></td><td class=expand><input type=text id=mUpdateURL></td></tr>
+				<tr title="@downloadURL"><td data-i18n=labelDownloadURL></td><td class=expand><input type=text id=mDownloadURL></td></tr>
 			</table>
 			<fieldset title="@include">
-				<legend class=i18n>labelInclude</legend>
-				<label><input type=checkbox id=cInclude><span class=i18n>labelKeepInclude</span></label>
-				<span class=i18n>labelCustomInclude</span>
+				<legend data-i18n=labelInclude></legend>
+				<label><input type=checkbox id=cInclude><span data-i18n=labelKeepInclude></span></label>
+				<span data-i18n=labelCustomInclude></span>
 				<textarea id=mInclude></textarea>
 			</fieldset>
 			<fieldset title="@match">
-				<legend class=i18n>labelMatch</legend>
-				<label><input type=checkbox id=cMatch><span class=i18n>labelKeepMatch</span></label>
-				<span class=i18n>labelCustomMatch</span>
+				<legend data-i18n=labelMatch></legend>
+				<label><input type=checkbox id=cMatch><span data-i18n=labelKeepMatch></span></label>
+				<span data-i18n=labelCustomMatch></span>
 				<textarea id=mMatch></textarea>
 			</fieldset>
 			<fieldset title="@exclude">
-				<legend class=i18n>labelExclude</legend>
-				<label><input type=checkbox id=cExclude><span class=i18n>labelKeepExclude</span></label>
-				<span class=i18n>labelCustomExclude</span>
+				<legend data-i18n=labelExclude></legend>
+				<label><input type=checkbox id=cExclude><span data-i18n=labelKeepExclude></span></label>
+				<span data-i18n=labelCustomExclude></span>
 				<textarea id=mExclude></textarea>
 			</fieldset>
-			<div class=right><button id=mOK class=i18n>buttonOK</button> <button id=mCancel class=i18n>buttonCancel</button></div>
+			<div class=right><button id=mOK data-i18n=buttonOK></button> <button id=mCancel data-i18n=buttonCancel></button></div>
 		</div>
 		<div id=export class="float hide">
-			<h2 class=i18n>labelExport</h2>
-			<span class=i18n>labelInstalledScripts</span>
+			<h2 data-i18n=labelExport></h2>
+			<span data-i18n=labelInstalledScripts></span>
 			<div id=xOptions class=right>
-				<a class=i18n>anchorExportOptions</a>
+				<a data-i18n=anchorExportOptions></a>
 				<div>
-					<label><input type=checkbox id=cWithData><span class=i18n>labelExportScriptData</span></label>
+					<label><input type=checkbox id=cWithData><span data-i18n=labelExportScriptData></span></label>
 				</div>
 			</div>
 			<div id=xList class=list></div>
-			<div class=left><button id=bSelect class=i18n>buttonAllNone</button></div>
+			<div class=left><button id=bSelect data-i18n=buttonAllNone></button></div>
 			<div class=right>
 				<button id=bExport></button>
-				<button id=bClose class=i18n>buttonClose</button>
+				<button id=bClose data-i18n=buttonClose></button>
 			</div>
 		</div>
 		<div id=advanced class="float hide">
-			<h2 class=i18n>labelAdvanced</h2>
-			<label><input type=checkbox id=cUpdate><span class=i18n>labelAutoUpdate</span></label>
+			<h2 data-i18n=labelAdvanced></h2>
+			<label><input type=checkbox id=cUpdate><span data-i18n=labelAutoUpdate></span></label>
 			<div>
-				<span class=i18n>labelSearchLink</span> <button id=bDefSearch class=i18n>buttonDefault</button><br>
+				<span data-i18n=labelSearchLink></span> <button id=bDefSearch data-i18n=buttonDefault></button><br>
 				<textarea id=tSearch></textarea><br>
 			</div>
 			<fieldset>
-				<legend class=i18n>labelData</legend>
-				<button id=aExport class=i18n>buttonExportData</button>
-				<button id=aImport class=i18n>buttonImportData</button><input type=file class=hide id=iImport>
-				<button id=aVacuum class=i18n>buttonVacuumData</button>
+				<legend data-i18n=labelData></legend>
+				<button id=aExport data-i18n=buttonExportData></button>
+				<button id=aImport data-i18n=buttonImportData></button><input type=file class=hide id=iImport>
+				<button id=aVacuum data-i18n=buttonVacuumData></button>
 			</fieldset>
-			<div class=right><button id=aClose class=i18n>buttonClose</button></div>
+			<div class=right><button id=aClose data-i18n=buttonClose></button></div>
 		</div>
 	</body>
 </html>
