@@ -1,25 +1,5 @@
-h1,h2{text-shadow:#999 3px 3px 5px;}
-a{color:dodgerblue;cursor:pointer;}
-.center{text-align:center;}
-.float,.frame{position:fixed;background:lightgray;border-spacing:10px;}
-.frame{left:0;right:0;top:0;bottom:0;table-layout:fixed;width:100%;height:100%;}
-.float{margin:0 auto;padding:10px;border-radius:10px;}
-.fill{background:#eee;height:100%;margin:0;padding:0;}
-.em{font-style:italic;}
-.new{color:red;}
-.menu,.ellipsis{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
-.menu{overflow-y:auto;}
 div.left{float:left;}
 div.right{float:right;}
-.buttons{text-align:right;vertical-align:bottom;}
-.menu,.x{clear:both;margin:0;padding:0;}
-.hide{display:none;}
-tr{vertical-align:top;padding:0;height:1px;}
-tr.expand{height:auto;}
-.expandr{position:relative;}
-.expanda{position:absolute;width:100%;height:100%;}
-textarea{width:100%;border:none;margin:0;padding:0;}
-fieldset{border-radius:5px;}
 #main{background:transparent;width:800px;margin:0 auto;border-spacing:0;}
 #main fieldset{position:relative;height:100%;padding:0;}
 #main legend{margin-left:10px;}
@@ -52,17 +32,13 @@ fieldset{border-radius:5px;}
 #overlay.overlay{opacity:0.6;}
 #advanced{padding:20px;}
 #advanced legend{margin:0;}
-.list{background:white;overflow-x:hidden;overflow-y:auto;}
-.list>div{display:block;padding:2px 10px;cursor:pointer;border-bottom:1px dashed lightgray;}
-.list .selected{background:gray;color:white;}
+textarea{width:100%;border:none;margin:0;padding:0;}
+fieldset{border-radius:5px;}
 #export .list{width:400px;height:420px;}
 #xOptions{display:inline-block;position:relative;}
 #xOptions>div{display:none;position:absolute;padding:10px;background:#eee;box-shadow:5px 10px 15px rgba(0,0,0,0.4);border:1px solid gray;}
 #xOptions>div>label{display:block;white-space:nowrap;}
 #xOptions:hover>div{display:block;}
-.menu>div{cursor:pointer;padding:5px;display:block;}
-.menu>div:hover{background:gray;color:gold;}
-.menu>div.disabled{color:gray;}
-.menu>div.disabled:hover{color:silver;}
-.menu>div span{display:inline-block;width:20px;}
-.menu>hr{border:none;border-top:1px dashed gray;}
+.list{background:white;overflow-x:hidden;overflow-y:auto;}
+.list>div{display:block;padding:2px 10px;cursor:pointer;border-bottom:1px dashed lightgray;}
+.list .selected{background:gray;color:white;}

@@ -1,0 +1,7 @@
+.menu{overflow-y:auto;max-width:300px;}
+.menu>div{cursor:pointer;padding:5px;display:block;}
+.menu>div:hover{background:gray;color:gold;}
+.menu>div.disabled{color:gray;}
+.menu>div.disabled:hover{color:silver;}
+.menu>div span{display:inline-block;width:20px;}
+.menu>hr{border:none;border-top:1px dashed gray;}
