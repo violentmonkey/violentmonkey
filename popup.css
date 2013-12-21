@@ -1,3 +1,4 @@
+body{margin:0;padding:8px;}
 .menu{overflow-y:auto;max-width:300px;}
 .menu>div{cursor:pointer;padding:5px;display:block;}
 .menu>div:hover{background:gray;color:gold;}

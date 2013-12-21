@@ -3,7 +3,7 @@
 	"version" : "2.0.0.7",
 	"manifest_version" : 2,
 	"description" : "__MSG_extDescription__",
-	"developer": {"name" : "Gerald", "url" : "http://gera2ld.blog.163.com"},
+	"developer": {"name" : "Gerald", "url" : "http://geraldl.tk"},
 	"homepage_url":"http://github.com/gera2ld/Violentmonkey/wiki",
 	"icons" : {
 		"16":"images/icon16.png",
@@ -27,6 +27,6 @@
 		"all_frames" : true
 	}],
 	"web_accessible_resources" : [],
-	"permissions" : ["tabs", "<all_urls>", "storage", "webRequest", "webRequestBlocking"],
+	"permissions" : ["tabs", "<all_urls>", "webRequest", "webRequestBlocking"],
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'unsafe-eval';"
 }
