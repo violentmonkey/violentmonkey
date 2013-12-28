@@ -1,5 +1,6 @@
 var $=document.getElementById.bind(document),M=$('msg'),I=$('bInstall'),data={},
-		B=$('bClose'),C=$('cClose'),T;
+		U=$('url'),B=$('bClose'),C=$('cClose'),T;
+function showMsg(m,t){M.innerHTML=m;M.setAttribute('title',t||m);}
 B.onclick=function(){window.close();};
 C.onchange=function(){
 	chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'closeAfterInstall',value:C.checked}});
@@ -11,6 +12,7 @@ I.onclick=function(){
 			url:data.url,
 			from:data.from,
 			code:T.getValue(),
+			require:data.require,
 		},
 	});
 	I.disabled=true;
@@ -18,7 +20,7 @@ I.onclick=function(){
 chrome.runtime.onMessage.addListener(function(req,src,callback) {
 	var maps={
 		ShowMessage: function(o){
-			M.innerHTML=o.message;
+			showMsg(o.message);
 			if(callback) callback();
 			if(o.status>=0&&C.checked) window.close();
 		},
@@ -32,17 +34,38 @@ initEditor(function(o){
 	o.split('&').forEach(function(i){
 		i.replace(/^([^=]*)=(.*)$/,function(r,g1,g2){data[g1]=decodeURIComponent(g2);});
 	});
-	function error(){M.innerHTML=_('msgErrorLoadingURL',[data.url]);}
-	if(!data.url) error(); else {
-		M.innerHTML=_('msgLoadingURL',[data.url]);
+	U.innerHTML=_('msgScriptURL',[data.url||'-']);
+	if(data.url) {
+		U.setAttribute('title',data.url);
+		showMsg(_('msgLoadingJS'));
 		var x=new XMLHttpRequest();
 		x.open('GET',data.url,true);
 		x.onloadend=function(){
 			if((!this.status||this.status==200)&&this.responseText) {
-				M.innerHTML=_('msgLoadedJS',[data.url]);
 				T.setValueAndFocus(this.responseText);
-				I.disabled=false;
-			} else error();
+				chrome.runtime.sendMessage({cmd:'ParseMeta',data:this.responseText},function(o){
+					var i=0,l=o.require.length,err=[];
+					showMsg(_('msgLoadingRequirements',[i,l]));
+					data.require={};
+					o.require.forEach(function(u){
+						var x=new XMLHttpRequest();
+						x.open('GET',u,true);
+						x.onloadend=function(){
+							i++;
+							if(this.status==200) data.require[u]=this.responseText;
+							else err.push(u);
+							if(i>=l) {
+								if(err.length) showMsg(_('msgErrorLoadingRequirements'),err.join('\n'));
+								else {
+									showMsg(_('msgLoadedJS'));
+									I.disabled=false;
+								}
+							}
+						};
+						x.send();
+					});
+				});
+			} else showMsg(_('msgErrorLoadingJS'));
 		};
 		x.send();
 	}

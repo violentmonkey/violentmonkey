@@ -56,7 +56,7 @@
 		"description": "Shown in the title of the confirm page while trying to install a script."
 	},
 	"optionClose": {
-		"message": "Close after installation",
+		"message": "Close po instalaci",
 		"description": "Option to close confirm window after installation."
 	},
 	"buttonConfirmInstallation": {
@@ -75,17 +75,29 @@
 		"message": "Design od <a href=mailto:gera2ld@163.com>Gerald</a>, Přeložil: <a href=http://my.opera.com/ahoj1234 target=_blank>ahoj1234</a>",
 		"description": "Author shown in the footer of options page, translator information may be added."
 	},
-	"msgErrorLoadingURL": {
-		"message": "Chyba načítání URL: $1",
-		"description": "Message shown in the confirm page when Violentmonkey failed to load the URL of a script."
+	"msgScriptURL": {
+		"message": "Skript URL: $1",
+		"description": "URL of the script to be installed on confirm page."
 	},
-	"msgLoadingURL": {
-		"message": "Načítání URL: $1",
-		"description": "Message shown in the confirm page when a URL of a script is being loaded."
+	"msgLoadingJS": {
+		"message": "Nahrávám skript...",
+		"description": "Message shown on confirm page when the script to be installed is loading."
+	},
+	"msgLoadingRequirements": {
+		"message": "Vkládání požadavky... ($1/$2)",
+		"description": "Message shown on confirm page when the requirements are being downloaded."
+	},
+	"msgErrorLoadingRequirements": {
+		"message": "Chyba při načítání požadavky.",
+		"description": "Message shown when not all requirements are loaded successfully."
 	},
 	"msgLoadedJS": {
-		"message": "Javascript načten: $1",
+		"message": "Skript načten.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
+	},
+	"msgErrorLoadingJS": {
+		"message": "Chyba při načítání skript.",
+		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
 	"labelOptions": {
 		"message": "Možnosti",
@@ -336,19 +348,19 @@
 		"description": "Menu item to list script commands."
 	},
 	"labelSearch": {
-		"message": "Search for: ",
+		"message": "Hledat: ",
 		"description": "Label for search input in search box."
 	},
 	"labelReplace": {
-		"message": "Replace with: ",
+		"message": "Nahradit: ",
 		"description": "Label for replace input in search box."
 	},
 	"buttonReplace": {
-		"message": "Replace",
+		"message": "Nahradit",
 		"description": "Button to replace the current match."
 	},
 	"buttonReplaceAll": {
-		"message": "All",
+		"message": "Vše",
 		"description": "Button to replace all matches."
 	}
 }

@@ -75,17 +75,29 @@
 		"message": "Designed by <a href=mailto:gera2ld@163.com>Gerald</a>",
 		"description": "Author shown in the footer of options page, translator information may be added."
 	},
-	"msgErrorLoadingURL": {
-		"message": "Error loading URL: $1",
-		"description": "Message shown in the confirm page when Violentmonkey failed to load the URL of a script."
+	"msgScriptURL": {
+		"message": "Script URL: $1",
+		"description": "URL of the script to be installed on confirm page."
 	},
-	"msgLoadingURL": {
-		"message": "Loading URL: $1",
-		"description": "Message shown in the confirm page when a URL of a script is being loaded."
+	"msgLoadingJS": {
+		"message": "Loading script...",
+		"description": "Message shown on confirm page when the script to be installed is loading."
+	},
+	"msgLoadingRequirements": {
+		"message": "Loading requirements... ($1/$2)",
+		"description": "Message shown on confirm page when the requirements are being downloaded."
+	},
+	"msgErrorLoadingRequirements": {
+		"message": "Error loading requirements.",
+		"description": "Message shown when not all requirements are loaded successfully."
 	},
 	"msgLoadedJS": {
-		"message": "Javascript loaded: $1",
+		"message": "Script loaded.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
+	},
+	"msgErrorLoadingJS": {
+		"message": "Error loading script.",
+		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
 	"labelOptions": {
 		"message": "Options",

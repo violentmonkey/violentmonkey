@@ -52,15 +52,15 @@
 		"description": "Additional CSS for all pages."
 	},
 	"labelInstall": {
-		"message": "Installing script",
+		"message": "Установка сценария",
 		"description": "Shown in the title of the confirm page while trying to install a script."
 	},
 	"optionClose": {
-		"message": "Close after installation",
+		"message": "Закрыть после установки",
 		"description": "Option to close confirm window after installation."
 	},
 	"buttonConfirmInstallation": {
-		"message": "Confirm installation",
+		"message": "Подтвердите установку",
 		"description": "Button to confirm installation of a script."
 	},
 	"buttonClose": {
@@ -75,17 +75,29 @@
 		"message": "Разработано <a href=mailto:gera2ld@163.com>Gerald</a>",
 		"description": "Author shown in the footer of options page, translator information may be added."
 	},
-	"msgErrorLoadingURL": {
-		"message": "Error loading URL: $1",
-		"description": "Message shown in the confirm page when Violentmonkey failed to load the URL of a script."
+	"msgScriptURL": {
+		"message": "URL скрипта: $1",
+		"description": "URL of the script to be installed on confirm page."
 	},
-	"msgLoadingURL": {
-		"message": "Loading URL: $1",
-		"description": "Message shown in the confirm page when a URL of a script is being loaded."
+	"msgLoadingJS": {
+		"message": "Загрузка сценарий...",
+		"description": "Message shown on confirm page when the script to be installed is loading."
+	},
+	"msgLoadingRequirements": {
+		"message": "Загрузка требования... ($1/$2)",
+		"description": "Message shown on confirm page when the requirements are being downloaded."
+	},
+	"msgErrorLoadingRequirements": {
+		"message": "Требования к погрузке Ошибка.",
+		"description": "Message shown when not all requirements are loaded successfully."
 	},
 	"msgLoadedJS": {
-		"message": "Javascript loaded: $1",
+		"message": "Скрипт загружается.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
+	},
+	"msgErrorLoadingJS": {
+		"message": "Ошибка загрузки сценария.",
+		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
 	"labelOptions": {
 		"message": "Опции",
@@ -276,7 +288,7 @@
 		"description": "Button to remove a script."
 	},
 	"labelNoName": {
-		"message": "Null name",
+		"message": "Без названия",
 		"description": "Text as the name of a script when no @name is assigned."
 	},
 	"labelAuthor": {
@@ -296,7 +308,7 @@
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
 	},
 	"buttonVacuuming": {
-		"message": "Vacuuming data...",
+		"message": "Уборка пылесосом данных...",
 		"description": "Message shown when data vacuum is in progress."
 	},
 	"hintVacuumData": {
@@ -308,7 +320,7 @@
 		"description": "Button to confirm export."
 	},
 	"buttonExporting": {
-		"message": "Exporting data...",
+		"message": "Экспорт данных...",
 		"description": "Message shown when data export is in progress."
 	},
 	"buttonVacuumed": {
@@ -336,19 +348,19 @@
 		"description": "Menu item to list script commands."
 	},
 	"labelSearch": {
-		"message": "Search for: ",
+		"message": "Искать: ",
 		"description": "Label for search input in search box."
 	},
 	"labelReplace": {
-		"message": "Replace with: ",
+		"message": "Заменить на: ",
 		"description": "Label for replace input in search box."
 	},
 	"buttonReplace": {
-		"message": "Replace",
+		"message": "Заменять",
 		"description": "Button to replace the current match."
 	},
 	"buttonReplaceAll": {
-		"message": "All",
+		"message": "Все",
 		"description": "Button to replace all matches."
 	}
 }

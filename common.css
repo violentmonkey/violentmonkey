@@ -16,3 +16,4 @@ tr{vertical-align:top;padding:0;height:1px;}
 tr.expand{height:auto;}
 .expandr{position:relative;}
 .expanda{position:absolute;width:100%;height:100%;}
+td.right{text-align:right;}

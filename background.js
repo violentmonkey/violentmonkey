@@ -283,13 +283,15 @@ function fetchCache(url) {
 		o.put({uri:url,data:this.response}).onsuccess=function(){delete _cache[url];};
 	}, 'arraybuffer');
 }
+function saveRequire(url,data,callback) {
+	var o=db.transaction('require','readwrite').objectStore('require');
+	o.put({uri:url,code:data}).onsuccess=callback;
+}
 function fetchRequire(url) {
 	if(_require[url]) return;
 	_require[url]=1;
-	fetchURL(url, function() {
-		if (this.status!=200) return;
-		var o=db.transaction('require','readwrite').objectStore('require');
-		o.put({uri:url,code:this.responseText}).onsuccess=function(){delete _require[url];};
+	fetchURL(url, function(){
+		if(this.status==200) saveRequire(url,this.responseText,function(){delete _require[url];});
 	});
 }
 function updateItem(r){
@@ -337,7 +339,10 @@ function parseScript(o,src,callback) {
 				r.id=c.id=e.target.result;r.obj=getMeta(c);finish();
 			};
 		});
-		meta.require.forEach(fetchRequire);	// @require
+		meta.require.forEach(function(u){	// @require
+			var c=o.require&&o.require[u];
+			if(c) saveRequire(u,c); else fetchRequire(u);
+		});
 		for(d in meta.resources) fetchCache(meta.resources[d]);	// @resource
 		if(meta.icon) fetchCache(meta.icon);	// @icon
 	}
@@ -574,6 +579,7 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 		AutoUpdate: autoUpdate,
 		Vacuum: vacuum,
 		Move: move,
+		ParseMeta: function(o,src,callback){callback(parseMeta(o));},
 	},f=maps[req.cmd];
 	if(f) f(req.data,src,callback);
 	return true;

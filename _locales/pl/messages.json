@@ -56,7 +56,7 @@
 		"description": "Shown in the title of the confirm page while trying to install a script."
 	},
 	"optionClose": {
-		"message": "Close after installation",
+		"message": "Zamknij po zakończeniu instalacji",
 		"description": "Option to close confirm window after installation."
 	},
 	"buttonConfirmInstallation": {
@@ -75,17 +75,29 @@
 		"message": "Stworzone przez <a href=mailto:gera2ld@163.com>Gerald</a>, tłumaczenie MISI90",
 		"description": "Author shown in the footer of options page, translator information may be added."
 	},
-	"msgErrorLoadingURL": {
-		"message": "Błąd ładowania URL: $1",
-		"description": "Message shown in the confirm page when Violentmonkey failed to load the URL of a script."
+	"msgScriptURL": {
+		"message": "Skrypt URL: $1",
+		"description": "URL of the script to be installed on confirm page."
 	},
-	"msgLoadingURL": {
-		"message": "Ładowanie URL: $1",
-		"description": "Message shown in the confirm page when a URL of a script is being loaded."
+	"msgLoadingJS": {
+		"message": "Skrypt ładowania...",
+		"description": "Message shown on confirm page when the script to be installed is loading."
+	},
+	"msgLoadingRequirements": {
+		"message": "Wymagania ładowania... ($1/$2)",
+		"description": "Message shown on confirm page when the requirements are being downloaded."
+	},
+	"msgErrorLoadingRequirements": {
+		"message": "Błąd podczas ładowania wymagania.",
+		"description": "Message shown when not all requirements are loaded successfully."
 	},
 	"msgLoadedJS": {
-		"message": "Javascript załadowany: $1",
+		"message": "Skrypt załadowany.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
+	},
+	"msgErrorLoadingJS": {
+		"message": "Błąd wczytywania skryptu.",
+		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
 	"labelOptions": {
 		"message": "Opcje",
@@ -116,7 +128,7 @@
 		"description": "Option to show the details of scripts, such as author, description, etc."
 	},
 	"msgLoading": {
-		"message": "Loading ...",
+		"message": "Ładowanie ...",
 		"description": "Message shown in the options page before script list is loaded."
 	},
 	"labelScriptEditor": {
@@ -336,19 +348,19 @@
 		"description": "Menu item to list script commands."
 	},
 	"labelSearch": {
-		"message": "Search for: ",
+		"message": "Szukaj w: ",
 		"description": "Label for search input in search box."
 	},
 	"labelReplace": {
-		"message": "Replace with: ",
+		"message": "Zamień na: ",
 		"description": "Label for replace input in search box."
 	},
 	"buttonReplace": {
-		"message": "Replace",
+		"message": "Zastąpić",
 		"description": "Button to replace the current match."
 	},
 	"buttonReplaceAll": {
-		"message": "All",
+		"message": "Wszystko",
 		"description": "Button to replace all matches."
 	}
 }
