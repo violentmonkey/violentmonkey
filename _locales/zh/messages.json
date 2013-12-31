@@ -79,6 +79,14 @@
 		"message": "脚本URL：$1",
 		"description": "URL of the script to be installed on confirm page."
 	},
+	"msgErrorLoadingJS": {
+		"message": "加载脚本发生错误。",
+		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
+	},
+	"msgLoadedJS": {
+		"message": "脚本已加载。",
+		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
+	},
 	"msgLoadingJS": {
 		"message": "正在加载脚本...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
@@ -90,14 +98,6 @@
 	"msgErrorLoadingRequirements": {
 		"message": "加载依赖脚本发生错误。",
 		"description": "Message shown when not all requirements are loaded successfully."
-	},
-	"msgLoadedJS": {
-		"message": "脚本已加载。",
-		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
-	},
-	"msgErrorLoadingJS": {
-		"message": "加载脚本发生错误。",
-		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
 	"labelOptions": {
 		"message": "选项",

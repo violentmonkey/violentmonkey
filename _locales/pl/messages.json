@@ -79,6 +79,14 @@
 		"message": "Skrypt URL: $1",
 		"description": "URL of the script to be installed on confirm page."
 	},
+	"msgErrorLoadingJS": {
+		"message": "Błąd wczytywania skryptu.",
+		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
+	},
+	"msgLoadedJS": {
+		"message": "Skrypt załadowany.",
+		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
+	},
 	"msgLoadingJS": {
 		"message": "Skrypt ładowania...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
@@ -90,14 +98,6 @@
 	"msgErrorLoadingRequirements": {
 		"message": "Błąd podczas ładowania wymagania.",
 		"description": "Message shown when not all requirements are loaded successfully."
-	},
-	"msgLoadedJS": {
-		"message": "Skrypt załadowany.",
-		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
-	},
-	"msgErrorLoadingJS": {
-		"message": "Błąd wczytywania skryptu.",
-		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
 	"labelOptions": {
 		"message": "Opcje",

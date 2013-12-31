@@ -35,6 +35,8 @@ initEditor(function(o){
 		i.replace(/^([^=]*)=(.*)$/,function(r,g1,g2){data[g1]=decodeURIComponent(g2);});
 	});
 	U.innerHTML=_('msgScriptURL',[data.url||'-']);
+	function error(){showMsg(_('msgErrorLoadingJS'));}
+	function loaded(){showMsg(_('msgLoadedJS'));I.disabled=false;}
 	if(data.url) {
 		U.setAttribute('title',data.url);
 		showMsg(_('msgLoadingJS'));
@@ -45,29 +47,28 @@ initEditor(function(o){
 				T.setValueAndFocus(this.responseText);
 				chrome.runtime.sendMessage({cmd:'ParseMeta',data:this.responseText},function(o){
 					var i=0,l=o.require.length,err=[];
-					showMsg(_('msgLoadingRequirements',[i,l]));
-					data.require={};
-					o.require.forEach(function(u){
-						var x=new XMLHttpRequest();
-						x.open('GET',u,true);
-						x.onloadend=function(){
-							i++;
-							if(this.status==200) data.require[u]=this.responseText;
-							else err.push(u);
-							if(i>=l) {
-								if(err.length) showMsg(_('msgErrorLoadingRequirements'),err.join('\n'));
-								else {
-									showMsg(_('msgLoadedJS'));
-									I.disabled=false;
+					if(l) {
+						showMsg(_('msgLoadingRequirements',[i,l]));
+						data.require={};
+						o.require.forEach(function(u){
+							var x=new XMLHttpRequest();
+							x.open('GET',u,true);
+							x.onloadend=function(){
+								i++;
+								if(this.status==200) data.require[u]=this.responseText;
+								else err.push(u);
+								if(i>=l) {
+									if(err.length) showMsg(_('msgErrorLoadingRequirements'),err.join('\n'));
+									else loaded();
 								}
-							}
-						};
-						x.send();
-					});
+							};
+							x.send();
+						});
+					} else loaded();
 				});
-			} else showMsg(_('msgErrorLoadingJS'));
+			} else error();
 		};
 		x.send();
-	}
+	} else error();
 },{exit:B.onclick,readonly:true});
 initCSS();initI18n();

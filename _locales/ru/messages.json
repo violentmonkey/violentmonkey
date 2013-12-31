@@ -4,7 +4,7 @@
 		"description": "Name of this extension."
 	},
 	"extDescription": {
-		"message": "Userscript support for Opera.",
+		"message": "Поддержка пользовательских скриптов для Opera.",
 		"description": "Description for this extension."
 	},
 	"extTranslator": {
@@ -16,7 +16,7 @@
 		"description": "Message shown when a script is updated/reinstalled."
 	},
 	"msgErrorFetchingScript": {
-		"message": "Ошибка чтения скрипта!",
+		"message": "Ошибка загрузки скрипта!",
 		"description": "Message shown when Violentmonkey fails fetching a new version of the script."
 	},
 	"msgInstalled": {
@@ -32,7 +32,7 @@
 		"description": "Message shown when a new version of script is being fetched."
 	},
 	"msgNewVersion": {
-		"message": "Найдена новая версия.",
+		"message": "Доступна новая версия.",
 		"description": "Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided."
 	},
 	"msgCheckingForUpdate": {
@@ -40,7 +40,7 @@
 		"description": "Message shown when a script is being checked for updates by version numbers."
 	},
 	"msgErrorFetchingUpdateInfo": {
-		"message": "Не удается найти обновления.",
+		"message": "Не удается проверить обновления.",
 		"description": "Message shown when Violentmonkey fails fetching version data of the script."
 	},
 	"msgNoUpdate": {
@@ -52,7 +52,7 @@
 		"description": "Additional CSS for all pages."
 	},
 	"labelInstall": {
-		"message": "Установка сценария",
+		"message": "Установка скрипта",
 		"description": "Shown in the title of the confirm page while trying to install a script."
 	},
 	"optionClose": {
@@ -60,7 +60,7 @@
 		"description": "Option to close confirm window after installation."
 	},
 	"buttonConfirmInstallation": {
-		"message": "Подтвердите установку",
+		"message": "Установить",
 		"description": "Button to confirm installation of a script."
 	},
 	"buttonClose": {
@@ -79,6 +79,14 @@
 		"message": "URL скрипта: $1",
 		"description": "URL of the script to be installed on confirm page."
 	},
+	"msgErrorLoadingJS": {
+		"message": "Ошибка загрузки сценария.",
+		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
+	},
+	"msgLoadedJS": {
+		"message": "Загружен скрипт: $1",
+		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
+	},
 	"msgLoadingJS": {
 		"message": "Загрузка сценарий...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
@@ -91,24 +99,16 @@
 		"message": "Требования к погрузке Ошибка.",
 		"description": "Message shown when not all requirements are loaded successfully."
 	},
-	"msgLoadedJS": {
-		"message": "Скрипт загружается.",
-		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
-	},
-	"msgErrorLoadingJS": {
-		"message": "Ошибка загрузки сценария.",
-		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
-	},
 	"labelOptions": {
-		"message": "Опции",
+		"message": "Настройки",
 		"description": "Options of this extension."
 	},
 	"buttonNew": {
-		"message": "Создать",
+		"message": "Новый",
 		"description": "Button to create a new script."
 	},
 	"anchorGetMoreScripts": {
-		"message": "<a href=http://userscripts.org target=_blank>Скачать скрипты с userscripts.org</a>",
+		"message": "<a href=http://userscripts.org target=_blank>Загрузить скрипты с userscripts.org</a>",
 		"description": "Link to get more scripts."
 	},
 	"anchorUpdateAll": {
@@ -116,7 +116,7 @@
 		"description": "Check all scripts for updates."
 	},
 	"buttonAdvanced": {
-		"message": "Дополнительные опции",
+		"message": "Дополнительно",
 		"description": "Button to show the advanced options."
 	},
 	"labelInstalledScripts": {
@@ -124,11 +124,11 @@
 		"description": "Label of the list of installed scripts."
 	},
 	"labelShowDetails": {
-		"message": "Показать детали",
+		"message": "Подробно",
 		"description": "Option to show the details of scripts, such as author, description, etc."
 	},
 	"msgLoading": {
-		"message": "Загрузка ...",
+		"message": "Загрузка...",
 		"description": "Message shown in the options page before script list is loaded."
 	},
 	"labelScriptEditor": {
@@ -152,11 +152,11 @@
 		"description": "Button to save modifications of a script and then close the editing page."
 	},
 	"labelName": {
-		"message": "Имя:",
+		"message": "Название:",
 		"description": "Label of script name."
 	},
 	"labelRunAt": {
-		"message": "Запуск:",
+		"message": "Выполнить:",
 		"description": "Label of script @run-at properties in custom meta data."
 	},
 	"labelRunAtDefault": {
@@ -168,55 +168,55 @@
 		"description": "Label of script @homepage in custom meta data."
 	},
 	"labelUpdateURL": {
-		"message": "URL обновления:",
+		"message": "Адрес обновления:",
 		"description": "Label of script @updateURL in custom meta data."
 	},
 	"labelDownloadURL": {
-		"message": "URL загрузки:",
+		"message": "Источник загрузки:",
 		"description": "Label of script @downloadURL in custom meta data."
 	},
 	"labelInclude": {
-		"message": "Включения",
+		"message": "Задействовать на (правила включений include):",
 		"description": "Label of @include rules."
 	},
 	"labelKeepInclude": {
-		"message": "Сохранять оригинальные правила include",
+		"message": "Использовать оригинальные правила",
 		"description": "Option to keep the original @include rules."
 	},
 	"labelCustomInclude": {
-		"message": "Пользовательские правила include: <em>(По одному на строку)</em>",
+		"message": "Пользовательские правила (одно на строку):",
 		"description": "Label of custom @include rules."
 	},
 	"labelMatch": {
-		"message": "Соответствия",
+		"message": "Задействовать на (правила совпадений match):",
 		"description": "Label of @match rules."
 	},
 	"labelKeepMatch": {
-		"message": "Сохранять оригинальные правила match",
+		"message": "Использовать оригинальные правила",
 		"description": "Option to keep the original @match rules."
 	},
 	"labelCustomMatch": {
-		"message": "Пользовательские правила match: <em>(По одному на строку)</em>",
+		"message": "Пользовательские правила (одно на строку):",
 		"description": "Label of custom @match rules."
 	},
 	"labelExclude": {
-		"message": "Исключения",
+		"message": "Не задействовать на (правила исключений exclude):",
 		"description": "Label of @exclude rules."
 	},
 	"labelKeepExclude": {
-		"message": "Сохранять оригинальные правила exclude",
+		"message": "Использовать оригинальные правила",
 		"description": "Option to keep the original @exclude rules."
 	},
 	"labelCustomExclude": {
-		"message": "Пользовательские правила exclude: <em>(По одному на строку)</em>",
+		"message": "Пользовательские правила (одно на строку):",
 		"description": "Label of custom @exclude rules."
 	},
 	"buttonOK": {
-		"message": "ОК",
+		"message": "Готово",
 		"description": "Button to confirm modifications."
 	},
 	"buttonCancel": {
-		"message": "Отменить",
+		"message": "Отмена",
 		"description": "Button to cancel modifications."
 	},
 	"labelExport": {
@@ -228,11 +228,11 @@
 		"description": "Options of export."
 	},
 	"labelExportScriptData": {
-		"message": "Экспортировать данные",
+		"message": "Настройки скрипта",
 		"description": "Option to export script data along with scripts."
 	},
 	"buttonAllNone": {
-		"message": "Всё/Ничего",
+		"message": "Выбрать Всё/Ничего",
 		"description": "Button to select all scripts or none."
 	},
 	"labelAdvanced": {
@@ -244,7 +244,7 @@
 		"description": "Option to allow automatically checking scripts for updates every 24 hours."
 	},
 	"labelSearchLink": {
-		"message": "Поисковый URL: ",
+		"message": "Поисковый адрес: ",
 		"description": "Label of URL for searching scripts for a site."
 	},
 	"buttonDefault": {
@@ -288,7 +288,7 @@
 		"description": "Button to remove a script."
 	},
 	"labelNoName": {
-		"message": "Без названия",
+		"message": "Новый скрипт",
 		"description": "Text as the name of a script when no @name is assigned."
 	},
 	"labelAuthor": {
@@ -296,23 +296,23 @@
 		"description": "Label of author shown in the details of a script."
 	},
 	"confirmNotSaved": {
-		"message": "Изменения не сохранены!\nНажмите OK, чтобы продолжить или Отменить, чтобы вернуться.",
+		"message": "Изменения не сохранены!\nНажмите OK, чтобы выйти или Отмена, чтобы вернуться.",
 		"description": "Confirm message shown when there are unsaved script modifications."
 	},
 	"hintSearchLink": {
-		"message": "Поисковый URL должен включать *, где * - ключевые слова генерируемые Violentmonkey",
+		"message": "Поисковый адрес должен включать *, где * - ключевые слова генерируемые Violentmonkey",
 		"description": "Hint for the search URL."
 	},
 	"msgImported": {
-		"message": "$1 пункт(ов) импортировано.",
+		"message": "$1 скрипт(ов) импортировано.",
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
 	},
 	"buttonVacuuming": {
-		"message": "Уборка пылесосом данных...",
+		"message": "Очистка данных кэша...",
 		"description": "Message shown when data vacuum is in progress."
 	},
 	"hintVacuumData": {
-		"message": "Сбросить избыточность и попробовать перезагрузить недостающие ресурсы в кэше",
+		"message": "Сбросить избыточность кэша и попробовать подгрузить недостающие ресурсы",
 		"description": "Hint for vacuuming data."
 	},
 	"buttonExport": {
@@ -344,7 +344,7 @@
 		"description": "Menu item to go back to main menu from script commands."
 	},
 	"menuCommands": {
-		"message": "Команды сценария...",
+		"message": "Команды скриптов...",
 		"description": "Menu item to list script commands."
 	},
 	"labelSearch": {
