@@ -76,39 +76,39 @@
 		"description": "Author shown in the footer of options page, translator information may be added."
 	},
 	"msgScriptURL": {
-		"message": "URL скрипта: $1",
+		"message": "URL-адрес скрипта: $1",
 		"description": "URL of the script to be installed on confirm page."
 	},
 	"msgErrorLoadingJS": {
-		"message": "Ошибка загрузки сценария.",
+		"message": "Ошибка загрузки скрипта.",
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
 	"msgLoadedJS": {
-		"message": "Загружен скрипт: $1",
+		"message": "Скрипт загружен.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	},
 	"msgLoadingJS": {
-		"message": "Загрузка сценарий...",
+		"message": "Загружается скрипт...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
 	},
 	"msgLoadingRequirements": {
-		"message": "Загрузка требования... ($1/$2)",
+		"message": "Загрузка требований... ($1/$2)",
 		"description": "Message shown on confirm page when the requirements are being downloaded."
 	},
 	"msgErrorLoadingRequirements": {
-		"message": "Требования к погрузке Ошибка.",
+		"message": "Ошибка загрузки требований.",
 		"description": "Message shown when not all requirements are loaded successfully."
 	},
 	"labelOptions": {
-		"message": "Настройки",
+		"message": "Опции",
 		"description": "Options of this extension."
 	},
 	"buttonNew": {
-		"message": "Новый",
+		"message": "Создать",
 		"description": "Button to create a new script."
 	},
 	"anchorGetMoreScripts": {
-		"message": "<a href=http://userscripts.org target=_blank>Загрузить скрипты с userscripts.org</a>",
+		"message": "<a href=http://userscripts.org target=_blank>Скачать скрипты с userscripts.org</a>",
 		"description": "Link to get more scripts."
 	},
 	"anchorUpdateAll": {
@@ -164,7 +164,7 @@
 		"description": "Shown when custom @run-at is not assigned."
 	},
 	"labelHomepage": {
-		"message": "Домашняя страница:",
+		"message": "Дом. страница:",
 		"description": "Label of script @homepage in custom meta data."
 	},
 	"labelUpdateURL": {
@@ -348,7 +348,7 @@
 		"description": "Menu item to list script commands."
 	},
 	"labelSearch": {
-		"message": "Искать: ",
+		"message": "Найти для: ",
 		"description": "Label for search input in search box."
 	},
 	"labelReplace": {
@@ -360,7 +360,7 @@
 		"description": "Button to replace the current match."
 	},
 	"buttonReplaceAll": {
-		"message": "Все",
+		"message": "Заменить всё",
 		"description": "Button to replace all matches."
 	}
 }
