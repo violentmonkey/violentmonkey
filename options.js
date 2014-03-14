@@ -11,9 +11,7 @@ function setIcon(n,d){
 function modifyItem(d,r){
 	if(r) {
 		if(r.message) d.querySelector('.message').innerHTML=r.message;
-		with(d.querySelector('.update'))
-			if(r.hideUpdate) classList.add('hide');
-			else classList.remove('hide');
+		if(d=d.querySelector('.update')) d.classList[r.hideUpdate?'add':'remove']('hide');
 	}
 }
 function loadItem(o,r){

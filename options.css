@@ -32,7 +32,7 @@ div.right{float:right;}
 #overlay.overlay{opacity:0.6;}
 #advanced{padding:20px;}
 #advanced legend{margin:0;}
-textarea{width:100%;border:none;margin:0;padding:0;}
+textarea{box-sizing:border-box;width:100%;}
 fieldset{border-radius:5px;}
 #export .list{width:400px;height:420px;}
 #xOptions{display:inline-block;position:relative;}
