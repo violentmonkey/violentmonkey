@@ -1,6 +1,6 @@
 {
 	"name": "Violent monkey",
-	"version" : "2.0.0.8",
+	"version" : "2.0.1",
 	"manifest_version" : 2,
 	"description" : "__MSG_extDescription__",
 	"developer": {"name" : "Gerald", "url" : "http://geraldl.tk"},

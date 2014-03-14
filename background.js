@@ -266,11 +266,13 @@ function getInjected(url,src,callback) {	// for injected
 	var data={scripts:[],require:{},cache:{},values:{}},cache=[],values=[],require=[];
 	if(data.isApplied=settings.isApplied) getScripts(); else finish();
 }
-function fetchURL(url, cb, type) {
-  var req = new XMLHttpRequest();
+function fetchURL(url, cb, type, headers) {
+  var req=new XMLHttpRequest(),i;
   req.open('GET', url, true);
-  if (type) req.responseType = type;
-  if (cb) req.onloadend = cb;
+  if(type) req.responseType = type;
+	if(headers) for(i in headers)
+		req.setRequestHeader(i,headers[i]);
+  if(cb) req.onloadend = cb;
   req.send();
 }
 var _cache={},_require={};
@@ -444,7 +446,7 @@ function checkUpdateO(o) {
       } catch(e){}
       delete r.hideUpdate;
       updateItem(r);finish();
-    });
+    },null,{Accept:'text/x-userscript-meta'});
   } else finish();
 }
 function checkUpdate(id,src,callback) {
