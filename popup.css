@@ -1,4 +1,4 @@
-body{margin:0;padding:8px;}
+html,body{height:auto;background:inherit;}
 .menu{overflow-y:auto;max-width:300px;}
 .menu>div{cursor:pointer;padding:5px;display:block;}
 .menu>div:hover{background:gray;color:gold;}
@@ -6,3 +6,5 @@ body{margin:0;padding:8px;}
 .menu>div.disabled:hover{color:silver;}
 .menu>div span{display:inline-block;width:20px;}
 .menu>hr{border:none;border-top:1px dashed gray;}
+.expand>td{border-top:1px dashed gray;}
+table{width:100%;height:100%;}

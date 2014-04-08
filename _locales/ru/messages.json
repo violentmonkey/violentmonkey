@@ -47,10 +47,6 @@
 		"message": "Обновления не найдены.",
 		"description": "Message shown when there is no new version of a script."
 	},
-	"css": {
-		"message": "html{font-family:Calibri,Arial;}",
-		"description": "Additional CSS for all pages."
-	},
 	"labelInstall": {
 		"message": "Установка скрипта",
 		"description": "Shown in the title of the confirm page while trying to install a script."
@@ -66,14 +62,6 @@
 	"buttonClose": {
 		"message": "Закрыть",
 		"description": "Button to close window."
-	},
-	"anchorSupportPage": {
-		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>",
-		"description": "Link to the support page of Violentmonkey."
-	},
-	"anchorAuthor": {
-		"message": "Разработано <a href=mailto:gera2ld@163.com>Gerald</a>",
-		"description": "Author shown in the footer of options page, translator information may be added."
 	},
 	"msgScriptURL": {
 		"message": "URL-адрес скрипта: $1",
@@ -99,37 +87,109 @@
 		"message": "Ошибка загрузки требований.",
 		"description": "Message shown when not all requirements are loaded successfully."
 	},
-	"labelOptions": {
-		"message": "Опции",
-		"description": "Options of this extension."
+	"anchorGetMoreScripts": {
+		"message": "<a href=http://userscripts.org target=_blank>Скачать скрипты</a>",
+		"description": "Link to get more scripts."
+	},
+	"sideMenuInstalled": {
+		"message": "Установленные скрипты",
+		"description": "Side menu: Installed scripts"
+	},
+	"sideMenuSettings": {
+		"message": "Settings",
+		"description": "Side menu: Settings"
+	},
+	"sideMenuAbout": {
+		"message": "About",
+		"description": "Side menu: About"
 	},
 	"buttonNew": {
 		"message": "Создать",
 		"description": "Button to create a new script."
 	},
-	"anchorGetMoreScripts": {
-		"message": "<a href=http://userscripts.org target=_blank>Скачать скрипты с userscripts.org</a>",
-		"description": "Link to get more scripts."
-	},
 	"anchorUpdateAll": {
 		"message": "Проверить обновления скриптов",
 		"description": "Check all scripts for updates."
 	},
-	"buttonAdvanced": {
-		"message": "Дополнительно",
-		"description": "Button to show the advanced options."
-	},
-	"labelInstalledScripts": {
-		"message": "Установленные скрипты",
-		"description": "Label of the list of installed scripts."
-	},
-	"labelShowDetails": {
-		"message": "Подробно",
-		"description": "Option to show the details of scripts, such as author, description, etc."
-	},
 	"msgLoading": {
 		"message": "Загрузка...",
 		"description": "Message shown in the options page before script list is loaded."
+	},
+	"labelSettings": {
+		"message": "Settings",
+		"description": "Label shown on the top of settings page"
+	},
+	"labelAutoUpdate": {
+		"message": "Ежедневно проверять обновления скриптов",
+		"description": "Option to allow automatically checking scripts for updates every 24 hours."
+	},
+	"labelSearchLink": {
+		"message": "Поисковый адрес: ",
+		"description": "Label of URL for searching scripts for a site."
+	},
+	"buttonDefault": {
+		"message": "По умолчанию",
+		"description": "Button to replace search URL with the default one."
+	},
+	"labelDataImport": {
+		"message": "Data Import",
+		"description": "Section title of data import."
+	},
+	"buttonImportData": {
+		"message": "Импорт из zip-файла",
+		"description": "Button to choose a file for data import."
+	},
+	"buttonVacuumData": {
+		"message": "Сбросить кэш",
+		"description": "Button to vacuum extension data."
+	},
+	"labelDataExport": {
+		"message": "Data Export",
+		"description": "Section title of data export."
+	},
+	"labelScriptsToExport": {
+		"message": "Scripts to export",
+		"description": "Label shown on top of the script list for export."
+	},
+	"labelExportScriptData": {
+		"message": "Настройки скрипта",
+		"description": "Option to export script data along with scripts."
+	},
+	"buttonAllNone": {
+		"message": "Выбрать Всё/Ничего",
+		"description": "Button to select all scripts or none."
+	},
+	"buttonExportData": {
+		"message": "Экспорт в zip-файл",
+		"description": "Button to open the data export dialog."
+	},
+	"labelAbout": {
+		"message": "About Violentmonkey",
+		"description": "Label shown on top of the about page."
+	},
+	"labelSupportPage": {
+		"message": "Support page: ",
+		"description": "Label of support page."
+	},
+	"anchorSupportPage": {
+		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>",
+		"description": "Link to the support page of Violentmonkey."
+	},
+	"labelAuthor": {
+		"message": "Автор: ",
+		"description": "Label of author shown in the details of a script."
+	},
+	"anchorAuthor": {
+		"message": "<a href=mailto:gera2ld@163.com>Gerald</a>",
+		"description": "Author shown on about tab."
+	},
+	"labelTranslator": {
+		"message": "Translator: ",
+		"description": "Label of translator."
+	},
+	"anchorTranslator": {
+		"message": "softovikk",
+		"description": "Translator shown on about tab."
 	},
 	"labelScriptEditor": {
 		"message": "Редактор скриптов",
@@ -138,18 +198,6 @@
 	"buttonCustomMeta": {
 		"message": "Пользовательские meta-данные",
 		"description": "Button to edit the custom meta data of a script."
-	},
-	"labelAllowUpdate": {
-		"message": "Разрешить обновление",
-		"description": "Option to allow checking updates for a script."
-	},
-	"buttonSave": {
-		"message": "Сохранить",
-		"description": "Button to save modifications of a script."
-	},
-	"buttonSaveClose": {
-		"message": "Сохранить и закрыть",
-		"description": "Button to save modifications of a script and then close the editing page."
 	},
 	"labelName": {
 		"message": "Название:",
@@ -211,69 +259,21 @@
 		"message": "Пользовательские правила (одно на строку):",
 		"description": "Label of custom @exclude rules."
 	},
-	"buttonOK": {
-		"message": "Готово",
-		"description": "Button to confirm modifications."
+	"labelAllowUpdate": {
+		"message": "Разрешить обновление",
+		"description": "Option to allow checking updates for a script."
 	},
-	"buttonCancel": {
-		"message": "Отмена",
-		"description": "Button to cancel modifications."
+	"buttonSave": {
+		"message": "Сохранить",
+		"description": "Button to save modifications of a script."
 	},
-	"labelExport": {
-		"message": "Экспорт данных",
-		"description": "Label shown in the title of export dialog."
+	"buttonSaveClose": {
+		"message": "Сохранить и закрыть",
+		"description": "Button to save modifications of a script and then close the editing page."
 	},
-	"anchorExportOptions": {
-		"message": "Параметры экспорта",
-		"description": "Options of export."
-	},
-	"labelExportScriptData": {
-		"message": "Настройки скрипта",
-		"description": "Option to export script data along with scripts."
-	},
-	"buttonAllNone": {
-		"message": "Выбрать Всё/Ничего",
-		"description": "Button to select all scripts or none."
-	},
-	"labelAdvanced": {
-		"message": "Дополнительно",
-		"description": "Label shown in the title of advanced dialog."
-	},
-	"labelAutoUpdate": {
-		"message": "Ежедневно проверять обновления скриптов",
-		"description": "Option to allow automatically checking scripts for updates every 24 hours."
-	},
-	"labelSearchLink": {
-		"message": "Поисковый адрес: ",
-		"description": "Label of URL for searching scripts for a site."
-	},
-	"buttonDefault": {
-		"message": "По умолчанию",
-		"description": "Button to replace search URL with the default one."
-	},
-	"labelData": {
-		"message": "Данные",
-		"description": "Label of extension data management."
-	},
-	"buttonExportData": {
-		"message": "Экспорт в zip-файл",
-		"description": "Button to open the data export dialog."
-	},
-	"buttonImportData": {
-		"message": "Импорт из zip-файла",
-		"description": "Button to choose a file for data import."
-	},
-	"buttonVacuumData": {
-		"message": "Сбросить кэш",
-		"description": "Button to vacuum extension data."
-	},
-	"anchorUpdate": {
-		"message": "Проверить обновления",
-		"description": "Check a script for updates."
-	},
-	"buttonEdit": {
-		"message": "Изменить",
-		"description": "Button to edit a script."
+	"labelNoName": {
+		"message": "Новый скрипт",
+		"description": "Text as the name of a script when no @name is assigned."
 	},
 	"buttonDisable": {
 		"message": "Выключить",
@@ -283,17 +283,17 @@
 		"message": "Включить",
 		"description": "Button to enable a script."
 	},
+	"buttonEdit": {
+		"message": "Изменить",
+		"description": "Button to edit a script."
+	},
 	"buttonRemove": {
 		"message": "Удалить",
 		"description": "Button to remove a script."
 	},
-	"labelNoName": {
-		"message": "Новый скрипт",
-		"description": "Text as the name of a script when no @name is assigned."
-	},
-	"labelAuthor": {
-		"message": "Автор: ",
-		"description": "Label of author shown in the details of a script."
+	"anchorUpdate": {
+		"message": "Проверить обновления",
+		"description": "Check a script for updates."
 	},
 	"confirmNotSaved": {
 		"message": "Изменения не сохранены!\nНажмите OK, чтобы выйти или Отмена, чтобы вернуться.",
@@ -314,14 +314,6 @@
 	"hintVacuumData": {
 		"message": "Сбросить избыточность кэша и попробовать подгрузить недостающие ресурсы",
 		"description": "Hint for vacuuming data."
-	},
-	"buttonExport": {
-		"message": "Экспорт",
-		"description": "Button to confirm export."
-	},
-	"buttonExporting": {
-		"message": "Экспорт данных...",
-		"description": "Message shown when data export is in progress."
 	},
 	"buttonVacuumed": {
 		"message": "Сбросить кэш",

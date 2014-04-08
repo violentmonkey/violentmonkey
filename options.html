@@ -1,133 +1,140 @@
 <!doctype html>
-<html class=fill>
+<html>
 	<head>
 		<meta http-equiv="content-type" content="text/html;charset=utf-8">
 		<link rel="shortcut icon" type="image/png" href="images/icon16.png">
 		<link rel="stylesheet" type="text/css" href="common.css">
 		<link rel="stylesheet" type="text/css" href="options.css">
-		<script type="text/javascript" src="lib/zip.js/zip.js"></script>
-		<script type="text/javascript" src="load.js"></script>
+		<script src="lib/zip.js/zip.js"></script>
+		<script src="load.js"></script>
 		<title data-i18n=extName></title>
 	</head>
 	<body>
-		<table id=main class=frame>
-			<tr><td><h1 class=center><span data-i18n=labelOptions></span> - <span data-i18n=extName></span></h1></td></tr>
+		<div class=main>
+			<div class=sidebar>
+				<img src=images/icon128.png>
+				<h1 data-i18n=extName></h1>
+				<p>2013-2014</p>
+				<div data-i18n=anchorGetMoreScripts></div>
+				<hr>
+				<div class=sidemenu>
+					<div id=smInstalled data-i18n=sideMenuInstalled></div>
+					<div id=smSettings data-i18n=sideMenuSettings></div>
+					<div id=smAbout data-i18n=sideMenuAbout></div>
+				</div>
+			</div>
+			<div class=content>
+				<table id=tabInstalled class=hide>
+					<tr>
+						<td>
+							<button id=bNew data-i18n=buttonNew></button>
+							<button id=bUpdate data-i18n=anchorUpdateAll></button>
+						</td>
+					</tr>
+					<tr class=expand>
+						<td class=expandr>
+							<div id=sList class=expanda>
+								<span id=message data-i18n=msgLoading></span>
+							</div>
+						</td>
+					</tr>
+				</table>
+				<div id=tabSettings class=hide>
+					<h1 data-i18n=labelSettings></h1>
+					<div><label><input type=checkbox id=cUpdate><span data-i18n=labelAutoUpdate></span></label></div>
+					<table>
+						<tr>
+							<td><span data-i18n=labelSearchLink></span></td>
+							<td class=expand><input type=text id=tSearch></td>
+							<td><button id=bDefSearch data-i18n=buttonDefault></button></td>
+						</tr>
+					</table>
+					<fieldset>
+						<legend data-i18n=labelDataImport></legend>
+						<button id=bImport data-i18n=buttonImportData></button><input type=file class=hide id=iImport>
+						<button id=bVacuum data-i18n=buttonVacuumData></button>
+					</fieldset>
+					<fieldset>
+						<legend data-i18n=labelDataExport></legend>
+						<b data-i18n=labelScriptsToExport></b>
+						<label><input type=checkbox id=cWithData><span data-i18n=labelExportScriptData></span></label>
+						<div id=xList class=list></div>
+						<button id=bSelect data-i18n=buttonAllNone></button>
+						<a id=xHelper></a><button id=bExport data-i18n=buttonExportData></button>
+					</fieldset>
+				</div>
+				<div id=tabAbout class=hide>
+					<h1 data-i18n=labelAbout></h1>
+					<p data-i18n=extDescription></p>
+					<p><label data-i18n=labelSupportPage></label><span data-i18n=anchorSupportPage></span></p>
+					<p><label data-i18n=labelAuthor></label><span data-i18n=anchorAuthor></span></p>
+					<p><label data-i18n=labelTranslator></label><span data-i18n=anchorTranslator></span></p>
+				</div>
+			</div>
+		</div>
+		<table id=wndEditor class="frame hide">
 			<tr>
-				<td>
-					<div class=left>
-						<button id=bNew data-i18n=buttonNew></button>
-						<span data-i18n=anchorGetMoreScripts></span>
-					</div>
-					<div class=right>
-						<a id=bUpdate href=# data-i18n=anchorUpdateAll></a>
-						<button id=bAdvanced data-i18n=buttonAdvanced></button>
-					</div>
-					<div class=x></div>
-				</td>
+				<td><h2 data-i18n=labelScriptEditor></h2></td>
+				<td class="right bottom"><button id=bCustom><span id=sCustom></span> <span data-i18n=buttonCustomMeta></span></button></td>
 			</tr>
 			<tr class=expand>
-				<td class=expandr>
-					<div class=expanda>
-						<fieldset>
+				<td colspan=2 class=expandr>
+					<div id=eCode class=expanda></div>
+					<div id=eMeta class="expanda hide">
+						<table>
+							<tr>
+								<td title="@name" data-i18n=labelName></td><td class=expand><input type=text id=mName></td>
+								<td title="@run-at" data-i18n=labelRunAt></td><td>
+									<select id=mRunAt>
+										<option value=default data-i18n=labelRunAtDefault></option>
+										<option value=start>document-start</option>
+										<option value=idle>document-idle</option>
+										<option value=end>document-end</option>
+									</select>
+								</td>
+							</tr>
+							<tr title="@homepage"><td data-i18n=labelHomepage></td><td colspan=3 class=expand><input type=text id=mHomepage></td></tr>
+						</table>
+						<table>
+							<tr title="@updateURL"><td data-i18n=labelUpdateURL></td><td class=expand><input type=text id=mUpdateURL></td></tr>
+							<tr title="@downloadURL"><td data-i18n=labelDownloadURL></td><td class=expand><input type=text id=mDownloadURL></td></tr>
+						</table>
+						<fieldset title="@include">
 							<legend>
-								<span data-i18n=labelInstalledScripts></span>
-								<label><input type=checkbox id=cDetail><span data-i18n=labelShowDetails></span></label>
+								<span data-i18n=labelInclude></span>
+								<label><input type=checkbox id=cInclude><span data-i18n=labelKeepInclude></span></label>
 							</legend>
-							<div id=sList><span class=hint data-i18n=msgLoading></span></div>
+							<div data-i18n=labelCustomInclude></div>
+							<textarea id=mInclude></textarea>
+						</fieldset>
+						<fieldset title="@match">
+							<legend>
+								<span data-i18n=labelMatch></span>
+								<label><input type=checkbox id=cMatch><span data-i18n=labelKeepMatch></span></label>
+							</legend>
+							<div data-i18n=labelCustomMatch></div>
+							<textarea id=mMatch></textarea>
+						</fieldset>
+						<fieldset title="@exclude">
+							<legend>
+								<span data-i18n=labelExclude></span>
+								<label><input type=checkbox id=cExclude><span data-i18n=labelKeepExclude></span></label>
+							</legend>
+							<div data-i18n=labelCustomExclude></div>
+							<textarea id=mExclude></textarea>
 						</fieldset>
 					</div>
 				</td>
 			</tr>
-			<tr><td class=center><span data-i18n=anchorSupportPage></span> 2013-2014 | <span data-i18n=anchorAuthor></span></td></tr>
-		</table>
-		<div id=overlay class=hide></div>
-		<table id=editor class="frame hide">
 			<tr>
-				<td><h2 data-i18n=labelScriptEditor></h2></td>
-				<td class=buttons><button id=bcustom data-i18n=buttonCustomMeta></button></td>
-			</tr>
-			<tr class=expand><td id=eCode colspan=2 class=expandr></td></tr>
-			<tr>
-				<td colspan=2>
-					<label><input type=checkbox id=eUpdate><span data-i18n=labelAllowUpdate></span></label>
-					<div class=right>
-						<button id=eSave data-i18n=buttonSave></button>
-						<button id=eSaveClose data-i18n=buttonSaveClose></button>
-						<button id=eClose data-i18n=buttonClose></button>
-					</div>
+				<td><label><input type=checkbox id=eUpdate><span data-i18n=labelAllowUpdate></span></label></td>
+				<td class=right>
+					<button id=eSave data-i18n=buttonSave></button>
+					<button id=eSaveClose data-i18n=buttonSaveClose></button>
+					<button id=eClose data-i18n=buttonClose></button>
 				</td>
 			</tr>
 		</table>
-		<div id=meta class="float hide">
-			<table>
-				<tr>
-					<td title="@name" data-i18n=labelName></td><td class=expand><input type=text id=mName></td>
-					<td title="@run-at" data-i18n=labelRunAt></td><td>
-						<select id=mRunAt>
-							<option value=default data-i18n=labelRunAtDefault></option>
-							<option value=start>document-start</option>
-							<option value=idle>document-idle</option>
-							<option value=end>document-end</option>
-						</select>
-					</td>
-				</tr>
-				<tr title="@homepage"><td data-i18n=labelHomepage></td><td colspan=3 class=expand><input type=text id=mHomepage></td></tr>
-			</table>
-			<table>
-				<tr title="@updateURL"><td data-i18n=labelUpdateURL></td><td class=expand><input type=text id=mUpdateURL></td></tr>
-				<tr title="@downloadURL"><td data-i18n=labelDownloadURL></td><td class=expand><input type=text id=mDownloadURL></td></tr>
-			</table>
-			<fieldset title="@include">
-				<legend data-i18n=labelInclude></legend>
-				<label><input type=checkbox id=cInclude><span data-i18n=labelKeepInclude></span></label>
-				<span data-i18n=labelCustomInclude></span>
-				<textarea id=mInclude></textarea>
-			</fieldset>
-			<fieldset title="@match">
-				<legend data-i18n=labelMatch></legend>
-				<label><input type=checkbox id=cMatch><span data-i18n=labelKeepMatch></span></label>
-				<span data-i18n=labelCustomMatch></span>
-				<textarea id=mMatch></textarea>
-			</fieldset>
-			<fieldset title="@exclude">
-				<legend data-i18n=labelExclude></legend>
-				<label><input type=checkbox id=cExclude><span data-i18n=labelKeepExclude></span></label>
-				<span data-i18n=labelCustomExclude></span>
-				<textarea id=mExclude></textarea>
-			</fieldset>
-			<div class=right><button id=mOK data-i18n=buttonOK></button> <button id=mCancel data-i18n=buttonCancel></button></div>
-		</div>
-		<div id=export class="float hide">
-			<h2 data-i18n=labelExport></h2>
-			<span data-i18n=labelInstalledScripts></span>
-			<div id=xOptions class=right>
-				<a data-i18n=anchorExportOptions></a>
-				<div>
-					<label><input type=checkbox id=cWithData><span data-i18n=labelExportScriptData></span></label>
-				</div>
-			</div>
-			<div id=xList class=list></div>
-			<div class=left><button id=bSelect data-i18n=buttonAllNone></button></div>
-			<div class=right>
-				<button id=bExport></button>
-				<button id=bClose data-i18n=buttonClose></button>
-			</div>
-		</div>
-		<div id=advanced class="float hide">
-			<h2 data-i18n=labelAdvanced></h2>
-			<label><input type=checkbox id=cUpdate><span data-i18n=labelAutoUpdate></span></label>
-			<div>
-				<span data-i18n=labelSearchLink></span> <button id=bDefSearch data-i18n=buttonDefault></button><br>
-				<textarea id=tSearch></textarea><br>
-			</div>
-			<fieldset>
-				<legend data-i18n=labelData></legend>
-				<button id=aExport data-i18n=buttonExportData></button>
-				<button id=aImport data-i18n=buttonImportData></button><input type=file class=hide id=iImport>
-				<button id=aVacuum data-i18n=buttonVacuumData></button>
-			</fieldset>
-			<div class=right><button id=aClose data-i18n=buttonClose></button></div>
-		</div>
 	</body>
 </html>
 <script src="common.js"></script>

@@ -6,11 +6,6 @@ function format() {
     return g1;
   });
 }
-function initCSS(){
-	var s=document.createElement('style');
-	s.innerHTML=_('css');
-	document.head.appendChild(s);
-}
 function initI18n(callback){
 	window.addEventListener('DOMContentLoaded',function(){
 		var nodes=document.querySelectorAll('*[data-i18n]'),i,t;

@@ -60,7 +60,7 @@ function initCodeMirror(callback,data){
 				CodeMirror.keyMap.vm['Esc']='exit';
 				CodeMirror.commands.exit=data.exit;
 			}
-			var T=CodeMirror($('eCode'),{
+			var T=CodeMirror(document.getElementById('eCode'),{
 				continueComments:true,
 				matchBrackets:true,
 				autoCloseBrackets:true,

@@ -47,10 +47,6 @@
 		"message": "未发现新版本。",
 		"description": "Message shown when there is no new version of a script."
 	},
-	"css": {
-		"message": "html{font-family:微软雅黑;}",
-		"description": "Additional CSS for all pages."
-	},
 	"labelInstall": {
 		"message": "安装脚本",
 		"description": "Shown in the title of the confirm page while trying to install a script."
@@ -66,14 +62,6 @@
 	"buttonClose": {
 		"message": "关闭",
 		"description": "Button to close window."
-	},
-	"anchorSupportPage": {
-		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>暴力猴</a>",
-		"description": "Link to the support page of Violentmonkey."
-	},
-	"anchorAuthor": {
-		"message": "<a href=mailto:gera2ld@163.com>Gerald</a> 制作",
-		"description": "Author shown in the footer of options page, translator information may be added."
 	},
 	"msgScriptURL": {
 		"message": "脚本URL：$1",
@@ -99,37 +87,109 @@
 		"message": "加载依赖脚本发生错误。",
 		"description": "Message shown when not all requirements are loaded successfully."
 	},
-	"labelOptions": {
-		"message": "选项",
-		"description": "Options of this extension."
+	"anchorGetMoreScripts": {
+		"message": "<a href=http://userscripts.org target=_blank>获取更多脚本</a>",
+		"description": "Link to get more scripts."
+	},
+	"sideMenuInstalled": {
+		"message": "已安装的脚本",
+		"description": "Side menu: Installed scripts"
+	},
+	"sideMenuSettings": {
+		"message": "设置",
+		"description": "Side menu: Settings"
+	},
+	"sideMenuAbout": {
+		"message": "关于",
+		"description": "Side menu: About"
 	},
 	"buttonNew": {
 		"message": "新建",
 		"description": "Button to create a new script."
 	},
-	"anchorGetMoreScripts": {
-		"message": "<a href=http://userscripts.org target=_blank>从userscripts.org获取更多脚本</a>",
-		"description": "Link to get more scripts."
-	},
 	"anchorUpdateAll": {
 		"message": "全部更新",
 		"description": "Check all scripts for updates."
 	},
-	"buttonAdvanced": {
-		"message": "高级",
-		"description": "Button to show the advanced options."
-	},
-	"labelInstalledScripts": {
-		"message": "已安装的脚本",
-		"description": "Label of the list of installed scripts."
-	},
-	"labelShowDetails": {
-		"message": "显示详情",
-		"description": "Option to show the details of scripts, such as author, description, etc."
-	},
 	"msgLoading": {
 		"message": "加载中 ...",
 		"description": "Message shown in the options page before script list is loaded."
+	},
+	"labelSettings": {
+		"message": "设置",
+		"description": "Label shown on the top of settings page"
+	},
+	"labelAutoUpdate": {
+		"message": "每天自动更新脚本",
+		"description": "Option to allow automatically checking scripts for updates every 24 hours."
+	},
+	"labelSearchLink": {
+		"message": "搜索网址：",
+		"description": "Label of URL for searching scripts for a site."
+	},
+	"buttonDefault": {
+		"message": "默认",
+		"description": "Button to replace search URL with the default one."
+	},
+	"labelDataImport": {
+		"message": "数据导入",
+		"description": "Section title of data import."
+	},
+	"buttonImportData": {
+		"message": "导入自zip文件",
+		"description": "Button to choose a file for data import."
+	},
+	"buttonVacuumData": {
+		"message": "整理数据",
+		"description": "Button to vacuum extension data."
+	},
+	"labelDataExport": {
+		"message": "数据导出",
+		"description": "Section title of data export."
+	},
+	"labelScriptsToExport": {
+		"message": "要导出的脚本",
+		"description": "Label shown on top of the script list for export."
+	},
+	"labelExportScriptData": {
+		"message": "导出脚本数据",
+		"description": "Option to export script data along with scripts."
+	},
+	"buttonAllNone": {
+		"message": "全选/不选",
+		"description": "Button to select all scripts or none."
+	},
+	"buttonExportData": {
+		"message": "导出为zip文件",
+		"description": "Button to open the data export dialog."
+	},
+	"labelAbout": {
+		"message": "关于暴力猴",
+		"description": "Label shown on top of the about page."
+	},
+	"labelSupportPage": {
+		"message": "支持页面：",
+		"description": "Label of support page."
+	},
+	"anchorSupportPage": {
+		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>暴力猴</a>",
+		"description": "Link to the support page of Violentmonkey."
+	},
+	"labelAuthor": {
+		"message": "作者：",
+		"description": "Label of author shown in the details of a script."
+	},
+	"anchorAuthor": {
+		"message": "<a href=mailto:gera2ld@163.com>Gerald</a>",
+		"description": "Author shown on about tab."
+	},
+	"labelTranslator": {
+		"message": "翻译者：",
+		"description": "Label of translator."
+	},
+	"anchorTranslator": {
+		"message": "<a href=mailto:gera2ld@163.com>Gerald</a>",
+		"description": "Translator shown on about tab."
 	},
 	"labelScriptEditor": {
 		"message": "脚本编辑器",
@@ -138,18 +198,6 @@
 	"buttonCustomMeta": {
 		"message": "自定义元数据",
 		"description": "Button to edit the custom meta data of a script."
-	},
-	"labelAllowUpdate": {
-		"message": "允许更新",
-		"description": "Option to allow checking updates for a script."
-	},
-	"buttonSave": {
-		"message": "保存",
-		"description": "Button to save modifications of a script."
-	},
-	"buttonSaveClose": {
-		"message": "保存并关闭",
-		"description": "Button to save modifications of a script and then close the editing page."
 	},
 	"labelName": {
 		"message": "名字：",
@@ -211,69 +259,21 @@
 		"message": "自定义排除规则：<em>（每行一个）</em>",
 		"description": "Label of custom @exclude rules."
 	},
-	"buttonOK": {
-		"message": "确定",
-		"description": "Button to confirm modifications."
+	"labelAllowUpdate": {
+		"message": "允许更新",
+		"description": "Option to allow checking updates for a script."
 	},
-	"buttonCancel": {
-		"message": "取消",
-		"description": "Button to cancel modifications."
+	"buttonSave": {
+		"message": "保存",
+		"description": "Button to save modifications of a script."
 	},
-	"labelExport": {
-		"message": "数据导出",
-		"description": "Label shown in the title of export dialog."
+	"buttonSaveClose": {
+		"message": "保存并关闭",
+		"description": "Button to save modifications of a script and then close the editing page."
 	},
-	"anchorExportOptions": {
-		"message": "选项",
-		"description": "Options of export."
-	},
-	"labelExportScriptData": {
-		"message": "导出脚本数据",
-		"description": "Option to export script data along with scripts."
-	},
-	"buttonAllNone": {
-		"message": "全选/不选",
-		"description": "Button to select all scripts or none."
-	},
-	"labelAdvanced": {
-		"message": "高级选项",
-		"description": "Label shown in the title of advanced dialog."
-	},
-	"labelAutoUpdate": {
-		"message": "每天自动更新脚本",
-		"description": "Option to allow automatically checking scripts for updates every 24 hours."
-	},
-	"labelSearchLink": {
-		"message": "搜索网址：",
-		"description": "Label of URL for searching scripts for a site."
-	},
-	"buttonDefault": {
-		"message": "默认",
-		"description": "Button to replace search URL with the default one."
-	},
-	"labelData": {
-		"message": "数据",
-		"description": "Label of extension data management."
-	},
-	"buttonExportData": {
-		"message": "导出为zip文件",
-		"description": "Button to open the data export dialog."
-	},
-	"buttonImportData": {
-		"message": "导入自zip文件",
-		"description": "Button to choose a file for data import."
-	},
-	"buttonVacuumData": {
-		"message": "整理数据",
-		"description": "Button to vacuum extension data."
-	},
-	"anchorUpdate": {
-		"message": "查找更新",
-		"description": "Check a script for updates."
-	},
-	"buttonEdit": {
-		"message": "编辑",
-		"description": "Button to edit a script."
+	"labelNoName": {
+		"message": "名字为空",
+		"description": "Text as the name of a script when no @name is assigned."
 	},
 	"buttonDisable": {
 		"message": "禁用",
@@ -283,17 +283,17 @@
 		"message": "启用",
 		"description": "Button to enable a script."
 	},
+	"buttonEdit": {
+		"message": "编辑",
+		"description": "Button to edit a script."
+	},
 	"buttonRemove": {
 		"message": "移除",
 		"description": "Button to remove a script."
 	},
-	"labelNoName": {
-		"message": "名字为空",
-		"description": "Text as the name of a script when no @name is assigned."
-	},
-	"labelAuthor": {
-		"message": "作者：",
-		"description": "Label of author shown in the details of a script."
+	"anchorUpdate": {
+		"message": "查找更新",
+		"description": "Check a script for updates."
 	},
 	"confirmNotSaved": {
 		"message": "修改尚未保存！\n点击确定放弃修改或点击取消停留此页面。",
@@ -314,14 +314,6 @@
 	"hintVacuumData": {
 		"message": "丢弃多余的数据，并尝试重新获取缺失的资源。",
 		"description": "Hint for vacuuming data."
-	},
-	"buttonExport": {
-		"message": "导出",
-		"description": "Button to confirm export."
-	},
-	"buttonExporting": {
-		"message": "正在导出...",
-		"description": "Message shown when data export is in progress."
 	},
 	"buttonVacuumed": {
 		"message": "数据已整理",

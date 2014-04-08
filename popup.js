@@ -133,4 +133,3 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 chrome.tabs.query({currentWindow:true,active:true},function(t) {
 	tab=t[0];initMenu();chrome.tabs.sendMessage(tab.id,{cmd:'GetPopup'});
 });
-initCSS();
