@@ -13,4 +13,4 @@ function initI18n(callback){
 		if(callback) callback();
 	},true);
 }
-var _=chrome.i18n.getMessage;
+var _=chrome.i18n.getMessage,$=document.querySelector.bind(document);

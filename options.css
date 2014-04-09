@@ -17,16 +17,16 @@ textarea,input[type=text]{box-sizing:border-box;width:100%;}
 /* Installed scripts */
 #tabInstalled{height:100%;width:100%;}
 #sList{height:100%;overflow-y:auto;box-sizing:border-box;padding:0 10px 10px;border-top:1px solid darkgray;}
-#sList h3{display:inline-block;margin-right:10px;margin-left:60px;}
-#sList>div{border-bottom:1px dashed silver;padding-bottom:10px;position:relative;}
+#sList>div{border-bottom:1px dashed silver;padding:10px;position:relative;}
 #sList>div.disabled{background:lightgray;color:gray;}
 #sList>div.disabled .name{color:blueviolet;}
 #sList>div.disabled .icon{opacity:0.5;}
 #sList>div.moving{background:lightgreen;border:1px outset gray;cursor:move;}
+#sList .name{margin-left:60px;margin-right:10px;font-weight:bold;font-size:120%;}
 #sList .icon{top:1em;width:40px;height:40px;margin:2px;position:absolute;}
 #sList .version{margin-right:10px;}
-#sList .descrip{margin-left:60px;margin-bottom:0.5em;}
-#sList .move{cursor:move;margin-left:20px;color:gray;font-size:1.5em;}
+#sList .descrip{margin-left:60px;}
+#sList .move{cursor:move;margin-left:20px;color:gray;font-size:150%;}
 #sList .panelT{position:absolute;top:10px;right:10px;}
 
 /* Editor */

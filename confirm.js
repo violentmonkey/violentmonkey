@@ -1,5 +1,4 @@
-var $=document.getElementById.bind(document),M=$('msg'),I=$('bInstall'),data={},
-		U=$('url'),B=$('bClose'),C=$('cClose'),T;
+var M=$('#msg'),I=$('#bInstall'),U=$('#url'),B=$('#bClose'),C=$('#cClose'),data={},T;
 function showMsg(m,t){M.innerHTML=m;M.setAttribute('title',t||m);}
 B.onclick=function(){window.close();};
 C.onchange=function(){

@@ -1,4 +1,4 @@
-var $=document.getElementById.bind(document),P=$('popup'),C=$('commands'),
+var P=$('#popup'),C=$('#commands'),
 		pT=P.querySelector('.top'),pB=P.querySelector('.bot'),
 		cT=C.querySelector('.top'),cB=C.querySelector('.bot'),
 		tab=null,ia=null,scripts={},hr=null;
