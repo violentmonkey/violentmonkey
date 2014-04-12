@@ -8,7 +8,7 @@
 		"description": "Description for this extension."
 	},
 	"extTranslator": {
-		"message": "MISI90 <cydziol@gmail.com>",
+		"message": "MISI90 <cydziol@gmail.com>, Piter432 <MyReksio@gmail.com>",
 		"description": "Information of the translator."
 	},
 	"msgUpdated": {
@@ -72,11 +72,11 @@
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
 	"msgLoadedJS": {
-		"message": "Skrypt załadowany.",
+		"message": "Skrypt wczytany.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	},
 	"msgLoadingJS": {
-		"message": "Skrypt ładowania...",
+		"message": "Wczytywanie skryptu...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
 	},
 	"msgLoadingRequirements": {
@@ -96,11 +96,11 @@
 		"description": "Side menu: Installed scripts"
 	},
 	"sideMenuSettings": {
-		"message": "Settings",
+		"message": "Ustawienia",
 		"description": "Side menu: Settings"
 	},
 	"sideMenuAbout": {
-		"message": "About",
+		"message": "O rozszerzeniu",
 		"description": "Side menu: About"
 	},
 	"buttonNew": {
@@ -112,11 +112,11 @@
 		"description": "Check all scripts for updates."
 	},
 	"msgLoading": {
-		"message": "Ładowanie ...",
+		"message": "Wczytywanie...",
 		"description": "Message shown in the options page before script list is loaded."
 	},
 	"labelSettings": {
-		"message": "Settings",
+		"message": "Ustawienia",
 		"description": "Label shown on the top of settings page"
 	},
 	"labelAutoUpdate": {
@@ -132,7 +132,7 @@
 		"description": "Button to replace search URL with the default one."
 	},
 	"labelDataImport": {
-		"message": "Data Import",
+		"message": "Import danych",
 		"description": "Section title of data import."
 	},
 	"buttonImportData": {
@@ -144,11 +144,11 @@
 		"description": "Button to vacuum extension data."
 	},
 	"labelDataExport": {
-		"message": "Data Export",
+		"message": "Eksport danych",
 		"description": "Section title of data export."
 	},
 	"labelScriptsToExport": {
-		"message": "Scripts to export",
+		"message": "Skrypty do eksportu",
 		"description": "Label shown on top of the script list for export."
 	},
 	"labelExportScriptData": {
@@ -164,11 +164,11 @@
 		"description": "Button to open the data export dialog."
 	},
 	"labelAbout": {
-		"message": "About Violentmonkey",
+		"message": "O rozszerzeniu Violentmonkey",
 		"description": "Label shown on top of the about page."
 	},
 	"labelSupportPage": {
-		"message": "Support page: ",
+		"message": "Strona wsparcia: ",
 		"description": "Label of support page."
 	},
 	"anchorSupportPage": {
@@ -176,7 +176,7 @@
 		"description": "Link to the support page of Violentmonkey."
 	},
 	"labelAuthor": {
-		"message": "Autor: ",
+		"message": "Autor skryptu: ",
 		"description": "Label of author shown in the details of a script."
 	},
 	"anchorAuthor": {
@@ -184,11 +184,11 @@
 		"description": "Author shown on about tab."
 	},
 	"labelTranslator": {
-		"message": "Translator: ",
+		"message": "Tłumacze: ",
 		"description": "Label of translator."
 	},
 	"anchorTranslator": {
-		"message": "MISI90",
+		"message": "<a href=mailto:cydziol@gmail.com>MISI90</a>, <a href=mailto:MyReksio@gmail.com>Piter432</a>",
 		"description": "Translator shown on about tab."
 	},
 	"labelScriptEditor": {
@@ -348,7 +348,7 @@
 		"description": "Label for replace input in search box."
 	},
 	"buttonReplace": {
-		"message": "Zastąpić",
+		"message": "Zastąp",
 		"description": "Button to replace the current match."
 	},
 	"buttonReplaceAll": {
