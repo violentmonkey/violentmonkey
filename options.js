@@ -236,7 +236,6 @@ function exported(o){
 					xH.download='scripts.zip';
 					xH.dispatchEvent(e);
 					writer=null;
-					X.close();
 					URL.revokeObjectURL(u);
 				});
 		}
