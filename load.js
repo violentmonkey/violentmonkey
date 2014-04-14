@@ -1,6 +1,6 @@
 function addScript(data,callback){
 	function add(data){
-		var s=document.createElement('script');
+		var s=document.createElement('script');s.async=false;
 		if(data.innerHTML) s.innerHTML=data.innerHTML;
 		else if(data.src) s.src=data.src;
 		s.onload=finish;

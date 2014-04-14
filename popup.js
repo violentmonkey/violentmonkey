@@ -29,16 +29,18 @@ function menuCommand(e) {
 	chrome.tabs.sendMessage(tab.id,{cmd:'Command',data:e.target.cmd});
 }
 function menuScript(s) {
-	if(scripts[s.id]) return;scripts[s.id]=s;
-  var n=s.meta.name?s.meta.name.replace(/&/g,'&amp;').replace(/</g,'&lt;'):'<em>'+_('labelNoName')+'</em>';
-  loadItem(addItem(n,{
-    holder: pB,
-		symbol: '✓',
-    title: s.meta.name,
-    onclick: function(e){
-			chrome.runtime.sendMessage({cmd:'UpdateMeta',data:{id:s.id,enabled:loadItem(this,!this.data)?1:0}});
-    }
-  }),s.enabled);
+	if(s&&!scripts[s.id]) {
+		scripts[s.id]=s;
+		var n=s.meta.name?s.meta.name.replace(/&/g,'&amp;').replace(/</g,'&lt;'):'<em>'+_('labelNoName')+'</em>';
+		loadItem(addItem(n,{
+			holder: pB,
+			symbol: '✓',
+			title: s.meta.name,
+			onclick: function(e){
+				chrome.runtime.sendMessage({cmd:'UpdateMeta',data:{id:s.id,enabled:loadItem(this,!this.data)?1:0}});
+			}
+		}),s.enabled);
+	}
 }
 function initMenu(){
   addItem(_('menuManageScripts'),{
