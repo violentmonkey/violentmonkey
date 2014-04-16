@@ -139,8 +139,8 @@
 		"message": "Import from zip",
 		"description": "Button to choose a file for data import."
 	},
-	"buttonVacuumData": {
-		"message": "Vacuum data",
+	"buttonVacuum": {
+		"message": "Vacuum database",
 		"description": "Button to vacuum extension data."
 	},
 	"labelDataExport": {
@@ -311,7 +311,7 @@
 		"message": "Vacuuming data...",
 		"description": "Message shown when data vacuum is in progress."
 	},
-	"hintVacuumData": {
+	"hintVacuum": {
 		"message": "Discard the redundancy and try to reload the missing resources in cache.",
 		"description": "Hint for vacuuming data."
 	},

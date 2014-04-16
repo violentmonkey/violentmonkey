@@ -191,7 +191,7 @@ V.onclick=function(){
 	this.innerHTML=_('buttonVacuuming');
 	chrome.runtime.sendMessage({cmd:'Vacuum'});
 };
-V.title=_('hintVacuumData');
+V.title=_('hintVacuum');
 
 // Export
 var xL=$('#xList'),xE=$('#bExport'),xD=$('#cWithData');

@@ -139,7 +139,7 @@
 		"message": "导入自zip文件",
 		"description": "Button to choose a file for data import."
 	},
-	"buttonVacuumData": {
+	"buttonVacuum": {
 		"message": "整理数据",
 		"description": "Button to vacuum extension data."
 	},
@@ -311,7 +311,7 @@
 		"message": "正在整理...",
 		"description": "Message shown when data vacuum is in progress."
 	},
-	"hintVacuumData": {
+	"hintVacuum": {
 		"message": "丢弃多余的数据，并尝试重新获取缺失的资源。",
 		"description": "Hint for vacuuming data."
 	},

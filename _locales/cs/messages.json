@@ -139,7 +139,7 @@
 		"message": "Importovat ze souboru zip",
 		"description": "Button to choose a file for data import."
 	},
-	"buttonVacuumData": {
+	"buttonVacuum": {
 		"message": "Vyprázdnit data",
 		"description": "Button to vacuum extension data."
 	},
@@ -311,7 +311,7 @@
 		"message": "Čištení dat...",
 		"description": "Message shown when data vacuum is in progress."
 	},
-	"hintVacuumData": {
+	"hintVacuum": {
 		"message": "Zbavit se nadbytečného a zkusit znovu načíst chybějící zdroje v cache.",
 		"description": "Hint for vacuuming data."
 	},

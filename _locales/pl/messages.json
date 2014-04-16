@@ -64,7 +64,7 @@
 		"description": "Button to close window."
 	},
 	"msgScriptURL": {
-		"message": "Skrypt URL: $1",
+		"message": "Adres URL skryptu: $1",
 		"description": "URL of the script to be installed on confirm page."
 	},
 	"msgErrorLoadingJS": {
@@ -80,11 +80,11 @@
 		"description": "Message shown on confirm page when the script to be installed is loading."
 	},
 	"msgLoadingRequirements": {
-		"message": "Wymagania ładowania... ($1/$2)",
+		"message": "Wczytywanie wymagań... ($1/$2)",
 		"description": "Message shown on confirm page when the requirements are being downloaded."
 	},
 	"msgErrorLoadingRequirements": {
-		"message": "Błąd podczas ładowania wymagania.",
+		"message": "Błąd podczas wczytywania wymagań.",
 		"description": "Message shown when not all requirements are loaded successfully."
 	},
 	"anchorGetMoreScripts": {
@@ -108,7 +108,7 @@
 		"description": "Button to create a new script."
 	},
 	"anchorUpdateAll": {
-		"message": "Sprawdź aktualizacje dla wszystkich",
+		"message": "Sprawdź aktualizacje dla wszystkich skryptów",
 		"description": "Check all scripts for updates."
 	},
 	"msgLoading": {
@@ -139,7 +139,7 @@
 		"message": "Importuj z pliku zip",
 		"description": "Button to choose a file for data import."
 	},
-	"buttonVacuumData": {
+	"buttonVacuum": {
 		"message": "Wyczyść dane",
 		"description": "Button to vacuum extension data."
 	},
@@ -176,7 +176,7 @@
 		"description": "Link to the support page of Violentmonkey."
 	},
 	"labelAuthor": {
-		"message": "Autor skryptu: ",
+		"message": "Autor: ",
 		"description": "Label of author shown in the details of a script."
 	},
 	"anchorAuthor": {
@@ -196,7 +196,7 @@
 		"description": "Shown in the title of the script editing page."
 	},
 	"buttonCustomMeta": {
-		"message": "Własne dane meta",
+		"message": "Własne metadane",
 		"description": "Button to edit the custom meta data of a script."
 	},
 	"labelName": {
@@ -204,7 +204,7 @@
 		"description": "Label of script name."
 	},
 	"labelRunAt": {
-		"message": "Uruchom gdy:",
+		"message": "Uruchom podczas:",
 		"description": "Label of script @run-at properties in custom meta data."
 	},
 	"labelRunAtDefault": {
@@ -260,7 +260,7 @@
 		"description": "Label of custom @exclude rules."
 	},
 	"labelAllowUpdate": {
-		"message": "Zezwól na aktualizacje",
+		"message": "Zezwalaj na aktualizacje",
 		"description": "Option to allow checking updates for a script."
 	},
 	"buttonSave": {
@@ -296,7 +296,7 @@
 		"description": "Check a script for updates."
 	},
 	"confirmNotSaved": {
-		"message": "Modyfikacje nie zostały zapisane! Kliknij OK aby wyjść lub Anuluj aby zostać.",
+		"message": "Modyfikacje nie zostały zapisane! Kliknij OK, aby wyjść lub Anuluj aby zostać.",
 		"description": "Confirm message shown when there are unsaved script modifications."
 	},
 	"hintSearchLink": {
@@ -311,7 +311,7 @@
 		"message": "Czyszczenie danych...",
 		"description": "Message shown when data vacuum is in progress."
 	},
-	"hintVacuumData": {
+	"hintVacuum": {
 		"message": "Usuń nadmiarowość i spróbuj przeładować brakujące dane w cache.",
 		"description": "Hint for vacuuming data."
 	},
@@ -348,7 +348,7 @@
 		"description": "Label for replace input in search box."
 	},
 	"buttonReplace": {
-		"message": "Zastąp",
+		"message": "Zamień",
 		"description": "Button to replace the current match."
 	},
 	"buttonReplaceAll": {

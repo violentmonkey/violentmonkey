@@ -139,7 +139,7 @@
 		"message": "Импорт из zip-файла",
 		"description": "Button to choose a file for data import."
 	},
-	"buttonVacuumData": {
+	"buttonVacuum": {
 		"message": "Сбросить кэш",
 		"description": "Button to vacuum extension data."
 	},
@@ -311,7 +311,7 @@
 		"message": "Очистка данных кэша...",
 		"description": "Message shown when data vacuum is in progress."
 	},
-	"hintVacuumData": {
+	"hintVacuum": {
 		"message": "Сбросить избыточность кэша и попробовать подгрузить недостающие ресурсы",
 		"description": "Hint for vacuuming data."
 	},
