@@ -296,7 +296,7 @@
 		"description": "Check a script for updates."
 	},
 	"confirmNotSaved": {
-		"message": "Modyfikacje skryptu nie zostały zapisane! Kliknij OK, aby wyjść lub Anuluj aby zostać.",
+		"message": "Modyfikacje w tym skrypcie nie zostały zapisane! Kliknij OK, aby wyjść lub Anuluj aby zostać.",
 		"description": "Confirm message shown when there are unsaved script modifications."
 	},
 	"hintSearchLink": {
