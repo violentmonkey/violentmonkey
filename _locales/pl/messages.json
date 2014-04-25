@@ -272,7 +272,7 @@
 		"description": "Button to save modifications of a script and then close the editing page."
 	},
 	"labelNoName": {
-		"message": "Pusta nazwa",
+		"message": "Bez nazwy",
 		"description": "Text as the name of a script when no @name is assigned."
 	},
 	"buttonDisable": {
