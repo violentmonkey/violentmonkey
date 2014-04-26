@@ -28,23 +28,23 @@
 		"description": "URL for searching scripts, * stands for the keywords."
 	},
 	"msgUpdating": {
-		"message": "Aktualizowanie...",
+		"message": "Aktualizowanie skryptu...",
 		"description": "Message shown when a new version of script is being fetched."
 	},
 	"msgNewVersion": {
-		"message": "Znaleziono nową wersję.",
+		"message": "Znaleziono nową wersję tego skryptu.",
 		"description": "Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided."
 	},
 	"msgCheckingForUpdate": {
-		"message": "Sprawdzanie aktualizacji...",
+		"message": "Sprawdzanie aktualizacji skryptu...",
 		"description": "Message shown when a script is being checked for updates by version numbers."
 	},
 	"msgErrorFetchingUpdateInfo": {
-		"message": "Błąd pobierania informacji aktualizacji.",
+		"message": "Błąd podczas pobierania informacji aktualizacji dla tego skryptu.",
 		"description": "Message shown when Violentmonkey fails fetching version data of the script."
 	},
 	"msgNoUpdate": {
-		"message": "Nie znaleziono aktualizacji.",
+		"message": "Brak aktualizacji dla tego skryptu.",
 		"description": "Message shown when there is no new version of a script."
 	},
 	"labelInstall": {
@@ -52,15 +52,15 @@
 		"description": "Shown in the title of the confirm page while trying to install a script."
 	},
 	"optionClose": {
-		"message": "Zamknij po zakończeniu instalacji",
+		"message": "Zamknij tą kartę/to okno po zakończeniu instalacji skryptu",
 		"description": "Option to close confirm window after installation."
 	},
 	"buttonConfirmInstallation": {
-		"message": "Potwierdź instalację",
+		"message": "Potwierdź instalację skryptu",
 		"description": "Button to confirm installation of a script."
 	},
 	"buttonClose": {
-		"message": "Zamknij",
+		"message": "Zamknij kartę/okno",
 		"description": "Button to close window."
 	},
 	"msgScriptURL": {
@@ -104,7 +104,7 @@
 		"description": "Side menu: About"
 	},
 	"buttonNew": {
-		"message": "Nowy",
+		"message": "Nowy skrypt",
 		"description": "Button to create a new script."
 	},
 	"anchorUpdateAll": {
@@ -136,11 +136,11 @@
 		"description": "Section title of data import."
 	},
 	"buttonImportData": {
-		"message": "Importuj z pliku zip",
+		"message": "Importuj skrypty z pliku zip",
 		"description": "Button to choose a file for data import."
 	},
 	"buttonVacuum": {
-		"message": "Wyczyść dane",
+		"message": "Wyczyść dane skryptów",
 		"description": "Button to vacuum extension data."
 	},
 	"labelDataExport": {
@@ -160,7 +160,7 @@
 		"description": "Button to select all scripts or none."
 	},
 	"buttonExportData": {
-		"message": "Eksportuj do pliku zip",
+		"message": "Eksportuj skrypty do pliku zip",
 		"description": "Button to open the data export dialog."
 	},
 	"labelAbout": {
@@ -196,15 +196,15 @@
 		"description": "Shown in the title of the script editing page."
 	},
 	"buttonCustomMeta": {
-		"message": "Własne metadane",
+		"message": "Własne metadane skryptu",
 		"description": "Button to edit the custom meta data of a script."
 	},
 	"labelName": {
-		"message": "Nazwa:",
+		"message": "Nazwa skryptu:",
 		"description": "Label of script name."
 	},
 	"labelRunAt": {
-		"message": "Uruchom podczas:",
+		"message": "Uruchom gdy:",
 		"description": "Label of script @run-at properties in custom meta data."
 	},
 	"labelRunAtDefault": {
@@ -212,7 +212,7 @@
 		"description": "Shown when custom @run-at is not assigned."
 	},
 	"labelHomepage": {
-		"message": "Strona domowa:",
+		"message": "Strona domowa skryptu:",
 		"description": "Label of script @homepage in custom meta data."
 	},
 	"labelUpdateURL": {
@@ -260,51 +260,51 @@
 		"description": "Label of custom @exclude rules."
 	},
 	"labelAllowUpdate": {
-		"message": "Zezwalaj na aktualizacje",
+		"message": "Zezwalaj na aktualizacje tego skryptu",
 		"description": "Option to allow checking updates for a script."
 	},
 	"buttonSave": {
-		"message": "Zapisz",
+		"message": "Zapisz skrypt",
 		"description": "Button to save modifications of a script."
 	},
 	"buttonSaveClose": {
-		"message": "Zapisz i zamknij",
+		"message": "Zapisz skrypt i zamknij kartę/okno",
 		"description": "Button to save modifications of a script and then close the editing page."
 	},
 	"labelNoName": {
-		"message": "Pusta nazwa",
+		"message": "Bez nazwy",
 		"description": "Text as the name of a script when no @name is assigned."
 	},
 	"buttonDisable": {
-		"message": "Wyłącz",
+		"message": "Wyłącz skrypt",
 		"description": "Button to disable a script."
 	},
 	"buttonEnable": {
-		"message": "Włącz",
+		"message": "Włącz skrypt",
 		"description": "Button to enable a script."
 	},
 	"buttonEdit": {
-		"message": "Edytuj",
+		"message": "Edytuj skrypt",
 		"description": "Button to edit a script."
 	},
 	"buttonRemove": {
-		"message": "Usuń",
+		"message": "Usuń skrypt",
 		"description": "Button to remove a script."
 	},
 	"anchorUpdate": {
-		"message": "Sprawdź aktualizacje",
+		"message": "Sprawdź aktualizację/e skryptu",
 		"description": "Check a script for updates."
 	},
 	"confirmNotSaved": {
-		"message": "Modyfikacje nie zostały zapisane! Kliknij OK, aby wyjść lub Anuluj aby zostać.",
+		"message": "Modyfikacje w tym skrypcie nie zostały zapisane! Kliknij OK, aby wyjść lub Anuluj aby pozostać.",
 		"description": "Confirm message shown when there are unsaved script modifications."
 	},
 	"hintSearchLink": {
-		"message": "Adres wyszukiwarki musi zawierać *. * oznacza słowa kluczowe generowane przez Violentmonkey.",
+		"message": "Adres wyszukiwarki musi zawierać *. *, co oznacza słowa kluczowe generowane przez Violentmonkey.",
 		"description": "Hint for the search URL."
 	},
 	"msgImported": {
-		"message": "$1 pozycja(e) zaimportowana(e).",
+		"message": "$1 pozycja/e zaimportowana/e.",
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported."
 	},
 	"buttonVacuuming": {
