@@ -13,6 +13,7 @@ textarea,input[type=text]{box-sizing:border-box;width:100%;}
 .list{background:white;}
 .list>div{border-bottom:1px dashed lightgray;line-height:2em;}
 .list .selected{background:gray;color:white;}
+fieldset.title{border:none;border-top:1px solid silver;margin:20px 0 0;}
 
 /* Installed scripts */
 #tabInstalled{height:100%;width:100%;}
@@ -39,6 +40,5 @@ textarea,input[type=text]{box-sizing:border-box;width:100%;}
 #tabSettings>table{width:100%;}
 #tabSettings>table td{width:1px;white-space:nowrap;vertical-align:middle;}
 #tabSettings>table td.expand{width:auto;}
-#tabSettings fieldset{border:none;border-top:1px solid silver;margin:20px 0 0;}
 #tabSettings .list{min-height:100px;max-height:400px;border:1px solid darkgray;cursor:pointer;overflow-y:auto;}
 #tabSettings .list>div{display:inline-block;width:180px;margin:2px;padding:0 5px;border:1px dashed lightgray;}

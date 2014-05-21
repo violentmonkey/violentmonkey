@@ -175,6 +175,10 @@
 		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>",
 		"description": "Link to the support page of Violentmonkey."
 	},
+	"labelDonate": {
+		"message": "Donate",
+		"description": "Label of link to donate page."
+	},
 	"labelAuthor": {
 		"message": "Author: ",
 		"description": "Label of author shown in the details of a script."

@@ -175,6 +175,10 @@
 		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>暴力猴</a>",
 		"description": "Link to the support page of Violentmonkey."
 	},
+	"labelDonate": {
+		"message": "捐助",
+		"description": "Label of link to donate page."
+	},
 	"labelAuthor": {
 		"message": "作者：",
 		"description": "Label of author shown in the details of a script."
