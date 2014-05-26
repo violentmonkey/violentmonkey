@@ -1,10 +1,10 @@
 {
 	"name": "Violent monkey",
-	"version" : "2.1.1",
+	"version" : "2.1.2",
 	"manifest_version" : 2,
 	"description" : "__MSG_extDescription__",
 	"developer": {"name" : "Gerald", "url" : "http://geraldl.ml"},
-	"homepage_url":"http://geraldl.ml/Production/vm",
+	"homepage_url":"http://geraldl.ml/proj/vm?from=nex",
 	"icons" : {
 		"16":"images/icon16.png",
 		"48":"images/icon48.png",

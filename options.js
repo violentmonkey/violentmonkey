@@ -9,7 +9,10 @@ function getName(d,n,def){
 
 // Main options
 function allowUpdate(n){
-	return n.update&&(n.custom.updateURL||n.meta.updateURL||n.custom.downloadURL||n.meta.downloadURL);
+	return n.update&&(
+		n.custom.updateURL||n.meta.updateURL
+		||n.custom.downloadURL||n.meta.downloadURL||n.custom.lastInstallURL
+	);
 }
 function setIcon(n,d){
 	d.src=cache[n.meta.icon]||'images/icon48.png';

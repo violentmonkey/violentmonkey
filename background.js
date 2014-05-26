@@ -336,7 +336,7 @@ function parseScript(o,src,callback) {
 			if(o.more) for(i in o.more) if(i in c) c[i]=o.more[i];	// for import and user edit
 			c.meta=meta;c.code=o.code;c.uri=getNameURI(c);
 			if(o.from&&!c.meta.homepage&&!c.custom.homepage&&!/^(file|data):/.test(o.from)) c.custom.homepage=o.from;
-			if(o.url&&!c.meta.downloadURL&&!c.custom.downloadURL) c.custom.downloadURL=o.url;
+			if(o.url&&!/^(file|data):/.test(o.url)) c.custom.lastInstallURL=o.url;
 			saveScript(c,src).onsuccess=function(e){
 				r.id=c.id=e.target.result;r.obj=getMeta(c);finish();
 			};
@@ -432,7 +432,7 @@ function checkUpdateO(o) {
     } else r.message='<span class=new>'+_('msgNewVersion')+'</span>';
     updateItem(r);finish();
   }
-	var du=o.custom.downloadURL||o.meta.downloadURL,
+	var du=o.custom.downloadURL||o.meta.downloadURL||o.custom.lastInstallURL,
 			u=o.custom.updateURL||o.meta.updateURL||du;
   if(u) {
     r.message=_('msgCheckingForUpdate');updateItem(r);
