@@ -17,6 +17,11 @@ function allowUpdate(n){
 function setIcon(n,d){
 	d.src=cache[n.meta.icon]||'images/icon48.png';
 }
+function getAuthor(a,n){
+	var m=n.match(/^(.*?)\s<(\S*?@\S*?)>$/),t=_('labelAuthor');
+	if(m) a.innerHTML=t+'<a href=mailto:'+m[2]+'>'+m[1]+'</a>';
+	else a.innerText=t+n;
+}
 function modifyItem(r){
 	var o=map[r.id],d=o.div,n=o.obj;
 	if(r.message) d.querySelector('.message').innerHTML=r.message;
@@ -26,7 +31,7 @@ function modifyItem(r){
 	a=d.querySelector('.name');
 	getName(a,n.custom.name||n.meta.name);
 	if(o=n.custom.homepage||n.meta.homepage) a.href=o;
-	if(n.meta.author) d.querySelector('.author').innerText=_('labelAuthor')+n.meta.author;
+	getAuthor(d.querySelector('.author'),n.meta.author||'');
 	a=d.querySelector('.descrip');
 	getName(a,n.meta.description||'','&nbsp;');
 	setIcon(n,d.querySelector('.icon'));
@@ -126,22 +131,28 @@ $('#bNew').onclick=function(){chrome.runtime.sendMessage({cmd:'NewScript'},funct
 });};
 $('#bUpdate').onclick=function(){chrome.runtime.sendMessage({cmd:'CheckUpdateAll'});};
 function switchTab(e){
-	var t=e.target,i=t.id.slice(2),o=C.querySelector('#tab'+i);
-	if(!o) return;
+	var h,o;
+	if(e) {
+		e=e.target;h=e.getAttribute('href').substr(1);
+	} else {
+		h=location.hash||'#Installed';
+		h=h.substr(1);
+		e=$('#sm'+h);
+	}
+	o=C.querySelector('#tab'+h);
+	if(!o) return switchTab({target:$('#smInstalled')});
 	if(cur) {
-		if(cur.tab==o) return;
 		cur.menu.classList.remove('selected');
 		cur.tab.classList.add('hide');
 	}
-	cur={menu:t,tab:o};
-	t.classList.add('selected');
+	cur={menu:e,tab:o};
+	e.classList.add('selected');
 	o.classList.remove('hide');
-	switch(i) {	// init
+	switch(h) {	// init
 		case 'Settings':xLoad();break;
 	}
 }
 $('.sidemenu').onclick=switchTab;
-switchTab({target:$('#smInstalled')});
 function confirmCancel(dirty){
 	return !dirty||confirm(_('confirmNotSaved'));
 }
@@ -204,7 +215,7 @@ function xLoad() {
 	xL.innerHTML='';xE.disabled=false;
 	ids.forEach(function(i){
 		var d=document.createElement('div'),n=map[i].obj;
-		d.className='ellipsis';
+		d.className='ellipsis selected';
 		getName(d,n.custom.name||n.meta.name);
 		xL.appendChild(d);
 	});
@@ -359,9 +370,9 @@ E.close=$('#eClose').onclick=function(){if(confirmCancel(!eS.disabled)) eClose()
 initEditor(function(o){T=o;},{save:eSave,exit:E.close,onchange:E.markDirty});
 
 // Load at last
-var ids,map,cache;
+var ids=[],map={},cache;
 function loadOptions(o){
-	ids=[];map={};L.innerHTML='';
+	L.innerHTML='';
 	cache=o.cache;
 	o.scripts.forEach(function(i){
 		ids.push(i.id);addItem(map[i.id]={obj:i});
@@ -369,7 +380,9 @@ function loadOptions(o){
 	$('#cUpdate').checked=o.settings.autoUpdate;
 	S.value=o.settings.search;
 	xD.checked=o.settings.withData;
+	switchTab();
 }
+switchTab();
 function updateItem(r){
 	if(!('id' in r)) return;
 	var m=map[r.id];
