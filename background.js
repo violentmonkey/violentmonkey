@@ -518,7 +518,9 @@ function getData(d,src,callback) {
 					var r=e.target.result,b;
 					if(r) {
 						try {
-							b=window.atob(r.data);
+							var rb=window.atob(r.data);
+							b=new Uint8Array(rb.length);
+							for(var j=0;j<rb.length;j++) b[j]=rb.charCodeAt(j);
 						} catch(e) {
 							// XXX: compatible with old data, and update it
 							b=r.data;
