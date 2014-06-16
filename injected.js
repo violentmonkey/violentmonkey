@@ -188,6 +188,7 @@ var comm={
 				for(i in resources) if(name==i) {
 					i=resources[i];u=urls[i];
 					if(!u&&(r=cache[i])) {
+						r=window.atob(r);
 						b=new Uint8Array(r.length);
 						for(j=0;j<r.length;j++) b[j]=r.charCodeAt(j);
 						b=new Blob([b]);
