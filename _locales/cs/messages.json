@@ -67,25 +67,25 @@
 		"message": "Skript URL: $1",
 		"description": "URL of the script to be installed on confirm page."
 	},
-	"msgErrorLoadingJS": {
+	"msgErrorLoadingData": {
 		"message": "Chyba při načítání skript.",
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
-	"msgLoadedJS": {
+	"msgLoadedData": {
 		"message": "Skript načten.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	},
-	"msgLoadingJS": {
+	"msgLoadingData": {
 		"message": "Nahrávám skript...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
 	},
-	"msgLoadingRequirements": {
-		"message": "Vkládání požadavky... ($1/$2)",
-		"description": "Message shown on confirm page when the requirements are being downloaded."
-	},
-	"msgErrorLoadingRequirements": {
+	"msgErrorLoadingDependency": {
 		"message": "Chyba při načítání požadavky.",
 		"description": "Message shown when not all requirements are loaded successfully."
+	},
+	"msgLoadingDependency": {
+		"message": "Vkládání požadavky... ($1/$2)",
+		"description": "Message shown on confirm page when the requirements are being downloaded."
 	},
 	"anchorGetMoreScripts": {
 		"message": "Získej více skritpů",

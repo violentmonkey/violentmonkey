@@ -25,8 +25,7 @@ function getNameURI(i) {
 }
 function getMeta(j){return {id:j.id,custom:j.custom,meta:j.meta,enabled:j.enabled,update:j.update};}
 function parseMeta(d){
-	var o=-1,meta={include:[],exclude:[],match:[],require:[],resources:{}};
-	meta.resource=[];
+	var o=-1,meta={include:[],exclude:[],match:[],require:[],resource:[],resources:{}};
 	d.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g,function(m,k,v){
 		if(o<0&&k=='==UserScript==') o=1;
 		else if(k=='==/UserScript==') o=0;
@@ -243,7 +242,7 @@ function getInjected(url,src,callback) {	// for injected
 			var i=cache.pop();
 			if(i) o.get(i).onsuccess=function(e){
 				var r=e.target.result;
-				if(r) data.cache[i]=new Int8Array(r.data);
+				if(r) data.cache[i]=r.data;
 				loop();
 			}; else getValues();
 		}
@@ -276,14 +275,21 @@ function fetchURL(url, cb, type, headers) {
   req.send();
 }
 var _cache={},_require={};
+function saveCache(url,data,callback) {
+	var o=db.transaction('cache','readwrite').objectStore('cache');
+	o.put({uri:url,data:data}).onsuccess=callback;
+}
 function fetchCache(url) {
 	if(_cache[url]) return;
 	_cache[url]=1;
 	fetchURL(url, function() {
 		if (this.status!=200) return;
-		var o=db.transaction('cache','readwrite').objectStore('cache');
-		o.put({uri:url,data:this.response}).onsuccess=function(){delete _cache[url];};
-	}, 'arraybuffer');
+		var r=new FileReader();
+		r.onload=function(e){
+			saveCache(url,window.btoa(r.result),function(){delete _cache[url];});
+		};
+		r.readAsBinaryString(this.response);
+	}, 'blob');
 }
 function saveRequire(url,data,callback) {
 	var o=db.transaction('require','readwrite').objectStore('require');
@@ -345,7 +351,10 @@ function parseScript(o,src,callback) {
 			var c=o.require&&o.require[u];
 			if(c) saveRequire(u,c); else fetchRequire(u);
 		});
-		for(d in meta.resources) fetchCache(meta.resources[d]);	// @resource
+		for(d in meta.resources) {	// @resource
+			var u=meta.resources[d],c=o.resources&&o.resources[u];
+			if(c) saveCache(u,c); else fetchCache(u);
+		}
 		if(meta.icon) fetchCache(meta.icon);	// @icon
 	}
 	if(callback) callback();
@@ -506,9 +515,16 @@ function getData(d,src,callback) {
 			var i=cache.pop();
 			if(i) {
 				o.get(i).onsuccess=function(e){
-					var r=e.target.result;
+					var r=e.target.result,b;
 					if(r) {
-						var b=new Blob([r.data],{type:'image/png'});
+						try {
+							b=window.atob(r.data);
+						} catch(e) {
+							// XXX: compatible with old data, and update it
+							b=r.data;
+							setTimeout(function(){fetchCache(i);},1);
+						}
+						b=new Blob([b],{type:'image/png'});
 						data.cache[i]=URL.createObjectURL(b);
 						URL.revokeObjectURL(b);
 					}

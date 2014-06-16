@@ -67,25 +67,25 @@
 		"message": "Adres URL skryptu: $1",
 		"description": "URL of the script to be installed on confirm page."
 	},
-	"msgErrorLoadingJS": {
+	"msgErrorLoadingData": {
 		"message": "Błąd wczytywania skryptu.",
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
-	"msgLoadedJS": {
+	"msgLoadedData": {
 		"message": "Skrypt wczytany.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	},
-	"msgLoadingJS": {
+	"msgLoadingData": {
 		"message": "Wczytywanie skryptu...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
 	},
-	"msgLoadingRequirements": {
-		"message": "Wczytywanie wymagań... ($1/$2)",
-		"description": "Message shown on confirm page when the requirements are being downloaded."
-	},
-	"msgErrorLoadingRequirements": {
+	"msgErrorLoadingDependency": {
 		"message": "Błąd podczas wczytywania wymagań.",
 		"description": "Message shown when not all requirements are loaded successfully."
+	},
+	"msgLoadingDependency": {
+		"message": "Wczytywanie wymagań... ($1/$2)",
+		"description": "Message shown on confirm page when the requirements are being downloaded."
 	},
 	"anchorGetMoreScripts": {
 		"message": "Znajdź nowe skrypty",

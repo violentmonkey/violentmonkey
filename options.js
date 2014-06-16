@@ -20,7 +20,9 @@ function setIcon(n,d){
 function getAuthor(a,n){
 	var m=n.match(/^(.*?)\s<(\S*?@\S*?)>$/),t=_('labelAuthor');
 	if(m) a.innerHTML=t+'<a href=mailto:'+m[2]+'>'+m[1]+'</a>';
-	else a.innerText=t+n;
+	else {
+		if(n) n=t+n;a.innerText=n;
+	}
 }
 function modifyItem(r){
 	var o=map[r.id],d=o.div,n=o.obj;

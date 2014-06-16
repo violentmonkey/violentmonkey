@@ -67,25 +67,25 @@
 		"message": "URL-адрес скрипта: $1",
 		"description": "URL of the script to be installed on confirm page."
 	},
-	"msgErrorLoadingJS": {
+	"msgErrorLoadingData": {
 		"message": "Ошибка загрузки скрипта.",
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
-	"msgLoadedJS": {
+	"msgLoadedData": {
 		"message": "Скрипт загружен.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	},
-	"msgLoadingJS": {
+	"msgLoadingData": {
 		"message": "Загружается скрипт...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
 	},
-	"msgLoadingRequirements": {
-		"message": "Загрузка требований... ($1/$2)",
-		"description": "Message shown on confirm page when the requirements are being downloaded."
-	},
-	"msgErrorLoadingRequirements": {
+	"msgErrorLoadingDependency": {
 		"message": "Ошибка загрузки требований.",
 		"description": "Message shown when not all requirements are loaded successfully."
+	},
+	"msgLoadingDependency": {
+		"message": "Загрузка требований... ($1/$2)",
+		"description": "Message shown on confirm page when the requirements are being downloaded."
 	},
 	"anchorGetMoreScripts": {
 		"message": "Скачать скрипты",

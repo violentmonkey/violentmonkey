@@ -12,6 +12,7 @@ I.onclick=function(){
 			from:data.from,
 			code:T.getValue(),
 			require:data.require,
+			resources:data.resources,
 		},
 	});
 	I.disabled=true;
@@ -34,35 +35,55 @@ initEditor(function(o){
 		i.replace(/^([^=]*)=(.*)$/,function(r,g1,g2){data[g1]=decodeURIComponent(g2);});
 	});
 	U.innerHTML=_('msgScriptURL',[data.url||'-']);
-	function error(){showMsg(_('msgErrorLoadingJS'));}
-	function loaded(){showMsg(_('msgLoadedJS'));I.disabled=false;}
+	function error(){showMsg(_('msgErrorLoadingData'));}
+	function loaded(){showMsg(_('msgLoadedData'));I.disabled=false;}
 	if(data.url) {
 		U.setAttribute('title',data.url);
-		showMsg(_('msgLoadingJS'));
+		showMsg(_('msgLoadingData'));
 		var x=new XMLHttpRequest();
 		x.open('GET',data.url,true);
 		x.onloadend=function(){
 			if((!this.status||this.status==200)&&this.responseText) {
 				T.setValueAndFocus(this.responseText);
 				chrome.runtime.sendMessage({cmd:'ParseMeta',data:this.responseText},function(o){
-					var i=0,l=o.require.length,err=[];
-					if(l) {
-						showMsg(_('msgLoadingRequirements',[i,l]));
-						data.require={};
-						o.require.forEach(function(u){
+					function next() {
+						i++;
+						if(i>=l) {
+							if(err.length) showMsg(_('msgErrorLoadingDependency'),err.join('\n'));
+							else loaded();
+						} else showMsg(_('msgLoadingDependency',[i,l]));
+					}
+					function loadDependency(d,r,b) {
+						r.forEach(function(u){
 							var x=new XMLHttpRequest();
 							x.open('GET',u,true);
+							if(b) x.responseType='blob';
 							x.onloadend=function(){
-								i++;
-								if(this.status==200) data.require[u]=this.responseText;
-								else err.push(u);
-								if(i>=l) {
-									if(err.length) showMsg(_('msgErrorLoadingRequirements'),err.join('\n'));
-									else loaded();
-								}
+								if(this.status==200) {
+									if(b) {
+										var r=new FileReader();
+										r.onload=function(e){
+											d[u]=window.btoa(r.result);
+											next();
+										};
+										r.readAsBinaryString(this.response);
+										return;
+									} else d[u]=this.responseText;
+								} else err.push(u);
+								next();
 							};
 							x.send();
 						});
+					}
+					var i=0,l,err=[],u=[];
+					for(l in o.resources) u.push(o.resources[l]);
+					l=o.require.length+u.length;
+					if(l) {
+						showMsg(_('msgLoadingDependency',[i,l]));
+						data.require={};
+						loadDependency(data.require,o.require);
+						data.resources={};
+						loadDependency(data.resources,u,true);
 					} else loaded();
 				});
 			} else error();

@@ -67,25 +67,25 @@
 		"message": "Script URL: $1",
 		"description": "URL of the script to be installed on confirm page."
 	},
-	"msgErrorLoadingJS": {
-		"message": "Error loading script.",
+	"msgErrorLoadingData": {
+		"message": "Error loading script data.",
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
-	"msgLoadedJS": {
-		"message": "Script loaded.",
+	"msgLoadedData": {
+		"message": "Script data loaded.",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	},
-	"msgLoadingJS": {
-		"message": "Loading script...",
+	"msgLoadingData": {
+		"message": "Loading script data...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
 	},
-	"msgLoadingRequirements": {
-		"message": "Loading requirements... ($1/$2)",
-		"description": "Message shown on confirm page when the requirements are being downloaded."
-	},
-	"msgErrorLoadingRequirements": {
-		"message": "Error loading requirements.",
+	"msgErrorLoadingDependency": {
+		"message": "Error loading dependencies.",
 		"description": "Message shown when not all requirements are loaded successfully."
+	},
+	"msgLoadingDependency": {
+		"message": "Loading dependencies... ($1/$2)",
+		"description": "Message shown on confirm page when the requirements are being downloaded."
 	},
 	"anchorGetMoreScripts": {
 		"message": "Get more scripts",

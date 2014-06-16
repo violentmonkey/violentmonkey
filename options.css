@@ -12,7 +12,7 @@ textarea,input[type=text]{box-sizing:border-box;width:100%;}
 .controls>div{padding:5px 10px;}
 .list{background:white;}
 .list>div{border-bottom:1px dashed lightgray;line-height:2em;}
-.list .selected{background:gray;color:white;}
+.list .selected{background:lightgreen;color:darkgreen;}
 fieldset.title{border:none;border-top:1px solid silver;margin:20px 0 0;}
 
 /* Installed scripts */

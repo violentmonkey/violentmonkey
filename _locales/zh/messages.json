@@ -67,25 +67,25 @@
 		"message": "脚本URL：$1",
 		"description": "URL of the script to be installed on confirm page."
 	},
-	"msgErrorLoadingJS": {
-		"message": "加载脚本发生错误。",
+	"msgErrorLoadingData": {
+		"message": "加载脚本数据发生错误。",
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded."
 	},
-	"msgLoadedJS": {
-		"message": "脚本已加载。",
+	"msgLoadedData": {
+		"message": "脚本数据已加载。",
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded."
 	},
-	"msgLoadingJS": {
-		"message": "正在加载脚本...",
+	"msgLoadingData": {
+		"message": "正在加载脚本数据...",
 		"description": "Message shown on confirm page when the script to be installed is loading."
 	},
-	"msgLoadingRequirements": {
-		"message": "正在加载依赖脚本...（$1/$2）",
-		"description": "Message shown on confirm page when the requirements are being downloaded."
-	},
-	"msgErrorLoadingRequirements": {
-		"message": "加载依赖脚本发生错误。",
+	"msgErrorLoadingDependency": {
+		"message": "加载脚本依赖发生错误。",
 		"description": "Message shown when not all requirements are loaded successfully."
+	},
+	"msgLoadingDependency": {
+		"message": "正在加载脚本依赖...（$1/$2）",
+		"description": "Message shown on confirm page when the requirements are being downloaded."
 	},
 	"anchorGetMoreScripts": {
 		"message": "获取更多脚本",
@@ -140,7 +140,7 @@
 		"description": "Button to choose a file for data import."
 	},
 	"buttonVacuum": {
-		"message": "整理数据",
+		"message": "整理数据库",
 		"description": "Button to vacuum extension data."
 	},
 	"labelDataExport": {
