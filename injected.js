@@ -193,7 +193,7 @@ var comm={
 						b=new Blob([b]);
 						urls[i]=u=URL.createObjectURL(b);
 					}
-				return u;
+					return u;
 				}
 			}});
 			addProperty('GM_addStyle',{value:function(css){
@@ -210,15 +210,39 @@ var comm={
 			}});
 			function Request(details){
 				this.callback=function(d){
-					var c=details['on'+d.type];
-					if(c) c(d.data);
-					if(!this.id) for(var i in d.data) this.req[i]=d.data[i];
+					var i,c=details['on'+d.type];
+					if(c) {
+						if(d.data.response) {
+							if(!this.data.length) {
+								if(d.resType) {	// blob or arraybuffer
+									var m=d.data.response.match(/^data:(.*?);base64,(.*)$/);
+									if(!m) d.data.response=null;
+									else {
+										var b=window.atob(m[2]);
+										if(details.responseType=='blob') {
+											this.data.push(new Blob([b],{type:m[1]}));
+										} else {	// arraybuffer
+											this.data.push(m=new Uint8Array(b.length));
+											for(i=0;i<b.length;i++) m[i]=b.charCodeAt(i);
+										}
+									}
+								} else if(details.responseType=='json')	// json
+									this.data.push(JSON.parse(d.data.response));
+								else	// text
+									this.data.push(d.data.response);
+							}
+							d.data.response=this.data[0];
+						}
+						c(d.data);
+					}
+					if(!this.id)	// synchronous, not tested yet
+						for(i in d.data) this.req[i]=d.data[i];
 					if(d.type=='load') delete comm.requests[this.id];
 				};
 				this.start=function(id){
 					this.id=id;
 					comm.requests[id]=this;
-					comm.post({cmd:'HttpRequest',data:{
+					var data={
 						id:id,
 						method:details.method,
 						url:details.url,
@@ -228,11 +252,14 @@ var comm={
 						password:details.password,
 						headers:details.headers,
 						overrideMimeType:details.overrideMimeType,
-					}});
+					};
+					if(['arraybuffer','blob'].indexOf(details.responseType)>=0) data.responseType='blob';
+					comm.post({cmd:'HttpRequest',data:data});
 				};
 				this.req={
 					abort:function(){comm.post({cmd:'AbortRequest',data:this.id});}
 				};
+				this.data=[];
 				comm.qrequests.push(this);
 				comm.post({cmd:'GetRequestId'});
 			};
@@ -306,33 +333,49 @@ function getRequestId() {
 }
 function httpRequest(details) {
   function callback(evt) {
-    comm.post({
-      cmd: 'HttpRequested',
-      data: {
-        id: details.id,
-        type: evt.type,
-        data: {
-          readyState: req.readyState,
-          responseHeaders: req.getAllResponseHeaders(),
-          responseText: req.responseText,
-          status: req.status,
-          statusText: req.statusText
-        }
-      }
-    });
+		function finish(){
+			comm.post({
+				cmd: 'HttpRequested',
+				data: {
+					id: details.id,
+					type: evt.type,
+					resType: req.responseType,
+					data: data
+				}
+			});
+		}
+		var data={
+			readyState: req.readyState,
+			responseHeaders: req.getAllResponseHeaders(),
+			responseText: req.responseText,
+			status: req.status,
+			statusText: req.statusText
+		}
+		if(req.response&&req.responseType=='blob') {
+			var r=new FileReader();
+			r.onload=function(e){
+				data.response=r.result;
+				finish();
+			};
+			r.readAsDataURL(req.response);
+		} else {	// default `null` for blob and '' for text
+			data.response=req.response;
+			finish();
+		}
   }
-  var i,req;
+  var i,req,url=null;
   if(details.id) req=requests[details.id]; else req=new XMLHttpRequest();
   try {
     req.open(details.method,details.url,details.async,details.user,details.password);
     if(details.headers) for(i in details.headers) req.setRequestHeader(i,details.headers[i]);
+		if(details.responseType) req.responseType='blob';
     if(details.overrideMimeType) req.overrideMimeType(details.overrideMimeType);
     ['abort','error','load','progress','readystatechange','timeout'].forEach(function(i) {
       req['on'+i]=callback;
     });
     req.send(details.data);
     if(!details.id) callback({type:'load'});
-  } catch (e) {
+  } catch(e) {
 		console.log(e);
   }
 }

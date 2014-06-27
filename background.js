@@ -73,7 +73,7 @@ function vacuum(o,src,callback) {
 			if(r) {
 				v=r.value;ids.push(v.id);
 				v.meta.require.forEach(function(i){rq[i]=1;});
-				for(i in v.meta.resources) cc[i]=1;
+				for(i in v.meta.resources) cc[v.meta.resources[i]]=1;
 				if(v.meta.icon) cc[v.meta.icon]=1;vl[v.uri]=1;
 				r.continue();
 			} else vacuumPosition();
@@ -199,12 +199,26 @@ function getMetas(ids,src,callback) {	// for popup menu
 	}
 	getOne();
 }
+function getCacheB64(ids,src,callback) {
+	var o=db.transaction('cache').objectStore('cache'),data={};
+	function loop(){
+		var i=ids.pop();
+		if(i) o.get(i).onsuccess=function(e){
+			var r=e.target.result,b,u;
+			if(r) {
+				if(typeof r.data=='string') data[i]=r.data;
+				else
+					// XXX: old data, update it
+					setTimeout(function(){fetchCache(i)},1);
+			}
+			loop();
+		}; else callback(data);
+	}
+	loop();
+}
 function getInjected(url,src,callback) {	// for injected
 	function getScripts(){
-		function addCache(i,c,d){
-			if(!(i in d)) {c.push(i);d[i]=null;}
-		}
-		var o=db.transaction('scripts').objectStore('scripts'),n=0;
+		var o=db.transaction('scripts').objectStore('scripts'),n=0,require={};
 		o.index('position').openCursor().onsuccess=function(e){
 			var i,r=e.target.result,v;
 			if(r) {
@@ -212,8 +226,8 @@ function getInjected(url,src,callback) {	// for injected
 				if(testURL(url,v)) {
 					data.scripts.push(v);if(v.enabled) n++;
 					values.push(v.uri);
-					v.meta.require.forEach(function(i){addCache(i,require,data.require);});
-					for(i in v.meta.resources) addCache(v.meta.resources[i],cache,data.cache);
+					v.meta.require.forEach(function(i){require[i]=1;});
+					for(i in v.meta.resources) cache[v.meta.resources[i]]=1;
 				}
 				r.continue();
 			} else {
@@ -221,11 +235,11 @@ function getInjected(url,src,callback) {	// for injected
 					chrome.browserAction.setBadgeBackgroundColor({color:'#808',tabId:src.tab.id});
 					chrome.browserAction.setBadgeText({text:n.toString(),tabId:src.tab.id});
 				}
-				getRequire();
+				getRequire(Object.getOwnPropertyNames(require));
 			}
 		};
 	}
-	function getRequire(){
+	function getRequire(require){
 		function loop(){
 			var i=require.pop();
 			if(i) o.get(i).onsuccess=function(e){
@@ -238,16 +252,10 @@ function getInjected(url,src,callback) {	// for injected
 		loop();
 	}
 	function getCache(){
-		function loop(){
-			var i=cache.pop();
-			if(i) o.get(i).onsuccess=function(e){
-				var r=e.target.result;
-				if(r) data.cache[i]=r.data;
-				loop();
-			}; else getValues();
-		}
-		var o=db.transaction('cache').objectStore('cache');
-		loop();
+		getCacheB64(Object.getOwnPropertyNames(cache),src,function(o){
+			data.cache=o;
+			getValues();
+		});
 	}
 	function getValues(){
 		function loop(){
@@ -262,7 +270,7 @@ function getInjected(url,src,callback) {	// for injected
 		loop();
 	}
 	function finish(){callback(data);}
-	var data={scripts:[],require:{},cache:{},values:{}},cache=[],values=[],require=[];
+	var data={scripts:[],values:{},require:{}},cache={},values=[];
 	if(data.isApplied=settings.isApplied) getScripts(); else finish();
 }
 function fetchURL(url, cb, type, headers) {
@@ -274,19 +282,20 @@ function fetchURL(url, cb, type, headers) {
   if(cb) req.onloadend = cb;
   req.send();
 }
-var _cache={},_require={};
+var u_cache={},u_require={};
 function saveCache(url,data,callback) {
 	var o=db.transaction('cache','readwrite').objectStore('cache');
 	o.put({uri:url,data:data}).onsuccess=callback;
 }
 function fetchCache(url) {
-	if(_cache[url]) return;
-	_cache[url]=1;
+	if(u_cache[url]) return;
+	u_cache[url]=1;
 	fetchURL(url, function() {
 		if (this.status!=200) return;
+		//saveCache(url,this.response,function(){delete u_cache[url];});
 		var r=new FileReader();
 		r.onload=function(e){
-			saveCache(url,window.btoa(r.result),function(){delete _cache[url];});
+			saveCache(url,window.btoa(r.result),function(){delete u_cache[url];});
 		};
 		r.readAsBinaryString(this.response);
 	}, 'blob');
@@ -296,10 +305,10 @@ function saveRequire(url,data,callback) {
 	o.put({uri:url,code:data}).onsuccess=callback;
 }
 function fetchRequire(url) {
-	if(_require[url]) return;
-	_require[url]=1;
+	if(u_require[url]) return;
+	u_require[url]=1;
 	fetchURL(url, function(){
-		if(this.status==200) saveRequire(url,this.responseText,function(){delete _require[url];});
+		if(this.status==200) saveRequire(url,this.responseText,function(){delete u_require[url];});
 	});
 }
 function updateItem(r){
@@ -500,43 +509,20 @@ function getData(d,src,callback) {
 			var r=e.target.result,v;
 			if(r) {
 				v=r.value;
-				if(v.meta.icon&&!(v.meta.icon in data.cache)) {
-					cache.push(v.meta.icon);
-					data.cache[v.meta.icon]=null;
-				}
+				if(v.meta.icon) cache[v.meta.icon]=1;
 				data.scripts.push(getMeta(v));
 				r.continue();
 			} else getCache();
 		};
-	}
-	function getCache(){
-		var o=db.transaction('cache').objectStore('cache');
-		function loop(){
-			var i=cache.pop();
-			if(i) {
-				o.get(i).onsuccess=function(e){
-					var r=e.target.result,b;
-					if(r) {
-						try {
-							var rb=window.atob(r.data);
-							b=new Uint8Array(rb.length);
-							for(var j=0;j<rb.length;j++) b[j]=rb.charCodeAt(j);
-						} catch(e) {
-							// XXX: compatible with old data, and update it
-							b=r.data;
-							setTimeout(function(){fetchCache(i);},1);
-						}
-						b=new Blob([b],{type:'image/png'});
-						data.cache[i]=URL.createObjectURL(b);
-						URL.revokeObjectURL(b);
-					}
-					loop();
-				};
-			} else callback(data);
+		function getCache(){
+			getCacheB64(Object.getOwnPropertyNames(cache),src,function(o){
+				for(var i in o) o[i]='data:image/png;base64,'+o[i];
+				data.cache=o;
+				callback(data);
+			});
 		}
-		loop();
 	}
-	var data={settings:settings,scripts:[],cache:{}},cache=[];
+	var data={settings:settings,scripts:[]},cache={};
 	getScripts();
 }
 function exportZip(z,src,callback){
