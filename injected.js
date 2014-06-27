@@ -81,7 +81,7 @@ var comm={
 		if(f) f(o.data);
 	},
 	loadScript:function(o){
-		var start=[],idle=[],end=[],cache,require,values,comm=this;
+		var start=[],idle=[],end=[],cache,require,values,comm=this,urls={};
 		comm.command={};comm.requests={};comm.qrequests=[];
 		function wrapper(){
 			// functions and properties
@@ -175,16 +175,15 @@ var comm={
 				value[key]=val;comm.post({cmd:'SetValue',data:{uri:c.uri,values:value}});
 			}});
 			addProperty('GM_getResourceText',{value:function(name){
-				var i,b=null;
+				var i,u;
 				for(i in resources) if(name==i) {
-					b=cache[resources[i]];
-					if(b) b=comm.utf8decode(b);
-					break;
+					u=cache[resources[i]];
+					if(u) u=comm.utf8decode(window.atob(u));
+					return u;
 				}
-				return b;
 			}});
 			addProperty('GM_getResourceURL',{value:function(name){
-				var i,j,u=null,b,r;
+				var i,u,r,j,b;
 				for(i in resources) if(name==i) {
 					i=resources[i];u=urls[i];
 					if(!u&&(r=cache[i])) {
@@ -194,9 +193,8 @@ var comm={
 						b=new Blob([b]);
 						urls[i]=u=URL.createObjectURL(b);
 					}
-					break;
-				}
 				return u;
+				}
 			}});
 			addProperty('GM_addStyle',{value:function(css){
 				if(!document.head) return;
