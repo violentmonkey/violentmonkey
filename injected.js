@@ -350,9 +350,9 @@ function httpRequest(details) {
 			responseText: req.responseText,
 			status: req.status,
 			statusText: req.statusText
-		}
+		},r;
 		if(req.response&&req.responseType=='blob') {
-			var r=new FileReader();
+			r=new FileReader();
 			r.onload=function(e){
 				data.response=r.result;
 				finish();
