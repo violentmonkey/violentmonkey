@@ -222,8 +222,9 @@ var comm={
 										if(details.responseType=='blob') {
 											this.data.push(new Blob([b],{type:m[1]}));
 										} else {	// arraybuffer
-											this.data.push(m=new Uint8Array(b.length));
+											m=new Uint8Array(b.length);
 											for(i=0;i<b.length;i++) m[i]=b.charCodeAt(i);
+											this.data.push(m.buffer);
 										}
 									}
 								} else if(details.responseType=='json')	// json
@@ -347,10 +348,12 @@ function httpRequest(details) {
 		var data={
 			readyState: req.readyState,
 			responseHeaders: req.getAllResponseHeaders(),
-			responseText: req.responseText,
 			status: req.status,
 			statusText: req.statusText
 		},r;
+		try {
+			data.responseText=req.responseText;
+		} catch(e) {}
 		if(req.response&&req.responseType=='blob') {
 			r=new FileReader();
 			r.onload=function(e){
