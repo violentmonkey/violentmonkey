@@ -39,6 +39,7 @@ function parseMeta(d){
 		if(o) meta.resources[o[1]]=o[2];
 	});
 	delete meta.resource;
+	if(!meta.homepageURL&&meta.homepage) meta.homepageURL=meta.homepage;	// @homepageURL instead of @homepage
 	return meta;
 }
 function newScript() {
