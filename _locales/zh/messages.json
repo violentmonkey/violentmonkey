@@ -215,9 +215,9 @@
 		"message": "（默认）",
 		"description": "Shown when custom @run-at is not assigned."
 	},
-	"labelHomepage": {
+	"labelHomepageURL": {
 		"message": "主页：",
-		"description": "Label of script @homepage in custom meta data."
+		"description": "Label of script @homepageURL in custom meta data."
 	},
 	"labelUpdateURL": {
 		"message": "检查更新地址：",

@@ -215,9 +215,9 @@
 		"message": "(standardní)",
 		"description": "Shown when custom @run-at is not assigned."
 	},
-	"labelHomepage": {
-		"message": "Domovská stránka:",
-		"description": "Label of script @homepage in custom meta data."
+	"labelHomepageURL": {
+		"message": "Domovská stránka URL:",
+		"description": "Label of script @homepageURL in custom meta data."
 	},
 	"labelUpdateURL": {
 		"message": "Aktualizovat URL:",

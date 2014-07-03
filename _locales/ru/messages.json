@@ -215,9 +215,9 @@
 		"message": "(по умолчанию)",
 		"description": "Shown when custom @run-at is not assigned."
 	},
-	"labelHomepage": {
+	"labelHomepageURL": {
 		"message": "Дом. страница:",
-		"description": "Label of script @homepage in custom meta data."
+		"description": "Label of script @homepageURL in custom meta data."
 	},
 	"labelUpdateURL": {
 		"message": "Адрес обновления:",
