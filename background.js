@@ -35,7 +35,7 @@ function parseMeta(d){
 		else if(!(k in meta)) meta[k]=v;	// only first value will be stored
 	});
 	meta.resource.forEach(function(i){
-		o=i.match(/^(\w+)\s+(.*)/);
+		o=i.match(/^(\w\S*)\s+(.*)/);
 		if(o) meta.resources[o[1]]=o[2];
 	});
 	delete meta.resource;
