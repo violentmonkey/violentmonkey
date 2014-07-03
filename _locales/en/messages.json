@@ -215,9 +215,9 @@
 		"message": "(Default)",
 		"description": "Shown when custom @run-at is not assigned."
 	},
-	"labelHomepage": {
-		"message": "Homepage:",
-		"description": "Label of script @homepage in custom meta data."
+	"labelHomepageURL": {
+		"message": "Homepage URL:",
+		"description": "Label of script @homepageURL in custom meta data."
 	},
 	"labelUpdateURL": {
 		"message": "Update URL:",

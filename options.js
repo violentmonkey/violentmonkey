@@ -32,7 +32,7 @@ function modifyItem(r){
 	if(a) a.disabled=r.updating;
 	a=d.querySelector('.name');
 	getName(a,n.custom.name||n.meta.name);
-	if(o=n.custom.homepage||n.meta.homepage) a.href=o;
+	if(o=n.custom.homepageURL||n.meta.homepageURL) a.href=o;
 	getAuthor(d.querySelector('.author'),n.meta.author||'');
 	a=d.querySelector('.descrip');
 	getName(a,n.meta.description||'','&nbsp;');
@@ -288,7 +288,7 @@ xE.onclick=function(e){
 
 // Script Editor
 var E=$('#wndEditor'),U=$('#eUpdate'),M=$('#eMeta'),
-		mN=$('#mName'),mH=$('#mHomepage'),mR=$('#mRunAt'),
+		mN=$('#mName'),mH=$('#mHomepageURL'),mR=$('#mRunAt'),
 		mU=$('#mUpdateURL'),mD=$('#mDownloadURL'),
     mI=$('#mInclude'),mE=$('#mExclude'),mM=$('#mMatch'),
     cI=$('#cInclude'),cE=$('#cExclude'),cM=$('#cMatch'),
@@ -301,7 +301,7 @@ function mReset(){
 	sC.innerHTML='&laquo;';
 	var e=[],c=E.scr.custom;M.dirty=false;
 	mN.value=c.name||'';
-	mH.value=c.homepage||'';
+	mH.value=c.homepageURL||'';
 	mU.value=c.updateURL||'';
 	mD.value=c.downloadURL||'';
 	switch(c['run-at']){
@@ -327,7 +327,7 @@ function eSave(){
 	if(M.dirty) {
 		var c=E.scr.custom;
 		c.name=mN.value;
-		c.homepage=mH.value;
+		c.homepageURL=mH.value;
 		c.updateURL=mU.value;
 		c.downloadURL=mD.value;
 		switch(mR.value){

@@ -350,7 +350,7 @@ function parseScript(o,src,callback) {
 			if(!c.id){r.status=1;r.message=_('msgInstalled');}
 			if(o.more) for(i in o.more) if(i in c) c[i]=o.more[i];	// for import and user edit
 			c.meta=meta;c.code=o.code;c.uri=getNameURI(c);
-			if(o.from&&!c.meta.homepage&&!c.custom.homepage&&!/^(file|data):/.test(o.from)) c.custom.homepage=o.from;
+			if(o.from&&!c.meta.homepageURL&&!c.custom.homepageURL&&!/^(file|data):/.test(o.from)) c.custom.homepageURL=o.from;
 			if(o.url&&!/^(file|data):/.test(o.url)) c.custom.lastInstallURL=o.url;
 			saveScript(c,src).onsuccess=function(e){
 				r.id=c.id=e.target.result;r.obj=getMeta(c);finish();
