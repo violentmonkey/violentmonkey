@@ -55,7 +55,7 @@ function initMenu(){
 			});
 		}
   });
-  if(/^https?:\/\//i.test(tab.url)) {
+  /*if(/^https?:\/\//i.test(tab.url)) {
 		var d=addItem(_('menuFindScripts'), {
 			holder: pT,
 			symbol: '➤',
@@ -71,7 +71,7 @@ function initMenu(){
 			};
 			loadItem(d,true);
 		});
-	}
+	}*/
   ia=addItem(_('menuScriptEnabled'), {
     holder: pT,
 		symbol: '✓',
