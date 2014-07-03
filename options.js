@@ -32,7 +32,7 @@ function modifyItem(r){
 	if(a) a.disabled=r.updating;
 	a=d.querySelector('.name');
 	getName(a,n.custom.name||n.meta.name);
-	if(o=n.custom.homepageURL||n.meta.homepageURL) a.href=o;
+	if(o=n.custom.homepageURL||n.meta.homepageURL||n.meta.homepage) a.href=o;	// compatible with @homepage
 	getAuthor(d.querySelector('.author'),n.meta.author||'');
 	a=d.querySelector('.descrip');
 	getName(a,n.meta.description||'','&nbsp;');
