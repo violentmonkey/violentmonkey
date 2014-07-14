@@ -25,7 +25,7 @@ function getNameURI(i) {
 }
 function getMeta(j){return {id:j.id,custom:j.custom,meta:j.meta,enabled:j.enabled,update:j.update};}
 function parseMeta(d){
-	var o=-1,meta={include:[],exclude:[],match:[],require:[],resource:[],resources:{}};
+	var o=-1,meta={include:[],exclude:[],match:[],require:[],resource:[],grant:[]};
 	d.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g,function(m,k,v){
 		if(o<0&&k=='==UserScript==') o=1;
 		else if(k=='==/UserScript==') o=0;
@@ -34,6 +34,7 @@ function parseMeta(d){
 		if(meta[k]&&meta[k].push) meta[k].push(v);	// multiple values allowed
 		else if(!(k in meta)) meta[k]=v;	// only first value will be stored
 	});
+	meta.resources={};
 	meta.resource.forEach(function(i){
 		o=i.match(/^(\w\S*)\s+(.*)/);
 		if(o) meta.resources[o[1]]=o[2];
@@ -393,15 +394,16 @@ function setValue(data,src,callback){
 	if(callback) callback();	// it seems that CALLBACK does not work with READWRITE transaction
 }
 function getOption(k,src,callback){
-	var v=localStorage.getItem(k)||'';
+	var v=localStorage.getItem(k)||'',r=true;
 	try{
 		v=JSON.parse(v);
+		settings[k]=v;
 	}catch(e){
-		return false;
+		v=null;
+		r=false;
 	}
-	settings[k]=v;
 	if(callback) callback(v);
-	return true;
+	return r;
 }
 function setOption(o,src,callback){
 	if(!o.check||(o.key in settings)) {
@@ -593,10 +595,24 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 var settings={};
 initSettings();
 initDb(function(){
-	var o=db.transaction('scripts').objectStore('scripts');
-	o.index('position').openCursor(null,'prev').onsuccess=function(e){
-		var r=e.target.result;pos=r.key;
-	};
+	var dataVer=1;
+	getOption('dataVer',null,function(ver){
+		if(!ver) ver=0;pos=null;
+		var o=db.transaction('scripts','readwrite').objectStore('scripts');
+		o.index('position').openCursor(null,'prev').onsuccess=function(e){
+			var r=e.target.result;
+			if(pos===null) pos=r?r.key:0;
+			if(ver<dataVer) {
+				if(r) {
+					r.value.meta=parseMeta(r.value.code);
+					o.put(r.value).onsuccess=function(){r.continue();};
+				} else {
+					console.log('Data upgraded.');
+					setOption({key:'dataVer',value:dataVer});
+				}
+			}
+		};
+	});
 	chrome.browserAction.setIcon({path:'images/icon19'+(settings.isApplied?'':'w')+'.png'});
 	setTimeout(autoCheck,2e4);
 });

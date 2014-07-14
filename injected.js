@@ -83,6 +83,62 @@ var comm={
 	loadScript:function(o){
 		var start=[],idle=[],end=[],cache,require,values,comm=this,urls={};
 		comm.command={};comm.requests={};comm.qrequests=[];
+		function Request(details){
+			this.callback=function(d){
+				var i,c=details['on'+d.type];
+				if(c) {
+					if(d.data.response) {
+						if(!this.data.length) {
+							if(d.resType) {	// blob or arraybuffer
+								var m=d.data.response.match(/^data:(.*?);base64,(.*)$/);
+								if(!m) d.data.response=null;
+								else {
+									var b=window.atob(m[2]);
+									if(details.responseType=='blob') {
+										this.data.push(new Blob([b],{type:m[1]}));
+									} else {	// arraybuffer
+										m=new Uint8Array(b.length);
+										for(i=0;i<b.length;i++) m[i]=b.charCodeAt(i);
+										this.data.push(m.buffer);
+									}
+								}
+							} else if(details.responseType=='json')	// json
+								this.data.push(JSON.parse(d.data.response));
+							else	// text
+								this.data.push(d.data.response);
+						}
+						d.data.response=this.data[0];
+					}
+					c(d.data);
+				}
+				if(!this.id)	// synchronous, not tested yet
+					for(i in d.data) this.req[i]=d.data[i];
+				if(d.type=='load') delete comm.requests[this.id];
+			};
+			this.start=function(id){
+				this.id=id;
+				comm.requests[id]=this;
+				var data={
+					id:id,
+					method:details.method,
+					url:details.url,
+					data:details.data,
+					async:!details.synchronous,
+					user:details.user,
+					password:details.password,
+					headers:details.headers,
+					overrideMimeType:details.overrideMimeType,
+				};
+				if(['arraybuffer','blob'].indexOf(details.responseType)>=0) data.responseType='blob';
+				comm.post({cmd:'HttpRequest',data:data});
+			};
+			this.req={
+				abort:function(){comm.post({cmd:'AbortRequest',data:this.id});}
+			};
+			this.data=[];
+			comm.qrequests.push(this);
+			comm.post({cmd:'GetRequestId'});
+		}
 		function wrapper(){
 			// functions and properties
 			function wrapFunction(o,i,c){
@@ -113,178 +169,124 @@ var comm={
 			comm.prop2.forEach(wrapItem);
 		}
 		function wrapGM(c){
-			var gm={},value=values[c.uri];if(!value) value={};
+			// Add GM functions
+			// Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
+			var gm={},value=values[c.uri],w,g=c.meta.grant||[];
+			if(!g.length||g.length==1&&g[0]=='none') {	// @grant none
+				w={};g.pop();
+			} else {
+				w=new wrapper();
+			}
+			if(g.indexOf('unsafeWindow')<0) g.push('unsafeWindow');
+			if(!value) value={};
 			function propertyToString(){return 'Property for Violentmonkey: designed by Gerald';}
 			function addProperty(name,prop,obj){
 				if('value' in prop) prop.writable=false;
 				prop.configurable=false;
-				if(!obj) obj=gm;
 				Object.defineProperty(obj,name,prop);
 				if(typeof obj[name]=='function') obj[name].toString=propertyToString;
 			}
-			var resources=c.meta.resources||{};
-			addProperty('unsafeWindow',{value:window});
-
-			// GM functions
-			// Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-			addProperty('GM_info',{get:function(){
-				var m=c.code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/),
-						script={
-							description:c.meta.description||'',
-							excludes:c.meta.exclude.concat(),
-							includes:c.meta.include.concat(),
-							matches:c.meta.match.concat(),
-							name:c.meta.name||'',
-							namespace:c.meta.namespace||'',
-							resources:{},
-							'run-at':c.meta['run-at']||'document-end',
-							unwrap:false,
-							version:c.meta.version||'',
-						},
-						o={};
-				addProperty('script',{value:{}},o);
-				addProperty('scriptMetaStr',{value:m?m[1]:''},o);
-				addProperty('scriptWillUpdate',{value:c.update},o);
-				addProperty('version',{value:undefined},o);
-				for(m in script) addProperty(m,{value:script[m]},o.script);
-				for(m in c.meta.resources) addProperty(m,{value:c.meta.resources[m]},o.script.resources);
-				return o;
-			}});
-			addProperty('GM_deleteValue',{value:function(key){delete value[key];comm.post({cmd:'SetValue',data:{uri:c.uri,values:value}});}});
-			addProperty('GM_getValue',{value:function(k,d){
-				var v=value[k];
-				if(v) {
-					k=v[0];
-					v=v.slice(1);
-					switch(k){
-						case 'n': d=Number(v);break;
-						case 'b': d=v=='true';break;
-						case 'o': try{d=JSON.parse(v);}catch(e){console.log(e);}break;
-						default: d=v;
-					}
-				}
-				return d;
-			}});
-			addProperty('GM_listValues',{value:function(){return Object.getOwnPropertyNames(value);}});
-			addProperty('GM_setValue',{value:function(key,val){
-				var t=(typeof val)[0];
-				switch(t){
-					case 'o':val=t+JSON.stringify(val);break;
-					default:val=t+val;
-				}
-				value[key]=val;comm.post({cmd:'SetValue',data:{uri:c.uri,values:value}});
-			}});
-			addProperty('GM_getResourceText',{value:function(name){
-				var i,u;
-				for(i in resources) if(name==i) {
-					u=cache[resources[i]];
-					if(u) u=comm.utf8decode(window.atob(u));
-					return u;
-				}
-			}});
-			addProperty('GM_getResourceURL',{value:function(name){
-				var i,u,r,j,b;
-				for(i in resources) if(name==i) {
-					i=resources[i];u=urls[i];
-					if(!u&&(r=cache[i])) {
-						r=window.atob(r);
-						b=new Uint8Array(r.length);
-						for(j=0;j<r.length;j++) b[j]=r.charCodeAt(j);
-						b=new Blob([b]);
-						urls[i]=u=URL.createObjectURL(b);
-					}
-					return u;
-				}
-			}});
-			addProperty('GM_addStyle',{value:function(css){
-				if(!document.head) return;
-				var v=document.createElement('style');
-				v.innerHTML=css;
-				document.head.appendChild(v);
-				return v;
-			}});
-			addProperty('GM_log',{value:function(d){console.log(d);}});
-			addProperty('GM_openInTab',{value:function(url){window.open(url);}});
-			addProperty('GM_registerMenuCommand',{value:function(cap,func,acc){
-				comm.command[cap]=func;comm.post({cmd:'RegisterMenu',data:[cap,acc]});
-			}});
-			function Request(details){
-				this.callback=function(d){
-					var i,c=details['on'+d.type];
-					if(c) {
-						if(d.data.response) {
-							if(!this.data.length) {
-								if(d.resType) {	// blob or arraybuffer
-									var m=d.data.response.match(/^data:(.*?);base64,(.*)$/);
-									if(!m) d.data.response=null;
-									else {
-										var b=window.atob(m[2]);
-										if(details.responseType=='blob') {
-											this.data.push(new Blob([b],{type:m[1]}));
-										} else {	// arraybuffer
-											m=new Uint8Array(b.length);
-											for(i=0;i<b.length;i++) m[i]=b.charCodeAt(i);
-											this.data.push(m.buffer);
-										}
-									}
-								} else if(details.responseType=='json')	// json
-									this.data.push(JSON.parse(d.data.response));
-								else	// text
-									this.data.push(d.data.response);
-							}
-							d.data.response=this.data[0];
+			var resources=c.meta.resources||{},gf={
+				unsafeWindow:{value:window},
+				GM_info:{get:function(){
+					var m=c.code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/),
+							script={
+								description:c.meta.description||'',
+								excludes:c.meta.exclude.concat(),
+								includes:c.meta.include.concat(),
+								matches:c.meta.match.concat(),
+								name:c.meta.name||'',
+								namespace:c.meta.namespace||'',
+								resources:{},
+								'run-at':c.meta['run-at']||'document-end',
+								unwrap:false,
+								version:c.meta.version||'',
+							},
+							o={};
+					addProperty('script',{value:{}},o);
+					addProperty('scriptMetaStr',{value:m?m[1]:''},o);
+					addProperty('scriptWillUpdate',{value:c.update},o);
+					addProperty('version',{value:undefined},o);
+					for(m in script) addProperty(m,{value:script[m]},o.script);
+					for(m in c.meta.resources) addProperty(m,{value:c.meta.resources[m]},o.script.resources);
+					return o;
+				}},
+				GM_deleteValue:{value:function(key){delete value[key];comm.post({cmd:'SetValue',data:{uri:c.uri,values:value}});}},
+				GM_getValue:{value:function(k,d){
+					var v=value[k];
+					if(v) {
+						k=v[0];
+						v=v.slice(1);
+						switch(k){
+							case 'n': d=Number(v);break;
+							case 'b': d=v=='true';break;
+							case 'o': try{d=JSON.parse(v);}catch(e){console.log(e);}break;
+							default: d=v;
 						}
-						c(d.data);
 					}
-					if(!this.id)	// synchronous, not tested yet
-						for(i in d.data) this.req[i]=d.data[i];
-					if(d.type=='load') delete comm.requests[this.id];
-				};
-				this.start=function(id){
-					this.id=id;
-					comm.requests[id]=this;
-					var data={
-						id:id,
-						method:details.method,
-						url:details.url,
-						data:details.data,
-						async:!details.synchronous,
-						user:details.user,
-						password:details.password,
-						headers:details.headers,
-						overrideMimeType:details.overrideMimeType,
-					};
-					if(['arraybuffer','blob'].indexOf(details.responseType)>=0) data.responseType='blob';
-					comm.post({cmd:'HttpRequest',data:data});
-				};
-				this.req={
-					abort:function(){comm.post({cmd:'AbortRequest',data:this.id});}
-				};
-				this.data=[];
-				comm.qrequests.push(this);
-				comm.post({cmd:'GetRequestId'});
+					return d;
+				}},
+				GM_listValues:{value:function(){return Object.getOwnPropertyNames(value);}},
+				GM_setValue:{value:function(key,val){
+					var t=(typeof val)[0];
+					switch(t){
+						case 'o':val=t+JSON.stringify(val);break;
+						default:val=t+val;
+					}
+					value[key]=val;comm.post({cmd:'SetValue',data:{uri:c.uri,values:value}});
+				}},
+				GM_getResourceText:{value:function(name){
+					var i,u;
+					for(i in resources) if(name==i) {
+						u=cache[resources[i]];
+						if(u) u=comm.utf8decode(window.atob(u));
+						return u;
+					}
+				}},
+				GM_getResourceURL:{value:function(name){
+					var i,u,r,j,b;
+					for(i in resources) if(name==i) {
+						i=resources[i];u=urls[i];
+						if(!u&&(r=cache[i])) {
+							r=window.atob(r);
+							b=new Uint8Array(r.length);
+							for(j=0;j<r.length;j++) b[j]=r.charCodeAt(j);
+							b=new Blob([b]);
+							urls[i]=u=URL.createObjectURL(b);
+						}
+						return u;
+					}
+				}},
+				GM_addStyle:{value:function(css){
+					if(!document.head) return;
+					var v=document.createElement('style');
+					v.innerHTML=css;
+					document.head.appendChild(v);
+					return v;
+				}},
+				GM_log:{value:function(d){console.log(d);}},
+				GM_openInTab:{value:function(url){window.open(url);}},
+				GM_registerMenuCommand:{value:function(cap,func,acc){
+					comm.command[cap]=func;comm.post({cmd:'RegisterMenu',data:[cap,acc]});
+				}},
+				GM_xmlhttpRequest:{value:function(details){
+					var r=new Request(details);
+					return r.req;
+				}},
 			};
-			addProperty('GM_xmlhttpRequest',{value:function(details){
-				var r=new Request(details);
-				return r.req;
-			}});
-			return gm;
+			g.forEach(function(i){var o=gf[i];if(o) addProperty(i,o,gm);});
+			return [w,gm];
 		}
 		function run(l){while(l.length) runCode(l.shift());}
 		function runCode(c){
-			var w,req=c.meta.require||[],i,r=[],code=[],g;
-			if(w=i=c.meta.namespace) w=wrappers[w];
-			if(!w) w=new wrapper();
-			if(i) wrappers[i]=w;
-			g=wrapGM(c);
-			Object.getOwnPropertyNames(g).forEach(function(i){r.push(i+'=g["'+i+'"]');});
-			code=[];
+			var w,req=c.meta.require||[],i,r=[],code=[];w=wrapGM(c);
+			Object.getOwnPropertyNames(w[1]).forEach(function(i){r.push(i+'=g["'+i+'"]');});
 			if(r.length) code.push('var '+r.join(',')+';delete g;with(this)(function(){');
 			for(i=0;i<req.length;i++) if(r=require[req[i]]) code.push(r);
 			code.push(c.code);code.push('}).call(window);');
 			code=code.join('\n');
 			try{
-				(new Function('g',code)).call(w,g);
+				(new Function('g',code)).call(w[0],w[1]);
 			}catch(e){
 				console.log('Error running script: '+(c.custom.name||c.meta.name||c.id)+'\n'+e);
 			}
@@ -294,8 +296,8 @@ var comm={
 			if(comm.state>1) run(end);
 		};
 
-		var l,wrappers={};
-		o.scripts.forEach(function(i){
+		//var wrappers={};
+		o.scripts.forEach(function(i,l){
 			if(i&&i.enabled) {
 				switch(i.custom['run-at']||i.meta['run-at']){
 					case 'document-start': l=start;break;
