@@ -422,6 +422,7 @@ function initSettings(){
 	init('withData',true);
 	init('closeAfterInstall',false);
 	init('search',_('defaultSearch'));
+	init('dataVer',0);
 }
 function updateMeta(d,src,callback) {
 	var o=db.transaction('scripts','readwrite').objectStore('scripts');
@@ -597,7 +598,7 @@ initSettings();
 initDb(function(){
 	var dataVer=1;
 	getOption('dataVer',null,function(ver){
-		if(!ver) ver=0;pos=null;
+		pos=null;
 		var o=db.transaction('scripts','readwrite').objectStore('scripts');
 		o.index('position').openCursor(null,'prev').onsuccess=function(e){
 			var r=e.target.result;

@@ -171,14 +171,13 @@ var comm={
 		function wrapGM(c){
 			// Add GM functions
 			// Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-			var gm={},value=values[c.uri],w,g=c.meta.grant||[];
+			var gm={},value=values[c.uri]||{},w,g=c.meta.grant||[];
 			if(!g.length||g.length==1&&g[0]=='none') {	// @grant none
 				w={};g.pop();
 			} else {
 				w=new wrapper();
 			}
 			if(g.indexOf('unsafeWindow')<0) g.push('unsafeWindow');
-			if(!value) value={};
 			function propertyToString(){return 'Property for Violentmonkey: designed by Gerald';}
 			function addProperty(name,prop,obj){
 				if('value' in prop) prop.writable=false;
@@ -279,7 +278,7 @@ var comm={
 		}
 		function run(l){while(l.length) runCode(l.shift());}
 		function runCode(c){
-			var w,req=c.meta.require||[],i,r=[],code=[];w=wrapGM(c);
+			var req=c.meta.require||[],i,r=[],code=[],w=wrapGM(c);
 			Object.getOwnPropertyNames(w[1]).forEach(function(i){r.push(i+'=g["'+i+'"]');});
 			if(r.length) code.push('var '+r.join(',')+';delete g;with(this)(function(){');
 			for(i=0;i<req.length;i++) if(r=require[req[i]]) code.push(r);
@@ -296,7 +295,6 @@ var comm={
 			if(comm.state>1) run(end);
 		};
 
-		//var wrappers={};
 		o.scripts.forEach(function(i,l){
 			if(i&&i.enabled) {
 				switch(i.custom['run-at']||i.meta['run-at']){
