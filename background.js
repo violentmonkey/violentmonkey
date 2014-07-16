@@ -589,6 +589,7 @@ chrome.runtime.onMessage.addListener(function(req,src,callback) {
 		Vacuum: vacuum,
 		Move: move,
 		ParseMeta: function(o,src,callback){callback(parseMeta(o));},
+		NewTab: function(o,src,callback){chrome.tabs.create({url:o});},
 	},f=maps[req.cmd];
 	if(f) f(req.data,src,callback);
 	return true;

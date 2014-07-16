@@ -268,7 +268,7 @@ var comm={
 					return v;
 				}},
 				GM_log:{value:function(d){console.log(d);}},
-				GM_openInTab:{value:function(url){window.open(url);}},
+				GM_openInTab:{value:function(url){comm.post({cmd:'NewTab',data:url});}},
 				GM_registerMenuCommand:{value:function(cap,func,acc){
 					comm.command[cap]=func;comm.post({cmd:'RegisterMenu',data:[cap,acc]});
 				}},
@@ -318,6 +318,7 @@ var comm={
 function handleC(e){
 	var o=JSON.parse(e.attrName),maps={
 		SetValue:function(o){post({cmd:'SetValue',data:o});},
+		NewTab:function(o){post({cmd:'NewTab',data:o});},
 		RegisterMenu:menu.push.bind(menu),
 		GetRequestId:getRequestId,
 		HttpRequest:httpRequest,
