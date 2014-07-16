@@ -109,6 +109,10 @@ var comm={
 						}
 						d.data.response=this.data[0];
 					}
+					// finalUrl not supported
+					Object.defineProperty(d.data,'finalUrl',{
+						get:function(){console.log('[Violentmonkey]Warning: finalUrl not supported for GM_xmlhttpRequest yet!');}
+					});
 					c(d.data);
 				}
 				if(!this.id)	// synchronous, not tested yet
@@ -400,9 +404,15 @@ function objEncode(o){
 }
 function initCommunicator(){
 	var s=document.createElement('script'),d=document.documentElement,C='C',R='R';
-	s.innerHTML='(function(){var c='+objEncode(comm)+';c.init("'+R+'","'+C+'");\
-document.addEventListener("readystatechange",function(){c.state=["loading","interactive","complete"].indexOf(document.readyState);c.load();},false);\
-document.addEventListener("DOMContentLoaded",function(){c.state=2;c.load();},false);})();';
+	s.innerHTML='('+(function(c,R,C){
+		function updateState(){
+			c.state=["loading","interactive","complete"].indexOf(document.readyState);
+			c.load();
+		}
+		c.init(R,C);
+		document.addEventListener("readystatechange",updateState,false);
+		updateState();
+	}).toString()+')('+objEncode(comm)+',"'+R+'","'+C+'")';
 	d.appendChild(s);d.removeChild(s);
 	comm.handleC=handleC;comm.init(C,R);
 	chrome.runtime.sendMessage({cmd:'GetInjected',data:location.href},loadScript);
