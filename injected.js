@@ -50,6 +50,11 @@ var comm={
 	state:0,
 	load:function(){},
 	utf8decode:utf8decode,
+	abspath:function(u){
+		// convert url to absolute path
+		var a=document.createElement('a');
+		a.href=u;return a.href;
+	},
 	prop1:Object.getOwnPropertyNames(window),
 	prop2:(function(n,p){
 		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
@@ -261,14 +266,17 @@ var comm={
 					}
 				}},
 				GM_addStyle:{value:function(css){
-					if(!document.head) return;
-					var v=document.createElement('style');
-					v.innerHTML=css;
-					document.head.appendChild(v);
-					return v;
+					if(document.head) {
+						var v=document.createElement('style');
+						v.innerHTML=css;
+						document.head.appendChild(v);
+						return v;
+					}
 				}},
 				GM_log:{value:function(d){console.log(d);}},
-				GM_openInTab:{value:function(url){comm.post({cmd:'NewTab',data:url});}},
+				GM_openInTab:{value:function(url){
+					comm.post({cmd:'NewTab',data:comm.abspath(url)});
+				}},
 				GM_registerMenuCommand:{value:function(cap,func,acc){
 					comm.command[cap]=func;comm.post({cmd:'RegisterMenu',data:[cap,acc]});
 				}},
