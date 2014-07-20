@@ -50,11 +50,6 @@ var comm={
 	state:0,
 	load:function(){},
 	utf8decode:utf8decode,
-	abspath:function(u){
-		// convert url to absolute path
-		var a=document.createElement('a');
-		a.href=u;return a.href;
-	},
 	prop1:Object.getOwnPropertyNames(window),
 	prop2:(function(n,p){
 		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
@@ -275,7 +270,8 @@ var comm={
 				}},
 				GM_log:{value:function(d){console.log(d);}},
 				GM_openInTab:{value:function(url){
-					comm.post({cmd:'NewTab',data:comm.abspath(url)});
+					var a=document.createElement('a');
+					a.href=url;a.target='_blank';a.click();
 				}},
 				GM_registerMenuCommand:{value:function(cap,func,acc){
 					comm.command[cap]=func;comm.post({cmd:'RegisterMenu',data:[cap,acc]});
@@ -303,10 +299,12 @@ var comm={
 			}
 		}
 		comm.load=function(){
-			if(comm.state>0) run(idle);
-			if(comm.state>1) run(end);
+			if(comm.state) {run(end);run(idle);}
 		};
 
+		require=o.require;
+		cache=o.cache;
+		values=o.values;
 		o.scripts.forEach(function(i,l){
 			if(i&&i.enabled) {
 				switch(i.custom['run-at']||i.meta['run-at']){
@@ -317,16 +315,12 @@ var comm={
 				l.push(i);
 			}
 		});
-		require=o.require;
-		cache=o.cache;
-		values=o.values;
 		run(start);comm.load();
 	},
 },menu=[],ids=[];
 function handleC(e){
 	var o=JSON.parse(e.attrName),maps={
 		SetValue:function(o){post({cmd:'SetValue',data:o});},
-		NewTab:function(o){post({cmd:'NewTab',data:o});},
 		RegisterMenu:menu.push.bind(menu),
 		GetRequestId:getRequestId,
 		HttpRequest:httpRequest,
@@ -414,13 +408,11 @@ function objEncode(o){
 function initCommunicator(){
 	var s=document.createElement('script'),d=document.documentElement,C='C',R='R';
 	s.innerHTML='('+(function(c,R,C){
-		function updateState(){
-			c.state=["loading","interactive","complete"].indexOf(document.readyState);
-			c.load();
-		}
 		c.init(R,C);
-		document.addEventListener("readystatechange",updateState,false);
-		updateState();
+		document.addEventListener("DOMContentLoaded",function(e){
+			c.state=1;c.load();
+		},false);
+		c.load();
 	}).toString()+')('+objEncode(comm)+',"'+R+'","'+C+'")';
 	d.appendChild(s);d.removeChild(s);
 	comm.handleC=handleC;comm.init(C,R);
