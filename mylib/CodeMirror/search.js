@@ -42,8 +42,8 @@
 			dialog = wrap.appendChild(document.createElement("div"));
 			dialog.className='CodeMirror-dialog';
 		}
-		var text=_('labelSearch')+'<input class=CodeMirror-search placeholder="Search for"><button class=CodeMirror-findPrev>&lt;</button><button class=CodeMirror-findNext>&gt;</button><button class=CodeMirror-cancel>&times;</button>',closed=false,iS,iR;
-		if(rep) text+='<br>'+_('labelReplace')+'<input class=CodeMirror-replace placeholder="Replace with"><button class=CodeMirror-replaceNext>'+_('buttonReplace')+'</button><button class=CodeMirror-replaceAll>'+_('buttonReplaceAll')+'</button>';
+		var text=_('labelSearch')+'<input class=CodeMirror-search placeholder="'+_('labelSearchFor')+'"><button class=CodeMirror-findPrev>&lt;</button><button class=CodeMirror-findNext>&gt;</button><button class=CodeMirror-cancel>&times;</button>',closed=false,iS,iR;
+		if(rep) text+='<br>'+_('labelReplace')+'<input class=CodeMirror-replace placeholder="'+_('labelReplaceWith')+'"><button class=CodeMirror-replaceNext>'+_('buttonReplace')+'</button><button class=CodeMirror-replaceAll>'+_('buttonReplaceAll')+'</button>';
 		dialog.innerHTML=text;
 		iS=dialog.querySelector('.CodeMirror-search');
 		CodeMirror.on(dialog.querySelector('.CodeMirror-findNext'), "click", function(e) {findNext(cm);});

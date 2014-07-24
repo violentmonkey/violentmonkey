@@ -87,10 +87,6 @@
 		"message": "正在加载脚本依赖...（$1/$2）",
 		"description": "Message shown on confirm page when the requirements are being downloaded."
 	},
-	"anchorGetMoreScripts": {
-		"message": "获取更多脚本",
-		"description": "Link to get more scripts."
-	},
 	"sideMenuInstalled": {
 		"message": "已安装的脚本",
 		"description": "Side menu: Installed scripts"
@@ -110,6 +106,10 @@
 	"anchorUpdateAll": {
 		"message": "全部更新",
 		"description": "Check all scripts for updates."
+	},
+	"anchorGetMoreScripts": {
+		"message": "获取更多脚本",
+		"description": "Link to get more scripts."
 	},
 	"msgLoading": {
 		"message": "加载中 ...",
@@ -167,9 +167,9 @@
 		"message": "关于暴力猴",
 		"description": "Label shown on top of the about page."
 	},
-	"labelSupportPage": {
-		"message": "支持页面：",
-		"description": "Label of support page."
+	"labelRelated": {
+		"message": "相关链接：",
+		"description": "Label of related links."
 	},
 	"anchorSupportPage": {
 		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>暴力猴</a>",
@@ -178,6 +178,10 @@
 	"labelDonate": {
 		"message": "捐助",
 		"description": "Label of link to donate page."
+	},
+	"labelFeedback": {
+		"message": "反馈",
+		"description": "Label of link to feedback page."
 	},
 	"labelAuthor": {
 		"message": "作者：",
@@ -279,6 +283,10 @@
 		"message": "名字为空",
 		"description": "Text as the name of a script when no @name is assigned."
 	},
+	"hintSupportPage": {
+		"message": "支持页面",
+		"description": "Hint for support page."
+	},
 	"buttonDisable": {
 		"message": "禁用",
 		"description": "Button to disable a script."
@@ -347,9 +355,17 @@
 		"message": "查找：",
 		"description": "Label for search input in search box."
 	},
+	"labelSearchFor": {
+		"message": "查找...",
+		"description": "Text shown as a place holder in the search box."
+	},
 	"labelReplace": {
 		"message": "替换：",
 		"description": "Label for replace input in search box."
+	},
+	"labelReplaceWith": {
+		"message": "替换成...",
+		"description": "Text shown as a place holder in the replace box."
 	},
 	"buttonReplace": {
 		"message": "替换",

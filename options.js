@@ -33,6 +33,10 @@ function modifyItem(r){
 	a=d.querySelector('.name');
 	getName(a,n.custom.name||n.meta.name);
 	if(o=n.custom.homepageURL||n.meta.homepageURL||n.meta.homepage) a.href=o;	// compatible with @homepage
+	if(o=n.meta.supportURL) {
+		a=d.querySelector('.support');a.classList.remove('hide');
+		a.href=o;a.title=_('hintSupportPage');
+	}
 	getAuthor(d.querySelector('.author'),n.meta.author||'');
 	a=d.querySelector('.descrip');
 	getName(a,n.meta.description||'','&nbsp;');
@@ -44,6 +48,7 @@ function loadItem(o,r){
 	var d=o.div,n=o.obj;if(!r) r={id:n.id};
 	d.innerHTML='<img class=icon>'
 	+'<a class="name ellipsis" target=_blank></a>'
+	+'<a class="support hide" target=_blank>?</a>'
 	+'<span class=version>'+(n.meta.version?'v'+n.meta.version:'')+'</span>'
 	+'<span class=author></span>'
 	+'<div class=panelT>'

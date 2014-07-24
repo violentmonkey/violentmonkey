@@ -87,10 +87,6 @@
 		"message": "Wczytywanie wymagań... ($1/$2)",
 		"description": "Message shown on confirm page when the requirements are being downloaded."
 	},
-	"anchorGetMoreScripts": {
-		"message": "Znajdź nowe skrypty",
-		"description": "Link to get more scripts."
-	},
 	"sideMenuInstalled": {
 		"message": "Zainstalowane skrypty",
 		"description": "Side menu: Installed scripts"
@@ -110,6 +106,10 @@
 	"anchorUpdateAll": {
 		"message": "Sprawdź aktualizacje dla wszystkich skryptów",
 		"description": "Check all scripts for updates."
+	},
+	"anchorGetMoreScripts": {
+		"message": "Znajdź nowe skrypty",
+		"description": "Link to get more scripts."
 	},
 	"msgLoading": {
 		"message": "Wczytywanie...",
@@ -167,9 +167,9 @@
 		"message": "O rozszerzeniu Violentmonkey",
 		"description": "Label shown on top of the about page."
 	},
-	"labelSupportPage": {
-		"message": "Strona wsparcia: ",
-		"description": "Label of support page."
+	"labelRelated": {
+		"message": "Related links: ",
+		"description": "Label of related links."
 	},
 	"anchorSupportPage": {
 		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>",
@@ -178,6 +178,10 @@
 	"labelDonate": {
 		"message": "Dotacja",
 		"description": "Label of link to donate page."
+	},
+	"labelFeedback": {
+		"message": "Feedback",
+		"description": "Label of link to feedback page."
 	},
 	"labelAuthor": {
 		"message": "Autor: ",
@@ -279,6 +283,10 @@
 		"message": "Bez nazwy",
 		"description": "Text as the name of a script when no @name is assigned."
 	},
+	"hintSupportPage": {
+		"message": "Strona wsparcia",
+		"description": "Hint for support page."
+	},
 	"buttonDisable": {
 		"message": "Wyłącz skrypt",
 		"description": "Button to disable a script."
@@ -347,9 +355,17 @@
 		"message": "Szukaj w: ",
 		"description": "Label for search input in search box."
 	},
+	"labelSearchFor": {
+		"message": "Search for...",
+		"description": "Text shown as a place holder in the search box."
+	},
 	"labelReplace": {
 		"message": "Zamień na: ",
 		"description": "Label for replace input in search box."
+	},
+	"labelReplaceWith": {
+		"message": "Replace with...",
+		"description": "Text shown as a place holder in the replace box."
 	},
 	"buttonReplace": {
 		"message": "Zamień",
