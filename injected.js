@@ -1,4 +1,5 @@
 (function(){
+if(window.VM) return;window.VM=1;	// avoid running repeatedly due to new document.documentElement
 /**
 * http://www.webtoolkit.info/javascript-utf8.html
 */
@@ -34,7 +35,7 @@ chrome.runtime.onMessage.addListener(function(req,src) {
 	if(req.frameid&&req.frameid!=id) return;
 	var maps={
 		Command:command,
-		GetPopup: getPopup,
+		GetPopup:getPopup,
 	},f=maps[req.cmd];
 	if(f) f(req.data,src);
 });
@@ -45,10 +46,7 @@ function getPopup(){
 // Communicator
 var comm={
 	vmid:'VM'+Math.random(),
-	sid:null,
-	did:null,
 	state:0,
-	load:function(){},
 	utf8decode:utf8decode,
 	prop1:Object.getOwnPropertyNames(window),
 	prop2:(function(n,p){
@@ -56,9 +54,11 @@ var comm={
 		return p;
 	})(window,[]),
 	init:function(s,d){
-		this.sid=this.vmid+s;
-		this.did=this.vmid+d;
-		document.addEventListener(this.sid,this['handle'+s].bind(this),false);
+		var t=this;
+		t.sid=t.vmid+s;
+		t.did=t.vmid+d;
+		document.addEventListener(t.sid,t['handle'+s].bind(t),false);
+		t.load=t.checkLoad=function(){};
 	},
 	post:function(d){
 		var e=document.createEvent("MutationEvent");
@@ -298,8 +298,10 @@ var comm={
 				console.log('Error running script: '+(c.custom.name||c.meta.name||c.id)+'\n'+e);
 			}
 		}
-		comm.load=function(){
-			if(comm.state) {run(end);run(idle);}
+		comm.load=function(){run(end);run(idle);};
+		comm.checkLoad=function(){
+			if(!comm.state&&['interactive','complete'].indexOf(document.readyState)>=0) comm.state=1;
+			if(comm.state) comm.load();
 		};
 
 		require=o.require;
@@ -315,7 +317,7 @@ var comm={
 				l.push(i);
 			}
 		});
-		run(start);comm.load();
+		run(start);comm.checkLoad();
 	},
 },menu=[],ids=[];
 function handleC(e){
@@ -412,7 +414,7 @@ function initCommunicator(){
 		document.addEventListener("DOMContentLoaded",function(e){
 			c.state=1;c.load();
 		},false);
-		c.load();
+		c.checkLoad();
 	}).toString()+')('+objEncode(comm)+',"'+R+'","'+C+'")';
 	d.appendChild(s);d.removeChild(s);
 	comm.handleC=handleC;comm.init(C,R);
