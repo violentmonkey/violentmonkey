@@ -103,7 +103,7 @@
 		"message": "Создать",
 		"description": "Button to create a new script."
 	},
-	"anchorUpdateAll": {
+	"buttonUpdateAll": {
 		"message": "Проверить обновления скриптов",
 		"description": "Check all scripts for updates."
 	},
@@ -303,7 +303,7 @@
 		"message": "Удалить",
 		"description": "Button to remove a script."
 	},
-	"anchorUpdate": {
+	"buttonUpdate": {
 		"message": "Проверить обновления",
 		"description": "Check a script for updates."
 	},

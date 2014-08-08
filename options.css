@@ -23,13 +23,14 @@ fieldset.title{border:none;border-top:1px solid silver;margin:20px 0 0;}
 #sList>div.disabled .name{color:blueviolet;}
 #sList>div.disabled .icon{opacity:0.5;}
 #sList>div.moving{background:lightgreen;border:1px outset gray;cursor:move;}
-#sList .name{margin-left:60px;margin-right:10px;font-weight:bold;font-size:120%;}
-#sList .support{margin-right:10px;width:16px;height:16px;border-radius:8px;background-color:green;color:white;text-align:center;display:inline-block;text-decoration:none;font-size:12px;}
+#sList .name{font-weight:bold;font-size:120%;}
+#sList .support{width:16px;height:16px;border-radius:8px;background-color:green;color:white;text-align:center;display:inline-block;text-decoration:none;font-size:12px;}
 #sList .support.hide{display:none;}
 #sList .icon{top:1em;width:40px;height:40px;margin:2px;position:absolute;}
-#sList .version{margin-right:10px;}
-#sList .descrip{margin-left:60px;}
-#sList .move{cursor:move;margin-left:20px;color:gray;font-size:150%;}
+#sList .descrip{margin-left:60px;min-height:1em;max-height:4.5em;overflow-y:auto;}
+#sList .move{cursor:move;color:gray;font-size:150%;}
+#sList .panelH{margin-left:60px;margin-right:20px;}
+#sList .panelH>*{display:inline-block;margin-right:10px;}
 #sList .panelT{position:absolute;top:10px;right:10px;}
 
 /* Editor */

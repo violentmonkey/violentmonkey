@@ -323,17 +323,20 @@ function updateItem(r){
 }
 function queryScript(id,meta,callback){
 	var o=db.transaction('scripts').objectStore('scripts');
+	function finish(r){
+		if(!r) r=newScript();
+		if(callback) callback(r);
+	}
 	function queryMeta() {
 		var uri=getNameURI({id:'',meta:meta});
 		if(uri!='::') o.index('uri').get(uri).onsuccess=function(e){
-			var r=e.target.result;
-			if(r) callback(r); else callback(newScript());
-		}; else callback(newScript());
+			finish(e.target.result);
+		}; else finish();
 	}
 	function queryId() {
 		if(id) o.get(id).onsuccess=function(e){
 			var r=e.target.result;
-			if(r) callback(r); else queryMeta();
+			if(r) finish(r); else queryMeta();
 		}; else queryMeta();
 	}
 	queryId();
@@ -568,31 +571,6 @@ chrome.runtime.onConnect.addListener(function(p){
 	port=p;
 	p.onDisconnect.addListener(function(){port=null;});
 });
-chrome.runtime.onMessage.addListener(function(req,src,callback) {
-	var maps={
-		NewScript:function(o,src,callback){callback(newScript());},
-		RemoveScript: removeScript,
-		GetData: getData,
-		GetInjected: getInjected,
-		CheckUpdate: checkUpdate,
-		CheckUpdateAll: checkUpdateAll,
-		SaveScript: saveScript,
-		UpdateMeta: updateMeta,
-		SetValue: setValue,
-		GetOption: getOption,
-		SetOption: setOption,
-		ExportZip: exportZip,
-		ParseScript: parseScript,
-		GetScript: getScript,	// for user edit
-		GetMetas: getMetas,	// for popup menu
-		AutoUpdate: autoUpdate,
-		Vacuum: vacuum,
-		Move: move,
-		ParseMeta: function(o,src,callback){callback(parseMeta(o));},
-	},f=maps[req.cmd];
-	if(f) f(req.data,src,callback);
-	return true;
-});
 var settings={};
 initSettings();
 initDb(function(){
@@ -613,6 +591,31 @@ initDb(function(){
 				}
 			}
 		};
+	});
+	chrome.runtime.onMessage.addListener(function(req,src,callback) {
+		var maps={
+			NewScript:function(o,src,callback){callback(newScript());},
+			RemoveScript: removeScript,
+			GetData: getData,
+			GetInjected: getInjected,
+			CheckUpdate: checkUpdate,
+			CheckUpdateAll: checkUpdateAll,
+			SaveScript: saveScript,
+			UpdateMeta: updateMeta,
+			SetValue: setValue,
+			GetOption: getOption,
+			SetOption: setOption,
+			ExportZip: exportZip,
+			ParseScript: parseScript,
+			GetScript: getScript,	// for user edit
+			GetMetas: getMetas,	// for popup menu
+			AutoUpdate: autoUpdate,
+			Vacuum: vacuum,
+			Move: move,
+			ParseMeta: function(o,src,callback){callback(parseMeta(o));},
+		},f=maps[req.cmd];
+		if(f) f(req.data,src,callback);
+		return true;
 	});
 	chrome.browserAction.setIcon({path:'images/icon19'+(settings.isApplied?'':'w')+'.png'});
 	setTimeout(autoCheck,2e4);

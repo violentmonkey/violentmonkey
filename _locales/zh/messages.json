@@ -103,7 +103,7 @@
 		"message": "新建",
 		"description": "Button to create a new script."
 	},
-	"anchorUpdateAll": {
+	"buttonUpdateAll": {
 		"message": "全部更新",
 		"description": "Check all scripts for updates."
 	},
@@ -303,7 +303,7 @@
 		"message": "移除",
 		"description": "Button to remove a script."
 	},
-	"anchorUpdate": {
+	"buttonUpdate": {
 		"message": "查找更新",
 		"description": "Check a script for updates."
 	},
