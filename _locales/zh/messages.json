@@ -173,7 +173,7 @@
 	},
 	"anchorSupportPage": {
 		"description": "Link to the support page of Violentmonkey.",
-		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>暴力猴</a>"
+		"message": "<a href=http://geraldl.net/proj/vm-nex target=_blank>暴力猴</a>"
 	},
 	"labelDonate": {
 		"description": "Label of link to donate page.",
@@ -326,6 +326,10 @@
 	"hintVacuum": {
 		"description": "Hint for vacuuming data.",
 		"message": "丢弃多余的数据，并尝试重新获取缺失的资源。"
+	},
+	"Use @downloadURL": {
+		"description": "Shown as a place holder for @updateURL when it is not assigned",
+		"message": "使用@downloadURL"
 	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",

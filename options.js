@@ -306,11 +306,16 @@ function markClean(){
 function mReset(){
 	M.classList.add('hide');
 	sC.innerHTML='&laquo;';
-	var e=[],c=E.scr.custom;M.dirty=false;
+	var e=[],c=E.scr.custom,m=E.scr.meta;
+	M.dirty=false;
 	mN.value=c.name||'';
+	mN.placeholder=m.name||'';
 	mH.value=c.homepageURL||'';
+	mH.placeholder=m.homepageURL||'';
 	mU.value=c.updateURL||'';
+	mU.placeholder=m.updateURL||_('Use @downloadURL');
 	mD.value=c.downloadURL||'';
+	mD.placeholder=m.downloadURL||c.lastInstallURL||'';
 	switch(c['run-at']){
 		case 'document-start':mR.value='start';break;
 		case 'document-idle':mR.value='idle';break;
@@ -319,10 +324,13 @@ function mReset(){
 	}
 	cI.checked=c._include!=false;
 	mI.value=(c.include||e).join('\n');
+	mI.placeholder=m.include.join('\n');
 	cM.checked=c._match!=false;
 	mM.value=(c.match||e).join('\n');
+	mM.placeholder=m.match.join('\n');
 	cE.checked=c._exclude!=false;
 	mE.value=(c.exclude||e).join('\n');
+	mE.placeholder=m.exclude.join('\n');
 }
 function gotScript(o){
 	E.classList.remove('hide');
@@ -377,6 +385,12 @@ eS.onclick=eSave;
 eSC.onclick=function(){eSave();eClose();};
 E.close=$('#eClose').onclick=function(){if(confirmCancel(!eS.disabled)) eClose();};
 initEditor(function(o){T=o;},{save:eSave,exit:E.close,onchange:E.markDirty});
+// double click to fill with default value
+function mDefault(e){
+	e=e.target;
+	if(!e.value) e.value=e.placeholder;
+}
+[mN,mH,mU,mD,mI,mM,mE].forEach(function(i){i.ondblclick=mDefault;});
 
 // Load at last
 var ids=[],map={},cache;

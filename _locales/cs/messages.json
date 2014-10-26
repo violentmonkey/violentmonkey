@@ -327,6 +327,10 @@
 		"description": "Hint for vacuuming data.",
 		"message": "Zbavit se nadbytečného a zkusit znovu načíst chybějící zdroje v cache."
 	},
+	"Use @downloadURL": {
+		"description": "Shown as a place holder for @updateURL when it is not assigned",
+		"message": "Use @downloadURL"
+	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",
 		"message": "Data vyprázdněna"

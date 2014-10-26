@@ -327,6 +327,10 @@
 		"description": "Hint for vacuuming data.",
 		"message": "Discard the redundancy and try to reload the missing resources in cache."
 	},
+	"Use @downloadURL": {
+		"description": "Shown as a place holder for @updateURL when it is not assigned",
+		"message": "Use @downloadURL"
+	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",
 		"message": "Data vacuumed"

@@ -113,7 +113,7 @@
 	},
 	"msgLoading": {
 		"description": "Message shown in the options page before script list is loaded.",
-		"message": "Загрузка..."
+		"message": "Загрузка ..."
 	},
 	"labelSettings": {
 		"description": "Label shown on the top of settings page",
@@ -326,6 +326,10 @@
 	"hintVacuum": {
 		"description": "Hint for vacuuming data.",
 		"message": "Сбросить избыточность кэша и попробовать подгрузить недостающие ресурсы"
+	},
+	"Use @downloadURL": {
+		"description": "Shown as a place holder for @updateURL when it is not assigned",
+		"message": "Use @downloadURL"
 	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",
