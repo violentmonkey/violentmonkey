@@ -313,7 +313,7 @@ function mReset(){
 	mH.value=c.homepageURL||'';
 	mH.placeholder=m.homepageURL||'';
 	mU.value=c.updateURL||'';
-	mU.placeholder=m.updateURL||_('Use @downloadURL');
+	mU.placeholder=m.updateURL||_('hintUseDownloadURL');
 	mD.value=c.downloadURL||'';
 	mD.placeholder=m.downloadURL||c.lastInstallURL||'';
 	switch(c['run-at']){

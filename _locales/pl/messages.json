@@ -327,7 +327,7 @@
 		"description": "Hint for vacuuming data.",
 		"message": "Usuń nadmiarowość i spróbuj przeładować brakujące dane w pamięci podręcznej."
 	},
-	"Use @downloadURL": {
+	"hintUseDownloadURL": {
 		"description": "Shown as a place holder for @updateURL when it is not assigned",
 		"message": "Use @downloadURL"
 	},

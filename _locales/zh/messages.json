@@ -327,7 +327,7 @@
 		"description": "Hint for vacuuming data.",
 		"message": "丢弃多余的数据，并尝试重新获取缺失的资源。"
 	},
-	"Use @downloadURL": {
+	"hintUseDownloadURL": {
 		"description": "Shown as a place holder for @updateURL when it is not assigned",
 		"message": "使用@downloadURL"
 	},
