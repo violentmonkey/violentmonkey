@@ -324,13 +324,10 @@ function mReset(){
 	}
 	cI.checked=c._include!=false;
 	mI.value=(c.include||e).join('\n');
-	mI.placeholder=m.include.join('\n');
 	cM.checked=c._match!=false;
 	mM.value=(c.match||e).join('\n');
-	mM.placeholder=m.match.join('\n');
 	cE.checked=c._exclude!=false;
 	mE.value=(c.exclude||e).join('\n');
-	mE.placeholder=m.exclude.join('\n');
 }
 function gotScript(o){
 	E.classList.remove('hide');
