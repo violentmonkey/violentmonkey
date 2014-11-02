@@ -178,18 +178,22 @@ var comm={
 						}
 					}
 				}
-				Object.defineProperty(t,i,{
-					get:function(){
-						initProperty();
-						return value===window?t:value;
-					},
-					set:function(v){
-						initProperty();
-						value=v;
-						if(type!='function') window[i]=v;
-						type='custom';
-					},
-				});
+				try {
+					Object.defineProperty(t,i,{
+						get:function(){
+							initProperty();
+							return value===window?t:value;
+						},
+						set:function(v){
+							initProperty();
+							value=v;
+							if(type!='function') window[i]=v;
+							type='custom';
+						},
+					});
+				} catch(e) {
+					// ignore protected data
+				}
 				/*try{	// avoid reading protected data
 					if(typeof window[i]=='function') {
 						if(itemWrapper) t[i]=itemWrapper(window,i,wrapWindow);
