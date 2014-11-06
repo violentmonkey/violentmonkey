@@ -424,7 +424,6 @@ function initSettings(){
 	init('lastUpdate',0);
 	init('withData',true);
 	init('closeAfterInstall',false);
-	init('search',_('defaultSearch'));
 	init('dataVer',0);
 }
 function updateMeta(d,src,callback) {
