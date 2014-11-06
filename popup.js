@@ -55,7 +55,7 @@ function initMenu(){
 			});
 		}
   });
-  /*if(/^https?:\/\//i.test(tab.url)) {
+  if(/^https?:\/\//i.test(tab.url)) {
 		var d=addItem(_('menuFindScripts'), {
 			holder: pT,
 			symbol: '➤',
@@ -64,14 +64,12 @@ function initMenu(){
 		loadItem(d,false);
 		chrome.runtime.sendMessage({cmd:'GetOption',data:'search'},function(o){
 			d.onclick=function(){
-				var q='site:userscripts.org+inurl:show+'+tab.url.replace(/^.*?:\/\/([^\/]*?)\.\w+\/.*$/, function(v,g){
-					return g.replace(/\.(com|..)$/, '').replace(/\./g, '+');
-				});
-				chrome.tabs.create({url:o.replace('*',q)});
+				var h=tab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
+				chrome.tabs.create({url:'https://greasyfork.org/scripts/search?q='+h[1]});
 			};
 			loadItem(d,true);
 		});
-	}*/
+	}
   ia=addItem(_('menuScriptEnabled'), {
     holder: pT,
 		symbol: '✓',
