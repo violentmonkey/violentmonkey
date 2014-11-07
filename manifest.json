@@ -1,6 +1,6 @@
 {
 	"name": "Violent monkey",
-	"version" : "2.1.6.5",
+	"version" : "2.1.6.6",
 	"manifest_version" : 2,
 	"description" : "__MSG_extDescription__",
 	"developer": {"name" : "Gerald", "url" : "http://geraldl.net"},
@@ -27,6 +27,6 @@
 		"all_frames" : true
 	}],
 	"web_accessible_resources" : [],
-	"permissions" : ["tabs", "<all_urls>", "webRequest", "webRequestBlocking"],
+	"permissions" : ["tabs", "<all_urls>", "webRequest", "webRequestBlocking", "notifications"],
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'unsafe-eval';"
 }

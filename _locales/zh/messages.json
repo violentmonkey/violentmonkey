@@ -23,6 +23,18 @@
 		"description": "Message shown when a script is installed.",
 		"message": "脚本已安装。"
 	},
+	"Warning": {
+		"description": "Show warnings with a notification.",
+		"message": "警告"
+	},
+	"msgWarnGrant": {
+		"description": "Message shown when `@grant` is not found in a script.",
+		"message": "脚本【$1】没有`@grant`行！点击查看更多信息。"
+	},
+	"labelNoName": {
+		"description": "Text as the name of a script when no @name is assigned.",
+		"message": "名字为空"
+	},
 	"msgUpdating": {
 		"description": "Message shown when a new version of script is being fetched.",
 		"message": "正在更新..."
@@ -266,10 +278,6 @@
 	"buttonSaveClose": {
 		"description": "Button to save modifications of a script and then close the editing page.",
 		"message": "保存并关闭"
-	},
-	"labelNoName": {
-		"description": "Text as the name of a script when no @name is assigned.",
-		"message": "名字为空"
 	},
 	"hintSupportPage": {
 		"description": "Hint for support page.",
