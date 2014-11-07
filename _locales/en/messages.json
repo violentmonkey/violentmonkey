@@ -23,6 +23,18 @@
 		"description": "Message shown when a script is installed.",
 		"message": "Script installed."
 	},
+	"Warning": {
+		"description": "Show warnings with a notification.",
+		"message": "Warning"
+	},
+	"msgWarnGrant": {
+		"description": "Message shown when `@grant` is not found in a script.",
+		"message": "Script [$1] has no `@grant` lines! Click to see more details."
+	},
+	"labelNoName": {
+		"description": "Text as the name of a script when no @name is assigned.",
+		"message": "No Name"
+	},
 	"msgUpdating": {
 		"description": "Message shown when a new version of script is being fetched.",
 		"message": "Updating..."
@@ -266,10 +278,6 @@
 	"buttonSaveClose": {
 		"description": "Button to save modifications of a script and then close the editing page.",
 		"message": "Save & Close"
-	},
-	"labelNoName": {
-		"description": "Text as the name of a script when no @name is assigned.",
-		"message": "No Name"
 	},
 	"hintSupportPage": {
 		"description": "Hint for support page.",

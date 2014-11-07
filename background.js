@@ -1,4 +1,17 @@
 var db,port=null,pos=0;
+function notify(title,options) {
+	function show() {
+		var n=new Notification(title+' - '+_('extName'),{
+			body:options.body,
+			icon:'images/icon128.png',
+		});
+		n.onclick=options.onclick;
+	}
+	show();
+	/*Notification.requestPermission(function(e){
+		if(e=='granted') show(); else console.log('Notification: '+options.body);
+	});*/
+}
 function initDb(callback) {
 	var request=indexedDB.open('Violentmonkey',1);
 	request.onsuccess=function(e){db=request.result;if(callback) callback();};
@@ -359,6 +372,14 @@ function parseScript(o,src,callback) {
 			if(o.url&&!/^(file|data):/.test(o.url)) c.custom.lastInstallURL=o.url;
 			saveScript(c,src).onsuccess=function(e){
 				r.id=c.id=e.target.result;r.obj=getMeta(c);finish();
+				if(!meta.grant.length)
+					notify(_('Warning'),{
+						body:_('msgWarnGrant',[meta.name||_('labelNoName')]),
+						onclick:function(){
+							chrome.tabs.create({url:'http://wiki.greasespot.net/@grant'});
+							this.close();
+						},
+					});
 			};
 		});
 		meta.require.forEach(function(u){	// @require

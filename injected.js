@@ -145,7 +145,7 @@ var comm={
 		}
 		function wrapper(){
 			// functions and properties
-			function wrapFunction(o,i,c){
+			/*function wrapFunction(o,i,c){
 				var f=function(){
 					var r;
 					try{r=Function.apply.apply(o[i],[o,arguments]);}
@@ -155,9 +155,46 @@ var comm={
 				f.__proto__=o[i];f.prototype=o[i].prototype;
 				return f;
 			}
-			function wrapWindow(w){return w==window?t:w;}
-			function wrapItem(i){
-				try{	// avoid reading protected data
+			function wrapWindow(w){return w==window?t:w;}*/
+			function wrapItem(i,wrap){
+				var type=null,value;
+				function initProperty() {
+					if(!type) {
+						value=window[i];
+						type=typeof value;
+						if(type=='function'&&wrap) {
+							var o=value;
+							value=function(){
+								var r;
+								try {
+									r=Function.apply.apply(o,[window,arguments]);
+								} catch(e) {
+									console.log('Error calling '+i+':\n'+e.stack);
+								}
+								return r===window?t:r;
+							};
+							value.__proto__=o;
+							value.prototype=o.prototype;
+						}
+					}
+				}
+				try {
+					Object.defineProperty(t,i,{
+						get:function(){
+							initProperty();
+							return value===window?t:value;
+						},
+						set:function(v){
+							initProperty();
+							value=v;
+							if(type!='function') window[i]=v;
+							type='custom';
+						},
+					});
+				} catch(e) {
+					// ignore protected data
+				}
+				/*try{	// avoid reading protected data
 					if(typeof window[i]=='function') {
 						if(itemWrapper) t[i]=itemWrapper(window,i,wrapWindow);
 						else t[i]=window[i];
@@ -165,12 +202,11 @@ var comm={
 						get:function(){return wrapWindow(window[i]);},
 						set:function(v){window[i]=v;},
 					});
-				}catch(e){}
+				}catch(e){}*/
 			}
-			var t=this,itemWrapper=null;
+			var t=this/*,itemWrapper=null*/;
 			comm.prop1.forEach(wrapItem);
-			itemWrapper=wrapFunction;
-			comm.prop2.forEach(wrapItem);
+			comm.prop2.forEach(function(i){wrapItem(i,true);});
 		}
 		function wrapGM(c){
 			// Add GM functions
