@@ -167,11 +167,8 @@ function confirmCancel(dirty){
 }
 
 // Advanced
-var H=$('#iImport'),S=$('#tSearch'),V=$('#bVacuum');
+var H=$('#iImport'),V=$('#bVacuum');
 $('#cUpdate').onchange=function(){chrome.runtime.sendMessage({cmd:'AutoUpdate',data:this.checked});};
-S.title=_('hintSearchLink');
-S.onchange=function(){chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'search',value:S.value}});};
-$('#bDefSearch').onclick=function(){S.value=_('defaultSearch');S.onchange();};
 H.onchange=function(e){
 	zip.createReader(new zip.BlobReader(e.target.files[0]),function(r){
 		r.getEntries(function(e){
@@ -398,7 +395,6 @@ function loadOptions(o){
 		ids.push(i.id);addItem(map[i.id]={obj:i});
 	});
 	$('#cUpdate').checked=o.settings.autoUpdate;
-	S.value=o.settings.search;
 	xD.checked=o.settings.withData;
 	switchTab();
 }

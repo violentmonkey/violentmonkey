@@ -5,5 +5,5 @@ html,body{height:auto;background:inherit;}
 .menu>div.disabled{color:gray;}
 .menu>div.disabled:hover{color:silver;}
 .menu>div span{display:inline-block;width:20px;}
-.menu>hr{border:none;border-top:1px dashed gray;}
-.expand>td{border-top:1px dashed gray;}
+.menu>hr{border:none;border-top:1px solid silver;}
+.expand>td{border-top:1px solid silver;}

@@ -23,10 +23,6 @@
 		"description": "Message shown when a script is installed.",
 		"message": "脚本已安装。"
 	},
-	"defaultSearch": {
-		"description": "URL for searching scripts, * stands for the keywords.",
-		"message": "http://www.baidu.com/s?wd=*"
-	},
 	"msgUpdating": {
 		"description": "Message shown when a new version of script is being fetched.",
 		"message": "正在更新..."
@@ -122,14 +118,6 @@
 	"labelAutoUpdate": {
 		"description": "Option to allow automatically checking scripts for updates every 24 hours.",
 		"message": "每天自动更新脚本"
-	},
-	"labelSearchLink": {
-		"description": "Label of URL for searching scripts for a site.",
-		"message": "搜索网址："
-	},
-	"buttonDefault": {
-		"description": "Button to replace search URL with the default one.",
-		"message": "默认"
 	},
 	"labelDataImport": {
 		"description": "Section title of data import.",
@@ -310,10 +298,6 @@
 	"confirmNotSaved": {
 		"description": "Confirm message shown when there are unsaved script modifications.",
 		"message": "修改尚未保存！\n点击确定放弃修改或点击取消停留此页面。"
-	},
-	"hintSearchLink": {
-		"description": "Hint for the search URL.",
-		"message": "搜索网址必须包含一个星号(*)，将替换为由<暴力猴>生成的关键字。"
 	},
 	"msgImported": {
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",

@@ -23,10 +23,6 @@
 		"description": "Message shown when a script is installed.",
 		"message": "Skrypt zainstalowany"
 	},
-	"defaultSearch": {
-		"description": "URL for searching scripts, * stands for the keywords.",
-		"message": "http://www.google.com/search?q=*"
-	},
 	"msgUpdating": {
 		"description": "Message shown when a new version of script is being fetched.",
 		"message": "Aktualizowanie skryptu..."
@@ -122,14 +118,6 @@
 	"labelAutoUpdate": {
 		"description": "Option to allow automatically checking scripts for updates every 24 hours.",
 		"message": "Automatycznie sprawdzaj aktualizacje dla skryptów każdego dnia"
-	},
-	"labelSearchLink": {
-		"description": "Label of URL for searching scripts for a site.",
-		"message": "Adres wyszukiwarki:"
-	},
-	"buttonDefault": {
-		"description": "Button to replace search URL with the default one.",
-		"message": "Domyślne"
 	},
 	"labelDataImport": {
 		"description": "Section title of data import.",
@@ -310,10 +298,6 @@
 	"confirmNotSaved": {
 		"description": "Confirm message shown when there are unsaved script modifications.",
 		"message": "Modyfikacje w tym skrypcie nie zostały zapisane! Kliknij \"OK\", aby wyjść lub \"Anuluj\", aby pozostać."
-	},
-	"hintSearchLink": {
-		"description": "Hint for the search URL.",
-		"message": "Adres wyszukiwarki musi zawierać *. *, co oznacza słowa kluczowe generowane przez Violentmonkey."
 	},
 	"msgImported": {
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",
