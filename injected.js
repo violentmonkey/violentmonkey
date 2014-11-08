@@ -205,7 +205,7 @@ var comm={
 				}catch(e){}*/
 			}
 			var t=this/*,itemWrapper=null*/;
-			comm.prop1.forEach(wrapItem);
+			comm.prop1.forEach(function(i){wrapItem(i);});
 			comm.prop2.forEach(function(i){wrapItem(i,true);});
 		}
 		function wrapGM(c){

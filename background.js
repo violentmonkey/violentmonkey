@@ -246,7 +246,7 @@ function getInjected(url,src,callback) {	// for injected
 				}
 				r.continue();
 			} else {
-				if(n) {
+				if(n&&src.url==src.tab.url) {
 					chrome.browserAction.setBadgeBackgroundColor({color:'#808',tabId:src.tab.id});
 					chrome.browserAction.setBadgeText({text:n.toString(),tabId:src.tab.id});
 				}
