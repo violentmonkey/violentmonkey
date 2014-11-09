@@ -645,7 +645,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(o){
 		var x=new XMLHttpRequest();
 		x.open('GET',o.url,false);
 		x.send();
-		if((!x.status||x.status==200)&&x.responseText[0]=='/') {
+		if((!x.status||x.status==200)&&!/^\s*</.test(x.responseText)) {
 			if(o.tabId<0) chrome.tabs.create({url:chrome.extension.getURL('/confirm.html')+'?url='+encodeURIComponent(o.url)});
 			else chrome.tabs.get(o.tabId,function(t){
 				chrome.tabs.create({url:chrome.extension.getURL('/confirm.html')+'?url='+encodeURIComponent(o.url)+'&from='+encodeURIComponent(t.url)});

@@ -13,4 +13,14 @@ function initI18n(callback){
 		if(callback) callback();
 	},true);
 }
+function getLocaleString(dict,key){
+	var lang=navigator.languages,i,lkey;
+	for(i=0;i<lang.length;i++) {
+		lkey=key+':'+lang[i];
+		if(lkey in dict) {
+			key=lkey;break;
+		}
+	}
+	return dict[key]||'';
+}
 var _=chrome.i18n.getMessage,$=document.querySelector.bind(document);

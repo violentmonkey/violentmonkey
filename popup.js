@@ -31,7 +31,8 @@ function menuCommand(e) {
 function menuScript(s) {
 	if(s&&!scripts[s.id]) {
 		scripts[s.id]=s;
-		var n=s.meta.name?s.meta.name.replace(/&/g,'&amp;').replace(/</g,'&lt;'):'<em>'+_('labelNoName')+'</em>';
+		var n=s.custom.name||getLocaleString(s.meta,'name');
+		n=n?n.replace(/&/g,'&amp;').replace(/</g,'&lt;'):'<em>'+_('labelNoName')+'</em>';
 		loadItem(addItem(n,{
 			holder: pB,
 			symbol: '✓',
