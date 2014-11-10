@@ -220,23 +220,17 @@ var xL=$('#xList'),xE=$('#bExport'),xD=$('#cWithData');
 function xLoad() {
 	xL.innerHTML='';xE.disabled=false;
 	ids.forEach(function(i){
-		var d=document.createElement('div'),n=map[i].obj;
-		d.className='ellipsis selected';
+		var d=document.createElement('option'),n=map[i].obj;
+		d.className='ellipsis';d.selected=true;
 		getName(d,n.custom.name||getLocaleString(n.meta,'name'));
 		xL.appendChild(d);
 	});
 }
 xD.onchange=function(){chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'withData',value:this.checked}});};
-xL.onclick=function(e){
-	var t=e.target;
-	if(t.parentNode!=this) return;
-	t.classList.toggle('selected');
-};
 $('#bSelect').onclick=function(){
 	var c=xL.childNodes,v,i;
-	for(i=0;i<c.length;i++) if(!c[i].classList.contains('selected')) break;
-	v=i<c.length;
-	for(i=0;i<c.length;i++) if(v) c[i].classList.add('selected'); else c[i].classList.remove('selected');
+	for(i=0;i<c.length;i++) if(!c[i].selected) break;
+	v=i<c.length;for(i=0;i<c.length;i++) c[i].selected=v;
 };
 function exported(o){
 	function addFiles(){
@@ -286,7 +280,7 @@ xE.onclick=function(e){
 	this.disabled=true;
 	var i,c=[];
 	for(i=0;i<ids.length;i++)
-		if(xL.childNodes[i].classList.contains('selected')) c.push(ids[i]);
+		if(xL.childNodes[i].selected) c.push(ids[i]);
 	chrome.runtime.sendMessage({cmd:'ExportZip',data:{values:xD.checked,data:c}},exported);
 };
 
