@@ -115,9 +115,7 @@ var comm={
 					});
 					c(d.data);
 				}
-				if(!this.id)	// synchronous, not tested yet
-					for(i in d.data) this.req[i]=d.data[i];
-				if(d.type=='load') delete comm.requests[this.id];
+				if(d.type=='loadend') delete comm.requests[this.id];
 			};
 			this.start=function(id){
 				this.id=id;
@@ -127,7 +125,7 @@ var comm={
 					method:details.method,
 					url:details.url,
 					data:details.data,
-					async:!details.synchronous,
+					//async:!details.synchronous,
 					user:details.user,
 					password:details.password,
 					headers:details.headers,
@@ -159,7 +157,7 @@ var comm={
 			function wrapItem(i,wrap){
 				var type=null,value;
 				function initProperty() {
-					if(!type) {
+					if(['function','custom'].indexOf(type)<0) {
 						value=window[i];
 						type=typeof value;
 						if(type=='function'&&wrap) {
@@ -414,15 +412,16 @@ function httpRequest(details) {
   var i,req,url=null;
   if(details.id) req=requests[details.id]; else req=new XMLHttpRequest();
   try {
-    req.open(details.method,details.url,details.async,details.user,details.password);
-    if(details.headers) for(i in details.headers) req.setRequestHeader(i,details.headers[i]);
+		// details.async=true;
+    req.open(details.method,details.url,true,details.user,details.password);
+    if(details.headers)
+			for(i in details.headers) req.setRequestHeader(i,details.headers[i]);
 		if(details.responseType) req.responseType='blob';
     if(details.overrideMimeType) req.overrideMimeType(details.overrideMimeType);
-    ['abort','error','load','progress','readystatechange','timeout'].forEach(function(i) {
+    ['abort','error','load','loadend','progress','readystatechange','timeout'].forEach(function(i) {
       req['on'+i]=callback;
     });
     req.send(details.data);
-    if(!details.id) callback({type:'load'});
   } catch(e) {
 		console.log(e);
   }
