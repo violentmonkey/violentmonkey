@@ -141,9 +141,15 @@ var comm={
 			comm.qrequests.push(this);
 			comm.post({cmd:'GetRequestId'});
 		}
-		function wrapper(){
-			// functions and properties
-			/*function wrapFunction(o,i,c){
+
+		/*
+		 * Wrap functions and properties
+		 */
+
+		// wrapper_old: wrap all functions and properties at the start
+		// DEPRECATED
+		/*function wrapper_old(){
+			function wrapFunction(o,i,c){
 				var f=function(){
 					var r;
 					try{r=Function.apply.apply(o[i],[o,arguments]);}
@@ -153,21 +159,45 @@ var comm={
 				f.__proto__=o[i];f.prototype=o[i].prototype;
 				return f;
 			}
-			function wrapWindow(w){return w==window?t:w;}*/
-			function wrapItem(i,wrap){
-				var type=null,value;
+			function wrapWindow(w){return w==window?t:w;}
+			function wrapItem(key,wrap){
+				try{	// avoid reading protected data
+					if(typeof window[key]=='function') {
+						if(wrap) t[key]=wrapFunction(window,key,wrapWindow);
+						else t[key]=window[key];
+					} else Object.defineProperty(t,key,{
+						get:function(){return wrapWindow(window[key]);},
+						set:function(v){window[key]=v;},
+					});
+				}catch(e){}
+			}
+			var t=this;
+			comm.prop1.forEach(function(i){wrapItem(i);});
+			comm.prop2.forEach(function(i){wrapItem(i,true);});
+		}*/
+
+		// wrapper: wrap functions as needed, return and set properties
+		function wrapper(){
+			function wrapItem(key,wrap){
+				var type=null,value,apply=Function.apply;
+				// avoid using prototype functions
+				// since some script authors change them unexpectedly
+				// (e.g. Array.indexOf)
 				function initProperty() {
-					if(['function','custom'].indexOf(type)<0) {
-						value=window[i];
+					var ignored_types=['function','custom'],i;
+					for(i=0;i<ignored_types.length;i++)
+						if(ignored_types[i]==type) break;
+					if(i==ignored_types.length) {
+						value=window[key];
 						type=typeof value;
 						if(type=='function'&&wrap) {
 							var o=value;
 							value=function(){
 								var r;
 								try {
-									r=Function.apply.apply(o,[window,arguments]);
+									r=apply.apply(o,[window,arguments]);
 								} catch(e) {
-									console.log('Error calling '+i+':\n'+e.stack);
+									console.log('Error calling '+key+':\n'+e.stack);
 								}
 								return r===window?t:r;
 							};
@@ -177,7 +207,7 @@ var comm={
 					}
 				}
 				try {
-					Object.defineProperty(t,i,{
+					Object.defineProperty(t,key,{
 						get:function(){
 							initProperty();
 							return value===window?t:value;
@@ -185,27 +215,19 @@ var comm={
 						set:function(v){
 							initProperty();
 							value=v;
-							if(type!='function') window[i]=v;
+							if(type!='function') window[key]=v;
 							type='custom';
 						},
 					});
 				} catch(e) {
 					// ignore protected data
 				}
-				/*try{	// avoid reading protected data
-					if(typeof window[i]=='function') {
-						if(itemWrapper) t[i]=itemWrapper(window,i,wrapWindow);
-						else t[i]=window[i];
-					} else Object.defineProperty(t,i,{
-						get:function(){return wrapWindow(window[i]);},
-						set:function(v){window[i]=v;},
-					});
-				}catch(e){}*/
 			}
-			var t=this/*,itemWrapper=null*/;
+			var t=this;
 			comm.prop1.forEach(function(i){wrapItem(i);});
 			comm.prop2.forEach(function(i){wrapItem(i,true);});
 		}
+
 		function wrapGM(c){
 			// Add GM functions
 			// Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
