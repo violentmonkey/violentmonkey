@@ -15,7 +15,7 @@ function allowUpdate(n){
 	);
 }
 function setIcon(n,d){
-	d.src=cache[n.meta.icon]||'images/icon48.png';
+	d.src=cache[n.meta.icon]||n.meta.icon||'images/icon48.png';
 }
 function getAuthor(a,n){
 	var m=n.match(/^(.*?)\s<(\S*?@\S*?)>$/),t=_('labelAuthor');

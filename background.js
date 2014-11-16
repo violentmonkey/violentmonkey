@@ -36,6 +36,9 @@ function getNameURI(i) {
   if(!ns&&!n) k+=i.id;
   return k;
 }
+function isRemote(url){
+	return url&&!/^data:/.test(url);
+}
 function getMeta(j){return {id:j.id,custom:j.custom,meta:j.meta,enabled:j.enabled,update:j.update};}
 function parseMeta(d){
 	var o=-1,meta={include:[],exclude:[],match:[],require:[],resource:[],grant:[]};
@@ -89,7 +92,8 @@ function vacuum(o,src,callback) {
 				v=r.value;ids.push(v.id);
 				v.meta.require.forEach(function(i){rq[i]=1;});
 				for(i in v.meta.resources) cc[v.meta.resources[i]]=1;
-				if(v.meta.icon) cc[v.meta.icon]=1;vl[v.uri]=1;
+				if(isRemote(v.meta.icon)) cc[v.meta.icon]=1;
+				vl[v.uri]=1;
 				r.continue();
 			} else vacuumPosition();
 		};
@@ -166,14 +170,18 @@ var match_reg=/(.*?):\/\/([^\/]*)\/(.*)/;
 function matchTest(s,u) {
   var m=s.match(match_reg);
   if(!m) return false;
-  if(m[1]=='*') {
-    if(u[1]!='http'&&u[1]!='https') return false;
-  } else if(m[1]!=u[1]) return false;
+	// scheme
+	if(!(
+		m[1]=='*'&&/^https?$/i.test(u[1])	// * = http|https
+		||m[1]==u[1]
+	)) return false;
+	// host
   if(m[2]!='*') {
     if(m[2].slice(0,2)=='*.') {
       if(u[2]!=m[2].slice(2)&&u[2].slice(1-m[2].length)!=m[2].slice(1)) return false;
     } else if(m[2]!=u[2]) return false;
   }
+	// pathname
   if(!autoReg(m[3],1).test(u[3])) return false;
   return true;
 }
@@ -390,7 +398,7 @@ function parseScript(o,src,callback) {
 			var u=meta.resources[d],c=o.resources&&o.resources[u];
 			if(c) saveCache(u,c); else fetchCache(u);
 		}
-		if(meta.icon) fetchCache(meta.icon);	// @icon
+		if(isRemote(meta.icon)) fetchCache(meta.icon);	// @icon
 	}
 	if(callback) callback();
 }
@@ -536,7 +544,7 @@ function getData(d,src,callback) {
 			var r=e.target.result,v;
 			if(r) {
 				v=r.value;
-				if(v.meta.icon) cache[v.meta.icon]=1;
+				if(isRemote(v.meta.icon)) cache[v.meta.icon]=1;
 				data.scripts.push(getMeta(v));
 				r.continue();
 			} else getCache();
