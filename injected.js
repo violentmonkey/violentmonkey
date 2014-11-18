@@ -410,7 +410,9 @@ var comm={
 function handleC(e){
 	var o=JSON.parse(e.attrName),maps={
 		SetValue:function(o){post({cmd:'SetValue',data:o});},
-		RegisterMenu:menu.push.bind(menu),
+		RegisterMenu:function(o){
+			if(window.top===window) menu.push(o);
+		},
 		GetRequestId:getRequestId,
 		HttpRequest:httpRequest,
 		AbortRequest:abortRequest,
