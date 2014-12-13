@@ -1,0 +1,5 @@
+.frame>.header{height:7rem;}
+.frame>.header>.buttons{bottom:3rem;}
+#url{float:left;max-width:50%;}
+#msg{text-align:right;}
+.frame>.body{top:7rem;bottom:5px;}

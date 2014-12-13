@@ -1,11 +1,8 @@
 html,body{background:#eee;font:menu;height:100%;margin:0;padding:0;}
 h1{text-shadow:#999 3px 3px 5px;}
 .hide{display:none;}
-tr{vertical-align:top;padding:0;height:1px;}
-tr.expand{height:auto;}
-.expandr{position:relative;}
-.expanda{position:absolute;width:100%;height:100%;}
 .ellipsis{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
 .frame{position:fixed;background:lightgray;border-spacing:10px;left:0;right:0;top:0;bottom:0;table-layout:fixed;width:100%;height:100%;}
-.right{text-align:right;}
-.bottom{vertical-align:bottom;}
+.frame>.header{position:relative;padding:1px 1rem;}
+.frame>.header>.buttons{position:absolute;right:1rem;}
+.frame>.body{position:absolute;left:5px;right:5px;}

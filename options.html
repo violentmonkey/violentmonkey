@@ -23,22 +23,16 @@
 				</div>
 			</div>
 			<div class=content>
-				<table id=tabInstalled class=hide>
-					<tr>
-						<td>
-							<button id=bNew data-i18n=buttonNew></button>
-							<button id=bUpdate data-i18n=buttonUpdateAll></button>
-							<a href=https://greasyfork.org/scripts target=_blank data-i18n=anchorGetMoreScripts></a>
-						</td>
-					</tr>
-					<tr class=expand>
-						<td class=expandr>
-							<div id=sList class=expanda>
-								<span id=message data-i18n=msgLoading></span>
-							</div>
-						</td>
-					</tr>
-				</table>
+				<div id=tabInstalled class=hide>
+					<div class=header>
+						<button id=bNew data-i18n=buttonNew></button>
+						<button id=bUpdate data-i18n=buttonUpdateAll></button>
+						<a href=https://greasyfork.org/scripts target=_blank data-i18n=anchorGetMoreScripts></a>
+					</div>
+					<div id=sList>
+						<span id=message data-i18n=msgLoading></span>
+					</div>
+				</div>
 				<div id=tabSettings class=hide>
 					<h1 data-i18n=labelSettings></h1>
 					<div><label><input type=checkbox id=cUpdate><span data-i18n=labelAutoUpdate></span></label></div>
@@ -65,71 +59,71 @@
 				</div>
 			</div>
 		</div>
-		<table id=wndEditor class="frame hide">
-			<tr>
-				<td><h2 data-i18n=labelScriptEditor></h2></td>
-				<td class="right bottom"><button id=bCustom><span id=sCustom></span> <span data-i18n=buttonCustomMeta></span></button></td>
-			</tr>
-			<tr class=expand>
-				<td colspan=2 class=expandr>
-					<div id=eCode class=expanda></div>
-					<div id=eMeta class="expanda hide">
-						<table>
-							<tr>
-								<td title="@name" data-i18n=labelName></td><td class=expand><input type=text id=mName></td>
-								<td title="@run-at" data-i18n=labelRunAt></td><td>
-									<select id=mRunAt>
-										<option value=default data-i18n=labelRunAtDefault></option>
-										<option value=start>document-start</option>
-										<option value=idle>document-idle</option>
-										<option value=end>document-end</option>
-									</select>
-								</td>
-							</tr>
-							<tr title="@homepageURL"><td data-i18n=labelHomepageURL></td><td colspan=3 class=expand><input type=text id=mHomepageURL></td></tr>
-						</table>
-						<table>
-							<tr title="@updateURL"><td data-i18n=labelUpdateURL></td><td class=expand><input type=text id=mUpdateURL></td></tr>
-							<tr title="@downloadURL"><td data-i18n=labelDownloadURL></td><td class=expand><input type=text id=mDownloadURL></td></tr>
-						</table>
-						<fieldset title="@include">
-							<legend>
-								<span data-i18n=labelInclude></span>
-								<label><input type=checkbox id=cInclude><span data-i18n=labelKeepInclude></span></label>
-							</legend>
-							<div data-i18n=labelCustomInclude></div>
-							<textarea id=mInclude></textarea>
-						</fieldset>
-						<fieldset title="@match">
-							<legend>
-								<span data-i18n=labelMatch></span>
-								<label><input type=checkbox id=cMatch><span data-i18n=labelKeepMatch></span></label>
-							</legend>
-							<div data-i18n=labelCustomMatch></div>
-							<textarea id=mMatch></textarea>
-						</fieldset>
-						<fieldset title="@exclude">
-							<legend>
-								<span data-i18n=labelExclude></span>
-								<label><input type=checkbox id=cExclude><span data-i18n=labelKeepExclude></span></label>
-							</legend>
-							<div data-i18n=labelCustomExclude></div>
-							<textarea id=mExclude></textarea>
-						</fieldset>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td><label><input type=checkbox id=eUpdate><span data-i18n=labelAllowUpdate></span></label></td>
-				<td class=right>
+		<div id=wndEditor class="frame hide">
+			<div class=header>
+				<h2 data-i18n=labelScriptEditor></h2>
+				<div class=buttons><button id=bCustom><span id=sCustom></span> <span data-i18n=buttonCustomMeta></span></button></div>
+			</div>
+			<div class=body>
+				<div id=eCode></div>
+				<div id=eMeta class=hide>
+					<table>
+						<tr>
+							<td title="@name" data-i18n=labelName></td><td class=expand><input type=text id=mName></td>
+							<td title="@run-at" data-i18n=labelRunAt></td><td>
+								<select id=mRunAt>
+									<option value=default data-i18n=labelRunAtDefault></option>
+									<option value=start>document-start</option>
+									<option value=idle>document-idle</option>
+									<option value=end>document-end</option>
+								</select>
+							</td>
+						</tr>
+						<tr title="@homepageURL"><td data-i18n=labelHomepageURL></td><td colspan=3 class=expand><input type=text id=mHomepageURL></td></tr>
+					</table>
+					<table>
+						<tr title="@updateURL"><td data-i18n=labelUpdateURL></td><td class=expand><input type=text id=mUpdateURL></td></tr>
+						<tr title="@downloadURL"><td data-i18n=labelDownloadURL></td><td class=expand><input type=text id=mDownloadURL></td></tr>
+					</table>
+					<fieldset title="@include">
+						<legend>
+							<span data-i18n=labelInclude></span>
+							<label><input type=checkbox id=cInclude><span data-i18n=labelKeepInclude></span></label>
+						</legend>
+						<div data-i18n=labelCustomInclude></div>
+						<textarea id=mInclude></textarea>
+					</fieldset>
+					<fieldset title="@match">
+						<legend>
+							<span data-i18n=labelMatch></span>
+							<label><input type=checkbox id=cMatch><span data-i18n=labelKeepMatch></span></label>
+						</legend>
+						<div data-i18n=labelCustomMatch></div>
+						<textarea id=mMatch></textarea>
+					</fieldset>
+					<fieldset title="@exclude">
+						<legend>
+							<span data-i18n=labelExclude></span>
+							<label><input type=checkbox id=cExclude><span data-i18n=labelKeepExclude></span></label>
+						</legend>
+						<div data-i18n=labelCustomExclude></div>
+						<textarea id=mExclude></textarea>
+					</fieldset>
+				</div>
+			</div>
+			<div class=footer>
+				<div class=options>
+					<label><input type=checkbox id=eUpdate><span data-i18n=labelAllowUpdate></span></label>
+				</div>
+				<div class=right>
 					<button id=eSave data-i18n=buttonSave></button>
 					<button id=eSaveClose data-i18n=buttonSaveClose></button>
 					<button id=eClose data-i18n=buttonClose></button>
-				</td>
-			</tr>
-		</table>
+				</div>
+			</div>
+		</div>
 	</body>
+	<script src="common.js"></script>
+	<script src="editor.js"></script>
+	<script src="options.js"></script>
 </html>
-<script src="common.js"></script>
-<script src="editor.js"></script>
-<script src="options.js"></script>
