@@ -5,11 +5,11 @@
 	},
 	"extDescription": {
 		"description": "Description for this extension.",
-		"message": "Userscript-Unterstützung für Opera."
+		"message": "Userscript-UnterstÃ¼tzung fÃ¼r Opera."
 	},
 	"extTranslator": {
 		"description": "Information of the translator.",
-		"message": "<a href="http://blog.scrobble.me">Adrian Moerchen</a>"
+		"message": "<a href=\"http://blog.scrobble.me\">Adrian Moerchen</a>"
 	},
 	"msgUpdated": {
 		"description": "Message shown when a script is updated/reinstalled.",
@@ -29,7 +29,7 @@
 	},
 	"msgWarnGrant": {
 		"description": "Message shown when `@grant` is not found in a script.",
-		"message": "Das Skript [$1] hat keinen Eintrag für `@grant`! Für mehr Details klicken."
+		"message": "Das Skript [$1] hat keinen Eintrag fÃ¼r `@grant`! FÃ¼r mehr Details klicken."
 	},
 	"labelNoName": {
 		"description": "Text as the name of a script when no @name is assigned.",
@@ -41,11 +41,11 @@
 	},
 	"msgNewVersion": {
 		"description": "Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.",
-		"message": "Neue Version verfügbar."
+		"message": "Neue Version verfÃ¼gbar."
 	},
 	"msgCheckingForUpdate": {
 		"description": "Message shown when a script is being checked for updates by version numbers.",
-		"message": "Prüfe auf Aktualisierung..."
+		"message": "PrÃ¼fe auf Aktualisierung..."
 	},
 	"msgErrorFetchingUpdateInfo": {
 		"description": "Message shown when Violentmonkey fails fetching version data of the script.",
@@ -61,15 +61,15 @@
 	},
 	"optionClose": {
 		"description": "Option to close confirm window after installation.",
-		"message": "Nach der Installation schließen"
+		"message": "Nach der Installation schlieÃŸen"
 	},
 	"buttonConfirmInstallation": {
 		"description": "Button to confirm installation of a script.",
-		"message": "Installation bestätigen"
+		"message": "Installation bestÃ¤tigen"
 	},
 	"buttonClose": {
 		"description": "Button to close window.",
-		"message": "Schließen"
+		"message": "SchlieÃŸen"
 	},
 	"msgScriptURL": {
 		"description": "URL of the script to be installed on confirm page.",
@@ -89,11 +89,11 @@
 	},
 	"msgErrorLoadingDependency": {
 		"description": "Message shown when not all requirements are loaded successfully.",
-		"message": "Fehler beim Laden der Abhängigkeiten."
+		"message": "Fehler beim Laden der AbhÃ¤ngigkeiten."
 	},
 	"msgLoadingDependency": {
 		"description": "Message shown on confirm page when the requirements are being downloaded.",
-		"message": "Lade Abhängigkeiten... ($1/$2)"
+		"message": "Lade AbhÃ¤ngigkeiten... ($1/$2)"
 	},
 	"sideMenuInstalled": {
 		"description": "Side menu: Installed scripts",
@@ -105,7 +105,7 @@
 	},
 	"sideMenuAbout": {
 		"description": "Side menu: About",
-		"message": "Über"
+		"message": "Ãœber"
 	},
 	"buttonNew": {
 		"description": "Button to create a new script.",
@@ -113,7 +113,7 @@
 	},
 	"buttonUpdateAll": {
 		"description": "Check all scripts for updates.",
-		"message": "Auf Aktualisierungen prüfen"
+		"message": "Auf Aktualisierungen prÃ¼fen"
 	},
 	"anchorGetMoreScripts": {
 		"description": "Link to get more scripts.",
@@ -129,7 +129,7 @@
 	},
 	"labelAutoUpdate": {
 		"description": "Option to allow automatically checking scripts for updates every 24 hours.",
-		"message": "Prüfe täglich auf Aktualisierungen"
+		"message": "PrÃ¼fe tÃ¤glich auf Aktualisierungen"
 	},
 	"labelDataImport": {
 		"description": "Section title of data import.",
@@ -141,7 +141,7 @@
 	},
 	"buttonVacuum": {
 		"description": "Button to vacuum extension data.",
-		"message": "Datenbank säubern"
+		"message": "Datenbank sÃ¤ubern"
 	},
 	"labelDataExport": {
 		"description": "Section title of data export.",
@@ -165,7 +165,7 @@
 	},
 	"labelAbout": {
 		"description": "Label shown on top of the about page.",
-		"message": "Über Violentmonkey"
+		"message": "Ãœber Violentmonkey"
 	},
 	"labelRelated": {
 		"description": "Label of related links.",
@@ -193,11 +193,11 @@
 	},
 	"labelTranslator": {
 		"description": "Label of translator.",
-		"message": "Übersetzer: "
+		"message": "Ãœbersetzer: "
 	},
 	"anchorTranslator": {
 		"description": "Translator shown on about tab.",
-		"message": "<a href="http://blog.scrobble.me">Adrian Moerchen</a>"
+		"message": "<a href=\"http://blog.scrobble.me\">Adrian Moerchen</a>"
 	},
 	"labelScriptEditor": {
 		"description": "Shown in the title of the script editing page.",
@@ -233,11 +233,11 @@
 	},
 	"labelInclude": {
 		"description": "Label of @include rules.",
-		"message": "Einschließen (@include)"
+		"message": "EinschlieÃŸen (@include)"
 	},
 	"labelKeepInclude": {
 		"description": "Option to keep the original @include rules.",
-		"message": "Ursprüngliche Regeln beibehalten"
+		"message": "UrsprÃ¼ngliche Regeln beibehalten"
 	},
 	"labelCustomInclude": {
 		"description": "Label of custom @include rules.",
@@ -245,11 +245,11 @@
 	},
 	"labelMatch": {
 		"description": "Label of @match rules.",
-		"message": "Übereinstimmungen (@match)"
+		"message": "Ãœbereinstimmungen (@match)"
 	},
 	"labelKeepMatch": {
 		"description": "Option to keep the original @match rules.",
-		"message": "Ursprüngliche Regeln beibehalten"
+		"message": "UrsprÃ¼ngliche Regeln beibehalten"
 	},
 	"labelCustomMatch": {
 		"description": "Label of custom @match rules.",
@@ -261,7 +261,7 @@
 	},
 	"labelKeepExclude": {
 		"description": "Option to keep the original @exclude rules.",
-		"message": "Ursprüngliche Regeln beibehalten"
+		"message": "UrsprÃ¼ngliche Regeln beibehalten"
 	},
 	"labelCustomExclude": {
 		"description": "Label of custom @exclude rules.",
@@ -277,7 +277,7 @@
 	},
 	"buttonSaveClose": {
 		"description": "Button to save modifications of a script and then close the editing page.",
-		"message": "Speichern & Schließen"
+		"message": "Speichern & SchlieÃŸen"
 	},
 	"hintSupportPage": {
 		"description": "Hint for support page.",
@@ -301,11 +301,11 @@
 	},
 	"buttonUpdate": {
 		"description": "Check a script for updates.",
-		"message": "Auf Aktualisierung prüfen"
+		"message": "Auf Aktualisierung prÃ¼fen"
 	},
 	"confirmNotSaved": {
 		"description": "Confirm message shown when there are unsaved script modifications.",
-		"message": "Die Änderungen wurden nicht gespreichert!\Zum Verwerfen OK drücken oder Abbrechen um fortzufahren."
+		"message": "Die Ã„nderungen wurden nicht gespreichert!Zum Verwerfen OK drÃ¼cken oder Abbrechen um fortzufahren."
 	},
 	"msgImported": {
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",
@@ -313,7 +313,7 @@
 	},
 	"buttonVacuuming": {
 		"description": "Message shown when data vacuum is in progress.",
-		"message": "Säubere Daten..."
+		"message": "SÃ¤ubere Daten..."
 	},
 	"hintVacuum": {
 		"description": "Hint for vacuuming data.",
@@ -325,7 +325,7 @@
 	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",
-		"message": "Daten gesäubert"
+		"message": "Daten gesÃ¤ubert"
 	},
 	"menuManageScripts": {
 		"description": "Menu item to manage scripts, or to open the options page of the extension.",
@@ -333,7 +333,7 @@
 	},
 	"menuFindScripts": {
 		"description": "Menu item to find scripts for a site.",
-		"message": "Finde Skripte für diese Seite"
+		"message": "Finde Skripte fÃ¼r diese Seite"
 	},
 	"menuScriptEnabled": {
 		"description": "Menu item showing the status of Violentmonkey, whether enabled.",
@@ -341,7 +341,7 @@
 	},
 	"menuBack": {
 		"description": "Menu item to go back to main menu from script commands.",
-		"message": "Zurück"
+		"message": "ZurÃ¼ck"
 	},
 	"menuCommands": {
 		"description": "Menu item to list script commands.",
