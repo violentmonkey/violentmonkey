@@ -232,6 +232,7 @@ function setBadge(n,src,callback) {
 	chrome.browserAction.setBadgeText({text:o.num.toString(),tabId:src.tab.id});
 	if(o.timer) clearTimeout(o.timer);
 	o.timer=setTimeout(function(){delete badges[src.id];},300);
+	callback();
 }
 function getCacheB64(ids,src,callback) {
 	var o=db.transaction('cache').objectStore('cache'),data={};
@@ -602,6 +603,13 @@ function exportZip(z,src,callback){
 	var d={scripts:[],settings:settings},values=[];
 	getScripts();
 }
+var sxhr={};
+function registerXHR(id,src,callback){
+	sxhr[id]=1;
+	// XHR should be sent immediately after registration
+	setTimeout(function(){delete sxhr[id];},1000);
+	callback();
+}
 
 chrome.runtime.onConnect.addListener(function(p){
 	port=p;
@@ -646,6 +654,7 @@ initDb(function(){
 			GetScript: getScript,	// for user edit
 			GetMetas: getMetas,	// for popup menu
 			SetBadge: setBadge,
+			RegisterXHR: registerXHR,
 			AutoUpdate: autoUpdate,
 			Vacuum: vacuum,
 			Move: move,
@@ -671,5 +680,26 @@ chrome.webRequest.onBeforeRequest.addListener(function(o){
 		}
 	}
 },{
-	urls:['*://*/*','file://*/*'],types:['main_frame']
+	urls:['<all_urls>'],types:['main_frame']
 },['blocking']);
+// Modifications on headers
+var allowed_headers=['user-agent'];
+chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
+	var headers=details.requestHeaders,new_headers=[],vm_headers={},v,i;
+	headers.forEach(function(header){
+		if(header.name.substr(0,3)=='VM-')
+			vm_headers[header.name.substr(3)]=header.value;
+		else
+			new_headers.push(header);
+	});
+	v=vm_headers['Verify'];
+	if(v&&sxhr[v]) {
+		for(i in vm_headers)
+			if(allowed_headers.indexOf(i.toLowerCase())>=0)
+				new_headers.push({name:i,value:vm_headers[i]});
+		delete sxhr[v];
+	}
+	return {requestHeaders: new_headers};
+},{
+	urls:['<all_urls>'],types: ['xmlhttprequest'],
+},["blocking", "requestHeaders"]);

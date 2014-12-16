@@ -24,6 +24,19 @@ function utf8decode (utftext) {
 	}
 	return string;
 }
+function getUniqId() {
+	function int2str(i) {
+		var k='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_+',
+				s='',m;
+		while(i>0) {
+			m=i%64;
+			s+=k[m];
+			i=Math.floor(i/64);
+		}
+		return s;
+	}
+	return int2str(Date.now())+int2str(Math.floor(Math.random()*2147483647));
+}
 
 // Messages
 chrome.runtime.onMessage.addListener(function(req,src) {
@@ -429,7 +442,7 @@ function command(o){
 // Requests
 var requests={};
 function getRequestId() {
-  var id=Date.now()+Math.random().toString().slice(1);
+  var id=getUniqId();
   requests[id]=new XMLHttpRequest();
 	comm.post({cmd:'GotRequestId',data:id});
 }
@@ -468,18 +481,33 @@ function httpRequest(details) {
 		}
 		if(evt.type=='loadend') delete requests[details.id];
   }
-  var i,req=requests[details.id];
+  var i,il,v,sid=null,req=requests[details.id];
+	function addSpecialHeader(){
+		if(sid) return;
+		sid=getUniqId();
+		req.setRequestHeader('VM-Verify',sid);
+	}
   if(req) try {
 		// details.async=true;
     req.open(details.method,details.url,true,details.user,details.password);
     if(details.headers)
-			for(i in details.headers) req.setRequestHeader(i,details.headers[i]);
+			for(i in details.headers) {
+				il=i.toLowerCase();
+				v=details.headers[i];
+				if(il=='user-agent') {
+					addSpecialHeader();
+					req.setRequestHeader('VM-User-Agent',v);
+				} else req.setRequestHeader(i,v);
+			}
 		if(details.responseType) req.responseType='blob';
     if(details.overrideMimeType) req.overrideMimeType(details.overrideMimeType);
     ['abort','error','load','loadend','progress','readystatechange','timeout'].forEach(function(i) {
       req['on'+i]=callback;
     });
-    req.send(details.data);
+		if(sid)
+			chrome.runtime.sendMessage({cmd:'RegisterXHR',data:sid},function(){req.send(details.data);});
+		else
+			req.send(details.data);
   } catch(e) {
 		console.log(e);
   }
