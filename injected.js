@@ -26,22 +26,23 @@ function utf8decode (utftext) {
 }
 
 // Messages
-var id=Math.random();
-function post(data,callback){
-	if(!data.data) data.data={};
-	data.data['frameid']=id;
-	chrome.runtime.sendMessage(data);
-}
 chrome.runtime.onMessage.addListener(function(req,src) {
-	if(req.frameid&&req.frameid!=id) return;
 	var maps={
 		Command:command,
 		GetPopup:getPopup,
+		GetBadge:getBadge,
 	},f=maps[req.cmd];
 	if(f) f(req.data,src);
 });
 function getPopup(){
-	chrome.runtime.sendMessage({cmd:'SetPopup',data:[menu,ids]});
+	// XXX: only scripts run in top level window are counted
+	if(top===window)
+		chrome.runtime.sendMessage({cmd:'SetPopup',data:[menu,ids]});
+}
+function getBadge(){
+	// XXX: only scripts run in top level window are counted
+	if(top===window)
+		chrome.runtime.sendMessage({cmd:'SetBadge',data:ids.length});
 }
 
 // Communicator
@@ -409,7 +410,9 @@ var comm={
 },menu=[],ids=[];
 function handleC(e){
 	var o=JSON.parse(e.attrName),maps={
-		SetValue:function(o){post({cmd:'SetValue',data:o});},
+		SetValue:function(o){
+			chrome.runtime.sendMessage({cmd:'SetValue',data:o});
+		},
 		RegisterMenu:function(o){
 			if(window.top===window) menu.push(o);
 		},

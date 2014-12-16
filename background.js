@@ -222,6 +222,17 @@ function getMetas(ids,src,callback) {	// for popup menu
 	}
 	getOne();
 }
+var badges={};
+function setBadge(n,src,callback) {
+	var o;
+	if(src.id in badges) o=badges[src.id];
+	else badges[src.id]=o={num:0};
+	o.num+=n;
+	chrome.browserAction.setBadgeBackgroundColor({color:'#808',tabId:src.tab.id});
+	chrome.browserAction.setBadgeText({text:o.num.toString(),tabId:src.tab.id});
+	if(o.timer) clearTimeout(o.timer);
+	o.timer=setTimeout(function(){delete badges[src.id];},300);
+}
 function getCacheB64(ids,src,callback) {
 	var o=db.transaction('cache').objectStore('cache'),data={};
 	function loop(){
@@ -241,7 +252,7 @@ function getCacheB64(ids,src,callback) {
 }
 function getInjected(url,src,callback) {	// for injected
 	function getScripts(){
-		var o=db.transaction('scripts').objectStore('scripts'),n=0,require={};
+		var o=db.transaction('scripts').objectStore('scripts'),require={};
 		o.index('position').openCursor().onsuccess=function(e){
 			var i,r=e.target.result,v;
 			if(r) {
@@ -253,13 +264,7 @@ function getInjected(url,src,callback) {	// for injected
 					for(i in v.meta.resources) cache[v.meta.resources[i]]=1;
 				}
 				r.continue();
-			} else {
-				if(n&&src.url==src.tab.url) {
-					chrome.browserAction.setBadgeBackgroundColor({color:'#808',tabId:src.tab.id});
-					chrome.browserAction.setBadgeText({text:n.toString(),tabId:src.tab.id});
-				}
-				getRequire(Object.getOwnPropertyNames(require));
-			}
+			} else getRequire(Object.getOwnPropertyNames(require));
 		};
 	}
 	function getRequire(require){
@@ -292,8 +297,11 @@ function getInjected(url,src,callback) {	// for injected
 		var o=db.transaction('values').objectStore('values');
 		loop();
 	}
-	function finish(){callback(data);}
-	var data={scripts:[],values:{},require:{}},cache={},values=[];
+	function finish(){
+		callback(data);
+		if(n&&src.url==src.tab.url) chrome.tabs.sendMessage(src.tab.id,{cmd:'GetBadge'});
+	}
+	var data={scripts:[],values:{},require:{}},cache={},values=[],n=0;
 	if(data.isApplied=settings.isApplied) getScripts(); else finish();
 }
 function fetchURL(url, cb, type, headers) {
@@ -637,6 +645,7 @@ initDb(function(){
 			ParseScript: parseScript,
 			GetScript: getScript,	// for user edit
 			GetMetas: getMetas,	// for popup menu
+			SetBadge: setBadge,
 			AutoUpdate: autoUpdate,
 			Vacuum: vacuum,
 			Move: move,
