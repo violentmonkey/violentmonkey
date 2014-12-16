@@ -49,7 +49,7 @@ function loadItem(o,r){
 	d.innerHTML='<img class=icon>'
 	+'<div class=panelH>'
 		+'<a class="name ellipsis" target=_blank></a>'
-		+'<a class="support hide" target=_blank>?</a>'
+		+'<a class="support hide" target=_blank><i class="fa fa-question-circle"></i></a>'
 		+'<span class=version>'+(n.meta.version?'v'+n.meta.version:'')+'</span>'
 		+'<span class=author></span>'
 	+'</div>'

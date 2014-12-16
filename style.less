@@ -1,3 +1,4 @@
+// common styles
 .fill(){
 	height: 100%;
 	margin: 0;
@@ -7,8 +8,6 @@
 	box-sizing: border-box;
 	width: 100%;
 }
-
-// common styles
 html{
 	.fill;
 	body{
@@ -31,65 +30,66 @@ h1{
 .frame{
 	position: fixed;
 	background: lightgray;
-	border-spacing:10px;
-	left:0;
-	right:0;
-	top:0;
-	bottom:0;
-	table-layout:fixed;
-	width:100%;
-	height:100%;
+	border-spacing: 10px;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	table-layout: fixed;
+	width: 100%;
+	height: 100%;
 	.header{
-		position:relative;
-		padding:1px 1rem;
+		position: relative;
+		padding: 1px 1em;
 		.buttons{
-			position:absolute;
-			right:1rem;
+			position: absolute;
+			right: 1em;
 		}
 	}
 	.body{
-		position:absolute;
-		left:5px;
-		right:5px;
+		position: absolute;
+		left: 5px;
+		right: 5px;
 	}
 }
 
 // popup menu
 #popup{
 	body {
-		background:inherit;
+		background: inherit;
 	}
 	.fa{
-		width:1em;
+		width: 1em;
 	}
 }
 .menu{
-	overflow-y:auto;
-	max-width:300px;
+	overflow-y: auto;
+	max-width: 300px;
 	div{
-		cursor:pointer;
-		padding:5px;
-		display:block;
+		cursor: pointer;
+		padding: 5px;
+		display: block;
 		&:hover{
-			background:gray;
-			color:gold;
+			background: gray;
+			color: gold;
 		}
 		&.disabled{
-			color:gray;
+			color: gray;
 			&:hover{
-				color:silver;
+				color: silver;
 			}
 		}
 	}
 	hr{
-		border:none;
-		border-top:1px solid silver;
+		border: none;
+		border-top: 1px solid silver;
 	}
 }
 
 // options page
+@menu-height: 2em;
 a{
-	color:dodgerblue;
+	color: dodgerblue;
 }
 textarea{
 	.fullsize;
@@ -102,81 +102,108 @@ label>*{
 }
 #options{
 	.main{
-		max-width:900px;
-		height:100%;
-		margin:0 auto;
+		max-width: 900px;
+		height: 100%;
+		margin: 0 auto;
 	}
 	.sidebar{
-		position:fixed;
-		background:#fafafa;
-		width:200px;
-		margin-top:30px;
-		box-sizing:border-box;
-		border:1px solid darkgray;
-		border-radius:10px 0 0 10px;
-		border-right:none;
-		padding:20px 10px 10px;
-		text-align:right;
+		position: fixed;
+		background: #fafafa;
+		width: 200px;
+		margin-top: 30px;
+		box-sizing: border-box;
+		border: 1px solid darkgray;
+		border-radius: 10px 0 0 10px;
+		border-right: none;
+		padding: 20px 10px 10px;
+		text-align: right;
 		img{
 			width: 64px;
 		}
 		hr{
-			border:none;
-			border-top:1px solid darkgray;
+			border: none;
+			border-top: 1px solid darkgray;
 		}
 	}
 	.sidemenu>a{
-		color:gray;
-		display:block;
-		font-size:1.17em;
-		font-weight:bold;
-		line-height:2.5em;
-		text-decoration:none;
+		color: gray;
+		display: block;
+		font-size: 1.17em;
+		font-weight: bold;
+		line-height: 2.5em;
+		text-decoration: none;
 		&.selected,&:hover{
-			color:black;
+			color: black;
 		}
 	}
 	fieldset.title{
-		border:none;
-		border-top:1px solid silver;
-		margin:20px 0 0;
+		border: none;
+		border-top: 1px solid silver;
+		margin: 20px 0 0;
+	}
+	.frame{
+		.header{
+			height: @editor-header-height;
+			.buttons{
+				bottom: 1em;
+			}
+		}
+		.body{
+			top: @editor-header-height;
+			bottom: @editor-footer-height;
+		}
+		.footer{
+			position: fixed;
+			padding: 1px 1em;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			height: @editor-footer-height;
+			line-height: @editor-footer-height;
+			.options{
+				float: left;
+			}
+			.right{
+				text-align: right;
+			}
+		}
 	}
 }
 .content{
-	background:white;
-	margin-left:200px;
-	box-sizing:border-box;
-	border-left:1px solid darkgray;
-	border-right:1px solid darkgray;
-	height:100%;
-	overflow-y:auto;
-	position:relative;
+	background: white;
+	margin-left: 200px;
+	box-sizing: border-box;
+	border-left: 1px solid darkgray;
+	border-right: 1px solid darkgray;
+	height: 100%;
+	overflow-y: auto;
+	position: relative;
 	&>div{
-		margin:20px;
+		margin: 20px;
 	}
 }
 // Installed scripts
 #tabInstalled{
-	height:100%;
-	width:100%;
-	margin:0;
+	height: 100%;
+	width: 100%;
+	margin: 0;
 	&>.header{
-		height:1.5rem;
-		line-height:1.5rem;
+		height: @menu-height;
+		line-height: @menu-height;
 	}
 }
 #sList{
-	overflow-y:auto;
-	box-sizing:border-box;
-	border-top:1px solid darkgray;
-	position:absolute;
-	top:1.5rem;
-	bottom:0;
-	width:100%;
+	overflow-y: auto;
+	box-sizing: border-box;
+	border-top: 1px solid darkgray;
+	position: absolute;
+	top: @menu-height;
+	bottom: 0;
+	width: 100%;
 	&>div{
-		border-bottom:1px dashed silver;
-		padding:10px;
-		position:relative;
+		border-bottom: 1px dashed silver;
+		padding: 10px;
+		position: relative;
 		.move{
 			cursor: pointer;
 			color: gray;
@@ -185,150 +212,123 @@ label>*{
 			}
 		}
 		&.disabled{
-			background:lightgray;
-			color:gray;
+			background: lightgray;
+			color: gray;
 			.name{
-				color:blueviolet;
+				color: blueviolet;
 			}
 			.icon{
-				opacity:0.5;
+				opacity: 0.5;
 			}
 		}
 		&.moving{
-			background:lightgreen;
-			border:1px outset gray;
-			cursor:move;
+			background: lightgreen;
+			border: 1px outset gray;
+			cursor: move;
 		}
 	}
 	.name{
-		font-weight:bold;
-		font-size:120%;
+		font-weight: bold;
+		font-size: 1.2em;
 	}
 	.support{
-		width:16px;
-		height:16px;
-		border-radius:8px;
-		background-color:green;
-		color:white;
-		text-align:center;
-		text-decoration:none;
-		font-size:12px;
+		font-size: 1.2em;
+		color: green;
+		text-decoration: none;
 		&.hide{
 			.hide;
 		}
 	}
 	.icon{
-		top:1em;
-		width:40px;
-		height:40px;
-		margin:2px;
-		position:absolute;
+		top: 1em;
+		width: 40px;
+		height: 40px;
+		margin: 2px;
+		position: absolute;
 	}
 	.descrip{
-		margin-left:60px;
-		min-height:1em;
-		max-height:4.5em;
-		overflow-y:auto;
+		margin-left: 60px;
+		min-height: 1em;
+		max-height: 4.5em;
+		overflow-y: auto;
 	}
 	.panelH{
-		margin-left:60px;
-		margin-right:20px;
+		margin-left: 60px;
+		margin-right: 20px;
 		&>*{
-			display:inline-block;
-			margin-right:10px;
-			vertical-align:middle;
+			display: inline-block;
+			margin-right: 10px;
+			vertical-align: middle;
 		}
 	}
 	.panelT{
-		position:absolute;
-		top:10px;
-		right:10px;
+		position: absolute;
+		top: 10px;
+		right: 10px;
 	}
 }
 // Editor
+@editor-header-height: 5em;
+@editor-footer-height: 3em;
 #eMeta{
-	max-width:450px;
-	max-height:100%;
-	height:auto;
-	background:lightgray;
-	z-index:10;
-	right:0;
-	top:0;
-	padding:10px;
-	box-sizing:border-box;
-	overflow-y:auto;
-	box-shadow:gray -2px 4px 4px;
-	position:absolute;
+	max-width: 450px;
+	max-height: 100%;
+	height: auto;
+	background: lightgray;
+	z-index: 10;
+	right: 0;
+	top: 0;
+	padding: 10px;
+	box-sizing: border-box;
+	overflow-y: auto;
+	box-shadow: gray -2px 4px 4px;
+	position: absolute;
 	table{
 		width: 100%;
 		td{
-			width:1px;
-			white-space:nowrap;
+			width: 1px;
+			white-space: nowrap;
 			&.expand{
-				width:auto;
+				width: auto;
 			}
-		}
-	}
-}
-.frame{
-	.header{
-		height:5rem;
-		.buttons{
-			bottom:1rem;
-		}
-	}
-	.body{
-		top:5rem;
-		bottom:3rem;
-	}
-	.footer{
-		position:absolute;
-		height:3rem;
-		bottom:0;
-		width:100%;
-		line-height:3rem;
-		.options{
-			float:left;
-		}
-		.right{
-			text-align:right;
 		}
 	}
 }
 // Settings
 #xList{
-	display:block;
-	width:100%;
-	white-space:normal;
-	min-height:100px;
+	display: block;
+	width: 100%;
+	white-space: normal;
+	min-height: 100px;
 	&>option{
-		display:inline-block;
-		width:180px;
-		margin:2px;
-		padding:0 5px;
-		border:1px dashed lightgray;
+		display: inline-block;
+		width: 180px;
+		margin: 2px;
+		padding: 0 5px;
+		border: 1px dashed lightgray;
 	}
 }
 
 // confirm page
+@confirm-header-height: 7em;
 #confirm{
 	.frame{
 		.header{
-			height:6rem;
+			height: @confirm-header-height;
 			.buttons{
-				bottom:3rem;
+				bottom: 3em;
 			}
 		}
 		.body{
-			top:6rem;
-			bottom:5px;
+			top: @confirm-header-height;
+			bottom: 5px;
 		}
 	}
 }
 #url{
-	float:left;
-	max-width:50%;
+	float: left;
+	max-width: 50%;
 }
 #msg{
-	text-align:right;
+	text-align: right;
 }
