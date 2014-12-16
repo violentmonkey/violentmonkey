@@ -426,8 +426,10 @@ function command(o){
 }
 
 // Requests
+var requests={};
 function getRequestId() {
 	chrome.runtime.sendMessage({cmd:'GetRequestId'},function(id){
+		requests[id]=1;
 		comm.post({cmd:'GotRequestId',data:id});
 	});
 }
@@ -435,7 +437,10 @@ function httpRequest(details) {
 	chrome.runtime.sendMessage({cmd:'HttpRequest',data:details});
 }
 function httpRequested(data) {
-	comm.post({cmd:'HttpRequested',data:data});
+	if(requests[data.id]) {
+		if(data.type=='loadend') delete requests[data.id];
+		comm.post({cmd:'HttpRequested',data:data});
+	}
 }
 function abortRequest(id) {
 	chrome.runtime.sendMessage({cmd:'AbortRequest',data:id});

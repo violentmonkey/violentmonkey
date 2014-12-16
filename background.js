@@ -674,10 +674,9 @@ function httpRequest(details,src,callback) {
     if(details.headers)
 			for(i in details.headers) {
 				v=details.headers[i];
-				if(special_headers.indexOf(i.toLowerCase())>=0) {
-					addSpecialHeader();
+				if(special_headers.indexOf(i.toLowerCase())>=0)
 					req.setRequestHeader('VM-'+i,v);
-				} else req.setRequestHeader(i,v);
+				else req.setRequestHeader(i,v);
 			}
 		if(details.responseType) req.responseType='blob';
     if(details.overrideMimeType) req.overrideMimeType(details.overrideMimeType);
