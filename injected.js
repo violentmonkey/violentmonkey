@@ -24,19 +24,6 @@ function utf8decode (utftext) {
 	}
 	return string;
 }
-function getUniqId() {
-	function int2str(i) {
-		var k='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_+',
-				s='',m;
-		while(i>0) {
-			m=i%64;
-			s+=k[m];
-			i=Math.floor(i/64);
-		}
-		return s;
-	}
-	return int2str(Date.now())+int2str(Math.floor(Math.random()*2147483647));
-}
 
 // Messages
 chrome.runtime.onMessage.addListener(function(req,src) {
@@ -44,6 +31,7 @@ chrome.runtime.onMessage.addListener(function(req,src) {
 		Command:command,
 		GetPopup:getPopup,
 		GetBadge:getBadge,
+		HttpRequested:httpRequested,
 	},f=maps[req.cmd];
 	if(f) f(req.data,src);
 });
@@ -147,10 +135,6 @@ var comm={
 						}
 						d.data.response=t.data[0];
 					}
-					// finalUrl not supported
-					Object.defineProperty(d.data,'finalUrl',{
-						get:function(){console.log('[Violentmonkey]Warning: finalUrl not supported for GM_xmlhttpRequest yet!');}
-					});
 					c(d.data);
 				}
 				if(d.type=='loadend') delete comm.requests[t.id];
@@ -182,7 +166,9 @@ var comm={
 						abort:reqAbort,
 					},
 					data:[],
-				};
+				},a=document.createElement('a');
+				a.setAttribute('href',details.url);
+				details.url=a.href;
 				comm.qrequests.push(t);
 				comm.post({cmd:'GetRequestId'});
 				return t.req;
@@ -440,82 +426,19 @@ function command(o){
 }
 
 // Requests
-var requests={};
 function getRequestId() {
-  var id=getUniqId();
-  requests[id]=new XMLHttpRequest();
-	comm.post({cmd:'GotRequestId',data:id});
+	chrome.runtime.sendMessage({cmd:'GetRequestId'},function(id){
+		comm.post({cmd:'GotRequestId',data:id});
+	});
 }
 function httpRequest(details) {
-  function callback(evt) {
-		function finish(){
-			comm.post({
-				cmd: 'HttpRequested',
-				data: {
-					id: details.id,
-					type: evt.type,
-					resType: req.responseType,
-					data: data
-				}
-			});
-		}
-		var data={
-			readyState: req.readyState,
-			responseHeaders: req.getAllResponseHeaders(),
-			status: req.status,
-			statusText: req.statusText
-		},r;
-		try {
-			data.responseText=req.responseText;
-		} catch(e) {}
-		if(req.response&&req.responseType=='blob') {
-			r=new FileReader();
-			r.onload=function(e){
-				data.response=r.result;
-				finish();
-			};
-			r.readAsDataURL(req.response);
-		} else {	// default `null` for blob and '' for text
-			data.response=req.response;
-			finish();
-		}
-		if(evt.type=='loadend') delete requests[details.id];
-  }
-  var i,il,v,sid=null,req=requests[details.id];
-	function addSpecialHeader(){
-		if(sid) return;
-		sid=getUniqId();
-		req.setRequestHeader('VM-Verify',sid);
-	}
-  if(req) try {
-		// details.async=true;
-    req.open(details.method,details.url,true,details.user,details.password);
-    if(details.headers)
-			for(i in details.headers) {
-				il=i.toLowerCase();
-				v=details.headers[i];
-				if(il=='user-agent') {
-					addSpecialHeader();
-					req.setRequestHeader('VM-User-Agent',v);
-				} else req.setRequestHeader(i,v);
-			}
-		if(details.responseType) req.responseType='blob';
-    if(details.overrideMimeType) req.overrideMimeType(details.overrideMimeType);
-    ['abort','error','load','loadend','progress','readystatechange','timeout'].forEach(function(i) {
-      req['on'+i]=callback;
-    });
-		if(sid)
-			chrome.runtime.sendMessage({cmd:'RegisterXHR',data:sid},function(){req.send(details.data);});
-		else
-			req.send(details.data);
-  } catch(e) {
-		console.log(e);
-  }
+	chrome.runtime.sendMessage({cmd:'HttpRequest',data:details});
+}
+function httpRequested(data) {
+	comm.post({cmd:'HttpRequested',data:data});
 }
 function abortRequest(id) {
-  var req=requests[id];
-  if(req) req.abort();
-  delete requests[id];
+	chrome.runtime.sendMessage({cmd:'AbortRequest',data:id});
 }
 
 // For injected scripts

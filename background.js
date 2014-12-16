@@ -1,4 +1,18 @@
 var db,port=null,pos=0;
+function getUniqId() {
+	function int2str(i) {
+		var k='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_+',
+				s='',m;
+		while(i>0) {
+			m=i%64;
+			s+=k[m];
+			i=Math.floor(i/64);
+		}
+		return s;
+	}
+	return int2str(Date.now()%0x80000*0x100+Math.floor(Math.random()*0x800))+
+		int2str(Math.floor(Math.random()*0x80000000));
+}
 function notify(title,options) {
 	function show() {
 		var n=new Notification(title+' - '+_('extName'),{
@@ -603,12 +617,83 @@ function exportZip(z,src,callback){
 	var d={scripts:[],settings:settings},values=[];
 	getScripts();
 }
-var sxhr={};
-function registerXHR(id,src,callback){
-	sxhr[id]=1;
-	// XHR should be sent immediately after registration
-	setTimeout(function(){delete sxhr[id];},1000);
-	callback();
+
+// Requests
+var requests={},request_id_map={},special_headers=['user-agent'];
+function getRequestId(data,src,callback) {
+  var id=getUniqId();
+	// XHR, finalUrl, requestId in browser
+  requests[id]=[new XMLHttpRequest(),'',''];
+	callback(id);
+}
+function httpRequest(details,src,callback) {
+  function reqCallback(evt) {
+		function finish(){
+			chrome.tabs.sendMessage(src.tab.id,{
+				cmd: 'HttpRequested',
+				data: {
+					id: details.id,
+					type: evt.type,
+					resType: req.responseType,
+					data: data
+				}
+			});
+		}
+		var data={
+			finalUrl: reqo[1],
+			readyState: req.readyState,
+			responseHeaders: req.getAllResponseHeaders(),
+			status: req.status,
+			statusText: req.statusText
+		},r;
+		try {
+			data.responseText=req.responseText;
+		} catch(e) {}
+		if(req.response&&req.responseType=='blob') {
+			r=new FileReader();
+			r.onload=function(e){
+				data.response=r.result;
+				finish();
+			};
+			r.readAsDataURL(req.response);
+		} else {	// default `null` for blob and '' for text
+			data.response=req.response;
+			finish();
+		}
+		if(evt.type=='loadend') {
+			if(reqo[2]) delete request_id_map[reqo[2]];
+			delete requests[details.id];
+		}
+  }
+  var i,il,v,reqo=requests[details.id],req;
+	if(!reqo) return;req=reqo[0];
+  try {
+		// details.async=true;
+    req.open(details.method,details.url,true,details.user,details.password);
+		req.setRequestHeader('VM-Verify',details.id);
+    if(details.headers)
+			for(i in details.headers) {
+				v=details.headers[i];
+				if(special_headers.indexOf(i.toLowerCase())>=0) {
+					addSpecialHeader();
+					req.setRequestHeader('VM-'+i,v);
+				} else req.setRequestHeader(i,v);
+			}
+		if(details.responseType) req.responseType='blob';
+    if(details.overrideMimeType) req.overrideMimeType(details.overrideMimeType);
+    ['abort','error','load','loadend','progress','readystatechange','timeout'].forEach(function(i) {
+      req['on'+i]=reqCallback;
+    });
+		reqo[1]=details.url;
+		req.send(details.data);
+  } catch(e) {
+		console.log(e);
+  }
+}
+function abortRequest(id) {
+  var req=requests[id];
+  if(req) req.abort();
+  delete requests[id];
 }
 
 chrome.runtime.onConnect.addListener(function(p){
@@ -654,11 +739,13 @@ initDb(function(){
 			GetScript: getScript,	// for user edit
 			GetMetas: getMetas,	// for popup menu
 			SetBadge: setBadge,
-			RegisterXHR: registerXHR,
 			AutoUpdate: autoUpdate,
 			Vacuum: vacuum,
 			Move: move,
 			ParseMeta: function(o,src,callback){callback(parseMeta(o));},
+			GetRequestId: getRequestId,
+			HttpRequest: httpRequest,
+			AbortRequest: abortRequest,
 		},f=maps[req.cmd];
 		if(f) f(req.data,src,callback);
 		return true;
@@ -683,7 +770,6 @@ chrome.webRequest.onBeforeRequest.addListener(function(o){
 	urls:['<all_urls>'],types:['main_frame']
 },['blocking']);
 // Modifications on headers
-var allowed_headers=['user-agent'];
 chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
 	var headers=details.requestHeaders,new_headers=[],vm_headers={},v,i;
 	headers.forEach(function(header){
@@ -693,13 +779,25 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
 			new_headers.push(header);
 	});
 	v=vm_headers['Verify'];
-	if(v&&sxhr[v]) {
+	if(v&&(i=requests[v])) {
+		delete vm_headers['Verify'];
+		request_id_map[details.requestId]=v;
+		i[2]=details.requestId;
 		for(i in vm_headers)
-			if(allowed_headers.indexOf(i.toLowerCase())>=0)
+			if(special_headers.indexOf(i.toLowerCase())>=0)
 				new_headers.push({name:i,value:vm_headers[i]});
-		delete sxhr[v];
 	}
 	return {requestHeaders: new_headers};
 },{
 	urls:['<all_urls>'],types: ['xmlhttprequest'],
 },["blocking", "requestHeaders"]);
+// Watch URL redirects
+chrome.webRequest.onBeforeRedirect.addListener(function(details) {
+	var v=request_id_map[details.requestId],reqo;
+	if(v) {
+		reqo=requests[v];
+		if(reqo) reqo[1]=details.redirectUrl;
+	}
+},{
+	urls:['<all_urls>'],types: ['xmlhttprequest'],
+});
