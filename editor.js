@@ -1,35 +1,4 @@
-/*function initAce(callback,data){
-	data=data||{};
-	addScript({src:'lib/ace-min-noconflict/ace.js'},function(){
-		var T=ace.edit('eCode'),s=T.getSession();
-		T.setTheme('ace/theme/github');
-		T.setValueAndFocus=function(v){
-			T.setValue(v);T.focus();T.gotoLine(0,0);
-		};
-		s.setMode('ace/mode/javascript');
-		s.setUseSoftTabs(false);
-		s.setUseWrapMode(true);
-		s.setUseWorker(true);
-		T.clearHistory=s.getUndoManager().reset;
-		if(data.onchange) s.on('change',data.onchange);
-		if(data.save) T.commands.addCommand({
-			name:'Save',
-			bindKey:{win:'Ctrl-S',mac:'Command-S'},
-			exec:data.save,
-			readOnly:false,
-		});
-		if(data.exit) T.commands.addCommand({
-			name:'Exit',
-			bindKey:{win:'Esc'},
-			exec:data.exit,
-			readOnly:true,
-		});
-		if(data.readonly) T.setReadOnly(data.readonly);
-		callback(T);
-	});
-}*/
-
-function initCodeMirror(callback,data){
+function initEditor(callback,data){
 	data=data||{};
 	addCSS([
 		{href:'lib/CodeMirror/lib/codemirror.css'},
@@ -83,5 +52,3 @@ function initCodeMirror(callback,data){
 		callback(T);
 	});
 }
-
-var initEditor=initCodeMirror;

@@ -3,13 +3,13 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html;charset=utf-8">
 		<link rel="shortcut icon" type="image/png" href="images/icon16.png">
-		<link rel="stylesheet" type="text/css" href="common.css">
-		<link rel="stylesheet" type="text/css" href="options.css">
+		<link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css">
+		<link rel="stylesheet" type="text/css" href="style.min.css">
 		<script src="lib/zip.js/zip.js"></script>
 		<script src="load.js"></script>
 		<title data-i18n=extName></title>
 	</head>
-	<body>
+	<body id=options>
 		<div class=main>
 			<div class=sidebar>
 				<img src=images/icon128.png>
@@ -62,7 +62,7 @@
 		<div id=wndEditor class="frame hide">
 			<div class=header>
 				<h2 data-i18n=labelScriptEditor></h2>
-				<div class=buttons><button id=bCustom><span id=sCustom></span> <span data-i18n=buttonCustomMeta></span></button></div>
+				<div class=buttons><button id=bCustom><i id=sCustom class="fa fa-caret-down"></i> <span data-i18n=buttonCustomMeta></span></button></div>
 			</div>
 			<div class=body>
 				<div id=eCode></div>

@@ -1,0 +1,334 @@
+.fill(){
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+.fullsize(){
+	box-sizing: border-box;
+	width: 100%;
+}
+
+// common styles
+html{
+	.fill;
+	body{
+		.fill;
+		background: #eee;
+		font: menu;
+	}
+}
+h1{
+	text-shadow: #999 3px 3px 5px;
+}
+.hide{
+	display: none;
+}
+.ellipsis{
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.frame{
+	position: fixed;
+	background: lightgray;
+	border-spacing:10px;
+	left:0;
+	right:0;
+	top:0;
+	bottom:0;
+	table-layout:fixed;
+	width:100%;
+	height:100%;
+	.header{
+		position:relative;
+		padding:1px 1rem;
+		.buttons{
+			position:absolute;
+			right:1rem;
+		}
+	}
+	.body{
+		position:absolute;
+		left:5px;
+		right:5px;
+	}
+}
+
+// popup menu
+#popup{
+	body {
+		background:inherit;
+	}
+	.fa{
+		width:1em;
+	}
+}
+.menu{
+	overflow-y:auto;
+	max-width:300px;
+	div{
+		cursor:pointer;
+		padding:5px;
+		display:block;
+		&:hover{
+			background:gray;
+			color:gold;
+		}
+		&.disabled{
+			color:gray;
+			&:hover{
+				color:silver;
+			}
+		}
+	}
+	hr{
+		border:none;
+		border-top:1px solid silver;
+	}
+}
+
+// options page
+a{
+	color:dodgerblue;
+}
+textarea{
+	.fullsize;
+}
+input[type=text]{
+	.fullsize;
+}
+label>*{
+	vertical-align: middle;
+}
+#options{
+	.main{
+		max-width:900px;
+		height:100%;
+		margin:0 auto;
+	}
+	.sidebar{
+		position:fixed;
+		background:#fafafa;
+		width:200px;
+		margin-top:30px;
+		box-sizing:border-box;
+		border:1px solid darkgray;
+		border-radius:10px 0 0 10px;
+		border-right:none;
+		padding:20px 10px 10px;
+		text-align:right;
+		img{
+			width: 64px;
+		}
+		hr{
+			border:none;
+			border-top:1px solid darkgray;
+		}
+	}
+	.sidemenu>a{
+		color:gray;
+		display:block;
+		font-size:1.17em;
+		font-weight:bold;
+		line-height:2.5em;
+		text-decoration:none;
+		&.selected,&:hover{
+			color:black;
+		}
+	}
+	fieldset.title{
+		border:none;
+		border-top:1px solid silver;
+		margin:20px 0 0;
+	}
+}
+.content{
+	background:white;
+	margin-left:200px;
+	box-sizing:border-box;
+	border-left:1px solid darkgray;
+	border-right:1px solid darkgray;
+	height:100%;
+	overflow-y:auto;
+	position:relative;
+	&>div{
+		margin:20px;
+	}
+}
+// Installed scripts
+#tabInstalled{
+	height:100%;
+	width:100%;
+	margin:0;
+	&>.header{
+		height:1.5rem;
+		line-height:1.5rem;
+	}
+}
+#sList{
+	overflow-y:auto;
+	box-sizing:border-box;
+	border-top:1px solid darkgray;
+	position:absolute;
+	top:1.5rem;
+	bottom:0;
+	width:100%;
+	&>div{
+		border-bottom:1px dashed silver;
+		padding:10px;
+		position:relative;
+		.move{
+			cursor: pointer;
+			color: gray;
+			&:hover{
+				color: black;
+			}
+		}
+		&.disabled{
+			background:lightgray;
+			color:gray;
+			.name{
+				color:blueviolet;
+			}
+			.icon{
+				opacity:0.5;
+			}
+		}
+		&.moving{
+			background:lightgreen;
+			border:1px outset gray;
+			cursor:move;
+		}
+	}
+	.name{
+		font-weight:bold;
+		font-size:120%;
+	}
+	.support{
+		width:16px;
+		height:16px;
+		border-radius:8px;
+		background-color:green;
+		color:white;
+		text-align:center;
+		text-decoration:none;
+		font-size:12px;
+		&.hide{
+			.hide;
+		}
+	}
+	.icon{
+		top:1em;
+		width:40px;
+		height:40px;
+		margin:2px;
+		position:absolute;
+	}
+	.descrip{
+		margin-left:60px;
+		min-height:1em;
+		max-height:4.5em;
+		overflow-y:auto;
+	}
+	.panelH{
+		margin-left:60px;
+		margin-right:20px;
+		&>*{
+			display:inline-block;
+			margin-right:10px;
+			vertical-align:middle;
+		}
+	}
+	.panelT{
+		position:absolute;
+		top:10px;
+		right:10px;
+	}
+}
+// Editor
+#eMeta{
+	max-width:450px;
+	max-height:100%;
+	height:auto;
+	background:lightgray;
+	z-index:10;
+	right:0;
+	top:0;
+	padding:10px;
+	box-sizing:border-box;
+	overflow-y:auto;
+	box-shadow:gray -2px 4px 4px;
+	position:absolute;
+	table{
+		width: 100%;
+		td{
+			width:1px;
+			white-space:nowrap;
+			&.expand{
+				width:auto;
+			}
+		}
+	}
+}
+.frame{
+	.header{
+		height:5rem;
+		.buttons{
+			bottom:1rem;
+		}
+	}
+	.body{
+		top:5rem;
+		bottom:3rem;
+	}
+	.footer{
+		position:absolute;
+		height:3rem;
+		bottom:0;
+		width:100%;
+		line-height:3rem;
+		.options{
+			float:left;
+		}
+		.right{
+			text-align:right;
+		}
+	}
+}
+// Settings
+#xList{
+	display:block;
+	width:100%;
+	white-space:normal;
+	min-height:100px;
+	&>option{
+		display:inline-block;
+		width:180px;
+		margin:2px;
+		padding:0 5px;
+		border:1px dashed lightgray;
+	}
+}
+
+// confirm page
+#confirm{
+	.frame{
+		.header{
+			height:6rem;
+			.buttons{
+				bottom:3rem;
+			}
+		}
+		.body{
+			top:6rem;
+			bottom:5px;
+		}
+	}
+}
+#url{
+	float:left;
+	max-width:50%;
+}
+#msg{
+	text-align:right;
+}

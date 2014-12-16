@@ -1,4 +1,4 @@
-var P=$('#popup'),C=$('#commands'),
+var P=$('#main'),C=$('#commands'),
 		pT=P.querySelector('.top'),pB=P.querySelector('.bot'),
 		cT=C.querySelector('.top'),cB=C.querySelector('.bot'),
 		tab=null,ia=null,scripts={},hr=null;
@@ -14,12 +14,11 @@ function loadItem(d,c) {
 }
 function addItem(h,c,b) {
   var d=document.createElement('div');
-  d.innerHTML='<i></i>'+h;
+  d.innerHTML='<i></i> '+h;
   if('title' in c) {
     d.title=typeof c.title=='string'?c.title:h;
     delete c.title;
   }
-  d.className='ellipsis';
   c.holder.insertBefore(d,b);
   for(h in c) d[h]=c[h];
 	if(d.symbols) loadItem(d,d.data);
@@ -36,6 +35,7 @@ function menuScript(s) {
 		addItem(n,{
 			holder: pB,
 			symbols: ['fa-times','fa-check'],
+			className: 'ellipsis',
 			title: s.meta.name,
 			onclick: function(e){
 				var d=!this.data;
@@ -108,6 +108,7 @@ function load(data) {
     data[0].forEach(function(i) {
       addItem(i[0], {
         holder: cB,
+				className: 'ellipsis',
         symbols: ['fa-hand-o-right'],
         //title: true,
         onclick: menuCommand,
