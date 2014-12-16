@@ -6,3 +6,4 @@ h1{text-shadow:#999 3px 3px 5px;}
 .frame>.header{position:relative;padding:1px 1rem;}
 .frame>.header>.buttons{position:absolute;right:1rem;}
 .frame>.body{position:absolute;left:5px;right:5px;}
+.fa{width:1em;margin-right:.3em;}

@@ -3,26 +3,26 @@ var P=$('#popup'),C=$('#commands'),
 		cT=C.querySelector('.top'),cB=C.querySelector('.bot'),
 		tab=null,ia=null,scripts={},hr=null;
 function loadItem(d,c) {
-  if(d.data=c){
-    d.firstChild.innerText=d.symbol;
-    d.classList.remove('disabled');
-  } else {
-    d.firstChild.innerText = '';
-    d.classList.add('disabled');
-  }
-	return c;
+	d.data=c;
+	if(d.symbols) {
+		d.firstChild.className='fa '+d.symbols[c?1:0];
+		if(d.symbols.length>1) {
+			if(c) d.classList.remove('disabled');
+			else d.classList.add('disabled');
+		}
+	}
 }
 function addItem(h,c,b) {
   var d=document.createElement('div');
-  d.innerHTML='<span></span>'+h;
+  d.innerHTML='<i></i>'+h;
   if('title' in c) {
     d.title=typeof c.title=='string'?c.title:h;
     delete c.title;
   }
   d.className='ellipsis';
   c.holder.insertBefore(d,b);
-  if('symbol' in c) d.firstChild.innerText = c.symbol;
   for(h in c) d[h]=c[h];
+	if(d.symbols) loadItem(d,d.data);
 	return d;
 }
 function menuCommand(e) {
@@ -33,20 +33,23 @@ function menuScript(s) {
 		scripts[s.id]=s;
 		var n=s.custom.name||getLocaleString(s.meta,'name');
 		n=n?n.replace(/&/g,'&amp;').replace(/</g,'&lt;'):'<em>'+_('labelNoName')+'</em>';
-		loadItem(addItem(n,{
+		addItem(n,{
 			holder: pB,
-			symbol: '✓',
+			symbols: ['fa-times','fa-check'],
 			title: s.meta.name,
 			onclick: function(e){
-				chrome.runtime.sendMessage({cmd:'UpdateMeta',data:{id:s.id,enabled:loadItem(this,!this.data)?1:0}});
-			}
-		}),s.enabled);
+				var d=!this.data;
+				chrome.runtime.sendMessage({cmd:'UpdateMeta',data:{id:s.id,enabled:d}});
+				loadItem(this,d);
+			},
+			data:s.enabled,
+		});
 	}
 }
 function initMenu(){
   addItem(_('menuManageScripts'),{
     holder: pT,
-    symbol: '➤',
+    symbols: ['fa-hand-o-right'],
     //title: true,
     onclick: function(){
 			var u=chrome.extension.getURL('/options.html');
@@ -59,34 +62,42 @@ function initMenu(){
   if(/^https?:\/\//i.test(tab.url)) {
 		var d=addItem(_('menuFindScripts'), {
 			holder: pT,
-			symbol: '➤',
+			symbols: ['fa-hand-o-right'],
 			//title: true,
 		});
-		loadItem(d,false);
 		chrome.runtime.sendMessage({cmd:'GetOption',data:'search'},function(o){
 			d.onclick=function(){
 				var h=tab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
 				chrome.tabs.create({url:'https://greasyfork.org/scripts/search?q='+h[1]});
 			};
-			loadItem(d,true);
+			loadItem(d,0);
 		});
 	}
   ia=addItem(_('menuScriptEnabled'), {
     holder: pT,
-		symbol: '✓',
+		symbols: ['fa-times','fa-check'],
     //title: true,
     onclick: function(e) {
-      chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'isApplied',value:loadItem(this,!this.data)}});
-			chrome.browserAction.setIcon({path:'images/icon19'+(this.data?'':'w')+'.png'});
+			var d=!this.data;
+      chrome.runtime.sendMessage({
+				cmd:'SetOption',
+				data:{key:'isApplied',value:d},
+			});
+			loadItem(this,d);
+			chrome.browserAction.setIcon({
+				path:'images/icon19'+(this.data?'':'w')+'.png',
+			});
     }
   });
-	chrome.runtime.sendMessage({cmd:'GetOption',data:'isApplied'},function(o){loadItem(ia,o);});
+	chrome.runtime.sendMessage({
+		cmd:'GetOption',data:'isApplied',
+	},function(o){loadItem(ia,o);});
 }
 function load(data) {
   if(data&&data[0]&&data[0].length) {
     addItem(_('menuBack'), {
       holder: cT,
-      symbol: '◄',
+      symbols: ['fa-arrow-left'],
       //title: true,
       onclick: function() {
         C.classList.add('hide');
@@ -97,7 +108,7 @@ function load(data) {
     data[0].forEach(function(i) {
       addItem(i[0], {
         holder: cB,
-        symbol: '➤',
+        symbols: ['fa-hand-o-right'],
         //title: true,
         onclick: menuCommand,
         cmd: i[0]
@@ -105,7 +116,7 @@ function load(data) {
     });
     addItem(_('menuCommands'),{
       holder: pT,
-      symbol: '➤',
+      symbols: ['fa-arrow-right'],
       //title: true,
       onclick: function() {
         P.classList.add('hide');
