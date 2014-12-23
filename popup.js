@@ -59,20 +59,16 @@ function initMenu(){
 			});
 		}
   });
-  if(/^https?:\/\//i.test(tab.url)) {
-		var d=addItem(_('menuFindScripts'), {
+  if(/^https?:\/\//i.test(tab.url))
+		addItem(_('menuFindScripts'), {
 			holder: pT,
 			symbols: ['fa-hand-o-right'],
 			//title: true,
-		});
-		chrome.runtime.sendMessage({cmd:'GetOption',data:'search'},function(o){
-			d.onclick=function(){
+			onclick: function(){
 				var h=tab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
 				chrome.tabs.create({url:'https://greasyfork.org/scripts/search?q='+h[1]});
-			};
-			loadItem(d,0);
+			},
 		});
-	}
   ia=addItem(_('menuScriptEnabled'), {
     holder: pT,
 		symbols: ['fa-times','fa-check'],

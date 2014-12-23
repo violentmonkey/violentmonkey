@@ -10,8 +10,7 @@ function getUniqId() {
 		}
 		return s;
 	}
-	return int2str(Date.now()%0x80000*0x100+Math.floor(Math.random()*0x800))+
-		int2str(Math.floor(Math.random()*0x80000000));
+	return int2str(Date.now()%0x80000)+int2str(Math.floor(Math.random()*0x8000000000));
 }
 function notify(title,options) {
 	function show() {
@@ -182,6 +181,7 @@ function autoReg(s, w) {
 }
 var match_reg=/(.*?):\/\/([^\/]*)\/(.*)/;
 function matchTest(s,u) {
+	if(s=='<all_urls>') return true;
   var m=s.match(match_reg);
   if(!m) return false;
 	// scheme
