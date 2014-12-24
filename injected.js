@@ -43,7 +43,7 @@ function getPopup(){
 function getBadge(){
 	// XXX: only scripts run in top level window are counted
 	if(top===window)
-		chrome.runtime.sendMessage({cmd:'SetBadge',data:ids.length});
+		chrome.runtime.sendMessage({cmd:'SetBadge',data:total});
 }
 
 // Communicator
@@ -406,7 +406,7 @@ var comm={
 		});
 		run(start);comm.checkLoad();
 	},
-},menu=[],ids=[];
+},menu=[],ids=[],total=0;
 function handleC(e){
 	var o=JSON.parse(e.attrName),maps={
 		SetValue:function(o){
@@ -470,7 +470,9 @@ function initCommunicator(){
 	chrome.runtime.sendMessage({cmd:'GetInjected',data:location.href},loadScript);
 }
 function loadScript(o){
-	o.scripts.forEach(function(i){ids.push(i.id);});
+	o.scripts.forEach(function(i){
+		ids.push(i.id);if(i.enabled) total++;
+	});
 	comm.post({cmd:'LoadScript',data:o});
 }
 initCommunicator();
