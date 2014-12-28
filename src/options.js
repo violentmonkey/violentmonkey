@@ -172,20 +172,19 @@ $('#cUpdate').onchange=function(){chrome.runtime.sendMessage({cmd:'AutoUpdate',d
 H.onchange=function(e){
 	zip.createReader(new zip.BlobReader(e.target.files[0]),function(r){
 		r.getEntries(function(e){
-			function getFiles(){
-				var i=e.shift();
-				if(i) i.getData(writer,function(t){
-					var c={code:t};
-					if(vm.scripts&&(v=vm.scripts[i.filename.slice(0,-8)])) {
-						delete v.id;c.more=v;
-					}
-					chrome.runtime.sendMessage({cmd:'ParseScript',data:c});
-					count++;
-					getFiles();
-				}); else {
-					alert(_('msgImported',[count]));
-					location.reload();
-				}
+			function getFiles(i){
+				while(i=e.shift()) if(/\.user\.js$/.test(i.filename))
+					return i.getData(writer,function(t){
+						var c={code:t};
+						if(vm.scripts&&(v=vm.scripts[i.filename.slice(0,-8)])) {
+							delete v.id;c.more=v;
+						}
+						chrome.runtime.sendMessage({cmd:'ParseScript',data:c});
+						count++;
+						getFiles();
+					});
+				alert(_('msgImported',[count]));
+				location.reload();
 			}
 			var i,vm={},writer=new zip.TextWriter(),count=0;
 			for(i=0;i<e.length;i++) if(e[i].filename=='ViolentMonkey') break;
