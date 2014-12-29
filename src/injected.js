@@ -179,44 +179,10 @@ var comm={
 		/*
 		 * Wrap functions and properties
 		 */
-
-		// wrapper_old: wrap all functions and properties at the start
-		// DEPRECATED
-		/*function wrapper_old(){
-			function wrapFunction(o,i,c){
-				var f=function(){
-					var r;
-					try{r=Function.apply.apply(o[i],[o,arguments]);}
-					catch(e){console.log('Error calling '+i+': \n'+e.stack);}
-					if(c) r=c(r);return r;
-				};
-				f.__proto__=o[i];f.prototype=o[i].prototype;
-				return f;
-			}
-			function wrapWindow(w){return w==window?t:w;}
-			function wrapItem(key,wrap){
-				try{	// avoid reading protected data
-					if(typeof window[key]=='function') {
-						if(wrap) t[key]=wrapFunction(window,key,wrapWindow);
-						else t[key]=window[key];
-					} else Object.defineProperty(t,key,{
-						get:function(){return wrapWindow(window[key]);},
-						set:function(v){window[key]=v;},
-					});
-				}catch(e){}
-			}
-			var t=this;
-			comm.prop1.forEach(function(i){wrapItem(i);});
-			comm.prop2.forEach(function(i){wrapItem(i,true);});
-		}*/
-
 		// wrapper: wrap functions as needed, return and set properties
 		function wrapper(){
 			function wrapItem(key,wrap){
 				var type=null,value,apply=Function.apply;
-				// avoid using prototype functions
-				// since some script authors change them unexpectedly
-				// (e.g. Array.indexOf)
 				function initProperty() {
 					if(!comm.inArray(['function','custom'],type)) {
 						value=window[key];
@@ -228,7 +194,7 @@ var comm={
 								try {
 									r=apply.apply(o,[window,arguments]);
 								} catch(e) {
-									console.log('Error calling '+key+':\n'+e.stack);
+									console.log('[Violentmonkey] Error calling '+key+':\n'+e.stack);
 								}
 								return r===window?t:r;
 							};
@@ -262,11 +228,11 @@ var comm={
 		function wrapGM(c){
 			// Add GM functions
 			// Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-			var gm={},value=values[c.uri]||{},w,g=c.meta.grant||[];
+			var gm={},value=values[c.uri]||{},g=c.meta.grant||[];
 			if(!g.length||g.length==1&&g[0]=='none') {	// @grant none
-				w={};g.pop();
+				g.pop();
 			} else {
-				w=new wrapper();
+				gm['window']=new wrapper();
 			}
 			if(!comm.inArray(g,'unsafeWindow')) g.push('unsafeWindow');
 			function propertyToString(){return 'Property for Violentmonkey: designed by Gerald';}
@@ -368,21 +334,20 @@ var comm={
 				}},
 			};
 			comm.forEach(g,function(i){var o=gf[i];if(o) addProperty(i,o,gm);});
-			return [w,gm];
+			return gm;
 		}
 		function run(l){while(l.length) runCode(l.shift());}
 		function runCode(c){
 			var req=c.meta.require||[],i,r=[],code=[],w=wrapGM(c);
-			comm.forEach(Object.getOwnPropertyNames(w[1]),function(i){r.push(i+'=g["'+i+'"]');});
+			comm.forEach(Object.getOwnPropertyNames(w),function(i){r.push(i+'=g["'+i+'"]');});
 			if(r.length) code.push('var '+r.join(',')+';delete g;with(this)(function(){');
 			for(i=0;i<req.length;i++) if(r=require[req[i]]) code.push(r);
-			code.push(c.code);code.push('}).call(window);');
-			code=code.join('\n');
+			code.push('(function(){'+c.code+'\n}).call(this);');	// to make 'use strict' work
+			code.push('}).call(this);');code=code.join('\n');
 			try{
-				(new Function('g',code)).call(w[0],w[1]);
+				(new Function('g',code)).call(w.window,w);
 			}catch(e){
 				console.log('Error running script: '+(c.custom.name||c.meta.name||c.id)+'\n'+e.message);
-				//console.log('Error running script: '+(c.custom.name||c.meta.name||c.id)+'\n'+e.stack);
 			}
 		}
 		comm.load=function(){run(end);run(idle);};
