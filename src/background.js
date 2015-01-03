@@ -1,17 +1,7 @@
-var db,port=null,pos=0;
 function getUniqId() {
-	function int2str(i) {
-		var k='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_+',
-				s='',m;
-		while(i>0) {
-			m=i%64;
-			s+=k[m];
-			i=Math.floor(i/64);
-		}
-		return s;
-	}
-	return int2str(Date.now()%0x80000)+int2str(Math.floor(Math.random()*0x8000000000));
+	return Date.now().toString(36)+Math.floor(Math.random()*0x100000).toString(36);
 }
+var db,port=null,pos=0;
 function notify(title,options) {
 	function show() {
 		var n=new Notification(title+' - '+_('extName'),{
@@ -316,7 +306,8 @@ function getInjected(url,src,callback) {	// for injected
 		callback(data);
 		if(n&&src.url==src.tab.url) chrome.tabs.sendMessage(src.tab.id,{cmd:'GetBadge'});
 	}
-	var data={scripts:[],values:{},require:{}},cache={},values=[],n=0;
+	var data={scripts:[],values:{},require:{},injectMode:settings.injectMode},
+			cache={},values=[],n=0;
 	if(data.isApplied=settings.isApplied) getScripts(); else finish();
 }
 function fetchURL(url, cb, type, headers) {
@@ -477,6 +468,7 @@ function initSettings(){
 	init('withData',true);
 	init('closeAfterInstall',false);
 	init('dataVer',0);
+	init('injectMode',0);
 }
 function updateMeta(d,src,callback) {
 	var o=db.transaction('scripts','readwrite').objectStore('scripts');

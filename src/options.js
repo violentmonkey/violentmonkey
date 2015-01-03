@@ -169,6 +169,7 @@ function confirmCancel(dirty){
 // Advanced
 var H=$('#iImport'),V=$('#bVacuum');
 $('#cUpdate').onchange=function(){chrome.runtime.sendMessage({cmd:'AutoUpdate',data:this.checked});};
+$('#sInjectMode').onchange=function(){chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'injectMode',value:this.value}});};
 H.onchange=function(e){
 	zip.createReader(new zip.BlobReader(e.target.files[0]),function(r){
 		r.getEntries(function(e){
@@ -387,6 +388,7 @@ function loadOptions(o){
 		ids.push(i.id);addItem(map[i.id]={obj:i});
 	});
 	$('#cUpdate').checked=o.settings.autoUpdate;
+	$('#sInjectMode').value=o.settings.injectMode;
 	xD.checked=o.settings.withData;
 	switchTab();
 }

@@ -1,11 +1,10 @@
 (function(){
-var prop1=Object.getOwnPropertyNames(window),
-	prop2=(function(n,p){
-		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
-		return p;
-	})(window,[]);
 // avoid running repeatedly due to new document.documentElement
 if(window.VM) return;window.VM=1;
+
+function getUniqId(){
+	return Date.now().toString(36)+Math.floor(Math.random()*0x100000).toString(36);
+}
 /**
 * http://www.webtoolkit.info/javascript-utf8.html
 */
@@ -53,9 +52,10 @@ function getBadge(){
 
 // Communicator
 var comm={
-	vmid:'VM'+Math.random(),
+	vmid:'VM_'+getUniqId(),
 	state:0,
 	utf8decode:utf8decode,
+	getUniqId:getUniqId,
 
 	// Array functions
 	// to avoid using prototype functions
@@ -76,8 +76,11 @@ var comm={
 		}
 	},
 
-	prop1:prop1,
-	prop2:prop2,
+	prop1:Object.getOwnPropertyNames(window),
+	prop2:(function(n,p){
+		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
+		return p;
+	})(window,[]),
 	init:function(s,d){
 		var t=this;
 		t.sid=t.vmid+s;
@@ -102,8 +105,22 @@ var comm={
 				var c=comm.requests[o.id];
 				if(c) c.callback(o);
 			},
+			Injected:function(u){
+				var o=comm.ainject[u],f=window['VM_'+u];
+				delete window['VM_'+u];delete comm.ainject[u];
+				if(o&&f) {
+					comm.runCode(o[0],f,o[1]);
+				}
+			},
 		},f=maps[o.cmd];
 		if(f) f(o.data);
+	},
+	runCode:function(name,func,wrapper){
+		try{
+			func.call(wrapper.window,wrapper);
+		}catch(e){
+			console.log('Error running script: '+name+'\n'+e.message);
+		}
 	},
 	loadScript:function(o){
 		var start=[],idle=[],end=[],cache,require,values,comm=this,urls={},
@@ -176,7 +193,8 @@ var comm={
 				return t.req;
 			};
 		})();
-		comm.command={};comm.requests={};comm.qrequests=[];
+		comm.requests={};comm.qrequests=[];
+		comm.command={};comm.ainject={};
 
 		/*
 		 * Wrap functions and properties
@@ -338,18 +356,27 @@ var comm={
 			comm.forEach(g,function(i){var o=gf[i];if(o) addProperty(i,o,gm);});
 			return gm;
 		}
-		function run(l){while(l.length) runCode(l.shift());}
-		function runCode(c){
-			var req=c.meta.require||[],i,r=[],code=[],w=wrapGM(c);
+		function run(l){while(l.length) buildCode(l.shift());}
+		function buildCode(c){
+			var req=c.meta.require||[],i,r=[],code=[],w=wrapGM(c),u;
 			comm.forEach(Object.getOwnPropertyNames(w),function(i){r.push(i+'=g["'+i+'"]');});
-			if(r.length) code.push('var '+r.join(',')+';delete g;with(this)(function(){');
+			if(r.length) code.push('var '+r.join(',')+';delete g;with(this)!function(){');
 			for(i=0;i<req.length;i++) if(r=require[req[i]]) code.push(r);
-			code.push('(function(){'+c.code+'\n}).call(this);');	// to make 'use strict' work
-			code.push('}).call(this);');code=code.join('\n');
-			try{
-				(new Function('g',code)).call(w.window,w);
-			}catch(e){
-				console.log('Error running script: '+(c.custom.name||c.meta.name||c.id)+'\n'+e.message);
+			code.push('\n!function(){'+c.code+'\n}.call(this)');	// to make 'use strict' work
+			code.push('}.call(this);');code=code.join('\n');
+			i=c.custom.name||c.meta.name||c.id;
+			if(o.injectMode==1) {	// advanced injection
+				u=comm.getUniqId();
+				comm.ainject[u]=[i,w];
+				comm.post({cmd:'Inject',data:[u,code]});
+			} else {	// normal injection
+				try{
+					r=new Function('g',code);
+				}catch(e){
+					console.log('Syntax error in script: '+i+'\n'+e.message);
+					return;
+				}
+				comm.runCode(i,r,w);
 			}
 		}
 		comm.load=function(){run(end);run(idle);};
@@ -374,6 +401,18 @@ var comm={
 		run(start);comm.checkLoad();
 	},
 },menu=[],ids=[],total=0;
+function injectScript(o){
+	var f=function(u,did,func){
+		Object.defineProperty(window,'VM_'+u,{
+			value:func,
+			configurable:true,
+		});
+		var e=document.createEvent("MutationEvent");
+		e.initMutationEvent(did,false,false,null,null,null,JSON.stringify({cmd:'Injected',data:u}),e.ADDITION);
+		document.dispatchEvent(e);
+	};
+	inject('!'+f.toString()+'('+JSON.stringify(o[0])+','+JSON.stringify(comm.did)+',function(g){'+o[1]+'})');
+}
 function handleC(e){
 	var o=JSON.parse(e.attrName),maps={
 		SetValue:function(o){
@@ -385,6 +424,7 @@ function handleC(e){
 		GetRequestId:getRequestId,
 		HttpRequest:httpRequest,
 		AbortRequest:abortRequest,
+		Inject:injectScript,
 	},f=maps[o.cmd];
 	if(f) f(o.data);
 }
@@ -425,18 +465,17 @@ function objEncode(o){
 }
 function inject(code){
 	var s=document.createElement('script'),d=document.documentElement;
-	s.innerHTML=code;
-	d.appendChild(s);d.removeChild(s);
+	s.innerHTML=code;d.appendChild(s);d.removeChild(s);
 }
 function initCommunicator(){
 	var C='C',R='R';
-	inject('('+(function(c,R,C){
+	inject('!'+(function(c,R,C){
 		c.init(R,C);
 		document.addEventListener("DOMContentLoaded",function(e){
 			c.state=1;c.load();
 		},false);
 		c.checkLoad();
-	}).toString()+')('+objEncode(comm)+',"'+R+'","'+C+'")');
+	}).toString()+'('+objEncode(comm)+',"'+R+'","'+C+'")');
 	comm.handleC=handleC;comm.init(C,R);
 	chrome.runtime.sendMessage({cmd:'GetInjected',data:location.href},loadScript);
 }

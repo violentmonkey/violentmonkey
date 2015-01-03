@@ -37,7 +37,14 @@
 				</div>
 				<div id=tabSettings class=hide>
 					<h1 data-i18n=labelSettings></h1>
-					<div><label><input type=checkbox id=cUpdate><span data-i18n=labelAutoUpdate></span></label></div>
+					<label class=line><input type=checkbox id=cUpdate><span data-i18n=labelAutoUpdate></span></label>
+					<label class=line>
+						<span data-i18n=labelInjectMode></span>
+						<select id=sInjectMode>
+							<option value=0 data-i18n=injectModeNormal></option>
+							<option value=1 data-i18n=injectModeAdvanced></option>
+						</select>
+					</label>
 					<fieldset class=title>
 						<legend data-i18n=labelDataImport></legend>
 						<button id=bImport data-i18n=buttonImportData></button><input type=file class=hide id=iImport>

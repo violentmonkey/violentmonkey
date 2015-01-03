@@ -71,10 +71,6 @@
 		"description": "Button to close window.",
 		"message": "Закрыть"
 	},
-	"msgScriptURL": {
-		"description": "URL of the script to be installed on confirm page.",
-		"message": "URL-адрес скрипта: $1"
-	},
 	"msgErrorLoadingData": {
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded.",
 		"message": "Ошибка загрузки скрипта."
@@ -82,6 +78,10 @@
 	"msgLoadedData": {
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded.",
 		"message": "Скрипт загружен."
+	},
+	"msgScriptURL": {
+		"description": "URL of the script to be installed on confirm page.",
+		"message": "URL-адрес скрипта: $1"
 	},
 	"msgLoadingData": {
 		"description": "Message shown on confirm page when the script to be installed is loading.",
@@ -283,14 +283,6 @@
 		"description": "Hint for support page.",
 		"message": "Support page"
 	},
-	"buttonDisable": {
-		"description": "Button to disable a script.",
-		"message": "Выключить"
-	},
-	"buttonEnable": {
-		"description": "Button to enable a script.",
-		"message": "Включить"
-	},
 	"buttonEdit": {
 		"description": "Button to edit a script.",
 		"message": "Изменить"
@@ -307,6 +299,10 @@
 		"description": "Confirm message shown when there are unsaved script modifications.",
 		"message": "Изменения не сохранены!\nНажмите OK, чтобы выйти или Отмена, чтобы вернуться."
 	},
+	"hintUseDownloadURL": {
+		"description": "Shown as a place holder for @updateURL when it is not assigned",
+		"message": "Use @downloadURL"
+	},
 	"msgImported": {
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",
 		"message": "$1 скрипт(ов) импортировано."
@@ -318,10 +314,6 @@
 	"hintVacuum": {
 		"description": "Hint for vacuuming data.",
 		"message": "Сбросить избыточность кэша и попробовать подгрузить недостающие ресурсы"
-	},
-	"hintUseDownloadURL": {
-		"description": "Shown as a place holder for @updateURL when it is not assigned",
-		"message": "Use @downloadURL"
 	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",
@@ -346,6 +338,26 @@
 	"menuCommands": {
 		"description": "Menu item to list script commands.",
 		"message": "Команды скриптов..."
+	},
+	"labelInjectMode": {
+		"description": "Label to a combo box to choose script injection modes.",
+		"message": "Script injection mode:"
+	},
+	"injectModeNormal": {
+		"description": "Script injection mode: Normal",
+		"message": "Normal"
+	},
+	"injectModeAdvanced": {
+		"description": "Script injection mode: Advanced",
+		"message": "Advanced"
+	},
+	"buttonDisable": {
+		"description": "Button to disable a script.",
+		"message": "Выключить"
+	},
+	"buttonEnable": {
+		"description": "Button to enable a script.",
+		"message": "Включить"
 	},
 	"labelSearch": {
 		"description": "Label for search input in search box.",
