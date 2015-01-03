@@ -27,6 +27,5 @@
 		"all_frames" : true
 	}],
 	"web_accessible_resources" : [],
-	"permissions" : ["tabs", "<all_urls>", "webRequest", "webRequestBlocking", "notifications"],
-	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'unsafe-eval';"
+	"permissions" : ["tabs", "<all_urls>", "webRequest", "webRequestBlocking", "notifications"]
 }

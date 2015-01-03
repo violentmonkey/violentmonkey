@@ -1,4 +1,9 @@
 (function(){
+var prop1=Object.getOwnPropertyNames(window),
+	prop2=(function(n,p){
+		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
+		return p;
+	})(window,[]);
 // avoid running repeatedly due to new document.documentElement
 if(window.VM) return;window.VM=1;
 /**
@@ -71,11 +76,8 @@ var comm={
 		}
 	},
 
-	prop1:Object.getOwnPropertyNames(window),
-	prop2:(function(n,p){
-		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
-		return p;
-	})(window,[]),
+	prop1:prop1,
+	prop2:prop2,
 	init:function(s,d){
 		var t=this;
 		t.sid=t.vmid+s;
@@ -421,16 +423,20 @@ function objEncode(o){
 	}
 	return '{'+t.join(',')+'}';
 }
+function inject(code){
+	var s=document.createElement('script'),d=document.documentElement;
+	s.innerHTML=code;
+	d.appendChild(s);d.removeChild(s);
+}
 function initCommunicator(){
-	var s=document.createElement('script'),d=document.documentElement,C='C',R='R';
-	s.innerHTML='('+(function(c,R,C){
+	var C='C',R='R';
+	inject('('+(function(c,R,C){
 		c.init(R,C);
 		document.addEventListener("DOMContentLoaded",function(e){
 			c.state=1;c.load();
 		},false);
 		c.checkLoad();
-	}).toString()+')('+objEncode(comm)+',"'+R+'","'+C+'")';
-	d.appendChild(s);d.removeChild(s);
+	}).toString()+')('+objEncode(comm)+',"'+R+'","'+C+'")');
 	comm.handleC=handleC;comm.init(C,R);
 	chrome.runtime.sendMessage({cmd:'GetInjected',data:location.href},loadScript);
 }
