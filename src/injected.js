@@ -362,7 +362,7 @@ var comm={
 			comm.forEach(Object.getOwnPropertyNames(w),function(i){r.push(i+'=g["'+i+'"]');});
 			if(r.length) code.push('var '+r.join(',')+';delete g;with(this)!function(){');
 			for(i=0;i<req.length;i++) if(r=require[req[i]]) code.push(r);
-			code.push('\n!function(){'+c.code+'\n}.call(this)');	// to make 'use strict' work
+			code.push('!function(){'+c.code+'\n}.call(this)');	// to make 'use strict' work
 			code.push('}.call(this);');code=code.join('\n');
 			i=c.custom.name||c.meta.name||c.id;
 			if(o.injectMode==1) {	// advanced injection
