@@ -1,5 +1,5 @@
 function getUniqId() {
-	return Date.now().toString(36)+Math.floor(Math.random()*0x100000).toString(36);
+	return Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 }
 var db,port=null,pos=0;
 function notify(title,options) {
@@ -611,7 +611,8 @@ function exportZip(z,src,callback){
 }
 
 // Requests
-var requests={},request_id_map={},special_headers=['user-agent'];
+var requests={},request_id_map={},
+		special_headers=['user-agent','referer','origin'];
 function getRequestId(data,src,callback) {
   var id=getUniqId();
 	// XHR, finalUrl, requestId in browser
