@@ -161,6 +161,7 @@ function switchTab(e){
 		case 'Settings':xLoad();break;
 	}
 }
+window.addEventListener('popstate',function(){switchTab()},false);
 $('.sidemenu').onclick=switchTab;
 function confirmCancel(dirty){
 	return !dirty||confirm(_('confirmNotSaved'));
