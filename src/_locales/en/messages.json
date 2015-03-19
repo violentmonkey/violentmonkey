@@ -71,6 +71,10 @@
 		"description": "Button to close window.",
 		"message": "Close"
 	},
+	"msgScriptURL": {
+		"description": "URL of the script to be installed on confirm page.",
+		"message": "Script URL: $1"
+	},
 	"msgErrorLoadingData": {
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded.",
 		"message": "Error loading script data."
@@ -78,10 +82,6 @@
 	"msgLoadedData": {
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded.",
 		"message": "Script data loaded."
-	},
-	"msgScriptURL": {
-		"description": "URL of the script to be installed on confirm page.",
-		"message": "Script URL: $1"
 	},
 	"msgLoadingData": {
 		"description": "Message shown on confirm page when the script to be installed is loading.",
@@ -130,6 +130,18 @@
 	"labelAutoUpdate": {
 		"description": "Option to allow automatically checking scripts for updates every 24 hours.",
 		"message": "Automatically check scripts for updates every day"
+	},
+	"labelInjectMode": {
+		"description": "Label to a combo box to choose script injection modes.",
+		"message": "Script injection mode:"
+	},
+	"injectModeNormal": {
+		"description": "Script injection mode: Normal",
+		"message": "Normal"
+	},
+	"injectModeAdvanced": {
+		"description": "Script injection mode: Advanced",
+		"message": "Advanced"
 	},
 	"labelDataImport": {
 		"description": "Section title of data import.",
@@ -198,6 +210,10 @@
 	"anchorTranslator": {
 		"description": "Translator shown on about tab.",
 		"message": "<a href=mailto:gera2ld@163.com>Gerald</a>"
+	},
+	"labelCurrentLang": {
+		"description": "Label of current language.",
+		"message": "Current Language:"
 	},
 	"labelScriptEditor": {
 		"description": "Shown in the title of the script editing page.",
@@ -283,6 +299,14 @@
 		"description": "Hint for support page.",
 		"message": "Support page"
 	},
+	"buttonDisable": {
+		"description": "Button to disable a script.",
+		"message": "Disable"
+	},
+	"buttonEnable": {
+		"description": "Button to enable a script.",
+		"message": "Enable"
+	},
 	"buttonEdit": {
 		"description": "Button to edit a script.",
 		"message": "Edit"
@@ -299,10 +323,6 @@
 		"description": "Confirm message shown when there are unsaved script modifications.",
 		"message": "Modifications are not saved!\nClick OK to discard them or cancel to stay."
 	},
-	"hintUseDownloadURL": {
-		"description": "Shown as a place holder for @updateURL when it is not assigned",
-		"message": "Use @downloadURL"
-	},
 	"msgImported": {
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",
 		"message": "$1 item(s) are imported."
@@ -314,6 +334,10 @@
 	"hintVacuum": {
 		"description": "Hint for vacuuming data.",
 		"message": "Discard the redundancy and try to reload the missing resources in cache."
+	},
+	"hintUseDownloadURL": {
+		"description": "Shown as a place holder for @updateURL when it is not assigned",
+		"message": "Use @downloadURL"
 	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",
@@ -338,26 +362,6 @@
 	"menuCommands": {
 		"description": "Menu item to list script commands.",
 		"message": "Script commands..."
-	},
-	"labelInjectMode": {
-		"description": "Label to a combo box to choose script injection modes.",
-		"message": "Script injection mode:"
-	},
-	"injectModeNormal": {
-		"description": "Script injection mode: Normal",
-		"message": "Normal"
-	},
-	"injectModeAdvanced": {
-		"description": "Script injection mode: Advanced",
-		"message": "Advanced"
-	},
-	"buttonDisable": {
-		"description": "Button to disable a script.",
-		"message": "Disable"
-	},
-	"buttonEnable": {
-		"description": "Button to enable a script.",
-		"message": "Enable"
 	},
 	"labelSearch": {
 		"description": "Label for search input in search box.",

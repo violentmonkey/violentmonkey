@@ -213,6 +213,7 @@ function getScript(id,src,callback) {	// for user edit
 			if(callback) callback(v);
 		}
 	};
+	return true;
 }
 function getMetas(ids,src,callback) {	// for popup menu
 	var o=db.transaction('scripts').objectStore('scripts'),data=[],id;
@@ -225,6 +226,7 @@ function getMetas(ids,src,callback) {	// for popup menu
 		}; else callback(data);
 	}
 	getOne();
+	return true;
 }
 var badges={};
 function setBadge(n,src,callback) {
@@ -254,6 +256,7 @@ function getCacheB64(ids,src,callback) {
 		}; else callback(data);
 	}
 	loop();
+	return true;
 }
 function getInjected(url,src,callback) {	// for injected
 	function getScripts(){
@@ -309,6 +312,7 @@ function getInjected(url,src,callback) {	// for injected
 	var data={scripts:[],values:{},require:{},injectMode:settings.injectMode},
 			cache={},values=[],n=0;
 	if(data.isApplied=settings.isApplied) getScripts(); else finish();
+	return true;
 }
 function fetchURL(url, cb, type, headers) {
   var req=new XMLHttpRequest(),i;
@@ -323,6 +327,7 @@ var u_cache={},u_require={};
 function saveCache(url,data,callback) {
 	var o=db.transaction('cache','readwrite').objectStore('cache');
 	o.put({uri:url,data:data}).onsuccess=callback;
+	return true;
 }
 function fetchCache(url) {
 	if(u_cache[url]) return;
@@ -340,6 +345,7 @@ function fetchCache(url) {
 function saveRequire(url,data,callback) {
 	var o=db.transaction('require','readwrite').objectStore('require');
 	o.put({uri:url,code:data}).onsuccess=callback;
+	return true;
 }
 function fetchRequire(url) {
 	if(u_require[url]) return;
@@ -375,6 +381,7 @@ function queryScript(id,meta,callback){
 		}; else queryMeta();
 	}
 	queryId();
+	return true;
 }
 function parseScript(o,src,callback) {
 	var i,r={status:0,message:'message' in o?o.message:_('msgUpdated')};
@@ -449,7 +456,6 @@ function getOption(k,src,callback){
 		r=false;
 	}
 	if(callback) callback(v);
-	return r;
 }
 function setOption(o,src,callback){
 	if(!o.check||(o.key in settings)) {
@@ -460,7 +466,9 @@ function setOption(o,src,callback){
 }
 function initSettings(){
 	function init(k,v){
-		if(!getOption(k)) setOption({key:k,value:v});
+		getOption(k,null,function(v){
+			if(v===null) setOption({key:k,value:v});
+		});
 	}
 	init('isApplied',true);
 	init('autoUpdate',true);
@@ -523,6 +531,7 @@ function checkUpdate(id,src,callback) {
 		if(r) checkUpdateO(r);
 		if(callback) callback();
 	};
+	return true;
 }
 function checkUpdateAll(e,src,callback) {
 	setOption({key:'lastUpdate',value:Date.now()});
@@ -536,6 +545,7 @@ function checkUpdateAll(e,src,callback) {
 		checkUpdateO(r.value);
 		r.continue();
 	};
+	return true;
 }
 var checking=false;
 function autoCheck() {
@@ -574,6 +584,7 @@ function getData(d,src,callback) {
 	}
 	var data={settings:settings,scripts:[]},cache={};
 	getScripts();
+	return true;
 }
 function exportZip(z,src,callback){
 	function getScripts(){
@@ -608,6 +619,7 @@ function exportZip(z,src,callback){
 	function finish(){callback(d);}
 	var d={scripts:[],settings:settings},values=[];
 	getScripts();
+	return true;
 }
 
 // Requests
@@ -739,8 +751,7 @@ initDb(function(){
 			HttpRequest: httpRequest,
 			AbortRequest: abortRequest,
 		},f=maps[req.cmd];
-		if(f) f(req.data,src,callback);
-		return true;
+		if(f) return f(req.data,src,callback);
 	});
 	chrome.browserAction.setIcon({path:'images/icon19'+(settings.isApplied?'':'w')+'.png'});
 	setTimeout(autoCheck,2e4);

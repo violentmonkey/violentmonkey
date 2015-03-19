@@ -6,6 +6,7 @@ function getName(d,n,def){
 	d.title=n||'';
 	d.innerHTML=n?n.replace(/&/g,'&amp;').replace(/</g,'&lt;'):(def||'<em>'+_('labelNoName')+'</em>');
 }
+$('#currentLang').innerHTML=navigator.language;
 
 // Main options
 function allowUpdate(n){
