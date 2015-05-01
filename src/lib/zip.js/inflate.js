@@ -33,7 +33,8 @@
  * and contributors of zlib.
  */
 
-(function(obj) {
+(function(global) {
+	"use strict";
 
 	// Global
 	var MAX_BITS = 15;
@@ -794,6 +795,7 @@
 					tree_index = ltree_index;
 
 					mode = LEN;
+					/* falls through */
 				case LEN: // i: get length/literal/eob next
 					j = need;
 
@@ -884,6 +886,7 @@
 					tree = dtree;
 					tree_index = dtree_index;
 					mode = DIST;
+					/* falls through */
 				case DIST: // i: get distance next
 					j = need;
 
@@ -961,6 +964,7 @@
 					k -= j;
 
 					mode = COPY;
+					/* falls through */
 				case COPY: // o: copying bytes in window, waiting for space
 					f = q - dist;
 					while (f < 0) { // modulo window size-"while" instead
@@ -1061,6 +1065,7 @@
 						return s.inflate_flush(z, r);
 					}
 					mode = END;
+					/* falls through */
 				case END:
 					r = Z_STREAM_END;
 					s.bitb = b;
@@ -1470,6 +1475,7 @@
 
 					index = 0;
 					mode = BTREE;
+					/* falls through */
 				case BTREE:
 					while (index < 4 + (table >>> 10)) {
 						while (k < (3)) {
@@ -1521,10 +1527,11 @@
 
 					index = 0;
 					mode = DTREE;
+					/* falls through */
 				case DTREE:
 					while (true) {
 						t = table;
-						if (!(index < 258 + (t & 0x1f) + ((t >> 5) & 0x1f))) {
+						if (index >= 258 + (t & 0x1f) + ((t >> 5) & 0x1f)) {
 							break;
 						}
 
@@ -1644,6 +1651,7 @@
 					codes.init(bl_[0], bd_[0], hufts, tl_[0], hufts, td_[0]);
 					// }
 					mode = CODES;
+					/* falls through */
 				case CODES:
 					that.bitb = b;
 					that.bitk = k;
@@ -1670,6 +1678,7 @@
 						break;
 					}
 					mode = DRY;
+					/* falls through */
 				case DRY:
 					that.write = q;
 					r = that.inflate_flush(z, r);
@@ -1685,6 +1694,7 @@
 						return that.inflate_flush(z, r);
 					}
 					mode = DONELOCKS;
+					/* falls through */
 				case DONELOCKS:
 					r = Z_STREAM_END;
 
@@ -1849,6 +1859,7 @@
 						break;
 					}
 					z.istate.mode = FLAG;
+					/* falls through */
 				case FLAG:
 
 					if (z.avail_in === 0)
@@ -1871,6 +1882,7 @@
 						break;
 					}
 					z.istate.mode = DICT4;
+					/* falls through */
 				case DICT4:
 
 					if (z.avail_in === 0)
@@ -1881,6 +1893,7 @@
 					z.total_in++;
 					z.istate.need = ((z.read_byte(z.next_in_index++) & 0xff) << 24) & 0xff000000;
 					z.istate.mode = DICT3;
+					/* falls through */
 				case DICT3:
 
 					if (z.avail_in === 0)
@@ -1891,6 +1904,7 @@
 					z.total_in++;
 					z.istate.need += ((z.read_byte(z.next_in_index++) & 0xff) << 16) & 0xff0000;
 					z.istate.mode = DICT2;
+					/* falls through */
 				case DICT2:
 
 					if (z.avail_in === 0)
@@ -1901,6 +1915,7 @@
 					z.total_in++;
 					z.istate.need += ((z.read_byte(z.next_in_index++) & 0xff) << 8) & 0xff00;
 					z.istate.mode = DICT1;
+					/* falls through */
 				case DICT1:
 
 					if (z.avail_in === 0)
@@ -1934,6 +1949,7 @@
 					r = f;
 					z.istate.blocks.reset(z, z.istate.was);
 					z.istate.mode = DONE;
+					/* falls through */
 				case DONE:
 					return Z_STREAM_END;
 				case BAD:
@@ -2103,14 +2119,15 @@
 					nomoreinput = true;
 				}
 				err = z.inflate(flush);
-				if (nomoreinput && (err == Z_BUF_ERROR))
-					return -1;
-				if (err != Z_OK && err != Z_STREAM_END)
-					throw "inflating: " + z.msg;
-				if ((nomoreinput || err == Z_STREAM_END) && (z.avail_in == data.length))
-					return -1;
+				if (nomoreinput && (err === Z_BUF_ERROR)) {
+					if (z.avail_in !== 0)
+						throw new Error("inflating: bad input");
+				} else if (err !== Z_OK && err !== Z_STREAM_END)
+					throw new Error("inflating: " + z.msg);
+				if ((nomoreinput || err === Z_STREAM_END) && (z.avail_in === data.length))
+					throw new Error("inflating: bad input");
 				if (z.next_out_index)
-					if (z.next_out_index == bufsize)
+					if (z.next_out_index === bufsize)
 						buffers.push(new Uint8Array(buf));
 					else
 						buffers.push(new Uint8Array(buf.subarray(0, z.next_out_index)));
@@ -2132,32 +2149,7 @@
 		};
 	}
 
-	var inflater;
-
-	if (obj.zip)
-		obj.zip.Inflater = Inflater;
-	else {
-		inflater = new Inflater();
-		obj.addEventListener("message", function(event) {
-			var message = event.data;
-
-			if (message.append)
-				obj.postMessage({
-					onappend : true,
-					data : inflater.append(message.data, function(current) {
-						obj.postMessage({
-							progress : true,
-							current : current
-						});
-					})
-				});
-			if (message.flush) {
-				inflater.flush();
-				obj.postMessage({
-					onflush : true
-				});
-			}
-		}, false);
-	}
-
+	// 'zip' may not be defined in z-worker and some tests
+	var env = global.zip || global;
+	env.Inflater = env._jzlib_Inflater = Inflater;
 })(this);

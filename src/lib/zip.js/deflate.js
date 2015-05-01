@@ -33,7 +33,8 @@
  * and contributors of zlib.
  */
 
-(function(obj) {
+(function(global) {
+	"use strict";
 
 	// Global
 
@@ -1988,13 +1989,13 @@
 
 	// Deflater
 
-	function Deflater(level) {
+	function Deflater(options) {
 		var that = this;
 		var z = new ZStream();
 		var bufsize = 512;
 		var flush = Z_NO_FLUSH;
 		var buf = new Uint8Array(bufsize);
-
+		var level = options ? options.level : Z_DEFAULT_COMPRESSION;
 		if (typeof level == "undefined")
 			level = Z_DEFAULT_COMPRESSION;
 		z.deflateInit(level);
@@ -2012,7 +2013,7 @@
 				z.avail_out = bufsize;
 				err = z.deflate(flush);
 				if (err != Z_OK)
-					throw "deflating: " + z.msg;
+					throw new Error("deflating: " + z.msg);
 				if (z.next_out_index)
 					if (z.next_out_index == bufsize)
 						buffers.push(new Uint8Array(buf));
@@ -2038,7 +2039,7 @@
 				z.avail_out = bufsize;
 				err = z.deflate(Z_FINISH);
 				if (err != Z_STREAM_END && err != Z_OK)
-					throw "deflating: " + z.msg;
+					throw new Error("deflating: " + z.msg);
 				if (bufsize - z.avail_out > 0)
 					buffers.push(new Uint8Array(buf.subarray(0, z.next_out_index)));
 				bufferSize += z.next_out_index;
@@ -2053,36 +2054,7 @@
 		};
 	}
 
-	var deflater;
-
-	if (obj.zip)
-		obj.zip.Deflater = Deflater;
-	else {
-		deflater = new Deflater();
-		obj.addEventListener("message", function(event) {
-			var message = event.data;
-			if (message.init) {
-				deflater = new Deflater(message.level);
-				obj.postMessage({
-					oninit : true
-				});
-			}
-			if (message.append)
-				obj.postMessage({
-					onappend : true,
-					data : deflater.append(message.data, function(current) {
-						obj.postMessage({
-							progress : true,
-							current : current
-						});
-					})
-				});
-			if (message.flush)
-				obj.postMessage({
-					onflush : true,
-					data : deflater.flush()
-				});
-		}, false);
-	}
-
+	// 'zip' may not be defined in z-worker and some tests
+	var env = global.zip || global;
+	env.Deflater = env._jzlib_Deflater = Deflater;
 })(this);
