@@ -676,6 +676,9 @@ var switchTab = function() {
 }();
 
 !function() {
+	$('#currentLang').innerHTML = navigator.language;
+	$('#cUpdate').checked = getOption('autoUpdate');
+	$('#sInjectMode').value = getOption('injectMode');
 	$('#cUpdate').addEventListener('change', function(e) {
 		chrome.runtime.sendMessage({
 			cmd: 'AutoUpdate',
@@ -704,9 +707,6 @@ var switchTab = function() {
 		chrome.runtime.sendMessage({cmd:'CheckUpdateAll'});
 	}, false);
 	$('.sidemenu').addEventListener('click', switchTab, false);
-	$('#currentLang').innerHTML = navigator.language;
-	$('#cUpdate').checked = getOption('autoUpdate');
-	$('#sInjectMode').value = getOption('injectMode');
 	window.addEventListener('popstate', switchTab, false);
 	chrome.runtime.sendMessage({cmd:'GetData'}, scriptList.setData);
 	var port = chrome.runtime.connect({name:'Options'});

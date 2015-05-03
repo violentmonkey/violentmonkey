@@ -403,7 +403,7 @@ function parseScript(o,src,callback) {
 	var i,r={code:0,message:'message' in o?o.message:_('msgUpdated')};
 	function finish(){
 		updateItem(r);
-		callback(r);
+		if(callback) callback(r);
 	}
 	if(o.status&&o.status!=200||o.code=='') {	// net error
 		r.code=-1;r.message=_('msgErrorFetchingScript');finish();
@@ -533,7 +533,7 @@ function checkUpdate(id,src,callback) {
 	return true;
 }
 function checkUpdateAll(e,src,callback) {
-	setOption({key:'lastUpdate',value:Date.now()});
+	setOption('lastUpdate',Date.now());
 	var o=db.transaction('scripts').objectStore('scripts');
 	o.index('update').openCursor(1).onsuccess=function(e){
 		var r=e.target.result;
@@ -558,7 +558,8 @@ function autoCheck() {
 }
 function autoUpdate(o,src,callback){
 	o=!!o;
-	setOption({key:'autoUpdate',value:o},src,autoCheck);
+	setOption('autoUpdate',o);
+	autoCheck();
 	if(callback) callback(o);
 }
 function getData(d,src,callback) {
