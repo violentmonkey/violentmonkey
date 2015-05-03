@@ -1,4 +1,5 @@
 // common styles
+@menu-height: 30px;
 .fill(){
 	height: 100%;
 	margin: 0;
@@ -55,9 +56,7 @@ h1{
 
 // popup menu
 #popup{
-	body {
-		background: inherit;
-	}
+	background: white;
 	.fa{
 		width: 1em;
 	}
@@ -87,7 +86,6 @@ h1{
 }
 
 // options page
-@menu-height: 2em;
 a{
 	color: dodgerblue;
 }
@@ -108,12 +106,14 @@ label>*{
 		max-width: 900px;
 		height: 100%;
 		margin: 0 auto;
+		position: relative;
 	}
 	.sidebar{
-		position: fixed;
+		position: absolute;
 		background: #fafafa;
+		top: @menu-height;
+		left: 0;
 		width: 200px;
-		margin-top: 30px;
 		box-sizing: border-box;
 		border: 1px solid darkgray;
 		border-radius: 10px 0 0 10px;
@@ -135,7 +135,7 @@ label>*{
 		font-weight: bold;
 		line-height: 2.5em;
 		text-decoration: none;
-		&.selected,&:hover{
+		&.selected, &:hover{
 			color: black;
 		}
 	}
@@ -194,20 +194,45 @@ label>*{
 		height: @menu-height;
 		line-height: @menu-height;
 		padding: 0 .5em;
+		border-bottom: 1px solid darkgray;
 	}
 	.right{
 		float: right;
 	}
 }
+.mask {
+	color: gray;
+	position: absolute;
+	top: @menu-height + 2px;
+	bottom: 2px;
+	width: 100%;
+	font-size: 0;
+	text-align: center;
+	background: white;
+	transition: opacity 1s;
+	&>*, &::after {
+		display: inline-block;
+		vertical-align: middle;
+	}
+	&>* {
+		font-size: 2rem;
+	}
+	&::after {
+		content: '.';
+		height: 100%;
+		width: 0;
+	}
+}
 #sList{
+	opacity: 0;
+	transition: opacity 1s;
 	overflow-y: auto;
 	box-sizing: border-box;
-	border-top: 1px solid darkgray;
 	position: absolute;
 	top: @menu-height;
 	bottom: 0;
 	width: 100%;
-	&>div{
+	.item {
 		border-bottom: 1px dashed silver;
 		padding: 10px;
 		position: relative;
@@ -278,50 +303,54 @@ label>*{
 // Editor
 @editor-header-height: 5em;
 @editor-footer-height: 3em;
-#eCode,#eCode .CodeMirror{
+#wndEditor {
+	z-index: 10;
+}
+.code, .code .CodeMirror{
 	height: 100%;
 }
-#eMeta{
+.meta {
 	max-width: 450px;
 	max-height: 100%;
 	height: auto;
-	background: lightgray;
+	background: #ddd;
 	z-index: 10;
 	right: 0;
 	top: 0;
 	padding: 10px;
 	box-sizing: border-box;
 	overflow-y: auto;
-	box-shadow: -2px 4px 4px gray;
+	box-shadow: 0 0 3px black;
 	position: absolute;
 	table{
 		width: 100%;
-		td{
-			width: 1px;
-			white-space: nowrap;
-			&.expand{
-				width: auto;
-			}
+	}
+	td{
+		width: 1px;
+		white-space: nowrap;
+		&.expand{
+			width: auto;
 		}
 	}
 }
+
 // Settings
 #xList{
 	display: block;
 	width: 100%;
 	white-space: normal;
-	min-height: 100px;
+	height: 200px;
 	&>option{
 		display: inline-block;
 		width: 180px;
 		margin: 2px;
 		padding: 0 5px;
-		border: 1px dashed lightgray;
+		box-shadow: 0 0 1px black;
 	}
 }
 // About
 #currentLang {
-	color: orange;
+	color: green;
 	font-weight: bold;
 }
 #tabAbout {
@@ -333,17 +362,31 @@ label>*{
 // confirm page
 @confirm-header-height: 7em;
 #confirm{
-	.frame{
-		.header{
-			height: @confirm-header-height;
-			.buttons{
-				bottom: 3em;
-			}
+	.header{
+		height: @confirm-header-height;
+	}
+	.buttons{
+		bottom: 3em;
+		.options {
+			display: none;
+			position: absolute;
+			top: 110%;
+			box-shadow: 0 0 3px black;
+			border-radius: 3px;
+			padding: 10px;
+			background: #ddd;
+			z-index: 1000;
+			width: 200px;
 		}
-		.body{
-			top: @confirm-header-height;
-			bottom: 5px;
+		label {
+			display: block;
+			padding-left: 16px;
+			text-indent: -16px;
 		}
+	}
+	.body{
+		top: @confirm-header-height;
+		bottom: 5px;
 	}
 }
 #url{
@@ -352,4 +395,7 @@ label>*{
 }
 #msg{
 	text-align: right;
+}
+input[disabled]~span {
+	color: gray;
 }

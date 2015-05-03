@@ -1,420 +1,716 @@
-var L=$('#sList'),cur=null,C=$('.content');
-zip.workerScriptsPath='lib/zip.js/';
-initI18n();
-function split(t){return t.replace(/^\s+|\s+$/g,'').split(/\s*\n\s*/).filter(function(e){return e;});}
-function getName(d,n,def){
-	d.title=n||'';
-	d.innerHTML=n?n.replace(/&/g,'&amp;').replace(/</g,'&lt;'):(def||'<em>'+_('labelNoName')+'</em>');
-}
-$('#currentLang').innerHTML=navigator.language;
+'use strict';
+zip.workerScriptsPath = 'lib/zip.js/';
 
-// Main options
-function allowUpdate(n){
-	return n.update&&(
-		n.custom.updateURL||n.meta.updateURL
-		||n.custom.downloadURL||n.meta.downloadURL||n.custom.lastInstallURL
-	);
+function setTitle(node, title, def) {
+	node.title = title || '';
+	node.innerHTML = title ?  safeHTML(title) :
+		(def || '<em>' + _('labelNoName') + '</em>');
 }
-function setIcon(n,d){
-	d.src=cache[n.meta.icon]||n.meta.icon||'images/icon48.png';
-}
-function getAuthor(a,n){
-	var m=n.match(/^(.*?)\s<(\S*?@\S*?)>$/),t=_('labelAuthor');
-	if(m) a.innerHTML=t+'<a href=mailto:'+m[2]+'>'+m[1]+'</a>';
-	else {
-		if(n) n=t+n;a.innerText=n;
-	}
-}
-function modifyItem(r){
-	var o=map[r.id],d=o.div,n=o.obj;
-	if(r.message) d.querySelector('.message').innerHTML=r.message;
-	d.className=n.enabled?'':'disabled';
-	var a=d.querySelector('.update');
-	if(a) a.disabled=r.updating;
-	a=d.querySelector('.name');
-	getName(a,n.custom.name||getLocaleString(n.meta,'name'));
-	if(o=n.custom.homepageURL||n.meta.homepageURL||n.meta.homepage) a.href=o;	// compatible with @homepage
-	if(o=n.meta.supportURL) {
-		a=d.querySelector('.support');a.classList.remove('hide');
-		a.href=o;a.title=_('hintSupportPage');
-	}
-	getAuthor(d.querySelector('.author'),n.meta.author||'');
-	a=d.querySelector('.descrip');
-	getName(a,getLocaleString(n.meta,'description'),'&nbsp;');
-	setIcon(n,d.querySelector('.icon'));
-	a=d.querySelector('.enable');
-	a.innerHTML=n.enabled?_('buttonDisable'):_('buttonEnable');
-}
-function loadItem(o,r){
-	var d=o.div,n=o.obj;if(!r) r={id:n.id};
-	d.innerHTML='<img class=icon>'
-	+'<div class=panelH>'
-		+'<a class="name ellipsis" target=_blank></a>'
-		+'<a class="support hide" target=_blank><i class="fa fa-question-circle"></i></a>'
-		+'<span class=version>'+(n.meta.version?'v'+n.meta.version:'')+'</span>'
-		+'<span class=author></span>'
-	+'</div>'
-	+'<div class=panelT>'
-		+'<i class="fa fa-arrows move" data="move"></i>'
-	+'</div>'
-	+'<p class="descrip ellipsis"></p>'
-	+'<div class=panelB>'
-		+'<button data=edit>'+_('buttonEdit')+'</button> '
-		+'<button data=enable class=enable></button> '
-		+'<button data=remove>'+_('buttonRemove')+'</button> '
-		+(allowUpdate(n)?'<button data=update class=update>'+_('buttonUpdate')+'</button> ':'')
-		+'<span class=message></span>'
-	+'</div>';
-	modifyItem(r);
-}
-function addItem(o){
-	o.div=document.createElement('div');
-	loadItem(o);
-	L.appendChild(o.div);
-}
-(function(){
-	function getSource(e){
-		var o=e.target,p,i;
-		for(p=o;p&&p.parentNode!=L;p=p.parentNode);
-		i=Array.prototype.indexOf.call(L.childNodes,p);
-		return [i,p,o];
-	}
-	function moveItem(e){
-		var m=getSource(e);if(m[0]<0) return;
-		if(m[0]>=0&&m[0]!=t) {
-			e=m;m=e[1];if(e[0]>t) m=m.nextSibling;
-			L.insertBefore(o[1],m);
-			t=e[0];
-		}
-	}
-	function movedItem(e){
-		if(!moving) return;moving=false;
-		o[1].classList.remove('moving');
-		L.onmousemove=L.onmouseup=null;L.onmousedown=startMove;
-		if(o[0]!=t) {
-			chrome.runtime.sendMessage({cmd:'Move',data:{id:ids[o[0]],offset:t-o[0]}});
-			var s=t>o[0]?1:-1,i=o[0],x=ids[i];
-			for(;i!=t;i+=s) ids[i]=ids[i+s];
-			ids[t]=x;
-		}
-	}
-	function startMove(e){
-		o=getSource(e);t=o[0];
-		if(o[2].getAttribute('data')=='move') {
-			if(moving) return;moving=true;
-			e.preventDefault();
-			o[1].classList.add('moving');
-			L.onmousedown=null;
-			L.onmousemove=moveItem;
-			L.onmouseup=movedItem;
-		}
-	}
-	var maps={
-		edit:function(i){
-			E.cur=map[ids[i]];
-			chrome.runtime.sendMessage({cmd:'GetScript',data:ids[i]},gotScript);
+
+var scriptList = function() {
+	var parent = $('#sList');
+	/**
+	 * list = [
+	 *   {
+	 *     node: DOM
+	 *     script: Object
+	 *   },
+	 *   ...
+	 * ]
+	 */
+	var list = [];
+	var dict = {};
+	var cache = {};
+	var mask = $('.mask');
+	var commands = {
+		edit: function(obj) {
+			chrome.runtime.sendMessage({
+				cmd: 'GetScript',
+				data: obj.data.script.id,
+			}, Editor.editScript);
 		},
-		enable:function(i,p,o){
-			var e=map[ids[i]].obj;
-			chrome.runtime.sendMessage({cmd:'UpdateMeta',data:{id:e.id,enabled:!e.enabled?1:0}});
+		enable: function(obj) {
+			var script = obj.data.script;
+			chrome.runtime.sendMessage({
+				cmd: 'UpdateMeta',
+				data: {
+					id: script.id,
+					enabled: script.enabled ? 0 : 1,
+				},
+			});
 		},
-		remove:function(i,p){
-			chrome.runtime.sendMessage({cmd:'RemoveScript',data:ids[i]});
-			delete map[ids.splice(i,1)[0]];
-			L.removeChild(p);
+		remove: function(obj) {
+			var script = obj.data.script;
+			chrome.runtime.sendMessage({
+				cmd: 'RemoveScript',
+				data: script.id,
+			}, function() {
+				list.splice(obj.index, 1);
+				delete dict[script.id];
+				parent.removeChild(obj.data.node);
+				if(!list.length) showEmptyHint();
+			});
 		},
-		update:function(i){
-			chrome.runtime.sendMessage({cmd:'CheckUpdate',data:ids[i]});
-		}
-	},o,t,moving=false;
-	L.onmousedown=startMove;
-	L.onclick=function(e){
-		var o=getSource(e),d=o[2].getAttribute('data'),f=maps[d];
-		if(f) {
-			e.preventDefault();
-			f.apply(this,o);
-		}
+		update: function(obj) {
+			chrome.runtime.sendMessage({
+				cmd: 'CheckUpdate',
+				data: obj.data.script.id,
+			});
+		},
 	};
-})();
-$('#bNew').onclick=function(){chrome.runtime.sendMessage({cmd:'NewScript'},function(o){
-	E.cur=null;gotScript(o);
-});};
-$('#bUpdate').onclick=function(){chrome.runtime.sendMessage({cmd:'CheckUpdateAll'});};
-function switchTab(e){
-	var h,o;
-	if(e) {
-		e=e.target;h=e.getAttribute('href').substr(1);
-	} else {
-		h=location.hash||'#Installed';
-		h=h.substr(1);
-		e=$('#sm'+h);
-	}
-	o=C.querySelector('#tab'+h);
-	if(!o) return switchTab({target:$('#smInstalled')});
-	if(cur) {
-		cur.menu.classList.remove('selected');
-		cur.tab.classList.add('hide');
-	}
-	cur={menu:e,tab:o};
-	e.classList.add('selected');
-	o.classList.remove('hide');
-	switch(h) {	// init
-		case 'Settings':xLoad();break;
-	}
-}
-window.addEventListener('popstate',function(){switchTab()},false);
-$('.sidemenu').onclick=switchTab;
-function confirmCancel(dirty){
-	return !dirty||confirm(_('confirmNotSaved'));
-}
 
-// Advanced
-var H=$('#iImport'),V=$('#bVacuum');
-$('#cUpdate').onchange=function(){chrome.runtime.sendMessage({cmd:'AutoUpdate',data:this.checked});};
-$('#sInjectMode').onchange=function(){chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'injectMode',value:this.value}});};
-H.onchange=function(e){
-	zip.createReader(new zip.BlobReader(e.target.files[0]),function(r){
-		r.getEntries(function(e){
-			function getFiles(i){
-				while(i=e.shift()) if(/\.user\.js$/.test(i.filename))
-					return i.getData(writer,function(t){
-						var c={code:t};
-						if(vm.scripts&&(v=vm.scripts[i.filename.slice(0,-8)])) {
-							delete v.id;c.more=v;
+	function showEmptyHint() {
+		mask.classList.remove('hide');
+		mask.style.opacity = 1;
+		mask.style.zIndex = 9;
+		mask.innerHTML = '<div>' + _('labelNoScripts') + '</div>';
+		parent.style.opacity = '';
+	}
+
+	function hideMask() {
+		parent.style.opacity = 1;
+		mask.style.opacity = 0;
+		setTimeout(function() {
+			mask.classList.add('hide');
+		}, 1000);
+	}
+
+	function setData(data) {
+		list = [];
+		dict = {};
+		cache = data.cache || {};
+		if(data.scripts.length) {
+			hideMask();
+			parent.innerHTML = '';
+			data.scripts.forEach(addScript);
+		} else
+			showEmptyHint();
+		Transporter.initList();
+	}
+
+	function findNode(target) {
+		for(var node = target; node && node.parentNode != parent; node = node.parentNode);
+		var index = Array.prototype.indexOf.call(parent.childNodes, node);
+		return index >= 0 && {
+			index: index,
+			data: node,
+		};
+	}
+
+	function findItem(target) {
+		var data = findNode(target);
+		if(data) data.data = list[data.index];
+		return data;
+	}
+
+	function allowUpdate(script){
+		return script.update && (
+			script.custom.updateURL ||
+			script.meta.updateURL ||
+			script.custom.downloadURL ||
+			script.meta.downloadURL ||
+			script.custom.lastInstallURL
+		);
+	}
+
+	function setAuthor(node, author) {
+		var matches = author.match(/^(.*?)\s<(\S*?@\S*?)>$/);
+		var label = _('labelAuthor');
+		if(matches)
+			node.innerHTML = label + '<a href=mailto:' + matches[2] + '>' + matches[1] + '</a>';
+		else
+			node.innerText = author ? label + author : '';
+	}
+
+	var images = {};
+	function loadImage(node, src) {
+		if(src in images) {
+			var data = images[src];
+			if(Array.isArray(data)) data.push(node);
+			else if(data) node.src = src;
+		} else {
+			var nodes = images[src] = [node];	// loading
+			var img = new Image;
+			img.src = src;
+			img.onload = function() {
+				images[src] = true;	// loaded
+				nodes.forEach(function(node) {
+					node.src = src;
+				});
+			};
+			img.onerror = function() {
+				images[src] = false;	// error
+			};
+		}
+	}
+
+	function updateNode(res) {
+		var data = dict[res.id];
+		if(!data) return;
+		var node = data.node;
+		var script = data.script;
+		if(res.message)
+			node.querySelector('.message').innerHTML = res.message;
+		node.classList[script.enabled ? 'remove' : 'add']('disabled');
+		var update = node.querySelector('.update');
+		if(update) update.disabled = res.code == 3;
+		var name = node.querySelector('.name');
+		setTitle(name, script.custom.name || getLocaleString(script.meta, 'name'));
+		var home = script.custom.homepageURL ||
+			script.meta.homepageURL ||
+			script.meta.homepage;
+		if(home) name.href = home;
+		var supportURL = script.meta.supportURL;
+		if(supportURL) {
+			var support = node.querySelector('.support');
+			support.classList.remove('hide');
+			support.href = supportURL;
+			support.title = _('hintSupportPage');
+		}
+		setAuthor(node.querySelector('.author'), script.meta.author || '');
+		setTitle(node.querySelector('.descrip'), getLocaleString(script.meta, 'description'));
+		var image = node.querySelector('.icon');
+		var src;
+		if(script.meta.icon) {
+			src = cache[script.meta.icon];
+			if(!src) loadImage(image, script.meta.icon);
+		}
+		image.src = src || 'images/icon48.png';
+		var enable = node.querySelector('.enable');
+		enable.innerHTML = script.enabled ? _('buttonDisable') : _('buttonEnable');
+	}
+
+	function initNode(data, res) {
+		var node = data.node;
+		var script = data.script;
+		node.innerHTML = 
+			'<img class=icon>' +
+			'<div class=panelH>' +
+				'<a class="name ellipsis" target=_blank></a>' +
+				'<a class="support hide" target=_blank><i class="fa fa-question-circle"></i></a>' +
+				'<span class=version>' +
+					(script.meta.version ? 'v' + script.meta.version : '') +
+				'</span>' +
+				'<span class=author></span>' +
+			'</div>' +
+			'<div class=panelT>' +
+				'<i class="fa fa-arrows move" data="move"></i>' +
+			'</div>' +
+			'<p class="descrip ellipsis"></p>' +
+			'<div class=panelB>' +
+				'<button data=edit>' + _('buttonEdit') + '</button> ' +
+				'<button data=enable class=enable></button> ' +
+				'<button data=remove>' + _('buttonRemove') + '</button> ' +
+				(allowUpdate(script) ? '<button data=update class=update>' + _('buttonUpdate') + '</button> ' : '') +
+				'<span class=message></span>' +
+			'</div>'
+		;
+		updateNode(res || {id: script.id});
+	}
+
+	function addScript(script) {
+		var node = document.createElement('div');
+		var data = {
+			script: script,
+			node: node,
+		};
+		dict[script.id] = data;
+		list.push(data);
+		node.className = 'item';
+		initNode(data);
+		parent.appendChild(data.node);
+		hideMask();
+	}
+
+	function updateItem(res) {
+		switch(res.code) {
+			case 0:	// script updated
+				var data = dict[res.id];
+				if(data && res.script) {
+					data.script = res.script;
+					initNode(data, res);
+				}
+				break;
+			case 1:	// script installed
+				addScript(res.script);
+				break;
+			default:	// message
+				updateNode(res);
+		}
+	}
+
+	function bindEvents() {
+		var index;
+		var current;
+		var moving = false;
+		var mousemove = function(e) {
+			var nodeData = findNode(e.target);
+			if(nodeData && nodeData.index !== index) {
+				var node = nodeData.data;
+				if(nodeData.index > index)
+					node = node.nextSibling;
+				parent.insertBefore(current.data.node, node);
+				index = nodeData.index;
+			}
+		};
+		var mouseup = function(e) {
+			if(!moving) return;
+			moving = false;
+			current.data.node.classList.remove('moving');
+			parent.removeEventListener('mousemove', mousemove, false);
+			parent.removeEventListener('mouseup', mouseup, false);
+			if(index != current.index) {
+				chrome.runtime.sendMessage({
+					cmd:'Move',
+					data:{
+						id: current.data.script.id,
+						offset: index - current.index,
+					},
+				});
+				var i = Math.min(index, current.index);
+				var j = Math.max(index, current.index);
+				var seq = [
+					list.slice(0, i),
+					list.slice(i+1, j+1),
+					list.slice(j+1),
+				];
+				if(i === index)
+					seq[1].unshift(seq[1].pop());
+				else
+					seq[1].push(seq[1].shift());
+				list = [];
+				seq.forEach(function(seq) {
+					list = list.concat(seq);
+				});
+			}
+		};
+		parent.addEventListener('mousedown', function(e) {
+			var data = e.target.getAttribute('data');
+			if(data == 'move') {
+				e.preventDefault();
+				if(moving) return;
+				moving = true;
+				parent.addEventListener('mousemove', mousemove, false);
+				parent.addEventListener('mouseup', mouseup, false);
+				current = findItem(e.target);
+				current.data.node.classList.add('moving');
+				index = current.index;
+			}
+		}, false);
+		parent.addEventListener('click', function(e) {
+			var data = e.target.getAttribute('data');
+			if(data) {
+				var obj = findItem(e.target);
+				if(obj) {
+					var func = commands[data];
+					if(func) func(obj);
+				}
+			}
+		}, false);
+	}
+	bindEvents();
+
+	return {
+		forEach: function(cb) {
+			list.forEach(cb);
+		},
+		setData: setData,
+		updateItem: updateItem,
+	};
+}();
+
+var Transporter = function() {
+	var helper = $('#iImport');
+	var cbValues = $('#cbValues');
+	var btExport = $('#bExport');
+	var xList = $('#xList');
+
+	function getFiles(entries) {
+		function getFile() {
+			var entry = entries.shift();
+			if(entry) {
+				if(userjs.test(entry.filename)) entry.getData(writer, function(text) {
+					var script = {code: text};
+					if(vm.scripts) {
+						var more = vm.scripts[entry.filename.slice(0, -8)];
+						if(more) {
+							delete more.id;
+							script.more = more;
 						}
-						chrome.runtime.sendMessage({cmd:'ParseScript',data:c});
-						count++;
-						getFiles();
+					}
+					chrome.runtime.sendMessage({cmd: 'ParseScript', data: script}, function() {
+						count ++;
+						getFile();
 					});
-				alert(_('msgImported',[count]));
+				}); else getFile();
+			} else {
+				alert(_('msgImported', [count]));
 				location.reload();
 			}
-			var i,vm={},writer=new zip.TextWriter(),count=0;
-			for(i=0;i<e.length;i++) if(e[i].filename=='ViolentMonkey') break;
-			if(i<e.length) e.splice(i,1)[0].getData(writer,function(t){
-				try{
-					vm=JSON.parse(t);
-				}catch(e){
-					vm={};
-					console.log('Error parsing ViolentMonkey configuration.');
-				}
-				if(vm.values) for(z in vm.values) chrome.runtime.sendMessage({cmd:'SetValue',data:{uri:z,values:vm.values[z]}});
-				if(vm.settings) for(z in vm.settings) chrome.runtime.sendMessage({cmd:'SetOption',data:{key:z,value:vm.settings[z],check:true}});
-				getFiles();
-			}); else getFiles();
-		});
-	},function(e){console.log(e);});
-};
-$('#bImport').onclick=function(){
-	var e=document.createEvent('MouseEvent');
-	e.initMouseEvent('click',true,true,window,0,0,0,0,0,false,false,false,false,0,null);
-	H.dispatchEvent(e);
-};
-V.onclick=function(){
-	this.disabled=true;
-	this.innerHTML=_('buttonVacuuming');
-	chrome.runtime.sendMessage({cmd:'Vacuum'});
-};
-V.title=_('hintVacuum');
-
-// Export
-var xL=$('#xList'),xE=$('#bExport'),xD=$('#cWithData');
-function xLoad() {
-	xL.innerHTML='';xE.disabled=false;
-	ids.forEach(function(i){
-		var d=document.createElement('option'),n=map[i].obj;
-		d.className='ellipsis';d.selected=true;
-		getName(d,n.custom.name||getLocaleString(n.meta,'name'));
-		xL.appendChild(d);
-	});
-}
-xD.onchange=function(){chrome.runtime.sendMessage({cmd:'SetOption',data:{key:'withData',value:this.checked}});};
-$('#bSelect').onclick=function(){
-	var c=xL.childNodes,v,i;
-	for(i=0;i<c.length;i++) if(!c[i].selected) break;
-	v=i<c.length;for(i=0;i<c.length;i++) c[i].selected=v;
-};
-function exported(o){
-	function addFiles(){
-		adding=true;
-		if(!writer) {	// create writer
-			zip.createWriter(new zip.BlobWriter(),function(w){writer=w;addFiles();});
-			return;
 		}
-		var i=files.shift();
-		if(i) {
-			if(i.name) {	// add file
-				writer.add(i.name,new zip.TextReader(i.content),addFiles);
-				return;
-			} else	// finished
-				writer.close(function(b){
-					var u=URL.createObjectURL(b),e=document.createEvent('MouseEvent');
-					e.initMouseEvent('click',true,true,window,0,0,0,0,0,false,false,false,false,0,null);
-					xH.href=u;
-					xH.download='scripts.zip';
-					xH.dispatchEvent(e);
-					writer=null;
-					URL.revokeObjectURL(u);
+		function getVMConfig(text) {
+			try {
+				vm = JSON.parse(text);
+			} catch(e) {
+				console.log('Error parsing ViolentMonkey configuration.');
+			}
+			var i;
+			if(vm.values)
+				for(i in vm.values) chrome.runtime.sendMessage({
+					cmd: 'SetValue',
+					data: {
+						uri: i,
+						values: vm.values[i],
+					},
+				});
+			if(vm.settings)
+				for(i in vm.settings) setOption(i, vm.settings[i]);
+			getFile();
+		}
+		var userjs = /\.user\.js$/i;
+		var writer = new zip.TextWriter();
+		var vm = {}, count = 0;
+		if(!entries.some(function(entry, i) {
+			if(entry.filename == 'ViolentMonkey') {
+				entries.splice(i, 1)[0].getData(writer, getVMConfig);
+				return true;
+			}
+		})) getFile();
+	}
+
+	function importData(e) {
+		zip.createReader(new zip.BlobReader(e.target.files[0]), function(r){
+			r.getEntries(getFiles);
+		}, function(e){console.log(e);});
+	}
+
+	function exported(data) {
+		function addFiles(){
+			var file = files.shift();
+			if(file)
+				writer.add(file.name, new zip.TextReader(file.content), addFiles);
+			else
+				writer.close(function(blob){
+					var url = URL.createObjectURL(blob);
+					var helper = document.createElement('a');
+					var e = document.createEvent('MouseEvent');
+					e.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+					helper.href = url;
+					helper.download = 'scripts.zip';
+					helper.dispatchEvent(e);
+					writer = null;
+					URL.revokeObjectURL(url);
 				});
 		}
-		adding=false;
+		var files = [];
+		var names = {};
+		var writer;
+		var vm = {scripts: {}, settings: getAllOptions()};
+		if(cbValues.checked) vm.values={};
+		data.scripts.forEach(function(script) {
+			var name = script.custom.name || script.meta.name || 'Noname';
+			if(names[name]) name += '_' + (++ names[name]);
+			else names[name] = 1;
+			files.push({name: name + '.user.js', content: script.code});
+			vm.scripts[name] = {
+				id: script.id,
+				custom: script.custom,
+				enabled: script.enabled,
+				update: script.update,
+			};
+			if(cbValues.checked) {
+				var values = data.values[script.uri];
+				if(values) vm.values[script.uri] = values;
+			}
+		});
+		files.push({name: 'ViolentMonkey', content: JSON.stringify(vm)});
+		zip.createWriter(new zip.BlobWriter(), function(_writer) {
+			writer = _writer;
+			addFiles();
+		});
 	}
-	function addFile(o){
-		files.push(o);
-		if(!adding) addFiles();
+
+	function bindEvents() {
+		$('#bImport').addEventListener('click', function(e) {
+			var e = document.createEvent('MouseEvent');
+			e.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			helper.dispatchEvent(e);
+		}, false);
+		helper.addEventListener('change', importData, false);
+		btExport.addEventListener('click', function(e) {
+			this.disabled=true;
+			var ids = [];
+			scriptList.forEach(function(data, i) {
+				if(xList.childNodes[i].selected) ids.push(data.script.id);
+			});
+			chrome.runtime.sendMessage({
+				cmd: 'ExportZip',
+				data: {
+					values: cbValues.checked,
+					data: ids,
+				},
+			}, exported);
+		}, false);
+		$('#bSelect').addEventListener('click', function(e) {
+			var nodes = xList.childNodes;
+			var state = !Array.prototype.some.call(nodes, function(node) {
+				return node.selected;
+			});
+			Array.prototype.forEach.call(nodes, function(node) {
+				node.selected = state;
+			});
+		}, false);
 	}
-	var writer=null,files=[],adding=false,xH=$('#xHelper'),
-			n,_n,names={},vm={scripts:{},settings:o.settings};
-	if(xD.checked) vm.values={};
-	o.scripts.forEach(function(c){
-		var j=0;
-		n=_n=c.custom.name||c.meta.name||'Noname';
-		while(names[n]) n=_n+'_'+(++j);names[n]=1;
-		addFile({name:n+'.user.js',content:c.code});
-		vm.scripts[n]={id:c.id,custom:c.custom,enabled:c.enabled,update:c.update};
-		if(xD.checked&&(n=o.values[c.uri])) vm.values[c.uri]=n;
-	});
-	addFile({name:'ViolentMonkey',content:JSON.stringify(vm)});
-	addFile({});	// finish adding files
-}
-xE.onclick=function(e){
-	e.preventDefault();
-	this.disabled=true;
-	var i,c=[];
-	for(i=0;i<ids.length;i++)
-		if(xL.childNodes[i].selected) c.push(ids[i]);
-	chrome.runtime.sendMessage({cmd:'ExportZip',data:{values:xD.checked,data:c}},exported);
-};
+
+	cbValues.checked = getOption('exportValues');
+	cbValues.addEventListener('change', function(e) {
+		setOption('exportValues', this.checked);
+	}, false);
+	bindEvents();
+
+	return {
+		initList: function() {
+			xList.innerHTML = '';
+			scriptList.forEach(function(data) {
+				var option = document.createElement('option');
+				var script = data.script;
+				option.className = 'ellipsis';
+				option.selected = true;
+				setTitle(option, script.custom.name || getLocaleString(script.meta, 'name'));
+				xList.appendChild(option);
+			});
+			btExport.disabled = false;
+		},
+	};
+}();
 
 // Script Editor
-var E=$('#wndEditor'),U=$('#eUpdate'),M=$('#eMeta'),
-		mN=$('#mName'),mH=$('#mHomepageURL'),mR=$('#mRunAt'),
-		mU=$('#mUpdateURL'),mD=$('#mDownloadURL'),
-    mI=$('#mInclude'),mE=$('#mExclude'),mM=$('#mMatch'),
-    cI=$('#cInclude'),cE=$('#cExclude'),cM=$('#cMatch'),
-		eS=$('#eSave'),eSC=$('#eSaveClose'),T,sC=$('#sCustom');
-function markClean(){
-	eS.disabled=eSC.disabled=true;
-}
-function mReset(){
-	M.classList.add('hide');
-	var e=[],c=E.scr.custom,m=E.scr.meta;
-	M.dirty=false;
-	mN.value=c.name||'';
-	mN.placeholder=m.name||'';
-	mH.value=c.homepageURL||'';
-	mH.placeholder=m.homepageURL||'';
-	mU.value=c.updateURL||'';
-	mU.placeholder=m.updateURL||_('hintUseDownloadURL');
-	mD.value=c.downloadURL||'';
-	mD.placeholder=m.downloadURL||c.lastInstallURL||'';
-	switch(c['run-at']){
-		case 'document-start':mR.value='start';break;
-		case 'document-idle':mR.value='idle';break;
-		case 'document-end':mR.value='end';break;
-		default:mR.value='default';
+var Editor = function() {
+	var parent = $('#wndEditor');
+	var meta = parent.querySelector('.meta');
+	var btSave = parent.querySelector('.save');
+	var btSaveClose = parent.querySelector('.savenclose');
+	var btClose = parent.querySelector('.close');
+	var cbUpdate = parent.querySelector('.update');
+	var pCustom = {
+		name: meta.querySelector('.name'),
+		runAt: meta.querySelector('.run-at'),
+		homepage: meta.querySelector('.homepage'),
+		updateURL: meta.querySelector('.updateurl'),
+		downloadURL: meta.querySelector('.downloadurl'),
+		keepInclude: meta.querySelector('.keep-include'),
+		include: meta.querySelector('.include'),
+		keepMatch: meta.querySelector('.keep-match'),
+		match: meta.querySelector('.match'),
+		keepExclude: meta.querySelector('.keep-exclude'),
+		exclude: meta.querySelector('.exclude'),
+	};
+	var modified = false;
+	var metaModified = false;
+	var script = null;
+	var editor;
+
+	function markClean() {
+		modified = false;
+		metaModified = false;
+		btSave.disabled = btSaveClose.disabled = true;
 	}
-	cI.checked=c._include!=false;
-	mI.value=(c.include||e).join('\n');
-	cM.checked=c._match!=false;
-	mM.value=(c.match||e).join('\n');
-	cE.checked=c._exclude!=false;
-	mE.value=(c.exclude||e).join('\n');
-}
-function gotScript(o){
-	E.classList.remove('hide');
-	E.scr=o;U.checked=o.update;
-	T.setValueAndFocus(o.code);
-	T.clearHistory();markClean();mReset();
-}
-function eSave(){
-	if(M.dirty) {
-		var c=E.scr.custom;
-		c.name=mN.value;
-		c.homepageURL=mH.value;
-		c.updateURL=mU.value;
-		c.downloadURL=mD.value;
-		switch(mR.value){
-			case 'start':c['run-at']='document-start';break;
-			case 'idle':c['run-at']='document-idle';break;
-			case 'end':c['run-at']='document-end';break;
-			default:delete c['run-at'];
-		}
-		c._include=cI.checked;
-		c.include=split(mI.value);
-		c._match=cM.checked;
-		c.match=split(mM.value);
-		c._exclude=cE.checked;
-		c.exclude=split(mE.value);
+
+	function markDirty(includeMeta) {
+		if(includeMeta) metaModified = true;
+		modified = true;
+		btSave.disabled = btSaveClose.disabled = false;
 	}
-	chrome.runtime.sendMessage({
-		cmd:'ParseScript',
-		data:{
-			id:E.scr.id,
-			code:T.getValue(),
-			message:'',
-			more:{
-				custom:E.scr.custom,
-				update:E.scr.update=U.checked
-			}
+
+	function bindEvents() {
+		var hideMeta = function(e) {
+			meta.classList.add('hide');
+			document.removeEventListener('mousedown', hideMeta, false);
+		};
+		meta.addEventListener('mousedown', stopPropagation, false);
+		parent.querySelector('.btCustom').addEventListener('click', function(e) {
+			meta.classList.remove('hide');
+			document.addEventListener('mousedown', hideMeta, false);
+		}, false);
+		btSave.addEventListener('click', save, false);
+		btSaveClose.addEventListener('click', function(e) {
+			save();
+			close();
+		}, false);
+		btClose.addEventListener('click', close, false);
+		cbUpdate.addEventListener('change', function(e) {
+			markDirty();
+		}, false);
+		meta.addEventListener('change', markDirty, false);
+		meta.addEventListener('dblclick', function(e) {
+			var target = e.target;
+			var placeholder = target.placeholder;
+			if(!target.value && placeholder)
+				target.value = placeholder;
+		}, false);
+	}
+
+	function editScript(_script) {
+		parent.classList.remove('hide');
+		script = _script;
+		cbUpdate.checked = script.update;
+		editor.setValueAndFocus(script.code);
+		editor.clearHistory();
+		markClean();
+		meta.classList.add('hide');
+		pCustom.name.value = script.custom.name || '';
+		pCustom.name.placeholder = script.meta.name || '';
+		pCustom.homepage.value = script.custom.homepageURL || '';
+		pCustom.homepage.placeholder = script.meta.homepageURL || '';
+		pCustom.updateURL.value = script.custom.updateURL || '';
+		pCustom.updateURL.placeholder = script.meta.updateURL || _('hintUseDownloadURL');
+		pCustom.downloadURL.value = script.custom.downloadURL || '';
+		pCustom.downloadURL.placeholder = script.meta.downloadURL || script.custom.lastInstallURL || '';
+		pCustom.runAt.value = {
+			'document-start': 'start',
+			'document-idle': 'idle',
+			'document-end': 'end',
+		}[script.custom['run-at']] || 'default';
+		pCustom.keepInclude.checked = script.custom._include != false;
+		pCustom.keepMatch.checked = script.custom._match != false;
+		pCustom.keepExclude.checked = script.custom._exclude != false;
+		pCustom.include.value = (script.custom.include || []).join('\n');
+		pCustom.match.value = (script.custom.match || []).join('\n');
+		pCustom.exclude.value = (script.custom.exclude || []).join('\n');
+	}
+
+	function split(str) {
+		var empty = /^\s*$/;
+		return str.split(/\s*\n\s*/)
+			.filter(function(e){return empty.test(e);});
+	}
+
+	function save() {
+		if(metaModified) {
+			script.custom.name = pCustom.name.value;
+			script.custom.homepageURL = pCustom.homepage.value;
+			script.custom.updateURL = pCustom.updateURL.value;
+			script.custom.downloadURL = pCustom.downloadURL.value;
+			var runAt = {
+				'start': 'document-start',
+				'idle': 'document-idle',
+				'end': 'document-end',
+			}[pCustom.runAt.value];
+			if(runAt) script.custom['run-at'] = runAt;
+			else delete script.custom['run-at'];
+			script.custom._include = pCustom.keepInclude.checked;
+			script.custom._match = pCustom.keepMatch.checked;
+			script.custom._exclude = pCustom.keepExclude.checked;
+			script.custom.include = split(pCustom.include.value);
+			script.custom.match = split(pCustom.match.value);
+			script.custom.exclude = split(pCustom.exclude.value);
 		}
+		chrome.runtime.sendMessage({
+			cmd:'ParseScript',
+			data:{
+				id: script.id,
+				code: editor.getValue(),
+				// suppress message
+				message: '',
+				more: {
+					custom: script.custom,
+					update: script.update = cbUpdate.checked,
+				},
+			},
+		});
+		markClean();
+	}
+
+	function close() {
+		if(!modified || confirm(_('confirmNotSaved'))) {
+			script = null;
+			parent.classList.add('hide');
+		}
+	}
+
+	initEditor({
+		callback: function(_editor) {
+			editor = _editor;
+		},
+		container: parent.querySelector('.code'),
+		onsave: save,
+		onexit: close,
+		onchange: function(e) {
+			markDirty();
+		},
 	});
-	markClean();
-}
-function mClose(){M.classList.add('hide');}
-function eClose(){E.classList.add('hide');E.scr=null;}
-U.onchange=E.markDirty=function(){eS.disabled=eSC.disabled=false;};
-M.markDirty=function(){M.dirty=true;E.markDirty();};
-[mN,mH,mR,mU,mD,mI,mM,mE,cI,cM,cE].forEach(function(i){i.onchange=M.markDirty;});
-$('#bCustom').onclick=function(){
-	var r=M.classList.toggle('hide');
-	sC.className='fa '+(r?'fa-caret-down':'fa-caret-up');
-};
-eS.onclick=eSave;
-eSC.onclick=function(){eSave();eClose();};
-E.close=$('#eClose').onclick=function(){if(confirmCancel(!eS.disabled)) eClose();};
-initEditor(function(o){T=o;},{save:eSave,exit:E.close,onchange:E.markDirty});
-// double click to fill with default value
-function mDefault(e){
-	e=e.target;
-	if(!e.value) e.value=e.placeholder;
-}
-[mN,mH,mU,mD,mI,mM,mE].forEach(function(i){i.ondblclick=mDefault;});
+	bindEvents();
+
+	return {
+		editScript: editScript,
+	};
+}();
 
 // Load at last
-var ids=[],map={},cache;
-function loadOptions(o){
-	L.innerHTML='';
-	cache=o.cache;
-	o.scripts.forEach(function(i){
-		ids.push(i.id);addItem(map[i.id]={obj:i});
-	});
-	$('#cUpdate').checked=o.settings.autoUpdate;
-	$('#sInjectMode').value=o.settings.injectMode;
-	xD.checked=o.settings.withData;
+var switchTab = function() {
+	var menus = $$('.sidemenu>a');
+	var tabs = $$('.content>div');
+	return function(e) {
+		var current;
+		Array.prototype.forEach.call(menus, function(menu) {
+			var href = menu.getAttribute('href');
+			if(href == location.hash) {
+				current = href;
+				menu.classList.add('selected');
+			} else
+				menu.classList.remove('selected');
+		});
+		if(!current) {
+			current = menus[0].getAttribute('href');
+			menus[0].classList.add('selected');
+		}
+		current = 'tab' + current.substr(1);
+		Array.prototype.forEach.call(tabs, function(tab) {
+			if(tab.id == current)
+				tab.classList.remove('hide');
+			else
+				tab.classList.add('hide');
+		});
+		if(current == 'tabSettings') Transporter.initList();
+	};
+}();
+
+!function() {
+	$('#cUpdate').addEventListener('change', function(e) {
+		chrome.runtime.sendMessage({
+			cmd: 'AutoUpdate',
+			data: this.checked,
+		});
+	}, false);
+	$('#sInjectMode').addEventListener('change', function(e) {
+		setOption('injectMode', this.value);
+	}, false);
+	var vacuum = $('#bVacuum');
+	vacuum.onclick=function(){
+		var self = this;
+		self.disabled = true;
+		self.innerHTML = _('buttonVacuuming');
+		chrome.runtime.sendMessage({cmd:'Vacuum'}, function() {
+			self.innerHTML = _('buttonVacuumed');
+		});
+	};
+	vacuum.title = _('hintVacuum');
+	$('#bNew').addEventListener('click', function(e) {
+		chrome.runtime.sendMessage({cmd:'NewScript'}, function(script) {
+			Editor.editScript(script);
+		});
+	}, false);
+	$('#bUpdate').addEventListener('click', function(e) {
+		chrome.runtime.sendMessage({cmd:'CheckUpdateAll'});
+	}, false);
+	$('.sidemenu').addEventListener('click', switchTab, false);
+	$('#currentLang').innerHTML = navigator.language;
+	$('#cUpdate').checked = getOption('autoUpdate');
+	$('#sInjectMode').value = getOption('injectMode');
+	window.addEventListener('popstate', switchTab, false);
+	chrome.runtime.sendMessage({cmd:'GetData'}, scriptList.setData);
+	var port = chrome.runtime.connect({name:'Options'});
+	port.onMessage.addListener(scriptList.updateItem);
+	initI18n();
 	switchTab();
-}
-switchTab();
-function updateItem(r){
-	if(!('id' in r)) return;
-	var m=map[r.id];
-	if(!m) map[r.id]=m={};
-	if(r.obj) m.obj=r.obj;
-	switch(r.status){
-		case 0:loadItem(m,r);break;
-		case 1:ids.push(r.id);addItem(m);break;
-		default:modifyItem(r);
-	}
-}
-chrome.runtime.sendMessage({cmd:'GetData'},loadOptions);
-chrome.runtime.onMessage.addListener(function(req,src){
-	var maps={
-		Vacuumed: function(){
-			for(var i=0;i<ids.length;i++) map[ids[i]].obj.position=i+1;
-			V.innerHTML=_('buttonVacuumed');
-		},
-	},f=maps[req.cmd];
-	if(f) f(req.data,src);
-});
-var port=chrome.runtime.connect({name:'Options'});
-port.onMessage.addListener(updateItem);
+}();

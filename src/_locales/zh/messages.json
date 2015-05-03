@@ -59,9 +59,17 @@
 		"description": "Shown in the title of the confirm page while trying to install a script.",
 		"message": "安装脚本"
 	},
-	"optionClose": {
+	"buttonInstallOptions": {
+		"description": "Button to show options of installation confirm page.",
+		"message": "选项"
+	},
+	"installOptionClose": {
 		"description": "Option to close confirm window after installation.",
 		"message": "安装完成后关闭"
+	},
+	"installOptionTrack": {
+		"description": "Option to track the loading local file before window is closed.",
+		"message": "本窗口关闭前跟踪打开的本地文件同步更新"
 	},
 	"buttonConfirmInstallation": {
 		"description": "Button to confirm installation of a script.",
@@ -71,10 +79,6 @@
 		"description": "Button to close window.",
 		"message": "关闭"
 	},
-	"msgScriptURL": {
-		"description": "URL of the script to be installed on confirm page.",
-		"message": "脚本URL：$1"
-	},
 	"msgErrorLoadingData": {
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded.",
 		"message": "加载脚本数据发生错误。"
@@ -83,10 +87,6 @@
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded.",
 		"message": "脚本数据已加载。"
 	},
-	"msgLoadingData": {
-		"description": "Message shown on confirm page when the script to be installed is loading.",
-		"message": "正在加载脚本数据..."
-	},
 	"msgErrorLoadingDependency": {
 		"description": "Message shown when not all requirements are loaded successfully.",
 		"message": "加载脚本依赖发生错误。"
@@ -94,6 +94,14 @@
 	"msgLoadingDependency": {
 		"description": "Message shown on confirm page when the requirements are being downloaded.",
 		"message": "正在加载脚本依赖...（$1/$2）"
+	},
+	"msgScriptURL": {
+		"description": "URL of the script to be installed on confirm page.",
+		"message": "脚本URL：$1"
+	},
+	"msgLoadingData": {
+		"description": "Message shown on confirm page when the script to be installed is loading.",
+		"message": "正在加载脚本数据..."
 	},
 	"sideMenuInstalled": {
 		"description": "Side menu: Installed scripts",
@@ -149,7 +157,7 @@
 	},
 	"buttonImportData": {
 		"description": "Button to choose a file for data import.",
-		"message": "导入自zip文件"
+		"message": "从zip文件导入"
 	},
 	"buttonVacuum": {
 		"description": "Button to vacuum extension data.",
@@ -185,7 +193,7 @@
 	},
 	"anchorSupportPage": {
 		"description": "Link to the support page of Violentmonkey.",
-		"message": "<a href=http://geraldl.net/proj/vm-nex target=_blank>暴力猴</a>"
+		"message": "<a href=http://gerald.top/code/vm-nex target=_blank>暴力猴</a>"
 	},
 	"labelDonate": {
 		"description": "Label of link to donate page.",
@@ -295,6 +303,10 @@
 		"description": "Button to save modifications of a script and then close the editing page.",
 		"message": "保存并关闭"
 	},
+	"labelNoScripts": {
+		"description": "Message shown when no script is installed.",
+		"message": "你居然没有脚本！<br>快<a href=http://gerald.top/tag/userjs target=_blank>点此</a>查看<a href=http://gerald.top target=_blank style='color:orange'>Gerald</a>的脚本吧~"
+	},
 	"hintSupportPage": {
 		"description": "Hint for support page.",
 		"message": "支持页面"
@@ -319,29 +331,29 @@
 		"description": "Check a script for updates.",
 		"message": "查找更新"
 	},
-	"confirmNotSaved": {
-		"description": "Confirm message shown when there are unsaved script modifications.",
-		"message": "修改尚未保存！\n点击确定放弃修改或点击取消停留此页面。"
-	},
 	"msgImported": {
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",
 		"message": "已导入$1个脚本。"
-	},
-	"buttonVacuuming": {
-		"description": "Message shown when data vacuum is in progress.",
-		"message": "正在整理..."
-	},
-	"hintVacuum": {
-		"description": "Hint for vacuuming data.",
-		"message": "丢弃多余的数据，并尝试重新获取缺失的资源。"
 	},
 	"hintUseDownloadURL": {
 		"description": "Shown as a place holder for @updateURL when it is not assigned",
 		"message": "使用@downloadURL"
 	},
+	"confirmNotSaved": {
+		"description": "Confirm message shown when there are unsaved script modifications.",
+		"message": "修改尚未保存！\n点击确定放弃修改或点击取消停留此页面。"
+	},
+	"buttonVacuuming": {
+		"description": "Message shown when data vacuum is in progress.",
+		"message": "正在整理..."
+	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",
 		"message": "数据已整理"
+	},
+	"hintVacuum": {
+		"description": "Hint for vacuuming data.",
+		"message": "丢弃多余的数据，并尝试重新获取缺失的资源。"
 	},
 	"menuManageScripts": {
 		"description": "Menu item to manage scripts, or to open the options page of the extension.",

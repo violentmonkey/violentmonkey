@@ -1,0 +1,21 @@
+{
+  "name": "Violentmonkey",
+  "version": "1.0.0",
+  "description": "Violentmonkey",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-inject": "^1.2.0",
+    "gulp-less": "^3.0.2",
+    "gulp-minify-css": "^1.0.0"
+  },
+  "author": "Gerald <gera2ld@163.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gera2ld/Violentmonkey.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gera2ld/Violentmonkey/issues"
+  },
+  "homepage": "https://github.com/gera2ld/Violentmonkey",
+  "license": "ISC"
+}

@@ -1,3 +1,4 @@
+'use strict';
 function getUniqId() {
 	return Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 }
@@ -134,11 +135,11 @@ function vacuum(o,src,callback) {
 			var i;
 			for(i in rq) if(rq[i]==1) fetchRequire(i);
 			for(i in cc) if(cc[i]==1) fetchCache(i);
-			chrome.tabs.sendMessage(src.tab.id,{cmd:'Vacuumed'});
+			callback();
 		}
 	}
 	init();
-	if(callback) callback();
+	return true;
 }
 function move(data,src,callback){
 	var o=db.transaction('scripts','readwrite').objectStore('scripts');
@@ -156,7 +157,8 @@ function move(data,src,callback){
 			var p=e.target.result,v;
 			if(p) {
 				data.offset--;
-				v=p.value;v.position=x;o.put(v);x=p.key;
+				v=p.value;v.position=x;x=p.key;
+				p.update(v);
 				if(data.offset) p.continue();
 				else {r.position=x;o.put(r);}
 			}
@@ -309,9 +311,9 @@ function getInjected(url,src,callback) {	// for injected
 		callback(data);
 		if(n&&src.url==src.tab.url) chrome.tabs.sendMessage(src.tab.id,{cmd:'GetBadge'});
 	}
-	var data={scripts:[],values:{},require:{},injectMode:settings.injectMode},
+	var data={scripts:[],values:{},require:{},injectMode:getOption('injectMode')},
 			cache={},values=[],n=0;
-	if(data.isApplied=settings.isApplied) getScripts(); else finish();
+	if(data.isApplied=getOption('isApplied')) getScripts(); else finish();
 	return true;
 }
 function fetchURL(url, cb, type, headers) {
@@ -329,23 +331,26 @@ function saveCache(url,data,callback) {
 	o.put({uri:url,data:data}).onsuccess=callback;
 	return true;
 }
-function fetchCache(url) {
-	if(u_cache[url]) return;
-	u_cache[url]=1;
-	fetchURL(url, function() {
-		if (this.status!=200) return;
-		//saveCache(url,this.response,function(){delete u_cache[url];});
+function fetchCache(url, check) {
+	function saveResult(blob) {
 		var r=new FileReader();
 		r.onload=function(e){
 			saveCache(url,window.btoa(r.result),function(){delete u_cache[url];});
 		};
-		r.readAsBinaryString(this.response);
-	}, 'blob');
+		r.readAsBinaryString(blob);
+	}
+	if(!u_cache[url]) {
+		u_cache[url]=1;
+		fetchURL(url, function() {
+			if (this.status!=200) return;
+			if(check) check(this.response,saveResult);
+			else saveResult(this.response);
+		}, 'blob');
+	}
 }
 function saveRequire(url,data,callback) {
 	var o=db.transaction('require','readwrite').objectStore('require');
 	o.put({uri:url,code:data}).onsuccess=callback;
-	return true;
 }
 function fetchRequire(url) {
 	if(u_require[url]) return;
@@ -354,9 +359,20 @@ function fetchRequire(url) {
 		if(this.status==200) saveRequire(url,this.responseText,function(){delete u_require[url];});
 	});
 }
-function updateItem(r){
+/**
+ * broadcast script change
+ * {
+ *   id: required if script is not given
+ *   script: optional
+ *   message: optional
+ *   code: optional
+ *     0 for updated, 1 for installed,
+ *     others for message: 3 for updating
+ * }
+ */
+function updateItem(res){
 	if(port) try{
-		port.postMessage(r);
+		port.postMessage(res);
 	}catch(e){
 		port=null;
 		console.log(e);
@@ -384,23 +400,23 @@ function queryScript(id,meta,callback){
 	return true;
 }
 function parseScript(o,src,callback) {
-	var i,r={status:0,message:'message' in o?o.message:_('msgUpdated')};
+	var i,r={code:0,message:'message' in o?o.message:_('msgUpdated')};
 	function finish(){
-		if(src) chrome.tabs.sendMessage(src.tab.id,{cmd:'ShowMessage',data:r});
 		updateItem(r);
+		callback(r);
 	}
 	if(o.status&&o.status!=200||o.code=='') {	// net error
-		r.status=-1;r.message=_('msgErrorFetchingScript');finish();
+		r.code=-1;r.message=_('msgErrorFetchingScript');finish();
 	} else {	// store script
 		var meta=parseMeta(o.code);
 		queryScript(o.id,meta,function(c){
-			if(!c.id){r.status=1;r.message=_('msgInstalled');}
+			if(!c.id){r.code=1;r.message=_('msgInstalled');}
 			if(o.more) for(i in o.more) if(i in c) c[i]=o.more[i];	// for import and user edit
 			c.meta=meta;c.code=o.code;c.uri=getNameURI(c);
 			if(o.from&&!c.meta.homepageURL&&!c.custom.homepageURL&&!/^(file|data):/.test(o.from)) c.custom.homepageURL=o.from;
 			if(o.url&&!/^(file|data):/.test(o.url)) c.custom.lastInstallURL=o.url;
 			saveScript(c,src).onsuccess=function(e){
-				r.id=c.id=e.target.result;r.obj=getMeta(c);finish();
+				r.id=c.id=e.target.result;r.script=getMeta(c);finish();
 				if(!meta.grant.length)
 					notify(_('Warning'),{
 						body:_('msgWarnGrant',[meta.name||_('labelNoName')]),
@@ -415,13 +431,28 @@ function parseScript(o,src,callback) {
 			var c=o.require&&o.require[u];
 			if(c) saveRequire(u,c); else fetchRequire(u);
 		});
-		for(d in meta.resources) {	// @resource
+		for(var d in meta.resources) {	// @resource
 			var u=meta.resources[d],c=o.resources&&o.resources[u];
 			if(c) saveCache(u,c); else fetchCache(u);
 		}
-		if(isRemote(meta.icon)) fetchCache(meta.icon);	// @icon
+		// @icon
+		if(isRemote(meta.icon)) fetchCache(meta.icon,function(blob,cb){
+			var free=function(){
+				URL.revokeObjectURL(url);
+			};
+			var url=URL.createObjectURL(blob);
+			var image=new Image;
+			image.onload=function(){
+				free();
+				cb(blob);
+			};
+			image.onerror=function(){
+				free();
+			};
+			image.src=url;
+		});
 	}
-	if(callback) callback();
+	return true;
 }
 function canUpdate(o,n){
   o=(o||'').split('.');
@@ -446,38 +477,6 @@ function setValue(data,src,callback){
 	o.put({uri:data.uri,values:data.values});
 	if(callback) callback();	// it seems that CALLBACK does not work with READWRITE transaction
 }
-function getOption(k,src,callback){
-	var v=localStorage.getItem(k)||'',r=true;
-	try{
-		v=JSON.parse(v);
-		settings[k]=v;
-	}catch(e){
-		v=null;
-		r=false;
-	}
-	if(callback) callback(v);
-}
-function setOption(o,src,callback){
-	if(!o.check||(o.key in settings)) {
-		localStorage.setItem(o.key,JSON.stringify(o.value));
-		settings[o.key]=o.value;
-	}
-	if(callback) callback(o.value);
-}
-function initSettings(){
-	function init(k,v){
-		getOption(k,null,function(v){
-			if(v===null) setOption({key:k,value:v});
-		});
-	}
-	init('isApplied',true);
-	init('autoUpdate',true);
-	init('lastUpdate',0);
-	init('withData',true);
-	init('closeAfterInstall',false);
-	init('dataVer',0);
-	init('injectMode',0);
-}
 function updateMeta(d,src,callback) {
 	var o=db.transaction('scripts','readwrite').objectStore('scripts');
 	o.get(d.id).onsuccess=function(e){
@@ -485,7 +484,7 @@ function updateMeta(d,src,callback) {
 		if(!r) return;
 		for(i in d) if(i in r) r[i]=d[i];
 		o.put(r).onsuccess=function(e){	// store script without another transaction
-			updateItem({id:d.id,obj:getMeta(r),status:0});
+			updateItem({id:r.id,script:getMeta(r),code:0});
 		};
 	};
 	if(callback) callback();
@@ -494,7 +493,7 @@ var _update={};
 function checkUpdateO(o) {
 	if(_update[o.id]) return;_update[o.id]=1;
 	function finish(){delete _update[o.id];}
-  var r={id:o.id,updating:1,status:2};
+  var r={id:o.id,code:3};
   function update() {
     if(du) {
       r.message=_('msgUpdating');
@@ -519,7 +518,7 @@ function checkUpdateO(o) {
         if(canUpdate(o.meta.version,m.version)) return update();
         r.message=_('msgNoUpdate');
       } catch(e){}
-      delete r.updating;
+			r.code = 2;
       updateItem(r);finish();
     },null,{Accept:'text/x-userscript-meta'});
   } else finish();
@@ -550,8 +549,8 @@ function checkUpdateAll(e,src,callback) {
 var checking=false;
 function autoCheck() {
   function check() {
-		if(settings.autoUpdate) {
-			if(Date.now()-settings.lastUpdate>=864e5) checkUpdateAll();
+		if(getOption('autoUpdate')) {
+			if(Date.now()-getOption('lastUpdate')>=864e5) checkUpdateAll();
 			setTimeout(check,36e5);
 		} else checking=false;
   }
@@ -582,7 +581,7 @@ function getData(d,src,callback) {
 			});
 		}
 	}
-	var data={settings:settings,scripts:[]},cache={};
+	var data={scripts:[]},cache={};
 	getScripts();
 	return true;
 }
@@ -617,7 +616,7 @@ function exportZip(z,src,callback){
 		} else finish();
 	}
 	function finish(){callback(d);}
-	var d={scripts:[],settings:settings},values=[];
+	var d={scripts:[]},values=[];
 	getScripts();
 	return true;
 }
@@ -704,27 +703,15 @@ chrome.runtime.onConnect.addListener(function(p){
 	port=p;
 	p.onDisconnect.addListener(function(){port=null;});
 });
-var settings={};
-initSettings();
 initDb(function(){
-	var dataVer=1;
-	getOption('dataVer',null,function(ver){
-		pos=null;
+	!function(){
+		pos=0;
 		var o=db.transaction('scripts','readwrite').objectStore('scripts');
 		o.index('position').openCursor(null,'prev').onsuccess=function(e){
-			var r=e.target.result;
-			if(pos===null) pos=r?r.key:0;
-			if(ver<dataVer) {
-				if(r) {
-					r.value.meta=parseMeta(r.value.code);
-					o.put(r.value).onsuccess=function(){r.continue();};
-				} else {
-					console.log('Data upgraded.');
-					setOption({key:'dataVer',value:dataVer});
-				}
-			}
+			var r=e.target.result,v;
+			if(r&&pos<r.key) pos=r.key;
 		};
-	});
+	}();
 	chrome.runtime.onMessage.addListener(function(req,src,callback) {
 		var maps={
 			NewScript:function(o,src,callback){callback(newScript());},
@@ -733,11 +720,11 @@ initDb(function(){
 			GetInjected: getInjected,
 			CheckUpdate: checkUpdate,
 			CheckUpdateAll: checkUpdateAll,
-			SaveScript: saveScript,
+			//SaveScript: saveScript,
 			UpdateMeta: updateMeta,
 			SetValue: setValue,
-			GetOption: getOption,
-			SetOption: setOption,
+			//GetOption: getOption,
+			//SetOption: setOption,
 			ExportZip: exportZip,
 			ParseScript: parseScript,
 			GetScript: getScript,	// for user edit
@@ -751,18 +738,26 @@ initDb(function(){
 			HttpRequest: httpRequest,
 			AbortRequest: abortRequest,
 		},f=maps[req.cmd];
-		if(f) return f(req.data,src,callback);
+		if(f) return f(req.data,src,function(){
+			// if callback function is not given in content page, callback will fail
+			try {
+				callback.apply(null,arguments);
+			} catch(e) {}
+		});
 	});
-	chrome.browserAction.setIcon({path:'images/icon19'+(settings.isApplied?'':'w')+'.png'});
+	chrome.browserAction.setIcon({path:'images/icon19'+(getOption('isApplied')?'':'w')+'.png'});
 	setTimeout(autoCheck,2e4);
 });
+
+// Confirm page
 chrome.webRequest.onBeforeRequest.addListener(function(o){
 	if(/\.user\.js([\?#]|$)/.test(o.url)) {
 		var x=new XMLHttpRequest();
 		x.open('GET',o.url,false);
 		x.send();
 		if((!x.status||x.status==200)&&!/^\s*</.test(x.responseText)) {
-			if(o.tabId<0) chrome.tabs.create({url:chrome.extension.getURL('/confirm.html')+'?url='+encodeURIComponent(o.url)});
+			if(o.tabId<0)
+				chrome.tabs.create({url:chrome.extension.getURL('/confirm.html')+'?url='+encodeURIComponent(o.url)});
 			else chrome.tabs.get(o.tabId,function(t){
 				chrome.tabs.create({url:chrome.extension.getURL('/confirm.html')+'?url='+encodeURIComponent(o.url)+'&from='+encodeURIComponent(t.url)});
 			});
@@ -772,6 +767,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(o){
 },{
 	urls:['<all_urls>'],types:['main_frame']
 },['blocking']);
+
 // Modifications on headers
 chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
 	var headers=details.requestHeaders,new_headers=[],vm_headers={},v,i;
@@ -794,6 +790,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
 },{
 	urls:['<all_urls>'],types: ['xmlhttprequest'],
 },["blocking", "requestHeaders"]);
+
 // Watch URL redirects
 chrome.webRequest.onBeforeRedirect.addListener(function(details) {
 	var v=request_id_map[details.requestId],reqo;

@@ -59,9 +59,17 @@
 		"description": "Shown in the title of the confirm page while trying to install a script.",
 		"message": "Instalator skryptu"
 	},
-	"optionClose": {
+	"buttonInstallOptions": {
+		"description": "Button to show options of installation confirm page.",
+		"message": "Options"
+	},
+	"installOptionClose": {
 		"description": "Option to close confirm window after installation.",
 		"message": "Zamknij instalator tego skryptu po zakończeniu instalacji skryptu"
+	},
+	"installOptionTrack": {
+		"description": "Option to track the loading local file before window is closed.",
+		"message": "Track local file before this window is closed"
 	},
 	"buttonConfirmInstallation": {
 		"description": "Button to confirm installation of a script.",
@@ -71,10 +79,6 @@
 		"description": "Button to close window.",
 		"message": "Zamknij edytor/instalator"
 	},
-	"msgScriptURL": {
-		"description": "URL of the script to be installed on confirm page.",
-		"message": "Adres URL skryptu: $1"
-	},
 	"msgErrorLoadingData": {
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded.",
 		"message": "Błąd wczytywania skryptu."
@@ -83,10 +87,6 @@
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded.",
 		"message": "Skrypt wczytany."
 	},
-	"msgLoadingData": {
-		"description": "Message shown on confirm page when the script to be installed is loading.",
-		"message": "Wczytywanie skryptu..."
-	},
 	"msgErrorLoadingDependency": {
 		"description": "Message shown when not all requirements are loaded successfully.",
 		"message": "Błąd podczas wczytywania wymagań."
@@ -94,6 +94,14 @@
 	"msgLoadingDependency": {
 		"description": "Message shown on confirm page when the requirements are being downloaded.",
 		"message": "Wczytywanie wymagań... ($1/$2)"
+	},
+	"msgScriptURL": {
+		"description": "URL of the script to be installed on confirm page.",
+		"message": "Adres URL skryptu: $1"
+	},
+	"msgLoadingData": {
+		"description": "Message shown on confirm page when the script to be installed is loading.",
+		"message": "Wczytywanie skryptu..."
 	},
 	"sideMenuInstalled": {
 		"description": "Side menu: Installed scripts",
@@ -295,6 +303,10 @@
 		"description": "Button to save modifications of a script and then close the editing page.",
 		"message": "Zapisz skrypt i zamknij edytor"
 	},
+	"labelNoScripts": {
+		"description": "Message shown when no script is installed.",
+		"message": "Oops, you haven't got any script yet."
+	},
 	"hintSupportPage": {
 		"description": "Hint for support page.",
 		"message": "Strona wsparcia"
@@ -319,29 +331,29 @@
 		"description": "Check a script for updates.",
 		"message": "Sprawdź aktualizację/e skryptu"
 	},
-	"confirmNotSaved": {
-		"description": "Confirm message shown when there are unsaved script modifications.",
-		"message": "Modyfikacje w tym skrypcie nie zostały zapisane! Kliknij \"OK\", aby wyjść lub \"Anuluj\", aby pozostać."
-	},
 	"msgImported": {
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",
 		"message": "$1 pozycja/e/i zaimportowana/e/ych."
-	},
-	"buttonVacuuming": {
-		"description": "Message shown when data vacuum is in progress.",
-		"message": "Czyszczenie danych..."
-	},
-	"hintVacuum": {
-		"description": "Hint for vacuuming data.",
-		"message": "Usuń nadmiarowość i spróbuj przeładować brakujące dane w pamięci podręcznej."
 	},
 	"hintUseDownloadURL": {
 		"description": "Shown as a place holder for @updateURL when it is not assigned",
 		"message": "Use @downloadURL"
 	},
+	"confirmNotSaved": {
+		"description": "Confirm message shown when there are unsaved script modifications.",
+		"message": "Modyfikacje w tym skrypcie nie zostały zapisane! Kliknij \"OK\", aby wyjść lub \"Anuluj\", aby pozostać."
+	},
+	"buttonVacuuming": {
+		"description": "Message shown when data vacuum is in progress.",
+		"message": "Czyszczenie danych..."
+	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",
 		"message": "Dane wyczyszczone"
+	},
+	"hintVacuum": {
+		"description": "Hint for vacuuming data.",
+		"message": "Usuń nadmiarowość i spróbuj przeładować brakujące dane w pamięci podręcznej."
 	},
 	"menuManageScripts": {
 		"description": "Menu item to manage scripts, or to open the options page of the extension.",

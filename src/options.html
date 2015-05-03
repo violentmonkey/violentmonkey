@@ -4,9 +4,11 @@
 		<meta charset="utf-8" />
 		<link rel="shortcut icon" type="image/png" href="images/icon16.png">
 		<link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css">
-		<link rel="stylesheet" type="text/css" href="style.min.css">
+		<!-- common:css -->
+		<link rel="stylesheet/less" type="text/css" href="style.less">
+		<script src="lib/less.min.js"></script>
+		<!-- endinject -->
 		<script src="lib/zip.js/zip.js"></script>
-		<script src="load.js"></script>
 		<title data-i18n=extName></title>
 	</head>
 	<body id=options>
@@ -17,9 +19,9 @@
 				<p>2013-2015</p>
 				<hr>
 				<div class=sidemenu>
-					<a id=smInstalled href=#Installed data-i18n=sideMenuInstalled></a>
-					<a id=smSettings href=#Settings data-i18n=sideMenuSettings></a>
-					<a id=smAbout href=#About data-i18n=sideMenuAbout></a>
+					<a href=#Installed data-i18n=sideMenuInstalled></a>
+					<a href=#Settings data-i18n=sideMenuSettings></a>
+					<a href=#About data-i18n=sideMenuAbout></a>
 				</div>
 			</div>
 			<div class=content>
@@ -31,9 +33,8 @@
 							<a href=https://greasyfork.org/scripts target=_blank data-i18n=anchorGetMoreScripts></a>
 						</div>
 					</div>
-					<div id=sList>
-						<span id=message data-i18n=msgLoading></span>
-					</div>
+					<div class="mask"><div data-i18n=msgLoading></div></div>
+					<div id=sList></div>
 				</div>
 				<div id=tabSettings class=hide>
 					<h1 data-i18n=labelSettings></h1>
@@ -53,16 +54,16 @@
 					<fieldset class=title>
 						<legend data-i18n=labelDataExport></legend>
 						<b data-i18n=labelScriptsToExport></b>
-						<label><input type=checkbox id=cWithData><span data-i18n=labelExportScriptData></span></label>
+						<label><input type=checkbox id=cbValues><span data-i18n=labelExportScriptData></span></label>
 						<select id=xList multiple></select>
 						<button id=bSelect data-i18n=buttonAllNone></button>
-						<a id=xHelper></a><button id=bExport data-i18n=buttonExportData></button>
+						<button id=bExport data-i18n=buttonExportData></button>
 					</fieldset>
 				</div>
 				<div id=tabAbout class=hide>
 					<h1 data-i18n=labelAbout></h1>
 					<p data-i18n=extDescription></p>
-					<p><label data-i18n=labelRelated></label><span data-i18n=anchorSupportPage></span> | <a href=http://geraldl.net/donate target=_blank data-i18n=labelDonate></a> | <a href=https://github.com/gera2ld/Violentmonkey/issues target=_blank data-i18n=labelFeedback></a></p>
+					<p><label data-i18n=labelRelated></label><span data-i18n=anchorSupportPage></span> | <a href=http://gerald.top/donate target=_blank data-i18n=labelDonate></a> | <a href=https://github.com/gera2ld/Violentmonkey/issues target=_blank data-i18n=labelFeedback></a></p>
 					<p><label data-i18n=labelAuthor></label><span data-i18n=anchorAuthor></span></p>
 					<p><label data-i18n=labelTranslator></label><span data-i18n=anchorTranslator></span></p>
 					<p><label data-i18n=labelCurrentLang></label><span id=currentLang></span> | <a href=http://cotrans.geraldl.net target=_blank>Help with translation<i class="fa fa-language"></i></a></p>
@@ -72,16 +73,20 @@
 		<div id=wndEditor class="frame hide">
 			<div class=header>
 				<h2 data-i18n=labelScriptEditor></h2>
-				<div class=buttons><button id=bCustom><i id=sCustom class="fa fa-caret-down"></i> <span data-i18n=buttonCustomMeta></span></button></div>
+				<div class=buttons>
+					<button class=btCustom data-i18n=buttonCustomMeta></button>
+				</div>
 			</div>
 			<div class=body>
-				<div id=eCode></div>
-				<div id=eMeta class=hide>
+				<div class="code"></div>
+				<div class="meta hide">
 					<table>
 						<tr>
-							<td title="@name" data-i18n=labelName></td><td class=expand><input type=text id=mName></td>
-							<td title="@run-at" data-i18n=labelRunAt></td><td>
-								<select id=mRunAt>
+							<td title="@name" data-i18n=labelName></td>
+							<td class=expand><input type=text class=name></td>
+							<td title="@run-at" data-i18n=labelRunAt></td>
+							<td>
+								<select class=run-at>
 									<option value=default data-i18n=labelRunAtDefault></option>
 									<option value=start>document-start</option>
 									<option value=idle>document-idle</option>
@@ -89,46 +94,55 @@
 								</select>
 							</td>
 						</tr>
-						<tr title="@homepageURL"><td data-i18n=labelHomepageURL></td><td colspan=3 class=expand><input type=text id=mHomepageURL></td></tr>
+						<tr title="@homepageURL">
+							<td data-i18n=labelHomepageURL></td>
+							<td colspan=3 class=expand><input type=text class=homepage></td>
+						</tr>
 					</table>
 					<table>
-						<tr title="@updateURL"><td data-i18n=labelUpdateURL></td><td class=expand><input type=text id=mUpdateURL></td></tr>
-						<tr title="@downloadURL"><td data-i18n=labelDownloadURL></td><td class=expand><input type=text id=mDownloadURL></td></tr>
+						<tr title="@updateURL">
+							<td data-i18n=labelUpdateURL></td>
+							<td class=expand><input type=text class=updateurl></td>
+						</tr>
+						<tr title="@downloadURL">
+							<td data-i18n=labelDownloadURL></td>
+							<td class=expand><input type=text class=downloadurl></td>
+						</tr>
 					</table>
 					<fieldset title="@include">
 						<legend>
 							<span data-i18n=labelInclude></span>
-							<label><input type=checkbox id=cInclude><span data-i18n=labelKeepInclude></span></label>
+							<label><input type=checkbox class=keep-include><span data-i18n=labelKeepInclude></span></label>
 						</legend>
 						<div data-i18n=labelCustomInclude></div>
-						<textarea id=mInclude></textarea>
+						<textarea class=include></textarea>
 					</fieldset>
 					<fieldset title="@match">
 						<legend>
 							<span data-i18n=labelMatch></span>
-							<label><input type=checkbox id=cMatch><span data-i18n=labelKeepMatch></span></label>
+							<label><input type=checkbox class=keep-match><span data-i18n=labelKeepMatch></span></label>
 						</legend>
 						<div data-i18n=labelCustomMatch></div>
-						<textarea id=mMatch></textarea>
+						<textarea class=match></textarea>
 					</fieldset>
 					<fieldset title="@exclude">
 						<legend>
 							<span data-i18n=labelExclude></span>
-							<label><input type=checkbox id=cExclude><span data-i18n=labelKeepExclude></span></label>
+							<label><input type=checkbox class=keep-exclude><span data-i18n=labelKeepExclude></span></label>
 						</legend>
 						<div data-i18n=labelCustomExclude></div>
-						<textarea id=mExclude></textarea>
+						<textarea class=exclude></textarea>
 					</fieldset>
 				</div>
 			</div>
 			<div class=footer>
 				<div class=options>
-					<label><input type=checkbox id=eUpdate><span data-i18n=labelAllowUpdate></span></label>
+					<label><input type=checkbox class="update"><span data-i18n=labelAllowUpdate></span></label>
 				</div>
 				<div class=right>
-					<button id=eSave data-i18n=buttonSave></button>
-					<button id=eSaveClose data-i18n=buttonSaveClose></button>
-					<button id=eClose data-i18n=buttonClose></button>
+					<button class="save" data-i18n=buttonSave></button>
+					<button class="savenclose" data-i18n=buttonSaveClose></button>
+					<button class="close" data-i18n=buttonClose></button>
 				</div>
 			</div>
 		</div>

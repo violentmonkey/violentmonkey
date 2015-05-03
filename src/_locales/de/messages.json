@@ -59,9 +59,17 @@
 		"description": "Shown in the title of the confirm page while trying to install a script.",
 		"message": "Skript installieren"
 	},
-	"optionClose": {
+	"buttonInstallOptions": {
+		"description": "Button to show options of installation confirm page.",
+		"message": "Options"
+	},
+	"installOptionClose": {
 		"description": "Option to close confirm window after installation.",
 		"message": "Nach der Installation schließen"
+	},
+	"installOptionTrack": {
+		"description": "Option to track the loading local file before window is closed.",
+		"message": "Track local file before this window is closed"
 	},
 	"buttonConfirmInstallation": {
 		"description": "Button to confirm installation of a script.",
@@ -71,10 +79,6 @@
 		"description": "Button to close window.",
 		"message": "Schließen"
 	},
-	"msgScriptURL": {
-		"description": "URL of the script to be installed on confirm page.",
-		"message": "Skript URL: $1"
-	},
 	"msgErrorLoadingData": {
 		"description": "Message shown on confirm page when the script to be installed cannot be loaded.",
 		"message": "Fehler beim Laden der Skriptdaten."
@@ -83,10 +87,6 @@
 		"description": "Message shown in the confirm page when a javascript file to be installed is loaded.",
 		"message": "Skriptdaten geladen"
 	},
-	"msgLoadingData": {
-		"description": "Message shown on confirm page when the script to be installed is loading.",
-		"message": "Skriptdaten werden geladen..."
-	},
 	"msgErrorLoadingDependency": {
 		"description": "Message shown when not all requirements are loaded successfully.",
 		"message": "Fehler beim Laden der Abhängigkeiten."
@@ -94,6 +94,14 @@
 	"msgLoadingDependency": {
 		"description": "Message shown on confirm page when the requirements are being downloaded.",
 		"message": "Lade Abhängigkeiten... ($1/$2)"
+	},
+	"msgScriptURL": {
+		"description": "URL of the script to be installed on confirm page.",
+		"message": "Skript URL: $1"
+	},
+	"msgLoadingData": {
+		"description": "Message shown on confirm page when the script to be installed is loading.",
+		"message": "Skriptdaten werden geladen..."
 	},
 	"sideMenuInstalled": {
 		"description": "Side menu: Installed scripts",
@@ -295,6 +303,10 @@
 		"description": "Button to save modifications of a script and then close the editing page.",
 		"message": "Speichern & Schließen"
 	},
+	"labelNoScripts": {
+		"description": "Message shown when no script is installed.",
+		"message": "Oops, you haven't got any script yet."
+	},
 	"hintSupportPage": {
 		"description": "Hint for support page.",
 		"message": "Support"
@@ -319,29 +331,29 @@
 		"description": "Check a script for updates.",
 		"message": "Auf Aktualisierung prüfen"
 	},
-	"confirmNotSaved": {
-		"description": "Confirm message shown when there are unsaved script modifications.",
-		"message": "Die Änderungen wurden nicht gespreichert!Zum Verwerfen OK drücken oder Abbrechen um fortzufahren."
-	},
 	"msgImported": {
 		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",
 		"message": "$1 Skript(e) wurden importiert."
-	},
-	"buttonVacuuming": {
-		"description": "Message shown when data vacuum is in progress.",
-		"message": "Säubere Daten..."
-	},
-	"hintVacuum": {
-		"description": "Hint for vacuuming data.",
-		"message": "Redundazen verwerfen und fehlenden Ressourcen aus dem Cache neuladen."
 	},
 	"hintUseDownloadURL": {
 		"description": "Shown as a place holder for @updateURL when it is not assigned",
 		"message": "Verwende @downloadURL"
 	},
+	"confirmNotSaved": {
+		"description": "Confirm message shown when there are unsaved script modifications.",
+		"message": "Die Änderungen wurden nicht gespreichert!Zum Verwerfen OK drücken oder Abbrechen um fortzufahren."
+	},
+	"buttonVacuuming": {
+		"description": "Message shown when data vacuum is in progress.",
+		"message": "Säubere Daten..."
+	},
 	"buttonVacuumed": {
 		"description": "Message shown when data is vacuumed.",
 		"message": "Daten gesäubert"
+	},
+	"hintVacuum": {
+		"description": "Hint for vacuuming data.",
+		"message": "Redundazen verwerfen und fehlenden Ressourcen aus dem Cache neuladen."
 	},
 	"menuManageScripts": {
 		"description": "Menu item to manage scripts, or to open the options page of the extension.",

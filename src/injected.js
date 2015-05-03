@@ -42,7 +42,7 @@ chrome.runtime.onMessage.addListener(function(req,src) {
 function getPopup(){
 	// XXX: only scripts run in top level window are counted
 	if(top===window)
-		chrome.runtime.sendMessage({cmd:'SetPopup',data:[menu,ids]});
+		chrome.runtime.sendMessage({cmd:'SetPopup',data:{ids:ids,menus:menus}});
 }
 function getBadge(){
 	// XXX: only scripts run in top level window are counted
@@ -408,7 +408,7 @@ var comm={
 		});
 		run(start);comm.checkLoad();
 	},
-},menu=[],ids=[],total=0;
+},menus=[],ids=[],total=0;
 function injectScript(o){
 	var f=function(u,did,func){
 		Object.defineProperty(window,'VM_'+u,{
@@ -427,7 +427,7 @@ function handleC(e){
 			chrome.runtime.sendMessage({cmd:'SetValue',data:o});
 		},
 		RegisterMenu:function(o){
-			if(window.top===window) menu.push(o);
+			if(window.top===window) menus.push(o);
 		},
 		GetRequestId:getRequestId,
 		HttpRequest:httpRequest,
