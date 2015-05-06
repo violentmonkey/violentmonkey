@@ -1,24 +1,22 @@
 // common styles
-@menu-height: 30px;
-.fill(){
-	height: 100%;
+* {
 	margin: 0;
 	padding: 0;
-}
-.fullsize(){
 	box-sizing: border-box;
-	width: 100%;
 }
-html{
-	.fill;
-}
-body{
-	.fill;
+html, body {
+	height: 100%;
 	background: #eee;
 	font: menu;
 }
 h1{
 	text-shadow: #999 3px 3px 5px;
+}
+h1, h2 {
+	margin: 10px 0;
+}
+button {
+	padding: 0 .5em;
 }
 .hide{
 	display: none;
@@ -89,17 +87,15 @@ h1{
 a{
 	color: dodgerblue;
 }
-textarea{
-	.fullsize;
-}
-input[type=text]{
-	.fullsize;
+textarea, input[type=text]{
+	width: 100%;
 }
 label>*{
 	vertical-align: middle;
 }
 .line{
 	display: block;
+	margin: 1em 0;
 }
 #options{
 	.main{
@@ -109,16 +105,17 @@ label>*{
 		position: relative;
 	}
 	.sidebar{
+		transition: top 1s;
 		position: absolute;
 		background: #fafafa;
-		top: @menu-height;
+		top: 50px;
 		left: 0;
 		width: 200px;
 		box-sizing: border-box;
 		border: 1px solid darkgray;
 		border-radius: 10px 0 0 10px;
 		border-right: none;
-		padding: 20px 10px 10px;
+		padding: 10px 10px 0;
 		text-align: right;
 		img{
 			width: 64px;
@@ -127,19 +124,31 @@ label>*{
 			border: none;
 			border-top: 1px solid darkgray;
 		}
+		&.init {
+			top: -100%;
+		}
 	}
-	.sidemenu>a{
-		color: gray;
-		display: block;
-		font-size: 1.17em;
-		font-weight: bold;
-		line-height: 2.5em;
-		text-decoration: none;
-		&.selected, &:hover{
-			color: black;
+	.sidemenu {
+		&>div {
+			a {
+				display: block;
+				margin: .5em;
+			}
+		}
+		&>a {
+			color: gray;
+			display: block;
+			font-size: 1.17em;
+			font-weight: bold;
+			line-height: 2.5em;
+			text-decoration: none;
+			&.selected, &:hover{
+				color: black;
+			}
 		}
 	}
 	fieldset.title{
+		padding: 10px;
 		border: none;
 		border-top: 1px solid silver;
 		margin: 20px 0 0;
@@ -174,18 +183,20 @@ label>*{
 }
 .content{
 	background: white;
+	position: relative;
 	margin-left: 200px;
+	height: 100%;
 	box-sizing: border-box;
 	border-left: 1px solid darkgray;
 	border-right: 1px solid darkgray;
 	height: 100%;
 	overflow-y: auto;
-	position: relative;
 	&>div{
 		margin: 20px;
 	}
 }
 // Installed scripts
+@menu-height: 30px;
 #tabInstalled{
 	height: 100%;
 	width: 100%;
@@ -203,8 +214,8 @@ label>*{
 .mask {
 	color: gray;
 	position: absolute;
-	top: @menu-height + 2px;
-	bottom: 2px;
+	top: @menu-height;
+	bottom: 0;
 	width: 100%;
 	font-size: 0;
 	text-align: center;
@@ -233,9 +244,24 @@ label>*{
 	bottom: 0;
 	width: 100%;
 	.item {
-		border-bottom: 1px dashed silver;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		transition: top .5s;
 		padding: 10px;
-		position: relative;
+		left: 10px;
+		right: 10px;
+		position: absolute;
+		opacity: 1;
+		margin-bottom: 10px;
+		background: white;
+		&.dragging {
+			position: fixed;
+			background: lightgreen;
+			z-index: 1;
+		}
+		&:hover {
+			border-color: darkgray;
+		}
 		.move{
 			cursor: pointer;
 			color: gray;
@@ -254,18 +280,20 @@ label>*{
 				-webkit-filter: grayscale(.5);
 			}
 		}
-		&.moving{
-			background: lightgreen;
-			border: 1px outset gray;
-			cursor: move;
-		}
 	}
 	.name{
 		font-weight: bold;
-		font-size: 1.2em;
+		font-size: 14px;
+	}
+	.author {
+		max-width: 30%;
+		.ellipsis;
+	}
+	.right {
+		margin-left: 10px;
 	}
 	.support{
-		font-size: 1.2em;
+		font-size: 14px;
 		color: green;
 		text-decoration: none;
 		&.hide{
@@ -273,31 +301,22 @@ label>*{
 		}
 	}
 	.icon{
-		top: 1em;
+		top: 10px;
 		width: 40px;
 		height: 40px;
-		margin: 2px;
 		position: absolute;
 	}
-	.descrip{
-		margin-left: 60px;
-		min-height: 1em;
-		max-height: 4.5em;
-		overflow-y: auto;
-	}
-	.panelH{
-		margin-left: 60px;
-		margin-right: 20px;
-		&>*{
-			display: inline-block;
+	.info {
+		margin-left: 50px;
+		line-height: 20px;
+		&>* {
 			margin-right: 10px;
-			vertical-align: middle;
 		}
 	}
-	.panelT{
-		position: absolute;
-		top: 10px;
-		right: 10px;
+	.descrip{
+		margin: 5px 0 5px 50px;
+		line-height: 20px;
+		overflow-y: auto;
 	}
 }
 // Editor

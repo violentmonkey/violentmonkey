@@ -58,7 +58,7 @@ function safeHTML(html) {
 
 function initI18n(callback){
 	window.addEventListener('DOMContentLoaded', function() {
-		Array.prototype.forEach.call($$('*[data-i18n]'), function(node) {
+		Array.prototype.forEach.call($$('[data-i18n]'), function(node) {
 			node.innerHTML = _(node.getAttribute('data-i18n'));
 		});
 		if(callback) callback();

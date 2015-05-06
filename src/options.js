@@ -3,7 +3,7 @@ zip.workerScriptsPath = 'lib/zip.js/';
 
 function setTitle(node, title, def) {
 	node.title = title || '';
-	node.innerHTML = title ?  safeHTML(title) :
+	node.innerHTML = title ? safeHTML(title) :
 		(def || '<em>' + _('labelNoName') + '</em>');
 }
 
@@ -90,7 +90,13 @@ var scriptList = function() {
 
 	function findNode(target) {
 		for(var node = target; node && node.parentNode != parent; node = node.parentNode);
-		var index = Array.prototype.indexOf.call(parent.childNodes, node);
+		var index = -1;
+		list.some(function(data, i) {
+			if(data.node === node) {
+				index = i;
+				return true;
+			}
+		});
 		return index >= 0 && {
 			index: index,
 			data: node,
@@ -120,6 +126,7 @@ var scriptList = function() {
 			node.innerHTML = label + '<a href=mailto:' + matches[2] + '>' + matches[1] + '</a>';
 		else
 			node.innerText = author ? label + author : '';
+		node.title = author || '';
 	}
 
 	var images = {};
@@ -183,21 +190,18 @@ var scriptList = function() {
 	function initNode(data, res) {
 		var node = data.node;
 		var script = data.script;
-		node.innerHTML = 
+		node.innerHTML =
 			'<img class=icon>' +
-			'<div class=panelH>' +
+			'<div class="right version">' +
+				(script.meta.version ? 'v' + script.meta.version : '') +
+			'</div> ' +
+			'<div class="right author"></div>' +
+			'<div class=info>' +
 				'<a class="name ellipsis" target=_blank></a>' +
 				'<a class="support hide" target=_blank><i class="fa fa-question-circle"></i></a>' +
-				'<span class=version>' +
-					(script.meta.version ? 'v' + script.meta.version : '') +
-				'</span>' +
-				'<span class=author></span>' +
-			'</div>' +
-			'<div class=panelT>' +
-				'<i class="fa fa-arrows move" data="move"></i>' +
 			'</div>' +
 			'<p class="descrip ellipsis"></p>' +
-			'<div class=panelB>' +
+			'<div class=buttons>' +
 				'<button data=edit>' + _('buttonEdit') + '</button> ' +
 				'<button data=enable class=enable></button> ' +
 				'<button data=remove>' + _('buttonRemove') + '</button> ' +
@@ -205,7 +209,115 @@ var scriptList = function() {
 				'<span class=message></span>' +
 			'</div>'
 		;
+		locate(list.indexOf(data));
 		updateNode(res || {id: script.id});
+	}
+
+	var height = 90;
+	var gap = 10;
+	function getIndexByTop(top) {
+		var i = Math.floor((top - gap) / (height + gap));
+		var lower = (height + gap) * i + gap;
+		var upper = lower + height;
+		return top >= lower + 10 && top <= upper - 10 ? i : -1;
+	}
+	function locate(i, data) {
+		data = data || list[i];
+		if(!data) return;
+		var node = data.node;
+		var top = (height + gap) * i + gap;
+		var delta = 60 * (i + 1);
+		if(node.style.top == '' && top < parent.clientHeight) {
+			top += delta;
+			node.style.opacity = 0;
+			setTimeout(function(){
+				top -= delta;
+				node.style.top = top + 'px';
+				node.style.opacity = '';
+			}, 0);
+		}
+		node.style.top = top + 'px';
+	}
+
+	var emptyDom = document.createElement('div');
+	var dragging = {};
+	function dragstart(e) {
+		e.preventDefault();
+		if(dragging.data) return;
+		var data = dragging.data = findItem(e.target);
+		dragging.index = data.index;
+		var node = e.target;
+		dragging.offsetX = e.offsetX;
+		dragging.offsetY = e.offsetY;
+		node.style.width = node.offsetWidth + 'px';
+		node.style.left = e.clientX - dragging.offsetX + 'px';
+		node.style.top = e.clientY - dragging.offsetY + 'px';
+		// transition is reset in style so that there will not be transition on mouseup
+		node.style.transition = 'none';
+		node.classList.add('dragging');
+		document.addEventListener('mousemove', mousemove, false);
+		document.addEventListener('mouseup', mouseup, false);
+	}
+	function mousemove(e) {
+		var node = dragging.data.data.node;
+		var index = getIndexByTop(e.clientY - parent.offsetTop);
+		node.style.left = e.clientX - dragging.offsetX + 'px';
+		node.style.top = e.clientY - dragging.offsetY + 'px';
+		if(index >= 0 && index != dragging.index) {
+			var current = dragging.index;
+			var step = index > current ? 1 : -1;
+			while(index != current) {
+				current += step;
+				var i = current;
+				if(step * (i - dragging.data.index) <= 0) i -= step;
+				locate(current - step, list[i]);
+			}
+			dragging.index = index;
+		}
+	}
+	function mouseup(e) {
+		var data = dragging.data;
+		var node = data.data.node;
+		dragging.data = null;
+		var offset = parent.getBoundingClientRect();
+		node.style.left = e.clientX - dragging.offsetX - offset.left + 'px';
+		node.style.top = e.clientY - dragging.offsetY - offset.top + 'px';
+		node.classList.remove('dragging');
+		setTimeout(function(){
+			node.style.left = '';
+			node.style.width = '';
+			node.style.transition = '';
+			locate(dragging.index, data.data);
+		}, 0);
+		orderScript(data.index, dragging.index);
+		document.removeEventListener('mousemove', mousemove, false);
+		document.removeEventListener('mouseup', mouseup, false);
+	}
+	function orderScript(idxFrom, idxTo) {
+		if(idxFrom != idxTo) {
+			chrome.runtime.sendMessage({
+				cmd:'Move',
+				data:{
+					id: list[idxFrom].script.id,
+					offset: idxTo - idxFrom,
+				},
+			});
+			var i = Math.min(idxTo, idxFrom);
+			var j = Math.max(idxTo, idxFrom);
+			var seq = [
+				list.slice(0, i),
+				list.slice(i, j+1),
+				list.slice(j+1),
+			];
+			if(i === idxTo)
+				seq[1].unshift(seq[1].pop());
+			else
+				seq[1].push(seq[1].shift());
+			list = [];
+			seq.forEach(function(seq) {
+				list = list.concat(seq);
+			});
+		}
 	}
 
 	function addScript(script) {
@@ -217,6 +329,8 @@ var scriptList = function() {
 		dict[script.id] = data;
 		list.push(data);
 		node.className = 'item';
+		node.draggable = true;
+		node.addEventListener('dragstart', dragstart, false);
 		initNode(data);
 		parent.appendChild(data.node);
 		hideMask();
@@ -239,76 +353,16 @@ var scriptList = function() {
 		}
 	}
 
-	function bindEvents() {
-		var index;
-		var current;
-		var moving = false;
-		var mousemove = function(e) {
-			var nodeData = findNode(e.target);
-			if(nodeData && nodeData.index !== index) {
-				var node = nodeData.data;
-				if(nodeData.index > index)
-					node = node.nextSibling;
-				parent.insertBefore(current.data.node, node);
-				index = nodeData.index;
+	parent.addEventListener('click', function(e) {
+		var data = e.target.getAttribute('data');
+		if(data) {
+			var obj = findItem(e.target);
+			if(obj) {
+				var func = commands[data];
+				if(func) func(obj);
 			}
-		};
-		var mouseup = function(e) {
-			if(!moving) return;
-			moving = false;
-			current.data.node.classList.remove('moving');
-			parent.removeEventListener('mousemove', mousemove, false);
-			parent.removeEventListener('mouseup', mouseup, false);
-			if(index != current.index) {
-				chrome.runtime.sendMessage({
-					cmd:'Move',
-					data:{
-						id: current.data.script.id,
-						offset: index - current.index,
-					},
-				});
-				var i = Math.min(index, current.index);
-				var j = Math.max(index, current.index);
-				var seq = [
-					list.slice(0, i),
-					list.slice(i+1, j+1),
-					list.slice(j+1),
-				];
-				if(i === index)
-					seq[1].unshift(seq[1].pop());
-				else
-					seq[1].push(seq[1].shift());
-				list = [];
-				seq.forEach(function(seq) {
-					list = list.concat(seq);
-				});
-			}
-		};
-		parent.addEventListener('mousedown', function(e) {
-			var data = e.target.getAttribute('data');
-			if(data == 'move') {
-				e.preventDefault();
-				if(moving) return;
-				moving = true;
-				parent.addEventListener('mousemove', mousemove, false);
-				parent.addEventListener('mouseup', mouseup, false);
-				current = findItem(e.target);
-				current.data.node.classList.add('moving');
-				index = current.index;
-			}
-		}, false);
-		parent.addEventListener('click', function(e) {
-			var data = e.target.getAttribute('data');
-			if(data) {
-				var obj = findItem(e.target);
-				if(obj) {
-					var func = commands[data];
-					if(func) func(obj);
-				}
-			}
-		}, false);
-	}
-	bindEvents();
+		}
+	}, false);
 
 	return {
 		forEach: function(cb) {
@@ -453,7 +507,7 @@ var Transporter = function() {
 		}, false);
 		$('#bSelect').addEventListener('click', function(e) {
 			var nodes = xList.childNodes;
-			var state = !Array.prototype.some.call(nodes, function(node) {
+			var state = !Array.prototype.every.call(nodes, function(node) {
 				return node.selected;
 			});
 			Array.prototype.forEach.call(nodes, function(node) {
@@ -649,10 +703,12 @@ var Editor = function() {
 // Load at last
 var switchTab = function() {
 	var menus = $$('.sidemenu>a');
+	var submenus = $$('.sidemenu>div');
 	var tabs = $$('.content>div');
+	var forEach = Array.prototype.forEach;
 	return function(e) {
 		var current;
-		Array.prototype.forEach.call(menus, function(menu) {
+		forEach.call(menus, function(menu) {
 			var href = menu.getAttribute('href');
 			if(href == location.hash) {
 				current = href;
@@ -665,7 +721,7 @@ var switchTab = function() {
 			menus[0].classList.add('selected');
 		}
 		current = 'tab' + current.substr(1);
-		Array.prototype.forEach.call(tabs, function(tab) {
+		forEach.call(tabs, function(tab) {
 			if(tab.id == current)
 				tab.classList.remove('hide');
 			else
@@ -676,6 +732,7 @@ var switchTab = function() {
 }();
 
 !function() {
+	$('.sidebar').classList.remove('init');
 	$('#currentLang').innerHTML = navigator.language;
 	$('#cUpdate').checked = getOption('autoUpdate');
 	$('#sInjectMode').value = getOption('injectMode');
@@ -699,9 +756,7 @@ var switchTab = function() {
 	};
 	vacuum.title = _('hintVacuum');
 	$('#bNew').addEventListener('click', function(e) {
-		chrome.runtime.sendMessage({cmd:'NewScript'}, function(script) {
-			Editor.editScript(script);
-		});
+		chrome.runtime.sendMessage({cmd:'NewScript'}, Editor.editScript);
 	}, false);
 	$('#bUpdate').addEventListener('click', function(e) {
 		chrome.runtime.sendMessage({cmd:'CheckUpdateAll'});
