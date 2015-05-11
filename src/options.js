@@ -7,8 +7,21 @@ function setTitle(node, title, def) {
 		(def || '<em>' + _('labelNoName') + '</em>');
 }
 
+function debounce(cb, delay) {
+	function callback() {
+		cb.apply(null, args);
+	}
+	var timer = null, args;
+	return function() {
+		if(timer) clearTimeout(timer);
+		args = arguments;
+		timer = setTimeout(callback, delay);
+	}
+}
+
 var scriptList = function() {
-	var parent = $('#sList');
+	var parent = $('.scripts-list');
+	var wrap = $('.scripts');
 	/**
 	 * list = [
 	 *   {
@@ -48,6 +61,8 @@ var scriptList = function() {
 				list.splice(obj.index, 1);
 				delete dict[script.id];
 				parent.removeChild(obj.data.node);
+				for ( var i = obj.index; i < list.length; i ++ )
+					locate(i);
 				if(!list.length) showEmptyHint();
 			});
 		},
@@ -64,11 +79,11 @@ var scriptList = function() {
 		mask.style.opacity = 1;
 		mask.style.zIndex = 9;
 		mask.innerHTML = '<div>' + _('labelNoScripts') + '</div>';
-		parent.style.opacity = '';
+		wrap.style.opacity = '';
 	}
 
 	function hideMask() {
-		parent.style.opacity = 1;
+		wrap.style.opacity = 1;
 		mask.style.opacity = 0;
 		setTimeout(function() {
 			mask.classList.add('hide');
@@ -81,7 +96,6 @@ var scriptList = function() {
 		cache = data.cache || {};
 		if(data.scripts.length) {
 			hideMask();
-			parent.innerHTML = '';
 			data.scripts.forEach(addScript);
 		} else
 			showEmptyHint();
@@ -215,6 +229,9 @@ var scriptList = function() {
 
 	var height = 90;
 	var gap = 10;
+	var setHeight = debounce(function(height) {
+		parent.style.height = height;
+	}, 500);
 	function getIndexByTop(top) {
 		var i = Math.floor((top - gap) / (height + gap));
 		var lower = (height + gap) * i + gap;
@@ -237,6 +254,7 @@ var scriptList = function() {
 			}, 0);
 		}
 		node.style.top = top + 'px';
+		setHeight((height + gap) * list.length + gap + 'px');
 	}
 
 	var emptyDom = document.createElement('div');
@@ -260,10 +278,10 @@ var scriptList = function() {
 	}
 	function mousemove(e) {
 		var node = dragging.data.data.node;
-		var index = getIndexByTop(e.clientY - parent.offsetTop);
+		var index = getIndexByTop(e.clientY - wrap.offsetTop + wrap.scrollTop);
 		node.style.left = e.clientX - dragging.offsetX + 'px';
 		node.style.top = e.clientY - dragging.offsetY + 'px';
-		if(index >= 0 && index != dragging.index) {
+		if(index >= 0 && index < list.length && index != dragging.index) {
 			var current = dragging.index;
 			var step = index > current ? 1 : -1;
 			while(index != current) {
@@ -274,14 +292,25 @@ var scriptList = function() {
 			}
 			dragging.index = index;
 		}
+		dragging.scroll = 0;
+		var scrollThreshold = 10;
+		var offset = wrap.getBoundingClientRect();
+		var delta = (e.clientY - (offset.bottom - scrollThreshold)) / scrollThreshold;
+		if ( delta > 0 ) dragging.scroll = 1 + Math.min(~~ (delta * 5), 10);
+		else {
+			delta = (offset.top + scrollThreshold - e.clientY) / scrollThreshold;
+			if(delta > 0) dragging.scroll = -1 - Math.min(~~ (delta * 5), 10);
+		}
+		if(dragging.scroll) scroll();
 	}
 	function mouseup(e) {
 		var data = dragging.data;
 		var node = data.data.node;
 		dragging.data = null;
-		var offset = parent.getBoundingClientRect();
+		dragging.scroll = 0;
+		var offset = wrap.getBoundingClientRect();
 		node.style.left = e.clientX - dragging.offsetX - offset.left + 'px';
-		node.style.top = e.clientY - dragging.offsetY - offset.top + 'px';
+		node.style.top = e.clientY - dragging.offsetY - offset.top + wrap.scrollTop + 'px';
 		node.classList.remove('dragging');
 		setTimeout(function(){
 			node.style.left = '';
@@ -293,11 +322,23 @@ var scriptList = function() {
 		document.removeEventListener('mousemove', mousemove, false);
 		document.removeEventListener('mouseup', mouseup, false);
 	}
+	function scroll() {
+		function scrollOnce() {
+			if(dragging.scroll) {
+				wrap.scrollTop += dragging.scroll;
+				setTimeout(scrollOnce, 20);
+			} else dragging.scrolling = false;
+		}
+		if(!dragging.scrolling) {
+			dragging.scrolling = true;
+			scrollOnce();
+		}
+	}
 	function orderScript(idxFrom, idxTo) {
 		if(idxFrom != idxTo) {
 			chrome.runtime.sendMessage({
-				cmd:'Move',
-				data:{
+				cmd: 'Move',
+				data: {
 					id: list[idxFrom].script.id,
 					offset: idxTo - idxFrom,
 				},

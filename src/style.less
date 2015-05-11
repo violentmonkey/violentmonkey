@@ -234,14 +234,18 @@ label>*{
 		width: 0;
 	}
 }
-#sList{
-	opacity: 0;
+.scripts {
 	transition: opacity 1s;
-	overflow-y: auto;
-	box-sizing: border-box;
+	opacity: 0;
 	position: absolute;
 	top: @menu-height;
 	bottom: 0;
+	width: 100%;
+	overflow-y: auto;
+}
+.scripts-list {
+	position: absolute;
+	top: 0;
 	width: 100%;
 	.item {
 		border: 1px solid #ccc;
