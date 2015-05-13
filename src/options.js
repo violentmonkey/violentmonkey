@@ -170,59 +170,60 @@ var scriptList = function() {
 		if(!data) return;
 		var node = data.node;
 		var script = data.script;
+		var elements = data.elements;
 		if(res.message)
-			node.querySelector('.message').innerHTML = res.message;
+			elements.message.innerHTML = res.message;
 		node.classList[script.enabled ? 'remove' : 'add']('disabled');
-		var update = node.querySelector('.update');
-		if(update) update.disabled = res.code == 3;
-		var name = node.querySelector('.name');
-		setTitle(name, script.custom.name || getLocaleString(script.meta, 'name'));
+		if(elements.update) elements.update.disabled = res.code == 3;
+		setTitle(elements.name, script.custom.name || getLocaleString(script.meta, 'name'));
 		var home = script.custom.homepageURL ||
 			script.meta.homepageURL ||
 			script.meta.homepage;
-		if(home) name.href = home;
+		if(home) elements.name.href = home;
 		var supportURL = script.meta.supportURL;
 		if(supportURL) {
-			var support = node.querySelector('.support');
+			var support = elements.support;
 			support.classList.remove('hide');
 			support.href = supportURL;
 			support.title = _('hintSupportPage');
 		}
-		setAuthor(node.querySelector('.author'), script.meta.author || '');
-		setTitle(node.querySelector('.descrip'), getLocaleString(script.meta, 'description'));
-		var image = node.querySelector('.icon');
+		setAuthor(elements.author, script.meta.author || '');
+		setTitle(elements.desc, getLocaleString(script.meta, 'description'));
 		var src;
 		if(script.meta.icon) {
 			src = cache[script.meta.icon];
-			if(!src) loadImage(image, script.meta.icon);
+			if(!src) loadImage(elements.icon, script.meta.icon);
 		}
-		image.src = src || 'images/icon48.png';
-		var enable = node.querySelector('.enable');
-		enable.innerHTML = script.enabled ? _('buttonDisable') : _('buttonEnable');
+		elements.icon.src = src || 'images/icon48.png';
+		elements.enable.innerHTML = script.enabled ? _('buttonDisable') : _('buttonEnable');
 	}
 
 	function initNode(data, res) {
 		var node = data.node;
 		var script = data.script;
 		node.innerHTML =
-			'<img class=icon>' +
-			'<div class="right version">' +
+			'<img data-id=icon class=script-icon>' +
+			'<div data-id=version class=right>' +
 				(script.meta.version ? 'v' + script.meta.version : '') +
 			'</div> ' +
-			'<div class="right author"></div>' +
-			'<div class=info>' +
-				'<a class="name ellipsis" target=_blank></a>' +
-				'<a class="support hide" target=_blank><i class="fa fa-question-circle"></i></a>' +
+			'<div data-id=author class="right script-author ellipsis"></div>' +
+			'<div class=script-info>' +
+				'<a data-id=name class="script-name ellipsis" target=_blank></a>' +
+				'<a data-id=support class="script-support hide" target=_blank><i class="fa fa-question-circle"></i></a>' +
 			'</div>' +
-			'<p class="descrip ellipsis"></p>' +
+			'<p data-id=desc class="script-desc ellipsis"></p>' +
 			'<div class=buttons>' +
-				'<button data=edit>' + _('buttonEdit') + '</button> ' +
-				'<button data=enable class=enable></button> ' +
-				'<button data=remove>' + _('buttonRemove') + '</button> ' +
-				(allowUpdate(script) ? '<button data=update class=update>' + _('buttonUpdate') + '</button> ' : '') +
-				'<span class=message></span>' +
+				'<button data-id=edit>' + _('buttonEdit') + '</button> ' +
+				'<button data-id=enable></button> ' +
+				'<button data-id=remove>' + _('buttonRemove') + '</button> ' +
+				(allowUpdate(script) ? '<button data-id=update>' + _('buttonUpdate') + '</button> ' : '') +
+				'<span data-id=message></span>' +
 			'</div>'
 		;
+		data.elements = {};
+		Array.prototype.forEach.call(node.querySelectorAll('[data-id]'), function(node) {
+			data.elements[node.dataset.id] = node;
+		});
 		locate(list.indexOf(data));
 		updateNode(res || {id: script.id});
 	}
@@ -369,7 +370,7 @@ var scriptList = function() {
 		};
 		dict[script.id] = data;
 		list.push(data);
-		node.className = 'item';
+		node.className = 'script';
 		node.draggable = true;
 		node.addEventListener('dragstart', dragstart, false);
 		initNode(data);
@@ -395,7 +396,7 @@ var scriptList = function() {
 	}
 
 	parent.addEventListener('click', function(e) {
-		var data = e.target.getAttribute('data');
+		var data = e.target.dataset && e.target.dataset.id;
 		if(data) {
 			var obj = findItem(e.target);
 			if(obj) {
@@ -418,7 +419,7 @@ var Transporter = function() {
 	var helper = $('#iImport');
 	var cbValues = $('#cbValues');
 	var btExport = $('#bExport');
-	var xList = $('#xList');
+	var xList = $('.export-list');
 
 	function getFiles(entries) {
 		function getFile() {
@@ -581,24 +582,34 @@ var Transporter = function() {
 
 // Script Editor
 var Editor = function() {
-	var parent = $('#wndEditor');
-	var meta = parent.querySelector('.meta');
-	var btSave = parent.querySelector('.save');
-	var btSaveClose = parent.querySelector('.savenclose');
-	var btClose = parent.querySelector('.close');
-	var cbUpdate = parent.querySelector('.update');
+	var parent = $('.editor-frame');
+	var findNode = function() {
+		var nodes = parent.querySelectorAll('[data-id]');
+		var dict = {};
+		Array.prototype.forEach.call(nodes, function(node) {
+			dict[node.dataset.id] = node;
+		});
+		return function(id) {
+			return dict[id];
+		};
+	}();
+	var meta = parent.querySelector('.editor-meta');
+	var btSave = findNode('save');
+	var btSaveClose = findNode('savenclose');
+	var btClose = findNode('close');
+	var cbUpdate = findNode('update');
 	var pCustom = {
-		name: meta.querySelector('.name'),
-		runAt: meta.querySelector('.run-at'),
-		homepage: meta.querySelector('.homepage'),
-		updateURL: meta.querySelector('.updateurl'),
-		downloadURL: meta.querySelector('.downloadurl'),
-		keepInclude: meta.querySelector('.keep-include'),
-		include: meta.querySelector('.include'),
-		keepMatch: meta.querySelector('.keep-match'),
-		match: meta.querySelector('.match'),
-		keepExclude: meta.querySelector('.keep-exclude'),
-		exclude: meta.querySelector('.exclude'),
+		name: findNode('name'),
+		runAt: findNode('run-at'),
+		homepage: findNode('homepage'),
+		updateURL: findNode('updateurl'),
+		downloadURL: findNode('downloadurl'),
+		keepInclude: findNode('keep-include'),
+		include: findNode('include'),
+		keepMatch: findNode('keep-match'),
+		match: findNode('match'),
+		keepExclude: findNode('keep-exclude'),
+		exclude: findNode('exclude'),
 	};
 	var modified = false;
 	var metaModified = false;
@@ -623,7 +634,7 @@ var Editor = function() {
 			document.removeEventListener('mousedown', hideMeta, false);
 		};
 		meta.addEventListener('mousedown', stopPropagation, false);
-		parent.querySelector('.btCustom').addEventListener('click', function(e) {
+		findNode('btCustom').addEventListener('click', function(e) {
 			meta.classList.remove('hide');
 			document.addEventListener('mousedown', hideMeta, false);
 		}, false);
@@ -727,7 +738,7 @@ var Editor = function() {
 		callback: function(_editor) {
 			editor = _editor;
 		},
-		container: parent.querySelector('.code'),
+		container: parent.querySelector('.editor-code'),
 		onsave: save,
 		onexit: close,
 		onchange: function(e) {
@@ -744,9 +755,13 @@ var Editor = function() {
 // Load at last
 var switchTab = function() {
 	var menus = $$('.sidemenu>a');
-	var submenus = $$('.sidemenu>div');
-	var tabs = $$('.content>div');
+	var tabs = $$('.content>[data-tab]');
 	var forEach = Array.prototype.forEach;
+	var dict = {};
+	forEach.call(tabs, function(tab) {
+		dict[tab.dataset.tab] = tab;
+	});
+	var currentTab = null;
 	return function(e) {
 		var current;
 		forEach.call(menus, function(menu) {
@@ -761,14 +776,11 @@ var switchTab = function() {
 			current = menus[0].getAttribute('href');
 			menus[0].classList.add('selected');
 		}
-		current = 'tab' + current.substr(1);
-		forEach.call(tabs, function(tab) {
-			if(tab.id == current)
-				tab.classList.remove('hide');
-			else
-				tab.classList.add('hide');
-		});
-		if(current == 'tabSettings') Transporter.initList();
+		current = current.slice(1);
+		if(currentTab) currentTab.classList.add('hide');
+		currentTab = dict[current];
+		currentTab.classList.remove('hide');
+		if(current == 'settings') Transporter.initList();
 	};
 }();
 

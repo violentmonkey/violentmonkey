@@ -9,7 +9,7 @@ html, body {
 	background: #eee;
 	font: menu;
 }
-h1{
+h1 {
 	text-shadow: #999 3px 3px 5px;
 }
 h1, h2 {
@@ -18,15 +18,15 @@ h1, h2 {
 button {
 	padding: 0 .5em;
 }
-.hide{
-	display: none;
-}
-.ellipsis{
+.ellipsis {
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-.frame{
+.hide {
+	display: none;
+}
+.frame {
 	position: fixed;
 	background: lightgray;
 	border-spacing: 10px;
@@ -37,151 +37,116 @@ button {
 	table-layout: fixed;
 	width: 100%;
 	height: 100%;
-	.header{
-		position: relative;
-		padding: 1px 1em;
-		.buttons{
-			position: absolute;
-			right: 1em;
-		}
-	}
-	.body{
-		position: absolute;
-		left: 5px;
-		right: 5px;
-	}
+}
+.frame-header {
+	position: relative;
+	padding: 1px 1em;
+}
+.frame-buttons {
+	position: absolute;
+	right: 1em;
+}
+.frame-body {
+	position: absolute;
+	left: 5px;
+	right: 5px;
 }
 
 // popup menu
-#popup{
+.popup {
 	background: white;
-	.fa{
+	.fa {
 		width: 1em;
 	}
 }
-.menu{
+.menu {
 	overflow-y: auto;
 	max-width: 300px;
-	div{
+	div {
 		cursor: pointer;
 		padding: 5px;
 		display: block;
-		&:hover{
+		&:hover {
 			background: cornflowerblue;
 			color: white;
 		}
-		&.disabled{
+		&.disabled {
 			color: gray;
-			&:hover{
+			&:hover {
 				color: silver;
 			}
 		}
 	}
-	hr{
+	hr {
 		border: none;
 		border-top: 1px solid silver;
 	}
 }
 
 // options page
-a{
+a {
 	color: dodgerblue;
 }
-textarea, input[type=text]{
+textarea, input[type=text] {
 	width: 100%;
 }
-label>*{
+label>* {
 	vertical-align: middle;
 }
-.line{
+.line {
 	display: block;
 	margin: 1em 0;
 }
-#options{
-	.main{
-		max-width: 900px;
-		height: 100%;
-		margin: 0 auto;
-		position: relative;
+.main {
+	max-width: 900px;
+	height: 100%;
+	margin: 0 auto;
+	position: relative;
+}
+.sidebar {
+	transition: top 1s;
+	position: absolute;
+	background: #fafafa;
+	top: 50px;
+	left: 0;
+	width: 200px;
+	box-sizing: border-box;
+	border: 1px solid darkgray;
+	border-radius: 10px 0 0 10px;
+	border-right: none;
+	padding: 10px 10px 0;
+	text-align: right;
+	img {
+		width: 64px;
 	}
-	.sidebar{
-		transition: top 1s;
-		position: absolute;
-		background: #fafafa;
-		top: 50px;
-		left: 0;
-		width: 200px;
-		box-sizing: border-box;
-		border: 1px solid darkgray;
-		border-radius: 10px 0 0 10px;
-		border-right: none;
-		padding: 10px 10px 0;
-		text-align: right;
-		img{
-			width: 64px;
-		}
-		hr{
-			border: none;
-			border-top: 1px solid darkgray;
-		}
-		&.init {
-			top: -100%;
-		}
-	}
-	.sidemenu {
-		&>div {
-			a {
-				display: block;
-				margin: .5em;
-			}
-		}
-		&>a {
-			color: gray;
-			display: block;
-			font-size: 1.17em;
-			font-weight: bold;
-			line-height: 2.5em;
-			text-decoration: none;
-			&.selected, &:hover{
-				color: black;
-			}
-		}
-	}
-	fieldset.title{
-		padding: 10px;
+	hr {
 		border: none;
-		border-top: 1px solid silver;
-		margin: 20px 0 0;
+		border-top: 1px solid darkgray;
 	}
-	.frame{
-		.header{
-			height: @editor-header-height;
-			.buttons{
-				bottom: 1em;
-			}
-		}
-		.body{
-			top: @editor-header-height;
-			bottom: @editor-footer-height;
-		}
-		.footer{
-			position: fixed;
-			padding: 1px 1em;
-			bottom: 0;
-			left: 0;
-			right: 0;
-			height: @editor-footer-height;
-			line-height: @editor-footer-height;
-			.options{
-				float: left;
-			}
-			.right{
-				text-align: right;
-			}
+	&.init {
+		top: -100%;
+	}
+}
+.sidemenu {
+	&>a {
+		color: gray;
+		display: block;
+		font-size: 1.17em;
+		font-weight: bold;
+		line-height: 2.5em;
+		text-decoration: none;
+		&.selected, &:hover {
+			color: black;
 		}
 	}
 }
-.content{
+fieldset.title {
+	padding: 10px;
+	border: none;
+	border-top: 1px solid silver;
+	margin: 20px 0 0;
+}
+.content {
 	background: white;
 	position: relative;
 	margin-left: 200px;
@@ -191,23 +156,23 @@ label>*{
 	border-right: 1px solid darkgray;
 	height: 100%;
 	overflow-y: auto;
-	&>div{
-		margin: 20px;
-	}
+}
+.tab {
+	margin: 20px;
 }
 // Installed scripts
 @menu-height: 30px;
-#tabInstalled{
+.tab-installed {
 	height: 100%;
 	width: 100%;
 	margin: 0;
-	&>.header{
+	&>.header {
 		height: @menu-height;
 		line-height: @menu-height;
 		padding: 0 .5em;
 		border-bottom: 1px solid darkgray;
 	}
-	.right{
+	.right {
 		float: right;
 	}
 }
@@ -247,92 +212,109 @@ label>*{
 	position: absolute;
 	top: 0;
 	width: 100%;
-	.item {
-		border: 1px solid #ccc;
-		border-radius: 5px;
-		transition: top .5s;
-		padding: 10px;
-		left: 10px;
-		right: 10px;
-		position: absolute;
-		opacity: 1;
-		margin-bottom: 10px;
-		background: white;
-		&.dragging {
-			position: fixed;
-			background: lightgreen;
-			z-index: 1;
-		}
-		&:hover {
-			border-color: darkgray;
-		}
-		.move{
-			cursor: pointer;
-			color: gray;
-			&:hover{
-				color: black;
-			}
-		}
-		&.disabled{
-			background: lightgray;
-			color: gray;
-			.name{
-				color: blueviolet;
-			}
-			.icon{
-				//opacity: 0.5;
-				-webkit-filter: grayscale(.5);
-			}
-		}
+}
+.script {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	transition: top .5s;
+	padding: 10px;
+	left: 10px;
+	right: 10px;
+	position: absolute;
+	opacity: 1;
+	margin-bottom: 10px;
+	background: white;
+	&.dragging {
+		position: fixed;
+		background: lightgreen;
+		z-index: 1;
 	}
-	.name{
-		font-weight: bold;
-		font-size: 14px;
+	&:hover {
+		border-color: darkgray;
 	}
-	.author {
-		max-width: 30%;
-		.ellipsis;
+	&.disabled {
+		background: lightgray;
+		color: gray;
 	}
 	.right {
 		margin-left: 10px;
 	}
-	.support{
-		font-size: 14px;
-		color: green;
-		text-decoration: none;
-		&.hide{
-			.hide;
-		}
+}
+.script-name {
+	font-weight: bold;
+	font-size: 14px;
+	.disabled & {
+		color: blueviolet;
 	}
-	.icon{
-		top: 10px;
-		width: 40px;
-		height: 40px;
-		position: absolute;
+}
+.script-author {
+	max-width: 30%;
+}
+.script-support {
+	font-size: 14px;
+	color: green;
+	text-decoration: none;
+	&.hide {
+		.hide;
 	}
-	.info {
-		margin-left: 50px;
-		line-height: 20px;
-		&>* {
-			margin-right: 10px;
-		}
+}
+.script-icon {
+	top: 10px;
+	width: 40px;
+	height: 40px;
+	position: absolute;
+	.disabled & {
+		//opacity: 0.5;
+		-webkit-filter: grayscale(.5);
 	}
-	.descrip{
-		margin: 5px 0 5px 50px;
-		line-height: 20px;
-		overflow-y: auto;
+}
+.script-info {
+	margin-left: 50px;
+	line-height: 20px;
+	&>* {
+		margin-right: 10px;
 	}
+}
+.script-desc {
+	margin: 5px 0 5px 50px;
+	line-height: 20px;
+	overflow-y: auto;
 }
 // Editor
 @editor-header-height: 5em;
 @editor-footer-height: 3em;
-#wndEditor {
+.editor-frame {
 	z-index: 10;
+	.frame-header {
+		height: @editor-header-height;
+	}
+	.frame-buttons {
+		bottom: 1em;
+	}
+	.frame-body {
+		top: @editor-header-height;
+		bottom: @editor-footer-height;
+	}
+	.frame-footer {
+		position: fixed;
+		padding: 1px 1em;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: @editor-footer-height;
+		line-height: @editor-footer-height;
+	}
+	.left {
+		float: left;
+	}
+	.right {
+		text-align: right;
+	}
 }
-.code, .code .CodeMirror{
+.editor-code, .editor-code .CodeMirror {
 	height: 100%;
 }
-.meta {
+.editor-meta {
 	max-width: 450px;
 	max-height: 100%;
 	height: auto;
@@ -345,25 +327,25 @@ label>*{
 	overflow-y: auto;
 	box-shadow: 0 0 3px black;
 	position: absolute;
-	table{
+	table {
 		width: 100%;
 	}
-	td{
+	td {
 		width: 1px;
 		white-space: nowrap;
-		&.expand{
+		&.expand {
 			width: auto;
 		}
 	}
 }
 
 // Settings
-#xList{
+.export-list {
 	display: block;
 	width: 100%;
 	white-space: normal;
 	height: 200px;
-	&>option{
+	&>option {
 		display: inline-block;
 		width: 180px;
 		margin: 2px;
@@ -376,47 +358,42 @@ label>*{
 	color: green;
 	font-weight: bold;
 }
-#tabAbout {
-	.fa-language {
-		padding-left: .3em;
-	}
-}
 
 // confirm page
 @confirm-header-height: 7em;
-#confirm{
-	.header{
+.confirm-frame {
+	.frame-header {
 		height: @confirm-header-height;
 	}
-	.buttons{
+	.frame-buttons {
 		bottom: 3em;
-		.options {
-			display: none;
-			position: absolute;
-			top: 110%;
-			box-shadow: 0 0 3px black;
-			border-radius: 3px;
-			padding: 10px;
-			background: #ddd;
-			z-index: 1000;
-			width: 200px;
-		}
-		label {
-			display: block;
-			padding-left: 16px;
-			text-indent: -16px;
-		}
 	}
-	.body{
+	.frame-body {
 		top: @confirm-header-height;
 		bottom: 5px;
 	}
 }
-#url{
+.confirm-options {
+	display: none;
+	position: absolute;
+	top: 110%;
+	box-shadow: 0 0 3px black;
+	border-radius: 3px;
+	padding: 10px;
+	background: #ddd;
+	z-index: 1000;
+	width: 200px;
+	label {
+		display: block;
+		padding-left: 16px;
+		text-indent: -16px;
+	}
+}
+#url {
 	float: left;
 	max-width: 50%;
 }
-#msg{
+#msg {
 	text-align: right;
 }
 input[disabled]~span {

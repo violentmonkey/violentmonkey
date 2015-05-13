@@ -35,10 +35,10 @@ var Popup = function() {
 	var main = $('#main');
 	var commands = $('#commands');
 	var scripts = {};
-	var main_top = main.querySelector('.top');
-	var main_bot = main.querySelector('.bot');
-	var commands_top = commands.querySelector('.top');
-	var commands_bot = commands.querySelector('.bot');
+	var main_top = main.firstElementChild;
+	var main_bot = main.lastElementChild;
+	var commands_top = commands.firstElementChild;
+	var commands_bot = commands.lastElementChild;
 	var nodeIsApplied;
 	var tab, sep;
 

@@ -6,12 +6,12 @@
 		<link rel="stylesheet" type="text/css" href="lib/font-awesome/font-awesome.min.css">
 		<!-- common:css -->
 		<link rel="stylesheet/less" type="text/css" href="style.less">
-		<script src="lib/less.min.js"></script>
+		<script src="lib/less.min.js" data-env="development"></script>
 		<!-- endinject -->
 		<script src="lib/zip.js/zip.js"></script>
 		<title data-i18n=extName></title>
 	</head>
-	<body id=options>
+	<body>
 		<div class=main>
 			<div class="sidebar init">
 				<img src=images/icon128.png>
@@ -19,13 +19,13 @@
 				<div class="line">2013-2015</div>
 				<hr>
 				<div class=sidemenu>
-					<a href=#Installed data-i18n=sideMenuInstalled></a>
-					<a href=#Settings data-i18n=sideMenuSettings></a>
-					<a href=#About data-i18n=sideMenuAbout></a>
+					<a href=#installed data-i18n=sideMenuInstalled></a>
+					<a href=#settings data-i18n=sideMenuSettings></a>
+					<a href=#about data-i18n=sideMenuAbout></a>
 				</div>
 			</div>
 			<div class=content>
-				<div id=tabInstalled class=hide>
+				<div data-tab=installed class="tab tab-installed hide">
 					<div class=header>
 						<button id=bNew data-i18n=buttonNew></button>
 						<button id=bUpdate data-i18n=buttonUpdateAll></button>
@@ -38,16 +38,18 @@
 						<div class="scripts-list"></div>
 					</div>
 				</div>
-				<div id=tabSettings class=hide>
+				<div data-tab=settings class="tab hide">
 					<h1 data-i18n=labelSettings></h1>
-					<label class=line><input type=checkbox id=cUpdate><span data-i18n=labelAutoUpdate></span></label>
-					<label class=line>
+					<div class=line><label>
+						<input type=checkbox id=cUpdate><span data-i18n=labelAutoUpdate></span>
+					</label></div>
+					<div class=line><label>
 						<span data-i18n=labelInjectMode></span>
 						<select id=sInjectMode>
 							<option value=0 data-i18n=injectModeNormal></option>
 							<option value=1 data-i18n=injectModeAdvanced></option>
 						</select>
-					</label>
+					</label></div>
 					<fieldset class=title>
 						<legend data-i18n=labelDataImport></legend>
 						<button id=bImport data-i18n=buttonImportData></button><input type=file class=hide id=iImport>
@@ -57,38 +59,38 @@
 						<legend data-i18n=labelDataExport></legend>
 						<b data-i18n=labelScriptsToExport></b>
 						<label><input type=checkbox id=cbValues><span data-i18n=labelExportScriptData></span></label>
-						<select id=xList multiple></select>
+						<select class=export-list multiple></select>
 						<button id=bSelect data-i18n=buttonAllNone></button>
 						<button id=bExport data-i18n=buttonExportData></button>
 					</fieldset>
 				</div>
-				<div id=tabAbout class=hide>
+				<div data-tab=about class="tab hide">
 					<h1 data-i18n=labelAbout></h1>
 					<div class=line data-i18n=extDescription></div>
 					<div class=line><label data-i18n=labelRelated></label><span data-i18n=anchorSupportPage></span> | <a href=http://gerald.top/donate target=_blank data-i18n=labelDonate></a> | <a href=https://github.com/gera2ld/Violentmonkey/issues target=_blank data-i18n=labelFeedback></a></div>
 					<div class=line><label data-i18n=labelAuthor></label><span data-i18n=anchorAuthor></span></div>
 					<div class=line><label data-i18n=labelTranslator></label><span data-i18n=anchorTranslator></span></div>
-					<div class=line><label data-i18n=labelCurrentLang></label><span id=currentLang></span> | <a href=http://cotrans.geraldl.net target=_blank>Help with translation<i class="fa fa-language"></i></a></div>
+					<div class=line><label data-i18n=labelCurrentLang></label><span id=currentLang></span> | <a href=http://cotrans.geraldl.net target=_blank>Help with translation <i class="fa fa-language"> </i></a></div>
 				</div>
 			</div>
 		</div>
-		<div id=wndEditor class="frame hide">
-			<div class=header>
+		<div class="frame editor-frame hide">
+			<div class=frame-header>
 				<h2 data-i18n=labelScriptEditor></h2>
-				<div class=buttons>
-					<button class=btCustom data-i18n=buttonCustomMeta></button>
+				<div class=frame-buttons>
+					<button data-id=btCustom data-i18n=buttonCustomMeta></button>
 				</div>
 			</div>
-			<div class=body>
-				<div class="code"></div>
-				<div class="meta hide">
+			<div class=frame-body>
+				<div class="editor-code"></div>
+				<div class="editor-meta hide">
 					<table>
 						<tr>
 							<td title="@name" data-i18n=labelName></td>
-							<td class=expand><input type=text class=name></td>
+							<td class=expand><input type=text data-id=name></td>
 							<td title="@run-at" data-i18n=labelRunAt></td>
 							<td>
-								<select class=run-at>
+								<select data-id=run-at>
 									<option value=default data-i18n=labelRunAtDefault></option>
 									<option value=start>document-start</option>
 									<option value=idle>document-idle</option>
@@ -98,53 +100,53 @@
 						</tr>
 						<tr title="@homepageURL">
 							<td data-i18n=labelHomepageURL></td>
-							<td colspan=3 class=expand><input type=text class=homepage></td>
+							<td colspan=3 class=expand><input type=text data-id=homepage></td>
 						</tr>
 					</table>
 					<table>
 						<tr title="@updateURL">
 							<td data-i18n=labelUpdateURL></td>
-							<td class=expand><input type=text class=updateurl></td>
+							<td class=expand><input type=text data-id=updateurl></td>
 						</tr>
 						<tr title="@downloadURL">
 							<td data-i18n=labelDownloadURL></td>
-							<td class=expand><input type=text class=downloadurl></td>
+							<td class=expand><input type=text data-id=downloadurl></td>
 						</tr>
 					</table>
 					<fieldset title="@include">
 						<legend>
 							<span data-i18n=labelInclude></span>
-							<label><input type=checkbox class=keep-include><span data-i18n=labelKeepInclude></span></label>
+							<label><input type=checkbox data-id=keep-include><span data-i18n=labelKeepInclude></span></label>
 						</legend>
 						<div data-i18n=labelCustomInclude></div>
-						<textarea class=include></textarea>
+						<textarea data-id=include></textarea>
 					</fieldset>
 					<fieldset title="@match">
 						<legend>
 							<span data-i18n=labelMatch></span>
-							<label><input type=checkbox class=keep-match><span data-i18n=labelKeepMatch></span></label>
+							<label><input type=checkbox data-id=keep-match><span data-i18n=labelKeepMatch></span></label>
 						</legend>
 						<div data-i18n=labelCustomMatch></div>
-						<textarea class=match></textarea>
+						<textarea data-id=match></textarea>
 					</fieldset>
 					<fieldset title="@exclude">
 						<legend>
 							<span data-i18n=labelExclude></span>
-							<label><input type=checkbox class=keep-exclude><span data-i18n=labelKeepExclude></span></label>
+							<label><input type=checkbox data-id=keep-exclude><span data-i18n=labelKeepExclude></span></label>
 						</legend>
 						<div data-i18n=labelCustomExclude></div>
-						<textarea class=exclude></textarea>
+						<textarea data-id=exclude></textarea>
 					</fieldset>
 				</div>
 			</div>
-			<div class=footer>
-				<div class=options>
-					<label><input type=checkbox class="update"><span data-i18n=labelAllowUpdate></span></label>
+			<div class=frame-footer>
+				<div class=left>
+					<label><input type=checkbox data-id="update"><span data-i18n=labelAllowUpdate></span></label>
 				</div>
 				<div class=right>
-					<button class="save" data-i18n=buttonSave></button>
-					<button class="savenclose" data-i18n=buttonSaveClose></button>
-					<button class="close" data-i18n=buttonClose></button>
+					<button data-id="save" data-i18n=buttonSave></button>
+					<button data-id="savenclose" data-i18n=buttonSaveClose></button>
+					<button data-id="close" data-i18n=buttonClose></button>
 				</div>
 			</div>
 		</div>

@@ -5,17 +5,17 @@
 		<link rel="shortcut icon" type="image/png" href="images/icon16.png" />
 		<!-- common:css -->
 		<link rel="stylesheet/less" type="text/css" href="style.less">
-		<script src="lib/less.min.js"></script>
+		<script src="lib/less.min.js" data-env="development"></script>
 		<!-- endinject -->
 		<title data-i18n=extName></title>
 	</head>
-	<body id=confirm>
-		<div class=frame>
-			<div class=header>
+	<body>
+		<div class="frame confirm-frame">
+			<div class=frame-header>
 				<h1><span data-i18n=labelInstall></span> - <span data-i18n=extName></span></h1>
-				<div class=buttons>
+				<div class=frame-buttons>
 					<button id=bOptions data-i18n=buttonInstallOptions></button>
-					<div class="options">
+					<div class="confirm-options">
 						<label><input type=checkbox id=cbClose><span data-i18n=installOptionClose></span></label>
 						<label><input type=checkbox id=cbTrack><span data-i18n=installOptionTrack></span></label>
 					</div>
@@ -25,8 +25,8 @@
 				<div id=url class=ellipsis></div>
 				<div id=msg class=ellipsis></div>
 			</div>
-			<div class=body>
-				<div class=code></div>
+			<div class=frame-body>
+				<div class=editor-code></div>
 			</div>
 		</div>
 	</body>

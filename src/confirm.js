@@ -7,7 +7,7 @@
 	var cbClose = $('#cbClose');
 	var cbTrack = $('#cbTrack');
 	var btInstall = $('#bInstall');
-	var options = $('.options');
+	var options = $('.confirm-options');
 	var timer, editor;
 
 	function showMessage(message, title) {
@@ -177,7 +177,7 @@
 	}
 
 	initEditor({
-		container: $('.code'),
+		container: $('.editor-code'),
 		callback: function(_editor) {
 			editor = _editor;
 			location.search.slice(1).split('&').forEach(function(part) {
