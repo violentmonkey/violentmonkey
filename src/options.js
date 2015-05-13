@@ -752,17 +752,9 @@ var Editor = function() {
 	};
 }();
 
-// Load at last
-var switchTab = function() {
-	var menus = $$('.sidemenu>a');
-	var tabs = $$('.content>[data-tab]');
-	var forEach = Array.prototype.forEach;
-	var dict = {};
-	forEach.call(tabs, function(tab) {
-		dict[tab.dataset.tab] = tab;
-	});
-	var currentTab = null;
-	return function(e) {
+// Switch tab
+!function() {
+	function switchTab(e) {
 		var current;
 		forEach.call(menus, function(menu) {
 			var href = menu.getAttribute('href');
@@ -782,8 +774,19 @@ var switchTab = function() {
 		currentTab.classList.remove('hide');
 		if(current == 'settings') Transporter.initList();
 	};
+	var menus = $$('.sidemenu>a');
+	var tabs = $$('.content>[data-tab]');
+	var forEach = Array.prototype.forEach;
+	var dict = {};
+	forEach.call(tabs, function(tab) {
+		dict[tab.dataset.tab] = tab;
+	});
+	var currentTab = null;
+	window.addEventListener('hashchange', switchTab, false);
+	switchTab();
 }();
 
+// Load at last
 !function() {
 	$('.sidebar').classList.remove('init');
 	$('#currentLang').innerHTML = navigator.language;
@@ -814,11 +817,8 @@ var switchTab = function() {
 	$('#bUpdate').addEventListener('click', function(e) {
 		chrome.runtime.sendMessage({cmd:'CheckUpdateAll'});
 	}, false);
-	$('.sidemenu').addEventListener('click', switchTab, false);
-	window.addEventListener('popstate', switchTab, false);
 	chrome.runtime.sendMessage({cmd:'GetData'}, scriptList.setData);
 	var port = chrome.runtime.connect({name:'Options'});
 	port.onMessage.addListener(scriptList.updateItem);
 	initI18n();
-	switchTab();
 }();
