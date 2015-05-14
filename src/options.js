@@ -558,12 +558,7 @@ var Transporter = function() {
 		}, false);
 	}
 
-	cbValues.checked = getOption('exportValues');
-	cbValues.addEventListener('change', function(e) {
-		setOption('exportValues', this.checked);
-	}, false);
 	bindEvents();
-
 	return {
 		initList: function() {
 			xList.innerHTML = '';
@@ -788,15 +783,19 @@ var Editor = function() {
 
 // Load at last
 !function() {
+	Array.prototype.forEach.call($$('[type=checkbox][data-check]'), function(node) {
+		var key = node.dataset.check;
+		node.checked = getOption(key);
+		node.addEventListener('change', function(e) {
+			setOption(key, this.checked);
+		}, false);
+	});
+
 	$('.sidebar').classList.remove('init');
 	$('#currentLang').innerHTML = navigator.language;
-	$('#cUpdate').checked = getOption('autoUpdate');
 	$('#sInjectMode').value = getOption('injectMode');
 	$('#cUpdate').addEventListener('change', function(e) {
-		chrome.runtime.sendMessage({
-			cmd: 'AutoUpdate',
-			data: this.checked,
-		});
+		chrome.runtime.sendMessage({cmd: 'AutoUpdate'});
 	}, false);
 	$('#sInjectMode').addEventListener('change', function(e) {
 		setOption('injectMode', this.value);

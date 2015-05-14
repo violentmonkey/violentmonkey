@@ -7,6 +7,7 @@ var stopPropagation = function(e) {e.stopPropagation();};
 var defaults = {
 	isApplied: true,
 	autoUpdate: true,
+	ignoreGrant: false,
 	lastUpdate: 0,
 	exportValues: true,
 	closeAfterInstall: false,
