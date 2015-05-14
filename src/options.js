@@ -245,7 +245,7 @@ var scriptList = function() {
 		var node = data.node;
 		var top = (height + gap) * i + gap;
 		var delta = 60 * (i + 1);
-		if(node.style.top == '' && top < parent.clientHeight) {
+		if(node.style.top == '' && top < wrap.clientHeight) {
 			top += delta;
 			node.style.opacity = 0;
 			setTimeout(function(){
