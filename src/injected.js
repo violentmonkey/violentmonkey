@@ -1,10 +1,12 @@
-(function(){
+!function(){
 // avoid running repeatedly due to new document.documentElement
-if(window.VM) return;window.VM=1;
+if (window.VM) return;
+window.VM = 1;
 
-function getUniqId(){
-	return Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+function getUniqId() {
+	return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
+
 /**
 * http://www.webtoolkit.info/javascript-utf8.html
 */
@@ -29,469 +31,612 @@ function utf8decode (utftext) {
 	return string;
 }
 
-// Messages
-chrome.runtime.onMessage.addListener(function(req,src) {
-	var maps={
-		Command:command,
-		GetPopup:getPopup,
-		GetBadge:getBadge,
-		HttpRequested:httpRequested,
-	},f=maps[req.cmd];
-	if(f) f(req.data,src);
-});
 function getPopup(){
 	// XXX: only scripts run in top level window are counted
-	if(top===window)
-		chrome.runtime.sendMessage({cmd:'SetPopup',data:{ids:ids,menus:menus}});
+	if(top === window)
+		chrome.runtime.sendMessage({
+			cmd: 'SetPopup',
+			data: {
+				ids: ids,
+				menus: menus,
+			},
+		});
 }
+
+var badge = {
+	number: 0,
+	ready: false,
+	willSet: false,
+};
 function getBadge(){
-	// XXX: only scripts run in top level window are counted
-	if(top===window)
-		chrome.runtime.sendMessage({cmd:'SetBadge',data:total});
+	badge.willSet = true;
+	setBadge();
+}
+function setBadge(){
+	if (badge.ready && badge.willSet) {
+		// XXX: only scripts run in top level window are counted
+		if (top === window)
+			chrome.runtime.sendMessage({cmd: 'SetBadge', data: badge.number});
+	}
 }
 
 // Communicator
-var comm={
-	vmid:'VM_'+getUniqId(),
-	state:0,
-	utf8decode:utf8decode,
-	getUniqId:getUniqId,
+var comm = {
+	vmid: 'VM_' + getUniqId(),
+	state: 0,
+	utf8decode: utf8decode,
+	getUniqId: getUniqId,
 
 	// Array functions
 	// to avoid using prototype functions
 	// since they may be changed by page scripts
-	inArray:function(arr, item) {
-		for(var i=0;i<arr.length;i++)
-			if(arr[i]==item) return true;
+	inArray: function(arr, item) {
+		for (var i = 0; i < arr.length; i ++)
+			if (arr[i] == item) return true;
 		return false;
 	},
-	extendArray:function(arr, arr2) {
-		for(var i=0;i<arr2.length;i++) arr.push(arr2[i]);
+	extendArray: function(arr, arr2) {
+		for(var i = 0; i < arr2.length; i ++) arr.push(arr2[i]);
 	},
-	forEach:function(arr, func, args) {
-		for(var i=0;i<arr.length;i++) {
-			var a=[arr[i]];
-			if(args) this.extendArray(a,args);
-			func.apply(arr,a);
+	forEach: function(arr, func, args) {
+		for(var i = 0; i < arr.length; i ++) {
+			var _args = [arr[i]];
+			if(args) this.extendArray(_args, args);
+			func.apply(arr, _args);
 		}
 	},
 
-	prop1:Object.getOwnPropertyNames(window),
-	prop2:(function(n,p){
+	prop1: Object.getOwnPropertyNames(window),
+	prop2: (function(n,p){
 		while(n=Object.getPrototypeOf(n)) p=p.concat(Object.getOwnPropertyNames(n));
 		return p;
 	})(window,[]),
-	init:function(s,d){
-		var comm=this;
-		comm.sid=comm.vmid+s;
-		comm.did=comm.vmid+d;
-		document.addEventListener(comm.sid,comm['handle'+s].bind(comm),false);
-		comm.load=comm.checkLoad=function(){};
+	init: function(srcId, destId) {
+		var comm = this;
+		comm.sid = comm.vmid + srcId;
+		comm.did = comm.vmid + destId;
+		document.addEventListener(comm.sid, comm['handle' + srcId].bind(comm), false);
+		comm.load = comm.checkLoad = function(){};
 	},
-	post:function(d){
-		var e=document.createEvent("MutationEvent");
-		e.initMutationEvent(this.did,false,false,null,null,null,JSON.stringify(d),e.ADDITION);
+	post: function(data) {
+		var e = document.createEvent("MutationEvent");
+		e.initMutationEvent(this.did, false, false, null, null, null, JSON.stringify(data), e.ADDITION);
 		document.dispatchEvent(e);
 	},
-	handleR:function(e){
-		var o=JSON.parse(e.attrName),comm=this,maps={
-			LoadScript:comm.loadScript.bind(comm),
-			Command:function(o){
-				var f=comm.command[o];
-				if(f) f();
+	handleR: function(e) {
+		var obj = JSON.parse(e.attrName);
+		var comm = this;
+		var maps = {
+			LoadScript: comm.loadScript.bind(comm),
+			Command: function (data) {
+				var func = comm.command[data];
+				if(func) func();
 			},
-			GotRequestId:function(o){comm.qrequests.shift().start(o);},
-			HttpRequested:function(o){
-				var c=comm.requests[o.id];
-				if(c) c.callback(o);
+			GotRequestId: function (id) {
+				comm.qrequests.shift().start(id);
 			},
-			Injected:function(u){
-				var o=comm.ainject[u],f=window['VM_'+u];
-				delete window['VM_'+u];delete comm.ainject[u];
-				if(o&&f) {
-					comm.runCode(o[0],f,o[1]);
-				}
+			HttpRequested: function (r) {
+				var req = comm.requests[r.id];
+				if (req) req.callback(r);
 			},
-		},f=maps[o.cmd];
-		if(f) f(o.data);
+			// advanced inject
+			Injected: function (id) {
+				var obj = comm.ainject[id];
+				var func = window['VM_' + id];
+				delete window['VM_' + id];
+				delete comm.ainject[id];
+				if (obj && func) comm.runCode(obj[0], func, obj[1]);
+			},
+		};
+		var func = maps[obj.cmd];
+		if (func) func(obj.data);
 	},
-	runCode:function(name,func,wrapper){
+	runCode: function(name, func, wrapper) {
 		try{
-			func.call(wrapper.window,wrapper);
+			func.call(wrapper.window, wrapper);
 		}catch(e){
-			console.log('Error running script: '+name+'\n'+e.message);
+			console.log('Error running script: ' + name + '\n' + e.message);
 		}
 	},
-	initRequest:function(){
+	initRequest: function() {
 		// request functions
-		function reqAbort(){comm.post({cmd:'AbortRequest',data:this.id});}
+		function reqAbort(){
+			comm.post({cmd: 'AbortRequest', data: this.id});
+		}
 
 		// request object functions
-		function callback(d){
-			var i,t=this,c=t.details['on'+d.type];
-			if(c) {
-				if(d.data.response) {
+		function callback(req){
+			var t = this;
+			var cb = t.details['on' + req.type];
+			if (cb) {
+				if(req.data.response) {
 					if(!t.data.length) {
-						if(d.resType) {	// blob or arraybuffer
-							var m=d.data.response.match(/^data:(.*?);base64,(.*)$/);
-							if(!m) d.data.response=null;
+						if(req.resType) {	// blob or arraybuffer
+							var m = req.data.response.match(/^data:(.*?);base64,(.*)$/);
+							if (!m) req.data.response = null;
 							else {
-								var b=window.atob(m[2]);
-								if(t.details.responseType=='blob') {
-									t.data.push(new Blob([b],{type:m[1]}));
-								} else {	// arraybuffer
-									m=new Uint8Array(b.length);
-									for(i=0;i<b.length;i++) m[i]=b.charCodeAt(i);
+								var b = window.atob(m[2]);
+								if(t.details.responseType == 'blob')
+									t.data.push(new Blob([b], {type: m[1]}));
+								else {	// arraybuffer
+									m = new Uint8Array(b.length);
+									for(var i = 0; i < b.length; i ++) m[i] = b.charCodeAt(i);
 									t.data.push(m.buffer);
 								}
 							}
-						} else if(t.details.responseType=='json')	// json
-							t.data.push(JSON.parse(d.data.response));
+						} else if(t.details.responseType == 'json')	// json
+							t.data.push(JSON.parse(req.data.response));
 						else	// text
-							t.data.push(d.data.response);
+							t.data.push(req.data.response);
 					}
-					d.data.response=t.data[0];
+					req.data.response = t.data[0];
 				}
-				c(d.data);
+				cb(req.data);
 			}
-			if(d.type=='loadend') delete comm.requests[t.id];
+			if (req.type == 'loadend') delete comm.requests[t.id];
 		}
-		function start(id){
-			var t=this,data={
-				id:id,
-				method:t.details.method,
-				url:t.details.url,
-				data:t.details.data,
-				//async:!t.details.synchronous,
-				user:t.details.user,
-				password:t.details.password,
-				headers:t.details.headers,
-				overrideMimeType:t.details.overrideMimeType,
+		function start(id) {
+			var t = this;
+			var data = {
+				id: id,
+				method: t.details.method,
+				url: t.details.url,
+				data: t.details.data,
+				//async: !t.details.synchronous,
+				user: t.details.user,
+				password: t.details.password,
+				headers: t.details.headers,
+				overrideMimeType: t.details.overrideMimeType,
 			};
-			t.id=id;
-			comm.requests[id]=t;
-			if(comm.inArray(['arraybuffer','blob'],t.details.responseType)) data.responseType='blob';
-			comm.post({cmd:'HttpRequest',data:data});
+			t.id = id;
+			comm.requests[id] = t;
+			if(comm.inArray(['arraybuffer', 'blob'], t.details.responseType))
+				data.responseType = 'blob';
+			comm.post({cmd: 'HttpRequest', data: data});
 		}
-		function getFullUrl(url){
-			var a=document.createElement('a');
-			a.setAttribute('href',url);
+		function getFullUrl(url) {
+			var a = document.createElement('a');
+			a.setAttribute('href', url);
 			return a.href;
 		}
 
-		var comm=this;
-		comm.requests={};
-		comm.qrequests=[];
-		comm.Request=function(details){
-			var t={
-				details:details,
-				callback:callback,
-				start:start,
-				req:{
-					abort:reqAbort,
+		var comm = this;
+		comm.requests = {};
+		comm.qrequests = [];
+		comm.Request = function(details) {
+			var t = {
+				details: details,
+				callback: callback,
+				start: start,
+				req: {
+					abort: reqAbort,
 				},
-				data:[],
+				data: [],
 			};
-			details.url=getFullUrl(details.url);
+			details.url = getFullUrl(details.url);
 			comm.qrequests.push(t);
 			comm.post({cmd:'GetRequestId'});
 			return t.req;
 		};
 	},
-	initWrapper:function(){
+	initWrapper: function() {
 		// wrapper: wrap functions as needed, return and set properties
-		function wrapItem(key,thisObj,wrap){
-			var type=null,value,apply=Function.apply;
+		function wrapItem(key, thisObj, wrap) {
+			var type;
+			var value;
+			var apply = Function.apply;
 			function initProperty() {
-				if(!comm.inArray(['function','custom'],type)) {
-					value=window[key];
-					type=typeof value;
-					if(wrap&&type=='function') {
-						var o=value;
-						value=function(){
+				if(!comm.inArray(['function', 'custom'], type)) {
+					value = window[key];
+					type = typeof value;
+					if(wrap && type == 'function') {
+						var func = value;
+						value = function () {
 							var r;
 							try {
-								r=apply.apply(o,[window,arguments]);
+								r = apply.apply(func, [window, arguments]);
 							} catch(e) {
-								console.log('[Violentmonkey] Error calling '+key+':\n'+e.stack);
+								console.log('[Violentmonkey] Error calling ' + key + ':\n' + e.stack);
 							}
-							return r===window?thisObj:r;
+							return r === window ? thisObj : r;
 						};
-						value.__proto__=o;
-						value.prototype=o.prototype;
+						value.__proto__ = func;
+						value.prototype = func.prototype;
 					}
 				}
 			}
 			try {
-				Object.defineProperty(thisObj,key,{
-					get:function(){
+				Object.defineProperty(thisObj, key, {
+					get: function () {
 						initProperty();
-						return value===window?thisObj:value;
+						return value === window ? thisObj : value;
 					},
-					set:function(v){
+					set: function (_value) {
 						initProperty();
-						value=v;
-						if(type!='function') window[key]=v;
-						type='custom';
+						value = _value;
+						if(type != 'function') window[key] = _value;
+						type = 'custom';
 					},
 				});
 			} catch(e) {
 				// ignore protected data
 			}
 		}
-		var comm=this;
-		comm.Wrapper=function(){
-			comm.forEach(comm.prop1,wrapItem,[this]);
-			comm.forEach(comm.prop2,wrapItem,[this,true]);
+		var comm = this;
+		comm.Wrapper = function () {
+			comm.forEach(comm.prop1, wrapItem, [this]);
+			comm.forEach(comm.prop2, wrapItem, [this, true]);
 		};
 	},
-	wrapGM:function(c,value,cache){
+	wrapGM: function(script, value, cache) {
 		// Add GM functions
 		// Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-		var gm={},g=c.meta.grant||[],urls={},comm=this;
-		if(!g.length||g.length==1&&g[0]=='none') {	// @grant none
-			g.pop();
-		} else {
-			if(!comm.Wrapper) comm.initWrapper();
-			gm['window']=new comm.Wrapper();
+		var comm = this;
+		var gm = {};
+		var grant = script.meta.grant || [];
+		var urls = {};
+		if (!grant.length || grant.length == 1 && grant[0] == 'none')
+			// @grant none
+			grant.pop();
+		else {
+			if (!comm.Wrapper) comm.initWrapper();
+			gm['window'] = new comm.Wrapper();
 		}
-		value=value||{};
-		if(!comm.inArray(g,'unsafeWindow')) g.push('unsafeWindow');
-		function propertyToString(){return 'Property for Violentmonkey: designed by Gerald';}
-		function addProperty(name,prop,obj){
-			if('value' in prop) prop.writable=false;
-			prop.configurable=false;
-			Object.defineProperty(obj,name,prop);
-			if(typeof obj[name]=='function') obj[name].toString=propertyToString;
+		value = value || {};
+		if(!comm.inArray(grant, 'unsafeWindow')) grant.push('unsafeWindow');
+		function propertyToString() {
+			return '[Violentmonkey property]';
 		}
-		var resources=c.meta.resources||{},gf={
-			unsafeWindow:{value:window},
-			GM_info:{get:function(){
-				var m=c.code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/),
-						script={
-							description:c.meta.description||'',
-							excludes:c.meta.exclude.concat(),
-							includes:c.meta.include.concat(),
-							matches:c.meta.match.concat(),
-							name:c.meta.name||'',
-							namespace:c.meta.namespace||'',
-							resources:{},
-							'run-at':c.meta['run-at']||'document-end',
-							unwrap:false,
-							version:c.meta.version||'',
-						},
-						o={};
-				addProperty('script',{value:{}},o);
-				addProperty('scriptMetaStr',{value:m?m[1]:''},o);
-				addProperty('scriptWillUpdate',{value:c.update},o);
-				addProperty('version',{value:undefined},o);
-				for(m in script) addProperty(m,{value:script[m]},o.script);
-				for(m in c.meta.resources) addProperty(m,{value:c.meta.resources[m]},o.script.resources);
-				return o;
-			}},
-			GM_deleteValue:{value:function(key){
-				delete value[key];comm.post({cmd:'SetValue',data:{uri:c.uri,values:value}});
-			}},
-			GM_getValue:{value:function(k,d){
-				var v=value[k];
-				if(v) {
-					k=v[0];
-					v=v.slice(1);
-					switch(k){
-						case 'n': d=Number(v);break;
-						case 'b': d=v=='true';break;
-						case 'o': try{d=JSON.parse(v);}catch(e){console.log(e);}break;
-						default: d=v;
+		function addProperty(name, prop, obj) {
+			if('value' in prop) prop.writable = false;
+			prop.configurable = false;
+			Object.defineProperty(obj, name, prop);
+			if (typeof obj[name] == 'function')
+				obj[name].toString = propertyToString;
+		}
+		function saveValues() {
+			comm.post({
+				cmd: 'SetValue',
+				data: {
+					uri: script.uri,
+					values: value,
+				},
+			});
+		}
+		var resources = script.meta.resources || {};
+		var gm_funcs = {
+			unsafeWindow: {value: window},
+			GM_info: {
+				get: function () {
+					var m = script.code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
+					var data = {
+						description: script.meta.description || '',
+						excludes: script.meta.exclude.concat(),
+						includes: script.meta.include.concat(),
+						matches: script.meta.match.concat(),
+						name: script.meta.name || '',
+						namespace: script.meta.namespace || '',
+						resources: {},
+						'run-at': script.meta['run-at'] || 'document-end',
+						unwrap: false,
+						version: script.meta.version || '',
+					};
+					var obj = {};
+					addProperty('script', {value:{}}, obj);
+					addProperty('scriptMetaStr', {value: m ? m[1] : ''}, obj);
+					addProperty('scriptWillUpdate', {value: script.update}, obj);
+					addProperty('version', {value: undefined}, obj);
+					for(m in script) addProperty(m, {value: data[m]}, obj.script);
+					for(m in script.meta.resources)
+						addProperty(m, {value: script.meta.resources[m]}, obj.script.resources);
+					return obj;
+				},
+			},
+			GM_deleteValue: {
+				value: function (key) {
+					delete value[key];
+					saveValues();
+				},
+			},
+			GM_getValue: {
+				value: function(key, val) {
+					var v = value[key];
+					if (v) {
+						var type = v[0];
+						v = v.slice(1);
+						switch(type) {
+							case 'n':
+								val = Number(v);
+								break;
+							case 'b':
+								val = v == 'true';
+								break;
+							case 'o':
+								try {
+									val = JSON.parse(v);
+								} catch(e) {
+									console.log(e);
+								}
+								break;
+							default:
+								val = v;
+						}
 					}
-				}
-				return d;
-			}},
-			GM_listValues:{value:function(){return Object.getOwnPropertyNames(value);}},
-			GM_setValue:{value:function(key,val){
-				var t=(typeof val)[0];
-				switch(t){
-					case 'o':val=t+JSON.stringify(val);break;
-					default:val=t+val;
-				}
-				value[key]=val;comm.post({cmd:'SetValue',data:{uri:c.uri,values:value}});
-			}},
-			GM_getResourceText:{value:function(name){
-				var i,u;
-				for(i in resources) if(name==i) {
-					u=cache[resources[i]];
-					if(u) u=comm.utf8decode(window.atob(u));
-					return u;
-				}
-			}},
-			GM_getResourceURL:{value:function(name){
-				var i,u,r,j,b;
-				for(i in resources) if(name==i) {
-					i=resources[i];u=urls[i];
-					if(!u&&(r=cache[i])) {
-						r=window.atob(r);
-						b=new Uint8Array(r.length);
-						for(j=0;j<r.length;j++) b[j]=r.charCodeAt(j);
-						b=new Blob([b]);
-						urls[i]=u=URL.createObjectURL(b);
+					return val;
+				},
+			},
+			GM_listValues: {
+				value: function () {
+					return Object.getOwnPropertyNames(value);
+				},
+			},
+			GM_setValue: {
+				value: function (key, val) {
+					var type = (typeof val)[0];
+					switch(type) {
+						case 'o':
+							val = type + JSON.stringify(val);
+							break;
+						default:
+							val = type + val;
 					}
-					return u;
+					value[key] = val;
+					saveValues();
+				},
+			},
+			GM_getResourceText: {
+				value: function (name) {
+					for(var i in resources) if (name == i) {
+						var text = cache[resources[i]];
+						if (text) text = comm.utf8decode(window.atob(text));
+						return text;
+					}
+				},
+			},
+			GM_getResourceURL: {
+				value: function (name) {
+					for(var i in resources) if (name == i) {
+						i = resources[i];
+						var url = urls[i];
+						if(!url) {
+							var cc = cache[i];
+							if(cc) {
+								cc = window.atob(cc);
+								var b = new Uint8Array(cc.length);
+								for(var j = 0; j < cc.length; j ++)
+									b[j] = cc.charCodeAt(j);
+								b = new Blob([b]);
+								urls[i] = url = URL.createObjectURL(b);
+							}
+						}
+					}
+					return url;
 				}
-			}},
-			GM_addStyle:{value:function(css){
-				if(document.head) {
-					var v=document.createElement('style');
-					v.innerHTML=css;
-					document.head.appendChild(v);
-					return v;
-				}
-			}},
-			GM_log:{value:function(d){console.log(d);}},
-			GM_openInTab:{value:function(url){
-				// XXX: open from background to avoid being blocked
-				var a=document.createElement('a');
-				a.href=url;a.target='_blank';a.click();
-			}},
-			GM_registerMenuCommand:{value:function(cap,func,acc){
-				comm.command[cap]=func;comm.post({cmd:'RegisterMenu',data:[cap,acc]});
-			}},
-			GM_xmlhttpRequest:{value:function(details){
-				if(!comm.Request) comm.initRequest();
-				return comm.Request(details);
-			}},
+			},
+			GM_addStyle: {
+				value: function (css) {
+					if (document.head) {
+						var style = document.createElement('style');
+						style.innerHTML = css;
+						document.head.appendChild(style);
+						return style;
+					}
+				},
+			},
+			GM_log: {
+				value: function (data) {console.log(data);},
+			},
+			GM_openInTab: {
+				value: function (url) {
+					// XXX: open from background to avoid being blocked
+					var a = document.createElement('a');
+					a.href = url;
+					a.target = '_blank';
+					a.click();
+				},
+			},
+			GM_registerMenuCommand: {
+				value: function (cap, func, acc) {
+					comm.command[cap] = func;
+					comm.post({cmd: 'RegisterMenu', data: [cap, acc]});
+				},
+			},
+			GM_xmlhttpRequest: {
+				value: function (details) {
+					if(!comm.Request) comm.initRequest();
+					return comm.Request(details);
+				},
+			},
 		};
-		comm.forEach(g,function(i){var o=gf[i];if(o) addProperty(i,o,gm);});
+		comm.forEach(grant, function (name) {
+			var prop = gm_funcs[name];
+			if(prop) addProperty(name, prop, gm);
+		});
 		return gm;
 	},
-	loadScript:function(data){
-		function buildCode(c){
-			var req=c.meta.require||[],i,r=[],code=[],
-					wrapper=comm.wrapGM(c,data.values[c.uri],data.cache);
-			comm.forEach(Object.getOwnPropertyNames(wrapper),function(i){r.push(i+'=g["'+i+'"]');});
-			if(r.length) code.push('var '+r.join(',')+';delete g;with(this)!function(){');
-			for(i=0;i<req.length;i++) if(r=data.require[req[i]]) code.push(r);
-			code.push('!function(){'+c.code+'\n}.call(this)');	// to make 'use strict' work
-			code.push('}.call(this);');code=code.join('\n');
-			i=c.custom.name||c.meta.name||c.id;
-			if(data.injectMode==1) {	// advanced injection
-				r=comm.getUniqId();
-				comm.ainject[r]=[i,wrapper];
-				comm.post({cmd:'Inject',data:[r,code]});
-			} else {	// normal injection
-				try{
-					r=new Function('g',code);
-				}catch(e){
-					console.log('Syntax error in script: '+i+'\n'+e.message);
+	loadScript: function (data) {
+		function buildCode(script) {
+			var require = script.meta.require || [];
+			var wrapper = comm.wrapGM(script, data.values[script.uri], data.cache);
+			var code = [];
+			var part;
+			comm.forEach(Object.getOwnPropertyNames(wrapper), function(name) {
+				code.push(name + '=g["' + name + '"]');
+			});
+			if (code.length)
+				code = ['var ' + code.join(',') + ';delete g;with(this)!function(){'];
+			else
+				code = [];
+			for(var i = 0; i < require.length; i ++)
+				if(part = data.require[require[i]]) code.push(part);
+			// wrap code to make 'use strict' work
+			code.push('!function(){' + script.code + '\n}.call(this)');
+			code.push('}.call(this);');
+			code = code.join('\n');
+			var name = script.custom.name || script.meta.name || script.id;
+			if (data.injectMode == 1) {
+				// advanced injection
+				var id = comm.getUniqId();
+				comm.ainject[id] = [name, wrapper];
+				comm.post({cmd: 'Inject', data: [id, code]});
+			} else {
+				// normal injection
+				try {
+					var func = new Function('g', code);
+				} catch(e) {
+					console.log('Syntax error in script: ' + name + '\n' + e.message);
 					return;
 				}
-				comm.runCode(i,r,wrapper);
+				comm.runCode(name, func, wrapper);
 			}
 		}
-		function run(list){
-			while(list.length) buildCode(list.shift());
+		function run(list) {
+			while (list.length) buildCode(list.shift());
 		}
-		var start=[],idle=[],end=[],comm=this;
-		comm.command={};comm.ainject={};
-		comm.load=function(){run(end);run(idle);};
-		comm.checkLoad=function(){
-			if(!comm.state&&comm.inArray(['interactive','complete'],document.readyState)) comm.state=1;
-			if(comm.state) comm.load();
+		var comm = this;
+		var start = [];
+		var idle = [];
+		var end = [];
+		comm.command = {};
+		comm.ainject = {};
+		// reset load and checkLoad
+		comm.load = function() {
+			run(end);
+			setTimeout(function() {
+				run(idle);
+			}, 0);
 		};
-		comm.forEach(data.scripts,function(i,l){
-			if(i&&i.enabled) {
-				switch(i.custom['run-at']||i.meta['run-at']){
-					case 'document-start': l=start;break;
-					case 'document-idle': l=idle;break;
-					default: l=end;
+		comm.checkLoad = function() {
+			if (!comm.state && comm.inArray(['interactive', 'complete'], document.readyState))
+				comm.state = 1;
+			if (comm.state) comm.load();
+		};
+		comm.forEach(data.scripts, function(script) {
+			var list;
+			if(script && script.enabled) {
+				switch (script.custom['run-at'] || script.meta['run-at']) {
+					case 'document-start':
+						list = start;
+						break;
+					case 'document-idle':
+						list = idle;
+						break;
+					default:
+						list = end;
 				}
-				l.push(i);
+				list.push(script);
 			}
 		});
-		run(start);comm.checkLoad();
+		run(start);
+		comm.checkLoad();
 	},
-},menus=[],ids=[],total=0;
-function injectScript(o){
-	var f=function(u,did,func){
-		Object.defineProperty(window,'VM_'+u,{
-			value:func,
-			configurable:true,
+};
+
+var menus = [];
+var ids = [];
+function injectScript(data) {
+	// data: [id, code]
+	var func = function(id, did, cb) {
+		Object.defineProperty(window, 'VM_' + id, {
+			value: cb,
+			configurable: true,
 		});
-		var e=document.createEvent("MutationEvent");
-		e.initMutationEvent(did,false,false,null,null,null,JSON.stringify({cmd:'Injected',data:u}),e.ADDITION);
+		var e = document.createEvent("MutationEvent");
+		e.initMutationEvent(did, false, false, null, null, null, JSON.stringify({cmd: 'Injected', data: id}), e.ADDITION);
 		document.dispatchEvent(e);
 	};
-	inject('!'+f.toString()+'('+JSON.stringify(o[0])+','+JSON.stringify(comm.did)+',function(g){'+o[1]+'})');
+	inject('!' + func.toString() + '(' + JSON.stringify(data[0]) + ',' + JSON.stringify(comm.did) + ',function(g){' + data[1] + '})');
 }
-function handleC(e){
-	var o=JSON.parse(e.attrName),maps={
-		SetValue:function(o){
-			chrome.runtime.sendMessage({cmd:'SetValue',data:o});
+function handleC(e) {
+	var req = JSON.parse(e.attrName);
+	var maps = {
+		SetValue: function(data) {
+			chrome.runtime.sendMessage({cmd: 'SetValue', data: data});
 		},
-		RegisterMenu:function(o){
-			if(window.top===window) menus.push(o);
+		RegisterMenu: function(data) {
+			if (window.top === window) menus.push(data);
 		},
-		GetRequestId:getRequestId,
-		HttpRequest:httpRequest,
-		AbortRequest:abortRequest,
-		Inject:injectScript,
-	},f=maps[o.cmd];
-	if(f) f(o.data);
-}
-function command(o){
-	comm.post({cmd:'Command',data:o});
+		GetRequestId: getRequestId,
+		HttpRequest: httpRequest,
+		AbortRequest: abortRequest,
+		Inject: injectScript,
+	};
+	var func = maps[req.cmd];
+	if (func) func(req.data);
 }
 
+// Messages
+chrome.runtime.onMessage.addListener(function(req, src) {
+	var maps = {
+		Command: function(data) {
+			comm.post({cmd: 'Command', data: data});
+		},
+		GetPopup: getPopup,
+		GetBadge: getBadge,
+		HttpRequested: httpRequested,
+	};
+	var func = maps[req.cmd];
+	if (func) func(req.data, src);
+});
+
 // Requests
-var requests={};
+var requests = {};
 function getRequestId() {
-	chrome.runtime.sendMessage({cmd:'GetRequestId'},function(id){
-		requests[id]=1;
-		comm.post({cmd:'GotRequestId',data:id});
+	chrome.runtime.sendMessage({cmd: 'GetRequestId'}, function (id) {
+		requests[id] = 1;
+		comm.post({cmd: 'GotRequestId', data: id});
 	});
 }
 function httpRequest(details) {
-	chrome.runtime.sendMessage({cmd:'HttpRequest',data:details});
+	chrome.runtime.sendMessage({cmd: 'HttpRequest', data: details});
 }
 function httpRequested(data) {
 	if(requests[data.id]) {
-		if(data.type=='loadend') delete requests[data.id];
-		comm.post({cmd:'HttpRequested',data:data});
+		if(data.type == 'loadend') delete requests[data.id];
+		comm.post({cmd: 'HttpRequested', data: data});
 	}
 }
 function abortRequest(id) {
-	chrome.runtime.sendMessage({cmd:'AbortRequest',data:id});
+	chrome.runtime.sendMessage({cmd: 'AbortRequest', data: id});
 }
 
-// For injected scripts
-function objEncode(o){
-	var t=[],i;
-	for(i in o) {
-		if(!o.hasOwnProperty(i)) continue;
-		if(typeof o[i]=='function') t.push(i+':'+o[i].toString());
-		else t.push(i+':'+JSON.stringify(o[i]));
+function objEncode(obj) {
+	var list = [];
+	for(var i in obj) {
+		if(!obj.hasOwnProperty(i)) continue;
+		if(typeof obj[i] == 'function')
+			list.push(i + ':' + obj[i].toString());
+		else
+			list.push(i + ':' + JSON.stringify(obj[i]));
 	}
-	return '{'+t.join(',')+'}';
+	return '{' + list.join(',') + '}';
 }
-function inject(code){
-	var s=document.createElement('script'),d=document.documentElement;
-	s.innerHTML=code;d.appendChild(s);d.removeChild(s);
+function inject(code) {
+	var script = document.createElement('script')
+	var doc = document.body || document.documentElement;
+	script.innerHTML = code;
+	doc.appendChild(script);
+	doc.removeChild(script);
 }
-function initCommunicator(){
-	var C='C',R='R';
-	inject('!'+(function(c,R,C){
-		c.init(R,C);
-		document.addEventListener("DOMContentLoaded",function(e){
-			c.state=1;c.load();
-		},false);
-		c.checkLoad();
-	}).toString()+'('+objEncode(comm)+',"'+R+'","'+C+'")');
-	comm.handleC=handleC;comm.init(C,R);
-	chrome.runtime.sendMessage({cmd:'GetInjected',data:location.href},loadScript);
-}
-function loadScript(o){
-	o.scripts.forEach(function(i){
-		ids.push(i.id);if(i.enabled) total++;
+function loadScript(data) {
+	data.scripts.forEach(function(script) {
+		ids.push(script.id);
+		if (script.enabled) badge.number ++;
 	});
-	comm.post({cmd:'LoadScript',data:o});
+	comm.post({cmd: 'LoadScript', data: data});
+	badge.ready = true;
+	setBadge();
+}
+function initCommunicator() {
+	var C = 'C';
+	var R = 'R';
+	inject(
+		'!function(c,R,C){c.init(R,C);document.addEventListener("DOMContentLoaded",function(e){c.state=1;c.load();},false);c.checkLoad();}(' +
+		objEncode(comm) + ',"' + R + '","' + C + '")'
+	);
+	comm.handleC = handleC;
+	comm.init(C, R);
+	chrome.runtime.sendMessage({cmd: 'GetInjected', data: location.href}, loadScript);
 }
 initCommunicator();
-})();
+}();

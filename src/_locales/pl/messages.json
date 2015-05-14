@@ -139,6 +139,10 @@
 		"description": "Option to allow automatically checking scripts for updates every 24 hours.",
 		"message": "Automatycznie sprawdzaj aktualizacje dla skryptów każdego dnia"
 	},
+	"labelIgnoreGrant": {
+		"description": "Option to suppress no @grant warnings.",
+		"message": "Suppress no @grant warnings"
+	},
 	"labelInjectMode": {
 		"description": "Label to a combo box to choose script injection modes.",
 		"message": "Script injection mode:"

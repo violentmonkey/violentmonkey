@@ -139,6 +139,10 @@
 		"description": "Option to allow automatically checking scripts for updates every 24 hours.",
 		"message": "每天自动更新脚本"
 	},
+	"labelIgnoreGrant": {
+		"description": "Option to suppress no @grant warnings.",
+		"message": "不显示缺少@grant的警告"
+	},
 	"labelInjectMode": {
 		"description": "Label to a combo box to choose script injection modes.",
 		"message": "脚本注入模式："

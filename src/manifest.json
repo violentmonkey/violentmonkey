@@ -29,11 +29,11 @@
 		"run_at": "document_start",
 		"all_frames" : true
 	}],
-	"web_accessible_resources" : [],
 	"permissions" : [
 		"tabs",
 		"<all_urls>",
 		"webRequest",
-		"webRequestBlocking"
+		"webRequestBlocking",
+		"notifications"
 	]
 }
