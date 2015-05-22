@@ -104,7 +104,7 @@ label>* {
 	position: relative;
 }
 .sidebar {
-	transition: top 1s;
+	transition: transform 1s;
 	position: absolute;
 	background: #fafafa;
 	top: 50px;
@@ -124,7 +124,7 @@ label>* {
 		border-top: 1px solid darkgray;
 	}
 	&.init {
-		top: -100%;
+		transform: translate(0,-100%);
 	}
 }
 .sidemenu {
@@ -206,6 +206,7 @@ fieldset.title {
 	top: @menu-height;
 	bottom: 0;
 	width: 100%;
+	overflow-x: hidden;
 	overflow-y: auto;
 }
 .scripts-list {
@@ -216,14 +217,17 @@ fieldset.title {
 .script {
 	border: 1px solid #ccc;
 	border-radius: 5px;
-	transition: top .5s;
+	transition: top .5s,transform .5s,opacity .5s;
 	padding: 10px;
 	left: 10px;
 	right: 10px;
 	position: absolute;
-	opacity: 1;
 	margin-bottom: 10px;
 	background: white;
+	&.entering {
+		transform: translate(50%,0);
+		opacity: 0;
+	}
 	&.dragging {
 		position: fixed;
 		background: lightgreen;
