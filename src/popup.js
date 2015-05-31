@@ -150,9 +150,8 @@ var Popup = function() {
 			});
 		}
 		if(data.ids && data.ids.length) {
-			var ids=[];
-			data.ids.forEach(function(id){
-				if(!scripts[id]) ids.push(id);
+			var ids = data.ids.filter(function (id) {
+				return !scripts[id];
 			});
 			if(ids.length)
 				chrome.runtime.sendMessage({cmd: 'GetMetas', data: ids}, function(scripts) {
@@ -164,7 +163,7 @@ var Popup = function() {
 	}
 
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-		tab=tabs[0];
+		tab = tabs[0];
 		initMenu();
 		chrome.tabs.sendMessage(tab.id, {cmd: 'GetPopup'});
 	});
@@ -175,8 +174,9 @@ var Popup = function() {
 }();
 
 chrome.runtime.onMessage.addListener(function(req, src, callback) {
-	var maps={
+	var maps = {
 		SetPopup: Popup.setData,
-	}, f=maps[req.cmd];
-	if(f) f(req.data, src, callback);
+	}
+	var func = maps[req.cmd];
+	if (func) func(req.data, src, callback);
 });

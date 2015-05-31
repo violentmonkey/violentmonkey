@@ -99,12 +99,11 @@ var comm = {
 		comm.load = comm.checkLoad = function(){};
 	},
 	post: function(data) {
-		var e = document.createEvent("MutationEvent");
-		e.initMutationEvent(this.did, false, false, null, null, null, JSON.stringify(data), e.ADDITION);
+		var e = new CustomEvent(this.did, {detail: data});
 		document.dispatchEvent(e);
 	},
 	handleR: function(e) {
-		var obj = JSON.parse(e.attrName);
+		var obj = e.detail;
 		var comm = this;
 		var maps = {
 			LoadScript: comm.loadScript.bind(comm),
@@ -541,14 +540,13 @@ function injectScript(data) {
 			value: cb,
 			configurable: true,
 		});
-		var e = document.createEvent("MutationEvent");
-		e.initMutationEvent(did, false, false, null, null, null, JSON.stringify({cmd: 'Injected', data: id}), e.ADDITION);
+		var e = new CustomEvent(did, {detail: {cmd: 'Injected', data: id}});
 		document.dispatchEvent(e);
 	};
 	inject('!' + func.toString() + '(' + JSON.stringify(data[0]) + ',' + JSON.stringify(comm.did) + ',function(g){' + data[1] + '})');
 }
 function handleC(e) {
-	var req = JSON.parse(e.attrName);
+	var req = e.detail;
 	var maps = {
 		SetValue: function(data) {
 			chrome.runtime.sendMessage({cmd: 'SetValue', data: data});
