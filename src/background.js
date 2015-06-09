@@ -2,6 +2,7 @@
 var db;
 var port = null;
 var position = 0;
+var vm_ver = chrome.app.getDetails().version;
 
 function compareVersion(version1, version2) {
 	version1 = (version1 || '').split('.');
@@ -425,6 +426,7 @@ function getInjected(url, src, callback) {
 		values: {},
 		require: {},
 		injectMode: getOption('injectMode'),
+		version: vm_ver,
 	};
 	var count = 1;
 	if (data.isApplied = getOption('isApplied')) getScripts();
