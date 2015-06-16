@@ -947,6 +947,7 @@ initDb(function() {
 
 // Confirm page
 chrome.webRequest.onBeforeRequest.addListener(function(req) {
+	// onBeforeRequest is fired for local files too
 	if(/\.user\.js([\?#]|$)/.test(req.url)) {
 		var x = new XMLHttpRequest();
 		x.open('GET', req.url, false);
@@ -972,7 +973,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(req) {
 
 // Modifications on headers
 chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
-	var headers = details.requestHeaders
+	var headers = details.requestHeaders;
 	var new_headers = [];
 	var vm_headers = {};
 	headers.forEach(function(header) {

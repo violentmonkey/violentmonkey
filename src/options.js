@@ -20,8 +20,9 @@ function setTitle(node, title, def) {
 }*/
 
 var scriptList = function() {
-	var parent = $('.scripts-list');
 	var wrap = $('.scripts');
+	// the height of `.scripts-list will be fixed
+	var parent = $('.scripts-list');
 	/**
 	 * list = [
 	 *   {
@@ -61,6 +62,7 @@ var scriptList = function() {
 				list.splice(obj.index, 1);
 				delete dict[script.id];
 				parent.removeChild(obj.data.node);
+				updateHeight();
 				for ( var i = obj.index; i < list.length; i ++ )
 					locate(i);
 				if(!list.length) showEmptyHint();
@@ -243,8 +245,11 @@ var scriptList = function() {
 		var top = (height + gap) * i + gap;
 		setTimeout(function(){
 			node.classList.remove('entering');
-		}, ~~ (Math.random() * 500));
+		}, ~~ (Math.random() * 300));
 		node.style.top = top + 'px';
+	}
+	function updateHeight() {
+		parent.style.height = (height + gap) * list.length + gap + 'px';
 	}
 
 	var emptyDom = document.createElement('div');
@@ -364,6 +369,7 @@ var scriptList = function() {
 		node.addEventListener('dragstart', dragstart, false);
 		initNode(data);
 		parent.appendChild(data.node);
+		updateHeight();
 		hideMask();
 	}
 
