@@ -190,7 +190,7 @@ var scriptList = function() {
 			support.title = _('hintSupportPage');
 		}
 		setAuthor(elements.author, script.meta.author || '');
-		setTitle(elements.desc, getLocaleString(script.meta, 'description'));
+		setTitle(elements.desc, getLocaleString(script.meta, 'description', ''));
 		var src;
 		if(script.meta.icon) {
 			src = cache[script.meta.icon];
