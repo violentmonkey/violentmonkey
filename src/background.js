@@ -806,7 +806,7 @@ function exportZip(exp, src, callback) {
 // Requests
 var requests = {};
 var requests_dict = {};
-var special_headers = ['user-agent', 'referer', 'origin'];
+var special_headers = ['user-agent', 'referer', 'origin', 'host'];
 function getRequestId(data, src, callback) {
   var id = getUniqId();
   requests[id] = {
