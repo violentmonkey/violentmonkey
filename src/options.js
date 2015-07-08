@@ -243,9 +243,6 @@ var scriptList = function() {
 		if(!data) return;
 		var node = data.node;
 		var top = (height + gap) * i + gap;
-		setTimeout(function(){
-			node.classList.remove('entering');
-		}, ~~ (Math.random() * 300));
 		node.style.top = top + 'px';
 	}
 	function updateHeight() {
@@ -371,6 +368,9 @@ var scriptList = function() {
 		parent.appendChild(data.node);
 		updateHeight();
 		hideMask();
+		setTimeout(function(){
+			node.classList.remove('entering');
+		}, ~~ (Math.random() * 300));
 	}
 
 	function updateItem(res) {
@@ -763,7 +763,7 @@ var Editor = function() {
 		currentTab = dict[current];
 		currentTab.classList.remove('hide');
 		if(current == 'settings') Transporter.initList();
-	};
+	}
 	var menus = $$('.sidemenu>a');
 	var tabs = $$('.content>[data-tab]');
 	var forEach = Array.prototype.forEach;

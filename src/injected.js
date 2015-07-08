@@ -472,7 +472,7 @@ var comm = {
 			var code = [];
 			var part;
 			comm.forEach(Object.getOwnPropertyNames(wrapper), function(name) {
-				code.push(name + '=g["' + name + '"]');
+				code.push(name + '=this["' + name + '"]=g["' + name + '"]');
 			});
 			if (code.length)
 				code = ['var ' + code.join(',') + ';delete g;with(this)!function(){'];

@@ -154,18 +154,19 @@ fieldset.title {
 	box-sizing: border-box;
 	border-left: 1px solid darkgray;
 	border-right: 1px solid darkgray;
-	height: 100%;
-	overflow-y: auto;
+	overflow-y: hidden;
 }
 .tab {
-	margin: 20px;
+	padding: 20px;
+	overflow-y: auto;
+	height: 100%;
 }
 // Installed scripts
 @menu-height: 30px;
 .tab-installed {
 	height: 100%;
 	width: 100%;
-	margin: 0;
+	padding: 0;
 	&>.header {
 		height: @menu-height;
 		line-height: @menu-height;
