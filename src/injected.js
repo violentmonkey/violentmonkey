@@ -285,6 +285,7 @@ var comm = {
 		}
 		value = value || {};
 		if(!comm.inArray(grant, 'unsafeWindow')) grant.push('unsafeWindow');
+		if(!comm.inArray(grant, 'GM_info')) grant.push('GM_info');
 		function propertyToString() {
 			return '[Violentmonkey property]';
 		}
