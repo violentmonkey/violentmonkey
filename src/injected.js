@@ -561,6 +561,10 @@ function injectScript(data) {
 }
 function handleC(e) {
   var req = e.detail;
+  if (!req) {
+    console.log('[Violentmonkey] Invalid data! There might be unsupported data format.');
+    return;
+  }
   var maps = {
     SetValue: function(data) {
       chrome.runtime.sendMessage({cmd: 'SetValue', data: data});
