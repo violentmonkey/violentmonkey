@@ -4,7 +4,7 @@ zip.workerScriptsPath = 'lib/zip.js/';
 function setTitle(node, title, def) {
   node.title = title || '';
   node.innerHTML = title ? safeHTML(title) :
-    (def || '<em>' + _('labelNoName') + '</em>');
+    (def == null ? '<em>' + _('labelNoName') + '</em>': def);
 }
 
 /*function debounce(cb, delay) {
@@ -190,7 +190,7 @@ var scriptList = function() {
       support.title = _('hintSupportPage');
     }
     setAuthor(elements.author, script.meta.author || '');
-    setTitle(elements.desc, getLocaleString(script.meta, 'description', ''));
+    setTitle(elements.desc, getLocaleString(script.meta, 'description'), '');
     var src;
     if(script.meta.icon) {
       src = cache[script.meta.icon];
