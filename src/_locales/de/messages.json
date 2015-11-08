@@ -61,7 +61,7 @@
 	},
 	"buttonInstallOptions": {
 		"description": "Button to show options of installation confirm page.",
-		"message": "Options"
+		"message": "Optionen"
 	},
 	"installOptionClose": {
 		"description": "Option to close confirm window after installation.",
@@ -141,7 +141,7 @@
 	},
 	"labelIgnoreGrant": {
 		"description": "Option to suppress no @grant warnings.",
-		"message": "Suppress no @grant warnings"
+		"message": "Unterdrücke @grant Warnungen"
 	},
 	"labelInjectMode": {
 		"description": "Label to a combo box to choose script injection modes.",
@@ -225,7 +225,7 @@
 	},
 	"labelCurrentLang": {
 		"description": "Label of current language.",
-		"message": "Current Language:"
+		"message": "Gewählte Sprache:"
 	},
 	"labelScriptEditor": {
 		"description": "Shown in the title of the script editing page.",
@@ -285,7 +285,7 @@
 	},
 	"labelExclude": {
 		"description": "Label of @exclude rules.",
-		"message": "Ausschliene (@exclude)"
+		"message": "Ausschließen (@exclude)"
 	},
 	"labelKeepExclude": {
 		"description": "Option to keep the original @exclude rules.",
@@ -309,7 +309,7 @@
 	},
 	"labelNoScripts": {
 		"description": "Message shown when no script is installed.",
-		"message": "Oops, you haven't got any script yet."
+		"message": "Es ist noch kein Script installiert."
 	},
 	"hintSupportPage": {
 		"description": "Hint for support page.",
