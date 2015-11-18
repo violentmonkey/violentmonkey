@@ -1,0 +1,74 @@
+<div class=frame-header>
+  <h2 data-i18n=labelScriptEditor></h2>
+  <div class=frame-buttons>
+    <button data-id=btCustom data-i18n=buttonCustomMeta></button>
+  </div>
+</div>
+<div class=frame-body>
+  <div class="editor-code"></div>
+  <div class="editor-meta hide">
+    <table>
+      <tr>
+        <td title="@name" data-i18n=labelName></td>
+        <td class=expand><input type=text data-id=name></td>
+        <td title="@run-at" data-i18n=labelRunAt></td>
+        <td>
+          <select data-id=run-at>
+            <option value=default data-i18n=labelRunAtDefault></option>
+            <option value=start>document-start</option>
+            <option value=idle>document-idle</option>
+            <option value=end>document-end</option>
+          </select>
+        </td>
+      </tr>
+      <tr title="@homepageURL">
+        <td data-i18n=labelHomepageURL></td>
+        <td colspan=3 class=expand><input type=text data-id=homepage></td>
+      </tr>
+    </table>
+    <table>
+      <tr title="@updateURL">
+        <td data-i18n=labelUpdateURL></td>
+        <td class=expand><input type=text data-id=updateurl></td>
+      </tr>
+      <tr title="@downloadURL">
+        <td data-i18n=labelDownloadURL></td>
+        <td class=expand><input type=text data-id=downloadurl></td>
+      </tr>
+    </table>
+    <fieldset title="@include">
+      <legend>
+        <span data-i18n=labelInclude></span>
+        <label><input type=checkbox data-id=keep-include><span data-i18n=labelKeepInclude></span></label>
+      </legend>
+      <div data-i18n=labelCustomInclude></div>
+      <textarea data-id=include></textarea>
+    </fieldset>
+    <fieldset title="@match">
+      <legend>
+        <span data-i18n=labelMatch></span>
+        <label><input type=checkbox data-id=keep-match><span data-i18n=labelKeepMatch></span></label>
+      </legend>
+      <div data-i18n=labelCustomMatch></div>
+      <textarea data-id=match></textarea>
+    </fieldset>
+    <fieldset title="@exclude">
+      <legend>
+        <span data-i18n=labelExclude></span>
+        <label><input type=checkbox data-id=keep-exclude><span data-i18n=labelKeepExclude></span></label>
+      </legend>
+      <div data-i18n=labelCustomExclude></div>
+      <textarea data-id=exclude></textarea>
+    </fieldset>
+  </div>
+</div>
+<div class=frame-footer>
+  <div class=left>
+    <label><input type=checkbox data-id="update"><span data-i18n=labelAllowUpdate></span></label>
+  </div>
+  <div class=right>
+    <button data-id="save" data-i18n=buttonSave></button>
+    <button data-id="savenclose" data-i18n=buttonSaveClose></button>
+    <button data-id="close" data-i18n=buttonClose></button>
+  </div>
+</div>
