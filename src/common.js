@@ -1,42 +1,50 @@
 'use strict';
 
-var _ = chrome.i18n.getMessage;
-var $ = document.querySelector.bind(document);
-var $$ = document.querySelectorAll.bind(document);
-var stopPropagation = function(e) {e.stopPropagation();};
-var defaults = {
-	isApplied: true,
-	autoUpdate: true,
-	ignoreGrant: false,
-	lastUpdate: 0,
-	exportValues: true,
-	closeAfterInstall: false,
-	trackLocalFile: false,
-	injectMode: 0,
-};
+_ = window._ || {};
+_.i18n = chrome.i18n.getMessage;
 
-function getOption(key, def) {
-	var value = localStorage.getItem(key), obj;
-	if(value) try {
-		obj = JSON.parse(value);
-	} catch(e) {
-		obj = def;
-	} else obj = def;
-	if(typeof obj === 'undefined')
-		obj = defaults[key];
-	return obj;
-}
+_.options = function () {
+  var defaults = {
+    isApplied: true,
+    autoUpdate: true,
+    ignoreGrant: false,
+    lastUpdate: 0,
+    exportValues: true,
+    closeAfterInstall: false,
+    trackLocalFile: false,
+    injectMode: 0,
+  };
 
-function setOption(key, value) {
-	if(key in defaults)
-		localStorage.setItem(key, JSON.stringify(value));
-}
+  function getOption(key, def) {
+    var value = localStorage.getItem(key), obj;
+    if (value)
+      try {
+        obj = JSON.parse(value);
+      } catch(e) {
+        obj = def;
+      }
+      else obj = def;
+      if (obj == null) obj = defaults[key];
+      return obj;
+  }
 
-function getAllOptions() {
-	var options = {};
-	for(var i in defaults) options[i] = getOption(i);
-	return options;
-}
+  function setOption(key, value) {
+    if (key in defaults)
+      localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function getAllOptions() {
+    var options = {};
+    for (var i in defaults) options[i] = getOption(i);
+    return options;
+  }
+
+  return {
+    get: getOption,
+    set: setOption,
+    getAll: getAllOptions,
+  };
+}();
 
 /*
 function format() {
@@ -49,7 +57,7 @@ function format() {
 */
 
 function safeHTML(html) {
-	return html.replace(/[&<]/g, function(m) {
+	return html.replace(/[&<]/g, function (m) {
 		return {
 			'&': '&amp;',
 			'<': '&lt;',
@@ -57,22 +65,18 @@ function safeHTML(html) {
 	});
 }
 
-function initI18n(callback){
-	window.addEventListener('DOMContentLoaded', function() {
-		Array.prototype.forEach.call($$('[data-i18n]'), function(node) {
-			node.innerHTML = _(node.dataset.i18n);
-		});
-		if(callback) callback();
+function initI18n(callback) {
+	window.addEventListener('DOMContentLoaded', function () {
 	}, false);
 }
 
 /**
- * Get locale attributes such as @name:zh-CN
+ * Get locale attributes such as `@name:zh-CN`
  */
-function getLocaleString(dict, key){
-	navigator.languages.some(function(lang) {
+function getLocaleString(dict, key) {
+	navigator.languages.some(function (lang) {
 		var keylang = key + ':' + lang;
-		if(keylang in dict) {
+		if (keylang in dict) {
 			key = keylang;
 			return true;
 		}

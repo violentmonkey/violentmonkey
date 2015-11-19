@@ -22,7 +22,7 @@
 	"background" : {
 		"page" : "background.html"
 	},
-	"options_page" : "options.html",
+	"options_page" : "options/index.html",
 	"content_scripts": [{
 		"js": ["injected.js"],
 		"matches": ["<all_urls>"],

@@ -1,0 +1,91 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  height: 100%;
+  background: #eee;
+  font: menu;
+  font-size: 12px;
+}
+h1 {
+  text-shadow: #999 3px 3px 5px;
+}
+h1, h2 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+button {
+  padding: 0 .5rem;
+}
+a {
+  color: dodgerblue;
+}
+textarea, input[type=text] {
+  width: 100%;
+}
+hr {
+  border: none;
+  border-top: 1px solid darkgray;
+}
+.right {
+  float: right;
+}
+
+#app {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.main {
+  position: relative;
+  max-width: 900px;
+  height: 100%;
+  margin: 0 auto;
+}
+aside {
+  position: absolute;
+  background: #fafafa;
+  top: 50px;
+  left: 0;
+  width: 200px;
+  padding: 10px 10px 0;
+  border: 1px solid darkgray;
+  border-radius: 10px 0 0 10px;
+  border-right: none;
+  text-align: right;
+}
+aside img {
+  width: 64px;
+}
+#tab {
+  position: relative;
+  height: 100%;
+  margin-left: 200px;
+  background: white;
+  border-left: 1px solid darkgray;
+  border-right: 1px solid darkgray;
+  overflow-y: hidden;
+}
+#tab > .header {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 .5rem;
+  border-bottom: 1px solid darkgray;
+}
+.mask {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,.2);
+  transition: opacity 1s;
+  text-align: center;
+}
+.mask > * {
+  font-size: 2rem;
+}
