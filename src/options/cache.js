@@ -3,10 +3,10 @@
     this.data = {};
     this.allowOverride = allowOverride;
   }
-  Cache.prototype.put = function (key, value) {
+  Cache.prototype.put = function (key, fn) {
     if (key in this.data)
       throw 'Key {' + key + '} already exists!';
-    this.data[key] = value;
+    this.data[key] = fn;
   };
   Cache.prototype.get = function (key) {
     var data = this.data;
@@ -15,7 +15,7 @@
       var xhr = new XMLHttpRequest();
       xhr.open('GET', key, true);
       xhr.onload = function () {
-        resolve(this.responseText);
+        resolve(_.template(this.responseText, {variable: 'it'}));
       };
       xhr.onerror = function () {
         reject(this);

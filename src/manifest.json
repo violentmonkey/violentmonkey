@@ -1,39 +1,46 @@
 {
-	"name": "Violent monkey",
-	"version" : "2.1.10.4",
-	"manifest_version" : 2,
-	"description" : "__MSG_extDescription__",
-	"developer": {
-		"name" : "Gerald",
-		"url" : "http://gerald.top"
-	},
-	"homepage_url":"http://gerald.top/code/vm?from=nex",
-	"icons" : {
-		"16":"images/icon16.png",
-		"48":"images/icon48.png",
-		"128":"images/icon128.png"
-	},
-	"default_locale":"en",
-	"browser_action" : {
-		"default_icon":"images/icon19.png",
-		"default_title":"__MSG_extName__",
-		"default_popup":"popup.html"
-	},
-	"background" : {
-		"page" : "background.html"
-	},
-	"options_page" : "options/index.html",
-	"content_scripts": [{
-		"js": ["injected.js"],
-		"matches": ["<all_urls>"],
-		"run_at": "document_start",
-		"all_frames" : true
-	}],
-	"permissions" : [
-		"tabs",
-		"<all_urls>",
-		"webRequest",
-		"webRequestBlocking",
-		"notifications"
-	]
+  "name": "Violent monkey",
+  "version": "2.1.10.4",
+  "manifest_version": 2,
+  "description": "__MSG_extDescription__",
+  "developer": {
+    "name": "Gerald",
+    "url": "http://gerald.top"
+  },
+  "homepage_url": "http://gerald.top/code/vm?from=nex",
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "default_locale": "en",
+  "browser_action": {
+    "default_icon": "images/icon19.png",
+    "default_title": "__MSG_extName__",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "page": "background.html"
+  },
+  "options_page": "options/index.html",
+  "content_scripts": [
+    {
+      "js": [
+        "injected.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "permissions": [
+    "tabs",
+    "<all_urls>",
+    "webRequest",
+    "webRequestBlocking",
+    "notifications"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

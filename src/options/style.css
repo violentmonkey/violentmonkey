@@ -10,11 +10,12 @@ body {
   font-size: 12px;
 }
 h1 {
+  font-size: 1.5rem;
   text-shadow: #999 3px 3px 5px;
 }
 h1, h2 {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 1rem;
+  margin-bottom: .5rem;
 }
 button {
   padding: 0 .5rem;
@@ -31,6 +32,11 @@ hr {
 }
 .right {
   float: right;
+}
+.ellipsis {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 #app {
@@ -61,6 +67,18 @@ aside {
 aside img {
   width: 64px;
 }
+.sidemenu > a {
+  display: block;
+  line-height: 2.5em;
+  font-size: 1.17em;
+  font-weight: bold;
+  text-decoration: none;
+  color: gray;
+}
+.sidemenu > a.active,
+.sidemenu > a:hover {
+  color: black;
+}
 #tab {
   position: relative;
   height: 100%;
@@ -76,16 +94,116 @@ aside img {
   padding: 0 .5rem;
   border-bottom: 1px solid darkgray;
 }
-.mask {
+.backdrop {
   position: absolute;
+  display: none;
   top: 30px;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,.2);
-  transition: opacity 1s;
   text-align: center;
+  color: gray;
 }
-.mask > * {
+.backdrop > *, .backdrop::after {
+  display: inline-block;
+	vertical-align: middle;
   font-size: 2rem;
+}
+.backdrop::after {
+  content: ' ';
+  width: 0;
+  height: 100%;
+}
+.mask {
+  background: rgba(0,0,0,.1);
+  /*transition: opacity 1s;*/
+}
+#currentLang {
+	color: green;
+	font-weight: bold;
+}
+.line {
+	display: block;
+	margin: 1em 0;
+}
+.content {
+  height: 100%;
+  padding: 20px;
+  overflow-y: auto;
+}
+fieldset.title {
+  margin-top: 20px;
+  padding: 10px;
+  border: none;
+  border-top: 1px solid silver;
+}
+.export-list {
+  display: block;
+  width: 100%;
+  height: 200px;
+}
+.export-list > option {
+  display: inline-block;
+  width: 180px;
+  margin: 2px;
+  padding: 0 5px;
+  box-shadow: 0 0 1px black;
+}
+.frame-header {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  right: 5px;
+  height: 5rem;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.frame-body {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  right: 5px;
+  bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.frame-header ~ .frame-body {
+  top: 5rem;
+}
+.frame-header > .buttons {
+  float: right;
+  margin-top: 1rem;
+}
+.buttons > * {
+  display: inline-block;
+  position: relative;
+}
+.button-panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 180px;
+  margin-top: 5px;
+  padding: 1em;
+  background: #f8f8f8;
+  border-radius: 4px;
+  box-shadow: 1px 2px 2px gray;
+  z-index: 1;
+}
+.button-panel > label {
+  display: block;
+}
+.button-toggle.active ~ .button-panel {
+  display: block;
+}
+.editor-code, .editor-code .CodeMirror {
+	height: 100%;
+}
+#url {
+  float: left;
+  max-width: 50%;
+}
+#msg {
+  text-align: right;
 }

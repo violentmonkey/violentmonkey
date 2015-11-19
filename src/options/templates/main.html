@@ -5,9 +5,9 @@
     <div class="line">2013-2015</div>
     <hr>
     <div class=sidemenu>
-      <a href=#installed data-i18n=sideMenuInstalled></a>
-      <a href=#settings data-i18n=sideMenuSettings></a>
-      <a href=#about data-i18n=sideMenuAbout></a>
+      <a href="#main/installed" <%= it.tab == 'main' ? 'class="active"' : ''  %> data-i18n=sideMenuInstalled></a>
+      <a href="#main/settings" <%= it.tab == 'settings' ? 'class="active"' : '' %> data-i18n=sideMenuSettings></a>
+      <a href="#main/about" <%= it.tab == 'about' ? 'class="active"' : '' %> data-i18n=sideMenuAbout></a>
     </div>
   </aside>
   <div id="tab"></div>
