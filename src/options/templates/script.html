@@ -7,14 +7,14 @@
 </div>
 <div class=script-info>
   <a data-id=name class="script-name ellipsis" target=_blank>
-    <%= it.name %>
+    <%= it.getLocaleString('name') %>
   </a>
   <a data-id=support class="script-support hide" target=_blank>
     <i class="fa fa-question-circle"></i>
   </a>
 </div>
 <p data-id=desc class="script-desc ellipsis">
-  <%= it.desc %>
+  <%= it.getLocaleString('description') %>
 </p>
 <div class=buttons>
   <button data-id=edit data-i18n="buttonEdit"></button>
@@ -22,6 +22,6 @@
     it.enabled ? 'buttonDisable' : 'buttonEnable'
   %>"></button>
   <button data-id=remove data-i18n="buttonRemove"></button>
-  <%= it.allowUpdate() ? '<button data-id=update data-i18n="buttonUpdate"></button>' : '' %>
+  <%= it.canUpdate ? '<button data-id=update data-i18n="buttonUpdate"></button>' : '' %>
   <span data-id=message><%= it.message %></span>
 </div>

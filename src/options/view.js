@@ -27,7 +27,11 @@ var BaseView = Backbone.View.extend({
 var ScriptView = BaseView.extend({
   templateUrl: 'templates/script.html',
   render: function () {
-    this.$el.html(this.templateFn(this.model.toJSON()));
+    var model = this.model;
+    var it = model.toJSON();
+    it.getLocaleString = model.getLocaleString.bind(model);
+    it.canUpdate = model.canUpdate();
+    this.$el.html(this.templateFn(it));
     return this;
   },
 });

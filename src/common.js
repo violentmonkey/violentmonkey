@@ -64,22 +64,3 @@ function safeHTML(html) {
 		}[m];
 	});
 }
-
-function initI18n(callback) {
-	window.addEventListener('DOMContentLoaded', function () {
-	}, false);
-}
-
-/**
- * Get locale attributes such as `@name:zh-CN`
- */
-function getLocaleString(dict, key) {
-	navigator.languages.some(function (lang) {
-		var keylang = key + ':' + lang;
-		if (keylang in dict) {
-			key = keylang;
-			return true;
-		}
-	});
-	return dict[key] || '';
-}

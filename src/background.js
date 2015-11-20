@@ -22,7 +22,7 @@ function notify(options) {
 	chrome.notifications.create(options.id || 'ViolentMonkey', {
 		type: 'basic',
 		iconUrl: 'images/icon128.png',
-		title: options.title + ' - ' + _('extName'),
+		title: options.title + ' - ' + _.i18n('extName'),
 		message: options.body,
 		isClickable: options.isClickable,
 	});
@@ -425,11 +425,11 @@ function getInjected(url, src, callback) {
 		scripts: [],
 		values: {},
 		require: {},
-		injectMode: getOption('injectMode'),
+		injectMode: _.options.get('injectMode'),
 		version: vm_ver,
 	};
 	var count = 1;
-	if (data.isApplied = getOption('isApplied')) getScripts();
+	if (data.isApplied = _.options.get('isApplied')) getScripts();
 	else finish();
 	return true;
 }
@@ -544,12 +544,12 @@ function parseScript(data, src, callback) {
 	}
 	var ret = {
 		code: 0,
-		message: 'message' in data ? data.message : _('msgUpdated'),
+		message: 'message' in data ? data.message : _.i18n('msgUpdated'),
 	};
 	if (data.status && data.status != 200 || data.code == '') {
 		// net error
 		ret.code = -1;
-		ret.message = _('msgErrorFetchingScript');
+		ret.message = _.i18n('msgErrorFetchingScript');
 		finish();
 	} else {
 		// store script
@@ -557,7 +557,7 @@ function parseScript(data, src, callback) {
 		queryScript(data.id, meta, function(script) {
 			if (!script.id) {
 				ret.code=1;
-				ret.message=_('msgInstalled');
+				ret.message=_.i18n('msgInstalled');
 			}
 			// add additional data for import and user edit
 			if (data.more)
@@ -575,11 +575,11 @@ function parseScript(data, src, callback) {
 				ret.id = script.id = e.target.result;
 				ret.script = getMeta(script);
 				finish();
-				if (!meta.grant.length && !getOption('ignoreGrant'))
+				if (!meta.grant.length && !_.options.get('ignoreGrant'))
 					notify({
 						id: 'VM-NoGrantWarning',
-						title: _('Warning'),
-						body: _('msgWarnGrant', [meta.name||_('labelNoName')]),
+						title: _.i18n('Warning'),
+						body: _.i18n('msgWarnGrant', [meta.name||_.i18n('labelNoName')]),
 						isClickable: true,
 					});
 			};
@@ -645,7 +645,7 @@ var _update = {};
 function realCheckUpdate(script) {
   function update() {
     if(downloadURL) {
-      ret.message = _('msgUpdating');
+      ret.message = _.i18n('msgUpdating');
       fetchURL(downloadURL, function(){
         parseScript({
 					id: script.id,
@@ -653,7 +653,7 @@ function realCheckUpdate(script) {
           code: this.responseText,
         });
       });
-    } else ret.message = '<span class=new>' + _('msgNewVersion') + '</span>';
+    } else ret.message = '<span class=new>' + _.i18n('msgNewVersion') + '</span>';
     updateItem(ret);
 		finish();
   }
@@ -672,16 +672,16 @@ function realCheckUpdate(script) {
 		script.meta.updateURL ||
 		downloadURL;
   if(updateURL) {
-    ret.message = _('msgCheckingForUpdate');
+    ret.message = _.i18n('msgCheckingForUpdate');
 		updateItem(ret);
     fetchURL(updateURL, function() {
-      ret.message = _('msgErrorFetchingUpdateInfo');
+      ret.message = _.i18n('msgErrorFetchingUpdateInfo');
       if (this.status == 200)
 				try {
 					var meta = parseMeta(this.responseText);
 					if(compareVersion(script.meta.version, meta.version) < 0)
 						return update();
-					ret.message = _('msgNoUpdate');
+					ret.message = _.i18n('msgNoUpdate');
 				} catch(e) {}
 			ret.code = 2;
       updateItem(ret);
@@ -718,8 +718,8 @@ function checkUpdateAll(e, src, callback) {
 var _autoUpdate = false;
 function autoUpdate(data, src, callback) {
   function check() {
-		if(getOption('autoUpdate')) {
-			if (Date.now() - getOption('lastUpdate') >= 864e5)
+		if(_.options.get('autoUpdate')) {
+			if (Date.now() - _.options.get('lastUpdate') >= 864e5)
 				checkUpdateAll();
 			setTimeout(check, 36e5);
 		} else _autoUpdate = false;
@@ -940,7 +940,7 @@ function initMessages() {
 initDb(function() {
 	initPosition(initMessages);
 	chrome.browserAction.setIcon({
-		path: 'images/icon19' + (getOption('isApplied') ? '' : 'w') + '.png',
+		path: 'images/icon19' + (_.options.get('isApplied') ? '' : 'w') + '.png',
 	});
 	setTimeout(autoUpdate, 2e4);
 });
@@ -955,12 +955,12 @@ chrome.webRequest.onBeforeRequest.addListener(function(req) {
 		if((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
 			if(req.tabId < 0)
 				chrome.tabs.create({
-					url: chrome.extension.getURL('/confirm.html') + '?url=' + encodeURIComponent(req.url),
+					url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url),
 				});
 			else
 				chrome.tabs.get(req.tabId, function(t){
 					chrome.tabs.create({
-						url: chrome.extension.getURL('/confirm.html') + '?url=' + encodeURIComponent(req.url) + '&from=' + encodeURIComponent(t.url),
+						url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url) + '/' + encodeURIComponent(t.url),
 					});
 				});
 			return {redirectUrl: 'javascript:history.back()'};
