@@ -3,11 +3,17 @@
     <div>
       <button class="button-toggle" data-i18n=buttonInstallOptions></button>
       <div class="button-panel">
-        <label><input type=checkbox id=cbClose><span data-i18n=installOptionClose></span></label>
-        <label><input type=checkbox id=cbTrack><span data-i18n=installOptionTrack></span></label>
+        <label>
+          <input type=checkbox data-check="closeAfterInstall" id="cbClose" <%= it.options.closeAfterInstall ? 'checked' : '' %>>
+          <span data-i18n=installOptionClose></span>
+        </label>
+        <label>
+          <input type=checkbox data-check="trackLocalFile" id="cbTrack" <%= it.options.trackLocalFile ? 'checked' : '' %>>
+          <span data-i18n=installOptionTrack></span>
+        </label>
       </div>
     </div>
-    <button id=bInstall disabled=disabled data-i18n=buttonConfirmInstallation></button>
+    <button id=btnInstall data-i18n=buttonConfirmInstallation></button>
     <button id=btnClose data-i18n=buttonClose></button>
   </div>
   <h1><span data-i18n=labelInstall></span> - <span data-i18n=extName></span></h1>

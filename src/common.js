@@ -1,6 +1,6 @@
 'use strict';
 
-_ = window._ || {};
+var _ = window._ || {};
 _.i18n = chrome.i18n.getMessage;
 
 _.options = function () {
@@ -45,6 +45,25 @@ _.options = function () {
     getAll: getAllOptions,
   };
 }();
+
+_.sendMessage = function (data) {
+  return new Promise(function (resolve, reject) {
+    chrome.runtime.sendMessage(data, function (res) {
+      resolve(res);
+    });
+  });
+};
+
+_.updateCheckbox = function (e) {
+  var target = e.target;
+  _.options.set(target.dataset.check, target.checked);
+};
+
+_.zfill = function (num, length) {
+  num = num.toString();
+  while (num.length < length) num = '0' + num;
+  return num;
+};
 
 /*
 function format() {
