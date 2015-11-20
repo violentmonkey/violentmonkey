@@ -4,11 +4,12 @@ var Script = Backbone.Model.extend({
    */
   getLocaleString: function (key) {
     var _this = this;
+    var meta = _this.get('meta') || {};
     var lang = navigator.languages.find(function (lang) {
-      return _this.has(key + ':' + lang);
+      return (key + ':' + lang) in meta;
     });
     if (lang) key += ':' + lang;
-    return _this.get(key) || '';
+    return meta[key] || '';
   },
   canUpdate: function () {
     var script = this.toJSON();

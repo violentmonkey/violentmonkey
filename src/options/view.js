@@ -48,7 +48,7 @@ var MainTab = BaseView.extend({
   },
   render: function () {
     this.$el.html(this.templateFn());
-    this.$list = this.$('.script-list');
+    this.$list = this.$('.scripts-list');
     this.$bd = this.$('.backdrop');
     this.$bdm = this.$('.backdrop > div');
     this.setBackdrop();

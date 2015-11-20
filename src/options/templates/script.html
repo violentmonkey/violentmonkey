@@ -7,14 +7,14 @@
 </div>
 <div class=script-info>
   <a data-id=name class="script-name ellipsis" target=_blank>
-    <%= it.getLocaleString('name') %>
+    <%= it.custom.name || it.getLocaleString('name') %>
   </a>
   <a data-id=support class="script-support hide" target=_blank>
     <i class="fa fa-question-circle"></i>
   </a>
 </div>
 <p data-id=desc class="script-desc ellipsis">
-  <%= it.getLocaleString('description') %>
+  <%= it.custom.description || it.getLocaleString('description') %>
 </p>
 <div class=buttons>
   <button data-id=edit data-i18n="buttonEdit"></button>
