@@ -83,21 +83,47 @@ var ExportList = BaseView.extend({
   },
   getSelected: function () {
     var selected = [];
-    _this.$('option').each(function(i, option) {
+    _this.$('option').each(function (i, option) {
       if (option.selected) selected.push(scriptList[i]);
     });
     return selected;
+  },
+  toggleAll: function () {
+    var options = this.$('option');
+    var select = _.some(options, function (option) {
+      return !option.selected;
+    });
+    options.each(function (i, option) {
+      option.selected = select;
+    });
   },
 });
 
 var SettingsTab = BaseView.extend({
   el: '#tab',
   name: 'settings',
+  events: {
+    'change [data-check]': 'updateCheckbox',
+    'change #sInjectMode': 'updateInjectMode',
+    'click #bSelect': 'toggleSelection',
+  },
   templateUrl: 'templates/tab-settings.html',
   render: function () {
-    this.$el.html(this.templateFn());
+    var options = _.options.getAll();
+    this.$el.html(this.templateFn(options));
+    this.$('#sInjectMode').val(options.injectMode);
     this.exportList = new ExportList;
     return this;
+  },
+  updateCheckbox: function (e) {
+    var target = e.target;
+    _.options.set(target.dataset.check, target.checked);
+  },
+  updateInjectMode: function (e) {
+    _.options.set('injectMode', e.target.value);
+  },
+  toggleSelection: function () {
+    this.exportList.toggleAll();
   },
 });
 

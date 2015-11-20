@@ -1,18 +1,20 @@
 <div class="content">
   <h1 data-i18n=labelSettings></h1>
-  <div class=line><label>
-      <input type=checkbox id=cUpdate data-check=autoUpdate><span data-i18n=labelAutoUpdate></span>
-  </label></div>
-  <div class=line><label>
-      <input type=checkbox data-check=ignoreGrant><span data-i18n=labelIgnoreGrant></span>
-  </label></div>
-  <div class=line><label>
-      <span data-i18n=labelInjectMode></span>
-      <select id=sInjectMode>
-        <option value=0 data-i18n=injectModeNormal></option>
-        <option value=1 data-i18n=injectModeAdvanced></option>
-      </select>
-  </label></div>
+  <label class="line">
+    <input type=checkbox data-check=autoUpdate <%= it.autoUpdate ? 'checked' : '' %>>
+    <span data-i18n=labelAutoUpdate></span>
+  </label>
+  <label class="line">
+    <input type=checkbox data-check=ignoreGrant <%= it.ignoreGrant ? 'checked' : '' %>>
+    <span data-i18n=labelIgnoreGrant></span>
+  </label>
+  <label class="line">
+    <span data-i18n=labelInjectMode></span>
+    <select id=sInjectMode>
+      <option value=0 data-i18n=injectModeNormal></option>
+      <option value=1 data-i18n=injectModeAdvanced></option>
+    </select>
+  </label>
   <fieldset class=title>
     <legend data-i18n=labelDataImport></legend>
     <button id=bImport data-i18n=buttonImportData></button>
@@ -21,7 +23,10 @@
   <fieldset class=title>
     <legend data-i18n=labelDataExport></legend>
     <b data-i18n=labelScriptsToExport></b>
-    <label><input type=checkbox id=cbValues data-check=exportValues><span data-i18n=labelExportScriptData></span></label>
+    <label>
+      <input type=checkbox data-check=exportValues <%= it.exportValues ? 'checked' : '' %>>
+      <span data-i18n=labelExportScriptData></span>
+    </label>
     <select class=export-list multiple></select>
     <button id=bSelect data-i18n=buttonAllNone></button>
     <button id=bExport data-i18n=buttonExportData></button>
