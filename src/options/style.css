@@ -88,7 +88,7 @@ aside img {
   border-right: 1px solid darkgray;
   overflow-y: hidden;
 }
-#tab > .header {
+#tab > header {
   height: 30px;
   line-height: 30px;
   padding: 0 .5rem;
@@ -115,7 +115,7 @@ aside img {
   height: 100%;
 }
 .mask {
-  background: rgba(0,0,0,.1);
+  background: rgba(0,0,0,.08);
   /*transition: opacity 1s;*/
 }
 #currentLang {
@@ -206,4 +206,54 @@ fieldset.title {
 }
 #msg {
   text-align: right;
+}
+.script {
+  position: relative;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.script .hide {
+  display: none;
+}
+.script:hover {
+  border-color: darkgray;
+}
+.script.disabled {
+  background: lightgray;
+  color: gray;
+}
+.script-info {
+  margin-left: 50px;
+  line-height: 1.5;
+}
+.script-info > * {
+  margin-right: 10px;
+}
+.script-icon {
+  position: absolute;
+  top: 10px;
+  width: 40px;
+  height: 40px;
+}
+.script-name {
+  font-weight: bold;
+  font-size: 1.17;
+}
+.script-author {
+  float: right;
+  max-width: 30%;
+}
+.script-desc {
+  margin: 5px 0 5px 50px;
+  line-height: 1.5;
+  overflow-y: auto;
+}
+.disabled .script-icon {
+  -webkit-filter: grayscale(.5);
+  filter: grayscale(.5);
+}
+.disabled .script-name {
+  color: blueviolet;
 }

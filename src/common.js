@@ -74,12 +74,3 @@ function format() {
   });
 }
 */
-
-function safeHTML(html) {
-	return html.replace(/[&<]/g, function (m) {
-		return {
-			'&': '&amp;',
-			'<': '&lt;',
-		}[m];
-	});
-}

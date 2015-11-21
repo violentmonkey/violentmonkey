@@ -1,20 +1,22 @@
-<img data-id=icon class=script-icon>
-<div data-id=version class=right>
-  <%= it.version ? 'v' + it.version : '' %>
+<img class=script-icon src="/images/icon48.png" data-src="<%- it.meta.icon %>">
+<div class=script-version>
+  <%- it.version ? 'v' + it.version : '' %>
 </div>
-<div data-id=author class="right script-author ellipsis">
+<div class="script-author ellipsis" title="<%- it.meta.author || '' %>">
   <%= it.author %>
 </div>
 <div class=script-info>
-  <a data-id=name class="script-name ellipsis" target=_blank>
-    <%= it.custom.name || it.getLocaleString('name') %>
+  <a class="script-name ellipsis" target=_blank
+    <%= it.homepageURL ? 'href="' + _.escape(it.homepageURL)  + '"' : '' %>
+    ><%- it.custom.name || it.getLocaleString('name') %>
   </a>
-  <a data-id=support class="script-support hide" target=_blank>
+  <a class="script-support <%= it.meta.supportURL ? '' : 'hide' %>"
+    target=_blank href="<%- it.meta.supportURL %>">
     <i class="fa fa-question-circle"></i>
   </a>
 </div>
-<p data-id=desc class="script-desc ellipsis">
-  <%= it.custom.description || it.getLocaleString('description') %>
+<p class="script-desc ellipsis">
+  <%- it.custom.description || it.getLocaleString('description') %>
 </p>
 <div class=buttons>
   <button data-id=edit data-i18n="buttonEdit"></button>

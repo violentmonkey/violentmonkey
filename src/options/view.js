@@ -25,14 +25,58 @@ var BaseView = Backbone.View.extend({
 });
 
 var ScriptView = BaseView.extend({
+  className: 'script',
   templateUrl: 'templates/script.html',
+  events: {
+    'click [data-id=edit]': 'onEdit',
+  },
+  initialize: function () {
+    BaseView.prototype.initialize.call(this);
+    this.listenTo(this.model, 'change', this.render);
+  },
   render: function () {
-    var model = this.model;
+    var _this = this;
+    var model = _this.model;
     var it = model.toJSON();
     it.getLocaleString = model.getLocaleString.bind(model);
     it.canUpdate = model.canUpdate();
-    this.$el.html(this.templateFn(it));
-    return this;
+    it.homepageURL = it.custom.homepageURL || it.meta.homepageURL || it.meta.homepage;
+    it.author = _this.getAuthor(it.meta.author);
+    _this.$el.html(_this.templateFn(it));
+    if (!it.enabled) _this.$el.addClass('disabled');
+    _this.$('img[data-src]').each(function (i, img) {
+      if (img.dataset.src) _this.loadImage(img.dataset.src).then(function () {
+        img.src = img.dataset.src;
+      });
+    });
+    return _this;
+  },
+  getAuthor: function (text) {
+    if (!text) return '';
+    var matches = text.match(/^(.*?)\s<(\S*?@\S*?)>$/);
+    var label = _.i18n('labelAuthor');
+    return matches
+      ? label + '<a href=mailto:' + matches[2] + '>' + matches[1] + '</a>'
+      : label + _.escape(text);
+  },
+  images: {},
+  loadImage: function (url) {
+    if (!url) return;
+    var promise = this.images[url];
+    if (!promise) promise = this.images[url] = new Promise(function (resolve, reject) {
+      var img = new Image;
+      img.onload = function () {
+        resolve(img);
+      };
+      img.onerror = function () {
+        reject(url);
+      };
+      img.src = url;
+    });
+    return promise;
+  },
+  onEdit: function () {
+    Backbone.trigger('edit', this.model);
   },
 });
 
@@ -48,7 +92,7 @@ var MainTab = BaseView.extend({
   },
   render: function () {
     this.$el.html(this.templateFn());
-    this.$list = this.$('.scripts-list');
+    this.$list = this.$('.scripts');
     this.$bd = this.$('.backdrop');
     this.$bdm = this.$('.backdrop > div');
     this.setBackdrop();
@@ -78,6 +122,10 @@ var MainTab = BaseView.extend({
 var ExportList = BaseView.extend({
   el: '.export-list',
   templateUrl: 'templates/option.html',
+  initialize: function () {
+    BaseView.prototype.initialize.call(this);
+    this.listenTo(scriptList, 'reset change', this.render);
+  },
   render: function () {
     var _this = this;
     _this.$el.html(scriptList.map(function (script) {
@@ -149,6 +197,9 @@ var MainView = BaseView.extend({
   initialize: function (tab) {
     this.tab = this.tabs[tab] || this.tabs[''];
     BaseView.prototype.initialize.call(this);
+    Backbone.on('edit', function (model) {
+      console.log(model);
+    });
   },
   render: function () {
     this.$el.html(this.templateFn({tab: this.tab.prototype.name}));
@@ -343,5 +394,17 @@ var ConfirmView = BaseView.extend({
           _this.trackLocalFile();
       });
     }, 2000);
+  },
+});
+
+var EditView = BaseView.extend({
+  el: '#edit',
+  templateUrl: 'templates/edit.html',
+  initialize: function (id) {
+    this.sid = id;
+    BaseView.prototype.initialize.call(this);
+  },
+  render: function () {
+    this.$el.html(this.templateFn());
   },
 });

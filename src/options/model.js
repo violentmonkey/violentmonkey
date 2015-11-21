@@ -34,7 +34,7 @@ var ScriptList = Backbone.Collection.extend({
 
 var scriptList = new ScriptList();
 
-chrome.runtime.sendMessage({cmd:'GetData'}, function (data) {
+_.sendMessage({cmd: 'GetData'}).then(function (data) {
   scriptList.loading = false;
   _.assign(scriptList.cache, data.cache);
   scriptList.reset(data.scripts);
