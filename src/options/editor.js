@@ -15,7 +15,6 @@
       });
     }
     if (!data.map) data = [data];
-    data.map(add);
     return Promise.all(data.map(add));
   }
 
@@ -59,12 +58,6 @@
         {src: '/lib/CodeMirror/addon/selection/active-line.js'},
         {src: '/mylib/CodeMirror/search.js'},
       ]);
-    }).then(function () {
-      CodeMirror.keyMap.vm = {
-        'fallthrough': 'default',
-        'Ctrl-S': 'save',
-        'Esc': 'exit',
-      };
     });
   }
 
@@ -83,7 +76,6 @@
         lineWrapping: true,
         indentUnit: 4,
         indentWithTabs: true,
-        keyMap: 'vm',
         styleActiveLine: true,
         foldGutter: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
@@ -95,10 +87,12 @@
         this.setValue(value);
         this.focus();
       };
-      options.onsave && editor.on('save', options.onsave);
-      options.onexit && editor.on('exit', options.onexit);
-      options.onchange && editor.on('change', options.onchange);
       options.readonly && editor.setOption('readOnly', options.readonly);
+      options.onchange && editor.on('change', options.onchange);
+      var extraKeys = {};
+      options.onexit && (extraKeys.Esc = options.onexit);
+      options.onsave && (extraKeys['Ctrl-S'] = options.onsave);
+      editor.setOption('extraKeys', extraKeys);
       return editor;
     });
   };

@@ -18,9 +18,29 @@ var BaseView = Backbone.View.extend({
     _this.render();
   },
   initI18n: function () {
-		_.forEach(this.$('[data-i18n]'), function (node) {
-			node.innerHTML = _.i18n(node.dataset.i18n);
-		});
+    _.forEach(this.$('[data-i18n]'), function (node) {
+      node.innerHTML = _.i18n(node.dataset.i18n);
+    });
+  },
+  getValue: function (target) {
+    var key = target.dataset.id;
+    var value;
+    switch (key[0]) {
+    case '!':
+      key = key.slice(1);
+      value = target.checked;
+      break;
+    case '[':
+      key = key.slice(1);
+      value = _.filter(target.value.split('\n').map(function (s) {return s.trim();}));
+      break;
+    default:
+      value = target.value;
+    }
+    return {
+      key: key,
+      value: value,
+    };
   },
 });
 
@@ -76,7 +96,7 @@ var ScriptView = BaseView.extend({
     return promise;
   },
   onEdit: function () {
-    Backbone.trigger('edit', this.model);
+    scriptList.trigger('edit:open', this.model);
   },
 });
 
@@ -85,10 +105,24 @@ var MainTab = BaseView.extend({
   name: 'main',
   templateUrl: 'templates/tab-installed.html',
   initialize: function () {
-    BaseView.prototype.initialize.call(this);
-    this.listenTo(scriptList, 'reset', this.render);
-    this.listenTo(scriptList, 'add', this.addOne);
-    this.listenTo(scriptList, 'add', this.setBackdrop);
+    var _this = this;
+    BaseView.prototype.initialize.call(_this);
+    _this.listenTo(scriptList, 'reset', _this.render);
+    _this.listenTo(scriptList, 'add', _this.addOne);
+    _this.listenTo(scriptList, 'add', _this.setBackdrop);
+    _this.listenTo(scriptList, 'edit:open', function (model) {
+      _this.closeEdit();
+      _this.editView = new EditView({model: model.clone()});
+      _this.$el.append(_this.editView.$el);
+    });
+    _this.listenTo(scriptList, 'edit:close', _this.closeEdit);
+  },
+  closeEdit: function () {
+    var _this = this;
+    if (_this.editView) {
+      _this.editView.remove();
+      _this.editView = null;
+    }
   },
   render: function () {
     this.$el.html(this.templateFn());
@@ -195,11 +229,9 @@ var MainView = BaseView.extend({
     about: AboutTab,
   },
   initialize: function (tab) {
-    this.tab = this.tabs[tab] || this.tabs[''];
-    BaseView.prototype.initialize.call(this);
-    Backbone.on('edit', function (model) {
-      console.log(model);
-    });
+    var _this = this;
+    _this.tab = _this.tabs[tab] || _this.tabs[''];
+    BaseView.prototype.initialize.call(_this);
   },
   render: function () {
     this.$el.html(this.templateFn({tab: this.tab.prototype.name}));
@@ -355,23 +387,23 @@ var ConfirmView = BaseView.extend({
     });
   },
   getTimeString: function () {
-		var now = new Date();
-		return _.zfill(now.getHours(), 2) + ':' +
-			_.zfill(now.getMinutes(), 2) + ':' +
-			_.zfill(now.getSeconds(), 2);
+    var now = new Date();
+    return _.zfill(now.getHours(), 2) + ':' +
+      _.zfill(now.getMinutes(), 2) + ':' +
+      _.zfill(now.getSeconds(), 2);
   },
   installScript: function () {
     var _this = this;
     _this.$('#btnInstall').prop('disabled', true);
     _.sendMessage({
-			cmd:'ParseScript',
-			data:{
-				url: _this.url,
-				from: _this.from,
-				code: _this.data.code,
-				require: _this.data.require,
-				resources: _this.data.resources,
-			},
+      cmd:'ParseScript',
+      data:{
+        url: _this.url,
+        from: _this.from,
+        code: _this.data.code,
+        require: _this.data.require,
+        resources: _this.data.resources,
+      },
     }).then(function (res) {
       _this.showMessage(res.message + '[' + _this.getTimeString() + ']');
       if (res.code < 0) return;
@@ -397,14 +429,119 @@ var ConfirmView = BaseView.extend({
   },
 });
 
-var EditView = BaseView.extend({
-  el: '#edit',
-  templateUrl: 'templates/edit.html',
-  initialize: function (id) {
-    this.sid = id;
-    BaseView.prototype.initialize.call(this);
+var MetaView = BaseView.extend({
+  className: 'button-panel',
+  templateUrl: 'templates/edit-meta.html',
+  events: {
+    'change [data-id]': 'onChange',
   },
   render: function () {
-    this.$el.html(this.templateFn());
+    var model = this.model;
+    var it = model.toJSON();
+    it.__name = model.meta.name;
+    it.__homepageURL = model.meta.homepageURL;
+    it.__updateURL = model.meta.updateURL || _.i18n('hintUseDownloadURL');
+    it.__downloadURL = model.meta.downloadURL || it.lastInstallURL;
+    this.$el.html(this.templateFn(it));
+  },
+  onChange: function (e) {
+    e.stopPropagation();
+    var res = this.getValue(e.target);
+    this.model.set(res.key, res.value);
+  },
+});
+
+var EditView = BaseView.extend({
+  className: 'frame edit',
+  templateUrl: 'templates/edit.html',
+  events: {
+    'click .button-toggle': 'toggleButton',
+    'change [data-id]': 'updateCheckbox',
+    'click #editorSave': 'save',
+    'click #editorClose': 'close',
+    'click #editorSaveClose': 'saveClose',
+  },
+  initialize: function () {
+    var _this = this;
+    BaseView.prototype.initialize.call(_this);
+    _this.metaModel = new Meta(_this.model.toJSON(), {parse: true});
+    _this.listenTo(_this.metaModel, 'change', function (model) {
+      _this.model.set('custom', model.toJSON());
+    });
+    _this.listenTo(_this.model, 'change', function (model) {
+      _this.updateStatus(true);
+    });
+  },
+  render: function () {
+    var _this = this;
+    var it = _this.model.toJSON();
+    _this.$el.html(_this.templateFn(it));
+    var gotScript = _.sendMessage({
+      cmd: 'GetScript',
+      data: it.id,
+    });
+    _this.loadedEditor = _.initEditor({
+      container: _this.$('.editor-code')[0],
+      onsave: _this.save.bind(_this),
+      onexit: _this.close,
+      onchange: function (e) {
+        _this.model.set('code', _this.editor.getValue());
+      },
+    });
+    Promise.all([
+      gotScript,
+      _this.loadedEditor,
+    ]).then(function (res) {
+      var script = res[0];
+      var editor = _this.editor = res[1];
+      editor.setValueAndFocus(script.code);
+      editor.clearHistory();
+      _this.updateStatus(false);
+    });
+  },
+  updateStatus: function (changed) {
+    this.changed = changed;
+    this.$('#editorSave').prop('disabled', !changed);
+    this.$('#editorSaveClose').prop('disabled', !changed);
+  },
+  save: function () {
+    var _this = this;
+    var data = _this.model.toJSON();
+    return _.sendMessage({
+      cmd: 'ParseScript',
+      data: {
+        id: data.id,
+        code: data.code,
+        message: '',
+        more: {
+          custom: data.custom,
+          update: data.update,
+        }
+      }
+    }).then(function () {
+      _this.updateStatus(false);
+    });
+  },
+  close: function () {
+    if (!this.changed || confirm(_.i18n('confirmNotSaved')))
+      scriptList.trigger('edit:close');
+  },
+  saveClose: function () {
+    this.save().then(this.close.bind(this));
+  },
+  toggleButton: function (e) {
+    if (this.metaView) {
+      this.$(e.target).removeClass('active');
+      this.metaView.remove();
+      this.metaView = null;
+    } else {
+      this.$(e.target).addClass('active');
+      this.metaView = new MetaView({model: this.metaModel});
+      this.metaView.$el.insertAfter(e.target);
+    }
+  },
+  updateCheckbox: function (e) {
+    var res = this.getValue(e.target);
+    this.model.set(res.key, res.value);
   },
 });

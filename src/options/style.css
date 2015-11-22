@@ -30,13 +30,16 @@ hr {
   border: none;
   border-top: 1px solid darkgray;
 }
-.right {
+.pull-left {
+  float: left;
+}
+.pull-right {
   float: right;
 }
 .ellipsis {
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 #app {
@@ -94,19 +97,24 @@ aside img {
   padding: 0 .5rem;
   border-bottom: 1px solid darkgray;
 }
-.backdrop {
+.backdrop, .scripts {
   position: absolute;
-  display: none;
   top: 30px;
   left: 0;
   right: 0;
   bottom: 0;
+}
+.scripts {
+  overflow-y: auto;
+}
+.backdrop {
+  display: none;
   text-align: center;
   color: gray;
 }
 .backdrop > *, .backdrop::after {
   display: inline-block;
-	vertical-align: middle;
+  vertical-align: middle;
   font-size: 2rem;
 }
 .backdrop::after {
@@ -119,12 +127,12 @@ aside img {
   /*transition: opacity 1s;*/
 }
 #currentLang {
-	color: green;
-	font-weight: bold;
+  color: green;
+  font-weight: bold;
 }
 .line {
-	display: block;
-	margin: 1em 0;
+  display: block;
+  margin: 1em 0;
 }
 .content {
   height: 100%;
@@ -141,6 +149,7 @@ fieldset.title {
   display: block;
   width: 100%;
   height: 200px;
+  white-space: normal;
 }
 .export-list > option {
   display: inline-block;
@@ -148,6 +157,15 @@ fieldset.title {
   margin: 2px;
   padding: 0 5px;
   box-shadow: 0 0 1px black;
+}
+.frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #eee;
+  z-index: 1;
 }
 .frame-header {
   position: absolute;
@@ -167,8 +185,19 @@ fieldset.title {
   padding-top: 5px;
   padding-bottom: 5px;
 }
+.frame-footer {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
 .frame-header ~ .frame-body {
   top: 5rem;
+}
+.frame-footer ~ .frame-body {
+  bottom: 2rem;
 }
 .frame-header > .buttons {
   float: right;
@@ -189,16 +218,16 @@ fieldset.title {
   background: #f8f8f8;
   border-radius: 4px;
   box-shadow: 1px 2px 2px gray;
-  z-index: 1;
+  z-index: 10;
 }
-.button-panel > label {
+.options-panel label {
   display: block;
 }
 .button-toggle.active ~ .button-panel {
   display: block;
 }
 .editor-code, .editor-code .CodeMirror {
-	height: 100%;
+  height: 100%;
 }
 #url {
   float: left;
@@ -224,6 +253,9 @@ fieldset.title {
   background: lightgray;
   color: gray;
 }
+.script .pull-right {
+  margin-left: 1em;
+}
 .script-info {
   margin-left: 50px;
   line-height: 1.5;
@@ -242,7 +274,6 @@ fieldset.title {
   font-size: 1.17;
 }
 .script-author {
-  float: right;
   max-width: 30%;
 }
 .script-desc {
@@ -256,4 +287,20 @@ fieldset.title {
 }
 .disabled .script-name {
   color: blueviolet;
+}
+.edit .frame-header {
+  height: 4rem;
+}
+.edit .frame-header ~ .frame-body {
+  top: 4rem;
+}
+.edit .button-panel {
+  width: 450px;
+}
+.edit .button-panel > table {
+  width: 100%;
+}
+.edit .button-panel td:not(.expand) {
+  width: 1px;
+  white-space: nowrap;
 }

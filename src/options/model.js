@@ -1,3 +1,13 @@
+var Meta = Backbone.Model.extend({
+  initialize: function () {
+
+  },
+  parse: function (script) {
+    this.meta = script.meta;
+    return script.custom;
+  },
+});
+
 var Script = Backbone.Model.extend({
   /**
    * Get locale attributes such as `@name:zh-CN`

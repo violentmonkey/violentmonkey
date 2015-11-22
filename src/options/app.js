@@ -11,6 +11,9 @@ var App = Backbone.Router.extend({
   renderConfirm: function (url, _from) {
     this.view = new ConfirmView(url, _from);
   },
+  renderEdit: function (id) {
+    this.view = new EditView(id);
+  },
 });
 var app = new App();
 if (!Backbone.history.start())

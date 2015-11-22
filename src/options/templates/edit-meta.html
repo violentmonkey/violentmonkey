@@ -1,0 +1,70 @@
+<table>
+  <tr>
+    <td title="@name" data-i18n=labelName></td>
+    <td class=expand>
+      <input type=text data-id=name value="<%- it.name %>" placeholder="<%- it.__name %>">
+    </td>
+    <td title="@run-at" data-i18n=labelRunAt></td>
+    <td>
+      <select data-id=run-at value="<%= it['run-at'] || 'default' %>">
+        <option value=default data-i18n=labelRunAtDefault></option>
+        <option value=start>document-start</option>
+        <option value=idle>document-idle</option>
+        <option value=end>document-end</option>
+      </select>
+    </td>
+  </tr>
+  <tr title="@homepageURL">
+    <td data-i18n=labelHomepageURL></td>
+    <td colspan=3 class=expand>
+      <input type=text data-id=homepageURL value="<%- it.homepageURL %>" placeholder="<%- it.__homepageURL %>">
+    </td>
+  </tr>
+</table>
+<table>
+  <tr title="@updateURL">
+    <td data-i18n=labelUpdateURL></td>
+    <td class=expand>
+      <input type=text data-id=updateURL value="<%- it.updateURL %>" placeholder="<%- it.__updateURL %>">
+    </td>
+  </tr>
+  <tr title="@downloadURL">
+    <td data-i18n=labelDownloadURL></td>
+    <td class=expand>
+      <input type=text data-id=downloadURL value="<%- it.downloadURL %>" placeholder="<%- it.__downloadURL %>">
+    </td>
+  </tr>
+</table>
+<fieldset title="@include">
+  <legend>
+    <span data-i18n=labelInclude></span>
+    <label>
+      <input type=checkbox data-id="!_include" <%= it._include !== false ? 'checked' : '' %>>
+      <span data-i18n=labelKeepInclude></span>
+    </label>
+  </legend>
+  <div data-i18n=labelCustomInclude></div>
+  <textarea data-id="[include"><%- (it.include || []).join('\n') %></textarea>
+</fieldset>
+<fieldset title="@match">
+  <legend>
+    <span data-i18n=labelMatch></span>
+    <label>
+      <input type=checkbox data-id="!_match" <%= it._match !== false ? 'checked' : '' %>>
+      <span data-i18n=labelKeepMatch></span>
+    </label>
+  </legend>
+  <div data-i18n=labelCustomMatch></div>
+  <textarea data-id="[match"><%- (it.match || []).join('\n') %></textarea>
+</fieldset>
+<fieldset title="@exclude">
+  <legend>
+    <span data-i18n=labelExclude></span>
+    <label>
+      <input type=checkbox data-id="!_exclude" <%= it._exclude !== false ? 'checked' : '' %>>
+      <span data-i18n=labelKeepExclude></span>
+    </label>
+  </legend>
+  <div data-i18n=labelCustomExclude></div>
+  <textarea data-id="[exclude"><%- (it.exclude || []).join('\n') %></textarea>
+</fieldset>

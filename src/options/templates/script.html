@@ -1,8 +1,8 @@
 <img class=script-icon src="/images/icon48.png" data-src="<%- it.meta.icon %>">
-<div class=script-version>
-  <%- it.version ? 'v' + it.version : '' %>
+<div class="script-version pull-right">
+  <%- it.meta.version ? 'v' + it.meta.version : '' %>
 </div>
-<div class="script-author ellipsis" title="<%- it.meta.author || '' %>">
+<div class="script-author ellipsis pull-right" title="<%- it.meta.author || '' %>">
   <%= it.author %>
 </div>
 <div class=script-info>
