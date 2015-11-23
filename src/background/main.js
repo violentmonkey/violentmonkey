@@ -21,7 +21,7 @@ function getUniqId() {
 function notify(options) {
 	chrome.notifications.create(options.id || 'ViolentMonkey', {
 		type: 'basic',
-		iconUrl: 'images/icon128.png',
+		iconUrl: '/images/icon128.png',
 		title: options.title + ' - ' + _.i18n('extName'),
 		message: options.body,
 		isClickable: options.isClickable,
@@ -936,7 +936,7 @@ function initMessages() {
 initDb(function() {
 	initPosition(initMessages);
 	chrome.browserAction.setIcon({
-		path: 'images/icon19' + (_.options.get('isApplied') ? '' : 'w') + '.png',
+		path: '/images/icon19' + (_.options.get('isApplied') ? '' : 'w') + '.png',
 	});
 	setTimeout(autoUpdate, 2e4);
 });

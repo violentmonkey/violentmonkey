@@ -11,11 +11,11 @@
   "author": "Gerald <gera2ld@163.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gera2ld/Violentmonkey.git"
+    "url": "https://github.com/Violentmonkey/Violentmonkey.git"
   },
   "bugs": {
-    "url": "https://github.com/gera2ld/Violentmonkey/issues"
+    "url": "https://github.com/Violentmonkey/Violentmonkey/issues"
   },
-  "homepage": "https://github.com/gera2ld/Violentmonkey",
+  "homepage": "https://github.com/Violentmonkey/Violentmonkey",
   "license": "ISC"
 }
