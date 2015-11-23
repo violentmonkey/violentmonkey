@@ -36,16 +36,19 @@ var Script = Backbone.Model.extend({
 var ScriptList = Backbone.Collection.extend({
   model: Script,
   comparator: 'position',
-  loading: true,
   initialize: function () {
     this.cache = {};
+    this.reload();
+  },
+  reload: function () {
+    var _this = this;
+    _this.loading = true;
+    _.sendMessage({cmd: 'GetData'}).then(function (data) {
+      _this.loading = false;
+      _.assign(_this.cache, data.cache);
+      _this.reset(data.scripts);
+    });
   },
 });
 
 var scriptList = new ScriptList();
-
-_.sendMessage({cmd: 'GetData'}).then(function (data) {
-  scriptList.loading = false;
-  _.assign(scriptList.cache, data.cache);
-  scriptList.reset(data.scripts);
-});

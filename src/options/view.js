@@ -192,6 +192,7 @@ var SettingsTab = BaseView.extend({
     'change [data-check]': 'updateCheckbox',
     'change #sInjectMode': 'updateInjectMode',
     'click #bSelect': 'toggleSelection',
+    'click #bImport': 'importFile',
   },
   templateUrl: 'templates/tab-settings.html',
   render: function () {
@@ -207,6 +208,98 @@ var SettingsTab = BaseView.extend({
   },
   toggleSelection: function () {
     this.exportList.toggleAll();
+  },
+  importData: function (file) {
+    function getVMConfig(text) {
+      var vm;
+      try {
+        vm = JSON.parse(text);
+      } catch (e) {
+        console.log('Error parsing ViolentMonkey configuration.');
+      }
+      vm = vm || {};
+      _.forEach(vm.values, function (value, key) {
+        _.sendMessage({
+          cmd: 'SetValue',
+          data: {
+            url: key,
+            values: value,
+          }
+        });
+      });
+      _.forEach(vm.settings, function (value, key) {
+        _.options.set(key, value);
+      });
+      return vm;
+    }
+    function getVMFile(entry, vm) {
+      if (!entry.filename.endsWith('.user.js')) return;
+      vm = vm || {};
+      return new Promise(function (resolve, reject) {
+        var writer = new zip.TextWriter;
+        entry.getData(writer, function (text) {
+          var script = {code: text};
+          if (vm.scripts) {
+            var more = vm.scripts[entry.filename.slice(0, -8)];
+            if (more) script.more = _.omit(more, ['id']);
+          }
+          _.sendMessage({
+            cmd: 'ParseScript',
+            data: script,
+          }).then(function () {
+            resolve(true);
+          });
+        });
+      });
+    }
+    function getVMFiles(entries) {
+      var i = entries.findIndex(function (entry) {
+        return entry.filename === 'ViolentMonkey';
+      });
+      if (~i) return new Promise(function (resolve, reject) {
+        var writer = new zip.TextWriter;
+        entries[i].getData(writer, function (text) {
+          entries.splice(i, 1);
+          resolve({
+            vm: getVMConfig(text),
+            entries: entries,
+          });
+        });
+      });
+      return {
+        entries: entries,
+      };
+    }
+    function readZip(file) {
+      return new Promise(function (resolve, reject) {
+        zip.createReader(new zip.BlobReader(file), function (res) {
+          res.getEntries(function (entries) {
+            resolve(entries);
+          });
+        }, function (err) {reject(err);});
+      });
+    }
+    readZip(file).then(getVMFiles).then(function (data) {
+      var vm = data.vm;
+      var entries = data.entries;
+      return Promise.all(entries.map(function (entry) {
+        return getVMFile(entry, vm);
+      })).then(function (res) {
+        return _.filter(res).length;
+      });
+    }).then(function (count) {
+      scriptList.reload();
+      alert(_.i18n('msgImported', [count]));
+    });
+  },
+  importFile: function () {
+    var _this = this;
+    $('<input type=file>')
+    .change(function (e) {
+      if (this.files && this.files.length)
+        _this.importData(this.files[0]);
+    })
+    .trigger('click');
   },
 });
 

@@ -111,6 +111,7 @@ aside img {
   display: none;
   text-align: center;
   color: gray;
+  z-index: 9;
 }
 .backdrop > *, .backdrop::after {
   display: inline-block;
