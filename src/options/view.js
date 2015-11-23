@@ -44,6 +44,7 @@ var BaseView = Backbone.View.extend({
   },
 });
 
+var DEFAULT_ICON = '/images/icon48.png';
 var ScriptView = BaseView.extend({
   className: 'script',
   templateUrl: 'templates/script.html',
@@ -54,9 +55,21 @@ var ScriptView = BaseView.extend({
     'click [data-id=update]': 'onUpdate',
   },
   initialize: function () {
-    BaseView.prototype.initialize.call(this);
-    this.listenTo(this.model, 'change', this.render);
-    this.listenTo(this.model, 'remove', this.onRemoved);
+    var _this = this;
+    _this.model.set('_icon', DEFAULT_ICON);
+    BaseView.prototype.initialize.call(_this);
+    _this.listenTo(_this.model, 'change', _this.render);
+    _this.listenTo(_this.model, 'remove', _this.onRemoved);
+  },
+  loadIcon: function () {
+    var _this = this;
+    var icon = _this.model.get('meta').icon;
+    if (icon && icon !== _this.model.get('_icon'))
+      _this.loadImage(icon).then(function () {
+        _this.model.set('_icon', icon);
+      }, function () {
+        _this.model.set('_icon', DEFAULT_ICON);
+      });
   },
   render: function () {
     var _this = this;
@@ -68,11 +81,8 @@ var ScriptView = BaseView.extend({
     it.author = _this.getAuthor(it.meta.author);
     _this.$el.html(_this.templateFn(it));
     if (!it.enabled) _this.$el.addClass('disabled');
-    _this.$('img[data-src]').each(function (i, img) {
-      if (img.dataset.src) _this.loadImage(img.dataset.src).then(function () {
-        img.src = img.dataset.src;
-      });
-    });
+    else _this.$el.removeClass('disabled');
+    _this.loadIcon();
     return _this;
   },
   getAuthor: function (text) {
@@ -138,6 +148,7 @@ var MainTab = BaseView.extend({
   templateUrl: 'templates/tab-installed.html',
   events: {
     'click #bNew': 'newScript',
+    'click #bUpdate': 'updateAll',
   },
   initialize: function () {
     var _this = this;
@@ -190,6 +201,9 @@ var MainTab = BaseView.extend({
     _.sendMessage({cmd: 'NewScript'}).then(function (script) {
       scriptList.trigger('edit:open', new Script(script));
     });
+  },
+  updateAll: function () {
+    _.sendMessage({cmd: 'CheckUpdateAll'});
   },
 });
 

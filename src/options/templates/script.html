@@ -1,4 +1,4 @@
-<img class=script-icon src="/images/icon48.png" data-src="<%- it.meta.icon %>">
+<img class=script-icon src="<%- it._icon %>">
 <div class="script-version pull-right">
   <%- it.meta.version ? 'v' + it.meta.version : '' %>
 </div>
@@ -24,6 +24,10 @@
     it.enabled ? 'buttonDisable' : 'buttonEnable'
   %>"></button>
   <button data-id=remove data-i18n="buttonRemove"></button>
-  <%= it.canUpdate ? '<button data-id=update data-i18n="buttonUpdate"></button>' : '' %>
+  <%= it.canUpdate ?
+  '<button data-id=update data-i18n="buttonUpdate"' + (
+    it.updating ? ' disabled' : ''
+  ) + '></button>'
+  : '' %>
   <span data-id=message><%= it.message %></span>
 </div>

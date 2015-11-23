@@ -483,20 +483,9 @@ function fetchRequire(url) {
 	});
 }
 
-/**
- * broadcast script change
- * {
- *   id: required if script is not given
- *   script: optional
- *   message: optional
- *   code: optional
- *     0 for updated, 1 for installed,
- *     others for message: 3 for updating
- * }
- */
-function updateItem(res) {
+function updateItem(data) {
 	if (port) try {
-		port.postMessage(res);
+		port.postMessage(data);
 	} catch(e) {
 		port = null;
 		console.log(e);
@@ -543,21 +532,23 @@ function parseScript(data, src, callback) {
 		if (callback) callback(ret);
 	}
 	var ret = {
-		code: 0,
-		message: 'message' in data ? data.message : _.i18n('msgUpdated'),
+		cmd: 'update',
+		data: {
+			message: 'message' in data ? data.message : _.i18n('msgUpdated'),
+		},
 	};
 	if (data.status && data.status != 200 || data.code == '') {
 		// net error
-		ret.code = -1;
-		ret.message = _.i18n('msgErrorFetchingScript');
+		ret.cmd = 'error';
+		ret.data.message = _.i18n('msgErrorFetchingScript');
 		finish();
 	} else {
 		// store script
 		var meta = parseMeta(data.code);
 		queryScript(data.id, meta, function(script) {
 			if (!script.id) {
-				ret.code=1;
-				ret.message=_.i18n('msgInstalled');
+				ret.cmd = 'add';
+				ret.data.message = _.i18n('msgInstalled');
 			}
 			// add additional data for import and user edit
 			if (data.more)
@@ -572,8 +563,8 @@ function parseScript(data, src, callback) {
 			if (data.url && !/^(file|data):/.test(data.url))
 				script.custom.lastInstallURL = data.url;
 			saveScript(script).onsuccess = function(e) {
-				ret.id = script.id = e.target.result;
-				ret.script = getMeta(script);
+				script.id = e.target.result;
+				_.assign(ret.data, getMeta(script));
 				finish();
 				if (!meta.grant.length && !_.options.get('ignoreGrant'))
 					notify({
@@ -632,9 +623,8 @@ function updateMeta(meta, src, callback) {
 			if (i in script) script[i] = meta[i];
 		o.put(script).onsuccess = function (e) {
 			updateItem({
-				code: 0,
-				id: script.id,
-				script: getMeta(script),
+				cmd: 'update',
+				data: getMeta(script),
 			});
 		};
 	};
@@ -645,7 +635,7 @@ var _update = {};
 function realCheckUpdate(script) {
   function update() {
     if(downloadURL) {
-      ret.message = _.i18n('msgUpdating');
+      ret.data.message = _.i18n('msgUpdating');
       fetchURL(downloadURL, function(){
         parseScript({
 					id: script.id,
@@ -653,7 +643,7 @@ function realCheckUpdate(script) {
           code: this.responseText,
         });
       });
-    } else ret.message = '<span class=new>' + _.i18n('msgNewVersion') + '</span>';
+    } else ret.data.message = '<span class=new>' + _.i18n('msgNewVersion') + '</span>';
     updateItem(ret);
 		finish();
   }
@@ -662,7 +652,13 @@ function realCheckUpdate(script) {
 	}
 	if (_update[script.id]) return;
 	_update[script.id] = 1;
-  var ret = {id: script.id, code: 3};
+  var ret = {
+		cmd: 'update',
+		data: {
+			id: script.id,
+			updating: true,
+		},
+	};
 	var downloadURL =
 		script.custom.downloadURL ||
 		script.meta.downloadURL ||
@@ -672,18 +668,18 @@ function realCheckUpdate(script) {
 		script.meta.updateURL ||
 		downloadURL;
   if(updateURL) {
-    ret.message = _.i18n('msgCheckingForUpdate');
+    ret.data.message = _.i18n('msgCheckingForUpdate');
 		updateItem(ret);
     fetchURL(updateURL, function() {
-      ret.message = _.i18n('msgErrorFetchingUpdateInfo');
+      ret.data.message = _.i18n('msgErrorFetchingUpdateInfo');
       if (this.status == 200)
 				try {
 					var meta = parseMeta(this.responseText);
 					if(compareVersion(script.meta.version, meta.version) < 0)
 						return update();
-					ret.message = _.i18n('msgNoUpdate');
+					ret.data.message = _.i18n('msgNoUpdate');
 				} catch(e) {}
-			ret.code = 2;
+			ret.data.updating = false;
       updateItem(ret);
 			finish();
     }, null, {
@@ -703,7 +699,7 @@ function checkUpdate(id, src, callback) {
 }
 
 function checkUpdateAll(e, src, callback) {
-	setOption('lastUpdate', Date.now());
+	_.options.set('lastUpdate', Date.now());
 	var o = db.transaction('scripts').objectStore('scripts');
 	o.index('update').openCursor(1).onsuccess = function (e) {
 		var r = e.target.result;
