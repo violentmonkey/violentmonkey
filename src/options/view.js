@@ -49,10 +49,14 @@ var ScriptView = BaseView.extend({
   templateUrl: 'templates/script.html',
   events: {
     'click [data-id=edit]': 'onEdit',
+    'click [data-id=remove]': 'onRemove',
+    'click [data-id=enable]': 'onEnable',
+    'click [data-id=update]': 'onUpdate',
   },
   initialize: function () {
     BaseView.prototype.initialize.call(this);
     this.listenTo(this.model, 'change', this.render);
+    this.listenTo(this.model, 'remove', this.onRemoved);
   },
   render: function () {
     var _this = this;
@@ -98,18 +102,49 @@ var ScriptView = BaseView.extend({
   onEdit: function () {
     scriptList.trigger('edit:open', this.model);
   },
+  onRemove: function () {
+    var _this = this;
+    _.sendMessage({
+      cmd: 'RemoveScript',
+      data: _this.model.id,
+    }).then(function () {
+      scriptList.remove(_this.model);
+    });
+  },
+  onRemoved: function () {
+    this.$el.remove();
+  },
+  onEnable: function () {
+    var _this = this;
+    _.sendMessage({
+      cmd: 'UpdateMeta',
+      data: {
+        id: _this.model.id,
+        enabled: _this.model.get('enabled') ? 0 : 1,
+      },
+    });
+  },
+  onUpdate: function () {
+    _.sendMessage({
+      cmd: 'CheckUpdate',
+      data: this.model.id,
+    });
+  },
 });
 
 var MainTab = BaseView.extend({
   el: '#tab',
   name: 'main',
   templateUrl: 'templates/tab-installed.html',
+  events: {
+    'click #bNew': 'newScript',
+  },
   initialize: function () {
     var _this = this;
     BaseView.prototype.initialize.call(_this);
     _this.listenTo(scriptList, 'reset', _this.render);
     _this.listenTo(scriptList, 'add', _this.addOne);
-    _this.listenTo(scriptList, 'add', _this.setBackdrop);
+    _this.listenTo(scriptList, 'add update', _this.setBackdrop);
     _this.listenTo(scriptList, 'edit:open', function (model) {
       _this.closeEdit();
       _this.editView = new EditView({model: model.clone()});
@@ -151,6 +186,11 @@ var MainTab = BaseView.extend({
   addAll: function () {
     scriptList.forEach(this.addOne, this);
   },
+  newScript: function () {
+    _.sendMessage({cmd: 'NewScript'}).then(function (script) {
+      scriptList.trigger('edit:open', new Script(script));
+    });
+  },
 });
 
 var ExportList = BaseView.extend({
@@ -191,9 +231,11 @@ var SettingsTab = BaseView.extend({
   events: {
     'change [data-check]': 'updateCheckbox',
     'change #sInjectMode': 'updateInjectMode',
+    'change #cUpdate': 'updateAutoUpdate',
     'click #bSelect': 'toggleSelection',
     'click #bImport': 'importFile',
     'click #bExport': 'exportData',
+    'click #bVacuum': 'onVacuum',
   },
   templateUrl: 'templates/tab-settings.html',
   render: function () {
@@ -204,6 +246,9 @@ var SettingsTab = BaseView.extend({
     return this;
   },
   updateCheckbox: _.updateCheckbox,
+  updateAutoUpdate: function (e) {
+    _.sendMessage({cmd: 'AutoUpdate'});
+  },
   updateInjectMode: function (e) {
     _.options.set('injectMode', e.target.value);
   },
@@ -375,6 +420,13 @@ var SettingsTab = BaseView.extend({
       }, getWriter()).then(download);
     }).then(function () {
       bExport.prop('disabled', false);
+    });
+  },
+  onVacuum: function (e) {
+    var button = $(e.target);
+    button.prop('disabled', true).html(_.i18n('buttonVacuuming'));
+    _.sendMessage({cmd: 'Vacuum'}).then(function () {
+      button.html(_.i18n('buttonVacuumed'));
     });
   },
 });
@@ -645,10 +697,10 @@ var EditView = BaseView.extend({
     var _this = this;
     var it = _this.model.toJSON();
     _this.$el.html(_this.templateFn(it));
-    var gotScript = _.sendMessage({
+    var gotScript = it.id ? _.sendMessage({
       cmd: 'GetScript',
       data: it.id,
-    });
+    }) : Promise.resolve(it);
     _this.loadedEditor = _.initEditor({
       container: _this.$('.editor-code')[0],
       onsave: _this.save.bind(_this),

@@ -1,7 +1,7 @@
 <div class="content">
   <h1 data-i18n=labelSettings></h1>
   <label class="line">
-    <input type=checkbox data-check=autoUpdate <%= it.autoUpdate ? 'checked' : '' %>>
+    <input id=cUpdate type=checkbox data-check=autoUpdate <%= it.autoUpdate ? 'checked' : '' %>>
     <span data-i18n=labelAutoUpdate></span>
   </label>
   <label class="line">
@@ -18,7 +18,7 @@
   <fieldset class=title>
     <legend data-i18n=labelDataImport></legend>
     <button id=bImport data-i18n=buttonImportData></button>
-    <button id=bVacuum data-i18n=buttonVacuum></button>
+    <button id=bVacuum data-i18n=buttonVacuum title="<%- _.i18n('hintVacuum') %>"></button>
   </fieldset>
   <fieldset class=title>
     <legend data-i18n=labelDataExport></legend>

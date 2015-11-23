@@ -279,7 +279,7 @@ fieldset.title {
 }
 .script-desc {
   margin: 5px 0 5px 50px;
-  line-height: 1.5;
+  height: 1.2rem;
   overflow-y: auto;
 }
 .disabled .script-icon {
