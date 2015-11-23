@@ -1,3 +1,5 @@
+zip.workerScriptsPath = '/lib/zip.js/';
+
 var App = Backbone.Router.extend({
   routes: {
     '': 'renderMain',

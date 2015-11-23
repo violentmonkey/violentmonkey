@@ -169,8 +169,8 @@ var ExportList = BaseView.extend({
   },
   getSelected: function () {
     var selected = [];
-    _this.$('option').each(function (i, option) {
-      if (option.selected) selected.push(scriptList[i]);
+    this.$('option').each(function (i, option) {
+      if (option.selected) selected.push(scriptList.at(i));
     });
     return selected;
   },
@@ -193,6 +193,7 @@ var SettingsTab = BaseView.extend({
     'change #sInjectMode': 'updateInjectMode',
     'click #bSelect': 'toggleSelection',
     'click #bImport': 'importFile',
+    'click #bExport': 'exportData',
   },
   templateUrl: 'templates/tab-settings.html',
   render: function () {
@@ -294,12 +295,87 @@ var SettingsTab = BaseView.extend({
   },
   importFile: function () {
     var _this = this;
-    $('<input type=file>')
+    $('<input type=file accept=".zip">')
     .change(function (e) {
       if (this.files && this.files.length)
         _this.importData(this.files[0]);
     })
     .trigger('click');
+  },
+  exportData: function () {
+    function getWriter() {
+      return new Promise(function (resolve, reject) {
+        zip.createWriter(new zip.BlobWriter, function (writer) {
+          resolve(writer);
+        });
+      });
+    }
+    function addFile(writer, file) {
+      return new Promise(function (resolve, reject) {
+        writer.add(file.name, new zip.TextReader(file.content), function () {
+          resolve(writer);
+        });
+      });
+    }
+    function download(writer) {
+      return new Promise(function (resolve, reject) {
+        writer.close(function (blob) {
+          var url = URL.createObjectURL(blob);
+          $('<a>').attr({
+            href: url,
+            download: 'scripts.zip',
+          }).trigger('click');
+          URL.revokeObjectURL(url);
+          resolve();
+        });
+      });
+    }
+    var bExport = this.$('#bExport');
+    bExport.prop('disabled', true);
+    var selected = this.exportList.getSelected();
+    if (!selected.length) return;
+    var withValues = this.$('#cbValues').prop('checked');
+    _.sendMessage({
+      cmd: 'ExportZip',
+      data: {
+        values: withValues,
+        data: _.pluck(selected, 'id'),
+      }
+    }).then(function (data) {
+      var names = {};
+      var vm = {
+        scripts: {},
+        settings: _.options.getAll(),
+      };
+      if (withValues) vm.values = {};
+      var files = data.scripts.map(function (script) {
+        var name = script.custom.name || script.meta.name || 'Noname';
+        if (names[name]) name += '_' + (++ names[name]);
+        else names[name] = 1;
+        vm.scripts[name] = _.pick(script, ['id', 'custom', 'enabled', 'update']);
+        if (withValues) {
+          var values = data.values[script.uri];
+          if (values) vm.values[script.uri] = values;
+        }
+        return {
+          name: name + '.user.js',
+          content: script.code,
+        };
+      });
+      files.push({
+        name: 'ViolentMonkey',
+        content: JSON.stringify(vm),
+      });
+      return files;
+    }).then(function (files) {
+      return files.reduce(function (result, file) {
+        return result.then(function (writer) {
+          return addFile(writer, file);
+        });
+      }, getWriter()).then(download);
+    }).then(function () {
+      bExport.prop('disabled', false);
+    });
   },
 });
 
