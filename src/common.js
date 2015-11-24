@@ -65,6 +65,10 @@ _.zfill = function (num, length) {
   return num;
 };
 
+_.getUniqId = function () {
+	return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+};
+
 /*
 function format() {
   var args = arguments;
