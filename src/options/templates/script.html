@@ -26,7 +26,7 @@
   <button data-id=remove data-i18n="buttonRemove"></button>
   <%= it.canUpdate ?
   '<button data-id=update data-i18n="buttonUpdate"' + (
-    it.updating ? ' disabled' : ''
+    it.checking ? ' disabled' : ''
   ) + '></button>'
   : '' %>
   <span data-id=message><%= it.message %></span>

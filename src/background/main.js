@@ -1,6 +1,5 @@
 var vmdb = new VMDB;
-var port = null;
-var vm_ver = chrome.app.getDetails().version;
+var VM_VER = chrome.app.getDetails().version;
 var commands = {
   NewScript: function (data, src) {
     return Promise.resolve(scriptUtils.newScript());
@@ -15,14 +14,14 @@ var commands = {
     var data = {
       isApplied: _.options.get('isApplied'),
       injectMode: _.options.get('injectMode'),
-      version: vm_ver,
+      version: VM_VER,
     };
     if(src.url == src.tab.url)
       chrome.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
     return data.isApplied
     ? vmdb.getScriptsByURL(url).then(function (res) {
       return Object.assign(data, res);
-    } : Promise.resolve(data);
+    }) : Promise.resolve(data);
   },
   UpdateMeta: function (data, src) {
     return vmdb.updateScriptInfo(data.id, data);
@@ -42,16 +41,56 @@ var commands = {
   Move: function (data, src) {
     return vmdb.moveScript(data.id, data.offset);
   },
-  CheckUpdate: checkUpdate,
-  CheckUpdateAll: checkUpdateAll,
-  ParseScript: parseScript,
-  SetBadge: setBadge,
+  Vacuum: function (data, src) {
+    return vmdb.vacuum();
+  },
+  ParseScript: function (data, src) {
+    return vmdb.parseScript(data).then(function (res) {
+      var meta = res.data.meta;
+      if (!meta.grant.length && !_.options.get('ignoreGrant'))
+        notify({
+          id: 'VM-NoGrantWarning',
+          title: _.i18n('Warning'),
+          body: _.i18n('msgWarnGrant', [meta.name||_.i18n('labelNoName')]),
+          isClickable: true,
+        });
+      _.messenger.post(res);
+    });
+  },
+  CheckUpdate: function (id, src) {
+    vmdb.getScript(id).then(vmdb.checkUpdate);
+    return false;
+  },
+  CheckUpdateAll: function (data, src) {
+    _.options.set('lastUpdate', Date.now());
+    vmdb.getScriptsByIndex('update', 1).then(function (scripts) {
+      return Promise.all(scripts.map(vmdb.checkUpdate));
+    });
+    return false;
+  },
+  ParseMeta: function (code, src) {
+    return Promise.resolve(scriptUtils.parseMeta(code));
+  },
   AutoUpdate: autoUpdate,
-  Vacuum: vacuum,
-  ParseMeta: function(o, src, callback) {callback(parseMeta(o));},
-  GetRequestId: getRequestId,
-  HttpRequest: httpRequest,
-  AbortRequest: abortRequest,
+  GetRequestId: function (data, src) {
+    return Promise.resolve(requests.getRequestId());
+  },
+  HttpRequest: function (details, src) {
+    requests.httpRequest(details, function (res) {
+      _.messenger.send(src.tab.id, {
+        cmd: 'HttpRequested',
+        data: res,
+      });
+    });
+    return false;
+  },
+  AbortRequest: function (id, src) {
+    return Promise.resolve(requests.abortRequest(id));
+  },
+  SetBadge: function (num, src) {
+    setBadge(num, src);
+    return false;
+  },
 };
 
 vmdb.initialized.then(function () {
@@ -76,16 +115,6 @@ vmdb.initialized.then(function () {
 
 // Common functions
 
-function compareVersion(version1, version2) {
-  version1 = (version1 || '').split('.');
-  version2 = (version2 || '').split('.');
-  for ( var i = 0; i < version1.length || i < version2.length; i ++ ) {
-    var delta = (parseInt(version1[i], 10) || 0) - (parseInt(version2[i], 10) || 0);
-    if(delta) return delta < 0 ? -1 : 1;
-  }
-  return 0;
-}
-
 function notify(options) {
   chrome.notifications.create(options.id || 'ViolentMonkey', {
     type: 'basic',
@@ -96,302 +125,69 @@ function notify(options) {
   });
 }
 
-function isRemote(url){
-  return url && !/^data:/.test(url);
-}
-
-function getMeta(script) {
-  return {
-    id: script.id,
-    custom: script.custom,
-    meta: script.meta,
-    enabled: script.enabled,
-    update: script.update,
-  };
-}
-
-function vacuum(o, src, callback) {
-  function init(){
-    var o = db.transaction('scripts').objectStore('scripts');
-    o.index('position').openCursor().onsuccess = function (e) {
-      var r = e.target.result;
-      if (r) {
-        var script = r.value;
-        ids.push(script.id);
-        script.meta.require.forEach(function (item) {require[item] = 1;});
-        for(var i in script.meta.resources) cache[script.meta.resources[i]] = 1;
-        if(isRemote(script.meta.icon)) cache[script.meta.icon] = 1;
-        values[script.uri] = 1;
-        r.continue();
-      } else vacuumPosition();
-    };
-  }
-  function vacuumPosition() {
-    var id = ids.shift();
-    if (id) {
-      var o = db.transaction('scripts','readwrite').objectStore('scripts');
-      o.get(id).onsuccess = function (e) {
-        var r = e.target.result;
-        r.position = ++ _pos;
-        o.put(r).onsuccess = vacuumPosition;
-      };
-    } else {
-      position = _pos;
-      vacuumDB('require', require);
-      vacuumDB('cache', cache);
-      vacuumDB('values', values);
-    }
-  }
-  function vacuumDB(dbName, dict) {
-    working ++;
-    // the database must have a keyPath of 'uri'
-    var o = db.transaction(dbName, 'readwrite').objectStore(dbName);
-    o.openCursor().onsuccess = function (e) {
-      var r = e.target.result;
-      if (r) {
-        var v = r.value;
-        if (!dict[v.uri]) o.delete(v.uri);
-        else dict[v.uri] ++;  // keep
-        r.continue();
-      } else finish();
-    };
-  }
-  function finish() {
-    if(! -- working) {
-      for(var i in require)
-        if(require[i] == 1) fetchRequire(i);
-      for(i in cache)
-        if(cache[i] == 1) fetchCache(i);
-      callback();
-    }
-  }
-  var ids = [];
-  var cache = {};
-  var require = {};
-  var values = {};
-  var working = 0;
-  var _pos=0;
-  init();
-  return true;
-}
-
-var badges = {};
-function setBadge(num, src, callback) {
-  var o;
-  if(src.id in badges) o = badges[src.id];
-  else badges[src.id] = o = {num: 0};
-  o.num += num;
-  chrome.browserAction.setBadgeBackgroundColor({color: '#808', tabId: src.tab.id});
-  chrome.browserAction.setBadgeText({
-    text: o.num ? o.num.toString() : '',
-    tabId: src.tab.id,
-  });
-  if(o.timer) clearTimeout(o.timer);
-  o.timer = setTimeout(function(){delete badges[src.id];}, 300);
-  callback();
-}
-
-function fetchURL(url, cb, type, headers) {
-  var req = new XMLHttpRequest();
-  req.open('GET', url, true);
-  if (type) req.responseType = type;
-  if (headers) for(var i in headers)
-    req.setRequestHeader(i, headers[i]);
-  if(cb) req.onloadend = cb;
-  req.send();
-}
-
-function updateItem(data) {
-  if (port) try {
-    port.postMessage(data);
-  } catch(e) {
-    port = null;
-    console.log(e);
-  }
-}
-
-function parseScript(data, src, callback) {
-  function finish() {
-    updateItem(ret);
-    if (callback) callback(ret);
-  }
-  var ret = {
-    cmd: 'update',
-    data: {
-      message: 'message' in data ? data.message : _.i18n('msgUpdated'),
-    },
-  };
-  if (data.status && data.status != 200 || data.code == '') {
-    // net error
-    ret.cmd = 'error';
-    ret.data.message = _.i18n('msgErrorFetchingScript');
-    finish();
-  } else {
-    // store script
-    var meta = parseMeta(data.code);
-    queryScript(data.id, meta, function(script) {
-      if (!script.id) {
-        ret.cmd = 'add';
-        ret.data.message = _.i18n('msgInstalled');
-      }
-      // add additional data for import and user edit
-      if (data.more)
-        for(var i in data.more)
-          if(i in script) script[i] = data.more[i];
-      script.meta = meta;
-      script.code = data.code;
-      script.uri = getNameURI(script);
-      // use referer page as default homepage
-      if (data.from && !script.meta.homepageURL && !script.custom.homepageURL && !/^(file|data):/.test(data.from))
-        script.custom.homepageURL = data.from;
-      if (data.url && !/^(file|data):/.test(data.url))
-        script.custom.lastInstallURL = data.url;
-      saveScript(script).onsuccess = function(e) {
-        script.id = e.target.result;
-        Object.assign(ret.data, getMeta(script));
-        finish();
-        if (!meta.grant.length && !_.options.get('ignoreGrant'))
-          notify({
-            id: 'VM-NoGrantWarning',
-            title: _.i18n('Warning'),
-            body: _.i18n('msgWarnGrant', [meta.name||_.i18n('labelNoName')]),
-            isClickable: true,
-          });
-      };
+var setBadge = function () {
+  var badges = {};
+  return function (num, src) {
+    var o = badges[src.id];
+    if (!o) o = badges[src.id] = {num: 0};
+    o.num += num;
+    chrome.browserAction.setBadgeBackgroundColor({
+      color: '#808',
+      tabId: src.tab.id,
     });
-    // @require
-    meta.require.forEach(function (url) {
-      var cache = data.require && data.require[url];
-      if(cache) saveRequire(url, cache);
-      else fetchRequire(url);
+    chrome.browserAction.setBadgeText({
+      text: (o.num || '').toString(),
+      tabId: src.tab.id,
     });
-    // @resource
-    for(var i in meta.resources) {
-      var url = meta.resources[i];
-      var cache = data.resources && data.resources[url];
-      if(cache) saveCache(url, cache);
-      else fetchCache(url);
-    }
-    // @icon
-    if(isRemote(meta.icon)) fetchCache(meta.icon, function (blob, cb) {
-      var free = function() {
-        URL.revokeObjectURL(url);
-      };
-      var url = URL.createObjectURL(blob);
-      var image = new Image;
-      image.onload = function() {
-        free();
-        cb(blob);
-      };
-      image.onerror = function() {
-        free();
-      };
-      image.src = url;
-    });
-  }
-  return true;
-}
-
-var _update = {};
-function realCheckUpdate(script) {
-  function update() {
-    if(downloadURL) {
-      ret.data.message = _.i18n('msgUpdating');
-      fetchURL(downloadURL, function(){
-        parseScript({
-          id: script.id,
-          status: this.status,
-          code: this.responseText,
-        });
-      });
-    } else ret.data.message = '<span class=new>' + _.i18n('msgNewVersion') + '</span>';
-    updateItem(ret);
-    finish();
-  }
-  function finish(){
-    delete _update[script.id];
-  }
-  if (_update[script.id]) return;
-  _update[script.id] = 1;
-  var ret = {
-    cmd: 'update',
-    data: {
-      id: script.id,
-      updating: true,
-    },
+    if (o.timer) clearTimeout(o.timer);
+    o.timer = setTimeout(function () {
+      delete badges[src.id];
+    }, 300);
   };
-  var downloadURL =
-    script.custom.downloadURL ||
-    script.meta.downloadURL ||
-    script.custom.lastInstallURL;
-  var updateURL =
-    script.custom.updateURL ||
-    script.meta.updateURL ||
-    downloadURL;
-  if(updateURL) {
-    ret.data.message = _.i18n('msgCheckingForUpdate');
-    updateItem(ret);
-    fetchURL(updateURL, function() {
-      ret.data.message = _.i18n('msgErrorFetchingUpdateInfo');
-      if (this.status == 200)
-        try {
-          var meta = parseMeta(this.responseText);
-          if(compareVersion(script.meta.version, meta.version) < 0)
-            return update();
-          ret.data.message = _.i18n('msgNoUpdate');
-        } catch(e) {}
-      ret.data.updating = false;
-      updateItem(ret);
-      finish();
-    }, null, {
-      Accept:'text/x-userscript-meta',
-    });
-  } else finish();
-}
+}();
 
-function checkUpdate(id, src, callback) {
-  var o = db.transaction('scripts').objectStore('scripts');
-  o.get(id).onsuccess = function (e) {
-    var script = e.target.result;
-    if(script) realCheckUpdate(script);
-    if(callback) callback();
-  };
-  return true;
-}
-
-function checkUpdateAll(e, src, callback) {
-  _.options.set('lastUpdate', Date.now());
-  var o = db.transaction('scripts').objectStore('scripts');
-  o.index('update').openCursor(1).onsuccess = function (e) {
-    var r = e.target.result;
-    if (r) {
-      realCheckUpdate(r.value);
-      r.continue();
-    } else if(callback) callback();
-  };
-  return true;
-}
-
-var _autoUpdate = false;
-function autoUpdate(data, src, callback) {
+var autoUpdate = function () {
   function check() {
-    if(_.options.get('autoUpdate')) {
+    checking = true;
+    return new Promise(function (resolve, reject) {
+      if (!_.options.get('autoUpdate')) return reject();
       if (Date.now() - _.options.get('lastUpdate') >= 864e5)
-        checkUpdateAll();
+        return commands.CheckUpdateAll();
+    }).then(function () {
       setTimeout(check, 36e5);
-    } else _autoUpdate = false;
+    }, function () {
+      checking = false;
+    });
   }
-  if (!_autoUpdate) {
-    _autoUpdate = true;
-    check();
-  }
-  if (callback) callback();
-}
+  var checking;
+  return function () {
+    checking || check();
+  };
+}();
 
-chrome.runtime.onConnect.addListener(function (_port) {
-  port = _port;
-  _port.onDisconnect.addListener(function () {port = null;});
-});
+_.messenger = function () {
+  var port;
+  chrome.runtime.onConnect.addListener(function (_port) {
+    port = _port;
+    _port.onDisconnect.addListener(function () {
+      if (port === _port) port = null;
+    });
+  });
+
+  return {
+    post: function (data) {
+      try {
+        port && port.postMessage(data);
+      } catch (e) {
+        console.log(e);
+        port = null;
+      }
+    },
+    send: function (tabId, data) {
+      chrome.tabs.sendMessage(tabId, data);
+    },
+  };
+}();
 
 chrome.browserAction.setIcon({
   path: '/images/icon19' + (_.options.get('isApplied') ? '' : 'w') + '.png',

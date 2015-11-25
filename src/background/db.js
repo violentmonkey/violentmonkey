@@ -1,6 +1,7 @@
 function VMDB() {
   var _this = this;
   _this.initialized = _this.openDB().then(_this.initPosition.bind(_this));
+  _this.checkUpdate = _this.checkUpdate.bind(_this);
 }
 
 VMDB.prototype.openDB = function () {
@@ -9,6 +10,7 @@ VMDB.prototype.openDB = function () {
     var request = indexedDB.open('Violentmonkey', 1);
     request.onsuccess = function (e) {
       _this.db = request.result;
+      resolve();
     };
     request.onerror = function (e) {
       var err = e.target.error;
@@ -43,15 +45,15 @@ VMDB.prototype.initPosition = function () {
   return new Promise(function (resolve, reject) {
     o.index('position').openCursor(null, 'prev').onsuccess = function (e) {
       var result = e.target.result;
-      if (result && _this.position < result.key)
-        _this.position = result.key;
+      if (result) _this.position = result.key;
       resolve();
     };
   });
 };
 
-VMDB.prototype.getScript = function (id, os) {
-  os = os || this.db.transaction('scripts').objectStore('scripts');
+VMDB.prototype.getScript = function (id, tx) {
+  tx = tx || this.db.transaction('scripts');
+  var os = tx.objectStore('scripts');
   return new Promise(function (resolve, reject) {
     os.get(id).onsuccess = function (e) {
       resolve(e.target.result);
@@ -59,12 +61,13 @@ VMDB.prototype.getScript = function (id, os) {
   });
 };
 
-VMDB.prototype.queryScript = function (id, meta) {
-  return id ? this.getScript(id)
+VMDB.prototype.queryScript = function (id, meta, tx) {
+  var _this = this;
+  return id ? _this.getScript(id, tx)
   : new Promise(function (resolve, reject) {
-    var uri = getNameURI({meta: meta});
+    var uri = scriptUtils.getNameURI({meta: meta});
     if (uri !== '::')
-      this.db.transaction('scripts').objectStore('scripts')
+      (tx || _this.db.transaction('scripts')).objectStore('scripts')
       .index('uri').get(uri).onsuccess = function (e) {
         resolve(e.target.result);
       };
@@ -76,7 +79,7 @@ VMDB.prototype.queryScript = function (id, meta) {
 VMDB.prototype.getScriptData = function (id) {
   return this.getScript(id).then(function (script) {
     if (!script) return Promise.reject();
-    var data = scriptUtils.getMeta(script);
+    var data = scriptUtils.getScriptInfo(script);
     data.code = script.code;
     return data;
   });
@@ -84,48 +87,40 @@ VMDB.prototype.getScriptData = function (id) {
 
 VMDB.prototype.getScriptInfos = function (ids) {
   var _this = this;
-  var os = _this.db.transaction('scripts').objectStore('scripts');
+  var tx = _this.db.transaction('scripts');
   return Promise.all(ids.map(function (id) {
-    return _this.getScript(id, os);
+    return _this.getScript(id, tx);
   })).then(function (scripts) {
-    return scripts.filter(function (x) {return x;}).map(scriptUtils.getMeta);
+    return scripts.filter(function (x) {return x;}).map(scriptUtils.getScriptInfo);
   });
 };
 
 VMDB.prototype.getScriptsByURL = function (url) {
   function getScripts() {
-    return new Promise(function (resolve, reject) {
+    return _this.getScriptsByIndex('position', null, tx).then(function (scripts) {
       var data = {
-        scripts: [],
         uris: [],
       };
       var require = {};
       var cache = {};
-      var o = db.transaction('scripts').objectStore('scripts');
-      o.index('position').openCursor().onsuccess = function (e) {
-        var result = e.target.result;
-        if (result) {
-          var value = result.value;
-          if (testURL(url, value)) {
-            data.scripts.push(value);
-            data.uris.push(value.uri);
-            value.meta.require.forEach(function (key) {
-              require[key] = 1;
-            });
-            for (var k in value.meta.resources)
-              cache[value.meta.resources[k]] = 1;
-          }
-          result.continue();
-        } else {
-          data.require = Object.getOwnPropertyNames(require);
-          data.cache = Object.getOwnPropertyNames(cache);
-          resolve(data);
+      data.scripts = scripts.filter(function (script) {
+        if (tester.testURL(url, script)) {
+          data.uris.push(script.uri);
+          script.meta.require.forEach(function (key) {
+            require[key] = 1;
+          });
+          for (var k in script.meta.resources)
+            cache[script.meta.resources[k]] = 1;
+          return true;
         }
-      };
+      });
+      data.require = Object.keys(require);
+      data.cache = Object.keys(cache);
+      return data;
     });
   }
   function getRequire(uris) {
-    var o = db.transaction('require').objectStore('require');
+    var o = tx.objectStore('require');
     return Promise.all(uris.map(function (uri) {
       return new Promise(function (resolve, reject) {
         o.get(uri).onsuccess = function (e) {
@@ -140,7 +135,7 @@ VMDB.prototype.getScriptsByURL = function (url) {
     });
   }
   function getValues(uris) {
-    var o = db.transaction('values').objectStore('values');
+    var o = tx.objectStore('values');
     return Promise.all(uris.map(function (uri) {
       return new Promise(function (resolve, reject) {
         o.get(uri).onsuccess = function (e) {
@@ -155,12 +150,12 @@ VMDB.prototype.getScriptsByURL = function (url) {
     });
   }
   var _this = this;
-  var db = _this.db;
+  var tx = _this.db.transaction(['scripts', 'require', 'values', 'cache']);
   return getScripts().then(function (data) {
     return Promise.all([
       getRequire(data.require),
       getValues(data.uris),
-      _this.getCacheB64(data.cache),
+      _this.getCacheB64(data.cache, tx),
     ]).then(function (res) {
       return {
         scripts: data.scripts,
@@ -174,35 +169,26 @@ VMDB.prototype.getScriptsByURL = function (url) {
 
 VMDB.prototype.getData = function () {
   function getScripts() {
-    return new Promise(function (resolve, reject) {
-      var data = {
-        scripts: [],
-      };
+    return _this.getScriptsByIndex('position', null, tx).then(function (scripts) {
+      var data = {};
       var cache = {};
-      var o = db.transaction('scripts').objectStore('scripts');
-      o.index('position').openCursor().onsuccess = function (e) {
-        var result = e.target.result;
-        if (result) {
-          var value = result.value;
-          if (isRemote(value.meta.icon)) cache[value.meta.icon] = 1;
-          data.scripts.push(scriptUtils.getMeta(value));
-          result.continue();
-        } else {
-          data.cache = Object.getOwnPropertyNames(cache);
-          resolve(data);
-        }
-      }
+      data.scripts = scripts.map(function (script) {
+        if (scriptUtils.isRemote(script.meta.icon)) cache[script.meta.icon] = 1;
+        return scriptUtils.getScriptInfo(script);
+      });
+      data.cache = Object.keys(cache);
+      return data;
     });
   }
   function getCache(uris) {
-    return _this.getCacheB64(uris).then(function (cache) {
+    return _this.getCacheB64(uris, tx).then(function (cache) {
       for (var k in cache)
         cache[k] = 'data:image/png;base64,' + cache[k];
       return cache;
     });
   }
   var _this = this;
-  var db = _this.db;
+  var tx = _this.db.transaction(['scripts', 'cache']);
   return getScripts().then(function (data) {
     return getCache(data.cache).then(function (cache) {
       return {
@@ -214,14 +200,19 @@ VMDB.prototype.getData = function () {
 };
 
 VMDB.prototype.removeScript = function (id) {
-	var o = this.db.transaction('scripts', 'readwrite').objectStore('scripts');
-	o.delete(id);
-  return Promise.resolve();
+  var tx = this.db.transaction('scripts', 'readwrite');
+  return new Promise(function (resolve, reject) {
+    var o = tx.objectStore('scripts');
+    o.delete(id).onsuccess = function () {
+      resolve();
+    };
+  });
 };
 
 VMDB.prototype.moveScript = function (id, offset) {
-  var o = this.db.transaction('scripts', 'readwrite').objectStore('scripts');
-  return this.getScript(id).then(function (script) {
+  var tx = this.db.transaction('scripts', 'readwrite');
+  var o = tx.objectStore('scripts');
+  return this.getScript(id, tx).then(function (script) {
     var pos = script.position;
     var range, order;
     if (offset < 0) {
@@ -254,8 +245,9 @@ VMDB.prototype.moveScript = function (id, offset) {
   });
 };
 
-VMDB.prototype.getCacheB64 = function (urls) {
-  var o = this.db.transaction('cache').objectStore('cache');
+VMDB.prototype.getCacheB64 = function (urls, tx) {
+  tx = tx || this.db.transaction('cache');
+  var o = tx.objectStore('cache');
   return Promise.all(urls.map(function (url) {
     return new Promise(function (resolve, reject) {
       o.get(url).onsuccess = function (e) {
@@ -269,8 +261,9 @@ VMDB.prototype.getCacheB64 = function (urls) {
   });
 };
 
-VMDB.prototype.saveCache = function (url, data) {
-  var o = this.db.transaction('cache', 'readwrite').objectStore('cache');
+VMDB.prototype.saveCache = function (url, data, tx) {
+  tx = tx || this.db.transaction('cache', 'readwrite');
+  var o = tx.objectStore('cache');
   return new Promise(function (resolve, reject) {
     o.put({uri: url, data: data}).onsuccess = function () {
       resolve();
@@ -278,8 +271,9 @@ VMDB.prototype.saveCache = function (url, data) {
   });
 };
 
-VMDB.prototype.saveRequire = function (url, data) {
-  var o = this.db.transaction('require', 'readwrite').objectStore('require');
+VMDB.prototype.saveRequire = function (url, data, tx) {
+  tx = tx || this.db.transaction('require', 'readwrite');
+  var o = tx.objectStore('require');
   return new Promise(function (resolve, reject) {
     o.put({uri: url, code: data}).onsuccess = function () {
       resolve();
@@ -287,47 +281,32 @@ VMDB.prototype.saveRequire = function (url, data) {
   });
 };
 
-VMDB.prototype.saveScript = function (script) {
+VMDB.prototype.saveScript = function (script, tx) {
   script.enabled = script.enabled ? 1 : 0;
   script.update = script.update ? 1 : 0;
   if (!script.position) script.position = ++ this.position;
-  var o = this.db.transaction('scripts', 'readwrite').objectStore('scripts');
+  tx = tx || this.db.transaction('scripts', 'readwrite');
+  var o = tx.objectStore('scripts');
   return new Promise(function (resolve, reject) {
-    o.put(script).onsuccess = function () {
-      resolve();
+    o.put(script).onsuccess = function (e) {
+      script.id = e.target.result;
+      resolve(script);
     };
-  });
-};
-
-VMDB.prototype.fetch = function (url, type, headers) {
-  var xhr = new XMLHttpRequest;
-  xhr.open('GET', url, true);
-  if (type) xhr.responseType = type;
-  if (headers) for (var k in headers)
-    xhr.setRequestHeader(k, headers[k]);
-  return new Promise(function (resolve, reject) {
-    xhr.onload = function () {
-      resolve(this);
-    };
-    xhr.onerror = function () {
-      reject(this);
-    };
-    xhr.send();
   });
 };
 
 VMDB.prototype.fetchCache = function () {
   var requests = {};
-  return function (url, check) {
+  return function (url, tx, check) {
     var _this = this;
     return requests[url]
-    || (requests[url] = _this.fetch(url, 'blob').then(function (res) {
+    || (requests[url] = scriptUtils.fetch(url, 'blob').then(function (res) {
       return check ? check(res.response) : res.response;
     }).then(function (data) {
       return new Promise(function (resolve, reject) {
         var reader = new FileReader;
         reader.onload = function (e) {
-          _this.saveCache(url, window.btoa(this.result)).then(function () {
+          _this.saveCache(url, window.btoa(this.result), tx).then(function () {
             delete requests[url];
             resolve();
           });
@@ -343,11 +322,11 @@ VMDB.prototype.fetchCache = function () {
 
 VMDB.prototype.fetchRequire = function () {
   var requests = {};
-  return function (url) {
+  return function (url, tx) {
     var _this = this;
     return requests[url]
-    || (requests[url] = _this.fetch(url).then(function (res) {
-      return _this.saveRequire(url, res.responseText);
+    || (requests[url] = scriptUtils.fetch(url).then(function (res) {
+      return _this.saveRequire(url, res.responseText, tx);
     }).then(function () {
       delete requests[url];
     }));
@@ -372,7 +351,7 @@ VMDB.prototype.updateScriptInfo = function (id, data) {
       for (var k in data)
         if (k in script) script[k] = data[k];
       o.put(script).onsuccess = function (e) {
-        resolve(scriptUtils.getMeta(script));
+        resolve(scriptUtils.getScriptInfo(script));
       };
     };
   });
@@ -380,7 +359,7 @@ VMDB.prototype.updateScriptInfo = function (id, data) {
 
 VMDB.prototype.getExportData = function (ids, withValues) {
   function getScripts(ids) {
-    var o = db.transaction('scripts').objectStore('scripts');
+    var o = tx.objectStore('scripts');
     return Promise.all(ids.map(function (id) {
       return new Promise(function (resolve, reject) {
         o.get(id).onsuccess = function (e) {
@@ -392,7 +371,7 @@ VMDB.prototype.getExportData = function (ids, withValues) {
     });
   }
   function getValues(uris) {
-    var o = db.transaction('values').objectStore('values');
+    var o = tx.objectStore('values');
     return Promise.all(uris.map(function (uri) {
       return new Promise(function (resolve, reject) {
         o.get(uri).onsuccess = function (e) {
@@ -406,7 +385,7 @@ VMDB.prototype.getExportData = function (ids, withValues) {
       }, {});
     });
   }
-  var db = this.db;
+  var tx = this.db.transaction(['scripts', 'values']);
   return getScripts(ids).then(function (scripts) {
     var res = {
       scripts: scripts,
@@ -419,142 +398,236 @@ VMDB.prototype.getExportData = function (ids, withValues) {
   });
 };
 
-var scriptUtils = {
-  parseMeta: function (code) {
-  	// initialize meta, specify those with multiple values allowed
-  	var meta = {
-  		include: [],
-  		exclude: [],
-  		match: [],
-  		require: [],
-  		resource: [],
-  		grant: [],
-  	};
-  	var flag = -1;
-  	code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, function(value, group1, group2) {
-  		if (flag < 0 && group1 == '==UserScript==')
-  			// start meta
-  			flag = 1;
-  		else if(flag > 0 && group1 == '==/UserScript==')
-  			// end meta
-  			flag = 0;
-  		if (flag == 1 && group1[0] == '@') {
-  			var key = group1.slice(1);
-  			var val = group2.replace(/^\s+|\s+$/g, '');
-  			var value = meta[key];
-        // multiple values allowed
-  			if (value && value.push) value.push(val);
-        // only first value will be stored
-  			else if (!(key in meta)) meta[key] = val;
-  		}
-  	});
-  	meta.resources = {};
-  	meta.resource.forEach(function(line) {
-  		var pair = line.match(/^(\w\S*)\s+(.*)/);
-  		if (pair) meta.resources[pair[1]] = pair[2];
-  	});
-  	delete meta.resource;
-  	// @homepageURL: compatible with @homepage
-  	if (!meta.homepageURL && meta.homepage) meta.homepageURL = meta.homepage;
-  	return meta;
-  },
-  newScript: function () {
-    var script = {
-  		custom: {},
-  		enabled: 1,
-  		update: 1,
-  		code: '// ==UserScript==\n// @name New Script\n// ==/UserScript==\n',
-  	};
-  	script.meta = scriptUtils.parseMeta(script.code);
-  	return script;
-  },
-  getMeta: function (script) {
-    return {
-  		id: script.id,
-  		custom: script.custom,
-  		meta: script.meta,
-  		enabled: script.enabled,
-  		update: script.update,
-  	};
-  },
-  getNameURI: function (script) {
-  	var ns = script.meta.namespace || '';
-  	var name = script.meta.name || '';
-  	var nameURI = escape(ns) + ':' + escape(name) + ':';
-  	if (!ns && !name) nameURI += script.id || '';
-  	return nameURI;
-  },
+VMDB.prototype.vacuum = function () {
+  function getScripts() {
+    return _this.getScriptsByIndex('position', null, tx).then(function (scripts) {
+      var data = {
+        require: {},
+        cache: {},
+        values: {},
+      };
+      data.ids = scripts.map(function (script) {
+        script.meta.require.forEach(function (uri) {data.require[uri] = 1;});
+        for (var k in script.meta.resources)
+          data.cache[script.meta.resources[k]] = 1;
+        if (scriptUtils.isRemote(script.meta.icon))
+          data.cache[script.meta.icon] = 1;
+        data.values[script.uri] = 1;
+        return script.id;
+      });
+      return data;
+    });
+  }
+  function vacuumPosition(ids) {
+    var o = tx.objectStore('scripts');
+    return ids.reduce(function (res, id, i) {
+      return res.then(function () {
+        return new Promise(function (resolve, reject) {
+          o.get(id).onsuccess = function (e) {
+            var result = e.target.result;
+            result.position = i + 1;
+            o.put(result).onsuccess = function () {
+              resolve();
+            };
+          };
+        });
+      });
+    }, Promise.resolve());
+  }
+  function vacuumCache(dbName, dict) {
+    return new Promise(function (resolve, reject) {
+      var o = tx.objectStore(dbName);
+      o.openCursor().onsuccess = function (e) {
+        var result = e.target.result;
+        if (result) {
+          var value = result.value;
+          (new Promise(function (resolve, reject) {
+            if (!dict[value.uri])
+              o.delete(value.uri).onsuccess = function () {
+                resolve();
+              };
+            else {
+              dict[value.uri] ++;
+              resolve();
+            }
+          })).then(function () {
+            result.continue();
+          });
+        } else resolve();
+      };
+    });
+  }
+  var _this = this;
+  var tx = _this.db.transaction(['scripts', 'require', 'cache', 'values'], 'readwrite');
+  return getScripts().then(function (data) {
+    return Promise.all([
+      vacuumPosition(data.ids),
+      vacuumCache('require', data.require),
+      vacuumCache('cache', data.cache),
+      vacuumCache('values', data.values),
+    ]).then(function () {
+      return {
+        require: data.require,
+        cache: data.cache,
+      };
+    });
+  }).then(function (data) {
+    return Promise.all([
+      Object.keys(data.require).map(function (k) {
+        return data.require[k] === 1 && _this.fetchRequire(k, tx);
+      }),
+      Object.keys(data.cache).map(function (k) {
+        return data.cache[k] === 1 && _this.fetchCache(k, tx);
+      }),
+    ]);
+  });
 };
 
-var tester = function () {
-  function testURL(url, script) {
-    var custom = script.custom;
-    var meta = script.meta;
-    var inc = [], exc = [], mat = [];
-    var ok = true;
-    if (custom._match !== false && meta.match) mat = mat.concat(meta.match);
-    if (custom.match) mat = mat.concat(custom.match);
-    if (custom._include !== false && meta.include) inc = inc.concat(meta.include);
-    if (custom.include) inc = inc.concat(custom.include);
-    if (custom._exclude !== false && meta.exclude) exc = exc.concat(meta.exclude);
-    if (custom.exclude) exc = exc.concat(custom.exclude);
-    if (mat.length) {
-      // @match
-      var urlParts = url.match(match_reg);
-      ok = mat.some(function (str) {
-        return matchTest(str, urlParts);
+VMDB.prototype.getScriptsByIndex = function (index, value, tx) {
+  tx = tx || this.db.transaction('scripts');
+  return new Promise(function (resolve, reject) {
+    var o = tx.objectStore('scripts');
+    var list = [];
+    o.index(index).openCursor(value).onsuccess = function (e) {
+      var result = e.target.result;
+      if (result) {
+        list.push(result.value);
+        result.continue();
+      } else resolve(list);
+    };
+  });
+};
+
+VMDB.prototype.parseScript = function (data) {
+  var res = {
+    cmd: 'update',
+    data: {
+      message: data.msg == null ? _.i18n('msgUpdated') : data.msg || '',
+    },
+  };
+  var meta = scriptUtils.parseMeta(data.code);
+  var _this = this;
+  var tx = _this.db.transaction(['scripts', 'require'], 'readwrite');
+  // @require
+  meta.require.forEach(function (url) {
+    var cache = data.require && data.require[url];
+    cache ? _this.saveRequire(url, cache, tx) : _this.fetchRequire(url, tx);
+  });
+  // @resource
+  Object.keys(meta.resources).forEach(function (k) {
+    var url = meta.resources[k];
+    var cache = data.resources && data.resources[url];
+    cache ? _this.saveCache(url, cache, tx) : _this.fetchCache(url, tx);
+  });
+  // @icon
+  if (scriptUtils.isRemote(meta.icon))
+    _this.fetchCache(meta.icon, tx, function (blob) {
+      return new Promise(function (resolve, reject) {
+        var url = URL.createObjectURL(blob);
+        var image = new Image;
+        var free = function () {
+          URL.revokeObjectURL(url);
+        };
+        image.onload = function () {
+          free();
+          resolve();
+        };
+        image.onerror = function () {
+          free();
+          reject();
+        };
+        image.src = url;
       });
-    } else {
-      // @include
-      ok = inc.some(function (str) {
-        return autoReg(str).test(url);
-      });
-    }
-    // exclude
-    ok = ok && !exc.some(function (str) {
-      return autoReg(str).test(url);
     });
-    return ok;
+  return _this.queryScript(data.id, meta, tx).then(function (script) {
+    if (!script.id) {
+      res.cmd = 'add';
+      res.data.message = _.i18n('msgInstalled');
+    }
+    if (data.more) for (var k in data.more)
+      if (k in script) script[k] = data.more[k];
+    script.meta = meta;
+    script.code = data.code;
+    script.uri = scriptUtils.getNameURI(script);
+    // use referer page as default homepage
+    if (!meta.homepageURL && !script.custom.homepageURL && scriptUtils.isRemote(data.from))
+      script.custom.homepageURL = data.from;
+    if (scriptUtils.isRemote(data.url))
+      script.custom.lastInstallURL = data.url;
+    return _this.saveScript(script, tx);
+  }).then(function (script) {
+    Object.assign(res.data, scriptUtils.getScriptInfo(script));
+    return res;
+  });
+};
+
+VMDB.prototype.checkUpdate = function () {
+  function check(script) {
+    var res = {
+      cmd: 'update',
+      data: {
+        id: script.id,
+        checking: true,
+      },
+    };
+    var downloadURL = script.custom.downloadURL || script.meta.downloadURL || script.custom.lastInstallURL;
+    var updateURL = script.custom.updateURL || script.meta.updateURL || downloadURL;
+    var okHandler = function (xhr) {
+      var meta = scriptUtils.parseMeta(xhr.responseText);
+      if (scriptUtils.compareVersion(script.meta.version, meta.version) < 0)
+        return resolve();
+      res.data.checking = false;
+      res.data.message = _.i18n('msgNoUpdate');
+      _.messenger.post(res);
+      return Promise.reject();
+    };
+    var errHandler = function (xhr) {
+      res.data.checking = false;
+      res.data.message = _.i18n('msgErrorFetchingUpdateInfo');
+      _.messenger.post(res);
+      return Promise.reject();
+    };
+    var update = function () {
+      if (!downloadURL) {
+        res.data.message = '<span class="new">' + _.i18n('msgNewVersion') + '</span>';
+        _.messenger.post(res);
+        return Promise.reject();
+      }
+      res.data.message = _.i18n('msgUpdating');
+      return scriptUtils.fetch(downloadURL).then(function (xhr) {
+        res.data.checking = false;
+        _.messenger.post(res);
+        return xhr.responseText;
+      }, function (xhr) {
+        res.data.checking = false;
+        res.data.message = _.i18n('msgErrorFetchingScript');
+        _.messenger.post(res);
+        return Promise.reject();
+      });
+    };
+    if (!updateURL) return Promise.reject();
+    res.data.message = _.i18n('msgCheckingForUpdate');
+    _.messenger.post(res);
+    return scriptUtils.fetch(updateURL, null, {
+      Accept: 'text/x-userscript-meta',
+    }).then(okHandler, errHandler).then(update);
   }
 
-  function str2RE(str) {
-    return RegExp('^' + str.replace(/([.?\/])/g, '\\$1').replace(/\*/g, '.*?') + '$');
-  }
-
-  function autoReg(str) {
-    if (/^\/.*\/$/.test(str))
-      return RegExp(str.slice(1, -1));	// Regular-expression
-    else
-      return str2RE(str);	// String with wildcards
-  }
-
-  var match_reg = /(.*?):\/\/([^\/]*)\/(.*)/;
-  function matchTest(str, urlParts) {
-    if (str == '<all_urls>') return true;
-    var parts = str.match(match_reg);
-    var ok = !!parts;
-    // scheme
-    ok = ok && (
-      // exact match
-      parts[1] == urlParts[1]
-      // * = http | https
-      || parts[1] == '*' && /^https?$/i.test(urlParts[1])
-    );
-    // host
-    ok = ok && (
-      // * matches all
-      parts[2] == '*'
-      // exact match
-      || parts[2] == urlParts[2]
-      // *.example.com
-      || /^\*\.[^*]*$/.test(parts[2]) && str2RE(parts[2]).test(urlParts[2])
-    );
-    // pathname
-    ok = ok && str2RE(parts[3]).test(urlParts[3]);
-    return ok;
-  }
-
-  return {
-    testURL: testURL,
+  var processes = {};
+  return function (script) {
+    var _this = this;
+    var promise = processes[script.id];
+    if (!promise)
+      promise = processes[script.id] = check(script).then(function (code) {
+        delete processes[script.id];
+        return _this.parseScript({
+          id: script.id,
+          code: code,
+        });
+      }, function () {
+        delete processes[script.id];
+        //return Promise.reject();
+      });
+    return promise;
   };
 }();
