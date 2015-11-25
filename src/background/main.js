@@ -1,40 +1,68 @@
 var vmdb = new VMDB;
 var port = null;
 var vm_ver = chrome.app.getDetails().version;
+var commands = {
+  NewScript: function (data, src) {
+    return Promise.resolve(scriptUtils.newScript());
+  },
+  RemoveScript: function (id, src) {
+    return vmdb.removeScript(id);
+  },
+  GetData: function (data, src) {
+    return vmdb.getData();
+  },
+  GetInjected: function (url, src) {
+    var data = {
+      isApplied: _.options.get('isApplied'),
+      injectMode: _.options.get('injectMode'),
+      version: vm_ver,
+    };
+    if(src.url == src.tab.url)
+      chrome.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
+    return data.isApplied
+    ? vmdb.getScriptsByURL(url).then(function (res) {
+      return Object.assign(data, res);
+    } : Promise.resolve(data);
+  },
+  UpdateMeta: function (data, src) {
+    return vmdb.updateScriptInfo(data.id, data);
+  },
+  SetValue: function (data, src) {
+    return vmdb.setValue(data.uri, data.values);
+  },
+  ExportZip: function (data, src) {
+    return vmdb.getExportData(data.ids, data.values);
+  },
+  GetScript: function (id, src) {
+    return vmdb.getScriptData(id);
+  },
+  GetMetas: function (ids, src) {
+    return vmdb.getScriptInfos(ids);
+  },
+  Move: function (data, src) {
+    return vmdb.moveScript(data.id, data.offset);
+  },
+  CheckUpdate: checkUpdate,
+  CheckUpdateAll: checkUpdateAll,
+  ParseScript: parseScript,
+  SetBadge: setBadge,
+  AutoUpdate: autoUpdate,
+  Vacuum: vacuum,
+  ParseMeta: function(o, src, callback) {callback(parseMeta(o));},
+  GetRequestId: getRequestId,
+  HttpRequest: httpRequest,
+  AbortRequest: abortRequest,
+};
 
 vmdb.initialized.then(function () {
-  var commands = {
-    NewScript: function (data, src) {
-      return Promise.resolve(newScript());
-    },
-    RemoveScript: removeScript,
-    GetData: getData,
-    GetInjected: getInjected,
-    CheckUpdate: checkUpdate,
-    CheckUpdateAll: checkUpdateAll,
-    UpdateMeta: updateMeta,
-    SetValue: setValue,
-    ExportZip: exportZip,
-    ParseScript: parseScript,
-    GetScript: getScript,
-    GetMetas: getMetas,
-    SetBadge: setBadge,
-    AutoUpdate: autoUpdate,
-    Vacuum: vacuum,
-    Move: move,
-    ParseMeta: function(o, src, callback) {callback(parseMeta(o));},
-    GetRequestId: getRequestId,
-    HttpRequest: httpRequest,
-    AbortRequest: abortRequest,
-  };
   chrome.runtime.onMessage.addListener(function (req, src, callback) {
     var func = commands[req.cmd];
     if (func) {
       var res = func(req.data, src);
       if (res === false) return;
-      var finish = function () {
+      var finish = function (data) {
         try {
-          callback.apply(null, arguments);
+          callback(data);
         } catch (e) {
           // callback fails if not given in content page
         }
@@ -161,82 +189,6 @@ function setBadge(num, src, callback) {
   if(o.timer) clearTimeout(o.timer);
   o.timer = setTimeout(function(){delete badges[src.id];}, 300);
   callback();
-}
-
-function getInjected(url, src, callback) {
-  function getScripts(){
-    var o = db.transaction('scripts').objectStore('scripts');
-    var require = {};
-    var cache = {};
-    var values = [];
-    o.index('position').openCursor().onsuccess = function (e) {
-      var r = e.target.result;
-      if (r) {
-        var v = r.value;
-        if (testURL(url, v)) {
-          data.scripts.push(v);
-          values.push(v.uri);
-          v.meta.require.forEach(function(i){require[i] = 1;});
-          for(var i in v.meta.resources) cache[v.meta.resources[i]] = 1;
-        }
-        r.continue();
-      } else {
-        count = 3;
-        getRequire(Object.getOwnPropertyNames(require));
-        getCacheB64(Object.getOwnPropertyNames(cache), function (cache) {
-          data.cache = cache;
-          finish();
-        });
-        getValues(values);
-      }
-    };
-  }
-  function getRequire(require) {
-    function loop() {
-      var uri = require.pop();
-      if(uri)
-        o.get(uri).onsuccess = function(e) {
-          var r = e.target.result;
-          if (r) data.require[uri] = r.code;
-          loop();
-        };
-      else finish();
-    }
-    var o = db.transaction('require').objectStore('require');
-    loop();
-  }
-  function getValues(values) {
-    function loop(){
-      var uri = values.pop();
-      if (uri)
-        o.get(uri).onsuccess = function (e) {
-          var v = e.target.result;
-          if (v) data.values[uri] = v.values;
-          loop();
-        };
-      else finish();
-    }
-    var o = db.transaction('values').objectStore('values');
-    loop();
-  }
-  function finish(){
-    if (! -- count) {
-      callback(data);
-      if(src.url == src.tab.url)
-        chrome.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
-    }
-  }
-  var data = {
-    scripts: [],
-    values: {},
-    require: {},
-    injectMode: _.options.get('injectMode'),
-    version: vm_ver,
-  };
-  var count = 1;
-  if (data.isApplied = _.options.get('isApplied')) getScripts();
-  else finish();
-  return true;
 }
 
 function fetchURL(url, cb, type, headers) {

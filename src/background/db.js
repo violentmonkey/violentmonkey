@@ -69,14 +69,14 @@ VMDB.prototype.queryScript = function (id, meta) {
         resolve(e.target.result);
       };
     else
-      resolve(newScript());
+      resolve(scriptUtils.newScript());
   });
 };
 
 VMDB.prototype.getScriptData = function (id) {
   return this.getScript(id).then(function (script) {
     if (!script) return Promise.reject();
-    var data = getMeta(script);
+    var data = scriptUtils.getMeta(script);
     data.code = script.code;
     return data;
   });
@@ -88,7 +88,7 @@ VMDB.prototype.getScriptInfos = function (ids) {
   return Promise.all(ids.map(function (id) {
     return _this.getScript(id, os);
   })).then(function (scripts) {
-    return scripts.filter(function (x) {return x;}).map(getMeta);
+    return scripts.filter(function (x) {return x;}).map(scriptUtils.getMeta);
   });
 };
 
@@ -185,7 +185,7 @@ VMDB.prototype.getData = function () {
         if (result) {
           var value = result.value;
           if (isRemote(value.meta.icon)) cache[value.meta.icon] = 1;
-          data.scripts.push(getMeta(value));
+          data.scripts.push(scriptUtils.getMeta(value));
           result.continue();
         } else {
           data.cache = Object.getOwnPropertyNames(cache);
@@ -372,7 +372,7 @@ VMDB.prototype.updateScriptInfo = function (id, data) {
       for (var k in data)
         if (k in script) script[k] = data[k];
       o.put(script).onsuccess = function (e) {
-        resolve(getMeta(script));
+        resolve(scriptUtils.getMeta(script));
       };
     };
   });
@@ -419,75 +419,72 @@ VMDB.prototype.getExportData = function (ids, withValues) {
   });
 };
 
-// Common functions
-
-function parseMeta(code) {
-	// initialize meta, specify those with multiple values allowed
-	var meta = {
-		include: [],
-		exclude: [],
-		match: [],
-		require: [],
-		resource: [],
-		grant: [],
-	};
-	var flag = -1;
-	code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, function(value, group1, group2) {
-		if (flag < 0 && group1 == '==UserScript==')
-			// start meta
-			flag = 1;
-		else if(flag > 0 && group1 == '==/UserScript==')
-			// end meta
-			flag = 0;
-		if (flag == 1 && group1[0] == '@') {
-			var key = group1.slice(1);
-			var val = group2.replace(/^\s+|\s+$/g, '');
-			var value = meta[key];
-      // multiple values allowed
-			if (value && value.push) value.push(val);
-      // only first value will be stored
-			else if (!(key in meta)) meta[key] = val;
-		}
-	});
-	meta.resources = {};
-	meta.resource.forEach(function(line) {
-		var pair = line.match(/^(\w\S*)\s+(.*)/);
-		if (pair) meta.resources[pair[1]] = pair[2];
-	});
-	delete meta.resource;
-	// @homepageURL: compatible with @homepage
-	if (!meta.homepageURL && meta.homepage) meta.homepageURL = meta.homepage;
-	return meta;
-}
-
-function newScript() {
-	var script = {
-		custom: {},
-		enabled: 1,
-		update: 1,
-		code: '// ==UserScript==\n// @name New Script\n// ==/UserScript==\n',
-	};
-	script.meta = parseMeta(script.code);
-	return script;
-}
-
-function getMeta(script) {
-	return {
-		id: script.id,
-		custom: script.custom,
-		meta: script.meta,
-		enabled: script.enabled,
-		update: script.update,
-	};
-}
-
-function getNameURI(script) {
-	var ns = script.meta.namespace || '';
-	var name = script.meta.name || '';
-	var nameURI = escape(ns) + ':' + escape(name) + ':';
-	if (!ns && !name) nameURI += script.id || '';
-	return nameURI;
-}
+var scriptUtils = {
+  parseMeta: function (code) {
+  	// initialize meta, specify those with multiple values allowed
+  	var meta = {
+  		include: [],
+  		exclude: [],
+  		match: [],
+  		require: [],
+  		resource: [],
+  		grant: [],
+  	};
+  	var flag = -1;
+  	code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, function(value, group1, group2) {
+  		if (flag < 0 && group1 == '==UserScript==')
+  			// start meta
+  			flag = 1;
+  		else if(flag > 0 && group1 == '==/UserScript==')
+  			// end meta
+  			flag = 0;
+  		if (flag == 1 && group1[0] == '@') {
+  			var key = group1.slice(1);
+  			var val = group2.replace(/^\s+|\s+$/g, '');
+  			var value = meta[key];
+        // multiple values allowed
+  			if (value && value.push) value.push(val);
+        // only first value will be stored
+  			else if (!(key in meta)) meta[key] = val;
+  		}
+  	});
+  	meta.resources = {};
+  	meta.resource.forEach(function(line) {
+  		var pair = line.match(/^(\w\S*)\s+(.*)/);
+  		if (pair) meta.resources[pair[1]] = pair[2];
+  	});
+  	delete meta.resource;
+  	// @homepageURL: compatible with @homepage
+  	if (!meta.homepageURL && meta.homepage) meta.homepageURL = meta.homepage;
+  	return meta;
+  },
+  newScript: function () {
+    var script = {
+  		custom: {},
+  		enabled: 1,
+  		update: 1,
+  		code: '// ==UserScript==\n// @name New Script\n// ==/UserScript==\n',
+  	};
+  	script.meta = scriptUtils.parseMeta(script.code);
+  	return script;
+  },
+  getMeta: function (script) {
+    return {
+  		id: script.id,
+  		custom: script.custom,
+  		meta: script.meta,
+  		enabled: script.enabled,
+  		update: script.update,
+  	};
+  },
+  getNameURI: function (script) {
+  	var ns = script.meta.namespace || '';
+  	var name = script.meta.name || '';
+  	var nameURI = escape(ns) + ':' + escape(name) + ':';
+  	if (!ns && !name) nameURI += script.id || '';
+  	return nameURI;
+  },
+};
 
 var tester = function () {
   function testURL(url, script) {

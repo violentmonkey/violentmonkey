@@ -398,7 +398,7 @@ var SettingsTab = BaseView.extend({
       cmd: 'ExportZip',
       data: {
         values: withValues,
-        data: _.pluck(selected, 'id'),
+        ids: _.pluck(selected, 'id'),
       }
     }).then(function (data) {
       var names = {};
