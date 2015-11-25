@@ -1,53 +1,7 @@
-var BaseView = Backbone.View.extend({
-  initialize: function () {
-    var _this = this;
-    var gotTemplate;
-    if (_this.templateUrl)
-      gotTemplate = _.cache.get(_this.templateUrl)
-      .then(function (fn) {
-        _this.templateFn = fn;
-      });
-    var render = _this.render.bind(_this);
-    var initI18n = _this.initI18n.bind(_this);
-    _this.render = function () {
-      gotTemplate
-        ? gotTemplate.then(render).then(initI18n)
-        : render();
-      return _this;
-    };
-    _this.render();
-  },
-  initI18n: function () {
-    _.forEach(this.$('[data-i18n]'), function (node) {
-      node.innerHTML = _.i18n(node.dataset.i18n);
-    });
-  },
-  getValue: function (target) {
-    var key = target.dataset.id;
-    var value;
-    switch (key[0]) {
-    case '!':
-      key = key.slice(1);
-      value = target.checked;
-      break;
-    case '[':
-      key = key.slice(1);
-      value = _.filter(target.value.split('\n').map(function (s) {return s.trim();}));
-      break;
-    default:
-      value = target.value;
-    }
-    return {
-      key: key,
-      value: value,
-    };
-  },
-});
-
 var DEFAULT_ICON = '/images/icon48.png';
 var ScriptView = BaseView.extend({
   className: 'script',
-  templateUrl: 'templates/script.html',
+  templateUrl: '/options/templates/script.html',
   events: {
     'click [data-id=edit]': 'onEdit',
     'click [data-id=remove]': 'onRemove',
@@ -145,7 +99,7 @@ var ScriptView = BaseView.extend({
 var MainTab = BaseView.extend({
   el: '#tab',
   name: 'main',
-  templateUrl: 'templates/tab-installed.html',
+  templateUrl: '/options/templates/tab-installed.html',
   events: {
     'click #bNew': 'newScript',
     'click #bUpdate': 'updateAll',
@@ -209,7 +163,7 @@ var MainTab = BaseView.extend({
 
 var ExportList = BaseView.extend({
   el: '.export-list',
-  templateUrl: 'templates/option.html',
+  templateUrl: '/options/templates/option.html',
   initialize: function () {
     BaseView.prototype.initialize.call(this);
     this.listenTo(scriptList, 'reset change', this.render);
@@ -251,7 +205,7 @@ var SettingsTab = BaseView.extend({
     'click #bExport': 'exportData',
     'click #bVacuum': 'onVacuum',
   },
-  templateUrl: 'templates/tab-settings.html',
+  templateUrl: '/options/templates/tab-settings.html',
   render: function () {
     var options = _.options.getAll();
     this.$el.html(this.templateFn(options));
@@ -448,7 +402,7 @@ var SettingsTab = BaseView.extend({
 var AboutTab = BaseView.extend({
   el: '#tab',
   name: 'about',
-  templateUrl: 'templates/tab-about.html',
+  templateUrl: '/options/templates/tab-about.html',
   render: function () {
     this.$el.html(this.templateFn());
     return this;
@@ -457,7 +411,7 @@ var AboutTab = BaseView.extend({
 
 var MainView = BaseView.extend({
   el: '#app',
-  templateUrl: 'templates/main.html',
+  templateUrl: '/options/templates/main.html',
   tabs: {
     '': MainTab,
     settings: SettingsTab,
@@ -484,7 +438,7 @@ var ConfirmView = BaseView.extend({
     'change [data-check]': 'updateCheckbox',
     'change #cbClose': 'updateClose',
   },
-  templateUrl: 'templates/confirm.html',
+  templateUrl: '/options/templates/confirm.html',
   initialize: function (url, _from) {
     this.url = url;
     this.from = _from;
@@ -666,7 +620,7 @@ var ConfirmView = BaseView.extend({
 
 var MetaView = BaseView.extend({
   className: 'button-panel',
-  templateUrl: 'templates/edit-meta.html',
+  templateUrl: '/options/templates/edit-meta.html',
   events: {
     'change [data-id]': 'onChange',
   },
@@ -688,7 +642,7 @@ var MetaView = BaseView.extend({
 
 var EditView = BaseView.extend({
   className: 'frame edit',
-  templateUrl: 'templates/edit.html',
+  templateUrl: '/options/templates/edit.html',
   events: {
     'click .button-toggle': 'toggleButton',
     'change [data-id]': 'updateCheckbox',

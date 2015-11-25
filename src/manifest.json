@@ -17,7 +17,7 @@
   "browser_action": {
     "default_icon": "images/icon19.png",
     "default_title": "__MSG_extName__",
-    "default_popup": "popup.html"
+    "default_popup": "popup/index.html"
   },
   "background": {
     "page": "background/index.html"
