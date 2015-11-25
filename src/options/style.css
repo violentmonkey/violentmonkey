@@ -254,6 +254,15 @@ fieldset.title {
   background: lightgray;
   color: gray;
 }
+.script.dragging-placeholder {
+  visibility: hidden;
+}
+.script.dragging {
+  position: fixed;
+  margin: 0;
+  background: lightgreen;
+  z-index: 9;
+}
 .script .pull-right {
   margin-left: 1em;
 }

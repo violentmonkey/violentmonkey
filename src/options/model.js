@@ -25,7 +25,7 @@ var Script = Backbone.Model.extend({
 
 var ScriptList = Backbone.Collection.extend({
   model: Script,
-  comparator: 'position',
+  // comparator: 'position',
   initialize: function () {
     this.cache = {};
     this.reload();

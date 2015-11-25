@@ -1,12 +1,16 @@
 var DEFAULT_ICON = '/images/icon48.png';
 var ScriptView = BaseView.extend({
   className: 'script',
+  attributes: {
+    draggable: true,
+  },
   templateUrl: '/options/templates/script.html',
   events: {
     'click [data-id=edit]': 'onEdit',
     'click [data-id=remove]': 'onRemove',
     'click [data-id=enable]': 'onEnable',
     'click [data-id=update]': 'onUpdate',
+    'dragstart': 'onDragStart',
   },
   initialize: function () {
     var _this = this;
@@ -94,7 +98,107 @@ var ScriptView = BaseView.extend({
       data: this.model.id,
     });
   },
+  onDragStart: function (e) {
+    var model = this.model;
+    new DND(e, function (data) {
+      if (data.from === data.to) return;
+      _.sendMessage({
+        cmd: 'Move',
+        data: {
+          id: model.id,
+          offset: data.to - data.from,
+        }
+      }).then(function () {
+        var collection = model.collection;
+        var models = collection.models;
+        var i = Math.min(data.from, data.to);
+        var j = Math.max(data.from, data.to);
+        var seq = [
+          models.slice(0, i),
+          models.slice(i, j + 1),
+          models.slice(j + 1),
+        ];
+        i === data.to
+        ? seq[1].unshift(seq[1].pop())
+        : seq[1].push(seq[1].shift());
+        collection.models = seq.concat.apply([], seq);
+      });
+    });
+  },
 });
+
+function DND(e, cb) {
+  this.mousemove = this.mousemove.bind(this);
+  this.mouseup = this.mouseup.bind(this);
+  if (e) {
+    e.preventDefault();
+    this.start(e);
+  }
+  this.onDrop = cb;
+}
+DND.prototype.start = function (e) {
+  var dragging = this.dragging = {
+    el: e.currentTarget,
+  };
+  var $el = dragging.$el = $(dragging.el);
+  var parent = $el.parent();
+  var offset = $el.offset();
+  dragging.offset = {
+    x: e.clientX - offset.left,
+    y: e.clientY - offset.top,
+  };
+  var children = parent.children();
+  dragging.lastIndex = dragging.index = children.index($el);
+  dragging.$elements = children.not($el);
+  dragging.$dragged = $el.clone().addClass('dragging').css({
+    left: offset.left,
+    top: offset.top,
+    width: offset.width,
+  }).appendTo(parent);
+  $el.addClass('dragging-placeholder');
+  $(document).on('mousemove', this.mousemove).on('mouseup', this.mouseup);
+};
+DND.prototype.mousemove = function (e) {
+  var dragging = this.dragging;
+  dragging.$dragged.css({
+    left: e.clientX - dragging.offset.x,
+    top: e.clientY - dragging.offset.y,
+  });
+  var hovered = null;
+  dragging.$elements.each(function (i, el) {
+    var offset = $(el).offset();
+    var pad = 10;
+    if (
+      e.clientX >= offset.left + pad
+      && e.clientX <= offset.left + offset.width - pad
+      && e.clientY >= offset.top + pad
+      && e.clientY <= offset.top + offset.height - pad
+    ) {
+      hovered = {
+        index: i + (i >= dragging.lastIndex ? 1 : 0),
+        el: el,
+      };
+      return false;
+    }
+  });
+  if (hovered) {
+    dragging.lastIndex > hovered.index
+    ? dragging.$el.insertBefore(hovered.el)
+    : dragging.$el.insertAfter(hovered.el);
+    dragging.lastIndex = hovered.index;
+  }
+};
+DND.prototype.mouseup = function (e) {
+  $(document).off('mousemove', this.mousemove).off('mouseup', this.mouseup);
+  var dragging = this.dragging;
+  dragging.$dragged.remove();
+  dragging.$el.removeClass('dragging-placeholder');
+  this.dragging = null;
+  this.onDrop && this.onDrop({
+    from: dragging.index,
+    to: dragging.lastIndex,
+  });
+};
 
 var MainTab = BaseView.extend({
   el: '#tab',

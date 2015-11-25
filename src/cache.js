@@ -4,7 +4,7 @@
     this.allowOverride = allowOverride;
   }
   Cache.prototype.put = function (key, fn) {
-    if (key in this.data)
+    if (key in this.data && !this.allowOverride)
       throw 'Key {' + key + '} already exists!';
     this.data[key] = fn;
   };
