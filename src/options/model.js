@@ -6,17 +6,10 @@ var Meta = Backbone.Model.extend({
 });
 
 var Script = Backbone.Model.extend({
-  /**
-   * Get locale attributes such as `@name:zh-CN`
-   */
   getLocaleString: function (key) {
     var _this = this;
     var meta = _this.get('meta') || {};
-    var lang = navigator.languages.find(function (lang) {
-      return (key + ':' + lang) in meta;
-    });
-    if (lang) key += ':' + lang;
-    return meta[key] || '';
+    return _.getLocaleString(meta, key);
   },
   canUpdate: function () {
     var script = this.toJSON();

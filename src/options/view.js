@@ -81,7 +81,7 @@ var ScriptView = BaseView.extend({
   onEnable: function () {
     var _this = this;
     _.sendMessage({
-      cmd: 'UpdateMeta',
+      cmd: 'UpdateScriptInfo',
       data: {
         id: _this.model.id,
         enabled: _this.model.get('enabled') ? 0 : 1,

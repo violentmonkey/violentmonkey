@@ -23,8 +23,13 @@ var commands = {
       return Object.assign(data, res);
     }) : Promise.resolve(data);
   },
-  UpdateMeta: function (data, src) {
-    return vmdb.updateScriptInfo(data.id, data);
+  UpdateScriptInfo: function (data, src) {
+    return vmdb.updateScriptInfo(data.id, data).then(function (script) {
+      _.messenger.post({
+        cmd: 'update',
+        data: script,
+      });
+    });
   },
   SetValue: function (data, src) {
     return vmdb.setValue(data.uri, data.values);

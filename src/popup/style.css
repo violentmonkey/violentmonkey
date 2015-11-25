@@ -1,0 +1,37 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font: menu;
+  font-size: 12px;
+}
+.menu {
+  max-width: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.fa {
+  width: 1em;
+}
+.menu-item {
+  cursor: pointer;
+  padding: 5px;
+}
+.menu-item:hover {
+  background: cornflowerblue;
+  color: white;
+}
+.menu-item.disabled {
+  color: gray;
+}
+.menu-item.disabled:hover {
+  color: silver;
+}
+hr {
+  border: none;
+  border-top: 1px solid silver;
+}
