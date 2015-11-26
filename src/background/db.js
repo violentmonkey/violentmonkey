@@ -63,16 +63,19 @@ VMDB.prototype.getScript = function (id, tx) {
 
 VMDB.prototype.queryScript = function (id, meta, tx) {
   var _this = this;
-  return id ? _this.getScript(id, tx)
-  : new Promise(function (resolve, reject) {
-    var uri = scriptUtils.getNameURI({meta: meta});
-    if (uri !== '::')
-      (tx || _this.db.transaction('scripts')).objectStore('scripts')
-      .index('uri').get(uri).onsuccess = function (e) {
-        resolve(e.target.result);
-      };
-    else
-      resolve(scriptUtils.newScript());
+  return (
+    id ? _this.getScript(id, tx)
+    : new Promise(function (resolve, reject) {
+      var uri = scriptUtils.getNameURI({meta: meta});
+      if (uri !== '::')
+        (tx || _this.db.transaction('scripts')).objectStore('scripts')
+        .index('uri').get(uri).onsuccess = function (e) {
+          resolve(e.target.result);
+        };
+      else resolve();
+    })
+  ).then(function (script) {
+    return script || scriptUtils.newScript();
   });
 };
 
@@ -297,16 +300,18 @@ VMDB.prototype.saveScript = function (script, tx) {
 
 VMDB.prototype.fetchCache = function () {
   var requests = {};
-  return function (url, tx, check) {
+  return function (url, check) {
     var _this = this;
     return requests[url]
     || (requests[url] = scriptUtils.fetch(url, 'blob').then(function (res) {
-      return check ? check(res.response) : res.response;
+      return (check ? check(res.response) : Promise.resolve()).then(function () {
+        return res.response;
+      });
     }).then(function (data) {
       return new Promise(function (resolve, reject) {
         var reader = new FileReader;
         reader.onload = function (e) {
-          _this.saveCache(url, window.btoa(this.result), tx).then(function () {
+          _this.saveCache(url, window.btoa(this.result)).then(function () {
             delete requests[url];
             resolve();
           });
@@ -322,11 +327,11 @@ VMDB.prototype.fetchCache = function () {
 
 VMDB.prototype.fetchRequire = function () {
   var requests = {};
-  return function (url, tx) {
+  return function (url) {
     var _this = this;
     return requests[url]
     || (requests[url] = scriptUtils.fetch(url).then(function (res) {
-      return _this.saveRequire(url, res.responseText, tx);
+      return _this.saveRequire(url, res.responseText);
     }).then(function () {
       delete requests[url];
     }));
@@ -474,10 +479,10 @@ VMDB.prototype.vacuum = function () {
   }).then(function (data) {
     return Promise.all([
       Object.keys(data.require).map(function (k) {
-        return data.require[k] === 1 && _this.fetchRequire(k, tx);
+        return data.require[k] === 1 && _this.fetchRequire(k);
       }),
       Object.keys(data.cache).map(function (k) {
-        return data.cache[k] === 1 && _this.fetchCache(k, tx);
+        return data.cache[k] === 1 && _this.fetchCache(k);
       }),
     ]);
   });
@@ -511,17 +516,17 @@ VMDB.prototype.parseScript = function (data) {
   // @require
   meta.require.forEach(function (url) {
     var cache = data.require && data.require[url];
-    cache ? _this.saveRequire(url, cache, tx) : _this.fetchRequire(url, tx);
+    cache ? _this.saveRequire(url, cache, tx) : _this.fetchRequire(url);
   });
   // @resource
   Object.keys(meta.resources).forEach(function (k) {
     var url = meta.resources[k];
     var cache = data.resources && data.resources[url];
-    cache ? _this.saveCache(url, cache, tx) : _this.fetchCache(url, tx);
+    cache ? _this.saveCache(url, cache, tx) : _this.fetchCache(url);
   });
   // @icon
   if (scriptUtils.isRemote(meta.icon))
-    _this.fetchCache(meta.icon, tx, function (blob) {
+    _this.fetchCache(meta.icon, function (blob) {
       return new Promise(function (resolve, reject) {
         var url = URL.createObjectURL(blob);
         var image = new Image;
@@ -530,7 +535,7 @@ VMDB.prototype.parseScript = function (data) {
         };
         image.onload = function () {
           free();
-          resolve();
+          resolve(blob);
         };
         image.onerror = function () {
           free();

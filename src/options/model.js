@@ -40,15 +40,3 @@ var ScriptList = Backbone.Collection.extend({
     });
   },
 });
-
-var scriptList = new ScriptList();
-
-var port = chrome.runtime.connect({name: 'Options'});
-port.onMessage.addListener(function (res) {
-  if (res.cmd === 'add')
-    scriptList.push(res.data);
-  else if (res.data) {
-    var model = scriptList.get(res.data.id);
-    if (model) model.set(res.data);
-  }
-});

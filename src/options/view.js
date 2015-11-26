@@ -212,15 +212,15 @@ DND.prototype.animate = function ($elements, delta) {
     $el.addClass('dragging-moving').css({
       transition: 'none',
       transform: 'translateY(' + delta + 'px)',
+    }).one('transitionend', function (e) {
+      $(e.target).removeClass('dragging-moving');
     });
     setTimeout(function () {
       $el.css({
         transition: '',
         transform: '',
-      }).one('transitionend', function (e) {
-        $(e.target).removeClass('dragging-moving');
       });
-    })
+    }, 20);
   });
 };
 DND.prototype.mouseup = function (e) {

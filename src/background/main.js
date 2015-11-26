@@ -60,6 +60,7 @@ var commands = {
           isClickable: true,
         });
       _.messenger.post(res);
+      return res.data;
     });
   },
   CheckUpdate: function (id, src) {

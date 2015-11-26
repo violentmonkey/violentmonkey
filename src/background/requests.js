@@ -108,75 +108,75 @@ var requests = function () {
     clearRequest(req);
   }
 
+  // Watch URL redirects
+  chrome.webRequest.onBeforeRedirect.addListener(function (details) {
+    var reqId = verify[details.requestId];
+    if (reqId) {
+      var req = requests[reqId];
+      if (req) req.finalUrl = details.redirectUrl;
+    }
+  }, {
+    urls: ['<all_urls>'],
+    types: ['xmlhttprequest'],
+  });
+
+  // Modifications on headers
+  chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
+    var headers = details.requestHeaders;
+    var new_headers = [];
+    var vm_headers = {};
+    headers.forEach(function (header) {
+      if (header.name.substr(0, 3) == 'VM-')
+        vm_headers[header.name.slice(3)] = header.value;
+      else
+        new_headers.push(header);
+    });
+    var reqId = vm_headers['Verify'];
+    if (reqId) {
+      var req = requests[reqId];
+      if (req) {
+        delete vm_headers['Verify'];
+        verify[details.requestId] = reqId;
+        req.coreId = details.requestId;
+        for (var i in vm_headers)
+          if (~special_headers.indexOf(i.toLowerCase()))
+            new_headers.push({name: i, value: vm_headers[i]});
+      }
+    }
+    return {requestHeaders: new_headers};
+  }, {
+    urls: ['<all_urls>'],
+    types: ['xmlhttprequest'],
+  }, ['blocking', 'requestHeaders']);
+
+  chrome.webRequest.onBeforeRequest.addListener(function (req) {
+    // onBeforeRequest is fired for local files too
+    if (/\.user\.js([\?#]|$)/.test(req.url)) {
+      var x = new XMLHttpRequest();
+      x.open('GET', req.url, false);
+      x.send();
+      if ((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
+        if (req.tabId < 0)
+          chrome.tabs.create({
+            url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url),
+          });
+        else
+          chrome.tabs.get(req.tabId, function (t) {
+            chrome.tabs.create({
+              url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url) + '/' + encodeURIComponent(t.url),
+            });
+          });
+        return {redirectUrl: 'javascript:history.back()'};
+      }
+    }
+  }, {
+    urls: ['<all_urls>'],
+    types: ['main_frame'],
+  }, ['blocking']);
+
   return {
     getRequestId: getRequestId,
     abortRequest: abortRequest,
     httpRequest: httpRequest,
   };
 }();
-
-// Watch URL redirects
-chrome.webRequest.onBeforeRedirect.addListener(function (details) {
-	var reqId = verify[details.requestId];
-	if (reqId) {
-		var req = requests[reqId];
-		if (req) req.finalUrl = details.redirectUrl;
-	}
-}, {
-	urls: ['<all_urls>'],
-	types: ['xmlhttprequest'],
-});
-
-// Modifications on headers
-chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
-	var headers = details.requestHeaders;
-	var new_headers = [];
-	var vm_headers = {};
-	headers.forEach(function (header) {
-		if (header.name.substr(0, 3) == 'VM-')
-			vm_headers[header.name.slice(3)] = header.value;
-		else
-			new_headers.push(header);
-	});
-	var reqId = vm_headers['Verify'];
-	if (reqId) {
-		var req = requests[reqId];
-		if (req) {
-			delete vm_headers['Verify'];
-			verify[details.requestId] = reqId;
-			req.coreId = details.requestId;
-			for (var i in vm_headers)
-				if (~special_headers.indexOf(i.toLowerCase()))
-					new_headers.push({name: i, value: vm_headers[i]});
-		}
-	}
-	return {requestHeaders: new_headers};
-}, {
-	urls: ['<all_urls>'],
-	types: ['xmlhttprequest'],
-}, ['blocking', 'requestHeaders']);
-
-chrome.webRequest.onBeforeRequest.addListener(function (req) {
-	// onBeforeRequest is fired for local files too
-	if (/\.user\.js([\?#]|$)/.test(req.url)) {
-		var x = new XMLHttpRequest();
-		x.open('GET', req.url, false);
-		x.send();
-		if ((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
-			if (req.tabId < 0)
-				chrome.tabs.create({
-					url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url),
-				});
-			else
-				chrome.tabs.get(req.tabId, function (t) {
-					chrome.tabs.create({
-						url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url) + '/' + encodeURIComponent(t.url),
-					});
-				});
-			return {redirectUrl: 'javascript:history.back()'};
-		}
-	}
-}, {
-	urls: ['<all_urls>'],
-	types: ['main_frame'],
-}, ['blocking']);
