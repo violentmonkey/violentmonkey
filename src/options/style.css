@@ -243,6 +243,7 @@ fieldset.title {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  transition: transform .5s;
 }
 .script .hide {
   display: none;
@@ -253,15 +254,6 @@ fieldset.title {
 .script.disabled {
   background: lightgray;
   color: gray;
-}
-.script.dragging-placeholder {
-  visibility: hidden;
-}
-.script.dragging {
-  position: fixed;
-  margin: 0;
-  background: lightgreen;
-  z-index: 9;
 }
 .script .pull-right {
   margin-left: 1em;
@@ -297,6 +289,15 @@ fieldset.title {
 }
 .disabled .script-name {
   color: blueviolet;
+}
+.dragging-placeholder {
+  visibility: hidden;
+}
+.dragging {
+  position: fixed;
+  margin: 0;
+  background: lightgreen;
+  z-index: 9;
 }
 .edit .frame-header {
   height: 4rem;

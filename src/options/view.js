@@ -147,6 +147,8 @@ DND.prototype.start = function (e) {
     x: e.clientX - offset.left,
     y: e.clientY - offset.top,
   };
+  var next = $el.next();
+  dragging.delta = (next.length ? next.offset().top : parent.height()) - offset.top;
   var children = parent.children();
   dragging.lastIndex = dragging.index = children.index($el);
   dragging.$elements = children.not($el);
@@ -166,7 +168,9 @@ DND.prototype.mousemove = function (e) {
   });
   var hovered = null;
   dragging.$elements.each(function (i, el) {
-    var offset = $(el).offset();
+    var $el = $(el);
+    if ($el.hasClass('dragging-moving')) return;
+    var offset = $el.offset();
     var pad = 10;
     if (
       e.clientX >= offset.left + pad
@@ -175,18 +179,49 @@ DND.prototype.mousemove = function (e) {
       && e.clientY <= offset.top + offset.height - pad
     ) {
       hovered = {
-        index: i + (i >= dragging.lastIndex ? 1 : 0),
+        index: i,
         el: el,
       };
       return false;
     }
   });
   if (hovered) {
-    dragging.lastIndex > hovered.index
-    ? dragging.$el.insertBefore(hovered.el)
-    : dragging.$el.insertAfter(hovered.el);
-    dragging.lastIndex = hovered.index;
+    var lastIndex = dragging.lastIndex;
+    var index = hovered.index;
+    var isDown = index >= lastIndex;
+    var $el = dragging.$el;
+    var delta = dragging.delta;
+    if (isDown) {
+      // If moving down, the actual index should be `index + 1`
+      index ++;
+      $el.insertAfter(hovered.el);
+    } else {
+      delta = -delta;
+      $el.insertBefore(hovered.el);
+    }
+    dragging.lastIndex = index;
+    this.animate(dragging.$elements.slice(
+      isDown ? lastIndex : index,
+      isDown ? index : lastIndex
+    ), delta);
   }
+};
+DND.prototype.animate = function ($elements, delta) {
+  $elements.each(function (i, el) {
+    var $el = $(el);
+    $el.addClass('dragging-moving').css({
+      transition: 'none',
+      transform: 'translateY(' + delta + 'px)',
+    });
+    setTimeout(function () {
+      $el.css({
+        transition: '',
+        transform: '',
+      }).one('transitionend', function (e) {
+        $(e.target).removeClass('dragging-moving');
+      });
+    })
+  });
 };
 DND.prototype.mouseup = function (e) {
   $(document).off('mousemove', this.mousemove).off('mouseup', this.mouseup);
