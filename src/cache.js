@@ -15,7 +15,7 @@
       var xhr = new XMLHttpRequest();
       xhr.open('GET', key, true);
       xhr.onload = function () {
-        resolve(_.template(this.responseText, {variable: 'it'}));
+        resolve(data[key] = _.template(this.responseText, {variable: 'it'}));
       };
       xhr.onerror = function () {
         reject(this);
