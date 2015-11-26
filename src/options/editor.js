@@ -61,10 +61,11 @@
     });
   }
 
-  var readyCodeMirror = initCodeMirror();
+  var readyCodeMirror;
 
   _.initEditor = function (options) {
     options = options || {};
+    readyCodeMirror = readyCodeMirror || initCodeMirror();
     return readyCodeMirror.then(function(){
       var editor = CodeMirror(options.container, {
         continueComments: true,
