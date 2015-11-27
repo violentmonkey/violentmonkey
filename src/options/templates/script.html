@@ -20,9 +20,9 @@
 </p>
 <div class=buttons>
   <button data-id=edit data-i18n="buttonEdit"></button>
-  <button data-id=enable data-i18n="<%=
-    it.enabled ? 'buttonDisable' : 'buttonEnable'
-  %>"></button>
+  <button data-id=enable><%=
+    it.enabled ? _.i18n('buttonDisable') : _.i18n('buttonEnable')
+  %></button>
   <button data-id=remove data-i18n="buttonRemove"></button>
   <%= it.canUpdate ?
   '<button data-id=update data-i18n="buttonUpdate"' + (

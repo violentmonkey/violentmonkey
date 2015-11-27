@@ -260,7 +260,7 @@ VMDB.prototype.getCacheB64 = function (urls, tx) {
     });
   })).then(function (data) {
     return data.reduce(function (map, value, i) {
-      map[urls[i]] = value.data;
+      if (value) map[urls[i]] = value.data;
       return map;
     }, {});
   });
@@ -509,7 +509,7 @@ VMDB.prototype.parseScript = function (data) {
   var res = {
     cmd: 'update',
     data: {
-      message: data.msg == null ? _.i18n('msgUpdated') : data.msg || '',
+      message: data.message == null ? _.i18n('msgUpdated') : data.message || '',
     },
   };
   var meta = scriptUtils.parseMeta(data.code);
@@ -582,7 +582,7 @@ VMDB.prototype.checkUpdate = function () {
     var okHandler = function (xhr) {
       var meta = scriptUtils.parseMeta(xhr.responseText);
       if (scriptUtils.compareVersion(script.meta.version, meta.version) < 0)
-        return resolve();
+        return Promise.resolve();
       res.data.checking = false;
       res.data.message = _.i18n('msgNoUpdate');
       _.messenger.post(res);
@@ -601,9 +601,8 @@ VMDB.prototype.checkUpdate = function () {
         return Promise.reject();
       }
       res.data.message = _.i18n('msgUpdating');
+      _.messenger.post(res);
       return scriptUtils.fetch(downloadURL).then(function (xhr) {
-        res.data.checking = false;
-        _.messenger.post(res);
         return xhr.responseText;
       }, function (xhr) {
         res.data.checking = false;
@@ -630,6 +629,9 @@ VMDB.prototype.checkUpdate = function () {
         return _this.parseScript({
           id: script.id,
           code: code,
+        }).then(function (res) {
+          res.data.checking = false;
+          _.messenger.post(res);
         });
       }, function () {
         delete processes[script.id];
