@@ -176,7 +176,8 @@ VMDB.prototype.getData = function () {
       var data = {};
       var cache = {};
       data.scripts = scripts.map(function (script) {
-        if (scriptUtils.isRemote(script.meta.icon)) cache[script.meta.icon] = 1;
+        var icon = script.meta.icon;
+        if (scriptUtils.isRemote(icon)) cache[icon] = 1;
         return scriptUtils.getScriptInfo(script);
       });
       data.cache = Object.keys(cache);
@@ -259,7 +260,8 @@ VMDB.prototype.getCacheB64 = function (urls, tx) {
     });
   })).then(function (data) {
     return data.reduce(function (map, value, i) {
-      map[urls[i]] = value;
+      map[urls[i]] = value.data;
+      return map;
     }, {});
   });
 };

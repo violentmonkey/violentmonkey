@@ -23,9 +23,9 @@ var ScriptView = BaseView.extend({
     var _this = this;
     var icon = _this.model.get('meta').icon;
     if (icon && icon !== _this.model.get('_icon'))
-      _this.loadImage(icon).then(function () {
-        _this.model.set('_icon', icon);
-      }, function () {
+      _this.loadImage(icon).then(function (url) {
+        _this.model.set('_icon', url);
+      }, function (url) {
         _this.model.set('_icon', DEFAULT_ICON);
       });
   },
@@ -55,16 +55,21 @@ var ScriptView = BaseView.extend({
   loadImage: function (url) {
     if (!url) return;
     var promise = this.images[url];
-    if (!promise) promise = this.images[url] = new Promise(function (resolve, reject) {
-      var img = new Image;
-      img.onload = function () {
-        resolve(img);
-      };
-      img.onerror = function () {
-        reject(url);
-      };
-      img.src = url;
-    });
+    if (!promise) {
+      var cache = scriptList.cache[url];
+      promise = cache ? Promise.resolve(cache)
+      : new Promise(function (resolve, reject) {
+        var img = new Image;
+        img.onload = function () {
+          resolve(url);
+        };
+        img.onerror = function () {
+          reject(url);
+        };
+        img.src = url;
+      });
+      this.images[url] = promise;
+    }
     return promise;
   },
   onEdit: function () {
