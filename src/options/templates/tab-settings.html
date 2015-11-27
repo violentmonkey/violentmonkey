@@ -9,6 +9,10 @@
     <span data-i18n=labelIgnoreGrant></span>
   </label>
   <label class="line">
+    <input type=checkbox data-check=autoReload <%= it.autoReload ? 'checked' : '' %>>
+    <span data-i18n=labelAutoReloadCurrentTab></span>
+  </label>
+  <label class="line">
     <span data-i18n=labelInjectMode></span>
     <select id=sInjectMode>
       <option value=0 data-i18n=injectModeNormal></option>

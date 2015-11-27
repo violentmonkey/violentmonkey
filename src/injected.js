@@ -571,6 +571,7 @@ function handleC(e) {
     },
     RegisterMenu: function(data) {
       if (window.top === window) menus.push(data);
+      getPopup();
     },
     GetRequestId: getRequestId,
     HttpRequest: httpRequest,
@@ -641,6 +642,7 @@ function loadScript(data) {
   });
   comm.post({cmd: 'LoadScript', data: data});
   badge.ready = true;
+  getPopup();
   setBadge();
 }
 function initCommunicator() {

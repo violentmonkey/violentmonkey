@@ -13,6 +13,7 @@ _.options = function () {
     closeAfterInstall: false,
     trackLocalFile: false,
     injectMode: 0,
+    autoReload: false,
   };
 
   function getOption(key, def) {
