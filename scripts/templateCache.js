@@ -13,6 +13,7 @@ const minified = require('./minifyHtml');
 module.exports = function templateCache() {
   const contentTpl = '_.cache.put(<%= name %>, <%= content %>);\n';
   let content = '/* Below are templates cached from `_.template` with love :) */\n\n';
+
   function bufferContents(file, enc, cb) {
     if (file.isNull()) return cb();
     if (file.isStream())
@@ -24,6 +25,7 @@ module.exports = function templateCache() {
     });
     cb();
   }
+
   function endStream(cb) {
     this.push(new gutil.File({
       base: '',
@@ -32,5 +34,6 @@ module.exports = function templateCache() {
     }));
     cb();
   }
+
   return through.obj(bufferContents, endStream);
 };

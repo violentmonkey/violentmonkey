@@ -7,6 +7,7 @@ const minifyCss = require('gulp-minify-css');
 const gulpFilter = require('gulp-filter');
 const del = require('del');
 const templateCache = require('./scripts/templateCache');
+const i18n = require('./scripts/i18n');
 
 gulp.task('templates', function () {
   return merge2([
@@ -27,6 +28,7 @@ gulp.task('copy-files', function () {
     '!src/cache.js',
     '!src/**/templates/**',
     '!src/**/templates',
+    '!src/_locales/**',
   ], {base:'src'})
   .pipe(cssFilter)
   .pipe(minifyCss())
@@ -34,4 +36,34 @@ gulp.task('copy-files', function () {
   .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('default', ['templates', 'copy-files']);
+gulp.task('copy-i18n', function () {
+  return gulp.src([
+    'src/**/*.js',
+    'src/**/*.html',
+    'src/**/*.json',
+  ]).pipe(i18n.extract({
+    base: 'src',
+    prefix: '_locales',
+    touchedOnly: true,
+    useDefaultLang: true,
+    markUntouched: false,
+  }))
+  .pipe(gulp.dest('dist'));
+});
+
+gulp.task('default', ['templates', 'copy-files', 'copy-i18n']);
+
+gulp.task('i18n', function () {
+  return gulp.src([
+    'src/**/*.js',
+    'src/**/*.html',
+    'src/**/*.json',
+  ]).pipe(i18n.extract({
+    base: 'src',
+    prefix: '_locales',
+    touchedOnly: false,
+    useDefaultLang: false,
+    markUntouched: true,
+  }))
+  .pipe(gulp.dest('src'));
+});
