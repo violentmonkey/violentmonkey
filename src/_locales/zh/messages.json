@@ -1,406 +1,410 @@
 {
-	"extName": {
-		"description": "Name of this extension.",
-		"message": "暴力猴"
-	},
-	"extDescription": {
-		"description": "Description for this extension.",
-		"message": "为Opera提供用户脚本支持。"
-	},
-	"extTranslator": {
-		"description": "Information of the translator.",
-		"message": "Gerald <gera2ld@163.com>"
-	},
-	"msgUpdated": {
-		"description": "Message shown when a script is updated/reinstalled.",
-		"message": "脚本已更新。"
-	},
-	"msgErrorFetchingScript": {
-		"description": "Message shown when Violentmonkey fails fetching a new version of the script.",
-		"message": "获取脚本发生错误！"
-	},
-	"msgInstalled": {
-		"description": "Message shown when a script is installed.",
-		"message": "脚本已安装。"
-	},
-	"Warning": {
-		"description": "Show warnings with a notification.",
-		"message": "警告"
-	},
-	"msgWarnGrant": {
-		"description": "Message shown when `@grant` is not found in a script.",
-		"message": "脚本【$1】没有`@grant`行！点击查看更多信息。"
-	},
-	"labelNoName": {
-		"description": "Text as the name of a script when no @name is assigned.",
-		"message": "名字为空"
-	},
-	"msgUpdating": {
-		"description": "Message shown when a new version of script is being fetched.",
-		"message": "正在更新..."
-	},
-	"msgNewVersion": {
-		"description": "Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.",
-		"message": "发现新版本。"
-	},
-	"msgCheckingForUpdate": {
-		"description": "Message shown when a script is being checked for updates by version numbers.",
-		"message": "正在检查更新..."
-	},
-	"msgErrorFetchingUpdateInfo": {
-		"description": "Message shown when Violentmonkey fails fetching version data of the script.",
-		"message": "获取更新信息失败。"
-	},
-	"msgNoUpdate": {
-		"description": "Message shown when there is no new version of a script.",
-		"message": "未发现新版本。"
-	},
-	"labelInstall": {
-		"description": "Shown in the title of the confirm page while trying to install a script.",
-		"message": "安装脚本"
-	},
-	"buttonInstallOptions": {
-		"description": "Button to show options of installation confirm page.",
-		"message": "选项"
-	},
-	"installOptionClose": {
-		"description": "Option to close confirm window after installation.",
-		"message": "安装完成后关闭"
-	},
-	"installOptionTrack": {
-		"description": "Option to track the loading local file before window is closed.",
-		"message": "本窗口关闭前跟踪打开的本地文件同步更新"
-	},
-	"buttonConfirmInstallation": {
-		"description": "Button to confirm installation of a script.",
-		"message": "确认安装"
-	},
-	"buttonClose": {
-		"description": "Button to close window.",
-		"message": "关闭"
-	},
-	"msgErrorLoadingData": {
-		"description": "Message shown on confirm page when the script to be installed cannot be loaded.",
-		"message": "加载脚本数据发生错误。"
-	},
-	"msgLoadedData": {
-		"description": "Message shown in the confirm page when a javascript file to be installed is loaded.",
-		"message": "脚本数据已加载。"
-	},
-	"msgErrorLoadingDependency": {
-		"description": "Message shown when not all requirements are loaded successfully.",
-		"message": "加载脚本依赖发生错误。"
-	},
-	"msgLoadingDependency": {
-		"description": "Message shown on confirm page when the requirements are being downloaded.",
-		"message": "正在加载脚本依赖...（$1/$2）"
-	},
-	"msgScriptURL": {
-		"description": "URL of the script to be installed on confirm page.",
-		"message": "脚本URL：$1"
-	},
-	"msgLoadingData": {
-		"description": "Message shown on confirm page when the script to be installed is loading.",
-		"message": "正在加载脚本数据..."
-	},
-	"sideMenuInstalled": {
-		"description": "Side menu: Installed scripts",
-		"message": "已安装的脚本"
-	},
-	"sideMenuSettings": {
-		"description": "Side menu: Settings",
-		"message": "设置"
-	},
-	"sideMenuAbout": {
-		"description": "Side menu: About",
-		"message": "关于"
-	},
-	"buttonNew": {
-		"description": "Button to create a new script.",
-		"message": "新建"
-	},
-	"buttonUpdateAll": {
-		"description": "Check all scripts for updates.",
-		"message": "全部更新"
-	},
-	"anchorGetMoreScripts": {
-		"description": "Link to get more scripts.",
-		"message": "获取更多脚本"
-	},
-	"msgLoading": {
-		"description": "Message shown in the options page before script list is loaded.",
-		"message": "加载中 ..."
-	},
-	"labelSettings": {
-		"description": "Label shown on the top of settings page",
-		"message": "设置"
-	},
-	"labelAutoUpdate": {
-		"description": "Option to allow automatically checking scripts for updates every 24 hours.",
-		"message": "每天自动更新脚本"
-	},
-	"labelIgnoreGrant": {
-		"description": "Option to suppress no @grant warnings.",
-		"message": "不显示缺少@grant的警告"
-	},
-	"labelInjectMode": {
-		"description": "Label to a combo box to choose script injection modes.",
-		"message": "脚本注入模式："
-	},
-	"injectModeNormal": {
-		"description": "Script injection mode: Normal",
-		"message": "普通"
-	},
-	"injectModeAdvanced": {
-		"description": "Script injection mode: Advanced",
-		"message": "高级"
-	},
-	"labelDataImport": {
-		"description": "Section title of data import.",
-		"message": "数据导入"
-	},
-	"buttonImportData": {
-		"description": "Button to choose a file for data import.",
-		"message": "从zip文件导入"
-	},
-	"buttonVacuum": {
-		"description": "Button to vacuum extension data.",
-		"message": "整理数据库"
-	},
-	"labelDataExport": {
-		"description": "Section title of data export.",
-		"message": "数据导出"
-	},
-	"labelScriptsToExport": {
-		"description": "Label shown on top of the script list for export.",
-		"message": "要导出的脚本"
-	},
-	"labelExportScriptData": {
-		"description": "Option to export script data along with scripts.",
-		"message": "导出脚本数据"
-	},
-	"buttonAllNone": {
-		"description": "Button to select all scripts or none.",
-		"message": "全选/不选"
-	},
-	"buttonExportData": {
-		"description": "Button to open the data export dialog.",
-		"message": "导出为zip文件"
-	},
-	"labelAbout": {
-		"description": "Label shown on top of the about page.",
-		"message": "关于暴力猴"
-	},
-	"labelRelated": {
-		"description": "Label of related links.",
-		"message": "相关链接："
-	},
-	"anchorSupportPage": {
-		"description": "Link to the support page of Violentmonkey.",
-		"message": "<a href=http://gerald.top/code/vm-nex target=_blank>暴力猴</a>"
-	},
-	"labelDonate": {
-		"description": "Label of link to donate page.",
-		"message": "捐助"
-	},
-	"labelFeedback": {
-		"description": "Label of link to feedback page.",
-		"message": "反馈"
-	},
-	"labelAuthor": {
-		"description": "Label of author shown in the details of a script.",
-		"message": "作者："
-	},
-	"anchorAuthor": {
-		"description": "Author shown on about tab.",
-		"message": "<a href=mailto:gera2ld@163.com>Gerald</a>"
-	},
-	"labelTranslator": {
-		"description": "Label of translator.",
-		"message": "翻译者："
-	},
-	"anchorTranslator": {
-		"description": "Translator shown on about tab.",
-		"message": "<a href=mailto:gera2ld@163.com>Gerald</a>"
-	},
-	"labelCurrentLang": {
-		"description": "Label of current language.",
-		"message": "当前语言："
-	},
-	"labelScriptEditor": {
-		"description": "Shown in the title of the script editing page.",
-		"message": "脚本编辑器"
-	},
-	"buttonCustomMeta": {
-		"description": "Button to edit the custom meta data of a script.",
-		"message": "自定义元数据"
-	},
-	"labelName": {
-		"description": "Label of script name.",
-		"message": "名字："
-	},
-	"labelRunAt": {
-		"description": "Label of script @run-at properties in custom meta data.",
-		"message": "运行时机："
-	},
-	"labelRunAtDefault": {
-		"description": "Shown when custom @run-at is not assigned.",
-		"message": "（默认）"
-	},
-	"labelHomepageURL": {
-		"description": "Label of script @homepageURL in custom meta data.",
-		"message": "主页地址："
-	},
-	"labelUpdateURL": {
-		"description": "Label of script @updateURL in custom meta data.",
-		"message": "检查更新地址："
-	},
-	"labelDownloadURL": {
-		"description": "Label of script @downloadURL in custom meta data.",
-		"message": "下载更新地址："
-	},
-	"labelInclude": {
-		"description": "Label of @include rules.",
-		"message": "包含规则"
-	},
-	"labelKeepInclude": {
-		"description": "Option to keep the original @include rules.",
-		"message": "保留原有的包含规则"
-	},
-	"labelCustomInclude": {
-		"description": "Label of custom @include rules.",
-		"message": "自定义包含规则：<em>（每行一个）</em>"
-	},
-	"labelMatch": {
-		"description": "Label of @match rules.",
-		"message": "匹配规则"
-	},
-	"labelKeepMatch": {
-		"description": "Option to keep the original @match rules.",
-		"message": "保留原有的匹配规则"
-	},
-	"labelCustomMatch": {
-		"description": "Label of custom @match rules.",
-		"message": "自定义匹配规则：<em>（每行一个）</em>"
-	},
-	"labelExclude": {
-		"description": "Label of @exclude rules.",
-		"message": "排除规则"
-	},
-	"labelKeepExclude": {
-		"description": "Option to keep the original @exclude rules.",
-		"message": "保留原有的排除规则"
-	},
-	"labelCustomExclude": {
-		"description": "Label of custom @exclude rules.",
-		"message": "自定义排除规则：<em>（每行一个）</em>"
-	},
-	"labelAllowUpdate": {
-		"description": "Option to allow checking updates for a script.",
-		"message": "允许更新"
-	},
-	"buttonSave": {
-		"description": "Button to save modifications of a script.",
-		"message": "保存"
-	},
-	"buttonSaveClose": {
-		"description": "Button to save modifications of a script and then close the editing page.",
-		"message": "保存并关闭"
-	},
-	"labelNoScripts": {
-		"description": "Message shown when no script is installed.",
-		"message": "你居然没有脚本！<br>快<a href=http://gerald.top/tag/userjs target=_blank>点此</a>查看<a href=http://gerald.top target=_blank style='color:orange'>Gerald</a>的脚本吧~"
-	},
-	"hintSupportPage": {
-		"description": "Hint for support page.",
-		"message": "支持页面"
-	},
-	"buttonDisable": {
-		"description": "Button to disable a script.",
-		"message": "禁用"
-	},
-	"buttonEnable": {
-		"description": "Button to enable a script.",
-		"message": "启用"
-	},
-	"buttonEdit": {
-		"description": "Button to edit a script.",
-		"message": "编辑"
-	},
-	"buttonRemove": {
-		"description": "Button to remove a script.",
-		"message": "移除"
-	},
-	"buttonUpdate": {
-		"description": "Check a script for updates.",
-		"message": "查找更新"
-	},
-	"msgImported": {
-		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",
-		"message": "已导入$1个脚本。"
-	},
-	"hintUseDownloadURL": {
-		"description": "Shown as a place holder for @updateURL when it is not assigned",
-		"message": "使用@downloadURL"
-	},
-	"confirmNotSaved": {
-		"description": "Confirm message shown when there are unsaved script modifications.",
-		"message": "修改尚未保存！\n点击确定放弃修改或点击取消停留此页面。"
-	},
-	"buttonVacuuming": {
-		"description": "Message shown when data vacuum is in progress.",
-		"message": "正在整理..."
-	},
-	"buttonVacuumed": {
-		"description": "Message shown when data is vacuumed.",
-		"message": "数据已整理"
-	},
-	"hintVacuum": {
-		"description": "Hint for vacuuming data.",
-		"message": "丢弃多余的数据，并尝试重新获取缺失的资源。"
-	},
-	"menuManageScripts": {
-		"description": "Menu item to manage scripts, or to open the options page of the extension.",
-		"message": "管理脚本"
-	},
-	"menuFindScripts": {
-		"description": "Menu item to find scripts for a site.",
-		"message": "为此站点查找脚本"
-	},
-	"menuScriptEnabled": {
-		"description": "Menu item showing the status of Violentmonkey, whether enabled.",
-		"message": "启用脚本"
-	},
-	"menuBack": {
-		"description": "Menu item to go back to main menu from script commands.",
-		"message": "返回"
-	},
-	"menuCommands": {
-		"description": "Menu item to list script commands.",
-		"message": "脚本命令..."
-	},
-	"labelSearch": {
-		"description": "Label for search input in search box.",
-		"message": "查找："
-	},
-	"labelSearchFor": {
-		"description": "Text shown as a place holder in the search box.",
-		"message": "查找..."
-	},
-	"labelReplace": {
-		"description": "Label for replace input in search box.",
-		"message": "替换："
-	},
-	"labelReplaceWith": {
-		"description": "Text shown as a place holder in the replace box.",
-		"message": "替换成..."
-	},
-	"buttonReplace": {
-		"description": "Button to replace the current match.",
-		"message": "替换"
-	},
-	"buttonReplaceAll": {
-		"description": "Button to replace all matches.",
-		"message": "所有"
-	}
+  "extName": {
+    "description": "Name of this extension.",
+    "message": "暴力猴"
+  },
+  "extDescription": {
+    "description": "Description for this extension.",
+    "message": "为Opera提供用户脚本支持。"
+  },
+  "extTranslator": {
+    "description": "Information of the translator.",
+    "message": "Gerald <gera2ld@163.com>"
+  },
+  "msgUpdated": {
+    "description": "Message shown when a script is updated/reinstalled.",
+    "message": "脚本已更新。"
+  },
+  "msgErrorFetchingScript": {
+    "description": "Message shown when Violentmonkey fails fetching a new version of the script.",
+    "message": "获取脚本发生错误！"
+  },
+  "msgInstalled": {
+    "description": "Message shown when a script is installed.",
+    "message": "脚本已安装。"
+  },
+  "Warning": {
+    "description": "Show warnings with a notification.",
+    "message": "警告"
+  },
+  "msgWarnGrant": {
+    "description": "Message shown when `@grant` is not found in a script.",
+    "message": "脚本【$1】没有`@grant`行！点击查看更多信息。"
+  },
+  "labelNoName": {
+    "description": "Text as the name of a script when no @name is assigned.",
+    "message": "名字为空"
+  },
+  "msgUpdating": {
+    "description": "Message shown when a new version of script is being fetched.",
+    "message": "正在更新..."
+  },
+  "msgNewVersion": {
+    "description": "Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.",
+    "message": "发现新版本。"
+  },
+  "msgCheckingForUpdate": {
+    "description": "Message shown when a script is being checked for updates by version numbers.",
+    "message": "正在检查更新..."
+  },
+  "msgErrorFetchingUpdateInfo": {
+    "description": "Message shown when Violentmonkey fails fetching version data of the script.",
+    "message": "获取更新信息失败。"
+  },
+  "msgNoUpdate": {
+    "description": "Message shown when there is no new version of a script.",
+    "message": "未发现新版本。"
+  },
+  "labelInstall": {
+    "description": "Shown in the title of the confirm page while trying to install a script.",
+    "message": "安装脚本"
+  },
+  "buttonInstallOptions": {
+    "description": "Button to show options of installation confirm page.",
+    "message": "选项"
+  },
+  "installOptionClose": {
+    "description": "Option to close confirm window after installation.",
+    "message": "安装完成后关闭"
+  },
+  "installOptionTrack": {
+    "description": "Option to track the loading local file before window is closed.",
+    "message": "本窗口关闭前跟踪打开的本地文件同步更新"
+  },
+  "buttonConfirmInstallation": {
+    "description": "Button to confirm installation of a script.",
+    "message": "确认安装"
+  },
+  "buttonClose": {
+    "description": "Button to close window.",
+    "message": "关闭"
+  },
+  "msgErrorLoadingData": {
+    "description": "Message shown on confirm page when the script to be installed cannot be loaded.",
+    "message": "加载脚本数据发生错误。"
+  },
+  "msgLoadedData": {
+    "description": "Message shown in the confirm page when a javascript file to be installed is loaded.",
+    "message": "脚本数据已加载。"
+  },
+  "msgErrorLoadingDependency": {
+    "description": "Message shown when not all requirements are loaded successfully.",
+    "message": "加载脚本依赖发生错误。"
+  },
+  "msgLoadingDependency": {
+    "description": "Message shown on confirm page when the requirements are being downloaded.",
+    "message": "正在加载脚本依赖...（$1/$2）"
+  },
+  "msgScriptURL": {
+    "description": "URL of the script to be installed on confirm page.",
+    "message": "脚本URL：$1"
+  },
+  "msgLoadingData": {
+    "description": "Message shown on confirm page when the script to be installed is loading.",
+    "message": "正在加载脚本数据..."
+  },
+  "sideMenuInstalled": {
+    "description": "Side menu: Installed scripts",
+    "message": "已安装的脚本"
+  },
+  "sideMenuSettings": {
+    "description": "Side menu: Settings",
+    "message": "设置"
+  },
+  "sideMenuAbout": {
+    "description": "Side menu: About",
+    "message": "关于"
+  },
+  "buttonNew": {
+    "description": "Button to create a new script.",
+    "message": "新建"
+  },
+  "buttonUpdateAll": {
+    "description": "Check all scripts for updates.",
+    "message": "全部更新"
+  },
+  "anchorGetMoreScripts": {
+    "description": "Link to get more scripts.",
+    "message": "获取更多脚本"
+  },
+  "msgLoading": {
+    "description": "Message shown in the options page before script list is loaded.",
+    "message": "加载中 ..."
+  },
+  "labelSettings": {
+    "description": "Label shown on the top of settings page",
+    "message": "设置"
+  },
+  "labelAutoUpdate": {
+    "description": "Option to allow automatically checking scripts for updates every 24 hours.",
+    "message": "每天自动更新脚本"
+  },
+  "labelIgnoreGrant": {
+    "description": "Option to suppress no @grant warnings.",
+    "message": "不显示缺少@grant的警告"
+  },
+  "labelInjectMode": {
+    "description": "Label to a combo box to choose script injection modes.",
+    "message": "脚本注入模式："
+  },
+  "injectModeNormal": {
+    "description": "Script injection mode: Normal",
+    "message": "普通"
+  },
+  "injectModeAdvanced": {
+    "description": "Script injection mode: Advanced",
+    "message": "高级"
+  },
+  "labelDataImport": {
+    "description": "Section title of data import.",
+    "message": "数据导入"
+  },
+  "buttonImportData": {
+    "description": "Button to choose a file for data import.",
+    "message": "从zip文件导入"
+  },
+  "buttonVacuum": {
+    "description": "Button to vacuum extension data.",
+    "message": "整理数据库"
+  },
+  "labelDataExport": {
+    "description": "Section title of data export.",
+    "message": "数据导出"
+  },
+  "labelScriptsToExport": {
+    "description": "Label shown on top of the script list for export.",
+    "message": "要导出的脚本"
+  },
+  "labelExportScriptData": {
+    "description": "Option to export script data along with scripts.",
+    "message": "导出脚本数据"
+  },
+  "buttonAllNone": {
+    "description": "Button to select all scripts or none.",
+    "message": "全选/不选"
+  },
+  "buttonExportData": {
+    "description": "Button to open the data export dialog.",
+    "message": "导出为zip文件"
+  },
+  "labelAbout": {
+    "description": "Label shown on top of the about page.",
+    "message": "关于暴力猴"
+  },
+  "labelRelated": {
+    "description": "Label of related links.",
+    "message": "相关链接："
+  },
+  "anchorSupportPage": {
+    "description": "Link to the support page of Violentmonkey.",
+    "message": "<a href=http://gerald.top/code/vm-nex target=_blank>暴力猴</a>"
+  },
+  "labelDonate": {
+    "description": "Label of link to donate page.",
+    "message": "捐助"
+  },
+  "labelFeedback": {
+    "description": "Label of link to feedback page.",
+    "message": "反馈"
+  },
+  "labelAuthor": {
+    "description": "Label of author shown in the details of a script.",
+    "message": "作者："
+  },
+  "anchorAuthor": {
+    "description": "Author shown on about tab.",
+    "message": "<a href=mailto:gera2ld@163.com>Gerald</a>"
+  },
+  "labelTranslator": {
+    "description": "Label of translator.",
+    "message": "翻译者："
+  },
+  "anchorTranslator": {
+    "description": "Translator shown on about tab.",
+    "message": "<a href=mailto:gera2ld@163.com>Gerald</a>"
+  },
+  "labelCurrentLang": {
+    "description": "Label of current language.",
+    "message": "当前语言："
+  },
+  "labelScriptEditor": {
+    "description": "Shown in the title of the script editing page.",
+    "message": "脚本编辑器"
+  },
+  "buttonCustomMeta": {
+    "description": "Button to edit the custom meta data of a script.",
+    "message": "自定义元数据"
+  },
+  "labelName": {
+    "description": "Label of script name.",
+    "message": "名字："
+  },
+  "labelRunAt": {
+    "description": "Label of script @run-at properties in custom meta data.",
+    "message": "运行时机："
+  },
+  "labelRunAtDefault": {
+    "description": "Shown when custom @run-at is not assigned.",
+    "message": "（默认）"
+  },
+  "labelHomepageURL": {
+    "description": "Label of script @homepageURL in custom meta data.",
+    "message": "主页地址："
+  },
+  "labelUpdateURL": {
+    "description": "Label of script @updateURL in custom meta data.",
+    "message": "检查更新地址："
+  },
+  "labelDownloadURL": {
+    "description": "Label of script @downloadURL in custom meta data.",
+    "message": "下载更新地址："
+  },
+  "labelInclude": {
+    "description": "Label of @include rules.",
+    "message": "包含规则"
+  },
+  "labelKeepInclude": {
+    "description": "Option to keep the original @include rules.",
+    "message": "保留原有的包含规则"
+  },
+  "labelCustomInclude": {
+    "description": "Label of custom @include rules.",
+    "message": "自定义包含规则：<em>（每行一个）</em>"
+  },
+  "labelMatch": {
+    "description": "Label of @match rules.",
+    "message": "匹配规则"
+  },
+  "labelKeepMatch": {
+    "description": "Option to keep the original @match rules.",
+    "message": "保留原有的匹配规则"
+  },
+  "labelCustomMatch": {
+    "description": "Label of custom @match rules.",
+    "message": "自定义匹配规则：<em>（每行一个）</em>"
+  },
+  "labelExclude": {
+    "description": "Label of @exclude rules.",
+    "message": "排除规则"
+  },
+  "labelKeepExclude": {
+    "description": "Option to keep the original @exclude rules.",
+    "message": "保留原有的排除规则"
+  },
+  "labelCustomExclude": {
+    "description": "Label of custom @exclude rules.",
+    "message": "自定义排除规则：<em>（每行一个）</em>"
+  },
+  "labelAllowUpdate": {
+    "description": "Option to allow checking updates for a script.",
+    "message": "允许更新"
+  },
+  "buttonSave": {
+    "description": "Button to save modifications of a script.",
+    "message": "保存"
+  },
+  "buttonSaveClose": {
+    "description": "Button to save modifications of a script and then close the editing page.",
+    "message": "保存并关闭"
+  },
+  "labelNoScripts": {
+    "description": "Message shown when no script is installed.",
+    "message": "你居然没有脚本！<br>快<a href=http://gerald.top/tag/userjs target=_blank>点此</a>查看<a href=http://gerald.top target=_blank style='color:orange'>Gerald</a>的脚本吧~"
+  },
+  "hintSupportPage": {
+    "description": "Hint for support page.",
+    "message": "支持页面"
+  },
+  "buttonDisable": {
+    "description": "Button to disable a script.",
+    "message": "禁用"
+  },
+  "buttonEnable": {
+    "description": "Button to enable a script.",
+    "message": "启用"
+  },
+  "buttonEdit": {
+    "description": "Button to edit a script.",
+    "message": "编辑"
+  },
+  "buttonRemove": {
+    "description": "Button to remove a script.",
+    "message": "移除"
+  },
+  "buttonUpdate": {
+    "description": "Check a script for updates.",
+    "message": "查找更新"
+  },
+  "msgImported": {
+    "description": "Message shown after import. There is an argument referring to the count of scripts imported.",
+    "message": "已导入$1个脚本。"
+  },
+  "hintUseDownloadURL": {
+    "description": "Shown as a place holder for @updateURL when it is not assigned",
+    "message": "使用@downloadURL"
+  },
+  "confirmNotSaved": {
+    "description": "Confirm message shown when there are unsaved script modifications.",
+    "message": "修改尚未保存！\n点击确定放弃修改或点击取消停留此页面。"
+  },
+  "buttonVacuuming": {
+    "description": "Message shown when data vacuum is in progress.",
+    "message": "正在整理..."
+  },
+  "buttonVacuumed": {
+    "description": "Message shown when data is vacuumed.",
+    "message": "数据已整理"
+  },
+  "hintVacuum": {
+    "description": "Hint for vacuuming data.",
+    "message": "丢弃多余的数据，并尝试重新获取缺失的资源。"
+  },
+  "menuManageScripts": {
+    "description": "Menu item to manage scripts, or to open the options page of the extension.",
+    "message": "管理脚本"
+  },
+  "menuFindScripts": {
+    "description": "Menu item to find scripts for a site.",
+    "message": "为此站点查找脚本"
+  },
+  "menuScriptEnabled": {
+    "description": "Menu item showing the status of Violentmonkey, whether enabled.",
+    "message": "启用脚本"
+  },
+  "menuBack": {
+    "description": "Menu item to go back to main menu from script commands.",
+    "message": "返回"
+  },
+  "menuCommands": {
+    "description": "Menu item to list script commands.",
+    "message": "脚本命令..."
+  },
+  "labelSearch": {
+    "description": "Label for search input in search box.",
+    "message": "查找："
+  },
+  "labelSearchFor": {
+    "description": "Text shown as a place holder in the search box.",
+    "message": "查找..."
+  },
+  "labelReplace": {
+    "description": "Label for replace input in search box.",
+    "message": "替换："
+  },
+  "labelReplaceWith": {
+    "description": "Text shown as a place holder in the replace box.",
+    "message": "替换成..."
+  },
+  "buttonReplace": {
+    "description": "Button to replace the current match.",
+    "message": "替换"
+  },
+  "buttonReplaceAll": {
+    "description": "Button to replace all matches.",
+    "message": "所有"
+  },
+  "labelAutoReloadCurrentTab": {
+    "description": "Option to reload current tab after a script is switched on or off from the popup menu.",
+    "message": "从菜单开启或关闭脚本后自动刷新当前页面"
+  }
 }

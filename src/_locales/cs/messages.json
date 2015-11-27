@@ -1,406 +1,410 @@
 {
-	"extName": {
-		"description": "Name of this extension.",
-		"message": "Violentmonkey"
-	},
-	"extDescription": {
-		"description": "Description for this extension.",
-		"message": "Podpora userscriptů pro Opera."
-	},
-	"extTranslator": {
-		"description": "Information of the translator.",
-		"message": "ahoj1234"
-	},
-	"msgUpdated": {
-		"description": "Message shown when a script is updated/reinstalled.",
-		"message": "Skript aktualizován."
-	},
-	"msgErrorFetchingScript": {
-		"description": "Message shown when Violentmonkey fails fetching a new version of the script.",
-		"message": "Chyba při načítání skritpu!"
-	},
-	"msgInstalled": {
-		"description": "Message shown when a script is installed.",
-		"message": "Skript nainstalován."
-	},
-	"Warning": {
-		"description": "Show warnings with a notification.",
-		"message": "Warning"
-	},
-	"msgWarnGrant": {
-		"description": "Message shown when `@grant` is not found in a script.",
-		"message": "Script [$1] has no `@grant` lines! Click to see more details."
-	},
-	"labelNoName": {
-		"description": "Text as the name of a script when no @name is assigned.",
-		"message": "Jméno nebylo definováno"
-	},
-	"msgUpdating": {
-		"description": "Message shown when a new version of script is being fetched.",
-		"message": "Aktualizuji..."
-	},
-	"msgNewVersion": {
-		"description": "Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.",
-		"message": "Nalezena nová verze."
-	},
-	"msgCheckingForUpdate": {
-		"description": "Message shown when a script is being checked for updates by version numbers.",
-		"message": "Kontroluji aktualizace..."
-	},
-	"msgErrorFetchingUpdateInfo": {
-		"description": "Message shown when Violentmonkey fails fetching version data of the script.",
-		"message": "Načtení informací o aktualizaci se nezdařilo."
-	},
-	"msgNoUpdate": {
-		"description": "Message shown when there is no new version of a script.",
-		"message": "Aktualizace nenalezena."
-	},
-	"labelInstall": {
-		"description": "Shown in the title of the confirm page while trying to install a script.",
-		"message": "Instaluji skript"
-	},
-	"buttonInstallOptions": {
-		"description": "Button to show options of installation confirm page.",
-		"message": "Options"
-	},
-	"installOptionClose": {
-		"description": "Option to close confirm window after installation.",
-		"message": "Close po instalaci"
-	},
-	"installOptionTrack": {
-		"description": "Option to track the loading local file before window is closed.",
-		"message": "Track local file before this window is closed"
-	},
-	"buttonConfirmInstallation": {
-		"description": "Button to confirm installation of a script.",
-		"message": "Potvrdit instalaci"
-	},
-	"buttonClose": {
-		"description": "Button to close window.",
-		"message": "Zavřít"
-	},
-	"msgErrorLoadingData": {
-		"description": "Message shown on confirm page when the script to be installed cannot be loaded.",
-		"message": "Chyba při načítání skript."
-	},
-	"msgLoadedData": {
-		"description": "Message shown in the confirm page when a javascript file to be installed is loaded.",
-		"message": "Skript načten."
-	},
-	"msgErrorLoadingDependency": {
-		"description": "Message shown when not all requirements are loaded successfully.",
-		"message": "Chyba při načítání požadavky."
-	},
-	"msgLoadingDependency": {
-		"description": "Message shown on confirm page when the requirements are being downloaded.",
-		"message": "Vkládání požadavky... ($1/$2)"
-	},
-	"msgScriptURL": {
-		"description": "URL of the script to be installed on confirm page.",
-		"message": "Skript URL: $1"
-	},
-	"msgLoadingData": {
-		"description": "Message shown on confirm page when the script to be installed is loading.",
-		"message": "Nahrávám skript..."
-	},
-	"sideMenuInstalled": {
-		"description": "Side menu: Installed scripts",
-		"message": "Nainstalované skripty"
-	},
-	"sideMenuSettings": {
-		"description": "Side menu: Settings",
-		"message": "Settings"
-	},
-	"sideMenuAbout": {
-		"description": "Side menu: About",
-		"message": "About"
-	},
-	"buttonNew": {
-		"description": "Button to create a new script.",
-		"message": "Nový"
-	},
-	"buttonUpdateAll": {
-		"description": "Check all scripts for updates.",
-		"message": "Zkontrolovat aktualizace"
-	},
-	"anchorGetMoreScripts": {
-		"description": "Link to get more scripts.",
-		"message": "Získej více skritpů"
-	},
-	"msgLoading": {
-		"description": "Message shown in the options page before script list is loaded.",
-		"message": "Nahrávám ..."
-	},
-	"labelSettings": {
-		"description": "Label shown on the top of settings page",
-		"message": "Settings"
-	},
-	"labelAutoUpdate": {
-		"description": "Option to allow automatically checking scripts for updates every 24 hours.",
-		"message": "Automaticky kontrolovat aktualizace skriptu každý den"
-	},
-	"labelIgnoreGrant": {
-		"description": "Option to suppress no @grant warnings.",
-		"message": "Suppress no @grant warnings"
-	},
-	"labelInjectMode": {
-		"description": "Label to a combo box to choose script injection modes.",
-		"message": "Script injection mode:"
-	},
-	"injectModeNormal": {
-		"description": "Script injection mode: Normal",
-		"message": "Normal"
-	},
-	"injectModeAdvanced": {
-		"description": "Script injection mode: Advanced",
-		"message": "Advanced"
-	},
-	"labelDataImport": {
-		"description": "Section title of data import.",
-		"message": "Data Import"
-	},
-	"buttonImportData": {
-		"description": "Button to choose a file for data import.",
-		"message": "Importovat ze souboru zip"
-	},
-	"buttonVacuum": {
-		"description": "Button to vacuum extension data.",
-		"message": "Vyprázdnit data"
-	},
-	"labelDataExport": {
-		"description": "Section title of data export.",
-		"message": "Data Export"
-	},
-	"labelScriptsToExport": {
-		"description": "Label shown on top of the script list for export.",
-		"message": "Scripts to export"
-	},
-	"labelExportScriptData": {
-		"description": "Option to export script data along with scripts.",
-		"message": "Export data skriptu"
-	},
-	"buttonAllNone": {
-		"description": "Button to select all scripts or none.",
-		"message": "Vše/Žádný"
-	},
-	"buttonExportData": {
-		"description": "Button to open the data export dialog.",
-		"message": "Exportovat do souboru zip"
-	},
-	"labelAbout": {
-		"description": "Label shown on top of the about page.",
-		"message": "About Violentmonkey"
-	},
-	"labelRelated": {
-		"description": "Label of related links.",
-		"message": "Related links: "
-	},
-	"anchorSupportPage": {
-		"description": "Link to the support page of Violentmonkey.",
-		"message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>"
-	},
-	"labelDonate": {
-		"description": "Label of link to donate page.",
-		"message": "Donate"
-	},
-	"labelFeedback": {
-		"description": "Label of link to feedback page.",
-		"message": "Feedback"
-	},
-	"labelAuthor": {
-		"description": "Label of author shown in the details of a script.",
-		"message": "Autor: "
-	},
-	"anchorAuthor": {
-		"description": "Author shown on about tab.",
-		"message": "<a href=mailto:gera2ld@163.com>Gerald</a>"
-	},
-	"labelTranslator": {
-		"description": "Label of translator.",
-		"message": "Translator: "
-	},
-	"anchorTranslator": {
-		"description": "Translator shown on about tab.",
-		"message": "<a href=http://my.opera.com/ahoj1234 target=_blank>ahoj1234</a>"
-	},
-	"labelCurrentLang": {
-		"description": "Label of current language.",
-		"message": "Current Language:"
-	},
-	"labelScriptEditor": {
-		"description": "Shown in the title of the script editing page.",
-		"message": "Editor skriptů"
-	},
-	"buttonCustomMeta": {
-		"description": "Button to edit the custom meta data of a script.",
-		"message": "Vlastní meta data"
-	},
-	"labelName": {
-		"description": "Label of script name.",
-		"message": "Jméno:"
-	},
-	"labelRunAt": {
-		"description": "Label of script @run-at properties in custom meta data.",
-		"message": "Spustit na: "
-	},
-	"labelRunAtDefault": {
-		"description": "Shown when custom @run-at is not assigned.",
-		"message": "(standardní)"
-	},
-	"labelHomepageURL": {
-		"description": "Label of script @homepageURL in custom meta data.",
-		"message": "Domovská stránka URL:"
-	},
-	"labelUpdateURL": {
-		"description": "Label of script @updateURL in custom meta data.",
-		"message": "Aktualizovat URL:"
-	},
-	"labelDownloadURL": {
-		"description": "Label of script @downloadURL in custom meta data.",
-		"message": "Stáhnout URL:"
-	},
-	"labelInclude": {
-		"description": "Label of @include rules.",
-		"message": "Zahrnout"
-	},
-	"labelKeepInclude": {
-		"description": "Option to keep the original @include rules.",
-		"message": "Dodržovat originální zahrnutí"
-	},
-	"labelCustomInclude": {
-		"description": "Label of custom @include rules.",
-		"message": "Vlastní pravidla pro zahrnování: <em>(Jedno na řádek)</em>"
-	},
-	"labelMatch": {
-		"description": "Label of @match rules.",
-		"message": "Přiřazení"
-	},
-	"labelKeepMatch": {
-		"description": "Option to keep the original @match rules.",
-		"message": "Dodržovat originální přiřazení"
-	},
-	"labelCustomMatch": {
-		"description": "Label of custom @match rules.",
-		"message": "Vlastní pravidla pro přiřazení: <em>(Jedno na řádek)</em>"
-	},
-	"labelExclude": {
-		"description": "Label of @exclude rules.",
-		"message": "Výjimky"
-	},
-	"labelKeepExclude": {
-		"description": "Option to keep the original @exclude rules.",
-		"message": "Dodržovat originální výjimky"
-	},
-	"labelCustomExclude": {
-		"description": "Label of custom @exclude rules.",
-		"message": "Vlastní pravidla pro výjimky: <em>(Jedno na řádek)</em>"
-	},
-	"labelAllowUpdate": {
-		"description": "Option to allow checking updates for a script.",
-		"message": "Povolit aktualizace"
-	},
-	"buttonSave": {
-		"description": "Button to save modifications of a script.",
-		"message": "Uložit"
-	},
-	"buttonSaveClose": {
-		"description": "Button to save modifications of a script and then close the editing page.",
-		"message": "Uložit a Zavřít"
-	},
-	"labelNoScripts": {
-		"description": "Message shown when no script is installed.",
-		"message": "Oops, you haven't got any script yet."
-	},
-	"hintSupportPage": {
-		"description": "Hint for support page.",
-		"message": "Support page"
-	},
-	"buttonDisable": {
-		"description": "Button to disable a script.",
-		"message": "Vypnout"
-	},
-	"buttonEnable": {
-		"description": "Button to enable a script.",
-		"message": "Zapnout"
-	},
-	"buttonEdit": {
-		"description": "Button to edit a script.",
-		"message": "Editovat"
-	},
-	"buttonRemove": {
-		"description": "Button to remove a script.",
-		"message": "Odstranit"
-	},
-	"buttonUpdate": {
-		"description": "Check a script for updates.",
-		"message": "Zkontrolovat aktualizace"
-	},
-	"msgImported": {
-		"description": "Message shown after import. There is an argument referring to the count of scripts imported.",
-		"message": "$1 vec(i) jsou importovány."
-	},
-	"hintUseDownloadURL": {
-		"description": "Shown as a place holder for @updateURL when it is not assigned",
-		"message": "Use @downloadURL"
-	},
-	"confirmNotSaved": {
-		"description": "Confirm message shown when there are unsaved script modifications.",
-		"message": "Modifikace není uložena! Klikni na OK pro zbavení se jí, nebo na zrušit pro zůstání zde."
-	},
-	"buttonVacuuming": {
-		"description": "Message shown when data vacuum is in progress.",
-		"message": "Čištení dat..."
-	},
-	"buttonVacuumed": {
-		"description": "Message shown when data is vacuumed.",
-		"message": "Data vyprázdněna"
-	},
-	"hintVacuum": {
-		"description": "Hint for vacuuming data.",
-		"message": "Zbavit se nadbytečného a zkusit znovu načíst chybějící zdroje v cache."
-	},
-	"menuManageScripts": {
-		"description": "Menu item to manage scripts, or to open the options page of the extension.",
-		"message": "Řízení skriptů"
-	},
-	"menuFindScripts": {
-		"description": "Menu item to find scripts for a site.",
-		"message": "Najdi skripty pro tuto stránku"
-	},
-	"menuScriptEnabled": {
-		"description": "Menu item showing the status of Violentmonkey, whether enabled.",
-		"message": "Skripty zapnuty"
-	},
-	"menuBack": {
-		"description": "Menu item to go back to main menu from script commands.",
-		"message": "Zpět"
-	},
-	"menuCommands": {
-		"description": "Menu item to list script commands.",
-		"message": "Skriptové příkazy..."
-	},
-	"labelSearch": {
-		"description": "Label for search input in search box.",
-		"message": "Hledat: "
-	},
-	"labelSearchFor": {
-		"description": "Text shown as a place holder in the search box.",
-		"message": "Search for..."
-	},
-	"labelReplace": {
-		"description": "Label for replace input in search box.",
-		"message": "Nahradit: "
-	},
-	"labelReplaceWith": {
-		"description": "Text shown as a place holder in the replace box.",
-		"message": "Replace with..."
-	},
-	"buttonReplace": {
-		"description": "Button to replace the current match.",
-		"message": "Nahradit"
-	},
-	"buttonReplaceAll": {
-		"description": "Button to replace all matches.",
-		"message": "Vše"
-	}
+  "extName": {
+    "description": "Name of this extension.",
+    "message": "Violentmonkey"
+  },
+  "extDescription": {
+    "description": "Description for this extension.",
+    "message": "Podpora userscriptů pro Opera."
+  },
+  "extTranslator": {
+    "description": "Information of the translator.",
+    "message": "ahoj1234"
+  },
+  "msgUpdated": {
+    "description": "Message shown when a script is updated/reinstalled.",
+    "message": "Skript aktualizován."
+  },
+  "msgErrorFetchingScript": {
+    "description": "Message shown when Violentmonkey fails fetching a new version of the script.",
+    "message": "Chyba při načítání skritpu!"
+  },
+  "msgInstalled": {
+    "description": "Message shown when a script is installed.",
+    "message": "Skript nainstalován."
+  },
+  "Warning": {
+    "description": "Show warnings with a notification.",
+    "message": "Warning"
+  },
+  "msgWarnGrant": {
+    "description": "Message shown when `@grant` is not found in a script.",
+    "message": "Script [$1] has no `@grant` lines! Click to see more details."
+  },
+  "labelNoName": {
+    "description": "Text as the name of a script when no @name is assigned.",
+    "message": "Jméno nebylo definováno"
+  },
+  "msgUpdating": {
+    "description": "Message shown when a new version of script is being fetched.",
+    "message": "Aktualizuji..."
+  },
+  "msgNewVersion": {
+    "description": "Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.",
+    "message": "Nalezena nová verze."
+  },
+  "msgCheckingForUpdate": {
+    "description": "Message shown when a script is being checked for updates by version numbers.",
+    "message": "Kontroluji aktualizace..."
+  },
+  "msgErrorFetchingUpdateInfo": {
+    "description": "Message shown when Violentmonkey fails fetching version data of the script.",
+    "message": "Načtení informací o aktualizaci se nezdařilo."
+  },
+  "msgNoUpdate": {
+    "description": "Message shown when there is no new version of a script.",
+    "message": "Aktualizace nenalezena."
+  },
+  "labelInstall": {
+    "description": "Shown in the title of the confirm page while trying to install a script.",
+    "message": "Instaluji skript"
+  },
+  "buttonInstallOptions": {
+    "description": "Button to show options of installation confirm page.",
+    "message": "Options"
+  },
+  "installOptionClose": {
+    "description": "Option to close confirm window after installation.",
+    "message": "Close po instalaci"
+  },
+  "installOptionTrack": {
+    "description": "Option to track the loading local file before window is closed.",
+    "message": "Track local file before this window is closed"
+  },
+  "buttonConfirmInstallation": {
+    "description": "Button to confirm installation of a script.",
+    "message": "Potvrdit instalaci"
+  },
+  "buttonClose": {
+    "description": "Button to close window.",
+    "message": "Zavřít"
+  },
+  "msgErrorLoadingData": {
+    "description": "Message shown on confirm page when the script to be installed cannot be loaded.",
+    "message": "Chyba při načítání skript."
+  },
+  "msgLoadedData": {
+    "description": "Message shown in the confirm page when a javascript file to be installed is loaded.",
+    "message": "Skript načten."
+  },
+  "msgErrorLoadingDependency": {
+    "description": "Message shown when not all requirements are loaded successfully.",
+    "message": "Chyba při načítání požadavky."
+  },
+  "msgLoadingDependency": {
+    "description": "Message shown on confirm page when the requirements are being downloaded.",
+    "message": "Vkládání požadavky... ($1/$2)"
+  },
+  "msgScriptURL": {
+    "description": "URL of the script to be installed on confirm page.",
+    "message": "Skript URL: $1"
+  },
+  "msgLoadingData": {
+    "description": "Message shown on confirm page when the script to be installed is loading.",
+    "message": "Nahrávám skript..."
+  },
+  "sideMenuInstalled": {
+    "description": "Side menu: Installed scripts",
+    "message": "Nainstalované skripty"
+  },
+  "sideMenuSettings": {
+    "description": "Side menu: Settings",
+    "message": "Settings"
+  },
+  "sideMenuAbout": {
+    "description": "Side menu: About",
+    "message": "About"
+  },
+  "buttonNew": {
+    "description": "Button to create a new script.",
+    "message": "Nový"
+  },
+  "buttonUpdateAll": {
+    "description": "Check all scripts for updates.",
+    "message": "Zkontrolovat aktualizace"
+  },
+  "anchorGetMoreScripts": {
+    "description": "Link to get more scripts.",
+    "message": "Získej více skritpů"
+  },
+  "msgLoading": {
+    "description": "Message shown in the options page before script list is loaded.",
+    "message": "Nahrávám ..."
+  },
+  "labelSettings": {
+    "description": "Label shown on the top of settings page",
+    "message": "Settings"
+  },
+  "labelAutoUpdate": {
+    "description": "Option to allow automatically checking scripts for updates every 24 hours.",
+    "message": "Automaticky kontrolovat aktualizace skriptu každý den"
+  },
+  "labelIgnoreGrant": {
+    "description": "Option to suppress no @grant warnings.",
+    "message": "Suppress no @grant warnings"
+  },
+  "labelInjectMode": {
+    "description": "Label to a combo box to choose script injection modes.",
+    "message": "Script injection mode:"
+  },
+  "injectModeNormal": {
+    "description": "Script injection mode: Normal",
+    "message": "Normal"
+  },
+  "injectModeAdvanced": {
+    "description": "Script injection mode: Advanced",
+    "message": "Advanced"
+  },
+  "labelDataImport": {
+    "description": "Section title of data import.",
+    "message": "Data Import"
+  },
+  "buttonImportData": {
+    "description": "Button to choose a file for data import.",
+    "message": "Importovat ze souboru zip"
+  },
+  "buttonVacuum": {
+    "description": "Button to vacuum extension data.",
+    "message": "Vyprázdnit data"
+  },
+  "labelDataExport": {
+    "description": "Section title of data export.",
+    "message": "Data Export"
+  },
+  "labelScriptsToExport": {
+    "description": "Label shown on top of the script list for export.",
+    "message": "Scripts to export"
+  },
+  "labelExportScriptData": {
+    "description": "Option to export script data along with scripts.",
+    "message": "Export data skriptu"
+  },
+  "buttonAllNone": {
+    "description": "Button to select all scripts or none.",
+    "message": "Vše/Žádný"
+  },
+  "buttonExportData": {
+    "description": "Button to open the data export dialog.",
+    "message": "Exportovat do souboru zip"
+  },
+  "labelAbout": {
+    "description": "Label shown on top of the about page.",
+    "message": "About Violentmonkey"
+  },
+  "labelRelated": {
+    "description": "Label of related links.",
+    "message": "Related links: "
+  },
+  "anchorSupportPage": {
+    "description": "Link to the support page of Violentmonkey.",
+    "message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>"
+  },
+  "labelDonate": {
+    "description": "Label of link to donate page.",
+    "message": "Donate"
+  },
+  "labelFeedback": {
+    "description": "Label of link to feedback page.",
+    "message": "Feedback"
+  },
+  "labelAuthor": {
+    "description": "Label of author shown in the details of a script.",
+    "message": "Autor: "
+  },
+  "anchorAuthor": {
+    "description": "Author shown on about tab.",
+    "message": "<a href=mailto:gera2ld@163.com>Gerald</a>"
+  },
+  "labelTranslator": {
+    "description": "Label of translator.",
+    "message": "Translator: "
+  },
+  "anchorTranslator": {
+    "description": "Translator shown on about tab.",
+    "message": "<a href=http://my.opera.com/ahoj1234 target=_blank>ahoj1234</a>"
+  },
+  "labelCurrentLang": {
+    "description": "Label of current language.",
+    "message": "Current Language:"
+  },
+  "labelScriptEditor": {
+    "description": "Shown in the title of the script editing page.",
+    "message": "Editor skriptů"
+  },
+  "buttonCustomMeta": {
+    "description": "Button to edit the custom meta data of a script.",
+    "message": "Vlastní meta data"
+  },
+  "labelName": {
+    "description": "Label of script name.",
+    "message": "Jméno:"
+  },
+  "labelRunAt": {
+    "description": "Label of script @run-at properties in custom meta data.",
+    "message": "Spustit na: "
+  },
+  "labelRunAtDefault": {
+    "description": "Shown when custom @run-at is not assigned.",
+    "message": "(standardní)"
+  },
+  "labelHomepageURL": {
+    "description": "Label of script @homepageURL in custom meta data.",
+    "message": "Domovská stránka URL:"
+  },
+  "labelUpdateURL": {
+    "description": "Label of script @updateURL in custom meta data.",
+    "message": "Aktualizovat URL:"
+  },
+  "labelDownloadURL": {
+    "description": "Label of script @downloadURL in custom meta data.",
+    "message": "Stáhnout URL:"
+  },
+  "labelInclude": {
+    "description": "Label of @include rules.",
+    "message": "Zahrnout"
+  },
+  "labelKeepInclude": {
+    "description": "Option to keep the original @include rules.",
+    "message": "Dodržovat originální zahrnutí"
+  },
+  "labelCustomInclude": {
+    "description": "Label of custom @include rules.",
+    "message": "Vlastní pravidla pro zahrnování: <em>(Jedno na řádek)</em>"
+  },
+  "labelMatch": {
+    "description": "Label of @match rules.",
+    "message": "Přiřazení"
+  },
+  "labelKeepMatch": {
+    "description": "Option to keep the original @match rules.",
+    "message": "Dodržovat originální přiřazení"
+  },
+  "labelCustomMatch": {
+    "description": "Label of custom @match rules.",
+    "message": "Vlastní pravidla pro přiřazení: <em>(Jedno na řádek)</em>"
+  },
+  "labelExclude": {
+    "description": "Label of @exclude rules.",
+    "message": "Výjimky"
+  },
+  "labelKeepExclude": {
+    "description": "Option to keep the original @exclude rules.",
+    "message": "Dodržovat originální výjimky"
+  },
+  "labelCustomExclude": {
+    "description": "Label of custom @exclude rules.",
+    "message": "Vlastní pravidla pro výjimky: <em>(Jedno na řádek)</em>"
+  },
+  "labelAllowUpdate": {
+    "description": "Option to allow checking updates for a script.",
+    "message": "Povolit aktualizace"
+  },
+  "buttonSave": {
+    "description": "Button to save modifications of a script.",
+    "message": "Uložit"
+  },
+  "buttonSaveClose": {
+    "description": "Button to save modifications of a script and then close the editing page.",
+    "message": "Uložit a Zavřít"
+  },
+  "labelNoScripts": {
+    "description": "Message shown when no script is installed.",
+    "message": "Oops, you haven't got any script yet."
+  },
+  "hintSupportPage": {
+    "description": "Hint for support page.",
+    "message": "Support page"
+  },
+  "buttonDisable": {
+    "description": "Button to disable a script.",
+    "message": "Vypnout"
+  },
+  "buttonEnable": {
+    "description": "Button to enable a script.",
+    "message": "Zapnout"
+  },
+  "buttonEdit": {
+    "description": "Button to edit a script.",
+    "message": "Editovat"
+  },
+  "buttonRemove": {
+    "description": "Button to remove a script.",
+    "message": "Odstranit"
+  },
+  "buttonUpdate": {
+    "description": "Check a script for updates.",
+    "message": "Zkontrolovat aktualizace"
+  },
+  "msgImported": {
+    "description": "Message shown after import. There is an argument referring to the count of scripts imported.",
+    "message": "$1 vec(i) jsou importovány."
+  },
+  "hintUseDownloadURL": {
+    "description": "Shown as a place holder for @updateURL when it is not assigned",
+    "message": "Use @downloadURL"
+  },
+  "confirmNotSaved": {
+    "description": "Confirm message shown when there are unsaved script modifications.",
+    "message": "Modifikace není uložena! Klikni na OK pro zbavení se jí, nebo na zrušit pro zůstání zde."
+  },
+  "buttonVacuuming": {
+    "description": "Message shown when data vacuum is in progress.",
+    "message": "Čištení dat..."
+  },
+  "buttonVacuumed": {
+    "description": "Message shown when data is vacuumed.",
+    "message": "Data vyprázdněna"
+  },
+  "hintVacuum": {
+    "description": "Hint for vacuuming data.",
+    "message": "Zbavit se nadbytečného a zkusit znovu načíst chybějící zdroje v cache."
+  },
+  "menuManageScripts": {
+    "description": "Menu item to manage scripts, or to open the options page of the extension.",
+    "message": "Řízení skriptů"
+  },
+  "menuFindScripts": {
+    "description": "Menu item to find scripts for a site.",
+    "message": "Najdi skripty pro tuto stránku"
+  },
+  "menuScriptEnabled": {
+    "description": "Menu item showing the status of Violentmonkey, whether enabled.",
+    "message": "Skripty zapnuty"
+  },
+  "menuBack": {
+    "description": "Menu item to go back to main menu from script commands.",
+    "message": "Zpět"
+  },
+  "menuCommands": {
+    "description": "Menu item to list script commands.",
+    "message": "Skriptové příkazy..."
+  },
+  "labelSearch": {
+    "description": "Label for search input in search box.",
+    "message": "Hledat: "
+  },
+  "labelSearchFor": {
+    "description": "Text shown as a place holder in the search box.",
+    "message": "Search for..."
+  },
+  "labelReplace": {
+    "description": "Label for replace input in search box.",
+    "message": "Nahradit: "
+  },
+  "labelReplaceWith": {
+    "description": "Text shown as a place holder in the replace box.",
+    "message": "Replace with..."
+  },
+  "buttonReplace": {
+    "description": "Button to replace the current match.",
+    "message": "Nahradit"
+  },
+  "buttonReplaceAll": {
+    "description": "Button to replace all matches.",
+    "message": "Vše"
+  },
+  "labelAutoReloadCurrentTab": {
+    "description": "Option to reload current tab after a script is switched on or off from the popup menu.",
+    "message": ""
+  }
 }
