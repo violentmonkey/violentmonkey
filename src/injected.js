@@ -3,9 +3,18 @@
 if (window.VM) return;
 window.VM = 1;
 
-function getUniqId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-}
+var _ = {
+  getUniqId: function () {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  },
+  sendMessage: function (data) {
+    return new Promise(function (resolve, reject) {
+      chrome.runtime.sendMessage(data, function (res) {
+        res && res.error ? reject(res.error) : resolve(res && res.data);
+      });
+    });
+  },
+};
 
 /**
 * http://www.webtoolkit.info/javascript-utf8.html
@@ -34,7 +43,7 @@ function utf8decode (utftext) {
 function getPopup(){
   // XXX: only scripts run in top level window are counted
   if(top === window)
-    chrome.runtime.sendMessage({
+    _.sendMessage({
       cmd: 'SetPopup',
       data: {
         ids: ids,
@@ -56,16 +65,16 @@ function setBadge(){
   if (badge.ready && badge.willSet) {
     // XXX: only scripts run in top level window are counted
     if (top === window)
-      chrome.runtime.sendMessage({cmd: 'SetBadge', data: badge.number});
+      _.sendMessage({cmd: 'SetBadge', data: badge.number});
   }
 }
 
 // Communicator
 var comm = {
-  vmid: 'VM_' + getUniqId(),
+  vmid: 'VM_' + _.getUniqId(),
   state: 0,
   utf8decode: utf8decode,
-  getUniqId: getUniqId,
+  getUniqId: _.getUniqId,
 
   // Array functions
   // to avoid using prototype functions
@@ -567,7 +576,7 @@ function handleC(e) {
   }
   var maps = {
     SetValue: function(data) {
-      chrome.runtime.sendMessage({cmd: 'SetValue', data: data});
+      _.sendMessage({cmd: 'SetValue', data: data});
     },
     RegisterMenu: function(data) {
       if (window.top === window) menus.push(data);
@@ -599,13 +608,13 @@ chrome.runtime.onMessage.addListener(function(req, src) {
 // Requests
 var requests = {};
 function getRequestId() {
-  chrome.runtime.sendMessage({cmd: 'GetRequestId'}, function (id) {
+  _.sendMessage({cmd: 'GetRequestId'}).then(function (id) {
     requests[id] = 1;
     comm.post({cmd: 'GotRequestId', data: id});
   });
 }
 function httpRequest(details) {
-  chrome.runtime.sendMessage({cmd: 'HttpRequest', data: details});
+  _.sendMessage({cmd: 'HttpRequest', data: details});
 }
 function httpRequested(data) {
   if(requests[data.id]) {
@@ -614,7 +623,7 @@ function httpRequested(data) {
   }
 }
 function abortRequest(id) {
-  chrome.runtime.sendMessage({cmd: 'AbortRequest', data: id});
+  _.sendMessage({cmd: 'AbortRequest', data: id});
 }
 
 function objEncode(obj) {
@@ -654,7 +663,7 @@ function initCommunicator() {
   );
   comm.handleC = handleC;
   comm.init(C, R);
-  chrome.runtime.sendMessage({cmd: 'GetInjected', data: location.href}, loadScript);
+  _.sendMessage({cmd: 'GetInjected', data: location.href}).then(loadScript);
 }
 initCommunicator();
 }();

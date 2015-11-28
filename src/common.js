@@ -50,7 +50,7 @@ _.options = function () {
 _.sendMessage = function (data) {
   return new Promise(function (resolve, reject) {
     chrome.runtime.sendMessage(data, function (res) {
-      resolve(res);
+      res && res.error ? reject(res.error) : resolve(res && res.data);
     });
   });
 };

@@ -112,7 +112,16 @@ vmdb.initialized.then(function () {
           // callback fails if not given in content page
         }
       };
-      res.then(finish, finish);
+      res.then(function (data) {
+        finish({
+          data: data,
+          error: null,
+        });
+      }, function (data) {
+        finish({
+          error: data,
+        });
+      });
       return true;
     }
   });
