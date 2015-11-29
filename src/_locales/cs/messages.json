@@ -249,15 +249,15 @@
   },
   "labelHomepageURL": {
     "description": "Label of script @homepageURL in custom meta data.",
-    "message": "Domovská stránka URL:"
+    "message": "Domovská stránka (URL):"
   },
   "labelUpdateURL": {
     "description": "Label of script @updateURL in custom meta data.",
-    "message": "Aktualizace URL:"
+    "message": "Aktualizace (URL):"
   },
   "labelDownloadURL": {
     "description": "Label of script @downloadURL in custom meta data.",
-    "message": "Stáhnout URL:"
+    "message": "Stažení (URL):"
   },
   "labelInclude": {
     "description": "Label of @include rules.",
