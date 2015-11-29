@@ -97,7 +97,7 @@
   },
   "msgScriptURL": {
     "description": "URL of the script to be installed on confirm page.",
-    "message": "Skript URL: $1"
+    "message": "Umístění skriptu: $1"
   },
   "msgLoadingData": {
     "description": "Message shown on confirm page when the script to be installed is loading.",
