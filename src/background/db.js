@@ -98,6 +98,24 @@ VMDB.prototype.getScriptInfos = function (ids) {
   });
 };
 
+VMDB.prototype.getValues = function (uris, tx) {
+  var _this = this;
+  tx = tx || _this.db.transaction('values');
+  var o = tx.objectStore('values');
+  return Promise.all(uris.map(function (uri) {
+    return new Promise(function (resolve, reject) {
+      o.get(uri).onsuccess = function (e) {
+        resolve(e.target.result);
+      };
+    });
+  })).then(function (data) {
+    return data.reduce(function (result, value, i) {
+      if (value) result[uris[i]] = value.values;
+      return result;
+    }, {});
+  });
+};
+
 VMDB.prototype.getScriptsByURL = function (url) {
   function getScripts() {
     return _this.getScriptsByIndex('position', null, tx).then(function (scripts) {
@@ -137,27 +155,12 @@ VMDB.prototype.getScriptsByURL = function (url) {
       }, {});
     });
   }
-  function getValues(uris) {
-    var o = tx.objectStore('values');
-    return Promise.all(uris.map(function (uri) {
-      return new Promise(function (resolve, reject) {
-        o.get(uri).onsuccess = function (e) {
-          resolve(e.target.result);
-        };
-      });
-    })).then(function (data) {
-      return data.reduce(function (result, value, i) {
-        if (value) result[uris[i]] = value.values;
-        return result;
-      }, {});
-    });
-  }
   var _this = this;
   var tx = _this.db.transaction(['scripts', 'require', 'values', 'cache']);
   return getScripts().then(function (data) {
     return Promise.all([
       getRequire(data.require),
-      getValues(data.uris),
+      _this.getValues(data.uris, tx),
       _this.getCacheB64(data.cache, tx),
     ]).then(function (res) {
       return {
@@ -377,28 +380,16 @@ VMDB.prototype.getExportData = function (ids, withValues) {
       return data.filter(function (x) {return x;});
     });
   }
-  function getValues(uris) {
-    var o = tx.objectStore('values');
-    return Promise.all(uris.map(function (uri) {
-      return new Promise(function (resolve, reject) {
-        o.get(uri).onsuccess = function (e) {
-          resolve(e.target.result);
-        };
-      });
-    })).then(function (data) {
-      return data.reduce(function (result, value, i) {
-        if (value) result[uris[i]] = value.values;
-        return result;
-      }, {});
-    });
-  }
-  var tx = this.db.transaction(['scripts', 'values']);
+  var _this = this;
+  var tx = _this.db.transaction(['scripts', 'values']);
   return getScripts(ids).then(function (scripts) {
     var res = {
       scripts: scripts,
     };
     return withValues
-    ? getValues(scripts.map(function (script) {return script.uri;})).then(function (values) {
+    ? _this.getValues(scripts.map(function (script) {
+      return script.uri;
+    }), tx).then(function (values) {
       res.values = values;
       return res;
     }) : res;
