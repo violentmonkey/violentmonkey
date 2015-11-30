@@ -144,7 +144,7 @@
     "message": "Suppress no @grant warnings"
   },
   "labelInjectMode": {
-    "description": "Label to a combo box to choose script injection modes.",
+    "description": "Label for a combo box to choose script injection modes.",
     "message": "Script injection mode:"
   },
   "injectModeNormal": {
@@ -406,5 +406,13 @@
   "labelAutoReloadCurrentTab": {
     "description": "Option to reload current tab after a script is switched on or off from menu.",
     "message": "Reload current tab after switching on/off a script from menu"
+  },
+  "hintInjectModeNormal": {
+    "description": "Hint to explain the normal injection mode.",
+    "message": "Efficient but fails in some high security pages, e.g. https://github.com"
+  },
+  "hintInjectModeAdvanced": {
+    "description": "Hint to explain the advanced injection mode.",
+    "message": "Works in most pages, actually a hack"
   }
 }

@@ -144,7 +144,7 @@
     "message": "不显示缺少@grant的警告"
   },
   "labelInjectMode": {
-    "description": "Label to a combo box to choose script injection modes.",
+    "description": "Label for a combo box to choose script injection modes.",
     "message": "脚本注入模式："
   },
   "injectModeNormal": {
@@ -404,7 +404,15 @@
     "message": "所有"
   },
   "labelAutoReloadCurrentTab": {
-    "description": "Option to reload current tab after a script is switched on or off from the popup menu.",
+    "description": "Option to reload current tab after a script is switched on or off from menu.",
     "message": "从菜单开启或关闭脚本后自动刷新当前页面"
+  },
+  "hintInjectModeNormal": {
+    "description": "Hint to explain the normal injection mode.",
+    "message": "简单粗暴，但是在某些安全性高的页面会注入失败，如https://github.com"
+  },
+  "hintInjectModeAdvanced": {
+    "description": "Hint to explain the advanced injection mode.",
+    "message": "不走寻常路，可以在大部分页面成功注入"
   }
 }

@@ -354,6 +354,7 @@ var SettingsTab = BaseView.extend({
     var options = _.options.getAll();
     this.$el.html(this.templateFn(options));
     this.$('#sInjectMode').val(options.injectMode);
+    this.updateInjectHint();
     this.exportList = new ExportList;
     return this;
   },
@@ -361,8 +362,15 @@ var SettingsTab = BaseView.extend({
   updateAutoUpdate: function (e) {
     _.sendMessage({cmd: 'AutoUpdate'});
   },
+  updateInjectHint: function () {
+    this.$('#sInjectMode+span').text([
+      _.i18n('hintInjectModeNormal'),
+      _.i18n('hintInjectModeAdvanced'),
+    ][this.$('#sInjectMode').val()]);
+  },
   updateInjectMode: function (e) {
     _.options.set('injectMode', e.target.value);
+    this.updateInjectHint();
   },
   toggleSelection: function () {
     this.exportList.toggleAll();
