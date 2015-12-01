@@ -15,9 +15,9 @@ var ScriptView = BaseView.extend({
   initialize: function () {
     var _this = this;
     _this.model.set('_icon', DEFAULT_ICON);
-    BaseView.prototype.initialize.call(_this);
     _this.listenTo(_this.model, 'change', _this.render);
     _this.listenTo(_this.model, 'remove', _this.onRemoved);
+    BaseView.prototype.initialize.call(_this);
   },
   loadIcon: function () {
     var _this = this;

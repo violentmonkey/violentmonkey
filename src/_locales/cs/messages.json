@@ -196,7 +196,7 @@
     "message": "Související odkazy: "
   },
   "anchorSupportPage": {
-    "description": "Odkaz na stránku podpory Violentmonkey.",
+    "description": "Link to the support page of Violentmonkey.",
     "message": "<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>"
   },
   "labelDonate": {
@@ -404,7 +404,7 @@
     "message": "Vše"
   },
   "labelAutoReloadCurrentTab": {
-    "description": "Option to reload current tab after a script is switched on or off from the popup menu.",
+    "description": "Option to reload current tab after a script is switched on or off from menu.",
     "message": "Znovu načíst současný list po zapnutí či vypnutí skriptu z nabídky."
   },
   "hintInjectModeNormal": {

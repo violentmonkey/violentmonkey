@@ -29,7 +29,7 @@ gulp.task('copy-files', function () {
     '!src/**/templates/**',
     '!src/**/templates',
     '!src/_locales/**',
-  ], {base:'src'})
+  ])
   .pipe(cssFilter)
   .pipe(minifyCss())
   .pipe(cssFilter.restore)
