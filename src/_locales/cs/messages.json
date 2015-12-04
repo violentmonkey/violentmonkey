@@ -129,7 +129,7 @@
   },
   "msgLoading": {
     "description": "Message shown in the options page before script list is loaded.",
-    "message": "Nahrávám ..."
+    "message": "Nahrávám..."
   },
   "labelSettings": {
     "description": "Label shown on the top of settings page",
@@ -141,19 +141,19 @@
   },
   "labelIgnoreGrant": {
     "description": "Option to suppress no @grant warnings.",
-    "message": "Suppress no @grant warnings"
+    "message": "Zobrazovat všechna @grant varování"
   },
   "labelInjectMode": {
     "description": "Label for a combo box to choose script injection modes.",
-    "message": "Script injection mode:"
+    "message": "Způsob podvržení skriptu:"
   },
   "injectModeNormal": {
     "description": "Script injection mode: Normal",
-    "message": "Normal"
+    "message": "Obyčejný"
   },
   "injectModeAdvanced": {
     "description": "Script injection mode: Advanced",
-    "message": "Advanced"
+    "message": "Pokročilý"
   },
   "labelDataImport": {
     "description": "Section title of data import.",
@@ -225,7 +225,7 @@
   },
   "labelCurrentLang": {
     "description": "Label of current language.",
-    "message": "Současný jazyk:"
+    "message": "Současný jazyk: "
   },
   "labelScriptEditor": {
     "description": "Shown in the title of the script editing page.",
@@ -409,10 +409,10 @@
   },
   "hintInjectModeNormal": {
     "description": "Hint to explain the normal injection mode.",
-    "message": ""
+    "message": "Účinné, ale selhává na dobře zabezpečených stránkách – např. https://github.com"
   },
   "hintInjectModeAdvanced": {
     "description": "Hint to explain the advanced injection mode.",
-    "message": ""
+    "message": "Pracuje na většině stránek, současně se jedná o hack."
   }
 }
