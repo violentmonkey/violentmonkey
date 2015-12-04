@@ -49,7 +49,7 @@ var MenuView = MenuBaseView.extend({
     var bot = children.last();
     _this.addMenuItem({
       name: _.i18n('menuManageScripts'),
-      symbol: 'fa-hand-o-right',
+      symbol: 'fa-cog',
       onClick: function (e) {
         var url = chrome.extension.getURL(chrome.app.getDetails().options_page);
         chrome.tabs.query({
@@ -64,7 +64,7 @@ var MenuView = MenuBaseView.extend({
     if (app.currentTab && /^https?:\/\//i.test(app.currentTab.url))
       _this.addMenuItem({
         name: _.i18n('menuFindScripts'),
-        symbol: 'fa-hand-o-right',
+        symbol: 'fa-search',
         onClick: function (e) {
           var matches = app.currentTab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
           chrome.tabs.create({
