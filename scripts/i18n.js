@@ -13,7 +13,8 @@ function Locale(lang, path, base) {
 }
 Locale.prototype.read = function () {
   return new Promise((resolve, reject) => {
-    fs.readFile(this.base + '/' + this.path, (err, data) => err ? reject(err) : resolve(data));
+    const file = this.base + '/' + this.path;
+    fs.readFile(file, 'utf8', (err, data) => err ? reject(err) : resolve(data));
   }).then((data) => {
     const desc = {};
     data = JSON.parse(data);
@@ -63,7 +64,7 @@ Locales.prototype.load = function () {
 };
 Locales.prototype.getData = function (lang, options) {
   options = options || {};
-  let data = {};
+  const data = {};
   const langData = this.data[lang];
   const defaultData = options.useDefaultLang && lang != this.defaultLang && this.data[this.defaultLang];
   for (let key in this.desc) {
@@ -83,7 +84,7 @@ Locales.prototype.dump = function (options) {
     const string = JSON.stringify(data, null, 2);
     return new gutil.File({
       base: '',
-      path: `${this.prefix}/${lang}/messages.json`,
+      path: this.data[lang].path,
       contents: new Buffer(string),
     });
   });

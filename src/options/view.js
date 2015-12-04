@@ -15,9 +15,9 @@ var ScriptView = BaseView.extend({
   initialize: function () {
     var _this = this;
     _this.model.set('_icon', DEFAULT_ICON);
-    BaseView.prototype.initialize.call(_this);
     _this.listenTo(_this.model, 'change', _this.render);
     _this.listenTo(_this.model, 'remove', _this.onRemoved);
+    BaseView.prototype.initialize.call(_this);
   },
   loadIcon: function () {
     var _this = this;
@@ -354,6 +354,7 @@ var SettingsTab = BaseView.extend({
     var options = _.options.getAll();
     this.$el.html(this.templateFn(options));
     this.$('#sInjectMode').val(options.injectMode);
+    this.updateInjectHint();
     this.exportList = new ExportList;
     return this;
   },
@@ -361,8 +362,15 @@ var SettingsTab = BaseView.extend({
   updateAutoUpdate: function (e) {
     _.sendMessage({cmd: 'AutoUpdate'});
   },
+  updateInjectHint: function () {
+    this.$('#sInjectMode+span').text([
+      _.i18n('hintInjectModeNormal'),
+      _.i18n('hintInjectModeAdvanced'),
+    ][this.$('#sInjectMode').val()]);
+  },
   updateInjectMode: function (e) {
     _.options.set('injectMode', e.target.value);
+    this.updateInjectHint();
   },
   toggleSelection: function () {
     this.exportList.toggleAll();
