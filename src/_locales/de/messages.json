@@ -227,7 +227,7 @@
   },
   "labelCurrentLang": {
     "description": "Label of current language.",
-    "message": "Gewählte Sprache:"
+    "message": "Gewählte Sprache: "
   },
   "labelScriptEditor": {
     "description": "Shown in the title of the script editing page.",
