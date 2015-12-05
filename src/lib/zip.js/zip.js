@@ -360,14 +360,21 @@
 
 		function step() {
 			index = chunkIndex * CHUNK_SIZE;
-			if (index < size) {
+			// use `<=` instead of `<`, because `size` may be 0.
+			if (index <= size) {
 				reader.readUint8Array(offset + index, Math.min(CHUNK_SIZE, size - index), function(array) {
 					if (onprogress)
 						onprogress(index, size);
 					var msg = index === 0 ? initialMessage : {sn : sn};
 					msg.type = 'append';
 					msg.data = array;
-					worker.postMessage(msg, [array.buffer]);
+					
+					// posting a message with transferables will fail on IE10
+					try {
+						worker.postMessage(msg, [array.buffer]);
+					} catch(ex) {
+						worker.postMessage(msg); // retry without transferables
+					}
 					chunkIndex++;
 				}, onreaderror);
 			} else {
