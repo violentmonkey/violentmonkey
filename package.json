@@ -1,9 +1,13 @@
 {
   "name": "Violentmonkey",
   "version": "2.2.0",
+  "scripts": {
+    "update": "node scripts/updateLib"
+  },
   "description": "Violentmonkey",
   "devDependencies": {
     "del": "^2.1.0",
+    "glob": "^6.0.1",
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
     "gulp-filter": "^3.0.1",
@@ -11,6 +15,7 @@
     "gulp-util": "^3.0.7",
     "html-minifier": "^1.0.0",
     "merge2": "^0.3.6",
+    "ncp": "^2.0.0",
     "through2": "^2.0.0",
     "underscore": "^1.8.3"
   },
@@ -23,5 +28,9 @@
     "url": "https://github.com/Violentmonkey/Violentmonkey/issues"
   },
   "homepage": "https://github.com/Violentmonkey/Violentmonkey",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "codemirror": "^5.9.0",
+    "font-awesome": "^4.5.0"
+  }
 }
