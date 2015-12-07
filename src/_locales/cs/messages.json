@@ -9,7 +9,8 @@
   },
   "extTranslator": {
     "description": "Information of the translator.",
-    "message": "ahoj1234; nfsmaniac"
+    "message": "ahoj1234; nfsmaniac",
+    "touched": false
   },
   "msgUpdated": {
     "description": "Message shown when a script is updated/reinstalled.",
@@ -97,7 +98,8 @@
   },
   "msgScriptURL": {
     "description": "URL of the script to be installed on confirm page.",
-    "message": "Umístění skriptu: $1"
+    "message": "Umístění skriptu: $1",
+    "touched": false
   },
   "msgLoadingData": {
     "description": "Message shown on confirm page when the script to be installed is loading.",
@@ -313,7 +315,8 @@
   },
   "hintSupportPage": {
     "description": "Hint for support page.",
-    "message": "Stránka podpory"
+    "message": "Stránka podpory",
+    "touched": false
   },
   "buttonDisable": {
     "description": "Button to disable a script.",

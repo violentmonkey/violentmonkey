@@ -142,6 +142,7 @@ function extract(options) {
       return locales.dump({
         touchedOnly: options.touchedOnly,
         useDefaultLang: options.useDefaultLang,
+        markUntouched: options.markUntouched,
       });
     }).then((files) => {
       files.forEach((file) => {
