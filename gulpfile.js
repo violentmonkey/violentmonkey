@@ -5,31 +5,76 @@ const concat = require('gulp-concat');
 const merge2 = require('merge2');
 const minifyCss = require('gulp-minify-css');
 const gulpFilter = require('gulp-filter');
+const order = require('gulp-order');
 const del = require('del');
 const templateCache = require('./scripts/templateCache');
 const i18n = require('./scripts/i18n');
 
-gulp.task('templates', function () {
-  return merge2([
-    gulp.src('src/cache.js'),
-    gulp.src('src/**/templates/*.html').pipe(templateCache()),
-  ]).pipe(concat('cache.js'))
-  .pipe(gulp.dest('dist'));
+const paths = {
+  cache: 'src/cache.js',
+  templates: 'src/**/templates/*.html',
+  jsOptions: 'src/options/**/*.js',
+  jsPopup: 'src/popup/**/*.js',
+  locales: [
+    'src/**/*.js',
+    'src/**/*.html',
+    'src/**/*.json',
+  ],
+  copy: [
+    'src/**',
+    '!src/cache.js',
+    '!src/**/templates/**',
+    '!src/**/templates',
+    '!src/**/views',
+    '!src/options/**/*.js',
+    '!src/popup/**/*.js',
+    '!src/_locales/**',
+  ],
+};
+
+gulp.task('watch', function () {
+  gulp.watch([].concat(paths.cache, paths.templates), ['templates']);
+  gulp.watch(paths.jsOptions, ['js-options']);
+  gulp.watch(paths.jsPopup, ['js-popup']);
+  gulp.watch(paths.copy, ['copy-files']);
+  gulp.watch(paths.locales, ['copy-i18n']);
 });
 
 gulp.task('clean', function () {
   return del(['dist']);
 });
 
+gulp.task('templates', function () {
+  return merge2([
+    gulp.src(paths.cache),
+    gulp.src(paths.templates).pipe(templateCache()),
+  ]).pipe(concat('cache.js'))
+  .pipe(gulp.dest('dist'));
+});
+
+gulp.task('js-options', function () {
+  return gulp.src(paths.jsOptions)
+  .pipe(order([
+    '**/tab-*.js',
+    '!**/app.js',
+  ]))
+  .pipe(concat('options/app.js'))
+  .pipe(gulp.dest('dist'));
+});
+
+gulp.task('js-popup', function () {
+  return gulp.src(paths.jsPopup)
+  .pipe(order([
+    '**/base.js',
+    '!**/app.js',
+  ]))
+  .pipe(concat('popup/app.js'))
+  .pipe(gulp.dest('dist'));
+})
+
 gulp.task('copy-files', function () {
   const cssFilter = gulpFilter(['**/*.css'], {restore: true});
-  return gulp.src([
-    'src/**',
-    '!src/cache.js',
-    '!src/**/templates/**',
-    '!src/**/templates',
-    '!src/_locales/**',
-  ])
+  return gulp.src(paths.copy)
   .pipe(cssFilter)
   .pipe(minifyCss())
   .pipe(cssFilter.restore)
@@ -37,11 +82,8 @@ gulp.task('copy-files', function () {
 });
 
 gulp.task('copy-i18n', function () {
-  return gulp.src([
-    'src/**/*.js',
-    'src/**/*.html',
-    'src/**/*.json',
-  ]).pipe(i18n.extract({
+  return gulp.src(paths.locales)
+  .pipe(i18n.extract({
     base: 'src',
     prefix: '_locales',
     touchedOnly: true,
@@ -51,14 +93,11 @@ gulp.task('copy-i18n', function () {
   .pipe(gulp.dest('dist'));
 });
 
-gulp.task('default', ['templates', 'copy-files', 'copy-i18n']);
+gulp.task('default', ['templates', 'js-options', 'js-popup', 'copy-files', 'copy-i18n']);
 
 gulp.task('i18n', function () {
-  return gulp.src([
-    'src/**/*.js',
-    'src/**/*.html',
-    'src/**/*.json',
-  ]).pipe(i18n.extract({
+  return gulp.src(paths.locales)
+  .pipe(i18n.extract({
     base: 'src',
     prefix: '_locales',
     touchedOnly: false,
