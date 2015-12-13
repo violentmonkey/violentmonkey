@@ -1,23 +1,21 @@
 var ConfirmView = BaseView.extend({
   el: '#app',
   events: {
-    'click .button-toggle': 'toggleButton',
+    'click .button-toggle': 'toggleOptions',
     'click #btnInstall': 'installScript',
     'click #btnClose': 'close',
-    'change [data-check]': 'updateCheckbox',
-    'change #cbClose': 'updateClose',
   },
   templateUrl: '/options/templates/confirm.html',
   initialize: function (url, _from) {
     this.url = url;
     this.from = _from;
+    _.bindAll(this, 'hideOptions');
     BaseView.prototype.initialize.call(this);
   },
-  render: function () {
+  _render: function () {
     var _this = this;
     _this.$el.html(_this.templateFn({
       url: _this.url,
-      options: _.options.getAll(),
     }));
     _this.showMessage(_.i18n('msgLoadingData'));
     _this.loadedEditor = _.initEditor({
@@ -30,9 +28,8 @@ var ConfirmView = BaseView.extend({
     _this.loadData().then(function () {
       _this.parseMeta();
     });
-    return _this;
+    _this.$toggler = _this.$('.button-toggle');
   },
-  updateCheckbox: _.updateCheckbox,
   loadData: function () {
     var _this = this;
     _this.$('#btnInstall').prop('disabled', true);
@@ -95,14 +92,24 @@ var ConfirmView = BaseView.extend({
       return Promise.reject();
     });
   },
-  toggleButton: function (e) {
-    this.$(e.target).toggleClass('active');
+  hideOptions: function () {
+    if (!this.optionsView) return;
+    this.$toggler.removeClass('active');
+    this.optionsView.remove();
+    this.optionsView = null;
+  },
+  toggleOptions: function (e) {
+    if (this.optionsView) {
+      this.hideOptions();
+    } else {
+      this.$toggler.addClass('active');
+      this.optionsView = new ConfirmOptionsView;
+      this.optionsView.$el.insertAfter(this.$toggler);
+      $(document).one('mousedown', this.hideOptions);
+    }
   },
   close: function () {
     window.close();
-  },
-  updateClose: function (e) {
-    this.$('#cbTrack').prop('disabled', e.target.checked);
   },
   showMessage: function (msg) {
     this.$('#msg').html(msg);

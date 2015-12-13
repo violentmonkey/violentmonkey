@@ -3,8 +3,9 @@ var MetaView = BaseView.extend({
   templateUrl: '/options/templates/edit-meta.html',
   events: {
     'change [data-id]': 'onChange',
+    'mousedown': 'onMousedown',
   },
-  render: function () {
+  _render: function () {
     var model = this.model;
     var it = model.toJSON();
     it.__name = model.meta.name;
@@ -17,5 +18,8 @@ var MetaView = BaseView.extend({
     e.stopPropagation();
     var res = this.getValue(e.target);
     this.model.set(res.key, res.value);
+  },
+  onMousedown: function (e) {
+    e.stopPropagation();
   },
 });

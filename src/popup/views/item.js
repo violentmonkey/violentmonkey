@@ -8,7 +8,7 @@ var MenuItemView = BaseView.extend({
     BaseView.prototype.initialize.call(this);
     this.listenTo(this.model, 'change', this.render);
   },
-  render: function () {
+  _render: function () {
     var it = this.model.toJSON();
     if (typeof it.symbol === 'function')
       it.symbol = it.symbol(it.data);

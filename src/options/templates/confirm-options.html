@@ -1,0 +1,11 @@
+<label>
+  <input type=checkbox data-check="closeAfterInstall" id="cbClose" <%=
+  it.closeAfterInstall ? 'checked' : '' %>>
+  <span data-i18n=installOptionClose></span>
+</label>
+<label>
+  <input type=checkbox data-check="trackLocalFile" id="cbTrack" <%=
+  it.trackLocalFile ? 'checked' : '' %> <%=
+  it.closeAfterInstall ? 'disabled' : '' %>>
+  <span data-i18n=installOptionTrack></span>
+</label>

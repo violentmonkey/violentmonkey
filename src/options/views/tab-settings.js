@@ -5,12 +5,11 @@ var ExportList = BaseView.extend({
     BaseView.prototype.initialize.call(this);
     this.listenTo(scriptList, 'reset change', this.render);
   },
-  render: function () {
+  _render: function () {
     var _this = this;
     _this.$el.html(scriptList.map(function (script) {
       return _this.templateFn(script.toJSON());
     }).join(''));
-    return _this;
   },
   getSelected: function () {
     var selected = [];
@@ -43,13 +42,12 @@ var SettingsTab = BaseView.extend({
     'click #bVacuum': 'onVacuum',
   },
   templateUrl: '/options/templates/tab-settings.html',
-  render: function () {
+  _render: function () {
     var options = _.options.getAll();
     this.$el.html(this.templateFn(options));
     this.$('#sInjectMode').val(options.injectMode);
     this.updateInjectHint();
     this.exportList = new ExportList;
-    return this;
   },
   updateCheckbox: _.updateCheckbox,
   updateAutoUpdate: function (e) {

@@ -30,21 +30,21 @@
 var BaseView = Backbone.View.extend({
   initialize: function () {
     var _this = this;
-    var gotTemplate;
     if (_this.templateUrl)
-      gotTemplate = _.cache.get(_this.templateUrl)
+      _this.__gotTemplate = _.cache.get(_this.templateUrl)
       .then(function (fn) {
         _this.templateFn = fn;
       });
-    var render = _this.render.bind(_this);
-    var initI18n = _this.initI18n.bind(_this);
-    _this.render = function () {
-      gotTemplate
-        ? gotTemplate.then(render).then(initI18n)
-        : render();
-      return _this;
-    };
+    _.bindAll(_this, 'render', 'initI18n');
     _this.render();
+  },
+  _render: function () {
+    this.$el.html(this.templateFn());
+  },
+  render: function () {
+    var render = this._render.bind(this);
+    (this.__gotTemplate || Promise.resolve()).then(render).then(this.initI18n);
+    return this;
   },
   initI18n: function () {
     _.forEach(this.$('[data-i18n]'), function (node) {

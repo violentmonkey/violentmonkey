@@ -5,7 +5,7 @@ const minify = require('html-minifier').minify;
 module.exports = function (data) {
   data = String(data);
   const fragments = [];
-  const html = data.replace(/<%.*?%>/g, function (match) {
+  const html = data.replace(/<%[\s\S]*?%>/g, function (match) {
     fragments.push(match);
     return `__frag_${fragments.length - 1}__`;
   });

@@ -4,7 +4,7 @@ var MenuView = MenuBaseView.extend({
     this.listenTo(scriptsMenu, 'reset', this.render);
     this.listenTo(commandsMenu, 'reset', this.render);
   },
-  render: function () {
+  _render: function () {
     var _this = this;
     _this.$el.html(_this.templateFn({
       hasSep: !!scriptsMenu.length

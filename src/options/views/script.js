@@ -30,7 +30,7 @@ var ScriptView = BaseView.extend({
         _this.model.set('_icon', DEFAULT_ICON);
       });
   },
-  render: function () {
+  _render: function () {
     var _this = this;
     var model = _this.model;
     var it = model.toJSON();
@@ -42,7 +42,6 @@ var ScriptView = BaseView.extend({
     if (!it.enabled) _this.$el.addClass('disabled');
     else _this.$el.removeClass('disabled');
     _this.loadIcon();
-    return _this;
   },
   getAuthor: function (text) {
     if (!text) return '';

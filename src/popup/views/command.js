@@ -3,7 +3,7 @@ var CommandsView = MenuBaseView.extend({
     MenuBaseView.prototype.initialize.call(this);
     this.listenTo(commandsMenu, 'reset', this.render);
   },
-  render: function () {
+  _render: function () {
     if (!commandsMenu.length)
       return app.navigate('', {trigger: true, replace: true});
     var _this = this;

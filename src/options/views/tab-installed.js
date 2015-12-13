@@ -26,14 +26,13 @@ var MainTab = BaseView.extend({
       _this.editView = null;
     }
   },
-  render: function () {
+  _render: function () {
     this.$el.html(this.templateFn());
     this.$list = this.$('.scripts');
     this.$bd = this.$('.backdrop');
     this.$bdm = this.$('.backdrop > div');
     this.setBackdrop();
     this.addAll();
-    return this;
   },
   setBackdrop: function () {
     if (scriptList.loading) {
