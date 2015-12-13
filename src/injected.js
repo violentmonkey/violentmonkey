@@ -140,7 +140,7 @@ function getWrapper() {
     };
   });
   // Wrap properties
-  Object.getOwnPropertyNames(window).forEach(function (name) {
+  comm.forEach(comm.props, function (name) {
     if (typeof window[name] === 'function') return;
     Object.defineProperty(wrapper, name, {
       get: function () {
@@ -162,6 +162,7 @@ var comm = {
   // since they may be changed by page scripts
   includes: _.includes,
   forEach: _.forEach,
+  props: Object.getOwnPropertyNames(window),
 
   init: function(srcId, destId) {
     var comm = this;

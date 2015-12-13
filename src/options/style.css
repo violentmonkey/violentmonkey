@@ -7,7 +7,7 @@ body {
   height: 100%;
   background: #eee;
   font: menu;
-  font-size: 12px;
+  font-size: 13px;
 }
 h1 {
   font-size: 1.5rem;
@@ -136,7 +136,7 @@ aside img {
 }
 .line {
   display: block;
-  margin: 1em 0;
+  line-height: 2;
 }
 .content {
   height: 100%;
