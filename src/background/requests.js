@@ -152,9 +152,15 @@ var requests = function () {
   chrome.webRequest.onBeforeRequest.addListener(function (req) {
     // onBeforeRequest is fired for local files too
     if (/\.user\.js([\?#]|$)/.test(req.url)) {
+      var noredirect = {redirectUrl: 'javascript:history.back()'};
       var x = new XMLHttpRequest();
       x.open('GET', req.url, false);
-      x.send();
+      try {
+        x.send();
+      } catch (e) {
+        console.log(e);
+        return noredirect;
+      }
       if ((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
         if (req.tabId < 0)
           chrome.tabs.create({
@@ -166,7 +172,7 @@ var requests = function () {
               url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url) + '/' + encodeURIComponent(t.url),
             });
           });
-        return {redirectUrl: 'javascript:history.back()'};
+        return noredirect;
       }
     }
   }, {

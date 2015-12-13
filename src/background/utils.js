@@ -1,6 +1,6 @@
 var scriptUtils = {
   isRemote: function (url) {
-    return url && !/^(file|data):/.test(url);
+    return url && !(/^(file|data):/.test(url));
   },
   fetch: function (url, type, headers) {
     var xhr = new XMLHttpRequest;
@@ -61,7 +61,7 @@ var scriptUtils = {
       custom: {},
       enabled: 1,
       update: 1,
-      code: '// ==UserScript==\n// @name New Script\n// ==/UserScript==\n',
+      code: '// ==UserScript==\n// @name New Script\n// @namespace Violentmonkey Scripts\n// @include *\n// @grant none\n// ==/UserScript==\n',
     };
     script.meta = scriptUtils.parseMeta(script.code);
     return script;
