@@ -141,11 +141,17 @@ function getWrapper() {
   });
   // Wrap properties
   comm.forEach(comm.props, function (name) {
-    if (typeof window[name] === 'function') return;
+    if (wrapper[name]) return;
+    var modified = false;
+    var value;
     Object.defineProperty(wrapper, name, {
       get: function () {
-        var value = window[name];
+        if (!modified) value = window[name];
         return value === window ? wrapper : value;
+      },
+      set: function (val) {
+        modified = true;
+        value = val;
       },
     });
   });
