@@ -110,7 +110,7 @@ var SettingsTab = BaseView.extend({
       });
     }
     function getVMFiles(entries) {
-      var i = entries.findIndex(function (entry) {
+      var i = _.findIndex(entries, function (entry) {
         return entry.filename === 'ViolentMonkey';
       });
       if (~i) return new Promise(function (resolve, reject) {

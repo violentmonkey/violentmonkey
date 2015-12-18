@@ -554,7 +554,7 @@ VMDB.prototype.parseScript = function (data) {
       script.custom.lastInstallURL = data.url;
     return _this.saveScript(script, tx);
   }).then(function (script) {
-    Object.assign(res.data, scriptUtils.getScriptInfo(script));
+    _.assign(res.data, scriptUtils.getScriptInfo(script));
     return res;
   });
 };

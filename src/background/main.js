@@ -20,7 +20,7 @@ var commands = {
       chrome.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
     return data.isApplied
     ? vmdb.getScriptsByURL(url).then(function (res) {
-      return Object.assign(data, res);
+      return _.assign(data, res);
     }) : Promise.resolve(data);
   },
   UpdateScriptInfo: function (data, src) {

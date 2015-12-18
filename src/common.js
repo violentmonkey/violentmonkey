@@ -74,7 +74,7 @@ _.getUniqId = function () {
  * Get locale attributes such as `@name:zh-CN`
  */
 _.getLocaleString = function (meta, key) {
-  var lang = navigator.languages.find(function (lang) {
+  var lang = _.find(navigator.languages, function (lang) {
     return (key + ':' + lang) in meta;
   });
   if (lang) key += ':' + lang;
