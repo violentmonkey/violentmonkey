@@ -21,7 +21,11 @@ var MenuView = MenuBaseView.extend({
           currentWindow: true,
           url: url,
         }, function (tabs) {
-          if (tabs[0]) chrome.tabs.update(tabs[0].id, {active: true});
+          var tab = _.find(tabs, function (tab) {
+            var hash = tab.url.match(/#(\w+)/);
+            return !hash || !_.includes(['confirm'], hash[1]);
+          });
+          if (tab) chrome.tabs.update(tab.id, {active: true});
           else chrome.tabs.create({url: url});
         });
       },

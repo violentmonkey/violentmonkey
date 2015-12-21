@@ -50,6 +50,8 @@ BaseView.prototype.initI18n.call(window);
         return new MenuItem({
           name: menu[0],
           symbol: 'fa-hand-o-right',
+          title: true,
+          className: 'ellipsis',
           onClick: commandClick,
         });
       }));
@@ -64,6 +66,7 @@ BaseView.prototype.initI18n.call(window);
             data: script.enabled,
             symbol: scriptSymbol,
             title: true,
+            className: 'ellipsis',
             onClick: scriptClick,
           });
         }));

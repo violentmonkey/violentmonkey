@@ -16,6 +16,7 @@ var MenuItemView = BaseView.extend({
     .attr('title', it.title === true ? it.name : it.title);
     if (it.data === false) this.$el.addClass('disabled');
     else this.$el.removeClass('disabled');
+    if (it.className) this.$el.addClass(it.className);
   },
   onClick: function (e) {
     var onClick = this.model.get('onClick');

@@ -9,17 +9,19 @@ body {
 }
 .menu {
   max-width: 300px;
-  overflow-x: hidden;
   overflow-y: auto;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 .fa {
   width: 1em;
 }
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .menu-item {
   cursor: pointer;
   padding: 5px;
+  white-space: nowrap;
 }
 .menu-item:hover {
   background: cornflowerblue;

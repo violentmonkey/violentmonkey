@@ -93,7 +93,7 @@ gulp.task('copy-i18n', function () {
   .pipe(gulp.dest('dist'));
 });
 
-gulp.task('default', ['templates', 'js-options', 'js-popup', 'copy-files', 'copy-i18n']);
+gulp.task('build', ['templates', 'js-options', 'js-popup', 'copy-files', 'copy-i18n']);
 
 gulp.task('i18n', function () {
   return gulp.src(paths.locales)
@@ -106,3 +106,5 @@ gulp.task('i18n', function () {
   }))
   .pipe(gulp.dest('src'));
 });
+
+gulp.task('default', ['build']);
