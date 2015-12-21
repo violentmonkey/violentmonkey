@@ -515,7 +515,7 @@ VMDB.prototype.parseScript = function (data) {
   Object.keys(meta.resources).forEach(function (k) {
     var url = meta.resources[k];
     var cache = data.resources && data.resources[url];
-    cache ? _this.saveCache(url, cache, tx) : _this.fetchCache(url);
+    cache ? _this.saveCache(url, cache) : _this.fetchCache(url);
   });
   // @icon
   if (scriptUtils.isRemote(meta.icon))
