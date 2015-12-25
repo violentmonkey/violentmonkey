@@ -5,6 +5,7 @@ var MainTab = BaseView.extend({
   events: {
     'click #bNew': 'newScript',
     'click #bUpdate': 'updateAll',
+    'click #bURL': 'installFromURL',
   },
   initialize: function () {
     var _this = this;
@@ -59,5 +60,13 @@ var MainTab = BaseView.extend({
   },
   updateAll: function () {
     _.sendMessage({cmd: 'CheckUpdateAll'});
+  },
+  installFromURL: function () {
+    var url = prompt(_.i18n('hintInputURL'));
+    if (~url.indexOf('://')) {
+      chrome.tabs.create({
+        url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(url),
+      });
+    }
   },
 });

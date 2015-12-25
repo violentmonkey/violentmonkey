@@ -417,5 +417,13 @@
   "hintInjectModeAdvanced": {
     "description": "Hint to explain the advanced injection mode.",
     "message": "Works in most pages, actually a hack"
+  },
+  "hintInputURL": {
+    "description": "Hint for a prompt box to input URL of a user script.",
+    "message": "Input URL:"
+  },
+  "buttonInstallFromURL": {
+    "description": "Button to ask for URL of a user script.",
+    "message": "Install from URL"
   }
 }

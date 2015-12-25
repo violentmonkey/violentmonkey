@@ -13,3 +13,13 @@ Multiple language
   have empty `message`s.
   You may then check out `src/_locales/en/messages.json` for the English version
   and translate it.
+
+Development
+---
+Run command below:
+
+``` sh
+$ gulp
+```
+
+Then you can load the extension from `dist/`.

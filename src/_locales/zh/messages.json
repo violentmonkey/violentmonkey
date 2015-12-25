@@ -417,5 +417,13 @@
   "hintInjectModeAdvanced": {
     "description": "Hint to explain the advanced injection mode.",
     "message": "不走寻常路，可以在大部分页面成功注入"
+  },
+  "hintInputURL": {
+    "description": "Hint for a prompt box to input URL of a user script.",
+    "message": "请输入地址："
+  },
+  "buttonInstallFromURL": {
+    "description": "Button to ask for URL of a user script.",
+    "message": "通过地址安装"
   }
 }
