@@ -92,7 +92,7 @@
       options.onchange && editor.on('change', options.onchange);
       var extraKeys = {};
       options.onexit && (extraKeys.Esc = options.onexit);
-      options.onsave && (extraKeys['Ctrl-S'] = options.onsave);
+      options.onsave && (extraKeys['Ctrl-S'] = extraKeys['Cmd-S'] = options.onsave);
       editor.setOption('extraKeys', extraKeys);
       return editor;
     });

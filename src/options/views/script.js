@@ -210,6 +210,7 @@ DND.prototype.mousemove = function (e) {
       isDown ? index : lastIndex
     ), delta);
   }
+  this.checkScroll(e.clientY);
 };
 DND.prototype.animate = function ($elements, delta) {
   $elements.each(function (i, el) {
@@ -238,4 +239,32 @@ DND.prototype.mouseup = function (e) {
     from: dragging.index,
     to: dragging.lastIndex,
   });
+};
+DND.prototype.checkScroll = function (y) {
+  var dragging = this.dragging;
+  var scrollThreshold = 10;
+  dragging.scroll = 0;
+  var offset = dragging.el.parentNode.getBoundingClientRect();
+  var delta = (y - (offset.bottom - scrollThreshold)) / scrollThreshold;
+  if (delta > 0) {
+    dragging.scroll = 1 + Math.min(~~ (delta * 5), 10);
+  } else {
+    delta = (offset.top + scrollThreshold - y) / scrollThreshold;
+    if (delta > 0) dragging.scroll = -1 - Math.min(~~ (delta * 5), 10);
+  }
+  if (dragging.scroll) this.scrollParent();
+};
+DND.prototype.scrollParent = function () {
+  function scroll() {
+    if (dragging.scroll) {
+      parent.scrollTop += dragging.scroll;
+      setTimeout(scroll, 20);
+    } else dragging.scrolling = false;
+  }
+  var dragging = this.dragging;
+  var parent = dragging.el.parentNode;
+  if (!dragging.scrolling) {
+    dragging.scrolling = true;
+    scroll();
+  }
 };
