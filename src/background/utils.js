@@ -61,7 +61,7 @@ var scriptUtils = {
       custom: {},
       enabled: 1,
       update: 1,
-      code: '// ==UserScript==\n// @name New Script\n// @namespace Violentmonkey Scripts\n// @include *\n// @grant none\n// ==/UserScript==\n',
+      code: '// ==UserScript==\n// @name New Script\n// @namespace Violentmonkey Scripts\n// @grant none\n// ==/UserScript==\n',
     };
     script.meta = scriptUtils.parseMeta(script.code);
     return script;
@@ -114,7 +114,7 @@ var tester = function () {
       });
     } else {
       // @include
-      ok = inc.some(function (str) {
+      ok = !inc.length || inc.some(function (str) {
         return autoReg(str).test(url);
       });
     }
