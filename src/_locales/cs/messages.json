@@ -420,10 +420,10 @@
   },
   "hintInputURL": {
     "description": "Hint for a prompt box to input URL of a user script.",
-    "message": ""
+    "message": "Adresa skriptu"
   },
   "buttonInstallFromURL": {
     "description": "Button to ask for URL of a user script.",
-    "message": ""
+    "message": "Nainstalovat skript"
   }
 }
