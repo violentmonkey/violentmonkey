@@ -256,15 +256,17 @@ DND.prototype.checkScroll = function (y) {
 };
 DND.prototype.scrollParent = function () {
   function scroll() {
-    if (dragging.scroll) {
-      parent.scrollTop += dragging.scroll;
-      setTimeout(scroll, 20);
-    } else dragging.scrolling = false;
+    var dragging = _this.dragging;
+    if (dragging) {
+      if (dragging.scroll) {
+        dragging.el.parentNode.scrollTop += dragging.scroll;
+        setTimeout(scroll, 20);
+      } else dragging.scrolling = false;
+    }
   }
-  var dragging = this.dragging;
-  var parent = dragging.el.parentNode;
-  if (!dragging.scrolling) {
-    dragging.scrolling = true;
+  var _this = this;
+  if (!_this.dragging.scrolling) {
+    _this.dragging.scrolling = true;
     scroll();
   }
 };

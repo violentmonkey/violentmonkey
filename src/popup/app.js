@@ -51,7 +51,7 @@ BaseView.prototype.initI18n.call(window);
           name: menu[0],
           symbol: 'fa-hand-o-right',
           title: true,
-          className: 'ellipsis',
+          //className: 'ellipsis',
           onClick: commandClick,
         });
       }));
@@ -66,7 +66,7 @@ BaseView.prototype.initI18n.call(window);
             data: script.enabled,
             symbol: scriptSymbol,
             title: true,
-            className: 'ellipsis',
+            //className: 'ellipsis',
             onClick: scriptClick,
           });
         }));
