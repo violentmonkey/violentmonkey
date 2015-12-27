@@ -424,6 +424,6 @@
   },
   "buttonInstallFromURL": {
     "description": "Button to ask for URL of a user script.",
-    "message": "Nainstalovat skript"
+    "message": "Instalovat vzdálený skript"
   }
 }
