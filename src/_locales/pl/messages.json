@@ -425,5 +425,9 @@
   "buttonInstallFromURL": {
     "description": "Button to ask for URL of a user script.",
     "message": ""
+  },
+  "labelVersion": {
+    "description": "Label of version info on About page. A space after colon is not needed.",
+    "message": ""
   }
 }
