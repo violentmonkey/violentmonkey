@@ -1,6 +1,6 @@
 {
   "name": "Violent monkey",
-  "version": "2.2.1",
+  "version": "__VERSION__",
   "manifest_version": 2,
   "description": "__MSG_extDescription__",
   "developer": {
