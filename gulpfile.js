@@ -2,6 +2,7 @@
 
 const gulp = require('gulp');
 const concat = require('gulp-concat');
+const replace = require('gulp-replace');
 const merge2 = require('merge2');
 const minifyCss = require('gulp-minify-css');
 const gulpFilter = require('gulp-filter');
@@ -9,9 +10,11 @@ const order = require('gulp-order');
 const del = require('del');
 const templateCache = require('./scripts/templateCache');
 const i18n = require('./scripts/i18n');
+const pkg = require('./package.json');
 
 const paths = {
   cache: 'src/cache.js',
+  manifest: 'src/manifest.json',
   templates: 'src/**/templates/*.html',
   jsOptions: 'src/options/**/*.js',
   jsPopup: 'src/popup/**/*.js',
@@ -22,6 +25,7 @@ const paths = {
   ],
   copy: [
     'src/**',
+    '!src/manifest.json',
     '!src/cache.js',
     '!src/**/templates/**',
     '!src/**/templates',
@@ -72,6 +76,12 @@ gulp.task('js-popup', function () {
   .pipe(gulp.dest('dist'));
 })
 
+gulp.task('manifest', function () {
+  return gulp.src(paths.manifest, {base: 'src'})
+  .pipe(replace('__VERSION__', pkg.version))
+  .pipe(gulp.dest('dist'));
+});
+
 gulp.task('copy-files', function () {
   const cssFilter = gulpFilter(['**/*.css'], {restore: true});
   return gulp.src(paths.copy)
@@ -93,7 +103,7 @@ gulp.task('copy-i18n', function () {
   .pipe(gulp.dest('dist'));
 });
 
-gulp.task('build', ['templates', 'js-options', 'js-popup', 'copy-files', 'copy-i18n']);
+gulp.task('build', ['templates', 'js-options', 'js-popup', 'manifest', 'copy-files', 'copy-i18n']);
 
 gulp.task('i18n', function () {
   return gulp.src(paths.locales)

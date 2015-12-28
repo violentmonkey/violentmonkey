@@ -29,8 +29,8 @@ var _ = {
 };
 
 /**
-* http://www.webtoolkit.info/javascript-utf8.html
-*/
+ * http://www.webtoolkit.info/javascript-utf8.html
+ */
 function utf8decode (utftext) {
   var string = "";
   var i = 0;
@@ -81,15 +81,18 @@ function setBadge(){
   }
 }
 
-// Communicator
+/**
+ * @desc Wrap methods to prevent unexpected modifications.
+ */
 function getWrapper() {
   // http://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
   // http://developer.mozilla.org/docs/Web/API/Window
   var comm = this;
   var wrapper = {};
+  // `eval` should be called directly so that it is run in current scope
+  wrapper.eval = eval;
   // Wrap methods
   comm.forEach([
-    'eval',
     // 'uneval',
     'isFinite',
     'isNaN',
@@ -157,6 +160,7 @@ function getWrapper() {
   });
   return wrapper;
 }
+// Communicator
 var comm = {
   vmid: 'VM_' + _.getUniqId(),
   state: 0,
