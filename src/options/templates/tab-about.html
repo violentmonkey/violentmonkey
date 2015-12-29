@@ -4,6 +4,12 @@
     <small>v<%= it.version %></small>
   </h1>
   <div class=line data-i18n=extDescription></div>
+    <label data-i18n=labelVersion></label>
+    <span id="ver"></span>
+      <script type="text/javascript">
+        var manifest = chrome.runtime.getManifest();
+        document.getElementById("ver").innerHTML=manifest.version;
+      </script>
   <div class=line>
     <label data-i18n=labelRelated></label>
     <span data-i18n=anchorSupportPage></span> |
