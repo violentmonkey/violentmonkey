@@ -26,11 +26,11 @@
   },
   "Warning": {
     "description": "Show warnings with a notification.",
-    "message": "Warning"
+    "message": "Предупреждение"
   },
   "msgWarnGrant": {
     "description": "Message shown when `@grant` is not found in a script.",
-    "message": "Script [$1] has no `@grant` lines! Click to see more details."
+    "message": "У скрипта [$1] отсутствует поле `@grant`! Кликните для подробностей."
   },
   "labelNoName": {
     "description": "Text as the name of a script when no @name is assigned.",
@@ -62,7 +62,7 @@
   },
   "buttonInstallOptions": {
     "description": "Button to show options of installation confirm page.",
-    "message": "Options"
+    "message": "Настройки"
   },
   "installOptionClose": {
     "description": "Option to close confirm window after installation.",
@@ -70,7 +70,7 @@
   },
   "installOptionTrack": {
     "description": "Option to track the loading local file before window is closed.",
-    "message": "Track local file before this window is closed"
+    "message": "Следить за обновлениями локального файла, пока это окно открыто"
   },
   "buttonConfirmInstallation": {
     "description": "Button to confirm installation of a script.",
@@ -111,11 +111,11 @@
   },
   "sideMenuSettings": {
     "description": "Side menu: Settings",
-    "message": "Settings"
+    "message": "Настройки"
   },
   "sideMenuAbout": {
     "description": "Side menu: About",
-    "message": "About"
+    "message": "О расширении"
   },
   "buttonNew": {
     "description": "Button to create a new script.",
@@ -135,7 +135,7 @@
   },
   "labelSettings": {
     "description": "Label shown on the top of settings page",
-    "message": "Settings"
+    "message": "Настройки"
   },
   "labelAutoUpdate": {
     "description": "Option to allow automatically checking scripts for updates every 24 hours.",
@@ -143,23 +143,23 @@
   },
   "labelIgnoreGrant": {
     "description": "Option to suppress no @grant warnings.",
-    "message": "Suppress no @grant warnings"
+    "message": "Не показывать предупреждения об отсутствии поля @grant"
   },
   "labelInjectMode": {
     "description": "Label for a combo box to choose script injection modes.",
-    "message": "Script injection mode:"
+    "message": "Режим встраивания скриптов:"
   },
   "injectModeNormal": {
     "description": "Script injection mode: Normal",
-    "message": "Normal"
+    "message": "Обычный"
   },
   "injectModeAdvanced": {
     "description": "Script injection mode: Advanced",
-    "message": "Advanced"
+    "message": "Расширенный"
   },
   "labelDataImport": {
     "description": "Section title of data import.",
-    "message": "Data Import"
+    "message": "Импорт данных"
   },
   "buttonImportData": {
     "description": "Button to choose a file for data import.",
@@ -171,11 +171,11 @@
   },
   "labelDataExport": {
     "description": "Section title of data export.",
-    "message": "Data Export"
+    "message": "Экспорт данных"
   },
   "labelScriptsToExport": {
     "description": "Label shown on top of the script list for export.",
-    "message": "Scripts to export"
+    "message": "Скрипты для экспорта"
   },
   "labelExportScriptData": {
     "description": "Option to export script data along with scripts.",
@@ -191,7 +191,7 @@
   },
   "labelAbout": {
     "description": "Label shown on top of the about page.",
-    "message": "About Violentmonkey"
+    "message": "О Violentmonkey"
   },
   "labelRelated": {
     "description": "Label of related links.",
@@ -219,7 +219,7 @@
   },
   "labelTranslator": {
     "description": "Label of translator.",
-    "message": "Translator: "
+    "message": "Переводчик: "
   },
   "anchorTranslator": {
     "description": "Translator shown on about tab.",
@@ -227,7 +227,7 @@
   },
   "labelCurrentLang": {
     "description": "Label of current language.",
-    "message": "Current Language: "
+    "message": "Текущий язык: "
   },
   "labelScriptEditor": {
     "description": "Shown in the title of the script editing page.",
@@ -311,11 +311,11 @@
   },
   "labelNoScripts": {
     "description": "Message shown when no script is installed.",
-    "message": "Oops, you haven't got any script yet."
+    "message": "У вас ещё не установлено ни одного скрипта."
   },
   "hintSupportPage": {
     "description": "Hint for support page.",
-    "message": "Support page",
+    "message": "Поддержка",
     "touched": false
   },
   "buttonDisable": {
@@ -388,7 +388,7 @@
   },
   "labelSearchFor": {
     "description": "Text shown as a place holder in the search box.",
-    "message": "Search for..."
+    "message": "Поиск..."
   },
   "labelReplace": {
     "description": "Label for replace input in search box.",
@@ -396,7 +396,7 @@
   },
   "labelReplaceWith": {
     "description": "Text shown as a place holder in the replace box.",
-    "message": "Replace with..."
+    "message": "Заменить..."
   },
   "buttonReplace": {
     "description": "Button to replace the current match.",
@@ -408,22 +408,22 @@
   },
   "labelAutoReloadCurrentTab": {
     "description": "Option to reload current tab after a script is switched on or off from menu.",
-    "message": ""
+    "message": "Обновить текущую вкладку после включения/выключения скрипта"
   },
   "hintInjectModeNormal": {
     "description": "Hint to explain the normal injection mode.",
-    "message": ""
+    "message": "Эффективен, но иеет проблемы с некоторыми защищенными страницами, например https://github.com"
   },
   "hintInjectModeAdvanced": {
     "description": "Hint to explain the advanced injection mode.",
-    "message": ""
+    "message": "Работает на большинстве сайтов"
   },
   "hintInputURL": {
     "description": "Hint for a prompt box to input URL of a user script.",
-    "message": ""
+    "message": "Введите URL:"
   },
   "buttonInstallFromURL": {
     "description": "Button to ask for URL of a user script.",
-    "message": ""
+    "message": "Установить по ссылке"
   }
 }
