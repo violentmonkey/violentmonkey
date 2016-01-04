@@ -9,7 +9,14 @@ body {
 }
 .menu {
   max-width: 400px;
+  max-height: 400px;
+  overflow-x: hidden;
   overflow-y: auto;
+}
+.menu.placeholder {
+  max-width: auto;
+  height: 0;
+  overflow: hidden;
 }
 .fa {
   width: 1em;

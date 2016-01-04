@@ -10,9 +10,9 @@ var CommandsView = MenuBaseView.extend({
     _this.$el.html(_this.templateFn({
       hasSep: true
     }));
-    var children = _this.$el.children();
-    var top = children.first();
-    var bot = children.last();
+    var comp = _this.components();
+    var top = comp.top;
+    var bot = comp.bot;
     _this.addMenuItem({
       name: _.i18n('menuBack'),
       symbol: 'fa-arrow-left',
@@ -22,6 +22,9 @@ var CommandsView = MenuBaseView.extend({
     }, top);
     commandsMenu.each(function (item) {
       _this.addMenuItem(item, bot);
+    });
+    setTimeout(function () {
+      _this.fixStyles(bot, comp.plh);
     });
   },
 });
