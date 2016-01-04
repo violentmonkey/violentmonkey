@@ -149,17 +149,17 @@ var requests = function () {
     types: ['xmlhttprequest'],
   }, ['blocking', 'requestHeaders']);
 
-  chrome.webRequest.onHeadersReceived.addListener(function (req) {
+  chrome.webRequest.onBeforeRequest.addListener(function (req) {
     // onBeforeRequest is fired for local files too
-    if (~([200, 304].indexOf(req.statusCode)) && /\.user\.js([\?#]|$)/.test(req.url)) {
+    if (/\.user\.js([\?#]|$)/.test(req.url)) {
       var noredirect = {redirectUrl: 'javascript:history.back()'};
       var x = new XMLHttpRequest();
       x.open('GET', req.url, false);
       try {
         x.send();
       } catch (e) {
-        console.log(e);
-        return noredirect;
+        // Request is redirected
+        return;
       }
       if ((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
         if (req.tabId < 0)
@@ -178,7 +178,7 @@ var requests = function () {
   }, {
     urls: ['<all_urls>'],
     types: ['main_frame'],
-  }, ['blocking', 'responseHeaders']);
+  }, ['blocking', 'requestBody']);
 
   return {
     getRequestId: getRequestId,

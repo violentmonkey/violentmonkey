@@ -1,5 +1,5 @@
 !function(){
-// avoid running repeatedly due to new document.documentElement
+// Avoid running repeatedly due to new document.documentElement
 if (window.VM) return;
 window.VM = 1;
 
