@@ -474,11 +474,7 @@ var comm = {
       },
       GM_openInTab: {
         value: function (url) {
-          // XXX: open from background to avoid being blocked
-          var a = document.createElement('a');
-          a.href = url;
-          a.target = '_blank';
-          a.click();
+          comm.post({cmd: 'NewTab', data: url});
         },
       },
       GM_registerMenuCommand: {
@@ -593,6 +589,9 @@ function injectScript(data) {
   };
   inject('!' + func.toString() + '(' + JSON.stringify(data[0]) + ',' + JSON.stringify(comm.did) + ',function(g){' + data[1] + '})');
 }
+function newTab(url) {
+  window.open(url);
+}
 function handleC(e) {
   var req = e.detail;
   if (!req) {
@@ -611,6 +610,7 @@ function handleC(e) {
     HttpRequest: httpRequest,
     AbortRequest: abortRequest,
     Inject: injectScript,
+    NewTab: newTab,
   };
   var func = maps[req.cmd];
   if (func) func(req.data);
