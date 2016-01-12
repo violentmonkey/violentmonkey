@@ -201,6 +201,9 @@ var comm = {
         var req = comm.requests[r.id];
         if (req) req.callback(r);
       },
+      UpdateValues: function (data) {
+        if (comm.values) comm.values[data.uri] = data.values;
+      },
       // advanced inject
       Injected: function (id) {
         var obj = comm.ainject[id];
@@ -304,22 +307,13 @@ var comm = {
     };
   },
   getWrapper: getWrapper,
-  wrapGM: function(script, value, cache) {
-    // Add GM functions
-    // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-    var comm = this;
-    var gm = {};
-    var grant = script.meta.grant || [];
-    var urls = {};
-    if (!grant.length || grant.length == 1 && grant[0] == 'none') {
-      // @grant none
-      grant.pop();
-    } else {
-      gm['window'] = comm.getWrapper();
+  wrapGM: function(script, cache) {
+    function getValues() {
+      var uri = script.uri;
+      var values = comm.values[uri];
+      if (!values) comm.values[uri] = values = {};
+      return values;
     }
-    value = value || {};
-    if(!comm.includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
-    if(!comm.includes(grant, 'GM_info')) grant.push('GM_info');
     function propertyToString() {
       return '[Violentmonkey property]';
     }
@@ -335,10 +329,24 @@ var comm = {
         cmd: 'SetValue',
         data: {
           uri: script.uri,
-          values: value,
+          values: getValues(),
         },
       });
     }
+    // Add GM functions
+    // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
+    var comm = this;
+    var gm = {};
+    var grant = script.meta.grant || [];
+    var urls = {};
+    if (!grant.length || grant.length == 1 && grant[0] == 'none') {
+      // @grant none
+      grant.pop();
+    } else {
+      gm['window'] = comm.getWrapper();
+    }
+    if(!comm.includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
+    if(!comm.includes(grant, 'GM_info')) grant.push('GM_info');
     var resources = script.meta.resources || {};
     var gm_funcs = {
       unsafeWindow: {value: window},
@@ -380,13 +388,15 @@ var comm = {
       },
       GM_deleteValue: {
         value: function (key) {
-          delete value[key];
+          var values = getValues();
+          delete values[key];
           saveValues();
         },
       },
       GM_getValue: {
         value: function(key, val) {
-          var v = value[key];
+          var values = getValues();
+          var v = values[key];
           if (v) {
             var type = v[0];
             v = v.slice(1);
@@ -413,7 +423,7 @@ var comm = {
       },
       GM_listValues: {
         value: function () {
-          return Object.getOwnPropertyNames(value);
+          return Object.getOwnPropertyNames(getValues());
         },
       },
       GM_setValue: {
@@ -426,7 +436,8 @@ var comm = {
             default:
               val = type + val;
           }
-          value[key] = val;
+          var values = getValues();
+          values[key] = val;
           saveValues();
         },
       },
@@ -499,7 +510,7 @@ var comm = {
   loadScript: function (data) {
     function buildCode(script) {
       var require = script.meta.require || [];
-      var wrapper = comm.wrapGM(script, data.values[script.uri], data.cache);
+      var wrapper = comm.wrapGM(script, data.cache);
       var code = [];
       var part;
       comm.forEach(Object.getOwnPropertyNames(wrapper), function(name) {
@@ -542,6 +553,7 @@ var comm = {
     comm.command = {};
     comm.ainject = {};
     comm.version = data.version;
+    comm.values = data.values;
     // reset load and checkLoad
     comm.load = function() {
       run(end);
@@ -617,14 +629,17 @@ function handleC(e) {
 }
 
 // Messages
-chrome.runtime.onMessage.addListener(function(req, src) {
+chrome.runtime.onMessage.addListener(function (req, src) {
   var maps = {
-    Command: function(data) {
+    Command: function (data) {
       comm.post({cmd: 'Command', data: data});
     },
     GetPopup: getPopup,
     GetBadge: getBadge,
     HttpRequested: httpRequested,
+    UpdateValues: function (data) {
+      comm.post({cmd: 'UpdateValues', data: data});
+    },
   };
   var func = maps[req.cmd];
   if (func) func(req.data, src);

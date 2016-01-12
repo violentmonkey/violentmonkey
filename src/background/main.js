@@ -32,7 +32,16 @@ var commands = {
     });
   },
   SetValue: function (data, src) {
-    return vmdb.setValue(data.uri, data.values);
+    return vmdb.setValue(data.uri, data.values)
+    .then(function () {
+      _.broadcast({
+        cmd: 'UpdateValues',
+        data: {
+          uri: data.uri,
+          values: data.values,
+        },
+      });
+    });
   },
   ExportZip: function (data, src) {
     return vmdb.getExportData(data.ids, data.values);
