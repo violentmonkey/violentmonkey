@@ -202,7 +202,8 @@ var comm = {
         if (req) req.callback(r);
       },
       UpdateValues: function (data) {
-        if (comm.values) comm.values[data.uri] = data.values;
+        var values = comm.values;
+        if (values && values[data.uri]) values[data.uri] = data.values;
       },
       // advanced inject
       Injected: function (id) {
@@ -309,10 +310,7 @@ var comm = {
   getWrapper: getWrapper,
   wrapGM: function(script, cache) {
     function getValues() {
-      var uri = script.uri;
-      var values = comm.values[uri];
-      if (!values) comm.values[uri] = values = {};
-      return values;
+      return comm.values[script.uri];
     }
     function propertyToString() {
       return '[Violentmonkey property]';
@@ -553,7 +551,7 @@ var comm = {
     comm.command = {};
     comm.ainject = {};
     comm.version = data.version;
-    comm.values = data.values;
+    comm.values = {};
     // reset load and checkLoad
     comm.load = function() {
       run(end);
@@ -567,6 +565,7 @@ var comm = {
       if (comm.state) comm.load();
     };
     comm.forEach(data.scripts, function(script) {
+      comm.values[script.uri] = data.values[script.uri] || {};
       var list;
       if(script && script.enabled) {
         switch (script.custom['run-at'] || script.meta['run-at']) {

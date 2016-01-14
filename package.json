@@ -2,7 +2,7 @@
   "name": "Violentmonkey",
   "version": "2.2.4",
   "scripts": {
-    "develop": "gulp build && gulp watch",
+    "dev": "gulp build && gulp watch",
     "update": "node scripts/updateLib"
   },
   "description": "Violentmonkey",

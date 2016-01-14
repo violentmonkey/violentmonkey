@@ -19,7 +19,7 @@ Development
 Run command below:
 
 ``` sh
-$ gulp
+$ npm run dev
 ```
 
 Then you can load the extension from `dist/`.
