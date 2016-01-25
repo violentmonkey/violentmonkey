@@ -59,7 +59,10 @@ var MenuView = MenuBaseView.extend({
         _.options.set('isApplied', isApplied);
         model.set({data: isApplied});
         chrome.browserAction.setIcon({
-          path: '/images/icon19' + (isApplied ? '' : 'w') + '.png',
+          path: {
+            19: '/images/icon19' + (isApplied ? '' : 'w') + '.png',
+            38: '/images/icon38' + (isApplied ? '' : 'w') + '.png'
+          },
         });
       },
     }, top);
