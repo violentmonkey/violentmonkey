@@ -214,7 +214,10 @@ _.messenger = function () {
 }();
 
 chrome.browserAction.setIcon({
-  path: '/images/icon19' + (_.options.get('isApplied') ? '' : 'w') + '.png',
+  path: {
+    19: '/images/icon19' + (isApplied ? '' : 'w') + '.png',
+    38: '/images/icon38' + (isApplied ? '' : 'w') + '.png'
+  },
 });
 
 chrome.notifications.onClicked.addListener(function(id) {
