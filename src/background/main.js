@@ -213,12 +213,14 @@ _.messenger = function () {
   };
 }();
 
-chrome.browserAction.setIcon({
-  path: {
-    19: '/images/icon19' + (isApplied ? '' : 'w') + '.png',
-    38: '/images/icon38' + (isApplied ? '' : 'w') + '.png'
-  },
-});
+!function (isApplied) {
+  chrome.browserAction.setIcon({
+    path: {
+      19: '/images/icon19' + (isApplied ? '' : 'w') + '.png',
+      38: '/images/icon38' + (isApplied ? '' : 'w') + '.png'
+    },
+  });
+}(_.options.get('isApplied'));
 
 chrome.notifications.onClicked.addListener(function(id) {
   if(id == 'VM-NoGrantWarning')
