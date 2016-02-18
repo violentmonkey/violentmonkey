@@ -99,25 +99,23 @@ var tester = function () {
     var custom = script.custom;
     var meta = script.meta;
     var inc = [], exc = [], mat = [];
-    var ok = true;
     if (custom._match !== false && meta.match) mat = mat.concat(meta.match);
     if (custom.match) mat = mat.concat(custom.match);
     if (custom._include !== false && meta.include) inc = inc.concat(meta.include);
     if (custom.include) inc = inc.concat(custom.include);
     if (custom._exclude !== false && meta.exclude) exc = exc.concat(meta.exclude);
     if (custom.exclude) exc = exc.concat(custom.exclude);
-    if (mat.length) {
-      // @match
-      var urlParts = url.match(match_reg);
-      ok = mat.some(function (str) {
+    var ok = !mat.length && !inc.length;
+    // @match
+    ok = ok || mat.length && function (urlParts) {
+      return mat.some(function (str) {
         return matchTest(str, urlParts);
       });
-    } else {
-      // @include
-      ok = !inc.length || inc.some(function (str) {
-        return autoReg(str).test(url);
-      });
-    }
+    }(url.match(match_reg));
+    // @include
+    ok = ok || inc.some(function (str) {
+      return autoReg(str).test(url);
+    });
     // exclude
     ok = ok && !exc.some(function (str) {
       return autoReg(str).test(url);
