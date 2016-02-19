@@ -176,13 +176,16 @@ var SettingsTab = BaseView.extend({
     function download(writer) {
       return new Promise(function (resolve, reject) {
         writer.close(function (blob) {
-          var url = URL.createObjectURL(blob);
-          $('<a>').attr({
-            href: url,
-            download: 'scripts.zip',
-          }).trigger('click');
+          resolve(blob);
+        });
+      }).then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        $('<a>').attr({
+          href: url,
+          download: 'scripts.zip',
+        }).trigger('click');
+        setTimeout(function () {
           URL.revokeObjectURL(url);
-          resolve();
         });
       });
     }
