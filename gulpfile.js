@@ -1,10 +1,8 @@
-'use strict';
-
 const gulp = require('gulp');
 const concat = require('gulp-concat');
 const replace = require('gulp-replace');
 const merge2 = require('merge2');
-const minifyCss = require('gulp-minify-css');
+const cssnano = require('gulp-cssnano');
 const gulpFilter = require('gulp-filter');
 const order = require('gulp-order');
 const del = require('del');
@@ -86,7 +84,7 @@ gulp.task('copy-files', function () {
   const cssFilter = gulpFilter(['**/*.css'], {restore: true});
   return gulp.src(paths.copy)
   .pipe(cssFilter)
-  .pipe(minifyCss())
+  .pipe(cssnano())
   .pipe(cssFilter.restore)
   .pipe(gulp.dest('dist/'));
 });

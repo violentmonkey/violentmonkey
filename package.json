@@ -2,38 +2,37 @@
   "name": "Violentmonkey",
   "version": "2.2.6",
   "scripts": {
+    "clean": "gulp clean",
     "dev": "gulp build && gulp watch",
     "update": "node scripts/updateLib"
   },
   "description": "Violentmonkey",
   "devDependencies": {
+    "codemirror": "^5.11.0",
     "del": "^2.2.0",
-    "glob": "^6.0.1",
-    "gulp": "^3.9.0",
+    "font-awesome": "^4.5.0",
+    "glob": "^7.0.0",
+    "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
+    "gulp-cssnano": "^2.1.1",
     "gulp-filter": "^3.0.1",
-    "gulp-minify-css": "^1.2.2",
     "gulp-order": "^1.1.1",
     "gulp-replace": "^0.5.4",
     "gulp-util": "^3.0.7",
-    "html-minifier": "^1.0.0",
-    "merge2": "^0.3.6",
+    "html-minifier": "^1.1.1",
+    "merge2": "^1.0.1",
     "ncp": "^2.0.0",
-    "through2": "^2.0.0",
+    "through2": "^2.0.1",
     "underscore": "^1.8.3"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Violentmonkey/Violentmonkey.git"
+    "url": "https://github.com/violentmonkey/violentmonkey.git"
   },
   "bugs": {
-    "url": "https://github.com/Violentmonkey/Violentmonkey/issues"
+    "url": "https://github.com/violentmonkey/violentmonkey/issues"
   },
-  "homepage": "https://github.com/Violentmonkey/Violentmonkey",
-  "license": "MIT",
-  "dependencies": {
-    "codemirror": "^5.9.0",
-    "font-awesome": "^4.5.0"
-  }
+  "homepage": "https://github.com/violentmonkey/violentmonkey",
+  "license": "MIT"
 }
