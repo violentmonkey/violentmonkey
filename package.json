@@ -2,7 +2,7 @@
   "name": "Violentmonkey",
   "version": "2.2.6",
   "scripts": {
-    "clean": "gulp clean",
+    "clean": "node -e \"require('del')(['dist'])\"",
     "dev": "gulp build && gulp watch",
     "i18n": "gulp i18n",
     "update": "node scripts/updateLib"

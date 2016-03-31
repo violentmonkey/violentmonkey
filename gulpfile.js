@@ -14,6 +14,7 @@ const paths = {
   cache: 'src/cache.js',
   manifest: 'src/manifest.json',
   templates: 'src/**/templates/*.html',
+  jsBg: 'src/background/**/*.js',
   jsOptions: 'src/options/**/*.js',
   jsPopup: 'src/popup/**/*.js',
   locales: [
@@ -22,65 +23,63 @@ const paths = {
     'src/**/*.json',
   ],
   copy: [
-    'src/**',
-    '!src/manifest.json',
-    '!src/cache.js',
-    '!src/**/templates/**',
-    '!src/**/templates',
-    '!src/**/views',
-    '!src/options/**/*.js',
-    '!src/popup/**/*.js',
-    '!src/_locales/**',
+    'src/*.js',
+    'src/public/**',
+    'src/*/*.html',
+    'src/*/*.css',
   ],
 };
 
-gulp.task('watch', function () {
+gulp.task('watch', () => {
   gulp.watch([].concat(paths.cache, paths.templates), ['templates']);
+  gulp.watch(paths.jsBg, ['js-bg']);
   gulp.watch(paths.jsOptions, ['js-options']);
   gulp.watch(paths.jsPopup, ['js-popup']);
   gulp.watch(paths.copy, ['copy-files']);
   gulp.watch(paths.locales, ['copy-i18n']);
 });
 
-gulp.task('clean', function () {
-  return del(['dist']);
-});
-
-gulp.task('templates', function () {
-  return merge2([
+gulp.task('templates', () => (
+  merge2([
     gulp.src(paths.cache),
     gulp.src(paths.templates).pipe(templateCache()),
   ]).pipe(concat('cache.js'))
-  .pipe(gulp.dest('dist'));
-});
+  .pipe(gulp.dest('dist'))
+));
 
-gulp.task('js-options', function () {
-  return gulp.src(paths.jsOptions)
+gulp.task('js-bg', () => (
+  gulp.src(paths.jsBg)
+  .pipe(concat('background/app.js'))
+  .pipe(gulp.dest('dist'))
+));
+
+gulp.task('js-options', () => (
+  gulp.src(paths.jsOptions)
   .pipe(order([
     '**/tab-*.js',
     '!**/app.js',
   ]))
   .pipe(concat('options/app.js'))
-  .pipe(gulp.dest('dist'));
-});
+  .pipe(gulp.dest('dist'))
+));
 
-gulp.task('js-popup', function () {
-  return gulp.src(paths.jsPopup)
+gulp.task('js-popup', () => (
+  gulp.src(paths.jsPopup)
   .pipe(order([
     '**/base.js',
     '!**/app.js',
   ]))
   .pipe(concat('popup/app.js'))
-  .pipe(gulp.dest('dist'));
-})
+  .pipe(gulp.dest('dist'))
+))
 
-gulp.task('manifest', function () {
-  return gulp.src(paths.manifest, {base: 'src'})
+gulp.task('manifest', () => (
+  gulp.src(paths.manifest, {base: 'src'})
   .pipe(replace('__VERSION__', pkg.version))
-  .pipe(gulp.dest('dist'));
-});
+  .pipe(gulp.dest('dist'))
+));
 
-gulp.task('copy-files', function () {
+gulp.task('copy-files', () => {
   const cssFilter = gulpFilter(['**/*.css'], {restore: true});
   return gulp.src(paths.copy)
   .pipe(cssFilter)
@@ -89,8 +88,8 @@ gulp.task('copy-files', function () {
   .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('copy-i18n', function () {
-  return gulp.src(paths.locales)
+gulp.task('copy-i18n', () => (
+  gulp.src(paths.locales)
   .pipe(i18n.extract({
     base: 'src',
     prefix: '_locales',
@@ -98,13 +97,21 @@ gulp.task('copy-i18n', function () {
     useDefaultLang: true,
     markUntouched: false,
   }))
-  .pipe(gulp.dest('dist'));
-});
+  .pipe(gulp.dest('dist'))
+));
 
-gulp.task('build', ['templates', 'js-options', 'js-popup', 'manifest', 'copy-files', 'copy-i18n']);
+gulp.task('build', [
+  'templates',
+  'js-bg',
+  'js-options',
+  'js-popup',
+  'manifest',
+  'copy-files',
+  'copy-i18n',
+]);
 
-gulp.task('i18n', function () {
-  return gulp.src(paths.locales)
+gulp.task('i18n', () => (
+  gulp.src(paths.locales)
   .pipe(i18n.extract({
     base: 'src',
     prefix: '_locales',
@@ -112,7 +119,7 @@ gulp.task('i18n', function () {
     useDefaultLang: false,
     markUntouched: true,
   }))
-  .pipe(gulp.dest('src'));
-});
+  .pipe(gulp.dest('src'))
+));
 
 gulp.task('default', ['build']);
