@@ -12,6 +12,8 @@ var MenuItemView = BaseView.extend({
     var it = this.model.toJSON();
     if (typeof it.symbol === 'function')
       it.symbol = it.symbol(it.data);
+    if (typeof it.name === 'function')
+      it.name = it.name(it.data);
     this.$el.html(this.templateFn(it))
     .attr('title', it.title === true ? it.name : it.title);
     if (it.data === false) this.$el.addClass('disabled');

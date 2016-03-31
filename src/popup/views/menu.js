@@ -49,7 +49,9 @@ var MenuView = MenuBaseView.extend({
       },
     }, top);
     _this.addMenuItem({
-      name: _.i18n('menuScriptEnabled'),
+      name: function (data) {
+        return data ? _.i18n('menuScriptEnabled') : _.i18n('menuScriptDisabled');
+      },
       data: _.options.get('isApplied'),
       symbol: function (data) {
         return data ? 'fa-check' : 'fa-times';
