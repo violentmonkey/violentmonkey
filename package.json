@@ -4,6 +4,7 @@
   "scripts": {
     "clean": "gulp clean",
     "dev": "gulp build && gulp watch",
+    "i18n": "gulp i18n",
     "update": "node scripts/updateLib"
   },
   "description": "Violentmonkey",

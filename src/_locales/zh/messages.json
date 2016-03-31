@@ -371,8 +371,12 @@
     "message": "为此站点查找脚本"
   },
   "menuScriptEnabled": {
-    "description": "Menu item showing the status of Violentmonkey, whether enabled.",
-    "message": "启用脚本"
+    "description": "Menu item showing the status of Violentmonkey, when enabled.",
+    "message": "脚本已启用"
+  },
+  "menuScriptDisabled": {
+    "description": "Menu item showing the status of Violentmonkey, when disabled.",
+    "message": "脚本已禁用"
   },
   "menuBack": {
     "description": "Menu item to go back to main menu from script commands.",

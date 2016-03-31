@@ -371,8 +371,12 @@
     "message": "Найти скрипты для сайта"
   },
   "menuScriptEnabled": {
-    "description": "Menu item showing the status of Violentmonkey, whether enabled.",
+    "description": "Menu item showing the status of Violentmonkey, when enabled.",
     "message": "Включить скрипты"
+  },
+  "menuScriptDisabled": {
+    "description": "Menu item showing the status of Violentmonkey, when disabled.",
+    "message": ""
   },
   "menuBack": {
     "description": "Menu item to go back to main menu from script commands.",
