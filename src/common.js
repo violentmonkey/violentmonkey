@@ -12,6 +12,7 @@ _.options = function () {
     trackLocalFile: false,
     injectMode: 0,
     autoReload: false,
+    dropbox: {},
   };
 
   function getOption(key, def) {

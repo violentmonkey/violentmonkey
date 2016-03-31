@@ -5,6 +5,7 @@ var commands = {
     return Promise.resolve(scriptUtils.newScript());
   },
   RemoveScript: function (id, src) {
+    setTimeout(sync.start);
     return vmdb.removeScript(id);
   },
   GetData: function (data, src) {
@@ -69,6 +70,7 @@ var commands = {
           isClickable: true,
         });
       _.messenger.post(res);
+      setTimeout(sync.start);
       return res.data;
     });
   },
@@ -135,6 +137,7 @@ vmdb.initialized.then(function () {
     }
   });
   setTimeout(autoUpdate, 2e4);
+  sync.init();
 });
 
 // Common functions

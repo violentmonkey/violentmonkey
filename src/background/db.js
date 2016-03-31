@@ -552,6 +552,7 @@ VMDB.prototype.parseScript = function (data) {
       script.custom.homepageURL = data.from;
     if (scriptUtils.isRemote(data.url))
       script.custom.lastInstallURL = data.url;
+    script.custom.modified = data.modified || Date.now();
     return _this.saveScript(script, tx);
   }).then(function (script) {
     _.assign(res.data, scriptUtils.getScriptInfo(script));

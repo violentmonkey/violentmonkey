@@ -165,6 +165,23 @@ var tester = function () {
   };
 }();
 
+var searchParams = {
+  load: function (string) {
+    return string.split('&').reduce(function (data, piece) {
+      parts = piece.split('=');
+      data[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
+      return data;
+    }, {});
+  },
+  dump: function (dict) {
+    var qs = [];
+    for (var k in dict) {
+      qs.push(encodeURIComponent(k) + '=' + encodeURIComponent(dict[k]));
+    }
+    return qs.join('&');
+  },
+};
+
 _.broadcast = function (data) {
   chrome.tabs.query({}, function (tabs) {
     _.forEach(tabs, function (tab) {
