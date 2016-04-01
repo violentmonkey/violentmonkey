@@ -432,18 +432,18 @@
   },
   "labelSync": {
     "description": "Label for sync options.",
-    "message": ""
+    "message": "同步"
   },
   "labelSyncDropbox": {
     "description": "Label for sync to dropbox option.",
-    "message": ""
+    "message": "同步到Dropbox"
   },
   "buttonAuthorize": {
     "description": "Button to authorize permissions for sync.",
-    "message": ""
+    "message": "授权"
   },
   "buttonAuthorized": {
     "description": "Button shown when permissions are already authorized for sync.",
-    "message": ""
+    "message": "已授权"
   }
 }
