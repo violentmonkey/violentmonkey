@@ -429,5 +429,21 @@
   "buttonInstallFromURL": {
     "description": "Button to ask for URL of a user script.",
     "message": "Установить по ссылке"
+  },
+  "labelSync": {
+    "description": "Label for sync options.",
+    "message": ""
+  },
+  "labelSyncDropbox": {
+    "description": "Label for sync to dropbox option.",
+    "message": ""
+  },
+  "buttonAuthorize": {
+    "description": "Button to authorize permissions for sync.",
+    "message": ""
+  },
+  "buttonAuthorized": {
+    "description": "Button shown when permissions are already authorized for sync.",
+    "message": ""
   }
 }

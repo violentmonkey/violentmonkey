@@ -164,7 +164,7 @@ var sync = function () {
         getRemote.map(function (item) {
           console.log('Download script:', item.uri);
           return service.inst.get(getFilename(item.uri)).then(function (code) {
-            return vmdb.parseScript({
+            return commands.ParseScript({
               code: code,
               modified: item.modified,
             });

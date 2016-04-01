@@ -36,4 +36,22 @@
     <button id=bSelect data-i18n=buttonAllNone></button>
     <button id=bExport data-i18n=buttonExportData></button>
   </fieldset>
+  <fieldset class=title>
+    <legend data-i18n=labelSync></legend>
+    <div>
+      <label>
+        <input id=cbSyncDropbox type=checkbox data-check=dropboxEnabled <%=
+        it.dropboxEnabled ? 'checked' : ''
+        %> <%=
+        it.dropboxAuthorized ? '' : 'disabled'
+        %>>
+        <span data-i18n=labelSyncDropbox></span>
+      </label>
+      <button <%=
+        it.dropboxAuthorized ? 'disabled' : ''
+      %>><%=
+        it.dropboxAuthorized ? _.i18n('buttonAuthorized') : _.i18n('buttonAuthorize')
+      %></button>
+    </div>
+  </fieldset>
 </div>
