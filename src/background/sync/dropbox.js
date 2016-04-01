@@ -79,13 +79,26 @@ setTimeout(function () {
     this.headers = {
       Authorization: 'Bearer ' + token,
     };
+    this.lastFetch = 0;
   }
   Dropbox.prototype.fetch = function (input, init) {
+    var _this = this;
     init = init || {};
-    init.headers = _.assign(init.headers || {}, this.headers);
-    return fetch(input, init)
+    init.headers = _.assign(init.headers || {}, _this.headers);
+    var delay = _this.lastFetch + 1000 - Date.now();
+    return new Promise(function (resolve, reject) {
+      if (delay > 0) setTimeout(resolve, delay);
+      else resolve();
+    })
+    .then(function () {
+      _this.lastFetch = Date.now();
+      return fetch(input, init);
+    })
     .then(function (res) {
       return new Promise(function (resolve, reject) {
+        if (res.status === 503) {
+          // TODO Too Many Requests
+        }
         res.status > 300 ? reject(res) : resolve(res);
       });
     });

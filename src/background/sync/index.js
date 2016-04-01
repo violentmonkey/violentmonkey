@@ -186,28 +186,20 @@ var sync = function () {
       local.data.forEach(function (item) {
         var remoteItem = map[item.uri];
         if (remoteItem) {
-          if (firstSync || remoteItem.modified <= item.custom.modified) {
-            if (!item.custom.modified) {
-              item.custom.modified = remoteItem.modified;
-              vmdb.saveScript(item);
-            }
-            // up to date
-            delete map[item.uri];
+          if (firstSync || !item.custom.modified || remoteItem.modified > item.custom.modified) {
+            getRemote.push(remoteItem);
+          } else if (remoteItem.modified < item.custom.modified) {
+            putRemote.push(item);
           }
+          delete map[item.uri];
         } else if (firstSync || !outdated) {
           putRemote.push(item);
         } else {
           delLocal.push(item);
         }
-        return map;
       });
       for (var uri in map) {
-        var item = map[uri];
-        if (firstSync || outdated) {
-          getRemote.push(item);
-        } else {
-          delRemote.push(item);
-        }
+        delRemote.push(map[uri]);
       }
       var promises = [].concat(
         getRemote.map(function (item) {
