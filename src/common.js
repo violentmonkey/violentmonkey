@@ -1,5 +1,3 @@
-'use strict';
-
 var _ = window._ || {};
 _.i18n = chrome.i18n.getMessage;
 

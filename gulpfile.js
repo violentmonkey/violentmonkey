@@ -24,6 +24,7 @@ const paths = {
   ],
   copy: [
     'src/*.js',
+    '!src/cache.js',
     'src/public/**',
     'src/*/*.html',
     'src/*/*.css',
