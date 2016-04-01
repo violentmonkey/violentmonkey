@@ -1,2 +1,5 @@
-<i class="fa <%- it.symbol %>"></i>
-<%- it.name %>
+<%= it.onClickDetail ? '<div class="menu-item-detail"><i class="fa fa-ellipsis-h"></i></div>' : '' %>
+<div class="menu-item-label">
+  <i class="fa <%- it.symbol %>"></i>
+  <%- it.name %>
+</div>

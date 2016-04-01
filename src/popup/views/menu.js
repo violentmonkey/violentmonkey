@@ -3,6 +3,7 @@ var MenuView = MenuBaseView.extend({
     MenuBaseView.prototype.initialize.call(this);
     this.listenTo(scriptsMenu, 'reset', this.render);
     this.listenTo(commandsMenu, 'reset', this.render);
+    this.listenTo(domainsMenu, 'reset', this.render);
   },
   _render: function () {
     var _this = this;
@@ -30,7 +31,7 @@ var MenuView = MenuBaseView.extend({
         });
       },
     }, top);
-    if (app.currentTab && /^https?:\/\//i.test(app.currentTab.url))
+    if (domainsMenu.length)
       _this.addMenuItem({
         name: _.i18n('menuFindScripts'),
         symbol: 'fa-search',
@@ -39,6 +40,9 @@ var MenuView = MenuBaseView.extend({
           chrome.tabs.create({
             url: 'https://greasyfork.org/scripts/search?q=' + matches[1],
           });
+        },
+        onClickDetail: function (e) {
+          app.navigate('domains', {trigger: true});
         },
       }, top);
     if (commandsMenu.length) _this.addMenuItem({

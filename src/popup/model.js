@@ -6,3 +6,4 @@ var Menu = Backbone.Collection.extend({
 
 var scriptsMenu = new Menu;
 var commandsMenu = new Menu;
+var domainsMenu = new Menu;

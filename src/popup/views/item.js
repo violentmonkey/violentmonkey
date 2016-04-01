@@ -2,11 +2,13 @@ var MenuItemView = BaseView.extend({
   className: 'menu-item',
   templateUrl: '/popup/templates/menuitem.html',
   events: {
-    'click': 'onClick',
+    'click .menu-item-detail': 'onClickDetail',
+    'click .menu-item-label': 'onClick',
   },
   initialize: function () {
     BaseView.prototype.initialize.call(this);
     this.listenTo(this.model, 'change', this.render);
+    if (this.model.get('onClickDetail')) this.el.classList.add('has-detail');
   },
   _render: function () {
     var it = this.model.toJSON();
@@ -24,4 +26,8 @@ var MenuItemView = BaseView.extend({
     var onClick = this.model.get('onClick');
     onClick && onClick(e, this.model);
   },
-})
+  onClickDetail: function (e) {
+    var onClickDetail = this.model.get('onClickDetail');
+    onClickDetail && onClickDetail(e, this.model);
+  },
+});

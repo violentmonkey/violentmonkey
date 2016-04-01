@@ -1,13 +1,17 @@
 var App = Backbone.Router.extend({
   routes: {
     '': 'renderMenu',
-    'commands': 'renderCommands',
+    commands: 'renderCommands',
+    domains: 'renderDomains',
   },
   renderMenu: function () {
     this.view = new MenuView;
   },
   renderCommands: function () {
     this.view = new CommandsView;
+  },
+  renderDomains: function () {
+    this.view = new DomainsView;
   },
 });
 var app = new App();
@@ -21,6 +25,11 @@ BaseView.prototype.initI18n.call(window);
     chrome.tabs.sendMessage(app.currentTab.id, {
       cmd: 'Command',
       data: model.get('name'),
+    });
+  }
+  function domainClick(e, model) {
+    chrome.tabs.create({
+      url: 'https://greasyfork.org/scripts/search?q=' + model.get('name'),
     });
   }
   function scriptSymbol(data) {
@@ -41,6 +50,26 @@ BaseView.prototype.initI18n.call(window);
   }
   function init() {
     chrome.tabs.sendMessage(app.currentTab.id, {cmd: 'GetPopup'});
+    if (app.currentTab && /^https?:\/\//i.test(app.currentTab.url)) {
+      var matches = app.currentTab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
+      var domain = matches[1];
+      var pieces = domain.split('.').reverse();
+      var domains = [];
+      var last = pieces.shift();
+      pieces.forEach(function (piece) {
+        last = piece + '.' + last;
+        domains.unshift(last);
+      });
+      if (!domains.length) domains.push(domain);
+      domainsMenu.reset(domains.map(function (domain) {
+        return new MenuItem({
+          name: domain,
+          title: true,
+          className: 'ellipsis',
+          onClick: domainClick,
+        });
+      }));
+    }
   }
 
   var commands = {
