@@ -77,6 +77,8 @@ var dropbox = function () {
     };
   }
 
+  // When path is encoded in URL directly,
+  // we MUST encodeURIComponent twice to ensure the filename has no slashes
   function Dropbox(token) {
     this.token = token;
     this.headers = {
@@ -94,6 +96,7 @@ var dropbox = function () {
     });
   };
   Dropbox.prototype.put = function (path, data) {
+    path = encodeURIComponent(path);
     return this.fetch('https://content.dropboxapi.com/1/files_put/auto/' + path, {
       method: 'PUT',
       body: data,
@@ -102,6 +105,7 @@ var dropbox = function () {
     }).then(normalize);
   };
   Dropbox.prototype.get = function (path) {
+    path = encodeURIComponent(path);
     return this.fetch('https://content.dropboxapi.com/1/files/auto/' + path)
     .then(function (res) {
       return res.text();

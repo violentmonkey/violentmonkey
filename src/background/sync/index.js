@@ -46,8 +46,7 @@ var sync = function () {
     });
   }
   function getFilename(uri) {
-    // encodeURIComponent twice to ensure the decoded filename has no slashes
-    return encodeURIComponent(encodeURIComponent(uri) + '.user.js');
+    return encodeURIComponent(uri) + '.user.js';
   }
   function syncOne(service) {
     if (!service.inst) return;
