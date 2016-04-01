@@ -22,7 +22,8 @@ var sync = function () {
         _.assign(this.data, key);
         this.dump();
       }
-    } else if (this.data[key] !== val) {
+    } else {
+      // val may be an object, so equal test does not work
       this.data[key] = val;
       this.dump();
     }
@@ -186,6 +187,10 @@ var sync = function () {
         var remoteItem = map[item.uri];
         if (remoteItem) {
           if (firstSync || remoteItem.modified <= item.custom.modified) {
+            if (!item.custom.modified) {
+              item.custom.modified = remoteItem.modified;
+              vmdb.saveScript(item);
+            }
             // up to date
             delete map[item.uri];
           }
@@ -240,7 +245,7 @@ var sync = function () {
           remote.meta.timestamp = Date.now();
           promises.push(service.inst.put(METAFILE, JSON.stringify(remote.meta)));
         }
-        if (!local.meta.timestamp || getRemote.length || delLocal.length || remoteChanged) {
+        if (!local.meta.timestamp || getRemote.length || delLocal.length || remoteChanged || outdated) {
           local.meta.timestamp = remote.meta.timestamp;
           service.config.set('meta', local.meta);
         }

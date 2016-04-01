@@ -15,6 +15,7 @@ setTimeout(function () {
     var url = changeInfo.url;
     if (url && url.slice(0, redirect_uri.length) === redirect_uri) {
       authorized(url.slice(redirect_uri.length));
+      chrome.tabs.remove(tabId);
     }
   });
 
