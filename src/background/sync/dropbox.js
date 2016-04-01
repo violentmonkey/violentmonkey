@@ -85,10 +85,13 @@ setTimeout(function () {
   }
   Dropbox.prototype.request = function (options) {
     var _this = this;
-    return _this.lastFetch.then(function () {
-      _this.lastFetch = new Promise(function (resolve, reject) {
+    var lastFetch = _this.lastFetch;
+    _this.lastFetch = lastFetch.then(function () {
+      return new Promise(function (resolve, reject) {
         setTimeout(resolve, 1000);
       });
+    });
+    return lastFetch.then(function () {
       return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest;
         xhr.open(options.method || 'GET', options.url, true);
@@ -147,7 +150,7 @@ setTimeout(function () {
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/files/delete',
       body: {
-        path: path,
+        path: '/' + path,
       },
     }).then(function (text) {
       return JSON.parse(text);

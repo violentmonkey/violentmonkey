@@ -174,7 +174,7 @@ var sync = function () {
       var firstSync = !local.meta.timestamp;
       var outdated = !local.meta.timestamp || remote.meta.timestamp > local.meta.timestamp;
       console.log('First sync:', firstSync);
-      console.log('Outdated:', outdated);
+      console.log('Outdated:', outdated, '(', 'local:', local.meta.timestamp, 'remote:', remote.meta.timestamp, ')');
       var map = {};
       var getRemote = [];
       var putRemote = [];
@@ -199,7 +199,12 @@ var sync = function () {
         }
       });
       for (var uri in map) {
-        delRemote.push(map[uri]);
+        var item = map[uri];
+        if (outdated) {
+          getRemote.push(item);
+        } else {
+          delRemote.push(item);
+        }
       }
       var promises = [].concat(
         getRemote.map(function (item) {
@@ -229,7 +234,7 @@ var sync = function () {
           return vmdb.removeScript(item.id);
         })
       );
-      return Promise.all(promises).then(function () {
+      promises.push(Promise.all(promises).then(function () {
         var promises = [];
         var remoteChanged;
         if (!remote.meta.timestamp || putRemote.length || delRemote.length) {
@@ -242,8 +247,14 @@ var sync = function () {
           service.config.set('meta', local.meta);
         }
         return Promise.all(promises);
-      });
-    }).catch(err => console.log(err));
+      }));
+      return Promise.all(promises.map(function (promise) {
+        // ignore errors to ensure all promises are fulfilled
+        return promise.catch(function (err) {
+          console.log(err);
+        });
+      }));
+    });
   }
 
   return {
