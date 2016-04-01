@@ -49,15 +49,59 @@ var sync = function () {
     _.options.set(this.prefix, this.data);
   };
 
+  function serviceStatus() {
+    var validStatused = [
+      'idle',
+      'initializing',
+      'authorized',
+      'unauthorized',
+    ];
+    var status = 'idle';
+    return {
+      get: function () {return status;},
+      set: function (_status) {
+        if (~validStatused.indexOf(_status)) {
+          status = _status;
+          _.messenger.post({
+            cmd: 'sync',
+            data: getStatuses(),
+          });
+        }
+        return status;
+      },
+    };
+  }
   function service(name, methods) {
-    var service = _.assign({}, methods, {
-      config: new ServiceConfig(name),
-    });
-    setTimeout(function () {
-      services.push(service);
-      inited && initService(service);
-    });
+    var service;
+    if (methods) {
+      // initialize
+      service = _.assign({}, methods, {
+        name: name,
+        config: new ServiceConfig(name),
+        status: serviceStatus(),
+      });
+      setTimeout(function () {
+        services.push(service);
+        inited && initService(service);
+      });
+    } else {
+      // get existent instance
+      for (var i = services.length; i --; ) {
+        if (services[i].name === name) break;
+      }
+      // i may be -1 if not founded
+      service = services[i];
+    }
     return service;
+  }
+  function getStatuses() {
+    return services.reduce(function (res, service) {
+      res[service.name] = {
+        status: service.status.get(),
+        timestamp: service.config.get('meta', {}).timestamp,
+      };
+      return res;
+    }, {});
   }
   function start(service) {
     if (service) {
@@ -209,5 +253,6 @@ var sync = function () {
     init: init,
     start: start,
     service: service,
+    status: getStatuses,
   };
 }();

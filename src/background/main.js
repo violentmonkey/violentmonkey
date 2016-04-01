@@ -9,7 +9,10 @@ var commands = {
     return vmdb.removeScript(id);
   },
   GetData: function (data, src) {
-    return vmdb.getData();
+    return vmdb.getData().then(function (data) {
+      data.sync = sync.status();
+      return data;
+    });
   },
   GetInjected: function (url, src) {
     var data = {
@@ -106,6 +109,15 @@ var commands = {
   },
   SetBadge: function (num, src) {
     setBadge(num, src);
+    return false;
+  },
+  Authenticate: function (data, src) {
+    var service = sync.service(data);
+    service && service.authenticate && service.authenticate();
+    return false;
+  },
+  SyncStart: function (data, src) {
+    sync.start();
     return false;
   },
 };

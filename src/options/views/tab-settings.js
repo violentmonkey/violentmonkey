@@ -40,10 +40,22 @@ var SettingsTab = BaseView.extend({
     'click #bImport': 'importFile',
     'click #bExport': 'exportData',
     'click #bVacuum': 'onVacuum',
+    'click [data-auth]': 'authenticate',
+    'change [data-sync]': 'toggleSync',
   },
   templateUrl: '/options/templates/tab-settings.html',
+  initialize: function () {
+    BaseView.prototype.initialize.call(this);
+    this.listenTo(syncData, 'change', this.render);
+  },
   _render: function () {
     var options = _.options.getAll();
+    var sync = options.sync = syncData.toJSON();
+    ['dropbox'].forEach(function (name) {
+      var service = sync[name] = sync[name] || {};
+      service.authorized = service.status === 'authorized';
+      service.unauthorized = service.status === 'unauthorized';
+    });
     this.$el.html(this.templateFn(options));
     this.$('#sInjectMode').val(options.injectMode);
     this.updateInjectHint();
@@ -242,5 +254,11 @@ var SettingsTab = BaseView.extend({
     _.sendMessage({cmd: 'Vacuum'}).then(function () {
       button.html(_.i18n('buttonVacuumed'));
     });
+  },
+  authenticate: function (e) {
+    _.sendMessage({cmd: 'Authenticate', data: e.target.dataset.auth});
+  },
+  toggleSync: function (e) {
+    e.target.checked && _.sendMessage({cmd: 'SyncStart'});
   },
 });

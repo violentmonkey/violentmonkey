@@ -24,12 +24,15 @@ if (!Backbone.history.start())
 
 BaseView.prototype.initI18n.call(window);
 
-var scriptList;
+var scriptList, syncData;
 function initMain() {
-  scriptList = new ScriptList();
+  scriptList = new ScriptList;
+  syncData = new Backbone.Model;
   var port = chrome.runtime.connect({name: 'Options'});
   port.onMessage.addListener(function (res) {
-    if (res.cmd === 'add') {
+    if (res.cmd === 'sync') {
+      syncData.set(res.data);
+    } else if (res.cmd === 'add') {
       res.data.message = '';
       scriptList.push(res.data);
     } else if (res.data) {

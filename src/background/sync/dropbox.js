@@ -20,20 +20,25 @@ setTimeout(function () {
 
   function init() {
     dropbox.inst = null;
+    dropbox.status.set('initializing');
     var token = dropbox.config.get('token');
     if (token) {
       dropbox.inst = new Dropbox(token);
       dropbox.inst.fetch('https://api.dropboxapi.com/1/account/info')
       .then(function (res) {
+        dropbox.status.set('authorized');
         events.fire('init');
         //return res.json();
       }, function (res) {
         if (res.status > 300) {
           dropbox.inst = null;
           dropbox.config.clear();
+          dropbox.status.set('unauthorized');
         }
         dropbox.config.setOption('enabled', false);
       });
+    } else {
+      dropbox.status.set('unauthorized');
     }
   }
   function authenticate() {
