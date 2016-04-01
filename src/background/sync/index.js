@@ -1,21 +1,74 @@
 var sync = function () {
   var METAFILE = 'Violentmonkey';
-  var services = [dropbox];
+  var services = [];
   var servicesReady = [];
   var queue = [];
   var syncing;
   var timer;
+  var inited;
 
-  return {
-    init: init,
-    start: start,
+  function ServiceConfig(name) {
+    this.prefix = name;
+    this.load();
+  }
+  ServiceConfig.prototype.get = function (key, def) {
+    var val = this.data[key];
+    if (val == null) val = def;
+    return val;
+  };
+  ServiceConfig.prototype.set = function (key, val) {
+    if (typeof key === 'object') {
+      if (arguments.length === 1) {
+        _.assign(this.data, key);
+        this.dump();
+      }
+    } else if (this.data[key] !== val) {
+      this.data[key] = val;
+      this.dump();
+    }
+  };
+  ServiceConfig.prototype.clear = function () {
+    this.data = {};
+    this.dump();
+  };
+  ServiceConfig.prototype.capitalize = function (string) {
+    return string[0].toUpperCase() + string.slice(1);
+  };
+  ServiceConfig.prototype.getOption = function (key, def) {
+    key = this.capitalize(key);
+    return _.options.get(this.prefix + key, def);
+  };
+  ServiceConfig.prototype.setOption = function (key, val) {
+    key = this.capitalize(key);
+    return _.options.set(this.prefix + key, val);
+  };
+  ServiceConfig.prototype.load = function () {
+    this.data = _.options.get(this.prefix, {});
+  };
+  ServiceConfig.prototype.dump = function () {
+    _.options.set(this.prefix, this.data);
   };
 
+  function service(name, methods) {
+    var service = _.assign({}, methods, {
+      config: new ServiceConfig(name),
+    });
+    setTimeout(function () {
+      services.push(service);
+      inited && initService(service);
+    });
+    return service;
+  }
   function start(service) {
-    if (service) queue.push(service);
-    else if (!syncing && queue.length < servicesReady.length) queue = servicesReady.slice();
+    if (service) {
+      service.config.getOption('enabled') && queue.push(service);
+    } else if (!syncing && queue.length < servicesReady.length) {
+      queue = servicesReady.filter(function (service) {
+        return service.config.getOption('enabled');
+      });
+    }
     if (syncing) return;
-    debouncedSync();
+    queue.length && debouncedSync();
   }
   function debouncedSync() {
     console.log('Ready to sync');
@@ -36,14 +89,16 @@ var sync = function () {
     syncing = true;
     syncOne(service).then(sync, stopSync);
   }
-  function init() {
-    services.forEach(function (service) {
-      service.on('init', function () {
-        servicesReady.push(service);
-        start(service);
-      });
-      service.init();
+  function initService(service) {
+    service.on('init', function () {
+      servicesReady.push(service);
+      start(service);
     });
+    service.init();
+  }
+  function init() {
+    inited = true;
+    services.forEach(initService);
   }
   function getFilename(uri) {
     return encodeURIComponent(uri) + '.user.js';
@@ -69,7 +124,7 @@ var sync = function () {
       };
       var local = {
         data: res[2],
-        meta: service.meta,
+        meta: service.config.get('meta', {}),
       };
       var firstSync = !local.meta.timestamp;
       var outdated = !local.meta.timestamp || remote.meta.timestamp > local.meta.timestamp;
@@ -135,16 +190,24 @@ var sync = function () {
       );
       return Promise.all(promises).then(function () {
         var promises = [];
+        var remoteChanged;
         if (!remote.meta.timestamp || putRemote.length || delRemote.length) {
+          remoteChanged = true;
           remote.meta.timestamp = Date.now();
           promises.push(service.inst.put(METAFILE, JSON.stringify(remote.meta)));
         }
-        if (!local.meta.timestamp || getRemote.length || delLocal.length) {
+        if (!local.meta.timestamp || getRemote.length || delLocal.length || remoteChanged) {
           local.meta.timestamp = remote.meta.timestamp;
-          service.dump();
+          service.config.set('meta', local.meta);
         }
         return Promise.all(promises);
       });
     }).catch(err => console.log(err));
   }
+
+  return {
+    init: init,
+    start: start,
+    service: service,
+  };
 }();

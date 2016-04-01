@@ -13,6 +13,7 @@ _.options = function () {
     injectMode: 0,
     autoReload: false,
     dropbox: {},
+    dropboxEnabled: false,
   };
 
   function getOption(key, def) {

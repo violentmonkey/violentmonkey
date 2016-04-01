@@ -24,5 +24,3 @@ function getEventEmitter() {
     });
   }
 }
-
-var events = getEventEmitter();

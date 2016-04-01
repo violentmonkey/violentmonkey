@@ -1,18 +1,14 @@
-var dropbox = function () {
+setTimeout(function () {
   var config = {
     client_id: 'f0q12zup2uys5w8',
     redirect_uri: 'https://violentmonkey.github.io/auth_dropbox.html',
-    options: _.options.get('dropbox', {}),
   };
   var events = getEventEmitter();
-  var dropbox = {
-    inst: null,
+  var dropbox = sync.service('dropbox', {
     init: init,
-    dump: dump,
     authenticate: authenticate,
     on: events.on,
-    meta: {},
-  };
+  });
 
   chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     var redirect_uri = config.redirect_uri + '#';
@@ -24,24 +20,21 @@ var dropbox = function () {
 
   function init() {
     dropbox.inst = null;
-    var ret;
-    if (config.options.token) {
-      dropbox.inst = new Dropbox(config.options.token);
-      dropbox.meta = config.options.meta = config.options.meta || {};
-      ret = dropbox.inst.fetch('https://api.dropboxapi.com/1/account/info')
+    var token = dropbox.config.get('token');
+    if (token) {
+      dropbox.inst = new Dropbox(token);
+      dropbox.inst.fetch('https://api.dropboxapi.com/1/account/info')
       .then(function (res) {
         events.fire('init');
         //return res.json();
       }, function (res) {
         if (res.status > 300) {
           dropbox.inst = null;
-          _.options.set('dropbox', config.options = {});
+          dropbox.config.clear();
         }
+        dropbox.config.setOption('enabled', false);
       });
-    } else {
-      ret = Promise.reject();
     }
-    return ret;
   }
   function authenticate() {
     var params = {
@@ -57,16 +50,12 @@ var dropbox = function () {
   function authorized(raw) {
     var data = searchParams.load(raw);
     if (data.access_token) {
-      _.assign(config.options, {
+      dropbox.config.set({
         uid: data.uid,
         token: data.access_token,
       });
-      dump();
       init();
     }
-  }
-  function dump() {
-    _.options.set('dropbox', config.options);
   }
   function normalize(item) {
     return {
@@ -138,6 +127,4 @@ var dropbox = function () {
       }).map(normalize);
     });
   };
-
-  return dropbox;
-}();
+});
