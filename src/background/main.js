@@ -73,7 +73,7 @@ var commands = {
           isClickable: true,
         });
       _.messenger.post(res);
-      setTimeout(sync.start);
+      sync.start();
       return res.data;
     });
   },

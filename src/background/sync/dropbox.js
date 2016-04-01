@@ -25,14 +25,18 @@ setTimeout(function () {
     var token = dropbox.config.get('token');
     if (token) {
       dropbox.inst = new Dropbox(token);
-      dropbox.inst.fetch('https://api.dropboxapi.com/1/account/info')
-      .then(function (res) {
+      dropbox.inst.request({
+        method: 'POST',
+        url: 'https://api.dropboxapi.com/2/users/get_current_account',
+      })
+      .then(function (text) {
         dropbox.status.set('authorized');
         events.fire('init');
-        //return res.json();
       }, function (res) {
         if (res.status > 300) {
           dropbox.inst = null;
+        }
+        if (res.status === 401) {
           dropbox.config.clear();
           dropbox.status.set('unauthorized');
         }
@@ -65,84 +69,105 @@ setTimeout(function () {
   }
   function normalize(item) {
     return {
-      bytes: item.bytes,
-      uri: decodeURIComponent(item.path.slice(1, -8)),
-      modified: new Date(item.modified).getTime(),
+      size: item.size,
+      uri: decodeURIComponent(item.name.slice(0, -8)),
+      modified: new Date(item.server_modified).getTime(),
       //is_deleted: item.is_deleted,
     };
   }
 
-  // When path is encoded in URL directly,
-  // we MUST encodeURIComponent twice to ensure the filename has no slashes
   function Dropbox(token) {
     this.token = token;
     this.headers = {
       Authorization: 'Bearer ' + token,
     };
-    this.lastFetch = 0;
+    this.lastFetch = Promise.resolve();
   }
-  Dropbox.prototype.fetch = function (input, init) {
+  Dropbox.prototype.request = function (options) {
     var _this = this;
-    init = init || {};
-    init.headers = _.assign(init.headers || {}, _this.headers);
-    var delay = _this.lastFetch + 1000 - Date.now();
-    return new Promise(function (resolve, reject) {
-      if (delay > 0) setTimeout(resolve, delay);
-      else resolve();
-    })
-    .then(function () {
-      _this.lastFetch = Date.now();
-      return fetch(input, init);
-    })
-    .then(function (res) {
+    return _this.lastFetch.then(function () {
+      _this.lastFetch = new Promise(function (resolve, reject) {
+        setTimeout(resolve, 1000);
+      });
       return new Promise(function (resolve, reject) {
-        if (res.status === 503) {
-          // TODO Too Many Requests
+        var xhr = new XMLHttpRequest;
+        xhr.open(options.method || 'GET', options.url, true);
+        var headers = _.assign({}, options.headers, _this.headers);
+        if (options.body && typeof options.body === 'object') {
+          headers['Content-Type'] = 'application/json';
+          options.body = JSON.stringify(options.body);
         }
-        res.status > 300 ? reject(res) : resolve(res);
+        for (var k in headers) {
+          var v = headers[k];
+          xhr.setRequestHeader(k, v);
+        }
+        xhr.onload = function () {
+          if (this.status > 300) reject(this);
+          else resolve(this.responseText);
+        };
+        xhr.onerror = function () {
+          if (this.status === 503) {
+            // TODO Too Many Requests
+          }
+          reject(this);
+        };
+        xhr.send(options.body);
       });
     });
   };
   Dropbox.prototype.put = function (path, data) {
-    path = encodeURIComponent(path);
-    return this.fetch('https://content.dropboxapi.com/1/files_put/auto/' + path, {
-      method: 'PUT',
+    return this.request({
+      method: 'POST',
+      url: 'https://content.dropboxapi.com/2/files/upload',
+      headers: {
+        'Dropbox-API-Arg': JSON.stringify({
+          path: '/' + path,
+          mode: 'overwrite',
+        }),
+        'Content-Type': 'application/octet-stream',
+      },
       body: data,
-    }).then(function (res) {
-      return res.json()
+    }).then(function (text) {
+      return JSON.parse(text);
     }).then(normalize);
   };
   Dropbox.prototype.get = function (path) {
-    path = encodeURIComponent(path);
-    return this.fetch('https://content.dropboxapi.com/1/files/auto/' + path)
-    .then(function (res) {
-      return res.text();
+    return this.request({
+      method: 'POST',
+      url: 'https://content.dropboxapi.com/2/files/download',
+      headers: {
+        'Dropbox-API-Arg': JSON.stringify({
+          path: '/' + path,
+        }),
+      },
     });
   };
   Dropbox.prototype.remove = function (path) {
-    return this.fetch('https://api.dropboxapi.com/1/fileops/delete', {
+    return this.request({
       method: 'POST',
-      headers: {
-        'Content-type': 'application/x-www-form-urlencoded',
-      },
-      body: searchParams.dump({
-        root: 'auto',
+      url: 'https://api.dropboxapi.com/2/files/delete',
+      body: {
         path: path,
-      }),
-    }).then(function (res) {
-      return res.json();
+      },
+    }).then(function (text) {
+      return JSON.parse(text);
     }).then(normalize);
   };
   Dropbox.prototype.list = function () {
     var _this = this;
-    //return _this.fetch('https://api.dropboxapi.com/1/metadata/auto/?include_deleted=true')
-    return _this.fetch('https://api.dropboxapi.com/1/metadata/auto/')
-    .then(function (res) {
-      return res.json();
+    return _this.request({
+      method: 'POST',
+      url: 'https://api.dropboxapi.com/2/files/list_folder',
+      body: {
+        path: '',
+      },
+    })
+    .then(function (text) {
+      return JSON.parse(text);
     })
     .then(function (data) {
-      return data.contents.filter(function (item) {
-        return !item.is_dir && /\.user\.js$/.test(item.path);
+      return data.entries.filter(function (item) {
+        return item['.tag'] === 'file' && /\.user\.js$/.test(item.name);
       }).map(normalize);
     });
   };
