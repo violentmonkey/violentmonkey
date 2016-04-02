@@ -352,7 +352,7 @@ VMDB.prototype.setValue = function (uri, values) {
   });
 };
 
-VMDB.prototype.updateScriptInfo = function (id, data) {
+VMDB.prototype.updateScriptInfo = function (id, data, custom) {
   var o = this.db.transaction('scripts', 'readwrite').objectStore('scripts');
   return new Promise(function (resolve, reject) {
     o.get(id).onsuccess = function (e) {
@@ -360,6 +360,7 @@ VMDB.prototype.updateScriptInfo = function (id, data) {
       if (!script) return reject();
       for (var k in data)
         if (k in script) script[k] = data[k];
+      _.assign(script.custom, custom);
       o.put(script).onsuccess = function (e) {
         resolve(scriptUtils.getScriptInfo(script));
       };

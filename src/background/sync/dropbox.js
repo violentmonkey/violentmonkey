@@ -70,7 +70,7 @@ setTimeout(function () {
   function normalize(item) {
     return {
       size: item.size,
-      uri: decodeURIComponent(item.name.slice(0, -8)),
+      uri: sync.utils.getURI(item.name),
       modified: new Date(item.server_modified).getTime(),
       //is_deleted: item.is_deleted,
     };
@@ -170,7 +170,7 @@ setTimeout(function () {
     })
     .then(function (data) {
       return data.entries.filter(function (item) {
-        return item['.tag'] === 'file' && /\.user\.js$/.test(item.name);
+        return item['.tag'] === 'file' && sync.utils.isScriptFile(item.name);
       }).map(normalize);
     });
   };

@@ -5,9 +5,9 @@ var commands = {
     return Promise.resolve(scriptUtils.newScript());
   },
   RemoveScript: function (id, src) {
-    sync.sync();
     return vmdb.removeScript(id)
     .then(function () {
+      sync.sync();
       _.messenger.post({
         cmd: 'del',
         data: id,
@@ -26,7 +26,7 @@ var commands = {
       injectMode: _.options.get('injectMode'),
       version: VM_VER,
     };
-    if(src.url == src.tab.url)
+    if (src.url == src.tab.url)
       chrome.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
     return data.isApplied
     ? vmdb.getScriptsByURL(url).then(function (res) {
@@ -34,7 +34,11 @@ var commands = {
     }) : Promise.resolve(data);
   },
   UpdateScriptInfo: function (data, src) {
-    return vmdb.updateScriptInfo(data.id, data).then(function (script) {
+    return vmdb.updateScriptInfo(data.id, data, {
+      modified: Date.now(),
+    })
+    .then(function (script) {
+      sync.sync();
       _.messenger.post({
         cmd: 'update',
         data: script,
