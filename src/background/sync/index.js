@@ -4,8 +4,16 @@ var sync = function () {
   var servicesReady = [];
   var queue, nextQueue = [];
   var syncing;
-  var timer;
   var inited;
+  var debouncedSync = _.debounce(function () {
+    console.log('Start to sync');
+    process();
+    autoSync();
+  }, 10 * 1000);
+  var autoSync = _.debounce(function () {
+    console.log('Auto start to sync');
+    sync();
+  }, 60 * 60 * 1000);
 
   function ServiceConfig(name) {
     this.prefix = name;
@@ -118,22 +126,17 @@ var sync = function () {
     if (syncing) return;
     queue = nextQueue;
     nextQueue = [];
-    queue.length && debouncedSync();
-  }
-  function debouncedSync() {
-    console.log('Ready to sync');
-    timer && clearTimeout(timer);
-    timer = setTimeout(function () {
-      timer = null;
-      console.log('Start to sync');
-      process();
-    }, 10000);
+    if (queue.length) {
+      console.log('Ready to sync');
+      debouncedSync();
+      return true;
+    }
   }
   function stopSync() {
     console.log('Sync ended');
     syncing = false;
     // start another check in case there are changes during sync
-    start();
+    start() || autoSync();
   }
   function process() {
     var service = queue.shift();
