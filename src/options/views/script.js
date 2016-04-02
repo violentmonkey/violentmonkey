@@ -80,8 +80,6 @@ var ScriptView = BaseView.extend({
     _.sendMessage({
       cmd: 'RemoveScript',
       data: _this.model.id,
-    }).then(function () {
-      scriptList.remove(_this.model);
     });
   },
   onRemoved: function () {

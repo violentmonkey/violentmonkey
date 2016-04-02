@@ -2,7 +2,7 @@ var sync = function () {
   var METAFILE = 'Violentmonkey';
   var services = [];
   var servicesReady = [];
-  var queue = [];
+  var queue, nextQueue = [];
   var syncing;
   var timer;
   var inited;
@@ -90,7 +90,7 @@ var sync = function () {
       for (var i = services.length; i --; ) {
         if (services[i].name === name) break;
       }
-      // i may be -1 if not founded
+      // i may be -1 if not found
       service = services[i];
     }
     return service;
@@ -104,15 +104,20 @@ var sync = function () {
       return res;
     }, {});
   }
-  function start(service) {
+  function sync(service) {
     if (service) {
-      service.config.getOption('enabled') && queue.push(service);
-    } else if (!syncing && queue.length < servicesReady.length) {
-      queue = servicesReady.filter(function (service) {
+      service.config.getOption('enabled') && nextQueue.push(service);
+    } else if (!syncing && nextQueue.length < servicesReady.length) {
+      nextQueue = servicesReady.filter(function (service) {
         return service.config.getOption('enabled');
       });
     }
+    start();
+  }
+  function start() {
     if (syncing) return;
+    queue = nextQueue;
+    nextQueue = [];
     queue.length && debouncedSync();
   }
   function debouncedSync() {
@@ -121,23 +126,25 @@ var sync = function () {
     timer = setTimeout(function () {
       timer = null;
       console.log('Start to sync');
-      sync();
+      process();
     }, 10000);
   }
   function stopSync() {
     console.log('Sync ended');
     syncing = false;
+    // start another check in case there are changes during sync
+    start();
   }
-  function sync() {
+  function process() {
     var service = queue.shift();
     if (!service) return stopSync();
     syncing = true;
-    syncOne(service).then(sync, stopSync);
+    syncOne(service).then(process, stopSync);
   }
   function initService(service) {
     service.on('init', function () {
       servicesReady.push(service);
-      start(service);
+      sync(service);
     });
     service.init();
   }
@@ -210,9 +217,11 @@ var sync = function () {
         getRemote.map(function (item) {
           console.log('Download script:', item.uri);
           return service.inst.get(getFilename(item.uri)).then(function (code) {
-            return commands.ParseScript({
+            return vmdb.parseScript({
               code: code,
               modified: item.modified,
+            }).then(function (res) {
+              _.messenger.post(res);
             });
           });
         }),
@@ -231,7 +240,13 @@ var sync = function () {
         }),
         delLocal.map(function (item) {
           console.log('Remove local script:', item.uri);
-          return vmdb.removeScript(item.id);
+          return vmdb.removeScript(item.id)
+          .then(function () {
+            _.messenger.post({
+              cmd: 'del',
+              data: item.id,
+            });
+          });
         })
       );
       promises.push(Promise.all(promises).then(function () {
@@ -259,7 +274,7 @@ var sync = function () {
 
   return {
     init: init,
-    start: start,
+    sync: sync,
     service: service,
     status: getStatuses,
   };

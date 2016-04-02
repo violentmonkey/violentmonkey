@@ -30,14 +30,22 @@ function initMain() {
   syncData = new Backbone.Model;
   var port = chrome.runtime.connect({name: 'Options'});
   port.onMessage.addListener(function (res) {
-    if (res.cmd === 'sync') {
-      syncData.set(res.data);
-    } else if (res.cmd === 'add') {
-      res.data.message = '';
-      scriptList.push(res.data);
-    } else if (res.data) {
-      var model = scriptList.get(res.data.id);
-      if (model) model.set(res.data);
+    switch (res.cmd) {
+      case 'sync':
+        syncData.set(res.data);
+        break;
+      case 'add':
+        res.data.message = '';
+        scriptList.push(res.data);
+        break;
+      case 'update':
+        if (res.data) {
+          var model = scriptList.get(res.data.id);
+          if (model) model.set(res.data);
+        }
+        break;
+      case 'del':
+        scriptList.remove(res.data);
     }
   });
 }

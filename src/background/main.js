@@ -5,8 +5,14 @@ var commands = {
     return Promise.resolve(scriptUtils.newScript());
   },
   RemoveScript: function (id, src) {
-    setTimeout(sync.start);
-    return vmdb.removeScript(id);
+    sync.sync();
+    return vmdb.removeScript(id)
+    .then(function () {
+      _.messenger.post({
+        cmd: 'del',
+        data: id,
+      });
+    });
   },
   GetData: function (data, src) {
     return vmdb.getData().then(function (data) {
@@ -73,7 +79,7 @@ var commands = {
           isClickable: true,
         });
       _.messenger.post(res);
-      sync.start();
+      sync.sync();
       return res.data;
     });
   },
@@ -117,7 +123,7 @@ var commands = {
     return false;
   },
   SyncStart: function (data, src) {
-    sync.start();
+    sync.sync();
     return false;
   },
 };
