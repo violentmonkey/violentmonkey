@@ -11,8 +11,8 @@ Language localization
 
 * If you are working with an existed locale file, the newly added items will
   have empty `message`s.
-  You may then check out `src/_locales/en/messages.yml` for the English version
-  and translate it.
+  You may then check out `src/_locales/en/messages.yml` for the English version and
+  translate it, or just leave it blank to use the English version as a fallback.
 
 Development
 ---

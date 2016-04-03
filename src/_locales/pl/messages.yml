@@ -149,7 +149,7 @@ labelRelated:
   message: 'Related links: '
 anchorSupportPage:
   description: Link to the support page of Violentmonkey.
-  message: '<a href=https://github.com/gera2ld/Violentmonkey/wiki target=_blank>Violentmonkey</a>'
+  message: ''
 labelDonate:
   description: Label of link to donate page.
   message: Dotacja
@@ -161,7 +161,7 @@ labelAuthor:
   message: 'Autor: '
 anchorAuthor:
   description: Author shown on about tab.
-  message: '<a href=mailto:gera2ld@163.com>Gerald</a>'
+  message: ''
 labelTranslator:
   description: Label of translator.
   message: 'Tłumacze: '

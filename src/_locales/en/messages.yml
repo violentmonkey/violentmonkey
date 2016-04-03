@@ -6,7 +6,7 @@ extDescription:
   message: Userscript support for Opera.
 extTranslator:
   description: Information of the translator.
-  message: 'Gerald <gera2ld@163.com>'
+  message: 'Gerald <i@gerald.top>'
   touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
@@ -149,7 +149,7 @@ labelRelated:
   message: 'Related links: '
 anchorSupportPage:
   description: Link to the support page of Violentmonkey.
-  message: '<a href=https://github.com/Violentmonkey/Violentmonkey/wiki target=_blank>Violentmonkey</a>'
+  message: '<a href=https://violentmonkey.github.io/violentmonkey/ target=_blank>Violentmonkey</a>'
 labelDonate:
   description: Label of link to donate page.
   message: Donate
@@ -161,13 +161,13 @@ labelAuthor:
   message: 'Author: '
 anchorAuthor:
   description: Author shown on about tab.
-  message: '<a href=mailto:gera2ld@163.com>Gerald</a>'
+  message: '<a href=mailto:i@gerald.top>Gerald</a>'
 labelTranslator:
   description: Label of translator.
   message: 'Translator: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href=mailto:gera2ld@163.com>Gerald</a>'
+  message: '<a href=mailto:i@gerald.top>Gerald</a>'
 labelCurrentLang:
   description: Label of current language.
   message: 'Current Language: '
