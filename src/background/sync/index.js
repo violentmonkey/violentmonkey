@@ -58,27 +58,26 @@ var sync = function () {
     _.options.set(this.prefix, this.data);
   };
 
-  function serviceStatus() {
-    var validStatused = [
-      'idle',
-      'initializing',
-      'authorized',
-      'unauthorized',
-    ];
-    var status = 'idle';
+  function serviceState(validStates, initialState, onChange) {
+    var state = initialState || validStates[0];
     return {
-      get: function () {return status;},
-      set: function (_status) {
-        if (~validStatused.indexOf(_status)) {
-          status = _status;
-          _.messenger.post({
-            cmd: 'sync',
-            data: getStatuses(),
-          });
+      get: function () {return state;},
+      set: function (_state) {
+        if (~validStates.indexOf(_state)) {
+          state = _state;
+          onChange && onChange();
+        } else {
+          console.warn('Invalid state:', _state);
         }
-        return status;
+        return state;
       },
     };
+  }
+  function onStateChange() {
+    _.messenger.post({
+      cmd: 'sync',
+      data: getStates(),
+    });
   }
   function service(name, methods) {
     var service;
@@ -87,7 +86,18 @@ var sync = function () {
       service = _.assign({}, methods, {
         name: name,
         config: new ServiceConfig(name),
-        status: serviceStatus(),
+        authState: serviceState([
+          'idle',
+          'initializing',
+          'authorized',
+          'unauthorized',
+          'error',
+        ], null, onStateChange),
+        syncState: serviceState([
+          'idle',
+          'syncing',
+          'error',
+        ], null, onStateChange),
       });
       setTimeout(function () {
         services.push(service);
@@ -103,14 +113,16 @@ var sync = function () {
     }
     return service;
   }
-  function getStatuses() {
-    return services.reduce(function (res, service) {
-      res[service.name] = {
-        status: service.status.get(),
+  function getStates() {
+    return services.map(function (service) {
+      return {
+        name: service.name,
+        displayName: service.displayName,
+        authState: service.authState.get(),
+        syncState: service.syncState.get(),
         timestamp: service.config.get('meta', {}).timestamp,
       };
-      return res;
-    }, {});
+    });
   }
   function sync(service) {
     if (service) {
@@ -142,7 +154,7 @@ var sync = function () {
     var service = queue.shift();
     if (!service) return stopSync();
     syncing = true;
-    syncOne(service).then(process, stopSync);
+    syncOne(service).then(process);
   }
   function initService(service) {
     service.on('init', function () {
@@ -166,6 +178,7 @@ var sync = function () {
   }
   function syncOne(service) {
     if (!service.inst) return;
+    service.syncState.set('syncing');
     return Promise.all([
       service.inst.list(),
       service.inst.get(METAFILE)
@@ -293,10 +306,21 @@ var sync = function () {
       }));
       return Promise.all(promises.map(function (promise) {
         // ignore errors to ensure all promises are fulfilled
-        return promise.catch(function (err) {
-          console.log(err);
+        return promise.then(function () {}, function (err) {
+          return err || true;
         });
-      }));
+      }))
+      .then(function (errors) {
+        errors = errors.filter(function (err) {return err;});
+        if (errors.length) throw errors;
+      });
+    })
+    .then(function () {
+      service.syncState.set('idle');
+    }, function (err) {
+      service.syncState.set('error');
+      console.log('Failed syncing:', service.name);
+      console.log(err);
     });
   }
 
@@ -304,7 +328,7 @@ var sync = function () {
     init: init,
     sync: sync,
     service: service,
-    status: getStatuses,
+    states: getStates,
     utils: {
       getFilename: getFilename,
       isScriptFile: isScriptFile,

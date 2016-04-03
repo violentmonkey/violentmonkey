@@ -5,6 +5,7 @@ setTimeout(function () {
   };
   var events = getEventEmitter();
   var dropbox = sync.service('dropbox', {
+    displayName: 'Dropbox',
     init: init,
     authenticate: authenticate,
     on: events.on,
@@ -21,7 +22,7 @@ setTimeout(function () {
 
   function init() {
     dropbox.inst = null;
-    dropbox.status.set('initializing');
+    dropbox.authState.set('initializing');
     var token = dropbox.config.get('token');
     if (token) {
       dropbox.inst = new Dropbox(token);
@@ -30,7 +31,7 @@ setTimeout(function () {
         url: 'https://api.dropboxapi.com/2/users/get_current_account',
       })
       .then(function (text) {
-        dropbox.status.set('authorized');
+        dropbox.authState.set('authorized');
         events.fire('init');
       }, function (res) {
         if (res.status > 300) {
@@ -38,12 +39,15 @@ setTimeout(function () {
         }
         if (res.status === 401) {
           dropbox.config.clear();
-          dropbox.status.set('unauthorized');
+          dropbox.authState.set('unauthorized');
+        } else {
+          dropbox.authState.set('error');
         }
+        dropbox.syncState.set('error');
         dropbox.config.setOption('enabled', false);
       });
     } else {
-      dropbox.status.set('unauthorized');
+      dropbox.authState.set('unauthorized');
     }
   }
   function authenticate() {
@@ -104,6 +108,7 @@ setTimeout(function () {
           var v = headers[k];
           xhr.setRequestHeader(k, v);
         }
+        xhr.timeout = 10 * 1000;
         xhr.onload = function () {
           if (this.status > 300) reject(this);
           else resolve(this.responseText);
@@ -112,9 +117,20 @@ setTimeout(function () {
           if (this.status === 503) {
             // TODO Too Many Requests
           }
-          reject(this);
+          requestError();
+        };
+        xhr.ontimeout = function () {
+          requestError('Timed out.');
         };
         xhr.send(options.body);
+
+        function requestError(reason) {
+          reject({
+            url: xhr.url,
+            status: xhr.status,
+            reason: reason || xhr.responseText,
+          });
+        }
       });
     });
   };

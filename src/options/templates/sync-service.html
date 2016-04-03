@@ -1,0 +1,17 @@
+<label>
+  <input type=checkbox data-check="<%= it.name + 'Enabled' %>" data-sync="<%= it.name %>" <%=
+  it.enabled ? 'checked' : ''
+  %> <%=
+  it.authorized ? '' : 'disabled'
+  %>>
+  <span><%= _.i18n('labelSyncTo', it.displayName || it.name) %></span>
+</label>
+<button data-auth="<%= it.name %>" <%= it.unauthorized ? '' : 'disabled' %>><%=
+  it.authorized ? _.i18n('buttonAuthorized') : _.i18n('buttonAuthorize')
+%></button>
+<span><%=
+  it.initializing ? _.i18n('msgSyncInit') :
+  it.error ? _.i18n('msgSyncError') :
+  it.syncing ? _.i18n('msgSyncing') :
+  it.lastSync ? _.i18n('lastSync', it.lastSync) : ''
+%></span>

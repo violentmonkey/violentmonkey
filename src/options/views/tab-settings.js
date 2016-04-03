@@ -31,7 +31,6 @@ var ExportList = BaseView.extend({
 
 var SettingsTab = BaseView.extend({
   el: '#tab',
-  name: 'settings',
   events: {
     'change [data-check]': 'updateCheckbox',
     'change #sInjectMode': 'updateInjectMode',
@@ -46,17 +45,16 @@ var SettingsTab = BaseView.extend({
   templateUrl: '/options/templates/tab-settings.html',
   initialize: function () {
     BaseView.prototype.initialize.call(this);
-    this.listenTo(syncData, 'change', this.render);
+    this.listenTo(syncData, 'reset', this.render);
   },
   _render: function () {
     var options = _.options.getAll();
-    var sync = options.sync = syncData.toJSON();
-    ['dropbox'].forEach(function (name) {
-      var service = sync[name] = sync[name] || {};
-      service.authorized = service.status === 'authorized';
-      service.unauthorized = service.status === 'unauthorized';
-    });
     this.$el.html(this.templateFn(options));
+    var syncServices = this.$('.sync-services');
+    syncData.each(function (service) {
+      var serviceView = new SyncServiceView({model: service});
+      syncServices.append(serviceView.$el);
+    });
     this.$('#sInjectMode').val(options.injectMode);
     this.updateInjectHint();
     this.exportList = new ExportList;

@@ -16,7 +16,7 @@ var commands = {
   },
   GetData: function (data, src) {
     return vmdb.getData().then(function (data) {
-      data.sync = sync.status();
+      data.sync = sync.states();
       return data;
     });
   },

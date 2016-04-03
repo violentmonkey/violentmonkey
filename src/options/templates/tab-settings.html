@@ -38,20 +38,6 @@
   </fieldset>
   <fieldset class=title>
     <legend data-i18n=labelSync></legend>
-    <div>
-      <label>
-        <input id=cbSyncDropbox type=checkbox data-check=dropboxEnabled data-sync=dropbox <%=
-        it.dropboxEnabled ? 'checked' : ''
-        %> <%=
-        it.sync.dropbox.authorized ? '' : 'disabled'
-        %>>
-        <span data-i18n=labelSyncDropbox></span>
-      </label>
-      <button data-auth=dropbox <%=
-        it.sync.dropbox.unauthorized ? '' : 'disabled'
-      %>><%=
-        it.sync.dropbox.authorized ? _.i18n('buttonAuthorized') : _.i18n('buttonAuthorize')
-      %></button>
-    </div>
+    <div class="sync-services"></div>
   </fieldset>
 </div>

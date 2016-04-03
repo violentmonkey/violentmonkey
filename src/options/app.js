@@ -27,12 +27,12 @@ BaseView.prototype.initI18n.call(window);
 var scriptList, syncData;
 function initMain() {
   scriptList = new ScriptList;
-  syncData = new Backbone.Model;
+  syncData = new Backbone.Collection;
   var port = chrome.runtime.connect({name: 'Options'});
   port.onMessage.addListener(function (res) {
     switch (res.cmd) {
       case 'sync':
-        syncData.set(res.data);
+        syncData.reset(res.data);
         break;
       case 'add':
         res.data.message = '';
