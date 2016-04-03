@@ -21,6 +21,7 @@ const paths = {
     'src/**/*.js',
     'src/**/*.html',
     'src/**/*.json',
+    'src/**/*.yml',
   ],
   copy: [
     'src/*.js',
@@ -97,6 +98,7 @@ gulp.task('copy-i18n', () => (
     touchedOnly: true,
     useDefaultLang: true,
     markUntouched: false,
+    extension: '.json',
   }))
   .pipe(gulp.dest('dist'))
 ));
@@ -119,6 +121,7 @@ gulp.task('i18n', () => (
     touchedOnly: false,
     useDefaultLang: false,
     markUntouched: true,
+    extension: '.yml',
   }))
   .pipe(gulp.dest('src'))
 ));

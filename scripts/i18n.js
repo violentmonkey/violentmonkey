@@ -1,23 +1,48 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const gutil = require('gulp-util');
 const through = require('through2');
-const fs = require('fs');
+const yaml = require('js-yaml');
 
-function Locale(lang, path, base) {
+function readFile(file) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, 'utf8', (err, data) => err ? reject(err) : resolve(data));
+  });
+}
+
+function Locale(lang, _path, base) {
   this.lang = lang;
-  this.path = path;
+  const ext = this.ext = path.extname(_path);
+  if (ext) _path = _path.slice(0, -ext.length);
+  this.path = _path;
   this.base = base || '.';
   this.data = {};
-  this.loaded = this.read();
+  this.loaded = this.load();
 }
-Locale.prototype.read = function () {
-  return new Promise((resolve, reject) => {
-    const file = this.base + '/' + this.path;
-    fs.readFile(file, 'utf8', (err, data) => err ? reject(err) : resolve(data));
-  }).then((data) => {
+Locale.prototype.extensions = ['.yml', '.json'];
+Locale.prototype.load = function () {
+  const file = this.base + '/' + this.path;
+  return (
+    this.ext
+      ? readFile(file + this.ext)
+      : this.extensions.reduce((promise, ext) => promise.catch(() => (
+        readFile(file + ext)
+        .then(data => {
+          this.ext = ext;
+          return data;
+        })
+      )), Promise.reject())
+  ).then(data => {
     const desc = {};
-    data = JSON.parse(data);
+    if (this.ext === '.json') {
+      data = JSON.parse(data);
+    } else if (this.ext === '.yml') {
+      data = yaml.safeLoad(data);
+    } else {
+      throw 'Unknown extension name!';
+    }
     for (let key in data) {
       this.data[key] = data[key].message;
       desc[key] = data[key].description;
@@ -27,6 +52,20 @@ Locale.prototype.read = function () {
 };
 Locale.prototype.get = function (key, def) {
   return this.data[key] || def;
+};
+Locale.prototype.dump = function (data, ext) {
+  ext = ext || this.ext;
+  if (ext === '.json') {
+    data = JSON.stringify(data, null, 2);
+  } else if (ext === '.yml') {
+    data = yaml.safeDump(data);
+  } else {
+    throw 'Unknown extension name!';
+  }
+  return {
+    path: this.path + ext,
+    data,
+  };
 };
 
 function Locales(prefix, base) {
@@ -49,7 +88,7 @@ Locales.prototype.load = function () {
   return this.getLanguages().then((langs) => {
     this.langs = langs;
     return Promise.all(langs.map((lang) => {
-      const locale = this.data[lang] = new Locale(lang, `${this.prefix}/${lang}/messages.json`, this.base);
+      const locale = this.data[lang] = new Locale(lang, `${this.prefix}/${lang}/messages`, this.base);
       return locale.loaded;
     }));
   }).then((data) => {
@@ -79,13 +118,14 @@ Locales.prototype.getData = function (lang, options) {
   return data;
 };
 Locales.prototype.dump = function (options) {
-  return this.langs.map((lang) => {
+  return this.langs.map(lang => {
     const data = this.getData(lang, options);
-    const string = JSON.stringify(data, null, 2);
+    const locale = this.data[lang];
+    const out = locale.dump(data, options.extension);
     return new gutil.File({
       base: '',
-      path: this.data[lang].path,
-      contents: new Buffer(string),
+      path: out.path,
+      contents: new Buffer(out.data),
     });
   });
 };
@@ -143,6 +183,7 @@ function extract(options) {
         touchedOnly: options.touchedOnly,
         useDefaultLang: options.useDefaultLang,
         markUntouched: options.markUntouched,
+        extension: options.extension,
       });
     }).then((files) => {
       files.forEach((file) => {
