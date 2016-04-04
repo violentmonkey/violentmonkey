@@ -348,3 +348,6 @@ msgSyncing:
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: 正在初始化...
+msgNamespaceConflict:
+  description: Message shown when namespace of the new script conflicts with an existent one.
+  message: 脚本命名空间冲突，请修改@name和@namespace！

@@ -335,3 +335,21 @@ fieldset.title {
   margin-left: 2px;
   background: red;
 }
+.message {
+  position: absolute;
+  width: 200px;
+  top: 0;
+  left: 50%;
+  margin-left: -100px;
+  padding: 16px;
+  z-index: 10;
+  transform: translateY(-120%);
+  transition: transform .5s;
+  background: white;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 0 5px rgba(0,0,0,.2);
+}
+.message-show {
+  transform: translateY(0);
+}

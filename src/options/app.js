@@ -1,5 +1,9 @@
 zip.workerScriptsPath = '/lib/zip.js/';
 
+_.showMessage = function (options) {
+  new MessageView(options);
+};
+
 var App = Backbone.Router.extend({
   routes: {
     '': 'renderMain',

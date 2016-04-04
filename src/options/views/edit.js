@@ -69,6 +69,10 @@ var EditView = BaseView.extend({
       }
     }).then(function () {
       _this.updateStatus(false);
+    }, function (err) {
+      _.showMessage({
+        data: err,
+      });
     });
   },
   close: function () {
@@ -76,7 +80,7 @@ var EditView = BaseView.extend({
       scriptList.trigger('edit:close');
   },
   saveClose: function () {
-    this.save().then(this.close.bind(this));
+    this.save().then(this.close);
   },
   hideMeta: function () {
     if (!this.metaView) return;

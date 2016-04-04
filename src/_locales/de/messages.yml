@@ -346,3 +346,6 @@ msgSyncing:
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: ''
+msgNamespaceConflict:
+  description: Message shown when namespace of the new script conflicts with an existent one.
+  message: ''
