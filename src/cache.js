@@ -35,7 +35,7 @@ var BaseView = Backbone.View.extend({
       .then(function (fn) {
         _this.templateFn = fn;
       });
-    _.bindAll(_this, 'render', 'initI18n');
+    _.bindAll(_this, 'render', 'postrender');
     _this.render();
   },
   _render: function () {
@@ -43,12 +43,16 @@ var BaseView = Backbone.View.extend({
   },
   render: function () {
     var render = this._render.bind(this);
-    (this.__gotTemplate || Promise.resolve()).then(render).then(this.initI18n);
+    (this.__gotTemplate || Promise.resolve()).then(render)
+    .then(this.postrender);
     return this;
   },
-  initI18n: function () {
+  postrender: function () {
     _.forEach(this.$('[data-i18n]'), function (node) {
       node.innerHTML = _.i18n(node.dataset.i18n);
+    });
+    _.forEach(this.$('[data-feature]'), function (node) {
+      _.features.isHit(node.dataset.feature) || node.classList.add('feature');
     });
   },
   getValue: function (target) {

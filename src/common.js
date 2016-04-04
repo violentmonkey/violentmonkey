@@ -14,6 +14,7 @@ _.options = function () {
     autoReload: false,
     dropbox: {},
     dropboxEnabled: false,
+    features: null,
   };
 
   function getOption(key, def) {
@@ -90,3 +91,33 @@ function format() {
   });
 }
 */
+
+_.features = function () {
+  var FEATURES = 'features';
+  var features = _.options.get(FEATURES);
+  if (!features || !features.data) features = {
+    data: {},
+  };
+
+  return {
+    init: init,
+    hit: hit,
+    isHit: isHit,
+  };
+
+  function init(version) {
+    if (features.version !== version) {
+      _.options.set(FEATURES, features = {
+        version: version,
+        data: {},
+      });
+    }
+  }
+  function hit(key) {
+    features.data[key] = 1;
+    _.options.set(FEATURES, features);
+  }
+  function isHit(key) {
+    return features.data[key];
+  }
+}();

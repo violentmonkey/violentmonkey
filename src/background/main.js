@@ -17,6 +17,7 @@ var commands = {
   GetData: function (data, src) {
     return vmdb.getData().then(function (data) {
       data.sync = sync.states();
+      data.version = VM_VER;
       return data;
     });
   },

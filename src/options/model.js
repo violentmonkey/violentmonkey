@@ -38,6 +38,7 @@ var ScriptList = Backbone.Collection.extend({
       _.assign(_this.cache, data.cache);
       _this.reset(data.scripts);
       syncData.reset(data.sync);
+      _.features.init(data.version);
     });
   },
 });

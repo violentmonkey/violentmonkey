@@ -22,7 +22,12 @@ var app = new App();
 if (!Backbone.history.start())
   app.navigate('', {trigger: true, replace: true});
 
-BaseView.prototype.initI18n.call(window);
+BaseView.prototype.postrender.call(window);
+$(document).on('click', '[data-feature]', function (e) {
+  var target = e.currentTarget;
+  _.features.hit(target.dataset.feature);
+  target.classList.remove('feature');
+});
 
 var scriptList, syncData;
 function initMain() {
