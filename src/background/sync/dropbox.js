@@ -23,6 +23,7 @@ setTimeout(function () {
   function init() {
     dropbox.inst = null;
     dropbox.authState.set('initializing');
+    dropbox.syncState.set('idle');
     var token = dropbox.config.get('token');
     if (token) {
       dropbox.inst = new Dropbox(token);

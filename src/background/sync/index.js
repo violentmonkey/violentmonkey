@@ -71,6 +71,9 @@ var sync = function () {
         }
         return state;
       },
+      is: function (_state) {
+        return state === _state;
+      },
     };
   }
   function onStateChange() {

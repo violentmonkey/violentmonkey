@@ -128,7 +128,15 @@ var commands = {
     return false;
   },
   SyncStart: function (data, src) {
-    sync.sync();
+    if (data) {
+      var service = sync.service(data);
+      if (service) {
+        if (service.authState.is('error')) service.init();
+        else sync.sync(service);
+      }
+    } else {
+      sync.sync();
+    }
     return false;
   },
 };

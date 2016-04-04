@@ -9,6 +9,9 @@
 <button data-auth="<%= it.name %>" <%= it.unauthorized ? '' : 'disabled' %>><%=
   it.authorized ? _.i18n('buttonAuthorized') : _.i18n('buttonAuthorize')
 %></button>
+<button <%= !_.includes(['authorized', 'error'], it.authState) || it.syncing ? 'disabled' : '' %> class="sync-start">
+  <i class="fa fa-refresh"></i>
+</button>
 <span><%=
   it.initializing ? _.i18n('msgSyncInit') :
   it.error ? _.i18n('msgSyncError') :
