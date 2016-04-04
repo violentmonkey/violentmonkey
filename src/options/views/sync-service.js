@@ -5,6 +5,7 @@ var SyncServiceView = BaseView.extend({
   },
   _render: function () {
     var it = this.model.toJSON();
+    it.enabled = _.options.get(it.name + 'Enabled');
     it.initializing = it.authState === 'initializing';
     it.authorized = it.authState === 'authorized';
     it.unauthorized = it.authState === 'unauthorized';
