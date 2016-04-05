@@ -61,6 +61,9 @@ var EditView = BaseView.extend({
       data: {
         id: data.id,
         code: data.code,
+        // User created scripts MUST be marked `isNew` so that
+        // the backend is able to check namespace conflicts
+        isNew: !data.id,
         message: '',
         more: {
           custom: data.custom,

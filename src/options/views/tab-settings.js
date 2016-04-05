@@ -31,6 +31,7 @@ var ExportList = BaseView.extend({
 
 var SettingsTab = BaseView.extend({
   el: '#tab',
+  name: 'settings',
   events: {
     'change [data-check]': 'updateCheckbox',
     'change #sInjectMode': 'updateInjectMode',
