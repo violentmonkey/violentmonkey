@@ -540,7 +540,7 @@ VMDB.prototype.parseScript = function (data) {
     });
   return _this.queryScript(data.id, meta, tx).then(function (script) {
     if (script) {
-      if (!data.id) throw _.i18n('msgNamespaceConflict');
+      if (data.isNew) throw _.i18n('msgNamespaceConflict');
     } else {
       script = scriptUtils.newScript();
       res.cmd = 'add';

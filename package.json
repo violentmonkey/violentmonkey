@@ -5,7 +5,8 @@
     "clean": "node -e \"require('del')(['dist'])\"",
     "dev": "gulp build && gulp watch",
     "i18n": "gulp i18n",
-    "update": "node scripts/updateLib"
+    "update": "node scripts/updateLib",
+    "version": "gulp build"
   },
   "description": "Violentmonkey",
   "devDependencies": {
