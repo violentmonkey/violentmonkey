@@ -1,4 +1,5 @@
 var SyncServiceView = BaseView.extend({
+  className: 'line',
   templateUrl: '/options/templates/sync-service.html',
   events: {
     'click .sync-start': 'retry',

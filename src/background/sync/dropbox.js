@@ -3,52 +3,12 @@ setTimeout(function () {
     client_id: 'f0q12zup2uys5w8',
     redirect_uri: 'https://violentmonkey.github.io/auth_dropbox.html',
   };
-  var events = getEventEmitter();
-  var dropbox = sync.service('dropbox', {
-    displayName: 'Dropbox',
-    init: init,
-    authenticate: authenticate,
-    on: events.on,
-  });
 
-  chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  function checkAuthenticate(url) {
     var redirect_uri = config.redirect_uri + '#';
-    var url = changeInfo.url;
-    if (url && url.slice(0, redirect_uri.length) === redirect_uri) {
+    if (url.slice(0, redirect_uri.length) === redirect_uri) {
       authorized(url.slice(redirect_uri.length));
-      chrome.tabs.remove(tabId);
-    }
-  });
-
-  function init() {
-    dropbox.inst = null;
-    dropbox.authState.set('initializing');
-    dropbox.syncState.set('idle');
-    var token = dropbox.config.get('token');
-    if (token) {
-      dropbox.inst = new Dropbox(token);
-      dropbox.inst.request({
-        method: 'POST',
-        url: 'https://api.dropboxapi.com/2/users/get_current_account',
-      })
-      .then(function (text) {
-        dropbox.authState.set('authorized');
-        events.fire('init');
-      }, function (res) {
-        if (res.status > 300) {
-          dropbox.inst = null;
-        }
-        if (res.status === 401) {
-          dropbox.config.clear();
-          dropbox.authState.set('unauthorized');
-        } else {
-          dropbox.authState.set('error');
-        }
-        dropbox.syncState.set('error');
-        dropbox.config.setOption('enabled', false);
-      });
-    } else {
-      dropbox.authState.set('unauthorized');
+      return true;
     }
   }
   function authenticate() {
@@ -69,7 +29,7 @@ setTimeout(function () {
         uid: data.uid,
         token: data.access_token,
       });
-      init();
+      this.prepare();
     }
   }
   function normalize(item) {
@@ -81,114 +41,71 @@ setTimeout(function () {
     };
   }
 
-  function Dropbox(token) {
-    this.token = token;
-    this.headers = {
-      Authorization: 'Bearer ' + token,
-    };
-    this.lastFetch = Promise.resolve();
-  }
-  Dropbox.prototype.request = function (options) {
-    var _this = this;
-    var lastFetch = _this.lastFetch;
-    _this.lastFetch = lastFetch.then(function () {
-      return new Promise(function (resolve, reject) {
-        setTimeout(resolve, 1000);
+  var Dropbox = sync.BaseService.extend({
+    name: 'dropbox',
+    displayName: 'Dropbox',
+    user: function () {
+      return this.request({
+        method: 'POST',
+        url: 'https://api.dropboxapi.com/2/users/get_current_account',
       });
-    });
-    return lastFetch.then(function () {
-      return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest;
-        xhr.open(options.method || 'GET', options.url, true);
-        var headers = _.assign({}, options.headers, _this.headers);
-        if (options.body && typeof options.body === 'object') {
-          headers['Content-Type'] = 'application/json';
-          options.body = JSON.stringify(options.body);
-        }
-        for (var k in headers) {
-          var v = headers[k];
-          xhr.setRequestHeader(k, v);
-        }
-        xhr.timeout = 10 * 1000;
-        xhr.onload = function () {
-          if (this.status > 300) reject(this);
-          else resolve(this.responseText);
-        };
-        xhr.onerror = function () {
-          if (this.status === 503) {
-            // TODO Too Many Requests
-          }
-          requestError();
-        };
-        xhr.ontimeout = function () {
-          requestError('Timed out.');
-        };
-        xhr.send(options.body);
-
-        function requestError(reason) {
-          reject({
-            url: xhr.url,
-            status: xhr.status,
-            reason: reason || xhr.responseText,
-          });
-        }
+    },
+    list: function () {
+      var _this = this;
+      return _this.request({
+        method: 'POST',
+        url: 'https://api.dropboxapi.com/2/files/list_folder',
+        body: {
+          path: '',
+        },
+      }).then(function (text) {
+        return JSON.parse(text);
+      }).then(function (data) {
+        return data.entries.filter(function (item) {
+          return item['.tag'] === 'file' && sync.utils.isScriptFile(item.name);
+        }).map(normalize);
       });
-    });
-  };
-  Dropbox.prototype.put = function (path, data) {
-    return this.request({
-      method: 'POST',
-      url: 'https://content.dropboxapi.com/2/files/upload',
-      headers: {
-        'Dropbox-API-Arg': JSON.stringify({
+    },
+    get: function (path) {
+      return this.request({
+        method: 'POST',
+        url: 'https://content.dropboxapi.com/2/files/download',
+        headers: {
+          'Dropbox-API-Arg': JSON.stringify({
+            path: '/' + path,
+          }),
+        },
+      });
+    },
+    put: function (path, data) {
+      return this.request({
+        method: 'POST',
+        url: 'https://content.dropboxapi.com/2/files/upload',
+        headers: {
+          'Dropbox-API-Arg': JSON.stringify({
+            path: '/' + path,
+            mode: 'overwrite',
+          }),
+          'Content-Type': 'application/octet-stream',
+        },
+        body: data,
+      }).then(function (text) {
+        return JSON.parse(text);
+      }).then(normalize);
+    },
+    remove: function (path) {
+      return this.request({
+        method: 'POST',
+        url: 'https://api.dropboxapi.com/2/files/delete',
+        body: {
           path: '/' + path,
-          mode: 'overwrite',
-        }),
-        'Content-Type': 'application/octet-stream',
-      },
-      body: data,
-    }).then(function (text) {
-      return JSON.parse(text);
-    }).then(normalize);
-  };
-  Dropbox.prototype.get = function (path) {
-    return this.request({
-      method: 'POST',
-      url: 'https://content.dropboxapi.com/2/files/download',
-      headers: {
-        'Dropbox-API-Arg': JSON.stringify({
-          path: '/' + path,
-        }),
-      },
-    });
-  };
-  Dropbox.prototype.remove = function (path) {
-    return this.request({
-      method: 'POST',
-      url: 'https://api.dropboxapi.com/2/files/delete',
-      body: {
-        path: '/' + path,
-      },
-    }).then(function (text) {
-      return JSON.parse(text);
-    }).then(normalize);
-  };
-  Dropbox.prototype.list = function () {
-    var _this = this;
-    return _this.request({
-      method: 'POST',
-      url: 'https://api.dropboxapi.com/2/files/list_folder',
-      body: {
-        path: '',
-      },
-    })
-    .then(function (text) {
-      return JSON.parse(text);
-    })
-    .then(function (data) {
-      return data.entries.filter(function (item) {
-        return item['.tag'] === 'file' && sync.utils.isScriptFile(item.name);
-      }).map(normalize);
-    });
-  };
+        },
+      }).then(function (text) {
+        return JSON.parse(text);
+      }).then(normalize);
+    },
+    authenticate: authenticate,
+    checkAuthenticate: checkAuthenticate,
+  });
+  var dropbox = sync.service('dropbox', Dropbox);
 });

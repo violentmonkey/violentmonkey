@@ -76,35 +76,18 @@ var sync = function () {
       },
     };
   }
-  function onStateChange() {
-    _.messenger.post({
-      cmd: 'sync',
-      data: getStates(),
-    });
-  }
-  function service(name, methods) {
+  function service(name, Service) {
     var service;
-    if (methods) {
+    if (typeof name === 'function') {
+      Service = name;
+      name = Service.prototype.name || Service.name;
+    }
+    if (Service) {
       // initialize
-      service = _.assign({}, methods, {
-        name: name,
-        config: new ServiceConfig(name),
-        authState: serviceState([
-          'idle',
-          'initializing',
-          'authorized',
-          'unauthorized',
-          'error',
-        ], null, onStateChange),
-        syncState: serviceState([
-          'idle',
-          'syncing',
-          'error',
-        ], null, onStateChange),
-      });
+      service = new Service(name);
       setTimeout(function () {
         services.push(service);
-        inited && initService(service);
+        inited && service.prepare();
       });
     } else {
       // get existent instance
@@ -130,7 +113,7 @@ var sync = function () {
   function sync(service) {
     if (service) {
       service.config.getOption('enabled') && nextQueue.push(service);
-    } else if (!syncing && nextQueue.length < servicesReady.length) {
+    } else if (!syncing) {
       nextQueue = servicesReady.filter(function (service) {
         return service.config.getOption('enabled');
       });
@@ -157,18 +140,13 @@ var sync = function () {
     var service = queue.shift();
     if (!service) return stopSync();
     syncing = true;
-    syncOne(service).then(process);
-  }
-  function initService(service) {
-    service.on('init', function () {
-      servicesReady.push(service);
-      sync(service);
-    });
-    service.init();
+    service.sync().then(process);
   }
   function init() {
     inited = true;
-    services.forEach(initService);
+    services.forEach(function (service) {
+      service.prepare();
+    });
   }
   function getFilename(uri) {
     return 'vm-' + encodeURIComponent(uri);
@@ -179,153 +157,290 @@ var sync = function () {
   function isScriptFile(name) {
     return /^vm-/.test(name);
   }
-  function syncOne(service) {
-    if (!service.inst) return;
-    service.syncState.set('syncing');
-    return Promise.all([
-      service.inst.list(),
-      service.inst.get(METAFILE)
-      .then(function (data) {
-        return JSON.parse(data);
-      }, function (res) {
-        if (res.status === 404) {
-          return {};
-        }
-        throw res;
-      }),
-      vmdb.getScriptsByIndex('position'),
-    ]).then(function (res) {
-      var remote = {
-        data: res[0],
-        meta: res[1],
-      };
-      var local = {
-        data: res[2],
-        meta: service.config.get('meta', {}),
-      };
-      var firstSync = !local.meta.timestamp;
-      var outdated = !local.meta.timestamp || remote.meta.timestamp > local.meta.timestamp;
-      console.log('First sync:', firstSync);
-      console.log('Outdated:', outdated, '(', 'local:', local.meta.timestamp, 'remote:', remote.meta.timestamp, ')');
-      var map = {};
-      var getRemote = [];
-      var putRemote = [];
-      var delRemote = [];
-      var delLocal = [];
-      remote.data.forEach(function (item) {
-        map[item.uri] = item;
-      });
-      local.data.forEach(function (item) {
-        var remoteItem = map[item.uri];
-        if (remoteItem) {
-          if (firstSync || !item.custom.modified || remoteItem.modified > item.custom.modified) {
-            getRemote.push(remoteItem);
-          } else if (remoteItem.modified < item.custom.modified) {
-            putRemote.push(item);
-          }
-          delete map[item.uri];
-        } else if (firstSync || !outdated) {
-          putRemote.push(item);
-        } else {
-          delLocal.push(item);
-        }
-      });
-      for (var uri in map) {
-        var item = map[uri];
-        if (outdated) {
-          getRemote.push(item);
-        } else {
-          delRemote.push(item);
-        }
-      }
-      var promises = [].concat(
-        getRemote.map(function (item) {
-          console.log('Download script:', item.uri);
-          return service.inst.get(getFilename(item.uri)).then(function (raw) {
-            var data = {};
-            try {
-              var obj = JSON.parse(raw);
-              if (obj.version === 1) {
-                data.code = obj.code;
-                data.more = obj.more;
-              }
-            } catch (e) {
-              data.code = raw;
-            }
-            data.modified = item.modified;
-            return vmdb.parseScript(data)
-            .then(function (res) {
-              _.messenger.post(res);
-            });
-          });
-        }),
-        putRemote.map(function (item) {
-          console.log('Upload script:', item.uri);
-          var data = JSON.stringify({
-            version: 1,
-            code: item.code,
-            more: {
-              custom: item.custom,
-              enabled: item.enabled,
-              update: item.update,
-            },
-          });
-          return service.inst.put(getFilename(item.uri), data)
-          .then(function (data) {
-            if (item.custom.modified !== data.modified) {
-              item.custom.modified = data.modified;
-              return vmdb.saveScript(item);
-            }
-          });
-        }),
-        delRemote.map(function (item) {
-          console.log('Remove remote script:', item.uri);
-          return service.inst.remove(getFilename(item.uri));
-        }),
-        delLocal.map(function (item) {
-          console.log('Remove local script:', item.uri);
-          return vmdb.removeScript(item.id)
-          .then(function () {
-            _.messenger.post({
-              cmd: 'del',
-              data: item.id,
-            });
-          });
-        })
-      );
-      promises.push(Promise.all(promises).then(function () {
-        var promises = [];
-        var remoteChanged;
-        if (!remote.meta.timestamp || putRemote.length || delRemote.length) {
-          remoteChanged = true;
-          remote.meta.timestamp = Date.now();
-          promises.push(service.inst.put(METAFILE, JSON.stringify(remote.meta)));
-        }
-        if (!local.meta.timestamp || getRemote.length || delLocal.length || remoteChanged || outdated) {
-          local.meta.timestamp = remote.meta.timestamp;
-          service.config.set('meta', local.meta);
-        }
-        return Promise.all(promises);
-      }));
-      return Promise.all(promises.map(function (promise) {
-        // ignore errors to ensure all promises are fulfilled
-        return promise.then(function () {}, function (err) {
-          return err || true;
-        });
-      }))
-      .then(function (errors) {
-        errors = errors.filter(function (err) {return err;});
-        if (errors.length) throw errors;
-      });
-    })
-    .then(function () {
-      service.syncState.set('idle');
-    }, function (err) {
-      service.syncState.set('error');
-      console.log('Failed syncing:', service.name);
-      console.log(err);
-    });
+
+  function serviceFactory(base, options) {
+    var Service = function () {
+      this.initialize.apply(this, arguments);
+    };
+    Service.prototype = _.assign(Object.create(base), options);
+    Service.extend = extendService;
+    return Service;
   }
+  function extendService(options) {
+    return serviceFactory(this.prototype, options);
+  }
+  var BaseService = serviceFactory({
+    name: 'base',
+    displayName: 'BaseService',
+    initialize: function (name) {
+      var _this = this;
+      if (name) _this.name = name;
+      _this.config = new ServiceConfig(_this.name);
+      _this.authState = serviceState([
+        'idle',
+        'initializing',
+        'authorized',
+        'unauthorized',
+        'error',
+      ], null, _this.onStateChange),
+      _this.syncState = serviceState([
+        'idle',
+        'syncing',
+        'error',
+      ], null, _this.onStateChange),
+      _this.initHeaders();
+      _this.events = getEventEmitter();
+      _this.lastFetch = Promise.resolve();
+    },
+    on: function () {
+      return this.events.on.apply(null, arguments);
+    },
+    off: function () {
+      return this.events.off.apply(null, arguments);
+    },
+    fire: function () {
+      return this.events.fire.apply(null, arguments);
+    },
+    onStateChange: function () {
+      _.messenger.post({
+        cmd: 'sync',
+        data: getStates(),
+      });
+    },
+    prepare: function () {
+      var _this = this;
+      var token = _this.token = _this.config.get('token');
+      _this.initHeaders();
+      (token ? Promise.resolve(_this.user()) : Promise.reject())
+      .then(function (text) {
+        _this.authState.set('authorized');
+        servicesReady.push(_this);
+        sync(_this);
+      }, function (err) {
+        if (err) {
+          if (err.status === 401) {
+            _this.config.clear();
+            _this.authState.set('unauthorized');
+          } else {
+            _this.authState.set('error');
+          }
+          _this.syncState.set('error');
+          _this.config.setOption('enabled', false);
+        } else {
+          _this.authState.set('unauthorized');
+        }
+      });
+    },
+    user: function () {},
+    initHeaders: function () {
+      var headers = this.headers = {};
+      var token = this.token;
+      if (token) headers.Authorization = 'Bearer ' + token;
+    },
+    request: function (options) {
+      var _this = this;
+      var lastFetch = _this.lastFetch;
+      _this.lastFetch = lastFetch.then(function () {
+        return new Promise(function (resolve, reject) {
+          setTimeout(resolve, 1000);
+        });
+      });
+      return lastFetch.then(function () {
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest;
+          xhr.open(options.method || 'GET', options.url, true);
+          var headers = _.assign({}, _this.headers, options.headers);
+          if (options.body && typeof options.body === 'object') {
+            headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(options.body);
+          }
+          for (var k in headers) {
+            var v = headers[k];
+            v && xhr.setRequestHeader(k, v);
+          }
+          xhr.timeout = 10 * 1000;
+          xhr.onload = function () {
+            if (this.status > 300) reject(this);
+            else resolve(this.responseText);
+          };
+          xhr.onerror = function () {
+            if (this.status === 503) {
+              // TODO Too Many Requests
+            }
+            requestError();
+          };
+          xhr.ontimeout = function () {
+            requestError('Timed out.');
+          };
+          xhr.send(options.body);
+
+          function requestError(reason) {
+            reject({
+              url: xhr.url,
+              status: xhr.status,
+              reason: reason || xhr.responseText,
+            });
+          }
+        });
+      });
+    },
+    sync: function () {
+      var _this = this;
+      if (!_this.authState.is('authorized') || !_this.config.getOption('enabled'))
+        return Promise.resolve();
+      _this.syncState.set('syncing');
+      return Promise.all([
+        _this.list(),
+        _this.get(METAFILE)
+        .then(function (data) {
+          return JSON.parse(data);
+        }, function (res) {
+          if (res.status === 404) {
+            return {};
+          }
+          throw res;
+        }),
+        vmdb.getScriptsByIndex('position'),
+      ]).then(function (res) {
+        var remote = {
+          data: res[0],
+          meta: res[1],
+        };
+        var local = {
+          data: res[2],
+          meta: _this.config.get('meta', {}),
+        };
+        var firstSync = !local.meta.timestamp;
+        var outdated = !local.meta.timestamp || remote.meta.timestamp > local.meta.timestamp;
+        console.log('First sync:', firstSync);
+        console.log('Outdated:', outdated, '(', 'local:', local.meta.timestamp, 'remote:', remote.meta.timestamp, ')');
+        var map = {};
+        var getRemote = [];
+        var putRemote = [];
+        var delRemote = [];
+        var delLocal = [];
+        remote.data.forEach(function (item) {
+          map[item.uri] = item;
+        });
+        local.data.forEach(function (item) {
+          var remoteItem = map[item.uri];
+          if (remoteItem) {
+            if (firstSync || !item.custom.modified || remoteItem.modified > item.custom.modified) {
+              getRemote.push(remoteItem);
+            } else if (remoteItem.modified < item.custom.modified) {
+              putRemote.push(item);
+            }
+            delete map[item.uri];
+          } else if (firstSync || !outdated) {
+            putRemote.push(item);
+          } else {
+            delLocal.push(item);
+          }
+        });
+        for (var uri in map) {
+          var item = map[uri];
+          if (outdated) {
+            getRemote.push(item);
+          } else {
+            delRemote.push(item);
+          }
+        }
+        var promises = [].concat(
+          getRemote.map(function (item) {
+            console.log('Download script:', item.uri);
+            return _this.get(getFilename(item.uri)).then(function (raw) {
+              var data = {};
+              try {
+                var obj = JSON.parse(raw);
+                if (obj.version === 1) {
+                  data.code = obj.code;
+                  data.more = obj.more;
+                }
+              } catch (e) {
+                data.code = raw;
+              }
+              data.modified = item.modified;
+              return vmdb.parseScript(data)
+              .then(function (res) {
+                _.messenger.post(res);
+              });
+            });
+          }),
+          putRemote.map(function (item) {
+            console.log('Upload script:', item.uri);
+            var data = JSON.stringify({
+              version: 1,
+              code: item.code,
+              more: {
+                custom: item.custom,
+                enabled: item.enabled,
+                update: item.update,
+              },
+            });
+            return _this.put(getFilename(item.uri), data)
+            .then(function (data) {
+              if (item.custom.modified !== data.modified) {
+                item.custom.modified = data.modified;
+                return vmdb.saveScript(item);
+              }
+            });
+          }),
+          delRemote.map(function (item) {
+            console.log('Remove remote script:', item.uri);
+            return _this.remove(getFilename(item.uri));
+          }),
+          delLocal.map(function (item) {
+            console.log('Remove local script:', item.uri);
+            return vmdb.removeScript(item.id)
+            .then(function () {
+              _.messenger.post({
+                cmd: 'del',
+                data: item.id,
+              });
+            });
+          })
+        );
+        promises.push(Promise.all(promises).then(function () {
+          var promises = [];
+          var remoteChanged;
+          if (!remote.meta.timestamp || putRemote.length || delRemote.length) {
+            remoteChanged = true;
+            remote.meta.timestamp = Date.now();
+            promises.push(_this.put(METAFILE, JSON.stringify(remote.meta)));
+          }
+          if (!local.meta.timestamp || getRemote.length || delLocal.length || remoteChanged || outdated) {
+            local.meta.timestamp = remote.meta.timestamp;
+            _this.config.set('meta', local.meta);
+          }
+          return Promise.all(promises);
+        }));
+        return Promise.all(promises.map(function (promise) {
+          // ignore errors to ensure all promises are fulfilled
+          return promise.then(function () {}, function (err) {
+            return err || true;
+          });
+        }))
+        .then(function (errors) {
+          errors = errors.filter(function (err) {return err;});
+          if (errors.length) throw errors;
+        });
+      })
+      .then(function () {
+        _this.syncState.set('idle');
+      }, function (err) {
+        _this.syncState.set('error');
+        console.log('Failed syncing:', _this.name);
+        console.log(err);
+      });
+    },
+  });
+
+  chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    var url = changeInfo.url;
+    url && services.some(function (service) {
+      return service.checkAuthenticate && service.checkAuthenticate(url);
+    }) && chrome.tabs.remove(tabId);
+  });
 
   return {
     init: init,
@@ -337,5 +452,6 @@ var sync = function () {
       isScriptFile: isScriptFile,
       getURI: getURI,
     },
+    BaseService: BaseService,
   };
 }();
