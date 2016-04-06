@@ -7,6 +7,8 @@ var sync = function () {
   var inited;
   var debouncedSync = _.debounce(function () {
     console.log('Start to sync');
+    queue = nextQueue;
+    nextQueue = [];
     process();
     autoSync();
   }, 10 * 1000);
@@ -122,9 +124,7 @@ var sync = function () {
   }
   function start() {
     if (syncing) return;
-    queue = nextQueue;
-    nextQueue = [];
-    if (queue.length) {
+    if (nextQueue.length) {
       console.log('Ready to sync');
       debouncedSync();
       return true;
@@ -172,6 +172,14 @@ var sync = function () {
   var BaseService = serviceFactory({
     name: 'base',
     displayName: 'BaseService',
+    delayTime: 1000,
+    urlPrefix: '',
+    delay: function (time) {
+      if (time == null) time = this.delayTime;
+      return new Promise(function (resolve, reject) {
+        setTimeout(resolve, time);
+      });
+    },
     initialize: function (name) {
       var _this = this;
       if (name) _this.name = name;
@@ -239,16 +247,19 @@ var sync = function () {
     },
     request: function (options) {
       var _this = this;
-      var lastFetch = _this.lastFetch;
-      _this.lastFetch = lastFetch.then(function () {
-        return new Promise(function (resolve, reject) {
-          setTimeout(resolve, 1000);
+      var lastFetch;
+      if (options.noDelay) {
+        lastFetch = Promise.resolve();
+      } else {
+        lastFetch = _this.lastFetch;
+        _this.lastFetch = lastFetch.then(function () {
+          return _this.delay();
         });
-      });
+      }
       return lastFetch.then(function () {
         return new Promise(function (resolve, reject) {
           var xhr = new XMLHttpRequest;
-          xhr.open(options.method || 'GET', options.url, true);
+          xhr.open(options.method || 'GET', _this.urlPrefix + options.url, true);
           var headers = _.assign({}, _this.headers, options.headers);
           if (options.body && typeof options.body === 'object') {
             headers['Content-Type'] = 'application/json';
@@ -276,7 +287,7 @@ var sync = function () {
 
           function requestError(reason) {
             reject({
-              url: xhr.url,
+              url: options.url,
               status: xhr.status,
               reason: reason || xhr.responseText,
             });

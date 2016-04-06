@@ -4,13 +4,6 @@ setTimeout(function () {
     redirect_uri: 'https://violentmonkey.github.io/auth_dropbox.html',
   };
 
-  function checkAuthenticate(url) {
-    var redirect_uri = config.redirect_uri + '#';
-    if (url.slice(0, redirect_uri.length) === redirect_uri) {
-      authorized(url.slice(redirect_uri.length));
-      return true;
-    }
-  }
   function authenticate() {
     var params = {
       response_type: 'token',
@@ -22,6 +15,13 @@ setTimeout(function () {
     url += '?' + qs;
     chrome.tabs.create({url: url});
   }
+  function checkAuthenticate(url) {
+    var redirect_uri = config.redirect_uri + '#';
+    if (url.slice(0, redirect_uri.length) === redirect_uri) {
+      authorized(url.slice(redirect_uri.length));
+      return true;
+    }
+  }
   function authorized(raw) {
     var data = searchParams.load(raw);
     if (data.access_token) {
@@ -29,7 +29,7 @@ setTimeout(function () {
         uid: data.uid,
         token: data.access_token,
       });
-      this.prepare();
+      dropbox.prepare();
     }
   }
   function normalize(item) {
