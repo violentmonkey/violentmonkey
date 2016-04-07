@@ -1,5 +1,4 @@
 var sync = function () {
-  var METAFILE = 'Violentmonkey';
   var services = [];
   var servicesReady = [];
   var queue, nextQueue = [];
@@ -89,7 +88,7 @@ var sync = function () {
       service = new Service(name);
       setTimeout(function () {
         services.push(service);
-        inited && service.prepare();
+        inited && service.checkSync();
       });
     } else {
       // get existent instance
@@ -145,7 +144,7 @@ var sync = function () {
   function init() {
     inited = true;
     services.forEach(function (service) {
-      service.prepare();
+      service.checkSync();
     });
   }
   function getFilename(uri) {
@@ -174,6 +173,7 @@ var sync = function () {
     displayName: 'BaseService',
     delayTime: 1000,
     urlPrefix: '',
+    metaFile: 'Violentmonkey',
     delay: function (time) {
       if (time == null) time = this.delayTime;
       return new Promise(function (resolve, reject) {
@@ -188,6 +188,7 @@ var sync = function () {
         'idle',
         'initializing',
         'authorized',
+        'authorizing',  // in case some services require asynchronous requests to get access_tokens
         'unauthorized',
         'error',
       ], null, _this.onStateChange),
@@ -219,8 +220,12 @@ var sync = function () {
       var _this = this;
       var token = _this.token = _this.config.get('token');
       _this.initHeaders();
-      (token ? Promise.resolve(_this.user()) : Promise.reject())
-      .then(function (text) {
+      return (token ? Promise.resolve(_this.user()) : Promise.reject());
+    },
+    checkSync: function () {
+      var _this = this;
+      return _this.prepare()
+      .then(function () {
         _this.authState.set('authorized');
         servicesReady.push(_this);
         sync(_this);
@@ -232,7 +237,7 @@ var sync = function () {
           } else {
             _this.authState.set('error');
           }
-          _this.syncState.set('error');
+          _this.syncState.set('idle');
           _this.config.setOption('enabled', false);
         } else {
           _this.authState.set('unauthorized');
@@ -240,6 +245,18 @@ var sync = function () {
       });
     },
     user: function () {},
+    getMeta: function () {
+      var _this = this;
+      return _this.get(_this.metaFile)
+      .then(function (data) {
+        return JSON.parse(data);
+      }, function (res) {
+        if (res.status === 404) {
+          return {};
+        }
+        throw res;
+      });
+    },
     initHeaders: function () {
       var headers = this.headers = {};
       var token = this.token;
@@ -259,7 +276,9 @@ var sync = function () {
       return lastFetch.then(function () {
         return new Promise(function (resolve, reject) {
           var xhr = new XMLHttpRequest;
-          xhr.open(options.method || 'GET', _this.urlPrefix + options.url, true);
+          var prefix = options.prefix;
+          if (prefix == null) prefix = _this.urlPrefix;
+          xhr.open(options.method || 'GET', prefix + options.url, true);
           var headers = _.assign({}, _this.headers, options.headers);
           if (options.body && typeof options.body === 'object') {
             headers['Content-Type'] = 'application/json';
@@ -300,26 +319,21 @@ var sync = function () {
       if (!_this.authState.is('authorized') || !_this.config.getOption('enabled'))
         return Promise.resolve();
       _this.syncState.set('syncing');
-      return Promise.all([
-        _this.list(),
-        _this.get(METAFILE)
-        .then(function (data) {
-          return JSON.parse(data);
-        }, function (res) {
-          if (res.status === 404) {
-            return {};
-          }
-          throw res;
-        }),
-        vmdb.getScriptsByIndex('position'),
-      ]).then(function (res) {
+      return _this.getMeta()
+      .then(function (meta) {
+        return Promise.all([
+          meta,
+          _this.list(),
+          vmdb.getScriptsByIndex('position'),
+        ]);
+      }).then(function (res) {
         var remote = {
-          data: res[0],
-          meta: res[1],
+          meta: res[0],
+          data: res[1],
         };
         var local = {
-          data: res[2],
           meta: _this.config.get('meta', {}),
+          data: res[2],
         };
         var firstSync = !local.meta.timestamp;
         var outdated = !local.meta.timestamp || remote.meta.timestamp > local.meta.timestamp;
@@ -417,7 +431,7 @@ var sync = function () {
           if (!remote.meta.timestamp || putRemote.length || delRemote.length) {
             remoteChanged = true;
             remote.meta.timestamp = Date.now();
-            promises.push(_this.put(METAFILE, JSON.stringify(remote.meta)));
+            promises.push(_this.put(_this.metaFile, JSON.stringify(remote.meta)));
           }
           if (!local.meta.timestamp || getRemote.length || delLocal.length || remoteChanged || outdated) {
             local.meta.timestamp = remote.meta.timestamp;
