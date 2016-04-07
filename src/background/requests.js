@@ -7,7 +7,7 @@ var requests = function () {
     'origin',
     'host',
   ];
-  var tasks = {};
+  // var tasks = {};
 
   function getRequestId() {
     var id = _.getUniqId();
@@ -152,36 +152,37 @@ var requests = function () {
     types: ['xmlhttprequest'],
   }, ['blocking', 'requestHeaders']);
 
+  // tasks are not necessary now, turned off
   // Stop redirects
-  chrome.webRequest.onHeadersReceived.addListener(function (details) {
-    var task = tasks[details.requestId];
-    if (task) {
-      delete tasks[details.requestId];
-      if (task === 'Get-Location' && _.includes([301, 302, 303], details.statusCode)) {
-        var locationHeader = _.find(details.responseHeaders, function (header) {
-          return header.name.toLowerCase() === 'location';
-        });
-        return {
-          redirectUrl: 'data:text/plain;charset=utf-8,' + (locationHeader && locationHeader.value || ''),
-        };
-      }
-    }
-  }, {
-    urls: ['<all_urls>'],
-    types: ['xmlhttprequest'],
-  }, ['blocking', 'responseHeaders']);
-  chrome.webRequest.onCompleted.addListener(function (details) {
-    delete tasks[details.requestId];
-  }, {
-    urls: ['<all_urls>'],
-    types: ['xmlhttprequest'],
-  });
-  chrome.webRequest.onErrorOccurred.addListener(function (details) {
-    delete tasks[details.requestId];
-  }, {
-    urls: ['<all_urls>'],
-    types: ['xmlhttprequest'],
-  });
+  // chrome.webRequest.onHeadersReceived.addListener(function (details) {
+  //   var task = tasks[details.requestId];
+  //   if (task) {
+  //     delete tasks[details.requestId];
+  //     if (task === 'Get-Location' && _.includes([301, 302, 303], details.statusCode)) {
+  //       var locationHeader = _.find(details.responseHeaders, function (header) {
+  //         return header.name.toLowerCase() === 'location';
+  //       });
+  //       return {
+  //         redirectUrl: 'data:text/plain;charset=utf-8,' + (locationHeader && locationHeader.value || ''),
+  //       };
+  //     }
+  //   }
+  // }, {
+  //   urls: ['<all_urls>'],
+  //   types: ['xmlhttprequest'],
+  // }, ['blocking', 'responseHeaders']);
+  // chrome.webRequest.onCompleted.addListener(function (details) {
+  //   delete tasks[details.requestId];
+  // }, {
+  //   urls: ['<all_urls>'],
+  //   types: ['xmlhttprequest'],
+  // });
+  // chrome.webRequest.onErrorOccurred.addListener(function (details) {
+  //   delete tasks[details.requestId];
+  // }, {
+  //   urls: ['<all_urls>'],
+  //   types: ['xmlhttprequest'],
+  // });
 
   chrome.webRequest.onBeforeRequest.addListener(function (req) {
     // onBeforeRequest is fired for local files too
