@@ -14,6 +14,8 @@ _.options = function () {
     autoReload: false,
     dropbox: {},
     dropboxEnabled: false,
+    onedrive: {},
+    onedriveEnabled: false,
     features: null,
   };
 
