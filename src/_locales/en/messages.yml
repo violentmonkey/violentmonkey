@@ -149,7 +149,7 @@ labelRelated:
   message: 'Related links: '
 anchorSupportPage:
   description: Link to the support page of Violentmonkey.
-  message: '<a href=https://violentmonkey.github.io/violentmonkey/ target=_blank>Violentmonkey</a>'
+  message: '<a href=https://violentmonkey.github.io/nex/ target=_blank>Violentmonkey</a>'
 labelDonate:
   description: Label of link to donate page.
   message: Donate
