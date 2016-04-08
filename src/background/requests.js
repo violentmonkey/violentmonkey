@@ -7,6 +7,7 @@ var requests = function () {
     'origin',
     'host',
   ];
+  // var tasks = {};
 
   function getRequestId() {
     var id = _.getUniqId();
@@ -123,36 +124,70 @@ var requests = function () {
   // Modifications on headers
   chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
     var headers = details.requestHeaders;
-    var new_headers = [];
-    var vm_headers = {};
+    var newHeaders = [];
+    var vmHeaders = {};
     headers.forEach(function (header) {
-      if (header.name.substr(0, 3) == 'VM-')
-        vm_headers[header.name.slice(3)] = header.value;
+      if (header.name === 'VM-Task')
+        tasks[details.requestId] = header.value;
+      else if (header.name.slice(0, 3) === 'VM-')
+        vmHeaders[header.name.slice(3)] = header.value;
       else
-        new_headers.push(header);
+        newHeaders.push(header);
     });
-    var reqId = vm_headers['Verify'];
+    var reqId = vmHeaders['Verify'];
     if (reqId) {
       var req = requests[reqId];
       if (req) {
-        delete vm_headers['Verify'];
+        delete vmHeaders['Verify'];
         verify[details.requestId] = reqId;
         req.coreId = details.requestId;
-        for (var i in vm_headers)
+        for (var i in vmHeaders)
           if (~special_headers.indexOf(i.toLowerCase()))
-            new_headers.push({name: i, value: vm_headers[i]});
+            newHeaders.push({name: i, value: vmHeaders[i]});
       }
     }
-    return {requestHeaders: new_headers};
+    return {requestHeaders: newHeaders};
   }, {
     urls: ['<all_urls>'],
     types: ['xmlhttprequest'],
   }, ['blocking', 'requestHeaders']);
 
+  // tasks are not necessary now, turned off
+  // Stop redirects
+  // chrome.webRequest.onHeadersReceived.addListener(function (details) {
+  //   var task = tasks[details.requestId];
+  //   if (task) {
+  //     delete tasks[details.requestId];
+  //     if (task === 'Get-Location' && _.includes([301, 302, 303], details.statusCode)) {
+  //       var locationHeader = _.find(details.responseHeaders, function (header) {
+  //         return header.name.toLowerCase() === 'location';
+  //       });
+  //       return {
+  //         redirectUrl: 'data:text/plain;charset=utf-8,' + (locationHeader && locationHeader.value || ''),
+  //       };
+  //     }
+  //   }
+  // }, {
+  //   urls: ['<all_urls>'],
+  //   types: ['xmlhttprequest'],
+  // }, ['blocking', 'responseHeaders']);
+  // chrome.webRequest.onCompleted.addListener(function (details) {
+  //   delete tasks[details.requestId];
+  // }, {
+  //   urls: ['<all_urls>'],
+  //   types: ['xmlhttprequest'],
+  // });
+  // chrome.webRequest.onErrorOccurred.addListener(function (details) {
+  //   delete tasks[details.requestId];
+  // }, {
+  //   urls: ['<all_urls>'],
+  //   types: ['xmlhttprequest'],
+  // });
+
   chrome.webRequest.onBeforeRequest.addListener(function (req) {
     // onBeforeRequest is fired for local files too
     if (/\.user\.js([\?#]|$)/.test(req.url)) {
-      var noredirect = {redirectUrl: 'javascript:history.back()'};
+      var noredirect = {cancel: true};
       var x = new XMLHttpRequest();
       x.open('GET', req.url, false);
       try {

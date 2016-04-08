@@ -330,6 +330,9 @@ labelSync:
 buttonAuthorize:
   description: Button to authorize permissions for sync.
   message: 授权
+buttonAuthorizing:
+  description: Button shown when authorization is in progress.
+  message: 正在授权
 buttonAuthorized:
   description: Button shown when permissions are already authorized for sync.
   message: 已授权

@@ -330,6 +330,9 @@ labelSync:
 buttonAuthorize:
   description: Button to authorize permissions for sync.
   message: ''
+buttonAuthorizing:
+  description: Button shown when authorization is in progress.
+  message: ''
 buttonAuthorized:
   description: Button shown when permissions are already authorized for sync.
   message: ''

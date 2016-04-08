@@ -258,6 +258,14 @@ var SettingsTab = BaseView.extend({
     _.sendMessage({cmd: 'Authenticate', data: e.target.dataset.auth});
   },
   toggleSync: function (e) {
-    e.target.checked && _.sendMessage({cmd: 'SyncStart'});
+    if (e.target.checked) {
+      this.$('[data-sync]').each(function (i, target) {
+        if (target !== e.target && target.checked) {
+          target.checked = false;
+          _.updateCheckbox({target: target});
+        }
+      });
+      _.sendMessage({cmd: 'SyncStart'});
+    }
   },
 });
