@@ -26,7 +26,7 @@ setTimeout(function () {
       authorized({
         code: url.slice(redirect_uri.length),
       }).then(function () {
-        onedrive.prepare();
+        onedrive.checkSync();
       });
       return true;
     }
