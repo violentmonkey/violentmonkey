@@ -107,7 +107,7 @@ var sync = function () {
         displayName: service.displayName,
         authState: service.authState.get(),
         syncState: service.syncState.get(),
-        timestamp: service.config.get('meta', {}).timestamp,
+        lastSync: service.config.get('meta', {}).lastSync,
       };
     });
   }
@@ -435,8 +435,9 @@ var sync = function () {
           }
           if (!local.meta.timestamp || getRemote.length || delLocal.length || remoteChanged || outdated) {
             local.meta.timestamp = remote.meta.timestamp;
-            _this.config.set('meta', local.meta);
           }
+          local.meta.lastSync = Date.now();
+          _this.config.set('meta', local.meta);
           return Promise.all(promises);
         }));
         return Promise.all(promises.map(function (promise) {
