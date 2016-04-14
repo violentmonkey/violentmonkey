@@ -375,10 +375,11 @@ var comm = {
 
           // script object
           addProperty('script', {value:{}}, obj);
-          for(var i in data) {
+          var i;
+          for(i in data) {
             addProperty(i, {value: data[i]}, obj.script);
           }
-          for(var i in script.meta.resources)
+          for(i in script.meta.resources)
             addProperty(i, {value: script.meta.resources[i]}, obj.script.resources);
 
           return obj;
@@ -519,7 +520,7 @@ var comm = {
       else
         code = [];
       for(var i = 0; i < require.length; i ++)
-        if(part = data.require[require[i]]) code.push(part);
+        if((part = data.require[require[i]])) code.push(part);
       // wrap code to make 'use strict' work
       code.push('!function(){' + script.code + '\n}.call(this)');
       code.push('}.call(this);');

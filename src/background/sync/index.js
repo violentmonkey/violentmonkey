@@ -1,20 +1,9 @@
 var sync = function () {
   var services = [];
   var servicesReady = [];
-  var queue, nextQueue = [];
-  var syncing;
   var inited;
-  var debouncedSync = _.debounce(function () {
-    console.log('Start to sync');
-    queue = nextQueue;
-    nextQueue = [];
-    process();
-    autoSync();
-  }, 10 * 1000);
-  var autoSync = _.debounce(function () {
-    console.log('Auto start to sync');
-    sync();
-  }, 60 * 60 * 1000);
+  var current = Promise.resolve();
+  var autoSync = _.debounce(sync, 60 * 60 * 1000);
 
   function ServiceConfig(name) {
     this.prefix = name;
@@ -112,40 +101,23 @@ var sync = function () {
     });
   }
   function sync(service) {
-    if (service) {
-      service.config.getOption('enabled') && nextQueue.push(service);
-    } else if (!syncing) {
-      nextQueue = servicesReady.filter(function (service) {
-        return service.config.getOption('enabled');
-      });
-    }
-    start();
-  }
-  function start() {
-    if (syncing) return;
-    if (nextQueue.length) {
-      console.log('Ready to sync');
-      debouncedSync();
-      return true;
-    }
-  }
-  function stopSync() {
-    console.log('Sync ended');
-    syncing = false;
-    // start another check in case there are changes during sync
-    start() || autoSync();
-  }
-  function process() {
-    var service = queue.shift();
-    if (!service) return stopSync();
-    syncing = true;
-    service.sync().then(process);
+    var services = (service ? [service] : servicesReady)
+    .filter(function (service) {
+      return service.config.getOption('enabled')
+      && !service.syncState.is('ready') && !service.syncState.is('syncing');
+    });
+    return Promise.all(services.map(function (service) {
+      return service.startSync();
+    })).then(function () {
+      autoSync();
+    });
   }
   function init() {
     inited = true;
     services.forEach(function (service) {
       service.checkSync();
     });
+    sync();
   }
   function getFilename(uri) {
     return 'vm-' + encodeURIComponent(uri);
@@ -194,12 +166,14 @@ var sync = function () {
       ], null, _this.onStateChange),
       _this.syncState = serviceState([
         'idle',
+        'ready',
         'syncing',
         'error',
       ], null, _this.onStateChange),
       _this.initHeaders();
       _this.events = getEventEmitter();
       _this.lastFetch = Promise.resolve();
+      _this.startSync = _this.syncFactory();
     },
     on: function () {
       return this.events.on.apply(null, arguments);
@@ -216,6 +190,36 @@ var sync = function () {
         data: getStates(),
       });
     },
+    syncFactory: function () {
+      var _this = this;
+      var promise, debouncedResolve;
+      function shouldSync() {
+        return _this.authState.is('authorized') && _this.config.getOption('enabled');
+      }
+      function init() {
+        if (!shouldSync()) return Promise.resolve();
+        console.log('Ready to sync:', _this.displayName);
+        _this.syncState.set('ready');
+        promise = current = current.then(function () {
+          return new Promise(function (resolve, reject) {
+            debouncedResolve = _.debounce(resolve, 10 * 1000);
+            debouncedResolve();
+          });
+        }).then(function () {
+          if (shouldSync()) {
+            return _this.sync();
+          }
+          _this.syncState.set('idle');
+        }).then(function () {
+          promise = debouncedResolve = null;
+        });
+      }
+      return function () {
+        if (!promise) init();
+        debouncedResolve && debouncedResolve();
+        return promise;
+      };
+    },
     prepare: function () {
       var _this = this;
       var token = _this.token = _this.config.get('token');
@@ -228,7 +232,7 @@ var sync = function () {
       .then(function () {
         _this.authState.set('authorized');
         servicesReady.push(_this);
-        sync(_this);
+        return _this.startSync();
       }, function (err) {
         if (err) {
           if (err.status === 401) {
@@ -316,8 +320,6 @@ var sync = function () {
     },
     sync: function () {
       var _this = this;
-      if (!_this.authState.is('authorized') || !_this.config.getOption('enabled'))
-        return Promise.resolve();
       _this.syncState.set('syncing');
       return _this.getMeta()
       .then(function (meta) {
