@@ -99,12 +99,21 @@ setTimeout(function () {
       var _this = this;
       return getMeta()
       .catch(function (res) {
-        if (res.status === 401) {
-          return _this.refreshToken().then(getMeta);
+        if (res.status === 404) {
+          var header = res.getResponseHeader('WWW-Authenticate') || '';
+          if (/"invalid_token"/.test(header)) {
+            return _this.refreshToken().then(getMeta);
+          } else {
+            return {};
+          }
         }
+        throw res;
       });
       function getMeta() {
-        return sync.BaseService.prototype.getMeta.call(_this);
+        return _this.get(_this.metaFile)
+        .then(function (data) {
+          return JSON.parse(data);
+        });
       }
     },
     list: function () {
@@ -121,7 +130,25 @@ setTimeout(function () {
     },
     get: function (path) {
       return this.request({
-        url: '/drive/special/approot:/' + encodeURIComponent(path) + ':/content',
+        url: '/drive/special/approot:/' + encodeURIComponent(path),
+      }).then(function (text) {
+        return JSON.parse(text);
+      }).then(function (data) {
+        var url = data['@content.downloadUrl'];
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest;
+          xhr.open('GET', url, true);
+          xhr.onload = function () {
+            resolve(xhr.responseText);
+          };
+          xhr.onerror = function () {
+            reject();
+          };
+          xhr.ontimeout = function () {
+            reject();
+          };
+          xhr.send();
+        });
       });
     },
     put: function (path, data) {

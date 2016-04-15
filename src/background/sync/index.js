@@ -248,7 +248,7 @@ var sync = function () {
             _this.authState.set('error');
           }
           _this.syncState.set('idle');
-          _this.config.setOption('enabled', false);
+          // _this.config.setOption('enabled', false);
         } else {
           _this.authState.set('unauthorized');
         }
@@ -300,8 +300,10 @@ var sync = function () {
           }
           xhr.timeout = 10 * 1000;
           xhr.onload = function () {
-            if (this.status > 300) reject(this);
-            else resolve(this.responseText);
+            if (!this.status || this.status > 300 || !this.responseText)
+              reject(this);
+            else
+              resolve(this.responseText);
           };
           xhr.onerror = function () {
             if (this.status === 503) {
