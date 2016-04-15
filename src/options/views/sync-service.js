@@ -7,7 +7,6 @@ var SyncServiceView = BaseView.extend({
   _render: function () {
     var it = this.model.toJSON();
     it.enabled = _.options.get(it.name + 'Enabled');
-    it.syncing = it.syncState === 'syncing';
     if (it.lastSync) it.lastSync = new Date(it.lastSync).toLocaleString();
     this.$el.html(this.templateFn(it));
   },

@@ -5,6 +5,7 @@
     "clean": "node -e \"require('del')(['dist'])\"",
     "dev": "gulp build && gulp watch",
     "i18n": "gulp i18n",
+    "eslint": "gulp eslint",
     "update": "node scripts/updateLib",
     "version": "gulp build"
   },
@@ -17,6 +18,7 @@
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-cssnano": "^2.1.1",
+    "gulp-eslint": "^2.0.0",
     "gulp-filter": "^3.0.1",
     "gulp-order": "^1.1.1",
     "gulp-replace": "^0.5.4",

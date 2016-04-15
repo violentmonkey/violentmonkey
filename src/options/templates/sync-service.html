@@ -14,12 +14,16 @@
     authorizing: _.i18n('buttonAuthorizing'),
   }[it.authState] || _.i18n('buttonAuthorize')
 %></button>
-<button <%= !_.includes(['authorized', 'error'], it.authState) || it.syncing ? 'disabled' : '' %> class="sync-start">
+<button <%=
+!_.includes(['authorized', 'error'], it.authState) ||
+it.syncState === 'syncing' ? 'disabled' : ''
+%> class="sync-start">
   <i class="fa fa-refresh"></i>
 </button>
 <span><%=
   it.authState === 'initializing' ? _.i18n('msgSyncInit') :
   it.syncState === 'error' ? _.i18n('msgSyncError') :
-  it.syncing ? _.i18n('msgSyncing') :
+  it.syncState === 'ready' ? _.i18n('msgSyncReady') :
+  it.syncState === 'syncing' ? _.i18n('msgSyncing') :
   it.lastSync ? _.i18n('lastSync', it.lastSync) : ''
 %></span>

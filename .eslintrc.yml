@@ -1,0 +1,17 @@
+rules:
+  no-undef:
+    - 0
+  no-unused-vars:
+    - 0
+  comma-dangle:
+    - 0
+  no-console:
+    - 0
+  no-empty:
+    - 0
+
+env:
+  browser: true
+  es6: true
+
+extends: 'eslint:recommended'

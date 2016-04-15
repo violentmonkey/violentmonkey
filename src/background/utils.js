@@ -29,7 +29,7 @@ var scriptUtils = {
       grant: [],
     };
     var flag = -1;
-    code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, function(value, group1, group2) {
+    code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, function(m, group1, group2) {
       if (flag < 0 && group1 == '==UserScript==')
         // start meta
         flag = 1;

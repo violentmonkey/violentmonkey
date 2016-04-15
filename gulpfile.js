@@ -5,6 +5,7 @@ const merge2 = require('merge2');
 const cssnano = require('gulp-cssnano');
 const gulpFilter = require('gulp-filter');
 const order = require('gulp-order');
+const eslint = require('gulp-eslint');
 const del = require('del');
 const templateCache = require('./scripts/templateCache');
 const i18n = require('./scripts/i18n');
@@ -40,6 +41,15 @@ gulp.task('watch', () => {
   gulp.watch(paths.copy, ['copy-files']);
   gulp.watch(paths.locales, ['copy-i18n']);
 });
+
+gulp.task('eslint', () => (
+  gulp.src([
+    'src/**/*.js',
+    '!src/public/**',
+  ])
+  .pipe(eslint())
+  .pipe(eslint.format())
+));
 
 gulp.task('templates', () => (
   merge2([
