@@ -1,8 +1,6 @@
 <label>
   <input type=checkbox data-check="<%= it.name + 'Enabled' %>" data-sync="<%= it.name %>" <%=
   it.enabled ? 'checked' : ''
-  %> <%=
-  it.authState === 'authorized' ? '' : 'disabled'
   %>>
   <span><%= _.i18n('labelSyncTo', it.displayName || it.name) %></span>
 </label>
@@ -15,13 +13,15 @@
   }[it.authState] || _.i18n('buttonAuthorize')
 %></button>
 <button <%=
-!_.includes(['authorized', 'error'], it.authState) ||
-it.syncState === 'syncing' ? 'disabled' : ''
+  !_.includes(['authorized', 'error'], it.authState) ||
+  _.includes(['ready', 'syncing'], it.syncState)
+  ? 'disabled' : ''
 %> class="sync-start">
   <i class="fa fa-refresh"></i>
 </button>
 <span><%=
   it.authState === 'initializing' ? _.i18n('msgSyncInit') :
+  it.authState === 'error' ? _.i18n('msgSyncInitError') :
   it.syncState === 'error' ? _.i18n('msgSyncError') :
   it.syncState === 'ready' ? _.i18n('msgSyncReady') :
   it.syncState === 'syncing' ? _.i18n('msgSyncing') :

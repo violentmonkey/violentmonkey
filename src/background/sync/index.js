@@ -230,15 +230,9 @@ var sync = function () {
       _this.authState.set('initializing');
       var token = _this.token = _this.config.get('token');
       _this.initHeaders();
-      return token ? Promise.resolve(_this.user()) : Promise.reject();
-    },
-    checkSync: function () {
-      var _this = this;
-      return _this.prepare()
+      return (token ? Promise.resolve(_this.user()) : Promise.reject())
       .then(function () {
         _this.authState.set('authorized');
-        servicesReady.push(_this);
-        return _this.startSync();
       }, function (err) {
         if (err) {
           if (err.status === 401) {
@@ -252,6 +246,18 @@ var sync = function () {
         } else {
           _this.authState.set('unauthorized');
         }
+        throw err;
+      });
+    },
+    checkSync: function () {
+      var _this = this;
+      return _this.prepare()
+      .then(function () {
+        servicesReady.push(_this);
+        return _this.startSync();
+      }, function () {
+        var i = servicesReady.indexOf(_this);
+        if (~i) servicesReady.splice(i, 1);
       });
     },
     user: function () {},
