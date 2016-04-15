@@ -61,8 +61,9 @@ var sync = function () {
         }
         return state;
       },
-      is: function (_state) {
-        return state === _state;
+      is: function (states) {
+        if (!_.isArray(states)) states = [states];
+        return _.includes(states, state);
       },
     };
   }
@@ -100,17 +101,21 @@ var sync = function () {
       };
     });
   }
-  function sync(service) {
-    var services = (service ? [service] : servicesReady)
-    .filter(function (service) {
-      return service.config.getOption('enabled')
-      && !service.syncState.is('ready') && !service.syncState.is('syncing');
-    });
-    return Promise.all(services.map(function (service) {
+  function syncOne(service) {
+    if (service.syncState.is(['ready', 'syncing'])) return;
+    if (service.authState.is(['idle', 'error'])) return service.checkSync();
+    if (service.authState.is('authorized')) return service.startSync();
+  }
+  function syncAll() {
+    return Promise.all(servicesReady.filter(function (service) {
+      return service.config.getOption('enabled') && !service.syncState.is(['ready', 'syncing']);
+    }).map(function (service) {
       return service.startSync();
-    })).then(function () {
-      autoSync();
-    });
+    }));
+  }
+  function sync(service) {
+    return (service ? Promise.resolve(syncOne(service)) : syncAll())
+    .then(autoSync);
   }
   function init() {
     inited = true;
@@ -159,8 +164,8 @@ var sync = function () {
       _this.authState = serviceState([
         'idle',
         'initializing',
-        'authorized',
         'authorizing',  // in case some services require asynchronous requests to get access_tokens
+        'authorized',
         'unauthorized',
         'error',
       ], null, _this.onStateChange),
@@ -222,9 +227,10 @@ var sync = function () {
     },
     prepare: function () {
       var _this = this;
+      _this.authState.set('initializing');
       var token = _this.token = _this.config.get('token');
       _this.initHeaders();
-      return (token ? Promise.resolve(_this.user()) : Promise.reject());
+      return token ? Promise.resolve(_this.user()) : Promise.reject();
     },
     checkSync: function () {
       var _this = this;
