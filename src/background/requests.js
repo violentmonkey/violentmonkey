@@ -187,7 +187,8 @@ var requests = function () {
   chrome.webRequest.onBeforeRequest.addListener(function (req) {
     // onBeforeRequest is fired for local files too
     if (/\.user\.js([\?#]|$)/.test(req.url)) {
-      var noredirect = {cancel: true};
+      // {cancel: true} will redirect to a blocked view
+      var noredirect = {redirectUrl: 'javascript:history.back()'};
       var x = new XMLHttpRequest();
       x.open('GET', req.url, false);
       try {
