@@ -3,7 +3,9 @@ var sync = function () {
   var servicesReady = [];
   var inited;
   var current = Promise.resolve();
-  var autoSync = _.debounce(sync, 60 * 60 * 1000);
+  var autoSync = _.debounce(function () {
+    sync();
+  }, 60 * 60 * 1000);
 
   function ServiceConfig(name) {
     this.prefix = name;
@@ -102,6 +104,7 @@ var sync = function () {
     });
   }
   function syncOne(service) {
+    console.log(service);
     if (service.syncState.is(['ready', 'syncing'])) return;
     if (service.authState.is(['idle', 'error'])) return service.checkSync();
     if (service.authState.is('authorized')) return service.startSync();
