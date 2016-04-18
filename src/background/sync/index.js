@@ -3,7 +3,9 @@ var sync = function () {
   var servicesReady = [];
   var inited;
   var current = Promise.resolve();
-  var autoSync = _.debounce(sync, 60 * 60 * 1000);
+  var autoSync = _.debounce(function () {
+    sync();
+  }, 60 * 60 * 1000);
 
   function ServiceConfig(name) {
     this.prefix = name;
@@ -102,6 +104,7 @@ var sync = function () {
     });
   }
   function syncOne(service) {
+    console.log(service);
     if (service.syncState.is(['ready', 'syncing'])) return;
     if (service.authState.is(['idle', 'error'])) return service.checkSync();
     if (service.authState.is('authorized')) return service.startSync();
@@ -230,15 +233,9 @@ var sync = function () {
       _this.authState.set('initializing');
       var token = _this.token = _this.config.get('token');
       _this.initHeaders();
-      return token ? Promise.resolve(_this.user()) : Promise.reject();
-    },
-    checkSync: function () {
-      var _this = this;
-      return _this.prepare()
+      return (token ? Promise.resolve(_this.user()) : Promise.reject())
       .then(function () {
         _this.authState.set('authorized');
-        servicesReady.push(_this);
-        return _this.startSync();
       }, function (err) {
         if (err) {
           if (err.status === 401) {
@@ -248,10 +245,22 @@ var sync = function () {
             _this.authState.set('error');
           }
           _this.syncState.set('idle');
-          _this.config.setOption('enabled', false);
+          // _this.config.setOption('enabled', false);
         } else {
           _this.authState.set('unauthorized');
         }
+        throw err;
+      });
+    },
+    checkSync: function () {
+      var _this = this;
+      return _this.prepare()
+      .then(function () {
+        servicesReady.push(_this);
+        return _this.startSync();
+      }, function () {
+        var i = servicesReady.indexOf(_this);
+        if (~i) servicesReady.splice(i, 1);
       });
     },
     user: function () {},
@@ -300,8 +309,10 @@ var sync = function () {
           }
           xhr.timeout = 10 * 1000;
           xhr.onload = function () {
-            if (this.status > 300) reject(this);
-            else resolve(this.responseText);
+            if (!this.status || this.status > 300 || !this.responseText)
+              reject(this);
+            else
+              resolve(this.responseText);
           };
           xhr.onerror = function () {
             if (this.status === 503) {

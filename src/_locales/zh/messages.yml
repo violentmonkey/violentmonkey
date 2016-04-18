@@ -3,7 +3,7 @@ extName:
   message: 暴力猴
 extDescription:
   description: Description for this extension.
-  message: 为Opera提供用户脚本支持。
+  message: 为基于Chromium的浏览器（如Opera和Chrome）提供用户脚本支持。
 extTranslator:
   description: Information of the translator.
   message: 'Gerald <i@gerald.top>'
@@ -345,6 +345,9 @@ lastSync:
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: 正在初始化...
+msgSyncInitError:
+  description: Message shown when sync fails in initialization.
+  message: 初始化失败！
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: 即将开始同步...

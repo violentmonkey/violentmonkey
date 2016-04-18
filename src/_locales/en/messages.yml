@@ -3,7 +3,7 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: Userscript support for Opera.
+  message: Userscript support for Chromium based browsers like Opera and Chrome.
 extTranslator:
   description: Information of the translator.
   message: 'Gerald <i@gerald.top>'
@@ -345,6 +345,9 @@ lastSync:
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: Initializing...
+msgSyncInitError:
+  description: Message shown when sync fails in initialization.
+  message: 'Initializing error!'
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Sync will start soon...

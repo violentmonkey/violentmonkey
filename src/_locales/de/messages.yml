@@ -343,6 +343,9 @@ lastSync:
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: ''
+msgSyncInitError:
+  description: Message shown when sync fails in initialization.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: ''
