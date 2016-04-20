@@ -104,7 +104,6 @@ var sync = function () {
     });
   }
   function syncOne(service) {
-    console.log(service);
     if (service.syncState.is(['ready', 'syncing'])) return;
     if (service.authState.is(['idle', 'error'])) return service.checkSync();
     if (service.authState.is('authorized')) return service.startSync();

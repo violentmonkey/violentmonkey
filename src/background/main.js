@@ -2,7 +2,7 @@ var vmdb = new VMDB;
 var VM_VER = chrome.app.getDetails().version;
 var commands = {
   NewScript: function (data, src) {
-    return Promise.resolve(scriptUtils.newScript());
+    return scriptUtils.newScript();
   },
   RemoveScript: function (id, src) {
     return vmdb.removeScript(id)
@@ -32,7 +32,7 @@ var commands = {
     return data.isApplied
     ? vmdb.getScriptsByURL(url).then(function (res) {
       return _.assign(data, res);
-    }) : Promise.resolve(data);
+    }) : data;
   },
   UpdateScriptInfo: function (data, src) {
     return vmdb.updateScriptInfo(data.id, data, {
@@ -100,11 +100,11 @@ var commands = {
     return false;
   },
   ParseMeta: function (code, src) {
-    return Promise.resolve(scriptUtils.parseMeta(code));
+    return scriptUtils.parseMeta(code);
   },
   AutoUpdate: autoUpdate,
   GetRequestId: function (data, src) {
-    return Promise.resolve(requests.getRequestId());
+    return requests.getRequestId();
   },
   HttpRequest: function (details, src) {
     requests.httpRequest(details, function (res) {
@@ -116,7 +116,7 @@ var commands = {
     return false;
   },
   AbortRequest: function (id, src) {
-    return Promise.resolve(requests.abortRequest(id));
+    return requests.abortRequest(id);
   },
   SetBadge: function (num, src) {
     setBadge(num, src);
@@ -146,7 +146,7 @@ vmdb.initialized.then(function () {
           // callback fails if not given in content page
         }
       };
-      res.then(function (data) {
+      Promise.resolve(res).then(function (data) {
         finish({
           data: data,
           error: null,
