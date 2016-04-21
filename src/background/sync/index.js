@@ -1,3 +1,4 @@
+/* eslint no-console: 0 */
 var sync = function () {
   var services = [];
   var servicesReady = [];
@@ -104,7 +105,6 @@ var sync = function () {
     });
   }
   function syncOne(service) {
-    console.log(service);
     if (service.syncState.is(['ready', 'syncing'])) return;
     if (service.authState.is(['idle', 'error'])) return service.checkSync();
     if (service.authState.is('authorized')) return service.startSync();
@@ -309,7 +309,7 @@ var sync = function () {
           }
           xhr.timeout = 10 * 1000;
           xhr.onload = function () {
-            if (!this.status || this.status > 300 || !this.responseText)
+            if (!this.status || this.status > 300)
               reject(this);
             else
               resolve(this.responseText);

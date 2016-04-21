@@ -6,7 +6,6 @@ const cssnano = require('gulp-cssnano');
 const gulpFilter = require('gulp-filter');
 const order = require('gulp-order');
 const eslint = require('gulp-eslint');
-const del = require('del');
 const templateCache = require('./scripts/templateCache');
 const i18n = require('./scripts/i18n');
 const pkg = require('./package.json');

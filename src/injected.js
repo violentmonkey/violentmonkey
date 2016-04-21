@@ -223,7 +223,7 @@ var comm = {
     }catch(e){
       var msg = 'Error running script: ' + name + '\n' + e;
       if(e.message) msg += '\n' + e.message;
-      console.log(msg);
+      console.error(msg);
     }
   },
   initRequest: function() {
@@ -410,7 +410,7 @@ var comm = {
                 try {
                   val = JSON.parse(v);
                 } catch(e) {
-                  console.log(e);
+                  console.warn(e);
                 }
                 break;
               default:
@@ -480,7 +480,9 @@ var comm = {
         },
       },
       GM_log: {
+        /* eslint-disable no-console */
         value: function (data) {console.log(data);},
+        /* eslint-enable no-console */
       },
       GM_openInTab: {
         value: function (url) {
@@ -536,7 +538,7 @@ var comm = {
         try {
           var func = new Function('g', code);
         } catch(e) {
-          console.log('Syntax error in script: ' + name + '\n' + e.message);
+          console.error('Syntax error in script: ' + name + '\n' + e.message);
           return;
         }
         comm.runCode(name, func, wrapper);
@@ -607,7 +609,7 @@ function newTab(url) {
 function handleC(e) {
   var req = e.detail;
   if (!req) {
-    console.log('[Violentmonkey] Invalid data! There might be unsupported data format.');
+    console.error('[Violentmonkey] Invalid data! There might be unsupported data format.');
     return;
   }
   var maps = {

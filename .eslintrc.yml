@@ -6,7 +6,10 @@ rules:
   comma-dangle:
     - 0
   no-console:
-    - 0
+    - 2
+    - allow:
+      - warn
+      - error
   no-empty:
     - 0
 
