@@ -229,7 +229,6 @@ _.messenger = function () {
       try {
         port && port.postMessage(data);
       } catch (e) {
-        console.log(e);
         port = null;
       }
     },

@@ -14,7 +14,7 @@ VMDB.prototype.openDB = function () {
     };
     request.onerror = function (e) {
       var err = e.target.error;
-      console.log('IndexedDB error: ' + err.message);
+      console.error('IndexedDB error: ' + err.message);
       reject(err);
     };
     request.onupgradeneeded = function (e) {

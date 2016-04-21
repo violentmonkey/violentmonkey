@@ -94,7 +94,7 @@ var requests = function () {
       req.finalUrl = details.url;
       xhr.send(details.data);
     } catch (e) {
-      console.log(e);
+      console.warn(e);
     }
   }
 

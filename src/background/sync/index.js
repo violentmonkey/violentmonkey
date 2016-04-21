@@ -1,3 +1,4 @@
+/* eslint no-console: 0 */
 var sync = function () {
   var services = [];
   var servicesReady = [];
