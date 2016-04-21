@@ -101,7 +101,7 @@ setTimeout(function () {
       .catch(function (res) {
         if (res.status === 404) {
           var header = res.getResponseHeader('WWW-Authenticate') || '';
-          if (/"invalid_token"/.test(header)) {
+          if (/^Bearer realm="OneDriveAPI"/.test(header)) {
             return _this.refreshToken().then(getMeta);
           } else {
             return {};
