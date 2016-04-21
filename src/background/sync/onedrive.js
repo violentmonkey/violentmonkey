@@ -168,7 +168,7 @@ setTimeout(function () {
       return this.request({
         method: 'DELETE',
         url: '/drive/special/approot:/' + encodeURIComponent(path),
-      });
+      }).catch(_.noop);
     },
     authenticate: authenticate,
     checkAuthenticate: checkAuthenticate,

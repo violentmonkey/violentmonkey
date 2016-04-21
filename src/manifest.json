@@ -3,7 +3,7 @@
   "version": "__VERSION__",
   "manifest_version": 2,
   "description": "__MSG_extDescription__",
-  "developer": {
+  "author": {
     "name": "Gerald",
     "url": "http://gerald.top"
   },

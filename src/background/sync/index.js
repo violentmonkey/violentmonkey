@@ -308,7 +308,7 @@ var sync = function () {
           }
           xhr.timeout = 10 * 1000;
           xhr.onload = function () {
-            if (!this.status || this.status > 300 || !this.responseText)
+            if (!this.status || this.status > 300)
               reject(this);
             else
               resolve(this.responseText);
