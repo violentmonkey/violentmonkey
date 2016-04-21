@@ -1,6 +1,6 @@
 {
   "name": "Violentmonkey",
-  "version": "2.3.5",
+  "version": "2.3.6",
   "scripts": {
     "clean": "node -e \"require('del')(['dist'])\"",
     "dev": "gulp build && gulp watch",
