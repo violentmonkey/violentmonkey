@@ -94,7 +94,9 @@ gulp.task('copy-files', () => {
   const cssFilter = gulpFilter(['**/*.css'], {restore: true});
   return gulp.src(paths.copy)
   .pipe(cssFilter)
-  .pipe(cssnano())
+  .pipe(cssnano({
+    zindex: false,
+  }))
   .pipe(cssFilter.restore)
   .pipe(gulp.dest('dist/'));
 });
