@@ -92,7 +92,7 @@ BaseView.prototype.postrender.call(window);
           return new MenuItem({
             id: script.id,
             name: script.custom.name || _.getLocaleString(script.meta, 'name'),
-            data: script.enabled,
+            data: !!script.enabled,
             symbol: scriptSymbol,
             title: true,
             className: 'ellipsis',
