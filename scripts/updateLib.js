@@ -5,6 +5,7 @@ const path = require('path');
 const glob = require('glob');
 const ncp = require('ncp');
 
+const SRC_DIR = 'src/public/lib';
 const aliases = {
   CodeMirror: 'codemirror',
   'font-awesome': {},
@@ -41,7 +42,7 @@ function update(lib, files) {
   };
   alias.lib = alias.lib || lib;
   const libdir = `node_modules/${alias.lib}`;
-  const srcdir = `src/lib/${lib}`
+  const srcdir = `${SRC_DIR}/${lib}`
   return Promise.all(files.map((file) => {
     let aliasFile = alias.files && alias.files[file] || file;
     if (aliasFile.endsWith('/')) aliasFile += file;
@@ -52,10 +53,10 @@ function update(lib, files) {
   });
 }
 
-readdir('./src/lib').then((data) => {
+readdir(SRC_DIR).then((data) => {
   data.forEach(function (name) {
     if (!aliases[name]) return;
-    getFiles('**', `src/lib/${name}`).then((files) => {
+    getFiles('**', `${SRC_DIR}/${name}`).then((files) => {
       update(name, files);
     });
   });
