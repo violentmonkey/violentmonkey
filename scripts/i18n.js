@@ -85,13 +85,13 @@ Locales.prototype.getLanguages = function () {
   });
 };
 Locales.prototype.load = function () {
-  return this.getLanguages().then((langs) => {
+  return this.getLanguages().then(langs => {
     this.langs = langs;
-    return Promise.all(langs.map((lang) => {
+    return Promise.all(langs.map(lang => {
       const locale = this.data[lang] = new Locale(lang, `${this.prefix}/${lang}/messages`, this.base);
       return locale.loaded;
     }));
-  }).then((data) => {
+  }).then(data => {
     const desc = data[this.langs.indexOf(this.defaultLang)];
     for (let key in desc) {
       this.desc[key] = {
@@ -176,7 +176,7 @@ function extract(options) {
 
   function endStream(cb) {
     locales.loaded.then(() => {
-      keys.forEach((key) => {
+      keys.forEach(key => {
         locales.touch(key);
       });
       return locales.dump({
@@ -185,8 +185,8 @@ function extract(options) {
         markUntouched: options.markUntouched,
         extension: options.extension,
       });
-    }).then((files) => {
-      files.forEach((file) => {
+    }).then(files => {
+      files.forEach(file => {
         this.push(file);
       });
       cb();
