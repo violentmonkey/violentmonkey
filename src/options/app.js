@@ -26,7 +26,6 @@ var app = new App();
 if (!Backbone.history.start())
   app.navigate('', {trigger: true, replace: true});
 
-BaseView.prototype.postrender.call(window);
 $(document).on('click', '[data-feature]', function (e) {
   var target = e.currentTarget;
   _.features.hit(target.dataset.feature);
@@ -36,12 +35,12 @@ $(document).on('click', '[data-feature]', function (e) {
 var scriptList, syncData;
 function initMain() {
   scriptList = new ScriptList;
-  syncData = new Backbone.Collection;
+  syncData = new SyncList;
   var port = chrome.runtime.connect({name: 'Options'});
   port.onMessage.addListener(function (res) {
     switch (res.cmd) {
     case 'sync':
-      syncData.reset(res.data);
+      syncData.set(res.data);
       break;
     case 'add':
       res.data.message = '';
