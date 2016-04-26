@@ -49,7 +49,7 @@ var commands = {
   SetValue: function (data, src) {
     return vmdb.setValue(data.uri, data.values)
     .then(function () {
-      _.broadcast({
+      _.tabs.broadcast({
         cmd: 'UpdateValues',
         data: {
           uri: data.uri,
@@ -249,5 +249,5 @@ _.messenger = function () {
 
 chrome.notifications.onClicked.addListener(function(id) {
   if(id == 'VM-NoGrantWarning')
-    chrome.tabs.create({url: 'http://wiki.greasespot.net/@grant'});
+    _.tabs.create('http://wiki.greasespot.net/@grant');
 });

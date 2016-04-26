@@ -40,21 +40,21 @@ function initMain() {
   var port = chrome.runtime.connect({name: 'Options'});
   port.onMessage.addListener(function (res) {
     switch (res.cmd) {
-      case 'sync':
-        syncData.reset(res.data);
-        break;
-      case 'add':
-        res.data.message = '';
-        scriptList.push(res.data);
-        break;
-      case 'update':
-        if (res.data) {
-          var model = scriptList.get(res.data.id);
-          if (model) model.set(res.data);
-        }
-        break;
-      case 'del':
-        scriptList.remove(res.data);
+    case 'sync':
+      syncData.reset(res.data);
+      break;
+    case 'add':
+      res.data.message = '';
+      scriptList.push(res.data);
+      break;
+    case 'update':
+      if (res.data) {
+        var model = scriptList.get(res.data.id);
+        if (model) model.set(res.data);
+      }
+      break;
+    case 'del':
+      scriptList.remove(res.data);
     }
   });
 }

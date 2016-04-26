@@ -182,10 +182,33 @@ var searchParams = {
   },
 };
 
-_.broadcast = function (data) {
-  chrome.tabs.query({}, function (tabs) {
-    _.forEach(tabs, function (tab) {
-      chrome.tabs.sendMessage(tab.id, data);
+_.tabs = {
+  create: function (url) {
+    chrome.tabs.create({url: url});
+  },
+  update: function (cb) {
+    chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+      cb({
+        id: tabId,
+        url: changeInfo.url,
+      });
     });
-  });
+  },
+  remove: function (id) {
+    chrome.tabs.remove(id);
+  },
+  get: function (id) {
+    return new Promise(function (resolve, reject) {
+      chrome.tabs.get(id, function (tab) {
+        resolve(tab);
+      });
+    });
+  },
+  broadcast: function (data) {
+    chrome.tabs.query({}, function (tabs) {
+      _.forEach(tabs, function (tab) {
+        chrome.tabs.sendMessage(tab.id, data);
+      });
+    });
+  },
 };
