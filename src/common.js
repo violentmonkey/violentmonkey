@@ -10,7 +10,7 @@ _.options = function () {
     exportValues: true,
     closeAfterInstall: false,
     trackLocalFile: false,
-    injectMode: 0,
+    // injectMode: 0,
     autoReload: false,
     dropbox: {},
     dropboxEnabled: false,

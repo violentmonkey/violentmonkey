@@ -34,7 +34,7 @@ var SettingsTab = BaseView.extend({
   name: 'settings',
   events: {
     'change [data-check]': 'updateCheckbox',
-    'change #sInjectMode': 'updateInjectMode',
+    // 'change #sInjectMode': 'updateInjectMode',
     'change #cUpdate': 'updateAutoUpdate',
     'click #bSelect': 'toggleSelection',
     'click #bImport': 'importFile',
@@ -56,24 +56,24 @@ var SettingsTab = BaseView.extend({
       var serviceView = new SyncServiceView({model: service});
       syncServices.append(serviceView.$el);
     });
-    this.$('#sInjectMode').val(options.injectMode);
-    this.updateInjectHint();
+    // this.$('#sInjectMode').val(options.injectMode);
+    // this.updateInjectHint();
     this.exportList = new ExportList;
   },
   updateCheckbox: _.updateCheckbox,
   updateAutoUpdate: function (e) {
     _.sendMessage({cmd: 'AutoUpdate'});
   },
-  updateInjectHint: function () {
-    this.$('#sInjectMode+span').text([
-      _.i18n('hintInjectModeNormal'),
-      _.i18n('hintInjectModeAdvanced'),
-    ][this.$('#sInjectMode').val()]);
-  },
-  updateInjectMode: function (e) {
-    _.options.set('injectMode', e.target.value);
-    this.updateInjectHint();
-  },
+  // updateInjectHint: function () {
+  //   this.$('#sInjectMode+span').text([
+  //     _.i18n('hintInjectModeNormal'),
+  //     _.i18n('hintInjectModeAdvanced'),
+  //   ][this.$('#sInjectMode').val()]);
+  // },
+  // updateInjectMode: function (e) {
+  //   _.options.set('injectMode', e.target.value);
+  //   this.updateInjectHint();
+  // },
   toggleSelection: function () {
     this.exportList.toggleAll();
   },
