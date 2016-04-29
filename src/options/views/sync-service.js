@@ -4,6 +4,10 @@ var SyncServiceView = BaseView.extend({
   events: {
     'click .sync-start': 'retry',
   },
+  initialize: function () {
+    BaseView.prototype.initialize.call(this);
+    this.listenTo(this.model, 'change', this.render);
+  },
   _render: function () {
     var it = this.model.toJSON();
     it.enabled = _.options.get(it.name + 'Enabled');

@@ -18,8 +18,6 @@ var app = new App();
 if (!Backbone.history.start())
   app.navigate('', {trigger: true, replace: true});
 
-BaseView.prototype.postrender.call(window);
-
 !function () {
   function commandClick(e, model) {
     chrome.tabs.sendMessage(app.currentTab.id, {

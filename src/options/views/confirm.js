@@ -138,17 +138,29 @@ var ConfirmView = BaseView.extend({
   },
   getScript: function (url) {
     var _this = this;
-    var xhr = new XMLHttpRequest;
-    xhr.open('GET', url, true);
-    return new Promise(function (resolve, reject) {
-      xhr.onload = function () {
-        resolve(this);
-      };
-      xhr.onerror = function () {
-        _this.showMessage(_.i18n('msgErrorLoadingData'));
-        reject(this);
-      };
-      xhr.send();
+    return _.sendMessage({
+      cmd: 'GetFromCache',
+      data: url,
+    })
+    .then(function (text) {
+      return text ? {
+        status: 200,
+        responseText: text,
+      } : Promise.reject();
+    })
+    .catch(function () {
+      return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest;
+        xhr.open('GET', url, true);
+        xhr.onload = function () {
+          resolve(this);
+        };
+        xhr.onerror = function () {
+          _this.showMessage(_.i18n('msgErrorLoadingData'));
+          reject(this);
+        };
+        xhr.send();
+      });
     });
   },
   getTimeString: function () {

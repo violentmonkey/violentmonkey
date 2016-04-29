@@ -42,3 +42,10 @@ var ScriptList = Backbone.Collection.extend({
     });
   },
 });
+
+var SyncModel = Backbone.Model.extend({
+  idAttribute: 'name',
+});
+var SyncList = Backbone.Collection.extend({
+  model: SyncModel,
+});

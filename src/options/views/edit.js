@@ -70,7 +70,8 @@ var EditView = BaseView.extend({
           update: data.update,
         }
       }
-    }).then(function () {
+    }).then(function (script) {
+      _this.model.set('id', script.id);
       _this.updateStatus(false);
     }, function (err) {
       _.showMessage({

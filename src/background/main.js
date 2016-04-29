@@ -49,7 +49,7 @@ var commands = {
   SetValue: function (data, src) {
     return vmdb.setValue(data.uri, data.values)
     .then(function () {
-      _.broadcast({
+      _.tabs.broadcast({
         cmd: 'UpdateValues',
         data: {
           uri: data.uri,
@@ -130,6 +130,9 @@ var commands = {
   SyncStart: function (data, src) {
     sync.sync(data && sync.service(data));
     return false;
+  },
+  GetFromCache: function (data, src) {
+    return _.cache.get(data) || null;
   },
 };
 
@@ -249,5 +252,5 @@ _.messenger = function () {
 
 chrome.notifications.onClicked.addListener(function(id) {
   if(id == 'VM-NoGrantWarning')
-    chrome.tabs.create({url: 'http://wiki.greasespot.net/@grant'});
+    _.tabs.create('http://wiki.greasespot.net/@grant');
 });

@@ -13,7 +13,7 @@ setTimeout(function () {
     var url = 'https://www.dropbox.com/1/oauth2/authorize';
     var qs = searchParams.dump(params);
     url += '?' + qs;
-    chrome.tabs.create({url: url});
+    _.tabs.create(url);
   }
   function checkAuthenticate(url) {
     var redirect_uri = config.redirect_uri + '#';

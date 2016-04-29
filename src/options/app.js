@@ -26,7 +26,6 @@ var app = new App();
 if (!Backbone.history.start())
   app.navigate('', {trigger: true, replace: true});
 
-BaseView.prototype.postrender.call(window);
 $(document).on('click', '[data-feature]', function (e) {
   var target = e.currentTarget;
   _.features.hit(target.dataset.feature);
@@ -36,25 +35,25 @@ $(document).on('click', '[data-feature]', function (e) {
 var scriptList, syncData;
 function initMain() {
   scriptList = new ScriptList;
-  syncData = new Backbone.Collection;
+  syncData = new SyncList;
   var port = chrome.runtime.connect({name: 'Options'});
   port.onMessage.addListener(function (res) {
     switch (res.cmd) {
-      case 'sync':
-        syncData.reset(res.data);
-        break;
-      case 'add':
-        res.data.message = '';
-        scriptList.push(res.data);
-        break;
-      case 'update':
-        if (res.data) {
-          var model = scriptList.get(res.data.id);
-          if (model) model.set(res.data);
-        }
-        break;
-      case 'del':
-        scriptList.remove(res.data);
+    case 'sync':
+      syncData.set(res.data);
+      break;
+    case 'add':
+      res.data.message = '';
+      scriptList.push(res.data);
+      break;
+    case 'update':
+      if (res.data) {
+        var model = scriptList.get(res.data.id);
+        if (model) model.set(res.data);
+      }
+      break;
+    case 'del':
+      scriptList.remove(res.data);
     }
   });
 }

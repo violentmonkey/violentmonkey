@@ -242,6 +242,7 @@ var sync = function () {
             _this.config.clear();
             _this.authState.set('unauthorized');
           } else {
+            console.error(err);
             _this.authState.set('error');
           }
           _this.syncState.set('idle');
@@ -480,11 +481,12 @@ var sync = function () {
     },
   });
 
-  chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    var url = changeInfo.url;
-    url && services.some(function (service) {
-      return service.checkAuthenticate && service.checkAuthenticate(url);
-    }) && chrome.tabs.remove(tabId);
+  setTimeout(function () {
+    _.tabs.update(function (tab) {
+      tab.url && services.some(function (service) {
+        return service.checkAuthenticate && service.checkAuthenticate(tab.url);
+      }) && _.tabs.remove(tab.id);
+    });
   });
 
   return {

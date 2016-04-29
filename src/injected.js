@@ -180,6 +180,12 @@ var comm = {
     comm.did = comm.vmid + destId;
     document.addEventListener(comm.sid, comm['handle' + srcId].bind(comm), false);
     comm.load = comm.checkLoad = function(){};
+    // check whether the page is injectable via <script>, whether limited by CSP
+    try {
+      comm.injectable = (0, eval)('true');
+    } catch (e) {
+      comm.injectable = false;
+    }
   },
   post: function(data) {
     var e = new CustomEvent(this.did, {detail: data});
@@ -528,12 +534,7 @@ var comm = {
       code.push('}.call(this);');
       code = code.join('\n');
       var name = script.custom.name || script.meta.name || script.id;
-      if (data.injectMode == 1) {
-        // advanced injection
-        var id = comm.getUniqId();
-        comm.ainject[id] = [name, wrapper];
-        comm.post({cmd: 'Inject', data: [id, code]});
-      } else {
+      if (comm.injectable) {
         // normal injection
         try {
           var func = new Function('g', code);
@@ -542,6 +543,11 @@ var comm = {
           return;
         }
         comm.runCode(name, func, wrapper);
+      } else {
+        // advanced injection
+        var id = comm.getUniqId();
+        comm.ainject[id] = [name, wrapper];
+        comm.post({cmd: 'Inject', data: [id, code]});
       }
     }
     function run(list) {

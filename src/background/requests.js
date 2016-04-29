@@ -198,16 +198,12 @@ var requests = function () {
         return;
       }
       if ((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
-        if (req.tabId < 0)
-          chrome.tabs.create({
-            url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url),
-          });
-        else
-          chrome.tabs.get(req.tabId, function (t) {
-            chrome.tabs.create({
-              url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url) + '/' + encodeURIComponent(t.url),
-            });
-          });
+        _.cache.set(req.url, x.responseText);
+        var url = chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url);
+        if (req.tabId < 0) _.tabs.create(url);
+        else _.tabs.get(req.tabId).then(function (t) {
+          _.tabs.create(url + '/' + encodeURIComponent(t.url));
+        });
         return noredirect;
       }
     }
