@@ -6,9 +6,11 @@ const cssnano = require('gulp-cssnano');
 const gulpFilter = require('gulp-filter');
 const order = require('gulp-order');
 const eslint = require('gulp-eslint');
+const uglify = require('gulp-uglify');
 const templateCache = require('./scripts/templateCache');
 const i18n = require('./scripts/i18n');
 const pkg = require('./package.json');
+const isProd = process.env.NODE_ENV === 'production';
 
 const paths = {
   cache: 'src/cache.js',
@@ -50,39 +52,48 @@ gulp.task('eslint', () => (
   .pipe(eslint.format())
 ));
 
-gulp.task('templates', () => (
-  merge2([
-    gulp.src(paths.cache),
+gulp.task('templates', () => {
+  var stream = merge2([
     gulp.src(paths.templates).pipe(templateCache()),
-  ]).pipe(concat('cache.js'))
-  .pipe(gulp.dest('dist'))
-));
+    gulp.src(paths.cache),
+  ])
+  .pipe(concat('cache.js'));
+  if (isProd) stream = stream.pipe(uglify());
+  return stream.pipe(gulp.dest('dist'));
+});
 
-gulp.task('js-bg', () => (
-  gulp.src(paths.jsBg)
-  .pipe(concat('background/app.js'))
-  .pipe(gulp.dest('dist'))
-));
+gulp.task('js-bg', () => {
+  var stream = gulp.src(paths.jsBg)
+  .pipe(order([
+    '**/utils.js',
+    '!**/app.js',
+  ]))
+  .pipe(concat('background/app.js'));
+  if (isProd) stream = stream.pipe(uglify());
+  return stream.pipe(gulp.dest('dist'));
+});
 
-gulp.task('js-options', () => (
-  gulp.src(paths.jsOptions)
+gulp.task('js-options', () => {
+  var stream = gulp.src(paths.jsOptions)
   .pipe(order([
     '**/tab-*.js',
     '!**/app.js',
   ]))
-  .pipe(concat('options/app.js'))
-  .pipe(gulp.dest('dist'))
-));
+  .pipe(concat('options/app.js'));
+  if (isProd) stream = stream.pipe(uglify());
+  return stream.pipe(gulp.dest('dist'));
+});
 
-gulp.task('js-popup', () => (
-  gulp.src(paths.jsPopup)
+gulp.task('js-popup', () => {
+  var stream = gulp.src(paths.jsPopup)
   .pipe(order([
     '**/base.js',
     '!**/app.js',
   ]))
-  .pipe(concat('popup/app.js'))
-  .pipe(gulp.dest('dist'))
-))
+  .pipe(concat('popup/app.js'));
+  if (isProd) stream = stream.pipe(uglify());
+  return stream.pipe(gulp.dest('dist'))
+});
 
 gulp.task('manifest', () => (
   gulp.src(paths.manifest, {base: 'src'})
@@ -91,8 +102,12 @@ gulp.task('manifest', () => (
 ));
 
 gulp.task('copy-files', () => {
+  const jsFilter = gulpFilter(['**/*.js'], {restore: true});
   const cssFilter = gulpFilter(['**/*.css'], {restore: true});
   return gulp.src(paths.copy)
+  .pipe(jsFilter)
+  .pipe(uglify())
+  .pipe(jsFilter.restore)
   .pipe(cssFilter)
   .pipe(cssnano({
     zindex: false,

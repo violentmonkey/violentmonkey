@@ -1,4 +1,4 @@
-/* eslint no-console: 0 */
+/* eslint-disable no-console */
 var sync = function () {
   var services = [];
   var servicesReady = [];
@@ -481,12 +481,10 @@ var sync = function () {
     },
   });
 
-  setTimeout(function () {
-    _.tabs.update(function (tab) {
-      tab.url && services.some(function (service) {
-        return service.checkAuthenticate && service.checkAuthenticate(tab.url);
-      }) && _.tabs.remove(tab.id);
-    });
+  _.tabs.update(function (tab) {
+    tab.url && services.some(function (service) {
+      return service.checkAuthenticate && service.checkAuthenticate(tab.url);
+    }) && _.tabs.remove(tab.id);
   });
 
   return {
