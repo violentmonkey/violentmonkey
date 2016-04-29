@@ -242,6 +242,7 @@ var sync = function () {
             _this.config.clear();
             _this.authState.set('unauthorized');
           } else {
+            console.error(err);
             _this.authState.set('error');
           }
           _this.syncState.set('idle');

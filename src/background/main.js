@@ -131,6 +131,9 @@ var commands = {
     sync.sync(data && sync.service(data));
     return false;
   },
+  GetFromCache: function (data, src) {
+    return _.cache.get(data) || null;
+  },
 };
 
 vmdb.initialized.then(function () {
