@@ -37,11 +37,10 @@ var ConfirmView = BaseView.extend({
       require: {},
       resources: {},
       dependencyOK: false,
-      isLocal: false,
+      isLocal: /^file:\/\/\//.test(_this.url),
     };
-    return _this.getScript(_this.url).then(function (res) {
-      _this.data.isLocal = !res.status;
-      _this.data.code = res.responseText;
+    return _this.getScript(_this.url).then(function (text) {
+      _this.data.code = text;
       _this.loadedEditor.then(function () {
         _this.editor.setValueAndFocus(_this.data.code);
       });
@@ -143,17 +142,14 @@ var ConfirmView = BaseView.extend({
       data: url,
     })
     .then(function (text) {
-      return text ? {
-        status: 200,
-        responseText: text,
-      } : Promise.reject();
+      return text || Promise.reject();
     })
     .catch(function () {
       return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest;
         xhr.open('GET', url, true);
         xhr.onload = function () {
-          resolve(this);
+          resolve(this.responseText);
         };
         xhr.onerror = function () {
           _this.showMessage(_.i18n('msgErrorLoadingData'));

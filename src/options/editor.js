@@ -75,8 +75,6 @@
         lineNumbers: true,
         mode: 'javascript',
         lineWrapping: true,
-        indentUnit: 4,
-        indentWithTabs: true,
         styleActiveLine: true,
         foldGutter: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
