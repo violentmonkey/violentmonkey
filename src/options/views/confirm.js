@@ -7,10 +7,11 @@ var ConfirmView = BaseView.extend({
   },
   templateUrl: '/options/templates/confirm.html',
   initialize: function (url, _from) {
-    this.url = url;
-    this.from = _from;
-    _.bindAll(this, 'hideOptions');
-    BaseView.prototype.initialize.call(this);
+    var _this = this;
+    _this.url = url;
+    _this.from = _from;
+    _.bindAll(_this, 'hideOptions', 'trackLocalFile');
+    BaseView.prototype.initialize.call(_this);
   },
   _render: function () {
     var _this = this;
@@ -30,16 +31,19 @@ var ConfirmView = BaseView.extend({
     });
     _this.$toggler = _this.$('.button-toggle');
   },
-  loadData: function () {
+  loadData: function (changedOnly) {
     var _this = this;
+    var _text = _this.data && _this.data.code;
     _this.$('#btnInstall').prop('disabled', true);
     _this.data = {
+      code: _text,
       require: {},
       resources: {},
       dependencyOK: false,
       isLocal: /^file:\/\/\//.test(_this.url),
     };
     return _this.getScript(_this.url).then(function (text) {
+      if (changedOnly && _text == text) return Promise.reject();
       _this.data.code = text;
       _this.loadedEditor.then(function () {
         _this.editor.setValueAndFocus(_this.data.code);
@@ -187,17 +191,13 @@ var ConfirmView = BaseView.extend({
   trackLocalFile: function () {
     var _this = this;
     setTimeout(function () {
-      var code = _this.data.code;
-      _this.loadData().then(function () {
+      _this.loadData(true).then(function () {
         var track = _.options.get('trackLocalFile');
         if (!track) return;
-        if (_this.data.code != code)
-          _this.parseMeta().then(function () {
-            track && _this.installScript();
-          });
-        else
-          _this.trackLocalFile();
-      });
+        _this.parseMeta().then(function () {
+          track && _this.installScript();
+        });
+      }, _this.trackLocalFile);
     }, 2000);
   },
 });
