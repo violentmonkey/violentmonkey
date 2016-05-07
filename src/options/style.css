@@ -353,3 +353,11 @@ fieldset.title {
 .message-show {
   transform: translateY(0);
 }
+.icon {
+  width: 14px;
+  height: 14px;
+  vertical-align: bottom;
+}
+svg path {
+  fill: currentColor;
+}

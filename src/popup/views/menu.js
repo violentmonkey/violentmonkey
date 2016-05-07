@@ -15,7 +15,7 @@ var MenuView = MenuBaseView.extend({
     var bot = comp.bot;
     _this.addMenuItem({
       name: _.i18n('menuManageScripts'),
-      symbol: 'fa-cog',
+      symbol: 'cog',
       onClick: function (e) {
         var url = chrome.extension.getURL(chrome.app.getDetails().options_page);
         chrome.tabs.query({
@@ -34,7 +34,7 @@ var MenuView = MenuBaseView.extend({
     if (domainsMenu.length)
       _this.addMenuItem({
         name: _.i18n('menuFindScripts'),
-        symbol: 'fa-search',
+        symbol: 'search',
         onClick: function (e) {
           var matches = app.currentTab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
           chrome.tabs.create({
@@ -47,7 +47,7 @@ var MenuView = MenuBaseView.extend({
       }, top);
     if (commandsMenu.length) _this.addMenuItem({
       name: _.i18n('menuCommands'),
-      symbol: 'fa-arrow-right',
+      symbol: 'arrow-right',
       onClick: function (e) {
         app.navigate('commands', {trigger: true});
       },
@@ -58,7 +58,7 @@ var MenuView = MenuBaseView.extend({
       },
       data: _.options.get('isApplied'),
       symbol: function (data) {
-        return data ? 'fa-check' : 'fa-times';
+        return data ? 'check' : 'remove';
       },
       onClick: function (e, model) {
         var isApplied = !model.get('data');

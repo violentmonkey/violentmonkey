@@ -7,6 +7,7 @@ const gulpFilter = require('gulp-filter');
 const order = require('gulp-order');
 const eslint = require('gulp-eslint');
 const uglify = require('gulp-uglify');
+const svgSprite = require('gulp-svg-sprite');
 const templateCache = require('./scripts/templateCache');
 const i18n = require('./scripts/i18n');
 const pkg = require('./package.json');
@@ -129,6 +130,19 @@ gulp.task('copy-i18n', () => (
   .pipe(gulp.dest('dist'))
 ));
 
+gulp.task('svg', () => (
+  gulp.src('icons/*.svg')
+  .pipe(svgSprite({
+    mode: {
+      symbol: {
+        dest: '',
+        sprite: 'sprite.svg',
+      },
+    },
+  }))
+  .pipe(gulp.dest('dist/images'))
+));
+
 gulp.task('build', [
   'templates',
   'js-bg',
@@ -137,6 +151,7 @@ gulp.task('build', [
   'manifest',
   'copy-files',
   'copy-i18n',
+  'svg',
 ]);
 
 gulp.task('i18n', () => (

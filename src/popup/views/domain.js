@@ -13,7 +13,7 @@ var DomainsView = MenuBaseView.extend({
     var bot = comp.bot;
     _this.addMenuItem({
       name: _.i18n('menuBack'),
-      symbol: 'fa-arrow-left',
+      symbol: 'arrow-left',
       onClick: function (e) {
         app.navigate('', {trigger: true});
       },

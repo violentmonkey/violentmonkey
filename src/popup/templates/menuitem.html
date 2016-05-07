@@ -1,5 +1,5 @@
-<%= it.onClickDetail ? '<div class="menu-item-detail"><i class="fa fa-ellipsis-h"></i></div>' : '' %>
+<%= it.onClickDetail ? '<div class="menu-item-detail">...</div>' : '' %>
 <div class="menu-item-label">
-  <i class="fa <%- it.symbol %>"></i>
+  <svg class="icon"><use xlink:href="#<%= it.symbol %>"/></svg>
   <%- it.name %>
 </div>

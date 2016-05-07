@@ -31,7 +31,7 @@ if (!Backbone.history.start())
     });
   }
   function scriptSymbol(data) {
-    return data ? 'fa-check' : 'fa-times';
+    return data ? 'check' : 'remove';
   }
   function scriptClick(e, model) {
     var data = !model.get('data');
@@ -76,7 +76,7 @@ if (!Backbone.history.start())
       commandsMenu.reset(data.menus.map(function (menu) {
         return new MenuItem({
           name: menu[0],
-          symbol: 'fa-hand-o-right',
+          symbol: 'right-hand',
           title: true,
           className: 'ellipsis',
           onClick: commandClick,
