@@ -205,7 +205,7 @@ var autoUpdate = function () {
     return new Promise(function (resolve, reject) {
       if (!_.options.get('autoUpdate')) return reject();
       if (Date.now() - _.options.get('lastUpdate') >= 864e5)
-        return commands.CheckUpdateAll();
+        resolve(commands.CheckUpdateAll());
     }).then(function () {
       setTimeout(check, 36e5);
     }, function () {

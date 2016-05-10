@@ -105,8 +105,10 @@ var requests = function () {
 
   function abortRequest(id) {
     var req = requests[id];
-    if (req) req.xhr.abort();
-    clearRequest(req);
+    if (req) {
+      req.xhr.abort();
+      clearRequest(req);
+    }
   }
 
   // Watch URL redirects

@@ -8,7 +8,6 @@ var MenuItemView = BaseView.extend({
   initialize: function () {
     BaseView.prototype.initialize.call(this);
     this.listenTo(this.model, 'change', this.render);
-    if (this.model.get('onClickDetail')) this.el.classList.add('has-detail');
   },
   _render: function () {
     var it = this.model.toJSON();
@@ -20,7 +19,8 @@ var MenuItemView = BaseView.extend({
     .attr('title', it.title === true ? it.name : it.title);
     if (it.data === false) this.$el.addClass('disabled');
     else this.$el.removeClass('disabled');
-    if (it.className) this.$el.addClass(it.className);
+    it.className && this.$el.addClass(it.className);
+    it.onClickDetail && this.$el.addClass('has-detail');
   },
   onClick: function (e) {
     var onClick = this.model.get('onClick');
