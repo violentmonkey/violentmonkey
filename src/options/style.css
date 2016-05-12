@@ -266,7 +266,9 @@ fieldset.title {
   line-height: 1.5;
 }
 .script-info > * {
+  display: inline-block;
   margin-right: 10px;
+  vertical-align: middle;
 }
 .script-icon {
   position: absolute;
@@ -276,7 +278,7 @@ fieldset.title {
 }
 .script-name {
   font-weight: bold;
-  font-size: 1.17;
+  font-size: 1.17em;
 }
 .script-author {
   max-width: 30%;
@@ -356,7 +358,7 @@ fieldset.title {
 .icon {
   width: 14px;
   height: 14px;
-  vertical-align: bottom;
+  vertical-align: middle;
 }
 svg path {
   fill: currentColor;
