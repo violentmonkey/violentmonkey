@@ -1,5 +1,9 @@
 /* eslint-disable no-console */
-var sync = function () {
+define('sync', function (require, _exports, module) {
+  var events = require('events');
+  var app = require('app');
+  var tabs = require('utils/tabs');
+
   var services = [];
   var servicesReady = [];
   var inited;
@@ -156,7 +160,7 @@ var sync = function () {
     metaFile: 'Violentmonkey',
     delay: function (time) {
       if (time == null) time = this.delayTime;
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve, _reject) {
         setTimeout(resolve, time);
       });
     },
@@ -179,7 +183,7 @@ var sync = function () {
         'error',
       ], null, _this.onStateChange),
       _this.initHeaders();
-      _this.events = getEventEmitter();
+      _this.events = events.getEventEmitter();
       _this.lastFetch = Promise.resolve();
       _this.startSync = _this.syncFactory();
     },
@@ -209,7 +213,7 @@ var sync = function () {
         console.log('Ready to sync:', _this.displayName);
         _this.syncState.set('ready');
         promise = current = current.then(function () {
-          return new Promise(function (resolve, reject) {
+          return new Promise(function (resolve, _reject) {
             debouncedResolve = _.debounce(resolve, 10 * 1000);
             debouncedResolve();
           });
@@ -339,7 +343,7 @@ var sync = function () {
         return Promise.all([
           meta,
           _this.list(),
-          vmdb.getScriptsByIndex('position'),
+          app.vmdb.getScriptsByIndex('position'),
         ]);
       }).then(function (res) {
         var remote = {
@@ -400,7 +404,7 @@ var sync = function () {
                 data.code = raw;
               }
               data.modified = item.modified;
-              return vmdb.parseScript(data)
+              return app.vmdb.parseScript(data)
               .then(function (res) {
                 _.messenger.post(res);
               });
@@ -421,7 +425,7 @@ var sync = function () {
             .then(function (data) {
               if (item.custom.modified !== data.modified) {
                 item.custom.modified = data.modified;
-                return vmdb.saveScript(item);
+                return app.vmdb.saveScript(item);
               }
             });
           }),
@@ -431,7 +435,7 @@ var sync = function () {
           }),
           delLocal.map(function (item) {
             console.log('Remove local script:', item.uri);
-            return vmdb.removeScript(item.id)
+            return app.vmdb.removeScript(item.id)
             .then(function () {
               _.messenger.post({
                 cmd: 'del',
@@ -476,13 +480,13 @@ var sync = function () {
     },
   });
 
-  _.tabs.update(function (tab) {
+  tabs.update(function (tab) {
     tab.url && services.some(function (service) {
       return service.checkAuthenticate && service.checkAuthenticate(tab.url);
-    }) && _.tabs.remove(tab.id);
+    }) && tabs.remove(tab.id);
   });
 
-  return {
+  module.exports = {
     init: init,
     sync: sync,
     service: service,
@@ -494,4 +498,4 @@ var sync = function () {
     },
     BaseService: BaseService,
   };
-}();
+});
