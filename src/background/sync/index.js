@@ -270,11 +270,6 @@ var sync = function () {
       return _this.get(_this.metaFile)
       .then(function (data) {
         return JSON.parse(data);
-      }, function (res) {
-        if (res.status === 404) {
-          return {};
-        }
-        throw res;
       });
     },
     initHeaders: function () {

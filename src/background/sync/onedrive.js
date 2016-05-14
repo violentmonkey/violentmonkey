@@ -96,6 +96,9 @@ setTimeout(function () {
       }
     },
     getMeta: function () {
+      function getMeta() {
+        return sync.BaseService.prototype.getMeta.call(_this);
+      }
       var _this = this;
       return getMeta()
       .catch(function (res) {
@@ -109,12 +112,6 @@ setTimeout(function () {
         }
         throw res;
       });
-      function getMeta() {
-        return _this.get(_this.metaFile)
-        .then(function (data) {
-          return JSON.parse(data);
-        });
-      }
     },
     list: function () {
       var _this = this;

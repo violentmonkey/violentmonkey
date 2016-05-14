@@ -50,6 +50,13 @@ setTimeout(function () {
         url: 'https://api.dropboxapi.com/2/users/get_current_account',
       });
     },
+    getMeta: function () {
+      return sync.BaseService.prototype.getMeta.call(this)
+      .catch(function (res) {
+        if (res.status === 409) return {};
+        throw res;
+      });
+    },
     list: function () {
       var _this = this;
       return _this.request({
