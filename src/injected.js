@@ -113,6 +113,7 @@ function getWrapper() {
     'close',
     'confirm',
     'dispatchEvent',
+    'fetch',
     'find',
     'focus',
     'getComputedStyle',
@@ -126,6 +127,7 @@ function getWrapper() {
     'print',
     'prompt',
     'removeEventListener',
+    'requestAnimationFrame',
     'resizeBy',
     'resizeTo',
     'scroll',
@@ -138,7 +140,7 @@ function getWrapper() {
     'stop',
   ], function (name) {
     var method = window[name];
-    wrapper[name] = function () {
+    if (method) wrapper[name] = function () {
       return method.apply(window, arguments);
     };
   });
@@ -224,9 +226,9 @@ var comm = {
     if (func) func(obj.data);
   },
   runCode: function(name, func, wrapper) {
-    try{
+    try {
       func.call(wrapper.window, wrapper);
-    }catch(e){
+    } catch (e) {
       var msg = 'Error running script: ' + name + '\n' + e;
       if(e.message) msg += '\n' + e.message;
       console.error(msg);
