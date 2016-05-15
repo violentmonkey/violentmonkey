@@ -4,17 +4,15 @@ define('utils/script', function (_require, _exports, module) {
       return url && !(/^(file|data):/.test(url));
     },
     fetch: function (url, type, headers) {
-      var xhr = new XMLHttpRequest;
-      xhr.open('GET', url, true);
-      if (type) xhr.responseType = type;
-      if (headers) for (var k in headers)
-        xhr.setRequestHeader(k, headers[k]);
       return new Promise(function (resolve, reject) {
-        xhr.onload = function () {
-          resolve(this);
-        };
-        xhr.onerror = function () {
-          reject(this);
+        var xhr = new XMLHttpRequest;
+        xhr.open('GET', url, true);
+        if (type) xhr.responseType = type;
+        if (headers) for (var k in headers) {
+          xhr.setRequestHeader(k, headers[k]);
+        }
+        xhr.onloadend = function () {
+          (xhr.status > 300 ? reject : resolve)(xhr);
         };
         xhr.send();
       });

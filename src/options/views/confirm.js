@@ -122,23 +122,21 @@ define('views/Confirm', function (require, _exports, module) {
       this.$('#msg').html(msg);
     },
     getFile: function (url, isBlob) {
-      var xhr = new XMLHttpRequest;
-      xhr.open('GET', url, true);
-      if (isBlob) xhr.responseType = 'blob';
       return new Promise(function (resolve, reject) {
-        xhr.onload = function () {
+        var xhr = new XMLHttpRequest;
+        xhr.open('GET', url, true);
+        if (isBlob) xhr.responseType = 'blob';
+        xhr.onloadend = function () {
+          if (xhr.status > 300) return reject(url);
           if (isBlob) {
             var reader = new FileReader;
             reader.onload = function () {
               resolve(window.btoa(this.result));
             };
-            reader.readAsBinaryString(this.response);
+            reader.readAsBinaryString(xhr.response);
           } else {
             resolve(xhr.responseText);
           }
-        };
-        xhr.onerror = function () {
-          reject(url);
         };
         xhr.send();
       });
@@ -153,17 +151,10 @@ define('views/Confirm', function (require, _exports, module) {
         return text || Promise.reject();
       })
       .catch(function () {
-        return new Promise(function (resolve, reject) {
-          var xhr = new XMLHttpRequest;
-          xhr.open('GET', url, true);
-          xhr.onload = function () {
-            resolve(this.responseText);
-          };
-          xhr.onerror = function () {
-            _this.showMessage(_.i18n('msgErrorLoadingData'));
-            reject(this);
-          };
-          xhr.send();
+        return _this.getFile(url)
+        .catch(function (url) {
+          _this.showMessage(_.i18n('msgErrorLoadingData'));
+          throw url;
         });
       });
     },
