@@ -1,4 +1,7 @@
-setTimeout(function () {
+define('sync_onedrive', function (require, _exports, _module) {
+  var sync = require('sync');
+  var tabsUtils = require('utils/tabs');
+  var searchUtils = require('utils/search');
   var config = _.assign({
     client_id: '000000004418358A',
     redirect_uri: 'https://violentmonkey.github.io/auth_onedrive.html',
@@ -15,9 +18,9 @@ setTimeout(function () {
       scope: 'onedrive.appfolder wl.offline_access',
     };
     var url = 'https://login.live.com/oauth20_authorize.srf';
-    var qs = searchParams.dump(params);
+    var qs = searchUtils.dump(params);
     url += '?' + qs;
-    _.tabs.create(url);
+    tabsUtils.create(url);
   }
   function checkAuthenticate(url) {
     var redirect_uri = config.redirect_uri + '?code=';
@@ -39,7 +42,7 @@ setTimeout(function () {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: searchParams.dump(_.assign({}, {
+      body: searchUtils.dump(_.assign({}, {
         client_id: config.client_id,
         client_secret: config.client_secret,
         redirect_uri: config.redirect_uri,
@@ -96,6 +99,9 @@ setTimeout(function () {
       }
     },
     getMeta: function () {
+      function getMeta() {
+        return sync.BaseService.prototype.getMeta.call(_this);
+      }
       var _this = this;
       return getMeta()
       .catch(function (res) {
@@ -109,12 +115,6 @@ setTimeout(function () {
         }
         throw res;
       });
-      function getMeta() {
-        return _this.get(_this.metaFile)
-        .then(function (data) {
-          return JSON.parse(data);
-        });
-      }
     },
     list: function () {
       var _this = this;

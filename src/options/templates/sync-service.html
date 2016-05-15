@@ -17,7 +17,7 @@
   _.includes(['ready', 'syncing'], it.syncState)
   ? 'disabled' : ''
 %> class="sync-start">
-  <i class="fa fa-refresh"></i>
+  <svg class="icon"><use xlink:href="#refresh"/></svg>
 </button>
 <span><%=
   it.authState === 'initializing' ? _.i18n('msgSyncInit') :

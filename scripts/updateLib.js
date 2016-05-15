@@ -8,7 +8,6 @@ const ncp = require('ncp');
 const SRC_DIR = 'src/public/lib';
 const aliases = {
   CodeMirror: 'codemirror',
-  'font-awesome': {},
 };
 
 function getFiles(pattern, cwd) {

@@ -1,4 +1,4 @@
-!function () {
+define('editor', function (_require, exports, _module) {
   function addScripts(data) {
     function add(data) {
       var s = document.createElement('script');
@@ -63,7 +63,7 @@
 
   var readyCodeMirror;
 
-  _.initEditor = function (options) {
+  exports.init = function (options) {
     options = options || {};
     readyCodeMirror = readyCodeMirror || initCodeMirror();
     return readyCodeMirror.then(function(){
@@ -75,8 +75,6 @@
         lineNumbers: true,
         mode: 'javascript',
         lineWrapping: true,
-        indentUnit: 4,
-        indentWithTabs: true,
         styleActiveLine: true,
         foldGutter: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
@@ -97,4 +95,4 @@
       return editor;
     });
   };
-}();
+});

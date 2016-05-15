@@ -140,7 +140,7 @@ Locales.prototype.touch = function (key) {
 function extract(options) {
   const keys = new Set();
   const patterns = {
-    js: ['_.i18n\\(([\'"])(\\w+)\\1', 2],
+    js: ['_\\.i18n\\(([\'"])(\\w+)\\1', 2],
     json: ['__MSG_(\\w+)__', 1],
     html: ['data-i18n=([\'"]?)(\\w+)\\1', 2],
   };

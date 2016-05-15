@@ -1,9 +1,7 @@
-var MenuItem = Backbone.Model.extend({});
+define('models', function (_require, exports, _module) {
+  exports.MenuItem = Backbone.Model.extend({});
 
-var Menu = Backbone.Collection.extend({
-  model: MenuItem,
+  exports.Menu = Backbone.Collection.extend({
+    model: exports.MenuItem,
+  });
 });
-
-var scriptsMenu = new Menu;
-var commandsMenu = new Menu;
-var domainsMenu = new Menu;

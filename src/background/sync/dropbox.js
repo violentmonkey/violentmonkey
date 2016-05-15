@@ -1,4 +1,7 @@
-setTimeout(function () {
+define('sync_dropbox', function (require, _exports, _module) {
+  var sync = require('sync');
+  var tabsUtils = require('utils/tabs');
+  var searchUtils = require('utils/search');
   var config = {
     client_id: 'f0q12zup2uys5w8',
     redirect_uri: 'https://violentmonkey.github.io/auth_dropbox.html',
@@ -11,9 +14,9 @@ setTimeout(function () {
       redirect_uri: config.redirect_uri,
     };
     var url = 'https://www.dropbox.com/1/oauth2/authorize';
-    var qs = searchParams.dump(params);
+    var qs = searchUtils.dump(params);
     url += '?' + qs;
-    _.tabs.create(url);
+    tabsUtils.create(url);
   }
   function checkAuthenticate(url) {
     var redirect_uri = config.redirect_uri + '#';
@@ -23,7 +26,7 @@ setTimeout(function () {
     }
   }
   function authorized(raw) {
-    var data = searchParams.load(raw);
+    var data = searchUtils.load(raw);
     if (data.access_token) {
       dropbox.config.set({
         uid: data.uid,
@@ -48,6 +51,13 @@ setTimeout(function () {
       return this.request({
         method: 'POST',
         url: 'https://api.dropboxapi.com/2/users/get_current_account',
+      });
+    },
+    getMeta: function () {
+      return sync.BaseService.prototype.getMeta.call(this)
+      .catch(function (res) {
+        if (res.status === 409) return {};
+        throw res;
       });
     },
     list: function () {
