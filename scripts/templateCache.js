@@ -11,18 +11,25 @@ const minified = require('./minifyHtml');
 }*/
 
 module.exports = function templateCache() {
-  const contentTpl = '_.cache.put(<%= name %>, <%= content %>);\n';
-  let content = '/* Below are templates cached from `_.template` with love :) */\n\n';
+  const contentTpl = 'cache.put(<%= name %>, <%= content %>);\n';
+  const header = `/* Templates cached from \`_.template\` with love :) */
+define('templates', function (require, exports, module) {
+  var cache = require('cache');
+`;
+  const footer = `
+});
+`;
+  const contents = [];
 
   function bufferContents(file, enc, cb) {
     if (file.isNull()) return cb();
     if (file.isStream())
       return this.emit('error', new gutil.PluginError('VM-cache', 'Stream is not supported.'));
-    content += gutil.template(contentTpl, {
+    contents.push(gutil.template(contentTpl, {
       name: JSON.stringify(('/' + file.relative).replace(/\\/g, '/')),
       content: _.template(minified(file.contents), {variable: 'it'}).source,
       file: '',
-    });
+    }));
     cb();
   }
 
@@ -30,7 +37,7 @@ module.exports = function templateCache() {
     this.push(new gutil.File({
       base: '',
       path: 'template.js',
-      contents: new Buffer(content),
+      contents: new Buffer(header + contents.join('') + footer),
     }));
     cb();
   }

@@ -1,10 +1,10 @@
 const gulp = require('gulp');
 const concat = require('gulp-concat');
 const replace = require('gulp-replace');
+const footer = require('gulp-footer');
 const merge2 = require('merge2');
 const cssnano = require('gulp-cssnano');
 const gulpFilter = require('gulp-filter');
-const order = require('gulp-order');
 const eslint = require('gulp-eslint');
 const uglify = require('gulp-uglify');
 const svgSprite = require('gulp-svg-sprite');
@@ -55,8 +55,8 @@ gulp.task('eslint', () => (
 
 gulp.task('templates', () => {
   var stream = merge2([
-    gulp.src(paths.templates).pipe(templateCache()),
     gulp.src(paths.cache),
+    gulp.src(paths.templates).pipe(templateCache()),
   ])
   .pipe(concat('cache.js'));
   if (isProd) stream = stream.pipe(uglify());
@@ -65,33 +65,24 @@ gulp.task('templates', () => {
 
 gulp.task('js-bg', () => {
   var stream = gulp.src(paths.jsBg)
-  .pipe(order([
-    '**/utils.js',
-    '!**/app.js',
-  ]))
-  .pipe(concat('background/app.js'));
+  .pipe(concat('background/app.js'))
+  .pipe(footer(';define.use("app");'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'));
 });
 
 gulp.task('js-options', () => {
   var stream = gulp.src(paths.jsOptions)
-  .pipe(order([
-    '**/tab-*.js',
-    '!**/app.js',
-  ]))
-  .pipe(concat('options/app.js'));
+  .pipe(concat('options/app.js'))
+  .pipe(footer(';define.use("app");'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'));
 });
 
 gulp.task('js-popup', () => {
   var stream = gulp.src(paths.jsPopup)
-  .pipe(order([
-    '**/base.js',
-    '!**/app.js',
-  ]))
-  .pipe(concat('popup/app.js'));
+  .pipe(concat('popup/app.js'))
+  .pipe(footer(';define.use("app");'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'))
 });
@@ -105,10 +96,12 @@ gulp.task('manifest', () => (
 gulp.task('copy-files', () => {
   const jsFilter = gulpFilter(['**/*.js'], {restore: true});
   const cssFilter = gulpFilter(['**/*.css'], {restore: true});
-  return gulp.src(paths.copy)
+  var stream = gulp.src(paths.copy);
+  if (isProd) stream = stream
   .pipe(jsFilter)
   .pipe(uglify())
-  .pipe(jsFilter.restore)
+  .pipe(jsFilter.restore);
+  stream = stream
   .pipe(cssFilter)
   .pipe(cssnano({
     zindex: false,

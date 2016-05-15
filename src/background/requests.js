@@ -1,4 +1,6 @@
-var requests = function () {
+define('requests', function (require, _exports, module) {
+  var tabsUtils = require('utils/tabs');
+  var cache = require('utils/cache');
   var requests = {};
   var verify = {};
   var special_headers = [
@@ -39,10 +41,10 @@ var requests = function () {
       } catch (e) {}
       if (evt.type === 'loadend') clearRequest(req);
       return lastPromise = lastPromise.then(function () {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve, _reject) {
           if (xhr.response && xhr.responseType === 'blob') {
             var reader = new FileReader;
-            reader.onload = function (e) {
+            reader.onload = function (_e) {
               data.response = this.result;
               resolve();
             };
@@ -129,12 +131,14 @@ var requests = function () {
     var newHeaders = [];
     var vmHeaders = {};
     headers.forEach(function (header) {
-      if (header.name === 'VM-Task')
-        tasks[details.requestId] = header.value;
-      else if (header.name.slice(0, 3) === 'VM-')
+      // if (header.name === 'VM-Task') {
+      //   tasks[details.requestId] = header.value;
+      // } else
+      if (header.name.slice(0, 3) === 'VM-') {
         vmHeaders[header.name.slice(3)] = header.value;
-      else
+      } else {
         newHeaders.push(header);
+      }
     });
     var reqId = vmHeaders['Verify'];
     if (reqId) {
@@ -200,11 +204,11 @@ var requests = function () {
         return;
       }
       if ((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
-        _.cache.set(req.url, x.responseText);
+        cache.set(req.url, x.responseText);
         var url = chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url);
-        if (req.tabId < 0) _.tabs.create(url);
-        else _.tabs.get(req.tabId).then(function (t) {
-          _.tabs.create(url + '/' + encodeURIComponent(t.url));
+        if (req.tabId < 0) tabsUtils.create(url);
+        else tabsUtils.get(req.tabId).then(function (t) {
+          tabsUtils.create(url + '/' + encodeURIComponent(t.url));
         });
         return noredirect;
       }
@@ -214,9 +218,9 @@ var requests = function () {
     types: ['main_frame'],
   }, ['blocking', 'requestBody']);
 
-  return {
+  module.exports = {
     getRequestId: getRequestId,
     abortRequest: abortRequest,
     httpRequest: httpRequest,
   };
-}();
+});

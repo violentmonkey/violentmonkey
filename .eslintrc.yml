@@ -1,8 +1,4 @@
 rules:
-  no-undef:
-    - 0
-  no-unused-vars:
-    - 0
   comma-dangle:
     - 0
   no-console:
@@ -12,9 +8,22 @@ rules:
       - error
   no-empty:
     - 0
+  no-unused-vars:
+    - 2
+    - args: all
+      argsIgnorePattern: ^_
 
 env:
   browser: true
   es6: true
+
+globals:
+  define: true
+  _: true
+  $: true
+  chrome: true
+  zip: true
+  Backbone: true
+  CodeMirror: true
 
 extends: 'eslint:recommended'
