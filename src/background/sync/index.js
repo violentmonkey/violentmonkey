@@ -105,6 +105,7 @@ define('sync', function (require, _exports, module) {
         authState: service.authState.get(),
         syncState: service.syncState.get(),
         lastSync: service.config.get('meta', {}).lastSync,
+        progress: service.progress,
       };
     });
   }
@@ -166,7 +167,12 @@ define('sync', function (require, _exports, module) {
     },
     initialize: function (name) {
       var _this = this;
+      _this.onStateChange = _.debounce(_this.onStateChange.bind(_this));
       if (name) _this.name = name;
+      _this.progress = {
+        finished: 0,
+        total: 0,
+      };
       _this.config = new ServiceConfig(_this.name);
       _this.authState = serviceState([
         'idle',
@@ -283,6 +289,7 @@ define('sync', function (require, _exports, module) {
     },
     request: function (options) {
       var _this = this;
+      var progress = _this.progress;
       var lastFetch;
       if (options.noDelay) {
         lastFetch = Promise.resolve();
@@ -292,6 +299,8 @@ define('sync', function (require, _exports, module) {
           return _this.delay();
         });
       }
+      progress.total ++;
+      _this.onStateChange();
       return lastFetch.then(function () {
         return new Promise(function (resolve, reject) {
           var xhr = new XMLHttpRequest;
@@ -307,21 +316,13 @@ define('sync', function (require, _exports, module) {
             var v = headers[k];
             v && xhr.setRequestHeader(k, v);
           }
-          xhr.timeout = 10 * 1000;
-          xhr.onload = function () {
-            if (!this.status || this.status > 300)
-              reject(this);
-            else
-              resolve(this.responseText);
-          };
-          xhr.onerror = function () {
-            if (this.status === 503) {
+          xhr.onloadend = function () {
+            progress.finished ++;
+            _this.onStateChange();
+            if (xhr.status === 503) {
               // TODO Too Many Requests
             }
-            requestError();
-          };
-          xhr.ontimeout = function () {
-            requestError('Timed out.');
+            xhr.status > 300 ? requestError() : resolve(xhr.responseText);
           };
           xhr.send(options.body);
 
@@ -337,6 +338,10 @@ define('sync', function (require, _exports, module) {
     },
     sync: function () {
       var _this = this;
+      _this.progress = {
+        finished: 0,
+        total: 0,
+      };
       _this.syncState.set('syncing');
       return _this.getMeta()
       .then(function (meta) {

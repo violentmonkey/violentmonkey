@@ -14,6 +14,7 @@ define('views/SyncService', function (require, _exports, module) {
       var it = this.model.toJSON();
       it.enabled = _.options.get(it.name + 'Enabled');
       if (it.lastSync) it.lastSync = new Date(it.lastSync).toLocaleString();
+      it.progress = it.progress && it.progress.total ? ' (' + it.progress.finished + '/' + it.progress.total + ')' : '';
       this.$el.html(this.templateFn(it));
     },
     retry: function () {

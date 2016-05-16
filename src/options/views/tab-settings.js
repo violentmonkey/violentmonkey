@@ -49,20 +49,22 @@ define('views/TabSettings', function (require, _exports, module) {
     },
     templateUrl: '/options/templates/tab-settings.html',
     initialize: function () {
-      BaseView.prototype.initialize.call(this);
-      this.listenTo(app.syncData, 'reset', this.render);
+      var _this = this;
+      BaseView.prototype.initialize.call(_this);
+      _this.listenTo(app.syncData, 'reset', _this.render);
     },
     _render: function () {
+      var _this = this;
       var options = _.options.getAll();
-      this.$el.html(this.templateFn(options));
-      var syncServices = this.$('.sync-services');
+      _this.$el.html(_this.templateFn(options));
+      var syncServices = _this.$('.sync-services');
       app.syncData.each(function (service) {
         var serviceView = new SyncServiceView({model: service});
         syncServices.append(serviceView.$el);
       });
-      // this.$('#sInjectMode').val(options.injectMode);
-      // this.updateInjectHint();
-      this.exportList = new ExportList;
+      // _this.$('#sInjectMode').val(options.injectMode);
+      // _this.updateInjectHint();
+      _this.exportList = new ExportList;
     },
     updateCheckbox: _.updateCheckbox,
     updateAutoUpdate: function (_e) {
