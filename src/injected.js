@@ -227,10 +227,10 @@ var comm = {
   },
   runCode: function(name, func, wrapper) {
     try {
-      func.call(wrapper.window, wrapper);
+      func.call(wrapper.window || wrapper, wrapper);
     } catch (e) {
       var msg = 'Error running script: ' + name + '\n' + e;
-      if(e.message) msg += '\n' + e.message;
+      if (e.message) msg += '\n' + e.message;
       console.error(msg);
     }
   },
