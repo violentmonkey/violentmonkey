@@ -26,9 +26,7 @@ define('views/Domain', function (require, _exports, module) {
       app.domainsMenu.each(function (item) {
         _this.addMenuItem(item, bot);
       });
-      setTimeout(function () {
-        _this.fixStyles(bot, comp.plh);
-      });
+      _this.fixStyles(bot, comp.plh);
     },
   });
 });

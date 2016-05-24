@@ -4,12 +4,12 @@ define('views/Base', function (require, _exports, module) {
   var MenuItemView = require('views/MenuItem');
 
   module.exports = BaseView.extend({
-    el: '#popup',
     templateUrl: '/popup/templates/menu.html',
     addMenuItem: function (obj, parent) {
       if (!(obj instanceof MenuItem)) obj = new MenuItem(obj);
       var item = new MenuItemView({model: obj});
       parent.append(item.$el);
+      this.childViews.push(item);
     },
     components: function () {
       var $el = this.$el;
@@ -21,9 +21,11 @@ define('views/Base', function (require, _exports, module) {
       };
     },
     fixStyles: function (div, plh) {
-      plh.html(div.html());
-      var pad = div[0].offsetWidth - div[0].clientWidth + 2;
-      plh.css('padding-right', pad + 'px');
+      setTimeout(function () {
+        plh.html(div.html());
+        var pad = div[0].offsetWidth - div[0].clientWidth + 2;
+        plh.css('padding-right', pad + 'px');
+      });
     },
   });
 });

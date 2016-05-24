@@ -28,9 +28,7 @@ define('views/Command', function (require, _exports, module) {
       app.commandsMenu.each(function (item) {
         _this.addMenuItem(item, bot);
       });
-      setTimeout(function () {
-        _this.fixStyles(bot, comp.plh);
-      });
+      _this.fixStyles(bot, comp.plh);
     },
   });
 });

@@ -14,17 +14,18 @@ define('views/MenuItem', function (require, _exports, module) {
       _this.listenTo(_this.model, 'change', _this.render);
     },
     _render: function () {
-      var it = this.model.toJSON();
+      var _this = this;
+      var it = _this.model.toJSON();
       if (typeof it.symbol === 'function')
       it.symbol = it.symbol(it.data);
       if (typeof it.name === 'function')
       it.name = it.name(it.data);
-      this.$el.html(this.templateFn(it))
+      _this.$el.html(_this.templateFn(it))
       .attr('title', it.title === true ? it.name : it.title);
-      if (it.data === false) this.$el.addClass('disabled');
-      else this.$el.removeClass('disabled');
-      it.className && this.$el.addClass(it.className);
-      it.onClickDetail && this.$el.addClass('has-detail');
+      if (it.data === false) _this.$el.addClass('disabled');
+      else _this.$el.removeClass('disabled');
+      it.className && _this.$el.addClass(it.className);
+      it.onClickDetail && _this.$el.addClass('has-detail');
     },
     onClick: function (e) {
       var onClick = this.model.get('onClick');
