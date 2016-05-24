@@ -11,11 +11,9 @@ define('utils/tester', function (_require, exports, _module) {
     if (custom.exclude) exc = exc.concat(custom.exclude);
     var ok = !mat.length && !inc.length;
     // @match
-    ok = ok || mat.length && function (urlParts) {
-      return mat.some(function (str) {
-        return matchTest(str, urlParts);
-      });
-    }(url.match(match_reg));
+    ok = ok || mat.length && function (test) {
+      return mat.some(test);
+    }(matchTester(url));
     // @include
     ok = ok || inc.some(function (str) {
       return autoReg(str).test(url);
@@ -38,30 +36,41 @@ define('utils/tester', function (_require, exports, _module) {
       return str2RE(str); // String with wildcards
   }
 
-  var match_reg = /(.*?):\/\/([^\/]*)\/(.*)/;
-  function matchTest(str, urlParts) {
-    if (str == '<all_urls>') return true;
-    var parts = str.match(match_reg);
-    var ok = !!parts;
-    // scheme
-    ok = ok && (
+  function matchTester(url) {
+    function matchScheme(rule, data) {
       // exact match
-      parts[1] == urlParts[1]
+      if (rule == data) return 1;
       // * = http | https
-      || parts[1] == '*' && /^https?$/i.test(urlParts[1])
-    );
-    // host
-    ok = ok && (
+      if (rule == '*' && /^https?$/i.test(data)) return 1;
+      return 0;
+    }
+    function matchHost(rule, data) {
       // * matches all
-      parts[2] == '*'
+      if (rule == '*') return 1;
       // exact match
-      || parts[2] == urlParts[2]
+      if (rule == data) return 1;
       // *.example.com
-      || /^\*\.[^*]*$/.test(parts[2]) && str2RE(parts[2]).test(urlParts[2])
-    );
-    // pathname
-    ok = ok && str2RE(parts[3]).test(urlParts[3]);
-    return ok;
+      if (/^\*\.[^*]*$/.test(rule)) {
+        // matches the specified domain
+        if (rule.slice(2) == data) return 1;
+        // matches subdomains
+        if (str2RE(rule).test(data)) return 1;
+      }
+      return 0;
+    }
+    function matchPath(rule, data) {
+      return str2RE(rule).test(data);
+    }
+    var RE = /(.*?):\/\/([^\/]*)\/(.*)/;
+    var urlParts = url.match(RE);
+    return function (str) {
+      if (str == '<all_urls>') return true;
+      var parts = str.match(RE);
+      return !!parts
+        && matchScheme(parts[1], urlParts[1])
+        && matchHost(parts[2], urlParts[2])
+        && matchPath(parts[3], urlParts[3]);
+    };
   }
 
   exports.testURL = testURL;
