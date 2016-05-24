@@ -3,7 +3,6 @@ define('views/TabSettings', function (require, _exports, module) {
   var app = require('app');
   var SyncServiceView = require('views/SyncService');
   var ExportList = BaseView.extend({
-    el: '.export-list',
     templateUrl: '/options/templates/option.html',
     initialize: function () {
       BaseView.prototype.initialize.call(this);
@@ -34,8 +33,8 @@ define('views/TabSettings', function (require, _exports, module) {
   });
 
   module.exports = BaseView.extend({
-    el: '#tab',
     name: 'settings',
+    className: 'content',
     events: {
       'change [data-check]': 'updateCheckbox',
       // 'change #sInjectMode': 'updateInjectMode',
@@ -56,15 +55,20 @@ define('views/TabSettings', function (require, _exports, module) {
     _render: function () {
       var _this = this;
       var options = _.options.getAll();
+      _this.clear();
       _this.$el.html(_this.templateFn(options));
       var syncServices = _this.$('.sync-services');
-      app.syncData.each(function (service) {
+      _this.childViews = app.syncData.map(function (service) {
         var serviceView = new SyncServiceView({model: service});
         syncServices.append(serviceView.$el);
+        return serviceView;
       });
       // _this.$('#sInjectMode').val(options.injectMode);
       // _this.updateInjectHint();
-      _this.exportList = new ExportList;
+      _this.exportList = new ExportList({
+        el: _this.$('.export-list')[0],
+      });
+      _this.childViews.push(_this.exportList);
     },
     updateCheckbox: _.updateCheckbox,
     updateAutoUpdate: function (_e) {

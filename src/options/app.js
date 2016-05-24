@@ -1,11 +1,11 @@
 define('app', function (require, exports, _module) {
   var MainView = require('views/Main');
   var ConfirmView = require('views/Confirm');
-  var EditView = require('views/Edit');
   var models = require('models');
+  var cache = require('cache');
   zip.workerScriptsPath = '/lib/zip.js/';
 
-  var App = Backbone.Router.extend({
+  var App = cache.BaseRouter.extend({
     routes: {
       '': 'renderMain',
       'main/:tab': 'renderMain',
@@ -13,17 +13,18 @@ define('app', function (require, exports, _module) {
       'confirm/:url/:from': 'renderConfirm',
     },
     renderMain: function (tab) {
-      exports.scriptList || initMain();
-      this.view = new MainView(tab);
+      this.loadView('main', function () {
+        initMain();
+        return new MainView;
+      }).loadTab(tab);
     },
-    renderConfirm: function (url, _from) {
-      this.view = new ConfirmView(url, _from);
-    },
-    renderEdit: function (id) {
-      this.view = new EditView(id);
+    renderConfirm: function (url, referer) {
+      this.loadView('confirm', function () {
+        return new ConfirmView;
+      }).initData(url, referer);
     },
   });
-  var app = new App();
+  var app = new App('#app');
   Backbone.history.start() || app.navigate('', {trigger: true, replace: true});
 
   $(document).on('click', '[data-feature]', function (e) {

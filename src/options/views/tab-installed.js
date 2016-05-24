@@ -5,8 +5,8 @@ define('views/TabInstalled', function (require, _exports, module) {
   var EditView = require('views/Edit');
   var Script = require('models').Script;
   module.exports = BaseView.extend({
-    el: '#tab',
     name: 'main',
+    className: 'content no-pad',
     templateUrl: '/options/templates/tab-installed.html',
     events: {
       'click #bNew': 'newScript',
@@ -26,6 +26,11 @@ define('views/TabInstalled', function (require, _exports, module) {
       });
       _this.listenTo(app.scriptList, 'edit:close', _this.closeEdit);
     },
+    remove: function () {
+      var _this = this;
+      _this.clear();
+      BaseView.prototype.remove.call(_this);
+    },
     closeEdit: function () {
       var _this = this;
       if (_this.editView) {
@@ -34,27 +39,32 @@ define('views/TabInstalled', function (require, _exports, module) {
       }
     },
     _render: function () {
-      this.$el.html(this.templateFn());
-      this.$list = this.$('.scripts');
-      this.$bd = this.$('.backdrop');
-      this.$bdm = this.$('.backdrop > div');
-      this.setBackdrop();
-      this.addAll();
+      var _this = this;
+      _this.clear();
+      _this.$el.html(_this.templateFn());
+      _this.$list = _this.$('.scripts');
+      _this.$bd = _this.$('.backdrop');
+      _this.$bdm = _this.$('.backdrop > div');
+      _this.setBackdrop();
+      _this.addAll();
     },
     setBackdrop: function () {
+      var _this = this;
       if (app.scriptList.loading) {
-        this.$bd.addClass('mask').show();
-        this.$bdm.html(_.i18n('msgLoading'));
+        _this.$bd.addClass('mask').show();
+        _this.$bdm.html(_.i18n('msgLoading'));
       } else if (!app.scriptList.length) {
-        this.$bd.removeClass('mask').show();
-        this.$bdm.html(_.i18n('labelNoScripts'));
+        _this.$bd.removeClass('mask').show();
+        _this.$bdm.html(_.i18n('labelNoScripts'));
       } else {
-        this.$bd.hide();
+        _this.$bd.hide();
       }
     },
     addOne: function (script) {
+      var _this = this;
       var view = new ScriptView({model: script});
-      this.$list.append(view.$el);
+      _this.childViews.push(view);
+      _this.$list.append(view.$el);
     },
     addAll: function () {
       app.scriptList.forEach(this.addOne, this);

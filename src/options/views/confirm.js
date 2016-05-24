@@ -3,26 +3,20 @@ define('views/Confirm', function (require, _exports, module) {
   var ConfirmOptionsView = require('views/ConfirmOptions');
   var BaseView = require('cache').BaseView;
   module.exports = BaseView.extend({
-    el: '#app',
     events: {
       'click .button-toggle': 'toggleOptions',
       'click #btnInstall': 'installScript',
       'click #btnClose': 'close',
     },
     templateUrl: '/options/templates/confirm.html',
-    initialize: function (url, _from) {
+    initialize: function () {
       var _this = this;
-      _this.url = url;
-      _this.from = _from;
       _.bindAll(_this, 'hideOptions', 'trackLocalFile');
       BaseView.prototype.initialize.call(_this);
     },
     _render: function () {
       var _this = this;
-      _this.$el.html(_this.templateFn({
-        url: _this.url,
-      }));
-      _this.showMessage(_.i18n('msgLoadingData'));
+      _this.$el.html(_this.templateFn());
       _this.loadedEditor = editor.init({
         container: _this.$('.editor-code')[0],
         readonly: true,
@@ -30,10 +24,18 @@ define('views/Confirm', function (require, _exports, module) {
       }).then(function (editor) {
         _this.editor = editor;
       });
+      _this.$toggler = _this.$('.button-toggle');
+      _this.$('#url').attr('title', _this.url).text(_this.url);
+      _this.showMessage(_.i18n('msgLoadingData'));
+    },
+    initData: function (url, referer) {
+      var _this = this;
+      _this.url = url;
+      _this.from = referer;
+      _this.render();
       _this.loadData().then(function () {
         _this.parseMeta();
       });
-      _this.$toggler = _this.$('.button-toggle');
     },
     loadData: function (changedOnly) {
       var _this = this;

@@ -1,16 +1,14 @@
-<div class="main">
-  <aside>
-    <img src="/images/icon128.png">
-    <h2 data-i18n=extName></h2>
-    <div class="line">2013-2016</div>
-    <hr>
-    <div class=sidemenu>
-      <a href="#main/installed" <%= it.tab == 'main' ? 'class="active"' : ''  %> data-i18n=sideMenuInstalled></a>
-      <a href="#main/settings" <%= it.tab == 'settings' ? 'class="active"' : '' %> data-feature="settings">
-        <span data-i18n=sideMenuSettings class="feature-text"></span>
-      </a>
-      <a href="#main/about" <%= it.tab == 'about' ? 'class="active"' : '' %> data-i18n=sideMenuAbout></a>
-    </div>
-  </aside>
-  <div id="tab"></div>
-</div>
+<aside>
+  <img src="/images/icon128.png">
+  <h2 data-i18n=extName></h2>
+  <div class="line">2013-2016</div>
+  <hr>
+  <div class=sidemenu>
+    <a href="#main/installed" <%= it.tab == 'main' ? 'class="active"' : ''  %> data-i18n=sideMenuInstalled></a>
+    <a href="#main/settings" <%= it.tab == 'settings' ? 'class="active"' : '' %> data-feature="settings">
+      <span data-i18n=sideMenuSettings class="feature-text"></span>
+    </a>
+    <a href="#main/about" <%= it.tab == 'about' ? 'class="active"' : '' %> data-i18n=sideMenuAbout></a>
+  </div>
+</aside>
+<div id="tab"></div>

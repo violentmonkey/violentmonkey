@@ -94,7 +94,7 @@ aside img {
   border-right: 1px solid darkgray;
   overflow-y: hidden;
 }
-#tab > header {
+.content > header {
   height: 30px;
   line-height: 30px;
   padding: 0 .5rem;
@@ -142,6 +142,9 @@ aside img {
   height: 100%;
   padding: 20px;
   overflow-y: auto;
+}
+.no-pad {
+  padding: 0;
 }
 fieldset.title {
   margin-top: 20px;
