@@ -22,6 +22,7 @@ define('sync_dropbox', function (require, _exports, _module) {
     var redirect_uri = config.redirect_uri + '#';
     if (url.slice(0, redirect_uri.length) === redirect_uri) {
       authorized(url.slice(redirect_uri.length));
+      dropbox.checkSync();
       return true;
     }
   }
@@ -32,7 +33,6 @@ define('sync_dropbox', function (require, _exports, _module) {
         uid: data.uid,
         token: data.access_token,
       });
-      dropbox.prepare();
     }
   }
   function normalize(item) {

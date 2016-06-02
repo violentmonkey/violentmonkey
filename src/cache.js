@@ -30,13 +30,31 @@ define('cache', function (require, _exports, module) {
   var BaseView = cache.BaseView = Backbone.View.extend({
     initialize: function () {
       var _this = this;
-      if (_this.templateUrl)
+      _this.subviews = {data: {}};
+      _this.childViews = [];
+      if (_this.templateUrl) {
         _this.__gotTemplate = cache.get(_this.templateUrl)
         .then(function (fn) {
           _this.templateFn = fn;
         });
+      }
       _.bindAll(_this, 'render', 'postrender');
       _this.render();
+    },
+    clear: function () {
+      var _this = this;
+      if (_this.childViews.length) {
+        _this.childViews.forEach(function (view) {
+          view.remove();
+        });
+        _this.childViews = [];
+      }
+    },
+    remove: function () {
+      var _this = this;
+      _this.clear();
+      _this.undelegateEvents();
+      Backbone.View.prototype.remove.call(_this);
     },
     _render: function () {
       this.$el.html(this.templateFn());
@@ -54,6 +72,27 @@ define('cache', function (require, _exports, module) {
       _.forEach(this.$('[data-feature]'), function (node) {
         _.features.isHit(node.dataset.feature) || node.classList.add('feature');
       });
+    },
+    loadSubview: function (name, factory, selector) {
+      var _this = this;
+      var view;
+      var subviews = _this.subviews;
+      view = subviews.data[name];
+      if (!view) {
+        view = factory();
+      }
+      var current = subviews.current;
+      if (name !== current) {
+        var currentView = subviews.data[current];
+        if (currentView) {
+          currentView.remove();
+          subviews.data[current] = null;
+        }
+      }
+      subviews.data[subviews.current = name] = view;
+      var $el = selector ? _this.$(selector) : _this.$el;
+      $el.html(view.render().el);
+      return view;
     },
     getValue: function (target) {
       var key = target.dataset.id;
@@ -78,6 +117,30 @@ define('cache', function (require, _exports, module) {
   });
 
   BaseView.prototype.postrender.call(window);
+
+  cache.BaseRouter = Backbone.Router.extend({
+    initialize: function (selector) {
+      var _this = this;
+      _this.views = {data: {}};
+      _this.$root = $(selector);
+    },
+    loadView: function (name, factory) {
+      var _this = this;
+      var views = _this.views;
+      var view = views.data[name];
+      if (!view) view = views.data[name] = factory();
+      if (name !== views.current) {
+        var currentView = views.data[views.current];
+        if (currentView) {
+          currentView.remove();
+          views.data[views.current] = null;
+        }
+        views.data[views.current = name] = view;
+      }
+      _this.$root.html(view.el);
+      return view;
+    },
+  });
 
   !function () {
     var xhr = new XMLHttpRequest;

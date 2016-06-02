@@ -339,12 +339,20 @@ define('vmdb', function (require, _exports, module) {
     var requests = {};
     return function (url) {
       var _this = this;
-      return requests[url]
-        || (requests[url] = scriptUtils.fetch(url).then(function (res) {
+      var promise = requests[url];
+      if (!promise) {
+        promise = requests[url] = scriptUtils.fetch(url)
+        .then(function (res) {
           return _this.saveRequire(url, res.responseText);
-        }).then(function () {
+        })
+        .catch(function () {
+          console.error('Error fetching required script: ' + url);
+        })
+        .then(function () {
           delete requests[url];
-        }));
+        });
+      }
+      return promise;
     };
   }();
 

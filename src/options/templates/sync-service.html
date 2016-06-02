@@ -24,6 +24,6 @@
   it.authState === 'error' ? _.i18n('msgSyncInitError') :
   it.syncState === 'error' ? _.i18n('msgSyncError') :
   it.syncState === 'ready' ? _.i18n('msgSyncReady') :
-  it.syncState === 'syncing' ? _.i18n('msgSyncing') :
+  it.syncState === 'syncing' ? _.i18n('msgSyncing') + it.progress :
   it.lastSync ? _.i18n('lastSync', it.lastSync) : ''
 %></span>

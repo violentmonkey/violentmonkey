@@ -4,21 +4,33 @@ define('views/Main', function (require, _exports, module) {
   var SettingsTab = require('views/TabSettings');
   var AboutTab = require('views/TabAbout');
   module.exports = BaseView.extend({
-    el: '#app',
+    className: 'main',
     templateUrl: '/options/templates/main.html',
     tabs: {
-      '': MainTab,
+      main: MainTab,
       settings: SettingsTab,
       about: AboutTab,
     },
-    initialize: function (tab) {
+    initialize: function () {
       var _this = this;
-      _this.tab = _this.tabs[tab] || _this.tabs[''];
+      _this.model = new Backbone.Model({
+        tab: null,
+      });
+      _this.listenTo(_this.model, 'change', _this.render);
       BaseView.prototype.initialize.call(_this);
     },
     _render: function () {
-      this.$el.html(this.templateFn({tab: this.tab.prototype.name}));
-      this.view = new this.tab;
+      var _this = this;
+      var Tab = _this.model.get('tab');
+      var name = Tab.prototype.name;
+      _this.$el.html(_this.templateFn({tab: name}));
+      _this.loadSubview(name, function () {
+        return new Tab;
+      }, '#tab');
+    },
+    loadTab: function (name) {
+      var _this = this;
+      _this.model.set('tab', _this.tabs[name] || _this.tabs['main']);
     },
   });
 });

@@ -79,9 +79,7 @@ define('views/Menu', function (require, _exports, module) {
       app.scriptsMenu.each(function (item) {
         _this.addMenuItem(item, bot);
       });
-      setTimeout(function () {
-        _this.fixStyles(bot, comp.plh);
-      });
+      _this.fixStyles(bot, comp.plh);
     },
   });
 });

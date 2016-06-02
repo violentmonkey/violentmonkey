@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Violentmonkey Tests</title>
+    <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
+    <script src="../src/public/lib/require-lite.js"></script>
+    <script src="../src/background/utils/tester.js"></script>
+  </head>
+  <body>
+    <div id="qunit"></div>
+    <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+    <script src="test_background.js"></script>
+    <script>define.use('tests/background');</script>
+  </body>
+</html>
