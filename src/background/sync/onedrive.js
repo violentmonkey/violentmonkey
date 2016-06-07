@@ -106,7 +106,7 @@ define('sync_onedrive', function (require, _exports, _module) {
       return getMeta()
       .catch(function (res) {
         if (res.status === 404) {
-          var header = res.getResponseHeader('WWW-Authenticate') || '';
+          var header = res.xhr.getResponseHeader('WWW-Authenticate') || '';
           if (/^Bearer realm="OneDriveAPI"/.test(header)) {
             return _this.refreshToken().then(getMeta);
           } else {

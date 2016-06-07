@@ -330,7 +330,7 @@ define('sync', function (require, _exports, module) {
             reject({
               url: options.url,
               status: xhr.status,
-              reason: reason || xhr.responseText,
+              xhr: xhr,
             });
           }
         });
