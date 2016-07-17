@@ -28,19 +28,18 @@ define('views/TabInstalled', function (require, _exports, module) {
           },
         })
         .then(function () {
-          var collection = model.collection;
-          var models = collection.models;
+          var scripts = _this.store.scripts;
           var i = Math.min(data.from, data.to);
           var j = Math.max(data.from, data.to);
           var seq = [
-            models.slice(0, i),
-            models.slice(i, j + 1),
-            models.slice(j + 1),
+            scripts.slice(0, i),
+            scripts.slice(i, j + 1),
+            scripts.slice(j + 1),
           ];
           i === data.to
           ? seq[1].unshift(seq[1].pop())
           : seq[1].push(seq[1].shift());
-          collection.models = seq.concat.apply([], seq);
+          _this.store.scripts = seq.concat.apply([], seq);
         });
       },
     },
