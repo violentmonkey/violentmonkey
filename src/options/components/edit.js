@@ -49,6 +49,12 @@ define('views/Edit', function (require, _exports, module) {
       code: function () {
         this.canSave = true;
       },
+      custom: {
+        deep: true,
+        handler: function () {
+          this.canSave = true;
+        },
+      },
     },
     ready: function () {
       var _this = this;
@@ -59,14 +65,24 @@ define('views/Edit', function (require, _exports, module) {
       .then(function (script) {
         _this.update = script.update;
         _this.code = script.code;
-        var custom = Object.assign({}, script.custom);
-        custom.keepInclude = custom._include;
-        custom.keepMatch = custom._match;
-        custom.keepExclude = custom._exclude;
-        custom.include = fromList(custom.include);
-        custom.match = fromList(custom.match);
-        custom.exclude = fromList(custom.exclude);
-        _this.custom = custom;
+        var custom = script.custom;
+        _this.custom = [
+          'name',
+          'homepageURL',
+          'updateURL',
+          'downloadURL',
+        ].reduce(function (value, key) {
+          value[key] = custom[key];
+          return value;
+        }, {
+          keepInclude: custom._include !== false,
+          keepMatch: custom._match !== false,
+          keepExclude: custom._exclude !== false,
+          include: fromList(custom.include),
+          match: fromList(custom.match),
+          exclude: fromList(custom.exclude),
+          'run-at': custom['run-at'] || '',
+        });
         _this.$nextTick(function () {
           _this.canSave = false;
         });

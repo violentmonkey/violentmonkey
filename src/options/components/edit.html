@@ -13,7 +13,7 @@
               <td title="@run-at" v-text="'labelRunAt'|i18n"></td>
               <td>
                 <select v-model="custom['run-at']">
-                  <option value=default v-text="'labelRunAtDefault'|i18n"></option>
+                  <option value="" v-text="'labelRunAtDefault'|i18n"></option>
                   <option value=start>document-start</option>
                   <option value=idle>document-idle</option>
                   <option value=end>document-end</option>
@@ -49,7 +49,7 @@
                 <span v-text="'labelKeepInclude'|i18n"></span>
               </label>
             </legend>
-            <div v-text="'labelCustomInclude'|i18n"></div>
+            <div v-html="'labelCustomInclude'|i18n"></div>
             <textarea v-model="custom.include"></textarea>
           </fieldset>
           <fieldset title="@match">
@@ -60,7 +60,7 @@
                 <span v-text="'labelKeepMatch'|i18n"></span>
               </label>
             </legend>
-            <div v-text="'labelCustomMatch'|i18n"></div>
+            <div v-html="'labelCustomMatch'|i18n"></div>
             <textarea v-model="custom.match"></textarea>
           </fieldset>
           <fieldset title="@exclude">
@@ -71,7 +71,7 @@
                 <span v-text="'labelKeepExclude'|i18n"></span>
               </label>
             </legend>
-            <div v-text="'labelCustomExclude'|i18n"></div>
+            <div v-html="'labelCustomExclude'|i18n"></div>
             <textarea v-model="custom.exclude"></textarea>
           </fieldset>
         </div>

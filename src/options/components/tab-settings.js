@@ -185,6 +185,9 @@ define('views/TabSettings', function (require, _exports, module) {
         _.sendMessage({cmd: 'SyncStart'});
       },
     },
+    created: function () {
+      this.updateSelection(true);
+    },
     methods: {
       updateAutoUpdate: function () {
         _.sendMessage({cmd: 'AutoUpdate'});
