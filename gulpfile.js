@@ -16,7 +16,10 @@ const isProd = process.env.NODE_ENV === 'production';
 const paths = {
   cache: 'src/cache.js',
   manifest: 'src/manifest.json',
-  templates: 'src/**/templates/*.html',
+  templates: [
+    'src/**/*.html',
+    '!src/**/index.html',
+  ],
   jsBg: 'src/background/**/*.js',
   jsOptions: 'src/options/**/*.js',
   jsPopup: 'src/popup/**/*.js',

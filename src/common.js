@@ -70,56 +70,16 @@ _.zfill = function (num, length) {
 };
 
 _.getUniqId = function () {
-	return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 };
 
 /**
  * Get locale attributes such as `@name:zh-CN`
  */
 _.getLocaleString = function (meta, key) {
-  var lang = _.find(navigator.languages, function (lang) {
+  var lang = navigator.languages.find(function (lang) {
     return (key + ':' + lang) in meta;
   });
   if (lang) key += ':' + lang;
   return meta[key] || '';
 };
-
-/*
-function format() {
-  var args = arguments;
-  if (args[0]) return args[0].replace(/\$(?:\{(\d+)\}|(\d+))/g, function(value, group1, group2) {
-		var index = typeof group1 != 'undefined' ? group1 : group2;
-		return index >= args.length ? value : (args[index] || '');
-  });
-}
-*/
-
-_.features = function () {
-  var FEATURES = 'features';
-  var features = _.options.get(FEATURES);
-  if (!features || !features.data) features = {
-    data: {},
-  };
-
-  return {
-    init: init,
-    hit: hit,
-    isHit: isHit,
-  };
-
-  function init(version) {
-    if (features.version !== version) {
-      _.options.set(FEATURES, features = {
-        version: version,
-        data: {},
-      });
-    }
-  }
-  function hit(key) {
-    features.data[key] = 1;
-    _.options.set(FEATURES, features);
-  }
-  function isHit(key) {
-    return features.data[key];
-  }
-}();

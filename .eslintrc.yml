@@ -20,10 +20,9 @@ env:
 globals:
   define: true
   _: true
-  $: true
   chrome: true
   zip: true
-  Backbone: true
+  Vue: true
   CodeMirror: true
 
 extends: 'eslint:recommended'
