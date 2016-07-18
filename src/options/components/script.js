@@ -1,6 +1,7 @@
 define('views/Script', function (require, _exports, module) {
   var store = require('utils').store;
   var cache = require('cache');
+  var _ = require('utils/common');
   var DEFAULT_ICON = '/images/icon48.png';
 
   module.exports = {

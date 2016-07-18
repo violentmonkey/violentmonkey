@@ -1,6 +1,7 @@
 define('views/Confirm', function (require, _exports, module) {
   var Editor = require('views/Editor');
   var cache = require('cache');
+  var _ = require('utils/common');
 
   module.exports = {
     props: ['params'],
@@ -48,7 +49,9 @@ define('views/Confirm', function (require, _exports, module) {
           data: _this.code,
         })
         .then(function (script) {
-          var urls = _.values(script.resources);
+          var urls = Object.keys(script.resources).map(function (key) {
+            return script.resources[key];
+          });
           var length = script.require.length + urls.length;
           if (!length) return;
           var finished = 0;

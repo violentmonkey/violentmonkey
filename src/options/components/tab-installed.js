@@ -2,6 +2,7 @@ define('views/TabInstalled', function (require, _exports, module) {
   var ScriptItem = require('views/Script');
   var Edit = require('views/Edit');
   var cache = require('cache');
+  var _ = require('utils/common');
   var store = require('utils').store;
 
   module.exports = {

@@ -29,7 +29,6 @@ define('utils', function (require, exports, _module) {
   exports.routeTester = routeTester;
   exports.store = {};
 
-  Vue.filter('i18n', _.i18n);
   require('utils/dropdown');
   require('utils/features');
   require('utils/settings');

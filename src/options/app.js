@@ -42,6 +42,7 @@ define('app', function (require, _exports, _module) {
     });
   }
 
+  var _ = require('utils/common');
   var utils = require('utils');
   var Main = require('views/Main');
   var Confirm = require('views/Confirm');

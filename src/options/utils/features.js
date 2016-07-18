@@ -1,4 +1,6 @@
-define('utils/features', function (_require, exports, _module) {
+define('utils/features', function (require, exports, _module) {
+  var _ = require('utils/common');
+
   var key = 'features';
   var features = _.options.get(key);
   if (!features || !features.data) features = {

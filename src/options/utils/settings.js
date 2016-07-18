@@ -1,4 +1,6 @@
-define('utils/settings', function () {
+define('utils/settings', function (require, _exports, _module) {
+  var _ = require('utils/common');
+
   Vue.directive('setting', {
     bind: function () {
       var _this = this;

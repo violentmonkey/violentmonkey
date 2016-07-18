@@ -3,6 +3,7 @@ define('app', function (require, exports, _module) {
   var Commands = require('views/Command');
   var Domains = require('views/Domain');
   var utils = require('utils');
+  var _ = require('utils/common');
 
   var app = new Vue({
     el: document.body,

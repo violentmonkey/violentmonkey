@@ -15,6 +15,7 @@ define('views/Edit', function (require, _exports, module) {
   var Message = require('views/Message');
   var Editor = require('views/Editor');
   var cache = require('cache');
+  var _ = require('utils/common');
 
   module.exports = {
     props: {

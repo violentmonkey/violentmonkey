@@ -1,6 +1,7 @@
 define('vmdb', function (require, _exports, module) {
   var scriptUtils = require('utils/script');
   var tester = require('utils/tester');
+  var _ = require('utils/common');
 
   function VMDB() {
     var _this = this;
@@ -373,7 +374,7 @@ define('vmdb', function (require, _exports, module) {
         if (!script) return reject();
         for (var k in data)
           if (k in script) script[k] = data[k];
-        _.assign(script.custom, custom);
+        Object.assign(script.custom, custom);
         o.put(script).onsuccess = function (_e) {
           resolve(scriptUtils.getScriptInfo(script));
         };
@@ -572,7 +573,7 @@ define('vmdb', function (require, _exports, module) {
         script.custom.modified = data.modified || Date.now();
         return _this.saveScript(script, tx);
       }).then(function (script) {
-        _.assign(res.data, scriptUtils.getScriptInfo(script));
+        Object.assign(res.data, scriptUtils.getScriptInfo(script));
         return res;
       });
   };

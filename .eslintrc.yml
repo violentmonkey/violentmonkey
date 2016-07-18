@@ -19,7 +19,6 @@ env:
 
 globals:
   define: true
-  _: true
   chrome: true
   zip: true
   Vue: true

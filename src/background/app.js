@@ -5,6 +5,7 @@ define('app', function (require, exports, _module) {
   var cache = require('utils/cache');
   var tabsUtils = require('utils/tabs');
   var scriptUtils = require('utils/script');
+  var _ = require('utils/common');
 
   var vmdb = exports.vmdb = new VMDB;
   var VM_VER = chrome.app.getDetails().version;
@@ -58,7 +59,7 @@ define('app', function (require, exports, _module) {
         chrome.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
       return data.isApplied
         ? vmdb.getScriptsByURL(url).then(function (res) {
-          return _.assign(data, res);
+          return Object.assign(data, res);
         }) : data;
     },
     UpdateScriptInfo: function (data, _src) {

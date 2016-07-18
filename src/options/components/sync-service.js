@@ -1,5 +1,6 @@
 define('views/SyncService', function (require, _exports, module) {
   var cache = require('cache');
+  var _ = require('utils/common');
 
   module.exports = {
     props: ['service'],

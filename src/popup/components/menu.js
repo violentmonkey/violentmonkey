@@ -1,6 +1,7 @@
 define('views/Menu', function (require, _exports, module) {
   var app = require('app');
   var MixIn = require('views/MixIn');
+  var _ = require('utils/common');
 
   module.exports = {
     mixins: [MixIn],

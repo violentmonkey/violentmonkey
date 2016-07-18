@@ -1,5 +1,11 @@
 define('views/TabSettings', function (require, _exports, module) {
   function importData(file) {
+    function forEach(obj, cb) {
+      obj && Object.keys(obj).forEach(function (key) {
+        var value = obj[key];
+        cb(value, key);
+      });
+    }
     function getVMConfig(text) {
       var vm;
       try {
@@ -8,8 +14,8 @@ define('views/TabSettings', function (require, _exports, module) {
         console.warn('Error parsing ViolentMonkey configuration.');
       }
       vm = vm || {};
-      _.forEach(vm.values, function (value, key) {
-        _.sendMessage({
+      forEach(vm.values, function (value, key) {
+        value && _.sendMessage({
           cmd: 'SetValue',
           data: {
             uri: key,
@@ -17,7 +23,7 @@ define('views/TabSettings', function (require, _exports, module) {
           }
         });
       });
-      _.forEach(vm.settings, function (value, key) {
+      forEach(vm.settings, function (value, key) {
         _.options.set(key, value);
       });
       return vm;
@@ -31,7 +37,10 @@ define('views/TabSettings', function (require, _exports, module) {
           var script = {code: text};
           if (vm.scripts) {
             var more = vm.scripts[entry.filename.slice(0, -8)];
-            if (more) script.more = _.omit(more, ['id']);
+            if (more) {
+              delete more.id;
+              script.more = more;
+            }
           }
           _.sendMessage({
             cmd: 'ParseScript',
@@ -43,7 +52,7 @@ define('views/TabSettings', function (require, _exports, module) {
       });
     }
     function getVMFiles(entries) {
-      var i = _.findIndex(entries, function (entry) {
+      var i = entries.findIndex(function (entry) {
         return entry.filename === 'ViolentMonkey';
       });
       if (~i) return new Promise(function (resolve, _reject) {
@@ -75,7 +84,7 @@ define('views/TabSettings', function (require, _exports, module) {
       return Promise.all(entries.map(function (entry) {
         return getVMFile(entry, vm);
       })).then(function (res) {
-        return _.filter(res).length;
+        return res.filter(function (item) {return item;}).length;
       });
     }).then(function (count) {
       new Message({text: _.i18n('msgImported', [count])});
@@ -131,7 +140,10 @@ define('views/TabSettings', function (require, _exports, module) {
         var name = script.custom.name || script.meta.name || 'Noname';
         if (names[name]) name += '_' + (++ names[name]);
         else names[name] = 1;
-        vm.scripts[name] = _.pick(script, ['id', 'custom', 'enabled', 'update']);
+        vm.scripts[name] = ['id', 'custom', 'enabled', 'update'].reduce(function (res, key) {
+          res[key] = script[key];
+          return res;
+        }, {});
         if (withValues) {
           var values = data.values[script.uri];
           if (values) vm.values[script.uri] = values;
@@ -159,6 +171,7 @@ define('views/TabSettings', function (require, _exports, module) {
   var SyncService = require('views/SyncService');
   var store = require('utils').store;
   var cache = require('cache');
+  var _ = require('utils/common');
 
   module.exports = {
     template: cache.get('/options/components/tab-settings.html'),
@@ -217,7 +230,7 @@ define('views/TabSettings', function (require, _exports, module) {
         var _this = this;
         _this.exporting = true;
         exportData(_this.selectedIds)
-        .catch(function () {})
+        .catch(_.noop)
         .then(function () {
           _this.exporting = false;
         });
