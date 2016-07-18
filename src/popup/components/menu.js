@@ -24,12 +24,10 @@ define('views/Menu', function (require, _exports, module) {
             else chrome.tabs.create({url: url});
           });
         },
-      }, {
+      }, _this.menuFindScripts = {
         name: _.i18n('menuFindScripts'),
         symbol: 'search',
-        show: function () {
-          return _this.store.domains.length;
-        },
+        hide: false,
         onClick: function () {
           var matches = _this.store.currentTab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
           chrome.tabs.create({
@@ -39,12 +37,10 @@ define('views/Menu', function (require, _exports, module) {
         detailClick: function () {
           app.navigate('domains');
         },
-      }, {
+      }, _this.menuCommands = {
         name: _.i18n('menuCommands'),
         symbol: 'arrow-right',
-        show: function () {
-          return _this.store.commands.length;
-        },
+        hide: false,
         onClick: function () {
           app.navigate('commands');
         },
@@ -68,10 +64,18 @@ define('views/Menu', function (require, _exports, module) {
           });
         },
       });
+      _this.updateDomains();
+      _this.updateCommands();
     },
     watch: {
       'store.scripts': function () {
         this.update();
+      },
+      'store.commands': function () {
+        this.updateCommands();
+      },
+      'store.domains': function () {
+        this.updateDomains();
       },
     },
     methods: {
@@ -103,6 +107,16 @@ define('views/Menu', function (require, _exports, module) {
             },
           };
         });
+      },
+      updateCommands: function () {
+        var _this = this;
+        var commands = _this.store.commands;
+        _this.menuCommands.hide = !commands || !commands.length;
+      },
+      updateDomains: function () {
+        var _this = this;
+        var domains = _this.store.domains;
+        _this.menuFindScripts.hide = !domains || !domains.length;
       },
     },
   };
