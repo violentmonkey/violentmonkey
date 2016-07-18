@@ -4,6 +4,42 @@ define('utils/common', function (_require, _exports, module) {
   Vue.filter('i18n', _.i18n);
 
   _.options = function () {
+    function getOption(key, def) {
+      var value = localStorage.getItem(key), obj;
+      if (value)
+        try {
+          obj = JSON.parse(value);
+        } catch(e) {
+          obj = def;
+        }
+        else obj = def;
+        if (obj == null) obj = defaults[key];
+        return obj;
+    }
+
+    function setOption(key, value) {
+      if (key in defaults) {
+        localStorage.setItem(key, JSON.stringify(value));
+        hooks.forEach(function (cb) {
+          cb(key, value);
+        });
+      }
+    }
+
+    function getAllOptions() {
+      var options = {};
+      for (var i in defaults) options[i] = getOption(i);
+      return options;
+    }
+
+    function hook(cb) {
+      hooks.push(cb);
+    }
+    function unhook(cb) {
+      var i = hooks.indexOf(cb);
+      ~i && hooks.splice(i, 1);
+    }
+
     var defaults = {
       isApplied: true,
       autoUpdate: true,
@@ -19,35 +55,14 @@ define('utils/common', function (_require, _exports, module) {
       onedriveEnabled: false,
       features: null,
     };
-
-    function getOption(key, def) {
-      var value = localStorage.getItem(key), obj;
-      if (value)
-        try {
-          obj = JSON.parse(value);
-        } catch(e) {
-          obj = def;
-        }
-        else obj = def;
-        if (obj == null) obj = defaults[key];
-        return obj;
-    }
-
-    function setOption(key, value) {
-      if (key in defaults)
-        localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function getAllOptions() {
-      var options = {};
-      for (var i in defaults) options[i] = getOption(i);
-      return options;
-    }
+    var hooks = [];
 
     return {
       get: getOption,
       set: setOption,
       getAll: getAllOptions,
+      hook: hook,
+      unhook: unhook,
     };
   }();
 

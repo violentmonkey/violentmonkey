@@ -194,7 +194,15 @@ define('views/TabSettings', function (require, _exports, module) {
     },
     events: {
       EnableService: function (name) {
-        // TODO disable other services
+        store.sync.forEach(function (service) {
+          if (service.name !== name) {
+            var key = service.name + 'Enabled';
+            var enabled = _.options.get(key);
+            if (enabled) {
+              _.options.set(key, false);
+            }
+          }
+        });
         _.sendMessage({cmd: 'SyncStart'});
       },
     },
