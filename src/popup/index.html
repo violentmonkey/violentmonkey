@@ -4,15 +4,13 @@
 		<meta charset="utf-8">
 		<title>Popup Menu - Violentmonkey</title>
     <link rel="stylesheet" href="style.css">
-		<script src="/lib/zepto.min.js"></script>
-    <script src="/lib/underscore-min.js"></script>
-    <script src="/lib/backbone-min.js"></script>
+    <script src="/lib/vue.min.js"></script>
 		<script src="/lib/require-lite.js"></script>
 		<script src="/common.js"></script>
     <script src="/cache.js"></script>
 	</head>
   <body>
-    <div id="app"></div>
+    <component :is="type"></component>
 		<script src="app.js"></script>
 	</body>
 </html>
