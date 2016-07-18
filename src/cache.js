@@ -14,6 +14,8 @@ define('cache', function (require, _exports, module) {
     throw 'Cache not found: ' + key;
   };
 
+  var _ = require('utils/common');
+  Vue.filter('i18n', _.i18n);
   module.exports = new Cache();
   require('templates');
 

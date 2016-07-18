@@ -62,7 +62,7 @@ define('views/Editor', function (require, _exports, module) {
   }
 
   var cache = require('cache');
-  initCodeMirror();
+  var readyCodeMirror = initCodeMirror();
 
   module.exports = {
     props: {
@@ -76,40 +76,51 @@ define('views/Editor', function (require, _exports, module) {
     template: cache.get('/options/components/editor.html'),
     ready: function () {
       var _this = this;
-      var editor = _this.editor = CodeMirror(_this.$el, {
-        continueComments: true,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-        highlightSelectionMatches: true,
-        lineNumbers: true,
-        mode: 'javascript',
-        lineWrapping: true,
-        styleActiveLine: true,
-        foldGutter: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+      readyCodeMirror.then(function () {
+        var editor = _this.editor = CodeMirror(_this.$el, {
+          continueComments: true,
+          matchBrackets: true,
+          autoCloseBrackets: true,
+          highlightSelectionMatches: true,
+          lineNumbers: true,
+          mode: 'javascript',
+          lineWrapping: true,
+          styleActiveLine: true,
+          foldGutter: true,
+          gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+        });
+        _this.readonly && editor.setOption('readOnly', _this.readonly);
+        editor.on('change', function () {
+          _this.cachedContent = editor.getValue();
+          _this.content = _this.cachedContent;
+        });
+        var extraKeys = {};
+        if (_this.onExit) {
+          extraKeys.Esc = _this.onExit;
+        }
+        if (_this.onSave) {
+          extraKeys['Ctrl-S'] = extraKeys['Cmd-S'] = _this.onSave;
+        }
+        editor.setOption('extraKeys', extraKeys);
+        _this.update();
       });
-      _this.readonly && editor.setOption('readOnly', _this.readonly);
-      editor.on('change', function () {
-        _this.cachedContent = editor.getValue();
-        _this.content = _this.cachedContent;
-      });
-      var extraKeys = {};
-      if (_this.onExit) {
-        extraKeys.Esc = _this.onExit;
-      }
-      if (_this.onSave) {
-        extraKeys['Ctrl-S'] = extraKeys['Cmd-S'] = _this.onSave;
-      }
-      editor.setOption('extraKeys', extraKeys);
     },
     watch: {
       content: function (content) {
         var _this = this;
         if (content !== _this.cachedContent) {
-          _this.editor.setValue(_this.cachedContent = content);
-          _this.editor.getDoc().clearHistory();
-          _this.editor.focus();
+          _this.cachedContent = content;
+          _this.update();
         }
+      },
+    },
+    methods: {
+      update: function () {
+        var _this = this;
+        if (!_this.editor || _this.cachedContent == null) return;
+        _this.editor.setValue(_this.cachedContent);
+        _this.editor.getDoc().clearHistory();
+        _this.editor.focus();
       },
     },
   };

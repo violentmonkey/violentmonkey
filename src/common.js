@@ -1,7 +1,6 @@
 define('utils/common', function (_require, _exports, module) {
   var _ = module.exports = {};
   _.i18n = chrome.i18n.getMessage;
-  Vue.filter('i18n', _.i18n);
 
   _.options = function () {
     function getOption(key, def) {

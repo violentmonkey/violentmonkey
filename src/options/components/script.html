@@ -9,7 +9,7 @@
   <div class=script-info>
     <a class="script-name ellipsis" target=_blank :href="homepageURL"
       v-text="script.custom.name||getLocaleString('name')"></a>
-    <a class="script-support" :class="{hide:!script.meta.supportURL}"
+    <a class="script-support" v-show="script.meta.supportURL"
       target=_blank :href="script.meta.supportURL">
       <svg class="icon"><use xlink:href="#question"/></svg>
     </a>

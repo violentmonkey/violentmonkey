@@ -18,7 +18,7 @@ define('utils', function (require, exports, _module) {
         var matches = url.match(route.re);
         if (matches) {
           return route.names.reduce(function (params, name, i) {
-            params[name] = matches[i + 1];
+            params[name] = decodeURIComponent(matches[i + 1]);
             return params;
           }, {});
         }

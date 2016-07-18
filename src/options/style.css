@@ -115,7 +115,8 @@ aside img {
   padding: 0 .5rem;
   border-bottom: 1px solid darkgray;
 }
-.backdrop, .scripts {
+.backdrop,
+.scripts {
   position: absolute;
   top: 30px;
   left: 0;
@@ -126,7 +127,6 @@ aside img {
   overflow-y: auto;
 }
 .backdrop {
-  display: none;
   text-align: center;
   color: gray;
   z-index: 9;
@@ -227,14 +227,15 @@ fieldset.title {
 .options-panel label {
   display: block;
 }
-.editor-code, .editor-code .CodeMirror {
+.editor-code,
+.editor-code .CodeMirror {
   height: 100%;
 }
-#url {
+.confirm-url {
   float: left;
   max-width: 50%;
 }
-#msg {
+.confirm-msg {
   text-align: right;
 }
 .script {
@@ -244,9 +245,6 @@ fieldset.title {
   border: 1px solid #ccc;
   border-radius: 4px;
   transition: transform .5s;
-}
-.script .hide {
-  display: none;
 }
 .script:hover {
   border-color: darkgray;
@@ -286,7 +284,6 @@ fieldset.title {
   overflow-y: auto;
 }
 .disabled .script-icon {
-  -webkit-filter: grayscale(.5);
   filter: grayscale(.5);
 }
 .disabled .script-name {

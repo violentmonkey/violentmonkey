@@ -2,8 +2,8 @@
   <div class=frame-header>
     <div class=buttons>
       <div v-dropdown>
-        <button dropdown-toggle v-text="'buttonInstallOptions'|i18n" @click="showOptions=!showOptions"></button>
-        <div class="dropdown-menu options-panel" @mousedown.stop v-show="showOptions">
+        <button dropdown-toggle v-text="'buttonInstallOptions'|i18n"></button>
+        <div class="dropdown-menu options-panel" @mousedown.stop>
           <label>
             <input type=checkbox v-setting="'closeAfterInstall'">
             <span v-text="'installOptionClose'|i18n"></span>
@@ -19,8 +19,8 @@
       <button v-text="'buttonClose'|i18n" @click="close"></button>
     </div>
     <h1><span v-text="'labelInstall'|i18n"></span> - <span v-text="'extName'|i18n"></span></h1>
-    <div class=ellipsis :title="url">{{url}}</div>
-    <div class=ellipsis>{{message}}</div>
+    <div class="ellipsis confirm-url" :title="params.url">{{params.url}}</div>
+    <div class="ellipsis confirm-msg">{{message}}</div>
   </div>
   <div class=frame-body>
     <editor readonly :on-exit="close" :content="code"></editor>
