@@ -57,6 +57,7 @@ define('app', function (require, _exports, _module) {
     Main: initMain,
   };
   zip.workerScriptsPath = '/lib/zip.js/';
+  document.title = _.i18n('extName');
 
   new Vue({
     el: document.body,
