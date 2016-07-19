@@ -29,8 +29,7 @@
     "merge2": "^1.0.2",
     "ncp": "^2.0.0",
     "qunitjs": "^2.0.0-rc1",
-    "through2": "^2.0.1",
-    "underscore": "^1.8.3"
+    "through2": "^2.0.1"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {

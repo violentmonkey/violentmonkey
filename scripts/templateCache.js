@@ -1,8 +1,8 @@
 'use strict';
 
 const gutil = require('gulp-util');
+const replace = require('gulp-replace');
 const through = require('through2');
-const _ = require('underscore');
 const minify = require('html-minifier').minify;
 
 module.exports = function templateCache() {
@@ -20,27 +20,44 @@ define('templates', function (require, exports, module) {
     if (file.isNull()) return cb();
     if (file.isStream())
       return this.emit('error', new gutil.PluginError('VM-cache', 'Stream is not supported.'));
-    contents.push(gutil.template(contentTpl, {
-      name: JSON.stringify(('/' + file.relative).replace(/\\/g, '/')),
-      content: JSON.stringify(minify(String(file.contents), {
+    contents.push({
+      filename: ('/' + file.relative).replace(/\\/g, '/'),
+      content: minify(String(file.contents), {
         removeComments: true,
         collapseWhitespace: true,
         conservativeCollapse: true,
         removeAttributeQuotes: true,
-      })),
-      file: '',
-    }));
+      }),
+    });
     cb();
   }
 
   function endStream(cb) {
+    contents.sort((a, b) => {
+      if (a.filename < b.filename) return -1;
+      if (a.filename > b.filename) return 1;
+      return 0;
+    });
+    const nameMap = contents.reduce((res, item, i) => {
+      res[item.filename] = i;
+      return res;
+    }, {});
+    this.replace = () => replace(/cache.get\('(.*?)'\)/g, (cache, filename) => {
+      const key = nameMap[filename];
+      if (key == null) console.warn(`Cache key not found: ${filename}`);
+      return `cache.get(${key})`;
+    });
+    const templates = contents.map(item => {
+      return `cache.put(${nameMap[item.filename]}, ${JSON.stringify(item.content)});`;
+    }).join('\n');
     this.push(new gutil.File({
       base: '',
       path: 'template.js',
-      contents: new Buffer(header + contents.join('') + footer),
+      contents: new Buffer(header + templates + footer),
     }));
     cb();
   }
 
-  return through.obj(bufferContents, endStream);
+  const cacheObj = through.obj(bufferContents, endStream);
+  return cacheObj;
 };
