@@ -1,125 +1,116 @@
-var _ = window._ || {};
-_.i18n = chrome.i18n.getMessage;
+define('utils/common', function (_require, _exports, module) {
+  var _ = module.exports = {};
+  _.i18n = chrome.i18n.getMessage;
 
-_.options = function () {
-  var defaults = {
-    isApplied: true,
-    autoUpdate: true,
-    ignoreGrant: false,
-    lastUpdate: 0,
-    exportValues: true,
-    closeAfterInstall: false,
-    trackLocalFile: false,
-    // injectMode: 0,
-    autoReload: false,
-    dropbox: {},
-    dropboxEnabled: false,
-    onedrive: {},
-    onedriveEnabled: false,
-    features: null,
-  };
-
-  function getOption(key, def) {
-    var value = localStorage.getItem(key), obj;
-    if (value)
-      try {
-        obj = JSON.parse(value);
-      } catch(e) {
-        obj = def;
-      }
-      else obj = def;
-      if (obj == null) obj = defaults[key];
-      return obj;
-  }
-
-  function setOption(key, value) {
-    if (key in defaults)
-      localStorage.setItem(key, JSON.stringify(value));
-  }
-
-  function getAllOptions() {
-    var options = {};
-    for (var i in defaults) options[i] = getOption(i);
-    return options;
-  }
-
-  return {
-    get: getOption,
-    set: setOption,
-    getAll: getAllOptions,
-  };
-}();
-
-_.sendMessage = function (data) {
-  return new Promise(function (resolve, reject) {
-    chrome.runtime.sendMessage(data, function (res) {
-      res && res.error ? reject(res.error) : resolve(res && res.data);
-    });
-  });
-};
-
-_.updateCheckbox = function (e) {
-  var target = e.target;
-  _.options.set(target.dataset.check, target.checked);
-};
-
-_.zfill = function (num, length) {
-  num = num.toString();
-  while (num.length < length) num = '0' + num;
-  return num;
-};
-
-_.getUniqId = function () {
-	return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-};
-
-/**
- * Get locale attributes such as `@name:zh-CN`
- */
-_.getLocaleString = function (meta, key) {
-  var lang = _.find(navigator.languages, function (lang) {
-    return (key + ':' + lang) in meta;
-  });
-  if (lang) key += ':' + lang;
-  return meta[key] || '';
-};
-
-/*
-function format() {
-  var args = arguments;
-  if (args[0]) return args[0].replace(/\$(?:\{(\d+)\}|(\d+))/g, function(value, group1, group2) {
-		var index = typeof group1 != 'undefined' ? group1 : group2;
-		return index >= args.length ? value : (args[index] || '');
-  });
-}
-*/
-
-_.features = function () {
-  var FEATURES = 'features';
-  var features = _.options.get(FEATURES);
-  if (!features || !features.data) features = {
-    data: {},
-  };
-
-  return {
-    init: init,
-    hit: hit,
-    isHit: isHit,
-  };
-
-  function init(version) {
-    if (features.version !== version) {
-      _.options.set(FEATURES, features = {
-        version: version,
-        data: {},
-      });
+  _.options = function () {
+    function getOption(key, def) {
+      var value = localStorage.getItem(key), obj;
+      if (value)
+        try {
+          obj = JSON.parse(value);
+        } catch(e) {
+          obj = def;
+        }
+        else obj = def;
+        if (obj == null) obj = defaults[key];
+        return obj;
     }
-  }
-  function hit(key) {
-    features.data[key] = 1;
-    _.options.set(FEATURES, features);
-  }
-  function isHit(key) {
-    return features.data[key];
-  }
-}();
+
+    function setOption(key, value) {
+      if (key in defaults) {
+        localStorage.setItem(key, JSON.stringify(value));
+        hooks.forEach(function (cb) {
+          cb(key, value);
+        });
+      }
+    }
+
+    function getAllOptions() {
+      var options = {};
+      for (var i in defaults) options[i] = getOption(i);
+      return options;
+    }
+
+    function hook(cb) {
+      hooks.push(cb);
+    }
+    function unhook(cb) {
+      var i = hooks.indexOf(cb);
+      ~i && hooks.splice(i, 1);
+    }
+
+    var defaults = {
+      isApplied: true,
+      autoUpdate: true,
+      ignoreGrant: false,
+      lastUpdate: 0,
+      exportValues: true,
+      closeAfterInstall: false,
+      trackLocalFile: false,
+      autoReload: false,
+      dropbox: {},
+      dropboxEnabled: false,
+      onedrive: {},
+      onedriveEnabled: false,
+      features: null,
+    };
+    var hooks = [];
+
+    return {
+      get: getOption,
+      set: setOption,
+      getAll: getAllOptions,
+      hook: hook,
+      unhook: unhook,
+    };
+  }();
+
+  _.sendMessage = function (data) {
+    return new Promise(function (resolve, reject) {
+      chrome.runtime.sendMessage(data, function (res) {
+        res && res.error ? reject(res.error) : resolve(res && res.data);
+      });
+    });
+  };
+
+  _.debounce = function (func, time) {
+    function run() {
+      cancel();
+      func();
+    }
+    function cancel() {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    }
+    var timer;
+    return function () {
+      cancel();
+      timer = setTimeout(run, time);
+    };
+  };
+
+  _.noop = function () {};
+
+  _.zfill = function (num, length) {
+    num = num.toString();
+    while (num.length < length) num = '0' + num;
+    return num;
+  };
+
+  _.getUniqId = function () {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  };
+
+  /**
+   * Get locale attributes such as `@name:zh-CN`
+   */
+  _.getLocaleString = function (meta, key) {
+    var lang = navigator.languages.find(function (lang) {
+      return (key + ':' + lang) in meta;
+    });
+    if (lang) key += ':' + lang;
+    return meta[key] || '';
+  };
+});

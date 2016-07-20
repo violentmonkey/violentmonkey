@@ -1,0 +1,28 @@
+<div>
+  <div class=frame-header>
+    <div class=buttons>
+      <div v-dropdown>
+        <button dropdown-toggle v-text="'buttonInstallOptions'|i18n"></button>
+        <div class="dropdown-menu options-panel" @mousedown.stop>
+          <label>
+            <input type=checkbox v-setting="'closeAfterInstall'">
+            <span v-text="'installOptionClose'|i18n"></span>
+          </label>
+          <label>
+            <input type=checkbox v-setting="'trackLocalFile'" :disabled="closeAfterInstall">
+            <span v-text="'installOptionTrack'|i18n"></span>
+          </label>
+        </div>
+      </div>
+      <button v-text="'buttonConfirmInstallation'|i18n"
+        :disabled="!installable" @click="installScript"></button>
+      <button v-text="'buttonClose'|i18n" @click="close"></button>
+    </div>
+    <h1><span v-text="'labelInstall'|i18n"></span> - <span v-text="'extName'|i18n"></span></h1>
+    <div class="ellipsis confirm-url" :title="params.url">{{params.url}}</div>
+    <div class="ellipsis confirm-msg">{{message}}</div>
+  </div>
+  <div class=frame-body>
+    <editor readonly :on-exit="close" :content="code"></editor>
+  </div>
+</div>

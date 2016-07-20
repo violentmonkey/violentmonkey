@@ -1,0 +1,26 @@
+<div class="script" :class="{disabled:!script.enabled}" draggable="true">
+  <img class=script-icon :src="safeIcon">
+  <div class="script-version pull-right" v-text="script.meta.version?'v'+script.meta.version:''"></div>
+  <div class="script-author ellipsis pull-right" :title="script.meta.author" v-if="author">
+    <span v-text="'labelAuthor'|i18n"></span>
+    <a href="mailto:{{author.email}}" v-if="author.email" v-text="author.name"></a>
+    <span v-if="!author.email" v-text="author.name"></a>
+  </div>
+  <div class=script-info>
+    <a class="script-name ellipsis" target=_blank :href="homepageURL"
+      v-text="script.custom.name||getLocaleString('name')"></a>
+    <a class="script-support" v-show="script.meta.supportURL"
+      target=_blank :href="script.meta.supportURL">
+      <svg class="icon"><use xlink:href="#question"/></svg>
+    </a>
+  </div>
+  <p class="script-desc ellipsis" v-text="script.custom.description||getLocaleString('description')"></p>
+  <div class=buttons>
+    <button v-text="'buttonEdit'|i18n" @click="onEdit"></button>
+    <button @click="onEnable">{{labelEnable}}</button>
+    <button v-text="'buttonRemove'|i18n" @click="onRemove"></button>
+    <button v-if="canUpdate" :disabled="script.checking"
+      v-text="'buttonUpdate'|i18n" @click="onUpdate"></button>
+    <span>{{script.message}}</span>
+  </div>
+</div>

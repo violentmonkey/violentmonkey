@@ -1,6 +1,7 @@
 define('requests', function (require, _exports, module) {
   var tabsUtils = require('utils/tabs');
   var cache = require('utils/cache');
+  var _ = require('utils/common');
   var requests = {};
   var verify = {};
   var special_headers = [
@@ -165,7 +166,7 @@ define('requests', function (require, _exports, module) {
   //   if (task) {
   //     delete tasks[details.requestId];
   //     if (task === 'Get-Location' && _.includes([301, 302, 303], details.statusCode)) {
-  //       var locationHeader = _.find(details.responseHeaders, function (header) {
+  //       var locationHeader = details.responseHeaders.find(function (header) {
   //         return header.name.toLowerCase() === 'location';
   //       });
   //       return {

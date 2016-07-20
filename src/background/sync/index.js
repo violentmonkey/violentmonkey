@@ -3,6 +3,7 @@ define('sync', function (require, _exports, module) {
   var events = require('events');
   var app = require('app');
   var tabs = require('utils/tabs');
+  var _ = require('utils/common');
 
   var services = [];
   var servicesReady = [];
@@ -24,7 +25,7 @@ define('sync', function (require, _exports, module) {
   ServiceConfig.prototype.set = function (key, val) {
     if (typeof key === 'object') {
       if (arguments.length === 1) {
-        _.assign(this.data, key);
+        Object.assign(this.data, key);
         this.dump();
       }
     } else {
@@ -69,8 +70,8 @@ define('sync', function (require, _exports, module) {
         return state;
       },
       is: function (states) {
-        if (!_.isArray(states)) states = [states];
-        return _.includes(states, state);
+        if (!Array.isArray(states)) states = [states];
+        return ~states.indexOf(state);
       },
     };
   }
@@ -146,7 +147,7 @@ define('sync', function (require, _exports, module) {
     var Service = function () {
       this.initialize.apply(this, arguments);
     };
-    Service.prototype = _.assign(Object.create(base), options);
+    Service.prototype = Object.assign(Object.create(base), options);
     Service.extend = extendService;
     return Service;
   }
@@ -274,7 +275,7 @@ define('sync', function (require, _exports, module) {
         if (~i) servicesReady.splice(i, 1);
       });
     },
-    user: function () {},
+    user: _.noop,
     getMeta: function () {
       var _this = this;
       return _this.get(_this.metaFile)
@@ -307,7 +308,7 @@ define('sync', function (require, _exports, module) {
           var prefix = options.prefix;
           if (prefix == null) prefix = _this.urlPrefix;
           xhr.open(options.method || 'GET', prefix + options.url, true);
-          var headers = _.assign({}, _this.headers, options.headers);
+          var headers = Object.assign({}, _this.headers, options.headers);
           if (options.body && typeof options.body === 'object') {
             headers['Content-Type'] = 'application/json';
             options.body = JSON.stringify(options.body);
@@ -466,7 +467,7 @@ define('sync', function (require, _exports, module) {
         }));
         return Promise.all(promises.map(function (promise) {
           // ignore errors to ensure all promises are fulfilled
-          return promise.then(function () {}, function (err) {
+          return promise.then(_.noop, function (err) {
             return err || true;
           });
         }))

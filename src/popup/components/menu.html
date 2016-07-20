@@ -1,0 +1,10 @@
+<div>
+  <div class="menu" v-el:top>
+    <menu-item v-for="item in items.top" v-show="!item.hide" :options="item"></menu-item>
+  </div>
+  <hr v-if="items.bot.length">
+  <div class="menu placeholder" v-el:placeholder></div>
+  <div class="menu" v-el:bot>
+    <menu-item v-for="item in items.bot" :options="item"></menu-item>
+  </div>
+</div>

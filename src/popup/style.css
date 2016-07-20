@@ -38,9 +38,6 @@ body {
 .menu-item.disabled .menu-item-label:hover {
   color: silver;
 }
-.has-detail .menu-item-label {
-  padding-right: 2em;
-}
 .menu-item-detail {
   float: right;
   border-radius: 2px;
@@ -49,6 +46,9 @@ body {
   margin: .4em;
   background: white;
   cursor: pointer;
+}
+.menu-item-detail ~ .menu-item-label {
+  padding-right: 2em;
 }
 hr {
   border: none;

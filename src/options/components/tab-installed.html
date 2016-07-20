@@ -1,0 +1,18 @@
+<div class="content no-pad">
+  <header>
+    <button v-text="'buttonNew'|i18n" @click="newScript"></button>
+    <button v-text="'buttonUpdateAll'|i18n" @click="updateAll"></button>
+    <button v-text="'buttonInstallFromURL'|i18n" @click="installFromURL"></button>
+    <div class="pull-right">
+      <a href=https://greasyfork.org/scripts target=_blank v-text="'anchorGetMoreScripts'|i18n"></a>
+    </div>
+  </header>
+  <div class="backdrop" :class="{mask:loading}" v-show="message">
+    <div>{{{message}}}</div>
+  </div>
+  <div class="scripts">
+    <script-item v-for="script in store.scripts"
+      :script="script"></script-item>
+  </div>
+  <edit v-if="script" :script.sync="script"></edit>
+</div>
