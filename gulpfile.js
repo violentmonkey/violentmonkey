@@ -16,7 +16,10 @@ const isProd = process.env.NODE_ENV === 'production';
 const paths = {
   cache: 'src/cache.js',
   manifest: 'src/manifest.json',
-  templates: 'src/**/templates/*.html',
+  templates: [
+    'src/**/*.html',
+    '!src/**/index.html',
+  ],
   jsBg: 'src/background/**/*.js',
   jsOptions: 'src/options/**/*.js',
   jsPopup: 'src/popup/**/*.js',
@@ -53,10 +56,12 @@ gulp.task('eslint', () => (
   .pipe(eslint.format())
 ));
 
+const cacheObj = templateCache();
+
 gulp.task('templates', () => {
   var stream = merge2([
     gulp.src(paths.cache),
-    gulp.src(paths.templates).pipe(templateCache()),
+    gulp.src(paths.templates).pipe(cacheObj),
   ])
   .pipe(concat('cache.js'));
   if (isProd) stream = stream.pipe(uglify());
@@ -71,16 +76,18 @@ gulp.task('js-bg', () => {
   return stream.pipe(gulp.dest('dist'));
 });
 
-gulp.task('js-options', () => {
+gulp.task('js-options', ['templates'], () => {
   var stream = gulp.src(paths.jsOptions)
+  .pipe(cacheObj.replace())
   .pipe(concat('options/app.js'))
   .pipe(footer(';define.use("app");'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'));
 });
 
-gulp.task('js-popup', () => {
+gulp.task('js-popup', ['templates'], () => {
   var stream = gulp.src(paths.jsPopup)
+  .pipe(cacheObj.replace())
   .pipe(concat('popup/app.js'))
   .pipe(footer(';define.use("app");'));
   if (isProd) stream = stream.pipe(uglify());
@@ -137,7 +144,6 @@ gulp.task('svg', () => (
 ));
 
 gulp.task('build', [
-  'templates',
   'js-bg',
   'js-options',
   'js-popup',

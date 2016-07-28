@@ -23,7 +23,7 @@ define('utils/tabs', function (_require, _exports, module) {
     },
     broadcast: function (data) {
       chrome.tabs.query({}, function (tabs) {
-        _.forEach(tabs, function (tab) {
+        tabs.forEach(function (tab) {
           chrome.tabs.sendMessage(tab.id, data);
         });
       });

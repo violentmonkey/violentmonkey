@@ -2,7 +2,8 @@ define('sync_onedrive', function (require, _exports, _module) {
   var sync = require('sync');
   var tabsUtils = require('utils/tabs');
   var searchUtils = require('utils/search');
-  var config = _.assign({
+  var _ = require('utils/common');
+  var config = Object.assign({
     client_id: '000000004418358A',
     redirect_uri: 'https://violentmonkey.github.io/auth_onedrive.html',
   }, JSON.parse(
@@ -42,7 +43,7 @@ define('sync_onedrive', function (require, _exports, _module) {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: searchUtils.dump(_.assign({}, {
+      body: searchUtils.dump(Object.assign({}, {
         client_id: config.client_id,
         client_secret: config.client_secret,
         redirect_uri: config.redirect_uri,

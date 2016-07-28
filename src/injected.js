@@ -479,12 +479,7 @@ var comm = {
       },
       GM_addStyle: {
         value: function (css) {
-          if (document.head) {
-            var style = document.createElement('style');
-            style.innerHTML = css;
-            document.head.appendChild(style);
-            return style;
-          }
+          comm.post({cmd: 'AddStyle', data: css});
         },
       },
       GM_log: {
@@ -611,9 +606,6 @@ function injectScript(data) {
   };
   inject('!' + func.toString() + '(' + JSON.stringify(data[0]) + ',' + JSON.stringify(comm.did) + ',function(g){' + data[1] + '})');
 }
-function newTab(url) {
-  window.open(url);
-}
 function handleC(e) {
   var req = e.detail;
   if (!req) {
@@ -621,18 +613,27 @@ function handleC(e) {
     return;
   }
   var maps = {
-    SetValue: function(data) {
-      _.sendMessage({cmd: 'SetValue', data: data});
-    },
-    RegisterMenu: function(data) {
-      if (window.top === window) menus.push(data);
-      getPopup();
-    },
     GetRequestId: getRequestId,
     HttpRequest: httpRequest,
     AbortRequest: abortRequest,
     Inject: injectScript,
-    NewTab: newTab,
+    NewTab: function (url) {
+      window.open(url);
+    },
+    SetValue: function (data) {
+      _.sendMessage({cmd: 'SetValue', data: data});
+    },
+    RegisterMenu: function (data) {
+      if (window.top === window) menus.push(data);
+      getPopup();
+    },
+    AddStyle: function (css) {
+      if (document.head) {
+        var style = document.createElement('style');
+        style.innerHTML = css;
+        document.head.appendChild(style);
+      }
+    },
   };
   var func = maps[req.cmd];
   if (func) func(req.data);
