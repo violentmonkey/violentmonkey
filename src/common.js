@@ -19,8 +19,10 @@ define('utils/common', function (_require, _exports, module) {
     function setOption(key, value) {
       if (key in defaults) {
         localStorage.setItem(key, JSON.stringify(value));
-        hooks.forEach(function (cb) {
-          cb(key, value);
+        [hooks[key], hooks['']].forEach(function (group) {
+          group && group.forEach(function (cb) {
+            cb(value, key);
+          });
         });
       }
     }
@@ -31,12 +33,32 @@ define('utils/common', function (_require, _exports, module) {
       return options;
     }
 
-    function hook(cb) {
-      hooks.push(cb);
+    function parseArgs(args) {
+      return args.length === 1 ? {
+        key: '',
+        cb: args[0],
+      } : {
+        key: args[0] || '',
+        cb: args[1],
+      };
     }
-    function unhook(cb) {
-      var i = hooks.indexOf(cb);
-      ~i && hooks.splice(i, 1);
+
+    function hook() {
+      var arg = parseArgs(arguments);
+      var list = hooks[arg.key];
+      if (!list) list = hooks[arg.key] = [];
+      list.push(arg.cb);
+      return function () {
+        unhook(arg.key, arg.cb);
+      };
+    }
+    function unhook() {
+      var arg = parseArgs(arguments);
+      var list = hooks[arg.key];
+      if (list) {
+        var i = list.indexOf(arg.cb);
+        ~i && list.splice(i, 1);
+      }
     }
 
     var defaults = {
@@ -54,7 +76,7 @@ define('utils/common', function (_require, _exports, module) {
       onedriveEnabled: false,
       features: null,
     };
-    var hooks = [];
+    var hooks = {};
 
     return {
       get: getOption,
