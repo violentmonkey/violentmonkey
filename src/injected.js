@@ -239,32 +239,41 @@ var comm = {
     function reqAbort(){
       comm.post({cmd: 'AbortRequest', data: this.id});
     }
-
+    function parseData(req, details) {
+      if (req.resType) {
+        // blob or arraybuffer
+        var data = req.data.response.split(',');
+        var mimetype = data[0].match(/^data:(.*?);base64$/);
+        if (!mimetype) {
+          // invalid
+          req.data.response = null;
+        } else {
+          data = window.atob(data[1]);
+          var arr = new window.Uint8Array(data.length);
+          for (var i = 0; i < data.length; i ++) arr[i] = data.charCodeAt(i);
+          if (details.responseType == 'blob') {
+            // blob
+            return new Blob([arr], {type: mimetype});
+          } else {
+            // arraybuffer
+            return arr.buffer;
+          }
+        }
+      } else if (details.responseType == 'json') {
+        // json
+        return JSON.parse(req.data.response);
+      } else {
+        // text
+        return req.data.response;
+      }
+    }
     // request object functions
     function callback(req) {
       var t = this;
       var cb = t.details['on' + req.type];
       if (cb) {
-        if(req.data.response) {
-          if(!t.data.length) {
-            if(req.resType) { // blob or arraybuffer
-              var m = req.data.response.match(/^data:(.*?);base64,(.*)$/);
-              if (!m) req.data.response = null;
-              else {
-                var b = window.atob(m[2]);
-                if(t.details.responseType == 'blob')
-                  t.data.push(new Blob([b], {type: m[1]}));
-                else {  // arraybuffer
-                  m = new Uint8Array(b.length);
-                  for(var i = 0; i < b.length; i ++) m[i] = b.charCodeAt(i);
-                  t.data.push(m.buffer);
-                }
-              }
-            } else if(t.details.responseType == 'json') // json
-              t.data.push(JSON.parse(req.data.response));
-            else  // text
-              t.data.push(req.data.response);
-          }
+        if (req.data.response) {
+          if (!t.data) t.data = [parseData(req, t.details)];
           req.data.response = t.data[0];
         }
         cb(req.data);
@@ -308,7 +317,6 @@ var comm = {
         req: {
           abort: reqAbort,
         },
-        data: [],
       };
       details.url = getFullUrl(details.url);
       comm.qrequests.push(t);
@@ -457,22 +465,27 @@ var comm = {
       },
       GM_getResourceURL: {
         value: function (name) {
-          for(var i in resources) if (name == i) {
-            i = resources[i];
-            var url = urls[i];
-            if(!url) {
-              var cc = cache[i];
-              if(cc) {
-                cc = window.atob(cc);
-                var b = new Uint8Array(cc.length);
-                for(var j = 0; j < cc.length; j ++)
-                  b[j] = cc.charCodeAt(j);
-                b = new Blob([b]);
-                urls[i] = url = URL.createObjectURL(b);
+          for (var k in resources) if (name == k) {
+            var key = resources[k];
+            var url = urls[key];
+            if (!url) {
+              var cc = cache[key];
+              if (cc) {
+                // Binary string is not supported by blob constructor,
+                // so we have to transform it into array buffer.
+                var bin = window.atob(cc);
+                var arr = new window.Uint8Array(bin.length);
+                for (var i = 0; i < bin.length; i ++) {
+                  arr[i] = bin.charCodeAt(i);
+                }
+                var b = new Blob([arr]);
+                urls[key] = url = URL.createObjectURL(b);
+              } else {
+                url = key;
               }
             }
+            return url;
           }
-          return url;
         }
       },
       GM_addStyle: {
