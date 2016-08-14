@@ -8,7 +8,7 @@ define('utils/common', function (_require, _exports, module) {
       if (value)
         try {
           obj = JSON.parse(value);
-        } catch(e) {
+        } catch (e) {
           obj = def;
         }
         else obj = def;

@@ -2,13 +2,13 @@ define('utils/dropdown', function () {
   Vue.directive('dropdown', {
     bind: function () {
       var _this = this;
-      const dropdown = _this.data = {
+      var dropdown = _this.data = {
         toggle: _this.el.querySelector('[dropdown-toggle]'),
         data: {
           isOpen: false,
         },
       };
-      const methods = dropdown.methods = {
+      var methods = dropdown.methods = {
         onClose: function (e) {
           if (e && _this.el && _this.el.contains(e.target)) return;
           dropdown.data.isOpen = false;

@@ -16,15 +16,16 @@ var _ = {
   },
 
   includes: function (arr, item) {
-    var length = arr.length;
-    for (var i = 0; i < length; i ++)
+    for (var i = arr.length; i --;) {
       if (arr[i] === item) return true;
+    }
     return false;
   },
   forEach: function (arr, func, context) {
     var length = arr.length;
-    for (var i = 0; i < length; i ++)
+    for (var i = 0; i < length; i ++) {
       if (func.call(context, arr[i], i, arr) === false) break;
+    }
   },
 };
 
@@ -37,14 +38,16 @@ function utf8decode (utftext) {
   var c = 0, c2 = 0, c3 = 0;
   while ( i < utftext.length ) {
     c = utftext.charCodeAt(i);
-    if (c < 128) {string += String.fromCharCode(c);i++;}
-    else if((c > 191) && (c < 224)) {
-      c2 = utftext.charCodeAt(i+1);
+    if (c < 128) {
+      string += String.fromCharCode(c);
+      i ++;
+    } else if (c > 191 && c < 224) {
+      c2 = utftext.charCodeAt(i + 1);
       string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
       i += 2;
     } else {
-      c2 = utftext.charCodeAt(i+1);
-      c3 = utftext.charCodeAt(i+2);
+      c2 = utftext.charCodeAt(i + 1);
+      c3 = utftext.charCodeAt(i + 2);
       string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
       i += 3;
     }
@@ -54,14 +57,13 @@ function utf8decode (utftext) {
 
 function getPopup(){
   // XXX: only scripts run in top level window are counted
-  if(top === window)
-    _.sendMessage({
-      cmd: 'SetPopup',
-      data: {
-        ids: ids,
-        menus: menus,
-      },
-    });
+  top === window && _.sendMessage({
+    cmd: 'SetPopup',
+    data: {
+      ids: ids,
+      menus: menus,
+    },
+  });
 }
 
 var badge = {
@@ -76,8 +78,7 @@ function getBadge(){
 function setBadge(){
   if (badge.ready && badge.willSet) {
     // XXX: only scripts run in top level window are counted
-    if (top === window)
-      _.sendMessage({cmd: 'SetBadge', data: badge.number});
+    top === window && _.sendMessage({cmd: 'SetBadge', data: badge.number});
   }
 }
 
@@ -168,20 +169,19 @@ var comm = {
   state: 0,
   utf8decode: utf8decode,
   getUniqId: _.getUniqId,
+  props: Object.getOwnPropertyNames(window),
 
   // Array functions
-  // to avoid using prototype functions
-  // since they may be changed by page scripts
+  // Notice: avoid using prototype functions since they may be changed by page scripts
   includes: _.includes,
   forEach: _.forEach,
-  props: Object.getOwnPropertyNames(window),
 
   init: function(srcId, destId) {
     var comm = this;
     comm.sid = comm.vmid + srcId;
     comm.did = comm.vmid + destId;
     document.addEventListener(comm.sid, comm['handle' + srcId].bind(comm), false);
-    comm.load = comm.checkLoad = function(){};
+    comm.load = comm.checkLoad = function () {};
     // check whether the page is injectable via <script>, whether limited by CSP
     try {
       comm.injectable = (0, eval)('true');
@@ -200,7 +200,7 @@ var comm = {
       LoadScript: comm.loadScript.bind(comm),
       Command: function (data) {
         var func = comm.command[data];
-        if(func) func();
+        func && func();
       },
       GotRequestId: function (id) {
         comm.qrequests.shift().start(id);
@@ -241,7 +241,7 @@ var comm = {
     }
 
     // request object functions
-    function callback(req){
+    function callback(req) {
       var t = this;
       var cb = t.details['on' + req.type];
       if (cb) {
@@ -286,8 +286,9 @@ var comm = {
       };
       t.id = id;
       comm.requests[id] = t;
-      if(comm.includes(['arraybuffer', 'blob'], t.details.responseType))
+      if (comm.includes(['arraybuffer', 'blob'], t.details.responseType)) {
         data.responseType = 'blob';
+      }
       comm.post({cmd: 'HttpRequest', data: data});
     }
     function getFullUrl(url) {
@@ -324,11 +325,10 @@ var comm = {
       return '[Violentmonkey property]';
     }
     function addProperty(name, prop, obj) {
-      if('value' in prop) prop.writable = false;
+      if ('value' in prop) prop.writable = false;
       prop.configurable = false;
       Object.defineProperty(obj, name, prop);
-      if (typeof obj[name] == 'function')
-        obj[name].toString = propertyToString;
+      if (typeof obj[name] == 'function') obj[name].toString = propertyToString;
     }
     function saveValues() {
       comm.post({
@@ -351,8 +351,8 @@ var comm = {
     } else {
       gm['window'] = comm.getWrapper();
     }
-    if(!comm.includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
-    if(!comm.includes(grant, 'GM_info')) grant.push('GM_info');
+    if (!comm.includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
+    if (!comm.includes(grant, 'GM_info')) grant.push('GM_info');
     var resources = script.meta.resources || {};
     var gm_funcs = {
       unsafeWindow: {value: window},
@@ -384,12 +384,10 @@ var comm = {
           // script object
           addProperty('script', {value:{}}, obj);
           var i;
-          for(i in data) {
-            addProperty(i, {value: data[i]}, obj.script);
-          }
-          for(i in script.meta.resources)
+          for (i in data) addProperty(i, {value: data[i]}, obj.script);
+          for (i in script.meta.resources) {
             addProperty(i, {value: script.meta.resources[i]}, obj.script.resources);
-
+          }
           return obj;
         },
       },
@@ -407,22 +405,22 @@ var comm = {
           if (v) {
             var type = v[0];
             v = v.slice(1);
-            switch(type) {
-              case 'n':
-                val = Number(v);
-                break;
-              case 'b':
-                val = v == 'true';
-                break;
-              case 'o':
-                try {
-                  val = JSON.parse(v);
-                } catch(e) {
-                  console.warn(e);
-                }
-                break;
-              default:
-                val = v;
+            switch (type) {
+            case 'n':
+              val = Number(v);
+              break;
+            case 'b':
+              val = v == 'true';
+              break;
+            case 'o':
+              try {
+                val = JSON.parse(v);
+              } catch (e) {
+                console.warn(e);
+              }
+              break;
+            default:
+              val = v;
             }
           }
           return val;
@@ -436,12 +434,12 @@ var comm = {
       GM_setValue: {
         value: function (key, val) {
           var type = (typeof val)[0];
-          switch(type) {
-            case 'o':
-              val = type + JSON.stringify(val);
-              break;
-            default:
-              val = type + val;
+          switch (type) {
+          case 'o':
+            val = type + JSON.stringify(val);
+            break;
+          default:
+            val = type + val;
           }
           var values = getValues();
           values[key] = val;
@@ -450,7 +448,7 @@ var comm = {
       },
       GM_getResourceText: {
         value: function (name) {
-          for(var i in resources) if (name == i) {
+          for (var i in resources) if (name == i) {
             var text = cache[resources[i]];
             if (text) text = comm.utf8decode(window.atob(text));
             return text;
@@ -500,14 +498,14 @@ var comm = {
       },
       GM_xmlhttpRequest: {
         value: function (details) {
-          if(!comm.Request) comm.initRequest();
+          if (!comm.Request) comm.initRequest();
           return comm.Request(details);
         },
       },
     };
     comm.forEach(grant, function (name) {
       var prop = gm_funcs[name];
-      if(prop) addProperty(name, prop, gm);
+      prop && addProperty(name, prop, gm);
     });
     return gm;
   },
@@ -515,17 +513,16 @@ var comm = {
     function buildCode(script) {
       var require = script.meta.require || [];
       var wrapper = comm.wrapGM(script, data.cache);
-      var code = [];
-      var part;
+      var vars = [];
       comm.forEach(Object.getOwnPropertyNames(wrapper), function(name) {
-        code.push(name + '=this["' + name + '"]=g["' + name + '"]');
+        vars.push(name + '=this["' + name + '"]=g["' + name + '"]');
       });
-      if (code.length)
-        code = ['var ' + code.join(',') + ';delete g;with(this)!function(){'];
-      else
-        code = [];
-      for(var i = 0; i < require.length; i ++)
-        if((part = data.require[require[i]])) code.push(part);
+      // vars should not be empty
+      var code = ['var ' + vars.join(',') + ';delete g;with(this)!function(){'];
+      comm.forEach(require, function (key) {
+        var script = data.require[key];
+        script && code.push(script);
+      });
       // wrap code to make 'use strict' work
       code.push('!function(){' + script.code + '\n}.call(this)');
       code.push('}.call(this);');
@@ -535,7 +532,7 @@ var comm = {
         // normal injection
         try {
           var func = new Function('g', code);
-        } catch(e) {
+        } catch (e) {
           console.error('Syntax error in script: ' + name + '\n' + e.message);
           return;
         }
@@ -570,20 +567,15 @@ var comm = {
         comm.state = 1;
       if (comm.state) comm.load();
     };
+    var listMap = {
+      'document-start': start,
+      'document-idle': idle,
+      'document-end': end,
+    };
     comm.forEach(data.scripts, function(script) {
       comm.values[script.uri] = data.values[script.uri] || {};
-      var list;
-      if(script && script.enabled) {
-        switch (script.custom['run-at'] || script.meta['run-at']) {
-          case 'document-start':
-            list = start;
-            break;
-          case 'document-idle':
-            list = idle;
-            break;
-          default:
-            list = end;
-        }
+      if (script && script.enabled) {
+        var list = listMap[script.custom['run-at'] || script.meta['run-at']] || end;
         list.push(script);
       }
     });
@@ -668,8 +660,8 @@ function httpRequest(details) {
   _.sendMessage({cmd: 'HttpRequest', data: details});
 }
 function httpRequested(data) {
-  if(requests[data.id]) {
-    if(data.type == 'loadend') delete requests[data.id];
+  if (requests[data.id]) {
+    if (data.type == 'loadend') delete requests[data.id];
     comm.post({cmd: 'HttpRequested', data: data});
   }
 }
@@ -679,12 +671,13 @@ function abortRequest(id) {
 
 function objEncode(obj) {
   var list = [];
-  for(var i in obj) {
-    if(!obj.hasOwnProperty(i)) continue;
-    if(typeof obj[i] == 'function')
+  for (var i in obj) {
+    if (!obj.hasOwnProperty(i)) continue;
+    if (typeof obj[i] == 'function') {
       list.push(i + ':' + obj[i].toString());
-    else
+    } else {
       list.push(i + ':' + JSON.stringify(obj[i]));
+    }
   }
   return '{' + list.join(',') + '}';
 }
