@@ -1,33 +1,30 @@
 !function(){
-// Avoid running repeatedly due to new document.documentElement
+// Avoid running repeatedly due to new `document.documentElement`
 if (window.VM) return;
 window.VM = 1;
 
-var _ = {
-  getUniqId: function () {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  },
-  sendMessage: function (data) {
-    return new Promise(function (resolve, reject) {
-      chrome.runtime.sendMessage(data, function (res) {
-        res && res.error ? reject(res.error) : resolve(res && res.data);
-      });
+function getUniqId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+function sendMessage(data) {
+  return new Promise(function (resolve, reject) {
+    chrome.runtime.sendMessage(data, function (res) {
+      res && res.error ? reject(res.error) : resolve(res && res.data);
     });
-  },
-
-  includes: function (arr, item) {
-    for (var i = arr.length; i --;) {
-      if (arr[i] === item) return true;
-    }
-    return false;
-  },
-  forEach: function (arr, func, context) {
-    var length = arr.length;
-    for (var i = 0; i < length; i ++) {
-      if (func.call(context, arr[i], i, arr) === false) break;
-    }
-  },
-};
+  });
+}
+function includes(arr, item) {
+  for (var i = arr.length; i --;) {
+    if (arr[i] === item) return true;
+  }
+  return false;
+}
+function forEach(arr, func, context) {
+  var length = arr.length;
+  for (var i = 0; i < length; i ++) {
+    if (func.call(context, arr[i], i, arr) === false) break;
+  }
+}
 
 /**
  * http://www.webtoolkit.info/javascript-utf8.html
@@ -57,7 +54,7 @@ function utf8decode (utftext) {
 
 function getPopup(){
   // XXX: only scripts run in top level window are counted
-  top === window && _.sendMessage({
+  top === window && sendMessage({
     cmd: 'SetPopup',
     data: {
       ids: ids,
@@ -78,7 +75,7 @@ function getBadge(){
 function setBadge(){
   if (badge.ready && badge.willSet) {
     // XXX: only scripts run in top level window are counted
-    top === window && _.sendMessage({cmd: 'SetBadge', data: badge.number});
+    top === window && sendMessage({cmd: 'SetBadge', data: badge.number});
   }
 }
 
@@ -165,16 +162,16 @@ function getWrapper() {
 }
 // Communicator
 var comm = {
-  vmid: 'VM_' + _.getUniqId(),
+  vmid: 'VM_' + getUniqId(),
   state: 0,
   utf8decode: utf8decode,
-  getUniqId: _.getUniqId,
+  getUniqId: getUniqId,
   props: Object.getOwnPropertyNames(window),
 
   // Array functions
   // Notice: avoid using prototype functions since they may be changed by page scripts
-  includes: _.includes,
-  forEach: _.forEach,
+  includes: includes,
+  forEach: forEach,
 
   init: function(srcId, destId) {
     var comm = this;
@@ -626,7 +623,7 @@ function handleC(e) {
       window.open(url);
     },
     SetValue: function (data) {
-      _.sendMessage({cmd: 'SetValue', data: data});
+      sendMessage({cmd: 'SetValue', data: data});
     },
     RegisterMenu: function (data) {
       if (window.top === window) menus.push(data);
@@ -664,13 +661,13 @@ chrome.runtime.onMessage.addListener(function (req, src) {
 // Requests
 var requests = {};
 function getRequestId() {
-  _.sendMessage({cmd: 'GetRequestId'}).then(function (id) {
+  sendMessage({cmd: 'GetRequestId'}).then(function (id) {
     requests[id] = 1;
     comm.post({cmd: 'GotRequestId', data: id});
   });
 }
 function httpRequest(details) {
-  _.sendMessage({cmd: 'HttpRequest', data: details});
+  sendMessage({cmd: 'HttpRequest', data: details});
 }
 function httpRequested(data) {
   if (requests[data.id]) {
@@ -679,7 +676,7 @@ function httpRequested(data) {
   }
 }
 function abortRequest(id) {
-  _.sendMessage({cmd: 'AbortRequest', data: id});
+  sendMessage({cmd: 'AbortRequest', data: id});
 }
 
 function objEncode(obj) {
@@ -720,7 +717,7 @@ function initCommunicator() {
   );
   comm.handleC = handleC;
   comm.init(C, R);
-  _.sendMessage({cmd: 'GetInjected', data: location.href}).then(loadScript);
+  sendMessage({cmd: 'GetInjected', data: location.href}).then(loadScript);
 }
 initCommunicator();
 }();
