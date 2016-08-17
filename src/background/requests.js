@@ -41,7 +41,7 @@ define('requests', function (require, _exports, module) {
         data.responseText = xhr.responseText;
       } catch (e) {}
       if (evt.type === 'loadend') clearRequest(req);
-      return lastPromise = lastPromise.then(function () {
+      lastPromise = lastPromise.then(function () {
         return new Promise(function (resolve, _reject) {
           if (xhr.response && xhr.responseType === 'blob') {
             var reader = new FileReader;
@@ -78,10 +78,8 @@ define('requests', function (require, _exports, module) {
           );
         }
       }
-      if (details.responseType)
-        xhr.responseType = 'blob';
-      if (details.overrideMimeType)
-        xhr.overrideMimeType(details.overrideMimeType);
+      if (details.responseType) xhr.responseType = 'blob';
+      if (details.overrideMimeType) xhr.overrideMimeType(details.overrideMimeType);
       var callback = xhrCallbackWrapper(req);
       [
         'abort',

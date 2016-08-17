@@ -38,7 +38,7 @@ const paths = {
   ],
 };
 
-gulp.task('watch', () => {
+gulp.task('watch', ['build'], () => {
   gulp.watch([].concat(paths.cache, paths.templates), ['templates']);
   gulp.watch(paths.jsBg, ['js-bg']);
   gulp.watch(paths.jsOptions, ['js-options']);
