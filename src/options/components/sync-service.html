@@ -4,7 +4,7 @@
       v-el:enabled @change="update">
     <span>{{labelText}}</span>
   </label>
-  <button @click="authenticate" :disabled="authState!=='unauthorized'">
+  <button @click="authenticate" :disabled="service.authState!=='unauthorized'">
     {{labelAuthenticate}}
   </button>
   <button :disabled="disableSync" class="sync-start" @click="retry">

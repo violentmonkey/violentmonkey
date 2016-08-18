@@ -56,9 +56,10 @@ gulp.task('eslint', () => (
   .pipe(eslint.format())
 ));
 
-const cacheObj = templateCache();
+var cacheObj;
 
 gulp.task('templates', () => {
+  cacheObj = templateCache();
   var stream = merge2([
     gulp.src(paths.cache),
     gulp.src(paths.templates).pipe(cacheObj),
