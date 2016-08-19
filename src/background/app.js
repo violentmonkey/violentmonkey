@@ -260,8 +260,7 @@ define('app', function (require, exports, _module) {
   }(_.options.get('isApplied'));
 
   chrome.notifications.onClicked.addListener(function(id) {
-    if(id == 'VM-NoGrantWarning')
-      tabsUtils.create('http://wiki.greasespot.net/@grant');
+    id == 'VM-NoGrantWarning' && tabsUtils.create('http://wiki.greasespot.net/@grant');
   });
 
   require('sync_dropbox');

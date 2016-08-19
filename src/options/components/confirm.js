@@ -12,11 +12,11 @@ define('views/Confirm', function (require, _exports, module) {
     data: function () {
       return {
         installable: false,
+        dependencyOK: false,
         message: '',
         code: '',
         require: {},
         resources: {},
-        dependencyOK: false,
       };
     },
     computed: {
@@ -27,9 +27,19 @@ define('views/Confirm', function (require, _exports, module) {
     ready: function () {
       var _this = this;
       _this.message = _.i18n('msgLoadingData');
+      _this.revoke = function (key) {
+        _this.$set(key, _.options.get(key));
+        return _.options.hook(key, function (value) {
+          _this.$set(key, value);
+          value && _.options.set('trackLocalFile', false);
+        });
+      }('closeAfterInstall');
       _this.loadData().then(function () {
         _this.parseMeta();
       });
+    },
+    beforeDestroy: function () {
+      this.revoke();
     },
     methods: {
       loadData: function (changedOnly) {

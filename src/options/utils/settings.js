@@ -7,13 +7,12 @@ define('utils/settings', function (require, _exports, _module) {
       _this.onChange = function () {
         _.options.set(_this.value, _this.el.checked);
       };
-      _this.onSet = function (key, value) {
+      _this.el.addEventListener('change', _this.onChange, false);
+      _this.revoke = _.options.hook(function (value, key) {
         if (key === _this.value) {
           _this.el.checked = value;
         }
-      };
-      _this.el.addEventListener('change', _this.onChange, false);
-      _.options.hook(_this.onSet);
+      });
     },
     update: function (value) {
       var _this = this;
@@ -22,7 +21,7 @@ define('utils/settings', function (require, _exports, _module) {
     unbind: function () {
       var _this = this;
       _this.el.removeEventListener('change', _this.onChange, false);
-      _.options.unhook(_this.onSet);
+      _this.revoke();
     },
   });
 });

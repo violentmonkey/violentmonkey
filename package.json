@@ -3,7 +3,7 @@
   "version": "2.4.0",
   "scripts": {
     "clean": "node -e \"require('del')(['dist'])\"",
-    "predev": "gulp build",
+    "build": "gulp build",
     "dev": "gulp watch",
     "i18n": "gulp i18n",
     "eslint": "gulp eslint",

@@ -38,7 +38,7 @@ const paths = {
   ],
 };
 
-gulp.task('watch', () => {
+gulp.task('watch', ['build'], () => {
   gulp.watch([].concat(paths.cache, paths.templates), ['templates']);
   gulp.watch(paths.jsBg, ['js-bg']);
   gulp.watch(paths.jsOptions, ['js-options']);
@@ -56,9 +56,10 @@ gulp.task('eslint', () => (
   .pipe(eslint.format())
 ));
 
-const cacheObj = templateCache();
+var cacheObj;
 
 gulp.task('templates', () => {
+  cacheObj = templateCache();
   var stream = merge2([
     gulp.src(paths.cache),
     gulp.src(paths.templates).pipe(cacheObj),
