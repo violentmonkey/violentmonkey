@@ -142,9 +142,7 @@ function getWrapper() {
       return method.apply(window, arguments);
     };
   });
-  // Wrap properties
-  comm.forEach(comm.props, function (name) {
-    if (wrapper[name]) return;
+  function defineProtectedProperty(name) {
     var modified = false;
     var value;
     Object.defineProperty(wrapper, name, {
@@ -157,6 +155,23 @@ function getWrapper() {
         value = val;
       },
     });
+  }
+  function defineReactedProperty(name) {
+    Object.defineProperty(wrapper, name, {
+      get: function () {
+        var value = window[name];
+        return value === window ? wrapper : value;
+      },
+      set: function (val) {
+        window[name] = val;
+      },
+    });
+  }
+  // Wrap properties
+  comm.forEach(comm.props, function (name) {
+    if (wrapper[name]) return;
+    if (name.slice(0, 2) === 'on') defineReactedProperty(name);
+    else defineProtectedProperty(name);
   });
   return wrapper;
 }
