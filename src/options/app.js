@@ -11,7 +11,8 @@ define('app', function (require, _exports, _module) {
         store[key] = data[key];
       });
       store.loading = false;
-      features.reset(data.version);
+      // features.reset(data.version);
+      features.reset('sync');
     });
     var port = chrome.runtime.connect({name: 'Options'});
     port.onMessage.addListener(function (res) {

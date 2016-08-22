@@ -18,8 +18,10 @@ define('views/SyncService', function (require, _exports, module) {
       },
       disableSync: function () {
         var service = this.service;
-        return ['authorized', 'error'].indexOf(service.authState) < 0
-        || ~['ready', 'syncing'].indexOf(service.syncState);
+        return !!(
+          ['authorized', 'error'].indexOf(service.authState) < 0 ||
+          ~['ready', 'syncing'].indexOf(service.syncState)
+        );
       },
       message: function () {
         var service = this.service;

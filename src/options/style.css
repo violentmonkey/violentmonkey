@@ -284,6 +284,9 @@ fieldset.title {
   margin-left: 3.5rem;
   line-height: 2rem;
 }
+.script-desc::after {
+  content: "\200b";
+}
 .disabled .script-icon {
   filter: grayscale(.5);
 }
