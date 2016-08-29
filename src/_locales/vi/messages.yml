@@ -6,7 +6,7 @@ extDescription:
   message: Userscript support for Chromium based browsers like Opera and Chrome.
 extTranslator:
   description: Information of the translator.
-  message: 'Nguyễn Đông Hoàng <donghoang.nguyen@gmail.c>'
+  message: 'Nguyễn Đông Hoàng <donghoang.nguyen@gmail.com>'
   touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
