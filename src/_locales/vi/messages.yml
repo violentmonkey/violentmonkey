@@ -1,0 +1,362 @@
+extName:
+  description: Name of this extension.
+  message: Violentmonkey
+extDescription:
+  description: Description for this extension.
+  message: Userscript support for Chromium based browsers like Opera and Chrome.
+extTranslator:
+  description: Information of the translator.
+  message: 'Nguyễn Đông Hoàng <donghoang.nguyen@gmail.com>'
+  touched: false
+msgUpdated:
+  description: Message shown when a script is updated/reinstalled.
+  message: Đã cập nhật script.
+msgErrorFetchingScript:
+  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  message: 'Có lỗi khi tìm phiên bản mới!'
+msgInstalled:
+  description: Message shown when a script is installed.
+  message: Đã cài đặt script.
+Warning:
+  description: Show warnings with a notification.
+  message: Cảnh báo
+msgWarnGrant:
+  description: Message shown when `@grant` is not found in a script.
+  message: 'Script [$1] thiếu thuộc tính `@grant`! Bấm để xem chi tiết.'
+labelNoName:
+  description: Text as the name of a script when no @name is assigned.
+  message: Không có tên
+msgUpdating:
+  description: Message shown when a new version of script is being fetched.
+  message: Đang cập nhật...
+msgNewVersion:
+  description: 'Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.'
+  message: Có phiên bản mới.
+msgCheckingForUpdate:
+  description: Message shown when a script is being checked for updates by version numbers.
+  message: Đang kiểm tra cập nhật...
+msgErrorFetchingUpdateInfo:
+  description: Message shown when Violentmonkey fails fetching version data of the script.
+  message: Tìm kiếm thông tin cập nhật thất bại.
+msgNoUpdate:
+  description: Message shown when there is no new version of a script.
+  message: Không có cập nhật mới.
+labelInstall:
+  description: Shown in the title of the confirm page while trying to install a script.
+  message: Đang cài đặt script
+buttonInstallOptions:
+  description: Button to show options of installation confirm page.
+  message: Tuỳ chọn
+installOptionClose:
+  description: Option to close confirm window after installation.
+  message: Đóng sau khi cài đặt xong
+installOptionTrack:
+  description: Option to track the loading local file before window is closed.
+  message: Track local file before this window is closed
+buttonConfirmInstallation:
+  description: Button to confirm installation of a script.
+  message: Xác nhận cài đặt
+buttonClose:
+  description: Button to close window.
+  message: Đóng
+msgErrorLoadingData:
+  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  message: Không thể tải script.
+msgLoadedData:
+  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  message: Đã tải script.
+msgErrorLoadingDependency:
+  description: Message shown when not all requirements are loaded successfully.
+  message: Lỗi tải thư viện.
+msgLoadingDependency:
+  description: Message shown on confirm page when the requirements are being downloaded.
+  message: Đang tải thư viện... ($1/$2)
+msgScriptURL:
+  description: URL of the script to be installed on confirm page.
+  message: 'Script URL: $1'
+  touched: false
+msgLoadingData:
+  description: Message shown on confirm page when the script to be installed is loading.
+  message: Đang tải thông tin script...
+sideMenuInstalled:
+  description: 'Side menu: Installed scripts'
+  message: Script đã cài đặt
+sideMenuSettings:
+  description: 'Side menu: Settings'
+  message: Cài đặt
+sideMenuAbout:
+  description: 'Side menu: About'
+  message: Thông tin
+buttonNew:
+  description: Button to create a new script.
+  message: Tạo mới
+buttonUpdateAll:
+  description: Check all scripts for updates.
+  message: Kiểm tra cập nhật tất cả
+anchorGetMoreScripts:
+  description: Link to get more scripts.
+  message: Tìm thêm script
+msgLoading:
+  description: Message shown in the options page before script list is loaded.
+  message: Đang tải ...
+labelSettings:
+  description: Label shown on the top of settings page
+  message: Cài đặt
+labelAutoUpdate:
+  description: Option to allow automatically checking scripts for updates every 24 hours.
+  message: Tự động kiểm tra cập nhật hàng ngày
+labelIgnoreGrant:
+  description: Option to suppress no @grant warnings.
+  message: Bỏ qua cảnh báo không có @grant
+labelInjectMode:
+  description: Label for a combo box to choose script injection modes.
+  message: 'Chế độ tiêm :'
+injectModeNormal:
+  description: 'Script injection mode: Normal'
+  message: Bình thường
+injectModeAdvanced:
+  description: 'Script injection mode: Advanced'
+  message: Nâng cao
+labelDataImport:
+  description: Section title of data import.
+  message: Nhập dữ liệu
+buttonImportData:
+  description: Button to choose a file for data import.
+  message: Nhập từ tập tin zip
+buttonVacuum:
+  description: Button to vacuum extension data.
+  message: Vacuum database
+labelDataExport:
+  description: Section title of data export.
+  message: Xuất dữ liệu
+labelScriptsToExport:
+  description: Label shown on top of the script list for export.
+  message: Script để xuất
+labelExportScriptData:
+  description: Option to export script data along with scripts.
+  message: Xuất dữ liệu script
+buttonAllNone:
+  description: Button to select all scripts or none.
+  message: Tất cả/Bỏ chọn
+buttonExportData:
+  description: Button to open the data export dialog.
+  message: Xuất ra tập tin zip
+labelAbout:
+  description: Label shown on top of the about page.
+  message: Thông tin Violentmonkey
+labelRelated:
+  description: Label of related links.
+  message: 'Liên kết gợi ý: '
+anchorSupportPage:
+  description: Link to the support page of Violentmonkey.
+  message: '<a href=https://violentmonkey.github.io/nex/ target=_blank>Violentmonkey</a>'
+labelDonate:
+  description: Label of link to donate page.
+  message: Đóng góp
+labelFeedback:
+  description: Label of link to feedback page.
+  message: Phản hồi
+labelAuthor:
+  description: Label of author shown in the details of a script.
+  message: 'Tác giả: '
+anchorAuthor:
+  description: Author shown on about tab.
+  message: '<a href=mailto:i@gerald.top>Gerald</a>'
+labelTranslator:
+  description: Label of translator.
+  message: 'Dịch bởi: '
+anchorTranslator:
+  description: Translator shown on about tab.
+  message: '<a href=mailto:donghoang.nguyen@gmail.com>Nguyễn Đông Hoàng</a>'
+labelCurrentLang:
+  description: Label of current language.
+  message: 'Ngôn ngữ hiện tại: '
+labelScriptEditor:
+  description: Shown in the title of the script editing page.
+  message: Trình chỉnh sửa script
+buttonCustomMeta:
+  description: Button to edit the custom meta data of a script.
+  message: Tuỳ chỉnh thẻ dữ liệu
+labelName:
+  description: Label of script name.
+  message: 'Tên:'
+labelRunAt:
+  description: Label of script @run-at properties in custom meta data.
+  message: 'Chạy khi:'
+labelRunAtDefault:
+  description: Shown when custom @run-at is not assigned.
+  message: (Mặc định)
+labelHomepageURL:
+  description: Label of script @homepageURL in custom meta data.
+  message: 'Trang chủ:'
+labelUpdateURL:
+  description: Label of script @updateURL in custom meta data.
+  message: 'URL Cập nhật:'
+labelDownloadURL:
+  description: Label of script @downloadURL in custom meta data.
+  message: 'URL tải về:'
+labelInclude:
+  description: Label of @include rules.
+  message: Thực thi
+labelKeepInclude:
+  description: Option to keep the original @include rules.
+  message: Giữ quy tắc thực thi gốc
+labelCustomInclude:
+  description: Label of custom @include rules.
+  message: 'Tuỳ chỉnh quy tắc thực thi: <em>(Một trên một dòng)</em>'
+labelMatch:
+  description: Label of @match rules.
+  message: Trùng khớp
+labelKeepMatch:
+  description: Option to keep the original @match rules.
+  message: Giữ quy tắc trùng khớp gốc
+labelCustomMatch:
+  description: Label of custom @match rules.
+  message: 'Tuỳ chỉnh quy tắc trùng khớp: <em>(Một trên một dòng)</em>'
+labelExclude:
+  description: Label of @exclude rules.
+  message: Bỏ qua
+labelKeepExclude:
+  description: Option to keep the original @exclude rules.
+  message: Giữ quy tắc bỏ qua gốc
+labelCustomExclude:
+  description: Label of custom @exclude rules.
+  message: 'Tuỳ chỉnh quy tắc bỏ qua: <em>(Một trên một dòng)</em>'
+labelAllowUpdate:
+  description: Option to allow checking updates for a script.
+  message: Cho phép cập nhật
+buttonSave:
+  description: Button to save modifications of a script.
+  message: Lưu
+buttonSaveClose:
+  description: Button to save modifications of a script and then close the editing page.
+  message: 'Lưu & Đóng'
+labelNoScripts:
+  description: Message shown when no script is installed.
+  message: "Oops, bạn không có script nào được cài đặt."
+hintSupportPage:
+  description: Hint for support page.
+  message: Trang hỗ trợ
+  touched: false
+buttonDisable:
+  description: Button to disable a script.
+  message: Vô hiệu hoá
+buttonEnable:
+  description: Button to enable a script.
+  message: Kích hoạt
+buttonEdit:
+  description: Button to edit a script.
+  message: Sửa
+buttonRemove:
+  description: Button to remove a script.
+  message: Xoá
+buttonUpdate:
+  description: Check a script for updates.
+  message: Kiểm tra cập nhật
+msgImported:
+  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  message: Đã nhập $1 script.
+hintUseDownloadURL:
+  description: Shown as a place holder for @updateURL when it is not assigned
+  message: Dùng @downloadURL
+confirmNotSaved:
+  description: Confirm message shown when there are unsaved script modifications.
+  message: |-
+    Thay đổi chưa được lưu!
+    Bấm OK để huỷ bỏ hoặc Cancel đế quay lại.
+buttonVacuuming:
+  description: Message shown when data vacuum is in progress.
+  message: Làm trống dữ liệu...
+buttonVacuumed:
+  description: Message shown when data is vacuumed.
+  message: Đã làm trống dữ liệu
+hintVacuum:
+  description: Hint for vacuuming data.
+  message: Bỏ qua dữ liệu thừa và cố gắng tải lại nguồn dữ liệu thiếu từ bộ nhớ đệm.
+menuManageScripts:
+  description: 'Menu item to manage scripts, or to open the options page of the extension.'
+  message: Quản lý scripts
+menuFindScripts:
+  description: Menu item to find scripts for a site.
+  message: Tìm script cho trang này
+menuScriptEnabled:
+  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  message: Đã kích hoạt script
+menuScriptDisabled:
+  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  message: Đã vô hiệu hoá script
+menuBack:
+  description: Menu item to go back to main menu from script commands.
+  message: Quay lại
+menuCommands:
+  description: Menu item to list script commands.
+  message: Menu của script...
+labelSearch:
+  description: Label for search input in search box.
+  message: 'Tìm kiếm: '
+labelSearchFor:
+  description: Text shown as a place holder in the search box.
+  message: Tìm kiếm...
+labelReplace:
+  description: Label for replace input in search box.
+  message: 'Replace with: '
+labelReplaceWith:
+  description: Text shown as a place holder in the replace box.
+  message: Thay thề với...
+buttonReplace:
+  description: Button to replace the current match.
+  message: Thay thế
+buttonReplaceAll:
+  description: Button to replace all matches.
+  message: Tất cả
+labelAutoReloadCurrentTab:
+  description: Option to reload current tab after a script is switched on or off from menu.
+  message: Tải lại trang khi bật/tắt script từ menu
+hintInjectModeNormal:
+  description: Hint to explain the normal injection mode.
+  message: 'Khá tốt nhưng có thể lỗi trên một số trang bảo mật cao, Ví dụ https://github.com'
+hintInjectModeAdvanced:
+  description: Hint to explain the advanced injection mode.
+  message: 'Hoạt đông trên hầu hết các trang, thực ra là hack'
+hintInputURL:
+  description: Hint for a prompt box to input URL of a user script.
+  message: 'URL đầu vào:'
+buttonInstallFromURL:
+  description: Button to ask for URL of a user script.
+  message: Cài đăt từ URL
+labelSync:
+  description: Label for sync options.
+  message: Đồng bộ
+buttonAuthorize:
+  description: Button to authorize permissions for sync.
+  message: Xác thực
+buttonAuthorizing:
+  description: Button shown when authorization is in progress.
+  message: Đang xác thực
+buttonAuthorized:
+  description: Button shown when permissions are already authorized for sync.
+  message: Đã xác thực
+labelSyncTo:
+  description: Label for sync service.
+  message: Đồng bộ đến $1
+lastSync:
+  description: Label for last sync timestamp.
+  message: Đồng bộ cuối lúc $1
+msgSyncInit:
+  description: Message shown when sync service is initializing.
+  message: Đang khởi tạo...
+msgSyncInitError:
+  description: Message shown when sync fails in initialization.
+  message: 'Khởi tạo lỗi!'
+msgSyncReady:
+  description: Message shown when sync will start soon.
+  message: Đồng bộ sẽ chạy sớm...
+msgSyncing:
+  description: Message shown when sync is in progress.
+  message: Đang đồng bộ...
+msgSyncError:
+  description: Message shown when sync failed.
+  message: 'Đồng bộ lỗi!'
+msgNamespaceConflict:
+  description: Message shown when namespace of the new script conflicts with an existent one.
+  message: 'Xung đột namespace! Vui lòng sửa @name và @namespace.'
