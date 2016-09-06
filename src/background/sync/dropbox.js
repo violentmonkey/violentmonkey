@@ -13,7 +13,7 @@ define('sync_dropbox', function (require, _exports, _module) {
       client_id: config.client_id,
       redirect_uri: config.redirect_uri,
     };
-    var url = 'https://www.dropbox.com/1/oauth2/authorize';
+    var url = 'https://www.dropbox.com/oauth2/authorize';
     var qs = searchUtils.dump(params);
     url += '?' + qs;
     tabsUtils.create(url);
