@@ -15,12 +15,10 @@ define('views/Domain', function (require, _exports, module) {
       });
     },
     watch: {
-      'store.domains': function () {
-        this.update();
-      },
+      'store.domains': 'update',
     },
     methods: {
-      update: function () {
+      updateView: function () {
         var _this = this;
         _this.items.bot = _this.store.domains.map(function (domain) {
           return {

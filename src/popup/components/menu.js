@@ -68,18 +68,12 @@ define('views/Menu', function (require, _exports, module) {
       _this.updateCommands();
     },
     watch: {
-      'store.scripts': function () {
-        this.update();
-      },
-      'store.commands': function () {
-        this.updateCommands();
-      },
-      'store.domains': function () {
-        this.updateDomains();
-      },
+      'store.scripts': 'update',
+      'store.commands': 'updateCommands',
+      'store.domains': 'updateDomains',
     },
     methods: {
-      update: function () {
+      updateView: function () {
         var _this = this;
         _this.items.bot = _this.store.scripts.map(function (script) {
           return {

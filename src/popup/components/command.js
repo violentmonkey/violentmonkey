@@ -15,12 +15,10 @@ define('views/Command', function (require, _exports, module) {
       });
     },
     watch: {
-      'store.commands': function () {
-        this.update();
-      },
+      'store.commands': 'update',
     },
     methods: {
-      update: function () {
+      updateView: function () {
         var _this = this;
         _this.items.bot = _this.store.commands.map(function (item) {
           return {

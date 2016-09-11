@@ -19,7 +19,23 @@ define('views/MixIn', function (require, _exports, module) {
     },
     ready: function () {
       this.update();
-      utils.fixStyles(this);
+    },
+    methods: {
+      update: function () {
+        var _this = this;
+        _this.updateView();
+        _this.fixStyles();
+      },
+      fixStyles: function () {
+        var _this = this;
+        _this.$nextTick(function () {
+          var placeholder = _this.$els.placeholder;
+          var bot = _this.$els.bot;
+          placeholder.innerHTML = bot.innerHTML;
+          var pad = bot.offsetWidth - bot.clientWidth + 2;
+          placeholder.style.paddingRight = pad + 'px';
+        });
+      },
     },
   };
 });
