@@ -20,7 +20,7 @@ function includes(arr, item) {
   return false;
 }
 function forEach(arr, func, context) {
-  var length = arr.length;
+  var length = arr && arr.length || 0;
   for (var i = 0; i < length; i ++) {
     if (func.call(context, arr[i], i, arr) === false) break;
   }
@@ -714,7 +714,7 @@ function inject(code) {
   doc.removeChild(script);
 }
 function loadScript(data) {
-  data.scripts.forEach(function(script) {
+  data.scripts && data.scripts.forEach(function (script) {
     ids.push(script.id);
     if (script.enabled) badge.number ++;
   });
