@@ -47,7 +47,7 @@ gulp.task('watch', ['build'], () => {
   gulp.watch(paths.locales, ['copy-i18n']);
 });
 
-gulp.task('eslint', () => (
+gulp.task('lint', () => (
   gulp.src([
     'src/**/*.js',
     '!src/public/**',

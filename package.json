@@ -6,7 +6,7 @@
     "build": "gulp build",
     "dev": "gulp watch",
     "i18n": "gulp i18n",
-    "eslint": "gulp eslint",
+    "lint": "gulp lint",
     "update": "node scripts/updateLib"
   },
   "description": "Violentmonkey",
