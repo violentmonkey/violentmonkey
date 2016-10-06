@@ -1,0 +1,16 @@
+<div class="main">
+  <aside>
+    <img src="/images/icon128.png">
+    <h1 v-text="i18n('extName')"></h1>
+    <div class="line">2013-2016</div>
+    <hr>
+    <div class=sidemenu>
+      <a href="#main/Installed" :class="{active:tab==='Main'}" v-text="i18n('sideMenuInstalled')"></a>
+      <a href="#main/Settings" :class="{active:tab==='Settings'}" v-feature="'settings'">
+        <span v-text="i18n('sideMenuSettings')" class="feature-text"></span>
+      </a>
+      <a href="#main/About" :class="{active:tab==='About'}" v-text="i18n('sideMenuAbout')"></a>
+    </div>
+  </aside>
+  <component :is="tab"></component>
+</div>

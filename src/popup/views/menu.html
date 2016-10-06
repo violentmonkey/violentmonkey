@@ -3,8 +3,8 @@
     <menu-item v-for="item in items.top" v-show="!item.hide" :options="item"></menu-item>
   </div>
   <hr v-if="items.bot.length">
-  <div class="menu placeholder" v-el:placeholder></div>
-  <div class="menu" v-el:bot>
+  <div class="menu placeholder" ref="placeholder"></div>
+  <div class="menu" ref="bot">
     <menu-item v-for="item in items.bot" :options="item"></menu-item>
   </div>
 </div>

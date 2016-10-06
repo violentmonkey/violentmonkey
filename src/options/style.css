@@ -348,11 +348,12 @@ fieldset.title {
   border-bottom-right-radius: .2rem;
   box-shadow: 0 0 .2rem rgba(0,0,0,.2);
 }
-.message-transition {
+.message-enter-active,
+.message-leave-active {
   transition: transform .5s;
 }
 .message-enter,
-.message-leave {
+.message-leave-active {
   transform: translateY(-120%);
 }
 .icon {

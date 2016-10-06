@@ -1,0 +1,12 @@
+<div class="line">
+  <label>
+    <input type=checkbox v-setting="service.name+'Enabled'" @change="update">
+    <span v-text="labelText"></span>
+  </label>
+  <button @click="authenticate" v-text="labelAuthenticate"
+  :disabled="service.authState!=='unauthorized'"></button>
+  <button :disabled="disableSync" class="sync-start" @click="retry">
+    <svg class="icon"><use xlink:href="#refresh"/></svg>
+  </button>
+  <span>{{message}}</span>
+</div>

@@ -1,0 +1,28 @@
+<div class="content">
+  <h1>
+    <span v-text="i18n('labelAbout')"></span>
+    <small>v{{version}}</small>
+  </h1>
+  <div class=line v-text="i18n('extDescription')"></div>
+  <div class=line>
+    <label v-text="i18n('labelRelated')"></label>
+    <span v-html="i18n('anchorSupportPage')"></span> |
+    <a href=https://gerald.top/~donate target=_blank v-text="i18n('labelDonate')"></a> |
+    <a href=https://github.com/violentmonkey/violentmonkey/issues target=_blank v-text="i18n('labelFeedback')"></a>
+  </div>
+  <div class=line>
+    <label v-text="i18n('labelAuthor')"></label>
+    <span v-html="i18n('anchorAuthor')"></span>
+  </div>
+  <div class=line>
+    <label v-text="i18n('labelTranslator')"></label>
+    <span v-html="i18n('anchorTranslator')"></span>
+  </div>
+  <div class=line>
+    <label v-text="i18n('labelCurrentLang')"></label>
+    <span id="currentLang">{{language}}</span> |
+    <a href=https://violentmonkey.github.io/localization.html#nex target=_blank>
+      Help with translation
+    </a>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="content">
+<h1 v-text="i18n('labelSettings')"></h1>
+<label class="line">
+  <input type=checkbox v-setting="'autoUpdate'" @change="updateAutoUpdate">
+  <span v-text="i18n('labelAutoUpdate')"></span>
+</label>
+<label class="line">
+  <input type=checkbox v-setting="'ignoreGrant'">
+  <span v-text="i18n('labelIgnoreGrant')"></span>
+</label>
+<label class="line">
+  <input type=checkbox v-setting="'autoReload'">
+  <span v-text="i18n('labelAutoReloadCurrentTab')"></span>
+</label>
+<fieldset class=title>
+  <legend v-text="i18n('labelDataImport')"></legend>
+  <button v-text="i18n('buttonImportData')" @click="importFile"></button>
+  <button :title="i18n('hintVacuum')" @click="vacuum" :disabled="vacuuming" v-text="labelVacuum"></button>
+</fieldset>
+<fieldset class=title>
+  <legend v-text="i18n('labelDataExport')"></legend>
+  <b v-text="i18n('labelScriptsToExport')"></b>
+  <label>
+    <input type=checkbox v-setting="'exportValues'">
+    <span v-text="i18n('labelExportScriptData')"></span>
+  </label>
+  <select class=export-list multiple v-model="selectedIds">
+    <option class="ellipsis" v-for="script in store.scripts"
+      :value="script.id" v-text="script.custom.name||script.meta.name"></option>
+  </select>
+  <button v-text="i18n('buttonAllNone')" @click="updateSelection()"></button>
+  <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
+</fieldset>
+<fieldset class=title v-feature="'sync'">
+  <legend v-text="i18n('labelSync')" class="feature-text"></legend>
+  <div class="sync-services">
+    <sync-service v-for="service in store.sync" :service="service"></sync-service>
+  </div>
+</fieldset>
+</div>

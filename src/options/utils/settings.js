@@ -1,27 +1,38 @@
-define('utils/settings', function (require, _exports, _module) {
-  var _ = require('utils/common');
+var _ = require('../../common');
 
-  Vue.directive('setting', {
-    bind: function () {
-      var _this = this;
-      _this.onChange = function () {
-        _.options.set(_this.value, _this.el.checked);
-      };
-      _this.el.addEventListener('change', _this.onChange, false);
-      _this.revoke = _.options.hook(function (value, key) {
-        if (key === _this.value) {
-          _this.el.checked = value;
-        }
-      });
-    },
-    update: function (value) {
-      var _this = this;
-      _this.el.checked = _.options.get(_this.value = value);
-    },
-    unbind: function () {
-      var _this = this;
-      _this.el.removeEventListener('change', _this.onChange, false);
-      _this.revoke();
-    },
+var hooks = {};
+_.options.hook(function (value, key) {
+  var list = hooks[key];
+  list && list.forEach(function (el) {
+    el.checked = value;
   });
+  setTimeout(onChanged, 0, value, key);
+});
+
+function onSettingChange(e) {
+  var target = e.target;
+  _.options.set(target.dataset.setting, target.checked);
+}
+function onChanged(value, key) {
+  if (value && key === 'closeAfterInstall') {
+    _.options.set('trackLocalFile', false);
+  }
+}
+
+Vue.directive('setting', {
+  bind: function (el, binding) {
+    var value = binding.value;
+    el.dataset.setting = value;
+    el.addEventListener('change', onSettingChange, false);
+    var list = hooks[value] = hooks[value] || [];
+    list.push(el);
+    el.checked = _.options.get(value);
+  },
+  unbind: function (el, binding) {
+    var value = binding.value;
+    el.removeEventListener('change', onSettingChange, false);
+    var list = hooks[value] || [];
+    var i = list.indexOf(el);
+    ~i && list.splice(i, 1);
+  },
 });

@@ -2,23 +2,23 @@
   <div class=frame-header>
     <div class=buttons>
       <div v-dropdown>
-        <button dropdown-toggle v-text="'buttonInstallOptions'|i18n"></button>
+        <button dropdown-toggle v-text="i18n('buttonInstallOptions')"></button>
         <div class="dropdown-menu options-panel" @mousedown.stop>
           <label>
             <input type=checkbox v-setting="'closeAfterInstall'">
-            <span v-text="'installOptionClose'|i18n"></span>
+            <span v-text="i18n('installOptionClose')"></span>
           </label>
           <label>
             <input type=checkbox v-setting="'trackLocalFile'" :disabled="closeAfterInstall">
-            <span v-text="'installOptionTrack'|i18n"></span>
+            <span v-text="i18n('installOptionTrack')"></span>
           </label>
         </div>
       </div>
-      <button v-text="'buttonConfirmInstallation'|i18n"
+      <button v-text="i18n('buttonConfirmInstallation')"
         :disabled="!installable" @click="installScript"></button>
-      <button v-text="'buttonClose'|i18n" @click="close"></button>
+      <button v-text="i18n('buttonClose')" @click="close"></button>
     </div>
-    <h1><span v-text="'labelInstall'|i18n"></span> - <span v-text="'extName'|i18n"></span></h1>
+    <h1><span v-text="i18n('labelInstall')"></span> - <span v-text="i18n('extName')"></span></h1>
     <div class="ellipsis confirm-url" :title="params.url">{{params.url}}</div>
     <div class="ellipsis confirm-msg">{{message}}</div>
   </div>

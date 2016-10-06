@@ -17,9 +17,9 @@ rules:
 
 env:
   browser: true
+  node: true
 
 globals:
-  define: true
   chrome: true
   zip: true
   Vue: true

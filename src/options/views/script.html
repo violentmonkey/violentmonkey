@@ -2,7 +2,7 @@
   <img class=script-icon :src="safeIcon">
   <div class="script-version pull-right" v-text="script.meta.version?'v'+script.meta.version:''"></div>
   <div class="script-author ellipsis pull-right" :title="script.meta.author" v-if="author">
-    <span v-text="'labelAuthor'|i18n"></span>
+    <span v-text="i18n('labelAuthor')"></span>
     <a href="mailto:{{author.email}}" v-if="author.email" v-text="author.name"></a>
     <span v-if="!author.email" v-text="author.name"></a>
   </div>
@@ -16,11 +16,11 @@
   </div>
   <p class="script-desc ellipsis" v-text="script.custom.description||getLocaleString('description')"></p>
   <div class=buttons>
-    <button v-text="'buttonEdit'|i18n" @click="onEdit"></button>
-    <button @click="onEnable">{{labelEnable}}</button>
-    <button v-text="'buttonRemove'|i18n" @click="onRemove"></button>
+    <button v-text="i18n('buttonEdit')" @click="onEdit"></button>
+    <button @click="onEnable" v-text="labelEnable"></button>
+    <button v-text="i18n('buttonRemove')" @click="onRemove"></button>
     <button v-if="canUpdate" :disabled="script.checking"
-      v-text="'buttonUpdate'|i18n" @click="onUpdate"></button>
-    <span>{{script.message}}</span>
+      v-text="i18n('buttonUpdate')" @click="onUpdate"></button>
+    <span v-text="script.message"></span>
   </div>
 </div>

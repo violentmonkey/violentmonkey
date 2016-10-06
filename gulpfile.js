@@ -1,13 +1,14 @@
+const del = require('del');
 const gulp = require('gulp');
 const concat = require('gulp-concat');
 const replace = require('gulp-replace');
-const footer = require('gulp-footer');
 const merge2 = require('merge2');
 const cssnano = require('gulp-cssnano');
 const gulpFilter = require('gulp-filter');
 const eslint = require('gulp-eslint');
 const uglify = require('gulp-uglify');
 const svgSprite = require('gulp-svg-sprite');
+const definePack = require('define-commonjs/pack/gulp');
 const templateCache = require('./scripts/templateCache');
 const i18n = require('./scripts/i18n');
 const pkg = require('./package.json');
@@ -20,6 +21,12 @@ const paths = {
     'src/**/*.html',
     '!src/**/index.html',
   ],
+  jsCollect: [
+    'src/**/*.js',
+    '!src/public/**',
+    '!src/injected.js',
+  ],
+  jsCommon: 'src/common.js',
   jsBg: 'src/background/**/*.js',
   jsOptions: 'src/options/**/*.js',
   jsPopup: 'src/popup/**/*.js',
@@ -30,19 +37,18 @@ const paths = {
     'src/**/*.yml',
   ],
   copy: [
-    'src/*.js',
-    '!src/cache.js',
+    'src/injected.js',
     'src/public/**',
     'src/*/*.html',
     'src/*/*.css',
   ],
 };
 
+gulp.task('del', () => del(['dist']));
+
 gulp.task('watch', ['build'], () => {
   gulp.watch([].concat(paths.cache, paths.templates), ['templates']);
-  gulp.watch(paths.jsBg, ['js-bg']);
-  gulp.watch(paths.jsOptions, ['js-options']);
-  gulp.watch(paths.jsPopup, ['js-popup']);
+  gulp.watch(paths.jsCollect, ['js']);
   gulp.watch(paths.copy, ['copy-files']);
   gulp.watch(paths.locales, ['copy-i18n']);
 });
@@ -57,43 +63,65 @@ gulp.task('lint', () => (
 ));
 
 var cacheObj;
+var collect;
 
-gulp.task('templates', () => {
-  cacheObj = templateCache();
+gulp.task('collect-js', () => {
+  collect = definePack();
+  return gulp.src(paths.jsCollect)
+  .pipe(collect);
+});
+
+gulp.task('templates', ['collect-js'], () => {
+  cacheObj = templateCache('cache');
   var stream = merge2([
     gulp.src(paths.cache),
     gulp.src(paths.templates).pipe(cacheObj),
   ])
-  .pipe(concat('cache.js'));
+  .pipe(concat('cache.js'))
+  .pipe(collect.pack(null, file => 'src/cache.js'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'));
 });
 
-gulp.task('js-bg', () => {
+gulp.task('js-common', ['collect-js'], () => {
+  var stream = gulp.src(paths.jsCommon)
+  .pipe(collect.pack());
+  if (isProd) stream = stream.pipe(uglify());
+  return stream.pipe(gulp.dest('dist'));
+});
+
+gulp.task('js-bg', ['collect-js'], () => {
   var stream = gulp.src(paths.jsBg)
-  .pipe(concat('background/app.js'))
-  .pipe(footer(';define.use("app");'));
+  .pipe(collect.pack('src/background/app.js'))
+  .pipe(concat('background/app.js'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'));
 });
 
-gulp.task('js-options', ['templates'], () => {
+gulp.task('js-options', ['templates', 'collect-js'], () => {
   var stream = gulp.src(paths.jsOptions)
   .pipe(cacheObj.replace())
-  .pipe(concat('options/app.js'))
-  .pipe(footer(';define.use("app");'));
+  .pipe(collect.pack('src/options/app.js'))
+  .pipe(concat('options/app.js'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'));
 });
 
-gulp.task('js-popup', ['templates'], () => {
+gulp.task('js-popup', ['templates', 'collect-js'], () => {
   var stream = gulp.src(paths.jsPopup)
   .pipe(cacheObj.replace())
-  .pipe(concat('popup/app.js'))
-  .pipe(footer(';define.use("app");'));
+  .pipe(collect.pack('src/popup/app.js'))
+  .pipe(concat('popup/app.js'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'))
 });
+
+gulp.task('js', [
+  'js-common',
+  'js-bg',
+  'js-options',
+  'js-popup',
+]);
 
 gulp.task('manifest', () => (
   gulp.src(paths.manifest, {base: 'src'})
@@ -145,9 +173,7 @@ gulp.task('svg', () => (
 ));
 
 gulp.task('build', [
-  'js-bg',
-  'js-options',
-  'js-popup',
+  'js',
   'manifest',
   'copy-files',
   'copy-i18n',
