@@ -13,7 +13,7 @@ msgUpdated:
   message: Скрипта је ажурирана.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: 'Грешка при преузимању скрипте!'
+  message: Грешка при преузимању скрипте!
 msgInstalled:
   description: Message shown when a script is installed.
   message: Скрипта је инсталирана.
@@ -30,7 +30,9 @@ msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Ажурирање...
 msgNewVersion:
-  description: 'Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.'
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
   message: Нова верзија је пронађена.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -60,10 +62,14 @@ buttonClose:
   description: Button to close window.
   message: Затвори
 msgErrorLoadingData:
-  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
   message: Грешка приликом учитавања скрипте.
 msgLoadedData:
-  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
   message: Скрипта је учитана.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
@@ -111,12 +117,15 @@ labelIgnoreGrant:
 labelInjectMode:
   description: Label for a combo box to choose script injection modes.
   message: 'Режим уграђивања скрипте:'
+  touched: false
 injectModeNormal:
   description: 'Script injection mode: Normal'
   message: Нормални
+  touched: false
 injectModeAdvanced:
   description: 'Script injection mode: Advanced'
   message: Напредни
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Увоз података
@@ -149,7 +158,9 @@ labelRelated:
   message: Сродне везе
 anchorSupportPage:
   description: Link to the support page of Violentmonkey.
-  message: '<a href=https://violentmonkey.github.io/violentmonkey/ target=_blank>Violentmonkey</a>'
+  message: >-
+    <a href=https://violentmonkey.github.io/violentmonkey/
+    target=_blank>Violentmonkey</a>
 labelDonate:
   description: Label of link to donate page.
   message: Донирај
@@ -254,7 +265,9 @@ buttonUpdate:
   description: Check a script for updates.
   message: Провери ажурирања
 msgImported:
-  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
   message: 'Увезено: $1 ставка/е/и'
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
@@ -311,13 +324,17 @@ buttonReplaceAll:
   message: Све
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Поново учитај тренутну картицу након укључивања/искључивања скрипте из менија
+  message: >-
+    Поново учитај тренутну картицу након укључивања/искључивања скрипте из
+    менија
 hintInjectModeNormal:
   description: Hint to explain the normal injection mode.
   message: 'Ефикасан, али не ради на неким безбедним страницама, нпр. https://github.com'
+  touched: false
 hintInjectModeAdvanced:
   description: Hint to explain the advanced injection mode.
   message: 'Ради на већини страница, заправо је хак'
+  touched: false
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Унесите адресу:'
@@ -358,5 +375,10 @@ msgSyncError:
   description: Message shown when sync failed.
   message: Грешка при синхронизацији
 msgNamespaceConflict:
-  description: Message shown when namespace of the new script conflicts with an existent one.
-  message: 'Неусаглашеност имена скрипти! Измените @name и @namespace.'
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: Неусаглашеност имена скрипти! Измените @name и @namespace.
+msgInvalidScript:
+  description: Message shown when script is invalid.
+  message: ''

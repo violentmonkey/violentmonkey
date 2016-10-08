@@ -13,7 +13,7 @@ msgUpdated:
   message: Skript aktualizován.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: 'Chyba při načítání skritpu!'
+  message: Chyba při načítání skritpu!
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skript nainstalován.
@@ -30,7 +30,9 @@ msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Aktualizuji...
 msgNewVersion:
-  description: 'Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.'
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
   message: Nalezena nová verze.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -60,10 +62,14 @@ buttonClose:
   description: Button to close window.
   message: Zavřít
 msgErrorLoadingData:
-  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
   message: Chyba při načítání skriptu.
 msgLoadedData:
-  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
   message: Skript načten.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
@@ -111,12 +117,15 @@ labelIgnoreGrant:
 labelInjectMode:
   description: Label for a combo box to choose script injection modes.
   message: 'Způsob podvržení skriptu:'
+  touched: false
 injectModeNormal:
   description: 'Script injection mode: Normal'
   message: Obyčejný
+  touched: false
 injectModeAdvanced:
   description: 'Script injection mode: Advanced'
   message: Pokročilý
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Obnova dat
@@ -167,7 +176,9 @@ labelTranslator:
   message: 'Překladatel: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href=https://www.transifex.com/user/profile/nfsmaniac target=_blank>nfsmaniac</a>'
+  message: >-
+    <a href=https://www.transifex.com/user/profile/nfsmaniac
+    target=_blank>nfsmaniac</a>
 labelCurrentLang:
   description: Label of current language.
   message: 'Současný jazyk: '
@@ -254,14 +265,18 @@ buttonUpdate:
   description: Check a script for updates.
   message: Zkontrolovat aktualizace
 msgImported:
-  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
   message: $1 věc(i) jsou obnovenyy.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Použít @downloadURL
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: 'Úpravy nebyly uloženy! Klikni na OK pro návrat a ztrátu změn, nebo na zrušit pro setrvání na této stránce.'
+  message: >-
+    Úpravy nebyly uloženy! Klikni na OK pro návrat a ztrátu změn, nebo na zrušit
+    pro setrvání na této stránce.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Čištení dat...
@@ -312,10 +327,14 @@ labelAutoReloadCurrentTab:
   message: Znovu načíst současný list po zapnutí či vypnutí skriptu z nabídky.
 hintInjectModeNormal:
   description: Hint to explain the normal injection mode.
-  message: 'Účinné, ale selhává na dobře zabezpečených stránkách – např. https://github.com'
+  message: >-
+    Účinné, ale selhává na dobře zabezpečených stránkách – např.
+    https://github.com
+  touched: false
 hintInjectModeAdvanced:
   description: Hint to explain the advanced injection mode.
   message: 'Pracuje na většině stránek, současně se jedná o hack.'
+  touched: false
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Adresa skriptu:'
@@ -356,5 +375,10 @@ msgSyncError:
   description: Message shown when sync failed.
   message: ''
 msgNamespaceConflict:
-  description: Message shown when namespace of the new script conflicts with an existent one.
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: ''
+msgInvalidScript:
+  description: Message shown when script is invalid.
   message: ''

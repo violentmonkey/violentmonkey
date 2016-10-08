@@ -511,13 +511,14 @@ VMDB.prototype.getScriptsByIndex = function (index, value, tx) {
 };
 
 VMDB.prototype.parseScript = function (data) {
+  var meta = scriptUtils.parseMeta(data.code);
+  if (!meta.name) return Promise.reject(_.i18n('msgInvalidScript'));
   var res = {
     cmd: 'update',
     data: {
       message: data.message == null ? _.i18n('msgUpdated') : data.message || '',
     },
   };
-  var meta = scriptUtils.parseMeta(data.code);
   var _this = this;
   var tx = _this.db.transaction(['scripts', 'require'], 'readwrite');
   // @require
