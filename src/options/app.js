@@ -7,7 +7,7 @@ function initMain() {
       'scripts',
       'sync',
     ].forEach(function (key) {
-      store[key] = data[key];
+      Vue.set(store, key, data[key]);
     });
     store.loading = false;
     // utils.features.reset(data.version);
