@@ -131,8 +131,9 @@ VMDB.prototype.getScriptsByURL = function (url) {
           script.meta.require.forEach(function (key) {
             require[key] = 1;
           });
-          for (var k in script.meta.resources)
-            cache[script.meta.resources[k]] = 1;
+          Object.keys(script.meta.resources).forEach(function (key) {
+            cache[script.meta.resources[key]] = 1;
+          });
           return true;
         }
       });
@@ -190,8 +191,9 @@ VMDB.prototype.getData = function () {
   }
   function getCache(uris) {
     return _this.getCacheB64(uris, tx).then(function (cache) {
-      for (var k in cache)
-        cache[k] = 'data:image/png;base64,' + cache[k];
+      Object.keys(cache).forEach(function (key) {
+        cache[key] = 'data:image/png;base64,' + cache[key];
+      });
       return cache;
     });
   }
@@ -371,8 +373,9 @@ VMDB.prototype.updateScriptInfo = function (id, data, custom) {
     o.get(id).onsuccess = function (e) {
       var script = e.target.result;
       if (!script) return reject();
-      for (var k in data)
-        if (k in script) script[k] = data[k];
+      Object.keys(data).forEach(function (key) {
+        if (key in script) script[key] = data[key];
+      });
       Object.assign(script.custom, custom);
       o.put(script).onsuccess = function (_e) {
         resolve(scriptUtils.getScriptInfo(script));
@@ -420,8 +423,9 @@ VMDB.prototype.vacuum = function () {
       };
       data.ids = scripts.map(function (script) {
         script.meta.require.forEach(function (uri) {data.require[uri] = 1;});
-        for (var k in script.meta.resources)
-          data.cache[script.meta.resources[k]] = 1;
+        Object.keys(scripts.meta.resources).forEach(function (key) {
+          data.cache[script.meta.resources[key]] = 1;
+        });
         if (scriptUtils.isRemote(script.meta.icon))
           data.cache[script.meta.icon] = 1;
         data.values[script.uri] = 1;
@@ -560,8 +564,9 @@ VMDB.prototype.parseScript = function (data) {
       res.cmd = 'add';
       res.data.message = _.i18n('msgInstalled');
     }
-    if (data.more) for (var k in data.more)
-      if (k in script) script[k] = data.more[k];
+    data.more && Object.keys(data.more).forEach(function (key) {
+      if (key in script) script[key] = data.more[key];
+    });
     script.meta = meta;
     script.code = data.code;
     script.uri = scriptUtils.getNameURI(script);

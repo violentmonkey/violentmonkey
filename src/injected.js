@@ -1,4 +1,4 @@
-!function(){
+!function () {
 // Avoid running repeatedly due to new `document.documentElement`
 if (window.VM) return;
 window.VM = 1;
@@ -29,7 +29,7 @@ function forEach(arr, func, context) {
 /**
  * http://www.webtoolkit.info/javascript-utf8.html
  */
-function utf8decode (utftext) {
+function utf8decode(utftext) {
   var string = "";
   var i = 0;
   var c = 0, c2 = 0, c3 = 0;
@@ -188,7 +188,7 @@ var comm = {
   includes: includes,
   forEach: forEach,
 
-  init: function(srcId, destId) {
+  init: function (srcId, destId) {
     var comm = this;
     comm.sid = comm.vmid + srcId;
     comm.did = comm.vmid + destId;
@@ -201,11 +201,11 @@ var comm = {
       comm.injectable = false;
     }
   },
-  post: function(data) {
+  post: function (data) {
     var e = new CustomEvent(this.did, {detail: data});
     document.dispatchEvent(e);
   },
-  handleR: function(e) {
+  handleR: function (e) {
     var obj = e.detail;
     var comm = this;
     var maps = {
@@ -237,7 +237,7 @@ var comm = {
     var func = maps[obj.cmd];
     if (func) func(obj.data);
   },
-  runCode: function(name, func, wrapper) {
+  runCode: function (name, func, wrapper) {
     try {
       func.call(wrapper.window || wrapper, wrapper);
     } catch (e) {
@@ -246,7 +246,7 @@ var comm = {
       console.error(msg);
     }
   },
-  initRequest: function() {
+  initRequest: function () {
     // request functions
     function reqAbort(){
       comm.post({cmd: 'AbortRequest', data: this.id});
@@ -321,7 +321,7 @@ var comm = {
     var comm = this;
     comm.requests = {};
     comm.qrequests = [];
-    comm.Request = function(details) {
+    comm.Request = function (details) {
       var t = {
         details: details,
         callback: callback,
@@ -337,7 +337,7 @@ var comm = {
     };
   },
   getWrapper: getWrapper,
-  wrapGM: function(script, cache) {
+  wrapGM: function (script, cache) {
     function getValues() {
       return comm.values[script.uri];
     }
@@ -419,7 +419,7 @@ var comm = {
         },
       },
       GM_getValue: {
-        value: function(key, val) {
+        value: function (key, val) {
           var values = getValues();
           var v = values[key];
           if (v) {
@@ -539,7 +539,8 @@ var comm = {
       var require = script.meta.require || [];
       var wrapper = comm.wrapGM(script, data.cache);
       var vars = [];
-      comm.forEach(Object.getOwnPropertyNames(wrapper), function(name) {
+      // Must use Object.getOwnPropertyNames to list unenumerable properties
+      comm.forEach(Object.getOwnPropertyNames(wrapper), function (name) {
         vars.push(name + '=this["' + name + '"]=g["' + name + '"]');
       });
       // vars should not be empty
@@ -581,13 +582,11 @@ var comm = {
     comm.version = data.version;
     comm.values = {};
     // reset load and checkLoad
-    comm.load = function() {
+    comm.load = function () {
       run(end);
-      setTimeout(function() {
-        run(idle);
-      }, 0);
+      setTimeout(run, 0, idle);
     };
-    comm.checkLoad = function() {
+    comm.checkLoad = function () {
       if (!comm.state && comm.includes(['interactive', 'complete'], document.readyState))
         comm.state = 1;
       if (comm.state) comm.load();
@@ -597,7 +596,7 @@ var comm = {
       'document-idle': idle,
       'document-end': end,
     };
-    comm.forEach(data.scripts, function(script) {
+    comm.forEach(data.scripts, function (script) {
       comm.values[script.uri] = data.values[script.uri] || {};
       if (script && script.enabled) {
         var list = listMap[script.custom['run-at'] || script.meta['run-at']] || end;
@@ -613,7 +612,7 @@ var menus = [];
 var ids = [];
 function injectScript(data) {
   // data: [id, code]
-  var func = function(id, did, cb) {
+  var func = function (id, did, cb) {
     Object.defineProperty(window, 'VM_' + id, {
       value: cb,
       configurable: true,

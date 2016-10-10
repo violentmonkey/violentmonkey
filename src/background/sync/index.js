@@ -318,10 +318,10 @@ var BaseService = serviceFactory({
           headers['Content-Type'] = 'application/json';
           options.body = JSON.stringify(options.body);
         }
-        for (var k in headers) {
-          var v = headers[k];
-          v && xhr.setRequestHeader(k, v);
-        }
+        Object.keys(headers).forEach(function (key) {
+          var v = headers[key];
+          v && xhr.setRequestHeader(key, v);
+        });
         xhr.onloadend = function () {
           progress.finished ++;
           _this.onStateChange();
@@ -392,14 +392,14 @@ var BaseService = serviceFactory({
           delLocal.push(item);
         }
       });
-      for (var uri in map) {
+      Object.keys(map).forEach(function (uri) {
         var item = map[uri];
         if (outdated) {
           getRemote.push(item);
         } else {
           delRemote.push(item);
         }
-      }
+      });
       var promises = [].concat(
         getRemote.map(function (item) {
           console.log('Download script:', item.uri);

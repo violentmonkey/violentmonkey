@@ -7,9 +7,9 @@ module.exports = {
       var xhr = new XMLHttpRequest;
       xhr.open('GET', url, true);
       if (type) xhr.responseType = type;
-      if (headers) for (var k in headers) {
-        xhr.setRequestHeader(k, headers[k]);
-      }
+      headers && Object.keys(headers).forEach(function (key) {
+        xhr.setRequestHeader(key, headers[key]);
+      });
       xhr.onloadend = function () {
         (xhr.status > 300 ? reject : resolve)(xhr);
       };
@@ -27,7 +27,7 @@ module.exports = {
       grant: [],
     };
     var flag = -1;
-    code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, function(_match, group1, group2) {
+    code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, function (_match, group1, group2) {
       if (flag < 0 && group1 == '==UserScript==') {
         // start meta
         flag = 1;
@@ -46,7 +46,7 @@ module.exports = {
       }
     });
     meta.resources = {};
-    meta.resource.forEach(function(line) {
+    meta.resource.forEach(function (line) {
       var pair = line.match(/^(\w\S*)\s+(.*)/);
       if (pair) meta.resources[pair[1]] = pair[2];
     });

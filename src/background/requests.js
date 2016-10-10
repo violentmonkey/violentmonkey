@@ -70,14 +70,12 @@ function httpRequest(details, cb) {
   try {
     xhr.open(details.method, details.url, true, details.user, details.password);
     xhr.setRequestHeader('VM-Verify', details.id);
-    if (details.headers) {
-      for (var k in details.headers) {
-        xhr.setRequestHeader(
-          ~special_headers.indexOf(k.toLowerCase()) ? 'VM-' + k : k,
-          details.headers[k]
-        );
-      }
-    }
+    details.headers && Object.keys(details.headers).forEach(function (key) {
+      xhr.setRequestHeader(
+        ~special_headers.indexOf(key.toLowerCase()) ? 'VM-' + key : key,
+        details.headers[key]
+      );
+    });
     if (details.responseType) xhr.responseType = 'blob';
     if (details.overrideMimeType) xhr.overrideMimeType(details.overrideMimeType);
     var callback = xhrCallbackWrapper(req);
@@ -146,9 +144,10 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
       delete vmHeaders['Verify'];
       verify[details.requestId] = reqId;
       req.coreId = details.requestId;
-      for (var i in vmHeaders)
-        if (~special_headers.indexOf(i.toLowerCase()))
-        newHeaders.push({name: i, value: vmHeaders[i]});
+      Object.keys(vmHeaders).forEach(function (key) {
+        ~special_headers.indexOf(key.toLowerCase())
+        && newHeaders.push({name: key, value: vmHeaders[key]});
+      });
     }
   }
   return {requestHeaders: newHeaders};

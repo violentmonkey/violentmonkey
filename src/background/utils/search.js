@@ -7,10 +7,8 @@ module.exports = {
     }, {});
   },
   dump: function (dict) {
-    var qs = [];
-    for (var k in dict) {
-      qs.push(encodeURIComponent(k) + '=' + encodeURIComponent(dict[k]));
-    }
-    return qs.join('&');
+    return Object.keys(dict).map(function (key) {
+      return encodeURIComponent(key) + '=' + encodeURIComponent(dict[key]);
+    }).join('&');
   },
 };

@@ -258,6 +258,6 @@ _.messenger = function () {
   });
 }(_.options.get('isApplied'));
 
-chrome.notifications.onClicked.addListener(function(id) {
+chrome.notifications.onClicked.addListener(function (id) {
   id == 'VM-NoGrantWarning' && tabsUtils.create('http://wiki.greasespot.net/@grant');
 });

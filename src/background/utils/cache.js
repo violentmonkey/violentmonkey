@@ -10,9 +10,7 @@ function set(key, value) {
     };
     obj.value = value;
     if (obj.timer) clearTimeout(obj.timer);
-    obj.timer = setTimeout(function () {
-      set(key);
-    }, 3000);
+    obj.timer = setTimeout(set, 3000, key);
   } else {
     delete cache[key];
   }

@@ -1,4 +1,4 @@
-var _ = module.exports = {};
+var _ = exports;
 _.i18n = chrome.i18n.getMessage;
 
 _.options = function () {
@@ -27,9 +27,10 @@ _.options = function () {
   }
 
   function getAllOptions() {
-    var options = {};
-    for (var i in defaults) options[i] = getOption(i);
-    return options;
+    return Object.keys(defaults).reduce(function (res, key) {
+      res[key] = getOption(key);
+      return res;
+    }, {});
   }
 
   function parseArgs(args) {
