@@ -96,20 +96,14 @@ _.sendMessage = function (data) {
 };
 
 _.debounce = function (func, time) {
-  function run() {
-    cancel();
-    func();
-  }
-  function cancel() {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
-    }
+  function run(thisObj, args) {
+    timer = null;
+    func.apply(thisObj, args);
   }
   var timer;
-  return function () {
-    cancel();
-    timer = setTimeout(run, time);
+  return function (args) {
+    timer && clearTimeout(timer);
+    timer = setTimeout(run, time, this, args);
   };
 };
 

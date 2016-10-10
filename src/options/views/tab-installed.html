@@ -11,8 +11,7 @@
     <div v-html="message"></div>
   </div>
   <div class="scripts">
-    <script-item v-for="script in store.scripts"
-      :script="script"></script-item>
+    <script-item v-for="script in store.scripts" :script="script"></script-item>
   </div>
   <edit v-if="script" :script="script" :on-close="endEditScript"></edit>
 </div>

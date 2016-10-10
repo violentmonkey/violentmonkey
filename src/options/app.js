@@ -28,9 +28,9 @@ function initMain() {
         var script = store.scripts.find(function (script) {
           return script.id === res.data.id;
         });
-        if (script) for (var k in res.data) {
-          Vue.set(script, k, res.data[k]);
-        }
+        script && Object.keys(script).forEach(function (key) {
+          Vue.set(script, key, res.data[key]);
+        });
       }
       break;
     case 'del':
@@ -38,6 +38,22 @@ function initMain() {
         return script.id === res.data;
       });
       ~i && store.scripts.splice(i, 1);
+    }
+  });
+}
+function loadHash() {
+  var hash = location.hash.slice(1);
+  Object.keys(routes).find(function (key) {
+    var test = routes[key];
+    var params = test(hash);
+    if (params) {
+      hashData.type = key;
+      hashData.params = params;
+      if (init[key]) {
+        init[key]();
+        init[key] = null;
+      }
+      return true;
     }
   });
 }
@@ -56,6 +72,22 @@ var store = Object.assign(utils.store, {
 var init = {
   Main: initMain,
 };
+var routes = {
+  Main: utils.routeTester([
+    '',
+    'main/:tab',
+  ]),
+  Confirm: utils.routeTester([
+    'confirm/:url',
+    'confirm/:url/:referer',
+  ]),
+};
+var hashData = {
+  type: null,
+  params: null,
+};
+window.addEventListener('hashchange', loadHash, false);
+loadHash();
 zip.workerScriptsPath = '/lib/zip.js/';
 document.title = _.i18n('extName');
 
@@ -67,43 +99,6 @@ new Vue({
     Confirm: Confirm,
   },
   data: function () {
-    return {
-      type: 'Main',
-      params: {},
-    };
-  },
-  mounted: function () {
-    var _this = this;
-    _this.routes = {
-      Main: utils.routeTester([
-        '',
-        'main/:tab',
-      ]),
-      Confirm: utils.routeTester([
-        'confirm/:url',
-        'confirm/:url/:referer',
-      ]),
-    };
-    window.addEventListener('hashchange', _this.loadHash.bind(_this));
-    _this.loadHash();
-  },
-  methods: {
-    loadHash: function () {
-      var _this = this;
-      var hash = location.hash.slice(1);
-      for (var k in _this.routes) {
-        var test = _this.routes[k];
-        var params = test(hash);
-        if (params) {
-          _this.type = k;
-          _this.params = params;
-          if (init[k]) {
-            init[k]();
-            init[k] = null;
-          }
-          break;
-        }
-      }
-    },
+    return hashData;
   },
 });

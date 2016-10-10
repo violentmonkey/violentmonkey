@@ -44,7 +44,7 @@ const paths = {
   ],
 };
 
-gulp.task('del', () => del(['dist']));
+gulp.task('clean', () => del(['dist']));
 
 gulp.task('watch', ['build'], () => {
   gulp.watch([].concat(paths.cache, paths.templates), ['templates']);
