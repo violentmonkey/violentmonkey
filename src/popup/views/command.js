@@ -4,22 +4,21 @@ var _ = require('../../common');
 
 module.exports = {
   mixins: [MixIn],
-  mounted: function () {
-    this.items.top.push({
-      name: _.i18n('menuBack'),
-      symbol: 'arrow-left',
-      onClick: function () {
-        app.navigate();
-      },
-    });
+  data: function () {
+    return {
+      top: [{
+        name: _.i18n('menuBack'),
+        symbol: 'arrow-left',
+        onClick: function () {
+          app.navigate();
+        },
+      }],
+    };
   },
-  watch: {
-    'store.commands': 'update',
-  },
-  methods: {
-    updateView: function () {
+  computed: {
+    bot: function () {
       var _this = this;
-      _this.items.bot = _this.store.commands.map(function (item) {
+      return _this.store.commands.map(function (item) {
         return {
           name: item[0],
           symbol: 'right-hand',
@@ -33,5 +32,8 @@ module.exports = {
         };
       });
     },
+  },
+  watch: {
+    'store.commands': 'fixStyles',
   },
 };

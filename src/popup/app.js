@@ -12,10 +12,8 @@ var app = new Vue({
     Commands: Commands,
     Domains: Domains,
   },
-  data: function () {
-    return {
-      type: 'Menu',
-    };
+  data: {
+    type: 'Menu',
   },
   methods: {
     navigate: function (type) {
@@ -28,6 +26,7 @@ exports.navigate = app.navigate.bind(app);
 
 !function () {
   function init() {
+    var currentTab = utils.store.currentTab;
     chrome.tabs.sendMessage(currentTab.id, {cmd: 'GetPopup'});
     if (currentTab && /^https?:\/\//i.test(currentTab.url)) {
       var matches = currentTab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
@@ -43,7 +42,6 @@ exports.navigate = app.navigate.bind(app);
     }
   }
 
-  var currentTab;
   var commands = {
     SetPopup: function (data, src, _callback) {
       if (utils.store.currentTab.id !== src.tab.id) return;
@@ -62,7 +60,7 @@ exports.navigate = app.navigate.bind(app);
   });
 
   chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
-    utils.store.currentTab = currentTab = {
+    utils.store.currentTab = {
       id: tabs[0].id,
       url: tabs[0].url,
     };

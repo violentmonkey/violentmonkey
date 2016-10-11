@@ -98,7 +98,5 @@ new Vue({
     Main: Main,
     Confirm: Confirm,
   },
-  data: function () {
-    return hashData;
-  },
+  data: hashData,
 });

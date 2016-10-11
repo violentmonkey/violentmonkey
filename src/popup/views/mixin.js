@@ -6,10 +6,6 @@ module.exports = {
   template: cache.get('./menu.html'),
   data: function () {
     return {
-      items: {
-        top: [],
-        bot: [],
-      },
       store: utils.store,
     };
   },
@@ -17,14 +13,9 @@ module.exports = {
     MenuItem: MenuItem,
   },
   mounted: function () {
-    this.update();
+    this.fixStyles();
   },
   methods: {
-    update: function () {
-      var _this = this;
-      _this.updateView();
-      _this.fixStyles();
-    },
     fixStyles: function () {
       var _this = this;
       _this.$nextTick(function () {
@@ -34,6 +25,11 @@ module.exports = {
         var pad = bot.offsetWidth - bot.clientWidth + 2;
         placeholder.style.paddingRight = pad + 'px';
       });
+    },
+    isVisible: function (item) {
+      var hide = item.hide;
+      if (typeof hide === 'function') hide = hide.call(this);
+      return !hide;
     },
   },
 };
