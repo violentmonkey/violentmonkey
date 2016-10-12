@@ -46,7 +46,7 @@ module.exports = {
       .then(function (code) {
         if (changedOnly && oldCode === code) return Promise.reject();
         _this.code = code;
-      })
+      });
     },
     parseMeta: function () {
       var _this = this;

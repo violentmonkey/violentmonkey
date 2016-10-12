@@ -11,6 +11,7 @@ const svgSprite = require('gulp-svg-sprite');
 const definePack = require('define-commonjs/pack/gulp');
 const templateCache = require('./scripts/templateCache');
 const i18n = require('./scripts/i18n');
+const wrap = require('./scripts/wrap');
 const pkg = require('./package.json');
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -130,9 +131,16 @@ gulp.task('manifest', () => (
 ));
 
 gulp.task('copy-files', () => {
+  const injectedFilter = gulpFilter(['**/injected.js'], {restore: true});
   const jsFilter = gulpFilter(['**/*.js'], {restore: true});
   const cssFilter = gulpFilter(['**/*.css'], {restore: true});
-  var stream = gulp.src(paths.copy);
+  var stream = gulp.src(paths.copy)
+  .pipe(injectedFilter)
+  .pipe(wrap({
+    header: '!function(){\n',
+    footer: '\n}();',
+  }))
+  .pipe(injectedFilter.restore);
   if (isProd) stream = stream
   .pipe(jsFilter)
   .pipe(uglify())

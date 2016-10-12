@@ -39,7 +39,9 @@ function xhrCallbackWrapper(req) {
     };
     try {
       data.responseText = xhr.responseText;
-    } catch (e) {}
+    } catch (e) {
+      // ignore if responseText is unreachable
+    }
     if (evt.type === 'loadend') clearRequest(req);
     lastPromise = lastPromise.then(function () {
       return new Promise(function (resolve, _reject) {

@@ -1,4 +1,3 @@
-!function () {
 // Avoid running repeatedly due to new `document.documentElement`
 if (window.VM) return;
 window.VM = 1;
@@ -30,7 +29,7 @@ function forEach(arr, func, context) {
  * http://www.webtoolkit.info/javascript-utf8.html
  */
 function utf8decode(utftext) {
-  var string = "";
+  var string = '';
   var i = 0;
   var c = 0, c2 = 0, c3 = 0;
   while ( i < utftext.length ) {
@@ -706,7 +705,7 @@ function objEncode(obj) {
   return '{' + list.join(',') + '}';
 }
 function inject(code) {
-  var script = document.createElement('script')
+  var script = document.createElement('script');
   var doc = document.body || document.documentElement;
   script.innerHTML = code;
   doc.appendChild(script);
@@ -734,4 +733,3 @@ function initCommunicator() {
   sendMessage({cmd: 'GetInjected', data: location.href}).then(loadScript);
 }
 initCommunicator();
-}();

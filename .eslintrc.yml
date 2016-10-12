@@ -1,4 +1,16 @@
 rules:
+  indent:
+    - 2
+    - 2
+  quotes:
+    - 2
+    - single
+  linebreak-style:
+    - 2
+    - unix
+  semi:
+    - 2
+    - always
   comma-dangle:
     - 0
   no-console:
@@ -6,8 +18,6 @@ rules:
     - allow:
       - warn
       - error
-  no-empty:
-    - 0
   no-unused-vars:
     - 2
     - args: all
