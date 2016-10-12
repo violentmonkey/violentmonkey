@@ -1,7 +1,6 @@
 const del = require('del');
 const gulp = require('gulp');
 const concat = require('gulp-concat');
-const replace = require('gulp-replace');
 const merge2 = require('merge2');
 const cssnano = require('gulp-cssnano');
 const gulpFilter = require('gulp-filter');
@@ -12,6 +11,7 @@ const definePack = require('define-commonjs/pack/gulp');
 const templateCache = require('./scripts/templateCache');
 const i18n = require('./scripts/i18n');
 const wrap = require('./scripts/wrap');
+const json = require('./scripts/json');
 const pkg = require('./package.json');
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -126,7 +126,10 @@ gulp.task('js', [
 
 gulp.task('manifest', () => (
   gulp.src(paths.manifest, {base: 'src'})
-  .pipe(replace('__VERSION__', pkg.version))
+  .pipe(json(data => {
+    data.version = pkg.version;
+    return data;
+  }))
   .pipe(gulp.dest('dist'))
 ));
 
