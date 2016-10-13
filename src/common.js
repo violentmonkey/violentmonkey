@@ -119,6 +119,16 @@ _.options = function () {
   };
   var hooks = {};
 
+  // XXX migrate sync status options
+  ['dropbox', 'onedrive'].forEach(function (name) {
+    var key = name + 'Enabled';
+    var val = getOption(key);
+    if (val != null) {
+      setOption([name, 'enabled'], val);
+      localStorage.removeItem(key);
+    }
+  });
+
   return {
     get: getOption,
     set: setOption,
