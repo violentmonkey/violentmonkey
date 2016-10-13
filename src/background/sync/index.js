@@ -19,46 +19,28 @@ var autoSync = _.debounce(function () {
 }, 60 * 60 * 1000);
 
 function ServiceConfig(name) {
-  this.prefix = name;
-  this.load();
+  this.name = name;
 }
+ServiceConfig.prototype.normalizeKeys = function (key) {
+  var keys = _.normalizeKeys(key);
+  keys.unshift(this.name);
+  return keys;
+};
 ServiceConfig.prototype.get = function (key, def) {
-  var val = this.data[key];
-  if (val == null) val = def;
-  return val;
+  var keys = this.normalizeKeys(key);
+  return _.options.get(keys, def);
 };
 ServiceConfig.prototype.set = function (key, val) {
-  if (typeof key === 'object') {
-    if (arguments.length === 1) {
-      Object.assign(this.data, key);
-      this.dump();
-    }
+  var _this = this;
+  if (arguments.length === 1) {
+    return _.options.set(_this.name, Object.assign(_.options.get(_this.name, {}), key));
   } else {
-    // val may be an object, so equal test does not work
-    this.data[key] = val;
-    this.dump();
+    var keys = this.normalizeKeys(key);
+    return _.options.set(keys, val);
   }
 };
 ServiceConfig.prototype.clear = function () {
-  this.data = {};
-  this.dump();
-};
-ServiceConfig.prototype.capitalize = function (string) {
-  return string[0].toUpperCase() + string.slice(1);
-};
-ServiceConfig.prototype.getOption = function (key, def) {
-  key = this.capitalize(key);
-  return _.options.get(this.prefix + key, def);
-};
-ServiceConfig.prototype.setOption = function (key, val) {
-  key = this.capitalize(key);
-  return _.options.set(this.prefix + key, val);
-};
-ServiceConfig.prototype.load = function () {
-  this.data = _.options.get(this.prefix, {});
-};
-ServiceConfig.prototype.dump = function () {
-  _.options.set(this.prefix, this.data);
+  _.options.set(this.name, {});
 };
 
 function serviceState(validStates, initialState, onChange) {
@@ -122,7 +104,7 @@ function syncOne(service) {
 }
 function syncAll() {
   return Promise.all(servicesReady.filter(function (service) {
-    return service.config.getOption('enabled') && !service.syncState.is(['ready', 'syncing']);
+    return service.config.get('enabled') && !service.syncState.is(['ready', 'syncing']);
   }).map(function (service) {
     return service.startSync();
   }));
@@ -218,7 +200,7 @@ var BaseService = serviceFactory({
     var _this = this;
     var promise, debouncedResolve;
     function shouldSync() {
-      return _this.authState.is('authorized') && _this.config.getOption('enabled');
+      return _this.authState.is('authorized') && _this.config.get('enabled');
     }
     function init() {
       if (!shouldSync()) return Promise.resolve();
@@ -262,7 +244,7 @@ var BaseService = serviceFactory({
           _this.authState.set('error');
         }
         _this.syncState.set('idle');
-        // _this.config.setOption('enabled', false);
+        // _this.config.set('enabled', false);
       } else {
         _this.authState.set('unauthorized');
       }

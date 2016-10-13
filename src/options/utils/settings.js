@@ -6,17 +6,11 @@ _.options.hook(function (value, key) {
   list && list.forEach(function (el) {
     el.checked = value;
   });
-  setTimeout(onChanged, 0, value, key);
 });
 
 function onSettingChange(e) {
   var target = e.target;
   _.options.set(target.dataset.setting, target.checked);
-}
-function onChanged(value, key) {
-  if (value && key === 'closeAfterInstall') {
-    _.options.set('trackLocalFile', false);
-  }
 }
 
 Vue.directive('setting', {

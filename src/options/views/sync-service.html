@@ -1,6 +1,6 @@
 <div class="line">
   <label>
-    <input type=checkbox v-setting="service.name+'Enabled'" @change="update">
+    <input type=checkbox v-setting="keyEnabled" @change="update">
     <span v-text="labelText"></span>
   </label>
   <button @click="authenticate" v-text="labelAuthenticate"

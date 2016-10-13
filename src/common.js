@@ -1,22 +1,65 @@
 var _ = exports;
 _.i18n = chrome.i18n.getMessage;
 
+function normalizeKeys(key) {
+  if (!key) key = [];
+  if (!Array.isArray(key)) key = key.toString().split('.');
+  return key;
+}
+
+_.normalizeKeys = normalizeKeys;
+
+_.object = function () {
+  function get(obj, key, def) {
+    var keys = normalizeKeys(key);
+    for (var i = 0, len = keys.length; i < len; i ++) {
+      key = keys[i];
+      if (obj && (key in obj)) obj = obj[key];
+      else return def;
+    }
+    return obj;
+  }
+  function set(obj, key, val) {
+    var keys = normalizeKeys(key);
+    if (!keys.length) return val;
+    var sub = obj = obj || {};
+    for (var i = 0, len = keys.length - 1; i < len; i ++) {
+      key = keys[i];
+      sub = sub[key] = sub[key] || {};
+    }
+    sub[keys[keys.length - 1]] = val;
+    return obj;
+  }
+  return {
+    get: get,
+    set: set,
+  };
+}();
+
 _.options = function () {
   function getOption(key, def) {
+    var keys = normalizeKeys(key);
+    key = keys[0];
     var value = localStorage.getItem(key), obj;
-    if (value)
+    if (value) {
       try {
         obj = JSON.parse(value);
       } catch (e) {
-        obj = def;
+        // ignore invalid JSON
       }
-    else obj = def;
+    }
     if (obj == null) obj = defaults[key];
-    return obj;
+    if (obj == null) obj = def;
+    return keys.length > 1 ? _.object.get(obj, keys.slice(1), def) : obj;
   }
 
   function setOption(key, value) {
+    var keys = normalizeKeys(key);
+    key = keys[0];
     if (key in defaults) {
+      if (keys.length > 1) {
+        value = _.object.set(getOption(key), keys.slice(1), value);
+      }
       localStorage.setItem(key, JSON.stringify(value));
       [hooks[key], hooks['']].forEach(function (group) {
         group && group.forEach(function (cb) {
@@ -71,9 +114,7 @@ _.options = function () {
     trackLocalFile: false,
     autoReload: false,
     dropbox: {},
-    dropboxEnabled: false,
     onedrive: {},
-    onedriveEnabled: false,
     features: null,
   };
   var hooks = {};

@@ -7,6 +7,9 @@ module.exports = {
   props: ['service'],
   template: cache.get('./sync-service.html'),
   computed: {
+    keyEnabled: function () {
+      return this.service.name + '.enabled';
+    },
     labelText: function () {
       var service = this.service;
       return _.i18n('labelSyncTo', service.displayName || service.name);

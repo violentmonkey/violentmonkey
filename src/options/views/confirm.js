@@ -180,5 +180,8 @@ module.exports = {
         _this.trackLocalFile();
       });
     },
+    checkClose: function (e) {
+      e.target.checked && _.options.set('trackLocalFile', false);
+    },
   },
 };

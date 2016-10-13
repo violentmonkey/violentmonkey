@@ -5,7 +5,7 @@
         <button dropdown-toggle v-text="i18n('buttonInstallOptions')"></button>
         <div class="dropdown-menu options-panel" @mousedown.stop>
           <label>
-            <input type=checkbox v-setting="'closeAfterInstall'">
+            <input type=checkbox v-setting="'closeAfterInstall'" @change="checkClose">
             <span v-text="i18n('installOptionClose')"></span>
           </label>
           <label>
