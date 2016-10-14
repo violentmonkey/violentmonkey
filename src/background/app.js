@@ -161,6 +161,18 @@ var commands = {
   GetFromCache: function (data, _src) {
     return cache.get(data) || null;
   },
+  Notification: function (data, _src) {
+    return new Promise(function (resolve) {
+      chrome.notifications.create({
+        type: 'basic',
+        title: data.title || _.i18n('extName'),
+        message: data.text,
+        iconUrl: data.image || _.defaultImage,
+      }, function (id) {
+        resolve(id);
+      });
+    });
+  },
 };
 
 vmdb.initialized.then(function () {
@@ -198,7 +210,7 @@ vmdb.initialized.then(function () {
 function notify(options) {
   chrome.notifications.create(options.id || 'ViolentMonkey', {
     type: 'basic',
-    iconUrl: '/images/icon128.png',
+    iconUrl: _.defaultImage,
     title: options.title + ' - ' + _.i18n('extName'),
     message: options.body,
     isClickable: options.isClickable,
@@ -259,5 +271,19 @@ _.messenger = function () {
 }(_.options.get('isApplied'));
 
 chrome.notifications.onClicked.addListener(function (id) {
-  id == 'VM-NoGrantWarning' && tabsUtils.create('http://wiki.greasespot.net/@grant');
+  if (id == 'VM-NoGrantWarning') {
+    tabsUtils.create('http://wiki.greasespot.net/@grant');
+  } else {
+    tabsUtils.broadcast({
+      cmd: 'NotificationClick',
+      data: id,
+    });
+  }
+});
+
+chrome.notifications.onClosed.addListener(function (id) {
+  tabsUtils.broadcast({
+    cmd: 'NotificationClose',
+    data: id,
+  });
 });

@@ -1,5 +1,6 @@
 var _ = exports;
 _.i18n = chrome.i18n.getMessage;
+_.defaultImage = '/images/icon128.png';
 
 function normalizeKeys(key) {
   if (!key) key = [];

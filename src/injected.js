@@ -231,6 +231,21 @@ var comm = {
         var values = comm.values;
         if (values && values[data.uri]) values[data.uri] = data.values;
       },
+      NotificationClicked: function (id) {
+        var options = comm.notif[id];
+        if (options) {
+          var onclick = options.onclick;
+          onclick && onclick();
+        }
+      },
+      NotificationClosed: function (id) {
+        var options = comm.notif[id];
+        if (options) {
+          delete comm.notif[id];
+          var ondone = options.ondone;
+          ondone && ondone();
+        }
+      },
       // advanced inject
       Injected: function (id) {
         var obj = comm.ainject[id];
@@ -533,6 +548,30 @@ var comm = {
           return comm.Request(details);
         },
       },
+      GM_notification: {
+        value: function (text, title, image, onclick) {
+          if (!text) {
+            throw 'Invalid parameters.';
+          }
+          var options = typeof text === 'object' ? text : {
+            text: text,
+            title: title,
+            image: image,
+            onclick: onclick,
+          };
+          var id = comm.notif[''] = (comm.notif[''] || 0) + 1;
+          comm.notif[id] = options;
+          comm.post({
+            cmd: 'Notification',
+            data: {
+              id: id,
+              text: options.text,
+              title: options.title,
+              image: options.image,
+            },
+          });
+        },
+      },
     };
     comm.forEach(grant, function (name) {
       var prop = gm_funcs[name];
@@ -586,6 +625,7 @@ var comm = {
     var idle = [];
     var end = [];
     comm.command = {};
+    comm.notif = {};
     comm.ainject = {};
     comm.version = data.version;
     comm.values = {};
@@ -658,9 +698,29 @@ function handleC(e) {
         document.head.appendChild(style);
       }
     },
+    Notification: onNotificationCreate,
   };
   var func = maps[req.cmd];
   if (func) func(req.data);
+}
+
+var notifications = {};
+function onNotificationCreate(options) {
+  sendMessage({cmd: 'Notification', data: options})
+  .then(function (nid) {
+    notifications[nid] = options.id;
+  });
+}
+function onNotificationClick(nid) {
+  var id = notifications[nid];
+  id && comm.post({cmd: 'NotificationClicked', data: id});
+}
+function onNotificationClose(nid) {
+  var id = notifications[nid];
+  if (id) {
+    comm.post({cmd: 'NotificationClosed', data: id});
+    delete notifications[nid];
+  }
 }
 
 // Messages
@@ -675,6 +735,8 @@ chrome.runtime.onMessage.addListener(function (req, src) {
     UpdateValues: function (data) {
       comm.post({cmd: 'UpdateValues', data: data});
     },
+    NotificationClick: onNotificationClick,
+    NotificationClose: onNotificationClose,
   };
   var func = maps[req.cmd];
   if (func) func(req.data, src);
