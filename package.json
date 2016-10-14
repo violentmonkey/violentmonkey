@@ -7,7 +7,8 @@
     "dev": "gulp watch",
     "i18n": "gulp i18n",
     "lint": "gulp lint",
-    "update": "node scripts/update"
+    "update": "node scripts/update",
+    "test": "mocha"
   },
   "description": "Violentmonkey",
   "devDependencies": {
@@ -26,8 +27,8 @@
     "html-minifier": "^2.1.0",
     "js-yaml": "^3.5.5",
     "merge2": "^1.0.2",
+    "mocha": "^3.1.2",
     "ncp": "^2.0.0",
-    "qunitjs": "^2.0.0-rc1",
     "through2": "^2.0.1"
   },
   "author": "Gerald <i@gerald.top>",
