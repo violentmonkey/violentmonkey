@@ -4,6 +4,7 @@ var requests = require('./requests');
 var cache = require('./utils/cache');
 var tabsUtils = require('./utils/tabs');
 var scriptUtils = require('./utils/script');
+var clipboard = require('./utils/clipboard');
 var _ = require('../common');
 
 var vmdb = exports.vmdb = new VMDB;
@@ -172,6 +173,9 @@ var commands = {
         resolve(id);
       });
     });
+  },
+  SetClipboard: function (data, _src) {
+    clipboard.set(data);
   },
 };
 
