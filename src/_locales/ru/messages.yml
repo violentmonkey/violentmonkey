@@ -13,7 +13,7 @@ msgUpdated:
   message: Скрипт обновлен.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: 'Ошибка загрузки скрипта!'
+  message: Ошибка загрузки скрипта!
 msgInstalled:
   description: Message shown when a script is installed.
   message: Скрипт установлен.
@@ -30,7 +30,9 @@ msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Обновление...
 msgNewVersion:
-  description: 'Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.'
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
   message: Доступна новая версия.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -60,10 +62,14 @@ buttonClose:
   description: Button to close window.
   message: Закрыть
 msgErrorLoadingData:
-  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
   message: Ошибка загрузки скрипта.
 msgLoadedData:
-  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
   message: Скрипт загружен.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
@@ -111,12 +117,15 @@ labelIgnoreGrant:
 labelInjectMode:
   description: Label for a combo box to choose script injection modes.
   message: 'Режим встраивания скриптов:'
+  touched: false
 injectModeNormal:
   description: 'Script injection mode: Normal'
   message: Обычный
+  touched: false
 injectModeAdvanced:
   description: 'Script injection mode: Advanced'
   message: Расширенный
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Импорт данных
@@ -254,7 +263,9 @@ buttonUpdate:
   description: Check a script for updates.
   message: Проверить обновления
 msgImported:
-  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
   message: $1 скрипт(ов) импортировано.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
@@ -314,10 +325,14 @@ labelAutoReloadCurrentTab:
   message: Обновить текущую вкладку после включения/выключения скрипта
 hintInjectModeNormal:
   description: Hint to explain the normal injection mode.
-  message: 'Эффективен, но иеет проблемы с некоторыми защищенными страницами, например https://github.com'
+  message: >-
+    Эффективен, но иеет проблемы с некоторыми защищенными страницами, например
+    https://github.com
+  touched: false
 hintInjectModeAdvanced:
   description: Hint to explain the advanced injection mode.
   message: Работает на большинстве сайтов
+  touched: false
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Введите URL:'
@@ -358,5 +373,10 @@ msgSyncError:
   description: Message shown when sync failed.
   message: ''
 msgNamespaceConflict:
-  description: Message shown when namespace of the new script conflicts with an existent one.
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: ''
+msgInvalidScript:
+  description: Message shown when script is invalid.
   message: ''

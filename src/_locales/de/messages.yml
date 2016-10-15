@@ -13,7 +13,7 @@ msgUpdated:
   message: Das Skript wurde aktualisiert.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: 'Fehler beim Herunterladen der neuen Version!'
+  message: Fehler beim Herunterladen der neuen Version!
 msgInstalled:
   description: Message shown when a script is installed.
   message: Das Skript wurde installiert.
@@ -30,7 +30,9 @@ msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Aktualisiere...
 msgNewVersion:
-  description: 'Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.'
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
   message: Neue Version verfügbar.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -60,10 +62,14 @@ buttonClose:
   description: Button to close window.
   message: Schließen
 msgErrorLoadingData:
-  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
   message: Fehler beim Laden der Skriptdaten.
 msgLoadedData:
-  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
   message: Skriptdaten geladen
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
@@ -111,12 +117,15 @@ labelIgnoreGrant:
 labelInjectMode:
   description: Label for a combo box to choose script injection modes.
   message: 'Script injection mode:'
+  touched: false
 injectModeNormal:
   description: 'Script injection mode: Normal'
   message: Normal
+  touched: false
 injectModeAdvanced:
   description: 'Script injection mode: Advanced'
   message: Advanced
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Importieren
@@ -230,7 +239,7 @@ buttonSave:
   message: Speichern
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: 'Speichern & Schließen'
+  message: Speichern & Schließen
 labelNoScripts:
   description: Message shown when no script is installed.
   message: Es ist noch kein Script installiert.
@@ -254,14 +263,18 @@ buttonUpdate:
   description: Check a script for updates.
   message: Auf Aktualisierung prüfen
 msgImported:
-  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
   message: $1 Skript(e) wurden importiert.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Verwende @downloadURL
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: 'Die Änderungen wurden nicht gespreichert!Zum Verwerfen OK drücken oder Abbrechen um fortzufahren.'
+  message: >-
+    Die Änderungen wurden nicht gespreichert!Zum Verwerfen OK drücken oder
+    Abbrechen um fortzufahren.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Säubere Daten...
@@ -313,9 +326,11 @@ labelAutoReloadCurrentTab:
 hintInjectModeNormal:
   description: Hint to explain the normal injection mode.
   message: ''
+  touched: false
 hintInjectModeAdvanced:
   description: Hint to explain the advanced injection mode.
   message: ''
+  touched: false
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: ''
@@ -356,5 +371,10 @@ msgSyncError:
   description: Message shown when sync failed.
   message: ''
 msgNamespaceConflict:
-  description: Message shown when namespace of the new script conflicts with an existent one.
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: ''
+msgInvalidScript:
+  description: Message shown when script is invalid.
   message: ''

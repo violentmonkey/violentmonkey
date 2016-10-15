@@ -3,7 +3,9 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: 'Suport pentru scripturi de utilizatori în navigatoare bazate pe Chromium, precum Opera și Chrome.'
+  message: >-
+    Suport pentru scripturi de utilizatori în navigatoare bazate pe Chromium,
+    precum Opera și Chrome.
 extTranslator:
   description: Information of the translator.
   message: Nicolae Crefelean
@@ -13,7 +15,7 @@ msgUpdated:
   message: Script actualizat.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: 'Eroare la preluarea scriptului!'
+  message: Eroare la preluarea scriptului!
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script instalat.
@@ -30,7 +32,9 @@ msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Se actualizează...
 msgNewVersion:
-  description: 'Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.'
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
   message: O nouă versiune a fost găsită.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -60,10 +64,14 @@ buttonClose:
   description: Button to close window.
   message: Închide
 msgErrorLoadingData:
-  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
   message: Eroare la încărcarea datelor scriptului.
 msgLoadedData:
-  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
   message: Datele scriptului au fost încărcate.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
@@ -111,12 +119,15 @@ labelIgnoreGrant:
 labelInjectMode:
   description: Label for a combo box to choose script injection modes.
   message: 'Modul de injectare a scriptului:'
+  touched: false
 injectModeNormal:
   description: 'Script injection mode: Normal'
   message: Normal
+  touched: false
 injectModeAdvanced:
   description: 'Script injection mode: Advanced'
   message: Avansat
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Import de date
@@ -254,7 +265,9 @@ buttonUpdate:
   description: Check a script for updates.
   message: Cuată actualizări
 msgImported:
-  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
   message: $1 obiect(e) importat(e).
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
@@ -272,7 +285,9 @@ buttonVacuumed:
   message: Date curățate
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Se elimină datele redundante și se încearcă reîncărcarea resurselor lipsă în cache.
+  message: >-
+    Se elimină datele redundante și se încearcă reîncărcarea resurselor lipsă în
+    cache.
 menuManageScripts:
   description: 'Menu item to manage scripts, or to open the options page of the extension.'
   message: Administrează scripturile
@@ -314,10 +329,14 @@ labelAutoReloadCurrentTab:
   message: Reîncarcă fila curentă după activarea/dezactivarea unui script din meniu
 hintInjectModeNormal:
   description: Hint to explain the normal injection mode.
-  message: 'Eficient dar eșuează în paginile cu securitate înaltă, de ex. https://github.com'
+  message: >-
+    Eficient dar eșuează în paginile cu securitate înaltă, de ex.
+    https://github.com
+  touched: false
 hintInjectModeAdvanced:
   description: Hint to explain the advanced injection mode.
   message: 'Funcționează în majoritatea paginilor, de fapt e un hack'
+  touched: false
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Introduceți URL-ul:'
@@ -347,7 +366,7 @@ msgSyncInit:
   message: Inițializare...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: 'Eroare la inițializare!'
+  message: Eroare la inițializare!
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Sincronizarea va începe în curând...
@@ -356,7 +375,12 @@ msgSyncing:
   message: Sincronizare în desfășurare...
 msgSyncError:
   description: Message shown when sync failed.
-  message: 'Eroare la sincronizare!'
+  message: Eroare la sincronizare!
 msgNamespaceConflict:
-  description: Message shown when namespace of the new script conflicts with an existent one.
-  message: 'Conflict în namespace-ul scriptului! Te rugăm modifică @name și @namespace.'
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: Conflict în namespace-ul scriptului! Te rugăm modifică @name și @namespace.
+msgInvalidScript:
+  description: Message shown when script is invalid.
+  message: ''

@@ -6,14 +6,14 @@ extDescription:
   message: Userscript support for Chromium based browsers like Opera and Chrome.
 extTranslator:
   description: Information of the translator.
-  message: 'Nguyễn Đông Hoàng <donghoang.nguyen@gmail.com>'
+  message: Nguyễn Đông Hoàng <donghoang.nguyen@gmail.com>
   touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Đã cập nhật script.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: 'Có lỗi khi tìm phiên bản mới!'
+  message: Có lỗi khi tìm phiên bản mới!
 msgInstalled:
   description: Message shown when a script is installed.
   message: Đã cài đặt script.
@@ -30,7 +30,9 @@ msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Đang cập nhật...
 msgNewVersion:
-  description: 'Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.'
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
   message: Có phiên bản mới.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -60,10 +62,14 @@ buttonClose:
   description: Button to close window.
   message: Đóng
 msgErrorLoadingData:
-  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
   message: Không thể tải script.
 msgLoadedData:
-  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
   message: Đã tải script.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
@@ -111,12 +117,15 @@ labelIgnoreGrant:
 labelInjectMode:
   description: Label for a combo box to choose script injection modes.
   message: 'Chế độ tiêm :'
+  touched: false
 injectModeNormal:
   description: 'Script injection mode: Normal'
   message: Bình thường
+  touched: false
 injectModeAdvanced:
   description: 'Script injection mode: Advanced'
   message: Nâng cao
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Nhập dữ liệu
@@ -230,10 +239,10 @@ buttonSave:
   message: Lưu
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: 'Lưu & Đóng'
+  message: Lưu & Đóng
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: "Oops, bạn không có script nào được cài đặt."
+  message: 'Oops, bạn không có script nào được cài đặt.'
 hintSupportPage:
   description: Hint for support page.
   message: Trang hỗ trợ
@@ -254,7 +263,9 @@ buttonUpdate:
   description: Check a script for updates.
   message: Kiểm tra cập nhật
 msgImported:
-  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
   message: Đã nhập $1 script.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
@@ -314,10 +325,14 @@ labelAutoReloadCurrentTab:
   message: Tải lại trang khi bật/tắt script từ menu
 hintInjectModeNormal:
   description: Hint to explain the normal injection mode.
-  message: 'Khá tốt nhưng có thể lỗi trên một số trang bảo mật cao, Ví dụ https://github.com'
+  message: >-
+    Khá tốt nhưng có thể lỗi trên một số trang bảo mật cao, Ví dụ
+    https://github.com
+  touched: false
 hintInjectModeAdvanced:
   description: Hint to explain the advanced injection mode.
   message: 'Hoạt đông trên hầu hết các trang, thực ra là hack'
+  touched: false
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL đầu vào:'
@@ -347,7 +362,7 @@ msgSyncInit:
   message: Đang khởi tạo...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: 'Khởi tạo lỗi!'
+  message: Khởi tạo lỗi!
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Đồng bộ sẽ chạy sớm...
@@ -356,7 +371,12 @@ msgSyncing:
   message: Đang đồng bộ...
 msgSyncError:
   description: Message shown when sync failed.
-  message: 'Đồng bộ lỗi!'
+  message: Đồng bộ lỗi!
 msgNamespaceConflict:
-  description: Message shown when namespace of the new script conflicts with an existent one.
-  message: 'Xung đột namespace! Vui lòng sửa @name và @namespace.'
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: Xung đột namespace! Vui lòng sửa @name và @namespace.
+msgInvalidScript:
+  description: Message shown when script is invalid.
+  message: ''

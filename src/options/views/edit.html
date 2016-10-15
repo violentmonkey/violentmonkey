@@ -1,0 +1,96 @@
+<div class="frame edit">
+  <div class="frame-header">
+    <div class="buttons">
+      <div v-dropdown>
+        <button dropdown-toggle v-text="i18n('buttonCustomMeta')"></button>
+        <div class="dropdown-menu">
+          <table>
+            <tr>
+              <td title="@name" v-text="i18n('labelName')"></td>
+              <td class=expand>
+                <input type="text" v-model="custom.name" :placeholder="placeholders.name">
+              </td>
+              <td title="@run-at" v-text="i18n('labelRunAt')"></td>
+              <td>
+                <select v-model="custom['run-at']">
+                  <option value="" v-text="i18n('labelRunAtDefault')"></option>
+                  <option value=start>document-start</option>
+                  <option value=idle>document-idle</option>
+                  <option value=end>document-end</option>
+                </select>
+              </td>
+            </tr>
+            <tr title="@homepageURL">
+              <td v-text="i18n('labelHomepageURL')"></td>
+              <td colspan=3 class=expand>
+                <input type="text" v-model="custom.homepageURL" :placeholder="placeholders.homepageURL">
+              </td>
+            </tr>
+          </table>
+          <table>
+            <tr title="@updateURL">
+              <td v-text="i18n('labelUpdateURL')"></td>
+              <td class=expand>
+                <input type="text" v-model="custom.updateURL" :placeholder="placeholders.updateURL">
+              </td>
+            </tr>
+            <tr title="@downloadURL">
+              <td v-text="i18n('labelDownloadURL')"></td>
+              <td class=expand>
+                <input type="text" v-model="custom.downloadURL" :placeholder="placeholders.downloadURL">
+              </td>
+            </tr>
+          </table>
+          <fieldset title="@include">
+            <legend>
+              <span v-text="i18n('labelInclude')"></span>
+              <label>
+                <input type=checkbox v-model="custom.keepInclude">
+                <span v-text="i18n('labelKeepInclude')"></span>
+              </label>
+            </legend>
+            <div v-html="i18n('labelCustomInclude')"></div>
+            <textarea v-model="custom.include"></textarea>
+          </fieldset>
+          <fieldset title="@match">
+            <legend>
+              <span v-text="i18n('labelMatch')"></span>
+              <label>
+                <input type=checkbox v-model="custom.keepMatch">
+                <span v-text="i18n('labelKeepMatch')"></span>
+              </label>
+            </legend>
+            <div v-html="i18n('labelCustomMatch')"></div>
+            <textarea v-model="custom.match"></textarea>
+          </fieldset>
+          <fieldset title="@exclude">
+            <legend>
+              <span v-text="i18n('labelExclude')"></span>
+              <label>
+                <input type=checkbox v-model="custom.keepExclude">
+                <span v-text="i18n('labelKeepExclude')"></span>
+              </label>
+            </legend>
+            <div v-html="i18n('labelCustomExclude')"></div>
+            <textarea v-model="custom.exclude"></textarea>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+    <h2 v-text="i18n('labelScriptEditor')"></h2>
+  </div>
+  <div class="frame-footer">
+    <div class="pull-right">
+      <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
+      <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
+      <button v-text="i18n('buttonClose')" @click="close"></button>
+    </div>
+    <label>
+      <input type=checkbox v-model="update">
+      <span v-text="i18n('labelAllowUpdate')"></span>
+    </label>
+  </div>
+  <div class=frame-body>
+    <editor :on-save="save" :on-exit="close" :on-change="contentChange" :content="code"></editor>
+  </div>
+</div>

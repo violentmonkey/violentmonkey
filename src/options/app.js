@@ -1,110 +1,102 @@
-define('app', function (require, _exports, _module) {
-  function initMain() {
-    store.loading = true;
-    _.sendMessage({cmd: 'GetData'})
-    .then(function (data) {
-      [
-        'cache',
-        'scripts',
-        'sync',
-      ].forEach(function (key) {
-        store[key] = data[key];
-      });
-      store.loading = false;
-      // features.reset(data.version);
-      features.reset('sync');
+function initMain() {
+  store.loading = true;
+  _.sendMessage({cmd: 'GetData'})
+  .then(function (data) {
+    [
+      'cache',
+      'scripts',
+      'sync',
+    ].forEach(function (key) {
+      Vue.set(store, key, data[key]);
     });
-    var port = chrome.runtime.connect({name: 'Options'});
-    port.onMessage.addListener(function (res) {
-      switch (res.cmd) {
-      case 'sync':
-        store.sync = res.data;
-        break;
-      case 'add':
-        res.data.message = '';
-        store.scripts.push(res.data);
-        break;
-      case 'update':
-        if (res.data) {
-          var script = store.scripts.find(function (script) {
-            return script.id === res.data.id;
-          });
-          if (script) for (var k in res.data) {
-            Vue.set(script, k, res.data[k]);
-          }
-        }
-        break;
-      case 'del':
-        var i = store.scripts.findIndex(function (script) {
-          return script.id === res.data;
+    store.loading = false;
+    // utils.features.reset(data.version);
+    utils.features.reset('sync');
+  });
+  var port = chrome.runtime.connect({name: 'Options'});
+  port.onMessage.addListener(function (res) {
+    switch (res.cmd) {
+    case 'sync':
+      store.sync = res.data;
+      break;
+    case 'add':
+      res.data.message = '';
+      store.scripts.push(res.data);
+      break;
+    case 'update':
+      if (res.data) {
+        var script = store.scripts.find(function (script) {
+          return script.id === res.data.id;
         });
-        ~i && store.scripts.splice(i, 1);
+        script && Object.keys(script).forEach(function (key) {
+          Vue.set(script, key, res.data[key]);
+        });
       }
-    });
-  }
-
-  var _ = require('utils/common');
-  var utils = require('utils');
-  var Main = require('views/Main');
-  var Confirm = require('views/Confirm');
-  var features = require('utils/features');
-  var store = Object.assign(utils.store, {
-    loading: false,
-    cache: {},
-    scripts: [],
-    sync: [],
+      break;
+    case 'del':
+      var i = store.scripts.findIndex(function (script) {
+        return script.id === res.data;
+      });
+      ~i && store.scripts.splice(i, 1);
+    }
   });
-  var init = {
-    Main: initMain,
-  };
-  zip.workerScriptsPath = '/lib/zip.js/';
-  document.title = _.i18n('extName');
-
-  new Vue({
-    el: document.body,
-    components: {
-      Main: Main,
-      Confirm: Confirm,
-    },
-    data: function () {
-      return {
-        type: 'main',
-        params: {},
-      };
-    },
-    ready: function () {
-      var _this = this;
-      _this.routes = {
-        Main: utils.routeTester([
-          '',
-          'main/:tab',
-        ]),
-        Confirm: utils.routeTester([
-          'confirm/:url',
-          'confirm/:url/:referer',
-        ]),
-      };
-      window.addEventListener('hashchange', _this.loadHash.bind(_this));
-      _this.loadHash();
-    },
-    methods: {
-      loadHash: function () {
-        var _this = this;
-        var hash = location.hash.slice(1);
-        for (var k in _this.routes) {
-          var test = _this.routes[k];
-          var params = test(hash);
-          if (params) {
-            _this.type = k;
-            _this.params = params;
-            if (init[k]) {
-              init[k]();
-              init[k] = null;
-            }
-            break;
-          }
-        }
-      },
-    },
+}
+function loadHash() {
+  var hash = location.hash.slice(1);
+  Object.keys(routes).find(function (key) {
+    var test = routes[key];
+    var params = test(hash);
+    if (params) {
+      hashData.type = key;
+      hashData.params = params;
+      if (init[key]) {
+        init[key]();
+        init[key] = null;
+      }
+      return true;
+    }
   });
+}
+
+var _ = require('../common');
+var utils = require('./utils');
+var Main = require('./views/main');
+var Confirm = require('./views/confirm');
+
+var store = Object.assign(utils.store, {
+  loading: false,
+  cache: {},
+  scripts: [],
+  sync: [],
+});
+var init = {
+  Main: initMain,
+};
+var routes = {
+  Main: utils.routeTester([
+    '',
+    'main/:tab',
+  ]),
+  Confirm: utils.routeTester([
+    'confirm/:url',
+    'confirm/:url/:referer',
+  ]),
+};
+var hashData = {
+  type: null,
+  params: null,
+};
+window.addEventListener('hashchange', loadHash, false);
+loadHash();
+zip.workerScriptsPath = '/lib/zip.js/';
+document.title = _.i18n('extName');
+
+new Vue({
+  el: '#app',
+  template: '<component :is=type :params=params></component>',
+  components: {
+    Main: Main,
+    Confirm: Confirm,
+  },
+  data: hashData,
 });

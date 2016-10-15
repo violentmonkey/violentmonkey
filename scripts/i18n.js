@@ -1,5 +1,3 @@
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
 const gutil = require('gulp-util');
@@ -26,14 +24,14 @@ Locale.prototype.load = function () {
   const file = this.base + '/' + this.path;
   return (
     this.ext
-      ? readFile(file + this.ext)
-      : this.extensions.reduce((promise, ext) => promise.catch(() => (
-        readFile(file + ext)
-        .then(data => {
-          this.ext = ext;
-          return data;
-        })
-      )), Promise.reject())
+    ? readFile(file + this.ext)
+    : this.extensions.reduce((promise, ext) => promise.catch(() => (
+      readFile(file + ext)
+      .then(data => {
+        this.ext = ext;
+        return data;
+      })
+    )), Promise.reject())
   ).then(data => {
     const desc = {};
     if (this.ext === '.json') {
@@ -142,7 +140,7 @@ function extract(options) {
   const patterns = {
     js: ['_\\.i18n\\(\'(\\w+)\'', 1],
     json: ['__MSG_(\\w+)__', 1],
-    html: ['\'(\\w+)\'\\|i18n', 1],
+    html: ['i18n\\(\'(\\w+)\'\\)', 1],
   };
 
   const locales = new Locales(options.prefix, options.base);

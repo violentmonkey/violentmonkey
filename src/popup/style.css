@@ -13,7 +13,7 @@ html {
   overflow-y: auto;
 }
 .menu.placeholder {
-  max-width: auto;
+  max-width: none;
   height: 0;
   overflow: hidden;
 }

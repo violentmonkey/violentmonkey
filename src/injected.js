@@ -1,4 +1,3 @@
-!function(){
 // Avoid running repeatedly due to new `document.documentElement`
 if (window.VM) return;
 window.VM = 1;
@@ -19,18 +18,24 @@ function includes(arr, item) {
   }
   return false;
 }
-function forEach(arr, func, context) {
-  var length = arr.length;
-  for (var i = 0; i < length; i ++) {
-    if (func.call(context, arr[i], i, arr) === false) break;
-  }
+function forEach(arr, func) {
+  var length = arr && arr.length || 0;
+  for (var i = 0; i < length; i ++) func(arr[i], i, arr);
+}
+function map(arr, func) {
+  var comm = this;
+  var res = [];
+  comm.forEach(arr, function (item, i) {
+    res.push(func(item, i, arr));
+  });
+  return res;
 }
 
 /**
  * http://www.webtoolkit.info/javascript-utf8.html
  */
-function utf8decode (utftext) {
-  var string = "";
+function utf8decode(utftext) {
+  var string = '';
   var i = 0;
   var c = 0, c2 = 0, c3 = 0;
   while ( i < utftext.length ) {
@@ -187,8 +192,9 @@ var comm = {
   // Notice: avoid using prototype functions since they may be changed by page scripts
   includes: includes,
   forEach: forEach,
+  map: map,
 
-  init: function(srcId, destId) {
+  init: function (srcId, destId) {
     var comm = this;
     comm.sid = comm.vmid + srcId;
     comm.did = comm.vmid + destId;
@@ -201,11 +207,11 @@ var comm = {
       comm.injectable = false;
     }
   },
-  post: function(data) {
+  post: function (data) {
     var e = new CustomEvent(this.did, {detail: data});
     document.dispatchEvent(e);
   },
-  handleR: function(e) {
+  handleR: function (e) {
     var obj = e.detail;
     var comm = this;
     var maps = {
@@ -225,28 +231,43 @@ var comm = {
         var values = comm.values;
         if (values && values[data.uri]) values[data.uri] = data.values;
       },
+      NotificationClicked: function (id) {
+        var options = comm.notif[id];
+        if (options) {
+          var onclick = options.onclick;
+          onclick && onclick();
+        }
+      },
+      NotificationClosed: function (id) {
+        var options = comm.notif[id];
+        if (options) {
+          delete comm.notif[id];
+          var ondone = options.ondone;
+          ondone && ondone();
+        }
+      },
       // advanced inject
       Injected: function (id) {
         var obj = comm.ainject[id];
         var func = window['VM_' + id];
         delete window['VM_' + id];
         delete comm.ainject[id];
-        if (obj && func) comm.runCode(obj[0], func, obj[1]);
+        if (obj && func) comm.runCode(obj[0], func, obj[1], obj[2]);
       },
     };
     var func = maps[obj.cmd];
     if (func) func(obj.data);
   },
-  runCode: function(name, func, wrapper) {
+  runCode: function (name, func, args, thisObj) {
     try {
-      func.call(wrapper.window || wrapper, wrapper);
+      func.apply(thisObj, args);
     } catch (e) {
       var msg = 'Error running script: ' + name + '\n' + e;
       if (e.message) msg += '\n' + e.message;
       console.error(msg);
     }
   },
-  initRequest: function() {
+  initRequest: function () {
     // request functions
     function reqAbort(){
       comm.post({cmd: 'AbortRequest', data: this.id});
@@ -321,7 +342,7 @@ var comm = {
     var comm = this;
     comm.requests = {};
     comm.qrequests = [];
-    comm.Request = function(details) {
+    comm.Request = function (details) {
       var t = {
         details: details,
         callback: callback,
@@ -337,7 +358,7 @@ var comm = {
     };
   },
   getWrapper: getWrapper,
-  wrapGM: function(script, cache) {
+  wrapGM: function (script, cache) {
     function getValues() {
       return comm.values[script.uri];
     }
@@ -419,7 +440,7 @@ var comm = {
         },
       },
       GM_getValue: {
-        value: function(key, val) {
+        value: function (key, val) {
           var values = getValues();
           var v = values[key];
           if (v) {
@@ -527,6 +548,41 @@ var comm = {
           return comm.Request(details);
         },
       },
+      GM_notification: {
+        value: function (text, title, image, onclick) {
+          if (!text) {
+            throw 'Invalid parameters.';
+          }
+          var options = typeof text === 'object' ? text : {
+            text: text,
+            title: title,
+            image: image,
+            onclick: onclick,
+          };
+          var id = comm.notif[''] = (comm.notif[''] || 0) + 1;
+          comm.notif[id] = options;
+          comm.post({
+            cmd: 'Notification',
+            data: {
+              id: id,
+              text: options.text,
+              title: options.title,
+              image: options.image,
+            },
+          });
+        },
+      },
+      GM_setClipboard: {
+        value: function (text, type) {
+          comm.post({
+            cmd: 'SetClipboard',
+            data: {
+              type: type,
+              data: text,
+            },
+          });
+        },
+      },
     };
     comm.forEach(grant, function (name) {
       var prop = gm_funcs[name];
@@ -538,12 +594,13 @@ var comm = {
     function buildCode(script) {
       var require = script.meta.require || [];
       var wrapper = comm.wrapGM(script, data.cache);
-      var vars = [];
-      comm.forEach(Object.getOwnPropertyNames(wrapper), function(name) {
-        vars.push(name + '=this["' + name + '"]=g["' + name + '"]');
-      });
-      // vars should not be empty
-      var code = ['var ' + vars.join(',') + ';delete g;with(this)!function(){'];
+      // Must use Object.getOwnPropertyNames to list unenumerable properties
+      var wrapperKeys = Object.getOwnPropertyNames(wrapper);
+      var code = [
+        comm.map(wrapperKeys, function (name) {
+          return 'this["' + name + '"]=' + name;
+        }).join(';') + ';with(this)!function(){',
+      ];
       comm.forEach(require, function (key) {
         var script = data.require[key];
         script && code.push(script);
@@ -553,20 +610,22 @@ var comm = {
       code.push('}.call(this);');
       code = code.join('\n');
       var name = script.custom.name || script.meta.name || script.id;
+      var args = comm.map(wrapperKeys, function (key) {return wrapper[key];});
+      var thisObj = wrapper.window || wrapper;
       if (comm.injectable) {
         // normal injection
         try {
-          var func = new Function('g', code);
+          var func = Function.apply(null, wrapperKeys.concat([code]));
         } catch (e) {
           console.error('Syntax error in script: ' + name + '\n' + e.message);
           return;
         }
-        comm.runCode(name, func, wrapper);
+        comm.runCode(name, func, args, thisObj);
       } else {
         // advanced injection
         var id = comm.getUniqId();
-        comm.ainject[id] = [name, wrapper];
-        comm.post({cmd: 'Inject', data: [id, code]});
+        comm.ainject[id] = [name, args, thisObj];
+        comm.post({cmd: 'Inject', data: [id, wrapperKeys, code]});
       }
     }
     function run(list) {
@@ -577,17 +636,16 @@ var comm = {
     var idle = [];
     var end = [];
     comm.command = {};
+    comm.notif = {};
     comm.ainject = {};
     comm.version = data.version;
     comm.values = {};
     // reset load and checkLoad
-    comm.load = function() {
+    comm.load = function () {
       run(end);
-      setTimeout(function() {
-        run(idle);
-      }, 0);
+      setTimeout(run, 0, idle);
     };
-    comm.checkLoad = function() {
+    comm.checkLoad = function () {
       if (!comm.state && comm.includes(['interactive', 'complete'], document.readyState))
         comm.state = 1;
       if (comm.state) comm.load();
@@ -597,7 +655,7 @@ var comm = {
       'document-idle': idle,
       'document-end': end,
     };
-    comm.forEach(data.scripts, function(script) {
+    comm.forEach(data.scripts, function (script) {
       comm.values[script.uri] = data.values[script.uri] || {};
       if (script && script.enabled) {
         var list = listMap[script.custom['run-at'] || script.meta['run-at']] || end;
@@ -612,8 +670,8 @@ var comm = {
 var menus = [];
 var ids = [];
 function injectScript(data) {
-  // data: [id, code]
-  var func = function(id, did, cb) {
+  // data: [id, wrapperKeys, code]
+  var func = function (id, did, cb) {
     Object.defineProperty(window, 'VM_' + id, {
       value: cb,
       configurable: true,
@@ -621,7 +679,7 @@ function injectScript(data) {
     var e = new CustomEvent(did, {detail: {cmd: 'Injected', data: id}});
     document.dispatchEvent(e);
   };
-  inject('!' + func.toString() + '(' + JSON.stringify(data[0]) + ',' + JSON.stringify(comm.did) + ',function(g){' + data[1] + '})');
+  inject('!' + func.toString() + '(' + JSON.stringify(data[0]) + ',' + JSON.stringify(comm.did) + ',function(' + data[1].join(',') + '){' + data[2] + '})');
 }
 function handleC(e) {
   var req = e.detail;
@@ -651,9 +709,32 @@ function handleC(e) {
         document.head.appendChild(style);
       }
     },
+    Notification: onNotificationCreate,
+    SetClipboard: function (data) {
+      sendMessage({cmd: 'SetClipboard', data: data});
+    },
   };
   var func = maps[req.cmd];
   if (func) func(req.data);
+}
+
+var notifications = {};
+function onNotificationCreate(options) {
+  sendMessage({cmd: 'Notification', data: options})
+  .then(function (nid) {
+    notifications[nid] = options.id;
+  });
+}
+function onNotificationClick(nid) {
+  var id = notifications[nid];
+  id && comm.post({cmd: 'NotificationClicked', data: id});
+}
+function onNotificationClose(nid) {
+  var id = notifications[nid];
+  if (id) {
+    comm.post({cmd: 'NotificationClosed', data: id});
+    delete notifications[nid];
+  }
 }
 
 // Messages
@@ -668,6 +749,8 @@ chrome.runtime.onMessage.addListener(function (req, src) {
     UpdateValues: function (data) {
       comm.post({cmd: 'UpdateValues', data: data});
     },
+    NotificationClick: onNotificationClick,
+    NotificationClose: onNotificationClose,
   };
   var func = maps[req.cmd];
   if (func) func(req.data, src);
@@ -707,14 +790,18 @@ function objEncode(obj) {
   return '{' + list.join(',') + '}';
 }
 function inject(code) {
-  var script = document.createElement('script')
+  var script = document.createElement('script');
   var doc = document.body || document.documentElement;
   script.innerHTML = code;
   doc.appendChild(script);
-  doc.removeChild(script);
+  try {
+    doc.removeChild(script);
+  } catch (e) {
+    // ignore if body is changed and script is detached
+  }
 }
 function loadScript(data) {
-  data.scripts.forEach(function(script) {
+  forEach(data.scripts, function (script) {
     ids.push(script.id);
     if (script.enabled) badge.number ++;
   });
@@ -735,4 +822,3 @@ function initCommunicator() {
   sendMessage({cmd: 'GetInjected', data: location.href}).then(loadScript);
 }
 initCommunicator();
-}();

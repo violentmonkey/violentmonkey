@@ -6,14 +6,14 @@ extDescription:
   message: Userscript support for Chromium based browsers like Opera and Chrome.
 extTranslator:
   description: Information of the translator.
-  message: 'Gerald <i@gerald.top>'
+  message: Gerald <i@gerald.top>
   touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script updated.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: 'Error fetching script!'
+  message: Error fetching script!
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script installed.
@@ -30,7 +30,9 @@ msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Updating...
 msgNewVersion:
-  description: 'Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.'
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
   message: New version found.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -60,10 +62,14 @@ buttonClose:
   description: Button to close window.
   message: Close
 msgErrorLoadingData:
-  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
   message: Error loading script data.
 msgLoadedData:
-  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
   message: Script data loaded.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
@@ -111,12 +117,15 @@ labelIgnoreGrant:
 labelInjectMode:
   description: Label for a combo box to choose script injection modes.
   message: 'Script injection mode:'
+  touched: false
 injectModeNormal:
   description: 'Script injection mode: Normal'
   message: Normal
+  touched: false
 injectModeAdvanced:
   description: 'Script injection mode: Advanced'
   message: Advanced
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Data Import
@@ -230,10 +239,10 @@ buttonSave:
   message: Save
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: 'Save & Close'
+  message: Save & Close
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: "Oops, you haven't got any script yet."
+  message: 'Oops, you haven''t got any script yet.'
 hintSupportPage:
   description: Hint for support page.
   message: Support page
@@ -254,7 +263,9 @@ buttonUpdate:
   description: Check a script for updates.
   message: Check for updates
 msgImported:
-  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
   message: $1 item(s) are imported.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
@@ -315,9 +326,11 @@ labelAutoReloadCurrentTab:
 hintInjectModeNormal:
   description: Hint to explain the normal injection mode.
   message: 'Efficient but fails in some high security pages, e.g. https://github.com'
+  touched: false
 hintInjectModeAdvanced:
   description: Hint to explain the advanced injection mode.
   message: 'Works in most pages, actually a hack'
+  touched: false
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Input URL:'
@@ -347,7 +360,7 @@ msgSyncInit:
   message: Initializing...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: 'Initializing error!'
+  message: Initializing error!
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Sync will start soon...
@@ -356,7 +369,12 @@ msgSyncing:
   message: Sync in progress...
 msgSyncError:
   description: Message shown when sync failed.
-  message: 'Sync error!'
+  message: Sync error!
 msgNamespaceConflict:
-  description: Message shown when namespace of the new script conflicts with an existent one.
-  message: 'Script namespace conflicts! Please modify @name and @namespace.'
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: Script namespace conflicts! Please modify @name and @namespace.
+msgInvalidScript:
+  description: Message shown when script is invalid.
+  message: Invalid script!
