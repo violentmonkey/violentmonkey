@@ -1,7 +1,7 @@
-<div class="menu-item" :class="[options.className,{disabled:options.disabled}]" :title="options.title||options.name">
-  <div class="menu-item-detail" v-if="options.detailClick" @click="detailClick">...</div>
+<div class="menu-item" :class="[data.className,{disabled:data.disabled}]" :title="data.title||data.name">
+  <div class="menu-item-detail" v-if="data.detailClick" @click="detailClick">...</div>
   <div class="menu-item-label" @click="onClick">
-    <svg class="icon"><use :xlink:href="'#'+options.symbol"/></svg>
-    {{options.name}}
+    <svg class="icon"><use :xlink:href="'#'+data.symbol"/></svg>
+    {{data.name}}
   </div>
 </div>
