@@ -310,7 +310,12 @@ var BaseService = serviceFactory({
           if (xhr.status === 503) {
             // TODO Too Many Requests
           }
-          xhr.status > 300 ? requestError() : resolve(xhr.responseText);
+          // net error: xhr.status === 0
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(xhr.responseText);
+          } else {
+            requestError();
+          }
         };
         xhr.send(options.body);
 
