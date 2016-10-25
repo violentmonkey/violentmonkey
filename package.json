@@ -2,7 +2,7 @@
   "name": "Violentmonkey",
   "version": "2.4.2",
   "scripts": {
-    "clean": "gulp clean",
+    "prebuild": "gulp clean",
     "build": "gulp build",
     "dev": "gulp watch",
     "i18n": "gulp i18n",
