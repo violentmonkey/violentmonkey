@@ -14,31 +14,33 @@ function initMain() {
     utils.features.reset('sync');
   });
   var port = chrome.runtime.connect({name: 'Options'});
-  port.onMessage.addListener(function (res) {
-    switch (res.cmd) {
-    case 'sync':
-      store.sync = res.data;
-      break;
-    case 'add':
-      res.data.message = '';
-      store.scripts.push(res.data);
-      break;
-    case 'update':
-      if (res.data) {
-        var script = store.scripts.find(function (script) {
-          return script.id === res.data.id;
-        });
-        script && Object.keys(script).forEach(function (key) {
-          Vue.set(script, key, res.data[key]);
-        });
-      }
-      break;
-    case 'del':
+  var handlers = {
+    sync: function (data) {
+      store.sync = data;
+    },
+    add: function (data) {
+      data.message = '';
+      store.scripts.push(data);
+    },
+    update: function (data) {
+      if (!data) return;
+      var script = store.scripts.find(function (script) {
+        return script.id === data.id;
+      });
+      script && Object.keys(data).forEach(function (key) {
+        Vue.set(script, key, data[key]);
+      });
+    },
+    del: function (data) {
       var i = store.scripts.findIndex(function (script) {
-        return script.id === res.data;
+        return script.id === data;
       });
       ~i && store.scripts.splice(i, 1);
-    }
+    },
+  };
+  port.onMessage.addListener(function (res) {
+    var handle = handlers[res.cmd];
+    handle && handle(res.data);
   });
 }
 function loadHash() {
