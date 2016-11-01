@@ -1,3 +1,38 @@
+// Polyfill start
+
+function polyfill(obj, name, value) {
+  if (!obj[name]) Object.defineProperty(obj, name, {
+    value: value,
+  });
+}
+
+polyfill(Object, 'assign', function () {
+  var obj = arguments[0];
+  for (var i = 1; i < arguments.length; i ++) {
+    var arg = arguments[i];
+    arg && Object.keys(arg).forEach(function (key) {
+      obj[key] = arg[key];
+    });
+  }
+  return obj;
+});
+polyfill(String.prototype, 'startsWith', function (str) {
+  return this.slice(0, str.length) === str;
+});
+polyfill(Array.prototype, 'findIndex', function (predicate) {
+  var length = this.length;
+  for (var i = 0; i < length; i ++) {
+    var item = this[i];
+    if (predicate(item, i, this)) return i;
+  }
+  return -1;
+});
+polyfill(Array.prototype, 'find', function (predicate) {
+  return this[this.findIndex(predicate)];
+});
+
+// Polyfill end
+
 var _ = exports;
 _.i18n = chrome.i18n.getMessage;
 _.defaultImage = '/images/icon128.png';
