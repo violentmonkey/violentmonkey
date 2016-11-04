@@ -532,8 +532,8 @@ var comm = {
         /* eslint-enable no-console */
       },
       GM_openInTab: {
-        value: function (url) {
-          comm.post({cmd: 'NewTab', data: url});
+        value: function (url, background) {
+          comm.post({cmd: 'OpenTab', data: {url: url, active: !background}});
         },
       },
       GM_registerMenuCommand: {
@@ -692,8 +692,8 @@ function handleC(e) {
     HttpRequest: httpRequest,
     AbortRequest: abortRequest,
     Inject: injectScript,
-    NewTab: function (url) {
-      window.open(url);
+    OpenTab: function (data) {
+      sendMessage({cmd: 'OpenTab', data: data});
     },
     SetValue: function (data) {
       sendMessage({cmd: 'SetValue', data: data});

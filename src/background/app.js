@@ -177,6 +177,12 @@ var commands = {
   SetClipboard: function (data, _src) {
     clipboard.set(data);
   },
+  OpenTab: function (data, _src) {
+    chrome.tabs.create({
+      url: data.url,
+      active: data.active,
+    });
+  },
 };
 
 vmdb.initialized.then(function () {
