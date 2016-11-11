@@ -1,0 +1,380 @@
+extName:
+  description: Name of this extension.
+  message: Violentmonkey
+extDescription:
+  description: Description for this extension.
+  message: Dukungan userscript untuk peramban berbasis Chromium seperti Opera dan Chrome.
+extTranslator:
+  description: Information of the translator.
+  message: Arif Budiman <arifpedia@gmail.com>
+  touched: false
+msgUpdated:
+  description: Message shown when a script is updated/reinstalled.
+  message: Script diperbarui.
+msgErrorFetchingScript:
+  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  message: Kesalahan saat mengambil script!
+msgInstalled:
+  description: Message shown when a script is installed.
+  message: Script dipasang.
+Warning:
+  description: Show warnings with a notification.
+  message: Peringatan
+msgWarnGrant:
+  description: Message shown when `@grant` is not found in a script.
+  message: 'Script [$1] tidak memiliki baris `@grant`! Klik untuk melihat lebih rinci.'
+labelNoName:
+  description: Text as the name of a script when no @name is assigned.
+  message: Tanpa nama
+msgUpdating:
+  description: Message shown when a new version of script is being fetched.
+  message: Memperbarui...
+msgNewVersion:
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
+  message: Versi baru ditemukan.
+msgCheckingForUpdate:
+  description: Message shown when a script is being checked for updates by version numbers.
+  message: Memeriksa pembaruan...
+msgErrorFetchingUpdateInfo:
+  description: Message shown when Violentmonkey fails fetching version data of the script.
+  message: Gagal mengambil informasi pembaruan.
+msgNoUpdate:
+  description: Message shown when there is no new version of a script.
+  message: Tidak ada pembaruan ditemukan.
+labelInstall:
+  description: Shown in the title of the confirm page while trying to install a script.
+  message: Memasang script
+buttonInstallOptions:
+  description: Button to show options of installation confirm page.
+  message: Opsi
+installOptionClose:
+  description: Option to close confirm window after installation.
+  message: Tutup setelah pemasangan
+installOptionTrack:
+  description: Option to track the loading local file before window is closed.
+  message: Menelusuri berkas lokal sebelum jendela ini ditutup
+buttonConfirmInstallation:
+  description: Button to confirm installation of a script.
+  message: Konfirmasi pemasangan
+buttonClose:
+  description: Button to close window.
+  message: Tutup
+msgErrorLoadingData:
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
+  message: Kesalahan memuat data script.
+msgLoadedData:
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
+  message: Data script dimuat.
+msgErrorLoadingDependency:
+  description: Message shown when not all requirements are loaded successfully.
+  message: Kesalahan memuat dependensi.
+msgLoadingDependency:
+  description: Message shown on confirm page when the requirements are being downloaded.
+  message: Memuat dependensi... ($1/$2)
+msgScriptURL:
+  description: URL of the script to be installed on confirm page.
+  message: 'URL Script: $1'
+  touched: false
+msgLoadingData:
+  description: Message shown on confirm page when the script to be installed is loading.
+  message: Memuat data script...
+sideMenuInstalled:
+  description: 'Side menu: Installed scripts'
+  message: Script terpasang
+sideMenuSettings:
+  description: 'Side menu: Settings'
+  message: Pengaturan
+sideMenuAbout:
+  description: 'Side menu: About'
+  message: Tentang
+buttonNew:
+  description: Button to create a new script.
+  message: Baru
+buttonUpdateAll:
+  description: Check all scripts for updates.
+  message: Periksa semua pembaruan
+anchorGetMoreScripts:
+  description: Link to get more scripts.
+  message: Dapatkan lebih banyak script
+msgLoading:
+  description: Message shown in the options page before script list is loaded.
+  message: Memuat ...
+labelSettings:
+  description: Label shown on the top of settings page
+  message: Pengaturan
+labelAutoUpdate:
+  description: Option to allow automatically checking scripts for updates every 24 hours.
+  message: Periksa script untuk pembaruan secara otomatis setiap hari
+labelIgnoreGrant:
+  description: Option to suppress no @grant warnings.
+  message: Menekan tanpa peringatan @grant
+labelInjectMode:
+  description: Label for a combo box to choose script injection modes.
+  message: 'Mode injeksi script:'
+  touched: false
+injectModeNormal:
+  description: 'Script injection mode: Normal'
+  message: Normal
+  touched: false
+injectModeAdvanced:
+  description: 'Script injection mode: Advanced'
+  message: Tingkat lanjut
+  touched: false
+labelDataImport:
+  description: Section title of data import.
+  message: Impor Data
+buttonImportData:
+  description: Button to choose a file for data import.
+  message: Impor dari zip
+buttonVacuum:
+  description: Button to vacuum extension data.
+  message: Vakum basis data
+labelDataExport:
+  description: Section title of data export.
+  message: Ekspor Data
+labelScriptsToExport:
+  description: Label shown on top of the script list for export.
+  message: Script untuk ekspor
+labelExportScriptData:
+  description: Option to export script data along with scripts.
+  message: Ekspor data script
+buttonAllNone:
+  description: Button to select all scripts or none.
+  message: Semua/Tidak Satupun
+buttonExportData:
+  description: Button to open the data export dialog.
+  message: Ekspor ke zip
+labelAbout:
+  description: Label shown on top of the about page.
+  message: Tentang Violentmonkey
+labelRelated:
+  description: Label of related links.
+  message: 'Tautan terkait: '
+anchorSupportPage:
+  description: Link to the support page of Violentmonkey.
+  message: '<a href=https://violentmonkey.github.io/nex/ target=_blank>Violentmonkey</a>'
+labelDonate:
+  description: Label of link to donate page.
+  message: Donasi
+labelFeedback:
+  description: Label of link to feedback page.
+  message: Umpan Balik
+labelAuthor:
+  description: Label of author shown in the details of a script.
+  message: 'Pembuat: '
+anchorAuthor:
+  description: Author shown on about tab.
+  message: '<a href=mailto:i@gerald.top>Gerald</a>'
+labelTranslator:
+  description: Label of translator.
+  message: 'Penerjemah: '
+anchorTranslator:
+  description: Translator shown on about tab.
+  message: '<a href=mailto:arifpedia@gmail.com>Arif Budiman</a>'
+labelCurrentLang:
+  description: Label of current language.
+  message: 'Bahasa Saat Ini: '
+labelScriptEditor:
+  description: Shown in the title of the script editing page.
+  message: Penyunting Script
+buttonCustomMeta:
+  description: Button to edit the custom meta data of a script.
+  message: Kustom meta data
+labelName:
+  description: Label of script name.
+  message: 'Nama:'
+labelRunAt:
+  description: Label of script @run-at properties in custom meta data.
+  message: 'Run-At:'
+labelRunAtDefault:
+  description: Shown when custom @run-at is not assigned.
+  message: (Baku)
+labelHomepageURL:
+  description: Label of script @homepageURL in custom meta data.
+  message: 'URL halaman rumah:'
+labelUpdateURL:
+  description: Label of script @updateURL in custom meta data.
+  message: 'URL Pembaruan:'
+labelDownloadURL:
+  description: Label of script @downloadURL in custom meta data.
+  message: 'URL Unduhan:'
+labelInclude:
+  description: Label of @include rules.
+  message: Penyertaan
+labelKeepInclude:
+  description: Option to keep the original @include rules.
+  message: Pertahankan aturan penyertaan asal
+labelCustomInclude:
+  description: Label of custom @include rules.
+  message: 'Aturan penyertaan kostum: <em>(Satu per baris)</em>'
+labelMatch:
+  description: Label of @match rules.
+  message: Kecocokan
+labelKeepMatch:
+  description: Option to keep the original @match rules.
+  message: Pertahankan aturan kecocokan asal
+labelCustomMatch:
+  description: Label of custom @match rules.
+  message: 'Aturan kecocokan kostum: <em>(Satu per baris)</em>'
+labelExclude:
+  description: Label of @exclude rules.
+  message: Pengecualian
+labelKeepExclude:
+  description: Option to keep the original @exclude rules.
+  message: Pertahankan aturan pengecualian asal
+labelCustomExclude:
+  description: Label of custom @exclude rules.
+  message: 'Aturan pengecualian kostum: <em>(Satu per baris)</em>'
+labelAllowUpdate:
+  description: Option to allow checking updates for a script.
+  message: Izinkan pembaruan
+buttonSave:
+  description: Button to save modifications of a script.
+  message: Simpan
+buttonSaveClose:
+  description: Button to save modifications of a script and then close the editing page.
+  message: Simpan & Tutup
+labelNoScripts:
+  description: Message shown when no script is installed.
+  message: 'Yaah, Anda tidak memiliki script satupun.'
+hintSupportPage:
+  description: Hint for support page.
+  message: Halaman dukungan
+  touched: false
+buttonDisable:
+  description: Button to disable a script.
+  message: Nonaktifkan
+buttonEnable:
+  description: Button to enable a script.
+  message: Aktifkan
+buttonEdit:
+  description: Button to edit a script.
+  message: Sunting
+buttonRemove:
+  description: Button to remove a script.
+  message: Hapus
+buttonUpdate:
+  description: Check a script for updates.
+  message: Periksa pembaruan
+msgImported:
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
+  message: $1 item diimpor.
+hintUseDownloadURL:
+  description: Shown as a place holder for @updateURL when it is not assigned
+  message: Gunakan @downloadURL
+confirmNotSaved:
+  description: Confirm message shown when there are unsaved script modifications.
+  message: |-
+    Modifikasi belum disimpan!
+    Klik Oke untuk menghapusnya atau batal untuk tinggal.
+buttonVacuuming:
+  description: Message shown when data vacuum is in progress.
+  message: Melakukan vakum data...
+buttonVacuumed:
+  description: Message shown when data is vacuumed.
+  message: Data tervakum
+hintVacuum:
+  description: Hint for vacuuming data.
+  message: Buang redundansi dan coba memuat ulang sumber daya yang tidak ada dalam cache.
+menuManageScripts:
+  description: 'Menu item to manage scripts, or to open the options page of the extension.'
+  message: Kelola script
+menuFindScripts:
+  description: Menu item to find scripts for a site.
+  message: Temukan script untuk situs ini
+menuScriptEnabled:
+  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  message: Script diaktifkan
+menuScriptDisabled:
+  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  message: Script dinonaktifkan
+menuBack:
+  description: Menu item to go back to main menu from script commands.
+  message: Kembali
+menuCommands:
+  description: Menu item to list script commands.
+  message: Perintah script...
+labelSearch:
+  description: Label for search input in search box.
+  message: 'Pencarian untuk: '
+labelSearchFor:
+  description: Text shown as a place holder in the search box.
+  message: Pencarian untuk...
+labelReplace:
+  description: Label for replace input in search box.
+  message: 'Ganti dengan: '
+labelReplaceWith:
+  description: Text shown as a place holder in the replace box.
+  message: Ganti dengan...
+buttonReplace:
+  description: Button to replace the current match.
+  message: Ganti
+buttonReplaceAll:
+  description: Button to replace all matches.
+  message: Semua
+labelAutoReloadCurrentTab:
+  description: Option to reload current tab after a script is switched on or off from menu.
+  message: Muat ulang tab saat ini setelah memilih hidupkan/matikan script dari menu
+hintInjectModeNormal:
+  description: Hint to explain the normal injection mode.
+  message: 'Efisien tapi gagal di beberapa halaman dengan keamanan yang tinggi, misal. https://github.com'
+  touched: false
+hintInjectModeAdvanced:
+  description: Hint to explain the advanced injection mode.
+  message: 'Bekerja di sebagian besar halaman, sebenarnya hack'
+  touched: false
+hintInputURL:
+  description: Hint for a prompt box to input URL of a user script.
+  message: 'Masukkan URL:'
+buttonInstallFromURL:
+  description: Button to ask for URL of a user script.
+  message: Pasang dari URL
+labelSync:
+  description: Label for sync options.
+  message: Sinkron
+buttonAuthorize:
+  description: Button to authorize permissions for sync.
+  message: Izinkan
+buttonAuthorizing:
+  description: Button shown when authorization is in progress.
+  message: Mengizinkan
+buttonAuthorized:
+  description: Button shown when permissions are already authorized for sync.
+  message: Diizinkan
+labelSyncTo:
+  description: Label for sync service.
+  message: Sinkron ke $1
+lastSync:
+  description: Label for last sync timestamp.
+  message: Sinkron terakhir pada $1
+msgSyncInit:
+  description: Message shown when sync service is initializing.
+  message: Sedang memulai...
+msgSyncInitError:
+  description: Message shown when sync fails in initialization.
+  message: Kesalahan saat memulai!
+msgSyncReady:
+  description: Message shown when sync will start soon.
+  message: Sinkron akan segera dimulai...
+msgSyncing:
+  description: Message shown when sync is in progress.
+  message: Sinkron dalam proses...
+msgSyncError:
+  description: Message shown when sync failed.
+  message: Kesalahan sinkron!
+msgNamespaceConflict:
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: Namespace script konflik! Silakan ubah @name dan @namespace.
+msgInvalidScript:
+  description: Message shown when script is invalid.
+  message: Script tidak valid!
