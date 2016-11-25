@@ -122,13 +122,14 @@ function exportData(selectedIds) {
   }
   if (!selectedIds.length) return;
   var withValues = _.options.get('exportValues');
-  _.sendMessage({
+  return _.sendMessage({
     cmd: 'ExportZip',
     data: {
       values: withValues,
       ids: selectedIds,
     }
-  }).then(function (data) {
+  })
+  .then(function (data) {
     var names = {};
     var vm = {
       scripts: {},
@@ -157,7 +158,8 @@ function exportData(selectedIds) {
       content: JSON.stringify(vm),
     });
     return files;
-  }).then(function (files) {
+  })
+  .then(function (files) {
     return files.reduce(function (result, file) {
       return result.then(function (writer) {
         return addFile(writer, file);
@@ -228,7 +230,7 @@ module.exports = {
     exportData: function () {
       var _this = this;
       _this.exporting = true;
-      exportData(_this.selectedIds)
+      Promise.resolve(exportData(_this.selectedIds))
       .catch(_.noop)
       .then(function () {
         _this.exporting = false;
