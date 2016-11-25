@@ -3,7 +3,6 @@ var Edit = require('./edit');
 var cache = require('../../cache');
 var _ = require('../../common');
 var utils = require('../utils');
-var events = utils.events;
 var store = utils.store;
 
 module.exports = {
@@ -82,13 +81,5 @@ module.exports = {
         _this.store.scripts = seq.concat.apply([], seq);
       });
     },
-  },
-  created: function () {
-    events.$on('EditScript', this.editScript);
-    events.$on('MoveScript', this.moveScript);
-  },
-  beforeDestroy: function () {
-    events.$off('EditScript', this.editScript);
-    events.$off('MoveScript', this.moveScript);
   },
 };

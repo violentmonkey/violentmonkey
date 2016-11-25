@@ -1,7 +1,5 @@
 var cache = require('../../cache');
 var _ = require('../../common');
-var utils = require('../utils');
-var events = utils.events;
 
 module.exports = {
   props: ['service'],
@@ -57,7 +55,7 @@ module.exports = {
       _.sendMessage({cmd: 'Authenticate', data: this.service.name});
     },
     update: function (e) {
-      e.target.checked && events.$emit('EnableService', this.service.name);
+      e.target.checked && this.$emit('service-checked', this.service.name);
     },
   },
 };

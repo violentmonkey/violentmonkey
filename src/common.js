@@ -89,18 +89,25 @@ _.options = function () {
     return keys.length > 1 ? _.object.get(obj, keys.slice(1), def) : obj;
   }
 
+  function fire(hkey, key, value) {
+    var group = hooks[hkey];
+    group && group.forEach(function (cb) {
+      cb(value, key);
+    });
+  }
+
   function setOption(key, value) {
     var keys = normalizeKeys(key);
+    var optionKey = keys.join('.');
+    var optionValue = value;
     key = keys[0];
     if (key in defaults) {
       if (keys.length > 1) {
-        value = _.object.set(getOption(key), keys.slice(1), value);
+        optionValue = _.object.set(getOption(key), keys.slice(1), value);
       }
-      localStorage.setItem(key, JSON.stringify(value));
-      [hooks[key], hooks['']].forEach(function (group) {
-        group && group.forEach(function (cb) {
-          cb(value, key);
-        });
+      localStorage.setItem(key, JSON.stringify(optionValue));
+      [optionKey, key, ''].forEach(function (hkey) {
+        fire(hkey, optionKey, value);
       });
     }
   }

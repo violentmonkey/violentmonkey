@@ -27,7 +27,6 @@ function routeTester(paths) {
 
 exports.routeTester = routeTester;
 exports.store = {};
-exports.events = new Vue;
 exports.features = require('./features');
 
 require('./dropdown');

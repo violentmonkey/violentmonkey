@@ -2,7 +2,6 @@ var utils = require('../utils');
 var cache = require('../../cache');
 var _ = require('../../common');
 var store = utils.store;
-var events = utils.events;
 
 var DEFAULT_ICON = '/images/icon48.png';
 
@@ -84,7 +83,7 @@ module.exports = {
     }(),
     onEdit: function () {
       var _this = this;
-      events.$emit('EditScript', _this.script.id);
+      _this.$emit('edit', _this.script.id);
     },
     onRemove: function () {
       var _this = this;
@@ -110,8 +109,9 @@ module.exports = {
       });
     },
     onDragStart: function (e) {
+      var _this = this;
       new DND(e, function (data) {
-        events.$emit('MoveScript', data);
+        _this.$emit('move', data);
       });
     },
   },

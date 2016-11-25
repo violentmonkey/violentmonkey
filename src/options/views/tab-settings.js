@@ -172,7 +172,6 @@ var Message = require('./message');
 var SyncService = require('./sync-service');
 var utils = require('../utils');
 var store = utils.store;
-var events = utils.events;
 var cache = require('../../cache');
 var _ = require('../../common');
 
@@ -197,10 +196,6 @@ module.exports = {
   },
   created: function () {
     this.updateSelection(true);
-    events.$on('EnableService', this.onEnableService);
-  },
-  beforeDestroy: function () {
-    events.$off('EnableService', this.onEnableService);
   },
   methods: {
     updateAutoUpdate: function () {
@@ -249,7 +244,7 @@ module.exports = {
     onEnableService: function (name) {
       store.sync.forEach(function (service) {
         if (service.name !== name) {
-          var key = service.name + 'Enabled';
+          var key = service.name + '.enabled';
           var enabled = _.options.get(key);
           if (enabled) {
             _.options.set(key, false);

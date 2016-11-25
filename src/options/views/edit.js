@@ -17,7 +17,7 @@ var cache = require('../../cache');
 var _ = require('../../common');
 
 module.exports = {
-  props: ['script', 'onClose'],
+  props: ['script'],
   template: cache.get('./edit.html'),
   components: {
     Editor: Editor,
@@ -127,7 +127,7 @@ module.exports = {
     close: function () {
       var _this = this;
       if (!_this.canSave || confirm(_.i18n('confirmNotSaved'))) {
-        _this.onClose();
+        _this.$emit('close');
       }
     },
     saveClose: function () {
