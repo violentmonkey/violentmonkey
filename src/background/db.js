@@ -423,7 +423,7 @@ VMDB.prototype.vacuum = function () {
       };
       data.ids = scripts.map(function (script) {
         script.meta.require.forEach(function (uri) {data.require[uri] = 1;});
-        Object.keys(scripts.meta.resources).forEach(function (key) {
+        Object.keys(script.meta.resources).forEach(function (key) {
           data.cache[script.meta.resources[key]] = 1;
         });
         if (scriptUtils.isRemote(script.meta.icon))
