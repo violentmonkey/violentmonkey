@@ -19,17 +19,18 @@
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-cssnano": "^2.1.2",
-    "gulp-eslint": "^2.0.0",
+    "gulp-eslint": "^3.0.1",
     "gulp-filter": "^4.0.0",
     "gulp-svg-sprite": "^1.2.19",
-    "gulp-uglify": "^1.5.3",
+    "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.7",
-    "html-minifier": "^2.1.0",
+    "html-minifier": "^3.2.3",
     "js-yaml": "^3.5.5",
     "merge2": "^1.0.2",
     "mocha": "^3.1.2",
     "ncp": "^2.0.0",
-    "through2": "^2.0.1"
+    "through2": "^2.0.3",
+    "vue": "^2.1.6"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {
