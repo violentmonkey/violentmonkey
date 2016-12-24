@@ -155,6 +155,7 @@ _.options = function () {
     autoUpdate: true,
     ignoreGrant: false,
     lastUpdate: 0,
+    showBadge: true,
     exportValues: true,
     closeAfterInstall: false,
     trackLocalFile: false,

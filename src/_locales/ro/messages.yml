@@ -384,3 +384,6 @@ msgNamespaceConflict:
 msgInvalidScript:
   description: Message shown when script is invalid.
   message: ''
+labelShowBadge:
+  description: Option to show number of running scripts on the badge
+  message: ''

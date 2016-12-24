@@ -3,7 +3,9 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: Dukungan userscript untuk peramban berbasis Chromium seperti Opera dan Chrome.
+  message: >-
+    Dukungan userscript untuk peramban berbasis Chromium seperti Opera dan
+    Chrome.
 extTranslator:
   description: Information of the translator.
   message: Arif Budiman <arifpedia@gmail.com>
@@ -283,7 +285,9 @@ buttonVacuumed:
   message: Data tervakum
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Buang redundansi dan coba memuat ulang sumber daya yang tidak ada dalam cache.
+  message: >-
+    Buang redundansi dan coba memuat ulang sumber daya yang tidak ada dalam
+    cache.
 menuManageScripts:
   description: 'Menu item to manage scripts, or to open the options page of the extension.'
   message: Kelola script
@@ -325,7 +329,9 @@ labelAutoReloadCurrentTab:
   message: Muat ulang tab saat ini setelah memilih hidupkan/matikan script dari menu
 hintInjectModeNormal:
   description: Hint to explain the normal injection mode.
-  message: 'Efisien tapi gagal di beberapa halaman dengan keamanan yang tinggi, misal. https://github.com'
+  message: >-
+    Efisien tapi gagal di beberapa halaman dengan keamanan yang tinggi, misal.
+    https://github.com
   touched: false
 hintInjectModeAdvanced:
   description: Hint to explain the advanced injection mode.
@@ -378,3 +384,6 @@ msgNamespaceConflict:
 msgInvalidScript:
   description: Message shown when script is invalid.
   message: Script tidak valid!
+labelShowBadge:
+  description: Option to show number of running scripts on the badge
+  message: ''
