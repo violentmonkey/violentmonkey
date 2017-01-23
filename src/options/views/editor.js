@@ -37,6 +37,7 @@ function addCSS(data) {
 function initCodeMirror() {
   addCSS([
     {href: '/lib/CodeMirror/lib/codemirror.css'},
+    {href: '/lib/CodeMirror/theme/eclipse.css'},
     {href: '/mylib/CodeMirror/fold.css'},
     {href: '/mylib/CodeMirror/search.css'},
   ]);
@@ -86,6 +87,7 @@ module.exports = {
         styleActiveLine: true,
         foldGutter: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+        theme: 'eclipse',
       });
       _this.readonly && editor.setOption('readOnly', _this.readonly);
       editor.on('change', function () {

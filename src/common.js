@@ -19,6 +19,9 @@ polyfill(Object, 'assign', function () {
 polyfill(String.prototype, 'startsWith', function (str) {
   return this.slice(0, str.length) === str;
 });
+polyfill(String.prototype, 'endsWith', function (str) {
+  return this.slice(-str.length) === str;
+});
 polyfill(Array.prototype, 'findIndex', function (predicate) {
   var length = this.length;
   for (var i = 0; i < length; i ++) {
@@ -152,6 +155,7 @@ _.options = function () {
     autoUpdate: true,
     ignoreGrant: false,
     lastUpdate: 0,
+    showBadge: true,
     exportValues: true,
     closeAfterInstall: false,
     trackLocalFile: false,

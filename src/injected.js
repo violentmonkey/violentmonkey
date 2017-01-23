@@ -603,7 +603,11 @@ var comm = {
       ];
       comm.forEach(require, function (key) {
         var script = data.require[key];
-        script && code.push(script);
+        if (script) {
+          code.push(script);
+          // Add `;` to a new line in case script ends with comment lines
+          code.push(';');
+        }
       });
       // wrap code to make 'use strict' work
       code.push('!function(){' + script.code + '\n}.call(this)');

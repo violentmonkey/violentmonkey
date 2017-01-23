@@ -10,6 +10,7 @@ html {
 }
 body {
   height: 100%;
+  font-size: 1em;
 }
 h1 {
   font-size: 1.5rem;

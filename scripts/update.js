@@ -32,6 +32,7 @@ const LIB_DIR = 'src/public/lib';
 const mappings = {
   CodeMirror: 'codemirror',
   'define.js': 'define-commonjs',
+  'vue.min.js': 'vue/dist',
 };
 
 function updateFile(dest, src) {

@@ -237,8 +237,9 @@ var setBadge = function () {
       color: '#808',
       tabId: src.tab.id,
     });
+    var text = (_.options.get('showBadge') && o.num || '').toString();
     chrome.browserAction.setBadgeText({
-      text: (o.num || '').toString(),
+      text: text,
       tabId: src.tab.id,
     });
     if (o.timer) clearTimeout(o.timer);
