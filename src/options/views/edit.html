@@ -1,6 +1,6 @@
-<div class="frame edit">
-  <div class="frame-header">
-    <div class="buttons">
+<div class="edit flex flex-col fixed-full">
+  <div class="frame-block">
+    <div class="buttons float-right">
       <div v-dropdown>
         <button dropdown-toggle v-text="i18n('buttonCustomMeta')"></button>
         <div class="dropdown-menu">
@@ -79,7 +79,25 @@
     </div>
     <h2 v-text="i18n('labelScriptEditor')"></h2>
   </div>
-  <div class="frame-footer">
+  <div class="frame-block flex-auto">
+    <editor :content="code" @change="contentChange" @ready="initEditor" :commands="commands"></editor>
+  </div>
+  <div class="frame-block" v-show="search.show">
+    <button class="float-right" @click="clearSearch">&times;</button>
+    <form class="inline-block" @submit.prevent="findNext()">
+      <span v-text="i18n('labelSearch')"></span>
+      <input ref="search" :placeholder="i18n('labelSearchFor')" v-model="search.state.query">
+      <button type="button" @click="findNext(1)">&lt;</button>
+      <button type="submit">&gt;</button>
+    </form>
+    <form class="inline-block" @submit.prevent="replace()">
+      <span v-text="i18n('labelReplace')"></span>
+      <input :placeholder="i18n('labelReplaceWith')" v-model="search.state.replace">
+      <button type="submit" v-text="i18n('buttonReplace')"></button>
+      <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
+    </form>
+  </div>
+  <div class="frame-block">
     <div class="pull-right">
       <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
       <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
@@ -89,8 +107,5 @@
       <input type=checkbox v-model="update">
       <span v-text="i18n('labelAllowUpdate')"></span>
     </label>
-  </div>
-  <div class=frame-body>
-    <editor :on-save="save" :on-exit="close" :on-change="contentChange" :content="code"></editor>
   </div>
 </div>
