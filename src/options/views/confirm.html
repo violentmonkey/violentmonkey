@@ -1,6 +1,6 @@
-<div>
-  <div class=frame-header>
-    <div class=buttons>
+<div class="flex flex-col h-100">
+  <div class="frame-block">
+    <div class="buttons pull-right">
       <div v-dropdown>
         <button dropdown-toggle v-text="i18n('buttonInstallOptions')"></button>
         <div class="dropdown-menu options-panel" @mousedown.stop>
@@ -22,7 +22,7 @@
     <div class="ellipsis confirm-url" :title="params.url">{{params.url}}</div>
     <div class="ellipsis confirm-msg">{{message}}</div>
   </div>
-  <div class=frame-body>
-    <editor readonly :on-exit="close" :content="code"></editor>
+  <div class="frame-block flex-auto">
+    <editor readonly :content="code" :commands="commands"></editor>
   </div>
 </div>

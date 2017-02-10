@@ -312,12 +312,14 @@ labelSearch:
 labelSearchFor:
   description: Text shown as a place holder in the search box.
   message: Caută...
+  touched: false
 labelReplace:
   description: Label for replace input in search box.
   message: 'Înlocuiește cu: '
 labelReplaceWith:
   description: Text shown as a place holder in the replace box.
   message: Înlocuiește cu...
+  touched: false
 buttonReplace:
   description: Button to replace the current match.
   message: Înlocuiește
@@ -385,5 +387,8 @@ msgInvalidScript:
   description: Message shown when script is invalid.
   message: ''
 labelShowBadge:
-  description: Option to show number of running scripts on the badge
+  description: Option to show number of running scripts on the badge.
+  message: ''
+labelLineNumber:
+  description: Label for line number jumper.
   message: ''

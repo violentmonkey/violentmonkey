@@ -17,6 +17,9 @@ module.exports = {
       require: {},
       resources: {},
       closeAfterInstall: _.options.get('closeAfterInstall'),
+      commands: {
+        cancel: this.close,
+      },
     };
   },
   computed: {

@@ -34,16 +34,24 @@ function addCSS(data) {
   data.forEach(add);
 }
 
+function getHandler(key) {
+  return function (cm) {
+    var commands = cm.state.commands;
+    var handle = commands && commands[key];
+    return handle && handle();
+  };
+}
+
 function initCodeMirror() {
   addCSS([
     {href: '/lib/CodeMirror/lib/codemirror.css'},
     {href: '/lib/CodeMirror/theme/eclipse.css'},
     {href: '/mylib/CodeMirror/fold.css'},
-    {href: '/mylib/CodeMirror/search.css'},
   ]);
   return addScripts(
     {src: '/lib/CodeMirror/lib/codemirror.js'}
-  ).then(function () {
+  )
+  .then(function () {
     return addScripts([
       {src: '/lib/CodeMirror/mode/javascript/javascript.js'},
       {src: '/lib/CodeMirror/addon/comment/continuecomment.js'},
@@ -56,8 +64,14 @@ function initCodeMirror() {
       {src: '/lib/CodeMirror/addon/search/match-highlighter.js'},
       {src: '/lib/CodeMirror/addon/search/searchcursor.js'},
       {src: '/lib/CodeMirror/addon/selection/active-line.js'},
-      {src: '/mylib/CodeMirror/search.js'},
     ]);
+  })
+  .then(function () {
+    [
+      'save', 'cancel', 'find', 'findNext', 'findPrev', 'replace', 'replaceAll',
+    ].forEach(function (key) {
+      CodeMirror.commands[key] = getHandler(key);
+    });
   });
 }
 
@@ -67,16 +81,14 @@ var readyCodeMirror = initCodeMirror();
 module.exports = {
   props: [
     'readonly',
-    'onExit',
-    'onSave',
-    'onChange',
     'content',
+    'commands',
   ],
   template: cache.get('./editor.html'),
   mounted: function () {
     var _this = this;
     readyCodeMirror.then(function () {
-      var editor = _this.editor = CodeMirror(_this.$el, {
+      var cm = _this.cm = CodeMirror(_this.$el, {
         continueComments: true,
         matchBrackets: true,
         autoCloseBrackets: true,
@@ -89,20 +101,20 @@ module.exports = {
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
         theme: 'eclipse',
       });
-      _this.readonly && editor.setOption('readOnly', _this.readonly);
-      editor.on('change', function () {
-        _this.cachedContent = editor.getValue();
-        _this.onChange && _this.onChange(_this.cachedContent);
+      _this.readonly && cm.setOption('readOnly', _this.readonly);
+      cm.on('change', function () {
+        _this.cachedContent = cm.getValue();
+        _this.$emit('change', _this.cachedContent);
       });
-      var extraKeys = {};
-      if (_this.onExit) {
-        extraKeys.Esc = _this.onExit;
-      }
-      if (_this.onSave) {
-        extraKeys['Ctrl-S'] = extraKeys['Cmd-S'] = _this.onSave;
-      }
-      editor.setOption('extraKeys', extraKeys);
+      cm.state.commands = _this.commands;
+      cm.setOption('extraKeys', {
+        Esc: 'cancel',
+      });
+      cm.on('keyHandled', function (_cm, _name, e) {
+        e.stopPropagation();
+      });
       _this.update();
+      _this.$emit('ready', cm);
     });
   },
   watch: {
@@ -117,10 +129,11 @@ module.exports = {
   methods: {
     update: function () {
       var _this = this;
-      if (!_this.editor || _this.cachedContent == null) return;
-      _this.editor.setValue(_this.cachedContent);
-      _this.editor.getDoc().clearHistory();
-      _this.editor.focus();
+      var cm = _this.cm;
+      if (!cm || _this.cachedContent == null) return;
+      cm.setValue(_this.cachedContent);
+      cm.getDoc().clearHistory();
+      cm.focus();
     },
   },
 };
