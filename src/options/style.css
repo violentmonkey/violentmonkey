@@ -42,6 +42,9 @@ hr {
 .pull-right {
   float: right;
 }
+.inline-block {
+  display: inline-block;
+}
 .flex {
   display: flex;
 }
@@ -205,13 +208,6 @@ fieldset.title {
 }
 .frame-block {
   padding: .5rem;
-}
-.frame-header > .buttons {
-  float: right;
-  margin-top: 1rem;
-}
-.inline-block {
-  display: inline-block;
 }
 .options-panel label {
   display: block;

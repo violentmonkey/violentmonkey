@@ -129,10 +129,11 @@ module.exports = {
   methods: {
     update: function () {
       var _this = this;
-      if (!_this.cm || _this.cachedContent == null) return;
-      _this.cm.setValue(_this.cachedContent);
-      _this.cm.getDoc().clearHistory();
-      _this.cm.focus();
+      var cm = _this.cm;
+      if (!cm || _this.cachedContent == null) return;
+      cm.setValue(_this.cachedContent);
+      cm.getDoc().clearHistory();
+      cm.focus();
     },
   },
 };

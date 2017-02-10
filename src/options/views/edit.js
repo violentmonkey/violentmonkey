@@ -243,6 +243,7 @@ module.exports = {
         state.posFrom = state.posTo = null;
         _this.search.show = false;
       });
+      cm.focus();
     },
     replace: function (all) {
       var _this = this;
