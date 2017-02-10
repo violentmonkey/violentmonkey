@@ -23,6 +23,6 @@
     <div class="ellipsis confirm-msg">{{message}}</div>
   </div>
   <div class="frame-block flex-auto">
-    <editor readonly :on-exit="close" :content="code"></editor>
+    <editor readonly :content="code" :commands="commands"></editor>
   </div>
 </div>
