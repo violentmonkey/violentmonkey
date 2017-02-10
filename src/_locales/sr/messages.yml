@@ -310,12 +310,14 @@ labelSearch:
 labelSearchFor:
   description: Text shown as a place holder in the search box.
   message: Претрага...
+  touched: false
 labelReplace:
   description: Label for replace input in search box.
   message: 'Замени са:'
 labelReplaceWith:
   description: Text shown as a place holder in the replace box.
   message: Замени са...
+  touched: false
 buttonReplace:
   description: Button to replace the current match.
   message: Замени
@@ -383,5 +385,8 @@ msgInvalidScript:
   description: Message shown when script is invalid.
   message: ''
 labelShowBadge:
-  description: Option to show number of running scripts on the badge
+  description: Option to show number of running scripts on the badge.
+  message: ''
+labelLineNumber:
+  description: Label for line number jumper.
   message: ''

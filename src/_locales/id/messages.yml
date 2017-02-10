@@ -312,12 +312,14 @@ labelSearch:
 labelSearchFor:
   description: Text shown as a place holder in the search box.
   message: Pencarian untuk...
+  touched: false
 labelReplace:
   description: Label for replace input in search box.
   message: 'Ganti dengan: '
 labelReplaceWith:
   description: Text shown as a place holder in the replace box.
   message: Ganti dengan...
+  touched: false
 buttonReplace:
   description: Button to replace the current match.
   message: Ganti
@@ -385,5 +387,8 @@ msgInvalidScript:
   description: Message shown when script is invalid.
   message: Script tidak valid!
 labelShowBadge:
-  description: Option to show number of running scripts on the badge
+  description: Option to show number of running scripts on the badge.
+  message: ''
+labelLineNumber:
+  description: Label for line number jumper.
   message: ''
