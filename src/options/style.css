@@ -42,6 +42,32 @@ hr {
 .pull-right {
   float: right;
 }
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.flex-auto {
+  height: 0;
+  flex: auto;
+}
+.mr-1 {
+  margin-right: 1em;
+}
+.h-100 {
+  height: 100%;
+}
+.w-1 {
+  width: 4em;
+}
+.fixed-full {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
 .ellipsis {
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -176,29 +202,6 @@ fieldset.title {
   margin: .1rem .2rem;
   padding: 0 .3rem;
   box-shadow: 0 0 1px black;
-}
-.flex {
-  display: flex;
-}
-.flex-col {
-  flex-direction: column;
-}
-.flex-auto {
-  height: 0;
-  flex: auto;
-}
-.float-right {
-  float: right;
-}
-.h-100 {
-  height: 100%;
-}
-.fixed-full {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 .frame-block {
   padding: .5rem;

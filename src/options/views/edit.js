@@ -288,5 +288,12 @@ module.exports = {
     unbindKeys: function () {
       window.removeEventListener('keydown', this.onKeyDown, false);
     },
+    goToLine: function () {
+      var _this = this;
+      var line = _this.search.line - 1;
+      var cm = _this.cm;
+      !isNaN(line) && cm.setCursor(line, 0);
+      cm.focus();
+    },
   },
 };
