@@ -90,15 +90,15 @@
     </form>
     <form class="inline-block mr-1" @submit.prevent="findNext()">
       <span v-text="i18n('labelSearch')"></span>
-      <input ref="search" v-model="search.state.query">
-      <button type="button" @click="findNext(1)">&lt;</button>
-      <button type="submit">&gt;</button>
+      <input ref="search" v-model="search.state.query" title="Ctrl-F">
+      <button type="button" @click="findNext(1)" title="Shift-Ctrl-G">&lt;</button>
+      <button type="submit" title="Ctrl-G">&gt;</button>
     </form>
     <form class="inline-block mr-1" @submit.prevent="replace()">
       <span v-text="i18n('labelReplace')"></span>
       <input v-model="search.state.replace">
-      <button type="submit" v-text="i18n('buttonReplace')"></button>
-      <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
+      <button type="submit" v-text="i18n('buttonReplace')" title="Shift-Ctrl-F"></button>
+      <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)" title="Shift-Ctrl-R"></button>
     </form>
   </div>
   <div class="frame-block">
