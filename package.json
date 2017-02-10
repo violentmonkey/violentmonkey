@@ -1,5 +1,5 @@
 {
-  "name": "Violentmonkey",
+  "name": "violentmonkey",
   "version": "2.5.2",
   "scripts": {
     "prebuild": "gulp clean",
@@ -12,8 +12,6 @@
   },
   "description": "Violentmonkey",
   "devDependencies": {
-    "codemirror": "^5.14.2",
-    "define-commonjs": "^1.0.0",
     "del": "^2.2.0",
     "glob": "^7.0.3",
     "gulp": "^3.9.1",
@@ -29,8 +27,7 @@
     "merge2": "^1.0.2",
     "mocha": "^3.1.2",
     "ncp": "^2.0.0",
-    "through2": "^2.0.3",
-    "vue": "^2.1.6"
+    "through2": "^2.0.3"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {
@@ -41,5 +38,10 @@
     "url": "https://github.com/violentmonkey/violentmonkey/issues"
   },
   "homepage": "https://github.com/violentmonkey/violentmonkey",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "codemirror": "^5.23.0",
+    "define-commonjs": "^1.0.0",
+    "vue": "^2.1.10"
+  }
 }
