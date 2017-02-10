@@ -49,7 +49,6 @@ hr {
 }
 .dropdown {
   position: relative;
-  cursor: pointer;
   display: inline-block;
 }
 .dropdown:not(.open) .dropdown-menu {

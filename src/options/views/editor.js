@@ -110,6 +110,9 @@ module.exports = {
       cm.setOption('extraKeys', {
         Esc: 'cancel',
       });
+      cm.on('keyHandled', function (_cm, _name, e) {
+        e.stopPropagation();
+      });
       _this.update();
       _this.$emit('ready', cm);
     });

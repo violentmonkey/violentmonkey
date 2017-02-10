@@ -220,7 +220,7 @@ module.exports = {
     find: function () {
       var _this = this;
       var state = _this.search.state;
-      state.posFrom = state.posTo = null;
+      state.posTo = state.posFrom;
       _this.findNext();
     },
     findNext: function (reversed) {
@@ -229,14 +229,11 @@ module.exports = {
       var cm = _this.cm;
       if (state.query) {
         findNext(cm, state, reversed);
-        return;
       }
-      if (!_this.search.show) {
-        _this.search.show = true;
-        _this.$nextTick(function () {
-          _this.$refs.search.focus();
-        });
-      }
+      _this.search.show = true;
+      _this.$nextTick(function () {
+        _this.$refs.search.focus();
+      });
     },
     clearSearch: function () {
       var _this = this;
@@ -257,11 +254,39 @@ module.exports = {
       }
       (all ? replaceAll : replaceOne)(cm, state);
     },
+    onKeyDown: function (e) {
+      var _this = this;
+      var cm = _this.cm;
+      var name = CodeMirror.keyName(e);
+      var commands = [
+        'cancel',
+        'find',
+        'findNext',
+        'findPrev',
+        'replace',
+        'replaceAll',
+      ];
+      [
+        cm.options.extraKeys,
+        cm.options.keyMap,
+      ].some(function (keyMap) {
+        var stop = false;
+        keyMap && CodeMirror.lookupKey(name, keyMap, function (b) {
+          if (~commands.indexOf(b)) {
+            e.preventDefault();
+            e.stopPropagation();
+            cm.execCommand(b);
+            stop = true;
+          }
+        }, cm);
+        return stop;
+      });
+    },
     bindKeys: function () {
-
+      window.addEventListener('keydown', this.onKeyDown, false);
     },
     unbindKeys: function () {
-
+      window.removeEventListener('keydown', this.onKeyDown, false);
     },
   },
 };
