@@ -22,7 +22,7 @@
     <div class="ellipsis confirm-url" :title="params.url">{{params.url}}</div>
     <div class="ellipsis confirm-msg">{{message}}</div>
   </div>
-  <div class="frame-block flex-auto">
-    <editor readonly :content="code" :commands="commands"></editor>
+  <div class="frame-block flex-auto p-rel">
+    <editor class="abs-full" readonly :content="code" :commands="commands"></editor>
   </div>
 </div>

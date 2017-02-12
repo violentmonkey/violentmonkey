@@ -55,6 +55,9 @@ hr {
   height: 0;
   flex: auto;
 }
+.p-rel {
+  position: relative;
+}
 .mr-1 {
   margin-right: 1em;
 }
@@ -66,6 +69,12 @@ hr {
 }
 .fixed-full {
   position: fixed;
+}
+.abs-full {
+  position: absolute;
+}
+.fixed-full,
+.abs-full {
   top: 0;
   left: 0;
   right: 0;
@@ -215,6 +224,8 @@ fieldset.title {
 .editor-code,
 .editor-code .CodeMirror {
   height: 100%;
+  /* Use `Courier New` to ensure `&nbsp;` has the same width as an original space. */
+  font-family: Courier New, Courier, monospace;
 }
 .confirm-url {
   float: left;
