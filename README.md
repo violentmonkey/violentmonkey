@@ -13,3 +13,13 @@ $ npm i
 $ npm run dev
 # Then load the extension from 'dist/'.
 ```
+
+Build
+---
+``` sh
+# Build without compression
+$ npm run build
+
+# Build a compressed version
+$ npm run build --production
+```
