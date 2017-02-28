@@ -8,5 +8,5 @@
   <button :disabled="disableSync" class="sync-start" @click="retry">
     <svg class="icon"><use xlink:href="#refresh"/></svg>
   </button>
-  <span>{{message}}</span>
+  <span v-text="message"></span>
 </div>

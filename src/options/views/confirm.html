@@ -19,8 +19,8 @@
       <button v-text="i18n('buttonClose')" @click="close"></button>
     </div>
     <h1><span v-text="i18n('labelInstall')"></span> - <span v-text="i18n('extName')"></span></h1>
-    <div class="ellipsis confirm-url" :title="params.url">{{params.url}}</div>
-    <div class="ellipsis confirm-msg">{{message}}</div>
+    <div class="ellipsis confirm-url" :title="params.url" v-text="params.url"></div>
+    <div class="ellipsis confirm-msg" v-text="message"></div>
   </div>
   <div class="frame-block flex-auto p-rel">
     <editor class="abs-full" readonly :content="code" :commands="commands"></editor>
