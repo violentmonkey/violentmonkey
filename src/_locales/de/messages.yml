@@ -141,6 +141,7 @@ labelDataExport:
 labelScriptsToExport:
   description: Label shown on top of the script list for export.
   message: Skripte
+  touched: false
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Skriptdaten exportieren
@@ -385,4 +386,19 @@ labelShowBadge:
   message: ''
 labelLineNumber:
   description: Label for line number jumper.
+  message: ''
+msgSavedSecurity:
+  description: Message shown when settings of security section are saved.
+  message: ''
+labelBlacklist:
+  description: Label for global blacklist settings in security section.
+  message: ''
+descBlacklist:
+  description: HTML Description for the global blacklist.
+  message: ''
+buttonSaveBlacklist:
+  description: Button to save global blacklist.
+  message: ''
+labelGeneral:
+  description: Label for general settings.
   message: ''

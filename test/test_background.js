@@ -12,8 +12,8 @@ describe('tester', () => {
           ],
         }
       };
-      assert.ok(tester.testURL('https://www.google.com/', script), 'should match `http | https`');
-      assert.ok(!tester.testURL('file:///Users/Gerald/file', script), 'should not match `file`');
+      assert.ok(tester.testScript('https://www.google.com/', script), 'should match `http | https`');
+      assert.ok(!tester.testScript('file:///Users/Gerald/file', script), 'should not match `file`');
     });
 
     it('should match exact', () => {
@@ -27,10 +27,10 @@ describe('tester', () => {
           ],
         },
       };
-      assert.ok(tester.testURL('http://www.google.com/', script), 'should match `http`');
-      assert.ok(!tester.testURL('https://www.google.com/', script), 'should not match `https`');
-      assert.ok(tester.testURL('file:///Users/Gerald/file', script), 'should match `file`');
-      assert.ok(tester.testURL('ftp://example.com/file', script), 'should match `ftp`');
+      assert.ok(tester.testScript('http://www.google.com/', script), 'should match `http`');
+      assert.ok(!tester.testScript('https://www.google.com/', script), 'should not match `https`');
+      assert.ok(tester.testScript('file:///Users/Gerald/file', script), 'should match `file`');
+      assert.ok(tester.testScript('ftp://example.com/file', script), 'should match `ftp`');
     });
   });
 
@@ -44,9 +44,9 @@ describe('tester', () => {
           ],
         },
       };
-      assert.ok(tester.testURL('https://docs.google.com/', script), 'should match exact domain name');
-      assert.ok(!tester.testURL('https://sub.docs.google.com/', script), 'should not match subdomains');
-      assert.ok(!tester.testURL('https://docs.google.com.cn/', script), 'should not match suffixed domains');
+      assert.ok(tester.testScript('https://docs.google.com/', script), 'should match exact domain name');
+      assert.ok(!tester.testScript('https://sub.docs.google.com/', script), 'should not match subdomains');
+      assert.ok(!tester.testScript('https://docs.google.com.cn/', script), 'should not match suffixed domains');
     });
 
     it('should match subdomains', () => {
@@ -58,10 +58,10 @@ describe('tester', () => {
           ],
         },
       };
-      assert.ok(tester.testURL('https://www.google.com/', script), 'should match subdomains');
-      assert.ok(tester.testURL('https://a.b.google.com/', script), 'should match subdomains');
-      assert.ok(tester.testURL('https://google.com/', script), 'should match specified domain');
-      assert.ok(!tester.testURL('https://www.google.com.hk/', script), 'should not match suffixed domains');
+      assert.ok(tester.testScript('https://www.google.com/', script), 'should match subdomains');
+      assert.ok(tester.testScript('https://a.b.google.com/', script), 'should match subdomains');
+      assert.ok(tester.testScript('https://google.com/', script), 'should match specified domain');
+      assert.ok(!tester.testScript('https://www.google.com.hk/', script), 'should not match suffixed domains');
     });
   });
 
@@ -75,8 +75,8 @@ describe('tester', () => {
           ],
         },
       };
-      assert.ok(tester.testURL('https://www.google.com/', script), 'should match `/`');
-      assert.ok(tester.testURL('https://www.google.com/hello/world', script), 'should match any');
+      assert.ok(tester.testScript('https://www.google.com/', script), 'should match `/`');
+      assert.ok(tester.testScript('https://www.google.com/hello/world', script), 'should match any');
     });
 
     it('should match exact', () => {
@@ -88,8 +88,8 @@ describe('tester', () => {
           ],
         },
       };
-      assert.ok(tester.testURL('https://www.google.com/a/b/c', script), 'should match exact');
-      assert.ok(!tester.testURL('https://www.google.com/a/b/c/d', script), 'should match exact');
+      assert.ok(tester.testScript('https://www.google.com/a/b/c', script), 'should match exact');
+      assert.ok(!tester.testScript('https://www.google.com/a/b/c/d', script), 'should match exact');
     });
   });
 });

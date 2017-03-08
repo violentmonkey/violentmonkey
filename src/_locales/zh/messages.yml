@@ -141,6 +141,7 @@ labelDataExport:
 labelScriptsToExport:
   description: Label shown on top of the script list for export.
   message: 要导出的脚本
+  touched: false
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: 导出脚本数据
@@ -388,3 +389,18 @@ labelShowBadge:
 labelLineNumber:
   description: Label for line number jumper.
   message: 行号：
+msgSavedSecurity:
+  description: Message shown when settings of security section are saved.
+  message: 黑名单已更新。
+labelBlacklist:
+  description: Label for global blacklist settings in security section.
+  message: 黑名单
+descBlacklist:
+  description: HTML Description for the global blacklist.
+  message: 此列表匹配的URL将不会被注入脚本。每行都是一条<code>@exclude</code>规则但是将用于全局。
+buttonSaveBlacklist:
+  description: Button to save global blacklist.
+  message: 保存
+labelGeneral:
+  description: Label for general settings.
+  message: 通用

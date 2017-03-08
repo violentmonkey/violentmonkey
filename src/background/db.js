@@ -126,7 +126,7 @@ VMDB.prototype.getScriptsByURL = function (url) {
       var require = {};
       var cache = {};
       data.scripts = scripts.filter(function (script) {
-        if (tester.testURL(url, script)) {
+        if (!tester.testBlacklist(url) && tester.testScript(url, script)) {
           data.uris.push(script.uri);
           script.meta.require.forEach(function (key) {
             require[key] = 1;

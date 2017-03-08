@@ -1,0 +1,8 @@
+<section v-feature="'blacklist'">
+  <h3 v-text="i18n('labelBlacklist')">
+    <span class="feature-text"></span>
+  </h3>
+  <p v-html="i18n('descBlacklist')"></p>
+  <textarea class="text-list" v-model="rules"></textarea>
+  <button v-text="i18n('buttonSaveBlacklist')" @click="onSave"></button>
+</section>
