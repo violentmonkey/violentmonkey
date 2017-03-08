@@ -37,7 +37,9 @@ polyfill(Array.prototype, 'find', function (predicate) {
 // Polyfill end
 
 var _ = exports;
-_.i18n = chrome.i18n.getMessage;
+_.i18n = function (name, args) {
+  return chrome.i18n.getMessage(name, args) || name;
+};
 _.defaultImage = '/images/icon128.png';
 
 function normalizeKeys(key) {

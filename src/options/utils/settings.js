@@ -1,4 +1,4 @@
-var _ = require('../../common');
+var _ = require('src/common');
 
 var hooks = {};
 _.options.hook(function (value, key) {

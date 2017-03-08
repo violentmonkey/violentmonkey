@@ -20,7 +20,7 @@ const paths = {
   manifest: 'src/manifest.json',
   templates: [
     'src/**/*.html',
-    '!src/**/index.html',
+    '!src/*/index.html',
   ],
   jsCollect: [
     'src/**/*.js',
@@ -79,7 +79,11 @@ gulp.task('templates', ['collect-js'], () => {
     gulp.src(paths.templates).pipe(cacheObj),
   ])
   .pipe(concat('cache.js'))
-  .pipe(collect.pack(null, file => 'src/cache.js'));
+  .pipe(collect.pack({
+    getPath(file) {
+      return 'src/cache.js';
+    },
+  }));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'));
 });
@@ -93,7 +97,7 @@ gulp.task('js-common', ['collect-js'], () => {
 
 gulp.task('js-bg', ['collect-js'], () => {
   var stream = gulp.src(paths.jsBg)
-  .pipe(collect.pack('src/background/app.js'))
+  .pipe(collect.pack({main: 'src/background/app.js'}))
   .pipe(concat('background/app.js'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'));
@@ -102,7 +106,7 @@ gulp.task('js-bg', ['collect-js'], () => {
 gulp.task('js-options', ['templates', 'collect-js'], () => {
   var stream = gulp.src(paths.jsOptions)
   .pipe(cacheObj.replace())
-  .pipe(collect.pack('src/options/app.js'))
+  .pipe(collect.pack({main: 'src/options/app.js'}))
   .pipe(concat('options/app.js'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'));
@@ -111,7 +115,7 @@ gulp.task('js-options', ['templates', 'collect-js'], () => {
 gulp.task('js-popup', ['templates', 'collect-js'], () => {
   var stream = gulp.src(paths.jsPopup)
   .pipe(cacheObj.replace())
-  .pipe(collect.pack('src/popup/app.js'))
+  .pipe(collect.pack({main: 'src/popup/app.js'}))
   .pipe(concat('popup/app.js'));
   if (isProd) stream = stream.pipe(uglify());
   return stream.pipe(gulp.dest('dist'))

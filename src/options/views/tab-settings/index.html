@@ -1,0 +1,22 @@
+<div class="content">
+  <h1 v-text="i18n('labelSettings')"></h1>
+  <label class="line">
+    <input type=checkbox v-setting="'autoUpdate'" @change="updateAutoUpdate">
+    <span v-text="i18n('labelAutoUpdate')"></span>
+  </label>
+  <label class="line">
+    <input type=checkbox v-setting="'showBadge'">
+    <span v-text="i18n('labelShowBadge')"></span>
+  </label>
+  <label class="line">
+    <input type=checkbox v-setting="'ignoreGrant'">
+    <span v-text="i18n('labelIgnoreGrant')"></span>
+  </label>
+  <label class="line">
+    <input type=checkbox v-setting="'autoReload'">
+    <span v-text="i18n('labelAutoReloadCurrentTab')"></span>
+  </label>
+  <vm-import></vm-import>
+  <vm-export></vm-export>
+  <vm-sync></vm-sync>
+</div>

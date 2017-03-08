@@ -1,0 +1,5 @@
+<fieldset class=title>
+  <legend v-text="i18n('labelDataImport')"></legend>
+  <button v-text="i18n('buttonImportData')" @click="importFile"></button>
+  <button :title="i18n('hintVacuum')" @click="vacuum" :disabled="vacuuming" v-text="labelVacuum"></button>
+</fieldset>

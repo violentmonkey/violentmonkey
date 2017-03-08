@@ -1,0 +1,6 @@
+<fieldset class=title v-feature="'sync'">
+  <legend v-text="i18n('labelSync')" class="feature-text"></legend>
+  <div class="sync-services">
+    <sync-service v-for="service in store.sync" :service="service" @service-checked="onEnableService"></sync-service>
+  </div>
+</fieldset>

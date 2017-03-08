@@ -41,7 +41,7 @@
   "license": "MIT",
   "dependencies": {
     "codemirror": "^5.23.0",
-    "define-commonjs": "^1.0.0",
+    "define-commonjs": "^1.1.0",
     "vue": "^2.1.10"
   }
 }

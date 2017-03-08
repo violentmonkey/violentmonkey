@@ -1,9 +1,9 @@
-var cache = require('../../cache');
-var _ = require('../../common');
+var _ = require('src/common');
+var cache = require('src/cache');
 
 module.exports = {
   props: ['service'],
-  template: cache.get('./sync-service.html'),
+  template: cache.get('./service.html'),
   computed: {
     keyEnabled: function () {
       return this.service.name + '.enabled';
