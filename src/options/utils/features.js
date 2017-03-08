@@ -1,6 +1,16 @@
-var _ = require('../../common');
+var _ = require('src/common');
 
 var key = 'features';
+var hooks = _.initHooks();
+var revoke = _.options.hook(function (data) {
+  if (data[key]) {
+    features = data[key];
+    revoke();
+    revoke = null;
+    hooks.fire();
+    hooks = null;
+  }
+});
 var features = _.options.get(key);
 if (!features || !features.data) features = {
   data: {},
@@ -23,9 +33,14 @@ Vue.directive('feature', {
       el.classList.remove('feature');
       el.removeEventListener('click', onFeatureClick, false);
     }
+    function reset() {
+      if (!features.version || features.data[value]) return;
+      el.classList.add('feature');
+      el.removeEventListener('click', onFeatureClick, false);
+      el.addEventListener('click', onFeatureClick, false);
+    }
     var value = binding.value;
-    if (features.data[value]) return;
-    el.classList.add('feature');
-    el.addEventListener('click', onFeatureClick, false);
+    reset();
+    hooks && hooks.hook(reset);
   },
 });

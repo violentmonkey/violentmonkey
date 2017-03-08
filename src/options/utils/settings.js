@@ -1,10 +1,12 @@
 var _ = require('src/common');
 
 var hooks = {};
-_.options.hook(function (value, key) {
-  var list = hooks[key];
-  list && list.forEach(function (el) {
-    el.checked = value;
+_.options.hook(function (data) {
+  Object.keys(data).forEach(function (key) {
+    var list = hooks[key];
+    list && list.forEach(function (el) {
+      el.checked = data[key];
+    });
   });
 });
 

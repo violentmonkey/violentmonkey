@@ -216,6 +216,12 @@ VMDB.prototype.removeScript = function (id) {
     o.delete(id).onsuccess = function () {
       resolve();
     };
+  })
+  .then(function () {
+    _.messenger.post({
+      cmd: 'RemoveScript',
+      data: id,
+    });
   });
 };
 
@@ -518,7 +524,7 @@ VMDB.prototype.parseScript = function (data) {
   var meta = scriptUtils.parseMeta(data.code);
   if (!meta.name) return Promise.reject(_.i18n('msgInvalidScript'));
   var res = {
-    cmd: 'update',
+    cmd: 'UpdateScript',
     data: {
       message: data.message == null ? _.i18n('msgUpdated') : data.message || '',
     },
@@ -561,7 +567,7 @@ VMDB.prototype.parseScript = function (data) {
       if (data.isNew) throw _.i18n('msgNamespaceConflict');
     } else {
       script = scriptUtils.newScript();
-      res.cmd = 'add';
+      res.cmd = 'AddScript';
       res.data.message = _.i18n('msgInstalled');
     }
     data.more && Object.keys(data.more).forEach(function (key) {
@@ -586,7 +592,7 @@ VMDB.prototype.parseScript = function (data) {
 VMDB.prototype.checkUpdate = function () {
   function check(script) {
     var res = {
-      cmd: 'update',
+      cmd: 'UpdateScript',
       data: {
         id: script.id,
         checking: true,

@@ -3,6 +3,7 @@ var events = require('../utils/events');
 var app = require('../app');
 var tabs = require('../utils/tabs');
 var _ = require('../../common');
+var options = require('../options');
 
 setTimeout(function () {
   // import sync modules
@@ -28,19 +29,19 @@ ServiceConfig.prototype.normalizeKeys = function (key) {
 };
 ServiceConfig.prototype.get = function (key, def) {
   var keys = this.normalizeKeys(key);
-  return _.options.get(keys, def);
+  return options.get(keys, def);
 };
 ServiceConfig.prototype.set = function (key, val) {
   var _this = this;
   if (arguments.length === 1) {
-    return _.options.set(_this.name, Object.assign(_.options.get(_this.name, {}), key));
+    return options.set(_this.name, Object.assign(options.get(_this.name, {}), key));
   } else {
     var keys = this.normalizeKeys(key);
-    return _.options.set(keys, val);
+    return options.set(keys, val);
   }
 };
 ServiceConfig.prototype.clear = function () {
-  _.options.set(this.name, {});
+  options.set(this.name, {});
 };
 
 function serviceState(validStates, initialState, onChange) {
@@ -192,7 +193,7 @@ var BaseService = serviceFactory({
   },
   onStateChange: function () {
     _.messenger.post({
-      cmd: 'sync',
+      cmd: 'UpdateSync',
       data: getStates(),
     });
   },
@@ -433,13 +434,7 @@ var BaseService = serviceFactory({
         }),
         delLocal.map(function (item) {
           console.log('Remove local script:', item.uri);
-          return app.vmdb.removeScript(item.id)
-          .then(function () {
-            _.messenger.post({
-              cmd: 'del',
-              data: item.id,
-            });
-          });
+          return app.vmdb.removeScript(item.id);
         })
       );
       promises.push(Promise.all(promises).then(function () {
