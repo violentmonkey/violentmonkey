@@ -2,7 +2,7 @@ const del = require('del');
 const gulp = require('gulp');
 const concat = require('gulp-concat');
 const merge2 = require('merge2');
-const cssnano = require('gulp-cssnano');
+const postcss = require('gulp-postcss');
 const gulpFilter = require('gulp-filter');
 const eslint = require('gulp-eslint');
 const uglify = require('gulp-uglify');
@@ -154,9 +154,10 @@ gulp.task('copy-files', () => {
   .pipe(jsFilter.restore);
   stream = stream
   .pipe(cssFilter)
-  .pipe(cssnano({
-    zindex: false,
-  }))
+  .pipe(postcss([
+    require('precss')(),
+    isProd && require('cssnano')(),
+  ].filter(Boolean)))
   .pipe(cssFilter.restore)
   .pipe(gulp.dest('dist/'));
 });
