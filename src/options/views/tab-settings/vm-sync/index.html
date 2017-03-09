@@ -1,6 +1,6 @@
 <section v-feature="'sync'">
-  <h3 v-text="i18n('labelSync')">
-    <span class="feature-text"></span>
+  <h3>
+    <span class="feature-text" v-text="i18n('labelSync')"></span>
   </h3>
   <div class="sync-services">
     <sync-service v-for="service in store.sync" :service="service" @service-checked="onEnableService"></sync-service>
