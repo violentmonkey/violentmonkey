@@ -2,7 +2,14 @@
   <h3>
     <span class="feature-text" v-text="i18n('labelSync')"></span>
   </h3>
-  <div class="sync-services">
+  <div class="sync-services mb-2">
     <sync-service v-for="service in store.sync" :service="service" @service-checked="onEnableService"></sync-service>
+  </div>
+  <h4 v-text="i18n('labelSyncSettings')"></h4>
+  <div class="mt-1">
+    <label>
+      <input type="checkbox" v-setting="'syncScriptStatus'">
+      <span v-text="i18n('labelSyncScriptStatus')"></span>
+    </label>
   </div>
 </section>

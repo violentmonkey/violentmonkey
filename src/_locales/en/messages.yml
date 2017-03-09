@@ -404,3 +404,9 @@ buttonSaveBlacklist:
 labelGeneral:
   description: Label for general settings.
   message: General
+labelSyncSettings:
+  description: Label for sync settings.
+  message: Settings
+labelSyncScriptStatus:
+  description: Label for option to sync script status.
+  message: Sync script status

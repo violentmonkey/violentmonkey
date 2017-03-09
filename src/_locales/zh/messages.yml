@@ -404,3 +404,9 @@ buttonSaveBlacklist:
 labelGeneral:
   description: Label for general settings.
   message: 通用
+labelSyncSettings:
+  description: Label for sync settings.
+  message: 设置
+labelSyncScriptStatus:
+  description: Label for option to sync script status.
+  message: 同步脚本状态

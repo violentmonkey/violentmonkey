@@ -14,6 +14,7 @@ var defaults = {
   onedrive: {},
   features: null,
   blacklist: null,
+  syncScriptStatus: true,
 };
 var changes = {};
 var hooks = _.initHooks();

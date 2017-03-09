@@ -403,6 +403,9 @@ var BaseService = serviceFactory({
               data.code = raw;
             }
             data.modified = item.modified;
+            if (!options.get('syncScriptStatus') && data.more) {
+              delete data.more.enabled;
+            }
             return app.vmdb.parseScript(data)
             .then(function (res) {
               _.messenger.post(res);
