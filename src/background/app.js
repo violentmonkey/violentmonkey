@@ -59,8 +59,9 @@ var commands = {
       injectMode: options.get('injectMode'),
       version: VM_VER,
     };
-    if (src.url == src.tab.url)
+    if (src.tab && src.url === src.tab.url) {
       chrome.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
+    }
     return data.isApplied
       ? vmdb.getScriptsByURL(url).then(function (res) {
         return Object.assign(data, res);
@@ -154,13 +155,12 @@ var commands = {
     setBadge(num, src);
     return false;
   },
-  Authenticate: function (data, _src) {
-    var service = sync.service(data);
-    service && service.authenticate && service.authenticate();
+  Authenticate: function (_data, _src) {
+    sync.authenticate();
     return false;
   },
-  SyncStart: function (data, _src) {
-    sync.sync(data && sync.service(data));
+  SyncStart: function (_data, _src) {
+    sync.sync();
     return false;
   },
   GetFromCache: function (data, _src) {
@@ -234,7 +234,7 @@ vmdb.initialized.then(function () {
     }
   });
   setTimeout(autoUpdate, 2e4);
-  sync.init();
+  sync.initialize();
 });
 
 // Common functions

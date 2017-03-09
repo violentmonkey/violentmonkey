@@ -1,7 +1,9 @@
-var sync = require('.');
+// Reference: https://dev.onedrive.com/README.htm
+
+var _ = require('src/common');
+var base = require('./base');
 var tabsUtils = require('../utils/tabs');
 var searchUtils = require('../utils/search');
-var _ = require('../../common');
 
 var config = Object.assign({
   client_id: '000000004418358A',
@@ -13,10 +15,10 @@ var config = Object.assign({
 
 function authenticate() {
   var params = {
-    response_type: 'code',
     client_id: config.client_id,
-    redirect_uri: config.redirect_uri,
     scope: 'onedrive.appfolder wl.offline_access',
+    response_type: 'code',
+    redirect_uri: config.redirect_uri,
   };
   var url = 'https://login.live.com/oauth20_authorize.srf';
   var qs = searchUtils.dump(params);
@@ -25,7 +27,7 @@ function authenticate() {
 }
 function checkAuthenticate(url) {
   var redirect_uri = config.redirect_uri + '?code=';
-  if (url.slice(0, redirect_uri.length) === redirect_uri) {
+  if (url.startsWith(redirect_uri)) {
     onedrive.authState.set('authorizing');
     authorized({
       code: url.slice(redirect_uri.length),
@@ -49,8 +51,8 @@ function authorized(params) {
       redirect_uri: config.redirect_uri,
       grant_type: 'authorization_code',
     }, params)),
-  }).then(function (text) {
-    var data = JSON.parse(text);
+    responseType: 'json',
+  }).then(function (data) {
     if (data.access_token) {
       onedrive.config.set({
         uid: data.user_id,
@@ -65,12 +67,12 @@ function authorized(params) {
 function normalize(item) {
   return {
     size: item.size,
-    uri: sync.utils.getURI(item.name),
+    uri: base.utils.getURI(item.name),
     modified: new Date(item.lastModifiedDateTime).getTime(),
   };
 }
 
-var OneDrive = sync.BaseService.extend({
+var OneDrive = base.BaseService.extend({
   name: 'onedrive',
   displayName: 'OneDrive',
   urlPrefix: 'https://api.onedrive.com/v1.0',
@@ -85,6 +87,12 @@ var OneDrive = sync.BaseService.extend({
     });
   },
   user: function () {
+    function requestUser() {
+      return _this.request({
+        url: '/drive',
+        responseType: 'json',
+      });
+    }
     var _this = this;
     return requestUser()
     .catch(function (res) {
@@ -92,16 +100,22 @@ var OneDrive = sync.BaseService.extend({
         return _this.refreshToken().then(requestUser);
       }
       throw res;
+    })
+    .catch(function (res) {
+      if (res.status === 400 && _.object.get(res, ['data', 'error']) === 'invalid_grant') {
+        throw {
+          type: 'unauthorized',
+        };
+      }
+      throw {
+        type: 'error',
+        data: res,
+      };
     });
-    function requestUser() {
-      return _this.request({
-        url: '/drive',
-      });
-    }
   },
   getMeta: function () {
     function getMeta() {
-      return sync.BaseService.prototype.getMeta.call(_this);
+      return base.BaseService.prototype.getMeta.call(_this);
     }
     var _this = this;
     return getMeta()
@@ -125,7 +139,7 @@ var OneDrive = sync.BaseService.extend({
       return JSON.parse(text);
     }).then(function (data) {
       return data.value.filter(function (item) {
-        return item.file && sync.utils.isScriptFile(item.name);
+        return item.file && base.utils.isScriptFile(item.name);
       }).map(normalize);
     });
   },
@@ -174,4 +188,4 @@ var OneDrive = sync.BaseService.extend({
   authenticate: authenticate,
   checkAuthenticate: checkAuthenticate,
 });
-var onedrive = sync.service('onedrive', OneDrive);
+var onedrive = base.register(OneDrive);

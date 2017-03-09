@@ -55,7 +55,7 @@ _.object = function () {
     var keys = normalizeKeys(key);
     for (var i = 0, len = keys.length; i < len; i ++) {
       key = keys[i];
-      if (obj && (key in obj)) obj = obj[key];
+      if (obj && typeof obj === 'object' && (key in obj)) obj = obj[key];
       else return def;
     }
     return obj;
@@ -68,7 +68,12 @@ _.object = function () {
       key = keys[i];
       sub = sub[key] = sub[key] || {};
     }
-    sub[keys[keys.length - 1]] = val;
+    var lastKey = keys[keys.length - 1];
+    if (val == null) {
+      delete sub[lastKey];
+    } else {
+      sub[lastKey] = val;
+    }
     return obj;
   }
   return {

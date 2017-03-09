@@ -10,11 +10,10 @@ var defaults = {
   closeAfterInstall: false,
   trackLocalFile: false,
   autoReload: false,
-  dropbox: {},
-  onedrive: {},
   features: null,
   blacklist: null,
   syncScriptStatus: true,
+  sync: null,
 };
 var changes = {};
 var hooks = _.initHooks();
