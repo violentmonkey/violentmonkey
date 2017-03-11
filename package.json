@@ -14,11 +14,12 @@
   "devDependencies": {
     "cssnano": "^3.10.0",
     "del": "^2.2.0",
+    "eslint": "^3.17.1",
     "glob": "^7.0.3",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-eslint": "^3.0.1",
-    "gulp-filter": "^4.0.0",
+    "gulp-filter": "^5.0.0",
     "gulp-postcss": "^6.3.0",
     "gulp-svg-sprite": "^1.2.19",
     "gulp-uglify": "^2.0.0",
@@ -43,7 +44,7 @@
   "license": "MIT",
   "dependencies": {
     "codemirror": "^5.23.0",
-    "define-commonjs": "^1.1.0",
+    "define-commonjs": "^1.1.2",
     "vue": "^2.1.10"
   }
 }
