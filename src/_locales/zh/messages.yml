@@ -410,3 +410,15 @@ labelSyncSettings:
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: 同步脚本状态
+labelSyncDisabled:
+  description: Label for option to disable sync service.
+  message: ''
+labelSyncService:
+  description: Label for sync service select.
+  message: ''
+labelSyncAuthorize:
+  description: Label for button to authorize a service.
+  message: ''
+labelSyncRevoke:
+  description: Label for button to revoke authorization for a service.
+  message: ''

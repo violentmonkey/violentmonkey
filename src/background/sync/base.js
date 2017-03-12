@@ -24,27 +24,32 @@ function getURI(name) {
 
 function initConfig() {
   function get(key, def) {
-    return _.object.get(config, key, def);
+    var keys = _.normalizeKeys(key);
+    keys.unshift('sync');
+    return options.get(keys, def);
   }
   function set(key, value) {
-    if (key) {
-      _.object.set(config, key, value);
+    var keys = _.normalizeKeys(key);
+    keys.unshift('sync');
+    options.set(keys, value);
+  }
+  function init() {
+    var sync = options.get('sync');
+    if (!sync || !sync.services) {
+      sync = {
+        services: {},
+      };
+
+      // XXX Migrate from old data
+      ['dropbox', 'onedrive']
+      .forEach(function (key) {
+        sync.services[key] = options.get(key);
+      });
+
+      set([], sync);
     }
-    options.set('sync', config);
   }
-  var config = options.get('sync');
-  if (!config || !config.services) {
-    config = {
-      services: {},
-    };
-    // XXX Migrate from old data
-    ['dropbox', 'onedrive']
-    .forEach(function (key) {
-      config.services[key] = options.get(key);
-    });
-    set();
-  }
-  console.log(config);
+  init();
   return {get: get, set: set};
 }
 
@@ -502,6 +507,10 @@ function authenticate() {
   var service = getService();
   service && service.authenticate && service.authenticate();
 }
+
+options.hook(function (data) {
+  ('sync.current' in data) && initialize();
+});
 
 exports.utils = {
   getFilename: getFilename,

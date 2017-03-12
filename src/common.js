@@ -111,7 +111,7 @@ _.initOptions = function () {
   var ready = _.sendMessage({cmd: 'GetAllOptions'})
   .then(function (data) {
     options = data;
-    hooks.fire(data);
+    data && hooks.fire(data);
   });
 
   function getOption(key, def) {
