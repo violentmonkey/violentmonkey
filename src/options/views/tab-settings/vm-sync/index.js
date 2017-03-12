@@ -2,7 +2,6 @@ var _ = require('src/common');
 var cache = require('src/cache');
 var utils = require('src/options/utils');
 var store = utils.store;
-var SyncService = require('./service');
 
 var SYNC_CURRENT = 'sync.current';
 var syncConfig = {
@@ -16,9 +15,6 @@ _.options.hook(function (data) {
 
 module.exports = {
   template: cache.get('./index.html'),
-  components: {
-    SyncService: SyncService,
-  },
   data: function () {
     return {
       syncConfig: syncConfig,
@@ -74,7 +70,6 @@ module.exports = {
       var service = this.service;
       if (service.authState === 'authorizing') return _.i18n('labelSyncAuthorizing');
       if (service.authState === 'authorized') return _.i18n('labelSyncRevoke');
-      if (service.authState === 'error') return _.i18n('labelSyncAuthError');
       return _.i18n('labelSyncAuthorize');
     },
     canAuthorize: function () {
