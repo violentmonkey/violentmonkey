@@ -37,7 +37,9 @@ module.exports = {
       var _this = this;
       _this.exporting = true;
       Promise.resolve(exportData(_this.selectedIds))
-      .catch(_.noop)
+      .catch(function (err) {
+        console.error(err);
+      })
       .then(function () {
         _this.exporting = false;
       });
@@ -93,7 +95,7 @@ function exportData(selectedIds) {
     var names = {};
     var vm = {
       scripts: {},
-      settings: _.options.getAll(),
+      settings: _.options.get(),
     };
     if (withValues) vm.values = {};
     var files = data.scripts.map(function (script) {
