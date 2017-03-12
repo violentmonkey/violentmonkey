@@ -104,5 +104,15 @@ module.exports = {
       var value = e.target.value;
       _.options.set(SYNC_CURRENT, value);
     },
+    onAuthorize: function () {
+      var service = this.service;
+      if (~['authorized'].indexOf(service.authState)) {
+        // revoke
+        _.sendMessage({cmd: 'SyncRevoke', data: service.name});
+      } else if (~['unauthorized', 'error'].indexOf(service.authState)) {
+        // authorize
+        _.sendMessage({cmd: 'SyncAuthorize', data: service.name});
+      }
+    },
   },
 };

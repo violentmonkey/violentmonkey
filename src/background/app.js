@@ -155,8 +155,12 @@ var commands = {
     setBadge(num, src);
     return false;
   },
-  Authenticate: function (_data, _src) {
-    sync.authenticate();
+  SyncAuthorize: function (_data, _src) {
+    sync.authorize();
+    return false;
+  },
+  SyncRevoke: function (_data, _src) {
+    sync.revoke();
     return false;
   },
   SyncStart: function (_data, _src) {

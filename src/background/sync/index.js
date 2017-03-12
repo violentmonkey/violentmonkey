@@ -2,7 +2,7 @@ var tabs = require('../utils/tabs');
 var base = require('./base');
 
 tabs.update(function (tab) {
-  tab.url && base.checkAuthenticateUrl(tab.url) && tabs.remove(tab.id);
+  tab.url && base.checkAuthUrl(tab.url) && tabs.remove(tab.id);
 });
 
 // import sync modules
@@ -14,5 +14,6 @@ module.exports = {
   sync: base.sync,
   states: base.getStates,
   service: base.getService,
-  authenticate: base.authenticate,
+  authorize: base.authorize,
+  revoke: base.revoke,
 };

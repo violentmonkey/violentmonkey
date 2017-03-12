@@ -7,7 +7,8 @@
     <select :value="syncConfig.current" @change="onSyncChange">
       <option v-for="service in syncServices" v-text="service.displayName" :value="service.name"></option>
     </select>
-    <button v-text="labelAuthorize" :disabled="!canAuthorize" v-if="service.name"></button>
+    <button v-text="labelAuthorize" v-if="service.name"
+    :disabled="!canAuthorize" @click="onAuthorize"></button>
     <button :disabled="!canSync" v-if="service.name">
       <svg class="icon"><use xlink:href="#refresh" /></svg>
     </button>

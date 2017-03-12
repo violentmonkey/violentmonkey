@@ -13,7 +13,7 @@ var config = Object.assign({
   window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ==')
 ));
 
-function authenticate() {
+function authorize() {
   var params = {
     client_id: config.client_id,
     scope: 'onedrive.appfolder wl.offline_access',
@@ -25,7 +25,7 @@ function authenticate() {
   url += '?' + qs;
   tabsUtils.create(url);
 }
-function checkAuthenticate(url) {
+function checkAuth(url) {
   var redirect_uri = config.redirect_uri + '?code=';
   if (url.startsWith(redirect_uri)) {
     onedrive.authState.set('authorizing');
@@ -52,7 +52,8 @@ function authorized(params) {
       grant_type: 'authorization_code',
     }, params)),
     responseType: 'json',
-  }).then(function (data) {
+  })
+  .then(function (data) {
     if (data.access_token) {
       onedrive.config.set({
         uid: data.user_id,
@@ -62,6 +63,13 @@ function authorized(params) {
     } else {
       throw data;
     }
+  });
+}
+function revoke() {
+  onedrive.config.set({
+    uid: null,
+    token: null,
+    refresh_token: null,
   });
 }
 function normalize(item) {
@@ -135,9 +143,9 @@ var OneDrive = base.BaseService.extend({
     var _this = this;
     return _this.request({
       url: '/drive/special/approot/children',
-    }).then(function (text) {
-      return JSON.parse(text);
-    }).then(function (data) {
+      responseType: 'json',
+    })
+    .then(function (data) {
       return data.value.filter(function (item) {
         return item.file && base.utils.isScriptFile(item.name);
       }).map(normalize);
@@ -146,9 +154,9 @@ var OneDrive = base.BaseService.extend({
   get: function (path) {
     return this.request({
       url: '/drive/special/approot:/' + encodeURIComponent(path),
-    }).then(function (text) {
-      return JSON.parse(text);
-    }).then(function (data) {
+      responseType: 'json',
+    })
+    .then(function (data) {
       var url = data['@content.downloadUrl'];
       return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest;
@@ -174,9 +182,9 @@ var OneDrive = base.BaseService.extend({
         'Content-Type': 'application/octet-stream',
       },
       body: data,
-    }).then(function (text) {
-      return JSON.parse(text);
-    }).then(normalize);
+      responseType: 'json',
+    })
+    .then(normalize);
   },
   remove: function (path) {
     // return 204
@@ -185,7 +193,11 @@ var OneDrive = base.BaseService.extend({
       url: '/drive/special/approot:/' + encodeURIComponent(path),
     }).catch(_.noop);
   },
-  authenticate: authenticate,
-  checkAuthenticate: checkAuthenticate,
+  authorize: authorize,
+  checkAuth: checkAuth,
+  revoke: function () {
+    revoke();
+    return this.prepare();
+  },
 });
 var onedrive = base.register(OneDrive);

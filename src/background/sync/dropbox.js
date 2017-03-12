@@ -6,7 +6,7 @@ var config = {
   redirect_uri: 'https://violentmonkey.github.io/auth_dropbox.html',
 };
 
-function authenticate() {
+function authorize() {
   var params = {
     response_type: 'token',
     client_id: config.client_id,
@@ -17,7 +17,7 @@ function authenticate() {
   url += '?' + qs;
   tabsUtils.create(url);
 }
-function checkAuthenticate(url) {
+function checkAuth(url) {
   var redirect_uri = config.redirect_uri + '#';
   if (url.startsWith(redirect_uri)) {
     authorized(url.slice(redirect_uri.length));
@@ -33,6 +33,12 @@ function authorized(raw) {
       token: data.access_token,
     });
   }
+}
+function revoke() {
+  dropbox.config.set({
+    uid: null,
+    token: null,
+  });
 }
 function normalize(item) {
   return {
@@ -124,7 +130,11 @@ var Dropbox = base.BaseService.extend({
     })
     .then(normalize);
   },
-  authenticate: authenticate,
-  checkAuthenticate: checkAuthenticate,
+  authorize: authorize,
+  checkAuth: checkAuth,
+  revoke: function () {
+    revoke();
+    return this.prepare();
+  },
 });
 var dropbox = base.register(Dropbox);

@@ -66,8 +66,17 @@ ServiceConfig.prototype.get = function (key, def) {
   return syncConfig.get(keys, def);
 };
 ServiceConfig.prototype.set = function (key, val) {
-  var keys = this.normalizeKeys(key);
-  return syncConfig.set(keys, val);
+  var _this = this;
+  if (typeof key === 'object') {
+    var data = key;
+    Object.keys(data).forEach(function (key) {
+      var keys = _this.normalizeKeys(key);
+      syncConfig.set(keys, data[key]);
+    });
+  } else {
+    var keys = _this.normalizeKeys(key);
+    syncConfig.set(keys, val);
+  }
 };
 ServiceConfig.prototype.clear = function () {
   syncConfig.set(this.normalizeKeys(), {});
@@ -145,14 +154,14 @@ var BaseService = serviceFactory({
       'authorized',
       'unauthorized',
       'error',
-    ], null, _this.onStateChange),
-      _this.syncState = serviceState([
-        'idle',
-        'ready',
-        'syncing',
-        'error',
-      ], null, _this.onStateChange),
-      _this.initHeaders();
+    ], null, _this.onStateChange);
+    _this.syncState = serviceState([
+      'idle',
+      'ready',
+      'syncing',
+      'error',
+    ], null, _this.onStateChange);
+    // _this.initToken();
     _this.events = events.getEventEmitter();
     _this.lastFetch = Promise.resolve();
     _this.startSync = _this.syncFactory();
@@ -207,12 +216,13 @@ var BaseService = serviceFactory({
       return promise;
     };
   },
+  prepareHeaders: function () {
+    this.headers = {};
+  },
   prepare: function () {
     var _this = this;
     _this.authState.set('initializing');
-    var token = _this.token = _this.config.get('token');
-    _this.initHeaders();
-    return (token ? Promise.resolve(_this.user()) : Promise.reject({
+    return (_this.initToken() ? Promise.resolve(_this.user()) : Promise.reject({
       type: 'unauthorized',
     }))
     .then(function () {
@@ -244,10 +254,14 @@ var BaseService = serviceFactory({
       return JSON.parse(data);
     });
   },
-  initHeaders: function () {
-    var headers = this.headers = {};
-    var token = this.token;
-    if (token) headers.Authorization = 'Bearer ' + token;
+  initToken: function () {
+    var _this = this;
+    _this.prepareHeaders();
+    var token = _this.config.get('token');
+    if (token) {
+      _this.headers.Authorization = 'Bearer ' + token;
+      return true;
+    }
   },
   request: function (options) {
     var _this = this;
@@ -496,16 +510,20 @@ function sync() {
   return service && syncOne(service).then(autoSync);
 }
 
-function checkAuthenticateUrl(url) {
+function checkAuthUrl(url) {
   return serviceNames.some(function (name) {
     var service = services[name];
-    return service.checkAuthenticate && service.checkAuthenticate(url);
+    return service.checkAuth && service.checkAuth(url);
   });
 }
 
-function authenticate() {
+function authorize() {
   var service = getService();
-  service && service.authenticate && service.authenticate();
+  service && service.authorize();
+}
+function revoke() {
+  var service = getService();
+  service && service.revoke();
 }
 
 options.hook(function (data) {
@@ -520,8 +538,9 @@ exports.utils = {
 exports.initialize = initialize;
 exports.sync = sync;
 exports.getStates = getStates;
-exports.checkAuthenticateUrl = checkAuthenticateUrl;
+exports.checkAuthUrl = checkAuthUrl;
 exports.BaseService = BaseService;
 exports.register = register;
 exports.service = getService;
-exports.authenticate = authenticate;
+exports.authorize = authorize;
+exports.revoke = revoke;
