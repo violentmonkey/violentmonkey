@@ -3,7 +3,6 @@ var events = require('../utils/events');
 var app = require('../app');
 var options = require('../options');
 
-var inited;
 var serviceNames = [];
 var services = {};
 var autoSync = _.debounce(function () {
@@ -181,6 +180,9 @@ var BaseService = serviceFactory({
       data: getStates(),
     });
   },
+  log: function () {
+    console.log.apply(console, arguments);  // eslint-disable-line no-console
+  },
   syncFactory: function () {
     var _this = this;
     var promise, debouncedResolve;
@@ -189,7 +191,7 @@ var BaseService = serviceFactory({
     }
     function init() {
       if (!shouldSync()) return Promise.resolve();
-      console.log('Ready to sync:', _this.displayName);
+      _this.log('Ready to sync:', _this.displayName);
       _this.syncState.set('ready');
       promise = working = working.then(function () {
         return new Promise(function (resolve, _reject) {
@@ -351,8 +353,8 @@ var BaseService = serviceFactory({
       };
       var firstSync = !local.meta.timestamp;
       var outdated = !local.meta.timestamp || remote.meta.timestamp > local.meta.timestamp;
-      console.log('First sync:', firstSync);
-      console.log('Outdated:', outdated, '(', 'local:', local.meta.timestamp, 'remote:', remote.meta.timestamp, ')');
+      _this.log('First sync:', firstSync);
+      _this.log('Outdated:', outdated, '(', 'local:', local.meta.timestamp, 'remote:', remote.meta.timestamp, ')');
       var map = {};
       var getRemote = [];
       var putRemote = [];
@@ -386,7 +388,7 @@ var BaseService = serviceFactory({
       });
       var promises = [].concat(
         getRemote.map(function (item) {
-          console.log('Download script:', item.uri);
+          _this.log('Download script:', item.uri);
           return _this.get(getFilename(item.uri)).then(function (raw) {
             var data = {};
             try {
@@ -409,7 +411,7 @@ var BaseService = serviceFactory({
           });
         }),
         putRemote.map(function (item) {
-          console.log('Upload script:', item.uri);
+          _this.log('Upload script:', item.uri);
           var data = JSON.stringify({
             version: 1,
             code: item.code,
@@ -428,11 +430,11 @@ var BaseService = serviceFactory({
           });
         }),
         delRemote.map(function (item) {
-          console.log('Remove remote script:', item.uri);
+          _this.log('Remove remote script:', item.uri);
           return _this.remove(getFilename(item.uri));
         }),
         delLocal.map(function (item) {
-          console.log('Remove local script:', item.uri);
+          _this.log('Remove local script:', item.uri);
           return app.vmdb.removeScript(item.id);
         })
       );
@@ -466,8 +468,8 @@ var BaseService = serviceFactory({
       _this.syncState.set('idle');
     }, function (err) {
       _this.syncState.set('error');
-      console.log('Failed syncing:', _this.name);
-      console.log(err);
+      _this.log('Failed syncing:', _this.name);
+      _this.log(err);
     });
   },
 });
@@ -477,9 +479,6 @@ function register(Service) {
   var service = new Service(name);
   serviceNames.push(name);
   services[name] = service;
-  // setTimeout(function () {
-  //   inited && service.checkSync();
-  // });
   return service;
 }
 function getCurrent() {
@@ -490,14 +489,8 @@ function getService(name) {
   return services[name];
 }
 function initialize() {
-  inited = true;
-  // serviceNames.forEach(function (name) {
-  //   var service = services[name];
-  //   service.checkSync();
-  // });
   var service = getService();
   service && service.checkSync();
-  // sync();
 }
 
 function syncOne(service) {
