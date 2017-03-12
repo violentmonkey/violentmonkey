@@ -1,4 +1,4 @@
-var sync = require('.');
+var base = require('./base');
 var tabsUtils = require('../utils/tabs');
 var searchUtils = require('../utils/search');
 var config = {
@@ -6,7 +6,7 @@ var config = {
   redirect_uri: 'https://violentmonkey.github.io/auth_dropbox.html',
 };
 
-function authenticate() {
+function authorize() {
   var params = {
     response_type: 'token',
     client_id: config.client_id,
@@ -17,9 +17,9 @@ function authenticate() {
   url += '?' + qs;
   tabsUtils.create(url);
 }
-function checkAuthenticate(url) {
+function checkAuth(url) {
   var redirect_uri = config.redirect_uri + '#';
-  if (url.slice(0, redirect_uri.length) === redirect_uri) {
+  if (url.startsWith(redirect_uri)) {
     authorized(url.slice(redirect_uri.length));
     dropbox.checkSync();
     return true;
@@ -34,26 +34,43 @@ function authorized(raw) {
     });
   }
 }
+function revoke() {
+  dropbox.config.set({
+    uid: null,
+    token: null,
+  });
+}
 function normalize(item) {
   return {
     size: item.size,
-    uri: sync.utils.getURI(item.name),
+    uri: base.utils.getURI(item.name),
     modified: new Date(item.server_modified).getTime(),
-    //is_deleted: item.is_deleted,
+    // is_deleted: item.is_deleted,
   };
 }
 
-var Dropbox = sync.BaseService.extend({
+var Dropbox = base.BaseService.extend({
   name: 'dropbox',
   displayName: 'Dropbox',
   user: function () {
     return this.request({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/users/get_current_account',
+    })
+    .catch(function (err) {
+      if (err.status === 401) {
+        throw {
+          type: 'unauthorized',
+        };
+      }
+      throw {
+        type: 'error',
+        data: err,
+      };
     });
   },
   getMeta: function () {
-    return sync.BaseService.prototype.getMeta.call(this)
+    return base.BaseService.prototype.getMeta.call(this)
     .catch(function (res) {
       if (res.status === 409) return {};
       throw res;
@@ -67,11 +84,11 @@ var Dropbox = sync.BaseService.extend({
       body: {
         path: '',
       },
-    }).then(function (text) {
-      return JSON.parse(text);
-    }).then(function (data) {
+      responseType: 'json',
+    })
+    .then(function (data) {
       return data.entries.filter(function (item) {
-        return item['.tag'] === 'file' && sync.utils.isScriptFile(item.name);
+        return item['.tag'] === 'file' && base.utils.isScriptFile(item.name);
       }).map(normalize);
     });
   },
@@ -98,9 +115,9 @@ var Dropbox = sync.BaseService.extend({
         'Content-Type': 'application/octet-stream',
       },
       body: data,
-    }).then(function (text) {
-      return JSON.parse(text);
-    }).then(normalize);
+      responseType: 'json',
+    })
+    .then(normalize);
   },
   remove: function (path) {
     return this.request({
@@ -109,11 +126,15 @@ var Dropbox = sync.BaseService.extend({
       body: {
         path: '/' + path,
       },
-    }).then(function (text) {
-      return JSON.parse(text);
-    }).then(normalize);
+      responseType: 'json',
+    })
+    .then(normalize);
   },
-  authenticate: authenticate,
-  checkAuthenticate: checkAuthenticate,
+  authorize: authorize,
+  checkAuth: checkAuth,
+  revoke: function () {
+    revoke();
+    return this.prepare();
+  },
 });
-var dropbox = sync.service('dropbox', Dropbox);
+var dropbox = base.register(Dropbox);

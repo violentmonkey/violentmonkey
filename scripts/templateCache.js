@@ -10,7 +10,10 @@ function replacePlugin(contents, objName) {
     file.contents = new Buffer(String(file.contents).replace(re, (m, name) => {
       const filepath = path.resolve(dirname, name);
       const item = contents[filepath];
-      if (!item) console.warn(`Cache not found: ${name}`);
+      if (!item) throw new Error(`\
+Cache not found: ${name}
+Required by:
+- ${file.path}`);
       return `${objName}.get(${item.id})`;
     }));
     cb(null, file);

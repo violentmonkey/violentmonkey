@@ -1,7 +1,7 @@
+var cache = require('src/cache');
 var MainTab = require('./tab-installed');
 var SettingsTab = require('./tab-settings');
 var AboutTab = require('./tab-about');
-var cache = require('../../cache');
 
 var components = {
   Main: MainTab,

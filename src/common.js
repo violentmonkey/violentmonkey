@@ -37,7 +37,9 @@ polyfill(Array.prototype, 'find', function (predicate) {
 // Polyfill end
 
 var _ = exports;
-_.i18n = chrome.i18n.getMessage;
+_.i18n = function (name, args) {
+  return chrome.i18n.getMessage(name, args) || name;
+};
 _.defaultImage = '/images/icon128.png';
 
 function normalizeKeys(key) {
@@ -53,7 +55,7 @@ _.object = function () {
     var keys = normalizeKeys(key);
     for (var i = 0, len = keys.length; i < len; i ++) {
       key = keys[i];
-      if (obj && (key in obj)) obj = obj[key];
+      if (obj && typeof obj === 'object' && (key in obj)) obj = obj[key];
       else return def;
     }
     return obj;
@@ -66,7 +68,12 @@ _.object = function () {
       key = keys[i];
       sub = sub[key] = sub[key] || {};
     }
-    sub[keys[keys.length - 1]] = val;
+    var lastKey = keys[keys.length - 1];
+    if (val == null) {
+      delete sub[lastKey];
+    } else {
+      sub[lastKey] = val;
+    }
     return obj;
   }
   return {
@@ -75,115 +82,68 @@ _.object = function () {
   };
 }();
 
-_.options = function () {
-  function getOption(key, def) {
-    var keys = normalizeKeys(key);
-    key = keys[0];
-    var value = localStorage.getItem(key), obj;
-    if (value) {
-      try {
-        obj = JSON.parse(value);
-      } catch (e) {
-        // ignore invalid JSON
-      }
-    }
-    if (obj == null) obj = defaults[key];
-    if (obj == null) obj = def;
-    return keys.length > 1 ? _.object.get(obj, keys.slice(1), def) : obj;
-  }
+_.initHooks = function () {
+  var hooks = [];
 
-  function fire(hkey, key, value) {
-    var group = hooks[hkey];
-    group && group.forEach(function (cb) {
-      cb(value, key);
+  function fire(data) {
+    hooks.slice().forEach(function (hook) {
+      hook(data);
     });
   }
 
-  function setOption(key, value) {
-    var keys = normalizeKeys(key);
-    var optionKey = keys.join('.');
-    var optionValue = value;
-    key = keys[0];
-    if (key in defaults) {
-      if (keys.length > 1) {
-        optionValue = _.object.set(getOption(key), keys.slice(1), value);
-      }
-      localStorage.setItem(key, JSON.stringify(optionValue));
-      [optionKey, key, ''].forEach(function (hkey) {
-        fire(hkey, optionKey, value);
-      });
-    }
-  }
-
-  function getAllOptions() {
-    return Object.keys(defaults).reduce(function (res, key) {
-      res[key] = getOption(key);
-      return res;
-    }, {});
-  }
-
-  function parseArgs(args) {
-    return args.length === 1 ? {
-      key: '',
-      cb: args[0],
-    } : {
-      key: args[0] || '',
-      cb: args[1],
-    };
-  }
-
-  function hook() {
-    var arg = parseArgs(arguments);
-    var list = hooks[arg.key];
-    if (!list) list = hooks[arg.key] = [];
-    list.push(arg.cb);
+  function hook(callback) {
+    hooks.push(callback);
     return function () {
-      unhook(arg.key, arg.cb);
+      var i = hooks.indexOf(callback);
+      ~i && hooks.splice(i, 1);
     };
   }
-  function unhook() {
-    var arg = parseArgs(arguments);
-    var list = hooks[arg.key];
-    if (list) {
-      var i = list.indexOf(arg.cb);
-      ~i && list.splice(i, 1);
-    }
-  }
-
-  var defaults = {
-    isApplied: true,
-    autoUpdate: true,
-    ignoreGrant: false,
-    lastUpdate: 0,
-    showBadge: true,
-    exportValues: true,
-    closeAfterInstall: false,
-    trackLocalFile: false,
-    autoReload: false,
-    dropbox: {},
-    onedrive: {},
-    features: null,
-  };
-  var hooks = {};
-
-  // XXX migrate sync status options
-  ['dropbox', 'onedrive'].forEach(function (name) {
-    var key = name + 'Enabled';
-    var val = getOption(key);
-    if (val != null) {
-      setOption([name, 'enabled'], val);
-      localStorage.removeItem(key);
-    }
-  });
 
   return {
+    hook: hook,
+    fire: fire,
+  };
+};
+
+_.initOptions = function () {
+  var options = {};
+  var hooks = _.initHooks();
+  var ready = _.sendMessage({cmd: 'GetAllOptions'})
+  .then(function (data) {
+    options = data;
+    data && hooks.fire(data);
+  });
+
+  function getOption(key, def) {
+    var keys = normalizeKeys(key);
+    return _.object.get(options, keys, def);
+  }
+
+  function setOption(key, value) {
+    _.sendMessage({
+      cmd: 'SetOptions',
+      data: {
+        key: key,
+        value: value,
+      },
+    });
+  }
+
+  function updateOptions(data) {
+    Object.keys(data).forEach(function (key) {
+      _.object.set(options, key, data[key]);
+    });
+    hooks.fire(data);
+  }
+
+  _.options = {
     get: getOption,
     set: setOption,
-    getAll: getAllOptions,
-    hook: hook,
-    unhook: unhook,
+    update: updateOptions,
+    hook: hooks.hook,
+    ready: ready,
   };
-}();
+};
 
 _.sendMessage = function (data) {
   return new Promise(function (resolve, reject) {

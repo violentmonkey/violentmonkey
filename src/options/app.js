@@ -13,16 +13,15 @@ function initMain() {
     // utils.features.reset(data.version);
     utils.features.reset('sync');
   });
-  var port = chrome.runtime.connect({name: 'Options'});
   var handlers = {
-    sync: function (data) {
+    UpdateSync: function (data) {
       store.sync = data;
     },
-    add: function (data) {
+    AddScript: function (data) {
       data.message = '';
       store.scripts.push(data);
     },
-    update: function (data) {
+    UpdateScript: function (data) {
       if (!data) return;
       var script = store.scripts.find(function (script) {
         return script.id === data.id;
@@ -31,14 +30,17 @@ function initMain() {
         Vue.set(script, key, data[key]);
       });
     },
-    del: function (data) {
+    RemoveScript: function (data) {
       var i = store.scripts.findIndex(function (script) {
         return script.id === data;
       });
       ~i && store.scripts.splice(i, 1);
     },
+    UpdateOptions: function (data) {
+      _.options.update(data);
+    },
   };
-  port.onMessage.addListener(function (res) {
+  chrome.runtime.onMessage.addListener(function (res) {
     var handle = handlers[res.cmd];
     handle && handle(res.data);
   });
@@ -61,6 +63,7 @@ function loadHash() {
 }
 
 var _ = require('../common');
+_.initOptions();
 var utils = require('./utils');
 var Main = require('./views/main');
 var Confirm = require('./views/confirm');
@@ -93,12 +96,14 @@ loadHash();
 zip.workerScriptsPath = '/lib/zip.js/';
 document.title = _.i18n('extName');
 
-new Vue({
-  el: '#app',
-  template: '<component :is=type :params=params></component>',
-  components: {
-    Main: Main,
-    Confirm: Confirm,
-  },
-  data: hashData,
+_.options.ready.then(function () {
+  new Vue({
+    el: '#app',
+    template: '<component :is=type :params=params></component>',
+    components: {
+      Main: Main,
+      Confirm: Confirm,
+    },
+    data: hashData,
+  });
 });

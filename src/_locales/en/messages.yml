@@ -141,6 +141,7 @@ labelDataExport:
 labelScriptsToExport:
   description: Label shown on top of the script list for export.
   message: Scripts to export
+  touched: false
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Export script data
@@ -345,15 +346,19 @@ labelSync:
 buttonAuthorize:
   description: Button to authorize permissions for sync.
   message: Authorize
+  touched: false
 buttonAuthorizing:
   description: Button shown when authorization is in progress.
   message: Authorizing
+  touched: false
 buttonAuthorized:
   description: Button shown when permissions are already authorized for sync.
   message: Authorized
+  touched: false
 labelSyncTo:
   description: Label for sync service.
   message: Sync to $1
+  touched: false
 lastSync:
   description: Label for last sync timestamp.
   message: Last sync at $1
@@ -386,3 +391,41 @@ labelShowBadge:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Line no.: '
+msgSavedSecurity:
+  description: Message shown when settings of security section are saved.
+  message: Blacklist updated.
+labelBlacklist:
+  description: Label for global blacklist settings in security section.
+  message: Blacklist
+descBlacklist:
+  description: HTML Description for the global blacklist.
+  message: >-
+    URL matched in this list will not be injected by scripts. Each line is an
+    <code>@exclude</code> rule but globally applied.
+buttonSaveBlacklist:
+  description: Button to save global blacklist.
+  message: Save
+labelGeneral:
+  description: Label for general settings.
+  message: General
+labelSyncSettings:
+  description: Label for sync settings.
+  message: Settings
+labelSyncScriptStatus:
+  description: Label for option to sync script status.
+  message: Sync script status
+labelSyncDisabled:
+  description: Label for option to disable sync service.
+  message: None
+labelSyncService:
+  description: Label for sync service select.
+  message: Sync to
+labelSyncAuthorize:
+  description: Label for button to authorize a service.
+  message: Authorize
+labelSyncRevoke:
+  description: Label for button to revoke authorization for a service.
+  message: Revoke
+labelSyncAuthorizing:
+  description: Label for button when authorization is in progress.
+  message: Authorizing

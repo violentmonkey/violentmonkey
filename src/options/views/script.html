@@ -3,7 +3,7 @@
   <div class="script-version pull-right" v-text="script.meta.version?'v'+script.meta.version:''"></div>
   <div class="script-author ellipsis pull-right" :title="script.meta.author" v-if="author">
     <span v-text="i18n('labelAuthor')"></span>
-    <a href="mailto:{{author.email}}" v-if="author.email" v-text="author.name"></a>
+    <a :href="'mailto:'+author.email" v-if="author.email" v-text="author.name"></a>
     <span v-if="!author.email" v-text="author.name"></a>
   </div>
   <div class=script-info>

@@ -55,19 +55,24 @@ module.exports = {
         symbol: null,
         disabled: null,
         init: function (options) {
+          options.update(options);
+          _.options.hook(function (data) {
+            data.isApplied != null && options.update(options);
+          });
+        },
+        update: function (options) {
           options.disabled = !_.options.get('isApplied');
           options.name = options.disabled ? _.i18n('menuScriptDisabled') : _.i18n('menuScriptEnabled');
           options.symbol = options.disabled ? 'remove' : 'check';
-        },
-        onClick: function (options) {
-          _.options.set('isApplied', options.disabled);
-          options.init.call(this, options);
           chrome.browserAction.setIcon({
             path: {
               19: '/images/icon19' + (options.disabled ? 'w' : '') + '.png',
               38: '/images/icon38' + (options.disabled ? 'w' : '') + '.png',
             },
           });
+        },
+        onClick: function (options) {
+          _.options.set('isApplied', options.disabled);
         },
       }],
     };
@@ -93,7 +98,8 @@ module.exports = {
                 id: script.id,
                 enabled: !script.enabled,
               },
-            }).then(function () {
+            })
+            .then(function () {
               script.enabled = !script.enabled;
               options.init.call(vm, options);
               _.options.get('autoReload') && chrome.tabs.reload(_this.store.currentTab.id);

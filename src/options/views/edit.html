@@ -79,8 +79,12 @@
     </div>
     <h2 v-text="i18n('labelScriptEditor')"></h2>
   </div>
-  <div class="frame-block flex-auto">
-    <editor :content="code" @change="contentChange" @ready="initEditor" :commands="commands"></editor>
+  <div class="frame-block flex-auto p-rel">
+    <editor
+      class="abs-full"
+      :content="code" :commands="commands"
+      @change="contentChange" @ready="initEditor"
+    />
   </div>
   <div class="frame-block" v-show="search.show">
     <button class="pull-right" @click="clearSearch">&times;</button>

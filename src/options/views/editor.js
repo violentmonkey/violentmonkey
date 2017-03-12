@@ -75,6 +75,16 @@ function initCodeMirror() {
   });
 }
 
+function indentWithTab(cm) {
+  if (cm.somethingSelected()) {
+    cm.indentSelection('add');
+  } else {
+    cm.replaceSelection(
+      cm.getOption('indentWithTabs') ? '\t' : ' '.repeat(cm.getOption('indentUnit')),
+      'end', '+input');
+  }
+}
+
 var cache = require('../../cache');
 var readyCodeMirror = initCodeMirror();
 
@@ -109,6 +119,7 @@ module.exports = {
       cm.state.commands = _this.commands;
       cm.setOption('extraKeys', {
         Esc: 'cancel',
+        Tab: indentWithTab,
       });
       cm.on('keyHandled', function (_cm, _name, e) {
         e.stopPropagation();

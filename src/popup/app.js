@@ -1,8 +1,9 @@
+var _ = require('src/common');
+_.initOptions();
 var Menu = require('./views/menu');
 var Commands = require('./views/command');
 var Domains = require('./views/domain');
 var utils = require('./utils');
-var _ = require('../common');
 
 var app = new Vue({
   el: '#app',
@@ -52,6 +53,9 @@ exports.navigate = app.navigate.bind(app);
       }).then(function (scripts) {
         utils.store.scripts = scripts;
       });
+    },
+    UpdateOptions: function (data) {
+      _.options.update(data);
     },
   };
   chrome.runtime.onMessage.addListener(function (req, src, callback) {

@@ -141,6 +141,7 @@ labelDataExport:
 labelScriptsToExport:
   description: Label shown on top of the script list for export.
   message: 要导出的脚本
+  touched: false
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: 导出脚本数据
@@ -347,15 +348,19 @@ labelSync:
 buttonAuthorize:
   description: Button to authorize permissions for sync.
   message: 授权
+  touched: false
 buttonAuthorizing:
   description: Button shown when authorization is in progress.
   message: 正在授权
+  touched: false
 buttonAuthorized:
   description: Button shown when permissions are already authorized for sync.
   message: 已授权
+  touched: false
 labelSyncTo:
   description: Label for sync service.
   message: 同步到 $1
+  touched: false
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步时间为 $1
@@ -388,3 +393,39 @@ labelShowBadge:
 labelLineNumber:
   description: Label for line number jumper.
   message: 行号：
+msgSavedSecurity:
+  description: Message shown when settings of security section are saved.
+  message: 黑名单已更新。
+labelBlacklist:
+  description: Label for global blacklist settings in security section.
+  message: 黑名单
+descBlacklist:
+  description: HTML Description for the global blacklist.
+  message: 此列表匹配的URL将不会被注入脚本。每行都是一条<code>@exclude</code>规则但是将用于全局。
+buttonSaveBlacklist:
+  description: Button to save global blacklist.
+  message: 保存
+labelGeneral:
+  description: Label for general settings.
+  message: 通用
+labelSyncSettings:
+  description: Label for sync settings.
+  message: 设置
+labelSyncScriptStatus:
+  description: Label for option to sync script status.
+  message: 同步脚本状态
+labelSyncDisabled:
+  description: Label for option to disable sync service.
+  message: 无
+labelSyncService:
+  description: Label for sync service select.
+  message: 同步到
+labelSyncAuthorize:
+  description: Label for button to authorize a service.
+  message: 授权
+labelSyncRevoke:
+  description: Label for button to revoke authorization for a service.
+  message: 取消授权
+labelSyncAuthorizing:
+  description: Label for button when authorization is in progress.
+  message: 授权中

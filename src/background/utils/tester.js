@@ -1,4 +1,6 @@
-function testURL(url, script) {
+var options = require('../options');
+
+function testScript(url, script) {
   var custom = script.custom;
   var meta = script.meta;
   var inc = [], exc = [], mat = [];
@@ -10,18 +12,25 @@ function testURL(url, script) {
   if (custom.exclude) exc = exc.concat(custom.exclude);
   var ok = !mat.length && !inc.length;
   // @match
-  ok = ok || mat.length && function (test) {
-    return mat.some(test);
-  }(matchTester(url));
+  ok = ok || testMatches(url, mat);
   // @include
-  ok = ok || inc.some(function (str) {
-    return autoReg(str).test(url);
-  });
-  // exclude
-  ok = ok && !exc.some(function (str) {
-    return autoReg(str).test(url);
-  });
+  ok = ok || testRules(url, inc);
+  // @exclude
+  ok = ok && !testRules(url, exc);
   return ok;
+}
+
+function testRules(url, rules) {
+  return rules.some(function (rule) {
+    return autoReg(rule).test(url);
+  });
+}
+function testMatches(url, rules) {
+  if (rules.length) {
+    var test = matchTester(url);
+    return rules.some(test);
+  }
+  return false;
 }
 
 function str2RE(str) {
@@ -29,10 +38,9 @@ function str2RE(str) {
 }
 
 function autoReg(str) {
-  if (/^\/.*\/$/.test(str))
-    return RegExp(str.slice(1, -1));  // Regular-expression
-  else
-    return str2RE(str); // String with wildcards
+  return str.length > 1 && str.charAt(0) === '/' && str.charAt(str.length - 1) === '/'
+    ? RegExp(str.slice(1, -1))  // Regular-expression
+    : str2RE(str);              // String with wildcards
 }
 
 function matchTester(url) {
@@ -72,4 +80,25 @@ function matchTester(url) {
   };
 }
 
-exports.testURL = testURL;
+var testBlacklist = function () {
+  function testBlacklist(url) {
+    return blacklistRE.some(function (re) {
+      return re.test(url);
+    });
+  }
+  function reset(list) {
+    blacklistRE = (list || []).map(function (rule) {
+      return autoReg(rule);
+    });
+  }
+  var blacklistRE = [];
+  reset(options.get('blacklist'));
+  options.hook(function (changes) {
+    var blacklist = changes.blacklist;
+    blacklist && reset(blacklist);
+  });
+  return testBlacklist;
+}();
+
+exports.testScript = testScript;
+exports.testBlacklist = testBlacklist;

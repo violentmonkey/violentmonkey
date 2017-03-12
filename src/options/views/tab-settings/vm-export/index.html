@@ -1,0 +1,13 @@
+<section>
+  <h3 v-text="i18n('labelDataExport')"></h3>
+  <select class=export-list multiple v-model="selectedIds">
+    <option class="ellipsis" v-for="script in store.scripts"
+      :value="script.id" v-text="script.custom.name||script.meta.name"></option>
+  </select>
+  <button v-text="i18n('buttonAllNone')" @click="updateSelection()"></button>
+  <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
+  <label>
+    <input type=checkbox v-setting="'exportValues'">
+    <span v-text="i18n('labelExportScriptData')"></span>
+  </label>
+</section>

@@ -1,3 +1,4 @@
+var _ = require('src/common');
 var VMDB = require('./db');
 var sync = require('./sync');
 var requests = require('./requests');
@@ -5,17 +6,24 @@ var cache = require('./utils/cache');
 var tabsUtils = require('./utils/tabs');
 var scriptUtils = require('./utils/script');
 var clipboard = require('./utils/clipboard');
-var _ = require('../common');
+var options = require('./options');
 
 var vmdb = exports.vmdb = new VMDB;
 var VM_VER = chrome.app.getDetails().version;
+
+options.hook(function (changes) {
+  _.messenger.post({
+    cmd: 'UpdateOptions',
+    data: changes,
+  });
+});
 
 var autoUpdate = function () {
   function check() {
     checking = true;
     return new Promise(function (resolve, reject) {
-      if (!_.options.get('autoUpdate')) return reject();
-      if (Date.now() - _.options.get('lastUpdate') >= 864e5)
+      if (!options.get('autoUpdate')) return reject();
+      if (Date.now() - options.get('lastUpdate') >= 864e5)
         resolve(commands.CheckUpdateAll());
     }).then(function () {
       setTimeout(check, 36e5);
@@ -36,10 +44,6 @@ var commands = {
     return vmdb.removeScript(id)
     .then(function () {
       sync.sync();
-      _.messenger.post({
-        cmd: 'del',
-        data: id,
-      });
     });
   },
   GetData: function (_data, _src) {
@@ -51,12 +55,13 @@ var commands = {
   },
   GetInjected: function (url, src) {
     var data = {
-      isApplied: _.options.get('isApplied'),
-      injectMode: _.options.get('injectMode'),
+      isApplied: options.get('isApplied'),
+      injectMode: options.get('injectMode'),
       version: VM_VER,
     };
-    if (src.url == src.tab.url)
+    if (src.tab && src.url === src.tab.url) {
       chrome.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
+    }
     return data.isApplied
       ? vmdb.getScriptsByURL(url).then(function (res) {
         return Object.assign(data, res);
@@ -69,7 +74,7 @@ var commands = {
     .then(function (script) {
       sync.sync();
       _.messenger.post({
-        cmd: 'update',
+        cmd: 'UpdateScript',
         data: script,
       });
     });
@@ -104,7 +109,7 @@ var commands = {
   ParseScript: function (data, _src) {
     return vmdb.parseScript(data).then(function (res) {
       var meta = res.data.meta;
-      if (!meta.grant.length && !_.options.get('ignoreGrant'))
+      if (!meta.grant.length && !options.get('ignoreGrant'))
         notify({
           id: 'VM-NoGrantWarning',
           title: _.i18n('Warning'),
@@ -121,7 +126,7 @@ var commands = {
     return false;
   },
   CheckUpdateAll: function (_data, _src) {
-    _.options.set('lastUpdate', Date.now());
+    options.set('lastUpdate', Date.now());
     vmdb.getScriptsByIndex('update', 1).then(function (scripts) {
       return Promise.all(scripts.map(vmdb.checkUpdate));
     });
@@ -150,13 +155,16 @@ var commands = {
     setBadge(num, src);
     return false;
   },
-  Authenticate: function (data, _src) {
-    var service = sync.service(data);
-    service && service.authenticate && service.authenticate();
+  SyncAuthorize: function (_data, _src) {
+    sync.authorize();
     return false;
   },
-  SyncStart: function (data, _src) {
-    sync.sync(data && sync.service(data));
+  SyncRevoke: function (_data, _src) {
+    sync.revoke();
+    return false;
+  },
+  SyncStart: function (_data, _src) {
+    sync.sync();
     return false;
   },
   GetFromCache: function (data, _src) {
@@ -176,12 +184,30 @@ var commands = {
   },
   SetClipboard: function (data, _src) {
     clipboard.set(data);
+    return false;
   },
   OpenTab: function (data, _src) {
     chrome.tabs.create({
       url: data.url,
       active: data.active,
     });
+    return false;
+  },
+  GetAllOptions: function (_data, _src) {
+    return options.getAll();
+  },
+  GetOptions: function (data, _src) {
+    return data.reduce(function (res, key) {
+      res[key] = options.get(key);
+      return res;
+    }, {});
+  },
+  SetOptions: function (data, _src) {
+    if (!Array.isArray(data)) data = [data];
+    data.forEach(function (item) {
+      options.set(item.key, item.value);
+    });
+    return false;
   },
 };
 
@@ -212,7 +238,7 @@ vmdb.initialized.then(function () {
     }
   });
   setTimeout(autoUpdate, 2e4);
-  sync.init();
+  sync.initialize();
 });
 
 // Common functions
@@ -237,7 +263,7 @@ var setBadge = function () {
       color: '#808',
       tabId: src.tab.id,
     });
-    var text = (_.options.get('showBadge') && o.num || '').toString();
+    var text = (options.get('showBadge') && o.num || '').toString();
     chrome.browserAction.setBadgeText({
       text: text,
       tabId: src.tab.id,
@@ -250,21 +276,9 @@ var setBadge = function () {
 }();
 
 _.messenger = function () {
-  var port;
-  chrome.runtime.onConnect.addListener(function (_port) {
-    port = _port;
-    _port.onDisconnect.addListener(function () {
-      if (port === _port) port = null;
-    });
-  });
-
   return {
     post: function (data) {
-      try {
-        port && port.postMessage(data);
-      } catch (e) {
-        port = null;
-      }
+      chrome.runtime.sendMessage(data);
     },
     send: function (tabId, data) {
       chrome.tabs.sendMessage(tabId, data);
@@ -279,7 +293,7 @@ _.messenger = function () {
       38: '/images/icon38' + (isApplied ? '' : 'w') + '.png'
     },
   });
-}(_.options.get('isApplied'));
+}(options.get('isApplied'));
 
 chrome.notifications.onClicked.addListener(function (id) {
   if (id == 'VM-NoGrantWarning') {
