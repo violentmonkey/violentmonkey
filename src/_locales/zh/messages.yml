@@ -157,9 +157,6 @@ labelAbout:
 labelRelated:
   description: Label of related links.
   message: 相关链接：
-anchorSupportPage:
-  description: Link to the support page of Violentmonkey.
-  message: '<a href=http://gerald.top/code/vm-nex target=_blank>暴力猴</a>'
 labelDonate:
   description: Label of link to donate page.
   message: 捐助

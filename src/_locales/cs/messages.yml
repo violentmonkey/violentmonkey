@@ -157,9 +157,6 @@ labelAbout:
 labelRelated:
   description: Label of related links.
   message: 'Související odkazy: '
-anchorSupportPage:
-  description: Link to the support page of Violentmonkey.
-  message: ''
 labelDonate:
   description: Label of link to donate page.
   message: Přispět
