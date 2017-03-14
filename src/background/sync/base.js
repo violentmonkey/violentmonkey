@@ -500,7 +500,7 @@ function syncOne(service) {
 }
 function sync() {
   var service = getService();
-  return service && syncOne(service).then(autoSync);
+  return service && Promise.resolve(syncOne(service)).then(autoSync);
 }
 
 function checkAuthUrl(url) {

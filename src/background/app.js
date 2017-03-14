@@ -230,6 +230,10 @@ vmdb.initialized.then(function () {
           error: null,
         });
       }, function (data) {
+        if (data instanceof Error) {
+          console.error(data);
+          data = data.toString();
+        }
         finish({
           error: data,
         });
