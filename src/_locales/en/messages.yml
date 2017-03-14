@@ -388,9 +388,6 @@ labelShowBadge:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Line no.: '
-msgSavedSecurity:
-  description: Message shown when settings of security section are saved.
-  message: Blacklist updated.
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Blacklist
@@ -402,6 +399,9 @@ descBlacklist:
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: Save
+msgSavedBlacklist:
+  description: Message shown when blacklist are saved.
+  message: Blacklist updated.
 labelGeneral:
   description: Label for general settings.
   message: General
@@ -426,3 +426,17 @@ labelSyncRevoke:
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
   message: Authorizing
+msgSavedCustomCSS:
+  description: Message shown when custom CSS is saved.
+  message: Custom style is updated.
+labelCustomCSS:
+  description: Label for custom CSS section.
+  message: Custom Style
+descCustomCSS:
+  description: Description of custom CSS section.
+  message: >-
+    Custom CSS for options page and script installation page. If you are not
+    sure what this is for, please do not edit it.
+buttonSaveCustomCSS:
+  description: Label for button to save custom CSS.
+  message: Save

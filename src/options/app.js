@@ -54,6 +54,19 @@ function loadHash() {
     }
   });
 }
+function initCustomCSS() {
+  var style;
+  _.options.hook(function (changes) {
+    var customCSS = changes.customCSS || '';
+    if (customCSS && !style) {
+      style = document.createElement('style');
+      document.head.appendChild(style);
+    }
+    if (customCSS || style) {
+      style.innerHTML = customCSS;
+    }
+  });
+}
 
 var _ = require('../common');
 _.initOptions();
@@ -84,9 +97,6 @@ var hashData = {
   type: null,
   params: null,
 };
-window.addEventListener('hashchange', loadHash, false);
-zip.workerScriptsPath = '/lib/zip.js/';
-document.title = _.i18n('extName');
 var handlers = {
   UpdateOptions: function (data) {
     _.options.update(data);
@@ -96,7 +106,11 @@ chrome.runtime.onMessage.addListener(function (res) {
   var handle = handlers[res.cmd];
   handle && handle(res.data);
 });
+window.addEventListener('hashchange', loadHash, false);
+zip.workerScriptsPath = '/lib/zip.js/';
+document.title = _.i18n('extName');
 loadHash();
+initCustomCSS();
 
 _.options.ready.then(function () {
   new Vue({

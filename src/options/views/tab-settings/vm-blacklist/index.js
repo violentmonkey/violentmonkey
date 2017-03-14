@@ -17,7 +17,7 @@ module.exports = {
       .filter(Boolean);
       _.options.set('blacklist', rules);
       Message.open({
-        text: _.i18n('msgSavedSecurity'),
+        text: _.i18n('msgSavedBlacklist'),
       });
       _.sendMessage({cmd: 'BlacklistReset'});
     },

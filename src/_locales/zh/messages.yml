@@ -390,9 +390,6 @@ labelShowBadge:
 labelLineNumber:
   description: Label for line number jumper.
   message: 行号：
-msgSavedSecurity:
-  description: Message shown when settings of security section are saved.
-  message: 黑名单已更新。
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: 黑名单
@@ -402,6 +399,9 @@ descBlacklist:
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: 保存
+msgSavedBlacklist:
+  description: Message shown when blacklist are saved.
+  message: 黑名单已更新！
 labelGeneral:
   description: Label for general settings.
   message: 通用
@@ -426,3 +426,15 @@ labelSyncRevoke:
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
   message: 授权中
+msgSavedCustomCSS:
+  description: Message shown when custom CSS is saved.
+  message: 自定义样式已更新！
+labelCustomCSS:
+  description: Label for custom CSS section.
+  message: 自定义样式
+descCustomCSS:
+  description: Description of custom CSS section.
+  message: 这里可以为管理页面和脚本安装页面设置自定义CSS。如果你不确定它的意思，请不要修改。
+buttonSaveCustomCSS:
+  description: Label for button to save custom CSS.
+  message: 保存

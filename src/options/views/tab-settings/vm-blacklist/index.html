@@ -3,6 +3,6 @@
     <span class="feature-text" v-text="i18n('labelBlacklist')"></span>
   </h3>
   <p v-html="i18n('descBlacklist')"></p>
-  <textarea class="text-list" v-model="rules"></textarea>
+  <textarea v-model="rules"></textarea>
   <button v-text="i18n('buttonSaveBlacklist')" @click="onSave"></button>
 </section>

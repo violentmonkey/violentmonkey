@@ -222,6 +222,7 @@ section {
     padding: 0 .2rem;
     top: -.6em;
     left: .8rem;
+    line-height: 1;
     background: white;
   }
   > h4 {
@@ -391,6 +392,8 @@ svg path {
   fill: currentColor;
 }
 
-.text-list {
-  height: 10em;
+.tab-settings {
+  textarea {
+    height: 10em;
+  }
 }

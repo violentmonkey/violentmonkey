@@ -4,6 +4,7 @@ var VmImport = require('./vm-import');
 var VmExport = require('./vm-export');
 var VmSync = require('./vm-sync');
 var VmBlacklist = require('./vm-blacklist');
+var VmCss = require('./vm-css');
 
 module.exports = {
   template: cache.get('./index.html'),
@@ -12,6 +13,7 @@ module.exports = {
     VmExport: VmExport,
     VmSync: VmSync,
     VmBlacklist: VmBlacklist,
+    VmCss: VmCss,
   },
   methods: {
     updateAutoUpdate: function () {

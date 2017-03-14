@@ -14,6 +14,7 @@ var defaults = {
   blacklist: null,
   syncScriptStatus: true,
   sync: null,
+  customCSS: null,
 };
 var changes = {};
 var hooks = _.initHooks();
