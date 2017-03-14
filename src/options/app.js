@@ -13,7 +13,7 @@ function initMain() {
     // utils.features.reset(data.version);
     utils.features.reset('sync');
   });
-  var handlers = {
+  Object.assign(handlers, {
     UpdateSync: function (data) {
       store.sync = data;
     },
@@ -36,13 +36,6 @@ function initMain() {
       });
       ~i && store.scripts.splice(i, 1);
     },
-    UpdateOptions: function (data) {
-      _.options.update(data);
-    },
-  };
-  chrome.runtime.onMessage.addListener(function (res) {
-    var handle = handlers[res.cmd];
-    handle && handle(res.data);
   });
 }
 function loadHash() {
@@ -92,9 +85,18 @@ var hashData = {
   params: null,
 };
 window.addEventListener('hashchange', loadHash, false);
-loadHash();
 zip.workerScriptsPath = '/lib/zip.js/';
 document.title = _.i18n('extName');
+var handlers = {
+  UpdateOptions: function (data) {
+    _.options.update(data);
+  },
+};
+chrome.runtime.onMessage.addListener(function (res) {
+  var handle = handlers[res.cmd];
+  handle && handle(res.data);
+});
+loadHash();
 
 _.options.ready.then(function () {
   new Vue({

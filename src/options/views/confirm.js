@@ -2,6 +2,16 @@ var Editor = require('./editor');
 var cache = require('../../cache');
 var _ = require('../../common');
 
+var options = {
+  closeAfterInstall: _.options.get('closeAfterInstall'),
+};
+
+_.options.hook(function (changes) {
+  if ('closeAfterInstall' in changes) {
+    options.closeAfterInstall = changes.closeAfterInstall;
+  }
+});
+
 module.exports = {
   props: ['params'],
   components: {
@@ -16,7 +26,7 @@ module.exports = {
       code: '',
       require: {},
       resources: {},
-      closeAfterInstall: _.options.get('closeAfterInstall'),
+      options: options,
       commands: {
         cancel: this.close,
       },
@@ -33,12 +43,6 @@ module.exports = {
     _this.loadData().then(function () {
       _this.parseMeta();
     });
-    _this.revoke = _.options.hook('closeAfterInstall', function (value) {
-      _this.closeAfterInstall = value;
-    });
-  },
-  beforeDestroy: function () {
-    this.revoke();
   },
   methods: {
     loadData: function (changedOnly) {
@@ -162,7 +166,7 @@ module.exports = {
       .then(function (res) {
         _this.message = res.message + '[' + _this.getTimeString() + ']';
         if (res.code < 0) return;
-        if (_.options.get('closeAfterInstall')) _this.close();
+        if (_this.closeAfterInstall) _this.close();
         else if (_this.isLocal && _.options.get('trackLocalFile')) _this.trackLocalFile();
       });
     },

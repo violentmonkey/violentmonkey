@@ -9,7 +9,7 @@
             <span v-text="i18n('installOptionClose')"></span>
           </label>
           <label>
-            <input type=checkbox v-setting="'trackLocalFile'" :disabled="closeAfterInstall">
+            <input type=checkbox v-setting="'trackLocalFile'" :disabled="options.closeAfterInstall">
             <span v-text="i18n('installOptionTrack')"></span>
           </label>
         </div>
