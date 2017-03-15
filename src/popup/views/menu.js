@@ -64,12 +64,6 @@ module.exports = {
           options.disabled = !_.options.get('isApplied');
           options.name = options.disabled ? _.i18n('menuScriptDisabled') : _.i18n('menuScriptEnabled');
           options.symbol = options.disabled ? 'remove' : 'check';
-          chrome.browserAction.setIcon({
-            path: {
-              19: '/images/icon19' + (options.disabled ? 'w' : '') + '.png',
-              38: '/images/icon38' + (options.disabled ? 'w' : '') + '.png',
-            },
-          });
         },
         onClick: function (options) {
           _.options.set('isApplied', options.disabled);

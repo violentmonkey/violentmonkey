@@ -12,6 +12,9 @@ var vmdb = exports.vmdb = new VMDB;
 var VM_VER = chrome.app.getDetails().version;
 
 options.hook(function (changes) {
+  if ('isApplied' in changes) {
+    setIcon(changes.isApplied);
+  }
   _.messenger.post({
     cmd: 'UpdateOptions',
     data: changes,
@@ -290,14 +293,15 @@ _.messenger = function () {
   };
 }();
 
-!function (isApplied) {
+function setIcon(isApplied) {
   chrome.browserAction.setIcon({
     path: {
       19: '/images/icon19' + (isApplied ? '' : 'w') + '.png',
       38: '/images/icon38' + (isApplied ? '' : 'w') + '.png'
     },
   });
-}(options.get('isApplied'));
+}
+setIcon(options.get('isApplied'));
 
 chrome.notifications.onClicked.addListener(function (id) {
   if (id == 'VM-NoGrantWarning') {
