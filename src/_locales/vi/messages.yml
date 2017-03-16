@@ -77,10 +77,6 @@ msgErrorLoadingDependency:
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Đang tải thư viện... ($1/$2)
-msgScriptURL:
-  description: URL of the script to be installed on confirm page.
-  message: 'Script URL: $1'
-  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Đang tải thông tin script...
@@ -114,18 +110,6 @@ labelAutoUpdate:
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
   message: Bỏ qua cảnh báo không có @grant
-labelInjectMode:
-  description: Label for a combo box to choose script injection modes.
-  message: 'Chế độ tiêm :'
-  touched: false
-injectModeNormal:
-  description: 'Script injection mode: Normal'
-  message: Bình thường
-  touched: false
-injectModeAdvanced:
-  description: 'Script injection mode: Advanced'
-  message: Nâng cao
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Nhập dữ liệu
@@ -138,10 +122,6 @@ buttonVacuum:
 labelDataExport:
   description: Section title of data export.
   message: Xuất dữ liệu
-labelScriptsToExport:
-  description: Label shown on top of the script list for export.
-  message: Script để xuất
-  touched: false
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Xuất dữ liệu script
@@ -241,10 +221,6 @@ buttonSaveClose:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Oops, bạn không có script nào được cài đặt.'
-hintSupportPage:
-  description: Hint for support page.
-  message: Trang hỗ trợ
-  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: Vô hiệu hoá
@@ -282,10 +258,6 @@ buttonVacuumed:
 hintVacuum:
   description: Hint for vacuuming data.
   message: Bỏ qua dữ liệu thừa và cố gắng tải lại nguồn dữ liệu thiếu từ bộ nhớ đệm.
-menuManageScripts:
-  description: 'Menu item to manage scripts, or to open the options page of the extension.'
-  message: Quản lý scripts
-  touched: false
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Tìm script cho trang này
@@ -295,27 +267,15 @@ menuScriptEnabled:
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Đã vô hiệu hoá script
-menuBack:
-  description: Menu item to go back to main menu from script commands.
-  message: Quay lại
-  touched: false
 menuCommands:
   description: Menu item to list script commands.
-  message: Menu của script...
+  message: Menu của script
 labelSearch:
   description: Label for search input in search box.
   message: 'Tìm kiếm: '
-labelSearchFor:
-  description: Text shown as a place holder in the search box.
-  message: Tìm kiếm...
-  touched: false
 labelReplace:
   description: Label for replace input in search box.
   message: 'Replace with: '
-labelReplaceWith:
-  description: Text shown as a place holder in the replace box.
-  message: Thay thề với...
-  touched: false
 buttonReplace:
   description: Button to replace the current match.
   message: Thay thế
@@ -325,16 +285,6 @@ buttonReplaceAll:
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Tải lại trang khi bật/tắt script từ menu
-hintInjectModeNormal:
-  description: Hint to explain the normal injection mode.
-  message: >-
-    Khá tốt nhưng có thể lỗi trên một số trang bảo mật cao, Ví dụ
-    https://github.com
-  touched: false
-hintInjectModeAdvanced:
-  description: Hint to explain the advanced injection mode.
-  message: 'Hoạt đông trên hầu hết các trang, thực ra là hack'
-  touched: false
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL đầu vào:'
@@ -344,22 +294,6 @@ buttonInstallFromURL:
 labelSync:
   description: Label for sync options.
   message: Đồng bộ
-buttonAuthorize:
-  description: Button to authorize permissions for sync.
-  message: Xác thực
-  touched: false
-buttonAuthorizing:
-  description: Button shown when authorization is in progress.
-  message: Đang xác thực
-  touched: false
-buttonAuthorized:
-  description: Button shown when permissions are already authorized for sync.
-  message: Đã xác thực
-  touched: false
-labelSyncTo:
-  description: Label for sync service.
-  message: Đồng bộ đến $1
-  touched: false
 lastSync:
   description: Label for last sync timestamp.
   message: Đồng bộ cuối lúc $1

@@ -77,10 +77,6 @@ msgErrorLoadingDependency:
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Учитавање захтева... ($1/$2)
-msgScriptURL:
-  description: URL of the script to be installed on confirm page.
-  message: ''
-  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Учитавање скрипте...
@@ -114,18 +110,6 @@ labelAutoUpdate:
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
   message: Не приказуј упозорење о недостатку линије @grant
-labelInjectMode:
-  description: Label for a combo box to choose script injection modes.
-  message: 'Режим уграђивања скрипте:'
-  touched: false
-injectModeNormal:
-  description: 'Script injection mode: Normal'
-  message: Нормални
-  touched: false
-injectModeAdvanced:
-  description: 'Script injection mode: Advanced'
-  message: Напредни
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Увоз података
@@ -138,10 +122,6 @@ buttonVacuum:
 labelDataExport:
   description: Section title of data export.
   message: Извоз података
-labelScriptsToExport:
-  description: Label shown on top of the script list for export.
-  message: Скрипте за извоз
-  touched: false
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Извези податке скрипти
@@ -241,10 +221,6 @@ buttonSaveClose:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: Још увек немате ниједну скрипту.
-hintSupportPage:
-  description: Hint for support page.
-  message: ''
-  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: Онемогући
@@ -282,10 +258,6 @@ buttonVacuumed:
 hintVacuum:
   description: Hint for vacuuming data.
   message: Одбаци вишак и поново учитај недостајуће податке у кеш.
-menuManageScripts:
-  description: 'Menu item to manage scripts, or to open the options page of the extension.'
-  message: Управљај скриптама
-  touched: false
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Пронађи скрипте за овај сајт
@@ -295,27 +267,15 @@ menuScriptEnabled:
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Скрипта је онемогућена
-menuBack:
-  description: Menu item to go back to main menu from script commands.
-  message: Назад
-  touched: false
 menuCommands:
   description: Menu item to list script commands.
-  message: Команде скрипте...
+  message: Команде скрипте
 labelSearch:
   description: Label for search input in search box.
   message: 'Тражи:'
-labelSearchFor:
-  description: Text shown as a place holder in the search box.
-  message: Претрага...
-  touched: false
 labelReplace:
   description: Label for replace input in search box.
   message: 'Замени са:'
-labelReplaceWith:
-  description: Text shown as a place holder in the replace box.
-  message: Замени са...
-  touched: false
 buttonReplace:
   description: Button to replace the current match.
   message: Замени
@@ -327,14 +287,6 @@ labelAutoReloadCurrentTab:
   message: >-
     Поново учитај тренутну картицу након укључивања/искључивања скрипте из
     менија
-hintInjectModeNormal:
-  description: Hint to explain the normal injection mode.
-  message: 'Ефикасан, али не ради на неким безбедним страницама, нпр. https://github.com'
-  touched: false
-hintInjectModeAdvanced:
-  description: Hint to explain the advanced injection mode.
-  message: 'Ради на већини страница, заправо је хак'
-  touched: false
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Унесите адресу:'
@@ -344,22 +296,6 @@ buttonInstallFromURL:
 labelSync:
   description: Label for sync options.
   message: Синхронизација
-buttonAuthorize:
-  description: Button to authorize permissions for sync.
-  message: Одобри
-  touched: false
-buttonAuthorizing:
-  description: Button shown when authorization is in progress.
-  message: Одобравање
-  touched: false
-buttonAuthorized:
-  description: Button shown when permissions are already authorized for sync.
-  message: Одобрено
-  touched: false
-labelSyncTo:
-  description: Label for sync service.
-  message: Синхронизуј са $1
-  touched: false
 lastSync:
   description: Label for last sync timestamp.
   message: 'Последња синхронизација: $1'
