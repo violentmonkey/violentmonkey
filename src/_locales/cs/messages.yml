@@ -287,6 +287,7 @@ hintVacuum:
 menuManageScripts:
   description: 'Menu item to manage scripts, or to open the options page of the extension.'
   message: Řízení skriptů
+  touched: false
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Najdi skripty pro tuto stránku
@@ -299,6 +300,7 @@ menuScriptDisabled:
 menuBack:
   description: Menu item to go back to main menu from script commands.
   message: Zpět
+  touched: false
 menuCommands:
   description: Menu item to list script commands.
   message: Skriptové příkazy...
@@ -439,4 +441,10 @@ descCustomCSS:
   message: ''
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
+  message: ''
+menuDashboard:
+  description: Label for menu item to open dashboard.
+  message: ''
+menuMatchedScripts:
+  description: Label for menu listing matched scripts.
   message: ''

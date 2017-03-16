@@ -287,6 +287,7 @@ hintVacuum:
 menuManageScripts:
   description: 'Menu item to manage scripts, or to open the options page of the extension.'
   message: 管理脚本
+  touched: false
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 为此站点查找脚本
@@ -299,6 +300,7 @@ menuScriptDisabled:
 menuBack:
   description: Menu item to go back to main menu from script commands.
   message: 返回
+  touched: false
 menuCommands:
   description: Menu item to list script commands.
   message: 脚本命令...
@@ -438,3 +440,9 @@ descCustomCSS:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: 保存
+menuDashboard:
+  description: Label for menu item to open dashboard.
+  message: 打开控制台
+menuMatchedScripts:
+  description: Label for menu listing matched scripts.
+  message: 匹配的脚本

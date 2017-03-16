@@ -8,6 +8,7 @@
     "i18n": "gulp i18n",
     "lint": "gulp lint",
     "update": "node scripts/update",
+    "svgo": "svgo icons",
     "test": "mocha"
   },
   "description": "Violentmonkey",
@@ -30,6 +31,7 @@
     "mocha": "^3.1.2",
     "ncp": "^2.0.0",
     "precss": "^1.4.0",
+    "svgo": "^0.7.2",
     "through2": "^2.0.3"
   },
   "author": "Gerald <i@gerald.top>",

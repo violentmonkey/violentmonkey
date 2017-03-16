@@ -285,6 +285,7 @@ hintVacuum:
 menuManageScripts:
   description: 'Menu item to manage scripts, or to open the options page of the extension.'
   message: Quản lý scripts
+  touched: false
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Tìm script cho trang này
@@ -297,6 +298,7 @@ menuScriptDisabled:
 menuBack:
   description: Menu item to go back to main menu from script commands.
   message: Quay lại
+  touched: false
 menuCommands:
   description: Menu item to list script commands.
   message: Menu của script...
@@ -437,4 +439,10 @@ descCustomCSS:
   message: ''
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
+  message: ''
+menuDashboard:
+  description: Label for menu item to open dashboard.
+  message: ''
+menuMatchedScripts:
+  description: Label for menu listing matched scripts.
   message: ''

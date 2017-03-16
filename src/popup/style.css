@@ -6,52 +6,10 @@
 html {
   font: 14px menu;
 }
-.menu {
-  max-width: 30rem;
-  max-height: 30rem;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-.menu.placeholder {
-  max-width: none;
-  height: 0;
-  overflow: hidden;
-}
-.ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.menu-item-label {
-  cursor: pointer;
-  padding: .4rem;
-  white-space: nowrap;
-}
-.menu-item-detail:hover,
-.menu-item-label:hover {
-  background: cornflowerblue;
-  color: white;
-}
-.menu-item.disabled .menu-item-label {
-  color: gray;
-}
-.menu-item.disabled .menu-item-label:hover {
-  color: silver;
-}
-.menu-item-detail {
-  float: right;
-  border-radius: .1rem;
-  text-align: center;
-  width: 1rem;
-  margin: .4rem;
-  background: white;
-  cursor: pointer;
-}
-.menu-item-detail ~ .menu-item-label {
-  padding-right: 2em;
-}
-hr {
-  border: none;
-  border-top: 1px solid silver;
+body {
+  min-width: 300px;
+  padding: 1em;
+  font-size: 1em;
 }
 .icon {
   width: 1rem;
@@ -60,4 +18,60 @@ hr {
 }
 svg path {
   fill: currentColor;
+}
+
+.logo {
+  text-align: center;
+  img {
+    width: 6em;
+  }
+  &.disabled > img {
+    opacity: .5;
+  }
+}
+.menu {
+  border-top: 1px solid silver;
+  &-item {
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+    padding: .5em 2em;
+    &.disabled {
+      color: gray;
+      &:hover {
+        color: silver;
+      }
+    }
+    &:hover {
+      background: cornflowerblue;
+      color: white;
+    }
+    > .icon {
+      position: absolute;
+      top: .7em;
+      left: .5em;
+      &-right {
+        left: auto;
+        right: .5em;
+      }
+    }
+  }
+  &.collapse {
+    > .submenu {
+      display: none;
+    }
+    > .menu-item > .icon-right {
+      transform: rotateZ(90deg);
+    }
+  }
+}
+.submenu {
+  min-height: 4em;
+  max-height: 12em;
+  margin-left: 2em;
+  overflow-y: auto;
+  border-top: 1px dashed #ddd;
+  .menu-scripts > & {
+    max-height: 20em;
+  }
 }

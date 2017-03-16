@@ -1,0 +1,50 @@
+<div id="app">
+  <div class="logo" :class="{disabled:!options.isApplied}">
+    <img src="/images/icon128.png">
+  </div>
+  <div class="menu-item" :class="{disabled:!options.isApplied}" @click="onToggle">
+    <icon :name="getSymbolCheck(options.isApplied)"></icon>
+    <span v-text="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"></span>
+  </div>
+  <div class="menu">
+    <div class="menu-item" @click="onManage">
+      <icon name="cog"></icon>
+      <span v-text="i18n('menuDashboard')"></span>
+    </div>
+  </div>
+  <div class="menu menu-domains" v-show="domains.length" :class="{collapse:collapse.domains}" @click="collapse.domains=!collapse.domains">
+    <div class="menu-item">
+      <icon name="search"></icon>
+      <icon name="more" class="icon-right"></icon>
+      <span v-text="i18n('menuFindScripts')"></span>
+    </div>
+    <div class="submenu">
+      <div class="menu-item" v-for="item in domains" @click="onFindScripts(item)">
+        <span v-text="item.name"></span>
+      </div>
+    </div>
+  </div>
+  <div class="menu menu-commands" v-show="commands.length" :class="{collapse:collapse.commands}" @click="collapse.commands=!collapse.commands">
+    <div class="menu-item">
+      <icon name="more" class="icon-right"></icon>
+      <span v-text="i18n('menuCommands')"></span>
+    </div>
+    <div class="submenu">
+      <div class="menu-item" v-for="item in commands" @click="onCommand(item)">
+        <span v-text="item.name"></span>
+      </div>
+    </div>
+  </div>
+  <div class="menu menu-scripts" v-show="scripts.length" :class="{collapse:collapse.scripts}" @click="collapse.scripts=!collapse.scripts">
+    <div class="menu-item">
+      <icon name="more" class="icon-right"></icon>
+      <span v-text="i18n('menuMatchedScripts')"></span>
+    </div>
+    <div class="submenu">
+      <div class="menu-item" v-for="item in scripts" @click="onToggleScript(item)" :class="{disabled:!item.data.enabled}">
+        <icon :name="getSymbolCheck(item.data.enabled)" class="icon-right"></icon>
+        <span v-text="item.name"></span>
+      </div>
+    </div>
+  </div>
+</div>
