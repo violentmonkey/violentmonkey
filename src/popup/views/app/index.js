@@ -66,7 +66,7 @@ module.exports = {
       _.options.set('isApplied', !this.options.isApplied);
     },
     onManage: function () {
-      var url = chrome.extension.getURL(chrome.app.getDetails().options_page);
+      var url = chrome.extension.getURL(chrome.runtime.getManifest().options_page);
       chrome.tabs.query({
         currentWindow: true,
         url: url,

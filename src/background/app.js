@@ -9,7 +9,7 @@ var clipboard = require('./utils/clipboard');
 var options = require('./options');
 
 var vmdb = exports.vmdb = new VMDB;
-var VM_VER = chrome.app.getDetails().version;
+var VM_VER = chrome.runtime.getManifest().version;
 
 options.hook(function (changes) {
   if ('isApplied' in changes) {
