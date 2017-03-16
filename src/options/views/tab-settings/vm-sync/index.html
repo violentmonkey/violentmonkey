@@ -9,7 +9,7 @@
     </select>
     <button v-text="labelAuthorize" v-if="service.name"
     :disabled="!canAuthorize" @click="onAuthorize"></button>
-    <button :disabled="!canSync" v-if="service.name">
+    <button :disabled="!canSync" v-if="service.name" @click="onSync">
       <svg class="icon"><use xlink:href="#refresh" /></svg>
     </button>
   </div>
