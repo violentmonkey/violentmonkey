@@ -7,7 +7,7 @@ html {
   font: 14px menu;
 }
 body {
-  min-width: 300px;
+  min-width: 20em;
   padding: 1em;
   font-size: 1em;
 }
@@ -23,7 +23,7 @@ svg path {
 .logo {
   text-align: center;
   img {
-    width: 6em;
+    width: 4em;
   }
   &.disabled > img {
     opacity: .5;
@@ -36,6 +36,9 @@ svg path {
     cursor: pointer;
     text-align: center;
     padding: .5em 2em;
+    .submenu > & {
+      text-align: left;
+    }
     &.disabled {
       color: gray;
       &:hover {
@@ -67,11 +70,8 @@ svg path {
 }
 .submenu {
   min-height: 4em;
-  max-height: 12em;
+  max-height: 18em;
   margin-left: 2em;
   overflow-y: auto;
   border-top: 1px dashed #ddd;
-  .menu-scripts > & {
-    max-height: 20em;
-  }
 }

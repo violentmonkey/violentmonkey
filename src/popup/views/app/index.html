@@ -12,8 +12,8 @@
       <span v-text="i18n('menuDashboard')"></span>
     </div>
   </div>
-  <div class="menu menu-domains" v-show="domains.length" :class="{collapse:collapse.domains}" @click="collapse.domains=!collapse.domains">
-    <div class="menu-item">
+  <div class="menu menu-domains" v-show="domains.length" :class="{collapse:activeMenu!=='domains'}">
+    <div class="menu-item" @click="toggleMenu('domains')">
       <icon name="search"></icon>
       <icon name="more" class="icon-right"></icon>
       <span v-text="i18n('menuFindScripts')"></span>
@@ -24,8 +24,8 @@
       </div>
     </div>
   </div>
-  <div class="menu menu-commands" v-show="commands.length" :class="{collapse:collapse.commands}" @click="collapse.commands=!collapse.commands">
-    <div class="menu-item">
+  <div class="menu menu-commands" v-show="commands.length" :class="{collapse:activeMenu!=='commands'}">
+    <div class="menu-item" @click="toggleMenu('commands')">
       <icon name="more" class="icon-right"></icon>
       <span v-text="i18n('menuCommands')"></span>
     </div>
@@ -35,8 +35,8 @@
       </div>
     </div>
   </div>
-  <div class="menu menu-scripts" v-show="scripts.length" :class="{collapse:collapse.scripts}" @click="collapse.scripts=!collapse.scripts">
-    <div class="menu-item">
+  <div class="menu menu-scripts" v-show="scripts.length" :class="{collapse:activeMenu!=='scripts'}">
+    <div class="menu-item" @click="toggleMenu('scripts')">
       <icon name="more" class="icon-right"></icon>
       <span v-text="i18n('menuMatchedScripts')"></span>
     </div>

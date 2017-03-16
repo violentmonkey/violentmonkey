@@ -20,6 +20,7 @@ module.exports = {
   data: function () {
     return {
       options: options,
+      activeMenu: 'scripts',
       store: utils.store,
       collapse: {
         domains: true,
@@ -55,6 +56,9 @@ module.exports = {
     },
   },
   methods: {
+    toggleMenu: function (name) {
+      this.activeMenu = this.activeMenu === name ? null : name;
+    },
     getSymbolCheck: function (bool) {
       return bool ? 'check' : 'remove';
     },
