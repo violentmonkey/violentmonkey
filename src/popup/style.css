@@ -63,7 +63,12 @@ svg path {
     > .submenu {
       display: none;
     }
-    > .menu-item > .icon-right {
+    .icon-collapse {
+      transform: none;
+    }
+  }
+  &:not(.collapse) {
+    > .menu-item > .icon-collapse {
       transform: rotateZ(90deg);
     }
   }

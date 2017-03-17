@@ -15,7 +15,7 @@
   <div class="menu menu-domains" v-show="domains.length" :class="{collapse:activeMenu!=='domains'}">
     <div class="menu-item" @click="toggleMenu('domains')">
       <icon name="search"></icon>
-      <icon name="more" class="icon-right"></icon>
+      <icon name="more" class="icon-right icon-collapse"></icon>
       <span v-text="i18n('menuFindScripts')"></span>
     </div>
     <div class="submenu">
@@ -26,7 +26,7 @@
   </div>
   <div class="menu menu-commands" v-show="commands.length" :class="{collapse:activeMenu!=='commands'}">
     <div class="menu-item" @click="toggleMenu('commands')">
-      <icon name="more" class="icon-right"></icon>
+      <icon name="more" class="icon-right icon-collapse"></icon>
       <span v-text="i18n('menuCommands')"></span>
     </div>
     <div class="submenu">
@@ -37,7 +37,7 @@
   </div>
   <div class="menu menu-scripts" v-show="scripts.length" :class="{collapse:activeMenu!=='scripts'}">
     <div class="menu-item" @click="toggleMenu('scripts')">
-      <icon name="more" class="icon-right"></icon>
+      <icon name="more" class="icon-right icon-collapse"></icon>
       <span v-text="i18n('menuMatchedScripts')"></span>
     </div>
     <div class="submenu">
