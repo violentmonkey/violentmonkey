@@ -102,7 +102,7 @@ var handlers = {
     _.options.update(data);
   },
 };
-chrome.runtime.onMessage.addListener(function (res) {
+browser.runtime.onMessage.addListener(function (res) {
   var handle = handlers[res.cmd];
   handle && handle(res.data);
 });

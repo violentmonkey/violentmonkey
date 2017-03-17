@@ -29,6 +29,7 @@
   "content_scripts": [
     {
       "js": [
+        "mylib/browser.js",
         "injected.js"
       ],
       "matches": [

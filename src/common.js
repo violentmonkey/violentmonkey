@@ -37,8 +37,9 @@ polyfill(Array.prototype, 'find', function (predicate) {
 // Polyfill end
 
 var _ = exports;
+
 _.i18n = function (name, args) {
-  return chrome.i18n.getMessage(name, args) || name;
+  return browser.i18n.getMessage(name, args) || name;
 };
 _.defaultImage = '/images/icon128.png';
 
@@ -146,10 +147,13 @@ _.initOptions = function () {
 };
 
 _.sendMessage = function (data) {
-  return new Promise(function (resolve, reject) {
-    chrome.runtime.sendMessage(data, function (res) {
-      res && res.error ? reject(res.error) : resolve(res && res.data);
-    });
+  return browser.runtime.sendMessage(data)
+  .then(function (res) {
+    if (res && res.error) throw res.error;
+    return res && res.data;
+  })
+  .catch(function (err) {
+    console.error(err);
   });
 };
 

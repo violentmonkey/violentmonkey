@@ -3,23 +3,31 @@ var VMDB = require('./db');
 var sync = require('./sync');
 var requests = require('./requests');
 var cache = require('./utils/cache');
-var tabsUtils = require('./utils/tabs');
 var scriptUtils = require('./utils/script');
 var clipboard = require('./utils/clipboard');
 var options = require('./options');
 
 var vmdb = exports.vmdb = new VMDB;
-var VM_VER = chrome.runtime.getManifest().version;
+var VM_VER = browser.runtime.getManifest().version;
 
 options.hook(function (changes) {
   if ('isApplied' in changes) {
     setIcon(changes.isApplied);
   }
-  _.messenger.post({
+  browser.runtime.sendMessage({
     cmd: 'UpdateOptions',
     data: changes,
   });
 });
+
+function broadcast(data) {
+  browser.tabs.query({})
+  .then(function (tabs) {
+    tabs.forEach(function (tab) {
+      browser.tabs.sendMessage(tab.id, data);
+    });
+  });
+}
 
 var autoUpdate = function () {
   function check() {
@@ -63,7 +71,7 @@ var commands = {
       version: VM_VER,
     };
     if (src.tab && src.url === src.tab.url) {
-      chrome.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
+      browser.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
     }
     return data.isApplied
       ? vmdb.getScriptsByURL(url).then(function (res) {
@@ -76,7 +84,7 @@ var commands = {
     })
     .then(function (script) {
       sync.sync();
-      _.messenger.post({
+      browser.runtime.sendMessage({
         cmd: 'UpdateScript',
         data: script,
       });
@@ -85,7 +93,7 @@ var commands = {
   SetValue: function (data, _src) {
     return vmdb.setValue(data.uri, data.values)
     .then(function () {
-      tabsUtils.broadcast({
+      broadcast({
         cmd: 'UpdateValues',
         data: {
           uri: data.uri,
@@ -119,7 +127,7 @@ var commands = {
           body: _.i18n('msgWarnGrant', [meta.name||_.i18n('labelNoName')]),
           isClickable: true,
         });
-      _.messenger.post(res);
+      browser.runtime.sendMessage(res);
       sync.sync();
       return res.data;
     });
@@ -144,7 +152,7 @@ var commands = {
   },
   HttpRequest: function (details, src) {
     requests.httpRequest(details, function (res) {
-      _.messenger.send(src.tab.id, {
+      browser.tabs.sendMessage(src.tab.id, {
         cmd: 'HttpRequested',
         data: res,
       });
@@ -175,12 +183,13 @@ var commands = {
   },
   Notification: function (data, _src) {
     return new Promise(function (resolve) {
-      chrome.notifications.create({
+      browser.notifications.create({
         type: 'basic',
         title: data.title || _.i18n('extName'),
         message: data.text,
         iconUrl: data.image || _.defaultImage,
-      }, function (id) {
+      })
+      .then(function (id) {
         resolve(id);
       });
     });
@@ -190,7 +199,7 @@ var commands = {
     return false;
   },
   OpenTab: function (data, _src) {
-    chrome.tabs.create({
+    browser.tabs.create({
       url: data.url,
       active: data.active,
     });
@@ -215,33 +224,10 @@ var commands = {
 };
 
 vmdb.initialized.then(function () {
-  chrome.runtime.onMessage.addListener(function (req, src, callback) {
+  browser.runtime.onMessage.addListener(function (req, src) {
     var func = commands[req.cmd];
     if (func) {
-      var res = func(req.data, src);
-      if (res === false) return;
-      var finish = function (data) {
-        try {
-          callback(data);
-        } catch (e) {
-          // callback fails if not given in content page
-        }
-      };
-      Promise.resolve(res).then(function (data) {
-        finish({
-          data: data,
-          error: null,
-        });
-      }, function (data) {
-        if (data instanceof Error) {
-          console.error(data);
-          data = data.toString();
-        }
-        finish({
-          error: data,
-        });
-      });
-      return true;
+      return func(req.data, src);
     }
   });
   setTimeout(autoUpdate, 2e4);
@@ -251,7 +237,7 @@ vmdb.initialized.then(function () {
 // Common functions
 
 function notify(options) {
-  chrome.notifications.create(options.id || 'ViolentMonkey', {
+  browser.notifications.create(options.id || 'ViolentMonkey', {
     type: 'basic',
     iconUrl: _.defaultImage,
     title: options.title + ' - ' + _.i18n('extName'),
@@ -266,12 +252,12 @@ var setBadge = function () {
     var o = badges[src.id];
     if (!o) o = badges[src.id] = {num: 0};
     o.num += num;
-    chrome.browserAction.setBadgeBackgroundColor({
+    browser.browserAction.setBadgeBackgroundColor({
       color: '#808',
       tabId: src.tab.id,
     });
     var text = (options.get('showBadge') && o.num || '').toString();
-    chrome.browserAction.setBadgeText({
+    browser.browserAction.setBadgeText({
       text: text,
       tabId: src.tab.id,
     });
@@ -282,19 +268,8 @@ var setBadge = function () {
   };
 }();
 
-_.messenger = function () {
-  return {
-    post: function (data) {
-      chrome.runtime.sendMessage(data);
-    },
-    send: function (tabId, data) {
-      chrome.tabs.sendMessage(tabId, data);
-    },
-  };
-}();
-
 function setIcon(isApplied) {
-  chrome.browserAction.setIcon({
+  browser.browserAction.setIcon({
     path: {
       19: '/images/icon19' + (isApplied ? '' : 'w') + '.png',
       38: '/images/icon38' + (isApplied ? '' : 'w') + '.png'
@@ -303,19 +278,21 @@ function setIcon(isApplied) {
 }
 setIcon(options.get('isApplied'));
 
-chrome.notifications.onClicked.addListener(function (id) {
+browser.notifications.onClicked.addListener(function (id) {
   if (id == 'VM-NoGrantWarning') {
-    tabsUtils.create('http://wiki.greasespot.net/@grant');
+    browser.tabs.create({
+      url: 'http://wiki.greasespot.net/@grant',
+    });
   } else {
-    tabsUtils.broadcast({
+    broadcast({
       cmd: 'NotificationClick',
       data: id,
     });
   }
 });
 
-chrome.notifications.onClosed.addListener(function (id) {
-  tabsUtils.broadcast({
+browser.notifications.onClosed.addListener(function (id) {
+  broadcast({
     cmd: 'NotificationClose',
     data: id,
   });

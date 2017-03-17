@@ -1,8 +1,7 @@
-var tabs = require('../utils/tabs');
 var base = require('./base');
 
-tabs.update(function (tab) {
-  tab.url && base.checkAuthUrl(tab.url) && tabs.remove(tab.id);
+browser.tabs.onUpdated.addListener(function (tabId, changes) {
+  changes.url && base.checkAuthUrl(changes.url) && browser.tabs.remove(tabId);
 });
 
 // import sync modules

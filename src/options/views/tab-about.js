@@ -1,6 +1,6 @@
 var cache = require('../../cache');
 var data = {
-  version: chrome.runtime.getManifest().version,
+  version: browser.runtime.getManifest().version,
   language: navigator.language,
 };
 

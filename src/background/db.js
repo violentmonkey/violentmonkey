@@ -218,7 +218,7 @@ VMDB.prototype.removeScript = function (id) {
     };
   })
   .then(function () {
-    _.messenger.post({
+    browser.runtime.sendMessage({
       cmd: 'RemoveScript',
       data: id,
     });
@@ -606,35 +606,35 @@ VMDB.prototype.checkUpdate = function () {
         return Promise.resolve();
       res.data.checking = false;
       res.data.message = _.i18n('msgNoUpdate');
-      _.messenger.post(res);
+      browser.runtime.sendMessage(res);
       return Promise.reject();
     };
     var errHandler = function (_xhr) {
       res.data.checking = false;
       res.data.message = _.i18n('msgErrorFetchingUpdateInfo');
-      _.messenger.post(res);
+      browser.runtime.sendMessage(res);
       return Promise.reject();
     };
     var update = function () {
       if (!downloadURL) {
         res.data.message = '<span class="new">' + _.i18n('msgNewVersion') + '</span>';
-        _.messenger.post(res);
+        browser.runtime.sendMessage(res);
         return Promise.reject();
       }
       res.data.message = _.i18n('msgUpdating');
-      _.messenger.post(res);
+      browser.runtime.sendMessage(res);
       return scriptUtils.fetch(downloadURL).then(function (xhr) {
         return xhr.responseText;
       }, function (_xhr) {
         res.data.checking = false;
         res.data.message = _.i18n('msgErrorFetchingScript');
-        _.messenger.post(res);
+        browser.runtime.sendMessage(res);
         return Promise.reject();
       });
     };
     if (!updateURL) return Promise.reject();
     res.data.message = _.i18n('msgCheckingForUpdate');
-    _.messenger.post(res);
+    browser.runtime.sendMessage(res);
     return scriptUtils.fetch(updateURL, null, {
       Accept: 'text/x-userscript-meta',
     }).then(okHandler, errHandler).then(update);
@@ -652,7 +652,7 @@ VMDB.prototype.checkUpdate = function () {
           code: code,
         }).then(function (res) {
           res.data.checking = false;
-          _.messenger.post(res);
+          browser.runtime.sendMessage(res);
         });
       }, function () {
         delete processes[script.id];

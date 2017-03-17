@@ -42,8 +42,8 @@ module.exports = {
     installFromURL: function () {
       var url = prompt(_.i18n('hintInputURL'));
       if (url && ~url.indexOf('://')) {
-        chrome.tabs.create({
-          url: chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(url),
+        browser.tabs.create({
+          url: browser.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(url),
         });
       }
     },

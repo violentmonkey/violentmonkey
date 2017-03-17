@@ -5,11 +5,15 @@ window.VM = 1;
 function getUniqId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
+function noop() {}
 function sendMessage(data) {
-  return new Promise(function (resolve, reject) {
-    chrome.runtime.sendMessage(data, function (res) {
-      res && res.error ? reject(res.error) : resolve(res && res.data);
-    });
+  return browser.runtime.sendMessage(data)
+  .then(function (res) {
+    if (res && res.error) throw res.error;
+    return res && res.data;
+  })
+  .catch(function (err) {
+    console.error(err);
   });
 }
 function includes(arr, item) {
@@ -65,7 +69,8 @@ function getPopup(){
       ids: ids,
       menus: menus,
     },
-  });
+  })
+  .catch(noop);
 }
 
 var badge = {
@@ -742,8 +747,8 @@ function onNotificationClose(nid) {
 }
 
 // Messages
-chrome.runtime.onMessage.addListener(function (req, src) {
-  var maps = {
+browser.runtime.onMessage.addListener(function (req, src) {
+  var handlers = {
     Command: function (data) {
       comm.post({cmd: 'Command', data: data});
     },
@@ -756,7 +761,7 @@ chrome.runtime.onMessage.addListener(function (req, src) {
     NotificationClick: onNotificationClick,
     NotificationClose: onNotificationClose,
   };
-  var func = maps[req.cmd];
+  var func = handlers[req.cmd];
   if (func) func(req.data, src);
 });
 

@@ -1,17 +1,17 @@
-function Cache(allowOverride) {
-  this.data = {};
-  this.allowOverride = allowOverride;
+function getCache() {
+  function put(key, value) {
+    if (key in data) {
+      throw 'Key {' + key + '} already exists!';
+    }
+    data[key] = value;
+  }
+  function get(key) {
+    if (key in data) return data[key];
+    throw 'Cache not found: ' + key;
+  }
+  var data = {};
+  return {get: get, put: put};
 }
-Cache.prototype.put = function (key, fn) {
-  if (key in this.data && !this.allowOverride)
-    throw 'Key {' + key + '} already exists!';
-  this.data[key] = fn;
-};
-Cache.prototype.get = function (key) {
-  var data = this.data;
-  if (key in data) return data[key];
-  throw 'Cache not found: ' + key;
-};
 
 var _ = require('./common');
 Vue.prototype.i18n = _.i18n;
@@ -29,4 +29,4 @@ Vue.prototype.i18n = _.i18n;
 }();
 
 /* eslint-disable no-unused-vars */
-var cache = module.exports = new Cache();
+var cache = module.exports = getCache();
