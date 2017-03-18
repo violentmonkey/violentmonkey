@@ -67,7 +67,6 @@ var commands = {
   GetInjected: function (url, src) {
     var data = {
       isApplied: options.get('isApplied'),
-      injectMode: options.get('injectMode'),
       version: VM_VER,
     };
     if (src.tab && src.url === src.tab.url) {
@@ -120,13 +119,14 @@ var commands = {
   ParseScript: function (data, _src) {
     return vmdb.parseScript(data).then(function (res) {
       var meta = res.data.meta;
-      if (!meta.grant.length && !options.get('ignoreGrant'))
+      if (!meta.grant.length && !options.get('ignoreGrant')) {
         notify({
           id: 'VM-NoGrantWarning',
           title: _.i18n('Warning'),
-          body: _.i18n('msgWarnGrant', [meta.name||_.i18n('labelNoName')]),
+          body: _.i18n('msgWarnGrant', [meta.name || _.i18n('labelNoName')]),
           isClickable: true,
         });
+      }
       browser.runtime.sendMessage(res);
       sync.sync();
       return res.data;
@@ -134,14 +134,12 @@ var commands = {
   },
   CheckUpdate: function (id, _src) {
     vmdb.getScript(id).then(vmdb.checkUpdate);
-    return false;
   },
   CheckUpdateAll: function (_data, _src) {
     options.set('lastUpdate', Date.now());
     vmdb.getScriptsByIndex('update', 1).then(function (scripts) {
       return Promise.all(scripts.map(vmdb.checkUpdate));
     });
-    return false;
   },
   ParseMeta: function (code, _src) {
     return scriptUtils.parseMeta(code);
@@ -157,53 +155,41 @@ var commands = {
         data: res,
       });
     });
-    return false;
   },
   AbortRequest: function (id, _src) {
     return requests.abortRequest(id);
   },
   SetBadge: function (num, src) {
     setBadge(num, src);
-    return false;
   },
   SyncAuthorize: function (_data, _src) {
     sync.authorize();
-    return false;
   },
   SyncRevoke: function (_data, _src) {
     sync.revoke();
-    return false;
   },
   SyncStart: function (_data, _src) {
     sync.sync();
-    return false;
   },
   GetFromCache: function (data, _src) {
     return cache.get(data) || null;
   },
   Notification: function (data, _src) {
-    return new Promise(function (resolve) {
-      browser.notifications.create({
-        type: 'basic',
-        title: data.title || _.i18n('extName'),
-        message: data.text,
-        iconUrl: data.image || _.defaultImage,
-      })
-      .then(function (id) {
-        resolve(id);
-      });
+    return browser.notifications.create({
+      type: 'basic',
+      title: data.title || _.i18n('extName'),
+      message: data.text,
+      iconUrl: data.image || _.defaultImage,
     });
   },
   SetClipboard: function (data, _src) {
     clipboard.set(data);
-    return false;
   },
   OpenTab: function (data, _src) {
     browser.tabs.create({
       url: data.url,
       active: data.active,
     });
-    return false;
   },
   GetAllOptions: function (_data, _src) {
     return options.getAll();
@@ -219,7 +205,6 @@ var commands = {
     data.forEach(function (item) {
       options.set(item.key, item.value);
     });
-    return false;
   },
 };
 
@@ -279,7 +264,7 @@ function setIcon(isApplied) {
 setIcon(options.get('isApplied'));
 
 browser.notifications.onClicked.addListener(function (id) {
-  if (id == 'VM-NoGrantWarning') {
+  if (id === 'VM-NoGrantWarning') {
     browser.tabs.create({
       url: 'http://wiki.greasespot.net/@grant',
     });

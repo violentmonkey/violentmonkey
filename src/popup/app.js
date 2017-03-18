@@ -3,7 +3,7 @@ _.initOptions();
 var App = require('./views/app');
 var utils = require('./utils');
 
-var app = new Vue({
+new Vue({
   el: '#app',
   render: function (h) {
     return h(App);

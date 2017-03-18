@@ -1,4 +1,4 @@
-var cache = require('../../cache');
+var cache = require('src/cache');
 var data = {
   version: browser.runtime.getManifest().version,
   language: navigator.language,

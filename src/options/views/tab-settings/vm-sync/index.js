@@ -38,7 +38,7 @@ module.exports = {
       return services;
     },
     service: function () {
-      var current = this.syncConfig.current;
+      var current = this.syncConfig.current || '';
       var service = this.syncServices.find(function (item) {
         return item.name === current;
       });

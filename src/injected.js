@@ -6,16 +6,6 @@ function getUniqId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 function noop() {}
-function sendMessage(data) {
-  return browser.runtime.sendMessage(data)
-  .then(function (res) {
-    if (res && res.error) throw res.error;
-    return res && res.data;
-  })
-  .catch(function (err) {
-    console.error(err);
-  });
-}
 function includes(arr, item) {
   for (var i = arr.length; i --;) {
     if (arr[i] === item) return true;
@@ -61,6 +51,13 @@ function utf8decode(utftext) {
   return string;
 }
 
+function sendMessage(data) {
+  return browser.runtime.sendMessage(data)
+  .then(function (res) {
+    if (res && res.error) throw res.error;
+    return res && res.data;
+  });
+}
 function getPopup(){
   // XXX: only scripts run in top level window are counted
   top === window && sendMessage({
