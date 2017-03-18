@@ -43,7 +43,7 @@ module.exports = {
       var url = prompt(_.i18n('hintInputURL'));
       if (url && ~url.indexOf('://')) {
         browser.tabs.create({
-          url: browser.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(url),
+          url: browser.runtime.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(url),
         });
       }
     },

@@ -18,7 +18,7 @@ Vue.prototype.i18n = _.i18n;
 
 !function () {
   var xhr = new XMLHttpRequest;
-  xhr.open('GET', '/images/sprite.svg', true);
+  xhr.open('GET', '/public/sprite.svg', true);
   xhr.onload = function () {
     var div = document.createElement('div');
     div.style.display = 'none';

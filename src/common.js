@@ -41,7 +41,7 @@ var _ = exports;
 _.i18n = function (name, args) {
   return browser.i18n.getMessage(name, args) || name;
 };
-_.defaultImage = '/images/icon128.png';
+_.defaultImage = '/public/images/icon128.png';
 
 function normalizeKeys(key) {
   if (!key) key = [];

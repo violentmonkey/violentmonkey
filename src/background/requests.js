@@ -204,7 +204,7 @@ browser.webRequest.onBeforeRequest.addListener(function (req) {
     }
     if ((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
       cache.set(req.url, x.responseText);
-      var url = browser.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url);
+      var url = browser.runtime.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url);
       if (req.tabId < 0) browser.tabs.create({url: url});
       else browser.tabs.get(req.tabId).then(function (tab) {
         browser.tabs.create({url: url + '/' + encodeURIComponent(tab.url)});

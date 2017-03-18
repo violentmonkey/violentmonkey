@@ -66,7 +66,7 @@ module.exports = {
       _.options.set('isApplied', !this.options.isApplied);
     },
     onManage: function () {
-      var url = browser.extension.getURL(browser.runtime.getManifest().options_page);
+      var url = browser.runtime.getURL(browser.runtime.getManifest().options_page);
       browser.tabs.query({
         currentWindow: true,
         url: url,

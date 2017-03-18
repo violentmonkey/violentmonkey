@@ -141,7 +141,7 @@ gulp.task('copy-files', () => {
   const injectedFilter = gulpFilter(['**/injected.js'], {restore: true});
   const jsFilter = gulpFilter(['**/*.js'], {restore: true});
   const cssFilter = gulpFilter(['**/*.css'], {restore: true});
-  var stream = gulp.src(paths.copy)
+  var stream = gulp.src(paths.copy, {base: 'src'})
   .pipe(injectedFilter)
   .pipe(wrap({
     header: '!function(){\n',
@@ -185,7 +185,7 @@ gulp.task('svg', () => (
       },
     },
   }))
-  .pipe(gulp.dest('dist/images'))
+  .pipe(gulp.dest('dist/public'))
 ));
 
 gulp.task('build', [

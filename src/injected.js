@@ -78,11 +78,11 @@ var badge = {
   ready: false,
   willSet: false,
 };
-function getBadge(){
+function getBadge() {
   badge.willSet = true;
   setBadge();
 }
-function setBadge(){
+function setBadge() {
   if (badge.ready && badge.willSet) {
     // XXX: only scripts run in top level window are counted
     top === window && sendMessage({cmd: 'SetBadge', data: badge.number});

@@ -9,15 +9,15 @@
   },
   "homepage_url": "https://violentmonkey.github.io/",
   "icons": {
-    "16": "images/icon16.png",
-    "48": "images/icon48.png",
-    "128": "images/icon128.png"
+    "16": "public/images/icon16.png",
+    "48": "public/images/icon48.png",
+    "128": "public/images/icon128.png"
   },
   "default_locale": "en",
   "browser_action": {
     "default_icon": {
-      "19": "images/icon19.png",
-      "38": "images/icon38.png"
+      "19": "public/images/icon19.png",
+      "38": "public/images/icon38.png"
     },
     "default_title": "__MSG_extName__",
     "default_popup": "popup/index.html"
@@ -29,7 +29,7 @@
   "content_scripts": [
     {
       "js": [
-        "mylib/browser.js",
+        "public/mylib/browser.js",
         "injected.js"
       ],
       "matches": [

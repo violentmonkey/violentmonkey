@@ -271,8 +271,8 @@ var setBadge = function () {
 function setIcon(isApplied) {
   browser.browserAction.setIcon({
     path: {
-      19: '/images/icon19' + (isApplied ? '' : 'w') + '.png',
-      38: '/images/icon38' + (isApplied ? '' : 'w') + '.png'
+      19: '/public/images/icon19' + (isApplied ? '' : 'w') + '.png',
+      38: '/public/images/icon38' + (isApplied ? '' : 'w') + '.png'
     },
   });
 }

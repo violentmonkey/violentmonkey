@@ -37,7 +37,6 @@
   }
   var meta = {
     browserAction: true,
-    extension: true,
     i18n: true,
     notifications: {
       onClicked: true,
@@ -46,6 +45,7 @@
     },
     runtime: {
       getManifest: true,
+      getURL: true,
       onMessage: function (onMessage) {
         function wrapListener(listener) {
           return function onMessage(message, sender, sendResponse) {
