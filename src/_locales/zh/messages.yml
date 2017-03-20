@@ -220,9 +220,7 @@ buttonSaveClose:
   message: 保存并关闭
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: >-
-    你居然没有脚本！<br>快<a href=http://gerald.top/tag/userjs target=_blank>点此</a>查看<a
-    href=http://gerald.top target=_blank style='color:orange'>Gerald</a>的脚本吧~
+  message: 奥欧，您还没有任何脚本~
 buttonDisable:
   description: Button to disable a script.
   message: 禁用

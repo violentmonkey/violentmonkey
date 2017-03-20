@@ -1,5 +1,6 @@
 var scriptUtils = require('./utils/script');
 var tester = require('./utils/tester');
+var Promise = require('./utils/sync-promise');
 var _ = require('../common');
 
 function VMDB() {

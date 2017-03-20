@@ -211,9 +211,15 @@ var commands = {
 vmdb.initialized.then(function () {
   browser.runtime.onMessage.addListener(function (req, src) {
     var func = commands[req.cmd];
+    var res;
     if (func) {
-      return func(req.data, src);
+      res = func(req.data, src);
+      if (typeof res !== 'undefined') {
+        // If res is not instance of native Promise, browser APIs will not wait for it.
+        res = Promise.resolve(res);
+      }
     }
+    return res;
   });
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
