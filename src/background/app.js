@@ -69,9 +69,12 @@ var commands = {
       isApplied: options.get('isApplied'),
       version: VM_VER,
     };
-    if (src.tab && src.url === src.tab.url) {
-      browser.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
-    }
+    setTimeout(function () {
+      // delayed to wait for the tab URL updated
+      if (src.tab && url === src.tab.url) {
+        browser.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
+      }
+    });
     return data.isApplied
       ? vmdb.getScriptsByURL(url).then(function (res) {
         return Object.assign(data, res);
