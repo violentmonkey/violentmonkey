@@ -196,7 +196,11 @@ var comm = {
     var comm = this;
     comm.sid = comm.vmid + srcId;
     comm.did = comm.vmid + destId;
-    document.addEventListener(comm.sid, comm['handle' + srcId].bind(comm), false);
+    var handle = comm['handle' + srcId];
+    document.addEventListener(comm.sid, function (e) {
+      var data = JSON.parse(e.detail);
+      handle.call(comm, data);
+    }, false);
     comm.load = comm.checkLoad = function () {};
     // check whether the page is injectable via <script>, whether limited by CSP
     try {
@@ -206,11 +210,11 @@ var comm = {
     }
   },
   post: function (data) {
-    var e = new CustomEvent(this.did, {detail: data});
+    // Firefox issue: data must be stringified to avoid cross-origin problem
+    var e = new CustomEvent(this.did, {detail: JSON.stringify(data)});
     document.dispatchEvent(e);
   },
-  handleR: function (e) {
-    var obj = e.detail;
+  handleR: function (obj) {
     var comm = this;
     var maps = {
       LoadScript: comm.loadScript.bind(comm),
@@ -351,7 +355,7 @@ var comm = {
       };
       details.url = getFullUrl(details.url);
       comm.qrequests.push(t);
-      comm.post({cmd:'GetRequestId'});
+      comm.post({cmd: 'GetRequestId'});
       return t.req;
     };
   },
@@ -525,9 +529,9 @@ var comm = {
         },
       },
       GM_log: {
-        /* eslint-disable no-console */
-        value: function (data) {console.log(data);},
-        /* eslint-enable no-console */
+        value: function (data) {
+          console.log(data);  // eslint-disable-line no-console
+        },
       },
       GM_openInTab: {
         value: function (url, background) {
@@ -683,8 +687,7 @@ function injectScript(data) {
   };
   inject('!' + func.toString() + '(' + JSON.stringify(data[0]) + ',' + JSON.stringify(comm.did) + ',function(' + data[1].join(',') + '){' + data[2] + '})');
 }
-function handleC(e) {
-  var req = e.detail;
+function handleC(req) {
   if (!req) {
     console.error('[Violentmonkey] Invalid data! There might be unsupported data format.');
     return;
