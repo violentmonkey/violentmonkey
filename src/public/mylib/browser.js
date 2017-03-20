@@ -69,7 +69,16 @@
           },
         };
       },
-      sendMessage: wrapAsync,
+      sendMessage: function (sendMessage) {
+        var promisifiedSendMessage = wrapAsync(sendMessage);
+        return function (data) {
+          return promisifiedSendMessage(data)
+          .then(function (res) {
+            if (res && res.error) throw res.error;
+            return res && res.data;
+          });
+        };
+      },
     },
     tabs: {
       onUpdated: true,

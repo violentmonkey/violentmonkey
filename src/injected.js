@@ -52,11 +52,7 @@ function utf8decode(utftext) {
 }
 
 function sendMessage(data) {
-  return browser.runtime.sendMessage(data)
-  .then(function (res) {
-    if (res && res.error) throw res.error;
-    return res && res.data;
-  });
+  return browser.runtime.sendMessage(data);
 }
 function getPopup(){
   // XXX: only scripts run in top level window are counted

@@ -107,7 +107,7 @@ browser.runtime.onMessage.addListener(function (res) {
   handle && handle(res.data);
 });
 window.addEventListener('hashchange', loadHash, false);
-zip.workerScriptsPath = '/lib/zip.js/';
+zip.workerScriptsPath = '/public/lib/zip.js/';
 document.title = _.i18n('extName');
 loadHash();
 initCustomCSS();
