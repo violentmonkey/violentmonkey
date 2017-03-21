@@ -58,7 +58,7 @@
                 sendResponse({error: err});
               });
               return true;
-            } else {
+            } else if (typeof result !== 'undefined') {
               sendResponse({data: result});
             }
           };
@@ -94,5 +94,6 @@
   };
   if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
     win.browser = wrapAPIs(chrome, meta);
+    win.browser.__patched = true;
   }
 }(this);
