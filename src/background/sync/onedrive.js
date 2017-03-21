@@ -2,7 +2,6 @@
 
 var _ = require('src/common');
 var base = require('./base');
-var tabsUtils = require('../utils/tabs');
 var searchUtils = require('../utils/search');
 
 var config = Object.assign({
@@ -23,7 +22,7 @@ function authorize() {
   var url = 'https://login.live.com/oauth20_authorize.srf';
   var qs = searchUtils.dump(params);
   url += '?' + qs;
-  tabsUtils.create(url);
+  browser.tabs.create({url: url});
 }
 function checkAuth(url) {
   var redirect_uri = config.redirect_uri + '?code=';

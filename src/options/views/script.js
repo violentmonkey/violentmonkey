@@ -3,7 +3,7 @@ var cache = require('../../cache');
 var _ = require('../../common');
 var store = utils.store;
 
-var DEFAULT_ICON = '/images/icon48.png';
+var DEFAULT_ICON = '/public/images/icon48.png';
 
 module.exports = {
   props: ['script'],

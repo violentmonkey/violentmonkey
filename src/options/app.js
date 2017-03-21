@@ -102,12 +102,12 @@ var handlers = {
     _.options.update(data);
   },
 };
-chrome.runtime.onMessage.addListener(function (res) {
+browser.runtime.onMessage.addListener(function (res) {
   var handle = handlers[res.cmd];
   handle && handle(res.data);
 });
 window.addEventListener('hashchange', loadHash, false);
-zip.workerScriptsPath = '/lib/zip.js/';
+zip.workerScriptsPath = '/public/lib/zip.js/';
 document.title = _.i18n('extName');
 loadHash();
 initCustomCSS();

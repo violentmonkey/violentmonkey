@@ -44,26 +44,26 @@ function getHandler(key) {
 
 function initCodeMirror() {
   addCSS([
-    {href: '/lib/CodeMirror/lib/codemirror.css'},
-    {href: '/lib/CodeMirror/theme/eclipse.css'},
-    {href: '/mylib/CodeMirror/fold.css'},
+    {href: '/public/lib/CodeMirror/lib/codemirror.css'},
+    {href: '/public/lib/CodeMirror/theme/eclipse.css'},
+    {href: '/public/mylib/CodeMirror/fold.css'},
   ]);
   return addScripts(
-    {src: '/lib/CodeMirror/lib/codemirror.js'}
+    {src: '/public/lib/CodeMirror/lib/codemirror.js'}
   )
   .then(function () {
     return addScripts([
-      {src: '/lib/CodeMirror/mode/javascript/javascript.js'},
-      {src: '/lib/CodeMirror/addon/comment/continuecomment.js'},
-      {src: '/lib/CodeMirror/addon/edit/matchbrackets.js'},
-      {src: '/lib/CodeMirror/addon/edit/closebrackets.js'},
-      {src: '/lib/CodeMirror/addon/fold/foldcode.js'},
-      {src: '/lib/CodeMirror/addon/fold/foldgutter.js'},
-      {src: '/lib/CodeMirror/addon/fold/brace-fold.js'},
-      {src: '/lib/CodeMirror/addon/fold/comment-fold.js'},
-      {src: '/lib/CodeMirror/addon/search/match-highlighter.js'},
-      {src: '/lib/CodeMirror/addon/search/searchcursor.js'},
-      {src: '/lib/CodeMirror/addon/selection/active-line.js'},
+      {src: '/public/lib/CodeMirror/mode/javascript/javascript.js'},
+      {src: '/public/lib/CodeMirror/addon/comment/continuecomment.js'},
+      {src: '/public/lib/CodeMirror/addon/edit/matchbrackets.js'},
+      {src: '/public/lib/CodeMirror/addon/edit/closebrackets.js'},
+      {src: '/public/lib/CodeMirror/addon/fold/foldcode.js'},
+      {src: '/public/lib/CodeMirror/addon/fold/foldgutter.js'},
+      {src: '/public/lib/CodeMirror/addon/fold/brace-fold.js'},
+      {src: '/public/lib/CodeMirror/addon/fold/comment-fold.js'},
+      {src: '/public/lib/CodeMirror/addon/search/match-highlighter.js'},
+      {src: '/public/lib/CodeMirror/addon/search/searchcursor.js'},
+      {src: '/public/lib/CodeMirror/addon/selection/active-line.js'},
     ]);
   })
   .then(function () {

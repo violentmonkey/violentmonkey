@@ -1,5 +1,4 @@
 var base = require('./base');
-var tabsUtils = require('../utils/tabs');
 var searchUtils = require('../utils/search');
 var config = {
   client_id: 'f0q12zup2uys5w8',
@@ -15,7 +14,7 @@ function authorize() {
   var url = 'https://www.dropbox.com/oauth2/authorize';
   var qs = searchUtils.dump(params);
   url += '?' + qs;
-  tabsUtils.create(url);
+  browser.tabs.create({url: url});
 }
 function checkAuth(url) {
   var redirect_uri = config.redirect_uri + '#';

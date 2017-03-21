@@ -37,10 +37,11 @@ polyfill(Array.prototype, 'find', function (predicate) {
 // Polyfill end
 
 var _ = exports;
+
 _.i18n = function (name, args) {
-  return chrome.i18n.getMessage(name, args) || name;
+  return browser.i18n.getMessage(name, args) || name;
 };
-_.defaultImage = '/images/icon128.png';
+_.defaultImage = '/public/images/icon128.png';
 
 function normalizeKeys(key) {
   if (!key) key = [];
@@ -146,10 +147,9 @@ _.initOptions = function () {
 };
 
 _.sendMessage = function (data) {
-  return new Promise(function (resolve, reject) {
-    chrome.runtime.sendMessage(data, function (res) {
-      res && res.error ? reject(res.error) : resolve(res && res.data);
-    });
+  return browser.runtime.sendMessage(data)
+  .catch(function (err) {
+    console.error(err);
   });
 };
 
@@ -159,8 +159,10 @@ _.debounce = function (func, time) {
     func.apply(thisObj, args);
   }
   var timer;
-  return function (args) {
+  return function () {
     timer && clearTimeout(timer);
+    var args = [];
+    for (var i = 0; i < arguments.length; i++) args.push(arguments[i]);
     timer = setTimeout(run, time, this, args);
   };
 };

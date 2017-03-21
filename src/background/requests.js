@@ -1,4 +1,3 @@
-var tabsUtils = require('./utils/tabs');
 var cache = require('./utils/cache');
 var _ = require('../common');
 
@@ -113,7 +112,7 @@ function abortRequest(id) {
 }
 
 // Watch URL redirects
-chrome.webRequest.onBeforeRedirect.addListener(function (details) {
+browser.webRequest.onBeforeRedirect.addListener(function (details) {
   var reqId = verify[details.requestId];
   if (reqId) {
     var req = requests[reqId];
@@ -125,7 +124,7 @@ chrome.webRequest.onBeforeRedirect.addListener(function (details) {
 });
 
 // Modifications on headers
-chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
+browser.webRequest.onBeforeSendHeaders.addListener(function (details) {
   var headers = details.requestHeaders;
   var newHeaders = [];
   var vmHeaders = {};
@@ -160,7 +159,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
 
 // tasks are not necessary now, turned off
 // Stop redirects
-// chrome.webRequest.onHeadersReceived.addListener(function (details) {
+// browser.webRequest.onHeadersReceived.addListener(function (details) {
 //   var task = tasks[details.requestId];
 //   if (task) {
 //     delete tasks[details.requestId];
@@ -177,20 +176,20 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
 //   urls: ['<all_urls>'],
 //   types: ['xmlhttprequest'],
 // }, ['blocking', 'responseHeaders']);
-// chrome.webRequest.onCompleted.addListener(function (details) {
+// browser.webRequest.onCompleted.addListener(function (details) {
 //   delete tasks[details.requestId];
 // }, {
 //   urls: ['<all_urls>'],
 //   types: ['xmlhttprequest'],
 // });
-// chrome.webRequest.onErrorOccurred.addListener(function (details) {
+// browser.webRequest.onErrorOccurred.addListener(function (details) {
 //   delete tasks[details.requestId];
 // }, {
 //   urls: ['<all_urls>'],
 //   types: ['xmlhttprequest'],
 // });
 
-chrome.webRequest.onBeforeRequest.addListener(function (req) {
+browser.webRequest.onBeforeRequest.addListener(function (req) {
   // onBeforeRequest is fired for local files too
   if (/\.user\.js([\?#]|$)/.test(req.url)) {
     // {cancel: true} will redirect to a blocked view
@@ -205,10 +204,10 @@ chrome.webRequest.onBeforeRequest.addListener(function (req) {
     }
     if ((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
       cache.set(req.url, x.responseText);
-      var url = chrome.extension.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url);
-      if (req.tabId < 0) tabsUtils.create(url);
-      else tabsUtils.get(req.tabId).then(function (t) {
-        tabsUtils.create(url + '/' + encodeURIComponent(t.url));
+      var url = browser.runtime.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url);
+      if (req.tabId < 0) browser.tabs.create({url: url});
+      else browser.tabs.get(req.tabId).then(function (tab) {
+        browser.tabs.create({url: url + '/' + encodeURIComponent(tab.url)});
       });
       return noredirect;
     }

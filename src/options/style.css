@@ -288,11 +288,13 @@ code {
 .script-info {
   margin-left: 3.5rem;
   line-height: 1.5;
-}
-.script-info > * {
-  display: inline-block;
-  margin-right: .8rem;
-  vertical-align: middle;
+  align-items: center;
+  > * {
+    margin-right: .8rem;
+  }
+  .icon {
+    display: block;
+  }
 }
 .script-icon {
   position: absolute;

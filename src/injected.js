@@ -5,13 +5,7 @@ window.VM = 1;
 function getUniqId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
-function sendMessage(data) {
-  return new Promise(function (resolve, reject) {
-    chrome.runtime.sendMessage(data, function (res) {
-      res && res.error ? reject(res.error) : resolve(res && res.data);
-    });
-  });
-}
+function noop() {}
 function includes(arr, item) {
   for (var i = arr.length; i --;) {
     if (arr[i] === item) return true;
@@ -57,6 +51,9 @@ function utf8decode(utftext) {
   return string;
 }
 
+function sendMessage(data) {
+  return browser.runtime.sendMessage(data);
+}
 function getPopup(){
   // XXX: only scripts run in top level window are counted
   top === window && sendMessage({
@@ -65,7 +62,8 @@ function getPopup(){
       ids: ids,
       menus: menus,
     },
-  });
+  })
+  .catch(noop);
 }
 
 var badge = {
@@ -73,11 +71,11 @@ var badge = {
   ready: false,
   willSet: false,
 };
-function getBadge(){
+function getBadge() {
   badge.willSet = true;
   setBadge();
 }
-function setBadge(){
+function setBadge() {
   if (badge.ready && badge.willSet) {
     // XXX: only scripts run in top level window are counted
     top === window && sendMessage({cmd: 'SetBadge', data: badge.number});
@@ -198,7 +196,11 @@ var comm = {
     var comm = this;
     comm.sid = comm.vmid + srcId;
     comm.did = comm.vmid + destId;
-    document.addEventListener(comm.sid, comm['handle' + srcId].bind(comm), false);
+    var handle = comm['handle' + srcId];
+    document.addEventListener(comm.sid, function (e) {
+      var data = JSON.parse(e.detail);
+      handle.call(comm, data);
+    }, false);
     comm.load = comm.checkLoad = function () {};
     // check whether the page is injectable via <script>, whether limited by CSP
     try {
@@ -208,11 +210,11 @@ var comm = {
     }
   },
   post: function (data) {
-    var e = new CustomEvent(this.did, {detail: data});
+    // Firefox issue: data must be stringified to avoid cross-origin problem
+    var e = new CustomEvent(this.did, {detail: JSON.stringify(data)});
     document.dispatchEvent(e);
   },
-  handleR: function (e) {
-    var obj = e.detail;
+  handleR: function (obj) {
     var comm = this;
     var maps = {
       LoadScript: comm.loadScript.bind(comm),
@@ -353,7 +355,7 @@ var comm = {
       };
       details.url = getFullUrl(details.url);
       comm.qrequests.push(t);
-      comm.post({cmd:'GetRequestId'});
+      comm.post({cmd: 'GetRequestId'});
       return t.req;
     };
   },
@@ -527,9 +529,9 @@ var comm = {
         },
       },
       GM_log: {
-        /* eslint-disable no-console */
-        value: function (data) {console.log(data);},
-        /* eslint-enable no-console */
+        value: function (data) {
+          console.log(data);  // eslint-disable-line no-console
+        },
       },
       GM_openInTab: {
         value: function (url, background) {
@@ -685,8 +687,7 @@ function injectScript(data) {
   };
   inject('!' + func.toString() + '(' + JSON.stringify(data[0]) + ',' + JSON.stringify(comm.did) + ',function(' + data[1].join(',') + '){' + data[2] + '})');
 }
-function handleC(e) {
-  var req = e.detail;
+function handleC(req) {
   if (!req) {
     console.error('[Violentmonkey] Invalid data! There might be unsupported data format.');
     return;
@@ -742,8 +743,8 @@ function onNotificationClose(nid) {
 }
 
 // Messages
-chrome.runtime.onMessage.addListener(function (req, src) {
-  var maps = {
+browser.runtime.onMessage.addListener(function (req, src) {
+  var handlers = {
     Command: function (data) {
       comm.post({cmd: 'Command', data: data});
     },
@@ -756,7 +757,7 @@ chrome.runtime.onMessage.addListener(function (req, src) {
     NotificationClick: onNotificationClick,
     NotificationClose: onNotificationClose,
   };
-  var func = maps[req.cmd];
+  var func = handlers[req.cmd];
   if (func) func(req.data, src);
 });
 

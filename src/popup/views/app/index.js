@@ -66,17 +66,20 @@ module.exports = {
       _.options.set('isApplied', !this.options.isApplied);
     },
     onManage: function () {
-      var url = chrome.extension.getURL(chrome.runtime.getManifest().options_page);
-      chrome.tabs.query({
+      var url = browser.runtime.getURL(browser.runtime.getManifest().options_page);
+      // Firefox: browser.tabs.query cannot filter tabs by URLs with custom
+      // schemes like `moz-extension:`
+      browser.tabs.query({
         currentWindow: true,
-        url: url,
-      }, function (tabs) {
+        // url: url,
+      })
+      .then(function (tabs) {
         var tab = tabs.find(function (tab) {
-          var hash = tab.url.match(/#(\w+)/);
-          return !hash || hash[1] !== 'confirm';
+          var parts = tab.url.split('#');
+          return parts[0] === url && (!parts[1] || parts[1].startsWith('confirm/'));
         });
-        if (tab) chrome.tabs.update(tab.id, {active: true});
-        else chrome.tabs.create({url: url});
+        if (tab) browser.tabs.update(tab.id, {active: true});
+        else browser.tabs.create({url: url});
       });
     },
     onFindScripts: function (item) {
@@ -87,12 +90,12 @@ module.exports = {
         var matches = this.store.currentTab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
         domain = matches[1];
       }
-      chrome.tabs.create({
+      browser.tabs.create({
         url: 'https://greasyfork.org/scripts/search?q=' + encodeURIComponent(domain),
       });
     },
     onCommand: function (item) {
-      chrome.tabs.sendMessage(this.store.currentTab.id, {
+      browser.tabs.sendMessage(this.store.currentTab.id, {
         cmd: 'Command',
         data: item.name,
       });
@@ -108,7 +111,7 @@ module.exports = {
       })
       .then(function () {
         item.data.enabled = !item.data.enabled;
-        _.options.get('autoReload') && chrome.tabs.reload(_this.store.currentTab.id);
+        _.options.get('autoReload') && browser.tabs.reload(_this.store.currentTab.id);
       });
     },
   },

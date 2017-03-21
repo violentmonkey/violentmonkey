@@ -175,7 +175,7 @@ var BaseService = serviceFactory({
     return this.events.fire.apply(null, arguments);
   },
   onStateChange: function () {
-    _.messenger.post({
+    browser.runtime.sendMessage({
       cmd: 'UpdateSync',
       data: getStates(),
     });
@@ -406,7 +406,7 @@ var BaseService = serviceFactory({
             }
             return app.vmdb.parseScript(data)
             .then(function (res) {
-              _.messenger.post(res);
+              browser.runtime.sendMessage(res);
             });
           });
         }),
