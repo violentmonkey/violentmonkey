@@ -67,14 +67,16 @@ module.exports = {
     },
     onManage: function () {
       var url = browser.runtime.getURL(browser.runtime.getManifest().options_page);
+      // Firefox: browser.tabs.query cannot filter tabs by URLs with custom
+      // schemes like `moz-extension:`
       browser.tabs.query({
         currentWindow: true,
-        url: url,
+        // url: url,
       })
       .then(function (tabs) {
         var tab = tabs.find(function (tab) {
-          var hash = tab.url.match(/#(\w+)/);
-          return !hash || hash[1] !== 'confirm';
+          var parts = tab.url.split('#');
+          return parts[0] === url && (!parts[1] || parts[1].startsWith('confirm/'));
         });
         if (tab) browser.tabs.update(tab.id, {active: true});
         else browser.tabs.create({url: url});
