@@ -156,7 +156,7 @@ gulp.task('copy-files', () => {
   .pipe(cssFilter)
   .pipe(postcss([
     require('precss')(),
-    isProd && require('cssnano')(),
+    isProd && require('cssnano')({zindex: false}),
   ].filter(Boolean)))
   .pipe(cssFilter.restore)
   .pipe(gulp.dest('dist/'));
