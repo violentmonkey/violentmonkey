@@ -34,7 +34,7 @@ module.exports = {
   },
   computed: {
     isLocal: function () {
-      return /^file:\/\/\//.test(this.params.url);
+      return /^file:\/\/\//.test(this.params.u);
     },
   },
   mounted: function () {
@@ -49,7 +49,7 @@ module.exports = {
       var _this = this;
       _this.installable = false;
       var oldCode = _this.code;
-      return _this.getScript(_this.params.url)
+      return _this.getScript(_this.params.u)
       .then(function (code) {
         if (changedOnly && oldCode === code) return Promise.reject();
         _this.code = code;
@@ -156,8 +156,8 @@ module.exports = {
       _.sendMessage({
         cmd:'ParseScript',
         data:{
-          url: _this.params.url,
-          from: _this.params.referer,
+          url: _this.params.u,
+          from: _this.params.f,
           code: _this.code,
           require: _this.require,
           resources: _this.resources,

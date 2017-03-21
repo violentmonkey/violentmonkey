@@ -191,7 +191,7 @@ browser.webRequest.onBeforeSendHeaders.addListener(function (details) {
 
 browser.webRequest.onBeforeRequest.addListener(function (req) {
   // onBeforeRequest is fired for local files too
-  if (/\.user\.js([\?#]|$)/.test(req.url)) {
+  if (req.method === 'GET' && /\.user\.js([\?#]|$)/.test(req.url)) {
     // {cancel: true} will redirect to a blocked view
     var noredirect = {redirectUrl: 'javascript:history.back()'};
     var x = new XMLHttpRequest();
@@ -204,10 +204,12 @@ browser.webRequest.onBeforeRequest.addListener(function (req) {
     }
     if ((!x.status || x.status == 200) && !/^\s*</.test(x.responseText)) {
       cache.set(req.url, x.responseText);
-      var url = browser.runtime.getURL('/options/index.html') + '#confirm/' + encodeURIComponent(req.url);
+      // Firefox: slashes are decoded automatically by Firefox, thus cannot be
+      // used as separators
+      var url = browser.runtime.getURL('/options/index.html') + '#confirm?u=' + encodeURIComponent(req.url);
       if (req.tabId < 0) browser.tabs.create({url: url});
       else browser.tabs.get(req.tabId).then(function (tab) {
-        browser.tabs.create({url: url + '/' + encodeURIComponent(tab.url)});
+        browser.tabs.create({url: url + '&f=' + encodeURIComponent(tab.url)});
       });
       return noredirect;
     }
@@ -215,7 +217,7 @@ browser.webRequest.onBeforeRequest.addListener(function (req) {
 }, {
   urls: ['<all_urls>'],
   types: ['main_frame'],
-}, ['blocking', 'requestBody']);
+}, ['blocking']);
 
 module.exports = {
   getRequestId: getRequestId,

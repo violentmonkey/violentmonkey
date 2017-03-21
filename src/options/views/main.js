@@ -15,7 +15,7 @@ module.exports = {
   components: components,
   computed: {
     tab: function () {
-      var tab = this.params.tab;
+      var tab = this.params.t;
       if (!components[tab]) tab = 'Main';
       return tab;
     },

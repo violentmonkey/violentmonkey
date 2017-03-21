@@ -38,21 +38,31 @@ function initMain() {
     },
   });
 }
-function loadHash() {
-  var hash = location.hash.slice(1);
-  Object.keys(routes).find(function (key) {
-    var test = routes[key];
-    var params = test(hash);
-    if (params) {
-      hashData.type = key;
-      hashData.params = params;
-      if (init[key]) {
-        init[key]();
-        init[key] = null;
-      }
-      return true;
+function parseLocation(pathInfo) {
+  var parts = pathInfo.split('?');
+  var path = parts[0];
+  var query = (parts[1] || '').split('&').reduce(function (res, seq) {
+    if (seq) {
+      var parts = seq.split('=');
+      res[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
     }
-  });
+    return res;
+  }, {});
+  return {path: path, query: query};
+}
+function loadHash() {
+  var loc = parseLocation(location.hash.slice(1));
+  var route = routes[loc.path];
+  if (route) {
+    hashData.type = route.key;
+    hashData.params = loc.query;
+    if (route.init) {
+      route.init();
+      route.init = null;
+    }
+  } else {
+    location.hash = '';
+  }
 }
 function initCustomCSS() {
   var style;
@@ -80,18 +90,14 @@ var store = Object.assign(utils.store, {
   scripts: [],
   sync: [],
 });
-var init = {
-  Main: initMain,
-};
 var routes = {
-  Main: utils.routeTester([
-    '',
-    'main/:tab',
-  ]),
-  Confirm: utils.routeTester([
-    'confirm/:url',
-    'confirm/:url/:referer',
-  ]),
+  '': {
+    key: 'Main',
+    init: initMain,
+  },
+  confirm: {
+    key: 'Confirm',
+  },
 };
 var hashData = {
   type: null,
