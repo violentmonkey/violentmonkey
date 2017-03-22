@@ -1,6 +1,6 @@
 {
   "name": "violentmonkey",
-  "version": "2.5.8",
+  "version": "2.5.9",
   "scripts": {
     "prebuild": "gulp clean",
     "build": "gulp build",
