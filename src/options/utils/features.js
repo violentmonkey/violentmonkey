@@ -1,35 +1,39 @@
-var _ = require('src/common');
+import Vue from 'vue';
+import { initHooks } from 'src/common';
+import options from 'src/common/options';
 
-var key = 'features';
-var hooks = _.initHooks();
-var revoke = _.options.hook(function (data) {
-  if (data[key]) {
-    features = data[key];
+const FEATURES = 'features';
+let features = options.get(FEATURES);
+let hooks = initHooks();
+let revoke = options.hook((data) => {
+  if (data[FEATURES]) {
+    features = data[FEATURES];
     revoke();
     revoke = null;
     hooks.fire();
     hooks = null;
   }
 });
-var features = _.options.get(key);
-if (!features || !features.data) features = {
-  data: {},
-};
-var items = {};
+if (!features || !features.data) {
+  features = {
+    data: {},
+  };
+}
+const items = {};
 
-exports.reset = function (version) {
+export default function resetFeatures(version) {
   if (features.version !== version) {
-    _.options.set(key, features = {
-      version: version,
+    options.set(FEATURES, features = {
+      version,
       data: {},
     });
   }
-};
+}
 
 function getContext(el, value) {
-  function onFeatureClick(_e) {
+  function onFeatureClick() {
     features.data[value] = 1;
-    _.options.set(key, features);
+    options.set(FEATURES, features);
     el.classList.remove('feature');
     el.removeEventListener('click', onFeatureClick, false);
   }
@@ -43,28 +47,30 @@ function getContext(el, value) {
     el.addEventListener('click', onFeatureClick, false);
   }
   return {
-    el: el,
-    reset: reset,
-    clear: clear,
+    el,
+    clear,
+    reset,
   };
 }
 
 Vue.directive('feature', {
-  bind: function (el, binding) {
-    var value = binding.value;
-    var item = getContext(el, value);
-    var list = items[value] = items[value] || [];
+  bind(el, binding) {
+    const { value } = binding;
+    const item = getContext(el, value);
+    let list = items[value];
+    if (!list) {
+      list = [];
+      items[value] = list;
+    }
     list.push(item);
     item.reset();
-    hooks && hooks.hook(item.reset);
+    if (hooks) hooks.hook(item.reset);
   },
-  unbind: function (el, binding) {
-    var list = items[binding.value];
+  unbind(el, binding) {
+    const list = items[binding.value];
     if (list) {
-      var index = list.findIndex(function (item) {
-        return item.el === el;
-      });
-      if (~index) {
+      const index = list.findIndex(item => item.el === el);
+      if (index >= 0) {
         list[index].clear();
         list.splice(index, 1);
       }

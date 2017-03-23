@@ -1,5 +1,6 @@
 dist/
 node_modules/
+*.zip
 *.nex
 *.crx
 *.log

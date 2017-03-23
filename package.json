@@ -13,9 +13,17 @@
   },
   "description": "Violentmonkey",
   "devDependencies": {
+    "babel-eslint": "^7.2.0",
     "cssnano": "^3.10.0",
     "del": "^2.2.0",
     "eslint": "^3.17.1",
+    "eslint-config-airbnb-base": "^11.1.1",
+    "eslint-friendly-formatter": "^2.0.7",
+    "eslint-import-resolver-webpack": "^0.8.1",
+    "eslint-plugin-html": "^2.0.1",
+    "eslint-plugin-import": "^2.2.0",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "friendly-errors-webpack-plugin": "^1.6.1",
     "glob": "^7.0.3",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
@@ -32,7 +40,8 @@
     "ncp": "^2.0.0",
     "precss": "^1.4.0",
     "svgo": "^0.7.2",
-    "through2": "^2.0.3"
+    "through2": "^2.0.3",
+    "webpack": "^2.3.1"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {
