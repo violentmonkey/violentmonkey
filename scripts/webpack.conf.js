@@ -13,12 +13,12 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    'background/app.js': './src/background/app.js',
-    'options/app.js': './src/options/app.js',
-    'popup/app.js': './src/popup/app.js',
+    'background/app': './src/background/app.js',
+    'options/app': './src/options/app.js',
+    'popup/app': './src/popup/app.js',
   },
   output: {
-    path: DIST,
+    path: path.resolve(DIST),
     publicPath: '/',
     filename: '[name].js',
   },
@@ -75,7 +75,7 @@ module.exports = {
       // })
     ] : [
       // extract css into its own file
-      new ExtractTextPlugin(`${DIST}/[name].css`),
+      new ExtractTextPlugin('[name].css'),
       // generate dist index.html with correct asset hash for caching.
       // you can customize output by editing /index.html
       // see https://github.com/ampedandwired/html-webpack-plugin

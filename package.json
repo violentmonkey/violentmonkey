@@ -4,7 +4,7 @@
   "scripts": {
     "prebuild": "gulp clean",
     "build": "gulp build",
-    "dev": "gulp watch",
+    "dev": "webpack --config scripts/webpack.conf.js",
     "i18n": "gulp i18n",
     "lint": "gulp lint",
     "update": "node scripts/update",
@@ -13,13 +13,20 @@
   },
   "description": "Violentmonkey",
   "devDependencies": {
-    "babel-eslint": "^7.2.0",
+    "babel-core": "^6.24.0",
+    "babel-eslint": "^7.2.1",
+    "babel-loader": "^6.4.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-latest": "^6.24.0",
+    "babel-preset-stage-2": "^6.22.0",
+    "css-loader": "^0.27.3",
     "cssnano": "^3.10.0",
     "del": "^2.2.0",
-    "eslint": "^3.17.1",
-    "eslint-config-airbnb-base": "^11.1.1",
+    "eslint": "^3.18.0",
+    "eslint-config-airbnb-base": "^11.1.2",
     "eslint-friendly-formatter": "^2.0.7",
     "eslint-import-resolver-webpack": "^0.8.1",
+    "eslint-loader": "^1.7.0",
     "eslint-plugin-html": "^2.0.1",
     "eslint-plugin-import": "^2.2.0",
     "extract-text-webpack-plugin": "^2.1.0",
@@ -41,7 +48,10 @@
     "precss": "^1.4.0",
     "svgo": "^0.7.2",
     "through2": "^2.0.3",
-    "webpack": "^2.3.1"
+    "vue-loader": "^11.3.3",
+    "vue-style-loader": "^2.0.4",
+    "vue-template-compiler": "^2.2.5",
+    "webpack": "^2.3.2"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {
@@ -54,8 +64,9 @@
   "homepage": "https://github.com/violentmonkey/violentmonkey",
   "license": "MIT",
   "dependencies": {
-    "codemirror": "^5.23.0",
+    "codemirror": "^5.25.0",
     "define-commonjs": "^1.1.2",
-    "vue": "^2.1.10"
+    "sync-promise-lite": "^0.2.3",
+    "vue": "^2.2.5"
   }
 }

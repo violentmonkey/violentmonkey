@@ -1,19 +1,17 @@
-var _ = require('src/common');
-var VMDB = require('./db');
-var sync = require('./sync');
-var requests = require('./requests');
-var cache = require('./utils/cache');
-var scriptUtils = require('./utils/script');
-var clipboard = require('./utils/clipboard');
-var options = require('./options');
+import { i18n, defaultImage } from 'src/common';
+import * as sync from './sync';
+import { getRequestId, httpRequest, abortRequest } from './utils/requests';
+import { getCache } from './utils/cache';
+import { newScript, parseMeta } from './utils/script';
+import { setClipboard } from './utils/clipboard';
+import { getOption, setOption, hookOptions, getAllOptions } from './utils/options';
+import * as vmdb from './utils/db';
+import checkUpdate from './utils/update';
 
-var vmdb = exports.vmdb = new VMDB;
-var VM_VER = browser.runtime.getManifest().version;
+const VM_VER = browser.runtime.getManifest().version;
 
-options.hook(function (changes) {
-  if ('isApplied' in changes) {
-    setIcon(changes.isApplied);
-  }
+hookOptions(changes => {
+  if ('isApplied' in changes) setIcon(changes.isApplied);
   browser.runtime.sendMessage({
     cmd: 'UpdateOptions',
     data: changes,
@@ -22,69 +20,68 @@ options.hook(function (changes) {
 
 function broadcast(data) {
   browser.tabs.query({})
-  .then(function (tabs) {
-    tabs.forEach(function (tab) {
+  .then(tabs => {
+    tabs.forEach(tab => {
       browser.tabs.sendMessage(tab.id, data);
     });
   });
 }
 
-var autoUpdate = function () {
+function checkUpdateAll() {
+  setOption('lastUpdate', Date.now());
+  vmdb.getScriptsByIndex('update', 1)
+  .then(scripts => Promise.all(scripts.map(checkUpdate)));
+}
+
+let autoUpdating;
+function autoUpdate() {
+  if (autoUpdating) return;
+  autoUpdating = true;
+  check();
   function check() {
-    checking = true;
-    return new Promise(function (resolve, reject) {
-      if (!options.get('autoUpdate')) return reject();
-      if (Date.now() - options.get('lastUpdate') >= 864e5)
-        resolve(commands.CheckUpdateAll());
-    }).then(function () {
-      setTimeout(check, 36e5);
-    }, function () {
-      checking = false;
-    });
+    new Promise((resolve, reject) => {
+      if (!getOption('autoUpdate')) return reject();
+      if (Date.now() - getOption('lastUpdate') >= 864e5) resolve(checkUpdateAll());
+    })
+    .then(() => setTimeout(check, 36e5), () => { autoUpdating = false; });
   }
-  var checking;
-  return function () {
-    checking || check();
-  };
-}();
-var commands = {
-  NewScript: function (_data, _src) {
-    return scriptUtils.newScript();
+}
+
+const commands = {
+  NewScript() {
+    return newScript();
   },
-  RemoveScript: function (id, _src) {
+  RemoveScript(id) {
     return vmdb.removeScript(id)
-    .then(function () {
-      sync.sync();
-    });
+    .then(() => { sync.sync(); });
   },
-  GetData: function (_data, _src) {
-    return vmdb.getData().then(function (data) {
-      data.sync = sync.states();
+  GetData() {
+    return vmdb.getData().then(data => {
+      data.sync = sync.getStates();
       data.version = VM_VER;
       return data;
     });
   },
-  GetInjected: function (url, src) {
-    var data = {
-      isApplied: options.get('isApplied'),
+  GetInjected(url, src) {
+    const data = {
+      isApplied: getOption('isApplied'),
       version: VM_VER,
     };
-    setTimeout(function () {
+    setTimeout(() => {
       // delayed to wait for the tab URL updated
       if (src.tab && url === src.tab.url) {
-        browser.tabs.sendMessage(src.tab.id, {cmd: 'GetBadge'});
+        browser.tabs.sendMessage(src.tab.id, { cmd: 'GetBadge' });
       }
     });
     return data.isApplied
-      ? vmdb.getScriptsByURL(url).then(function (res) {
-        return Object.assign(data, res);
-      }) : data;
+    ? vmdb.getScriptsByURL(url).then(res => Object.assign(data, res))
+    : data;
   },
-  UpdateScriptInfo: function (data, _src) {
+  UpdateScriptInfo(data) {
     return vmdb.updateScriptInfo(data.id, data, {
       modified: Date.now(),
     })
-    .then(function (script) {
+    .then(script => {
       sync.sync();
       browser.runtime.sendMessage({
         cmd: 'UpdateScript',
@@ -92,9 +89,9 @@ var commands = {
       });
     });
   },
-  SetValue: function (data, _src) {
+  SetValue(data) {
     return vmdb.setValue(data.uri, data.values)
-    .then(function () {
+    .then(() => {
       broadcast({
         cmd: 'UpdateValues',
         data: {
@@ -104,29 +101,27 @@ var commands = {
       });
     });
   },
-  ExportZip: function (data, _src) {
+  ExportZip(data) {
     return vmdb.getExportData(data.ids, data.values);
   },
-  GetScript: function (id, _src) {
+  GetScript(id) {
     return vmdb.getScriptData(id);
   },
-  GetMetas: function (ids, _src) {
+  GetMetas(ids) {
     return vmdb.getScriptInfos(ids);
   },
-  Move: function (data, _src) {
+  Move(data) {
     return vmdb.moveScript(data.id, data.offset);
   },
-  Vacuum: function (_data, _src) {
-    return vmdb.vacuum();
-  },
-  ParseScript: function (data, _src) {
-    return vmdb.parseScript(data).then(function (res) {
-      var meta = res.data.meta;
-      if (!meta.grant.length && !options.get('ignoreGrant')) {
+  Vacuum: vmdb.vacuum,
+  ParseScript(data) {
+    return vmdb.parseScript(data).then(res => {
+      const { meta } = res.data;
+      if (!meta.grant.length && !getOption('ignoreGrant')) {
         notify({
           id: 'VM-NoGrantWarning',
-          title: _.i18n('Warning'),
-          body: _.i18n('msgWarnGrant', [meta.name || _.i18n('labelNoName')]),
+          title: i18n('Warning'),
+          body: i18n('msgWarnGrant', [meta.name || i18n('labelNoName')]),
           isClickable: true,
         });
       }
@@ -135,86 +130,63 @@ var commands = {
       return res.data;
     });
   },
-  CheckUpdate: function (id, _src) {
-    vmdb.getScript(id).then(vmdb.checkUpdate);
+  CheckUpdate(id) {
+    vmdb.getScript(id).then(checkUpdate);
   },
-  CheckUpdateAll: function (_data, _src) {
-    options.set('lastUpdate', Date.now());
-    vmdb.getScriptsByIndex('update', 1).then(function (scripts) {
-      return Promise.all(scripts.map(vmdb.checkUpdate));
-    });
-  },
-  ParseMeta: function (code, _src) {
-    return scriptUtils.parseMeta(code);
+  CheckUpdateAll: checkUpdateAll,
+  ParseMeta(code) {
+    return parseMeta(code);
   },
   AutoUpdate: autoUpdate,
-  GetRequestId: function (_data, _src) {
-    return requests.getRequestId();
-  },
-  HttpRequest: function (details, src) {
-    requests.httpRequest(details, function (res) {
+  GetRequestId: getRequestId,
+  HttpRequest(details, src) {
+    httpRequest(details, res => {
       browser.tabs.sendMessage(src.tab.id, {
         cmd: 'HttpRequested',
         data: res,
       });
     });
   },
-  AbortRequest: function (id, _src) {
-    return requests.abortRequest(id);
+  AbortRequest: abortRequest,
+  SetBadge: setBadge,
+  SyncAuthorize: sync.authorize,
+  SyncRevoke: sync.revoke,
+  SyncStart: sync.sync,
+  GetFromCache(data) {
+    return getCache(data) || null;
   },
-  SetBadge: function (num, src) {
-    setBadge(num, src);
-  },
-  SyncAuthorize: function (_data, _src) {
-    sync.authorize();
-  },
-  SyncRevoke: function (_data, _src) {
-    sync.revoke();
-  },
-  SyncStart: function (_data, _src) {
-    sync.sync();
-  },
-  GetFromCache: function (data, _src) {
-    return cache.get(data) || null;
-  },
-  Notification: function (data, _src) {
+  Notification(data) {
     return browser.notifications.create({
       type: 'basic',
-      title: data.title || _.i18n('extName'),
+      title: data.title || i18n('extName'),
       message: data.text,
-      iconUrl: data.image || _.defaultImage,
+      iconUrl: data.image || defaultImage,
     });
   },
-  SetClipboard: function (data, _src) {
-    clipboard.set(data);
-  },
-  OpenTab: function (data, _src) {
+  SetClipboard: setClipboard,
+  OpenTab(data) {
     browser.tabs.create({
       url: data.url,
       active: data.active,
     });
   },
-  GetAllOptions: function (_data, _src) {
-    return options.getAll();
-  },
-  GetOptions: function (data, _src) {
-    return data.reduce(function (res, key) {
-      res[key] = options.get(key);
+  GetAllOptions: getAllOptions,
+  GetOptions(data) {
+    return data.reduce((res, key) => {
+      res[key] = getOption(key);
       return res;
     }, {});
   },
-  SetOptions: function (data, _src) {
-    if (!Array.isArray(data)) data = [data];
-    data.forEach(function (item) {
-      options.set(item.key, item.value);
-    });
+  SetOptions(data) {
+    const items = Array.isArray(data) ? data : [data];
+    items.forEach(item => { setOption(item.key, item.value); });
   },
 };
 
-vmdb.initialized.then(function () {
-  browser.runtime.onMessage.addListener(function (req, src) {
-    var func = commands[req.cmd];
-    var res;
+vmdb.initialized.then(() => {
+  browser.runtime.onMessage.addListener((req, src) => {
+    const func = commands[req.cmd];
+    let res;
     if (func) {
       res = func(req.data, src);
       if (typeof res !== 'undefined') {
@@ -233,46 +205,45 @@ vmdb.initialized.then(function () {
 function notify(options) {
   browser.notifications.create(options.id || 'ViolentMonkey', {
     type: 'basic',
-    iconUrl: _.defaultImage,
-    title: options.title + ' - ' + _.i18n('extName'),
+    iconUrl: defaultImage,
+    title: `${options.title} - ${i18n('extName')}`,
     message: options.body,
     isClickable: options.isClickable,
   });
 }
 
-var setBadge = function () {
-  var badges = {};
-  return function (num, src) {
-    var o = badges[src.id];
-    if (!o) o = badges[src.id] = {num: 0};
-    o.num += num;
-    browser.browserAction.setBadgeBackgroundColor({
-      color: '#808',
-      tabId: src.tab.id,
-    });
-    var text = (options.get('showBadge') && o.num || '').toString();
-    browser.browserAction.setBadgeText({
-      text: text,
-      tabId: src.tab.id,
-    });
-    if (o.timer) clearTimeout(o.timer);
-    o.timer = setTimeout(function () {
-      delete badges[src.id];
-    }, 300);
-  };
-}();
+const badges = {};
+function setBadge(num, src) {
+  let data = badges[src.id];
+  if (!data) {
+    data = { num: 0 };
+    badges[src.id] = data;
+  }
+  data.num += num;
+  browser.browserAction.setBadgeBackgroundColor({
+    color: '#808',
+    tabId: src.tab.id,
+  });
+  const text = ((getOption('showBadge') && data.num) || '').toString();
+  browser.browserAction.setBadgeText({
+    text,
+    tabId: src.tab.id,
+  });
+  if (data.timer) clearTimeout(data.timer);
+  data.timer = setTimeout(() => { delete badges[src.id]; }, 300);
+}
 
 function setIcon(isApplied) {
   browser.browserAction.setIcon({
     path: {
-      19: '/public/images/icon19' + (isApplied ? '' : 'w') + '.png',
-      38: '/public/images/icon38' + (isApplied ? '' : 'w') + '.png'
+      19: `/public/images/icon19${isApplied ? '' : 'w'}.png`,
+      38: `/public/images/icon38${isApplied ? '' : 'w'}.png`,
     },
   });
 }
-setIcon(options.get('isApplied'));
+setIcon(getOption('isApplied'));
 
-browser.notifications.onClicked.addListener(function (id) {
+browser.notifications.onClicked.addListener(id => {
   if (id === 'VM-NoGrantWarning') {
     browser.tabs.create({
       url: 'http://wiki.greasespot.net/@grant',
@@ -285,7 +256,7 @@ browser.notifications.onClicked.addListener(function (id) {
   }
 });
 
-browser.notifications.onClosed.addListener(function (id) {
+browser.notifications.onClosed.addListener(id => {
   broadcast({
     cmd: 'NotificationClose',
     data: id,

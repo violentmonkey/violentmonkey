@@ -48,6 +48,7 @@ module.exports = {
     'no-mixed-operators': ['error', {allowSamePrecedence: true}],
     'no-bitwise': ['error', {int32Hint: true}],
     'no-underscore-dangle': ['off'],
+    'arrow-parens': 0,
   },
   globals: {
     browser: true,

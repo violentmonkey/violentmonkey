@@ -93,7 +93,7 @@ export default {
         const length = script.require.length + urls.length;
         if (!length) return;
         let finished = 0;
-        let error = [];
+        const error = [];
         const updateStatus = () => {
           this.message = this.i18n('msgLoadingDependency', [finished, length]);
         };
@@ -107,7 +107,7 @@ export default {
         promises = promises.map(promise => promise.then(() => {
           finished += 1;
           updateStatus();
-        }, (url) => {
+        }, url => {
           error.push(url);
         }));
         return Promise.all(promises).then(() => {
@@ -127,8 +127,8 @@ export default {
       window.close();
     },
     getFile(url, isBlob) {
-      return new Promise((resolve, reject) {
-        const xhr = new XMLHttpRequest;
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         if (isBlob) xhr.responseType = 'blob';
         xhr.onloadend = () => {
@@ -153,7 +153,7 @@ export default {
       })
       .then(text => text || Promise.reject())
       .catch(() => this.getFile(url))
-      .catch((url) => {
+      .catch(() => {
         this.message = this.i18n('msgErrorLoadingData');
         throw url;
       });

@@ -20,7 +20,7 @@
 
 <script>
 import { i18n, sendMessage } from 'src/common';
-import Item from './script';
+import Item from './script-item';
 import Edit from './edit';
 import { store } from '../utils';
 
