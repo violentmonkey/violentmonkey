@@ -2,9 +2,9 @@
   "name": "violentmonkey",
   "version": "2.5.9",
   "scripts": {
-    "prebuild": "gulp clean",
-    "build": "gulp build",
-    "dev": "webpack --config scripts/webpack.conf.js",
+    "build": "webpack --config scripts/webpack.conf.js",
+    "analyze": "webpack --profile --json --config scripts/webpack.conf.js | webpack-bundle-size-analyzer",
+    "analyze:json": "webpack --profile --json --config scripts/webpack.conf.js > stats.json",
     "i18n": "gulp i18n",
     "lint": "gulp lint",
     "update": "node scripts/update",
@@ -17,8 +17,7 @@
     "babel-eslint": "^7.2.1",
     "babel-loader": "^6.4.1",
     "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-latest": "^6.24.0",
-    "babel-preset-stage-2": "^6.22.0",
+    "babel-preset-env": "^1.2.2",
     "css-loader": "^0.27.3",
     "cssnano": "^3.10.0",
     "del": "^2.2.0",
@@ -41,6 +40,7 @@
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.7",
     "html-minifier": "^3.2.3",
+    "html-webpack-plugin": "^2.28.0",
     "js-yaml": "^3.5.5",
     "merge2": "^1.0.2",
     "mocha": "^3.1.2",
@@ -51,7 +51,8 @@
     "vue-loader": "^11.3.3",
     "vue-style-loader": "^2.0.4",
     "vue-template-compiler": "^2.2.5",
-    "webpack": "^2.3.2"
+    "webpack": "^2.3.2",
+    "webpack-bundle-size-analyzer": "^2.5.0"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {

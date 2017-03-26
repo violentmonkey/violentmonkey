@@ -1,7 +1,8 @@
-dist/
+/dist/
 node_modules/
-*.zip
-*.nex
-*.crx
-*.log
-*.lock
+/*.zip
+/*.nex
+/*.crx
+/*.log
+/*.lock
+/*.json
