@@ -26,7 +26,7 @@
   "content_scripts": [
     {
       "js": [
-        "public/mylib/browser.js",
+        "public/browser.js",
         "injected.js"
       ],
       "matches": [

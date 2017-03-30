@@ -51,7 +51,7 @@ const base = {
     })),
   },
   // cheap-module-eval-source-map is faster for development
-  devtool: IS_DEV ? '#cheap-module-eval-source-map' : false,
+  devtool: IS_DEV ? '#inline-source-map' : false,
 };
 
 const targets = module.exports = [];

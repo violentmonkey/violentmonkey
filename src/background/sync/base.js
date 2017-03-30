@@ -123,9 +123,7 @@ export const BaseService = serviceFactory({
   urlPrefix: '',
   metaFile: 'Violentmonkey',
   delay(time) {
-    return new Promise(resolve => {
-      setTimeout(resolve, time == null ? this.delayTime : time);
-    });
+    return new Promise(resolve => { setTimeout(resolve, time); });
   },
   initialize(name) {
     this.onStateChange = debounce(this.onStateChange.bind(this));
@@ -237,12 +235,23 @@ export const BaseService = serviceFactory({
   request(options) {
     const { progress } = this;
     let lastFetch;
-    if (options.noDelay) {
-      lastFetch = Promise.resolve();
+    if (options.delay == null) {
+      lastFetch = Promise.resolve(Date.now());
     } else {
-      lastFetch = this.lastFetch;
-      this.lastFetch = lastFetch.then(() => this.delay());
+      lastFetch = this.lastFetch
+      .then(ts => new Promise(resolve => {
+        let delay = options.delay;
+        if (!isNaN(delay)) delay = this.delayTime;
+        const delta = delay - (Date.now() - ts);
+        if (delta > 0) {
+          setTimeout(resolve, delta);
+        } else {
+          resolve();
+        }
+      }))
+      .then(() => Date.now());
     }
+    this.lastFetch = lastFetch;
     progress.total += 1;
     this.onStateChange();
     return lastFetch.then(() => new Promise((resolve, reject) => {

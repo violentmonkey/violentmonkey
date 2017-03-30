@@ -6,6 +6,8 @@ import Main from './views/main';
 import Confirm from './views/confirm';
 import './style.css';
 
+Vue.prototype.i18n = i18n;
+
 Object.assign(store, {
   loading: false,
   cache: {},

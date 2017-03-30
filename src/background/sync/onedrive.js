@@ -73,14 +73,9 @@ const OneDrive = BaseService.extend({
       url: `/drive/special/approot:/${encodeURIComponent(path)}`,
       responseType: 'json',
     })
-    .then(data => new Promise((resolve, reject) => {
-      const url = data['@content.downloadUrl'];
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true);
-      xhr.onload = () => { resolve(xhr.responseText); };
-      xhr.onerror = () => { reject(); };
-      xhr.ontimeout = () => { reject(); };
-      xhr.send();
+    .then(data => this.request({
+      url: data['@content.downloadUrl'],
+      delay: 0,
     }));
   },
   put(path, data) {

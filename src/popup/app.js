@@ -1,8 +1,11 @@
 import Vue from 'vue';
 import options from 'src/common/options';
-import { sendMessage } from 'src/common';
+import { i18n, sendMessage } from 'src/common';
 import App from './views/app';
 import { store } from './utils';
+import './style.css';
+
+Vue.prototype.i18n = i18n;
 
 new Vue({
   render: h => h(App),

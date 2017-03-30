@@ -138,9 +138,14 @@ Locales.prototype.touch = function (key) {
 function extract(options) {
   const keys = new Set();
   const patterns = {
-    js: ['_\\.i18n\\(\'(\\w+)\'', 1],
+    default: ['\\bi18n\\(\'(\\w+)\'', 1],
     json: ['__MSG_(\\w+)__', 1],
-    html: ['i18n\\(\'(\\w+)\'\\)', 1],
+  };
+  const types = {
+    '.js': 'default',
+    '.json': 'json',
+    '.html': 'default',
+    '.vue': 'default',
   };
 
   const locales = new Locales(options.prefix, options.base);
@@ -161,14 +166,10 @@ function extract(options) {
 
   function bufferContents(file, enc, cb) {
     if (file.isNull()) return cb();
-    if (file.isStream())
-      return this.emit('error', new gutil.PluginError('VM-i18n', 'Stream is not supported.'));
-    if (file.path.endsWith('.js'))
-      extract(file.contents, 'js');
-    else if (file.path.endsWith('.json'))
-      extract(file.contents, 'json');
-    else if (file.path.endsWith('.html'))
-      extract(file.contents, ['html', 'js']);
+    if (file.isStream()) return this.emit('error', new gutil.PluginError('VM-i18n', 'Stream is not supported.'));
+    const extname = path.extname(file.path);
+    const type = types[extname];
+    type && extract(file.contents, type);
     cb();
   }
 

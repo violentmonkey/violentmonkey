@@ -2,11 +2,12 @@
   "name": "violentmonkey",
   "version": "2.5.9",
   "scripts": {
-    "build": "webpack --config scripts/webpack.conf.js",
+    "dev": "gulp watch",
+    "build": "gulp build",
     "analyze": "webpack --profile --json --config scripts/webpack.conf.js | webpack-bundle-size-analyzer",
     "analyze:json": "webpack --profile --json --config scripts/webpack.conf.js > stats.json",
     "i18n": "gulp i18n",
-    "lint": "gulp lint",
+    "lint": "eslint src",
     "update": "node scripts/update",
     "svgo": "svgo icons",
     "test": "mocha"
