@@ -6,5 +6,5 @@ module.exports = {
     sourceMap: false,
     extract: isProduction,
   }),
-  postcss: [require('precss')],
+  postcss: [ require('precss') ],
 };

@@ -2,9 +2,7 @@ import Vue from 'vue';
 import { sendMessage, i18n } from 'src/common';
 import options from 'src/common/options';
 import { store, features } from './utils';
-import Main from './views/main';
-import Confirm from './views/confirm';
-import './style.css';
+import App from './views/app';
 
 Vue.prototype.i18n = i18n;
 
@@ -30,11 +28,11 @@ initCustomCSS();
 
 const routes = {
   '': {
-    comp: Main,
+    comp: 'Main',
     init: initMain,
   },
   confirm: {
-    comp: Confirm,
+    comp: 'Confirm',
   },
 };
 window.addEventListener('hashchange', loadHash, false);
@@ -42,8 +40,7 @@ loadHash();
 
 options.ready(() => new Vue({
   el: '#app',
-  // store.route.comp should not change
-  render: h => h(store.route.comp),
+  render: h => h(App),
 }));
 
 function parseLocation(pathInfo) {

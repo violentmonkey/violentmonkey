@@ -3,7 +3,6 @@ import options from 'src/common/options';
 import { i18n, sendMessage } from 'src/common';
 import App from './views/app';
 import { store } from './utils';
-import './style.css';
 
 Vue.prototype.i18n = i18n;
 
