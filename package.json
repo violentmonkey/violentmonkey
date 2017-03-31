@@ -19,6 +19,7 @@
     "babel-loader": "^6.4.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.2.2",
+    "core-js": "^2.4.1",
     "css-loader": "^0.27.3",
     "cssnano": "^3.10.0",
     "del": "^2.2.0",

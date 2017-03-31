@@ -8,7 +8,7 @@ const vueLoaderConfig = require('./vue-loader.conf');
 const IS_DEV = process.env.NODE_ENV !== 'production';
 const DIST = 'dist';
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
@@ -96,23 +96,6 @@ targets.push(Object.assign({}, base, {
     ] : [
       // extract css into its own file
       new ExtractTextPlugin('[name].css'),
-      // generate dist index.html with correct asset hash for caching.
-      // you can customize output by editing /index.html
-      // see https://github.com/ampedandwired/html-webpack-plugin
-      // new HtmlWebpackPlugin({
-      //   filename: 'index.html',
-      //   template: 'src/public/index.ejs',
-      //   inject: true,
-      //   minify: {
-      //     removeComments: true,
-      //     collapseWhitespace: true,
-      //     removeAttributeQuotes: true
-      //     // more options:
-      //     // https://github.com/kangax/html-minifier#options-quick-reference
-      //   },
-      //   // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-      //   chunksSortMode: 'dependency'
-      // }),
       new webpack.optimize.UglifyJsPlugin({
         compress: {
           warnings: false
@@ -125,6 +108,7 @@ targets.push(Object.assign({}, base, {
 targets.push(Object.assign({}, base, {
   entry: {
     injected: 'src/injected.js',
+    browser: 'src/browser.js',
   },
   plugins: IS_DEV ? [] : [
     new webpack.optimize.UglifyJsPlugin({

@@ -4,8 +4,13 @@
       "targets": {
         "browsers": ["Chrome >= 41"]
       },
+      "modules": false,
+      // "useBuiltIns": true,
+      // "debug": true,
     }]
   ],
-  "plugins": ["transform-runtime"],
+  "plugins": [
+    ["transform-runtime", {"polyfill": false}]
+  ],
   "comments": false
 }
