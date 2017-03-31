@@ -442,7 +442,8 @@ export const BaseService = serviceFactory({
   },
 });
 
-export function register(service) {
+export function register(factory) {
+  const service = typeof factory === 'function' ? factory() : factory;
   serviceNames.push(service.name);
   services[service.name] = service;
   return service;
