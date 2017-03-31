@@ -3,7 +3,7 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: Подршка за прилагођене скрипте за Operu.
+  message: ''
 extTranslator:
   description: Information of the translator.
   message: ''

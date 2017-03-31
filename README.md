@@ -1,10 +1,14 @@
 Violentmonkey
 =============
 
-Violentmonkey provides userscripts support for Chromium-based Opera.  
-Violentmonkey for Opera Presto: <https://github.com/violentmonkey/violentmonkey-oex>
+Violentmonkey provides userscripts support for browsers.
+It works on browsers with [WebExtensions](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) support.
 
-For more information, click [here](https://violentmonkey.github.io/).
+Links
+---
+- [Homepage](https://violentmonkey.github.io/)
+- [Violentmonkey for Opera Presto](https://github.com/violentmonkey/violentmonkey-oex)
+- [Violentmonkey for Maxthon](https://github.com/violentmonkey/violentmonkey-mx)
 
 Development
 ---

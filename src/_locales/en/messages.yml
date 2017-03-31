@@ -3,7 +3,7 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: Userscript support for Chromium based browsers like Opera and Chrome.
+  message: Provide userscript support for browsers.
 extTranslator:
   description: Information of the translator.
   message: Gerald <i@gerald.top>

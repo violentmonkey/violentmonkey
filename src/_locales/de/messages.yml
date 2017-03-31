@@ -3,7 +3,7 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: Userscript-Unterstützung für Opera.
+  message: ''
 extTranslator:
   description: Information of the translator.
   message: '<a href="http://blog.scrobble.me">Adrian Moerchen</a>'
