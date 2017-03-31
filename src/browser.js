@@ -2,18 +2,23 @@
 const global = window;
 
 function wrapAsync(func) {
-  return (...args) => new Promise((resolve, reject) => {
-    args.push(res => {
-      const err = chrome.runtime.lastError;
-      if (err) {
-        console.error(args);
-        reject(err);
-      } else {
-        resolve(res);
-      }
+  return (...args) => {
+    const promise = new Promise((resolve, reject) => {
+      args.push(res => {
+        const err = chrome.runtime.lastError;
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+      func(...args);
     });
-    func(...args);
-  });
+    promise.catch(err => {
+      if (process.env.DEBUG) console.error(args, err);
+    });
+    return promise;
+  };
 }
 function wrapAPIs(source, meta) {
   const target = {};
@@ -51,7 +56,7 @@ const meta = {
             result.then(data => {
               sendResponse({ data });
             }, error => {
-              console.error(error);
+              if (process.env.DEBUG) console.error(error);
               sendResponse({ error });
             });
             return true;
@@ -71,11 +76,17 @@ const meta = {
     },
     sendMessage(sendMessage) {
       const promisifiedSendMessage = wrapAsync(sendMessage);
-      return data => promisifiedSendMessage(data)
-      .then(res => {
-        if (res && res.error) throw res.error;
-        return res && res.data;
-      });
+      return data => {
+        const promise = promisifiedSendMessage(data)
+        .then(res => {
+          if (res && res.error) throw res.error;
+          return res && res.data;
+        });
+        promise.catch(err => {
+          if (process.env.DEBUG) console.error(err);
+        });
+        return promise;
+      };
     },
   },
   tabs: {

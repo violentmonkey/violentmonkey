@@ -5,8 +5,15 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const utils = require('./utils');
 const vueLoaderConfig = require('./vue-loader.conf');
-const IS_DEV = process.env.NODE_ENV !== 'production';
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+const IS_DEV = process.env.NODE_ENV === 'development';
 const DIST = 'dist';
+const definePlugin = new webpack.DefinePlugin({
+  'process.env': {
+    NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+    DEBUG: IS_DEV ? 'true' : 'false', // whether to log message errors
+  },
+});
 
 function resolve(dir) {
   return path.join(__dirname, '..', dir)
@@ -63,9 +70,7 @@ targets.push(Object.assign({}, base, {
     'popup/app': 'src/popup/app.js',
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': {},
-    }),
+    definePlugin,
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
@@ -110,11 +115,14 @@ targets.push(Object.assign({}, base, {
     injected: 'src/injected.js',
     browser: 'src/browser.js',
   },
-  plugins: IS_DEV ? [] : [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    }),
+  plugins: [
+    definePlugin,
+    ... IS_DEV ? [] : [
+      new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          warnings: false
+        }
+      }),
+    ],
   ],
 }));
