@@ -57,7 +57,7 @@ gulp.task('js-prd', () => webpack(webpackConfig, webpackCallback));
 gulp.task('manifest', () => (
   gulp.src(paths.manifest, {base: 'src'})
   .pipe(json(data => {
-    data.version = pkg.version;
+    data.version = pkg.version.replace(/-[^.]*/, '');
     return data;
   }))
   .pipe(gulp.dest('dist'))
