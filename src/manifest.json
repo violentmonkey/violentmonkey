@@ -26,7 +26,7 @@
   "content_scripts": [
     {
       "js": [
-        "public/mylib/browser.js",
+        "browser.js",
         "injected.js"
       ],
       "matches": [
@@ -43,5 +43,5 @@
     "webRequestBlocking",
     "notifications"
   ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+  "content_security_policy": "script-src 'self'; object-src 'self'"
 }

@@ -1,57 +1,53 @@
-var _ = require('src/common');
-_.initOptions();
-var App = require('./views/app');
-var utils = require('./utils');
+import Vue from 'vue';
+import options from 'src/common/options';
+import { i18n, sendMessage } from 'src/common';
+import App from './views/app';
+import { store } from './utils';
+
+Vue.prototype.i18n = i18n;
 
 new Vue({
-  el: '#app',
-  render: function (h) {
-    return h(App);
-  },
-});
+  render: h => h(App),
+}).$mount('#app');
 
-function init() {
-  var currentTab = utils.store.currentTab;
-  browser.tabs.sendMessage(currentTab.id, {cmd: 'GetPopup'});
-  if (currentTab && /^https?:\/\//i.test(currentTab.url)) {
-    var matches = currentTab.url.match(/:\/\/(?:www\.)?([^\/]*)/);
-    var domain = matches[1];
-    var domains = domain.split('.').reduceRight(function (res, part) {
-      var last = res[0];
-      if (last) part += '.' + last;
-      res.unshift(part);
-      return res;
-    }, []);
-    domains.length > 1 && domains.pop();
-    utils.store.domains = domains;
-  }
-}
-
-var handlers = {
-  SetPopup: function (data, src, _callback) {
-    if (utils.store.currentTab.id !== src.tab.id) return;
-    utils.store.commands = data.menus;
-    _.sendMessage({
+const handlers = {
+  SetPopup(data, src) {
+    if (store.currentTab.id !== src.tab.id) return;
+    store.commands = data.menus;
+    sendMessage({
       cmd: 'GetMetas',
       data: data.ids,
-    }).then(function (scripts) {
-      utils.store.scripts = scripts;
+    })
+    .then(scripts => {
+      store.scripts = scripts;
     });
   },
-  UpdateOptions: function (data) {
-    _.options.update(data);
+  UpdateOptions(data) {
+    options.update(data);
   },
 };
-browser.runtime.onMessage.addListener(function (req, src, callback) {
-  var func = handlers[req.cmd];
+browser.runtime.onMessage.addListener((req, src, callback) => {
+  const func = handlers[req.cmd];
   if (func) func(req.data, src, callback);
 });
 
-browser.tabs.query({currentWindow: true, active: true})
-.then(function (tabs) {
-  utils.store.currentTab = {
+browser.tabs.query({ currentWindow: true, active: true })
+.then(tabs => {
+  const currentTab = {
     id: tabs[0].id,
     url: tabs[0].url,
   };
-  init();
+  store.currentTab = currentTab;
+  browser.tabs.sendMessage(currentTab.id, { cmd: 'GetPopup' });
+  if (currentTab && /^https?:\/\//i.test(currentTab.url)) {
+    const matches = currentTab.url.match(/:\/\/(?:www\.)?([^/]*)/);
+    const domain = matches[1];
+    const domains = domain.split('.').reduceRight((res, part) => {
+      const last = res[0];
+      res.unshift(last ? `${part}.${last}` : part);
+      return res;
+    }, []);
+    if (domains.length) domains.pop();
+    store.domains = domains;
+  }
 });

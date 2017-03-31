@@ -3,7 +3,7 @@ extName:
   message: 暴力猴
 extDescription:
   description: Description for this extension.
-  message: 为基于Chromium的浏览器（如Opera和Chrome）提供用户脚本支持。
+  message: 为浏览器提供用户脚本支持。
 extTranslator:
   description: Information of the translator.
   message: Gerald <i@gerald.top>

@@ -3,7 +3,7 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: Wsparcie dla UserScriptów dla Opery.
+  message: ''
 extTranslator:
   description: Information of the translator.
   message: 'MISI90 <cydziol@gmail.com>, Piter432 <MyReksio@gmail.com>'

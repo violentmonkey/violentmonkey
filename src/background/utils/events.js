@@ -1,28 +1,28 @@
-function getEventEmitter() {
-  var events = {};
-  return {
-    on: on,
-    off: off,
-    fire: fire,
-  };
+export default function getEventEmitter() {
+  const events = {};
+  return { on, off, fire };
+
   function on(type, func) {
-    var list = events[type];
-    if (!list) list = events[type] = [];
+    let list = events[type];
+    if (!list) {
+      list = [];
+      events[type] = list;
+    }
     list.push(func);
   }
   function off(type, func) {
-    var list = events[type];
+    const list = events[type];
     if (list) {
-      var i = list.indexOf(func);
-      if (~i) list.splice(i, 1);
+      const i = list.indexOf(func);
+      if (i >= 0) list.splice(i, 1);
     }
   }
   function fire(type, data) {
-    var list = events[type];
-    list && list.forEach(function (func) {
-      func(data, type);
-    });
+    const list = events[type];
+    if (list) {
+      list.forEach(func => {
+        func(data, type);
+      });
+    }
   }
 }
-
-exports.getEventEmitter = getEventEmitter;

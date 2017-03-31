@@ -3,9 +3,7 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: >-
-    Suport pentru scripturi de utilizatori în navigatoare bazate pe Chromium,
-    precum Opera și Chrome.
+  message: ''
 extTranslator:
   description: Information of the translator.
   message: Nicolae Crefelean

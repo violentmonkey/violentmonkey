@@ -1,16 +1,17 @@
-var options = require('../options');
+import { getOption, hookOptions } from './options';
 
-function testScript(url, script) {
-  var custom = script.custom;
-  var meta = script.meta;
-  var inc = [], exc = [], mat = [];
+export function testScript(url, script) {
+  const { custom, meta } = script;
+  let inc = [];
+  let exc = [];
+  let mat = [];
   if (custom._match !== false && meta.match) mat = mat.concat(meta.match);
   if (custom.match) mat = mat.concat(custom.match);
   if (custom._include !== false && meta.include) inc = inc.concat(meta.include);
   if (custom.include) inc = inc.concat(custom.include);
   if (custom._exclude !== false && meta.exclude) exc = exc.concat(meta.exclude);
   if (custom.exclude) exc = exc.concat(custom.exclude);
-  var ok = !mat.length && !inc.length;
+  let ok = !mat.length && !inc.length;
   // @match
   ok = ok || testMatches(url, mat);
   // @include
@@ -21,45 +22,41 @@ function testScript(url, script) {
 }
 
 function testRules(url, rules) {
-  return rules.some(function (rule) {
-    return autoReg(rule).test(url);
-  });
+  return rules.some(rule => autoReg(rule).test(url));
 }
 function testMatches(url, rules) {
-  if (rules.length) {
-    var test = matchTester(url);
-    return rules.some(test);
-  }
-  return false;
+  return rules.length && rules.some(matchTester(url));
 }
 
 function str2RE(str) {
-  return RegExp('^' + str.replace(/([.?\/])/g, '\\$1').replace(/\*/g, '.*?') + '$');
+  const re = str.replace(/([.?/])/g, '\\$1').replace(/\*/g, '.*?');
+  return RegExp(`^${re}$`);
 }
 
 function autoReg(str) {
-  return str.length > 1 && str.charAt(0) === '/' && str.charAt(str.length - 1) === '/'
-    ? RegExp(str.slice(1, -1))  // Regular-expression
-    : str2RE(str);              // String with wildcards
+  if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
+    return RegExp(str.slice(1, -1));  // Regular-expression
+  }
+  return str2RE(str);              // String with wildcards
 }
 
 function matchTester(url) {
   function matchScheme(rule, data) {
     // exact match
-    if (rule == data) return 1;
+    if (rule === data) return 1;
     // * = http | https
-    if (rule == '*' && /^https?$/i.test(data)) return 1;
+    if (rule === '*' && /^https?$/i.test(data)) return 1;
     return 0;
   }
   function matchHost(rule, data) {
     // * matches all
-    if (rule == '*') return 1;
+    if (rule === '*') return 1;
     // exact match
-    if (rule == data) return 1;
+    if (rule === data) return 1;
     // *.example.com
     if (/^\*\.[^*]*$/.test(rule)) {
       // matches the specified domain
-      if (rule.slice(2) == data) return 1;
+      if (rule.slice(2) === data) return 1;
       // matches subdomains
       if (str2RE(rule).test(data)) return 1;
     }
@@ -68,11 +65,11 @@ function matchTester(url) {
   function matchPath(rule, data) {
     return str2RE(rule).test(data);
   }
-  var RE = /(.*?):\/\/([^\/]*)\/(.*)/;
-  var urlParts = url.match(RE);
-  return function (str) {
-    if (str == '<all_urls>') return true;
-    var parts = str.match(RE);
+  const RE = /(.*?):\/\/([^/]*)\/(.*)/;
+  const urlParts = url.match(RE);
+  return str => {
+    if (str === '<all_urls>') return true;
+    const parts = str.match(RE);
     return !!parts
       && matchScheme(parts[1], urlParts[1])
       && matchHost(parts[2], urlParts[2])
@@ -80,25 +77,15 @@ function matchTester(url) {
   };
 }
 
-var testBlacklist = function () {
-  function testBlacklist(url) {
-    return blacklistRE.some(function (re) {
-      return re.test(url);
-    });
-  }
-  function reset(list) {
-    blacklistRE = (list || []).map(function (rule) {
-      return autoReg(rule);
-    });
-  }
-  var blacklistRE = [];
-  reset(options.get('blacklist'));
-  options.hook(function (changes) {
-    var blacklist = changes.blacklist;
-    blacklist && reset(blacklist);
-  });
-  return testBlacklist;
-}();
-
-exports.testScript = testScript;
-exports.testBlacklist = testBlacklist;
+let blacklistRE = [];
+resetBlacklist(getOption('blacklist'));
+hookOptions(changes => {
+  const { blacklist } = changes;
+  if (blacklist) resetBlacklist(blacklist);
+});
+export function testBlacklist(url) {
+  return blacklistRE.some(re => re.test(url));
+}
+function resetBlacklist(list) {
+  blacklistRE = (list || []).map(rule => autoReg(rule));
+}
