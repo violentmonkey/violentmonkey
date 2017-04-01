@@ -20,11 +20,11 @@
         <button v-text="i18n('buttonClose')" @click="close"></button>
       </div>
       <h1><span v-text="i18n('labelInstall')"></span> - <span v-text="i18n('extName')"></span></h1>
-      <div class="ellipsis confirm-url" :title="params.url" v-text="params.url"></div>
+      <div class="ellipsis confirm-url" :title="query.url" v-text="query.url"></div>
       <div class="ellipsis confirm-msg" v-text="message"></div>
     </div>
     <div class="frame-block flex-auto p-rel">
-      <Code class="abs-full" readonly :content="code" :commands="commands" />
+      <vm-code class="abs-full" readonly :content="code" :commands="commands" />
     </div>
   </div>
 </template>
@@ -32,25 +32,26 @@
 <script>
 import { sendMessage, zfill } from 'src/common';
 import options from 'src/common/options';
-import Code from './code';
+import VmCode from './code';
+import { store } from '../utils';
 
 const settings = {
   closeAfterInstall: options.get('closeAfterInstall'),
 };
 
-options.hook((changes) => {
+options.hook(changes => {
   if ('closeAfterInstall' in changes) {
     settings.closeAfterInstall = changes.closeAfterInstall;
   }
 });
 
 export default {
-  props: ['params'],
   components: {
-    Code,
+    VmCode,
   },
   data() {
     return {
+      store,
       settings,
       installable: false,
       dependencyOK: false,
@@ -64,8 +65,11 @@ export default {
     };
   },
   computed: {
+    query() {
+      return this.store.route.query;
+    },
     isLocal() {
-      return /^file:\/\/\//.test(this.params.u);
+      return /^file:\/\/\//.test(this.query.u);
     },
   },
   mounted() {
@@ -76,7 +80,7 @@ export default {
     loadData(changedOnly) {
       this.installable = false;
       const { code: oldCode } = this;
-      return this.getScript(this.params.u)
+      return this.getScript(this.query.u)
       .then((code) => {
         if (changedOnly && oldCode === code) return Promise.reject();
         this.code = code;
@@ -167,8 +171,8 @@ export default {
       sendMessage({
         cmd: 'ParseScript',
         data: {
-          url: this.params.u,
-          from: this.params.f,
+          url: this.query.u,
+          from: this.query.f,
           code: this.code,
           require: this.require,
           resources: this.resources,
