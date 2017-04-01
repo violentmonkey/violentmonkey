@@ -82,7 +82,7 @@
       <h2 v-text="i18n('labelScriptEditor')"></h2>
     </div>
     <div class="frame-block flex-auto p-rel">
-      <Code
+      <vm-code
       class="abs-full"
       :content="code" :commands="commands"
       @change="contentChange" @ready="initEditor"
@@ -125,7 +125,7 @@
 import CodeMirror from 'codemirror';
 import { i18n, debounce, sendMessage } from 'src/common';
 import { showMessage } from '../utils';
-import Code from './code';
+import VmCode from './code';
 
 function fromList(list) {
   return (list || []).join('\n');
@@ -176,7 +176,7 @@ function replaceAll(cm, state) {
 export default {
   props: ['script'],
   components: {
-    Code,
+    VmCode,
   },
   data() {
     this.debouncedFind = debounce(this.find, 100);

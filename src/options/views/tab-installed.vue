@@ -1,10 +1,11 @@
 <template>
   <div class="content no-pad">
     <header class="flex">
-      <button v-text="i18n('buttonNew')" @click="newScript"></button>
-      <button v-text="i18n('buttonUpdateAll')" @click="updateAll"></button>
-      <button v-text="i18n('buttonInstallFromURL')" @click="installFromURL"></button>
-      <div class="flex-auto"></div>
+      <div class="flex-auto">
+        <button v-text="i18n('buttonNew')" @click="newScript"></button>
+        <button v-text="i18n('buttonUpdateAll')" @click="updateAll"></button>
+        <button v-text="i18n('buttonInstallFromURL')" @click="installFromURL"></button>
+      </div>
       <a href="https://greasyfork.org/scripts" target="_blank" v-text="i18n('anchorGetMoreScripts')"></a>
     </header>
     <div class="backdrop" :class="{mask: store.loading}" v-show="message">
