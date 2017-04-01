@@ -217,10 +217,9 @@
     comm.load = comm.noop;
     comm.checkLoad = comm.noop;
   }
-  function postData(data) {
-    const comm = this;
+  function postData(id, data) {
     // Firefox issue: data must be stringified to avoid cross-origin problem
-    const e = new CustomEvent(comm.did, { detail: JSON.stringify(data) });
+    const e = new CustomEvent(id, { detail: JSON.stringify(data) });
     document.dispatchEvent(e);
   }
   function getRequest(arg) {
@@ -587,7 +586,7 @@
         }
       });
       // wrap code to make 'use strict' work
-      codeSlices.push(`!function(){${script.code$}\n}.call(this)`);
+      codeSlices.push(`!function(){${script.code}\n}.call(this)`);
       codeSlices.push('}.call(this);');
       const code = codeSlices.join('\n');
       const name = script.custom.name || script.meta.name || script.id;
@@ -632,8 +631,14 @@
     },
 
     init: initHandler,
-    post: postData,
+    postData,
+    post(data) {
+      return this.postData(this.did, data);
+    },
     runCode(name, func, args, thisObj) {
+      if (process.env.DEBUG) {
+        console.log(`Run script: ${name}`); // eslint-disable-line no-console
+      }
       try {
         func.apply(thisObj, args);
       } catch (e) {
@@ -652,15 +657,14 @@
   const menus = [];
   function injectScript(data) {
     // data: [id, wrapperKeys, code]
-    const func = (scriptId, destId, cb) => {
+    const func = (scriptId, destId, cb, post) => {
       Object.defineProperty(window, `VM_${scriptId}`, {
         value: cb,
         configurable: true,
       });
-      const e = new CustomEvent(destId, { detail: { cmd: 'Injected', data: scriptId } });
-      document.dispatchEvent(e);
+      post(destId, { cmd: 'Injected', data: scriptId });
     };
-    inject(`!${func.toString()}(${JSON.stringify(data[0])},${JSON.stringify(comm.did)},function(${data[1].join(',')}){${data[2]}})`);
+    inject(`!${func.toString()}(${JSON.stringify(data[0])},${JSON.stringify(comm.did)},function(${data[1].join(',')}){${data[2]}},${postData.toString()})`);
   }
   function handleContent(req) {
     if (!req) {
