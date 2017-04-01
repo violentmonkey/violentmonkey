@@ -1,4 +1,4 @@
-import { debounce, normalizeKeys, noop } from 'src/common';
+import { debounce, normalizeKeys, noop, request } from 'src/common';
 import getEventEmitter from '../utils/events';
 import { getOption, setOption, hookOptions } from '../utils/options';
 import { getScriptsByIndex, parseScript, saveScript, removeScript } from '../utils/db';
@@ -254,52 +254,23 @@ export const BaseService = serviceFactory({
     this.lastFetch = lastFetch;
     progress.total += 1;
     this.onStateChange();
-    return lastFetch.then(() => new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
+    return lastFetch.then(() => {
       let { prefix } = options;
       if (prefix == null) prefix = this.urlPrefix;
-      xhr.open(options.method || 'GET', prefix + options.url, true);
       const headers = Object.assign({}, this.headers, options.headers);
-      if (options.body && typeof options.body === 'object') {
-        headers['Content-Type'] = 'application/json';
-        options.body = JSON.stringify(options.body);
-      }
-      Object.keys(headers).forEach(key => {
-        const value = headers[key];
-        if (value) xhr.setRequestHeader(key, value);
-      });
-      xhr.onloadend = () => {
+      return request(prefix + options.url, {
+        headers,
+        method: options.method,
+        body: options.body,
+      })
+      .then(data => ({ data }), error => ({ error }))
+      .then(({ data, error }) => {
         progress.finished += 1;
-        let data = xhr.responseText;
-        if (options.responseType === 'json') {
-          try {
-            data = JSON.parse(data);
-          } catch (e) {
-            // Invalid JSON data
-          }
-        }
         this.onStateChange();
-        // TODO Too Many Requests
-        // if (xhr.status === 503) {
-        // }
-        // net error: xhr.status === 0
-        if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(data);
-        } else {
-          requestError(data);
-        }
-      };
-      xhr.send(options.body);
-
-      function requestError(data) {
-        reject({
-          xhr,
-          data,
-          url: options.url,
-          status: xhr.status,
-        });
-      }
-    }));
+        if (error) return Promise.reject(error);
+        return data;
+      });
+    });
   },
   sync() {
     this.progress = {

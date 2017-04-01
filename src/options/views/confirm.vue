@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { sendMessage, zfill } from 'src/common';
+import { sendMessage, zfill, request } from 'src/common';
 import options from 'src/common/options';
 import VmCode from './code';
 import { store } from '../utils';
@@ -131,23 +131,18 @@ export default {
       window.close();
     },
     getFile(url, isBlob) {
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        if (isBlob) xhr.responseType = 'blob';
-        xhr.onloadend = () => {
-          if (xhr.status > 300) return reject(url);
-          if (isBlob) {
-            const reader = new FileReader();
-            reader.onload = function onload() {
-              resolve(window.btoa(this.result));
-            };
-            reader.readAsBinaryString(xhr.response);
-          } else {
-            resolve(xhr.responseText);
-          }
-        };
-        xhr.send();
+      return request(url, {
+        responseType: isBlob ? 'blob' : null,
+      })
+      .then(data => {
+        if (!isBlob) return data;
+        return new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = function onload() {
+            resolve(window.btoa(this.result));
+          };
+          reader.readAsBinaryString(data);
+        });
       });
     },
     getScript(url) {

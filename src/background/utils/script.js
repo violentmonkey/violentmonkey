@@ -2,23 +2,6 @@ export function isRemote(url) {
   return url && !(/^(file|data):/.test(url));
 }
 
-export function fetch(url, type, headers) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    if (type) xhr.responseType = type;
-    if (headers) {
-      Object.keys(headers).forEach(key => {
-        xhr.setRequestHeader(key, headers[key]);
-      });
-    }
-    xhr.onloadend = () => {
-      (xhr.status > 300 ? reject : resolve)(xhr);
-    };
-    xhr.send();
-  });
-}
-
 export function parseMeta(code) {
   // initialize meta, specify those with multiple values allowed
   const meta = {

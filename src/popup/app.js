@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import 'src/common/sprite';
 import options from 'src/common/options';
 import { i18n, sendMessage } from 'src/common';
 import App from './views/app';

@@ -106,3 +106,49 @@ export function getLocaleString(meta, key) {
   const langKey = navigator.languages.map(lang => `${key}:${lang}`).find(item => item in meta);
   return (langKey ? meta[langKey] : meta[key]) || '';
 }
+
+/**
+ * Make a request.
+ * @param {String} url
+ * @param {Object} headers
+ * @return Promise
+ */
+export function request(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const { responseType } = options;
+    xhr.open(options.method || 'GET', url, true);
+    if (responseType) xhr.responseType = responseType;
+    const headers = Object.assign({}, options.headers);
+    let { body } = options;
+    if (body && typeof body === 'object') {
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(body);
+    }
+    Object.keys(headers).forEach(key => {
+      xhr.setRequestHeader(key, headers[key]);
+    });
+    xhr.onloadend = () => {
+      let data;
+      if (responseType === 'blob') {
+        data = xhr.response;
+      } else {
+        data = xhr.responseText;
+      }
+      if (responseType === 'json') {
+        try {
+          data = JSON.parse(data);
+        } catch (e) {
+          // Ignore invalid JSON
+        }
+      }
+      (xhr.status > 300 ? reject : resolve)({
+        url,
+        data,
+        status: xhr.status,
+        // xhr,
+      });
+    };
+    xhr.send(body);
+  });
+}
