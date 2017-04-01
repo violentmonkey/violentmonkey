@@ -104,5 +104,5 @@ export function getUniqId() {
  */
 export function getLocaleString(meta, key) {
   const langKey = navigator.languages.map(lang => `${key}:${lang}`).find(item => item in meta);
-  return (langKey && meta[langKey]) || '';
+  return (langKey ? meta[langKey] : meta[key]) || '';
 }

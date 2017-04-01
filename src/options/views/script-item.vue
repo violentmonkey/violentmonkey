@@ -3,7 +3,7 @@
     <img class="script-icon" :src="safeIcon">
     <div class="script-info flex">
       <a class="script-name ellipsis" target=_blank :href="homepageURL"
-      v-text="script.custom.name||getLocaleString('name')"></a>
+      v-text="script.custom.name || getLocaleString('name')"></a>
       <a class="script-support" v-if="script.meta.supportURL" target=_blank :href="script.meta.supportURL">
         <svg class="icon"><use xlink:href="#question" /></svg>
       </a>
@@ -15,7 +15,7 @@
       </div>
       <div class="script-version" v-text="script.meta.version?'v'+script.meta.version:''"></div>
     </div>
-    <p class="script-desc ellipsis" v-text="script.custom.description||getLocaleString('description')"></p>
+    <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
     <div class=buttons>
       <button v-text="i18n('buttonEdit')" @click="onEdit"></button>
       <button @click="onEnable" v-text="labelEnable"></button>
