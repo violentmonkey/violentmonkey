@@ -7,7 +7,7 @@
     "analyze": "webpack --profile --json --config scripts/webpack.conf.js | webpack-bundle-size-analyzer",
     "analyze:json": "webpack --profile --json --config scripts/webpack.conf.js > stats.json",
     "i18n": "gulp i18n",
-    "lint": "eslint src",
+    "lint": "eslint --ext .js,.vue src",
     "update": "node scripts/update",
     "svgo": "svgo icons",
     "test": "mocha"
