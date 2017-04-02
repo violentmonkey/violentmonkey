@@ -19,11 +19,14 @@ function initMessage() {
   }).$mount(el);
 }
 
-export function showMessage(data) {
+export function showMessage(options) {
   initMessage();
-  store.messages.push(data);
-  setTimeout(() => {
-    const i = store.messages.indexOf(data);
-    if (i >= 0) store.messages.splice(i, 1);
-  }, 2000);
+  const message = Object.assign({}, options, !options.buttons && {
+    onInit(vm) {
+      setTimeout(() => {
+        vm.$emit('dismiss');
+      }, 2000);
+    },
+  });
+  store.messages.push(message);
 }

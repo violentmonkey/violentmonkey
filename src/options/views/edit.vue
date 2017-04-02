@@ -123,7 +123,7 @@
 
 <script>
 import CodeMirror from 'codemirror';
-import { i18n, debounce, sendMessage } from 'src/common';
+import { i18n, debounce, sendMessage, noop } from 'src/common';
 import { showMessage } from '../utils';
 import VmCode from './code';
 
@@ -307,14 +307,30 @@ export default {
       .then((script) => {
         this.script = script;
         this.canSave = false;
-      }, (err) => {
+      }, err => {
         showMessage({ text: err });
       });
     },
     close() {
-      if (!this.canSave || confirm(i18n('confirmNotSaved'))) {
-        this.$emit('close');
-      }
+      (this.canSave ? Promise.reject() : Promise.resolve())
+      .catch(() => new Promise((resolve, reject) => {
+        showMessage({
+          input: false,
+          text: i18n('confirmNotSaved'),
+          buttons: [
+            {
+              text: 'OK',
+              onClick: resolve,
+            },
+            {
+              text: 'Cancel',
+              onClick: reject,
+            },
+          ],
+          onBackdropClick: reject,
+        });
+      }))
+      .then(() => this.$emit('close'), noop);
     },
     saveClose() {
       this.save().then(this.close);

@@ -20,10 +20,10 @@
 </template>
 
 <script>
-import { i18n, sendMessage } from 'src/common';
+import { i18n, sendMessage, noop } from 'src/common';
 import Item from './script-item';
 import Edit from './edit';
-import { store } from '../utils';
+import { store, showMessage } from '../utils';
 
 export default {
   components: {
@@ -57,13 +57,31 @@ export default {
       sendMessage({ cmd: 'CheckUpdateAll' });
     },
     installFromURL() {
-      const url = prompt(i18n('hintInputURL'));
-      if (url && url.includes('://')) {
-        const urlOptions = browser.runtime.getURL(browser.runtime.getManifest().options_page);
-        browser.tabs.create({
-          url: `${urlOptions}#confirm?u=${encodeURIComponent(url)}`,
+      new Promise((resolve, reject) => {
+        showMessage({
+          text: i18n('hintInputURL'),
+          onBackdropClick: reject,
+          buttons: [
+            {
+              type: 'submit',
+              text: 'OK',
+              onClick: resolve,
+            },
+            {
+              text: 'Cancel',
+              onClick: reject,
+            },
+          ],
         });
-      }
+      })
+      .then(url => {
+        if (url && url.includes('://')) {
+          const urlOptions = browser.runtime.getURL(browser.runtime.getManifest().options_page);
+          browser.tabs.create({
+            url: `${urlOptions}#confirm?u=${encodeURIComponent(url)}`,
+          });
+        }
+      }, noop);
     },
     editScript(id) {
       this.script = this.store.scripts.find(script => script.id === id);

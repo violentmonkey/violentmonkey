@@ -23,9 +23,7 @@ export default {
   methods: {
     onSave() {
       options.set('customCSS', (this.css || '').trim());
-      showMessage({
-        text: i18n('msgSavedCustomCSS'),
-      });
+      showMessage({ text: i18n('msgSavedCustomCSS') });
     },
   },
 };

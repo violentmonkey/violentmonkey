@@ -20,7 +20,7 @@
         <button v-text="i18n('buttonClose')" @click="close"></button>
       </div>
       <h1><span v-text="i18n('labelInstall')"></span> - <span v-text="i18n('extName')"></span></h1>
-      <div class="ellipsis confirm-url" :title="query.url" v-text="query.url"></div>
+      <div class="ellipsis confirm-url" :title="query.u" v-text="query.u"></div>
       <div class="ellipsis confirm-msg" v-text="message"></div>
     </div>
     <div class="frame-block flex-auto p-rel">
@@ -81,7 +81,7 @@ export default {
       this.installable = false;
       const { code: oldCode } = this;
       return this.getScript(this.query.u)
-      .then((code) => {
+      .then(code => {
         if (changedOnly && oldCode === code) return Promise.reject();
         this.code = code;
       });
@@ -91,7 +91,7 @@ export default {
         cmd: 'ParseMeta',
         data: this.code,
       })
-      .then((script) => {
+      .then(script => {
         const urls = Object.keys(script.resources)
         .map(key => script.resources[key]);
         const length = script.require.length + urls.length;
@@ -122,7 +122,7 @@ export default {
       .then(() => {
         this.message = this.i18n('msgLoadedData');
         this.installable = true;
-      }, (err) => {
+      }, err => {
         this.message = this.i18n('msgErrorLoadingDependency', [err]);
         return Promise.reject();
       });
@@ -134,7 +134,7 @@ export default {
       return request(url, {
         responseType: isBlob ? 'blob' : null,
       })
-      .then(data => {
+      .then(({ data }) => {
         if (!isBlob) return data;
         return new Promise(resolve => {
           const reader = new FileReader();

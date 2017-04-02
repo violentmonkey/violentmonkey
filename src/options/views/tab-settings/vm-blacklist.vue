@@ -27,9 +27,7 @@ export default {
       .map(item => item.trim())
       .filter(Boolean);
       options.set('blacklist', rules);
-      showMessage({
-        text: i18n('msgSavedBlacklist'),
-      });
+      showMessage({ text: i18n('msgSavedBlacklist') });
       sendMessage({ cmd: 'BlacklistReset' });
     },
   },

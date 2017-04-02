@@ -364,27 +364,6 @@ code {
     }
   }
 }
-.message {
-  position: absolute;
-  width: 14rem;
-  top: 0;
-  left: 50%;
-  margin-left: -7rem;
-  padding: 1rem;
-  z-index: 10;
-  background: white;
-  border-bottom-left-radius: .2rem;
-  border-bottom-right-radius: .2rem;
-  box-shadow: 0 0 .2rem rgba(0,0,0,.2);
-}
-.message-enter-active,
-.message-leave-active {
-  transition: transform .5s;
-}
-.message-enter,
-.message-leave-active {
-  transform: translateY(-120%);
-}
 .icon {
   width: 1rem;
   height: 1rem;
