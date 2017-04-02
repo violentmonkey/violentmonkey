@@ -123,7 +123,7 @@ export default {
       .then(tabs => {
         const optionsTab = tabs.find(tab => {
           const [path, qs] = tab.url.split('#');
-          return path === url && (!qs || qs.startsWith('confirm/'));
+          return path === url && (!qs || qs.startsWith('?'));
         });
         if (optionsTab) browser.tabs.update(optionsTab.id, { active: true });
         else browser.tabs.create({ url });
