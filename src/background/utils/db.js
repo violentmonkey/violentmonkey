@@ -1,6 +1,6 @@
 import Promise from 'sync-promise-lite';
-import { i18n } from 'src/common';
-import * as scriptUtils from './script';
+import { i18n, request } from 'src/common';
+import { getNameURI, getScriptInfo, isRemote, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
 
 let db;
@@ -10,17 +10,17 @@ export const initialized = openDatabase().then(initPosition);
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('Violentmonkey', 1);
-    request.onsuccess = () => {
-      db = request.result;
+    const req = indexedDB.open('Violentmonkey', 1);
+    req.onsuccess = () => {
+      db = req.result;
       resolve();
     };
-    request.onerror = e => {
+    req.onerror = e => {
       const { error } = e.target;
       console.error(`IndexedDB error: ${error.message}`);
       reject(error);
     };
-    request.onupgradeneeded = e => {
+    req.onupgradeneeded = e => {
       const _db = e.currentTarget.result;
       // scripts: id uri custom meta enabled update code position
       const os = _db.createObjectStore('scripts', {
@@ -66,7 +66,7 @@ export function getScript(id, cTx) {
 export function queryScript(id, meta, cTx) {
   if (id) return getScript(id, cTx);
   return new Promise(resolve => {
-    const uri = scriptUtils.getNameURI({ meta });
+    const uri = getNameURI({ meta });
     const tx = cTx || db.transaction('scripts');
     tx.objectStore('scripts').index('uri').get(uri).onsuccess = e => {
       resolve(e.target.result);
@@ -77,7 +77,7 @@ export function queryScript(id, meta, cTx) {
 export function getScriptData(id) {
   return getScript(id).then(script => {
     if (!script) return Promise.reject();
-    const data = scriptUtils.getScriptInfo(script);
+    const data = getScriptInfo(script);
     data.code = script.code;
     return data;
   });
@@ -86,7 +86,7 @@ export function getScriptData(id) {
 export function getScriptInfos(ids) {
   const tx = db.transaction('scripts');
   return Promise.all(ids.map(id => getScript(id, tx)))
-  .then(scripts => scripts.filter(Boolean).map(scriptUtils.getScriptInfo));
+  .then(scripts => scripts.filter(Boolean).map(getScriptInfo));
 }
 
 export function getValues(uris, cTx) {
@@ -168,8 +168,8 @@ export function getData() {
       const cache = {};
       data.scripts = scripts.map(script => {
         const { icon } = script.meta;
-        if (scriptUtils.isRemote(icon)) cache[icon] = 1;
-        return scriptUtils.getScriptInfo(script);
+        if (isRemote(icon)) cache[icon] = 1;
+        return getScriptInfo(script);
       });
       data.cache = Object.keys(cache);
       return data;
@@ -292,12 +292,12 @@ const cacheRequests = {};
 function fetchCache(url, check) {
   let promise = cacheRequests[url];
   if (!promise) {
-    promise = scriptUtils.fetch(url, 'blob')
-    .then(res => Promise.resolve(check && check(res.response)).then(() => res.response))
+    promise = request(url, { responseType: 'blob' })
+    .then(({ data }) => Promise.resolve(check && check(data)).then(() => data))
     .then(data => new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
-        saveCache(url, window.btoa(this.result)).then(() => {
+        saveCache(url, window.btoa(reader.result)).then(() => {
           delete cacheRequests[url];
           resolve();
         });
@@ -314,8 +314,8 @@ const requireRequests = {};
 function fetchRequire(url) {
   let promise = requireRequests[url];
   if (!promise) {
-    promise = scriptUtils.fetch(url)
-    .then(res => saveRequire(url, res.responseText))
+    promise = request(url)
+    .then(({ data }) => saveRequire(url, data))
     .catch(() => { console.error(`Error fetching required script: ${url}`); })
     .then(() => { delete requireRequests[url]; });
     requireRequests[url] = promise;
@@ -341,7 +341,7 @@ export function updateScriptInfo(id, data, custom) {
       });
       Object.assign(script.custom, custom);
       os.put(script).onsuccess = () => {
-        resolve(scriptUtils.getScriptInfo(script));
+        resolve(getScriptInfo(script));
       };
     };
   });
@@ -402,7 +402,7 @@ export function vacuum() {
         Object.keys(script.meta.resources).forEach(key => {
           data.cache[script.meta.resources[key]] = 1;
         });
-        if (scriptUtils.isRemote(script.meta.icon)) data.cache[script.meta.icon] = 1;
+        if (isRemote(script.meta.icon)) data.cache[script.meta.icon] = 1;
         data.values[script.uri] = 1;
         return script.id;
       });
@@ -457,7 +457,7 @@ export function getScriptsByIndex(index, value, cTx) {
 }
 
 export function parseScript(data) {
-  const meta = scriptUtils.parseMeta(data.code);
+  const meta = parseMeta(data.code);
   if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
   const res = {
     cmd: 'UpdateScript',
@@ -480,7 +480,7 @@ export function parseScript(data) {
     else fetchCache(url);
   });
   // @icon
-  if (scriptUtils.isRemote(meta.icon)) {
+  if (isRemote(meta.icon)) {
     fetchCache(meta.icon, blob => new Promise((resolve, reject) => {
       const url = URL.createObjectURL(blob);
       const image = new Image();
@@ -503,7 +503,7 @@ export function parseScript(data) {
       if (data.isNew) throw i18n('msgNamespaceConflict');
       script = result;
     } else {
-      script = scriptUtils.newScript();
+      script = newScript();
       res.cmd = 'AddScript';
       res.data.message = i18n('msgInstalled');
     }
@@ -514,17 +514,17 @@ export function parseScript(data) {
     }
     script.meta = meta;
     script.code = data.code;
-    script.uri = scriptUtils.getNameURI(script);
+    script.uri = getNameURI(script);
     // use referer page as default homepage
-    if (!meta.homepageURL && !script.custom.homepageURL && scriptUtils.isRemote(data.from)) {
+    if (!meta.homepageURL && !script.custom.homepageURL && isRemote(data.from)) {
       script.custom.homepageURL = data.from;
     }
-    if (scriptUtils.isRemote(data.url)) script.custom.lastInstallURL = data.url;
+    if (isRemote(data.url)) script.custom.lastInstallURL = data.url;
     script.custom.modified = data.modified || Date.now();
     return saveScript(script, tx);
   })
   .then(script => {
-    Object.assign(res.data, scriptUtils.getScriptInfo(script));
+    Object.assign(res.data, getScriptInfo(script));
     return res;
   });
 }

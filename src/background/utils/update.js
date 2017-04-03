@@ -1,6 +1,6 @@
-import { i18n } from 'src/common';
+import { i18n, request } from 'src/common';
 import { parseScript } from './db';
-import * as scriptUtils from './script';
+import { parseMeta, compareVersion } from './script';
 
 const processes = {};
 
@@ -18,9 +18,9 @@ function doCheckUpdate(script) {
     || script.custom.lastInstallURL
   );
   const updateURL = script.custom.updateURL || script.meta.updateURL || downloadURL;
-  const okHandler = xhr => {
-    const meta = scriptUtils.parseMeta(xhr.responseText);
-    if (scriptUtils.compareVersion(script.meta.version, meta.version) < 0) return Promise.resolve();
+  const okHandler = ({ data }) => {
+    const meta = parseMeta(data);
+    if (compareVersion(script.meta.version, meta.version) < 0) return Promise.resolve();
     res.data.checking = false;
     res.data.message = i18n('msgNoUpdate');
     browser.runtime.sendMessage(res);
@@ -40,8 +40,8 @@ function doCheckUpdate(script) {
     }
     res.data.message = i18n('msgUpdating');
     browser.runtime.sendMessage(res);
-    return scriptUtils.fetch(downloadURL)
-    .then(xhr => xhr.responseText, () => {
+    return request(downloadURL)
+    .then(({ data }) => data, () => {
       res.data.checking = false;
       res.data.message = i18n('msgErrorFetchingScript');
       browser.runtime.sendMessage(res);
@@ -51,8 +51,10 @@ function doCheckUpdate(script) {
   if (!updateURL) return Promise.reject();
   res.data.message = i18n('msgCheckingForUpdate');
   browser.runtime.sendMessage(res);
-  return scriptUtils.fetch(updateURL, null, {
-    Accept: 'text/x-userscript-meta',
+  return request(updateURL, {
+    headers: {
+      Accept: 'text/x-userscript-meta',
+    },
   })
   .then(okHandler, errHandler)
   .then(update);
