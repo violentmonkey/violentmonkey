@@ -24,7 +24,7 @@ const OneDrive = BaseService.extend({
     .then(() => this.prepare());
   },
   user() {
-    const requestUser = () => this.request({
+    const requestUser = () => this.loadData({
       url: '/drive',
       responseType: 'json',
     });
@@ -48,7 +48,7 @@ const OneDrive = BaseService.extend({
     });
   },
   getMeta() {
-    const getMeta = () => BaseService.getMeta.call(this);
+    const getMeta = () => BaseService.prototype.getMeta.call(this);
     return getMeta()
     .catch(res => {
       if (res.status === 404) {
@@ -62,24 +62,24 @@ const OneDrive = BaseService.extend({
     });
   },
   list() {
-    return this.request({
+    return this.loadData({
       url: '/drive/special/approot/children',
       responseType: 'json',
     })
     .then(data => data.value.filter(item => item.file && isScriptFile(item.name)).map(normalize));
   },
   get(path) {
-    return this.request({
+    return this.loadData({
       url: `/drive/special/approot:/${encodeURIComponent(path)}`,
       responseType: 'json',
     })
-    .then(data => this.request({
+    .then(data => this.loadData({
       url: data['@content.downloadUrl'],
       delay: 0,
     }));
   },
   put(path, data) {
-    return this.request({
+    return this.loadData({
       method: 'PUT',
       url: `/drive/special/approot:/${encodeURIComponent(path)}:/content`,
       headers: {
@@ -92,7 +92,7 @@ const OneDrive = BaseService.extend({
   },
   remove(path) {
     // return 204
-    return this.request({
+    return this.loadData({
       method: 'DELETE',
       url: `/drive/special/approot:/${encodeURIComponent(path)}`,
     })
@@ -128,7 +128,7 @@ const OneDrive = BaseService.extend({
     return this.prepare();
   },
   authorized(params) {
-    return this.request({
+    return this.loadData({
       method: 'POST',
       url: 'https://login.live.com/oauth20_token.srf',
       prefix: '',

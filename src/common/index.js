@@ -118,7 +118,7 @@ export function request(url, options = {}) {
     const xhr = new XMLHttpRequest();
     const { responseType } = options;
     xhr.open(options.method || 'GET', url, true);
-    if (responseType) xhr.responseType = responseType;
+    if (['blob'].includes(responseType)) xhr.responseType = responseType;
     const headers = Object.assign({}, options.headers);
     let { body } = options;
     if (body && typeof body === 'object') {

@@ -1,4 +1,4 @@
-import { debounce, normalizeKeys, noop, request } from 'src/common';
+import { debounce, normalizeKeys, request, noop } from 'src/common';
 import getEventEmitter from '../utils/events';
 import { getOption, setOption, hookOptions } from '../utils/options';
 import { getScriptsByIndex, parseScript, saveScript, removeScript } from '../utils/db';
@@ -108,25 +108,32 @@ export function getStates() {
 }
 
 function serviceFactory(base) {
-  const initService = (...args) => {
-    const service = Object.create(base);
-    service.initialize(...args);
-    return service;
+  const Service = function constructor(...args) {
+    if (!(this instanceof Service)) return new Service(...args);
+    this.initialize(...args);
   };
-  initService.extend = options => serviceFactory(Object.assign(Object.create(base), options));
-  return initService;
+  Service.prototype = base;
+  Service.extend = extendService;
+  return Service;
 }
+function extendService(options) {
+  return serviceFactory(Object.assign(Object.create(this.prototype), options));
+}
+
+const onStateChange = debounce(() => {
+  browser.runtime.sendMessage({
+    cmd: 'UpdateSync',
+    data: getStates(),
+  });
+});
+
 export const BaseService = serviceFactory({
   name: 'base',
   displayName: 'BaseService',
   delayTime: 1000,
   urlPrefix: '',
   metaFile: 'Violentmonkey',
-  delay(time) {
-    return new Promise(resolve => { setTimeout(resolve, time); });
-  },
   initialize(name) {
-    this.onStateChange = debounce(this.onStateChange.bind(this));
     if (name) this.name = name;
     this.progress = {
       finished: 0,
@@ -140,13 +147,13 @@ export const BaseService = serviceFactory({
       'authorized',
       'unauthorized',
       'error',
-    ], null, this.onStateChange);
+    ], null, onStateChange);
     this.syncState = serviceState([
       'idle',
       'ready',
       'syncing',
       'error',
-    ], null, this.onStateChange);
+    ], null, onStateChange);
     // this.initToken();
     this.lastFetch = Promise.resolve();
     this.startSync = this.syncFactory();
@@ -154,12 +161,6 @@ export const BaseService = serviceFactory({
     ['on', 'off', 'fire']
     .forEach(key => {
       this[key] = (...args) => { events[key](...args); };
-    });
-  },
-  onStateChange() {
-    browser.runtime.sendMessage({
-      cmd: 'UpdateSync',
-      data: getStates(),
     });
   },
   log(...args) {
@@ -232,7 +233,7 @@ export const BaseService = serviceFactory({
     this.headers.Authorization = token ? `Bearer ${token}` : null;
     return !!token;
   },
-  request(options) {
+  loadData(options) {
     const { progress } = this;
     let lastFetch;
     if (options.delay == null) {
@@ -253,23 +254,26 @@ export const BaseService = serviceFactory({
     }
     this.lastFetch = lastFetch;
     progress.total += 1;
-    this.onStateChange();
+    onStateChange();
     return lastFetch.then(() => {
       let { prefix } = options;
       if (prefix == null) prefix = this.urlPrefix;
       const headers = Object.assign({}, this.headers, options.headers);
-      return request(prefix + options.url, {
+      let { url } = options;
+      if (url.startsWith('/')) url = prefix + url;
+      return request(url, {
         headers,
         method: options.method,
         body: options.body,
-      })
-      .then(data => ({ data }), error => ({ error }))
-      .then(({ data, error }) => {
-        progress.finished += 1;
-        this.onStateChange();
-        if (error) return Promise.reject(error);
-        return data;
+        responseType: options.responseType,
       });
+    })
+    .then(({ data }) => ({ data }), error => ({ error }))
+    .then(({ data, error }) => {
+      progress.finished += 1;
+      onStateChange();
+      if (error) return Promise.reject(error);
+      return data;
     });
   },
   sync() {
@@ -399,7 +403,7 @@ export const BaseService = serviceFactory({
         return Promise.all(promises);
       }));
       // ignore errors to ensure all promises are fulfilled
-      return Promise.all(promiseQueue.map(promise => promise.catch(err => err || true)))
+      return Promise.all(promiseQueue.map(promise => promise.then(noop, err => err || true)))
       .then(errors => errors.filter(Boolean))
       .then(errors => { if (errors.length) throw errors; });
     })

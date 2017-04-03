@@ -10,7 +10,7 @@ const Dropbox = BaseService.extend({
   name: 'dropbox',
   displayName: 'Dropbox',
   user() {
-    return this.request({
+    return this.loadData({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/users/get_current_account',
     })
@@ -27,14 +27,14 @@ const Dropbox = BaseService.extend({
     });
   },
   getMeta() {
-    return BaseService.getMeta.call(this)
+    return BaseService.prototype.getMeta.call(this)
     .catch(res => {
       if (res.status === 409) return {};
       throw res;
     });
   },
   list() {
-    return this.request({
+    return this.loadData({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/files/list_folder',
       body: {
@@ -47,7 +47,7 @@ const Dropbox = BaseService.extend({
     ));
   },
   get(path) {
-    return this.request({
+    return this.loadData({
       method: 'POST',
       url: 'https://content.dropboxapi.com/2/files/download',
       headers: {
@@ -58,7 +58,7 @@ const Dropbox = BaseService.extend({
     });
   },
   put(path, data) {
-    return this.request({
+    return this.loadData({
       method: 'POST',
       url: 'https://content.dropboxapi.com/2/files/upload',
       headers: {
@@ -74,7 +74,7 @@ const Dropbox = BaseService.extend({
     .then(normalize);
   },
   remove(path) {
-    return this.request({
+    return this.loadData({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/files/delete',
       body: {
