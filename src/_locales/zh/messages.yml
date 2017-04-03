@@ -380,3 +380,9 @@ menuDashboard:
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: 匹配的脚本
+buttonOK:
+  description: OK button on dialog.
+  message: 确定
+buttonCancel:
+  description: Cancel button on dialog.
+  message: 取消

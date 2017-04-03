@@ -4,9 +4,9 @@
     v-if="message.backdrop || message.onBackdropClick"
     @click="onBackdropClick"></div>
     <div class="message">
-      <div v-if="message.text" v-text="message.text"></div>
+      <div class="mb-1" v-if="message.text" v-text="message.text"></div>
       <form v-if="message.buttons">
-        <input type="text" v-if="message.input !== false" v-model="message.input">
+        <input class="mb-1" type="text" v-if="message.input !== false" v-model="message.input">
         <div>
           <button v-for="button in message.buttons" class="mr-1"
           :type="button.type || 'button'" v-text="button.text"

@@ -382,3 +382,9 @@ menuDashboard:
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: ''
+buttonOK:
+  description: OK button on dialog.
+  message: ''
+buttonCancel:
+  description: Cancel button on dialog.
+  message: ''

@@ -319,11 +319,11 @@ export default {
           text: i18n('confirmNotSaved'),
           buttons: [
             {
-              text: 'OK',
+              text: i18n('buttonOK'),
               onClick: resolve,
             },
             {
-              text: 'Cancel',
+              text: i18n('buttonCancel'),
               onClick: reject,
             },
           ],
