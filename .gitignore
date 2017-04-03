@@ -5,4 +5,4 @@ node_modules/
 /*.crx
 /*.log
 /*.lock
-/*.json
+/stats.json

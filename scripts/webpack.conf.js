@@ -16,17 +16,17 @@ const definePlugin = new webpack.DefinePlugin({
 });
 
 function resolve(dir) {
-  return path.join(__dirname, '..', dir)
+  return path.join(__dirname, '..', dir);
 }
 
 const base = {
   output: {
-    path: path.resolve(DIST),
+    path: resolve(DIST),
     publicPath: '/',
     filename: '[name].js',
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.js', '.vue'],
     alias: {
       src: resolve('src'),
     }
