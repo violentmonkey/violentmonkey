@@ -29,8 +29,15 @@ const paths = {
 
 function webpackCallback(err, stats) {
   if (err) {
-    gutil.log('[ERROR]', err);
+    gutil.log('[FATAL]', err);
     return;
+  }
+  if (stats.hasErrors()) {
+    gutil.log('[ERROR] webpack compilation failed\n', stats.toJson().errors.join('\n'));
+    return;
+  }
+  if (stats.hasWarnings()) {
+    gutil.log('[WARNING] webpack compilation has warnings\n', stats.toJson().warnings.join('\n'));
   }
   stats.stats.forEach(stat => {
     const timeCost = (stat.endTime - stat.startTime) / 1000;
