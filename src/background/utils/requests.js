@@ -8,6 +8,7 @@ const specialHeaders = [
   'referer',
   'origin',
   'host',
+  'cookie',
 ];
 // const tasks = {};
 
