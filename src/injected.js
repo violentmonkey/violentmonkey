@@ -282,6 +282,7 @@
           if (!req.data) req.data = [parseData(res, req.details)];
           res.data.response = req.data[0];
         }
+        res.data.context = req.details.context;
         cb(res.data);
       }
       if (res.type === 'loadend') delete comm.requests[req.id];
