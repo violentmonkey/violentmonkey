@@ -1,6 +1,7 @@
 /dist/
 node_modules/
 /*.zip
+/*.tar.gz
 /*.nex
 /*.crx
 /*.log

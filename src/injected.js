@@ -287,20 +287,21 @@
       if (res.type === 'loadend') delete comm.requests[req.id];
     }
     function start(req, id) {
+      const { details } = req;
       const data = {
         id,
-        method: req.details.method,
-        url: req.details.url,
-        data: req.details.data,
-        // async: !req.details.synchronous,
-        user: req.details.user,
-        password: req.details.password,
-        headers: req.details.headers,
-        overrideMimeType: req.details.overrideMimeType,
+        method: details.method,
+        url: details.url,
+        data: details.data,
+        // async: !details.synchronous,
+        user: details.user,
+        password: details.password,
+        headers: details.headers,
+        overrideMimeType: details.overrideMimeType,
       };
       req.id = id;
       comm.requests[id] = req;
-      if (comm.includes(['arraybuffer', 'blob'], req.details.responseType)) {
+      if (comm.includes(['arraybuffer', 'blob'], details.responseType)) {
         data.responseType = 'blob';
       }
       comm.post({ cmd: 'HttpRequest', data });

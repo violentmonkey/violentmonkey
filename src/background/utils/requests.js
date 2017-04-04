@@ -73,8 +73,11 @@ export function httpRequest(details, cb) {
     xhr.setRequestHeader('VM-Verify', details.id);
     if (details.headers) {
       Object.keys(details.headers).forEach(key => {
+        const lowerKey = key.toLowerCase();
+        // `VM-` headers are reserved
+        if (lowerKey.startsWith('vm-')) return;
         xhr.setRequestHeader(
-          specialHeaders.includes(key.toLowerCase()) ? `VM-${key}` : key,
+          specialHeaders.includes(lowerKey) ? `VM-${key}` : key,
           details.headers[key],
         );
       });
