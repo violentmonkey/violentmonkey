@@ -74,6 +74,7 @@ targets.push(Object.assign({}, base, {
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
+      minChunks: 2,
     }),
     new HtmlWebpackPlugin({
       filename: 'background/index.html',

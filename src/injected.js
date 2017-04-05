@@ -691,7 +691,7 @@
       AddStyle(css) {
         if (document.head) {
           const style = document.createElement('style');
-          style.innerHTML = css;
+          style.textContent = css;
           document.head.appendChild(style);
         }
       },
@@ -784,7 +784,7 @@
   function inject(code) {
     const script = document.createElement('script');
     const doc = document.body || document.documentElement;
-    script.innerHTML = code;
+    script.textContent = code;
     doc.appendChild(script);
     try {
       doc.removeChild(script);
