@@ -1,7 +1,7 @@
 import { debounce, normalizeKeys, request, noop } from 'src/common';
 import getEventEmitter from '../utils/events';
 import { getOption, setOption, hookOptions } from '../utils/options';
-import { getScriptsByIndex, parseScript, saveScript, removeScript } from '../utils/db';
+import { getScriptsByIndex, parseScript, removeScript } from '../utils/db';
 
 const serviceNames = [];
 const services = {};
@@ -282,48 +282,60 @@ export const BaseService = serviceFactory({
       total: 0,
     };
     this.syncState.set('syncing');
+    // Avoid simultaneous requests
     return this.getMeta()
-    .then(meta => Promise.all([
-      meta,
+    .then(remoteMeta => Promise.all([
+      remoteMeta,
       this.list(),
       getScriptsByIndex('position'),
     ]))
-    .then(([meta, remoteData, localData]) => {
-      const remote = {
-        meta,
-        data: remoteData,
-      };
-      const local = {
-        meta: this.config.get('meta', {}),
-        data: localData,
-      };
-      const firstSync = !local.meta.timestamp;
-      const outdated = !local.meta.timestamp || remote.meta.timestamp > local.meta.timestamp;
+    .then(([remoteMeta, remoteData, localData]) => {
+      const remoteMetaInfo = remoteMeta.info || {};
+      let remoteChanged = !remoteMeta.timestamp || Object.keys(remoteMetaInfo).length !== remoteData.length;
+      const now = Date.now();
+      const remoteItemMap = {};
+      remoteMeta.info = remoteData.reduce((info, item) => {
+        remoteItemMap[item.uri] = item;
+        info[item.uri] = remoteMetaInfo[item.uri];
+        let itemInfo = info[item.uri];
+        if (!itemInfo) {
+          itemInfo = {};
+          info[item.uri] = itemInfo;
+          remoteChanged = true;
+        }
+        if (!itemInfo.modified) {
+          itemInfo.modified = now;
+          remoteChanged = true;
+        }
+        return info;
+      }, {});
+      const localMeta = this.config.get('meta', {});
+      const firstSync = !localMeta.timestamp;
+      const outdated = !localMeta.timestamp || remoteMeta.timestamp > localMeta.timestamp;
       this.log('First sync:', firstSync);
-      this.log('Outdated:', outdated, '(', 'local:', local.meta.timestamp, 'remote:', remote.meta.timestamp, ')');
-      const map = {};
+      this.log('Outdated:', outdated, '(', 'local:', localMeta.timestamp, 'remote:', remoteMeta.timestamp, ')');
       const getRemote = [];
       const putRemote = [];
       const delRemote = [];
       const delLocal = [];
-      remote.data.forEach(item => { map[item.uri] = item; });
-      local.data.forEach(item => {
-        const remoteItem = map[item.uri];
-        if (remoteItem) {
-          if (firstSync || !item.custom.modified || remoteItem.modified > item.custom.modified) {
+      localData.forEach(item => {
+        const remoteInfo = remoteMeta.info[item.uri];
+        if (remoteInfo) {
+          if (firstSync || !item.custom.modified || remoteInfo.modified > item.custom.modified) {
+            const remoteItem = remoteItemMap[item.uri];
             getRemote.push(remoteItem);
-          } else if (remoteItem.modified < item.custom.modified) {
+          } else if (remoteInfo.modified < item.custom.modified) {
             putRemote.push(item);
           }
-          delete map[item.uri];
+          delete remoteItemMap[item.uri];
         } else if (firstSync || !outdated) {
           putRemote.push(item);
         } else {
           delLocal.push(item);
         }
       });
-      Object.keys(map).forEach(uri => {
-        const item = map[uri];
+      Object.keys(remoteItemMap).forEach(uri => {
+        const item = remoteItemMap[uri];
         if (outdated) {
           getRemote.push(item);
         } else {
@@ -345,7 +357,7 @@ export const BaseService = serviceFactory({
             } catch (e) {
               data.code = raw;
             }
-            data.modified = item.modified;
+            data.modified = remoteMeta.info[item.uri].modified;
             if (!getOption('syncScriptStatus') && data.more) {
               delete data.more.enabled;
             }
@@ -364,16 +376,14 @@ export const BaseService = serviceFactory({
               update: item.update,
             },
           });
-          return this.put(getFilename(item.uri), data)
-          .then(res => {
-            if (item.custom.modified !== res.modified) {
-              item.custom.modified = res.modified;
-              return saveScript(item);
-            }
-          });
+          remoteMeta.info[item.uri] = { modified: item.custom.modified };
+          remoteChanged = true;
+          return this.put(getFilename(item.uri), data);
         }),
         delRemote.map(item => {
           this.log('Remove remote script:', item.uri);
+          delete remoteMeta.info[item.uri];
+          remoteChanged = true;
           return this.remove(getFilename(item.uri));
         }),
         delLocal.map(item => {
@@ -383,23 +393,13 @@ export const BaseService = serviceFactory({
       );
       promiseQueue.push(Promise.all(promiseQueue).then(() => {
         const promises = [];
-        let remoteChanged;
-        if (!remote.meta.timestamp || putRemote.length || delRemote.length) {
-          remoteChanged = true;
-          remote.meta.timestamp = Date.now();
-          promises.push(this.put(this.metaFile, JSON.stringify(remote.meta)));
+        if (remoteChanged) {
+          remoteMeta.timestamp = Date.now();
+          promises.push(this.put(this.metaFile, JSON.stringify(remoteMeta)));
         }
-        if (
-          !local.meta.timestamp
-          || getRemote.length
-          || delLocal.length
-          || remoteChanged
-          || outdated
-        ) {
-          local.meta.timestamp = remote.meta.timestamp;
-        }
-        local.meta.lastSync = Date.now();
-        this.config.set('meta', local.meta);
+        localMeta.timestamp = remoteMeta.timestamp;
+        localMeta.lastSync = Date.now();
+        this.config.set('meta', localMeta);
         return Promise.all(promises);
       }));
       // ignore errors to ensure all promises are fulfilled

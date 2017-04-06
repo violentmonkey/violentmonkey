@@ -124,7 +124,7 @@ function normalize(item) {
   return {
     size: item.size,
     uri: getURI(item.name),
-    modified: new Date(item.server_modified).getTime(),
+    // modified: new Date(item.server_modified).getTime(),
     // isDeleted: item.is_deleted,
   };
 }

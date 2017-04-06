@@ -162,6 +162,6 @@ function normalize(item) {
   return {
     size: item.size,
     uri: getURI(item.name),
-    modified: new Date(item.lastModifiedDateTime).getTime(),
+    // modified: new Date(item.lastModifiedDateTime).getTime(),
   };
 }
