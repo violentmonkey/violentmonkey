@@ -142,7 +142,8 @@ export function request(url, options = {}) {
           // Ignore invalid JSON
         }
       }
-      (xhr.status > 300 ? reject : resolve)({
+      // xhr.status may be 0 or -1 if connection failed
+      (xhr.status >= 200 && xhr.status < 300 ? resolve : reject)({
         url,
         data,
         status: xhr.status,
