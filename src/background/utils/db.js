@@ -118,22 +118,24 @@ export function getScriptsByURL(url) {
   })));
 
   function loadScripts() {
-    return getScriptsByIndex('position', null, tx)
-    .then(scripts => {
-      const data = {
-        uris: [],
-      };
-      const require = {};
-      const cache = {};
-      data.scripts = scripts.filter(script => {
-        if (testBlacklist(url) || !testScript(url, script)) return;
-        data.uris.push(script.uri);
-        script.meta.require.forEach(key => { require[key] = 1; });
-        Object.keys(script.meta.resources).forEach(key => {
-          cache[script.meta.resources[key]] = 1;
-        });
-        return true;
+    const data = {
+      uris: [],
+    };
+    const require = {};
+    const cache = {};
+    return (testBlacklist(url)
+    ? Promise.resolve([])
+    : getScriptsByIndex('position', null, tx, script => {
+      if (!testScript(url, script)) return;
+      data.uris.push(script.uri);
+      script.meta.require.forEach(key => { require[key] = 1; });
+      Object.keys(script.meta.resources).forEach(key => {
+        cache[script.meta.resources[key]] = 1;
       });
+      return script;
+    }))
+    .then(scripts => {
+      data.scripts = scripts.filter(Boolean);
       data.require = Object.keys(require);
       data.cache = Object.keys(cache);
       return data;
@@ -162,15 +164,15 @@ export function getData() {
   })));
 
   function loadScripts() {
-    return getScriptsByIndex('position', null, tx)
+    const data = {};
+    const cache = {};
+    return getScriptsByIndex('position', null, tx, script => {
+      const { icon } = script.meta;
+      if (isRemote(icon)) cache[icon] = 1;
+      return getScriptInfo(script);
+    })
     .then(scripts => {
-      const data = {};
-      const cache = {};
-      data.scripts = scripts.map(script => {
-        const { icon } = script.meta;
-        if (isRemote(icon)) cache[icon] = 1;
-        return getScriptInfo(script);
-      });
+      data.scripts = scripts;
       data.cache = Object.keys(cache);
       return data;
     });
@@ -390,22 +392,22 @@ export function vacuum() {
   ]));
 
   function loadScripts() {
-    return getScriptsByIndex('position', null, tx)
-    .then(scripts => {
-      const data = {
-        require: {},
-        cache: {},
-        values: {},
-      };
-      data.ids = scripts.map(script => {
-        script.meta.require.forEach(uri => { data.require[uri] = 1; });
-        Object.keys(script.meta.resources).forEach(key => {
-          data.cache[script.meta.resources[key]] = 1;
-        });
-        if (isRemote(script.meta.icon)) data.cache[script.meta.icon] = 1;
-        data.values[script.uri] = 1;
-        return script.id;
+    const data = {
+      require: {},
+      cache: {},
+      values: {},
+    };
+    return getScriptsByIndex('position', null, tx, script => {
+      script.meta.require.forEach(uri => { data.require[uri] = 1; });
+      Object.keys(script.meta.resources).forEach(key => {
+        data.cache[script.meta.resources[key]] = 1;
       });
+      if (isRemote(script.meta.icon)) data.cache[script.meta.icon] = 1;
+      data.values[script.uri] = 1;
+      return script.id;
+    })
+    .then(ids => {
+      data.ids = ids;
       return data;
     });
   }
@@ -441,15 +443,17 @@ export function vacuum() {
   }
 }
 
-export function getScriptsByIndex(index, value, cTx) {
+export function getScriptsByIndex(index, options, cTx, mapEach) {
   const tx = cTx || db.transaction('scripts');
   return new Promise(resolve => {
     const os = tx.objectStore('scripts');
     const list = [];
-    os.index(index).openCursor(value).onsuccess = e => {
+    os.index(index).openCursor(options).onsuccess = e => {
       const { result } = e.target;
       if (result) {
-        list.push(result.value);
+        let { value } = result;
+        if (mapEach) value = mapEach(value);
+        list.push(value);
         result.continue();
       } else resolve(list);
     };
