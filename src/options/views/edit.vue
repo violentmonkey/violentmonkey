@@ -298,8 +298,8 @@ export default {
           // the backend is able to check namespace conflicts
           isNew: !this.script.id,
           message: '',
+          custom: value,
           more: {
-            custom: value,
             update: this.update,
           },
         },

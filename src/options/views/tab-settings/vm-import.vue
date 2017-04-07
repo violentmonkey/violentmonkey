@@ -79,17 +79,19 @@ function getVMFile(entry, vmFile) {
   return new Promise((resolve) => {
     const writer = new zip.TextWriter();
     entry.getData(writer, (text) => {
-      const script = { code: text };
+      const data = { code: text };
       if (vm.scripts) {
         const more = vm.scripts[entry.filename.slice(0, -8)];
         if (more) {
+          if (more.custom) data.custom = more.custom;
+          data.more = more;
           delete more.id;
-          script.more = more;
+          delete more.custom;
         }
       }
       sendMessage({
         cmd: 'ParseScript',
-        data: script,
+        data,
       }).then(() => resolve(true));
     });
   });

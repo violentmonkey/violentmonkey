@@ -166,9 +166,9 @@ export default {
       sendMessage({
         cmd: 'ParseScript',
         data: {
+          code: this.code,
           url: this.query.u,
           from: this.query.f,
-          code: this.code,
           require: this.require,
           resources: this.resources,
         },

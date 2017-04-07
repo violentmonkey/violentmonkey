@@ -456,6 +456,15 @@ export function getScriptsByIndex(index, value, cTx) {
   });
 }
 
+function updateProps(target, source) {
+  if (source) {
+    Object.keys(source).forEach(key => {
+      if (key in target) target[key] = source[key];
+    });
+  }
+  return target;
+}
+
 export function parseScript(data) {
   const meta = parseMeta(data.code);
   if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
@@ -507,11 +516,8 @@ export function parseScript(data) {
       res.cmd = 'AddScript';
       res.data.message = i18n('msgInstalled');
     }
-    if (data.more) {
-      Object.keys(data.more).forEach(key => {
-        if (key in script) script[key] = data.more[key];
-      });
-    }
+    updateProps(script, data.more);
+    updateProps(script.custom, data.custom);
     script.meta = meta;
     script.code = data.code;
     script.uri = getNameURI(script);
