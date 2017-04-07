@@ -291,7 +291,8 @@ export const BaseService = serviceFactory({
     ]))
     .then(([remoteMeta, remoteData, localData]) => {
       const remoteMetaInfo = remoteMeta.info || {};
-      let remoteChanged = !remoteMeta.timestamp || Object.keys(remoteMetaInfo).length !== remoteData.length;
+      let remoteChanged = !remoteMeta.timestamp
+        || Object.keys(remoteMetaInfo).length !== remoteData.length;
       const now = Date.now();
       const remoteItemMap = {};
       remoteMeta.info = remoteData.reduce((info, item) => {

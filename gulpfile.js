@@ -2,8 +2,6 @@ const del = require('del');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const concat = require('gulp-concat');
-const merge2 = require('merge2');
-const postcss = require('gulp-postcss');
 const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const svgSprite = require('gulp-svg-sprite');
@@ -72,21 +70,12 @@ gulp.task('manifest', () => (
 
 gulp.task('copy-files', () => {
   const jsFilter = gulpFilter(['**/*.js'], {restore: true});
-  const cssFilter = gulpFilter(['**/*.css'], {restore: true});
   let stream = gulp.src(paths.copy, {base: 'src'});
   if (isProd) stream = stream
   .pipe(jsFilter)
   .pipe(uglify())
   .pipe(jsFilter.restore);
   stream = stream
-  .pipe(cssFilter)
-  .pipe(postcss([
-    require('precss')(),
-    isProd && require('cssnano')({
-      // zindex: false,
-    }),
-  ].filter(Boolean)))
-  .pipe(cssFilter.restore)
   .pipe(gulp.dest('dist/'));
 });
 
