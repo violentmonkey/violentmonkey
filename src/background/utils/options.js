@@ -1,4 +1,5 @@
 import { initHooks, debounce, normalizeKeys, object } from 'src/common';
+import storage from 'localStorage';
 
 const defaults = {
   isApplied: true,
@@ -33,7 +34,7 @@ function callHooks() {
 export function getOption(key, def) {
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
-  const value = localStorage.getItem(mainKey);
+  const value = storage.getItem(mainKey);
   let obj;
   if (value) {
     try {
@@ -56,7 +57,7 @@ export function setOption(key, value) {
     if (keys.length > 1) {
       optionValue = object.set(getOption(mainKey), keys.slice(1), value);
     }
-    localStorage.setItem(mainKey, JSON.stringify(optionValue));
+    storage.setItem(mainKey, JSON.stringify(optionValue));
     fireChange(optionKey, value);
   }
 }
