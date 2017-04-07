@@ -1,65 +1,9 @@
-const path = require('path');
 const webpack = require('webpack');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const utils = require('./utils');
-const vueLoaderConfig = require('./vue-loader.conf');
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+const base = require('./webpack.base.conf');
 const IS_DEV = process.env.NODE_ENV === 'development';
-const DIST = 'dist';
-const definePlugin = new webpack.DefinePlugin({
-  'process.env': {
-    NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-    DEBUG: IS_DEV ? 'true' : 'false', // whether to log message errors
-  },
-});
-
-function resolve(dir) {
-  return path.join(__dirname, '..', dir);
-}
-
-const base = {
-  output: {
-    path: resolve(DIST),
-    publicPath: '/',
-    filename: '[name].js',
-  },
-  resolve: {
-    extensions: ['.js', '.vue'],
-    alias: {
-      src: resolve('src'),
-    }
-  },
-  module: {
-    rules: [
-      // {
-      //   test: /\.(js|vue)$/,
-      //   loader: 'eslint-loader',
-      //   enforce: 'pre',
-      //   include: [resolve('src'), resolve('test')],
-      //   options: {
-      //     formatter: require('eslint-friendly-formatter')
-      //   }
-      // },
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: vueLoaderConfig
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
-      },
-    ].concat(utils.styleLoaders({
-      sourceMap: false,
-      extract: !IS_DEV,
-    })),
-  },
-  // cheap-module-eval-source-map is faster for development
-  devtool: IS_DEV ? '#inline-source-map' : false,
-};
 
 const targets = module.exports = [];
 
@@ -70,7 +14,7 @@ targets.push(Object.assign({}, base, {
     'popup/app': 'src/popup/app.js',
   },
   plugins: [
-    definePlugin,
+    ... base.plugins,
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
@@ -109,6 +53,9 @@ targets.push(Object.assign({}, base, {
       }),
     ],
   ],
+  externals: {
+    localStorage: 'localStorage',
+  },
 }));
 
 targets.push(Object.assign({}, base, {
@@ -117,7 +64,7 @@ targets.push(Object.assign({}, base, {
     browser: 'src/browser.js',
   },
   plugins: [
-    definePlugin,
+    ... base.plugins,
     ... IS_DEV ? [] : [
       new webpack.optimize.UglifyJsPlugin({
         compress: {

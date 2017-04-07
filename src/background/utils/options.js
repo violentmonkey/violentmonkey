@@ -1,5 +1,5 @@
 import { initHooks, debounce, normalizeKeys, object } from 'src/common';
-import storage from 'localStorage';
+import storage from 'localStorage';   // eslint-disable-line import/no-extraneous-dependencies
 
 const defaults = {
   isApplied: true,
