@@ -75,7 +75,7 @@
         if (req) req.callback(req, res);
       },
       UpdateValues(data) {
-        const { values } = comm.values;
+        const { values } = comm;
         if (values && values[data.uri]) values[data.uri] = data.values;
       },
       NotificationClicked(id) {
