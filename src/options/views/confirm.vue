@@ -32,8 +32,11 @@
 <script>
 import { sendMessage, zfill, request } from 'src/common';
 import options from 'src/common/options';
+import initCache from 'src/common/cache';
 import VmCode from './code';
 import { store } from '../utils';
+
+const cache = initCache({});
 
 const settings = {
   closeAfterInstall: options.get('closeAfterInstall'),
@@ -57,8 +60,6 @@ export default {
       dependencyOK: false,
       message: '',
       code: '',
-      require: {},
-      resources: {},
       commands: {
         cancel: this.close,
       },
@@ -102,13 +103,17 @@ export default {
           this.message = this.i18n('msgLoadingDependency', [finished, length]);
         };
         updateStatus();
-        let promises = script.require.map(url => this.getFile(url).then((res) => {
-          this.require[url] = res;
-        }))
-        .concat(urls.map(url => this.getFile(url, true).then((res) => {
+        this.require = {};
+        this.resources = {};
+        const promises = script.require.map(url => (
+          this.getFile(url, { useCache: true }).then(res => {
+            this.require[url] = res;
+          })
+        ))
+        .concat(urls.map(url => this.getFile(url, { isBlob: true, useCache: true }).then((res) => {
           this.resources[url] = res;
-        })));
-        promises = promises.map(promise => promise.then(() => {
+        })))
+        .map(promise => promise.then(() => {
           finished += 1;
           updateStatus();
         }, url => {
@@ -130,7 +135,11 @@ export default {
     close() {
       window.close();
     },
-    getFile(url, isBlob) {
+    getFile(url, { isBlob, useCache }) {
+      const cacheKey = isBlob ? `blob+${url}` : `text+${url}`;
+      if (useCache && cache.has(cacheKey)) {
+        return Promise.resolve(cache.get(cacheKey));
+      }
       return request(url, {
         responseType: isBlob ? 'blob' : null,
       })
@@ -143,6 +152,10 @@ export default {
           };
           reader.readAsBinaryString(data);
         });
+      })
+      .then(data => {
+        if (useCache) cache.put(cacheKey, data);
+        return data;
       });
     },
     getScript(url) {
