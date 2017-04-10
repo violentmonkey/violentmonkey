@@ -344,36 +344,27 @@
       GM_info: {
         get() {
           const matches = script.code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
-          const data = {
-            description: script.meta.description || '',
-            excludes: script.meta.exclude.concat(),
-            includes: script.meta.include.concat(),
-            matches: script.meta.match.concat(),
-            name: script.meta.name || '',
-            namespace: script.meta.namespace || '',
-            resources: {},
-            'run-at': script.meta['run-at'] || '',
-            unwrap: false,
-            version: script.meta.version || '',
+          const obj = {
+            scriptMetaStr: matches ? matches[1] : '',
+            scriptWillUpdate: !!script.update,
+            scriptHandler: 'Violentmonkey',
+            version: comm.version,
+            script: {
+              description: script.meta.description || '',
+              excludes: script.meta.exclude.concat(),
+              includes: script.meta.include.concat(),
+              matches: script.meta.match.concat(),
+              name: script.meta.name || '',
+              namespace: script.meta.namespace || '',
+              resources: Object.keys(resources).map(name => ({
+                name,
+                url: resources[name],
+              })),
+              'run-at': script.meta['run-at'] || '',
+              unwrap: false,  // deprecated, always `false`
+              version: script.meta.version || '',
+            },
           };
-          const obj = {};
-          addProperty('scriptMetaStr', { value: matches ? matches[1] : '' }, obj);
-
-          // whether update is allowed
-          addProperty('scriptWillUpdate', { value: !!script.update }, obj);
-
-          // Violentmonkey specific data
-          addProperty('version', { value: comm.version }, obj);
-          addProperty('scriptHandler', { value: 'Violentmonkey' }, obj);
-
-          // script object
-          addProperty('script', { value: {} }, obj);
-          comm.forEach(Object.keys(resources), name => {
-            addProperty(name, { value: resources[name] }, data.resources);
-          });
-          comm.forEach(Object.keys(data), name => {
-            addProperty(name, { value: data[name] }, obj.script);
-          });
           return obj;
         },
       },
