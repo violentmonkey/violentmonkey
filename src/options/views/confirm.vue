@@ -135,7 +135,7 @@ export default {
     close() {
       window.close();
     },
-    getFile(url, { isBlob, useCache }) {
+    getFile(url, { isBlob, useCache } = {}) {
       const cacheKey = isBlob ? `blob+${url}` : `text+${url}`;
       if (useCache && cache.has(cacheKey)) {
         return Promise.resolve(cache.get(cacheKey));

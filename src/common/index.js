@@ -128,28 +128,37 @@ export function request(url, options = {}) {
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, headers[key]);
     });
-    xhr.onloadend = () => {
-      let data;
-      if (responseType === 'blob') {
-        data = xhr.response;
-      } else {
-        data = xhr.responseText;
-      }
-      if (responseType === 'json') {
-        try {
-          data = JSON.parse(data);
-        } catch (e) {
-          // Ignore invalid JSON
-        }
-      }
-      // xhr.status may be 0 or -1 if connection failed
-      (xhr.status >= 200 && xhr.status < 300 ? resolve : reject)({
-        url,
-        data,
-        status: xhr.status,
-        // xhr,
-      });
+    xhr.onload = () => {
+      const res = getResponse(xhr);
+      // status for `file:` protocol will always be `0`
+      res.status = xhr.status || 200;
+      resolve(res);
     };
+    xhr.onerror = () => {
+      const res = getResponse(xhr);
+      reject(res);
+    };
+    xhr.ontimeout = xhr.onerror;
     xhr.send(body);
   });
+  function getResponse(xhr) {
+    const { responseType } = options;
+    let data;
+    if (responseType === 'blob') {
+      data = xhr.response;
+    } else {
+      data = xhr.responseText;
+    }
+    if (responseType === 'json') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        // Ignore invalid JSON
+      }
+    }
+    return {
+      url,
+      data,
+    };
+  }
 }
