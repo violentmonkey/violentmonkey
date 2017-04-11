@@ -31,7 +31,7 @@ function xhrCallbackWrapper(req) {
       resType: xhr.responseType,
     };
     const data = {
-      finalUrl: req.finalUrl,
+      finalUrl: xhr.responseURL,
       readyState: xhr.readyState,
       responseHeaders: xhr.getAllResponseHeaders(),
       status: xhr.status,
@@ -96,7 +96,7 @@ export function httpRequest(details, cb) {
       'timeout',
     ]
     .forEach(evt => { xhr[`on${evt}`] = callback; });
-    req.finalUrl = details.url;
+    // req.finalUrl = details.url;
     xhr.send(details.data);
   } catch (e) {
     console.warn(e);
@@ -117,16 +117,16 @@ export function abortRequest(id) {
 }
 
 // Watch URL redirects
-browser.webRequest.onBeforeRedirect.addListener(details => {
-  const reqId = verify[details.requestId];
-  if (reqId) {
-    const req = requests[reqId];
-    if (req) req.finalUrl = details.redirectUrl;
-  }
-}, {
-  urls: ['<all_urls>'],
-  types: ['xmlhttprequest'],
-});
+// browser.webRequest.onBeforeRedirect.addListener(details => {
+//   const reqId = verify[details.requestId];
+//   if (reqId) {
+//     const req = requests[reqId];
+//     if (req) req.finalUrl = details.redirectUrl;
+//   }
+// }, {
+//   urls: ['<all_urls>'],
+//   types: ['xmlhttprequest'],
+// });
 
 // Modifications on headers
 browser.webRequest.onBeforeSendHeaders.addListener(details => {
