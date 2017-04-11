@@ -187,7 +187,7 @@ labelInclude:
   message: '@include:'
 labelKeepInclude:
   description: Option to keep the original @include rules.
-  message: Mantener reglas de @include predeterminadas
+  message: Mantener reglas @include predeterminadas
 labelCustomInclude:
   description: Label of custom @include rules.
   message: 'Reglas @include personalizadas: <em>(Uno por linea)</em>'
@@ -372,7 +372,7 @@ labelCustomCSS:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS personalizado para las paginas de opciones y instalación de scripts. Si no sabes para que es esto, porfavor no lo edites.
+    CSS personalizado para las paginas de opciones e instalación de scripts. Si no sabes para que es esto, porfavor no lo edites.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Guardar
