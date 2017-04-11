@@ -94,7 +94,7 @@ buttonNew:
   message: Nuevo script
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Comprobar si hay actualizaciones de todos los scripts
+  message: Comprobar si hay actualizaciones
 anchorGetMoreScripts:
   description: Link to get more scripts.
   message: Consigue mas scripts
