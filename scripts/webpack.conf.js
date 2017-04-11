@@ -60,7 +60,7 @@ targets.push(Object.assign({}, base, {
 
 targets.push(Object.assign({}, base, {
   entry: {
-    injected: 'src/injected.js',
+    injected: 'src/injected/index.js',
     browser: 'src/browser.js',
   },
   plugins: [
