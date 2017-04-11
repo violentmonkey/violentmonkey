@@ -1,6 +1,7 @@
-import { httpRequested } from './requests';
 import { inject, objEncode, getUniqId, sendMessage } from './utils';
 import { onNotificationClick, onNotificationClose } from './notification';
+import { httpRequested } from './requests';
+import { tabClosed } from './tabs';
 import bridge from './content';
 import webBridgeObj from './web';
 
@@ -34,6 +35,7 @@ import webBridgeObj from './web';
       GetPopup: bridge.getPopup,
       GetBadge: getBadge,
       HttpRequested: httpRequested,
+      TabClosed: tabClosed,
       UpdateValues(data) {
         bridge.post({ cmd: 'UpdateValues', data });
       },

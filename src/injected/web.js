@@ -4,6 +4,19 @@
  */
 import base from './bridge';
 
+export default Object.assign({
+  utf8decode,
+  getRequest,
+  getTab,
+  wrapGM,
+  getWrapper,
+  onLoadScripts,
+  runCode,
+  initialize,
+  state: 0,
+  handle: handleWeb,
+}, base);
+
 /**
  * http://www.webtoolkit.info/javascript-utf8.html
  */
@@ -109,12 +122,21 @@ function handleWeb(obj) {
       if (func) func();
     },
     GotRequestId(id) {
-      const req = bridge.qrequests.shift();
+      const req = bridge.requests.queue.shift();
       req.start(req, id);
     },
     HttpRequested(res) {
-      const req = bridge.requests[res.id];
+      const req = bridge.requests.map[res.id];
       if (req) req.callback(req, res);
+    },
+    TabClosed(key) {
+      const item = bridge.tabs[key];
+      if (item) {
+        item.closed = true;
+        const { onclose } = item;
+        if (onclose) onclose();
+        delete bridge.tabs[key];
+      }
     },
     UpdateValues(data) {
       const { values } = bridge;
@@ -166,8 +188,10 @@ function getRequest(arg) {
   init();
   return bridge.getRequest(arg);
   function init() {
-    bridge.requests = {};
-    bridge.qrequests = [];
+    bridge.requests = {
+      map: {},
+      queue: [],
+    };
     bridge.getRequest = details => {
       const req = {
         details,
@@ -178,7 +202,7 @@ function getRequest(arg) {
         },
       };
       details.url = getFullUrl(details.url);
-      bridge.qrequests.push(req);
+      bridge.requests.queue.push(req);
       bridge.post({ cmd: 'GetRequestId' });
       return req.req;
     };
@@ -224,7 +248,7 @@ function getRequest(arg) {
       res.data.context = req.details.context;
       cb(res.data);
     }
-    if (res.type === 'loadend') delete bridge.requests[req.id];
+    if (res.type === 'loadend') delete bridge.requests.map[req.id];
   }
   function start(req, id) {
     const { details } = req;
@@ -240,7 +264,7 @@ function getRequest(arg) {
       overrideMimeType: details.overrideMimeType,
     };
     req.id = id;
-    bridge.requests[id] = req;
+    bridge.requests.map[id] = req;
     if (bridge.includes(['arraybuffer', 'blob'], details.responseType)) {
       data.responseType = 'blob';
     }
@@ -250,6 +274,28 @@ function getRequest(arg) {
     const a = document.createElement('a');
     a.setAttribute('href', url);
     return a.href;
+  }
+}
+
+function getTab(detail) {
+  const bridge = this;
+  init();
+  return bridge.getTab(detail);
+  function init() {
+    bridge.tabs = {};
+    bridge.getTab = data => {
+      const key = bridge.getUniqId();
+      const item = {
+        close() {
+          bridge.post({ cmd: 'TabClose', data: key });
+        },
+        onclose: null,
+        closed: false,
+      };
+      bridge.tabs[key] = item;
+      bridge.post({ cmd: 'TabOpen', data: { key, data } });
+      return item;
+    };
   }
 }
 
@@ -394,8 +440,12 @@ function wrapGM(script, cache) {
       },
     },
     GM_openInTab: {
-      value(url, background) {
-        bridge.post({ cmd: 'OpenTab', data: { url, active: !background } });
+      value(url, options = { active: false }) {
+        const data = options && typeof options === 'object' ? options : {
+          active: !options,
+        };
+        data.url = url;
+        return bridge.getTab(data);
       },
     },
     GM_registerMenuCommand: {
@@ -578,15 +628,3 @@ function initialize(src, dest, props) {
   bridge.checkLoad = bridge.noop;
   bridge.bindEvents(src, dest);
 }
-
-export default Object.assign({
-  utf8decode,
-  getRequest,
-  wrapGM,
-  getWrapper,
-  onLoadScripts,
-  runCode,
-  initialize,
-  state: 0,
-  handle: handleWeb,
-}, base);

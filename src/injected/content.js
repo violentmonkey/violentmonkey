@@ -2,6 +2,7 @@ import base from './bridge';
 import { getRequestId, httpRequest, abortRequest } from './requests';
 import { inject, postData, sendMessage, noop } from './utils';
 import { onNotificationCreate } from './notification';
+import { tabOpen, tabClose } from './tabs';
 
 const ids = [];
 const menus = [];
@@ -55,9 +56,8 @@ function handleContent(req) {
     HttpRequest: httpRequest,
     AbortRequest: abortRequest,
     Inject: injectScript,
-    OpenTab(data) {
-      sendMessage({ cmd: 'OpenTab', data });
-    },
+    TabOpen: tabOpen,
+    TabClose: tabClose,
     SetValue(data) {
       sendMessage({ cmd: 'SetValue', data });
     },

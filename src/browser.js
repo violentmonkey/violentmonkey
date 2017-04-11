@@ -91,6 +91,7 @@ const meta = {
   },
   tabs: {
     onUpdated: true,
+    onRemoved: true,
     create: wrapAsync,
     get: wrapAsync,
     query: wrapAsync,

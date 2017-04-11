@@ -167,11 +167,17 @@ const commands = {
     });
   },
   SetClipboard: setClipboard,
-  OpenTab(data) {
-    browser.tabs.create({
+  TabOpen(data) {
+    return browser.tabs.create({
       url: data.url,
       active: data.active,
-    });
+    })
+    .then(tab => ({
+      id: tab.id,
+    }));
+  },
+  TabClose(id) {
+    browser.tabs.remove(id);
   },
   GetAllOptions: getAllOptions,
   GetOptions(data) {
@@ -262,6 +268,13 @@ browser.notifications.onClicked.addListener(id => {
 browser.notifications.onClosed.addListener(id => {
   broadcast({
     cmd: 'NotificationClose',
+    data: id,
+  });
+});
+
+browser.tabs.onRemoved.addListener(id => {
+  broadcast({
+    cmd: 'TabClosed',
     data: id,
   });
 });
