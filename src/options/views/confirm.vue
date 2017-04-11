@@ -20,7 +20,7 @@
         <button v-text="i18n('buttonClose')" @click="close"></button>
       </div>
       <h1><span v-text="i18n('labelInstall')"></span> - <span v-text="i18n('extName')"></span></h1>
-      <div class="ellipsis confirm-url" :title="query.u" v-text="query.u"></div>
+      <div class="ellipsis confirm-url" :title="info.url" v-text="info.url"></div>
       <div class="ellipsis confirm-msg" v-text="message"></div>
     </div>
     <div class="frame-block flex-auto p-rel">
@@ -63,6 +63,7 @@ export default {
       commands: {
         cancel: this.close,
       },
+      info: {},
     };
   },
   computed: {
@@ -70,18 +71,51 @@ export default {
       return this.store.route.query;
     },
     isLocal() {
-      return /^file:\/\/\//.test(this.query.u);
+      return /^file:\/\/\//.test(this.info.url);
     },
   },
   mounted() {
     this.message = this.i18n('msgLoadingData');
-    this.loadData().then(this.parseMeta);
+    this.loadInfo()
+    .then(() => {
+      const id = this.store.route.query.id;
+      this.guard = setInterval(() => {
+        sendMessage({
+          cmd: 'CacheHit',
+          data: {
+            key: `confirm-${id}`,
+          },
+        });
+      }, 5000);
+    }, () => {
+      this.close();
+      return Promise.reject();
+    })
+    .then(this.loadData)
+    .then(this.parseMeta);
+  },
+  beforeDestroy() {
+    if (this.guard) {
+      clearInterval(this.guard);
+      this.guard = null;
+    }
   },
   methods: {
+    loadInfo() {
+      const id = this.store.route.query.id;
+      return sendMessage({
+        cmd: 'CacheLoad',
+        data: `confirm-${id}`,
+      })
+      .then(info => {
+        if (!info) return Promise.reject();
+        this.info = info;
+      });
+    },
     loadData(changedOnly) {
       this.installable = false;
       const { code: oldCode } = this;
-      return this.getScript(this.query.u)
+      return this.getScript(this.info.url)
       .then(code => {
         if (changedOnly && oldCode === code) return Promise.reject();
         this.code = code;
@@ -160,7 +194,7 @@ export default {
     },
     getScript(url) {
       return sendMessage({
-        cmd: 'GetFromCache',
+        cmd: 'CacheLoad',
         data: url,
       })
       .then(text => text || Promise.reject())
@@ -180,8 +214,8 @@ export default {
         cmd: 'ParseScript',
         data: {
           code: this.code,
-          url: this.query.u,
-          from: this.query.f,
+          url: this.info.url,
+          from: this.info.from,
           require: this.require,
           resources: this.resources,
         },

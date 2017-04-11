@@ -1,5 +1,5 @@
 import { getUniqId } from 'src/common';
-import { setCache } from './cache';
+import cache from './cache';
 
 const requests = {};
 const verify = {};
@@ -209,17 +209,21 @@ browser.webRequest.onBeforeRequest.addListener(req => {
       return;
     }
     if ((!x.status || x.status === 200) && !/^\s*</.test(x.responseText)) {
-      setCache(req.url, x.responseText);
+      cache.put(req.url, x.responseText, 3000);
+      const confirmInfo = {
+        url: req.url,
+      };
+      const confirmKey = getUniqId();
       // Firefox: slashes are decoded automatically by Firefox, thus cannot be
       // used as separators
       const optionsURL = browser.runtime.getURL(browser.runtime.getManifest().options_page);
-      const url = `${optionsURL}#confirm?u=${encodeURIComponent(req.url)}`;
-      if (req.tabId < 0) browser.tabs.create({ url });
-      else {
-        browser.tabs.get(req.tabId).then(tab => {
-          browser.tabs.create({ url: `${url}&f=${encodeURIComponent(tab.url)}` });
-        });
-      }
+      const url = `${optionsURL}#confirm?id=${confirmKey}`;
+      (req.tabId < 0 ? Promise.resolve() : browser.tabs.get(req.tabId))
+      .then(tab => {
+        confirmInfo.from = tab && tab.url;
+        cache.put(`confirm-${confirmKey}`, confirmInfo);
+        browser.tabs.create({ url });
+      });
       return noredirect;
     }
   }

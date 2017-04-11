@@ -1,7 +1,7 @@
 import { i18n, defaultImage } from 'src/common';
 import * as sync from './sync';
 import { getRequestId, httpRequest, abortRequest } from './utils/requests';
-import { getCache } from './utils/cache';
+import cache from './utils/cache';
 import { newScript, parseMeta } from './utils/script';
 import { setClipboard } from './utils/clipboard';
 import { getOption, setOption, hookOptions, getAllOptions } from './utils/options';
@@ -152,8 +152,11 @@ const commands = {
   SyncAuthorize: sync.authorize,
   SyncRevoke: sync.revoke,
   SyncStart: sync.sync,
-  GetFromCache(data) {
-    return getCache(data) || null;
+  CacheLoad(data) {
+    return cache.get(data) || null;
+  },
+  CacheHit(data) {
+    cache.hit(data.key, data.lifetime);
   },
   Notification(data) {
     return browser.notifications.create({

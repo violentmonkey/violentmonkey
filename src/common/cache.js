@@ -1,19 +1,21 @@
+const defaults = {
+  lifetime: 3000,
+};
+
 export default function initCache(options) {
   const cache = {};
-  const { lifetime: defaultLifetime } = options || {
-    lifetime: 3000,
-  };
-  return { get, put, del, has };
+  const { lifetime: defaultLifetime } = options || defaults;
+  return { get, put, del, has, hit };
   function get(key, def) {
     const item = cache[key];
     return item ? item.value : def;
   }
-  function put(key, value, lifetime = defaultLifetime) {
+  function put(key, value, lifetime) {
     del(key);
     if (value) {
       cache[key] = {
         value,
-        timer: lifetime > 0 && setTimeout(del, lifetime, key),
+        timer: setTimeout(del, lifetime || defaultLifetime, key),
       };
     }
   }
@@ -26,5 +28,8 @@ export default function initCache(options) {
   }
   function has(key) {
     return !!cache[key];
+  }
+  function hit(key, lifetime) {
+    put(key, get(key), lifetime);
   }
 }
