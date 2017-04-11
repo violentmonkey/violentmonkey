@@ -332,7 +332,7 @@ labelBlacklist:
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: >-
-    URLs en esta lista no seran injectados en esta por los scripts. Cada linea es una regla <code>@exclude</code> pero aplicado globalmente.
+    URLs en esta lista no seran injectados por los scripts. Cada linea es una regla <code>@exclude</code> pero aplicado globalmente.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: Guardar
