@@ -3,6 +3,12 @@
     <h3 v-text="i18n('labelDataImport')"></h3>
     <button v-text="i18n('buttonImportData')" @click="importFile"></button>
     <button :title="i18n('hintVacuum')" @click="vacuum" :disabled="vacuuming" v-text="labelVacuum"></button>
+    <div class="mt-1">
+      <label>
+        <input type="checkbox" v-setting="'importSettings'">
+        <span v-text="i18n('labelImportSettings')"></span>
+      </label>
+    </div>
   </section>
 </template>
 
@@ -67,9 +73,11 @@ function getVMConfig(text) {
       });
     }
   });
-  forEachItem(vm.settings, (value, key) => {
-    options.set(key, value);
-  });
+  if (options.get('importSettings')) {
+    forEachItem(vm.settings, (value, key) => {
+      options.set(key, value);
+    });
+  }
   return vm;
 }
 

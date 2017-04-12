@@ -15,7 +15,6 @@
       </button>
     </div>
     <p class="mt-1" v-text="message"></p>
-    <h4 v-text="i18n('labelSyncSettings')"></h4>
     <div class="mt-1">
       <label>
         <input type="checkbox" v-setting="'syncScriptStatus'">

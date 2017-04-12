@@ -346,6 +346,7 @@ labelGeneral:
 labelSyncSettings:
   description: Label for sync settings.
   message: Settings
+  touched: false
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Sync script status
@@ -390,3 +391,6 @@ buttonOK:
 buttonCancel:
   description: Cancel button on dialog.
   message: Cancel
+labelImportSettings:
+  description: Label for option to import settings from zip file.
+  message: Import settings

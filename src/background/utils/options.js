@@ -16,6 +16,7 @@ const defaults = {
   syncScriptStatus: true,
   sync: null,
   customCSS: null,
+  importSettings: true,
 };
 let changes = {};
 const hooks = initHooks();

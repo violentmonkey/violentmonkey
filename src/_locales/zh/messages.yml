@@ -344,6 +344,7 @@ labelGeneral:
 labelSyncSettings:
   description: Label for sync settings.
   message: 设置
+  touched: false
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: 同步脚本状态
@@ -386,3 +387,6 @@ buttonOK:
 buttonCancel:
   description: Cancel button on dialog.
   message: 取消
+labelImportSettings:
+  description: Label for option to import settings from zip file.
+  message: 导入设置
