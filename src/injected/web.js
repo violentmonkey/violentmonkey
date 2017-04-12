@@ -314,6 +314,7 @@ function wrapGM(script, cache) {
   }
   if (!bridge.includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
   if (!bridge.includes(grant, 'GM_info')) grant.push('GM_info');
+  if (bridge.includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
   const resources = script.meta.resources || {};
   const dataEncoders = {
     o: val => JSON.stringify(val),

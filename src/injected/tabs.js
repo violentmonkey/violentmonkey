@@ -12,10 +12,14 @@ export function tabOpen({ data, key }) {
   });
 }
 export function tabClose(key) {
-  const item = tabs[key];
-  if (item) {
-    sendMessage({ cmd: 'TabClose', data: item.id });
+  let data;
+  if (key) {
+    const item = tabs[key];
+    data = item && { id: item.id };
+  } else {
+    data = {};
   }
+  if (data) sendMessage({ cmd: 'TabClose', data });
 }
 export function tabClosed(id) {
   const key = tabIdMap[id];
