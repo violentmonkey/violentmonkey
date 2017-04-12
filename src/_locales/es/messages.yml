@@ -6,7 +6,7 @@ extDescription:
   message: Proporciona soporte de scripts para navegadores
 extTranslator:
   description: Information of the translator.
-  message: 'Greydus'
+  message: Greydus
   touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
@@ -154,7 +154,7 @@ labelTranslator:
   message: 'Traductor: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: 'Greydus'
+  message: Greydus
 labelCurrentLang:
   description: Label of current language.
   message: 'Idioma actual: '
@@ -257,7 +257,9 @@ buttonVacuumed:
   message: Datos vaciados.
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Descarta la redundancia e intenta volver a cargar los recursos que faltan en caché
+  message: >-
+    Descarta la redundancia e intenta volver a cargar los recursos que faltan en
+    caché
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Buscar scripts para este sitio
@@ -284,7 +286,9 @@ buttonReplaceAll:
   message: Todos
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Actualizar la pestaña actual después de activar/desactivar un script del menu
+  message: >-
+    Actualizar la pestaña actual después de activar/desactivar un script del
+    menu
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Escribe URL:'
@@ -332,7 +336,8 @@ labelBlacklist:
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: >-
-    URLs en esta lista no seran injectados por los scripts. Cada linea es una regla <code>@exclude</code> pero aplicado globalmente.
+    URLs en esta lista no seran injectados por los scripts. Cada linea es una
+    regla <code>@exclude</code> pero aplicado globalmente.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: Guardar
@@ -372,7 +377,8 @@ labelCustomCSS:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS personalizado para las paginas de opciones e instalación de scripts. Si no sabes para que es esto, porfavor no lo edites.
+    CSS personalizado para las paginas de opciones e instalación de scripts. Si
+    no sabes para que es esto, porfavor no lo edites.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Guardar
