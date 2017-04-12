@@ -11,7 +11,8 @@
     "lint": "eslint --ext .js,.vue .",
     "svgo": "svgo icons",
     "pretest": "webpack --config scripts/webpack.test.conf.js",
-    "test": "node dist/test"
+    "test": "node dist/test",
+    "prepush": "npm run lint"
   },
   "description": "Violentmonkey",
   "devDependencies": {
@@ -39,6 +40,7 @@
     "gulp-util": "^3.0.7",
     "html-minifier": "^3.2.3",
     "html-webpack-plugin": "^2.28.0",
+    "husky": "^0.13.3",
     "js-yaml": "^3.5.5",
     "localStorage": "^1.0.3",
     "precss": "^1.4.0",
