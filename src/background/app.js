@@ -111,7 +111,8 @@ const commands = {
     return vmdb.getScriptInfos(ids);
   },
   Move(data) {
-    return vmdb.moveScript(data.id, data.offset);
+    return vmdb.moveScript(data.id, data.offset)
+    .then(() => { sync.sync(); });
   },
   Vacuum: vmdb.vacuum,
   ParseScript(data) {
@@ -191,6 +192,7 @@ const commands = {
     const items = Array.isArray(data) ? data : [data];
     items.forEach(item => { setOption(item.key, item.value); });
   },
+  CheckPosition: vmdb.checkPosition,
 };
 
 vmdb.initialized.then(() => {

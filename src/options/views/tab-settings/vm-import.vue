@@ -140,6 +140,9 @@ function importData(file) {
     return Promise.all(entries.map(entry => getVMFile(entry, vm)));
   })
   .then(res => res.filter(Boolean).length)
-  .then(count => { showMessage({ text: i18n('msgImported', [count]) }); });
+  .then(count => {
+    showMessage({ text: i18n('msgImported', [count]) });
+    sendMessage({ cmd: 'CheckPosition' });
+  });
 }
 </script>

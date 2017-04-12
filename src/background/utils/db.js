@@ -2,16 +2,23 @@ import Promise from 'sync-promise-lite';
 import { i18n, request } from 'src/common';
 import { getNameURI, getScriptInfo, isRemote, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
-import {
-  initialize as initPosition,
-  check as checkPosition,
-  get as getPosition,
-  update as updatePosition,
-} from './position';
 
 let db;
 
-export const initialized = openDatabase().then(() => initPosition(db));
+const position = {
+  value: 0,
+  set(number) {
+    position.value = number;
+  },
+  get() {
+    return position + 1;
+  },
+  update(value) {
+    if (position.value < value) position.value = value;
+  },
+};
+
+export const initialized = openDatabase().then(initPosition);
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -265,8 +272,8 @@ function saveRequire(uri, code, cTx) {
 export function saveScript(script, cTx) {
   script.enabled = script.enabled ? 1 : 0;
   script.update = script.update ? 1 : 0;
-  if (!script.position) script.position = getPosition();
-  updatePosition(script.position);
+  if (!script.position) script.position = position.get();
+  position.update(script.position);
   const tx = cTx || db.transaction('scripts', 'readwrite');
   const os = tx.objectStore('scripts');
   return new Promise((resolve, reject) => {
@@ -486,7 +493,6 @@ export function parseScript(data) {
       image.src = url;
     }));
   }
-  let needCheckPosition;
   return queryScript(data.id, meta, tx)
   .then(result => {
     let script;
@@ -495,11 +501,10 @@ export function parseScript(data) {
       script = result;
     } else {
       script = newScript();
-      script.position = getPosition();
+      script.position = position.get();
       res.cmd = 'AddScript';
       res.data.message = i18n('msgInstalled');
     }
-    needCheckPosition = data.more && data.more.position !== script.position;
     updateProps(script, data.more);
     updateProps(script.custom, data.custom);
     script.meta = meta;
@@ -514,8 +519,67 @@ export function parseScript(data) {
     return saveScript(script, tx);
   })
   .then(script => {
-    if (needCheckPosition) checkPosition(script.position);
     Object.assign(res.data, getScriptInfo(script));
     return res;
   });
+}
+
+function initPosition() {
+  const os = db.transaction('scripts', 'readwrite').objectStore('scripts');
+  return new Promise(resolve => {
+    os.index('position').openCursor(null, 'prev').onsuccess = e => {
+      const { result } = e.target;
+      if (result) position.set(result.key);
+      resolve();
+    };
+  });
+}
+
+export function checkPosition(start) {
+  const tx = db.transaction('scripts', 'readwrite');
+  const os = tx.objectStore('scripts');
+  let offset = Math.max(1, start || 0);
+  const updates = [];
+  let changed;
+  if (!position.checking) {
+    position.checking = new Promise(resolve => {
+      os.index('position').openCursor(start).onsuccess = e => {
+        const cursor = e.target.result;
+        if (cursor) {
+          const { value } = cursor;
+          if (value.position !== offset) updates.push({ id: value.id, position: offset });
+          position.update(offset);
+          offset += 1;
+          cursor.continue();
+        } else {
+          resolve();
+        }
+      };
+    })
+    .then(() => {
+      changed = updates.length;
+      return update();
+    })
+    .then(() => {
+      browser.runtime.sendMessage({
+        cmd: 'ScriptsUpdated',
+      });
+      position.checking = null;
+    })
+    .then(() => changed);
+  }
+  return position.checking;
+  function update() {
+    const item = updates.shift();
+    if (item) {
+      return new Promise(resolve => {
+        os.get(item.id).onsuccess = e => {
+          const { result } = e.target;
+          result.position = item.position;
+          os.put(result).onsuccess = () => { resolve(); };
+        };
+      })
+      .then(update);
+    }
+  }
 }

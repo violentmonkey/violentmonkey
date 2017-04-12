@@ -1,7 +1,7 @@
 import { debounce, normalizeKeys, request, noop } from 'src/common';
 import getEventEmitter from '../utils/events';
 import { getOption, setOption, hookOptions } from '../utils/options';
-import { getScriptsByIndex, parseScript, removeScript } from '../utils/db';
+import { getScriptsByIndex, parseScript, removeScript, checkPosition } from '../utils/db';
 
 const serviceNames = [];
 const services = {};
@@ -295,21 +295,6 @@ export const BaseService = serviceFactory({
         || Object.keys(remoteMetaInfo).length !== remoteData.length;
       const now = Date.now();
       const remoteItemMap = {};
-      remoteMeta.info = remoteData.reduce((info, item) => {
-        remoteItemMap[item.uri] = item;
-        info[item.uri] = remoteMetaInfo[item.uri];
-        let itemInfo = info[item.uri];
-        if (!itemInfo) {
-          itemInfo = {};
-          info[item.uri] = itemInfo;
-          remoteChanged = true;
-        }
-        if (!itemInfo.modified) {
-          itemInfo.modified = now;
-          remoteChanged = true;
-        }
-        return info;
-      }, {});
       const localMeta = this.config.get('meta', {});
       const firstSync = !localMeta.timestamp;
       const outdated = !localMeta.timestamp || remoteMeta.timestamp > localMeta.timestamp;
@@ -319,6 +304,20 @@ export const BaseService = serviceFactory({
       const putRemote = [];
       const delRemote = [];
       const delLocal = [];
+      remoteMeta.info = remoteData.reduce((info, item) => {
+        remoteItemMap[item.uri] = item;
+        let itemInfo = remoteMetaInfo[item.uri];
+        if (!itemInfo) {
+          itemInfo = {};
+          remoteChanged = true;
+        }
+        info[item.uri] = itemInfo;
+        if (!itemInfo.modified) {
+          itemInfo.modified = now;
+          remoteChanged = true;
+        }
+        return info;
+      }, {});
       localData.forEach(item => {
         const remoteInfo = remoteMeta.info[item.uri];
         if (remoteInfo) {
@@ -348,17 +347,20 @@ export const BaseService = serviceFactory({
           this.log('Download script:', item.uri);
           return this.get(getFilename(item.uri))
           .then(raw => {
-            const data = {};
+            const data = { more: {} };
             try {
               const obj = JSON.parse(raw);
               if (obj.version === 1) {
                 data.code = obj.code;
-                data.more = obj.more;
+                if (obj.more) data.more = obj.more;
               }
             } catch (e) {
               data.code = raw;
             }
-            data.modified = remoteMeta.info[item.uri].modified;
+            const remoteInfo = remoteMeta.info[item.uri];
+            const { modified, position } = remoteInfo;
+            data.modified = modified;
+            if (position) data.more.position = position;
             if (!getOption('syncScriptStatus') && data.more) {
               delete data.more.enabled;
             }
@@ -377,7 +379,10 @@ export const BaseService = serviceFactory({
               update: item.update,
             },
           });
-          remoteMeta.info[item.uri] = { modified: item.custom.modified };
+          remoteMeta.info[item.uri] = {
+            modified: item.custom.modified,
+            position: item.position,
+          };
           remoteChanged = true;
           return this.put(getFilename(item.uri), data);
         }),
@@ -392,6 +397,14 @@ export const BaseService = serviceFactory({
           return removeScript(item.id);
         }),
       );
+      promiseQueue.push(Promise.all(promiseQueue).then(() => checkPosition()).then(changed => {
+        if (!changed) return;
+        remoteChanged = true;
+        return getScriptsByIndex('position', null, null, item => {
+          const remoteInfo = remoteMeta.info[item.uri];
+          if (remoteInfo) remoteInfo.position = item.position;
+        });
+      }));
       promiseQueue.push(Promise.all(promiseQueue).then(() => {
         const promises = [];
         if (remoteChanged) {
