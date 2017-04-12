@@ -2,11 +2,16 @@ import Promise from 'sync-promise-lite';
 import { i18n, request } from 'src/common';
 import { getNameURI, getScriptInfo, isRemote, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
+import {
+  initialize as initPosition,
+  check as checkPosition,
+  get as getPosition,
+  update as updatePosition,
+} from './position';
 
 let db;
-let position;
 
-export const initialized = openDatabase().then(initPosition);
+export const initialized = openDatabase().then(() => initPosition(db));
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -37,18 +42,6 @@ function openDatabase() {
       _db.createObjectStore('cache', { keyPath: 'uri' });
       // values: uri values
       _db.createObjectStore('values', { keyPath: 'uri' });
-    };
-  });
-}
-
-function initPosition() {
-  position = 0;
-  const os = db.transaction('scripts', 'readwrite').objectStore('scripts');
-  return new Promise(resolve => {
-    os.index('position').openCursor(null, 'prev').onsuccess = e => {
-      const { result } = e.target;
-      if (result) position = result.key;
-      resolve();
     };
   });
 }
@@ -272,10 +265,8 @@ function saveRequire(uri, code, cTx) {
 export function saveScript(script, cTx) {
   script.enabled = script.enabled ? 1 : 0;
   script.update = script.update ? 1 : 0;
-  if (!script.position) {
-    position += 1;
-    script.position = position;
-  }
+  if (!script.position) script.position = getPosition();
+  updatePosition(script.position);
   const tx = cTx || db.transaction('scripts', 'readwrite');
   const os = tx.objectStore('scripts');
   return new Promise((resolve, reject) => {
@@ -376,9 +367,9 @@ export function getExportData(ids, withValues) {
 
 export function vacuum() {
   const tx = db.transaction(['scripts', 'require', 'cache', 'values'], 'readwrite');
+  checkPosition();
   return loadScripts()
   .then(data => Promise.all([
-    vacuumPosition(data.ids),
     vacuumCache('require', data.require),
     vacuumCache('cache', data.cache),
     vacuumCache('values', data.values),
@@ -404,22 +395,8 @@ export function vacuum() {
       });
       if (isRemote(script.meta.icon)) data.cache[script.meta.icon] = 1;
       data.values[script.uri] = 1;
-      return script.id;
     })
-    .then(ids => {
-      data.ids = ids;
-      return data;
-    });
-  }
-  function vacuumPosition(ids) {
-    const os = tx.objectStore('scripts');
-    return ids.reduce((res, id, i) => res.then(() => new Promise(resolve => {
-      os.get(id).onsuccess = e => {
-        const { result } = e.target;
-        result.position = i + 1;
-        os.put(result).onsuccess = () => resolve();
-      };
-    })), Promise.resolve());
+    .then(() => data);
   }
   function vacuumCache(dbName, dict) {
     const os = tx.objectStore(dbName);
@@ -509,6 +486,7 @@ export function parseScript(data) {
       image.src = url;
     }));
   }
+  let needCheckPosition;
   return queryScript(data.id, meta, tx)
   .then(result => {
     let script;
@@ -517,9 +495,11 @@ export function parseScript(data) {
       script = result;
     } else {
       script = newScript();
+      script.position = getPosition();
       res.cmd = 'AddScript';
       res.data.message = i18n('msgInstalled');
     }
+    needCheckPosition = data.more && data.more.position !== script.position;
     updateProps(script, data.more);
     updateProps(script.custom, data.custom);
     script.meta = meta;
@@ -534,6 +514,7 @@ export function parseScript(data) {
     return saveScript(script, tx);
   })
   .then(script => {
+    if (needCheckPosition) checkPosition(script.position);
     Object.assign(res.data, getScriptInfo(script));
     return res;
   });

@@ -114,7 +114,7 @@ function exportData(selectedIds) {
         names[name] += 1;
         name = `${name}_${names[name]}`;
       } else names[name] = 1;
-      vm.scripts[name] = ['id', 'custom', 'enabled', 'update']
+      vm.scripts[name] = ['custom', 'enabled', 'update', 'position']
       .reduce((res, key) => {
         res[key] = script[key];
         return res;

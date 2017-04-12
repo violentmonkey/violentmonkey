@@ -72,8 +72,7 @@ function loadHash() {
   }
 }
 
-function initMain() {
-  store.loading = true;
+function loadData() {
   sendMessage({ cmd: 'GetData' })
   .then((data) => {
     [
@@ -87,7 +86,13 @@ function initMain() {
     // features.reset(data.version);
     features.reset('sync');
   });
+}
+
+function initMain() {
+  store.loading = true;
+  loadData();
   Object.assign(handlers, {
+    ScriptsUpdated: loadData,
     UpdateSync(data) {
       store.sync = data;
     },
