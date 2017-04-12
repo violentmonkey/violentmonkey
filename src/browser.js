@@ -15,7 +15,7 @@ function wrapAsync(func) {
       func(...args);
     });
     promise.catch(err => {
-      if (process.env.DEBUG) console.error(args, err);
+      if (process.env.DEBUG) console.warn(args, err);
     });
     return promise;
   };
@@ -56,7 +56,7 @@ const meta = {
             result.then(data => {
               sendResponse({ data });
             }, error => {
-              if (process.env.DEBUG) console.error(error);
+              if (process.env.DEBUG) console.warn(error);
               sendResponse({ error });
             });
             return true;
@@ -83,7 +83,7 @@ const meta = {
           return res && res.data;
         });
         promise.catch(err => {
-          if (process.env.DEBUG) console.error(err);
+          if (process.env.DEBUG) console.warn(err);
         });
         return promise;
       };
