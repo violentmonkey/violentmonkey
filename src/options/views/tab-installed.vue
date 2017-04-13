@@ -75,13 +75,11 @@ export default {
         });
       })
       .then(url => {
-        if (url && url.includes('://')) {
-          const urlOptions = browser.runtime.getURL(browser.runtime.getManifest().options_page);
-          browser.tabs.create({
-            url: `${urlOptions}#confirm?u=${encodeURIComponent(url)}`,
-          });
-        }
-      }, noop);
+        if (url && url.includes('://')) return sendMessage({ cmd: 'ConfirmInstall', data: { url } });
+      }, noop)
+      .catch(err => {
+        if (err) showMessage({ text: err });
+      });
     },
     editScript(id) {
       this.script = this.store.scripts.find(script => script.id === id);

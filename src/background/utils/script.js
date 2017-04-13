@@ -1,5 +1,14 @@
+const metaStart = '==UserScript==';
+const metaEnd = '==/UserScript==';
+
 export function isRemote(url) {
   return url && !(/^(file|data):/.test(url));
+}
+
+export function isUserScript(text) {
+  if (/^\s*</.test(text)) return false; // HTML
+  if (text.indexOf(metaStart) < 0) return false;  // Lack of meta block
+  return true;
 }
 
 export function parseMeta(code) {
@@ -14,10 +23,10 @@ export function parseMeta(code) {
   };
   let flag = -1;
   code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, (_match, group1, group2) => {
-    if (flag < 0 && group1 === '==UserScript==') {
+    if (flag < 0 && group1 === metaStart) {
       // start meta
       flag = 1;
-    } else if (flag > 0 && group1 === '==/UserScript==') {
+    } else if (flag > 0 && group1 === metaEnd) {
       // end meta
       flag = 0;
     }

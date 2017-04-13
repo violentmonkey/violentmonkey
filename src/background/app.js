@@ -1,6 +1,6 @@
 import { i18n, defaultImage } from 'src/common';
 import * as sync from './sync';
-import { getRequestId, httpRequest, abortRequest } from './utils/requests';
+import { getRequestId, httpRequest, abortRequest, confirmInstall } from './utils/requests';
 import cache from './utils/cache';
 import { newScript, parseMeta } from './utils/script';
 import { setClipboard } from './utils/clipboard';
@@ -193,6 +193,7 @@ const commands = {
     items.forEach(item => { setOption(item.key, item.value); });
   },
   CheckPosition: vmdb.checkPosition,
+  ConfirmInstall: confirmInstall,
 };
 
 vmdb.initialized.then(() => {

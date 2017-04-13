@@ -1,5 +1,6 @@
-import { getUniqId } from 'src/common';
+import { getUniqId, request, i18n } from 'src/common';
 import cache from './cache';
+import { isUserScript } from './script';
 
 const requests = {};
 const verify = {};
@@ -195,6 +196,26 @@ browser.webRequest.onBeforeSendHeaders.addListener(details => {
 //   types: ['xmlhttprequest'],
 // });
 
+export function confirmInstall(info) {
+  return (info.code
+    ? Promise.resolve(info.code)
+    : request(info.url).then(({ data }) => {
+      if (!isUserScript(data)) return Promise.reject(i18n('msgInvalidScript'));
+      return data;
+    })
+  )
+  .then(code => {
+    cache.put(info.url, code, 3000);
+    const confirmKey = getUniqId();
+    cache.put(`confirm-${confirmKey}`, {
+      url: info.url,
+      from: info.from,
+    });
+    const optionsURL = browser.runtime.getURL(browser.runtime.getManifest().options_page);
+    browser.tabs.create({ url: `${optionsURL}#confirm?id=${confirmKey}` });
+  });
+}
+
 browser.webRequest.onBeforeRequest.addListener(req => {
   // onBeforeRequest is fired for local files too
   if (req.method === 'GET' && /\.user\.js([?#]|$)/.test(req.url)) {
@@ -208,21 +229,16 @@ browser.webRequest.onBeforeRequest.addListener(req => {
       // Request is redirected
       return;
     }
-    if ((!x.status || x.status === 200) && !/^\s*</.test(x.responseText)) {
-      cache.put(req.url, x.responseText, 3000);
-      const confirmInfo = {
-        url: req.url,
-      };
-      const confirmKey = getUniqId();
+    if ((!x.status || x.status === 200) && isUserScript(x.responseText)) {
       // Firefox: slashes are decoded automatically by Firefox, thus cannot be
       // used as separators
-      const optionsURL = browser.runtime.getURL(browser.runtime.getManifest().options_page);
-      const url = `${optionsURL}#confirm?id=${confirmKey}`;
       (req.tabId < 0 ? Promise.resolve() : browser.tabs.get(req.tabId))
       .then(tab => {
-        confirmInfo.from = tab && tab.url;
-        cache.put(`confirm-${confirmKey}`, confirmInfo);
-        browser.tabs.create({ url });
+        confirmInstall({
+          url: req.url,
+          from: tab && tab.url,
+          code: x.responseText,
+        });
       });
       return noredirect;
     }
