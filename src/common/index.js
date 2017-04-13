@@ -68,11 +68,17 @@ export function initHooks() {
   return { hook, fire };
 }
 
-export function sendMessage(data) {
-  return browser.runtime.sendMessage(data)
-  .catch((err) => {
-    console.error(err);
+export function sendMessage(payload) {
+  const promise = browser.runtime.sendMessage(payload)
+  .then(res => {
+    const { data, error } = res || {};
+    if (error) return Promise.reject(error);
+    return data;
   });
+  promise.catch((err) => {
+    if (process.env.DEBUG) console.warn(err);
+  });
+  return promise;
 }
 
 export function debounce(func, time) {

@@ -74,7 +74,10 @@ function onLoadScripts(data) {
   bridge.forEach(data.scripts, script => {
     bridge.values[script.uri] = data.values[script.uri] || {};
     if (script && script.enabled) {
-      const list = listMap[script.custom['run-at'] || script.meta['run-at']] || end;
+      const list = listMap[
+        script.custom.runAt || script.custom['run-at']
+        || script.meta.runAt || script.meta['run-at']
+      ] || end;
       list.push(script);
     }
   });
@@ -347,7 +350,7 @@ function wrapGM(script, cache) {
               name,
               url: resources[name],
             })),
-            'run-at': script.meta['run-at'] || '',
+            runAt: script.meta.runAt || '',
             unwrap: false,  // deprecated, always `false`
             version: script.meta.version || '',
           },

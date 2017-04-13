@@ -1,11 +1,11 @@
+import { sendMessage, noop } from 'src/common';
+
+export { sendMessage, noop };
+
 export function postData(destId, data) {
   // Firefox issue: data must be stringified to avoid cross-origin problem
   const e = new CustomEvent(destId, { detail: JSON.stringify(data) });
   document.dispatchEvent(e);
-}
-
-export function sendMessage(data) {
-  return browser.runtime.sendMessage(data);
 }
 
 export function inject(code) {
@@ -33,5 +33,3 @@ export function objEncode(obj) {
 export function getUniqId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
-
-export function noop() {}

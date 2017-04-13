@@ -5,7 +5,7 @@
     @click="onBackdropClick"></div>
     <div class="message">
       <div class="mb-1" v-if="message.text" v-text="message.text"></div>
-      <form v-if="message.buttons">
+      <form v-if="message.buttons" @submit.prevent>
         <input class="mb-1" type="text" v-if="message.input !== false" v-model="message.input">
         <div>
           <button v-for="button in message.buttons" class="mr-1"

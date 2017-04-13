@@ -203,7 +203,8 @@ vmdb.initialized.then(() => {
       res = func(req.data, src);
       if (typeof res !== 'undefined') {
         // If res is not instance of native Promise, browser APIs will not wait for it.
-        res = Promise.resolve(res);
+        res = Promise.resolve(res)
+        .then(data => ({ data }), error => ({ error }));
       }
     }
     return res;

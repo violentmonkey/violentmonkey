@@ -27,9 +27,9 @@ const handlers = {
     options.update(data);
   },
 };
-browser.runtime.onMessage.addListener((req, src, callback) => {
+browser.runtime.onMessage.addListener((req, src) => {
   const func = handlers[req.cmd];
-  if (func) func(req.data, src, callback);
+  if (func) func(req.data, src);
 });
 
 browser.tabs.query({ currentWindow: true, active: true })

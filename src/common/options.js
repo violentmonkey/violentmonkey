@@ -3,7 +3,7 @@ import { initHooks, sendMessage, object, normalizeKeys } from '.';
 let options = {};
 const hooks = initHooks();
 const ready = sendMessage({ cmd: 'GetAllOptions' })
-.then((data) => {
+.then(data => {
   options = data;
   if (data) hooks.fire(data);
 });

@@ -19,7 +19,7 @@ const handlers = {
     options.update(data);
   },
 };
-browser.runtime.onMessage.addListener((res) => {
+browser.runtime.onMessage.addListener(res => {
   const handle = handlers[res.cmd];
   if (handle) handle(res.data);
 });
@@ -74,7 +74,7 @@ function loadHash() {
 
 function loadData() {
   sendMessage({ cmd: 'GetData' })
-  .then((data) => {
+  .then(data => {
     [
       'cache',
       'scripts',

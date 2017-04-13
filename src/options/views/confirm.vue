@@ -220,7 +220,7 @@ export default {
           resources: this.resources,
         },
       })
-      .then((res) => {
+      .then(res => {
         this.message = `${res.message}[${this.getTimeString()}]`;
         if (res.code < 0) return;
         if (this.closeAfterInstall) this.close();

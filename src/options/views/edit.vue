@@ -240,7 +240,7 @@ export default {
       cmd: 'GetScript',
       data: this.script.id,
     }) : Promise.resolve(this.script))
-    .then((script) => {
+    .then(script => {
       this.update = script.update;
       this.code = script.code;
       const { custom } = script;
@@ -304,7 +304,7 @@ export default {
           },
         },
       })
-      .then((script) => {
+      .then(script => {
         this.script = script;
         this.canSave = false;
       }, err => {

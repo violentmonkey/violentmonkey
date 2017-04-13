@@ -1,6 +1,6 @@
 import base from './bridge';
 import { getRequestId, httpRequest, abortRequest } from './requests';
-import { inject, postData, sendMessage, noop } from './utils';
+import { inject, postData, sendMessage } from './utils';
 import { onNotificationCreate } from './notification';
 import { tabOpen, tabClose } from './tabs';
 
@@ -23,8 +23,7 @@ function getPopup() {
     sendMessage({
       cmd: 'SetPopup',
       data: { ids, menus },
-    })
-    .catch(noop);
+    });
   }
 }
 
