@@ -326,6 +326,9 @@ export const BaseService = serviceFactory({
             getRemote.push(remoteItem);
           } else if (remoteInfo.modified < item.custom.modified) {
             putRemote.push(item);
+          } else if (remoteInfo.position !== item.position) {
+            remoteInfo.position = item.position;
+            remoteChanged = true;
           }
           delete remoteItemMap[item.uri];
         } else if (firstSync || !outdated) {
