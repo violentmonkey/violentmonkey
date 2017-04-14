@@ -14,7 +14,7 @@
                 </td>
                 <td title="@run-at" v-text="i18n('labelRunAt')"></td>
                 <td>
-                  <select v-model="custom['run-at']">
+                  <select v-model="custom.runAt">
                     <option value="" v-text="i18n('labelRunAtDefault')"></option>
                     <option value=start>document-start</option>
                     <option value=idle>document-idle</option>
@@ -259,7 +259,7 @@ export default {
         include: fromList(custom.include),
         match: fromList(custom.match),
         exclude: fromList(custom.exclude),
-        'run-at': custom['run-at'] || '',
+        runAt: custom.runAt || custom['run-at'] || '',
       });
       this.$nextTick(() => {
         this.canSave = false;
@@ -274,7 +274,7 @@ export default {
       const { custom } = this;
       const value = [
         'name',
-        'run-at',
+        'runAt',
         'homepageURL',
         'updateURL',
         'downloadURL',

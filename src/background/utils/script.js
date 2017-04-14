@@ -17,6 +17,7 @@ export function parseMeta(code) {
     include: [],
     exclude: [],
     match: [],
+    excludeMatch: [],
     require: [],
     resource: [],
     grant: [],
@@ -31,7 +32,7 @@ export function parseMeta(code) {
       flag = 0;
     }
     if (flag === 1 && group1[0] === '@') {
-      const key = group1.slice(1);
+      const key = group1.slice(1).replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
       const val = group2.trim();
       const data = meta[key];
       // multiple values allowed

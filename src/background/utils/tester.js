@@ -1,31 +1,64 @@
+import cache from './cache';
 import { getOption, hookOptions } from './options';
+
+/**
+ * Test glob rules like `@include` and `@exclude`.
+ */
+export function testGlob(url, rules) {
+  const lifetime = 60 * 1000;
+  return rules.some(rule => {
+    const key = `re:${rule}`;
+    let re = cache.get(key);
+    if (re) {
+      cache.hit(key, lifetime);
+    } else {
+      re = autoReg(rule);
+      cache.put(key, re, lifetime);
+    }
+    return re.test(url);
+  });
+}
+
+/**
+ * Test match rules like `@match` and `@exclude_match`.
+ */
+export function testMatch(url, rules) {
+  const lifetime = 10 * 1000;
+  const key = `match:${url}`;
+  let matcher = cache.get(key);
+  if (matcher) {
+    cache.hit(key, lifetime);
+  } else {
+    matcher = matchTester(url);
+    cache.put(key, matcher, lifetime);
+  }
+  return rules.some(matcher);
+}
 
 export function testScript(url, script) {
   const { custom, meta } = script;
-  let inc = [];
-  let exc = [];
-  let mat = [];
-  if (custom._match !== false && meta.match) mat = mat.concat(meta.match);
-  if (custom.match) mat = mat.concat(custom.match);
-  if (custom._include !== false && meta.include) inc = inc.concat(meta.include);
-  if (custom.include) inc = inc.concat(custom.include);
-  if (custom._exclude !== false && meta.exclude) exc = exc.concat(meta.exclude);
-  if (custom.exclude) exc = exc.concat(custom.exclude);
+  const mat = mergeLists(custom._match !== false && meta.match, custom.match);
+  const inc = mergeLists(custom._include !== false && meta.include, custom.include);
+  const exc = mergeLists(custom._exclude !== false && meta.exclude, custom.exclude);
+  const excMat = mergeLists(
+    custom._excludeMatch !== false && meta.excludeMatch,
+    custom.excludeMatch,
+  );
+  // match all if no @match or @include rule
   let ok = !mat.length && !inc.length;
   // @match
-  ok = ok || testMatches(url, mat);
+  ok = ok || testMatch(url, mat);
   // @include
-  ok = ok || testRules(url, inc);
+  ok = ok || testGlob(url, inc);
+  // @exclude-match
+  ok = ok && !testMatch(url, excMat);
   // @exclude
-  ok = ok && !testRules(url, exc);
+  ok = ok && !testGlob(url, exc);
   return ok;
 }
 
-function testRules(url, rules) {
-  return rules.some(rule => autoReg(rule).test(url));
-}
-function testMatches(url, rules) {
-  return rules.length && rules.some(matchTester(url));
+function mergeLists(...args) {
+  return args.reduce((res, item) => (item ? res.concat(item) : res), []);
 }
 
 function str2RE(str) {
@@ -40,31 +73,31 @@ function autoReg(str) {
   return str2RE(str);              // String with wildcards
 }
 
+function matchScheme(rule, data) {
+  // exact match
+  if (rule === data) return 1;
+  // * = http | https
+  if (rule === '*' && /^https?$/i.test(data)) return 1;
+  return 0;
+}
+function matchHost(rule, data) {
+  // * matches all
+  if (rule === '*') return 1;
+  // exact match
+  if (rule === data) return 1;
+  // *.example.com
+  if (/^\*\.[^*]*$/.test(rule)) {
+    // matches the specified domain
+    if (rule.slice(2) === data) return 1;
+    // matches subdomains
+    if (str2RE(rule).test(data)) return 1;
+  }
+  return 0;
+}
+function matchPath(rule, data) {
+  return str2RE(rule).test(data);
+}
 function matchTester(url) {
-  function matchScheme(rule, data) {
-    // exact match
-    if (rule === data) return 1;
-    // * = http | https
-    if (rule === '*' && /^https?$/i.test(data)) return 1;
-    return 0;
-  }
-  function matchHost(rule, data) {
-    // * matches all
-    if (rule === '*') return 1;
-    // exact match
-    if (rule === data) return 1;
-    // *.example.com
-    if (/^\*\.[^*]*$/.test(rule)) {
-      // matches the specified domain
-      if (rule.slice(2) === data) return 1;
-      // matches subdomains
-      if (str2RE(rule).test(data)) return 1;
-    }
-    return 0;
-  }
-  function matchPath(rule, data) {
-    return str2RE(rule).test(data);
-  }
   const RE = /(.*?):\/\/([^/]*)\/(.*)/;
   const urlParts = url.match(RE);
   return str => {

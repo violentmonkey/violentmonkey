@@ -5,7 +5,7 @@ const defaults = {
 export default function initCache(options) {
   const cache = {};
   const { lifetime: defaultLifetime } = options || defaults;
-  return { get, put, del, has, hit };
+  return { get, put, del, has, hit, destroy };
   function get(key, def) {
     const item = cache[key];
     return item ? item.value : def;
@@ -31,5 +31,8 @@ export default function initCache(options) {
   }
   function hit(key, lifetime) {
     put(key, get(key), lifetime);
+  }
+  function destroy() {
+    Object.keys(cache).forEach(del);
   }
 }
