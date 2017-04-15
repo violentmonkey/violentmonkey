@@ -16,17 +16,16 @@ import { showMessage } from '../../utils';
 
 export default {
   data() {
-    const rules = options.get('blacklist') || [];
+    let rules = options.get('blacklist');
+    // XXX compatible
+    if (Array.isArray(rules)) rules = rules.join('\n');
     return {
-      rules: rules.join('\n'),
+      rules,
     };
   },
   methods: {
     onSave() {
-      const rules = this.rules.split('\n')
-      .map(item => item.trim())
-      .filter(Boolean);
-      options.set('blacklist', rules);
+      options.set('blacklist', this.rules);
       showMessage({ text: i18n('msgSavedBlacklist') });
       sendMessage({ cmd: 'BlacklistReset' });
     },

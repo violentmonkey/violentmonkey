@@ -1,5 +1,5 @@
 import test from 'tape';
-import { testScript } from 'src/background/utils/tester';
+import { testScript, testBlacklist, resetBlacklist } from 'src/background/utils/tester';
 import cache from 'src/background/utils/cache';
 
 test.onFinish(cache.destroy);
@@ -209,6 +209,41 @@ test('exclude-match', t => {
     q.notOk(testScript('https://www.google.com/', script), 'should exclude `/`');
     q.notOk(testScript('https://www.google.com/hello/world', script), 'exclude by prefix');
     q.ok(testScript('https://www.hello.com/', script), 'not exclude by prefix');
+    q.end();
+  });
+});
+
+test('blacklist', t => {
+  t.test('should exclude match rules', q => {
+    resetBlacklist(`\
+# match rules
+*://www.google.com/*
+`);
+    q.ok(testBlacklist('http://www.google.com/'));
+    q.ok(testBlacklist('https://www.google.com/'));
+    q.notOk(testBlacklist('https://twitter.com/'));
+    q.end();
+  });
+
+  t.test('should exclude domains', q => {
+    resetBlacklist(`\
+# domains
+www.google.com
+`);
+    q.ok(testBlacklist('http://www.google.com/'));
+    q.ok(testBlacklist('https://www.google.com/'));
+    q.notOk(testBlacklist('https://twitter.com/'));
+    q.end();
+  });
+
+  t.test('should support @exclude rules', q => {
+    resetBlacklist(`\
+# @exclude rules
+@exclude https://www.google.com/*
+`);
+    q.ok(testBlacklist('https://www.google.com/'));
+    q.ok(testBlacklist('https://www.google.com/whatever'));
+    q.notOk(testBlacklist('http://www.google.com/'));
     q.end();
   });
 });

@@ -23,16 +23,18 @@ export function testGlob(url, rules) {
  * Test match rules like `@match` and `@exclude_match`.
  */
 export function testMatch(url, rules) {
-  const lifetime = 10 * 1000;
-  const key = `match:${url}`;
-  let matcher = cache.get(key);
-  if (matcher) {
-    cache.hit(key, lifetime);
-  } else {
-    matcher = matchTester(url);
-    cache.put(key, matcher, lifetime);
-  }
-  return rules.some(matcher);
+  const lifetime = 60 * 1000;
+  return rules.some(rule => {
+    const key = `match:${rule}`;
+    let matcher = cache.get(key);
+    if (matcher) {
+      cache.hit(key, lifetime);
+    } else {
+      matcher = matchTester(rule);
+      cache.put(key, matcher, lifetime);
+    }
+    return matcher.test(url);
+  });
 }
 
 export function testScript(url, script) {
@@ -97,28 +99,43 @@ function matchHost(rule, data) {
 function matchPath(rule, data) {
   return str2RE(rule).test(data);
 }
-function matchTester(url) {
-  const RE = /(.*?):\/\/([^/]*)\/(.*)/;
-  const urlParts = url.match(RE);
-  return str => {
-    if (str === '<all_urls>') return true;
-    const parts = str.match(RE);
-    return !!parts
-      && matchScheme(parts[1], urlParts[1])
-      && matchHost(parts[2], urlParts[2])
-      && matchPath(parts[3], urlParts[3]);
-  };
+function matchTester(rule) {
+  let test;
+  if (rule === '<all_urls>') test = () => true;
+  else {
+    const RE = /(.*?):\/\/([^/]*)\/(.*)/;
+    const ruleParts = rule.match(RE);
+    test = url => {
+      const parts = url.match(RE);
+      return !!ruleParts && !!parts
+      && matchScheme(ruleParts[1], parts[1])
+      && matchHost(ruleParts[2], parts[2])
+      && matchPath(ruleParts[3], parts[3]);
+    };
+  }
+  return { test };
 }
 
-let blacklistRE = [];
+let blacklistRules = [];
 resetBlacklist(getOption('blacklist'));
 hookOptions(changes => {
   const { blacklist } = changes;
   if (blacklist) resetBlacklist(blacklist);
 });
 export function testBlacklist(url) {
-  return blacklistRE.some(re => re.test(url));
+  return blacklistRules.some(re => re.test(url));
 }
-function resetBlacklist(list) {
-  blacklistRE = (list || []).map(rule => autoReg(rule));
+export function resetBlacklist(list) {
+  blacklistRules = (Array.isArray(list) ? list : (list || '').split('\n'))
+  .map(line => {
+    const item = line.trim();
+    if (!item || item.startsWith('#')) return;
+    // @exclude
+    if (item.startsWith('@exclude ')) return autoReg(item.slice(9));
+    // domains
+    if (item.indexOf('/') < 0) return matchTester(`*://${item}/*`);
+    // @exclude-match
+    return matchTester(item);
+  })
+  .filter(Boolean);
 }
