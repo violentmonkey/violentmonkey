@@ -335,9 +335,7 @@ labelBlacklist:
   message: Blacklist
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: >-
-    URLs en esta lista no seran injectados por los scripts. Cada linea es una
-    regla <code>@exclude</code> pero aplicado globalmente.
+  message: URLs en esta lista no seran injectados por los scripts.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: Guardar
@@ -397,4 +395,7 @@ buttonCancel:
   message: Cancelar
 labelImportSettings:
   description: Label for option to import settings from zip file.
+  message: ''
+learnBlacklist:
+  description: Refers to a link to introduce blacklist patterns.
   message: ''

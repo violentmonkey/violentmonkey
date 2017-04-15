@@ -3,7 +3,10 @@
     <h3>
       <span class="feature-text" v-text="i18n('labelBlacklist')"></span>
     </h3>
-    <p v-html="i18n('descBlacklist')"></p>
+    <p>
+      {{i18n('descBlacklist')}}
+      <a href="https://violentmonkey.github.io/2017/04/15/Smart-rules-for-blacklist/#Blacklist-patterns" target="_blank" v-text="i18n('learnBlacklist')"></a>
+    </p>
     <textarea v-model="rules"></textarea>
     <button v-text="i18n('buttonSaveBlacklist')" @click="onSave"></button>
   </section>

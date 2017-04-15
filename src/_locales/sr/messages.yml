@@ -392,3 +392,6 @@ buttonCancel:
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: ''
+learnBlacklist:
+  description: Refers to a link to introduce blacklist patterns.
+  message: ''

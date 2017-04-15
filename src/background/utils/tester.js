@@ -131,7 +131,7 @@ export function resetBlacklist(list) {
     const item = line.trim();
     if (!item || item.startsWith('#')) return;
     // @exclude
-    if (item.startsWith('@exclude ')) return autoReg(item.slice(9));
+    if (item.startsWith('@exclude ')) return autoReg(item.slice(9).trim());
     // domains
     if (item.indexOf('/') < 0) return matchTester(`*://${item}/*`);
     // @exclude-match

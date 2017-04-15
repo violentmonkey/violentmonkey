@@ -331,7 +331,7 @@ labelBlacklist:
   message: 黑名单
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: 此列表匹配的URL将不会被注入脚本。每行都是一条<code>@exclude</code>规则但是将用于全局。
+  message: 此列表匹配的URL将不会被注入脚本。
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: 保存
@@ -390,3 +390,6 @@ buttonCancel:
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: 导入设置
+learnBlacklist:
+  description: Refers to a link to introduce blacklist patterns.
+  message: 了解更多黑名单规则。
