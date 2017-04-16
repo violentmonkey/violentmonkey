@@ -39,13 +39,10 @@ export function testMatch(url, rules) {
 
 export function testScript(url, script) {
   const { custom, meta } = script;
-  const mat = mergeLists(custom._match !== false && meta.match, custom.match);
-  const inc = mergeLists(custom._include !== false && meta.include, custom.include);
-  const exc = mergeLists(custom._exclude !== false && meta.exclude, custom.exclude);
-  const excMat = mergeLists(
-    custom._excludeMatch !== false && meta.excludeMatch,
-    custom.excludeMatch,
-  );
+  const mat = mergeLists(custom.origMatch && meta.match, custom.match);
+  const inc = mergeLists(custom.origInclude && meta.include, custom.include);
+  const exc = mergeLists(custom.origExclude && meta.exclude, custom.exclude);
+  const excMat = mergeLists(custom.origExcludeMatch && meta.excludeMatch, custom.excludeMatch);
   // match all if no @match or @include rule
   let ok = !mat.length && !inc.length;
   // @match
@@ -126,6 +123,7 @@ export function testBlacklist(url) {
   return blacklistRules.some(re => re.test(url));
 }
 export function resetBlacklist(list) {
+  // XXX compatible with {Array} list in v2.6.1-
   blacklistRules = (Array.isArray(list) ? list : (list || '').split('\n'))
   .map(line => {
     const item = line.trim();

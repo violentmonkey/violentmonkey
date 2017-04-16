@@ -53,6 +53,25 @@ function openDatabase() {
   });
 }
 
+function transformScript(script) {
+  // XXX transform custom fields used in v2.6.1-
+  if (script) {
+    const { custom } = script;
+    [
+      ['origInclude', '_include'],
+      ['origMatch', '_match'],
+      ['origExclude', '_exclude'],
+      ['origExcludeMatch', '_excludeMatch'],
+    ].forEach(([key, oldKey]) => {
+      if (typeof custom[key] === 'undefined') {
+        custom[key] = custom[oldKey] !== false;
+        delete custom[oldKey];
+      }
+    });
+  }
+  return script;
+}
+
 export function getScript(id, cTx) {
   const tx = cTx || db.transaction('scripts');
   const os = tx.objectStore('scripts');
@@ -60,7 +79,8 @@ export function getScript(id, cTx) {
     os.get(id).onsuccess = e => {
       resolve(e.target.result);
     };
-  });
+  })
+  .then(transformScript);
 }
 
 export function queryScript(id, meta, cTx) {
@@ -71,7 +91,8 @@ export function queryScript(id, meta, cTx) {
     tx.objectStore('scripts').index('uri').get(uri).onsuccess = e => {
       resolve(e.target.result);
     };
-  });
+  })
+  .then(transformScript);
 }
 
 export function getScriptData(id) {
@@ -436,6 +457,7 @@ export function getScriptsByIndex(index, options, cTx, mapEach) {
       const { result } = e.target;
       if (result) {
         let { value } = result;
+        value = transformScript(value);
         if (mapEach) value = mapEach(value);
         list.push(value);
         result.continue();
@@ -506,7 +528,7 @@ export function parseScript(data) {
       res.data.message = i18n('msgInstalled');
     }
     updateProps(script, data.more);
-    updateProps(script.custom, data.custom);
+    Object.assign(script.custom, data.custom);
     script.meta = meta;
     script.code = data.code;
     script.uri = getNameURI(script);

@@ -47,7 +47,7 @@
               <legend>
                 <span v-text="i18n('labelInclude')"></span>
                 <label>
-                  <input type=checkbox v-model="custom.keepInclude">
+                  <input type=checkbox v-model="custom.origInclude">
                   <span v-text="i18n('labelKeepInclude')"></span>
                 </label>
               </legend>
@@ -58,7 +58,7 @@
               <legend>
                 <span v-text="i18n('labelMatch')"></span>
                 <label>
-                  <input type=checkbox v-model="custom.keepMatch">
+                  <input type=checkbox v-model="custom.origMatch">
                   <span v-text="i18n('labelKeepMatch')"></span>
                 </label>
               </legend>
@@ -69,7 +69,7 @@
               <legend>
                 <span v-text="i18n('labelExclude')"></span>
                 <label>
-                  <input type=checkbox v-model="custom.keepExclude">
+                  <input type=checkbox v-model="custom.origExclude">
                   <span v-text="i18n('labelKeepExclude')"></span>
                 </label>
               </legend>
@@ -249,16 +249,18 @@ export default {
         'homepageURL',
         'updateURL',
         'downloadURL',
+        'origInclude',
+        'origExclude',
+        'origMatch',
+        'origExcludeMatch',
       ].reduce((value, key) => {
         value[key] = custom[key];
         return value;
       }, {
-        keepInclude: custom._include !== false,
-        keepMatch: custom._match !== false,
-        keepExclude: custom._exclude !== false,
         include: fromList(custom.include),
         match: fromList(custom.match),
         exclude: fromList(custom.exclude),
+        excludeMatch: fromList(custom.excludeMatch),
         runAt: custom.runAt || custom['run-at'] || '',
       });
       this.$nextTick(() => {
@@ -278,16 +280,18 @@ export default {
         'homepageURL',
         'updateURL',
         'downloadURL',
+        'origInclude',
+        'origExclude',
+        'origMatch',
+        'origExcludeMatch',
       ].reduce((val, key) => {
         val[key] = custom[key];
         return val;
       }, {
-        _include: custom.keepInclude,
-        _match: custom.keepMatch,
-        _exclude: custom.keepExclude,
         include: toList(custom.include),
         match: toList(custom.match),
         exclude: toList(custom.exclude),
+        excludeMatch: toList(custom.excludeMatch),
       });
       return sendMessage({
         cmd: 'ParseScript',

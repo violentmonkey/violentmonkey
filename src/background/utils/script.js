@@ -54,7 +54,12 @@ export function parseMeta(code) {
 
 export function newScript() {
   const script = {
-    custom: {},
+    custom: {
+      origInclude: true,
+      origExclude: true,
+      origMatch: true,
+      origExcludeMatch: true,
+    },
     enabled: 1,
     update: 1,
     code: `\
