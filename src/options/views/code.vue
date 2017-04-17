@@ -75,24 +75,22 @@ export default {
     cm.on('keyHandled', (_cm, _name, e) => {
       e.stopPropagation();
     });
-    this.update();
+    this.setContent(this.content);
     this.$emit('ready', cm);
   },
   watch: {
-    content(content) {
-      if (content !== this.cachedContent) {
-        this.cachedContent = content;
-        this.update();
-      }
-    },
+    content: 'setContent',
   },
   methods: {
-    update() {
-      const { cm } = this;
-      if (!cm || this.cachedContent == null) return;
-      cm.setValue(this.cachedContent);
-      cm.getDoc().clearHistory();
-      cm.focus();
+    setContent(content) {
+      if (content !== this.cachedContent) {
+        this.cachedContent = content;
+        const { cm } = this;
+        if (!cm) return;
+        cm.setValue(content);
+        cm.getDoc().clearHistory();
+        cm.focus();
+      }
     },
   },
 };

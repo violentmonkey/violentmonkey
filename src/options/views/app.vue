@@ -2,6 +2,7 @@
 import { store } from '../utils';
 import Main from './main';
 import Confirm from './confirm';
+import '../style.css';
 
 const components = {
   Main,
@@ -16,7 +17,3 @@ export default {
   },
 };
 </script>
-
-<style>
-@import '../style.css';
-</style>

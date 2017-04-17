@@ -26,10 +26,6 @@ button {
 a {
   color: dodgerblue;
 }
-textarea,
-input[type=text] {
-  width: 100%;
-}
 input[disabled] ~ * {
   color: gray;
 }
@@ -62,10 +58,12 @@ fieldset {
   flex-direction: column;
 }
 .flex-auto {
-  height: 0;
   flex: auto;
+  .flex-col > & {
+    height: 0;
+  }
 }
-.p-rel {
+.pos-rel {
   position: relative;
 }
 .mr-1 {
@@ -79,6 +77,10 @@ fieldset {
 }
 .mb-2 {
   margin-bottom: 1em;
+}
+.px-2 {
+  margin-left: 1em;
+  margin-right: 1em;
 }
 .h-100 {
   height: 100%;
@@ -380,23 +382,23 @@ svg path {
 }
 
 .CodeMirror-foldmarker {
-	color: blue;
-	text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
-	font-family: arial;
-	line-height: .3;
-	cursor: pointer;
+  color: blue;
+  text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
+  font-family: arial;
+  line-height: .3;
+  cursor: pointer;
 }
 .CodeMirror-foldgutter {
-	width: .7em;
+  width: .7em;
 }
 .CodeMirror-foldgutter-open,
 .CodeMirror-foldgutter-folded {
-	color: #555;
-	cursor: pointer;
+  color: #555;
+  cursor: pointer;
 }
 .CodeMirror-foldgutter-open:after {
-	content: "\25BE";
+  content: "\25BE";
 }
 .CodeMirror-foldgutter-folded:after {
-	content: "\25B8";
+  content: "\25B8";
 }

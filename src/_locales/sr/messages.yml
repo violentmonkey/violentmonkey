@@ -164,6 +164,7 @@ labelScriptEditor:
 buttonCustomMeta:
   description: Button to edit the custom meta data of a script.
   message: Прилагођени метаподаци
+  touched: false
 labelName:
   description: Label of script name.
   message: Име
@@ -191,6 +192,7 @@ labelKeepInclude:
 labelCustomInclude:
   description: Label of custom @include rules.
   message: 'Прилагођена @include правила: <em>(Једно по линији)</em>'
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Правила подударања
@@ -200,6 +202,7 @@ labelKeepMatch:
 labelCustomMatch:
   description: Label of custom @match rules.
   message: 'Прилагођена @match правила: <em>(Једно по линији)</em>'
+  touched: false
 labelExclude:
   description: Label of @exclude rules.
   message: Правила изузимања
@@ -209,6 +212,13 @@ labelKeepExclude:
 labelCustomExclude:
   description: Label of custom @exclude rules.
   message: 'Прилагођена @exclude правила: <em>(Једно по линији)</em>'
+  touched: false
+labelExcludeMatch:
+  description: Label of @exclude-match rules.
+  message: ''
+labelKeepExcludeMatch:
+  description: Label of custom @exclude-match rules.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Дозволи ажурирања
@@ -394,4 +404,16 @@ labelImportSettings:
   message: ''
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
+  message: ''
+editNavCode:
+  description: Label of code tab in script editor.
+  message: ''
+editNavSettings:
+  description: Label of settings tab in script editor.
+  message: ''
+editLabelSettings:
+  description: Settings section in settings tab of script editor.
+  message: ''
+editLabelMeta:
+  description: Metadata section in settings tab of script editor.
   message: ''

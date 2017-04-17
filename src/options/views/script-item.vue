@@ -253,3 +253,11 @@ export default {
   },
 };
 </script>
+
+<style>
+.script-info {
+  > *:not(:last-child) {
+    margin-right: 8px;
+  }
+}
+</style>

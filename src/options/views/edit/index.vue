@@ -1,91 +1,27 @@
 <template>
   <div class="edit flex flex-col fixed-full">
-    <div class="frame-block">
-      <div class="buttons pull-right">
-        <a class="mr-1" href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit locally?</a>
-        <div v-dropdown>
-          <button dropdown-toggle v-text="i18n('buttonCustomMeta')"></button>
-          <div class="dropdown-menu">
-            <table>
-              <tr>
-                <td title="@name" v-text="i18n('labelName')"></td>
-                <td class="expand">
-                  <input type="text" v-model="custom.name" :placeholder="placeholders.name">
-                </td>
-                <td title="@run-at" v-text="i18n('labelRunAt')"></td>
-                <td>
-                  <select v-model="custom.runAt">
-                    <option value="" v-text="i18n('labelRunAtDefault')"></option>
-                    <option value=start>document-start</option>
-                    <option value=idle>document-idle</option>
-                    <option value=end>document-end</option>
-                  </select>
-                </td>
-              </tr>
-              <tr title="@homepageURL">
-                <td v-text="i18n('labelHomepageURL')"></td>
-                <td colspan=3 class=expand>
-                  <input type="text" v-model="custom.homepageURL" :placeholder="placeholders.homepageURL">
-                </td>
-              </tr>
-            </table>
-            <table>
-              <tr title="@updateURL">
-                <td v-text="i18n('labelUpdateURL')"></td>
-                <td class=expand>
-                  <input type="text" v-model="custom.updateURL" :placeholder="placeholders.updateURL">
-                </td>
-              </tr>
-              <tr title="@downloadURL">
-                <td v-text="i18n('labelDownloadURL')"></td>
-                <td class=expand>
-                  <input type="text" v-model="custom.downloadURL" :placeholder="placeholders.downloadURL">
-                </td>
-              </tr>
-            </table>
-            <fieldset title="@include">
-              <legend>
-                <span v-text="i18n('labelInclude')"></span>
-                <label>
-                  <input type=checkbox v-model="custom.origInclude">
-                  <span v-text="i18n('labelKeepInclude')"></span>
-                </label>
-              </legend>
-              <div v-html="i18n('labelCustomInclude')"></div>
-              <textarea v-model="custom.include"></textarea>
-            </fieldset>
-            <fieldset title="@match">
-              <legend>
-                <span v-text="i18n('labelMatch')"></span>
-                <label>
-                  <input type=checkbox v-model="custom.origMatch">
-                  <span v-text="i18n('labelKeepMatch')"></span>
-                </label>
-              </legend>
-              <div v-html="i18n('labelCustomMatch')"></div>
-              <textarea v-model="custom.match"></textarea>
-            </fieldset>
-            <fieldset title="@exclude">
-              <legend>
-                <span v-text="i18n('labelExclude')"></span>
-                <label>
-                  <input type=checkbox v-model="custom.origExclude">
-                  <span v-text="i18n('labelKeepExclude')"></span>
-                </label>
-              </legend>
-              <div v-html="i18n('labelCustomExclude')"></div>
-              <textarea v-model="custom.exclude"></textarea>
-            </fieldset>
-          </div>
+    <div class="flex edit-header">
+      <h2 v-text="i18n('labelScriptEditor')"></h2>
+      <div class="flex-auto pos-rel px-2">
+        <div class="edit-nav">
+          <div v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
+          <div v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
         </div>
       </div>
-      <h2 v-text="i18n('labelScriptEditor')"></h2>
+      <div class="buttons">
+        <a class="mr-1" href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
+      </div>
     </div>
-    <div class="frame-block flex-auto p-rel">
+    <div class="frame-block flex-auto pos-rel">
       <vm-code
-      class="abs-full"
-      :content="code" :commands="commands"
-      @change="contentChange" @ready="initEditor"
+        v-show="nav === 'code'"
+        class="abs-full"
+        :content="code" :commands="commands"
+        @change="contentChange" @ready="initEditor"
+      />
+      <vm-settings
+        v-show="nav === 'settings'" class="abs-full"
+        :script="script" :settings="settings"
       />
     </div>
     <div class="frame-block" v-show="search.show">
@@ -113,10 +49,6 @@
         <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
         <button v-text="i18n('buttonClose')" @click="close"></button>
       </div>
-      <label>
-        <input type=checkbox v-model="update">
-        <span v-text="i18n('labelAllowUpdate')"></span>
-      </label>
     </div>
   </div>
 </template>
@@ -124,8 +56,9 @@
 <script>
 import CodeMirror from 'codemirror';
 import { i18n, debounce, sendMessage, noop } from 'src/common';
-import { showMessage } from '../utils';
-import VmCode from './code';
+import { showMessage } from '../../utils';
+import VmCode from '../code';
+import VmSettings from './settings';
 
 function fromList(list) {
   return (list || []).join('\n');
@@ -177,14 +110,15 @@ export default {
   props: ['script'],
   components: {
     VmCode,
+    VmSettings,
   },
   data() {
     this.debouncedFind = debounce(this.find, 100);
     return {
+      nav: 'code',
       canSave: false,
-      update: false,
       code: '',
-      custom: {},
+      settings: {},
       search: {
         show: false,
         state: {
@@ -213,19 +147,8 @@ export default {
       },
     };
   },
-  computed: {
-    placeholders() {
-      const { script } = this;
-      return {
-        name: script.meta.name,
-        homepageURL: script.meta.homepageURL,
-        updateURL: script.meta.updateURL || i18n('hintUseDownloadURL'),
-        downloadURL: script.meta.downloadURL || script.lastInstallURL,
-      };
-    },
-  },
   watch: {
-    custom: {
+    settings: {
       deep: true,
       handler() {
         this.canSave = true;
@@ -236,15 +159,19 @@ export default {
     },
   },
   mounted() {
+    this.bindKeys();
     (this.script.id ? sendMessage({
       cmd: 'GetScript',
       data: this.script.id,
     }) : Promise.resolve(this.script))
     .then(script => {
-      this.update = script.update;
+      const settings = {};
+      settings.more = {
+        update: script.update,
+      };
       this.code = script.code;
       const { custom } = script;
-      this.custom = [
+      settings.custom = [
         'name',
         'homepageURL',
         'updateURL',
@@ -263,17 +190,18 @@ export default {
         excludeMatch: fromList(custom.excludeMatch),
         runAt: custom.runAt || custom['run-at'] || '',
       });
+      this.settings = settings;
       this.$nextTick(() => {
         this.canSave = false;
       });
     });
   },
   beforeDestroy() {
-    if (this.cm) this.unbindKeys();
+    this.unbindKeys();
   },
   methods: {
     save() {
-      const { custom } = this;
+      const { settings: { custom, more } } = this;
       const value = [
         'name',
         'runAt',
@@ -303,9 +231,7 @@ export default {
           isNew: !this.script.id,
           message: '',
           custom: value,
-          more: {
-            update: this.update,
-          },
+          more,
         },
       })
       .then(script => {
@@ -384,6 +310,7 @@ export default {
     },
     onKeyDown(e) {
       const { cm } = this;
+      if (!cm) return;
       const name = CodeMirror.keyName(e);
       const commands = [
         'cancel',
@@ -426,3 +353,34 @@ export default {
   },
 };
 </script>
+
+<style>
+.edit {
+  &-header {
+    > * {
+      padding: 8px;
+      cursor: pointer;
+    }
+  }
+  &-nav {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    > div {
+      display: inline-block;
+      padding: 8px 16px;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      color: #bbb;
+      &.active {
+        background: white;
+        box-shadow: 0 -1px 1px #999;
+        color: #333;
+      }
+      &:hover {
+        box-shadow: 0 -1px 1px #999;
+      }
+    }
+  }
+}
+</style>

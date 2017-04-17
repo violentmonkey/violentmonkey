@@ -164,6 +164,7 @@ labelScriptEditor:
 buttonCustomMeta:
   description: Button to edit the custom meta data of a script.
   message: Eigene Metadaten
+  touched: false
 labelName:
   description: Label of script name.
   message: 'Name:'
@@ -191,6 +192,7 @@ labelKeepInclude:
 labelCustomInclude:
   description: Label of custom @include rules.
   message: 'Eigene @include-Regeln: <em>(Eine pro Zeile)</em>'
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Übereinstimmungen (@match)
@@ -200,6 +202,7 @@ labelKeepMatch:
 labelCustomMatch:
   description: Label of custom @match rules.
   message: 'Eigene @match-Regeln: <em>(Eine pro Zeile)</em>'
+  touched: false
 labelExclude:
   description: Label of @exclude rules.
   message: Ausschließen (@exclude)
@@ -209,6 +212,13 @@ labelKeepExclude:
 labelCustomExclude:
   description: Label of custom @exclude rules.
   message: 'Eigene @exclude-Regeln: <em>(Eine pro Zeile)</em>'
+  touched: false
+labelExcludeMatch:
+  description: Label of @exclude-match rules.
+  message: ''
+labelKeepExcludeMatch:
+  description: Label of custom @exclude-match rules.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Aktualisierung erlauben
@@ -392,4 +402,16 @@ labelImportSettings:
   message: ''
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
+  message: ''
+editNavCode:
+  description: Label of code tab in script editor.
+  message: ''
+editNavSettings:
+  description: Label of settings tab in script editor.
+  message: ''
+editLabelSettings:
+  description: Settings section in settings tab of script editor.
+  message: ''
+editLabelMeta:
+  description: Metadata section in settings tab of script editor.
   message: ''

@@ -23,7 +23,7 @@
       <div class="ellipsis confirm-url" :title="info.url" v-text="info.url"></div>
       <div class="ellipsis confirm-msg" v-text="message"></div>
     </div>
-    <div class="frame-block flex-auto p-rel">
+    <div class="frame-block flex-auto pos-rel">
       <vm-code class="abs-full" readonly :content="code" :commands="commands" />
     </div>
   </div>
