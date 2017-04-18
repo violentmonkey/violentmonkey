@@ -4,10 +4,6 @@ extName:
 extDescription:
   description: Description for this extension.
   message: Proporciona soporte de scripts para navegadores
-extTranslator:
-  description: Information of the translator.
-  message: Greydus
-  touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: ¡Script actualizado!
@@ -161,10 +157,6 @@ labelCurrentLang:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Editor de Scripts
-buttonCustomMeta:
-  description: Button to edit the custom meta data of a script.
-  message: Metadatos personalizados
-  touched: false
 labelName:
   description: Label of script name.
   message: '@name:'
@@ -186,38 +178,14 @@ labelDownloadURL:
 labelInclude:
   description: Label of @include rules.
   message: '@include:'
-labelKeepInclude:
-  description: Option to keep the original @include rules.
-  message: Mantener reglas @include predeterminadas
-labelCustomInclude:
-  description: Label of custom @include rules.
-  message: 'Reglas @include personalizadas: <em>(Uno por linea)</em>'
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match:'
-labelKeepMatch:
-  description: Option to keep the original @match rules.
-  message: Mantener reglas @match pedeterminadas
-labelCustomMatch:
-  description: Label of custom @match rules.
-  message: 'Reglas @match personalizadas: <em>(Uno por linea)</em>'
-  touched: false
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude:'
-labelKeepExclude:
-  description: Option to keep the original @exclude rules.
-  message: Mantener reglas @exclude predeterminadas
-labelCustomExclude:
-  description: Label of custom @exclude rules.
-  message: 'Reglas @exclude personalizadas: <em>(Uno por linea)</em>'
-  touched: false
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
-labelKeepExcludeMatch:
-  description: Label of custom @exclude-match rules.
   message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
@@ -355,10 +323,6 @@ msgSavedBlacklist:
 labelGeneral:
   description: Label for general settings.
   message: General
-labelSyncSettings:
-  description: Label for sync settings.
-  message: Sincronización
-  touched: false
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Estado de la sincronización de scripts
@@ -420,4 +384,7 @@ editLabelSettings:
   message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
+  message: Metadatos personalizados
+labelKeepOriginal:
+  description: Option to keep the original match or ignore rules.
   message: ''

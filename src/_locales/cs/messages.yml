@@ -4,10 +4,6 @@ extName:
 extDescription:
   description: Description for this extension.
   message: ''
-extTranslator:
-  description: Information of the translator.
-  message: ahoj1234; nfsmaniac
-  touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Skript aktualizován.
@@ -163,10 +159,6 @@ labelCurrentLang:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Úprava skriptu
-buttonCustomMeta:
-  description: Button to edit the custom meta data of a script.
-  message: Vlastní metadata
-  touched: false
 labelName:
   description: Label of script name.
   message: 'Jméno:'
@@ -188,38 +180,14 @@ labelDownloadURL:
 labelInclude:
   description: Label of @include rules.
   message: Zahrnout
-labelKeepInclude:
-  description: Option to keep the original @include rules.
-  message: Dodržovat původní zahrnutí
-labelCustomInclude:
-  description: Label of custom @include rules.
-  message: 'Vlastní pravidla pro zahrnování: <em>(Jedno na řádek)</em>'
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Přiřazení
-labelKeepMatch:
-  description: Option to keep the original @match rules.
-  message: Dodržovat původní přiřazení
-labelCustomMatch:
-  description: Label of custom @match rules.
-  message: 'Vlastní pravidla pro přiřazení: <em>(Jedno na řádek)</em>'
-  touched: false
 labelExclude:
   description: Label of @exclude rules.
   message: Výjimky
-labelKeepExclude:
-  description: Option to keep the original @exclude rules.
-  message: Dodržovat původní výjimky
-labelCustomExclude:
-  description: Label of custom @exclude rules.
-  message: 'Vlastní pravidla pro výjimky: <em>(Jedno na řádek)</em>'
-  touched: false
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
-labelKeepExcludeMatch:
-  description: Label of custom @exclude-match rules.
   message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
@@ -353,10 +321,6 @@ msgSavedBlacklist:
 labelGeneral:
   description: Label for general settings.
   message: ''
-labelSyncSettings:
-  description: Label for sync settings.
-  message: ''
-  touched: false
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: ''
@@ -416,4 +380,7 @@ editLabelSettings:
   message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
+  message: Vlastní metadata
+labelKeepOriginal:
+  description: Option to keep the original match or ignore rules.
   message: ''

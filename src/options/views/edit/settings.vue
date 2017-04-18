@@ -43,7 +43,7 @@
         <span class="flex-auto" v-text="i18n('labelInclude')"></span>
         <label>
           <input type="checkbox" v-model="custom.origInclude">
-          <span v-text="i18n('labelKeepInclude')"></span>
+          <span v-text="i18n('labelKeepOriginal')"></span>
         </label>
       </div>
       <textarea v-model="custom.include"></textarea>
@@ -54,7 +54,7 @@
         <span class="flex-auto" v-text="i18n('labelMatch')"></span>
         <label>
           <input type="checkbox" v-model="custom.origMatch">
-          <span v-text="i18n('labelKeepMatch')"></span>
+          <span v-text="i18n('labelKeepOriginal')"></span>
         </label>
       </div>
       <textarea v-model="custom.match"></textarea>
@@ -65,7 +65,7 @@
         <span class="flex-auto" v-text="i18n('labelExclude')"></span>
         <label>
           <input type="checkbox" v-model="custom.origExclude">
-          <span v-text="i18n('labelKeepExclude')"></span>
+          <span v-text="i18n('labelKeepOriginal')"></span>
         </label>
       </div>
       <textarea v-model="custom.exclude"></textarea>
@@ -76,7 +76,7 @@
         <span class="flex-auto" v-text="i18n('labelExcludeMatch')"></span>
         <label>
           <input type="checkbox" v-model="custom.origExcludeMatch">
-          <span v-text="i18n('labelKeepExcludeMatch')"></span>
+          <span v-text="i18n('labelKeepOriginal')"></span>
         </label>
       </div>
       <textarea v-model="custom.excludeMatch"></textarea>

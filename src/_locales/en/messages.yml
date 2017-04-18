@@ -4,10 +4,6 @@ extName:
 extDescription:
   description: Description for this extension.
   message: Provide userscript support for browsers.
-extTranslator:
-  description: Information of the translator.
-  message: Gerald <i@gerald.top>
-  touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script updated.
@@ -161,10 +157,6 @@ labelCurrentLang:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Script Editor
-buttonCustomMeta:
-  description: Button to edit the custom meta data of a script.
-  message: Custom meta data
-  touched: false
 labelName:
   description: Label of script name.
   message: 'Name:'
@@ -186,39 +178,15 @@ labelDownloadURL:
 labelInclude:
   description: Label of @include rules.
   message: '@include rules'
-labelKeepInclude:
-  description: Option to keep the original @include rules.
-  message: Keep original
-labelCustomInclude:
-  description: Label of custom @include rules.
-  message: 'Custom include rules: <em>(One per line)</em>'
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match rules'
-labelKeepMatch:
-  description: Option to keep the original @match rules.
-  message: Keep original
-labelCustomMatch:
-  description: Label of custom @match rules.
-  message: 'Custom match rules: <em>(One per line)</em>'
-  touched: false
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude rules'
-labelKeepExclude:
-  description: Option to keep the original @exclude rules.
-  message: Keep original
-labelCustomExclude:
-  description: Label of custom @exclude rules.
-  message: 'Custom exclude rules: <em>(One per line)</em>'
-  touched: false
 labelExcludeMatch:
   description: Label of @exclude-match rules.
   message: '@exclude-match rules'
-labelKeepExcludeMatch:
-  description: Label of custom @exclude-match rules.
-  message: Keep original
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Allow update
@@ -351,10 +319,6 @@ msgSavedBlacklist:
 labelGeneral:
   description: Label for general settings.
   message: General
-labelSyncSettings:
-  description: Label for sync settings.
-  message: Settings
-  touched: false
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Sync script status
@@ -416,4 +380,7 @@ editLabelSettings:
   message: Script settings
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: Metadata
+  message: Custom metadata
+labelKeepOriginal:
+  description: Option to keep the original match or ignore rules.
+  message: Keep original

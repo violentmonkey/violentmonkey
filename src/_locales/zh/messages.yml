@@ -4,10 +4,6 @@ extName:
 extDescription:
   description: Description for this extension.
   message: 为浏览器提供用户脚本支持。
-extTranslator:
-  description: Information of the translator.
-  message: Gerald <i@gerald.top>
-  touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: 脚本已更新。
@@ -161,10 +157,6 @@ labelCurrentLang:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: 脚本编辑器
-buttonCustomMeta:
-  description: Button to edit the custom meta data of a script.
-  message: 自定义元数据
-  touched: false
 labelName:
   description: Label of script name.
   message: 名字：
@@ -186,39 +178,15 @@ labelDownloadURL:
 labelInclude:
   description: Label of @include rules.
   message: '@include 规则'
-labelKeepInclude:
-  description: Option to keep the original @include rules.
-  message: 保留原有规则
-labelCustomInclude:
-  description: Label of custom @include rules.
-  message: 自定义包含规则：<em>（每行一个）</em>
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match 规则'
-labelKeepMatch:
-  description: Option to keep the original @match rules.
-  message: 保留原有规则
-labelCustomMatch:
-  description: Label of custom @match rules.
-  message: 自定义匹配规则：<em>（每行一个）</em>
-  touched: false
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude 规则'
-labelKeepExclude:
-  description: Option to keep the original @exclude rules.
-  message: 保留原有规则
-labelCustomExclude:
-  description: Label of custom @exclude rules.
-  message: 自定义排除规则：<em>（每行一个）</em>
-  touched: false
 labelExcludeMatch:
   description: Label of @exclude-match rules.
   message: '@exclude-match 规则'
-labelKeepExcludeMatch:
-  description: Label of custom @exclude-match rules.
-  message: 保留原有规则
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: 允许更新
@@ -351,10 +319,6 @@ msgSavedBlacklist:
 labelGeneral:
   description: Label for general settings.
   message: 通用
-labelSyncSettings:
-  description: Label for sync settings.
-  message: 设置
-  touched: false
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: 同步脚本状态
@@ -414,4 +378,7 @@ editLabelSettings:
   message: 脚本设置
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: 元数据
+  message: 自定义元数据
+labelKeepOriginal:
+  description: Option to keep the original match or ignore rules.
+  message: 保留原有规则

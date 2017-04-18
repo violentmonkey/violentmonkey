@@ -4,10 +4,6 @@ extName:
 extDescription:
   description: Description for this extension.
   message: ''
-extTranslator:
-  description: Information of the translator.
-  message: '<a href="http://blog.scrobble.me">Adrian Moerchen</a>'
-  touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Das Skript wurde aktualisiert.
@@ -161,10 +157,6 @@ labelCurrentLang:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Editor
-buttonCustomMeta:
-  description: Button to edit the custom meta data of a script.
-  message: Eigene Metadaten
-  touched: false
 labelName:
   description: Label of script name.
   message: 'Name:'
@@ -186,38 +178,14 @@ labelDownloadURL:
 labelInclude:
   description: Label of @include rules.
   message: Einschließen (@include)
-labelKeepInclude:
-  description: Option to keep the original @include rules.
-  message: Ursprüngliche Regeln beibehalten
-labelCustomInclude:
-  description: Label of custom @include rules.
-  message: 'Eigene @include-Regeln: <em>(Eine pro Zeile)</em>'
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Übereinstimmungen (@match)
-labelKeepMatch:
-  description: Option to keep the original @match rules.
-  message: Ursprüngliche Regeln beibehalten
-labelCustomMatch:
-  description: Label of custom @match rules.
-  message: 'Eigene @match-Regeln: <em>(Eine pro Zeile)</em>'
-  touched: false
 labelExclude:
   description: Label of @exclude rules.
   message: Ausschließen (@exclude)
-labelKeepExclude:
-  description: Option to keep the original @exclude rules.
-  message: Ursprüngliche Regeln beibehalten
-labelCustomExclude:
-  description: Label of custom @exclude rules.
-  message: 'Eigene @exclude-Regeln: <em>(Eine pro Zeile)</em>'
-  touched: false
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
-labelKeepExcludeMatch:
-  description: Label of custom @exclude-match rules.
   message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
@@ -351,10 +319,6 @@ msgSavedBlacklist:
 labelGeneral:
   description: Label for general settings.
   message: ''
-labelSyncSettings:
-  description: Label for sync settings.
-  message: ''
-  touched: false
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: ''
@@ -414,4 +378,7 @@ editLabelSettings:
   message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: ''
+  message: Eigene Metadaten
+labelKeepOriginal:
+  description: Option to keep the original match or ignore rules.
+  message: Ursprüngliche Regeln beibehalten

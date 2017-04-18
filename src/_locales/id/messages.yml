@@ -4,10 +4,6 @@ extName:
 extDescription:
   description: Description for this extension.
   message: ''
-extTranslator:
-  description: Information of the translator.
-  message: Arif Budiman <arifpedia@gmail.com>
-  touched: false
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script diperbarui.
@@ -161,10 +157,6 @@ labelCurrentLang:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Penyunting Script
-buttonCustomMeta:
-  description: Button to edit the custom meta data of a script.
-  message: Kustom meta data
-  touched: false
 labelName:
   description: Label of script name.
   message: 'Nama:'
@@ -186,38 +178,14 @@ labelDownloadURL:
 labelInclude:
   description: Label of @include rules.
   message: Penyertaan
-labelKeepInclude:
-  description: Option to keep the original @include rules.
-  message: Pertahankan aturan penyertaan asal
-labelCustomInclude:
-  description: Label of custom @include rules.
-  message: 'Aturan penyertaan kostum: <em>(Satu per baris)</em>'
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Kecocokan
-labelKeepMatch:
-  description: Option to keep the original @match rules.
-  message: Pertahankan aturan kecocokan asal
-labelCustomMatch:
-  description: Label of custom @match rules.
-  message: 'Aturan kecocokan kostum: <em>(Satu per baris)</em>'
-  touched: false
 labelExclude:
   description: Label of @exclude rules.
   message: Pengecualian
-labelKeepExclude:
-  description: Option to keep the original @exclude rules.
-  message: Pertahankan aturan pengecualian asal
-labelCustomExclude:
-  description: Label of custom @exclude rules.
-  message: 'Aturan pengecualian kostum: <em>(Satu per baris)</em>'
-  touched: false
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
-labelKeepExcludeMatch:
-  description: Label of custom @exclude-match rules.
   message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
@@ -353,10 +321,6 @@ msgSavedBlacklist:
 labelGeneral:
   description: Label for general settings.
   message: ''
-labelSyncSettings:
-  description: Label for sync settings.
-  message: ''
-  touched: false
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: ''
@@ -416,4 +380,7 @@ editLabelSettings:
   message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
+  message: Kustom meta data
+labelKeepOriginal:
+  description: Option to keep the original match or ignore rules.
   message: ''
