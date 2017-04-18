@@ -105,6 +105,10 @@ gulp.task('svg', () => (
   .pipe(gulp.dest('dist/public'))
 ));
 
+/**
+ * Load locale files (src/_locales/<lang>/message.[json|yml]), and
+ * update them with keys in template files, then store in `message.yml`.
+ */
 gulp.task('i18n', () => (
   gulp.src(paths.templates)
   .pipe(i18n.extract({

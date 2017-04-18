@@ -10,49 +10,43 @@ function readFile(file) {
   });
 }
 
-function Locale(lang, _path, base) {
+const transformers = {
+  '.yml': data => yaml.safeLoad(data),
+  '.json': data => JSON.parse(data),
+};
+
+function Locale(lang, basepath, basedir) {
   this.lang = lang;
-  const ext = this.ext = path.extname(_path);
-  if (ext) _path = _path.slice(0, -ext.length);
-  this.path = _path;
-  this.base = base || '.';
+  const ext = path.extname(basepath);
+  if (ext) {
+    console.warn(`Extension name is ignored in basepath: ${basepath}`);
+    basepath = basepath.slice(0, -ext.length);
+  }
+  this.basepath = basepath;
+  this.basedir = basedir || '.';
   this.data = {};
   this.loaded = this.load();
 }
 Locale.prototype.extensions = ['.yml', '.json'];
 Locale.prototype.load = function () {
-  const file = this.base + '/' + this.path;
-  return (
-    this.ext
-    ? readFile(file + this.ext)
-    : this.extensions.reduce((promise, ext) => promise.catch(() => (
-      readFile(file + ext)
-      .then(data => {
-        this.ext = ext;
-        return data;
-      })
-    )), Promise.reject())
-  ).then(data => {
-    const desc = {};
-    if (this.ext === '.json') {
-      data = JSON.parse(data);
-    } else if (this.ext === '.yml') {
-      data = yaml.safeLoad(data);
-    } else {
-      throw 'Unknown extension name!';
-    }
-    for (let key in data) {
-      this.data[key] = data[key].message;
-      desc[key] = data[key].description;
-    }
+  const file = `${this.basedir}/${this.basepath}`;
+  const data = {};
+  return this.extensions.reduceRight((promise, ext) => promise.then(() =>
+    readFile(file + ext)
+    .then(res => {
+      Object.assign(data, transformers[ext](res));
+    }, err => {})
+  ), Promise.resolve())
+  .then(() => Object.keys(data).reduce((desc, key) => {
+    this.data[key] = data[key].message;
+    desc[key] = data[key].description;
     return desc;
-  });
+  }, {}));
 };
 Locale.prototype.get = function (key, def) {
   return this.data[key] || def;
 };
 Locale.prototype.dump = function (data, ext) {
-  ext = ext || this.ext;
   if (ext === '.json') {
     data = JSON.stringify(data, null, 2);
   } else if (ext === '.yml') {
@@ -61,7 +55,7 @@ Locale.prototype.dump = function (data, ext) {
     throw 'Unknown extension name!';
   }
   return {
-    path: this.path + ext,
+    path: this.basepath + ext,
     data,
   };
 };
@@ -89,14 +83,15 @@ Locales.prototype.load = function () {
       const locale = this.data[lang] = new Locale(lang, `${this.prefix}/${lang}/messages`, this.base);
       return locale.loaded;
     }));
-  }).then(data => {
+  })
+  .then(data => {
     const desc = data[this.langs.indexOf(this.defaultLang)];
-    for (let key in desc) {
+    Object.keys(desc).forEach(key => {
       this.desc[key] = {
         touched: false,
         value: desc[key],
       };
-    }
+    });
   });
 };
 Locales.prototype.getData = function (lang, options) {
