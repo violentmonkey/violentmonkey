@@ -33,13 +33,9 @@ hr {
   border: none;
   border-top: 1px solid darkgray;
 }
-fieldset {
-  padding: .3rem;
-  margin-top: .5rem;
-  border: 1px solid silver;
-  textarea {
-    height: 5em;
-  }
+textarea {
+  display: block;
+  width: 100%;
 }
 
 .pull-left {

@@ -164,6 +164,4 @@ export default {
 };
 </script>
 
-<style>
-@import '../style.css';
-</style>
+<style src="../style.css"></style>

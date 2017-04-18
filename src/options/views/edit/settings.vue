@@ -132,8 +132,7 @@ export default {
     flex: 1;
   }
   > textarea {
-    display: block;
-    width: 100%;
+    min-height: 5em;
   }
   > .hint {
     display: none;
@@ -160,9 +159,6 @@ export default {
   }
   &:hover > .hint {
     display: block;
-  }
-  > textarea {
-    min-height: 5em;
   }
 }
 </style>
