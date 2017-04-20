@@ -3,7 +3,7 @@ const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const base = require('./webpack.base.conf');
-const IS_DEV = process.env.NODE_ENV === 'development';
+const { IS_DEV } = require('./utils');
 
 const targets = module.exports = [];
 

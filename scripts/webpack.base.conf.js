@@ -1,10 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const vueLoaderConfig = require('./vue-loader.conf');
-const utils = require('./utils');
+const { IS_DEV, styleRule } = require('./utils');
 const DIST = 'dist';
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-const IS_DEV = process.env.NODE_ENV === 'development';
 const definePlugin = new webpack.DefinePlugin({
   'process.env': {
     NODE_ENV: JSON.stringify(process.env.NODE_ENV),
@@ -57,10 +55,8 @@ module.exports = {
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test')]
       },
-    ].concat(utils.styleLoaders({
-      sourceMap: false,
-      extract: !IS_DEV,
-    })),
+      styleRule({ fallback: 'vue-style-loader' }),
+    ],
   },
   // cheap-module-eval-source-map is faster for development
   devtool: IS_DEV ? '#inline-source-map' : false,

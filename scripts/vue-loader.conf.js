@@ -1,10 +1,8 @@
-const utils = require('./utils');
-const isProduction = process.env.NODE_ENV === 'production';
+const { styleLoader } = require('./utils');
 
 module.exports = {
-  loaders: utils.cssLoaders({
-    sourceMap: false,
-    extract: isProduction,
-  }),
+  loaders: {
+    css: styleLoader({ fallback: 'vue-style-loader' }),
+  },
   postcss: [ require('precss') ],
 };
