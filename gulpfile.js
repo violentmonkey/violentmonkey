@@ -1,7 +1,6 @@
 const del = require('del');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
-const concat = require('gulp-concat');
 const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const svgSprite = require('gulp-svg-sprite');
@@ -9,6 +8,7 @@ const webpack = require('webpack');
 const i18n = require('./scripts/i18n');
 const json = require('./scripts/json');
 const pkg = require('./package.json');
+
 const isProd = process.env.NODE_ENV === 'production';
 const webpackConfig = require('./scripts/webpack.conf');
 
@@ -60,7 +60,7 @@ gulp.task('js-dev', () => webpack(webpackConfig).watch({}, webpackCallback));
 gulp.task('js-prd', () => webpack(webpackConfig, webpackCallback));
 
 gulp.task('manifest', () => (
-  gulp.src(paths.manifest, {base: 'src'})
+  gulp.src(paths.manifest, { base: 'src' })
   .pipe(json(data => {
     data.version = pkg.version.replace(/-[^.]*/, '');
     return data;
@@ -69,13 +69,13 @@ gulp.task('manifest', () => (
 ));
 
 gulp.task('copy-files', () => {
-  const jsFilter = gulpFilter(['**/*.js'], {restore: true});
-  let stream = gulp.src(paths.copy, {base: 'src'});
+  const jsFilter = gulpFilter(['**/*.js'], { restore: true });
+  let stream = gulp.src(paths.copy, { base: 'src' });
   if (isProd) stream = stream
   .pipe(jsFilter)
   .pipe(uglify())
   .pipe(jsFilter.restore);
-  stream = stream
+  return stream
   .pipe(gulp.dest('dist/'));
 });
 

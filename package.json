@@ -33,7 +33,6 @@
     "extract-text-webpack-plugin": "^2.1.0",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.0",
     "gulp-filter": "^5.0.0",
     "gulp-svg-sprite": "^1.2.19",
     "gulp-uglify": "^2.0.0",
@@ -65,7 +64,6 @@
   "dependencies": {
     "codemirror": "^5.25.0",
     "core-js": "^2.4.1",
-    "define-commonjs": "^1.1.2",
     "sync-promise-lite": "^0.2.3",
     "vue": "^2.2.5"
   }
