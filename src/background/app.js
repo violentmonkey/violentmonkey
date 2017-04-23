@@ -173,9 +173,7 @@ const commands = {
       url: data.url,
       active: data.active,
     })
-    .then(tab => ({
-      id: tab.id,
-    }));
+    .then(tab => ({ id: tab.id }));
   },
   TabClose(data, src) {
     const tabId = data && (data.id || (src.tab && src.tab.id));

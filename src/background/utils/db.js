@@ -352,20 +352,19 @@ export function setValue(uri, values) {
 }
 
 export function updateScriptInfo(id, data, custom) {
-  const os = db.transaction('scripts', 'readwrite').objectStore('scripts');
-  return new Promise((resolve, reject) => {
-    os.get(id).onsuccess = e => {
-      const { result: script } = e.target;
-      if (!script) return reject();
-      Object.keys(data).forEach(key => {
-        if (key in script) script[key] = data[key];
-      });
-      Object.assign(script.custom, custom);
-      os.put(script).onsuccess = () => {
-        resolve(getScriptInfo(script));
-      };
+  const tx = db.transaction('scripts', 'readwrite');
+  const os = tx.objectStore('scripts');
+  return getScript(id, tx)
+  .then(script => new Promise((resolve, reject) => {
+    if (!script) return reject();
+    Object.keys(data).forEach(key => {
+      if (key in script) script[key] = data[key];
+    });
+    Object.assign(script.custom, custom);
+    os.put(script).onsuccess = () => {
+      resolve(getScriptInfo(script));
     };
-  });
+  }));
 }
 
 export function getExportData(ids, withValues) {
@@ -547,7 +546,7 @@ export function parseScript(data) {
 }
 
 function initPosition() {
-  const os = db.transaction('scripts', 'readwrite').objectStore('scripts');
+  const os = db.transaction('scripts').objectStore('scripts');
   return new Promise(resolve => {
     os.index('position').openCursor(null, 'prev').onsuccess = e => {
       const { result } = e.target;
@@ -558,12 +557,12 @@ function initPosition() {
 }
 
 export function checkPosition(start) {
-  const tx = db.transaction('scripts', 'readwrite');
-  const os = tx.objectStore('scripts');
   let offset = Math.max(1, start || 0);
   const updates = [];
   let changed;
   if (!position.checking) {
+    const tx = db.transaction('scripts', 'readwrite');
+    const os = tx.objectStore('scripts');
     position.checking = new Promise(resolve => {
       os.index('position').openCursor(start).onsuccess = e => {
         const cursor = e.target.result;
@@ -581,6 +580,19 @@ export function checkPosition(start) {
     .then(() => {
       changed = updates.length;
       return update();
+      function update() {
+        const item = updates.shift();
+        if (item) {
+          return new Promise(resolve => {
+            os.get(item.id).onsuccess = e => {
+              const { result } = e.target;
+              result.position = item.position;
+              os.put(result).onsuccess = () => { resolve(); };
+            };
+          })
+          .then(update);
+        }
+      }
     })
     .then(() => {
       browser.runtime.sendMessage({
@@ -591,17 +603,4 @@ export function checkPosition(start) {
     .then(() => changed);
   }
   return position.checking;
-  function update() {
-    const item = updates.shift();
-    if (item) {
-      return new Promise(resolve => {
-        os.get(item.id).onsuccess = e => {
-          const { result } = e.target;
-          result.position = item.position;
-          os.put(result).onsuccess = () => { resolve(); };
-        };
-      })
-      .then(update);
-    }
-  }
 }
