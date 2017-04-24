@@ -3,22 +3,22 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: ''
+  message: Menyediakan dukungan skrip pengguna untuk peramban.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Script diperbarui.
+  message: Skrip telah diperbarui.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Kesalahan saat mengambil script!
+  message: Kesalahan saat mengambil skrip!
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Script dipasang.
+  message: Skrip telah terpasang.
 Warning:
   description: Show warnings with a notification.
   message: Peringatan
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
-  message: 'Script [$1] tidak memiliki baris `@grant`! Klik untuk melihat lebih rinci.'
+  message: 'Skrip [$1] tidak memiliki baris `@grant`! Klik untuk melihat lebih rinci.'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Tanpa nama
@@ -29,7 +29,7 @@ msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Versi baru ditemukan.
+  message: Ditemukan versi baru
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: Memeriksa pembaruan...
@@ -41,7 +41,7 @@ msgNoUpdate:
   message: Tidak ada pembaruan ditemukan.
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Memasang script
+  message: Memasang skrip
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Opsi
@@ -61,12 +61,12 @@ msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Kesalahan memuat data script.
+  message: Kesalahan memuat data skrip.
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: Data script dimuat.
+  message: Data skrip telah dimuat.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
   message: Kesalahan memuat dependensi.
@@ -75,10 +75,10 @@ msgLoadingDependency:
   message: Memuat dependensi... ($1/$2)
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Memuat data script...
+  message: Memuat data skrip...
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: Script terpasang
+  message: Skrip terpasang
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Pengaturan
@@ -93,7 +93,7 @@ buttonUpdateAll:
   message: Periksa semua pembaruan
 anchorGetMoreScripts:
   description: Link to get more scripts.
-  message: Dapatkan lebih banyak script
+  message: Dapatkan lebih banyak skrip
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Memuat ...
@@ -102,7 +102,7 @@ labelSettings:
   message: Pengaturan
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Periksa script untuk pembaruan secara otomatis setiap hari
+  message: Periksa pembaruan skrip secara otomatis setiap hari
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
   message: Menekan tanpa peringatan @grant
@@ -120,7 +120,7 @@ labelDataExport:
   message: Ekspor Data
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Ekspor data script
+  message: Ekspor data skrip
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Semua/Tidak Satupun
@@ -156,7 +156,7 @@ labelCurrentLang:
   message: 'Bahasa Saat Ini: '
 labelScriptEditor:
   description: Shown in the title of the script editing page.
-  message: Penyunting Script
+  message: Penyunting Skrip
 labelName:
   description: Label of script name.
   message: 'Nama:'
@@ -186,7 +186,7 @@ labelExclude:
   message: Pengecualian
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: Aturan @exclude-match
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Izinkan pembaruan
@@ -198,7 +198,7 @@ buttonSaveClose:
   message: Simpan & Tutup
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'Yaah, Anda tidak memiliki script satupun.'
+  message: 'Yaah, Anda tidak memiliki skrip satupun.'
 buttonDisable:
   description: Button to disable a script.
   message: Nonaktifkan
@@ -240,13 +240,13 @@ hintVacuum:
     cache.
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Temukan script untuk situs ini
+  message: Temukan skrip untuk situs ini
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Script diaktifkan
+  message: Skrip diaktifkan
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Script dinonaktifkan
+  message: Skrip dinonaktifkan
 menuCommands:
   description: Menu item to list script commands.
   message: Perintah script
@@ -264,7 +264,7 @@ buttonReplaceAll:
   message: Semua
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Muat ulang tab saat ini setelah memilih hidupkan/matikan script dari menu
+  message: Muat ulang tab saat ini setelah memilih hidupkan/matikan skrip dari menu
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Masukkan URL:'
@@ -296,88 +296,90 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Namespace script konflik! Silakan ubah @name dan @namespace.
+  message: Namespace skrip konflik! Mohon ubah @name dan @namespace.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Script tidak valid!
+  message: Skrip tidak valid!
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: ''
+  message: Tampilkan jumlah skrip yang berjalan di lencana
 labelLineNumber:
   description: Label for line number jumper.
-  message: ''
+  message: 'No. Baris:'
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: ''
+  message: Daftar hitam
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: ''
+  message: URL yang cocok dengan daftar ini tidak akan diinjeksi oleh skrip.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: ''
+  message: Simpan
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: ''
+  message: Daftar hitam diperbarui.
 labelGeneral:
   description: Label for general settings.
-  message: ''
+  message: Umum
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: ''
+  message: Status sinkron skrip
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: ''
+  message: Tanpa
 labelSyncService:
   description: Label for sync service select.
-  message: ''
+  message: Sinkron ke
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: ''
+  message: Izinkan
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: ''
+  message: Cabut
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: ''
+  message: Mengizinkan
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: ''
+  message: Gaya kustom diperbarui.
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: ''
+  message: Gaya Kustom
 descCustomCSS:
   description: Description of custom CSS section.
-  message: ''
+  message: >-
+    CSS Kustom untuk halaman opsi dan halaman pemasangan skrip. Jika Anda tidak
+    yakin untuk apa ini, mohon jangan menyuntingnya.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: ''
+  message: Simpan
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: Buka Dasbor
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: ''
+  message: Skrip yang cocok
 buttonOK:
   description: OK button on dialog.
-  message: ''
+  message: OKE
 buttonCancel:
   description: Cancel button on dialog.
-  message: ''
+  message: Batal
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: Impor pengaturan
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: Pelajari lebih lanjut tantang pola daftar hitam.
 editNavCode:
   description: Label of code tab in script editor.
-  message: ''
+  message: Kode
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: ''
+  message: Pengaturan
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: Pengaturan skrip
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Kustom meta data

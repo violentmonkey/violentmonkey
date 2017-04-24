@@ -31,7 +31,7 @@ Locale.prototype.extensions = ['.yml', '.json'];
 Locale.prototype.load = function () {
   const file = `${this.basedir}/${this.basepath}`;
   const data = {};
-  return this.extensions.reduceRight((promise, ext) => promise.then(() =>
+  return this.extensions.reduce((promise, ext) => promise.then(() =>
     readFile(file + ext)
     .then(res => {
       Object.assign(data, transformers[ext](res));
