@@ -1,8 +1,11 @@
 <template>
-  <div class="editor-code"></div>
+  <vue-code class="editor-code" ref="code"
+    :options="cmOptions" v-model="content" @ready="onReady"
+  />
 </template>
 
 <script>
+import VueCode from 'vue-code';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/eclipse.css';
 import 'codemirror/mode/javascript/javascript';
@@ -41,56 +44,65 @@ function indentWithTab(cm) {
   CodeMirror.commands[key] = getHandler(key);
 });
 
+const cmOptions = {
+  continueComments: true,
+  matchBrackets: true,
+  autoCloseBrackets: true,
+  highlightSelectionMatches: true,
+  lineNumbers: true,
+  mode: 'javascript',
+  lineWrapping: true,
+  styleActiveLine: true,
+  foldGutter: true,
+  gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+  theme: 'eclipse',
+};
+
 export default {
   props: [
     'readonly',
-    'content',
+    'value',
     'commands',
   ],
-  mounted() {
-    const cm = CodeMirror(this.$el, {
-      continueComments: true,
-      matchBrackets: true,
-      autoCloseBrackets: true,
-      highlightSelectionMatches: true,
-      lineNumbers: true,
-      mode: 'javascript',
-      lineWrapping: true,
-      styleActiveLine: true,
-      foldGutter: true,
-      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-      theme: 'eclipse',
-    });
-    this.cm = cm;
-    if (this.readonly) cm.setOption('readOnly', true);
-    cm.on('change', () => {
-      this.cachedContent = cm.getValue();
-      this.$emit('change', this.cachedContent);
-    });
-    cm.state.commands = this.commands;
-    cm.setOption('extraKeys', {
-      Esc: 'cancel',
-      Tab: indentWithTab,
-    });
-    cm.on('keyHandled', (_cm, _name, e) => {
-      e.stopPropagation();
-    });
-    this.setContent(this.content);
-    this.$emit('ready', cm);
+  components: {
+    VueCode,
+  },
+  data() {
+    return {
+      content: this.value,
+      cmOptions,
+    };
   },
   watch: {
-    content: 'setContent',
+    content(content) {
+      this.$emit('input', content);
+    },
+    value(value) {
+      if (value === this.content) return;
+      this.content = value;
+      const { cm } = this;
+      if (!cm) return;
+      cm.getDoc().clearHistory();
+      cm.focus();
+    },
+  },
+  mounted() {
+    // XXX vue-code does not emit `ready` in v1.2.0, call it directly
+    if (!this.cm) this.onReady(this.$refs.code.cm);
   },
   methods: {
-    setContent(content) {
-      if (content !== this.cachedContent) {
-        this.cachedContent = content;
-        const { cm } = this;
-        if (!cm) return;
-        cm.setValue(content);
-        cm.getDoc().clearHistory();
-        cm.focus();
-      }
+    onReady(cm) {
+      this.cm = cm;
+      if (this.readonly != null) cm.setOption('readOnly', true);
+      cm.state.commands = this.commands;
+      cm.setOption('extraKeys', {
+        Esc: 'cancel',
+        Tab: indentWithTab,
+      });
+      cm.on('keyHandled', (_cm, _name, e) => {
+        e.stopPropagation();
+      });
+      this.$emit('ready', cm);
     },
   },
 };

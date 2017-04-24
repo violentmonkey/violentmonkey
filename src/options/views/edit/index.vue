@@ -14,10 +14,8 @@
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
-        v-show="nav === 'code'"
-        class="abs-full"
-        :content="code" :commands="commands"
-        @change="contentChange" @ready="initEditor"
+        v-show="nav === 'code'" class="abs-full"
+        v-model="code" :commands="commands" @ready="initEditor"
       />
       <vm-settings
         v-show="nav === 'settings'" class="abs-full"
@@ -148,6 +146,9 @@ export default {
     };
   },
   watch: {
+    code() {
+      this.canSave = true;
+    },
     settings: {
       deep: true,
       handler() {
@@ -265,13 +266,8 @@ export default {
     saveClose() {
       this.save().then(this.close);
     },
-    contentChange(code) {
-      this.code = code;
-      this.canSave = true;
-    },
     initEditor(cm) {
       this.cm = cm;
-      this.bindKeys();
     },
     find() {
       const { state } = this.search;

@@ -24,7 +24,7 @@
       <div class="ellipsis confirm-msg" v-text="message"></div>
     </div>
     <div class="frame-block flex-auto pos-rel">
-      <vm-code class="abs-full" readonly :content="code" :commands="commands" />
+      <vm-code class="abs-full" readonly v-model="code" :commands="commands" />
     </div>
   </div>
 </template>
