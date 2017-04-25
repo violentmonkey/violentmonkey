@@ -15,7 +15,7 @@
       <item v-for="script in store.scripts" :key="script"
       :script="script" @edit="editScript" @move="moveScript"></item>
     </div>
-    <edit v-if="script" :script="script" @close="endEditScript"></edit>
+    <edit v-if="script" v-model="script" @close="endEditScript"></edit>
   </div>
 </template>
 

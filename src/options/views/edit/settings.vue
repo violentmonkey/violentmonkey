@@ -89,7 +89,7 @@
 import { i18n } from 'src/common';
 
 export default {
-  props: ['script', 'settings'],
+  props: ['value', 'settings'],
   computed: {
     custom() {
       return this.settings.custom || {};
@@ -98,12 +98,12 @@ export default {
       return this.settings.more || {};
     },
     placeholders() {
-      const { script } = this;
+      const { value } = this;
       return {
-        name: script.meta.name,
-        homepageURL: script.meta.homepageURL,
-        updateURL: script.meta.updateURL || i18n('hintUseDownloadURL'),
-        downloadURL: script.meta.downloadURL || script.lastInstallURL,
+        name: value.meta.name,
+        homepageURL: value.meta.homepageURL,
+        updateURL: value.meta.updateURL || i18n('hintUseDownloadURL'),
+        downloadURL: value.meta.downloadURL || value.lastInstallURL,
       };
     },
   },

@@ -19,7 +19,7 @@
       />
       <vm-settings
         v-show="nav === 'settings'" class="abs-full"
-        :script="script" :settings="settings"
+        :value="value" :settings="settings"
       />
     </div>
     <div class="frame-block" v-show="search.show">
@@ -105,7 +105,7 @@ function replaceAll(cm, state) {
 }
 
 export default {
-  props: ['script'],
+  props: ['value'],
   components: {
     VmCode,
     VmSettings,
@@ -161,10 +161,10 @@ export default {
   },
   mounted() {
     this.bindKeys();
-    (this.script.id ? sendMessage({
+    (this.value.id ? sendMessage({
       cmd: 'GetScript',
-      data: this.script.id,
-    }) : Promise.resolve(this.script))
+      data: this.value.id,
+    }) : Promise.resolve(this.value))
     .then(script => {
       const settings = {};
       settings.more = {
@@ -225,18 +225,19 @@ export default {
       return sendMessage({
         cmd: 'ParseScript',
         data: {
-          id: this.script.id,
+          id: this.value.id,
           code: this.code,
           // User created scripts MUST be marked `isNew` so that
-          // the backend is able to check namespace conflicts
-          isNew: !this.script.id,
+          // the backend is able to check namespace conflicts,
+          // otherwise the script with same namespace will be overridden
+          isNew: !this.value.id,
           message: '',
           custom: value,
           more,
         },
       })
       .then(script => {
-        this.script = script;
+        this.$emit('input', script);
         this.canSave = false;
       }, err => {
         showMessage({ text: err });
