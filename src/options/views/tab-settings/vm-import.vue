@@ -74,7 +74,9 @@ function getVMConfig(text) {
     }
   });
   if (options.get('importSettings')) {
+    const ignoreKeys = ['sync'];
     forEachItem(vm.settings, (value, key) => {
+      if (ignoreKeys.includes(key)) return;
       options.set(key, value);
     });
   }

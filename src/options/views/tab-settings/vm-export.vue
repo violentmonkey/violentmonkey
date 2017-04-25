@@ -107,6 +107,7 @@ function exportData(selectedIds) {
       scripts: {},
       settings: options.get(),
     };
+    delete vm.settings.sync;
     if (withValues) vm.values = {};
     const files = data.scripts.map((script) => {
       let name = script.custom.name || script.meta.name || 'Noname';

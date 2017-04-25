@@ -291,15 +291,16 @@ export const BaseService = serviceFactory({
     ]))
     .then(([remoteMeta, remoteData, localData]) => {
       const remoteMetaInfo = remoteMeta.info || {};
-      let remoteChanged = !remoteMeta.timestamp
+      const remoteTimestamp = remoteMeta.timestamp || 0;
+      let remoteChanged = !remoteTimestamp
         || Object.keys(remoteMetaInfo).length !== remoteData.length;
       const now = Date.now();
       const remoteItemMap = {};
       const localMeta = this.config.get('meta', {});
       const firstSync = !localMeta.timestamp;
-      const outdated = !localMeta.timestamp || remoteMeta.timestamp > localMeta.timestamp;
+      const outdated = firstSync || remoteTimestamp > localMeta.timestamp;
       this.log('First sync:', firstSync);
-      this.log('Outdated:', outdated, '(', 'local:', localMeta.timestamp, 'remote:', remoteMeta.timestamp, ')');
+      this.log('Outdated:', outdated, '(', 'local:', localMeta.timestamp, 'remote:', remoteTimestamp, ')');
       const getRemote = [];
       const putRemote = [];
       const delRemote = [];
@@ -331,7 +332,7 @@ export const BaseService = serviceFactory({
             remoteChanged = true;
           }
           delete remoteItemMap[item.uri];
-        } else if (firstSync || !outdated) {
+        } else if (firstSync || !outdated || item.custom.modified > remoteTimestamp) {
           putRemote.push(item);
         } else {
           delLocal.push(item);
