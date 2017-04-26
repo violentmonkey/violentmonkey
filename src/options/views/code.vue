@@ -1,5 +1,5 @@
 <template>
-  <vue-code class="editor-code" ref="code"
+  <vue-code class="editor-code"
     :options="cmOptions" v-model="content" @ready="onReady"
   />
 </template>
@@ -85,10 +85,6 @@ export default {
       cm.getDoc().clearHistory();
       cm.focus();
     },
-  },
-  mounted() {
-    // XXX vue-code does not emit `ready` in v1.2.0, call it directly
-    if (!this.cm) this.onReady(this.$refs.code.cm);
   },
   methods: {
     onReady(cm) {
