@@ -3,132 +3,141 @@ const path = require('path');
 const gutil = require('gulp-util');
 const through = require('through2');
 const yaml = require('js-yaml');
+const promisify = require('es6-promisify');
 
-function readFile(file) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(file, 'utf8', (err, data) => err ? reject(err) : resolve(data));
-  });
-}
+const readFile = promisify(fs.readFile);
+const readdir = promisify(fs.readdir);
 
 const transformers = {
   '.yml': data => yaml.safeLoad(data),
   '.json': data => JSON.parse(data),
 };
 
-function Locale(lang, basepath, basedir) {
-  this.lang = lang;
-  const ext = path.extname(basepath);
-  if (ext) {
-    console.warn(`Extension name is ignored in basepath: ${basepath}`);
-    basepath = basepath.slice(0, -ext.length);
+class Locale {
+  constructor(lang, basepath, basedir) {
+    this.defaultLocale = 'messages.yml';
+    this.lang = lang;
+    this.basepath = basepath;
+    this.basedir = basedir || '.';
+    this.data = {};
+    this.loaded = this.load();
   }
-  this.basepath = basepath;
-  this.basedir = basedir || '.';
-  this.data = {};
-  this.loaded = this.load();
-}
-Locale.prototype.extensions = ['.yml', '.json'];
-Locale.prototype.load = function () {
-  const file = `${this.basedir}/${this.basepath}`;
-  const data = {};
-  return this.extensions.reduce((promise, ext) => promise.then(() =>
-    readFile(file + ext)
-    .then(res => {
-      Object.assign(data, transformers[ext](res));
-    }, err => {})
-  ), Promise.resolve())
-  .then(() => Object.keys(data).reduce((desc, key) => {
-    this.data[key] = data[key].message;
-    desc[key] = data[key].description;
-    return desc;
-  }, {}));
-};
-Locale.prototype.get = function (key, def) {
-  return this.data[key] || def;
-};
-Locale.prototype.dump = function (data, ext) {
-  if (ext === '.json') {
-    data = JSON.stringify(data, null, 2);
-  } else if (ext === '.yml') {
-    data = yaml.safeDump(data);
-  } else {
-    throw 'Unknown extension name!';
-  }
-  return {
-    path: this.basepath + ext,
-    data,
-  };
-};
 
-function Locales(prefix, base) {
-  this.prefix = prefix || '.';
-  this.base = base || '.';
-  this.langs = [];
-  this.data = {};
-  this.desc = {};
-  this.loaded = this.load();
-}
-Locales.prototype.defaultLang = 'en';
-Locales.prototype.newLocaleItem = 'NEW_LOCALE_ITEM';
-Locales.prototype.getLanguages = function () {
-  const localeDir = this.base + '/' + this.prefix;
-  return new Promise((resolve, reject) => {
-    fs.readdir(localeDir, (err, files) => err ? reject(err) : resolve(files));
-  });
-};
-Locales.prototype.load = function () {
-  return this.getLanguages().then(langs => {
-    this.langs = langs;
-    return Promise.all(langs.map(lang => {
-      const locale = this.data[lang] = new Locale(lang, `${this.prefix}/${lang}/messages`, this.base);
-      return locale.loaded;
-    }));
-  })
-  .then(data => {
-    const desc = data[this.langs.indexOf(this.defaultLang)];
-    Object.keys(desc).forEach(key => {
-      this.desc[key] = {
-        touched: false,
-        value: desc[key],
-      };
-    });
-  });
-};
-Locales.prototype.getData = function (lang, options) {
-  options = options || {};
-  const data = {};
-  const langData = this.data[lang];
-  const defaultData = options.useDefaultLang && lang != this.defaultLang && this.data[this.defaultLang];
-  for (let key in this.desc) {
-    if (options.touchedOnly && !this.desc[key].touched) continue;
-    data[key] = {
-      description: this.desc[key].value || this.newLocaleItem,
-      message: langData.get(key) || defaultData && defaultData.get(key) || '',
-    };
-    if (options.markUntouched && !this.desc[key].touched)
-      data[key].touched = false;
+  load() {
+    const localeDir = `${this.basedir}/${this.basepath}`;
+    const data = {};
+    return readdir(localeDir)
+    .then(files => [this.defaultLocale].concat(files.filter(file => file !== this.defaultLocale)))
+    .then(files => files.reduce((promise, file) => promise.then(() => {
+      const ext = path.extname(file);
+      const transformer = transformers[ext];
+      if (transformer) {
+        return readFile(`${localeDir}/${file}`, 'utf8')
+        .then(res => { Object.assign(data, transformer(res)); }, err => {});
+      }
+    }), Promise.resolve()))
+    .then(() => Object.keys(data).reduce((desc, key) => {
+      this.data[key] = data[key].message;
+      desc[key] = desc[key] || data[key].description;
+      return desc;
+    }, {}));
   }
-  return data;
-};
-Locales.prototype.dump = function (options) {
-  return this.langs.map(lang => {
-    const data = this.getData(lang, options);
-    const locale = this.data[lang];
-    const out = locale.dump(data, options.extension);
-    return new gutil.File({
-      base: '',
-      path: out.path,
-      contents: new Buffer(out.data),
+
+  get(key, def) {
+    return this.data[key] || def;
+  }
+
+  dump(data, ext) {
+    if (ext === '.json') {
+      data = JSON.stringify(data, null, 2);
+    } else if (ext === '.yml') {
+      data = yaml.safeDump(data);
+    } else {
+      throw 'Unknown extension name!';
+    }
+    return {
+      path: `${this.basepath}/messages${ext}`,
+      data,
+    };
+  }
+}
+
+class Locales {
+  constructor(prefix, base) {
+    this.defaultLang = 'en';
+    this.newLocaleItem = 'NEW_LOCALE_ITEM';
+    this.prefix = prefix || '.';
+    this.base = base || '.';
+    this.langs = [];
+    this.data = {};
+    this.desc = {};
+    this.loaded = this.load();
+  }
+
+  getLanguages() {
+    const localeDir = this.base + '/' + this.prefix;
+    return new Promise((resolve, reject) => {
+      fs.readdir(localeDir, (err, files) => err ? reject(err) : resolve(files));
     });
-  });
-};
-Locales.prototype.touch = function (key) {
-  let item = this.desc[key];
-  if (!item) item = this.desc[key] = {
-    value: this.newLocaleItem,
-  };
-  item.touched = true;
-};
+  }
+
+  load() {
+    return readdir(`${this.base}/${this.prefix}`)
+    .then(langs => {
+      this.langs = langs;
+      return Promise.all(langs.map(lang => {
+        const locale = this.data[lang] = new Locale(lang, `${this.prefix}/${lang}`, this.base);
+        return locale.loaded;
+      }));
+    })
+    .then(data => {
+      const desc = data[this.langs.indexOf(this.defaultLang)];
+      Object.keys(desc).forEach(key => {
+        this.desc[key] = {
+          touched: false,
+          value: desc[key],
+        };
+      });
+    });
+  }
+
+  getData(lang, options) {
+    options = options || {};
+    const data = {};
+    const langData = this.data[lang];
+    const defaultData = options.useDefaultLang && lang != this.defaultLang && this.data[this.defaultLang];
+    Object.keys(this.desc).forEach(key => {
+      if (options.touchedOnly && !this.desc[key].touched) return;
+      data[key] = {
+        description: this.desc[key].value || this.newLocaleItem,
+        message: langData.get(key) || defaultData && defaultData.get(key) || '',
+      };
+      if (options.markUntouched && !this.desc[key].touched) data[key].touched = false;
+    });
+    return data;
+  }
+
+  dump(options) {
+    return this.langs.map(lang => {
+      const data = this.getData(lang, options);
+      const locale = this.data[lang];
+      const out = locale.dump(data, options.extension);
+      return new gutil.File({
+        base: '',
+        path: out.path,
+        contents: new Buffer(out.data),
+      });
+    });
+  }
+
+  touch(key) {
+    let item = this.desc[key];
+    if (!item) item = this.desc[key] = {
+      value: this.newLocaleItem,
+    };
+    item.touched = true;
+  }
+}
 
 function extract(options) {
   const keys = new Set();
