@@ -39,10 +39,11 @@ const routes = {
 window.addEventListener('hashchange', loadHash, false);
 loadHash();
 
-options.ready(() => new Vue({
-  el: '#app',
-  render: h => h(App),
-}));
+options.ready(() => {
+  new Vue({
+    render: h => h(App),
+  }).$mount('#app');
+});
 
 function parseLocation(pathInfo) {
   const [path, qs] = pathInfo.split('?');
