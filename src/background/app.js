@@ -30,7 +30,10 @@ function broadcast(data) {
 function checkUpdateAll() {
   setOption('lastUpdate', Date.now());
   vmdb.getScriptsByIndex('update', 1)
-  .then(scripts => Promise.all(scripts.map(checkUpdate)));
+  .then(scripts => Promise.all(scripts.map(checkUpdate)))
+  .then(updatedList => {
+    if (updatedList.some(Boolean)) sync.sync();
+  });
 }
 
 let autoUpdating;
@@ -132,7 +135,10 @@ const commands = {
     });
   },
   CheckUpdate(id) {
-    vmdb.getScript(id).then(checkUpdate);
+    vmdb.getScript(id).then(checkUpdate)
+    .then(updated => {
+      if (updated) sync.sync();
+    });
   },
   CheckUpdateAll: checkUpdateAll,
   ParseMeta(code) {

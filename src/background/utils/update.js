@@ -1,4 +1,4 @@
-import { i18n, request } from 'src/common';
+import { i18n, request, noop } from 'src/common';
 import { parseScript } from './db';
 import { parseMeta, compareVersion } from './script';
 
@@ -63,20 +63,23 @@ function doCheckUpdate(script) {
 export default function checkUpdate(script) {
   let promise = processes[script.id];
   if (!promise) {
+    let updated = false;
     promise = doCheckUpdate(script)
-    .then(code => {
-      delete processes[script.id];
-      return parseScript({
+    .then(code => (
+      parseScript({
         code,
         id: script.id,
       })
       .then(res => {
         res.data.checking = false;
         browser.runtime.sendMessage(res);
-      });
-    }, () => {
+        updated = true;
+      })
+    ))
+    .catch(noop)
+    .then(() => {
       delete processes[script.id];
-      // return Promise.reject();
+      return updated;
     });
     processes[script.id] = promise;
   }
