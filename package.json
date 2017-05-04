@@ -1,6 +1,6 @@
 {
   "name": "violentmonkey",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "scripts": {
     "dev": "gulp watch",
     "prebuild": "gulp clean",
