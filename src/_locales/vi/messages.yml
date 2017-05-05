@@ -346,8 +346,8 @@ labelCustomCSS:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Custom CSS for options page and script installation page. If you are not
-    sure what this is for, please do not edit it.
+    CSS tùy chỉnh cho trang tùy chọn và trang script đã cài đặt
+    Nếu không hiểu rõ xin đừng sửa.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Lưu
