@@ -3,7 +3,7 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: ''
+  message: Hỗ trợ chạy userscript trên trình duyệt.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Đã cập nhật script.
@@ -253,7 +253,7 @@ labelSearch:
   message: 'Tìm kiếm: '
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Replace with: '
+  message: 'Thay thế bằng: '
 buttonReplace:
   description: Button to replace the current match.
   message: Thay thế
@@ -297,88 +297,90 @@ msgNamespaceConflict:
   message: Xung đột namespace! Vui lòng sửa @name và @namespace.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: ''
+  message: Script không hợp lệ!
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: ''
+  message: Hiện thị số script đang chạy ở icon
 labelLineNumber:
   description: Label for line number jumper.
-  message: ''
+  message: 'Dòng số.: '
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: ''
+  message: Danh sách đen
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: ''
+  message: URL matched in this list will not be injected by scripts.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: ''
+  message: Lưu
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: ''
+  message: Danh sách đen đã cập nhật.
 labelGeneral:
   description: Label for general settings.
-  message: ''
+  message: Chung
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: ''
+  message: Trạng thái đồng bộ script
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: ''
+  message: Không có
 labelSyncService:
   description: Label for sync service select.
-  message: ''
+  message: Đồng bộ tới
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: ''
+  message: Authorize
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: ''
+  message: Revoke
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: ''
+  message: Đang xác thực
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: ''
+  message: Giao diện tùy chỉnh đã cập nhật.
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: ''
+  message: Giao diện tùy chỉnh
 descCustomCSS:
   description: Description of custom CSS section.
-  message: ''
+  message: >-
+    CSS tùy chỉnh cho trang tùy chọn và trang script đã cài đặt
+    Nếu không hiểu rõ xin đừng sửa.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: ''
+  message: Lưu
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: Mở bảng điều khiển
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: ''
+  message: Script trùng khớp
 buttonOK:
   description: OK button on dialog.
-  message: ''
+  message: Đồng ý
 buttonCancel:
   description: Cancel button on dialog.
-  message: ''
+  message: Hủy
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: Nhập cài đặt
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: Tìm hiểu thêm về quy tắc danh sách đen.
 editNavCode:
   description: Label of code tab in script editor.
-  message: ''
+  message: Mã nguồn
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: ''
+  message: Cài đặt
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: Cài đặt Script
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Tuỳ chỉnh thẻ dữ liệu
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: ''
+  message: Giữ bản gốc
