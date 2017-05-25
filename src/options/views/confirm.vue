@@ -167,7 +167,8 @@ export default {
       });
     },
     close() {
-      window.close();
+      // window.close();
+      sendMessage({ cmd: 'TabClose' });
     },
     getFile(url, { isBlob, useCache } = {}) {
       const cacheKey = isBlob ? `blob+${url}` : `text+${url}`;
@@ -222,8 +223,7 @@ export default {
       })
       .then(res => {
         this.message = `${res.message}[${this.getTimeString()}]`;
-        if (res.code < 0) return;
-        if (this.closeAfterInstall) this.close();
+        if (this.settings.closeAfterInstall) this.close();
         else if (this.isLocal && options.get('trackLocalFile')) this.trackLocalFile();
       });
     },
