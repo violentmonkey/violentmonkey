@@ -17,6 +17,7 @@ const defaults = {
   sync: null,
   customCSS: null,
   importSettings: true,
+  notifyUpdates: true,
 };
 let changes = {};
 const hooks = initHooks();

@@ -346,8 +346,8 @@ labelCustomCSS:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS tùy chỉnh cho trang tùy chọn và trang script đã cài đặt
-    Nếu không hiểu rõ xin đừng sửa.
+    CSS tùy chỉnh cho trang tùy chọn và trang script đã cài đặt Nếu không hiểu
+    rõ xin đừng sửa.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Lưu
@@ -384,3 +384,12 @@ editLabelMeta:
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Giữ bản gốc
+titleScriptUpdated:
+  description: Notification title for script updates.
+  message: ''
+msgScriptUpdated:
+  description: Notification message for script updates.
+  message: ''
+labelNotifyUpdates:
+  description: Option to show notification when script is updated.
+  message: ''

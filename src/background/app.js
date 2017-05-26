@@ -1,5 +1,6 @@
 import { i18n, defaultImage } from 'src/common';
 import * as sync from './sync';
+import { notify } from './utils';
 import { getRequestId, httpRequest, abortRequest, confirmInstall } from './utils/requests';
 import cache from './utils/cache';
 import { newScript, parseMeta } from './utils/script';
@@ -222,16 +223,6 @@ vmdb.initialized.then(() => {
 });
 
 // Common functions
-
-function notify(options) {
-  browser.notifications.create(options.id || 'ViolentMonkey', {
-    type: 'basic',
-    iconUrl: defaultImage,
-    title: `${options.title} - ${i18n('extName')}`,
-    message: options.body,
-    isClickable: options.isClickable,
-  });
-}
 
 const badges = {};
 function setBadge(num, src) {

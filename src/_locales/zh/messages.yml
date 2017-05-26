@@ -382,3 +382,12 @@ editLabelMeta:
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: 保留原有规则
+titleScriptUpdated:
+  description: Notification title for script updates.
+  message: 更新
+msgScriptUpdated:
+  description: Notification message for script updates.
+  message: 脚本【$1】已更新！
+labelNotifyUpdates:
+  description: Option to show notification when script is updated.
+  message: 脚本更新时提示

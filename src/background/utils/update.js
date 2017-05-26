@@ -1,6 +1,8 @@
-import { i18n, request, noop } from 'src/common';
+import { i18n, request } from 'src/common';
 import { parseScript } from './db';
 import { parseMeta, compareVersion } from './script';
+import { getOption } from './options';
+import { notify } from '.';
 
 const processes = {};
 
@@ -65,18 +67,25 @@ export default function checkUpdate(script) {
   if (!promise) {
     let updated = false;
     promise = doCheckUpdate(script)
-    .then(code => (
-      parseScript({
-        code,
-        id: script.id,
-      })
-      .then(res => {
-        res.data.checking = false;
-        browser.runtime.sendMessage(res);
-        updated = true;
-      })
-    ))
-    .catch(noop)
+    .then(code => parseScript({
+      code,
+      id: script.id,
+    }))
+    .then(res => {
+      const { data } = res;
+      data.checking = false;
+      browser.runtime.sendMessage(res);
+      updated = true;
+      if (getOption('notifyUpdates')) {
+        notify({
+          title: i18n('titleScriptUpdated'),
+          body: i18n('msgScriptUpdated', [data.meta.name || i18n('labelNoName')]),
+        });
+      }
+    })
+    .catch(err => {
+      if (process.env.DEBUG) console.error(err);
+    })
     .then(() => {
       delete processes[script.id];
       return updated;
