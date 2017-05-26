@@ -216,6 +216,9 @@ vmdb.initialized.then(() => {
   });
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
+
+  // XXX fix position regression in v2.6.3
+  vmdb.checkPosition();
 });
 
 // Common functions

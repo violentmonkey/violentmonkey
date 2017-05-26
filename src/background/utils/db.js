@@ -7,14 +7,14 @@ let db;
 
 const position = {
   value: 0,
-  set(number) {
-    position.value = number;
+  set(v) {
+    position.value = +v || 0;
   },
   get() {
-    return position + 1;
+    return position.value + 1;
   },
-  update(value) {
-    if (position.value < value) position.value = value;
+  update(v) {
+    if (position.value < +v) position.set(v);
   },
 };
 
