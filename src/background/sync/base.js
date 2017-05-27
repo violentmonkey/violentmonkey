@@ -1,7 +1,10 @@
 import { debounce, normalizeKeys, request, noop } from 'src/common';
-import getEventEmitter from '../utils/events';
-import { getOption, setOption, hookOptions } from '../utils/options';
-import { getScriptsByIndex, parseScript, removeScript, checkPosition } from '../utils/db';
+import {
+  getEventEmitter, vmdb,
+  getOption, setOption, hookOptions,
+} from '../utils';
+
+const { getScriptsByIndex, parseScript, removeScript, checkPosition } = vmdb;
 
 const serviceNames = [];
 const services = {};

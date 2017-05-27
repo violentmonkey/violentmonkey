@@ -1,13 +1,12 @@
 import { i18n, defaultImage } from 'src/common';
 import * as sync from './sync';
-import { notify } from './utils';
-import { getRequestId, httpRequest, abortRequest, confirmInstall } from './utils/requests';
-import cache from './utils/cache';
-import { newScript, parseMeta } from './utils/script';
-import { setClipboard } from './utils/clipboard';
-import { getOption, setOption, hookOptions, getAllOptions } from './utils/options';
-import * as vmdb from './utils/db';
-import checkUpdate from './utils/update';
+import {
+  notify, cache, vmdb,
+  getRequestId, httpRequest, abortRequest, confirmInstall,
+  newScript, parseMeta,
+  setClipboard, checkUpdate,
+  getOption, setOption, hookOptions, getAllOptions,
+} from './utils';
 
 const VM_VER = browser.runtime.getManifest().version;
 
