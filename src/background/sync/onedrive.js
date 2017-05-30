@@ -75,7 +75,7 @@ const OneDrive = BaseService.extend({
     })
     .then(data => this.loadData({
       url: data['@content.downloadUrl'],
-      delay: 0,
+      delay: false,
     }));
   },
   put(path, data) {
