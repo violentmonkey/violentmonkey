@@ -78,4 +78,28 @@ import webBridgeObj from './web';
     });
   }
   initBridge();
+
+  // For installation
+  // Firefox does not support `onBeforeRequest` for `file:`
+  function checkJS() {
+    if (!document.querySelector('title')) {
+      // plain text
+      sendMessage({
+        cmd: 'ConfirmInstall',
+        data: {
+          code: document.body.textContent,
+          url: location.href,
+          from: document.referrer,
+        },
+      })
+      .then(() => {
+        if (history.length > 1) history.go(-1);
+        else sendMessage({ cmd: 'TabClose' });
+      });
+    }
+  }
+  if (/\.user\.js$/.test(location.pathname)) {
+    if (document.readyState === 'complete') checkJS();
+    else window.addEventListener('load', checkJS, false);
+  }
 }());

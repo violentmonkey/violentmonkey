@@ -217,7 +217,9 @@ export function confirmInstall(info) {
 }
 
 browser.webRequest.onBeforeRequest.addListener(req => {
-  // onBeforeRequest is fired for local files too
+  // onBeforeRequest fired for `file:`
+  // - works on Chrome
+  // - does not work on Firefox
   if (req.method === 'GET' && /\.user\.js([?#]|$)/.test(req.url)) {
     // {cancel: true} will redirect to a blocked view
     const noredirect = { redirectUrl: 'javascript:history.back()' };  // eslint-disable-line no-script-url
