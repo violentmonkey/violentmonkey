@@ -135,19 +135,21 @@ export function request(url, options = {}) {
       xhr.setRequestHeader(key, headers[key]);
     });
     xhr.onload = () => {
-      const res = getResponse(xhr);
-      // status for `file:` protocol will always be `0`
-      res.status = xhr.status || 200;
-      resolve(res);
+      const res = getResponse(xhr, {
+        // status for `file:` protocol will always be `0`
+        status: xhr.status || 200,
+      });
+      if (res.status > 300) reject(res);
+      else resolve(res);
     };
     xhr.onerror = () => {
-      const res = getResponse(xhr);
+      const res = getResponse(xhr, { status: -1 });
       reject(res);
     };
     xhr.ontimeout = xhr.onerror;
     xhr.send(body);
   });
-  function getResponse(xhr) {
+  function getResponse(xhr, extra) {
     const { responseType } = options;
     let data;
     if (responseType === 'blob') {
@@ -162,9 +164,9 @@ export function request(url, options = {}) {
         // Ignore invalid JSON
       }
     }
-    return {
+    return Object.assign({
       url,
       data,
-    };
+    }, extra);
   }
 }
