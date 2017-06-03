@@ -1,3 +1,4 @@
+import 'src/common/browser';
 import { inject, objEncode, getUniqId, sendMessage } from './utils';
 import { onNotificationClick, onNotificationClose } from './notification';
 import { httpRequested } from './requests';
