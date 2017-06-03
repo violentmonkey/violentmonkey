@@ -5,7 +5,8 @@
       <div class="ellipsis" v-for="item in items"
         :class="{active: item.active}"
         @click="item.active = !item.active"
-        v-text="item.script.custom.name || item.script.meta.name"></div>
+        v-text="item.script.custom.name || item.script.meta.name">
+      </div>
     </div>
     <button v-text="i18n('buttonAllNone')" @click="toggleSelection()"></button>
     <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
@@ -92,7 +93,7 @@ function download(blob) {
   // https://bugzilla.mozilla.org/show_bug.cgi?id=1331176
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.style = 'display: none';
+  a.style.display = 'none';
   document.body.appendChild(a);
   a.href = url;
   a.download = 'scripts.zip';

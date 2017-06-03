@@ -318,17 +318,6 @@ code {
 }
 .edit {
   background: #eee;
-  z-index: 10;
-  .dropdown-menu {
-    width: 32rem;
-    > table {
-      width: 100%;
-    }
-    td:not(.expand) {
-      width: 1px;
-      white-space: nowrap;
-    }
-  }
 }
 .feature {
   &-text {
