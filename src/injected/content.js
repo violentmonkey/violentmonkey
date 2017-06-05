@@ -75,6 +75,12 @@ function handleContent(req) {
     SetClipboard(data) {
       sendMessage({ cmd: 'SetClipboard', data });
     },
+    CheckScript({ name, namespace, callback }) {
+      sendMessage({ cmd: 'CheckScript', data: { name, namespace } })
+      .then(result => {
+        bridge.post({ cmd: 'ScriptChecked', data: { callback, result } });
+      });
+    },
   };
   const handle = handlers[req.cmd];
   if (handle) handle(req.data);

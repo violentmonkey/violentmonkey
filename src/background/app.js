@@ -199,6 +199,10 @@ const commands = {
   },
   CheckPosition: vmdb.checkPosition,
   ConfirmInstall: confirmInstall,
+  CheckScript({ name, namespace }) {
+    return vmdb.queryScript(null, { name, namespace })
+    .then(script => (script ? script.meta.version : null));
+  },
 };
 
 vmdb.initialized.then(() => {
