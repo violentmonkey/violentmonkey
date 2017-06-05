@@ -78,7 +78,7 @@ msgLoadingData:
   message: スクリプトの取得中…
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: インストール済みのスクリプト
+  message: インストール済み
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: 設定
@@ -383,13 +383,13 @@ editLabelMeta:
   message: カスタムメタデータ
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: ''
+  message: 元のルールに追記
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: ''
+  message: 更新
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: スクリプト「$1」が更新されました!
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: スクリプトの更新を通知する
