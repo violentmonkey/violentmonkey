@@ -11,6 +11,7 @@ export default Object.assign({
   wrapGM,
   getWrapper,
   onLoadScripts,
+  exposeVM,
   runCode,
   initialize,
   state: 0,
@@ -47,6 +48,47 @@ function utf8decode(utftext) {
   /* eslint-enable no-bitwise */
 }
 
+function exposeVM() {
+  const bridge = this;
+  const Violentmonkey = {};
+  const checking = {};
+  let key = 0;
+  bridge.onScriptChecked = ({ callback, result }) => {
+    const cb = checking[callback];
+    if (cb) {
+      cb(result);
+      delete checking[callback];
+    }
+  };
+  Object.defineProperty(Violentmonkey, 'getVersion', {
+    value() {
+      return Promise.resolve({
+        version: bridge.version,
+      });
+    },
+  });
+  Object.defineProperty(Violentmonkey, 'isInstalled', {
+    value(name, namespace) {
+      return new Promise(resolve => {
+        key += 1;
+        const callback = checking[key];
+        checking[callback] = resolve;
+        bridge.post({
+          cmd: 'CheckScript',
+          data: {
+            name,
+            namespace,
+            callback,
+          },
+        });
+      });
+    },
+  });
+  Object.defineProperty(window.external, 'Violentmonkey', {
+    value: Violentmonkey,
+  });
+}
+
 function onLoadScripts(data) {
   const bridge = this;
   const start = [];
@@ -56,6 +98,11 @@ function onLoadScripts(data) {
   bridge.notif = {};
   bridge.ainject = {};
   bridge.version = data.version;
+  if (bridge.includes([
+    'greasyfork.org',
+  ], location.host)) {
+    bridge.exposeVM();
+  }
   bridge.values = {};
   // reset load and checkLoad
   bridge.load = () => {
@@ -167,6 +214,9 @@ function handleWeb(obj) {
       delete window[`VM_${id}`];
       delete bridge.ainject[id];
       if (item && func) bridge.runCode(item[0], func, item[1], item[2]);
+    },
+    ScriptChecked(data) {
+      if (bridge.onScriptChecked) bridge.onScriptChecked(data);
     },
   };
   const handle = handlers[obj.cmd];

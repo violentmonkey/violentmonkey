@@ -233,19 +233,6 @@ section {
 code {
   background: #F7E999;
 }
-.export-list {
-  display: block;
-  width: 100%;
-  height: 14rem;
-  white-space: normal;
-}
-.export-list > option {
-  display: inline-block;
-  width: 13rem;
-  margin: .1rem .2rem;
-  padding: 0 .3rem;
-  box-shadow: 0 0 1px black;
-}
 .frame-block {
   padding: .5rem;
 }
@@ -331,17 +318,6 @@ code {
 }
 .edit {
   background: #eee;
-  z-index: 10;
-  .dropdown-menu {
-    width: 32rem;
-    > table {
-      width: 100%;
-    }
-    td:not(.expand) {
-      width: 1px;
-      white-space: nowrap;
-    }
-  }
 }
 .feature {
   &-text {

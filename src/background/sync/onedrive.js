@@ -1,6 +1,6 @@
 // Reference: https://dev.onedrive.com/README.htm
 import { object, noop } from 'src/common';
-import { dumpQuery } from '../utils/search';
+import { dumpQuery } from '../utils';
 import { BaseService, isScriptFile, register, getURI } from './base';
 
 const config = Object.assign({
@@ -75,7 +75,7 @@ const OneDrive = BaseService.extend({
     })
     .then(data => this.loadData({
       url: data['@content.downloadUrl'],
-      delay: 0,
+      delay: false,
     }));
   },
   put(path, data) {

@@ -1,11 +1,14 @@
 <template>
   <section>
     <h3 v-text="i18n('labelDataExport')"></h3>
-    <select class=export-list multiple v-model="selectedIds">
-      <option class="ellipsis" v-for="script in store.scripts"
-      :value="script.id" v-text="script.custom.name||script.meta.name"></option>
-    </select>
-    <button v-text="i18n('buttonAllNone')" @click="updateSelection()"></button>
+    <div class="export-list">
+      <div class="ellipsis" v-for="item in items"
+        :class="{active: item.active}"
+        @click="item.active = !item.active"
+        v-text="item.script.custom.name || item.script.meta.name">
+      </div>
+    </div>
+    <button v-text="i18n('buttonAllNone')" @click="toggleSelection()"></button>
     <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
     <label>
       <input type=checkbox v-setting="'exportValues'">
@@ -19,34 +22,46 @@ import { sendMessage } from 'src/common';
 import options from 'src/common/options';
 import { store } from '../../utils';
 
+/**
+ * Note:
+ * - Firefox does not support multiline <select>
+ */
+
 export default {
   data() {
     return {
       store,
-      selectedIds: [],
       exporting: false,
+      items: [],
     };
   },
   watch: {
-    'store.scripts'() {
-      this.updateSelection(true);
+    'store.scripts': 'initItems',
+  },
+  computed: {
+    selectedIds() {
+      return this.items.filter(item => item.active).map(item => item.script.id);
     },
   },
   created() {
-    this.updateSelection(true);
+    this.initItems();
   },
   methods: {
-    updateSelection(selectAll) {
+    initItems() {
+      this.items = (store.scripts || []).map(script => ({
+        script,
+        active: true,
+      }));
+    },
+    toggleSelection() {
       if (!store.scripts.length) return;
-      if (selectAll || this.selectedIds.length < store.scripts.length) {
-        this.selectedIds = store.scripts.map(script => script.id);
-      } else {
-        this.selectedIds = [];
-      }
+      const active = this.selectedIds.length < store.scripts.length;
+      this.items.forEach(item => { item.active = active; });
     },
     exportData() {
       this.exporting = true;
       Promise.resolve(exportData(this.selectedIds))
+      .then(download)
       .catch((err) => {
         console.error(err);
       })
@@ -73,21 +88,19 @@ function addFile(writer, file) {
   });
 }
 
-function download(writer) {
-  return new Promise((resolve) => {
-    writer.close((blob) => {
-      resolve(blob);
-    });
-  })
-  .then((blob) => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'scripts.zip';
-    a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    });
+function download(blob) {
+  // Known issue: does not work on Firefox
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=1331176
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.href = url;
+  a.download = 'scripts.zip';
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   });
 }
 
@@ -138,6 +151,37 @@ function exportData(selectedIds) {
   .then(files => files.reduce((result, file) => (
     result.then(writer => addFile(writer, file))
   ), getWriter()))
-  .then(download);
+  .then(writer => new Promise((resolve) => {
+    writer.close((blob) => {
+      resolve(blob);
+    });
+  }));
 }
 </script>
+
+<style>
+.export-list {
+  display: block;
+  min-height: 4rem;
+  max-height: 20rem;
+  overflow-y: auto;
+  padding: .3rem;
+  white-space: normal;
+  border: 1px solid #ddd;
+  > .ellipsis {
+    display: inline-block;
+    width: 13rem;
+    max-width: 100%;
+    line-height: 1.5;
+    margin-right: .2rem;
+    margin-bottom: .1rem;
+    padding: 0 .3rem;
+    box-shadow: 0 0 1px black;
+    cursor: pointer;
+    &.active {
+      background: #3498db;
+      color: white;
+    }
+  }
+}
+</style>

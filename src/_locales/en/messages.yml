@@ -384,3 +384,12 @@ editLabelMeta:
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Keep original
+titleScriptUpdated:
+  description: Notification title for script updates.
+  message: Update
+msgScriptUpdated:
+  description: Notification message for script updates.
+  message: 'Script [$1] is updated!'
+labelNotifyUpdates:
+  description: Option to show notification when script is updated.
+  message: Notify script updates

@@ -8,8 +8,7 @@ function oncopy(e) {
 }
 document.addEventListener('copy', oncopy, false);
 
-/* eslint-disable import/prefer-default-export */
-export function setClipboard(data) {
+export default function setClipboard(data) {
   clipboardData.type = data.type;
   clipboardData.data = data.data;
   textarea.focus();

@@ -27,6 +27,12 @@
           <span v-text="i18n('labelAutoReloadCurrentTab')"></span>
         </label>
       </div>
+      <div class="mb-1">
+        <label>
+          <input type=checkbox v-setting="'notifyUpdates'">
+          <span v-text="i18n('labelNotifyUpdates')"></span>
+        </label>
+      </div>
     </section>
     <vm-import></vm-import>
     <vm-export></vm-export>

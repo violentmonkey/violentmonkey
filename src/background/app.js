@@ -1,12 +1,13 @@
+import 'src/common/browser';
 import { i18n, defaultImage } from 'src/common';
 import * as sync from './sync';
-import { getRequestId, httpRequest, abortRequest, confirmInstall } from './utils/requests';
-import cache from './utils/cache';
-import { newScript, parseMeta } from './utils/script';
-import { setClipboard } from './utils/clipboard';
-import { getOption, setOption, hookOptions, getAllOptions } from './utils/options';
-import * as vmdb from './utils/db';
-import checkUpdate from './utils/update';
+import {
+  notify, cache, vmdb,
+  getRequestId, httpRequest, abortRequest, confirmInstall,
+  newScript, parseMeta,
+  setClipboard, checkUpdate,
+  getOption, setOption, hookOptions, getAllOptions,
+} from './utils';
 
 const VM_VER = browser.runtime.getManifest().version;
 
@@ -182,7 +183,7 @@ const commands = {
     .then(tab => ({ id: tab.id }));
   },
   TabClose(data, src) {
-    const tabId = data && (data.id || (src.tab && src.tab.id));
+    const tabId = (data && data.id) || (src.tab && src.tab.id);
     if (tabId) browser.tabs.remove(tabId);
   },
   GetAllOptions: getAllOptions,
@@ -198,6 +199,10 @@ const commands = {
   },
   CheckPosition: vmdb.checkPosition,
   ConfirmInstall: confirmInstall,
+  CheckScript({ name, namespace }) {
+    return vmdb.queryScript(null, { name, namespace })
+    .then(script => (script ? script.meta.version : null));
+  },
 };
 
 vmdb.initialized.then(() => {
@@ -216,19 +221,12 @@ vmdb.initialized.then(() => {
   });
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
+
+  // XXX fix position regression in v2.6.3
+  vmdb.checkPosition();
 });
 
 // Common functions
-
-function notify(options) {
-  browser.notifications.create(options.id || 'ViolentMonkey', {
-    type: 'basic',
-    iconUrl: defaultImage,
-    title: `${options.title} - ${i18n('extName')}`,
-    message: options.body,
-    isClickable: options.isClickable,
-  });
-}
 
 const badges = {};
 function setBadge(num, src) {

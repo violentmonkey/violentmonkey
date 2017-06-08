@@ -1,7 +1,10 @@
 import { debounce, normalizeKeys, request, noop } from 'src/common';
-import getEventEmitter from '../utils/events';
-import { getOption, setOption, hookOptions } from '../utils/options';
-import { getScriptsByIndex, parseScript, removeScript, checkPosition } from '../utils/db';
+import {
+  getEventEmitter, vmdb,
+  getOption, setOption, hookOptions,
+} from '../utils';
+
+const { getScriptsByIndex, parseScript, removeScript, checkPosition } = vmdb;
 
 const serviceNames = [];
 const services = {};
@@ -235,14 +238,14 @@ export const BaseService = serviceFactory({
   },
   loadData(options) {
     const { progress } = this;
-    let lastFetch;
-    if (options.delay == null) {
-      lastFetch = Promise.resolve(Date.now());
-    } else {
+    let { delay } = options;
+    if (delay == null) {
+      delay = this.delayTime;
+    }
+    let lastFetch = Promise.resolve();
+    if (delay) {
       lastFetch = this.lastFetch
       .then(ts => new Promise(resolve => {
-        let delay = options.delay;
-        if (!isNaN(delay)) delay = this.delayTime;
         const delta = delay - (Date.now() - ts);
         if (delta > 0) {
           setTimeout(resolve, delta);
@@ -251,8 +254,8 @@ export const BaseService = serviceFactory({
         }
       }))
       .then(() => Date.now());
+      this.lastFetch = lastFetch;
     }
-    this.lastFetch = lastFetch;
     progress.total += 1;
     onStateChange();
     return lastFetch.then(() => {

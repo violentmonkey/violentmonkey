@@ -1,4 +1,4 @@
-import { loadQuery, dumpQuery } from '../utils/search';
+import { loadQuery, dumpQuery } from '../utils';
 import { getURI, BaseService, isScriptFile, register } from './base';
 
 const config = {
