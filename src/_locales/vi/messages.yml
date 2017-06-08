@@ -114,7 +114,7 @@ buttonImportData:
   message: Nhập từ tập tin zip
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Vacuum database
+  message: Làm trống dữ liệu
 labelDataExport:
   description: Section title of data export.
   message: Xuất dữ liệu
@@ -309,7 +309,7 @@ labelBlacklist:
   message: Danh sách đen
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: URL matched in this list will not be injected by scripts.
+  message: URL trong danh sách này sẽ không bị bỏ qua.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: Lưu
