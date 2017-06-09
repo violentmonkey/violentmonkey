@@ -171,37 +171,6 @@ aside img {
   padding: 0 .5rem;
   border-bottom: 1px solid darkgray;
 }
-.backdrop,
-.scripts {
-  position: absolute;
-  top: 2rem;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-.scripts {
-  overflow-y: auto;
-}
-.backdrop {
-  text-align: center;
-  color: gray;
-  z-index: 9;
-}
-.backdrop > *,
-.backdrop::after {
-  display: inline-block;
-  vertical-align: middle;
-  font-size: 2rem;
-}
-.backdrop::after {
-  content: ' ';
-  width: 0;
-  height: 100%;
-}
-.mask {
-  background: rgba(0,0,0,.08);
-  /*transition: opacity 1s;*/
-}
 #currentLang {
   color: green;
   font-weight: bold;
