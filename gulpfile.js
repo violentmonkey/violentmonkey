@@ -56,8 +56,15 @@ gulp.task('watch', ['pack', 'js-dev', 'svg'], () => {
 
 gulp.task('build', ['pack', 'js-prd', 'svg']);
 
-gulp.task('js-dev', () => webpack(webpackConfig).watch({}, webpackCallback));
-gulp.task('js-prd', () => webpack(webpackConfig, webpackCallback));
+gulp.task('js-dev', () => {
+  webpack(webpackConfig).watch({}, webpackCallback);
+});
+gulp.task('js-prd', cb => {
+  webpack(webpackConfig, (...args) => {
+    webpackCallback(...args);
+    cb();
+  });
+});
 
 gulp.task('manifest', () => (
   gulp.src(paths.manifest, { base: 'src' })

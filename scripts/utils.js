@@ -28,6 +28,21 @@ function styleRule(options = {}) {
   };
 }
 
+function merge(obj1, obj2) {
+  if (!obj2) return obj1;
+  if (Array.isArray(obj1)) return obj1.concat(obj2);
+  const obj = Object.assign({}, obj1);
+  Object.keys(obj2).forEach(key => {
+    if (typeof obj[key] === 'object') {
+      obj[key] = merge(obj[key], obj2[key]);
+    } else {
+      obj[key] = obj2[key];
+    }
+  });
+  return obj;
+}
+
 exports.IS_DEV = IS_DEV;
 exports.styleLoader = styleLoader;
 exports.styleRule = styleRule;
+exports.merge = merge;

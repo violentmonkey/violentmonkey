@@ -2,8 +2,9 @@ const webpack = require('webpack');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const BabiliWebpackPlugin = require('babili-webpack-plugin');
 const base = require('./webpack.base.conf');
-const { IS_DEV } = require('./utils');
+const { IS_DEV, merge } = require('./utils');
 
 const entry = {
   'background/app': 'src/background/app.js',
@@ -12,10 +13,9 @@ const entry = {
   injected: 'src/injected/index.js',
 };
 
-module.exports = Object.assign({}, base, {
+module.exports = merge(base, {
   entry,
   plugins: [
-    ... base.plugins,
     new webpack.optimize.CommonsChunkPlugin({
       name: 'browser',
       chunks: Object.keys(entry),
@@ -51,11 +51,7 @@ module.exports = Object.assign({}, base, {
     ] : [
       // extract css into its own file
       new ExtractTextPlugin('[name].css'),
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false
-        }
-      }),
+      new BabiliWebpackPlugin(),
     ],
   ],
   externals: {
