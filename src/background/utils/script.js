@@ -32,7 +32,9 @@ export function parseMeta(code) {
       flag = 0;
     }
     if (flag === 1 && group1[0] === '@') {
-      const key = group1.slice(1).replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
+      const [keyName, locale] = group1.slice(1).split(':');
+      const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
+      const key = locale ? `${camelKey}:${locale.toLowerCase()}` : camelKey;
       const val = group2.trim();
       const data = meta[key];
       // multiple values allowed

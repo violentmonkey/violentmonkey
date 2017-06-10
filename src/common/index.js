@@ -107,8 +107,11 @@ export function getUniqId() {
  * Get locale attributes such as `@name:zh-CN`
  */
 export function getLocaleString(meta, key) {
-  const langKey = navigator.languages.map(lang => `${key}:${lang}`).find(item => item in meta);
-  return (langKey ? meta[langKey] : meta[key]) || '';
+  const localeMeta = navigator.languages
+  // Use `lang.toLowerCase()` since v2.6.5
+  .map(lang => meta[`${key}:${lang}`] || meta[`${key}:${lang.toLowerCase()}`])
+  .find(Boolean);
+  return localeMeta || meta[key] || '';
 }
 
 /**
