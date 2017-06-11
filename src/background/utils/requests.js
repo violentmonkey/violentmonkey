@@ -242,34 +242,28 @@ export function confirmInstall(info) {
   });
 }
 
+const installURLs = [
+  '^https://greasyfork.org/scripts/[^/]*/code/[^/]*?\\.user\\.js([?#]|$)',
+  '^https://openuserjs.org/install/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
+  '^https://github.com/[^/]*/[^/]*/raw/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
+].map(re => new RegExp(re));
+
 browser.webRequest.onBeforeRequest.addListener(req => {
   // onBeforeRequest fired for `file:`
   // - works on Chrome
   // - does not work on Firefox
-  if (req.method === 'GET' && /\.user\.js([?#]|$)/.test(req.url)) {
-    // {cancel: true} will redirect to a blocked view
-    const noredirect = { redirectUrl: 'javascript:history.back()' };  // eslint-disable-line no-script-url
-    const x = new XMLHttpRequest();
-    x.open('GET', req.url, false);
-    try {
-      x.send();
-    } catch (e) {
-      // Request is redirected
-      return;
-    }
-    if ((!x.status || x.status === 200) && isUserScript(x.responseText)) {
-      // Firefox: slashes are decoded automatically by Firefox, thus cannot be
-      // used as separators
-      (req.tabId < 0 ? Promise.resolve() : browser.tabs.get(req.tabId))
-      .then(tab => {
-        confirmInstall({
-          url: req.url,
-          from: tab && tab.url,
-          code: x.responseText,
-        });
+  if (req.method === 'GET' && installURLs.some(re => re.test(req.url))) {
+    // Firefox: slashes are decoded automatically by Firefox, thus cannot be
+    // used as separators
+    (req.tabId < 0 ? Promise.resolve() : browser.tabs.get(req.tabId))
+    .then(tab => {
+      confirmInstall({
+        url: req.url,
+        from: tab && tab.url,
       });
-      return noredirect;
-    }
+    });
+    // { cancel: true } will redirect to a blocked view
+    return { redirectUrl: 'javascript:history.back()' };  // eslint-disable-line no-script-url
   }
 }, {
   urls: ['<all_urls>'],
