@@ -1,12 +1,12 @@
 const fs = require('fs');
 const path = require('path');
+const util = require('util');
 const gutil = require('gulp-util');
 const through = require('through2');
 const yaml = require('js-yaml');
-const promisify = require('es6-promisify');
 
-const readFile = promisify(fs.readFile);
-const readdir = promisify(fs.readdir);
+const readFile = util.promisify(fs.readFile);
+const readdir = util.promisify(fs.readdir);
 
 const transformers = {
   '.yml': data => yaml.safeLoad(data),

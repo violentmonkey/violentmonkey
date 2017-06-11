@@ -12,6 +12,7 @@ Links
 
 Development
 ---
+Make sure [Node.js](https://nodejs.org/) v8+ is installed.
 ``` sh
 $ npm i
 $ npm run dev

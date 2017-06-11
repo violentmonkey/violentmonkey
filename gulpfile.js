@@ -37,7 +37,8 @@ function webpackCallback(err, stats) {
   if (stats.hasWarnings()) {
     gutil.log('[WARNING] webpack compilation has warnings\n', stats.toJson().warnings.join('\n'));
   }
-  [stats].forEach(stat => {
+  (Array.isArray(stats.stats) ? stats.stats : [stats])
+  .forEach(stat => {
     const timeCost = (stat.endTime - stat.startTime) / 1000;
     const chunks = Object.keys(stat.compilation.namedChunks).join(' ');
     gutil.log(`Webpack built: [${timeCost.toFixed(3)}s] ${chunks}`);
