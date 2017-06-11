@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const BabiliWebpackPlugin = require('babili-webpack-plugin');
 const vueLoaderConfig = require('./vue-loader.conf');
 const { IS_DEV, styleRule } = require('./utils');
 const DIST = 'dist';
@@ -65,5 +66,6 @@ module.exports = {
   devtool: IS_DEV ? '#inline-source-map' : false,
   plugins: [
     definePlugin,
-  ],
+    !IS_DEV && new BabiliWebpackPlugin(),
+  ].filter(Boolean),
 };

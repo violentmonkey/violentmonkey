@@ -1,5 +1,5 @@
-import { sendMessage } from './utils';
-import bridge from './content';
+import { sendMessage } from '../utils';
+import bridge from './bridge';
 
 const requests = {};
 

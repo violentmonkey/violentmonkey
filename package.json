@@ -3,7 +3,7 @@
   "version": "2.6.4",
   "scripts": {
     "dev": "gulp watch",
-    "prebuild": "gulp clean",
+    "prebuild": "npm run lint && gulp clean",
     "build": "gulp build",
     "analyze": "webpack --profile --json --config scripts/webpack.conf.js | webpack-bundle-size-analyzer",
     "analyze:json": "webpack --profile --json --config scripts/webpack.conf.js > stats.json",
@@ -51,7 +51,8 @@
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.3.4",
     "webpack": "^2.6.1",
-    "webpack-bundle-size-analyzer": "^2.7.0"
+    "webpack-bundle-size-analyzer": "^2.7.0",
+    "wrapper-webpack-plugin": "^0.1.11"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {

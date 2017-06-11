@@ -27,6 +27,7 @@
     {
       "js": [
         "browser.js",
+        "injected-web.js",
         "injected.js"
       ],
       "matches": [

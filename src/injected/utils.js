@@ -1,4 +1,4 @@
-export { sendMessage, noop } from 'src/common';
+export { sendMessage, noop, request } from 'src/common';
 
 export function postData(destId, data) {
   // Firefox issue: data must be stringified to avoid cross-origin problem
@@ -18,27 +18,35 @@ export function inject(code) {
   }
 }
 
-export function encodeObject(obj) {
-  if (Array.isArray(obj)) {
-    return obj.map(encodeObject).join(',');
-  }
-  if (typeof obj === 'function') {
-    let str = obj.toString();
-    const prefix = str.slice(0, str.indexOf('{'));
-    if (prefix.indexOf('=>') < 0 && prefix.indexOf('function ') < 0) {
-      // method definition
-      str = `function ${str}`;
-    }
-    return str;
-  }
-  if (obj && typeof obj === 'object') {
-    const pairs = Object.keys(obj)
-    .map(key => `${JSON.stringify(key)}:${encodeObject(obj[key])}`);
-    return `{${pairs.join(',')}}`;
-  }
-  return JSON.stringify(obj);
-}
+// export function encodeObject(obj) {
+//   if (Array.isArray(obj)) {
+//     return obj.map(encodeObject).join(',');
+//   }
+//   if (typeof obj === 'function') {
+//     let str = obj.toString();
+//     const prefix = str.slice(0, str.indexOf('{'));
+//     if (prefix.indexOf('=>') < 0 && prefix.indexOf('function ') < 0) {
+//       // method definition
+//       str = `function ${str}`;
+//     }
+//     return str;
+//   }
+//   if (obj && typeof obj === 'object') {
+//     const pairs = Object.keys(obj)
+//     .map(key => `${JSON.stringify(key)}:${encodeObject(obj[key])}`);
+//     return `{${pairs.join(',')}}`;
+//   }
+//   return JSON.stringify(obj);
+// }
 
 export function getUniqId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+export function bindEvents(srcId, destId, handle) {
+  document.addEventListener(srcId, e => {
+    const data = JSON.parse(e.detail);
+    handle(data);
+  }, false);
+  return data => { postData(destId, data); };
 }
