@@ -147,6 +147,7 @@ export function request(url, options = {}) {
       const res = getResponse(xhr, { status: -1 });
       reject(res);
     };
+    xhr.onabort = xhr.onerror;
     xhr.ontimeout = xhr.onerror;
     xhr.send(body);
   });

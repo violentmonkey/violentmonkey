@@ -98,7 +98,9 @@ export function httpRequest(details, cb) {
     ]
     .forEach(evt => { xhr[`on${evt}`] = callback; });
     // req.finalUrl = details.url;
-    xhr.send(details.data);
+    const { data } = details;
+    const body = data ? decodeBody(data) : null;
+    xhr.send(body);
   } catch (e) {
     console.warn(e);
   }
@@ -115,6 +117,30 @@ export function abortRequest(id) {
     req.xhr.abort();
     clearRequest(req);
   }
+}
+
+function decodeBody(obj) {
+  const { cls, value } = obj;
+  if (cls === 'formdata') {
+    const result = new FormData();
+    if (value) {
+      Object.keys(value).forEach(key => {
+        value[key].forEach(item => {
+          result.append(key, decodeBody(item));
+        });
+      });
+    }
+    return result;
+  }
+  if (['blob', 'file'].includes(cls)) {
+    const { type, name, lastModified } = obj;
+    const array = new Uint8Array(value.length);
+    for (let i = 0; i < value.length; i += 1) array[i] = value.charCodeAt(i);
+    const data = [array.buffer];
+    if (cls === 'file') return new File(data, name, { type, lastModified });
+    return new Blob(data, { type });
+  }
+  if (value) return JSON.parse(value);
 }
 
 // Watch URL redirects

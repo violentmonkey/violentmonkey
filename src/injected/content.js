@@ -7,13 +7,12 @@ import { tabOpen, tabClose } from './tabs';
 const ids = [];
 const menus = [];
 
-const bridge = Object.assign({
-  initialize,
+const bridge = Object.assign({}, base, {
   getPopup,
   ids,
   menus,
   handle: handleContent,
-}, base);
+});
 
 export default bridge;
 
@@ -84,8 +83,4 @@ function handleContent(req) {
   };
   const handle = handlers[req.cmd];
   if (handle) handle(req.data);
-}
-
-function initialize(src, dest) {
-  bridge.bindEvents(src, dest);
 }

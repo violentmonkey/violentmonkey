@@ -4,7 +4,7 @@
  */
 import base from './bridge';
 
-export default Object.assign({
+export default Object.assign({}, base, {
   utf8decode,
   getRequest,
   getTab,
@@ -16,7 +16,7 @@ export default Object.assign({
   initialize,
   state: 0,
   handle: handleWeb,
-}, base);
+});
 
 /**
  * http://www.webtoolkit.info/javascript-utf8.html
@@ -98,7 +98,8 @@ function onLoadScripts(data) {
   bridge.notif = {};
   bridge.ainject = {};
   bridge.version = data.version;
-  if (bridge.includes([
+  const { helpers } = bridge;
+  if (helpers.includes([
     'greasyfork.org',
   ], location.host)) {
     bridge.exposeVM();
@@ -110,7 +111,7 @@ function onLoadScripts(data) {
     setTimeout(run, 0, idle);
   };
   bridge.checkLoad = () => {
-    if (!bridge.state && bridge.includes(['interactive', 'complete'], document.readyState)) bridge.state = 1;
+    if (!bridge.state && helpers.includes(['interactive', 'complete'], document.readyState)) bridge.state = 1;
     if (bridge.state) bridge.load();
   };
   const listMap = {
@@ -118,7 +119,7 @@ function onLoadScripts(data) {
     'document-idle': idle,
     'document-end': end,
   };
-  bridge.forEach(data.scripts, script => {
+  helpers.forEach(data.scripts, script => {
     bridge.values[script.uri] = data.values[script.uri] || {};
     if (script && script.enabled) {
       const list = listMap[
@@ -135,9 +136,9 @@ function onLoadScripts(data) {
     const wrapper = bridge.wrapGM(script, data.cache);
     // Must use Object.getOwnPropertyNames to list unenumerable properties
     const wrapperKeys = Object.getOwnPropertyNames(wrapper);
-    const wrapperInit = bridge.map(wrapperKeys, name => `this["${name}"]=${name}`).join(';');
+    const wrapperInit = helpers.map(wrapperKeys, name => `this["${name}"]=${name}`).join(';');
     const codeSlices = [`${wrapperInit};with(this)!function(){`];
-    bridge.forEach(requireKeys, key => {
+    helpers.forEach(requireKeys, key => {
       const requireCode = data.require[key];
       if (requireCode) {
         codeSlices.push(requireCode);
@@ -150,7 +151,7 @@ function onLoadScripts(data) {
     codeSlices.push('}.call(this);');
     const code = codeSlices.join('\n');
     const name = script.custom.name || script.meta.name || script.id;
-    const args = bridge.map(wrapperKeys, key => wrapper[key]);
+    const args = helpers.map(wrapperKeys, key => wrapper[key]);
     const thisObj = wrapper.window || wrapper;
     const id = bridge.getUniqId();
     bridge.ainject[id] = [name, args, thisObj];
@@ -238,6 +239,7 @@ function runCode(name, func, args, thisObj) {
 
 function getRequest(arg) {
   const bridge = this;
+  const { helpers } = bridge;
   init();
   return bridge.getRequest(arg);
   function init() {
@@ -305,12 +307,10 @@ function getRequest(arg) {
   }
   function start(req, id) {
     const { details } = req;
-    const data = {
+    const payload = {
       id,
       method: details.method,
       url: details.url,
-      data: details.data,
-      // async: !details.synchronous,
       user: details.user,
       password: details.password,
       headers: details.headers,
@@ -318,10 +318,17 @@ function getRequest(arg) {
     };
     req.id = id;
     bridge.requests.map[id] = req;
-    if (bridge.includes(['arraybuffer', 'blob'], details.responseType)) {
-      data.responseType = 'blob';
+    if (helpers.includes(['arraybuffer', 'blob'], details.responseType)) {
+      payload.responseType = 'blob';
     }
-    bridge.post({ cmd: 'HttpRequest', data });
+    helpers.encodeBody(details.data)
+    .then(body => {
+      payload.data = body;
+      bridge.post({
+        cmd: 'HttpRequest',
+        data: payload,
+      });
+    });
   }
   function getFullUrl(url) {
     const a = document.createElement('a');
@@ -365,9 +372,10 @@ function wrapGM(script, cache) {
   } else {
     gm.window = bridge.getWrapper();
   }
-  if (!bridge.includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
-  if (!bridge.includes(grant, 'GM_info')) grant.push('GM_info');
-  if (bridge.includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
+  const { helpers } = bridge;
+  if (!helpers.includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
+  if (!helpers.includes(grant, 'GM_info')) grant.push('GM_info');
+  if (helpers.includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
   const resources = script.meta.resources || {};
   const dataEncoders = {
     o: val => JSON.stringify(val),
@@ -490,7 +498,8 @@ function wrapGM(script, cache) {
     },
     GM_log: {
       value(data) {
-        console.log(`[Violentmonkey][${script.meta.name || 'No name'}]`, data);  // eslint-disable-line no-console
+        // eslint-disable-next-line no-console
+        console.log(`[Violentmonkey][${script.meta.name || 'No name'}]`, data);
       },
     },
     GM_openInTab: {
@@ -547,7 +556,7 @@ function wrapGM(script, cache) {
       },
     },
   };
-  bridge.forEach(grant, name => {
+  helpers.forEach(grant, name => {
     const prop = gmFunctions[name];
     if (prop) addProperty(name, prop, gm);
   });
@@ -576,20 +585,21 @@ function wrapGM(script, cache) {
 }
 
 /**
- * @desc Wrap methods to prevent unexpected modifications.
+ * @desc Wrap helpers to prevent unexpected modifications.
  */
 function getWrapper() {
   // http://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
   // http://developer.mozilla.org/docs/Web/API/Window
   const bridge = this;
   const wrapper = {};
-  bridge.forEach([
+  const { helpers } = bridge;
+  helpers.forEach([
     // `eval` should be called directly so that it is run in current scope
     'eval',
   ], name => {
     wrapper[name] = window[name];
   });
-  bridge.forEach([
+  helpers.forEach([
     // 'uneval',
     'isFinite',
     'isNaN',
@@ -667,7 +677,7 @@ function getWrapper() {
     });
   }
   // Wrap properties
-  bridge.forEach(bridge.props, name => {
+  helpers.forEach(bridge.props, name => {
     if (name in wrapper) return;
     if (name.slice(0, 2) === 'on') defineReactedProperty(name);
     else defineProtectedProperty(name);
@@ -677,8 +687,9 @@ function getWrapper() {
 
 function initialize(src, dest, props) {
   const bridge = this;
+  bridge.prepare(src, dest);
   bridge.props = props;
-  bridge.load = bridge.noop;
-  bridge.checkLoad = bridge.noop;
-  bridge.bindEvents(src, dest);
+  const { noop } = bridge.helpers;
+  bridge.load = noop;
+  bridge.checkLoad = noop;
 }

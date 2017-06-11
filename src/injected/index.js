@@ -1,5 +1,5 @@
 import 'src/common/browser';
-import { inject, objEncode, getUniqId, sendMessage } from './utils';
+import { inject, encodeObject, getUniqId, sendMessage } from './utils';
 import { onNotificationClick, onNotificationClose } from './notification';
 import { httpRequested } from './requests';
 import { tabClosed } from './tabs';
@@ -59,7 +59,7 @@ import webBridgeObj from './web';
     const contentId = getUniqId();
     const webId = getUniqId();
     const args = [
-      objEncode(webBridgeObj),
+      encodeObject(webBridgeObj),
       JSON.stringify(webId),
       JSON.stringify(contentId),
       JSON.stringify(Object.getOwnPropertyNames(window)),
@@ -68,10 +68,12 @@ import webBridgeObj from './web';
     bridge.initialize(contentId, webId);
     sendMessage({ cmd: 'GetInjected', data: location.href })
     .then(data => {
-      bridge.forEach(data.scripts, script => {
-        bridge.ids.push(script.id);
-        if (script.enabled) badge.number += 1;
-      });
+      if (data.scripts) {
+        data.scripts.forEach(script => {
+          bridge.ids.push(script.id);
+          if (script.enabled) badge.number += 1;
+        });
+      }
       bridge.post({ cmd: 'LoadScripts', data });
       badge.ready = true;
       bridge.getPopup();
