@@ -16,9 +16,11 @@ msgInstalled:
 Warning:
   description: Show warnings with a notification.
   message: Упозорење
+  touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
   message: 'Скрипта [$1] нема `@grant` линије! Кликните за више детаља.'
+  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Без имена

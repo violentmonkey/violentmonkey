@@ -16,9 +16,11 @@ msgInstalled:
 Warning:
   description: Show warnings with a notification.
   message: Warning
+  touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
   message: 'Script [$1] has no `@grant` lines! Click to see more details.'
+  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: No Name

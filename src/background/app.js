@@ -2,7 +2,7 @@ import 'src/common/browser';
 import { i18n, defaultImage } from 'src/common';
 import * as sync from './sync';
 import {
-  notify, cache, vmdb,
+  cache, vmdb,
   getRequestId, httpRequest, abortRequest, confirmInstall,
   newScript, parseMeta,
   setClipboard, checkUpdate,
@@ -121,15 +121,6 @@ const commands = {
   Vacuum: vmdb.vacuum,
   ParseScript(data) {
     return vmdb.parseScript(data).then(res => {
-      const { meta } = res.data;
-      if (!meta.grant.length && !getOption('ignoreGrant')) {
-        notify({
-          id: 'VM-NoGrantWarning',
-          title: i18n('Warning'),
-          body: i18n('msgWarnGrant', [meta.name || i18n('labelNoName')]),
-          isClickable: true,
-        });
-      }
       browser.runtime.sendMessage(res);
       sync.sync();
       return res.data;

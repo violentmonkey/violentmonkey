@@ -16,9 +16,11 @@ msgInstalled:
 Warning:
   description: Show warnings with a notification.
   message: Предупреждение
+  touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
   message: 'У скрипта [$1] отсутствует поле `@grant`! Кликните для подробностей.'
+  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Новый скрипт

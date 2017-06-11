@@ -16,9 +16,11 @@ msgInstalled:
 Warning:
   description: Show warnings with a notification.
   message: Atenție
+  touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
   message: 'Scriptul [$1] nu are linii `@grant`! Dați clic pentru detalii.'
+  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Fără nume

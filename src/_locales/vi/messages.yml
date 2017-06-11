@@ -16,9 +16,11 @@ msgInstalled:
 Warning:
   description: Show warnings with a notification.
   message: Cảnh báo
+  touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
   message: 'Script [$1] thiếu thuộc tính `@grant`! Bấm để xem chi tiết.'
+  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Không có tên

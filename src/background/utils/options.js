@@ -4,7 +4,7 @@ import storage from 'localStorage';   // eslint-disable-line import/no-extraneou
 const defaults = {
   isApplied: true,
   autoUpdate: true,
-  ignoreGrant: false,
+  // ignoreGrant: false,
   lastUpdate: 0,
   showBadge: true,
   exportValues: true,

@@ -16,9 +16,11 @@ msgInstalled:
 Warning:
   description: Show warnings with a notification.
   message: 警告
+  touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
   message: スクリプト「$1」には @grant が記述された行がありません!　詳細を見るにはクリックしてください。
+  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 名前なし

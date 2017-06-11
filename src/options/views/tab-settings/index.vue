@@ -15,12 +15,14 @@
           <span v-text="i18n('labelShowBadge')"></span>
         </label>
       </div>
+      <!--
       <div class="mb-1">
         <label>
           <input type=checkbox v-setting="'ignoreGrant'">
           <span v-text="i18n('labelIgnoreGrant')"></span>
         </label>
       </div>
+      -->
       <div class="mb-1">
         <label>
           <input type=checkbox v-setting="'autoReload'">
