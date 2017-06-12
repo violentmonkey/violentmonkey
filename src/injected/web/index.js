@@ -268,7 +268,7 @@ function wrapGM(script, cache) {
       },
     },
     GM_openInTab: {
-      value(url, options = { active: false }) {
+      value(url, options) {
         const data = options && typeof options === 'object' ? options : {
           active: !options,
         };

@@ -1,12 +1,27 @@
 import { sendMessage } from '../utils';
 import bridge from './bridge';
 
-export function tabOpen(data) {
-  sendMessage({ cmd: 'TabOpen', data });
+const tabIds = {};
+const tabKeys = {};
+
+export function tabOpen({ key, data }) {
+  sendMessage({ cmd: 'TabOpen', data })
+  .then(({ id }) => {
+    tabIds[key] = id;
+    tabKeys[id] = key;
+  });
 }
-export function tabClose(id) {
+
+export function tabClose(key) {
+  const id = tabIds[key];
   sendMessage({ cmd: 'TabClose', data: { id } });
 }
+
 export function tabClosed(id) {
-  bridge.post({ cmd: 'TabClosed', data: id });
+  const key = tabKeys[id];
+  delete tabKeys[id];
+  delete tabIds[key];
+  if (key) {
+    bridge.post({ cmd: 'TabClosed', data: key });
+  }
 }
