@@ -5,7 +5,7 @@
     <button :title="i18n('hintVacuum')" @click="vacuum" :disabled="vacuuming" v-text="labelVacuum"></button>
     <div class="mt-1">
       <label>
-        <input type="checkbox" v-setting="'importSettings'">
+        <setting-check name="importSettings" />
         <span v-text="i18n('labelImportSettings')"></span>
       </label>
     </div>
@@ -16,8 +16,12 @@
 import { i18n, sendMessage } from 'src/common';
 import options from 'src/common/options';
 import { showMessage } from '../../utils';
+import SettingCheck from '../setting-check';
 
 export default {
+  components: {
+    SettingCheck,
+  },
   data() {
     return {
       vacuuming: false,

@@ -11,7 +11,7 @@
     <button v-text="i18n('buttonAllNone')" @click="toggleSelection()"></button>
     <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
     <label>
-      <input type=checkbox v-setting="'exportValues'">
+      <setting-check name="exportValues" />
       <span v-text="i18n('labelExportScriptData')"></span>
     </label>
   </section>
@@ -21,6 +21,7 @@
 import { sendMessage } from 'src/common';
 import options from 'src/common/options';
 import { store } from '../../utils';
+import SettingCheck from '../setting-check';
 
 /**
  * Note:
@@ -28,6 +29,9 @@ import { store } from '../../utils';
  */
 
 export default {
+  components: {
+    SettingCheck,
+  },
   data() {
     return {
       store,

@@ -17,7 +17,7 @@
     <p class="mt-1" v-text="message"></p>
     <div class="mt-1">
       <label>
-        <input type="checkbox" v-setting="'syncScriptStatus'">
+        <setting-check name="syncScriptStatus" />
         <span v-text="i18n('labelSyncScriptStatus')"></span>
       </label>
     </div>
@@ -28,6 +28,7 @@
 import { sendMessage } from 'src/common';
 import options from 'src/common/options';
 import { store } from '../../utils';
+import SettingCheck from '../setting-check';
 
 const SYNC_CURRENT = 'sync.current';
 const syncConfig = {
@@ -40,6 +41,9 @@ options.hook((data) => {
 });
 
 export default {
+  components: {
+    SettingCheck,
+  },
   data() {
     return {
       syncConfig,

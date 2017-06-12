@@ -4,7 +4,7 @@
       <span class="feature-text" v-text="i18n('labelCustomCSS')"></span>
     </h3>
     <p v-html="i18n('descCustomCSS')"></p>
-    <textarea v-model="css"></textarea>
+    <setting-text name="customCSS" ref="css" />
     <button v-text="i18n('buttonSaveCustomCSS')" @click="onSave"></button>
   </section>
 </template>
@@ -12,17 +12,16 @@
 <script>
 import { i18n } from 'src/common';
 import options from 'src/common/options';
-import { showMessage } from '../../utils';
+import { showMessage } from 'src/options/utils';
+import SettingText from '../setting-text';
 
 export default {
-  data() {
-    return {
-      css: options.get('customCSS'),
-    };
+  components: {
+    SettingText,
   },
   methods: {
     onSave() {
-      options.set('customCSS', (this.css || '').trim());
+      options.set('customCSS', this.$refs.css.value);
       showMessage({ text: i18n('msgSavedCustomCSS') });
     },
   },

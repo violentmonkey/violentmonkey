@@ -5,33 +5,33 @@
       <h3 v-text="i18n('labelGeneral')"></h3>
       <div class="mb-1">
         <label>
-          <input type=checkbox v-setting="'autoUpdate'" @change="updateAutoUpdate">
+          <setting-check name="autoUpdate" @change="updateAutoUpdate" />
           <span v-text="i18n('labelAutoUpdate')"></span>
         </label>
       </div>
       <div class="mb-1">
         <label>
-          <input type=checkbox v-setting="'showBadge'">
+          <setting-check name="showBadge" />
           <span v-text="i18n('labelShowBadge')"></span>
         </label>
       </div>
       <!--
       <div class="mb-1">
         <label>
-          <input type=checkbox v-setting="'ignoreGrant'">
+          <setting-check name="ignoreGrant" />
           <span v-text="i18n('labelIgnoreGrant')"></span>
         </label>
       </div>
       -->
       <div class="mb-1">
         <label>
-          <input type=checkbox v-setting="'autoReload'">
+          <setting-check name="autoReload" />
           <span v-text="i18n('labelAutoReloadCurrentTab')"></span>
         </label>
       </div>
       <div class="mb-1">
         <label>
-          <input type=checkbox v-setting="'notifyUpdates'">
+          <setting-check name="notifyUpdates" />
           <span v-text="i18n('labelNotifyUpdates')"></span>
         </label>
       </div>
@@ -51,6 +51,7 @@ import VmExport from './vm-export';
 import VmSync from './vm-sync';
 import VmBlacklist from './vm-blacklist';
 import VmCss from './vm-css';
+import SettingCheck from '../setting-check';
 
 export default {
   components: {
@@ -59,6 +60,7 @@ export default {
     VmSync,
     VmBlacklist,
     VmCss,
+    SettingCheck,
   },
   methods: {
     updateAutoUpdate() {

@@ -7,7 +7,7 @@
       {{i18n('descBlacklist')}}
       <a href="https://violentmonkey.github.io/2017/04/15/Smart-rules-for-blacklist/#Blacklist-patterns" target="_blank" v-text="i18n('learnBlacklist')"></a>
     </p>
-    <textarea v-model="rules"></textarea>
+    <setting-text name="blacklist" ref="blacklist" />
     <button v-text="i18n('buttonSaveBlacklist')" @click="onSave"></button>
   </section>
 </template>
@@ -15,20 +15,16 @@
 <script>
 import { i18n, sendMessage } from 'src/common';
 import options from 'src/common/options';
-import { showMessage } from '../../utils';
+import { showMessage } from 'src/options/utils';
+import SettingText from '../setting-text';
 
 export default {
-  data() {
-    let rules = options.get('blacklist');
-    // XXX compatible
-    if (Array.isArray(rules)) rules = rules.join('\n');
-    return {
-      rules,
-    };
+  components: {
+    SettingText,
   },
   methods: {
     onSave() {
-      options.set('blacklist', this.rules);
+      options.set('blacklist', this.$refs.blacklist.value);
       showMessage({ text: i18n('msgSavedBlacklist') });
       sendMessage({ cmd: 'BlacklistReset' });
     },

@@ -6,11 +6,11 @@
           <button dropdown-toggle v-text="i18n('buttonInstallOptions')"></button>
           <div class="dropdown-menu options-panel" @mousedown.stop>
             <label>
-              <input type=checkbox v-setting="'closeAfterInstall'" @change="checkClose">
+              <setting-check name="closeAfterInstall" @change="checkClose" ref="closeAfterInstall" />
               <span v-text="i18n('installOptionClose')"></span>
             </label>
             <label>
-              <input type=checkbox v-setting="'trackLocalFile'" :disabled="settings.closeAfterInstall">
+              <setting-check name="trackLocalFile" :disabled="closeAfterInstall" />
               <span v-text="i18n('installOptionTrack')"></span>
             </label>
           </div>
@@ -35,29 +35,21 @@ import options from 'src/common/options';
 import initCache from 'src/common/cache';
 import VmCode from './code';
 import { store } from '../utils';
+import SettingCheck from './setting-check';
 
 const cache = initCache({});
-
-const settings = {
-  closeAfterInstall: options.get('closeAfterInstall'),
-};
-
-options.hook(changes => {
-  if ('closeAfterInstall' in changes) {
-    settings.closeAfterInstall = changes.closeAfterInstall;
-  }
-});
 
 export default {
   components: {
     VmCode,
+    SettingCheck,
   },
   data() {
     return {
       store,
-      settings,
       installable: false,
       dependencyOK: false,
+      closeAfterInstall: options.get('closeAfterInstall'),
       message: '',
       code: '',
       commands: {
@@ -214,7 +206,7 @@ export default {
       })
       .then(res => {
         this.message = `${res.message}[${this.getTimeString()}]`;
-        if (this.settings.closeAfterInstall) this.close();
+        if (this.closeAfterInstall) this.close();
         else if (this.isLocal && options.get('trackLocalFile')) this.trackLocalFile();
       });
     },
@@ -231,8 +223,9 @@ export default {
         this.trackLocalFile();
       });
     },
-    checkClose(e) {
-      if (e.target.checked) options.set('trackLocalFile', false);
+    checkClose(value) {
+      this.closeAfterInstall = value;
+      if (value) options.set('trackLocalFile', false);
     },
   },
 };

@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import './dropdown';
-import './settings';
 import resetFeatures from './features';
 import Message from '../views/message';
+
+export hookSetting from './settings';
 
 export const store = {
   messages: null,
