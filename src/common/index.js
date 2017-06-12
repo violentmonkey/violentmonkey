@@ -114,6 +114,11 @@ export function getLocaleString(meta, key) {
   return localeMeta || meta[key] || '';
 }
 
+const binaryTypes = [
+  'blob',
+  'arraybuffer',
+];
+
 /**
  * Make a request.
  * @param {String} url
@@ -125,7 +130,7 @@ export function request(url, options = {}) {
     const xhr = new XMLHttpRequest();
     const { responseType } = options;
     xhr.open(options.method || 'GET', url, true);
-    if (['blob'].includes(responseType)) xhr.responseType = responseType;
+    if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
     const headers = Object.assign({}, options.headers);
     let { body } = options;
     if (body && typeof body === 'object') {
@@ -154,7 +159,7 @@ export function request(url, options = {}) {
   function getResponse(xhr, extra) {
     const { responseType } = options;
     let data;
-    if (responseType === 'blob') {
+    if (binaryTypes.includes(responseType)) {
       data = xhr.response;
     } else {
       data = xhr.responseText;
@@ -171,4 +176,14 @@ export function request(url, options = {}) {
       data,
     }, extra);
   }
+}
+
+export function buffer2string(buffer) {
+  const array = new window.Uint8Array(buffer);
+  const sliceSize = 8192;
+  let str = '';
+  for (let i = 0; i < array.length; i += sliceSize) {
+    str += String.fromCharCode.apply(null, array.subarray(i, i + sliceSize));
+  }
+  return str;
 }

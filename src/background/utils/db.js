@@ -1,5 +1,5 @@
 import Promise from 'sync-promise-lite';
-import { i18n, request } from 'src/common';
+import { i18n, request, buffer2string } from 'src/common';
 import { getNameURI, getScriptInfo, isRemote, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
 
@@ -313,19 +313,29 @@ const cacheRequests = {};
 function fetchCache(url, check) {
   let promise = cacheRequests[url];
   if (!promise) {
-    promise = request(url, { responseType: 'blob' })
-    .then(({ data }) => Promise.resolve(check && check(data)).then(() => data))
-    .then(data => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        saveCache(url, window.btoa(reader.result)).then(() => {
-          delete cacheRequests[url];
-          resolve();
-        });
+    // DataURL cannot be loaded with `responseType=blob`
+    // ref: https://bugs.chromium.org/p/chromium/issues/detail?id=412752
+    promise = request(url, { responseType: 'arraybuffer' })
+    .then(({ data: buffer }) => {
+      const data = {
+        buffer,
+        blob(options) {
+          return new Blob([buffer], options);
+        },
+        string() {
+          return buffer2string(buffer);
+        },
+        base64() {
+          return window.btoa(data.string());
+        },
       };
-      reader.onerror = e => { reject(e); };
-      reader.readAsBinaryString(data);
-    }));
+      if (check) {
+        return Promise.resolve(check(data)).then(() => data);
+      }
+      return data;
+    })
+    .then(({ base64 }) => saveCache(url, base64()))
+    .then(() => { delete cacheRequests[url]; });
     cacheRequests[url] = promise;
   }
   return promise;
@@ -499,13 +509,14 @@ export function parseScript(data) {
   });
   // @icon
   if (isRemote(meta.icon)) {
-    fetchCache(meta.icon, blob => new Promise((resolve, reject) => {
+    fetchCache(meta.icon, ({ blob: getBlob }) => new Promise((resolve, reject) => {
+      const blob = getBlob({ type: 'image/png' });
       const url = URL.createObjectURL(blob);
       const image = new Image();
       const free = () => URL.revokeObjectURL(url);
       image.onload = () => {
         free();
-        resolve(blob);
+        resolve();
       };
       image.onerror = () => {
         free();
