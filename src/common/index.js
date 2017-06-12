@@ -187,3 +187,14 @@ export function buffer2string(buffer) {
   }
   return str;
 }
+
+export function getFullUrl(url, base) {
+  const obj = new URL(url, base);
+  // Do not allow `file:` protocol
+  if (obj.protocol === 'file:') obj.protocol = 'http:';
+  return obj.href;
+}
+
+export function isRemote(url) {
+  return url && !(/^(file|data):/.test(url));
+}

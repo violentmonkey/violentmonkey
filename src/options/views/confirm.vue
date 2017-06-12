@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { sendMessage, zfill, request, buffer2string } from 'src/common';
+import { sendMessage, zfill, request, buffer2string, isRemote, getFullUrl } from 'src/common';
 import options from 'src/common/options';
 import initCache from 'src/common/cache';
 import VmCode from './code';
@@ -63,7 +63,7 @@ export default {
       return this.store.route.query;
     },
     isLocal() {
-      return /^file:\/\/\//.test(this.info.url);
+      return !isRemote(this.info.url);
     },
   },
   mounted() {
@@ -131,14 +131,19 @@ export default {
         updateStatus();
         this.require = {};
         this.resources = {};
-        const promises = script.require.map(url => (
-          this.getFile(url, { useCache: true }).then(res => {
-            this.require[url] = res;
-          })
-        ))
-        .concat(urls.map(url => this.getFile(url, { isBlob: true, useCache: true }).then((res) => {
-          this.resources[url] = res;
-        })))
+        const promises = script.require.map(url => {
+          const fullUrl = getFullUrl(url, this.info.url);
+          return this.getFile(fullUrl, { useCache: true }).then(res => {
+            this.require[fullUrl] = res;
+          });
+        })
+        .concat(urls.map(url => {
+          const fullUrl = getFullUrl(url, this.info.url);
+          return this.getFile(fullUrl, { isBlob: true, useCache: true })
+          .then(res => {
+            this.resources[fullUrl] = res;
+          });
+        }))
         .map(promise => promise.then(() => {
           finished += 1;
           updateStatus();

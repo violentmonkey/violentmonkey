@@ -1,5 +1,5 @@
 import Promise from 'sync-promise-lite';
-import { i18n, request, buffer2string } from 'src/common';
+import { i18n, request, buffer2string, getFullUrl } from 'src/common';
 import { getNameURI, getScriptInfo, isRemote, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
 
@@ -494,36 +494,43 @@ export function parseScript(data) {
     },
   };
   const tx = db.transaction(['scripts', 'require'], 'readwrite');
-  // @require
-  meta.require.forEach(url => {
-    const cache = data.require && data.require[url];
-    if (cache) saveRequire(url, cache, tx);
-    else fetchRequire(url);
-  });
-  // @resource
-  Object.keys(meta.resources).forEach(k => {
-    const url = meta.resources[k];
-    const cache = data.resources && data.resources[url];
-    if (cache) saveCache(url, cache);
-    else fetchCache(url);
-  });
-  // @icon
-  if (isRemote(meta.icon)) {
-    fetchCache(meta.icon, ({ blob: getBlob }) => new Promise((resolve, reject) => {
-      const blob = getBlob({ type: 'image/png' });
-      const url = URL.createObjectURL(blob);
-      const image = new Image();
-      const free = () => URL.revokeObjectURL(url);
-      image.onload = () => {
-        free();
-        resolve();
-      };
-      image.onerror = () => {
-        free();
-        reject();
-      };
-      image.src = url;
-    }));
+  function fetchResources(base) {
+    // @require
+    meta.require.forEach(url => {
+      const fullUrl = getFullUrl(url, base);
+      const cache = data.require && data.require[fullUrl];
+      if (cache) saveRequire(fullUrl, cache, tx);
+      else fetchRequire(fullUrl);
+    });
+    // @resource
+    Object.keys(meta.resources).forEach(k => {
+      const url = meta.resources[k];
+      const fullUrl = getFullUrl(url, base);
+      const cache = data.resources && data.resources[fullUrl];
+      if (cache) saveCache(fullUrl, cache);
+      else fetchCache(fullUrl);
+    });
+    // @icon
+    if (isRemote(meta.icon)) {
+      fetchCache(
+        getFullUrl(meta.icon, base),
+        ({ blob: getBlob }) => new Promise((resolve, reject) => {
+          const blob = getBlob({ type: 'image/png' });
+          const url = URL.createObjectURL(blob);
+          const image = new Image();
+          const free = () => URL.revokeObjectURL(url);
+          image.onload = () => {
+            free();
+            resolve();
+          };
+          image.onerror = () => {
+            free();
+            reject();
+          };
+          image.src = url;
+        }),
+      );
+    }
   }
   return queryScript(data.id, meta, tx)
   .then(result => {
@@ -547,6 +554,7 @@ export function parseScript(data) {
       script.custom.homepageURL = data.from;
     }
     if (isRemote(data.url)) script.custom.lastInstallURL = data.url;
+    fetchResources(script.custom.lastInstallURL);
     script.custom.modified = data.modified || Date.now();
     return saveScript(script, tx);
   })
