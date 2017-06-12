@@ -246,6 +246,7 @@ const installURLs = [
   '^https://greasyfork.org/scripts/[^/]*/code/[^/]*?\\.user\\.js([?#]|$)',
   '^https://openuserjs.org/install/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
   '^https://github.com/[^/]*/[^/]*/raw/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
+  '^https://gist.github.com/.*?/[^/]*?.user.js([?#]|$)',
 ].map(re => new RegExp(re));
 
 browser.webRequest.onBeforeRequest.addListener(req => {

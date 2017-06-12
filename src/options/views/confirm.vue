@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { sendMessage, zfill, request } from 'src/common';
+import { sendMessage, zfill, request, buffer2string } from 'src/common';
 import options from 'src/common/options';
 import initCache from 'src/common/cache';
 import VmCode from './code';
@@ -176,18 +176,9 @@ export default {
         return Promise.resolve(cache.get(cacheKey));
       }
       return request(url, {
-        responseType: isBlob ? 'blob' : null,
+        responseType: isBlob ? 'arraybuffer' : null,
       })
-      .then(({ data }) => {
-        if (!isBlob) return data;
-        return new Promise(resolve => {
-          const reader = new FileReader();
-          reader.onload = function onload() {
-            resolve(window.btoa(this.result));
-          };
-          reader.readAsBinaryString(data);
-        });
-      })
+      .then(({ data }) => (isBlob ? window.btoa(buffer2string(data)) : data))
       .then(data => {
         if (useCache) cache.put(cacheKey, data);
         return data;
