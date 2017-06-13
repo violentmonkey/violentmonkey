@@ -111,7 +111,7 @@ export default {
     VmSettings,
   },
   data() {
-    this.debouncedFind = debounce(this.find, 100);
+    this.debouncedFind = debounce(this.doFind, 100);
     return {
       nav: 'code',
       canSave: false,
@@ -270,18 +270,26 @@ export default {
     initEditor(cm) {
       this.cm = cm;
     },
-    find() {
-      const { state } = this.search;
-      state.posTo = state.posFrom;
-      this.findNext();
-    },
-    findNext(reversed) {
+    doFind(reversed) {
       const { state } = this.search;
       const { cm } = this;
       if (state.query) {
         findNext(cm, state, reversed);
       }
       this.search.show = true;
+    },
+    find() {
+      const { state } = this.search;
+      state.posTo = state.posFrom;
+      this.doFind();
+      this.$nextTick(() => {
+        const { search } = this.$refs;
+        search.select();
+        search.focus();
+      });
+    },
+    findNext(reversed) {
+      this.doFind(reversed);
       this.$nextTick(() => {
         this.$refs.search.focus();
       });
