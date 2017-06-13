@@ -67,7 +67,7 @@ targets.push(merge(base, {
   plugins: [
     new WrapperWebpackPlugin({
       header: `\
-var VM_initializeWeb = function () {
+window.VM_initializeWeb = function () {
   var module = { exports: {} };
 `,
       footer: `
