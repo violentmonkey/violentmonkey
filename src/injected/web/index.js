@@ -374,6 +374,7 @@ function getWrapper() {
     'find',
     'focus',
     'getComputedStyle',
+    'getDefaultComputedStyle',  // Non-standard, Firefox only, used by jQuery
     'getSelection',
     'matchMedia',
     'moveBy',
