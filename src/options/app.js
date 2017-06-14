@@ -119,14 +119,16 @@ function initMain() {
 }
 function initCustomCSS() {
   let style;
-  options.hook((changes) => {
-    const customCSS = changes.customCSS || '';
-    if (customCSS && !style) {
-      style = document.createElement('style');
-      document.head.appendChild(style);
-    }
-    if (customCSS || style) {
-      style.textContent = customCSS;
+  options.hook(changes => {
+    if ('customCSS' in changes) {
+      const { customCSS } = changes;
+      if (customCSS && !style) {
+        style = document.createElement('style');
+        document.head.appendChild(style);
+      }
+      if (customCSS || style) {
+        style.textContent = customCSS;
+      }
     }
   });
 }
