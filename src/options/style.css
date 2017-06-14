@@ -105,21 +105,23 @@ textarea {
 .dropdown {
   position: relative;
   display: inline-block;
+  &-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: .4rem;
+    padding: .5rem 1rem;
+    background: #fbfbfb;
+    border-radius: .3rem;
+    box-shadow: 0 1px 1px #bbb;
+    z-index: 10;
+  }
+  &:not(.show) .dropdown-menu {
+    display: none;
+  }
 }
-.dropdown:not(.open) .dropdown-menu {
-  display: none;
-}
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 13rem;
-  margin-top: .4rem;
-  padding: 1rem;
-  background: #f8f8f8;
-  border-radius: .3rem;
-  box-shadow: .1rem .2rem .2rem gray;
-  z-index: 10;
+[dropdown-toggle] {
+  cursor: pointer;
 }
 
 .main {
@@ -213,13 +215,6 @@ code {
   height: 100%;
   /* Use `Courier New` to ensure `&nbsp;` has the same width as an original space. */
   font-family: Courier New, Courier, monospace;
-}
-.confirm-url {
-  float: left;
-  max-width: 50%;
-}
-.confirm-msg {
-  text-align: right;
 }
 .script {
   position: relative;

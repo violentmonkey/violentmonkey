@@ -2,7 +2,7 @@
   <div class="flex flex-col h-100">
     <div class="frame-block">
       <div class="buttons pull-right">
-        <div v-dropdown>
+        <div v-dropdown class="confirm-options">
           <button dropdown-toggle v-text="i18n('buttonInstallOptions')"></button>
           <div class="dropdown-menu options-panel" @mousedown.stop>
             <label>
@@ -235,3 +235,16 @@ export default {
   },
 };
 </script>
+
+<style>
+.confirm-options .dropdown-menu {
+  width: 13rem;
+}
+.confirm-url {
+  float: left;
+  max-width: 50%;
+}
+.confirm-msg {
+  text-align: right;
+}
+</style>

@@ -391,11 +391,11 @@ export default {
       color: #bbb;
       &.active {
         background: white;
-        box-shadow: 0 -1px 1px #999;
+        box-shadow: 0 -1px 1px #bbb;
         color: #333;
       }
       &:hover {
-        box-shadow: 0 -1px 1px #999;
+        box-shadow: 0 -1px 1px #bbb;
       }
     }
   }
