@@ -6,7 +6,13 @@
         <button v-text="i18n('buttonUpdateAll')" @click="updateAll"></button>
         <button v-text="i18n('buttonInstallFromURL')" @click="installFromURL"></button>
       </div>
-      <a href="https://greasyfork.org/scripts" target="_blank" v-text="i18n('anchorGetMoreScripts')"></a>
+      <div v-dropdown>
+        <button dropdown-toggle v-text="i18n('anchorGetMoreScripts')"></button>
+        <div class="dropdown-menu">
+          <a href="https://openuserjs.org/" target="_blank">OpenUserJS</a>
+          <a href="https://greasyfork.org/scripts" target="_blank">GreasyFork</a>
+        </div>
+      </div>
     </header>
     <div class="scripts">
       <item v-for="script in store.scripts" :key="script"
