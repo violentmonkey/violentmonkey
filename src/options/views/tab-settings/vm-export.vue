@@ -65,7 +65,7 @@ export default {
     exportData() {
       this.exporting = true;
       Promise.resolve(exportData(this.selectedIds))
-      .then(download)
+      .then(downloadBlob)
       .catch((err) => {
         console.error(err);
       })
@@ -92,10 +92,7 @@ function addFile(writer, file) {
   });
 }
 
-function download(blob) {
-  // Known issue: does not work on Firefox
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=1331176
-  const url = URL.createObjectURL(blob);
+function download(url, cb) {
   const a = document.createElement('a');
   a.style.display = 'none';
   document.body.appendChild(a);
@@ -104,8 +101,25 @@ function download(blob) {
   a.click();
   setTimeout(() => {
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    if (cb) cb();
   });
+}
+
+function downloadBlob(blob) {
+  // Known issue: does not work on Firefox
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=1331176
+  if (process.env.CLIENT === 'firefox') {
+    const reader = new FileReader();
+    reader.onload = () => {
+      download(reader.result);
+    };
+    reader.readAsDataURL(blob);
+  } else {
+    const url = URL.createObjectURL(blob);
+    download(url, () => {
+      URL.revokeObjectURL(url);
+    });
+  }
 }
 
 function exportData(selectedIds) {
