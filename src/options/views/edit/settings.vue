@@ -10,35 +10,40 @@
     <h4 v-text="i18n('editLabelMeta')"></h4>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelName')"></label>
-      <input type="text" v-model="custom.name" :placeholder="placeholders.name">
-      <div class="hint">@name</div>
+      <tooltip title="@name" placement="right">
+        <input type="text" v-model="custom.name" :placeholder="placeholders.name">
+      </tooltip>
     </div>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelRunAt')"></label>
-      <select v-model="custom.runAt">
-        <option value="" v-text="i18n('labelRunAtDefault')"></option>
-        <option value="start">document-start</option>
-        <option value="idle">document-idle</option>
-        <option value="end">document-end</option>
-      </select>
-      <div class="hint">@run-at</div>
+      <tooltip title="@run-at" placement="right">
+        <select v-model="custom.runAt">
+          <option value="" v-text="i18n('labelRunAtDefault')"></option>
+          <option value="start">document-start</option>
+          <option value="idle">document-idle</option>
+          <option value="end">document-end</option>
+        </select>
+      </tooltip>
     </div>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelHomepageURL')"></label>
-      <input type="text" v-model="custom.homepageURL" :placeholder="placeholders.homepageURL">
-      <div class="hint">@homepageURL</div>
+      <tooltip title="@homepageURL" placement="right">
+        <input type="text" v-model="custom.homepageURL" :placeholder="placeholders.homepageURL">
+      </tooltip>
     </div>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelUpdateURL')"></label>
-      <input type="text" v-model="custom.updateURL" :placeholder="placeholders.updateURL">
-      <div class="hint">@updateURL</div>
+      <tooltip title="@updateURL" placement="right">
+        <input type="text" v-model="custom.updateURL" :placeholder="placeholders.updateURL">
+      </tooltip>
     </div>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelDownloadURL')"></label>
-      <input type="text" v-model="custom.downloadURL" :placeholder="placeholders.downloadURL">
-      <div class="hint">@downloadURL</div>
+      <tooltip title="@downloadURL" placement="right">
+        <input type="text" v-model="custom.downloadURL" :placeholder="placeholders.downloadURL">
+      </tooltip>
     </div>
-    <div class="form-group">
+    <tooltip class="form-group" title="@include" placement="right">
       <div class="flex">
         <span class="flex-auto" v-text="i18n('labelInclude')"></span>
         <label>
@@ -47,9 +52,8 @@
         </label>
       </div>
       <textarea v-model="custom.include"></textarea>
-      <div class="hint">@include</div>
-    </div>
-    <div class="form-group">
+    </tooltip>
+    <tooltip class="form-group" title="@match" placement="right">
       <div class="flex">
         <span class="flex-auto" v-text="i18n('labelMatch')"></span>
         <label>
@@ -58,9 +62,8 @@
         </label>
       </div>
       <textarea v-model="custom.match"></textarea>
-      <div class="hint">@match</div>
-    </div>
-    <div class="form-group">
+    </tooltip>
+    <tooltip class="form-group" title="@exclude" placement="right">
       <div class="flex">
         <span class="flex-auto" v-text="i18n('labelExclude')"></span>
         <label>
@@ -69,9 +72,8 @@
         </label>
       </div>
       <textarea v-model="custom.exclude"></textarea>
-      <div class="hint">@exclude</div>
-    </div>
-    <div class="form-group">
+    </tooltip>
+    <tooltip class="form-group" title="@exclude-match" placement="right">
       <div class="flex">
         <span class="flex-auto" v-text="i18n('labelExcludeMatch')"></span>
         <label>
@@ -80,16 +82,19 @@
         </label>
       </div>
       <textarea v-model="custom.excludeMatch"></textarea>
-      <div class="hint">@exclude-match</div>
-    </div>
+    </tooltip>
   </div>
 </template>
 
 <script>
 import { i18n } from 'src/common';
+import Tooltip from '../tooltip';
 
 export default {
   props: ['value', 'settings'],
+  components: {
+    Tooltip,
+  },
   computed: {
     custom() {
       return this.settings.custom || {};
@@ -118,47 +123,25 @@ export default {
   h4 {
     margin: 2em 0 1em;
   }
-  > * {
-    max-width: 600px;
-  }
 }
 .form-group {
   position: relative;
+  max-width: 600px;
   margin-bottom: .5em;
+  &.tooltip {
+    display: block;
+  }
+  input[type=text] {
+    width: 100%;
+  }
+  > * {
+    flex: 1;
+  }
   > .label {
     flex: 0 0 8em;
   }
-  > input[type=text] {
-    flex: 1;
-  }
   > textarea {
     min-height: 5em;
-  }
-  > .hint {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 100%;
-    transform: translate(10px,-50%);
-    padding: 8px;
-    white-space: nowrap;
-    border-radius: 6px;
-    background: rgba(0,0,0,.8);
-    color: white;
-    font-size: 12px;
-    &::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      transform: translate(-100%, -50%);
-      border-top: 4px solid transparent;
-      border-bottom: 4px solid transparent;
-      border-right: 8px solid rgba(0,0,0,.8);
-    }
-  }
-  &:hover > .hint {
-    display: block;
   }
 }
 </style>

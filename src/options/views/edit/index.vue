@@ -30,15 +30,25 @@
       </form>
       <form class="inline-block mr-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
-        <input ref="search" v-model="search.state.query" title="Ctrl-F">
-        <button type="button" @click="findNext(1)" title="Shift-Ctrl-G">&lt;</button>
-        <button type="submit" title="Ctrl-G">&gt;</button>
+        <tooltip title="Ctrl-F">
+          <input ref="search" v-model="search.state.query">
+        </tooltip>
+        <tooltip title="Shift-Ctrl-G">
+          <button type="button" @click="findNext(1)">&lt;</button>
+        </tooltip>
+        <tooltip title="Ctrl-G">
+          <button type="submit">&gt;</button>
+        </tooltip>
       </form>
       <form class="inline-block mr-1" @submit.prevent="replace()">
         <span v-text="i18n('labelReplace')"></span>
         <input v-model="search.state.replace">
-        <button type="submit" v-text="i18n('buttonReplace')" title="Shift-Ctrl-F"></button>
-        <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)" title="Shift-Ctrl-R"></button>
+        <tooltip title="Shift-Ctrl-F">
+          <button type="submit" v-text="i18n('buttonReplace')"></button>
+        </tooltip>
+        <tooltip title="Shift-Ctrl-R">
+          <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
+        </tooltip>
       </form>
     </div>
     <div class="frame-block">
@@ -57,6 +67,7 @@ import { i18n, debounce, sendMessage, noop } from 'src/common';
 import { showMessage } from '../../utils';
 import VmCode from '../code';
 import VmSettings from './settings';
+import Tooltip from '../tooltip';
 
 function fromList(list) {
   return (list || []).join('\n');
@@ -109,6 +120,7 @@ export default {
   components: {
     VmCode,
     VmSettings,
+    Tooltip,
   },
   data() {
     this.debouncedFind = debounce(this.doFind, 100);
