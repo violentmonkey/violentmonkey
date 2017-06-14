@@ -1,6 +1,6 @@
 import { getUniqId, request, i18n } from 'src/common';
 import cache from './cache';
-import { isUserScript } from './script';
+import { isUserScript, parseMeta } from './script';
 
 const requests = {};
 const verify = {};
@@ -242,29 +242,56 @@ export function confirmInstall(info) {
   });
 }
 
-const installURLs = [
+const reUserScript = /\.user\.js([?#]|$)/;
+const whitelist = [
   '^https://greasyfork.org/scripts/[^/]*/code/[^/]*?\\.user\\.js([?#]|$)',
   '^https://openuserjs.org/install/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
   '^https://github.com/[^/]*/[^/]*/raw/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
   '^https://gist.github.com/.*?/[^/]*?.user.js([?#]|$)',
 ].map(re => new RegExp(re));
+const blacklist = [
+  '//(?:(?:gist.|)github.com|greasyfork.org|openuserjs.org)/',
+].map(re => new RegExp(re));
+const bypass = {};
 
 browser.webRequest.onBeforeRequest.addListener(req => {
   // onBeforeRequest fired for `file:`
   // - works on Chrome
   // - does not work on Firefox
-  if (req.method === 'GET' && installURLs.some(re => re.test(req.url))) {
-    // Firefox: slashes are decoded automatically by Firefox, thus cannot be
-    // used as separators
-    (req.tabId < 0 ? Promise.resolve() : browser.tabs.get(req.tabId))
-    .then(tab => {
-      confirmInstall({
-        url: req.url,
-        from: tab && tab.url,
+  const { url } = req;
+  if (req.method === 'GET' && reUserScript.test(url)) {
+    if (
+      whitelist.some(re => re.test(url)) ||
+      (!blacklist.some(re => re.test(url)) && !bypass[url])
+    ) {
+      Promise.all([
+        request(url),
+        req.tabId < 0 ? Promise.resolve() : browser.tabs.get(req.tabId),
+      ])
+      .then(([{ data: code }, tab]) => {
+        const meta = parseMeta(code);
+        if (meta.name && meta.namespace) {
+          confirmInstall({
+            code,
+            url,
+            from: tab && tab.url,
+          });
+        } else {
+          if (!bypass[url]) {
+            bypass[url] = {
+              timer: setTimeout(() => {
+                delete bypass[url];
+              }, 10000),
+            };
+          }
+          if (tab && tab.id) {
+            browser.tabs.update(tab.id, { url });
+          }
+        }
       });
-    });
-    // { cancel: true } will redirect to a blocked view
-    return { redirectUrl: 'javascript:history.back()' };  // eslint-disable-line no-script-url
+      // { cancel: true } will redirect to a blocked view
+      return { redirectUrl: 'javascript:history.back()' };  // eslint-disable-line no-script-url
+    }
   }
 }, {
   urls: ['<all_urls>'],
