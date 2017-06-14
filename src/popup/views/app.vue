@@ -111,6 +111,7 @@ export default {
     },
     onToggle() {
       options.set('isApplied', !this.options.isApplied);
+      this.checkReload();
     },
     onManage() {
       const url = browser.runtime.getURL(browser.runtime.getManifest().options_page);
@@ -157,8 +158,11 @@ export default {
       })
       .then(() => {
         item.data.enabled = !item.data.enabled;
-        if (options.get('autoReload')) browser.tabs.reload(this.store.currentTab.id);
+        this.checkReload();
       });
+    },
+    checkReload() {
+      if (options.get('autoReload')) browser.tabs.reload(this.store.currentTab.id);
     },
   },
 };
