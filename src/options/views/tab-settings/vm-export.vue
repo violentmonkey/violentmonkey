@@ -5,7 +5,7 @@
       <div class="ellipsis" v-for="item in items"
         :class="{active: item.active}"
         @click="item.active = !item.active"
-        v-text="item.script.custom.name || item.script.meta.name">
+        v-text="getName(item)">
       </div>
     </div>
     <button v-text="i18n('buttonAllNone')" @click="toggleSelection()"></button>
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { sendMessage } from 'src/common';
+import { sendMessage, getLocaleString } from 'src/common';
 import options from 'src/common/options';
 import { store } from '../../utils';
 import SettingCheck from '../setting-check';
@@ -72,6 +72,9 @@ export default {
       .then(() => {
         this.exporting = false;
       });
+    },
+    getName(item) {
+      return item.script.custom.name || getLocaleString(item.script.meta, 'name');
     },
   },
 };
