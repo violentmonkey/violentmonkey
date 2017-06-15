@@ -25,26 +25,7 @@ browser.runtime.onMessage.addListener(res => {
   if (handle) handle(res.data);
 });
 zip.workerScriptsPath = '/public/lib/zip.js/';
-document.title = i18n('extName');
-initCustomCSS();
-
-const routes = {
-  '': {
-    comp: 'Main',
-    init: initMain,
-  },
-  confirm: {
-    comp: 'Confirm',
-  },
-};
-window.addEventListener('hashchange', loadHash, false);
-loadHash();
-
-options.ready(() => {
-  new Vue({
-    render: h => h(App),
-  }).$mount('#app');
-});
+initialize();
 
 function parseLocation(pathInfo) {
   const [path, qs] = pathInfo.split('?');
@@ -58,20 +39,26 @@ function parseLocation(pathInfo) {
   return { path, query };
 }
 function loadHash() {
-  const loc = parseLocation(location.hash.slice(1));
-  const route = routes[loc.path];
-  if (route) {
-    store.route = {
-      comp: route.comp,
-      query: loc.query,
-    };
-    if (route.init) {
-      route.init();
-      route.init = null;
-    }
-  } else {
-    location.hash = '';
-  }
+  const route = parseLocation(location.hash.slice(1));
+  store.route = route;
+  if (!['', 'confirm'].includes(route.path)) location.hash = '';
+}
+
+function initialize() {
+  document.title = i18n('extName');
+  initCustomCSS();
+  window.addEventListener('hashchange', loadHash, false);
+  loadHash();
+  const initializers = {
+    '': initMain,
+  };
+  const init = initializers[store.route.path];
+  if (init) init();
+  options.ready(() => {
+    new Vue({
+      render: h => h(App),
+    }).$mount('#app');
+  });
 }
 
 function loadData() {

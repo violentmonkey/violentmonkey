@@ -83,18 +83,20 @@ function onLoadScripts(data) {
     'document-idle': idle,
     'document-end': end,
   };
-  forEach(data.scripts, script => {
-    values[script.uri] = data.values[script.uri] || {};
-    if (script && script.enabled) {
-      const list = listMap[
-        // XXX: use camelCase since v2.6.3
-        script.custom.runAt || script.custom['run-at'] ||
-        script.meta.runAt || script.meta['run-at']
-      ] || end;
-      list.push(script);
-    }
-  });
-  run(start);
+  if (data.scripts) {
+    forEach(data.scripts, script => {
+      values[script.uri] = data.values[script.uri] || {};
+      if (script && script.enabled) {
+        const list = listMap[
+          // XXX: use camelCase since v2.6.3
+          script.custom.runAt || script.custom['run-at'] ||
+          script.meta.runAt || script.meta['run-at']
+        ] || end;
+        list.push(script);
+      }
+    });
+    run(start);
+  }
   bridge.checkLoad();
   function buildCode(script) {
     const requireKeys = script.meta.require || [];
