@@ -426,9 +426,15 @@ export function vacuum() {
       values: {},
     };
     return getScriptsByIndex('position', null, tx, script => {
-      script.meta.require.forEach(uri => { data.require[uri] = 1; });
+      const base = script.custom.lastInstallURL;
+      script.meta.require.forEach(url => {
+        const fullUrl = getFullUrl(url, base);
+        data.require[fullUrl] = 1;
+      });
       Object.keys(script.meta.resources).forEach(key => {
-        data.cache[script.meta.resources[key]] = 1;
+        const url = script.meta.resources[key];
+        const fullUrl = getFullUrl(url, base);
+        data.cache[fullUrl] = 1;
       });
       if (isRemote(script.meta.icon)) data.cache[script.meta.icon] = 1;
       data.values[script.uri] = 1;
