@@ -329,9 +329,7 @@ function fetchCache(url, check) {
           return window.btoa(data.string());
         },
       };
-      if (check) {
-        return Promise.resolve(check(data)).then(() => data);
-      }
+      if (check) return Promise.resolve(check(data)).then(() => data);
       return data;
     })
     .then(({ base64 }) => saveCache(url, base64()))

@@ -34,21 +34,24 @@ function reqAbort() {
 function parseData(req, details) {
   if (req.resType) {
     // blob or arraybuffer
-    let data = req.data.response.split(',');
-    const mimetype = data[0].match(/^data:(.*?);base64$/);
-    if (!mimetype) {
-      // invalid
-      req.data.response = null;
-    } else {
-      data = window.atob(data[1]);
-      const arr = new window.Uint8Array(data.length);
-      for (let i = 0; i < data.length; i += 1) arr[i] = data.charCodeAt(i);
-      if (details.responseType === 'blob') {
-        // blob
-        return new Blob([arr], { type: mimetype });
+    const { response } = req.data;
+    if (response) {
+      let data = response.split(',');
+      const matches = data[0].match(/^data:(.*?);base64$/);
+      if (!matches) {
+        // invalid
+        req.data.response = null;
+      } else {
+        data = window.atob(data[1]);
+        const arr = new window.Uint8Array(data.length);
+        for (let i = 0; i < data.length; i += 1) arr[i] = data.charCodeAt(i);
+        if (details.responseType === 'blob') {
+          // blob
+          return new Blob([arr], { type: matches[1] });
+        }
+        // arraybuffer
+        return arr.buffer;
       }
-      // arraybuffer
-      return arr.buffer;
     }
   } else if (details.responseType === 'json') {
     // json
@@ -87,7 +90,7 @@ function start(req, id) {
   req.id = id;
   map[id] = req;
   if (includes(['arraybuffer', 'blob'], details.responseType)) {
-    payload.responseType = 'blob';
+    payload.responseType = 'arraybuffer';
   }
   encodeBody(details.data)
   .then(body => {
