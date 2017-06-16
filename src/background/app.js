@@ -251,16 +251,10 @@ function setIcon(isApplied) {
 setIcon(getOption('isApplied'));
 
 browser.notifications.onClicked.addListener(id => {
-  if (id === 'VM-NoGrantWarning') {
-    browser.tabs.create({
-      url: 'http://wiki.greasespot.net/@grant',
-    });
-  } else {
-    broadcast({
-      cmd: 'NotificationClick',
-      data: id,
-    });
-  }
+  broadcast({
+    cmd: 'NotificationClick',
+    data: id,
+  });
 });
 
 browser.notifications.onClosed.addListener(id => {

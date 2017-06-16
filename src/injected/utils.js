@@ -1,4 +1,4 @@
-export { sendMessage, noop, request } from 'src/common';
+export { sendMessage, request } from 'src/common';
 
 export function postData(destId, data) {
   // Firefox issue: data must be stringified to avoid cross-origin problem

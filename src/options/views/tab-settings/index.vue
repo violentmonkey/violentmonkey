@@ -15,14 +15,6 @@
           <span v-text="i18n('labelShowBadge')"></span>
         </label>
       </div>
-      <!--
-      <div class="mb-1">
-        <label>
-          <setting-check name="ignoreGrant" />
-          <span v-text="i18n('labelIgnoreGrant')"></span>
-        </label>
-      </div>
-      -->
       <div class="mb-1">
         <label>
           <setting-check name="autoReload" />

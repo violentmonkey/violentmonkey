@@ -5,12 +5,11 @@ const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const svgSprite = require('gulp-svg-sprite');
 const webpack = require('webpack');
+const webpackConfig = require('./scripts/webpack.conf');
 const i18n = require('./scripts/i18n');
 const json = require('./scripts/json');
+const { IS_DEV } = require('./scripts/utils');
 const pkg = require('./package.json');
-
-const isProd = process.env.NODE_ENV === 'production';
-const webpackConfig = require('./scripts/webpack.conf');
 
 const paths = {
   manifest: 'src/manifest.json',
@@ -79,7 +78,7 @@ gulp.task('manifest', () => (
 gulp.task('copy-files', () => {
   const jsFilter = gulpFilter(['**/*.js'], { restore: true });
   let stream = gulp.src(paths.copy, { base: 'src' });
-  if (isProd) stream = stream
+  if (!IS_DEV) stream = stream
   .pipe(jsFilter)
   .pipe(uglify())
   .pipe(jsFilter.restore);
