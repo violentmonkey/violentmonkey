@@ -1,6 +1,6 @@
 {
   "name": "violentmonkey",
-  "version": "2.6.4",
+  "version": "2.7.0",
   "scripts": {
     "dev": "gulp watch",
     "prebuild": "npm run lint && gulp clean",
