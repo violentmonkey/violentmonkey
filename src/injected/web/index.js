@@ -87,11 +87,10 @@ function onLoadScripts(data) {
     forEach(data.scripts, script => {
       values[script.uri] = data.values[script.uri] || {};
       if (script && script.enabled) {
-        const list = listMap[
-          // XXX: use camelCase since v2.6.3
-          script.custom.runAt || script.custom['run-at'] ||
-          script.meta.runAt || script.meta['run-at']
-        ] || end;
+        // XXX: use camelCase since v2.6.3
+        const runAt = script.custom.runAt || script.custom['run-at']
+          || script.meta.runAt || script.meta['run-at'];
+        const list = listMap[runAt] || end;
         list.push(script);
       }
     });
@@ -177,7 +176,7 @@ function wrapGM(script, cache) {
               url: resources[name],
             })),
             runAt: script.meta.runAt || '',
-            unwrap: false,  // deprecated, always `false`
+            unwrap: false, // deprecated, always `false`
             version: script.meta.version || '',
           },
         };
@@ -376,7 +375,7 @@ function getWrapper() {
     'find',
     'focus',
     'getComputedStyle',
-    'getDefaultComputedStyle',  // Non-standard, Firefox only, used by jQuery
+    'getDefaultComputedStyle', // Non-standard, Firefox only, used by jQuery
     'getSelection',
     'matchMedia',
     'moveBy',

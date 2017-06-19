@@ -5,7 +5,7 @@ const metaEnd = '==/UserScript==';
 
 export function isUserScript(text) {
   if (/^\s*</.test(text)) return false; // HTML
-  if (text.indexOf(metaStart) < 0) return false;  // Lack of meta block
+  if (text.indexOf(metaStart) < 0) return false; // Lack of meta block
   return true;
 }
 

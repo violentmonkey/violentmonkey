@@ -67,9 +67,9 @@ function str2RE(str) {
 
 function autoReg(str) {
   if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
-    return RegExp(str.slice(1, -1));  // Regular-expression
+    return RegExp(str.slice(1, -1)); // Regular-expression
   }
-  return str2RE(str);              // String with wildcards
+  return str2RE(str); // String with wildcards
 }
 
 function matchScheme(rule, data) {

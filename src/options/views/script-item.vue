@@ -42,13 +42,13 @@ function loadImage(url) {
   if (!promise) {
     const cache = store.cache[url];
     promise = cache
-    ? Promise.resolve(cache)
-    : new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(url);
-      img.onerror = () => reject(url);
-      img.src = url;
-    });
+      ? Promise.resolve(cache)
+      : new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(url);
+        img.onerror = () => reject(url);
+        img.src = url;
+      });
     images[url] = promise;
   }
   return promise;

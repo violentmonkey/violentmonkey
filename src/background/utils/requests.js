@@ -286,7 +286,7 @@ browser.webRequest.onBeforeRequest.addListener(req => {
         }
       });
       // { cancel: true } will redirect to a blocked view
-      return { redirectUrl: 'javascript:history.back()' };  // eslint-disable-line no-script-url
+      return { redirectUrl: 'javascript:history.back()' }; // eslint-disable-line no-script-url
     }
   }
 }, {

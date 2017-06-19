@@ -144,17 +144,17 @@ export function getScriptsByURL(url) {
     };
     const require = {};
     const cache = {};
-    return (testBlacklist(url)
-    ? Promise.resolve([])
-    : getScriptsByIndex('position', null, tx, script => {
-      if (!testScript(url, script)) return;
-      data.uris.push(script.uri);
-      script.meta.require.forEach(key => { require[key] = 1; });
-      Object.keys(script.meta.resources).forEach(key => {
-        cache[script.meta.resources[key]] = 1;
-      });
-      return script;
-    }))
+    return (testBlacklist(url) ? Promise.resolve([]) : (
+      getScriptsByIndex('position', null, tx, script => {
+        if (!testScript(url, script)) return;
+        data.uris.push(script.uri);
+        script.meta.require.forEach(key => { require[key] = 1; });
+        Object.keys(script.meta.resources).forEach(key => {
+          cache[script.meta.resources[key]] = 1;
+        });
+        return script;
+      })
+    ))
     .then(scripts => {
       data.scripts = scripts.filter(Boolean);
       data.require = Object.keys(require);

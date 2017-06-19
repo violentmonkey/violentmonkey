@@ -77,9 +77,9 @@ const commands = {
         browser.tabs.sendMessage(src.tab.id, { cmd: 'GetBadge' });
       }
     });
-    return data.isApplied
-    ? vmdb.getScriptsByURL(url).then(res => Object.assign(data, res))
-    : data;
+    return data.isApplied ? (
+      vmdb.getScriptsByURL(url).then(res => Object.assign(data, res))
+    ) : data;
   },
   UpdateScriptInfo(data) {
     return vmdb.updateScriptInfo(data.id, data, {
