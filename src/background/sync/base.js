@@ -111,9 +111,9 @@ export function getStates() {
 }
 
 function serviceFactory(base) {
-  const Service = function constructor(...args) {
-    if (!(this instanceof Service)) return new Service(...args);
-    this.initialize(...args);
+  const Service = function constructor() {
+    if (!(this instanceof Service)) return new Service();
+    this.initialize();
   };
   Service.prototype = base;
   Service.extend = extendService;
@@ -136,8 +136,7 @@ export const BaseService = serviceFactory({
   delayTime: 1000,
   urlPrefix: '',
   metaFile: 'Violentmonkey',
-  initialize(name) {
-    if (name) this.name = name;
+  initialize() {
     this.progress = {
       finished: 0,
       total: 0,
