@@ -20,6 +20,7 @@
 <script>
 import { sendMessage, getLocaleString } from 'src/common';
 import options from 'src/common/options';
+import { isFirefox } from 'src/common/ua';
 import { store } from '../../utils';
 import SettingCheck from '../setting-check';
 
@@ -111,7 +112,7 @@ function download(url, cb) {
 function downloadBlob(blob) {
   // Known issue: does not work on Firefox
   // https://bugzilla.mozilla.org/show_bug.cgi?id=1331176
-  if (process.env.CLIENT === 'firefox') {
+  if (isFirefox) {
     const reader = new FileReader();
     reader.onload = () => {
       download(reader.result);

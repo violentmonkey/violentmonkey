@@ -9,8 +9,6 @@ const definePlugin = new webpack.DefinePlugin({
     NODE_ENV: JSON.stringify(process.env.NODE_ENV),
     // DEBUG: IS_DEV ? 'true' : 'false', // whether to log message errors
     DEBUG: 'false',
-    // CLIENT may be `chrome`, `firefox`, `edge`
-    CLIENT: JSON.stringify(process.env.CLIENT || 'chrome'),
   },
 });
 
