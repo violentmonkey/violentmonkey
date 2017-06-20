@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div>
     <h1>
       <span v-text="i18n('labelAbout')"></span>
       <small v-text="`v${version}`"></small>

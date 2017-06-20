@@ -386,8 +386,6 @@ export default {
     > div {
       display: inline-block;
       padding: 8px 16px;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
       color: #bbb;
       &.active {
         background: white;

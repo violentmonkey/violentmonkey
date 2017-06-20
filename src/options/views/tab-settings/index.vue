@@ -1,5 +1,5 @@
 <template>
-  <div class="content tab-settings">
+  <div class="tab-settings">
     <h1 v-text="i18n('labelSettings')"></h1>
     <section>
       <h3 v-text="i18n('labelGeneral')"></h3>
@@ -61,3 +61,12 @@ export default {
   },
 };
 </script>
+
+<style>
+.tab-settings {
+  overflow-y: auto;
+  textarea {
+    height: 10em;
+  }
+}
+</style>

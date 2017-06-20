@@ -3,10 +3,13 @@
   padding: 0;
   box-sizing: border-box;
 }
+:focus {
+  outline: none;
+}
 html {
   height: 100%;
   font: 14px menu;
-  background: #eee;
+  background: #f0f0f0;
 }
 body {
   height: 100%;
@@ -22,16 +25,24 @@ h1, h2 {
 button {
   padding: 0 .5rem;
   font-size: 1rem;
+  line-height: 1.5;
+  background: white;
+  border: 1px solid #bbb;
+  cursor: pointer;
 }
 a {
   color: dodgerblue;
 }
-input[disabled] ~ * {
-  color: gray;
-}
 hr {
   border: none;
   border-top: 1px solid darkgray;
+}
+input[disabled] ~ * {
+  color: gray;
+}
+input[type=text] {
+  display: block;
+  width: 100%;
 }
 textarea {
   display: block;
@@ -108,13 +119,14 @@ textarea {
   &-menu {
     position: absolute;
     top: 100%;
-    right: 0;
     margin-top: .4rem;
-    padding: .5rem 1rem;
-    background: #fbfbfb;
-    border-radius: .3rem;
-    box-shadow: 0 1px 1px #bbb;
+    padding: .5rem;
+    border: 1px solid #bbb;
+    background: white;
     z-index: 10;
+    .dropdown-right & {
+      right: 0;
+    }
   }
   &:not(.show) .dropdown-menu {
     display: none;
@@ -159,27 +171,10 @@ aside img {
   color: black;
 }
 .content {
-  position: relative;
-  height: 100%;
-  margin-left: 14rem;
-  padding: 1.2rem;
-  background: white;
-  border-left: 1px solid darkgray;
-  border-right: 1px solid darkgray;
-  overflow-y: auto;
-}
-.content > header {
-  height: 2rem;
-  line-height: 2rem;
-  padding: 0 .5rem;
-  border-bottom: 1px solid darkgray;
 }
 #currentLang {
   color: green;
   font-weight: bold;
-}
-.no-pad {
-  padding: 0;
 }
 section {
   position: relative;
@@ -282,7 +277,7 @@ code {
   z-index: 9;
 }
 .edit {
-  background: #eee;
+  background: #f0f0f0;
 }
 .feature {
   &-text {
@@ -312,10 +307,14 @@ svg path {
   fill: currentColor;
 }
 
-.tab-settings {
-  textarea {
-    height: 10em;
-  }
+.tab {
+  position: relative;
+  height: 100%;
+  margin-left: 14rem;
+  padding: 1.2rem;
+  background: white;
+  border-left: 1px solid darkgray;
+  border-right: 1px solid darkgray;
 }
 
 .CodeMirror-foldmarker {

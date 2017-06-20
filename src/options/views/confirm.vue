@@ -2,7 +2,7 @@
   <div class="flex flex-col h-100">
     <div class="frame-block">
       <div class="buttons pull-right">
-        <div v-dropdown class="confirm-options">
+        <div v-dropdown class="confirm-options dropdown-right">
           <button dropdown-toggle v-text="i18n('buttonInstallOptions')"></button>
           <div class="dropdown-menu options-panel" @mousedown.stop>
             <label>

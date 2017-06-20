@@ -96,6 +96,7 @@ buttonUpdateAll:
 anchorGetMoreScripts:
   description: Link to get more scripts.
   message: Get more scripts
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Loading ...
@@ -108,6 +109,7 @@ labelAutoUpdate:
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
   message: Suppress no @grant warnings
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Data Import
@@ -395,3 +397,12 @@ msgScriptUpdated:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notify script updates
+installFrom:
+  description: Label for button to install script from a userscript site.
+  message: Install from $1
+labelSearchScript:
+  description: Placeholder for script search box.
+  message: Search scripts...
+labelNoSearchScripts:
+  description: Message shown when no script is found in search results.
+  message: No script is found.

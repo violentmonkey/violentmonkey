@@ -12,7 +12,7 @@
         <a href="#?t=About" :class="{active: tab === 'About'}" v-text="i18n('sideMenuAbout')"></a>
       </div>
     </aside>
-    <component :is="tab"></component>
+    <component :is="tab" class="tab"></component>
   </div>
 </template>
 

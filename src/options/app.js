@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import 'src/common/browser';
 import 'src/common/sprite';
-import { sendMessage, i18n } from 'src/common';
+import { sendMessage, i18n, getLocaleString } from 'src/common';
 import options from 'src/common/options';
 import { store, features } from './utils';
 import App from './views/app';
@@ -61,6 +61,18 @@ function initialize() {
   });
 }
 
+function initSearch(script) {
+  const meta = script.meta || {};
+  script._search = [
+    meta.name,
+    getLocaleString(meta, 'name'),
+    meta.description,
+    getLocaleString(meta, 'description'),
+    script.custom.name,
+    script.custom.description,
+  ].filter(Boolean).join('\n').toLowerCase();
+}
+
 function loadData() {
   sendMessage({ cmd: 'GetData' })
   .then(data => {
@@ -71,6 +83,9 @@ function loadData() {
     ].forEach((key) => {
       Vue.set(store, key, data[key]);
     });
+    if (store.scripts) {
+      store.scripts.forEach(initSearch);
+    }
     store.loading = false;
     // features.reset(data.version);
     features.reset('sync');
@@ -87,6 +102,7 @@ function initMain() {
     },
     AddScript(data) {
       data.message = '';
+      initSearch(data);
       store.scripts.push(data);
     },
     UpdateScript(data) {
@@ -96,6 +112,7 @@ function initMain() {
         Object.keys(data).forEach((key) => {
           Vue.set(script, key, data[key]);
         });
+        initSearch(script);
       }
     },
     RemoveScript(data) {

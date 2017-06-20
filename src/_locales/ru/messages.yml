@@ -3,7 +3,9 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: Violentmonkey позволяет пользователю автоматически вводить скрипты в страницы чтобы изменять их вид или поведение.
+  message: >-
+    Violentmonkey позволяет пользователю автоматически вводить скрипты в
+    страницы чтобы изменять их вид или поведение.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Скрипт обновлен.
@@ -96,6 +98,7 @@ buttonUpdateAll:
 anchorGetMoreScripts:
   description: Link to get more scripts.
   message: Скачать скрипты
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Загрузка...
@@ -108,6 +111,7 @@ labelAutoUpdate:
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
   message: Не показывать предупреждения об отсутствии поля @grant.
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Импорт данных
@@ -152,7 +156,9 @@ labelTranslator:
   message: 'Переводчики: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: 'softovikk, <a href=https://github.com/alexesprit>alexesprit</a>, <a href=https://github.com/bershan2>bershan2</a>'
+  message: >-
+    softovikk, <a href=https://github.com/alexesprit>alexesprit</a>, <a
+    href=https://github.com/bershan2>bershan2</a>
 labelCurrentLang:
   description: Label of current language.
   message: 'Текущий язык: '
@@ -305,13 +311,15 @@ labelShowBadge:
   message: Показывать количество активных скриптов на значке.
 labelLineNumber:
   description: Label for line number jumper.
-  message: Номер строки:
+  message: 'Номер строки:'
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Чёрный список
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: Скрипты не будут вводиться в документы, URL адреса которых совпадают с правилами в этом списке.
+  message: >-
+    Скрипты не будут вводиться в документы, URL адреса которых совпадают с
+    правилами в этом списке.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: Сохранить
@@ -348,8 +356,9 @@ labelCustomCSS:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Пользовательские стили CSS для страницы Настройки и страницы установки скриптов. 
-    Если Вы не знаете что это такое, пожалуйста не редактируйте этот текст.
+    Пользовательские стили CSS для страницы Настройки и страницы установки
+    скриптов. Если Вы не знаете что это такое, пожалуйста не редактируйте этот
+    текст.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Сохранить
@@ -395,3 +404,12 @@ msgScriptUpdated:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Уведомлять об обновлениях скриптов.
+installFrom:
+  description: Label for button to install script from a userscript site.
+  message: ''
+labelSearchScript:
+  description: Placeholder for script search box.
+  message: ''
+labelNoSearchScripts:
+  description: Message shown when no script is found in search results.
+  message: ''
