@@ -77,7 +77,9 @@ export function getScript(id, cTx) {
   const os = tx.objectStore('scripts');
   return new Promise(resolve => {
     os.get(id).onsuccess = e => {
-      resolve(e.target.result);
+      const { result } = e.target;
+      result.id = id;
+      resolve(result);
     };
   })
   .then(transformScript);
