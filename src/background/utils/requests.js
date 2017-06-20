@@ -256,17 +256,16 @@ browser.webRequest.onBeforeRequest.addListener(req => {
   // - does not work on Firefox
   const { url } = req;
   if (req.method === 'GET' && reUserScript.test(url)) {
-    if (
-      whitelist.some(re => re.test(url)) ||
-      (!blacklist.some(re => re.test(url)) && !bypass[url])
-    ) {
+    if (!bypass[url] && (
+      whitelist.some(re => re.test(url)) || !blacklist.some(re => re.test(url))
+    )) {
       Promise.all([
         request(url),
         req.tabId < 0 ? Promise.resolve() : browser.tabs.get(req.tabId),
       ])
       .then(([{ data: code }, tab]) => {
         const meta = parseMeta(code);
-        if (meta.name && meta.namespace) {
+        if (meta.name) {
           confirmInstall({
             code,
             url,
