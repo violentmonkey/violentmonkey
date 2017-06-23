@@ -59,7 +59,9 @@ export default {
     };
   },
   watch: {
-    search: 'onUpdate',
+    search() {
+      this.debouncedUpdate();
+    },
     'store.scripts': 'onUpdate',
   },
   computed: {
@@ -76,13 +78,13 @@ export default {
     },
   },
   methods: {
-    onUpdate: debounce(function onUpdate() {
+    onUpdate() {
       const { search } = this;
       const { scripts } = this.store;
       this.scripts = search
         ? scripts.filter(script => (script._search || '').includes(search.toLowerCase()))
         : scripts;
-    }, 200),
+    },
     newScript() {
       sendMessage({ cmd: 'NewScript' })
       .then((script) => {
@@ -152,6 +154,9 @@ export default {
         this.store.scripts = seq.concat.apply([], seq);
       });
     },
+  },
+  created() {
+    this.debouncedUpdate = debounce(this.onUpdate, 200);
   },
 };
 </script>
