@@ -10,6 +10,9 @@ const autoSync = debounce(sync, 60 * 60 * 1000);
 let working = Promise.resolve();
 let syncConfig;
 
+export function getItemFilename({ name: filename, uri }) {
+  return uri ? getFilename(uri) : filename;
+}
 export function getFilename(uri) {
   return `vm-${encodeURIComponent(uri)}`;
 }
@@ -18,11 +21,6 @@ export function isScriptFile(name) {
 }
 export function getURI(name) {
   return decodeURIComponent(name.slice(3));
-}
-
-function getLocalData() {
-  return getScripts()
-  .then(scripts => scripts.filter(script => !script.config.removed));
 }
 
 function initConfig() {
@@ -151,7 +149,6 @@ export const BaseService = serviceFactory({
       'syncing',
       'error',
     ], null, onStateChange);
-    // this.initToken();
     this.lastFetch = Promise.resolve();
     this.startSync = this.syncFactory();
     const events = getEventEmitter();
@@ -220,9 +217,14 @@ export const BaseService = serviceFactory({
     .then(() => this.startSync());
   },
   user: noop,
+  handleMetaError(err) {
+    throw err;
+  },
   getMeta() {
     return this.get(this.metaFile)
-    .then(data => JSON.parse(data));
+    .then(data => JSON.parse(data))
+    .catch(err => this.handleMetaError(err))
+    .then(data => ({ name: this.metaFile, data }));
   },
   initToken() {
     this.prepareHeaders();
@@ -273,6 +275,18 @@ export const BaseService = serviceFactory({
       return data;
     });
   },
+  getLocalData() {
+    return getScripts()
+    .then(scripts => scripts.filter(script => !script.config.removed));
+  },
+  getSyncData() {
+    return this.getMeta()
+    .then(remoteMeta => Promise.all([
+      remoteMeta,
+      this.list(),
+      this.getLocalData(),
+    ]));
+  },
   sync() {
     this.progress = {
       finished: 0,
@@ -280,15 +294,11 @@ export const BaseService = serviceFactory({
     };
     this.syncState.set('syncing');
     // Avoid simultaneous requests
-    return this.getMeta()
-    .then(remoteMeta => Promise.all([
-      remoteMeta,
-      this.list(),
-      getLocalData(),
-    ]))
+    return this.getSyncData()
     .then(([remoteMeta, remoteData, localData]) => {
-      const remoteMetaInfo = remoteMeta.info || {};
-      const remoteTimestamp = remoteMeta.timestamp || 0;
+      const { data: remoteMetaData } = remoteMeta;
+      const remoteMetaInfo = remoteMetaData.info || {};
+      const remoteTimestamp = remoteMetaData.timestamp || 0;
       let remoteChanged = !remoteTimestamp
         || Object.keys(remoteMetaInfo).length !== remoteData.length;
       const now = Date.now();
@@ -302,7 +312,7 @@ export const BaseService = serviceFactory({
       const putRemote = [];
       const delRemote = [];
       const delLocal = [];
-      remoteMeta.info = remoteData.reduce((info, item) => {
+      remoteMetaData.info = remoteData.reduce((info, item) => {
         remoteItemMap[item.uri] = item;
         let itemInfo = remoteMetaInfo[item.uri];
         if (!itemInfo) {
@@ -318,36 +328,36 @@ export const BaseService = serviceFactory({
       }, {});
       localData.forEach(item => {
         const { props: { uri, position, lastModified } } = item;
-        const remoteInfo = remoteMeta.info[uri];
+        const remoteInfo = remoteMetaData.info[uri];
         if (remoteInfo) {
+          const remoteItem = remoteItemMap[uri];
           if (firstSync || !lastModified || remoteInfo.modified > lastModified) {
-            const remoteItem = remoteItemMap[uri];
-            getRemote.push(remoteItem);
+            getRemote.push({ local: item, remote: remoteItem });
           } else if (remoteInfo.modified < lastModified) {
-            putRemote.push(item);
+            putRemote.push({ local: item, remote: remoteItem });
           } else if (remoteInfo.position !== position) {
             remoteInfo.position = position;
             remoteChanged = true;
           }
           delete remoteItemMap[uri];
         } else if (firstSync || !outdated || lastModified > remoteTimestamp) {
-          putRemote.push(item);
+          putRemote.push({ local: item });
         } else {
-          delLocal.push(item);
+          delLocal.push({ local: item });
         }
       });
       Object.keys(remoteItemMap).forEach(uri => {
         const item = remoteItemMap[uri];
         if (outdated) {
-          getRemote.push(item);
+          getRemote.push({ remote: item });
         } else {
-          delRemote.push(item);
+          delRemote.push({ remote: item });
         }
       });
       const promiseQueue = [
-        ...getRemote.map(item => {
-          this.log('Download script:', item.uri);
-          return this.get(getFilename(item.uri))
+        ...getRemote.map(({ remote }) => {
+          this.log('Download script:', remote.uri);
+          return this.get(remote)
           .then(raw => {
             const data = {};
             try {
@@ -370,7 +380,7 @@ export const BaseService = serviceFactory({
             }
             // Invalid data
             if (!data.code) return;
-            const remoteInfo = remoteMeta.info[item.uri];
+            const remoteInfo = remoteMetaData.info[remote.uri];
             const { modified } = remoteInfo;
             data.modified = modified;
             const position = +remoteInfo.position;
@@ -382,9 +392,9 @@ export const BaseService = serviceFactory({
             .then(res => { browser.runtime.sendMessage(res); });
           });
         }),
-        ...putRemote.map(script => {
-          this.log('Upload script:', script.props.uri);
-          return getScriptCode(script.props.id)
+        ...putRemote.map(({ local, remote }) => {
+          this.log('Upload script:', local.props.uri);
+          return getScriptCode(local.props.id)
           .then(code => {
             // const data = {
             //   version: 2,
@@ -397,28 +407,31 @@ export const BaseService = serviceFactory({
               version: 1,
               code,
               more: {
-                custom: script.custom,
-                enabled: script.config.enabled,
-                update: script.config.shouldUpdate,
+                custom: local.custom,
+                enabled: local.config.enabled,
+                update: local.config.shouldUpdate,
               },
             };
-            remoteMeta.info[script.props.uri] = {
-              modified: script.props.lastModified,
-              position: script.props.position,
+            remoteMetaData.info[local.props.uri] = {
+              modified: local.props.lastModified,
+              position: local.props.position,
             };
             remoteChanged = true;
-            return this.put(getFilename(script.props.uri), JSON.stringify(data));
+            return this.put(
+              Object.assign({}, remote, { uri: local.props.uri }),
+              JSON.stringify(data),
+            );
           });
         }),
-        ...delRemote.map(item => {
-          this.log('Remove remote script:', item.uri);
-          delete remoteMeta.info[item.uri];
+        ...delRemote.map(({ remote }) => {
+          this.log('Remove remote script:', remote.uri);
+          delete remoteMetaData.info[remote.uri];
           remoteChanged = true;
-          return this.remove(getFilename(item.uri));
+          return this.remove(remote);
         }),
-        ...delLocal.map(script => {
-          this.log('Remove local script:', script.props.uri);
-          return removeScript(script.props.id);
+        ...delLocal.map(({ local }) => {
+          this.log('Remove local script:', local.props.uri);
+          return removeScript(local.props.id);
         }),
       ];
       promiseQueue.push(Promise.all(promiseQueue).then(() => normalizePosition()).then(changed => {
@@ -426,7 +439,7 @@ export const BaseService = serviceFactory({
         remoteChanged = true;
         return getScripts().then(scripts => {
           scripts.forEach(script => {
-            const remoteInfo = remoteMeta.info[script.props.uri];
+            const remoteInfo = remoteMetaData.info[script.props.uri];
             if (remoteInfo) remoteInfo.position = script.props.position;
           });
         });
@@ -434,10 +447,10 @@ export const BaseService = serviceFactory({
       promiseQueue.push(Promise.all(promiseQueue).then(() => {
         const promises = [];
         if (remoteChanged) {
-          remoteMeta.timestamp = Date.now();
-          promises.push(this.put(this.metaFile, JSON.stringify(remoteMeta)));
+          remoteMetaData.timestamp = Date.now();
+          promises.push(this.put(remoteMeta, JSON.stringify(remoteMetaData)));
         }
-        localMeta.timestamp = remoteMeta.timestamp;
+        localMeta.timestamp = remoteMetaData.timestamp;
         localMeta.lastSync = Date.now();
         this.config.set('meta', localMeta);
         return Promise.all(promises);
