@@ -154,7 +154,7 @@ labelTranslator:
   message: 'Traductor: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: Greydus
+  message: <a href="http://greydus.tk" target="_blank">Greydus</a>
 labelCurrentLang:
   description: Label of current language.
   message: 'Idioma actual: '
@@ -276,7 +276,7 @@ hintInputURL:
   message: 'Escribe URL:'
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Instalar desde URL
+  message: Instalar de URL
 labelSync:
   description: Label for sync options.
   message: Sincronizar
@@ -314,7 +314,7 @@ labelLineNumber:
   message: 'Numero de linea: '
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Blacklist
+  message: Lista negra
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: URLs en esta lista no seran injectados por los scripts.
@@ -373,40 +373,40 @@ buttonCancel:
   message: Cancelar
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: Importar opciones
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: Obtenga más información acerca de los patrones de la lista negra
 editNavCode:
   description: Label of code tab in script editor.
-  message: ''
+  message: Codigo
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: ''
+  message: Ajustes
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: Ajustes de script
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadatos personalizados
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: ''
+  message: Mantener original
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: ''
+  message: Actualización
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: '!Script [$1] se ha actualizado¡'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: Notificar actualizaciones de scripts
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: Instalar de $1
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: Buscar scripts...
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: No se encontro ningun script
