@@ -15,8 +15,8 @@
 <script>
 import { i18n, sendMessage } from 'src/common';
 import options from 'src/common/options';
+import SettingCheck from 'src/common/ui/setting-check';
 import { showMessage } from '../../utils';
-import SettingCheck from '../setting-check';
 
 export default {
   components: {

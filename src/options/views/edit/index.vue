@@ -1,5 +1,5 @@
 <template>
-  <div class="edit flex flex-col fixed-full">
+  <div class="frame flex flex-col fixed-full">
     <div class="flex edit-header">
       <h2 v-text="i18n('labelScriptEditor')"></h2>
       <div class="flex-auto pos-rel px-2">
@@ -64,8 +64,8 @@
 <script>
 import CodeMirror from 'codemirror';
 import { i18n, debounce, sendMessage, noop } from 'src/common';
+import VmCode from 'src/common/ui/code';
 import { showMessage } from '../../utils';
-import VmCode from '../code';
 import VmSettings from './settings';
 import Tooltip from '../tooltip';
 

@@ -38,12 +38,12 @@
 
 <script>
 import { sendMessage } from 'src/common';
+import SettingCheck from 'src/common/ui/setting-check';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
 import VmBlacklist from './vm-blacklist';
 import VmCss from './vm-css';
-import SettingCheck from '../setting-check';
 
 export default {
   components: {

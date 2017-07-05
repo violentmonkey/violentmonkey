@@ -1,23 +1,6 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-html {
-  font: 14px menu;
-}
 body {
   min-width: 20em;
   padding: 1em;
-  font-size: 1em;
-}
-.icon {
-  width: 1rem;
-  height: 1rem;
-  vertical-align: bottom;
-}
-svg path {
-  fill: currentColor;
 }
 
 .logo {

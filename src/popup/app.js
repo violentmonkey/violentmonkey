@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import 'src/common/browser';
 import 'src/common/sprite';
-import options from 'src/common/options';
 import { i18n, sendMessage } from 'src/common';
+import handlers from 'src/common/handlers';
+import 'src/common/ui/style';
 import App from './views/app';
 import { store } from './utils';
 
@@ -12,7 +13,7 @@ new Vue({
   render: h => h(App),
 }).$mount('#app');
 
-const handlers = {
+Object.assign(handlers, {
   SetPopup(data, src) {
     if (store.currentTab.id !== src.tab.id) return;
     store.commands = data.menus;
@@ -24,13 +25,6 @@ const handlers = {
       store.scripts = scripts;
     });
   },
-  UpdateOptions(data) {
-    options.update(data);
-  },
-};
-browser.runtime.onMessage.addListener((req, src) => {
-  const func = handlers[req.cmd];
-  if (func) func(req.data, src);
 });
 
 browser.tabs.query({ currentWindow: true, active: true })

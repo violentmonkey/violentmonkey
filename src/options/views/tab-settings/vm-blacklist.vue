@@ -16,7 +16,7 @@
 import { i18n, sendMessage } from 'src/common';
 import options from 'src/common/options';
 import { showMessage } from 'src/options/utils';
-import SettingText from '../setting-text';
+import SettingText from 'src/common/ui/setting-text';
 
 export default {
   components: {

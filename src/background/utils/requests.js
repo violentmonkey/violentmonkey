@@ -233,8 +233,8 @@ export function confirmInstall(info) {
       url: info.url,
       from: info.from,
     });
-    const optionsURL = browser.runtime.getURL(browser.runtime.getManifest().options_page);
-    browser.tabs.create({ url: `${optionsURL}#confirm?id=${confirmKey}` });
+    const optionsURL = browser.runtime.getURL('/confirm/index.html');
+    browser.tabs.create({ url: `${optionsURL}#?id=${confirmKey}` });
   });
 }
 

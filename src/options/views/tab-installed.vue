@@ -2,17 +2,15 @@
   <div class="tab-installed">
     <header class="flex">
       <div class="flex-auto">
-        <div v-dropdown="{autoClose: true}">
-          <button dropdown-toggle>
+        <vm-dropdown :closeAfterClick="true">
+          <button slot="toggle">
             <svg class="icon"><use xlink:href="#plus" /></svg>
           </button>
-          <div class="dropdown-menu">
-            <a href="#" v-text="i18n('buttonNew')" @click.prevent="newScript"></a>
-            <a v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
-            <a v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank"></a>
-            <a href="#" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></a>
-          </div>
-        </div>
+          <a href="#" v-text="i18n('buttonNew')" @click.prevent="newScript"></a>
+          <a v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
+          <a v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank"></a>
+          <a href="#" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></a>
+        </vm-dropdown>
         <tooltip :title="i18n('buttonUpdateAll')" placement="down">
           <button @click="updateAll">
             <svg class="icon"><use xlink:href="#refresh" /></svg>
@@ -39,6 +37,7 @@
 
 <script>
 import { i18n, sendMessage, noop, debounce } from 'src/common';
+import VmDropdown from 'src/common/ui/dropdown';
 import Item from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
@@ -49,6 +48,7 @@ export default {
     Item,
     Edit,
     Tooltip,
+    VmDropdown,
   },
   data() {
     return {

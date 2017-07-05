@@ -9,6 +9,7 @@ const { IS_DEV, merge } = require('./utils');
 const entry = {
   'background/app': 'src/background/app.js',
   'options/app': 'src/options/app.js',
+  'confirm/app': 'src/confirm/app.js',
   'popup/app': 'src/popup/app.js',
   injected: 'src/injected/index.js',
 };
@@ -37,6 +38,11 @@ targets.push(merge(base, {
       filename: 'options/index.html',
       template: 'src/options/index.html',
       chunks: ['browser', 'common', 'options/app'],
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'confirm/index.html',
+      template: 'src/public/index.html',
+      chunks: ['browser', 'common', 'confirm/app'],
     }),
     new HtmlWebpackPlugin({
       filename: 'popup/index.html',

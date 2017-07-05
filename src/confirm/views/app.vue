@@ -1,10 +1,10 @@
 <template>
-  <div class="flex flex-col h-100">
+  <div class="frame flex flex-col h-100">
     <div class="frame-block">
       <div class="buttons pull-right">
-        <div v-dropdown class="confirm-options dropdown-right">
-          <button dropdown-toggle v-text="i18n('buttonInstallOptions')"></button>
-          <div class="dropdown-menu options-panel" @mousedown.stop>
+        <vm-dropdown class="confirm-options" align="right">
+          <button slot="toggle" v-text="i18n('buttonInstallOptions')"></button>
+          <div class="options-panel">
             <label>
               <setting-check name="closeAfterInstall" @change="checkClose" />
               <span v-text="i18n('installOptionClose')"></span>
@@ -14,7 +14,7 @@
               <span v-text="i18n('installOptionTrack')"></span>
             </label>
           </div>
-        </div>
+        </vm-dropdown>
         <button v-text="i18n('buttonConfirmInstallation')"
         :disabled="!installable" @click="installScript"></button>
         <button v-text="i18n('buttonClose')" @click="close"></button>
@@ -33,20 +33,22 @@
 import { sendMessage, zfill, request, buffer2string, isRemote, getFullUrl } from 'src/common';
 import options from 'src/common/options';
 import initCache from 'src/common/cache';
-import VmCode from './code';
-import { store } from '../utils';
-import SettingCheck from './setting-check';
+import VmCode from 'src/common/ui/code';
+import VmDropdown from 'src/common/ui/dropdown';
+import SettingCheck from 'src/common/ui/setting-check';
+import getPathInfo from 'src/common/pathinfo';
 
 const cache = initCache({});
+const { query } = getPathInfo();
 
 export default {
   components: {
+    VmDropdown,
     VmCode,
     SettingCheck,
   },
   data() {
     return {
-      store,
       installable: false,
       dependencyOK: false,
       closeAfterInstall: options.get('closeAfterInstall'),
@@ -59,9 +61,6 @@ export default {
     };
   },
   computed: {
-    query() {
-      return this.store.route.query;
-    },
     isLocal() {
       return !isRemote(this.info.url);
     },
@@ -70,7 +69,7 @@ export default {
     this.message = this.i18n('msgLoadingData');
     this.loadInfo()
     .then(() => {
-      const id = this.store.route.query.id;
+      const id = query.id;
       this.guard = setInterval(() => {
         sendMessage({
           cmd: 'CacheHit',
@@ -94,7 +93,7 @@ export default {
   },
   methods: {
     loadInfo() {
-      const id = this.store.route.query.id;
+      const id = query.id;
       return sendMessage({
         cmd: 'CacheLoad',
         data: `confirm-${id}`,
@@ -237,8 +236,13 @@ export default {
 </script>
 
 <style>
-.confirm-options .dropdown-menu {
-  width: 13rem;
+.confirm-options {
+  label {
+    display: block;
+  }
+  .dropdown-menu {
+    width: 13rem;
+  }
 }
 .confirm-url {
   float: left;

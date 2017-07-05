@@ -1,4 +1,4 @@
-import options from 'src/common/options';
+import options from './options';
 
 const hooks = {};
 

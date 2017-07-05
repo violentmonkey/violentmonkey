@@ -27,8 +27,8 @@
 <script>
 import { sendMessage } from 'src/common';
 import options from 'src/common/options';
+import SettingCheck from 'src/common/ui/setting-check';
 import { store } from '../../utils';
-import SettingCheck from '../setting-check';
 
 const SYNC_CURRENT = 'sync.current';
 const syncConfig = {

@@ -21,8 +21,8 @@
 import { sendMessage, getLocaleString } from 'src/common';
 import options from 'src/common/options';
 import { isFirefox } from 'src/common/ua';
+import SettingCheck from 'src/common/ui/setting-check';
 import { store } from '../../utils';
-import SettingCheck from '../setting-check';
 
 /**
  * Note:

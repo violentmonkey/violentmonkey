@@ -1,10 +1,10 @@
 <template>
-  <textarea v-model="value" @change="onChange" :disabled="disabled" />
+  <input type="checkbox" v-model="value" @change="onChange" :disabled="disabled">
 </template>
 
 <script>
-import options from 'src/common/options';
-import { hookSetting } from 'src/options/utils';
+import options from '../options';
+import hookSetting from '../hook-setting';
 
 export default {
   props: {
@@ -21,11 +21,9 @@ export default {
     };
   },
   created() {
-    // XXX compatible with old data format
-    const handle = value => (Array.isArray(value) ? value.join('\n') : (value || ''));
-    this.value = handle(options.get(this.name));
+    this.value = options.get(this.name);
     this.revoke = hookSetting(this.name, value => {
-      this.value = handle(value);
+      this.value = value;
     });
   },
   beforeDestroy() {
