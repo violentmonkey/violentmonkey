@@ -20,34 +20,28 @@ targets.push(merge(base, {
   entry,
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'browser',
-      chunks: Object.keys(entry),
+      name: 'common',
+      chunks: Object.keys(entry).filter(name => name !== 'injected'),
+      minChunks: (m, c) => c >= 2,
     }),
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      chunks: Object.keys(entry).filter(key => key !== 'injected'),
-      minChunks: 2,
+      name: 'browser',
+      chunks: ['common', 'injected'],
+      minChunks: (m, c) => c >= 2,
     }),
     new HtmlWebpackPlugin({
       filename: 'background/index.html',
-      template: 'src/background/index.html',
-      inject: true,
-      chunks: ['vendor', 'browser', 'background/app'],
-      chunksSortMode: 'dependency'
+      chunks: ['browser', 'common', 'background/app'],
     }),
     new HtmlWebpackPlugin({
       filename: 'options/index.html',
       template: 'src/options/index.html',
-      inject: true,
-      chunks: ['vendor', 'browser', 'options/app'],
-      chunksSortMode: 'dependency'
+      chunks: ['browser', 'common', 'options/app'],
     }),
     new HtmlWebpackPlugin({
       filename: 'popup/index.html',
-      template: 'src/popup/index.html',
-      inject: true,
-      chunks: ['vendor', 'browser', 'popup/app'],
-      chunksSortMode: 'dependency'
+      template: 'src/public/index.html',
+      chunks: ['browser', 'common', 'popup/app'],
     }),
     // new FriendlyErrorsPlugin(),
     !IS_DEV && new ExtractTextPlugin('[name].css'),
