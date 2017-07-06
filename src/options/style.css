@@ -1,15 +1,15 @@
-aside {
-  position: absolute;
-  background: #fafafa;
-  top: 0;
-  left: 0;
-  width: 14rem;
-  padding: 4rem 1rem 0;
-  border: none;
-  text-align: right;
+html,
+body {
+  height: 100%;
 }
-aside img {
-  width: 5rem;
+aside {
+  flex: 0 0 14rem;
+  padding: 4rem 1rem 0;
+  text-align: right;
+  background: #fafafa;
+  img {
+    width: 5rem;
+  }
 }
 .sidemenu > a {
   display: block;
@@ -19,10 +19,10 @@ aside img {
   font-weight: bold;
   text-decoration: none;
   color: gray;
-}
-.sidemenu > a.active,
-.sidemenu > a:hover {
-  color: black;
+  &.active,
+  &:hover {
+    color: black;
+  }
 }
 #currentLang {
   color: green;
@@ -52,70 +52,6 @@ section {
 .options-panel label {
   display: block;
 }
-.script {
-  position: relative;
-  margin: .6rem;
-  padding: .6rem;
-  border: 1px solid #ccc;
-  border-radius: .3rem;
-  transition: transform .5s;
-}
-.script:hover {
-  border-color: darkgray;
-}
-.script.disabled {
-  background: lightgray;
-  color: gray;
-}
-.script .pull-right {
-  margin-left: 1em;
-}
-.script-info {
-  margin-left: 3.5rem;
-  line-height: 1.5;
-  align-items: center;
-  > * {
-    margin-right: .8rem;
-  }
-  .icon {
-    display: block;
-  }
-}
-.script-icon {
-  position: absolute;
-  top: .8rem;
-  width: 3rem;
-  height: 3rem;
-}
-.script-name {
-  font-weight: bold;
-  font-size: 1rem;
-}
-.script-author {
-  max-width: 30%;
-}
-.script-desc {
-  margin-left: 3.5rem;
-  line-height: 2rem;
-}
-.script-desc::after {
-  content: "\200b";
-}
-.disabled .script-icon {
-  filter: grayscale(.5);
-}
-.disabled .script-name {
-  color: blueviolet;
-}
-.dragging-placeholder {
-  visibility: hidden;
-}
-.dragging {
-  position: fixed;
-  margin: 0;
-  background: wheat;
-  z-index: 9;
-}
 .feature {
   &-text {
     position: relative;
@@ -138,8 +74,6 @@ section {
 
 .tab {
   position: relative;
-  height: 100%;
-  margin-left: 14rem;
   padding: 1.2rem;
   background: white;
   border-left: 1px solid darkgray;

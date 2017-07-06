@@ -1,10 +1,10 @@
 <template>
-  <div class="page-options pos-rel h-100">
-    <aside class="h-100">
+  <div class="page-options flex h-100">
+    <aside>
       <img src="/public/images/icon128.png">
       <h1 v-text="i18n('extName')"></h1>
       <hr>
-      <div class=sidemenu>
+      <div class="sidemenu">
         <a href="#?t=Installed" :class="{active: tab === 'Installed'}" v-text="i18n('sideMenuInstalled')"></a>
         <a href="#?t=Settings" :class="{active: tab === 'Settings'}" v-feature="'settings'">
           <span v-text="i18n('sideMenuSettings')" class="feature-text"></span>
@@ -12,7 +12,7 @@
         <a href="#?t=About" :class="{active: tab === 'About'}" v-text="i18n('sideMenuAbout')"></a>
       </div>
     </aside>
-    <component :is="tab" class="tab"></component>
+    <component :is="tab" class="tab flex-auto"></component>
   </div>
 </template>
 

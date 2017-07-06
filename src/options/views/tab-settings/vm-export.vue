@@ -198,9 +198,11 @@ function exportData(selectedIds) {
     margin-right: .2rem;
     margin-bottom: .1rem;
     padding: 0 .3rem;
-    box-shadow: 0 0 1px black;
+    border: 1px solid #bbb;
+    border-radius: 3px;
     cursor: pointer;
     &.active {
+      border-color: #2c82c9;
       background: #3498db;
       color: white;
     }

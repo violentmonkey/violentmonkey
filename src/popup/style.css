@@ -1,6 +1,6 @@
 body {
   min-width: 20em;
-  padding: 1em;
+  padding-top: 1em;
 }
 
 .logo {
@@ -16,9 +16,11 @@ body {
   border-top: 1px solid silver;
   &-item {
     position: relative;
+    height: 2rem;
+    line-height: 2rem;
+    padding: 0 3rem;
     cursor: pointer;
     text-align: center;
-    padding: .5em 2em;
     .submenu > & {
       text-align: left;
     }
@@ -34,32 +36,35 @@ body {
     }
     > .icon {
       position: absolute;
-      top: .7em;
-      left: .5em;
+      top: 0;
+      left: 1.5rem;
+      width: 1rem;
+      height: 100%;
       &-right {
         left: auto;
-        right: .5em;
+        right: 1.5em;
       }
     }
   }
-  &.collapse {
+  .icon-collapse {
+    transform: none;
+  }
+  &.expand {
+    background: #fbfbfb;
     > .submenu {
-      display: none;
+      display: block;
     }
     .icon-collapse {
-      transform: none;
-    }
-  }
-  &:not(.collapse) {
-    > .menu-item > .icon-collapse {
       transform: rotateZ(90deg);
     }
   }
 }
 .submenu {
-  min-height: 4em;
-  max-height: 18em;
-  margin-left: 2em;
+  display: none;
+  background: white;
+  min-height: 4rem;
+  max-height: 16rem;
+  margin-left: 2rem;
   overflow-y: auto;
   border-top: 1px dashed #ddd;
 }

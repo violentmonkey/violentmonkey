@@ -3,18 +3,18 @@
     <header class="flex">
       <div class="flex-auto">
         <vm-dropdown :closeAfterClick="true">
-          <button slot="toggle">
+          <span class="btn-ghost" slot="toggle">
             <svg class="icon"><use xlink:href="#plus" /></svg>
-          </button>
+          </span>
           <a href="#" v-text="i18n('buttonNew')" @click.prevent="newScript"></a>
           <a v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
           <a v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank"></a>
           <a href="#" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></a>
         </vm-dropdown>
         <tooltip :title="i18n('buttonUpdateAll')" placement="down">
-          <button @click="updateAll">
+          <span class="btn-ghost" @click="updateAll">
             <svg class="icon"><use xlink:href="#refresh" /></svg>
-          </button>
+          </span>
         </tooltip>
       </div>
       <div class="filter-search">

@@ -16,28 +16,28 @@
       <div class="script-version" v-text="script.meta.version?'v'+script.meta.version:''"></div>
     </div>
     <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
-    <div class="buttons">
+    <div class="buttons flex">
       <tooltip :title="i18n('buttonEdit')">
-        <button @click="onEdit">
+        <span class="btn-ghost" @click="onEdit">
           <svg class="icon"><use xlink:href="#code" /></svg>
-        </button>
+        </span>
       </tooltip>
       <tooltip :title="labelEnable">
-        <button @click="onEnable">
+        <span class="btn-ghost" @click="onEnable">
           <svg class="icon"><use :xlink:href="`#toggle-${script.enabled ? 'on' : 'off'}`" /></svg>
-        </button>
+        </span>
       </tooltip>
       <tooltip :title="i18n('buttonRemove')">
-        <button @click="onRemove">
+        <span class="btn-ghost" @click="onRemove">
           <svg class="icon"><use xlink:href="#trash" /></svg>
-        </button>
+        </span>
       </tooltip>
       <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')">
-        <button :disabled="script.checking" @click="onUpdate">
+        <span class="btn-ghost" :disabled="script.checking" @click="onUpdate">
           <svg class="icon"><use xlink:href="#refresh" /></svg>
-        </button>
+        </span>
       </tooltip>
-      <span v-text="script.message"></span>
+      <span class="flex-auto" v-text="script.message"></span>
     </div>
   </div>
 </template>
@@ -275,13 +275,71 @@ export default {
 
 <style>
 .script {
+  position: relative;
+  margin: 8px;
+  padding: 12px 10px 5px;
+  border: 1px solid #ccc;
+  border-radius: .3rem;
+  transition: transform .5s;
+  background: white;
+  &:hover {
+    border-color: darkgray;
+  }
+  &.disabled {
+    background: #f0f0f0;
+    color: #999;
+  }
   .buttons {
+    align-items: center;
     line-height: 1;
+    > .flex-auto {
+      text-align: right;
+    }
   }
   &-info {
+    margin-left: 3.5rem;
+    line-height: 1.5;
+    align-items: center;
     > *:not(:last-child) {
       margin-right: 8px;
     }
+    .icon {
+      display: block;
+    }
+  }
+  &-icon {
+    position: absolute;
+    top: 1rem;
+    width: 3rem;
+    height: 3rem;
+    .disabled & {
+      filter: grayscale(.8);
+    }
+  }
+  &-name {
+    font-weight: bold;
+    font-size: 1rem;
+    .disabled & {
+      color: blueviolet;
+    }
+  }
+  &-author {
+    max-width: 30%;
+  }
+  &-desc {
+    margin-left: 3.5rem;
+    line-height: 2rem;
+    &::after {
+      content: "\200b";
+    }
+  }
+}
+.dragging {
+  position: fixed;
+  margin: 0;
+  z-index: 9;
+  &-placeholder {
+    visibility: hidden;
   }
 }
 </style>

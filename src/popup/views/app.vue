@@ -13,7 +13,7 @@
         <span v-text="i18n('menuDashboard')"></span>
       </div>
     </div>
-    <div class="menu menu-domains" v-show="domains.length" :class="{collapse:activeMenu!=='domains'}">
+    <div class="menu menu-domains" v-show="domains.length" :class="{expand:activeMenu==='domains'}">
       <div class="menu-item" @click="toggleMenu('domains')">
         <icon name="search"></icon>
         <icon name="more" class="icon-right icon-collapse"></icon>
@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-    <div class="menu menu-commands" v-show="commands.length" :class="{collapse:activeMenu!=='commands'}">
+    <div class="menu menu-commands" v-show="commands.length" :class="{expand:activeMenu==='commands'}">
       <div class="menu-item" @click="toggleMenu('commands')">
         <icon name="more" class="icon-right icon-collapse"></icon>
         <span v-text="i18n('menuCommands')"></span>
@@ -36,7 +36,7 @@
         </div>
       </div>
     </div>
-    <div class="menu menu-scripts" v-show="scripts.length" :class="{collapse:activeMenu!=='scripts'}">
+    <div class="menu menu-scripts" v-show="scripts.length" :class="{expand:activeMenu==='scripts'}">
       <div class="menu-item" @click="toggleMenu('scripts')">
         <icon name="more" class="icon-right icon-collapse"></icon>
         <span v-text="i18n('menuMatchedScripts')"></span>
@@ -75,11 +75,6 @@ export default {
       store,
       options: optionsData,
       activeMenu: 'scripts',
-      collapse: {
-        domains: true,
-        commands: true,
-        scripts: false,
-      },
     };
   },
   computed: {
@@ -107,7 +102,7 @@ export default {
       this.activeMenu = this.activeMenu === name ? null : name;
     },
     getSymbolCheck(bool) {
-      return bool ? 'check' : 'remove';
+      return `toggle-${bool ? 'on' : 'off'}`;
     },
     onToggle() {
       options.set('isApplied', !this.options.isApplied);

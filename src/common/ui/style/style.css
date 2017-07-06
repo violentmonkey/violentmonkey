@@ -5,12 +5,10 @@
 }
 
 html {
-  height: 100%;
   font: 14px menu;
 }
 
 body {
-  height: 100%;
   font-size: 1rem;
   font-family: "PingFang SC", STHeiti, "Microsoft YaHei", sans-serif;
 }
@@ -21,21 +19,6 @@ h1 {
 h1, h2 {
   margin-top: .5em;
   margin-bottom: .5em;
-}
-button {
-  padding: 0 .5rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  background: white;
-  cursor: pointer;
-  border: 1px solid #bbb;
-  &:hover {
-    border-color: #bbb;
-  }
-  > .icon {
-    display: block;
-    height: 2rem;
-  }
 }
 a {
   color: dodgerblue;
@@ -72,9 +55,27 @@ svg path {
   fill: currentColor;
 }
 
-.pull-left {
-  float: left;
+.btn-ghost,
+button {
+  display: inline-block;
+  padding: 0 .5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  cursor: pointer;
+  vertical-align: bottom;
 }
+.btn-ghost {
+  border: 1px solid transparent;
+  &:hover {
+    border-color: #bbb;
+    background: white;
+  }
+  > .icon {
+    display: block;
+    height: 2rem;
+  }
+}
+
 .pull-right {
   float: right;
 }
