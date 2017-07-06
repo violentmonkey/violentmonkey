@@ -1,6 +1,6 @@
 <template>
-  <div class="main">
-    <aside>
+  <div class="page-options pos-rel h-100">
+    <aside class="h-100">
       <img src="/public/images/icon128.png">
       <h1 v-text="i18n('extName')"></h1>
       <hr>

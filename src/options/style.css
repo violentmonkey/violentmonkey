@@ -1,23 +1,11 @@
-html {
-  background: #f0f0f0;
-}
-
-.main {
-  position: relative;
-  max-width: 65rem;
-  height: 100%;
-  margin: 0 auto;
-}
 aside {
   position: absolute;
   background: #fafafa;
-  top: 3rem;
+  top: 0;
   left: 0;
   width: 14rem;
-  padding: 1rem 1rem 0;
-  border: 1px solid darkgray;
-  border-right: none;
-  border-radius: 1rem 0 0 1rem;
+  padding: 4rem 1rem 0;
+  border: none;
   text-align: right;
 }
 aside img {
@@ -155,5 +143,4 @@ section {
   padding: 1.2rem;
   background: white;
   border-left: 1px solid darkgray;
-  border-right: 1px solid darkgray;
 }

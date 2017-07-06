@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="page-popup">
     <div class="logo" :class="{disabled:!options.isApplied}">
       <img src="/public/images/icon128.png">
     </div>

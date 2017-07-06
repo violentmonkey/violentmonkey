@@ -21,8 +21,10 @@ export default {
 $bg-color: rgba(0,0,0,.8);
 $border-side: 4px solid transparent;
 $border-base: 6px solid $bg-color;
+$gap: 10px;
 
 .tooltip {
+  display: inline-block;
   position: relative;
   &-title {
     display: none;
@@ -51,7 +53,7 @@ $border-base: 6px solid $bg-color;
     }
     &.tooltip-up {
       bottom: 100%;
-      margin-bottom: 1rem;
+      margin-bottom: $gap;
       &::before {
         top: 100%;
         border-top: $border-base;
@@ -61,7 +63,7 @@ $border-base: 6px solid $bg-color;
     }
     &.tooltip-down {
       top: 100%;
-      margin-top: 1rem;
+      margin-top: $gap;
       &::before {
         bottom: 100%;
         border-left: $border-side;

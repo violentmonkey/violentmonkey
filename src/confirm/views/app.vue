@@ -1,5 +1,5 @@
 <template>
-  <div class="frame flex flex-col h-100">
+  <div class="page-confirm frame flex flex-col h-100">
     <div class="frame-block">
       <div class="buttons pull-right">
         <vm-dropdown class="confirm-options" align="right">

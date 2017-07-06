@@ -2,7 +2,7 @@
   <div class="script" :class="{disabled:!script.enabled}" draggable="true" @dragstart.prevent="onDragStart">
     <img class="script-icon" :src="safeIcon">
     <div class="script-info flex">
-      <a class="script-name ellipsis" target=_blank :href="homepageURL"
+      <a class="script-name ellipsis" target="_blank" :href="homepageURL"
       v-text="script.custom.name || getLocaleString('name')"></a>
       <a class="script-support" v-if="script.meta.supportURL" target=_blank :href="script.meta.supportURL">
         <svg class="icon"><use xlink:href="#question" /></svg>
@@ -16,12 +16,27 @@
       <div class="script-version" v-text="script.meta.version?'v'+script.meta.version:''"></div>
     </div>
     <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
-    <div class=buttons>
-      <button v-text="i18n('buttonEdit')" @click="onEdit"></button>
-      <button @click="onEnable" v-text="labelEnable"></button>
-      <button v-text="i18n('buttonRemove')" @click="onRemove"></button>
-      <button v-if="canUpdate" :disabled="script.checking"
-      v-text="i18n('buttonUpdate')" @click="onUpdate"></button>
+    <div class="buttons">
+      <tooltip :title="i18n('buttonEdit')">
+        <button @click="onEdit">
+          <svg class="icon"><use xlink:href="#code" /></svg>
+        </button>
+      </tooltip>
+      <tooltip :title="labelEnable">
+        <button @click="onEnable">
+          <svg class="icon"><use :xlink:href="`#toggle-${script.enabled ? 'on' : 'off'}`" /></svg>
+        </button>
+      </tooltip>
+      <tooltip :title="i18n('buttonRemove')">
+        <button @click="onRemove">
+          <svg class="icon"><use xlink:href="#trash" /></svg>
+        </button>
+      </tooltip>
+      <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')">
+        <button :disabled="script.checking" @click="onUpdate">
+          <svg class="icon"><use xlink:href="#refresh" /></svg>
+        </button>
+      </tooltip>
       <span v-text="script.message"></span>
     </div>
   </div>
@@ -29,6 +44,7 @@
 
 <script>
 import { sendMessage, getLocaleString } from 'src/common';
+import Tooltip from './tooltip';
 import { store } from '../utils';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
@@ -56,6 +72,9 @@ function loadImage(url) {
 
 export default {
   props: ['script'],
+  components: {
+    Tooltip,
+  },
   data() {
     return {
       safeIcon: DEFAULT_ICON,
@@ -255,9 +274,14 @@ export default {
 </script>
 
 <style>
-.script-info {
-  > *:not(:last-child) {
-    margin-right: 8px;
+.script {
+  .buttons {
+    line-height: 1;
+  }
+  &-info {
+    > *:not(:last-child) {
+      margin-right: 8px;
+    }
   }
 }
 </style>

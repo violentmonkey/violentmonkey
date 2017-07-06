@@ -162,13 +162,15 @@ export default {
 </script>
 
 <style>
+$header-height: 4rem;
+
 .tab-installed {
   padding: 0;
   > header {
-    height: 3rem;
+    height: $header-height;
     align-items: center;
-    padding: 0 .5rem;
-    line-height: 1.5;
+    padding: 0 1rem;
+    line-height: 1;
     border-bottom: 1px solid darkgray;
   }
   .dropdown-menu {
@@ -190,7 +192,7 @@ export default {
 .backdrop,
 .scripts {
   position: absolute;
-  top: 3rem;
+  top: $header-height;
   left: 0;
   right: 0;
   bottom: 0;
