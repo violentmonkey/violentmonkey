@@ -57,7 +57,10 @@ module.exports = {
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test')]
       },
-      styleRule({ fallback: 'vue-style-loader' }),
+      styleRule({
+        fallback: 'vue-style-loader',
+        loaders: ['postcss-loader'],
+      }),
     ],
   },
   // cheap-module-eval-source-map is faster for development

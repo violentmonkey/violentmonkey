@@ -4,5 +4,4 @@ module.exports = {
   loaders: {
     css: styleLoader({ fallback: 'vue-style-loader' }),
   },
-  postcss: [ require('precss') ],
 };
