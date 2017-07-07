@@ -172,7 +172,6 @@ export default {
     },
   },
   mounted() {
-    this.bindKeys();
     (this.value.id ? sendMessage({
       cmd: 'GetScript',
       data: this.value.id,
@@ -208,9 +207,6 @@ export default {
         this.canSave = false;
       });
     });
-  },
-  beforeDestroy() {
-    this.unbindKeys();
   },
   methods: {
     save() {
@@ -324,42 +320,6 @@ export default {
         return;
       }
       (all ? replaceAll : replaceOne)(cm, state);
-    },
-    onKeyDown(e) {
-      const { cm } = this;
-      if (!cm) return;
-      const name = CodeMirror.keyName(e);
-      const commands = [
-        'cancel',
-        'find',
-        'findNext',
-        'findPrev',
-        'replace',
-        'replaceAll',
-      ];
-      [
-        cm.options.extraKeys,
-        cm.options.keyMap,
-      ].some((keyMap) => {
-        let stop = false;
-        if (keyMap) {
-          CodeMirror.lookupKey(name, keyMap, (b) => {
-            if (commands.includes(b)) {
-              e.preventDefault();
-              e.stopPropagation();
-              cm.execCommand(b);
-              stop = true;
-            }
-          }, cm);
-        }
-        return stop;
-      });
-    },
-    bindKeys() {
-      window.addEventListener('keydown', this.onKeyDown, false);
-    },
-    unbindKeys() {
-      window.removeEventListener('keydown', this.onKeyDown, false);
     },
     goToLine() {
       const line = this.search.line - 1;

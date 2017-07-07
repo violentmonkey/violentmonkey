@@ -59,11 +59,18 @@ const cmOptions = {
 };
 
 export default {
-  props: [
-    'readonly',
-    'value',
-    'commands',
-  ],
+  props: {
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
+    value: true,
+    commands: true,
+    global: {
+      type: Boolean,
+      default: true,
+    },
+  },
   components: {
     VueCode,
   },
@@ -100,6 +107,33 @@ export default {
       });
       this.$emit('ready', cm);
     },
+    onKeyDown(e) {
+      const name = CodeMirror.keyName(e);
+      const { cm } = this;
+      [
+        cm.options.extraKeys,
+        cm.options.keyMap,
+      ].some((keyMap) => {
+        let stop = false;
+        if (keyMap) {
+          CodeMirror.lookupKey(name, keyMap, (b) => {
+            if (this.commands[b]) {
+              e.preventDefault();
+              e.stopPropagation();
+              cm.execCommand(b);
+              stop = true;
+            }
+          }, cm);
+        }
+        return stop;
+      });
+    },
+  },
+  mounted() {
+    if (this.global) window.addEventListener('keydown', this.onKeyDown, false);
+  },
+  beforeDestroy() {
+    if (this.global) window.removeEventListener('keydown', this.onKeyDown, false);
   },
 };
 </script>
