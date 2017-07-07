@@ -5,7 +5,7 @@
       <a class="script-name ellipsis" target="_blank" :href="homepageURL"
       v-text="script.custom.name || getLocaleString('name')"></a>
       <a class="script-support" v-if="script.meta.supportURL" target=_blank :href="script.meta.supportURL">
-        <svg class="icon"><use xlink:href="#question" /></svg>
+        <icon name="question"></icon>
       </a>
       <div class="flex-auto"></div>
       <div class="script-author ellipsis" :title="script.meta.author" v-if="author">
@@ -19,22 +19,22 @@
     <div class="buttons flex">
       <tooltip :title="i18n('buttonEdit')">
         <span class="btn-ghost" @click="onEdit">
-          <svg class="icon"><use xlink:href="#code" /></svg>
+          <icon name="code"></icon>
         </span>
       </tooltip>
       <tooltip :title="labelEnable">
         <span class="btn-ghost" @click="onEnable">
-          <svg class="icon"><use :xlink:href="`#toggle-${script.enabled ? 'on' : 'off'}`" /></svg>
+          <icon :name="`toggle-${script.enabled ? 'on' : 'off'}`"></icon>
         </span>
       </tooltip>
       <tooltip :title="i18n('buttonRemove')">
         <span class="btn-ghost" @click="onRemove">
-          <svg class="icon"><use xlink:href="#trash" /></svg>
+          <icon name="trash"></icon>
         </span>
       </tooltip>
       <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')">
         <span class="btn-ghost" :disabled="script.checking" @click="onUpdate">
-          <svg class="icon"><use xlink:href="#refresh" /></svg>
+          <icon name="refresh"></icon>
         </span>
       </tooltip>
       <span class="flex-auto" v-text="script.message"></span>
@@ -44,6 +44,7 @@
 
 <script>
 import { sendMessage, getLocaleString } from 'src/common';
+import Icon from 'src/common/ui/icon';
 import Tooltip from './tooltip';
 import { store } from '../utils';
 
@@ -73,6 +74,7 @@ function loadImage(url) {
 export default {
   props: ['script'],
   components: {
+    Icon,
     Tooltip,
   },
   data() {

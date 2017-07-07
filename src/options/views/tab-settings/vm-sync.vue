@@ -11,7 +11,7 @@
       <button v-text="labelAuthorize" v-if="service.name"
       :disabled="!canAuthorize" @click="onAuthorize"></button>
       <button :disabled="!canSync" v-if="service.name" @click="onSync">
-        <svg class="icon"><use xlink:href="#refresh" /></svg>
+        <icon name="refresh"></icon>
       </button>
     </div>
     <p class="mt-1" v-text="message"></p>
@@ -28,6 +28,7 @@
 import { sendMessage } from 'src/common';
 import options from 'src/common/options';
 import SettingCheck from 'src/common/ui/setting-check';
+import Icon from 'src/common/ui/icon';
 import { store } from '../../utils';
 
 const SYNC_CURRENT = 'sync.current';
@@ -43,6 +44,7 @@ options.hook((data) => {
 export default {
   components: {
     SettingCheck,
+    Icon,
   },
   data() {
     return {

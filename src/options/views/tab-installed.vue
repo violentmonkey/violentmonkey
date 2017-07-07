@@ -4,7 +4,7 @@
       <div class="flex-auto">
         <vm-dropdown :closeAfterClick="true">
           <span class="btn-ghost" slot="toggle">
-            <svg class="icon"><use xlink:href="#plus" /></svg>
+            <icon name="plus"></icon>
           </span>
           <a href="#" v-text="i18n('buttonNew')" @click.prevent="newScript"></a>
           <a v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
@@ -13,13 +13,13 @@
         </vm-dropdown>
         <tooltip :title="i18n('buttonUpdateAll')" placement="down">
           <span class="btn-ghost" @click="updateAll">
-            <svg class="icon"><use xlink:href="#refresh" /></svg>
+            <icon name="refresh"></icon>
           </span>
         </tooltip>
       </div>
       <div class="filter-search">
         <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
-        <svg class="icon"><use xlink:href="#search" /></svg>
+        <icon name="search"></icon>
       </div>
       <div>
       </div>
@@ -38,6 +38,7 @@
 <script>
 import { i18n, sendMessage, noop, debounce } from 'src/common';
 import VmDropdown from 'src/common/ui/dropdown';
+import Icon from 'src/common/ui/icon';
 import Item from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
@@ -49,6 +50,7 @@ export default {
     Edit,
     Tooltip,
     VmDropdown,
+    Icon,
   },
   data() {
     return {

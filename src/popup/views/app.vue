@@ -54,7 +54,7 @@
 <script>
 import options from 'src/common/options';
 import { getLocaleString, sendMessage } from 'src/common';
-import Icon from './icon';
+import Icon from 'src/common/ui/icon';
 import { store } from '../utils';
 
 const optionsData = {
