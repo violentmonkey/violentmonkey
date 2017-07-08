@@ -105,7 +105,7 @@ labelSettings:
   message: Ajustes
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Automaticamente comprueba actualizaciones de los scripts
+  message: Comprobar automáticamente actualizaciones de los scripts cada día
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
   message: Suprime las advertencias de scripts que no tenga lineas @grant
@@ -115,7 +115,7 @@ labelDataImport:
   message: Importar datos
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Importar de zip
+  message: Importar desde zip
 buttonVacuum:
   description: Button to vacuum extension data.
   message: Vaciar base de datos
@@ -154,7 +154,7 @@ labelTranslator:
   message: 'Traductor: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: <a href="http://greydus.tk" target="_blank">Greydus</a>
+  message: '<a href="http://greydus.tk" target="_blank">Greydus</a>'
 labelCurrentLang:
   description: Label of current language.
   message: 'Idioma actual: '
@@ -190,7 +190,7 @@ labelExclude:
   message: '@exclude:'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: '@exclude-match rules'
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Permitir actualización
@@ -229,8 +229,8 @@ hintUseDownloadURL:
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    ¡Modificaciones no fueron guardadas!
-    Clic OK para descartarlas o Cancelar para quedarte.
+    ¡Las modificaciones no fueron guardadas!
+    Haga clic en Aceptar para descartarlas o en Cancelar para mantenerlas.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Vaciando datos...
@@ -276,7 +276,7 @@ hintInputURL:
   message: 'Escribe URL:'
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Instalar de URL
+  message: Instalar desde URL
 labelSync:
   description: Label for sync options.
   message: Sincronizar
@@ -311,19 +311,19 @@ labelShowBadge:
   message: Mostrar el numero de scripts en ejecución en el icono de la extensión
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Numero de linea: '
+  message: 'Número de línea: '
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Lista negra
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: URLs en esta lista no seran injectados por los scripts.
+  message: Las URLs en esta lista no serán inyectadas por los scripts.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: Guardar
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: Blacklist actualizada.
+  message: Lista negra actualizada.
 labelGeneral:
   description: Label for general settings.
   message: General
@@ -347,7 +347,7 @@ labelSyncAuthorizing:
   message: Autorizando...
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: Estilo personalizado esta actualizado.
+  message: Estilo personalizado actualizado.
 labelCustomCSS:
   description: Label for custom CSS section.
   message: Estilo personalizado
@@ -361,52 +361,52 @@ buttonSaveCustomCSS:
   message: Guardar
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: Abrir Panel de Control
+  message: Abrir panel de control
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Scripts concuerdan
+  message: Scripts igualados
 buttonOK:
   description: OK button on dialog.
-  message: OK
+  message: Aceptar
 buttonCancel:
   description: Cancel button on dialog.
   message: Cancelar
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Importar opciones
+  message: Importar ajustes
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Obtenga más información acerca de los patrones de la lista negra
+  message: Aprender más sobre los patrones de la lista negra.
 editNavCode:
   description: Label of code tab in script editor.
-  message: Codigo
+  message: Código
 editNavSettings:
   description: Label of settings tab in script editor.
   message: Ajustes
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Ajustes de script
+  message: Ajustes del script
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadatos personalizados
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Mantener original
+  message: Conservar original
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: Actualización
+  message: Actualizar
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: '!Script [$1] se ha actualizado¡'
+  message: '¡Script [$1] actualizado!'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notificar actualizaciones de scripts
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Instalar de $1
+  message: Instalar desde $1
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Buscar scripts...
+  message: Buscar scripts ...
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: No se encontro ningun script
+  message: No se encontraron scripts.

@@ -389,22 +389,22 @@ editLabelMeta:
   message: Kustom meta data
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: ''
+  message: Simpan yang asli
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: ''
+  message: Update
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: 'Script [$1] is updated!'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: Notify script updates
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: Install from $1
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: Search scripts...
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: No script is found.

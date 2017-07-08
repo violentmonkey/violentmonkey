@@ -399,10 +399,10 @@ labelNotifyUpdates:
   message: スクリプトの更新を通知する
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: $1 からインストール
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: スクリプトを検索
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: スクリプトは見つかりませんでした。
