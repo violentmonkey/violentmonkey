@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import 'src/common/polyfills';
 import 'src/common/browser';
 import { i18n } from 'src/common';
 import 'src/common/handlers';

@@ -1,3 +1,4 @@
+import 'src/common/polyfills';
 import 'src/common/browser';
 import { i18n, defaultImage } from 'src/common';
 import * as sync from './sync';

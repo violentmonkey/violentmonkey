@@ -1,4 +1,5 @@
 export { sendMessage, request } from 'src/common';
+export Promise from 'core-js/library/fn/promise';
 
 export function postData(destId, data) {
   // Firefox issue: data must be stringified to avoid cross-origin problem

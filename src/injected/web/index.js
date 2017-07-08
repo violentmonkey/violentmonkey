@@ -1,4 +1,4 @@
-import { getUniqId, bindEvents } from '../utils';
+import { getUniqId, bindEvents, Promise } from '../utils';
 import { includes, forEach, map, utf8decode } from './helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';

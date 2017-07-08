@@ -1,3 +1,5 @@
+import { Promise } from '../utils';
+
 const arrayProto = Array.prototype;
 
 const bindThis = func => (thisObj, ...args) => func.apply(thisObj, args);

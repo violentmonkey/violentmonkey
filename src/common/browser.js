@@ -1,5 +1,3 @@
-import './polyfills';
-
 /* global chrome */
 const global = window;
 
