@@ -1,9 +1,9 @@
 body {
-  min-width: 20em;
-  padding-top: 1em;
+  min-width: 20rem;
 }
 
 .logo {
+  margin-top: 1rem;
   text-align: center;
   img {
     width: 4em;
@@ -42,12 +42,9 @@ body {
       height: 100%;
       &-right {
         left: auto;
-        right: 1.5em;
+        right: 1.5rem;
       }
     }
-  }
-  .icon-collapse {
-    transform: none;
   }
   &.expand {
     background: #fbfbfb;

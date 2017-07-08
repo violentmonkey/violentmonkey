@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import 'src/common/ui/dropdown';
 import resetFeatures from './features';
 import Message from '../views/message';
 

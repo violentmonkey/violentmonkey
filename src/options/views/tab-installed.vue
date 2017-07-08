@@ -21,8 +21,6 @@
         <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
         <icon name="search"></icon>
       </div>
-      <div>
-      </div>
     </header>
     <div class="scripts">
       <item v-for="script in scripts" :key="script.id"
@@ -95,9 +93,6 @@ export default {
     },
     updateAll() {
       sendMessage({ cmd: 'CheckUpdateAll' });
-    },
-    openURL(url) {
-      window.open(url);
     },
     installFromURL() {
       new Promise((resolve, reject) => {
