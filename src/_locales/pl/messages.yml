@@ -15,11 +15,11 @@ msgInstalled:
   message: Skrypt zainstalowany.
 Warning:
   description: Show warnings with a notification.
-  message: Warning
+  message: Ostrzeżenie
   touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
-  message: 'Script [$1] has no `@grant` lines! Click to see more details.'
+  message: 'Skrypt [$1] nie ma linii `@grant`! Kliknij, aby zobaczyć więcej szczegółów.'
   touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
@@ -108,7 +108,7 @@ labelAutoUpdate:
   message: Automatycznie sprawdzaj aktualizacje dla skryptów każdego dnia
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
-  message: Suppress no @grant warnings
+  message: Pomijaj ostzeżenia dla skryptów, które nie mają linii @grant
   touched: false
 labelDataImport:
   description: Section title of data import.
@@ -271,7 +271,7 @@ buttonReplaceAll:
   message: Wszystko
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Odśwież bieżącą kartę po włączeniu/wyłączeniu skryptu z menu
+  message: Odświeżaj bieżącą kartę po włączeniu/wyłączeniu skryptu z menu
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Wprowadź adres URL:'
