@@ -51,7 +51,8 @@ code {
   height: 1rem;
 }
 
-svg path {
+// Firefox does not support `svg path` selector
+svg {
   fill: currentColor;
 }
 

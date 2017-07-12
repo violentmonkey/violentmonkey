@@ -108,7 +108,7 @@ labelAutoUpdate:
   message: Automatycznie sprawdzaj aktualizacje dla skryptów każdego dnia
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
-  message: Pomijaj ostzeżenia dla skryptów, które nie mają linii @grant
+  message: 'Pomijaj ostzeżenia dla skryptów, które nie mają linii @grant'
   touched: false
 labelDataImport:
   description: Section title of data import.
