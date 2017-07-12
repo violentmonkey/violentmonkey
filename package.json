@@ -44,6 +44,7 @@
     "js-yaml": "^3.8.4",
     "localStorage": "^1.0.3",
     "postcss-loader": "^2.0.6",
+    "postcss-scss": "^1.0.2",
     "precss": "^2.0.0",
     "svgo": "^0.7.2",
     "tape": "^4.7.0",
