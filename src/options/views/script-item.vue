@@ -2,8 +2,10 @@
   <div class="script" :class="{disabled:!script.enabled}" draggable="true" @dragstart.prevent="onDragStart">
     <img class="script-icon" :src="safeIcon">
     <div class="script-info flex">
-      <a class="script-name ellipsis" target="_blank" :href="homepageURL"
-      v-text="script.custom.name || getLocaleString('name')"></a>
+      <a class="script-name ellipsis" v-text="script.custom.name || getLocaleString('name')"></a>
+      <a class="script-support" v-if="homepageURL" target=_blank :href="homepageURL">
+        <icon name="question"></icon>
+      </a>
       <a class="script-support" v-if="script.meta.supportURL" target=_blank :href="script.meta.supportURL">
         <icon name="question"></icon>
       </a>
