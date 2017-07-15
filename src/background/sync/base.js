@@ -348,8 +348,8 @@ export const BaseService = serviceFactory({
           delRemote.push(item);
         }
       });
-      const promiseQueue = [].concat(
-        getRemote.map(item => {
+      const promiseQueue = [
+        ...getRemote.map(item => {
           this.log('Download script:', item.uri);
           return this.get(getFilename(item.uri))
           .then(raw => {
@@ -374,7 +374,7 @@ export const BaseService = serviceFactory({
             .then(res => { browser.runtime.sendMessage(res); });
           });
         }),
-        putRemote.map(item => {
+        ...putRemote.map(item => {
           this.log('Upload script:', item.uri);
           const data = JSON.stringify({
             version: 1,
@@ -392,17 +392,17 @@ export const BaseService = serviceFactory({
           remoteChanged = true;
           return this.put(getFilename(item.uri), data);
         }),
-        delRemote.map(item => {
+        ...delRemote.map(item => {
           this.log('Remove remote script:', item.uri);
           delete remoteMeta.info[item.uri];
           remoteChanged = true;
           return this.remove(getFilename(item.uri));
         }),
-        delLocal.map(item => {
+        ...delLocal.map(item => {
           this.log('Remove local script:', item.uri);
           return removeScript(item.id);
         }),
-      );
+      ];
       promiseQueue.push(Promise.all(promiseQueue).then(() => checkPosition()).then(changed => {
         if (!changed) return;
         remoteChanged = true;
