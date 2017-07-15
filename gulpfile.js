@@ -14,7 +14,8 @@ const pkg = require('./package.json');
 const paths = {
   manifest: 'src/manifest.json',
   copy: [
-    'src/public/**',
+    'src/public/images/**',
+    'src/public/lib/**',
   ],
   locales: [
     'src/_locales/**',
