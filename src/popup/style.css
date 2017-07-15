@@ -21,8 +21,12 @@ body {
     padding: 0 3rem;
     cursor: pointer;
     text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
     .submenu > & {
       text-align: left;
+      padding-left: 1rem;
     }
     &.disabled {
       color: gray;
