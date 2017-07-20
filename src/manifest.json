@@ -1,5 +1,5 @@
 {
-  "name": "Violentmonkey",
+  "name": "__MSG_extName__",
   "version": "__VERSION__",
   "manifest_version": 2,
   "description": "__MSG_extDescription__",
@@ -23,6 +23,10 @@
     "page": "background/index.html"
   },
   "options_page": "options/index.html",
+  "options_ui": {
+    "page": "options/index.html",
+    "open_in_tab": true
+  },
   "content_scripts": [
     {
       "js": [
