@@ -2,7 +2,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "PingFang SC", STHeiti, "Microsoft YaHei", sans-serif;
 }
 
 html {
@@ -11,6 +10,15 @@ html {
 
 body {
   font-size: 1rem;
+}
+
+body,
+// Form elements will not inherit
+button,
+select,
+input,
+textarea {
+  font-family: "PingFang SC", STHeiti, "Microsoft YaHei", sans-serif;
 }
 
 h1 {
