@@ -174,6 +174,7 @@ export function request(url, options = {}) {
     return Object.assign({
       url,
       data,
+      xhr,
     }, extra);
   }
 }

@@ -27,17 +27,17 @@
           <icon :name="`toggle-${script.enabled ? 'on' : 'off'}`"></icon>
         </span>
       </tooltip>
-      <tooltip :title="i18n('buttonRemove')">
-        <span class="btn-ghost" @click="onRemove">
-          <icon name="trash"></icon>
-        </span>
-      </tooltip>
       <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')">
         <span class="btn-ghost" :disabled="script.checking" @click="onUpdate">
           <icon name="refresh"></icon>
         </span>
       </tooltip>
-      <span class="flex-auto" v-text="script.message"></span>
+      <div class="flex-auto" v-text="script.message"></div>
+      <tooltip :title="i18n('buttonRemove')">
+        <span class="btn-ghost" @click="onRemove">
+          <icon name="trash"></icon>
+        </span>
+      </tooltip>
     </div>
   </div>
 </template>
@@ -295,7 +295,7 @@ export default {
     align-items: center;
     line-height: 1;
     > .flex-auto {
-      text-align: right;
+      margin-left: 1rem;
     }
   }
   &-info {

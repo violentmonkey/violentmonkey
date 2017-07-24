@@ -96,7 +96,7 @@ export default {
   methods: {
     onReady(cm) {
       this.cm = cm;
-      if (this.readonly != null) cm.setOption('readOnly', true);
+      if (this.readonly) cm.setOption('readOnly', true);
       cm.state.commands = this.commands;
       cm.setOption('extraKeys', {
         Esc: 'cancel',

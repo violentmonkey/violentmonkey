@@ -1,6 +1,6 @@
 {
   "name": "violentmonkey",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "scripts": {
     "dev": "gulp watch",
     "prebuild": "npm run lint && gulp clean",
@@ -25,14 +25,12 @@
     "babili-webpack-plugin": "^0.1.2",
     "css-loader": "^0.28.4",
     "del": "^3.0.0",
-    "eslint": "^4.0.0",
+    "eslint": "^4.2.0",
     "eslint-config-airbnb-base": "^11.2.0",
-    "eslint-friendly-formatter": "^3.0.0",
     "eslint-import-resolver-webpack": "^0.8.3",
-    "eslint-loader": "^1.8.0",
-    "eslint-plugin-html": "^3.0.0",
-    "eslint-plugin-import": "^2.6.1",
-    "extract-text-webpack-plugin": "^2.1.2",
+    "eslint-plugin-html": "^3.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "extract-text-webpack-plugin": "^3.0.0",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "gulp": "^3.9.1",
     "gulp-filter": "^5.0.0",
@@ -41,19 +39,20 @@
     "gulp-util": "^3.0.7",
     "html-webpack-plugin": "^2.29.0",
     "husky": "^0.14.3",
-    "js-yaml": "^3.8.4",
+    "js-yaml": "^3.9.0",
     "localStorage": "^1.0.3",
     "postcss-loader": "^2.0.6",
+    "postcss-scss": "^1.0.2",
     "precss": "^2.0.0",
     "svgo": "^0.7.2",
     "tape": "^4.7.0",
     "through2": "^2.0.3",
-    "vue-loader": "^13.0.0",
+    "vue-loader": "^13.0.2",
     "vue-style-loader": "^3.0.1",
-    "vue-template-compiler": "^2.3.4",
-    "webpack": "^3.0.0",
+    "vue-template-compiler": "^2.4.1",
+    "webpack": "^3.3.0",
     "webpack-bundle-size-analyzer": "^2.7.0",
-    "wrapper-webpack-plugin": "^0.1.11"
+    "wrapper-webpack-plugin": "^1.0.0"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {
@@ -69,7 +68,7 @@
     "codemirror": "^5.27.4",
     "core-js": "^2.4.1",
     "sync-promise-lite": "^0.2.3",
-    "vue": "^2.3.4",
+    "vue": "^2.4.1",
     "vue-code": "^1.2.2"
   }
 }

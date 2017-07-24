@@ -10,6 +10,14 @@ html {
 
 body {
   font-size: 1rem;
+}
+
+body,
+// Form elements will not inherit
+button,
+select,
+input,
+textarea {
   font-family: "PingFang SC", STHeiti, "Microsoft YaHei", sans-serif;
 }
 
@@ -51,7 +59,8 @@ code {
   height: 1rem;
 }
 
-svg path {
+// Firefox does not support `svg path` selector
+svg {
   fill: currentColor;
 }
 
