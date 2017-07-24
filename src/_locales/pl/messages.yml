@@ -105,7 +105,7 @@ labelSettings:
   message: Ustawienia
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Automatycznie sprawdzaj aktualizacje dla skryptów każdego dnia
+  message: Automatycznie codziennie sprawdzaj aktualizacje dla skryptów
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
   message: 'Pomijaj ostzeżenia dla skryptów, które nie mają linii @grant'
@@ -142,7 +142,7 @@ labelDonate:
   message: Dotacja
 labelFeedback:
   description: Label of link to feedback page.
-  message: Opinie
+  message: Informacje zwrotne
 labelAuthor:
   description: Label of author shown in the details of a script.
   message: 'Autor: '
