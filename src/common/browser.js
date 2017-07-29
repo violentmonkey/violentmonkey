@@ -48,6 +48,7 @@ const meta = {
   runtime: {
     getManifest: true,
     getURL: true,
+    openOptionsPage: wrapAsync,
     onMessage(onMessage) {
       function wrapListener(listener) {
         return function onChromeMessage(message, sender, sendResponse) {

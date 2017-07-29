@@ -109,21 +109,7 @@ export default {
       this.checkReload();
     },
     onManage() {
-      const url = browser.runtime.getURL(browser.runtime.getManifest().options_page);
-      // Firefox: browser.tabs.query cannot filter tabs by URLs with custom
-      // schemes like `moz-extension:`
-      browser.tabs.query({
-        currentWindow: true,
-        // url: url,
-      })
-      .then(tabs => {
-        const optionsTab = tabs.find(tab => {
-          const [path, qs] = tab.url.split('#');
-          return path === url && (!qs || qs.startsWith('?'));
-        });
-        if (optionsTab) browser.tabs.update(optionsTab.id, { active: true });
-        else browser.tabs.create({ url });
-      });
+      browser.runtime.openOptionsPage();
     },
     onFindScripts(item) {
       let domain;
