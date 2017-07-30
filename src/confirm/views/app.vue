@@ -4,16 +4,14 @@
       <div class="buttons pull-right">
         <vm-dropdown class="confirm-options" align="right">
           <button slot="toggle" v-text="i18n('buttonInstallOptions')"></button>
-          <div class="options-panel">
-            <label>
-              <setting-check name="closeAfterInstall" @change="checkClose" />
-              <span v-text="i18n('installOptionClose')"></span>
-            </label>
-            <label>
-              <setting-check name="trackLocalFile" :disabled="closeAfterInstall" />
-              <span v-text="i18n('installOptionTrack')"></span>
-            </label>
-          </div>
+          <label>
+            <setting-check name="closeAfterInstall" @change="checkClose" />
+            <span v-text="i18n('installOptionClose')"></span>
+          </label>
+          <label>
+            <setting-check name="trackLocalFile" :disabled="closeAfterInstall" />
+            <span v-text="i18n('installOptionTrack')"></span>
+          </label>
         </vm-dropdown>
         <button v-text="i18n('buttonConfirmInstallation')"
         :disabled="!installable" @click="installScript"></button>
@@ -34,7 +32,7 @@ import { sendMessage, zfill, request, buffer2string, isRemote, getFullUrl } from
 import options from 'src/common/options';
 import initCache from 'src/common/cache';
 import VmCode from 'src/common/ui/code';
-import VmDropdown from 'src/common/ui/dropdown';
+import { Dropdown as VmDropdown } from 'src/common/ui/vueleton';
 import SettingCheck from 'src/common/ui/setting-check';
 import getPathInfo from 'src/common/pathinfo';
 
@@ -240,7 +238,7 @@ export default {
   label {
     display: block;
   }
-  .dropdown-menu {
+  .vl-dropdown-menu {
     width: 13rem;
   }
 }

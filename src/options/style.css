@@ -49,9 +49,6 @@ section {
     margin-bottom: .3rem;
   }
 }
-.options-panel label {
-  display: block;
-}
 .feature {
   &-text {
     position: relative;

@@ -35,7 +35,7 @@
 
 <script>
 import { i18n, sendMessage, noop, debounce } from 'src/common';
-import VmDropdown from 'src/common/ui/dropdown';
+import { Dropdown as VmDropdown } from 'src/common/ui/vueleton';
 import Icon from 'src/common/ui/icon';
 import Item from './script-item';
 import Edit from './edit';
@@ -170,7 +170,7 @@ $header-height: 4rem;
     line-height: 1;
     border-bottom: 1px solid darkgray;
   }
-  .dropdown-menu {
+  .vl-dropdown-menu {
     padding: .5rem;
     white-space: nowrap;
     > a {
