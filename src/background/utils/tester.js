@@ -1,6 +1,14 @@
 import cache from './cache';
 import { getOption, hookOptions } from './options';
 
+const RE = /(.*?):\/\/([^/]*)\/(.*)/;
+let blacklistRules = [];
+resetBlacklist(getOption('blacklist'));
+hookOptions(changes => {
+  const { blacklist } = changes;
+  if (blacklist) resetBlacklist(blacklist);
+});
+
 /**
  * Test glob rules like `@include` and `@exclude`.
  */
@@ -100,7 +108,6 @@ function matchTester(rule) {
   let test;
   if (rule === '<all_urls>') test = () => true;
   else {
-    const RE = /(.*?):\/\/([^/]*)\/(.*)/;
     const ruleParts = rule.match(RE);
     test = url => {
       const parts = url.match(RE);
@@ -113,14 +120,17 @@ function matchTester(rule) {
   return { test };
 }
 
-let blacklistRules = [];
-resetBlacklist(getOption('blacklist'));
-hookOptions(changes => {
-  const { blacklist } = changes;
-  if (blacklist) resetBlacklist(blacklist);
-});
+function checkPrefix(prefix, rule) {
+  if (rule.startsWith(prefix)) {
+    return rule.slice(prefix.length).trim();
+  }
+}
+
 export function testBlacklist(url) {
-  return blacklistRules.some(re => re.test(url));
+  for (let i = 0; i < blacklistRules.length; i += 1) {
+    const { test, reject } = blacklistRules[i];
+    if (test(url)) return reject;
+  }
 }
 export function resetBlacklist(list) {
   // XXX compatible with {Array} list in v2.6.1-
@@ -128,12 +138,47 @@ export function resetBlacklist(list) {
   .map(line => {
     const item = line.trim();
     if (!item || item.startsWith('#')) return;
+
+    /**
+     * @include and @match rules are added for people who need a whitelist.
+     */
+    // @include
+    const includeRule = checkPrefix('@include ', item);
+    if (includeRule) {
+      return {
+        test: autoReg(includeRule).test,
+        reject: false,
+      };
+    }
+    // @match
+    const matchRule = checkPrefix('@match ', item);
+    if (matchRule) {
+      return {
+        test: matchTester(matchRule).test,
+        reject: false,
+      };
+    }
+
     // @exclude
-    if (item.startsWith('@exclude ')) return autoReg(item.slice(9).trim());
+    const excludeRule = checkPrefix('@exclude ', item);
+    if (excludeRule) {
+      return {
+        test: autoReg(excludeRule).test,
+        reject: true,
+      };
+    }
     // domains
-    if (item.indexOf('/') < 0) return matchTester(`*://${item}/*`);
+    if (item.indexOf('/') < 0) {
+      return {
+        test: matchTester(`*://${item}/*`).test,
+        reject: true,
+      };
+    }
     // @exclude-match
-    return matchTester(item);
+    return {
+      test: matchTester(item).test,
+      reject: true,
+    };
   })
   .filter(Boolean);
 }
