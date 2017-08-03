@@ -1,11 +1,11 @@
 extName:
-  description: Ime ove extenzije.
+  description: Name of this extension.
   message: Violentmonkey
 extDescription:
-  description: Opis ove extenzije.
+  description: Description for this extension.
   message: Omogućava korištenje korisničkih skripti u web pregledniku.
 msgUpdated:
-  description: Poruka koja se prikazuje kada je skripta obnovljena/reinstalirana.
+  description: Message shown when a script is updated/reinstalled.
   message: Skripta je obnovljena.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
@@ -14,11 +14,11 @@ msgInstalled:
   description: Message shown when a script is installed.
   message: Skripta je instalirana.
 Warning:
-  description: Pokaži upozorenja s notifikacijom.
+  description: Show warnings with a notification.
   message: Upozorenje
   touched: false
 msgWarnGrant:
-  description: Poruka koja se pirkazuje kad `@grant` nije nađen u skripti.
+  description: Message shown when `@grant` is not found in a script.
   message: 'Skripta [$1] nema `@grant` linije! Klikni da vidiš više detalja.'
   touched: false
 labelNoName:
@@ -54,10 +54,10 @@ installOptionTrack:
   description: Option to track the loading local file before window is closed.
   message: Track lokalni fajl prije no što se ovaj prozor zatvori
 buttonConfirmInstallation:
-  description: Gumb kojim se potvrđuje instalacija skripte.
+  description: Button to confirm installation of a script.
   message: Potvrdi instalaciju
 buttonClose:
-  description: Gumb za zatvaranje prozora.
+  description: Button to close window.
   message: Zatvori
 msgErrorLoadingData:
   description: >-
@@ -79,16 +79,16 @@ msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Učitavam podatke skripte...
 sideMenuInstalled:
-  description: 'Side menu: Instalirane skripte'
+  description: 'Side menu: Installed scripts'
   message: Instalirane skripte
 sideMenuSettings:
-  description: 'Side menu: Postavke'
+  description: 'Side menu: Settings'
   message: Postavke
 sideMenuAbout:
   description: 'Side menu: About'
   message: O extenziji
 buttonNew:
-  description: Gumb za kreiranje nove skripte.
+  description: Button to create a new script.
   message: Nova
 buttonUpdateAll:
   description: Check all scripts for updates.
@@ -154,7 +154,7 @@ labelTranslator:
   message: 'Prevoditelj: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: 'diomed'
+  message: diomed
 labelCurrentLang:
   description: Label of current language.
   message: 'Trenutni jezik: '
@@ -201,19 +201,19 @@ buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Sačuvaj & Zatvori
 labelNoScripts:
-  description: Poruka koja se prikazuje kad nijedna skripta nije instalirana.
+  description: Message shown when no script is installed.
   message: 'Ups, još nemaš nijednu skriptu.'
 buttonDisable:
   description: Button to disable a script.
   message: Onemogući
 buttonEnable:
-  description: Gumb za omogućavanje skripte.
+  description: Button to enable a script.
   message: Omogući
 buttonEdit:
-  description: Gumb za uređivanje skripte.
+  description: Button to edit a script.
   message: Uredi
 buttonRemove:
-  description: Gumb za micanje skripte.
+  description: Button to remove a script.
   message: Makni
 buttonUpdate:
   description: Check a script for updates.
@@ -304,7 +304,7 @@ msgInvalidScript:
   message: Skripta ne valja!
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: Na bedžu [znački] prikaži broj skripti koje rade
+  message: 'Na bedžu [znački] prikaži broj skripti koje rade'
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Linija br.: '
@@ -406,3 +406,9 @@ labelSearchScript:
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Nijedna skripta nije nađena.
+buttonHome:
+  description: Button to open homepage.
+  message: ''
+buttonSupport:
+  description: Button to open support page.
+  message: ''

@@ -1,7 +1,10 @@
 <template>
   <span class="tooltip">
     <slot></slot>
-    <div class="tooltip-title" :class="`tooltip-${placement}`" v-text="title"></div>
+    <div class="tooltip-title" :class="`tooltip-${placement} tooltip-align-${align}`">
+      <i></i>
+      <div v-text="title"></div>
+    </div>
   </span>
 </template>
 
@@ -12,6 +15,10 @@ export default {
     placement: {
       type: String,
       default: 'up',
+    },
+    align: {
+      type: String,
+      default: 'center', // start | center | end
     },
   },
 };
@@ -29,56 +36,79 @@ $gap: 10px;
   &-title {
     display: none;
     position: absolute;
-    padding: 8px;
-    white-space: nowrap;
-    border-radius: 6px;
-    background: $bg-color;
     color: white;
     font-size: 12px;
     z-index: 100;
     .tooltip:hover & {
       display: block;
     }
-    &::before {
-      content: '';
+    > * {
       position: absolute;
+      white-space: nowrap;
+    }
+    > div {
+      padding: 8px;
+      background: $bg-color;
+      border-radius: 6px;
     }
     &.tooltip-up,
     &.tooltip-down {
-      &,
-      &::before {
-        left: 50%;
+      left: 50%;
+      > i {
         transform: translateX(-50%);
+      }
+      &.tooltip-align-center {
+        > div {
+          left: 50%;
+          transform: translateX(-50%);
+        }
+      }
+      &.tooltip-align-start {
+        > div {
+          left: -10px;
+        }
+      }
+      &.tooltip-align-end {
+        > div {
+          right: -10px;
+        }
       }
     }
     &.tooltip-up {
       bottom: 100%;
       margin-bottom: $gap;
-      &::before {
+      > i {
         top: 100%;
         border-top: $border-base;
         border-left: $border-side;
         border-right: $border-side;
       }
+      > div {
+        bottom: 0;
+      }
     }
     &.tooltip-down {
       top: 100%;
       margin-top: $gap;
-      &::before {
+      > i {
         bottom: 100%;
         border-left: $border-side;
         border-right: $border-side;
         border-bottom: $border-base;
       }
+      > div {
+        top: 0;
+      }
     }
     &.tooltip-right {
       top: 50%;
       left: 100%;
-      transform: translate(10px,-50%);
-      &::before {
-        top: 50%;
-        right: 100%;
+      margin-left: 10px;
+      > * {
         transform: translateY(-50%);
+      }
+      > i {
+        right: 100%;
         border-top: $border-side;
         border-right: $border-base;
         border-bottom: $border-side;

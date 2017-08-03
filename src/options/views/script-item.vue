@@ -2,11 +2,7 @@
   <div class="script" :class="{disabled:!script.enabled}" draggable="true" @dragstart.prevent="onDragStart">
     <img class="script-icon" :src="safeIcon">
     <div class="script-info flex">
-      <a class="script-name ellipsis" target="_blank" :href="homepageURL"
-      v-text="script.custom.name || getLocaleString('name')"></a>
-      <a class="script-support" v-if="script.meta.supportURL" target=_blank :href="script.meta.supportURL">
-        <icon name="question"></icon>
-      </a>
+      <div class="script-name ellipsis" v-text="script.custom.name || getLocaleString('name')"></div>
       <div class="flex-auto"></div>
       <div class="script-author ellipsis" :title="script.meta.author" v-if="author">
         <span v-text="i18n('labelAuthor')"></span>
@@ -16,24 +12,35 @@
       <div class="script-version" v-text="script.meta.version?'v'+script.meta.version:''"></div>
     </div>
     <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
-    <div class="buttons flex">
-      <tooltip :title="i18n('buttonEdit')">
+    <div class="script-buttons flex">
+      <tooltip :title="i18n('buttonEdit')" align="start">
         <span class="btn-ghost" @click="onEdit">
           <icon name="code"></icon>
         </span>
       </tooltip>
-      <tooltip :title="labelEnable">
+      <tooltip :title="labelEnable" align="start">
         <span class="btn-ghost" @click="onEnable">
           <icon :name="`toggle-${script.enabled ? 'on' : 'off'}`"></icon>
         </span>
       </tooltip>
-      <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')">
+      <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')" align="start">
         <span class="btn-ghost" :disabled="script.checking" @click="onUpdate">
           <icon name="refresh"></icon>
         </span>
       </tooltip>
+      <span class="sep"></span>
+      <tooltip v-if="homepageURL || script.meta.supportURL" :title="i18n('buttonHome')" align="start">
+        <a class="btn-ghost" target="_blank" :href="homepageURL">
+          <icon name="home"></icon>
+        </a>
+      </tooltip>
+      <tooltip v-if="script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
+        <a class="btn-ghost" target="_blank" :href="script.meta.supportURL">
+          <icon name="question"></icon>
+        </a>
+      </tooltip>
       <div class="flex-auto" v-text="script.message"></div>
-      <tooltip :title="i18n('buttonRemove')">
+      <tooltip :title="i18n('buttonRemove')" align="end">
         <span class="btn-ghost" @click="onRemove">
           <icon name="trash"></icon>
         </span>
@@ -291,9 +298,10 @@ export default {
     background: #f0f0f0;
     color: #999;
   }
-  .buttons {
+  &-buttons {
     align-items: center;
     line-height: 1;
+    color: #3e4651;
     > .flex-auto {
       margin-left: 1rem;
     }
@@ -331,6 +339,7 @@ export default {
   &-desc {
     margin-left: 3.5rem;
     line-height: 2rem;
+    color: #60646d;
     &::after {
       content: "\200b";
     }

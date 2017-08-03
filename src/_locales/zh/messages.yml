@@ -404,3 +404,9 @@ labelSearchScript:
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 没有找到脚本！
+buttonHome:
+  description: Button to open homepage.
+  message: 主页
+buttonSupport:
+  description: Button to open support page.
+  message: 支持页面

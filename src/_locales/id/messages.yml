@@ -408,3 +408,9 @@ labelSearchScript:
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: No script is found.
+buttonHome:
+  description: Button to open homepage.
+  message: ''
+buttonSupport:
+  description: Button to open support page.
+  message: ''
