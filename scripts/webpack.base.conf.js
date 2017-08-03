@@ -1,8 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const BabiliWebpackPlugin = require('babili-webpack-plugin');
+const babiliPreset = require('babel-preset-babili');
 const vueLoaderConfig = require('./vue-loader.conf');
 const { IS_DEV, styleRule } = require('./utils');
+
+const { MINIFY } = process.env;
 const DIST = 'dist';
 const definePlugin = new webpack.DefinePlugin({
   'process.env': {
@@ -58,6 +61,12 @@ module.exports = {
   devtool: IS_DEV ? '#inline-source-map' : false,
   plugins: [
     definePlugin,
-    !IS_DEV && new BabiliWebpackPlugin(),
+    !IS_DEV && new BabiliWebpackPlugin({
+      mangle: !!MINIFY,
+    }, {
+      babili: (...args) => Object.assign(babiliPreset(...args), {
+        minified: !!MINIFY,
+      }),
+    }),
   ].filter(Boolean),
 };

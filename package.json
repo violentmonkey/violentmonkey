@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "gulp watch",
     "prebuild": "npm run lint && gulp clean",
-    "build": "gulp build",
+    "build": "NODE_ENV=production gulp build",
+    "build:min": "MINIFY=true NODE_ENV=production gulp build",
     "analyze": "webpack --profile --json --config scripts/webpack.conf.js | webpack-bundle-size-analyzer",
     "analyze:json": "webpack --profile --json --config scripts/webpack.conf.js > stats.json",
     "i18n": "gulp i18n",

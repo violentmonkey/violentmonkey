@@ -30,5 +30,5 @@ Build
 $ npm run build
 
 # Build a compressed version
-$ npm run build --production
+$ npm run build:min
 ```
