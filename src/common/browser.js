@@ -52,9 +52,15 @@ const meta = {
     onMessage(onMessage) {
       function wrapListener(listener) {
         return function onChromeMessage(message, sender, sendResponse) {
+          if (process.env.DEBUG) {
+            console.info('receive', message);
+          }
           const result = listener(message, sender);
           if (result && typeof result.then === 'function') {
             result.then(data => {
+              if (process.env.DEBUG) {
+                console.info('send', data);
+              }
               sendResponse({ data });
             }, error => {
               if (process.env.DEBUG) console.warn(error);
