@@ -52,9 +52,6 @@ targets.push(merge(base, {
     // new FriendlyErrorsPlugin(),
     !IS_DEV && new ExtractTextPlugin('[name].css'),
   ].filter(Boolean),
-  externals: {
-    localStorage: 'localStorage',
-  },
 }));
 
 targets.push(merge(base, {

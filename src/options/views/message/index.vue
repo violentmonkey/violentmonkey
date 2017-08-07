@@ -1,6 +1,6 @@
 <template>
   <transition-group tag="div" name="message">
-    <item v-for="message in store.messages" :key="message"
+    <item v-for="message in store.messages" :key="message.id"
     :message="message" @dismiss="onDismiss(message)" />
   </transition-group>
 </template>

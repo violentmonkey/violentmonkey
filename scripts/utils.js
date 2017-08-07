@@ -1,6 +1,7 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 const IS_DEV = process.env.NODE_ENV === 'development';
+const IS_TEST = process.env.NODE_ENV === 'test';
 
 function styleLoader({ loaders = [], extract = !IS_DEV, minimize = !IS_DEV, fallback = 'style-loader' } = {}) {
   const cssLoader = {
@@ -43,6 +44,7 @@ function merge(obj1, obj2) {
 }
 
 exports.IS_DEV = IS_DEV;
+exports.IS_TEST = IS_TEST;
 exports.styleLoader = styleLoader;
 exports.styleRule = styleRule;
 exports.merge = merge;

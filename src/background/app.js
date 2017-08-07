@@ -8,6 +8,7 @@ import {
   newScript, parseMeta,
   setClipboard, checkUpdate,
   getOption, setOption, hookOptions, getAllOptions,
+  initialize,
 } from './utils';
 
 const VM_VER = browser.runtime.getManifest().version;
@@ -197,7 +198,8 @@ const commands = {
   },
 };
 
-vmdb.initialized.then(() => {
+initialize()
+.then(() => {
   browser.runtime.onMessage.addListener((req, src) => {
     const func = commands[req.cmd];
     let res;

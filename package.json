@@ -11,7 +11,7 @@
     "i18n": "gulp i18n",
     "lint": "eslint --ext .js,.vue .",
     "svgo": "svgo --config .svgo.yml icons",
-    "pretest": "webpack --config scripts/webpack.test.conf.js",
+    "pretest": "NODE_ENV=test webpack --config scripts/webpack.test.conf.js",
     "test": "node dist/test",
     "prepush": "npm run lint"
   },
@@ -41,7 +41,6 @@
     "html-webpack-plugin": "^2.29.0",
     "husky": "^0.14.3",
     "js-yaml": "^3.9.0",
-    "localStorage": "^1.0.3",
     "postcss-loader": "^2.0.6",
     "postcss-scss": "^1.0.2",
     "precss": "^2.0.0",

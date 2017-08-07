@@ -1,5 +1,5 @@
 <template>
-  <section v-feature="'sync'">
+  <feature name="sync" tag="section">
     <h3>
       <span class="feature-text" v-text="i18n('labelSync')"></span>
     </h3>
@@ -21,7 +21,7 @@
         <span v-text="i18n('labelSyncScriptStatus')"></span>
       </label>
     </div>
-  </section>
+  </feature>
 </template>
 
 <script>
@@ -30,6 +30,7 @@ import options from 'src/common/options';
 import SettingCheck from 'src/common/ui/setting-check';
 import Icon from 'src/common/ui/icon';
 import { store } from '../../utils';
+import Feature from '../feature';
 
 const SYNC_CURRENT = 'sync.current';
 const syncConfig = {
@@ -45,6 +46,7 @@ export default {
   components: {
     SettingCheck,
     Icon,
+    Feature,
   },
   data() {
     return {

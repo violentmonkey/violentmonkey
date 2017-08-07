@@ -2,6 +2,7 @@ import Promise from 'sync-promise-lite';
 import { i18n, request, buffer2string, getFullUrl } from 'src/common';
 import { getNameURI, getScriptInfo, isRemote, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
+import { register } from './init';
 
 let db;
 
@@ -18,7 +19,7 @@ const position = {
   },
 };
 
-export const initialized = openDatabase().then(initPosition);
+register(openDatabase().then(initPosition));
 
 function openDatabase() {
   return new Promise((resolve, reject) => {

@@ -1,5 +1,5 @@
 <template>
-  <section v-feature="'blacklist'">
+  <feature name="blacklist" tag="section">
     <h3>
       <span class="feature-text" v-text="i18n('labelBlacklist')"></span>
     </h3>
@@ -9,7 +9,7 @@
     </p>
     <setting-text name="blacklist" ref="blacklist" />
     <button v-text="i18n('buttonSaveBlacklist')" @click="onSave"></button>
-  </section>
+  </feature>
 </template>
 
 <script>
@@ -17,10 +17,12 @@ import { i18n, sendMessage } from 'src/common';
 import options from 'src/common/options';
 import { showMessage } from 'src/options/utils';
 import SettingText from 'src/common/ui/setting-text';
+import Feature from '../feature';
 
 export default {
   components: {
     SettingText,
+    Feature,
   },
   methods: {
     onSave() {

@@ -59,6 +59,9 @@ const meta = {
             }, error => {
               if (process.env.DEBUG) console.warn(error);
               sendResponse({ error });
+            })
+            .catch(() => {
+              // Ignore sendResponse error
             });
             return true;
           } else if (typeof result !== 'undefined') {
@@ -88,6 +91,13 @@ const meta = {
         });
         return promise;
       };
+    },
+  },
+  storage: {
+    local: {
+      get: wrapAsync,
+      set: wrapAsync,
+      remove: wrapAsync,
     },
   },
   tabs: {

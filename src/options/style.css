@@ -49,25 +49,6 @@ section {
     margin-bottom: .3rem;
   }
 }
-.feature {
-  &-text {
-    position: relative;
-    &::after {
-      .feature & {
-        content: '';
-        display: block;
-        position: absolute;
-        width: 6px;
-        height: 6px;
-        top: -.1rem;
-        left: 100%;
-        border-radius: 50%;
-        margin-left: .1rem;
-        background: red;
-      }
-    }
-  }
-}
 
 .tab {
   position: relative;

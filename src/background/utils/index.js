@@ -9,6 +9,7 @@ export * from './options';
 export * from './requests';
 export * as vmdb from './db';
 export * from './search';
+export { initialize } from './init';
 
 export function notify(options) {
   browser.notifications.create(options.id || 'ViolentMonkey', {

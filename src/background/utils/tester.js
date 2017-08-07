@@ -77,7 +77,8 @@ function autoReg(str) {
   if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
     return RegExp(str.slice(1, -1)); // Regular-expression
   }
-  return str2RE(str); // String with wildcards
+  const re = str2RE(str); // String with wildcards
+  return { test: tstr => re.test(tstr) };
 }
 
 function matchScheme(rule, data) {

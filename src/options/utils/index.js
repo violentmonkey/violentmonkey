@@ -1,11 +1,9 @@
 import Vue from 'vue';
-import resetFeatures from './features';
 import Message from '../views/message';
 
 export const store = {
   messages: null,
 };
-export const features = { reset: resetFeatures };
 
 function initMessage() {
   if (store.messages) return;
@@ -17,9 +15,14 @@ function initMessage() {
   }).$mount(el);
 }
 
+let id = 0;
+
 export function showMessage(options) {
   initMessage();
-  const message = Object.assign({}, options, !options.buttons && {
+  id += 1;
+  const message = Object.assign({
+    id,
+  }, options, !options.buttons && {
     onInit(vm) {
       setTimeout(() => {
         vm.$emit('dismiss');

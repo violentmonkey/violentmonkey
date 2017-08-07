@@ -1,5 +1,5 @@
 import { initHooks, debounce, normalizeKeys, object } from 'src/common';
-import storage from 'localStorage'; // eslint-disable-line import/no-extraneous-dependencies
+import { register } from './init';
 
 const defaults = {
   isApplied: true,
@@ -23,6 +23,34 @@ let changes = {};
 const hooks = initHooks();
 const callHooksLater = debounce(callHooks, 100);
 
+let options = {};
+const init = browser.storage.local.get('options')
+.then(({ options: value }) => {
+  options = value;
+  if (!options || typeof options !== 'object') options = {};
+});
+register(init);
+
+// v2.8.0+ stores options in browser.storage.local
+// Upgrade from v2.7.x
+if (localStorage.length) {
+  Object.keys(defaults)
+  .forEach(key => {
+    let value = localStorage.getItem(key);
+    if (value) {
+      try {
+        value = JSON.parse(value);
+      } catch (e) {
+        value = null;
+      }
+    }
+    if (value) {
+      setOption(key, value);
+    }
+    localStorage.clear();
+  });
+}
+
 function fireChange(key, value) {
   changes[key] = value;
   callHooksLater();
@@ -36,18 +64,10 @@ function callHooks() {
 export function getOption(key, def) {
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
-  const value = storage.getItem(mainKey);
-  let obj;
-  if (value) {
-    try {
-      obj = JSON.parse(value);
-    } catch (e) {
-      // ignore invalid JSON
-    }
-  }
-  if (obj == null) obj = defaults[mainKey];
-  if (obj == null) obj = def;
-  return keys.length > 1 ? object.get(obj, keys.slice(1), def) : obj;
+  let value = options[mainKey];
+  if (value == null) value = defaults[mainKey];
+  if (value == null) value = def;
+  return keys.length > 1 ? object.get(value, keys.slice(1), def) : value;
 }
 
 export function setOption(key, value) {
@@ -59,7 +79,8 @@ export function setOption(key, value) {
     if (keys.length > 1) {
       optionValue = object.set(getOption(mainKey), keys.slice(1), value);
     }
-    storage.setItem(mainKey, JSON.stringify(optionValue));
+    options[mainKey] = optionValue;
+    browser.storage.local.set({ options });
     fireChange(optionKey, value);
   }
 }
