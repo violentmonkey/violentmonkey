@@ -263,9 +263,9 @@ function wrapGM(script, cache) {
       },
     },
     GM_log: {
-      value(data) {
+      value(...args) {
         // eslint-disable-next-line no-console
-        console.log(`[Violentmonkey][${script.meta.name || 'No name'}]`, data);
+        console.log(`[Violentmonkey][${script.meta.name || 'No name'}]`, ...args);
       },
     },
     GM_openInTab: {
