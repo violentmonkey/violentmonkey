@@ -3,7 +3,7 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: ''
+  message: Userscript-Unterstützung für Browser.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Das Skript wurde aktualisiert.
