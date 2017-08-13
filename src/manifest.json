@@ -47,6 +47,7 @@
     "webRequest",
     "webRequestBlocking",
     "notifications",
-    "storage"
+    "storage",
+    "unlimitedStorage"
   ]
 }

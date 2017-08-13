@@ -10,7 +10,7 @@ function doCheckUpdate(script) {
   const res = {
     cmd: 'UpdateScript',
     data: {
-      id: script.id,
+      id: script.props.id,
       checking: true,
     },
   };
@@ -63,23 +63,24 @@ function doCheckUpdate(script) {
 }
 
 export default function checkUpdate(script) {
-  let promise = processes[script.id];
+  const { id } = script.props;
+  let promise = processes[id];
   if (!promise) {
     let updated = false;
     promise = doCheckUpdate(script)
     .then(code => parseScript({
+      id,
       code,
-      id: script.id,
     }))
     .then(res => {
-      const { data } = res;
-      data.checking = false;
+      const { data: { update } } = res;
+      update.checking = false;
       browser.runtime.sendMessage(res);
       updated = true;
       if (getOption('notifyUpdates')) {
         notify({
           title: i18n('titleScriptUpdated'),
-          body: i18n('msgScriptUpdated', [data.meta.name || i18n('labelNoName')]),
+          body: i18n('msgScriptUpdated', [update.meta.name || i18n('labelNoName')]),
         });
       }
     })
@@ -87,10 +88,10 @@ export default function checkUpdate(script) {
       if (process.env.DEBUG) console.error(err);
     })
     .then(() => {
-      delete processes[script.id];
+      delete processes[id];
       return updated;
     });
-    processes[script.id] = promise;
+    processes[id] = promise;
   }
   return promise;
 }

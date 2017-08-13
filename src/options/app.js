@@ -82,17 +82,15 @@ function initMain() {
     },
     UpdateScript(data) {
       if (!data) return;
-      const script = store.scripts.find(item => item.id === data.id);
-      if (script) {
-        Object.keys(data).forEach((key) => {
-          Vue.set(script, key, data[key]);
-        });
-        initSearch(script);
+      const index = store.scripts.findIndex(item => item.props.id === data.props.id);
+      if (index >= 0) {
+        Vue.set(store.scripts, index, data);
+        initSearch(data);
       }
     },
-    RemoveScript(data) {
-      const i = store.scripts.findIndex(script => script.id === data);
-      if (i >= 0) store.scripts.splice(i, 1);
-    },
+    // RemoveScript(data) {
+    //   const i = store.scripts.findIndex(script => script.props.id === data);
+    //   if (i >= 0) store.scripts.splice(i, 1);
+    // },
   });
 }

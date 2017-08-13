@@ -37,7 +37,7 @@ export const object = {
       }
       sub = child;
     });
-    if (val == null) {
+    if (typeof val === 'undefined') {
       delete sub[lastKey];
     } else {
       sub[lastKey] = val;

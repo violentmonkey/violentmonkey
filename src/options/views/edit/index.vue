@@ -19,7 +19,7 @@
       />
       <vm-settings
         v-show="nav === 'settings'" class="abs-full"
-        :value="value" :settings="settings"
+        :value="script" :settings="settings"
       />
     </div>
     <div class="frame-block">
@@ -33,7 +33,6 @@
 </template>
 
 <script>
-import CodeMirror from 'codemirror';
 import { i18n, sendMessage, noop } from 'src/common';
 import VmCode from 'src/common/ui/code';
 import { showMessage } from '../../utils';
@@ -49,7 +48,7 @@ function toList(text) {
 }
 
 export default {
-  props: ['value'],
+  props: ['initial'],
   components: {
     VmCode,
     VmSettings,
@@ -58,6 +57,7 @@ export default {
     return {
       nav: 'code',
       canSave: false,
+      script: null,
       code: '',
       settings: {},
       commands: {
@@ -77,18 +77,27 @@ export default {
       },
     },
   },
+  created() {
+    this.script = this.initial;
+  },
   mounted() {
-    (this.value.id ? sendMessage({
-      cmd: 'GetScript',
-      data: this.value.id,
-    }) : Promise.resolve(this.value))
-    .then(script => {
+    const { id } = this.script.props;
+    (id ? sendMessage({
+      cmd: 'GetScriptCode',
+      data: id,
+    }) : sendMessage({
+      cmd: 'NewScript',
+    }).then(({ script, code }) => {
+      this.script = script;
+      return code;
+    }))
+    .then(code => {
+      this.code = code;
       const settings = {};
-      settings.more = {
-        update: script.update,
+      const { custom, config } = this.script;
+      settings.config = {
+        shouldUpdate: config.shouldUpdate,
       };
-      this.code = script.code;
-      const { custom } = script;
       settings.custom = [
         'name',
         'homepageURL',
@@ -116,8 +125,8 @@ export default {
   },
   methods: {
     save() {
-      const { settings: { custom, more } } = this;
-      const value = [
+      const { settings: { config, custom: rawCustom } } = this;
+      const custom = [
         'name',
         'runAt',
         'homepageURL',
@@ -128,30 +137,30 @@ export default {
         'origMatch',
         'origExcludeMatch',
       ].reduce((val, key) => {
-        val[key] = custom[key];
+        val[key] = rawCustom[key];
         return val;
       }, {
-        include: toList(custom.include),
-        match: toList(custom.match),
-        exclude: toList(custom.exclude),
-        excludeMatch: toList(custom.excludeMatch),
+        include: toList(rawCustom.include),
+        match: toList(rawCustom.match),
+        exclude: toList(rawCustom.exclude),
+        excludeMatch: toList(rawCustom.excludeMatch),
       });
+      const { id } = this.script.props;
       return sendMessage({
         cmd: 'ParseScript',
         data: {
-          id: this.value.id,
+          id,
+          custom,
+          config,
           code: this.code,
           // User created scripts MUST be marked `isNew` so that
           // the backend is able to check namespace conflicts,
           // otherwise the script with same namespace will be overridden
-          isNew: !this.value.id,
+          isNew: !id,
           message: '',
-          custom: value,
-          more,
         },
       })
-      .then(script => {
-        this.$emit('input', script);
+      .then(() => {
         this.canSave = false;
       }, err => {
         showMessage({ text: err });

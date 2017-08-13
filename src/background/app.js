@@ -1,6 +1,6 @@
 import 'src/common/polyfills';
 import 'src/common/browser';
-import { i18n, defaultImage } from 'src/common';
+import { i18n, defaultImage, object } from 'src/common';
 import * as sync from './sync';
 import {
   cache, vmdb,
@@ -32,8 +32,11 @@ function broadcast(data) {
 
 function checkUpdateAll() {
   setOption('lastUpdate', Date.now());
-  vmdb.getScriptsByIndex('update', 1)
-  .then(scripts => Promise.all(scripts.map(checkUpdate)))
+  vmdb.getScripts()
+  .then(scripts => {
+    const toUpdate = scripts.filter(item => object.get(item, 'config.shouldUpdate'));
+    return Promise.all(toUpdate.map(checkUpdate));
+  })
   .then(updatedList => {
     if (updatedList.some(Boolean)) sync.sync();
   });
@@ -83,11 +86,14 @@ const commands = {
       vmdb.getScriptsByURL(url).then(res => Object.assign(data, res))
     ) : data;
   },
-  UpdateScriptInfo(data) {
-    return vmdb.updateScriptInfo(data.id, data, {
-      modified: Date.now(),
+  UpdateScriptInfo({ id, config }) {
+    return vmdb.updateScriptInfo(id, {
+      config,
+      custom: {
+        modified: Date.now(),
+      },
     })
-    .then(script => {
+    .then(([script]) => {
       sync.sync();
       browser.runtime.sendMessage({
         cmd: 'UpdateScript',
@@ -95,29 +101,26 @@ const commands = {
       });
     });
   },
-  SetValue(data) {
-    return vmdb.setValue(data.uri, data.values)
+  SetValue({ id, values }) {
+    return vmdb.setValues(id, values)
     .then(() => {
       broadcast({
         cmd: 'UpdateValues',
-        data: {
-          uri: data.uri,
-          values: data.values,
-        },
+        data: { id, values },
       });
     });
   },
-  ExportZip(data) {
-    return vmdb.getExportData(data.ids, data.values);
+  ExportZip({ ids, values }) {
+    return vmdb.getExportData(ids, values);
   },
-  GetScript(id) {
-    return vmdb.getScriptData(id);
+  GetScriptCode(id) {
+    return vmdb.getScriptCode(id);
   },
   GetMetas(ids) {
-    return vmdb.getScriptInfos(ids);
+    return vmdb.getScriptByIds(ids);
   },
-  Move(data) {
-    return vmdb.moveScript(data.id, data.offset)
+  Move({ id, offset }) {
+    return vmdb.moveScript(id, offset)
     .then(() => { sync.sync(); });
   },
   Vacuum: vmdb.vacuum,
@@ -129,7 +132,7 @@ const commands = {
     });
   },
   CheckUpdate(id) {
-    vmdb.getScript(id).then(checkUpdate)
+    vmdb.getScript({ id }).then(checkUpdate)
     .then(updated => {
       if (updated) sync.sync();
     });
@@ -190,11 +193,13 @@ const commands = {
     const items = Array.isArray(data) ? data : [data];
     items.forEach(item => { setOption(item.key, item.value); });
   },
-  CheckPosition: vmdb.checkPosition,
   ConfirmInstall: confirmInstall,
   CheckScript({ name, namespace }) {
-    return vmdb.queryScript(null, { name, namespace })
+    return vmdb.getScript({ meta: { name, namespace } })
     .then(script => (script ? script.meta.version : null));
+  },
+  CheckPosition() {
+    return vmdb.normalizePosition();
   },
 };
 
@@ -218,9 +223,6 @@ initialize()
   });
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
-
-  // XXX fix position regression in v2.6.3
-  vmdb.checkPosition();
 });
 
 // Common functions

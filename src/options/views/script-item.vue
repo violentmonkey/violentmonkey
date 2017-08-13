@@ -1,5 +1,5 @@
 <template>
-  <div class="script" :class="{disabled:!script.enabled}" draggable="true" @dragstart.prevent="onDragStart">
+  <div class="script" :class="{ disabled: !script.config.enabled || script.config.removed }" draggable="true" @dragstart.prevent="onDragStart">
     <img class="script-icon" :src="safeIcon">
     <div class="script-info flex">
       <div class="script-name ellipsis" v-text="script.custom.name || getLocaleString('name')"></div>
@@ -9,7 +9,7 @@
         <a :href="'mailto:'+author.email" v-if="author.email" v-text="author.name"></a>
         <span v-if="!author.email" v-text="author.name"></span>
       </div>
-      <div class="script-version" v-text="script.meta.version?'v'+script.meta.version:''"></div>
+      <div class="script-version" v-text="script.meta.version ? `v${script.meta.version}` : ''"></div>
     </div>
     <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
     <div class="script-buttons flex">
@@ -20,7 +20,7 @@
       </tooltip>
       <tooltip :title="labelEnable" align="start">
         <span class="btn-ghost" @click="onEnable">
-          <icon :name="`toggle-${script.enabled ? 'on' : 'off'}`"></icon>
+          <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
         </span>
       </tooltip>
       <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')" align="start">
@@ -92,7 +92,7 @@ export default {
   computed: {
     canUpdate() {
       const { script } = this;
-      return script.update && (
+      return script.config.shouldUpdate && (
         script.custom.updateURL ||
         script.meta.updateURL ||
         script.custom.downloadURL ||
@@ -114,7 +114,7 @@ export default {
       };
     },
     labelEnable() {
-      return this.script.enabled ? this.i18n('buttonDisable') : this.i18n('buttonEnable');
+      return this.script.config.enabled ? this.i18n('buttonDisable') : this.i18n('buttonEnable');
     },
   },
   mounted() {
@@ -133,27 +133,34 @@ export default {
       return getLocaleString(this.script.meta, key);
     },
     onEdit() {
-      this.$emit('edit', this.script.id);
+      this.$emit('edit', this.script.props.id);
     },
     onRemove() {
       sendMessage({
-        cmd: 'RemoveScript',
-        data: this.script.id,
+        cmd: 'UpdateScriptInfo',
+        data: {
+          id: this.script.props.id,
+          config: {
+            removed: 1,
+          },
+        },
       });
     },
     onEnable() {
       sendMessage({
         cmd: 'UpdateScriptInfo',
         data: {
-          id: this.script.id,
-          enabled: this.script.enabled ? 0 : 1,
+          id: this.script.props.id,
+          config: {
+            enabled: this.script.config.enabled ? 0 : 1,
+          },
         },
       });
     },
     onUpdate() {
       sendMessage({
         cmd: 'CheckUpdate',
-        data: this.script.id,
+        data: this.script.props.id,
       });
     },
     onDragStart(e) {

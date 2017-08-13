@@ -23,13 +23,13 @@
       </div>
     </header>
     <div class="scripts">
-      <item v-for="script in scripts" :key="script.id"
+      <item v-for="script in scripts" :key="script.props.id"
       :script="script" @edit="editScript" @move="moveScript"></item>
     </div>
     <div class="backdrop" :class="{mask: store.loading}" v-show="message">
       <div v-html="message"></div>
     </div>
-    <edit v-if="script" v-model="script" @close="endEditScript"></edit>
+    <edit v-if="script" :initial="script" @close="endEditScript"></edit>
   </div>
 </template>
 
@@ -86,10 +86,7 @@ export default {
         : scripts;
     },
     newScript() {
-      sendMessage({ cmd: 'NewScript' })
-      .then((script) => {
-        this.script = script;
-      });
+      this.script = {};
     },
     updateAll() {
       sendMessage({ cmd: 'CheckUpdateAll' });
@@ -120,7 +117,7 @@ export default {
       });
     },
     editScript(id) {
-      this.script = this.store.scripts.find(script => script.id === id);
+      this.script = this.store.scripts.find(script => script.props.id === id);
     },
     endEditScript() {
       this.script = null;
@@ -130,7 +127,7 @@ export default {
       sendMessage({
         cmd: 'Move',
         data: {
-          id: this.store.scripts[data.from].id,
+          id: this.store.scripts[data.from].props.id,
           offset: data.to - data.from,
         },
       })
@@ -150,6 +147,9 @@ export default {
         }
         this.store.scripts = seq.concat.apply([], seq);
       });
+    },
+    onScriptUpdated(script) {
+      this.script = script;
     },
   },
   created() {

@@ -3,7 +3,7 @@
     <h4 v-text="i18n('editLabelSettings')"></h4>
     <div class="form-group">
       <label>
-        <input type="checkbox" v-model="more.update">
+        <input type="checkbox" v-model="config.shouldUpdate">
         <span v-text="i18n('labelAllowUpdate')"></span>
       </label>
     </div>

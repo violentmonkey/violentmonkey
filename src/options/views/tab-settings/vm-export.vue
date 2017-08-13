@@ -45,7 +45,7 @@ export default {
   },
   computed: {
     selectedIds() {
-      return this.items.filter(item => item.active).map(item => item.script.id);
+      return this.items.filter(item => item.active).map(item => item.script.props.id);
     },
   },
   created() {
