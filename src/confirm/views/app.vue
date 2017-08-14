@@ -53,7 +53,7 @@ export default {
       message: '',
       code: '',
       commands: {
-        cancel: this.close,
+        close: this.close,
       },
       info: {},
     };

@@ -99,8 +99,8 @@ export default {
     custom() {
       return this.settings.custom || {};
     },
-    more() {
-      return this.settings.more || {};
+    config() {
+      return this.settings.config || {};
     },
     placeholders() {
       const { value } = this;
