@@ -154,7 +154,9 @@ labelTranslator:
   message: 'Übersetzer: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href="http://blog.scrobble.me">Adrian Mörchen</a> <a href="https://github.com/spodermenpls">spodermenpls</a>'
+  message: >-
+    <a href="http://blog.scrobble.me">Adrian Mörchen</a> <a
+    href="https://github.com/spodermenpls">spodermenpls</a>
 labelCurrentLang:
   description: Label of current language.
   message: 'Gewählte Sprache: '
@@ -181,13 +183,13 @@ labelDownloadURL:
   message: 'Download URL:'
 labelInclude:
   description: Label of @include rules.
-  message: 'Einschließen (@include)'
+  message: Einschließen (@include)
 labelMatch:
   description: Label of @match rules.
-  message: 'Übereinstimmungen (@match)'
+  message: Übereinstimmungen (@match)
 labelExclude:
   description: Label of @exclude rules.
-  message: 'Ausschließen (@exclude)'
+  message: Ausschließen (@exclude)
 labelExcludeMatch:
   description: Label of @exclude-match rules.
   message: '@exclude-match Regel'
@@ -229,8 +231,8 @@ hintUseDownloadURL:
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: >-
-    Die Änderungen wurden nicht gespreichert! 
-    Zum Verwerfen OK drücken oder Abbrechen um zurückzukehren.
+    Die Änderungen wurden nicht gespreichert! Zum Verwerfen OK drücken oder
+    Abbrechen um zurückzukehren.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Säubere Daten...
@@ -349,8 +351,9 @@ labelCustomCSS:
   message: Benutzerdefiniertes Aussehen
 descCustomCSS:
   description: Description of custom CSS section.
-  message: Benutzerdefiniertes CSS für die Seiten "Einstellungen" und "Installierte Skripte". 
-  Bitte nicht editieren, falls die Fachkenntnis hierüber fehlt.
+  message: >-
+    Benutzerdefiniertes CSS für die Seiten "Einstellungen" und "Installierte
+    Skripte". Bitte nicht editieren, falls die Fachkenntnis hierüber fehlt.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Speichern
