@@ -1,10 +1,6 @@
-import { debounce, normalizeKeys, request, noop } from 'src/common';
-import {
-  getEventEmitter, vmdb,
-  getOption, setOption, hookOptions,
-} from '../utils';
-
-const { getScriptsByIndex, parseScript, removeScript, checkPosition } = vmdb;
+import { debounce, normalizeKeys, request, noop, object } from 'src/common';
+import { getEventEmitter, getOption, setOption, hookOptions } from '../utils';
+import { getScripts, getScriptCode, parseScript, removeScript, normalizePosition } from '../utils/db';
 
 const serviceNames = [];
 const services = {};
@@ -20,6 +16,11 @@ export function isScriptFile(name) {
 }
 export function getURI(name) {
   return decodeURIComponent(name.slice(3));
+}
+
+function getLocalData() {
+  return getScripts()
+  .then(scripts => scripts.filter(script => !script.config.removed));
 }
 
 function initConfig() {
@@ -289,7 +290,7 @@ export const BaseService = serviceFactory({
     .then(remoteMeta => Promise.all([
       remoteMeta,
       this.list(),
-      getScriptsByIndex('position'),
+      getLocalData(),
     ]))
     .then(([remoteMeta, remoteData, localData]) => {
       const remoteMetaInfo = remoteMeta.info || {};
@@ -322,19 +323,20 @@ export const BaseService = serviceFactory({
         return info;
       }, {});
       localData.forEach(item => {
-        const remoteInfo = remoteMeta.info[item.uri];
+        const { props: { uri, position }, custom: { modified } } = item;
+        const remoteInfo = remoteMeta.info[uri];
         if (remoteInfo) {
-          if (firstSync || !item.custom.modified || remoteInfo.modified > item.custom.modified) {
-            const remoteItem = remoteItemMap[item.uri];
+          if (firstSync || !modified || remoteInfo.modified > modified) {
+            const remoteItem = remoteItemMap[uri];
             getRemote.push(remoteItem);
-          } else if (remoteInfo.modified < item.custom.modified) {
+          } else if (remoteInfo.modified < modified) {
             putRemote.push(item);
-          } else if (remoteInfo.position !== item.position) {
-            remoteInfo.position = item.position;
+          } else if (remoteInfo.position !== position) {
+            remoteInfo.position = position;
             remoteChanged = true;
           }
-          delete remoteItemMap[item.uri];
-        } else if (firstSync || !outdated || item.custom.modified > remoteTimestamp) {
+          delete remoteItemMap[uri];
+        } else if (firstSync || !outdated || modified > remoteTimestamp) {
           putRemote.push(item);
         } else {
           delLocal.push(item);
@@ -353,44 +355,55 @@ export const BaseService = serviceFactory({
           this.log('Download script:', item.uri);
           return this.get(getFilename(item.uri))
           .then(raw => {
-            const data = { more: {} };
+            const data = {};
             try {
               const obj = JSON.parse(raw);
-              if (obj.version === 1) {
+              if (obj.version === 2) {
                 data.code = obj.code;
-                if (obj.more) data.more = obj.more;
+                data.config = obj.config;
+                data.custom = obj.custom;
+              } else if (obj.version === 1) {
+                data.code = obj.code;
+                if (obj.more) {
+                  data.custom = obj.more.custom;
+                  data.config = object.purify({
+                    enabled: obj.more.enabled,
+                    shouldUpdate: obj.more.update,
+                  });
+                }
               }
             } catch (e) {
               data.code = raw;
             }
             const remoteInfo = remoteMeta.info[item.uri];
-            const { modified, position } = remoteInfo;
+            const { modified } = remoteInfo;
             data.modified = modified;
-            if (position) data.more.position = position;
-            if (!getOption('syncScriptStatus') && data.more) {
-              delete data.more.enabled;
+            const position = +remoteInfo.position;
+            if (position) data.position = position;
+            if (!getOption('syncScriptStatus') && data.config) {
+              delete data.config.enabled;
             }
             return parseScript(data)
             .then(res => { browser.runtime.sendMessage(res); });
           });
         }),
-        ...putRemote.map(item => {
-          this.log('Upload script:', item.uri);
-          const data = JSON.stringify({
-            version: 1,
-            code: item.code,
-            more: {
-              custom: item.custom,
-              enabled: item.enabled,
-              update: item.update,
-            },
+        ...putRemote.map(script => {
+          this.log('Upload script:', script.props.uri);
+          return getScriptCode(script.props.id)
+          .then(code => {
+            const data = JSON.stringify({
+              version: 2,
+              code,
+              custom: script.custom,
+              config: script.config,
+            });
+            remoteMeta.info[script.props.uri] = {
+              modified: script.custom.modified,
+              position: script.props.position,
+            };
+            remoteChanged = true;
+            return this.put(getFilename(script.props.uri), data);
           });
-          remoteMeta.info[item.uri] = {
-            modified: item.custom.modified,
-            position: item.position,
-          };
-          remoteChanged = true;
-          return this.put(getFilename(item.uri), data);
         }),
         ...delRemote.map(item => {
           this.log('Remove remote script:', item.uri);
@@ -398,17 +411,19 @@ export const BaseService = serviceFactory({
           remoteChanged = true;
           return this.remove(getFilename(item.uri));
         }),
-        ...delLocal.map(item => {
-          this.log('Remove local script:', item.uri);
-          return removeScript(item.id);
+        ...delLocal.map(script => {
+          this.log('Remove local script:', script.props.uri);
+          return removeScript(script.props.id);
         }),
       ];
-      promiseQueue.push(Promise.all(promiseQueue).then(() => checkPosition()).then(changed => {
+      promiseQueue.push(Promise.all(promiseQueue).then(() => normalizePosition()).then(changed => {
         if (!changed) return;
         remoteChanged = true;
-        return getScriptsByIndex('position', null, null, item => {
-          const remoteInfo = remoteMeta.info[item.uri];
-          if (remoteInfo) remoteInfo.position = item.position;
+        return getScripts().then(scripts => {
+          scripts.forEach(script => {
+            const remoteInfo = remoteMeta.info[script.props.uri];
+            if (remoteInfo) remoteInfo.position = script.props.position;
+          });
         });
       }));
       promiseQueue.push(Promise.all(promiseQueue).then(() => {

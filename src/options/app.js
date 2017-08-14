@@ -75,10 +75,10 @@ function initMain() {
     UpdateSync(data) {
       store.sync = data;
     },
-    AddScript(data) {
-      data.message = '';
-      initSearch(data);
-      store.scripts.push(data);
+    AddScript({ update }) {
+      update.message = '';
+      initSearch(update);
+      store.scripts.push(update);
     },
     UpdateScript(data) {
       if (!data) return;

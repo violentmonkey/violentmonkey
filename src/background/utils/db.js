@@ -306,7 +306,8 @@ export function normalizePosition() {
     }
   });
   store.storeInfo.position = store.scripts.length;
-  return storage.script.dump(updates);
+  const { length } = updates;
+  return length ? storage.script.dump(updates).then(() => length) : Promise.resolve();
 }
 
 export function getScript(where) {
@@ -540,11 +541,14 @@ export function parseScript(data) {
     }
     if (isRemote(data.url)) script.custom.lastInstallURL = data.url;
     object.set(script, 'props.lastModified', data.modified || Date.now());
+    const position = +data.position;
+    if (position) object.set(script, 'props.position', position);
     return saveScript(script, code).then(() => script);
   })
   .then(script => {
     fetchScriptResources(script, data);
     Object.assign(result.data.update, script);
+    result.data.where = { id: script.props.id };
     return result;
   });
 }

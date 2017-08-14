@@ -79,11 +79,11 @@ function getVMFile(entry, vmFile) {
         const more = vm.scripts[entry.filename.slice(0, -8)];
         if (more) {
           data.custom = more.custom;
-          data.config = more.config;
+          data.config = more.config || {};
           data.position = more.position;
           // Import data from older version
-          if ('enabled' in more) object.set(data, ['config', 'enabled'], more.enabled);
-          if ('update' in more) object.set(data, ['config', 'shouldUpdate'], more.update);
+          if ('enabled' in more) data.config.enabled = more.enabled;
+          if ('update' in more) data.config.shouldUpdate = more.update;
         }
       }
       sendMessage({

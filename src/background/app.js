@@ -3,13 +3,19 @@ import 'src/common/browser';
 import { i18n, defaultImage, object } from 'src/common';
 import * as sync from './sync';
 import {
-  cache, vmdb,
+  cache,
   getRequestId, httpRequest, abortRequest, confirmInstall,
   newScript, parseMeta,
   setClipboard, checkUpdate,
   getOption, setOption, hookOptions, getAllOptions,
   initialize,
 } from './utils';
+import {
+  getScripts, removeScript, getData, getScriptsByURL,
+  updateScriptInfo, setValues, getExportData, getScriptCode,
+  getScriptByIds, moveScript, vacuum, parseScript, getScript,
+  normalizePosition,
+} from './utils/db';
 
 const VM_VER = browser.runtime.getManifest().version;
 
@@ -32,7 +38,7 @@ function broadcast(data) {
 
 function checkUpdateAll() {
   setOption('lastUpdate', Date.now());
-  vmdb.getScripts()
+  getScripts()
   .then(scripts => {
     const toUpdate = scripts.filter(item => object.get(item, 'config.shouldUpdate'));
     return Promise.all(toUpdate.map(checkUpdate));
@@ -61,11 +67,11 @@ const commands = {
     return newScript();
   },
   RemoveScript(id) {
-    return vmdb.removeScript(id)
+    return removeScript(id)
     .then(() => { sync.sync(); });
   },
   GetData() {
-    return vmdb.getData().then(data => {
+    return getData().then(data => {
       data.sync = sync.getStates();
       data.version = VM_VER;
       return data;
@@ -83,11 +89,11 @@ const commands = {
       }
     });
     return data.isApplied ? (
-      vmdb.getScriptsByURL(url).then(res => Object.assign(data, res))
+      getScriptsByURL(url).then(res => Object.assign(data, res))
     ) : data;
   },
   UpdateScriptInfo({ id, config }) {
-    return vmdb.updateScriptInfo(id, {
+    return updateScriptInfo(id, {
       config,
       custom: {
         modified: Date.now(),
@@ -97,12 +103,15 @@ const commands = {
       sync.sync();
       browser.runtime.sendMessage({
         cmd: 'UpdateScript',
-        data: script,
+        data: {
+          where: { id: script.props.id },
+          update: script,
+        },
       });
     });
   },
   SetValue({ where, values }) {
-    return vmdb.setValues(where, values)
+    return setValues(where, values)
     .then(data => {
       broadcast({
         cmd: 'UpdateValues',
@@ -111,28 +120,28 @@ const commands = {
     });
   },
   ExportZip({ ids, values }) {
-    return vmdb.getExportData(ids, values);
+    return getExportData(ids, values);
   },
   GetScriptCode(id) {
-    return vmdb.getScriptCode(id);
+    return getScriptCode(id);
   },
   GetMetas(ids) {
-    return vmdb.getScriptByIds(ids);
+    return getScriptByIds(ids);
   },
   Move({ id, offset }) {
-    return vmdb.moveScript(id, offset)
+    return moveScript(id, offset)
     .then(() => { sync.sync(); });
   },
-  Vacuum: vmdb.vacuum,
+  Vacuum: vacuum,
   ParseScript(data) {
-    return vmdb.parseScript(data).then(res => {
+    return parseScript(data).then(res => {
       browser.runtime.sendMessage(res);
       sync.sync();
       return res.data;
     });
   },
   CheckUpdate(id) {
-    vmdb.getScript({ id }).then(checkUpdate)
+    getScript({ id }).then(checkUpdate)
     .then(updated => {
       if (updated) sync.sync();
     });
@@ -195,11 +204,11 @@ const commands = {
   },
   ConfirmInstall: confirmInstall,
   CheckScript({ name, namespace }) {
-    return vmdb.getScript({ meta: { name, namespace } })
+    return getScript({ meta: { name, namespace } })
     .then(script => (script ? script.meta.version : null));
   },
   CheckPosition() {
-    return vmdb.normalizePosition();
+    return normalizePosition();
   },
 };
 
