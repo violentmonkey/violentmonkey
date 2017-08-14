@@ -11,7 +11,7 @@ import {
   initialize,
 } from './utils';
 import {
-  getScripts, removeScript, getData, getScriptsByURL,
+  getScripts, removeScript, getData, checkRemove, getScriptsByURL,
   updateScriptInfo, setValues, getExportData, getScriptCode,
   getScriptByIds, moveScript, vacuum, parseScript, getScript,
   normalizePosition,
@@ -71,7 +71,12 @@ const commands = {
     .then(() => { sync.sync(); });
   },
   GetData() {
-    return getData().then(data => {
+    return checkRemove()
+    .then(changed => {
+      if (changed) sync.sync();
+      return getData();
+    })
+    .then(data => {
       data.sync = sync.getStates();
       data.version = VM_VER;
       return data;

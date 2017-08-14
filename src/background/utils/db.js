@@ -386,12 +386,6 @@ export function getScriptsByURL(url) {
  */
 export function getData() {
   const cacheKeys = {};
-  const toRemove = store.scripts.filter(script => script.config.removed);
-  if (toRemove.length) {
-    store.scripts = store.scripts.filter(script => !script.config.removed);
-    storage.script.removeMulti(toRemove);
-    storage.code.removeMulti(toRemove);
-  }
   const { scripts } = store;
   scripts.forEach(script => {
     const icon = object.get(script, 'meta.icon');
@@ -405,6 +399,16 @@ export function getData() {
     return cache;
   })
   .then(cache => ({ scripts, cache }));
+}
+
+export function checkRemove() {
+  const toRemove = store.scripts.filter(script => script.config.removed);
+  if (toRemove.length) {
+    store.scripts = store.scripts.filter(script => !script.config.removed);
+    storage.script.removeMulti(toRemove);
+    storage.code.removeMulti(toRemove);
+  }
+  return Promise.resolve(toRemove.length);
 }
 
 export function removeScript(id) {
