@@ -412,3 +412,9 @@ buttonHome:
 buttonSupport:
   description: Button to open support page.
   message: ''
+buttonUndo:
+  description: Button to undo removement of a script.
+  message: ''
+labelRemoved:
+  description: Label shown when a script is removed.
+  message: ''

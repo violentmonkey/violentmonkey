@@ -410,3 +410,9 @@ buttonHome:
 buttonSupport:
   description: Button to open support page.
   message: 支持页面
+buttonUndo:
+  description: Button to undo removement of a script.
+  message: 撤销
+labelRemoved:
+  description: Label shown when a script is removed.
+  message: 【已删除】

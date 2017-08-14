@@ -7,11 +7,16 @@ import { notify } from '.';
 const processes = {};
 
 function doCheckUpdate(script) {
+  const update = {
+    checking: true,
+  };
   const res = {
     cmd: 'UpdateScript',
     data: {
-      id: script.props.id,
-      checking: true,
+      where: {
+        id: script.props.id,
+      },
+      update,
     },
   };
   const downloadURL = (
@@ -23,35 +28,35 @@ function doCheckUpdate(script) {
   const okHandler = ({ data }) => {
     const meta = parseMeta(data);
     if (compareVersion(script.meta.version, meta.version) < 0) return Promise.resolve();
-    res.data.checking = false;
-    res.data.message = i18n('msgNoUpdate');
+    update.checking = false;
+    update.message = i18n('msgNoUpdate');
     browser.runtime.sendMessage(res);
     return Promise.reject();
   };
   const errHandler = () => {
-    res.data.checking = false;
-    res.data.message = i18n('msgErrorFetchingUpdateInfo');
+    update.checking = false;
+    update.message = i18n('msgErrorFetchingUpdateInfo');
     browser.runtime.sendMessage(res);
     return Promise.reject();
   };
-  const update = () => {
+  const doUpdate = () => {
     if (!downloadURL) {
-      res.data.message = `<span class="new">${i18n('msgNewVersion')}</span>`;
+      update.message = `<span class="new">${i18n('msgNewVersion')}</span>`;
       browser.runtime.sendMessage(res);
       return Promise.reject();
     }
-    res.data.message = i18n('msgUpdating');
+    update.message = i18n('msgUpdating');
     browser.runtime.sendMessage(res);
     return request(downloadURL)
     .then(({ data }) => data, () => {
-      res.data.checking = false;
-      res.data.message = i18n('msgErrorFetchingScript');
+      update.checking = false;
+      update.message = i18n('msgErrorFetchingScript');
       browser.runtime.sendMessage(res);
       return Promise.reject();
     });
   };
   if (!updateURL) return Promise.reject();
-  res.data.message = i18n('msgCheckingForUpdate');
+  update.message = i18n('msgCheckingForUpdate');
   browser.runtime.sendMessage(res);
   return request(updateURL, {
     headers: {
@@ -59,7 +64,7 @@ function doCheckUpdate(script) {
     },
   })
   .then(okHandler, errHandler)
-  .then(update);
+  .then(doUpdate);
 }
 
 export default function checkUpdate(script) {

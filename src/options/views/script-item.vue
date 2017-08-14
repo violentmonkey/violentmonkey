@@ -1,5 +1,5 @@
 <template>
-  <div class="script" :class="{ disabled: !script.config.enabled || script.config.removed }" draggable="true" @dragstart.prevent="onDragStart">
+  <div class="script" :class="{ disabled: !script.config.enabled, removed: script.config.removed }" :draggable="!script.config.removed" @dragstart.prevent="onDragStart">
     <img class="script-icon" :src="safeIcon">
     <div class="script-info flex">
       <div class="script-name ellipsis" v-text="script.custom.name || getLocaleString('name')"></div>
@@ -10,6 +10,14 @@
         <span v-if="!author.email" v-text="author.name"></span>
       </div>
       <div class="script-version" v-text="script.meta.version ? `v${script.meta.version}` : ''"></div>
+      <div v-if="script.config.removed" v-text="i18n('labelRemoved')"></div>
+      <div v-if="script.config.removed">
+        <tooltip :title="i18n('buttonUndo')" placement="left">
+          <span class="btn-ghost" @click="onRemove(0)">
+            <icon name="undo"></icon>
+          </span>
+        </tooltip>
+      </div>
     </div>
     <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
     <div class="script-buttons flex">
@@ -41,7 +49,7 @@
       </tooltip>
       <div class="flex-auto" v-text="script.message"></div>
       <tooltip :title="i18n('buttonRemove')" align="end">
-        <span class="btn-ghost" @click="onRemove">
+        <span class="btn-ghost" @click="onRemove(1)">
           <icon name="trash"></icon>
         </span>
       </tooltip>
@@ -135,13 +143,13 @@ export default {
     onEdit() {
       this.$emit('edit', this.script.props.id);
     },
-    onRemove() {
+    onRemove(remove) {
       sendMessage({
         cmd: 'UpdateScriptInfo',
         data: {
           id: this.script.props.id,
           config: {
-            removed: 1,
+            removed: remove ? 1 : 0,
           },
         },
       });
@@ -301,9 +309,13 @@ export default {
   &:hover {
     border-color: darkgray;
   }
-  &.disabled {
+  &.disabled,
+  &.removed {
     background: #f0f0f0;
     color: #999;
+  }
+  &.removed {
+    padding-bottom: 10px;
   }
   &-buttons {
     align-items: center;
@@ -311,6 +323,9 @@ export default {
     color: #3e4651;
     > .flex-auto {
       margin-left: 1rem;
+    }
+    .removed & {
+      display: none;
     }
   }
   &-info {
@@ -326,11 +341,16 @@ export default {
   }
   &-icon {
     position: absolute;
-    top: 1rem;
     width: 3rem;
     height: 3rem;
-    .disabled & {
+    top: 1rem;
+    .disabled &,
+    .removed & {
       filter: grayscale(.8);
+    }
+    .removed & {
+      width: 2rem;
+      height: 2rem;
     }
   }
   &-name {
@@ -349,6 +369,9 @@ export default {
     color: #60646d;
     &::after {
       content: "\200b";
+    }
+    .removed & {
+      display: none;
     }
   }
 }

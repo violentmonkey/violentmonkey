@@ -195,6 +195,9 @@ const storage = {
       if (!id) return Promise.resolve();
       return browser.storage.local.remove(this.getKey(id));
     },
+    removeMulti(ids) {
+      return browser.storage.local.remove(ids.map(id => this.getKey(id)));
+    },
   },
 };
 storage.script = Object.assign({}, storage.base, {
@@ -344,7 +347,9 @@ export function setValues(where, values) {
  * @desc Get scripts to be injected to page with specific URL.
  */
 export function getScriptsByURL(url) {
-  const scripts = testBlacklist(url) ? [] : store.scripts.filter(script => testScript(url, script));
+  const scripts = testBlacklist(url)
+    ? []
+    : store.scripts.filter(script => !script.config.removed && testScript(url, script));
   const reqKeys = {};
   const cacheKeys = {};
   scripts.forEach(script => {
@@ -379,8 +384,14 @@ export function getScriptsByURL(url) {
  * @desc Get data for dashboard.
  */
 export function getData() {
-  const scripts = store.scripts;
   const cacheKeys = {};
+  const toRemove = store.scripts.filter(script => script.config.removed);
+  if (toRemove.length) {
+    store.scripts = store.scripts.filter(script => !script.config.removed);
+    storage.script.removeMulti(toRemove);
+    storage.code.removeMulti(toRemove);
+  }
+  const { scripts } = store;
   scripts.forEach(script => {
     const icon = object.get(script, 'meta.icon');
     if (isRemote(icon)) cacheKeys[icon] = 1;
@@ -400,6 +411,7 @@ export function removeScript(id) {
   if (i >= 0) {
     store.scripts.splice(i, 1);
     storage.script.remove(id);
+    storage.code.remove(id);
   }
   return browser.runtime.sendMessage({
     cmd: 'RemoveScript',
@@ -475,9 +487,13 @@ export function updateScriptInfo(id, data) {
 }
 
 export function getExportData(ids, withValues) {
+  const availableIds = ids.filter(id => {
+    const script = store.scriptMap[id];
+    return script && !script.config.removed;
+  });
   return Promise.all([
-    Promise.all(ids.map(id => getScript({ id }))),
-    storage.code.getMulti(ids),
+    Promise.all(availableIds.map(id => getScript({ id }))),
+    storage.code.getMulti(availableIds),
   ])
   .then(([scripts, codeMap]) => {
     const data = {};
@@ -500,7 +516,9 @@ export function parseScript(data) {
   const result = {
     cmd: 'UpdateScript',
     data: {
-      message: message == null ? i18n('msgUpdated') : message || '',
+      update: {
+        message: message == null ? i18n('msgUpdated') : message || '',
+      },
     },
   };
   return getScript({ id, meta })
@@ -512,7 +530,7 @@ export function parseScript(data) {
     } else {
       ({ script } = newScript());
       result.cmd = 'AddScript';
-      result.data.message = i18n('msgInstalled');
+      result.data.update.message = i18n('msgInstalled');
     }
     script.config = Object.assign({}, script.config, config);
     script.custom = Object.assign({}, script.custom, custom);
@@ -526,7 +544,7 @@ export function parseScript(data) {
   })
   .then(script => {
     fetchScriptResources(script, data);
-    Object.assign(result.data, script);
+    Object.assign(result.data.update, script);
     return result;
   });
 }
