@@ -38,7 +38,6 @@ import { i18n, sendMessage, noop } from 'src/common';
 import VmCode from 'src/common/ui/code';
 import { showMessage } from '../../utils';
 import VmSettings from './settings';
-import Tooltip from '../tooltip';
 
 function fromList(list) {
   return (list || []).join('\n');
@@ -54,7 +53,6 @@ export default {
   components: {
     VmCode,
     VmSettings,
-    Tooltip,
   },
   data() {
     return {

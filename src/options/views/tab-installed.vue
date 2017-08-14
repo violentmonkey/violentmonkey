@@ -37,10 +37,10 @@
 import { i18n, sendMessage, noop, debounce } from 'src/common';
 import { Dropdown as VmDropdown } from 'src/common/ui/vueleton';
 import Icon from 'src/common/ui/icon';
+import Tooltip from 'src/common/ui/tooltip';
 import Item from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
-import Tooltip from './tooltip';
 
 export default {
   components: {

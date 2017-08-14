@@ -88,7 +88,7 @@
 
 <script>
 import { i18n } from 'src/common';
-import Tooltip from '../tooltip';
+import Tooltip from 'src/common/ui/tooltip';
 
 export default {
   props: ['value', 'settings'],

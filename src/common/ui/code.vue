@@ -52,6 +52,7 @@ import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import CodeMirror from 'codemirror';
 import { debounce } from 'src/common';
+import Tooltip from './tooltip';
 
 function getHandler(key) {
   return (cm) => {
@@ -143,6 +144,7 @@ export default {
   },
   components: {
     VueCode,
+    Tooltip,
   },
   data() {
     return {
