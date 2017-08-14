@@ -65,26 +65,7 @@ function getVMConfig(text) {
   } catch (e) {
     console.warn('Error parsing ViolentMonkey configuration.');
   }
-  vm = vm || {};
-  forEachItem(vm.values, (value, key) => {
-    if (value) {
-      sendMessage({
-        cmd: 'SetValue',
-        data: {
-          uri: key,
-          values: value,
-        },
-      });
-    }
-  });
-  if (options.get('importSettings')) {
-    const ignoreKeys = ['sync'];
-    forEachItem(vm.settings, (value, key) => {
-      if (ignoreKeys.includes(key)) return;
-      options.set(key, value);
-    });
-  }
-  return vm;
+  return vm || {};
 }
 
 function getVMFile(entry, vmFile) {
@@ -97,10 +78,12 @@ function getVMFile(entry, vmFile) {
       if (vm.scripts) {
         const more = vm.scripts[entry.filename.slice(0, -8)];
         if (more) {
-          if (more.custom) data.custom = more.custom;
-          data.more = more;
-          delete more.id;
-          delete more.custom;
+          data.custom = more.custom;
+          data.config = more.config;
+          data.position = more.position;
+          // Import data from older version
+          if ('enabled' in more) object.set(data, ['config', 'enabled'], more.enabled);
+          if ('update' in more) object.set(data, ['config', 'shouldUpdate'], more.update);
         }
       }
       sendMessage({
@@ -112,7 +95,7 @@ function getVMFile(entry, vmFile) {
 }
 
 function getVMFiles(entries) {
-  const i = entries.findIndex(entry => entry.filename === 'ViolentMonkey');
+  const i = entries.findIndex(entry => entry.filename && entry.filename.toLowerCase() === 'violentmonkey');
   if (i < 0) {
     return { entries };
   }
@@ -141,14 +124,32 @@ function readZip(file) {
 function importData(file) {
   readZip(file)
   .then(getVMFiles)
-  .then((data) => {
+  .then(data => {
     const { vm, entries } = data;
-    return Promise.all(entries.map(entry => getVMFile(entry, vm)));
-  })
-  .then(res => res.filter(Boolean).length)
-  .then(count => {
-    showMessage({ text: i18n('msgImported', [count]) });
-    sendMessage({ cmd: 'CheckPosition' });
+    if (options.get('importSettings')) {
+      const ignoreKeys = ['sync'];
+      forEachItem(vm.settings, (value, key) => {
+        if (ignoreKeys.includes(key)) return;
+        options.set(key, value);
+      });
+    }
+    return Promise.all(entries.map(entry => getVMFile(entry, vm)))
+    .then(res => res.filter(Boolean).length)
+    .then(count => {
+      forEachItem(vm.values, (value, key) => {
+        if (value) {
+          sendMessage({
+            cmd: 'SetValue',
+            data: {
+              where: { uri: key },
+              values: value,
+            },
+          });
+        }
+      });
+      showMessage({ text: i18n('msgImported', [count]) });
+      sendMessage({ cmd: 'CheckPosition' });
+    });
   });
 }
 </script>

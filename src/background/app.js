@@ -101,12 +101,12 @@ const commands = {
       });
     });
   },
-  SetValue({ id, values }) {
-    return vmdb.setValues(id, values)
-    .then(() => {
+  SetValue({ where, values }) {
+    return vmdb.setValues(where, values)
+    .then(data => {
       broadcast({
         cmd: 'UpdateValues',
-        data: { id, values },
+        data,
       });
     });
   },

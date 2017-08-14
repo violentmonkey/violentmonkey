@@ -333,7 +333,7 @@ function wrapGM(script, metaStr, cache) {
     bridge.post({
       cmd: 'SetValue',
       data: {
-        id: script.props.id,
+        where: { id: script.props.id },
         values: getValues(),
       },
     });

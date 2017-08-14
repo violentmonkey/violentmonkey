@@ -311,7 +311,7 @@ export function getScript(where) {
   if (where.id) {
     script = store.scriptMap[where.id];
   } else {
-    const uri = getNameURI({ meta: where.meta, id: '@@should-have-name' });
+    const uri = where.uri || getNameURI({ meta: where.meta, id: '@@should-have-name' });
     const predicate = item => uri === object.get(item, 'props.uri');
     script = store.scripts.find(predicate);
   }
@@ -331,8 +331,13 @@ export function getScriptCode(id) {
   return storage.code.getOne(id);
 }
 
-export function setValues(id, values) {
-  return storage.value.dump(id, values);
+export function setValues(where, values) {
+  return (where.id
+    ? Promise.resolve(where.id)
+    : getScript(where).then(script => object.get(script, 'props.id')))
+  .then(id => {
+    if (id) storage.value.dump(id, values).then(() => ({ id, values }));
+  });
 }
 
 /**
@@ -470,9 +475,13 @@ export function updateScriptInfo(id, data) {
 }
 
 export function getExportData(ids, withValues) {
-  return Promise.all(ids.map(id => getScript({ id })))
-  .then(scripts => {
-    const data = { scripts };
+  return Promise.all([
+    Promise.all(ids.map(id => getScript({ id }))),
+    storage.code.getMulti(ids),
+  ])
+  .then(([scripts, codeMap]) => {
+    const data = {};
+    data.items = scripts.map(script => ({ script, code: codeMap[script.props.id] }));
     if (withValues) {
       return storage.value.getMulti(ids)
       .then(values => {

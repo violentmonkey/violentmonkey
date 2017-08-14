@@ -136,7 +136,7 @@ function exportData(selectedIds) {
       ids: selectedIds,
     },
   })
-  .then((data) => {
+  .then(data => {
     const names = {};
     const vm = {
       scripts: {},
@@ -144,28 +144,31 @@ function exportData(selectedIds) {
     };
     delete vm.settings.sync;
     if (withValues) vm.values = {};
-    const files = data.scripts.map((script) => {
-      let name = script.custom.name || script.meta.name || 'Noname';
+    const files = data.items.map(({ script, code }) => {
+      let name = script.custom.name || script.meta.name || script.props.id;
       if (names[name]) {
         names[name] += 1;
         name = `${name}_${names[name]}`;
       } else names[name] = 1;
-      vm.scripts[name] = ['custom', 'enabled', 'update', 'position']
-      .reduce((res, key) => {
-        res[key] = script[key];
-        return res;
-      }, {});
+      const info = {
+        custom: script.custom,
+        config: script.config,
+        position: script.props.position,
+      };
       if (withValues) {
-        const values = data.values[script.uri];
-        if (values) vm.values[script.uri] = values;
+        // `values` are related to scripts by `props.id` in Violentmonkey,
+        // but by the global `props.uri` when exported.
+        const values = data.values[script.props.id];
+        if (values) vm.values[script.props.uri] = values;
       }
+      vm.scripts[name] = info;
       return {
         name: `${name}.user.js`,
-        content: script.code,
+        content: code,
       };
     });
     files.push({
-      name: 'ViolentMonkey',
+      name: 'violentmonkey',
       content: JSON.stringify(vm),
     });
     return files;
