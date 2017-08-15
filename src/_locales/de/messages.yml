@@ -410,13 +410,13 @@ labelNoSearchScripts:
   message: Kein Skript gefunden.
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Homepage
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Support-Seite
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Rückgängig machen
 labelRemoved:
   description: Label shown when a script is removed.
-  message: ''
+  message: '[Entfernt]'
