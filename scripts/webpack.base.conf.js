@@ -65,6 +65,7 @@ module.exports = {
     }, {
       babili: (...args) => Object.assign(babiliPreset(...args), {
         minified: !!MINIFY,
+        compact: !!MINIFY,
       }),
     }),
   ].filter(Boolean),
