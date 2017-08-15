@@ -33,22 +33,26 @@ register(init);
 
 // v2.8.0+ stores options in browser.storage.local
 // Upgrade from v2.7.x
-if (localStorage.length) {
-  Object.keys(defaults)
-  .forEach(key => {
-    let value = localStorage.getItem(key);
-    if (value) {
-      try {
-        value = JSON.parse(value);
-      } catch (e) {
-        value = null;
+try {
+  if (localStorage.length) {
+    Object.keys(defaults)
+    .forEach(key => {
+      let value = localStorage.getItem(key);
+      if (value) {
+        try {
+          value = JSON.parse(value);
+        } catch (e) {
+          value = null;
+        }
       }
-    }
-    if (value) {
-      setOption(key, value);
-    }
-    localStorage.clear();
-  });
+      if (value) {
+        setOption(key, value);
+      }
+      localStorage.clear();
+    });
+  }
+} catch (e) {
+  // ignore security issue in Firefox
 }
 
 function fireChange(key, value) {
