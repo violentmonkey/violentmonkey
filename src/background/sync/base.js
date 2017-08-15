@@ -391,18 +391,28 @@ export const BaseService = serviceFactory({
           this.log('Upload script:', script.props.uri);
           return getScriptCode(script.props.id)
           .then(code => {
-            const data = JSON.stringify({
-              version: 2,
+            // const data = {
+            //   version: 2,
+            //   code,
+            //   custom: script.custom,
+            //   config: script.config,
+            // };
+            // XXX use version 1 to be compatible with Violentmonkey on other platforms
+            const data = {
+              version: 1,
               code,
-              custom: script.custom,
-              config: script.config,
-            });
+              more: {
+                custom: script.custom,
+                enabled: script.config.enabled,
+                update: script.config.shouldUpdate,
+              },
+            };
             remoteMeta.info[script.props.uri] = {
               modified: script.custom.modified,
               position: script.props.position,
             };
             remoteChanged = true;
-            return this.put(getFilename(script.props.uri), data);
+            return this.put(getFilename(script.props.uri), JSON.stringify(data));
           });
         }),
         ...delRemote.map(item => {
