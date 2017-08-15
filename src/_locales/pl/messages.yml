@@ -175,7 +175,7 @@ labelRunAtDefault:
   message: (domyślnie)
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: ' Adres URL strony domowej:'
+  message: 'Adres URL strony głównej:'
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Adres URL aktualizacji:'
@@ -413,13 +413,13 @@ labelNoSearchScripts:
   message: Nie znaleziono skryptu.
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Strona główna
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Strona wsparcia technicznego
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Cofnij
 labelRemoved:
   description: Label shown when a script is removed.
-  message: ''
+  message: '[Usunięty]'
