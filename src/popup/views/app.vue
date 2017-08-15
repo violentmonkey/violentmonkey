@@ -42,8 +42,8 @@
         <span v-text="i18n('menuMatchedScripts')"></span>
       </div>
       <div class="submenu">
-        <div class="menu-item" v-for="item in scripts" @click="onToggleScript(item)" :class="{disabled:!item.data.enabled}">
-          <icon :name="getSymbolCheck(item.data.enabled)" class="icon-right"></icon>
+        <div class="menu-item" v-for="item in scripts" @click="onToggleScript(item)" :class="{disabled:!item.data.config.enabled}">
+          <icon :name="getSymbolCheck(item.data.config.enabled)" class="icon-right"></icon>
           <span v-text="item.name"></span>
         </div>
       </div>
@@ -130,15 +130,17 @@ export default {
       });
     },
     onToggleScript(item) {
+      const { data } = item;
+      const enabled = !data.config.enabled;
       sendMessage({
         cmd: 'UpdateScriptInfo',
         data: {
-          id: item.data.id,
-          enabled: !item.data.enabled,
+          id: data.props.id,
+          config: { enabled },
         },
       })
       .then(() => {
-        item.data.enabled = !item.data.enabled;
+        data.config.enabled = enabled;
         this.checkReload();
       });
     },

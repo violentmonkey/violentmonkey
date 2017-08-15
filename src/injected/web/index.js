@@ -21,30 +21,31 @@ export default function initialize(webId, contentId, props) {
   bridge.checkLoad();
 }
 
-const commands = {};
-const ainject = {};
-const values = {};
+const store = {
+  commands: {},
+  ainject: {},
+  values: {},
+};
 
 const handlers = {
   LoadScripts: onLoadScripts,
   Command(data) {
-    const func = commands[data];
+    const func = store.commands[data];
     if (func) func();
   },
   GotRequestId: onRequestStart,
   HttpRequested: onRequestCallback,
   TabClosed: onTabClosed,
-  UpdateValues(data) {
-    if (values[data.uri]) values[data.uri] = data.values;
+  UpdateValues({ id, values }) {
+    if (values[id]) values[id] = values;
   },
   NotificationClicked: onNotificationClicked,
   NotificationClosed: onNotificationClosed,
-  // advanced inject
   Injected(id) {
-    const item = ainject[id];
+    const item = store.ainject[id];
     const func = window[`VM_${id}`];
     delete window[`VM_${id}`];
-    delete ainject[id];
+    delete store.ainject[id];
     if (item && func) runCode(item[0], func, item[1], item[2]);
   },
   ScriptChecked(data) {
@@ -85,13 +86,13 @@ function onLoadScripts(data) {
   };
   if (data.scripts) {
     forEach(data.scripts, script => {
-      values[script.uri] = data.values[script.uri] || {};
-      if (script && script.enabled) {
+      if (script && script.config.enabled) {
         // XXX: use camelCase since v2.6.3
         const runAt = script.custom.runAt || script.custom['run-at']
           || script.meta.runAt || script.meta['run-at'];
         const list = listMap[runAt] || end;
         list.push(script);
+        store.values[script.props.id] = data.values[script.props.id] || {};
       }
     });
     run(start);
@@ -99,7 +100,10 @@ function onLoadScripts(data) {
   bridge.checkLoad();
   function buildCode(script) {
     const requireKeys = script.meta.require || [];
-    const wrapper = wrapGM(script, data.cache);
+    const code = data.code[script.props.id] || '';
+    const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
+    const metaStr = matches ? matches[1] : '';
+    const wrapper = wrapGM(script, metaStr, data.cache);
     // Must use Object.getOwnPropertyNames to list unenumerable properties
     const wrapperKeys = Object.getOwnPropertyNames(wrapper);
     const wrapperInit = map(wrapperKeys, name => `this["${name}"]=${name}`).join(';');
@@ -113,22 +117,22 @@ function onLoadScripts(data) {
       }
     });
     // wrap code to make 'use strict' work
-    codeSlices.push(`!function(){${script.code}\n}.call(this)`);
+    codeSlices.push(`!function(){${code}\n}.call(this)`);
     codeSlices.push('}.call(this);');
-    const code = codeSlices.join('\n');
-    const name = script.custom.name || script.meta.name || script.id;
+    const codeConcat = codeSlices.join('\n');
+    const name = script.custom.name || script.meta.name || script.props.id;
     const args = map(wrapperKeys, key => wrapper[key]);
     const thisObj = wrapper.window || wrapper;
     const id = getUniqId();
-    ainject[id] = [name, args, thisObj];
-    bridge.post({ cmd: 'Inject', data: [id, wrapperKeys, code] });
+    store.ainject[id] = [name, args, thisObj];
+    bridge.post({ cmd: 'Inject', data: [id, wrapperKeys, codeConcat] });
   }
   function run(list) {
     while (list.length) buildCode(list.shift());
   }
 }
 
-function wrapGM(script, cache) {
+function wrapGM(script, metaStr, cache) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const gm = {};
@@ -158,10 +162,9 @@ function wrapGM(script, cache) {
     unsafeWindow: { value: window },
     GM_info: {
       get() {
-        const matches = script.code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
         const obj = {
-          scriptMetaStr: matches ? matches[1] : '',
-          scriptWillUpdate: !!script.update,
+          scriptMetaStr: metaStr,
+          scriptWillUpdate: !!script.config.shouldUpdate,
           scriptHandler: 'Violentmonkey',
           version: bridge.version,
           script: {
@@ -279,7 +282,7 @@ function wrapGM(script, cache) {
     },
     GM_registerMenuCommand: {
       value(cap, func, acc) {
-        commands[cap] = func;
+        store.commands[cap] = func;
         bridge.post({ cmd: 'RegisterMenu', data: [cap, acc] });
       },
     },
@@ -315,7 +318,7 @@ function wrapGM(script, cache) {
   });
   return gm;
   function getValues() {
-    return values[script.uri];
+    return store.values[script.props.id];
   }
   function propertyToString() {
     return '[Violentmonkey property]';
@@ -330,7 +333,7 @@ function wrapGM(script, cache) {
     bridge.post({
       cmd: 'SetValue',
       data: {
-        uri: script.uri,
+        where: { id: script.props.id },
         values: getValues(),
       },
     });

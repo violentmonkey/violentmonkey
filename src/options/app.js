@@ -75,24 +75,19 @@ function initMain() {
     UpdateSync(data) {
       store.sync = data;
     },
-    AddScript(data) {
-      data.message = '';
-      initSearch(data);
-      store.scripts.push(data);
+    AddScript({ update }) {
+      update.message = '';
+      initSearch(update);
+      store.scripts.push(update);
     },
     UpdateScript(data) {
       if (!data) return;
-      const script = store.scripts.find(item => item.id === data.id);
-      if (script) {
-        Object.keys(data).forEach((key) => {
-          Vue.set(script, key, data[key]);
-        });
-        initSearch(script);
+      const index = store.scripts.findIndex(item => item.props.id === data.where.id);
+      if (index >= 0) {
+        const updated = Object.assign({}, store.scripts[index], data.update);
+        Vue.set(store.scripts, index, updated);
+        initSearch(updated);
       }
-    },
-    RemoveScript(data) {
-      const i = store.scripts.findIndex(script => script.id === data);
-      if (i >= 0) store.scripts.splice(i, 1);
     },
   });
 }

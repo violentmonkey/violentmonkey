@@ -53,7 +53,7 @@ export default {
       message: '',
       code: '',
       commands: {
-        cancel: this.close,
+        close: this.close,
       },
       info: {},
     };
@@ -161,7 +161,6 @@ export default {
       });
     },
     close() {
-      // window.close();
       sendMessage({ cmd: 'TabClose' });
     },
     getFile(url, { isBlob, useCache } = {}) {
@@ -206,8 +205,8 @@ export default {
           resources: this.resources,
         },
       })
-      .then(res => {
-        this.message = `${res.message}[${this.getTimeString()}]`;
+      .then(result => {
+        this.message = `${result.update.message}[${this.getTimeString()}]`;
         if (this.closeAfterInstall) this.close();
         else if (this.isLocal && options.get('trackLocalFile')) this.trackLocalFile();
       });

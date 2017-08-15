@@ -53,8 +53,8 @@ export default function initialize(contentId, webId) {
   .then(data => {
     if (data.scripts) {
       data.scripts.forEach(script => {
-        ids.push(script.id);
-        if (script.enabled) badge.number += 1;
+        ids.push(script.props.id);
+        if (script.config.enabled) badge.number += 1;
       });
     }
     bridge.post({ cmd: 'LoadScripts', data });

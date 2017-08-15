@@ -100,18 +100,37 @@ $gap: 10px;
         top: 0;
       }
     }
+    &.tooltip-left,
     &.tooltip-right {
       top: 50%;
-      left: 100%;
-      margin-left: 10px;
       > * {
         transform: translateY(-50%);
       }
       > i {
-        right: 100%;
         border-top: $border-side;
-        border-right: $border-base;
         border-bottom: $border-side;
+      }
+    }
+    &.tooltip-left {
+      margin-right: 10px;
+      right: 100%;
+      > div {
+        right: 100%;
+      }
+      > i {
+        left: 100%;
+        border-left: $border-base;
+      }
+    }
+    &.tooltip-right {
+      margin-left: 10px;
+      left: 100%;
+      > div {
+        left: 100%;
+      }
+      > i {
+        right: 100%;
+        border-right: $border-base;
       }
     }
   }

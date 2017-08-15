@@ -53,6 +53,14 @@ export function parseMeta(code) {
 }
 
 export function newScript() {
+  const code = `\
+// ==UserScript==
+// @name New Script
+// @namespace Violentmonkey Scripts
+// @match *://*/*
+// @grant none
+// ==/UserScript==
+`;
   const script = {
     custom: {
       origInclude: true,
@@ -60,36 +68,20 @@ export function newScript() {
       origMatch: true,
       origExcludeMatch: true,
     },
-    enabled: 1,
-    update: 1,
-    code: `\
-// ==UserScript==
-// @name New Script
-// @namespace Violentmonkey Scripts
-// @match *://*/*
-// @grant none
-// ==/UserScript==
-`,
+    config: {
+      enabled: 1,
+      shouldUpdate: 1,
+    },
+    meta: parseMeta(code),
   };
-  script.meta = parseMeta(script.code);
-  return script;
-}
-
-export function getScriptInfo(script) {
-  return {
-    id: script.id,
-    custom: script.custom,
-    meta: script.meta,
-    enabled: script.enabled,
-    update: script.update,
-  };
+  return { script, code };
 }
 
 export function getNameURI(script) {
   const ns = script.meta.namespace || '';
   const name = script.meta.name || '';
   let nameURI = `${escape(ns)}:${escape(name)}:`;
-  if (!ns && !name) nameURI += script.id || '';
+  if (!ns && !name) nameURI += script.props.id || '';
   return nameURI;
 }
 

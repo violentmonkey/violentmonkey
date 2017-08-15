@@ -1,15 +1,21 @@
 import 'src/common/polyfills';
 import 'src/common/browser';
-import { i18n, defaultImage } from 'src/common';
+import { i18n, defaultImage, object } from 'src/common';
 import * as sync from './sync';
 import {
-  cache, vmdb,
+  cache,
   getRequestId, httpRequest, abortRequest, confirmInstall,
   newScript, parseMeta,
   setClipboard, checkUpdate,
   getOption, setOption, hookOptions, getAllOptions,
   initialize,
 } from './utils';
+import {
+  getScripts, removeScript, getData, checkRemove, getScriptsByURL,
+  updateScriptInfo, setValues, getExportData, getScriptCode,
+  getScriptByIds, moveScript, vacuum, parseScript, getScript,
+  normalizePosition,
+} from './utils/db';
 
 const VM_VER = browser.runtime.getManifest().version;
 
@@ -32,8 +38,11 @@ function broadcast(data) {
 
 function checkUpdateAll() {
   setOption('lastUpdate', Date.now());
-  vmdb.getScriptsByIndex('update', 1)
-  .then(scripts => Promise.all(scripts.map(checkUpdate)))
+  getScripts()
+  .then(scripts => {
+    const toUpdate = scripts.filter(item => object.get(item, 'config.shouldUpdate'));
+    return Promise.all(toUpdate.map(checkUpdate));
+  })
   .then(updatedList => {
     if (updatedList.some(Boolean)) sync.sync();
   });
@@ -58,11 +67,16 @@ const commands = {
     return newScript();
   },
   RemoveScript(id) {
-    return vmdb.removeScript(id)
+    return removeScript(id)
     .then(() => { sync.sync(); });
   },
   GetData() {
-    return vmdb.getData().then(data => {
+    return checkRemove()
+    .then(changed => {
+      if (changed) sync.sync();
+      return getData();
+    })
+    .then(data => {
       data.sync = sync.getStates();
       data.version = VM_VER;
       return data;
@@ -80,56 +94,59 @@ const commands = {
       }
     });
     return data.isApplied ? (
-      vmdb.getScriptsByURL(url).then(res => Object.assign(data, res))
+      getScriptsByURL(url).then(res => Object.assign(data, res))
     ) : data;
   },
-  UpdateScriptInfo(data) {
-    return vmdb.updateScriptInfo(data.id, data, {
-      modified: Date.now(),
+  UpdateScriptInfo({ id, config }) {
+    return updateScriptInfo(id, {
+      config,
+      custom: {
+        modified: Date.now(),
+      },
     })
-    .then(script => {
+    .then(([script]) => {
       sync.sync();
       browser.runtime.sendMessage({
         cmd: 'UpdateScript',
-        data: script,
-      });
-    });
-  },
-  SetValue(data) {
-    return vmdb.setValue(data.uri, data.values)
-    .then(() => {
-      broadcast({
-        cmd: 'UpdateValues',
         data: {
-          uri: data.uri,
-          values: data.values,
+          where: { id: script.props.id },
+          update: script,
         },
       });
     });
   },
-  ExportZip(data) {
-    return vmdb.getExportData(data.ids, data.values);
+  SetValue({ where, values }) {
+    return setValues(where, values)
+    .then(data => {
+      broadcast({
+        cmd: 'UpdateValues',
+        data,
+      });
+    });
   },
-  GetScript(id) {
-    return vmdb.getScriptData(id);
+  ExportZip({ ids, values }) {
+    return getExportData(ids, values);
+  },
+  GetScriptCode(id) {
+    return getScriptCode(id);
   },
   GetMetas(ids) {
-    return vmdb.getScriptInfos(ids);
+    return getScriptByIds(ids);
   },
-  Move(data) {
-    return vmdb.moveScript(data.id, data.offset)
+  Move({ id, offset }) {
+    return moveScript(id, offset)
     .then(() => { sync.sync(); });
   },
-  Vacuum: vmdb.vacuum,
+  Vacuum: vacuum,
   ParseScript(data) {
-    return vmdb.parseScript(data).then(res => {
+    return parseScript(data).then(res => {
       browser.runtime.sendMessage(res);
       sync.sync();
       return res.data;
     });
   },
   CheckUpdate(id) {
-    vmdb.getScript(id).then(checkUpdate)
+    getScript({ id }).then(checkUpdate)
     .then(updated => {
       if (updated) sync.sync();
     });
@@ -190,11 +207,13 @@ const commands = {
     const items = Array.isArray(data) ? data : [data];
     items.forEach(item => { setOption(item.key, item.value); });
   },
-  CheckPosition: vmdb.checkPosition,
   ConfirmInstall: confirmInstall,
   CheckScript({ name, namespace }) {
-    return vmdb.queryScript(null, { name, namespace })
+    return getScript({ meta: { name, namespace } })
     .then(script => (script ? script.meta.version : null));
+  },
+  CheckPosition() {
+    return normalizePosition();
   },
 };
 
@@ -218,9 +237,6 @@ initialize()
   });
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
-
-  // XXX fix position regression in v2.6.3
-  vmdb.checkPosition();
 });
 
 // Common functions

@@ -37,10 +37,23 @@ export const object = {
       }
       sub = child;
     });
-    if (val == null) {
+    if (typeof val === 'undefined') {
       delete sub[lastKey];
     } else {
       sub[lastKey] = val;
+    }
+    return root;
+  },
+  purify(obj) {
+    // Remove keys with undefined values
+    if (Array.isArray(obj)) {
+      obj.forEach(object.purify);
+    } else if (obj && typeof obj === 'object') {
+      Object.keys(obj).forEach(key => {
+        const type = typeof obj[key];
+        if (type === 'undefined') delete obj[key];
+        else object.purify(obj[key]);
+      });
     }
     return obj;
   },

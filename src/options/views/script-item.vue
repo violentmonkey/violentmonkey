@@ -1,5 +1,5 @@
 <template>
-  <div class="script" :class="{disabled:!script.enabled}" draggable="true" @dragstart.prevent="onDragStart">
+  <div class="script" :class="{ disabled: !script.config.enabled, removed: script.config.removed }" :draggable="!script.config.removed" @dragstart.prevent="onDragStart">
     <img class="script-icon" :src="safeIcon">
     <div class="script-info flex">
       <div class="script-name ellipsis" v-text="script.custom.name || getLocaleString('name')"></div>
@@ -9,7 +9,15 @@
         <a :href="'mailto:'+author.email" v-if="author.email" v-text="author.name"></a>
         <span v-if="!author.email" v-text="author.name"></span>
       </div>
-      <div class="script-version" v-text="script.meta.version?'v'+script.meta.version:''"></div>
+      <div class="script-version" v-text="script.meta.version ? `v${script.meta.version}` : ''"></div>
+      <div v-if="script.config.removed" v-text="i18n('labelRemoved')"></div>
+      <div v-if="script.config.removed">
+        <tooltip :title="i18n('buttonUndo')" placement="left">
+          <span class="btn-ghost" @click="onRemove(0)">
+            <icon name="undo"></icon>
+          </span>
+        </tooltip>
+      </div>
     </div>
     <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
     <div class="script-buttons flex">
@@ -20,7 +28,7 @@
       </tooltip>
       <tooltip :title="labelEnable" align="start">
         <span class="btn-ghost" @click="onEnable">
-          <icon :name="`toggle-${script.enabled ? 'on' : 'off'}`"></icon>
+          <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
         </span>
       </tooltip>
       <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')" align="start">
@@ -41,7 +49,7 @@
       </tooltip>
       <div class="flex-auto" v-text="script.message"></div>
       <tooltip :title="i18n('buttonRemove')" align="end">
-        <span class="btn-ghost" @click="onRemove">
+        <span class="btn-ghost" @click="onRemove(1)">
           <icon name="trash"></icon>
         </span>
       </tooltip>
@@ -52,7 +60,7 @@
 <script>
 import { sendMessage, getLocaleString } from 'src/common';
 import Icon from 'src/common/ui/icon';
-import Tooltip from './tooltip';
+import Tooltip from 'src/common/ui/tooltip';
 import { store } from '../utils';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
@@ -92,7 +100,7 @@ export default {
   computed: {
     canUpdate() {
       const { script } = this;
-      return script.update && (
+      return script.config.shouldUpdate && (
         script.custom.updateURL ||
         script.meta.updateURL ||
         script.custom.downloadURL ||
@@ -114,7 +122,7 @@ export default {
       };
     },
     labelEnable() {
-      return this.script.enabled ? this.i18n('buttonDisable') : this.i18n('buttonEnable');
+      return this.script.config.enabled ? this.i18n('buttonDisable') : this.i18n('buttonEnable');
     },
   },
   mounted() {
@@ -133,27 +141,34 @@ export default {
       return getLocaleString(this.script.meta, key);
     },
     onEdit() {
-      this.$emit('edit', this.script.id);
+      this.$emit('edit', this.script.props.id);
     },
-    onRemove() {
+    onRemove(remove) {
       sendMessage({
-        cmd: 'RemoveScript',
-        data: this.script.id,
+        cmd: 'UpdateScriptInfo',
+        data: {
+          id: this.script.props.id,
+          config: {
+            removed: remove ? 1 : 0,
+          },
+        },
       });
     },
     onEnable() {
       sendMessage({
         cmd: 'UpdateScriptInfo',
         data: {
-          id: this.script.id,
-          enabled: this.script.enabled ? 0 : 1,
+          id: this.script.props.id,
+          config: {
+            enabled: this.script.config.enabled ? 0 : 1,
+          },
         },
       });
     },
     onUpdate() {
       sendMessage({
         cmd: 'CheckUpdate',
-        data: this.script.id,
+        data: this.script.props.id,
       });
     },
     onDragStart(e) {
@@ -294,9 +309,13 @@ export default {
   &:hover {
     border-color: darkgray;
   }
-  &.disabled {
+  &.disabled,
+  &.removed {
     background: #f0f0f0;
     color: #999;
+  }
+  &.removed {
+    padding-bottom: 10px;
   }
   &-buttons {
     align-items: center;
@@ -304,6 +323,9 @@ export default {
     color: #3e4651;
     > .flex-auto {
       margin-left: 1rem;
+    }
+    .removed & {
+      display: none;
     }
   }
   &-info {
@@ -319,11 +341,16 @@ export default {
   }
   &-icon {
     position: absolute;
-    top: 1rem;
     width: 3rem;
     height: 3rem;
-    .disabled & {
+    top: 1rem;
+    .disabled &,
+    .removed & {
       filter: grayscale(.8);
+    }
+    .removed & {
+      width: 2rem;
+      height: 2rem;
     }
   }
   &-name {
@@ -342,6 +369,9 @@ export default {
     color: #60646d;
     &::after {
       content: "\200b";
+    }
+    .removed & {
+      display: none;
     }
   }
 }

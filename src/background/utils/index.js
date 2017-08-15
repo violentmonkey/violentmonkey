@@ -7,7 +7,6 @@ export getEventEmitter from './events';
 export * from './script';
 export * from './options';
 export * from './requests';
-export * as vmdb from './db';
 export * from './search';
 export { initialize } from './init';
 

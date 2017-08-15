@@ -1,632 +1,664 @@
-import Promise from 'sync-promise-lite';
-import { i18n, request, buffer2string, getFullUrl } from 'src/common';
-import { getNameURI, getScriptInfo, isRemote, parseMeta, newScript } from './script';
+import { i18n, request, buffer2string, getFullUrl, object } from 'src/common';
+import { getNameURI, isRemote, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
 import { register } from './init';
 
-let db;
-
-const position = {
-  value: 0,
-  set(v) {
-    position.value = +v || 0;
-  },
-  get() {
-    return position.value + 1;
-  },
-  update(v) {
-    if (position.value < +v) position.set(v);
-  },
-};
-
-register(openDatabase().then(initPosition));
-
-function openDatabase() {
-  return new Promise((resolve, reject) => {
+const patch = () => new Promise((resolve, reject) => {
+  console.info('Upgrade database...');
+  init();
+  function init() {
     const req = indexedDB.open('Violentmonkey', 1);
     req.onsuccess = () => {
-      db = req.result;
-      resolve();
+      transform(req.result);
     };
-    req.onerror = e => {
-      const { error } = e.target;
-      console.error(`IndexedDB error: ${error.message}`);
-      reject(error);
+    req.onerror = reject;
+    req.onupgradeneeded = () => {
+      // No available upgradation
+      throw reject();
     };
-    req.onupgradeneeded = e => {
-      const _db = e.currentTarget.result;
-      // scripts: id uri custom meta enabled update code position
-      const os = _db.createObjectStore('scripts', {
-        keyPath: 'id',
-        autoIncrement: true,
+  }
+  function transform(db) {
+    const tx = db.transaction(['scripts', 'require', 'cache', 'values']);
+    const updates = {};
+    let processing = 3;
+    const onCallback = () => {
+      processing -= 1;
+      if (!processing) resolve(browser.storage.local.set(updates));
+    };
+    getAllScripts(tx, items => {
+      const uriMap = {};
+      items.forEach(({ script, code }) => {
+        updates[`scr:${script.props.id}`] = script;
+        updates[`code:${script.props.id}`] = code;
+        uriMap[script.props.uri] = script.props.id;
       });
-      os.createIndex('uri', 'uri', { unique: true });
-      os.createIndex('update', 'update', { unique: false });
-      // position should be unique at last
-      os.createIndex('position', 'position', { unique: false });
-      // require: uri code
-      _db.createObjectStore('require', { keyPath: 'uri' });
-      // cache: uri data
-      _db.createObjectStore('cache', { keyPath: 'uri' });
-      // values: uri values
-      _db.createObjectStore('values', { keyPath: 'uri' });
+      getAllValues(tx, data => {
+        data.forEach(({ id, values }) => {
+          updates[`val:${id}`] = values;
+        });
+        onCallback();
+      }, uriMap);
+    });
+    getAllCache(tx, cache => {
+      cache.forEach(({ uri, data }) => {
+        updates[`cac:${uri}`] = data;
+      });
+      onCallback();
+    });
+    getAllRequire(tx, data => {
+      data.forEach(({ uri, code }) => {
+        updates[`req:${uri}`] = code;
+      });
+      onCallback();
+    });
+  }
+  function getAllScripts(tx, callback) {
+    const os = tx.objectStore('scripts');
+    const list = [];
+    const req = os.openCursor();
+    req.onsuccess = e => {
+      const cursor = e.target.result;
+      if (cursor) {
+        const { value } = cursor;
+        list.push(transformScript(value));
+        cursor.continue();
+      } else {
+        callback(list);
+      }
     };
-  });
+    req.onerror = reject;
+  }
+  function getAllCache(tx, callback) {
+    const os = tx.objectStore('cache');
+    const list = [];
+    const req = os.openCursor();
+    req.onsuccess = e => {
+      const cursor = e.target.result;
+      if (cursor) {
+        const { value: { uri, data } } = cursor;
+        list.push({ uri, data });
+        cursor.continue();
+      } else {
+        callback(list);
+      }
+    };
+    req.onerror = reject;
+  }
+  function getAllRequire(tx, callback) {
+    const os = tx.objectStore('require');
+    const list = [];
+    const req = os.openCursor();
+    req.onsuccess = e => {
+      const cursor = e.target.result;
+      if (cursor) {
+        const { value: { uri, code } } = cursor;
+        list.push({ uri, code });
+        cursor.continue();
+      } else {
+        callback(list);
+      }
+    };
+    req.onerror = reject;
+  }
+  function getAllValues(tx, callback, uriMap) {
+    const os = tx.objectStore('values');
+    const list = [];
+    const req = os.openCursor();
+    req.onsuccess = e => {
+      const cursor = e.target.result;
+      if (cursor) {
+        const { value: { uri, values } } = cursor;
+        const id = uriMap[uri];
+        if (id) list.push({ id, values });
+        cursor.continue();
+      } else {
+        callback(list);
+      }
+    };
+    req.onerror = reject;
+  }
+  function transformScript(script) {
+    const item = {
+      script: {
+        meta: parseMeta(script.code),
+        custom: script.custom,
+        props: {
+          id: script.id,
+          uri: script.uri,
+          position: script.position,
+        },
+        config: {
+          enabled: script.enabled,
+          shouldUpdate: script.update,
+        },
+      },
+      code: script.code,
+    };
+    return item;
+  }
+})
+// Ignore error
+.catch(() => {});
+
+function cacheOrFetch(handle) {
+  const requests = {};
+  return function cachedHandle(url, ...args) {
+    let promise = requests[url];
+    if (!promise) {
+      promise = handle.call(this, url, ...args)
+      .catch(() => {
+        console.error(`Error fetching: ${url}`);
+      })
+      .then(() => {
+        delete requests[url];
+      });
+      requests[url] = promise;
+    }
+    return promise;
+  };
+}
+function ensureListArgs(handle) {
+  return function handleList(data) {
+    let items = Array.isArray(data) ? data : [data];
+    items = items.filter(Boolean);
+    if (!items.length) return Promise.resolve();
+    return handle.call(this, items);
+  };
 }
 
-function transformScript(script) {
-  // XXX transform custom fields used in v2.6.1-
-  if (script) {
-    const { custom } = script;
-    [
-      ['origInclude', '_include'],
-      ['origMatch', '_match'],
-      ['origExclude', '_exclude'],
-      ['origExcludeMatch', '_excludeMatch'],
-    ].forEach(([key, oldKey]) => {
-      if (typeof custom[key] === 'undefined') {
-        custom[key] = custom[oldKey] !== false;
-        delete custom[oldKey];
+const store = {};
+const storage = {
+  base: {
+    prefix: '',
+    getKey(id) {
+      return `${this.prefix}${id}`;
+    },
+    getOne(id) {
+      const key = this.getKey(id);
+      return browser.storage.local.get(key).then(data => data[key]);
+    },
+    getMulti(ids) {
+      return browser.storage.local.get(ids.map(id => this.getKey(id)))
+      .then(data => {
+        const result = {};
+        ids.forEach(id => { result[id] = data[this.getKey(id)]; });
+        return result;
+      });
+    },
+    dump(id, value) {
+      if (!id) return Promise.resolve();
+      return browser.storage.local.set({
+        [this.getKey(id)]: value,
+      });
+    },
+    remove(id) {
+      if (!id) return Promise.resolve();
+      return browser.storage.local.remove(this.getKey(id));
+    },
+    removeMulti(ids) {
+      return browser.storage.local.remove(ids.map(id => this.getKey(id)));
+    },
+  },
+};
+storage.script = Object.assign({}, storage.base, {
+  prefix: 'scr:',
+  dump: ensureListArgs(function dump(items) {
+    const updates = {};
+    items.forEach(item => {
+      updates[this.getKey(item.props.id)] = item;
+      store.scriptMap[item.props.id] = item;
+    });
+    return browser.storage.local.set(updates)
+    .then(() => items);
+  }),
+});
+storage.code = Object.assign({}, storage.base, {
+  prefix: 'code:',
+});
+storage.value = Object.assign({}, storage.base, {
+  prefix: 'val:',
+});
+storage.require = Object.assign({}, storage.base, {
+  prefix: 'req:',
+  fetch: cacheOrFetch(function fetch(uri) {
+    return request(uri).then(({ data }) => this.dump(uri, data));
+  }),
+});
+storage.cache = Object.assign({}, storage.base, {
+  prefix: 'cac:',
+  fetch: cacheOrFetch(function fetch(uri, check) {
+    return request(uri, { responseType: 'arraybuffer' })
+    .then(({ data: buffer }) => {
+      const data = {
+        buffer,
+        blob: options => new Blob([buffer], options),
+        string: () => buffer2string(buffer),
+        base64: () => window.btoa(data.string()),
+      };
+      return (check ? Promise.resolve(check(data)) : Promise.resolve())
+      .then(() => this.dump(uri, data.base64()));
+    });
+  }),
+});
+
+register(initialize());
+
+function initialize() {
+  return browser.storage.local.get('version')
+  .then(({ version: lastVersion }) => {
+    const { version } = browser.runtime.getManifest();
+    return (lastVersion ? Promise.resolve() : patch())
+    .then(() => {
+      if (version !== lastVersion) return browser.storage.local.set({ version });
+    });
+  })
+  .then(() => browser.storage.local.get())
+  .then(data => {
+    const scripts = [];
+    const storeInfo = {
+      id: 0,
+      position: 0,
+    };
+    Object.keys(data).forEach(key => {
+      const value = data[key];
+      if (key.startsWith('scr:')) {
+        // {
+        //   meta,
+        //   custom,
+        //   props: { id, position, uri },
+        //   config: { enabled, shouldUpdate },
+        // }
+        scripts.push(value);
+        storeInfo.id = Math.max(storeInfo.id, getInt(object.get(value, 'props.id')));
+        storeInfo.position = Math.max(storeInfo.position, getInt(object.get(value, 'props.position')));
       }
     });
-  }
-  return script;
-}
-
-export function getScript(id, cTx) {
-  const tx = cTx || db.transaction('scripts');
-  const os = tx.objectStore('scripts');
-  return new Promise(resolve => {
-    os.get(id).onsuccess = e => {
-      const { result } = e.target;
-      result.id = id;
-      resolve(result);
-    };
-  })
-  .then(transformScript);
-}
-
-export function queryScript(id, meta, cTx) {
-  if (id) return getScript(id, cTx);
-  return new Promise(resolve => {
-    const uri = getNameURI({ meta });
-    const tx = cTx || db.transaction('scripts');
-    tx.objectStore('scripts').index('uri').get(uri).onsuccess = e => {
-      resolve(e.target.result);
-    };
-  })
-  .then(transformScript);
-}
-
-export function getScriptData(id) {
-  return getScript(id).then(script => {
-    if (!script) return Promise.reject();
-    const data = getScriptInfo(script);
-    data.code = script.code;
-    return data;
+    scripts.sort((a, b) => {
+      const [pos1, pos2] = [a, b].map(item => getInt(object.get(item, 'props.position')));
+      return Math.sign(pos1 - pos2);
+    });
+    Object.assign(store, {
+      scripts,
+      storeInfo,
+      scriptMap: scripts.reduce((map, item) => {
+        map[item.props.id] = item;
+        return map;
+      }, {}),
+    });
+    if (process.env.DEBUG) {
+      console.log('store:', store); // eslint-disable-line no-console
+    }
+    return normalizePosition();
   });
 }
 
-export function getScriptInfos(ids) {
-  const tx = db.transaction('scripts');
-  return Promise.all(ids.map(id => getScript(id, tx)))
-  .then(scripts => scripts.filter(Boolean).map(getScriptInfo));
+function getInt(val) {
+  return +val || 0;
 }
 
-export function getValues(uris, cTx) {
-  const tx = cTx || db.transaction('values');
-  const os = tx.objectStore('values');
-  return Promise.all(uris.map(uri => new Promise(resolve => {
-    os.get(uri).onsuccess = e => {
-      resolve(e.target.result);
-    };
-  })))
-  .then(data => data.reduce((result, value, i) => {
-    if (value) result[uris[i]] = value.values;
-    return result;
-  }, {}));
+export function normalizePosition() {
+  const updates = [];
+  store.scripts.forEach((item, index) => {
+    const position = index + 1;
+    if (object.get(item, 'props.position') !== position) {
+      object.set(item, 'props.position', position);
+      updates.push(item);
+    }
+  });
+  store.storeInfo.position = store.scripts.length;
+  const { length } = updates;
+  return length ? storage.script.dump(updates).then(() => length) : Promise.resolve();
 }
 
+export function getScript(where) {
+  let script;
+  if (where.id) {
+    script = store.scriptMap[where.id];
+  } else {
+    const uri = where.uri || getNameURI({ meta: where.meta, id: '@@should-have-name' });
+    const predicate = item => uri === object.get(item, 'props.uri');
+    script = store.scripts.find(predicate);
+  }
+  return Promise.resolve(script);
+}
+
+export function getScripts() {
+  return Promise.resolve(store.scripts);
+}
+
+export function getScriptByIds(ids) {
+  return Promise.all(ids.map(id => getScript({ id })))
+  .then(scripts => scripts.filter(Boolean));
+}
+
+export function getScriptCode(id) {
+  return storage.code.getOne(id);
+}
+
+export function setValues(where, values) {
+  return (where.id
+    ? Promise.resolve(where.id)
+    : getScript(where).then(script => object.get(script, 'props.id')))
+  .then(id => {
+    if (id) storage.value.dump(id, values).then(() => ({ id, values }));
+  });
+}
+
+/**
+ * @desc Get scripts to be injected to page with specific URL.
+ */
 export function getScriptsByURL(url) {
-  const tx = db.transaction(['scripts', 'require', 'values', 'cache']);
-  return loadScripts()
-  .then(data => Promise.all([
-    loadRequires(data.require),
-    getValues(data.uris, tx),
-    getCacheB64(data.cache, tx),
-  ]).then(res => ({
-    scripts: data.scripts,
-    require: res[0],
-    values: res[1],
-    cache: res[2],
-  })));
-
-  function loadScripts() {
-    const data = {
-      uris: [],
-    };
-    const require = {};
-    const cache = {};
-    return (testBlacklist(url) ? Promise.resolve([]) : (
-      getScriptsByIndex('position', null, tx, script => {
-        if (!testScript(url, script)) return;
-        data.uris.push(script.uri);
-        script.meta.require.forEach(key => { require[key] = 1; });
-        Object.keys(script.meta.resources).forEach(key => {
-          cache[script.meta.resources[key]] = 1;
-        });
-        return script;
-      })
-    ))
-    .then(scripts => {
-      data.scripts = scripts.filter(Boolean);
-      data.require = Object.keys(require);
-      data.cache = Object.keys(cache);
-      return data;
-    });
-  }
-  function loadRequires(uris) {
-    const os = tx.objectStore('require');
-    return Promise.all(uris.map(uri => new Promise(resolve => {
-      os.get(uri).onsuccess = e => {
-        resolve(e.target.result);
-      };
-    })))
-    .then(data => data.reduce((result, value, i) => {
-      if (value) result[uris[i]] = value.code;
-      return result;
-    }, {}));
-  }
+  const scripts = testBlacklist(url)
+    ? []
+    : store.scripts.filter(script => !script.config.removed && testScript(url, script));
+  const reqKeys = {};
+  const cacheKeys = {};
+  scripts.forEach(script => {
+    if (object.get(script, 'config.enabled')) {
+      script.meta.require.forEach(key => {
+        reqKeys[key] = 1;
+      });
+      Object.keys(script.meta.resources).forEach(key => {
+        cacheKeys[script.meta.resources[key]] = 1;
+      });
+    }
+  });
+  const enabledScriptIds = scripts
+  .filter(script => script.config.enabled)
+  .map(script => script.props.id);
+  return Promise.all([
+    storage.require.getMulti(Object.keys(reqKeys)),
+    storage.cache.getMulti(Object.keys(cacheKeys)),
+    storage.value.getMulti(enabledScriptIds),
+    storage.code.getMulti(enabledScriptIds),
+  ])
+  .then(([require, cache, values, code]) => ({
+    scripts,
+    require,
+    cache,
+    values,
+    code,
+  }));
 }
 
+/**
+ * @desc Get data for dashboard.
+ */
 export function getData() {
-  const tx = db.transaction(['scripts', 'cache']);
-  return loadScripts()
-  .then(data => loadCache(data.cache).then(cache => ({
-    cache,
-    scripts: data.scripts,
-  })));
+  const cacheKeys = {};
+  const { scripts } = store;
+  scripts.forEach(script => {
+    const icon = object.get(script, 'meta.icon');
+    if (isRemote(icon)) cacheKeys[icon] = 1;
+  });
+  return storage.cache.getMulti(Object.keys(cacheKeys))
+  .then(cache => {
+    Object.keys(cache).forEach(key => {
+      cache[key] = `data:image/png;base64,${cache[key]}`;
+    });
+    return cache;
+  })
+  .then(cache => ({ scripts, cache }));
+}
 
-  function loadScripts() {
-    const data = {};
-    const cache = {};
-    return getScriptsByIndex('position', null, tx, script => {
-      const { icon } = script.meta;
-      if (isRemote(icon)) cache[icon] = 1;
-      return getScriptInfo(script);
-    })
-    .then(scripts => {
-      data.scripts = scripts;
-      data.cache = Object.keys(cache);
-      return data;
-    });
+export function checkRemove() {
+  const toRemove = store.scripts.filter(script => script.config.removed);
+  if (toRemove.length) {
+    store.scripts = store.scripts.filter(script => !script.config.removed);
+    storage.script.removeMulti(toRemove);
+    storage.code.removeMulti(toRemove);
   }
-  function loadCache(uris) {
-    return getCacheB64(uris, tx)
-    .then(cache => {
-      Object.keys(cache).forEach(key => {
-        cache[key] = `data:image/png;base64,${cache[key]}`;
-      });
-      return cache;
-    });
-  }
+  return Promise.resolve(toRemove.length);
 }
 
 export function removeScript(id) {
-  const tx = db.transaction('scripts', 'readwrite');
-  return new Promise(resolve => {
-    const os = tx.objectStore('scripts');
-    os.delete(id).onsuccess = () => { resolve(); };
-  })
-  .then(() => {
-    browser.runtime.sendMessage({
-      cmd: 'RemoveScript',
-      data: id,
-    });
+  const i = store.scripts.findIndex(item => id === object.get(item, 'props.id'));
+  if (i >= 0) {
+    store.scripts.splice(i, 1);
+    storage.script.remove(id);
+    storage.code.remove(id);
+  }
+  return browser.runtime.sendMessage({
+    cmd: 'RemoveScript',
+    data: id,
   });
 }
 
 export function moveScript(id, offset) {
-  const tx = db.transaction('scripts', 'readwrite');
-  const os = tx.objectStore('scripts');
-  return getScript(id, tx)
-  .then(script => {
-    let pos = script.position;
-    let range;
-    let order;
-    let number = offset;
-    if (offset < 0) {
-      range = IDBKeyRange.upperBound(pos, true);
-      order = 'prev';
-      number = -number;
-    } else {
-      range = IDBKeyRange.lowerBound(pos, true);
-      order = 'next';
-    }
-    return new Promise(resolve => {
-      os.index('position').openCursor(range, order).onsuccess = e => {
-        const { result } = e.target;
-        if (result) {
-          number -= 1;
-          const { value } = result;
-          value.position = pos;
-          pos = result.key;
-          result.update(value);
-          if (number) result.continue();
-          else {
-            script.position = pos;
-            os.put(script).onsuccess = () => { resolve(); };
-          }
-        }
-      };
-    });
-  });
-}
-
-function getCacheB64(urls, cTx) {
-  const tx = cTx || db.transaction('cache');
-  const os = tx.objectStore('cache');
-  return Promise.all(urls.map(url => new Promise(resolve => {
-    os.get(url).onsuccess = e => {
-      resolve(e.target.result);
-    };
-  })))
-  .then(data => data.reduce((map, value, i) => {
-    if (value) map[urls[i]] = value.data;
-    return map;
-  }, {}));
-}
-
-function saveCache(uri, data, cTx) {
-  const tx = cTx || db.transaction('cache', 'readwrite');
-  const os = tx.objectStore('cache');
-  return new Promise(resolve => {
-    os.put({ uri, data }).onsuccess = () => { resolve(); };
-  });
-}
-
-function saveRequire(uri, code, cTx) {
-  const tx = cTx || db.transaction('require', 'readwrite');
-  const os = tx.objectStore('require');
-  return new Promise(resolve => {
-    os.put({ uri, code }).onsuccess = () => { resolve(); };
-  });
-}
-
-export function saveScript(script, cTx) {
-  script.enabled = script.enabled ? 1 : 0;
-  script.update = script.update ? 1 : 0;
-  if (!script.position) script.position = position.get();
-  position.update(script.position);
-  const tx = cTx || db.transaction('scripts', 'readwrite');
-  const os = tx.objectStore('scripts');
-  return new Promise((resolve, reject) => {
-    const res = os.put(script);
-    res.onsuccess = e => {
-      script.id = e.target.result;
-      resolve(script);
-    };
-    res.onerror = () => {
-      reject(i18n('msgNamespaceConflict'));
-    };
-  });
-}
-
-const cacheRequests = {};
-function fetchCache(url, check) {
-  let promise = cacheRequests[url];
-  if (!promise) {
-    // DataURL cannot be loaded with `responseType=blob`
-    // ref: https://bugs.chromium.org/p/chromium/issues/detail?id=412752
-    promise = request(url, { responseType: 'arraybuffer' })
-    .then(({ data: buffer }) => {
-      const data = {
-        buffer,
-        blob(options) {
-          return new Blob([buffer], options);
-        },
-        string() {
-          return buffer2string(buffer);
-        },
-        base64() {
-          return window.btoa(data.string());
-        },
-      };
-      if (check) return Promise.resolve(check(data)).then(() => data);
-      return data;
-    })
-    .then(({ base64 }) => saveCache(url, base64()))
-    .then(() => { delete cacheRequests[url]; });
-    cacheRequests[url] = promise;
+  const index = store.scripts.findIndex(item => id === object.get(item, 'props.id'));
+  const step = offset > 0 ? 1 : -1;
+  const indexStart = index;
+  const indexEnd = index + offset;
+  const offsetI = Math.min(indexStart, indexEnd);
+  const offsetJ = Math.max(indexStart, indexEnd);
+  const updated = store.scripts.slice(offsetI, offsetJ + 1);
+  if (step > 0) {
+    updated.push(updated.shift());
+  } else {
+    updated.unshift(updated.pop());
   }
-  return promise;
+  store.scripts = [
+    ...store.scripts.slice(0, offsetI),
+    ...updated,
+    ...store.scripts.slice(offsetJ + 1),
+  ];
+  return normalizePosition();
 }
 
-const requireRequests = {};
-function fetchRequire(url) {
-  let promise = requireRequests[url];
-  if (!promise) {
-    promise = request(url)
-    .then(({ data }) => saveRequire(url, data))
-    .catch(() => { console.error(`Error fetching required script: ${url}`); })
-    .then(() => { delete requireRequests[url]; });
-    requireRequests[url] = promise;
+function saveScript(script, code) {
+  const config = script.config || {};
+  config.enabled = getInt(config.enabled);
+  config.shouldUpdate = getInt(config.shouldUpdate);
+  const props = script.props || {};
+  let oldScript;
+  if (!props.id) {
+    store.storeInfo.id += 1;
+    props.id = store.storeInfo.id;
+  } else {
+    oldScript = store.scriptMap[props.id];
   }
-  return promise;
+  props.uri = getNameURI(script);
+  // Do not allow script with same name and namespace
+  if (store.scripts.some(item => {
+    const itemProps = item.props || {};
+    return props.id !== itemProps.id && props.uri === itemProps.uri;
+  })) {
+    throw i18n('msgNamespaceConflict');
+  }
+  if (oldScript) {
+    script.config = Object.assign({}, oldScript.config, config);
+    script.props = Object.assign({}, oldScript.props, props);
+    const index = store.scripts.indexOf(oldScript);
+    store.scripts[index] = script;
+  } else {
+    store.storeInfo.position += 1;
+    props.position = store.storeInfo.position;
+    script.config = config;
+    script.props = props;
+    store.scripts.push(script);
+  }
+  return Promise.all([
+    storage.script.dump(script),
+    storage.code.dump(props.id, code),
+  ]);
 }
 
-export function setValue(uri, values) {
-  const os = db.transaction('values', 'readwrite').objectStore('values');
-  return new Promise(resolve => {
-    os.put({ uri, values }).onsuccess = () => { resolve(); };
-  });
-}
-
-export function updateScriptInfo(id, data, custom) {
-  const tx = db.transaction('scripts', 'readwrite');
-  const os = tx.objectStore('scripts');
-  return getScript(id, tx)
-  .then(script => new Promise((resolve, reject) => {
-    if (!script) return reject();
-    Object.keys(data).forEach(key => {
-      if (key in script) script[key] = data[key];
-    });
-    Object.assign(script.custom, custom);
-    os.put(script).onsuccess = () => {
-      resolve(getScriptInfo(script));
-    };
-  }));
+export function updateScriptInfo(id, data) {
+  const script = store.scriptMap[id];
+  if (!script) return Promise.reject();
+  script.config = Object.assign({}, script.config, data.config);
+  script.custom = Object.assign({}, script.custom, data.custom);
+  return storage.script.dump(script);
 }
 
 export function getExportData(ids, withValues) {
-  const tx = db.transaction(['scripts', 'values']);
-  return loadScripts()
-  .then(scripts => {
-    const res = { scripts };
+  const availableIds = ids.filter(id => {
+    const script = store.scriptMap[id];
+    return script && !script.config.removed;
+  });
+  return Promise.all([
+    Promise.all(availableIds.map(id => getScript({ id }))),
+    storage.code.getMulti(availableIds),
+  ])
+  .then(([scripts, codeMap]) => {
+    const data = {};
+    data.items = scripts.map(script => ({ script, code: codeMap[script.props.id] }));
     if (withValues) {
-      return getValues(scripts.map(script => script.uri), tx)
+      return storage.value.getMulti(ids)
       .then(values => {
-        res.values = values;
-        return res;
+        data.values = values;
+        return data;
       });
     }
-    return res;
+    return data;
   });
-  function loadScripts() {
-    const os = tx.objectStore('scripts');
-    return Promise.all(ids.map(id => new Promise(resolve => {
-      os.get(id).onsuccess = e => {
-        resolve(e.target.result);
-      };
-    })))
-    .then(data => data.filter(Boolean));
-  }
-}
-
-export function vacuum() {
-  const tx = db.transaction(['scripts', 'require', 'cache', 'values'], 'readwrite');
-  checkPosition();
-  return loadScripts()
-  .then(data => Promise.all([
-    vacuumCache('require', data.require),
-    vacuumCache('cache', data.cache),
-    vacuumCache('values', data.values),
-  ]).then(() => ({
-    require: data.require,
-    cache: data.cache,
-  })))
-  .then(data => Promise.all([
-    Object.keys(data.require).map(k => data.require[k] === 1 && fetchRequire(k)),
-    Object.keys(data.cache).map(k => data.cache[k] === 1 && fetchCache(k)),
-  ]));
-
-  function loadScripts() {
-    const data = {
-      require: {},
-      cache: {},
-      values: {},
-    };
-    return getScriptsByIndex('position', null, tx, script => {
-      const base = script.custom.lastInstallURL;
-      script.meta.require.forEach(url => {
-        const fullUrl = getFullUrl(url, base);
-        data.require[fullUrl] = 1;
-      });
-      Object.keys(script.meta.resources).forEach(key => {
-        const url = script.meta.resources[key];
-        const fullUrl = getFullUrl(url, base);
-        data.cache[fullUrl] = 1;
-      });
-      if (isRemote(script.meta.icon)) data.cache[script.meta.icon] = 1;
-      data.values[script.uri] = 1;
-    })
-    .then(() => data);
-  }
-  function vacuumCache(dbName, dict) {
-    const os = tx.objectStore(dbName);
-    const deleteCache = uri => new Promise(resolve => {
-      if (!dict[uri]) {
-        os.delete(uri).onsuccess = () => { resolve(); };
-      } else {
-        dict[uri] += 1;
-        resolve();
-      }
-    });
-    return new Promise(resolve => {
-      os.openCursor().onsuccess = e => {
-        const { result } = e.target;
-        if (result) {
-          const { value } = result;
-          deleteCache(value.uri).then(() => result.continue());
-        } else resolve();
-      };
-    });
-  }
-}
-
-export function getScriptsByIndex(index, options, cTx, mapEach) {
-  const tx = cTx || db.transaction('scripts');
-  return new Promise(resolve => {
-    const os = tx.objectStore('scripts');
-    const list = [];
-    os.index(index).openCursor(options).onsuccess = e => {
-      const { result } = e.target;
-      if (result) {
-        let { value } = result;
-        value = transformScript(value);
-        if (mapEach) value = mapEach(value);
-        list.push(value);
-        result.continue();
-      } else resolve(list);
-    };
-  });
-}
-
-function updateProps(target, source) {
-  if (source) {
-    Object.keys(source).forEach(key => {
-      if (key in target) target[key] = source[key];
-    });
-  }
-  return target;
 }
 
 export function parseScript(data) {
-  const meta = parseMeta(data.code);
-  if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
-  const res = {
+  const { id, code, message, isNew, config, custom } = data;
+  const meta = parseMeta(code);
+  if (!meta.name) throw i18n('msgInvalidScript');
+  const result = {
     cmd: 'UpdateScript',
     data: {
-      message: data.message == null ? i18n('msgUpdated') : data.message || '',
+      update: {
+        message: message == null ? i18n('msgUpdated') : message || '',
+      },
     },
   };
-  const tx = db.transaction(['scripts', 'require'], 'readwrite');
-  function fetchResources(base) {
-    // @require
-    meta.require.forEach(url => {
-      const fullUrl = getFullUrl(url, base);
-      const cache = data.require && data.require[fullUrl];
-      if (cache) saveRequire(fullUrl, cache, tx);
-      else fetchRequire(fullUrl);
-    });
-    // @resource
-    Object.keys(meta.resources).forEach(k => {
-      const url = meta.resources[k];
-      const fullUrl = getFullUrl(url, base);
-      const cache = data.resources && data.resources[fullUrl];
-      if (cache) saveCache(fullUrl, cache);
-      else fetchCache(fullUrl);
-    });
-    // @icon
-    if (isRemote(meta.icon)) {
-      fetchCache(
-        getFullUrl(meta.icon, base),
-        ({ blob: getBlob }) => new Promise((resolve, reject) => {
-          const blob = getBlob({ type: 'image/png' });
-          const url = URL.createObjectURL(blob);
-          const image = new Image();
-          const free = () => URL.revokeObjectURL(url);
-          image.onload = () => {
-            free();
-            resolve();
-          };
-          image.onerror = () => {
-            free();
-            reject();
-          };
-          image.src = url;
-        }),
-      );
-    }
-  }
-  return queryScript(data.id, meta, tx)
-  .then(result => {
+  return getScript({ id, meta })
+  .then(oldScript => {
     let script;
-    if (result) {
-      if (data.isNew) throw i18n('msgNamespaceConflict');
-      script = result;
+    if (oldScript) {
+      if (isNew) throw i18n('msgNamespaceConflict');
+      script = Object.assign({}, oldScript);
     } else {
-      script = newScript();
-      script.position = position.get();
-      res.cmd = 'AddScript';
-      res.data.message = i18n('msgInstalled');
+      ({ script } = newScript());
+      result.cmd = 'AddScript';
+      result.data.update.message = i18n('msgInstalled');
     }
-    updateProps(script, data.more);
-    Object.assign(script.custom, data.custom);
+    script.config = Object.assign({}, script.config, config);
+    script.custom = Object.assign({}, script.custom, custom);
     script.meta = meta;
-    script.code = data.code;
-    script.uri = getNameURI(script);
-    // use referer page as default homepage
     if (!meta.homepageURL && !script.custom.homepageURL && isRemote(data.from)) {
       script.custom.homepageURL = data.from;
     }
     if (isRemote(data.url)) script.custom.lastInstallURL = data.url;
-    fetchResources(script.custom.lastInstallURL);
-    script.custom.modified = data.modified || Date.now();
-    return saveScript(script, tx);
+    object.set(script, 'props.lastModified', data.modified || Date.now());
+    const position = +data.position;
+    if (position) object.set(script, 'props.position', position);
+    return saveScript(script, code).then(() => script);
   })
   .then(script => {
-    Object.assign(res.data, getScriptInfo(script));
-    return res;
+    fetchScriptResources(script, data);
+    Object.assign(result.data.update, script);
+    result.data.where = { id: script.props.id };
+    return result;
   });
 }
 
-function initPosition() {
-  const os = db.transaction('scripts').objectStore('scripts');
-  return new Promise(resolve => {
-    os.index('position').openCursor(null, 'prev').onsuccess = e => {
-      const { result } = e.target;
-      if (result) position.set(result.key);
-      resolve();
-    };
+function fetchScriptResources(script, cache) {
+  const base = object.get(script, 'custom.lastInstallURL');
+  const meta = script.meta;
+  // @require
+  meta.require.forEach(url => {
+    const fullUrl = getFullUrl(url, base);
+    const cached = object.get(cache, ['require', fullUrl]);
+    if (cached) {
+      storage.require.dump(fullUrl, cached);
+    } else {
+      storage.require.fetch(fullUrl);
+    }
   });
-}
-
-export function checkPosition(start) {
-  let offset = Math.max(1, start || 0);
-  const updates = [];
-  let changed;
-  if (!position.checking) {
-    const tx = db.transaction('scripts', 'readwrite');
-    const os = tx.objectStore('scripts');
-    position.checking = new Promise(resolve => {
-      os.index('position').openCursor(start).onsuccess = e => {
-        const cursor = e.target.result;
-        if (cursor) {
-          const { value } = cursor;
-          if (value.position !== offset) updates.push({ id: value.id, position: offset });
-          position.update(offset);
-          offset += 1;
-          cursor.continue();
-        } else {
-          resolve();
-        }
+  // @resource
+  Object.keys(meta.resources).forEach(key => {
+    const url = meta.resources[key];
+    const fullUrl = getFullUrl(url, base);
+    const cached = object.get(cache, ['resources', fullUrl]);
+    if (cached) {
+      storage.cache.dump(fullUrl, cached);
+    } else {
+      storage.cache.fetch(fullUrl);
+    }
+  });
+  // @icon
+  if (isRemote(meta.icon)) {
+    const fullUrl = getFullUrl(meta.icon, base);
+    storage.cache.fetch(fullUrl, ({ blob: getBlob }) => new Promise((resolve, reject) => {
+      const blob = getBlob({ type: 'image/png' });
+      const url = URL.createObjectURL(blob);
+      const image = new Image();
+      const free = () => URL.revokeObjectURL(url);
+      image.onload = () => {
+        free();
+        resolve();
       };
-    })
-    .then(() => {
-      changed = updates.length;
-      return update();
-      function update() {
-        const item = updates.shift();
-        if (item) {
-          return new Promise(resolve => {
-            os.get(item.id).onsuccess = e => {
-              const { result } = e.target;
-              result.position = item.position;
-              os.put(result).onsuccess = () => { resolve(); };
-            };
-          })
-          .then(update);
-        }
-      }
-    })
-    .then(() => {
-      browser.runtime.sendMessage({
-        cmd: 'ScriptsUpdated',
-      });
-      position.checking = null;
-    })
-    .then(() => changed);
+      image.onerror = () => {
+        free();
+        reject();
+      };
+      image.src = url;
+    }));
   }
-  return position.checking;
+}
+
+export function vacuum() {
+  const valueKeys = {};
+  const cacheKeys = {};
+  const requireKeys = {};
+  const codeKeys = {};
+  const mappings = [
+    [storage.value, valueKeys],
+    [storage.cache, cacheKeys],
+    [storage.require, requireKeys],
+    [storage.code, codeKeys],
+  ];
+  browser.storage.get().then(data => {
+    Object.keys(data).forEach(key => {
+      mappings.some(([substore, map]) => {
+        const { prefix } = substore;
+        if (key.startsWith(prefix)) {
+          // -1 for untouched, 1 for touched, 2 for missing
+          map[key.slice(prefix.length)] = -1;
+          return true;
+        }
+      });
+    });
+  });
+  const touch = (obj, key) => {
+    if (obj[key] < 0) obj[key] = 1;
+    else if (!obj[key]) obj[key] = 2;
+  };
+  store.scripts.forEach(script => {
+    const { id } = script.props;
+    touch(codeKeys, id);
+    touch(valueKeys, id);
+    const base = script.custom.lastInstallURL;
+    script.meta.require.forEach(url => {
+      const fullUrl = getFullUrl(url, base);
+      touch(requireKeys, fullUrl);
+    });
+    Object.keys(script.meta.resources).forEach(key => {
+      const url = script.meta.resources[key];
+      const fullUrl = getFullUrl(url, base);
+      touch(cacheKeys, fullUrl);
+    });
+    const { icon } = script.meta;
+    if (isRemote(icon)) {
+      const fullUrl = getFullUrl(icon, base);
+      touch(cacheKeys, fullUrl);
+    }
+  });
+  mappings.forEach(([substore, map]) => {
+    Object.keys(map).forEach(key => {
+      const value = map[key];
+      if (value < 0) {
+        // redundant value
+        substore.remove(key);
+      } else if (value === 2 && substore.fetch) {
+        // missing resource
+        substore.fetch(key);
+      }
+    });
+  });
 }
