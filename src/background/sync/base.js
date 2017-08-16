@@ -3,10 +3,11 @@ import { getEventEmitter, getOption, setOption, hookOptions } from '../utils';
 import { getScripts, getScriptCode, parseScript, removeScript, normalizePosition } from '../utils/db';
 
 const serviceNames = [];
+const serviceClasses = [];
 const services = {};
 const autoSync = debounce(sync, 60 * 60 * 1000);
 let working = Promise.resolve();
-const syncConfig = initConfig();
+let syncConfig;
 
 export function getFilename(uri) {
   return `vm-${encodeURIComponent(uri)}`;
@@ -113,7 +114,6 @@ export function getStates() {
 
 function serviceFactory(base) {
   const Service = function constructor() {
-    if (!(this instanceof Service)) return new Service();
     this.initialize();
   };
   Service.prototype = base;
@@ -462,11 +462,8 @@ export const BaseService = serviceFactory({
   },
 });
 
-export function register(factory) {
-  const service = typeof factory === 'function' ? factory() : factory;
-  serviceNames.push(service.name);
-  services[service.name] = service;
-  return service;
+export function register(Factory) {
+  serviceClasses.push(Factory);
 }
 function getCurrent() {
   return syncConfig.get('current');
@@ -475,6 +472,13 @@ function getService(name) {
   return services[name || getCurrent()];
 }
 export function initialize() {
+  syncConfig = initConfig();
+  serviceClasses.forEach(Factory => {
+    const service = new Factory();
+    const { name } = service;
+    serviceNames.push(name);
+    services[name] = service;
+  });
   const service = getService();
   if (service) service.checkSync();
 }

@@ -18,6 +18,7 @@ const defaults = {
   customCSS: null,
   importSettings: true,
   notifyUpdates: true,
+  version: null,
 };
 let changes = {};
 const hooks = initHooks();
@@ -25,35 +26,44 @@ const callHooksLater = debounce(callHooks, 100);
 
 let options = {};
 const init = browser.storage.local.get('options')
-.then(({ options: value }) => {
-  options = value;
-  if (!options || typeof options !== 'object') options = {};
+.then(({ options: data }) => {
+  if (data && typeof data === 'object') options = data;
+  if (process.env.DEBUG) {
+    console.log('options:', options); // eslint-disable-line no-console
+  }
+  if (!object.get(options, 'version')) {
+    // v2.8.0+ stores options in browser.storage.local
+    // Upgrade from v2.7.x
+    if (process.env.DEBUG) {
+      console.log('Upgrade options...'); // eslint-disable-line no-console
+    }
+    try {
+      if (localStorage.length) {
+        Object.keys(defaults)
+        .forEach(key => {
+          let value = localStorage.getItem(key);
+          if (value) {
+            try {
+              value = JSON.parse(value);
+            } catch (e) {
+              value = null;
+            }
+          }
+          if (value) {
+            if (process.env.DEBUG) {
+              console.log('Upgrade option:', key, value); // eslint-disable-line no-console
+            }
+            setOption(key, value);
+          }
+        });
+      }
+    } catch (e) {
+      // ignore security issue in Firefox
+    }
+    setOption('version', 1);
+  }
 });
 register(init);
-
-// v2.8.0+ stores options in browser.storage.local
-// Upgrade from v2.7.x
-try {
-  if (localStorage.length) {
-    Object.keys(defaults)
-    .forEach(key => {
-      let value = localStorage.getItem(key);
-      if (value) {
-        try {
-          value = JSON.parse(value);
-        } catch (e) {
-          value = null;
-        }
-      }
-      if (value) {
-        setOption(key, value);
-      }
-      localStorage.clear();
-    });
-  }
-} catch (e) {
-  // ignore security issue in Firefox
-}
 
 function fireChange(key, value) {
   changes[key] = value;
@@ -86,6 +96,9 @@ export function setOption(key, value) {
     options[mainKey] = optionValue;
     browser.storage.local.set({ options });
     fireChange(optionKey, value);
+    if (process.env.DEBUG) {
+      console.log('Options updated:', optionKey, value, options); // eslint-disable-line no-console
+    }
   }
 }
 
