@@ -121,7 +121,12 @@ const patch = () => new Promise((resolve, reject) => {
     const item = {
       script: {
         meta: parseMeta(script.code),
-        custom: script.custom,
+        custom: Object.assign({
+          origInclude: true,
+          origExclude: true,
+          origMatch: true,
+          origExcludeMatch: true,
+        }, script.custom),
         props: {
           id: script.id,
           uri: script.uri,
@@ -303,6 +308,16 @@ export function normalizePosition() {
     if (object.get(item, 'props.position') !== position) {
       object.set(item, 'props.position', position);
       updates.push(item);
+    }
+    // XXX patch v2.8.0
+    if (typeof item.custom.origInclude === 'undefined') {
+      item.custom = Object.assign({
+        origInclude: true,
+        origExclude: true,
+        origMatch: true,
+        origExcludeMatch: true,
+      }, item.custom);
+      if (!updates.includes(item)) updates.push(item);
     }
   });
   store.storeInfo.position = store.scripts.length;
