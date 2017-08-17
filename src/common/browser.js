@@ -1,7 +1,7 @@
 /* global chrome */
 const global = window;
 
-function wrapAsync(func) {
+function wrapAsync(func, thisObj) {
   return (...args) => {
     const promise = new Promise((resolve, reject) => {
       args.push(res => {
@@ -12,7 +12,7 @@ function wrapAsync(func) {
           resolve(res);
         }
       });
-      func(...args);
+      func.apply(thisObj, args);
     });
     promise.catch(err => {
       if (process.env.DEBUG) console.warn(args, err);
@@ -27,7 +27,7 @@ function wrapAPIs(source, meta) {
     if (metaVal) {
       const value = source[key];
       if (typeof metaVal === 'function') {
-        target[key] = metaVal(value);
+        target[key] = metaVal(value, source);
       } else if (typeof metaVal === 'object' && typeof value === 'object') {
         target[key] = wrapAPIs(value, metaVal);
       } else {
