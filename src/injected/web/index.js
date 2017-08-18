@@ -1,4 +1,4 @@
-import { getUniqId, bindEvents, Promise } from '../utils';
+import { getUniqId, bindEvents, Promise, attachFunction, console } from '../utils';
 import { includes, forEach, map, utf8decode } from './helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
@@ -23,7 +23,6 @@ export default function initialize(webId, contentId, props) {
 
 const store = {
   commands: {},
-  ainject: {},
   values: {},
 };
 
@@ -41,13 +40,6 @@ const handlers = {
   },
   NotificationClicked: onNotificationClicked,
   NotificationClosed: onNotificationClosed,
-  Injected(id) {
-    const item = store.ainject[id];
-    const func = window[`VM_${id}`];
-    delete window[`VM_${id}`];
-    delete store.ainject[id];
-    if (item && func) runCode(item[0], func, item[1], item[2]);
-  },
   ScriptChecked(data) {
     if (bridge.onScriptChecked) bridge.onScriptChecked(data);
   },
@@ -105,8 +97,8 @@ function onLoadScripts(data) {
     const metaStr = matches ? matches[1] : '';
     const wrapper = wrapGM(script, metaStr, data.cache);
     // Must use Object.getOwnPropertyNames to list unenumerable properties
-    const wrapperKeys = Object.getOwnPropertyNames(wrapper);
-    const wrapperInit = map(wrapperKeys, name => `this["${name}"]=${name}`).join(';');
+    const argNames = Object.getOwnPropertyNames(wrapper);
+    const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
     const codeSlices = [`${wrapperInit};with(this)!function(){`];
     forEach(requireKeys, key => {
       const requireCode = data.require[key];
@@ -121,11 +113,15 @@ function onLoadScripts(data) {
     codeSlices.push('}.call(this);');
     const codeConcat = codeSlices.join('\n');
     const name = script.custom.name || script.meta.name || script.props.id;
-    const args = map(wrapperKeys, key => wrapper[key]);
+    const args = map(argNames, key => wrapper[key]);
     const thisObj = wrapper.window || wrapper;
-    const id = getUniqId();
-    store.ainject[id] = [name, args, thisObj];
-    bridge.post({ cmd: 'Inject', data: [id, wrapperKeys, codeConcat] });
+    const id = `VMin${getUniqId()}`;
+    const callbackId = `VMcb${getUniqId()}`;
+    attachFunction(callbackId, () => {
+      const func = window[id];
+      if (func) runCode(name, func, args, thisObj);
+    });
+    bridge.post({ cmd: 'Inject', data: [id, argNames, codeConcat, callbackId] });
   }
   function run(list) {
     while (list.length) buildCode(list.shift());

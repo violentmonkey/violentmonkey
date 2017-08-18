@@ -1,4 +1,4 @@
-import { bindEvents, sendMessage, postData, inject } from '../utils';
+import { bindEvents, sendMessage, inject, attachFunction } from '../utils';
 import bridge from './bridge';
 import { tabOpen, tabClose, tabClosed } from './tabs';
 import { onNotificationCreate, onNotificationClick, onNotificationClose } from './notifications';
@@ -113,19 +113,17 @@ function getPopup() {
 }
 
 function injectScript(data) {
-  const [id, wrapperKeys, code] = data;
-  const func = (scriptId, cb, post, destId) => {
-    Object.defineProperty(window, `VM_${scriptId}`, {
-      value: cb,
-      configurable: true,
-    });
-    post(destId, { cmd: 'Injected', data: scriptId });
+  const [vId, wrapperKeys, code, vCallbackId] = data;
+  const func = (attach, id, cb, callbackId) => {
+    attach(id, cb);
+    const callback = window[callbackId];
+    if (callback) callback();
   };
   const args = [
-    JSON.stringify(id),
+    attachFunction.toString(),
+    JSON.stringify(vId),
     `function(${wrapperKeys.join(',')}){${code}}`,
-    postData.toString(),
-    JSON.stringify(bridge.destId),
+    JSON.stringify(vCallbackId),
   ];
   inject(`!${func.toString()}(${args.join(',')})`);
 }
