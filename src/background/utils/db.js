@@ -355,7 +355,7 @@ export function setValues(where, values) {
     ? Promise.resolve(where.id)
     : getScript(where).then(script => object.get(script, 'props.id')))
   .then(id => {
-    if (id) storage.value.dump(id, values).then(() => ({ id, values }));
+    if (id) return storage.value.dump(id, values).then(() => ({ id, values }));
   });
 }
 
