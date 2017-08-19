@@ -16,6 +16,7 @@ import {
   getScriptByIds, moveScript, vacuum, parseScript, getScript,
   normalizePosition,
 } from './utils/db';
+import { resetBlacklist } from './utils/tester';
 
 const VM_VER = browser.runtime.getManifest().version;
 
@@ -237,6 +238,7 @@ initialize()
   });
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
+  resetBlacklist();
 });
 
 // Common functions

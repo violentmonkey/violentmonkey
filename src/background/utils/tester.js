@@ -3,7 +3,6 @@ import { getOption, hookOptions } from './options';
 
 const RE = /(.*?):\/\/([^/]*)\/(.*)/;
 let blacklistRules = [];
-resetBlacklist(getOption('blacklist'));
 hookOptions(changes => {
   const { blacklist } = changes;
   if (blacklist) resetBlacklist(blacklist);
@@ -134,8 +133,9 @@ export function testBlacklist(url) {
   }
 }
 export function resetBlacklist(list) {
+  const rules = list || getOption('blacklist');
   // XXX compatible with {Array} list in v2.6.1-
-  blacklistRules = (Array.isArray(list) ? list : (list || '').split('\n'))
+  blacklistRules = (Array.isArray(rules) ? rules : (rules || '').split('\n'))
   .map(line => {
     const item = line.trim();
     if (!item || item.startsWith('#')) return;
