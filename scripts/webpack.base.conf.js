@@ -25,6 +25,9 @@ module.exports = {
     filename: '[name].js',
   },
   resolve: {
+    // Tell webpack to look for peer dependencies in `node_modules`
+    // when packages are linked from outside directories
+    modules: [resolve('node_modules')],
     extensions: ['.js', '.vue'],
     alias: {
       src: resolve('src'),
@@ -49,6 +52,10 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test')]
+      },
+      {
+        test: /\.esm\.js$/,
+        loader: 'babel-loader',
       },
       styleRule({
         fallback: 'vue-style-loader',

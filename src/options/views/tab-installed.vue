@@ -2,7 +2,7 @@
   <div class="tab-installed">
     <header class="flex">
       <div class="flex-auto">
-        <vm-dropdown :closeAfterClick="true">
+        <vl-dropdown :closeAfterClick="true">
           <span class="btn-ghost" slot="toggle">
             <icon name="plus"></icon>
           </span>
@@ -10,7 +10,7 @@
           <a v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
           <a v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank"></a>
           <a href="#" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></a>
-        </vm-dropdown>
+        </vl-dropdown>
         <tooltip :title="i18n('buttonUpdateAll')" placement="down">
           <span class="btn-ghost" @click="updateAll">
             <icon name="refresh"></icon>
@@ -34,8 +34,8 @@
 </template>
 
 <script>
+import { Dropdown as VlDropdown } from 'vueleton';
 import { i18n, sendMessage, noop, debounce } from 'src/common';
-import { Dropdown as VmDropdown } from 'src/common/ui/vueleton';
 import Icon from 'src/common/ui/icon';
 import Tooltip from 'src/common/ui/tooltip';
 import Item from './script-item';
@@ -47,7 +47,7 @@ export default {
     Item,
     Edit,
     Tooltip,
-    VmDropdown,
+    VlDropdown,
     Icon,
   },
   data() {
@@ -171,7 +171,6 @@ $header-height: 4rem;
     border-bottom: 1px solid darkgray;
   }
   .vl-dropdown-menu {
-    padding: .5rem;
     white-space: nowrap;
     > a {
       display: block;

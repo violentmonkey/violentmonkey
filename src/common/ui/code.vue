@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <vue-code class="editor-code flex-auto"
+    <vl-code class="editor-code flex-auto"
       :options="cmOptions" v-model="content" @ready="onReady"
     />
     <div class="frame-block" v-show="search.show">
@@ -36,7 +36,6 @@
 </template>
 
 <script>
-import VueCode from 'vue-code';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/eclipse.css';
 import 'codemirror/mode/javascript/javascript';
@@ -51,6 +50,7 @@ import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import CodeMirror from 'codemirror';
+import { Code as VlCode } from 'vueleton';
 import { debounce } from 'src/common';
 import Tooltip from './tooltip';
 
@@ -143,7 +143,7 @@ export default {
     },
   },
   components: {
-    VueCode,
+    VlCode,
     Tooltip,
   },
   data() {

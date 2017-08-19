@@ -191,3 +191,9 @@ button {
 .CodeMirror-foldgutter-folded:after {
   content: "\25B8";
 }
+
+.vl-dropdown-menu {
+  padding: .5rem;
+  border: 1px solid #bbb;
+  background: white;
+}
