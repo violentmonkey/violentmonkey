@@ -1,3 +1,4 @@
+import { getFullUrl } from 'src/common';
 import { sendMessage } from '../utils';
 import bridge from './bridge';
 
@@ -5,6 +6,7 @@ const tabIds = {};
 const tabKeys = {};
 
 export function tabOpen({ key, data }) {
+  data.url = getFullUrl(data.url, location.href);
   sendMessage({ cmd: 'TabOpen', data })
   .then(({ id }) => {
     tabIds[key] = id;

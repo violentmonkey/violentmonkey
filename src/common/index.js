@@ -204,8 +204,13 @@ export function buffer2string(buffer) {
 
 export function getFullUrl(url, base) {
   const obj = new URL(url, base);
-  // Do not allow `file:` protocol
-  if (obj.protocol === 'file:') obj.protocol = 'http:';
+  // Use protocol whitelist to filter URLs
+  if (![
+    'http:',
+    'https:',
+    'ftp:',
+    'data:',
+  ].includes(obj.protocol)) obj.protocol = 'http:';
   return obj.href;
 }
 
