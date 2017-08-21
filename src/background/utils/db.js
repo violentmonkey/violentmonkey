@@ -532,7 +532,7 @@ export function getExportData(ids, withValues) {
 export function parseScript(data) {
   const { id, code, message, isNew, config, custom } = data;
   const meta = parseMeta(code);
-  if (!meta.name) throw i18n('msgInvalidScript');
+  if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
   const result = {
     cmd: 'UpdateScript',
     data: {
