@@ -420,8 +420,10 @@ export function checkRemove() {
   const toRemove = store.scripts.filter(script => script.config.removed);
   if (toRemove.length) {
     store.scripts = store.scripts.filter(script => !script.config.removed);
-    storage.script.removeMulti(toRemove);
-    storage.code.removeMulti(toRemove);
+    const ids = toRemove.map(script => script.props.id);
+    storage.script.removeMulti(ids);
+    storage.code.removeMulti(ids);
+    storage.value.removeMulti(ids);
   }
   return Promise.resolve(toRemove.length);
 }
