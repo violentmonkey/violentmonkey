@@ -323,20 +323,20 @@ export const BaseService = serviceFactory({
         return info;
       }, {});
       localData.forEach(item => {
-        const { props: { uri, position }, custom: { modified } } = item;
+        const { props: { uri, position, lastModified } } = item;
         const remoteInfo = remoteMeta.info[uri];
         if (remoteInfo) {
-          if (firstSync || !modified || remoteInfo.modified > modified) {
+          if (firstSync || !lastModified || remoteInfo.modified > lastModified) {
             const remoteItem = remoteItemMap[uri];
             getRemote.push(remoteItem);
-          } else if (remoteInfo.modified < modified) {
+          } else if (remoteInfo.modified < lastModified) {
             putRemote.push(item);
           } else if (remoteInfo.position !== position) {
             remoteInfo.position = position;
             remoteChanged = true;
           }
           delete remoteItemMap[uri];
-        } else if (firstSync || !outdated || modified > remoteTimestamp) {
+        } else if (firstSync || !outdated || lastModified > remoteTimestamp) {
           putRemote.push(item);
         } else {
           delLocal.push(item);
@@ -408,7 +408,7 @@ export const BaseService = serviceFactory({
               },
             };
             remoteMeta.info[script.props.uri] = {
-              modified: script.custom.modified,
+              modified: script.props.lastModified,
               position: script.props.position,
             };
             remoteChanged = true;
