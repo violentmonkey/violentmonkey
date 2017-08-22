@@ -104,6 +104,19 @@ export function debounce(func, time) {
   };
 }
 
+export function throttle(func, time) {
+  let timer;
+  function run(thisObj, args) {
+    timer = null;
+    func.apply(thisObj, args);
+  }
+  return function throttledFunction(...args) {
+    if (!timer) {
+      timer = setTimeout(run, time, this, args);
+    }
+  };
+}
+
 export function noop() {}
 
 export function zfill(input, length) {

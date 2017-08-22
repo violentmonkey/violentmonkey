@@ -1,4 +1,4 @@
-import { getUniqId, bindEvents, Promise, attachFunction, console } from '../utils';
+import { getUniqId, bindEvents, Promise, attachFunction, console, throttle } from '../utils';
 import { includes, forEach, map, utf8decode } from './helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
@@ -154,6 +154,7 @@ function wrapGM(script, metaStr, cache) {
     o: val => JSON.parse(val),
     '': val => val,
   };
+  const throttledSaveValues = throttle(saveValues, 200);
   const gmFunctions = {
     unsafeWindow: { value: window },
     GM_info: {
@@ -186,7 +187,7 @@ function wrapGM(script, metaStr, cache) {
       value(key) {
         const value = getValues();
         delete value[key];
-        saveValues();
+        throttledSaveValues();
       },
     },
     GM_getValue: {
@@ -219,7 +220,7 @@ function wrapGM(script, metaStr, cache) {
         const raw = type + handle(val);
         const value = getValues();
         value[key] = raw;
-        saveValues();
+        throttledSaveValues();
       },
     },
     GM_getResourceText: {
