@@ -432,6 +432,7 @@ export function removeScript(id) {
     store.scripts.splice(i, 1);
     storage.script.remove(id);
     storage.code.remove(id);
+    storage.value.remove(id);
   }
   return browser.runtime.sendMessage({
     cmd: 'RemoveScript',
