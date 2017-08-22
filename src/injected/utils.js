@@ -58,7 +58,7 @@ export function bindEvents(srcId, destId, handle) {
 export function attachFunction(id, cb) {
   Object.defineProperty(window, id, {
     value(...args) {
-      cb(...args);
+      cb.apply(this, args);
       delete window[id];
     },
     configurable: true,
