@@ -553,7 +553,9 @@ export function parseScript(data) {
       result.cmd = 'AddScript';
       result.data.update.message = i18n('msgInstalled');
     }
-    script.config = Object.assign({}, script.config, config);
+    script.config = Object.assign({}, script.config, config, {
+      removed: 0, // force reset `removed` since this is an installation
+    });
     script.custom = Object.assign({}, script.custom, custom);
     script.meta = meta;
     if (!meta.homepageURL && !script.custom.homepageURL && isRemote(data.from)) {
