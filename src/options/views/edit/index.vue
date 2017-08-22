@@ -160,8 +160,9 @@ export default {
           message: '',
         },
       })
-      .then(() => {
+      .then(res => {
         this.canSave = false;
+        if (object.get(res, 'where.id')) this.script = res.update;
       }, err => {
         showMessage({ text: err });
       });

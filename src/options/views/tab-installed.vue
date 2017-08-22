@@ -148,9 +148,6 @@ export default {
         this.store.scripts = seq.concat.apply([], seq);
       });
     },
-    onScriptUpdated(script) {
-      this.script = script;
-    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 200);
