@@ -223,6 +223,7 @@ export function getFullUrl(url, base) {
     'https:',
     'ftp:',
     'data:',
+    'blob:',
   ].includes(obj.protocol)) obj.protocol = 'http:';
   return obj.href;
 }
