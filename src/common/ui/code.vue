@@ -50,7 +50,7 @@ import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import CodeMirror from 'codemirror';
-import { Code as VlCode } from 'vueleton';
+import VlCode from 'vueleton/lib/code';
 import { debounce } from 'src/common';
 import Tooltip from './tooltip';
 

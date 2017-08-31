@@ -52,8 +52,8 @@ export default {
   &-appear,
   &-enter,
   &-leave-active {
-    .vl-modal-content {
-      transform: translateY(-150%);
+    .vl-modal-content > * {
+      transform: translateY(-120%);
     }
     .vl-modal-backdrop {
       opacity: 0;
@@ -63,7 +63,7 @@ export default {
   &-enter-active,
   &-leave-active {
     &,
-    .vl-modal-content {
+    .vl-modal-content > * {
       transition: transform .5s;
     }
     .vl-modal-backdrop {

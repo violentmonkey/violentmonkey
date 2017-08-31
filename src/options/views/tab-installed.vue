@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { Dropdown as VlDropdown } from 'vueleton';
+import VlDropdown from 'vueleton/lib/dropdown';
 import { i18n, sendMessage, noop, debounce } from 'src/common';
 import Icon from 'src/common/ui/icon';
 import Tooltip from 'src/common/ui/tooltip';

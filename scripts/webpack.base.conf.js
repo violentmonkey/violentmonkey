@@ -53,10 +53,6 @@ module.exports = {
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test')]
       },
-      {
-        test: /\.esm\.js$/,
-        loader: 'babel-loader',
-      },
       styleRule({
         fallback: 'vue-style-loader',
         loaders: ['postcss-loader'],

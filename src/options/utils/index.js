@@ -1,4 +1,4 @@
-import { Modal } from 'vueleton';
+import Modal from 'vueleton/lib/modal';
 import Message from '../views/message';
 
 export const store = {};

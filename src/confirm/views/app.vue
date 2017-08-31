@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { Dropdown as VlDropdown } from 'vueleton';
+import VlDropdown from 'vueleton/lib/dropdown';
 import { sendMessage, zfill, request, buffer2string, isRemote, getFullUrl } from 'src/common';
 import options from 'src/common/options';
 import initCache from 'src/common/cache';
