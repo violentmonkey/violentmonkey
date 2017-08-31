@@ -186,10 +186,13 @@ const commands = {
     });
   },
   SetClipboard: setClipboard,
-  TabOpen(data) {
+  TabOpen(data, src) {
+    const srcTab = src.tab || {};
     return browser.tabs.create({
       url: data.url,
       active: data.active,
+      windowId: srcTab.windowId,
+      index: srcTab.index + 1,
     })
     .then(tab => ({ id: tab.id }));
   },
