@@ -84,7 +84,7 @@ function onLoadScripts(data) {
           || script.meta.runAt || script.meta['run-at'];
         const list = listMap[runAt] || end;
         list.push(script);
-        store.values[script.props.id] = data.values[script.props.id] || {};
+        store.values[script.props.id] = data.values[script.props.id];
       }
     });
     run(start);

@@ -182,11 +182,11 @@ const storage = {
       const key = this.getKey(id);
       return browser.storage.local.get(key).then(data => data[key]);
     },
-    getMulti(ids) {
+    getMulti(ids, def) {
       return browser.storage.local.get(ids.map(id => this.getKey(id)))
       .then(data => {
         const result = {};
-        ids.forEach(id => { result[id] = data[this.getKey(id)]; });
+        ids.forEach(id => { result[id] = data[this.getKey(id)] || def; });
         return result;
       });
     },
@@ -369,7 +369,7 @@ export function getScriptsByURL(url) {
   const reqKeys = {};
   const cacheKeys = {};
   scripts.forEach(script => {
-    if (object.get(script, 'config.enabled')) {
+    if (script.config.enabled) {
       script.meta.require.forEach(key => {
         reqKeys[key] = 1;
       });
@@ -378,14 +378,24 @@ export function getScriptsByURL(url) {
       });
     }
   });
-  const enabledScriptIds = scripts
-  .filter(script => script.config.enabled)
-  .map(script => script.props.id);
+  const enabledScripts = scripts
+  .filter(script => script.config.enabled);
+  const gmValues = [
+    'GM_getValue',
+    'GM_setValue',
+    'GM_listValues',
+    'GM_deleteValue',
+  ];
+  const scriptsWithValue = enabledScripts
+  .filter(script => {
+    const grant = object.get(script, 'meta.grant');
+    return grant && grant.some(gm => gmValues.includes(gm));
+  });
   return Promise.all([
     storage.require.getMulti(Object.keys(reqKeys)),
     storage.cache.getMulti(Object.keys(cacheKeys)),
-    storage.value.getMulti(enabledScriptIds),
-    storage.code.getMulti(enabledScriptIds),
+    storage.value.getMulti(scriptsWithValue.map(script => script.props.id), {}),
+    storage.code.getMulti(enabledScripts.map(script => script.props.id)),
   ])
   .then(([require, cache, values, code]) => ({
     scripts,
