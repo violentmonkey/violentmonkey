@@ -36,7 +36,7 @@ const handlers = {
   HttpRequested: onRequestCallback,
   TabClosed: onTabClosed,
   UpdateValues({ id, values }) {
-    if (values[id]) values[id] = values;
+    if (store.values[id]) store.values[id] = values;
   },
   NotificationClicked: onNotificationClicked,
   NotificationClosed: onNotificationClosed,
@@ -154,7 +154,7 @@ function wrapGM(script, metaStr, cache) {
     o: val => JSON.parse(val),
     '': val => val,
   };
-  const throttledSaveValues = throttle(saveValues, 200);
+  const throttledDumpValues = throttle(dumpValues, 200);
   const gmFunctions = {
     unsafeWindow: { value: window },
     GM_info: {
@@ -185,14 +185,14 @@ function wrapGM(script, metaStr, cache) {
     },
     GM_deleteValue: {
       value(key) {
-        const value = getValues();
+        const value = loadValues();
         delete value[key];
-        throttledSaveValues();
+        throttledDumpValues();
       },
     },
     GM_getValue: {
       value(key, def) {
-        const value = getValues();
+        const value = loadValues();
         const raw = value[key];
         if (raw) {
           const type = raw[0];
@@ -210,7 +210,7 @@ function wrapGM(script, metaStr, cache) {
     },
     GM_listValues: {
       value() {
-        return Object.keys(getValues());
+        return Object.keys(loadValues());
       },
     },
     GM_setValue: {
@@ -218,9 +218,9 @@ function wrapGM(script, metaStr, cache) {
         const type = (typeof val)[0];
         const handle = dataEncoders[type] || dataEncoders[''];
         const raw = type + handle(val);
-        const value = getValues();
+        const value = loadValues();
         value[key] = raw;
-        throttledSaveValues();
+        throttledDumpValues();
       },
     },
     GM_getResourceText: {
@@ -314,7 +314,7 @@ function wrapGM(script, metaStr, cache) {
     if (prop) addProperty(name, prop, gm);
   });
   return gm;
-  function getValues() {
+  function loadValues() {
     return store.values[script.props.id];
   }
   function propertyToString() {
@@ -326,12 +326,12 @@ function wrapGM(script, metaStr, cache) {
     Object.defineProperty(obj, name, prop);
     if (typeof obj[name] === 'function') obj[name].toString = propertyToString;
   }
-  function saveValues() {
+  function dumpValues() {
     bridge.post({
       cmd: 'SetValue',
       data: {
         where: { id: script.props.id },
-        values: getValues(),
+        values: loadValues(),
       },
     });
   }
