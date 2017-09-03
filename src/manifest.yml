@@ -1,0 +1,40 @@
+name: __MSG_extName__
+version: __VERSION__
+manifest_version: 2
+description: __MSG_extDescription__
+author: Gerald
+homepage_url: 'https://violentmonkey.github.io/'
+icons:
+  '16': public/images/icon16.png
+  '48': public/images/icon48.png
+  '128': public/images/icon128.png
+default_locale: en
+browser_action:
+  default_icon:
+    '19': public/images/icon19.png
+    '38': public/images/icon38.png
+  default_title: __MSG_extName__
+  default_popup: popup/index.html
+background:
+  page: background/index.html
+options_page: options/index.html
+options_ui:
+  page: options/index.html
+  open_in_tab: true
+content_scripts:
+  - js:
+      - browser.js
+      - injected-web.js
+      - injected.js
+    matches:
+      - <all_urls>
+    run_at: document_start
+    all_frames: true
+permissions:
+  - tabs
+  - <all_urls>
+  - webRequest
+  - webRequestBlocking
+  - notifications
+  - storage
+  - unlimitedStorage

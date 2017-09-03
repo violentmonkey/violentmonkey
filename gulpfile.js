@@ -4,15 +4,16 @@ const gutil = require('gulp-util');
 const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const svgSprite = require('gulp-svg-sprite');
+const yaml = require('js-yaml');
 const webpack = require('webpack');
 const webpackConfig = require('./scripts/webpack.conf');
 const i18n = require('./scripts/i18n');
-const json = require('./scripts/json');
+const string = require('./scripts/string');
 const { IS_DEV } = require('./scripts/utils');
 const pkg = require('./package.json');
 
 const paths = {
-  manifest: 'src/manifest.json',
+  manifest: 'src/manifest.yml',
   copy: [
     'src/public/images/**',
     'src/public/lib/**',
@@ -69,9 +70,12 @@ gulp.task('js-prd', cb => {
 
 gulp.task('manifest', () => (
   gulp.src(paths.manifest, { base: 'src' })
-  .pipe(json(data => {
+  .pipe(string((input, file) => {
+    const data = yaml.safeLoad(input);
+    // Strip alphabetic suffix
     data.version = pkg.version.replace(/-[^.]*/, '');
-    return data;
+    file.path = file.path.replace(/\.yml$/, '.json');
+    return JSON.stringify(data);
   }))
   .pipe(gulp.dest('dist'))
 ));
