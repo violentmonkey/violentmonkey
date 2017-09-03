@@ -38,3 +38,8 @@ permissions:
   - notifications
   - storage
   - unlimitedStorage
+
+applications:
+  gecko:
+    id: '{aecec67f-0d10-4fa7-b7c7-609a2db280cf}'
+    update_url: https://violentmonkey.top/updates.json
