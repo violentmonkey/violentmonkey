@@ -68,7 +68,7 @@ msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: Skriptdaten geladen
+  message: Skriptdaten geladen.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
   message: Fehler beim Laden der Abhängigkeiten.
@@ -148,7 +148,7 @@ labelAuthor:
   message: 'Autor: '
 anchorAuthor:
   description: Author shown on about tab.
-  message: '<a href=mailto:i@gerald.top>Gerald</a>'
+  message: ''
 labelTranslator:
   description: Label of translator.
   message: 'Übersetzer: '
@@ -192,7 +192,7 @@ labelExclude:
   message: Ausschließen (@exclude)
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match Regel'
+  message: '@exclude-match Regeln'
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Aktualisierung erlauben
@@ -244,7 +244,7 @@ hintVacuum:
   message: Redundanzen verwerfen und fehlende Ressourcen aus dem Cache neu laden.
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Finde Skripte für diese Seite
+  message: Skripte für diese Seite finden
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
   message: Skripte aktiviert
@@ -306,7 +306,7 @@ msgInvalidScript:
   message: Ungültiges Skript!
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: Zeige Anzahl der angewandten Skripte auf dem Addon-Symbol.
+  message: Zeige Anzahl der angewandten Skripte auf dem Addon-Symbol
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Zeile Nr.:'
@@ -327,13 +327,13 @@ labelGeneral:
   message: Allgemein
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Sync Skript-Status
+  message: Skript-Status Sync
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Keines
 labelSyncService:
   description: Label for sync service select.
-  message: Sync zu
+  message: Sync mit
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Autorisieren
@@ -404,7 +404,7 @@ installFrom:
   message: Installiere aus $1
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Suche Skripte...
+  message: Skripte durchsuchen...
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Kein Skript gefunden.
