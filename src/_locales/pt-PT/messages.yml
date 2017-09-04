@@ -19,7 +19,7 @@ Warning:
   touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
-  message: 'O script [$1] não tem linhas `@grant`! Clique para ver mais detalhes.'
+  message: 'O script [$1] nÃ£o tem linhas `@grant`! Clique para ver mais detalhes.'
   touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
@@ -31,31 +31,31 @@ msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Nova versão encontrada.
+  message: Nova versÃ£o encontrada.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Procurar por atualizações...
+  message: Procurar por atualizaÃ§Ãµes...
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Falha ao obter atualização de atualização.
+  message: Falha ao obter informaÃ§Ã£o de atualizaÃ§Ã£o.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Nenhuma atualização encontrada.
+  message: Nenhuma atualizaÃ§Ã£o encontrada.
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: A instalar script
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
-  message: Opções
+  message: OpÃ§Ãµes
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Fechar depois da instalação
+  message: Fechar depois da instalaÃ§Ã£o
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Track local file before this window is closed
+  message: Rastrear ficheiro local antes desta janela fechar
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: Confirmar instalação
+  message: Confirmar instalaÃ§Ã£o
 buttonClose:
   description: Button to close window.
   message: Fechar
@@ -71,10 +71,10 @@ msgLoadedData:
   message: Dados do script instalados.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: Erro ao carregar dependências.
+  message: Erro ao carregar dependÃªncias.
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: A carregar dependências... ($1/$2)
+  message: A carregar dependÃªncias... ($1/$2)
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: A carregar dados do script...
@@ -83,7 +83,7 @@ sideMenuInstalled:
   message: Scripts instalados
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Definições
+  message: DefiniÃ§Ãµes
 sideMenuAbout:
   description: 'Side menu: About'
   message: Acerca
@@ -92,7 +92,7 @@ buttonNew:
   message: Novo
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Procurar todos por atualizações
+  message: Procurar todos por atualizaÃ§Ãµes
 anchorGetMoreScripts:
   description: Link to get more scripts.
   message: Obter mais scripts
@@ -102,17 +102,17 @@ msgLoading:
   message: A carregar ...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Definições
+  message: DefiniÃ§Ãµes
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Procurar por atualizações automaticamente todos os dias
+  message: Procurar por atualizaÃ§Ãµes automaticamente todos os dias
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
   message: Suprimir avisos sem @grant
   touched: false
 labelDataImport:
   description: Section title of data import.
-  message: Importação dados
+  message: ImportaÃ§Ã£o dados
 buttonImportData:
   description: Button to choose a file for data import.
   message: Importar a partir de zip
@@ -121,7 +121,7 @@ buttonVacuum:
   message: Aspirar base de dados
 labelDataExport:
   description: Section title of data export.
-  message: Exportação de dados
+  message: ExportaÃ§Ã£o de dados
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportar dados de scripts
@@ -136,7 +136,7 @@ labelAbout:
   message: Acerca do Violentmonkey
 labelRelated:
   description: Label of related links.
-  message: 'Ligações relacionadas: '
+  message: 'LigaÃ§Ãµes relacionadas: '
 labelDonate:
   description: Label of link to donate page.
   message: Doar
@@ -169,13 +169,13 @@ labelRunAt:
   message: 'Run-At:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Predefinição)
+  message: (PredefiniÃ§Ã£o)
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'URL da página inicial:'
+  message: 'URL da pÃ¡gina inicial:'
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'URL de atualização:'
+  message: 'URL de atualizaÃ§Ã£o:'
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'URL de descarga:'
@@ -202,7 +202,7 @@ buttonSaveClose:
   message: Guardar e fechar
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'Oops, não tem nenhum script ainda.'
+  message: 'Oops, nÃ£o tem nenhum script ainda.'
 buttonDisable:
   description: Button to disable a script.
   message: Desativar
@@ -217,7 +217,7 @@ buttonRemove:
   message: Remover
 buttonUpdate:
   description: Check a script for updates.
-  message: Procurar por atualizações
+  message: Procurar por atualizaÃ§Ãµes
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
@@ -229,7 +229,7 @@ hintUseDownloadURL:
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    As modificações não foram guardadas!
+    As modificaÃ§Ãµes nÃ£o foram guardadas!
     Clique OK para as descartar ou cancelar para ficar.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
@@ -239,7 +239,7 @@ buttonVacuumed:
   message: Dados aspirados
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Descartar a redundância e tentar recarregar os recursos em falta em cache.
+  message: Descartar a redundÃ¢ncia e tentar recarregar os recursos em falta em cache.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Encontrar scripts para este site
@@ -266,19 +266,19 @@ buttonReplaceAll:
   message: Tudo
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Recarregar separador atual após ligar/desligar um script a partir do menu
+  message: Recarregar separador atual apÃ³s ligar/desligar um script a partir do menu
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'URL de entrada:'
+  message: 'Introduza o URL:'
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
   message: Instalar a partir de URL
 labelSync:
   description: Label for sync options.
-  message: Sincronização
+  message: SincronizaÃ§Ã£o
 lastSync:
   description: Label for last sync timestamp.
-  message: Última sincronização em $1
+  message: Ãšltima sincronizaÃ§Ã£o em $1
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: A inicializar...
@@ -287,10 +287,10 @@ msgSyncInitError:
   message: Erro ao inicializar!
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: A sincronização irá começar brevemente...
+  message: A sincronizaÃ§Ã£o irÃ¡ comeÃ§ar brevemente...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Sincronização em progresso...
+  message: SincronizaÃ§Ã£o em progresso...
 msgSyncError:
   description: Message shown when sync failed.
   message: Erro ao sincronizar!
@@ -301,19 +301,19 @@ msgNamespaceConflict:
   message: Conflitos de namespace do script! Por favor modifique @name e @namespace.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Script inválido!
+  message: Script invÃ¡lido!
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: Mostrar número de scripts executados no emblema
+  message: Mostrar nÃºmero de scripts executados no emblema
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Linha núm.: '
+  message: 'Linha nÃºm.: '
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Lista negra
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: Os URLs correspondidos nesta lista não serão injetados por scripts.
+  message: Os URLs correspondidos nesta lista nÃ£o serÃ£o injetados por scripts.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: Guardar
@@ -343,15 +343,15 @@ labelSyncAuthorizing:
   message: A autorizar
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: O estilo personalizado está atualizado.
+  message: O estilo personalizado estÃ¡ atualizado.
 labelCustomCSS:
   description: Label for custom CSS section.
   message: Estilo personalizado
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS personalizado para a página de opções e de instalação de script. Se não tem
-    a certeza para que isto é, por favor não edite.
+    CSS personalizado para a pÃ¡gina de opÃ§Ãµes e de instalaÃ§Ã£o de script. Se nÃ£o tem
+    a certeza para que isto Ã©, por favor nÃ£o edite.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Guardar
@@ -369,19 +369,19 @@ buttonCancel:
   message: Cancelar
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Importar definições
+  message: Importar definiÃ§Ãµes
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Saber mais acerca de padrões de lista negra.
+  message: Saber mais acerca de padrÃµes de lista negra.
 editNavCode:
   description: Label of code tab in script editor.
-  message: Código
+  message: CÃ³digo
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: Definições
+  message: DefiniÃ§Ãµes
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Definições do script
+  message: DefiniÃ§Ãµes do script
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadados personalizados
@@ -390,13 +390,13 @@ labelKeepOriginal:
   message: Manter original
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: Atualização
+  message: AtualizaÃ§Ã£o
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'O script [$1] está atualizado!'
+  message: 'O script [$1] estÃ¡ atualizado!'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Notificar atualizações de scripts
+  message: Notificar atualizaÃ§Ãµes de scripts
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Instalar a partir de $1
@@ -408,10 +408,10 @@ labelNoSearchScripts:
   message: Nenhum script foi encontrado.
 buttonHome:
   description: Button to open homepage.
-  message: Página inicial
+  message: PÃ¡gina inicial
 buttonSupport:
   description: Button to open support page.
-  message: Página de apoio
+  message: PÃ¡gina de apoio
 buttonUndo:
   description: Button to undo removement of a script.
   message: Desfazer
