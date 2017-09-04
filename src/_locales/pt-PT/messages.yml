@@ -112,7 +112,7 @@ labelIgnoreGrant:
   touched: false
 labelDataImport:
   description: Section title of data import.
-  message: Importação dados
+  message: Importação de dados
 buttonImportData:
   description: Button to choose a file for data import.
   message: Importar a partir de zip
