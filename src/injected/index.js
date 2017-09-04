@@ -10,10 +10,17 @@ import initialize from './content';
   function initBridge() {
     const contentId = getUniqId();
     const webId = getUniqId();
+    const props = {};
+    [
+      Object.getOwnPropertyNames(window),
+      typeof global !== 'undefined' && Object.getOwnPropertyNames(global),
+    ].forEach(keys => {
+      keys.forEach(key => { props[key] = 1; });
+    });
     const args = [
       JSON.stringify(webId),
       JSON.stringify(contentId),
-      JSON.stringify(Object.getOwnPropertyNames(window)),
+      JSON.stringify(Object.keys(props)),
     ];
     inject(`(${window.VM_initializeWeb.toString()}())(${args.join(',')})`);
     initialize(contentId, webId);
