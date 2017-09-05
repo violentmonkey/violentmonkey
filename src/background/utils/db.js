@@ -370,11 +370,12 @@ export function getScriptsByURL(url) {
   const cacheKeys = {};
   scripts.forEach(script => {
     if (script.config.enabled) {
+      const base = object.get(script, 'custom.lastInstallURL');
       script.meta.require.forEach(key => {
-        reqKeys[key] = 1;
+        reqKeys[getFullUrl(key, base)] = 1;
       });
       Object.keys(script.meta.resources).forEach(key => {
-        cacheKeys[script.meta.resources[key]] = 1;
+        cacheKeys[getFullUrl(script.meta.resources[key], base)] = 1;
       });
     }
   });

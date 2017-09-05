@@ -1,4 +1,4 @@
-import { getUniqId, bindEvents, Promise, attachFunction, console, throttle } from '../utils';
+import { getUniqId, bindEvents, Promise, attachFunction, console, throttle, getFullUrl } from '../utils';
 import { includes, forEach, map, utf8decode } from './helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
@@ -92,16 +92,15 @@ function onLoadScripts(data) {
   bridge.checkLoad();
   function buildCode(script) {
     const requireKeys = script.meta.require || [];
+    const base = script.custom.lastInstallURL;
     const code = data.code[script.props.id] || '';
-    const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
-    const metaStr = matches ? matches[1] : '';
-    const wrapper = wrapGM(script, metaStr, data.cache);
+    const wrapper = wrapGM(script, code, data.cache);
     // Must use Object.getOwnPropertyNames to list unenumerable properties
     const argNames = Object.getOwnPropertyNames(wrapper);
     const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
     const codeSlices = [`${wrapperInit};with(this)!function(){`];
     forEach(requireKeys, key => {
-      const requireCode = data.require[key];
+      const requireCode = data.require[getFullUrl(key, base)];
       if (requireCode) {
         codeSlices.push(requireCode);
         // Add `;` to a new line in case script ends with comment lines
@@ -128,7 +127,7 @@ function onLoadScripts(data) {
   }
 }
 
-function wrapGM(script, metaStr, cache) {
+function wrapGM(script, code, cache) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const gm = {};
@@ -154,7 +153,10 @@ function wrapGM(script, metaStr, cache) {
     o: val => JSON.parse(val),
     '': val => val,
   };
+  const base = script.custom.lastInstallURL;
   const throttledDumpValues = throttle(dumpValues, 200);
+  const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
+  const metaStr = matches ? matches[1] : '';
   const gmFunctions = {
     unsafeWindow: { value: window },
     GM_info: {
@@ -226,8 +228,8 @@ function wrapGM(script, metaStr, cache) {
     GM_getResourceText: {
       value(name) {
         if (name in resources) {
-          const uri = resources[name];
-          const raw = cache[uri];
+          const key = resources[name];
+          const raw = cache[getFullUrl(key, base)];
           const text = raw && utf8decode(window.atob(raw));
           return text;
         }
@@ -239,7 +241,7 @@ function wrapGM(script, metaStr, cache) {
           const key = resources[name];
           let blobUrl = urls[key];
           if (!blobUrl) {
-            const raw = cache[key];
+            const raw = cache[getFullUrl(key, base)];
             if (raw) {
               // Binary string is not supported by blob constructor,
               // so we have to transform it into array buffer.
