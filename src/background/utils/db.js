@@ -380,16 +380,16 @@ export function getScriptsByURL(url) {
   });
   const enabledScripts = scripts
   .filter(script => script.config.enabled);
-  const gmValues = [
-    'GM_getValue',
-    'GM_setValue',
-    'GM_listValues',
-    'GM_deleteValue',
-  ];
+  const gmValues = {
+    GM_getValue: 1,
+    GM_setValue: 1,
+    GM_listValues: 1,
+    GM_deleteValue: 1,
+  };
   const scriptsWithValue = enabledScripts
   .filter(script => {
     const grant = object.get(script, 'meta.grant');
-    return grant && grant.some(gm => gmValues.includes(gm));
+    return grant && grant.some(gm => gmValues[gm]);
   });
   return Promise.all([
     storage.require.getMulti(Object.keys(reqKeys)),
