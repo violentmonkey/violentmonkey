@@ -1,4 +1,5 @@
-import { i18n, request, buffer2string, getFullUrl, object } from 'src/common';
+import { i18n, request, buffer2string, getFullUrl } from 'src/common';
+import { objectGet, objectSet } from 'src/common/object';
 import { getNameURI, isRemote, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
 import { register } from './init';
@@ -274,12 +275,12 @@ function initialize() {
         //   config: { enabled, shouldUpdate },
         // }
         scripts.push(value);
-        storeInfo.id = Math.max(storeInfo.id, getInt(object.get(value, 'props.id')));
-        storeInfo.position = Math.max(storeInfo.position, getInt(object.get(value, 'props.position')));
+        storeInfo.id = Math.max(storeInfo.id, getInt(objectGet(value, 'props.id')));
+        storeInfo.position = Math.max(storeInfo.position, getInt(objectGet(value, 'props.position')));
       }
     });
     scripts.sort((a, b) => {
-      const [pos1, pos2] = [a, b].map(item => getInt(object.get(item, 'props.position')));
+      const [pos1, pos2] = [a, b].map(item => getInt(objectGet(item, 'props.position')));
       return Math.sign(pos1 - pos2);
     });
     Object.assign(store, {
@@ -305,8 +306,8 @@ export function normalizePosition() {
   const updates = [];
   store.scripts.forEach((item, index) => {
     const position = index + 1;
-    if (object.get(item, 'props.position') !== position) {
-      object.set(item, 'props.position', position);
+    if (objectGet(item, 'props.position') !== position) {
+      objectSet(item, 'props.position', position);
       updates.push(item);
     }
     // XXX patch v2.8.0
@@ -331,7 +332,7 @@ export function getScript(where) {
     script = store.scriptMap[where.id];
   } else {
     const uri = where.uri || getNameURI({ meta: where.meta, id: '@@should-have-name' });
-    const predicate = item => uri === object.get(item, 'props.uri');
+    const predicate = item => uri === objectGet(item, 'props.uri');
     script = store.scripts.find(predicate);
   }
   return Promise.resolve(script);
@@ -353,7 +354,7 @@ export function getScriptCode(id) {
 export function setValues(where, values) {
   return (where.id
     ? Promise.resolve(where.id)
-    : getScript(where).then(script => object.get(script, 'props.id')))
+    : getScript(where).then(script => objectGet(script, 'props.id')))
   .then(id => {
     if (id) return storage.value.dump(id, values).then(() => ({ id, values }));
   });
@@ -390,7 +391,7 @@ export function getScriptsByURL(url) {
   };
   const scriptsWithValue = enabledScripts
   .filter(script => {
-    const grant = object.get(script, 'meta.grant');
+    const grant = objectGet(script, 'meta.grant');
     return grant && grant.some(gm => gmValues[gm]);
   });
   return Promise.all([
@@ -415,7 +416,7 @@ export function getData() {
   const cacheKeys = {};
   const { scripts } = store;
   scripts.forEach(script => {
-    const icon = object.get(script, 'meta.icon');
+    const icon = objectGet(script, 'meta.icon');
     if (isRemote(icon)) cacheKeys[icon] = 1;
   });
   return storage.cache.getMulti(Object.keys(cacheKeys))
@@ -441,7 +442,7 @@ export function checkRemove() {
 }
 
 export function removeScript(id) {
-  const i = store.scripts.findIndex(item => id === object.get(item, 'props.id'));
+  const i = store.scripts.findIndex(item => id === objectGet(item, 'props.id'));
   if (i >= 0) {
     store.scripts.splice(i, 1);
     storage.script.remove(id);
@@ -455,7 +456,7 @@ export function removeScript(id) {
 }
 
 export function moveScript(id, offset) {
-  const index = store.scripts.findIndex(item => id === object.get(item, 'props.id'));
+  const index = store.scripts.findIndex(item => id === objectGet(item, 'props.id'));
   const step = offset > 0 ? 1 : -1;
   const indexStart = index;
   const indexEnd = index + offset;
@@ -576,9 +577,9 @@ export function parseScript(data) {
       script.custom.homepageURL = data.from;
     }
     if (isRemote(data.url)) script.custom.lastInstallURL = data.url;
-    object.set(script, 'props.lastModified', data.modified || Date.now());
+    objectSet(script, 'props.lastModified', data.modified || Date.now());
     const position = +data.position;
-    if (position) object.set(script, 'props.position', position);
+    if (position) objectSet(script, 'props.position', position);
     buildPathMap(script);
     return saveScript(script, code).then(() => script);
   })
@@ -613,7 +614,7 @@ function fetchScriptResources(script, cache) {
   // @require
   meta.require.forEach(key => {
     const fullUrl = pathMap[key] || key;
-    const cached = object.get(cache, ['require', fullUrl]);
+    const cached = objectGet(cache, ['require', fullUrl]);
     if (cached) {
       storage.require.dump(fullUrl, cached);
     } else {
@@ -623,7 +624,7 @@ function fetchScriptResources(script, cache) {
   // @resource
   Object.values(meta.resources).forEach(url => {
     const fullUrl = pathMap[url] || url;
-    const cached = object.get(cache, ['resources', fullUrl]);
+    const cached = objectGet(cache, ['resources', fullUrl]);
     if (cached) {
       storage.cache.dump(fullUrl, cached);
     } else {

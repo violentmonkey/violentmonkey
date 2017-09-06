@@ -1,6 +1,7 @@
 import 'src/common/polyfills';
 import 'src/common/browser';
-import { i18n, defaultImage, object } from 'src/common';
+import { i18n, defaultImage } from 'src/common';
+import { objectGet } from 'src/common/object';
 import * as sync from './sync';
 import {
   cache,
@@ -41,7 +42,7 @@ function checkUpdateAll() {
   setOption('lastUpdate', Date.now());
   getScripts()
   .then(scripts => {
-    const toUpdate = scripts.filter(item => object.get(item, 'config.shouldUpdate'));
+    const toUpdate = scripts.filter(item => objectGet(item, 'config.shouldUpdate'));
     return Promise.all(toUpdate.map(checkUpdate));
   })
   .then(updatedList => {

@@ -9,56 +9,6 @@ export function normalizeKeys(key) {
   return keys;
 }
 
-export const object = {
-  get(obj, rawKey, def) {
-    const keys = normalizeKeys(rawKey);
-    let res = obj;
-    keys.some((key) => {
-      if (res && typeof res === 'object' && (key in res)) {
-        res = res[key];
-      } else {
-        res = def;
-        return true;
-      }
-    });
-    return res;
-  },
-  set(obj, rawKey, val) {
-    const keys = normalizeKeys(rawKey);
-    if (!keys.length) return val;
-    const root = obj || {};
-    let sub = root;
-    const lastKey = keys.pop();
-    keys.forEach((key) => {
-      let child = sub[key];
-      if (!child) {
-        child = {};
-        sub[key] = child;
-      }
-      sub = child;
-    });
-    if (typeof val === 'undefined') {
-      delete sub[lastKey];
-    } else {
-      sub[lastKey] = val;
-    }
-    return root;
-  },
-  purify(obj) {
-    // Remove keys with undefined values
-    if (Array.isArray(obj)) {
-      obj.forEach(object.purify);
-    } else if (obj && typeof obj === 'object') {
-      Object.keys(obj).forEach(key => {
-        const type = typeof obj[key];
-        if (type === 'undefined') delete obj[key];
-        else object.purify(obj[key]);
-      });
-    }
-    return obj;
-  },
-};
-
 export function initHooks() {
   const hooks = [];
 

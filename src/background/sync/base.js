@@ -1,4 +1,5 @@
-import { debounce, normalizeKeys, request, noop, object } from 'src/common';
+import { debounce, normalizeKeys, request, noop } from 'src/common';
+import { objectPurify } from 'src/common/object';
 import { getEventEmitter, getOption, setOption, hookOptions } from '../utils';
 import { getScripts, getScriptCode, parseScript, removeScript, normalizePosition } from '../utils/db';
 
@@ -366,7 +367,7 @@ export const BaseService = serviceFactory({
                 data.code = obj.code;
                 if (obj.more) {
                   data.custom = obj.more.custom;
-                  data.config = object.purify({
+                  data.config = objectPurify({
                     enabled: obj.more.enabled,
                     shouldUpdate: obj.more.update,
                   });

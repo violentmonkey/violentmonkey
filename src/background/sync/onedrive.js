@@ -1,5 +1,6 @@
 // Reference: https://dev.onedrive.com/README.htm
-import { object, noop } from 'src/common';
+import { noop } from 'src/common';
+import { objectGet } from 'src/common/object';
 import { dumpQuery } from '../utils';
 import { BaseService, isScriptFile, register, getURI } from './base';
 
@@ -36,7 +37,7 @@ const OneDrive = BaseService.extend({
       throw res;
     })
     .catch(res => {
-      if (res.status === 400 && object.get(res, ['data', 'error']) === 'invalid_grant') {
+      if (res.status === 400 && objectGet(res, ['data', 'error']) === 'invalid_grant') {
         return Promise.reject({
           type: 'unauthorized',
         });

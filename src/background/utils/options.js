@@ -1,4 +1,5 @@
-import { initHooks, debounce, normalizeKeys, object } from 'src/common';
+import { initHooks, debounce, normalizeKeys } from 'src/common';
+import { objectGet, objectSet } from 'src/common/object';
 import { register } from './init';
 
 const defaults = {
@@ -31,7 +32,7 @@ const init = browser.storage.local.get('options')
   if (process.env.DEBUG) {
     console.log('options:', options); // eslint-disable-line no-console
   }
-  if (!object.get(options, 'version')) {
+  if (!objectGet(options, 'version')) {
     // v2.8.0+ stores options in browser.storage.local
     // Upgrade from v2.7.x
     if (process.env.DEBUG) {
@@ -81,7 +82,7 @@ export function getOption(key, def) {
   let value = options[mainKey];
   if (value == null) value = defaults[mainKey];
   if (value == null) value = def;
-  return keys.length > 1 ? object.get(value, keys.slice(1), def) : value;
+  return keys.length > 1 ? objectGet(value, keys.slice(1), def) : value;
 }
 
 export function setOption(key, value) {
@@ -91,7 +92,7 @@ export function setOption(key, value) {
   const mainKey = keys[0];
   if (mainKey in defaults) {
     if (keys.length > 1) {
-      optionValue = object.set(getOption(mainKey), keys.slice(1), value);
+      optionValue = objectSet(getOption(mainKey), keys.slice(1), value);
     }
     options[mainKey] = optionValue;
     browser.storage.local.set({ options });

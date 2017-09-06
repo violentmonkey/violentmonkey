@@ -1,4 +1,5 @@
-import { initHooks, sendMessage, object, normalizeKeys } from '.';
+import { initHooks, sendMessage, normalizeKeys } from '.';
+import { objectGet, objectSet } from './object';
 
 let options = {};
 const hooks = initHooks();
@@ -10,7 +11,7 @@ const ready = sendMessage({ cmd: 'GetAllOptions' })
 
 function getOption(key, def) {
   const keys = normalizeKeys(key);
-  return object.get(options, keys, def);
+  return objectGet(options, keys, def);
 }
 
 function setOption(key, value) {
@@ -22,7 +23,7 @@ function setOption(key, value) {
 
 function updateOptions(data) {
   Object.keys(data).forEach((key) => {
-    object.set(options, key, data[key]);
+    objectSet(options, key, data[key]);
   });
   hooks.fire(data);
 }
