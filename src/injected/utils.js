@@ -1,4 +1,4 @@
-export { sendMessage, request, throttle, getFullUrl } from 'src/common';
+export { sendMessage, request, throttle } from 'src/common';
 export Promise from 'core-js/library/fn/promise';
 
 // cache native properties to avoid being overridden, see violentmonkey/violentmonkey#151

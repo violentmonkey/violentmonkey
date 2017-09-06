@@ -370,12 +370,13 @@ export function getScriptsByURL(url) {
   const cacheKeys = {};
   scripts.forEach(script => {
     if (script.config.enabled) {
-      const base = object.get(script, 'custom.lastInstallURL');
+      if (!script.custom.pathMap) buildPathMap(script);
+      const { pathMap } = script.custom;
       script.meta.require.forEach(key => {
-        reqKeys[getFullUrl(key, base)] = 1;
+        reqKeys[pathMap[key] || key] = 1;
       });
-      Object.keys(script.meta.resources).forEach(key => {
-        cacheKeys[getFullUrl(script.meta.resources[key], base)] = 1;
+      Object.values(script.meta.resources).forEach(key => {
+        cacheKeys[pathMap[key] || key] = 1;
       });
     }
   });
@@ -578,6 +579,7 @@ export function parseScript(data) {
     object.set(script, 'props.lastModified', data.modified || Date.now());
     const position = +data.position;
     if (position) object.set(script, 'props.position', position);
+    buildPathMap(script);
     return saveScript(script, code).then(() => script);
   })
   .then(script => {
@@ -588,12 +590,29 @@ export function parseScript(data) {
   });
 }
 
+function buildPathMap(script) {
+  const { meta } = script;
+  const base = script.custom.lastInstallURL;
+  const pathMap = {};
+  [
+    ...meta.require,
+    ...Object.values(meta.resources),
+    isRemote(meta.icon) && meta.icon,
+  ].forEach(key => {
+    if (key) {
+      const fullUrl = getFullUrl(key, base);
+      if (fullUrl !== key) pathMap[key] = fullUrl;
+    }
+  });
+  script.custom.pathMap = pathMap;
+  return pathMap;
+}
+
 function fetchScriptResources(script, cache) {
-  const base = object.get(script, 'custom.lastInstallURL');
-  const meta = script.meta;
+  const { meta, custom: { pathMap } } = script;
   // @require
-  meta.require.forEach(url => {
-    const fullUrl = getFullUrl(url, base);
+  meta.require.forEach(key => {
+    const fullUrl = pathMap[key] || key;
     const cached = object.get(cache, ['require', fullUrl]);
     if (cached) {
       storage.require.dump(fullUrl, cached);
@@ -602,9 +621,8 @@ function fetchScriptResources(script, cache) {
     }
   });
   // @resource
-  Object.keys(meta.resources).forEach(key => {
-    const url = meta.resources[key];
-    const fullUrl = getFullUrl(url, base);
+  Object.values(meta.resources).forEach(url => {
+    const fullUrl = pathMap[url] || url;
     const cached = object.get(cache, ['resources', fullUrl]);
     if (cached) {
       storage.cache.dump(fullUrl, cached);
@@ -614,7 +632,7 @@ function fetchScriptResources(script, cache) {
   });
   // @icon
   if (isRemote(meta.icon)) {
-    const fullUrl = getFullUrl(meta.icon, base);
+    const fullUrl = pathMap[meta.icon] || meta.icon;
     storage.cache.fetch(fullUrl, ({ blob: getBlob }) => new Promise((resolve, reject) => {
       const blob = getBlob({ type: 'image/png' });
       const url = URL.createObjectURL(blob);
@@ -664,19 +682,17 @@ export function vacuum() {
     const { id } = script.props;
     touch(codeKeys, id);
     touch(valueKeys, id);
-    const base = script.custom.lastInstallURL;
+    if (!script.custom.pathMap) buildPathMap(script);
+    const { pathMap } = script.custom;
     script.meta.require.forEach(url => {
-      const fullUrl = getFullUrl(url, base);
-      touch(requireKeys, fullUrl);
+      touch(requireKeys, pathMap[url] || url);
     });
-    Object.keys(script.meta.resources).forEach(key => {
-      const url = script.meta.resources[key];
-      const fullUrl = getFullUrl(url, base);
-      touch(cacheKeys, fullUrl);
+    Object.values(script.meta.resources).forEach(url => {
+      touch(cacheKeys, pathMap[url] || url);
     });
     const { icon } = script.meta;
     if (isRemote(icon)) {
-      const fullUrl = getFullUrl(icon, base);
+      const fullUrl = pathMap[icon] || icon;
       touch(cacheKeys, fullUrl);
     }
   });

@@ -1,4 +1,4 @@
-import { getUniqId, bindEvents, Promise, attachFunction, console, throttle, getFullUrl } from '../utils';
+import { getUniqId, bindEvents, Promise, attachFunction, console, throttle } from '../utils';
 import { includes, forEach, map, utf8decode } from './helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
@@ -92,7 +92,7 @@ function onLoadScripts(data) {
   bridge.checkLoad();
   function buildCode(script) {
     const requireKeys = script.meta.require || [];
-    const base = script.custom.lastInstallURL;
+    const pathMap = script.custom.pathMap || {};
     const code = data.code[script.props.id] || '';
     const wrapper = wrapGM(script, code, data.cache);
     // Must use Object.getOwnPropertyNames to list unenumerable properties
@@ -100,7 +100,7 @@ function onLoadScripts(data) {
     const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
     const codeSlices = [`${wrapperInit};with(this)!function(){`];
     forEach(requireKeys, key => {
-      const requireCode = data.require[getFullUrl(key, base)];
+      const requireCode = data.require[pathMap[key] || key];
       if (requireCode) {
         codeSlices.push(requireCode);
         // Add `;` to a new line in case script ends with comment lines
@@ -153,7 +153,7 @@ function wrapGM(script, code, cache) {
     o: val => JSON.parse(val),
     '': val => val,
   };
-  const base = script.custom.lastInstallURL;
+  const pathMap = script.custom.pathMap || {};
   const throttledDumpValues = throttle(dumpValues, 200);
   const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
   const metaStr = matches ? matches[1] : '';
@@ -229,7 +229,7 @@ function wrapGM(script, code, cache) {
       value(name) {
         if (name in resources) {
           const key = resources[name];
-          const raw = cache[getFullUrl(key, base)];
+          const raw = cache[pathMap[key] || key];
           const text = raw && utf8decode(window.atob(raw));
           return text;
         }
@@ -241,7 +241,7 @@ function wrapGM(script, code, cache) {
           const key = resources[name];
           let blobUrl = urls[key];
           if (!blobUrl) {
-            const raw = cache[getFullUrl(key, base)];
+            const raw = cache[pathMap[key] || key];
             if (raw) {
               // Binary string is not supported by blob constructor,
               // so we have to transform it into array buffer.
