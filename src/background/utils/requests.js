@@ -44,6 +44,11 @@ function xhrCallbackWrapper(req) {
     } catch (e) {
       // ignore if responseText is unreachable
     }
+    if (evt.type === 'progress') {
+      ['lengthComputable', 'loaded', 'total'].forEach(key => {
+        data[key] = evt[key];
+      });
+    }
     if (evt.type === 'loadend') clearRequest(req);
     lastPromise = lastPromise.then(() => {
       if (xhr.response && xhr.responseType === 'arraybuffer') {
