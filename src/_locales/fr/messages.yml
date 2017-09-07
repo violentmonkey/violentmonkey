@@ -181,16 +181,16 @@ labelDownloadURL:
   message: 'URL de téléchargement:'
 labelInclude:
   description: Label of @include rules.
-  message: 'Règles @include'
+  message: Règles @include
 labelMatch:
   description: Label of @match rules.
-  message: 'Règles @match'
+  message: Règles @match
 labelExclude:
   description: Label of @exclude rules.
-  message: 'Règles @exclude'
+  message: Règles @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: 'Règles @exclude-match'
+  message: Règles @exclude-match
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Autoriser les mises à jour
@@ -202,7 +202,7 @@ buttonSaveClose:
   message: Sauvegarder & Fermer
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: Oups, vous n'avez pas encore de scripts
+  message: 'Oups, vous n''avez pas encore de scripts'
 buttonDisable:
   description: Button to disable a script.
   message: Désactiver
@@ -236,10 +236,12 @@ buttonVacuuming:
   message: Nettoyage des données...
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Données nettoyées 
+  message: Données nettoyées
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Rejeter la redondance et essayer de recharger les ressources manquantes dans le cache
+  message: >-
+    Rejeter la redondance et essayer de recharger les ressources manquantes dans
+    le cache
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Chercher des scripts pour ce site
@@ -256,7 +258,7 @@ labelSearch:
   description: Label for search input in search box.
   message: 'Chercher pour: '
 labelReplace:
-  description: Label for replace input in search box. '
+  description: Label for replace input in search box.
   message: 'Remplacer par: '
 buttonReplace:
   description: Button to replace the current match.
@@ -298,7 +300,7 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Conflit de namespace du script ! Veuillez modifier @name et @namespace 
+  message: Conflit de namespace du script ! Veuillez modifier @name et @namespace
 msgInvalidScript:
   description: Message shown when script is invalid.
   message: Script invalide !
@@ -325,7 +327,7 @@ labelGeneral:
   message: General
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Synchroniser le status du script 
+  message: Synchroniser le status du script
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Aucun
@@ -350,9 +352,9 @@ labelCustomCSS:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS personnalisé pour la page d'options et pour la page d'installation
-    de script. Si vous n'êtes pas certain de ce que vous faites, veuillez
-    ne pas l'éditer.
+    CSS personnalisé pour la page d'options et pour la page d'installation de
+    script. Si vous n'êtes pas certain de ce que vous faites, veuillez ne pas
+    l'éditer.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Sauvegarder
