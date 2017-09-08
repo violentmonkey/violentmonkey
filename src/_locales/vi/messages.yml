@@ -390,31 +390,31 @@ labelKeepOriginal:
   message: Giữ bản gốc
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: ''
+  message: Cập nhật
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: 'Script [$1] đã được cập nhật!'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: Thông báo có cập nhật script
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: Cài đặt từ $1
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: Tìm kiếm....
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: Không thấy script nào
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Trang chủ
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Hỗ trợ
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Hoàn tác
 labelRemoved:
   description: Label shown when a script is removed.
-  message: ''
+  message: '[Đã xóa]'
