@@ -18,7 +18,7 @@ const defaults = {
   sync: null,
   customCSS: null,
   importSettings: true,
-  notifyUpdates: true,
+  notifyUpdates: false,
   version: null,
 };
 let changes = {};
