@@ -359,12 +359,11 @@ export const BaseService = serviceFactory({
             const data = {};
             try {
               const obj = JSON.parse(raw);
+              data.code = obj.code;
               if (obj.version === 2) {
-                data.code = obj.code;
                 data.config = obj.config;
                 data.custom = obj.custom;
               } else if (obj.version === 1) {
-                data.code = obj.code;
                 if (obj.more) {
                   data.custom = obj.more.custom;
                   data.config = objectPurify({
@@ -376,6 +375,8 @@ export const BaseService = serviceFactory({
             } catch (e) {
               data.code = raw;
             }
+            // Invalid data
+            if (!data.code) return;
             const remoteInfo = remoteMeta.info[item.uri];
             const { modified } = remoteInfo;
             data.modified = modified;
