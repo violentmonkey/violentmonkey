@@ -15,7 +15,7 @@
     <div class="frame-block flex-auto pos-rel">
       <vm-code
         v-show="nav === 'code'" class="abs-full"
-        v-model="code" :commands="commands" @ready="initEditor"
+        v-model="code" :commands="commands"
       />
       <vm-settings
         v-show="nav === 'settings'" class="abs-full"
@@ -191,9 +191,6 @@ export default {
     },
     saveClose() {
       this.save().then(this.close);
-    },
-    initEditor(cm) {
-      this.cm = cm;
     },
   },
 };

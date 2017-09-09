@@ -163,7 +163,6 @@ button {
   }
 }
 
-.editor-code,
 .editor-code .CodeMirror {
   height: 100%;
   /* Use `Courier New` to ensure `&nbsp;` has the same width as an original space. */

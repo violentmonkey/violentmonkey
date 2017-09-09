@@ -1,7 +1,7 @@
-import Vue from 'vue';
 import 'src/common/polyfills';
 import 'src/common/browser';
 import 'src/common/sprite';
+import Vue from 'vue';
 import { sendMessage, i18n, getLocaleString } from 'src/common';
 import options from 'src/common/options';
 import getPathInfo from 'src/common/pathinfo';
