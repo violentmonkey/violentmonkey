@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const BabiliWebpackPlugin = require('babili-webpack-plugin');
+const MinifyPlugin = require('babel-minify-webpack-plugin');
 const babiliPreset = require('babel-preset-babili');
 const vueLoaderConfig = require('./vue-loader.conf');
 const { IS_DEV, styleRule } = require('./utils');
@@ -63,7 +63,7 @@ module.exports = {
   devtool: IS_DEV ? '#inline-source-map' : false,
   plugins: [
     definePlugin,
-    !IS_DEV && new BabiliWebpackPlugin({
+    !IS_DEV && new MinifyPlugin({
       mangle: !!MINIFY,
     }, {
       babili: (...args) => Object.assign(babiliPreset(...args), {
