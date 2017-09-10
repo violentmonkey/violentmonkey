@@ -22,7 +22,7 @@ function setOption(key, value) {
 }
 
 function updateOptions(data) {
-  Object.keys(data).forEach((key) => {
+  Object.keys(data).forEach(key => {
     objectSet(options, key, data[key]);
   });
   hooks.fire(data);

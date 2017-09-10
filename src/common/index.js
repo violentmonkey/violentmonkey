@@ -13,7 +13,7 @@ export function initHooks() {
   const hooks = [];
 
   function fire(data) {
-    hooks.slice().forEach((cb) => {
+    hooks.slice().forEach(cb => {
       cb(data);
     });
   }
@@ -36,7 +36,7 @@ export function sendMessage(payload) {
     if (error) return Promise.reject(error);
     return data;
   });
-  promise.catch((err) => {
+  promise.catch(err => {
     if (process.env.DEBUG) console.warn(err);
   });
   return promise;

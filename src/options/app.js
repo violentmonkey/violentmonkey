@@ -57,7 +57,7 @@ function loadData() {
       'cache',
       'scripts',
       'sync',
-    ].forEach((key) => {
+    ].forEach(key => {
       Vue.set(store, key, data[key]);
     });
     if (store.scripts) {

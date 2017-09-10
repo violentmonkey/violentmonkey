@@ -3,13 +3,13 @@ import { normalizeKeys } from '.';
 export function objectGet(obj, rawKey, def) {
   const keys = normalizeKeys(rawKey);
   let res = obj;
-  keys.some((key) => {
+  keys.every(key => {
     if (res && typeof res === 'object' && (key in res)) {
       res = res[key];
-    } else {
-      res = def;
       return true;
     }
+    res = def;
+    return false;
   });
   return res;
 }
@@ -20,7 +20,7 @@ export function objectSet(obj, rawKey, val) {
   const root = obj || {};
   let sub = root;
   const lastKey = keys.pop();
-  keys.forEach((key) => {
+  keys.forEach(key => {
     let child = sub[key];
     if (!child) {
       child = {};

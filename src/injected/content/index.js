@@ -4,6 +4,8 @@ import { tabOpen, tabClose, tabClosed } from './tabs';
 import { onNotificationCreate, onNotificationClick, onNotificationClose } from './notifications';
 import { getRequestId, httpRequest, abortRequest, httpRequested } from './requests';
 
+const IS_TOP = window.top === window;
+
 const ids = [];
 const menus = [];
 
@@ -21,7 +23,7 @@ function getBadge() {
 function setBadge() {
   if (badge.ready && badge.willSet) {
     // XXX: only scripts run in top level window are counted
-    if (top === window) sendMessage({ cmd: 'SetBadge', data: badge.number });
+    if (IS_TOP) sendMessage({ cmd: 'SetBadge', data: badge.number });
   }
 }
 
@@ -49,7 +51,7 @@ export default function initialize(contentId, webId) {
     if (handle) handle(req.data, src);
   });
 
-  sendMessage({ cmd: 'GetInjected', data: location.href })
+  sendMessage({ cmd: 'GetInjected', data: window.location.href })
   .then(data => {
     if (data.scripts) {
       data.scripts.forEach(script => {
@@ -75,7 +77,7 @@ const handlers = {
     sendMessage({ cmd: 'SetValue', data });
   },
   RegisterMenu(data) {
-    if (window.top === window) menus.push(data);
+    if (IS_TOP) menus.push(data);
     getPopup();
   },
   AddStyle(css) {
@@ -104,7 +106,7 @@ function onHandle(req) {
 
 function getPopup() {
   // XXX: only scripts run in top level window are counted
-  if (top === window) {
+  if (IS_TOP) {
     sendMessage({
       cmd: 'SetPopup',
       data: { ids, menus },

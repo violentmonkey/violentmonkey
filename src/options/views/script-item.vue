@@ -129,7 +129,7 @@ export default {
     const { icon } = this.script.meta;
     if (icon && icon !== this.safeIcon) {
       loadImage(icon)
-      .then((url) => {
+      .then(url => {
         this.safeIcon = url;
       }, () => {
         this.safeIcon = DEFAULT_ICON;
@@ -201,12 +201,13 @@ export default {
     },
     onDragMouseMove(e) {
       const { dragging } = this;
-      const { el, dragged, offset, elements, lastIndex } = dragging;
+      const {
+        el, dragged, offset, elements, lastIndex,
+      } = dragging;
       dragged.style.left = `${e.clientX - offset.x}px`;
       dragged.style.top = `${e.clientY - offset.y}px`;
-      let hoveredIndex = elements.findIndex((item) => {
-        if (!item) return;
-        if (item.classList.contains('dragging-moving')) return;
+      let hoveredIndex = elements.findIndex(item => {
+        if (!item || item.classList.contains('dragging-moving')) return false;
         const rect = item.getBoundingClientRect();
         return (
           e.clientX >= rect.left + PADDING
@@ -247,7 +248,7 @@ export default {
       });
     },
     onDragAnimate(elements, delta) {
-      elements.forEach((el) => {
+      elements.forEach(el => {
         if (!el) return;
         el.classList.add('dragging-moving');
         el.style.transition = 'none';

@@ -4,13 +4,11 @@ import { objectGet } from 'src/common/object';
 import { dumpQuery } from '../utils';
 import { BaseService, isScriptFile, register, getURI } from './base';
 
+const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ=='));
 const config = Object.assign({
   client_id: '000000004418358A',
   redirect_uri: 'https://violentmonkey.github.io/auth_onedrive.html',
-}, JSON.parse(
-  // assume this is secret
-  window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ=='),
-));
+}, SECRET_KEY);
 
 const OneDrive = BaseService.extend({
   name: 'onedrive',

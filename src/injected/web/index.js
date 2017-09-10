@@ -57,7 +57,7 @@ function onLoadScripts(data) {
   bridge.version = data.version;
   if (includes([
     'greasyfork.org',
-  ], location.host)) {
+  ], window.location.host)) {
     exposeVM();
   }
   // reset load and checkLoad

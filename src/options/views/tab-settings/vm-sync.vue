@@ -36,7 +36,7 @@ const SYNC_CURRENT = 'sync.current';
 const syncConfig = {
   current: '',
 };
-options.hook((data) => {
+options.hook(data => {
   if (SYNC_CURRENT in data) {
     syncConfig.current = data[SYNC_CURRENT] || '';
   }

@@ -546,7 +546,9 @@ export function getExportData(ids, withValues) {
 }
 
 export function parseScript(data) {
-  const { id, code, message, isNew, config, custom } = data;
+  const {
+    id, code, message, isNew, config, custom,
+  } = data;
   const meta = parseMeta(code);
   if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
   const result = {
@@ -672,6 +674,7 @@ export function vacuum() {
           map[key.slice(prefix.length)] = -1;
           return true;
         }
+        return false;
       });
     });
   });

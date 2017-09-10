@@ -138,7 +138,7 @@ export function resetBlacklist(list) {
   blacklistRules = (Array.isArray(rules) ? rules : (rules || '').split('\n'))
   .map(line => {
     const item = line.trim();
-    if (!item || item.startsWith('#')) return;
+    if (!item || item.startsWith('#')) return null;
 
     /**
      * @include and @match rules are added for people who need a whitelist.

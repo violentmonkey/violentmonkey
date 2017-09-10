@@ -83,15 +83,19 @@ export default {
   },
   mounted() {
     const id = objectGet(this.script, 'props.id');
-    (id ? sendMessage({
-      cmd: 'GetScriptCode',
-      data: id,
-    }) : sendMessage({
-      cmd: 'NewScript',
-    }).then(({ script, code }) => {
-      this.script = script;
-      return code;
-    }))
+    (id
+      ? sendMessage({
+        cmd: 'GetScriptCode',
+        data: id,
+      })
+      : sendMessage({
+        cmd: 'NewScript',
+      })
+      .then(({ script, code }) => {
+        this.script = script;
+        return code;
+      })
+    )
     .then(code => {
       this.code = code;
       const settings = {};
