@@ -1,8 +1,10 @@
+import { isFirefox } from 'src/common/ua';
 import { bindEvents, sendMessage, inject, attachFunction } from '../utils';
 import bridge from './bridge';
 import { tabOpen, tabClose, tabClosed } from './tabs';
 import { onNotificationCreate, onNotificationClick, onNotificationClose } from './notifications';
 import { getRequestId, httpRequest, abortRequest, httpRequested } from './requests';
+import dirtySetClipboard from './clipboard';
 
 const IS_TOP = window.top === window;
 
@@ -89,7 +91,14 @@ const handlers = {
   },
   Notification: onNotificationCreate,
   SetClipboard(data) {
-    sendMessage({ cmd: 'SetClipboard', data });
+    if (isFirefox) {
+      // Firefox does not support copy from background page.
+      // ref: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Interact_with_the_clipboard
+      // The dirty way will create a <textarea> element in web page and change the selection.
+      dirtySetClipboard(data);
+    } else {
+      sendMessage({ cmd: 'SetClipboard', data });
+    }
   },
   CheckScript({ name, namespace, callback }) {
     sendMessage({ cmd: 'CheckScript', data: { name, namespace } })

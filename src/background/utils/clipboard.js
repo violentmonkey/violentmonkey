@@ -1,16 +1,19 @@
 const textarea = document.createElement('textarea');
 document.body.appendChild(textarea);
 
-const clipboardData = {};
-function oncopy(e) {
+let clipboardData;
+function onCopy(e) {
   e.preventDefault();
-  e.clipboardData.setData(clipboardData.type || 'text/plain', clipboardData.data);
+  const { type, data } = clipboardData;
+  e.clipboardData.setData(type || 'text/plain', data);
 }
-document.addEventListener('copy', oncopy, false);
+document.addEventListener('copy', onCopy, false);
 
 export default function setClipboard(data) {
-  clipboardData.type = data.type;
-  clipboardData.data = data.data;
+  clipboardData = data;
   textarea.focus();
-  document.execCommand('copy', false, null);
+  const ret = document.execCommand('copy', false, null);
+  if (!ret && process.env.DEBUG) {
+    console.warn('Copy failed!');
+  }
 }

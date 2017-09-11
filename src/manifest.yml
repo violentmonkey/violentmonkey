@@ -38,6 +38,7 @@ permissions:
   - notifications
   - storage
   - unlimitedStorage
+  - clipboardWrite
 
 applications:
   gecko:
