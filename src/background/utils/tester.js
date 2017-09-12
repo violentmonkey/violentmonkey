@@ -4,8 +4,7 @@ import { getOption, hookOptions } from './options';
 const RE = /(.*?):\/\/([^/]*)\/(.*)/;
 let blacklistRules = [];
 hookOptions(changes => {
-  const { blacklist } = changes;
-  if (blacklist) resetBlacklist(blacklist);
+  if ('blacklist' in changes) resetBlacklist(changes.blacklist || '');
 });
 
 /**
@@ -133,7 +132,10 @@ export function testBlacklist(url) {
   }
 }
 export function resetBlacklist(list) {
-  const rules = list || getOption('blacklist');
+  const rules = list == null ? getOption('blacklist') : list;
+  if (process.env.DEBUG) {
+    console.info('Reset blacklist:', rules);
+  }
   // XXX compatible with {Array} list in v2.6.1-
   blacklistRules = (Array.isArray(rules) ? rules : (rules || '').split('\n'))
   .map(line => {
