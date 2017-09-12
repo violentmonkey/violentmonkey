@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const MinifyPlugin = require('babel-minify-webpack-plugin');
-const babiliPreset = require('babel-preset-babili');
+const minifyPreset = require('babel-preset-minify');
 const vueLoaderConfig = require('./vue-loader.conf');
 const { IS_DEV, styleRule } = require('./utils');
 
@@ -66,7 +66,7 @@ module.exports = {
     !IS_DEV && new MinifyPlugin({
       mangle: !!MINIFY,
     }, {
-      babili: (...args) => Object.assign(babiliPreset(...args), {
+      babili: (...args) => Object.assign(minifyPreset(...args), {
         minified: !!MINIFY,
         compact: !!MINIFY,
       }),
