@@ -1,4 +1,3 @@
-import 'src/common/polyfills';
 import 'src/common/browser';
 import Vue from 'vue';
 import { i18n } from 'src/common';
