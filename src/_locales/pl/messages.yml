@@ -169,10 +169,10 @@ labelName:
   message: 'Nazwa skryptu:'
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Uruchom gdy:'
+  message: 'Moment uruchomienia:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (domyślnie)
+  message: (domyślny)
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Adres URL strony głównej:'
@@ -392,7 +392,7 @@ editLabelMeta:
   message: Niestandardowe metadane
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Zachowaj oryginalny
+  message: Zachowaj oryginalne
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Aktualizacja
@@ -407,7 +407,7 @@ installFrom:
   message: Zainstaluj z $1
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Szukanie skryptów...
+  message: Szukaj skryptów...
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Nie znaleziono skryptu.
