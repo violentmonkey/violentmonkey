@@ -50,7 +50,7 @@ const storage = {
         return result;
       });
     },
-    dump(id, value) {
+    set(id, value) {
       if (!id) return Promise.resolve();
       return browser.storage.local.set({
         [this.getKey(id)]: value,
@@ -82,11 +82,20 @@ storage.code = Object.assign({}, storage.base, {
 });
 storage.value = Object.assign({}, storage.base, {
   prefix: 'val:',
+  dump(dict) {
+    const updates = {};
+    Object.keys(dict)
+    .forEach(id => {
+      const value = dict[id];
+      updates[this.getKey(id)] = value;
+    });
+    return browser.storage.local.set(updates);
+  },
 });
 storage.require = Object.assign({}, storage.base, {
   prefix: 'req:',
   fetch: cacheOrFetch(function fetch(uri) {
-    return request(uri).then(({ data }) => this.dump(uri, data));
+    return request(uri).then(({ data }) => this.set(uri, data));
   }),
 });
 storage.cache = Object.assign({}, storage.base, {
@@ -101,7 +110,7 @@ storage.cache = Object.assign({}, storage.base, {
         base64: () => window.btoa(data.string()),
       };
       return (check ? Promise.resolve(check(data)) : Promise.resolve())
-      .then(() => this.dump(uri, data.base64()));
+      .then(() => this.set(uri, data.base64()));
     });
   }),
 });
@@ -210,12 +219,31 @@ export function getScriptCode(id) {
   return storage.code.getOne(id);
 }
 
-export function setValues(where, values) {
+/**
+ * @desc Load values for batch updates.
+ * @param {Array} ids
+ */
+export function getValueStoresByIds(ids) {
+  return storage.value.getMulti(ids);
+}
+
+/**
+ * @desc Dump values for batch updates.
+ * @param {Object} valueDict { id1: value1, id2: value2, ... }
+ */
+export function dumpValueStores(valueDict) {
+  if (process.env.DEBUG) {
+    console.info('Update value stores', valueDict);
+  }
+  return storage.value.dump(valueDict).then(() => valueDict);
+}
+
+export function dumpValueStore(where, valueStore) {
   return (where.id
     ? Promise.resolve(where.id)
     : getScript(where).then(script => objectGet(script, 'props.id')))
   .then(id => {
-    if (id) return storage.value.dump(id, values).then(() => ({ id, values }));
+    if (id) return dumpValueStores({ [id]: valueStore });
   });
 }
 
@@ -369,7 +397,7 @@ function saveScript(script, code) {
   }
   return Promise.all([
     storage.script.dump(script),
-    storage.code.dump(props.id, code),
+    storage.code.set(props.id, code),
   ]);
 }
 
@@ -477,7 +505,7 @@ function fetchScriptResources(script, cache) {
     const fullUrl = pathMap[key] || key;
     const cached = objectGet(cache, ['require', fullUrl]);
     if (cached) {
-      storage.require.dump(fullUrl, cached);
+      storage.require.set(fullUrl, cached);
     } else {
       storage.require.fetch(fullUrl);
     }
@@ -487,7 +515,7 @@ function fetchScriptResources(script, cache) {
     const fullUrl = pathMap[url] || url;
     const cached = objectGet(cache, ['resources', fullUrl]);
     if (cached) {
-      storage.cache.dump(fullUrl, cached);
+      storage.cache.set(fullUrl, cached);
     } else {
       storage.cache.fetch(fullUrl);
     }
