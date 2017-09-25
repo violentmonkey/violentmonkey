@@ -20,7 +20,6 @@ class Locale {
     this.basepath = basepath;
     this.basedir = basedir || '.';
     this.data = {};
-    this.loaded = this.load();
   }
 
   load() {
@@ -71,7 +70,6 @@ class Locales {
     this.langs = [];
     this.data = {};
     this.desc = {};
-    this.loaded = this.load();
   }
 
   getLanguages() {
@@ -87,7 +85,7 @@ class Locales {
       this.langs = langs;
       return Promise.all(langs.map(lang => {
         const locale = this.data[lang] = new Locale(lang, `${this.prefix}/${lang}`, this.base);
-        return locale.loaded;
+        return locale.load();
       }));
     })
     .then(data => {
@@ -178,7 +176,8 @@ function extract(options) {
   }
 
   function endStream(cb) {
-    locales.loaded.then(() => {
+    locales.load()
+    .then(() => {
       keys.forEach(key => {
         locales.touch(key);
       });
@@ -188,12 +187,14 @@ function extract(options) {
         markUntouched: options.markUntouched,
         extension: options.extension,
       });
-    }).then(files => {
+    })
+    .then(files => {
       files.forEach(file => {
         this.push(file);
       });
       cb();
-    });
+    })
+    .catch(cb);
   }
 
   return through.obj(bufferContents, endStream);
