@@ -108,7 +108,7 @@ labelAutoUpdate:
   message: Scriptleri her gün otomatik olarak kontrol et
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
-  message: @grant bulunmama uyarılarını engelle
+  message: `@grant` izin bulunmama uyarılarını engelle
   touched: false
 labelDataImport:
   description: Section title of data import.
@@ -151,7 +151,7 @@ anchorAuthor:
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 labelTranslator:
   description: Label of translator.
-  message: 'Translator: '
+  message: 'Çeviren: '
 anchorTranslator:
   description: Translator shown on about tab.
   message: '<a href=mailto:arrest.anarchy@gmail.com>ArresT AnarchY</a>'
@@ -169,7 +169,7 @@ labelRunAt:
   message: 'Çalışan:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Default)
+  message: (Varsayılan)
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Anasayfa URL:'
@@ -225,12 +225,12 @@ msgImported:
   message: $1 adet içeriye aktarıldı.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: @downloadURL Kullan
+  message: `@downloadURL` Kullan
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    Modifications are not saved!
-    Click OK to discard them or cancel to stay.
+    Yapılan ayarlar kaydedilemedi!
+    Gözardı etmek için Tamam tıklayın veya İptal ile ayarları düzenleyin.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Datalar içeri çekiliyor..
@@ -348,10 +348,10 @@ labelCustomCSS:
   description: Label for custom CSS section.
   message: Geçerli Stil
 descCustomCSS:
-  description: Geçerli stil bölüm açıklamaları
-  message: >-
-    Custom CSS for options page and script installation page. If you are not
-    sure what this is for, please do not edit it.
+  description: Description of custom CSS section.
+ message: >-
+   Seçenekler sayfası ve script yükleme sayfası için geçerli CSS. 
+   Eğer ne yaptığınızdan emin değilseniz, lütfen düzenlemeyiniz.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Kaydet
