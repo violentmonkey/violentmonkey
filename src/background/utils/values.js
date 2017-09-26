@@ -3,7 +3,6 @@ import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 
 let cache;
 let timer;
-let updating;
 
 export function updateValueStore(id, update) {
   updateLater();
@@ -23,7 +22,7 @@ export function setValueStore(where, value) {
 }
 
 function updateLater() {
-  if (!updating && !timer) {
+  if (!timer) {
     timer = Promise.resolve().then(doUpdate);
     // timer = setTimeout(doUpdate);
   }
@@ -32,9 +31,7 @@ function updateLater() {
 function doUpdate() {
   const currentCache = cache;
   cache = null;
-  timer = null;
   const ids = Object.keys(currentCache);
-  updating = true;
   getValueStoresByIds(ids)
   .then(valueStores => {
     ids.forEach(id => {
@@ -51,7 +48,7 @@ function doUpdate() {
   })
   .then(broadcastUpdates)
   .then(() => {
-    updating = false;
+    timer = null;
     if (cache) updateLater();
   });
 }
