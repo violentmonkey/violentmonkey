@@ -108,7 +108,7 @@ labelAutoUpdate:
   message: Scriptleri her gün otomatik olarak kontrol et
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
-  message: `@grant` izin bulunmama uyarılarını engelle
+  message: '@grant' izin bulunmama uyarılarını engelle
   touched: false
 labelDataImport:
   description: Section title of data import.
@@ -225,7 +225,7 @@ msgImported:
   message: $1 adet içeriye aktarıldı.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: `@downloadURL` Kullan
+  message: '@downloadURL' Kullan
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -349,7 +349,7 @@ labelCustomCSS:
   message: Geçerli Stil
 descCustomCSS:
   description: Description of custom CSS section.
- message: >-
+  message: >-
    Seçenekler sayfası ve script yükleme sayfası için geçerli CSS. 
    Eğer ne yaptığınızdan emin değilseniz, lütfen düzenlemeyiniz.
 buttonSaveCustomCSS:
