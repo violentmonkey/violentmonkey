@@ -1,11 +1,13 @@
+import tldjs from 'tldjs';
 import cache from './cache';
 import { getOption, hookOptions } from './options';
 
-const RE = /(.*?):\/\/([^/]*)\/(.*)/;
+const RE_MATCH_PARTS = /(.*?):\/\/([^/]*)\/(.*)/;
 let blacklistRules = [];
 hookOptions(changes => {
   if ('blacklist' in changes) resetBlacklist(changes.blacklist || '');
 });
+const RE_HTTP_OR_HTTPS = /^https?$/i;
 
 /**
  * Test glob rules like `@include` and `@exclude`.
@@ -67,53 +69,74 @@ function mergeLists(...args) {
 }
 
 function str2RE(str) {
-  const re = str.replace(/([.?/])/g, '\\$1').replace(/\*/g, '.*?');
-  return RegExp(`^${re}$`);
+  const re = str.replace(/([.?])/g, '\\$1').replace(/\*/g, '.*?');
+  return `^${re}$`;
 }
 
 function autoReg(str) {
   if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
-    return RegExp(str.slice(1, -1)); // Regular-expression
+    return new RegExp(str.slice(1, -1)); // Regular-expression
   }
-  const re = str2RE(str); // String with wildcards
-  return { test: tstr => re.test(tstr) };
+  const reStr = str2RE(str);
+  const re = new RegExp(reStr); // String with wildcards
+  const tests = [
+    tstr => re.test(tstr),
+  ];
+  if (str.includes('.tld/')) {
+    const reTldStr = reStr.replace('\\.tld/', '((?:\\.\\w+)+)/');
+    tests.push(tstr => {
+      const matches = tstr.match(reTldStr);
+      if (matches) {
+        const suffix = matches[1].slice(1);
+        if (tldjs.getPublicSuffix(suffix) === suffix) return true;
+      }
+      return false;
+    });
+  }
+  return { test: tstr => tests.some(test => test(tstr)) };
 }
 
 function matchScheme(rule, data) {
   // exact match
   if (rule === data) return 1;
   // * = http | https
-  if (rule === '*' && /^https?$/i.test(data)) return 1;
+  if (rule === '*' && RE_HTTP_OR_HTTPS.test(data)) return 1;
   return 0;
 }
-function matchHost(rule, data) {
-  // * matches all
-  if (rule === '*') return 1;
-  // exact match
-  if (rule === data) return 1;
-  // *.example.com
-  if (/^\*\.[^*]*$/.test(rule)) {
-    // matches the specified domain
-    if (rule.slice(2) === data) return 1;
-    // matches subdomains
-    if (str2RE(rule).test(data)) return 1;
-  }
-  return 0;
+function hostMatcher(rule) {
+  const reRule = new RegExp(str2RE(rule));
+  return data => {
+    // * matches all
+    if (rule === '*') return 1;
+    // exact match
+    if (rule === data) return 1;
+    // *.example.com
+    if (/^\*\.[^*]*$/.test(rule)) {
+      // matches the specified domain
+      if (rule.slice(2) === data) return 1;
+      // matches subdomains
+      if (reRule.test(data)) return 1;
+    }
+    return 0;
+  };
 }
-function matchPath(rule, data) {
-  return str2RE(rule).test(data);
+function pathMatcher(rule) {
+  const reRule = new RegExp(str2RE(rule));
+  return data => reRule.test(data);
 }
 function matchTester(rule) {
   let test;
   if (rule === '<all_urls>') test = () => true;
   else {
-    const ruleParts = rule.match(RE);
+    const ruleParts = rule.match(RE_MATCH_PARTS);
+    const matchHost = hostMatcher(ruleParts[2]);
+    const matchPath = pathMatcher(ruleParts[3]);
     test = url => {
-      const parts = url.match(RE);
+      const parts = url.match(RE_MATCH_PARTS);
       return !!ruleParts && !!parts
       && matchScheme(ruleParts[1], parts[1])
-      && matchHost(ruleParts[2], parts[2])
-      && matchPath(ruleParts[3], parts[3]);
+      && matchHost(parts[2])
+      && matchPath(parts[3]);
     };
   }
   return { test };

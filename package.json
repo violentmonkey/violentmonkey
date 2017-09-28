@@ -69,6 +69,7 @@
   "dependencies": {
     "codemirror": "^5.29.0",
     "core-js": "^2.5.1",
+    "tldjs": "^2.2.0",
     "vue": "^2.4.2",
     "vueleton": "^0.4.0"
   }
