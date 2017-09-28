@@ -107,7 +107,7 @@ gulp.task('copy-i18n', () => (
 ));
 
 gulp.task('svg', () => (
-  gulp.src('icons/*.svg')
+  gulp.src('src/resources/icons/*.svg')
   .pipe(svgSprite({
     mode: {
       symbol: {
