@@ -266,7 +266,9 @@ buttonReplaceAll:
   message: Tümü
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Bir script dosyasını menüden açıp / kapattıktan sonra geçerli sekmeyi yeniden yükle
+  message: >-
+    Bir script dosyasını menüden açıp / kapattıktan sonra geçerli sekmeyi
+    yeniden yükle
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL Girdisi:'
@@ -298,7 +300,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Script isiminde anlaşmazlık! Lütfen @name ve @namespace alanlarını düzenleyin.
+  message: >-
+    Script isiminde anlaşmazlık! Lütfen @name ve @namespace alanlarını
+    düzenleyin.
 msgInvalidScript:
   description: Message shown when script is invalid.
   message: Geçersiz Script!
@@ -350,8 +354,8 @@ labelCustomCSS:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-   Seçenekler sayfası ve script yükleme sayfası için geçerli CSS. 
-   Eğer ne yaptığınızdan emin değilseniz, lütfen düzenlemeyiniz.
+    Seçenekler sayfası ve script yükleme sayfası için geçerli CSS.  Eğer ne
+    yaptığınızdan emin değilseniz, lütfen düzenlemeyiniz.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Kaydet
@@ -418,3 +422,18 @@ buttonUndo:
 labelRemoved:
   description: Label shown when a script is removed.
   message: '[Silindi]'
+buttonFilter:
+  description: Button to show filters menu.
+  message: ''
+optionShowEnabledFirst:
+  description: Option to show enabled scripts first in alphabetical order.
+  message: ''
+filterExecutionOrder:
+  description: Label for option to sort scripts in execution order.
+  message: ''
+filterAlphabeticalOrder:
+  description: Label for option to sort scripts in alphabetical order.
+  message: ''
+labelFilterSort:
+  description: Label for sort filter.
+  message: ''

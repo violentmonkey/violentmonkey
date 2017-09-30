@@ -11,17 +11,20 @@ aside {
     width: 5rem;
   }
 }
-.sidemenu > a {
-  display: block;
-  padding-top: 0.6rem;
-  padding-bottom: 0.6rem;
-  font-size: 1rem;
-  font-weight: bold;
-  text-decoration: none;
-  color: gray;
-  &.active,
-  &:hover {
-    color: black;
+.sidemenu {
+  border-top: 1px solid #bbb;
+  > a {
+    display: block;
+    padding-top: .6rem;
+    padding-bottom: .6rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: gray;
+    &.active,
+    &:hover {
+      color: black;
+    }
   }
 }
 #currentLang {

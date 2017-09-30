@@ -1,8 +1,8 @@
 <template>
-  <div class="script" :class="{ disabled: !script.config.enabled, removed: script.config.removed }" :draggable="!script.config.removed" @dragstart.prevent="onDragStart">
+  <div class="script" :class="{ disabled: !script.config.enabled, removed: script.config.removed }" :draggable="draggable" @dragstart.prevent="onDragStart">
     <img class="script-icon" :src="safeIcon">
     <div class="script-info flex">
-      <div class="script-name ellipsis" v-text="script.custom.name || getLocaleString('name')"></div>
+      <div class="script-name ellipsis" v-text="script._cache.name"></div>
       <div class="flex-auto"></div>
       <div class="script-author ellipsis" :title="script.meta.author" v-if="author">
         <span v-text="i18n('labelAuthor')"></span>
@@ -87,7 +87,7 @@ function loadImage(url) {
 }
 
 export default {
-  props: ['script'],
+  props: ['script', 'draggable'],
   components: {
     Icon,
     Tooltip,

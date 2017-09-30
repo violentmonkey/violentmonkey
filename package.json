@@ -10,7 +10,7 @@
     "analyze:json": "webpack --profile --json --config scripts/webpack.conf.js > stats.json",
     "i18n": "gulp i18n",
     "lint": "eslint --ext .js,.vue .",
-    "svgo": "svgo --config .svgo.yml icons",
+    "svgo": "svgo --config .svgo.yml src/resources/icons",
     "pretest": "cross-env NODE_ENV=test webpack --config scripts/webpack.test.conf.js",
     "test": "node dist/test",
     "prepush": "npm run lint"

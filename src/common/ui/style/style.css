@@ -32,6 +32,7 @@ a {
   color: dodgerblue;
 }
 hr {
+  margin: .5rem;
   border: none;
   border-top: 1px solid darkgray;
 }
@@ -194,5 +195,10 @@ button {
 .vl-dropdown-menu {
   padding: .5rem;
   border: 1px solid #bbb;
+  background: white;
+}
+
+.modal-content {
+  padding: 1rem;
   background: white;
 }

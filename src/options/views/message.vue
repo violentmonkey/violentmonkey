@@ -1,5 +1,5 @@
 <template>
-  <div class="message">
+  <div class="message modal-content">
     <div class="mb-1" v-if="message.text" v-text="message.text"></div>
     <form v-if="message.buttons" @submit.prevent>
       <input class="mb-1" type="text" v-if="message.input !== false" v-model="message.input">
@@ -42,8 +42,6 @@ export default {
 <style>
 .message {
   width: 18rem;
-  padding: 1rem;
-  background: white;
   border-bottom-left-radius: .2rem;
   border-bottom-right-radius: .2rem;
   box-shadow: 0 0 .2rem rgba(0,0,0,.2);
