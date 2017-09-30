@@ -4,6 +4,7 @@ const gutil = require('gulp-util');
 const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const svgSprite = require('gulp-svg-sprite');
+const plumber = require('gulp-plumber');
 const yaml = require('js-yaml');
 const webpack = require('webpack');
 const webpackConfig = require('./scripts/webpack.conf');
@@ -93,6 +94,7 @@ gulp.task('copy-files', () => {
 
 gulp.task('copy-i18n', () => (
   gulp.src(paths.templates)
+  .pipe(plumber(logError))
   .pipe(i18n.extract({
     base: 'src',
     prefix: '_locales',
@@ -105,7 +107,7 @@ gulp.task('copy-i18n', () => (
 ));
 
 gulp.task('svg', () => (
-  gulp.src('icons/*.svg')
+  gulp.src('src/resources/icons/*.svg')
   .pipe(svgSprite({
     mode: {
       symbol: {
@@ -123,6 +125,7 @@ gulp.task('svg', () => (
  */
 gulp.task('i18n', () => (
   gulp.src(paths.templates)
+  .pipe(plumber(logError))
   .pipe(i18n.extract({
     base: 'src',
     prefix: '_locales',
@@ -133,3 +136,8 @@ gulp.task('i18n', () => (
   }))
   .pipe(gulp.dest('src'))
 ));
+
+function logError(err) {
+  gutil.log(err.toString());
+  return this.emit('end');
+}

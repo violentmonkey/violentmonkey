@@ -1,4 +1,3 @@
-import 'src/common/polyfills';
 import 'src/common/browser';
 import { i18n, defaultImage } from 'src/common';
 import { objectGet } from 'src/common/object';
@@ -9,15 +8,16 @@ import {
   newScript, parseMeta,
   setClipboard, checkUpdate,
   getOption, setOption, hookOptions, getAllOptions,
-  initialize,
+  initialize, broadcast,
 } from './utils';
 import {
   getScripts, removeScript, getData, checkRemove, getScriptsByURL,
-  updateScriptInfo, setValues, getExportData, getScriptCode,
+  updateScriptInfo, getExportData, getScriptCode,
   getScriptByIds, moveScript, vacuum, parseScript, getScript,
   normalizePosition,
 } from './utils/db';
 import { resetBlacklist } from './utils/tester';
+import { setValueStore, updateValueStore } from './utils/values';
 
 const VM_VER = browser.runtime.getManifest().version;
 
@@ -28,15 +28,6 @@ hookOptions(changes => {
     data: changes,
   });
 });
-
-function broadcast(data) {
-  browser.tabs.query({})
-  .then(tabs => {
-    tabs.forEach(tab => {
-      browser.tabs.sendMessage(tab.id, data);
-    });
-  });
-}
 
 function checkUpdateAll() {
   setOption('lastUpdate', Date.now());
@@ -117,14 +108,13 @@ const commands = {
       });
     });
   },
-  SetValue({ where, values }) {
-    return setValues(where, values)
-    .then(data => {
-      broadcast({
-        cmd: 'UpdateValues',
-        data,
-      });
-    });
+  SetValueStore({ where, valueStore }) {
+    // Value store will be replaced soon.
+    return setValueStore(where, valueStore);
+  },
+  UpdateValue({ id, update }) {
+    // Value will be updated to store later.
+    return updateValueStore(id, update);
   },
   ExportZip({ ids, values }) {
     return getExportData(ids, values);

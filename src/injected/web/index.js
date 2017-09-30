@@ -1,4 +1,4 @@
-import { getUniqId, bindEvents, Promise, attachFunction, console, throttle } from '../utils';
+import { getUniqId, bindEvents, Promise, attachFunction, console } from '../utils';
 import { includes, forEach, map, utf8decode } from './helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
@@ -35,8 +35,11 @@ const handlers = {
   GotRequestId: onRequestStart,
   HttpRequested: onRequestCallback,
   TabClosed: onTabClosed,
-  UpdateValues({ id, values }) {
-    if (store.values[id]) store.values[id] = values;
+  UpdatedValues(updates) {
+    Object.keys(updates)
+    .forEach(id => {
+      if (store.values[id]) store.values[id] = updates[id];
+    });
   },
   NotificationClicked: onNotificationClicked,
   NotificationClosed: onNotificationClosed,
@@ -154,7 +157,6 @@ function wrapGM(script, code, cache) {
     '': val => val,
   };
   const pathMap = script.custom.pathMap || {};
-  const throttledDumpValues = throttle(dumpValues, 200);
   const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
   const metaStr = matches ? matches[1] : '';
   const gmFunctions = {
@@ -189,7 +191,7 @@ function wrapGM(script, code, cache) {
       value(key) {
         const value = loadValues();
         delete value[key];
-        throttledDumpValues();
+        dumpValue(key);
       },
     },
     GM_getValue: {
@@ -203,7 +205,7 @@ function wrapGM(script, code, cache) {
           try {
             val = handle(val);
           } catch (e) {
-            console.warn(e);
+            if (process.env.DEBUG) console.warn(e);
           }
           return val;
         }
@@ -222,7 +224,7 @@ function wrapGM(script, code, cache) {
         const raw = type + handle(val);
         const value = loadValues();
         value[key] = raw;
-        throttledDumpValues();
+        dumpValue(key, raw);
       },
     },
     GM_getResourceText: {
@@ -328,12 +330,12 @@ function wrapGM(script, code, cache) {
     Object.defineProperty(obj, name, prop);
     if (typeof obj[name] === 'function') obj[name].toString = propertyToString;
   }
-  function dumpValues() {
+  function dumpValue(key, value) {
     bridge.post({
-      cmd: 'SetValue',
+      cmd: 'UpdateValue',
       data: {
-        where: { id: script.props.id },
-        values: loadValues(),
+        id: script.props.id,
+        update: { key, value },
       },
     });
   }

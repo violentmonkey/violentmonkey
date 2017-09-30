@@ -154,7 +154,7 @@ labelTranslator:
   message: 翻譯者：
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '吳某'
+  message: 吳某
 labelCurrentLang:
   description: Label of current language.
   message: 當前語言：
@@ -416,3 +416,18 @@ buttonUndo:
 labelRemoved:
   description: Label shown when a script is removed.
   message: 【已刪除】
+buttonFilter:
+  description: Button to show filters menu.
+  message: ''
+optionShowEnabledFirst:
+  description: Option to show enabled scripts first in alphabetical order.
+  message: ''
+filterExecutionOrder:
+  description: Label for option to sort scripts in execution order.
+  message: ''
+filterAlphabeticalOrder:
+  description: Label for option to sort scripts in alphabetical order.
+  message: ''
+labelFilterSort:
+  description: Label for sort filter.
+  message: ''

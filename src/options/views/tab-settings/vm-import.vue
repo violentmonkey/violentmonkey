@@ -136,13 +136,13 @@ function importData(file) {
     return Promise.all(entries.map(entry => getVMFile(entry, vm)))
     .then(res => res.filter(Boolean).length)
     .then(count => {
-      forEachItem(vm.values, (value, key) => {
-        if (value) {
+      forEachItem(vm.values, (valueStore, key) => {
+        if (valueStore) {
           sendMessage({
-            cmd: 'SetValue',
+            cmd: 'SetValueStore',
             data: {
               where: { uri: key },
-              values: value,
+              valueStore,
             },
           });
         }

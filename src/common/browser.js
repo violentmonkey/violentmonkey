@@ -1,5 +1,7 @@
+import 'src/common/polyfills';
+
 /* global chrome */
-const global = window;
+const globalObj = typeof global !== 'undefined' ? global : window;
 
 function wrapAsync(func, thisObj) {
   return (...args) => {
@@ -120,6 +122,6 @@ const meta = {
   webRequest: true,
 };
 if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
-  global.browser = wrapAPIs(chrome, meta);
-  global.browser.__patched = true;
+  globalObj.browser = wrapAPIs(chrome, meta);
+  globalObj.browser.__patched = true;
 }

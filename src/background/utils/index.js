@@ -19,3 +19,12 @@ export function notify(options) {
     isClickable: options.isClickable,
   });
 }
+
+export function broadcast(data) {
+  browser.tabs.query({})
+  .then(tabs => {
+    tabs.forEach(tab => {
+      browser.tabs.sendMessage(tab.id, data);
+    });
+  });
+}

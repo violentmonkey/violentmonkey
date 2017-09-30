@@ -1,4 +1,3 @@
-import 'src/common/polyfills';
 import 'src/common/browser';
 import 'src/common/sprite';
 import Vue from 'vue';

@@ -1,17 +1,14 @@
 const path = require('path');
 const webpack = require('webpack');
 const MinifyPlugin = require('babel-minify-webpack-plugin');
-const babiliPreset = require('babel-preset-babili');
+const minifyPreset = require('babel-preset-minify');
 const vueLoaderConfig = require('./vue-loader.conf');
 const { IS_DEV, styleRule } = require('./utils');
 
 const { MINIFY } = process.env;
 const DIST = 'dist';
 const definePlugin = new webpack.DefinePlugin({
-  'process.env': {
-    NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-    DEBUG: IS_DEV ? 'true' : 'false', // whether to log message errors
-  },
+  'process.env.DEBUG': IS_DEV ? 'true' : 'false', // whether to log message errors
 });
 
 function resolve(dir) {
@@ -66,7 +63,7 @@ module.exports = {
     !IS_DEV && new MinifyPlugin({
       mangle: !!MINIFY,
     }, {
-      babili: (...args) => Object.assign(babiliPreset(...args), {
+      babili: (...args) => Object.assign(minifyPreset(...args), {
         minified: !!MINIFY,
         compact: !!MINIFY,
       }),

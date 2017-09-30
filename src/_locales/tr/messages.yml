@@ -3,421 +3,425 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: Hỗ trợ chạy userscript trên trình duyệt.
+  message: Tarayıcılar için userscript desteği sağlar.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Đã cập nhật script.
+  message: Script güncellendi.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Có lỗi khi tìm phiên bản mới!
+  message: Script güncelleme hatası!
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Đã cài đặt script.
+  message: Script yüklendi.
 Warning:
   description: Show warnings with a notification.
-  message: Cảnh báo
+  message: Uyarı
   touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
-  message: 'Script [$1] thiếu thuộc tính `@grant`! Bấm để xem chi tiết.'
+  message: 'Script [$1] içerisinde `@grant` satırı yok! Detaylı inceleme için tıklayın.'
   touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Không có tên
+  message: İsimsiz
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Đang cập nhật...
+  message: Güncelleniyor...
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Có phiên bản mới.
+  message: Yeni versiyon bulundu.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Đang kiểm tra cập nhật...
+  message: Güncellemeler denetlemiyor...
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Tìm kiếm thông tin cập nhật thất bại.
+  message: Bilgileri güncellerken hata oluştu.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Không có cập nhật mới.
+  message: Güncelleme bulunamadı.
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Đang cài đặt script
+  message: Script yükleniyor
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
-  message: Tuỳ chọn
+  message: Ayarlar
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Đóng sau khi cài đặt xong
+  message: Yüklemeden sonra kapat
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Track local file before this window is closed
+  message: Bu pencere kapanmadan önce yerel dosyayı takip et
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: Xác nhận cài đặt
+  message: Yüklemeyi onayla
 buttonClose:
   description: Button to close window.
-  message: Đóng
+  message: Kapat
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Không thể tải script.
+  message: Script verisi yüklenirken hata oluştu.
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: Đã tải script.
+  message: Script verileri yüklendi.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: Lỗi tải thư viện.
+  message: Script yüklemesinde veriler tam yüklenmedi.
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: Đang tải thư viện... ($1/$2)
+  message: Veriler yükleniyor... ($1/$2)
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Đang tải thông tin script...
+  message: Script verileri yükleniyor...
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: Script đã cài đặt
+  message: Yüklenen Scriptler
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Cài đặt
+  message: Ayarlar
 sideMenuAbout:
   description: 'Side menu: About'
-  message: Thông tin
+  message: Hakkında
 buttonNew:
   description: Button to create a new script.
-  message: Tạo mới
+  message: Yeni
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Kiểm tra cập nhật tất cả
+  message: Yeni güncellemeleri kontrol et
 anchorGetMoreScripts:
   description: Link to get more scripts.
-  message: Tìm thêm script
+  message: Daha fazla script
   touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
-  message: Đang tải ...
+  message: Yükleniyor ...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Cài đặt
+  message: Ayarlar
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Tự động kiểm tra cập nhật hàng ngày
+  message: Scriptleri her gün otomatik olarak kontrol et
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
-  message: Bỏ qua cảnh báo không có @grant
+  message: '@grant izin bulunmama uyarılarını engelle'
   touched: false
 labelDataImport:
   description: Section title of data import.
-  message: Nhập dữ liệu
+  message: Veri içeri aktar
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Nhập từ tập tin zip
+  message: Veriyi içeri zip olarak aktar
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Làm trống dữ liệu
+  message: Verileri çek
 labelDataExport:
   description: Section title of data export.
-  message: Xuất dữ liệu
+  message: Veri dışarı aktar
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Xuất dữ liệu script
+  message: Script verilerini dışarı aktar
 buttonAllNone:
   description: Button to select all scripts or none.
-  message: Tất cả/Bỏ chọn
+  message: Tümü/Hiçbiri
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Xuất ra tập tin zip
+  message: Zip olarak dışarı aktar
 labelAbout:
   description: Label shown on top of the about page.
-  message: Thông tin Violentmonkey
+  message: Violentmonkey hakkında
 labelRelated:
   description: Label of related links.
-  message: 'Liên kết gợi ý: '
+  message: 'İlgili bağlantılar: '
 labelDonate:
   description: Label of link to donate page.
-  message: Đóng góp
+  message: Bağış yap
 labelFeedback:
   description: Label of link to feedback page.
-  message: Phản hồi
+  message: Geribildirim
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 'Tác giả: '
+  message: 'Yazar: '
 anchorAuthor:
   description: Author shown on about tab.
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 labelTranslator:
   description: Label of translator.
-  message: 'Dịch bởi: '
+  message: 'Çeviren: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href=mailto:donghoang.nguyen@gmail.com>Nguyễn Đông Hoàng</a>'
+  message: '<a href=mailto:arrest.anarchy@gmail.com>ArresT AnarchY</a>'
 labelCurrentLang:
   description: Label of current language.
-  message: 'Ngôn ngữ hiện tại: '
+  message: 'Geçerli Dil: '
 labelScriptEditor:
   description: Shown in the title of the script editing page.
-  message: Trình chỉnh sửa script
+  message: Script Editör
 labelName:
   description: Label of script name.
-  message: 'Tên:'
+  message: 'İsim:'
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Chạy khi:'
+  message: 'Çalışan:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Mặc định)
+  message: (Varsayılan)
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Trang chủ:'
+  message: 'Anasayfa URL:'
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'URL Cập nhật:'
+  message: 'Güncelleme URL:'
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'URL tải về:'
+  message: 'İndirme URL:'
 labelInclude:
   description: Label of @include rules.
-  message: Thực thi
+  message: '@include kuralları'
 labelMatch:
   description: Label of @match rules.
-  message: Trùng khớp
+  message: '@match kuralları'
 labelExclude:
   description: Label of @exclude rules.
-  message: Bỏ qua
+  message: '@exclude kuralları'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: '@exclude-match kuralları'
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Cho phép cập nhật
+  message: Güncellemelere izin ver
 buttonSave:
   description: Button to save modifications of a script.
-  message: Lưu
+  message: Kaydet
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: Lưu & Đóng
+  message: Kaydet & Kapat
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'Oops, bạn không có script nào được cài đặt.'
+  message: 'Heyoo, şu anda herhangi bir scriptiniz bulunmamakta..'
 buttonDisable:
   description: Button to disable a script.
-  message: Vô hiệu hoá
+  message: Deaktif
 buttonEnable:
   description: Button to enable a script.
-  message: Kích hoạt
+  message: Aktif
 buttonEdit:
   description: Button to edit a script.
-  message: Sửa
+  message: Düzenle
 buttonRemove:
   description: Button to remove a script.
-  message: Xoá
+  message: Kaldır
 buttonUpdate:
   description: Check a script for updates.
-  message: Kiểm tra cập nhật
+  message: Güncellemeleri denetle
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: Đã nhập $1 script.
+  message: $1 adet içeriye aktarıldı.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: Dùng @downloadURL
+  message: '@downloadURL Kullan'
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    Thay đổi chưa được lưu!
-    Bấm OK để huỷ bỏ hoặc Cancel đế quay lại.
+    Yapılan ayarlar kaydedilemedi!
+    Gözardı etmek için Tamam tıklayın veya İptal ile ayarları düzenleyin.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Làm trống dữ liệu...
+  message: Datalar içeri çekiliyor..
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Đã làm trống dữ liệu
+  message: Datalar içeri çekildi
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Bỏ qua dữ liệu thừa và cố gắng tải lại nguồn dữ liệu thiếu từ bộ nhớ đệm.
+  message: Fazlalığı atın ve eksik kaynakları önbellekte yeniden yüklemeyi deneyin.
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Tìm script cho trang này
+  message: Bu sitede bulunan scriptleri bul
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Đã kích hoạt script
+  message: Scriptler aktif edildi
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Đã vô hiệu hoá script
+  message: Scriptler deaktif edildi
 menuCommands:
   description: Menu item to list script commands.
-  message: Menu của script
+  message: Script komutları
 labelSearch:
   description: Label for search input in search box.
-  message: 'Tìm kiếm: '
+  message: 'Arama: '
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Thay thế bằng: '
+  message: 'Değiştir: '
 buttonReplace:
   description: Button to replace the current match.
-  message: Thay thế
+  message: Değiştir
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: Tất cả
+  message: Tümü
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Tải lại trang khi bật/tắt script từ menu
+  message: >-
+    Bir script dosyasını menüden açıp / kapattıktan sonra geçerli sekmeyi
+    yeniden yükle
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'URL đầu vào:'
+  message: 'URL Girdisi:'
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Cài đăt từ URL
+  message: URL üzerinden yükle
 labelSync:
   description: Label for sync options.
-  message: Đồng bộ
+  message: Eşitle
 lastSync:
   description: Label for last sync timestamp.
-  message: Đồng bộ cuối lúc $1
+  message: Son eşitleme zamanı $1
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Đang khởi tạo...
+  message: Başlatılıyor...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: Khởi tạo lỗi!
+  message: Başlatma error!
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: Đồng bộ sẽ chạy sớm...
+  message: Eşitleme az sonra başlayacak...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Đang đồng bộ...
+  message: Şu anda eşitleniyor...
 msgSyncError:
   description: Message shown when sync failed.
-  message: Đồng bộ lỗi!
+  message: Eşitleme hatası!
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Xung đột namespace! Vui lòng sửa @name và @namespace.
+  message: >-
+    Script isiminde anlaşmazlık! Lütfen @name ve @namespace alanlarını
+    düzenleyin.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Script không hợp lệ!
+  message: Geçersiz Script!
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: Hiện thị số script đang chạy ở icon
+  message: Çalışan script sayısını göster.
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Dòng số.: '
+  message: 'Satır no.: '
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Danh sách đen
+  message: Kara Liste
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: URL trong danh sách này sẽ không bị bỏ qua.
+  message: Listede bulunan URL girişleri script tarafından eklenmeyecek.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: Lưu
+  message: Kayıt
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: Danh sách đen đã cập nhật.
+  message: Kara liste güncellendi.
 labelGeneral:
   description: Label for general settings.
-  message: Chung
+  message: Genel
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Trạng thái đồng bộ script
+  message: Eşitleme script durumu
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: Không có
+  message: Yok
 labelSyncService:
   description: Label for sync service select.
-  message: Đồng bộ tới
+  message: Eşitleyen
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Authorize
+  message: Yetkilendirme
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Revoke
+  message: İptal edildi
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Đang xác thực
+  message: Yetkilendiriliyor
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: Giao diện tùy chỉnh đã cập nhật.
+  message: Geçerli stil güncellendi.
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Giao diện tùy chỉnh
+  message: Geçerli Stil
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS tùy chỉnh cho trang tùy chọn và trang script đã cài đặt Nếu không hiểu
-    rõ xin đừng sửa.
+    Seçenekler sayfası ve script yükleme sayfası için geçerli CSS.  Eğer ne
+    yaptığınızdan emin değilseniz, lütfen düzenlemeyiniz.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: Lưu
+  message: Kaydet
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: Mở bảng điều khiển
+  message: Panelde Aç
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Script trùng khớp
+  message: Seçilen scriptler
 buttonOK:
   description: OK button on dialog.
-  message: Đồng ý
+  message: Tamam
 buttonCancel:
   description: Cancel button on dialog.
-  message: Hủy
+  message: İptal
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Nhập cài đặt
+  message: Ayarları içeri aktar
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Tìm hiểu thêm về quy tắc danh sách đen.
+  message: Kara liste şablonları hakkında daha fazla öğren.
 editNavCode:
   description: Label of code tab in script editor.
-  message: Mã nguồn
+  message: Kod
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: Cài đặt
+  message: Ayarlar
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Cài đặt Script
+  message: Script ayarları
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: Tuỳ chỉnh thẻ dữ liệu
+  message: Geçerli metadata
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Giữ bản gốc
+  message: Orjinalde kal
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: Cập nhật
+  message: Güncelleme
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Script [$1] đã được cập nhật!'
+  message: 'Script [$1] güncellendi!'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Thông báo có cập nhật script
+  message: Script güncellemelerini bildir
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Cài đặt từ $1
+  message: $1 tarafından yüklendi
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Tìm kiếm....
+  message: Script Aranıyor...
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: Không thấy script nào
+  message: Script bulunamadı.
 buttonHome:
   description: Button to open homepage.
-  message: Trang chủ
+  message: Anasayfa
 buttonSupport:
   description: Button to open support page.
-  message: Hỗ trợ
+  message: Destek Sayfası
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Hoàn tác
+  message: Geri Al
 labelRemoved:
   description: Label shown when a script is removed.
-  message: '[Đã xóa]'
+  message: '[Silindi]'
 buttonFilter:
   description: Button to show filters menu.
   message: ''

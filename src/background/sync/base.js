@@ -42,13 +42,6 @@ function initConfig() {
       config = {
         services: {},
       };
-
-      // XXX Migrate from old data
-      ['dropbox', 'onedrive']
-      .forEach(key => {
-        config.services[key] = getOption(key);
-      });
-
       set([], config);
     }
   }

@@ -46,7 +46,7 @@ targets.push(merge(base, {
     }),
     new HtmlWebpackPlugin({
       filename: 'popup/index.html',
-      template: 'src/public/index.html',
+      template: 'src/popup/index.html',
       chunks: ['browser', 'common', 'popup/app'],
     }),
     // new FriendlyErrorsPlugin(),

@@ -1,4 +1,3 @@
-global.localStorage = {};
 global.browser = {
   storage: {
     local: {
