@@ -425,16 +425,16 @@ labelRemoved:
   message: '[Usunięty]'
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Filtry
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Pokaż najpierw włączone skrypty
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: kolejności wykonywania
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: kolejności alfabetycznej
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: Sortuj wg $1
