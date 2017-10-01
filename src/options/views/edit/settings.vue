@@ -87,7 +87,8 @@
 </template>
 
 <script>
-import { i18n, object } from 'src/common';
+import { i18n } from 'src/common';
+import { objectGet } from 'src/common/object';
 import Tooltip from 'src/common/ui/tooltip';
 
 export default {
@@ -105,10 +106,10 @@ export default {
     placeholders() {
       const { value } = this;
       return {
-        name: object.get(value, 'meta.name'),
-        homepageURL: object.get(value, 'meta.homepageURL'),
-        updateURL: object.get(value, 'meta.updateURL') || i18n('hintUseDownloadURL'),
-        downloadURL: object.get(value, 'meta.downloadURL') || value.lastInstallURL,
+        name: objectGet(value, 'meta.name'),
+        homepageURL: objectGet(value, 'meta.homepageURL'),
+        updateURL: objectGet(value, 'meta.updateURL') || i18n('hintUseDownloadURL'),
+        downloadURL: objectGet(value, 'meta.downloadURL') || value.lastInstallURL,
       };
     },
   },

@@ -3,20 +3,46 @@
     <header class="flex">
       <div class="flex-auto">
         <vl-dropdown :closeAfterClick="true">
-          <span class="btn-ghost" slot="toggle">
-            <icon name="plus"></icon>
-          </span>
-          <a href="#" v-text="i18n('buttonNew')" @click.prevent="newScript"></a>
-          <a v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
-          <a v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank"></a>
-          <a href="#" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></a>
+          <tooltip :title="i18n('buttonNew')" placement="down" align="start" slot="toggle">
+            <span class="btn-ghost">
+              <icon name="plus"></icon>
+            </span>
+          </tooltip>
+          <div class="dropdown-menu-item" v-text="i18n('buttonNew')" @click.prevent="newScript"></div>
+          <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
+          <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank"></a>
+          <div class="dropdown-menu-item" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></div>
         </vl-dropdown>
-        <tooltip :title="i18n('buttonUpdateAll')" placement="down">
+        <tooltip :title="i18n('buttonUpdateAll')" placement="down" align="start">
           <span class="btn-ghost" @click="updateAll">
             <icon name="refresh"></icon>
           </span>
         </tooltip>
       </div>
+      <vl-dropdown align="right" class="filter-sort">
+        <tooltip :title="i18n('buttonFilter')" placement="down" slot="toggle">
+          <span class="btn-ghost">
+            <icon name="filter"></icon>
+          </span>
+        </tooltip>
+        <div>
+          <locale-group i18n-key="labelFilterSort">
+            <select :value="filters.sort.value" @change="onOrderChange">
+              <option
+                v-for="option in filterOptions.sort"
+                v-text="option.title"
+                :value="option.value">
+              </option>
+            </select>
+          </locale-group>
+        </div>
+        <div v-if="filters.sort.value === 'alpha'">
+          <label>
+            <setting-check name="filters.showEnabledFirst" @change="updateLater"></setting-check>
+            <span v-text="i18n('optionShowEnabledFirst')"></span>
+          </label>
+        </div>
+      </vl-dropdown>
       <div class="filter-search">
         <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
         <icon name="search"></icon>
@@ -24,7 +50,8 @@
     </header>
     <div class="scripts">
       <item v-for="script in scripts" :key="script.props.id"
-      :script="script" @edit="editScript" @move="moveScript"></item>
+      :script="script" :draggable="filters.sort.value === 'exec' && !script.config.removed"
+      @edit="editScript" @move="moveScript"></item>
     </div>
     <div class="backdrop" :class="{mask: store.loading}" v-show="message">
       <div v-html="message"></div>
@@ -35,33 +62,72 @@
 
 <script>
 import VlDropdown from 'vueleton/lib/dropdown';
+import VlModal from 'vueleton/lib/modal';
 import { i18n, sendMessage, noop, debounce } from 'src/common';
+import options from 'src/common/options';
+import SettingCheck from 'src/common/ui/setting-check';
+import hookSetting from 'src/common/hook-setting';
 import Icon from 'src/common/ui/icon';
 import Tooltip from 'src/common/ui/tooltip';
+import LocaleGroup from 'src/common/ui/locale-group';
 import Item from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
+
+const filterOptions = {
+  sort: [
+    { value: 'exec', title: i18n('filterExecutionOrder') },
+    { value: 'alpha', title: i18n('filterAlphabeticalOrder') },
+  ],
+};
+const filters = {
+  sort: {
+    value: null,
+    title: null,
+    set(value) {
+      const option = filterOptions.sort.find(item => item.value === value);
+      const { sort } = filters;
+      if (!option) {
+        sort.set(filterOptions.sort[0].value);
+        return;
+      }
+      sort.value = option && option.value;
+      sort.title = option && option.title;
+    },
+  },
+};
+hookSetting('filters.sort', value => {
+  filters.sort.set(value);
+});
+options.ready(() => {
+  filters.sort.set(options.get('filters.sort'));
+});
 
 export default {
   components: {
     Item,
     Edit,
     Tooltip,
+    SettingCheck,
+    LocaleGroup,
     VlDropdown,
+    VlModal,
     Icon,
   },
   data() {
     return {
       store,
+      filterOptions,
+      filters,
       script: null,
       search: null,
+      modal: null,
       scripts: store.scripts,
     };
   },
   watch: {
-    search() {
-      this.debouncedUpdate();
-    },
+    search: 'updateLater',
+    'filters.sort.value': 'updateLater',
     'store.scripts': 'onUpdate',
   },
   computed: {
@@ -79,11 +145,29 @@ export default {
   },
   methods: {
     onUpdate() {
-      const { search } = this;
+      const { search, filters: { sort } } = this;
+      const lowerSearch = (search || '').toLowerCase();
       const { scripts } = this.store;
-      this.scripts = search
-        ? scripts.filter(script => (script._search || '').includes(search.toLowerCase()))
-        : scripts;
+      const filteredScripts = search
+        ? scripts.filter(script => script._cache.search.includes(lowerSearch))
+        : scripts.slice();
+      if (sort.value === 'alpha') {
+        const showEnabledFirst = options.get('filters.showEnabledFirst');
+        filteredScripts.sort((a, b) => {
+          if (showEnabledFirst && a.config.enabled !== b.config.enabled) {
+            return a.config.enabled ? -1 : 1;
+          }
+          const { _cache: { lowerName: nameA } } = a;
+          const { _cache: { lowerName: nameB } } = b;
+          if (nameA < nameB) return -1;
+          if (nameA > nameB) return 1;
+          return 0;
+        });
+      }
+      this.scripts = filteredScripts;
+    },
+    updateLater() {
+      this.debouncedUpdate();
     },
     newScript() {
       this.script = {};
@@ -148,6 +232,9 @@ export default {
         this.store.scripts = seq.concat.apply([], seq);
       });
     },
+    onOrderChange(e) {
+      options.set('filters.sort', e.target.value);
+    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 200);
@@ -169,17 +256,6 @@ $header-height: 4rem;
   }
   .vl-dropdown-menu {
     white-space: nowrap;
-    > a {
-      display: block;
-      width: 100%;
-      padding: .5rem;
-      text-decoration: none;
-      color: #666;
-      &:hover {
-        color: inherit;
-        background: #fbfbfb;
-      }
-    }
   }
 }
 .backdrop,
@@ -212,6 +288,18 @@ $header-height: 4rem;
   background: rgba(0,0,0,.08);
   /*transition: opacity 1s;*/
 }
+.dropdown-menu-item {
+  display: block;
+  width: 100%;
+  padding: .5rem;
+  text-decoration: none;
+  color: #666;
+  cursor: pointer;
+  &:hover {
+    color: inherit;
+    background: #fbfbfb;
+  }
+}
 .filter-search {
   position: relative;
   width: 12rem;
@@ -225,6 +313,14 @@ $header-height: 4rem;
     padding-left: .5rem;
     padding-right: 2rem;
     line-height: 2;
+  }
+}
+.filter-sort {
+  .vl-dropdown-menu {
+    padding: 1rem;
+    > * {
+      margin-bottom: .5rem;
+    }
   }
 }
 </style>

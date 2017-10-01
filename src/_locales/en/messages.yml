@@ -418,3 +418,18 @@ buttonUndo:
 labelRemoved:
   description: Label shown when a script is removed.
   message: '[Removed]'
+buttonFilter:
+  description: Button to show filters menu.
+  message: Filters
+optionShowEnabledFirst:
+  description: Option to show enabled scripts first in alphabetical order.
+  message: Show enabled scripts first
+filterExecutionOrder:
+  description: Label for option to sort scripts in execution order.
+  message: execution order
+filterAlphabeticalOrder:
+  description: Label for option to sort scripts in alphabetical order.
+  message: alphabetical order
+labelFilterSort:
+  description: Label for sort filter.
+  message: Sort by $1

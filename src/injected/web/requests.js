@@ -36,15 +36,15 @@ function parseData(req, details) {
     // blob or arraybuffer
     const { response } = req.data;
     if (response) {
-      let data = response.split(',');
+      const data = response.split(',');
       const matches = data[0].match(/^data:(.*?);base64$/);
       if (!matches) {
         // invalid
         req.data.response = null;
       } else {
-        data = window.atob(data[1]);
-        const arr = new window.Uint8Array(data.length);
-        for (let i = 0; i < data.length; i += 1) arr[i] = data.charCodeAt(i);
+        const raw = window.atob(data[1]);
+        const arr = new window.Uint8Array(raw.length);
+        for (let i = 0; i < raw.length; i += 1) arr[i] = raw.charCodeAt(i);
         if (details.responseType === 'blob') {
           // blob
           return new Blob([arr], { type: matches[1] });
@@ -68,7 +68,7 @@ function callback(req, res) {
   if (cb) {
     if (res.data.response) {
       if (!req.data) req.data = [parseData(res, req.details)];
-      res.data.response = req.data[0];
+      [res.data.response] = req.data;
     }
     res.data.context = req.details.context;
     cb(res.data);

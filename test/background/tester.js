@@ -141,6 +141,20 @@ test('include', t => {
     q.notOk(testScript('https://www.hello.com/', script), 'not include by prefix');
     q.end();
   });
+
+  t.test('should support magic TLD', q => {
+    const script = buildScript({
+      meta: {
+        include: [
+          'https://www.google.tld/*',
+        ],
+      },
+    });
+    q.ok(testScript('https://www.google.com/', script), 'should match `.com`');
+    q.ok(testScript('https://www.google.com.hk/', script), 'should match `.com.hk`');
+    q.notOk(testScript('https://www.google.example.com/', script), 'should not match subdomains');
+    q.end();
+  });
 });
 
 test('exclude', t => {
@@ -174,6 +188,20 @@ test('exclude', t => {
     q.notOk(testScript('https://www.google.com/', script), 'should exclude `/`');
     q.notOk(testScript('https://www.google.com/hello/world', script), 'exclude by prefix');
     q.ok(testScript('https://www.hello.com/', script), 'not exclude by prefix');
+    q.end();
+  });
+
+  t.test('should support magic TLD', q => {
+    const script = buildScript({
+      meta: {
+        exclude: [
+          'https://www.google.tld/*',
+        ],
+      },
+    });
+    q.notOk(testScript('https://www.google.com/', script), 'should match `.com`');
+    q.notOk(testScript('https://www.google.com.hk/', script), 'should match `.com.hk`');
+    q.ok(testScript('https://www.google.example.com/', script), 'should not match subdomains');
     q.end();
   });
 });

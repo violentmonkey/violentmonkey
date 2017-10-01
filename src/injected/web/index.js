@@ -1,4 +1,4 @@
-import { getUniqId, bindEvents, Promise, attachFunction, console, throttle } from '../utils';
+import { getUniqId, bindEvents, Promise, attachFunction, console } from '../utils';
 import { includes, forEach, map, utf8decode } from './helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
@@ -35,8 +35,11 @@ const handlers = {
   GotRequestId: onRequestStart,
   HttpRequested: onRequestCallback,
   TabClosed: onTabClosed,
-  UpdateValues({ id, values }) {
-    if (store.values[id]) store.values[id] = values;
+  UpdatedValues(updates) {
+    Object.keys(updates)
+    .forEach(id => {
+      if (store.values[id]) store.values[id] = updates[id];
+    });
   },
   NotificationClicked: onNotificationClicked,
   NotificationClosed: onNotificationClosed,
@@ -57,7 +60,7 @@ function onLoadScripts(data) {
   bridge.version = data.version;
   if (includes([
     'greasyfork.org',
-  ], location.host)) {
+  ], window.location.host)) {
     exposeVM();
   }
   // reset load and checkLoad
@@ -92,16 +95,15 @@ function onLoadScripts(data) {
   bridge.checkLoad();
   function buildCode(script) {
     const requireKeys = script.meta.require || [];
+    const pathMap = script.custom.pathMap || {};
     const code = data.code[script.props.id] || '';
-    const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
-    const metaStr = matches ? matches[1] : '';
-    const wrapper = wrapGM(script, metaStr, data.cache);
+    const wrapper = wrapGM(script, code, data.cache);
     // Must use Object.getOwnPropertyNames to list unenumerable properties
     const argNames = Object.getOwnPropertyNames(wrapper);
     const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
     const codeSlices = [`${wrapperInit};with(this)!function(){`];
     forEach(requireKeys, key => {
-      const requireCode = data.require[key];
+      const requireCode = data.require[pathMap[key] || key];
       if (requireCode) {
         codeSlices.push(requireCode);
         // Add `;` to a new line in case script ends with comment lines
@@ -128,7 +130,7 @@ function onLoadScripts(data) {
   }
 }
 
-function wrapGM(script, metaStr, cache) {
+function wrapGM(script, code, cache) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const gm = {};
@@ -154,7 +156,9 @@ function wrapGM(script, metaStr, cache) {
     o: val => JSON.parse(val),
     '': val => val,
   };
-  const throttledDumpValues = throttle(dumpValues, 200);
+  const pathMap = script.custom.pathMap || {};
+  const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
+  const metaStr = matches ? matches[1] : '';
   const gmFunctions = {
     unsafeWindow: { value: window },
     GM_info: {
@@ -187,7 +191,7 @@ function wrapGM(script, metaStr, cache) {
       value(key) {
         const value = loadValues();
         delete value[key];
-        throttledDumpValues();
+        dumpValue(key);
       },
     },
     GM_getValue: {
@@ -201,7 +205,7 @@ function wrapGM(script, metaStr, cache) {
           try {
             val = handle(val);
           } catch (e) {
-            console.warn(e);
+            if (process.env.DEBUG) console.warn(e);
           }
           return val;
         }
@@ -220,14 +224,14 @@ function wrapGM(script, metaStr, cache) {
         const raw = type + handle(val);
         const value = loadValues();
         value[key] = raw;
-        throttledDumpValues();
+        dumpValue(key, raw);
       },
     },
     GM_getResourceText: {
       value(name) {
         if (name in resources) {
-          const uri = resources[name];
-          const raw = cache[uri];
+          const key = resources[name];
+          const raw = cache[pathMap[key] || key];
           const text = raw && utf8decode(window.atob(raw));
           return text;
         }
@@ -239,7 +243,7 @@ function wrapGM(script, metaStr, cache) {
           const key = resources[name];
           let blobUrl = urls[key];
           if (!blobUrl) {
-            const raw = cache[key];
+            const raw = cache[pathMap[key] || key];
             if (raw) {
               // Binary string is not supported by blob constructor,
               // so we have to transform it into array buffer.
@@ -326,12 +330,12 @@ function wrapGM(script, metaStr, cache) {
     Object.defineProperty(obj, name, prop);
     if (typeof obj[name] === 'function') obj[name].toString = propertyToString;
   }
-  function dumpValues() {
+  function dumpValue(key, value) {
     bridge.post({
-      cmd: 'SetValue',
+      cmd: 'UpdateValue',
       data: {
-        where: { id: script.props.id },
-        values: loadValues(),
+        id: script.props.id,
+        update: { key, value },
       },
     });
   }

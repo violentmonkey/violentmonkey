@@ -31,21 +31,25 @@ module.exports = {
     }],
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-    'no-console': ['error', {
+    'no-console': ['warn', {
       allow: ['error', 'warn', 'info'],
     }],
     'no-param-reassign': ['error', {
       props: false,
     }],
-    'array-callback-return': ['off'],
-    'consistent-return': ['off'],
+    'consistent-return': 'off',
     'no-use-before-define': ['error', 'nofunc'],
     'object-shorthand': ['error', 'always'],
-    'no-mixed-operators': ['error', {allowSamePrecedence: true}],
-    'no-bitwise': ['error', {int32Hint: true}],
-    'no-underscore-dangle': ['off'],
-    'arrow-parens': 0,
-    'indent': ['error', 2, { MemberExpression: 0 }],
+    'no-mixed-operators': ['error', { allowSamePrecedence: true }],
+    'no-bitwise': ['error', { int32Hint: true }],
+    'no-underscore-dangle': 'off',
+    'arrow-parens': ['error', 'as-needed'],
+    'prefer-promise-reject-errors': 'off',
+    'prefer-destructuring': ['error', { array: false }],
+    indent: ['error', 2, {
+      MemberExpression: 0,
+      flatTernaryExpressions: true,
+    }],
   },
   globals: {
     browser: true,

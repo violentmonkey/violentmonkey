@@ -1,7 +1,6 @@
-import Vue from 'vue';
-import 'src/common/polyfills';
 import 'src/common/browser';
 import 'src/common/sprite';
+import Vue from 'vue';
 import { sendMessage, i18n, getLocaleString } from 'src/common';
 import options from 'src/common/options';
 import getPathInfo from 'src/common/pathinfo';
@@ -38,16 +37,20 @@ function initialize() {
   });
 }
 
-function initSearch(script) {
+function initScript(script) {
   const meta = script.meta || {};
-  script._search = [
+  const localeName = getLocaleString(meta, 'name');
+  const search = [
     meta.name,
-    getLocaleString(meta, 'name'),
+    localeName,
     meta.description,
     getLocaleString(meta, 'description'),
     script.custom.name,
     script.custom.description,
   ].filter(Boolean).join('\n').toLowerCase();
+  const name = script.custom.name || localeName;
+  const lowerName = name.toLowerCase();
+  script._cache = { search, name, lowerName };
 }
 
 function loadData() {
@@ -57,11 +60,11 @@ function loadData() {
       'cache',
       'scripts',
       'sync',
-    ].forEach((key) => {
+    ].forEach(key => {
       Vue.set(store, key, data[key]);
     });
     if (store.scripts) {
-      store.scripts.forEach(initSearch);
+      store.scripts.forEach(initScript);
     }
     store.loading = false;
   });
@@ -77,7 +80,7 @@ function initMain() {
     },
     AddScript({ update }) {
       update.message = '';
-      initSearch(update);
+      initScript(update);
       store.scripts.push(update);
     },
     UpdateScript(data) {
@@ -86,7 +89,7 @@ function initMain() {
       if (index >= 0) {
         const updated = Object.assign({}, store.scripts[index], data.update);
         Vue.set(store.scripts, index, updated);
-        initSearch(updated);
+        initScript(updated);
       }
     },
   });

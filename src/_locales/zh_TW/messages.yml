@@ -1,423 +1,421 @@
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: 暴力猴
 extDescription:
   description: Description for this extension.
-  message: Hỗ trợ chạy userscript trên trình duyệt.
+  message: 為瀏覽器提供使用者腳本支援。
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Đã cập nhật script.
+  message: 腳本已更新。
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Có lỗi khi tìm phiên bản mới!
+  message: 獲取腳本發生錯誤！
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Đã cài đặt script.
+  message: 腳本已安裝。
 Warning:
   description: Show warnings with a notification.
-  message: Cảnh báo
+  message: 警告
   touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
-  message: 'Script [$1] thiếu thuộc tính `@grant`! Bấm để xem chi tiết.'
+  message: 腳本【$1】沒有`@grant`行！點擊檢視更多資訊。
   touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Không có tên
+  message: 名字為空
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Đang cập nhật...
+  message: 正在更新…
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Có phiên bản mới.
+  message: 發現新版本。
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Đang kiểm tra cập nhật...
+  message: 正在檢查更新…
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Tìm kiếm thông tin cập nhật thất bại.
+  message: 獲取更新資訊失敗。
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Không có cập nhật mới.
+  message: 未發現新版本。
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Đang cài đặt script
+  message: 安裝腳本
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
-  message: Tuỳ chọn
+  message: 選項
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Đóng sau khi cài đặt xong
+  message: 安裝完成後關閉
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Track local file before this window is closed
+  message: 本視窗關閉前跟蹤開啟的本地檔案同步更新
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: Xác nhận cài đặt
+  message: 確認安裝
 buttonClose:
   description: Button to close window.
-  message: Đóng
+  message: 關閉
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Không thể tải script.
+  message: 載入腳本數據發生錯誤。
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: Đã tải script.
+  message: 腳本數據已載入。
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: Lỗi tải thư viện.
+  message: 載入腳本依賴發生錯誤。
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: Đang tải thư viện... ($1/$2)
+  message: 正在載入腳本依賴…（$1/$2）
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Đang tải thông tin script...
+  message: 正在載入腳本數據…
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: Script đã cài đặt
+  message: 已安裝的腳本
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Cài đặt
+  message: 設定
 sideMenuAbout:
   description: 'Side menu: About'
-  message: Thông tin
+  message: 關於
 buttonNew:
   description: Button to create a new script.
-  message: Tạo mới
+  message: 新建
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Kiểm tra cập nhật tất cả
+  message: 全部更新
 anchorGetMoreScripts:
   description: Link to get more scripts.
-  message: Tìm thêm script
+  message: 獲取更多腳本
   touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
-  message: Đang tải ...
+  message: 載入中…
 labelSettings:
   description: Label shown on the top of settings page
-  message: Cài đặt
+  message: 設定
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Tự động kiểm tra cập nhật hàng ngày
+  message: 每天自動更新腳本
 labelIgnoreGrant:
   description: Option to suppress no @grant warnings.
-  message: Bỏ qua cảnh báo không có @grant
+  message: 不顯示缺少@grant的警告
   touched: false
 labelDataImport:
   description: Section title of data import.
-  message: Nhập dữ liệu
+  message: 數據匯入
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Nhập từ tập tin zip
+  message: 從zip檔匯入
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Làm trống dữ liệu
+  message: 整理數據庫
 labelDataExport:
   description: Section title of data export.
-  message: Xuất dữ liệu
+  message: 數據匯出
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Xuất dữ liệu script
+  message: 匯出腳本數據
 buttonAllNone:
   description: Button to select all scripts or none.
-  message: Tất cả/Bỏ chọn
+  message: 全選/不選
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Xuất ra tập tin zip
+  message: 匯出為zip檔
 labelAbout:
   description: Label shown on top of the about page.
-  message: Thông tin Violentmonkey
+  message: 關於暴力猴
 labelRelated:
   description: Label of related links.
-  message: 'Liên kết gợi ý: '
+  message: 相關連結：
 labelDonate:
   description: Label of link to donate page.
-  message: Đóng góp
+  message: 捐助
 labelFeedback:
   description: Label of link to feedback page.
-  message: Phản hồi
+  message: 反饋
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 'Tác giả: '
+  message: 作者：
 anchorAuthor:
   description: Author shown on about tab.
-  message: '<a href=mailto:i@gerald.top>Gerald</a>'
+  message: ''
 labelTranslator:
   description: Label of translator.
-  message: 'Dịch bởi: '
+  message: 翻譯者：
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href=mailto:donghoang.nguyen@gmail.com>Nguyễn Đông Hoàng</a>'
+  message: 吳某
 labelCurrentLang:
   description: Label of current language.
-  message: 'Ngôn ngữ hiện tại: '
+  message: 當前語言：
 labelScriptEditor:
   description: Shown in the title of the script editing page.
-  message: Trình chỉnh sửa script
+  message: 腳本編輯器
 labelName:
   description: Label of script name.
-  message: 'Tên:'
+  message: 名字：
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Chạy khi:'
+  message: 執行時機：
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Mặc định)
+  message: （預設）
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Trang chủ:'
+  message: 主頁網址：
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'URL Cập nhật:'
+  message: 檢查更新網址：
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'URL tải về:'
+  message: 下載更新網址：
 labelInclude:
   description: Label of @include rules.
-  message: Thực thi
+  message: '@include 規則'
 labelMatch:
   description: Label of @match rules.
-  message: Trùng khớp
+  message: '@match 規則'
 labelExclude:
   description: Label of @exclude rules.
-  message: Bỏ qua
+  message: '@exclude 規則'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: '@exclude-match 規則'
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Cho phép cập nhật
+  message: 允許更新
 buttonSave:
   description: Button to save modifications of a script.
-  message: Lưu
+  message: 儲存
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: Lưu & Đóng
+  message: 儲存並關閉
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'Oops, bạn không có script nào được cài đặt.'
+  message: 噢喔，您還沒有任何腳本～
 buttonDisable:
   description: Button to disable a script.
-  message: Vô hiệu hoá
+  message: 停用
 buttonEnable:
   description: Button to enable a script.
-  message: Kích hoạt
+  message: 啟用
 buttonEdit:
   description: Button to edit a script.
-  message: Sửa
+  message: 編輯
 buttonRemove:
   description: Button to remove a script.
-  message: Xoá
+  message: 移除
 buttonUpdate:
   description: Check a script for updates.
-  message: Kiểm tra cập nhật
+  message: 檢查更新
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: Đã nhập $1 script.
+  message: 已匯入$1個腳本。
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: Dùng @downloadURL
+  message: 使用@downloadURL
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    Thay đổi chưa được lưu!
-    Bấm OK để huỷ bỏ hoặc Cancel đế quay lại.
+    修改尚未儲存！
+    點選確定放棄修改或點選取消停留此頁面。
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Làm trống dữ liệu...
+  message: 正在整理…
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Đã làm trống dữ liệu
+  message: 數據已整理
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Bỏ qua dữ liệu thừa và cố gắng tải lại nguồn dữ liệu thiếu từ bộ nhớ đệm.
+  message: 丟棄多餘的數據，並嘗試重新獲取缺失的資源。
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Tìm script cho trang này
+  message: 為此站點查詢腳本
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Đã kích hoạt script
+  message: 腳本已啟用
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Đã vô hiệu hoá script
+  message: 腳本已停用
 menuCommands:
   description: Menu item to list script commands.
-  message: Menu của script
+  message: 腳本命令
 labelSearch:
   description: Label for search input in search box.
-  message: 'Tìm kiếm: '
+  message: 尋找：
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Thay thế bằng: '
+  message: 取代：
 buttonReplace:
   description: Button to replace the current match.
-  message: Thay thế
+  message: 取代
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: Tất cả
+  message: 全部
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Tải lại trang khi bật/tắt script từ menu
+  message: 從選單開啟或關閉腳本後自動重新整理當前頁面
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'URL đầu vào:'
+  message: 請輸入網址：
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Cài đăt từ URL
+  message: 通過網址安裝
 labelSync:
   description: Label for sync options.
-  message: Đồng bộ
+  message: 同步
 lastSync:
   description: Label for last sync timestamp.
-  message: Đồng bộ cuối lúc $1
+  message: 最近同步時間為 $1
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Đang khởi tạo...
+  message: 正在初始化…
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: Khởi tạo lỗi!
+  message: 初始化失敗！
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: Đồng bộ sẽ chạy sớm...
+  message: 即將開始同步…
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Đang đồng bộ...
+  message: 正在同步…
 msgSyncError:
   description: Message shown when sync failed.
-  message: Đồng bộ lỗi!
+  message: 同步出錯！
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Xung đột namespace! Vui lòng sửa @name và @namespace.
+  message: 腳本命名空間衝突，請修改@name和@namespace！
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Script không hợp lệ!
+  message: 腳本不合法！
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: Hiện thị số script đang chạy ở icon
+  message: 在擴充套件圖示上顯示執行的腳本數
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Dòng số.: '
+  message: 行號：
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Danh sách đen
+  message: 黑名單
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: URL trong danh sách này sẽ không bị bỏ qua.
+  message: 符合此列表的URL將不會被注入腳本。
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: Lưu
+  message: 儲存
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: Danh sách đen đã cập nhật.
+  message: 黑名單已更新！
 labelGeneral:
   description: Label for general settings.
-  message: Chung
+  message: 通用
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Trạng thái đồng bộ script
+  message: 同步腳本狀態
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: Không có
+  message: 無
 labelSyncService:
   description: Label for sync service select.
-  message: Đồng bộ tới
+  message: 同步到
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Authorize
+  message: 授權
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Revoke
+  message: 取消授權
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Đang xác thực
+  message: 授權中
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: Giao diện tùy chỉnh đã cập nhật.
+  message: 自訂樣式已更新！
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Giao diện tùy chỉnh
+  message: 自訂樣式
 descCustomCSS:
   description: Description of custom CSS section.
-  message: >-
-    CSS tùy chỉnh cho trang tùy chọn và trang script đã cài đặt Nếu không hiểu
-    rõ xin đừng sửa.
+  message: 這裡可以為管理頁面和腳本安裝頁面設定自訂CSS。如果你不確定它的意思，請不要修改。
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: Lưu
+  message: 儲存
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: Mở bảng điều khiển
+  message: 打開控制台
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Script trùng khớp
+  message: 匹配的腳本
 buttonOK:
   description: OK button on dialog.
-  message: Đồng ý
+  message: 確定
 buttonCancel:
   description: Cancel button on dialog.
-  message: Hủy
+  message: 取消
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Nhập cài đặt
+  message: 匯入設定
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Tìm hiểu thêm về quy tắc danh sách đen.
+  message: 了解更多黑名單規則。
 editNavCode:
   description: Label of code tab in script editor.
-  message: Mã nguồn
+  message: 程式碼
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: Cài đặt
+  message: 設定
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Cài đặt Script
+  message: 腳本設定
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: Tuỳ chỉnh thẻ dữ liệu
+  message: 自訂元數據
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Giữ bản gốc
+  message: 保留原有規則
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: Cập nhật
+  message: 更新
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Script [$1] đã được cập nhật!'
+  message: 腳本【$1】已更新！
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Thông báo có cập nhật script
+  message: 腳本更新時通知
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Cài đặt từ $1
+  message: 從$1安裝
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Tìm kiếm....
+  message: 搜尋腳本…
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: Không thấy script nào
+  message: 沒有找到腳本！
 buttonHome:
   description: Button to open homepage.
-  message: Trang chủ
+  message: 主頁
 buttonSupport:
   description: Button to open support page.
-  message: Hỗ trợ
+  message: 支援頁面
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Hoàn tác
+  message: 復原
 labelRemoved:
   description: Label shown when a script is removed.
-  message: '[Đã xóa]'
+  message: 【已刪除】
 buttonFilter:
   description: Button to show filters menu.
   message: ''

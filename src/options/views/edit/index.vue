@@ -15,7 +15,7 @@
     <div class="frame-block flex-auto pos-rel">
       <vm-code
         v-show="nav === 'code'" class="abs-full"
-        v-model="code" :commands="commands" @ready="initEditor"
+        v-model="code" :commands="commands"
       />
       <vm-settings
         v-show="nav === 'settings'" class="abs-full"
@@ -33,7 +33,8 @@
 </template>
 
 <script>
-import { i18n, sendMessage, noop, object } from 'src/common';
+import { i18n, sendMessage, noop } from 'src/common';
+import { objectGet } from 'src/common/object';
 import VmCode from 'src/common/ui/code';
 import { showMessage } from '../../utils';
 import VmSettings from './settings';
@@ -81,16 +82,20 @@ export default {
     this.script = this.initial;
   },
   mounted() {
-    const id = object.get(this.script, 'props.id');
-    (id ? sendMessage({
-      cmd: 'GetScriptCode',
-      data: id,
-    }) : sendMessage({
-      cmd: 'NewScript',
-    }).then(({ script, code }) => {
-      this.script = script;
-      return code;
-    }))
+    const id = objectGet(this.script, 'props.id');
+    (id
+      ? sendMessage({
+        cmd: 'GetScriptCode',
+        data: id,
+      })
+      : sendMessage({
+        cmd: 'NewScript',
+      })
+      .then(({ script, code }) => {
+        this.script = script;
+        return code;
+      })
+    )
     .then(code => {
       this.code = code;
       const settings = {};
@@ -145,7 +150,7 @@ export default {
         exclude: toList(rawCustom.exclude),
         excludeMatch: toList(rawCustom.excludeMatch),
       });
-      const id = object.get(this.script, 'props.id');
+      const id = objectGet(this.script, 'props.id');
       return sendMessage({
         cmd: 'ParseScript',
         data: {
@@ -162,7 +167,7 @@ export default {
       })
       .then(res => {
         this.canSave = false;
-        if (object.get(res, 'where.id')) this.script = res.update;
+        if (objectGet(res, 'where.id')) this.script = res.update;
       }, err => {
         showMessage({ text: err });
       });
@@ -190,9 +195,6 @@ export default {
     },
     saveClose() {
       this.save().then(this.close);
-    },
-    initEditor(cm) {
-      this.cm = cm;
     },
   },
 };

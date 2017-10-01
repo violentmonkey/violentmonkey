@@ -10,10 +10,17 @@ import initialize from './content';
   function initBridge() {
     const contentId = getUniqId();
     const webId = getUniqId();
+    const props = {};
+    [
+      Object.getOwnPropertyNames(window),
+      typeof global !== 'undefined' && Object.getOwnPropertyNames(global),
+    ].forEach(keys => {
+      keys.forEach(key => { props[key] = 1; });
+    });
     const args = [
       JSON.stringify(webId),
       JSON.stringify(contentId),
-      JSON.stringify(Object.getOwnPropertyNames(window)),
+      JSON.stringify(Object.keys(props)),
     ];
     inject(`(${window.VM_initializeWeb.toString()}())(${args.join(',')})`);
     initialize(contentId, webId);
@@ -29,17 +36,17 @@ import initialize from './content';
         cmd: 'ConfirmInstall',
         data: {
           code: document.body.textContent,
-          url: location.href,
+          url: window.location.href,
           from: document.referrer,
         },
       })
       .then(() => {
-        if (history.length > 1) history.go(-1);
+        if (window.history.length > 1) window.history.go(-1);
         else sendMessage({ cmd: 'TabClose' });
       });
     }
   }
-  if (/\.user\.js$/.test(location.pathname)) {
+  if (/\.user\.js$/.test(window.location.pathname)) {
     if (document.readyState === 'complete') checkJS();
     else window.addEventListener('load', checkJS, false);
   }

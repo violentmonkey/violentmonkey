@@ -1,6 +1,5 @@
-import Vue from 'vue';
-import 'src/common/polyfills';
 import 'src/common/browser';
+import Vue from 'vue';
 import { i18n } from 'src/common';
 import 'src/common/handlers';
 import options from 'src/common/options';

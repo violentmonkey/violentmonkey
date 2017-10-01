@@ -7,7 +7,7 @@
 <script>
 import Vue from 'vue';
 import options from 'src/common/options';
-import { object } from 'src/common';
+import { objectGet } from 'src/common/object';
 import { store } from '../utils';
 
 const FEATURES_KEY = 'features';
@@ -19,10 +19,9 @@ options.hook(data => {
   }
 });
 options.ready(() => reset('sync'));
-window.store = store;
 
 function reset(version) {
-  if (object.get(store, 'features.version') !== version) {
+  if (objectGet(store, 'features.version') !== version) {
     options.set(FEATURES_KEY, {
       version,
       data: {},
@@ -46,13 +45,13 @@ export default {
   },
   computed: {
     featured() {
-      return this.store.features && !object.get(this.store, ['features', 'data', this.name]);
+      return this.store.features && !objectGet(this.store, ['features', 'data', this.name]);
     },
   },
   methods: {
     onClick() {
       const { features } = this.store;
-      if (object.get(features, 'version')) {
+      if (objectGet(features, 'version')) {
         features.data[this.name] = 1;
         options.set(FEATURES_KEY, features);
       }

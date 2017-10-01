@@ -52,7 +52,7 @@ export default {
 
 function forEachItem(obj, cb) {
   if (obj) {
-    Object.keys(obj).forEach((key) => {
+    Object.keys(obj).forEach(key => {
       cb(obj[key], key);
     });
   }
@@ -71,9 +71,9 @@ function getVMConfig(text) {
 function getVMFile(entry, vmFile) {
   if (!entry.filename.endsWith('.user.js')) return;
   const vm = vmFile || {};
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const writer = new zip.TextWriter();
-    entry.getData(writer, (text) => {
+    entry.getData(writer, text => {
       const data = { code: text };
       if (vm.scripts) {
         const more = vm.scripts[entry.filename.slice(0, -8)];
@@ -99,9 +99,9 @@ function getVMFiles(entries) {
   if (i < 0) {
     return { entries };
   }
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const writer = new zip.TextWriter();
-    entries[i].getData(writer, (text) => {
+    entries[i].getData(writer, text => {
       entries.splice(i, 1);
       resolve({
         entries,
@@ -113,11 +113,11 @@ function getVMFiles(entries) {
 
 function readZip(file) {
   return new Promise((resolve, reject) => {
-    zip.createReader(new zip.BlobReader(file), (res) => {
-      res.getEntries((entries) => {
+    zip.createReader(new zip.BlobReader(file), res => {
+      res.getEntries(entries => {
         resolve(entries);
       });
-    }, (err) => { reject(err); });
+    }, err => { reject(err); });
   });
 }
 
@@ -136,13 +136,13 @@ function importData(file) {
     return Promise.all(entries.map(entry => getVMFile(entry, vm)))
     .then(res => res.filter(Boolean).length)
     .then(count => {
-      forEachItem(vm.values, (value, key) => {
-        if (value) {
+      forEachItem(vm.values, (valueStore, key) => {
+        if (valueStore) {
           sendMessage({
-            cmd: 'SetValue',
+            cmd: 'SetValueStore',
             data: {
               where: { uri: key },
-              values: value,
+              valueStore,
             },
           });
         }

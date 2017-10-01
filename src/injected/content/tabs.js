@@ -6,7 +6,7 @@ const tabIds = {};
 const tabKeys = {};
 
 export function tabOpen({ key, data }) {
-  data.url = getFullUrl(data.url, location.href);
+  data.url = getFullUrl(data.url, window.location.href);
   sendMessage({ cmd: 'TabOpen', data })
   .then(({ id }) => {
     tabIds[key] = id;

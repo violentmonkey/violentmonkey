@@ -1,15 +1,14 @@
 // Reference: https://dev.onedrive.com/README.htm
-import { object, noop } from 'src/common';
+import { noop } from 'src/common';
+import { objectGet } from 'src/common/object';
 import { dumpQuery } from '../utils';
 import { BaseService, isScriptFile, register, getURI } from './base';
 
+const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ=='));
 const config = Object.assign({
   client_id: '000000004418358A',
   redirect_uri: 'https://violentmonkey.github.io/auth_onedrive.html',
-}, JSON.parse(
-  // assume this is secret
-  window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ=='),
-));
+}, SECRET_KEY);
 
 const OneDrive = BaseService.extend({
   name: 'onedrive',
@@ -36,7 +35,7 @@ const OneDrive = BaseService.extend({
       throw res;
     })
     .catch(res => {
-      if (res.status === 400 && object.get(res, ['data', 'error']) === 'invalid_grant') {
+      if (res.status === 400 && objectGet(res, ['data', 'error']) === 'invalid_grant') {
         return Promise.reject({
           type: 'unauthorized',
         });

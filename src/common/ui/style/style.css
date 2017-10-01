@@ -32,6 +32,7 @@ a {
   color: dodgerblue;
 }
 hr {
+  margin: .5rem;
   border: none;
   border-top: 1px solid darkgray;
 }
@@ -163,7 +164,6 @@ button {
   }
 }
 
-.editor-code,
 .editor-code .CodeMirror {
   height: 100%;
   /* Use `Courier New` to ensure `&nbsp;` has the same width as an original space. */
@@ -195,5 +195,10 @@ button {
 .vl-dropdown-menu {
   padding: .5rem;
   border: 1px solid #bbb;
+  background: white;
+}
+
+.modal-content {
+  padding: 1rem;
   background: white;
 }

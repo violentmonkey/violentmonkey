@@ -28,6 +28,7 @@
 import { sendMessage } from 'src/common';
 import options from 'src/common/options';
 import SettingCheck from 'src/common/ui/setting-check';
+import hookSetting from 'src/common/hook-setting';
 import Icon from 'src/common/ui/icon';
 import { store } from '../../utils';
 import Feature from '../feature';
@@ -36,10 +37,8 @@ const SYNC_CURRENT = 'sync.current';
 const syncConfig = {
   current: '',
 };
-options.hook((data) => {
-  if (SYNC_CURRENT in data) {
-    syncConfig.current = data[SYNC_CURRENT] || '';
-  }
+hookSetting(SYNC_CURRENT, value => {
+  syncConfig.current = value || '';
 });
 
 export default {

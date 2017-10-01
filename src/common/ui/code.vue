@@ -55,7 +55,7 @@ import { debounce } from 'src/common';
 import Tooltip from './tooltip';
 
 function getHandler(key) {
-  return (cm) => {
+  return cm => {
     const { commands } = cm.state;
     const handle = commands && commands[key];
     return handle && handle();
@@ -67,13 +67,15 @@ function indentWithTab(cm) {
   } else {
     cm.replaceSelection(
       cm.getOption('indentWithTabs') ? '\t' : ' '.repeat(cm.getOption('indentUnit')),
-      'end', '+input');
+      'end',
+      '+input',
+    );
   }
 }
 
 [
   'save', 'cancel', 'find', 'findNext', 'findPrev', 'replace', 'replaceAll', 'close',
-].forEach((key) => {
+].forEach(key => {
   CodeMirror.commands[key] = getHandler(key);
 });
 
@@ -96,8 +98,10 @@ function findNext(cm, state, reversed) {
     const query = state.query || '';
     let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo);
     if (!cursor.find(reversed)) {
-      cursor = cm.getSearchCursor(query,
-        reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0));
+      cursor = cm.getSearchCursor(
+        query,
+        reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
+      );
       if (!cursor.find(reversed)) return;
     }
     cm.setSelection(cursor.from(), cursor.to());
@@ -212,10 +216,10 @@ export default {
       [
         cm.options.extraKeys,
         cm.options.keyMap,
-      ].some((keyMap) => {
+      ].some(keyMap => {
         let stop = false;
         if (keyMap) {
-          CodeMirror.lookupKey(name, keyMap, (b) => {
+          CodeMirror.lookupKey(name, keyMap, b => {
             if (cm.state.commands[b]) {
               e.preventDefault();
               e.stopPropagation();
@@ -271,9 +275,9 @@ export default {
       (all ? replaceAll : replaceOne)(cm, state);
     },
     goToLine() {
-      const line = this.search.line - 1;
       const { cm } = this;
-      if (!isNaN(line)) cm.setCursor(line, 0);
+      const line = +this.search.line;
+      if (line > 0) cm.setCursor(line - 1, 0);
       cm.focus();
     },
   },
@@ -286,3 +290,10 @@ export default {
   },
 };
 </script>
+
+<style>
+/* compatible with old browsers, e.g. Maxthon 4.4 */
+.editor-code.flex-auto {
+  height: 100%;
+}
+</style>

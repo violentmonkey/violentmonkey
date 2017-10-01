@@ -1,4 +1,5 @@
-import { debounce, normalizeKeys, request, noop, object } from 'src/common';
+import { debounce, normalizeKeys, request, noop } from 'src/common';
+import { objectPurify } from 'src/common/object';
 import { getEventEmitter, getOption, setOption, hookOptions } from '../utils';
 import { getScripts, getScriptCode, parseScript, removeScript, normalizePosition } from '../utils/db';
 
@@ -41,13 +42,6 @@ function initConfig() {
       config = {
         services: {},
       };
-
-      // XXX Migrate from old data
-      ['dropbox', 'onedrive']
-      .forEach(key => {
-        config.services[key] = getOption(key);
-      });
-
       set([], config);
     }
   }
@@ -358,15 +352,14 @@ export const BaseService = serviceFactory({
             const data = {};
             try {
               const obj = JSON.parse(raw);
+              data.code = obj.code;
               if (obj.version === 2) {
-                data.code = obj.code;
                 data.config = obj.config;
                 data.custom = obj.custom;
               } else if (obj.version === 1) {
-                data.code = obj.code;
                 if (obj.more) {
                   data.custom = obj.more.custom;
-                  data.config = object.purify({
+                  data.config = objectPurify({
                     enabled: obj.more.enabled,
                     shouldUpdate: obj.more.update,
                   });
@@ -375,6 +368,8 @@ export const BaseService = serviceFactory({
             } catch (e) {
               data.code = raw;
             }
+            // Invalid data
+            if (!data.code) return;
             const remoteInfo = remoteMeta.info[item.uri];
             const { modified } = remoteInfo;
             data.modified = modified;

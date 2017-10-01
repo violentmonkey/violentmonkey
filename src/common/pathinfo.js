@@ -11,5 +11,5 @@ function parseLocation(pathInfo) {
 }
 
 export default function getPathInfo() {
-  return parseLocation(location.hash.slice(1));
+  return parseLocation(window.location.hash.slice(1));
 }

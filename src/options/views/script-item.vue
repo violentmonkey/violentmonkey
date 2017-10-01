@@ -1,8 +1,8 @@
 <template>
-  <div class="script" :class="{ disabled: !script.config.enabled, removed: script.config.removed }" :draggable="!script.config.removed" @dragstart.prevent="onDragStart">
+  <div class="script" :class="{ disabled: !script.config.enabled, removed: script.config.removed }" :draggable="draggable" @dragstart.prevent="onDragStart">
     <img class="script-icon" :src="safeIcon">
     <div class="script-info flex">
-      <div class="script-name ellipsis" v-text="script.custom.name || getLocaleString('name')"></div>
+      <div class="script-name ellipsis" v-text="script._cache.name"></div>
       <div class="flex-auto"></div>
       <div class="script-author ellipsis" :title="script.meta.author" v-if="author">
         <span v-text="i18n('labelAuthor')"></span>
@@ -87,7 +87,7 @@ function loadImage(url) {
 }
 
 export default {
-  props: ['script'],
+  props: ['script', 'draggable'],
   components: {
     Icon,
     Tooltip,
@@ -129,7 +129,7 @@ export default {
     const { icon } = this.script.meta;
     if (icon && icon !== this.safeIcon) {
       loadImage(icon)
-      .then((url) => {
+      .then(url => {
         this.safeIcon = url;
       }, () => {
         this.safeIcon = DEFAULT_ICON;
@@ -201,12 +201,13 @@ export default {
     },
     onDragMouseMove(e) {
       const { dragging } = this;
-      const { el, dragged, offset, elements, lastIndex } = dragging;
+      const {
+        el, dragged, offset, elements, lastIndex,
+      } = dragging;
       dragged.style.left = `${e.clientX - offset.x}px`;
       dragged.style.top = `${e.clientY - offset.y}px`;
-      let hoveredIndex = elements.findIndex((item) => {
-        if (!item) return;
-        if (item.classList.contains('dragging-moving')) return;
+      let hoveredIndex = elements.findIndex(item => {
+        if (!item || item.classList.contains('dragging-moving')) return false;
         const rect = item.getBoundingClientRect();
         return (
           e.clientX >= rect.left + PADDING
@@ -247,7 +248,7 @@ export default {
       });
     },
     onDragAnimate(elements, delta) {
-      elements.forEach((el) => {
+      elements.forEach(el => {
         if (!el) return;
         el.classList.add('dragging-moving');
         el.style.transition = 'none';
