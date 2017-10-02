@@ -19,7 +19,9 @@ Warning:
   touched: false
 msgWarnGrant:
   description: Message shown when `@grant` is not found in a script.
-  message: 'Skriptissä [$1] ei ole yhtään `@grant` -riviä! Klikkaa tästä saadaksesi lisätietoja.'
+  message: >-
+    Skriptissä [$1] ei ole yhtään `@grant` -riviä! Klikkaa tästä saadaksesi
+    lisätietoja.
   touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
@@ -225,7 +227,7 @@ msgImported:
   message: $1 skriptiä tuotu.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: Käytä @downloadURL:ia
+  message: 'Käytä @downloadURL:ia'
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -298,7 +300,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Konflikti skriptien nimiavaruudessa! Ole hyvä ja muokkaa @name:a and @namespace:a.
+  message: >-
+    Konflikti skriptien nimiavaruudessa! Ole hyvä ja muokkaa @name:a and
+    @namespace:a.
 msgInvalidScript:
   description: Message shown when script is invalid.
   message: Epäkelpo skripti!
@@ -432,4 +436,4 @@ filterAlphabeticalOrder:
   message: aakkosjärjestys
 labelFilterSort:
   description: Label for sort filter.
-  message: Järjestä $1:n mukaan
+  message: 'Järjestä $1:n mukaan'
