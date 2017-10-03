@@ -5,7 +5,8 @@ const minifyPreset = require('babel-preset-minify');
 const vueLoaderConfig = require('./vue-loader.conf');
 const { IS_DEV, styleRule } = require('./utils');
 
-const { MINIFY } = process.env;
+// const { MINIFY } = process.env;
+const MINIFY = true;
 const DIST = 'dist';
 const definePlugin = new webpack.DefinePlugin({
   'process.env.DEBUG': IS_DEV ? 'true' : 'false', // whether to log message errors

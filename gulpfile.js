@@ -75,6 +75,10 @@ gulp.task('manifest', () => (
     const data = yaml.safeLoad(input);
     // Strip alphabetic suffix
     data.version = pkg.version.replace(/-[^.]*/, '');
+    if (process.env.TARGET === 'firefox') {
+      data.version += 'f';
+      delete data.applications.gecko.update_url;
+    }
     file.path = file.path.replace(/\.yml$/, '.json');
     return JSON.stringify(data);
   }))

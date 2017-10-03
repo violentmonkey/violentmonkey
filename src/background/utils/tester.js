@@ -1,4 +1,4 @@
-import tldjs from 'tldjs';
+// import tldjs from 'tldjs';
 import cache from './cache';
 import { getOption, hookOptions } from './options';
 
@@ -82,17 +82,17 @@ function autoReg(str) {
   const tests = [
     tstr => re.test(tstr),
   ];
-  if (str.includes('.tld/')) {
-    const reTldStr = reStr.replace('\\.tld/', '((?:\\.\\w+)+)/');
-    tests.push(tstr => {
-      const matches = tstr.match(reTldStr);
-      if (matches) {
-        const suffix = matches[1].slice(1);
-        if (tldjs.getPublicSuffix(suffix) === suffix) return true;
-      }
-      return false;
-    });
-  }
+  // if (str.includes('.tld/')) {
+  //   const reTldStr = reStr.replace('\\.tld/', '((?:\\.\\w+)+)/');
+  //   tests.push(tstr => {
+  //     const matches = tstr.match(reTldStr);
+  //     if (matches) {
+  //       const suffix = matches[1].slice(1);
+  //       if (tldjs.getPublicSuffix(suffix) === suffix) return true;
+  //     }
+  //     return false;
+  //   });
+  // }
   return { test: tstr => tests.some(test => test(tstr)) };
 }
 
