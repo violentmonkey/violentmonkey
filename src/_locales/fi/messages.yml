@@ -52,7 +52,7 @@ installOptionClose:
   message: Sulje asennuksen jälkeen
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Seuraa paikallista tiedotoa ennen ikkunan sulkemista
+  message: Seuraa paikallista tiedostoa ennen ikkunan sulkemista
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Vahvista asennus
@@ -154,7 +154,7 @@ labelTranslator:
   message: 'Kääntäjä: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href=mailto:i@gerald.top>Gerald</a>'
+  message: 'raina'
 labelCurrentLang:
   description: Label of current language.
   message: 'Nykyinen kieli: '
@@ -225,7 +225,7 @@ msgImported:
   message: $1 skriptiä tuotu.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: Käytä @downloadURL:ia
+  message: Käytä latausosoitetta (@downloadURL)
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
