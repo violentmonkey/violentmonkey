@@ -126,18 +126,24 @@ function pathMatcher(rule) {
 }
 function matchTester(rule) {
   let test;
-  if (rule === '<all_urls>') test = () => true;
-  else {
+  if (rule === '<all_urls>') {
+    test = () => true;
+  } else {
     const ruleParts = rule.match(RE_MATCH_PARTS);
-    const matchHost = hostMatcher(ruleParts[2]);
-    const matchPath = pathMatcher(ruleParts[3]);
-    test = url => {
-      const parts = url.match(RE_MATCH_PARTS);
-      return !!ruleParts && !!parts
-      && matchScheme(ruleParts[1], parts[1])
-      && matchHost(parts[2])
-      && matchPath(parts[3]);
-    };
+    if (ruleParts) {
+      const matchHost = hostMatcher(ruleParts[2]);
+      const matchPath = pathMatcher(ruleParts[3]);
+      test = url => {
+        const parts = url.match(RE_MATCH_PARTS);
+        return !!ruleParts && !!parts
+          && matchScheme(ruleParts[1], parts[1])
+          && matchHost(parts[2])
+          && matchPath(parts[3]);
+      };
+    } else {
+      // Ignore invalid match rules
+      test = () => false;
+    }
   }
   return { test };
 }
