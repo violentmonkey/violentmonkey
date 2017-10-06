@@ -420,16 +420,16 @@ labelRemoved:
   message: '[Đã xóa]'
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Lọc
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Hiển thị script được bật trước
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: thứ tự thực thi
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: thứ tự bảng chứ cái
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: Sắp xếp theo $1
