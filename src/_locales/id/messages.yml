@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skrip telah terpasang.
-Warning:
-  description: Show warnings with a notification.
-  message: Peringatan
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 'Skrip [$1] tidak memiliki baris `@grant`! Klik untuk melihat lebih rinci.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Tanpa nama
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Periksa semua pembaruan
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Dapatkan lebih banyak skrip
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Memuat ...
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Periksa pembaruan skrip secara otomatis setiap hari
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Menekan tanpa peringatan @grant
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Impor Data

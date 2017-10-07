@@ -16,7 +16,7 @@ Related projects
 
 Development
 ---
-Make sure [Node.js](https://nodejs.org/) v8+ is installed.
+Make sure [Node.js](https://nodejs.org/) greater than v8.0 is installed.
 ``` sh
 $ npm i
 $ npm run dev
@@ -26,9 +26,6 @@ $ npm run dev
 Build
 ---
 ``` sh
-# Build without compression
+$ npm i
 $ npm run build
-
-# Build a compressed version
-$ npm run build:min
 ```

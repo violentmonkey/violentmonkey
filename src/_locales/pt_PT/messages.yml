@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script instalado.
-Warning:
-  description: Show warnings with a notification.
-  message: Aviso
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: '[$1] não possui nenhuma linha `@grant`! Clique para obter mais detalhes.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Sem nome
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Procurar atualizações para todos
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Obter mais scripts
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: A carregar...
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Procurar atualizações de scripts automaticamente todos os dias
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Suprimir avisos de @grant inexistente
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Importar dados
@@ -424,16 +408,16 @@ labelRemoved:
   message: '[Removido]'
 buttonFilter:
   description: Button to show filters menu.
-  message: 'Filtros'
+  message: Filtros
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: 'Mostrar scripts ativos primeiro'
+  message: Mostrar scripts ativos primeiro
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: 'por ordem de execução'
+  message: por ordem de execução
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: 'alfabeticamente'
+  message: alfabeticamente
 labelFilterSort:
   description: Label for sort filter.
-  message: 'Ordenar $1'
+  message: Ordenar $1

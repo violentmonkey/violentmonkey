@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Đã cài đặt script.
-Warning:
-  description: Show warnings with a notification.
-  message: Cảnh báo
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 'Script [$1] thiếu thuộc tính `@grant`! Bấm để xem chi tiết.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Không có tên
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Kiểm tra cập nhật tất cả
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Tìm thêm script
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Đang tải ...
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Tự động kiểm tra cập nhật hàng ngày
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Bỏ qua cảnh báo không có @grant
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Nhập dữ liệu
@@ -420,16 +404,16 @@ labelRemoved:
   message: '[Đã xóa]'
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Lọc
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Hiển thị script được bật trước
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: thứ tự thực thi
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: thứ tự bảng chứ cái
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: Sắp xếp theo $1

@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script yüklendi.
-Warning:
-  description: Show warnings with a notification.
-  message: Uyarı
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 'Script [$1] içerisinde `@grant` satırı yok! Detaylı inceleme için tıklayın.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: İsimsiz
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Yeni güncellemeleri kontrol et
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Daha fazla script
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Yükleniyor ...
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Scriptleri her gün otomatik olarak kontrol et
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: '@grant izin bulunmama uyarılarını engelle'
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Veri içeri aktar

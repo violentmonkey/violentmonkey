@@ -467,13 +467,15 @@ function getService(name) {
   return services[name || getCurrent()];
 }
 export function initialize() {
-  syncConfig = initConfig();
-  serviceClasses.forEach(Factory => {
-    const service = new Factory();
-    const { name } = service;
-    serviceNames.push(name);
-    services[name] = service;
-  });
+  if (!syncConfig) {
+    syncConfig = initConfig();
+    serviceClasses.forEach(Factory => {
+      const service = new Factory();
+      const { name } = service;
+      serviceNames.push(name);
+      services[name] = service;
+    });
+  }
   const service = getService();
   if (service) service.checkSync();
 }

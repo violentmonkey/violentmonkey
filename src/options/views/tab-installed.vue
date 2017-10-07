@@ -49,7 +49,7 @@
       </div>
     </header>
     <div class="scripts">
-      <item v-for="script in scripts" :key="script.props.id"
+      <item v-for="script in store.filteredScripts" :key="script.props.id"
       :script="script" :draggable="filters.sort.value === 'exec' && !script.config.removed"
       @edit="editScript" @move="moveScript"></item>
     </div>
@@ -64,6 +64,7 @@
 import VlDropdown from 'vueleton/lib/dropdown';
 import VlModal from 'vueleton/lib/modal';
 import { i18n, sendMessage, noop, debounce } from 'src/common';
+import { objectGet } from 'src/common/object';
 import options from 'src/common/options';
 import SettingCheck from 'src/common/ui/setting-check';
 import hookSetting from 'src/common/hook-setting';
@@ -122,7 +123,6 @@ export default {
       script: null,
       search: null,
       modal: null,
-      scripts: store.scripts,
     };
   },
   watch: {
@@ -138,7 +138,7 @@ export default {
       if (!this.store.scripts.length) {
         return i18n('labelNoScripts');
       }
-      if (!this.scripts.length) {
+      if (!objectGet(this.store, 'filteredScripts.length')) {
         return i18n('labelNoSearchScripts');
       }
     },
@@ -164,7 +164,7 @@ export default {
           return 0;
         });
       }
-      this.scripts = filteredScripts;
+      this.store.filteredScripts = filteredScripts;
     },
     updateLater() {
       this.debouncedUpdate();

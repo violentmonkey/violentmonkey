@@ -1,11 +1,11 @@
 {
   "name": "violentmonkey",
-  "version": "2.8.9",
+  "version": "2.8.12",
   "scripts": {
     "dev": "gulp watch",
     "prebuild": "npm run lint && gulp clean",
     "build": "cross-env NODE_ENV=production gulp build",
-    "build:min": "cross-env MINIFY=true npm run build",
+    "build:firefox": "cross-env TARGET=firefox npm run build",
     "analyze": "webpack --profile --json --config scripts/webpack.conf.js | webpack-bundle-size-analyzer",
     "analyze:json": "webpack --profile --json --config scripts/webpack.conf.js > stats.json",
     "i18n": "gulp i18n",
@@ -18,7 +18,7 @@
   "description": "Violentmonkey",
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-eslint": "^7.2.3",
+    "babel-eslint": "^8.0.1",
     "babel-loader": "^7.1.2",
     "babel-minify-webpack-plugin": "^0.2.0",
     "babel-plugin-transform-export-extensions": "^6.22.0",
