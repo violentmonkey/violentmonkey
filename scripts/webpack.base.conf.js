@@ -3,17 +3,12 @@ const webpack = require('webpack');
 const MinifyPlugin = require('babel-minify-webpack-plugin');
 const minifyPreset = require('babel-preset-minify');
 const vueLoaderConfig = require('./vue-loader.conf');
-const { IS_DEV, styleRule } = require('./utils');
+const { IS_DEV, styleRule, definitions } = require('./utils');
 
 // const { MINIFY } = process.env;
 const MINIFY = true;
 const DIST = 'dist';
-const definePlugin = new webpack.DefinePlugin({
-  'process.env': {
-    NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-    DEBUG: IS_DEV ? 'true' : 'false', // whether to log message errors
-  },
-});
+const definePlugin = new webpack.DefinePlugin(definitions);
 
 function resolve(dir) {
   return path.join(__dirname, '..', dir);

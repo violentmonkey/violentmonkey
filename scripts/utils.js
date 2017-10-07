@@ -48,3 +48,9 @@ exports.IS_TEST = IS_TEST;
 exports.styleLoader = styleLoader;
 exports.styleRule = styleRule;
 exports.merge = merge;
+exports.definitions = {
+  'process.env': {
+    NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+    DEBUG: IS_DEV ? 'true' : 'false', // whether to log message errors
+  },
+};
