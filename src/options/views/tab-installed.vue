@@ -238,6 +238,7 @@ export default {
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 200);
+    this.onUpdate();
   },
 };
 </script>
