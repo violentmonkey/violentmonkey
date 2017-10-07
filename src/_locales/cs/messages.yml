@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skript nainstalován.
-Warning:
-  description: Show warnings with a notification.
-  message: Varování
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 'Skript [$1] nemá žádné ‚@grant‘ řádky! Klikněte pro více podprobností.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Jméno skriptu nebylo určeno.
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Zkontrolovat aktualizace
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Získej více skritpů
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Nahrávám...
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Automaticky kontrolovat aktualizace skriptu každý den
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Zobrazovat všechna @grant varování
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Obnova dat

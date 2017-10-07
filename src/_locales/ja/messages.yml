@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: スクリプトがインストールされました。
-Warning:
-  description: Show warnings with a notification.
-  message: 警告
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: スクリプト「$1」には @grant が記述された行がありません!　詳細を見るにはクリックしてください。
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 名前なし
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: すべての更新を確認
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: スクリプトの入手
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: 読み込み中…
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: スクリプトの更新を自動的に確認する (毎日)
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: '@grant が存在しない場合の警告を表示しない'
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: インポート

@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Скрипта је инсталирана.
-Warning:
-  description: Show warnings with a notification.
-  message: Упозорење
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 'Скрипта [$1] нема `@grant` линије! Кликните за више детаља.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Без имена
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Провери ажурирања за све
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Набави још скрипти
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Учитавање...
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Аутоматски провери ажурирања за скрипте свакодневно
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Не приказуј упозорење о недостатку линије @grant
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Увоз података

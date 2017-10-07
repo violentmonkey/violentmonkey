@@ -13,16 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skripti asennettu.
-Warning:
-  description: Show warnings with a notification.
-  message: Varoitus
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: >-
-    Skriptissä [$1] ei ole yhtään `@grant` -riviä! Klikkaa tästä saadaksesi
-    lisätietoja.
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Ei nimeä
@@ -95,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Tarkista kaikki päivitykset
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Lisää skriptejä
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Ladataan ...
@@ -108,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Tarkista skriptien päivitykset joka päivä
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Piilota @grant -varoitukset
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Datan tuonti
@@ -156,7 +138,7 @@ labelTranslator:
   message: 'Kääntäjä: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: 'raina'
+  message: raina
 labelCurrentLang:
   description: Label of current language.
   message: 'Nykyinen kieli: '
@@ -227,7 +209,7 @@ msgImported:
   message: $1 skriptiä tuotu.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: 'Käytä latausosoitetta (@downloadURL)'
+  message: Käytä latausosoitetta (@downloadURL)
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
