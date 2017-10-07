@@ -18,14 +18,20 @@ Development
 ---
 Make sure [Node.js](https://nodejs.org/) greater than v8.0 is installed.
 ``` sh
+$ yarn
+$ yarn run dev
+# or
 $ npm i
 $ npm run dev
-# Then load the extension from 'dist/'.
 ```
+Then load the extension from 'dist/'.
 
 Build
 ---
 ``` sh
+$ yarn
+$ yarn run build
+# or
 $ npm i
 $ npm run build
 ```
