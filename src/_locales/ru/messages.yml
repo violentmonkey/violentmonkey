@@ -15,14 +15,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Скрипт установлен.
-Warning:
-  description: Show warnings with a notification.
-  message: Предупреждение
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 'У скрипта [$1] отсутствует поле `@grant`! Кликните для подробностей.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Новый скрипт
@@ -95,10 +87,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Проверить обновления скриптов
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Скачать скрипты
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Загрузка...
@@ -108,10 +96,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Ежедневно проверять наличие обновлений скриптов.
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Не показывать предупреждения об отсутствии поля @grant.
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Импорт данных

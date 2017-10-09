@@ -72,13 +72,6 @@ class Locales {
     this.desc = {};
   }
 
-  getLanguages() {
-    const localeDir = this.base + '/' + this.prefix;
-    return new Promise((resolve, reject) => {
-      fs.readdir(localeDir, (err, files) => err ? reject(err) : resolve(files));
-    });
-  }
-
   load() {
     return readdir(`${this.base}/${this.prefix}`)
     .then(langs => {

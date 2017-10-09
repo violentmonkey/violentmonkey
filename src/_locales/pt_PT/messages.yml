@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script instalado.
-Warning:
-  description: Show warnings with a notification.
-  message: Aviso
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: '[$1] não possui nenhuma linha `@grant`! Clique para obter mais detalhes.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Sem nome
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Procurar atualizações para todos
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Obter mais scripts
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: A carregar...
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Procurar atualizações de scripts automaticamente todos os dias
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Suprimir avisos de @grant inexistente
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Importar dados
@@ -118,13 +102,13 @@ buttonImportData:
   message: Importar a partir de ZIP
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Limpar base de dados
+  message: Otimizar base de dados
 labelDataExport:
   description: Section title of data export.
   message: Exportar dados
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Export dados dos scripts
+  message: Exportar dados dos scripts
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Todos/nenhum
@@ -233,10 +217,10 @@ confirmNotSaved:
     Clique em OK para rejeitá-las ou em Cancelar para ficar.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: A limpar dados...
+  message: A otimizar dados...
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Dados limpos
+  message: Dados otimizados
 hintVacuum:
   description: Hint for vacuuming data.
   message: Eliminar as redundâncias e tentar recarregar os recursos em falta na cache.
@@ -289,7 +273,7 @@ msgSyncInitError:
   message: Erro de inicialização!
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: A sincronização iniciará em breve...
+  message: A sincronização será iniciada em breve...
 msgSyncing:
   description: Message shown when sync is in progress.
   message: A sincronizar...
@@ -403,7 +387,7 @@ labelNotifyUpdates:
   message: Notificar sobre atualizações de scripts
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Instalar a partir de $1
+  message: Instalar a partir do $1
 labelSearchScript:
   description: Placeholder for script search box.
   message: Localizar scripts...
@@ -430,10 +414,10 @@ optionShowEnabledFirst:
   message: Mostrar scripts ativos primeiro
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: por ordem de execução
+  message: ordem de execução
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: alfabeticamente
+  message: ordem alfabética
 labelFilterSort:
   description: Label for sort filter.
-  message: Ordenar $1
+  message: Ordenar por $1

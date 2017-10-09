@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script instalat.
-Warning:
-  description: Show warnings with a notification.
-  message: Atenție
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 'Scriptul [$1] nu are linii `@grant`! Dați clic pentru detalii.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Fără nume
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Caută actualizări pentru toate
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Ia mai multe scripturi
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Se încarcă...
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: 'Caută zilnic actualizări pentru scripturi, în mod automat'
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Suprimă avertismentele „no @grant”
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Import de date

@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: 腳本已安裝。
-Warning:
-  description: Show warnings with a notification.
-  message: 警告
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 腳本【$1】沒有`@grant`行！點擊檢視更多資訊。
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 名字為空
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: 全部更新
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: 獲取更多腳本
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: 載入中…
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: 每天自動更新腳本
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: 不顯示缺少@grant的警告
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: 數據匯入

@@ -13,14 +13,6 @@ msgErrorFetchingScript:
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skrypt zainstalowany.
-Warning:
-  description: Show warnings with a notification.
-  message: Ostrzeżenie
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 'Skrypt [$1] nie ma linii `@grant`! Kliknij, aby zobaczyć więcej szczegółów.'
-  touched: false
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Bez nazwy
@@ -93,10 +85,6 @@ buttonNew:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Sprawdź aktualizacje dla wszystkich skryptów
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Znajdź nowe skrypty
-  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Wczytywanie ...
@@ -106,10 +94,6 @@ labelSettings:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Automatycznie codziennie sprawdzaj aktualizacje dla skryptów
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: 'Pomijaj ostzeżenia dla skryptów, które nie mają linii @grant'
-  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Import danych

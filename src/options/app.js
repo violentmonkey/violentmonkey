@@ -16,6 +16,7 @@ Object.assign(store, {
   cache: {},
   scripts: [],
   sync: [],
+  filteredScripts: [],
   route: null,
 });
 zip.workerScriptsPath = '/public/lib/zip.js/';
