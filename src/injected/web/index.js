@@ -117,13 +117,13 @@ function onLoadScripts(data) {
     const name = script.custom.name || script.meta.name || script.props.id;
     const args = map(argNames, key => wrapper[key]);
     const thisObj = wrapper.window || wrapper;
-    const id = `VMin${getUniqId()}`;
-    const callbackId = `VMcb${getUniqId()}`;
-    attachFunction(callbackId, () => {
+    const id = getUniqId('VMin');
+    const fnId = getUniqId('VMfn');
+    attachFunction(fnId, () => {
       const func = window[id];
       if (func) runCode(name, func, args, thisObj);
     });
-    bridge.post({ cmd: 'Inject', data: [id, argNames, codeConcat, callbackId] });
+    bridge.post({ cmd: 'Inject', data: [id, argNames, codeConcat, fnId] });
   }
   function run(list) {
     while (list.length) buildCode(list.shift());
