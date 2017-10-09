@@ -24,6 +24,7 @@ export default function initialize(webId, contentId, props) {
 const store = {
   commands: {},
   values: {},
+  callbacks: {},
 };
 
 const handlers = {
@@ -31,6 +32,10 @@ const handlers = {
   Command(data) {
     const func = store.commands[data];
     if (func) func();
+  },
+  Callback({ callbackId, payload }) {
+    const func = store.callbacks[callbackId];
+    if (func) func(payload);
   },
   GotRequestId: onRequestStart,
   HttpRequested: onRequestCallback,
@@ -47,6 +52,15 @@ const handlers = {
     if (bridge.onScriptChecked) bridge.onScriptChecked(data);
   },
 };
+
+function registerCallback(callback) {
+  const callbackId = getUniqId('VMcb');
+  store.callbacks[callbackId] = payload => {
+    callback(payload);
+    delete store.callbacks[callbackId];
+  };
+  return callbackId;
+}
 
 function onHandle(obj) {
   const handle = handlers[obj.cmd];
@@ -262,8 +276,21 @@ function wrapGM(script, code, cache) {
       },
     },
     GM_addStyle: {
-      value(data) {
-        bridge.post({ cmd: 'AddStyle', data });
+      value(css) {
+        const callbacks = [];
+        let el = false;
+        const callbackId = registerCallback(styleId => {
+          el = document.getElementById(styleId);
+          callbacks.splice().forEach(callback => callback(el));
+        });
+        bridge.post({ cmd: 'AddStyle', data: { css, callbackId } });
+        // Mock a Promise without the need for polyfill
+        return {
+          then(callback) {
+            if (el !== false) callback(el);
+            else callbacks.push(callback);
+          },
+        };
       },
     },
     GM_log: {

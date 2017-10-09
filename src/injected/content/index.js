@@ -1,4 +1,5 @@
 import { isFirefox } from 'src/common/ua';
+import { getUniqId } from 'src/common';
 import { bindEvents, sendMessage, inject, attachFunction } from '../utils';
 import bridge from './bridge';
 import { tabOpen, tabClose, tabClosed } from './tabs';
@@ -82,12 +83,16 @@ const handlers = {
     if (IS_TOP) menus.push(data);
     getPopup();
   },
-  AddStyle(css) {
+  AddStyle({ css, callbackId }) {
+    let styleId = null;
     if (document.head) {
+      styleId = getUniqId('VMst');
       const style = document.createElement('style');
+      style.id = styleId;
       style.textContent = css;
       document.head.appendChild(style);
     }
+    bridge.post({ cmd: 'Callback', data: { callbackId, payload: styleId } });
   },
   Notification: onNotificationCreate,
   SetClipboard(data) {
