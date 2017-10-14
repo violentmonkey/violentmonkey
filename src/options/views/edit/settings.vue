@@ -20,8 +20,8 @@
         <select v-model="custom.runAt">
           <option value="" v-text="i18n('labelRunAtDefault')"></option>
           <option value="start">document-start</option>
-          <option value="idle">document-idle</option>
           <option value="end">document-end</option>
+          <option value="idle">document-idle</option>
         </select>
       </tooltip>
     </div>

@@ -16,7 +16,8 @@ export default function initialize(webId, contentId, props) {
   bridge.post = bindEvents(webId, contentId, onHandle);
   document.addEventListener('DOMContentLoaded', () => {
     state = 1;
-    bridge.load();
+    // Load scripts after being handled by listeners in web page
+    Promise.resolve().then(bridge.load);
   }, false);
   bridge.checkLoad();
 }
