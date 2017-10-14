@@ -172,8 +172,10 @@ export default {
       this.content = value;
       const { cm } = this;
       if (!cm) return;
-      cm.getDoc().clearHistory();
-      cm.focus();
+      this.$nextTick(() => {
+        cm.getDoc().clearHistory();
+        cm.focus();
+      });
     },
     'search.state.query'() {
       this.debouncedFind();
