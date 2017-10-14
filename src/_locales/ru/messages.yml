@@ -341,7 +341,7 @@ descCustomCSS:
   description: Description of custom CSS section.
   message: >-
     Пользовательские стили CSS для страницы Настройки и страницы установки
-    скриптов. Если Вы не знаете что это такое, пожалуйста не редактируйте этот
+    скриптов. Если Вы не знаете, что это такое, пожалуйста, не редактируйте этот
     текст.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
@@ -399,28 +399,28 @@ labelNoSearchScripts:
   message: Скрипты не найдены.
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Домашняя страница
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Страница поддержки
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Отменить
 labelRemoved:
   description: Label shown when a script is removed.
-  message: ''
+  message: '[Удалено]'
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Фильтры
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Показывать включенные скрипты первыми
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: порядку выполнения
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: алфавиту
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: Сортировать по $1
