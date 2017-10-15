@@ -314,7 +314,7 @@ labelGeneral:
   message: Ogólne
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Stan synchronizacji skryptu
+  message: Synchronizuj stan skryptu
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Żaden
@@ -412,7 +412,7 @@ buttonFilter:
   message: Filtry
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Pokaż najpierw włączone skrypty
+  message: Pokazuj najpierw włączone skrypty
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: kolejności wykonywania
