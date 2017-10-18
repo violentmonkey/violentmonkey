@@ -62,7 +62,6 @@
 
 <script>
 import VlDropdown from 'vueleton/lib/dropdown';
-import VlModal from 'vueleton/lib/modal';
 import { i18n, sendMessage, noop, debounce } from 'src/common';
 import { objectGet } from 'src/common/object';
 import options from 'src/common/options';
@@ -112,7 +111,6 @@ export default {
     SettingCheck,
     LocaleGroup,
     VlDropdown,
-    VlModal,
     Icon,
   },
   data() {
