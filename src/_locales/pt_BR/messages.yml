@@ -90,7 +90,7 @@ msgLoading:
   message: Carregando...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Definições
+  message: Configurações
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Procurar atualizações de scripts automaticamente todos os dias
