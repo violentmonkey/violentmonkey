@@ -75,7 +75,7 @@ sideMenuInstalled:
   message: Scripts instalados
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Definições
+  message: Configurações
 sideMenuAbout:
   description: 'Side menu: About'
   message: Sobre
