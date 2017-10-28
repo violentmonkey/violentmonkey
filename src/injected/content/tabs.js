@@ -16,7 +16,9 @@ export function tabOpen({ key, data }) {
 
 export function tabClose(key) {
   const id = tabIds[key];
-  sendMessage({ cmd: 'TabClose', data: { id } });
+  // !key => close current tab
+  // id => close tab by id
+  if (!key || id) sendMessage({ cmd: 'TabClose', data: { id } });
 }
 
 export function tabClosed(id) {
