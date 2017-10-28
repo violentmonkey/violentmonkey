@@ -19,7 +19,7 @@ export default function initialize(webId, contentId, props) {
     // Load scripts after being handled by listeners in web page
     Promise.resolve().then(bridge.load);
   }, false);
-  bridge.checkLoad();
+  bridge.post({ cmd: 'Ready' });
 }
 
 const store = {

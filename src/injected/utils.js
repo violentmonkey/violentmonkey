@@ -17,11 +17,11 @@ export function inject(code) {
   script.src = url;
   doc.appendChild(script);
   try {
-    URL.revokeObjectURL(url);
     doc.removeChild(script);
   } catch (e) {
     // ignore if body is changed and script is detached
   }
+  URL.revokeObjectURL(url);
 }
 
 export function getUniqId() {

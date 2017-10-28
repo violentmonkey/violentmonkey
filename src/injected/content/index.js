@@ -62,7 +62,9 @@ export default function initialize(contentId, webId) {
         if (script.config.enabled) badge.number += 1;
       });
     }
-    bridge.post({ cmd: 'LoadScripts', data });
+    bridge.ready.then(() => {
+      bridge.post({ cmd: 'LoadScripts', data });
+    });
     badge.ready = true;
     getPopup();
     setBadge();
@@ -76,6 +78,9 @@ const handlers = {
   Inject: injectScript,
   TabOpen: tabOpen,
   TabClose: tabClose,
+  Ready() {
+    bridge.ready = Promise.resolve();
+  },
   UpdateValue(data) {
     sendMessage({ cmd: 'UpdateValue', data });
   },
@@ -112,6 +117,10 @@ const handlers = {
     });
   },
 };
+
+bridge.ready = new Promise(resolve => {
+  handlers.Ready = resolve;
+});
 
 function onHandle(req) {
   const handle = handlers[req.cmd];
