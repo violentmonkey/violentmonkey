@@ -83,12 +83,6 @@ function onLoadScripts(data) {
     run(end);
     setTimeout(run, 0, idle);
   };
-  bridge.checkLoad = () => {
-    if (!state && includes(['interactive', 'complete'], document.readyState)) {
-      state = 1;
-    }
-    if (state) bridge.load();
-  };
   const listMap = {
     'document-start': start,
     'document-idle': idle,
@@ -107,7 +101,11 @@ function onLoadScripts(data) {
     });
     run(start);
   }
-  bridge.checkLoad();
+  if (!state && includes(['interactive', 'complete'], document.readyState)) {
+    state = 1;
+  }
+  if (state) bridge.load();
+
   function buildCode(script) {
     const requireKeys = script.meta.require || [];
     const pathMap = script.custom.pathMap || {};
