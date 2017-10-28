@@ -178,5 +178,5 @@ export function getFullUrl(url, base) {
 }
 
 export function isRemote(url) {
-  return url && !(/^(file|data):/.test(url));
+  return url && !(/^(file:|data:|http:\/\/localhost[:/])/.test(url));
 }
