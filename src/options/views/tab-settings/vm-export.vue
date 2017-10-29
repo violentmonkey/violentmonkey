@@ -65,7 +65,9 @@ export default {
   },
   methods: {
     initItems() {
-      this.items = (store.scripts || []).map(script => ({
+      this.items = (store.scripts || [])
+      .filter(({ config: { removed } }) => !removed)
+      .map(script => ({
         script,
         active: true,
       }));
