@@ -22,8 +22,8 @@ import initialize from './content';
       JSON.stringify(contentId),
       JSON.stringify(Object.keys(props)),
     ];
-    inject(`(${window.VM_initializeWeb.toString()}())(${args.join(',')})`);
     initialize(contentId, webId);
+    inject(`(${window.VM_initializeWeb.toString()}())(${args.join(',')})`);
   }
   initBridge();
 
