@@ -54,20 +54,27 @@ export default function initialize(contentId, webId) {
     if (handle) handle(req.data, src);
   });
 
-  sendMessage({ cmd: 'GetInjected', data: window.location.href })
+  return sendMessage({ cmd: 'GetInjected', data: window.location.href })
   .then(data => {
+    let needInject = false;
     if (data.scripts) {
       data.scripts.forEach(script => {
         ids.push(script.props.id);
-        if (script.config.enabled) badge.number += 1;
+        if (script.config.enabled) {
+          badge.number += 1;
+          needInject = true;
+        }
       });
     }
-    bridge.ready.then(() => {
-      bridge.post({ cmd: 'LoadScripts', data });
-    });
+    if (needInject) {
+      bridge.ready.then(() => {
+        bridge.post({ cmd: 'LoadScripts', data });
+      });
+    }
     badge.ready = true;
     getPopup();
     setBadge();
+    return needInject;
   });
 }
 
