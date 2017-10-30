@@ -19,7 +19,6 @@
         </tooltip>
       </div>
     </div>
-    <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
     <div class="script-buttons flex">
       <tooltip :title="i18n('buttonEdit')" align="start">
         <span class="btn-ghost" @click="onEdit">
@@ -31,18 +30,23 @@
           <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
         </span>
       </tooltip>
-      <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')" align="start">
-        <span class="btn-ghost" :disabled="script.checking" @click="onUpdate">
+      <tooltip :disabled="!canUpdate || script.checking" :title="i18n('buttonUpdate')" align="start">
+        <span class="btn-ghost" @click="onUpdate">
           <icon name="refresh"></icon>
         </span>
       </tooltip>
       <span class="sep"></span>
-      <tooltip v-if="homepageURL || script.meta.supportURL" :title="i18n('buttonHome')" align="start">
+      <tooltip :disabled="!homepageURL" :title="i18n('buttonHome')" align="start">
         <a class="btn-ghost" target="_blank" :href="homepageURL">
           <icon name="home"></icon>
         </a>
       </tooltip>
-      <tooltip v-if="script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
+      <tooltip :disabled="!description" :title="description" align="start">
+        <span class="btn-ghost">
+          <icon name="info"></icon>
+        </span>
+      </tooltip>
+      <tooltip :disabled="!script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
         <a class="btn-ghost" target="_blank" :href="script.meta.supportURL">
           <icon name="question"></icon>
         </a>
@@ -124,6 +128,9 @@ export default {
     labelEnable() {
       return this.script.config.enabled ? this.i18n('buttonDisable') : this.i18n('buttonEnable');
     },
+    description() {
+      return this.script.custom.description || getLocaleString(this.script.meta, 'description');
+    },
   },
   mounted() {
     const { icon } = this.script.meta;
@@ -137,9 +144,6 @@ export default {
     }
   },
   methods: {
-    getLocaleString(key) {
-      return getLocaleString(this.script.meta, key);
-    },
     onEdit() {
       this.$emit('edit', this.script.props.id);
     },
@@ -319,6 +323,7 @@ export default {
     padding-bottom: 10px;
   }
   &-buttons {
+    margin-left: 3.5rem;
     align-items: center;
     line-height: 1;
     color: #3e4651;
@@ -327,6 +332,9 @@ export default {
     }
     .removed & {
       display: none;
+    }
+    > .disabled {
+      color: gainsboro;
     }
   }
   &-info {
@@ -358,22 +366,11 @@ export default {
     font-weight: bold;
     font-size: 1rem;
     .disabled & {
-      color: blueviolet;
+      color: gray;
     }
   }
   &-author {
     max-width: 30%;
-  }
-  &-desc {
-    margin-left: 3.5rem;
-    line-height: 2rem;
-    color: #60646d;
-    &::after {
-      content: "\200b";
-    }
-    .removed & {
-      display: none;
-    }
   }
 }
 .dragging {
