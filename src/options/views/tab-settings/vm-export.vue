@@ -14,9 +14,9 @@
       <setting-check name="exportValues" />
       <span v-text="i18n('labelExportScriptData')"></span>
     </label>
-    <vl-modal transition="in-out" :visible="!!store.ffUrl" @close="store.ffUrl = null">
+    <vl-modal v-if="store.ffDownload" transition="in-out" :visible="!!store.ffDownload.url" @close="store.ffDownload = {}">
       <div class="export-modal modal-content">
-        <a download="scripts.zip" :href="store.ffUrl">
+        <a :download="store.ffDownload.name" :href="store.ffDownload.url">
           Right click and save as<br />
           <strong>scripts.zip</strong>
         </a>
@@ -37,7 +37,7 @@ import { store } from '../../utils';
  * Note:
  * - Firefox does not support multiline <select>
  */
-if (isFirefox) store.ffUrl = null;
+if (isFirefox) store.ffDownload = {};
 
 export default {
   components: {
@@ -110,12 +110,39 @@ function addFile(writer, file) {
   });
 }
 
+function leftpad(src, length, pad = '0') {
+  let str = `${src}`;
+  while (str.length < length) str = pad + str;
+  return str;
+}
+
+function getTimestamp() {
+  const date = new Date();
+  return `${
+    date.getFullYear()
+  }-${
+    leftpad(date.getMonth() + 1, 2)
+  }-${
+    leftpad(date.getDate(), 2)
+  }_${
+    leftpad(date.getHours(), 2)
+  }.${
+    leftpad(date.getMinutes(), 2)
+  }.${
+    leftpad(date.getSeconds(), 2)
+  }`;
+}
+
+function getExportname() {
+  return `scripts_${getTimestamp()}.zip`;
+}
+
 function download(url, cb) {
   const a = document.createElement('a');
   a.style.display = 'none';
   document.body.appendChild(a);
   a.href = url;
-  a.download = 'scripts.zip';
+  a.download = getExportname();
   a.click();
   setTimeout(() => {
     document.body.removeChild(a);
@@ -129,7 +156,10 @@ function downloadBlob(blob) {
   if (isFirefox) {
     const reader = new FileReader();
     reader.onload = () => {
-      store.ffUrl = reader.result;
+      store.ffDownload = {
+        name: getExportname(),
+        url: reader.result,
+      };
     };
     reader.readAsDataURL(blob);
   } else {
