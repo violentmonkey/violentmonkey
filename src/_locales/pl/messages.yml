@@ -422,3 +422,6 @@ filterAlphabeticalOrder:
 labelFilterSort:
   description: Label for sort filter.
   message: Sortuj wg $1
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: ''

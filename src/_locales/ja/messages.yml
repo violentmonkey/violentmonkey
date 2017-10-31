@@ -417,3 +417,6 @@ filterAlphabeticalOrder:
 labelFilterSort:
   description: Label for sort filter.
   message: $1 によって
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: ''

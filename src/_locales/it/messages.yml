@@ -282,7 +282,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Conflitto del namespace dello script! Per favore modifica @name e @namespace.
+  message: >-
+    Conflitto del namespace dello script! Per favore modifica @name e
+    @namespace.
 msgInvalidScript:
   description: Message shown when script is invalid.
   message: Script non valido!
@@ -417,3 +419,6 @@ filterAlphabeticalOrder:
 labelFilterSort:
   description: Label for sort filter.
   message: Ordina per $1
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: ''

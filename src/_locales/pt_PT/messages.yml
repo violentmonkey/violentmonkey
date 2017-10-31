@@ -421,3 +421,6 @@ filterAlphabeticalOrder:
 labelFilterSort:
   description: Label for sort filter.
   message: Ordenar por $1
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: ''

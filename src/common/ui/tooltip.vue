@@ -85,6 +85,7 @@ $max-width: 250px;
       &.tooltip-align-center {
         > div {
           left: 50%;
+          // calc will be reduced by cssnano
           margin-left: calc(-$max-width / 2);
           text-align: center;
         }
