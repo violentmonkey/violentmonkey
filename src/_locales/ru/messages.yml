@@ -393,7 +393,7 @@ installFrom:
   message: Установить с $1
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Посик скриптов...
+  message: Поиск скриптов...
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Скрипты не найдены.
