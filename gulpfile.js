@@ -77,7 +77,7 @@ gulp.task('manifest', () => (
     data.version = pkg.version.replace(/-[^.]*/, '');
     if (process.env.TARGET === 'firefox') {
       data.version += 'f';
-      delete data.applications.gecko.update_url;
+      data.applications.gecko.update_url = 'https://violentmonkey.top/static/updates.json';
     }
     file.path = file.path.replace(/\.yml$/, '.json');
     return JSON.stringify(data);

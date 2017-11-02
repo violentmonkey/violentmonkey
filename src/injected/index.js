@@ -10,6 +10,14 @@ import initialize from './content';
   function initBridge() {
     const contentId = getUniqId();
     const webId = getUniqId();
+    initialize(contentId, webId).then(needInject => {
+      if (needInject) {
+        doInject(contentId, webId);
+      }
+    });
+  }
+
+  function doInject(contentId, webId) {
     const props = {};
     [
       Object.getOwnPropertyNames(window),
@@ -23,8 +31,8 @@ import initialize from './content';
       JSON.stringify(Object.keys(props)),
     ];
     inject(`(${window.VM_initializeWeb.toString()}())(${args.join(',')})`);
-    initialize(contentId, webId);
   }
+
   initBridge();
 
   // For installation

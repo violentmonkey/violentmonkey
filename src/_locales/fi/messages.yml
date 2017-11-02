@@ -419,3 +419,6 @@ filterAlphabeticalOrder:
 labelFilterSort:
   description: Label for sort filter.
   message: 'Järjestä $1:n mukaan'
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: ''

@@ -415,3 +415,6 @@ filterAlphabeticalOrder:
 labelFilterSort:
   description: Label for sort filter.
   message: 按 $1 排序
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: 最后更新于 $1

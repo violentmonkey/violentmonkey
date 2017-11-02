@@ -172,8 +172,10 @@ export default {
       this.content = value;
       const { cm } = this;
       if (!cm) return;
-      cm.getDoc().clearHistory();
-      cm.focus();
+      this.$nextTick(() => {
+        cm.getDoc().clearHistory();
+        cm.focus();
+      });
     },
     'search.state.query'() {
       this.debouncedFind();
@@ -290,10 +292,3 @@ export default {
   },
 };
 </script>
-
-<style>
-/* compatible with old browsers, e.g. Maxthon 4.4 */
-.editor-code.flex-auto {
-  height: 100%;
-}
-</style>

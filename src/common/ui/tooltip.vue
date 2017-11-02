@@ -1,9 +1,9 @@
 <template>
-  <span class="tooltip">
+  <span class="tooltip" :class="{ disabled }" @mouseenter="onEnter" @mouseleave="onLeave" @click.capture="onClick">
     <slot></slot>
-    <div class="tooltip-title" :class="`tooltip-${placement} tooltip-align-${align}`">
+    <div v-if="hovered && title && !disabled" class="tooltip-wrap" :class="`tooltip-${adjustedPlacement} tooltip-align-${align}`">
       <i></i>
-      <div v-text="title"></div>
+      <div><div class="tooltip-text" v-text="title"></div></div>
     </div>
   </span>
 </template>
@@ -14,11 +14,39 @@ export default {
     title: String,
     placement: {
       type: String,
-      default: 'up',
+      default: 'auto-y',
     },
     align: {
       type: String,
       default: 'center', // start | center | end
+    },
+    disabled: Boolean,
+  },
+  data() {
+    return {
+      hovered: false,
+      adjustedPlacement: null,
+    };
+  },
+  methods: {
+    adjustPlacement() {
+      const { placement } = this;
+      if (placement === 'auto-y') {
+        const rect = this.$el.getBoundingClientRect();
+        this.adjustedPlacement = rect.bottom < document.body.clientHeight / 2 ? 'down' : 'up';
+      } else {
+        this.adjustedPlacement = placement;
+      }
+    },
+    onEnter() {
+      this.adjustPlacement();
+      this.hovered = true;
+    },
+    onLeave() {
+      this.hovered = false;
+    },
+    onClick(e) {
+      if (this.disabled) e.stopPropagation();
     },
   },
 };
@@ -26,41 +54,40 @@ export default {
 
 <style>
 $bg-color: rgba(0,0,0,.8);
-$border-side: 4px solid transparent;
+$border-side-width: 4px;
+$border-side: $border-side-width solid transparent;
 $border-base: 6px solid $bg-color;
 $gap: 10px;
+$max-width: 250px;
 
 .tooltip {
   display: inline-block;
   position: relative;
-  &-title {
-    display: none;
+  &-wrap {
     position: absolute;
     color: white;
     font-size: 12px;
+    line-height: 1.4;
     z-index: 100;
-    .tooltip:hover & {
-      display: block;
-    }
     > * {
       position: absolute;
-      white-space: nowrap;
     }
     > div {
-      padding: 8px;
-      background: $bg-color;
-      border-radius: 6px;
+      width: $max-width;
+      height: 0;
     }
     &.tooltip-up,
     &.tooltip-down {
       left: 50%;
       > i {
-        transform: translateX(-50%);
+        margin-left: -$border-side-width;
       }
       &.tooltip-align-center {
         > div {
           left: 50%;
-          transform: translateX(-50%);
+          // calc will be reduced by cssnano
+          margin-left: calc(-$max-width / 2);
+          text-align: center;
         }
       }
       &.tooltip-align-start {
@@ -71,6 +98,7 @@ $gap: 10px;
       &.tooltip-align-end {
         > div {
           right: -10px;
+          text-align: right;
         }
       }
     }
@@ -83,8 +111,8 @@ $gap: 10px;
         border-left: $border-side;
         border-right: $border-side;
       }
-      > div {
-        bottom: 0;
+      .tooltip-text {
+        transform: translateY(-100%);
       }
     }
     &.tooltip-down {
@@ -96,14 +124,12 @@ $gap: 10px;
         border-right: $border-side;
         border-bottom: $border-base;
       }
-      > div {
-        top: 0;
-      }
     }
     &.tooltip-left,
     &.tooltip-right {
       top: 50%;
-      > * {
+      > i,
+      .tooltip-text {
         transform: translateY(-50%);
       }
       > i {
@@ -116,6 +142,7 @@ $gap: 10px;
       right: 100%;
       > div {
         right: 100%;
+        text-align: right;
       }
       > i {
         left: 100%;
@@ -133,6 +160,13 @@ $gap: 10px;
         border-right: $border-base;
       }
     }
+  }
+  &-text {
+    display: inline-block;
+    padding: 8px;
+    background: $bg-color;
+    border-radius: 6px;
+    text-align: left;
   }
 }
 </style>

@@ -552,7 +552,8 @@ export function vacuum() {
     [storage.require, requireKeys],
     [storage.code, codeKeys],
   ];
-  browser.storage.get().then(data => {
+  return browser.storage.local.get()
+  .then(data => {
     Object.keys(data).forEach(key => {
       mappings.some(([substore, map]) => {
         const { prefix } = substore;
@@ -564,39 +565,39 @@ export function vacuum() {
         return false;
       });
     });
-  });
-  const touch = (obj, key) => {
-    if (obj[key] < 0) obj[key] = 1;
-    else if (!obj[key]) obj[key] = 2;
-  };
-  store.scripts.forEach(script => {
-    const { id } = script.props;
-    touch(codeKeys, id);
-    touch(valueKeys, id);
-    if (!script.custom.pathMap) buildPathMap(script);
-    const { pathMap } = script.custom;
-    script.meta.require.forEach(url => {
-      touch(requireKeys, pathMap[url] || url);
-    });
-    Object.values(script.meta.resources).forEach(url => {
-      touch(cacheKeys, pathMap[url] || url);
-    });
-    const { icon } = script.meta;
-    if (isRemote(icon)) {
-      const fullUrl = pathMap[icon] || icon;
-      touch(cacheKeys, fullUrl);
-    }
-  });
-  mappings.forEach(([substore, map]) => {
-    Object.keys(map).forEach(key => {
-      const value = map[key];
-      if (value < 0) {
-        // redundant value
-        substore.remove(key);
-      } else if (value === 2 && substore.fetch) {
-        // missing resource
-        substore.fetch(key);
+    const touch = (obj, key) => {
+      if (obj[key] < 0) obj[key] = 1;
+      else if (!obj[key]) obj[key] = 2;
+    };
+    store.scripts.forEach(script => {
+      const { id } = script.props;
+      touch(codeKeys, id);
+      touch(valueKeys, id);
+      if (!script.custom.pathMap) buildPathMap(script);
+      const { pathMap } = script.custom;
+      script.meta.require.forEach(url => {
+        touch(requireKeys, pathMap[url] || url);
+      });
+      Object.values(script.meta.resources).forEach(url => {
+        touch(cacheKeys, pathMap[url] || url);
+      });
+      const { icon } = script.meta;
+      if (isRemote(icon)) {
+        const fullUrl = pathMap[icon] || icon;
+        touch(cacheKeys, fullUrl);
       }
+    });
+    mappings.forEach(([substore, map]) => {
+      Object.keys(map).forEach(key => {
+        const value = map[key];
+        if (value < 0) {
+          // redundant value
+          substore.remove(key);
+        } else if (value === 2 && substore.fetch) {
+          // missing resource
+          substore.fetch(key);
+        }
+      });
     });
   });
 }

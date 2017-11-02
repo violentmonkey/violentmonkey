@@ -12,13 +12,17 @@ export function postData(destId, data) {
 export function inject(code) {
   const script = document.createElement('script');
   const doc = document.body || document.documentElement;
-  script.textContent = code;
+  // https://en.wikipedia.org/wiki/Byte_order_mark
+  const blob = new Blob(['\ufeff', code], { type: 'text/javascript' });
+  const url = URL.createObjectURL(blob);
+  script.src = url;
   doc.appendChild(script);
   try {
     doc.removeChild(script);
   } catch (e) {
     // ignore if body is changed and script is detached
   }
+  URL.revokeObjectURL(url);
 }
 
 export function getUniqId() {

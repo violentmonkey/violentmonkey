@@ -417,3 +417,6 @@ filterAlphabeticalOrder:
 labelFilterSort:
   description: Label for sort filter.
   message: Sắp xếp theo $1
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: ''

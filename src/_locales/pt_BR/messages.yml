@@ -3,420 +3,424 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: ''
+  message: Fornece suporte a scripts de usuários para navegadores.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Скрипта је ажурирана.
+  message: Script atualizado.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Грешка при преузимању скрипте!
+  message: Erro ao obter script!
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Скрипта је инсталирана.
+  message: Script instalado.
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Без имена
+  message: Sem nome
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Ажурирање...
+  message: Atualizando...
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Нова верзија је пронађена.
+  message: Nova versão encontrada.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Провера ажурирања...
+  message: Procurando atualizações...
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Грешка приликом преузимања информација о ажурирању.
+  message: Falha ao obter informações de atualização.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Нема пронађених ажурирања.
+  message: Nenhuma atualização encontrada.
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Инсталирање скрипте
+  message: Instalando o script
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
-  message: Опције
+  message: Opções
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Затвори након инсталације
+  message: Fechar após instalação
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Прати локалну датотеку пре него што се овај прозор затвори
+  message: Monitorar o arquivo local até esta janela ser fechada
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: Потврди инсталацију
+  message: Confirmar instalação
 buttonClose:
   description: Button to close window.
-  message: Затвори
+  message: Fechar
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Грешка приликом учитавања скрипте.
+  message: Erro ao carregar os dados do script.
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: Скрипта је учитана.
+  message: Dados do script carregados.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: Грешка приликом учитавања захтева.
+  message: Erro ao carregar dependências.
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: Учитавање захтева... ($1/$2)
+  message: A carregar dependências... ($1/$2)
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Учитавање скрипте...
+  message: A carregar dados do script...
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: Инсталиране скрипте
+  message: Scripts instalados
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Подешавања
+  message: Configurações
 sideMenuAbout:
   description: 'Side menu: About'
-  message: Информације
+  message: Sobre
 buttonNew:
   description: Button to create a new script.
-  message: Нова скрипта
+  message: Novo
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Провери ажурирања за све
+  message: Procurar atualizações para todos
 msgLoading:
   description: Message shown in the options page before script list is loaded.
-  message: Учитавање...
+  message: Carregando...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Подешавања
+  message: Configurações
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Аутоматски провери ажурирања за скрипте свакодневно
+  message: Procurar atualizações de scripts automaticamente todos os dias
 labelDataImport:
   description: Section title of data import.
-  message: Увоз података
+  message: Importar dados
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Увези из zip датотеке
+  message: Importar a partir de ZIP
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Избриши базу података
+  message: Limpar base de dados
 labelDataExport:
   description: Section title of data export.
-  message: Извоз података
+  message: Exportar dados
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Извези податке скрипти
+  message: Exportar dados do script
 buttonAllNone:
   description: Button to select all scripts or none.
-  message: Све/Ниједна
+  message: Todos/nenhum
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Извези као zip
+  message: Exportar para ZIP
 labelAbout:
   description: Label shown on top of the about page.
-  message: Информације о Violentmonkey
+  message: Sobre o Violentmonkey
 labelRelated:
   description: Label of related links.
-  message: Сродне везе
+  message: 'Links relacionados: '
 labelDonate:
   description: Label of link to donate page.
-  message: Донирај
+  message: Fazer uma doação
 labelFeedback:
   description: Label of link to feedback page.
-  message: Повратне информације
+  message: Fornecer comentários
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 'Аутор:'
+  message: 'Autor: '
 anchorAuthor:
   description: Author shown on about tab.
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 labelTranslator:
   description: Label of translator.
-  message: 'Преводилац:'
+  message: 'Tradução: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: Trex
+  message: '<a href=https://github.com/KingThunder>KingThunder</a>'
 labelCurrentLang:
   description: Label of current language.
-  message: 'Тренутни језик:'
+  message: 'Idioma atual: '
 labelScriptEditor:
   description: Shown in the title of the script editing page.
-  message: Уређивач скрипте
+  message: Editor de scripts
 labelName:
   description: Label of script name.
-  message: Име
+  message: 'Nome:'
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Покрени:'
+  message: 'Executar em:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Подразумевано)
+  message: (Padrão)
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Адреса почетне странице:'
+  message: 'URL do website:'
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'Адреса ажурирања:'
+  message: 'URL de atualização:'
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'Адреса преузимања:'
+  message: 'URL de download:'
 labelInclude:
   description: Label of @include rules.
-  message: Правила обухватања
+  message: Regras @include
 labelMatch:
   description: Label of @match rules.
-  message: Правила подударања
+  message: Regras @match
 labelExclude:
   description: Label of @exclude rules.
-  message: Правила изузимања
+  message: Regras @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: Regras @exclude-match
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Дозволи ажурирања
+  message: Permitir atualização
 buttonSave:
   description: Button to save modifications of a script.
-  message: Сачувај
+  message: Salvar
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: Сачувај и затвори
+  message: Salvar e fechar
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: Још увек немате ниједну скрипту.
+  message: 'Ops, você não tem nenhum script ainda.'
 buttonDisable:
   description: Button to disable a script.
-  message: Онемогући
+  message: Desativar
 buttonEnable:
   description: Button to enable a script.
-  message: Омогући
+  message: Ativar
 buttonEdit:
   description: Button to edit a script.
-  message: Уреди
+  message: Editar
 buttonRemove:
   description: Button to remove a script.
-  message: Уклони
+  message: Remover
 buttonUpdate:
   description: Check a script for updates.
-  message: Провери ажурирања
+  message: Procurar atualizações
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: 'Увезено: $1 ставка/е/и'
+  message: $1 item(ns) importado(s).
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: Користи @downloadURL
+  message: Utilizar @downloadURL
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    Измене нису сачуване!
-    Кликните на ОК да бисте их одбацили или на откажи за наставак.
+    As alterações não foram guardadas!
+    Clique em OK para rejeitá-las ou em Cancelar para ficar.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Брисање података...
+  message: Limpando os dados...
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Подаци су избрисани
+  message: Dados limpos
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Одбаци вишак и поново учитај недостајуће податке у кеш.
+  message: Eliminar as redundâncias e tentar recarregar os recursos em falta no cache.
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Пронађи скрипте за овај сајт
+  message: Procurar scripts para este site
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Скрипта је омогућена
+  message: Scripts ativados
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Скрипта је онемогућена
+  message: Scripts desativados
 menuCommands:
   description: Menu item to list script commands.
-  message: Команде скрипте
+  message: Comandos do script
 labelSearch:
   description: Label for search input in search box.
-  message: 'Тражи:'
+  message: 'Localizar: '
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Замени са:'
+  message: 'Substituir por: '
 buttonReplace:
   description: Button to replace the current match.
-  message: Замени
+  message: Substituir
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: Све
+  message: Tudo
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: >-
-    Поново учитај тренутну картицу након укључивања/искључивања скрипте из
-    менија
+    Recarregar o separador atual após ativar/desativar um script a partir do
+    menu
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'Унесите адресу:'
+  message: 'Coloque o URL:'
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Инсталирај са адресе
+  message: Instalar a partir de URL
 labelSync:
   description: Label for sync options.
-  message: Синхронизација
+  message: Sincronizar
 lastSync:
   description: Label for last sync timestamp.
-  message: 'Последња синхронизација: $1'
+  message: 'Última sincronização: $1'
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Покретање...
+  message: Inicializando...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: ''
+  message: Erro de inicialização!
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: ''
+  message: A sincronização será iniciada em breve...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Синхронизовање...
+  message: Sincronizando...
 msgSyncError:
   description: Message shown when sync failed.
-  message: Грешка при синхронизацији
+  message: Erro de sincronização!
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Неусаглашеност имена скрипти! Измените @name и @namespace.
+  message: >-
+    Conflito de namespace entre scripts! Por favor, altere o @name e o
+    @namespace.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: ''
+  message: Script inválido!
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: ''
+  message: Mostrar número de scripts em execução no ícone
 labelLineNumber:
   description: Label for line number jumper.
-  message: ''
+  message: 'Linha n.º: '
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: ''
+  message: Lista negra
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: ''
+  message: Os URLs correspondidos por esta lista não serão injetados com scripts.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: ''
+  message: Salvar
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: ''
+  message: Lista negra atualizada.
 labelGeneral:
   description: Label for general settings.
-  message: ''
+  message: Gerais
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: ''
+  message: Sincronizar estados dos scripts
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: ''
+  message: Nenhum
 labelSyncService:
   description: Label for sync service select.
-  message: ''
+  message: Sincronizar em
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: ''
+  message: Autorizar
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: ''
+  message: Revogar
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: ''
+  message: Autorizando
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: ''
+  message: Estilo personalizado atualizado.
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: ''
+  message: Estilo personalizado
 descCustomCSS:
   description: Description of custom CSS section.
-  message: ''
+  message: >-
+    CSS personalizado para as páginas de opções e de instalação de scripts. Se
+    não tiver a certeza da utilidade disto, por favor, não altere.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: ''
+  message: Salvar
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: Abrir painel
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: ''
+  message: Scripts correspondidos
 buttonOK:
   description: OK button on dialog.
-  message: ''
+  message: OK
 buttonCancel:
   description: Cancel button on dialog.
-  message: ''
+  message: Cancelar
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: Importar definições
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: Saiba mais sobre os padrões para a lista negra.
 editNavCode:
   description: Label of code tab in script editor.
-  message: ''
+  message: Código
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: ''
+  message: Definições
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: Definições do script
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: Прилагођени метаподаци
+  message: Metadados personalizados
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: ''
+  message: Manter originais
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: ''
+  message: Atualização
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: '[$1] foi atualizado!'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: Notificar sobre atualizações de scripts
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: Instalar a partir do $1
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: Localizar scripts...
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: Nenhum script encontrado.
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Website
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Página de suporte
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Anular
 labelRemoved:
   description: Label shown when a script is removed.
-  message: ''
+  message: '[Removido]'
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Filtros
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Mostrar scripts ativos primeiro
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: ordem de execução
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: ordem alfabética
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: Ordenar por $1
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: ''

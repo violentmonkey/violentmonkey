@@ -46,27 +46,4 @@ export default {
   border-bottom-right-radius: .2rem;
   box-shadow: 0 0 .2rem rgba(0,0,0,.2);
 }
-.in-out {
-  &-appear,
-  &-enter,
-  &-leave-active {
-    .vl-modal-content > * {
-      transform: translateY(-120%);
-    }
-    .vl-modal-backdrop {
-      opacity: 0;
-    }
-  }
-  &-appear-active,
-  &-enter-active,
-  &-leave-active {
-    &,
-    .vl-modal-content > * {
-      transition: transform .5s;
-    }
-    .vl-modal-backdrop {
-      transition: opacity .5s;
-    }
-  }
-}
 </style>

@@ -1,4 +1,5 @@
 import { isFirefox } from 'src/common/ua';
+import { getUniqId } from 'src/common';
 import { bindEvents, sendMessage, inject, attachFunction } from '../utils';
 import bridge from './bridge';
 import { tabOpen, tabClose, tabClosed } from './tabs';
@@ -53,18 +54,27 @@ export default function initialize(contentId, webId) {
     if (handle) handle(req.data, src);
   });
 
-  sendMessage({ cmd: 'GetInjected', data: window.location.href })
+  return sendMessage({ cmd: 'GetInjected', data: window.location.href })
   .then(data => {
+    let needInject = false;
     if (data.scripts) {
       data.scripts.forEach(script => {
         ids.push(script.props.id);
-        if (script.config.enabled) badge.number += 1;
+        if (script.config.enabled) {
+          badge.number += 1;
+          needInject = true;
+        }
       });
     }
-    bridge.post({ cmd: 'LoadScripts', data });
+    if (needInject) {
+      bridge.ready.then(() => {
+        bridge.post({ cmd: 'LoadScripts', data });
+      });
+    }
     badge.ready = true;
     getPopup();
     setBadge();
+    return needInject;
   });
 }
 
@@ -75,6 +85,9 @@ const handlers = {
   Inject: injectScript,
   TabOpen: tabOpen,
   TabClose: tabClose,
+  Ready() {
+    bridge.ready = Promise.resolve();
+  },
   UpdateValue(data) {
     sendMessage({ cmd: 'UpdateValue', data });
   },
@@ -82,12 +95,16 @@ const handlers = {
     if (IS_TOP) menus.push(data);
     getPopup();
   },
-  AddStyle(css) {
+  AddStyle({ css, callbackId }) {
+    let styleId = null;
     if (document.head) {
+      styleId = getUniqId('VMst');
       const style = document.createElement('style');
+      style.id = styleId;
       style.textContent = css;
       document.head.appendChild(style);
     }
+    bridge.post({ cmd: 'Callback', data: { callbackId, payload: styleId } });
   },
   Notification: onNotificationCreate,
   SetClipboard(data) {
@@ -107,6 +124,10 @@ const handlers = {
     });
   },
 };
+
+bridge.ready = new Promise(resolve => {
+  handlers.Ready = resolve;
+});
 
 function onHandle(req) {
   const handle = handlers[req.cmd];

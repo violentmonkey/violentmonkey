@@ -4,12 +4,15 @@
     <div class="script-info flex">
       <div class="script-name ellipsis" v-text="script._cache.name"></div>
       <div class="flex-auto"></div>
-      <div class="script-author ellipsis" :title="script.meta.author" v-if="author">
-        <span v-text="i18n('labelAuthor')"></span>
-        <a :href="'mailto:'+author.email" v-if="author.email" v-text="author.name"></a>
-        <span v-if="!author.email" v-text="author.name"></span>
-      </div>
-      <div class="script-version" v-text="script.meta.version ? `v${script.meta.version}` : ''"></div>
+      <tooltip :title="i18n('labelAuthor') + script.meta.author" class="script-author" v-if="author" align="end">
+        <icon name="author"></icon>
+        <a class="ellipsis" :href="`mailto:${author.email}`" v-if="author.email" v-text="author.name"></a>
+        <span class="ellipsis" v-else v-text="author.name"></span>
+      </tooltip>
+      <tooltip :title="lastModified.title" align="end">
+        <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
+        <span class="secondary" v-text="lastModified.show"></span>
+      </tooltip>
       <div v-if="script.config.removed" v-text="i18n('labelRemoved')"></div>
       <div v-if="script.config.removed">
         <tooltip :title="i18n('buttonUndo')" placement="left">
@@ -19,7 +22,6 @@
         </tooltip>
       </div>
     </div>
-    <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
     <div class="script-buttons flex">
       <tooltip :title="i18n('buttonEdit')" align="start">
         <span class="btn-ghost" @click="onEdit">
@@ -31,18 +33,23 @@
           <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
         </span>
       </tooltip>
-      <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')" align="start">
-        <span class="btn-ghost" :disabled="script.checking" @click="onUpdate">
+      <tooltip :disabled="!canUpdate || script.checking" :title="i18n('buttonUpdate')" align="start">
+        <span class="btn-ghost" @click="onUpdate">
           <icon name="refresh"></icon>
         </span>
       </tooltip>
       <span class="sep"></span>
-      <tooltip v-if="homepageURL || script.meta.supportURL" :title="i18n('buttonHome')" align="start">
+      <tooltip :disabled="!homepageURL" :title="i18n('buttonHome')" align="start">
         <a class="btn-ghost" target="_blank" :href="homepageURL">
           <icon name="home"></icon>
         </a>
       </tooltip>
-      <tooltip v-if="script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
+      <tooltip :disabled="!description" :title="description" align="start">
+        <span class="btn-ghost">
+          <icon name="info"></icon>
+        </span>
+      </tooltip>
+      <tooltip :disabled="!script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
         <a class="btn-ghost" target="_blank" :href="script.meta.supportURL">
           <icon name="question"></icon>
         </a>
@@ -124,6 +131,32 @@ export default {
     labelEnable() {
       return this.script.config.enabled ? this.i18n('buttonDisable') : this.i18n('buttonEnable');
     },
+    description() {
+      return this.script.custom.description || getLocaleString(this.script.meta, 'description');
+    },
+    lastModified() {
+      const { lastModified } = this.script.props;
+      const ret = {};
+      if (lastModified) {
+        let delta = (Date.now() - lastModified) / 1000 / 60;
+        const units = [
+          [60, 'min'],
+          [24, 'h'],
+          [30, 'd'],
+          [12, 'mon'],
+          [-1, 'yr'],
+        ];
+        const unitInfo = units.find(([max]) => {
+          if (max < 0 || delta < max) return true;
+          delta = Math.floor(delta / max);
+          return false;
+        });
+        const date = new Date(lastModified);
+        ret.title = this.i18n('labelLastUpdatedAt', date.toLocaleString());
+        ret.show = `${delta | 0}${unitInfo[1]}`;
+      }
+      return ret;
+    },
   },
   mounted() {
     const { icon } = this.script.meta;
@@ -137,9 +170,6 @@ export default {
     }
   },
   methods: {
-    getLocaleString(key) {
-      return getLocaleString(this.script.meta, key);
-    },
     onEdit() {
       this.$emit('edit', this.script.props.id);
     },
@@ -310,15 +340,23 @@ export default {
   &:hover {
     border-color: darkgray;
   }
+  .secondary {
+    color: gray;
+    font-size: small;
+  }
   &.disabled,
   &.removed {
     background: #f0f0f0;
     color: #999;
+    .secondary {
+      color: darkgray;
+    }
   }
   &.removed {
     padding-bottom: 10px;
   }
   &-buttons {
+    margin-left: 3.5rem;
     align-items: center;
     line-height: 1;
     color: #3e4651;
@@ -328,6 +366,12 @@ export default {
     .removed & {
       display: none;
     }
+    > .disabled {
+      color: gainsboro;
+    }
+    .icon {
+      display: block;
+    }
   }
   &-info {
     margin-left: 3.5rem;
@@ -335,9 +379,6 @@ export default {
     align-items: center;
     > *:not(:last-child) {
       margin-right: 8px;
-    }
-    .icon {
-      display: block;
     }
   }
   &-icon {
@@ -358,21 +399,16 @@ export default {
     font-weight: bold;
     font-size: 1rem;
     .disabled & {
-      color: blueviolet;
+      color: gray;
     }
   }
   &-author {
-    max-width: 30%;
-  }
-  &-desc {
-    margin-left: 3.5rem;
-    line-height: 2rem;
-    color: #60646d;
-    &::after {
-      content: "\200b";
+    > * {
+      vertical-align: middle;
     }
-    .removed & {
-      display: none;
+    > .ellipsis {
+      display: inline-block;
+      max-width: 100px;
     }
   }
 }
