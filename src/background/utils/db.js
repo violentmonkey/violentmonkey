@@ -336,7 +336,7 @@ export function removeScript(id) {
     storage.code.remove(id);
     storage.value.remove(id);
   }
-  return browser.runtime.sendMessage({
+  browser.runtime.sendMessage({
     cmd: 'RemoveScript',
     data: id,
   });
