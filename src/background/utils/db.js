@@ -1,6 +1,6 @@
-import { i18n, request, buffer2string, getFullUrl } from 'src/common';
+import { i18n, request, buffer2string, getFullUrl, isRemote } from 'src/common';
 import { objectGet, objectSet } from 'src/common/object';
-import { getNameURI, isRemote, parseMeta, newScript } from './script';
+import { getNameURI, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
 import { register } from './init';
 import patchDB from './patch-db';

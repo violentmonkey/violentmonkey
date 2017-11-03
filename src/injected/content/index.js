@@ -56,24 +56,25 @@ export default function initialize(contentId, webId) {
 
   return sendMessage({ cmd: 'GetInjected', data: window.location.href })
   .then(data => {
-    let needInject = false;
     if (data.scripts) {
-      data.scripts.forEach(script => {
+      data.scripts = data.scripts.filter(script => {
         ids.push(script.props.id);
-        if (script.config.enabled) {
+        if ((IS_TOP || !script.meta.noframes) && script.config.enabled) {
           badge.number += 1;
-          needInject = true;
+          return true;
         }
-      });
-    }
-    if (needInject) {
-      bridge.ready.then(() => {
-        bridge.post({ cmd: 'LoadScripts', data });
+        return false;
       });
     }
     badge.ready = true;
     getPopup();
     setBadge();
+    const needInject = data.scripts && data.scripts.length;
+    if (needInject) {
+      bridge.ready.then(() => {
+        bridge.post({ cmd: 'LoadScripts', data });
+      });
+    }
     return needInject;
   });
 }

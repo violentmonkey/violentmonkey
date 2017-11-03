@@ -1,5 +1,3 @@
-export { isRemote } from 'src/common';
-
 const metaStart = '==UserScript==';
 const metaEnd = '==/UserScript==';
 
@@ -9,17 +7,43 @@ export function isUserScript(text) {
   return true;
 }
 
+const arrayType = {
+  default: () => [],
+  transform: (res, val) => {
+    res.push(val);
+    return res;
+  },
+};
+const defaultType = {
+  default: () => null,
+  transform: (res, val) => (res == null ? val : res),
+};
+const metaTypes = {
+  include: arrayType,
+  exclude: arrayType,
+  match: arrayType,
+  excludeMatch: arrayType,
+  require: arrayType,
+  resource: {
+    default: () => ({}),
+    transform: (res, val) => {
+      const pair = val.match(/^(\w\S*)\s+(.*)/);
+      if (pair) res[pair[1]] = pair[2];
+      return res;
+    },
+  },
+  grant: arrayType,
+  noframes: {
+    default: () => false,
+    transform: () => true,
+  },
+};
 export function parseMeta(code) {
-  // initialize meta, specify those with multiple values allowed
-  const meta = {
-    include: [],
-    exclude: [],
-    match: [],
-    excludeMatch: [],
-    require: [],
-    resource: [],
-    grant: [],
-  };
+  // initialize meta
+  const meta = Object.keys(metaTypes)
+  .reduce((res, key) => Object.assign(res, {
+    [key]: metaTypes[key].default(),
+  }), {});
   let flag = -1;
   code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, (_match, group1, group2) => {
     if (flag < 0 && group1 === metaStart) {
@@ -34,18 +58,13 @@ export function parseMeta(code) {
       const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
       const key = locale ? `${camelKey}:${locale.toLowerCase()}` : camelKey;
       const val = group2.trim();
-      const data = meta[key];
-      // multiple values allowed
-      if (data && data.push) data.push(val);
-      // only first value will be stored
-      else if (!(key in meta)) meta[key] = val;
+      const metaType = metaTypes[key] || defaultType;
+      let oldValue = meta[key];
+      if (typeof oldValue === 'undefined') oldValue = metaType.default();
+      meta[key] = metaType.transform(oldValue, val);
     }
   });
-  meta.resources = {};
-  meta.resource.forEach(line => {
-    const pair = line.match(/^(\w\S*)\s+(.*)/);
-    if (pair) meta.resources[pair[1]] = pair[2];
-  });
+  meta.resources = meta.resource;
   delete meta.resource;
   // @homepageURL: compatible with @homepage
   if (!meta.homepageURL && meta.homepage) meta.homepageURL = meta.homepage;
