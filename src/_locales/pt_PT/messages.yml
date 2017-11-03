@@ -423,4 +423,4 @@ labelFilterSort:
   message: Ordenar por $1
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: 'Última atualização: $1'
