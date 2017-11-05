@@ -217,10 +217,10 @@ confirmNotSaved:
     Clique em OK para rejeitá-las ou em Cancelar para ficar.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Limpando os dados...
+  message: Otimizando os dados...
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Dados limpos
+  message: Dados otimizados
 hintVacuum:
   description: Hint for vacuuming data.
   message: Eliminar as redundâncias e tentar recarregar os recursos em falta no cache.
@@ -423,4 +423,4 @@ labelFilterSort:
   message: Ordenar por $1
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: 'Última atualização: $1'
