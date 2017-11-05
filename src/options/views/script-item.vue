@@ -143,8 +143,8 @@ export default {
           [60, 'min'],
           [24, 'h'],
           [30, 'd'],
-          [12, 'mon'],
-          [-1, 'yr'],
+          [12, 'm'],
+          [-1, 'y'],
         ];
         const unitInfo = units.find(([max]) => {
           if (max < 0 || delta < max) return true;
