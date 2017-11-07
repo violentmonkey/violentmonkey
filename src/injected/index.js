@@ -7,6 +7,8 @@ import initialize from './content';
   if (window.VM) return;
   window.VM = 1;
 
+  const { VM_initializeWeb } = window;
+
   function initBridge() {
     const contentId = getUniqId();
     const webId = getUniqId();
@@ -30,7 +32,7 @@ import initialize from './content';
       JSON.stringify(contentId),
       JSON.stringify(Object.keys(props)),
     ];
-    inject(`(${window.VM_initializeWeb.toString()}())(${args.join(',')})`);
+    inject(`(${VM_initializeWeb.toString()}())(${args.join(',')})`);
   }
 
   initBridge();
