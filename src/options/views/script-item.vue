@@ -140,20 +140,21 @@ export default {
       if (lastModified) {
         let delta = (Date.now() - lastModified) / 1000 / 60;
         const units = [
-          [60, 'min'],
-          [24, 'h'],
-          [30, 'd'],
-          [12, 'm'],
-          [-1, 'y'],
+          ['min', 60],
+          ['h', 24],
+          ['d', 1000, 365],
+          ['y'],
         ];
-        const unitInfo = units.find(([max]) => {
-          if (max < 0 || delta < max) return true;
-          delta = Math.floor(delta / max);
+        const unitInfo = units.find(item => {
+          const max = item[1];
+          if (!max || delta < max) return true;
+          const step = item[2] || max;
+          delta /= step;
           return false;
         });
         const date = new Date(lastModified);
         ret.title = this.i18n('labelLastUpdatedAt', date.toLocaleString());
-        ret.show = `${delta | 0}${unitInfo[1]}`;
+        ret.show = `${delta | 0}${unitInfo[0]}`;
       }
       return ret;
     },
