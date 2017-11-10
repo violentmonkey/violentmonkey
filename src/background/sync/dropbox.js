@@ -1,5 +1,5 @@
 import { loadQuery, dumpQuery } from '../utils';
-import { getURI, getFilename, BaseService, isScriptFile, register } from './base';
+import { getURI, getItemFilename, BaseService, isScriptFile, register } from './base';
 
 const config = {
   client_id: 'f0q12zup2uys5w8',
@@ -43,8 +43,8 @@ const Dropbox = BaseService.extend({
       data.entries.filter(item => item['.tag'] === 'file' && isScriptFile(item.name)).map(normalize)
     ));
   },
-  get({ uri }) {
-    const name = getFilename(uri);
+  get(item) {
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'POST',
       url: 'https://content.dropboxapi.com/2/files/download',
@@ -55,8 +55,8 @@ const Dropbox = BaseService.extend({
       },
     });
   },
-  put({ uri }, data) {
-    const name = getFilename(uri);
+  put(item, data) {
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'POST',
       url: 'https://content.dropboxapi.com/2/files/upload',
@@ -72,8 +72,8 @@ const Dropbox = BaseService.extend({
     })
     .then(normalize);
   },
-  remove({ uri }) {
-    const name = getFilename(uri);
+  remove(item) {
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/files/delete',

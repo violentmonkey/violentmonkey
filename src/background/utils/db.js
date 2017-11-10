@@ -4,6 +4,7 @@ import { getNameURI, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
 import { register } from './init';
 import patchDB from './patch-db';
+import { setOption } from './options';
 
 function cacheOrFetch(handle) {
   const requests = {};
@@ -147,10 +148,6 @@ function initialize() {
         storeInfo.position = Math.max(storeInfo.position, getInt(objectGet(value, 'props.position')));
       }
     });
-    scripts.sort((a, b) => {
-      const [pos1, pos2] = [a, b].map(item => getInt(objectGet(item, 'props.position')));
-      return Math.sign(pos1 - pos2);
-    });
     Object.assign(store, {
       scripts,
       storeInfo,
@@ -162,7 +159,7 @@ function initialize() {
     if (process.env.DEBUG) {
       console.log('store:', store); // eslint-disable-line no-console
     }
-    return normalizePosition();
+    return sortScripts();
   });
 }
 
@@ -170,12 +167,17 @@ function getInt(val) {
   return +val || 0;
 }
 
+function updateLastModified() {
+  setOption('lastModified', Date.now());
+}
+
 export function normalizePosition() {
   const updates = [];
+  const positionKey = 'props.position';
   store.scripts.forEach((item, index) => {
     const position = index + 1;
-    if (objectGet(item, 'props.position') !== position) {
-      objectSet(item, 'props.position', position);
+    if (objectGet(item, positionKey) !== position) {
+      objectSet(item, positionKey, position);
       updates.push(item);
     }
     // XXX patch v2.8.0
@@ -191,7 +193,24 @@ export function normalizePosition() {
   });
   store.storeInfo.position = store.scripts.length;
   const { length } = updates;
-  return length ? storage.script.dump(updates).then(() => length) : Promise.resolve();
+  if (!length) return Promise.resolve();
+  return storage.script.dump(updates)
+  .then(() => {
+    updateLastModified();
+    return length;
+  });
+}
+
+export function sortScripts() {
+  store.scripts.sort((a, b) => {
+    const [pos1, pos2] = [a, b].map(item => getInt(objectGet(item, 'props.position')));
+    return Math.sign(pos1 - pos2);
+  });
+  return normalizePosition()
+  .then(changed => {
+    browser.runtime.sendMessage({ cmd: 'ScriptsUpdated' });
+    return changed;
+  });
 }
 
 export function getScript(where) {
@@ -340,6 +359,7 @@ export function removeScript(id) {
     cmd: 'RemoveScript',
     data: id,
   });
+  return Promise.resolve();
 }
 
 export function moveScript(id, offset) {
@@ -389,8 +409,12 @@ function saveScript(script, code) {
     const index = store.scripts.indexOf(oldScript);
     store.scripts[index] = script;
   } else {
-    store.storeInfo.position += 1;
-    props.position = store.storeInfo.position;
+    if (!props.position) {
+      store.storeInfo.position += 1;
+      props.position = store.storeInfo.position;
+    } else if (store.storeInfo.position < props.position) {
+      store.storeInfo.position = props.position;
+    }
     script.config = config;
     script.props = props;
     store.scripts.push(script);
@@ -404,8 +428,9 @@ function saveScript(script, code) {
 export function updateScriptInfo(id, data) {
   const script = store.scriptMap[id];
   if (!script) return Promise.reject();
+  script.props = Object.assign({}, script.props, data.props);
   script.config = Object.assign({}, script.config, data.config);
-  script.custom = Object.assign({}, script.custom, data.custom);
+  // script.custom = Object.assign({}, script.custom, data.custom);
   return storage.script.dump(script);
 }
 

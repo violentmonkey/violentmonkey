@@ -2,7 +2,7 @@
 import { noop } from 'src/common';
 import { objectGet } from 'src/common/object';
 import { dumpQuery } from '../utils';
-import { getURI, getFilename, BaseService, isScriptFile, register } from './base';
+import { getURI, getItemFilename, BaseService, isScriptFile, register } from './base';
 
 const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ=='));
 const config = Object.assign({
@@ -50,7 +50,7 @@ const OneDrive = BaseService.extend({
     if (res.status === 404) {
       const header = res.xhr.getResponseHeader('WWW-Authenticate') || '';
       if (/^Bearer realm="OneDriveAPI"/.test(header)) {
-        return this.refreshToken().then(this.getMeta);
+        return this.refreshToken().then(() => this.getMeta());
       }
       return {};
     }
@@ -63,8 +63,8 @@ const OneDrive = BaseService.extend({
     })
     .then(data => data.value.filter(item => item.file && isScriptFile(item.name)).map(normalize));
   },
-  get({ uri }) {
-    const name = getFilename(uri);
+  get(item) {
+    const name = getItemFilename(item);
     return this.loadData({
       url: `/drive/special/approot:/${encodeURIComponent(name)}`,
       responseType: 'json',
@@ -74,8 +74,8 @@ const OneDrive = BaseService.extend({
       delay: false,
     }));
   },
-  put({ uri }, data) {
-    const name = getFilename(uri);
+  put(item, data) {
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'PUT',
       url: `/drive/special/approot:/${encodeURIComponent(name)}:/content`,
@@ -87,9 +87,9 @@ const OneDrive = BaseService.extend({
     })
     .then(normalize);
   },
-  remove({ uri }) {
+  remove(item) {
     // return 204
-    const name = getFilename(uri);
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'DELETE',
       url: `/drive/special/approot:/${encodeURIComponent(name)}`,

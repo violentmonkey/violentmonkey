@@ -4,7 +4,7 @@
 import { getUniqId } from 'src/common';
 import { objectGet } from 'src/common/object';
 import { loadQuery, dumpQuery } from '../utils';
-import { getURI, getFilename, BaseService, register, isScriptFile } from './base';
+import { getURI, getItemFilename, BaseService, register, isScriptFile } from './base';
 
 const config = {
   client_id: '590447512361-05hjbhnf8ua3iha55e5pgqg15om0cpef.apps.googleusercontent.com',
@@ -118,8 +118,9 @@ const GoogleDrive = BaseService.extend({
       url: `/files/${id}?alt=media`,
     });
   },
-  put({ id, name: filename, uri }, data) {
-    const name = uri ? getFilename(uri) : filename;
+  put(item, data) {
+    const name = getItemFilename(item);
+    const { id } = item;
     const boundary = getUniqId('violentmonkey-is-great-');
     const headers = {
       'Content-Type': `multipart/related; boundary=${boundary}`,
