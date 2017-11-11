@@ -10,6 +10,9 @@
       </div>
       <div class="buttons">
         <a class="mr-1" href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
+        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
+        <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
+        <button v-text="i18n('buttonClose')" @click="close"></button>
       </div>
     </div>
     <div class="frame-block flex-auto pos-rel">
@@ -21,13 +24,6 @@
         v-show="nav === 'settings'" class="abs-full"
         :value="script" :settings="settings"
       />
-    </div>
-    <div class="frame-block">
-      <div class="pull-right">
-        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
-        <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
-        <button v-text="i18n('buttonClose')" @click="close"></button>
-      </div>
     </div>
   </div>
 </template>

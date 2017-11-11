@@ -1,8 +1,5 @@
 <template>
   <div class="flex flex-col">
-    <vl-code class="editor-code flex-auto"
-      :options="cmOptions" v-model="content" @ready="onReady"
-    />
     <div class="frame-block" v-show="search.show">
       <button class="pull-right" @click="clearSearch">&times;</button>
       <form class="inline-block mr-1" @submit.prevent="goToLine()">
@@ -32,6 +29,9 @@
         </tooltip>
       </form>
     </div>
+    <vl-code class="editor-code flex-auto"
+      :options="cmOptions" v-model="content" @ready="onReady"
+    />
   </div>
 </template>
 
@@ -233,7 +233,7 @@ export default {
         return stop;
       });
     },
-    doFind(reversed) {
+    doSearch(reversed) {
       const { state } = this.search;
       const { cm } = this;
       if (state.query) {
@@ -241,10 +241,13 @@ export default {
       }
       this.search.show = true;
     },
-    find() {
+    searchInPlace() {
       const { state } = this.search;
       state.posTo = state.posFrom;
-      this.doFind();
+      this.doSearch();
+    },
+    find() {
+      this.searchInPlace();
       this.$nextTick(() => {
         const { search } = this.$refs;
         search.select();
@@ -252,7 +255,7 @@ export default {
       });
     },
     findNext(reversed) {
-      this.doFind(reversed);
+      this.doSearch(reversed);
       this.$nextTick(() => {
         this.$refs.search.focus();
       });
@@ -284,7 +287,7 @@ export default {
     },
   },
   mounted() {
-    this.debouncedFind = debounce(this.doFind, 100);
+    this.debouncedFind = debounce(this.searchInPlace, 100);
     if (this.global) window.addEventListener('keydown', this.onKeyDown, false);
   },
   beforeDestroy() {
