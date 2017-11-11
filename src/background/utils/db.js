@@ -459,7 +459,7 @@ export function getExportData(ids, withValues) {
 
 export function parseScript(data) {
   const {
-    id, code, message, isNew, config, custom,
+    id, code, message, isNew, config, custom, props,
   } = data;
   const meta = parseMeta(code);
   if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
@@ -486,12 +486,15 @@ export function parseScript(data) {
       removed: 0, // force reset `removed` since this is an installation
     });
     script.custom = Object.assign({}, script.custom, custom);
+    script.props = Object.assign({}, script.props, {
+      lastModified: Date.now(),
+      lastUpdated: Date.now(),
+    }, props);
     script.meta = meta;
     if (!meta.homepageURL && !script.custom.homepageURL && isRemote(data.from)) {
       script.custom.homepageURL = data.from;
     }
     if (isRemote(data.url)) script.custom.lastInstallURL = data.url;
-    objectSet(script, 'props.lastModified', data.modified || Date.now());
     const position = +data.position;
     if (position) objectSet(script, 'props.position', position);
     buildPathMap(script);

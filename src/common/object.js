@@ -49,3 +49,11 @@ export function objectPurify(obj) {
   }
   return obj;
 }
+
+export function objectPick(obj, keys) {
+  return keys.reduce((res, key) => {
+    const value = obj ? obj[key] : null;
+    if (value != null) res[key] = value;
+    return res;
+  }, {});
+}

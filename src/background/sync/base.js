@@ -1,5 +1,5 @@
 import { debounce, normalizeKeys, request, noop } from 'src/common';
-import { objectPurify } from 'src/common/object';
+import { objectSet, objectPurify } from 'src/common/object';
 import { getEventEmitter, getOption, setOption, hookOptions } from '../utils';
 import {
   getScripts,
@@ -385,12 +385,16 @@ export const BaseService = serviceFactory({
               if (obj.version === 2) {
                 data.config = obj.config;
                 data.custom = obj.custom;
+                data.props = obj.props;
               } else if (obj.version === 1) {
                 if (obj.more) {
                   data.custom = obj.more.custom;
                   data.config = objectPurify({
                     enabled: obj.more.enabled,
                     shouldUpdate: obj.more.update,
+                  });
+                  data.props = objectPurify({
+                    lastUpdated: obj.more.lastUpdated,
                   });
                 }
               }
@@ -399,8 +403,7 @@ export const BaseService = serviceFactory({
             }
             // Invalid data
             if (!data.code) return;
-            const { modified } = info;
-            data.modified = modified;
+            if (info.modified) objectSet(data, 'props.lastModified', info.modified);
             const position = +info.position;
             if (position) data.position = position;
             if (!getOption('syncScriptStatus') && data.config) {
@@ -419,6 +422,7 @@ export const BaseService = serviceFactory({
             //   code,
             //   custom: script.custom,
             //   config: script.config,
+            //   props: objectPick(script.props, ['lastUpdated']),
             // };
             // XXX use version 1 to be compatible with Violentmonkey on other platforms
             const data = {
@@ -428,6 +432,7 @@ export const BaseService = serviceFactory({
                 custom: local.custom,
                 enabled: local.config.enabled,
                 update: local.config.shouldUpdate,
+                lastUpdated: local.props.lastUpdated,
               },
             };
             remoteMetaData.info[local.props.uri] = {
