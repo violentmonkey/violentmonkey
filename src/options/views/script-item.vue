@@ -349,12 +349,17 @@ export default {
   &.removed {
     background: #f0f0f0;
     color: #999;
+  }
+  &.disabled {
     .secondary {
       color: darkgray;
     }
   }
   &.removed {
     padding-bottom: 10px;
+    .secondary {
+      display: none;
+    }
   }
   &-buttons {
     margin-left: 3.5rem;
