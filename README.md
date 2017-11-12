@@ -20,7 +20,7 @@ Development
 Make sure [Node.js](https://nodejs.org/) greater than v8.0 is installed.
 ``` sh
 $ yarn
-$ yarn run dev
+$ yarn dev
 # or
 $ npm i
 $ npm run dev
@@ -31,7 +31,7 @@ Build
 ---
 ``` sh
 $ yarn
-$ yarn run build
+$ yarn build
 # or
 $ npm i
 $ npm run build
