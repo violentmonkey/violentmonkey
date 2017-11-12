@@ -1,272 +1,402 @@
-extName:
-  description: Name of this extension.
-  message: Violentmonkey
-extDescription:
-  description: Description for this extension.
-  message: >-
-    Violentmonkey позволяет пользователю автоматически вводить скрипты в
-    страницы чтобы изменять их вид или поведение.
-msgUpdated:
-  description: Message shown when a script is updated/reinstalled.
-  message: Скрипт обновлен.
-msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Ошибка загрузки скрипта!
-msgInstalled:
-  description: Message shown when a script is installed.
-  message: Скрипт установлен.
-labelNoName:
-  description: Text as the name of a script when no @name is assigned.
-  message: Новый скрипт
-msgUpdating:
-  description: Message shown when a new version of script is being fetched.
-  message: Обновление...
-msgNewVersion:
-  description: >-
-    Message shown when a new version of script is found by @updateURL, but no
-    @downloadURL is provided.
-  message: Доступна новая версия.
-msgCheckingForUpdate:
-  description: Message shown when a script is being checked for updates by version numbers.
-  message: Проверка наличия обновлений...
-msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Не удается проверить наличие обновлений.
-msgNoUpdate:
-  description: Message shown when there is no new version of a script.
-  message: Обновления не найдены.
-labelInstall:
-  description: Shown in the title of the confirm page while trying to install a script.
-  message: Установка скрипта...
-buttonInstallOptions:
-  description: Button to show options of installation confirm page.
-  message: Настройки
-installOptionClose:
-  description: Option to close confirm window after installation.
-  message: Закрыть после установки.
-installOptionTrack:
-  description: Option to track the loading local file before window is closed.
-  message: 'Следить за обновлениями локального файла, пока открыто это окно.'
-buttonConfirmInstallation:
-  description: Button to confirm installation of a script.
-  message: Установить
-buttonClose:
-  description: Button to close window.
-  message: Закрыть
-msgErrorLoadingData:
-  description: >-
-    Message shown on confirm page when the script to be installed cannot be
-    loaded.
-  message: Ошибка загрузки скрипта.
-msgLoadedData:
-  description: >-
-    Message shown in the confirm page when a javascript file to be installed is
-    loaded.
-  message: Скрипт загружен.
-msgErrorLoadingDependency:
-  description: Message shown when not all requirements are loaded successfully.
-  message: Ошибка загрузки необходимых компонентов.
-msgLoadingDependency:
-  description: Message shown on confirm page when the requirements are being downloaded.
-  message: Загрузка необходимых компонентов... ($1/$2)
-msgLoadingData:
-  description: Message shown on confirm page when the script to be installed is loading.
-  message: Загрузка скрипта...
-sideMenuInstalled:
-  description: 'Side menu: Installed scripts'
-  message: Установленные скрипты
-sideMenuSettings:
-  description: 'Side menu: Settings'
-  message: Настройки
-sideMenuAbout:
-  description: 'Side menu: About'
-  message: О расширении
-buttonNew:
-  description: Button to create a new script.
-  message: Создать
-buttonUpdateAll:
-  description: Check all scripts for updates.
-  message: Проверить обновления скриптов
-msgLoading:
-  description: Message shown in the options page before script list is loaded.
-  message: Загрузка...
-labelSettings:
-  description: Label shown on the top of settings page
-  message: Настройки
-labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Ежедневно проверять наличие обновлений скриптов.
-labelDataImport:
-  description: Section title of data import.
-  message: Импорт данных
-buttonImportData:
-  description: Button to choose a file for data import.
-  message: Импорт из zip-файла
-buttonVacuum:
-  description: Button to vacuum extension data.
-  message: Сбросить кэш
-labelDataExport:
-  description: Section title of data export.
-  message: Экспорт данных
-labelExportScriptData:
-  description: Option to export script data along with scripts.
-  message: Настройки скрипта
-buttonAllNone:
-  description: Button to select all scripts or none.
-  message: Выбрать Всё/Ничего
-buttonExportData:
-  description: Button to open the data export dialog.
-  message: Экспорт в zip-файл
-labelAbout:
-  description: Label shown on top of the about page.
-  message: О расширении Violentmonkey
-labelRelated:
-  description: Label of related links.
-  message: 'Связанные ссылки: '
-labelDonate:
-  description: Label of link to donate page.
-  message: Поддержать проект финансово
-labelFeedback:
-  description: Label of link to feedback page.
-  message: Обратная связь
-labelAuthor:
-  description: Label of author shown in the details of a script.
-  message: 'Автор: '
 anchorAuthor:
   description: Author shown on about tab.
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
-labelTranslator:
-  description: Label of translator.
-  message: 'Переводчики: '
 anchorTranslator:
   description: Translator shown on about tab.
   message: >-
     softovikk, <a href=https://github.com/alexesprit>alexesprit</a>, <a
     href=https://github.com/bershan2>bershan2</a>
-labelCurrentLang:
-  description: Label of current language.
-  message: 'Текущий язык: '
-labelScriptEditor:
-  description: Shown in the title of the script editing page.
-  message: Редактор скриптов
-labelName:
-  description: Label of script name.
-  message: 'Название:'
-labelRunAt:
-  description: Label of script @run-at properties in custom meta data.
-  message: 'Выполнять:'
-labelRunAtDefault:
-  description: Shown when custom @run-at is not assigned.
-  message: (по умолчанию)
-labelHomepageURL:
-  description: Label of script @homepageURL in custom meta data.
-  message: 'Дом. страница:'
-labelUpdateURL:
-  description: Label of script @updateURL in custom meta data.
-  message: 'Адрес обновления:'
-labelDownloadURL:
-  description: Label of script @downloadURL in custom meta data.
-  message: 'Источник загрузки:'
-labelInclude:
-  description: Label of @include rules.
-  message: 'Задействовать на (правила включений @include):'
-labelMatch:
-  description: Label of @match rules.
-  message: 'Задействовать на (правила совпадений @match):'
-labelExclude:
-  description: Label of @exclude rules.
-  message: 'Не задействовать на (правила исключений @exclude):'
-labelExcludeMatch:
-  description: Label of @exclude-match rules.
-  message: 'Не задействовать на (правила исключений @exclude-match):'
-labelAllowUpdate:
-  description: Option to allow checking updates for a script.
-  message: Разрешить обновление
-buttonSave:
-  description: Button to save modifications of a script.
-  message: Сохранить
-buttonSaveClose:
-  description: Button to save modifications of a script and then close the editing page.
-  message: Сохранить и закрыть
-labelNoScripts:
-  description: Message shown when no script is installed.
-  message: У вас ещё не установлено ни одного скрипта.
+buttonAllNone:
+  description: Button to select all scripts or none.
+  message: Выбрать Всё/Ничего
+buttonCancel:
+  description: Cancel button on dialog.
+  message: Отмена
+buttonClose:
+  description: Button to close window.
+  message: Закрыть
+buttonConfirmInstallation:
+  description: Button to confirm installation of a script.
+  message: Установить
 buttonDisable:
   description: Button to disable a script.
   message: Выключить
-buttonEnable:
-  description: Button to enable a script.
-  message: Включить
 buttonEdit:
   description: Button to edit a script.
   message: Редактировать
+buttonEnable:
+  description: Button to enable a script.
+  message: Включить
+buttonExportData:
+  description: Button to open the data export dialog.
+  message: Экспорт в zip-файл
+buttonFilter:
+  description: Button to show filters menu.
+  message: Фильтры
+buttonHome:
+  description: Button to open homepage.
+  message: Домашняя страница
+buttonImportData:
+  description: Button to choose a file for data import.
+  message: Импорт из zip-файла
+buttonInstallFromURL:
+  description: Button to ask for URL of a user script.
+  message: Установить по ссылке
+buttonInstallOptions:
+  description: Button to show options of installation confirm page.
+  message: Настройки
+buttonNew:
+  description: Button to create a new script.
+  message: Создать
+buttonOK:
+  description: OK button on dialog.
+  message: OK
 buttonRemove:
   description: Button to remove a script.
   message: Удалить
-buttonUpdate:
-  description: Check a script for updates.
-  message: Проверить обновления
-msgImported:
-  description: >-
-    Message shown after import. There is an argument referring to the count of
-    scripts imported.
-  message: $1 скрипт(a/ов) импортировано.
-hintUseDownloadURL:
-  description: Shown as a place holder for @updateURL when it is not assigned
-  message: Использовать @downloadURL
-confirmNotSaved:
-  description: Confirm message shown when there are unsaved script modifications.
-  message: |-
-    Изменения не сохранены!
-    Нажмите OK, чтобы выйти или Отмена, чтобы вернуться.
-buttonVacuuming:
-  description: Message shown when data vacuum is in progress.
-  message: Очистка данных кэша...
-buttonVacuumed:
-  description: Message shown when data is vacuumed.
-  message: Кэш очищен
-hintVacuum:
-  description: Hint for vacuuming data.
-  message: Сбросить избыточный кэш и попробовать подгрузить недостающие ресурсы.
-menuFindScripts:
-  description: Menu item to find scripts for a site.
-  message: Найти скрипты для сайта
-menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Скрипты включены
-menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Скрипты отключены
-menuCommands:
-  description: Menu item to list script commands.
-  message: Команды скриптов
-labelSearch:
-  description: Label for search input in search box.
-  message: 'Найти: '
-labelReplace:
-  description: Label for replace input in search box.
-  message: 'Заменить на: '
 buttonReplace:
   description: Button to replace the current match.
   message: Заменить
 buttonReplaceAll:
   description: Button to replace all matches.
   message: Заменить все
-labelAutoReloadCurrentTab:
-  description: Option to reload current tab after a script is switched on or off from menu.
-  message: Обновить текущую вкладку после включения/отключения скрипта.
+buttonSave:
+  description: Button to save modifications of a script.
+  message: Сохранить
+buttonSaveBlacklist:
+  description: Button to save global blacklist.
+  message: Сохранить
+buttonSaveClose:
+  description: Button to save modifications of a script and then close the editing page.
+  message: Сохранить и закрыть
+buttonSaveCustomCSS:
+  description: Label for button to save custom CSS.
+  message: Сохранить
+buttonSupport:
+  description: Button to open support page.
+  message: Страница поддержки
+buttonUndo:
+  description: Button to undo removement of a script.
+  message: Отменить
+buttonUpdate:
+  description: Check a script for updates.
+  message: Проверить обновления
+buttonUpdateAll:
+  description: Check all scripts for updates.
+  message: Проверить обновления скриптов
+buttonVacuum:
+  description: Button to vacuum extension data.
+  message: Сбросить кэш
+buttonVacuumed:
+  description: Message shown when data is vacuumed.
+  message: Кэш очищен
+buttonVacuuming:
+  description: Message shown when data vacuum is in progress.
+  message: Очистка данных кэша...
+confirmNotSaved:
+  description: Confirm message shown when there are unsaved script modifications.
+  message: |-
+    Изменения не сохранены!
+    Нажмите OK, чтобы выйти или Отмена, чтобы вернуться.
+descBlacklist:
+  description: HTML Description for the global blacklist.
+  message: >-
+    Скрипты не будут вводиться в документы, URL адреса которых совпадают с
+    правилами в этом списке.
+descCustomCSS:
+  description: Description of custom CSS section.
+  message: >-
+    Пользовательские стили CSS для страницы Настройки и страницы установки
+    скриптов. Если Вы не знаете, что это такое, пожалуйста, не редактируйте этот
+    текст.
+editLabelMeta:
+  description: Metadata section in settings tab of script editor.
+  message: Пользовательские meta-данные
+editLabelSettings:
+  description: Settings section in settings tab of script editor.
+  message: Настройки скрипта
+editNavCode:
+  description: Label of code tab in script editor.
+  message: Код
+editNavSettings:
+  description: Label of settings tab in script editor.
+  message: Настройки
+extDescription:
+  description: Description for this extension.
+  message: >-
+    Violentmonkey позволяет пользователю автоматически вводить скрипты в
+    страницы чтобы изменять их вид или поведение.
+extName:
+  description: Name of this extension.
+  message: Violentmonkey
+filterAlphabeticalOrder:
+  description: Label for option to sort scripts in alphabetical order.
+  message: алфавиту
+filterExecutionOrder:
+  description: Label for option to sort scripts in execution order.
+  message: порядку выполнения
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Введите URL:'
-buttonInstallFromURL:
-  description: Button to ask for URL of a user script.
-  message: Установить по ссылке
+hintUseDownloadURL:
+  description: Shown as a place holder for @updateURL when it is not assigned
+  message: Использовать @downloadURL
+hintVacuum:
+  description: Hint for vacuuming data.
+  message: Сбросить избыточный кэш и попробовать подгрузить недостающие ресурсы.
+installFrom:
+  description: Label for button to install script from a userscript site.
+  message: Установить с $1
+installOptionClose:
+  description: Option to close confirm window after installation.
+  message: Закрыть после установки.
+installOptionTrack:
+  description: Option to track the loading local file before window is closed.
+  message: 'Следить за обновлениями локального файла, пока открыто это окно.'
+labelAbout:
+  description: Label shown on top of the about page.
+  message: О расширении Violentmonkey
+labelAllowUpdate:
+  description: Option to allow checking updates for a script.
+  message: Разрешить обновление
+labelAuthor:
+  description: Label of author shown in the details of a script.
+  message: 'Автор: '
+labelAutoReloadCurrentTab:
+  description: Option to reload current tab after a script is switched on or off from menu.
+  message: Обновить текущую вкладку после включения/отключения скрипта.
+labelAutoUpdate:
+  description: Option to allow automatically checking scripts for updates every 24 hours.
+  message: Ежедневно проверять наличие обновлений скриптов.
+labelBlacklist:
+  description: Label for global blacklist settings in security section.
+  message: Чёрный список
+labelCurrentLang:
+  description: Label of current language.
+  message: 'Текущий язык: '
+labelCustomCSS:
+  description: Label for custom CSS section.
+  message: Пользовотельские стили CSS
+labelDataExport:
+  description: Section title of data export.
+  message: Экспорт данных
+labelDataImport:
+  description: Section title of data import.
+  message: Импорт данных
+labelDonate:
+  description: Label of link to donate page.
+  message: Поддержать проект финансово
+labelDownloadURL:
+  description: Label of script @downloadURL in custom meta data.
+  message: 'Источник загрузки:'
+labelExclude:
+  description: Label of @exclude rules.
+  message: 'Не задействовать на (правила исключений @exclude):'
+labelExcludeMatch:
+  description: Label of @exclude-match rules.
+  message: 'Не задействовать на (правила исключений @exclude-match):'
+labelExportScriptData:
+  description: Option to export script data along with scripts.
+  message: Настройки скрипта
+labelFeedback:
+  description: Label of link to feedback page.
+  message: Обратная связь
+labelFilterSort:
+  description: Label for sort filter.
+  message: Сортировать по $1
+labelGeneral:
+  description: Label for general settings.
+  message: Общие настройки
+labelHomepageURL:
+  description: Label of script @homepageURL in custom meta data.
+  message: 'Дом. страница:'
+labelImportSettings:
+  description: Label for option to import settings from zip file.
+  message: Импортировать настройки.
+labelInclude:
+  description: Label of @include rules.
+  message: 'Задействовать на (правила включений @include):'
+labelInstall:
+  description: Shown in the title of the confirm page while trying to install a script.
+  message: Установка скрипта...
+labelKeepOriginal:
+  description: Option to keep the original match or ignore rules.
+  message: Использовать оригинальные правила.
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: ''
+labelLineNumber:
+  description: Label for line number jumper.
+  message: 'Номер строки:'
+labelMatch:
+  description: Label of @match rules.
+  message: 'Задействовать на (правила совпадений @match):'
+labelName:
+  description: Label of script name.
+  message: 'Название:'
+labelNoName:
+  description: Text as the name of a script when no @name is assigned.
+  message: Новый скрипт
+labelNoScripts:
+  description: Message shown when no script is installed.
+  message: У вас ещё не установлено ни одного скрипта.
+labelNoSearchScripts:
+  description: Message shown when no script is found in search results.
+  message: Скрипты не найдены.
+labelNotifyUpdates:
+  description: Option to show notification when script is updated.
+  message: Уведомлять об обновлениях скриптов.
+labelRelated:
+  description: Label of related links.
+  message: 'Связанные ссылки: '
+labelRemoved:
+  description: Label shown when a script is removed.
+  message: '[Удалено]'
+labelReplace:
+  description: Label for replace input in search box.
+  message: 'Заменить на: '
+labelRunAt:
+  description: Label of script @run-at properties in custom meta data.
+  message: 'Выполнять:'
+labelRunAtDefault:
+  description: Shown when custom @run-at is not assigned.
+  message: (по умолчанию)
+labelScriptEditor:
+  description: Shown in the title of the script editing page.
+  message: Редактор скриптов
+labelSearch:
+  description: Label for search input in search box.
+  message: 'Найти: '
+labelSearchScript:
+  description: Placeholder for script search box.
+  message: Поиск скриптов...
+labelSettings:
+  description: Label shown on the top of settings page
+  message: Настройки
+labelShowBadge:
+  description: Option to show number of running scripts on the badge.
+  message: Показывать количество активных скриптов на значке.
 labelSync:
   description: Label for sync options.
   message: Синхронизация с облачным  хранилищем
+labelSyncAuthorize:
+  description: Label for button to authorize a service.
+  message: Подключить
+labelSyncAuthorizing:
+  description: Label for button when authorization is in progress.
+  message: Авторизация...
+labelSyncDisabled:
+  description: Label for option to disable sync service.
+  message: ничем
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
+  message: ''
+labelSyncRevoke:
+  description: Label for button to revoke authorization for a service.
+  message: Отключить
+labelSyncScriptStatus:
+  description: Label for option to sync script status.
+  message: Синхронизировать статус скриптов.
+labelSyncService:
+  description: Label for sync service select.
+  message: Синхронизировать с
+labelTranslator:
+  description: Label of translator.
+  message: 'Переводчики: '
+labelUpdateURL:
+  description: Label of script @updateURL in custom meta data.
+  message: 'Адрес обновления:'
 lastSync:
   description: Label for last sync timestamp.
   message: Последняя синхронизация в $1.
+learnBlacklist:
+  description: Refers to a link to introduce blacklist patterns.
+  message: Подробнее о чёрных списках.
+menuCommands:
+  description: Menu item to list script commands.
+  message: Команды скриптов
+menuDashboard:
+  description: Label for menu item to open dashboard.
+  message: Панель управления
+menuFindScripts:
+  description: Menu item to find scripts for a site.
+  message: Найти скрипты для сайта
+menuMatchedScripts:
+  description: Label for menu listing matched scripts.
+  message: Совпадающие скрипты
+menuScriptDisabled:
+  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  message: Скрипты отключены
+menuScriptEnabled:
+  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  message: Скрипты включены
+msgCheckingForUpdate:
+  description: Message shown when a script is being checked for updates by version numbers.
+  message: Проверка наличия обновлений...
+msgErrorFetchingScript:
+  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  message: Ошибка загрузки скрипта!
+msgErrorFetchingUpdateInfo:
+  description: Message shown when Violentmonkey fails fetching version data of the script.
+  message: Не удается проверить наличие обновлений.
+msgErrorLoadingData:
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
+  message: Ошибка загрузки скрипта.
+msgErrorLoadingDependency:
+  description: Message shown when not all requirements are loaded successfully.
+  message: Ошибка загрузки необходимых компонентов.
+msgImported:
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
+  message: $1 скрипт(a/ов) импортировано.
+msgInstalled:
+  description: Message shown when a script is installed.
+  message: Скрипт установлен.
+msgInvalidScript:
+  description: Message shown when script is invalid.
+  message: Неверный скрипт.
+msgLoadedData:
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
+  message: Скрипт загружен.
+msgLoading:
+  description: Message shown in the options page before script list is loaded.
+  message: Загрузка...
+msgLoadingData:
+  description: Message shown on confirm page when the script to be installed is loading.
+  message: Загрузка скрипта...
+msgLoadingDependency:
+  description: Message shown on confirm page when the requirements are being downloaded.
+  message: Загрузка необходимых компонентов... ($1/$2)
+msgNamespaceConflict:
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: Конфликт пространства имен скриптов. Измените @name и @namespace.
+msgNewVersion:
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
+  message: Доступна новая версия.
+msgNoUpdate:
+  description: Message shown when there is no new version of a script.
+  message: Обновления не найдены.
+msgSavedBlacklist:
+  description: Message shown when blacklist are saved.
+  message: Чёрный список сохранён.
+msgSavedCustomCSS:
+  description: Message shown when custom CSS is saved.
+  message: Пользовотельские стили CSS сохранены.
+msgScriptUpdated:
+  description: Notification message for script updates.
+  message: 'Скрипт [$1] обновлён!'
+msgSyncError:
+  description: Message shown when sync failed.
+  message: Ошибка синхронизации.
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: Установление соединения...
@@ -279,154 +409,24 @@ msgSyncReady:
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Синхронизация...
-msgSyncError:
-  description: Message shown when sync failed.
-  message: Ошибка синхронизации.
-msgNamespaceConflict:
-  description: >-
-    Message shown when namespace of the new script conflicts with an existent
-    one.
-  message: Конфликт пространства имен скриптов. Измените @name и @namespace.
-msgInvalidScript:
-  description: Message shown when script is invalid.
-  message: Неверный скрипт.
-labelShowBadge:
-  description: Option to show number of running scripts on the badge.
-  message: Показывать количество активных скриптов на значке.
-labelLineNumber:
-  description: Label for line number jumper.
-  message: 'Номер строки:'
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
-  message: Чёрный список
-descBlacklist:
-  description: HTML Description for the global blacklist.
-  message: >-
-    Скрипты не будут вводиться в документы, URL адреса которых совпадают с
-    правилами в этом списке.
-buttonSaveBlacklist:
-  description: Button to save global blacklist.
-  message: Сохранить
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
-  message: Чёрный список сохранён.
-labelGeneral:
-  description: Label for general settings.
-  message: Общие настройки
-labelSyncScriptStatus:
-  description: Label for option to sync script status.
-  message: Синхронизировать статус скриптов.
-labelSyncDisabled:
-  description: Label for option to disable sync service.
-  message: ничем
-labelSyncService:
-  description: Label for sync service select.
-  message: Синхронизировать с
-labelSyncAuthorize:
-  description: Label for button to authorize a service.
-  message: Подключить
-labelSyncRevoke:
-  description: Label for button to revoke authorization for a service.
-  message: Отключить
-labelSyncAuthorizing:
-  description: Label for button when authorization is in progress.
-  message: Авторизация...
-msgSavedCustomCSS:
-  description: Message shown when custom CSS is saved.
-  message: Пользовотельские стили CSS сохранены.
-labelCustomCSS:
-  description: Label for custom CSS section.
-  message: Пользовотельские стили CSS
-descCustomCSS:
-  description: Description of custom CSS section.
-  message: >-
-    Пользовательские стили CSS для страницы Настройки и страницы установки
-    скриптов. Если Вы не знаете, что это такое, пожалуйста, не редактируйте этот
-    текст.
-buttonSaveCustomCSS:
-  description: Label for button to save custom CSS.
-  message: Сохранить
-menuDashboard:
-  description: Label for menu item to open dashboard.
-  message: Панель управления
-menuMatchedScripts:
-  description: Label for menu listing matched scripts.
-  message: Совпадающие скрипты
-buttonOK:
-  description: OK button on dialog.
-  message: OK
-buttonCancel:
-  description: Cancel button on dialog.
-  message: Отмена
-labelImportSettings:
-  description: Label for option to import settings from zip file.
-  message: Импортировать настройки.
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
-  message: Подробнее о чёрных списках.
-editNavCode:
-  description: Label of code tab in script editor.
-  message: Код
-editNavSettings:
-  description: Label of settings tab in script editor.
-  message: Настройки
-editLabelSettings:
-  description: Settings section in settings tab of script editor.
-  message: Настройки скрипта
-editLabelMeta:
-  description: Metadata section in settings tab of script editor.
-  message: Пользовательские meta-данные
-labelKeepOriginal:
-  description: Option to keep the original match or ignore rules.
-  message: Использовать оригинальные правила.
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: Обновление
-msgScriptUpdated:
-  description: Notification message for script updates.
-  message: 'Скрипт [$1] обновлён!'
-labelNotifyUpdates:
-  description: Option to show notification when script is updated.
-  message: Уведомлять об обновлениях скриптов.
-installFrom:
-  description: Label for button to install script from a userscript site.
-  message: Установить с $1
-labelSearchScript:
-  description: Placeholder for script search box.
-  message: Поиск скриптов...
-labelNoSearchScripts:
-  description: Message shown when no script is found in search results.
-  message: Скрипты не найдены.
-buttonHome:
-  description: Button to open homepage.
-  message: Домашняя страница
-buttonSupport:
-  description: Button to open support page.
-  message: Страница поддержки
-buttonUndo:
-  description: Button to undo removement of a script.
-  message: Отменить
-labelRemoved:
-  description: Label shown when a script is removed.
-  message: '[Удалено]'
-buttonFilter:
-  description: Button to show filters menu.
-  message: Фильтры
+msgUpdated:
+  description: Message shown when a script is updated/reinstalled.
+  message: Скрипт обновлен.
+msgUpdating:
+  description: Message shown when a new version of script is being fetched.
+  message: Обновление...
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Показывать включенные скрипты первыми
-filterExecutionOrder:
-  description: Label for option to sort scripts in execution order.
-  message: порядку выполнения
-filterAlphabeticalOrder:
-  description: Label for option to sort scripts in alphabetical order.
-  message: алфавиту
-labelFilterSort:
-  description: Label for sort filter.
-  message: Сортировать по $1
-labelLastUpdatedAt:
-  description: Label shown on last updated time.
-  message: ''
-labelSyncReauthorize:
-  description: Option to reauthorize sync service when expired.
-  message: ''
+sideMenuAbout:
+  description: 'Side menu: About'
+  message: О расширении
+sideMenuInstalled:
+  description: 'Side menu: Installed scripts'
+  message: Установленные скрипты
+sideMenuSettings:
+  description: 'Side menu: Settings'
+  message: Настройки
+titleScriptUpdated:
+  description: Notification title for script updates.
+  message: Обновление
