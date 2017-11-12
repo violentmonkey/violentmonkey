@@ -209,8 +209,13 @@ export const BaseService = serviceFactory({
       this.authState.set('authorized');
     }, err => {
       if (err && err.type === 'unauthorized') {
-        // _this.config.clear();
         this.authState.set('unauthorized');
+        if (this.config.get('token') && getOption('syncReauthorize') && !this.config.get('reauthorized')) {
+          this.config.set({
+            reauthorized: true,
+          });
+          this.authorize();
+        }
       } else {
         console.error(err);
         this.authState.set('error');
@@ -536,7 +541,13 @@ export function sync() {
 export function checkAuthUrl(url) {
   return serviceNames.some(name => {
     const service = services[name];
-    return service.checkAuth && service.checkAuth(url);
+    const authorized = service.checkAuth && service.checkAuth(url);
+    if (authorized) {
+      service.config.set({
+        reauthorized: false,
+      });
+    }
+    return authorized;
   });
 }
 

@@ -16,6 +16,7 @@ const defaults = {
   features: null,
   blacklist: null,
   syncScriptStatus: true,
+  syncReauthorize: true,
   sync: null,
   customCSS: null,
   importSettings: true,

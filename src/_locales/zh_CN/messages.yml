@@ -418,3 +418,6 @@ labelFilterSort:
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: 最后更新于 $1
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
+  message: 授权失效后自动重新授权
