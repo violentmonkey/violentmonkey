@@ -90,14 +90,12 @@ function onLoadScripts(data) {
   };
   if (data.scripts) {
     forEach(data.scripts, script => {
-      if (script && script.config.enabled) {
-        // XXX: use camelCase since v2.6.3
-        const runAt = script.custom.runAt || script.custom['run-at']
-          || script.meta.runAt || script.meta['run-at'];
-        const list = listMap[runAt] || end;
-        list.push(script);
-        store.values[script.props.id] = data.values[script.props.id];
-      }
+      // XXX: use camelCase since v2.6.3
+      const runAt = script.custom.runAt || script.custom['run-at']
+        || script.meta.runAt || script.meta['run-at'];
+      const list = listMap[runAt] || end;
+      list.push(script);
+      store.values[script.props.id] = data.values[script.props.id];
     });
     run(start);
   }

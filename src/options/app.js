@@ -93,5 +93,9 @@ function initMain() {
         initScript(updated);
       }
     },
+    RemoveScript(id) {
+      const i = store.scripts.findIndex(script => script.props.id === id);
+      if (i >= 0) store.scripts.splice(i, 1);
+    },
   });
 }

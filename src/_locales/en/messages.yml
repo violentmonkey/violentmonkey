@@ -420,3 +420,6 @@ labelFilterSort:
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: Last updated at $1
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
+  message: Reauthorize automatically when expired

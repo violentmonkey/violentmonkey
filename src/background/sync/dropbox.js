@@ -1,5 +1,5 @@
 import { loadQuery, dumpQuery } from '../utils';
-import { getURI, BaseService, isScriptFile, register } from './base';
+import { getURI, getItemFilename, BaseService, isScriptFile, register } from './base';
 
 const config = {
   client_id: 'f0q12zup2uys5w8',
@@ -26,12 +26,9 @@ const Dropbox = BaseService.extend({
       });
     });
   },
-  getMeta() {
-    return BaseService.prototype.getMeta.call(this)
-    .catch(res => {
-      if (res.status === 409) return {};
-      throw res;
-    });
+  handleMetaError(res) {
+    if (res.status === 409) return {};
+    throw res;
   },
   list() {
     return this.loadData({
@@ -46,24 +43,26 @@ const Dropbox = BaseService.extend({
       data.entries.filter(item => item['.tag'] === 'file' && isScriptFile(item.name)).map(normalize)
     ));
   },
-  get(path) {
+  get(item) {
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'POST',
       url: 'https://content.dropboxapi.com/2/files/download',
       headers: {
         'Dropbox-API-Arg': JSON.stringify({
-          path: `/${path}`,
+          path: `/${name}`,
         }),
       },
     });
   },
-  put(path, data) {
+  put(item, data) {
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'POST',
       url: 'https://content.dropboxapi.com/2/files/upload',
       headers: {
         'Dropbox-API-Arg': JSON.stringify({
-          path: `/${path}`,
+          path: `/${name}`,
           mode: 'overwrite',
         }),
         'Content-Type': 'application/octet-stream',
@@ -73,12 +72,13 @@ const Dropbox = BaseService.extend({
     })
     .then(normalize);
   },
-  remove(path) {
+  remove(item) {
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/files/delete',
       body: {
-        path: `/${path}`,
+        path: `/${name}`,
       },
       responseType: 'json',
     })

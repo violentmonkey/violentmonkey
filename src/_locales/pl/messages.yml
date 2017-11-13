@@ -424,4 +424,7 @@ labelFilterSort:
   message: Sortuj wg $1
 labelLastUpdatedAt:
   description: Label shown on last updated time.
+  message: Ostatnio zaktualizowany $1
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
   message: ''

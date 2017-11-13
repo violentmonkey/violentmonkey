@@ -14,7 +14,7 @@ import {
   getScripts, removeScript, getData, checkRemove, getScriptsByURL,
   updateScriptInfo, getExportData, getScriptCode,
   getScriptByIds, moveScript, vacuum, parseScript, getScript,
-  normalizePosition,
+  sortScripts,
 } from './utils/db';
 import { resetBlacklist } from './utils/tester';
 import { setValueStore, updateValueStore } from './utils/values';
@@ -93,8 +93,8 @@ const commands = {
   UpdateScriptInfo({ id, config }) {
     return updateScriptInfo(id, {
       config,
-      custom: {
-        modified: Date.now(),
+      props: {
+        lastModified: Date.now(),
       },
     })
     .then(([script]) => {
@@ -127,7 +127,9 @@ const commands = {
   },
   Move({ id, offset }) {
     return moveScript(id, offset)
-    .then(() => { sync.sync(); });
+    .then(() => {
+      sync.sync();
+    });
   },
   Vacuum: vacuum,
   ParseScript(data) {
@@ -208,7 +210,7 @@ const commands = {
     .then(script => (script ? script.meta.version : null));
   },
   CheckPosition() {
-    return normalizePosition();
+    return sortScripts();
   },
 };
 

@@ -109,7 +109,7 @@ export function request(url, options = {}) {
     if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
     const headers = Object.assign({}, options.headers);
     let { body } = options;
-    if (body && typeof body === 'object') {
+    if (body && Object.prototype.toString.call(body) === '[object Object]') {
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify(body);
     }

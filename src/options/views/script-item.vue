@@ -9,9 +9,9 @@
         <a class="ellipsis" :href="`mailto:${author.email}`" v-if="author.email" v-text="author.name"></a>
         <span class="ellipsis" v-else v-text="author.name"></span>
       </tooltip>
-      <tooltip :title="lastModified.title" align="end">
+      <tooltip :title="lastUpdated.title" align="end">
         <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
-        <span class="secondary" v-text="lastModified.show"></span>
+        <span class="secondary" v-text="lastUpdated.show"></span>
       </tooltip>
       <div v-if="script.config.removed" v-text="i18n('labelRemoved')"></div>
       <div v-if="script.config.removed">
@@ -134,26 +134,29 @@ export default {
     description() {
       return this.script.custom.description || getLocaleString(this.script.meta, 'description');
     },
-    lastModified() {
-      const { lastModified } = this.script.props;
+    lastUpdated() {
+      const { props } = this.script;
+      // XXX use `lastModified` as a fallback for scripts without `lastUpdated`
+      const lastUpdated = props.lastUpdated || props.lastModified;
       const ret = {};
-      if (lastModified) {
-        let delta = (Date.now() - lastModified) / 1000 / 60;
+      if (lastUpdated) {
+        let delta = (Date.now() - lastUpdated) / 1000 / 60;
         const units = [
-          [60, 'min'],
-          [24, 'h'],
-          [30, 'd'],
-          [12, 'mon'],
-          [-1, 'yr'],
+          ['min', 60],
+          ['h', 24],
+          ['d', 1000, 365],
+          ['y'],
         ];
-        const unitInfo = units.find(([max]) => {
-          if (max < 0 || delta < max) return true;
-          delta = Math.floor(delta / max);
+        const unitInfo = units.find(item => {
+          const max = item[1];
+          if (!max || delta < max) return true;
+          const step = item[2] || max;
+          delta /= step;
           return false;
         });
-        const date = new Date(lastModified);
+        const date = new Date(lastUpdated);
         ret.title = this.i18n('labelLastUpdatedAt', date.toLocaleString());
-        ret.show = `${delta | 0}${unitInfo[1]}`;
+        ret.show = `${delta | 0}${unitInfo[0]}`;
       }
       return ret;
     },
@@ -348,12 +351,17 @@ export default {
   &.removed {
     background: #f0f0f0;
     color: #999;
+  }
+  &.disabled {
     .secondary {
       color: darkgray;
     }
   }
   &.removed {
     padding-bottom: 10px;
+    .secondary {
+      display: none;
+    }
   }
   &-buttons {
     margin-left: 3.5rem;
