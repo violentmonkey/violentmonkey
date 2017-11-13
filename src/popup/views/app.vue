@@ -110,6 +110,7 @@ export default {
     },
     onManage() {
       browser.runtime.openOptionsPage();
+      window.close();
     },
     onFindScripts(item) {
       let domain;

@@ -7,6 +7,7 @@ const defaults = {
   autoUpdate: true,
   // ignoreGrant: false,
   lastUpdate: 0,
+  lastModified: 0,
   showBadge: true,
   exportValues: true,
   closeAfterInstall: false,
@@ -15,6 +16,7 @@ const defaults = {
   features: null,
   blacklist: null,
   syncScriptStatus: true,
+  syncReauthorize: true,
   sync: null,
   customCSS: null,
   importSettings: true,
@@ -29,6 +31,7 @@ const hooks = initHooks();
 const callHooksLater = debounce(callHooks, 100);
 
 let options = {};
+let ready = false;
 const init = browser.storage.local.get('options')
 .then(({ options: data }) => {
   if (data && typeof data === 'object') options = data;
@@ -66,6 +69,9 @@ const init = browser.storage.local.get('options')
     }
     setOption('version', 1);
   }
+})
+.then(() => {
+  ready = true;
 });
 register(init);
 
@@ -89,6 +95,12 @@ export function getOption(key, def) {
 }
 
 export function setOption(key, value) {
+  if (!ready) {
+    init.then(() => {
+      setOption(key, value);
+    });
+    return;
+  }
   const keys = normalizeKeys(key);
   const optionKey = keys.join('.');
   let optionValue = value;

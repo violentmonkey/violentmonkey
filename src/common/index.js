@@ -75,8 +75,8 @@ export function zfill(input, length) {
   return num;
 }
 
-export function getUniqId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+export function getUniqId(prefix) {
+  return (prefix || '') + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
 /**
@@ -109,7 +109,7 @@ export function request(url, options = {}) {
     if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
     const headers = Object.assign({}, options.headers);
     let { body } = options;
-    if (body && typeof body === 'object') {
+    if (body && Object.prototype.toString.call(body) === '[object Object]') {
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify(body);
     }
@@ -178,5 +178,5 @@ export function getFullUrl(url, base) {
 }
 
 export function isRemote(url) {
-  return url && !(/^(file|data):/.test(url));
+  return url && !(/^(file:|data:|http:\/\/localhost[:/])/.test(url));
 }

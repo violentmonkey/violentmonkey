@@ -14,10 +14,19 @@
       <setting-check name="exportValues" />
       <span v-text="i18n('labelExportScriptData')"></span>
     </label>
+    <vl-modal v-if="store.ffDownload" transition="in-out" :visible="!!store.ffDownload.url" @close="store.ffDownload = {}">
+      <div class="export-modal modal-content">
+        <a :download="store.ffDownload.name" :href="store.ffDownload.url">
+          Right click and save as<br />
+          <strong>scripts.zip</strong>
+        </a>
+      </div>
+    </vl-modal>
   </section>
 </template>
 
 <script>
+import VlModal from 'vueleton/lib/modal';
 import { sendMessage, getLocaleString } from 'src/common';
 import options from 'src/common/options';
 import { isFirefox } from 'src/common/ua';
@@ -28,13 +37,16 @@ import { store } from '../../utils';
  * Note:
  * - Firefox does not support multiline <select>
  */
+if (isFirefox) store.ffDownload = {};
 
 export default {
   components: {
     SettingCheck,
+    VlModal,
   },
   data() {
     return {
+      isFirefox,
       store,
       exporting: false,
       items: [],
@@ -53,7 +65,9 @@ export default {
   },
   methods: {
     initItems() {
-      this.items = (store.scripts || []).map(script => ({
+      this.items = (store.scripts || [])
+      .filter(({ config: { removed } }) => !removed)
+      .map(script => ({
         script,
         active: true,
       }));
@@ -96,12 +110,39 @@ function addFile(writer, file) {
   });
 }
 
+function leftpad(src, length, pad = '0') {
+  let str = `${src}`;
+  while (str.length < length) str = pad + str;
+  return str;
+}
+
+function getTimestamp() {
+  const date = new Date();
+  return `${
+    date.getFullYear()
+  }-${
+    leftpad(date.getMonth() + 1, 2)
+  }-${
+    leftpad(date.getDate(), 2)
+  }_${
+    leftpad(date.getHours(), 2)
+  }.${
+    leftpad(date.getMinutes(), 2)
+  }.${
+    leftpad(date.getSeconds(), 2)
+  }`;
+}
+
+function getExportname() {
+  return `scripts_${getTimestamp()}.zip`;
+}
+
 function download(url, cb) {
   const a = document.createElement('a');
   a.style.display = 'none';
   document.body.appendChild(a);
   a.href = url;
-  a.download = 'scripts.zip';
+  a.download = getExportname();
   a.click();
   setTimeout(() => {
     document.body.removeChild(a);
@@ -115,7 +156,10 @@ function downloadBlob(blob) {
   if (isFirefox) {
     const reader = new FileReader();
     reader.onload = () => {
-      download(reader.result);
+      store.ffDownload = {
+        name: getExportname(),
+        url: reader.result,
+      };
     };
     reader.readAsDataURL(blob);
   } else {
@@ -210,5 +254,8 @@ function exportData(selectedIds) {
       color: white;
     }
   }
+}
+.export-modal {
+  width: 13rem;
 }
 </style>

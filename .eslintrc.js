@@ -40,7 +40,7 @@ module.exports = {
     'consistent-return': 'off',
     'no-use-before-define': ['error', 'nofunc'],
     'object-shorthand': ['error', 'always'],
-    'no-mixed-operators': ['error', { allowSamePrecedence: true }],
+    'no-mixed-operators': 'off',
     'no-bitwise': ['error', { int32Hint: true }],
     'no-underscore-dangle': 'off',
     'arrow-parens': ['error', 'as-needed'],

@@ -1,9 +1,10 @@
-import { i18n, request, buffer2string, getFullUrl } from 'src/common';
+import { i18n, request, buffer2string, getFullUrl, isRemote } from 'src/common';
 import { objectGet, objectSet } from 'src/common/object';
-import { getNameURI, isRemote, parseMeta, newScript } from './script';
+import { getNameURI, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
 import { register } from './init';
 import patchDB from './patch-db';
+import { setOption } from './options';
 
 function cacheOrFetch(handle) {
   const requests = {};
@@ -147,10 +148,6 @@ function initialize() {
         storeInfo.position = Math.max(storeInfo.position, getInt(objectGet(value, 'props.position')));
       }
     });
-    scripts.sort((a, b) => {
-      const [pos1, pos2] = [a, b].map(item => getInt(objectGet(item, 'props.position')));
-      return Math.sign(pos1 - pos2);
-    });
     Object.assign(store, {
       scripts,
       storeInfo,
@@ -162,7 +159,7 @@ function initialize() {
     if (process.env.DEBUG) {
       console.log('store:', store); // eslint-disable-line no-console
     }
-    return normalizePosition();
+    return sortScripts();
   });
 }
 
@@ -170,12 +167,17 @@ function getInt(val) {
   return +val || 0;
 }
 
+function updateLastModified() {
+  setOption('lastModified', Date.now());
+}
+
 export function normalizePosition() {
   const updates = [];
+  const positionKey = 'props.position';
   store.scripts.forEach((item, index) => {
     const position = index + 1;
-    if (objectGet(item, 'props.position') !== position) {
-      objectSet(item, 'props.position', position);
+    if (objectGet(item, positionKey) !== position) {
+      objectSet(item, positionKey, position);
       updates.push(item);
     }
     // XXX patch v2.8.0
@@ -191,7 +193,24 @@ export function normalizePosition() {
   });
   store.storeInfo.position = store.scripts.length;
   const { length } = updates;
-  return length ? storage.script.dump(updates).then(() => length) : Promise.resolve();
+  if (!length) return Promise.resolve();
+  return storage.script.dump(updates)
+  .then(() => {
+    updateLastModified();
+    return length;
+  });
+}
+
+export function sortScripts() {
+  store.scripts.sort((a, b) => {
+    const [pos1, pos2] = [a, b].map(item => getInt(objectGet(item, 'props.position')));
+    return Math.sign(pos1 - pos2);
+  });
+  return normalizePosition()
+  .then(changed => {
+    browser.runtime.sendMessage({ cmd: 'ScriptsUpdated' });
+    return changed;
+  });
 }
 
 export function getScript(where) {
@@ -336,10 +355,11 @@ export function removeScript(id) {
     storage.code.remove(id);
     storage.value.remove(id);
   }
-  return browser.runtime.sendMessage({
+  browser.runtime.sendMessage({
     cmd: 'RemoveScript',
     data: id,
   });
+  return Promise.resolve();
 }
 
 export function moveScript(id, offset) {
@@ -389,8 +409,12 @@ function saveScript(script, code) {
     const index = store.scripts.indexOf(oldScript);
     store.scripts[index] = script;
   } else {
-    store.storeInfo.position += 1;
-    props.position = store.storeInfo.position;
+    if (!props.position) {
+      store.storeInfo.position += 1;
+      props.position = store.storeInfo.position;
+    } else if (store.storeInfo.position < props.position) {
+      store.storeInfo.position = props.position;
+    }
     script.config = config;
     script.props = props;
     store.scripts.push(script);
@@ -404,8 +428,9 @@ function saveScript(script, code) {
 export function updateScriptInfo(id, data) {
   const script = store.scriptMap[id];
   if (!script) return Promise.reject();
+  script.props = Object.assign({}, script.props, data.props);
   script.config = Object.assign({}, script.config, data.config);
-  script.custom = Object.assign({}, script.custom, data.custom);
+  // script.custom = Object.assign({}, script.custom, data.custom);
   return storage.script.dump(script);
 }
 
@@ -434,7 +459,7 @@ export function getExportData(ids, withValues) {
 
 export function parseScript(data) {
   const {
-    id, code, message, isNew, config, custom,
+    id, code, message, isNew, config, custom, props,
   } = data;
   const meta = parseMeta(code);
   if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
@@ -461,12 +486,15 @@ export function parseScript(data) {
       removed: 0, // force reset `removed` since this is an installation
     });
     script.custom = Object.assign({}, script.custom, custom);
+    script.props = Object.assign({}, script.props, {
+      lastModified: Date.now(),
+      lastUpdated: Date.now(),
+    }, props);
     script.meta = meta;
     if (!meta.homepageURL && !script.custom.homepageURL && isRemote(data.from)) {
       script.custom.homepageURL = data.from;
     }
     if (isRemote(data.url)) script.custom.lastInstallURL = data.url;
-    objectSet(script, 'props.lastModified', data.modified || Date.now());
     const position = +data.position;
     if (position) objectSet(script, 'props.position', position);
     buildPathMap(script);
@@ -552,7 +580,8 @@ export function vacuum() {
     [storage.require, requireKeys],
     [storage.code, codeKeys],
   ];
-  browser.storage.get().then(data => {
+  return browser.storage.local.get()
+  .then(data => {
     Object.keys(data).forEach(key => {
       mappings.some(([substore, map]) => {
         const { prefix } = substore;
@@ -564,39 +593,39 @@ export function vacuum() {
         return false;
       });
     });
-  });
-  const touch = (obj, key) => {
-    if (obj[key] < 0) obj[key] = 1;
-    else if (!obj[key]) obj[key] = 2;
-  };
-  store.scripts.forEach(script => {
-    const { id } = script.props;
-    touch(codeKeys, id);
-    touch(valueKeys, id);
-    if (!script.custom.pathMap) buildPathMap(script);
-    const { pathMap } = script.custom;
-    script.meta.require.forEach(url => {
-      touch(requireKeys, pathMap[url] || url);
-    });
-    Object.values(script.meta.resources).forEach(url => {
-      touch(cacheKeys, pathMap[url] || url);
-    });
-    const { icon } = script.meta;
-    if (isRemote(icon)) {
-      const fullUrl = pathMap[icon] || icon;
-      touch(cacheKeys, fullUrl);
-    }
-  });
-  mappings.forEach(([substore, map]) => {
-    Object.keys(map).forEach(key => {
-      const value = map[key];
-      if (value < 0) {
-        // redundant value
-        substore.remove(key);
-      } else if (value === 2 && substore.fetch) {
-        // missing resource
-        substore.fetch(key);
+    const touch = (obj, key) => {
+      if (obj[key] < 0) obj[key] = 1;
+      else if (!obj[key]) obj[key] = 2;
+    };
+    store.scripts.forEach(script => {
+      const { id } = script.props;
+      touch(codeKeys, id);
+      touch(valueKeys, id);
+      if (!script.custom.pathMap) buildPathMap(script);
+      const { pathMap } = script.custom;
+      script.meta.require.forEach(url => {
+        touch(requireKeys, pathMap[url] || url);
+      });
+      Object.values(script.meta.resources).forEach(url => {
+        touch(cacheKeys, pathMap[url] || url);
+      });
+      const { icon } = script.meta;
+      if (isRemote(icon)) {
+        const fullUrl = pathMap[icon] || icon;
+        touch(cacheKeys, fullUrl);
       }
+    });
+    mappings.forEach(([substore, map]) => {
+      Object.keys(map).forEach(key => {
+        const value = map[key];
+        if (value < 0) {
+          // redundant value
+          substore.remove(key);
+        } else if (value === 2 && substore.fetch) {
+          // missing resource
+          substore.fetch(key);
+        }
+      });
     });
   });
 }

@@ -98,7 +98,7 @@ function mergeLists(...args) {
 }
 
 function str2RE(str) {
-  const re = str.replace(/([.?])/g, '\\$1').replace(/\*/g, '.*?');
+  const re = str.replace(/([.?+[\]{}()|^$])/g, '\\$1').replace(/\*/g, '.*?');
   return `^${re}$`;
 }
 

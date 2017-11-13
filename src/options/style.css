@@ -59,3 +59,27 @@ section {
   background: white;
   border-left: 1px solid darkgray;
 }
+
+.in-out {
+  &-appear,
+  &-enter,
+  &-leave-active {
+    > .modal-content {
+      transform: translateY(-120%);
+    }
+    > .vl-modal-backdrop {
+      opacity: 0;
+    }
+  }
+  &-appear-active,
+  &-enter-active,
+  &-leave-active {
+    &,
+    > .modal-content {
+      transition: transform .5s;
+    }
+    > .vl-modal-backdrop {
+      transition: opacity .5s;
+    }
+  }
+}

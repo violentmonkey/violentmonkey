@@ -421,3 +421,9 @@ filterAlphabeticalOrder:
 labelFilterSort:
   description: Label for sort filter.
   message: Ordenar por $1
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: 'Última atualização: $1'
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
+  message: Reautorizar automaticamente quando expirar

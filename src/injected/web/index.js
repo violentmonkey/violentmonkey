@@ -16,14 +16,16 @@ export default function initialize(webId, contentId, props) {
   bridge.post = bindEvents(webId, contentId, onHandle);
   document.addEventListener('DOMContentLoaded', () => {
     state = 1;
-    bridge.load();
+    // Load scripts after being handled by listeners in web page
+    Promise.resolve().then(bridge.load);
   }, false);
-  bridge.checkLoad();
+  bridge.post({ cmd: 'Ready' });
 }
 
 const store = {
   commands: {},
   values: {},
+  callbacks: {},
 };
 
 const handlers = {
@@ -31,6 +33,10 @@ const handlers = {
   Command(data) {
     const func = store.commands[data];
     if (func) func();
+  },
+  Callback({ callbackId, payload }) {
+    const func = store.callbacks[callbackId];
+    if (func) func(payload);
   },
   GotRequestId: onRequestStart,
   HttpRequested: onRequestCallback,
@@ -47,6 +53,15 @@ const handlers = {
     if (bridge.onScriptChecked) bridge.onScriptChecked(data);
   },
 };
+
+function registerCallback(callback) {
+  const callbackId = getUniqId('VMcb');
+  store.callbacks[callbackId] = payload => {
+    callback(payload);
+    delete store.callbacks[callbackId];
+  };
+  return callbackId;
+}
 
 function onHandle(obj) {
   const handle = handlers[obj.cmd];
@@ -68,12 +83,6 @@ function onLoadScripts(data) {
     run(end);
     setTimeout(run, 0, idle);
   };
-  bridge.checkLoad = () => {
-    if (!state && includes(['interactive', 'complete'], document.readyState)) {
-      state = 1;
-    }
-    if (state) bridge.load();
-  };
   const listMap = {
     'document-start': start,
     'document-idle': idle,
@@ -81,18 +90,20 @@ function onLoadScripts(data) {
   };
   if (data.scripts) {
     forEach(data.scripts, script => {
-      if (script && script.config.enabled) {
-        // XXX: use camelCase since v2.6.3
-        const runAt = script.custom.runAt || script.custom['run-at']
-          || script.meta.runAt || script.meta['run-at'];
-        const list = listMap[runAt] || end;
-        list.push(script);
-        store.values[script.props.id] = data.values[script.props.id];
-      }
+      // XXX: use camelCase since v2.6.3
+      const runAt = script.custom.runAt || script.custom['run-at']
+        || script.meta.runAt || script.meta['run-at'];
+      const list = listMap[runAt] || end;
+      list.push(script);
+      store.values[script.props.id] = data.values[script.props.id];
     });
     run(start);
   }
-  bridge.checkLoad();
+  if (!state && includes(['interactive', 'complete'], document.readyState)) {
+    state = 1;
+  }
+  if (state) bridge.load();
+
   function buildCode(script) {
     const requireKeys = script.meta.require || [];
     const pathMap = script.custom.pathMap || {};
@@ -117,13 +128,13 @@ function onLoadScripts(data) {
     const name = script.custom.name || script.meta.name || script.props.id;
     const args = map(argNames, key => wrapper[key]);
     const thisObj = wrapper.window || wrapper;
-    const id = `VMin${getUniqId()}`;
-    const callbackId = `VMcb${getUniqId()}`;
-    attachFunction(callbackId, () => {
+    const id = getUniqId('VMin');
+    const fnId = getUniqId('VMfn');
+    attachFunction(fnId, () => {
       const func = window[id];
       if (func) runCode(name, func, args, thisObj);
     });
-    bridge.post({ cmd: 'Inject', data: [id, argNames, codeConcat, callbackId] });
+    bridge.post({ cmd: 'Inject', data: [id, argNames, codeConcat, fnId] });
   }
   function run(list) {
     while (list.length) buildCode(list.shift());
@@ -262,8 +273,21 @@ function wrapGM(script, code, cache) {
       },
     },
     GM_addStyle: {
-      value(data) {
-        bridge.post({ cmd: 'AddStyle', data });
+      value(css) {
+        const callbacks = [];
+        let el = false;
+        const callbackId = registerCallback(styleId => {
+          el = document.getElementById(styleId);
+          callbacks.splice().forEach(callback => callback(el));
+        });
+        bridge.post({ cmd: 'AddStyle', data: { css, callbackId } });
+        // Mock a Promise without the need for polyfill
+        return {
+          then(callback) {
+            if (el !== false) callback(el);
+            else callbacks.push(callback);
+          },
+        };
       },
     },
     GM_log: {

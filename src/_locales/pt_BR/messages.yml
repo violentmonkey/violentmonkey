@@ -3,425 +3,427 @@ extName:
   message: Violentmonkey
 extDescription:
   description: Description for this extension.
-  message: Tarjoaa selaimiin tuen käyttäjäskripteille.
+  message: Fornece suporte a scripts de usuários para navegadores.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Skripti päivitetty.
+  message: Script atualizado.
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Virhe noudettaessa skriptiä!
+  message: Erro ao obter script!
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Skripti asennettu.
+  message: Script instalado.
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Ei nimeä
+  message: Sem nome
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Päivitetään...
+  message: Atualizando...
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Uusi versio löytynyt.
+  message: Nova versão encontrada.
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Tarkistetaan päivityksiä...
+  message: Procurando atualizações...
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Päivitystietojen noutaminen epäonnistui.
+  message: Falha ao obter informações de atualização.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Päivitystä ei löytynyt.
+  message: Nenhuma atualização encontrada.
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Asennetaan skriptiä
+  message: Instalando o script
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
-  message: Valinnat
+  message: Opções
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Sulje asennuksen jälkeen
+  message: Fechar após instalação
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Seuraa paikallista tiedostoa ennen ikkunan sulkemista
+  message: Monitorar o arquivo local até esta janela ser fechada
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: Vahvista asennus
+  message: Confirmar instalação
 buttonClose:
   description: Button to close window.
-  message: Sulje
+  message: Fechar
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Virhe ladattaessa skriptidataa.
+  message: Erro ao carregar os dados do script.
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: Skriptidata ladattu.
+  message: Dados do script carregados.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: Virhe ladattaessa riippuvuuksia.
+  message: Erro ao carregar dependências.
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: Ladataan riippuvuuksia... ($1/$2)
+  message: A carregar dependências... ($1/$2)
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Ladataan skriptidataa...
+  message: A carregar dados do script...
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: Asennetut skriptit
+  message: Scripts instalados
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Asetukset
+  message: Configurações
 sideMenuAbout:
   description: 'Side menu: About'
-  message: Tietoja
+  message: Sobre
 buttonNew:
   description: Button to create a new script.
-  message: Uusi
+  message: Novo
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Tarkista kaikki päivitykset
+  message: Procurar atualizações para todos
 msgLoading:
   description: Message shown in the options page before script list is loaded.
-  message: Ladataan ...
+  message: Carregando...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Asetukset
+  message: Configurações
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Tarkista skriptien päivitykset joka päivä
+  message: Procurar atualizações de scripts automaticamente todos os dias
 labelDataImport:
   description: Section title of data import.
-  message: Datan tuonti
+  message: Importar dados
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Tuo zip-tiedostosta
+  message: Importar a partir de ZIP
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Imuroi tietokanta
+  message: Limpar base de dados
 labelDataExport:
   description: Section title of data export.
-  message: Datan vienti
+  message: Exportar dados
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Vie skriptidata
+  message: Exportar dados do script
 buttonAllNone:
   description: Button to select all scripts or none.
-  message: Kaikki/Ei mitään
+  message: Todos/nenhum
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Vie zip-tiedostoon
+  message: Exportar para ZIP
 labelAbout:
   description: Label shown on top of the about page.
-  message: Tietoja Violentmonkeystä
+  message: Sobre o Violentmonkey
 labelRelated:
   description: Label of related links.
-  message: 'Linkkejä aiheesta: '
+  message: 'Links relacionados: '
 labelDonate:
   description: Label of link to donate page.
-  message: Lahjoita
+  message: Fazer uma doação
 labelFeedback:
   description: Label of link to feedback page.
-  message: Palaute
+  message: Fornecer comentários
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 'Tekijä: '
+  message: 'Autor: '
 anchorAuthor:
   description: Author shown on about tab.
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 labelTranslator:
   description: Label of translator.
-  message: 'Kääntäjä: '
+  message: 'Tradução: '
 anchorTranslator:
   description: Translator shown on about tab.
-  message: raina
+  message: '<a href=https://github.com/KingThunder>KingThunder</a>'
 labelCurrentLang:
   description: Label of current language.
-  message: 'Nykyinen kieli: '
+  message: 'Idioma atual: '
 labelScriptEditor:
   description: Shown in the title of the script editing page.
-  message: Skriptieditori
+  message: Editor de scripts
 labelName:
   description: Label of script name.
-  message: 'Nimi:'
+  message: 'Nome:'
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Ajoaika:'
+  message: 'Executar em:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Oletus)
+  message: (Padrão)
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Kotisivun osoite:'
+  message: 'URL do website:'
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'Päivitysosoite:'
+  message: 'URL de atualização:'
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'Latausosoite:'
+  message: 'URL de download:'
 labelInclude:
   description: Label of @include rules.
-  message: '@include-säännöt'
+  message: Regras @include
 labelMatch:
   description: Label of @match rules.
-  message: '@match-säännöt'
+  message: Regras @match
 labelExclude:
   description: Label of @exclude rules.
-  message: '@exclude-säännöt'
+  message: Regras @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match-säännöt'
+  message: Regras @exclude-match
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Salli päivitykset
+  message: Permitir atualização
 buttonSave:
   description: Button to save modifications of a script.
-  message: Tallenna
+  message: Salvar
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: Tallenna & sulje
+  message: Salvar e fechar
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'Hups, sinulla ei ole vielä yhtään skriptiä.'
+  message: 'Ops, você não tem nenhum script ainda.'
 buttonDisable:
   description: Button to disable a script.
-  message: Poista käytöstä
+  message: Desativar
 buttonEnable:
   description: Button to enable a script.
-  message: Ota käyttöön
+  message: Ativar
 buttonEdit:
   description: Button to edit a script.
-  message: Muokkaa
+  message: Editar
 buttonRemove:
   description: Button to remove a script.
-  message: Poista
+  message: Remover
 buttonUpdate:
   description: Check a script for updates.
-  message: Tarkista päivitykset
+  message: Procurar atualizações
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: $1 skriptiä tuotu.
+  message: $1 item(ns) importado(s).
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: Käytä latausosoitetta (@downloadURL)
+  message: Utilizar @downloadURL
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    Muokkauksia ei ole tallennettu!
-    Klikkaa OK hylätäksesi ne tai Peruuta pysyäksesi tässä.
+    As alterações não foram guardadas!
+    Clique em OK para rejeitá-las ou em Cancelar para ficar.
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Imuroidaan dataa...
+  message: Otimizando os dados...
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Data imuroitu
+  message: Dados otimizados
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Hylkää redundanssi ja yritä ladata puuttuvat resurssit välimuistiin.
+  message: Eliminar as redundâncias e tentar recarregar os recursos em falta no cache.
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Etsi skriptejä tälle sivustolle
+  message: Procurar scripts para este site
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Skriptit käytössä
+  message: Scripts ativados
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Skriptit poissa käytöstä
+  message: Scripts desativados
 menuCommands:
   description: Menu item to list script commands.
-  message: Skriptikomennot
+  message: Comandos do script
 labelSearch:
   description: Label for search input in search box.
-  message: 'Etsi: '
+  message: 'Localizar: '
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Korvaa: '
+  message: 'Substituir por: '
 buttonReplace:
   description: Button to replace the current match.
-  message: Korvaa
+  message: Substituir
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: Kaikki
+  message: Tudo
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Lataa välilehti uudelleen kytkettäessä skripti päälle/pois päältä valikosta
+  message: >-
+    Recarregar o separador atual após ativar/desativar um script a partir do
+    menu
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'Syötä osoite:'
+  message: 'Coloque o URL:'
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Asenna osoitteesta
+  message: Instalar a partir de URL
 labelSync:
   description: Label for sync options.
-  message: Synkronointi
+  message: Sincronizar
 lastSync:
   description: Label for last sync timestamp.
-  message: Synkronoitu viimeksi $1
+  message: 'Última sincronização: $1'
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Alustetaan...
+  message: Inicializando...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: Alustusvirhe!
+  message: Erro de inicialização!
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: Synkronointi alkaa pian...
+  message: A sincronização será iniciada em breve...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Synkronointi käynnissä...
+  message: Sincronizando...
 msgSyncError:
   description: Message shown when sync failed.
-  message: Synkronointivirhe!
+  message: Erro de sincronização!
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Konflikti skriptien nimiavaruudessa! Ole hyvä ja muokkaa @name:a and
-    @namespace:a.
+    Conflito de namespace entre scripts! Por favor, altere o @name e o
+    @namespace.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Epäkelpo skripti!
+  message: Script inválido!
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: Näytä ajettavien skriptien lukumäärä kuvakkeessa
+  message: Mostrar número de scripts em execução no ícone
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Rivi nro.: '
+  message: 'Linha n.º: '
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Musta lista
+  message: Lista negra
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: Listan osoitteissa ei ajeta skriptejä.
+  message: Os URLs correspondidos por esta lista não serão injetados com scripts.
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: Tallenna
+  message: Salvar
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: Musta lista päivitetty.
+  message: Lista negra atualizada.
 labelGeneral:
   description: Label for general settings.
-  message: Yleiset
+  message: Gerais
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Synkronoi skriptien tila
+  message: Sincronizar estados dos scripts
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: Ei mihinkään
+  message: Nenhum
 labelSyncService:
   description: Label for sync service select.
-  message: Synkronoi
+  message: Sincronizar em
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Anna lupa
+  message: Autorizar
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Kumoa
+  message: Revogar
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Vahvistetaan
+  message: Autorizando
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: Oma tyyli päivitetty.
+  message: Estilo personalizado atualizado.
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Oma tyyli
+  message: Estilo personalizado
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Oma tyyli asetussivua ja skriptien asennussivua varten. Jos et ole varma,
-    mitä olet tekemässä, älä muokkaa tätä.
+    CSS personalizado para as páginas de opções e de instalação de scripts. Se
+    não tiver a certeza da utilidade disto, por favor, não altere.
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: Tallenna
+  message: Salvar
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: Avaa kojelauta
+  message: Abrir painel
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Täsmäävät skriptit
+  message: Scripts correspondidos
 buttonOK:
   description: OK button on dialog.
   message: OK
 buttonCancel:
   description: Cancel button on dialog.
-  message: Peruuta
+  message: Cancelar
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Tuo asetukset
+  message: Importar definições
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Lisää tietoa mustalistauksen malleista.
+  message: Saiba mais sobre os padrões para a lista negra.
 editNavCode:
   description: Label of code tab in script editor.
-  message: Koodi
+  message: Código
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: Asetukset
+  message: Definições
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Skriptin asetukset
+  message: Definições do script
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: Oma metadata
+  message: Metadados personalizados
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Pidä alkuperäinen
+  message: Manter originais
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: Päivitys
+  message: Atualização
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Skripti [$1] on päivitetty!'
+  message: '[$1] foi atualizado!'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Näytä ilmoitus päivityksistä
+  message: Notificar sobre atualizações de scripts
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Asenna lähteestä $1
+  message: Instalar a partir do $1
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Etsi skriptejä...
+  message: Localizar scripts...
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: Skriptejä ei löytynyt.
+  message: Nenhum script encontrado.
 buttonHome:
   description: Button to open homepage.
-  message: Kotisivu
+  message: Website
 buttonSupport:
   description: Button to open support page.
-  message: Tukisivu
+  message: Página de suporte
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Peruuta
+  message: Anular
 labelRemoved:
   description: Label shown when a script is removed.
-  message: '[Poistettu]'
+  message: '[Removido]'
 buttonFilter:
   description: Button to show filters menu.
-  message: Suodattimet
+  message: Filtros
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Näytä käytössä olevat skriptit ensin
+  message: Mostrar scripts ativos primeiro
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ajojärjestys
+  message: ordem de execução
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: aakkosjärjestys
+  message: ordem alfabética
 labelFilterSort:
   description: Label for sort filter.
-  message: 'Järjestä $1:n mukaan'
+  message: Ordenar por $1
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: 'Última atualização: $1'
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''

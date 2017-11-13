@@ -2,7 +2,7 @@
 import { noop } from 'src/common';
 import { objectGet } from 'src/common/object';
 import { dumpQuery } from '../utils';
-import { BaseService, isScriptFile, register, getURI } from './base';
+import { getURI, getItemFilename, BaseService, isScriptFile, register } from './base';
 
 const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ=='));
 const config = Object.assign({
@@ -35,7 +35,7 @@ const OneDrive = BaseService.extend({
       throw res;
     })
     .catch(res => {
-      if (res.status === 400 && objectGet(res, ['data', 'error']) === 'invalid_grant') {
+      if (res.status === 400 && objectGet(res, 'data.error') === 'invalid_grant') {
         return Promise.reject({
           type: 'unauthorized',
         });
@@ -46,19 +46,15 @@ const OneDrive = BaseService.extend({
       });
     });
   },
-  getMeta() {
-    const getMeta = () => BaseService.prototype.getMeta.call(this);
-    return getMeta()
-    .catch(res => {
-      if (res.status === 404) {
-        const header = res.xhr.getResponseHeader('WWW-Authenticate') || '';
-        if (/^Bearer realm="OneDriveAPI"/.test(header)) {
-          return this.refreshToken().then(getMeta);
-        }
-        return {};
+  handleMetaError(res) {
+    if (res.status === 404) {
+      const header = res.xhr.getResponseHeader('WWW-Authenticate') || '';
+      if (/^Bearer realm="OneDriveAPI"/.test(header)) {
+        return this.refreshToken().then(() => this.getMeta());
       }
-      throw res;
-    });
+      return {};
+    }
+    throw res;
   },
   list() {
     return this.loadData({
@@ -67,9 +63,10 @@ const OneDrive = BaseService.extend({
     })
     .then(data => data.value.filter(item => item.file && isScriptFile(item.name)).map(normalize));
   },
-  get(path) {
+  get(item) {
+    const name = getItemFilename(item);
     return this.loadData({
-      url: `/drive/special/approot:/${encodeURIComponent(path)}`,
+      url: `/drive/special/approot:/${encodeURIComponent(name)}`,
       responseType: 'json',
     })
     .then(data => this.loadData({
@@ -77,10 +74,11 @@ const OneDrive = BaseService.extend({
       delay: false,
     }));
   },
-  put(path, data) {
+  put(item, data) {
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'PUT',
-      url: `/drive/special/approot:/${encodeURIComponent(path)}:/content`,
+      url: `/drive/special/approot:/${encodeURIComponent(name)}:/content`,
       headers: {
         'Content-Type': 'application/octet-stream',
       },
@@ -89,11 +87,12 @@ const OneDrive = BaseService.extend({
     })
     .then(normalize);
   },
-  remove(path) {
+  remove(item) {
     // return 204
+    const name = getItemFilename(item);
     return this.loadData({
       method: 'DELETE',
-      url: `/drive/special/approot:/${encodeURIComponent(path)}`,
+      url: `/drive/special/approot:/${encodeURIComponent(name)}`,
     })
     .catch(noop);
   },

@@ -21,6 +21,12 @@
         <span v-text="i18n('labelSyncScriptStatus')"></span>
       </label>
     </div>
+    <div class="mt-1">
+      <label>
+        <setting-check name="syncReauthorize" />
+        <span v-text="i18n('labelSyncReauthorize')"></span>
+      </label>
+    </div>
   </feature>
 </template>
 

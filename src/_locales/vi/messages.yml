@@ -417,3 +417,9 @@ filterAlphabeticalOrder:
 labelFilterSort:
   description: Label for sort filter.
   message: Sắp xếp theo $1
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: ''
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
+  message: ''

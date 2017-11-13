@@ -140,7 +140,7 @@ anchorTranslator:
   description: Translator shown on about tab.
   message: >-
     <a
-    href="https://www.transifex.com/user/profile/100%E3%81%AE%E4%BA%BA/">100の人</a>
+    href="https://www.transifex.com/user/profile/100%E3%81%AE%E4%BA%BA/">100の人</a>、Takute
 labelCurrentLang:
   description: Label of current language.
   message: '現在の言語: '
@@ -392,28 +392,34 @@ labelNoSearchScripts:
   message: スクリプトは見つかりませんでした。
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: ホームページ
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: サポート　ページ
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: 戻す
 labelRemoved:
   description: Label shown when a script is removed.
-  message: ''
+  message: 【削除したもの】
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: 条件指定
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: 有効にされたスクリプトを先に
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: 実行順序
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: アルファベット順序
 labelFilterSort:
   description: Label for sort filter.
+  message: $1 によって
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: ''
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
   message: ''
