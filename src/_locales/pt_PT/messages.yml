@@ -426,4 +426,4 @@ labelLastUpdatedAt:
   message: 'Última atualização: $1'
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: ''
+  message: Reautorizar automaticamente quando expirar
