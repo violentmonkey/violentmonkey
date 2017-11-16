@@ -419,7 +419,7 @@ labelFilterSort:
   message: Sắp xếp theo $1
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: Cập nhật lần cuối lúc $1
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: ''
+  message: Tự động xác thực lại khi hết hạn
