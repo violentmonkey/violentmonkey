@@ -9,7 +9,42 @@ export function postData(destId, data) {
   document.dispatchEvent(e);
 }
 
+let doInject;
 export function inject(code) {
+  if (!doInject) {
+    const id = getUniqId('VM-');
+    const detect = domId => {
+      const span = document.createElement('span');
+      span.id = domId;
+      document.documentElement.appendChild(span);
+    };
+    injectViaText(`(${detect.toString()})(${JSON.stringify(id)})`);
+    const span = document.querySelector(`#${id}`);
+    if (span) {
+      span.parentNode.removeChild(span);
+      doInject = injectViaText;
+    }
+    // For Firefox in CSP limited pages
+    doInject = injectViaBlob;
+  }
+  doInject(code);
+}
+
+function injectViaText(code) {
+  const script = document.createElement('script');
+  const doc = document.body || document.documentElement;
+  script.textContent = code;
+  doc.appendChild(script);
+  try {
+    doc.removeChild(script);
+  } catch (e) {
+    // ignore if body is changed and script is detached
+  }
+}
+
+// Firefox does not support script injection by `textCode` in CSP limited pages
+// have to inject via blob URL, leading to delayed first injection
+function injectViaBlob(code) {
   const script = document.createElement('script');
   const doc = document.body || document.documentElement;
   // https://en.wikipedia.org/wiki/Byte_order_mark
