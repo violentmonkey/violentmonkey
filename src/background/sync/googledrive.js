@@ -9,7 +9,9 @@ import { getURI, getItemFilename, BaseService, register, isScriptFile } from './
 const config = {
   client_id: '590447512361-05hjbhnf8ua3iha55e5pgqg15om0cpef.apps.googleusercontent.com',
   redirect_uri: 'https://violentmonkey.github.io/auth_googledrive.html',
+  scope: 'https://www.googleapis.com/auth/drive.appdata',
 };
+const UNAUTHORIZED = { status: 'UNAUTHORIZED' };
 
 const GoogleDrive = BaseService.extend({
   name: 'googledrive',
@@ -24,8 +26,11 @@ const GoogleDrive = BaseService.extend({
       url: `https://www.googleapis.com/oauth2/v3/tokeninfo?${dumpQuery(params)}`,
       responseType: 'json',
     })
+    .then(info => {
+      if (info.scope !== config.scope) return Promise.reject(UNAUTHORIZED);
+    })
     .catch(res => {
-      if (res.status === 400 && objectGet(res, 'data.error_description') === 'Invalid Value') {
+      if (res === UNAUTHORIZED || res.status === 400 && objectGet(res, 'data.error_description') === 'Invalid Value') {
         return Promise.reject({ type: 'unauthorized' });
       }
       return Promise.reject({
@@ -79,7 +84,7 @@ const GoogleDrive = BaseService.extend({
       response_type: 'token',
       client_id: config.client_id,
       redirect_uri: config.redirect_uri,
-      scope: 'https://www.googleapis.com/auth/drive.appdata',
+      scope: config.scope,
     };
     const url = `https://accounts.google.com/o/oauth2/v2/auth?${dumpQuery(params)}`;
     browser.tabs.create({ url });
