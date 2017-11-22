@@ -23,9 +23,10 @@ export function inject(code) {
     if (span) {
       span.parentNode.removeChild(span);
       doInject = injectViaText;
+    } else {
+      // For Firefox in CSP limited pages
+      doInject = injectViaBlob;
     }
-    // For Firefox in CSP limited pages
-    doInject = injectViaBlob;
   }
   doInject(code);
 }
