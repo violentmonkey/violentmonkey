@@ -25,8 +25,15 @@ function getBadge() {
 
 function setBadge() {
   if (badge.ready && badge.willSet) {
-    // XXX: only scripts run in top level window are counted
-    if (IS_TOP) sendMessage({ cmd: 'SetBadge', data: badge.number });
+    // delay setBadge in frames so that they can be added to the initial count
+    new Promise(resolve => setTimeout(resolve, IS_TOP ? 0 : 300))
+    .then(() => sendMessage({
+      cmd: 'SetBadge',
+      data: {
+        number: badge.number,
+        reset: IS_TOP,
+      },
+    }));
   }
 }
 
@@ -54,7 +61,13 @@ export default function initialize(contentId, webId) {
     if (handle) handle(req.data, src);
   });
 
-  return sendMessage({ cmd: 'GetInjected', data: window.location.href })
+  return sendMessage({
+    cmd: 'GetInjected',
+    data: {
+      url: window.location.href,
+      reset: IS_TOP,
+    },
+  })
   .then(data => {
     if (data.scripts) {
       data.scripts = data.scripts.filter(script => {
