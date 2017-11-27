@@ -1,5 +1,10 @@
-import { getUniqId, bindEvents, Promise, attachFunction, console } from '../utils';
-import { includes, forEach, map, utf8decode } from './helpers';
+import {
+  getUniqId, bindEvents, attachFunction,
+} from '../utils';
+import {
+  includes, forEach, map, utf8decode, jsonDump, jsonLoad,
+  Promise, console,
+} from '../utils/helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
 import {
@@ -158,13 +163,13 @@ function wrapGM(script, code, cache) {
   if (includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
   const resources = script.meta.resources || {};
   const dataEncoders = {
-    o: val => JSON.stringify(val),
+    o: val => jsonDump(val),
     '': val => val.toString(),
   };
   const dataDecoders = {
     n: val => Number(val),
     b: val => val === 'true',
-    o: val => JSON.parse(val),
+    o: val => jsonLoad(val),
     '': val => val,
   };
   const pathMap = script.custom.pathMap || {};

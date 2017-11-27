@@ -1,11 +1,10 @@
-export { sendMessage, request, throttle } from 'src/common';
+import { CustomEvent, jsonDump, jsonLoad } from './helpers';
 
-// cache native properties to avoid being overridden, see violentmonkey/violentmonkey#151
-export const { console, CustomEvent, Promise } = window;
+export { sendMessage, request, throttle } from 'src/common';
 
 export function postData(destId, data) {
   // Firefox issue: data must be stringified to avoid cross-origin problem
-  const e = new CustomEvent(destId, { detail: JSON.stringify(data) });
+  const e = new CustomEvent(destId, { detail: jsonDump(data) });
   document.dispatchEvent(e);
 }
 
@@ -18,7 +17,7 @@ export function inject(code) {
       span.id = domId;
       document.documentElement.appendChild(span);
     };
-    injectViaText(`(${detect.toString()})(${JSON.stringify(id)})`);
+    injectViaText(`(${detect.toString()})(${jsonDump(id)})`);
     const span = document.querySelector(`#${id}`);
     if (span) {
       span.parentNode.removeChild(span);
@@ -67,7 +66,7 @@ export function getUniqId() {
 
 export function bindEvents(srcId, destId, handle) {
   document.addEventListener(srcId, e => {
-    const data = JSON.parse(e.detail);
+    const data = jsonLoad(e.detail);
     handle(data);
   }, false);
   return data => { postData(destId, data); };

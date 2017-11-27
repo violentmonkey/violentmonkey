@@ -1,6 +1,11 @@
-import { Promise } from '../utils';
+// cache native properties to avoid being overridden, see violentmonkey/violentmonkey#151
+// eslint-disable-next-line no-restricted-properties
+export const {
+  console, CustomEvent, Promise, isFinite,
+} = window;
 
 const arrayProto = Array.prototype;
+const objectProto = Object.prototype;
 
 const bindThis = func => (thisObj, ...args) => func.apply(thisObj, args);
 
@@ -14,18 +19,25 @@ export const includes = arrayProto.includes
   ? bindThis(arrayProto.includes)
   : (arr, item) => indexOf(arr, item) >= 0;
 
-export const toString = bindThis(Object.prototype.toString);
+export const toString = bindThis(objectProto.toString);
+const numberToString = bindThis(Number.prototype.toString);
+const stringSlice = bindThis(String.prototype.slice);
+const stringCharCodeAt = bindThis(String.prototype.charCodeAt);
+const { fromCharCode } = String;
 
+export const { keys } = Object;
 export const assign = Object.assign || ((obj, ...args) => {
   forEach(args, arg => {
     if (arg) {
-      forEach(Object.keys(arg), key => {
+      forEach(keys(arg), key => {
         obj[key] = arg[key];
       });
     }
   });
   return obj;
 });
+
+export const isArray = obj => toString(obj) === '[object Array]';
 
 export function encodeBody(body) {
   const cls = getType(body);
@@ -57,7 +69,7 @@ export function encodeBody(body) {
         let value = '';
         const array = new Uint8Array(reader.result);
         for (let i = 0; i < array.length; i += bufsize) {
-          value += String.fromCharCode.apply(null, array.subarray(i, i + bufsize));
+          value += fromCharCode(...array.subarray(i, i + bufsize));
         }
         resolve({
           cls,
@@ -72,7 +84,7 @@ export function encodeBody(body) {
   } else if (body) {
     result = {
       cls,
-      value: JSON.stringify(body),
+      value: jsonDump(body),
     };
   }
   return Promise.resolve(result);
@@ -98,21 +110,65 @@ export function utf8decode(utftext) {
   let c2 = 0;
   let c3 = 0;
   while (i < utftext.length) {
-    c1 = utftext.charCodeAt(i);
+    c1 = stringCharCodeAt(utftext, i);
     if (c1 < 128) {
-      string += String.fromCharCode(c1);
+      string += fromCharCode(c1);
       i += 1;
     } else if (c1 > 191 && c1 < 224) {
-      c2 = utftext.charCodeAt(i + 1);
-      string += String.fromCharCode(((c1 & 31) << 6) | (c2 & 63));
+      c2 = stringCharCodeAt(utftext, i + 1);
+      string += fromCharCode(((c1 & 31) << 6) | (c2 & 63));
       i += 2;
     } else {
-      c2 = utftext.charCodeAt(i + 1);
-      c3 = utftext.charCodeAt(i + 2);
-      string += String.fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+      c2 = stringCharCodeAt(utftext, i + 1);
+      c3 = stringCharCodeAt(utftext, i + 2);
+      string += fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
       i += 3;
     }
   }
   return string;
   /* eslint-enable no-bitwise */
+}
+
+// Reference: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON#Polyfill
+const escMap = {
+  '"': '\\"',
+  '\\': '\\\\',
+  '\b': '\\b',
+  '\f': '\\f',
+  '\n': '\\n',
+  '\r': '\\r',
+  '\t': '\\t',
+};
+const escRE = /[\\"\u0000-\u001F\u2028\u2029]/g;
+const escFunc = m => escMap[m] || `\\u${stringSlice(numberToString(stringCharCodeAt(m, 0) + 0x10000, 16), 1)}`;
+export const jsonLoad = JSON.parse;
+export function jsonDump(value) {
+  if (value == null) return 'null';
+  const type = typeof value;
+  if (type === 'number') {
+    return isFinite(value) ? `${value}` : 'null';
+  }
+  if (type === 'boolean') return `${value}`;
+  if (type === 'object') {
+    if (isArray(value)) {
+      let res = '[';
+      forEach(value, (item, i) => {
+        if (i) res += ',';
+        res += jsonDump(item);
+      });
+      res += ']';
+      return res;
+    }
+    if (toString(value) === '[object Object]') {
+      let res = '{';
+      forEach(keys(value), (key, i) => {
+        if (i) res += ',';
+        res += `${jsonDump(key)}:${jsonDump(value[key])}`;
+      });
+      res += '}';
+      return res;
+    }
+  }
+  const escaped = `${value}`.replace(escRE, escFunc);
+  return `"${escaped}"`;
 }

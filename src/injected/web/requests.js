@@ -1,4 +1,4 @@
-import { includes, encodeBody } from './helpers';
+import { includes, encodeBody, jsonLoad } from '../utils/helpers';
 import bridge from './bridge';
 
 const map = {};
@@ -55,7 +55,7 @@ function parseData(req, details) {
     }
   } else if (details.responseType === 'json') {
     // json
-    return JSON.parse(req.data.response);
+    return jsonLoad(req.data.response);
   } else {
     // text
     return req.data.response;
