@@ -247,6 +247,9 @@ function setBadge({ number, reset }, src) {
     tabId: srcTab.id,
   });
 }
+browser.tabs.onRemoved.addListener(id => {
+  delete badges[id];
+});
 
 function setIcon(isApplied) {
   browser.browserAction.setIcon({
