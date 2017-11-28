@@ -83,12 +83,12 @@ const commands = {
       isApplied: getOption('isApplied'),
       version: VM_VER,
     };
-    setTimeout(() => {
-      // delayed to wait for the tab URL updated
-      if (srcTab.id && url === srcTab.url) {
-        browser.tabs.sendMessage(srcTab.id, { cmd: 'GetBadge' });
-      }
-    });
+    // setTimeout(() => {
+    //   // delayed to wait for the tab URL updated
+    //   if (srcTab.id && url === srcTab.url) {
+    //     browser.tabs.sendMessage(srcTab.id, { cmd: 'GetBadge' });
+    //   }
+    // });
     if (!data.isApplied) return data;
     return getScriptsByURL(url)
     .then(res => {

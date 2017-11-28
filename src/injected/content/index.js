@@ -14,27 +14,18 @@ const menus = [];
 
 const badge = {
   number: 0,
-  ready: false,
-  willSet: false,
 };
 
-function getBadge() {
-  badge.willSet = true;
-  setBadge();
-}
-
 function setBadge() {
-  if (badge.ready && badge.willSet) {
-    // delay setBadge in frames so that they can be added to the initial count
-    new Promise(resolve => setTimeout(resolve, IS_TOP ? 0 : 300))
-    .then(() => sendMessage({
-      cmd: 'SetBadge',
-      data: {
-        number: badge.number,
-        reset: IS_TOP,
-      },
-    }));
-  }
+  // delay setBadge in frames so that they can be added to the initial count
+  new Promise(resolve => setTimeout(resolve, IS_TOP ? 0 : 300))
+  .then(() => sendMessage({
+    cmd: 'SetBadge',
+    data: {
+      number: badge.number,
+      reset: IS_TOP,
+    },
+  }));
 }
 
 const bgHandlers = {
@@ -42,7 +33,6 @@ const bgHandlers = {
     bridge.post({ cmd: 'Command', data });
   },
   GetPopup: getPopup,
-  GetBadge: getBadge,
   HttpRequested: httpRequested,
   TabClosed: tabClosed,
   UpdatedValues(data) {
@@ -79,7 +69,6 @@ export default function initialize(contentId, webId) {
         return false;
       });
     }
-    badge.ready = true;
     getPopup();
     setBadge();
     const needInject = data.scripts && data.scripts.length;
