@@ -1,3 +1,5 @@
+import { noop } from 'src/common';
+
 const openers = {};
 
 browser.tabs.onRemoved.addListener(id => {
@@ -6,7 +8,8 @@ browser.tabs.onRemoved.addListener(id => {
     browser.tabs.sendMessage(openerId, {
       cmd: 'TabClosed',
       data: id,
-    });
+    })
+    .catch(noop);
     delete openers[id];
   }
 });

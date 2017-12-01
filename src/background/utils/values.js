@@ -1,3 +1,4 @@
+import { noop } from 'src/common';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 
 const openers = {}; // scriptId: { openerId: 1, ... }
@@ -94,7 +95,8 @@ function broadcastUpdates(updates) {
       browser.tabs.sendMessage(+openerId, {
         cmd: 'UpdatedValues',
         data: updates,
-      });
+      })
+      .catch(noop);
     });
   }
 }

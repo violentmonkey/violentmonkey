@@ -1,4 +1,4 @@
-import { i18n, defaultImage } from 'src/common';
+import { i18n, defaultImage, noop } from 'src/common';
 
 const openers = {};
 
@@ -8,7 +8,8 @@ browser.notifications.onClicked.addListener(id => {
     browser.tabs.sendMessage(openerId, {
       cmd: 'NotificationClick',
       data: id,
-    });
+    })
+    .catch(noop);
   }
 });
 
@@ -18,7 +19,8 @@ browser.notifications.onClosed.addListener(id => {
     browser.tabs.sendMessage(openerId, {
       cmd: 'NotificationClose',
       data: id,
-    });
+    })
+    .catch(noop);
     delete openers[id];
   }
 });

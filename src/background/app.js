@@ -1,4 +1,5 @@
 import 'src/common/browser';
+import { noop } from 'src/common';
 import { objectGet } from 'src/common/object';
 import * as sync from './sync';
 import {
@@ -83,12 +84,6 @@ const commands = {
       isApplied: getOption('isApplied'),
       version: VM_VER,
     };
-    // setTimeout(() => {
-    //   // delayed to wait for the tab URL updated
-    //   if (srcTab.id && url === srcTab.url) {
-    //     browser.tabs.sendMessage(srcTab.id, { cmd: 'GetBadge' });
-    //   }
-    // });
     if (!data.isApplied) return data;
     return getScriptsByURL(url)
     .then(res => {
@@ -162,7 +157,8 @@ const commands = {
       browser.tabs.sendMessage(src.tab.id, {
         cmd: 'HttpRequested',
         data: res,
-      });
+      })
+      .catch(noop);
     });
   },
   AbortRequest: abortRequest,
