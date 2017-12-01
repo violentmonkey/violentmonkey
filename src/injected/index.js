@@ -23,7 +23,7 @@ import initialize from './content';
     const props = {};
     [
       Object.getOwnPropertyNames(window),
-      typeof global !== 'undefined' && Object.getOwnPropertyNames(global),
+      Object.getOwnPropertyNames(global),
     ].forEach(keys => {
       keys.forEach(key => { props[key] = 1; });
     });

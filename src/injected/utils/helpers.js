@@ -1,8 +1,9 @@
 // cache native properties to avoid being overridden, see violentmonkey/violentmonkey#151
+// Firefox sucks: `isFinite` is not defined on `window`, see violentmonkey/violentmonkey#300
 // eslint-disable-next-line no-restricted-properties
 export const {
   console, CustomEvent, Promise, isFinite,
-} = window;
+} = global;
 
 const arrayProto = Array.prototype;
 const objectProto = Object.prototype;
