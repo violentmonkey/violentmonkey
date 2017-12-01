@@ -256,3 +256,18 @@ function setIcon(isApplied) {
   });
 }
 setIcon(getOption('isApplied'));
+
+let upgradeId;
+createNotification({
+  text: 'You are using an unlisted version of Violentmonkey! Please upgrade it from AMO.',
+}, {})
+.then(id => {
+  upgradeId = id;
+});
+browser.notifications.onClicked.addListener(id => {
+  if (id === upgradeId) {
+    browser.tabs.create({
+      url: 'https://addons.mozilla.org/firefox/addon/violentmonkey/',
+    });
+  }
+});

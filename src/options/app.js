@@ -6,7 +6,7 @@ import options from 'src/common/options';
 import getPathInfo from 'src/common/pathinfo';
 import handlers from 'src/common/handlers';
 import 'src/common/ui/style';
-import { store } from './utils';
+import { store, showMessage } from './utils';
 import App from './views/app';
 
 Vue.prototype.i18n = i18n;
@@ -99,3 +99,27 @@ function initMain() {
     },
   });
 }
+
+setTimeout(() => {
+  new Promise((resolve, reject) => {
+    showMessage({
+      text: 'You are using an unlisted version of Violentmonkey! Please upgrade it from AMO.',
+      input: false,
+      buttons: [
+        {
+          text: 'Go now',
+          onClick: resolve,
+        },
+        {
+          text: 'Later',
+          onClick: reject,
+        },
+      ],
+    });
+  })
+  .then(() => {
+    browser.tabs.create({
+      url: 'https://addons.mozilla.org/firefox/addon/violentmonkey/',
+    });
+  });
+}, 2000);
