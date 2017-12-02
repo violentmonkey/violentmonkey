@@ -502,7 +502,7 @@ function exposeVM() {
   Object.defineProperty(Violentmonkey, 'isInstalled', {
     value: (name, namespace) => new Promise(resolve => {
       key += 1;
-      const callback = checking[key];
+      const callback = key;
       checking[callback] = resolve;
       bridge.post({
         cmd: 'CheckScript',
