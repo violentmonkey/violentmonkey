@@ -52,9 +52,9 @@ targets.push(merge(base, {
     }),
     // new FriendlyErrorsPlugin(),
     !IS_DEV && new ExtractTextPlugin('[name].css'),
-    new webpack.NormalModuleReplacementPlugin(/\.\/rules\.json$/, resource => {
-      resource.request = path.resolve(__dirname, '../src/resources/empty-rules.json');
-    }),
+    // new webpack.NormalModuleReplacementPlugin(/\.\/rules\.json$/, resource => {
+    //   resource.request = path.resolve(__dirname, '../src/resources/empty-rules.json');
+    // }),
   ].filter(Boolean),
 }));
 
