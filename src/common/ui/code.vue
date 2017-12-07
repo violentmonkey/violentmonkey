@@ -295,3 +295,14 @@ export default {
   },
 };
 </script>
+
+<style>
+/* compatible with old browsers, e.g. Maxthon 4.4, Chrome 50- */
+.editor-code.flex-auto {
+  position: relative;
+  > div {
+    position: absolute;
+    width: 100%;
+  }
+}
+</style>
