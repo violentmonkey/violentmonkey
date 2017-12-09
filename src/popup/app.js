@@ -1,5 +1,4 @@
 import 'src/common/browser';
-import 'src/common/sprite';
 import Vue from 'vue';
 import { i18n, sendMessage } from 'src/common';
 import handlers from 'src/common/handlers';
