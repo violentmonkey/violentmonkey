@@ -1,6 +1,8 @@
-import tld from './tld';
+import * as tld from 'src/common/tld';
 import cache from './cache';
 import { getOption, hookOptions } from './options';
+
+tld.initTLD(true);
 
 const RE_MATCH_PARTS = /(.*?):\/\/([^/]*)\/(.*)/;
 let blacklistRules = [];
@@ -82,7 +84,7 @@ function autoReg(str) {
   const tests = [
     tstr => re.test(tstr),
   ];
-  if (tld && str.includes('.tld/')) {
+  if (tld.isReady() && str.includes('.tld/')) {
     const reTldStr = reStr.replace('\\.tld/', '((?:\\.\\w+)+)/');
     tests.push(tstr => {
       const matches = tstr.match(reTldStr);
