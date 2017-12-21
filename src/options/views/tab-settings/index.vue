@@ -23,7 +23,7 @@
       </div>
       <div class="mb-1">
         <label>
-          <span v-text="i18n('labelShowBadge')"></span>
+          <span v-text="i18n('labelBadge')"></span>
           <select v-model="showBadge">
             <option value="" v-text="i18n('labelBadgeNone')" />
             <option value="unique" v-text="i18n('labelBadgeUnique')" />
