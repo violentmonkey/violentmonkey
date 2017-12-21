@@ -8,7 +8,7 @@ const defaults = {
   // ignoreGrant: false,
   lastUpdate: 0,
   lastModified: 0,
-  showBadge: true,
+  showBadge: 'unique', // '' | 'unique' | 'total'
   exportValues: true,
   closeAfterInstall: false,
   trackLocalFile: false,

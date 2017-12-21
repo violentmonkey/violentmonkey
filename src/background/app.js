@@ -25,6 +25,8 @@ const VM_VER = browser.runtime.getManifest().version;
 
 hookOptions(changes => {
   if ('isApplied' in changes) setIcon(changes.isApplied);
+  if ('autoUpdate' in changes) autoUpdate();
+  if ('showBadge' in changes) updateBadges();
   browser.runtime.sendMessage({
     cmd: 'UpdateOptions',
     data: changes,
@@ -150,7 +152,6 @@ const commands = {
   ParseMeta(code) {
     return parseMeta(code);
   },
-  AutoUpdate: autoUpdate,
   GetRequestId: getRequestId,
   HttpRequest(details, src) {
     httpRequest(details, res => {
@@ -225,22 +226,49 @@ initialize()
 // Common functions
 
 const badges = {};
-function setBadge({ number, reset }, src) {
+function setBadge({ ids, reset }, src) {
   const srcTab = src.tab || {};
   let data = !reset && badges[srcTab.id];
   if (!data) {
-    data = { number: 0 };
+    data = {
+      number: 0,
+      unique: 0,
+      idMap: {},
+    };
     badges[srcTab.id] = data;
   }
-  data.number += number;
+  data.number += ids.length;
+  if (ids) {
+    ids.forEach(id => {
+      data.idMap[id] = 1;
+    });
+    data.unique = Object.keys(data.idMap).length;
+  }
   browser.browserAction.setBadgeBackgroundColor({
     color: '#808',
     tabId: srcTab.id,
   });
-  const text = ((getOption('showBadge') && data.number) || '').toString();
-  browser.browserAction.setBadgeText({
-    text,
-    tabId: srcTab.id,
+  updateBadge(srcTab.id);
+}
+function updateBadge(tabId) {
+  const data = badges[tabId];
+  if (data) {
+    const showBadge = getOption('showBadge');
+    let text;
+    if (showBadge === 'total') text = data.number;
+    else if (showBadge) text = data.unique;
+    browser.browserAction.setBadgeText({
+      text: `${text || ''}`,
+      tabId,
+    });
+  }
+}
+function updateBadges() {
+  browser.tabs.query({})
+  .then(tabs => {
+    tabs.forEach(tab => {
+      updateBadge(tab.id);
+    });
   });
 }
 browser.tabs.onRemoved.addListener(id => {
