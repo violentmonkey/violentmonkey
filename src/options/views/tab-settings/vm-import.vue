@@ -89,7 +89,8 @@ function getVMFile(entry, vmFile) {
       sendMessage({
         cmd: 'ParseScript',
         data,
-      }).then(() => resolve(true));
+      })
+      .then(() => resolve(true), () => resolve());
     });
   });
 }
