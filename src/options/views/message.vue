@@ -13,11 +13,27 @@
 </template>
 
 <script>
+const dismissers = [];
+
+window.addEventListener('keydown', e => {
+  if (e.keyCode === 27 && dismissers.length) {
+    e.stopImmediatePropagation();
+    dismissers.pop()();
+  }
+}, true);
+
 export default {
   props: ['message'],
+  created() {
+    dismissers.push(this.dismiss);
+  },
   mounted() {
     const input = this.$el.querySelector('input');
     if (input) input.focus();
+  },
+  beforeDestroy() {
+    const i = dismissers.indexOf(this.dismiss);
+    if (i >= 0) dismissers.splice(i, 1);
   },
   methods: {
     onButtonClick(button) {
