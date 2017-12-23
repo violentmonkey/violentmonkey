@@ -71,7 +71,7 @@
     "core-js": "^2.5.1",
     "tldjs": "^2.2.0",
     "vue": "^2.4.2",
-    "vueleton": "^0.5.0"
+    "vueleton": "^0.6.1"
   },
   "engines": {
     "node": ">=8"
