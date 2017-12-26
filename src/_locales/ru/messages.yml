@@ -188,7 +188,7 @@ labelCurrentLang:
   message: 'Текущий язык: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Пользовотельские стили CSS
+  message: Пользовательские стили CSS
 labelDataExport:
   description: Section title of data export.
   message: Экспорт данных
@@ -403,7 +403,7 @@ msgSavedBlacklist:
   message: Чёрный список сохранён.
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: Пользовотельские стили CSS сохранены.
+  message: Пользовательские стили CSS сохранены.
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Скрипт [$1] обновлён!'
