@@ -114,7 +114,7 @@ export default {
     },
     onFindScripts({ name: domain }) {
       browser.tabs.create({
-        url: `https://greasyfork.org/scripts/search?q=${encodeURIComponent(domain)}`,
+        url: `https://greasyfork.org/scripts/by-site/${encodeURIComponent(domain)}`,
       });
     },
     onCommand(item) {
