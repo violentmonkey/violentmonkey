@@ -40,15 +40,6 @@ browser.tabs.query({ currentWindow: true, active: true })
   if (/^https?:\/\//i.test(currentTab.url)) {
     const matches = currentTab.url.match(/:\/\/([^/]*)/);
     const domain = matches[1];
-    const topLevelDomain = tld.getDomain(domain) || domain;
-    let domains = [topLevelDomain];
-    if (domain !== topLevelDomain) {
-      domains = domain.slice(0, -topLevelDomain.length - 1).split('.')
-      .reduceRight(
-        (res, part) => [`${part}.${res[0]}`, ...res],
-        domains,
-      );
-    }
-    store.domains = domains;
+    store.domain = tld.getDomain(domain) || domain;
   }
 });
