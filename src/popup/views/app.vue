@@ -13,8 +13,8 @@
         <span v-text="i18n('menuDashboard')"></span>
       </div>
     </div>
-    <div class="menu">
-      <div class="menu-item" @click="onClickDomain">
+    <div class="menu" v-show="store.domain">
+      <div class="menu-item" @click="onFindSameDomainScripts">
         <icon name="search"></icon>
         <span v-text="i18n('menuFindScripts')"></span>
       </div>
@@ -100,9 +100,9 @@ export default {
       browser.runtime.openOptionsPage();
       window.close();
     },
-    onFindScripts({ name: domain }) {
+    onFindSameDomainScripts() {
       browser.tabs.create({
-        url: `https://greasyfork.org/scripts/by-site/${encodeURIComponent(domain)}`,
+        url: `https://greasyfork.org/scripts/by-site/${encodeURIComponent(this.store.domain)}`,
       });
     },
     onCommand(item) {
@@ -128,9 +128,6 @@ export default {
     },
     checkReload() {
       if (options.get('autoReload')) browser.tabs.reload(this.store.currentTab.id);
-    },
-    onClickDomain() {
-      this.onFindScripts(this.store.domain);
     },
   },
 };
