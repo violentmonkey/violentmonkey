@@ -204,7 +204,7 @@ export function normalizePosition() {
 export function sortScripts() {
   store.scripts.sort((a, b) => {
     const [pos1, pos2] = [a, b].map(item => getInt(objectGet(item, 'props.position')));
-    return Math.sign(pos1 - pos2);
+    return pos1 - pos2;
   });
   return normalizePosition()
   .then(changed => {
