@@ -13,16 +13,10 @@
         <span v-text="i18n('menuDashboard')"></span>
       </div>
     </div>
-    <div class="menu menu-domains" v-show="domains.length" :class="{expand: activeMenu === 'domains'}">
-      <div class="menu-item" @click="onClickDomains">
+    <div class="menu" v-show="store.domain">
+      <div class="menu-item" @click="onFindSameDomainScripts">
         <icon name="search"></icon>
-        <icon v-if="domains.length > 1" name="more" class="icon-right icon-collapse"></icon>
         <span v-text="i18n('menuFindScripts')"></span>
-      </div>
-      <div class="submenu">
-        <div class="menu-item" v-for="item in domains" @click="onFindScripts(item)">
-          <span v-text="item.name"></span>
-        </div>
       </div>
     </div>
     <div class="menu menu-commands" v-show="commands.length" :class="{expand: activeMenu === 'commands'}">
@@ -78,12 +72,6 @@ export default {
     };
   },
   computed: {
-    domains() {
-      return this.store.domains.map(item => ({
-        name: item,
-        data: item,
-      }));
-    },
     commands() {
       return this.store.commands.map(item => ({
         name: item[0],
@@ -112,9 +100,9 @@ export default {
       browser.runtime.openOptionsPage();
       window.close();
     },
-    onFindScripts({ name: domain }) {
+    onFindSameDomainScripts() {
       browser.tabs.create({
-        url: `https://greasyfork.org/scripts/search?q=${encodeURIComponent(domain)}`,
+        url: `https://greasyfork.org/scripts/by-site/${encodeURIComponent(this.store.domain)}`,
       });
     },
     onCommand(item) {
@@ -140,13 +128,6 @@ export default {
     },
     checkReload() {
       if (options.get('autoReload')) browser.tabs.reload(this.store.currentTab.id);
-    },
-    onClickDomains() {
-      if (this.domains.length === 1) {
-        this.onFindScripts(this.domains[0]);
-      } else {
-        this.toggleMenu('domains');
-      }
     },
   },
 };
