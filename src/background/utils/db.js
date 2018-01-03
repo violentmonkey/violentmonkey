@@ -323,7 +323,11 @@ export function getData() {
   const { scripts } = store;
   scripts.forEach(script => {
     const icon = objectGet(script, 'meta.icon');
-    if (isRemote(icon)) cacheKeys[icon] = 1;
+    if (isRemote(icon)) {
+      const pathMap = objectGet(script, 'custom.pathMap') || {};
+      const fullUrl = pathMap[icon] || icon;
+      cacheKeys[fullUrl] = 1;
+    }
   });
   return storage.cache.getMulti(Object.keys(cacheKeys))
   .then(cache => {
