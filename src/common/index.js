@@ -4,9 +4,9 @@ export function i18n(name, args) {
 export const defaultImage = '/public/images/icon128.png';
 
 export function normalizeKeys(key) {
-  let keys = key || [];
-  if (!Array.isArray(keys)) keys = keys.toString().split('.');
-  return keys;
+  if (key == null) return [];
+  if (Array.isArray(key)) return key;
+  return `${key}`.split('.').filter(Boolean);
 }
 
 export function initHooks() {

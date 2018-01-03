@@ -51,8 +51,8 @@ import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import CodeMirror from 'codemirror';
 import VlCode from 'vueleton/lib/code';
+import Tooltip from 'vueleton/lib/tooltip';
 import { debounce } from 'src/common';
-import Tooltip from './tooltip';
 
 function getHandler(key) {
   return cm => {

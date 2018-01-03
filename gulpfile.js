@@ -3,7 +3,6 @@ const gulp = require('gulp');
 const gutil = require('gulp-util');
 const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
-const svgSprite = require('gulp-svg-sprite');
 const plumber = require('gulp-plumber');
 const yaml = require('js-yaml');
 const webpack = require('webpack');
@@ -51,13 +50,13 @@ gulp.task('clean', () => del(['dist']));
 
 gulp.task('pack', ['manifest', 'copy-files', 'copy-i18n']);
 
-gulp.task('watch', ['pack', 'js-dev', 'svg'], () => {
+gulp.task('watch', ['pack', 'js-dev'], () => {
   gulp.watch(paths.manifest, ['manifest']);
   gulp.watch(paths.copy, ['copy-files']);
   gulp.watch(paths.locales.concat(paths.templates), ['copy-i18n']);
 });
 
-gulp.task('build', ['pack', 'js-prd', 'svg']);
+gulp.task('build', ['pack', 'js-prd']);
 
 gulp.task('js-dev', () => {
   webpack(webpackConfig).watch({}, webpackCallback);
@@ -107,19 +106,6 @@ gulp.task('copy-i18n', () => (
     extension: '.json',
   }))
   .pipe(gulp.dest('dist/_locales'))
-));
-
-gulp.task('svg', () => (
-  gulp.src('src/resources/icons/*.svg')
-  .pipe(svgSprite({
-    mode: {
-      symbol: {
-        dest: '',
-        sprite: 'sprite.svg',
-      },
-    },
-  }))
-  .pipe(gulp.dest('dist/public'))
 ));
 
 /**

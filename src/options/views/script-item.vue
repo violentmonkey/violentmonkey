@@ -65,9 +65,9 @@
 </template>
 
 <script>
+import Tooltip from 'vueleton/lib/tooltip';
 import { sendMessage, getLocaleString } from 'src/common';
 import Icon from 'src/common/ui/icon';
-import Tooltip from 'src/common/ui/tooltip';
 import { store } from '../utils';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
@@ -404,7 +404,7 @@ export default {
     }
   }
   &-name {
-    font-weight: bold;
+    font-weight: 500;
     font-size: 1rem;
     .disabled & {
       color: gray;

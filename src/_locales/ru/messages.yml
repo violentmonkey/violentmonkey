@@ -168,6 +168,18 @@ labelAutoReloadCurrentTab:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Ежедневно проверять наличие обновлений скриптов.
+labelBadge:
+  description: Label for option to show number on badge.
+  message: ''
+labelBadgeNone:
+  description: Option to display nothing on badge.
+  message: ''
+labelBadgeTotal:
+  description: Option to display total number of running scripts on badge.
+  message: ''
+labelBadgeUnique:
+  description: Option to display number of unique running scripts on badge.
+  message: ''
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Чёрный список
@@ -176,7 +188,7 @@ labelCurrentLang:
   message: 'Текущий язык: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Пользовотельские стили CSS
+  message: Пользовательские стили CSS
 labelDataExport:
   description: Section title of data export.
   message: Экспорт данных
@@ -276,6 +288,7 @@ labelSettings:
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
   message: Показывать количество активных скриптов на значке.
+  touched: false
 labelSync:
   description: Label for sync options.
   message: Синхронизация с облачным  хранилищем
@@ -390,7 +403,7 @@ msgSavedBlacklist:
   message: Чёрный список сохранён.
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: Пользовотельские стили CSS сохранены.
+  message: Пользовательские стили CSS сохранены.
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Скрипт [$1] обновлён!'

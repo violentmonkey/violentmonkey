@@ -201,7 +201,6 @@ export default {
   &-header {
     > * {
       padding: 8px;
-      cursor: pointer;
     }
   }
   &-nav {

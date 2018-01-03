@@ -161,6 +161,18 @@ labelAutoReloadCurrentTab:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Automatically check scripts for updates every day
+labelBadge:
+  description: Label for option to show number on badge.
+  message: 'Display on badge: '
+labelBadgeNone:
+  description: Option to display nothing on badge.
+  message: none
+labelBadgeTotal:
+  description: Option to display total number of running scripts on badge.
+  message: number of running scripts
+labelBadgeUnique:
+  description: Option to display number of unique running scripts on badge.
+  message: number of unique running scripts
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Blacklist
@@ -269,6 +281,7 @@ labelSettings:
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
   message: Show number of running scripts on the badge
+  touched: false
 labelSync:
   description: Label for sync options.
   message: Sync

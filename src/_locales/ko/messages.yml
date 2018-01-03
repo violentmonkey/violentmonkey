@@ -159,6 +159,18 @@ labelAutoReloadCurrentTab:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: 매일 스크립트 업데이트를 자동으로 확인
+labelBadge:
+  description: Label for option to show number on badge.
+  message: ''
+labelBadgeNone:
+  description: Option to display nothing on badge.
+  message: ''
+labelBadgeTotal:
+  description: Option to display total number of running scripts on badge.
+  message: ''
+labelBadgeUnique:
+  description: Option to display number of unique running scripts on badge.
+  message: ''
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: 블랙리스트
@@ -267,6 +279,7 @@ labelSettings:
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
   message: 뱃지에 실행중인 스크립트 수 보이기
+  touched: false
 labelSync:
   description: Label for sync options.
   message: 동기화

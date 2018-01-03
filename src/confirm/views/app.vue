@@ -2,7 +2,7 @@
   <div class="page-confirm frame flex flex-col h-100">
     <div class="frame-block">
       <div class="buttons pull-right">
-        <vl-dropdown class="confirm-options" align="right">
+        <dropdown class="confirm-options" align="right">
           <button slot="toggle" v-text="i18n('buttonInstallOptions')"></button>
           <label>
             <setting-check name="closeAfterInstall" @change="checkClose" />
@@ -12,7 +12,7 @@
             <setting-check name="trackLocalFile" :disabled="closeAfterInstall" />
             <span v-text="i18n('installOptionTrack')"></span>
           </label>
-        </vl-dropdown>
+        </dropdown>
         <button v-text="i18n('buttonConfirmInstallation')"
         :disabled="!installable" @click="installScript"></button>
         <button v-text="i18n('buttonClose')" @click="close"></button>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import VlDropdown from 'vueleton/lib/dropdown';
+import Dropdown from 'vueleton/lib/dropdown';
 import { sendMessage, zfill, request, buffer2string, isRemote, getFullUrl } from 'src/common';
 import options from 'src/common/options';
 import initCache from 'src/common/cache';
@@ -41,7 +41,7 @@ const { query } = getPathInfo();
 
 export default {
   components: {
-    VlDropdown,
+    Dropdown,
     VmCode,
     SettingCheck,
   },

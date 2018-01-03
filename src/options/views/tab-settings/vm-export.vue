@@ -14,19 +14,19 @@
       <setting-check name="exportValues" />
       <span v-text="i18n('labelExportScriptData')"></span>
     </label>
-    <vl-modal v-if="store.ffDownload" transition="in-out" :visible="!!store.ffDownload.url" @close="store.ffDownload = {}">
+    <modal v-if="store.ffDownload" transition="in-out" :visible="!!store.ffDownload.url" @close="store.ffDownload = {}">
       <div class="export-modal modal-content">
         <a :download="store.ffDownload.name" :href="store.ffDownload.url">
           Right click and save as<br />
           <strong>scripts.zip</strong>
         </a>
       </div>
-    </vl-modal>
+    </modal>
   </section>
 </template>
 
 <script>
-import VlModal from 'vueleton/lib/modal';
+import Modal from 'vueleton/lib/modal';
 import { sendMessage, getLocaleString } from 'src/common';
 import options from 'src/common/options';
 import { isFirefox } from 'src/common/ua';
@@ -42,7 +42,7 @@ if (isFirefox) store.ffDownload = {};
 export default {
   components: {
     SettingCheck,
-    VlModal,
+    Modal,
   },
   data() {
     return {

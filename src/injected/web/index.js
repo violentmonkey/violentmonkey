@@ -117,7 +117,7 @@ function onLoadScripts(data) {
     // Must use Object.getOwnPropertyNames to list unenumerable properties
     const argNames = Object.getOwnPropertyNames(wrapper);
     const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
-    const codeSlices = [`${wrapperInit};with(this)!function(){`];
+    const codeSlices = [`${wrapperInit};with(this)!function(define,module,exports){`];
     forEach(requireKeys, key => {
       const requireCode = data.require[pathMap[key] || key];
       if (requireCode) {
@@ -502,7 +502,7 @@ function exposeVM() {
   Object.defineProperty(Violentmonkey, 'isInstalled', {
     value: (name, namespace) => new Promise(resolve => {
       key += 1;
-      const callback = checking[key];
+      const callback = key;
       checking[callback] = resolve;
       bridge.post({
         cmd: 'CheckScript',

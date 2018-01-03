@@ -87,9 +87,9 @@
 </template>
 
 <script>
+import Tooltip from 'vueleton/lib/tooltip';
 import { i18n } from 'src/common';
 import { objectGet } from 'src/common/object';
-import Tooltip from 'src/common/ui/tooltip';
 
 export default {
   props: ['value', 'settings'],
@@ -129,7 +129,7 @@ export default {
   position: relative;
   max-width: 600px;
   margin-bottom: .5em;
-  &.tooltip {
+  &.vl-tooltip {
     display: block;
   }
   input[type=text] {
