@@ -84,21 +84,21 @@ buttonUpdateAll:
   message: 'Έλεγχος όλων για αναβαθμίσεις'
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Vacuum database
+  message: 'Εκκαθάριση βάσης δεδομένων'
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Data vacuumed
+  message: 'Δεδομένα διαγράφηκαν'
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Vacuuming data...
+  message: 'Διαγραφή δεδομένων...'
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    Modifications are not saved!
-    Click OK to discard them or cancel to stay.
+    'Οι αλλαγές δεν αποθηκεύτηκαν!'
+    'Πατήστε Εντάξει για να τις απορρίψετε ή Άκυρο για να παραμείνετε.'
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: URL matched in this list will not be injected by scripts.
+  message: 'Στα URL που ταιριάζουν σε αυτήν την λίστα δεν θα εκτελούνται σενάρια εντολών.'
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
