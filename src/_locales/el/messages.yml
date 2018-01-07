@@ -6,91 +6,91 @@ anchorTranslator:
   message: '<a href=mailto:theseas.work@gmail.com>Theseas Maroulis</a>'
 buttonAllNone:
   description: Button to select all scripts or none.
-  message: 'Όλα/Κανένα'
+  message: Όλα/Κανένα
 buttonCancel:
   description: Cancel button on dialog.
-  message: 'Ακύρωση'
+  message: Ακύρωση
 buttonClose:
   description: Button to close window.
-  message: 'Κλείσιμο'
+  message: Κλείσιμο
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: 'Επιβεβαίωση εγκατάστασης'
+  message: Επιβεβαίωση εγκατάστασης
 buttonDisable:
   description: Button to disable a script.
-  message: 'Απενεργοποίηση'
+  message: Απενεργοποίηση
 buttonEdit:
   description: Button to edit a script.
-  message: 'Επεξεργασία'
+  message: Επεξεργασία
 buttonEnable:
   description: Button to enable a script.
-  message: 'Ενεργοποίηση'
+  message: Ενεργοποίηση
 buttonExportData:
   description: Button to open the data export dialog.
-  message: 'Εξαγωγή σε zip'
+  message: Εξαγωγή σε zip
 buttonFilter:
   description: Button to show filters menu.
-  message: 'Φίλτρα'
+  message: Φίλτρα
 buttonHome:
   description: Button to open homepage.
-  message: 'Αρχική σελίδα'
+  message: Αρχική σελίδα
 buttonImportData:
   description: Button to choose a file for data import.
-  message: 'Εισαγωγή από zip'
+  message: Εισαγωγή από zip
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: 'Εγκατάσταση από URL'
+  message: Εγκατάσταση από URL
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
-  message: 'Επιλογές'
+  message: Επιλογές
 buttonNew:
   description: Button to create a new script.
-  message: 'Νέο'
+  message: Νέο
 buttonOK:
   description: OK button on dialog.
-  message: 'Εντάξει'
+  message: Εντάξει
 buttonRemove:
   description: Button to remove a script.
-  message: 'Αφαίρεση'
+  message: Αφαίρεση
 buttonReplace:
   description: Button to replace the current match.
-  message: 'Αντικατάσταση'
+  message: Αντικατάσταση
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: 'Όλα'
+  message: Όλα
 buttonSave:
   description: Button to save modifications of a script.
-  message: 'Αποθήκευση'
+  message: Αποθήκευση
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: 'Αποθήκευση'
+  message: Αποθήκευση
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: 'Αποθήκευση και Κλείσιμο'
+  message: Αποθήκευση και Κλείσιμο
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: 'Αποθήκευση'
+  message: Αποθήκευση
 buttonSupport:
   description: Button to open support page.
-  message: 'Βοήθεια'
+  message: Βοήθεια
 buttonUndo:
   description: Button to undo removement of a script.
-  message: 'Αναίρεση'
+  message: Αναίρεση
 buttonUpdate:
   description: Check a script for updates.
-  message: 'Έλεγχος για αναβαθμίσεις'
+  message: Έλεγχος για αναβαθμίσεις
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: 'Έλεγχος όλων για αναβαθμίσεις'
+  message: Έλεγχος όλων για αναβαθμίσεις
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: 'Εκκαθάριση βάσης δεδομένων'
+  message: Εκκαθάριση βάσης δεδομένων
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: 'Δεδομένα διαγράφηκαν'
+  message: Δεδομένα διαγράφηκαν
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: 'Διαγραφή δεδομένων...'
+  message: Διαγραφή δεδομένων...
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -98,84 +98,90 @@ confirmNotSaved:
     'Πατήστε Εντάξει για να τις απορρίψετε ή Άκυρο για να παραμείνετε.'
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: 'Στα URL που ταιριάζουν σε αυτήν την λίστα δεν θα εκτελούνται σενάρια εντολών.'
+  message: >-
+    Στα URL που ταιριάζουν σε αυτήν την λίστα δεν θα εκτελούνται σενάρια
+    εντολών.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Custom CSS for options page and script installation page. If you are not
-    sure what this is for, please do not edit it.
+    'Προσαρμοσμένη CSS για την σελίδα των επιλογών και την σελίδα εγκατάστασης
+    σεναρίων. Αν δεν είσαι σίγουρος τι είναι αυτό, παρακαλώ μην το αλλάξεις.'
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: Custom metadata
+  message: Προσαρμοσμένα μεταδεδομένα
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Script settings
+  message: Ρυθμίσεις δέσμης ενεργειών
 editNavCode:
   description: Label of code tab in script editor.
-  message: Code
+  message: Κώδικας
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: Settings
+  message: Ρυθμίσεις
 extDescription:
   description: Description for this extension.
-  message: Provide userscript support for browsers.
+  message: Προσφέρει υποστήριξη για σενάρια χρηστών για τους φυλλομετρητές.
 extName:
   description: Name of this extension.
   message: Violentmonkey
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: alphabetical order
+  message: αλφαβητική σειρά
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: execution order
+  message: σειρά εκτέλεσης
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'Input URL:'
+  message: 'Εισαγωγή URL:'
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: Use @downloadURL
+  message: Χρήση @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Discard the redundancy and try to reload the missing resources in cache.
+  message: >-
+    Απόρριψη των περιττών και προσπάθεια επαναφόρτωσης των πόρων που λείπουν
+    στην cache.
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Install from $1
+  message: Εγκατάσταση από $1
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Close after installation
+  message: Κλείσιμο μετά την εγκατάσταση
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Track local file before this window is closed
+  message: Παρακολούθηση του τοπικού αρχείου πριν αυτό το παράθυρο κλείσει
 labelAbout:
   description: Label shown on top of the about page.
-  message: About Violentmonkey
+  message: Περί του Violentmonkey
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Allow update
+  message: Επιτρέψτε αναβαθμίσεις
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 'Author: '
+  message: 'Συγγραφέας: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Reload current tab after switching on/off a script from menu
+  message: >-
+    Επαναφόρτωση τρέχουσας καρτέλας μετά την ενεργοποίηση/απενεργοποίηση ενός
+    σεναρίου από το μενού
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Automatically check scripts for updates every day
+  message: Καθημερινός αυτόματος έλεγχος ενημερώσεων για τα σενάρια
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Display on badge: '
+  message: 'Εμφάνιση στο εικονίδιο: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: none
+  message: τίποτα
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: number of running scripts
+  message: αριθμός των σεναρίων που εκτελούνται
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: number of unique running scripts
+  message: αριθμός των μοναδικών σεναρίων που εκτελούνται
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Blacklist
+  message: Μαύρη λίστα
 labelCurrentLang:
   description: Label of current language.
   message: 'Current Language: '
