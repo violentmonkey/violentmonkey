@@ -69,14 +69,18 @@ export function throttle(func, time) {
 
 export function noop() {}
 
-export function zfill(input, length) {
+export function leftpad(input, length, pad = '0') {
   let num = input.toString();
-  while (num.length < length) num = `0${num}`;
+  while (num.length < length) num = `${pad}${num}`;
   return num;
 }
 
+export function getRnd4() {
+  return Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(-4);
+}
+
 export function getUniqId(prefix) {
-  return (prefix || '') + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  return (prefix || '') + Date.now().toString(36) + getRnd4();
 }
 
 /**

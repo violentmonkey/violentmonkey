@@ -180,6 +180,7 @@ function wrapGM(script, code, cache) {
     GM_info: {
       get() {
         const obj = {
+          uuid: script.props.uuid,
           scriptMetaStr: metaStr,
           scriptWillUpdate: !!script.config.shouldUpdate,
           scriptHandler: 'Violentmonkey',

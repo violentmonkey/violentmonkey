@@ -29,7 +29,7 @@
 
 <script>
 import Dropdown from 'vueleton/lib/dropdown';
-import { sendMessage, zfill, request, buffer2string, isRemote, getFullUrl } from 'src/common';
+import { sendMessage, leftpad, request, buffer2string, isRemote, getFullUrl } from 'src/common';
 import options from 'src/common/options';
 import initCache from 'src/common/cache';
 import VmCode from 'src/common/ui/code';
@@ -191,7 +191,7 @@ export default {
     },
     getTimeString() {
       const now = new Date();
-      return `${zfill(now.getHours(), 2)}:${zfill(now.getMinutes(), 2)}:${zfill(now.getSeconds(), 2)}`;
+      return `${leftpad(now.getHours(), 2)}:${leftpad(now.getMinutes(), 2)}:${leftpad(now.getSeconds(), 2)}`;
     },
     installScript() {
       this.installable = false;
