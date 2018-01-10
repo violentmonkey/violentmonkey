@@ -1,5 +1,10 @@
-import { getUniqId, bindEvents, Promise, attachFunction, console } from '../utils';
-import { includes, forEach, map, utf8decode } from './helpers';
+import {
+  getUniqId, bindEvents, attachFunction,
+} from '../utils';
+import {
+  includes, forEach, map, utf8decode, jsonDump, jsonLoad,
+  Promise, console,
+} from '../utils/helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
 import {
@@ -112,7 +117,7 @@ function onLoadScripts(data) {
     // Must use Object.getOwnPropertyNames to list unenumerable properties
     const argNames = Object.getOwnPropertyNames(wrapper);
     const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
-    const codeSlices = [`${wrapperInit};with(this)!function(){`];
+    const codeSlices = [`${wrapperInit};with(this)!function(define,module,exports){`];
     forEach(requireKeys, key => {
       const requireCode = data.require[pathMap[key] || key];
       if (requireCode) {
@@ -158,13 +163,13 @@ function wrapGM(script, code, cache) {
   if (includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
   const resources = script.meta.resources || {};
   const dataEncoders = {
-    o: val => JSON.stringify(val),
+    o: val => jsonDump(val),
     '': val => val.toString(),
   };
   const dataDecoders = {
     n: val => Number(val),
     b: val => val === 'true',
-    o: val => JSON.parse(val),
+    o: val => jsonLoad(val),
     '': val => val,
   };
   const pathMap = script.custom.pathMap || {};
@@ -175,6 +180,7 @@ function wrapGM(script, code, cache) {
     GM_info: {
       get() {
         const obj = {
+          uuid: script.props.uuid,
           scriptMetaStr: metaStr,
           scriptWillUpdate: !!script.config.shouldUpdate,
           scriptHandler: 'Violentmonkey',
@@ -497,7 +503,7 @@ function exposeVM() {
   Object.defineProperty(Violentmonkey, 'isInstalled', {
     value: (name, namespace) => new Promise(resolve => {
       key += 1;
-      const callback = checking[key];
+      const callback = key;
       checking[callback] = resolve;
       bridge.post({
         cmd: 'CheckScript',

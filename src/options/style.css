@@ -18,7 +18,7 @@ aside {
     padding-top: .6rem;
     padding-bottom: .6rem;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 500;
     text-decoration: none;
     color: gray;
     &.active,
@@ -29,7 +29,6 @@ aside {
 }
 #currentLang {
   color: green;
-  font-weight: bold;
 }
 section {
   position: relative;

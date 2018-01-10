@@ -2,5 +2,5 @@
 export const store = {
   scripts: [],
   commands: [],
-  domains: [],
+  domain: '',
 };

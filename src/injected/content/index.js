@@ -10,24 +10,19 @@ import dirtySetClipboard from './clipboard';
 const IS_TOP = window.top === window;
 
 const ids = [];
+const enabledIds = [];
 const menus = [];
 
-const badge = {
-  number: 0,
-  ready: false,
-  willSet: false,
-};
-
-function getBadge() {
-  badge.willSet = true;
-  setBadge();
-}
-
 function setBadge() {
-  if (badge.ready && badge.willSet) {
-    // XXX: only scripts run in top level window are counted
-    if (IS_TOP) sendMessage({ cmd: 'SetBadge', data: badge.number });
-  }
+  // delay setBadge in frames so that they can be added to the initial count
+  new Promise(resolve => setTimeout(resolve, IS_TOP ? 0 : 300))
+  .then(() => sendMessage({
+    cmd: 'SetBadge',
+    data: {
+      ids: enabledIds,
+      reset: IS_TOP,
+    },
+  }));
 }
 
 const bgHandlers = {
@@ -35,7 +30,6 @@ const bgHandlers = {
     bridge.post({ cmd: 'Command', data });
   },
   GetPopup: getPopup,
-  GetBadge: getBadge,
   HttpRequested: httpRequested,
   TabClosed: tabClosed,
   UpdatedValues(data) {
@@ -54,19 +48,24 @@ export default function initialize(contentId, webId) {
     if (handle) handle(req.data, src);
   });
 
-  return sendMessage({ cmd: 'GetInjected', data: window.location.href })
+  return sendMessage({
+    cmd: 'GetInjected',
+    data: {
+      url: window.location.href,
+      reset: IS_TOP,
+    },
+  })
   .then(data => {
     if (data.scripts) {
       data.scripts = data.scripts.filter(script => {
         ids.push(script.props.id);
         if ((IS_TOP || !script.meta.noframes) && script.config.enabled) {
-          badge.number += 1;
+          enabledIds.push(script.props.id);
           return true;
         }
         return false;
       });
     }
-    badge.ready = true;
     getPopup();
     setBadge();
     const needInject = data.scripts && data.scripts.length;

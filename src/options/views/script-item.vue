@@ -65,9 +65,10 @@
 </template>
 
 <script>
+import Tooltip from 'vueleton/lib/tooltip';
 import { sendMessage, getLocaleString } from 'src/common';
+import { objectGet } from 'src/common/object';
 import Icon from 'src/common/ui/icon';
-import Tooltip from 'src/common/ui/tooltip';
 import { store } from '../utils';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
@@ -164,7 +165,9 @@ export default {
   mounted() {
     const { icon } = this.script.meta;
     if (icon && icon !== this.safeIcon) {
-      loadImage(icon)
+      const pathMap = objectGet(this.script, 'custom.pathMap') || {};
+      const fullUrl = pathMap[icon] || icon;
+      loadImage(fullUrl)
       .then(url => {
         this.safeIcon = url;
       }, () => {
@@ -404,7 +407,7 @@ export default {
     }
   }
   &-name {
-    font-weight: bold;
+    font-weight: 500;
     font-size: 1rem;
     .disabled & {
       color: gray;

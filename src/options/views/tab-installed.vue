@@ -2,7 +2,7 @@
   <div class="tab-installed">
     <header class="flex">
       <div class="flex-auto">
-        <vl-dropdown :closeAfterClick="true">
+        <dropdown :closeAfterClick="true" :class="{active: menuNewActive}" @stateChange="onStateChange">
           <tooltip :title="i18n('buttonNew')" placement="down" align="start" slot="toggle">
             <span class="btn-ghost">
               <icon name="plus"></icon>
@@ -12,14 +12,14 @@
           <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
           <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank"></a>
           <div class="dropdown-menu-item" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></div>
-        </vl-dropdown>
+        </dropdown>
         <tooltip :title="i18n('buttonUpdateAll')" placement="down" align="start">
           <span class="btn-ghost" @click="updateAll">
             <icon name="refresh"></icon>
           </span>
         </tooltip>
       </div>
-      <vl-dropdown align="right" class="filter-sort">
+      <dropdown align="right" class="filter-sort">
         <tooltip :title="i18n('buttonFilter')" placement="down" slot="toggle">
           <span class="btn-ghost">
             <icon name="filter"></icon>
@@ -42,7 +42,7 @@
             <span v-text="i18n('optionShowEnabledFirst')"></span>
           </label>
         </div>
-      </vl-dropdown>
+      </dropdown>
       <div class="filter-search">
         <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
         <icon name="search"></icon>
@@ -61,14 +61,14 @@
 </template>
 
 <script>
-import VlDropdown from 'vueleton/lib/dropdown';
+import Dropdown from 'vueleton/lib/dropdown';
+import Tooltip from 'vueleton/lib/tooltip';
 import { i18n, sendMessage, noop, debounce } from 'src/common';
 import { objectGet } from 'src/common/object';
 import options from 'src/common/options';
 import SettingCheck from 'src/common/ui/setting-check';
 import hookSetting from 'src/common/hook-setting';
 import Icon from 'src/common/ui/icon';
-import Tooltip from 'src/common/ui/tooltip';
 import LocaleGroup from 'src/common/ui/locale-group';
 import Item from './script-item';
 import Edit from './edit';
@@ -110,7 +110,7 @@ export default {
     Tooltip,
     SettingCheck,
     LocaleGroup,
-    VlDropdown,
+    Dropdown,
     Icon,
   },
   data() {
@@ -121,6 +121,7 @@ export default {
       script: null,
       search: null,
       modal: null,
+      menuNewActive: false,
     };
   },
   watch: {
@@ -233,6 +234,9 @@ export default {
     onOrderChange(e) {
       options.set('filters.sort', e.target.value);
     },
+    onStateChange(active) {
+      this.menuNewActive = active;
+    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 200);
@@ -255,6 +259,9 @@ $header-height: 4rem;
   }
   .vl-dropdown-menu {
     white-space: nowrap;
+  }
+  .vl-dropdown.active .vl-tooltip-wrap {
+    display: none;
   }
 }
 .backdrop,

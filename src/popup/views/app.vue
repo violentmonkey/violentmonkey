@@ -13,19 +13,13 @@
         <span v-text="i18n('menuDashboard')"></span>
       </div>
     </div>
-    <div class="menu menu-domains" v-show="domains.length" :class="{expand:activeMenu==='domains'}">
-      <div class="menu-item" @click="toggleMenu('domains')">
+    <div class="menu" v-show="store.domain">
+      <div class="menu-item" @click="onFindSameDomainScripts">
         <icon name="search"></icon>
-        <icon name="more" class="icon-right icon-collapse"></icon>
         <span v-text="i18n('menuFindScripts')"></span>
       </div>
-      <div class="submenu">
-        <div class="menu-item" v-for="item in domains" @click="onFindScripts(item)">
-          <span v-text="item.name"></span>
-        </div>
-      </div>
     </div>
-    <div class="menu menu-commands" v-show="commands.length" :class="{expand:activeMenu==='commands'}">
+    <div class="menu menu-commands" v-show="commands.length" :class="{expand: activeMenu === 'commands'}">
       <div class="menu-item" @click="toggleMenu('commands')">
         <icon name="more" class="icon-right icon-collapse"></icon>
         <span v-text="i18n('menuCommands')"></span>
@@ -36,7 +30,7 @@
         </div>
       </div>
     </div>
-    <div class="menu menu-scripts" v-show="scripts.length" :class="{expand:activeMenu==='scripts'}">
+    <div class="menu menu-scripts" v-show="scripts.length" :class="{expand: activeMenu === 'scripts'}">
       <div class="menu-item" @click="toggleMenu('scripts')">
         <icon name="more" class="icon-right icon-collapse"></icon>
         <span v-text="i18n('menuMatchedScripts')"></span>
@@ -78,12 +72,6 @@ export default {
     };
   },
   computed: {
-    domains() {
-      return this.store.domains.map(item => ({
-        name: item,
-        data: item,
-      }));
-    },
     commands() {
       return this.store.commands.map(item => ({
         name: item[0],
@@ -112,16 +100,9 @@ export default {
       browser.runtime.openOptionsPage();
       window.close();
     },
-    onFindScripts(item) {
-      let domain;
-      if (item) {
-        domain = item.name;
-      } else {
-        const matches = this.store.currentTab.url.match(/:\/\/(?:www\.)?([^/]*)/);
-        domain = matches[1];
-      }
+    onFindSameDomainScripts() {
       browser.tabs.create({
-        url: `https://greasyfork.org/scripts/search?q=${encodeURIComponent(domain)}`,
+        url: `https://greasyfork.org/scripts/by-site/${encodeURIComponent(this.store.domain)}`,
       });
     },
     onCommand(item) {

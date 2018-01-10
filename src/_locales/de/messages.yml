@@ -163,6 +163,18 @@ labelAutoReloadCurrentTab:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Prüfe täglich auf Aktualisierungen
+labelBadge:
+  description: Label for option to show number on badge.
+  message: 'Auf dem Symbol anzeigen: '
+labelBadgeNone:
+  description: Option to display nothing on badge.
+  message: nichts
+labelBadgeTotal:
+  description: Option to display total number of running scripts on badge.
+  message: Gesamtanzahl angewandter Skripte
+labelBadgeUnique:
+  description: Option to display number of unique running scripts on badge.
+  message: Anzahl angewandter einzigartiger Skripte
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Blacklist
@@ -271,6 +283,7 @@ labelSettings:
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
   message: Zeige Anzahl der angewandten Skripte auf dem Addon-Symbol
+  touched: false
 labelSync:
   description: Label for sync options.
   message: Sync
@@ -291,7 +304,7 @@ labelSyncRevoke:
   message: Autorisierung entziehen
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Skript-Status Sync
+  message: Skriptstatus-Sync
 labelSyncService:
   description: Label for sync service select.
   message: Sync mit
