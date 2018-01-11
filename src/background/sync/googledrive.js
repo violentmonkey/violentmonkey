@@ -3,35 +3,62 @@
 // - https://github.com/google/google-api-nodejs-client
 import { getUniqId } from 'src/common';
 import { objectGet } from 'src/common/object';
-import { loadQuery, dumpQuery } from '../utils';
+import { dumpQuery, notify } from '../utils';
 import { getURI, getItemFilename, BaseService, register, isScriptFile } from './base';
 
-const config = {
+const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0IjoiTjBEbTZJOEV3bkJaeE1xMUpuMHN3UER0In0='));
+const config = Object.assign({
   client_id: '590447512361-05hjbhnf8ua3iha55e5pgqg15om0cpef.apps.googleusercontent.com',
   redirect_uri: 'https://violentmonkey.github.io/auth_googledrive.html',
   scope: 'https://www.googleapis.com/auth/drive.appdata',
-};
+}, SECRET_KEY);
 const UNAUTHORIZED = { status: 'UNAUTHORIZED' };
 
 const GoogleDrive = BaseService.extend({
   name: 'googledrive',
   displayName: 'Google Drive',
   urlPrefix: 'https://www.googleapis.com/drive/v3',
-  user() {
-    const params = {
-      access_token: this.config.get('token'),
-    };
-    return this.loadData({
-      method: 'GET',
-      url: `https://www.googleapis.com/oauth2/v3/tokeninfo?${dumpQuery(params)}`,
-      responseType: 'json',
+  refreshToken() {
+    const refreshToken = this.config.get('refresh_token');
+    if (!refreshToken) return Promise.reject({ type: 'unauthorized' });
+    return this.authorized({
+      refresh_token: refreshToken,
+      grant_type: 'refresh_token',
     })
+    .then(() => this.prepare());
+  },
+  user() {
+    const requestUser = () => this.loadData({
+      url: `https://www.googleapis.com/oauth2/v3/tokeninfo?${dumpQuery({
+        access_token: this.config.get('token'),
+      })}`,
+      responseType: 'json',
+    });
+    return requestUser()
     .then(info => {
+      // If access was granted with access_type=online, revoke it.
+      if (info.access_type === 'online') {
+        return this.loadData({
+          method: 'POST',
+          url: `https://accounts.google.com/o/oauth2/revoke?token=${this.config.get('token')}`,
+          prefix: '',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        })
+        .then(() => {
+          notify({
+            title: 'Sync Upgraded',
+            body: 'Please reauthorize access to your Google Drive to complete the upgradation.',
+          });
+          return Promise.reject('Online access revoked.');
+        });
+      }
       if (info.scope !== config.scope) return Promise.reject(UNAUTHORIZED);
     })
     .catch(res => {
       if (res === UNAUTHORIZED || res.status === 400 && objectGet(res, 'data.error_description') === 'Invalid Value') {
-        return Promise.reject({ type: 'unauthorized' });
+        return this.refreshToken().then(requestUser);
       }
       return Promise.reject({
         type: 'error',
@@ -81,35 +108,63 @@ const GoogleDrive = BaseService.extend({
   },
   authorize() {
     const params = {
-      response_type: 'token',
+      response_type: 'code',
+      access_type: 'offline',
       client_id: config.client_id,
       redirect_uri: config.redirect_uri,
       scope: config.scope,
     };
+    if (!this.config.get('refresh_token')) params.prompt = 'consent';
     const url = `https://accounts.google.com/o/oauth2/v2/auth?${dumpQuery(params)}`;
     browser.tabs.create({ url });
   },
-  authorized(raw) {
-    const data = loadQuery(raw);
-    if (data.access_token) {
-      this.config.set({
-        token: data.access_token,
-      });
-    }
-  },
   checkAuth(url) {
-    const redirectUri = `${config.redirect_uri}#`;
+    const redirectUri = `${config.redirect_uri}?code=`;
     if (url.startsWith(redirectUri)) {
-      this.authorized(url.slice(redirectUri.length));
-      this.checkSync();
+      this.authState.set('authorizing');
+      this.authorized({
+        code: url.split('#')[0].slice(redirectUri.length),
+      })
+      .then(() => this.checkSync());
       return true;
     }
   },
   revoke() {
     this.config.set({
       token: null,
+      refresh_token: null,
     });
     return this.prepare();
+  },
+  authorized(params) {
+    return this.loadData({
+      method: 'POST',
+      url: 'https://www.googleapis.com/oauth2/v4/token',
+      prefix: '',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: dumpQuery(Object.assign({}, {
+        client_id: config.client_id,
+        client_secret: config.client_secret,
+        redirect_uri: config.redirect_uri,
+        grant_type: 'authorization_code',
+      }, params)),
+      responseType: 'json',
+    })
+    .then(data => {
+      if (data.access_token) {
+        const update = {
+          token: data.access_token,
+        };
+        if (data.refresh_token) {
+          update.refresh_token = data.refresh_token;
+        }
+        this.config.set(update);
+      } else {
+        throw data;
+      }
+    });
   },
   handleMetaError() {
     return {};
