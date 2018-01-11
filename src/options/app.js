@@ -53,8 +53,8 @@ function initScript(script) {
   script._cache = { search, name, lowerName };
 }
 
-function loadData() {
-  sendMessage({ cmd: 'GetData' })
+function loadData(clear) {
+  sendMessage({ cmd: 'GetData', data: clear })
   .then(data => {
     [
       'cache',
@@ -72,9 +72,11 @@ function loadData() {
 
 function initMain() {
   store.loading = true;
-  loadData();
+  loadData(true);
   Object.assign(handlers, {
-    ScriptsUpdated: loadData,
+    ScriptsUpdated() {
+      loadData();
+    },
     UpdateSync(data) {
       store.sync = data;
     },
