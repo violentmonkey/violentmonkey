@@ -28,6 +28,14 @@
           <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
         </tooltip>
       </form>
+      <div class="inline-block">
+        <tooltip title="Use Regex">
+          <toggle-button v-model="searchOptions.useRegex">.*</toggle-button>
+        </tooltip>
+        <tooltip title="Case sensitive">
+          <toggle-button v-model="searchOptions.caseSensitive">Aa</toggle-button>
+        </tooltip>
+      </div>
     </div>
     <vl-code class="editor-code flex-auto"
       :options="cmOptions" v-model="content" @ready="onReady"
@@ -53,6 +61,7 @@ import CodeMirror from 'codemirror';
 import VlCode from 'vueleton/lib/code';
 import Tooltip from 'vueleton/lib/tooltip';
 import { debounce } from 'src/common';
+import ToggleButton from 'src/common/ui/toggle-button';
 
 function getHandler(key) {
   return cm => {
@@ -92,15 +101,26 @@ const cmOptions = {
   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
   theme: 'eclipse',
 };
+const searchOptions = {
+  useRegex: false,
+  caseSensitive: false,
+};
 
 function findNext(cm, state, reversed) {
   cm.operation(() => {
-    const query = state.query || '';
-    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo);
+    let query = state.query || '';
+    if (query && searchOptions.useRegex) {
+      query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
+    }
+    const options = {
+      caseFold: !searchOptions.caseSensitive,
+    };
+    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo, options);
     if (!cursor.find(reversed)) {
       cursor = cm.getSearchCursor(
         query,
         reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
+        options,
       );
       if (!cursor.find(reversed)) return;
     }
@@ -149,10 +169,12 @@ export default {
   components: {
     VlCode,
     Tooltip,
+    ToggleButton,
   },
   data() {
     return {
       cmOptions,
+      searchOptions,
       content: this.value,
       search: {
         show: false,
