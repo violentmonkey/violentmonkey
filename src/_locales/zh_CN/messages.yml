@@ -422,6 +422,12 @@ msgUpdating:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 先显示被启用的脚本
+searchCaseSensitive:
+  description: Option to perform a case-sensitive search
+  message: 区分大小写
+searchUseRegex:
+  description: Option to perform a regular expression search
+  message: 使用正则表达式
 sideMenuAbout:
   description: 'Side menu: About'
   message: 关于

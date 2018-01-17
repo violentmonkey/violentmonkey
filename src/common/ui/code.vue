@@ -29,10 +29,10 @@
         </tooltip>
       </form>
       <div class="inline-block">
-        <tooltip title="Use Regex">
+        <tooltip :title="i18n('searchUseRegex')">
           <toggle-button v-model="searchOptions.useRegex">.*</toggle-button>
         </tooltip>
-        <tooltip title="Case sensitive">
+        <tooltip :title="i18n('searchCaseSensitive')">
           <toggle-button v-model="searchOptions.caseSensitive">Aa</toggle-button>
         </tooltip>
       </div>

@@ -424,6 +424,12 @@ msgUpdating:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Show enabled scripts first
+searchCaseSensitive:
+  description: Option to perform a case-sensitive search
+  message: Case sensitive
+searchUseRegex:
+  description: Option to perform a regular expression search
+  message: Use Regex
 sideMenuAbout:
   description: 'Side menu: About'
   message: About
