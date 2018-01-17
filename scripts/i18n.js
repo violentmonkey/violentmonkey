@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
-const gutil = require('gulp-util');
+const Vinyl = require('vinyl');
+const PluginError = require('plugin-error');
 const through = require('through2');
 const yaml = require('js-yaml');
 
@@ -111,8 +112,7 @@ class Locales {
       const data = this.getData(lang, options);
       const locale = this.data[lang];
       const out = locale.dump(data, options);
-      return new gutil.File({
-        base: '',
+      return new Vinyl({
         path: out.path,
         contents: new Buffer(out.data),
       });
@@ -159,7 +159,7 @@ function extract(options) {
 
   function bufferContents(file, enc, cb) {
     if (file.isNull()) return cb();
-    if (file.isStream()) return this.emit('error', new gutil.PluginError('VM-i18n', 'Stream is not supported.'));
+    if (file.isStream()) return this.emit('error', new PluginError('VM-i18n', 'Stream is not supported.'));
     const extname = path.extname(file.path);
     const type = types[extname];
     type && extract(file.contents, type);

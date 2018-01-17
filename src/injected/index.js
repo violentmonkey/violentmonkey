@@ -7,6 +7,7 @@ import initialize from './content';
   if (window.VM) return;
   window.VM = 1;
 
+  // eslint-disable-next-line camelcase
   const { VM_initializeWeb } = window;
 
   function initBridge() {
