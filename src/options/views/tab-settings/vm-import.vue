@@ -96,18 +96,18 @@ function getVMFile(entry, vmFile) {
 }
 
 function getVMFiles(entries) {
-  const i = entries.findIndex(entry => entry.filename && entry.filename.toLowerCase() === 'violentmonkey');
-  if (i < 0) {
-    return { entries };
-  }
   return new Promise(resolve => {
+    const data = { entries };
+    const i = entries.findIndex(entry => entry.filename && entry.filename.toLowerCase() === 'violentmonkey');
+    if (i < 0) {
+      data.vm = {};
+      return resolve(data);
+    }
     const writer = new zip.TextWriter();
     entries[i].getData(writer, text => {
       entries.splice(i, 1);
-      resolve({
-        entries,
-        vm: getVMConfig(text),
-      });
+      data.vm = getVMConfig(text);
+      resolve(data);
     });
   });
 }
