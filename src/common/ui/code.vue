@@ -202,6 +202,12 @@ export default {
     'search.state.query'() {
       this.debouncedFind();
     },
+    searchOptions: {
+      deep: true,
+      handler() {
+        this.debouncedFind();
+      },
+    },
   },
   methods: {
     onReady(cm) {
