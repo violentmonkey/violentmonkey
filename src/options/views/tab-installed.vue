@@ -152,12 +152,17 @@ export default {
         : scripts.slice();
       if (sort.value === 'alpha') {
         const showEnabledFirst = options.get('filters.showEnabledFirst');
-        filteredScripts.sort((a, b) => {
-          if (showEnabledFirst && a.config.enabled !== b.config.enabled) {
-            return a.config.enabled ? -1 : 1;
+        const getSortKey = item => {
+          const keys = [];
+          if (showEnabledFirst) {
+            keys.push(item.config.enabled ? 0 : 1);
           }
-          const { _cache: { lowerName: nameA } } = a;
-          const { _cache: { lowerName: nameB } } = b;
+          keys.push(item._cache.lowerName);
+          return keys.join('');
+        };
+        filteredScripts.sort((a, b) => {
+          const nameA = getSortKey(a);
+          const nameB = getSortKey(b);
           if (nameA < nameB) return -1;
           if (nameA > nameB) return 1;
           return 0;
