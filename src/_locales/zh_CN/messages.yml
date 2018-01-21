@@ -210,6 +210,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: 通用
+labelHomepage:
+  description: Label for home page in about tab.
+  message: 主页
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 主页地址：

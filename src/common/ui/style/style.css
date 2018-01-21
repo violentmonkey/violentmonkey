@@ -18,7 +18,7 @@ button,
 select,
 input,
 textarea {
-  font-family: "PingFang SC", STHeiti, "Microsoft YaHei", sans-serif;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", sans-serif;
 }
 
 h1 {

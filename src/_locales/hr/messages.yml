@@ -212,6 +212,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: Generalni
+labelHomepage:
+  description: Label for home page in about tab.
+  message: ''
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Homepage URL:'
