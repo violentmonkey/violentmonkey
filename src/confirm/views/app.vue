@@ -34,10 +34,9 @@ import options from 'src/common/options';
 import initCache from 'src/common/cache';
 import VmCode from 'src/common/ui/code';
 import SettingCheck from 'src/common/ui/setting-check';
-import getPathInfo from 'src/common/pathinfo';
+import { route } from 'src/common/router';
 
 const cache = initCache({});
-const { query } = getPathInfo();
 
 export default {
   components: {
@@ -67,7 +66,7 @@ export default {
     this.message = this.i18n('msgLoadingData');
     this.loadInfo()
     .then(() => {
-      const id = query.id;
+      const id = route.paths[0];
       this.guard = setInterval(() => {
         sendMessage({
           cmd: 'CacheHit',
@@ -91,7 +90,7 @@ export default {
   },
   methods: {
     loadInfo() {
-      const id = query.id;
+      const id = route.paths[0];
       return sendMessage({
         cmd: 'CacheLoad',
         data: `confirm-${id}`,

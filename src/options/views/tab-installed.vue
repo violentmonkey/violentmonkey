@@ -8,7 +8,7 @@
               <icon name="plus"></icon>
             </span>
           </tooltip>
-          <div class="dropdown-menu-item" v-text="i18n('buttonNew')" @click.prevent="newScript"></div>
+          <div class="dropdown-menu-item" v-text="i18n('buttonNew')" @click.prevent="onEditScript('_new')"></div>
           <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
           <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank"></a>
           <div class="dropdown-menu-item" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></div>
@@ -51,12 +51,12 @@
     <div class="scripts">
       <item v-for="script in store.filteredScripts" :key="script.props.id"
       :script="script" :draggable="filters.sort.value === 'exec' && !script.config.removed"
-      @edit="editScript" @move="moveScript"></item>
+      @edit="onEditScript" @move="moveScript"></item>
     </div>
     <div class="backdrop" :class="{mask: store.loading}" v-show="message">
       <div v-html="message"></div>
     </div>
-    <edit v-if="script" :initial="script" @close="endEditScript"></edit>
+    <edit v-if="script" :initial="script" @close="onEditScript()"></edit>
   </div>
 </template>
 
@@ -70,6 +70,7 @@ import SettingCheck from 'src/common/ui/setting-check';
 import hookSetting from 'src/common/hook-setting';
 import Icon from 'src/common/ui/icon';
 import LocaleGroup from 'src/common/ui/locale-group';
+import { setRoute } from 'src/common/router';
 import Item from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
@@ -127,7 +128,11 @@ export default {
   watch: {
     search: 'updateLater',
     'filters.sort.value': 'updateLater',
-    'store.scripts': 'onUpdate',
+    'store.scripts'() {
+      this.onUpdate();
+      this.onHashChange();
+    },
+    'store.route.paths.1': 'onHashChange',
   },
   computed: {
     message() {
@@ -173,9 +178,6 @@ export default {
     updateLater() {
       this.debouncedUpdate();
     },
-    newScript() {
-      this.script = {};
-    },
     updateAll() {
       sendMessage({ cmd: 'CheckUpdateAll' });
     },
@@ -203,12 +205,6 @@ export default {
       .catch(err => {
         if (err) showMessage({ text: err });
       });
-    },
-    editScript(id) {
-      this.script = this.store.scripts.find(script => script.props.id === id);
-    },
-    endEditScript() {
-      this.script = null;
     },
     moveScript(data) {
       if (data.from === data.to) return;
@@ -241,6 +237,18 @@ export default {
     },
     onStateChange(active) {
       this.menuNewActive = active;
+    },
+    onEditScript(id) {
+      setRoute(['scripts', id].filter(Boolean).join('/'), true);
+    },
+    onHashChange() {
+      const id = this.store.route.paths[1];
+      if (id === '_new') {
+        this.script = {};
+      } else {
+        const nid = id && +id || null;
+        this.script = nid && this.store.scripts.find(script => script.props.id === nid);
+      }
     },
   },
   created() {
