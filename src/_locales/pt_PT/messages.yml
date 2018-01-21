@@ -433,10 +433,10 @@ optionShowEnabledFirst:
   message: Mostrar scripts ativos primeiro
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: Respeitar maiúsculas/minúsculas
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Utilizar expressão regular
 sideMenuAbout:
   description: 'Side menu: About'
   message: Acerca de
