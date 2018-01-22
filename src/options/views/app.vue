@@ -11,7 +11,7 @@
         <a href="#about" :class="{active: tab === 'about'}" v-text="i18n('sideMenuAbout')"></a>
       </div>
     </aside>
-    <component :is="getTab()" class="tab flex-auto"></component>
+    <component :is="tabComponent" class="tab flex-auto"></component>
   </div>
 </template>
 
@@ -41,9 +41,7 @@ export default {
       if (!tabs[tab]) tab = 'scripts';
       return tab;
     },
-  },
-  methods: {
-    getTab() {
+    tabComponent() {
       return tabs[this.tab];
     },
   },
