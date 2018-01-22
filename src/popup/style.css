@@ -1,5 +1,5 @@
 body {
-  width: 20rem;
+  min-width: 20rem;
 }
 
 .logo {
@@ -43,7 +43,7 @@ body {
       color: white;
     }
     .icon {
-      width: 1rem;
+      flex: 0 0 1rem;
     }
     > .flex-auto {
       &:first-child {
