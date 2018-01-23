@@ -105,7 +105,7 @@ descCustomCSS:
   description: Description of custom CSS section.
   message: >-
     'Προσαρμοσμένη CSS για την σελίδα των επιλογών και την σελίδα εγκατάστασης
-    σεναρίων. Αν δεν είσαι σίγουρος τι είναι αυτό, παρακαλώ μην το αλλάξεις.'
+    σεναρίων. Αν δεν είστε σίγουρος(η) τι είναι αυτό, παρακαλώ μην το αλλάξετε.'
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Προσαρμοσμένα μεταδεδομένα
@@ -199,7 +199,7 @@ labelDonate:
   message: Δωρίστε
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'Download URL:'
+  message: 'URL Λήψης:'
 labelExclude:
   description: Label of @exclude rules.
   message: 'Κανόνες @exclude'
@@ -220,7 +220,7 @@ labelGeneral:
   message: Γενικές
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Homepage URL:'
+  message: 'URL Αρχικής Σελίδας:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Ρυθμίσεις εισαγωγής
@@ -286,159 +286,159 @@ labelSettings:
   message: Ρυθμίσεις
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: Show number of running scripts on the badge
+  message: Εμφάνιση του αριθμού των σεναρίων που τρέχουν στο σήμα
   touched: false
 labelSync:
   description: Label for sync options.
-  message: Sync
+  message: Συγχρονισμός
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Authorize
+  message: Εξουσιοδότησε
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Authorizing
+  message: Εξουσιοδότηση
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: None
+  message: Κανένας
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: Reauthorize automatically when expired
+  message: Αυτόματη επανεξουσιοδότηση όταν λήξει
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Revoke
+  message: Ανάκληση
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Sync script status
+  message: Κατάσταση συγχρονισμού σεναρίου
 labelSyncService:
   description: Label for sync service select.
-  message: Sync to
+  message: Συγχρονισμός σε
 labelTranslator:
   description: Label of translator.
-  message: 'Translator: '
+  message: 'Μεταφραστής: '
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'Update URL:'
+  message: 'URL Ενημέρωσης:'
 lastSync:
   description: Label for last sync timestamp.
-  message: Last sync at $1
+  message: Τελευταίος συγχρονισμός στις $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Learn more about blacklist patterns.
+  message: Μάθετε περισσότερα για τα πρότυπα της μαύρης λίστας.
 menuCommands:
   description: Menu item to list script commands.
-  message: Script commands
+  message: Εντολές σεναρίου
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: Open Dashboard
+  message: Άνοιγμα Ταμπλό
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Find scripts for this site
+  message: 'Βρείτε σενάρια γι᾽ αυτήν την σελίδα'
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Matched scripts
+  message: Σενάρια που ταιριάζουν
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Scripts disabled
+  message: Σενάρια απενεργοποιήθηκαν
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Scripts enabled
+  message: Σενάρια ενεργοποιήθηκαν
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Checking for updates...
+  message: Έλεγχος για αναβαθμίσεις...
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Error fetching script!
+  message: Σφάλμα λήψης σεναρίου!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Failed fetching update information.
+  message: Αδυναμία λήψης πληροφοριών ενημέρωσης.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Error loading script data.
+  message: Σφάλμα φόρτωσης δεδομένων σεναρίων.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: Error loading dependencies.
+  message: Σφάλμα φόρτωσης εξαρτήσεων.
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: $1 item(s) are imported.
+  message: $1 αντικείμενο(α) εισήχθησαν.
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Script installed.
+  message: Σενάριο εγκαταστάθηκε.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Invalid script!
+  message: Μη έγκυρο σενάριο!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: Script data loaded.
+  message: Φορτώθηκαν δεδομένα σεναρίου.
 msgLoading:
   description: Message shown in the options page before script list is loaded.
-  message: Loading ...
+  message: Φόρτωση ...
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Loading script data...
+  message: Φόρτωση δεδομένων σεναρίου...
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: Loading dependencies... ($1/$2)
+  message: Φόρτωση εξαρτήσεων... ($1/$2)
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Script namespace conflicts! Please modify @name and @namespace.
+  message: Σύγκρουση χώρου ονόματος σεναρίου! Παρακαλώ αλλάξτε το @name και το @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: New version found.
+  message: Βρέθηκε νέα έκδοση.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: No update found.
+  message: Δεν βρέθηκε ενημέρωση.
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: Blacklist updated.
+  message: Η Μαύρη λίστα ενημερώθηκε.
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: Custom style is updated.
+  message: Το προσαρμοσμένο στυλ ενημερώθηκε.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Script [$1] is updated!'
+  message: 'Το σενάριο [$1] είναι ενημερωμένο!'
 msgSyncError:
   description: Message shown when sync failed.
-  message: Sync error!
+  message: Σφάλμα συγχρονισμού!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Initializing...
+  message: Αρχικοποίηση...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: Initializing error!
+  message: Σφάλμα αρχικοποίησης!
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: Sync will start soon...
+  message: Ο συγχρονισμός θα ξεκινήσει σύντομα...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Sync in progress...
+  message: Συγχρονισμός σε εξέλιξη...
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Script updated.
+  message: Σενάριο ενημερώθηκε.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Updating...
+  message: Ενημέρωση...
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Show enabled scripts first
+  message: Εμφάνιση των ενεργοποιημένων σεναρίων πρώτα
 sideMenuAbout:
   description: 'Side menu: About'
-  message: About
+  message: Σχετικά
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: Installed scripts
+  message: Εγκατεστημένα σενάρια
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Settings
+  message: Ρυθμίσεις
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: Update
+  message: Ενημέρωση
