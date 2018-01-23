@@ -184,106 +184,106 @@ labelBlacklist:
   message: Μαύρη λίστα
 labelCurrentLang:
   description: Label of current language.
-  message: 'Current Language: '
+  message: 'Τρέχουσα Γλώσσα: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Custom Style
+  message: Προσαρμοσμένο Στυλ
 labelDataExport:
   description: Section title of data export.
-  message: Data Export
+  message: Εξαγωγή Δεδομένων
 labelDataImport:
   description: Section title of data import.
-  message: Data Import
+  message: Εισαγωγή Δεδομένων
 labelDonate:
   description: Label of link to donate page.
-  message: Donate
+  message: Δωρίστε
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'Download URL:'
 labelExclude:
   description: Label of @exclude rules.
-  message: '@exclude rules'
+  message: 'Κανόνες @exclude'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match rules'
+  message: 'Κανόνες @exclude-match'
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Export script data
+  message: Εξαγωγή δεδομένων σεναρίου
 labelFeedback:
   description: Label of link to feedback page.
-  message: Feedback
+  message: Σχόλια
 labelFilterSort:
   description: Label for sort filter.
-  message: Sort by $1
+  message: Ταξινόμηση κατά $1
 labelGeneral:
   description: Label for general settings.
-  message: General
+  message: Γενικές
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Homepage URL:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Import settings
+  message: Ρυθμίσεις εισαγωγής
 labelInclude:
   description: Label of @include rules.
-  message: '@include rules'
+  message: 'Κανόνες @include'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Installing script
+  message: Σενάριο εγκατάστασης
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Keep original
+  message: Κρατήστε τα αρχικά 
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: Last updated at $1
+  message: Τελευταία ενημέρωση στις $1
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Line no.: '
+  message: 'Αριθμός γραμμής: '
 labelMatch:
   description: Label of @match rules.
-  message: '@match rules'
+  message: 'Κανόνες @match'
 labelName:
   description: Label of script name.
-  message: 'Name:'
+  message: 'Όνομα:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: No Name
+  message: Χωρίς Όνομα
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'Oops, you haven''t got any script yet.'
+  message: 'Ωχ, δεν έχετε κανένα σενάριο ακόμα.'
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: No script is found.
+  message: Δεν βρέθηκε σενάριο.
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Notify script updates
+  message: Ειδοποίηση ενημερώσεων σεναρίου
 labelRelated:
   description: Label of related links.
-  message: 'Related links: '
+  message: 'Σχετικοί σύνδεσμοι: '
 labelRemoved:
   description: Label shown when a script is removed.
-  message: '[Removed]'
+  message: '[Αφαιρέθηκε]'
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Replace with: '
+  message: 'Αντικατάσταση με: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Run-At:'
+  message: 'Εκτέλεση κατά:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Default)
+  message: (Προκαθορισμένο)
 labelScriptEditor:
   description: Shown in the title of the script editing page.
-  message: Script Editor
+  message: Επεξεργαστής σεναρίου
 labelSearch:
   description: Label for search input in search box.
-  message: 'Search for: '
+  message: 'Αναζήτηση για: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Search scripts...
+  message: Αναζήτηση σεναρίων...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Settings
+  message: Ρυθμίσεις
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
   message: Show number of running scripts on the badge
