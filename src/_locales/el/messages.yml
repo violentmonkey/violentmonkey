@@ -202,10 +202,10 @@ labelDownloadURL:
   message: 'URL Λήψης:'
 labelExclude:
   description: Label of @exclude rules.
-  message: 'Κανόνες @exclude'
+  message: Κανόνες @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: 'Κανόνες @exclude-match'
+  message: Κανόνες @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Εξαγωγή δεδομένων σεναρίου
@@ -218,6 +218,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: Γενικές
+labelHomepage:
+  description: Label for home page in about tab.
+  message: ''
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL Αρχικής Σελίδας:'
@@ -226,13 +229,13 @@ labelImportSettings:
   message: Ρυθμίσεις εισαγωγής
 labelInclude:
   description: Label of @include rules.
-  message: 'Κανόνες @include'
+  message: Κανόνες @include
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Σενάριο εγκατάστασης
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Κρατήστε τα αρχικά 
+  message: Κρατήστε τα αρχικά
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: Τελευταία ενημέρωση στις $1
@@ -241,7 +244,7 @@ labelLineNumber:
   message: 'Αριθμός γραμμής: '
 labelMatch:
   description: Label of @match rules.
-  message: 'Κανόνες @match'
+  message: Κανόνες @match
 labelName:
   description: Label of script name.
   message: 'Όνομα:'
@@ -332,7 +335,7 @@ menuDashboard:
   message: Άνοιγμα Ταμπλό
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: 'Βρείτε σενάρια γι᾽ αυτήν την σελίδα'
+  message: Βρείτε σενάρια γι᾽ αυτήν την σελίδα
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Σενάρια που ταιριάζουν
@@ -388,7 +391,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Σύγκρουση χώρου ονόματος σεναρίου! Παρακαλώ αλλάξτε το @name και το @namespace.
+  message: >-
+    Σύγκρουση χώρου ονόματος σεναρίου! Παρακαλώ αλλάξτε το @name και το
+    @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -430,6 +435,12 @@ msgUpdating:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Εμφάνιση των ενεργοποιημένων σεναρίων πρώτα
+searchCaseSensitive:
+  description: Option to perform a case-sensitive search
+  message: ''
+searchUseRegex:
+  description: Option to perform a regular expression search
+  message: ''
 sideMenuAbout:
   description: 'Side menu: About'
   message: Σχετικά
