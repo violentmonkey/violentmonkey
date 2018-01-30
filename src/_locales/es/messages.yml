@@ -449,3 +449,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Actualizar
+warnScriptTooLarge:
+  description: Warning message shown when script is too large to be edited.
+  message: ''

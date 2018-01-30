@@ -4,8 +4,9 @@
       <h2 v-text="i18n('labelScriptEditor')"></h2>
       <div class="flex-auto pos-rel px-2">
         <div class="edit-nav">
-          <div v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
-          <div v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
+          <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
+          <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
+          <span class="text-red" v-if="tooLarge" v-text="i18n('warnScriptTooLarge')"></span>
         </div>
       </div>
       <div class="buttons">
@@ -18,7 +19,7 @@
     <div class="frame-block flex-auto pos-rel">
       <vm-code
         v-show="nav === 'code'" class="abs-full"
-        v-model="code" :commands="commands"
+        v-model="code" :commands="commands" @warnLarge="onWarnLarge"
       />
       <vm-settings
         v-show="nav === 'settings'" class="abs-full"
@@ -55,6 +56,7 @@ export default {
       nav: 'code',
       canSave: false,
       script: null,
+      tooLarge: false,
       code: '',
       settings: {},
       commands: {
@@ -192,6 +194,9 @@ export default {
     saveClose() {
       this.save().then(this.close);
     },
+    onWarnLarge(tooLarge) {
+      this.tooLarge = tooLarge;
+    },
   },
 };
 </script>
@@ -207,18 +212,22 @@ export default {
     position: absolute;
     left: 0;
     bottom: 0;
-    > div {
-      display: inline-block;
-      padding: 8px 16px;
-      color: #bbb;
-      &.active {
-        background: white;
-        box-shadow: 0 -1px 1px #bbb;
-        color: #333;
-      }
-      &:hover {
-        box-shadow: 0 -1px 1px #bbb;
-      }
+    .text-red {
+      margin-left: 8px;
+    }
+  }
+  &-nav-item {
+    display: inline-block;
+    padding: 8px 16px;
+    cursor: pointer;
+    color: #bbb;
+    &.active {
+      background: white;
+      box-shadow: 0 -1px 1px #bbb;
+      color: #333;
+    }
+    &:hover {
+      box-shadow: 0 -1px 1px #bbb;
     }
   }
 }
