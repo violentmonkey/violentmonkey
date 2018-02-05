@@ -71,23 +71,16 @@ function getHandler(key) {
     return handle && handle();
   };
 }
-function indentWithTab(cm) {
-  if (cm.somethingSelected()) {
-    cm.indentSelection('add');
-  } else {
-    cm.replaceSelection(
-      cm.getOption('indentWithTabs') ? '\t' : ' '.repeat(cm.getOption('indentUnit')),
-      'end',
-      '+input',
-    );
-  }
-}
 
 [
   'save', 'cancel', 'close',
   'find', 'findNext', 'findPrev', 'replace', 'replaceAll',
 ].forEach(key => {
   CodeMirror.commands[key] = getHandler(key);
+});
+Object.assign(CodeMirror.keyMap.default, {
+  Tab: 'indentMore',
+  'Shift-Tab': 'indentLess',
 });
 
 const cmOptions = {
@@ -268,7 +261,6 @@ export default {
       }, this.commands);
       cm.setOption('extraKeys', {
         Esc: 'cancel',
-        Tab: indentWithTab,
       });
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
