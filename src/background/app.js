@@ -67,12 +67,9 @@ const commands = {
     return removeScript(id)
     .then(() => { sync.sync(); });
   },
-  GetData() {
-    return checkRemove()
-    .then(changed => {
-      if (changed) sync.sync();
-      return getData();
-    })
+  GetData(clear) {
+    return (clear ? checkRemove() : Promise.resolve())
+    .then(getData)
     .then(data => {
       data.sync = sync.getStates();
       data.version = VM_VER;

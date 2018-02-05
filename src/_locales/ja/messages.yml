@@ -212,6 +212,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: 基本設定
+labelHomepage:
+  description: Label for home page in about tab.
+  message: ''
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'ホームページのURL:'
@@ -424,6 +427,12 @@ msgUpdating:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 有効にされたスクリプトを先に
+searchCaseSensitive:
+  description: Option to perform a case-sensitive search
+  message: ''
+searchUseRegex:
+  description: Option to perform a regular expression search
+  message: ''
 sideMenuAbout:
   description: 'Side menu: About'
   message: Violentmonkey について
@@ -436,3 +445,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: 更新
+warnScriptTooLarge:
+  description: Warning message shown when script is too large to be edited.
+  message: ''

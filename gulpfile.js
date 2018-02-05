@@ -1,6 +1,6 @@
-const del = require('del');
 const gulp = require('gulp');
-const gutil = require('gulp-util');
+const del = require('del');
+const log = require('fancy-log');
 const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const plumber = require('gulp-plumber');
@@ -12,6 +12,7 @@ const string = require('./scripts/string');
 const { IS_DEV } = require('./scripts/utils');
 const pkg = require('./package.json');
 
+const DIST = 'dist';
 const paths = {
   manifest: 'src/manifest.yml',
   copy: [
@@ -28,48 +29,54 @@ const paths = {
 
 function webpackCallback(err, stats) {
   if (err) {
-    gutil.log('[FATAL]', err);
+    log('[FATAL]', err);
     return;
   }
   if (stats.hasErrors()) {
-    gutil.log('[ERROR] webpack compilation failed\n', stats.toJson().errors.join('\n'));
+    log('[ERROR] webpack compilation failed\n', stats.toJson().errors.join('\n'));
     return;
   }
   if (stats.hasWarnings()) {
-    gutil.log('[WARNING] webpack compilation has warnings\n', stats.toJson().warnings.join('\n'));
+    log('[WARNING] webpack compilation has warnings\n', stats.toJson().warnings.join('\n'));
   }
   (Array.isArray(stats.stats) ? stats.stats : [stats])
   .forEach(stat => {
     const timeCost = (stat.endTime - stat.startTime) / 1000;
     const chunks = Object.keys(stat.compilation.namedChunks).join(' ');
-    gutil.log(`Webpack built: [${timeCost.toFixed(3)}s] ${chunks}`);
+    log(`Webpack built: [${timeCost.toFixed(3)}s] ${chunks}`);
   });
 }
 
-gulp.task('clean', () => del(['dist']));
+function clean() {
+  return del(DIST);
+}
 
-gulp.task('pack', ['manifest', 'copy-files', 'copy-i18n']);
+function watch() {
+  gulp.watch(paths.manifest, manifest);
+  gulp.watch(paths.copy, copyFiles);
+  gulp.watch(paths.locales.concat(paths.templates), copyI18n);
+}
 
-gulp.task('watch', ['pack', 'js-dev'], () => {
-  gulp.watch(paths.manifest, ['manifest']);
-  gulp.watch(paths.copy, ['copy-files']);
-  gulp.watch(paths.locales.concat(paths.templates), ['copy-i18n']);
-});
+function jsDev(done) {
+  let firstRun = true;
+  webpack(webpackConfig).watch({}, (...args) => {
+    webpackCallback(...args);
+    if (firstRun) {
+      firstRun = false;
+      done();
+    }
+  });
+}
 
-gulp.task('build', ['pack', 'js-prd']);
-
-gulp.task('js-dev', () => {
-  webpack(webpackConfig).watch({}, webpackCallback);
-});
-gulp.task('js-prd', cb => {
+function jsProd(done) {
   webpack(webpackConfig, (...args) => {
     webpackCallback(...args);
-    cb();
+    done();
   });
-});
+}
 
-gulp.task('manifest', () => (
-  gulp.src(paths.manifest, { base: 'src' })
+function manifest() {
+  return gulp.src(paths.manifest, { base: 'src' })
   .pipe(string((input, file) => {
     const data = yaml.safeLoad(input);
     // Strip alphabetic suffix
@@ -81,10 +88,10 @@ gulp.task('manifest', () => (
     file.path = file.path.replace(/\.yml$/, '.json');
     return JSON.stringify(data);
   }))
-  .pipe(gulp.dest('dist'))
-));
+  .pipe(gulp.dest(DIST));
+}
 
-gulp.task('copy-files', () => {
+function copyFiles() {
   const jsFilter = gulpFilter(['**/*.js'], { restore: true });
   let stream = gulp.src(paths.copy, { base: 'src' });
   if (!IS_DEV) stream = stream
@@ -92,11 +99,11 @@ gulp.task('copy-files', () => {
   .pipe(uglify())
   .pipe(jsFilter.restore);
   return stream
-  .pipe(gulp.dest('dist/'));
-});
+  .pipe(gulp.dest(DIST));
+}
 
-gulp.task('copy-i18n', () => (
-  gulp.src(paths.templates)
+function copyI18n() {
+  return gulp.src(paths.templates)
   .pipe(plumber(logError))
   .pipe(i18n.extract({
     base: 'src/_locales',
@@ -105,15 +112,15 @@ gulp.task('copy-i18n', () => (
     markUntouched: false,
     extension: '.json',
   }))
-  .pipe(gulp.dest('dist/_locales'))
-));
+  .pipe(gulp.dest(`${DIST}/_locales`));
+}
 
 /**
  * Load locale files (src/_locales/<lang>/message.[json|yml]), and
  * update them with keys in template files, then store in `message.yml`.
  */
-gulp.task('i18n', () => (
-  gulp.src(paths.templates)
+function updateI18n() {
+  return gulp.src(paths.templates)
   .pipe(plumber(logError))
   .pipe(i18n.extract({
     base: 'src/_locales',
@@ -122,10 +129,17 @@ gulp.task('i18n', () => (
     markUntouched: true,
     extension: '.yml',
   }))
-  .pipe(gulp.dest('src/_locales'))
-));
+  .pipe(gulp.dest('src/_locales'));
+}
 
 function logError(err) {
-  gutil.log(err.toString());
+  log(err.toString());
   return this.emit('end');
 }
+
+const pack = gulp.parallel(manifest, copyFiles, copyI18n);
+
+exports.clean = clean;
+exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
+exports.build = gulp.parallel(pack, jsProd);
+exports.i18n = updateI18n;

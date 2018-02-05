@@ -3,432 +3,438 @@ anchorAuthor:
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 anchorTranslator:
   description: Translator shown on about tab.
-  message: raina
+  message: '<a href=mailto:theseas.work@gmail.com>Theseas Maroulis</a>'
 buttonAllNone:
   description: Button to select all scripts or none.
-  message: Kaikki/Ei mitään
+  message: Όλα/Κανένα
 buttonCancel:
   description: Cancel button on dialog.
-  message: Peruuta
+  message: Ακύρωση
 buttonClose:
   description: Button to close window.
-  message: Sulje
+  message: Κλείσιμο
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: Vahvista asennus
+  message: Επιβεβαίωση εγκατάστασης
 buttonDisable:
   description: Button to disable a script.
-  message: Poista käytöstä
+  message: Απενεργοποίηση
 buttonEdit:
   description: Button to edit a script.
-  message: Muokkaa
+  message: Επεξεργασία
 buttonEnable:
   description: Button to enable a script.
-  message: Ota käyttöön
+  message: Ενεργοποίηση
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Vie zip-tiedostoon
+  message: Εξαγωγή σε zip
 buttonFilter:
   description: Button to show filters menu.
-  message: Suodattimet
+  message: Φίλτρα
 buttonHome:
   description: Button to open homepage.
-  message: Kotisivu
+  message: Αρχική σελίδα
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Tuo zip-tiedostosta
+  message: Εισαγωγή από zip
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Asenna osoitteesta
+  message: Εγκατάσταση από URL
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
-  message: Valinnat
+  message: Επιλογές
 buttonNew:
   description: Button to create a new script.
-  message: Uusi
+  message: Νέο
 buttonOK:
   description: OK button on dialog.
-  message: OK
+  message: Εντάξει
 buttonRemove:
   description: Button to remove a script.
-  message: Poista
+  message: Αφαίρεση
 buttonReplace:
   description: Button to replace the current match.
-  message: Korvaa
+  message: Αντικατάσταση
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: Kaikki
+  message: Όλα
 buttonSave:
   description: Button to save modifications of a script.
-  message: Tallenna
+  message: Αποθήκευση
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: Tallenna
+  message: Αποθήκευση
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: Tallenna & sulje
+  message: Αποθήκευση και Κλείσιμο
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: Tallenna
+  message: Αποθήκευση
 buttonSupport:
   description: Button to open support page.
-  message: Tukisivu
+  message: Βοήθεια
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Peruuta
+  message: Αναίρεση
 buttonUpdate:
   description: Check a script for updates.
-  message: Tarkista päivitykset
+  message: Έλεγχος για αναβαθμίσεις
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Tarkista kaikki päivitykset
+  message: Έλεγχος όλων για αναβαθμίσεις
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Imuroi tietokanta
+  message: Εκκαθάριση βάσης δεδομένων
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Data imuroitu
+  message: Δεδομένα διαγράφηκαν
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Imuroidaan dataa...
+  message: Διαγραφή δεδομένων...
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    Muokkauksia ei ole tallennettu!
-    Klikkaa OK hylätäksesi ne tai Peruuta pysyäksesi tässä.
+    'Οι αλλαγές δεν αποθηκεύτηκαν!'
+    'Πατήστε Εντάξει για να τις απορρίψετε ή Άκυρο για να παραμείνετε.'
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: Listan osoitteissa ei ajeta skriptejä.
+  message: >-
+    Στα URL που ταιριάζουν σε αυτήν την λίστα δεν θα εκτελούνται σενάρια
+    εντολών.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Oma tyyli asetussivua ja skriptien asennussivua varten. Jos et ole varma,
-    mitä olet tekemässä, älä muokkaa tätä.
+    'Προσαρμοσμένη CSS για την σελίδα των επιλογών και την σελίδα εγκατάστασης
+    σεναρίων. Αν δεν είστε σίγουρος(η) τι είναι αυτό, παρακαλώ μην το αλλάξετε.'
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: Oma metadata
+  message: Προσαρμοσμένα μεταδεδομένα
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Skriptin asetukset
+  message: Ρυθμίσεις δέσμης ενεργειών
 editNavCode:
   description: Label of code tab in script editor.
-  message: Koodi
+  message: Κώδικας
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: Asetukset
+  message: Ρυθμίσεις
 extDescription:
   description: Description for this extension.
-  message: Tarjoaa selaimiin tuen käyttäjäskripteille.
+  message: Προσφέρει υποστήριξη για σενάρια χρηστών για τους φυλλομετρητές.
 extName:
   description: Name of this extension.
   message: Violentmonkey
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: aakkosjärjestys
+  message: αλφαβητική σειρά
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ajojärjestys
+  message: σειρά εκτέλεσης
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'Syötä osoite:'
+  message: 'Εισαγωγή URL:'
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: Käytä latausosoitetta (@downloadURL)
+  message: Χρήση @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Hylkää redundanssi ja yritä ladata puuttuvat resurssit välimuistiin.
+  message: >-
+    Απόρριψη των περιττών και προσπάθεια επαναφόρτωσης των πόρων που λείπουν
+    στην cache.
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Asenna lähteestä $1
+  message: Εγκατάσταση από $1
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Sulje asennuksen jälkeen
+  message: Κλείσιμο μετά την εγκατάσταση
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Seuraa paikallista tiedostoa ennen ikkunan sulkemista
+  message: Παρακολούθηση του τοπικού αρχείου πριν αυτό το παράθυρο κλείσει
 labelAbout:
   description: Label shown on top of the about page.
-  message: Tietoja Violentmonkeystä
+  message: Περί του Violentmonkey
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Salli päivitykset
+  message: Επιτρέψτε αναβαθμίσεις
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 'Tekijä: '
+  message: 'Συγγραφέας: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Lataa välilehti uudelleen kytkettäessä skripti päälle/pois päältä valikosta
+  message: >-
+    Επαναφόρτωση τρέχουσας καρτέλας μετά την ενεργοποίηση/απενεργοποίηση ενός
+    σεναρίου από το μενού
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Tarkista skriptien päivitykset joka päivä
+  message: Καθημερινός αυτόματος έλεγχος ενημερώσεων για τα σενάρια
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'Εμφάνιση στο εικονίδιο: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: τίποτα
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: αριθμός των σεναρίων που εκτελούνται
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: αριθμός των μοναδικών σεναρίων που εκτελούνται
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Musta lista
+  message: Μαύρη λίστα
 labelCurrentLang:
   description: Label of current language.
-  message: 'Nykyinen kieli: '
+  message: 'Τρέχουσα Γλώσσα: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Oma tyyli
+  message: Προσαρμοσμένο Στυλ
 labelDataExport:
   description: Section title of data export.
-  message: Datan vienti
+  message: Εξαγωγή Δεδομένων
 labelDataImport:
   description: Section title of data import.
-  message: Datan tuonti
+  message: Εισαγωγή Δεδομένων
 labelDonate:
   description: Label of link to donate page.
-  message: Lahjoita
+  message: Δωρίστε
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'Latausosoite:'
+  message: 'URL Λήψης:'
 labelExclude:
   description: Label of @exclude rules.
-  message: '@exclude-säännöt'
+  message: Κανόνες @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match-säännöt'
+  message: Κανόνες @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Vie skriptidata
+  message: Εξαγωγή δεδομένων σεναρίου
 labelFeedback:
   description: Label of link to feedback page.
-  message: Palaute
+  message: Σχόλια
 labelFilterSort:
   description: Label for sort filter.
-  message: 'Järjestä $1:n mukaan'
+  message: Ταξινόμηση κατά $1
 labelGeneral:
   description: Label for general settings.
-  message: Yleiset
+  message: Γενικές
 labelHomepage:
   description: Label for home page in about tab.
   message: ''
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Kotisivun osoite:'
+  message: 'URL Αρχικής Σελίδας:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Tuo asetukset
+  message: Ρυθμίσεις εισαγωγής
 labelInclude:
   description: Label of @include rules.
-  message: '@include-säännöt'
+  message: Κανόνες @include
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Asennetaan skriptiä
+  message: Σενάριο εγκατάστασης
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Pidä alkuperäinen
+  message: Κρατήστε τα αρχικά
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: Τελευταία ενημέρωση στις $1
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Rivi nro.: '
+  message: 'Αριθμός γραμμής: '
 labelMatch:
   description: Label of @match rules.
-  message: '@match-säännöt'
+  message: Κανόνες @match
 labelName:
   description: Label of script name.
-  message: 'Nimi:'
+  message: 'Όνομα:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Ei nimeä
+  message: Χωρίς Όνομα
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'Hups, sinulla ei ole vielä yhtään skriptiä.'
+  message: 'Ωχ, δεν έχετε κανένα σενάριο ακόμα.'
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: Skriptejä ei löytynyt.
+  message: Δεν βρέθηκε σενάριο.
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Näytä ilmoitus päivityksistä
+  message: Ειδοποίηση ενημερώσεων σεναρίου
 labelRelated:
   description: Label of related links.
-  message: 'Linkkejä aiheesta: '
+  message: 'Σχετικοί σύνδεσμοι: '
 labelRemoved:
   description: Label shown when a script is removed.
-  message: '[Poistettu]'
+  message: '[Αφαιρέθηκε]'
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Korvaa: '
+  message: 'Αντικατάσταση με: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Ajoaika:'
+  message: 'Εκτέλεση κατά:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Oletus)
+  message: (Προκαθορισμένο)
 labelScriptEditor:
   description: Shown in the title of the script editing page.
-  message: Skriptieditori
+  message: Επεξεργαστής σεναρίου
 labelSearch:
   description: Label for search input in search box.
-  message: 'Etsi: '
+  message: 'Αναζήτηση για: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Etsi skriptejä...
+  message: Αναζήτηση σεναρίων...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Asetukset
+  message: Ρυθμίσεις
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: Näytä ajettavien skriptien lukumäärä kuvakkeessa
+  message: Εμφάνιση του αριθμού των σεναρίων που τρέχουν στο σήμα
   touched: false
 labelSync:
   description: Label for sync options.
-  message: Synkronointi
+  message: Συγχρονισμός
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Anna lupa
+  message: Εξουσιοδότησε
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Vahvistetaan
+  message: Εξουσιοδότηση
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: Ei mihinkään
+  message: Κανένας
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: ''
+  message: Αυτόματη επανεξουσιοδότηση όταν λήξει
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Kumoa
+  message: Ανάκληση
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Synkronoi skriptien tila
+  message: Κατάσταση συγχρονισμού σεναρίου
 labelSyncService:
   description: Label for sync service select.
-  message: Synkronoi
+  message: Συγχρονισμός σε
 labelTranslator:
   description: Label of translator.
-  message: 'Kääntäjä: '
+  message: 'Μεταφραστής: '
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'Päivitysosoite:'
+  message: 'URL Ενημέρωσης:'
 lastSync:
   description: Label for last sync timestamp.
-  message: Synkronoitu viimeksi $1
+  message: Τελευταίος συγχρονισμός στις $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Lisää tietoa mustalistauksen malleista.
+  message: Μάθετε περισσότερα για τα πρότυπα της μαύρης λίστας.
 menuCommands:
   description: Menu item to list script commands.
-  message: Skriptikomennot
+  message: Εντολές σεναρίου
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: Avaa kojelauta
+  message: Άνοιγμα Ταμπλό
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Etsi skriptejä tälle sivustolle
+  message: Βρείτε σενάρια γι᾽ αυτήν την σελίδα
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Täsmäävät skriptit
+  message: Σενάρια που ταιριάζουν
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Skriptit poissa käytöstä
+  message: Σενάρια απενεργοποιήθηκαν
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Skriptit käytössä
+  message: Σενάρια ενεργοποιήθηκαν
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Tarkistetaan päivityksiä...
+  message: Έλεγχος για αναβαθμίσεις...
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Virhe noudettaessa skriptiä!
+  message: Σφάλμα λήψης σεναρίου!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Päivitystietojen noutaminen epäonnistui.
+  message: Αδυναμία λήψης πληροφοριών ενημέρωσης.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Virhe ladattaessa skriptidataa.
+  message: Σφάλμα φόρτωσης δεδομένων σεναρίων.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: Virhe ladattaessa riippuvuuksia.
+  message: Σφάλμα φόρτωσης εξαρτήσεων.
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: $1 skriptiä tuotu.
+  message: $1 αντικείμενο(α) εισήχθησαν.
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Skripti asennettu.
+  message: Σενάριο εγκαταστάθηκε.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Epäkelpo skripti!
+  message: Μη έγκυρο σενάριο!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: Skriptidata ladattu.
+  message: Φορτώθηκαν δεδομένα σεναρίου.
 msgLoading:
   description: Message shown in the options page before script list is loaded.
-  message: Ladataan ...
+  message: Φόρτωση ...
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Ladataan skriptidataa...
+  message: Φόρτωση δεδομένων σεναρίου...
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: Ladataan riippuvuuksia... ($1/$2)
+  message: Φόρτωση εξαρτήσεων... ($1/$2)
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Konflikti skriptien nimiavaruudessa! Ole hyvä ja muokkaa @name:a and
-    @namespace:a.
+    Σύγκρουση χώρου ονόματος σεναρίου! Παρακαλώ αλλάξτε το @name και το
+    @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Uusi versio löytynyt.
+  message: Βρέθηκε νέα έκδοση.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Päivitystä ei löytynyt.
+  message: Δεν βρέθηκε ενημέρωση.
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: Musta lista päivitetty.
+  message: Η Μαύρη λίστα ενημερώθηκε.
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: Oma tyyli päivitetty.
+  message: Το προσαρμοσμένο στυλ ενημερώθηκε.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Skripti [$1] on päivitetty!'
+  message: 'Το σενάριο [$1] είναι ενημερωμένο!'
 msgSyncError:
   description: Message shown when sync failed.
-  message: Synkronointivirhe!
+  message: Σφάλμα συγχρονισμού!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Alustetaan...
+  message: Αρχικοποίηση...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: Alustusvirhe!
+  message: Σφάλμα αρχικοποίησης!
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: Synkronointi alkaa pian...
+  message: Ο συγχρονισμός θα ξεκινήσει σύντομα...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Synkronointi käynnissä...
+  message: Συγχρονισμός σε εξέλιξη...
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Skripti päivitetty.
+  message: Σενάριο ενημερώθηκε.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Päivitetään...
+  message: Ενημέρωση...
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Näytä käytössä olevat skriptit ensin
+  message: Εμφάνιση των ενεργοποιημένων σεναρίων πρώτα
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: ''
@@ -437,16 +443,16 @@ searchUseRegex:
   message: ''
 sideMenuAbout:
   description: 'Side menu: About'
-  message: Tietoja
+  message: Σχετικά
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: Asennetut skriptit
+  message: Εγκατεστημένα σενάρια
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Asetukset
+  message: Ρυθμίσεις
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: Päivitys
+  message: Ενημέρωση
 warnScriptTooLarge:
   description: Warning message shown when script is too large to be edited.
   message: ''

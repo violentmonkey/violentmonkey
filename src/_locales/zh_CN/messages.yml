@@ -210,6 +210,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: 通用
+labelHomepage:
+  description: Label for home page in about tab.
+  message: 主页
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 主页地址：
@@ -422,6 +425,12 @@ msgUpdating:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 先显示被启用的脚本
+searchCaseSensitive:
+  description: Option to perform a case-sensitive search
+  message: 区分大小写
+searchUseRegex:
+  description: Option to perform a regular expression search
+  message: 使用正则表达式
 sideMenuAbout:
   description: 'Side menu: About'
   message: 关于
@@ -434,3 +443,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: 更新
+warnScriptTooLarge:
+  description: Warning message shown when script is too large to be edited.
+  message: 脚本过大，以只读模式打开。

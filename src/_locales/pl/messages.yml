@@ -217,6 +217,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: Ogólne
+labelHomepage:
+  description: Label for home page in about tab.
+  message: ''
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Adres URL strony głównej:'
@@ -429,6 +432,12 @@ msgUpdating:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Pokazuj najpierw włączone skrypty
+searchCaseSensitive:
+  description: Option to perform a case-sensitive search
+  message: ''
+searchUseRegex:
+  description: Option to perform a regular expression search
+  message: ''
 sideMenuAbout:
   description: 'Side menu: About'
   message: O rozszerzeniu
@@ -441,3 +450,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Aktualizacja
+warnScriptTooLarge:
+  description: Warning message shown when script is too large to be edited.
+  message: ''

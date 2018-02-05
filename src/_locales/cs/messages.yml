@@ -212,6 +212,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: ''
+labelHomepage:
+  description: Label for home page in about tab.
+  message: ''
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Domovská stránka (URL):'
@@ -424,6 +427,12 @@ msgUpdating:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: ''
+searchCaseSensitive:
+  description: Option to perform a case-sensitive search
+  message: ''
+searchUseRegex:
+  description: Option to perform a regular expression search
+  message: ''
 sideMenuAbout:
   description: 'Side menu: About'
   message: O rozšíření
@@ -435,4 +444,7 @@ sideMenuSettings:
   message: Nastavení
 titleScriptUpdated:
   description: Notification title for script updates.
+  message: ''
+warnScriptTooLarge:
+  description: Warning message shown when script is too large to be edited.
   message: ''

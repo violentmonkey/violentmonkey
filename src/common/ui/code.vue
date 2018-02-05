@@ -28,8 +28,17 @@
           <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
         </tooltip>
       </form>
+      <div class="inline-block">
+        <tooltip :title="i18n('searchUseRegex')">
+          <toggle-button v-model="searchOptions.useRegex">.*</toggle-button>
+        </tooltip>
+        <tooltip :title="i18n('searchCaseSensitive')">
+          <toggle-button v-model="searchOptions.caseSensitive">Aa</toggle-button>
+        </tooltip>
+      </div>
     </div>
-    <vl-code class="editor-code flex-auto"
+    <vl-code
+      class="editor-code flex-auto"
       :options="cmOptions" v-model="content" @ready="onReady"
     />
   </div>
@@ -53,6 +62,7 @@ import CodeMirror from 'codemirror';
 import VlCode from 'vueleton/lib/code';
 import Tooltip from 'vueleton/lib/tooltip';
 import { debounce } from 'src/common';
+import ToggleButton from 'src/common/ui/toggle-button';
 
 function getHandler(key) {
   return cm => {
@@ -74,7 +84,8 @@ function indentWithTab(cm) {
 }
 
 [
-  'save', 'cancel', 'find', 'findNext', 'findPrev', 'replace', 'replaceAll', 'close',
+  'save', 'cancel', 'close',
+  'find', 'findNext', 'findPrev', 'replace', 'replaceAll',
 ].forEach(key => {
   CodeMirror.commands[key] = getHandler(key);
 });
@@ -84,23 +95,31 @@ const cmOptions = {
   matchBrackets: true,
   autoCloseBrackets: true,
   highlightSelectionMatches: true,
-  lineNumbers: true,
-  mode: 'javascript',
-  lineWrapping: true,
   styleActiveLine: true,
   foldGutter: true,
   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
   theme: 'eclipse',
 };
+const searchOptions = {
+  useRegex: false,
+  caseSensitive: false,
+};
 
 function findNext(cm, state, reversed) {
   cm.operation(() => {
-    const query = state.query || '';
-    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo);
+    let query = state.query || '';
+    if (query && searchOptions.useRegex) {
+      query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
+    }
+    const options = {
+      caseFold: !searchOptions.caseSensitive,
+    };
+    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo, options);
     if (!cursor.find(reversed)) {
       cursor = cm.getSearchCursor(
         query,
         reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
+        options,
       );
       if (!cursor.find(reversed)) return;
     }
@@ -149,11 +168,14 @@ export default {
   components: {
     VlCode,
     Tooltip,
+    ToggleButton,
   },
   data() {
     return {
       cmOptions,
-      content: this.value,
+      searchOptions,
+      content: null,
+      lineTooLong: false,
       search: {
         show: false,
         state: {
@@ -169,7 +191,11 @@ export default {
     },
     value(value) {
       if (value === this.content) return;
-      this.content = value;
+      const { cut, cutLines } = this.getCutContent(value);
+      this.lineTooLong = cut && cutLines;
+      this.checkOptions();
+      this.content = cut ? cutLines.map(({ text }) => text).join('\n') : value;
+      this.$emit('warnLarge', !!this.lineTooLong);
       const { cm } = this;
       if (!cm) return;
       this.$nextTick(() => {
@@ -180,11 +206,48 @@ export default {
     'search.state.query'() {
       this.debouncedFind();
     },
+    searchOptions: {
+      deep: true,
+      handler() {
+        this.debouncedFind();
+      },
+    },
   },
   methods: {
+    checkOptions() {
+      const { cm, lineTooLong } = this;
+      if (!cm) return;
+      cm.setOption('readOnly', !!(lineTooLong || this.readonly));
+      cm.setOption('mode', lineTooLong ? 'null' : 'javascript');
+      cm.setOption('lineNumbers', !lineTooLong);
+      cm.setOption('lineWrapping', !lineTooLong);
+    },
+    getCutContent(value) {
+      const lines = value.split('\n');
+      const cut = lines.some(line => line.length > 10 * 1024);
+      const cutLines = [];
+      if (cut) {
+        const maxLength = 3 * 1024;
+        lines.forEach((line, index) => {
+          for (let offset = 0; offset < line.length; offset += maxLength) {
+            cutLines.push({
+              index,
+              text: line.slice(offset, offset + maxLength),
+            });
+          }
+          if (!line.length) {
+            cutLines.push({
+              index,
+              text: '',
+            });
+          }
+        });
+      }
+      return { cut, cutLines };
+    },
     onReady(cm) {
       this.cm = cm;
-      if (this.readonly) cm.setOption('readOnly', true);
+      this.checkOptions();
       cm.state.commands = Object.assign({
         cancel: () => {
           if (this.search.show) {
@@ -215,6 +278,7 @@ export default {
     onKeyDown(e) {
       const name = CodeMirror.keyName(e);
       const { cm } = this;
+      if (!cm) return;
       [
         cm.options.extraKeys,
         cm.options.keyMap,
@@ -285,13 +349,45 @@ export default {
       if (line > 0) cm.setCursor(line - 1, 0);
       cm.focus();
     },
+    onCopy(e) {
+      if (!this.lineTooLong || !this.cm || !this.cm.somethingSelected()) return;
+      const [rng] = this.cm.listSelections();
+      const positions = {};
+      [rng.anchor, rng.head].forEach(pos => {
+        positions[pos.sticky] = pos;
+      });
+      const meta = [];
+      {
+        let { line, ch } = positions.after;
+        for (; line < positions.before.line; line += 1) {
+          meta.push({ line, from: ch });
+          ch = 0;
+        }
+        meta.push({ line, from: ch, to: positions.before.ch });
+      }
+      const result = [];
+      let lastLine;
+      meta.forEach(({ line, from, to }) => {
+        const { text, index } = this.lineTooLong[line];
+        if (lastLine != null && lastLine !== index) {
+          result.push('\n');
+        }
+        lastLine = index;
+        result.push(to == null ? text.slice(from) : text.slice(from, to));
+      });
+      e.clipboardData.setData('text', result.join(''));
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    },
   },
   mounted() {
     this.debouncedFind = debounce(this.searchInPlace, 100);
     if (this.global) window.addEventListener('keydown', this.onKeyDown, false);
+    document.addEventListener('copy', this.onCopy, false);
   },
   beforeDestroy() {
     if (this.global) window.removeEventListener('keydown', this.onKeyDown, false);
+    document.removeEventListener('copy', this.onCopy, false);
   },
 };
 </script>

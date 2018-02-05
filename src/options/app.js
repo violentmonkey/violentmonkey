@@ -2,7 +2,6 @@ import 'src/common/browser';
 import Vue from 'vue';
 import { sendMessage, i18n, getLocaleString } from 'src/common';
 import options from 'src/common/options';
-import getPathInfo from 'src/common/pathinfo';
 import handlers from 'src/common/handlers';
 import 'src/common/ui/style';
 import { store } from './utils';
@@ -16,19 +15,12 @@ Object.assign(store, {
   scripts: [],
   sync: [],
   filteredScripts: [],
-  route: null,
 });
 zip.workerScriptsPath = '/public/lib/zip.js/';
 initialize();
 
-function loadHash() {
-  store.route = getPathInfo();
-}
-
 function initialize() {
   document.title = i18n('extName');
-  window.addEventListener('hashchange', loadHash, false);
-  loadHash();
   initMain();
   options.ready(() => {
     new Vue({
@@ -53,8 +45,8 @@ function initScript(script) {
   script._cache = { search, name, lowerName };
 }
 
-function loadData() {
-  sendMessage({ cmd: 'GetData' })
+function loadData(clear) {
+  sendMessage({ cmd: 'GetData', data: clear })
   .then(data => {
     [
       'cache',
@@ -72,9 +64,11 @@ function loadData() {
 
 function initMain() {
   store.loading = true;
-  loadData();
+  loadData(true);
   Object.assign(handlers, {
-    ScriptsUpdated: loadData,
+    ScriptsUpdated() {
+      loadData();
+    },
     UpdateSync(data) {
       store.sync = data;
     },

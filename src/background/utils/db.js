@@ -1,4 +1,4 @@
-import { i18n, request, buffer2string, getFullUrl, isRemote } from 'src/common';
+import { i18n, request, buffer2string, getFullUrl, isRemote, getRnd4 } from 'src/common';
 import { objectGet, objectSet } from 'src/common/object';
 import { getNameURI, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
@@ -387,6 +387,11 @@ export function moveScript(id, offset) {
   return normalizePosition();
 }
 
+function getUUID(id) {
+  const idSec = (id + 0x10bde6a2).toString(16).slice(-8);
+  return `${idSec}-${getRnd4()}-${getRnd4()}-${getRnd4()}-${getRnd4()}${getRnd4()}${getRnd4()}`;
+}
+
 function saveScript(script, code) {
   const config = script.config || {};
   config.enabled = getInt(config.enabled);
@@ -400,6 +405,7 @@ function saveScript(script, code) {
     oldScript = store.scriptMap[props.id];
   }
   props.uri = getNameURI(script);
+  props.uuid = props.uuid || getUUID(props.id);
   // Do not allow script with same name and namespace
   if (store.scripts.some(item => {
     const itemProps = item.props || {};
