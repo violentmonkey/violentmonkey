@@ -26,14 +26,6 @@ module.exports = {
       src: resolve('src'),
     }
   },
-  node: {
-    // css-loader requires unnecessary `Buffer` polyfill,
-    // which increases the bundle size significantly.
-    // See:
-    // - https://github.com/webpack-contrib/css-loader/issues/454
-    // - https://github.com/vuejs/vue-loader/issues/720
-    Buffer: false,
-  },
   module: {
     rules: [
       {
