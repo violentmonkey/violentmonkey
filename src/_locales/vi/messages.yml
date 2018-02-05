@@ -199,7 +199,7 @@ labelExclude:
   message: Bỏ qua
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match quy tắc bỏ qua'
+  message: 'Quy tắc bỏ qua'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Xuất dữ liệu script
