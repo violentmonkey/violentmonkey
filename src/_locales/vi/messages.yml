@@ -163,16 +163,16 @@ labelAutoUpdate:
   message: Tự động kiểm tra cập nhật hàng ngày
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'Hiển thị ở huy hiệu: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: Không có gì
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: Số script đang chạy
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: Số script không trùng lặp đang chạy
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Danh sách đen
@@ -199,7 +199,7 @@ labelExclude:
   message: Bỏ qua
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: 'Quy tắc bỏ qua'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Xuất dữ liệu script
@@ -214,10 +214,10 @@ labelGeneral:
   message: Chung
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Trang chủ
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Trang chủ:'
+  message: 'Liên kết rang chủ:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Nhập cài đặt
@@ -429,10 +429,10 @@ optionShowEnabledFirst:
   message: Hiển thị script được bật trước
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: Phân biệt hoa thường
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Dùng biểu thức chính quy
 sideMenuAbout:
   description: 'Side menu: About'
   message: Thông tin
@@ -447,4 +447,4 @@ titleScriptUpdated:
   message: Cập nhật
 warnScriptTooLarge:
   description: Warning message shown when script is too large to be edited.
-  message: ''
+  message: 'Script quá lớn. Đang mở ở chế độ chỉ đọc'
