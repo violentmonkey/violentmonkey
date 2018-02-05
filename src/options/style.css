@@ -62,6 +62,10 @@ section {
   border-left: 1px solid darkgray;
 }
 
+input[type=checkbox] {
+  margin-right: .5em;
+}
+
 .in-out {
   &-appear,
   &-enter,

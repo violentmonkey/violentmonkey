@@ -116,6 +116,9 @@ button {
 .pos-rel {
   position: relative;
 }
+.ml-1 {
+  margin-left: .5em;
+}
 .mr-1 {
   margin-right: .5em;
 }
@@ -127,6 +130,10 @@ button {
 }
 .mb-2 {
   margin-bottom: 1em;
+}
+.mx-1 {
+  margin-left: .5em;
+  margin-right: .5em;
 }
 .px-2 {
   margin-left: 1em;

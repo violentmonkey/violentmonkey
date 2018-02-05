@@ -4,17 +4,17 @@
     <div class="script-info flex">
       <div class="script-name ellipsis" v-text="script._cache.name"></div>
       <div class="flex-auto"></div>
-      <tooltip :title="i18n('labelAuthor') + script.meta.author" class="script-author" v-if="author" align="end">
+      <tooltip :title="i18n('labelAuthor') + script.meta.author" class="script-author ml-1" v-if="author" align="end">
         <icon name="author"></icon>
-        <a class="ellipsis" :href="`mailto:${author.email}`" v-if="author.email" v-text="author.name"></a>
-        <span class="ellipsis" v-else v-text="author.name"></span>
+        <a class="ellipsis ml-1" :href="`mailto:${author.email}`" v-if="author.email" v-text="author.name"></a>
+        <span class="ellipsis ml-1" v-else v-text="author.name"></span>
       </tooltip>
-      <tooltip :title="lastUpdated.title" align="end">
+      <tooltip :title="lastUpdated.title" class="ml-1" align="end">
         <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
-        <span class="secondary" v-text="lastUpdated.show"></span>
+        <span class="secondary ml-1" v-text="lastUpdated.show"></span>
       </tooltip>
-      <div v-if="script.config.removed" v-text="i18n('labelRemoved')"></div>
-      <div v-if="script.config.removed">
+      <div v-if="script.config.removed" class="ml-1" v-text="i18n('labelRemoved')"></div>
+      <div v-if="script.config.removed" class="ml-1">
         <tooltip :title="i18n('buttonUndo')" placement="left">
           <span class="btn-ghost" @click="onRemove(0)">
             <icon name="undo"></icon>
@@ -388,9 +388,6 @@ export default {
     margin-left: 3.5rem;
     line-height: 1.5;
     align-items: center;
-    > *:not(:last-child) {
-      margin-right: 8px;
-    }
   }
   &-icon {
     position: absolute;

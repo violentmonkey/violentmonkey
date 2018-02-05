@@ -5,7 +5,7 @@
     </h3>
     <div>
       <span v-text="i18n('labelSyncService')"></span>
-      <select :value="syncConfig.current" @change="onSyncChange">
+      <select class="mx-1" :value="syncConfig.current" @change="onSyncChange">
         <option v-for="service in syncServices" v-text="service.displayName" :value="service.name"></option>
       </select>
       <button v-text="labelAuthorize" v-if="service.name"
