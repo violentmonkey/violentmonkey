@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const MinifyPlugin = require('babel-minify-webpack-plugin');
 const vueLoaderConfig = require('./vue-loader.conf');
-const { IS_DEV, styleRule, definitions } = require('./utils');
+const { isDev, isProd, styleRule, definitions } = require('./utils');
 
 const DIST = 'dist';
 const definePlugin = new webpack.DefinePlugin(definitions);
@@ -58,9 +58,9 @@ module.exports = {
     ],
   },
   // cheap-module-eval-source-map is faster for development
-  devtool: IS_DEV ? '#inline-source-map' : false,
+  devtool: isDev ? '#inline-source-map' : false,
   plugins: [
     definePlugin,
-    !IS_DEV && new MinifyPlugin(),
+    isProd && new MinifyPlugin(),
   ].filter(Boolean),
 };
