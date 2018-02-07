@@ -1,8 +1,6 @@
 <template>
-  <feature name="sync" tag="section">
-    <h3>
-      <span class="feature-text" v-text="i18n('labelSync')"></span>
-    </h3>
+  <section>
+    <h3 v-text="i18n('labelSync')"></h3>
     <div>
       <span v-text="i18n('labelSyncService')"></span>
       <select class="mx-1" :value="syncConfig.current" @change="onSyncChange">
@@ -29,7 +27,7 @@
       </label>
     </div>
     -->
-  </feature>
+  </section>
 </template>
 
 <script>
@@ -39,7 +37,6 @@ import SettingCheck from 'src/common/ui/setting-check';
 import hookSetting from 'src/common/hook-setting';
 import Icon from 'src/common/ui/icon';
 import { store } from '../../utils';
-import Feature from '../feature';
 
 const SYNC_CURRENT = 'sync.current';
 const syncConfig = {
@@ -53,7 +50,6 @@ export default {
   components: {
     SettingCheck,
     Icon,
-    Feature,
   },
   data() {
     return {
