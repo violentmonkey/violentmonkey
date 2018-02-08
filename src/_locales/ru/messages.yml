@@ -170,16 +170,16 @@ labelAutoUpdate:
   message: Ежедневно проверять наличие обновлений скриптов.
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'Показывать на значке: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: ничего
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: количество выполняющихся скриптов
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: количество уникальных выполняющихся скриптов
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Чёрный список
