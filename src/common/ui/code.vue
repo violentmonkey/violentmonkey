@@ -85,9 +85,6 @@ Object.assign(CodeMirror.keyMap.default, {
 
 const cmOptions = {
   continueComments: true,
-  matchBrackets: true,
-  autoCloseBrackets: true,
-  highlightSelectionMatches: true,
   styleActiveLine: true,
   foldGutter: true,
   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
@@ -214,10 +211,13 @@ export default {
       cm.setOption('mode', lineTooLong ? 'null' : 'javascript');
       cm.setOption('lineNumbers', !lineTooLong);
       cm.setOption('lineWrapping', !lineTooLong);
+      cm.setOption('matchBrackets', !lineTooLong);
+      cm.setOption('autoCloseBrackets', !lineTooLong);
+      cm.setOption('highlightSelectionMatches', !lineTooLong);
     },
     getCutContent(value) {
       const lines = value.split('\n');
-      const cut = lines.some(line => line.length > 10 * 1024);
+      const cut = lines.some(line => line.length > 50000);
       const cutLines = [];
       if (cut) {
         const maxLength = 3 * 1024;
