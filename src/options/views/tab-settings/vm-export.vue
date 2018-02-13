@@ -147,7 +147,7 @@ function download(url, cb) {
   setTimeout(() => {
     document.body.removeChild(a);
     if (cb) cb();
-  });
+  }, 3000);
 }
 
 function downloadBlob(blob) {
