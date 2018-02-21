@@ -1,0 +1,457 @@
+anchorAuthor:
+description: Author shown on about tab.
+message: '<a href=mailto:i@gerald.top>Gerald</a>'
+anchorTranslator:
+description: Translator shown on about tab.
+message: henaro/ironwool
+buttonAllNone:
+description: Button to select all scripts or none.
+message: Вибрати Все/Нічого
+buttonCancel:
+description: Cancel button on dialog.
+message: Скасувати
+buttonClose:
+description: Button to close window.
+message: Закрити
+buttonConfirmInstallation:
+ description: Button to confirm installation of a script.
+message: Встановити
+buttonDisable:
+description: Button to disable a script.
+message: Вимкнути
+buttonEdit:
+description: Button to edit a script.
+message: Редагувати
+buttonEnable:
+description: Button to enable a script.
+message: Ввімкнути
+buttonExportData:
+description: Button to open the data export dialog.
+message: Експорт в zip-файл
+buttonFilter:
+description: Button to show filters menu.
+message: Фільтри
+buttonHome:
+description: Button to open homepage.
+message: Домашня сторінка
+buttonImportData:
+ description: Button to choose a file for data import.
+message: Імпорт з zip-файлу
+buttonInstallFromURL:
+description: Button to ask for URL of a user script.
+message: Встановити за посиланням
+buttonInstallOptions:
+description: Button to show options of installation confirm page.
+message: Налаштування
+buttonNew:
+description: Button to create a new script.
+message: Створити
+buttonOK:
+description: OK button on dialog.
+message: OK
+buttonRemove:
+description: Button to remove a script.
+message: Видалити
+buttonReplace:
+description: Button to replace the current match.
+ message: Замінити
+buttonReplaceAll:
+description: Button to replace all matches.
+message: Замінити всі
+buttonSave:
+description: Button to save modifications of a script.
+message: Зберегти
+buttonSaveBlacklist:
+description: Button to save global blacklist.
+message: Зберегти
+buttonSaveClose:
+description: Button to save modifications of a script and then close the editing page.
+message: Зберегти й закрити
+buttonSaveCustomCSS:
+description: Label for button to save custom CSS.
+message: Зберегти
+buttonSupport:
+description: Button to open support page.
+ message: Сторінка підтримки
+buttonUndo:
+description: Button to undo removement of a script.
+message: Скасувати
+buttonUpdate:
+description: Check a script for updates.
+message: Перевірити оновлення
+buttonUpdateAll:
+description: Check all scripts for updates.
+message: Перевірити оновлення скриптів
+buttonVacuum:
+description: Button to vacuum extension data.
+message: Очистити кеш
+buttonVacuumed:
+description: Message shown when data is vacuumed.
+message: Кеш очищено
+buttonVacuuming:
+description: Message shown when data vacuum is in progress.
+message: Очищення даних кешу...
+confirmNotSaved:
+description: Confirm message shown when there are unsaved script modifications.
+message: |-
+Зміни не збережено!
+Натисніть OK, щоб вийти або Скасувати, щоб повернутися.
+descBlacklist:
+description: HTML Description for the global blacklist.
+message: >-
+Скрипти не будуть вводитися в документи, URL яких збігаються з
+правилами у цьому списку.
+descCustomCSS:
+description: Description of custom CSS section.
+message: >-
+Користувальницькі стилі CSS для сторінки Налаштування і сторінки встановлення скриптів. 
+Якщо Ви не знаєте, що це, будь ласка, не редагуйте цей
+текст.
+editLabelMeta:
+description: Metadata section in settings tab of script editor.
+message: Користувацькі meta-дані
+editLabelSettings:
+description: Settings section in settings tab of script editor.
+message: Налаштування скрипта
+editNavCode:
+description: Label of code tab in script editor.
+message: Код
+editNavSettings:
+description: Label of settings tab in script editor.
+message: Налаштування
+extDescription:
+description: Description for this extension.
+message: >-
+ Violentmonkey дозволяє користувачеві автоматично вводити скрипти в
+сторінки, щоб змінювати їх вигляд чи поведінку.
+extName:
+description: Name of this extension.
+message: Violentmonkey
+filterAlphabeticalOrder:
+description: Label for option to sort scripts in alphabetical order.
+message: алфавіту
+filterExecutionOrder:
+description: Label for option to sort scripts in order execution.
+message: порядку виконання
+hintInputURL:
+description: Hint for a prompt box to input URL of a user script.
+message: 'Введіть URL:'
+hintUseDownloadURL:
+ description: Shown as a place holder for @updateURL when it is not assigned
+message: Використовувати @downloadURL
+hintVacuum:
+description: Hint for vacuuming data.
+message: Очистити зайвий кеш та спробувати довантажити відсутні ресурси.
+installFrom:
+description: Label for button to install script from a userscript site.
+message: Встановити з $1
+installOptionClose:
+description: Option to close confirm window after installation.
+message: Закрити після встановлення.
+installOptionTrack:
+description: Option to track loading the local file before window is closed.
+ message: 'Стежити за оновленнями локального файлу, доки відкрите це вікно.'
+labelAbout:
+description: Label shown on top of the about page.
+message: Про додаток Violentmonkey
+labelAllowUpdate:
+description: Option to allow checking updates for a script.
+message: Дозволити оновлення
+labelAuthor:
+description: Label of author shown in the details of a script.
+message: 'Автор: '
+labelAutoReloadCurrentTab:
+description: Option to reload current tab after a script is switched on or off from menu.
+message: Оновити поточну вкладку після ввімкнення/вимкнення скрипта.
+labelAutoUpdate:
+ description: Option to allow automatically checking scripts for updates every 24 hours.
+message: Щоденно перевіряти наявність оновлень скриптів.
+labelBadge:
+description: Label for option to show number on badge.
+message: 'Показувати на значку: '
+labelBadgeNone:
+description: Option to display nothing on badge.
+message: нічого
+labelBadgeTotal:
+description: Option to display total number of running scripts on badge.
+message: кількість запущених скриптів
+labelBadgeUnique:
+description: Option to display number of unique running scripts on badge.
+ message: кількість унікальних діючих скриптів
+labelBlacklist:
+description: Label for global blacklist settings in security section.
+message: Чорний список
+labelCurrentLang:
+description: Label of current language.
+message: 'Поточна мова: '
+labelCustomCSS:
+description: Label for custom CSS section.
+message: Користувацькі стилі CSS
+labelDataExport:
+description: Section title of data export.
+message: Експорт даних
+labelDataImport:
+description: Section title of data import.
+message: Імпорт даних
+labelDonate:
+description: Label of link to donate page.
+ message: Підтримати проект фінансово
+labelDownloadURL:
+description: Label of script @downloadURL in custom meta data.
+message: 'Джерело завантаження:'
+labelExclude:
+description: Label of @exclude rules.
+message: 'Не застосовувати на (правила виключень @exclude):'
+labelExcludeMatch:
+description: Label of @exclude-match rules.
+message: 'Не застосовувати на (правила виключень @exclude-match):'
+labelExportScriptData:
+description: Option to export script data along with scripts.
+message: Налаштування скрипта
+labelFeedback:
+description: Label of link to feedback page.
+ message: Зворотній зв'язок
+labelFilterSort:
+description: Label for sort filter.
+message: Сортувати по $1
+labelGeneral:
+description: Label for general settings.
+message: Загальні налаштування
+labelHomepage:
+description: Label for home page in about tab.
+message: ''
+labelHomepageURL:
+description: Label of script @homepageURL in custom meta data.
+message: 'Дом.сторінка:'
+labelImportSettings:
+description: Label for option to import settings from zip file.
+message: Імпортувати налаштування.
+labelInclude:
+description: Label of @include rules.
+ message: 'Застосовувати на (правила включень @include):'
+labelInstall:
+description: Shown in the title of the confirm page while trying to install a script.
+message: Встановлення скрипта...
+labelKeepOriginal:
+description: Option to keep the original match or ignore rules.
+message: Використовувати оригінальні правила.
+labelLastUpdatedAt:
+description: Label shown on last updated time.
+message: ''
+labelLineNumber:
+description: Label for line number jumper.
+message: 'Номер рядка:'
+labelMatch:
+description: Label of @match rules.
+ message: 'Застосовувати на (правила збігів @match):'
+labelName:
+description: Label of script name.
+message: 'Назва:'
+labelNoName:
+description: Text as the name of a script when no @name is assigned.
+message: Новий скрипт
+labelNoScripts:
+description: Message shown when no script is installed.
+message: У вас ще не встановлено жодного скрипта.
+labelNoSearchScripts:
+description: Message shown when no script is found in search results.
+message: Скрипти не знайдено.
+labelNotifyUpdates:
+description: Option to show notification when script is updated.
+ message: Повідомляти про оновлення скриптів.
+labelRelated:
+description: Label of related links.
+message: 'Пов'язані посилання: '
+labelRemoved:
+description: Label shown when a script is removed.
+message: '[Видалено]'
+labelReplace:
+description: Label for replace input in search box.
+message: 'Замінити на: '
+labelRunAt:
+description: Label of script @run-at properties in custom meta data.
+message: 'Виконувати:'
+labelRunAtDefault:
+description: Shown when custom @run-at is not assigned.
+message: (за замовчуванням)
+labelScriptEditor:
+ description: Shown in the title of the script editing page.
+message: Редактор скриптів
+labelSearch:
+description: Label for search input in search box.
+message: 'Знайти: '
+YandexTranslate
+
+labelSearchScript:
+description: Placeholder for script search box.
+message: Пошук скриптів...
+labelSettings:
+description: Label shown on the top of settings page
+message: Налаштування
+labelShowBadge:
+description: Option to show number of running scripts on the badge.
+message: Показувати кількість активних скриптів на значку.
+touched: false
+labelSync:
+description: Label for sync options.
+message: Синхронізація з хмарним сховищем
+labelSyncAuthorize:
+description: Label for button to authorize a service.
+message: Підключити
+labelSyncAuthorizing:
+ description: Label for button when authorization is in progress.
+message: Авторизація...
+labelSyncDisabled:
+description: Label for option to disable sync service.
+message: нічим
+labelSyncReauthorize:
+description: Option to reauthorize sync service when expired.
+message: ''
+labelSyncRevoke:
+description: Label for button to revoke authorization for a service.
+message: Відключити
+labelSyncScriptStatus:
+description: Label for option to sync script status.
+message: Синхронізувати статус скриптів.
+labelSyncService:
+description: Label for sync service select.
+ message: Синхронізувати з
+labelTranslator:
+description: Label of translator.
+message: 'Перекладачі: '
+labelUpdateURL:
+description: Label of script @updateURL in custom meta data.
+message: 'Адреса оновлення:'
+lastSync:
+description: Label for last sync timestamp.
+message: Остання синхронізація в $1.
+learnBlacklist:
+description: Refers to a link to introduce blacklist patterns.
+message: Детальніше про чорні списки.
+menuCommands:
+description: Menu item to list script commands.
+message: Команди скриптів
+menuDashboard:
+description: Label for menu item to open dashboard.
+ message: Панель керування
+menuFindScripts:
+description: Menu item to find scripts for a site.
+message: Знайти скрипти для сайту
+menuMatchedScripts:
+description: Label for menu listing matched scripts.
+message: Співпадаючі скрипти
+menuScriptDisabled:
+description: 'Menu item showing the status of Violentmonkey, when disabled.'
+message: Скрипти вимкнені
+menuScriptEnabled:
+description: 'Menu item showing the status of Violentmonkey, when enabled.'
+message: Скрипти ввімкнені
+msgCheckingForUpdate:
+ description: Message shown when a script is being checked for updates version by numbers.
+message: Перевірка наявності оновлень...
+msgErrorFetchingScript:
+description: Message shown when Violentmonkey fails fetching a new version of the script.
+message: Помилка завантаження скрипта!
+msgErrorFetchingUpdateInfo:
+description: Message shown when Violentmonkey fails fetching version data of the script.
+message: Не вдається перевірити наявність оновлень.
+msgErrorLoadingData:
+description: >-
+Message shown on confirm page when the script to be installed cannot be
+loaded.
+ message: Помилка завантаження скрипта.
+msgErrorLoadingDependency:
+description: Message shown when not all requirements are loaded successfully.
+message: Помилка завантаження необхідних компонентів.
+msgImported:
+description: >-
+Message shown after import. There is an argument referring to the count of
+scripts imported.
+message: $1 скрипт(a/ів) імпортовано.
+msgInstalled:
+description: Message shown when a script is installed.
+message: Скрипт встановлено.
+msgInvalidScript:
+description: Message shown when script is invalid.
+message: Невірний скрипт.
+msgLoadedData:
+ description: >-
+Message shown in the confirm page when a javascript file to be installed is
+loaded.
+message: Скрипт завантажено.
+msgLoading:
+description: Message shown in the options page before script list is loaded.
+message: Завантаження...
+msgLoadingData:
+description: Message shown on confirm page when the script to be installed is loading.
+message: Завантаження скрипта...
+msgLoadingDependency:
+description: Message shown on confirm page when the requirements are being downloaded.
+message: Завантаження необхідних компонентів... ($1/$2)
+msgNamespaceConflict:
+description: >-
+ Message shown when namespace of the new script conflicts with an existent
+one.
+message: Конфлікт простору імен скриптів. Змініть @name і @namespace.
+msgNewVersion:
+description: >-
+Message shown when a new version of script is found by @updateURL, but no
+@downloadURL is provided.
+message: Доступна нова версія.
+msgNoUpdate:
+description: Message shown when there is no new version of a script.
+message: Оновлення не знайдено.
+msgSavedBlacklist:
+description: Message shown when blacklist are saved.
+message: Чорний список збережено.
+msgSavedCustomCSS:
+ description: Message shown when custom CSS is saved.
+message: Користувацькі стилі CSS збережено.
+msgScriptUpdated:
+опис: Notification message script for updates.
+message: 'Скрипт [$1] оновлено!'
+msgSyncError:
+description: Message shown when sync failed.
+message: Помилка синхронізації.
+msgSyncInit:
+description: Message shown when sync service is initializing.
+message: Встановлення з'єднання...
+msgSyncInitError:
+description: Message shown when sync fails in initialization.
+message: Помилка ініціалізації синхронізації.
+msgSyncReady:
+ description: Message shown when sync will start soon.
+message: Синхронізація скоро почнеться...
+msgSyncing:
+description: Message shown when sync is in progress.
+message: Синхронізація...
+msgUpdated:
+description: Message shown when a script is updated/reinstalled.
+message: Скрипт оновлено.
+msgUpdating:
+description: Message shown when a new version of script is being fetched.
+message: Оновлення...
+optionShowEnabledFirst:
+description: Option to show enabled scripts first in alphabetical order.
+message: Показувати ввімкнені скрипти першими
+searchCaseSensitive:
+ description: Option to perform a case-sensitive search
+message: ''
+searchUseRegex:
+description: Option to perform a regular expression search
+message: ''
+sideMenuAbout:
+description: 'Side menu: About'
+message: Про розширення
+sideMenuInstalled:
+description: 'Side menu: Installed scripts'
+message: Встановлені скрипти
+sideMenuSettings:
+description: 'Side menu: Settings'
+message: Налаштування
+titleScriptUpdated:
+description: Notification title for script updates.
+message: Оновлення
+warnScriptTooLarge:
+ description: Warning message shown when script is too large to be edited.
+message: ''
