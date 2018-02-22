@@ -1,6 +1,6 @@
 import 'src/common/browser';
 import Vue from 'vue';
-import { sendMessage, i18n, getLocaleString } from 'src/common';
+import { sendMessage, i18n, getLocaleString, cache2blobUrl } from 'src/common';
 import options from 'src/common/options';
 import handlers from 'src/common/handlers';
 import 'src/common/ui/style';
@@ -48,6 +48,12 @@ function initScript(script) {
 function loadData(clear) {
   sendMessage({ cmd: 'GetData', data: clear })
   .then(data => {
+    if (store.cache) {
+      Object.keys(store.cache).forEach(url => {
+        URL.revokeObjectURL(store.cache[url]);
+      });
+      store.cache = null;
+    }
     [
       'cache',
       'scripts',
@@ -57,6 +63,12 @@ function loadData(clear) {
     });
     if (store.scripts) {
       store.scripts.forEach(initScript);
+    }
+    if (store.cache) {
+      Object.keys(store.cache).forEach(url => {
+        const raw = store.cache[url];
+        store.cache[url] = cache2blobUrl(raw, { defaultType: 'image/png' });
+      });
     }
     store.loading = false;
   });

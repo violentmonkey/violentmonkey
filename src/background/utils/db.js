@@ -12,8 +12,8 @@ function cacheOrFetch(handle) {
     let promise = requests[url];
     if (!promise) {
       promise = handle.call(this, url, ...args)
-      .catch(() => {
-        console.error(`Error fetching: ${url}`);
+      .catch(err => {
+        console.error(`Error fetching: ${url}`, err);
       })
       .then(() => {
         delete requests[url];
@@ -103,15 +103,17 @@ storage.cache = Object.assign({}, storage.base, {
   prefix: 'cac:',
   fetch: cacheOrFetch(function fetch(uri, check) {
     return request(uri, { responseType: 'arraybuffer' })
-    .then(({ data: buffer }) => {
+    .then(({ data: buffer, xhr }) => {
+      const contentType = (xhr.getResponseHeader('content-type') || '').split(';')[0];
       const data = {
+        contentType,
         buffer,
-        blob: options => new Blob([buffer], options),
+        blob: options => new Blob([buffer], Object.assign({ type: contentType }, options)),
         string: () => buffer2string(buffer),
         base64: () => window.btoa(data.string()),
       };
       return (check ? Promise.resolve(check(data)) : Promise.resolve())
-      .then(() => this.set(uri, data.base64()));
+      .then(() => this.set(uri, `${contentType},${data.base64()}`));
     });
   }),
 });
@@ -330,12 +332,6 @@ export function getData() {
     }
   });
   return storage.cache.getMulti(Object.keys(cacheKeys))
-  .then(cache => {
-    Object.keys(cache).forEach(key => {
-      cache[key] = `data:image/png;base64,${cache[key]}`;
-    });
-    return cache;
-  })
   .then(cache => ({ scripts, cache }));
 }
 
@@ -562,7 +558,7 @@ function fetchScriptResources(script, cache) {
   if (isRemote(meta.icon)) {
     const fullUrl = pathMap[meta.icon] || meta.icon;
     storage.cache.fetch(fullUrl, ({ blob: getBlob }) => new Promise((resolve, reject) => {
-      const blob = getBlob({ type: 'image/png' });
+      const blob = getBlob();
       const url = URL.createObjectURL(blob);
       const image = new Image();
       const free = () => URL.revokeObjectURL(url);
@@ -572,7 +568,7 @@ function fetchScriptResources(script, cache) {
       };
       image.onerror = () => {
         free();
-        reject();
+        reject({ type: 'IMAGE_ERROR', url });
       };
       image.src = url;
     }));

@@ -1,5 +1,5 @@
 import {
-  getUniqId, bindEvents, attachFunction,
+  getUniqId, bindEvents, attachFunction, cache2blobUrl,
 } from '../utils';
 import {
   includes, forEach, map, utf8decode, jsonDump, jsonLoad,
@@ -249,7 +249,7 @@ function wrapGM(script, code, cache) {
         if (name in resources) {
           const key = resources[name];
           const raw = cache[pathMap[key] || key];
-          const text = raw && utf8decode(window.atob(raw));
+          const text = raw && utf8decode(window.atob(raw.split(',').pop()));
           return text;
         }
       },
@@ -262,13 +262,7 @@ function wrapGM(script, code, cache) {
           if (!blobUrl) {
             const raw = cache[pathMap[key] || key];
             if (raw) {
-              // Binary string is not supported by blob constructor,
-              // so we have to transform it into array buffer.
-              const bin = window.atob(raw);
-              const arr = new window.Uint8Array(bin.length);
-              for (let i = 0; i < bin.length; i += 1) arr[i] = bin.charCodeAt(i);
-              const blob = new Blob([arr]);
-              blobUrl = URL.createObjectURL(blob);
+              blobUrl = cache2blobUrl(raw);
               urls[key] = blobUrl;
             } else {
               blobUrl = key;
