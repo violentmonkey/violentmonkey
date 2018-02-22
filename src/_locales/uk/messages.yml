@@ -262,7 +262,7 @@ labelNotifyUpdates:
   message: Повідомляти про оновлення скриптів.
 labelRelated:
   description: Label of related links.
-  message: 'Пов'язані посилання: '
+  message: 'Посилання: '
 labelRemoved:
   description: Label shown when a script is removed.
   message: '[Видалено]'
