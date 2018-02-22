@@ -1,6 +1,4 @@
-import {
-  getUniqId, bindEvents, attachFunction, cache2blobUrl,
-} from '../utils';
+import { getUniqId, bindEvents, attachFunction, cache2blobUrl } from '../utils';
 import {
   includes, forEach, map, utf8decode, jsonDump, jsonLoad,
   Promise, console,
