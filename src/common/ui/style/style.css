@@ -12,8 +12,8 @@ body {
   font-size: 1rem;
 }
 
-body,
 // Form elements will not inherit
+body,
 button,
 select,
 input,
