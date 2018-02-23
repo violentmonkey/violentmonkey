@@ -330,8 +330,7 @@ export const BaseService = serviceFactory({
     });
   },
   getLocalData() {
-    return getScripts()
-    .then(scripts => scripts.filter(script => !script.config.removed));
+    return getScripts();
   },
   getSyncData() {
     return this.getMeta()

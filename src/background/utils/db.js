@@ -228,7 +228,8 @@ export function getScript(where) {
 }
 
 export function getScripts() {
-  return Promise.resolve(store.scripts);
+  return Promise.resolve(store.scripts)
+  .then(scripts => scripts.filter(script => !script.config.removed));
 }
 
 export function getScriptByIds(ids) {
