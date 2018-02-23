@@ -3,8 +3,7 @@ anchorAuthor:
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 anchorTranslator:
   description: Translator shown on about tab.
-  message: >-
-    henaro aka ironwool
+  message: henaro aka ironwool
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Обрати Все/Нічого
@@ -100,14 +99,13 @@ confirmNotSaved:
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: >-
-    Скрипти не будуть вводитися в документи, URL яких збігаються з
-    правилами цього списку.
+    Скрипти не будуть вводитися в документи, URL яких збігаються з правилами
+    цього списку.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Користувацькі стилі CSS для сторінки Налаштування і сторінки 
-    встановлення скриптів. Якщо Ви не знаєте, що це, будь ласка, не редагуйте цей
-    текст.
+    Користувацькі стилі CSS для сторінки Налаштування і сторінки  встановлення
+    скриптів. Якщо Ви не знаєте, що це, будь ласка, не редагуйте цей текст.
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Користувацькі meta-дані
@@ -123,8 +121,8 @@ editNavSettings:
 extDescription:
   description: Description for this extension.
   message: >-
-    Violentmonkey дозволяє користувачеві автоматично вводити скрипти в
-    сторінки, щоб змінювати їх вигляд чи поведінку.
+    Violentmonkey дозволяє користувачеві автоматично вводити скрипти в сторінки,
+    щоб змінювати їх вигляд чи поведінку.
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -451,6 +449,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Оновлення
-warnScriptTooLarge:
-  description: Warning message shown when script is too large to be edited.
+warnScriptLongLines:
+  description: Warning message shown when script has lines that are too long to be edited.
   message: ''

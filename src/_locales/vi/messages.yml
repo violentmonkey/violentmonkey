@@ -199,7 +199,7 @@ labelExclude:
   message: Bỏ qua
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: 'Quy tắc bỏ qua'
+  message: Quy tắc bỏ qua
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Xuất dữ liệu script
@@ -445,6 +445,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Cập nhật
-warnScriptTooLarge:
-  description: Warning message shown when script is too large to be edited.
-  message: 'Script quá lớn. Đang mở ở chế độ chỉ đọc'
+warnScriptLongLines:
+  description: Warning message shown when script has lines that are too long to be edited.
+  message: ''

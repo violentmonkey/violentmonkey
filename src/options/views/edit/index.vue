@@ -2,18 +2,18 @@
   <div class="frame flex flex-col fixed-full">
     <div class="flex edit-header">
       <h2 v-text="i18n('labelScriptEditor')"></h2>
-      <div class="flex-auto pos-rel px-2">
+      <div class="flex-auto pos-rel ml-2">
         <div class="edit-nav">
           <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
           <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
-          <span class="text-red" v-if="tooLarge" v-text="i18n('warnScriptTooLarge')"></span>
         </div>
       </div>
-      <div class="buttons">
+      <div class="text-right">
         <a class="mr-1" href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
         <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
         <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
         <button v-text="i18n('buttonClose')" @click="close"></button>
+        <div class="text-red mt-1" v-if="tooLarge" v-text="i18n('warnScriptLongLines')"></div>
       </div>
     </div>
     <div class="frame-block flex-auto pos-rel">

@@ -122,6 +122,9 @@ button {
 .mr-1 {
   margin-right: .5em;
 }
+.ml-2 {
+  margin-left: 1em;
+}
 .mt-1 {
   margin-top: .5em;
 }
@@ -134,10 +137,6 @@ button {
 .mx-1 {
   margin-left: .5em;
   margin-right: .5em;
-}
-.px-2 {
-  margin-left: 1em;
-  margin-right: 1em;
 }
 .h-100 {
   height: 100%;

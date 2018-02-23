@@ -443,6 +443,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: 更新
-warnScriptTooLarge:
-  description: Warning message shown when script is too large to be edited.
-  message: 脚本过大，以只读模式打开。
+warnScriptLongLines:
+  description: Warning message shown when script has lines that are too long to be edited.
+  message: 某些行超长，以只读模式打开。请使用外部编辑器编辑。

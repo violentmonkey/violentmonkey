@@ -33,6 +33,9 @@ aside {
 .text-green {
   color: green;
 }
+.text-right {
+  text-align: right;
+}
 section {
   position: relative;
   margin-top: 2rem;
