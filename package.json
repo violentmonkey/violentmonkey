@@ -71,7 +71,7 @@
   "homepage": "https://github.com/violentmonkey/violentmonkey",
   "license": "MIT",
   "dependencies": {
-    "codemirror": "^5.35.0",
+    "@timkendrick/monaco-editor": "^0.0.9",
     "core-js": "^2.5.1",
     "tldjs": "^2.3.1",
     "vue": "^2.4.2",
