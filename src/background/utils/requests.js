@@ -72,7 +72,7 @@ export function httpRequest(details, cb) {
   req.cb = cb;
   const { xhr } = req;
   try {
-    xhr.open(details.method, details.url, true, details.user, details.password);
+    xhr.open(details.method, details.url, true, details.user || '', details.password || '');
     xhr.setRequestHeader('VM-Verify', details.id);
     if (details.headers) {
       Object.keys(details.headers).forEach(key => {
