@@ -18,7 +18,7 @@
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
-        v-show="nav === 'code'" class="abs-full"
+        v-show="nav === 'code'" class="abs-full" :dirty.sync="editorDirty" ref="editor"
         v-model="code" :commands="commands" @warnLarge="onWarnLarge"
       />
       <vm-settings
@@ -54,7 +54,8 @@ export default {
   data() {
     return {
       nav: 'code',
-      canSave: false,
+      editorDirty: false,
+      settingsDirty: false,
       script: null,
       tooLarge: false,
       code: '',
@@ -65,14 +66,16 @@ export default {
       },
     };
   },
-  watch: {
-    code() {
-      this.canSave = true;
+  computed: {
+    canSave() {
+      return this.editorDirty || this.settingsDirty;
     },
+  },
+  watch: {
     settings: {
       deep: true,
       handler() {
-        this.canSave = true;
+        this.settingsDirty = true;
       },
     },
   },
@@ -95,7 +98,7 @@ export default {
       })
     )
     .then(code => {
-      this.code = code;
+      this.$refs.editor.setValue(code);
       const settings = {};
       const { custom, config } = this.script;
       settings.config = {
@@ -122,13 +125,15 @@ export default {
       });
       this.settings = settings;
       this.$nextTick(() => {
-        this.canSave = false;
+        this.editorDirty = false;
+        this.settingsDirty = false;
       });
     });
   },
   methods: {
     save() {
       const { settings: { config, custom: rawCustom } } = this;
+      const { editor } = this.$refs;
       const custom = [
         'name',
         'runAt',
@@ -155,7 +160,7 @@ export default {
           id,
           custom,
           config,
-          code: this.code,
+          code: editor.getValue(),
           // User created scripts MUST be marked `isNew` so that
           // the backend is able to check namespace conflicts,
           // otherwise the script with same namespace will be overridden
@@ -164,7 +169,8 @@ export default {
         },
       })
       .then(res => {
-        this.canSave = false;
+        this.editorDirty = false;
+        editor.flush();
         if (objectGet(res, 'where.id')) this.script = res.update;
       }, err => {
         showMessage({ text: err });
