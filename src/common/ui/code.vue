@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <div class="frame-block" v-show="search.show">
+    <div class="frame-block editor-search" v-show="search.show">
       <button class="pull-right" @click="clearSearch">&times;</button>
       <form class="inline-block mr-1" @submit.prevent="goToLine()">
         <span v-text="i18n('labelLineNumber')"></span>
@@ -396,5 +396,9 @@ export default {
     position: absolute;
     width: 100%;
   }
+}
+
+.editor-search > .inline-block > * {
+  vertical-align: middle;
 }
 </style>
