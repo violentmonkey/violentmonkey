@@ -160,10 +160,6 @@ function wrapGM(script, code, cache) {
   if (!includes(grant, 'GM_info')) grant.push('GM_info');
   if (includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
   const resources = script.meta.resources || {};
-  const dataEncoders = {
-    o: val => jsonDump(val),
-    '': val => val.toString(),
-  };
   const dataDecoders = {
     n: val => Number(val),
     b: val => val === 'true',
@@ -215,7 +211,7 @@ function wrapGM(script, code, cache) {
         const raw = value[key];
         if (raw) {
           const type = raw[0];
-          const handle = dataDecoders[type] || dataDecoders[''];
+          const handle = dataDecoders[type];
           let val = raw.slice(1);
           try {
             val = handle(val);
@@ -234,9 +230,8 @@ function wrapGM(script, code, cache) {
     },
     GM_setValue: {
       value(key, val) {
-        const type = (typeof val)[0];
-        const handle = dataEncoders[type] || dataEncoders[''];
-        const raw = type + handle(val);
+        const dumped = jsonDump(val);
+        const raw = dumped ? `o${dumped}` : null;
         const value = loadValues();
         value[key] = raw;
         dumpValue(key, raw);
