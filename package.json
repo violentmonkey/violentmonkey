@@ -1,6 +1,6 @@
 {
   "name": "violentmonkey",
-  "version": "2.8.29",
+  "version": "2.8.30",
   "scripts": {
     "dev": "gulp dev",
     "prebuild": "yarn lint && gulp clean",
