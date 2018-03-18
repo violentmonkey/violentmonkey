@@ -8,6 +8,14 @@ export function postData(destId, data) {
   document.dispatchEvent(e);
 }
 
+function removeElement(id) {
+  const el = document.querySelector(`#${id}`);
+  if (el) {
+    el.parentNode.removeChild(el);
+    return true;
+  }
+}
+
 let doInject;
 export function inject(code) {
   if (!doInject) {
@@ -18,9 +26,7 @@ export function inject(code) {
       document.documentElement.appendChild(span);
     };
     injectViaText(`(${detect.toString()})(${jsonDump(id)})`);
-    const span = document.querySelector(`#${id}`);
-    if (span) {
-      span.parentNode.removeChild(span);
+    if (removeElement(id)) {
       doInject = injectViaText;
     } else {
       // For Firefox in CSP limited pages
@@ -32,31 +38,25 @@ export function inject(code) {
 
 function injectViaText(code) {
   const script = document.createElement('script');
-  const doc = document.body || document.documentElement;
-  script.textContent = code;
-  doc.appendChild(script);
-  try {
-    doc.removeChild(script);
-  } catch (e) {
-    // ignore if body is changed and script is detached
-  }
+  const id = getUniqId('VM-');
+  script.id = id;
+  script.textContent = `!${removeElement.toString()}(${JSON.stringify(id)});${code}`;
+  document.documentElement.appendChild(script);
+  // in case the script is blocked by CSP
+  removeElement(id);
 }
 
 // Firefox does not support script injection by `textCode` in CSP limited pages
 // have to inject via blob URL, leading to delayed first injection
 function injectViaBlob(code) {
   const script = document.createElement('script');
-  const doc = document.body || document.documentElement;
   // https://en.wikipedia.org/wiki/Byte_order_mark
   const blob = new Blob(['\ufeff', code], { type: 'text/javascript' });
   const url = URL.createObjectURL(blob);
   script.src = url;
-  doc.appendChild(script);
-  try {
-    doc.removeChild(script);
-  } catch (e) {
-    // ignore if body is changed and script is detached
-  }
+  document.documentElement.appendChild(script);
+  const { parentNode } = script;
+  if (parentNode) parentNode.removeChild(script);
   URL.revokeObjectURL(url);
 }
 
