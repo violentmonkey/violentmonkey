@@ -157,7 +157,7 @@ labelAuthor:
   message: 'Autore: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Ricarica la scheda corente dopo aver spento o acceso uno script dal menu
+  message: Ricarica la scheda corrente dopo aver spento o acceso uno script dal menu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Controlla automaticamente gli script per aggiornamenti tutti i giorni
