@@ -149,6 +149,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: O Violentmonkey
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Dopusti obnavljanje
@@ -224,6 +227,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: '@include rules'
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Instaliranje skripte
@@ -236,6 +242,9 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Linija br.: '
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: ''
 labelMatch:
   description: Label of @match rules.
   message: '@match rules'
@@ -300,6 +309,7 @@ labelSyncDisabled:
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: Odbij

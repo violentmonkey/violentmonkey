@@ -147,6 +147,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: Violentmonkey에 대해서
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: 업데이트 허용
@@ -222,6 +225,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: '@include 규칙'
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: 스크립트 설치
@@ -234,6 +240,9 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: '줄 번호: '
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: ''
 labelMatch:
   description: Label of @match rules.
   message: '@match 규칙'
@@ -298,6 +307,7 @@ labelSyncDisabled:
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: 만료시 자동으로 재인증
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: 인증 폐기

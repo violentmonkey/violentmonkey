@@ -153,6 +153,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: Περί του Violentmonkey
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Επιτρέψτε αναβαθμίσεις
@@ -230,6 +233,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: Κανόνες @include
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Σενάριο εγκατάστασης
@@ -242,6 +248,9 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Αριθμός γραμμής: '
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: ''
 labelMatch:
   description: Label of @match rules.
   message: Κανόνες @match
@@ -306,6 +315,7 @@ labelSyncDisabled:
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Αυτόματη επανεξουσιοδότηση όταν λήξει
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: Ανάκληση

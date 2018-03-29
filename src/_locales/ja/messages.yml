@@ -4,9 +4,9 @@ anchorAuthor:
 anchorTranslator:
   description: Translator shown on about tab.
   message: >-
-    <a href="https://www.transifex.com/user/profile/100%E3%81%AE%E4%BA%BA/">100の人</a>,
-    Takute,
-    <a href="https://github.com/ScrachBuild">ScratchBuild</a>
+    <a
+    href="https://www.transifex.com/user/profile/100%E3%81%AE%E4%BA%BA/">100の人</a>,
+    Takute, <a href="https://github.com/ScrachBuild">ScratchBuild</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: すべて選択 / 解除
@@ -150,6 +150,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: Violentmonkey について
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: 更新を許可
@@ -225,6 +228,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: 実行するページのURL (@include)
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: スクリプトのインストール
@@ -237,6 +243,9 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: '指定行へ移動: '
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: ''
 labelMatch:
   description: Label of @match rules.
   message: 実行するページのURL (@match)
@@ -301,6 +310,7 @@ labelSyncDisabled:
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: 期限が切れたとき、自動的に再認証する
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: 取り消し
@@ -448,6 +458,4 @@ titleScriptUpdated:
   message: 更新
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
-  message: >-
-    一部の行が長すぎるため、読み取り専用モードで開きます。
-    外部エディタで編集してください。
+  message: 一部の行が長すぎるため、読み取り専用モードで開きます。 外部エディタで編集してください。
