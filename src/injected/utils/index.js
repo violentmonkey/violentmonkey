@@ -16,26 +16,27 @@ function removeElement(id) {
   }
 }
 
-let doInject;
-export function inject(code) {
-  if (!doInject) {
-    const id = getUniqId('VM-');
-    const detect = domId => {
-      const span = document.createElement('span');
-      span.id = domId;
-      document.documentElement.appendChild(span);
-    };
-    injectViaText(`(${detect.toString()})(${jsonDump(id)})`);
-    if (removeElement(id)) {
-      doInject = injectViaText;
-    } else {
-      // For Firefox in CSP limited pages
-      doInject = injectViaBlob;
-    }
-  }
-  doInject(code);
-}
+// let doInject;
+// export function inject(code) {
+//   if (!doInject) {
+//     const id = getUniqId('VM-');
+//     const detect = domId => {
+//       const span = document.createElement('span');
+//       span.id = domId;
+//       document.documentElement.appendChild(span);
+//     };
+//     injectViaText(`(${detect.toString()})(${jsonDump(id)})`);
+//     if (removeElement(id)) {
+//       doInject = injectViaText;
+//     } else {
+//       // For Firefox in CSP limited pages
+//       doInject = injectViaBlob;
+//     }
+//   }
+//   doInject(code);
+// }
 
+export const inject = injectViaText;
 function injectViaText(code) {
   const script = document.createElement('script');
   const id = getUniqId('VM-');
@@ -47,18 +48,19 @@ function injectViaText(code) {
 }
 
 // Firefox does not support script injection by `textCode` in CSP limited pages
-// have to inject via blob URL, leading to delayed first injection
-function injectViaBlob(code) {
-  const script = document.createElement('script');
-  // https://en.wikipedia.org/wiki/Byte_order_mark
-  const blob = new Blob(['\ufeff', code], { type: 'text/javascript' });
-  const url = URL.createObjectURL(blob);
-  script.src = url;
-  document.documentElement.appendChild(script);
-  const { parentNode } = script;
-  if (parentNode) parentNode.removeChild(script);
-  URL.revokeObjectURL(url);
-}
+// have to inject via blob URL, leading to delayed first injection.
+// This is rejected by Firefox reviewer.
+// function injectViaBlob(code) {
+//   const script = document.createElement('script');
+//   // https://en.wikipedia.org/wiki/Byte_order_mark
+//   const blob = new Blob(['\ufeff', code], { type: 'text/javascript' });
+//   const url = URL.createObjectURL(blob);
+//   script.src = url;
+//   document.documentElement.appendChild(script);
+//   const { parentNode } = script;
+//   if (parentNode) parentNode.removeChild(script);
+//   URL.revokeObjectURL(url);
+// }
 
 export function getUniqId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
