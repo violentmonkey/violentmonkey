@@ -74,8 +74,8 @@ const init = browser.storage.local.get('options')
 });
 register(init);
 
-function fireChange(key, value) {
-  changes[key] = value;
+function fireChange(keys, value) {
+  objectSet(changes, keys, value);
   callHooksLater();
 }
 
@@ -110,7 +110,7 @@ export function setOption(key, value) {
     }
     options[mainKey] = optionValue;
     browser.storage.local.set({ options });
-    fireChange(optionKey, value);
+    fireChange(keys, value);
     if (process.env.DEBUG) {
       console.log('Options updated:', optionKey, value, options); // eslint-disable-line no-console
     }

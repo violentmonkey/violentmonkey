@@ -1,11 +1,15 @@
 import options from './options';
+import { objectGet } from './object';
 
 const hooks = {};
 
 options.hook(data => {
-  Object.keys(data).forEach(key => {
+  Object.keys(hooks).forEach(key => {
     const list = hooks[key];
-    if (list) list.forEach(update => { update(data[key]); });
+    if (list) {
+      const value = objectGet(data, key);
+      if (value !== undefined) list.forEach(update => update(value));
+    }
   });
 });
 

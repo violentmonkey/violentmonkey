@@ -1,32 +1,24 @@
 <template>
   <section>
     <h3 v-text="i18n('labelSync')"></h3>
-    <div>
+    <div v-if="state">
       <span v-text="i18n('labelSyncService')"></span>
       <select class="mx-1" :value="syncConfig.current" @change="onSyncChange">
         <option v-for="service in syncServices" v-text="service.displayName" :value="service.name"></option>
       </select>
-      <button v-text="labelAuthorize" v-if="service.name"
-      :disabled="!canAuthorize" @click="onAuthorize"></button>
-      <button :disabled="!canSync" v-if="service.name" @click="onSync">
+      <button v-text="state.label" v-if="service.name"
+      :disabled="!state.canAuthorize" @click="onAuthorize"></button>
+      <button :disabled="!state.canSync" v-if="service.name" @click="onSync">
         <icon name="refresh"></icon>
       </button>
     </div>
-    <p class="mt-1" v-text="message"></p>
+    <p v-if="state" class="mt-1" v-text="state.message"></p>
     <div class="mt-1">
       <label>
         <setting-check name="syncScriptStatus" />
         <span v-text="i18n('labelSyncScriptStatus')"></span>
       </label>
     </div>
-    <!--
-    <div class="mt-1">
-      <label>
-        <setting-check name="syncReauthorize" />
-        <span v-text="i18n('labelSyncReauthorize')"></span>
-      </label>
-    </div>
-    -->
   </section>
 </template>
 
@@ -59,61 +51,41 @@ export default {
   },
   computed: {
     syncServices() {
-      let services = [{
-        displayName: this.i18n('labelSyncDisabled'),
-        name: '',
-      }];
       const states = this.store.sync;
       if (states && states.length) {
-        services = services.concat(states);
-        this.$nextTick(() => {
-          // Set `current` after options are ready
-          syncConfig.current = options.get(SYNC_CURRENT);
-        });
+        return [
+          {
+            displayName: this.i18n('labelSyncDisabled'),
+            name: '',
+          },
+          ...states,
+        ];
       }
-      return services;
     },
     service() {
-      const current = this.syncConfig.current || '';
-      let service = this.syncServices.find(item => item.name === current);
-      if (!service) {
-        console.warn('Invalid current service:', current);
-        service = this.syncServices[0];
-      }
-      return service;
-    },
-    message() {
-      const { service } = this;
-      if (service.authState === 'initializing') return this.i18n('msgSyncInit');
-      if (service.authState === 'error') return this.i18n('msgSyncInitError');
-      if (service.syncState === 'error') return this.i18n('msgSyncError');
-      if (service.syncState === 'ready') return this.i18n('msgSyncReady');
-      if (service.syncState === 'syncing') {
-        let progress = '';
-        if (service.progress && service.progress.total) {
-          progress = ` (${service.progress.finished}/${service.progress.total})`;
+      if (this.syncServices) {
+        const current = this.syncConfig.current || '';
+        let service = this.syncServices.find(item => item.name === current);
+        if (!service) {
+          console.warn('Invalid current service:', current);
+          service = this.syncServices[0];
         }
-        return this.i18n('msgSyncing') + progress;
-      }
-      if (service.lastSync) {
-        const lastSync = new Date(service.lastSync).toLocaleString();
-        return this.i18n('lastSync', lastSync);
+        return service;
       }
     },
-    labelAuthorize() {
+    state() {
       const { service } = this;
-      if (service.authState === 'authorizing') return this.i18n('labelSyncAuthorizing');
-      if (service.authState === 'authorized') return this.i18n('labelSyncRevoke');
-      return this.i18n('labelSyncAuthorize');
-    },
-    canAuthorize() {
-      const { service } = this;
-      return ['unauthorized', 'error', 'authorized'].includes(service.authState)
-      && ['idle', 'error'].includes(service.syncState);
-    },
-    canSync() {
-      const { service } = this;
-      return this.canAuthorize && service.authState === 'authorized';
+      if (service) {
+        const canAuthorize = ['unauthorized', 'error', 'authorized'].includes(service.authState)
+          && ['idle', 'error'].includes(service.syncState);
+        const canSync = canAuthorize && service.authState === 'authorized';
+        return {
+          message: this.getMessage(),
+          label: this.getLabel(),
+          canAuthorize,
+          canSync,
+        };
+      }
     },
   },
   methods: {
@@ -133,6 +105,30 @@ export default {
     },
     onSync() {
       sendMessage({ cmd: 'SyncStart' });
+    },
+    getMessage() {
+      const { service } = this;
+      if (service.authState === 'initializing') return this.i18n('msgSyncInit');
+      if (service.authState === 'error') return this.i18n('msgSyncInitError');
+      if (service.syncState === 'error') return this.i18n('msgSyncError');
+      if (service.syncState === 'ready') return this.i18n('msgSyncReady');
+      if (service.syncState === 'syncing') {
+        let progress = '';
+        if (service.progress && service.progress.total) {
+          progress = ` (${service.progress.finished}/${service.progress.total})`;
+        }
+        return this.i18n('msgSyncing') + progress;
+      }
+      if (service.lastSync) {
+        const lastSync = new Date(service.lastSync).toLocaleString();
+        return this.i18n('lastSync', lastSync);
+      }
+    },
+    getLabel() {
+      const { service } = this;
+      if (service.authState === 'authorizing') return this.i18n('labelSyncAuthorizing');
+      if (service.authState === 'authorized') return this.i18n('labelSyncRevoke');
+      return this.i18n('labelSyncAuthorize');
     },
   },
 };
