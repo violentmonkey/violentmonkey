@@ -35,24 +35,31 @@
     <vm-import></vm-import>
     <vm-export></vm-export>
     <vm-sync></vm-sync>
-    <div>Advanced <icon name="arrow" /></div>
-    <section>
-      <h3>Editor</h3>
-      <div class="mb-1">
-        <label>
-          <setting-check name="editor.lineWrapping" />
-          <span>Line wrapping</span>
-        </label>
-      </div>
-      <div class="mb-1">
-        <label>
-          <span class="mr-1">Indent unit:</span>
-          <input type="number" min="1" class="w-1" v-model="indentUnit" />
-        </label>
-      </div>
-    </section>
-    <vm-blacklist></vm-blacklist>
-    <vm-css></vm-css>
+    <div class="show-advanced">
+      <button @click="showAdvanced = !showAdvanced">
+        <span v-text="i18n('labelAdvanced')"></span>
+        <icon name="arrow" :class="{ rotate: showAdvanced }" />
+      </button>
+    </div>
+    <div v-show="showAdvanced">
+      <section>
+        <h3>Editor</h3>
+        <div class="mb-1">
+          <label>
+            <setting-check name="editor.lineWrapping" />
+            <span v-text="i18n('labelLineWrapping')"></span>
+          </label>
+        </div>
+        <div class="mb-1">
+          <label>
+            <span class="mr-1" v-text="i18n('labelIndentUnit')"></span>
+            <input type="number" min="1" class="w-1" v-model="indentUnit" />
+          </label>
+        </div>
+      </section>
+      <vm-blacklist></vm-blacklist>
+      <vm-css></vm-css>
+    </div>
   </div>
 </template>
 
@@ -84,7 +91,9 @@ const items = [
     },
   },
 ];
-const settings = {};
+const settings = {
+  showAdvanced: false,
+};
 items.forEach(({ name, key, normalize }) => {
   settings[name] = normalize(options.get(key || name));
   hookSetting(key, value => {
@@ -125,6 +134,12 @@ export default {
   overflow-y: auto;
   textarea {
     height: 10em;
+  }
+}
+.show-advanced {
+  margin: 20px 0;
+  .rotate {
+    transform: rotate(90deg);
   }
 }
 </style>

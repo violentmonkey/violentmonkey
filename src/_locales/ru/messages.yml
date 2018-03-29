@@ -156,6 +156,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: О расширении Violentmonkey
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Разрешить обновление
@@ -231,6 +234,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: 'Задействовать на (правила включений @include):'
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта...
@@ -243,6 +249,9 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Номер строки:'
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: ''
 labelMatch:
   description: Label of @match rules.
   message: 'Задействовать на (правила совпадений @match):'
@@ -307,6 +316,7 @@ labelSyncDisabled:
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: Отключить

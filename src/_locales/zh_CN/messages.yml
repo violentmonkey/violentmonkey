@@ -147,6 +147,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: 关于暴力猴
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: 高级
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: 允许更新
@@ -222,6 +225,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: '@include 规则'
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: 缩进大小：
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: 安装脚本
@@ -234,6 +240,9 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 行号：
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: 自动换行
 labelMatch:
   description: Label of @match rules.
   message: '@match 规则'
@@ -298,6 +307,7 @@ labelSyncDisabled:
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: 授权失效后自动重新授权
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: 取消授权
