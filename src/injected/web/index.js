@@ -164,7 +164,6 @@ function wrapGM(script, code, cache) {
     n: val => Number(val),
     b: val => val === 'true',
     o: val => jsonLoad(val),
-    '': val => val,
   };
   const pathMap = script.custom.pathMap || {};
   const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
@@ -214,7 +213,7 @@ function wrapGM(script, code, cache) {
           const handle = dataDecoders[type];
           let val = raw.slice(1);
           try {
-            val = handle(val);
+            if (handle) val = handle(val);
           } catch (e) {
             if (process.env.DEBUG) console.warn(e);
           }
