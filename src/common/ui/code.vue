@@ -94,7 +94,6 @@ const cmOptions = {
   theme: 'eclipse',
   mode: 'javascript',
   lineNumbers: true,
-  // lineWrapping: true,
   matchBrackets: true,
   autoCloseBrackets: true,
   highlightSelectionMatches: true,
