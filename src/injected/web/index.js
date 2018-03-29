@@ -161,9 +161,10 @@ function wrapGM(script, code, cache) {
   if (includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
   const resources = script.meta.resources || {};
   const dataDecoders = {
+    o: val => jsonLoad(val),
+    // deprecated
     n: val => Number(val),
     b: val => val === 'true',
-    o: val => jsonLoad(val),
   };
   const pathMap = script.custom.pathMap || {};
   const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);

@@ -60,6 +60,7 @@ import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip';
 import { debounce } from 'src/common';
 import ToggleButton from 'src/common/ui/toggle-button';
+import options from 'src/common/options';
 
 /* eslint-disable no-control-regex */
 const MAX_LINE_LENGTH = 50 * 1024;
@@ -117,15 +118,15 @@ function findNext(cm, state, reversed) {
     if (query && searchOptions.useRegex) {
       query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
     }
-    const options = {
+    const cOptions = {
       caseFold: !searchOptions.caseSensitive,
     };
-    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo, options);
+    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo, cOptions);
     if (!findUnmarked(cursor, reversed)) {
       cursor = cm.getSearchCursor(
         query,
         reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
-        options,
+        cOptions,
       );
       if (!findUnmarked(cursor, reversed)) return;
     }
@@ -375,7 +376,10 @@ export default {
     },
   },
   mounted() {
-    this.initialize(CodeMirror(this.$refs.code, this.cmOptions));
+    this.initialize(CodeMirror(
+      this.$refs.code,
+      Object.assign({}, this.cmOptions, options.get('editor')),
+    ));
     this.debouncedFind = debounce(this.searchInPlace, 100);
     if (this.global) window.addEventListener('keydown', this.onKeyDown, false);
     document.addEventListener('copy', this.onCopy, false);
