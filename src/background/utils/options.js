@@ -24,6 +24,10 @@ const defaults = {
   filters: {
     sort: 'exec',
   },
+  editor: {
+    lineWrapping: false,
+    indentUnit: 2,
+  },
 };
 let changes = {};
 const hooks = initHooks();

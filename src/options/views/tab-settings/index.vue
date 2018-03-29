@@ -35,35 +35,66 @@
     <vm-import></vm-import>
     <vm-export></vm-export>
     <vm-sync></vm-sync>
+    <div>Advanced <icon name="arrow" /></div>
+    <section>
+      <h3>Editor</h3>
+      <div class="mb-1">
+        <label>
+          <setting-check name="editor.lineWrapping" />
+          <span>Line wrapping</span>
+        </label>
+      </div>
+      <div class="mb-1">
+        <label>
+          <span class="mr-1">Indent unit:</span>
+          <input type="number" min="1" class="w-1" v-model="indentUnit" />
+        </label>
+      </div>
+    </section>
     <vm-blacklist></vm-blacklist>
     <vm-css></vm-css>
   </div>
 </template>
 
 <script>
+import { debounce } from 'src/common';
 import SettingCheck from 'src/common/ui/setting-check';
 import options from 'src/common/options';
 import hookSetting from 'src/common/hook-setting';
+import Icon from 'src/common/ui/icon';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
 import VmBlacklist from './vm-blacklist';
 import VmCss from './vm-css';
 
-const settings = {
-  showBadge: normalizeShowBadge(options.get('showBadge')),
-};
-hookSetting('showBadge', value => {
-  settings.showBadge = normalizeShowBadge(value);
+const items = [
+  {
+    name: 'showBadge',
+    normalize(value) {
+      if (!value) return '';
+      return value === 'total' ? 'total' : 'unique';
+    },
+  },
+  {
+    name: 'indentUnit',
+    key: 'editor.indentUnit',
+    normalize(value) {
+      return +value || 2;
+    },
+  },
+];
+const settings = {};
+items.forEach(({ name, key, normalize }) => {
+  settings[name] = normalize(options.get(key || name));
+  hookSetting(key, value => {
+    settings[name] = value;
+  });
 });
-
-function normalizeShowBadge(value) {
-  if (!value) return '';
-  return value === 'total' ? 'total' : 'unique';
-}
 
 export default {
   components: {
+    Icon,
     VmImport,
     VmExport,
     VmSync,
@@ -74,10 +105,17 @@ export default {
   data() {
     return settings;
   },
-  watch: {
-    showBadge(value) {
-      options.set('showBadge', value);
+  methods: {
+    getUpdater({ key, normalize }) {
+      return (value, oldValue) => {
+        if (value !== oldValue) options.set(key, normalize(value));
+      };
     },
+  },
+  created() {
+    items.forEach(item => {
+      this.$watch(item.name, debounce(this.getUpdater(item), 300));
+    });
   },
 };
 </script>
