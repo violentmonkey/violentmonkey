@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <div class="frame-block" v-show="search.show">
+    <div class="frame-block editor-search" v-show="search.show">
       <button class="pull-right" @click="clearSearch">&times;</button>
       <form class="inline-block mr-1" @submit.prevent="goToLine()">
         <span v-text="i18n('labelLineNumber')"></span>
@@ -37,10 +37,7 @@
         </tooltip>
       </div>
     </div>
-    <vl-code
-      class="editor-code flex-auto"
-      :options="cmOptions" v-model="content" @ready="onReady"
-    />
+    <div class="editor-code flex-auto" ref="code"></div>
   </div>
 </template>
 
@@ -53,16 +50,23 @@ import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/fold/foldcode';
 import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/fold/brace-fold';
 import 'codemirror/addon/fold/comment-fold';
 import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import CodeMirror from 'codemirror';
-import VlCode from 'vueleton/lib/code';
 import Tooltip from 'vueleton/lib/tooltip';
 import { debounce } from 'src/common';
 import ToggleButton from 'src/common/ui/toggle-button';
+import options from 'src/common/options';
+
+/* eslint-disable no-control-regex */
+const MAX_LINE_LENGTH = 50 * 1024;
+// Make sure this is still the longest line in the doc
+const CTRL_OPEN = '\x02'.repeat(256);
+const CTRL_CLOSE = '\x03'.repeat(256);
 
 function getHandler(key) {
   return cm => {
@@ -71,17 +75,6 @@ function getHandler(key) {
     return handle && handle();
   };
 }
-function indentWithTab(cm) {
-  if (cm.somethingSelected()) {
-    cm.indentSelection('add');
-  } else {
-    cm.replaceSelection(
-      cm.getOption('indentWithTabs') ? '\t' : ' '.repeat(cm.getOption('indentUnit')),
-      'end',
-      '+input',
-    );
-  }
-}
 
 [
   'save', 'cancel', 'close',
@@ -89,21 +82,35 @@ function indentWithTab(cm) {
 ].forEach(key => {
   CodeMirror.commands[key] = getHandler(key);
 });
+Object.assign(CodeMirror.keyMap.default, {
+  Tab: 'indentMore',
+  'Shift-Tab': 'indentLess',
+});
 
 const cmOptions = {
   continueComments: true,
-  matchBrackets: true,
-  autoCloseBrackets: true,
-  highlightSelectionMatches: true,
   styleActiveLine: true,
   foldGutter: true,
   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
   theme: 'eclipse',
+  mode: 'javascript',
+  lineNumbers: true,
+  matchBrackets: true,
+  autoCloseBrackets: true,
+  highlightSelectionMatches: true,
 };
 const searchOptions = {
   useRegex: false,
   caseSensitive: false,
 };
+
+function findUnmarked(cursor, reversed) {
+  while (cursor.find(reversed)) {
+    const marks = cursor.doc.findMarksAt(cursor.from(), cursor.to());
+    if (!marks.length) return true;
+  }
+  return false;
+}
 
 function findNext(cm, state, reversed) {
   cm.operation(() => {
@@ -111,17 +118,17 @@ function findNext(cm, state, reversed) {
     if (query && searchOptions.useRegex) {
       query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
     }
-    const options = {
+    const cOptions = {
       caseFold: !searchOptions.caseSensitive,
     };
-    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo, options);
-    if (!cursor.find(reversed)) {
+    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo, cOptions);
+    if (!findUnmarked(cursor, reversed)) {
       cursor = cm.getSearchCursor(
         query,
         reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
-        options,
+        cOptions,
       );
-      if (!cursor.find(reversed)) return;
+      if (!findUnmarked(cursor, reversed)) return;
     }
     cm.setSelection(cursor.from(), cursor.to());
     state.posFrom = cursor.from();
@@ -146,7 +153,7 @@ function replaceOne(cm, state) {
 function replaceAll(cm, state) {
   cm.operation(() => {
     const query = state.query || '';
-    for (let cursor = cm.getSearchCursor(query); cursor.findNext();) {
+    for (let cursor = cm.getSearchCursor(query); findUnmarked(cursor);) {
       cursor.replace(state.replace);
     }
   });
@@ -166,7 +173,6 @@ export default {
     },
   },
   components: {
-    VlCode,
     Tooltip,
     ToggleButton,
   },
@@ -174,8 +180,7 @@ export default {
     return {
       cmOptions,
       searchOptions,
-      content: null,
-      lineTooLong: false,
+      content: '',
       search: {
         show: false,
         state: {
@@ -186,22 +191,56 @@ export default {
     };
   },
   watch: {
-    content(content) {
-      this.$emit('input', content);
-    },
     value(value) {
-      if (value === this.content) return;
-      const { cut, cutLines } = this.getCutContent(value);
-      this.lineTooLong = cut && cutLines;
-      this.checkOptions();
-      this.content = cut ? cutLines.map(({ text }) => text).join('\n') : value;
-      this.$emit('warnLarge', !!this.lineTooLong);
+      if (value === this.cached) return;
+      this.cached = value;
+      const placeholders = [];
+      this.content = value.replace(/[\x02\x03]/g, '')
+      .split('\n')
+      .map((line, i) => {
+        if (line.length > MAX_LINE_LENGTH) {
+          const matches = line.match(/^(\s*)(.*)$/);
+          const prefix = matches[1];
+          const body = matches[2];
+          const id = placeholders.length;
+          const replaced = `${CTRL_OPEN}${id}${CTRL_CLOSE}`;
+          const placeholder = {
+            id,
+            body,
+            line: i,
+            start: prefix.length,
+            length: replaced.length,
+          };
+          placeholders.push(placeholder);
+          return `${prefix}${replaced}`;
+        }
+        return line;
+      })
+      .join('\n');
+      this.placeholders = placeholders;
       const { cm } = this;
       if (!cm) return;
-      this.$nextTick(() => {
-        cm.getDoc().clearHistory();
-        cm.focus();
+      cm.off('change', this.onChange);
+      cm.setValue(this.content || '');
+      placeholders.forEach(({
+        line, start, body, length,
+      }) => {
+        const span = document.createElement('span');
+        span.textContent = `${body.slice(0, MAX_LINE_LENGTH)}...`;
+        const mark = cm.markText({ line, ch: start }, { line, ch: start + length }, {
+          replacedWith: span,
+        });
+        span.addEventListener('click', debounce(() => {
+          if (!window.getSelection().toString()) {
+            const { from } = mark.find();
+            cm.setCursor(from);
+            cm.focus();
+          }
+        }));
       });
+      cm.getDoc().clearHistory();
+      cm.focus();
+      cm.on('change', this.onChange);
     },
     'search.state.query'() {
       this.debouncedFind();
@@ -214,40 +253,14 @@ export default {
     },
   },
   methods: {
-    checkOptions() {
-      const { cm, lineTooLong } = this;
-      if (!cm) return;
-      cm.setOption('readOnly', !!(lineTooLong || this.readonly));
-      cm.setOption('mode', lineTooLong ? 'null' : 'javascript');
-      cm.setOption('lineNumbers', !lineTooLong);
-      cm.setOption('lineWrapping', !lineTooLong);
-    },
-    getCutContent(value) {
-      const lines = value.split('\n');
-      const cut = lines.some(line => line.length > 10 * 1024);
-      const cutLines = [];
-      if (cut) {
-        const maxLength = 3 * 1024;
-        lines.forEach((line, index) => {
-          for (let offset = 0; offset < line.length; offset += maxLength) {
-            cutLines.push({
-              index,
-              text: line.slice(offset, offset + maxLength),
-            });
-          }
-          if (!line.length) {
-            cutLines.push({
-              index,
-              text: '',
-            });
-          }
-        });
-      }
-      return { cut, cutLines };
-    },
-    onReady(cm) {
+    onChange: debounce(function onChange() {
+      const content = this.getRealContent(this.cm.getValue());
+      this.cached = content;
+      this.$emit('input', content);
+    }, 200),
+    initialize(cm) {
       this.cm = cm;
-      this.checkOptions();
+      cm.setOption('readOnly', this.readonly);
       cm.state.commands = Object.assign({
         cancel: () => {
           if (this.search.show) {
@@ -268,7 +281,6 @@ export default {
       }, this.commands);
       cm.setOption('extraKeys', {
         Esc: 'cancel',
-        Tab: indentWithTab,
       });
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
@@ -350,37 +362,24 @@ export default {
       cm.focus();
     },
     onCopy(e) {
-      if (!this.lineTooLong || !this.cm || !this.cm.somethingSelected()) return;
-      const [rng] = this.cm.listSelections();
-      const positions = {};
-      [rng.anchor, rng.head].forEach(pos => {
-        positions[pos.sticky] = pos;
-      });
-      const meta = [];
-      {
-        let { line, ch } = positions.after;
-        for (; line < positions.before.line; line += 1) {
-          meta.push({ line, from: ch });
-          ch = 0;
-        }
-        meta.push({ line, from: ch, to: positions.before.ch });
-      }
-      const result = [];
-      let lastLine;
-      meta.forEach(({ line, from, to }) => {
-        const { text, index } = this.lineTooLong[line];
-        if (lastLine != null && lastLine !== index) {
-          result.push('\n');
-        }
-        lastLine = index;
-        result.push(to == null ? text.slice(from) : text.slice(from, to));
-      });
-      e.clipboardData.setData('text', result.join(''));
+      if (!this.cm || !this.cm.somethingSelected()) return;
+      const text = this.getRealContent(this.cm.getSelection());
+      e.clipboardData.setData('text', text);
       e.preventDefault();
       e.stopImmediatePropagation();
     },
+    getRealContent(text) {
+      return text.replace(/\x02+(\d+)\x03+/g, (_, id) => {
+        const placeholder = this.placeholders[id];
+        return placeholder && placeholder.body || '';
+      });
+    },
   },
   mounted() {
+    this.initialize(CodeMirror(
+      this.$refs.code,
+      Object.assign({}, this.cmOptions, options.get('editor')),
+    ));
     this.debouncedFind = debounce(this.searchInPlace, 100);
     if (this.global) window.addEventListener('keydown', this.onKeyDown, false);
     document.addEventListener('copy', this.onCopy, false);
@@ -400,5 +399,9 @@ export default {
     position: absolute;
     width: 100%;
   }
+}
+
+.editor-search > .inline-block > * {
+  vertical-align: middle;
 }
 </style>

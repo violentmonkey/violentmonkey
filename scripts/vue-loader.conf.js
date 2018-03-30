@@ -1,7 +1,6 @@
-const { styleLoader } = require('./utils');
+const { isProd } = require('./utils');
 
 module.exports = {
-  loaders: {
-    css: styleLoader({ fallback: 'vue-style-loader' }),
-  },
+  extractCSS: isProd,
+  preserveWhitespace: false,
 };

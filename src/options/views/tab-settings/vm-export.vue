@@ -10,7 +10,7 @@
     </div>
     <button v-text="i18n('buttonAllNone')" @click="toggleSelection()"></button>
     <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
-    <label>
+    <label class="ml-1">
       <setting-check name="exportValues" />
       <span v-text="i18n('labelExportScriptData')"></span>
     </label>
@@ -28,6 +28,7 @@
 <script>
 import Modal from 'vueleton/lib/modal';
 import { sendMessage, getLocaleString } from 'src/common';
+import { objectGet } from 'src/common/object';
 import options from 'src/common/options';
 import { isFirefox } from 'src/common/ua';
 import SettingCheck from 'src/common/ui/setting-check';
@@ -147,7 +148,7 @@ function download(url, cb) {
   setTimeout(() => {
     document.body.removeChild(a);
     if (cb) cb();
-  });
+  }, 3000);
 }
 
 function downloadBlob(blob) {
@@ -171,15 +172,14 @@ function downloadBlob(blob) {
 }
 
 function exportData(selectedIds) {
-  if (!selectedIds.length) return;
   const withValues = options.get('exportValues');
-  return sendMessage({
+  return (selectedIds.length ? sendMessage({
     cmd: 'ExportZip',
     data: {
       values: withValues,
       ids: selectedIds,
     },
-  })
+  }) : Promise.resolve())
   .then(data => {
     const names = {};
     const vm = {
@@ -188,7 +188,7 @@ function exportData(selectedIds) {
     };
     delete vm.settings.sync;
     if (withValues) vm.values = {};
-    const files = data.items.map(({ script, code }) => {
+    const files = (objectGet(data, 'items') || []).map(({ script, code }) => {
       let name = script.custom.name || script.meta.name || script.props.id;
       if (names[name]) {
         names[name] += 1;

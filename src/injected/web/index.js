@@ -1,6 +1,4 @@
-import {
-  getUniqId, bindEvents, attachFunction,
-} from '../utils';
+import { getUniqId, bindEvents, attachFunction, cache2blobUrl } from '../utils';
 import {
   includes, forEach, map, utf8decode, jsonDump, jsonLoad,
   Promise, console,
@@ -162,15 +160,11 @@ function wrapGM(script, code, cache) {
   if (!includes(grant, 'GM_info')) grant.push('GM_info');
   if (includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
   const resources = script.meta.resources || {};
-  const dataEncoders = {
-    o: val => jsonDump(val),
-    '': val => val.toString(),
-  };
   const dataDecoders = {
+    o: val => jsonLoad(val),
+    // deprecated
     n: val => Number(val),
     b: val => val === 'true',
-    o: val => jsonLoad(val),
-    '': val => val,
   };
   const pathMap = script.custom.pathMap || {};
   const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
@@ -217,10 +211,10 @@ function wrapGM(script, code, cache) {
         const raw = value[key];
         if (raw) {
           const type = raw[0];
-          const handle = dataDecoders[type] || dataDecoders[''];
+          const handle = dataDecoders[type];
           let val = raw.slice(1);
           try {
-            val = handle(val);
+            if (handle) val = handle(val);
           } catch (e) {
             if (process.env.DEBUG) console.warn(e);
           }
@@ -236,9 +230,8 @@ function wrapGM(script, code, cache) {
     },
     GM_setValue: {
       value(key, val) {
-        const type = (typeof val)[0];
-        const handle = dataEncoders[type] || dataEncoders[''];
-        const raw = type + handle(val);
+        const dumped = jsonDump(val);
+        const raw = dumped ? `o${dumped}` : null;
         const value = loadValues();
         value[key] = raw;
         dumpValue(key, raw);
@@ -249,7 +242,7 @@ function wrapGM(script, code, cache) {
         if (name in resources) {
           const key = resources[name];
           const raw = cache[pathMap[key] || key];
-          const text = raw && utf8decode(window.atob(raw));
+          const text = raw && utf8decode(window.atob(raw.split(',').pop()));
           return text;
         }
       },
@@ -262,13 +255,7 @@ function wrapGM(script, code, cache) {
           if (!blobUrl) {
             const raw = cache[pathMap[key] || key];
             if (raw) {
-              // Binary string is not supported by blob constructor,
-              // so we have to transform it into array buffer.
-              const bin = window.atob(raw);
-              const arr = new window.Uint8Array(bin.length);
-              for (let i = 0; i < bin.length; i += 1) arr[i] = bin.charCodeAt(i);
-              const blob = new Blob([arr]);
-              blobUrl = URL.createObjectURL(blob);
+              blobUrl = cache2blobUrl(raw);
               urls[key] = blobUrl;
             } else {
               blobUrl = key;

@@ -12,8 +12,8 @@ body {
   font-size: 1rem;
 }
 
-body,
 // Form elements will not inherit
+body,
 button,
 select,
 input,
@@ -116,8 +116,14 @@ button {
 .pos-rel {
   position: relative;
 }
+.ml-1 {
+  margin-left: .5em;
+}
 .mr-1 {
   margin-right: .5em;
+}
+.ml-2 {
+  margin-left: 1em;
 }
 .mt-1 {
   margin-top: .5em;
@@ -128,9 +134,9 @@ button {
 .mb-2 {
   margin-bottom: 1em;
 }
-.px-2 {
-  margin-left: 1em;
-  margin-right: 1em;
+.mx-1 {
+  margin-left: .5em;
+  margin-right: .5em;
 }
 .h-100 {
   height: 100%;
@@ -168,28 +174,6 @@ button {
   height: 100%;
   /* Use `Courier New` to ensure `&nbsp;` has the same width as an original space. */
   font-family: Courier New, Courier, monospace;
-}
-
-.CodeMirror-foldmarker {
-  color: blue;
-  text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
-  font-family: arial;
-  line-height: .3;
-  cursor: pointer;
-}
-.CodeMirror-foldgutter {
-  width: .7em;
-}
-.CodeMirror-foldgutter-open,
-.CodeMirror-foldgutter-folded {
-  color: #555;
-  cursor: pointer;
-}
-.CodeMirror-foldgutter-open:after {
-  content: "\25BE";
-}
-.CodeMirror-foldgutter-folded:after {
-  content: "\25B8";
 }
 
 .vl-dropdown-menu {

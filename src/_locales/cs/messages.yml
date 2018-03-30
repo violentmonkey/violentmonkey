@@ -149,6 +149,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: O Violentmonkey
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Povolit aktualizace
@@ -224,6 +227,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: Zahrnout
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Instaluji skript
@@ -235,6 +241,9 @@ labelLastUpdatedAt:
   message: ''
 labelLineNumber:
   description: Label for line number jumper.
+  message: ''
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
   message: ''
 labelMatch:
   description: Label of @match rules.
@@ -300,6 +309,7 @@ labelSyncDisabled:
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: ''
@@ -445,6 +455,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: ''
-warnScriptTooLarge:
-  description: Warning message shown when script is too large to be edited.
+warnScriptLongLines:
+  description: Warning message shown when script has lines that are too long to be edited.
   message: ''

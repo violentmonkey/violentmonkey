@@ -5,7 +5,8 @@ anchorTranslator:
   description: Translator shown on about tab.
   message: >-
     <a
-    href="https://www.transifex.com/user/profile/100%E3%81%AE%E4%BA%BA/">100の人</a>、Takute
+    href="https://www.transifex.com/user/profile/100%E3%81%AE%E4%BA%BA/">100の人</a>,
+    Takute, <a href="https://github.com/ScrachBuild">ScratchBuild</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: すべて選択 / 解除
@@ -149,6 +150,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: Violentmonkey について
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: 更新を許可
@@ -163,16 +167,16 @@ labelAutoUpdate:
   message: スクリプトの更新を自動的に確認する (毎日)
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'バッジの表示: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: 何も表示しない
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: 実行中のスクリプト数
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: 一意な実行中のスクリプト数
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: ブラックリスト
@@ -214,7 +218,7 @@ labelGeneral:
   message: 基本設定
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: ホームページ
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'ホームページのURL:'
@@ -224,6 +228,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: 実行するページのURL (@include)
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: スクリプトのインストール
@@ -232,10 +239,13 @@ labelKeepOriginal:
   message: 元のルールに追記
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: 最終更新日 $1
 labelLineNumber:
   description: Label for line number jumper.
   message: '指定行へ移動: '
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: ''
 labelMatch:
   description: Label of @match rules.
   message: 実行するページのURL (@match)
@@ -299,7 +309,8 @@ labelSyncDisabled:
   message: なし
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: ''
+  message: 期限が切れたとき、自動的に再認証する
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: 取り消し
@@ -429,10 +440,10 @@ optionShowEnabledFirst:
   message: 有効にされたスクリプトを先に
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: 大文字と小文字を区別する
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: 正規表現を使用する
 sideMenuAbout:
   description: 'Side menu: About'
   message: Violentmonkey について
@@ -445,6 +456,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: 更新
-warnScriptTooLarge:
-  description: Warning message shown when script is too large to be edited.
-  message: ''
+warnScriptLongLines:
+  description: Warning message shown when script has lines that are too long to be edited.
+  message: 一部の行が長すぎるため、読み取り専用モードで開きます。 外部エディタで編集してください。

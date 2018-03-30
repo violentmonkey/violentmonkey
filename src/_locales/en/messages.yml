@@ -149,6 +149,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: About Violentmonkey
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: Advanced
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Allow update
@@ -224,6 +227,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: '@include rules'
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: 'Indent unit:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Installing script
@@ -236,6 +242,9 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Line no.: '
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: Wrap long lines
 labelMatch:
   description: Label of @match rules.
   message: '@match rules'
@@ -300,6 +309,7 @@ labelSyncDisabled:
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Reauthorize automatically when expired
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: Revoke
@@ -445,6 +455,8 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Update
-warnScriptTooLarge:
-  description: Warning message shown when script is too large to be edited.
-  message: 'Script too large, opening in read-only mode.'
+warnScriptLongLines:
+  description: Warning message shown when script has lines that are too long to be edited.
+  message: >-
+    Some lines are too long, opening in read-only mode. Please edit with an
+    external editor.

@@ -11,7 +11,7 @@ export default () => new Promise((resolve, reject) => {
     req.onerror = reject;
     req.onupgradeneeded = () => {
       // No available upgradation
-      throw reject();
+      reject();
     };
   }
   function transform(db) {

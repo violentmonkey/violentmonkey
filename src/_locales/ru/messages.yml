@@ -156,6 +156,9 @@ installOptionTrack:
 labelAbout:
   description: Label shown on top of the about page.
   message: О расширении Violentmonkey
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Разрешить обновление
@@ -170,16 +173,16 @@ labelAutoUpdate:
   message: Ежедневно проверять наличие обновлений скриптов.
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'Показывать на значке: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: ничего
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: количество выполняющихся скриптов
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: количество уникальных выполняющихся скриптов
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Чёрный список
@@ -231,6 +234,9 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: 'Задействовать на (правила включений @include):'
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта...
@@ -243,6 +249,9 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Номер строки:'
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: ''
 labelMatch:
   description: Label of @match rules.
   message: 'Задействовать на (правила совпадений @match):'
@@ -307,6 +316,7 @@ labelSyncDisabled:
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: Отключить
@@ -452,6 +462,6 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Обновление
-warnScriptTooLarge:
-  description: Warning message shown when script is too large to be edited.
+warnScriptLongLines:
+  description: Warning message shown when script has lines that are too long to be edited.
   message: ''

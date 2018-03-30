@@ -5,7 +5,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
 const base = require('./webpack.base.conf');
-const { IS_DEV, merge } = require('./utils');
+const { isProd, merge } = require('./utils');
 
 const entry = {
   'background/app': 'src/background/app.js',
@@ -51,7 +51,7 @@ targets.push(merge(base, {
       chunks: ['browser', 'common', 'popup/app'],
     }),
     // new FriendlyErrorsPlugin(),
-    !IS_DEV && new ExtractTextPlugin('[name].css'),
+    isProd && new ExtractTextPlugin('[name].css'),
     // new webpack.NormalModuleReplacementPlugin(/\.\/rules\.json$/, resource => {
     //   resource.request = path.resolve(__dirname, '../src/resources/empty-rules.json');
     // }),

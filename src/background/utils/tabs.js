@@ -22,6 +22,7 @@ export function tabOpen(data, src) {
     active,
     windowId: srcTab.windowId,
     index: srcTab.index + 1,
+    openerTabId: srcTab.id,
   })
   .then(tab => {
     const { id } = tab;

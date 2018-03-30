@@ -184,3 +184,19 @@ export function getFullUrl(url, base) {
 export function isRemote(url) {
   return url && !(/^(file:|data:|http:\/\/localhost[:/])/.test(url));
 }
+
+export function cache2blobUrl(raw, { defaultType, type: overrideType } = {}) {
+  if (raw) {
+    const parts = `${raw}`.split(',');
+    const { length } = parts;
+    const b64 = parts[length - 1];
+    const type = overrideType || parts[length - 2] || defaultType || '';
+    // Binary string is not supported by blob constructor,
+    // so we have to transform it into array buffer.
+    const bin = window.atob(b64);
+    const arr = new window.Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i += 1) arr[i] = bin.charCodeAt(i);
+    const blob = new Blob([arr], { type });
+    return URL.createObjectURL(blob);
+  }
+}

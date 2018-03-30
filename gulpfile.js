@@ -9,7 +9,7 @@ const webpack = require('webpack');
 const webpackConfig = require('./scripts/webpack.conf');
 const i18n = require('./scripts/i18n');
 const string = require('./scripts/string');
-const { IS_DEV } = require('./scripts/utils');
+const { isProd } = require('./scripts/utils');
 const pkg = require('./package.json');
 
 const DIST = 'dist';
@@ -94,7 +94,7 @@ function manifest() {
 function copyFiles() {
   const jsFilter = gulpFilter(['**/*.js'], { restore: true });
   let stream = gulp.src(paths.copy, { base: 'src' });
-  if (!IS_DEV) stream = stream
+  if (isProd) stream = stream
   .pipe(jsFilter)
   .pipe(uglify())
   .pipe(jsFilter.restore);
