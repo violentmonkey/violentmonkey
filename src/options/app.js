@@ -48,12 +48,8 @@ function initScript(script) {
 function loadData(clear) {
   sendMessage({ cmd: 'GetData', data: clear })
   .then(data => {
-    if (store.cache) {
-      Object.keys(store.cache).forEach(url => {
-        URL.revokeObjectURL(store.cache[url]);
-      });
-      store.cache = null;
-    }
+    const oldCache = store.cache || {};
+    store.cache = null;
     [
       'cache',
       'scripts',
@@ -67,9 +63,17 @@ function loadData(clear) {
     if (store.cache) {
       Object.keys(store.cache).forEach(url => {
         const raw = store.cache[url];
-        store.cache[url] = cache2blobUrl(raw, { defaultType: 'image/png' });
+        if (oldCache[url]) {
+          store.cache[url] = oldCache[url];
+          delete oldCache[url];
+        } else {
+          store.cache[url] = cache2blobUrl(raw, { defaultType: 'image/png' });
+        }
       });
     }
+    Object.values(oldCache).forEach(blobUrl => {
+      URL.revokeObjectURL(blobUrl);
+    });
     store.loading = false;
   });
 }
