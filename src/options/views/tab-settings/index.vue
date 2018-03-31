@@ -94,11 +94,8 @@ const items = [
 const settings = {
   showAdvanced: false,
 };
-items.forEach(({ name, key, normalize }) => {
-  settings[name] = normalize(options.get(key || name));
-  hookSetting(key, value => {
-    settings[name] = value;
-  });
+items.forEach(({ name }) => {
+  settings[name] = null;
 });
 
 export default {
@@ -115,15 +112,22 @@ export default {
     return settings;
   },
   methods: {
-    getUpdater({ key, normalize }) {
+    getUpdater({ key, name, normalize }) {
       return (value, oldValue) => {
-        if (value !== oldValue) options.set(key, normalize(value));
+        if (value !== oldValue) options.set(key || name, normalize(value));
       };
     },
   },
   created() {
-    items.forEach(item => {
-      this.$watch(item.name, debounce(this.getUpdater(item), 300));
+    options.ready(() => {
+      items.forEach(item => {
+        const { name, key, normalize } = item;
+        settings[name] = normalize(options.get(key || name));
+        hookSetting(key, value => {
+          settings[name] = value;
+        });
+        this.$watch(name, debounce(this.getUpdater(item), 300));
+      });
     });
   },
 };
