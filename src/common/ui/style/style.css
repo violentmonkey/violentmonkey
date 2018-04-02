@@ -10,6 +10,7 @@ html {
 
 body {
   font-size: 1rem;
+  background: white;
 }
 
 // Form elements will not inherit
