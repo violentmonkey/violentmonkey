@@ -112,6 +112,9 @@ button {
   .flex-col > & {
     height: 0;
   }
+  :not(.flex-col) > & {
+    width: 0;
+  }
 }
 .pos-rel {
   position: relative;

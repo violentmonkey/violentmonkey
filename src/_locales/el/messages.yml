@@ -118,6 +118,15 @@ editNavCode:
 editNavSettings:
   description: Label of settings tab in script editor.
   message: Ρυθμίσεις
+editNavValues:
+  description: Label of values tab in script editor.
+  message: ''
+editValueCancel:
+  description: Button to cancel modification of a script value.
+  message: ''
+editValueSave:
+  description: Button to save modification of a script value.
+  message: ''
 extDescription:
   description: Description for this extension.
   message: Προσφέρει υποστήριξη για σενάρια χρηστών για τους φυλλομετρητές.
@@ -203,6 +212,9 @@ labelDonate:
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'URL Λήψης:'
+labelEditValue:
+  description: Label shown in the panel to edit a script value.
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
   message: Κανόνες @exclude
@@ -442,6 +454,9 @@ msgUpdated:
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Ενημέρωση...
+noValues:
+  description: Label shown when there is no value for current script.
+  message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Εμφάνιση των ενεργοποιημένων σεναρίων πρώτα
@@ -463,6 +478,12 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Ενημέρωση
+valueLabelKey:
+  description: Label for key of a script value.
+  message: ''
+valueLabelValue:
+  description: Label for value of a script value.
+  message: ''
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: ''

@@ -6,6 +6,7 @@
         <div class="edit-nav">
           <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
           <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
+          <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
         </div>
       </div>
       <div class="text-right">
@@ -22,8 +23,11 @@
         v-model="code" :commands="commands" @warnLarge="onWarnLarge"
       />
       <vm-settings
-        v-show="nav === 'settings'" class="abs-full"
+        v-show="nav === 'settings'" class="abs-full edit-body"
         :value="script" :settings="settings"
+      />
+      <vm-values
+        :show="nav === 'values'" class="abs-full edit-body" :script="script"
       />
     </div>
   </div>
@@ -35,6 +39,7 @@ import { objectGet } from 'src/common/object';
 import VmCode from 'src/common/ui/code';
 import { showMessage } from '../../utils';
 import VmSettings from './settings';
+import VmValues from './values';
 
 function fromList(list) {
   return (list || []).join('\n');
@@ -50,6 +55,7 @@ export default {
   components: {
     VmCode,
     VmSettings,
+    VmValues,
   },
   data() {
     return {
@@ -207,6 +213,11 @@ export default {
     > * {
       padding: 8px;
     }
+  }
+  &-body {
+    padding: 8px 16px;
+    overflow: auto;
+    background: white;
   }
   &-nav {
     position: absolute;
