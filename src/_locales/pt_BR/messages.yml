@@ -121,10 +121,10 @@ editNavValues:
   message: ''
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: Cancelar
+  message: 'Cancelar'
 editValueSave:
   description: Button to save modification of a script value.
-  message: Salvar
+  message: 'Salvar'
 extDescription:
   description: Description for this extension.
   message: Fornece suporte a scripts de usuários para navegadores.
