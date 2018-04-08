@@ -139,7 +139,7 @@ filterExecutionOrder:
   message: ordem de execução
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: Coloque o URL:
+  message: 'Coloque o URL:'
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Utilizar @downloadURL
