@@ -248,7 +248,7 @@ labelInclude:
   message: 'Задействовать на (правила включений @include):'
 labelIndentUnit:
   description: Label for editor option of indent unit size.
-  message: ''
+  message: 'Ширина отступа'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта...
@@ -263,7 +263,7 @@ labelLineNumber:
   message: 'Номер строки:'
 labelLineWrapping:
   description: Label for editor option of line wrapping.
-  message: ''
+  message: 'Переносить длинные строки'
 labelMatch:
   description: Label of @match rules.
   message: 'Задействовать на (правила совпадений @match):'
@@ -479,10 +479,10 @@ titleScriptUpdated:
   message: Обновление
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: 'Ключ (строка)'
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: 'Значение (сериализованное как JSON)'
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: ''
