@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - node
+cache: yarn
+script:
+  - yarn lint
+  - yarn i18n
+  - yarn test
