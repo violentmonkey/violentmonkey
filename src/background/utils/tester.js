@@ -53,8 +53,7 @@ export function testScript(url, script) {
   const inc = mergeLists(custom.origInclude && meta.include, custom.include);
   const exc = mergeLists(custom.origExclude && meta.exclude, custom.exclude);
   const excMat = mergeLists(custom.origExcludeMatch && meta.excludeMatch, custom.excludeMatch);
-  // match all if no @match or @include rule
-  let ok = !mat.length && !inc.length;
+  let ok = false;
   // @match
   ok = ok || testMatch(url, mat);
   // @include
