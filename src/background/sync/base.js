@@ -1,5 +1,5 @@
 import { debounce, normalizeKeys, request, noop } from 'src/common';
-import { objectSet, objectPick, objectPurify } from 'src/common/object';
+import { objectGet, objectSet, objectPick, objectPurify } from 'src/common/object';
 import { getEventEmitter, getOption, setOption, hookOptions } from '../utils';
 import {
   getScripts,
@@ -560,5 +560,6 @@ export function revoke() {
 }
 
 hookOptions(data => {
-  if ('sync.current' in data) initialize();
+  const value = objectGet(data, 'sync.current');
+  if (value) initialize();
 });
