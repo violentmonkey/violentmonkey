@@ -8,7 +8,7 @@ import {
   newScript, parseMeta,
   setClipboard, checkUpdate,
   getOption, setOption, hookOptions, getAllOptions,
-  initialize,
+  initialize, sendMessageOrIgnore,
 } from './utils';
 import { tabOpen, tabClose } from './utils/tabs';
 import createNotification from './utils/notifications';
@@ -27,7 +27,7 @@ hookOptions(changes => {
   if ('isApplied' in changes) setIcon(changes.isApplied);
   if ('autoUpdate' in changes) autoUpdate();
   if ('showBadge' in changes) updateBadges();
-  browser.runtime.sendMessage({
+  sendMessageOrIgnore({
     cmd: 'UpdateOptions',
     data: changes,
   });
@@ -99,7 +99,7 @@ const commands = {
     })
     .then(([script]) => {
       sync.sync();
-      browser.runtime.sendMessage({
+      sendMessageOrIgnore({
         cmd: 'UpdateScript',
         data: {
           where: { id: script.props.id },
@@ -137,7 +137,7 @@ const commands = {
   Vacuum: vacuum,
   ParseScript(data) {
     return parseScript(data).then(res => {
-      browser.runtime.sendMessage(res);
+      sendMessageOrIgnore(res);
       sync.sync();
       return res.data;
     });
