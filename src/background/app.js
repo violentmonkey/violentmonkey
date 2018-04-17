@@ -23,6 +23,17 @@ import { setValueStore, updateValueStore, resetValueOpener, addValueOpener } fro
 
 const VM_VER = browser.runtime.getManifest().version;
 
+// Firefox Android does not support such APIs, use noop
+const browserAction = [
+  'setIcon',
+  'setBadgeText',
+  'setBadgeBackgroundColor',
+].reduce((actions, key) => {
+  const fn = browser.browserAction[key];
+  actions[key] = fn ? fn.bind(browser.browserAction) : noop;
+  return actions;
+}, {});
+
 hookOptions(changes => {
   if ('isApplied' in changes) setIcon(changes.isApplied);
   if ('autoUpdate' in changes) autoUpdate();
@@ -244,7 +255,7 @@ function setBadge({ ids, reset }, src) {
     });
     data.unique = Object.keys(data.idMap).length;
   }
-  browser.browserAction.setBadgeBackgroundColor({
+  browserAction.setBadgeBackgroundColor({
     color: '#808',
     tabId: srcTab.id,
   });
@@ -257,7 +268,7 @@ function updateBadge(tabId) {
     let text;
     if (showBadge === 'total') text = data.number;
     else if (showBadge) text = data.unique;
-    browser.browserAction.setBadgeText({
+    browserAction.setBadgeText({
       text: `${text || ''}`,
       tabId,
     });
@@ -276,7 +287,7 @@ browser.tabs.onRemoved.addListener(id => {
 });
 
 function setIcon(isApplied) {
-  browser.browserAction.setIcon({
+  browserAction.setIcon({
     path: {
       19: `/public/images/icon19${isApplied ? '' : 'w'}.png`,
       38: `/public/images/icon38${isApplied ? '' : 'w'}.png`,
