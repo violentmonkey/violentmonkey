@@ -5,7 +5,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
 const base = require('./webpack.base.conf');
-const { isProd, merge } = require('./utils');
+const { isProd, merge, INIT_FUNC_NAME } = require('./utils');
 
 const entry = {
   'background/app': 'src/background/app.js',
@@ -68,13 +68,13 @@ targets.push(merge(base, {
   plugins: [
     new WrapperWebpackPlugin({
       header: `\
-window.VM_initializeWeb = function () {
+window.${INIT_FUNC_NAME} = function () {
   var module = { exports: {} };
 `,
       footer: `
   var exports = module.exports;
   return exports.__esModule ? exports['default'] : exports;
-};`,
+};0;`,
     }),
   ],
 }));

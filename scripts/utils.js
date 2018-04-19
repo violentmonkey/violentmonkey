@@ -3,6 +3,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
+const INIT_FUNC_NAME = 'VMInitInjection';
 
 function styleLoader({
   loaders = [],
@@ -55,9 +56,11 @@ exports.isTest = isTest;
 exports.styleLoader = styleLoader;
 exports.styleRule = styleRule;
 exports.merge = merge;
+exports.INIT_FUNC_NAME = INIT_FUNC_NAME;
 exports.definitions = {
   'process.env': {
     NODE_ENV: JSON.stringify(process.env.NODE_ENV),
     DEBUG: isDev ? 'true' : 'false', // whether to log message errors
+    INIT_FUNC_NAME: JSON.stringify(INIT_FUNC_NAME),
   },
 };

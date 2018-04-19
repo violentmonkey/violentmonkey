@@ -2,7 +2,7 @@
 // Firefox sucks: `isFinite` is not defined on `window`, see violentmonkey/violentmonkey#300
 // eslint-disable-next-line no-restricted-properties
 export const {
-  console, CustomEvent, Promise, isFinite,
+  console, CustomEvent, Promise, isFinite, Uint8Array,
 } = global;
 
 const arrayProto = Array.prototype;
@@ -63,14 +63,14 @@ export function encodeBody(body) {
     }, {}))
     .then(value => ({ cls, value }));
   } else if (includes(['blob', 'file'], cls)) {
-    const bufsize = 8192;
     result = new Promise(resolve => {
       const reader = new FileReader();
       reader.onload = () => {
-        let value = '';
+        // In Firefox, Uint8Array cannot be sliced if its data is read by FileReader
         const array = new Uint8Array(reader.result);
-        for (let i = 0; i < array.length; i += bufsize) {
-          value += fromCharCode(...array.subarray(i, i + bufsize));
+        let value = '';
+        for (let i = 0; i < array.length; i += 1) {
+          value += fromCharCode(array[i]);
         }
         resolve({
           cls,
