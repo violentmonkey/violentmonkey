@@ -76,6 +76,7 @@ function onLoadScripts(data) {
   const idle = [];
   const end = [];
   bridge.version = data.version;
+  bridge.isFirefox = data.isFirefox;
   if (includes([
     'greasyfork.org',
   ], window.location.host)) {
@@ -150,9 +151,11 @@ function wrapGM(script, code, cache) {
   const gm = {};
   const grant = script.meta.grant || [];
   const urls = {};
+  const unsafeWindow = bridge.isFirefox ? window.wrappedJSObject : window;
   if (!grant.length || (grant.length === 1 && grant[0] === 'none')) {
     // @grant none
     grant.pop();
+    gm.window = unsafeWindow;
   } else {
     gm.window = getWrapper();
   }
@@ -169,35 +172,31 @@ function wrapGM(script, code, cache) {
   const pathMap = script.custom.pathMap || {};
   const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
   const metaStr = matches ? matches[1] : '';
-  const gmFunctions = {
-    unsafeWindow: { value: window },
-    GM_info: {
-      get() {
-        const obj = {
-          uuid: script.props.uuid,
-          scriptMetaStr: metaStr,
-          scriptWillUpdate: !!script.config.shouldUpdate,
-          scriptHandler: 'Violentmonkey',
-          version: bridge.version,
-          script: {
-            description: script.meta.description || '',
-            excludes: script.meta.exclude.concat(),
-            includes: script.meta.include.concat(),
-            matches: script.meta.match.concat(),
-            name: script.meta.name || '',
-            namespace: script.meta.namespace || '',
-            resources: Object.keys(resources).map(name => ({
-              name,
-              url: resources[name],
-            })),
-            runAt: script.meta.runAt || '',
-            unwrap: false, // deprecated, always `false`
-            version: script.meta.version || '',
-          },
-        };
-        return obj;
-      },
+  const gmInfo = {
+    uuid: script.props.uuid,
+    scriptMetaStr: metaStr,
+    scriptWillUpdate: !!script.config.shouldUpdate,
+    scriptHandler: 'Violentmonkey',
+    version: bridge.version,
+    script: {
+      description: script.meta.description || '',
+      excludes: script.meta.exclude.concat(),
+      includes: script.meta.include.concat(),
+      matches: script.meta.match.concat(),
+      name: script.meta.name || '',
+      namespace: script.meta.namespace || '',
+      resources: Object.keys(resources).map(name => ({
+        name,
+        url: resources[name],
+      })),
+      runAt: script.meta.runAt || '',
+      unwrap: false, // deprecated, always `false`
+      version: script.meta.version || '',
     },
+  };
+  const gmFunctions = {
+    unsafeWindow: { value: unsafeWindow },
+    GM_info: { value: gmInfo },
     GM_deleteValue: {
       value(key) {
         const value = loadValues();
@@ -365,11 +364,20 @@ function getWrapper() {
   // http://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
   // http://developer.mozilla.org/docs/Web/API/Window
   const wrapper = {};
+  const defined = {};
+  // Block special objects
+  forEach([
+    'browser',
+  ], name => {
+    wrapper[name] = undefined;
+    defined[name] = 1;
+  });
   forEach([
     // `eval` should be called directly so that it is run in current scope
     'eval',
   ], name => {
-    wrapper[name] = window[name];
+    wrapper[name] = global[name];
+    defined[name] = 1;
   });
   forEach([
     // 'uneval',
@@ -419,9 +427,17 @@ function getWrapper() {
     'setTimeout',
     'stop',
   ], name => {
-    const method = window[name];
+    const method = global[name];
     if (method) {
-      wrapper[name] = (...args) => method.apply(window, args);
+      wrapper[name] = (...args) => method.apply(global, args);
+      defined[name] = 1;
+    }
+  });
+  Object.getOwnPropertyNames(global).forEach(name => {
+    const value = global[name];
+    if (!defined[name] && ['object', 'function'].includes(typeof value)) {
+      wrapper[name] = value;
+      defined[name] = 1;
     }
   });
   function defineProtectedProperty(name) {

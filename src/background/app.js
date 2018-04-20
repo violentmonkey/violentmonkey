@@ -8,7 +8,7 @@ import {
   newScript, parseMeta,
   setClipboard, checkUpdate,
   getOption, setOption, hookOptions, getAllOptions,
-  initialize,
+  initialize, sendMessageOrIgnore,
 } from './utils';
 import { tabOpen, tabClose } from './utils/tabs';
 import createNotification from './utils/notifications';
@@ -16,18 +16,29 @@ import {
   getScripts, removeScript, getData, checkRemove, getScriptsByURL,
   updateScriptInfo, getExportData, getScriptCode,
   getScriptByIds, moveScript, vacuum, parseScript, getScript,
-  sortScripts,
+  sortScripts, getValueStoresByIds,
 } from './utils/db';
 import { resetBlacklist } from './utils/tester';
 import { setValueStore, updateValueStore, resetValueOpener, addValueOpener } from './utils/values';
 
 const VM_VER = browser.runtime.getManifest().version;
 
+// Firefox Android does not support such APIs, use noop
+const browserAction = [
+  'setIcon',
+  'setBadgeText',
+  'setBadgeBackgroundColor',
+].reduce((actions, key) => {
+  const fn = browser.browserAction[key];
+  actions[key] = fn ? fn.bind(browser.browserAction) : noop;
+  return actions;
+}, {});
+
 hookOptions(changes => {
   if ('isApplied' in changes) setIcon(changes.isApplied);
   if ('autoUpdate' in changes) autoUpdate();
   if ('showBadge' in changes) updateBadges();
-  browser.runtime.sendMessage({
+  sendMessageOrIgnore({
     cmd: 'UpdateOptions',
     data: changes,
   });
@@ -99,7 +110,7 @@ const commands = {
     })
     .then(([script]) => {
       sync.sync();
-      browser.runtime.sendMessage({
+      sendMessageOrIgnore({
         cmd: 'UpdateScript',
         data: {
           where: { id: script.props.id },
@@ -107,6 +118,9 @@ const commands = {
         },
       });
     });
+  },
+  GetValueStore(id) {
+    return getValueStoresByIds([id]).then(res => res[id] || {});
   },
   SetValueStore({ where, valueStore }) {
     // Value store will be replaced soon.
@@ -134,7 +148,7 @@ const commands = {
   Vacuum: vacuum,
   ParseScript(data) {
     return parseScript(data).then(res => {
-      browser.runtime.sendMessage(res);
+      sendMessageOrIgnore(res);
       sync.sync();
       return res.data;
     });
@@ -193,6 +207,12 @@ const commands = {
   CheckPosition() {
     return sortScripts();
   },
+  // For Firefox
+  InjectScript(code, src) {
+    return browser.tabs.executeScript(src.tab.id, {
+      code: `${code};0`,
+    });
+  },
 };
 
 initialize()
@@ -241,7 +261,7 @@ function setBadge({ ids, reset }, src) {
     });
     data.unique = Object.keys(data.idMap).length;
   }
-  browser.browserAction.setBadgeBackgroundColor({
+  browserAction.setBadgeBackgroundColor({
     color: '#808',
     tabId: srcTab.id,
   });
@@ -254,7 +274,7 @@ function updateBadge(tabId) {
     let text;
     if (showBadge === 'total') text = data.number;
     else if (showBadge) text = data.unique;
-    browser.browserAction.setBadgeText({
+    browserAction.setBadgeText({
       text: `${text || ''}`,
       tabId,
     });
@@ -273,7 +293,7 @@ browser.tabs.onRemoved.addListener(id => {
 });
 
 function setIcon(isApplied) {
-  browser.browserAction.setIcon({
+  browserAction.setIcon({
     path: {
       19: `/public/images/icon19${isApplied ? '' : 'w'}.png`,
       38: `/public/images/icon38${isApplied ? '' : 'w'}.png`,

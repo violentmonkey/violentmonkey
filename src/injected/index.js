@@ -1,4 +1,5 @@
 import 'src/common/browser';
+import { isFirefox } from 'src/common/ua';
 import { inject, getUniqId, sendMessage } from './utils';
 import initialize from './content';
 
@@ -6,9 +7,6 @@ import initialize from './content';
   // Avoid running repeatedly due to new `document.documentElement`
   if (window.VM) return;
   window.VM = 1;
-
-  // eslint-disable-next-line camelcase
-  const { VM_initializeWeb } = window;
 
   function initBridge() {
     const contentId = getUniqId();
@@ -29,11 +27,19 @@ import initialize from './content';
       keys.forEach(key => { props[key] = 1; });
     });
     const args = [
-      JSON.stringify(webId),
-      JSON.stringify(contentId),
-      JSON.stringify(Object.keys(props)),
+      webId,
+      contentId,
+      Object.keys(props),
     ];
-    inject(`(${VM_initializeWeb.toString()}())(${args.join(',')})`);
+    const init = window[process.env.INIT_FUNC_NAME];
+    if (isFirefox) {
+      // In Firefox, unsafeWindow = window.wrappedJSObject
+      // So we don't need to inject the scripts into page context
+      init()(...args);
+    } else {
+      // Avoid using Function::apply in case it is shimmed
+      inject(`(${init.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
+    }
   }
 
   initBridge();

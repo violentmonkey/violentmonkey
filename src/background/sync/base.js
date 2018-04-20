@@ -1,6 +1,6 @@
 import { debounce, normalizeKeys, request, noop } from 'src/common';
-import { objectSet, objectPick, objectPurify } from 'src/common/object';
-import { getEventEmitter, getOption, setOption, hookOptions } from '../utils';
+import { objectGet, objectSet, objectPick, objectPurify } from 'src/common/object';
+import { getEventEmitter, getOption, setOption, hookOptions, sendMessageOrIgnore } from '../utils';
 import {
   getScripts,
   getScriptCode,
@@ -173,7 +173,7 @@ function extendService(options) {
 }
 
 const onStateChange = debounce(() => {
-  browser.runtime.sendMessage({
+  sendMessageOrIgnore({
     cmd: 'UpdateSync',
     data: getStates(),
   });
@@ -435,7 +435,7 @@ export const BaseService = serviceFactory({
               delete data.config.enabled;
             }
             return parseScript(data)
-            .then(res => { browser.runtime.sendMessage(res); });
+            .then(res => { sendMessageOrIgnore(res); });
           });
         }),
         ...putRemote.map(({ local, remote }) => {
@@ -560,5 +560,6 @@ export function revoke() {
 }
 
 hookOptions(data => {
-  if ('sync.current' in data) initialize();
+  const value = objectGet(data, 'sync.current');
+  if (value) initialize();
 });

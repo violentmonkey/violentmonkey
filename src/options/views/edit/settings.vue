@@ -118,31 +118,28 @@ export default {
 
 <style>
 .edit-settings {
-  padding: 8px 16px;
-  overflow: auto;
-  background: white;
   h4 {
     margin: 2em 0 1em;
   }
-}
-.form-group {
-  position: relative;
-  max-width: 600px;
-  margin-bottom: .5em;
-  &.vl-tooltip {
-    display: block;
-  }
-  input[type=text] {
-    width: 100%;
-  }
-  > * {
-    flex: 1;
-  }
-  > .label {
-    flex: 0 0 8em;
-  }
-  > textarea {
-    min-height: 5em;
+  .form-group {
+    position: relative;
+    max-width: 600px;
+    margin-bottom: .5em;
+    &.vl-tooltip {
+      display: block;
+    }
+    input[type=text] {
+      width: 100%;
+    }
+    > * {
+      flex: 1;
+    }
+    > .label {
+      flex: 0 0 8em;
+    }
+    > textarea {
+      min-height: 5em;
+    }
   }
 }
 </style>

@@ -5,6 +5,7 @@ import { testScript, testBlacklist } from './tester';
 import { register } from './init';
 import patchDB from './patch-db';
 import { setOption } from './options';
+import { sendMessageOrIgnore } from '.';
 
 function cacheOrFetch(handle) {
   const requests = {};
@@ -210,7 +211,7 @@ export function sortScripts() {
   });
   return normalizePosition()
   .then(changed => {
-    browser.runtime.sendMessage({ cmd: 'ScriptsUpdated' });
+    sendMessageOrIgnore({ cmd: 'ScriptsUpdated' });
     return changed;
   });
 }
@@ -356,7 +357,7 @@ export function removeScript(id) {
     storage.code.remove(id);
     storage.value.remove(id);
   }
-  browser.runtime.sendMessage({
+  sendMessageOrIgnore({
     cmd: 'RemoveScript',
     data: id,
   });

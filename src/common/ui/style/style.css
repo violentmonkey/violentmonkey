@@ -10,6 +10,7 @@ html {
 
 body {
   font-size: 1rem;
+  background: white;
 }
 
 // Form elements will not inherit
@@ -111,6 +112,9 @@ button {
   flex: auto;
   .flex-col > & {
     height: 0;
+  }
+  :not(.flex-col) > & {
+    width: 0;
   }
 }
 .pos-rel {

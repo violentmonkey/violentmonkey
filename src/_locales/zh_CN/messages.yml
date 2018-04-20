@@ -114,6 +114,15 @@ editNavCode:
 editNavSettings:
   description: Label of settings tab in script editor.
   message: 设置
+editNavValues:
+  description: Label of values tab in script editor.
+  message: 数据
+editValueCancel:
+  description: Button to cancel modification of a script value.
+  message: 取消
+editValueSave:
+  description: Button to save modification of a script value.
+  message: 保存
 extDescription:
   description: Description for this extension.
   message: 为浏览器提供用户脚本支持。
@@ -195,6 +204,9 @@ labelDonate:
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 下载更新地址：
+labelEditValue:
+  description: Label shown in the panel to edit a script value.
+  message: 编辑数据
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude 规则'
@@ -432,6 +444,9 @@ msgUpdated:
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: 正在更新...
+noValues:
+  description: Label shown when there is no value for current script.
+  message: 没有存储数据
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 先显示被启用的脚本
@@ -453,6 +468,12 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: 更新
+valueLabelKey:
+  description: Label for key of a script value.
+  message: 键名（字符串）
+valueLabelValue:
+  description: Label for value of a script value.
+  message: 键值（作为JSON序列化）
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: 某些行超长，以只读模式打开。请使用外部编辑器编辑。

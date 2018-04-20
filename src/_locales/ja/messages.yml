@@ -75,7 +75,7 @@ buttonSaveCustomCSS:
   message: 保存
 buttonSupport:
   description: Button to open support page.
-  message: サポート　ページ
+  message: サポートページ
 buttonUndo:
   description: Button to undo removement of a script.
   message: 戻す
@@ -117,6 +117,15 @@ editNavCode:
 editNavSettings:
   description: Label of settings tab in script editor.
   message: 設定
+editNavValues:
+  description: Label of values tab in script editor.
+  message: 値
+editValueCancel:
+  description: Button to cancel modification of a script value.
+  message: キャンセル
+editValueSave:
+  description: Button to save modification of a script value.
+  message: 保存
 extDescription:
   description: Description for this extension.
   message: ブラウザでユーザースクリプトを利用できるようにします。
@@ -152,7 +161,7 @@ labelAbout:
   message: Violentmonkey について
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: 高度な設定
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: 更新を許可
@@ -198,6 +207,9 @@ labelDonate:
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: '更新を取得するURL:'
+labelEditValue:
+  description: Label shown in the panel to edit a script value.
+  message: スクリプトの値を編集中
 labelExclude:
   description: Label of @exclude rules.
   message: 除外するページのURL (@exclude)
@@ -230,7 +242,7 @@ labelInclude:
   message: 実行するページのURL (@include)
 labelIndentUnit:
   description: Label for editor option of indent unit size.
-  message: ''
+  message: 'インデント幅:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: スクリプトのインストール
@@ -245,7 +257,7 @@ labelLineNumber:
   message: '指定行へ移動: '
 labelLineWrapping:
   description: Label for editor option of line wrapping.
-  message: ''
+  message: 長い行を折り返す
 labelMatch:
   description: Label of @match rules.
   message: 実行するページのURL (@match)
@@ -435,6 +447,9 @@ msgUpdated:
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: 更新中…
+noValues:
+  description: Label shown when there is no value for current script.
+  message: 値は保存されていません
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 有効にされたスクリプトを先に
@@ -456,6 +471,12 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: 更新
+valueLabelKey:
+  description: Label for key of a script value.
+  message: キー (文字列)
+valueLabelValue:
+  description: Label for value of a script value.
+  message: 値 (JSONとしてシリアル化された)
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: 一部の行が長すぎるため、読み取り専用モードで開きます。 外部エディタで編集してください。

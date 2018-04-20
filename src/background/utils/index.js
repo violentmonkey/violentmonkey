@@ -29,3 +29,7 @@ export function broadcast(data) {
     });
   });
 }
+
+export function sendMessageOrIgnore(...args) {
+  return browser.runtime.sendMessage(...args).catch(noop);
+}

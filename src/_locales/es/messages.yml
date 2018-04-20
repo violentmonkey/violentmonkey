@@ -116,6 +116,15 @@ editNavCode:
 editNavSettings:
   description: Label of settings tab in script editor.
   message: Ajustes
+editNavValues:
+  description: Label of values tab in script editor.
+  message: ''
+editValueCancel:
+  description: Button to cancel modification of a script value.
+  message: ''
+editValueSave:
+  description: Button to save modification of a script value.
+  message: ''
 extDescription:
   description: Description for this extension.
   message: Proporciona soporte de scripts para navegadores
@@ -201,6 +210,9 @@ labelDonate:
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: '@downloadURL:'
+labelEditValue:
+  description: Label shown in the panel to edit a script value.
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude:'
@@ -438,6 +450,9 @@ msgUpdated:
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Actualizando...
+noValues:
+  description: Label shown when there is no value for current script.
+  message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: ''
@@ -459,6 +474,12 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Actualizar
+valueLabelKey:
+  description: Label for key of a script value.
+  message: ''
+valueLabelValue:
+  description: Label for value of a script value.
+  message: ''
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: ''

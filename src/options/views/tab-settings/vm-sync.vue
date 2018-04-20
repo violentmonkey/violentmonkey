@@ -78,7 +78,7 @@ export default {
       if (service) {
         const canAuthorize = ['unauthorized', 'error', 'authorized'].includes(service.authState)
           && ['idle', 'error'].includes(service.syncState);
-        const canSync = this.canAuthorize && service.authState === 'authorized';
+        const canSync = canAuthorize && service.authState === 'authorized';
         return {
           message: this.getMessage(),
           label: this.getLabel(),

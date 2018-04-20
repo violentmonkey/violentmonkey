@@ -1,4 +1,5 @@
 import { noop } from 'src/common';
+import { isFirefox, isAndroid } from 'src/common/ua';
 
 const openers = {};
 
@@ -17,13 +18,17 @@ browser.tabs.onRemoved.addListener(id => {
 export function tabOpen(data, src) {
   const { url, active } = data;
   const srcTab = src.tab || {};
-  return browser.tabs.create({
+  const options = {
     url,
     active,
     windowId: srcTab.windowId,
     index: srcTab.index + 1,
-    openerTabId: srcTab.id,
-  })
+  };
+  // Firefox Android does not support `openerTabId` field, it fails if this field is passed
+  if (!isFirefox || !isAndroid) {
+    options.openerTabId = srcTab.id;
+  }
+  return browser.tabs.create(options)
   .then(tab => {
     const { id } = tab;
     openers[id] = srcTab.id;
