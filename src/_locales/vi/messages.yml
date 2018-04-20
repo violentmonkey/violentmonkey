@@ -472,10 +472,12 @@ titleScriptUpdated:
   message: Cập nhật
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Khóa (chuỗi)
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: Giá trị (đã đưa về dạng JSON)
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
-  message: ''
+  message: >-
+    Một số dòng quá dài, đang mở ở chế độ chỉ đọc. Vui lòng mở bằng trình
+    chỉnh sửa bên ngoài.
