@@ -66,7 +66,6 @@ export default function initialize(contentId, webId) {
         return false;
       });
     }
-    data.isFirefox = isFirefox;
     getPopup();
     setBadge();
     const needInject = data.scripts && data.scripts.length;
@@ -159,9 +158,5 @@ function injectScript(data) {
     JSON.stringify(vCallbackId),
   ];
   const injectedCode = `!${func.toString()}(${args.join(',')})`;
-  if (isFirefox) {
-    sendMessage({ cmd: 'InjectScript', data: injectedCode });
-  } else {
-    inject(injectedCode);
-  }
+  inject(injectedCode);
 }

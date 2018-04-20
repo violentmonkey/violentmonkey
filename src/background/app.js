@@ -207,12 +207,6 @@ const commands = {
   CheckPosition() {
     return sortScripts();
   },
-  // For Firefox
-  InjectScript(code, src) {
-    return browser.tabs.executeScript(src.tab.id, {
-      code: `${code};0`,
-    });
-  },
 };
 
 initialize()

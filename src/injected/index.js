@@ -1,5 +1,4 @@
 import 'src/common/browser';
-import { isFirefox } from 'src/common/ua';
 import { inject, getUniqId, sendMessage } from './utils';
 import initialize from './content';
 
@@ -32,14 +31,8 @@ import initialize from './content';
       Object.keys(props),
     ];
     const init = window[process.env.INIT_FUNC_NAME];
-    if (isFirefox) {
-      // In Firefox, unsafeWindow = window.wrappedJSObject
-      // So we don't need to inject the scripts into page context
-      init()(...args);
-    } else {
-      // Avoid using Function::apply in case it is shimmed
-      inject(`(${init.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
-    }
+    // Avoid using Function::apply in case it is shimmed
+    inject(`(${init.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
   }
 
   initBridge();

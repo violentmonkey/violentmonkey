@@ -76,7 +76,6 @@ function onLoadScripts(data) {
   const idle = [];
   const end = [];
   bridge.version = data.version;
-  bridge.isFirefox = data.isFirefox;
   if (includes([
     'greasyfork.org',
   ], window.location.host)) {
@@ -151,7 +150,7 @@ function wrapGM(script, code, cache) {
   const gm = {};
   const grant = script.meta.grant || [];
   const urls = {};
-  const unsafeWindow = bridge.isFirefox ? window.wrappedJSObject : window;
+  const unsafeWindow = window;
   if (!grant.length || (grant.length === 1 && grant[0] === 'none')) {
     // @grant none
     grant.pop();
@@ -364,20 +363,17 @@ function getWrapper() {
   // http://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
   // http://developer.mozilla.org/docs/Web/API/Window
   const wrapper = {};
-  const defined = {};
   // Block special objects
   forEach([
     'browser',
   ], name => {
     wrapper[name] = undefined;
-    defined[name] = 1;
   });
   forEach([
     // `eval` should be called directly so that it is run in current scope
     'eval',
   ], name => {
-    wrapper[name] = global[name];
-    defined[name] = 1;
+    wrapper[name] = window[name];
   });
   forEach([
     // 'uneval',
@@ -427,17 +423,9 @@ function getWrapper() {
     'setTimeout',
     'stop',
   ], name => {
-    const method = global[name];
+    const method = window[name];
     if (method) {
-      wrapper[name] = (...args) => method.apply(global, args);
-      defined[name] = 1;
-    }
-  });
-  Object.getOwnPropertyNames(global).forEach(name => {
-    const value = global[name];
-    if (!defined[name] && ['object', 'function'].includes(typeof value)) {
-      wrapper[name] = value;
-      defined[name] = 1;
+      wrapper[name] = (...args) => method.apply(window, args);
     }
   });
   function defineProtectedProperty(name) {
