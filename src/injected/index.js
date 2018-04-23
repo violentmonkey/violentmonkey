@@ -7,6 +7,9 @@ import initialize from './content';
   if (window.VM) return;
   window.VM = 1;
 
+  // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
+  const VMInitInjection = window[process.env.INIT_FUNC_NAME];
+
   function initBridge() {
     const contentId = getUniqId();
     const webId = getUniqId();
@@ -30,9 +33,8 @@ import initialize from './content';
       contentId,
       Object.keys(props),
     ];
-    const init = window[process.env.INIT_FUNC_NAME];
     // Avoid using Function::apply in case it is shimmed
-    inject(`(${init.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
+    inject(`(${VMInitInjection.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
   }
 
   initBridge();
