@@ -194,9 +194,6 @@ test('exclude', t => {
   t.test('should support magic TLD', q => {
     const script = buildScript({
       meta: {
-        match: [
-          '*://*/*',
-        ],
         exclude: [
           'https://www.google.tld/*',
         ],
