@@ -297,9 +297,19 @@ function wrapGM(script, code, cache) {
       },
     },
     GM_registerMenuCommand: {
-      value(cap, func, acc) {
-        store.commands[cap] = func;
-        bridge.post({ cmd: 'RegisterMenu', data: [cap, acc] });
+      value(cap, func) {
+        const { id } = script.props;
+        const key = `${id}:${cap}`;
+        store.commands[key] = func;
+        bridge.post({ cmd: 'RegisterMenu', data: [key, cap] });
+      },
+    },
+    GM_unregisterMenuCommand: {
+      value(cap) {
+        const { id } = script.props;
+        const key = `${id}:${cap}`;
+        delete store.commands[key];
+        bridge.post({ cmd: 'UnregisterMenu', data: [key, cap] });
       },
     },
     GM_xmlhttpRequest: {
