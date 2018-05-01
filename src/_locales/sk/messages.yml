@@ -1,0 +1,459 @@
+﻿anchorAuthor: 
+  description: Author shown on about tab.
+  message: '<a href=mailto:kubala.v@gmail.com>kubalav</a>'
+anchorTranslator: 
+  description: Translator shown on about tab.
+  message: '<a href=mailto:kubala.v@gmail.com>kubalav</a>;'
+buttonAllNone: 
+  description: Button to select all scripts or none.
+  message: Všetko/Nič
+buttonCancel: 
+  description: Cancel button on dialog.
+  message: Zrušiť
+buttonClose: 
+  description: Button to close window.
+  message: Zavrieť
+buttonConfirmInstallation: 
+  description: Button to confirm installation of a script.
+  message: Potvrdiť inštaláciu
+buttonDisable: 
+  description: Button to disable a script.
+  message: Zakázať
+buttonEdit: 
+  description: Button to edit a script.
+  message: Upraviť
+buttonEnable: 
+  description: Button to enable a script.
+  message: Povoliť
+buttonExportData: 
+  description: Button to open the data export dialog.
+  message: Exportovať do zip
+buttonFilter: 
+  description: Button to show filters menu.
+  message: Filter
+buttonHome: 
+  description: Button to open homepage.
+  message: Domovská stránka
+buttonImportData: 
+  description: Button to choose a file for data import.
+  message: Importovať zo zip
+buttonInstallFromURL: 
+  description: Button to ask for URL of a user script.
+  message: Inštalovať z adresy
+buttonInstallOptions: 
+  description: Button to show options of installation confirm page.
+  message: Možnosti
+buttonNew: 
+  description: Button to create a new script.
+  message: Nový
+buttonOK: 
+  description: OK button on dialog.
+  message: OK
+buttonRemove: 
+  description: Button to remove a script.
+  message: Odstrániť
+buttonReplace: 
+  description: Button to replace the current match.
+  message: Nahradiť
+buttonReplaceAll: 
+  description: Button to replace all matches.
+  message: Všetko
+buttonSave: 
+  description: Button to save modifications of a script.
+  message: Uložiť
+buttonSaveBlacklist: 
+  description: Button to save global blacklist.
+  message: Uložiť
+buttonSaveClose: 
+  description: Button to save modifications of a script and then close the editing page.
+  message: Uložiť & Zavrieť
+buttonSaveCustomCSS: 
+  description: Label for button to save custom CSS.
+  message: Uložiť
+buttonSupport: 
+  description: Button to open support page.
+  message: Stránka podpory
+buttonUndo: 
+  description: Button to undo removement of a script.
+  message: Späť
+buttonUpdate: 
+  description: Check a script for updates.
+  message: Skontrolovať aktualizácie
+buttonUpdateAll: 
+  description: Check all scripts for updates.
+  message: Skontrolovať aktualizácie
+buttonVacuum: 
+  description: Button to vacuum extension data.
+  message: Prečistiť databázu
+buttonVacuumed: 
+  description: Message shown when data is vacuumed.
+  message: Databáza bola prečistená
+buttonVacuuming: 
+  description: Message shown when data vacuum is in progress.
+  message: Čistím databázu...
+confirmNotSaved: 
+  description: Confirm message shown when there are unsaved script modifications.
+  message: Kliknutím na OK sa zmeny neuložia, Zrušiť vráti späť na úpravu.
+descBlacklist: 
+  description: HTML Description for the global blacklist.
+  message: Webové adresy v tomto zozname nebudú injektované skriptami.
+descCustomCSS: 
+  description: Description of custom CSS section.
+  message: Vlastné CSS pre stránku s možnosťami a inštalačnú stránku. Ak si nie ste istí, čo to je, prosím, neupravujte to.
+editLabelMeta: 
+  description: Metadata section in settings tab of script editor.
+  message: Vlastné metadáta
+editLabelSettings: 
+  description: Settings section in settings tab of script editor.
+  message: Nastavenia skriptu
+editNavCode: 
+  description: Label of code tab in script editor.
+  message: Kód
+editNavSettings: 
+  description: Label of settings tab in script editor.
+  message: Nastavenia
+editNavValues: 
+  description: Label of values tab in script editor.
+  message: Hodnoty
+editValueCancel: 
+  description: Button to cancel modification of a script value.
+  message: Zrušiť
+editValueSave: 
+  description: Button to save modification of a script value.
+  message: Uložiť
+extDescription: 
+  description: Description for this extension.
+  message: Umožňuje inštaláciu skriptov v prehliadači.
+extName: 
+  description: Name of this extension.
+  message: Violentmonkey
+filterAlphabeticalOrder: 
+  description: Label for option to sort scripts in alphabetical order.
+  message: abecedne
+filterExecutionOrder: 
+  description: Label for option to sort scripts in execution order.
+  message: spustenia
+hintInputURL: 
+  description: Hint for a prompt box to input URL of a user script.
+  message: Vložte adresu:
+hintUseDownloadURL: 
+  description: Shown as a place holder for @updateURL when it is not assigned
+  message: Použiť @downloadURL
+hintVacuum: 
+  description: Hint for vacuuming data.
+  message: Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej pamäte.
+installFrom: 
+  description: Label for button to install script from a userscript site.
+  message: Inštalovať z $1
+installOptionClose: 
+  description: Option to close confirm window after installation.
+  message: Zavrieť po nainštalovaní
+installOptionTrack: 
+  description: Option to track the loading local file before window is closed.
+  message: Sledovať lokálne súbory predtým ako sa toto okno zavrie
+labelAbout: 
+  description: Label shown on top of the about page.
+  message: Informácie o Violentmonkey
+labelAdvanced: 
+  description: Label for button to show advanced settings.
+  message: Pokročilé
+labelAllowUpdate: 
+  description: Option to allow checking updates for a script.
+  message: Povoliť aktualizácie
+labelAuthor: 
+  description: Label of author shown in the details of a script.
+  message: Autor: 
+labelAutoReloadCurrentTab: 
+  description: Option to reload current tab after a script is switched on or off from menu.
+  message: Obnoviť aktuálny list po vypnutí alebo zapnutí skriptu z menu
+labelAutoUpdate: 
+  description: Option to allow automatically checking scripts for updates every 24 hours.
+  message: Automaticky kontrolovať aktualizácie skriptov každý deň
+labelBadge: 
+  description: Label for option to show number on badge.
+  message: Zobraziť počítadlo: 
+labelBadgeNone: 
+  description: Option to display nothing on badge.
+  message: žiadny
+labelBadgeTotal: 
+  description: Option to display total number of running scripts on badge.
+  message: počet spustených skriptov
+labelBadgeUnique: 
+  description: Option to display number of unique running scripts on badge.
+  message: počet spustených unikátnych skriptov
+labelBlacklist: 
+  description: Label for global blacklist settings in security section.
+  message: Čierna listina
+labelCurrentLang: 
+  description: Label of current language.
+  message: Aktuálny jazyk: 
+labelCustomCSS: 
+  description: Label for custom CSS section.
+  message: Vlastný štýl
+labelDataExport: 
+  description: Section title of data export.
+  message: Export dát
+labelDataImport: 
+  description: Section title of data import.
+  message: Import dát
+labelDonate: 
+  description: Label of link to donate page.
+  message: Podporiť
+labelDownloadURL: 
+  description: Label of script @downloadURL in custom meta data.
+  message: Adresa pre sťahovanie:
+labelEditValue: 
+  description: Label shown in the panel to edit a script value.
+  message: Úprava hodnoty skriptu
+labelExclude: 
+  description: Label of @exclude rules.
+  message: pravidlá @exclude
+labelExcludeMatch: 
+  description: Label of @exclude-match rules.
+  message: pravidlá @exclude-match
+labelExportScriptData: 
+  description: Option to export script data along with scripts.
+  message: Exportovať dáta skriptu
+labelFeedback: 
+  description: Label of link to feedback page.
+  message: Spätná väzba
+labelFilterSort: 
+  description: Label for sort filter.
+  message: Zoradiť podľa $1
+labelGeneral: 
+  description: Label for general settings.
+  message: Všeobecné
+labelHomepage: 
+  description: Label for home page in about tab.
+  message: Domovská stránka
+labelHomepageURL: 
+  description: Label of script @homepageURL in custom meta data.
+  message: Adresa domovskej stránky:
+labelImportSettings: 
+  description: Label for option to import settings from zip file.
+  message: Importovať nastavenia
+labelInclude: 
+  description: Label of @include rules.
+  message: pravidlá @include
+labelIndentUnit: 
+  description: Label for editor option of indent unit size.
+  message: Zarážka:
+labelInstall: 
+  description: Shown in the title of the confirm page while trying to install a script.
+  message: Inštalovanie skriptu
+labelKeepOriginal: 
+  description: Option to keep the original match or ignore rules.
+  message: Ponechať pôvodné
+labelLastUpdatedAt: 
+  description: Label shown on last updated time.
+  message: Posledná aktualizácia $1
+labelLineNumber: 
+  description: Label for line number jumper.
+  message: Riadok č.: 
+labelLineWrapping: 
+  description: Label for editor option of line wrapping.
+  message: Zalomiť dlhé riadky
+labelMatch: 
+  description: Label of @match rules.
+  message: pravidlá @match
+labelName: 
+  description: Label of script name.
+  message: Názov:
+labelNoName: 
+  description: Text as the name of a script when no @name is assigned.
+  message: Bez názvu
+labelNoScripts: 
+  description: Message shown when no script is installed.
+  message: Ups, ešte nemáte nainštalovaný žiadny skript.
+labelNoSearchScripts: 
+  description: Message shown when no script is found in search results.
+  message: Nenašiel sa žiadny skript.
+labelNotifyUpdates: 
+  description: Option to show notification when script is updated.
+  message: Upozorňovať na aktualizácie skriptu
+labelRelated: 
+  description: Label of related links.
+  message: Súvisiace odkazy: 
+labelRemoved: 
+  description: Label shown when a script is removed.
+  message: [Odstránený]
+labelReplace: 
+  description: Label for replace input in search box.
+  message: Nahradiť: 
+labelRunAt: 
+  description: Label of script @run-at properties in custom meta data.
+  message: Spustiť pri:
+labelRunAtDefault: 
+  description: Shown when custom @run-at is not assigned.
+  message: (Predvolené)
+labelScriptEditor: 
+  description: Shown in the title of the script editing page.
+  message: Editor skriptu
+labelSearch: 
+  description: Label for search input in search box.
+  message: Vyhľadať: 
+labelSearchScript: 
+  description: Placeholder for script search box.
+  message: Vyhľadať skripty...
+labelSettings: 
+  description: Label shown on the top of settings page
+  message: Nastavenia
+labelSync: 
+  description: Label for sync options.
+  message: Synchronizácia
+labelSyncAuthorize: 
+  description: Label for button to authorize a service.
+  message: Autorizácia
+labelSyncAuthorizing: 
+  description: Label for button when authorization is in progress.
+  message: Autorizácia
+labelSyncDisabled: 
+  description: Label for option to disable sync service.
+  message: Nič
+labelSyncRevoke: 
+  description: Label for button to revoke authorization for a service.
+  message: Odvolať
+labelSyncScriptStatus: 
+  description: Label for option to sync script status.
+  message: Stav synchronizácie skriptu
+labelSyncService: 
+  description: Label for sync service select.
+  message: Synchronizovať na
+labelTranslator: 
+  description: Label of translator.
+  message: Prekladateľ: 
+labelUpdateURL: 
+  description: Label of script @updateURL in custom meta data.
+  message: Aktualizačná adresa:
+lastSync: 
+  description: Label for last sync timestamp.
+  message: Posledná synchronizácia $1
+learnBlacklist: 
+  description: Refers to a link to introduce blacklist patterns.
+  message: Získajte viac informácií o vzoroch čiernej listiny.
+menuCommands: 
+  description: Menu item to list script commands.
+  message: Príkazy skriptu
+menuDashboard: 
+  description: Label for menu item to open dashboard.
+  message: Otvoriť Dashboard
+menuFindScripts: 
+  description: Menu item to find scripts for a site.
+  message: Vyhľadať skripty pre túto stránku
+menuMatchedScripts: 
+  description: Label for menu listing matched scripts.
+  message: Vyhovujúce skripty
+menuScriptDisabled: 
+  description: Menu item showing the status of Violentmonkey, when disabled.
+  message: Skripty sú zakázané
+menuScriptEnabled: 
+  description: Menu item showing the status of Violentmonkey, when enabled.
+  message: Skripty sú povolené
+msgCheckingForUpdate: 
+  description: Message shown when a script is being checked for updates by version numbers.
+  message: Kontrola aktualizácií...
+msgErrorFetchingScript: 
+  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  message: Chyba pri načítaní skriptu!
+msgErrorFetchingUpdateInfo: 
+  description: Message shown when Violentmonkey fails fetching version data of the script.
+  message: Načítanie informácií o aktualizácii skončilo chybou.
+msgErrorLoadingData: 
+  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  message: Chyba pri načítaní dát skriptu.
+msgErrorLoadingDependency: 
+  description: Message shown when not all requirements are loaded successfully.
+  message: Chyba pri načítaní závislostí.
+msgImported: 
+  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  message: Importovaných položiek: $1
+msgInstalled: 
+  description: Message shown when a script is installed.
+  message: Skript bol nainštalovaný.
+msgInvalidScript: 
+  description: Message shown when script is invalid.
+  message: Neplatný skript!
+msgLoadedData: 
+  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  message: Dáta skriptu načítané.
+msgLoading: 
+  description: Message shown in the options page before script list is loaded.
+  message: Načítavam ...
+msgLoadingData: 
+  description: Message shown on confirm page when the script to be installed is loading.
+  message: Načítavam dáta skriptu...
+msgLoadingDependency: 
+  description: Message shown on confirm page when the requirements are being downloaded.
+  message: Načítavam závislosti... ($1/$2)
+msgNamespaceConflict: 
+  description: Message shown when namespace of the new script conflicts with an existent one.
+  message: Konflikt menného priestoru skriptu! Prosím, upravte @name a @namespace.
+msgNewVersion: 
+  description: Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.
+  message: Nájdená nová verzia.
+msgNoUpdate: 
+  description: Message shown when there is no new version of a script.
+  message: Nie sú žiadne aktualizácie.
+msgSavedBlacklist: 
+  description: Message shown when blacklist are saved.
+  message: Aktualizovaná čierna listina.
+msgSavedCustomCSS: 
+  description: Message shown when custom CSS is saved.
+  message: Aktualizovaný vlastný štýl.
+msgScriptUpdated: 
+  description: Notification message for script updates.
+  message: Skript [$1] ja aktualizovaný!
+msgSyncError: 
+  description: Message shown when sync failed.
+  message: Chyba synchronizácie!
+msgSyncInit: 
+  description: Message shown when sync service is initializing.
+  message: Inicializácia...
+msgSyncInitError: 
+  description: Message shown when sync fails in initialization.
+  message: Chyba inicializácie!
+msgSyncReady: 
+  description: Message shown when sync will start soon.
+  message: Synchronizácia sa spustí o chvíľu...
+msgSyncing: 
+  description: Message shown when sync is in progress.
+  message: Prebieha synchronizácia...
+msgUpdated: 
+  description: Message shown when a script is updated/reinstalled.
+  message: Skript aktualizovaný.
+msgUpdating: 
+  description: Message shown when a new version of script is being fetched.
+  message: Aktualizujem...
+noValues: 
+  description: Label shown when there is no value for current script.
+  message: Nie je uložená žiadna hodnota
+optionShowEnabledFirst: 
+  description: Option to show enabled scripts first in alphabetical order.
+  message: Zobraziť najskôr povolené skripty
+searchCaseSensitive: 
+  description: Option to perform a case-sensitive search
+  message: Rozlišovať veľké a malé písmená
+searchUseRegex: 
+  description: Option to perform a regular expression search
+  message: Použiť regulárne výrazy
+sideMenuAbout: 
+  description: Side menu: About
+  message: O Violentmonkey
+sideMenuInstalled: 
+  description: Side menu: Installed scripts
+  message: Nainštalované skripty
+sideMenuSettings: 
+  description: Side menu: Settings
+  message: Nastavenia
+titleScriptUpdated: 
+  description: Notification title for script updates.
+  message: Aktualizácia
+valueLabelKey: 
+  description: Label for key of a script value.
+  message: Kľúč (reťazec)
+valueLabelValue: 
+  description: Label for value of a script value.
+  message: Hodnota (serializované ako JSON)
+warnScriptLongLines: 
+  description: Warning message shown when script has lines that are too long to be edited.
+  message: Niektoré riadky sú príliš dlhé, otváram v režime iba na čítanie. Prosím, upravte s externým editorom.
