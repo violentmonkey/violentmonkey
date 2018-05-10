@@ -11,7 +11,7 @@ const IS_TOP = window.top === window;
 
 const ids = [];
 const enabledIds = [];
-const menus = [];
+const menus = {};
 
 function setBadge() {
   // delay setBadge in frames so that they can be added to the initial count
@@ -66,7 +66,6 @@ export default function initialize(contentId, webId) {
         return false;
       });
     }
-    data.isFirefox = isFirefox;
     getPopup();
     setBadge();
     const needInject = data.scripts && data.scripts.length;
@@ -93,7 +92,17 @@ const handlers = {
     sendMessage({ cmd: 'UpdateValue', data });
   },
   RegisterMenu(data) {
-    if (IS_TOP) menus.push(data);
+    if (IS_TOP) {
+      const [key] = data;
+      menus[key] = data;
+    }
+    getPopup();
+  },
+  UnregisterMenu(data) {
+    if (IS_TOP) {
+      const [key] = data;
+      delete menus[key];
+    }
     getPopup();
   },
   AddStyle({ css, callbackId }) {
@@ -140,7 +149,7 @@ function getPopup() {
   if (IS_TOP) {
     sendMessage({
       cmd: 'SetPopup',
-      data: { ids, menus },
+      data: { ids, menus: Object.values(menus) },
     });
   }
 }
@@ -159,9 +168,5 @@ function injectScript(data) {
     JSON.stringify(vCallbackId),
   ];
   const injectedCode = `!${func.toString()}(${args.join(',')})`;
-  if (isFirefox) {
-    sendMessage({ cmd: 'InjectScript', data: injectedCode });
-  } else {
-    inject(injectedCode);
-  }
+  inject(injectedCode);
 }

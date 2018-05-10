@@ -85,6 +85,7 @@ function start(req, id) {
     user: details.user,
     password: details.password,
     headers: details.headers,
+    timeout: details.timeout,
     overrideMimeType: details.overrideMimeType,
   };
   req.id = id;

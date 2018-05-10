@@ -1,5 +1,4 @@
 import 'src/common/browser';
-import { isFirefox } from 'src/common/ua';
 import { inject, getUniqId, sendMessage } from './utils';
 import initialize from './content';
 
@@ -7,6 +6,9 @@ import initialize from './content';
   // Avoid running repeatedly due to new `document.documentElement`
   if (window.VM) return;
   window.VM = 1;
+
+  // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
+  const VMInitInjection = window[process.env.INIT_FUNC_NAME];
 
   function initBridge() {
     const contentId = getUniqId();
@@ -31,15 +33,8 @@ import initialize from './content';
       contentId,
       Object.keys(props),
     ];
-    const init = window[process.env.INIT_FUNC_NAME];
-    if (isFirefox) {
-      // In Firefox, unsafeWindow = window.wrappedJSObject
-      // So we don't need to inject the scripts into page context
-      init()(...args);
-    } else {
-      // Avoid using Function::apply in case it is shimmed
-      inject(`(${init.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
-    }
+    // Avoid using Function::apply in case it is shimmed
+    inject(`(${VMInitInjection.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
   }
 
   initBridge();
