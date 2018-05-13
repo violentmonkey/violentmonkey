@@ -140,7 +140,7 @@ const escMap = {
   '\r': '\\r',
   '\t': '\\t',
 };
-const escRE = /[\\"\u0000-\u001F\u2028\u2029]/g;
+const escRE = /[\\"\u0000-\u001F\u2028\u2029]/g; // eslint-disable-line no-control-regex
 const escFunc = m => escMap[m] || `\\u${stringSlice(numberToString(stringCharCodeAt(m, 0) + 0x10000, 16), 1)}`;
 export const jsonLoad = JSON.parse;
 export function jsonDump(value) {

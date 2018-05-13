@@ -80,7 +80,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn transform '=yarn'",
+      "pre-commit": "yarn transform \"=yarn\"",
       "pre-push": "yarn lint"
     }
   }
