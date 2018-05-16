@@ -208,6 +208,9 @@ export default {
         this.message = `${result.update.message}[${this.getTimeString()}]`;
         if (this.closeAfterInstall) this.close();
         else if (this.isLocal && options.get('trackLocalFile')) this.trackLocalFile();
+      }, err => {
+        this.message = `${err}`;
+        this.installable = true;
       });
     },
     trackLocalFile() {
