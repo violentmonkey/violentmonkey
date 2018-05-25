@@ -1,7 +1,7 @@
 <!--
-Make sure you searched for existing issues that already report this problem.
+Make sure you searched for existing issues that already reported this problem.
 
-Note that duplicate issues or issues lack of essential information may be closed immediately!
+Note that issues without a reproduction may be closed immediately!
 -->
 
 ### What is the problem?
