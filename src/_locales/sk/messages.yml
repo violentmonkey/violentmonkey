@@ -1,9 +1,9 @@
 ﻿anchorAuthor: 
   description: Author shown on about tab.
-  message: '<a href=mailto:kubala.v@gmail.com>kubalav</a>'
+  message: '<a href=mailto:i@gerald.top>Gerald</a>'
 anchorTranslator: 
   description: Translator shown on about tab.
-  message: '<a href=mailto:kubala.v@gmail.com>kubalav</a>;'
+  message: '<a href=mailto:kubala.v@gmail.com>kubalav</a>'
 buttonAllNone: 
   description: Button to select all scripts or none.
   message: Všetko/Nič
@@ -135,7 +135,7 @@ filterExecutionOrder:
   message: spustenia
 hintInputURL: 
   description: Hint for a prompt box to input URL of a user script.
-  message: Vložte adresu:
+  message: 'Vložte adresu:'
 hintUseDownloadURL: 
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Použiť @downloadURL
@@ -162,7 +162,7 @@ labelAllowUpdate:
   message: Povoliť aktualizácie
 labelAuthor: 
   description: Label of author shown in the details of a script.
-  message: Autor: 
+  message: 'Autor: '
 labelAutoReloadCurrentTab: 
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Obnoviť aktuálny list po vypnutí alebo zapnutí skriptu z menu
@@ -171,22 +171,22 @@ labelAutoUpdate:
   message: Automaticky kontrolovať aktualizácie skriptov každý deň
 labelBadge: 
   description: Label for option to show number on badge.
-  message: Zobraziť počítadlo: 
+  message: 'Zobraziť počítadlo: '
 labelBadgeNone: 
   description: Option to display nothing on badge.
-  message: žiadny
+  message: žiadne
 labelBadgeTotal: 
   description: Option to display total number of running scripts on badge.
-  message: počet spustených skriptov
+  message: spustených skriptov
 labelBadgeUnique: 
   description: Option to display number of unique running scripts on badge.
-  message: počet spustených unikátnych skriptov
+  message: spustených unikátnych skriptov
 labelBlacklist: 
   description: Label for global blacklist settings in security section.
   message: Čierna listina
 labelCurrentLang: 
   description: Label of current language.
-  message: Aktuálny jazyk: 
+  message: 'Aktuálny jazyk: '
 labelCustomCSS: 
   description: Label for custom CSS section.
   message: Vlastný štýl
@@ -201,16 +201,16 @@ labelDonate:
   message: Podporiť
 labelDownloadURL: 
   description: Label of script @downloadURL in custom meta data.
-  message: Adresa pre sťahovanie:
+  message: 'Adresa pre sťahovanie:'
 labelEditValue: 
   description: Label shown in the panel to edit a script value.
   message: Úprava hodnoty skriptu
 labelExclude: 
   description: Label of @exclude rules.
-  message: pravidlá @exclude
+  message: 'pravidlá @exclude'
 labelExcludeMatch: 
   description: Label of @exclude-match rules.
-  message: pravidlá @exclude-match
+  message: 'pravidlá @exclude-match'
 labelExportScriptData: 
   description: Option to export script data along with scripts.
   message: Exportovať dáta skriptu
@@ -228,16 +228,16 @@ labelHomepage:
   message: Domovská stránka
 labelHomepageURL: 
   description: Label of script @homepageURL in custom meta data.
-  message: Adresa domovskej stránky:
+  message: 'Adresa domovskej stránky:'
 labelImportSettings: 
   description: Label for option to import settings from zip file.
   message: Importovať nastavenia
 labelInclude: 
   description: Label of @include rules.
-  message: pravidlá @include
+  message: 'pravidlá @include'
 labelIndentUnit: 
   description: Label for editor option of indent unit size.
-  message: Zarážka:
+  message: 'Zarážka:'
 labelInstall: 
   description: Shown in the title of the confirm page while trying to install a script.
   message: Inštalovanie skriptu
@@ -249,22 +249,22 @@ labelLastUpdatedAt:
   message: Posledná aktualizácia $1
 labelLineNumber: 
   description: Label for line number jumper.
-  message: Riadok č.: 
+  message: 'Riadok č.: '
 labelLineWrapping: 
   description: Label for editor option of line wrapping.
   message: Zalomiť dlhé riadky
 labelMatch: 
   description: Label of @match rules.
-  message: pravidlá @match
+  message: 'pravidlá @match'
 labelName: 
   description: Label of script name.
-  message: Názov:
+  message: 'Názov:'
 labelNoName: 
   description: Text as the name of a script when no @name is assigned.
   message: Bez názvu
 labelNoScripts: 
   description: Message shown when no script is installed.
-  message: Ups, ešte nemáte nainštalovaný žiadny skript.
+  message: 'Ups, ešte nemáte nainštalovaný žiadny skript.'
 labelNoSearchScripts: 
   description: Message shown when no script is found in search results.
   message: Nenašiel sa žiadny skript.
@@ -273,16 +273,16 @@ labelNotifyUpdates:
   message: Upozorňovať na aktualizácie skriptu
 labelRelated: 
   description: Label of related links.
-  message: Súvisiace odkazy: 
+  message: 'Súvisiace odkazy: '
 labelRemoved: 
   description: Label shown when a script is removed.
-  message: [Odstránený]
+  message: '[Odstránený]'
 labelReplace: 
   description: Label for replace input in search box.
-  message: Nahradiť: 
+  message: 'Nahradiť: '
 labelRunAt: 
   description: Label of script @run-at properties in custom meta data.
-  message: Spustiť pri:
+  message: 'Spustiť pri:'
 labelRunAtDefault: 
   description: Shown when custom @run-at is not assigned.
   message: (Predvolené)
@@ -291,7 +291,7 @@ labelScriptEditor:
   message: Editor skriptu
 labelSearch: 
   description: Label for search input in search box.
-  message: Vyhľadať: 
+  message: 'Vyhľadať: '
 labelSearchScript: 
   description: Placeholder for script search box.
   message: Vyhľadať skripty...
@@ -309,7 +309,7 @@ labelSyncAuthorizing:
   message: Autorizácia
 labelSyncDisabled: 
   description: Label for option to disable sync service.
-  message: Nič
+  message: Zakázané
 labelSyncRevoke: 
   description: Label for button to revoke authorization for a service.
   message: Odvolať
@@ -321,10 +321,10 @@ labelSyncService:
   message: Synchronizovať na
 labelTranslator: 
   description: Label of translator.
-  message: Prekladateľ: 
+  message: 'Prekladateľ: '
 labelUpdateURL: 
   description: Label of script @updateURL in custom meta data.
-  message: Aktualizačná adresa:
+  message: 'Aktualizačná adresa:'
 lastSync: 
   description: Label for last sync timestamp.
   message: Posledná synchronizácia $1
@@ -344,10 +344,10 @@ menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Vyhovujúce skripty
 menuScriptDisabled: 
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Skripty sú zakázané
 menuScriptEnabled: 
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: 'Menu item showing the status of Violentmonkey, when enabled.'
   message: Skripty sú povolené
 msgCheckingForUpdate: 
   description: Message shown when a script is being checked for updates by version numbers.
@@ -402,7 +402,7 @@ msgSavedCustomCSS:
   message: Aktualizovaný vlastný štýl.
 msgScriptUpdated: 
   description: Notification message for script updates.
-  message: Skript [$1] ja aktualizovaný!
+  message: 'Skript [$1] ja aktualizovaný!'
 msgSyncError: 
   description: Message shown when sync failed.
   message: Chyba synchronizácie!
@@ -437,13 +437,13 @@ searchUseRegex:
   description: Option to perform a regular expression search
   message: Použiť regulárne výrazy
 sideMenuAbout: 
-  description: Side menu: About
+  description: 'Side menu: About'
   message: O Violentmonkey
 sideMenuInstalled: 
-  description: Side menu: Installed scripts
+  description: 'Side menu: Installed scripts'
   message: Nainštalované skripty
 sideMenuSettings: 
-  description: Side menu: Settings
+  description: 'Side menu: Settings'
   message: Nastavenia
 titleScriptUpdated: 
   description: Notification title for script updates.
