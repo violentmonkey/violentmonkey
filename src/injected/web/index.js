@@ -11,6 +11,7 @@ import {
   onNotificationClosed,
 } from './notifications';
 import { onTabCreate, onTabClosed } from './tabs';
+import { onDownload } from './download';
 
 let state = 0;
 
@@ -314,6 +315,9 @@ function wrapGM(script, code, cache) {
     },
     GM_xmlhttpRequest: {
       value: onRequestCreate,
+    },
+    GM_download: {
+      value: onDownload,
     },
     GM_notification: {
       value(text, title, image, onclick) {
