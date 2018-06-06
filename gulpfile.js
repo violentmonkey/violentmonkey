@@ -102,6 +102,14 @@ function copyFiles() {
   .pipe(gulp.dest(DIST));
 }
 
+function checkI18n() {
+  return gulp.src(paths.templates)
+  .pipe(i18n.extract({
+    base: 'src/_locales',
+    extension: '.json',
+  }));
+}
+
 function copyI18n() {
   return gulp.src(paths.templates)
   .pipe(plumber(logError))
@@ -143,3 +151,4 @@ exports.clean = clean;
 exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
 exports.build = gulp.parallel(pack, jsProd);
 exports.i18n = updateI18n;
+exports.check = checkI18n;
