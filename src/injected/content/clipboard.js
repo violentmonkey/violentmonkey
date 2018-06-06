@@ -12,7 +12,8 @@ export default function setClipboard({ type, data }) {
   document.addEventListener('copy', onCopy, false);
   const ret = document.execCommand('copy', false, null);
   document.removeEventListener('copy', onCopy, false);
-  if (!ret && process.env.DEBUG) {
+  clipboardData = null;
+  if (process.env.DEBUG && !ret) {
     console.warn('Copy failed!');
   }
 }

@@ -179,9 +179,9 @@ function wrapGM(script, code, cache) {
     version: bridge.version,
     script: {
       description: script.meta.description || '',
-      excludes: script.meta.exclude.concat(),
-      includes: script.meta.include.concat(),
-      matches: script.meta.match.concat(),
+      excludes: [...script.meta.exclude],
+      includes: [...script.meta.include],
+      matches: [...script.meta.match],
       name: script.meta.name || '',
       namespace: script.meta.namespace || '',
       resources: Object.keys(resources).map(name => ({
