@@ -118,13 +118,13 @@ editNavSettings:
   message: Cài đặt
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: Các giá trị
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: ''
+  message: Huỷ
 editValueSave:
   description: Button to save modification of a script value.
-  message: ''
+  message: Lưu
 extDescription:
   description: Description for this extension.
   message: Hỗ trợ chạy userscript trên trình duyệt.
@@ -160,7 +160,7 @@ labelAbout:
   message: Thông tin Violentmonkey
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: Nâng cao
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Cho phép cập nhật
@@ -208,7 +208,7 @@ labelDownloadURL:
   message: 'URL tải về:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Sửa giá trị script
 labelExclude:
   description: Label of @exclude rules.
   message: Bỏ qua
@@ -241,7 +241,7 @@ labelInclude:
   message: Thực thi
 labelIndentUnit:
   description: Label for editor option of indent unit size.
-  message: ''
+  message: Khoảng cách thụt lề
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Đang cài đặt script
@@ -256,7 +256,7 @@ labelLineNumber:
   message: 'Dòng số.: '
 labelLineWrapping:
   description: Label for editor option of line wrapping.
-  message: ''
+  message: Ngắt dòng dài
 labelMatch:
   description: Label of @match rules.
   message: Trùng khớp
@@ -304,7 +304,7 @@ labelSettings:
   message: Cài đặt
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: Hiện thị số script đang chạy ở icon
+  message: Hiển thị số script đang chạy ở icon
   touched: false
 labelSync:
   description: Label for sync options.
@@ -448,7 +448,7 @@ msgUpdating:
   message: Đang cập nhật...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: Không có giá trị nào được lưu trữ
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Hiển thị script được bật trước
