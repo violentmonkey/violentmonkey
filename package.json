@@ -1,6 +1,6 @@
 {
   "name": "violentmonkey",
-  "version": "2.9.4",
+  "version": "2.9.5",
   "scripts": {
     "dev": "gulp dev",
     "prebuild": "yarn lint && gulp clean",
@@ -9,7 +9,7 @@
     "analyze": "webpack --profile --json --config scripts/webpack.conf.js | webpack-bundle-size-analyzer",
     "analyze:json": "webpack --profile --json --config scripts/webpack.conf.js > stats.json",
     "i18n": "gulp i18n",
-    "lint": "eslint --ext .js,.vue .",
+    "lint": "eslint --ext .js,.vue . && gulp check",
     "svgo": "svgo --config .svgo.yml src/resources/icons",
     "pretest": "cross-env NODE_ENV=test webpack --config scripts/webpack.test.conf.js",
     "test": "node dist/test",
@@ -80,7 +80,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn transform '=yarn'",
+      "pre-commit": "yarn transform \"=yarn\"",
       "pre-push": "yarn lint"
     }
   }

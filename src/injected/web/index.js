@@ -11,6 +11,7 @@ import {
   onNotificationClosed,
 } from './notifications';
 import { onTabCreate, onTabClosed } from './tabs';
+import { onDownload } from './download';
 
 let state = 0;
 
@@ -179,9 +180,9 @@ function wrapGM(script, code, cache) {
     version: bridge.version,
     script: {
       description: script.meta.description || '',
-      excludes: script.meta.exclude.concat(),
-      includes: script.meta.include.concat(),
-      matches: script.meta.match.concat(),
+      excludes: [...script.meta.exclude],
+      includes: [...script.meta.include],
+      matches: [...script.meta.match],
       name: script.meta.name || '',
       namespace: script.meta.namespace || '',
       resources: Object.keys(resources).map(name => ({
@@ -314,6 +315,9 @@ function wrapGM(script, code, cache) {
     },
     GM_xmlhttpRequest: {
       value: onRequestCreate,
+    },
+    GM_download: {
+      value: onDownload,
     },
     GM_notification: {
       value(text, title, image, onclick) {

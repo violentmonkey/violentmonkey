@@ -45,7 +45,7 @@ export function parseMeta(code) {
     [key]: metaTypes[key].default(),
   }), {});
   let flag = -1;
-  code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, (_match, group1, group2) => {
+  code.replace(/(?:^|\n)\s*\/\/\s*([@=]\S+)(.*)/g, (_match, group1, group2) => {
     if (flag < 0 && group1 === metaStart) {
       // start meta
       flag = 1;

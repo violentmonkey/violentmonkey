@@ -32,6 +32,7 @@ import { objectGet } from 'src/common/object';
 import options from 'src/common/options';
 import { isFirefox } from 'src/common/ua';
 import SettingCheck from 'src/common/ui/setting-check';
+import { downloadBlob } from 'src/common/download';
 import { store } from '../../utils';
 
 /**
@@ -81,7 +82,7 @@ export default {
     exportData() {
       this.exporting = true;
       Promise.resolve(exportData(this.selectedIds))
-      .then(downloadBlob)
+      .then(download)
       .catch(err => {
         console.error(err);
       })
@@ -138,20 +139,7 @@ function getExportname() {
   return `scripts_${getTimestamp()}.zip`;
 }
 
-function download(url, cb) {
-  const a = document.createElement('a');
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.href = url;
-  a.download = getExportname();
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-    if (cb) cb();
-  }, 3000);
-}
-
-function downloadBlob(blob) {
+function download(blob) {
   // Known issue: does not work on Firefox
   // https://bugzilla.mozilla.org/show_bug.cgi?id=1331176
   if (isFirefox) {
@@ -164,10 +152,7 @@ function downloadBlob(blob) {
     };
     reader.readAsDataURL(blob);
   } else {
-    const url = URL.createObjectURL(blob);
-    download(url, () => {
-      URL.revokeObjectURL(url);
-    });
+    downloadBlob(blob, getExportname());
   }
 }
 
