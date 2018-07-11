@@ -10,15 +10,16 @@ html {
 
 body {
   font-size: 1rem;
+  background: white;
 }
 
-body,
 // Form elements will not inherit
+body,
 button,
 select,
 input,
 textarea {
-  font-family: "PingFang SC", STHeiti, "Microsoft YaHei", sans-serif;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", sans-serif;
 }
 
 h1 {
@@ -112,12 +113,21 @@ button {
   .flex-col > & {
     height: 0;
   }
+  :not(.flex-col) > & {
+    width: 0;
+  }
 }
 .pos-rel {
   position: relative;
 }
+.ml-1 {
+  margin-left: .5em;
+}
 .mr-1 {
   margin-right: .5em;
+}
+.ml-2 {
+  margin-left: 1em;
 }
 .mt-1 {
   margin-top: .5em;
@@ -128,9 +138,9 @@ button {
 .mb-2 {
   margin-bottom: 1em;
 }
-.px-2 {
-  margin-left: 1em;
-  margin-right: 1em;
+.mx-1 {
+  margin-left: .5em;
+  margin-right: .5em;
 }
 .h-100 {
   height: 100%;
@@ -170,28 +180,6 @@ button {
   font-family: Courier New, Courier, monospace;
 }
 
-.CodeMirror-foldmarker {
-  color: blue;
-  text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
-  font-family: arial;
-  line-height: .3;
-  cursor: pointer;
-}
-.CodeMirror-foldgutter {
-  width: .7em;
-}
-.CodeMirror-foldgutter-open,
-.CodeMirror-foldgutter-folded {
-  color: #555;
-  cursor: pointer;
-}
-.CodeMirror-foldgutter-open:after {
-  content: "\25BE";
-}
-.CodeMirror-foldgutter-folded:after {
-  content: "\25B8";
-}
-
 .vl-dropdown-menu {
   padding: .5rem;
   border: 1px solid #bbb;
@@ -199,6 +187,7 @@ button {
 }
 
 .modal-content {
+  margin: 0 auto;
   padding: 1rem;
   background: white;
 }

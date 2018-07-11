@@ -3,6 +3,9 @@
 </template>
 
 <script>
+const requireIcon = require.context('src/resources/icons', false, /\.svg$/);
+requireIcon.keys().map(key => requireIcon(key));
+
 export default {
   props: ['name'],
 };

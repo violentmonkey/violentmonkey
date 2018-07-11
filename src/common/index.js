@@ -4,9 +4,9 @@ export function i18n(name, args) {
 export const defaultImage = '/public/images/icon128.png';
 
 export function normalizeKeys(key) {
-  let keys = key || [];
-  if (!Array.isArray(keys)) keys = keys.toString().split('.');
-  return keys;
+  if (key == null) return [];
+  if (Array.isArray(key)) return key;
+  return `${key}`.split('.').filter(Boolean);
 }
 
 export function initHooks() {
@@ -69,14 +69,18 @@ export function throttle(func, time) {
 
 export function noop() {}
 
-export function zfill(input, length) {
+export function leftpad(input, length, pad = '0') {
   let num = input.toString();
-  while (num.length < length) num = `0${num}`;
+  while (num.length < length) num = `${pad}${num}`;
   return num;
 }
 
-export function getUniqId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+export function getRnd4() {
+  return Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(-4);
+}
+
+export function getUniqId(prefix) {
+  return (prefix || '') + Date.now().toString(36) + getRnd4();
 }
 
 /**
@@ -109,7 +113,7 @@ export function request(url, options = {}) {
     if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
     const headers = Object.assign({}, options.headers);
     let { body } = options;
-    if (body && typeof body === 'object') {
+    if (body && Object.prototype.toString.call(body) === '[object Object]') {
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify(body);
     }
@@ -178,5 +182,21 @@ export function getFullUrl(url, base) {
 }
 
 export function isRemote(url) {
-  return url && !(/^(file|data):/.test(url));
+  return url && !(/^(file:|data:|http:\/\/localhost[:/])/.test(url));
+}
+
+export function cache2blobUrl(raw, { defaultType, type: overrideType } = {}) {
+  if (raw) {
+    const parts = `${raw}`.split(',');
+    const { length } = parts;
+    const b64 = parts[length - 1];
+    const type = overrideType || parts[length - 2] || defaultType || '';
+    // Binary string is not supported by blob constructor,
+    // so we have to transform it into array buffer.
+    const bin = window.atob(b64);
+    const arr = new window.Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i += 1) arr[i] = bin.charCodeAt(i);
+    const blob = new Blob([arr], { type });
+    return URL.createObjectURL(blob);
+  }
 }

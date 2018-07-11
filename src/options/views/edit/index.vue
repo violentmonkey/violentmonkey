@@ -2,32 +2,33 @@
   <div class="frame flex flex-col fixed-full">
     <div class="flex edit-header">
       <h2 v-text="i18n('labelScriptEditor')"></h2>
-      <div class="flex-auto pos-rel px-2">
+      <div class="flex-auto pos-rel ml-2">
         <div class="edit-nav">
-          <div v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
-          <div v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
+          <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
+          <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
+          <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
         </div>
       </div>
-      <div class="buttons">
+      <div class="text-right">
         <a class="mr-1" href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
+        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
+        <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
+        <button v-text="i18n('buttonClose')" @click="close"></button>
+        <div class="text-red mt-1" v-if="tooLarge" v-text="i18n('warnScriptLongLines')"></div>
       </div>
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
         v-show="nav === 'code'" class="abs-full"
-        v-model="code" :commands="commands"
+        v-model="code" :commands="commands" @warnLarge="onWarnLarge"
       />
       <vm-settings
-        v-show="nav === 'settings'" class="abs-full"
+        v-show="nav === 'settings'" class="abs-full edit-body"
         :value="script" :settings="settings"
       />
-    </div>
-    <div class="frame-block">
-      <div class="pull-right">
-        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
-        <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
-        <button v-text="i18n('buttonClose')" @click="close"></button>
-      </div>
+      <vm-values
+        :show="nav === 'values'" class="abs-full edit-body" :script="script"
+      />
     </div>
   </div>
 </template>
@@ -38,6 +39,7 @@ import { objectGet } from 'src/common/object';
 import VmCode from 'src/common/ui/code';
 import { showMessage } from '../../utils';
 import VmSettings from './settings';
+import VmValues from './values';
 
 function fromList(list) {
   return (list || []).join('\n');
@@ -53,12 +55,14 @@ export default {
   components: {
     VmCode,
     VmSettings,
+    VmValues,
   },
   data() {
     return {
       nav: 'code',
       canSave: false,
       script: null,
+      tooLarge: false,
       code: '',
       settings: {},
       commands: {
@@ -196,6 +200,9 @@ export default {
     saveClose() {
       this.save().then(this.close);
     },
+    onWarnLarge(tooLarge) {
+      this.tooLarge = tooLarge;
+    },
   },
 };
 </script>
@@ -205,25 +212,33 @@ export default {
   &-header {
     > * {
       padding: 8px;
-      cursor: pointer;
     }
+  }
+  &-body {
+    padding: 8px 16px;
+    overflow: auto;
+    background: white;
   }
   &-nav {
     position: absolute;
     left: 0;
     bottom: 0;
-    > div {
-      display: inline-block;
-      padding: 8px 16px;
-      color: #bbb;
-      &.active {
-        background: white;
-        box-shadow: 0 -1px 1px #bbb;
-        color: #333;
-      }
-      &:hover {
-        box-shadow: 0 -1px 1px #bbb;
-      }
+    .text-red {
+      margin-left: 8px;
+    }
+  }
+  &-nav-item {
+    display: inline-block;
+    padding: 8px 16px;
+    cursor: pointer;
+    color: #bbb;
+    &.active {
+      background: white;
+      box-shadow: 0 -1px 1px #bbb;
+      color: #333;
+    }
+    &:hover {
+      box-shadow: 0 -1px 1px #bbb;
     }
   }
 }

@@ -2,24 +2,24 @@
   <div class="tab-installed">
     <header class="flex">
       <div class="flex-auto">
-        <vl-dropdown :closeAfterClick="true">
+        <dropdown :closeAfterClick="true" :class="{active: menuNewActive}" @stateChange="onStateChange">
           <tooltip :title="i18n('buttonNew')" placement="down" align="start" slot="toggle">
             <span class="btn-ghost">
               <icon name="plus"></icon>
             </span>
           </tooltip>
-          <div class="dropdown-menu-item" v-text="i18n('buttonNew')" @click.prevent="newScript"></div>
+          <div class="dropdown-menu-item" v-text="i18n('buttonNew')" @click.prevent="onEditScript('_new')"></div>
           <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank"></a>
           <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank"></a>
           <div class="dropdown-menu-item" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></div>
-        </vl-dropdown>
+        </dropdown>
         <tooltip :title="i18n('buttonUpdateAll')" placement="down" align="start">
           <span class="btn-ghost" @click="updateAll">
             <icon name="refresh"></icon>
           </span>
         </tooltip>
       </div>
-      <vl-dropdown align="right" class="filter-sort">
+      <dropdown align="right" class="filter-sort">
         <tooltip :title="i18n('buttonFilter')" placement="down" slot="toggle">
           <span class="btn-ghost">
             <icon name="filter"></icon>
@@ -42,7 +42,7 @@
             <span v-text="i18n('optionShowEnabledFirst')"></span>
           </label>
         </div>
-      </vl-dropdown>
+      </dropdown>
       <div class="filter-search">
         <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
         <icon name="search"></icon>
@@ -51,26 +51,26 @@
     <div class="scripts">
       <item v-for="script in store.filteredScripts" :key="script.props.id"
       :script="script" :draggable="filters.sort.value === 'exec' && !script.config.removed"
-      @edit="editScript" @move="moveScript"></item>
+      @edit="onEditScript" @move="moveScript"></item>
     </div>
     <div class="backdrop" :class="{mask: store.loading}" v-show="message">
       <div v-html="message"></div>
     </div>
-    <edit v-if="script" :initial="script" @close="endEditScript"></edit>
+    <edit v-if="script" :initial="script" @close="onEditScript()"></edit>
   </div>
 </template>
 
 <script>
-import VlDropdown from 'vueleton/lib/dropdown';
-import VlModal from 'vueleton/lib/modal';
+import Dropdown from 'vueleton/lib/dropdown';
+import Tooltip from 'vueleton/lib/tooltip';
 import { i18n, sendMessage, noop, debounce } from 'src/common';
 import { objectGet } from 'src/common/object';
 import options from 'src/common/options';
 import SettingCheck from 'src/common/ui/setting-check';
 import hookSetting from 'src/common/hook-setting';
 import Icon from 'src/common/ui/icon';
-import Tooltip from 'src/common/ui/tooltip';
 import LocaleGroup from 'src/common/ui/locale-group';
+import { setRoute } from 'src/common/router';
 import Item from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
@@ -111,8 +111,7 @@ export default {
     Tooltip,
     SettingCheck,
     LocaleGroup,
-    VlDropdown,
-    VlModal,
+    Dropdown,
     Icon,
   },
   data() {
@@ -123,12 +122,17 @@ export default {
       script: null,
       search: null,
       modal: null,
+      menuNewActive: false,
     };
   },
   watch: {
     search: 'updateLater',
     'filters.sort.value': 'updateLater',
-    'store.scripts': 'onUpdate',
+    'store.scripts'() {
+      this.onUpdate();
+      this.onHashChange();
+    },
+    'store.route.paths.1': 'onHashChange',
   },
   computed: {
     message() {
@@ -153,12 +157,17 @@ export default {
         : scripts.slice();
       if (sort.value === 'alpha') {
         const showEnabledFirst = options.get('filters.showEnabledFirst');
-        filteredScripts.sort((a, b) => {
-          if (showEnabledFirst && a.config.enabled !== b.config.enabled) {
-            return a.config.enabled ? -1 : 1;
+        const getSortKey = item => {
+          const keys = [];
+          if (showEnabledFirst) {
+            keys.push(item.config.enabled ? 0 : 1);
           }
-          const { _cache: { lowerName: nameA } } = a;
-          const { _cache: { lowerName: nameB } } = b;
+          keys.push(item._cache.lowerName);
+          return keys.join('');
+        };
+        filteredScripts.sort((a, b) => {
+          const nameA = getSortKey(a);
+          const nameB = getSortKey(b);
           if (nameA < nameB) return -1;
           if (nameA > nameB) return 1;
           return 0;
@@ -168,9 +177,6 @@ export default {
     },
     updateLater() {
       this.debouncedUpdate();
-    },
-    newScript() {
-      this.script = {};
     },
     updateAll() {
       sendMessage({ cmd: 'CheckUpdateAll' });
@@ -199,12 +205,6 @@ export default {
       .catch(err => {
         if (err) showMessage({ text: err });
       });
-    },
-    editScript(id) {
-      this.script = this.store.scripts.find(script => script.props.id === id);
-    },
-    endEditScript() {
-      this.script = null;
     },
     moveScript(data) {
       if (data.from === data.to) return;
@@ -235,9 +235,25 @@ export default {
     onOrderChange(e) {
       options.set('filters.sort', e.target.value);
     },
+    onStateChange(active) {
+      this.menuNewActive = active;
+    },
+    onEditScript(id) {
+      setRoute(['scripts', id].filter(Boolean).join('/'), true);
+    },
+    onHashChange() {
+      const id = this.store.route.paths[1];
+      if (id === '_new') {
+        this.script = {};
+      } else {
+        const nid = id && +id || null;
+        this.script = nid && this.store.scripts.find(script => script.props.id === nid);
+      }
+    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 200);
+    this.onUpdate();
   },
 };
 </script>
@@ -256,6 +272,9 @@ $header-height: 4rem;
   }
   .vl-dropdown-menu {
     white-space: nowrap;
+  }
+  .vl-dropdown.active .vl-tooltip-wrap {
+    display: none;
   }
 }
 .backdrop,

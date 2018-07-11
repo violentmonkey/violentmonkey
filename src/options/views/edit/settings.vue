@@ -19,9 +19,9 @@
       <tooltip title="@run-at" placement="right">
         <select v-model="custom.runAt">
           <option value="" v-text="i18n('labelRunAtDefault')"></option>
-          <option value="start">document-start</option>
-          <option value="idle">document-idle</option>
-          <option value="end">document-end</option>
+          <option value="document-start">document-start</option>
+          <option value="document-end">document-end</option>
+          <option value="document-idle">document-idle</option>
         </select>
       </tooltip>
     </div>
@@ -87,9 +87,9 @@
 </template>
 
 <script>
+import Tooltip from 'vueleton/lib/tooltip';
 import { i18n } from 'src/common';
 import { objectGet } from 'src/common/object';
-import Tooltip from 'src/common/ui/tooltip';
 
 export default {
   props: ['value', 'settings'],
@@ -118,31 +118,28 @@ export default {
 
 <style>
 .edit-settings {
-  padding: 8px 16px;
-  overflow: auto;
-  background: white;
   h4 {
     margin: 2em 0 1em;
   }
-}
-.form-group {
-  position: relative;
-  max-width: 600px;
-  margin-bottom: .5em;
-  &.tooltip {
-    display: block;
-  }
-  input[type=text] {
-    width: 100%;
-  }
-  > * {
-    flex: 1;
-  }
-  > .label {
-    flex: 0 0 8em;
-  }
-  > textarea {
-    min-height: 5em;
+  .form-group {
+    position: relative;
+    max-width: 600px;
+    margin-bottom: .5em;
+    &.vl-tooltip {
+      display: block;
+    }
+    input[type=text] {
+      width: 100%;
+    }
+    > * {
+      flex: 1;
+    }
+    > .label {
+      flex: 0 0 8em;
+    }
+    > textarea {
+      min-height: 5em;
+    }
   }
 }
 </style>

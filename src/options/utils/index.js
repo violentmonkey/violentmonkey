@@ -1,7 +1,10 @@
 import Modal from 'vueleton/lib/modal';
+import { route } from 'src/common/router';
 import Message from '../views/message';
 
-export const store = {};
+export const store = {
+  route,
+};
 
 export function showMessage(message) {
   const modal = Modal.show(h => h(Message, {

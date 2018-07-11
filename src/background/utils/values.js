@@ -1,8 +1,14 @@
-import { broadcast } from '.';
+import { noop } from 'src/common';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 
+const openers = {}; // scriptId: { openerId: 1, ... }
+const tabScripts = {}; // openerId: { scriptId: 1, ... }
 let cache;
 let timer;
+
+browser.tabs.onRemoved.addListener(id => {
+  resetValueOpener(id);
+});
 
 export function updateValueStore(id, update) {
   updateLater();
@@ -19,6 +25,34 @@ export function updateValueStore(id, update) {
 export function setValueStore(where, value) {
   return dumpValueStore(where, value)
   .then(broadcastUpdates);
+}
+
+export function resetValueOpener(openerId) {
+  const scriptMap = tabScripts[openerId];
+  if (scriptMap) {
+    Object.keys(scriptMap).forEach(scriptId => {
+      const map = openers[scriptId];
+      if (map) delete map[openerId];
+    });
+    delete tabScripts[openerId];
+  }
+}
+
+export function addValueOpener(openerId, scriptIds) {
+  let scriptMap = tabScripts[openerId];
+  if (!scriptMap) {
+    scriptMap = {};
+    tabScripts[openerId] = scriptMap;
+  }
+  scriptIds.forEach(scriptId => {
+    scriptMap[scriptId] = 1;
+    let openerMap = openers[scriptId];
+    if (!openerMap) {
+      openerMap = {};
+      openers[scriptId] = openerMap;
+    }
+    openerMap[openerId] = 1;
+  });
 }
 
 function updateLater() {
@@ -55,9 +89,14 @@ function doUpdate() {
 
 function broadcastUpdates(updates) {
   if (updates) {
-    broadcast({
-      cmd: 'UpdatedValues',
-      data: updates,
+    const updatedOpeners = Object.keys(updates)
+    .reduce((map, scriptId) => Object.assign(map, openers[scriptId]), {});
+    Object.keys(updatedOpeners).forEach(openerId => {
+      browser.tabs.sendMessage(+openerId, {
+        cmd: 'UpdatedValues',
+        data: updates,
+      })
+      .catch(noop);
     });
   }
 }

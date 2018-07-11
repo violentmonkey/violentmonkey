@@ -1,24 +1,29 @@
-export { sendMessage, request, throttle } from 'src/common';
+import { CustomEvent, jsonDump, jsonLoad } from './helpers';
 
-// cache native properties to avoid being overridden, see violentmonkey/violentmonkey#151
-export const { console, CustomEvent, Promise } = window;
+export { sendMessage, request, throttle, cache2blobUrl } from 'src/common';
 
 export function postData(destId, data) {
   // Firefox issue: data must be stringified to avoid cross-origin problem
-  const e = new CustomEvent(destId, { detail: JSON.stringify(data) });
+  const e = new CustomEvent(destId, { detail: jsonDump(data) });
   document.dispatchEvent(e);
+}
+
+function removeElement(id) {
+  const el = document.querySelector(`#${id}`);
+  if (el) {
+    el.parentNode.removeChild(el);
+    return true;
+  }
 }
 
 export function inject(code) {
   const script = document.createElement('script');
-  const doc = document.body || document.documentElement;
-  script.textContent = code;
-  doc.appendChild(script);
-  try {
-    doc.removeChild(script);
-  } catch (e) {
-    // ignore if body is changed and script is detached
-  }
+  const id = getUniqId('VM-');
+  script.id = id;
+  script.textContent = `!${removeElement.toString()}(${JSON.stringify(id)});${code}`;
+  document.documentElement.appendChild(script);
+  // in case the script is blocked by CSP
+  removeElement(id);
 }
 
 export function getUniqId() {
@@ -27,7 +32,7 @@ export function getUniqId() {
 
 export function bindEvents(srcId, destId, handle) {
   document.addEventListener(srcId, e => {
-    const data = JSON.parse(e.detail);
+    const data = jsonLoad(e.detail);
     handle(data);
   }, false);
   return data => { postData(destId, data); };

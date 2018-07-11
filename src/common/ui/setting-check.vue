@@ -20,8 +20,8 @@ export default {
       value: null,
     };
   },
-  watch: {
-    value(value) {
+  methods: {
+    onChange(value) {
       // Maxthon is recognized as Chrome in Vue.js.
       // Due to vuejs/vue#4521, model is updated actually on click.
       // Normally `click` event should be fired before `change` event.
@@ -35,13 +35,16 @@ export default {
     },
   },
   created() {
-    this.value = options.get(this.name);
-    this.revoke = hookSetting(this.name, value => {
-      this.value = value;
+    options.ready(() => {
+      this.value = options.get(this.name);
+      this.revoke = hookSetting(this.name, value => {
+        this.value = value;
+      });
+      this.$watch('value', this.onChange);
     });
   },
   beforeDestroy() {
-    this.revoke();
+    if (this.revoke) this.revoke();
   },
 };
 </script>

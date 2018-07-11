@@ -7,24 +7,36 @@ import initialize from './content';
   if (window.VM) return;
   window.VM = 1;
 
+  // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
+  const VMInitInjection = window[process.env.INIT_FUNC_NAME];
+
   function initBridge() {
     const contentId = getUniqId();
     const webId = getUniqId();
+    initialize(contentId, webId).then(needInject => {
+      if (needInject) {
+        doInject(contentId, webId);
+      }
+    });
+  }
+
+  function doInject(contentId, webId) {
     const props = {};
     [
       Object.getOwnPropertyNames(window),
-      typeof global !== 'undefined' && Object.getOwnPropertyNames(global),
+      Object.getOwnPropertyNames(global),
     ].forEach(keys => {
       keys.forEach(key => { props[key] = 1; });
     });
     const args = [
-      JSON.stringify(webId),
-      JSON.stringify(contentId),
-      JSON.stringify(Object.keys(props)),
+      webId,
+      contentId,
+      Object.keys(props),
     ];
-    inject(`(${window.VM_initializeWeb.toString()}())(${args.join(',')})`);
-    initialize(contentId, webId);
+    // Avoid using Function::apply in case it is shimmed
+    inject(`(${VMInitInjection.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
   }
+
   initBridge();
 
   // For installation

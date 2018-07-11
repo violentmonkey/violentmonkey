@@ -6,6 +6,7 @@ import 'core-js/fn/array/find-index';
 import 'core-js/fn/string/includes';
 import 'core-js/fn/string/starts-with';
 import 'core-js/fn/string/ends-with';
+import 'core-js/fn/string/repeat';
 
 // Must use native Promise for Firefox to work
 // import 'core-js/fn/promise';

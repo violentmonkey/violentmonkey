@@ -1,19 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const MinifyPlugin = require('babel-minify-webpack-plugin');
-const minifyPreset = require('babel-preset-minify');
 const vueLoaderConfig = require('./vue-loader.conf');
-const { IS_DEV, styleRule } = require('./utils');
+const { isDev, isProd, styleRule, definitions } = require('./utils');
 
-// const { MINIFY } = process.env;
-const MINIFY = true;
 const DIST = 'dist';
-const definePlugin = new webpack.DefinePlugin({
-  'process.env': {
-    NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-    DEBUG: IS_DEV ? 'true' : 'false', // whether to log message errors
-  },
-});
+const definePlugin = new webpack.DefinePlugin(definitions);
 
 function resolve(dir) {
   return path.join(__dirname, '..', dir);
@@ -34,14 +26,6 @@ module.exports = {
       src: resolve('src'),
     }
   },
-  node: {
-    // css-loader requires unnecessary `Buffer` polyfill,
-    // which increases the bundle size significantly.
-    // See:
-    // - https://github.com/webpack-contrib/css-loader/issues/454
-    // - https://github.com/vuejs/vue-loader/issues/720
-    Buffer: false,
-  },
   module: {
     rules: [
       {
@@ -54,6 +38,11 @@ module.exports = {
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test')]
       },
+      {
+        test: /\.svg$/,
+        loader: 'svg-sprite-loader',
+        include: [resolve('src/resources/icons')],
+      },
       styleRule({
         fallback: 'vue-style-loader',
         loaders: ['postcss-loader'],
@@ -61,16 +50,9 @@ module.exports = {
     ],
   },
   // cheap-module-eval-source-map is faster for development
-  devtool: IS_DEV ? '#inline-source-map' : false,
+  devtool: isDev ? '#inline-source-map' : false,
   plugins: [
     definePlugin,
-    !IS_DEV && new MinifyPlugin({
-      mangle: !!MINIFY,
-    }, {
-      babili: (...args) => Object.assign(minifyPreset(...args), {
-        minified: !!MINIFY,
-        compact: !!MINIFY,
-      }),
-    }),
+    isProd && new MinifyPlugin(),
   ].filter(Boolean),
 };

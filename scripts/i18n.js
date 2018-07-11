@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
-const gutil = require('gulp-util');
+const Vinyl = require('vinyl');
+const PluginError = require('plugin-error');
 const through = require('through2');
 const yaml = require('js-yaml');
 
@@ -14,16 +15,15 @@ const transformers = {
 };
 
 class Locale {
-  constructor(lang, basepath, basedir) {
+  constructor(lang, base) {
     this.defaultLocale = 'messages.yml';
     this.lang = lang;
-    this.basepath = basepath;
-    this.basedir = basedir || '.';
+    this.base = base;
     this.data = {};
   }
 
   load() {
-    const localeDir = `${this.basedir}/${this.basepath}`;
+    const localeDir = `${this.base}/${this.lang}`;
     const data = {};
     return readdir(localeDir)
     .then(files => [this.defaultLocale].concat(files.filter(file => file !== this.defaultLocale)))
@@ -46,45 +46,37 @@ class Locale {
     return this.data[key] || def;
   }
 
-  dump(data, ext) {
-    if (ext === '.json') {
+  dump(data, { extension }) {
+    if (extension === '.json') {
       data = JSON.stringify(data, null, 2);
-    } else if (ext === '.yml') {
-      data = yaml.safeDump(data);
+    } else if (extension === '.yml') {
+      data = yaml.safeDump(data, { sortKeys: true });
     } else {
       throw 'Unknown extension name!';
     }
     return {
-      path: `${this.basepath}/messages${ext}`,
+      path: `${this.lang}/messages${extension}`,
       data,
     };
   }
 }
 
 class Locales {
-  constructor(prefix, base) {
+  constructor(base) {
     this.defaultLang = 'en';
     this.newLocaleItem = 'NEW_LOCALE_ITEM';
-    this.prefix = prefix || '.';
     this.base = base || '.';
     this.langs = [];
     this.data = {};
     this.desc = {};
   }
 
-  getLanguages() {
-    const localeDir = this.base + '/' + this.prefix;
-    return new Promise((resolve, reject) => {
-      fs.readdir(localeDir, (err, files) => err ? reject(err) : resolve(files));
-    });
-  }
-
   load() {
-    return readdir(`${this.base}/${this.prefix}`)
+    return readdir(this.base)
     .then(langs => {
       this.langs = langs;
       return Promise.all(langs.map(lang => {
-        const locale = this.data[lang] = new Locale(lang, `${this.prefix}/${lang}`, this.base);
+        const locale = this.data[lang] = new Locale(lang, this.base);
         return locale.load();
       }));
     })
@@ -119,9 +111,8 @@ class Locales {
     return this.langs.map(lang => {
       const data = this.getData(lang, options);
       const locale = this.data[lang];
-      const out = locale.dump(data, options.extension);
-      return new gutil.File({
-        base: '',
+      const out = locale.dump(data, options);
+      return new Vinyl({
         path: out.path,
         contents: new Buffer(out.data),
       });
@@ -150,7 +141,7 @@ function extract(options) {
     '.vue': 'default',
   };
 
-  const locales = new Locales(options.prefix, options.base);
+  const locales = new Locales(options.base);
 
   function extract(data, types) {
     if (!Array.isArray(types)) types = [types];
@@ -168,7 +159,7 @@ function extract(options) {
 
   function bufferContents(file, enc, cb) {
     if (file.isNull()) return cb();
-    if (file.isStream()) return this.emit('error', new gutil.PluginError('VM-i18n', 'Stream is not supported.'));
+    if (file.isStream()) return this.emit('error', new PluginError('VM-i18n', 'Stream is not supported.'));
     const extname = path.extname(file.path);
     const type = types[extname];
     type && extract(file.contents, type);

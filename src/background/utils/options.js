@@ -7,7 +7,8 @@ const defaults = {
   autoUpdate: true,
   // ignoreGrant: false,
   lastUpdate: 0,
-  showBadge: true,
+  lastModified: 0,
+  showBadge: 'unique', // '' | 'unique' | 'total'
   exportValues: true,
   closeAfterInstall: false,
   trackLocalFile: false,
@@ -23,12 +24,17 @@ const defaults = {
   filters: {
     sort: 'exec',
   },
+  editor: {
+    lineWrapping: false,
+    indentUnit: 2,
+  },
 };
 let changes = {};
 const hooks = initHooks();
 const callHooksLater = debounce(callHooks, 100);
 
 let options = {};
+let ready = false;
 const init = browser.storage.local.get('options')
 .then(({ options: data }) => {
   if (data && typeof data === 'object') options = data;
@@ -66,11 +72,14 @@ const init = browser.storage.local.get('options')
     }
     setOption('version', 1);
   }
+})
+.then(() => {
+  ready = true;
 });
 register(init);
 
-function fireChange(key, value) {
-  changes[key] = value;
+function fireChange(keys, value) {
+  objectSet(changes, keys, value);
   callHooksLater();
 }
 
@@ -89,6 +98,12 @@ export function getOption(key, def) {
 }
 
 export function setOption(key, value) {
+  if (!ready) {
+    init.then(() => {
+      setOption(key, value);
+    });
+    return;
+  }
   const keys = normalizeKeys(key);
   const optionKey = keys.join('.');
   let optionValue = value;
@@ -99,7 +114,7 @@ export function setOption(key, value) {
     }
     options[mainKey] = optionValue;
     browser.storage.local.set({ options });
-    fireChange(optionKey, value);
+    fireChange(keys, value);
     if (process.env.DEBUG) {
       console.log('Options updated:', optionKey, value, options); // eslint-disable-line no-console
     }

@@ -1,9 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <vl-code class="editor-code flex-auto"
-      :options="cmOptions" v-model="content" @ready="onReady"
-    />
-    <div class="frame-block" v-show="search.show">
+    <div class="frame-block editor-search" v-show="search.show">
       <button class="pull-right" @click="clearSearch">&times;</button>
       <form class="inline-block mr-1" @submit.prevent="goToLine()">
         <span v-text="i18n('labelLineNumber')"></span>
@@ -31,7 +28,16 @@
           <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
         </tooltip>
       </form>
+      <div class="inline-block">
+        <tooltip :title="i18n('searchUseRegex')">
+          <toggle-button v-model="searchOptions.useRegex">.*</toggle-button>
+        </tooltip>
+        <tooltip :title="i18n('searchCaseSensitive')">
+          <toggle-button v-model="searchOptions.caseSensitive">Aa</toggle-button>
+        </tooltip>
+      </div>
     </div>
+    <div class="editor-code flex-auto" ref="code"></div>
   </div>
 </template>
 
@@ -44,15 +50,23 @@ import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/fold/foldcode';
 import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/fold/brace-fold';
 import 'codemirror/addon/fold/comment-fold';
 import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import CodeMirror from 'codemirror';
-import VlCode from 'vueleton/lib/code';
+import Tooltip from 'vueleton/lib/tooltip';
 import { debounce } from 'src/common';
-import Tooltip from './tooltip';
+import ToggleButton from 'src/common/ui/toggle-button';
+import options from 'src/common/options';
+
+/* eslint-disable no-control-regex */
+const MAX_LINE_LENGTH = 50 * 1024;
+// Make sure this is still the longest line in the doc
+const CTRL_OPEN = '\x02'.repeat(256);
+const CTRL_CLOSE = '\x03'.repeat(256);
 
 function getHandler(key) {
   return cm => {
@@ -61,48 +75,60 @@ function getHandler(key) {
     return handle && handle();
   };
 }
-function indentWithTab(cm) {
-  if (cm.somethingSelected()) {
-    cm.indentSelection('add');
-  } else {
-    cm.replaceSelection(
-      cm.getOption('indentWithTabs') ? '\t' : ' '.repeat(cm.getOption('indentUnit')),
-      'end',
-      '+input',
-    );
-  }
-}
 
 [
-  'save', 'cancel', 'find', 'findNext', 'findPrev', 'replace', 'replaceAll', 'close',
+  'save', 'cancel', 'close',
+  'find', 'findNext', 'findPrev', 'replace', 'replaceAll',
 ].forEach(key => {
   CodeMirror.commands[key] = getHandler(key);
+});
+Object.assign(CodeMirror.keyMap.default, {
+  Tab: 'indentMore',
+  'Shift-Tab': 'indentLess',
 });
 
 const cmOptions = {
   continueComments: true,
-  matchBrackets: true,
-  autoCloseBrackets: true,
-  highlightSelectionMatches: true,
-  lineNumbers: true,
-  mode: 'javascript',
-  lineWrapping: true,
   styleActiveLine: true,
   foldGutter: true,
   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
   theme: 'eclipse',
+  mode: 'javascript',
+  lineNumbers: true,
+  matchBrackets: true,
+  autoCloseBrackets: true,
+  highlightSelectionMatches: true,
 };
+const searchOptions = {
+  useRegex: false,
+  caseSensitive: false,
+};
+
+function findUnmarked(cursor, reversed) {
+  while (cursor.find(reversed)) {
+    const marks = cursor.doc.findMarksAt(cursor.from(), cursor.to());
+    if (!marks.length) return true;
+  }
+  return false;
+}
 
 function findNext(cm, state, reversed) {
   cm.operation(() => {
-    const query = state.query || '';
-    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo);
-    if (!cursor.find(reversed)) {
+    let query = state.query || '';
+    if (query && searchOptions.useRegex) {
+      query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
+    }
+    const cOptions = {
+      caseFold: !searchOptions.caseSensitive,
+    };
+    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo, cOptions);
+    if (!findUnmarked(cursor, reversed)) {
       cursor = cm.getSearchCursor(
         query,
         reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
+        cOptions,
       );
-      if (!cursor.find(reversed)) return;
+      if (!findUnmarked(cursor, reversed)) return;
     }
     cm.setSelection(cursor.from(), cursor.to());
     state.posFrom = cursor.from();
@@ -127,7 +153,7 @@ function replaceOne(cm, state) {
 function replaceAll(cm, state) {
   cm.operation(() => {
     const query = state.query || '';
-    for (let cursor = cm.getSearchCursor(query); cursor.findNext();) {
+    for (let cursor = cm.getSearchCursor(query); findUnmarked(cursor);) {
       cursor.replace(state.replace);
     }
   });
@@ -147,13 +173,14 @@ export default {
     },
   },
   components: {
-    VlCode,
     Tooltip,
+    ToggleButton,
   },
   data() {
     return {
       cmOptions,
-      content: this.value,
+      searchOptions,
+      content: '',
       search: {
         show: false,
         state: {
@@ -164,25 +191,76 @@ export default {
     };
   },
   watch: {
-    content(content) {
-      this.$emit('input', content);
-    },
     value(value) {
-      if (value === this.content) return;
-      this.content = value;
+      if (value === this.cached) return;
+      this.cached = value;
+      const placeholders = [];
+      this.content = value.replace(/[\x02\x03]/g, '')
+      .split('\n')
+      .map((line, i) => {
+        if (line.length > MAX_LINE_LENGTH) {
+          const matches = line.match(/^(\s*)(.*)$/);
+          const prefix = matches[1];
+          const body = matches[2];
+          const id = placeholders.length;
+          const replaced = `${CTRL_OPEN}${id}${CTRL_CLOSE}`;
+          const placeholder = {
+            id,
+            body,
+            line: i,
+            start: prefix.length,
+            length: replaced.length,
+          };
+          placeholders.push(placeholder);
+          return `${prefix}${replaced}`;
+        }
+        return line;
+      })
+      .join('\n');
+      this.placeholders = placeholders;
       const { cm } = this;
       if (!cm) return;
+      cm.off('change', this.onChange);
+      cm.setValue(this.content || '');
+      placeholders.forEach(({
+        line, start, body, length,
+      }) => {
+        const span = document.createElement('span');
+        span.textContent = `${body.slice(0, MAX_LINE_LENGTH)}...`;
+        const mark = cm.markText({ line, ch: start }, { line, ch: start + length }, {
+          replacedWith: span,
+        });
+        span.addEventListener('click', debounce(() => {
+          if (!window.getSelection().toString()) {
+            const { from } = mark.find();
+            cm.setCursor(from);
+            cm.focus();
+          }
+        }));
+      });
       cm.getDoc().clearHistory();
       cm.focus();
+      cm.on('change', this.onChange);
     },
     'search.state.query'() {
       this.debouncedFind();
     },
+    searchOptions: {
+      deep: true,
+      handler() {
+        this.debouncedFind();
+      },
+    },
   },
   methods: {
-    onReady(cm) {
+    onChange: debounce(function onChange() {
+      const content = this.getRealContent(this.cm.getValue());
+      this.cached = content;
+      this.$emit('input', content);
+    }, 200),
+    initialize(cm) {
       this.cm = cm;
-      if (this.readonly) cm.setOption('readOnly', true);
+      cm.setOption('readOnly', this.readonly);
       cm.state.commands = Object.assign({
         cancel: () => {
           if (this.search.show) {
@@ -203,7 +281,6 @@ export default {
       }, this.commands);
       cm.setOption('extraKeys', {
         Esc: 'cancel',
-        Tab: indentWithTab,
       });
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
@@ -213,6 +290,7 @@ export default {
     onKeyDown(e) {
       const name = CodeMirror.keyName(e);
       const { cm } = this;
+      if (!cm) return;
       [
         cm.options.extraKeys,
         cm.options.keyMap,
@@ -231,7 +309,7 @@ export default {
         return stop;
       });
     },
-    doFind(reversed) {
+    doSearch(reversed) {
       const { state } = this.search;
       const { cm } = this;
       if (state.query) {
@@ -239,10 +317,13 @@ export default {
       }
       this.search.show = true;
     },
-    find() {
+    searchInPlace() {
       const { state } = this.search;
       state.posTo = state.posFrom;
-      this.doFind();
+      this.doSearch();
+    },
+    find() {
+      this.searchInPlace();
       this.$nextTick(() => {
         const { search } = this.$refs;
         search.select();
@@ -250,7 +331,7 @@ export default {
       });
     },
     findNext(reversed) {
-      this.doFind(reversed);
+      this.doSearch(reversed);
       this.$nextTick(() => {
         this.$refs.search.focus();
       });
@@ -280,20 +361,47 @@ export default {
       if (line > 0) cm.setCursor(line - 1, 0);
       cm.focus();
     },
+    onCopy(e) {
+      if (!this.cm || !this.cm.somethingSelected()) return;
+      const text = this.getRealContent(this.cm.getSelection());
+      e.clipboardData.setData('text', text);
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    },
+    getRealContent(text) {
+      return text.replace(/\x02+(\d+)\x03+/g, (_, id) => {
+        const placeholder = this.placeholders[id];
+        return placeholder && placeholder.body || '';
+      });
+    },
   },
   mounted() {
-    this.debouncedFind = debounce(this.doFind, 100);
+    this.initialize(CodeMirror(
+      this.$refs.code,
+      Object.assign({}, this.cmOptions, options.get('editor')),
+    ));
+    this.debouncedFind = debounce(this.searchInPlace, 100);
     if (this.global) window.addEventListener('keydown', this.onKeyDown, false);
+    document.addEventListener('copy', this.onCopy, false);
   },
   beforeDestroy() {
     if (this.global) window.removeEventListener('keydown', this.onKeyDown, false);
+    document.removeEventListener('copy', this.onCopy, false);
   },
 };
 </script>
 
 <style>
-/* compatible with old browsers, e.g. Maxthon 4.4 */
+/* compatible with old browsers, e.g. Maxthon 4.4, Chrome 50- */
 .editor-code.flex-auto {
-  height: 100%;
+  position: relative;
+  > div {
+    position: absolute;
+    width: 100%;
+  }
+}
+
+.editor-search > .inline-block > * {
+  vertical-align: middle;
 }
 </style>

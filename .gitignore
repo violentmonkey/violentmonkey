@@ -1,9 +1,4 @@
 /dist/
 node_modules/
-/*.zip
-/*.tar.gz
-/*.nex
-/*.crx
-/*.log
-/*.lock
+*.log
 /stats.json

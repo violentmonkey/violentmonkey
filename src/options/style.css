@@ -18,7 +18,7 @@ aside {
     padding-top: .6rem;
     padding-bottom: .6rem;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 500;
     text-decoration: none;
     color: gray;
     &.active,
@@ -27,9 +27,14 @@ aside {
     }
   }
 }
-#currentLang {
+.text-red {
+  color: red;
+}
+.text-green {
   color: green;
-  font-weight: bold;
+}
+.text-right {
+  text-align: right;
 }
 section {
   position: relative;
@@ -58,4 +63,32 @@ section {
   padding: 1.2rem;
   background: white;
   border-left: 1px solid darkgray;
+}
+
+input[type=checkbox] {
+  margin-right: .5em;
+}
+
+.in-out {
+  &-appear,
+  &-enter,
+  &-leave-active {
+    > .modal-content {
+      transform: translateY(-120%);
+    }
+    > .vl-modal-backdrop {
+      opacity: 0;
+    }
+  }
+  &-appear-active,
+  &-enter-active,
+  &-leave-active {
+    &,
+    > .modal-content {
+      transition: transform .5s;
+    }
+    > .vl-modal-backdrop {
+      transition: opacity .5s;
+    }
+  }
 }

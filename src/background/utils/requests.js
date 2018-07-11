@@ -72,7 +72,7 @@ export function httpRequest(details, cb) {
   req.cb = cb;
   const { xhr } = req;
   try {
-    xhr.open(details.method, details.url, true, details.user, details.password);
+    xhr.open(details.method, details.url, true, details.user || '', details.password || '');
     xhr.setRequestHeader('VM-Verify', details.id);
     if (details.headers) {
       Object.keys(details.headers).forEach(key => {
@@ -85,6 +85,7 @@ export function httpRequest(details, cb) {
         );
       });
     }
+    if (details.timeout) xhr.timeout = details.timeout;
     if (details.responseType) xhr.responseType = 'arraybuffer';
     if (details.overrideMimeType) xhr.overrideMimeType(details.overrideMimeType);
     const callback = xhrCallbackWrapper(req);
@@ -239,7 +240,7 @@ export function confirmInstall(info) {
       from: info.from,
     });
     const optionsURL = browser.runtime.getURL('/confirm/index.html');
-    browser.tabs.create({ url: `${optionsURL}#?id=${confirmKey}` });
+    browser.tabs.create({ url: `${optionsURL}#${confirmKey}` });
   });
 }
 
@@ -265,7 +266,7 @@ browser.webRequest.onBeforeRequest.addListener(req => {
       whitelist.some(re => re.test(url)) || !blacklist.some(re => re.test(url))
     )) {
       Promise.all([
-        request(url),
+        request(url).catch(() => ({ data: '' })),
         req.tabId < 0 ? Promise.resolve() : browser.tabs.get(req.tabId),
       ])
       .then(([{ data: code }, tab]) => {

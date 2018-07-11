@@ -1,6 +1,5 @@
-import { noop } from './helpers';
+import { noop } from '../utils/helpers';
 
 export default {
   load: noop,
-  checkLoad: noop,
 };

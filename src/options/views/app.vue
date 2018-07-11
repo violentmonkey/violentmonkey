@@ -4,14 +4,12 @@
       <img src="/public/images/icon128.png">
       <h1 v-text="i18n('extName')"></h1>
       <div class="sidemenu">
-        <a href="#?t=Installed" :class="{active: tab === 'Installed'}" v-text="i18n('sideMenuInstalled')"></a>
-        <feature name="settings" tag="a" href="#?t=Settings" :class="{active: tab === 'Settings'}">
-          <span class="feature-text" v-text="i18n('sideMenuSettings')"></span>
-        </feature>
-        <a href="#?t=About" :class="{active: tab === 'About'}" v-text="i18n('sideMenuAbout')"></a>
+        <a href="#scripts" :class="{active: tab === 'scripts'}" v-text="i18n('sideMenuInstalled')"></a>
+        <a href="#settings" :class="{active: tab === 'settings'}" v-text="i18n('sideMenuSettings')"></a>
+        <a href="#about" :class="{active: tab === 'about'}" v-text="i18n('sideMenuAbout')"></a>
       </div>
     </aside>
-    <component :is="tab" class="tab flex-auto"></component>
+    <component :is="tabComponent" class="tab flex-auto"></component>
   </div>
 </template>
 
@@ -20,26 +18,25 @@ import { store } from '../utils';
 import Installed from './tab-installed';
 import Settings from './tab-settings';
 import About from './tab-about';
-import Feature from './feature';
 
 const tabs = {
-  Installed,
-  Settings,
-  About,
+  scripts: Installed,
+  settings: Settings,
+  about: About,
 };
 
 export default {
-  components: Object.assign({
-    Feature,
-  }, tabs),
   data() {
     return store;
   },
   computed: {
     tab() {
-      let tab = this.route.query.t;
-      if (!tabs[tab]) tab = 'Installed';
+      let tab = this.route.paths[0];
+      if (!tabs[tab]) tab = 'scripts';
       return tab;
+    },
+    tabComponent() {
+      return tabs[this.tab];
     },
   },
 };

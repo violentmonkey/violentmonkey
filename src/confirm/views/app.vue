@@ -2,7 +2,7 @@
   <div class="page-confirm frame flex flex-col h-100">
     <div class="frame-block">
       <div class="buttons pull-right">
-        <vl-dropdown class="confirm-options" align="right">
+        <dropdown class="confirm-options" align="right">
           <button slot="toggle" v-text="i18n('buttonInstallOptions')"></button>
           <label>
             <setting-check name="closeAfterInstall" @change="checkClose" />
@@ -12,7 +12,7 @@
             <setting-check name="trackLocalFile" :disabled="closeAfterInstall" />
             <span v-text="i18n('installOptionTrack')"></span>
           </label>
-        </vl-dropdown>
+        </dropdown>
         <button v-text="i18n('buttonConfirmInstallation')"
         :disabled="!installable" @click="installScript"></button>
         <button v-text="i18n('buttonClose')" @click="close"></button>
@@ -28,20 +28,19 @@
 </template>
 
 <script>
-import VlDropdown from 'vueleton/lib/dropdown';
-import { sendMessage, zfill, request, buffer2string, isRemote, getFullUrl } from 'src/common';
+import Dropdown from 'vueleton/lib/dropdown';
+import { sendMessage, leftpad, request, buffer2string, isRemote, getFullUrl } from 'src/common';
 import options from 'src/common/options';
 import initCache from 'src/common/cache';
 import VmCode from 'src/common/ui/code';
 import SettingCheck from 'src/common/ui/setting-check';
-import getPathInfo from 'src/common/pathinfo';
+import { route } from 'src/common/router';
 
 const cache = initCache({});
-const { query } = getPathInfo();
 
 export default {
   components: {
-    VlDropdown,
+    Dropdown,
     VmCode,
     SettingCheck,
   },
@@ -67,7 +66,7 @@ export default {
     this.message = this.i18n('msgLoadingData');
     this.loadInfo()
     .then(() => {
-      const id = query.id;
+      const id = route.paths[0];
       this.guard = setInterval(() => {
         sendMessage({
           cmd: 'CacheHit',
@@ -91,7 +90,7 @@ export default {
   },
   methods: {
     loadInfo() {
-      const id = query.id;
+      const id = route.paths[0];
       return sendMessage({
         cmd: 'CacheLoad',
         data: `confirm-${id}`,
@@ -191,7 +190,7 @@ export default {
     },
     getTimeString() {
       const now = new Date();
-      return `${zfill(now.getHours(), 2)}:${zfill(now.getMinutes(), 2)}:${zfill(now.getSeconds(), 2)}`;
+      return `${leftpad(now.getHours(), 2)}:${leftpad(now.getMinutes(), 2)}:${leftpad(now.getSeconds(), 2)}`;
     },
     installScript() {
       this.installable = false;
@@ -209,6 +208,9 @@ export default {
         this.message = `${result.update.message}[${this.getTimeString()}]`;
         if (this.closeAfterInstall) this.close();
         else if (this.isLocal && options.get('trackLocalFile')) this.trackLocalFile();
+      }, err => {
+        this.message = `${err}`;
+        this.installable = true;
       });
     },
     trackLocalFile() {

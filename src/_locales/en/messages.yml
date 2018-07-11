@@ -1,284 +1,433 @@
-extName:
-  description: Name of this extension.
-  message: Violentmonkey
-extDescription:
-  description: Description for this extension.
-  message: Provide userscript support for browsers.
-msgUpdated:
-  description: Message shown when a script is updated/reinstalled.
-  message: Script updated.
-msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Error fetching script!
-msgInstalled:
-  description: Message shown when a script is installed.
-  message: Script installed.
-Warning:
-  description: Show warnings with a notification.
-  message: Warning
-  touched: false
-msgWarnGrant:
-  description: Message shown when `@grant` is not found in a script.
-  message: 'Script [$1] has no `@grant` lines! Click to see more details.'
-  touched: false
-labelNoName:
-  description: Text as the name of a script when no @name is assigned.
-  message: No Name
-msgUpdating:
-  description: Message shown when a new version of script is being fetched.
-  message: Updating...
-msgNewVersion:
-  description: >-
-    Message shown when a new version of script is found by @updateURL, but no
-    @downloadURL is provided.
-  message: New version found.
-msgCheckingForUpdate:
-  description: Message shown when a script is being checked for updates by version numbers.
-  message: Checking for updates...
-msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Failed fetching update information.
-msgNoUpdate:
-  description: Message shown when there is no new version of a script.
-  message: No update found.
-labelInstall:
-  description: Shown in the title of the confirm page while trying to install a script.
-  message: Installing script
-buttonInstallOptions:
-  description: Button to show options of installation confirm page.
-  message: Options
-installOptionClose:
-  description: Option to close confirm window after installation.
-  message: Close after installation
-installOptionTrack:
-  description: Option to track the loading local file before window is closed.
-  message: Track local file before this window is closed
-buttonConfirmInstallation:
-  description: Button to confirm installation of a script.
-  message: Confirm installation
-buttonClose:
-  description: Button to close window.
-  message: Close
-msgErrorLoadingData:
-  description: >-
-    Message shown on confirm page when the script to be installed cannot be
-    loaded.
-  message: Error loading script data.
-msgLoadedData:
-  description: >-
-    Message shown in the confirm page when a javascript file to be installed is
-    loaded.
-  message: Script data loaded.
-msgErrorLoadingDependency:
-  description: Message shown when not all requirements are loaded successfully.
-  message: Error loading dependencies.
-msgLoadingDependency:
-  description: Message shown on confirm page when the requirements are being downloaded.
-  message: Loading dependencies... ($1/$2)
-msgLoadingData:
-  description: Message shown on confirm page when the script to be installed is loading.
-  message: Loading script data...
-sideMenuInstalled:
-  description: 'Side menu: Installed scripts'
-  message: Installed scripts
-sideMenuSettings:
-  description: 'Side menu: Settings'
-  message: Settings
-sideMenuAbout:
-  description: 'Side menu: About'
-  message: About
-buttonNew:
-  description: Button to create a new script.
-  message: New
-buttonUpdateAll:
-  description: Check all scripts for updates.
-  message: Check all for updates
-anchorGetMoreScripts:
-  description: Link to get more scripts.
-  message: Get more scripts
-  touched: false
-msgLoading:
-  description: Message shown in the options page before script list is loaded.
-  message: Loading ...
-labelSettings:
-  description: Label shown on the top of settings page
-  message: Settings
-labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Automatically check scripts for updates every day
-labelIgnoreGrant:
-  description: Option to suppress no @grant warnings.
-  message: Suppress no @grant warnings
-  touched: false
-labelDataImport:
-  description: Section title of data import.
-  message: Data Import
-buttonImportData:
-  description: Button to choose a file for data import.
-  message: Import from zip
-buttonVacuum:
-  description: Button to vacuum extension data.
-  message: Vacuum database
-labelDataExport:
-  description: Section title of data export.
-  message: Data Export
-labelExportScriptData:
-  description: Option to export script data along with scripts.
-  message: Export script data
-buttonAllNone:
-  description: Button to select all scripts or none.
-  message: All/None
-buttonExportData:
-  description: Button to open the data export dialog.
-  message: Export to zip
-labelAbout:
-  description: Label shown on top of the about page.
-  message: About Violentmonkey
-labelRelated:
-  description: Label of related links.
-  message: 'Related links: '
-labelDonate:
-  description: Label of link to donate page.
-  message: Donate
-labelFeedback:
-  description: Label of link to feedback page.
-  message: Feedback
-labelAuthor:
-  description: Label of author shown in the details of a script.
-  message: 'Author: '
 anchorAuthor:
   description: Author shown on about tab.
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
-labelTranslator:
-  description: Label of translator.
-  message: 'Translator: '
 anchorTranslator:
   description: Translator shown on about tab.
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
-labelCurrentLang:
-  description: Label of current language.
-  message: 'Current Language: '
-labelScriptEditor:
-  description: Shown in the title of the script editing page.
-  message: Script Editor
-labelName:
-  description: Label of script name.
-  message: 'Name:'
-labelRunAt:
-  description: Label of script @run-at properties in custom meta data.
-  message: 'Run-At:'
-labelRunAtDefault:
-  description: Shown when custom @run-at is not assigned.
-  message: (Default)
-labelHomepageURL:
-  description: Label of script @homepageURL in custom meta data.
-  message: 'Homepage URL:'
-labelUpdateURL:
-  description: Label of script @updateURL in custom meta data.
-  message: 'Update URL:'
-labelDownloadURL:
-  description: Label of script @downloadURL in custom meta data.
-  message: 'Download URL:'
-labelInclude:
-  description: Label of @include rules.
-  message: '@include rules'
-labelMatch:
-  description: Label of @match rules.
-  message: '@match rules'
-labelExclude:
-  description: Label of @exclude rules.
-  message: '@exclude rules'
-labelExcludeMatch:
-  description: Label of @exclude-match rules.
-  message: '@exclude-match rules'
-labelAllowUpdate:
-  description: Option to allow checking updates for a script.
-  message: Allow update
-buttonSave:
-  description: Button to save modifications of a script.
-  message: Save
-buttonSaveClose:
-  description: Button to save modifications of a script and then close the editing page.
-  message: Save & Close
-labelNoScripts:
-  description: Message shown when no script is installed.
-  message: 'Oops, you haven''t got any script yet.'
+buttonAllNone:
+  description: Button to select all scripts or none.
+  message: All/None
+buttonCancel:
+  description: Cancel button on dialog.
+  message: Cancel
+buttonClose:
+  description: Button to close window.
+  message: Close
+buttonConfirmInstallation:
+  description: Button to confirm installation of a script.
+  message: Confirm installation
 buttonDisable:
   description: Button to disable a script.
   message: Disable
-buttonEnable:
-  description: Button to enable a script.
-  message: Enable
 buttonEdit:
   description: Button to edit a script.
   message: Edit
+buttonEnable:
+  description: Button to enable a script.
+  message: Enable
+buttonExportData:
+  description: Button to open the data export dialog.
+  message: Export to zip
+buttonFilter:
+  description: Button to show filters menu.
+  message: Filters
+buttonHome:
+  description: Button to open homepage.
+  message: Homepage
+buttonImportData:
+  description: Button to choose a file for data import.
+  message: Import from zip
+buttonInstallFromURL:
+  description: Button to ask for URL of a user script.
+  message: Install from URL
+buttonInstallOptions:
+  description: Button to show options of installation confirm page.
+  message: Options
+buttonNew:
+  description: Button to create a new script.
+  message: New
+buttonOK:
+  description: OK button on dialog.
+  message: OK
 buttonRemove:
   description: Button to remove a script.
   message: Remove
-buttonUpdate:
-  description: Check a script for updates.
-  message: Check for updates
-msgImported:
-  description: >-
-    Message shown after import. There is an argument referring to the count of
-    scripts imported.
-  message: $1 item(s) are imported.
-hintUseDownloadURL:
-  description: Shown as a place holder for @updateURL when it is not assigned
-  message: Use @downloadURL
-confirmNotSaved:
-  description: Confirm message shown when there are unsaved script modifications.
-  message: |-
-    Modifications are not saved!
-    Click OK to discard them or cancel to stay.
-buttonVacuuming:
-  description: Message shown when data vacuum is in progress.
-  message: Vacuuming data...
-buttonVacuumed:
-  description: Message shown when data is vacuumed.
-  message: Data vacuumed
-hintVacuum:
-  description: Hint for vacuuming data.
-  message: Discard the redundancy and try to reload the missing resources in cache.
-menuFindScripts:
-  description: Menu item to find scripts for a site.
-  message: Find scripts for this site
-menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Scripts enabled
-menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Scripts disabled
-menuCommands:
-  description: Menu item to list script commands.
-  message: Script commands
-labelSearch:
-  description: Label for search input in search box.
-  message: 'Search for: '
-labelReplace:
-  description: Label for replace input in search box.
-  message: 'Replace with: '
 buttonReplace:
   description: Button to replace the current match.
   message: Replace
 buttonReplaceAll:
   description: Button to replace all matches.
   message: All
-labelAutoReloadCurrentTab:
-  description: Option to reload current tab after a script is switched on or off from menu.
-  message: Reload current tab after switching on/off a script from menu
+buttonSave:
+  description: Button to save modifications of a script.
+  message: Save
+buttonSaveBlacklist:
+  description: Button to save global blacklist.
+  message: Save
+buttonSaveClose:
+  description: Button to save modifications of a script and then close the editing page.
+  message: Save & Close
+buttonSaveCustomCSS:
+  description: Label for button to save custom CSS.
+  message: Save
+buttonSupport:
+  description: Button to open support page.
+  message: Support page
+buttonUndo:
+  description: Button to undo removement of a script.
+  message: Undo
+buttonUpdate:
+  description: Check a script for updates.
+  message: Check for updates
+buttonUpdateAll:
+  description: Check all scripts for updates.
+  message: Check all for updates
+buttonVacuum:
+  description: Button to vacuum extension data.
+  message: Vacuum database
+buttonVacuumed:
+  description: Message shown when data is vacuumed.
+  message: Data vacuumed
+buttonVacuuming:
+  description: Message shown when data vacuum is in progress.
+  message: Vacuuming data...
+confirmNotSaved:
+  description: Confirm message shown when there are unsaved script modifications.
+  message: |-
+    Modifications are not saved!
+    Click OK to discard them or cancel to stay.
+descBlacklist:
+  description: HTML Description for the global blacklist.
+  message: URL matched in this list will not be injected by scripts.
+descCustomCSS:
+  description: Description of custom CSS section.
+  message: >-
+    Custom CSS for options page and script installation page. If you are not
+    sure what this is for, please do not edit it.
+editLabelMeta:
+  description: Metadata section in settings tab of script editor.
+  message: Custom metadata
+editLabelSettings:
+  description: Settings section in settings tab of script editor.
+  message: Script settings
+editNavCode:
+  description: Label of code tab in script editor.
+  message: Code
+editNavSettings:
+  description: Label of settings tab in script editor.
+  message: Settings
+editNavValues:
+  description: Label of values tab in script editor.
+  message: Values
+editValueCancel:
+  description: Button to cancel modification of a script value.
+  message: Cancel
+editValueSave:
+  description: Button to save modification of a script value.
+  message: Save
+extDescription:
+  description: Description for this extension.
+  message: Provide userscript support for browsers.
+extName:
+  description: Name of this extension.
+  message: Violentmonkey
+filterAlphabeticalOrder:
+  description: Label for option to sort scripts in alphabetical order.
+  message: alphabetical order
+filterExecutionOrder:
+  description: Label for option to sort scripts in execution order.
+  message: execution order
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Input URL:'
-buttonInstallFromURL:
-  description: Button to ask for URL of a user script.
-  message: Install from URL
+hintUseDownloadURL:
+  description: Shown as a place holder for @updateURL when it is not assigned
+  message: Use @downloadURL
+hintVacuum:
+  description: Hint for vacuuming data.
+  message: Discard the redundancy and try to reload the missing resources in cache.
+installFrom:
+  description: Label for button to install script from a userscript site.
+  message: Install from $1
+installOptionClose:
+  description: Option to close confirm window after installation.
+  message: Close after installation
+installOptionTrack:
+  description: Option to track the loading local file before window is closed.
+  message: Track local file before this window is closed
+labelAbout:
+  description: Label shown on top of the about page.
+  message: About Violentmonkey
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: Advanced
+labelAllowUpdate:
+  description: Option to allow checking updates for a script.
+  message: Allow update
+labelAuthor:
+  description: Label of author shown in the details of a script.
+  message: 'Author: '
+labelAutoReloadCurrentTab:
+  description: Option to reload current tab after a script is switched on or off from menu.
+  message: Reload current tab after switching on/off a script from menu
+labelAutoUpdate:
+  description: Option to allow automatically checking scripts for updates every 24 hours.
+  message: Automatically check scripts for updates every day
+labelBadge:
+  description: Label for option to show number on badge.
+  message: 'Display on badge: '
+labelBadgeNone:
+  description: Option to display nothing on badge.
+  message: none
+labelBadgeTotal:
+  description: Option to display total number of running scripts on badge.
+  message: number of running scripts
+labelBadgeUnique:
+  description: Option to display number of unique running scripts on badge.
+  message: number of unique running scripts
+labelBlacklist:
+  description: Label for global blacklist settings in security section.
+  message: Blacklist
+labelCurrentLang:
+  description: Label of current language.
+  message: 'Current Language: '
+labelCustomCSS:
+  description: Label for custom CSS section.
+  message: Custom Style
+labelDataExport:
+  description: Section title of data export.
+  message: Data Export
+labelDataImport:
+  description: Section title of data import.
+  message: Data Import
+labelDonate:
+  description: Label of link to donate page.
+  message: Donate
+labelDownloadURL:
+  description: Label of script @downloadURL in custom meta data.
+  message: 'Download URL:'
+labelEditValue:
+  description: Label shown in the panel to edit a script value.
+  message: Editing script value
+labelExclude:
+  description: Label of @exclude rules.
+  message: '@exclude rules'
+labelExcludeMatch:
+  description: Label of @exclude-match rules.
+  message: '@exclude-match rules'
+labelExportScriptData:
+  description: Option to export script data along with scripts.
+  message: Export script data
+labelFeedback:
+  description: Label of link to feedback page.
+  message: Feedback
+labelFilterSort:
+  description: Label for sort filter.
+  message: Sort by $1
+labelGeneral:
+  description: Label for general settings.
+  message: General
+labelHomepage:
+  description: Label for home page in about tab.
+  message: Homepage
+labelHomepageURL:
+  description: Label of script @homepageURL in custom meta data.
+  message: 'Homepage URL:'
+labelImportSettings:
+  description: Label for option to import settings from zip file.
+  message: Import settings
+labelInclude:
+  description: Label of @include rules.
+  message: '@include rules'
+labelIndentUnit:
+  description: Label for editor option of indent unit size.
+  message: 'Indent unit:'
+labelInstall:
+  description: Shown in the title of the confirm page while trying to install a script.
+  message: Installing script
+labelKeepOriginal:
+  description: Option to keep the original match or ignore rules.
+  message: Keep original
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: Last updated at $1
+labelLineNumber:
+  description: Label for line number jumper.
+  message: 'Line no.: '
+labelLineWrapping:
+  description: Label for editor option of line wrapping.
+  message: Wrap long lines
+labelMatch:
+  description: Label of @match rules.
+  message: '@match rules'
+labelName:
+  description: Label of script name.
+  message: 'Name:'
+labelNoName:
+  description: Text as the name of a script when no @name is assigned.
+  message: No Name
+labelNoScripts:
+  description: Message shown when no script is installed.
+  message: 'Oops, you haven''t got any script yet.'
+labelNoSearchScripts:
+  description: Message shown when no script is found in search results.
+  message: No script is found.
+labelNotifyUpdates:
+  description: Option to show notification when script is updated.
+  message: Notify script updates
+labelRelated:
+  description: Label of related links.
+  message: 'Related links: '
+labelRemoved:
+  description: Label shown when a script is removed.
+  message: '[Removed]'
+labelReplace:
+  description: Label for replace input in search box.
+  message: 'Replace with: '
+labelRunAt:
+  description: Label of script @run-at properties in custom meta data.
+  message: 'Run-At:'
+labelRunAtDefault:
+  description: Shown when custom @run-at is not assigned.
+  message: (Default)
+labelScriptEditor:
+  description: Shown in the title of the script editing page.
+  message: Script Editor
+labelSearch:
+  description: Label for search input in search box.
+  message: 'Search for: '
+labelSearchScript:
+  description: Placeholder for script search box.
+  message: Search scripts...
+labelSettings:
+  description: Label shown on the top of settings page
+  message: Settings
+labelShowBadge:
+  description: Option to show number of running scripts on the badge.
+  message: Show number of running scripts on the badge
+  touched: false
 labelSync:
   description: Label for sync options.
   message: Sync
+labelSyncAuthorize:
+  description: Label for button to authorize a service.
+  message: Authorize
+labelSyncAuthorizing:
+  description: Label for button when authorization is in progress.
+  message: Authorizing
+labelSyncDisabled:
+  description: Label for option to disable sync service.
+  message: None
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
+  message: Reauthorize automatically when expired
+  touched: false
+labelSyncRevoke:
+  description: Label for button to revoke authorization for a service.
+  message: Revoke
+labelSyncScriptStatus:
+  description: Label for option to sync script status.
+  message: Sync script status
+labelSyncService:
+  description: Label for sync service select.
+  message: Sync to
+labelTranslator:
+  description: Label of translator.
+  message: 'Translator: '
+labelUpdateURL:
+  description: Label of script @updateURL in custom meta data.
+  message: 'Update URL:'
 lastSync:
   description: Label for last sync timestamp.
   message: Last sync at $1
+learnBlacklist:
+  description: Refers to a link to introduce blacklist patterns.
+  message: Learn more about blacklist patterns.
+menuCommands:
+  description: Menu item to list script commands.
+  message: Script commands
+menuDashboard:
+  description: Label for menu item to open dashboard.
+  message: Open Dashboard
+menuFindScripts:
+  description: Menu item to find scripts for a site.
+  message: Find scripts for this site
+menuMatchedScripts:
+  description: Label for menu listing matched scripts.
+  message: Matched scripts
+menuScriptDisabled:
+  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  message: Scripts disabled
+menuScriptEnabled:
+  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  message: Scripts enabled
+msgCheckingForUpdate:
+  description: Message shown when a script is being checked for updates by version numbers.
+  message: Checking for updates...
+msgErrorFetchingScript:
+  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  message: Error fetching script!
+msgErrorFetchingUpdateInfo:
+  description: Message shown when Violentmonkey fails fetching version data of the script.
+  message: Failed fetching update information.
+msgErrorLoadingData:
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
+  message: Error loading script data.
+msgErrorLoadingDependency:
+  description: Message shown when not all requirements are loaded successfully.
+  message: Error loading dependencies.
+msgImported:
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
+  message: $1 item(s) are imported.
+msgInstalled:
+  description: Message shown when a script is installed.
+  message: Script installed.
+msgInvalidScript:
+  description: Message shown when script is invalid.
+  message: Invalid script!
+msgLoadedData:
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
+  message: Script data loaded.
+msgLoading:
+  description: Message shown in the options page before script list is loaded.
+  message: Loading ...
+msgLoadingData:
+  description: Message shown on confirm page when the script to be installed is loading.
+  message: Loading script data...
+msgLoadingDependency:
+  description: Message shown on confirm page when the requirements are being downloaded.
+  message: Loading dependencies... ($1/$2)
+msgNamespaceConflict:
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: Script namespace conflicts! Please modify @name and @namespace.
+msgNewVersion:
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
+  message: New version found.
+msgNoUpdate:
+  description: Message shown when there is no new version of a script.
+  message: No update found.
+msgSavedBlacklist:
+  description: Message shown when blacklist are saved.
+  message: Blacklist updated.
+msgSavedCustomCSS:
+  description: Message shown when custom CSS is saved.
+  message: Custom style is updated.
+msgScriptUpdated:
+  description: Notification message for script updates.
+  message: 'Script [$1] is updated!'
+msgSyncError:
+  description: Message shown when sync failed.
+  message: Sync error!
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: Initializing...
@@ -291,145 +440,44 @@ msgSyncReady:
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Sync in progress...
-msgSyncError:
-  description: Message shown when sync failed.
-  message: Sync error!
-msgNamespaceConflict:
-  description: >-
-    Message shown when namespace of the new script conflicts with an existent
-    one.
-  message: Script namespace conflicts! Please modify @name and @namespace.
-msgInvalidScript:
-  description: Message shown when script is invalid.
-  message: Invalid script!
-labelShowBadge:
-  description: Option to show number of running scripts on the badge.
-  message: Show number of running scripts on the badge
-labelLineNumber:
-  description: Label for line number jumper.
-  message: 'Line no.: '
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
-  message: Blacklist
-descBlacklist:
-  description: HTML Description for the global blacklist.
-  message: URL matched in this list will not be injected by scripts.
-buttonSaveBlacklist:
-  description: Button to save global blacklist.
-  message: Save
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
-  message: Blacklist updated.
-labelGeneral:
-  description: Label for general settings.
-  message: General
-labelSyncScriptStatus:
-  description: Label for option to sync script status.
-  message: Sync script status
-labelSyncDisabled:
-  description: Label for option to disable sync service.
-  message: None
-labelSyncService:
-  description: Label for sync service select.
-  message: Sync to
-labelSyncAuthorize:
-  description: Label for button to authorize a service.
-  message: Authorize
-labelSyncRevoke:
-  description: Label for button to revoke authorization for a service.
-  message: Revoke
-labelSyncAuthorizing:
-  description: Label for button when authorization is in progress.
-  message: Authorizing
-msgSavedCustomCSS:
-  description: Message shown when custom CSS is saved.
-  message: Custom style is updated.
-labelCustomCSS:
-  description: Label for custom CSS section.
-  message: Custom Style
-descCustomCSS:
-  description: Description of custom CSS section.
-  message: >-
-    Custom CSS for options page and script installation page. If you are not
-    sure what this is for, please do not edit it.
-buttonSaveCustomCSS:
-  description: Label for button to save custom CSS.
-  message: Save
-menuDashboard:
-  description: Label for menu item to open dashboard.
-  message: Open Dashboard
-menuMatchedScripts:
-  description: Label for menu listing matched scripts.
-  message: Matched scripts
-buttonOK:
-  description: OK button on dialog.
-  message: OK
-buttonCancel:
-  description: Cancel button on dialog.
-  message: Cancel
-labelImportSettings:
-  description: Label for option to import settings from zip file.
-  message: Import settings
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
-  message: Learn more about blacklist patterns.
-editNavCode:
-  description: Label of code tab in script editor.
-  message: Code
-editNavSettings:
-  description: Label of settings tab in script editor.
-  message: Settings
-editLabelSettings:
-  description: Settings section in settings tab of script editor.
-  message: Script settings
-editLabelMeta:
-  description: Metadata section in settings tab of script editor.
-  message: Custom metadata
-labelKeepOriginal:
-  description: Option to keep the original match or ignore rules.
-  message: Keep original
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: Update
-msgScriptUpdated:
-  description: Notification message for script updates.
-  message: 'Script [$1] is updated!'
-labelNotifyUpdates:
-  description: Option to show notification when script is updated.
-  message: Notify script updates
-installFrom:
-  description: Label for button to install script from a userscript site.
-  message: Install from $1
-labelSearchScript:
-  description: Placeholder for script search box.
-  message: Search scripts...
-labelNoSearchScripts:
-  description: Message shown when no script is found in search results.
-  message: No script is found.
-buttonHome:
-  description: Button to open homepage.
-  message: Homepage
-buttonSupport:
-  description: Button to open support page.
-  message: Support page
-buttonUndo:
-  description: Button to undo removement of a script.
-  message: Undo
-labelRemoved:
-  description: Label shown when a script is removed.
-  message: '[Removed]'
-buttonFilter:
-  description: Button to show filters menu.
-  message: Filters
+msgUpdated:
+  description: Message shown when a script is updated/reinstalled.
+  message: Script updated.
+msgUpdating:
+  description: Message shown when a new version of script is being fetched.
+  message: Updating...
+noValues:
+  description: Label shown when there is no value for current script.
+  message: No value is stored
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Show enabled scripts first
-filterExecutionOrder:
-  description: Label for option to sort scripts in execution order.
-  message: execution order
-filterAlphabeticalOrder:
-  description: Label for option to sort scripts in alphabetical order.
-  message: alphabetical order
-labelFilterSort:
-  description: Label for sort filter.
-  message: Sort by $1
+searchCaseSensitive:
+  description: Option to perform a case-sensitive search
+  message: Case sensitive
+searchUseRegex:
+  description: Option to perform a regular expression search
+  message: Use Regex
+sideMenuAbout:
+  description: 'Side menu: About'
+  message: About
+sideMenuInstalled:
+  description: 'Side menu: Installed scripts'
+  message: Installed scripts
+sideMenuSettings:
+  description: 'Side menu: Settings'
+  message: Settings
+titleScriptUpdated:
+  description: Notification title for script updates.
+  message: Update
+valueLabelKey:
+  description: Label for key of a script value.
+  message: Key (string)
+valueLabelValue:
+  description: Label for value of a script value.
+  message: Value (serialized as JSON)
+warnScriptLongLines:
+  description: Warning message shown when script has lines that are too long to be edited.
+  message: >-
+    Some lines are too long, opening in read-only mode. Please edit with an
+    external editor.

@@ -10,31 +10,45 @@
     </div>
     <button v-text="i18n('buttonAllNone')" @click="toggleSelection()"></button>
     <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
-    <label>
+    <label class="ml-1">
       <setting-check name="exportValues" />
       <span v-text="i18n('labelExportScriptData')"></span>
     </label>
+    <modal v-if="store.ffDownload" transition="in-out" :visible="!!store.ffDownload.url" @close="store.ffDownload = {}">
+      <div class="export-modal modal-content">
+        <a :download="store.ffDownload.name" :href="store.ffDownload.url">
+          Right click and save as<br />
+          <strong>scripts.zip</strong>
+        </a>
+      </div>
+    </modal>
   </section>
 </template>
 
 <script>
+import Modal from 'vueleton/lib/modal';
 import { sendMessage, getLocaleString } from 'src/common';
+import { objectGet } from 'src/common/object';
 import options from 'src/common/options';
 import { isFirefox } from 'src/common/ua';
 import SettingCheck from 'src/common/ui/setting-check';
+import { downloadBlob } from 'src/common/download';
 import { store } from '../../utils';
 
 /**
  * Note:
  * - Firefox does not support multiline <select>
  */
+if (isFirefox) store.ffDownload = {};
 
 export default {
   components: {
     SettingCheck,
+    Modal,
   },
   data() {
     return {
+      isFirefox,
       store,
       exporting: false,
       items: [],
@@ -53,7 +67,9 @@ export default {
   },
   methods: {
     initItems() {
-      this.items = (store.scripts || []).map(script => ({
+      this.items = (store.scripts || [])
+      .filter(({ config: { removed } }) => !removed)
+      .map(script => ({
         script,
         active: true,
       }));
@@ -66,7 +82,7 @@ export default {
     exportData() {
       this.exporting = true;
       Promise.resolve(exportData(this.selectedIds))
-      .then(downloadBlob)
+      .then(download)
       .catch(err => {
         console.error(err);
       })
@@ -96,46 +112,59 @@ function addFile(writer, file) {
   });
 }
 
-function download(url, cb) {
-  const a = document.createElement('a');
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.href = url;
-  a.download = 'scripts.zip';
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-    if (cb) cb();
-  });
+function leftpad(src, length, pad = '0') {
+  let str = `${src}`;
+  while (str.length < length) str = pad + str;
+  return str;
 }
 
-function downloadBlob(blob) {
+function getTimestamp() {
+  const date = new Date();
+  return `${
+    date.getFullYear()
+  }-${
+    leftpad(date.getMonth() + 1, 2)
+  }-${
+    leftpad(date.getDate(), 2)
+  }_${
+    leftpad(date.getHours(), 2)
+  }.${
+    leftpad(date.getMinutes(), 2)
+  }.${
+    leftpad(date.getSeconds(), 2)
+  }`;
+}
+
+function getExportname() {
+  return `scripts_${getTimestamp()}.zip`;
+}
+
+function download(blob) {
   // Known issue: does not work on Firefox
   // https://bugzilla.mozilla.org/show_bug.cgi?id=1331176
   if (isFirefox) {
     const reader = new FileReader();
     reader.onload = () => {
-      download(reader.result);
+      store.ffDownload = {
+        name: getExportname(),
+        url: reader.result,
+      };
     };
     reader.readAsDataURL(blob);
   } else {
-    const url = URL.createObjectURL(blob);
-    download(url, () => {
-      URL.revokeObjectURL(url);
-    });
+    downloadBlob(blob, getExportname());
   }
 }
 
 function exportData(selectedIds) {
-  if (!selectedIds.length) return;
   const withValues = options.get('exportValues');
-  return sendMessage({
+  return (selectedIds.length ? sendMessage({
     cmd: 'ExportZip',
     data: {
       values: withValues,
       ids: selectedIds,
     },
-  })
+  }) : Promise.resolve())
   .then(data => {
     const names = {};
     const vm = {
@@ -144,7 +173,7 @@ function exportData(selectedIds) {
     };
     delete vm.settings.sync;
     if (withValues) vm.values = {};
-    const files = data.items.map(({ script, code }) => {
+    const files = (objectGet(data, 'items') || []).map(({ script, code }) => {
       let name = script.custom.name || script.meta.name || script.props.id;
       if (names[name]) {
         names[name] += 1;
@@ -210,5 +239,8 @@ function exportData(selectedIds) {
       color: white;
     }
   }
+}
+.export-modal {
+  width: 13rem;
 }
 </style>

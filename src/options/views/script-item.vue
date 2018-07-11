@@ -4,14 +4,17 @@
     <div class="script-info flex">
       <div class="script-name ellipsis" v-text="script._cache.name"></div>
       <div class="flex-auto"></div>
-      <div class="script-author ellipsis" :title="script.meta.author" v-if="author">
-        <span v-text="i18n('labelAuthor')"></span>
-        <a :href="'mailto:'+author.email" v-if="author.email" v-text="author.name"></a>
-        <span v-if="!author.email" v-text="author.name"></span>
-      </div>
-      <div class="script-version" v-text="script.meta.version ? `v${script.meta.version}` : ''"></div>
-      <div v-if="script.config.removed" v-text="i18n('labelRemoved')"></div>
-      <div v-if="script.config.removed">
+      <tooltip :title="i18n('labelAuthor') + script.meta.author" class="script-author ml-1" v-if="author" align="end">
+        <icon name="author"></icon>
+        <a class="ellipsis ml-1" :href="`mailto:${author.email}`" v-if="author.email" v-text="author.name"></a>
+        <span class="ellipsis ml-1" v-else v-text="author.name"></span>
+      </tooltip>
+      <tooltip :title="lastUpdated.title" class="ml-1" align="end">
+        <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
+        <span class="secondary ml-1" v-text="lastUpdated.show"></span>
+      </tooltip>
+      <div v-if="script.config.removed" class="ml-1" v-text="i18n('labelRemoved')"></div>
+      <div v-if="script.config.removed" class="ml-1">
         <tooltip :title="i18n('buttonUndo')" placement="left">
           <span class="btn-ghost" @click="onRemove(0)">
             <icon name="undo"></icon>
@@ -19,7 +22,6 @@
         </tooltip>
       </div>
     </div>
-    <p class="script-desc ellipsis" v-text="script.custom.description || getLocaleString('description')"></p>
     <div class="script-buttons flex">
       <tooltip :title="i18n('buttonEdit')" align="start">
         <span class="btn-ghost" @click="onEdit">
@@ -31,18 +33,23 @@
           <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
         </span>
       </tooltip>
-      <tooltip v-if="canUpdate" :title="i18n('buttonUpdate')" align="start">
-        <span class="btn-ghost" :disabled="script.checking" @click="onUpdate">
+      <tooltip :disabled="!canUpdate || script.checking" :title="i18n('buttonUpdate')" align="start">
+        <span class="btn-ghost" @click="onUpdate">
           <icon name="refresh"></icon>
         </span>
       </tooltip>
       <span class="sep"></span>
-      <tooltip v-if="homepageURL || script.meta.supportURL" :title="i18n('buttonHome')" align="start">
+      <tooltip :disabled="!homepageURL" :title="i18n('buttonHome')" align="start">
         <a class="btn-ghost" target="_blank" :href="homepageURL">
           <icon name="home"></icon>
         </a>
       </tooltip>
-      <tooltip v-if="script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
+      <tooltip :disabled="!description" :title="description" align="start">
+        <span class="btn-ghost">
+          <icon name="info"></icon>
+        </span>
+      </tooltip>
+      <tooltip :disabled="!script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
         <a class="btn-ghost" target="_blank" :href="script.meta.supportURL">
           <icon name="question"></icon>
         </a>
@@ -58,9 +65,10 @@
 </template>
 
 <script>
+import Tooltip from 'vueleton/lib/tooltip';
 import { sendMessage, getLocaleString } from 'src/common';
+import { objectGet } from 'src/common/object';
 import Icon from 'src/common/ui/icon';
-import Tooltip from 'src/common/ui/tooltip';
 import { store } from '../utils';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
@@ -124,11 +132,42 @@ export default {
     labelEnable() {
       return this.script.config.enabled ? this.i18n('buttonDisable') : this.i18n('buttonEnable');
     },
+    description() {
+      return this.script.custom.description || getLocaleString(this.script.meta, 'description');
+    },
+    lastUpdated() {
+      const { props } = this.script;
+      // XXX use `lastModified` as a fallback for scripts without `lastUpdated`
+      const lastUpdated = props.lastUpdated || props.lastModified;
+      const ret = {};
+      if (lastUpdated) {
+        let delta = (Date.now() - lastUpdated) / 1000 / 60;
+        const units = [
+          ['min', 60],
+          ['h', 24],
+          ['d', 1000, 365],
+          ['y'],
+        ];
+        const unitInfo = units.find(item => {
+          const max = item[1];
+          if (!max || delta < max) return true;
+          const step = item[2] || max;
+          delta /= step;
+          return false;
+        });
+        const date = new Date(lastUpdated);
+        ret.title = this.i18n('labelLastUpdatedAt', date.toLocaleString());
+        ret.show = `${delta | 0}${unitInfo[0]}`;
+      }
+      return ret;
+    },
   },
   mounted() {
     const { icon } = this.script.meta;
     if (icon && icon !== this.safeIcon) {
-      loadImage(icon)
+      const pathMap = objectGet(this.script, 'custom.pathMap') || {};
+      const fullUrl = pathMap[icon] || icon;
+      loadImage(fullUrl)
       .then(url => {
         this.safeIcon = url;
       }, () => {
@@ -137,9 +176,6 @@ export default {
     }
   },
   methods: {
-    getLocaleString(key) {
-      return getLocaleString(this.script.meta, key);
-    },
     onEdit() {
       this.$emit('edit', this.script.props.id);
     },
@@ -310,15 +346,28 @@ export default {
   &:hover {
     border-color: darkgray;
   }
+  .secondary {
+    color: gray;
+    font-size: small;
+  }
   &.disabled,
   &.removed {
     background: #f0f0f0;
     color: #999;
   }
+  &.disabled {
+    .secondary {
+      color: darkgray;
+    }
+  }
   &.removed {
     padding-bottom: 10px;
+    .secondary {
+      display: none;
+    }
   }
   &-buttons {
+    margin-left: 3.5rem;
     align-items: center;
     line-height: 1;
     color: #3e4651;
@@ -328,17 +377,17 @@ export default {
     .removed & {
       display: none;
     }
+    > .disabled {
+      color: gainsboro;
+    }
+    .icon {
+      display: block;
+    }
   }
   &-info {
     margin-left: 3.5rem;
     line-height: 1.5;
     align-items: center;
-    > *:not(:last-child) {
-      margin-right: 8px;
-    }
-    .icon {
-      display: block;
-    }
   }
   &-icon {
     position: absolute;
@@ -355,24 +404,19 @@ export default {
     }
   }
   &-name {
-    font-weight: bold;
+    font-weight: 500;
     font-size: 1rem;
     .disabled & {
-      color: blueviolet;
+      color: gray;
     }
   }
   &-author {
-    max-width: 30%;
-  }
-  &-desc {
-    margin-left: 3.5rem;
-    line-height: 2rem;
-    color: #60646d;
-    &::after {
-      content: "\200b";
+    > * {
+      vertical-align: middle;
     }
-    .removed & {
-      display: none;
+    > .ellipsis {
+      display: inline-block;
+      max-width: 100px;
     }
   }
 }
