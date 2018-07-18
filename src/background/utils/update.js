@@ -76,11 +76,12 @@ export default function checkUpdate(script) {
     .then(code => parseScript({
       id,
       code,
+      update: {
+        checking: false,
+      },
     }))
     .then(res => {
       const { data: { update } } = res;
-      update.checking = false;
-      sendMessageOrIgnore(res);
       updated = true;
       if (getOption('notifyUpdates')) {
         notify({
