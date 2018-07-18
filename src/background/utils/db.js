@@ -8,6 +8,7 @@ import { register } from './init';
 import patchDB from './patch-db';
 import { setOption } from './options';
 import { sendMessageOrIgnore } from './message';
+import pluginEvents from '../plugin/events';
 
 function cacheOrFetch(handle) {
   const requests = {};
@@ -467,6 +468,8 @@ export function getExportData(ids, withValues) {
   });
 }
 
+const CMD_UPDATE = 'UpdateScript';
+const CMD_ADD = 'AddScript';
 export function parseScript(data) {
   const {
     id, code, message, isNew, config, custom, props, update,
@@ -474,7 +477,7 @@ export function parseScript(data) {
   const meta = parseMeta(code);
   if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
   const result = {
-    cmd: 'UpdateScript',
+    cmd: CMD_UPDATE,
     data: {
       update: {
         message: message == null ? i18n('msgUpdated') : message || '',
@@ -489,7 +492,8 @@ export function parseScript(data) {
       script = Object.assign({}, oldScript);
     } else {
       ({ script } = newScript());
-      result.cmd = 'AddScript';
+      result.cmd = CMD_ADD;
+      result.data.isNew = true;
       result.data.update.message = i18n('msgInstalled');
     }
     script.config = Object.assign({}, script.config, config, {
@@ -515,6 +519,7 @@ export function parseScript(data) {
     Object.assign(result.data.update, script, update);
     result.data.where = { id: script.props.id };
     sendMessageOrIgnore(result);
+    pluginEvents.emit('scriptChanged', result.data);
     return result;
   });
 }
