@@ -118,16 +118,16 @@ editNavSettings:
   message: Asetukset
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: Arvot
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: ''
+  message: Peruuta
 editValueSave:
   description: Button to save modification of a script value.
-  message: ''
+  message: Tallenna
 extDescription:
   description: Description for this extension.
-  message: Tarjoaa selaimiin tuen käyttäjäskripteille.
+  message: Lisää selaimiin tuen käyttäjäskripteille.
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -160,7 +160,7 @@ labelAbout:
   message: Tietoja Violentmonkeystä
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: Lisäasetukset
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Salli päivitykset
@@ -175,16 +175,16 @@ labelAutoUpdate:
   message: Tarkista skriptien päivitykset joka päivä
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: "Näytä lätkässä: "
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: ei mitään
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: ajossa olevien skriptien määrä
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: ajossa olevien uniikkien skriptien määrä
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Musta lista
@@ -208,7 +208,7 @@ labelDownloadURL:
   message: 'Latausosoite:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Muokataan skriptin arvoa
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude-säännöt'
@@ -229,7 +229,7 @@ labelGeneral:
   message: Yleiset
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Koitisivu
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Kotisivun osoite:'
@@ -241,7 +241,7 @@ labelInclude:
   message: '@include-säännöt'
 labelIndentUnit:
   description: Label for editor option of indent unit size.
-  message: ''
+  message: Sisennysyksikkö
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Asennetaan skriptiä
@@ -250,13 +250,13 @@ labelKeepOriginal:
   message: Pidä alkuperäinen
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: Päivitetty viimeksi $1
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Rivi nro.: '
 labelLineWrapping:
   description: Label for editor option of line wrapping.
-  message: ''
+  message: Rivitä pitkät rivit
 labelMatch:
   description: Label of @match rules.
   message: '@match-säännöt'
@@ -320,7 +320,7 @@ labelSyncDisabled:
   message: Ei mihinkään
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: ''
+  message: Uudista lupa automaattisesti sen vanhettua
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
@@ -450,16 +450,16 @@ msgUpdating:
   message: Päivitetään...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: Ei tallennettuja arvoja
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Näytä käytössä olevat skriptit ensin
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: Merkkikokoriippuvainen
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Käytä Regex-ilmaisua
 sideMenuAbout:
   description: 'Side menu: About'
   message: Tietoja
@@ -474,10 +474,12 @@ titleScriptUpdated:
   message: Päivitys
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Avain (merkkijono)
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: Arvo (JSON-serialisoitu)
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
-  message: ''
+  message: >-
+    Osa riveistä on liian pitkiä, avataan vain-luku-tilassa. Ole hyvä ja
+    muokkaa ulkoisella editorilla.

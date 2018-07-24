@@ -118,13 +118,13 @@ editNavSettings:
   message: Definições
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: Valores
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: ''
+  message: Cancelar
 editValueSave:
   description: Button to save modification of a script value.
-  message: ''
+  message: Guardar
 extDescription:
   description: Description for this extension.
   message: Fornece suporte a scripts de utilizador para navegadores.
@@ -160,7 +160,7 @@ labelAbout:
   message: Acerca do Violentmonkey
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: Avançadas
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Permitir atualização
@@ -210,7 +210,7 @@ labelDownloadURL:
   message: 'URL de descarga:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: A editar valor do script
 labelExclude:
   description: Label of @exclude rules.
   message: Regras @exclude
@@ -231,7 +231,7 @@ labelGeneral:
   message: Gerais
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Website
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL do website:'
@@ -243,7 +243,7 @@ labelInclude:
   message: Regras @include
 labelIndentUnit:
   description: Label for editor option of indent unit size.
-  message: ''
+  message: 'Unidade de indentação:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: A instalar o script
@@ -258,7 +258,7 @@ labelLineNumber:
   message: 'Linha n.º: '
 labelLineWrapping:
   description: Label for editor option of line wrapping.
-  message: ''
+  message: Moldar o texto em linhas compridas
 labelMatch:
   description: Label of @match rules.
   message: Regras @match
@@ -452,7 +452,7 @@ msgUpdating:
   message: A atualizar...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: Nenhum valor está a ser armazenado
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Mostrar scripts ativos primeiro
@@ -476,10 +476,12 @@ titleScriptUpdated:
   message: Atualização
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Chave (cadeia de carateres)
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: Valor (serializado em JSON)
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
-  message: ''
+  message: >-
+    Algumas linhas são demasiado compridas; a abrir em modo só de leitura. Por
+    favor, edite com um editor externo.

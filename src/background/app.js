@@ -148,7 +148,6 @@ const commands = {
   Vacuum: vacuum,
   ParseScript(data) {
     return parseScript(data).then(res => {
-      sendMessageOrIgnore(res);
       sync.sync();
       return res.data;
     });

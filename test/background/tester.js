@@ -110,6 +110,21 @@ test('path', t => {
     q.end();
   });
 
+  t.test('should ignore query string and hash', q => {
+    const script = buildScript({
+      meta: {
+        match: [
+          'https://www.google.com/a',
+        ],
+      },
+    });
+    q.ok(testScript('https://www.google.com/a', script), 'should match without query and hash');
+    q.ok(testScript('https://www.google.com/a#hash', script), 'should match with hash');
+    q.ok(testScript('https://www.google.com/a?query', script), 'should match with query');
+    q.ok(testScript('https://www.google.com/a?query#hash', script), 'should match with query and hash');
+    q.end();
+  });
+
   t.end();
 });
 

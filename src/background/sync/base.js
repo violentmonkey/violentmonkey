@@ -434,8 +434,7 @@ export const BaseService = serviceFactory({
             if (!getOption('syncScriptStatus') && data.config) {
               delete data.config.enabled;
             }
-            return parseScript(data)
-            .then(res => { sendMessageOrIgnore(res); });
+            return parseScript(data);
           });
         }),
         ...putRemote.map(({ local, remote }) => {

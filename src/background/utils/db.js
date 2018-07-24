@@ -467,7 +467,7 @@ export function getExportData(ids, withValues) {
 
 export function parseScript(data) {
   const {
-    id, code, message, isNew, config, custom, props,
+    id, code, message, isNew, config, custom, props, update,
   } = data;
   const meta = parseMeta(code);
   if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
@@ -510,8 +510,9 @@ export function parseScript(data) {
   })
   .then(script => {
     fetchScriptResources(script, data);
-    Object.assign(result.data.update, script);
+    Object.assign(result.data.update, script, update);
     result.data.where = { id: script.props.id };
+    sendMessageOrIgnore(result);
     return result;
   });
 }

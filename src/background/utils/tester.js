@@ -53,14 +53,16 @@ export function testScript(url, script) {
   const inc = mergeLists(custom.origInclude && meta.include, custom.include);
   const exc = mergeLists(custom.origExclude && meta.exclude, custom.exclude);
   const excMat = mergeLists(custom.origExcludeMatch && meta.excludeMatch, custom.excludeMatch);
+  // Match patterns works only on scheme, host and path.
+  const baseUrl = url.split('#')[0].split('?')[0];
   // match all if no @match or @include rule
   let ok = !mat.length && !inc.length;
   // @match
-  ok = ok || testMatch(url, mat);
+  ok = ok || testMatch(baseUrl, mat);
   // @include
   ok = ok || testGlob(url, inc);
   // @exclude-match
-  ok = ok && !testMatch(url, excMat);
+  ok = ok && !testMatch(baseUrl, excMat);
   // @exclude
   ok = ok && !testGlob(url, exc);
   return ok;
