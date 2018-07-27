@@ -1,5 +1,5 @@
-import { initHooks, debounce, normalizeKeys } from 'src/common';
-import { objectGet, objectSet } from 'src/common/object';
+import { initHooks, debounce, normalizeKeys } from '#/common';
+import { objectGet, objectSet } from '#/common/object';
 import { register } from './init';
 
 const defaults = {

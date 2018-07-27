@@ -53,9 +53,9 @@
 </template>
 
 <script>
-import options from 'src/common/options';
-import { getLocaleString, sendMessage } from 'src/common';
-import Icon from 'src/common/ui/icon';
+import options from '#/common/options';
+import { getLocaleString, sendMessage } from '#/common';
+import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 
 const optionsData = {

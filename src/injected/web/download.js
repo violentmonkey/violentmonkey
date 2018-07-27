@@ -1,4 +1,4 @@
-import { downloadBlob } from 'src/common/download';
+import { downloadBlob } from '#/common/download';
 import { onRequestCreate } from './requests';
 
 // eslint-disable-next-line import/prefer-default-export

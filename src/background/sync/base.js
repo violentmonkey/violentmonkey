@@ -1,6 +1,12 @@
-import { debounce, normalizeKeys, request, noop } from 'src/common';
-import { objectGet, objectSet, objectPick, objectPurify } from 'src/common/object';
-import { getEventEmitter, getOption, setOption, hookOptions, sendMessageOrIgnore } from '../utils';
+import {
+  debounce, normalizeKeys, request, noop,
+} from '#/common';
+import {
+  objectGet, objectSet, objectPick, objectPurify,
+} from '#/common/object';
+import {
+  getEventEmitter, getOption, setOption, hookOptions, sendMessageOrIgnore,
+} from '../utils';
 import {
   getScripts,
   getScriptCode,

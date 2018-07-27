@@ -1,9 +1,11 @@
-import 'src/common/browser';
+import '#/common/browser';
 import Vue from 'vue';
-import { sendMessage, i18n, getLocaleString, cache2blobUrl } from 'src/common';
-import options from 'src/common/options';
-import handlers from 'src/common/handlers';
-import 'src/common/ui/style';
+import {
+  sendMessage, i18n, getLocaleString, cache2blobUrl,
+} from '#/common';
+import options from '#/common/options';
+import handlers from '#/common/handlers';
+import '#/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
 

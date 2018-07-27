@@ -88,8 +88,8 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip';
-import { i18n } from 'src/common';
-import { objectGet } from 'src/common/object';
+import { i18n } from '#/common';
+import { objectGet } from '#/common/object';
 
 export default {
   props: ['value', 'settings'],

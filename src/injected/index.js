@@ -1,4 +1,4 @@
-import 'src/common/browser';
+import '#/common/browser';
 import { inject, getUniqId, sendMessage } from './utils';
 import initialize from './content';
 

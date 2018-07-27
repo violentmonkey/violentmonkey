@@ -1,4 +1,4 @@
-import { noop } from 'src/common';
+import { noop } from '#/common';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 
 const openers = {}; // scriptId: { openerId: 1, ... }

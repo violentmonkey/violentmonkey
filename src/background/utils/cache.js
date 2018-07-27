@@ -1,4 +1,4 @@
-import initCache from 'src/common/cache';
+import initCache from '#/common/cache';
 
 export default initCache({
   lifetime: 10 * 1000,

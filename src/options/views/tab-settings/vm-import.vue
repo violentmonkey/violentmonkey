@@ -13,9 +13,9 @@
 </template>
 
 <script>
-import { i18n, sendMessage } from 'src/common';
-import options from 'src/common/options';
-import SettingCheck from 'src/common/ui/setting-check';
+import { i18n, sendMessage } from '#/common';
+import options from '#/common/options';
+import SettingCheck from '#/common/ui/setting-check';
 import { showMessage } from '../../utils';
 
 export default {

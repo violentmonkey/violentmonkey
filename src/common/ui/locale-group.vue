@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { i18n } from 'src/common';
+import { i18n } from '#/common';
 
 const SEP = '￥￥';
 

@@ -1,4 +1,4 @@
-import { getFullUrl } from 'src/common';
+import { getFullUrl } from '#/common';
 import { sendMessage } from '../utils';
 import bridge from './bridge';
 

@@ -1,5 +1,5 @@
 import test from 'tape';
-import { isRemote } from 'src/common';
+import { isRemote } from '#/common';
 
 test('isRemote', t => {
   t.notOk(isRemote());

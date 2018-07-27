@@ -8,11 +8,11 @@ const base = require('./webpack.base.conf');
 const { isProd, merge, INIT_FUNC_NAME } = require('./utils');
 
 const entry = {
-  'background/app': 'src/background/app.js',
-  'options/app': 'src/options/app.js',
-  'confirm/app': 'src/confirm/app.js',
-  'popup/app': 'src/popup/app.js',
-  injected: 'src/injected/index.js',
+  'background/app': './src/background/app.js',
+  'options/app': './src/options/app.js',
+  'confirm/app': './src/confirm/app.js',
+  'popup/app': './src/popup/app.js',
+  injected: './src/injected/index.js',
 };
 
 const targets = [];
@@ -60,7 +60,7 @@ targets.push(merge(base, {
 
 targets.push(merge(base, {
   entry: {
-    'injected-web': 'src/injected/web',
+    'injected-web': './src/injected/web',
   },
   output: {
     libraryTarget: 'commonjs2',

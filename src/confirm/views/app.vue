@@ -29,12 +29,14 @@
 
 <script>
 import Dropdown from 'vueleton/lib/dropdown';
-import { sendMessage, leftpad, request, buffer2string, isRemote, getFullUrl } from 'src/common';
-import options from 'src/common/options';
-import initCache from 'src/common/cache';
-import VmCode from 'src/common/ui/code';
-import SettingCheck from 'src/common/ui/setting-check';
-import { route } from 'src/common/router';
+import {
+  sendMessage, leftpad, request, buffer2string, isRemote, getFullUrl,
+} from '#/common';
+import options from '#/common/options';
+import initCache from '#/common/cache';
+import VmCode from '#/common/ui/code';
+import SettingCheck from '#/common/ui/setting-check';
+import { route } from '#/common/router';
 
 const cache = initCache({});
 

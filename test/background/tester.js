@@ -1,6 +1,6 @@
 import test from 'tape';
-import { testScript, testBlacklist, resetBlacklist } from 'src/background/utils/tester';
-import cache from 'src/background/utils/cache';
+import { testScript, testBlacklist, resetBlacklist } from '#/background/utils/tester';
+import cache from '#/background/utils/cache';
 
 test.onFinish(cache.destroy);
 

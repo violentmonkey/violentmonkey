@@ -1,11 +1,13 @@
-import { i18n, request, buffer2string, getFullUrl, isRemote, getRnd4 } from 'src/common';
-import { objectGet, objectSet } from 'src/common/object';
+import {
+  i18n, request, buffer2string, getFullUrl, isRemote, getRnd4,
+} from '#/common';
+import { objectGet, objectSet } from '#/common/object';
 import { getNameURI, parseMeta, newScript } from './script';
 import { testScript, testBlacklist } from './tester';
 import { register } from './init';
 import patchDB from './patch-db';
 import { setOption } from './options';
-import { sendMessageOrIgnore } from '.';
+import { sendMessageOrIgnore } from './message';
 
 function cacheOrFetch(handle) {
   const requests = {};

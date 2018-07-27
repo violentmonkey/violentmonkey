@@ -64,11 +64,11 @@
 </template>
 
 <script>
-import { debounce } from 'src/common';
-import SettingCheck from 'src/common/ui/setting-check';
-import options from 'src/common/options';
-import hookSetting from 'src/common/hook-setting';
-import Icon from 'src/common/ui/icon';
+import { debounce } from '#/common';
+import SettingCheck from '#/common/ui/setting-check';
+import options from '#/common/options';
+import hookSetting from '#/common/hook-setting';
+import Icon from '#/common/ui/icon';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
