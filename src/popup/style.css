@@ -6,12 +6,13 @@ body {
   margin-top: 1rem;
   text-align: center;
   img {
-    width: 4em;
+    width: 4rem;
   }
   &.disabled > img {
     opacity: .5;
   }
 }
+
 .menu {
   border-top: 1px solid silver;
   &-item {
@@ -62,6 +63,7 @@ body {
     }
   }
 }
+
 .submenu {
   display: none;
   min-height: 4rem;
