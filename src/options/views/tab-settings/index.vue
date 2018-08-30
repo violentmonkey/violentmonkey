@@ -43,7 +43,7 @@
     </div>
     <div v-show="showAdvanced">
       <section>
-        <h3>Editor</h3>
+        <h3 v-text="i18n('labelEditor')"></h3>
         <div class="mb-1">
           <label>
             <setting-check name="editor.lineWrapping" />

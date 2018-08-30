@@ -3,7 +3,9 @@ anchorAuthor:
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href=mailto:germain.poirrier@gmail.com>BeardedBear</a>'
+  message: >-
+    <a href=mailto:germain.poirrier@gmail.com>BeardedBear</a>, <a
+    href=mailto:perso@hack-libre.org>ariasuni</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Tous/Aucun
@@ -212,6 +214,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: ''
+labelEditor:
+  description: Label for Editor settings
+  message: Éditeur
 labelExclude:
   description: Label of @exclude rules.
   message: Règles @exclude
@@ -230,6 +235,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: General
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: Aider à traduire
 labelHomepage:
   description: Label for home page in about tab.
   message: ''
