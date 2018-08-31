@@ -24,13 +24,8 @@ body {
     cursor: pointer;
     text-align: center;
     white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
     .submenu & {
       text-align: left;
-      > .flex-auto {
-        margin-left: 1rem;
-      }
     }
     &.disabled {
       color: gray;
@@ -45,6 +40,9 @@ body {
     .icon {
       flex: 0 0 1rem;
     }
+    > .icon:first-child {
+      margin-right: 1rem;
+    }
     > .flex-auto {
       &:first-child {
         padding-left: 1rem;
@@ -52,6 +50,9 @@ body {
       &:last-child {
         padding-right: 1rem;
       }
+    }
+    > .flex-1 {
+      padding-right: 2rem;
     }
   }
   &.expand {

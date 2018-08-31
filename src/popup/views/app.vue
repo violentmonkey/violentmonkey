@@ -5,18 +5,18 @@
     </div>
     <div class="menu-item" :class="{disabled:!options.isApplied}" @click="onToggle">
       <icon :name="getSymbolCheck(options.isApplied)"></icon>
-      <div class="flex-auto" v-text="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"></div>
+      <div class="flex-1" v-text="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"></div>
     </div>
     <div class="menu">
       <div class="menu-item" @click="onManage">
         <icon name="cog"></icon>
-        <div class="flex-auto" v-text="i18n('menuDashboard')"></div>
+        <div class="flex-1" v-text="i18n('menuDashboard')"></div>
       </div>
     </div>
     <div class="menu" v-show="store.domain">
       <div class="menu-item" @click="onFindSameDomainScripts">
         <icon name="search"></icon>
-        <div class="flex-auto" v-text="i18n('menuFindScripts')"></div>
+        <div class="flex-1" v-text="i18n('menuFindScripts')"></div>
       </div>
     </div>
     <div class="menu menu-commands" v-show="commands.length" :class="{expand: activeMenu === 'commands'}">
