@@ -209,7 +209,7 @@ labelEditValue:
   message: 编辑数据
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: 编辑器
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude 规则'
