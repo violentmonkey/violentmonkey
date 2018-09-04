@@ -323,7 +323,7 @@ $header-height: 4rem;
 }
 .filter-search {
   position: relative;
-  width: 12rem;
+  width: 14rem;
   .icon {
     position: absolute;
     height: 100%;

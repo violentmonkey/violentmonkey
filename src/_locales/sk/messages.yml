@@ -93,13 +93,15 @@ buttonVacuuming:
   message: Čistím databázu...
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: Kliknutím na OK sa zmeny neuložia, Zrušiť vráti späť na úpravu.
+  message: 'Kliknutím na OK sa zmeny neuložia, Zrušiť vráti späť na úpravu.'
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: Webové adresy v tomto zozname nebudú injektované skriptami.
 descCustomCSS:
   description: Description of custom CSS section.
-  message: Vlastné CSS pre stránku s možnosťami a inštalačnú stránku. Ak si nie ste istí, čo to je, prosím, neupravujte to.
+  message: >-
+    Vlastné CSS pre stránku s možnosťami a inštalačnú stránku. Ak si nie ste
+    istí, čo to je, prosím, neupravujte to.
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Vlastné metadáta
@@ -141,7 +143,9 @@ hintUseDownloadURL:
   message: Použiť @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej pamäte.
+  message: >-
+    Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej
+    pamäte.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Inštalovať z $1
@@ -205,12 +209,15 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Úprava hodnoty skriptu
+labelEditor:
+  description: Label for Editor settings
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
-  message: 'pravidlá @exclude'
+  message: pravidlá @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: 'pravidlá @exclude-match'
+  message: pravidlá @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportovať dáta skriptu
@@ -223,6 +230,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: Všeobecné
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: ''
 labelHomepage:
   description: Label for home page in about tab.
   message: Domovská stránka
@@ -234,7 +244,7 @@ labelImportSettings:
   message: Importovať nastavenia
 labelInclude:
   description: Label of @include rules.
-  message: 'pravidlá @include'
+  message: pravidlá @include
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Zarážka:'
@@ -255,7 +265,7 @@ labelLineWrapping:
   message: Zalomiť dlhé riadky
 labelMatch:
   description: Label of @match rules.
-  message: 'pravidlá @match'
+  message: pravidlá @match
 labelName:
   description: Label of script name.
   message: 'Názov:'
@@ -298,6 +308,10 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Nastavenia
+labelShowBadge:
+  description: Option to show number of running scripts on the badge.
+  message: ''
+  touched: false
 labelSync:
   description: Label for sync options.
   message: Synchronizácia
@@ -310,6 +324,10 @@ labelSyncAuthorizing:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Zakázané
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
+  message: ''
+  touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: Odvolať
@@ -359,13 +377,17 @@ msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
   message: Načítanie informácií o aktualizácii skončilo chybou.
 msgErrorLoadingData:
-  description: Message shown on confirm page when the script to be installed cannot be loaded.
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
   message: Chyba pri načítaní dát skriptu.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
   message: Chyba pri načítaní závislostí.
 msgImported:
-  description: Message shown after import. There is an argument referring to the count of scripts imported.
+  description: >-
+    Message shown after import. There is an argument referring to the count of
+    scripts imported.
   message: 'Importovaných položiek: $1'
 msgInstalled:
   description: Message shown when a script is installed.
@@ -374,7 +396,9 @@ msgInvalidScript:
   description: Message shown when script is invalid.
   message: Neplatný skript!
 msgLoadedData:
-  description: Message shown in the confirm page when a javascript file to be installed is loaded.
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
   message: Dáta skriptu načítané.
 msgLoading:
   description: Message shown in the options page before script list is loaded.
@@ -386,10 +410,14 @@ msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Načítavam závislosti... ($1/$2)
 msgNamespaceConflict:
-  description: Message shown when namespace of the new script conflicts with an existent one.
-  message: Konflikt menného priestoru skriptu! Prosím, upravte @name a @namespace.
+  description: >-
+    Message shown when namespace of the new script conflicts with an existent
+    one.
+  message: 'Konflikt menného priestoru skriptu! Prosím, upravte @name a @namespace.'
 msgNewVersion:
-  description: Message shown when a new version of script is found by @updateURL, but no @downloadURL is provided.
+  description: >-
+    Message shown when a new version of script is found by @updateURL, but no
+    @downloadURL is provided.
   message: Nájdená nová verzia.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
@@ -456,4 +484,6 @@ valueLabelValue:
   message: Hodnota (serializované ako JSON)
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
-  message: Niektoré riadky sú príliš dlhé, otváram v režime iba na čítanie. Prosím, upravte s externým editorom.
+  message: >-
+    Niektoré riadky sú príliš dlhé, otváram v režime iba na čítanie. Prosím,
+    upravte s externým editorom.
