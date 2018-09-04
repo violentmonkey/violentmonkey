@@ -81,6 +81,9 @@ function doUpdate() {
     return dumpValueStores(valueStores);
   })
   .then(broadcastUpdates)
+  .catch(err => {
+    console.error('Values error:', err);
+  })
   .then(() => {
     timer = null;
     if (cache) updateLater();
