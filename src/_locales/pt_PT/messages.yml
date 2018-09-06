@@ -213,7 +213,7 @@ labelEditValue:
   message: A editar valor do script
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Editor
 labelExclude:
   description: Label of @exclude rules.
   message: Regras @exclude
@@ -234,7 +234,7 @@ labelGeneral:
   message: Gerais
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Colabore na tradução
 labelHomepage:
   description: Label for home page in about tab.
   message: Website
