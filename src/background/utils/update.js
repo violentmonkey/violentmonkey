@@ -1,8 +1,8 @@
-import { i18n, request } from 'src/common';
+import { i18n, request } from '#/common';
 import { parseScript } from './db';
 import { parseMeta, compareVersion } from './script';
 import { getOption } from './options';
-import { notify, sendMessageOrIgnore } from '.';
+import { notify, sendMessageOrIgnore } from './message';
 
 const processes = {};
 

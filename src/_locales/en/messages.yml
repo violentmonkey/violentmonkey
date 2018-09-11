@@ -209,6 +209,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Editing script value
+labelEditor:
+  description: Label for Editor settings
+  message: Editor
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude rules'
@@ -227,6 +230,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: General
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: Help with translation
 labelHomepage:
   description: Label for home page in about tab.
   message: Homepage

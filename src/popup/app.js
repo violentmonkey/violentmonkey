@@ -1,9 +1,9 @@
-import 'src/common/browser';
+import '#/common/browser';
 import Vue from 'vue';
-import { i18n, sendMessage } from 'src/common';
-import handlers from 'src/common/handlers';
-import * as tld from 'src/common/tld';
-import 'src/common/ui/style';
+import { i18n, sendMessage } from '#/common';
+import handlers from '#/common/handlers';
+import * as tld from '#/common/tld';
+import '#/common/ui/style';
 import App from './views/app';
 import { store } from './utils';
 

@@ -118,13 +118,13 @@ editNavSettings:
   message: Impostazioni
 editNavValues:
   description: Label of values tab in script editor.
-  message: 'Valori'
+  message: Valori
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: 'Annulla'
+  message: Annulla
 editValueSave:
   description: Button to save modification of a script value.
-  message: 'Salva'
+  message: Salva
 extDescription:
   description: Description for this extension.
   message: Introduce il supporto agli userscript per browser.
@@ -160,7 +160,7 @@ labelAbout:
   message: Riguardo Violentmonkey
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: 'Impostazioni avanzate'
+  message: Impostazioni avanzate
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Permetti aggiornamenti
@@ -175,16 +175,16 @@ labelAutoUpdate:
   message: Controlla automaticamente gli script per aggiornamenti tutti i giorni
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Mostra sull''icona'
+  message: Mostra sull'icona
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: 'Nulla'
+  message: Nulla
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: 'Il numero di script totali in esecuzione'
+  message: Il numero di script totali in esecuzione
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: 'Il numero di script unici in esecuzione'
+  message: Il numero di script unici in esecuzione
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Blacklist
@@ -208,7 +208,10 @@ labelDownloadURL:
   message: 'URL Download:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: 'Modifica valore per lo scipt'
+  message: Modifica valore per lo scipt
+labelEditor:
+  description: Label for Editor settings
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude rules'
@@ -227,9 +230,12 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: Generale
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: ''
 labelHomepage:
   description: Label for home page in about tab.
-  message: 'Homepage'
+  message: Homepage
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL Homepage:'
@@ -256,7 +262,7 @@ labelLineNumber:
   message: 'Linea numero: '
 labelLineWrapping:
   description: Label for editor option of line wrapping.
-  message: 'A-capo automatico'
+  message: A-capo automatico
 labelMatch:
   description: Label of @match rules.
   message: '@match rules'
@@ -450,16 +456,16 @@ msgUpdating:
   message: Aggiornando...
 noValues:
   description: Label shown when there is no value for current script.
-  message: 'Nessun valore salvato'
+  message: Nessun valore salvato
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Visualizza script abilitati per primi
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: 'Maiuscole/minuscole'
+  message: Maiuscole/minuscole
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: 'Espressione regolare'
+  message: Espressione regolare
 sideMenuAbout:
   description: 'Side menu: About'
   message: A riguardo
@@ -474,10 +480,12 @@ titleScriptUpdated:
   message: Aggiornamento
 valueLabelKey:
   description: Label for key of a script value.
-  message: 'Chiave (stringa)'
+  message: Chiave (stringa)
 valueLabelValue:
   description: Label for value of a script value.
-  message: 'Valore (stringa JSON)'
+  message: Valore (stringa JSON)
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
-  message: 'Alcune linee dello script sono troppo lunghe e non possono essere editate. Apri lo script con un editor esterno.'
+  message: >-
+    Alcune linee dello script sono troppo lunghe e non possono essere editate.
+    Apri lo script con un editor esterno.

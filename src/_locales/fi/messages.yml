@@ -175,7 +175,7 @@ labelAutoUpdate:
   message: Tarkista skriptien päivitykset joka päivä
 labelBadge:
   description: Label for option to show number on badge.
-  message: "Näytä lätkässä: "
+  message: 'Näytä lätkässä: '
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: ei mitään
@@ -209,6 +209,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Muokataan skriptin arvoa
+labelEditor:
+  description: Label for Editor settings
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude-säännöt'
@@ -227,6 +230,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: Yleiset
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: ''
 labelHomepage:
   description: Label for home page in about tab.
   message: Koitisivu
@@ -481,5 +487,5 @@ valueLabelValue:
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-
-    Osa riveistä on liian pitkiä, avataan vain-luku-tilassa. Ole hyvä ja
-    muokkaa ulkoisella editorilla.
+    Osa riveistä on liian pitkiä, avataan vain-luku-tilassa. Ole hyvä ja muokkaa
+    ulkoisella editorilla.

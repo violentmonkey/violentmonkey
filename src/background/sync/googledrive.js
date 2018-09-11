@@ -1,10 +1,12 @@
 // Reference:
 // - https://developers.google.com/drive/v3/reference/files
 // - https://github.com/google/google-api-nodejs-client
-import { getUniqId } from 'src/common';
-import { objectGet } from 'src/common/object';
+import { getUniqId } from '#/common';
+import { objectGet } from '#/common/object';
 import { dumpQuery, notify } from '../utils';
-import { getURI, getItemFilename, BaseService, register, isScriptFile } from './base';
+import {
+  getURI, getItemFilename, BaseService, register, isScriptFile,
+} from './base';
 
 const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0IjoiTjBEbTZJOEV3bkJaeE1xMUpuMHN3UER0In0='));
 const config = Object.assign({

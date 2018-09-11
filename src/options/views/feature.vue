@@ -6,8 +6,8 @@
 
 <script>
 import Vue from 'vue';
-import options from 'src/common/options';
-import { objectGet } from 'src/common/object';
+import options from '#/common/options';
+import { objectGet } from '#/common/object';
 import { store } from '../utils';
 
 const FEATURES_KEY = 'features';

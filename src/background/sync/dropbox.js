@@ -1,5 +1,7 @@
 import { loadQuery, dumpQuery } from '../utils';
-import { getURI, getItemFilename, BaseService, isScriptFile, register } from './base';
+import {
+  getURI, getItemFilename, BaseService, isScriptFile, register,
+} from './base';
 
 const config = {
   client_id: 'f0q12zup2uys5w8',

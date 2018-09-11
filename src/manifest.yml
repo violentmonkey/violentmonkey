@@ -10,6 +10,7 @@ icons:
   '128': public/images/icon128.png
 default_locale: en
 browser_action:
+  browser_style: true
   default_icon:
     '19': public/images/icon19.png
     '38': public/images/icon38.png

@@ -1,6 +1,8 @@
 import { CustomEvent, jsonDump, jsonLoad } from './helpers';
 
-export { sendMessage, request, throttle, cache2blobUrl } from 'src/common';
+export {
+  sendMessage, request, throttle, cache2blobUrl,
+} from '#/common';
 
 export function postData(destId, data) {
   // Firefox issue: data must be stringified to avoid cross-origin problem

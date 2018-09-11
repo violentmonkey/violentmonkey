@@ -21,9 +21,7 @@
     <div class="mb-1">
       <label v-text="i18n('labelCurrentLang')"></label>
       <span class="text-green" v-text="language"></span> |
-      <a href="https://violentmonkey.github.io/localization/" target="_blank">
-        Help with translation
-      </a>
+      <a href="https://violentmonkey.github.io/localization/" target="_blank" v-text="i18n('labelHelpTranslate')"></a>
     </div>
   </div>
 </template>

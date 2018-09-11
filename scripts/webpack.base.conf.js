@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const MinifyPlugin = require('babel-minify-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const vueLoaderConfig = require('./vue-loader.conf');
 const { isDev, isProd, styleRule, definitions } = require('./utils');
 
@@ -23,7 +24,7 @@ module.exports = {
     modules: [resolve('node_modules')],
     extensions: ['.js', '.vue'],
     alias: {
-      src: resolve('src'),
+      '#': resolve('src'),
     }
   },
   module: {
@@ -53,6 +54,7 @@ module.exports = {
   devtool: isDev ? '#inline-source-map' : false,
   plugins: [
     definePlugin,
+    new VueLoaderPlugin(),
     isProd && new MinifyPlugin(),
   ].filter(Boolean),
 };

@@ -1,10 +1,14 @@
-import { isFirefox } from 'src/common/ua';
-import { getUniqId } from 'src/common';
-import { bindEvents, sendMessage, inject, attachFunction } from '../utils';
+import { isFirefox } from '#/common/ua';
+import { getUniqId } from '#/common';
+import {
+  bindEvents, sendMessage, inject, attachFunction,
+} from '../utils';
 import bridge from './bridge';
 import { tabOpen, tabClose, tabClosed } from './tabs';
 import { onNotificationCreate, onNotificationClick, onNotificationClose } from './notifications';
-import { getRequestId, httpRequest, abortRequest, httpRequested } from './requests';
+import {
+  getRequestId, httpRequest, abortRequest, httpRequested,
+} from './requests';
 import dirtySetClipboard from './clipboard';
 
 const IS_TOP = window.top === window;

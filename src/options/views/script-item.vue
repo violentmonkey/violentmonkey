@@ -66,9 +66,9 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip';
-import { sendMessage, getLocaleString } from 'src/common';
-import { objectGet } from 'src/common/object';
-import Icon from 'src/common/ui/icon';
+import { sendMessage, getLocaleString } from '#/common';
+import { objectGet } from '#/common/object';
+import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
@@ -109,11 +109,11 @@ export default {
     canUpdate() {
       const { script } = this;
       return script.config.shouldUpdate && (
-        script.custom.updateURL ||
-        script.meta.updateURL ||
-        script.custom.downloadURL ||
-        script.meta.downloadURL ||
-        script.custom.lastInstallURL
+        script.custom.updateURL
+        || script.meta.updateURL
+        || script.custom.downloadURL
+        || script.meta.downloadURL
+        || script.custom.lastInstallURL
       );
     },
     homepageURL() {

@@ -1,4 +1,6 @@
-import { getUniqId, request, i18n, buffer2string } from 'src/common';
+import {
+  getUniqId, request, i18n, buffer2string,
+} from '#/common';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
 

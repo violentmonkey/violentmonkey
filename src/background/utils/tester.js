@@ -1,4 +1,4 @@
-import * as tld from 'src/common/tld';
+import * as tld from '#/common/tld';
 import cache from './cache';
 import { getOption, hookOptions } from './options';
 

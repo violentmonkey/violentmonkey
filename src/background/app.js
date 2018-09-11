@@ -1,6 +1,6 @@
-import 'src/common/browser';
-import { noop } from 'src/common';
-import { objectGet } from 'src/common/object';
+import '#/common/browser';
+import { noop } from '#/common';
+import { objectGet } from '#/common/object';
 import * as sync from './sync';
 import {
   cache,
@@ -19,7 +19,9 @@ import {
   sortScripts, getValueStoresByIds,
 } from './utils/db';
 import { resetBlacklist } from './utils/tester';
-import { setValueStore, updateValueStore, resetValueOpener, addValueOpener } from './utils/values';
+import {
+  setValueStore, updateValueStore, resetValueOpener, addValueOpener,
+} from './utils/values';
 
 const VM_VER = browser.runtime.getManifest().version;
 
