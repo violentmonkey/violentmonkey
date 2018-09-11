@@ -211,7 +211,7 @@ labelEditValue:
   message: Sửa giá trị script
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Trình chỉnh sửa
 labelExclude:
   description: Label of @exclude rules.
   message: Bỏ qua
@@ -232,7 +232,7 @@ labelGeneral:
   message: Chung
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Giúp chúng tôi dịch
 labelHomepage:
   description: Label for home page in about tab.
   message: Trang chủ
