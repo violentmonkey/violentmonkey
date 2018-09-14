@@ -507,7 +507,7 @@ export function parseScript(data) {
     if (isRemote(data.url)) script.custom.lastInstallURL = data.url;
     const position = +data.position;
     if (position) objectSet(script, 'props.position', position);
-    buildPathMap(script);
+    buildPathMap(script, data.url);
     return saveScript(script, code).then(() => script);
   })
   .then(script => {
@@ -519,20 +519,20 @@ export function parseScript(data) {
   });
 }
 
-function buildPathMap(script) {
+function buildPathMap(script, base) {
   const { meta } = script;
-  const base = script.custom.lastInstallURL;
-  const pathMap = {};
-  [
+  const baseUrl = base || script.custom.lastInstallURL;
+  const pathMap = baseUrl ? [
     ...meta.require,
     ...Object.values(meta.resources),
-    isRemote(meta.icon) && meta.icon,
-  ].forEach(key => {
+    meta.icon,
+  ].reduce((map, key) => {
     if (key) {
-      const fullUrl = getFullUrl(key, base);
-      if (fullUrl !== key) pathMap[key] = fullUrl;
+      const fullUrl = getFullUrl(key, baseUrl);
+      if (fullUrl !== key) map[key] = fullUrl;
     }
-  });
+    return map;
+  }, {}) : {};
   script.custom.pathMap = pathMap;
   return pathMap;
 }
