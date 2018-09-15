@@ -436,7 +436,7 @@ msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Користувацькі стилі CSS збережено.
 msgSavedScriptTemplate:
-  description: Message shown wen custom script template is saved.
+  description: Message shown when custom script template is saved.
   message: ''
 msgScriptUpdated:
   description: Notification message for script updates.

@@ -434,7 +434,7 @@ msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Gaya kustom diperbarui.
 msgSavedScriptTemplate:
-  description: Message shown wen custom script template is saved.
+  description: Message shown when custom script template is saved.
   message: ''
 msgScriptUpdated:
   description: Notification message for script updates.
