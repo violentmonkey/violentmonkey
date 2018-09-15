@@ -300,6 +300,9 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: スクリプトエディタ
+labelScriptTemplate:
+  description: Label for custom script template.
+  message: ''
 labelSearch:
   description: Label for search input in search box.
   message: '検索する文字列: '
@@ -429,6 +432,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: カスタムスタイルが更新されました。
+msgSavedScriptTemplate:
+  description: Message shown wen custom script template is saved.
+  message: ''
 msgScriptUpdated:
   description: Notification message for script updates.
   message: スクリプト「$1」が更新されました!
