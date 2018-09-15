@@ -42,7 +42,7 @@ targets.push(merge(base, {
     }),
     new HtmlWebpackPlugin({
       filename: 'confirm/index.html',
-      template: 'src/public/index.html',
+      template: 'src/confirm/index.html',
       chunks: ['browser', 'common', 'confirm/app'],
     }),
     new HtmlWebpackPlugin({
