@@ -57,8 +57,9 @@
           </label>
         </div>
       </section>
-      <vm-blacklist></vm-blacklist>
-      <vm-css></vm-css>
+      <vm-template />
+      <vm-blacklist />
+      <vm-css />
     </div>
   </div>
 </template>
@@ -72,6 +73,7 @@ import Icon from '#/common/ui/icon';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
+import VmTemplate from './vm-template';
 import VmBlacklist from './vm-blacklist';
 import VmCss from './vm-css';
 
@@ -104,6 +106,7 @@ export default {
     VmImport,
     VmExport,
     VmSync,
+    VmTemplate,
     VmBlacklist,
     VmCss,
     SettingCheck,
