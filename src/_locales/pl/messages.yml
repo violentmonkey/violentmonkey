@@ -306,7 +306,7 @@ labelScriptEditor:
   message: Edytor skryptu
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Niestandardowy szablon skryptu
 labelSearch:
   description: Label for search input in search box.
   message: 'Szukaj: '
@@ -438,7 +438,7 @@ msgSavedCustomCSS:
   message: Styl niestandardowy jest aktualizowany.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: Niestandardowy szablon skryptu jest aktualizowany.
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Skrypt [$1] jest aktualizowany!'
