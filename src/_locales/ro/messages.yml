@@ -299,6 +299,9 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Editor de script
+labelScriptTemplate:
+  description: Label for custom script template.
+  message: ''
 labelSearch:
   description: Label for search input in search box.
   message: 'Caută: '
@@ -427,6 +430,9 @@ msgSavedBlacklist:
   message: ''
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
+  message: ''
+msgSavedScriptTemplate:
+  description: Message shown when custom script template is saved.
   message: ''
 msgScriptUpdated:
   description: Notification message for script updates.

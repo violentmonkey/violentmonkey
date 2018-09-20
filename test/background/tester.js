@@ -125,6 +125,26 @@ test('path', t => {
     q.end();
   });
 
+  t.test('should match query string and hash if existed in rules', q => {
+    const script = buildScript({
+      meta: {
+        match: [
+          'https://www.google.com/a?query',
+          'https://www.google.com/b#hash',
+          'https://www.google.com/c?query#hash',
+        ],
+      },
+    });
+    q.notOk(testScript('https://www.google.com/a', script), 'should match query');
+    q.notOk(testScript('https://www.google.com/b', script), 'should match hash');
+    q.ok(testScript('https://www.google.com/a?query', script), 'should match query');
+    q.ok(testScript('https://www.google.com/a?query#hash', script), 'should match query and ignore hash');
+    q.notOk(testScript('https://www.google.com/b?query#hash', script), 'should match query and hash');
+    q.ok(testScript('https://www.google.com/b#hash', script), 'should match hash');
+    q.ok(testScript('https://www.google.com/c?query#hash', script), 'should match query and hash');
+    q.end();
+  });
+
   t.end();
 });
 

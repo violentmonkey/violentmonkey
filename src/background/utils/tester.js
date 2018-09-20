@@ -53,16 +53,14 @@ export function testScript(url, script) {
   const inc = mergeLists(custom.origInclude && meta.include, custom.include);
   const exc = mergeLists(custom.origExclude && meta.exclude, custom.exclude);
   const excMat = mergeLists(custom.origExcludeMatch && meta.excludeMatch, custom.excludeMatch);
-  // Match patterns works only on scheme, host and path.
-  const baseUrl = url.split('#')[0].split('?')[0];
   // match all if no @match or @include rule
   let ok = !mat.length && !inc.length;
   // @match
-  ok = ok || testMatch(baseUrl, mat);
+  ok = ok || testMatch(url, mat);
   // @include
   ok = ok || testGlob(url, inc);
   // @exclude-match
-  ok = ok && !testMatch(baseUrl, excMat);
+  ok = ok && !testMatch(url, excMat);
   // @exclude
   ok = ok && !testGlob(url, exc);
   return ok;
@@ -125,7 +123,13 @@ function hostMatcher(rule) {
   };
 }
 function pathMatcher(rule) {
-  const reRule = new RegExp(str2RE(rule));
+  const iHash = rule.indexOf('#');
+  let iQuery = rule.indexOf('?');
+  let strRe = str2RE(rule);
+  if (iQuery > iHash) iQuery = -1;
+  if (iQuery < 0 && iHash < 0) strRe = `${strRe.slice(0, -1)}(?:[?#]|$)`;
+  else if (iHash < 0) strRe = `${strRe.slice(0, -1)}(?:#|$)`;
+  const reRule = new RegExp(strRe);
   return data => reRule.test(data);
 }
 function matchTester(rule) {

@@ -1,16 +1,18 @@
 <template>
-  <div class="frame flex flex-col fixed-full">
+  <div class="edit frame flex flex-col fixed-full">
     <div class="flex edit-header">
-      <h2 v-text="i18n('labelScriptEditor')"></h2>
-      <div class="flex-auto pos-rel ml-2">
+      <h2 class="mr-2" v-text="i18n('labelScriptEditor')"></h2>
+      <div class="pos-rel">
         <div class="edit-nav">
           <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
           <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
           <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
         </div>
       </div>
-      <div class="text-right">
-        <a class="mr-1" href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
+      <div class="flex-auto text-right ellipsis mr-1">
+        <a href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
+      </div>
+      <div>
         <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
         <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
         <button v-text="i18n('buttonClose')" @click="close"></button>
@@ -209,6 +211,7 @@ export default {
 
 <style>
 .edit {
+  z-index: 2000;
   &-header {
     > * {
       padding: 8px;
@@ -223,6 +226,7 @@ export default {
     position: absolute;
     left: 0;
     bottom: 0;
+    white-space: nowrap;
     .text-red {
       margin-left: 8px;
     }
@@ -240,6 +244,14 @@ export default {
     &:hover {
       box-shadow: 0 -1px 1px #bbb;
     }
+  }
+}
+
+@media (max-width: 767px) {
+  .edit-header > h2,
+  .edit-header > .flex-auto,
+  .edit-nav {
+    display: none;
   }
 }
 </style>

@@ -7,7 +7,7 @@ import {
   getRequestId, httpRequest, abortRequest, confirmInstall,
   newScript, parseMeta,
   setClipboard, checkUpdate,
-  getOption, setOption, hookOptions, getAllOptions,
+  getOption, getDefaultOption, setOption, hookOptions, getAllOptions,
   initialize, sendMessageOrIgnore,
 } from './utils';
 import { tabOpen, tabClose } from './utils/tabs';
@@ -40,6 +40,10 @@ hookOptions(changes => {
   if ('isApplied' in changes) setIcon(changes.isApplied);
   if ('autoUpdate' in changes) autoUpdate();
   if ('showBadge' in changes) updateBadges();
+  const SCRIPT_TEMPLATE = 'scriptTemplate';
+  if (SCRIPT_TEMPLATE in changes && !changes[SCRIPT_TEMPLATE]) {
+    setOption(SCRIPT_TEMPLATE, getDefaultOption(SCRIPT_TEMPLATE));
+  }
   sendMessageOrIgnore({
     cmd: 'UpdateOptions',
     data: changes,

@@ -3,15 +3,21 @@ body {
   height: 100%;
 }
 aside {
-  flex: 0 0 14rem;
+  position: relative;
+  z-index: 1000;
+}
+.aside-content {
+  width: 14rem;
+  height: 100%;
   padding: 4rem 1rem 0;
   text-align: right;
+  border-right: 1px solid darkgray;
   background: #fafafa;
   img {
     width: 5rem;
   }
 }
-.sidemenu {
+.aside-menu {
   border-top: 1px solid #bbb;
   > a {
     display: block;
@@ -27,6 +33,29 @@ aside {
     }
   }
 }
+.aside-toggle {
+  position: absolute;
+  width: 1rem;
+  height: 2rem;
+  top: 50%;
+  left: 100%;
+  margin-top: -1rem;
+  line-height: 2rem;
+  background: #fafafa;
+  color: darkgray;
+  border: 1px solid currentColor;
+  border-left: 0;
+  border-radius: 0 1rem 1rem 0;
+  > .icon {
+    display: block;
+    margin-top: .4rem;
+    margin-left: -.1rem;
+  }
+  .show-aside & > .icon {
+    transform: rotateY(180deg);
+  }
+}
+
 .text-red {
   color: red;
 }
@@ -62,7 +91,6 @@ section {
   position: relative;
   padding: 1.2rem;
   background: white;
-  border-left: 1px solid darkgray;
 }
 
 input[type=checkbox] {
@@ -89,6 +117,19 @@ input[type=checkbox] {
     }
     > .vl-modal-backdrop {
       transition: opacity .5s;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .aside-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    transition: transform .2s;
+    .show-aside > & {
+      transform: none;
     }
   }
 }

@@ -1,3 +1,5 @@
+import { getOption } from './options';
+
 const metaStart = '==UserScript==';
 const metaEnd = '==/UserScript==';
 
@@ -72,14 +74,7 @@ export function parseMeta(code) {
 }
 
 export function newScript() {
-  const code = `\
-// ==UserScript==
-// @name New Script
-// @namespace Violentmonkey Scripts
-// @match *://*/*
-// @grant none
-// ==/UserScript==
-`;
+  const code = getOption('scriptTemplate');
   const script = {
     custom: {
       origInclude: true,

@@ -43,7 +43,7 @@
           </label>
         </div>
       </dropdown>
-      <div class="filter-search">
+      <div class="filter-search hidden-sm">
         <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
         <icon name="search"></icon>
       </div>
