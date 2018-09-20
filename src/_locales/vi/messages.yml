@@ -301,7 +301,7 @@ labelScriptEditor:
   message: Trình chỉnh sửa script
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Script template tuỳ chỉnh
 labelSearch:
   description: Label for search input in search box.
   message: 'Tìm kiếm: '
@@ -433,7 +433,7 @@ msgSavedCustomCSS:
   message: Giao diện tùy chỉnh đã cập nhật.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: Script template tuỳ chỉnh đã được lưu
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Script [$1] đã được cập nhật!'
