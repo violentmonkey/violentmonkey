@@ -6,7 +6,12 @@ export default () => new Promise((resolve, reject) => {
   function init() {
     const req = indexedDB.open('Violentmonkey', 1);
     req.onsuccess = () => {
-      transform(req.result);
+      try {
+        transform(req.result);
+      } catch (err) {
+        // This should not happen, but did happen in Firefox.
+        reject(err);
+      }
     };
     req.onerror = reject;
     req.onupgradeneeded = () => {
