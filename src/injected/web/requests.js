@@ -90,8 +90,13 @@ function start(req, id) {
   };
   req.id = id;
   map[id] = req;
-  if (includes(['arraybuffer', 'blob'], details.responseType)) {
-    payload.responseType = 'arraybuffer';
+  const { responseType } = details;
+  if (responseType) {
+    if (includes(['arraybuffer', 'blob'], responseType)) {
+      payload.responseType = 'arraybuffer';
+    } else if (!includes(['json'], responseType)) {
+      console.warn(`[Violentmonkey] Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm.html#GM-xmlhttpRequest for more detail.`);
+    }
   }
   encodeBody(details.data)
   .then(body => {
