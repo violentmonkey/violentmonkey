@@ -8,13 +8,10 @@ import {
   getEventEmitter, getOption, setOption, hookOptions, sendMessageOrIgnore,
 } from '../utils';
 import {
-  getScripts,
-  getScriptCode,
-  parseScript,
-  removeScript,
   sortScripts,
   updateScriptInfo,
 } from '../utils/db';
+import { script as pluginScript } from '../plugin';
 
 const serviceNames = [];
 const serviceClasses = [];
@@ -336,7 +333,7 @@ export const BaseService = serviceFactory({
     });
   },
   getLocalData() {
-    return getScripts();
+    return pluginScript.list();
   },
   getSyncData() {
     return this.getMeta()
@@ -440,12 +437,12 @@ export const BaseService = serviceFactory({
             if (!getOption('syncScriptStatus') && data.config) {
               delete data.config.enabled;
             }
-            return parseScript(data);
+            return pluginScript.update(data);
           });
         }),
         ...putRemote.map(({ local, remote }) => {
           this.log('Upload script:', local.props.uri);
-          return getScriptCode(local.props.id)
+          return pluginScript.get(local.props.id)
           .then(code => {
             // XXX use version 1 to be compatible with Violentmonkey on other platforms
             const data = getScriptData(local, 1, { code });
@@ -468,7 +465,7 @@ export const BaseService = serviceFactory({
         }),
         ...delLocal.map(({ local }) => {
           this.log('Remove local script:', local.props.uri);
-          return removeScript(local.props.id);
+          return pluginScript.remove(local.props.id);
         }),
         ...updateLocal.map(({ local, info }) => {
           const updates = {};
@@ -481,7 +478,8 @@ export const BaseService = serviceFactory({
       promiseQueue.push(Promise.all(promiseQueue).then(() => sortScripts()).then(changed => {
         if (!changed) return;
         remoteChanged = true;
-        return getScripts().then(scripts => {
+        return pluginScript.list()
+        .then(scripts => {
           scripts.forEach(script => {
             const remoteInfo = remoteMetaData.info[script.props.uri];
             if (remoteInfo) remoteInfo.position = script.props.position;

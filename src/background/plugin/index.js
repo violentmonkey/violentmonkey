@@ -1,14 +1,18 @@
-import { parseScript, getScripts, getScriptCode } from '../utils/db';
+import {
+  parseScript,
+  getScripts,
+  getScriptCode,
+  removeScript,
+} from '../utils/db';
 
 // eslint-disable-next-line import/prefer-default-export
 export const script = {
-  update({ id, code }) {
+  update(data) {
     // Update an existing script by ID
-    return parseScript({ id, code });
-  },
-  add({ code }) {
-    // Set id=-1 to skip checking @name and @namespace
-    return parseScript({ id: -1, code });
+    // data: {
+    //   id, code, message, isNew, config, custom, props, update,
+    // }
+    return parseScript(data);
   },
   list() {
     // List all available scripts, without script code
@@ -17,5 +21,9 @@ export const script = {
   get(id) {
     // Get script code of an existing script
     return getScriptCode(id);
+  },
+  remove(id) {
+    // Remove script by id
+    return removeScript(id);
   },
 };
