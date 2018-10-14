@@ -95,7 +95,7 @@ function start(req, id) {
     if (includes(['arraybuffer', 'blob'], responseType)) {
       payload.responseType = 'arraybuffer';
     } else if (!includes(['json'], responseType)) {
-      console.warn(`[Violentmonkey] Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm.html#GM-xmlhttpRequest for more detail.`);
+      console.warn(`[Violentmonkey] Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
   }
   encodeBody(details.data)

@@ -3,7 +3,7 @@
     <h3 v-text="i18n('labelBlacklist')"></h3>
     <p>
       {{i18n('descBlacklist')}}
-      <a href="https://violentmonkey.github.io/2017/04/15/Smart-rules-for-blacklist/#Blacklist-patterns" target="_blank" v-text="i18n('learnBlacklist')"></a>
+      <a href="https://violentmonkey.github.io/2017/04/15/Smart-rules-for-blacklist/#blacklist-patterns" target="_blank" v-text="i18n('learnBlacklist')"></a>
     </p>
     <setting-text name="blacklist" ref="blacklist" />
     <button v-text="i18n('buttonSaveBlacklist')" @click="onSave"></button>
