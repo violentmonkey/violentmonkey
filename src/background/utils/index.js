@@ -1,7 +1,7 @@
-export cache from './cache';
-export setClipboard from './clipboard';
-export checkUpdate from './update';
-export getEventEmitter from './events';
+export { default as cache } from './cache';
+export { default as setClipboard } from './clipboard';
+export { default as checkUpdate } from './update';
+export { default as getEventEmitter } from './events';
 export * from './script';
 export * from './options';
 export * from './requests';

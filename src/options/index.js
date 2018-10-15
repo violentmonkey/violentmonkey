@@ -1,4 +1,3 @@
-import '#/common/browser';
 import Vue from 'vue';
 import {
   sendMessage, i18n, getLocaleString, cache2blobUrl,
@@ -25,9 +24,12 @@ function initialize() {
   document.title = i18n('extName');
   initMain();
   options.ready(() => {
+    const el = document.createElement('div');
+    document.body.appendChild(el);
     new Vue({
       render: h => h(App),
-    }).$mount('#app');
+    })
+    .$mount(el);
   });
 }
 
@@ -44,7 +46,7 @@ function initScript(script) {
   ].filter(Boolean).join('\n').toLowerCase();
   const name = script.custom.name || localeName;
   const lowerName = name.toLowerCase();
-  script._cache = { search, name, lowerName };
+  script.$cache = { search, name, lowerName };
 }
 
 function loadData(clear) {

@@ -2,7 +2,7 @@
   <div class="script" :class="{ disabled: !script.config.enabled, removed: script.config.removed }" :draggable="draggable" @dragstart.prevent="onDragStart">
     <img class="script-icon hidden-xs" :src="safeIcon">
     <div class="script-info flex">
-      <div class="script-name ellipsis flex-auto" v-text="script._cache.name"></div>
+      <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
       <tooltip :title="i18n('labelAuthor') + script.meta.author" class="script-author ml-1 hidden-sm" v-if="author" align="end">
         <icon name="author"></icon>
         <a class="ellipsis ml-1" :href="`mailto:${author.email}`" v-if="author.email" v-text="author.name"></a>

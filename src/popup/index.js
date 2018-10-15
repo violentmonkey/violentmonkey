@@ -1,4 +1,3 @@
-import '#/common/browser';
 import Vue from 'vue';
 import { i18n, sendMessage } from '#/common';
 import handlers from '#/common/handlers';
@@ -11,9 +10,12 @@ tld.initTLD();
 
 Vue.prototype.i18n = i18n;
 
+const el = document.createElement('div');
+document.body.appendChild(el);
 new Vue({
   render: h => h(App),
-}).$mount('#app');
+})
+.$mount(el);
 
 Object.assign(handlers, {
   SetPopup(data, src) {

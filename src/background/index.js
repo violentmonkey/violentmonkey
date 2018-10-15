@@ -1,4 +1,3 @@
-import '#/common/browser';
 import { noop } from '#/common';
 import { objectGet } from '#/common/object';
 import * as sync from './sync';

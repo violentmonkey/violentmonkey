@@ -155,7 +155,7 @@ export default {
       const lowerSearch = (search || '').toLowerCase();
       const { scripts } = this.store;
       const filteredScripts = search
-        ? scripts.filter(script => script._cache.search.includes(lowerSearch))
+        ? scripts.filter(script => script.$cache.search.includes(lowerSearch))
         : scripts.slice();
       if (sort.value === 'alpha') {
         const showEnabledFirst = options.get('filters.showEnabledFirst');
@@ -164,7 +164,7 @@ export default {
           if (showEnabledFirst) {
             keys.push(item.config.enabled ? 0 : 1);
           }
-          keys.push(item._cache.lowerName);
+          keys.push(item.$cache.lowerName);
           return keys.join('');
         };
         filteredScripts.sort((a, b) => {

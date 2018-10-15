@@ -123,5 +123,5 @@ const meta = {
 };
 if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
   global.browser = wrapAPIs(chrome, meta);
-  global.browser.__patched = true;
+  // global.browser.__patched = true;
 }
