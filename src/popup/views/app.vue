@@ -39,7 +39,7 @@
         <div v-for="item in scripts">
           <div class="menu-item" @click="onToggleScript(item)" :class="{disabled:!item.data.config.enabled}">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
-            <div class="flex-auto ellipsis" v-text="item.name"></div>
+            <div class="flex-auto ellipsis" v-text="item.name" :title="item.name"></div>
           </div>
           <div class="submenu-buttons">
             <div class="submenu-button" @click="onEditScript(item)">
