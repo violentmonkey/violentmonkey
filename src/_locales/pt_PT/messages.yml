@@ -207,7 +207,7 @@ labelDonate:
   message: Fazer um donativo
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'URL de descarga:'
+  message: 'URL de transferência:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: A editar valor do script
@@ -303,7 +303,7 @@ labelScriptEditor:
   message: Editor de scripts
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Modelo personalizado de scripts
 labelSearch:
   description: Label for search input in search box.
   message: 'Localizar: '
@@ -437,10 +437,10 @@ msgSavedCustomCSS:
   message: Estilo personalizado atualizado.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: O modelo personalizado de scripts foi atualizado.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: '[$1] foi atualizado!'
+  message: $1 foi atualizado!
 msgSyncError:
   description: Message shown when sync failed.
   message: Erro de sincronização!
