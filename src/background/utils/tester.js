@@ -1,4 +1,4 @@
-import * as tld from 'src/common/tld';
+import * as tld from '#/common/tld';
 import cache from './cache';
 import { getOption, hookOptions } from './options';
 
@@ -123,7 +123,13 @@ function hostMatcher(rule) {
   };
 }
 function pathMatcher(rule) {
-  const reRule = new RegExp(str2RE(rule));
+  const iHash = rule.indexOf('#');
+  let iQuery = rule.indexOf('?');
+  let strRe = str2RE(rule);
+  if (iQuery > iHash) iQuery = -1;
+  if (iQuery < 0 && iHash < 0) strRe = `${strRe.slice(0, -1)}(?:[?#]|$)`;
+  else if (iHash < 0) strRe = `${strRe.slice(0, -1)}(?:#|$)`;
+  const reRule = new RegExp(strRe);
   return data => reRule.test(data);
 }
 function matchTester(rule) {

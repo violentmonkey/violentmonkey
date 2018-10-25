@@ -210,6 +210,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: スクリプトの値を編集中
+labelEditor:
+  description: Label for Editor settings
+  message: エディタ
 labelExclude:
   description: Label of @exclude rules.
   message: 除外するページのURL (@exclude)
@@ -228,6 +231,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: 基本設定
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: 翻訳のヘルプ
 labelHomepage:
   description: Label for home page in about tab.
   message: ホームページ
@@ -294,6 +300,9 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: スクリプトエディタ
+labelScriptTemplate:
+  description: Label for custom script template.
+  message: カスタムスクリプト (テンプレート)
 labelSearch:
   description: Label for search input in search box.
   message: '検索する文字列: '
@@ -423,6 +432,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: カスタムスタイルが更新されました。
+msgSavedScriptTemplate:
+  description: Message shown when custom script template is saved.
+  message: カスタムスクリプト (テンプレート) が更新されました。
 msgScriptUpdated:
   description: Notification message for script updates.
   message: スクリプト「$1」が更新されました!

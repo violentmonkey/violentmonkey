@@ -1,8 +1,8 @@
-import { i18n, request } from 'src/common';
+import { i18n, request } from '#/common';
 import { parseScript } from './db';
 import { parseMeta, compareVersion } from './script';
 import { getOption } from './options';
-import { notify, sendMessageOrIgnore } from '.';
+import { notify, sendMessageOrIgnore } from './message';
 
 const processes = {};
 
@@ -41,7 +41,7 @@ function doCheckUpdate(script) {
   };
   const doUpdate = () => {
     if (!downloadURL) {
-      update.message = `<span class="new">${i18n('msgNewVersion')}</span>`;
+      update.message = i18n('msgNewVersion');
       sendMessageOrIgnore(res);
       return Promise.reject();
     }
@@ -76,11 +76,12 @@ export default function checkUpdate(script) {
     .then(code => parseScript({
       id,
       code,
+      update: {
+        checking: false,
+      },
     }))
     .then(res => {
       const { data: { update } } = res;
-      update.checking = false;
-      sendMessageOrIgnore(res);
       updated = true;
       if (getOption('notifyUpdates')) {
         notify({

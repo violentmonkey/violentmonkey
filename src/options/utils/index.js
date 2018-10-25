@@ -1,5 +1,5 @@
 import Modal from 'vueleton/lib/modal';
-import { route } from 'src/common/router';
+import { route } from '#/common/router';
 import Message from '../views/message';
 
 export const store = {

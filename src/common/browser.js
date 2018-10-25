@@ -1,4 +1,4 @@
-import 'src/common/polyfills';
+import '#/common/polyfills';
 
 /* global chrome */
 
@@ -71,7 +71,8 @@ const meta = {
               // Ignore sendResponse error
             });
             return true;
-          } else if (typeof result !== 'undefined') {
+          }
+          if (typeof result !== 'undefined') {
             // In some browsers (e.g Chrome 56, Vivaldi), the listener in
             // popup pages are not properly cleared after closed.
             // They may send `undefined` before the real response is sent.
@@ -122,5 +123,5 @@ const meta = {
 };
 if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
   global.browser = wrapAPIs(chrome, meta);
-  global.browser.__patched = true;
+  // global.browser.__patched = true;
 }

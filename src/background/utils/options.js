@@ -1,5 +1,5 @@
-import { initHooks, debounce, normalizeKeys } from 'src/common';
-import { objectGet, objectSet } from 'src/common/object';
+import { initHooks, debounce, normalizeKeys } from '#/common';
+import { objectGet, objectSet } from '#/common/object';
 import { register } from './init';
 
 const defaults = {
@@ -28,6 +28,14 @@ const defaults = {
     lineWrapping: false,
     indentUnit: 2,
   },
+  scriptTemplate: `\
+// ==UserScript==
+// @name New Script
+// @namespace Violentmonkey Scripts
+// @match *://*/*
+// @grant none
+// ==/UserScript==
+`,
 };
 let changes = {};
 const hooks = initHooks();
@@ -95,6 +103,10 @@ export function getOption(key, def) {
   if (value == null) value = defaults[mainKey];
   if (value == null) value = def;
   return keys.length > 1 ? objectGet(value, keys.slice(1), def) : value;
+}
+
+export function getDefaultOption(key) {
+  return objectGet(defaults, key);
 }
 
 export function setOption(key, value) {

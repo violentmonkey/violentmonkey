@@ -209,6 +209,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: ''
+labelEditor:
+  description: Label for Editor settings
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
   message: Excluderi
@@ -226,6 +229,9 @@ labelFilterSort:
   message: ''
 labelGeneral:
   description: Label for general settings.
+  message: ''
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
   message: ''
 labelHomepage:
   description: Label for home page in about tab.
@@ -293,6 +299,9 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Editor de script
+labelScriptTemplate:
+  description: Label for custom script template.
+  message: ''
 labelSearch:
   description: Label for search input in search box.
   message: 'Caută: '
@@ -421,6 +430,9 @@ msgSavedBlacklist:
   message: ''
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
+  message: ''
+msgSavedScriptTemplate:
+  description: Message shown when custom script template is saved.
   message: ''
 msgScriptUpdated:
   description: Notification message for script updates.

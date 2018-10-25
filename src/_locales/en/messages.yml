@@ -209,6 +209,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Editing script value
+labelEditor:
+  description: Label for Editor settings
+  message: Editor
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude rules'
@@ -227,6 +230,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: General
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: Help with translation
 labelHomepage:
   description: Label for home page in about tab.
   message: Homepage
@@ -293,6 +299,9 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Script Editor
+labelScriptTemplate:
+  description: Label for custom script template.
+  message: Custom Script Template
 labelSearch:
   description: Label for search input in search box.
   message: 'Search for: '
@@ -422,6 +431,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Custom style is updated.
+msgSavedScriptTemplate:
+  description: Message shown when custom script template is saved.
+  message: Custom script template is updated.
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Script [$1] is updated!'

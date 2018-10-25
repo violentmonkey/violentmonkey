@@ -1,4 +1,6 @@
-import { getUniqId, bindEvents, attachFunction, cache2blobUrl } from '../utils';
+import {
+  getUniqId, bindEvents, attachFunction, cache2blobUrl,
+} from '../utils';
 import {
   includes, forEach, map, utf8decode, jsonDump, jsonLoad,
   Promise, console,
@@ -112,7 +114,7 @@ function onLoadScripts(data) {
     const requireKeys = script.meta.require || [];
     const pathMap = script.custom.pathMap || {};
     const code = data.code[script.props.id] || '';
-    const wrapper = wrapGM(script, code, data.cache);
+    const { wrapper, thisObj } = wrapGM(script, code, data.cache);
     // Must use Object.getOwnPropertyNames to list unenumerable properties
     const argNames = Object.getOwnPropertyNames(wrapper);
     const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
@@ -131,7 +133,6 @@ function onLoadScripts(data) {
     const codeConcat = codeSlices.join('\n');
     const name = script.custom.name || script.meta.name || script.props.id;
     const args = map(argNames, key => wrapper[key]);
-    const thisObj = wrapper.window || wrapper;
     const id = getUniqId('VMin');
     const fnId = getUniqId('VMfn');
     attachFunction(fnId, () => {
@@ -152,12 +153,14 @@ function wrapGM(script, code, cache) {
   const grant = script.meta.grant || [];
   const urls = {};
   const unsafeWindow = window;
+  let thisObj = gm;
   if (!grant.length || (grant.length === 1 && grant[0] === 'none')) {
     // @grant none
     grant.pop();
     gm.window = unsafeWindow;
   } else {
-    gm.window = getWrapper();
+    thisObj = getWrapper(unsafeWindow);
+    gm.window = thisObj;
   }
   if (!includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
   if (!includes(grant, 'GM_info')) grant.push('GM_info');
@@ -346,7 +349,7 @@ function wrapGM(script, code, cache) {
     const prop = gmFunctions[name];
     if (prop) addProperty(name, prop, gm);
   });
-  return gm;
+  return { thisObj, wrapper: gm };
   function loadValues() {
     return store.values[script.props.id];
   }
@@ -373,7 +376,7 @@ function wrapGM(script, code, cache) {
 /**
  * @desc Wrap helpers to prevent unexpected modifications.
  */
-function getWrapper() {
+function getWrapper(unsafeWindow) {
   // http://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
   // http://developer.mozilla.org/docs/Web/API/Window
   const wrapper = {};
@@ -387,7 +390,7 @@ function getWrapper() {
     // `eval` should be called directly so that it is run in current scope
     'eval',
   ], name => {
-    wrapper[name] = window[name];
+    wrapper[name] = unsafeWindow[name];
   });
   forEach([
     // 'uneval',
@@ -437,9 +440,9 @@ function getWrapper() {
     'setTimeout',
     'stop',
   ], name => {
-    const method = window[name];
+    const method = unsafeWindow[name];
     if (method) {
-      wrapper[name] = (...args) => method.apply(window, args);
+      wrapper[name] = (...args) => method.apply(unsafeWindow, args);
     }
   });
   function defineProtectedProperty(name) {
@@ -447,8 +450,8 @@ function getWrapper() {
     let value;
     Object.defineProperty(wrapper, name, {
       get() {
-        if (!modified) value = window[name];
-        return value === window ? wrapper : value;
+        if (!modified) value = unsafeWindow[name];
+        return value === unsafeWindow ? wrapper : value;
       },
       set(val) {
         modified = true;
@@ -459,11 +462,11 @@ function getWrapper() {
   function defineReactedProperty(name) {
     Object.defineProperty(wrapper, name, {
       get() {
-        const value = window[name];
-        return value === window ? wrapper : value;
+        const value = unsafeWindow[name];
+        return value === unsafeWindow ? wrapper : value;
       },
       set(val) {
-        window[name] = val;
+        unsafeWindow[name] = val;
       },
     });
   }

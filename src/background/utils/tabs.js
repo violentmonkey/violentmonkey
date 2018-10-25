@@ -1,5 +1,5 @@
-import { noop } from 'src/common';
-import { isFirefox, isAndroid } from 'src/common/ua';
+import { noop } from '#/common';
+import { isFirefox, isAndroid } from '#/common/ua';
 
 const openers = {};
 

@@ -23,11 +23,11 @@
 </template>
 
 <script>
-import { sendMessage } from 'src/common';
-import options from 'src/common/options';
-import SettingCheck from 'src/common/ui/setting-check';
-import hookSetting from 'src/common/hook-setting';
-import Icon from 'src/common/ui/icon';
+import { sendMessage } from '#/common';
+import options from '#/common/options';
+import SettingCheck from '#/common/ui/setting-check';
+import hookSetting from '#/common/hook-setting';
+import Icon from '#/common/ui/icon';
 import { store } from '../../utils';
 
 const SYNC_CURRENT = 'sync.current';

@@ -7,9 +7,10 @@ const plumber = require('gulp-plumber');
 const yaml = require('js-yaml');
 const webpack = require('webpack');
 const webpackConfig = require('./scripts/webpack.conf');
+const webpackTestConfig = require('./scripts/webpack.test.conf');
 const i18n = require('./scripts/i18n');
 const string = require('./scripts/string');
-const { isProd } = require('./scripts/utils');
+const { isProd } = require('./scripts/util');
 const pkg = require('./package.json');
 
 const DIST = 'dist';
@@ -70,6 +71,13 @@ function jsDev(done) {
 
 function jsProd(done) {
   webpack(webpackConfig, (...args) => {
+    webpackCallback(...args);
+    done();
+  });
+}
+
+function jsTest(done) {
+  webpack(webpackTestConfig, (...args) => {
     webpackCallback(...args);
     done();
   });
@@ -150,5 +158,6 @@ const pack = gulp.parallel(manifest, copyFiles, copyI18n);
 exports.clean = clean;
 exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
 exports.build = gulp.parallel(pack, jsProd);
+exports.buildTest = jsTest;
 exports.i18n = updateI18n;
 exports.check = checkI18n;

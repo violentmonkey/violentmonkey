@@ -1,4 +1,4 @@
-import { noop } from 'src/common';
+import { noop } from '#/common';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 
 const openers = {}; // scriptId: { openerId: 1, ... }
@@ -81,6 +81,9 @@ function doUpdate() {
     return dumpValueStores(valueStores);
   })
   .then(broadcastUpdates)
+  .catch(err => {
+    console.error('Values error:', err);
+  })
   .then(() => {
     timer = null;
     if (cache) updateLater();

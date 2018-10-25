@@ -27,12 +27,12 @@
 
 <script>
 import Modal from 'vueleton/lib/modal';
-import { sendMessage, getLocaleString } from 'src/common';
-import { objectGet } from 'src/common/object';
-import options from 'src/common/options';
-import { isFirefox } from 'src/common/ua';
-import SettingCheck from 'src/common/ui/setting-check';
-import { downloadBlob } from 'src/common/download';
+import { sendMessage, getLocaleString } from '#/common';
+import { objectGet } from '#/common/object';
+import options from '#/common/options';
+import { isFirefox } from '#/common/ua';
+import SettingCheck from '#/common/ui/setting-check';
+import { downloadBlob } from '#/common/download';
 import { store } from '../../utils';
 
 /**

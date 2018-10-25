@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import { sendMessage } from 'src/common';
-import Icon from 'src/common/ui/icon';
+import { sendMessage } from '#/common';
+import Icon from '#/common/ui/icon';
 
 const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;

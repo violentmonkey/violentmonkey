@@ -1,5 +1,5 @@
 import test from 'tape';
-import { compareVersion, parseMeta } from 'src/background/utils/script';
+import { compareVersion, parseMeta } from '#/background/utils/script';
 
 test('compareVersion', t => {
   t.equal(compareVersion('1.2.3', '1.2.3'), 0);

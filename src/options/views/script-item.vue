@@ -1,15 +1,14 @@
 <template>
   <div class="script" :class="{ disabled: !script.config.enabled, removed: script.config.removed }" :draggable="draggable" @dragstart.prevent="onDragStart">
-    <img class="script-icon" :src="safeIcon">
+    <img class="script-icon hidden-xs" :src="safeIcon">
     <div class="script-info flex">
-      <div class="script-name ellipsis" v-text="script._cache.name"></div>
-      <div class="flex-auto"></div>
-      <tooltip :title="i18n('labelAuthor') + script.meta.author" class="script-author ml-1" v-if="author" align="end">
+      <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
+      <tooltip :title="i18n('labelAuthor') + script.meta.author" class="script-author ml-1 hidden-sm" v-if="author" align="end">
         <icon name="author"></icon>
         <a class="ellipsis ml-1" :href="`mailto:${author.email}`" v-if="author.email" v-text="author.name"></a>
         <span class="ellipsis ml-1" v-else v-text="author.name"></span>
       </tooltip>
-      <tooltip :title="lastUpdated.title" class="ml-1" align="end">
+      <tooltip class="ml-1 hidden-sm" :title="lastUpdated.title" align="end">
         <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
         <span class="secondary ml-1" v-text="lastUpdated.show"></span>
       </tooltip>
@@ -23,38 +22,40 @@
       </div>
     </div>
     <div class="script-buttons flex">
-      <tooltip :title="i18n('buttonEdit')" align="start">
-        <span class="btn-ghost" @click="onEdit">
-          <icon name="code"></icon>
-        </span>
-      </tooltip>
-      <tooltip :title="labelEnable" align="start">
-        <span class="btn-ghost" @click="onEnable">
-          <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
-        </span>
-      </tooltip>
-      <tooltip :disabled="!canUpdate || script.checking" :title="i18n('buttonUpdate')" align="start">
-        <span class="btn-ghost" @click="onUpdate">
-          <icon name="refresh"></icon>
-        </span>
-      </tooltip>
-      <span class="sep"></span>
-      <tooltip :disabled="!homepageURL" :title="i18n('buttonHome')" align="start">
-        <a class="btn-ghost" target="_blank" :href="homepageURL">
-          <icon name="home"></icon>
-        </a>
-      </tooltip>
-      <tooltip :disabled="!description" :title="description" align="start">
-        <span class="btn-ghost">
-          <icon name="info"></icon>
-        </span>
-      </tooltip>
-      <tooltip :disabled="!script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
-        <a class="btn-ghost" target="_blank" :href="script.meta.supportURL">
-          <icon name="question"></icon>
-        </a>
-      </tooltip>
-      <div class="flex-auto" v-text="script.message"></div>
+      <div class="flex-auto flex flex-wrap">
+        <tooltip :title="i18n('buttonEdit')" align="start">
+          <span class="btn-ghost" @click="onEdit">
+            <icon name="code"></icon>
+          </span>
+        </tooltip>
+        <tooltip :title="labelEnable" align="start">
+          <span class="btn-ghost" @click="onEnable">
+            <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
+          </span>
+        </tooltip>
+        <tooltip :disabled="!canUpdate || script.checking" :title="i18n('buttonUpdate')" align="start">
+          <span class="btn-ghost" @click="onUpdate">
+            <icon name="refresh"></icon>
+          </span>
+        </tooltip>
+        <span class="sep"></span>
+        <tooltip :disabled="!homepageURL" :title="i18n('buttonHome')" align="start">
+          <a class="btn-ghost" target="_blank" :href="homepageURL">
+            <icon name="home"></icon>
+          </a>
+        </tooltip>
+        <tooltip :disabled="!description" :title="description" align="start">
+          <span class="btn-ghost">
+            <icon name="info"></icon>
+          </span>
+        </tooltip>
+        <tooltip :disabled="!script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
+          <a class="btn-ghost" target="_blank" :href="script.meta.supportURL">
+            <icon name="question"></icon>
+          </a>
+        </tooltip>
+        <div class="script-message" v-text="script.message"></div>
+      </div>
       <tooltip :title="i18n('buttonRemove')" align="end">
         <span class="btn-ghost" @click="onRemove(1)">
           <icon name="trash"></icon>
@@ -66,9 +67,9 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip';
-import { sendMessage, getLocaleString } from 'src/common';
-import { objectGet } from 'src/common/object';
-import Icon from 'src/common/ui/icon';
+import { sendMessage, getLocaleString } from '#/common';
+import { objectGet } from '#/common/object';
+import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
@@ -109,11 +110,11 @@ export default {
     canUpdate() {
       const { script } = this;
       return script.config.shouldUpdate && (
-        script.custom.updateURL ||
-        script.meta.updateURL ||
-        script.custom.downloadURL ||
-        script.meta.downloadURL ||
-        script.custom.lastInstallURL
+        script.custom.updateURL
+        || script.meta.updateURL
+        || script.custom.downloadURL
+        || script.meta.downloadURL
+        || script.custom.lastInstallURL
       );
     },
     homepageURL() {
@@ -367,17 +368,15 @@ export default {
     }
   }
   &-buttons {
-    margin-left: 3.5rem;
-    align-items: center;
     line-height: 1;
     color: #3e4651;
-    > .flex-auto {
-      margin-left: 1rem;
+    > .flex {
+      align-items: center;
     }
     .removed & {
       display: none;
     }
-    > .disabled {
+    .disabled {
       color: gainsboro;
     }
     .icon {
@@ -385,7 +384,6 @@ export default {
     }
   }
   &-info {
-    margin-left: 3.5rem;
     line-height: 1.5;
     align-items: center;
   }
@@ -401,6 +399,9 @@ export default {
     .removed & {
       width: 2rem;
       height: 2rem;
+    }
+    ~ * {
+      margin-left: 3.5rem;
     }
   }
   &-name {
@@ -419,6 +420,9 @@ export default {
       max-width: 100px;
     }
   }
+  &-message {
+    white-space: nowrap;
+  }
 }
 .dragging {
   position: fixed;
@@ -426,6 +430,12 @@ export default {
   z-index: 9;
   &-placeholder {
     visibility: hidden;
+  }
+}
+
+@media (max-width: 319px) {
+  .script-icon ~ * {
+    margin-left: 0;
   }
 }
 </style>
