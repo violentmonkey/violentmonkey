@@ -2,12 +2,9 @@
   "presets": [
     ["@babel/preset-env", {
       "modules": false,
-      "useBuiltIns": "usage",
     }],
   ],
   "plugins": [
-    "@babel/plugin-transform-runtime",
-
     // stage-2
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
     "@babel/plugin-proposal-function-sent",
