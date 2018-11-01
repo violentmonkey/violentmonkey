@@ -97,6 +97,10 @@ input[type=checkbox] {
   margin-right: .5em;
 }
 
+.vl-modal {
+  z-index: 3000;
+}
+
 .in-out {
   &-appear,
   &-enter,
