@@ -214,6 +214,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Edytowanie wartości skryptu
+labelEditing:
+  description: Label for current editing script
+  message: ''
 labelEditor:
   description: Label for Editor settings
   message: Edytor

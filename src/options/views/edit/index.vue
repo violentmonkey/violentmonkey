@@ -14,10 +14,16 @@
             <div class="text-red mt-1" v-if="tooLarge" v-text="i18n('warnScriptLongLines')"></div>
           </div>
         </div>
-        <div class="edit-nav mx-1">
-          <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
-          <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
-          <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
+        <div class="flex mx-1">
+          <div class="edit-nav">
+            <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
+            <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
+            <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
+          </div>
+          <div class="flex-auto text-right mt-1 ellipsis">
+            <span v-text="i18n('labelEditing')"></span>
+            <em v-text="scriptName"></em>
+          </div>
         </div>
       </div>
     </div>
@@ -74,6 +80,12 @@ export default {
         close: this.close,
       },
     };
+  },
+  computed: {
+    scriptName() {
+      const { custom, meta } = this.script || {};
+      return custom && custom.name || meta && meta.name;
+    },
   },
   watch: {
     code() {

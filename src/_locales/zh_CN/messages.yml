@@ -207,6 +207,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: 编辑数据
+labelEditing:
+  description: Label for current editing script
+  message: 正在编辑：
 labelEditor:
   description: Label for Editor settings
   message: 编辑器
