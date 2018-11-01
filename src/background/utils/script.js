@@ -73,8 +73,16 @@ export function parseMeta(code) {
   return meta;
 }
 
-export function newScript() {
-  const code = getOption('scriptTemplate');
+export function newScript(data) {
+  const state = {
+    url: '*://*/*',
+    ...data,
+  };
+  const code = getOption('scriptTemplate')
+  .replace(/{{(\w+)}}/g, (str, name) => {
+    const value = state[name];
+    return value == null ? str : value;
+  });
   const script = {
     custom: {
       origInclude: true,

@@ -1,4 +1,4 @@
-import { noop } from '#/common';
+import { noop, getUniqId } from '#/common';
 import { objectGet } from '#/common/object';
 import * as sync from './sync';
 import {
@@ -76,8 +76,13 @@ function autoUpdate() {
 }
 
 const commands = {
-  NewScript() {
-    return newScript();
+  NewScript(id) {
+    return id && cache.get(`new-${id}`) || newScript();
+  },
+  CacheNewScript(data) {
+    const id = getUniqId();
+    cache.put(`new-${id}`, newScript(data));
+    return id;
   },
   RemoveScript(id) {
     return removeScript(id)

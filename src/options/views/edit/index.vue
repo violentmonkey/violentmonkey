@@ -47,6 +47,7 @@
 import { i18n, sendMessage, noop } from '#/common';
 import { objectGet } from '#/common/object';
 import VmCode from '#/common/ui/code';
+import { route } from '#/common/router';
 import { showMessage } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
@@ -110,6 +111,7 @@ export default {
       })
       : sendMessage({
         cmd: 'NewScript',
+        data: route.paths[2],
       })
       .then(({ script, code }) => {
         this.script = script;

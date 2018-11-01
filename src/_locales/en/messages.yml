@@ -367,6 +367,9 @@ menuFindScripts:
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Matched scripts
+menuNewScript:
+  description: Menu item to create a new script.
+  message: Create a new script
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Scripts disabled

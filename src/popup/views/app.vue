@@ -13,6 +13,12 @@
         <div class="flex-1" v-text="i18n('menuDashboard')"></div>
       </div>
     </div>
+    <div class="menu">
+      <div class="menu-item" @click="onCreateScript">
+        <icon name="code"></icon>
+        <div class="flex-1" v-text="i18n('menuNewScript')"></div>
+      </div>
+    </div>
     <div class="menu" v-show="store.domain">
       <div class="menu-item" @click="onFindSameDomainScripts">
         <icon name="search"></icon>
@@ -144,6 +150,24 @@ export default {
     },
     checkReload() {
       if (options.get('autoReload')) browser.tabs.reload(this.store.currentTab.id);
+    },
+    onCreateScript() {
+      const { currentTab, domain } = this.store;
+      (domain ? (
+        sendMessage({
+          cmd: 'CacheNewScript',
+          data: {
+            url: currentTab.url.split('#')[0].split('?')[0],
+          },
+        })
+      ) : Promise.resolve())
+      .then(id => {
+        const path = ['scripts', '_new', id].filter(Boolean).join('/');
+        browser.tabs.create({
+          url: browser.runtime.getURL(`/options/index.html#${path}`),
+        });
+        window.close();
+      });
     },
   },
 };
