@@ -1,22 +1,24 @@
 <template>
   <div class="edit frame flex flex-col fixed-full">
-    <div class="flex edit-header">
-      <h2 class="mr-2" v-text="i18n('labelScriptEditor')"></h2>
-      <div class="pos-rel">
-        <div class="edit-nav">
+    <div class="flex flex-wrap edit-header">
+      <h2 class="mr-2 ml-1" v-text="i18n('labelScriptEditor')"></h2>
+      <div class="flex-auto">
+        <div class="flex mx-1 my-1">
+          <div class="edit-hint flex-auto text-right ellipsis mr-1">
+            <a href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
+          </div>
+          <div class="edit-buttons">
+            <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
+            <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
+            <button v-text="i18n('buttonClose')" @click="close"></button>
+            <div class="text-red mt-1" v-if="tooLarge" v-text="i18n('warnScriptLongLines')"></div>
+          </div>
+        </div>
+        <div class="edit-nav mx-1">
           <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
           <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
           <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
         </div>
-      </div>
-      <div class="flex-auto text-right ellipsis mr-1">
-        <a href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
-      </div>
-      <div>
-        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
-        <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
-        <button v-text="i18n('buttonClose')" @click="close"></button>
-        <div class="text-red mt-1" v-if="tooLarge" v-text="i18n('warnScriptLongLines')"></div>
       </div>
     </div>
     <div class="frame-block flex-auto pos-rel">
@@ -212,21 +214,12 @@ export default {
 <style>
 .edit {
   z-index: 2000;
-  &-header {
-    > * {
-      padding: 8px;
-    }
-  }
   &-body {
     padding: 8px 16px;
     overflow: auto;
     background: white;
   }
   &-nav {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    white-space: nowrap;
     .text-red {
       margin-left: 8px;
     }
@@ -249,8 +242,7 @@ export default {
 
 @media (max-width: 767px) {
   .edit-header > h2,
-  .edit-header > .flex-auto,
-  .edit-nav {
+  .edit-hint {
     display: none;
   }
 }

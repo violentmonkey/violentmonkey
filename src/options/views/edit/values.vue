@@ -206,6 +206,9 @@ export default {
     box-shadow: -5px 0 5px #ddd;
     background: white;
     z-index: 10;
+    @media (max-width: 767px) {
+      width: 100%;
+    }
     input {
       width: 100%;
     }
