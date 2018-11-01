@@ -20,7 +20,7 @@
             <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
             <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
           </div>
-          <div class="flex-auto text-right mt-1 ellipsis">
+          <div class="edit-info flex-auto text-right mt-1 ellipsis">
             <span v-text="i18n('labelEditing')"></span>
             <em v-text="scriptName"></em>
           </div>
@@ -256,7 +256,8 @@ export default {
 
 @media (max-width: 767px) {
   .edit-header > h2,
-  .edit-hint {
+  .edit-hint,
+  .edit-info {
     display: none;
   }
 }
