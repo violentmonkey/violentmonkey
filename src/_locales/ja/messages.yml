@@ -212,7 +212,7 @@ labelEditValue:
   message: スクリプトの値を編集中
 labelEditing:
   description: Label for current editing script
-  message: ''
+  message: '編集中: '
 labelEditor:
   description: Label for Editor settings
   message: エディタ
@@ -370,7 +370,7 @@ menuMatchedScripts:
   message: このページで実行されるスクリプト
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: '新しいスクリプトを作成'
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: スクリプトは無効
