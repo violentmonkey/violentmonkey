@@ -3,6 +3,7 @@
     <h3 v-text="i18n('labelScriptTemplate')"></h3>
     <setting-text name="scriptTemplate" ref="template" />
     <button v-text="i18n('buttonSave')" @click="onSave"></button>
+    <button v-text="i18n('buttonReset')" @click="onReset"></button>
   </section>
 </template>
 
@@ -18,7 +19,13 @@ export default {
   },
   methods: {
     onSave() {
-      options.set('scriptTemplate', this.$refs.template.value);
+      this.setTemplate(this.$refs.template.value);
+    },
+    onReset() {
+      this.setTemplate('');
+    },
+    setTemplate(value) {
+      options.set('scriptTemplate', value);
       showMessage({ text: i18n('msgSavedScriptTemplate') });
     },
   },

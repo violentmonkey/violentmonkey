@@ -60,6 +60,9 @@ buttonReplace:
 buttonReplaceAll:
   description: Button to replace all matches.
   message: Заменить все
+buttonReset:
+  description: Button to reset to default values.
+  message: ''
 buttonSave:
   description: Button to save modifications of a script.
   message: Сохранить

@@ -58,6 +58,9 @@ buttonReplace:
 buttonReplaceAll:
   description: Button to replace all matches.
   message: 所有
+buttonReset:
+  description: Button to reset to default values.
+  message: 重置
 buttonSave:
   description: Button to save modifications of a script.
   message: 保存

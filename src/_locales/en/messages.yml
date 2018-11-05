@@ -58,6 +58,9 @@ buttonReplace:
 buttonReplaceAll:
   description: Button to replace all matches.
   message: All
+buttonReset:
+  description: Button to reset to default values.
+  message: Reset
 buttonSave:
   description: Button to save modifications of a script.
   message: Save

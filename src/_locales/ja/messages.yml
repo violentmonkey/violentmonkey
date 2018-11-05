@@ -61,6 +61,9 @@ buttonReplace:
 buttonReplaceAll:
   description: Button to replace all matches.
   message: すべて置換
+buttonReset:
+  description: Button to reset to default values.
+  message: ''
 buttonSave:
   description: Button to save modifications of a script.
   message: 保存
@@ -370,7 +373,7 @@ menuMatchedScripts:
   message: このページで実行されるスクリプト
 menuNewScript:
   description: Menu item to create a new script.
-  message: '新しいスクリプトを作成'
+  message: 新しいスクリプトを作成
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: スクリプトは無効

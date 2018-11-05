@@ -58,6 +58,9 @@ buttonReplace:
 buttonReplaceAll:
   description: Button to replace all matches.
   message: Tất cả
+buttonReset:
+  description: Button to reset to default values.
+  message: ''
 buttonSave:
   description: Button to save modifications of a script.
   message: Lưu
