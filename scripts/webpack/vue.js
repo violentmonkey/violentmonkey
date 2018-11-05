@@ -6,7 +6,9 @@ module.exports = () => config => {
     test: /\.vue$/,
     loader: 'vue-loader',
     options: {
-      preserveWhitespace: false,
+      compilerOptions: {
+        preserveWhitespace: false,
+      },
     },
   });
   config.plugins.push(new VueLoaderPlugin());
