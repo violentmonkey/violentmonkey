@@ -60,7 +60,7 @@ buttonReplaceAll:
   message: Tudo
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Redefinir
 buttonSave:
   description: Button to save modifications of a script.
   message: Guardar
@@ -216,7 +216,7 @@ labelEditValue:
   message: A editar valor do script
 labelEditing:
   description: Label for current editing script
-  message: ''
+  message: 'A editar: '
 labelEditor:
   description: Label for Editor settings
   message: Editor
@@ -374,7 +374,7 @@ menuMatchedScripts:
   message: Scripts correspondidos
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Criar um novo script
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Scripts desativados
