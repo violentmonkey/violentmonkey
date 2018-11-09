@@ -2,3 +2,4 @@
 node_modules/
 *.log
 /stats.json
+*.bak
