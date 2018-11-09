@@ -1,21 +1,26 @@
 <template>
-  <div class="frame flex flex-col fixed-full">
-    <div class="flex edit-header">
-      <h2 v-text="i18n('labelScriptEditor')"></h2>
-      <div class="flex-auto pos-rel ml-2">
-        <div class="edit-nav">
-          <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
-          <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
-          <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
+  <div class="edit frame flex flex-col fixed-full">
+    <div class="flex flex-wrap edit-header mx-1 my-1">
+      <div class="edit-info text-right ellipsis">
+        <strong v-text="i18n('labelEditing')"></strong>
+        <em v-text="scriptName"></em>
+      </div>
+      <div class="flex-auto flex">
+        <div class="edit-hint flex-auto text-right ellipsis mr-1">
+          <a href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
+        </div>
+        <div class="edit-buttons">
+          <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
+          <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
+          <button v-text="i18n('buttonClose')" @click="close"></button>
+          <div class="text-red mt-1" v-if="tooLarge" v-text="i18n('warnScriptLongLines')"></div>
         </div>
       </div>
-      <div class="text-right">
-        <a class="mr-1" href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
-        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
-        <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
-        <button v-text="i18n('buttonClose')" @click="close"></button>
-        <div class="text-red mt-1" v-if="tooLarge" v-text="i18n('warnScriptLongLines')"></div>
-      </div>
+    </div>
+    <div class="edit-nav mx-1">
+      <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
+      <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
+      <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
@@ -34,9 +39,10 @@
 </template>
 
 <script>
-import { i18n, sendMessage, noop } from 'src/common';
-import { objectGet } from 'src/common/object';
-import VmCode from 'src/common/ui/code';
+import { i18n, sendMessage, noop } from '#/common';
+import { objectGet } from '#/common/object';
+import VmCode from '#/common/ui/code';
+import { route } from '#/common/router';
 import { showMessage } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
@@ -71,6 +77,12 @@ export default {
       },
     };
   },
+  computed: {
+    scriptName() {
+      const { custom, meta } = this.script || {};
+      return custom && custom.name || meta && meta.name;
+    },
+  },
   watch: {
     code() {
       this.canSave = true;
@@ -94,6 +106,7 @@ export default {
       })
       : sendMessage({
         cmd: 'NewScript',
+        data: route.paths[2],
       })
       .then(({ script, code }) => {
         this.script = script;
@@ -209,20 +222,13 @@ export default {
 
 <style>
 .edit {
-  &-header {
-    > * {
-      padding: 8px;
-    }
-  }
+  z-index: 2000;
   &-body {
     padding: 8px 16px;
     overflow: auto;
     background: white;
   }
   &-nav {
-    position: absolute;
-    left: 0;
-    bottom: 0;
     .text-red {
       margin-left: 8px;
     }
@@ -240,6 +246,14 @@ export default {
     &:hover {
       box-shadow: 0 -1px 1px #bbb;
     }
+  }
+}
+
+@media (max-width: 767px) {
+  .edit-header > h2,
+  .edit-hint,
+  .edit-info {
+    display: none;
   }
 }
 </style>

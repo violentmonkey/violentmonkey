@@ -1,215 +1,215 @@
-﻿anchorAuthor: 
+anchorAuthor:
   description: Author shown on about tab.
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
-anchorTranslator: 
+anchorTranslator:
   description: Translator shown on about tab.
   message: '<a href=mailto:kubala.v@gmail.com>kubalav</a>'
-buttonAllNone: 
+buttonAllNone:
   description: Button to select all scripts or none.
   message: Všetko/Nič
-buttonCancel: 
+buttonCancel:
   description: Cancel button on dialog.
   message: Zrušiť
-buttonClose: 
+buttonClose:
   description: Button to close window.
   message: Zavrieť
-buttonConfirmInstallation: 
+buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Potvrdiť inštaláciu
-buttonDisable: 
+buttonDisable:
   description: Button to disable a script.
   message: Zakázať
-buttonEdit: 
+buttonEdit:
   description: Button to edit a script.
   message: Upraviť
-buttonEnable: 
+buttonEnable:
   description: Button to enable a script.
   message: Povoliť
-buttonExportData: 
+buttonExportData:
   description: Button to open the data export dialog.
   message: Exportovať do zip
-buttonFilter: 
+buttonFilter:
   description: Button to show filters menu.
   message: Filter
-buttonHome: 
+buttonHome:
   description: Button to open homepage.
   message: Domovská stránka
-buttonImportData: 
+buttonImportData:
   description: Button to choose a file for data import.
   message: Importovať zo zip
-buttonInstallFromURL: 
+buttonInstallFromURL:
   description: Button to ask for URL of a user script.
   message: Inštalovať z adresy
-buttonInstallOptions: 
+buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Možnosti
-buttonNew: 
+buttonNew:
   description: Button to create a new script.
   message: Nový
-buttonOK: 
+buttonOK:
   description: OK button on dialog.
   message: OK
-buttonRemove: 
+buttonRemove:
   description: Button to remove a script.
   message: Odstrániť
-buttonReplace: 
+buttonReplace:
   description: Button to replace the current match.
   message: Nahradiť
-buttonReplaceAll: 
+buttonReplaceAll:
   description: Button to replace all matches.
   message: Všetko
 buttonReset:
   description: Button to reset to default values.
   message: Obnoviť
-buttonSave: 
+buttonSave:
   description: Button to save modifications of a script.
   message: Uložiť
-buttonSaveBlacklist: 
+buttonSaveBlacklist:
   description: Button to save global blacklist.
   message: Uložiť
-buttonSaveClose: 
+buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Uložiť & Zavrieť
-buttonSaveCustomCSS: 
+buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Uložiť
-buttonSupport: 
+buttonSupport:
   description: Button to open support page.
   message: Stránka podpory
-buttonUndo: 
+buttonUndo:
   description: Button to undo removement of a script.
   message: Späť
-buttonUpdate: 
+buttonUpdate:
   description: Check a script for updates.
   message: Skontrolovať aktualizácie
-buttonUpdateAll: 
+buttonUpdateAll:
   description: Check all scripts for updates.
   message: Skontrolovať aktualizácie
-buttonVacuum: 
+buttonVacuum:
   description: Button to vacuum extension data.
   message: Prečistiť databázu
-buttonVacuumed: 
+buttonVacuumed:
   description: Message shown when data is vacuumed.
   message: Databáza bola prečistená
-buttonVacuuming: 
+buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Čistím databázu...
-confirmNotSaved: 
+confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: Kliknutím na OK sa zmeny neuložia, Zrušiť vráti späť na úpravu.
-descBlacklist: 
+  message: 'Kliknutím na OK sa zmeny neuložia, Zrušiť vráti späť na úpravu.'
+descBlacklist:
   description: HTML Description for the global blacklist.
   message: Webové adresy v tomto zozname nebudú injektované skriptami.
-descCustomCSS: 
+descCustomCSS:
   description: Description of custom CSS section.
   message: >-
     Vlastné CSS pre stránku s možnosťami a inštalačnú stránku. Ak si nie ste
     istí, čo to je, prosím, neupravujte to.
-editLabelMeta: 
+editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Vlastné metadáta
-editLabelSettings: 
+editLabelSettings:
   description: Settings section in settings tab of script editor.
   message: Nastavenia skriptu
-editNavCode: 
+editNavCode:
   description: Label of code tab in script editor.
   message: Kód
-editNavSettings: 
+editNavSettings:
   description: Label of settings tab in script editor.
   message: Nastavenia
-editNavValues: 
+editNavValues:
   description: Label of values tab in script editor.
   message: Hodnoty
-editValueCancel: 
+editValueCancel:
   description: Button to cancel modification of a script value.
   message: Zrušiť
-editValueSave: 
+editValueSave:
   description: Button to save modification of a script value.
   message: Uložiť
-extDescription: 
+extDescription:
   description: Description for this extension.
   message: Umožňuje inštaláciu skriptov v prehliadači.
-extName: 
+extName:
   description: Name of this extension.
   message: Violentmonkey
-filterAlphabeticalOrder: 
+filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: abecedne
-filterExecutionOrder: 
+filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: spustenia
-hintInputURL: 
+hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Vložte adresu:'
-hintUseDownloadURL: 
+hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Použiť @downloadURL
-hintVacuum: 
+hintVacuum:
   description: Hint for vacuuming data.
   message: >-
     Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej
     pamäte.
-installFrom: 
+installFrom:
   description: Label for button to install script from a userscript site.
   message: Inštalovať z $1
-installOptionClose: 
+installOptionClose:
   description: Option to close confirm window after installation.
   message: Zavrieť po nainštalovaní
-installOptionTrack: 
+installOptionTrack:
   description: Option to track the loading local file before window is closed.
   message: Sledovať lokálne súbory predtým ako sa toto okno zavrie
-labelAbout: 
+labelAbout:
   description: Label shown on top of the about page.
   message: Informácie o Violentmonkey
-labelAdvanced: 
+labelAdvanced:
   description: Label for button to show advanced settings.
   message: Pokročilé
-labelAllowUpdate: 
+labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Povoliť aktualizácie
-labelAuthor: 
+labelAuthor:
   description: Label of author shown in the details of a script.
   message: 'Autor: '
-labelAutoReloadCurrentTab: 
+labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Obnoviť aktuálny list po vypnutí alebo zapnutí skriptu z menu
-labelAutoUpdate: 
+labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Automaticky kontrolovať aktualizácie skriptov každý deň
-labelBadge: 
+labelBadge:
   description: Label for option to show number on badge.
   message: 'Zobraziť počítadlo: '
-labelBadgeNone: 
+labelBadgeNone:
   description: Option to display nothing on badge.
   message: žiadne
-labelBadgeTotal: 
+labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
   message: spustených skriptov
-labelBadgeUnique: 
+labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: spustených unikátnych skriptov
-labelBlacklist: 
+labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Čierna listina
-labelCurrentLang: 
+labelCurrentLang:
   description: Label of current language.
   message: 'Aktuálny jazyk: '
-labelCustomCSS: 
+labelCustomCSS:
   description: Label for custom CSS section.
   message: Vlastný štýl
-labelDataExport: 
+labelDataExport:
   description: Section title of data export.
   message: Export dát
-labelDataImport: 
+labelDataImport:
   description: Section title of data import.
   message: Import dát
-labelDonate: 
+labelDonate:
   description: Label of link to donate page.
   message: Podporiť
-labelDownloadURL: 
+labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'Adresa pre sťahovanie:'
-labelEditValue: 
+labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Úprava hodnoty skriptu
 labelEditing:
@@ -218,286 +218,286 @@ labelEditing:
 labelEditor:
   description: Label for Editor settings
   message: Editor
-labelExclude: 
+labelExclude:
   description: Label of @exclude rules.
-  message: 'pravidlá @exclude'
-labelExcludeMatch: 
+  message: pravidlá @exclude
+labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: 'pravidlá @exclude-match'
-labelExportScriptData: 
+  message: pravidlá @exclude-match
+labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportovať dáta skriptu
-labelFeedback: 
+labelFeedback:
   description: Label of link to feedback page.
   message: Spätná väzba
-labelFilterSort: 
+labelFilterSort:
   description: Label for sort filter.
   message: Zoradiť podľa $1
-labelGeneral: 
+labelGeneral:
   description: Label for general settings.
   message: Všeobecné
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Pomôžte s prekladom
-labelHomepage: 
+labelHomepage:
   description: Label for home page in about tab.
   message: Domovská stránka
-labelHomepageURL: 
+labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Adresa domovskej stránky:'
-labelImportSettings: 
+labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importovať nastavenia
-labelInclude: 
+labelInclude:
   description: Label of @include rules.
-  message: 'pravidlá @include'
-labelIndentUnit: 
+  message: pravidlá @include
+labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Zarážka:'
-labelInstall: 
+labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Inštalovanie skriptu
-labelKeepOriginal: 
+labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Ponechať pôvodné
-labelLastUpdatedAt: 
+labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: Posledná aktualizácia $1
-labelLineNumber: 
+labelLineNumber:
   description: Label for line number jumper.
   message: 'Riadok č.: '
-labelLineWrapping: 
+labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Zalomiť dlhé riadky
-labelMatch: 
+labelMatch:
   description: Label of @match rules.
-  message: 'pravidlá @match'
-labelName: 
+  message: pravidlá @match
+labelName:
   description: Label of script name.
   message: 'Názov:'
-labelNoName: 
+labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Bez názvu
-labelNoScripts: 
+labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Ups, ešte nemáte nainštalovaný žiadny skript.'
-labelNoSearchScripts: 
+labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Nenašiel sa žiadny skript.
-labelNotifyUpdates: 
+labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Upozorňovať na aktualizácie skriptu
-labelRelated: 
+labelRelated:
   description: Label of related links.
   message: 'Súvisiace odkazy: '
-labelRemoved: 
+labelRemoved:
   description: Label shown when a script is removed.
   message: '[Odstránený]'
-labelReplace: 
+labelReplace:
   description: Label for replace input in search box.
   message: 'Nahradiť: '
-labelRunAt: 
+labelRunAt:
   description: Label of script @run-at properties in custom meta data.
   message: 'Spustiť pri:'
-labelRunAtDefault: 
+labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Predvolené)
-labelScriptEditor: 
+labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Editor skriptu
 labelScriptTemplate:
   description: Label for custom script template.
   message: Šablóna vlastného skriptu
-labelSearch: 
+labelSearch:
   description: Label for search input in search box.
   message: 'Vyhľadať: '
-labelSearchScript: 
+labelSearchScript:
   description: Placeholder for script search box.
   message: Vyhľadať skripty...
-labelSettings: 
+labelSettings:
   description: Label shown on the top of settings page
   message: Nastavenia
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
   message: Zobraziť počet spustených skriptov v odznaku
   touched: false
-labelSync: 
+labelSync:
   description: Label for sync options.
   message: Synchronizácia
-labelSyncAuthorize: 
+labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Autorizácia
-labelSyncAuthorizing: 
+labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
   message: Autorizácia
-labelSyncDisabled: 
+labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Zakázané
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Po exsiprovaní automaticky reautorizovať
   touched: false
-labelSyncRevoke: 
+labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: Odvolať
-labelSyncScriptStatus: 
+labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Stav synchronizácie skriptu
-labelSyncService: 
+labelSyncService:
   description: Label for sync service select.
   message: Synchronizovať na
-labelTranslator: 
+labelTranslator:
   description: Label of translator.
   message: 'Prekladateľ: '
-labelUpdateURL: 
+labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Aktualizačná adresa:'
-lastSync: 
+lastSync:
   description: Label for last sync timestamp.
   message: Posledná synchronizácia $1
-learnBlacklist: 
+learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Získajte viac informácií o vzoroch čiernej listiny.
-menuCommands: 
+menuCommands:
   description: Menu item to list script commands.
   message: Príkazy skriptu
-menuDashboard: 
+menuDashboard:
   description: Label for menu item to open dashboard.
   message: Otvoriť Dashboard
-menuFindScripts: 
+menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Vyhľadať skripty pre túto stránku
-menuMatchedScripts: 
+menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Vyhovujúce skripty
 menuNewScript:
   description: Menu item to create a new script.
   message: Vytvoriť nový skript
-menuScriptDisabled: 
+menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Skripty sú zakázané
-menuScriptEnabled: 
+menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
   message: Skripty sú povolené
-msgCheckingForUpdate: 
+msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: Kontrola aktualizácií...
-msgErrorFetchingScript: 
+msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: Chyba pri načítaní skriptu!
-msgErrorFetchingUpdateInfo: 
+msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
   message: Načítanie informácií o aktualizácii skončilo chybou.
-msgErrorLoadingData: 
+msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
   message: Chyba pri načítaní dát skriptu.
-msgErrorLoadingDependency: 
+msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
   message: Chyba pri načítaní závislostí.
-msgImported: 
+msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
   message: 'Importovaných položiek: $1'
-msgInstalled: 
+msgInstalled:
   description: Message shown when a script is installed.
   message: Skript bol nainštalovaný.
-msgInvalidScript: 
+msgInvalidScript:
   description: Message shown when script is invalid.
   message: Neplatný skript!
-msgLoadedData: 
+msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: Dáta skriptu načítané.
-msgLoading: 
+msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Načítavam ...
-msgLoadingData: 
+msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Načítavam dáta skriptu...
-msgLoadingDependency: 
+msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Načítavam závislosti... ($1/$2)
-msgNamespaceConflict: 
+msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: 'Konflikt menného priestoru skriptu! Prosím, upravte @name a @namespace.'
-msgNewVersion: 
+msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
   message: Nájdená nová verzia.
-msgNoUpdate: 
+msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Nie sú žiadne aktualizácie.
-msgSavedBlacklist: 
+msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Aktualizovaná čierna listina.
-msgSavedCustomCSS: 
+msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Aktualizovaný vlastný štýl.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Šablóna nového skriptu bola uktualizovaná.
-msgScriptUpdated: 
+msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Skript [$1] ja aktualizovaný!'
-msgSyncError: 
+msgSyncError:
   description: Message shown when sync failed.
   message: Chyba synchronizácie!
-msgSyncInit: 
+msgSyncInit:
   description: Message shown when sync service is initializing.
   message: Inicializácia...
-msgSyncInitError: 
+msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Chyba inicializácie!
-msgSyncReady: 
+msgSyncReady:
   description: Message shown when sync will start soon.
   message: Synchronizácia sa spustí o chvíľu...
-msgSyncing: 
+msgSyncing:
   description: Message shown when sync is in progress.
   message: Prebieha synchronizácia...
-msgUpdated: 
+msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Skript aktualizovaný.
-msgUpdating: 
+msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Aktualizujem...
-noValues: 
+noValues:
   description: Label shown when there is no value for current script.
   message: Nie je uložená žiadna hodnota
-optionShowEnabledFirst: 
+optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Zobraziť najskôr povolené skripty
-searchCaseSensitive: 
+searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Rozlišovať veľké a malé písmená
-searchUseRegex: 
+searchUseRegex:
   description: Option to perform a regular expression search
   message: Použiť regulárne výrazy
-sideMenuAbout: 
+sideMenuAbout:
   description: 'Side menu: About'
   message: O Violentmonkey
-sideMenuInstalled: 
+sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: Nainštalované skripty
-sideMenuSettings: 
+sideMenuSettings:
   description: 'Side menu: Settings'
   message: Nastavenia
-titleScriptUpdated: 
+titleScriptUpdated:
   description: Notification title for script updates.
   message: Aktualizácia
-valueLabelKey: 
+valueLabelKey:
   description: Label for key of a script value.
   message: Kľúč (reťazec)
-valueLabelValue: 
+valueLabelValue:
   description: Label for value of a script value.
   message: Hodnota (serializované ako JSON)
-warnScriptLongLines: 
+warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-
     Niektoré riadky sú príliš dlhé, otváram v režime iba na čítanie. Prosím,

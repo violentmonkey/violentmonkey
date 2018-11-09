@@ -43,7 +43,7 @@
           </label>
         </div>
       </dropdown>
-      <div class="filter-search">
+      <div class="filter-search hidden-sm">
         <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
         <icon name="search"></icon>
       </div>
@@ -63,14 +63,16 @@
 <script>
 import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
-import { i18n, sendMessage, noop, debounce } from 'src/common';
-import { objectGet } from 'src/common/object';
-import options from 'src/common/options';
-import SettingCheck from 'src/common/ui/setting-check';
-import hookSetting from 'src/common/hook-setting';
-import Icon from 'src/common/ui/icon';
-import LocaleGroup from 'src/common/ui/locale-group';
-import { setRoute } from 'src/common/router';
+import {
+  i18n, sendMessage, noop, debounce,
+} from '#/common';
+import { objectGet } from '#/common/object';
+import options from '#/common/options';
+import SettingCheck from '#/common/ui/setting-check';
+import hookSetting from '#/common/hook-setting';
+import Icon from '#/common/ui/icon';
+import LocaleGroup from '#/common/ui/locale-group';
+import { setRoute } from '#/common/router';
 import Item from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
@@ -153,7 +155,7 @@ export default {
       const lowerSearch = (search || '').toLowerCase();
       const { scripts } = this.store;
       const filteredScripts = search
-        ? scripts.filter(script => script._cache.search.includes(lowerSearch))
+        ? scripts.filter(script => script.$cache.search.includes(lowerSearch))
         : scripts.slice();
       if (sort.value === 'alpha') {
         const showEnabledFirst = options.get('filters.showEnabledFirst');
@@ -162,7 +164,7 @@ export default {
           if (showEnabledFirst) {
             keys.push(item.config.enabled ? 0 : 1);
           }
-          keys.push(item._cache.lowerName);
+          keys.push(item.$cache.lowerName);
           return keys.join('');
         };
         filteredScripts.sort((a, b) => {
@@ -261,7 +263,7 @@ export default {
 <style>
 $header-height: 4rem;
 
-.tab-installed {
+.tab.tab-installed {
   padding: 0;
   > header {
     height: $header-height;
@@ -321,7 +323,7 @@ $header-height: 4rem;
 }
 .filter-search {
   position: relative;
-  width: 12rem;
+  width: 14rem;
   .icon {
     position: absolute;
     height: 100%;

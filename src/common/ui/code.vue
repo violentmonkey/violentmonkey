@@ -58,9 +58,9 @@ import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip';
-import { debounce } from 'src/common';
-import ToggleButton from 'src/common/ui/toggle-button';
-import options from 'src/common/options';
+import { debounce } from '#/common';
+import ToggleButton from '#/common/ui/toggle-button';
+import options from '#/common/options';
 
 /* eslint-disable no-control-regex */
 const MAX_LINE_LENGTH = 50 * 1024;

@@ -60,6 +60,9 @@ buttonReplace:
 buttonReplaceAll:
   description: Button to replace all matches.
   message: Vše
+buttonReset:
+  description: Button to reset to default values.
+  message: ''
 buttonSave:
   description: Button to save modifications of a script.
   message: Uložit
@@ -209,6 +212,12 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: ''
+labelEditing:
+  description: Label for current editing script
+  message: ''
+labelEditor:
+  description: Label for Editor settings
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
   message: Výjimky
@@ -226,6 +235,9 @@ labelFilterSort:
   message: ''
 labelGeneral:
   description: Label for general settings.
+  message: ''
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
   message: ''
 labelHomepage:
   description: Label for home page in about tab.
@@ -293,6 +305,9 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Úprava skriptu
+labelScriptTemplate:
+  description: Label for custom script template.
+  message: ''
 labelSearch:
   description: Label for search input in search box.
   message: 'Hledat: '
@@ -354,6 +369,9 @@ menuFindScripts:
   message: Najdi skripty pro tuto stránku
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
+  message: ''
+menuNewScript:
+  description: Menu item to create a new script.
   message: ''
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
@@ -421,6 +439,9 @@ msgSavedBlacklist:
   message: ''
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
+  message: ''
+msgSavedScriptTemplate:
+  description: Message shown when custom script template is saved.
   message: ''
 msgScriptUpdated:
   description: Notification message for script updates.

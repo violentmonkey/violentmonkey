@@ -1,6 +1,6 @@
 import test from 'tape';
-import { testScript, testBlacklist, resetBlacklist } from 'src/background/utils/tester';
-import cache from 'src/background/utils/cache';
+import { testScript, testBlacklist, resetBlacklist } from '#/background/utils/tester';
+import cache from '#/background/utils/cache';
 
 test.onFinish(cache.destroy);
 
@@ -107,6 +107,41 @@ test('path', t => {
     });
     q.ok(testScript('https://www.google.com/a/b/c', script), 'should match exact');
     q.notOk(testScript('https://www.google.com/a/b/c/d', script), 'should match exact');
+    q.end();
+  });
+
+  t.test('should ignore query string and hash', q => {
+    const script = buildScript({
+      meta: {
+        match: [
+          'https://www.google.com/a',
+        ],
+      },
+    });
+    q.ok(testScript('https://www.google.com/a', script), 'should match without query and hash');
+    q.ok(testScript('https://www.google.com/a#hash', script), 'should match with hash');
+    q.ok(testScript('https://www.google.com/a?query', script), 'should match with query');
+    q.ok(testScript('https://www.google.com/a?query#hash', script), 'should match with query and hash');
+    q.end();
+  });
+
+  t.test('should match query string and hash if existed in rules', q => {
+    const script = buildScript({
+      meta: {
+        match: [
+          'https://www.google.com/a?query',
+          'https://www.google.com/b#hash',
+          'https://www.google.com/c?query#hash',
+        ],
+      },
+    });
+    q.notOk(testScript('https://www.google.com/a', script), 'should match query');
+    q.notOk(testScript('https://www.google.com/b', script), 'should match hash');
+    q.ok(testScript('https://www.google.com/a?query', script), 'should match query');
+    q.ok(testScript('https://www.google.com/a?query#hash', script), 'should match query and ignore hash');
+    q.notOk(testScript('https://www.google.com/b?query#hash', script), 'should match query and hash');
+    q.ok(testScript('https://www.google.com/b#hash', script), 'should match hash');
+    q.ok(testScript('https://www.google.com/c?query#hash', script), 'should match query and hash');
     q.end();
   });
 

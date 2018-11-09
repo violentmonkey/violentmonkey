@@ -5,18 +5,24 @@
     </div>
     <div class="menu-item" :class="{disabled:!options.isApplied}" @click="onToggle">
       <icon :name="getSymbolCheck(options.isApplied)"></icon>
-      <div class="flex-auto" v-text="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"></div>
+      <div class="flex-1" v-text="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"></div>
     </div>
     <div class="menu">
       <div class="menu-item" @click="onManage">
         <icon name="cog"></icon>
-        <div class="flex-auto" v-text="i18n('menuDashboard')"></div>
+        <div class="flex-1" v-text="i18n('menuDashboard')"></div>
+      </div>
+    </div>
+    <div class="menu">
+      <div class="menu-item" @click="onCreateScript">
+        <icon name="code"></icon>
+        <div class="flex-1" v-text="i18n('menuNewScript')"></div>
       </div>
     </div>
     <div class="menu" v-show="store.domain">
       <div class="menu-item" @click="onFindSameDomainScripts">
         <icon name="search"></icon>
-        <div class="flex-auto" v-text="i18n('menuFindScripts')"></div>
+        <div class="flex-1" v-text="i18n('menuFindScripts')"></div>
       </div>
     </div>
     <div class="menu menu-commands" v-show="commands.length" :class="{expand: activeMenu === 'commands'}">
@@ -39,7 +45,7 @@
         <div v-for="item in scripts">
           <div class="menu-item" @click="onToggleScript(item)" :class="{disabled:!item.data.config.enabled}">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
-            <div class="flex-auto ellipsis" v-text="item.name"></div>
+            <div class="flex-auto ellipsis" v-text="item.name" :title="item.name"></div>
           </div>
           <div class="submenu-buttons">
             <div class="submenu-button" @click="onEditScript(item)">
@@ -53,9 +59,9 @@
 </template>
 
 <script>
-import options from 'src/common/options';
-import { getLocaleString, sendMessage } from 'src/common';
-import Icon from 'src/common/ui/icon';
+import options from '#/common/options';
+import { getLocaleString, sendMessage } from '#/common';
+import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 
 const optionsData = {
@@ -144,6 +150,24 @@ export default {
     },
     checkReload() {
       if (options.get('autoReload')) browser.tabs.reload(this.store.currentTab.id);
+    },
+    onCreateScript() {
+      const { currentTab, domain } = this.store;
+      (domain ? (
+        sendMessage({
+          cmd: 'CacheNewScript',
+          data: {
+            url: currentTab.url.split('#')[0].split('?')[0],
+          },
+        })
+      ) : Promise.resolve())
+      .then(id => {
+        const path = ['scripts', '_new', id].filter(Boolean).join('/');
+        browser.tabs.create({
+          url: browser.runtime.getURL(`/options/index.html#${path}`),
+        });
+        window.close();
+      });
     },
   },
 };

@@ -58,6 +58,9 @@ buttonReplace:
 buttonReplaceAll:
   description: Button to replace all matches.
   message: 所有
+buttonReset:
+  description: Button to reset to default values.
+  message: 重置
 buttonSave:
   description: Button to save modifications of a script.
   message: 保存
@@ -207,6 +210,12 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: 编辑数据
+labelEditing:
+  description: Label for current editing script
+  message: 正在编辑：
+labelEditor:
+  description: Label for Editor settings
+  message: 编辑器
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude 规则'
@@ -225,6 +234,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: 通用
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: ''
 labelHomepage:
   description: Label for home page in about tab.
   message: 主页
@@ -291,6 +303,9 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: 脚本编辑器
+labelScriptTemplate:
+  description: Label for custom script template.
+  message: 自定义脚本模板
 labelSearch:
   description: Label for search input in search box.
   message: 查找：
@@ -353,6 +368,9 @@ menuFindScripts:
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: 匹配的脚本
+menuNewScript:
+  description: Menu item to create a new script.
+  message: 创建新脚本
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: 脚本已禁用
@@ -420,6 +438,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: 自定义样式已更新！
+msgSavedScriptTemplate:
+  description: Message shown when custom script template is saved.
+  message: 自定义脚本模板已更新！
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 脚本【$1】已更新！

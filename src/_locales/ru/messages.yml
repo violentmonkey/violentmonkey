@@ -60,6 +60,9 @@ buttonReplace:
 buttonReplaceAll:
   description: Button to replace all matches.
   message: Заменить все
+buttonReset:
+  description: Button to reset to default values.
+  message: ''
 buttonSave:
   description: Button to save modifications of a script.
   message: Сохранить
@@ -216,6 +219,12 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: ''
+labelEditing:
+  description: Label for current editing script
+  message: ''
+labelEditor:
+  description: Label for Editor settings
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
   message: 'Не задействовать на (правила исключений @exclude):'
@@ -234,6 +243,9 @@ labelFilterSort:
 labelGeneral:
   description: Label for general settings.
   message: Общие настройки
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: ''
 labelHomepage:
   description: Label for home page in about tab.
   message: ''
@@ -248,7 +260,7 @@ labelInclude:
   message: 'Задействовать на (правила включений @include):'
 labelIndentUnit:
   description: Label for editor option of indent unit size.
-  message: 'Ширина отступа'
+  message: Ширина отступа
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта...
@@ -263,7 +275,7 @@ labelLineNumber:
   message: 'Номер строки:'
 labelLineWrapping:
   description: Label for editor option of line wrapping.
-  message: 'Переносить длинные строки'
+  message: Переносить длинные строки
 labelMatch:
   description: Label of @match rules.
   message: 'Задействовать на (правила совпадений @match):'
@@ -300,6 +312,9 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Редактор скриптов
+labelScriptTemplate:
+  description: Label for custom script template.
+  message: ''
 labelSearch:
   description: Label for search input in search box.
   message: 'Найти: '
@@ -362,6 +377,9 @@ menuFindScripts:
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Совпадающие скрипты
+menuNewScript:
+  description: Menu item to create a new script.
+  message: ''
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Скрипты отключены
@@ -429,6 +447,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Пользовательские стили CSS сохранены.
+msgSavedScriptTemplate:
+  description: Message shown when custom script template is saved.
+  message: ''
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Скрипт [$1] обновлён!'
@@ -479,10 +500,10 @@ titleScriptUpdated:
   message: Обновление
 valueLabelKey:
   description: Label for key of a script value.
-  message: 'Ключ (строка)'
+  message: Ключ (строка)
 valueLabelValue:
   description: Label for value of a script value.
-  message: 'Значение (сериализованное как JSON)'
+  message: Значение (сериализованное как JSON)
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: ''

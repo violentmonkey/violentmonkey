@@ -1,4 +1,4 @@
-import { i18n, defaultImage, noop } from 'src/common';
+import { i18n, defaultImage, noop } from '#/common';
 
 const openers = {};
 

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title><%= htmlWebpackPlugin.options.title %></title>
+<%
+if (htmlWebpackPlugin.options.manifest) {
+%><link rel="manifest" href="<%= htmlWebpackPlugin.options.manifest %>"><%
+}
+htmlWebpackPlugin.options.css.forEach(url => {
+%><link rel="stylesheet" href="<%= url %>"><%
+});
+htmlWebpackPlugin.options.inlineSource && htmlWebpackPlugin.files.css.forEach(file => {
+%><style><%= compilation.assets[file.slice(htmlWebpackPlugin.files.publicPath.length)].source() %></style><%
+});
+htmlWebpackPlugin.options.js.forEach(url => {
+%><script src="<%= url %>"></script><%
+});
+%></head>
+<body></body>
+</html>

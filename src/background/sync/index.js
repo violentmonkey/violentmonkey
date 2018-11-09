@@ -1,4 +1,6 @@
-import { checkAuthUrl, initialize, sync, getStates, authorize, revoke } from './base';
+import {
+  checkAuthUrl, initialize, sync, getStates, authorize, revoke,
+} from './base';
 import './dropbox';
 import './onedrive';
 import './googledrive';

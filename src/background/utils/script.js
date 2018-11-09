@@ -1,3 +1,5 @@
+import { getOption } from './options';
+
 const metaStart = '==UserScript==';
 const metaEnd = '==/UserScript==';
 
@@ -45,7 +47,7 @@ export function parseMeta(code) {
     [key]: metaTypes[key].default(),
   }), {});
   let flag = -1;
-  code.replace(/(?:^|\n)\/\/\s*([@=]\S+)(.*)/g, (_match, group1, group2) => {
+  code.replace(/(?:^|\n)\s*\/\/\s*([@=]\S+)(.*)/g, (_match, group1, group2) => {
     if (flag < 0 && group1 === metaStart) {
       // start meta
       flag = 1;
@@ -71,15 +73,16 @@ export function parseMeta(code) {
   return meta;
 }
 
-export function newScript() {
-  const code = `\
-// ==UserScript==
-// @name New Script
-// @namespace Violentmonkey Scripts
-// @match *://*/*
-// @grant none
-// ==/UserScript==
-`;
+export function newScript(data) {
+  const state = {
+    url: '*://*/*',
+    ...data,
+  };
+  const code = getOption('scriptTemplate')
+  .replace(/{{(\w+)}}/g, (str, name) => {
+    const value = state[name];
+    return value == null ? str : value;
+  });
   const script = {
     custom: {
       origInclude: true,

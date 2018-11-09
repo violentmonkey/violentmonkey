@@ -43,7 +43,7 @@
     </div>
     <div v-show="showAdvanced">
       <section>
-        <h3>Editor</h3>
+        <h3 v-text="i18n('labelEditor')"></h3>
         <div class="mb-1">
           <label>
             <setting-check name="editor.lineWrapping" />
@@ -57,21 +57,23 @@
           </label>
         </div>
       </section>
-      <vm-blacklist></vm-blacklist>
-      <vm-css></vm-css>
+      <vm-template />
+      <vm-blacklist />
+      <vm-css />
     </div>
   </div>
 </template>
 
 <script>
-import { debounce } from 'src/common';
-import SettingCheck from 'src/common/ui/setting-check';
-import options from 'src/common/options';
-import hookSetting from 'src/common/hook-setting';
-import Icon from 'src/common/ui/icon';
+import { debounce } from '#/common';
+import SettingCheck from '#/common/ui/setting-check';
+import options from '#/common/options';
+import hookSetting from '#/common/hook-setting';
+import Icon from '#/common/ui/icon';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
+import VmTemplate from './vm-template';
 import VmBlacklist from './vm-blacklist';
 import VmCss from './vm-css';
 
@@ -104,6 +106,7 @@ export default {
     VmImport,
     VmExport,
     VmSync,
+    VmTemplate,
     VmBlacklist,
     VmCss,
     SettingCheck,

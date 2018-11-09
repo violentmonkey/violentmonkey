@@ -85,12 +85,18 @@ function start(req, id) {
     user: details.user,
     password: details.password,
     headers: details.headers,
+    timeout: details.timeout,
     overrideMimeType: details.overrideMimeType,
   };
   req.id = id;
   map[id] = req;
-  if (includes(['arraybuffer', 'blob'], details.responseType)) {
-    payload.responseType = 'arraybuffer';
+  const { responseType } = details;
+  if (responseType) {
+    if (includes(['arraybuffer', 'blob'], responseType)) {
+      payload.responseType = 'arraybuffer';
+    } else if (!includes(['json'], responseType)) {
+      console.warn(`[Violentmonkey] Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
+    }
   }
   encodeBody(details.data)
   .then(body => {

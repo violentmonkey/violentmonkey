@@ -1,8 +1,10 @@
 // Reference: https://dev.onedrive.com/README.htm
-import { noop } from 'src/common';
-import { objectGet } from 'src/common/object';
+import { noop } from '#/common';
+import { objectGet } from '#/common/object';
 import { dumpQuery } from '../utils';
-import { getURI, getItemFilename, BaseService, isScriptFile, register } from './base';
+import {
+  getURI, getItemFilename, BaseService, isScriptFile, register,
+} from './base';
 
 const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ=='));
 const config = Object.assign({

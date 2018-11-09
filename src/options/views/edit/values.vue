@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import { sendMessage } from 'src/common';
-import Icon from 'src/common/ui/icon';
+import { sendMessage } from '#/common';
+import Icon from '#/common/ui/icon';
 
 const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;
@@ -206,6 +206,9 @@ export default {
     box-shadow: -5px 0 5px #ddd;
     background: white;
     z-index: 10;
+    @media (max-width: 767px) {
+      width: 100%;
+    }
     input {
       width: 100%;
     }

@@ -1,6 +1,6 @@
 function parse(pathInfo) {
-  const [pathname, qs] = pathInfo.split('?');
-  const query = (qs || '').split('&').reduce((res, seq) => {
+  const [pathname, search = ''] = pathInfo.split('?');
+  const query = search.split('&').reduce((res, seq) => {
     if (seq) {
       const [key, val] = seq.split('=');
       res[decodeURIComponent(key)] = decodeURIComponent(val);

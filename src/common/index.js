@@ -182,7 +182,7 @@ export function getFullUrl(url, base) {
 }
 
 export function isRemote(url) {
-  return url && !(/^(file:|data:|http:\/\/localhost[:/])/.test(url));
+  return url && !(/^(file:|data:|https?:\/\/localhost[:/]|http:\/\/127\.0\.0\.1[:/])/.test(url));
 }
 
 export function cache2blobUrl(raw, { defaultType, type: overrideType } = {}) {

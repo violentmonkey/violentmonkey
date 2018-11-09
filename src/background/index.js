@@ -1,13 +1,12 @@
-import 'src/common/browser';
-import { noop } from 'src/common';
-import { objectGet } from 'src/common/object';
+import { noop, getUniqId } from '#/common';
+import { objectGet } from '#/common/object';
 import * as sync from './sync';
 import {
   cache,
   getRequestId, httpRequest, abortRequest, confirmInstall,
   newScript, parseMeta,
   setClipboard, checkUpdate,
-  getOption, setOption, hookOptions, getAllOptions,
+  getOption, getDefaultOption, setOption, hookOptions, getAllOptions,
   initialize, sendMessageOrIgnore,
 } from './utils';
 import { tabOpen, tabClose } from './utils/tabs';
@@ -19,7 +18,9 @@ import {
   sortScripts, getValueStoresByIds,
 } from './utils/db';
 import { resetBlacklist } from './utils/tester';
-import { setValueStore, updateValueStore, resetValueOpener, addValueOpener } from './utils/values';
+import {
+  setValueStore, updateValueStore, resetValueOpener, addValueOpener,
+} from './utils/values';
 
 const VM_VER = browser.runtime.getManifest().version;
 
@@ -38,6 +39,10 @@ hookOptions(changes => {
   if ('isApplied' in changes) setIcon(changes.isApplied);
   if ('autoUpdate' in changes) autoUpdate();
   if ('showBadge' in changes) updateBadges();
+  const SCRIPT_TEMPLATE = 'scriptTemplate';
+  if (SCRIPT_TEMPLATE in changes && !changes[SCRIPT_TEMPLATE]) {
+    setOption(SCRIPT_TEMPLATE, getDefaultOption(SCRIPT_TEMPLATE));
+  }
   sendMessageOrIgnore({
     cmd: 'UpdateOptions',
     data: changes,
@@ -71,8 +76,13 @@ function autoUpdate() {
 }
 
 const commands = {
-  NewScript() {
-    return newScript();
+  NewScript(id) {
+    return id && cache.get(`new-${id}`) || newScript();
+  },
+  CacheNewScript(data) {
+    const id = getUniqId();
+    cache.put(`new-${id}`, newScript(data));
+    return id;
   },
   RemoveScript(id) {
     return removeScript(id)
@@ -148,7 +158,6 @@ const commands = {
   Vacuum: vacuum,
   ParseScript(data) {
     return parseScript(data).then(res => {
-      sendMessageOrIgnore(res);
       sync.sync();
       return res.data;
     });
