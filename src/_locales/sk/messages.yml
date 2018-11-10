@@ -60,7 +60,7 @@ buttonReplaceAll:
   message: Všetko
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Obnoviť
 buttonSave:
   description: Button to save modifications of a script.
   message: Uložiť
@@ -214,10 +214,10 @@ labelEditValue:
   message: Úprava hodnoty skriptu
 labelEditing:
   description: Label for current editing script
-  message: ''
+  message: Práve sa upravuje
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Editor
 labelExclude:
   description: Label of @exclude rules.
   message: pravidlá @exclude
@@ -238,7 +238,7 @@ labelGeneral:
   message: Všeobecné
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Pomôžte s prekladom
 labelHomepage:
   description: Label for home page in about tab.
   message: Domovská stránka
@@ -307,7 +307,7 @@ labelScriptEditor:
   message: Editor skriptu
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Šablóna vlastného skriptu
 labelSearch:
   description: Label for search input in search box.
   message: 'Vyhľadať: '
@@ -319,7 +319,7 @@ labelSettings:
   message: Nastavenia
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: ''
+  message: Zobraziť počet spustených skriptov v odznaku
   touched: false
 labelSync:
   description: Label for sync options.
@@ -335,7 +335,7 @@ labelSyncDisabled:
   message: Zakázané
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: ''
+  message: Po exsiprovaní automaticky reautorizovať
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
@@ -372,7 +372,7 @@ menuMatchedScripts:
   message: Vyhovujúce skripty
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Vytvoriť nový skript
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Skripty sú zakázané
@@ -442,7 +442,7 @@ msgSavedCustomCSS:
   message: Aktualizovaný vlastný štýl.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: Šablóna nového skriptu bola uktualizovaná.
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Skript [$1] ja aktualizovaný!'
