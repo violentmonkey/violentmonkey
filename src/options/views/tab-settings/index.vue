@@ -31,6 +31,15 @@
           </select>
         </label>
       </div>
+      <div class="mb-1">
+        <label>
+          <span v-text="i18n('labelInjectionMode')"></span>
+          <select v-model="defaultInjectInto">
+            <option value="page">page</option>
+            <option value="auto">auto</option>
+          </select>
+        </label>
+      </div>
     </section>
     <vm-import></vm-import>
     <vm-export></vm-export>
@@ -86,6 +95,12 @@ const items = [
     },
   },
   {
+    name: 'defaultInjectInto',
+    normalize(value) {
+      return value === 'auto' ? 'auto' : 'page';
+    },
+  },
+  {
     name: 'indentUnit',
     key: 'editor.indentUnit',
     normalize(value) {
@@ -122,16 +137,20 @@ export default {
     },
   },
   created() {
+    this.revokers = [];
     options.ready(() => {
       items.forEach(item => {
         const { name, key, normalize } = item;
         settings[name] = normalize(options.get(key || name));
-        hookSetting(key, value => {
+        this.revokers.push(hookSetting(key, value => {
           settings[name] = value;
-        });
+        }));
         this.$watch(name, debounce(this.getUpdater(item), 300));
       });
     });
+  },
+  beforeDestroy() {
+    this.revokers.forEach(revoke => { revoke(); });
   },
 };
 </script>

@@ -256,6 +256,9 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: ''
+labelInjectionMode:
+  description: Label for default option to inject scripts.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Script yükleniyor
@@ -307,6 +310,7 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Script Editör
+  touched: false
 labelScriptTemplate:
   description: Label for custom script template.
   message: ''

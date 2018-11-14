@@ -102,6 +102,7 @@ const commands = {
     if (reset && srcTab.id) resetValueOpener(srcTab.id);
     const data = {
       isApplied: getOption('isApplied'),
+      injectInto: getOption('defaultInjectInto'),
       version: VM_VER,
     };
     if (!data.isApplied) return data;

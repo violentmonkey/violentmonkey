@@ -21,6 +21,7 @@ const defaults = {
   importSettings: true,
   notifyUpdates: false,
   version: null,
+  defaultInjectInto: 'page', // 'page' | 'auto',
   filters: {
     sort: 'exec',
   },
