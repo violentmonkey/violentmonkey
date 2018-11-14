@@ -60,7 +60,7 @@ buttonReplaceAll:
   message: Tất cả
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Thiết lập lại
 buttonSave:
   description: Button to save modifications of a script.
   message: Lưu
@@ -214,7 +214,7 @@ labelEditValue:
   message: Sửa giá trị script
 labelEditing:
   description: Label for current editing script
-  message: ''
+  message: 'Đang chỉnh sửa: '
 labelEditor:
   description: Label for Editor settings
   message: Trình chỉnh sửa
@@ -372,7 +372,7 @@ menuMatchedScripts:
   message: Script trùng khớp
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Tạo script mới
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Đã vô hiệu hoá script
