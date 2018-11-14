@@ -25,6 +25,7 @@ const baseConfig = [
     plugins: [
       new webpack.DefinePlugin({
         'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
+        'process.env.DEBUG': JSON.stringify(process.env.DEBUG || false),
       }),
     ],
   },

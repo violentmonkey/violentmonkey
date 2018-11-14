@@ -1,39 +1,16 @@
-import { inject, getUniqId, sendMessage } from './utils';
+import { getUniqId, sendMessage } from './utils';
 import initialize from './content';
 
 (function main() {
   // Avoid running repeatedly due to new `document.documentElement`
-  if (window.VM) return;
-  window.VM = 1;
-
-  // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
-  const VMInitInjection = window[process.env.INIT_FUNC_NAME];
+  const VM_KEY = '__Violentmonkey';
+  if (window[VM_KEY]) return;
+  window[VM_KEY] = 1;
 
   function initBridge() {
     const contentId = getUniqId();
     const webId = getUniqId();
-    initialize(contentId, webId).then(needInject => {
-      if (needInject) {
-        doInject(contentId, webId);
-      }
-    });
-  }
-
-  function doInject(contentId, webId) {
-    const props = {};
-    [
-      Object.getOwnPropertyNames(window),
-      Object.getOwnPropertyNames(global),
-    ].forEach(keys => {
-      keys.forEach(key => { props[key] = 1; });
-    });
-    const args = [
-      webId,
-      contentId,
-      Object.keys(props),
-    ];
-    // Avoid using Function::apply in case it is shimmed
-    inject(`(${VMInitInjection.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
+    initialize(contentId, webId);
   }
 
   initBridge();

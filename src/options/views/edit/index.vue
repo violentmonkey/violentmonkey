@@ -137,7 +137,7 @@ export default {
         match: fromList(custom.match),
         exclude: fromList(custom.exclude),
         excludeMatch: fromList(custom.excludeMatch),
-        runAt: custom.runAt || custom['run-at'] || '',
+        runAt: custom.runAt || '',
       });
       this.settings = settings;
       this.$nextTick(() => {

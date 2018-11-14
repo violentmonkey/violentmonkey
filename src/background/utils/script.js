@@ -73,6 +73,15 @@ export function parseMeta(code) {
   return meta;
 }
 
+export function getDefaultCustom() {
+  return {
+    origInclude: true,
+    origExclude: true,
+    origMatch: true,
+    origExcludeMatch: true,
+  };
+}
+
 export function newScript(data) {
   const state = {
     url: '*://*/*',
@@ -84,12 +93,7 @@ export function newScript(data) {
     return value == null ? str : value;
   });
   const script = {
-    custom: {
-      origInclude: true,
-      origExclude: true,
-      origMatch: true,
-      origExcludeMatch: true,
-    },
+    custom: getDefaultCustom(),
     config: {
       enabled: 1,
       shouldUpdate: 1,

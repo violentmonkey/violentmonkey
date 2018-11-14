@@ -216,6 +216,12 @@ const commands = {
   CheckPosition() {
     return sortScripts();
   },
+  InjectScript(code, src) {
+    return browser.tabs.executeScript(src.tab.id, {
+      code: `${code};0`,
+      runAt: 'document_start',
+    });
+  },
 };
 
 initialize()

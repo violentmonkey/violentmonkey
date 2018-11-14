@@ -1,5 +1,6 @@
 import { isFirefox } from '#/common/ua';
 import { getUniqId } from '#/common';
+import { INJECT_PAGE, INJECT_CONTENT, INJECT_AUTO } from '#/common/consts';
 import {
   bindEvents, sendMessage, inject, attachFunction,
 } from '../utils';
@@ -12,6 +13,9 @@ import {
 import dirtySetClipboard from './clipboard';
 
 const IS_TOP = window.top === window;
+
+// Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
+const VMInitInjection = window[process.env.INIT_FUNC_NAME];
 
 const ids = [];
 const enabledIds = [];
@@ -46,6 +50,7 @@ const bgHandlers = {
 export default function initialize(contentId, webId) {
   bridge.post = bindEvents(contentId, webId, onHandle);
   bridge.destId = webId;
+  const injectable = checkInjectable();
 
   browser.runtime.onMessage.addListener((req, src) => {
     const handle = bgHandlers[req.cmd];
@@ -60,6 +65,10 @@ export default function initialize(contentId, webId) {
     },
   })
   .then(data => {
+    const scriptLists = {
+      [INJECT_PAGE]: [],
+      [INJECT_CONTENT]: [],
+    };
     if (data.scripts) {
       data.scripts = data.scripts.filter(script => {
         ids.push(script.props.id);
@@ -69,17 +78,80 @@ export default function initialize(contentId, webId) {
         }
         return false;
       });
+      data.scripts.forEach(script => {
+        let injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
+        if (injectInto === INJECT_AUTO) {
+          injectInto = injectable ? INJECT_PAGE : INJECT_CONTENT;
+        }
+        const list = scriptLists[injectInto];
+        if (list) list.push(script);
+      });
     }
     getPopup();
     setBadge();
-    const needInject = data.scripts && data.scripts.length;
-    if (needInject) {
-      bridge.ready.then(() => {
-        bridge.post({ cmd: 'LoadScripts', data });
-      });
+    if (scriptLists[INJECT_PAGE].length || scriptLists[INJECT_CONTENT].length) {
+      injectScripts(contentId, webId, data, scriptLists);
     }
-    return needInject;
   });
+}
+
+function checkInjectable() {
+  const id = getUniqId('VM-');
+  const detect = domId => {
+    const span = document.createElement('span');
+    span.id = domId;
+    document.documentElement.appendChild(span);
+  };
+  inject(`(${detect.toString()})(${JSON.stringify(id)})`);
+  const span = document.querySelector(`#${id}`);
+  const injectable = !!span;
+  if (span) span.parentNode.removeChild(span);
+  return injectable;
+}
+
+function injectScripts(contentId, webId, data, scriptLists) {
+  const props = {};
+  [
+    Object.getOwnPropertyNames(window),
+    Object.getOwnPropertyNames(global),
+  ].forEach(keys => {
+    keys.forEach(key => { props[key] = 1; });
+  });
+  const args = [
+    webId,
+    contentId,
+    Object.keys(props),
+  ];
+
+  const injectPage = scriptLists[INJECT_PAGE];
+  const injectContent = scriptLists[INJECT_CONTENT];
+  if (injectContent.length) {
+    VMInitInjection()(...args, INJECT_CONTENT);
+    bridge.ready.then(() => {
+      bridge.post({
+        cmd: 'LoadScripts',
+        data: {
+          ...data,
+          mode: INJECT_CONTENT,
+          scripts: injectContent,
+        },
+      });
+    });
+  }
+  if (injectPage.length) {
+    // Avoid using Function::apply in case it is shimmed
+    inject(`(${VMInitInjection.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
+    bridge.ready.then(() => {
+      bridge.post({
+        cmd: 'LoadScripts',
+        data: {
+          ...data,
+          mode: INJECT_PAGE,
+          scripts: injectPage,
+        },
+      });
+    });
+  }
 }
 
 const handlers = {
@@ -159,7 +231,7 @@ function getPopup() {
 }
 
 function injectScript(data) {
-  const [vId, wrapperKeys, code, vCallbackId] = data;
+  const [vId, code, vCallbackId, mode] = data;
   const func = (attach, id, cb, callbackId) => {
     attach(id, cb);
     const callback = window[callbackId];
@@ -168,9 +240,16 @@ function injectScript(data) {
   const args = [
     attachFunction.toString(),
     JSON.stringify(vId),
-    `function(${wrapperKeys.join(',')}){${code}}`,
+    code,
     JSON.stringify(vCallbackId),
   ];
   const injectedCode = `!${func.toString()}(${args.join(',')})`;
-  inject(injectedCode);
+  if (mode === INJECT_CONTENT) {
+    sendMessage({
+      cmd: 'InjectScript',
+      data: injectedCode,
+    });
+  } else {
+    inject(injectedCode);
+  }
 }
