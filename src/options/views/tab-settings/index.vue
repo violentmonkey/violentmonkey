@@ -39,6 +39,7 @@
             <option value="auto">auto</option>
           </select>
         </label>
+        <a class="ml-1" href="https://violentmonkey.github.io/2018/11/23/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
       </div>
     </section>
     <vm-import></vm-import>

@@ -4,8 +4,8 @@ anchorAuthor:
 anchorTranslator:
   description: Translator shown on about tab.
   message: >-
-    <a href=https://www.transifex.com/user/profile/nfsmaniac
-    target=_blank>nfsmaniac</a>
+    <a href="https://www.transifex.com/user/profile/nfsmaniac" target="_blank"
+    rel="noopener noreferrer">nfsmaniac</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Vše/Žádný
@@ -361,6 +361,9 @@ lastSync:
   message: ''
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
+  message: ''
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
   message: ''
 menuCommands:
   description: Menu item to list script commands.

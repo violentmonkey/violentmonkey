@@ -360,6 +360,9 @@ lastSync:
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: 블랙리스트 패턴에 대해 자세히 알아보기
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: 스크립트 명령어

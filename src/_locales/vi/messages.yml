@@ -362,6 +362,9 @@ lastSync:
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Tìm hiểu thêm về quy tắc danh sách đen.
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: Menu của script

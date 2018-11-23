@@ -3,7 +3,9 @@ anchorAuthor:
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href="http://greydus.tk" target="_blank">Greydus</a>'
+  message: >-
+    <a href="http://greydus.tk" target="_blank" rel="noopener
+    noreferrer">Greydus</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Todos/Ninguno
@@ -366,6 +368,9 @@ lastSync:
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Aprender más sobre los patrones de la lista negra.
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: Comandos de scripts

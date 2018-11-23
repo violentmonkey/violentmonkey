@@ -364,6 +364,9 @@ lastSync:
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Kara liste şablonları hakkında daha fazla öğren.
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: Script komutları

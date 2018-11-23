@@ -254,7 +254,7 @@ labelIndentUnit:
   message: 缩进大小：
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 默认注入模式：
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: 安装脚本
@@ -360,6 +360,9 @@ lastSync:
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: 了解更多黑名单规则。
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: 了解更多注入模式。
 menuCommands:
   description: Menu item to list script commands.
   message: 脚本命令

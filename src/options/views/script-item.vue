@@ -40,7 +40,7 @@
         </tooltip>
         <span class="sep"></span>
         <tooltip :disabled="!homepageURL" :title="i18n('buttonHome')" align="start">
-          <a class="btn-ghost" target="_blank" :href="homepageURL">
+          <a class="btn-ghost" target="_blank" rel="noopener noreferrer" :href="homepageURL">
             <icon name="home"></icon>
           </a>
         </tooltip>
@@ -50,7 +50,7 @@
           </span>
         </tooltip>
         <tooltip :disabled="!script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
-          <a class="btn-ghost" target="_blank" :href="script.meta.supportURL">
+          <a class="btn-ghost" target="_blank" rel="noopener noreferrer" :href="script.meta.supportURL">
             <icon name="question"></icon>
           </a>
         </tooltip>

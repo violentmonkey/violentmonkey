@@ -7,7 +7,7 @@
       </div>
       <div class="flex-auto flex">
         <div class="edit-hint flex-auto text-right ellipsis mr-1">
-          <a href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
+          <a href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank" rel="noopener noreferrer">How to edit with your favorite editor?</a>
         </div>
         <div class="edit-buttons">
           <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
