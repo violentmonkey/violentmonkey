@@ -256,7 +256,7 @@ labelIndentUnit:
   message: Khoảng cách thụt lề
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Chế độ tiêm mặc định: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Đang cài đặt script
@@ -364,7 +364,7 @@ learnBlacklist:
   message: Tìm hiểu thêm về quy tắc danh sách đen.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Tìm hiểu thêm về các chế độ tiêm.
 menuCommands:
   description: Menu item to list script commands.
   message: Menu của script
