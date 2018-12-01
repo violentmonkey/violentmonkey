@@ -2,16 +2,27 @@
   <div class="tab-installed">
     <header class="flex">
       <div class="flex-auto">
-        <dropdown :closeAfterClick="true" :class="{active: menuNewActive}" @stateChange="onStateChange">
+        <dropdown
+          :closeAfterClick="true"
+          :class="{active: menuNewActive}"
+          @stateChange="onStateChange">
           <tooltip :title="i18n('buttonNew')" placement="down" align="start" slot="toggle">
             <span class="btn-ghost">
               <icon name="plus"></icon>
             </span>
           </tooltip>
-          <div class="dropdown-menu-item" v-text="i18n('buttonNew')" @click.prevent="onEditScript('_new')"></div>
+          <div
+            class="dropdown-menu-item"
+            v-text="i18n('buttonNew')"
+            @click.prevent="onEditScript('_new')"
+          />
           <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank" rel="noopener noreferrer"></a>
           <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank" rel="noopener noreferrer"></a>
-          <div class="dropdown-menu-item" v-text="i18n('buttonInstallFromURL')" @click.prevent="installFromURL"></div>
+          <div
+            class="dropdown-menu-item"
+            v-text="i18n('buttonInstallFromURL')"
+            @click.prevent="installFromURL"
+          />
         </dropdown>
         <tooltip :title="i18n('buttonUpdateAll')" placement="down" align="start">
           <span class="btn-ghost" @click="updateAll">
@@ -30,6 +41,7 @@
             <select :value="filters.sort.value" @change="onOrderChange">
               <option
                 v-for="option in filterOptions.sort"
+                :key="option.value"
                 v-text="option.title"
                 :value="option.value">
               </option>
@@ -147,6 +159,7 @@ export default {
       if (!objectGet(this.store, 'filteredScripts.length')) {
         return i18n('labelNoSearchScripts');
       }
+      return null;
     },
   },
   methods: {

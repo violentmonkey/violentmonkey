@@ -3,16 +3,20 @@
     <div class="mb-1">
       <button @click="onNew">+</button>
       <div class="inline-block ml-2" v-if="totalPages > 1">
-        <button :disabled="!hasPrevious" @click="page -= 1">&larr;</button>
+        <button :disabled="!hasPrevious" @click="setPage(currentPage.page - 1)">&larr;</button>
         <span class="mx-1" v-text="page"></span>
-        <button :disabled="!hasNext" @click="page += 1">&rarr;</button>
+        <button :disabled="!hasNext" @click="setPage(currentPage.page + 1)">&rarr;</button>
       </div>
     </div>
     <div class="edit-values-table" v-if="keys">
       <div class="edit-values-empty" v-if="!keys.length">
         <div v-text="i18n('noValues')"></div>
       </div>
-      <div class="edit-values-row flex" v-for="key in currentPage" @click="onEdit(key)">
+      <div
+        v-for="key in currentPage.data"
+        :key="key"
+        class="edit-values-row flex"
+        @click="onEdit(key)">
         <div class="ellipsis">
           <span v-text="key"></span>
           <div class="edit-values-btn">
@@ -54,7 +58,7 @@ export default {
   },
   data() {
     return {
-      page: 1,
+      currentPage: null,
       current: null,
       keys: null,
       values: null,
@@ -65,17 +69,11 @@ export default {
       if (!this.keys) return 0;
       return Math.floor(this.keys.length / PAGE_SIZE) + 1;
     },
-    currentPage() {
-      if (!this.keys) return null;
-      this.page = Math.max(1, Math.min(this.page, this.totalPages));
-      const offset = PAGE_SIZE * (this.page - 1);
-      return this.keys.slice(offset, offset + PAGE_SIZE);
-    },
     hasPrevious() {
-      return this.page > 1;
+      return this.currentPage.page > 1;
     },
     hasNext() {
-      return this.page < this.totalPages;
+      return this.currentPage.page < this.totalPages;
     },
   },
   watch: {
@@ -84,6 +82,14 @@ export default {
     },
   },
   methods: {
+    setPage(expected) {
+      const page = Math.max(1, Math.min(expected, this.totalPages));
+      const offset = PAGE_SIZE * (page - 1);
+      this.currentPage = {
+        page,
+        data: this.keys ? this.keys.slice(offset, offset + PAGE_SIZE) : null,
+      };
+    },
     getValue(key, sliced) {
       let value = this.values[key];
       const type = value[0];
@@ -99,6 +105,7 @@ export default {
       .then(values => {
         this.values = values;
         this.keys = Object.keys(values).sort();
+        this.setPage(1);
       });
     },
     updateValue({ key, value, isNew }) {

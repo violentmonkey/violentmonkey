@@ -72,7 +72,6 @@ const htmlPlugins = Object.entries(pages)
     }
   }
   if (options) {
-    if (options.inlineSource) options.inject = false;
     return new HtmlWebpackPlugin(options);
   }
 })

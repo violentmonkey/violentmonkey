@@ -5,7 +5,10 @@
     </div>
     <div class="menu-item" :class="{disabled:!options.isApplied}" @click="onToggle">
       <icon :name="getSymbolCheck(options.isApplied)"></icon>
-      <div class="flex-1" v-text="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"></div>
+      <div
+        class="flex-1"
+        v-text="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
+      />
     </div>
     <div class="menu">
       <div class="menu-item" @click="onManage">
@@ -25,25 +28,38 @@
         <div class="flex-1" v-text="i18n('menuFindScripts')"></div>
       </div>
     </div>
-    <div class="menu menu-commands" v-show="commands.length" :class="{expand: activeMenu === 'commands'}">
+    <div
+      class="menu menu-commands"
+      v-show="commands.length"
+      :class="{expand: activeMenu === 'commands'}">
       <div class="menu-item" @click="toggleMenu('commands')">
         <div class="flex-auto" v-text="i18n('menuCommands')"></div>
         <icon name="arrow" class="icon-collapse"></icon>
       </div>
       <div class="submenu">
-        <div class="menu-item" v-for="item in commands" @click="onCommand(item)">
+        <div
+          v-for="(item, index) in commands"
+          :key="index"
+          class="menu-item"
+          @click="onCommand(item)">
           <span v-text="item.name"></span>
         </div>
       </div>
     </div>
-    <div class="menu menu-scripts" v-show="scripts.length" :class="{expand: activeMenu === 'scripts'}">
+    <div
+      v-show="scripts.length"
+      class="menu menu-scripts"
+      :class="{expand: activeMenu === 'scripts'}">
       <div class="menu-item" @click="toggleMenu('scripts')">
         <div class="flex-auto" v-text="i18n('menuMatchedScripts')"></div>
         <icon name="arrow" class="icon-collapse"></icon>
       </div>
       <div class="submenu">
-        <div v-for="item in scripts">
-          <div class="menu-item" @click="onToggleScript(item)" :class="{disabled:!item.data.config.enabled}">
+        <div v-for="(item, index) in scripts" :key="index">
+          <div
+            class="menu-item"
+            :class="{ disabled: !item.data.config.enabled }"
+            @click="onToggleScript(item)">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
             <div class="flex-auto ellipsis" v-text="item.name" :title="item.name"></div>
           </div>

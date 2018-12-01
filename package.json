@@ -41,8 +41,8 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-import-resolver-babel-module": "^5.0.0-beta.1",
     "eslint-import-resolver-webpack": "^0.10.1",
-    "eslint-plugin-html": "^4.0.6",
     "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-vue": "^5.0.0-beta.5",
     "fancy-log": "^1.3.2",
     "gulp": "^4.0.0",
     "gulp-filter": "^5.0.1",
@@ -68,7 +68,6 @@
     "vue-template-compiler": "^2.5.17",
     "webpack": "^4.20.2",
     "webpack-bundle-analyzer": "^3.0.2",
-    "webpack-bundle-size-analyzer": "^2.7.0",
     "wrapper-webpack-plugin": "2.0.0"
   },
   "author": "Gerald <i@gerald.top>",

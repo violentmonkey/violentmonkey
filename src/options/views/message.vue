@@ -4,9 +4,14 @@
     <form v-if="message.buttons" @submit.prevent>
       <input class="mb-1" type="text" v-if="message.input !== false" v-model="message.input">
       <div>
-        <button v-for="button in message.buttons" class="mr-1"
-          :type="button.type || 'button'" v-text="button.text"
-          @click="onButtonClick(button)"></button>
+        <button
+          v-for="(button, index) in message.buttons"
+          :key="index"
+          class="mr-1"
+          :type="button.type || 'button'"
+          v-text="button.text"
+          @click="onButtonClick(button)"
+        />
       </div>
     </form>
   </div>

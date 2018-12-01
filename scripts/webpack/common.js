@@ -1,4 +1,4 @@
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const { isProd, styleRule, resolve, DIST } = require('../util');
@@ -57,15 +57,14 @@ module.exports = options => config => {
   config.optimization = {
     ...config.optimization,
   };
-  config.optimization.minimizer = [
-    ...config.optimization.minimizer || [],
-    isProd && new UglifyJsPlugin({
+  config.optimization.minimizer = (config.optimization.minimizer || [
+    isProd && new TerserPlugin({
       cache: true,
       parallel: true,
       sourceMap: true // set to true if you want JS source maps
     }),
     isProd && new OptimizeCSSAssetsPlugin(),
-  ].filter(Boolean);
+  ]).filter(Boolean);
   config.plugins = [
     ...config.plugins || [],
     isProd && new MiniCssExtractPlugin(),
