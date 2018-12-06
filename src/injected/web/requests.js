@@ -19,7 +19,7 @@ export function onRequestCreate(details) {
 
 export function onRequestStart(id) {
   const req = queue.shift();
-  start(req, id);
+  if (req) start(req, id);
 }
 
 export function onRequestCallback(res) {

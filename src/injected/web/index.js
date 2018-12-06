@@ -1,3 +1,4 @@
+import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import {
   getUniqId, bindEvents, attachFunction, cache2blobUrl,
 } from '../utils';
@@ -17,8 +18,14 @@ import { onDownload } from './download';
 
 let state = 0;
 
-export default function initialize(webId, contentId, props) {
+export default function initialize(
+  webId,
+  contentId,
+  props,
+  mode = INJECT_PAGE,
+) {
   bridge.props = props;
+  bridge.mode = mode;
   bridge.post = bindEvents(webId, contentId, onHandle);
   document.addEventListener('DOMContentLoaded', () => {
     state = 1;
@@ -75,6 +82,7 @@ function onHandle(obj) {
 }
 
 function onLoadScripts(data) {
+  if (data.mode !== bridge.mode) return;
   const start = [];
   const idle = [];
   const end = [];
@@ -96,9 +104,7 @@ function onLoadScripts(data) {
   };
   if (data.scripts) {
     forEach(data.scripts, script => {
-      // XXX: use camelCase since v2.6.3
-      const runAt = script.custom.runAt || script.custom['run-at']
-        || script.meta.runAt || script.meta['run-at'];
+      const runAt = script.custom.runAt || script.meta.runAt;
       const list = listMap[runAt] || end;
       list.push(script);
       store.values[script.props.id] = data.values[script.props.id];
@@ -114,7 +120,8 @@ function onLoadScripts(data) {
     const requireKeys = script.meta.require || [];
     const pathMap = script.custom.pathMap || {};
     const code = data.code[script.props.id] || '';
-    const { wrapper, thisObj } = wrapGM(script, code, data.cache);
+    const unsafeWindow = bridge.mode === INJECT_CONTENT ? global : window;
+    const { wrapper, thisObj } = wrapGM(script, code, data.cache, unsafeWindow);
     // Must use Object.getOwnPropertyNames to list unenumerable properties
     const argNames = Object.getOwnPropertyNames(wrapper);
     const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
@@ -130,7 +137,7 @@ function onLoadScripts(data) {
     // wrap code to make 'use strict' work
     codeSlices.push(`!function(){${code}\n}.call(this)`);
     codeSlices.push('}.call(this);');
-    const codeConcat = codeSlices.join('\n');
+    const codeConcat = `function(${argNames.join(',')}){${codeSlices.join('\n')}}`;
     const name = script.custom.name || script.meta.name || script.props.id;
     const args = map(argNames, key => wrapper[key]);
     const id = getUniqId('VMin');
@@ -139,20 +146,19 @@ function onLoadScripts(data) {
       const func = window[id];
       if (func) runCode(name, func, args, thisObj);
     });
-    bridge.post({ cmd: 'Inject', data: [id, argNames, codeConcat, fnId] });
+    bridge.post({ cmd: 'Inject', data: [id, codeConcat, fnId, bridge.mode] });
   }
   function run(list) {
     while (list.length) buildCode(list.shift());
   }
 }
 
-function wrapGM(script, code, cache) {
+function wrapGM(script, code, cache, unsafeWindow) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const gm = {};
   const grant = script.meta.grant || [];
   const urls = {};
-  const unsafeWindow = window;
   let thisObj = gm;
   if (!grant.length || (grant.length === 1 && grant[0] === 'none')) {
     // @grant none
@@ -181,6 +187,7 @@ function wrapGM(script, code, cache) {
     scriptWillUpdate: !!script.config.shouldUpdate,
     scriptHandler: 'Violentmonkey',
     version: bridge.version,
+    injectInto: bridge.mode,
     script: {
       description: script.meta.description || '',
       excludes: [...script.meta.exclude],
@@ -218,7 +225,7 @@ function wrapGM(script, code, cache) {
           try {
             if (handle) val = handle(val);
           } catch (e) {
-            if (process.env.DEBUG) console.warn(e);
+            if (process.env.DEBUG) log('warn', 'GM_getValue', e);
           }
           return val;
         }
@@ -287,8 +294,7 @@ function wrapGM(script, code, cache) {
     },
     GM_log: {
       value(...args) {
-        // eslint-disable-next-line no-console
-        console.log(`[Violentmonkey][${script.meta.name || 'No name'}]`, ...args);
+        log('log', [script.meta.name || 'No name'], ...args);
       },
     },
     GM_openInTab: {
@@ -479,16 +485,23 @@ function getWrapper(unsafeWindow) {
   return wrapper;
 }
 
+function log(level, tags, ...args) {
+  const tagList = ['Violentmonkey'];
+  if (tags) tagList.push(...tags);
+  const prefix = tagList.map(tag => `[${tag}]`).join('');
+  console[level](prefix, ...args);
+}
+
 function runCode(name, func, args, thisObj) {
   if (process.env.DEBUG) {
-    console.log(`Run script: ${name}`); // eslint-disable-line no-console
+    log('info', [bridge.mode], name);
   }
   try {
     func.apply(thisObj, args);
   } catch (e) {
-    let msg = `Error running script: ${name}\n${e}`;
-    if (e.message) msg = `${msg}\n${e.message}`;
-    console.error(msg);
+    let message = `\n${e}`;
+    if (e.message) message = `${message}\n${e.message}`;
+    log('error', [bridge.mode, name], message);
   }
 }
 

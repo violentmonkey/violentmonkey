@@ -1,11 +1,5 @@
 module.exports = {
-  plugins: [
-    'html',
+  extends: [
+    'plugin:vue/essential',
   ],
-  rules: {
-    'import/extensions': ['error', 'always', {
-      js: 'never',
-      vue: 'never',
-    }],
-  },
 };

@@ -254,6 +254,9 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: Sisennysyksikkö
+labelInjectionMode:
+  description: Label for default option to inject scripts.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Asennetaan skriptiä
@@ -305,6 +308,7 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Skriptieditori
+  touched: false
 labelScriptTemplate:
   description: Label for custom script template.
   message: Oma skriptipohja
@@ -358,6 +362,9 @@ lastSync:
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Lisää tietoa mustalistauksen malleista.
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: Skriptikomennot

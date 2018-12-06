@@ -261,6 +261,9 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: Ширина отступа
+labelInjectionMode:
+  description: Label for default option to inject scripts.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта...
@@ -312,6 +315,7 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Редактор скриптов
+  touched: false
 labelScriptTemplate:
   description: Label for custom script template.
   message: ''
@@ -365,6 +369,9 @@ lastSync:
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Подробнее о чёрных списках.
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: Команды скриптов

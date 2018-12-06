@@ -60,7 +60,7 @@ buttonReplaceAll:
   message: Tất cả
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Thiết lập lại
 buttonSave:
   description: Button to save modifications of a script.
   message: Lưu
@@ -214,7 +214,7 @@ labelEditValue:
   message: Sửa giá trị script
 labelEditing:
   description: Label for current editing script
-  message: ''
+  message: 'Đang chỉnh sửa: '
 labelEditor:
   description: Label for Editor settings
   message: Trình chỉnh sửa
@@ -254,6 +254,9 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: Khoảng cách thụt lề
+labelInjectionMode:
+  description: Label for default option to inject scripts.
+  message: 'Chế độ tiêm mặc định: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Đang cài đặt script
@@ -305,6 +308,7 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Trình chỉnh sửa script
+  touched: false
 labelScriptTemplate:
   description: Label for custom script template.
   message: Script template tuỳ chỉnh
@@ -358,6 +362,9 @@ lastSync:
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Tìm hiểu thêm về quy tắc danh sách đen.
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: Tìm hiểu thêm về các chế độ tiêm.
 menuCommands:
   description: Menu item to list script commands.
   message: Menu của script
@@ -372,7 +379,7 @@ menuMatchedScripts:
   message: Script trùng khớp
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Tạo script mới
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Đã vô hiệu hoá script

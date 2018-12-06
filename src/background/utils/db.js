@@ -2,7 +2,9 @@ import {
   i18n, request, buffer2string, getFullUrl, isRemote, getRnd4,
 } from '#/common';
 import { objectGet, objectSet } from '#/common/object';
-import { getNameURI, parseMeta, newScript } from './script';
+import {
+  getNameURI, parseMeta, newScript, getDefaultCustom,
+} from './script';
 import { testScript, testBlacklist } from './tester';
 import { register } from './init';
 import patchDB from './patch-db';
@@ -154,6 +156,12 @@ function initialize() {
         storeInfo.position = Math.max(storeInfo.position, getInt(objectGet(value, 'props.position')));
       }
     });
+    scripts.forEach(script => {
+      script.custom = {
+        ...getDefaultCustom(),
+        ...script.custom,
+      };
+    });
     Object.assign(store, {
       scripts,
       storeInfo,
@@ -185,16 +193,6 @@ export function normalizePosition() {
     if (objectGet(item, positionKey) !== position) {
       objectSet(item, positionKey, position);
       updates.push(item);
-    }
-    // XXX patch v2.8.0
-    if (typeof item.custom.origInclude === 'undefined') {
-      item.custom = Object.assign({
-        origInclude: true,
-        origExclude: true,
-        origMatch: true,
-        origExcludeMatch: true,
-      }, item.custom);
-      if (!updates.includes(item)) updates.push(item);
     }
   });
   store.storeInfo.position = store.scripts.length;

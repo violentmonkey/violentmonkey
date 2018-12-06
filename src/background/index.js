@@ -102,6 +102,7 @@ const commands = {
     if (reset && srcTab.id) resetValueOpener(srcTab.id);
     const data = {
       isApplied: getOption('isApplied'),
+      injectInto: getOption('defaultInjectInto'),
       version: VM_VER,
     };
     if (!data.isApplied) return data;
@@ -215,6 +216,12 @@ const commands = {
   },
   CheckPosition() {
     return sortScripts();
+  },
+  InjectScript(code, src) {
+    return browser.tabs.executeScript(src.tab.id, {
+      code: `${code};0`,
+      runAt: 'document_start',
+    });
   },
 };
 

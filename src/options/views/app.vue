@@ -5,9 +5,21 @@
         <img src="/public/images/icon128.png">
         <h1 v-text="i18n('extName')"></h1>
         <div class="aside-menu">
-          <a href="#scripts" :class="{active: tab === 'scripts'}" v-text="i18n('sideMenuInstalled')"></a>
-          <a href="#settings" :class="{active: tab === 'settings'}" v-text="i18n('sideMenuSettings')"></a>
-          <a href="#about" :class="{active: tab === 'about'}" v-text="i18n('sideMenuAbout')"></a>
+          <a
+            href="#scripts"
+            :class="{active: tab === 'scripts'}"
+            v-text="i18n('sideMenuInstalled')"
+          />
+          <a
+            href="#settings"
+            :class="{active: tab === 'settings'}"
+            v-text="i18n('sideMenuSettings')"
+          />
+          <a
+            href="#about"
+            :class="{active: tab === 'about'}"
+            v-text="i18n('sideMenuAbout')"
+          />
         </div>
         <div class="aside-toggle visible-sm" @click="aside = !aside">
           <icon name="arrow" />

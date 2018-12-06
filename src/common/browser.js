@@ -118,6 +118,7 @@ const meta = {
     remove: wrapAsync,
     sendMessage: wrapAsync,
     update: wrapAsync,
+    executeScript: wrapAsync,
   },
   webRequest: true,
 };

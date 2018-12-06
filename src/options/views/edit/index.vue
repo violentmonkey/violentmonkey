@@ -7,7 +7,7 @@
       </div>
       <div class="flex-auto flex">
         <div class="edit-hint flex-auto text-right ellipsis mr-1">
-          <a href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank">How to edit with your favorite editor?</a>
+          <a href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank" rel="noopener noreferrer">How to edit with your favorite editor?</a>
         </div>
         <div class="edit-buttons">
           <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
@@ -18,9 +18,24 @@
       </div>
     </div>
     <div class="edit-nav mx-1">
-      <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
-      <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
-      <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
+      <div
+        class="edit-nav-item"
+        :class="{active: nav === 'code'}"
+        v-text="i18n('editNavCode')"
+        @click="nav = 'code'"
+      />
+      <div
+        class="edit-nav-item"
+        :class="{active: nav === 'settings'}"
+        v-text="i18n('editNavSettings')"
+        @click="nav = 'settings'"
+      />
+      <div
+        class="edit-nav-item"
+        :class="{active: nav === 'values'}"
+        v-text="i18n('editNavValues')"
+        @click="nav = 'values'"
+      />
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
@@ -137,7 +152,7 @@ export default {
         match: fromList(custom.match),
         exclude: fromList(custom.exclude),
         excludeMatch: fromList(custom.excludeMatch),
-        runAt: custom.runAt || custom['run-at'] || '',
+        runAt: custom.runAt || '',
       });
       this.settings = settings;
       this.$nextTick(() => {

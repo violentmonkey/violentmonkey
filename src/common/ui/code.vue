@@ -165,8 +165,14 @@ export default {
       type: Boolean,
       default: false,
     },
-    value: true,
-    commands: true,
+    value: {
+      type: String,
+      default: '',
+    },
+    commands: {
+      type: Object,
+      default: null,
+    },
     global: {
       type: Boolean,
       default: true,

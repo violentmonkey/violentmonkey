@@ -3,7 +3,9 @@ anchorAuthor:
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href="http://greydus.tk" target="_blank">Greydus</a>'
+  message: >-
+    <a href="http://greydus.tk" target="_blank" rel="noopener
+    noreferrer">Greydus</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Todos/Ninguno
@@ -258,6 +260,9 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: ''
+labelInjectionMode:
+  description: Label for default option to inject scripts.
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Instalando script
@@ -309,6 +314,7 @@ labelRunAtDefault:
 labelScriptEditor:
   description: Shown in the title of the script editing page.
   message: Editor de Scripts
+  touched: false
 labelScriptTemplate:
   description: Label for custom script template.
   message: ''
@@ -362,6 +368,9 @@ lastSync:
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Aprender más sobre los patrones de la lista negra.
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: Comandos de scripts

@@ -1,11 +1,24 @@
 <template>
-  <div class="script" :class="{ disabled: !script.config.enabled, removed: script.config.removed }" :draggable="draggable" @dragstart.prevent="onDragStart">
+  <div
+    class="script"
+    :class="{ disabled: !script.config.enabled, removed: script.config.removed }"
+    :draggable="draggable"
+    @dragstart.prevent="onDragStart">
     <img class="script-icon hidden-xs" :src="safeIcon">
     <div class="script-info flex">
       <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
-      <tooltip :title="i18n('labelAuthor') + script.meta.author" class="script-author ml-1 hidden-sm" v-if="author" align="end">
+      <tooltip
+        v-if="author"
+        :title="i18n('labelAuthor') + script.meta.author"
+        class="script-author ml-1 hidden-sm"
+        align="end">
         <icon name="author"></icon>
-        <a class="ellipsis ml-1" :href="`mailto:${author.email}`" v-if="author.email" v-text="author.name"></a>
+        <a
+          v-if="author.email"
+          class="ellipsis ml-1"
+          :href="`mailto:${author.email}`"
+          v-text="author.name"
+        />
         <span class="ellipsis ml-1" v-else v-text="author.name"></span>
       </tooltip>
       <tooltip class="ml-1 hidden-sm" :title="lastUpdated.title" align="end">
@@ -33,14 +46,17 @@
             <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
           </span>
         </tooltip>
-        <tooltip :disabled="!canUpdate || script.checking" :title="i18n('buttonUpdate')" align="start">
+        <tooltip
+          :disabled="!canUpdate || script.checking"
+          :title="i18n('buttonUpdate')"
+          align="start">
           <span class="btn-ghost" @click="onUpdate">
             <icon name="refresh"></icon>
           </span>
         </tooltip>
         <span class="sep"></span>
         <tooltip :disabled="!homepageURL" :title="i18n('buttonHome')" align="start">
-          <a class="btn-ghost" target="_blank" :href="homepageURL">
+          <a class="btn-ghost" target="_blank" rel="noopener noreferrer" :href="homepageURL">
             <icon name="home"></icon>
           </a>
         </tooltip>
@@ -49,8 +65,15 @@
             <icon name="info"></icon>
           </span>
         </tooltip>
-        <tooltip :disabled="!script.meta.supportURL" :title="i18n('buttonSupport')" align="start">
-          <a class="btn-ghost" target="_blank" :href="script.meta.supportURL">
+        <tooltip
+          :disabled="!script.meta.supportURL"
+          :title="i18n('buttonSupport')"
+          align="start">
+          <a
+            class="btn-ghost"
+            target="_blank"
+            rel="noopener noreferrer"
+            :href="script.meta.supportURL">
             <icon name="question"></icon>
           </a>
         </tooltip>
