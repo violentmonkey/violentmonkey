@@ -12,8 +12,7 @@
     "lint:js": "eslint --ext .js,.vue .",
     "lint:yml": "gulp check",
     "svgo": "svgo --config .svgo.yml src/resources/icons",
-    "pretest": "cross-env NODE_ENV=test gulp buildTest",
-    "test": "node dist/test",
+    "test": "cross-env BABEL_ENV=test tape -r ./test/mock/register 'test/**/*.test.js'",
     "transform": "node scripts/transform-lock"
   },
   "description": "Violentmonkey",
@@ -30,6 +29,7 @@
     "@babel/plugin-syntax-import-meta": "^7.0.0",
     "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
+    "@babel/register": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
     "babel-minify-webpack-plugin": "^0.3.0",
