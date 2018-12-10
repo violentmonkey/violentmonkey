@@ -96,7 +96,9 @@ buttonVacuuming:
   message: Čistím databázu...
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: 'Kliknutím na OK sa zmeny neuložia, Zrušiť vráti späť na úpravu.'
+  message: |-
+    Úpravy nie sú uložené!
+    Kliknite na OK pre ich zrušenie alebo zrušiť pre ich ponechanie.
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: Webové adresy v tomto zozname nebudú injektované skriptami.
@@ -146,9 +148,7 @@ hintUseDownloadURL:
   message: Použiť @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: >-
-    Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej
-    pamäte.
+  message: Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej pamäte.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Inštalovať z $1
@@ -256,7 +256,7 @@ labelIndentUnit:
   message: 'Zarážka:'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Predvolený režim injektovania'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Inštalovanie skriptu
@@ -364,7 +364,7 @@ learnBlacklist:
   message: Získajte viac informácií o vzoroch čiernej listiny.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: 'Viac informácií o režimoch injektovania.'
 menuCommands:
   description: Menu item to list script commands.
   message: Príkazy skriptu
