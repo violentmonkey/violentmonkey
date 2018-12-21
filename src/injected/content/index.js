@@ -50,7 +50,6 @@ const bgHandlers = {
 export default function initialize(contentId, webId) {
   bridge.post = bindEvents(contentId, webId, onHandle);
   bridge.destId = webId;
-  const injectable = checkInjectable();
 
   browser.runtime.onMessage.addListener((req, src) => {
     const handle = bgHandlers[req.cmd];
@@ -78,10 +77,12 @@ export default function initialize(contentId, webId) {
         }
         return false;
       });
+      let support;
       data.scripts.forEach(script => {
         let injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
         if (injectInto === INJECT_AUTO) {
-          injectInto = injectable ? INJECT_PAGE : INJECT_CONTENT;
+          if (!support) support = { injectable: checkInjectable() };
+          injectInto = support.injectable ? INJECT_PAGE : INJECT_CONTENT;
         }
         const list = scriptLists[injectInto];
         if (list) list.push(script);
