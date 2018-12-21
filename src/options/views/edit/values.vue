@@ -37,7 +37,7 @@
         </div>
       </div>
       <label class="mb-1" v-text="i18n('valueLabelKey')"></label>
-      <input v-model="current.key" :readOnly="!current.isNew">
+      <input type="text" v-model="current.key" :readOnly="!current.isNew">
       <label class="mt-1 mb-1" v-text="i18n('valueLabelValue')"></label>
       <textarea class="flex-auto" v-model="current.value"></textarea>
     </div>
