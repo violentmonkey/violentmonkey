@@ -72,6 +72,7 @@ export function httpRequest(details, cb) {
   const req = requests[details.id];
   if (!req || req.cb) return;
   req.cb = cb;
+  req.anonymous = details.anonymous;
   const { xhr } = req;
   try {
     xhr.open(details.method, details.url, true, details.user || '', details.password || '');
@@ -162,7 +163,7 @@ function decodeBody(obj) {
 // Modifications on headers
 browser.webRequest.onBeforeSendHeaders.addListener(details => {
   const headers = details.requestHeaders;
-  const newHeaders = [];
+  let newHeaders = [];
   const vmHeaders = {};
   headers.forEach(header => {
     // if (header.name === 'VM-Task') {
@@ -186,6 +187,10 @@ browser.webRequest.onBeforeSendHeaders.addListener(details => {
           newHeaders.push({ name, value: vmHeaders[name] });
         }
       });
+      if (req.anonymous) {
+        // Drop cookie in anonymous mode
+        newHeaders = newHeaders.filter(({ name }) => name.toLowerCase() !== 'cookie');
+      }
     }
   }
   return { requestHeaders: newHeaders };

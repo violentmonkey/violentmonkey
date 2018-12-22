@@ -80,6 +80,7 @@ function start(req, id) {
   const { details } = req;
   const payload = {
     id,
+    anonymous: details.anonymous,
     method: details.method,
     url: details.url,
     user: details.user,
