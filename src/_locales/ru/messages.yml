@@ -62,7 +62,7 @@ buttonReplaceAll:
   message: Заменить все
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Сброс
 buttonSave:
   description: Button to save modifications of a script.
   message: Сохранить
@@ -126,13 +126,13 @@ editNavSettings:
   message: Настройки
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: Значения
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: ''
+  message: Отменить
 editValueSave:
   description: Button to save modification of a script value.
-  message: ''
+  message: Сохранить
 extDescription:
   description: Description for this extension.
   message: >-
@@ -143,7 +143,7 @@ extName:
   message: Violentmonkey
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: алфавиту
+  message: алфавитному порядку
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: порядку выполнения
@@ -161,7 +161,7 @@ installFrom:
   message: Установить с $1
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Закрыть после установки.
+  message: Закрыть окно после установки.
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
   message: 'Следить за обновлениями локального файла, пока открыто это окно.'
@@ -170,7 +170,7 @@ labelAbout:
   message: О расширении Violentmonkey
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: Дополнительные настройки
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Разрешить обновление
@@ -179,7 +179,7 @@ labelAuthor:
   message: 'Автор: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Обновить текущую вкладку после включения/отключения скрипта.
+  message: Обновить текущую вкладку после включения или отключения скрипта.
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Ежедневно проверять наличие обновлений скриптов.
@@ -218,13 +218,13 @@ labelDownloadURL:
   message: 'Источник загрузки:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Изменить значение скрипта
 labelEditing:
   description: Label for current editing script
-  message: ''
+  message: 'Редактируется: '
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Редактор
 labelExclude:
   description: Label of @exclude rules.
   message: 'Не задействовать на (правила исключений @exclude):'
@@ -245,13 +245,13 @@ labelGeneral:
   message: Общие настройки
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Помочь перевести
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Домашняя страница
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Дом. страница:'
+  message: 'Домашняя страница:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Импортировать настройки.
@@ -263,7 +263,7 @@ labelIndentUnit:
   message: Ширина отступа
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Режим иньекции по умолчанию'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта...
@@ -272,7 +272,7 @@ labelKeepOriginal:
   message: Использовать оригинальные правила.
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: Дата последнего обновления $1
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Номер строки:'
@@ -318,7 +318,7 @@ labelScriptEditor:
   touched: false
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: 'Пользовательский шаблон скрипта'
 labelSearch:
   description: Label for search input in search box.
   message: 'Найти: '
@@ -346,7 +346,7 @@ labelSyncDisabled:
   message: ничем
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: ''
+  message: Автоматически переустанавливать по истечении срока действия
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
@@ -371,7 +371,7 @@ learnBlacklist:
   message: Подробнее о чёрных списках.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: 'Подробнее о режимах инъекций'
 menuCommands:
   description: Menu item to list script commands.
   message: Команды скриптов
@@ -386,7 +386,7 @@ menuMatchedScripts:
   message: Совпадающие скрипты
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: 'Создание нового скрипта'
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Скрипты отключены
@@ -456,7 +456,7 @@ msgSavedCustomCSS:
   message: Пользовательские стили CSS сохранены.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: 'Пользовательский шаблон скрипта был обновлен'
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Скрипт [$1] обновлён!'
@@ -483,16 +483,16 @@ msgUpdating:
   message: Обновление...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: Значения не сохраняются
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Показывать включенные скрипты первыми
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: Возможность выполнить поиск с учетом регистра
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Возможность поиска по регулярному выражению
 sideMenuAbout:
   description: 'Side menu: About'
   message: О расширении
@@ -513,4 +513,4 @@ valueLabelValue:
   message: Значение (сериализованное как JSON)
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
-  message: ''
+  message: - Некоторые строки слишком длинные и открыты только для чтения. Пожалуйста откройте его с помощью внешнего редактора.
