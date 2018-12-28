@@ -513,4 +513,6 @@ valueLabelValue:
   message: Значение (сериализованное как JSON)
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
-  message: - Некоторые строки слишком длинные и открыты только для чтения. Пожалуйста откройте его с помощью внешнего редактора.
+  message: >-
+    Некоторые строки слишком длинные и открыты только для чтения.
+    Пожалуйста откройте его с помощью внешнего редактора.
