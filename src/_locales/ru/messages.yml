@@ -5,7 +5,8 @@ anchorTranslator:
   description: Translator shown on about tab.
   message: >-
     softovikk, <a href=https://github.com/alexesprit>alexesprit</a>, <a
-    href=https://github.com/bershan2>bershan2</a>
+    href=https://github.com/bershan2>bershan2</a>, <a
+    href=https://github.com/bogachenko>bogachenko</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Выбрать Всё/Ничего
