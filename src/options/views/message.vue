@@ -66,5 +66,8 @@ export default {
   border-bottom-left-radius: .2rem;
   border-bottom-right-radius: .2rem;
   box-shadow: 0 0 .2rem rgba(0,0,0,.2);
+  input {
+    width: 100%;
+  }
 }
 </style>
