@@ -13,6 +13,9 @@ const specialHeaders = [
   'host',
   'cookie',
 ];
+const specialHeaderPrefixes = [
+  'sec-',
+];
 // const tasks = {};
 
 export function getRequestId() {
@@ -68,6 +71,11 @@ function xhrCallbackWrapper(req) {
   };
 }
 
+function isSpecialHeader(lowerHeader) {
+  return specialHeaders.includes(lowerHeader)
+    || specialHeaderPrefixes.includes(lowerHeader.replace(/-.*/, '-'));
+}
+
 export function httpRequest(details, cb) {
   const req = requests[details.id];
   if (!req || req.cb) return;
@@ -83,7 +91,7 @@ export function httpRequest(details, cb) {
         // `VM-` headers are reserved
         if (lowerKey.startsWith('vm-')) return;
         xhr.setRequestHeader(
-          specialHeaders.includes(lowerKey) ? `VM-${key}` : key,
+          isSpecialHeader(lowerKey) ? `VM-${key}` : key,
           details.headers[key],
         );
       });
@@ -183,7 +191,7 @@ browser.webRequest.onBeforeSendHeaders.addListener(details => {
       verify[details.requestId] = reqId;
       req.coreId = details.requestId;
       Object.keys(vmHeaders).forEach(name => {
-        if (specialHeaders.includes(name.toLowerCase())) {
+        if (isSpecialHeader(name.toLowerCase())) {
           newHeaders.push({ name, value: vmHeaders[name] });
         }
       });
