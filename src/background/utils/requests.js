@@ -13,9 +13,6 @@ const specialHeaders = [
   'host',
   'cookie',
 ];
-const specialHeaderPrefixes = [
-  'sec-',
-];
 // const tasks = {};
 
 export function getRequestId() {
@@ -73,7 +70,7 @@ function xhrCallbackWrapper(req) {
 
 function isSpecialHeader(lowerHeader) {
   return specialHeaders.includes(lowerHeader)
-    || specialHeaderPrefixes.includes(lowerHeader.replace(/-.*/, '-'));
+    || lowerHeader.startsWith('sec-');
 }
 
 export function httpRequest(details, cb) {
