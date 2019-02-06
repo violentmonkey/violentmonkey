@@ -15,7 +15,7 @@ buttonCancel:
   message: キャンセル
 buttonClose:
   description: Button to close window.
-  message: キャンセル
+  message: 閉じる
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: インストール
@@ -63,7 +63,7 @@ buttonReplaceAll:
   message: すべて置換
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: リセット
 buttonSave:
   description: Button to save modifications of a script.
   message: 保存
@@ -81,7 +81,7 @@ buttonSupport:
   message: サポートページ
 buttonUndo:
   description: Button to undo removement of a script.
-  message: 戻す
+  message: 元に戻す
 buttonUpdate:
   description: Check a script for updates.
   message: 更新を確認
@@ -137,10 +137,10 @@ extName:
   message: Violentmonkey
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: アルファベット順序
+  message: アルファベット順
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: 実行順序
+  message: 実行順
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: URLを入力してください。
@@ -233,7 +233,7 @@ labelFeedback:
   message: フィードバック
 labelFilterSort:
   description: Label for sort filter.
-  message: $1 によって
+  message: $1 で並べ替え
 labelGeneral:
   description: Label for general settings.
   message: 基本設定
@@ -318,7 +318,7 @@ labelSearch:
   message: '検索する文字列: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: スクリプトを検索
+  message: スクリプトを検索…
 labelSettings:
   description: Label shown on the top of settings page
   message: 設定
@@ -371,7 +371,7 @@ menuCommands:
   message: ユーザスクリプトコマンド
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: オプション
+  message: ダッシュボードを開く
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 表示しているサイト用のスクリプトを探す
@@ -428,7 +428,7 @@ msgLoadingData:
   message: スクリプトの取得中…
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: 依存ライブラリを取得中… ($1⁄$2)
+  message: 依存ライブラリを取得中… ($1/$2)
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
