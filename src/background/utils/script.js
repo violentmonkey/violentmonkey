@@ -112,6 +112,9 @@ export function getNameURI(script) {
 }
 
 export function compareVersion(ver1, ver2) {
+  if(ver1 === undefined || ver2 === undefined) {
+    return -1;
+  }
   const parts1 = (ver1 || '').split('.');
   const parts2 = (ver2 || '').split('.');
   for (let i = 0; i < parts1.length || i < parts2.length; i += 1) {
