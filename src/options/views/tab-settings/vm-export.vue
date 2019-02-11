@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import Modal from 'vueleton/lib/modal';
+import Modal from 'vueleton/lib/modal/bundle';
 import { sendMessage, getLocaleString } from '#/common';
 import { objectGet } from '#/common/object';
 import options from '#/common/options';

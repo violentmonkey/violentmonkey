@@ -1,4 +1,4 @@
-import Modal from 'vueleton/lib/modal';
+import Modal from 'vueleton/lib/modal/bundle';
 import { route } from '#/common/router';
 import Message from '../views/message';
 

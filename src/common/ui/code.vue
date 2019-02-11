@@ -8,31 +8,31 @@
       </form>
       <form class="inline-block mr-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
-        <tooltip title="Ctrl-F">
+        <tooltip content="Ctrl-F">
           <input type="text" ref="search" v-model="search.state.query">
         </tooltip>
-        <tooltip title="Shift-Ctrl-G">
+        <tooltip content="Shift-Ctrl-G">
           <button type="button" @click="findNext(1)">&lt;</button>
         </tooltip>
-        <tooltip title="Ctrl-G">
+        <tooltip content="Ctrl-G">
           <button type="submit">&gt;</button>
         </tooltip>
       </form>
       <form class="inline-block mr-1" @submit.prevent="replace()" v-if="!readonly">
         <span v-text="i18n('labelReplace')"></span>
         <input type="text" v-model="search.state.replace">
-        <tooltip title="Shift-Ctrl-F">
+        <tooltip content="Shift-Ctrl-F">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
-        <tooltip title="Shift-Ctrl-R">
+        <tooltip content="Shift-Ctrl-R">
           <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
         </tooltip>
       </form>
       <div class="inline-block">
-        <tooltip :title="i18n('searchUseRegex')">
+        <tooltip :content="i18n('searchUseRegex')">
           <toggle-button v-model="searchOptions.useRegex">.*</toggle-button>
         </tooltip>
-        <tooltip :title="i18n('searchCaseSensitive')">
+        <tooltip :content="i18n('searchCaseSensitive')">
           <toggle-button v-model="searchOptions.caseSensitive">Aa</toggle-button>
         </tooltip>
       </div>
@@ -57,7 +57,7 @@ import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import CodeMirror from 'codemirror';
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { debounce } from '#/common';
 import ToggleButton from '#/common/ui/toggle-button';
 import options from '#/common/options';

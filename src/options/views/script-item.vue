@@ -9,7 +9,7 @@
       <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
       <tooltip
         v-if="author"
-        :title="i18n('labelAuthor') + script.meta.author"
+        :content="i18n('labelAuthor') + script.meta.author"
         class="script-author ml-1 hidden-sm"
         align="end">
         <icon name="author"></icon>
@@ -21,13 +21,13 @@
         />
         <span class="ellipsis ml-1" v-else v-text="author.name"></span>
       </tooltip>
-      <tooltip class="ml-1 hidden-sm" :title="lastUpdated.title" align="end">
+      <tooltip class="ml-1 hidden-sm" :content="lastUpdated.title" align="end">
         <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
         <span class="secondary ml-1" v-text="lastUpdated.show"></span>
       </tooltip>
       <div v-if="script.config.removed" class="ml-1" v-text="i18n('labelRemoved')"></div>
       <div v-if="script.config.removed" class="ml-1">
-        <tooltip :title="i18n('buttonUndo')" placement="left">
+        <tooltip :content="i18n('buttonUndo')" placement="left">
           <span class="btn-ghost" @click="onRemove(0)">
             <icon name="undo"></icon>
           </span>
@@ -36,38 +36,38 @@
     </div>
     <div class="script-buttons flex">
       <div class="flex-auto flex flex-wrap">
-        <tooltip :title="i18n('buttonEdit')" align="start">
+        <tooltip :content="i18n('buttonEdit')" align="start">
           <span class="btn-ghost" @click="onEdit">
             <icon name="code"></icon>
           </span>
         </tooltip>
-        <tooltip :title="labelEnable" align="start">
+        <tooltip :content="labelEnable" align="start">
           <span class="btn-ghost" @click="onEnable">
             <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
           </span>
         </tooltip>
         <tooltip
           :disabled="!canUpdate || script.checking"
-          :title="i18n('buttonUpdate')"
+          :content="i18n('buttonUpdate')"
           align="start">
           <span class="btn-ghost" @click="onUpdate">
             <icon name="refresh"></icon>
           </span>
         </tooltip>
         <span class="sep"></span>
-        <tooltip :disabled="!homepageURL" :title="i18n('buttonHome')" align="start">
+        <tooltip :disabled="!homepageURL" :content="i18n('buttonHome')" align="start">
           <a class="btn-ghost" target="_blank" rel="noopener noreferrer" :href="homepageURL">
             <icon name="home"></icon>
           </a>
         </tooltip>
-        <tooltip :disabled="!description" :title="description" align="start">
+        <tooltip :disabled="!description" :content="description" align="start">
           <span class="btn-ghost">
             <icon name="info"></icon>
           </span>
         </tooltip>
         <tooltip
           :disabled="!script.meta.supportURL"
-          :title="i18n('buttonSupport')"
+          :content="i18n('buttonSupport')"
           align="start">
           <a
             class="btn-ghost"
@@ -79,7 +79,7 @@
         </tooltip>
         <div class="script-message" v-text="script.message"></div>
       </div>
-      <tooltip :title="i18n('buttonRemove')" align="end">
+      <tooltip :content="i18n('buttonRemove')" align="end">
         <span class="btn-ghost" @click="onRemove(1)">
           <icon name="trash"></icon>
         </span>
@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { sendMessage, getLocaleString } from '#/common';
 import { objectGet } from '#/common/object';
 import Icon from '#/common/ui/icon';

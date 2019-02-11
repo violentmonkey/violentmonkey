@@ -195,6 +195,10 @@ button,
   font-family: "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", Courier, monospace;
 }
 
+.vl-tooltip {
+  z-index: 10000 !important;
+}
+
 .vl-dropdown-menu {
   padding: .5rem;
   border: 1px solid #bbb;
