@@ -2,11 +2,14 @@
   <section>
     <h3 v-text="i18n('labelDataExport')"></h3>
     <div class="export-list">
-      <div class="ellipsis" v-for="item in items"
+      <div
+        v-for="(item, index) in items"
+        :key="index"
+        class="ellipsis"
         :class="{active: item.active}"
         @click="item.active = !item.active"
-        v-text="getName(item)">
-      </div>
+        v-text="getName(item)"
+      />
     </div>
     <button v-text="i18n('buttonAllNone')" @click="toggleSelection()"></button>
     <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
@@ -14,7 +17,11 @@
       <setting-check name="exportValues" />
       <span v-text="i18n('labelExportScriptData')"></span>
     </label>
-    <modal v-if="store.ffDownload" transition="in-out" :visible="!!store.ffDownload.url" @close="store.ffDownload = {}">
+    <modal
+      v-if="store.ffDownload"
+      transition="in-out"
+      :visible="!!store.ffDownload.url"
+      @close="store.ffDownload = {}">
       <div class="export-modal modal-content">
         <a :download="store.ffDownload.name" :href="store.ffDownload.url">
           Right click and save as<br />

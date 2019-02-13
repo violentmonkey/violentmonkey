@@ -62,7 +62,7 @@ buttonReplaceAll:
   message: Tous
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: 'Réinitialiser'
 buttonSave:
   description: Button to save modifications of a script.
   message: Sauvegarder
@@ -221,7 +221,7 @@ labelEditValue:
   message: Éditer la valeur du script
 labelEditing:
   description: Label for current editing script
-  message: ''
+  message: 'En cours d’édition: '
 labelEditor:
   description: Label for Editor settings
   message: Éditeur
@@ -263,7 +263,7 @@ labelIndentUnit:
   message: Taille de l’indentation
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Mode d’injection par défaut:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Installation du script
@@ -318,7 +318,7 @@ labelScriptEditor:
   touched: false
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: 'Modèle de script personnalisé'
 labelSearch:
   description: Label for search input in search box.
   message: 'Rechercher: '
@@ -371,7 +371,7 @@ learnBlacklist:
   message: En apprendre plus sur les motifs de la liste noire.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: 'En savoir plus sur les modes d’injection'
 menuCommands:
   description: Menu item to list script commands.
   message: Commandes de script
@@ -386,7 +386,7 @@ menuMatchedScripts:
   message: Scripts associés
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: 'Créer un nouveau script'
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Scripts désactivés
@@ -456,7 +456,7 @@ msgSavedCustomCSS:
   message: Style personnalisé mis à jour.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: 'Le modèle de script personnalisé a été mis à jour.'
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Script [$1] mis à jour!'

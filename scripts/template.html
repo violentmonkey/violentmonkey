@@ -10,9 +10,6 @@ if (htmlWebpackPlugin.options.manifest) {
 htmlWebpackPlugin.options.css.forEach(url => {
 %><link rel="stylesheet" href="<%= url %>"><%
 });
-htmlWebpackPlugin.options.inlineSource && htmlWebpackPlugin.files.css.forEach(file => {
-%><style><%= compilation.assets[file.slice(htmlWebpackPlugin.files.publicPath.length)].source() %></style><%
-});
 htmlWebpackPlugin.options.js.forEach(url => {
 %><script src="<%= url %>"></script><%
 });

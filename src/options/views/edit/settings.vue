@@ -129,6 +129,7 @@ export default {
       display: block;
     }
     input[type=text] {
+      display: block;
       width: 100%;
     }
     > * {

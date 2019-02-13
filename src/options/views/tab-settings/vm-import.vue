@@ -1,8 +1,13 @@
 <template>
   <section>
-    <h3 v-text="i18n('labelDataImport')"></h3>
-    <button v-text="i18n('buttonImportData')" @click="importFile"></button>
-    <button :title="i18n('hintVacuum')" @click="vacuum" :disabled="vacuuming" v-text="labelVacuum"></button>
+    <h3 v-text="i18n('labelDataImport')" />
+    <button v-text="i18n('buttonImportData')" @click="importFile" />
+    <button
+      :title="i18n('hintVacuum')"
+      @click="vacuum"
+      :disabled="vacuuming"
+      v-text="labelVacuum"
+    />
     <div class="mt-1">
       <label>
         <setting-check name="importSettings" />

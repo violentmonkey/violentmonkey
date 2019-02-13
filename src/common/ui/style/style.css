@@ -41,8 +41,7 @@ input[disabled] ~ * {
   color: gray;
 }
 input[type=text] {
-  display: block;
-  width: 100%;
+  line-height: 1.5rem;
 }
 textarea {
   display: block;
@@ -66,19 +65,19 @@ svg {
   fill: currentColor;
 }
 
+button,
 .btn-ghost,
-.sep,
-button {
+.sep {
   display: inline-block;
   padding: 0 .5rem;
   font-size: 1rem;
   line-height: 1.5;
-  cursor: pointer;
   vertical-align: bottom;
 }
 .btn-ghost {
   color: inherit;
   border: 1px solid transparent;
+  cursor: pointer;
   &:hover {
     border-color: #bbb;
     background: white;

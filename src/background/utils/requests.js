@@ -68,10 +68,16 @@ function xhrCallbackWrapper(req) {
   };
 }
 
+function isSpecialHeader(lowerHeader) {
+  return specialHeaders.includes(lowerHeader)
+    || lowerHeader.startsWith('sec-');
+}
+
 export function httpRequest(details, cb) {
   const req = requests[details.id];
   if (!req || req.cb) return;
   req.cb = cb;
+  req.anonymous = details.anonymous;
   const { xhr } = req;
   try {
     xhr.open(details.method, details.url, true, details.user || '', details.password || '');
@@ -82,7 +88,7 @@ export function httpRequest(details, cb) {
         // `VM-` headers are reserved
         if (lowerKey.startsWith('vm-')) return;
         xhr.setRequestHeader(
-          specialHeaders.includes(lowerKey) ? `VM-${key}` : key,
+          isSpecialHeader(lowerKey) ? `VM-${key}` : key,
           details.headers[key],
         );
       });
@@ -162,7 +168,7 @@ function decodeBody(obj) {
 // Modifications on headers
 browser.webRequest.onBeforeSendHeaders.addListener(details => {
   const headers = details.requestHeaders;
-  const newHeaders = [];
+  let newHeaders = [];
   const vmHeaders = {};
   headers.forEach(header => {
     // if (header.name === 'VM-Task') {
@@ -182,10 +188,14 @@ browser.webRequest.onBeforeSendHeaders.addListener(details => {
       verify[details.requestId] = reqId;
       req.coreId = details.requestId;
       Object.keys(vmHeaders).forEach(name => {
-        if (specialHeaders.includes(name.toLowerCase())) {
+        if (isSpecialHeader(name.toLowerCase())) {
           newHeaders.push({ name, value: vmHeaders[name] });
         }
       });
+      if (req.anonymous) {
+        // Drop cookie in anonymous mode
+        newHeaders = newHeaders.filter(({ name }) => name.toLowerCase() !== 'cookie');
+      }
     }
   }
   return { requestHeaders: newHeaders };

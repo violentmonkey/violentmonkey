@@ -18,9 +18,24 @@
       </div>
     </div>
     <div class="edit-nav mx-1">
-      <div class="edit-nav-item" v-text="i18n('editNavCode')" :class="{active: nav === 'code'}" @click="nav = 'code'"></div>
-      <div class="edit-nav-item" v-text="i18n('editNavSettings')" :class="{active: nav === 'settings'}" @click="nav = 'settings'"></div>
-      <div class="edit-nav-item" v-text="i18n('editNavValues')" :class="{active: nav === 'values'}" @click="nav = 'values'"></div>
+      <div
+        class="edit-nav-item"
+        :class="{active: nav === 'code'}"
+        v-text="i18n('editNavCode')"
+        @click="nav = 'code'"
+      />
+      <div
+        class="edit-nav-item"
+        :class="{active: nav === 'settings'}"
+        v-text="i18n('editNavSettings')"
+        @click="nav = 'settings'"
+      />
+      <div
+        class="edit-nav-item"
+        :class="{active: nav === 'values'}"
+        v-text="i18n('editNavValues')"
+        @click="nav = 'values'"
+      />
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code

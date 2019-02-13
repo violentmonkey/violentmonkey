@@ -4,7 +4,12 @@
     <div v-if="state">
       <span v-text="i18n('labelSyncService')"></span>
       <select class="mx-1" :value="syncConfig.current" @change="onSyncChange">
-        <option v-for="service in syncServices" v-text="service.displayName" :value="service.name"></option>
+        <option
+          v-for="service in syncServices"
+          :key="service.name"
+          v-text="service.displayName"
+          :value="service.name"
+        />
       </select>
       <button v-text="state.label" v-if="service.name"
       :disabled="!state.canAuthorize" @click="onAuthorize"></button>
@@ -61,6 +66,7 @@ export default {
           ...states,
         ];
       }
+      return null;
     },
     service() {
       if (this.syncServices) {
@@ -72,6 +78,7 @@ export default {
         }
         return service;
       }
+      return null;
     },
     state() {
       const { service } = this;
@@ -86,6 +93,7 @@ export default {
           canSync,
         };
       }
+      return null;
     },
   },
   methods: {

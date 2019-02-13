@@ -4,12 +4,12 @@
       <button class="pull-right" @click="clearSearch">&times;</button>
       <form class="inline-block mr-1" @submit.prevent="goToLine()">
         <span v-text="i18n('labelLineNumber')"></span>
-        <input class="w-1" v-model="search.line">
+        <input type="text" class="w-1" v-model="search.line">
       </form>
       <form class="inline-block mr-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
         <tooltip title="Ctrl-F">
-          <input ref="search" v-model="search.state.query">
+          <input type="text" ref="search" v-model="search.state.query">
         </tooltip>
         <tooltip title="Shift-Ctrl-G">
           <button type="button" @click="findNext(1)">&lt;</button>
@@ -20,7 +20,7 @@
       </form>
       <form class="inline-block mr-1" @submit.prevent="replace()" v-if="!readonly">
         <span v-text="i18n('labelReplace')"></span>
-        <input v-model="search.state.replace">
+        <input type="text" v-model="search.state.replace">
         <tooltip title="Shift-Ctrl-F">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
@@ -165,8 +165,14 @@ export default {
       type: Boolean,
       default: false,
     },
-    value: true,
-    commands: true,
+    value: {
+      type: String,
+      default: '',
+    },
+    commands: {
+      type: Object,
+      default: null,
+    },
     global: {
       type: Boolean,
       default: true,

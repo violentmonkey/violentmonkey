@@ -1,5 +1,8 @@
 module.exports = {
-  parser: 'babel-eslint',
+  root: true,
+  parserOptions: {
+    parser: 'babel-eslint',
+  },
   extends: [
     'airbnb-base',
     require.resolve('./scripts/eslint/vue'),
@@ -7,7 +10,6 @@ module.exports = {
   env: {
     browser: true,
   },
-  plugins: [],
   settings: {
     'import/resolver': {
       'babel-module': {},
