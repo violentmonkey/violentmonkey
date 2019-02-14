@@ -9,6 +9,7 @@ anchorTranslator:
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Tous/Aucun
+  touched: false
 buttonCancel:
   description: Cancel button on dialog.
   message: Annuler
@@ -62,7 +63,7 @@ buttonReplaceAll:
   message: Tous
 buttonReset:
   description: Button to reset to default values.
-  message: 'Réinitialiser'
+  message: Réinitialiser
 buttonSave:
   description: Button to save modifications of a script.
   message: Sauvegarder
@@ -318,7 +319,7 @@ labelScriptEditor:
   touched: false
 labelScriptTemplate:
   description: Label for custom script template.
-  message: 'Modèle de script personnalisé'
+  message: Modèle de script personnalisé
 labelSearch:
   description: Label for search input in search box.
   message: 'Rechercher: '
@@ -371,7 +372,7 @@ learnBlacklist:
   message: En apprendre plus sur les motifs de la liste noire.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: 'En savoir plus sur les modes d’injection'
+  message: En savoir plus sur les modes d’injection
 menuCommands:
   description: Menu item to list script commands.
   message: Commandes de script
@@ -386,7 +387,7 @@ menuMatchedScripts:
   message: Scripts associés
 menuNewScript:
   description: Menu item to create a new script.
-  message: 'Créer un nouveau script'
+  message: Créer un nouveau script
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Scripts désactivés
@@ -456,7 +457,7 @@ msgSavedCustomCSS:
   message: Style personnalisé mis à jour.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: 'Le modèle de script personnalisé a été mis à jour.'
+  message: Le modèle de script personnalisé a été mis à jour.
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Script [$1] mis à jour!'
@@ -511,6 +512,9 @@ valueLabelKey:
 valueLabelValue:
   description: Label for value of a script value.
   message: Valeur (sérialisée comme JSON)
+visitWebsite:
+  description: Label for link to open Violentmonkey website.
+  message: ''
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-

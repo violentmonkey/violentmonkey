@@ -9,6 +9,7 @@ anchorTranslator:
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Alle/Keines
+  touched: false
 buttonCancel:
   description: Cancel button on dialog.
   message: Abbrechen
@@ -505,6 +506,9 @@ valueLabelKey:
   message: ''
 valueLabelValue:
   description: Label for value of a script value.
+  message: ''
+visitWebsite:
+  description: Label for link to open Violentmonkey website.
   message: ''
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.

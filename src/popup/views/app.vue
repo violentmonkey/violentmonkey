@@ -68,7 +68,11 @@
         <icon name="arrow" class="icon-collapse"></icon>
       </div>
       <div class="submenu">
-        <div v-for="(item, index) in scripts" :key="index" @mouseenter="message = item.name" @mouseleave="message = ''">
+        <div
+          v-for="(item, index) in scripts"
+          :key="index"
+          @mouseenter="message = item.name"
+          @mouseleave="message = ''">
           <div
             class="menu-item menu-area"
             :class="{ disabled: !item.data.config.enabled }"
@@ -85,7 +89,7 @@
       </div>
     </div>
     <footer>
-      <span @click="onVisitWebsite">Visit Website</span>
+      <span @click="onVisitWebsite" v-text="i18n('visitWebsite')" />
     </footer>
     <div class="message" v-if="message">
       <div v-text="message"></div>

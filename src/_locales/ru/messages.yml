@@ -10,6 +10,7 @@ anchorTranslator:
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Выбрать Всё/Ничего
+  touched: false
 buttonCancel:
   description: Cancel button on dialog.
   message: Отмена
@@ -104,8 +105,7 @@ confirmNotSaved:
     Нажмите OK, чтобы выйти или Отмена, чтобы вернуться.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: >-
-    URL-адрес, сопоставленный в этом списке, не будет вводиться скриптами.
+  message: 'URL-адрес, сопоставленный в этом списке, не будет вводиться скриптами.'
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -154,7 +154,9 @@ hintUseDownloadURL:
   message: Использовать @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Сбросить избыточный кэш и попробуйте перезагрузить недостающие ресурсы в кэше.
+  message: >-
+    Сбросить избыточный кэш и попробуйте перезагрузить недостающие ресурсы в
+    кэше.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Установить с $1
@@ -262,7 +264,7 @@ labelIndentUnit:
   message: Ширина отступа
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: 'Режим иньекции по умолчанию'
+  message: Режим иньекции по умолчанию
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта
@@ -280,7 +282,7 @@ labelLineWrapping:
   message: Переносить длинные строки
 labelMatch:
   description: Label of @match rules.
-  message: 'Правило @соответствия'
+  message: Правило @соответствия
 labelName:
   description: Label of script name.
   message: 'Имя:'
@@ -289,7 +291,7 @@ labelNoName:
   message: Нет имени
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: К сожалению, у вас еще не установлено ни одного скрипта.
+  message: 'К сожалению, у вас еще не установлено ни одного скрипта.'
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Скрипты не найдены.
@@ -317,7 +319,7 @@ labelScriptEditor:
   touched: false
 labelScriptTemplate:
   description: Label for custom script template.
-  message: 'Пользовательский шаблон скрипта'
+  message: Пользовательский шаблон скрипта
 labelSearch:
   description: Label for search input in search box.
   message: 'Найти: '
@@ -510,8 +512,11 @@ valueLabelKey:
 valueLabelValue:
   description: Label for value of a script value.
   message: Значение (сериализованное как JSON)
+visitWebsite:
+  description: Label for link to open Violentmonkey website.
+  message: ''
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-
-    Некоторые строки слишком длинные и открыты только для чтения.
-    Пожалуйста откройте его с помощью внешнего редактора.
+    Некоторые строки слишком длинные и открыты только для чтения. Пожалуйста
+    откройте его с помощью внешнего редактора.
