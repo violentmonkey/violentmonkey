@@ -514,7 +514,7 @@ valueLabelValue:
   message: Значение (сериализованное как JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Посетить сайт
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-
