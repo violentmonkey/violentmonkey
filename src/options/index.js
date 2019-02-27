@@ -16,12 +16,12 @@ Object.assign(store, {
   scripts: [],
   sync: [],
   filteredScripts: [],
+  title: null,
 });
 zip.workerScriptsPath = '/public/lib/zip.js/';
 initialize();
 
 function initialize() {
-  document.title = i18n('extName');
   initMain();
   options.ready(() => {
     const el = document.createElement('div');

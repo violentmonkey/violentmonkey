@@ -58,7 +58,7 @@ import { i18n, sendMessage, noop } from '#/common';
 import { objectGet } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import { route } from '#/common/router';
-import { showMessage } from '../../utils';
+import { store, showMessage } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
 
@@ -95,7 +95,9 @@ export default {
   computed: {
     scriptName() {
       const { custom, meta } = this.script || {};
-      return custom && custom.name || meta && meta.name;
+      const scriptName = custom && custom.name || meta && meta.name;
+      store.title = scriptName;
+      return scriptName;
     },
   },
   watch: {
@@ -231,6 +233,9 @@ export default {
     onWarnLarge(tooLarge) {
       this.tooLarge = tooLarge;
     },
+  },
+  beforeDestroy() {
+    store.title = null;
   },
 };
 </script>

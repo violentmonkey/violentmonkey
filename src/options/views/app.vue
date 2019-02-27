@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import { i18n } from '#/common';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 import Installed from './tab-installed';
@@ -42,6 +43,7 @@ const tabs = {
   settings: Settings,
   about: About,
 };
+const extName = i18n('extName');
 
 export default {
   components: {
@@ -61,6 +63,11 @@ export default {
     },
     tabComponent() {
       return tabs[this.tab];
+    },
+  },
+  watch: {
+    'store.title'(title) {
+      document.title = title ? `${title} - ${extName}` : extName;
     },
   },
 };
