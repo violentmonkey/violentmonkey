@@ -13,11 +13,10 @@
           <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
           <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
           <button v-text="i18n('buttonClose')" @click="close"></button>
-          <div class="text-red mt-1" v-if="tooLarge" v-text="i18n('warnScriptLongLines')"></div>
         </div>
       </div>
     </div>
-    <div class="edit-nav mx-1">
+    <div class="flex mx-1">
       <div
         class="edit-nav-item"
         :class="{active: nav === 'code'}"
@@ -36,6 +35,13 @@
         v-text="i18n('editNavValues')"
         @click="nav = 'values'"
       />
+      <div class="flex-auto pos-rel">
+        <div
+          v-if="tooLarge"
+          class="edit-warn text-red hidden-sm"
+          v-text="i18n('warnScriptLongLines')"
+        />
+      </div>
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
@@ -244,14 +250,9 @@ export default {
 .edit {
   z-index: 2000;
   &-body {
-    padding: 8px 16px;
+    padding: .5rem 1rem;
     overflow: auto;
     background: white;
-  }
-  &-nav {
-    .text-red {
-      margin-left: 8px;
-    }
   }
   &-nav-item {
     display: inline-block;
@@ -267,6 +268,14 @@ export default {
       box-shadow: 0 -1px 1px #bbb;
     }
   }
+}
+
+.edit-warn {
+  position: absolute;
+  left: 0;
+  right: .5rem;
+  bottom: .5rem;
+  text-align: right;
 }
 
 @media (max-width: 767px) {

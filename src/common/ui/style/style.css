@@ -47,6 +47,14 @@ textarea {
   display: block;
   width: 100%;
 }
+input[type=text],
+textarea {
+  padding: 0 .5rem;
+  border: 1px solid #ccc;
+  &:focus {
+    border-color: darkgray;
+  }
+}
 code {
   background: #F7E999;
 }
@@ -63,6 +71,22 @@ code {
 // Firefox does not support `svg path` selector
 svg {
   fill: currentColor;
+}
+
+button {
+  border: 1px solid #afafaf;
+  background: #f4f4f4;
+  &:active {
+    background: #bfbfbf;
+  }
+  &[disabled] {
+    color: #d0d0d0;
+    border-color: #d0d0d0;
+    background: #f0f0f0;
+  }
+  &:not([disabled]) {
+    cursor: pointer;
+  }
 }
 
 button,
