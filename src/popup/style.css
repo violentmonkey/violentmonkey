@@ -1,5 +1,6 @@
 body {
-  min-width: 30rem;
+  width: 30rem;
+  max-width: 100%;
   background: #f8f8f8;
 }
 
@@ -149,6 +150,11 @@ footer {
   padding: 4px 8px;
   word-wrap: break-word;
   font-size: 12px;
+  line-height: 1;
   background: #fdfdfd;
   border: 1px solid #ddd;
+  > div {
+    max-height: 2em;
+    overflow: hidden;
+  }
 }
