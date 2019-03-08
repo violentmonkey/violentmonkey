@@ -29,5 +29,8 @@ export default {
     color: white;
     background: #666;
   }
+  &:hover {
+    filter: brightness(.8);
+  }
 }
 </style>

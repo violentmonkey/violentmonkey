@@ -408,6 +408,7 @@ export default {
 }
 
 .editor-search > .inline-block > * {
+  display: inline-block;
   vertical-align: middle;
 }
 </style>
