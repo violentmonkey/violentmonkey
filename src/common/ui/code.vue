@@ -9,7 +9,12 @@
       <form class="inline-block mr-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
         <tooltip content="Ctrl-F">
-          <input type="text" ref="search" v-model="search.state.query">
+          <input
+            :class="{ 'is-error': !search.state.hasResult }"
+            type="text"
+            ref="search"
+            v-model="search.state.query"
+          />
         </tooltip>
         <tooltip content="Shift-Ctrl-G">
           <button type="button" @click="findNext(1)">&lt;</button>
@@ -115,6 +120,10 @@ function findUnmarked(cursor, reversed) {
 function findNext(cm, state, reversed) {
   cm.operation(() => {
     let query = state.query || '';
+    if (!query) {
+      state.hasResult = true;
+      return;
+    }
     if (query && searchOptions.useRegex) {
       query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
     }
@@ -128,11 +137,15 @@ function findNext(cm, state, reversed) {
         reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
         cOptions,
       );
-      if (!findUnmarked(cursor, reversed)) return;
+      if (!findUnmarked(cursor, reversed)) {
+        state.hasResult = false;
+        return;
+      }
     }
     cm.setSelection(cursor.from(), cursor.to());
     state.posFrom = cursor.from();
     state.posTo = cursor.to();
+    state.hasResult = true;
   });
 }
 function replaceOne(cm, state) {
@@ -192,6 +205,7 @@ export default {
         state: {
           query: null,
           replace: null,
+          hasResult: false,
         },
       },
     };
@@ -318,9 +332,7 @@ export default {
     doSearch(reversed) {
       const { state } = this.search;
       const { cm } = this;
-      if (state.query) {
-        findNext(cm, state, reversed);
-      }
+      findNext(cm, state, reversed);
       this.search.show = true;
     },
     searchInPlace() {
@@ -410,5 +422,9 @@ export default {
 .editor-search > .inline-block > * {
   display: inline-block;
   vertical-align: middle;
+}
+
+input[type=text].is-error {
+  border: 1px solid #e85600;
 }
 </style>
