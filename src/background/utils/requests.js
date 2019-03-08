@@ -202,7 +202,7 @@ browser.webRequest.onBeforeSendHeaders.addListener(details => {
 }, {
   urls: ['<all_urls>'],
   types: ['xmlhttprequest'],
-}, ['blocking', 'requestHeaders']);
+}, ['blocking', 'requestHeaders', 'extraHeaders']);
 
 // tasks are not necessary now, turned off
 // Stop redirects
