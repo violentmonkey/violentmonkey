@@ -422,9 +422,11 @@ export default {
 .editor-search > .inline-block > * {
   display: inline-block;
   vertical-align: middle;
+  white-space: pre;
 }
 
 input[type=text].is-error {
   border: 1px solid #e85600;
+  background: #e8560010;
 }
 </style>

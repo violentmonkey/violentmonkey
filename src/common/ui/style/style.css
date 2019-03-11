@@ -56,7 +56,7 @@ textarea {
   }
 }
 code {
-  background: #F7E999;
+  background: #f7e999;
 }
 
 :focus {
@@ -76,6 +76,9 @@ svg {
 button {
   border: 1px solid #afafaf;
   background: #f4f4f4;
+  &:hover {
+    background: #e4e4e4;
+  }
   &:active {
     background: #bfbfbf;
   }
