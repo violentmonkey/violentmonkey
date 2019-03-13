@@ -6,7 +6,7 @@
           :closeAfterClick="true"
           :class="{active: menuNewActive}"
           @stateChange="onStateChange">
-          <tooltip :title="i18n('buttonNew')" placement="down" align="start" slot="toggle">
+          <tooltip :content="i18n('buttonNew')" placement="bottom" align="start" slot="toggle">
             <span class="btn-ghost">
               <icon name="plus"></icon>
             </span>
@@ -24,14 +24,14 @@
             @click.prevent="installFromURL"
           />
         </dropdown>
-        <tooltip :title="i18n('buttonUpdateAll')" placement="down" align="start">
+        <tooltip :content="i18n('buttonUpdateAll')" placement="bottom" align="start">
           <span class="btn-ghost" @click="updateAll">
             <icon name="refresh"></icon>
           </span>
         </tooltip>
       </div>
       <dropdown align="right" class="filter-sort">
-        <tooltip :title="i18n('buttonFilter')" placement="down" slot="toggle">
+        <tooltip :content="i18n('buttonFilter')" placement="bottom" slot="toggle">
           <span class="btn-ghost">
             <icon name="filter"></icon>
           </span>
@@ -73,8 +73,8 @@
 </template>
 
 <script>
-import Dropdown from 'vueleton/lib/dropdown';
-import Tooltip from 'vueleton/lib/tooltip';
+import Dropdown from 'vueleton/lib/dropdown/bundle';
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import {
   i18n, sendMessage, noop, debounce,
 } from '#/common';
@@ -344,6 +344,7 @@ $header-height: 4rem;
     right: .5rem;
   }
   > input {
+    width: 100%;
     padding-left: .5rem;
     padding-right: 2rem;
     line-height: 2;

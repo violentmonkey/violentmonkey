@@ -166,43 +166,60 @@ function decodeBody(obj) {
 // });
 
 // Modifications on headers
-browser.webRequest.onBeforeSendHeaders.addListener(details => {
-  const headers = details.requestHeaders;
-  let newHeaders = [];
-  const vmHeaders = {};
-  headers.forEach(header => {
-    // if (header.name === 'VM-Task') {
-    //   tasks[details.requestId] = header.value;
-    // } else
-    if (header.name.startsWith('VM-')) {
-      vmHeaders[header.name.slice(3)] = header.value;
-    } else {
-      newHeaders.push(header);
-    }
-  });
-  const reqId = vmHeaders.Verify;
-  if (reqId) {
-    const req = requests[reqId];
-    if (req) {
-      delete vmHeaders.Verify;
-      verify[details.requestId] = reqId;
-      req.coreId = details.requestId;
-      Object.keys(vmHeaders).forEach(name => {
-        if (isSpecialHeader(name.toLowerCase())) {
-          newHeaders.push({ name, value: vmHeaders[name] });
+{
+  function onBeforeSendHeaders(details) {
+    const headers = details.requestHeaders;
+    let newHeaders = [];
+    const vmHeaders = {};
+    headers.forEach(header => {
+      // if (header.name === 'VM-Task') {
+      //   tasks[details.requestId] = header.value;
+      // } else
+      if (header.name.startsWith('VM-')) {
+        vmHeaders[header.name.slice(3)] = header.value;
+      } else {
+        newHeaders.push(header);
+      }
+    });
+    const reqId = vmHeaders.Verify;
+    if (reqId) {
+      const req = requests[reqId];
+      if (req) {
+        delete vmHeaders.Verify;
+        verify[details.requestId] = reqId;
+        req.coreId = details.requestId;
+        Object.keys(vmHeaders).forEach(name => {
+          if (isSpecialHeader(name.toLowerCase())) {
+            newHeaders.push({ name, value: vmHeaders[name] });
+          }
+        });
+        if (req.anonymous) {
+          // Drop cookie in anonymous mode
+          newHeaders = newHeaders.filter(({ name }) => name.toLowerCase() !== 'cookie');
         }
-      });
-      if (req.anonymous) {
-        // Drop cookie in anonymous mode
-        newHeaders = newHeaders.filter(({ name }) => name.toLowerCase() !== 'cookie');
       }
     }
+    return { requestHeaders: newHeaders };
   }
-  return { requestHeaders: newHeaders };
-}, {
-  urls: ['<all_urls>'],
-  types: ['xmlhttprequest'],
-}, ['blocking', 'requestHeaders']);
+  const filter = {
+    urls: ['<all_urls>'],
+    types: ['xmlhttprequest'],
+  };
+  try {
+    browser.webRequest.onBeforeSendHeaders.addListener(
+      onBeforeSendHeaders,
+      filter,
+      ['blocking', 'requestHeaders', 'extraHeaders'],
+    );
+  } catch {
+    // extraHeaders is supported since Chrome v72
+    browser.webRequest.onBeforeSendHeaders.addListener(
+      onBeforeSendHeaders,
+      filter,
+      ['blocking', 'requestHeaders'],
+    );
+  }
+}
 
 // tasks are not necessary now, turned off
 // Stop redirects

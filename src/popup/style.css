@@ -1,42 +1,83 @@
 body {
-  min-width: 20rem;
+  width: 30rem;
+  max-width: 100%;
+  background: #f8f8f8;
+}
+
+footer {
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  > span {
+    cursor: pointer;
+    &:hover {
+      color: #666;
+    }
+  }
 }
 
 .logo {
-  margin-top: 1rem;
   text-align: center;
   img {
-    width: 4rem;
+    width: 32px;
   }
   &.disabled > img {
     opacity: .5;
   }
 }
 
+.menu-area {
+  cursor: pointer;
+  &:hover {
+    background: cornflowerblue;
+    color: white;
+  }
+  &.disabled {
+    color: gray;
+    &:hover {
+      color: silver;
+    }
+  }
+}
+
+.ext-name {
+  margin-top: 12px;
+  font-size: 12px;
+  &.disabled {
+    color: gray;
+  }
+}
+
+.menu-buttons {
+  align-items: center;
+  padding: 8px;
+  background: white;
+  > .menu-area {
+    padding: 8px;
+  }
+  .icon {
+    display: block;
+    width: 20px;
+    height: 20px;
+  }
+}
+
 .menu {
+  background: white;
   border-top: 1px solid silver;
   &-item {
     position: relative;
     display: flex;
     align-items: center;
-    height: 2rem;
+    min-height: 2rem;
     padding-left: 1rem;
     padding-right: 1rem;
-    cursor: pointer;
-    text-align: center;
+    text-align: left;
     white-space: nowrap;
     .submenu & {
       text-align: left;
-    }
-    &.disabled {
-      color: gray;
-      &:hover {
-        color: silver;
-      }
-    }
-    &:hover {
-      background: cornflowerblue;
-      color: white;
     }
     .icon {
       flex: 0 0 1rem;
@@ -98,5 +139,22 @@ body {
     .icon {
       display: block;
     }
+  }
+}
+
+.message {
+  position: absolute;
+  max-width: 100%;
+  left: 0;
+  bottom: 0;
+  padding: 4px 8px;
+  word-wrap: break-word;
+  font-size: 12px;
+  line-height: 1;
+  background: #fdfdfd;
+  border: 1px solid #ddd;
+  > div {
+    max-height: 2em;
+    overflow: hidden;
   }
 }

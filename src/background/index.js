@@ -141,8 +141,8 @@ const commands = {
     // Value will be updated to store later.
     return updateValueStore(id, update);
   },
-  ExportZip({ ids, values }) {
-    return getExportData(ids, values);
+  ExportZip({ values }) {
+    return getExportData(values);
   },
   GetScriptCode(id) {
     return getScriptCode(id);

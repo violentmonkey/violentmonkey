@@ -1,22 +1,13 @@
 <template>
   <section>
     <h3 v-text="i18n('labelDataExport')"></h3>
-    <div class="export-list">
-      <div
-        v-for="(item, index) in items"
-        :key="index"
-        class="ellipsis"
-        :class="{active: item.active}"
-        @click="item.active = !item.active"
-        v-text="getName(item)"
-      />
-    </div>
-    <button v-text="i18n('buttonAllNone')" @click="toggleSelection()"></button>
     <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
-    <label class="ml-1">
-      <setting-check name="exportValues" />
-      <span v-text="i18n('labelExportScriptData')"></span>
-    </label>
+    <div class="mt-1">
+      <label>
+        <setting-check name="exportValues" />
+        <span v-text="i18n('labelExportScriptData')"></span>
+      </label>
+    </div>
     <modal
       v-if="store.ffDownload"
       transition="in-out"
@@ -33,7 +24,7 @@
 </template>
 
 <script>
-import Modal from 'vueleton/lib/modal';
+import Modal from 'vueleton/lib/modal/bundle';
 import { sendMessage, getLocaleString } from '#/common';
 import { objectGet } from '#/common/object';
 import options from '#/common/options';
@@ -55,40 +46,14 @@ export default {
   },
   data() {
     return {
-      isFirefox,
       store,
       exporting: false,
-      items: [],
     };
   },
-  watch: {
-    'store.scripts': 'initItems',
-  },
-  computed: {
-    selectedIds() {
-      return this.items.filter(item => item.active).map(item => item.script.props.id);
-    },
-  },
-  created() {
-    this.initItems();
-  },
   methods: {
-    initItems() {
-      this.items = (store.scripts || [])
-      .filter(({ config: { removed } }) => !removed)
-      .map(script => ({
-        script,
-        active: true,
-      }));
-    },
-    toggleSelection() {
-      if (!store.scripts.length) return;
-      const active = this.selectedIds.length < store.scripts.length;
-      this.items.forEach(item => { item.active = active; });
-    },
     exportData() {
       this.exporting = true;
-      Promise.resolve(exportData(this.selectedIds))
+      Promise.resolve(exportData())
       .then(download)
       .catch(err => {
         console.error(err);
@@ -163,15 +128,14 @@ function download(blob) {
   }
 }
 
-function exportData(selectedIds) {
+function exportData() {
   const withValues = options.get('exportValues');
-  return (selectedIds.length ? sendMessage({
+  return sendMessage({
     cmd: 'ExportZip',
     data: {
       values: withValues,
-      ids: selectedIds,
     },
-  }) : Promise.resolve())
+  })
   .then(data => {
     const names = {};
     const vm = {
@@ -221,32 +185,6 @@ function exportData(selectedIds) {
 </script>
 
 <style>
-.export-list {
-  display: block;
-  min-height: 4rem;
-  max-height: 20rem;
-  overflow-y: auto;
-  padding: .3rem;
-  white-space: normal;
-  border: 1px solid #ddd;
-  > .ellipsis {
-    display: inline-block;
-    width: 13rem;
-    max-width: 100%;
-    line-height: 1.5;
-    margin-right: .2rem;
-    margin-bottom: .1rem;
-    padding: 0 .3rem;
-    border: 1px solid #bbb;
-    border-radius: 3px;
-    cursor: pointer;
-    &.active {
-      border-color: #2c82c9;
-      background: #3498db;
-      color: white;
-    }
-  }
-}
 .export-modal {
   width: 13rem;
 }

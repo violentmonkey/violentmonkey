@@ -29,11 +29,14 @@ const pages = {
   },
   'background/index': {
     entry: './src/background',
-    html: {},
+    html: {
+      title: 'Violentmonkey',
+    },
   },
   'options/index': {
     entry: './src/options',
     html: {
+      title: 'Violentmonkey',
       js: [
         '/public/lib/zip.js/zip.js',
       ],
@@ -41,11 +44,15 @@ const pages = {
   },
   'confirm/index': {
     entry: './src/confirm',
-    html: {},
+    html: {
+      title: 'Violentmonkey',
+    },
   },
   'popup/index': {
     entry: './src/popup',
-    html: {},
+    html: {
+      title: 'Violentmonkey',
+    },
   },
   injected: {
     entry: './src/injected',

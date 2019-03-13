@@ -10,6 +10,7 @@ anchorTranslator:
 buttonAllNone:
   description: Button to select all scripts or none.
   message: すべて選択 / 解除
+  touched: false
 buttonCancel:
   description: Cancel button on dialog.
   message: キャンセル
@@ -257,7 +258,7 @@ labelIndentUnit:
   message: 'インデント幅:'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: '既定のインジェクションモード: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: スクリプトのインストール
@@ -365,7 +366,7 @@ learnBlacklist:
   message: パターンの詳細
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: インジェクションモードについての詳細
 menuCommands:
   description: Menu item to list script commands.
   message: ユーザスクリプトコマンド
@@ -480,7 +481,7 @@ noValues:
   message: 値は保存されていません
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: 有効にされたスクリプトを先に
+  message: 有効なスクリプトを先頭に表示
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 大文字と小文字を区別する
@@ -505,6 +506,9 @@ valueLabelKey:
 valueLabelValue:
   description: Label for value of a script value.
   message: 値 (JSONとしてシリアル化された)
+visitWebsite:
+  description: Label for link to open Violentmonkey website.
+  message: ''
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: 一部の行が長すぎるため、読み取り専用モードで開きます。 外部エディタで編集してください。

@@ -443,26 +443,23 @@ export function updateScriptInfo(id, data) {
   return storage.script.dump(script);
 }
 
-export function getExportData(ids, withValues) {
-  const availableIds = ids.filter(id => {
-    const script = store.scriptMap[id];
-    return script && !script.config.removed;
-  });
-  return Promise.all([
-    Promise.all(availableIds.map(id => getScript({ id }))),
-    storage.code.getMulti(availableIds),
-  ])
-  .then(([scripts, codeMap]) => {
-    const data = {};
-    data.items = scripts.map(script => ({ script, code: codeMap[script.props.id] }));
-    if (withValues) {
-      return storage.value.getMulti(ids)
-      .then(values => {
-        data.values = values;
-        return data;
-      });
-    }
-    return data;
+export function getExportData(withValues) {
+  return getScripts()
+  .then(scripts => {
+    const ids = scripts.map(({ props: { id } }) => id);
+    return storage.code.getMulti(ids)
+    .then(codeMap => {
+      const data = {};
+      data.items = scripts.map(script => ({ script, code: codeMap[script.props.id] }));
+      if (withValues) {
+        return storage.value.getMulti(ids)
+        .then(values => {
+          data.values = values;
+          return data;
+        });
+      }
+      return data;
+    });
   });
 }
 

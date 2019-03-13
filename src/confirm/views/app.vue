@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import Dropdown from 'vueleton/lib/dropdown';
+import Dropdown from 'vueleton/lib/dropdown/bundle';
 import {
   sendMessage, leftpad, request, buffer2string, isRemote, getFullUrl,
 } from '#/common';

@@ -10,13 +10,13 @@
     <h4 v-text="i18n('editLabelMeta')"></h4>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelName')"></label>
-      <tooltip title="@name" placement="right">
+      <tooltip content="@name" placement="right">
         <input type="text" v-model="custom.name" :placeholder="placeholders.name">
       </tooltip>
     </div>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelRunAt')"></label>
-      <tooltip title="@run-at" placement="right">
+      <tooltip content="@run-at" placement="right">
         <select v-model="custom.runAt">
           <option value="" v-text="i18n('labelRunAtDefault')"></option>
           <option value="document-start">document-start</option>
@@ -27,23 +27,23 @@
     </div>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelHomepageURL')"></label>
-      <tooltip title="@homepageURL" placement="right">
+      <tooltip content="@homepageURL" placement="right">
         <input type="text" v-model="custom.homepageURL" :placeholder="placeholders.homepageURL">
       </tooltip>
     </div>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelUpdateURL')"></label>
-      <tooltip title="@updateURL" placement="right">
+      <tooltip content="@updateURL" placement="right">
         <input type="text" v-model="custom.updateURL" :placeholder="placeholders.updateURL">
       </tooltip>
     </div>
     <div class="form-group flex">
       <label class="label" v-text="i18n('labelDownloadURL')"></label>
-      <tooltip title="@downloadURL" placement="right">
+      <tooltip content="@downloadURL" placement="right">
         <input type="text" v-model="custom.downloadURL" :placeholder="placeholders.downloadURL">
       </tooltip>
     </div>
-    <tooltip class="form-group" title="@include" placement="right">
+    <tooltip class="form-group" content="@include" placement="right">
       <div class="flex">
         <span class="flex-auto" v-text="i18n('labelInclude')"></span>
         <label>
@@ -53,7 +53,7 @@
       </div>
       <textarea v-model="custom.include"></textarea>
     </tooltip>
-    <tooltip class="form-group" title="@match" placement="right">
+    <tooltip class="form-group" content="@match" placement="right">
       <div class="flex">
         <span class="flex-auto" v-text="i18n('labelMatch')"></span>
         <label>
@@ -63,7 +63,7 @@
       </div>
       <textarea v-model="custom.match"></textarea>
     </tooltip>
-    <tooltip class="form-group" title="@exclude" placement="right">
+    <tooltip class="form-group" content="@exclude" placement="right">
       <div class="flex">
         <span class="flex-auto" v-text="i18n('labelExclude')"></span>
         <label>
@@ -73,7 +73,7 @@
       </div>
       <textarea v-model="custom.exclude"></textarea>
     </tooltip>
-    <tooltip class="form-group" title="@exclude-match" placement="right">
+    <tooltip class="form-group" content="@exclude-match" placement="right">
       <div class="flex">
         <span class="flex-auto" v-text="i18n('labelExcludeMatch')"></span>
         <label>
@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { i18n } from '#/common';
 import { objectGet } from '#/common/object';
 
@@ -122,6 +122,7 @@ export default {
     margin: 2em 0 1em;
   }
   .form-group {
+    display: block;
     position: relative;
     max-width: 600px;
     margin-bottom: .5em;

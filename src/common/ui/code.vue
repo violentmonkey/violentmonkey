@@ -8,31 +8,36 @@
       </form>
       <form class="inline-block mr-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
-        <tooltip title="Ctrl-F">
-          <input type="text" ref="search" v-model="search.state.query">
+        <tooltip content="Ctrl-F">
+          <input
+            :class="{ 'is-error': !search.state.hasResult }"
+            type="text"
+            ref="search"
+            v-model="search.state.query"
+          />
         </tooltip>
-        <tooltip title="Shift-Ctrl-G">
+        <tooltip content="Shift-Ctrl-G">
           <button type="button" @click="findNext(1)">&lt;</button>
         </tooltip>
-        <tooltip title="Ctrl-G">
+        <tooltip content="Ctrl-G">
           <button type="submit">&gt;</button>
         </tooltip>
       </form>
       <form class="inline-block mr-1" @submit.prevent="replace()" v-if="!readonly">
         <span v-text="i18n('labelReplace')"></span>
         <input type="text" v-model="search.state.replace">
-        <tooltip title="Shift-Ctrl-F">
+        <tooltip content="Shift-Ctrl-F">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
-        <tooltip title="Shift-Ctrl-R">
+        <tooltip content="Shift-Ctrl-R">
           <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
         </tooltip>
       </form>
       <div class="inline-block">
-        <tooltip :title="i18n('searchUseRegex')">
+        <tooltip :content="i18n('searchUseRegex')">
           <toggle-button v-model="searchOptions.useRegex">.*</toggle-button>
         </tooltip>
-        <tooltip :title="i18n('searchCaseSensitive')">
+        <tooltip :content="i18n('searchCaseSensitive')">
           <toggle-button v-model="searchOptions.caseSensitive">Aa</toggle-button>
         </tooltip>
       </div>
@@ -57,7 +62,7 @@ import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import CodeMirror from 'codemirror';
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { debounce } from '#/common';
 import ToggleButton from '#/common/ui/toggle-button';
 import options from '#/common/options';
@@ -115,6 +120,10 @@ function findUnmarked(cursor, reversed) {
 function findNext(cm, state, reversed) {
   cm.operation(() => {
     let query = state.query || '';
+    if (!query) {
+      state.hasResult = true;
+      return;
+    }
     if (query && searchOptions.useRegex) {
       query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
     }
@@ -128,11 +137,15 @@ function findNext(cm, state, reversed) {
         reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
         cOptions,
       );
-      if (!findUnmarked(cursor, reversed)) return;
+      if (!findUnmarked(cursor, reversed)) {
+        state.hasResult = false;
+        return;
+      }
     }
     cm.setSelection(cursor.from(), cursor.to());
     state.posFrom = cursor.from();
     state.posTo = cursor.to();
+    state.hasResult = true;
   });
 }
 function replaceOne(cm, state) {
@@ -192,6 +205,7 @@ export default {
         state: {
           query: null,
           replace: null,
+          hasResult: false,
         },
       },
     };
@@ -318,9 +332,7 @@ export default {
     doSearch(reversed) {
       const { state } = this.search;
       const { cm } = this;
-      if (state.query) {
-        findNext(cm, state, reversed);
-      }
+      findNext(cm, state, reversed);
       this.search.show = true;
     },
     searchInPlace() {
@@ -408,6 +420,13 @@ export default {
 }
 
 .editor-search > .inline-block > * {
+  display: inline-block;
   vertical-align: middle;
+  white-space: pre;
+}
+
+input[type=text].is-error {
+  border: 1px solid #e85600;
+  background: #e8560010;
 }
 </style>
