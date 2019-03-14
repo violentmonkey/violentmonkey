@@ -245,7 +245,7 @@ labelHomepage:
   message: Trang chủ
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Liên kết rang chủ:'
+  message: 'Liên kết trang chủ:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Nhập cài đặt
@@ -331,7 +331,7 @@ labelSync:
   message: Đồng bộ
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Authorize
+  message: Xác thực
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
   message: Đang xác thực
@@ -507,7 +507,7 @@ valueLabelValue:
   message: Giá trị (đã đưa về dạng JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Truy cập trang web
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-
