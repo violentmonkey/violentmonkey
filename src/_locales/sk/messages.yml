@@ -149,9 +149,7 @@ hintUseDownloadURL:
   message: Použiť @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: >-
-    Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej
-    pamäte.
+  message: Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej pamäte.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Inštalovať z $1
@@ -259,7 +257,7 @@ labelIndentUnit:
   message: 'Zarážka:'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: Predvolený režim injektovania
+  message: 'Predvolený režim injektovania'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Inštalovanie skriptu
@@ -367,7 +365,7 @@ learnBlacklist:
   message: Získajte viac informácií o vzoroch čiernej listiny.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: Viac informácií o režimoch injektovania.
+  message: 'Viac informácií o režimoch injektovania.'
 menuCommands:
   description: Menu item to list script commands.
   message: Príkazy skriptu
@@ -455,7 +453,7 @@ msgSavedScriptTemplate:
   message: Šablóna nového skriptu bola uktualizovaná.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Skript [$1] ja aktualizovaný!'
+  message: 'Skript [$1] bol aktualizovaný!'
 msgSyncError:
   description: Message shown when sync failed.
   message: Chyba synchronizácie!
@@ -509,7 +507,7 @@ valueLabelValue:
   message: Hodnota (serializované ako JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Prejsť na stránku
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-
