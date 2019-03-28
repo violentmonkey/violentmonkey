@@ -131,7 +131,7 @@ editValueSave:
   message: Guardar
 extDescription:
   description: Description for this extension.
-  message: Fornece suporte a scripts de utilizador para navegadores.
+  message: Oferece suporte a scripts de utilizador para navegadores.
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -208,7 +208,7 @@ labelDataImport:
   message: Importar dados
 labelDonate:
   description: Label of link to donate page.
-  message: Fazer um donativo
+  message: Faça um donativo
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'URL de transferência:'
@@ -232,7 +232,7 @@ labelExportScriptData:
   message: Exportar dados dos scripts
 labelFeedback:
   description: Label of link to feedback page.
-  message: Fornecer comentários
+  message: Forneça comentários
 labelFilterSort:
   description: Label for sort filter.
   message: Ordenar por $1
@@ -259,7 +259,7 @@ labelIndentUnit:
   message: 'Unidade de indentação:'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Modo de injeção predefinido: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: A instalar o script
@@ -314,7 +314,7 @@ labelScriptEditor:
   touched: false
 labelScriptTemplate:
   description: Label for custom script template.
-  message: Modelo personalizado de scripts
+  message: Modelo de scripts personalizado
 labelSearch:
   description: Label for search input in search box.
   message: 'Localizar: '
@@ -364,10 +364,10 @@ lastSync:
   message: 'Última sincronização: $1'
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Saiba mais acerca de padrões para a lista negra.
+  message: Saiba mais acerca de padrões para a lista negra (em inglês).
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Saiba mais acerca de modos de injeção (em inglês).
 menuCommands:
   description: Menu item to list script commands.
   message: Comandos do script
@@ -454,7 +454,7 @@ msgSavedCustomCSS:
   message: Estilo personalizado atualizado.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: O modelo personalizado de scripts foi atualizado.
+  message: O modelo de scripts personalizado foi atualizado.
 msgScriptUpdated:
   description: Notification message for script updates.
   message: $1 foi atualizado!
@@ -511,7 +511,7 @@ valueLabelValue:
   message: Valor (serializado em JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Visitar website
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-
