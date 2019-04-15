@@ -267,7 +267,7 @@ labelInstall:
   message: Instalarea scriptului
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Păstrează valorea(ile) originală(e)
+  message: Păstrează valoarea(ile) originală(e)
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: Ultima actualizare în $1
@@ -294,7 +294,7 @@ labelNoSearchScripts:
   message: Nu a fost găsit niciun script.
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Notifică pentru actualizările scripturilor
+  message: Notifică la actualizările scripturilor
 labelRelated:
   description: Label of related links.
   message: 'Linkuri relevante: '
