@@ -11,6 +11,7 @@ html {
 body {
   font-size: 1rem;
   background: white;
+  color: black;
 }
 
 // Form elements will not inherit
@@ -76,6 +77,7 @@ svg {
 button {
   border: 1px solid #afafaf;
   background: #f4f4f4;
+  color: black;
   &:hover {
     background: #e4e4e4;
   }
