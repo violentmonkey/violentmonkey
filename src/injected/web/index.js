@@ -121,11 +121,13 @@ function onLoadScripts(data) {
     const pathMap = script.custom.pathMap || {};
     const code = data.code[script.props.id] || '';
     const unsafeWindow = bridge.mode === INJECT_CONTENT ? global : window;
-    const { wrapper, thisObj } = wrapGM(script, code, data.cache, unsafeWindow);
-    // Must use Object.getOwnPropertyNames to list unenumerable properties
-    const argNames = Object.getOwnPropertyNames(wrapper);
-    const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
-    const codeSlices = [`${wrapperInit};with(this)!function(define,module,exports){`];
+    const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache, unsafeWindow);
+    const id = getUniqId('VMin');
+    const fnId = getUniqId('VMfn');
+    const wrapperInit = map(keys, name => `this["${name}"]=${name}`).join(';');
+    const codeSlices = [
+      `${wrapperInit};with(this)!function(define,module,exports){`,
+    ];
     forEach(requireKeys, key => {
       const requireCode = data.require[pathMap[key] || key];
       if (requireCode) {
@@ -137,14 +139,12 @@ function onLoadScripts(data) {
     // wrap code to make 'use strict' work
     codeSlices.push(`!function(){${code}\n}.call(this)`);
     codeSlices.push('}.call(this);');
-    const codeConcat = `function(${argNames.join(',')}){${codeSlices.join('\n')}}`;
+    const codeConcat = `function(${keys.join(',')},__${id}){__${id}(new Error);${codeSlices.join('\n')}}`;
     const name = script.custom.name || script.meta.name || script.props.id;
-    const args = map(argNames, key => wrapper[key]);
-    const id = getUniqId('VMin');
-    const fnId = getUniqId('VMfn');
+    const args = map(keys, key => wrapper[key]);
     attachFunction(fnId, () => {
       const func = window[id];
-      if (func) runCode(name, func, args, thisObj);
+      if (func) runCode(name, func, args, thisObj, codeConcat);
     });
     bridge.post({ cmd: 'Inject', data: [id, codeConcat, fnId, bridge.mode] });
   }
@@ -351,11 +351,15 @@ function wrapGM(script, code, cache, unsafeWindow) {
       },
     },
   };
+  const keys = [];
   forEach(grant, name => {
     const prop = gmFunctions[name];
-    if (prop) addProperty(name, prop, gm);
+    if (prop) {
+      keys.push(name);
+      addProperty(name, prop, gm);
+    }
   });
-  return { thisObj, wrapper: gm };
+  return { thisObj, wrapper: gm, keys };
   function loadValues() {
     return store.values[script.props.id];
   }
@@ -492,15 +496,41 @@ function log(level, tags, ...args) {
   console[level](prefix, ...args);
 }
 
-function runCode(name, func, args, thisObj) {
+function runCode(name, func, args, thisObj, code) {
   if (process.env.DEBUG) {
     log('info', [bridge.mode], name);
   }
+  let startLine;
+  const parseError = err => {
+    // Does not support Firefox since no correct line info is provided
+    const stack = err && err.stack;
+    const lineInfo = typeof stack === 'string' && stack.split('\n')[1];
+    const matches = lineInfo && lineInfo.match(/at .*?:(\d+):(\d+)\)?$/);
+    if (!matches) return;
+    const [, row, col] = matches;
+    return { row, col };
+  };
+  const setStartLine = err => {
+    startLine = parseError(err);
+  };
+  args.push(setStartLine);
   try {
     func.apply(thisObj, args);
   } catch (e) {
     let message = `\n${e}`;
     if (e.message) message = `${message}\n${e.message}`;
+    if (startLine) {
+      const lineInfo = parseError(e);
+      if (lineInfo) {
+        const offset = lineInfo.row - startLine.row;
+        const lines = code.split('\n');
+        message = `${message}
+
+Line ${offset}, column ${lineInfo.col}:
+${lines[offset].replace(/\t/g, ' ')}
+${' '.repeat(lineInfo.col - 1)}^`;
+      }
+    }
     log('error', [bridge.mode, name], message);
   }
 }

@@ -1,5 +1,7 @@
+import { getUniqId } from '#/common';
 import { CustomEvent, jsonDump, jsonLoad } from './helpers';
 
+export { getUniqId };
 export {
   sendMessage, request, throttle, cache2blobUrl,
 } from '#/common';
@@ -26,10 +28,6 @@ export function inject(code) {
   document.documentElement.appendChild(script);
   // in case the script is blocked by CSP
   removeElement(id);
-}
-
-export function getUniqId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
 export function bindEvents(srcId, destId, handle) {
