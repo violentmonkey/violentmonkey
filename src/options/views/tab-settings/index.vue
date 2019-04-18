@@ -166,7 +166,7 @@ export default {
 .show-advanced {
   margin: 20px 0;
   .rotate {
-    transform: rotate(90deg);
+    transform: rotate(-90deg);
   }
 }
 </style>
