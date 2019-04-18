@@ -496,16 +496,18 @@ function log(level, tags, ...args) {
   console[level](prefix, ...args);
 }
 
+const RE_STACK_INFO = /^\s*(?:at |@).*?:(\d+):(\d+)\)?$/;
 function runCode(name, func, args, thisObj, code) {
   if (process.env.DEBUG) {
     log('info', [bridge.mode], name);
   }
   let startLine;
   const parseError = err => {
-    // Does not support Firefox since no correct line info is provided
     const stack = err && err.stack;
-    const lineInfo = typeof stack === 'string' && stack.split('\n')[1];
-    const matches = lineInfo && lineInfo.match(/at .*?:(\d+):(\d+)\)?$/);
+    if (typeof stack !== 'string') return;
+    const lines = stack.split('\n');
+    const matches = lines[0] && lines[0].match(RE_STACK_INFO)
+      || lines[1] && lines[1].match(RE_STACK_INFO);
     if (!matches) return;
     const [, row, col] = matches;
     return { row, col };
