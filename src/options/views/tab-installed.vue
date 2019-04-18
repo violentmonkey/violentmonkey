@@ -89,10 +89,14 @@ import Item from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
 
+const SORT_EXEC = { value: 'exec', title: i18n('filterExecutionOrder') };
+const SORT_ALPHA = { value: 'alpha', title: i18n('filterAlphabeticalOrder') };
+const SORT_UPDATE = { value: 'update', title: i18n('filterLastUpdateOrder') };
 const filterOptions = {
   sort: [
-    { value: 'exec', title: i18n('filterExecutionOrder') },
-    { value: 'alpha', title: i18n('filterAlphabeticalOrder') },
+    SORT_EXEC,
+    SORT_ALPHA,
+    SORT_UPDATE,
   ],
 };
 const filters = {
@@ -170,7 +174,7 @@ export default {
       const filteredScripts = search
         ? scripts.filter(script => script.$cache.search.includes(lowerSearch))
         : scripts.slice();
-      if (sort.value === 'alpha') {
+      if (sort.value === SORT_ALPHA.value) {
         const showEnabledFirst = options.get('filters.showEnabledFirst');
         const getSortKey = item => {
           const keys = [];
@@ -187,6 +191,9 @@ export default {
           if (nameA > nameB) return 1;
           return 0;
         });
+      } else if (sort.value === SORT_UPDATE.value) {
+        const getSortKey = item => +item.props.lastUpdated || 0;
+        filteredScripts.sort((a, b) => getSortKey(b) - getSortKey(a));
       }
       this.store.filteredScripts = filteredScripts;
     },

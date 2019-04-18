@@ -139,6 +139,9 @@ filterAlphabeticalOrder:
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: 执行顺序
+filterLastUpdateOrder:
+  description: Label for option to sort scripts by last update time.
+  message: 最近更新时间
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 请输入地址：

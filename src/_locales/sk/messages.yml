@@ -141,6 +141,9 @@ filterAlphabeticalOrder:
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: spustenia
+filterLastUpdateOrder:
+  description: Label for option to sort scripts by last update time.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Vložte adresu:'
@@ -149,7 +152,9 @@ hintUseDownloadURL:
   message: Použiť @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej pamäte.
+  message: >-
+    Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej
+    pamäte.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Inštalovať z $1
@@ -257,7 +262,7 @@ labelIndentUnit:
   message: 'Zarážka:'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: 'Predvolený režim injektovania'
+  message: Predvolený režim injektovania
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Inštalovanie skriptu
@@ -365,7 +370,7 @@ learnBlacklist:
   message: Získajte viac informácií o vzoroch čiernej listiny.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: 'Viac informácií o režimoch injektovania.'
+  message: Viac informácií o režimoch injektovania.
 menuCommands:
   description: Menu item to list script commands.
   message: Príkazy skriptu
