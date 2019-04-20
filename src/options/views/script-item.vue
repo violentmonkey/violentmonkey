@@ -235,14 +235,13 @@ export default {
       const el = e.currentTarget;
       const parent = el.parentNode;
       const rect = el.getBoundingClientRect();
-      const next = el.nextElementSibling;
       const dragging = {
         el,
         offset: {
           x: e.clientX - rect.left,
           y: e.clientY - rect.top,
         },
-        delta: (next ? next.getBoundingClientRect().top : parent.offsetHeight) - rect.top,
+        delta: rect.height,
         index: [].indexOf.call(parent.children, el),
         elements: [].filter.call(parent.children, child => child !== el),
         dragged: el.cloneNode(true),
