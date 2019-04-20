@@ -18,15 +18,30 @@ function buildScript(props) {
 
 test('scheme', t => {
   t.test('should match all', q => {
-    const script = buildScript({
-      meta: {
-        match: [
-          '*://*/*',
-        ],
-      },
-    });
-    q.ok(testScript('https://www.google.com/', script), 'should match `http | https`');
-    q.notOk(testScript('file:///Users/Gerald/file', script), 'should not match `file`');
+    {
+      const script = buildScript({
+        meta: {
+          match: [
+            '*://*/*',
+          ],
+        },
+      });
+      q.ok(testScript('http://www.google.com/', script), 'should match `http | https`');
+      q.ok(testScript('https://www.google.com/', script), 'should match `http | https`');
+      q.notOk(testScript('file:///Users/Gerald/file', script), 'should not match `file`');
+    }
+    {
+      const script = buildScript({
+        meta: {
+          match: [
+            'http*://*/*',
+          ],
+        },
+      });
+      q.ok(testScript('http://www.google.com/', script), 'should match `http | https`');
+      q.ok(testScript('https://www.google.com/', script), 'should match `http | https`');
+      q.notOk(testScript('file:///Users/Gerald/file', script), 'should not match `file`');
+    }
     q.end();
   });
 
@@ -65,11 +80,12 @@ test('host', t => {
     q.end();
   });
 
-  t.test('should match subdomains', q => {
+  t.test('should match wildcard', q => {
     const script = buildScript({
       meta: {
         match: [
           '*://*.google.com/',
+          '*://www.example.*/',
         ],
       },
     });
@@ -77,6 +93,24 @@ test('host', t => {
     q.ok(testScript('https://a.b.google.com/', script), 'should match subdomains');
     q.ok(testScript('https://google.com/', script), 'should match specified domain');
     q.notOk(testScript('https://www.google.com.hk/', script), 'should not match suffixed domains');
+    q.ok(testScript('https://www.example.com/', script), 'should match prefix');
+    q.ok(testScript('https://www.example.com.cn/', script), 'should match prefix');
+    q.ok(testScript('https://www.example.g.com/', script), 'should match prefix');
+    q.end();
+  });
+
+  t.test('should match tld', q => {
+    const script = buildScript({
+      meta: {
+        match: [
+          '*://www.google.tld/',
+        ],
+      },
+    });
+    q.ok(testScript('https://www.google.com/', script), 'should match subdomains');
+    q.ok(testScript('https://www.google.com.cn/', script), 'should match subdomains');
+    q.ok(testScript('https://www.google.jp/', script), 'should match tld');
+    q.notOk(testScript('https://www.google.example.com/', script), 'should not match subdomains');
     q.end();
   });
 
