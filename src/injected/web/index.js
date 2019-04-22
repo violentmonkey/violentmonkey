@@ -3,7 +3,7 @@ import {
   getUniqId, bindEvents, attachFunction, cache2blobUrl,
 } from '../utils';
 import {
-  includes, forEach, map, utf8decode, jsonDump, jsonLoad,
+  includes, forEach, map, push, utf8decode, jsonDump, jsonLoad,
   Promise, console,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -106,7 +106,7 @@ function onLoadScripts(data) {
     forEach(data.scripts, script => {
       const runAt = script.custom.runAt || script.meta.runAt;
       const list = listMap[runAt] || end;
-      list.push(script);
+      push(list, script);
       store.values[script.props.id] = data.values[script.props.id];
     });
     run(start);
@@ -131,12 +131,16 @@ function onLoadScripts(data) {
     forEach(requireKeys, key => {
       const requireCode = data.require[pathMap[key] || key];
       if (requireCode) {
-        codeSlices.push(requireCode);
-        // Add `;` to a new line in case script ends with comment lines
-        codeSlices.push(';');
+        push(
+          codeSlices,
+          requireCode,
+          // Add `;` to a new line in case script ends with comment lines
+          ';',
+        );
       }
     });
-    codeSlices.push(
+    push(
+      codeSlices,
       `!function(){__${id}(new Error);`,
       code,
       '}.call(this)}.call(this);',
@@ -170,8 +174,8 @@ function wrapGM(script, code, cache, unsafeWindow) {
     thisObj = getWrapper(unsafeWindow);
     gm.window = thisObj;
   }
-  if (!includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
-  if (!includes(grant, 'GM_info')) grant.push('GM_info');
+  if (!includes(grant, 'unsafeWindow')) push(grant, 'unsafeWindow');
+  if (!includes(grant, 'GM_info')) push(grant, 'GM_info');
   if (includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
   const resources = script.meta.resources || {};
   const dataDecoders = {
@@ -289,7 +293,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
         return {
           then(callback) {
             if (el !== false) callback(el);
-            else callbacks.push(callback);
+            else push(callbacks, callback);
           },
         };
       },
@@ -357,7 +361,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
   forEach(grant, name => {
     const prop = gmFunctions[name];
     if (prop) {
-      keys.push(name);
+      push(keys, name);
       addProperty(name, prop, gm);
     }
   });
@@ -493,7 +497,7 @@ function getWrapper(unsafeWindow) {
 
 function log(level, tags, ...args) {
   const tagList = ['Violentmonkey'];
-  if (tags) tagList.push(...tags);
+  if (tags) push(tagList, ...tags);
   const prefix = tagList.map(tag => `[${tag}]`).join('');
   console[level](prefix, ...args);
 }
@@ -522,9 +526,9 @@ function runCode(name, func, args, thisObj, code) {
   };
   const addStartInfo = err => {
     const info = parseError(err, 0);
-    if (info) startInfo.push(info);
+    if (info) push(startInfo, info);
   };
-  args.push(addStartInfo);
+  push(args, addStartInfo);
   try {
     func.apply(thisObj, args);
   } catch (e) {

@@ -16,6 +16,8 @@ export const map = bindThis(arrayProto.map);
 
 export const indexOf = bindThis(arrayProto.indexOf);
 
+export const push = bindThis(arrayProto.push);
+
 export const includes = arrayProto.includes
   ? bindThis(arrayProto.includes)
   : (arr, item) => indexOf(arr, item) >= 0;
