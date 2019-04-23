@@ -128,6 +128,10 @@ function download(blob) {
   }
 }
 
+function normalizeFilename(name) {
+  return name.replace(/[\\/:*?"<>|]/g, '-');
+}
+
 function exportData() {
   const withValues = options.get('exportValues');
   return sendMessage({
@@ -145,7 +149,7 @@ function exportData() {
     delete vm.settings.sync;
     if (withValues) vm.values = {};
     const files = (objectGet(data, 'items') || []).map(({ script, code }) => {
-      let name = script.custom.name || script.meta.name || script.props.id;
+      let name = normalizeFilename(script.custom.name || script.meta.name || script.props.id);
       if (names[name]) {
         names[name] += 1;
         name = `${name}_${names[name]}`;
