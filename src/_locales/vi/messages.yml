@@ -143,7 +143,7 @@ filterExecutionOrder:
   message: thứ tự thực thi
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: cập nhật cuối
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL đầu vào:'
