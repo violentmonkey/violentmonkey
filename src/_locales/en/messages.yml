@@ -287,7 +287,7 @@ labelNoName:
   message: No Name
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'Oops, you haven''t got any script yet.'
+  message: 'Oops, you haven’t got any scripts yet.'
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: No script is found.
