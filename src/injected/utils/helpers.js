@@ -40,7 +40,13 @@ export const assign = Object.assign || ((obj, ...args) => {
   return obj;
 });
 
-export const isArray = obj => toString(obj) === '[object Array]';
+export const isArray = obj => (
+  // ES3 way, not reliable if prototype is modified
+  // toString(obj) === '[object Array]'
+  // #565 steamcommunity.com has overridden `Array.prototype`
+  // support duck typing
+  obj && typeof obj.length === 'number' && typeof obj.splice === 'function'
+);
 
 export function encodeBody(body) {
   const cls = getType(body);
