@@ -144,7 +144,7 @@ filterExecutionOrder:
   message: 実行順
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: 最終更新日順
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: URLを入力してください。
@@ -511,7 +511,7 @@ valueLabelValue:
   message: 値 (JSONとしてシリアル化された)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: ウェブサイトを開く
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: 一部の行が長すぎるため、読み取り専用モードで開きます。 外部エディタで編集してください。
