@@ -64,7 +64,7 @@ buttonReplaceAll:
   message: Wszystko
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Zresetuj
 buttonSave:
   description: Button to save modifications of a script.
   message: Zapisz
@@ -146,7 +146,7 @@ filterExecutionOrder:
   message: kolejności wykonywania
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: czasu ostatniej aktualizacji
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Wprowadź adres URL:'
@@ -223,7 +223,7 @@ labelEditValue:
   message: Edytowanie wartości skryptu
 labelEditing:
   description: Label for current editing script
-  message: ''
+  message: 'Aktualnie edytowany: '
 labelEditor:
   description: Label for Editor settings
   message: Edytor
@@ -265,7 +265,7 @@ labelIndentUnit:
   message: 'Jednostki wcięcia:'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Domyślny tryb wstrzykiwania: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Instalacja skryptu
@@ -373,7 +373,7 @@ learnBlacklist:
   message: Dowiedz się więcej o formach czarnej listy.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Dowiedz się więcej o trybach wstrzykiwania.
 menuCommands:
   description: Menu item to list script commands.
   message: Komendy skryptu
@@ -388,7 +388,7 @@ menuMatchedScripts:
   message: Dopasowane skrypty
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Utwórz nowy skrypt
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Skrypty wyłączone
@@ -515,7 +515,7 @@ valueLabelValue:
   message: Wartość (serializowana jako JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Odwiedź stronę internetową rozszerzenia
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-
