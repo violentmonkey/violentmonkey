@@ -5,7 +5,6 @@ import {
   removeScript,
 } from '../utils/db';
 
-// eslint-disable-next-line import/prefer-default-export
 export const script = {
   update(data) {
     // Update an existing script by ID

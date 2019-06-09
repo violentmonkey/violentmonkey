@@ -16,7 +16,7 @@ module.exports = {
     },
   },
   rules: {
-    'no-param-reassign': ['error', { props: false }],
+    'no-param-reassign': 'off',
     'consistent-return': 'off',
     'no-use-before-define': ['error', 'nofunc'],
     'no-mixed-operators': 'off',
@@ -29,6 +29,9 @@ module.exports = {
     }],
     indent: ['error', 2, { MemberExpression: 0 }],
     'object-shorthand': ['error', 'always'],
+    'no-restricted-syntax': 'off',
+    'class-methods-use-this': 'off',
+    'import/prefer-default-export': 'off',
   },
   globals: {
     browser: true,
