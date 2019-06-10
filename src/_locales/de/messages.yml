@@ -334,6 +334,9 @@ labelShowBadge:
 labelSync:
   description: Label for sync options.
   message: Sync
+labelSyncAnonymous:
+  description: Label for using anonymous account.
+  message: ''
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Autorisieren
@@ -343,6 +346,9 @@ labelSyncAuthorizing:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Keines
+labelSyncPassword:
+  description: Label for input to hold password.
+  message: ''
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Abgelaufene Autorisierung automatisch erneuern
@@ -353,9 +359,15 @@ labelSyncRevoke:
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Skriptstatus-Sync
+labelSyncServerUrl:
+  description: Label for input to hold server URL.
+  message: ''
 labelSyncService:
   description: Label for sync service select.
   message: Sync mit
+labelSyncUsername:
+  description: Label for input to hold username.
+  message: ''
 labelTranslator:
   description: Label of translator.
   message: 'Übersetzer: '

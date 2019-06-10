@@ -330,6 +330,9 @@ labelShowBadge:
 labelSync:
   description: Label for sync options.
   message: 同步
+labelSyncAnonymous:
+  description: Label for using anonymous account.
+  message: ''
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: 授權
@@ -339,6 +342,9 @@ labelSyncAuthorizing:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: 無
+labelSyncPassword:
+  description: Label for input to hold password.
+  message: ''
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
@@ -349,9 +355,15 @@ labelSyncRevoke:
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: 同步腳本狀態
+labelSyncServerUrl:
+  description: Label for input to hold server URL.
+  message: ''
 labelSyncService:
   description: Label for sync service select.
   message: 同步到
+labelSyncUsername:
+  description: Label for input to hold username.
+  message: ''
 labelTranslator:
   description: Label of translator.
   message: 翻譯者：

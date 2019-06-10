@@ -338,6 +338,9 @@ labelShowBadge:
 labelSync:
   description: Label for sync options.
   message: Συγχρονισμός
+labelSyncAnonymous:
+  description: Label for using anonymous account.
+  message: ''
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Εξουσιοδότησε
@@ -347,6 +350,9 @@ labelSyncAuthorizing:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Κανένας
+labelSyncPassword:
+  description: Label for input to hold password.
+  message: ''
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Αυτόματη επανεξουσιοδότηση όταν λήξει
@@ -357,9 +363,15 @@ labelSyncRevoke:
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Κατάσταση συγχρονισμού σεναρίου
+labelSyncServerUrl:
+  description: Label for input to hold server URL.
+  message: ''
 labelSyncService:
   description: Label for sync service select.
   message: Συγχρονισμός σε
+labelSyncUsername:
+  description: Label for input to hold username.
+  message: ''
 labelTranslator:
   description: Label of translator.
   message: 'Μεταφραστής: '

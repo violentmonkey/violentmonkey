@@ -1,7 +1,7 @@
 // Reference:
 // - https://developers.google.com/drive/v3/reference/files
 // - https://github.com/google/google-api-nodejs-client
-import { getUniqId } from '#/common';
+import { getUniqId, noop } from '#/common';
 import { objectGet } from '#/common/object';
 import { dumpQuery, notify } from '../utils';
 import {
@@ -168,9 +168,7 @@ const GoogleDrive = BaseService.extend({
       }
     });
   },
-  handleMetaError() {
-    return {};
-  },
+  handleMetaError: noop,
   list() {
     throw new Error('Not supported');
   },
@@ -227,6 +225,7 @@ register(GoogleDrive);
 function normalize(item) {
   return {
     id: item.id,
+    name: item.name,
     size: +item.size,
     uri: getURI(item.name),
   };

@@ -188,6 +188,7 @@ const commands = {
   SyncAuthorize: sync.authorize,
   SyncRevoke: sync.revoke,
   SyncStart: sync.sync,
+  SyncSetConfig: sync.setConfig,
   CacheLoad(data) {
     return cache.get(data) || null;
   },

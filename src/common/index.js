@@ -200,3 +200,16 @@ export function cache2blobUrl(raw, { defaultType, type: overrideType } = {}) {
     return URL.createObjectURL(blob);
   }
 }
+
+export function encodeFilename(name) {
+  // `escape` generated URI has % in it
+  return name.replace(/[-\\/:*?"<>|%\s]/g, m => {
+    let code = m.charCodeAt(0).toString(16);
+    if (code.length < 2) code = `0${code}`;
+    return `-x${code}`;
+  });
+}
+
+export function decodeFilename(filename) {
+  return filename.replace(/-x([0-9a-f]{2})/g, (_m, g) => String.fromCharCode(+`0x${g}`));
+}

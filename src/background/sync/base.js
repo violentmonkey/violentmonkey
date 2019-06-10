@@ -1,5 +1,6 @@
 import {
   debounce, normalizeKeys, request, noop,
+  encodeFilename, decodeFilename,
 } from '#/common';
 import {
   objectGet, objectSet, objectPick, objectPurify,
@@ -20,17 +21,28 @@ const autoSync = debounce(sync, 60 * 60 * 1000);
 let working = Promise.resolve();
 let syncConfig;
 
-export function getItemFilename({ name: filename, uri }) {
-  return uri ? getFilename(uri) : filename;
+export function getItemFilename({ name, uri }) {
+  // When get or remove, current name should be prefered
+  // otherwise uri derived name should be prefered
+  return name || getFilename(uri);
 }
 export function getFilename(uri) {
-  return `vm-${encodeURIComponent(uri)}`;
+  return `vm@2-${encodeFilename(uri)}`;
 }
 export function isScriptFile(name) {
-  return /^vm-/.test(name);
+  return /^vm(?:@\d+)?-/.test(name);
 }
 export function getURI(name) {
-  return decodeURIComponent(name.slice(3));
+  const i = name.indexOf('-');
+  const [, version] = name.slice(0, i).split('@');
+  if (version === '2') {
+    return decodeFilename(name.slice(i + 1));
+  }
+  try {
+    return decodeURIComponent(name.slice(3));
+  } catch (err) {
+    return name.slice(3);
+  }
 }
 
 function initConfig() {
@@ -110,6 +122,8 @@ export function getStates() {
       syncState: service.syncState.get(),
       lastSync: service.config.get('meta', {}).lastSync,
       progress: service.progress,
+      properties: service.properties,
+      userConfig: service.getUserConfig(),
     };
   });
 }
@@ -188,6 +202,11 @@ export const BaseService = serviceFactory({
   delayTime: 1000,
   urlPrefix: '',
   metaFile: 'Violentmonkey',
+  properties: {
+    authType: 'oauth',
+  },
+  getUserConfig: noop,
+  setUserConfig: noop,
   initialize() {
     this.progress = {
       finished: 0,
@@ -275,13 +294,16 @@ export const BaseService = serviceFactory({
     .then(() => this.startSync());
   },
   user: noop,
+  acquireLock: noop,
+  releaseLock: noop,
   handleMetaError(err) {
     throw err;
   },
   getMeta() {
     return this.get({ name: this.metaFile })
     .then(data => JSON.parse(data))
-    .catch(err => this.handleMetaError(err));
+    .catch(err => this.handleMetaError(err))
+    .then(data => data || {});
   },
   initToken() {
     this.prepareHeaders();
@@ -352,6 +374,7 @@ export const BaseService = serviceFactory({
     // Avoid simultaneous requests
     return this.prepare()
     .then(() => this.getSyncData())
+    .then(data => Promise.resolve(this.acquireLock()).then(() => data))
     .then(([remoteMeta, remoteData, localData]) => {
       const { data: remoteMetaData } = remoteMeta;
       const remoteMetaInfo = remoteMetaData.info || {};
@@ -425,7 +448,7 @@ export const BaseService = serviceFactory({
       });
       const promiseQueue = [
         ...putLocal.map(({ remote, info }) => {
-          this.log('Download script:', remote.uri);
+          this.log('Download script:', getFilename(remote.uri));
           return this.get(remote)
           .then(raw => {
             const data = parseScriptData(raw);
@@ -441,7 +464,7 @@ export const BaseService = serviceFactory({
           });
         }),
         ...putRemote.map(({ local, remote }) => {
-          this.log('Upload script:', local.props.uri);
+          this.log('Upload script:', getFilename(local.props.uri));
           return pluginScript.get(local.props.id)
           .then(code => {
             // XXX use version 1 to be compatible with Violentmonkey on other platforms
@@ -452,19 +475,22 @@ export const BaseService = serviceFactory({
             };
             remoteChanged = true;
             return this.put(
-              Object.assign({}, remote, { uri: local.props.uri }),
+              Object.assign({}, remote, {
+                uri: local.props.uri,
+                name: null, // prefer using uri on PUT
+              }),
               JSON.stringify(data),
             );
           });
         }),
         ...delRemote.map(({ remote }) => {
-          this.log('Remove remote script:', remote.uri);
+          this.log('Remove remote script:', getFilename(remote.uri));
           delete remoteMetaData.info[remote.uri];
           remoteChanged = true;
           return this.remove(remote);
         }),
         ...delLocal.map(({ local }) => {
-          this.log('Remove local script:', local.props.uri);
+          this.log('Remove local script:', getFilename(local.props.uri));
           return pluginScript.remove(local.props.id);
         }),
         ...updateLocal.map(({ local, info }) => {
@@ -504,11 +530,13 @@ export const BaseService = serviceFactory({
     })
     .then(() => {
       this.syncState.set('idle');
+      this.log('Sync finished:', this.displayName);
     }, err => {
       this.syncState.set('error');
-      this.log('Failed syncing:', this.name);
+      this.log('Failed syncing:', this.displayName);
       this.log(err);
-    });
+    })
+    .then(() => Promise.resolve(this.releaseLock()).catch(noop));
   },
 });
 
@@ -560,6 +588,14 @@ export function authorize() {
 export function revoke() {
   const service = getService();
   if (service) service.revoke();
+}
+
+export function setConfig(config) {
+  const service = getService();
+  if (service) {
+    service.setUserConfig(config);
+    service.checkSync();
+  }
 }
 
 hookOptions(data => {

@@ -54,7 +54,7 @@ const OneDrive = BaseService.extend({
       if (/^Bearer realm="OneDriveAPI"/.test(header)) {
         return this.refreshToken().then(() => this.getMeta());
       }
-      return {};
+      return;
     }
     throw res;
   },
@@ -160,6 +160,7 @@ register(OneDrive);
 
 function normalize(item) {
   return {
+    name: item.name,
     size: item.size,
     uri: getURI(item.name),
     // modified: new Date(item.lastModifiedDateTime).getTime(),

@@ -1,3 +1,4 @@
+import { encodeFilename } from '#/common';
 import { getOption } from './options';
 
 const metaStart = '==UserScript==';
@@ -106,7 +107,7 @@ export function newScript(data) {
 export function getNameURI(script) {
   const ns = script.meta.namespace || '';
   const name = script.meta.name || '';
-  let nameURI = `${escape(ns)}:${escape(name)}:`;
+  let nameURI = encodeFilename(`${ns}\n${name}\n`);
   if (!ns && !name) nameURI += script.props.id || '';
   return nameURI;
 }

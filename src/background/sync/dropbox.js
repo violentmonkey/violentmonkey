@@ -29,8 +29,7 @@ const Dropbox = BaseService.extend({
     });
   },
   handleMetaError(res) {
-    if (res.status === 409) return {};
-    throw res;
+    if (res.status !== 409) throw res;
   },
   list() {
     return this.loadData({
@@ -124,6 +123,7 @@ register(Dropbox);
 
 function normalize(item) {
   return {
+    name: item.name,
     size: item.size,
     uri: getURI(item.name),
     // modified: new Date(item.server_modified).getTime(),

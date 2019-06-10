@@ -133,12 +133,6 @@ export default {
       display: block;
       width: 100%;
     }
-    > * {
-      flex: 1;
-    }
-    > .label {
-      flex: 0 0 8em;
-    }
     > textarea {
       min-height: 5em;
     }
