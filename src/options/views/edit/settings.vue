@@ -109,7 +109,7 @@ export default {
         name: objectGet(value, 'meta.name'),
         homepageURL: objectGet(value, 'meta.homepageURL'),
         updateURL: objectGet(value, 'meta.updateURL') || i18n('hintUseDownloadURL'),
-        downloadURL: objectGet(value, 'meta.downloadURL') || value.lastInstallURL,
+        downloadURL: objectGet(value, 'meta.downloadURL') || objectGet(value, 'custom.lastInstallURL'),
       };
     },
   },
