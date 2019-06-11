@@ -1,15 +1,15 @@
-import 'core-js/fn/object/assign';
-import 'core-js/fn/object/values';
-import 'core-js/fn/array/includes';
-import 'core-js/fn/array/find';
-import 'core-js/fn/array/find-index';
-import 'core-js/fn/string/includes';
-import 'core-js/fn/string/starts-with';
-import 'core-js/fn/string/ends-with';
-import 'core-js/fn/string/repeat';
+import 'core-js/features/object/assign';
+import 'core-js/features/object/values';
+import 'core-js/features/array/includes';
+import 'core-js/features/array/find';
+import 'core-js/features/array/find-index';
+import 'core-js/features/string/includes';
+import 'core-js/features/string/starts-with';
+import 'core-js/features/string/ends-with';
+import 'core-js/features/string/repeat';
 
 // Must use native Promise for Firefox to work
-// import 'core-js/fn/promise';
+// import 'core-js/features/promise';
 
 // function polyfill(obj, name, value) {
 //   if (!obj[name]) {

@@ -2,7 +2,7 @@ import options from '../../options';
 import './style.css';
 
 let style;
-options.hook(changes => {
+options.hook((changes) => {
   if ('customCSS' in changes) {
     const { customCSS } = changes;
     if (customCSS && !style) {

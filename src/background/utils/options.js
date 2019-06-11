@@ -59,7 +59,7 @@ const init = browser.storage.local.get('options')
     try {
       if (localStorage.length) {
         Object.keys(defaults)
-        .forEach(key => {
+        .forEach((key) => {
           let value = localStorage.getItem(key);
           if (value) {
             try {

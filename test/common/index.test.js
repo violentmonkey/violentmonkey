@@ -1,7 +1,7 @@
 import test from 'tape';
 import { isRemote } from '#/common';
 
-test('isRemote', t => {
+test('isRemote', (t) => {
   t.notOk(isRemote());
   t.notOk(isRemote('file:///tmp/file'));
   t.notOk(isRemote('data:text/plain,hello,world'));

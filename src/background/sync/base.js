@@ -80,7 +80,7 @@ function serviceConfig(name) {
   function set(key, val) {
     if (typeof key === 'object') {
       const data = key;
-      Object.keys(data).forEach(k => {
+      Object.keys(data).forEach((k) => {
         syncConfig.set(getKeys(k), data[k]);
       });
     } else {
@@ -113,7 +113,7 @@ function serviceState(validStates, initialState, onChange) {
   return { get, set, is };
 }
 export function getStates() {
-  return serviceNames.map(name => {
+  return serviceNames.map((name) => {
     const service = services[name];
     return {
       name: service.name,
@@ -231,7 +231,7 @@ export const BaseService = serviceFactory({
     this.startSync = this.syncFactory();
     const events = getEventEmitter();
     ['on', 'off', 'fire']
-    .forEach(key => {
+    .forEach((key) => {
       this[key] = (...args) => { events[key](...args); };
     });
   },
@@ -246,7 +246,7 @@ export const BaseService = serviceFactory({
       if (!shouldSync()) return Promise.resolve();
       this.log('Ready to sync:', this.displayName);
       this.syncState.set('ready');
-      working = working.then(() => new Promise(resolve => {
+      working = working.then(() => new Promise((resolve) => {
         debouncedResolve = debounce(resolve, 10 * 1000);
         debouncedResolve();
       }))
@@ -254,7 +254,7 @@ export const BaseService = serviceFactory({
         if (shouldSync()) return this.sync();
         this.syncState.set('idle');
       })
-      .catch(err => { console.error(err); })
+      .catch((err) => { console.error(err); })
       .then(() => {
         promise = null;
         debouncedResolve = null;
@@ -278,7 +278,7 @@ export const BaseService = serviceFactory({
     }))
     .then(() => {
       this.authState.set('authorized');
-    }, err => {
+    }, (err) => {
       if (err && err.type === 'unauthorized') {
         this.authState.set('unauthorized');
       } else {
@@ -320,7 +320,7 @@ export const BaseService = serviceFactory({
     let lastFetch = Promise.resolve();
     if (delay) {
       lastFetch = this.lastFetch
-      .then(ts => new Promise(resolve => {
+      .then(ts => new Promise((resolve) => {
         const delta = delay - (Date.now() - ts);
         if (delta > 0) {
           setTimeout(resolve, delta);
@@ -408,7 +408,7 @@ export const BaseService = serviceFactory({
         }
         return info;
       }, {});
-      localData.forEach(item => {
+      localData.forEach((item) => {
         const { props: { uri, position, lastModified } } = item;
         const remoteInfo = remoteMetaData.info[uri];
         if (remoteInfo) {
@@ -437,7 +437,7 @@ export const BaseService = serviceFactory({
           delLocal.push({ local: item });
         }
       });
-      Object.keys(remoteItemMap).forEach(uri => {
+      Object.keys(remoteItemMap).forEach((uri) => {
         const item = remoteItemMap[uri];
         const info = remoteMetaData.info[uri];
         if (outdated) {
@@ -450,7 +450,7 @@ export const BaseService = serviceFactory({
         ...putLocal.map(({ remote, info }) => {
           this.log('Download script:', getFilename(remote.uri));
           return this.get(remote)
-          .then(raw => {
+          .then((raw) => {
             const data = parseScriptData(raw);
             // Invalid data
             if (!data.code) return;
@@ -466,7 +466,7 @@ export const BaseService = serviceFactory({
         ...putRemote.map(({ local, remote }) => {
           this.log('Upload script:', getFilename(local.props.uri));
           return pluginScript.get(local.props.id)
-          .then(code => {
+          .then((code) => {
             // XXX use version 1 to be compatible with Violentmonkey on other platforms
             const data = getScriptData(local, 1, { code });
             remoteMetaData.info[local.props.uri] = {
@@ -501,12 +501,12 @@ export const BaseService = serviceFactory({
           return updateScriptInfo(local.props.id, updates);
         }),
       ];
-      promiseQueue.push(Promise.all(promiseQueue).then(() => sortScripts()).then(changed => {
+      promiseQueue.push(Promise.all(promiseQueue).then(() => sortScripts()).then((changed) => {
         if (!changed) return;
         remoteChanged = true;
         return pluginScript.list()
-        .then(scripts => {
-          scripts.forEach(script => {
+        .then((scripts) => {
+          scripts.forEach((script) => {
             const remoteInfo = remoteMetaData.info[script.props.uri];
             if (remoteInfo) remoteInfo.position = script.props.position;
           });
@@ -526,12 +526,12 @@ export const BaseService = serviceFactory({
       // ignore errors to ensure all promises are fulfilled
       return Promise.all(promiseQueue.map(promise => promise.then(noop, err => err || true)))
       .then(errors => errors.filter(Boolean))
-      .then(errors => { if (errors.length) throw errors; });
+      .then((errors) => { if (errors.length) throw errors; });
     })
     .then(() => {
       this.syncState.set('idle');
       this.log('Sync finished:', this.displayName);
-    }, err => {
+    }, (err) => {
       this.syncState.set('error');
       this.log('Failed syncing:', this.displayName);
       this.log(err);
@@ -552,7 +552,7 @@ function getService(name) {
 export function initialize() {
   if (!syncConfig) {
     syncConfig = initConfig();
-    serviceClasses.forEach(Factory => {
+    serviceClasses.forEach((Factory) => {
       const service = new Factory();
       const { name } = service;
       serviceNames.push(name);
@@ -574,7 +574,7 @@ export function sync() {
 }
 
 export function checkAuthUrl(url) {
-  return serviceNames.some(name => {
+  return serviceNames.some((name) => {
     const service = services[name];
     const authorized = service.checkAuth && service.checkAuth(url);
     return authorized;
@@ -598,7 +598,7 @@ export function setConfig(config) {
   }
 }
 
-hookOptions(data => {
+hookOptions((data) => {
   const value = objectGet(data, 'sync.current');
   if (value) initialize();
 });

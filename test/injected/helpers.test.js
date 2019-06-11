@@ -1,7 +1,7 @@
 import test from 'tape';
 import { jsonDump } from '#/injected/utils/helpers';
 
-test('jsonDump', t => {
+test('jsonDump', (t) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const obj of [
     1,

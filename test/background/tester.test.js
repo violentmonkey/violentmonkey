@@ -16,8 +16,8 @@ function buildScript(props) {
   }, props);
 }
 
-test('scheme', t => {
-  t.test('should match all', q => {
+test('scheme', (t) => {
+  t.test('should match all', (q) => {
     {
       const script = buildScript({
         meta: {
@@ -45,7 +45,7 @@ test('scheme', t => {
     q.end();
   });
 
-  t.test('should match exact', q => {
+  t.test('should match exact', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -65,8 +65,8 @@ test('scheme', t => {
   t.end();
 });
 
-test('host', t => {
-  t.test('should match domain', q => {
+test('host', (t) => {
+  t.test('should match domain', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -80,7 +80,7 @@ test('host', t => {
     q.end();
   });
 
-  t.test('should match wildcard', q => {
+  t.test('should match wildcard', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -99,7 +99,7 @@ test('host', t => {
     q.end();
   });
 
-  t.test('should match tld', q => {
+  t.test('should match tld', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -117,8 +117,8 @@ test('host', t => {
   t.end();
 });
 
-test('path', t => {
-  t.test('should match any', q => {
+test('path', (t) => {
+  t.test('should match any', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -131,7 +131,7 @@ test('path', t => {
     q.end();
   });
 
-  t.test('should match exact', q => {
+  t.test('should match exact', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -144,7 +144,7 @@ test('path', t => {
     q.end();
   });
 
-  t.test('should ignore query string and hash', q => {
+  t.test('should ignore query string and hash', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -159,7 +159,7 @@ test('path', t => {
     q.end();
   });
 
-  t.test('should match query string and hash if existed in rules', q => {
+  t.test('should match query string and hash if existed in rules', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -182,8 +182,8 @@ test('path', t => {
   t.end();
 });
 
-test('include', t => {
-  t.test('should include any', q => {
+test('include', (t) => {
+  t.test('should include any', (q) => {
     const script = buildScript({
       meta: {
         include: [
@@ -196,7 +196,7 @@ test('include', t => {
     q.end();
   });
 
-  t.test('should include by regexp', q => {
+  t.test('should include by regexp', (q) => {
     const script = buildScript({
       meta: {
         include: [
@@ -211,7 +211,7 @@ test('include', t => {
     q.end();
   });
 
-  t.test('should support magic TLD', q => {
+  t.test('should support magic TLD', (q) => {
     const script = buildScript({
       meta: {
         include: [
@@ -226,8 +226,8 @@ test('include', t => {
   });
 });
 
-test('exclude', t => {
-  t.test('should exclude any', q => {
+test('exclude', (t) => {
+  t.test('should exclude any', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -242,7 +242,7 @@ test('exclude', t => {
     q.end();
   });
 
-  t.test('should include by regexp', q => {
+  t.test('should include by regexp', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -260,7 +260,7 @@ test('exclude', t => {
     q.end();
   });
 
-  t.test('should support magic TLD', q => {
+  t.test('should support magic TLD', (q) => {
     const script = buildScript({
       meta: {
         exclude: [
@@ -275,8 +275,8 @@ test('exclude', t => {
   });
 });
 
-test('exclude-match', t => {
-  t.test('should exclude any', q => {
+test('exclude-match', (t) => {
+  t.test('should exclude any', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -291,7 +291,7 @@ test('exclude-match', t => {
     q.end();
   });
 
-  t.test('should include by regexp', q => {
+  t.test('should include by regexp', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -310,8 +310,8 @@ test('exclude-match', t => {
   });
 });
 
-test('custom', t => {
-  t.test('should ignore original rules', q => {
+test('custom', (t) => {
+  t.test('should ignore original rules', (q) => {
     const script = buildScript({
       custom: {
         match: [
@@ -330,8 +330,8 @@ test('custom', t => {
   });
 });
 
-test('blacklist', t => {
-  t.test('should exclude match rules', q => {
+test('blacklist', (t) => {
+  t.test('should exclude match rules', (q) => {
     resetBlacklist(`\
 # match rules
 *://www.google.com/*
@@ -342,7 +342,7 @@ test('blacklist', t => {
     q.end();
   });
 
-  t.test('should exclude domains', q => {
+  t.test('should exclude domains', (q) => {
     resetBlacklist(`\
 # domains
 www.google.com
@@ -353,7 +353,7 @@ www.google.com
     q.end();
   });
 
-  t.test('should support @exclude rules', q => {
+  t.test('should support @exclude rules', (q) => {
     resetBlacklist(`\
 # @exclude rules
 @exclude https://www.google.com/*

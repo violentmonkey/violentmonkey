@@ -80,7 +80,7 @@ export default function checkUpdate(script) {
         checking: false,
       },
     }))
-    .then(res => {
+    .then((res) => {
       const { data: { update } } = res;
       updated = true;
       if (getOption('notifyUpdates')) {
@@ -90,7 +90,7 @@ export default function checkUpdate(script) {
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       if (process.env.DEBUG) console.error(err);
     })
     .then(() => {

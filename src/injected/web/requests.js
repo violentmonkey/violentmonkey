@@ -100,7 +100,7 @@ function start(req, id) {
     }
   }
   encodeBody(details.data)
-  .then(body => {
+  .then((body) => {
     payload.data = body;
     bridge.post({
       cmd: 'HttpRequest',

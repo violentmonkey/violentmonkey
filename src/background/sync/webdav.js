@@ -228,10 +228,10 @@ const WebDAV = BaseService.extend({
         depth: '1',
       },
     })
-    .then(xml => {
+    .then((xml) => {
       const doc = XNode.fromXML(xml);
       const items = doc.children()[0]
-      .map(node => {
+      .map((node) => {
         const prop = node.find('DAV:propstat').find('DAV:prop');
         const type = prop.find('DAV:resourcetype').find('DAV:collection') ? 'directory' : 'file';
         const displayName = prop.find('DAV:displayname').text();
@@ -248,7 +248,7 @@ const WebDAV = BaseService.extend({
       return items;
     });
     return readdir()
-    .catch(err => {
+    .catch((err) => {
       if (err.status === 404) {
         return mkdir().then(readdir);
       }

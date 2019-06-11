@@ -6,7 +6,7 @@ tld.initTLD(true);
 
 const RE_MATCH_PARTS = /(.*?):\/\/([^/]*)\/(.*)/;
 let blacklistRules = [];
-hookOptions(changes => {
+hookOptions((changes) => {
   if ('blacklist' in changes) resetBlacklist(changes.blacklist || '');
 });
 const RE_HTTP_OR_HTTPS = /^https?$/i;
@@ -16,7 +16,7 @@ const RE_HTTP_OR_HTTPS = /^https?$/i;
  */
 export function testGlob(url, rules) {
   const lifetime = 60 * 1000;
-  return rules.some(rule => {
+  return rules.some((rule) => {
     const key = `re:${rule}`;
     let re = cache.get(key);
     if (re) {
@@ -34,7 +34,7 @@ export function testGlob(url, rules) {
  */
 export function testMatch(url, rules) {
   const lifetime = 60 * 1000;
-  return rules.some(rule => {
+  return rules.some((rule) => {
     const key = `match:${rule}`;
     let matcher = cache.get(key);
     if (matcher) {
@@ -83,7 +83,7 @@ function autoReg(str) {
   if (tld.isReady() && str.includes('.tld/')) {
     const reTldStr = reStr.replace('\\.tld/', '((?:\\.\\w+)+)/');
     return {
-      test: tstr => {
+      test: (tstr) => {
         const matches = tstr.match(reTldStr);
         if (matches) {
           const suffix = matches[1].slice(1);
@@ -127,7 +127,7 @@ function hostMatcher(rule) {
     suffix = RE_STR_TLD;
   }
   const re = new RegExp(`^${prefix}${str2RE(base)}${suffix}$`);
-  return data => {
+  return (data) => {
     // * matches all
     if (rule === '*') return 1;
     // exact match
@@ -164,7 +164,7 @@ function matchTester(rule) {
     if (ruleParts) {
       const matchHost = hostMatcher(ruleParts[2]);
       const matchPath = pathMatcher(ruleParts[3]);
-      test = url => {
+      test = (url) => {
         const parts = url.match(RE_MATCH_PARTS);
         return !!ruleParts && !!parts
           && matchScheme(ruleParts[1], parts[1])
@@ -198,7 +198,7 @@ export function resetBlacklist(list) {
   }
   // XXX compatible with {Array} list in v2.6.1-
   blacklistRules = (Array.isArray(rules) ? rules : (rules || '').split('\n'))
-  .map(line => {
+  .map((line) => {
     const item = line.trim();
     if (!item || item.startsWith('#')) return null;
 

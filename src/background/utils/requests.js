@@ -27,7 +27,7 @@ export function getRequestId() {
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
   const { xhr } = req;
-  return evt => {
+  return (evt) => {
     const res = {
       id: req.id,
       type: evt.type,
@@ -47,7 +47,7 @@ function xhrCallbackWrapper(req) {
       // ignore if responseText is unreachable
     }
     if (evt.type === 'progress') {
-      ['lengthComputable', 'loaded', 'total'].forEach(key => {
+      ['lengthComputable', 'loaded', 'total'].forEach((key) => {
         data[key] = evt[key];
       });
     }
@@ -83,7 +83,7 @@ export function httpRequest(details, cb) {
     xhr.open(details.method, details.url, true, details.user || '', details.password || '');
     xhr.setRequestHeader('VM-Verify', details.id);
     if (details.headers) {
-      Object.keys(details.headers).forEach(key => {
+      Object.keys(details.headers).forEach((key) => {
         const lowerKey = key.toLowerCase();
         // `VM-` headers are reserved
         if (lowerKey.startsWith('vm-')) return;
@@ -106,7 +106,7 @@ export function httpRequest(details, cb) {
       'readystatechange',
       'timeout',
     ]
-    .forEach(evt => { xhr[`on${evt}`] = callback; });
+    .forEach((evt) => { xhr[`on${evt}`] = callback; });
     // req.finalUrl = details.url;
     const { data } = details;
     const body = data ? decodeBody(data) : null;
@@ -134,8 +134,8 @@ function decodeBody(obj) {
   if (cls === 'formdata') {
     const result = new FormData();
     if (value) {
-      Object.keys(value).forEach(key => {
-        value[key].forEach(item => {
+      Object.keys(value).forEach((key) => {
+        value[key].forEach((item) => {
           result.append(key, decodeBody(item));
         });
       });
@@ -171,7 +171,7 @@ function decodeBody(obj) {
     const headers = details.requestHeaders;
     let newHeaders = [];
     const vmHeaders = {};
-    headers.forEach(header => {
+    headers.forEach((header) => {
       // if (header.name === 'VM-Task') {
       //   tasks[details.requestId] = header.value;
       // } else
@@ -188,7 +188,7 @@ function decodeBody(obj) {
         delete vmHeaders.Verify;
         verify[details.requestId] = reqId;
         req.coreId = details.requestId;
-        Object.keys(vmHeaders).forEach(name => {
+        Object.keys(vmHeaders).forEach((name) => {
           if (isSpecialHeader(name.toLowerCase())) {
             newHeaders.push({ name, value: vmHeaders[name] });
           }
@@ -261,7 +261,7 @@ export function confirmInstall(info) {
       return data;
     })
   )
-  .then(code => {
+  .then((code) => {
     cache.put(info.url, code, 3000);
     const confirmKey = getUniqId();
     cache.put(`confirm-${confirmKey}`, {
@@ -285,7 +285,7 @@ const blacklist = [
 ].map(re => new RegExp(re));
 const bypass = {};
 
-browser.webRequest.onBeforeRequest.addListener(req => {
+browser.webRequest.onBeforeRequest.addListener((req) => {
   // onBeforeRequest fired for `file:`
   // - works on Chrome
   // - does not work on Firefox

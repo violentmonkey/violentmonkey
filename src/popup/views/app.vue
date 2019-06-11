@@ -107,7 +107,7 @@ import { store } from '../utils';
 const optionsData = {
   isApplied: options.get('isApplied'),
 };
-options.hook(changes => {
+options.hook((changes) => {
   if ('isApplied' in changes) {
     optionsData.isApplied = changes.isApplied;
   }
@@ -128,7 +128,7 @@ export default {
   },
   computed: {
     commands() {
-      return this.store.commands.map(item => {
+      return this.store.commands.map((item) => {
         const [key, name] = item;
         return {
           name,
@@ -209,7 +209,7 @@ export default {
           },
         })
       ) : Promise.resolve())
-      .then(id => {
+      .then((id) => {
         const path = ['scripts', '_new', id].filter(Boolean).join('/');
         browser.tabs.create({
           url: browser.runtime.getURL(`/options/index.html#${path}`),

@@ -2,7 +2,7 @@ import { i18n, defaultImage, noop } from '#/common';
 
 const openers = {};
 
-browser.notifications.onClicked.addListener(id => {
+browser.notifications.onClicked.addListener((id) => {
   const openerId = openers[id];
   if (openerId) {
     browser.tabs.sendMessage(openerId, {
@@ -13,7 +13,7 @@ browser.notifications.onClicked.addListener(id => {
   }
 });
 
-browser.notifications.onClosed.addListener(id => {
+browser.notifications.onClosed.addListener((id) => {
   const openerId = openers[id];
   if (openerId) {
     browser.tabs.sendMessage(openerId, {
@@ -33,7 +33,7 @@ export default function createNotification(data, src) {
     message: data.text,
     iconUrl: data.image || defaultImage,
   })
-  .then(notificationId => {
+  .then((notificationId) => {
     openers[notificationId] = srcTab.id;
     return notificationId;
   });

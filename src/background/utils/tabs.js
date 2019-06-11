@@ -3,7 +3,7 @@ import { isFirefox, isAndroid } from '#/common/ua';
 
 const openers = {};
 
-browser.tabs.onRemoved.addListener(id => {
+browser.tabs.onRemoved.addListener((id) => {
   const openerId = openers[id];
   if (openerId) {
     browser.tabs.sendMessage(openerId, {
@@ -29,7 +29,7 @@ export function tabOpen(data, src) {
     options.openerTabId = srcTab.id;
   }
   return browser.tabs.create(options)
-  .then(tab => {
+  .then((tab) => {
     const { id } = tab;
     openers[id] = srcTab.id;
     return { id };

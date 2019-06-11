@@ -101,7 +101,7 @@ export default {
     },
     refresh() {
       sendMessage({ cmd: 'GetValueStore', data: this.script.props.id })
-      .then(values => {
+      .then((values) => {
         this.values = values;
         this.keys = Object.keys(values).sort();
         this.page = 1;

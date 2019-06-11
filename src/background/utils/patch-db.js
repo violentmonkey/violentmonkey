@@ -27,27 +27,27 @@ export default () => new Promise((resolve, reject) => {
       processing -= 1;
       if (!processing) resolve(browser.storage.local.set(updates));
     };
-    getAllScripts(tx, items => {
+    getAllScripts(tx, (items) => {
       const uriMap = {};
       items.forEach(({ script, code }) => {
         updates[`scr:${script.props.id}`] = script;
         updates[`code:${script.props.id}`] = code;
         uriMap[script.props.uri] = script.props.id;
       });
-      getAllValues(tx, data => {
+      getAllValues(tx, (data) => {
         data.forEach(({ id, values }) => {
           updates[`val:${id}`] = values;
         });
         onCallback();
       }, uriMap);
     });
-    getAllCache(tx, cache => {
+    getAllCache(tx, (cache) => {
       cache.forEach(({ uri, data }) => {
         updates[`cac:${uri}`] = data;
       });
       onCallback();
     });
-    getAllRequire(tx, data => {
+    getAllRequire(tx, (data) => {
       data.forEach(({ uri, code }) => {
         updates[`req:${uri}`] = code;
       });
@@ -58,7 +58,7 @@ export default () => new Promise((resolve, reject) => {
     const os = tx.objectStore('scripts');
     const list = [];
     const req = os.openCursor();
-    req.onsuccess = e => {
+    req.onsuccess = (e) => {
       const cursor = e.target.result;
       if (cursor) {
         const { value } = cursor;
@@ -74,7 +74,7 @@ export default () => new Promise((resolve, reject) => {
     const os = tx.objectStore('cache');
     const list = [];
     const req = os.openCursor();
-    req.onsuccess = e => {
+    req.onsuccess = (e) => {
       const cursor = e.target.result;
       if (cursor) {
         const { value: { uri, data } } = cursor;
@@ -90,7 +90,7 @@ export default () => new Promise((resolve, reject) => {
     const os = tx.objectStore('require');
     const list = [];
     const req = os.openCursor();
-    req.onsuccess = e => {
+    req.onsuccess = (e) => {
       const cursor = e.target.result;
       if (cursor) {
         const { value: { uri, code } } = cursor;
@@ -106,7 +106,7 @@ export default () => new Promise((resolve, reject) => {
     const os = tx.objectStore('values');
     const list = [];
     const req = os.openCursor();
-    req.onsuccess = e => {
+    req.onsuccess = (e) => {
       const cursor = e.target.result;
       if (cursor) {
         const { value: { uri, values } } = cursor;

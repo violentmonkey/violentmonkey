@@ -82,7 +82,7 @@ const SYNC_CURRENT = 'sync.current';
 const syncConfig = {
   current: '',
 };
-hookSetting(SYNC_CURRENT, value => {
+hookSetting(SYNC_CURRENT, (value) => {
   syncConfig.current = value || '';
 });
 

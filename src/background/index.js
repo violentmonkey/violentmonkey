@@ -35,7 +35,7 @@ const browserAction = [
   return actions;
 }, {});
 
-hookOptions(changes => {
+hookOptions((changes) => {
   if ('isApplied' in changes) setIcon(changes.isApplied);
   if ('autoUpdate' in changes) autoUpdate();
   if ('showBadge' in changes) updateBadges();
@@ -52,11 +52,11 @@ hookOptions(changes => {
 function checkUpdateAll() {
   setOption('lastUpdate', Date.now());
   getScripts()
-  .then(scripts => {
+  .then((scripts) => {
     const toUpdate = scripts.filter(item => objectGet(item, 'config.shouldUpdate'));
     return Promise.all(toUpdate.map(checkUpdate));
   })
-  .then(updatedList => {
+  .then((updatedList) => {
     if (updatedList.some(Boolean)) sync.sync();
   });
 }
@@ -91,7 +91,7 @@ const commands = {
   GetData(clear) {
     return (clear ? checkRemove() : Promise.resolve())
     .then(getData)
-    .then(data => {
+    .then((data) => {
       data.sync = sync.getStates();
       data.version = VM_VER;
       return data;
@@ -107,7 +107,7 @@ const commands = {
     };
     if (!data.isApplied) return data;
     return getScriptsByURL(url)
-    .then(res => {
+    .then((res) => {
       addValueOpener(srcTab.id, Object.keys(res.values));
       return Object.assign(data, res);
     });
@@ -158,14 +158,14 @@ const commands = {
   },
   Vacuum: vacuum,
   ParseScript(data) {
-    return parseScript(data).then(res => {
+    return parseScript(data).then((res) => {
       sync.sync();
       return res.data;
     });
   },
   CheckUpdate(id) {
     getScript({ id }).then(checkUpdate)
-    .then(updated => {
+    .then((updated) => {
       if (updated) sync.sync();
     });
   },
@@ -175,7 +175,7 @@ const commands = {
   },
   GetRequestId: getRequestId,
   HttpRequest(details, src) {
-    httpRequest(details, res => {
+    httpRequest(details, (res) => {
       browser.tabs.sendMessage(src.tab.id, {
         cmd: 'HttpRequested',
         data: res,
@@ -208,7 +208,7 @@ const commands = {
   },
   SetOptions(data) {
     const items = Array.isArray(data) ? data : [data];
-    items.forEach(item => { setOption(item.key, item.value); });
+    items.forEach((item) => { setOption(item.key, item.value); });
   },
   ConfirmInstall: confirmInstall,
   CheckScript({ name, namespace }) {
@@ -236,7 +236,7 @@ initialize()
       if (typeof res !== 'undefined') {
         // If res is not instance of native Promise, browser APIs will not wait for it.
         res = Promise.resolve(res)
-        .then(data => ({ data }), error => {
+        .then(data => ({ data }), (error) => {
           if (process.env.DEBUG) console.error(error);
           return { error };
         });
@@ -267,7 +267,7 @@ function setBadge({ ids, reset }, src) {
   }
   data.number += ids.length;
   if (ids) {
-    ids.forEach(id => {
+    ids.forEach((id) => {
       data.idMap[id] = 1;
     });
     data.unique = Object.keys(data.idMap).length;
@@ -293,13 +293,13 @@ function updateBadge(tabId) {
 }
 function updateBadges() {
   browser.tabs.query({})
-  .then(tabs => {
-    tabs.forEach(tab => {
+  .then((tabs) => {
+    tabs.forEach((tab) => {
       updateBadge(tab.id);
     });
   });
 }
-browser.tabs.onRemoved.addListener(id => {
+browser.tabs.onRemoved.addListener((id) => {
   delete badges[id];
 });
 

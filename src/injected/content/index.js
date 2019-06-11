@@ -63,13 +63,13 @@ export default function initialize(contentId, webId) {
       reset: IS_TOP,
     },
   })
-  .then(data => {
+  .then((data) => {
     const scriptLists = {
       [INJECT_PAGE]: [],
       [INJECT_CONTENT]: [],
     };
     if (data.scripts) {
-      data.scripts = data.scripts.filter(script => {
+      data.scripts = data.scripts.filter((script) => {
         ids.push(script.props.id);
         if ((IS_TOP || !script.meta.noframes) && script.config.enabled) {
           enabledIds.push(script.props.id);
@@ -78,7 +78,7 @@ export default function initialize(contentId, webId) {
         return false;
       });
       let support;
-      data.scripts.forEach(script => {
+      data.scripts.forEach((script) => {
         let injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
         if (injectInto === INJECT_AUTO) {
           if (!support) support = { injectable: checkInjectable() };
@@ -98,7 +98,7 @@ export default function initialize(contentId, webId) {
 
 function checkInjectable() {
   const id = getUniqId('VM-');
-  const detect = domId => {
+  const detect = (domId) => {
     const span = document.createElement('span');
     span.id = domId;
     document.documentElement.appendChild(span);
@@ -115,8 +115,8 @@ function injectScripts(contentId, webId, data, scriptLists) {
   [
     Object.getOwnPropertyNames(window),
     Object.getOwnPropertyNames(global),
-  ].forEach(keys => {
-    keys.forEach(key => { props[key] = 1; });
+  ].forEach((keys) => {
+    keys.forEach((key) => { props[key] = 1; });
   });
   const args = [
     webId,
@@ -206,13 +206,13 @@ const handlers = {
   },
   CheckScript({ name, namespace, callback }) {
     sendMessage({ cmd: 'CheckScript', data: { name, namespace } })
-    .then(result => {
+    .then((result) => {
       bridge.post({ cmd: 'ScriptChecked', data: { callback, result } });
     });
   },
 };
 
-bridge.ready = new Promise(resolve => {
+bridge.ready = new Promise((resolve) => {
   handlers.Ready = resolve;
 });
 

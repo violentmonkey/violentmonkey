@@ -31,11 +31,11 @@ export function inject(code) {
 }
 
 export function bindEvents(srcId, destId, handle) {
-  document.addEventListener(srcId, e => {
+  document.addEventListener(srcId, (e) => {
     const data = jsonLoad(e.detail);
     handle(data);
   }, false);
-  return data => { postData(destId, data); };
+  return (data) => { postData(destId, data); };
 }
 
 export function attachFunction(id, cb) {

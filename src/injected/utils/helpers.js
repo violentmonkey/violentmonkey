@@ -30,9 +30,9 @@ const { fromCharCode } = String;
 
 export const { keys } = Object;
 export const assign = Object.assign || ((obj, ...args) => {
-  forEach(args, arg => {
+  forEach(args, (arg) => {
     if (arg) {
-      forEach(keys(arg), key => {
+      forEach(keys(arg), (key) => {
         obj[key] = arg[key];
       });
     }
@@ -71,7 +71,7 @@ export function encodeBody(body) {
     }, {}))
     .then(value => ({ cls, value }));
   } else if (includes(['blob', 'file'], cls)) {
-    result = new Promise(resolve => {
+    result = new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = () => {
         // In Firefox, Uint8Array cannot be sliced if its data is read by FileReader

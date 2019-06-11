@@ -13,7 +13,7 @@ export function initHooks() {
   const hooks = [];
 
   function fire(data) {
-    hooks.slice().forEach(cb => {
+    hooks.slice().forEach((cb) => {
       cb(data);
     });
   }
@@ -31,12 +31,12 @@ export function initHooks() {
 
 export function sendMessage(payload) {
   const promise = browser.runtime.sendMessage(payload)
-  .then(res => {
+  .then((res) => {
     const { data, error } = res || {};
     if (error) return Promise.reject(error);
     return data;
   });
-  promise.catch(err => {
+  promise.catch((err) => {
     if (process.env.DEBUG) console.warn(err);
   });
   return promise;
@@ -117,7 +117,7 @@ export function request(url, options = {}) {
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify(body);
     }
-    Object.keys(headers).forEach(key => {
+    Object.keys(headers).forEach((key) => {
       xhr.setRequestHeader(key, headers[key]);
     });
     xhr.onload = () => {
@@ -203,7 +203,7 @@ export function cache2blobUrl(raw, { defaultType, type: overrideType } = {}) {
 
 export function encodeFilename(name) {
   // `escape` generated URI has % in it
-  return name.replace(/[-\\/:*?"<>|%\s]/g, m => {
+  return name.replace(/[-\\/:*?"<>|%\s]/g, (m) => {
     let code = m.charCodeAt(0).toString(16);
     if (code.length < 2) code = `0${code}`;
     return `-x${code}`;

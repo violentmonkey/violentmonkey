@@ -5,7 +5,7 @@ const requests = {};
 
 export function getRequestId() {
   sendMessage({ cmd: 'GetRequestId' })
-  .then(id => {
+  .then((id) => {
     requests[id] = 1;
     bridge.post({ cmd: 'GotRequestId', data: id });
   });

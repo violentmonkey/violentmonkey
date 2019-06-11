@@ -16,7 +16,7 @@ const Dropbox = BaseService.extend({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/users/get_current_account',
     })
-    .catch(err => {
+    .catch((err) => {
       if (err.status === 401) {
         return Promise.reject({
           type: 'unauthorized',

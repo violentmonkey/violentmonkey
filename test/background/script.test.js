@@ -1,7 +1,7 @@
 import test from 'tape';
 import { compareVersion, parseMeta } from '#/background/utils/script';
 
-test('compareVersion', t => {
+test('compareVersion', (t) => {
   t.equal(compareVersion('1.2.3', '1.2.3'), 0);
   t.equal(compareVersion('1.2.3', '1.2.0'), 1);
   t.equal(compareVersion('1.2.3', '1.2.4'), -1);
@@ -23,7 +23,7 @@ const baseMeta = {
   noframes: false,
 };
 
-test('parseMeta', t => {
+test('parseMeta', (t) => {
   t.deepEqual(parseMeta(`\
 // ==UserScript==
 // @name New Script

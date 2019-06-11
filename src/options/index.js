@@ -51,21 +51,21 @@ function initScript(script) {
 
 function loadData(clear) {
   sendMessage({ cmd: 'GetData', data: clear })
-  .then(data => {
+  .then((data) => {
     const oldCache = store.cache || {};
     store.cache = null;
     [
       'cache',
       'scripts',
       'sync',
-    ].forEach(key => {
+    ].forEach((key) => {
       Vue.set(store, key, data[key]);
     });
     if (store.scripts) {
       store.scripts.forEach(initScript);
     }
     if (store.cache) {
-      Object.keys(store.cache).forEach(url => {
+      Object.keys(store.cache).forEach((url) => {
         const raw = store.cache[url];
         if (oldCache[url]) {
           store.cache[url] = oldCache[url];
@@ -75,7 +75,7 @@ function loadData(clear) {
         }
       });
     }
-    Object.values(oldCache).forEach(blobUrl => {
+    Object.values(oldCache).forEach((blobUrl) => {
       URL.revokeObjectURL(blobUrl);
     });
     store.loading = false;

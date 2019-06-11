@@ -42,7 +42,7 @@ export default class EventEmitter {
           evt.defaultPrevented = true;
         },
       };
-      handlers.some(handle => {
+      handlers.some((handle) => {
         handle(evt);
         return evt.defaultPrevented;
       });

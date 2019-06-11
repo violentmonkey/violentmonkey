@@ -24,7 +24,7 @@ export default {
     // XXX compatible with old data format
     const handle = value => (Array.isArray(value) ? value.join('\n') : (value || ''));
     this.value = handle(options.get(this.name));
-    this.revoke = hookSetting(this.name, value => {
+    this.revoke = hookSetting(this.name, (value) => {
       this.value = handle(value);
     });
   },

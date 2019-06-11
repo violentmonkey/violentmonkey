@@ -18,7 +18,7 @@ Related projects
 
 Development
 ---
-Make sure [Node.js](https://nodejs.org/) greater than v8.0 is installed.
+Make sure [Node.js](https://nodejs.org/) greater than v10.0 is installed.
 ``` sh
 # Install dependencies
 $ yarn

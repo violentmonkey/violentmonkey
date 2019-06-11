@@ -56,7 +56,7 @@ const handlers = {
   TabClosed: onTabClosed,
   UpdatedValues(updates) {
     Object.keys(updates)
-    .forEach(id => {
+    .forEach((id) => {
       if (store.values[id]) store.values[id] = updates[id];
     });
   },
@@ -69,7 +69,7 @@ const handlers = {
 
 function registerCallback(callback) {
   const callbackId = getUniqId('VMcb');
-  store.callbacks[callbackId] = payload => {
+  store.callbacks[callbackId] = (payload) => {
     callback(payload);
     delete store.callbacks[callbackId];
   };
@@ -103,7 +103,7 @@ function onLoadScripts(data) {
     'document-end': end,
   };
   if (data.scripts) {
-    forEach(data.scripts, script => {
+    forEach(data.scripts, (script) => {
       const runAt = script.custom.runAt || script.meta.runAt;
       const list = listMap[runAt] || end;
       push(list, script);
@@ -128,7 +128,7 @@ function onLoadScripts(data) {
     const codeSlices = [
       `${wrapperInit};with(this)!function(define,module,exports){`,
     ];
-    forEach(requireKeys, key => {
+    forEach(requireKeys, (key) => {
       const requireCode = data.require[pathMap[key] || key];
       if (requireCode) {
         push(
@@ -284,7 +284,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
       value(css) {
         const callbacks = [];
         let el = false;
-        const callbackId = registerCallback(styleId => {
+        const callbackId = registerCallback((styleId) => {
           el = document.getElementById(styleId);
           callbacks.splice().forEach(callback => callback(el));
         });
@@ -358,7 +358,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
     },
   };
   const keys = [];
-  forEach(grant, name => {
+  forEach(grant, (name) => {
     const prop = gmFunctions[name];
     if (prop) {
       push(keys, name);
@@ -399,13 +399,13 @@ function getWrapper(unsafeWindow) {
   // Block special objects
   forEach([
     'browser',
-  ], name => {
+  ], (name) => {
     wrapper[name] = undefined;
   });
   forEach([
     // `eval` should be called directly so that it is run in current scope
     'eval',
-  ], name => {
+  ], (name) => {
     wrapper[name] = unsafeWindow[name];
   });
   forEach([
@@ -455,7 +455,7 @@ function getWrapper(unsafeWindow) {
     'setInterval',
     'setTimeout',
     'stop',
-  ], name => {
+  ], (name) => {
     const method = unsafeWindow[name];
     if (method) {
       wrapper[name] = (...args) => method.apply(unsafeWindow, args);
@@ -487,7 +487,7 @@ function getWrapper(unsafeWindow) {
     });
   }
   // Wrap properties
-  forEach(bridge.props, name => {
+  forEach(bridge.props, (name) => {
     if (name in wrapper) return;
     if (name.slice(0, 2) === 'on') defineReactedProperty(name);
     else defineProtectedProperty(name);
@@ -524,7 +524,7 @@ function runCode(name, func, args, thisObj, code) {
       }
     }
   };
-  const addStartInfo = err => {
+  const addStartInfo = (err) => {
     const info = parseError(err, 0);
     if (info) push(startInfo, info);
   };
@@ -571,7 +571,7 @@ function exposeVM() {
     }),
   });
   Object.defineProperty(Violentmonkey, 'isInstalled', {
-    value: (name, namespace) => new Promise(resolve => {
+    value: (name, namespace) => new Promise((resolve) => {
       key += 1;
       const callback = key;
       checking[callback] = resolve;

@@ -172,7 +172,7 @@ export default {
           ['d', 1000, 365],
           ['y'],
         ];
-        const unitInfo = units.find(item => {
+        const unitInfo = units.find((item) => {
           const max = item[1];
           if (!max || delta < max) return true;
           const step = item[2] || max;
@@ -192,7 +192,7 @@ export default {
       const pathMap = objectGet(this.script, 'custom.pathMap') || {};
       const fullUrl = pathMap[icon] || icon;
       loadImage(fullUrl)
-      .then(url => {
+      .then((url) => {
         this.safeIcon = url;
       }, () => {
         this.safeIcon = DEFAULT_ICON;
@@ -265,7 +265,7 @@ export default {
       } = dragging;
       dragged.style.left = `${e.clientX - offset.x}px`;
       dragged.style.top = `${e.clientY - offset.y}px`;
-      let hoveredIndex = elements.findIndex(item => {
+      let hoveredIndex = elements.findIndex((item) => {
         if (!item || item.classList.contains('dragging-moving')) return false;
         const rect = item.getBoundingClientRect();
         return (
@@ -307,7 +307,7 @@ export default {
       });
     },
     onDragAnimate(elements, delta) {
-      elements.forEach(el => {
+      elements.forEach((el) => {
         if (!el) return;
         el.classList.add('dragging-moving');
         el.style.transition = 'none';

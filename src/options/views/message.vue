@@ -20,7 +20,7 @@
 <script>
 const dismissers = [];
 
-window.addEventListener('keydown', e => {
+window.addEventListener('keydown', (e) => {
   if (e.keyCode === 27 && dismissers.length) {
     e.stopImmediatePropagation();
     dismissers.pop()();

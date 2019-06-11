@@ -25,14 +25,14 @@ Object.assign(handlers, {
       cmd: 'GetMetas',
       data: data.ids,
     })
-    .then(scripts => {
+    .then((scripts) => {
       store.scripts = scripts;
     });
   },
 });
 
 browser.tabs.query({ currentWindow: true, active: true })
-.then(tabs => {
+.then((tabs) => {
   const currentTab = {
     id: tabs[0].id,
     url: tabs[0].url,

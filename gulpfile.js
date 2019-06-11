@@ -6,10 +6,10 @@ const uglify = require('gulp-uglify');
 const plumber = require('gulp-plumber');
 const yaml = require('js-yaml');
 const webpack = require('webpack');
+const { isProd } = require('@gera2ld/plaid/util');
 const webpackConfig = require('./scripts/webpack.conf');
 const i18n = require('./scripts/i18n');
 const string = require('./scripts/string');
-const { isProd } = require('./scripts/util');
 const pkg = require('./package.json');
 
 const DIST = 'dist';
@@ -57,21 +57,13 @@ function watch() {
   gulp.watch(paths.locales.concat(paths.templates), copyI18n);
 }
 
-function jsDev(done) {
-  let firstRun = true;
-  webpack(webpackConfig).watch({}, (...args) => {
-    webpackCallback(...args);
-    if (firstRun) {
-      firstRun = false;
-      done();
-    }
-  });
+async function jsDev() {
+  require('@gera2ld/plaid-webpack/bin/develop')();
 }
 
-function jsProd(done) {
-  webpack(webpackConfig, (...args) => {
-    webpackCallback(...args);
-    done();
+async function jsProd() {
+  return require('@gera2ld/plaid-webpack/bin/build')({
+    api: true,
   });
 }
 

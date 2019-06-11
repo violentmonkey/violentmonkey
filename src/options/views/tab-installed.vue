@@ -115,7 +115,7 @@ const filters = {
     },
   },
 };
-hookSetting('filters.sort', value => {
+hookSetting('filters.sort', (value) => {
   filters.sort.set(value);
 });
 options.ready(() => {
@@ -176,7 +176,7 @@ export default {
         : scripts.slice();
       if (sort.value === SORT_ALPHA.value) {
         const showEnabledFirst = options.get('filters.showEnabledFirst');
-        const getSortKey = item => {
+        const getSortKey = (item) => {
           const keys = [];
           if (showEnabledFirst) {
             keys.push(item.config.enabled ? 0 : 1);
@@ -221,10 +221,10 @@ export default {
           ],
         });
       })
-      .then(url => {
+      .then((url) => {
         if (url && url.includes('://')) return sendMessage({ cmd: 'ConfirmInstall', data: { url } });
       }, noop)
-      .catch(err => {
+      .catch((err) => {
         if (err) showMessage({ text: err });
       });
     },
