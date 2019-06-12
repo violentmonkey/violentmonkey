@@ -335,7 +335,7 @@ labelSync:
   message: 同期
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: 匿名アカウントを使用
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: アクセス許可
@@ -347,7 +347,7 @@ labelSyncDisabled:
   message: なし
 labelSyncPassword:
   description: Label for input to hold password.
-  message: ''
+  message: 'パスワード: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: 期限が切れたとき、自動的に再認証する
@@ -360,13 +360,13 @@ labelSyncScriptStatus:
   message: スクリプトのステータスも同期する
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'サーバURL: '
 labelSyncService:
   description: Label for sync service select.
   message: '同期に利用するサービス:'
 labelSyncUsername:
   description: Label for input to hold username.
-  message: ''
+  message: 'ユーザ名: '
 labelTranslator:
   description: Label of translator.
   message: '翻訳者: '
