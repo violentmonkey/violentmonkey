@@ -1,6 +1,6 @@
-import { i18n, request } from '#/common';
+import { i18n, request, compareVersion } from '#/common';
 import { parseScript } from './db';
-import { parseMeta, compareVersion } from './script';
+import { parseMeta } from './script';
 import { getOption } from './options';
 import { notify, sendMessageOrIgnore } from './message';
 

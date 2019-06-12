@@ -1,6 +1,5 @@
 import {
   debounce, normalizeKeys, request, noop,
-  encodeFilename, decodeFilename,
 } from '#/common';
 import {
   objectGet, objectSet, objectPick, objectPurify,
@@ -23,11 +22,10 @@ let syncConfig;
 
 export function getItemFilename({ name, uri }) {
   // When get or remove, current name should be prefered
+  if (name) return name;
   // otherwise uri derived name should be prefered
-  return name || getFilename(uri);
-}
-export function getFilename(uri) {
-  return `vm@2-${encodeFilename(uri)}`;
+  // uri is already encoded by `encodeFilename`
+  return `vm@2-${uri}`;
 }
 export function isScriptFile(name) {
   return /^vm(?:@\d+)?-/.test(name);
@@ -36,7 +34,8 @@ export function getURI(name) {
   const i = name.indexOf('-');
   const [, version] = name.slice(0, i).split('@');
   if (version === '2') {
-    return decodeFilename(name.slice(i + 1));
+    // uri is encoded by `encodedFilename`, so we should not decode it here
+    return name.slice(i + 1);
   }
   try {
     return decodeURIComponent(name.slice(3));
@@ -448,7 +447,7 @@ export const BaseService = serviceFactory({
       });
       const promiseQueue = [
         ...putLocal.map(({ remote, info }) => {
-          this.log('Download script:', getFilename(remote.uri));
+          this.log('Download script:', remote.uri);
           return this.get(remote)
           .then((raw) => {
             const data = parseScriptData(raw);
@@ -464,7 +463,7 @@ export const BaseService = serviceFactory({
           });
         }),
         ...putRemote.map(({ local, remote }) => {
-          this.log('Upload script:', getFilename(local.props.uri));
+          this.log('Upload script:', local.props.uri);
           return pluginScript.get(local.props.id)
           .then((code) => {
             // XXX use version 1 to be compatible with Violentmonkey on other platforms
@@ -484,13 +483,13 @@ export const BaseService = serviceFactory({
           });
         }),
         ...delRemote.map(({ remote }) => {
-          this.log('Remove remote script:', getFilename(remote.uri));
+          this.log('Remove remote script:', remote.uri);
           delete remoteMetaData.info[remote.uri];
           remoteChanged = true;
           return this.remove(remote);
         }),
         ...delLocal.map(({ local }) => {
-          this.log('Remove local script:', getFilename(local.props.uri));
+          this.log('Remove local script:', local.props.uri);
           return pluginScript.remove(local.props.id);
         }),
         ...updateLocal.map(({ local, info }) => {

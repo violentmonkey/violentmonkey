@@ -161,6 +161,7 @@ function initialize() {
         ...getDefaultCustom(),
         ...script.custom,
       };
+      script.props.uri = getNameURI(script);
     });
     Object.assign(store, {
       scripts,
