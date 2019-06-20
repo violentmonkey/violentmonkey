@@ -232,7 +232,7 @@ function getPopup() {
 }
 
 function injectScript(data) {
-  const [vId, code, vCallbackId, mode] = data;
+  const [vId, code, vCallbackId, mode, scriptId] = data;
   const func = (attach, id, cb, callbackId) => {
     attach(id, cb);
     const callback = window[callbackId];
@@ -251,6 +251,6 @@ function injectScript(data) {
       data: injectedCode,
     });
   } else {
-    inject(injectedCode);
+    inject(injectedCode, browser.extension.getURL(`/options/index.html#scripts/${scriptId}`));
   }
 }

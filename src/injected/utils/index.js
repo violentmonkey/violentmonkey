@@ -20,11 +20,12 @@ function removeElement(id) {
   }
 }
 
-export function inject(code) {
+export function inject(code, sourceUrl) {
   const script = document.createElement('script');
   const id = getUniqId('VM-');
   script.id = id;
-  script.textContent = `!${removeElement.toString()}(${JSON.stringify(id)});${code}`;
+  const sourceComment = sourceUrl ? `\n//# sourceURL=${sourceUrl}` : '';
+  script.textContent = `!${removeElement.toString()}(${JSON.stringify(id)});${code}${sourceComment}`;
   document.documentElement.appendChild(script);
   // in case the script is blocked by CSP
   removeElement(id);

@@ -152,7 +152,7 @@ function onLoadScripts(data) {
       const func = window[id];
       if (func) runCode(name, func, args, thisObj, codeConcat);
     });
-    bridge.post({ cmd: 'Inject', data: [id, codeConcat, fnId, bridge.mode] });
+    bridge.post({ cmd: 'Inject', data: [id, codeConcat, fnId, bridge.mode, script.props.id] });
   }
   function run(list) {
     while (list.length) buildCode(list.shift());

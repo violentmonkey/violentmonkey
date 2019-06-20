@@ -40,6 +40,7 @@ function wrapAPIs(source, meta) {
 }
 const meta = {
   browserAction: true,
+  extension: true,
   i18n: true,
   notifications: {
     onClicked: true,
