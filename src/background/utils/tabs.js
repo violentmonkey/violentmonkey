@@ -16,16 +16,25 @@ browser.tabs.onRemoved.addListener((id) => {
 });
 
 export function tabOpen(data, src) {
-  const { url, active } = data;
+  const {
+    url,
+    active,
+    insert = true,
+  } = data;
   const srcTab = src.tab || {};
   const options = {
     url,
     active,
     windowId: srcTab.windowId,
-    index: srcTab.index + 1,
   };
+  if (insert) {
+    options.index = srcTab.index + 1;
+  }
   // Firefox Android does not support `openerTabId` field, it fails if this field is passed
   if (!isFirefox || !isAndroid) {
+    // XXX openerTabId seems buggy on Chrome
+    // It seems to do nothing even set successfully with `browser.tabs.update`.
+    // Reference: http://crbug.com/967150
     options.openerTabId = srcTab.id;
   }
   return browser.tabs.create(options)
