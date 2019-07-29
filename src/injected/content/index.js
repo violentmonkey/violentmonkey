@@ -2,7 +2,7 @@ import { isFirefox } from '#/common/ua';
 import { getUniqId } from '#/common';
 import { INJECT_PAGE, INJECT_CONTENT, INJECT_AUTO } from '#/common/consts';
 import {
-  bindEvents, sendMessage, inject, attachFunction,
+  bindEvents, sendMessage, attachFunction,
 } from '../utils';
 import bridge from './bridge';
 import { tabOpen, tabClose, tabClosed } from './tabs';
@@ -11,6 +11,7 @@ import {
   getRequestId, httpRequest, abortRequest, httpRequested,
 } from './requests';
 import dirtySetClipboard from './clipboard';
+import { inject } from './util';
 
 const IS_TOP = window.top === window;
 
