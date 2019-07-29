@@ -98,16 +98,18 @@ export default function initialize(contentId, webId) {
 }
 
 function checkInjectable() {
+  // Check default namespace, `a.style` only exists in HTML namespace
+  if (!('style' in document.createElement('a'))) return false;
   const id = getUniqId('VM-');
   const detect = (domId) => {
-    const span = document.createElement('span');
-    span.id = domId;
-    document.documentElement.appendChild(span);
+    const a = document.createElement('a');
+    a.id = domId;
+    document.documentElement.appendChild(a);
   };
   inject(`(${detect.toString()})(${JSON.stringify(id)})`);
-  const span = document.querySelector(`#${id}`);
-  const injectable = !!span;
-  if (span) span.parentNode.removeChild(span);
+  const a = document.querySelector(`#${id}`);
+  const injectable = !!a;
+  if (a) a.parentNode.removeChild(a);
   return injectable;
 }
 
