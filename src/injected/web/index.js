@@ -141,11 +141,11 @@ function onLoadScripts(data) {
     });
     push(
       codeSlices,
-      `!function(){__${id}(new Error);`,
+      '!function(){',
       code,
       '}.call(this)}.call(this);',
     );
-    const codeConcat = `function(${keys.join(',')},__${id}){__${id}(new Error);${codeSlices.join('\n')}}`;
+    const codeConcat = `function(${keys.join(',')}){${codeSlices.join('\n')}}`;
     const name = script.custom.name || script.meta.name || script.props.id;
     const args = map(keys, key => wrapper[key]);
     attachFunction(fnId, () => {
@@ -502,56 +502,11 @@ function log(level, tags, ...args) {
   console[level](prefix, ...args);
 }
 
-const RE_STACK_INFO = /^\s*(?:at |@).*?([^(:\s]*):(\d+):(\d+)\)?$/;
-function runCode(name, func, args, thisObj, code) {
+function runCode(name, func, args, thisObj) {
   if (process.env.DEBUG) {
     log('info', [bridge.mode], name);
   }
-  const startInfo = [];
-  const parseError = (err, minLine) => {
-    const stack = err && err.stack;
-    if (typeof stack !== 'string') return;
-    const lines = stack.split('\n');
-    let scriptElement;
-    for (let i = 0; i < lines.length; i += 1) {
-      const matches = lines[i] && lines[i].match(RE_STACK_INFO);
-      if (matches) {
-        const [, el, rowS, colS] = matches;
-        if (!scriptElement) scriptElement = el;
-        const row = +rowS;
-        const col = +colS;
-        if (el === scriptElement && row >= minLine) return { row, col };
-      }
-    }
-  };
-  const addStartInfo = (err) => {
-    const info = parseError(err, 0);
-    if (info) push(startInfo, info);
-  };
-  push(args, addStartInfo);
-  try {
-    func.apply(thisObj, args);
-  } catch (e) {
-    let message = `\n${e}`;
-    if (e.message) message = `${message}\n${e.message}`;
-    if (startInfo.length === 2) {
-      const [pos0, pos1] = startInfo;
-      const lineInfo = parseError(e, pos1.row);
-      if (lineInfo) {
-        const offset = lineInfo.row - pos1.row;
-        const lines = code.split('\n').slice(pos1.row - pos0.row + 1, -1);
-        const errorLine = lines[offset - 1].replace(/\t/g, ' ');
-        if (errorLine.length < 256) {
-          message = `${message}
-
-Line ${offset}, column ${lineInfo.col}:
-${errorLine}
-${' '.repeat(lineInfo.col - 1)}^`;
-        }
-      }
-    }
-    log('error', [bridge.mode, name], message);
-  }
+  func.apply(thisObj, args);
 }
 
 function exposeVM() {
