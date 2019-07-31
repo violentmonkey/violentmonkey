@@ -410,8 +410,8 @@ export const BaseService = serviceFactory({
       localData.forEach((item) => {
         const { props: { uri, position, lastModified } } = item;
         const remoteInfo = remoteMetaData.info[uri];
-        if (remoteInfo) {
-          const remoteItem = remoteItemMap[uri];
+        const remoteItem = remoteItemMap[uri];
+        if (remoteInfo && remoteItem) {
           if (firstSync || !lastModified || remoteInfo.modified > lastModified) {
             putLocal.push({ local: item, remote: remoteItem, info: remoteInfo });
           } else {

@@ -142,8 +142,10 @@ function initialize() {
       id: 0,
       position: 0,
     };
+    const idMap = {};
+    const uriMap = {};
     Object.keys(data).forEach((key) => {
-      const value = data[key];
+      const script = data[key];
       if (key.startsWith('scr:')) {
         // {
         //   meta,
@@ -151,17 +153,33 @@ function initialize() {
         //   props: { id, position, uri },
         //   config: { enabled, shouldUpdate },
         // }
-        scripts.push(value);
-        storeInfo.id = Math.max(storeInfo.id, getInt(objectGet(value, 'props.id')));
-        storeInfo.position = Math.max(storeInfo.position, getInt(objectGet(value, 'props.position')));
+        const id = getInt(key.slice(4));
+        if (!id || idMap[id]) {
+          // ID conflicts!
+          // Should not happen, discard duplicates.
+          return;
+        }
+        idMap[id] = script;
+        const uri = getNameURI(script);
+        if (uriMap[uri]) {
+          // Namespace conflicts!
+          // Should not happen, discard duplicates.
+          return;
+        }
+        uriMap[uri] = script;
+        script.props = {
+          ...script.props,
+          id,
+          uri,
+        };
+        script.custom = {
+          ...getDefaultCustom(),
+          ...script.custom,
+        };
+        storeInfo.id = Math.max(storeInfo.id, id);
+        storeInfo.position = Math.max(storeInfo.position, getInt(objectGet(script, 'props.position')));
+        scripts.push(script);
       }
-    });
-    scripts.forEach((script) => {
-      script.custom = {
-        ...getDefaultCustom(),
-        ...script.custom,
-      };
-      script.props.uri = getNameURI(script);
     });
     Object.assign(store, {
       scripts,
