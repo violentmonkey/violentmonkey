@@ -37,15 +37,22 @@ aside {
   position: absolute;
   width: 1rem;
   height: 2rem;
-  top: 50%;
-  left: 100%;
-  margin-top: -1rem;
+  top: 1rem;
+  left: 0;
   line-height: 2rem;
   background: #fafafa;
   color: darkgray;
   border: 1px solid currentColor;
   border-left: 0;
   border-radius: 0 1rem 1rem 0;
+  &-wrapper {
+    position: absolute;
+    width: 2rem;
+    height: 4rem;
+    top: 50%;
+    left: 100%;
+    margin-top: -2rem;
+  }
   > .icon {
     display: block;
     margin-top: .4rem;
@@ -54,6 +61,13 @@ aside {
   .show-aside & > .icon {
     transform: rotateY(180deg);
   }
+}
+.aside-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .text-red {

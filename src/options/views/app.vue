@@ -1,6 +1,7 @@
 <template>
   <div class="page-options flex h-100">
     <aside :class="{ 'show-aside': aside }">
+      <div v-if="aside" class="aside-backdrop visible-sm" @click="aside = false" />
       <div class="aside-content">
         <img src="/public/images/icon128.png">
         <h1 v-text="i18n('extName')"></h1>
@@ -21,8 +22,10 @@
             v-text="i18n('sideMenuAbout')"
           />
         </div>
-        <div class="aside-toggle visible-sm" @click="aside = !aside">
-          <icon name="arrow" />
+        <div class="aside-toggle-wrapper visible-sm" @click="aside = !aside">
+          <div class="aside-toggle">
+            <icon name="arrow" />
+          </div>
         </div>
       </div>
     </aside>
