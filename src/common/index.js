@@ -206,12 +206,12 @@ export function encodeFilename(name) {
   return name.replace(/[-\\/:*?"<>|%\s]/g, (m) => {
     let code = m.charCodeAt(0).toString(16);
     if (code.length < 2) code = `0${code}`;
-    return `-x${code}`;
+    return `-${code}`;
   });
 }
 
 export function decodeFilename(filename) {
-  return filename.replace(/-x([0-9a-f]{2})/g, (_m, g) => String.fromCharCode(+`0x${g}`));
+  return filename.replace(/-([0-9a-f]{2})/g, (_m, g) => String.fromCharCode(parseInt(g, 16)));
 }
 
 export function compareVersion(ver1, ver2) {
