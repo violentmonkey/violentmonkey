@@ -33,7 +33,7 @@
         </div>
         <div class="flex-auto" v-else v-text="i18n('headerRecycleBin')" />
         <tooltip :content="i18n('buttonRecycleBin')" placement="bottom">
-          <span class="btn-ghost" @click="toggleRecycle" :class="{active: showRecycle}">
+          <span class="btn-ghost" @click="toggleRecycle" :class="{active: showRecycle}" ref="trash">
             <icon name="trash"></icon>
           </span>
         </tooltip>
@@ -67,16 +67,22 @@
           <icon name="search"></icon>
         </div>
       </header>
-      <div class="trash-hint mx-1 my-1 text-center" v-if="showRecycle" v-text="i18n('hintRecycleBin')" />
+      <div
+        v-if="showRecycle"
+        class="trash-hint mx-1 my-1 text-center"
+        v-text="i18n('hintRecycleBin')"
+      />
       <div class="flex-auto pos-rel">
         <div class="scripts abs-full">
-          <item
+          <script-item
             v-for="script in filteredScripts"
             :key="script.props.id"
+            :class="{ removing: removing && removing.id === script.props.id }"
             :script="script"
             :draggable="filters.sort.value === 'exec' && !script.config.removed"
             @edit="onEditScript"
             @move="moveScript"
+            @remove="onRemove"
           />
         </div>
         <div class="backdrop abs-full" :class="{mask: store.loading}" v-show="message">
@@ -85,6 +91,7 @@
       </div>
     </div>
     <edit v-if="script" :initial="script" @close="onEditScript()"></edit>
+    <div class="trash-animate" v-if="removing" :style="removing.animation" />
   </div>
 </template>
 
@@ -92,7 +99,7 @@
 import Dropdown from 'vueleton/lib/dropdown/bundle';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import {
-  i18n, sendMessage, noop, debounce,
+  i18n, sendMessage, debounce,
 } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
@@ -100,7 +107,7 @@ import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
 import LocaleGroup from '#/common/ui/locale-group';
 import { setRoute } from '#/common/router';
-import Item from './script-item';
+import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
 
@@ -139,7 +146,7 @@ options.ready(() => {
 
 export default {
   components: {
-    Item,
+    ScriptItem,
     Edit,
     Tooltip,
     SettingCheck,
@@ -158,6 +165,7 @@ export default {
       menuNewActive: false,
       showRecycle: false,
       filteredScripts: [],
+      removing: null,
     };
   },
   watch: {
@@ -299,6 +307,29 @@ export default {
     toggleRecycle() {
       this.showRecycle = !this.showRecycle;
     },
+    onRemove(id, rect, callback) {
+      const { trash } = this.$refs;
+      if (!trash) return;
+      const trashRect = trash.getBoundingClientRect();
+      this.removing = {
+        id,
+        animation: {
+          width: `${trashRect.width}px`,
+          height: `${trashRect.height}px`,
+          top: `${trashRect.top}px`,
+          left: `${trashRect.left}px`,
+          transform: `translate(${rect.left - trashRect.left}px,${rect.top - trashRect.top}px) scale(${rect.width / trashRect.width},${rect.height / trashRect.height})`,
+          transition: 'transform .3s',
+        },
+      };
+      setTimeout(() => {
+        this.removing.animation.transform = 'translate(0,0) scale(1,1)';
+        setTimeout(() => {
+          this.removing = null;
+          callback();
+        }, 300);
+      });
+    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 200);
@@ -386,5 +417,15 @@ export default {
 .trash-hint {
   line-height: 1.5;
   color: #999;
+}
+
+.trash-animate {
+  position: fixed;
+  background: rgba(0,0,0,.1);
+  transform-origin: top left;
+}
+
+.script.removing {
+  opacity: .2;
 }
 </style>

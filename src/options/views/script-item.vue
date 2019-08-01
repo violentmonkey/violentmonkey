@@ -27,7 +27,7 @@
       </tooltip>
       <div v-if="script.config.removed" class="ml-1">
         <tooltip :content="i18n('buttonRestore')" placement="left">
-          <span class="btn-ghost" @click="onRemove(0)">
+          <span class="btn-ghost" @click="onRestore">
             <icon name="undo"></icon>
           </span>
         </tooltip>
@@ -79,7 +79,7 @@
         <div class="script-message" v-text="script.message"></div>
       </div>
       <tooltip :content="i18n('buttonRemove')" align="end">
-        <span class="btn-ghost" @click="onRemove(1)">
+        <span class="btn-ghost" @click="onRemove">
           <icon name="trash"></icon>
         </span>
       </tooltip>
@@ -197,14 +197,23 @@ export default {
     onEdit() {
       this.$emit('edit', this.script.props.id);
     },
-    onRemove(remove) {
+    markRemoved(removed) {
       sendMessage({
         cmd: 'MarkRemoved',
         data: {
           id: this.script.props.id,
-          removed: remove ? 1 : 0,
+          removed,
         },
       });
+    },
+    onRemove() {
+      const rect = this.$el.getBoundingClientRect();
+      this.$emit('remove', this.script.props.id, rect, () => {
+        this.markRemoved(1);
+      });
+    },
+    onRestore() {
+      this.markRemoved(0);
     },
     onEnable() {
       sendMessage({
