@@ -1,4 +1,5 @@
 import { i18n, request, compareVersion } from '#/common';
+import { CMD_SCRIPT_UPDATE } from '#/common/consts';
 import { parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption } from './options';
@@ -11,7 +12,7 @@ function doCheckUpdate(script) {
     checking: true,
   };
   const res = {
-    cmd: 'UpdateScript',
+    cmd: CMD_SCRIPT_UPDATE,
     data: {
       where: {
         id: script.props.id,

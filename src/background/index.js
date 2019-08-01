@@ -12,7 +12,7 @@ import {
 import { tabOpen, tabClose } from './utils/tabs';
 import createNotification from './utils/notifications';
 import {
-  getScripts, removeScript, getData, checkRemove, getScriptsByURL,
+  getScripts, markRemoved, removeScript, getData, checkRemove, getScriptsByURL,
   updateScriptInfo, getExportData, getScriptCode,
   getScriptByIds, moveScript, vacuum, parseScript, getScript,
   sortScripts, getValueStoresByIds,
@@ -84,13 +84,16 @@ const commands = {
     cache.put(`new-${id}`, newScript(data));
     return id;
   },
+  MarkRemoved({ id, removed }) {
+    return markRemoved(id, removed)
+    .then(() => { sync.sync(); });
+  },
   RemoveScript(id) {
     return removeScript(id)
     .then(() => { sync.sync(); });
   },
-  GetData(clear) {
-    return (clear ? checkRemove() : Promise.resolve())
-    .then(getData)
+  GetData() {
+    return getData()
     .then((data) => {
       data.sync = sync.getStates();
       data.version = VM_VER;
@@ -119,16 +122,7 @@ const commands = {
         lastModified: Date.now(),
       },
     })
-    .then(([script]) => {
-      sync.sync();
-      sendMessageOrIgnore({
-        cmd: 'UpdateScript',
-        data: {
-          where: { id: script.props.id },
-          update: script,
-        },
-      });
-    });
+    .then(() => { sync.sync(); });
   },
   GetValueStore(id) {
     return getValueStoresByIds([id]).then(res => res[id] || {});
@@ -213,7 +207,7 @@ const commands = {
   ConfirmInstall: confirmInstall,
   CheckScript({ name, namespace }) {
     return getScript({ meta: { name, namespace } })
-    .then(script => (script ? script.meta.version : null));
+    .then(script => (script && !script.config.removed ? script.meta.version : null));
   },
   CheckPosition() {
     return sortScripts();

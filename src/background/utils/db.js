@@ -2,6 +2,8 @@ import {
   i18n, request, buffer2string, getFullUrl, isRemote, getRnd4,
 } from '#/common';
 import { objectGet, objectSet } from '#/common/object';
+import { CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE } from '#/common/consts';
+import pluginEvents from '../plugin/events';
 import {
   getNameURI, parseMeta, newScript, getDefaultCustom,
 } from './script';
@@ -10,7 +12,6 @@ import { register } from './init';
 import patchDB from './patch-db';
 import { setOption } from './options';
 import { sendMessageOrIgnore } from './message';
-import pluginEvents from '../plugin/events';
 
 function cacheOrFetch(handle) {
   const requests = {};
@@ -358,7 +359,12 @@ export function getData() {
 }
 
 export function checkRemove() {
-  const toRemove = store.scripts.filter(script => script.config.removed);
+  const now = Date.now();
+  const toRemove = store.scripts.filter((script) => {
+    if (!script.config.removed) return false;
+    const lastModified = +script.props.lastModified || 0;
+    return now - lastModified > 7 * 24 * 60 * 60 * 1000;
+  });
   if (toRemove.length) {
     store.scripts = store.scripts.filter(script => !script.config.removed);
     const ids = toRemove.map(script => script.props.id);
@@ -382,6 +388,17 @@ export function removeScript(id) {
     data: id,
   });
   return Promise.resolve();
+}
+
+export function markRemoved(id, removed) {
+  return updateScriptInfo(id, {
+    config: {
+      removed: removed ? 1 : 0,
+    },
+    props: {
+      lastModified: Date.now(),
+    },
+  });
 }
 
 export function moveScript(id, offset) {
@@ -459,7 +476,14 @@ export function updateScriptInfo(id, data) {
   script.props = Object.assign({}, script.props, data.props);
   script.config = Object.assign({}, script.config, data.config);
   // script.custom = Object.assign({}, script.custom, data.custom);
-  return storage.script.dump(script);
+  return storage.script.dump(script)
+  .then(() => sendMessageOrIgnore({
+    cmd: CMD_SCRIPT_UPDATE,
+    data: {
+      where: { id },
+      update: script,
+    },
+  }));
 }
 
 export function getExportData(withValues) {
@@ -482,8 +506,6 @@ export function getExportData(withValues) {
   });
 }
 
-const CMD_UPDATE = 'UpdateScript';
-const CMD_ADD = 'AddScript';
 export function parseScript(data) {
   const {
     id, code, message, isNew, config, custom, props, update,
@@ -491,7 +513,7 @@ export function parseScript(data) {
   const meta = parseMeta(code);
   if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
   const result = {
-    cmd: CMD_UPDATE,
+    cmd: CMD_SCRIPT_UPDATE,
     data: {
       update: {
         message: message == null ? i18n('msgUpdated') : message || '',
@@ -506,7 +528,7 @@ export function parseScript(data) {
       script = Object.assign({}, oldScript);
     } else {
       ({ script } = newScript());
-      result.cmd = CMD_ADD;
+      result.cmd = CMD_SCRIPT_ADD;
       result.data.isNew = true;
       result.data.update.message = i18n('msgInstalled');
     }

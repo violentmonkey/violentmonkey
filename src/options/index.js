@@ -15,7 +15,6 @@ Object.assign(store, {
   cache: {},
   scripts: [],
   sync: [],
-  filteredScripts: [],
   title: null,
 });
 zip.workerScriptsPath = '/public/lib/zip.js/';
@@ -49,18 +48,13 @@ function initScript(script) {
   script.$cache = { search, name, lowerName };
 }
 
-function loadData(clear) {
-  sendMessage({ cmd: 'GetData', data: clear })
+function loadData() {
+  sendMessage({ cmd: 'GetData' })
   .then((data) => {
     const oldCache = store.cache || {};
-    store.cache = null;
-    [
-      'cache',
-      'scripts',
-      'sync',
-    ].forEach((key) => {
-      Vue.set(store, key, data[key]);
-    });
+    store.cache = data.cache;
+    store.sync = data.sync;
+    store.scripts = data.scripts;
     if (store.scripts) {
       store.scripts.forEach(initScript);
     }
@@ -84,7 +78,7 @@ function loadData(clear) {
 
 function initMain() {
   store.loading = true;
-  loadData(true);
+  loadData();
   Object.assign(handlers, {
     ScriptsUpdated() {
       loadData();

@@ -21,13 +21,12 @@
         />
         <span class="ellipsis ml-1" v-else v-text="author.name"></span>
       </tooltip>
-      <tooltip class="ml-1 hidden-sm" :content="lastUpdated.title" align="end">
+      <tooltip class="ml-1 hidden-sm" :content="updatedAt.title" align="end">
         <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
-        <span class="secondary ml-1" v-text="lastUpdated.show"></span>
+        <span class="ml-1" v-text="updatedAt.show"></span>
       </tooltip>
-      <div v-if="script.config.removed" class="ml-1" v-text="i18n('labelRemoved')"></div>
       <div v-if="script.config.removed" class="ml-1">
-        <tooltip :content="i18n('buttonUndo')" placement="left">
+        <tooltip :content="i18n('buttonRestore')" placement="left">
           <span class="btn-ghost" @click="onRemove(0)">
             <icon name="undo"></icon>
           </span>
@@ -90,7 +89,7 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { sendMessage, getLocaleString } from '#/common';
+import { sendMessage, getLocaleString, formatTime } from '#/common';
 import { objectGet } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
@@ -159,29 +158,24 @@ export default {
     description() {
       return this.script.custom.description || getLocaleString(this.script.meta, 'description');
     },
-    lastUpdated() {
-      const { props } = this.script;
-      // XXX use `lastModified` as a fallback for scripts without `lastUpdated`
-      const lastUpdated = props.lastUpdated || props.lastModified;
+    updatedAt() {
+      const { props, config } = this.script;
       const ret = {};
-      if (lastUpdated) {
-        let delta = (Date.now() - lastUpdated) / 1000 / 60;
-        const units = [
-          ['min', 60],
-          ['h', 24],
-          ['d', 1000, 365],
-          ['y'],
-        ];
-        const unitInfo = units.find((item) => {
-          const max = item[1];
-          if (!max || delta < max) return true;
-          const step = item[2] || max;
-          delta /= step;
-          return false;
-        });
-        const date = new Date(lastUpdated);
-        ret.title = this.i18n('labelLastUpdatedAt', date.toLocaleString());
-        ret.show = `${delta | 0}${unitInfo[0]}`;
+      let lastModified;
+      if (config.removed) {
+        ({ lastModified } = props);
+      } else {
+        // XXX use `lastModified` as a fallback for scripts without `lastUpdated`
+        lastModified = props.lastUpdated || props.lastModified;
+      }
+      if (lastModified) {
+        const date = new Date(lastModified);
+        ret.show = formatTime(Date.now() - lastModified);
+        if (config.removed) {
+          ret.title = this.i18n('labelRemovedAt', date.toLocaleString());
+        } else {
+          ret.title = this.i18n('labelLastUpdatedAt', date.toLocaleString());
+        }
       }
       return ret;
     },
@@ -205,12 +199,10 @@ export default {
     },
     onRemove(remove) {
       sendMessage({
-        cmd: 'UpdateScriptInfo',
+        cmd: 'MarkRemoved',
         data: {
           id: this.script.props.id,
-          config: {
-            removed: remove ? 1 : 0,
-          },
+          removed: remove ? 1 : 0,
         },
       });
     },

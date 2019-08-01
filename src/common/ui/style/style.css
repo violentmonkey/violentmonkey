@@ -127,6 +127,10 @@ button,
     display: block;
     height: 2rem;
   }
+  &.active {
+    background: #eee;
+    border-color: #aaa;
+  }
 }
 
 .sep {
@@ -219,8 +223,14 @@ button,
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.text-center {
+  text-align: center;
+}
 .text-right {
   text-align: right;
+}
+.scroll-y {
+  overflow-y: auto;
 }
 
 .frame {

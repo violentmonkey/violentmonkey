@@ -223,3 +223,21 @@ export function compareVersion(ver1, ver2) {
   }
   return 0;
 }
+
+const units = [
+  ['min', 60],
+  ['h', 24],
+  ['d', 1000, 365],
+  ['y'],
+];
+export function formatTime(duration) {
+  duration /= 60 * 1000;
+  const unitInfo = units.find((item) => {
+    const max = item[1];
+    if (!max || duration < max) return true;
+    const step = item[2] || max;
+    duration /= step;
+    return false;
+  });
+  return `${duration | 0}${unitInfo[0]}`;
+}

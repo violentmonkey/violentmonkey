@@ -2,7 +2,7 @@ import {
   parseScript,
   getScripts,
   getScriptCode,
-  removeScript,
+  markRemoved,
 } from '../utils/db';
 
 export const script = {
@@ -23,6 +23,6 @@ export const script = {
   },
   remove(id) {
     // Remove script by id
-    return removeScript(id);
+    return markRemoved(id, true);
   },
 };

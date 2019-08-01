@@ -1,72 +1,88 @@
 <template>
-  <div class="tab-installed">
-    <header class="flex">
-      <div class="flex-auto">
-        <dropdown
-          :closeAfterClick="true"
-          :class="{active: menuNewActive}"
-          @stateChange="onStateChange">
-          <tooltip :content="i18n('buttonNew')" placement="bottom" align="start" slot="toggle">
-            <span class="btn-ghost">
-              <icon name="plus"></icon>
+  <div class="tab-installed flex flex-col">
+    <div class="flex flex-col flex-auto">
+      <header class="flex">
+        <div class="flex-auto" v-if="!showRecycle">
+          <dropdown
+            :closeAfterClick="true"
+            :class="{active: menuNewActive}"
+            @stateChange="onStateChange">
+            <tooltip :content="i18n('buttonNew')" placement="bottom" align="start" slot="toggle">
+              <span class="btn-ghost">
+                <icon name="plus"></icon>
+              </span>
+            </tooltip>
+            <div
+              class="dropdown-menu-item"
+              v-text="i18n('buttonNew')"
+              @click.prevent="onEditScript('_new')"
+            />
+            <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank" rel="noopener noreferrer"></a>
+            <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank" rel="noopener noreferrer"></a>
+            <div
+              class="dropdown-menu-item"
+              v-text="i18n('buttonInstallFromURL')"
+              @click.prevent="installFromURL"
+            />
+          </dropdown>
+          <tooltip :content="i18n('buttonUpdateAll')" placement="bottom" align="start">
+            <span class="btn-ghost" @click="updateAll">
+              <icon name="refresh"></icon>
             </span>
           </tooltip>
-          <div
-            class="dropdown-menu-item"
-            v-text="i18n('buttonNew')"
-            @click.prevent="onEditScript('_new')"
-          />
-          <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank" rel="noopener noreferrer"></a>
-          <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank" rel="noopener noreferrer"></a>
-          <div
-            class="dropdown-menu-item"
-            v-text="i18n('buttonInstallFromURL')"
-            @click.prevent="installFromURL"
-          />
+        </div>
+        <div class="flex-auto" v-else v-text="i18n('headerRecycleBin')" />
+        <tooltip :content="i18n('buttonRecycleBin')" placement="bottom">
+          <span class="btn-ghost" @click="toggleRecycle" :class="{active: showRecycle}">
+            <icon name="trash"></icon>
+          </span>
+        </tooltip>
+        <dropdown align="right" class="filter-sort">
+          <tooltip :content="i18n('buttonFilter')" placement="bottom" slot="toggle">
+            <span class="btn-ghost">
+              <icon name="filter"></icon>
+            </span>
+          </tooltip>
+          <div>
+            <locale-group i18n-key="labelFilterSort">
+              <select :value="filters.sort.value" @change="onOrderChange">
+                <option
+                  v-for="option in filterOptions.sort"
+                  :key="option.value"
+                  v-text="option.title"
+                  :value="option.value">
+                </option>
+              </select>
+            </locale-group>
+          </div>
+          <div v-if="filters.sort.value === 'alpha'">
+            <label>
+              <setting-check name="filters.showEnabledFirst" @change="updateLater"></setting-check>
+              <span v-text="i18n('optionShowEnabledFirst')"></span>
+            </label>
+          </div>
         </dropdown>
-        <tooltip :content="i18n('buttonUpdateAll')" placement="bottom" align="start">
-          <span class="btn-ghost" @click="updateAll">
-            <icon name="refresh"></icon>
-          </span>
-        </tooltip>
-      </div>
-      <dropdown align="right" class="filter-sort">
-        <tooltip :content="i18n('buttonFilter')" placement="bottom" slot="toggle">
-          <span class="btn-ghost">
-            <icon name="filter"></icon>
-          </span>
-        </tooltip>
-        <div>
-          <locale-group i18n-key="labelFilterSort">
-            <select :value="filters.sort.value" @change="onOrderChange">
-              <option
-                v-for="option in filterOptions.sort"
-                :key="option.value"
-                v-text="option.title"
-                :value="option.value">
-              </option>
-            </select>
-          </locale-group>
+        <div class="filter-search hidden-sm">
+          <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
+          <icon name="search"></icon>
         </div>
-        <div v-if="filters.sort.value === 'alpha'">
-          <label>
-            <setting-check name="filters.showEnabledFirst" @change="updateLater"></setting-check>
-            <span v-text="i18n('optionShowEnabledFirst')"></span>
-          </label>
+      </header>
+      <div class="trash-hint mx-1 my-1 text-center" v-if="showRecycle" v-text="i18n('hintRecycleBin')" />
+      <div class="flex-auto pos-rel">
+        <div class="scripts abs-full">
+          <item
+            v-for="script in filteredScripts"
+            :key="script.props.id"
+            :script="script"
+            :draggable="filters.sort.value === 'exec' && !script.config.removed"
+            @edit="onEditScript"
+            @move="moveScript"
+          />
         </div>
-      </dropdown>
-      <div class="filter-search hidden-sm">
-        <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
-        <icon name="search"></icon>
+        <div class="backdrop abs-full" :class="{mask: store.loading}" v-show="message">
+          <div v-html="message"></div>
+        </div>
       </div>
-    </header>
-    <div class="scripts">
-      <item v-for="script in store.filteredScripts" :key="script.props.id"
-      :script="script" :draggable="filters.sort.value === 'exec' && !script.config.removed"
-      @edit="onEditScript" @move="moveScript"></item>
-    </div>
-    <div class="backdrop" :class="{mask: store.loading}" v-show="message">
-      <div v-html="message"></div>
     </div>
     <edit v-if="script" :initial="script" @close="onEditScript()"></edit>
   </div>
@@ -78,7 +94,6 @@ import Tooltip from 'vueleton/lib/tooltip/bundle';
 import {
   i18n, sendMessage, noop, debounce,
 } from '#/common';
-import { objectGet } from '#/common/object';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
 import hookSetting from '#/common/hook-setting';
@@ -141,12 +156,15 @@ export default {
       search: null,
       modal: null,
       menuNewActive: false,
+      showRecycle: false,
+      filteredScripts: [],
     };
   },
   watch: {
     search: 'updateLater',
     'filters.sort.value': 'updateLater',
-    'store.scripts'() {
+    showRecycle: 'onUpdate',
+    scripts() {
       this.onUpdate();
       this.onHashChange();
     },
@@ -157,20 +175,26 @@ export default {
       if (this.store.loading) {
         return i18n('msgLoading');
       }
-      if (!this.store.scripts.length) {
+      if (!this.scripts.length) {
         return i18n('labelNoScripts');
       }
-      if (!objectGet(this.store, 'filteredScripts.length')) {
+      if (!this.filteredScripts.length) {
         return i18n('labelNoSearchScripts');
       }
       return null;
     },
+    scripts() {
+      return this.store.scripts.filter(script => !script.config.removed);
+    },
+    trash() {
+      return this.store.scripts.filter(script => script.config.removed);
+    },
   },
   methods: {
     onUpdate() {
-      const { search, filters: { sort } } = this;
+      const { search, filters: { sort }, showRecycle } = this;
       const lowerSearch = (search || '').toLowerCase();
-      const { scripts } = this.store;
+      const scripts = showRecycle ? this.trash : this.scripts;
       const filteredScripts = search
         ? scripts.filter(script => script.$cache.search.includes(lowerSearch))
         : scripts.slice();
@@ -195,7 +219,7 @@ export default {
         const getSortKey = item => +item.props.lastUpdated || 0;
         filteredScripts.sort((a, b) => getSortKey(b) - getSortKey(a));
       }
-      this.store.filteredScripts = filteredScripts;
+      this.filteredScripts = filteredScripts;
     },
     updateLater() {
       this.debouncedUpdate();
@@ -233,12 +257,12 @@ export default {
       sendMessage({
         cmd: 'Move',
         data: {
-          id: this.store.scripts[data.from].props.id,
+          id: this.scripts[data.from].props.id,
           offset: data.to - data.from,
         },
       })
       .then(() => {
-        const { scripts } = this.store;
+        const { scripts } = this;
         const i = Math.min(data.from, data.to);
         const j = Math.max(data.from, data.to);
         const seq = [
@@ -251,7 +275,7 @@ export default {
         } else {
           seq[1].push(seq[1].shift());
         }
-        this.store.scripts = seq.concat.apply([], seq);
+        this.store.scripts = [...seq.flat(), ...this.trash];
       });
     },
     onOrderChange(e) {
@@ -269,8 +293,11 @@ export default {
         this.script = {};
       } else {
         const nid = id && +id || null;
-        this.script = nid && this.store.scripts.find(script => script.props.id === nid);
+        this.script = nid && this.scripts.find(script => script.props.id === nid);
       }
+    },
+    toggleRecycle() {
+      this.showRecycle = !this.showRecycle;
     },
   },
   created() {
@@ -281,12 +308,10 @@ export default {
 </script>
 
 <style>
-$header-height: 4rem;
-
 .tab.tab-installed {
   padding: 0;
-  > header {
-    height: $header-height;
+  header {
+    height: 4rem;
     align-items: center;
     padding: 0 1rem;
     line-height: 1;
@@ -299,20 +324,12 @@ $header-height: 4rem;
     display: none;
   }
 }
-.backdrop,
-.scripts {
-  position: absolute;
-  top: $header-height;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-.scripts {
-  overflow-y: auto;
-}
 .backdrop {
   text-align: center;
   color: gray;
+}
+.scripts {
+  overflow-y: auto;
 }
 .backdrop > *,
 .backdrop::after {
@@ -364,5 +381,10 @@ $header-height: 4rem;
       margin-bottom: .5rem;
     }
   }
+}
+
+.trash-hint {
+  line-height: 1.5;
+  color: #999;
 }
 </style>
