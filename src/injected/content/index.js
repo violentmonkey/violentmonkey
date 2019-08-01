@@ -173,15 +173,23 @@ const handlers = {
   },
   RegisterMenu(data) {
     if (IS_TOP) {
-      const [key] = data;
-      menus[key] = data;
+      const [id, cap] = data;
+      let commandMap = menus[id];
+      if (!commandMap) {
+        commandMap = {};
+        menus[id] = commandMap;
+      }
+      commandMap[cap] = 1;
     }
     getPopup();
   },
   UnregisterMenu(data) {
     if (IS_TOP) {
-      const [key] = data;
-      delete menus[key];
+      const [id, cap] = data;
+      const commandMap = menus[id];
+      if (commandMap) {
+        delete menus[cap];
+      }
     }
     getPopup();
   },
@@ -229,7 +237,7 @@ function getPopup() {
   if (IS_TOP) {
     sendMessage({
       cmd: 'SetPopup',
-      data: { ids, menus: Object.values(menus) },
+      data: { ids, menus },
     });
   }
 }

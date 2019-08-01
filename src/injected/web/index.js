@@ -317,7 +317,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
         const { id } = script.props;
         const key = `${id}:${cap}`;
         store.commands[key] = func;
-        bridge.post({ cmd: 'RegisterMenu', data: [key, cap] });
+        bridge.post({ cmd: 'RegisterMenu', data: [id, cap] });
       },
     },
     GM_unregisterMenuCommand: {
@@ -325,7 +325,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
         const { id } = script.props;
         const key = `${id}:${cap}`;
         delete store.commands[key];
-        bridge.post({ cmd: 'UnregisterMenu', data: [key, cap] });
+        bridge.post({ cmd: 'UnregisterMenu', data: [id, cap] });
       },
     },
     GM_xmlhttpRequest: {
