@@ -34,7 +34,11 @@ export default {
   },
   mounted() {
     const input = this.$el.querySelector('input');
-    if (input) input.focus();
+    if (input) {
+      setTimeout(() => {
+        input.focus();
+      });
+    }
   },
   beforeDestroy() {
     const i = dismissers.indexOf(this.dismiss);
