@@ -9248,10 +9248,10 @@ vue@^2.6.10:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
   integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
 
-vueleton@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/vueleton/-/vueleton-1.0.1.tgz#0dae8da8047a0f41200ac3f67f1752e4047912e1"
-  integrity sha512-61H5ekL9iLi0u593hMfVWw10BVpIuYhNq9s+1g4k6Vc3PSingHb0t15ViVC8WBDs4b91g2g2wIQxy+zCWeVFxA==
+vueleton@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/vueleton/-/vueleton-1.0.2.tgz#d8211251e4ec860006fabb148803fd41d90367c1"
+  integrity sha512-orXGCRV+UNm0eOe2gSaB9sGeR8J1zzFIfzzoRnFjhOfWxMVShuvun3P6Q0Qf7wX5e7Mf6SzPmW5CVHG565RGoA==
   dependencies:
     "@babel/runtime" "^7.3.4"
 

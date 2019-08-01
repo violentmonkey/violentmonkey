@@ -247,7 +247,7 @@ export default {
       })
       .then((url) => {
         if (url && url.includes('://')) return sendMessage({ cmd: 'ConfirmInstall', data: { url } });
-      }, noop)
+      })
       .catch((err) => {
         if (err) showMessage({ text: err });
       });
