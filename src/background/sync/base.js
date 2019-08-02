@@ -558,8 +558,7 @@ export function initialize() {
       services[name] = service;
     });
   }
-  const service = getService();
-  if (service) service.checkSync();
+  sync();
 }
 
 function syncOne(service) {
