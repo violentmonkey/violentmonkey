@@ -299,6 +299,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 奥欧，您还没有任何脚本~
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 未找到脚本！
@@ -399,6 +400,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: 脚本命令
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: 打开控制台

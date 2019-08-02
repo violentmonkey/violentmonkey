@@ -302,6 +302,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: スクリプトはインストールされていません。
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: スクリプトは見つかりませんでした。
@@ -402,6 +403,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: ユーザスクリプトコマンド
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: ダッシュボードを開く

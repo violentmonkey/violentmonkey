@@ -308,6 +308,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'К сожалению, у вас еще не установлено ни одного скрипта.'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Скрипты не найдены.
@@ -408,6 +409,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Команды скриптов
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Панель управления

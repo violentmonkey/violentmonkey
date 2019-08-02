@@ -85,7 +85,10 @@
             @remove="onRemove"
           />
         </div>
-        <div class="backdrop abs-full" :class="{mask: store.loading}" v-show="message">
+        <div
+          class="backdrop abs-full"
+          :class="{mask: store.loading}"
+          v-show="message">
           <div v-html="message"></div>
         </div>
       </div>
@@ -182,9 +185,6 @@ export default {
     message() {
       if (this.store.loading) {
         return i18n('msgLoading');
-      }
-      if (!this.scripts.length) {
-        return i18n('labelNoScripts');
       }
       if (!this.filteredScripts.length) {
         return i18n('labelNoSearchScripts');

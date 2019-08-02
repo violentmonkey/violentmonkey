@@ -307,6 +307,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Ωχ, δεν έχετε κανένα σενάριο ακόμα.'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Δεν βρέθηκε σενάριο.
@@ -407,6 +408,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Εντολές σεναρίου
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Άνοιγμα Ταμπλό

@@ -303,6 +303,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Heyoo, şu anda herhangi bir scriptiniz bulunmamakta..'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Script bulunamadı.
@@ -403,6 +404,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Script komutları
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Panelde Aç

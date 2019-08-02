@@ -303,6 +303,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: Es wurde noch kein Skript installiert.
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Kein Skript gefunden.
@@ -403,6 +404,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Skriptbefehle
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Dashboard öffnen

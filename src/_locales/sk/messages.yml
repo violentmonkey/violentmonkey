@@ -303,6 +303,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Ups, ešte nemáte nainštalovaný žiadny skript.'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Nenašiel sa žiadny skript.
@@ -403,6 +404,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Príkazy skriptu
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Otvoriť Dashboard

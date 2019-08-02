@@ -301,6 +301,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Oops, you haven’t got any scripts yet.'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: No script is found.
@@ -401,6 +402,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Script commands
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Open Dashboard

@@ -307,6 +307,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Vaya, todavía no tienes ningún script'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: No se encontraron scripts.
@@ -407,6 +408,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Comandos de scripts
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Abrir panel de control

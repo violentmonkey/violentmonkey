@@ -301,6 +301,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: Још увек немате ниједну скрипту.
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: ''
@@ -401,6 +402,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Команде скрипте
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: ''

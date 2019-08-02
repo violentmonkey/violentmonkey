@@ -299,6 +299,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: '이런, 아무 스크립트도 없네요.'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 스크립트 못 찾음.
@@ -399,6 +400,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: 스크립트 명령어
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: 대시보드 열기
