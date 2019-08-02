@@ -76,7 +76,7 @@
               @mouseenter="message = cap"
               @mouseleave="message = item.name">
               <icon name="command" />
-              {{cap}}
+              <div class="flex-auto ellipsis" v-text="cap" />
             </div>
           </div>
         </div>

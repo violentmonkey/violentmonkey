@@ -1,7 +1,10 @@
 body {
-  width: 24rem;
+  width: 320px;
   max-width: 100%;
   background: #f8f8f8;
+  @media (min-width: 360px) {
+    width: 100%;
+  }
 }
 
 footer {
