@@ -307,9 +307,9 @@ export default {
     toggleRecycle() {
       this.showRecycle = !this.showRecycle;
     },
-    onRemove(id, rect, callback) {
+    onRemove(id, rect) {
       const { trash } = this.$refs;
-      if (!trash) return;
+      if (!trash || this.removing) return;
       const trashRect = trash.getBoundingClientRect();
       this.removing = {
         id,
@@ -326,7 +326,6 @@ export default {
         this.removing.animation.transform = 'translate(0,0) scale(1,1)';
         setTimeout(() => {
           this.removing = null;
-          callback();
         }, 300);
       });
     },

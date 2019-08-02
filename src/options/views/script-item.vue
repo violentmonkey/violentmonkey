@@ -208,9 +208,8 @@ export default {
     },
     onRemove() {
       const rect = this.$el.getBoundingClientRect();
-      this.$emit('remove', this.script.props.id, rect, () => {
-        this.markRemoved(1);
-      });
+      this.markRemoved(1);
+      this.$emit('remove', this.script.props.id, rect);
     },
     onRestore() {
       this.markRemoved(0);
