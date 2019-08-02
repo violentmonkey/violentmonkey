@@ -75,6 +75,11 @@ function autoUpdate() {
   }
 }
 
+function autoCheckRemove() {
+  checkRemove();
+  setTimeout(autoCheckRemove, 24 * 60 * 60 * 1000);
+}
+
 const commands = {
   NewScript(id) {
     return id && cache.get(`new-${id}`) || newScript();
@@ -242,7 +247,7 @@ initialize()
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
   resetBlacklist();
-  checkRemove();
+  autoCheckRemove();
 });
 
 // Common functions
