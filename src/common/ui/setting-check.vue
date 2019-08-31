@@ -37,7 +37,7 @@ export default {
   created() {
     options.ready(() => {
       this.value = options.get(this.name);
-      this.revoke = hookSetting(this.name, value => {
+      this.revoke = hookSetting(this.name, (value) => {
         this.value = value;
       });
       this.$watch('value', this.onChange);

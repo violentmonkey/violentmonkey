@@ -3,20 +3,22 @@ anchorAuthor:
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
 anchorTranslator:
   description: Translator shown on about tab.
-  message: '<a href="http://www.forumit.ro/">Nicolae Crefelean</a>'
+  message: >-
+    <a href="http://www.forumit.ro/">Nicolae Crefelean</a>, <a 
+    href=mailto:cristian.silaghi@mozilla.ro>Cristian Silaghi</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Toate/Niciunul
   touched: false
 buttonCancel:
   description: Cancel button on dialog.
-  message: ''
+  message: Anulează
 buttonClose:
   description: Button to close window.
   message: Închide
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: Confirm instalarea
+  message: Confirmă instalarea
 buttonDisable:
   description: Button to disable a script.
   message: Dezactivează
@@ -31,16 +33,16 @@ buttonExportData:
   message: Exportă în zip
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Filtre
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Pagină de start
 buttonImportData:
   description: Button to choose a file for data import.
   message: Importă din zip
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Instalare din URL
+  message: Instalează din URL
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Opțiuni
@@ -49,7 +51,10 @@ buttonNew:
   message: Nou
 buttonOK:
   description: OK button on dialog.
-  message: ''
+  message: Ok
+buttonRecycleBin:
+  description: Button to list scripts in recycle bin.
+  message: Coș de reciclare
 buttonRemove:
   description: Button to remove a script.
   message: Elimină
@@ -61,28 +66,32 @@ buttonReplaceAll:
   message: Toate
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Resetează
+buttonRestore:
+  description: Button to restore a removed script.
+  message: Restaurează
 buttonSave:
   description: Button to save modifications of a script.
   message: Salvează
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: ''
+  message: Salvează
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Salvează și închide
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: ''
+  message: Salvează
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Pagină de asistență
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Revocă
+  touched: false
 buttonUpdate:
   description: Check a script for updates.
-  message: Cuată actualizări
+  message: Caută actualizări
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Caută actualizări pentru toate
@@ -94,65 +103,77 @@ buttonVacuumed:
   message: Date curățate
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Curățare date...
+  message: Se curăță datele...
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
     Modificările nu sunt salvate!
-    Apasă OK ca să le ignori sau Anulează ca să rămâi aici.
+    Clic pe Ok pentru a le ignora sau Anulează pentru a rămâne.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: ''
+  message: Scripturile nu vor fi injectate în URL-urile corespondente acestei liste.
 descCustomCSS:
   description: Description of custom CSS section.
-  message: ''
+  message: >-
+    CSS personalizat pentru pagina cu opțiuni și pagina de instalare a
+    scripturilor. Dacă nu ești sigur despre ce este vorba, te rugăm să nu
+    editezi.
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadate personalizate
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: Setările scriptului
 editNavCode:
   description: Label of code tab in script editor.
-  message: ''
+  message: Cod
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: ''
+  message: Setări
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: Valori
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: ''
+  message: Anulează
 editValueSave:
   description: Button to save modification of a script value.
-  message: ''
+  message: Salvează
 extDescription:
   description: Description for this extension.
-  message: ''
+  message: Oferă suport dedicat userscripturilor pentru browsere.
 extName:
   description: Name of this extension.
   message: Violentmonkey
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: ordinea alfabetică
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: ordinea executărilor
+filterLastUpdateOrder:
+  description: Label for option to sort scripts by last update time.
+  message: momentul ultimei actualizări
+headerRecycleBin:
+  description: Text shown in the header when scripts in recycle bin are listed.
+  message: Coș de reciclare
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'Introduceți URL-ul:'
+  message: 'Introdu URL-ul:'
+hintRecycleBin:
+  description: Hint for recycle bin.
+  message: Scripturile eliminate sunt listate aici și vor fi păstrate timp de 7 zile.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Folosește @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
   message: >-
-    Se elimină datele redundante și se încearcă reîncărcarea resurselor lipsă în
+    Înlătură datele redundante și încearcă să reîncarce resursele lipsă din
     cache.
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: Instalează din $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Închide după instalare
@@ -164,7 +185,7 @@ labelAbout:
   message: Despre Violentmonkey
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: Avansat
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Permite actualizarea
@@ -173,58 +194,58 @@ labelAuthor:
   message: 'Autor: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Reîncarcă fila curentă după activarea/dezactivarea unui script din meniu
+  message: Reîncarcă fila actuală după activarea/dezactivarea unui script din meniu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: 'Caută zilnic actualizări pentru scripturi, în mod automat'
+  message: Caută zilnic actualizări pentru scripturi, în mod automat
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'Afișează pe insignă: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: nimic
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: numărul scripturilor care rulează
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: numărul scripturilor unice care rulează
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: ''
+  message: Listă neagră
 labelCurrentLang:
   description: Label of current language.
-  message: 'Limba curentă: '
+  message: 'Limba actuală: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: ''
+  message: Stil personalizat
 labelDataExport:
   description: Section title of data export.
-  message: Export de date
+  message: Exportare de date
 labelDataImport:
   description: Section title of data import.
-  message: Import de date
+  message: Importare de date
 labelDonate:
   description: Label of link to donate page.
   message: Donează
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'URL Descărcare:'
+  message: 'URL pentru descărcare:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Editarea valorii scriptului
 labelEditing:
   description: Label for current editing script
-  message: ''
+  message: 'Editare în prezent: '
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Editor
 labelExclude:
   description: Label of @exclude rules.
-  message: Excluderi
+  message: Reguli @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: Reguli @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportă datele scripturilor
@@ -233,49 +254,49 @@ labelFeedback:
   message: Feedback
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: Sortează după $1
 labelGeneral:
   description: Label for general settings.
-  message: ''
+  message: Generale
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Ajută la traducere
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Pagină de start
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'URL Homepage:'
+  message: 'URL pentru pagina de start:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: Importă setări
 labelInclude:
   description: Label of @include rules.
-  message: Includeri
+  message: 'Reguli @include'
 labelIndentUnit:
   description: Label for editor option of indent unit size.
-  message: ''
+  message: 'Unitate de indentare:'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Modul de injectare implicit: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Se instalează scriptul
+  message: Instalarea scriptului
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: ''
+  message: Păstrează valoarea(ile) originală(e)
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: Ultima actualizare în $1
 labelLineNumber:
   description: Label for line number jumper.
-  message: ''
+  message: 'Rândul nr.: '
 labelLineWrapping:
   description: Label for editor option of line wrapping.
-  message: ''
+  message: Desparte rândurile lungi
 labelMatch:
   description: Label of @match rules.
-  message: Potriviri
+  message: 'Reguli @match'
 labelName:
   description: Label of script name.
   message: 'Nume:'
@@ -284,109 +305,127 @@ labelNoName:
   message: Fără nume
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'Ups, încă nu ai niciun script.'
+  message: 'Ups, nu ai încă vreun script.'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: Nu a fost găsit niciun script.
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: Notifică la actualizările scripturilor
 labelRelated:
   description: Label of related links.
-  message: 'Legături înrudite: '
+  message: 'Linkuri relevante: '
 labelRemoved:
   description: Label shown when a script is removed.
-  message: ''
+  message: '[Eliminat]'
+  touched: false
+labelRemovedAt:
+  description: Label for the time when the script is removed.
+  message: Eliminat în $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Înlocuiește cu: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Execuție:'
+  message: 'Momentul rulării:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Implicită)
+  message: (Implicit)
 labelScriptEditor:
   description: Shown in the title of the script editing page.
-  message: Editor de script
+  message: Editor de scripturi
   touched: false
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Șablon personalizat pentru scripturi
 labelSearch:
   description: Label for search input in search box.
   message: 'Caută: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: Caută scripturi...
 labelSettings:
   description: Label shown on the top of settings page
   message: Setări
 labelShowBadge:
   description: Option to show number of running scripts on the badge.
-  message: ''
+  message: Afișează pe insignă numărul de scripturi care rulează
   touched: false
 labelSync:
   description: Label for sync options.
   message: Sincronizare
+labelSyncAnonymous:
+  description: Label for using anonymous account.
+  message: Folosește un cont anonim
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: ''
+  message: Autorizează
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: ''
+  message: Se autorizează
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: ''
+  message: Niciunul
+labelSyncPassword:
+  description: Label for input to hold password.
+  message: 'Parolă: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: ''
+  message: Reautorizează automat la expirare
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: ''
+  message: Revocă
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: ''
+  message: Sincronizează starea scripturilor
+labelSyncServerUrl:
+  description: Label for input to hold server URL.
+  message: 'URL-ul serverului: '
 labelSyncService:
   description: Label for sync service select.
-  message: ''
+  message: Sincronizează cu
+labelSyncUsername:
+  description: Label for input to hold username.
+  message: 'Nume de utilizator: '
 labelTranslator:
   description: Label of translator.
   message: 'Traducător: '
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'URL Actualizare:'
+  message: 'URL pentru actualizare:'
 lastSync:
   description: Label for last sync timestamp.
-  message: Ultima sincronizare la $1
+  message: Ultima sincronizare în $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: Află mai multe despre tiparele listei negre.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Află mai multe despre modurile de injectare.
 menuCommands:
   description: Menu item to list script commands.
-  message: Comenzi de scripturi
+  message: Comenzi pentru scripturi
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: Deschide tabloul de bord
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Găsește scripturi pentru acest sait
+  message: Găsește scripturi pentru acest site
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: ''
+  message: Scripturi care corespund paginii
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Creează un script nou
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Scripturile sunt dezactivate
+  message: Scripturi dezactivate
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Scripturile sunt activate
+  message: Scripturi activate
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: Se caută actualizări...
@@ -414,12 +453,12 @@ msgInstalled:
   message: Script instalat.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: ''
+  message: Script nevalid!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: Datele scriptului au fost încărcate.
+  message: Datele scriptului sunt încărcate.
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Se încarcă...
@@ -433,7 +472,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Conflict în namespace-ul scriptului! Te rugăm modifică @name și @namespace.
+  message: >-
+    Conflicte în namespace-ul scriptului! Te rugăm să modifici @name și
+    @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -444,22 +485,22 @@ msgNoUpdate:
   message: Nu au fost găsite actualizări.
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: ''
+  message: Lista neagră este actualizată.
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: ''
+  message: Stilul personalizat este actualizat.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: Șablonul personalizat pentru scripturi este actualizat.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: 'Scriptul [$1] este actualizat!'
 msgSyncError:
   description: Message shown when sync failed.
   message: Eroare la sincronizare!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Inițializare...
+  message: Se inițializează...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Eroare la inițializare!
@@ -477,16 +518,16 @@ msgUpdating:
   message: Se actualizează...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: Nu este stocată nicio valoare
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Afișează mai întâi scripturile activate
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: Sensibil la scrierea cu litere mari și mici
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Folosește regex
 sideMenuAbout:
   description: 'Side menu: About'
   message: Despre
@@ -498,16 +539,18 @@ sideMenuSettings:
   message: Setări
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: ''
+  message: Actualizare
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Cheie (șir de caractere)
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: Valoare (serializată ca JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Vizitează site-ul web
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
-  message: ''
+  message: >-
+    Unele rânduri sunt prea lungi, se deschide în modul numai citire. Te rugăm
+    să editezi cu un editor extern.

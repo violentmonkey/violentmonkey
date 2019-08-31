@@ -12,7 +12,7 @@ import {
 import { tabOpen, tabClose } from './utils/tabs';
 import createNotification from './utils/notifications';
 import {
-  getScripts, removeScript, getData, checkRemove, getScriptsByURL,
+  getScripts, markRemoved, removeScript, getData, checkRemove, getScriptsByURL,
   updateScriptInfo, getExportData, getScriptCode,
   getScriptByIds, moveScript, vacuum, parseScript, getScript,
   sortScripts, getValueStoresByIds,
@@ -35,7 +35,7 @@ const browserAction = [
   return actions;
 }, {});
 
-hookOptions(changes => {
+hookOptions((changes) => {
   if ('isApplied' in changes) setIcon(changes.isApplied);
   if ('autoUpdate' in changes) autoUpdate();
   if ('showBadge' in changes) updateBadges();
@@ -52,11 +52,11 @@ hookOptions(changes => {
 function checkUpdateAll() {
   setOption('lastUpdate', Date.now());
   getScripts()
-  .then(scripts => {
+  .then((scripts) => {
     const toUpdate = scripts.filter(item => objectGet(item, 'config.shouldUpdate'));
     return Promise.all(toUpdate.map(checkUpdate));
   })
-  .then(updatedList => {
+  .then((updatedList) => {
     if (updatedList.some(Boolean)) sync.sync();
   });
 }
@@ -75,6 +75,11 @@ function autoUpdate() {
   }
 }
 
+function autoCheckRemove() {
+  checkRemove();
+  setTimeout(autoCheckRemove, 24 * 60 * 60 * 1000);
+}
+
 const commands = {
   NewScript(id) {
     return id && cache.get(`new-${id}`) || newScript();
@@ -84,14 +89,17 @@ const commands = {
     cache.put(`new-${id}`, newScript(data));
     return id;
   },
+  MarkRemoved({ id, removed }) {
+    return markRemoved(id, removed)
+    .then(() => { sync.sync(); });
+  },
   RemoveScript(id) {
     return removeScript(id)
     .then(() => { sync.sync(); });
   },
-  GetData(clear) {
-    return (clear ? checkRemove() : Promise.resolve())
-    .then(getData)
-    .then(data => {
+  GetData() {
+    return getData()
+    .then((data) => {
       data.sync = sync.getStates();
       data.version = VM_VER;
       return data;
@@ -107,7 +115,7 @@ const commands = {
     };
     if (!data.isApplied) return data;
     return getScriptsByURL(url)
-    .then(res => {
+    .then((res) => {
       addValueOpener(srcTab.id, Object.keys(res.values));
       return Object.assign(data, res);
     });
@@ -119,16 +127,7 @@ const commands = {
         lastModified: Date.now(),
       },
     })
-    .then(([script]) => {
-      sync.sync();
-      sendMessageOrIgnore({
-        cmd: 'UpdateScript',
-        data: {
-          where: { id: script.props.id },
-          update: script,
-        },
-      });
-    });
+    .then(() => { sync.sync(); });
   },
   GetValueStore(id) {
     return getValueStoresByIds([id]).then(res => res[id] || {});
@@ -158,14 +157,14 @@ const commands = {
   },
   Vacuum: vacuum,
   ParseScript(data) {
-    return parseScript(data).then(res => {
+    return parseScript(data).then((res) => {
       sync.sync();
       return res.data;
     });
   },
   CheckUpdate(id) {
     getScript({ id }).then(checkUpdate)
-    .then(updated => {
+    .then((updated) => {
       if (updated) sync.sync();
     });
   },
@@ -175,7 +174,7 @@ const commands = {
   },
   GetRequestId: getRequestId,
   HttpRequest(details, src) {
-    httpRequest(details, res => {
+    httpRequest(details, (res) => {
       browser.tabs.sendMessage(src.tab.id, {
         cmd: 'HttpRequested',
         data: res,
@@ -188,6 +187,7 @@ const commands = {
   SyncAuthorize: sync.authorize,
   SyncRevoke: sync.revoke,
   SyncStart: sync.sync,
+  SyncSetConfig: sync.setConfig,
   CacheLoad(data) {
     return cache.get(data) || null;
   },
@@ -207,12 +207,12 @@ const commands = {
   },
   SetOptions(data) {
     const items = Array.isArray(data) ? data : [data];
-    items.forEach(item => { setOption(item.key, item.value); });
+    items.forEach((item) => { setOption(item.key, item.value); });
   },
   ConfirmInstall: confirmInstall,
   CheckScript({ name, namespace }) {
     return getScript({ meta: { name, namespace } })
-    .then(script => (script ? script.meta.version : null));
+    .then(script => (script && !script.config.removed ? script.meta.version : null));
   },
   CheckPosition() {
     return sortScripts();
@@ -235,7 +235,7 @@ initialize()
       if (typeof res !== 'undefined') {
         // If res is not instance of native Promise, browser APIs will not wait for it.
         res = Promise.resolve(res)
-        .then(data => ({ data }), error => {
+        .then(data => ({ data }), (error) => {
           if (process.env.DEBUG) console.error(error);
           return { error };
         });
@@ -247,7 +247,7 @@ initialize()
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
   resetBlacklist();
-  checkRemove();
+  autoCheckRemove();
 });
 
 // Common functions
@@ -266,7 +266,7 @@ function setBadge({ ids, reset }, src) {
   }
   data.number += ids.length;
   if (ids) {
-    ids.forEach(id => {
+    ids.forEach((id) => {
       data.idMap[id] = 1;
     });
     data.unique = Object.keys(data.idMap).length;
@@ -292,13 +292,13 @@ function updateBadge(tabId) {
 }
 function updateBadges() {
   browser.tabs.query({})
-  .then(tabs => {
-    tabs.forEach(tab => {
+  .then((tabs) => {
+    tabs.forEach((tab) => {
       updateBadge(tab.id);
     });
   });
 }
-browser.tabs.onRemoved.addListener(id => {
+browser.tabs.onRemoved.addListener((id) => {
   delete badges[id];
 });
 

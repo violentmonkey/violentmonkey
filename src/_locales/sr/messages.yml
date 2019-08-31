@@ -50,6 +50,9 @@ buttonNew:
 buttonOK:
   description: OK button on dialog.
   message: ''
+buttonRecycleBin:
+  description: Button to list scripts in recycle bin.
+  message: ''
 buttonRemove:
   description: Button to remove a script.
   message: Уклони
@@ -61,6 +64,9 @@ buttonReplaceAll:
   message: Све
 buttonReset:
   description: Button to reset to default values.
+  message: ''
+buttonRestore:
+  description: Button to restore a removed script.
   message: ''
 buttonSave:
   description: Button to save modifications of a script.
@@ -80,6 +86,7 @@ buttonSupport:
 buttonUndo:
   description: Button to undo removement of a script.
   message: ''
+  touched: false
 buttonUpdate:
   description: Check a script for updates.
   message: Провери ажурирања
@@ -139,9 +146,18 @@ filterAlphabeticalOrder:
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: ''
+filterLastUpdateOrder:
+  description: Label for option to sort scripts by last update time.
+  message: ''
+headerRecycleBin:
+  description: Text shown in the header when scripts in recycle bin are listed.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Унесите адресу:'
+hintRecycleBin:
+  description: Hint for recycle bin.
+  message: ''
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Користи @downloadURL
@@ -285,6 +301,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: Још увек немате ниједну скрипту.
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: ''
@@ -296,6 +313,10 @@ labelRelated:
   message: Сродне везе
 labelRemoved:
   description: Label shown when a script is removed.
+  message: ''
+  touched: false
+labelRemovedAt:
+  description: Label for the time when the script is removed.
   message: ''
 labelReplace:
   description: Label for replace input in search box.
@@ -329,6 +350,9 @@ labelShowBadge:
 labelSync:
   description: Label for sync options.
   message: Синхронизација
+labelSyncAnonymous:
+  description: Label for using anonymous account.
+  message: ''
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: ''
@@ -337,6 +361,9 @@ labelSyncAuthorizing:
   message: ''
 labelSyncDisabled:
   description: Label for option to disable sync service.
+  message: ''
+labelSyncPassword:
+  description: Label for input to hold password.
   message: ''
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
@@ -348,8 +375,14 @@ labelSyncRevoke:
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: ''
+labelSyncServerUrl:
+  description: Label for input to hold server URL.
+  message: ''
 labelSyncService:
   description: Label for sync service select.
+  message: ''
+labelSyncUsername:
+  description: Label for input to hold username.
   message: ''
 labelTranslator:
   description: Label of translator.
@@ -369,6 +402,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Команде скрипте
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: ''

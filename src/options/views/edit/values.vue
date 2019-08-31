@@ -3,9 +3,9 @@
     <div class="mb-1">
       <button @click="onNew">+</button>
       <div class="inline-block ml-2" v-if="totalPages > 1">
-        <button :disabled="!hasPrevious" @click="setPage(currentPage.page - 1)">&larr;</button>
+        <button :disabled="!hasPrevious" @click="page = currentPage.page - 1">&larr;</button>
         <span class="mx-1" v-text="page"></span>
-        <button :disabled="!hasNext" @click="setPage(currentPage.page + 1)">&rarr;</button>
+        <button :disabled="!hasNext" @click="page = currentPage.page + 1">&rarr;</button>
       </div>
     </div>
     <div class="edit-values-table" v-if="keys">
@@ -58,7 +58,6 @@ export default {
   },
   data() {
     return {
-      currentPage: null,
       current: null,
       keys: null,
       values: null,
@@ -68,6 +67,14 @@ export default {
     totalPages() {
       if (!this.keys) return 0;
       return Math.floor(this.keys.length / PAGE_SIZE) + 1;
+    },
+    currentPage() {
+      const page = Math.max(1, Math.min(this.page, this.totalPages));
+      const offset = PAGE_SIZE * (page - 1);
+      return {
+        page,
+        data: this.keys ? this.keys.slice(offset, offset + PAGE_SIZE) : null,
+      };
     },
     hasPrevious() {
       return this.currentPage.page > 1;
@@ -82,14 +89,6 @@ export default {
     },
   },
   methods: {
-    setPage(expected) {
-      const page = Math.max(1, Math.min(expected, this.totalPages));
-      const offset = PAGE_SIZE * (page - 1);
-      this.currentPage = {
-        page,
-        data: this.keys ? this.keys.slice(offset, offset + PAGE_SIZE) : null,
-      };
-    },
     getValue(key, sliced) {
       let value = this.values[key];
       const type = value[0];
@@ -102,10 +101,10 @@ export default {
     },
     refresh() {
       sendMessage({ cmd: 'GetValueStore', data: this.script.props.id })
-      .then(values => {
+      .then((values) => {
         this.values = values;
         this.keys = Object.keys(values).sort();
-        this.setPage(1);
+        this.page = 1;
       });
     },
     updateValue({ key, value, isNew }) {
@@ -122,12 +121,12 @@ export default {
       })
       .then(() => {
         if (value) {
-          this.values[key] = rawValue;
+          this.$set(this.values, key, rawValue);
           if (isNew) this.keys.push(key);
         } else {
           const i = this.keys.indexOf(key);
           if (i >= 0) this.keys.splice(i, 1);
-          delete this.values[key];
+          this.$delete(this.values, key);
         }
       });
     },

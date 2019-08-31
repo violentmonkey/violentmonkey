@@ -5,7 +5,7 @@ const notifications = {};
 
 export function onNotificationCreate(options) {
   sendMessage({ cmd: 'Notification', data: options })
-  .then(nid => { notifications[nid] = options.id; });
+  .then((nid) => { notifications[nid] = options.id; });
 }
 
 export function onNotificationClick(nid) {

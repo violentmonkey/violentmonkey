@@ -19,7 +19,7 @@ const base = {
 };
 const targets = {
   taobao: Object.assign({}, base, {
-    prefix: 'http://registry.npm.taobao.org/',
+    prefix: 'https://registry.npm.taobao.org/',
     build({ scope, name, suffix }) {
       return this.prefix + [scope, name, 'download', scope, suffix].filter(Boolean).join('/');
     },
@@ -28,7 +28,7 @@ const targets = {
     prefix: 'https://registry.yarnpkg.com/',
   }),
   npm: Object.assign({}, base, {
-    prefix: 'http://registry.npmjs.org/',
+    prefix: 'https://registry.npmjs.org/',
   }),
 };
 

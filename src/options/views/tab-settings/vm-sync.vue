@@ -11,13 +11,56 @@
           :value="service.name"
         />
       </select>
-      <button v-text="state.label" v-if="service.name"
+      <button v-text="state.label" v-if="service.name && state.authType === 'oauth'"
       :disabled="!state.canAuthorize" @click="onAuthorize"></button>
       <button :disabled="!state.canSync" v-if="service.name" @click="onSync">
         <icon name="refresh"></icon>
       </button>
     </div>
     <p v-if="state" class="mt-1" v-text="state.message"></p>
+    <fieldset class="mt-1" v-if="state && state.authType === 'password'">
+      <div class="sync-server-url">
+        <label v-text="i18n('labelSyncServerUrl')"></label>
+        <input
+          type="text"
+          v-model="state.userConfig.serverUrl"
+          :disabled="!state.canAuthorize || state.userConfig.anonymous"
+        />
+      </div>
+      <div class="mt-1">
+        <div class="inline-block mr-2">
+          <label v-text="i18n('labelSyncUsername')"></label>
+          <input
+            type="text"
+            v-model="state.userConfig.username"
+            :disabled="!state.canAuthorize || state.userConfig.anonymous"
+          />
+        </div>
+        <div class="inline-block mr-2">
+          <label v-text="i18n('labelSyncPassword')"></label>
+          <input
+            type="password"
+            v-model="state.userConfig.password"
+            :disabled="!state.canAuthorize || state.userConfig.anonymous"
+          />
+        </div>
+        <label class="mr-2">
+          <input
+            type="checkbox"
+            v-model="state.userConfig.anonymous"
+            :disabled="!state.canAuthorize"
+          />
+          <span v-text="i18n('labelSyncAnonymous')"></span>
+        </label>
+      </div>
+      <div class="mt-1">
+        <button
+          v-text="i18n('buttonSave')"
+          @click.prevent="onSaveUserConfig"
+          :disabled="!state.canAuthorize"
+        />
+      </div>
+    </fieldset>
     <div class="mt-1">
       <label>
         <setting-check name="syncScriptStatus" />
@@ -39,7 +82,7 @@ const SYNC_CURRENT = 'sync.current';
 const syncConfig = {
   current: '',
 };
-hookSetting(SYNC_CURRENT, value => {
+hookSetting(SYNC_CURRENT, (value) => {
   syncConfig.current = value || '';
 });
 
@@ -62,6 +105,7 @@ export default {
           {
             displayName: this.i18n('labelSyncDisabled'),
             name: '',
+            properties: {},
           },
           ...states,
         ];
@@ -91,12 +135,20 @@ export default {
           label: this.getLabel(),
           canAuthorize,
           canSync,
+          authType: service.properties.authType,
+          userConfig: service.userConfig || {},
         };
       }
       return null;
     },
   },
   methods: {
+    onSaveUserConfig() {
+      sendMessage({
+        cmd: 'SyncSetConfig',
+        data: this.state.userConfig,
+      });
+    },
     onSyncChange(e) {
       const { value } = e.target;
       options.set(SYNC_CURRENT, value);
@@ -141,3 +193,11 @@ export default {
   },
 };
 </script>
+
+<style>
+.sync-server-url {
+  > input {
+    width: 400px;
+  }
+}
+</style>

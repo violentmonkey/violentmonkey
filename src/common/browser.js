@@ -5,7 +5,7 @@ import '#/common/polyfills';
 function wrapAsync(func, thisObj) {
   return (...args) => {
     const promise = new Promise((resolve, reject) => {
-      args.push(res => {
+      args.push((res) => {
         const err = chrome.runtime.lastError;
         if (err) {
           reject(err);
@@ -15,7 +15,7 @@ function wrapAsync(func, thisObj) {
       });
       func.apply(thisObj, args);
     });
-    promise.catch(err => {
+    promise.catch((err) => {
       if (process.env.DEBUG) console.warn(args, err);
     });
     return promise;
@@ -23,7 +23,7 @@ function wrapAsync(func, thisObj) {
 }
 function wrapAPIs(source, meta) {
   const target = {};
-  Object.keys(source).forEach(key => {
+  Object.keys(source).forEach((key) => {
     const metaVal = meta && meta[key];
     if (metaVal) {
       const value = source[key];
@@ -40,6 +40,7 @@ function wrapAPIs(source, meta) {
 }
 const meta = {
   browserAction: true,
+  extension: true,
   i18n: true,
   notifications: {
     onClicked: true,
@@ -58,12 +59,12 @@ const meta = {
           }
           const result = listener(message, sender);
           if (result && typeof result.then === 'function') {
-            result.then(data => {
+            result.then((data) => {
               if (process.env.DEBUG) {
                 console.info('send', data);
               }
               sendResponse({ data });
-            }, error => {
+            }, (error) => {
               if (process.env.DEBUG) console.warn(error);
               sendResponse({ error });
             })
@@ -88,13 +89,13 @@ const meta = {
     },
     sendMessage(sendMessage) {
       const promisifiedSendMessage = wrapAsync(sendMessage);
-      return data => {
+      return (data) => {
         const promise = promisifiedSendMessage(data)
-        .then(res => {
+        .then((res) => {
           if (res && res.error) throw res.error;
           return res && res.data;
         });
-        promise.catch(err => {
+        promise.catch((err) => {
           if (process.env.DEBUG) console.warn(err);
         });
         return promise;

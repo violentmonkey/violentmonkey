@@ -6,7 +6,7 @@ tld.initTLD(true);
 
 const RE_MATCH_PARTS = /(.*?):\/\/([^/]*)\/(.*)/;
 let blacklistRules = [];
-hookOptions(changes => {
+hookOptions((changes) => {
   if ('blacklist' in changes) resetBlacklist(changes.blacklist || '');
 });
 const RE_HTTP_OR_HTTPS = /^https?$/i;
@@ -16,7 +16,7 @@ const RE_HTTP_OR_HTTPS = /^https?$/i;
  */
 export function testGlob(url, rules) {
   const lifetime = 60 * 1000;
-  return rules.some(rule => {
+  return rules.some((rule) => {
     const key = `re:${rule}`;
     let re = cache.get(key);
     if (re) {
@@ -34,7 +34,7 @@ export function testGlob(url, rules) {
  */
 export function testMatch(url, rules) {
   const lifetime = 60 * 1000;
-  return rules.some(rule => {
+  return rules.some((rule) => {
     const key = `match:${rule}`;
     let matcher = cache.get(key);
     if (matcher) {
@@ -72,7 +72,7 @@ function mergeLists(...args) {
 
 function str2RE(str) {
   const re = str.replace(/([.?+[\]{}()|^$])/g, '\\$1').replace(/\*/g, '.*?');
-  return `^${re}$`;
+  return re;
 }
 
 function autoReg(str) {
@@ -80,55 +80,78 @@ function autoReg(str) {
     return new RegExp(str.slice(1, -1)); // Regular-expression
   }
   const reStr = str2RE(str);
-  const re = new RegExp(reStr); // String with wildcards
-  const tests = [
-    tstr => re.test(tstr),
-  ];
   if (tld.isReady() && str.includes('.tld/')) {
     const reTldStr = reStr.replace('\\.tld/', '((?:\\.\\w+)+)/');
-    tests.push(tstr => {
-      const matches = tstr.match(reTldStr);
-      if (matches) {
-        const suffix = matches[1].slice(1);
-        if (tld.getPublicSuffix(suffix) === suffix) return true;
-      }
-      return false;
-    });
+    return {
+      test: (tstr) => {
+        const matches = tstr.match(reTldStr);
+        if (matches) {
+          const suffix = matches[1].slice(1);
+          if (tld.getPublicSuffix(suffix) === suffix) return true;
+        }
+        return false;
+      },
+    };
   }
-  return { test: tstr => tests.some(test => test(tstr)) };
+  const re = new RegExp(`^${reStr}$`); // String with wildcards
+  return { test: tstr => re.test(tstr) };
 }
 
 function matchScheme(rule, data) {
   // exact match
   if (rule === data) return 1;
   // * = http | https
-  if (rule === '*' && RE_HTTP_OR_HTTPS.test(data)) return 1;
+  // support http*
+  if ([
+    '*',
+    'http*',
+  ].includes(rule) && RE_HTTP_OR_HTTPS.test(data)) return 1;
   return 0;
 }
+
+const RE_STR_ANY = '(?:|.*?\\.)';
+const RE_STR_TLD = '((?:\\.\\w+)+)';
 function hostMatcher(rule) {
-  const reRule = new RegExp(str2RE(rule));
-  return data => {
+  // *.example.com
+  // www.google.*
+  // www.google.tld
+  let prefix = '';
+  let base = rule;
+  let suffix = '';
+  if (rule.startsWith('*.')) {
+    base = base.slice(2);
+    prefix = RE_STR_ANY;
+  }
+  if (tld.isReady() && rule.endsWith('.tld')) {
+    base = base.slice(0, -4);
+    suffix = RE_STR_TLD;
+  }
+  const re = new RegExp(`^${prefix}${str2RE(base)}${suffix}$`);
+  return (data) => {
     // * matches all
     if (rule === '*') return 1;
     // exact match
     if (rule === data) return 1;
-    // *.example.com
-    if (/^\*\.[^*]*$/.test(rule)) {
-      // matches the specified domain
-      if (rule.slice(2) === data) return 1;
-      // matches subdomains
-      if (reRule.test(data)) return 1;
+    const matches = data.match(re);
+    if (matches) {
+      const [, tldStr] = matches;
+      if (!tldStr) return 1;
+      const tldSuffix = tldStr.slice(1);
+      return tld.getPublicSuffix(tldSuffix) === tldSuffix;
     }
     return 0;
   };
 }
+
 function pathMatcher(rule) {
   const iHash = rule.indexOf('#');
   let iQuery = rule.indexOf('?');
   let strRe = str2RE(rule);
   if (iQuery > iHash) iQuery = -1;
-  if (iQuery < 0 && iHash < 0) strRe = `${strRe.slice(0, -1)}(?:[?#]|$)`;
-  else if (iHash < 0) strRe = `${strRe.slice(0, -1)}(?:#|$)`;
+  if (iHash < 0) {
+    if (iQuery < 0) strRe = `^${strRe}(?:[?#]|$)`;
+    else strRe = `^${strRe}(?:#|$)`;
+  }
   const reRule = new RegExp(strRe);
   return data => reRule.test(data);
 }
@@ -141,7 +164,7 @@ function matchTester(rule) {
     if (ruleParts) {
       const matchHost = hostMatcher(ruleParts[2]);
       const matchPath = pathMatcher(ruleParts[3]);
-      test = url => {
+      test = (url) => {
         const parts = url.match(RE_MATCH_PARTS);
         return !!ruleParts && !!parts
           && matchScheme(ruleParts[1], parts[1])
@@ -175,7 +198,7 @@ export function resetBlacklist(list) {
   }
   // XXX compatible with {Array} list in v2.6.1-
   blacklistRules = (Array.isArray(rules) ? rules : (rules || '').split('\n'))
-  .map(line => {
+  .map((line) => {
     const item = line.trim();
     if (!item || item.startsWith('#')) return null;
 

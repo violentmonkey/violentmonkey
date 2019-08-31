@@ -52,6 +52,9 @@ buttonNew:
 buttonOK:
   description: OK button on dialog.
   message: OK
+buttonRecycleBin:
+  description: Button to list scripts in recycle bin.
+  message: ''
 buttonRemove:
   description: Button to remove a script.
   message: Supprimer
@@ -64,6 +67,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Réinitialiser
+buttonRestore:
+  description: Button to restore a removed script.
+  message: ''
 buttonSave:
   description: Button to save modifications of a script.
   message: Sauvegarder
@@ -82,6 +88,7 @@ buttonSupport:
 buttonUndo:
   description: Button to undo removement of a script.
   message: Annuler
+  touched: false
 buttonUpdate:
   description: Check a script for updates.
   message: Vérifier les mises à jour
@@ -144,9 +151,18 @@ filterAlphabeticalOrder:
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: ordre d’exécution
+filterLastUpdateOrder:
+  description: Label for option to sort scripts by last update time.
+  message: ''
+headerRecycleBin:
+  description: Text shown in the header when scripts in recycle bin are listed.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL source:'
+hintRecycleBin:
+  description: Hint for recycle bin.
+  message: ''
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Utiliser @downloadURL
@@ -292,6 +308,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Oups, vous n’avez pas encore de scripts.'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Pas de script trouvé
@@ -304,6 +321,10 @@ labelRelated:
 labelRemoved:
   description: Label shown when a script is removed.
   message: '[Supprimé]'
+  touched: false
+labelRemovedAt:
+  description: Label for the time when the script is removed.
+  message: ''
 labelReplace:
   description: Label for replace input in search box.
   message: 'Remplacer par: '
@@ -336,6 +357,9 @@ labelShowBadge:
 labelSync:
   description: Label for sync options.
   message: Synchronisation
+labelSyncAnonymous:
+  description: Label for using anonymous account.
+  message: ''
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Autoriser
@@ -345,6 +369,9 @@ labelSyncAuthorizing:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Aucun
+labelSyncPassword:
+  description: Label for input to hold password.
+  message: ''
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Réautoriser automatiquement à l’expiration
@@ -355,9 +382,15 @@ labelSyncRevoke:
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Synchroniser le statut du script
+labelSyncServerUrl:
+  description: Label for input to hold server URL.
+  message: ''
 labelSyncService:
   description: Label for sync service select.
   message: Synchroniser sur
+labelSyncUsername:
+  description: Label for input to hold username.
+  message: ''
 labelTranslator:
   description: Label of translator.
   message: 'Traducteur·ice·s: '
@@ -376,6 +409,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Commandes de script
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Ouvrir le tableau de bord

@@ -16,6 +16,8 @@ export const map = bindThis(arrayProto.map);
 
 export const indexOf = bindThis(arrayProto.indexOf);
 
+export const push = bindThis(arrayProto.push);
+
 export const includes = arrayProto.includes
   ? bindThis(arrayProto.includes)
   : (arr, item) => indexOf(arr, item) >= 0;
@@ -28,9 +30,9 @@ const { fromCharCode } = String;
 
 export const { keys } = Object;
 export const assign = Object.assign || ((obj, ...args) => {
-  forEach(args, arg => {
+  forEach(args, (arg) => {
     if (arg) {
-      forEach(keys(arg), key => {
+      forEach(keys(arg), (key) => {
         obj[key] = arg[key];
       });
     }
@@ -38,7 +40,13 @@ export const assign = Object.assign || ((obj, ...args) => {
   return obj;
 });
 
-export const isArray = obj => toString(obj) === '[object Array]';
+export const isArray = obj => (
+  // ES3 way, not reliable if prototype is modified
+  // toString(obj) === '[object Array]'
+  // #565 steamcommunity.com has overridden `Array.prototype`
+  // support duck typing
+  obj && typeof obj.length === 'number' && typeof obj.splice === 'function'
+);
 
 export function encodeBody(body) {
   const cls = getType(body);
@@ -63,7 +71,7 @@ export function encodeBody(body) {
     }, {}))
     .then(value => ({ cls, value }));
   } else if (includes(['blob', 'file'], cls)) {
-    result = new Promise(resolve => {
+    result = new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = () => {
         // In Firefox, Uint8Array cannot be sliced if its data is read by FileReader

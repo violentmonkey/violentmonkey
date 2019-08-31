@@ -3,7 +3,7 @@ import {
   getUniqId, bindEvents, attachFunction, cache2blobUrl,
 } from '../utils';
 import {
-  includes, forEach, map, utf8decode, jsonDump, jsonLoad,
+  includes, forEach, map, push, utf8decode, jsonDump, jsonLoad,
   Promise, console,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -56,7 +56,7 @@ const handlers = {
   TabClosed: onTabClosed,
   UpdatedValues(updates) {
     Object.keys(updates)
-    .forEach(id => {
+    .forEach((id) => {
       if (store.values[id]) store.values[id] = updates[id];
     });
   },
@@ -69,7 +69,7 @@ const handlers = {
 
 function registerCallback(callback) {
   const callbackId = getUniqId('VMcb');
-  store.callbacks[callbackId] = payload => {
+  store.callbacks[callbackId] = (payload) => {
     callback(payload);
     delete store.callbacks[callbackId];
   };
@@ -103,10 +103,10 @@ function onLoadScripts(data) {
     'document-end': end,
   };
   if (data.scripts) {
-    forEach(data.scripts, script => {
+    forEach(data.scripts, (script) => {
       const runAt = script.custom.runAt || script.meta.runAt;
       const list = listMap[runAt] || end;
-      list.push(script);
+      push(list, script);
       store.values[script.props.id] = data.values[script.props.id];
     });
     run(start);
@@ -121,32 +121,38 @@ function onLoadScripts(data) {
     const pathMap = script.custom.pathMap || {};
     const code = data.code[script.props.id] || '';
     const unsafeWindow = bridge.mode === INJECT_CONTENT ? global : window;
-    const { wrapper, thisObj } = wrapGM(script, code, data.cache, unsafeWindow);
-    // Must use Object.getOwnPropertyNames to list unenumerable properties
-    const argNames = Object.getOwnPropertyNames(wrapper);
-    const wrapperInit = map(argNames, name => `this["${name}"]=${name}`).join(';');
-    const codeSlices = [`${wrapperInit};with(this)!function(define,module,exports){`];
-    forEach(requireKeys, key => {
-      const requireCode = data.require[pathMap[key] || key];
-      if (requireCode) {
-        codeSlices.push(requireCode);
-        // Add `;` to a new line in case script ends with comment lines
-        codeSlices.push(';');
-      }
-    });
-    // wrap code to make 'use strict' work
-    codeSlices.push(`!function(){${code}\n}.call(this)`);
-    codeSlices.push('}.call(this);');
-    const codeConcat = `function(${argNames.join(',')}){${codeSlices.join('\n')}}`;
-    const name = script.custom.name || script.meta.name || script.props.id;
-    const args = map(argNames, key => wrapper[key]);
+    const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache, unsafeWindow);
     const id = getUniqId('VMin');
     const fnId = getUniqId('VMfn');
+    const wrapperInit = map(keys, name => `this["${name}"]=${name}`).join(';');
+    const codeSlices = [
+      `${wrapperInit};with(this)!function(define,module,exports){`,
+    ];
+    forEach(requireKeys, (key) => {
+      const requireCode = data.require[pathMap[key] || key];
+      if (requireCode) {
+        push(
+          codeSlices,
+          requireCode,
+          // Add `;` to a new line in case script ends with comment lines
+          ';',
+        );
+      }
+    });
+    push(
+      codeSlices,
+      '!function(){',
+      code,
+      '}.call(this)}.call(this);',
+    );
+    const codeConcat = `function(${keys.join(',')}){${codeSlices.join('\n')}}`;
+    const name = script.custom.name || script.meta.name || script.props.id;
+    const args = map(keys, key => wrapper[key]);
     attachFunction(fnId, () => {
       const func = window[id];
-      if (func) runCode(name, func, args, thisObj);
+      if (func) runCode(name, func, args, thisObj, codeConcat);
     });
-    bridge.post({ cmd: 'Inject', data: [id, codeConcat, fnId, bridge.mode] });
+    bridge.post({ cmd: 'Inject', data: [id, codeConcat, fnId, bridge.mode, script.props.id] });
   }
   function run(list) {
     while (list.length) buildCode(list.shift());
@@ -168,8 +174,8 @@ function wrapGM(script, code, cache, unsafeWindow) {
     thisObj = getWrapper(unsafeWindow);
     gm.window = thisObj;
   }
-  if (!includes(grant, 'unsafeWindow')) grant.push('unsafeWindow');
-  if (!includes(grant, 'GM_info')) grant.push('GM_info');
+  if (!includes(grant, 'unsafeWindow')) push(grant, 'unsafeWindow');
+  if (!includes(grant, 'GM_info')) push(grant, 'GM_info');
   if (includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
   const resources = script.meta.resources || {};
   const dataDecoders = {
@@ -278,7 +284,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
       value(css) {
         const callbacks = [];
         let el = false;
-        const callbackId = registerCallback(styleId => {
+        const callbackId = registerCallback((styleId) => {
           el = document.getElementById(styleId);
           callbacks.splice().forEach(callback => callback(el));
         });
@@ -287,7 +293,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
         return {
           then(callback) {
             if (el !== false) callback(el);
-            else callbacks.push(callback);
+            else push(callbacks, callback);
           },
         };
       },
@@ -311,7 +317,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
         const { id } = script.props;
         const key = `${id}:${cap}`;
         store.commands[key] = func;
-        bridge.post({ cmd: 'RegisterMenu', data: [key, cap] });
+        bridge.post({ cmd: 'RegisterMenu', data: [id, cap] });
       },
     },
     GM_unregisterMenuCommand: {
@@ -319,7 +325,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
         const { id } = script.props;
         const key = `${id}:${cap}`;
         delete store.commands[key];
-        bridge.post({ cmd: 'UnregisterMenu', data: [key, cap] });
+        bridge.post({ cmd: 'UnregisterMenu', data: [id, cap] });
       },
     },
     GM_xmlhttpRequest: {
@@ -351,11 +357,15 @@ function wrapGM(script, code, cache, unsafeWindow) {
       },
     },
   };
-  forEach(grant, name => {
+  const keys = [];
+  forEach(grant, (name) => {
     const prop = gmFunctions[name];
-    if (prop) addProperty(name, prop, gm);
+    if (prop) {
+      push(keys, name);
+      addProperty(name, prop, gm);
+    }
   });
-  return { thisObj, wrapper: gm };
+  return { thisObj, wrapper: gm, keys };
   function loadValues() {
     return store.values[script.props.id];
   }
@@ -389,13 +399,13 @@ function getWrapper(unsafeWindow) {
   // Block special objects
   forEach([
     'browser',
-  ], name => {
+  ], (name) => {
     wrapper[name] = undefined;
   });
   forEach([
     // `eval` should be called directly so that it is run in current scope
     'eval',
-  ], name => {
+  ], (name) => {
     wrapper[name] = unsafeWindow[name];
   });
   forEach([
@@ -445,7 +455,7 @@ function getWrapper(unsafeWindow) {
     'setInterval',
     'setTimeout',
     'stop',
-  ], name => {
+  ], (name) => {
     const method = unsafeWindow[name];
     if (method) {
       wrapper[name] = (...args) => method.apply(unsafeWindow, args);
@@ -477,7 +487,7 @@ function getWrapper(unsafeWindow) {
     });
   }
   // Wrap properties
-  forEach(bridge.props, name => {
+  forEach(bridge.props, (name) => {
     if (name in wrapper) return;
     if (name.slice(0, 2) === 'on') defineReactedProperty(name);
     else defineProtectedProperty(name);
@@ -487,7 +497,7 @@ function getWrapper(unsafeWindow) {
 
 function log(level, tags, ...args) {
   const tagList = ['Violentmonkey'];
-  if (tags) tagList.push(...tags);
+  if (tags) push(tagList, ...tags);
   const prefix = tagList.map(tag => `[${tag}]`).join('');
   console[level](prefix, ...args);
 }
@@ -496,13 +506,7 @@ function runCode(name, func, args, thisObj) {
   if (process.env.DEBUG) {
     log('info', [bridge.mode], name);
   }
-  try {
-    func.apply(thisObj, args);
-  } catch (e) {
-    let message = `\n${e}`;
-    if (e.message) message = `${message}\n${e.message}`;
-    log('error', [bridge.mode, name], message);
-  }
+  func.apply(thisObj, args);
 }
 
 function exposeVM() {
@@ -522,7 +526,7 @@ function exposeVM() {
     }),
   });
   Object.defineProperty(Violentmonkey, 'isInstalled', {
-    value: (name, namespace) => new Promise(resolve => {
+    value: (name, namespace) => new Promise((resolve) => {
       key += 1;
       const callback = key;
       checking[callback] = resolve;

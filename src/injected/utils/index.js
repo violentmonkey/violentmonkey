@@ -1,5 +1,7 @@
+import { getUniqId } from '#/common';
 import { CustomEvent, jsonDump, jsonLoad } from './helpers';
 
+export { getUniqId };
 export {
   sendMessage, request, throttle, cache2blobUrl,
 } from '#/common';
@@ -10,34 +12,12 @@ export function postData(destId, data) {
   document.dispatchEvent(e);
 }
 
-function removeElement(id) {
-  const el = document.querySelector(`#${id}`);
-  if (el) {
-    el.parentNode.removeChild(el);
-    return true;
-  }
-}
-
-export function inject(code) {
-  const script = document.createElement('script');
-  const id = getUniqId('VM-');
-  script.id = id;
-  script.textContent = `!${removeElement.toString()}(${JSON.stringify(id)});${code}`;
-  document.documentElement.appendChild(script);
-  // in case the script is blocked by CSP
-  removeElement(id);
-}
-
-export function getUniqId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-}
-
 export function bindEvents(srcId, destId, handle) {
-  document.addEventListener(srcId, e => {
+  document.addEventListener(srcId, (e) => {
     const data = jsonLoad(e.detail);
     handle(data);
   }, false);
-  return data => { postData(destId, data); };
+  return (data) => { postData(destId, data); };
 }
 
 export function attachFunction(id, cb) {

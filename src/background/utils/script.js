@@ -1,3 +1,4 @@
+import { encodeFilename } from '#/common';
 import { getOption } from './options';
 
 const metaStart = '==UserScript==';
@@ -106,17 +107,7 @@ export function newScript(data) {
 export function getNameURI(script) {
   const ns = script.meta.namespace || '';
   const name = script.meta.name || '';
-  let nameURI = `${escape(ns)}:${escape(name)}:`;
+  let nameURI = encodeFilename(`${ns}\n${name}\n`);
   if (!ns && !name) nameURI += script.props.id || '';
   return nameURI;
-}
-
-export function compareVersion(ver1, ver2) {
-  const parts1 = (ver1 || '').split('.');
-  const parts2 = (ver2 || '').split('.');
-  for (let i = 0; i < parts1.length || i < parts2.length; i += 1) {
-    const delta = (parseInt(parts1[i], 10) || 0) - (parseInt(parts2[i], 10) || 0);
-    if (delta) return delta < 0 ? -1 : 1;
-  }
-  return 0;
 }

@@ -1,6 +1,7 @@
-import { i18n, request } from '#/common';
+import { i18n, request, compareVersion } from '#/common';
+import { CMD_SCRIPT_UPDATE } from '#/common/consts';
 import { parseScript } from './db';
-import { parseMeta, compareVersion } from './script';
+import { parseMeta } from './script';
 import { getOption } from './options';
 import { notify, sendMessageOrIgnore } from './message';
 
@@ -11,7 +12,7 @@ function doCheckUpdate(script) {
     checking: true,
   };
   const res = {
-    cmd: 'UpdateScript',
+    cmd: CMD_SCRIPT_UPDATE,
     data: {
       where: {
         id: script.props.id,
@@ -80,7 +81,7 @@ export default function checkUpdate(script) {
         checking: false,
       },
     }))
-    .then(res => {
+    .then((res) => {
       const { data: { update } } = res;
       updated = true;
       if (getOption('notifyUpdates')) {
@@ -90,7 +91,7 @@ export default function checkUpdate(script) {
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       if (process.env.DEBUG) console.error(err);
     })
     .then(() => {

@@ -13,7 +13,7 @@ export function initHooks() {
   const hooks = [];
 
   function fire(data) {
-    hooks.slice().forEach(cb => {
+    hooks.slice().forEach((cb) => {
       cb(data);
     });
   }
@@ -31,12 +31,12 @@ export function initHooks() {
 
 export function sendMessage(payload) {
   const promise = browser.runtime.sendMessage(payload)
-  .then(res => {
+  .then((res) => {
     const { data, error } = res || {};
     if (error) return Promise.reject(error);
     return data;
   });
-  promise.catch(err => {
+  promise.catch((err) => {
     if (process.env.DEBUG) console.warn(err);
   });
   return promise;
@@ -117,7 +117,7 @@ export function request(url, options = {}) {
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify(body);
     }
-    Object.keys(headers).forEach(key => {
+    Object.keys(headers).forEach((key) => {
       xhr.setRequestHeader(key, headers[key]);
     });
     xhr.onload = () => {
@@ -199,4 +199,45 @@ export function cache2blobUrl(raw, { defaultType, type: overrideType } = {}) {
     const blob = new Blob([arr], { type });
     return URL.createObjectURL(blob);
   }
+}
+
+export function encodeFilename(name) {
+  // `escape` generated URI has % in it
+  return name.replace(/[-\\/:*?"<>|%\s]/g, (m) => {
+    let code = m.charCodeAt(0).toString(16);
+    if (code.length < 2) code = `0${code}`;
+    return `-${code}`;
+  });
+}
+
+export function decodeFilename(filename) {
+  return filename.replace(/-([0-9a-f]{2})/g, (_m, g) => String.fromCharCode(parseInt(g, 16)));
+}
+
+export function compareVersion(ver1, ver2) {
+  const parts1 = (ver1 || '').split('.');
+  const parts2 = (ver2 || '').split('.');
+  for (let i = 0; i < parts1.length || i < parts2.length; i += 1) {
+    const delta = (parseInt(parts1[i], 10) || 0) - (parseInt(parts2[i], 10) || 0);
+    if (delta) return delta < 0 ? -1 : 1;
+  }
+  return 0;
+}
+
+const units = [
+  ['min', 60],
+  ['h', 24],
+  ['d', 1000, 365],
+  ['y'],
+];
+export function formatTime(duration) {
+  duration /= 60 * 1000;
+  const unitInfo = units.find((item) => {
+    const max = item[1];
+    if (!max || duration < max) return true;
+    const step = item[2] || max;
+    duration /= step;
+    return false;
+  });
+  return `${duration | 0}${unitInfo[0]}`;
 }

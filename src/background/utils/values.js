@@ -6,7 +6,7 @@ const tabScripts = {}; // openerId: { scriptId: 1, ... }
 let cache;
 let timer;
 
-browser.tabs.onRemoved.addListener(id => {
+browser.tabs.onRemoved.addListener((id) => {
   resetValueOpener(id);
 });
 
@@ -30,7 +30,7 @@ export function setValueStore(where, value) {
 export function resetValueOpener(openerId) {
   const scriptMap = tabScripts[openerId];
   if (scriptMap) {
-    Object.keys(scriptMap).forEach(scriptId => {
+    Object.keys(scriptMap).forEach((scriptId) => {
       const map = openers[scriptId];
       if (map) delete map[openerId];
     });
@@ -44,7 +44,7 @@ export function addValueOpener(openerId, scriptIds) {
     scriptMap = {};
     tabScripts[openerId] = scriptMap;
   }
-  scriptIds.forEach(scriptId => {
+  scriptIds.forEach((scriptId) => {
     scriptMap[scriptId] = 1;
     let openerMap = openers[scriptId];
     if (!openerMap) {
@@ -67,12 +67,12 @@ function doUpdate() {
   cache = null;
   const ids = Object.keys(currentCache);
   getValueStoresByIds(ids)
-  .then(valueStores => {
-    ids.forEach(id => {
+  .then((valueStores) => {
+    ids.forEach((id) => {
       const valueStore = valueStores[id] || {};
       valueStores[id] = valueStore;
       const updates = currentCache[id] || {};
-      Object.keys(updates).forEach(key => {
+      Object.keys(updates).forEach((key) => {
         const value = updates[key];
         if (!value) delete valueStore[key];
         else valueStore[key] = value;
@@ -81,7 +81,7 @@ function doUpdate() {
     return dumpValueStores(valueStores);
   })
   .then(broadcastUpdates)
-  .catch(err => {
+  .catch((err) => {
     console.error('Values error:', err);
   })
   .then(() => {
@@ -94,7 +94,7 @@ function broadcastUpdates(updates) {
   if (updates) {
     const updatedOpeners = Object.keys(updates)
     .reduce((map, scriptId) => Object.assign(map, openers[scriptId]), {});
-    Object.keys(updatedOpeners).forEach(openerId => {
+    Object.keys(updatedOpeners).forEach((openerId) => {
       browser.tabs.sendMessage(+openerId, {
         cmd: 'UpdatedValues',
         data: updates,

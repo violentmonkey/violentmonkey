@@ -5,7 +5,7 @@ export function register(init) {
 }
 
 export function initialize() {
-  return Promise.all(initializers.map(init => {
+  return Promise.all(initializers.map((init) => {
     if (typeof init === 'function') return init();
     return init;
   }))

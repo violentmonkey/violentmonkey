@@ -11,6 +11,7 @@ html {
 body {
   font-size: 1rem;
   background: white;
+  color: black;
 }
 
 // Form elements will not inherit
@@ -40,14 +41,20 @@ hr {
 input[disabled] ~ * {
   color: gray;
 }
-input[type=text] {
+input[type=text],
+input[type=password] {
   line-height: 1.5rem;
+  &[disabled] {
+    background: #eee;
+    cursor: not-allowed;
+  }
 }
 textarea {
   display: block;
   width: 100%;
 }
 input[type=text],
+input[type=password],
 textarea {
   padding: 0 .5rem;
   border: 1px solid #ccc;
@@ -57,6 +64,12 @@ textarea {
 }
 code {
   background: #f7e999;
+}
+
+fieldset {
+  display: inline-block;
+  padding: .5rem;
+  border: 1px solid #ccc;
 }
 
 :focus {
@@ -76,6 +89,7 @@ svg {
 button {
   border: 1px solid #afafaf;
   background: #f4f4f4;
+  color: black;
   &:hover {
     background: #e4e4e4;
   }
@@ -112,6 +126,10 @@ button,
   > .icon {
     display: block;
     height: 2rem;
+  }
+  &.active {
+    background: #eee;
+    border-color: #aaa;
   }
 }
 
@@ -205,8 +223,14 @@ button,
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.text-center {
+  text-align: center;
+}
 .text-right {
   text-align: right;
+}
+.scroll-y {
+  overflow-y: auto;
 }
 
 .frame {

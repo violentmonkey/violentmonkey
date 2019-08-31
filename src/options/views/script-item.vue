@@ -21,14 +21,13 @@
         />
         <span class="ellipsis ml-1" v-else v-text="author.name"></span>
       </tooltip>
-      <tooltip class="ml-1 hidden-sm" :content="lastUpdated.title" align="end">
+      <tooltip class="ml-1 hidden-sm" :content="updatedAt.title" align="end">
         <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
-        <span class="secondary ml-1" v-text="lastUpdated.show"></span>
+        <span class="ml-1" v-text="updatedAt.show"></span>
       </tooltip>
-      <div v-if="script.config.removed" class="ml-1" v-text="i18n('labelRemoved')"></div>
       <div v-if="script.config.removed" class="ml-1">
-        <tooltip :content="i18n('buttonUndo')" placement="left">
-          <span class="btn-ghost" @click="onRemove(0)">
+        <tooltip :content="i18n('buttonRestore')" placement="left">
+          <span class="btn-ghost" @click="onRestore">
             <icon name="undo"></icon>
           </span>
         </tooltip>
@@ -80,7 +79,7 @@
         <div class="script-message" v-text="script.message"></div>
       </div>
       <tooltip :content="i18n('buttonRemove')" align="end">
-        <span class="btn-ghost" @click="onRemove(1)">
+        <span class="btn-ghost" @click="onRemove">
           <icon name="trash"></icon>
         </span>
       </tooltip>
@@ -90,7 +89,7 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { sendMessage, getLocaleString } from '#/common';
+import { sendMessage, getLocaleString, formatTime } from '#/common';
 import { objectGet } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
@@ -159,29 +158,24 @@ export default {
     description() {
       return this.script.custom.description || getLocaleString(this.script.meta, 'description');
     },
-    lastUpdated() {
-      const { props } = this.script;
-      // XXX use `lastModified` as a fallback for scripts without `lastUpdated`
-      const lastUpdated = props.lastUpdated || props.lastModified;
+    updatedAt() {
+      const { props, config } = this.script;
       const ret = {};
-      if (lastUpdated) {
-        let delta = (Date.now() - lastUpdated) / 1000 / 60;
-        const units = [
-          ['min', 60],
-          ['h', 24],
-          ['d', 1000, 365],
-          ['y'],
-        ];
-        const unitInfo = units.find(item => {
-          const max = item[1];
-          if (!max || delta < max) return true;
-          const step = item[2] || max;
-          delta /= step;
-          return false;
-        });
-        const date = new Date(lastUpdated);
-        ret.title = this.i18n('labelLastUpdatedAt', date.toLocaleString());
-        ret.show = `${delta | 0}${unitInfo[0]}`;
+      let lastModified;
+      if (config.removed) {
+        ({ lastModified } = props);
+      } else {
+        // XXX use `lastModified` as a fallback for scripts without `lastUpdated`
+        lastModified = props.lastUpdated || props.lastModified;
+      }
+      if (lastModified) {
+        const date = new Date(lastModified);
+        ret.show = formatTime(Date.now() - lastModified);
+        if (config.removed) {
+          ret.title = this.i18n('labelRemovedAt', date.toLocaleString());
+        } else {
+          ret.title = this.i18n('labelLastUpdatedAt', date.toLocaleString());
+        }
       }
       return ret;
     },
@@ -192,7 +186,7 @@ export default {
       const pathMap = objectGet(this.script, 'custom.pathMap') || {};
       const fullUrl = pathMap[icon] || icon;
       loadImage(fullUrl)
-      .then(url => {
+      .then((url) => {
         this.safeIcon = url;
       }, () => {
         this.safeIcon = DEFAULT_ICON;
@@ -203,16 +197,22 @@ export default {
     onEdit() {
       this.$emit('edit', this.script.props.id);
     },
-    onRemove(remove) {
+    markRemoved(removed) {
       sendMessage({
-        cmd: 'UpdateScriptInfo',
+        cmd: 'MarkRemoved',
         data: {
           id: this.script.props.id,
-          config: {
-            removed: remove ? 1 : 0,
-          },
+          removed,
         },
       });
+    },
+    onRemove() {
+      const rect = this.$el.getBoundingClientRect();
+      this.markRemoved(1);
+      this.$emit('remove', this.script.props.id, rect);
+    },
+    onRestore() {
+      this.markRemoved(0);
     },
     onEnable() {
       sendMessage({
@@ -235,14 +235,13 @@ export default {
       const el = e.currentTarget;
       const parent = el.parentNode;
       const rect = el.getBoundingClientRect();
-      const next = el.nextElementSibling;
       const dragging = {
         el,
         offset: {
           x: e.clientX - rect.left,
           y: e.clientY - rect.top,
         },
-        delta: (next ? next.getBoundingClientRect().top : parent.offsetHeight) - rect.top,
+        delta: rect.height,
         index: [].indexOf.call(parent.children, el),
         elements: [].filter.call(parent.children, child => child !== el),
         dragged: el.cloneNode(true),
@@ -266,7 +265,7 @@ export default {
       } = dragging;
       dragged.style.left = `${e.clientX - offset.x}px`;
       dragged.style.top = `${e.clientY - offset.y}px`;
-      let hoveredIndex = elements.findIndex(item => {
+      let hoveredIndex = elements.findIndex((item) => {
         if (!item || item.classList.contains('dragging-moving')) return false;
         const rect = item.getBoundingClientRect();
         return (
@@ -308,7 +307,7 @@ export default {
       });
     },
     onDragAnimate(elements, delta) {
-      elements.forEach(el => {
+      elements.forEach((el) => {
         if (!el) return;
         el.classList.add('dragging-moving');
         el.style.transition = 'none';

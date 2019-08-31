@@ -136,7 +136,7 @@ export default {
         return code;
       })
     )
-    .then(code => {
+    .then((code) => {
       this.code = code;
       const settings = {};
       const { custom, config } = this.script;
@@ -205,10 +205,10 @@ export default {
           message: '',
         },
       })
-      .then(res => {
+      .then((res) => {
         this.canSave = false;
         if (objectGet(res, 'where.id')) this.script = res.update;
-      }, err => {
+      }, (err) => {
         showMessage({ text: err });
       });
     },

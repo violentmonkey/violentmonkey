@@ -50,6 +50,9 @@ buttonNew:
 buttonOK:
   description: OK button on dialog.
   message: Đồng ý
+buttonRecycleBin:
+  description: Button to list scripts in recycle bin.
+  message: ''
 buttonRemove:
   description: Button to remove a script.
   message: Xoá
@@ -62,6 +65,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Thiết lập lại
+buttonRestore:
+  description: Button to restore a removed script.
+  message: ''
 buttonSave:
   description: Button to save modifications of a script.
   message: Lưu
@@ -80,6 +86,7 @@ buttonSupport:
 buttonUndo:
   description: Button to undo removement of a script.
   message: Hoàn tác
+  touched: false
 buttonUpdate:
   description: Check a script for updates.
   message: Kiểm tra cập nhật
@@ -141,9 +148,18 @@ filterAlphabeticalOrder:
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: thứ tự thực thi
+filterLastUpdateOrder:
+  description: Label for option to sort scripts by last update time.
+  message: cập nhật cuối
+headerRecycleBin:
+  description: Text shown in the header when scripts in recycle bin are listed.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL đầu vào:'
+hintRecycleBin:
+  description: Hint for recycle bin.
+  message: ''
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Dùng @downloadURL
@@ -285,6 +301,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Oops, bạn không có script nào được cài đặt.'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Không thấy script nào
@@ -297,6 +314,10 @@ labelRelated:
 labelRemoved:
   description: Label shown when a script is removed.
   message: '[Đã xóa]'
+  touched: false
+labelRemovedAt:
+  description: Label for the time when the script is removed.
+  message: ''
 labelReplace:
   description: Label for replace input in search box.
   message: 'Thay thế bằng: '
@@ -329,6 +350,9 @@ labelShowBadge:
 labelSync:
   description: Label for sync options.
   message: Đồng bộ
+labelSyncAnonymous:
+  description: Label for using anonymous account.
+  message: ''
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Xác thực
@@ -338,6 +362,9 @@ labelSyncAuthorizing:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Không có
+labelSyncPassword:
+  description: Label for input to hold password.
+  message: ''
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Tự động xác thực lại khi hết hạn
@@ -348,9 +375,15 @@ labelSyncRevoke:
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Trạng thái đồng bộ script
+labelSyncServerUrl:
+  description: Label for input to hold server URL.
+  message: ''
 labelSyncService:
   description: Label for sync service select.
   message: Đồng bộ tới
+labelSyncUsername:
+  description: Label for input to hold username.
+  message: ''
 labelTranslator:
   description: Label of translator.
   message: 'Dịch bởi: '
@@ -369,6 +402,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Menu của script
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Mở bảng điều khiển

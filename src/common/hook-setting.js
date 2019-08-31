@@ -3,8 +3,8 @@ import { objectGet } from './object';
 
 const hooks = {};
 
-options.hook(data => {
-  Object.keys(hooks).forEach(key => {
+options.hook((data) => {
+  Object.keys(hooks).forEach((key) => {
     const list = hooks[key];
     if (list) {
       const value = objectGet(data, key);

@@ -109,7 +109,7 @@ export default {
         name: objectGet(value, 'meta.name'),
         homepageURL: objectGet(value, 'meta.homepageURL'),
         updateURL: objectGet(value, 'meta.updateURL') || i18n('hintUseDownloadURL'),
-        downloadURL: objectGet(value, 'meta.downloadURL') || value.lastInstallURL,
+        downloadURL: objectGet(value, 'meta.downloadURL') || objectGet(value, 'custom.lastInstallURL'),
       };
     },
   },
@@ -132,12 +132,6 @@ export default {
     input[type=text] {
       display: block;
       width: 100%;
-    }
-    > * {
-      flex: 1;
-    }
-    > .label {
-      flex: 0 0 8em;
     }
     > textarea {
       min-height: 5em;

@@ -140,10 +140,10 @@ export default {
   created() {
     this.revokers = [];
     options.ready(() => {
-      items.forEach(item => {
+      items.forEach((item) => {
         const { name, key, normalize } = item;
         settings[name] = normalize(options.get(key || name));
-        this.revokers.push(hookSetting(key, value => {
+        this.revokers.push(hookSetting(key, (value) => {
           settings[name] = value;
         }));
         this.$watch(name, debounce(this.getUpdater(item), 300));
@@ -151,7 +151,7 @@ export default {
     });
   },
   beforeDestroy() {
-    this.revokers.forEach(revoke => { revoke(); });
+    this.revokers.forEach((revoke) => { revoke(); });
   },
 };
 </script>
@@ -166,7 +166,7 @@ export default {
 .show-advanced {
   margin: 20px 0;
   .rotate {
-    transform: rotate(90deg);
+    transform: rotate(-90deg);
   }
 }
 </style>

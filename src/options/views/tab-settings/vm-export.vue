@@ -55,7 +55,7 @@ export default {
       this.exporting = true;
       Promise.resolve(exportData())
       .then(download)
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
       })
       .then(() => {
@@ -69,15 +69,15 @@ export default {
 };
 
 function getWriter() {
-  return new Promise(resolve => {
-    zip.createWriter(new zip.BlobWriter(), writer => {
+  return new Promise((resolve) => {
+    zip.createWriter(new zip.BlobWriter(), (writer) => {
       resolve(writer);
     });
   });
 }
 
 function addFile(writer, file) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     writer.add(file.name, new zip.TextReader(file.content), () => {
       resolve(writer);
     });
@@ -128,6 +128,10 @@ function download(blob) {
   }
 }
 
+function normalizeFilename(name) {
+  return name.replace(/[\\/:*?"<>|]/g, '-');
+}
+
 function exportData() {
   const withValues = options.get('exportValues');
   return sendMessage({
@@ -136,7 +140,7 @@ function exportData() {
       values: withValues,
     },
   })
-  .then(data => {
+  .then((data) => {
     const names = {};
     const vm = {
       scripts: {},
@@ -145,7 +149,7 @@ function exportData() {
     delete vm.settings.sync;
     if (withValues) vm.values = {};
     const files = (objectGet(data, 'items') || []).map(({ script, code }) => {
-      let name = script.custom.name || script.meta.name || script.props.id;
+      let name = normalizeFilename(script.custom.name || script.meta.name || script.props.id);
       if (names[name]) {
         names[name] += 1;
         name = `${name}_${names[name]}`;
@@ -176,8 +180,8 @@ function exportData() {
   .then(files => files.reduce((result, file) => (
     result.then(writer => addFile(writer, file))
   ), getWriter()))
-  .then(writer => new Promise(resolve => {
-    writer.close(blob => {
+  .then(writer => new Promise((resolve) => {
+    writer.close((blob) => {
       resolve(blob);
     });
   }));

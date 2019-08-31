@@ -29,7 +29,7 @@
 <script>
 const data = {
   version: browser.runtime.getManifest().version,
-  language: navigator.language,
+  language: browser.i18n.getUILanguage(),
 };
 
 export default {

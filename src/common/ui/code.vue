@@ -74,7 +74,7 @@ const CTRL_OPEN = '\x02'.repeat(256);
 const CTRL_CLOSE = '\x03'.repeat(256);
 
 function getHandler(key) {
-  return cm => {
+  return (cm) => {
     const { commands } = cm.state;
     const handle = commands && commands[key];
     return handle && handle();
@@ -84,7 +84,7 @@ function getHandler(key) {
 [
   'save', 'cancel', 'close',
   'find', 'findNext', 'findPrev', 'replace', 'replaceAll',
-].forEach(key => {
+].forEach((key) => {
   CodeMirror.commands[key] = getHandler(key);
 });
 Object.assign(CodeMirror.keyMap.default, {
@@ -314,10 +314,10 @@ export default {
       [
         cm.options.extraKeys,
         cm.options.keyMap,
-      ].some(keyMap => {
+      ].some((keyMap) => {
         let stop = false;
         if (keyMap) {
-          CodeMirror.lookupKey(name, keyMap, b => {
+          CodeMirror.lookupKey(name, keyMap, (b) => {
             if (cm.state.commands[b]) {
               e.preventDefault();
               e.stopPropagation();

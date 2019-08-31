@@ -12,8 +12,8 @@ export function notify(options) {
 
 export function broadcast(data) {
   browser.tabs.query({})
-  .then(tabs => {
-    tabs.forEach(tab => {
+  .then((tabs) => {
+    tabs.forEach((tab) => {
       browser.tabs.sendMessage(tab.id, data)
       .catch(noop);
     });

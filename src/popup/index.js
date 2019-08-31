@@ -20,19 +20,24 @@ new Vue({
 Object.assign(handlers, {
   SetPopup(data, src) {
     if (store.currentTab.id !== src.tab.id) return;
-    store.commands = data.menus;
+    const { menus } = data;
+    store.commands = Object.entries(menus)
+    .reduce((map, [id, values]) => {
+      map[id] = Object.keys(values).sort();
+      return map;
+    }, {});
     sendMessage({
       cmd: 'GetMetas',
       data: data.ids,
     })
-    .then(scripts => {
+    .then((scripts) => {
       store.scripts = scripts;
     });
   },
 });
 
 browser.tabs.query({ currentWindow: true, active: true })
-.then(tabs => {
+.then((tabs) => {
   const currentTab = {
     id: tabs[0].id,
     url: tabs[0].url,

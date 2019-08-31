@@ -104,7 +104,7 @@ export default {
         cmd: 'CacheLoad',
         data: `confirm-${id}`,
       })
-      .then(info => {
+      .then((info) => {
         if (!info) return Promise.reject();
         this.info = info;
       });
@@ -113,7 +113,7 @@ export default {
       this.installable = false;
       const { code: oldCode } = this;
       return this.getScript(this.info.url)
-      .then(code => {
+      .then((code) => {
         if (changedOnly && oldCode === code) return Promise.reject();
         this.code = code;
       });
@@ -123,7 +123,7 @@ export default {
         cmd: 'ParseMeta',
         data: this.code,
       })
-      .then(script => {
+      .then((script) => {
         const urls = Object.keys(script.resources)
         .map(key => script.resources[key]);
         const length = script.require.length + urls.length;
@@ -136,23 +136,23 @@ export default {
         updateStatus();
         this.require = {};
         this.resources = {};
-        const promises = script.require.map(url => {
+        const promises = script.require.map((url) => {
           const fullUrl = getFullUrl(url, this.info.url);
-          return this.getFile(fullUrl, { useCache: true }).then(res => {
+          return this.getFile(fullUrl, { useCache: true }).then((res) => {
             this.require[fullUrl] = res;
           });
         })
-        .concat(urls.map(url => {
+        .concat(urls.map((url) => {
           const fullUrl = getFullUrl(url, this.info.url);
           return this.getFile(fullUrl, { isBlob: true, useCache: true })
-          .then(res => {
+          .then((res) => {
             this.resources[fullUrl] = res;
           });
         }))
         .map(promise => promise.then(() => {
           finished += 1;
           updateStatus();
-        }, url => {
+        }, (url) => {
           error.push(url);
         }));
         return Promise.all(promises).then(() => {
@@ -163,7 +163,7 @@ export default {
       .then(() => {
         this.message = this.i18n('msgLoadedData');
         this.installable = true;
-      }, err => {
+      }, (err) => {
         this.message = this.i18n('msgErrorLoadingDependency', [err]);
         return Promise.reject();
       });
@@ -180,7 +180,7 @@ export default {
         responseType: isBlob ? 'arraybuffer' : null,
       })
       .then(({ data }) => (isBlob ? window.btoa(buffer2string(data)) : data))
-      .then(data => {
+      .then((data) => {
         if (useCache) cache.put(cacheKey, data);
         return data;
       });
@@ -213,17 +213,17 @@ export default {
           resources: this.resources,
         },
       })
-      .then(result => {
+      .then((result) => {
         this.message = `${result.update.message}[${this.getTimeString()}]`;
         if (this.closeAfterInstall) this.close();
         else if (this.isLocal && options.get('trackLocalFile')) this.trackLocalFile();
-      }, err => {
+      }, (err) => {
         this.message = `${err}`;
         this.installable = true;
       });
     },
     trackLocalFile() {
-      new Promise(resolve => {
+      new Promise((resolve) => {
         setTimeout(resolve, 2000);
       })
       .then(() => this.loadData(true))

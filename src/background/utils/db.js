@@ -2,6 +2,8 @@ import {
   i18n, request, buffer2string, getFullUrl, isRemote, getRnd4,
 } from '#/common';
 import { objectGet, objectSet } from '#/common/object';
+import { CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE } from '#/common/consts';
+import pluginEvents from '../plugin/events';
 import {
   getNameURI, parseMeta, newScript, getDefaultCustom,
 } from './script';
@@ -10,7 +12,6 @@ import { register } from './init';
 import patchDB from './patch-db';
 import { setOption } from './options';
 import { sendMessageOrIgnore } from './message';
-import pluginEvents from '../plugin/events';
 
 function cacheOrFetch(handle) {
   const requests = {};
@@ -18,7 +19,7 @@ function cacheOrFetch(handle) {
     let promise = requests[url];
     if (!promise) {
       promise = handle.call(this, url, ...args)
-      .catch(err => {
+      .catch((err) => {
         console.error(`Error fetching: ${url}`, err);
       })
       .then(() => {
@@ -51,9 +52,9 @@ const storage = {
     },
     getMulti(ids, def) {
       return browser.storage.local.get(ids.map(id => this.getKey(id)))
-      .then(data => {
+      .then((data) => {
         const result = {};
-        ids.forEach(id => { result[id] = data[this.getKey(id)] || def; });
+        ids.forEach((id) => { result[id] = data[this.getKey(id)] || def; });
         return result;
       });
     },
@@ -76,7 +77,7 @@ storage.script = Object.assign({}, storage.base, {
   prefix: 'scr:',
   dump: ensureListArgs(function dump(items) {
     const updates = {};
-    items.forEach(item => {
+    items.forEach((item) => {
       updates[this.getKey(item.props.id)] = item;
       store.scriptMap[item.props.id] = item;
     });
@@ -92,7 +93,7 @@ storage.value = Object.assign({}, storage.base, {
   dump(dict) {
     const updates = {};
     Object.keys(dict)
-    .forEach(id => {
+    .forEach((id) => {
       const value = dict[id];
       updates[this.getKey(id)] = value;
     });
@@ -136,14 +137,16 @@ function initialize() {
     });
   })
   .then(() => browser.storage.local.get())
-  .then(data => {
+  .then((data) => {
     const scripts = [];
     const storeInfo = {
       id: 0,
       position: 0,
     };
-    Object.keys(data).forEach(key => {
-      const value = data[key];
+    const idMap = {};
+    const uriMap = {};
+    Object.keys(data).forEach((key) => {
+      const script = data[key];
       if (key.startsWith('scr:')) {
         // {
         //   meta,
@@ -151,16 +154,33 @@ function initialize() {
         //   props: { id, position, uri },
         //   config: { enabled, shouldUpdate },
         // }
-        scripts.push(value);
-        storeInfo.id = Math.max(storeInfo.id, getInt(objectGet(value, 'props.id')));
-        storeInfo.position = Math.max(storeInfo.position, getInt(objectGet(value, 'props.position')));
+        const id = getInt(key.slice(4));
+        if (!id || idMap[id]) {
+          // ID conflicts!
+          // Should not happen, discard duplicates.
+          return;
+        }
+        idMap[id] = script;
+        const uri = getNameURI(script);
+        if (uriMap[uri]) {
+          // Namespace conflicts!
+          // Should not happen, discard duplicates.
+          return;
+        }
+        uriMap[uri] = script;
+        script.props = {
+          ...script.props,
+          id,
+          uri,
+        };
+        script.custom = {
+          ...getDefaultCustom(),
+          ...script.custom,
+        };
+        storeInfo.id = Math.max(storeInfo.id, id);
+        storeInfo.position = Math.max(storeInfo.position, getInt(objectGet(script, 'props.position')));
+        scripts.push(script);
       }
-    });
-    scripts.forEach(script => {
-      script.custom = {
-        ...getDefaultCustom(),
-        ...script.custom,
-      };
     });
     Object.assign(store, {
       scripts,
@@ -211,7 +231,7 @@ export function sortScripts() {
     return pos1 - pos2;
   });
   return normalizePosition()
-  .then(changed => {
+  .then((changed) => {
     sendMessageOrIgnore({ cmd: 'ScriptsUpdated' });
     return changed;
   });
@@ -266,7 +286,7 @@ export function dumpValueStore(where, valueStore) {
   return (where.id
     ? Promise.resolve(where.id)
     : getScript(where).then(script => objectGet(script, 'props.id')))
-  .then(id => {
+  .then((id) => {
     if (id) return dumpValueStores({ [id]: valueStore });
   });
 }
@@ -280,14 +300,14 @@ export function getScriptsByURL(url) {
     : store.scripts.filter(script => !script.config.removed && testScript(url, script));
   const reqKeys = {};
   const cacheKeys = {};
-  scripts.forEach(script => {
+  scripts.forEach((script) => {
     if (script.config.enabled) {
       if (!script.custom.pathMap) buildPathMap(script);
       const { pathMap } = script.custom;
-      script.meta.require.forEach(key => {
+      script.meta.require.forEach((key) => {
         reqKeys[pathMap[key] || key] = 1;
       });
-      Object.values(script.meta.resources).forEach(key => {
+      Object.values(script.meta.resources).forEach((key) => {
         cacheKeys[pathMap[key] || key] = 1;
       });
     }
@@ -301,7 +321,7 @@ export function getScriptsByURL(url) {
     GM_deleteValue: 1,
   };
   const scriptsWithValue = enabledScripts
-  .filter(script => {
+  .filter((script) => {
     const grant = objectGet(script, 'meta.grant');
     return grant && grant.some(gm => gmValues[gm]);
   });
@@ -326,7 +346,7 @@ export function getScriptsByURL(url) {
 export function getData() {
   const cacheKeys = {};
   const { scripts } = store;
-  scripts.forEach(script => {
+  scripts.forEach((script) => {
     const icon = objectGet(script, 'meta.icon');
     if (isRemote(icon)) {
       const pathMap = objectGet(script, 'custom.pathMap') || {};
@@ -339,7 +359,12 @@ export function getData() {
 }
 
 export function checkRemove() {
-  const toRemove = store.scripts.filter(script => script.config.removed);
+  const now = Date.now();
+  const toRemove = store.scripts.filter((script) => {
+    if (!script.config.removed) return false;
+    const lastModified = +script.props.lastModified || 0;
+    return now - lastModified > 7 * 24 * 60 * 60 * 1000;
+  });
   if (toRemove.length) {
     store.scripts = store.scripts.filter(script => !script.config.removed);
     const ids = toRemove.map(script => script.props.id);
@@ -363,6 +388,17 @@ export function removeScript(id) {
     data: id,
   });
   return Promise.resolve();
+}
+
+export function markRemoved(id, removed) {
+  return updateScriptInfo(id, {
+    config: {
+      removed: removed ? 1 : 0,
+    },
+    props: {
+      lastModified: Date.now(),
+    },
+  });
 }
 
 export function moveScript(id, offset) {
@@ -406,7 +442,7 @@ function saveScript(script, code) {
   props.uri = getNameURI(script);
   props.uuid = props.uuid || getUUID(props.id);
   // Do not allow script with same name and namespace
-  if (store.scripts.some(item => {
+  if (store.scripts.some((item) => {
     const itemProps = item.props || {};
     return props.id !== itemProps.id && props.uri === itemProps.uri;
   })) {
@@ -440,20 +476,27 @@ export function updateScriptInfo(id, data) {
   script.props = Object.assign({}, script.props, data.props);
   script.config = Object.assign({}, script.config, data.config);
   // script.custom = Object.assign({}, script.custom, data.custom);
-  return storage.script.dump(script);
+  return storage.script.dump(script)
+  .then(() => sendMessageOrIgnore({
+    cmd: CMD_SCRIPT_UPDATE,
+    data: {
+      where: { id },
+      update: script,
+    },
+  }));
 }
 
 export function getExportData(withValues) {
   return getScripts()
-  .then(scripts => {
+  .then((scripts) => {
     const ids = scripts.map(({ props: { id } }) => id);
     return storage.code.getMulti(ids)
-    .then(codeMap => {
+    .then((codeMap) => {
       const data = {};
       data.items = scripts.map(script => ({ script, code: codeMap[script.props.id] }));
       if (withValues) {
         return storage.value.getMulti(ids)
-        .then(values => {
+        .then((values) => {
           data.values = values;
           return data;
         });
@@ -463,8 +506,6 @@ export function getExportData(withValues) {
   });
 }
 
-const CMD_UPDATE = 'UpdateScript';
-const CMD_ADD = 'AddScript';
 export function parseScript(data) {
   const {
     id, code, message, isNew, config, custom, props, update,
@@ -472,7 +513,7 @@ export function parseScript(data) {
   const meta = parseMeta(code);
   if (!meta.name) return Promise.reject(i18n('msgInvalidScript'));
   const result = {
-    cmd: CMD_UPDATE,
+    cmd: CMD_SCRIPT_UPDATE,
     data: {
       update: {
         message: message == null ? i18n('msgUpdated') : message || '',
@@ -480,14 +521,14 @@ export function parseScript(data) {
     },
   };
   return getScript({ id, meta })
-  .then(oldScript => {
+  .then((oldScript) => {
     let script;
     if (oldScript) {
       if (isNew) throw i18n('msgNamespaceConflict');
       script = Object.assign({}, oldScript);
     } else {
       ({ script } = newScript());
-      result.cmd = CMD_ADD;
+      result.cmd = CMD_SCRIPT_ADD;
       result.data.isNew = true;
       result.data.update.message = i18n('msgInstalled');
     }
@@ -509,7 +550,7 @@ export function parseScript(data) {
     buildPathMap(script, data.url);
     return saveScript(script, code).then(() => script);
   })
-  .then(script => {
+  .then((script) => {
     fetchScriptResources(script, data);
     Object.assign(result.data.update, script, update);
     result.data.where = { id: script.props.id };
@@ -540,7 +581,7 @@ function buildPathMap(script, base) {
 function fetchScriptResources(script, cache) {
   const { meta, custom: { pathMap } } = script;
   // @require
-  meta.require.forEach(key => {
+  meta.require.forEach((key) => {
     const fullUrl = pathMap[key] || key;
     const cached = objectGet(cache, ['require', fullUrl]);
     if (cached) {
@@ -550,7 +591,7 @@ function fetchScriptResources(script, cache) {
     }
   });
   // @resource
-  Object.values(meta.resources).forEach(url => {
+  Object.values(meta.resources).forEach((url) => {
     const fullUrl = pathMap[url] || url;
     const cached = objectGet(cache, ['resources', fullUrl]);
     if (cached) {
@@ -592,8 +633,8 @@ export function vacuum() {
     [storage.code, codeKeys],
   ];
   return browser.storage.local.get()
-  .then(data => {
-    Object.keys(data).forEach(key => {
+  .then((data) => {
+    Object.keys(data).forEach((key) => {
       mappings.some(([substore, map]) => {
         const { prefix } = substore;
         if (key.startsWith(prefix)) {
@@ -608,16 +649,16 @@ export function vacuum() {
       if (obj[key] < 0) obj[key] = 1;
       else if (!obj[key]) obj[key] = 2;
     };
-    store.scripts.forEach(script => {
+    store.scripts.forEach((script) => {
       const { id } = script.props;
       touch(codeKeys, id);
       touch(valueKeys, id);
       if (!script.custom.pathMap) buildPathMap(script);
       const { pathMap } = script.custom;
-      script.meta.require.forEach(url => {
+      script.meta.require.forEach((url) => {
         touch(requireKeys, pathMap[url] || url);
       });
-      Object.values(script.meta.resources).forEach(url => {
+      Object.values(script.meta.resources).forEach((url) => {
         touch(cacheKeys, pathMap[url] || url);
       });
       const { icon } = script.meta;
@@ -627,7 +668,7 @@ export function vacuum() {
       }
     });
     mappings.forEach(([substore, map]) => {
-      Object.keys(map).forEach(key => {
+      Object.keys(map).forEach((key) => {
         const value = map[key];
         if (value < 0) {
           // redundant value

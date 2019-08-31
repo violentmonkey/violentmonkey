@@ -50,6 +50,9 @@ buttonNew:
 buttonOK:
   description: OK button on dialog.
   message: OK
+buttonRecycleBin:
+  description: Button to list scripts in recycle bin.
+  message: Kôš
 buttonRemove:
   description: Button to remove a script.
   message: Odstrániť
@@ -61,6 +64,9 @@ buttonReplaceAll:
   message: Všetko
 buttonReset:
   description: Button to reset to default values.
+  message: Obnoviť
+buttonRestore:
+  description: Button to restore a removed script.
   message: Obnoviť
 buttonSave:
   description: Button to save modifications of a script.
@@ -80,6 +86,7 @@ buttonSupport:
 buttonUndo:
   description: Button to undo removement of a script.
   message: Späť
+  touched: false
 buttonUpdate:
   description: Check a script for updates.
   message: Skontrolovať aktualizácie
@@ -141,9 +148,18 @@ filterAlphabeticalOrder:
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: spustenia
+filterLastUpdateOrder:
+  description: Label for option to sort scripts by last update time.
+  message: poslednej aktualizácie
+headerRecycleBin:
+  description: Text shown in the header when scripts in recycle bin are listed.
+  message: Kôš
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Vložte adresu:'
+hintRecycleBin:
+  description: Hint for recycle bin.
+  message: Tu sa zobrazujú odstránené súbory a budú odstránené po 7 dňoch.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Použiť @downloadURL
@@ -287,6 +303,7 @@ labelNoName:
 labelNoScripts:
   description: Message shown when no script is installed.
   message: 'Ups, ešte nemáte nainštalovaný žiadny skript.'
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Nenašiel sa žiadny skript.
@@ -299,6 +316,10 @@ labelRelated:
 labelRemoved:
   description: Label shown when a script is removed.
   message: '[Odstránený]'
+  touched: false
+labelRemovedAt:
+  description: Label for the time when the script is removed.
+  message: Odstránené $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Nahradiť: '
@@ -331,6 +352,9 @@ labelShowBadge:
 labelSync:
   description: Label for sync options.
   message: Synchronizácia
+labelSyncAnonymous:
+  description: Label for using anonymous account.
+  message: Použiť anonymný účet
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Autorizácia
@@ -340,6 +364,9 @@ labelSyncAuthorizing:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Zakázané
+labelSyncPassword:
+  description: Label for input to hold password.
+  message: 'Heslo: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Po exsiprovaní automaticky reautorizovať
@@ -350,9 +377,15 @@ labelSyncRevoke:
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Stav synchronizácie skriptu
+labelSyncServerUrl:
+  description: Label for input to hold server URL.
+  message: 'Server URL: '
 labelSyncService:
   description: Label for sync service select.
   message: Synchronizovať na
+labelSyncUsername:
+  description: Label for input to hold username.
+  message: 'Používateľské meno: '
 labelTranslator:
   description: Label of translator.
   message: 'Prekladateľ: '
@@ -371,6 +404,7 @@ learnInjectionMode:
 menuCommands:
   description: Menu item to list script commands.
   message: Príkazy skriptu
+  touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Otvoriť Dashboard
@@ -455,7 +489,7 @@ msgSavedScriptTemplate:
   message: Šablóna nového skriptu bola uktualizovaná.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Skript [$1] ja aktualizovaný!'
+  message: 'Skript [$1] bol aktualizovaný!'
 msgSyncError:
   description: Message shown when sync failed.
   message: Chyba synchronizácie!
@@ -509,7 +543,7 @@ valueLabelValue:
   message: Hodnota (serializované ako JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Prejsť na stránku
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-

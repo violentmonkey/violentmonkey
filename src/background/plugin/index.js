@@ -2,10 +2,9 @@ import {
   parseScript,
   getScripts,
   getScriptCode,
-  removeScript,
+  markRemoved,
 } from '../utils/db';
 
-// eslint-disable-next-line import/prefer-default-export
 export const script = {
   update(data) {
     // Update an existing script by ID
@@ -24,6 +23,6 @@ export const script = {
   },
   remove(id) {
     // Remove script by id
-    return removeScript(id);
+    return markRemoved(id, true);
   },
 };

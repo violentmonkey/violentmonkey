@@ -2,7 +2,7 @@ import { isFirefox } from '#/common/ua';
 import { getUniqId } from '#/common';
 import { INJECT_PAGE, INJECT_CONTENT, INJECT_AUTO } from '#/common/consts';
 import {
-  bindEvents, sendMessage, inject, attachFunction,
+  bindEvents, sendMessage, attachFunction,
 } from '../utils';
 import bridge from './bridge';
 import { tabOpen, tabClose, tabClosed } from './tabs';
@@ -11,6 +11,7 @@ import {
   getRequestId, httpRequest, abortRequest, httpRequested,
 } from './requests';
 import dirtySetClipboard from './clipboard';
+import { inject } from './util';
 
 const IS_TOP = window.top === window;
 
@@ -63,13 +64,13 @@ export default function initialize(contentId, webId) {
       reset: IS_TOP,
     },
   })
-  .then(data => {
+  .then((data) => {
     const scriptLists = {
       [INJECT_PAGE]: [],
       [INJECT_CONTENT]: [],
     };
     if (data.scripts) {
-      data.scripts = data.scripts.filter(script => {
+      data.scripts = data.scripts.filter((script) => {
         ids.push(script.props.id);
         if ((IS_TOP || !script.meta.noframes) && script.config.enabled) {
           enabledIds.push(script.props.id);
@@ -78,7 +79,7 @@ export default function initialize(contentId, webId) {
         return false;
       });
       let support;
-      data.scripts.forEach(script => {
+      data.scripts.forEach((script) => {
         let injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
         if (injectInto === INJECT_AUTO) {
           if (!support) support = { injectable: checkInjectable() };
@@ -97,16 +98,18 @@ export default function initialize(contentId, webId) {
 }
 
 function checkInjectable() {
+  // Check default namespace, `a.style` only exists in HTML namespace
+  if (!('style' in document.createElement('a'))) return false;
   const id = getUniqId('VM-');
-  const detect = domId => {
-    const span = document.createElement('span');
-    span.id = domId;
-    document.documentElement.appendChild(span);
+  const detect = (domId) => {
+    const a = document.createElement('a');
+    a.id = domId;
+    document.documentElement.appendChild(a);
   };
   inject(`(${detect.toString()})(${JSON.stringify(id)})`);
-  const span = document.querySelector(`#${id}`);
-  const injectable = !!span;
-  if (span) span.parentNode.removeChild(span);
+  const a = document.querySelector(`#${id}`);
+  const injectable = !!a;
+  if (a) a.parentNode.removeChild(a);
   return injectable;
 }
 
@@ -115,8 +118,8 @@ function injectScripts(contentId, webId, data, scriptLists) {
   [
     Object.getOwnPropertyNames(window),
     Object.getOwnPropertyNames(global),
-  ].forEach(keys => {
-    keys.forEach(key => { props[key] = 1; });
+  ].forEach((keys) => {
+    keys.forEach((key) => { props[key] = 1; });
   });
   const args = [
     webId,
@@ -170,15 +173,23 @@ const handlers = {
   },
   RegisterMenu(data) {
     if (IS_TOP) {
-      const [key] = data;
-      menus[key] = data;
+      const [id, cap] = data;
+      let commandMap = menus[id];
+      if (!commandMap) {
+        commandMap = {};
+        menus[id] = commandMap;
+      }
+      commandMap[cap] = 1;
     }
     getPopup();
   },
   UnregisterMenu(data) {
     if (IS_TOP) {
-      const [key] = data;
-      delete menus[key];
+      const [id, cap] = data;
+      const commandMap = menus[id];
+      if (commandMap) {
+        delete menus[cap];
+      }
     }
     getPopup();
   },
@@ -206,13 +217,13 @@ const handlers = {
   },
   CheckScript({ name, namespace, callback }) {
     sendMessage({ cmd: 'CheckScript', data: { name, namespace } })
-    .then(result => {
+    .then((result) => {
       bridge.post({ cmd: 'ScriptChecked', data: { callback, result } });
     });
   },
 };
 
-bridge.ready = new Promise(resolve => {
+bridge.ready = new Promise((resolve) => {
   handlers.Ready = resolve;
 });
 
@@ -226,13 +237,13 @@ function getPopup() {
   if (IS_TOP) {
     sendMessage({
       cmd: 'SetPopup',
-      data: { ids, menus: Object.values(menus) },
+      data: { ids, menus },
     });
   }
 }
 
 function injectScript(data) {
-  const [vId, code, vCallbackId, mode] = data;
+  const [vId, code, vCallbackId, mode, scriptId] = data;
   const func = (attach, id, cb, callbackId) => {
     attach(id, cb);
     const callback = window[callbackId];
@@ -251,6 +262,6 @@ function injectScript(data) {
       data: injectedCode,
     });
   } else {
-    inject(injectedCode);
+    inject(injectedCode, browser.extension.getURL(`/options/index.html#scripts/${scriptId}`));
   }
 }

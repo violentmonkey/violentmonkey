@@ -20,7 +20,7 @@ export default function getEventEmitter() {
   function fire(type, data) {
     const list = events[type];
     if (list) {
-      list.forEach(func => {
+      list.forEach((func) => {
         func(data, type);
       });
     }

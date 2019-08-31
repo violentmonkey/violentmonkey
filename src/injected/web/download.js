@@ -1,7 +1,6 @@
 import { downloadBlob } from '#/common/download';
 import { onRequestCreate } from './requests';
 
-// eslint-disable-next-line import/prefer-default-export
 export function onDownload(arg1, arg2) {
   let options;
   if (typeof arg1 === 'string') {

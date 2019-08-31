@@ -4,6 +4,8 @@ import bridge from './bridge';
 const map = {};
 const queue = [];
 
+const NS_HTML = 'http://www.w3.org/1999/xhtml';
+
 export function onRequestCreate(details) {
   const req = {
     details,
@@ -100,7 +102,7 @@ function start(req, id) {
     }
   }
   encodeBody(details.data)
-  .then(body => {
+  .then((body) => {
     payload.data = body;
     bridge.post({
       cmd: 'HttpRequest',
@@ -110,7 +112,7 @@ function start(req, id) {
 }
 
 function getFullUrl(url) {
-  const a = document.createElement('a');
+  const a = document.createElementNS(NS_HTML, 'a');
   a.setAttribute('href', url);
   return a.href;
 }

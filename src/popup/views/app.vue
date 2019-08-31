@@ -42,24 +42,6 @@
       </div>
     </div>
     <div
-      class="menu menu-commands"
-      v-show="commands.length"
-      :class="{expand: activeMenu === 'commands'}">
-      <div class="menu-item menu-area" @click="toggleMenu('commands')">
-        <div class="flex-auto" v-text="i18n('menuCommands')"></div>
-        <icon name="arrow" class="icon-collapse"></icon>
-      </div>
-      <div class="submenu">
-        <div
-          v-for="(item, index) in commands"
-          :key="index"
-          class="menu-item menu-area"
-          @click="onCommand(item)">
-          <span v-text="item.name"></span>
-        </div>
-      </div>
-    </div>
-    <div
       v-show="scripts.length"
       class="menu menu-scripts"
       :class="{expand: activeMenu === 'scripts'}">
@@ -85,6 +67,18 @@
               <icon name="code"></icon>
             </div>
           </div>
+          <div class="submenu-commands">
+            <div
+              class="menu-item menu-area"
+              v-for="(cap, i) in store.commands[item.data.props.id]"
+              :key="i"
+              @click="onCommand(item.data.props.id, cap)"
+              @mouseenter="message = cap"
+              @mouseleave="message = item.name">
+              <icon name="command" />
+              <div class="flex-auto ellipsis" v-text="cap" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -107,7 +101,7 @@ import { store } from '../utils';
 const optionsData = {
   isApplied: options.get('isApplied'),
 };
-options.hook(changes => {
+options.hook((changes) => {
   if ('isApplied' in changes) {
     optionsData.isApplied = changes.isApplied;
   }
@@ -127,15 +121,6 @@ export default {
     };
   },
   computed: {
-    commands() {
-      return this.store.commands.map(item => {
-        const [key, name] = item;
-        return {
-          name,
-          key,
-        };
-      });
-    },
     scripts() {
       return this.store.scripts.map(script => ({
         name: script.custom.name || getLocaleString(script.meta, 'name'),
@@ -175,10 +160,10 @@ export default {
         url: `https://greasyfork.org/scripts/by-site/${encodeURIComponent(this.store.domain)}`,
       });
     },
-    onCommand(item) {
+    onCommand(id, cap) {
       browser.tabs.sendMessage(this.store.currentTab.id, {
         cmd: 'Command',
-        data: item.key,
+        data: `${id}:${cap}`,
       });
     },
     onToggleScript(item) {
@@ -209,7 +194,7 @@ export default {
           },
         })
       ) : Promise.resolve())
-      .then(id => {
+      .then((id) => {
         const path = ['scripts', '_new', id].filter(Boolean).join('/');
         browser.tabs.create({
           url: browser.runtime.getURL(`/options/index.html#${path}`),

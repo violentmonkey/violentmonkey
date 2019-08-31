@@ -30,13 +30,13 @@ const OneDrive = BaseService.extend({
       responseType: 'json',
     });
     return requestUser()
-    .catch(res => {
+    .catch((res) => {
       if (res.status === 401) {
         return this.refreshToken().then(requestUser);
       }
       throw res;
     })
-    .catch(res => {
+    .catch((res) => {
       if (res.status === 400 && objectGet(res, 'data.error') === 'invalid_grant') {
         return Promise.reject({
           type: 'unauthorized',
@@ -54,7 +54,7 @@ const OneDrive = BaseService.extend({
       if (/^Bearer realm="OneDriveAPI"/.test(header)) {
         return this.refreshToken().then(() => this.getMeta());
       }
-      return {};
+      return;
     }
     throw res;
   },
@@ -143,7 +143,7 @@ const OneDrive = BaseService.extend({
       }, params)),
       responseType: 'json',
     })
-    .then(data => {
+    .then((data) => {
       if (data.access_token) {
         this.config.set({
           uid: data.user_id,
@@ -160,6 +160,7 @@ register(OneDrive);
 
 function normalize(item) {
   return {
+    name: item.name,
     size: item.size,
     uri: getURI(item.name),
     // modified: new Date(item.lastModifiedDateTime).getTime(),
