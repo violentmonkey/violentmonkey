@@ -20,8 +20,7 @@ new Vue({
 Object.assign(handlers, {
   SetPopup(data, src) {
     if (store.currentTab.id !== src.tab.id) return;
-    const { menus } = data;
-    store.commands = Object.entries(menus)
+    store.commands = Object.entries(data.menus)
     .reduce((map, [id, values]) => {
       map[id] = Object.keys(values).sort();
       return map;
