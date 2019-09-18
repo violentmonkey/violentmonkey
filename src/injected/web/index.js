@@ -126,7 +126,7 @@ function onLoadScripts(data) {
     const fnId = getUniqId('VMfn');
     const wrapperInit = map(keys, name => `this["${name}"]=${name}`).join(';');
     const codeSlices = [
-      `${wrapperInit};with(this)!function(define,module,exports){`,
+      `${wrapperInit};with(this)((define,module,exports)=>{`,
     ];
     forEach(requireKeys, (key) => {
       const requireCode = data.require[pathMap[key] || key];
@@ -141,9 +141,9 @@ function onLoadScripts(data) {
     });
     push(
       codeSlices,
-      '!function(){',
+      '(()=>{',
       code,
-      '}.call(this)}.call(this);',
+      '})()})();',
     );
     const codeConcat = `function(${keys.join(',')}){${codeSlices.join('\n')}}`;
     const name = script.custom.name || script.meta.name || script.props.id;

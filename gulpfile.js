@@ -73,10 +73,6 @@ function manifest() {
     const data = yaml.safeLoad(input);
     // Strip alphabetic suffix
     data.version = pkg.version.replace(/-[^.]*/, '');
-    if (process.env.TARGET === 'firefox') {
-      data.version += 'f';
-      data.applications.gecko.update_url = 'https://violentmonkey.top/static/updates.json';
-    }
     file.path = file.path.replace(/\.yml$/, '.json');
     return JSON.stringify(data);
   }))

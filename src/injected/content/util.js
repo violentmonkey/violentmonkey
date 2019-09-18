@@ -13,7 +13,7 @@ export function inject(code, sourceUrl) {
   const id = getUniqId('VM-');
   script.id = id;
   const sourceComment = sourceUrl ? `\n//# sourceURL=${sourceUrl}` : '';
-  script.textContent = `!${removeElement.toString()}(${JSON.stringify(id)});${code}${sourceComment}`;
+  script.textContent = `(${removeElement.toString()})(${JSON.stringify(id)});${code}${sourceComment}`;
   document.documentElement.appendChild(script);
   // in case the script is blocked by CSP
   removeElement(id);
