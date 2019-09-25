@@ -37,7 +37,7 @@ footer {
     background: cornflowerblue;
     color: white;
   }
-  &.disabled {
+  .disabled & {
     color: gray;
     &:hover {
       color: silver;

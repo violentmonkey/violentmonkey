@@ -53,11 +53,11 @@
         <div
           v-for="(item, index) in scripts"
           :key="index"
+          :class="{ disabled: !item.data.config.enabled }"
           @mouseenter="message = item.name"
           @mouseleave="message = ''">
           <div
             class="menu-item menu-area"
-            :class="{ disabled: !item.data.config.enabled }"
             @click="onToggleScript(item)">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
             <div class="flex-auto ellipsis" v-text="item.name" />
