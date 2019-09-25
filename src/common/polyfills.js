@@ -8,6 +8,8 @@
 // import 'core-js/features/string/ends-with'; // Chrome >= 41, Firefox >= 17
 // import 'core-js/features/string/repeat'; // Chrome >= 41, Firefox >= 24
 
+// ParentNode#append // Chrome >= 54, Firefox >= 49
+
 // Must use native Promise for Firefox to work
 // import 'core-js/features/promise';
 

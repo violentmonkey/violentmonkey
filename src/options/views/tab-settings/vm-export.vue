@@ -31,6 +31,7 @@ import options from '#/common/options';
 import { isFirefox } from '#/common/ua';
 import SettingCheck from '#/common/ui/setting-check';
 import { downloadBlob } from '#/common/download';
+import loadZip from '#/common/zip';
 import { store } from '../../utils';
 
 /**
@@ -69,19 +70,21 @@ export default {
 };
 
 function getWriter() {
-  return new Promise((resolve) => {
+  return loadZip()
+  .then(zip => new Promise((resolve) => {
     zip.createWriter(new zip.BlobWriter(), (writer) => {
       resolve(writer);
     });
-  });
+  }));
 }
 
 function addFile(writer, file) {
-  return new Promise((resolve) => {
+  return loadZip()
+  .then(zip => new Promise((resolve) => {
     writer.add(file.name, new zip.TextReader(file.content), () => {
       resolve(writer);
     });
-  });
+  }));
 }
 
 function leftpad(src, length, pad = '0') {

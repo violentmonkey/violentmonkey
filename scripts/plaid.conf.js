@@ -22,11 +22,7 @@ exports.pages = {
   },
   'options/index': {
     entry: './src/options',
-    html: htmlFactory({
-      js: [
-        '/public/lib/zip.js/zip.js',
-      ],
-    }),
+    html: htmlFactory(),
   },
   'confirm/index': {
     entry: './src/confirm',
