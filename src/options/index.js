@@ -4,6 +4,7 @@ import {
 } from '#/common';
 import options from '#/common/options';
 import handlers from '#/common/handlers';
+import loadZip from '#/common/zip';
 import '#/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
@@ -17,7 +18,6 @@ Object.assign(store, {
   sync: [],
   title: null,
 });
-zip.workerScriptsPath = '/public/lib/zip.js/';
 initialize();
 
 function initialize() {
@@ -29,6 +29,11 @@ function initialize() {
       render: h => h(App),
     })
     .$mount(el);
+  });
+  loadZip()
+  .then((zip) => {
+    store.zip = zip;
+    zip.workerScriptsPath = '/public/lib/zip.js/';
   });
 }
 

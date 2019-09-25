@@ -14,6 +14,5 @@ module.exports = {
   },
   globals: {
     browser: true,
-    zip: true,
   },
 };
