@@ -48,15 +48,18 @@ export function parseMeta(code) {
     [key]: metaTypes[key].default(),
   }), {});
   let flag = -1;
-  code.replace(/(?:^|\n)\s*\/\/\s*([@=]\S+)(.*)/g, (_match, group1, group2) => {
-    if (flag < 0 && group1 === metaStart) {
+  // Allow metadata lines to start with SPACE? '//' SPACE?
+  // Allow anything to follow the predefined text of the metaStart/End
+  // The spaces must be on the same line so [\t\x20] is used as \s also matches \r\n
+  code.replace(/(?:^|\n)\s*\/\/[\t\x20]*([@=]\S+)(.*)/g, (_match, group1, group2) => {
+    if (flag < 0 && group1.startsWith(metaStart)) {
       // start meta
       flag = 1;
-    } else if (flag > 0 && group1 === metaEnd) {
+    } else if (flag > 0 && group1.startsWith(metaEnd)) {
       // end meta
       flag = 0;
     }
-    if (flag === 1 && group1[0] === '@') {
+    if (flag === 1 && group1.startsWith('@')) {
       const [keyName, locale] = group1.slice(1).split(':');
       const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
       const key = locale ? `${camelKey}:${locale.toLowerCase()}` : camelKey;

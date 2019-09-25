@@ -185,7 +185,10 @@ function wrapGM(script, code, cache, unsafeWindow) {
     b: val => val === 'true',
   };
   const pathMap = script.custom.pathMap || {};
-  const matches = code.match(/\/\/\s+==UserScript==\s+([\s\S]*?)\/\/\s+==\/UserScript==\s/);
+  // Allow metadata lines to start with SPACE? '//' SPACE?
+  // Allow anything to follow the predefined text of the metaStart/End
+  // The spaces must be on the same line so [\t\x20] is used as \s also matches \r\n
+  const matches = code.match(/(?:^|\n)\s*\/\/[\t\x20]*==UserScript==.*\n([\s\S]*?\n|)\s*\/\/[\t\x20]*==\/UserScript==/);
   const metaStr = matches ? matches[1] : '';
   const gmInfo = {
     uuid: script.props.uuid,
