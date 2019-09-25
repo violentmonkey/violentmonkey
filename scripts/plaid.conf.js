@@ -1,4 +1,5 @@
 const { isProd } = require('@gera2ld/plaid/util');
+const { defaultOptions } = require('@gera2ld/plaid-webpack/util');
 
 /**
  * For each entry, `key` is the chunk name, `value` has following properties:
@@ -59,4 +60,8 @@ exports.optimization = {
       },
     },
   },
+};
+exports.htmlOptions = {
+  ...defaultOptions.htmlOptions,
+  template: require.resolve('./template.html'),
 };

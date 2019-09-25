@@ -2,6 +2,9 @@ import { initHooks, debounce, normalizeKeys } from '#/common';
 import { objectGet, objectSet } from '#/common/object';
 import { register } from './init';
 
+// make usable with browser.extension.getBackgroundPage()
+Object.assign(global, { getOption });
+
 const defaults = {
   isApplied: true,
   autoUpdate: true,

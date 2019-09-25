@@ -1,5 +1,5 @@
 const textarea = document.createElement('textarea');
-document.body.appendChild(textarea);
+setTimeout(() => document.body.appendChild(textarea));
 
 let clipboardData;
 function onCopy(e) {

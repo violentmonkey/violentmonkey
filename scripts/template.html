@@ -2,17 +2,51 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<% Object.entries(htmlWebpackPlugin.options.meta || {}).forEach(([ name, content ]) => { %>
+<meta name="<%= name %>" content="<%= content %>">
+<% }) %>
 <title><%= htmlWebpackPlugin.options.title %></title>
-<%
-if (htmlWebpackPlugin.options.manifest) {
-%><link rel="manifest" href="<%= htmlWebpackPlugin.options.manifest %>"><%
-}
-htmlWebpackPlugin.options.css.forEach(url => {
-%><link rel="stylesheet" href="<%= url %>"><%
-});
-htmlWebpackPlugin.options.js.forEach(url => {
-%><script src="<%= url %>"></script><%
-});
-%></head>
-<body></body>
+<% if (htmlWebpackPlugin.options.manifest) { %>
+<link rel="manifest" href="<%= htmlWebpackPlugin.options.manifest %>">
+<% } %>
+<% htmlWebpackPlugin.options.css.forEach(({ href, content }) => { %>
+<% if (href) { %>
+<link rel="stylesheet" href="<%= href %>">
+<% } else { %>
+<style><%= content %></style>
+<% } %>
+<% }); %>
+<% htmlWebpackPlugin.files.css.forEach(file => { %>
+<% if (htmlWebpackPlugin.options.inlineSource) { %>
+<style><%= compilation.assets[file.slice(htmlWebpackPlugin.files.publicPath.length)].source() %></style>
+<% } else { %>
+<link rel="stylesheet" href="<%= file %>">
+<% } %>
+<% }); %>
+<% htmlWebpackPlugin.options.js.forEach(({ src, content }) => { %>
+<% if (src) { %>
+<script src="<%= src %>"></script>
+<% } else { %>
+<script><%= content %></script>
+<% } %>
+<% }); %>
+<% htmlWebpackPlugin.files.js.forEach(file => { %>
+<% if (htmlWebpackPlugin.options.inlineSource) { %>
+<script><%= htmlWebpackPlugin.options.util.escapeScript(compilation.assets[file.slice(htmlWebpackPlugin.files.publicPath.length)].source()) %></script>
+<% } else { %>
+<script src="<%= file %>"></script>
+<% } %>
+<% }); %>
+</head>
+<!--
+All scripts should be loaded in HEAD so they run before DOMContentLoaded
+otherwise there'll be an empty white frame shown during page load
+which is a big nuisance with dark CSS themes.
+
+In your code make sure to wait for document.body either via MutationObserver
+or simply by accessing it inside an asynchronous event callback that runs
+in a separate event loop cycle e.g. any callback from extensions API.
+-->
+<body>
+</body>
 </html>

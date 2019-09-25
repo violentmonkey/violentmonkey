@@ -10,12 +10,13 @@ tld.initTLD();
 
 Vue.prototype.i18n = i18n;
 
-const el = document.createElement('div');
-document.body.appendChild(el);
-new Vue({
-  render: h => h(App),
-})
-.$mount(el);
+waitForBody()
+.then((body) => {
+  new Vue({
+    render: h => h(App),
+  })
+  .$mount(body.appendChild(document.createElement('div')));
+});
 
 Object.assign(handlers, {
   SetPopup(data, src) {
@@ -50,3 +51,14 @@ browser.tabs.query({ currentWindow: true, active: true })
     store.domain = tld.getDomain(domain) || domain;
   }
 });
+
+function waitForBody() {
+  return Promise.resolve(document.body || new Promise((resolve) => {
+    new MutationObserver(((_mutations, observer) => {
+      if (document.body) {
+        observer.disconnect();
+        resolve(document.body);
+      }
+    })).observe(document.documentElement, { childList: true });
+  }));
+}
