@@ -123,7 +123,13 @@ const meta = {
   },
   webRequest: true,
 };
-if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
+
+// Since this also runs in a content script we'll guard against implicit global variables
+// for DOM elements with 'id' attribute which is a standard feature, more info:
+// https://github.com/mozilla/webextension-polyfill/pull/153
+// https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
+if ((typeof browser === 'undefined' || Object.getPrototypeOf(browser) !== Object.prototype)
+    && typeof chrome !== 'undefined') {
   global.browser = wrapAPIs(chrome, meta);
   // global.browser.__patched = true;
 }
