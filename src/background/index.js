@@ -21,24 +21,12 @@ import { resetBlacklist } from './utils/tester';
 import {
   setValueStore, updateValueStore, resetValueOpener, addValueOpener,
 } from './utils/values';
+import { setBadge } from './utils/icon';
 
 const VM_VER = browser.runtime.getManifest().version;
 
-// Firefox Android does not support such APIs, use noop
-const browserAction = [
-  'setIcon',
-  'setBadgeText',
-  'setBadgeBackgroundColor',
-].reduce((actions, key) => {
-  const fn = browser.browserAction[key];
-  actions[key] = fn ? fn.bind(browser.browserAction) : noop;
-  return actions;
-}, {});
-
 hookOptions((changes) => {
-  if ('isApplied' in changes) setIcon(changes.isApplied);
   if ('autoUpdate' in changes) autoUpdate();
-  if ('showBadge' in changes) updateBadges();
   const SCRIPT_TEMPLATE = 'scriptTemplate';
   if (SCRIPT_TEMPLATE in changes && !changes[SCRIPT_TEMPLATE]) {
     setOption(SCRIPT_TEMPLATE, getDefaultOption(SCRIPT_TEMPLATE));
@@ -249,65 +237,3 @@ initialize()
   resetBlacklist();
   autoCheckRemove();
 });
-
-// Common functions
-
-const badges = {};
-function setBadge({ ids, reset }, src) {
-  const srcTab = src.tab || {};
-  let data = !reset && badges[srcTab.id];
-  if (!data) {
-    data = {
-      number: 0,
-      unique: 0,
-      idMap: {},
-    };
-    badges[srcTab.id] = data;
-  }
-  data.number += ids.length;
-  if (ids) {
-    ids.forEach((id) => {
-      data.idMap[id] = 1;
-    });
-    data.unique = Object.keys(data.idMap).length;
-  }
-  browserAction.setBadgeBackgroundColor({
-    color: '#808',
-    tabId: srcTab.id,
-  });
-  updateBadge(srcTab.id);
-}
-function updateBadge(tabId) {
-  const data = badges[tabId];
-  if (data) {
-    const showBadge = getOption('showBadge');
-    let text;
-    if (showBadge === 'total') text = data.number;
-    else if (showBadge) text = data.unique;
-    browserAction.setBadgeText({
-      text: `${text || ''}`,
-      tabId,
-    });
-  }
-}
-function updateBadges() {
-  browser.tabs.query({})
-  .then((tabs) => {
-    tabs.forEach((tab) => {
-      updateBadge(tab.id);
-    });
-  });
-}
-browser.tabs.onRemoved.addListener((id) => {
-  delete badges[id];
-});
-
-function setIcon(isApplied) {
-  // modern Chrome and Firefox use 16/32, other browsers may still use 19/38 (e.g. Vivaldi)
-  browserAction.setIcon({
-    path: Object.assign({}, ...[16, 19, 32, 38].map(n => ({
-      [n]: `/public/images/icon${n}${isApplied ? '' : 'w'}.png`,
-    }))),
-  });
-}
-setIcon(getOption('isApplied'));
