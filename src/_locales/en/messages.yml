@@ -142,6 +142,12 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
+failureReasonBlacklisted:
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+  message: Blacklisted in Violentmonkey's settings
+failureReasonNoninjectable:
+  description: Shown for URLs that cannot be processed (same places as failureBlacklistedUrl)
+  message: "Violentmonkey cannot access this page\n(common examples: browser UI or an extension)"
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alphabetical order
