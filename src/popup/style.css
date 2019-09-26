@@ -173,3 +173,7 @@ footer {
     overflow: hidden;
   }
 }
+
+.failure-reason {
+  padding: .75rem 1rem 0 3rem;
+}

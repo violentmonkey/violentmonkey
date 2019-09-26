@@ -1,5 +1,7 @@
 <template>
-  <div class="page-popup">
+  <div
+    class="page-popup"
+    :data-failure-reason="failureReason">
     <div class="flex menu-buttons">
       <div class="logo" :class="{disabled:!options.isApplied}">
         <img src="/public/images/icon128.png">
@@ -35,13 +37,18 @@
         <icon name="plus"></icon>
       </tooltip>
     </div>
-    <div class="menu" v-show="store.domain">
+    <div class="menu" v-if="store.injectable" v-show="store.domain">
       <div class="menu-item menu-area" @click="onFindSameDomainScripts">
         <icon name="search"></icon>
         <div class="flex-1" v-text="i18n('menuFindScripts')"></div>
       </div>
     </div>
     <div
+      class="failure-reason"
+      v-if="failureReasonText"
+      v-text="failureReasonText" />
+    <div
+      v-if="store.injectable"
       v-show="scripts.length"
       class="menu menu-scripts"
       :class="{expand: activeMenu === 'scripts'}">
@@ -94,7 +101,7 @@
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import options from '#/common/options';
-import { getLocaleString, sendMessage } from '#/common';
+import { getLocaleString, i18n, sendMessage } from '#/common';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 
@@ -126,6 +133,22 @@ export default {
         name: script.custom.name || getLocaleString(script.meta, 'name'),
         data: script,
       }));
+    },
+    failureReason() {
+      return [
+        !store.injectable && 'noninjectable',
+        store.blacklisted && 'blacklisted',
+        // undefined means the data isn't ready yet
+        optionsData.isApplied === false && 'scripts-disabled',
+      ].filter(Boolean).join(' ');
+    },
+    failureReasonText() {
+      return (
+        !store.injectable && i18n('failureReasonNoninjectable')
+        || store.blacklisted && i18n('failureReasonBlacklisted')
+        || optionsData.isApplied === false && i18n('menuScriptDisabled')
+        || ''
+      );
     },
   },
   methods: {
