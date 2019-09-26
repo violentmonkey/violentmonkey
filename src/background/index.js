@@ -236,4 +236,5 @@ initialize()
   sync.initialize();
   resetBlacklist();
   autoCheckRemove();
+  global.dispatchEvent(new Event('backgroundInitialized'));
 });
