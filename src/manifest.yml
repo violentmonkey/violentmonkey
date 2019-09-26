@@ -12,7 +12,9 @@ default_locale: en
 browser_action:
   browser_style: true
   default_icon:
+    '16': public/images/icon16.png
     '19': public/images/icon19.png
+    '32': public/images/icon32.png
     '38': public/images/icon38.png
   default_title: __MSG_extName__
   default_popup: popup/index.html

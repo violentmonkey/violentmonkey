@@ -303,11 +303,11 @@ browser.tabs.onRemoved.addListener((id) => {
 });
 
 function setIcon(isApplied) {
+  // modern Chrome and Firefox use 16/32, other browsers may still use 19/38 (e.g. Vivaldi)
   browserAction.setIcon({
-    path: {
-      19: `/public/images/icon19${isApplied ? '' : 'w'}.png`,
-      38: `/public/images/icon38${isApplied ? '' : 'w'}.png`,
-    },
+    path: Object.assign({}, ...[16, 19, 32, 38].map(n => ({
+      [n]: `/public/images/icon${n}${isApplied ? '' : 'w'}.png`,
+    }))),
   });
 }
 setIcon(getOption('isApplied'));
