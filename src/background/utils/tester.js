@@ -11,6 +11,21 @@ hookOptions((changes) => {
 });
 const RE_HTTP_OR_HTTPS = /^https?$/i;
 
+/*
+ Simple FIFO queue for the results of testBlacklist, cached separately from the main |cache|
+ because the blacklist is updated only once in a while so its entries would be crowding
+ the main cache and reducing its performance (objects with lots of keys are slow to access).
+
+ We also don't need to auto-expire the entries after a timeout.
+ The only limit we're concerned with is the overall memory used.
+ The limit is specified in the amount of unicode characters (string length) for simplicity.
+ Disregarding deduplication due to interning, the actual memory used is approximately twice as big:
+ 2 * keyLength + objectStructureOverhead * objectCount
+*/
+const MAX_BL_CACHE_LENGTH = 100e3;
+let blCache = {};
+let blCacheSize = 0;
+
 /**
  * Test glob rules like `@include` and `@exclude`.
  */
@@ -186,11 +201,15 @@ function checkPrefix(prefix, rule) {
 }
 
 export function testBlacklist(url) {
-  for (let i = 0; i < blacklistRules.length; i += 1) {
-    const { test, reject } = blacklistRules[i];
-    if (test(url)) return reject;
+  let res = blCache[url];
+  if (res === undefined) {
+    const rule = blacklistRules.find(({ test }) => test(url));
+    if (rule) res = rule.reject;
+    updateBlacklistCache(url, res || false);
   }
+  return res;
 }
+
 export function resetBlacklist(list) {
   const rules = list == null ? getOption('blacklist') : list;
   if (process.env.DEBUG) {
@@ -244,4 +263,20 @@ export function resetBlacklist(list) {
     };
   })
   .filter(Boolean);
+  blCache = {};
+  blCacheSize = 0;
+}
+
+function updateBlacklistCache(key, value) {
+  blCache[key] = value;
+  blCacheSize += key.length;
+  if (blCacheSize > MAX_BL_CACHE_LENGTH) {
+    Object.keys(blCache)
+    .some((k) => {
+      blCacheSize -= blCache[k].length;
+      delete blCache[k];
+      // reduce the cache to 75% so that this function doesn't run too often.
+      return blCacheSize < MAX_BL_CACHE_LENGTH * 3 / 4;
+    });
+  }
 }
