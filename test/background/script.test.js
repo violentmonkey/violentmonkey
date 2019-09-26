@@ -45,3 +45,25 @@ test('parseMeta', (t) => {
   }));
   t.end();
 });
+
+test('parseMetaIrregularities', (t) => {
+  t.deepEqual(parseMeta(`\
+  //    ==UserScript==============
+// @name foo
+ //@namespace bar
+//==/UserScript===================
+  `), {
+    ...baseMeta,
+    name: 'foo',
+    namespace: 'bar',
+  });
+  t.deepEqual(parseMeta(`\
+/*
+//
+  ==UserScript==
+// @name foo
+//
+==/UserScript==
+*/`), baseMeta);
+  t.end();
+});
