@@ -17,7 +17,7 @@ import {
   getScriptByIds, moveScript, vacuum, parseScript, getScript,
   sortScripts, getValueStoresByIds,
 } from './utils/db';
-import { resetBlacklist } from './utils/tester';
+import { resetBlacklist, testBlacklist } from './utils/tester';
 import {
   setValueStore, updateValueStore, resetValueOpener, addValueOpener,
 } from './utils/values';
@@ -211,6 +211,7 @@ const commands = {
       runAt: 'document_start',
     });
   },
+  TestBlacklist: testBlacklist,
 };
 
 initialize()

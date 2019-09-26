@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { i18n, sendMessage } from '#/common';
+import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import handlers from '#/common/handlers';
 import * as tld from '#/common/tld';
 import '#/common/ui/style';
@@ -46,5 +47,13 @@ browser.tabs.query({ currentWindow: true, active: true })
     const matches = currentTab.url.match(/:\/\/([^/]*)/);
     const domain = matches[1];
     store.domain = tld.getDomain(domain) || domain;
+  }
+  if (!INJECTABLE_TAB_URL_RE.test(currentTab.url)) {
+    store.injectable = false;
+  } else {
+    sendMessage({ cmd: 'TestBlacklist', data: currentTab.url })
+    .then((blocked) => {
+      if (blocked) store.blacklisted = true;
+    });
   }
 });
