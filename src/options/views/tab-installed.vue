@@ -178,10 +178,7 @@ export default {
     search: 'updateLater',
     'filters.sort.value': 'updateLater',
     showRecycle: 'onUpdate',
-    scripts() {
-      this.onUpdate();
-      this.onHashChange();
-    },
+    scripts: 'refreshUI',
     'store.route.paths.1': 'onHashChange',
   },
   computed: {
@@ -202,6 +199,10 @@ export default {
     },
   },
   methods: {
+    refreshUI() {
+      this.onUpdate();
+      this.onHashChange();
+    },
     onUpdate() {
       const { search, filters: { sort }, showRecycle } = this;
       const lowerSearch = (search || '').toLowerCase();
@@ -342,7 +343,12 @@ export default {
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 200);
-    this.onUpdate();
+  },
+  mounted() {
+    // Ensure the correct UI is shown when mounted:
+    // * on subsequent navigation via history back/forward;
+    // * on first initialization in some weird case the scripts got loaded early.
+    if (!store.loading) this.refreshUI();
   },
 };
 </script>
