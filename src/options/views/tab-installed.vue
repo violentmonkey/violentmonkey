@@ -1,6 +1,6 @@
 <template>
   <div class="tab-installed flex flex-col">
-    <div class="flex flex-col flex-auto">
+    <div class="flex flex-col flex-auto" v-if="canRenderScripts">
       <header class="flex">
         <div class="flex-auto" v-if="!showRecycle">
           <dropdown
@@ -169,6 +169,9 @@ export default {
       showRecycle: false,
       filteredScripts: [],
       removing: null,
+      // Speedup and deflicker for initial page load:
+      // skip rendering the script list when starting in the editor.
+      canRenderScripts: !store.route.paths[1],
     };
   },
   watch: {
@@ -296,12 +299,19 @@ export default {
       setRoute(['scripts', id].filter(Boolean).join('/'), true);
     },
     onHashChange() {
-      const id = this.store.route.paths[1];
+      const [tab, id] = this.store.route.paths;
       if (id === '_new') {
         this.script = {};
       } else {
         const nid = id && +id || null;
         this.script = nid && this.scripts.find(script => script.props.id === nid);
+        if (!this.script) {
+          // First time showing the list we need to tell v-if to keep it forever
+          this.canRenderScripts = true;
+          // Strip the invalid id from the URL so |App| can render the aside,
+          // which was hidden to avoid flicker on initial page load directly into the editor.
+          if (id) setRoute(tab, true);
+        }
       }
     },
     toggleRecycle() {
