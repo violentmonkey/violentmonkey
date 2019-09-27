@@ -285,20 +285,17 @@ function wrapGM(script, code, cache, unsafeWindow) {
     },
     GM_addStyle: {
       value(css) {
-        const callbacks = [];
         let el = false;
         const callbackId = registerCallback((styleId) => {
           el = document.getElementById(styleId);
-          callbacks.splice().forEach(callback => callback(el));
         });
         bridge.post({ cmd: 'AddStyle', data: { css, callbackId } });
         // Mock a Promise without the need for polyfill
-        return {
-          then(callback) {
-            if (el !== false) callback(el);
-            else push(callbacks, callback);
-          },
-        };
+        // It's not actually necessary because DOM messaging is synchronous
+        // but we keep it for compatibility with VM's 2017-2019 behavior
+        // https://github.com/violentmonkey/violentmonkey/issues/217
+        el.then = callback => callback(el);
+        return el;
       },
     },
     GM_log: {
