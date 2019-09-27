@@ -194,14 +194,13 @@ const handlers = {
     getPopup();
   },
   AddStyle({ css, callbackId }) {
-    let styleId = null;
-    if (document.head) {
-      styleId = getUniqId('VMst');
-      const style = document.createElement('style');
-      style.id = styleId;
-      style.textContent = css;
-      document.head.appendChild(style);
-    }
+    const styleId = getUniqId('VMst');
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = css;
+    // DOM spec allows any elements under documentElement
+    // https://dom.spec.whatwg.org/#node-trees
+    (document.head || document.documentElement).appendChild(style);
     bridge.post({ cmd: 'Callback', data: { callbackId, payload: styleId } });
   },
   Notification: onNotificationCreate,
