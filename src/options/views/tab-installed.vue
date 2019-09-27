@@ -109,7 +109,7 @@ import SettingCheck from '#/common/ui/setting-check';
 import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
 import LocaleGroup from '#/common/ui/locale-group';
-import { setRoute } from '#/common/router';
+import { setRoute, lastRoute } from '#/common/router';
 import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
@@ -297,7 +297,12 @@ export default {
       this.menuNewActive = active;
     },
     onEditScript(id) {
-      setRoute(['scripts', id].filter(Boolean).join('/'), true);
+      const pathname = ['scripts', id].filter(Boolean).join('/');
+      if (!id && pathname === lastRoute.pathname) {
+        window.history.back();
+      } else {
+        setRoute(pathname);
+      }
     },
     onHashChange() {
       const [tab, id] = this.store.route.paths;

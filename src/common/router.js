@@ -12,9 +12,12 @@ function parse(pathInfo) {
 }
 
 export const route = {};
+export const lastRoute = {};
+
 updateRoute();
 
 function updateRoute() {
+  Object.assign(lastRoute, route);
   Object.assign(route, parse(window.location.hash.slice(1)));
 }
 
