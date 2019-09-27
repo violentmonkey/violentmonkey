@@ -48,15 +48,23 @@ test('parseMeta', (t) => {
 
 test('parseMetaIrregularities', (t) => {
   t.deepEqual(parseMeta(`\
-  //    ==UserScript==============
+  // ==UserScript==============
 // @name foo
- //@namespace bar
-//==/UserScript===================
+ // @namespace bar
+// ==/UserScript===================
   `), {
     ...baseMeta,
     name: 'foo',
     namespace: 'bar',
   });
+  t.deepEqual(parseMeta(`\
+// ==UserScript==
+//@name foo
+// ==/UserScript==`), baseMeta);
+  t.deepEqual(parseMeta(`\
+//==UserScript==
+// @name foo
+//\t==/UserScript==`), baseMeta);
   t.deepEqual(parseMeta(`\
 /*
 //
