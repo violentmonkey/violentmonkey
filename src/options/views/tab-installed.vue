@@ -1,6 +1,6 @@
 <template>
   <div class="tab-installed flex flex-col">
-    <div class="flex flex-col flex-auto">
+    <div class="flex flex-col flex-auto" v-if="canRenderScripts">
       <header class="flex">
         <div class="flex-auto" v-if="!showRecycle">
           <dropdown
@@ -109,7 +109,7 @@ import SettingCheck from '#/common/ui/setting-check';
 import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
 import LocaleGroup from '#/common/ui/locale-group';
-import { setRoute } from '#/common/router';
+import { setRoute, lastRoute } from '#/common/router';
 import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
@@ -169,16 +169,16 @@ export default {
       showRecycle: false,
       filteredScripts: [],
       removing: null,
+      // Speedup and deflicker for initial page load:
+      // skip rendering the script list when starting in the editor.
+      canRenderScripts: !store.route.paths[1],
     };
   },
   watch: {
     search: 'updateLater',
     'filters.sort.value': 'updateLater',
     showRecycle: 'onUpdate',
-    scripts() {
-      this.onUpdate();
-      this.onHashChange();
-    },
+    scripts: 'refreshUI',
     'store.route.paths.1': 'onHashChange',
   },
   computed: {
@@ -199,6 +199,10 @@ export default {
     },
   },
   methods: {
+    refreshUI() {
+      this.onUpdate();
+      this.onHashChange();
+    },
     onUpdate() {
       const { search, filters: { sort }, showRecycle } = this;
       const lowerSearch = (search || '').toLowerCase();
@@ -293,15 +297,27 @@ export default {
       this.menuNewActive = active;
     },
     onEditScript(id) {
-      setRoute(['scripts', id].filter(Boolean).join('/'), true);
+      const pathname = ['scripts', id].filter(Boolean).join('/');
+      if (!id && pathname === lastRoute.pathname) {
+        window.history.back();
+      } else {
+        setRoute(pathname);
+      }
     },
     onHashChange() {
-      const id = this.store.route.paths[1];
+      const [tab, id] = this.store.route.paths;
       if (id === '_new') {
         this.script = {};
       } else {
         const nid = id && +id || null;
         this.script = nid && this.scripts.find(script => script.props.id === nid);
+        if (!this.script) {
+          // First time showing the list we need to tell v-if to keep it forever
+          this.canRenderScripts = true;
+          // Strip the invalid id from the URL so |App| can render the aside,
+          // which was hidden to avoid flicker on initial page load directly into the editor.
+          if (id) setRoute(tab, true);
+        }
       }
     },
     toggleRecycle() {
@@ -332,7 +348,12 @@ export default {
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 200);
-    this.onUpdate();
+  },
+  mounted() {
+    // Ensure the correct UI is shown when mounted:
+    // * on subsequent navigation via history back/forward;
+    // * on first initialization in some weird case the scripts got loaded early.
+    if (!store.loading) this.refreshUI();
   },
 };
 </script>
