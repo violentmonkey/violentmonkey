@@ -184,7 +184,7 @@ export default {
   computed: {
     message() {
       if (this.store.loading) {
-        return i18n('msgLoading');
+        return null;
       }
       if (!this.filteredScripts.length) {
         return i18n('labelNoSearchScripts');
