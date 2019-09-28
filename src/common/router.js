@@ -12,17 +12,21 @@ function parse(pathInfo) {
 }
 
 export const route = {};
-export const lastRoute = {};
+
+Object.defineProperties(route, {
+  stack: { value: [] },
+  last: { get: () => route.stack[route.stack.length - 1] || {} },
+});
 
 updateRoute();
 
 function updateRoute() {
-  Object.assign(lastRoute, route);
   Object.assign(route, parse(window.location.hash.slice(1)));
 }
 
+// popstate should be the first to ensure hashchange listeners see the correct route.last
+window.addEventListener('popstate', () => route.stack.pop());
 window.addEventListener('hashchange', updateRoute, false);
-window.addEventListener('popstate', updateRoute, false);
 
 export function setRoute(hash, replace) {
   let hashString = `${hash}`;
@@ -30,6 +34,7 @@ export function setRoute(hash, replace) {
   if (replace) {
     window.history.replaceState('', null, hashString);
   } else {
+    route.stack.push(Object.assign({}, route));
     window.history.pushState('', null, hashString);
   }
   updateRoute();
