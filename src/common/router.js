@@ -22,6 +22,7 @@ function updateRoute() {
 }
 
 window.addEventListener('hashchange', updateRoute, false);
+window.addEventListener('popstate', updateRoute, false);
 
 export function setRoute(hash, replace) {
   let hashString = `${hash}`;
