@@ -22,7 +22,7 @@ initialize();
 
 function initialize() {
   initMain();
-  options.ready(() => {
+  options.ready.then(() => {
     const el = document.createElement('div');
     document.body.appendChild(el);
     new Vue({

@@ -143,7 +143,7 @@ const filters = {
 hookSetting('filters.sort', (value) => {
   filters.sort.set(value);
 });
-options.ready(() => {
+options.ready.then(() => {
   filters.sort.set(options.get('filters.sort'));
 });
 
