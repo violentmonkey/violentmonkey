@@ -51,34 +51,6 @@ const init = browser.storage.local.get('options')
     console.log('options:', options); // eslint-disable-line no-console
   }
   if (!objectGet(options, 'version')) {
-    // v2.8.0+ stores options in browser.storage.local
-    // Upgrade from v2.7.x
-    if (process.env.DEBUG) {
-      console.log('Upgrade options...'); // eslint-disable-line no-console
-    }
-    try {
-      if (localStorage.length) {
-        Object.keys(defaults)
-        .forEach((key) => {
-          let value = localStorage.getItem(key);
-          if (value) {
-            try {
-              value = JSON.parse(value);
-            } catch (e) {
-              value = null;
-            }
-          }
-          if (value) {
-            if (process.env.DEBUG) {
-              console.log('Upgrade option:', key, value); // eslint-disable-line no-console
-            }
-            setOption(key, value);
-          }
-        });
-      }
-    } catch (e) {
-      // ignore security issue in Firefox
-    }
     setOption('version', 1);
   }
 })
