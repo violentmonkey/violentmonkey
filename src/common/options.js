@@ -28,12 +28,8 @@ function updateOptions(data) {
   hooks.fire(data);
 }
 
-function onReady(cb) {
-  ready.then(cb);
-}
-
 export default {
-  ready: onReady,
+  ready,
   get: getOption,
   set: setOption,
   update: updateOptions,

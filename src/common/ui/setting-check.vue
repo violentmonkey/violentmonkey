@@ -35,7 +35,7 @@ export default {
     },
   },
   created() {
-    options.ready(() => {
+    options.ready.then(() => {
       this.value = options.get(this.name);
       this.revoke = hookSetting(this.name, (value) => {
         this.value = value;
