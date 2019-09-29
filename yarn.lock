@@ -834,10 +834,10 @@
     vue-loader "^15.7.1"
     vue-template-compiler "^2.6.10"
 
-"@gera2ld/plaid-webpack@~1.4.12":
-  version "1.4.12"
-  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-webpack/-/plaid-webpack-1.4.12.tgz#c9d563abcd3195f8573c1bd940b38b463b1ebc76"
-  integrity sha1-ydVjq80xlfhXPBvZQLOLRjsevHY=
+"@gera2ld/plaid-webpack@~1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-webpack/-/plaid-webpack-1.5.0.tgz#b6dfa4a3ef58c742c61195144a70aad70aa92b72"
+  integrity sha512-K1F5r/mxTEN+AT3z0PSNe91LcRrQoFYeBzT+u1jUuTbufu+sX6N/NeartL2MBmFw8XcRZvvcoB8aU09Sz4TO0g==
   dependencies:
     babel-loader "^8.0.6"
     css-loader "^3.2.0"

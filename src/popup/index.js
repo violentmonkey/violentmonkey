@@ -10,12 +10,11 @@ tld.initTLD();
 
 Vue.prototype.i18n = i18n;
 
-const el = document.createElement('div');
-document.body.appendChild(el);
-new Vue({
+const vm = new Vue({
   render: h => h(App),
 })
-.$mount(el);
+.$mount();
+document.body.append(vm.$el);
 
 Object.assign(handlers, {
   SetPopup(data, src) {
