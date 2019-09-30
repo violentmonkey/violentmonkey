@@ -7,16 +7,26 @@ const CACHE_KEY = 'cacheCustomCSS';
 const setStyle = (css) => {
   if (css && !style) {
     style = document.createElement('style');
-    document.head.appendChild(style);
+    document.documentElement.appendChild(style);
   }
   if (css || style) {
     css = css || '';
     style.textContent = css;
-    localStorage.setItem(CACHE_KEY, css);
+    try {
+      localStorage.setItem(CACHE_KEY, css);
+    } catch {
+      // ignore
+    }
   }
 };
 
-setStyle(localStorage.getItem(CACHE_KEY));
+// In some versions of Firefox, `localStorage` is not allowed to be accessed
+// in Private Browsing mode.
+try {
+  setStyle(localStorage.getItem(CACHE_KEY));
+} catch {
+  // ignore
+}
 
 options.hook((changes) => {
   if ('customCSS' in changes) {
