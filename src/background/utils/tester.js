@@ -81,6 +81,16 @@ export function testScript(url, script) {
   return ok;
 }
 
+function testRegExp(re, text) {
+  const key = `re-test:${re.source}:${text}`;
+  let res = cache.get(key);
+  if (!res) {
+    res = re.test(text) ? 1 : -1;
+    cache.put(key, res);
+  }
+  return res === 1;
+}
+
 function mergeLists(...args) {
   return args.reduce((res, item) => (item ? res.concat(item) : res), []);
 }
@@ -109,7 +119,7 @@ function autoReg(str) {
     };
   }
   const re = new RegExp(`^${reStr}$`); // String with wildcards
-  return { test: tstr => re.test(tstr) };
+  return { test: tstr => testRegExp(re, tstr) };
 }
 
 function matchScheme(rule, data) {
@@ -168,7 +178,7 @@ function pathMatcher(rule) {
     else strRe = `^${strRe}(?:#|$)`;
   }
   const reRule = new RegExp(strRe);
-  return data => reRule.test(data);
+  return data => testRegExp(reRule, data);
 }
 function matchTester(rule) {
   let test;
