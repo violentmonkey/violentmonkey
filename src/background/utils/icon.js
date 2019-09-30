@@ -121,15 +121,19 @@ async function setIcon(tab = {}, data = {}) {
   // modern Chrome and Firefox use 16/32, other browsers may still use 19/38 (e.g. Vivaldi)
   const mod = data.blocked && 'b' || !isApplied && 'w' || '';
   const iconData = {};
-  const iconOptions = {
-    tabId: tab.id,
-    [iconCache ? 'imageData' : 'path']: iconData,
-  };
   for (const n of [16, 19, 32, 38]) {
     const path = `/public/images/icon${n}${mod}.png`;
-    iconData[n] = !iconCache ? path : iconCache[path] || await loadImageData(path);
+    let icon = iconCache ? iconCache[path] : path;
+    if (!icon) {
+      icon = await loadImageData(path);
+      iconCache[path] = icon;
+    }
+    iconData[n] = icon;
   }
-  browserAction.setIcon(iconOptions);
+  browserAction.setIcon({
+    tabId: tab.id,
+    [iconCache ? 'imageData' : 'path']: iconData,
+  });
 }
 
 function loadImageData(path) {
@@ -144,9 +148,7 @@ function loadImageData(path) {
       canvas.height = height;
       ctx.clearRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0, width, height);
-      const data = ctx.getImageData(0, 0, width, height);
-      iconCache[path] = data;
-      resolve(data);
+      resolve(ctx.getImageData(0, 0, width, height));
     };
   });
 }
