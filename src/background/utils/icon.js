@@ -51,7 +51,9 @@ browser.tabs.onRemoved.addListener((id) => {
 });
 
 browser.tabs.onUpdated.addListener((tabId, info, tab) => {
-  if (info.status === 'loading') {
+  if (info.status === 'loading'
+      // at least about:newtab in Firefox may open without 'loading' status
+      || info.favIconUrl && tab.url.startsWith('about:')) {
     updateState(tab, info.url);
   }
 });
