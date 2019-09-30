@@ -298,7 +298,7 @@ export default {
     },
     onEditScript(id) {
       const pathname = ['scripts', id].filter(Boolean).join('/');
-      if (!id && pathname === lastRoute.pathname) {
+      if (!id && pathname === lastRoute().pathname) {
         window.history.back();
       } else {
         setRoute(pathname);
