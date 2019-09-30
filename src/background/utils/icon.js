@@ -23,6 +23,10 @@ let showBadge;
 let titleBlacklisted;
 let titleNoninjectable;
 
+// We'll cache the icon data in Chrome as it doesn't cache the data and takes up to 40ms
+// in our background page context to set the 4 icon sizes for each new tab opened
+const iconCache = (global.chrome || {}).app && {};
+
 hookOptions((changes) => {
   if ('isApplied' in changes) {
     isApplied = changes.isApplied;
@@ -113,13 +117,36 @@ function updateState(tab, url = tab.url) {
   }
 }
 
-function setIcon(tab = {}, data = {}) {
+async function setIcon(tab = {}, data = {}) {
   // modern Chrome and Firefox use 16/32, other browsers may still use 19/38 (e.g. Vivaldi)
   const mod = data.blocked && 'b' || !isApplied && 'w' || '';
-  browserAction.setIcon({
-    path: Object.assign({}, ...[16, 19, 32, 38].map(n => ({
-      [n]: `/public/images/icon${n}${mod}.png`,
-    }))),
+  const iconData = {};
+  const iconOptions = {
     tabId: tab.id,
+    [iconCache ? 'imageData' : 'path']: iconData,
+  };
+  for (const n of [16, 19, 32, 38]) {
+    const path = `/public/images/icon${n}${mod}.png`;
+    iconData[n] = !iconCache ? path : iconCache[path] || await loadImageData(path);
+  }
+  browserAction.setIcon(iconOptions);
+}
+
+function loadImageData(path) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.src = path;
+    img.onload = () => {
+      const { width, height } = img;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+      ctx.clearRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+      const data = ctx.getImageData(0, 0, width, height);
+      iconCache[path] = data;
+      resolve(data);
+    };
   });
 }
