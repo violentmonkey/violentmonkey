@@ -5,6 +5,10 @@ module.exports = {
       ...process.env.BABEL_ENV !== 'test' && {
         modules: false,
       },
+      exclude: [
+        // for Firefox 52, see babel/babel#8204
+        'transform-regenerator',
+      ],
       useBuiltIns: false,
     }],
   ],
