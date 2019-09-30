@@ -43,6 +43,9 @@ permissions:
   - unlimitedStorage
   - clipboardWrite
 
+minimum_chrome_version: '55.0'
+
 browser_specific_settings:
   gecko:
     id: '{aecec67f-0d10-4fa7-b7c7-609a2db280cf}'
+    strict_min_version: '52.0'
