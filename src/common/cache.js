@@ -1,7 +1,5 @@
-const DEFAULT_LIFETIME = 3000;
-
 export default function initCache({
-  lifetime: defaultLifetime = DEFAULT_LIFETIME,
+  lifetime: defaultLifetime = 3000,
 } = {}) {
   let cache = {};
   // setTimeout call is very expensive when done frequently,
