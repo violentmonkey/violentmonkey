@@ -143,11 +143,15 @@ extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
   message: Blacklisted in Violentmonkey's settings
 failureReasonNoninjectable:
-  description: Shown for URLs that cannot be processed (same places as failureBlacklistedUrl)
-  message: "Violentmonkey cannot run userscripts in this page\n(common examples: browser UI or an extension)"
+  description: >-
+    Shown for URLs that cannot be processed (same places as
+    failureBlacklistedUrl)
+  message: |-
+    Violentmonkey cannot run userscripts in this page
+    (common examples: browser UI or an extension)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alphabetical order

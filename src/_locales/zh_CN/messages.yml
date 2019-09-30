@@ -140,6 +140,16 @@ extDescription:
 extName:
   description: Name of this extension.
   message: 暴力猴
+failureReasonBlacklisted:
+  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  message: 暴力猴黑名单设置阻止运行
+failureReasonNoninjectable:
+  description: >-
+    Shown for URLs that cannot be processed (same places as
+    failureBlacklistedUrl)
+  message: |-
+    暴力猴无法在此页面执行用户脚本
+    （如：浏览器界面、扩展页面）
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 字母顺序
