@@ -64,6 +64,7 @@ async function jsDev() {
 async function jsProd() {
   return require('@gera2ld/plaid-webpack/bin/build')({
     api: true,
+    keep: true,
   });
 }
 
@@ -137,6 +138,6 @@ const pack = gulp.parallel(manifest, copyFiles, copyI18n);
 
 exports.clean = clean;
 exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
-exports.build = gulp.parallel(pack, jsProd);
+exports.build = gulp.series(clean, gulp.parallel(pack, jsProd));
 exports.i18n = updateI18n;
 exports.check = checkI18n;
