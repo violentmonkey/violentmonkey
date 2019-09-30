@@ -13,10 +13,7 @@ function parse(pathInfo) {
 
 const stack = [];
 export const route = {};
-
-Object.defineProperty(route, {
-  last: { get: () => stack[stack.length - 1] || {} },
-});
+export const lastRoute = () => stack[stack.length - 1] || {};
 
 updateRoute();
 
