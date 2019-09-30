@@ -21,8 +21,8 @@ function updateRoute() {
   Object.assign(route, parse(window.location.hash.slice(1)));
 }
 
-// popstate should be the first to ensure hashchange listeners see the correct route.last
-window.addEventListener('popstate', () => route.stack.pop());
+// popstate should be the first to ensure hashchange listeners see the correct lastRoute
+window.addEventListener('popstate', () => stack.pop());
 window.addEventListener('hashchange', updateRoute, false);
 
 export function setRoute(hash, replace) {
