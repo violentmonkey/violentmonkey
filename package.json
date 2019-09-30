@@ -3,7 +3,7 @@
   "version": "2.11.2",
   "scripts": {
     "dev": "gulp dev",
-    "prebuild": "yarn lint && gulp clean",
+    "prebuild": "yarn lint",
     "build": "cross-env NODE_ENV=production gulp build",
     "build:firefox": "cross-env TARGET=firefox yarn build",
     "analyze": "cross-env RUN_ENV=analyze npm run build",
