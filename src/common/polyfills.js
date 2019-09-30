@@ -1,12 +1,14 @@
-import 'core-js/features/object/assign';
-import 'core-js/features/object/values';
-import 'core-js/features/array/includes';
-import 'core-js/features/array/find';
-import 'core-js/features/array/find-index';
-import 'core-js/features/string/includes';
-import 'core-js/features/string/starts-with';
-import 'core-js/features/string/ends-with';
-import 'core-js/features/string/repeat';
+// import 'core-js/features/object/assign'; // Chrome >= 45, Firefox >= 34
+// import 'core-js/features/object/values'; // Chrome >= 54, Firefox >= 47
+// import 'core-js/features/array/includes'; // Chrome >= 47, Firefox >= 43
+// import 'core-js/features/array/find'; // Chrome >= 45, Firefox >= 25
+// import 'core-js/features/array/find-index'; // Chrome >= 45, Firefox >= 25
+// import 'core-js/features/string/includes'; // Chrome >= 41, Firefox >= 40
+// import 'core-js/features/string/starts-with'; // Chrome >= 41, Firefox >= 17
+// import 'core-js/features/string/ends-with'; // Chrome >= 41, Firefox >= 17
+// import 'core-js/features/string/repeat'; // Chrome >= 41, Firefox >= 24
+
+// ParentNode#append // Chrome >= 54, Firefox >= 49
 
 // Must use native Promise for Firefox to work
 // import 'core-js/features/promise';

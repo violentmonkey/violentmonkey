@@ -10,18 +10,16 @@ tld.initTLD();
 
 Vue.prototype.i18n = i18n;
 
-const el = document.createElement('div');
-document.body.appendChild(el);
-new Vue({
+const vm = new Vue({
   render: h => h(App),
 })
-.$mount(el);
+.$mount();
+document.body.append(vm.$el);
 
 Object.assign(handlers, {
   SetPopup(data, src) {
     if (store.currentTab.id !== src.tab.id) return;
-    const { menus } = data;
-    store.commands = Object.entries(menus)
+    store.commands = Object.entries(data.menus)
     .reduce((map, [id, values]) => {
       map[id] = Object.keys(values).sort();
       return map;

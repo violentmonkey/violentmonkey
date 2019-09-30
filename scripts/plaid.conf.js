@@ -6,11 +6,20 @@ const { isProd } = require('@gera2ld/plaid/util');
  * - value.html: options object passed to HtmlWebpackPlugin.
  * - value.html.inlineSource: if true, JS and CSS files will be inlined in HTML.
  */
+const injectTo = item => {
+  if ([
+    '../browser.js',
+    '../common.js',
+  ].includes(item.attributes.src)) {
+    return 'head';
+  }
+};
 const htmlFactory = extra => options => ({
   ...options,
   title: 'Violentmonkey',
   ...extra,
   chunks: ['browser', ...options.chunks],
+  injectTo,
 });
 exports.pages = {
   'browser': {
@@ -22,11 +31,7 @@ exports.pages = {
   },
   'options/index': {
     entry: './src/options',
-    html: htmlFactory({
-      js: [
-        '/public/lib/zip.js/zip.js',
-      ],
-    }),
+    html: htmlFactory(),
   },
   'confirm/index': {
     entry: './src/confirm',

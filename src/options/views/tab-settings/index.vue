@@ -139,7 +139,7 @@ export default {
   },
   created() {
     this.revokers = [];
-    options.ready(() => {
+    options.ready.then(() => {
       items.forEach((item) => {
         const { name, key, normalize } = item;
         settings[name] = normalize(options.get(key || name));

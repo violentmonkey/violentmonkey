@@ -254,7 +254,7 @@ function injectScript(data) {
     code,
     JSON.stringify(vCallbackId),
   ];
-  const injectedCode = `!${func.toString()}(${args.join(',')})`;
+  const injectedCode = `(${func.toString()})(${args.join(',')});`;
   if (mode === INJECT_CONTENT) {
     sendMessage({
       cmd: 'InjectScript',

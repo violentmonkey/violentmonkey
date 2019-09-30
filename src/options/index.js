@@ -2,8 +2,8 @@ import Vue from 'vue';
 import {
   sendMessage, i18n, getLocaleString, cache2blobUrl,
 } from '#/common';
-import options from '#/common/options';
 import handlers from '#/common/handlers';
+import loadZip from '#/common/zip';
 import '#/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
@@ -17,18 +17,19 @@ Object.assign(store, {
   sync: [],
   title: null,
 });
-zip.workerScriptsPath = '/public/lib/zip.js/';
 initialize();
 
 function initialize() {
   initMain();
-  options.ready(() => {
-    const el = document.createElement('div');
-    document.body.appendChild(el);
-    new Vue({
-      render: h => h(App),
-    })
-    .$mount(el);
+  const vm = new Vue({
+    render: h => h(App),
+  })
+  .$mount();
+  document.body.append(vm.$el);
+  loadZip()
+  .then((zip) => {
+    store.zip = zip;
+    zip.workerScriptsPath = '/public/lib/zip.js/';
   });
 }
 
