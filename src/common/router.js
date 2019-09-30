@@ -11,11 +11,11 @@ function parse(pathInfo) {
   return { pathname, query, paths };
 }
 
+const stack = [];
 export const route = {};
 
-Object.defineProperties(route, {
-  stack: { value: [] },
-  last: { get: () => route.stack[route.stack.length - 1] || {} },
+Object.defineProperty(route, {
+  last: { get: () => stack[stack.length - 1] || {} },
 });
 
 updateRoute();
@@ -34,7 +34,7 @@ export function setRoute(hash, replace) {
   if (replace) {
     window.history.replaceState('', null, hashString);
   } else {
-    route.stack.push(Object.assign({}, route));
+    stack.push(Object.assign({}, route));
     window.history.pushState('', null, hashString);
   }
   updateRoute();
