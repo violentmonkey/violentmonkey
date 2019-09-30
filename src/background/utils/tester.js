@@ -30,15 +30,14 @@ let blCacheSize = 0;
  * Test glob rules like `@include` and `@exclude`.
  */
 export function testGlob(url, rules) {
-  const lifetime = 60 * 1000;
   return rules.some((rule) => {
     const key = `re:${rule}`;
     let re = cache.get(key);
     if (re) {
-      cache.hit(key, lifetime);
+      cache.hit(key);
     } else {
       re = autoReg(rule);
-      cache.put(key, re, lifetime);
+      cache.put(key, re);
     }
     return re.test(url);
   });
@@ -48,15 +47,14 @@ export function testGlob(url, rules) {
  * Test match rules like `@match` and `@exclude_match`.
  */
 export function testMatch(url, rules) {
-  const lifetime = 60 * 1000;
   return rules.some((rule) => {
     const key = `match:${rule}`;
     let matcher = cache.get(key);
     if (matcher) {
-      cache.hit(key, lifetime);
+      cache.hit(key);
     } else {
       matcher = matchTester(rule);
-      cache.put(key, matcher, lifetime);
+      cache.put(key, matcher);
     }
     return matcher.test(url);
   });
