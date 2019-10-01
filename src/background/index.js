@@ -102,7 +102,10 @@ const commands = {
       version: VM_VER,
     };
     if (!data.isApplied) return data;
-    return getScriptsByURL(url)
+    const key = `getScriptsByURL:${url}`;
+    const cachedData = cache.get(key);
+    if (cachedData) cache.del(key);
+    return Promise.resolve(cachedData || getScriptsByURL(url))
     .then((res) => {
       addValueOpener(srcTab.id, Object.keys(res.values));
       return Object.assign(data, res);
@@ -232,6 +235,15 @@ initialize()
     }
     // undefined will be ignored
     return res || null;
+  });
+  browser.webRequest.onHeadersReceived.addListener(async ({ url }) => {
+    const key = `getScriptsByURL:${url}`;
+    if (!cache.has(key)) {
+      cache.put(key, await getScriptsByURL(url), 250);
+    }
+  }, {
+    urls: ['*://*/*'],
+    types: ['main_frame', 'sub_frame'],
   });
   setTimeout(autoUpdate, 2e4);
   sync.initialize();

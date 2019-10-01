@@ -16,3 +16,5 @@ global.browser = {
     },
   },
 };
+
+global.performance = { now: () => Date.now() };

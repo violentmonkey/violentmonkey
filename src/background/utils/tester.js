@@ -30,15 +30,14 @@ let blCacheSize = 0;
  * Test glob rules like `@include` and `@exclude`.
  */
 export function testGlob(url, rules) {
-  const lifetime = 60 * 1000;
   return rules.some((rule) => {
     const key = `re:${rule}`;
     let re = cache.get(key);
     if (re) {
-      cache.hit(key, lifetime);
+      cache.hit(key);
     } else {
       re = autoReg(rule);
-      cache.put(key, re, lifetime);
+      cache.put(key, re);
     }
     return re.test(url);
   });
@@ -48,15 +47,14 @@ export function testGlob(url, rules) {
  * Test match rules like `@match` and `@exclude_match`.
  */
 export function testMatch(url, rules) {
-  const lifetime = 60 * 1000;
   return rules.some((rule) => {
     const key = `match:${rule}`;
     let matcher = cache.get(key);
     if (matcher) {
-      cache.hit(key, lifetime);
+      cache.hit(key);
     } else {
       matcher = matchTester(rule);
-      cache.put(key, matcher, lifetime);
+      cache.put(key, matcher);
     }
     return matcher.test(url);
   });
@@ -79,6 +77,16 @@ export function testScript(url, script) {
   // @exclude
   ok = ok && !testGlob(url, exc);
   return ok;
+}
+
+function testRegExp(re, text) {
+  const key = `re-test:${re.source}:${text}`;
+  let res = cache.get(key);
+  if (!res) {
+    res = re.test(text) ? 1 : -1;
+    cache.put(key, res);
+  }
+  return res === 1;
 }
 
 function mergeLists(...args) {
@@ -109,7 +117,7 @@ function autoReg(str) {
     };
   }
   const re = new RegExp(`^${reStr}$`); // String with wildcards
-  return { test: tstr => re.test(tstr) };
+  return { test: tstr => testRegExp(re, tstr) };
 }
 
 function matchScheme(rule, data) {
@@ -168,7 +176,7 @@ function pathMatcher(rule) {
     else strRe = `^${strRe}(?:#|$)`;
   }
   const reRule = new RegExp(strRe);
-  return data => reRule.test(data);
+  return data => testRegExp(reRule, data);
 }
 function matchTester(rule) {
   let test;
