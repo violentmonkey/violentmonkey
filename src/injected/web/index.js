@@ -32,7 +32,6 @@ export default function initialize(
     // Load scripts after being handled by listeners in web page
     Promise.resolve().then(bridge.load);
   }, false);
-  bridge.post({ cmd: 'Ready' });
 }
 
 const store = {

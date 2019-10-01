@@ -131,29 +131,25 @@ function injectScripts(contentId, webId, data, scriptLists) {
   const injectContent = scriptLists[INJECT_CONTENT];
   if (injectContent.length) {
     VMInitInjection()(...args, INJECT_CONTENT);
-    bridge.ready.then(() => {
-      bridge.post({
-        cmd: 'LoadScripts',
-        data: {
-          ...data,
-          mode: INJECT_CONTENT,
-          scripts: injectContent,
-        },
-      });
+    bridge.post({
+      cmd: 'LoadScripts',
+      data: {
+        ...data,
+        mode: INJECT_CONTENT,
+        scripts: injectContent,
+      },
     });
   }
   if (injectPage.length) {
     // Avoid using Function::apply in case it is shimmed
     inject(`(${VMInitInjection.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
-    bridge.ready.then(() => {
-      bridge.post({
-        cmd: 'LoadScripts',
-        data: {
-          ...data,
-          mode: INJECT_PAGE,
-          scripts: injectPage,
-        },
-      });
+    bridge.post({
+      cmd: 'LoadScripts',
+      data: {
+        ...data,
+        mode: INJECT_PAGE,
+        scripts: injectPage,
+      },
     });
   }
 }
@@ -165,9 +161,6 @@ const handlers = {
   Inject: injectScript,
   TabOpen: tabOpen,
   TabClose: tabClose,
-  Ready() {
-    bridge.ready = Promise.resolve();
-  },
   UpdateValue(data) {
     sendMessage({ cmd: 'UpdateValue', data });
   },
@@ -221,10 +214,6 @@ const handlers = {
     });
   },
 };
-
-bridge.ready = new Promise((resolve) => {
-  handlers.Ready = resolve;
-});
 
 function onHandle(req) {
   const handle = handlers[req.cmd];
