@@ -23,6 +23,10 @@ let showBadge;
 let titleBlacklisted;
 let titleNoninjectable;
 
+// We'll cache the icon data in Chrome as it doesn't cache the data and takes up to 40ms
+// in our background page context to set the 4 icon sizes for each new tab opened
+const iconCache = (global.chrome || {}).app && {};
+
 hookOptions((changes) => {
   if ('isApplied' in changes) {
     isApplied = changes.isApplied;
@@ -51,7 +55,9 @@ browser.tabs.onRemoved.addListener((id) => {
 });
 
 browser.tabs.onUpdated.addListener((tabId, info, tab) => {
-  if (info.status === 'loading') {
+  if (info.status === 'loading'
+      // at least about:newtab in Firefox may open without 'loading' status
+      || info.favIconUrl && tab.url.startsWith('about:')) {
     updateState(tab, info.url);
   }
 });
@@ -111,13 +117,38 @@ function updateState(tab, url = tab.url) {
   }
 }
 
-function setIcon(tab = {}, data = {}) {
+async function setIcon(tab = {}, data = {}) {
   // modern Chrome and Firefox use 16/32, other browsers may still use 19/38 (e.g. Vivaldi)
   const mod = data.blocked && 'b' || !isApplied && 'w' || '';
+  const iconData = {};
+  for (const n of [16, 19, 32, 38]) {
+    const path = `/public/images/icon${n}${mod}.png`;
+    let icon = iconCache ? iconCache[path] : path;
+    if (!icon) {
+      icon = await loadImageData(path);
+      iconCache[path] = icon;
+    }
+    iconData[n] = icon;
+  }
   browserAction.setIcon({
-    path: Object.assign({}, ...[16, 19, 32, 38].map(n => ({
-      [n]: `/public/images/icon${n}${mod}.png`,
-    }))),
     tabId: tab.id,
+    [iconCache ? 'imageData' : 'path']: iconData,
+  });
+}
+
+function loadImageData(path) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.src = path;
+    img.onload = () => {
+      const { width, height } = img;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+      ctx.clearRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(ctx.getImageData(0, 0, width, height));
+    };
   });
 }
