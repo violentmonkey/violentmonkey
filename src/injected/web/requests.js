@@ -1,10 +1,18 @@
-import { includes, encodeBody, jsonLoad } from '../utils/helpers';
+import {
+  includes, push, shift, encodeBody, jsonLoad, Uint8Array, Blob, warn,
+  stringSlice, stringMatch, stringCharCodeAt,
+} from '../utils/helpers';
 import bridge from './bridge';
 
 const map = {};
 const queue = [];
 
 const NS_HTML = 'http://www.w3.org/1999/xhtml';
+
+// rarely used so we'll do an explicit .call() later to reduce init time now
+const { createElementNS } = Document.prototype;
+const { setAttribute } = Element.prototype;
+const hrefGet = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
 
 export function onRequestCreate(details) {
   const req = {
@@ -14,13 +22,13 @@ export function onRequestCreate(details) {
     },
   };
   details.url = getFullUrl(details.url);
-  queue.push(req);
+  push(queue, req);
   bridge.post({ cmd: 'GetRequestId' });
   return req.req;
 }
 
 export function onRequestStart(id) {
-  const req = queue.shift();
+  const req = shift(queue);
   if (req) start(req, id);
 }
 
@@ -38,15 +46,14 @@ function parseData(req, details) {
     // blob or arraybuffer
     const { response } = req.data;
     if (response) {
-      const data = response.split(',');
-      const matches = data[0].match(/^data:(.*?);base64$/);
+      const matches = stringMatch(response, /^data:([^;,]*);base64,/);
       if (!matches) {
         // invalid
         req.data.response = null;
       } else {
-        const raw = window.atob(data[1]);
-        const arr = new window.Uint8Array(raw.length);
-        for (let i = 0; i < raw.length; i += 1) arr[i] = raw.charCodeAt(i);
+        const raw = atob(stringSlice(response, matches[0].length));
+        const arr = new Uint8Array(raw.length);
+        for (let i = 0; i < raw.length; i += 1) arr[i] = stringCharCodeAt(raw, i);
         if (details.responseType === 'blob') {
           // blob
           return new Blob([arr], { type: matches[1] });
@@ -98,7 +105,7 @@ function start(req, id) {
     if (includes(['arraybuffer', 'blob'], responseType)) {
       payload.responseType = 'arraybuffer';
     } else if (!includes(['json', 'text'], responseType)) {
-      console.warn(`[Violentmonkey] Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
+      warn(`[Violentmonkey] Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
   }
   encodeBody(details.data)
@@ -112,7 +119,7 @@ function start(req, id) {
 }
 
 function getFullUrl(url) {
-  const a = document.createElementNS(NS_HTML, 'a');
-  a.setAttribute('href', url);
-  return a.href;
+  const a = createElementNS.call(document, NS_HTML, 'a');
+  setAttribute.call(a, 'href', url);
+  return hrefGet.call(a);
 }

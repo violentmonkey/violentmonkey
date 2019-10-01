@@ -4,7 +4,8 @@ import initialize from './content';
 (function main() {
   // Avoid running repeatedly due to new `document.documentElement`
   const VM_KEY = '__Violentmonkey';
-  if (window[VM_KEY]) return;
+  // Literal `1` guards against <html id="__Violentmonkey">, more info in browser.js
+  if (window[VM_KEY] === 1) return;
   window[VM_KEY] = 1;
 
   function initBridge() {

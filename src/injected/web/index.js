@@ -3,8 +3,9 @@ import {
   getUniqId, bindEvents, attachFunction, cache2blobUrl,
 } from '../utils';
 import {
-  includes, forEach, map, push, utf8decode, jsonDump, jsonLoad,
-  Promise, console,
+  includes, forEach, map, push, join, concat, filter, Boolean, utf8decode, jsonDump, jsonLoad, atob,
+  Promise, console, assign, objectKeys, setTimeout, Error, defineProperty, defineProperties,
+  stringLastIndexOf, stringMatch, stringSlice, stringStarts, noop,
 } from '../utils/helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
@@ -18,20 +19,35 @@ import { onDownload } from './download';
 
 let state = 0;
 
+// rarely used so we'll do an explicit .call() later to reduce init time now
+const { addEventListener } = EventTarget.prototype;
+const { getElementById } = Document.prototype;
+const readyStateGet = Object.getOwnPropertyDescriptor(Document.prototype, 'readyState').get;
+
 export default function initialize(
   webId,
   contentId,
   props,
-  mode = INJECT_PAGE,
+  isFirefox,
+  invokeHost,
 ) {
+  let invokeGuest;
   bridge.props = props;
-  bridge.mode = mode;
-  bridge.post = bindEvents(webId, contentId, onHandle);
-  document.addEventListener('DOMContentLoaded', () => {
+  if (invokeHost) {
+    bridge.mode = INJECT_CONTENT;
+    bridge.post = msg => invokeHost(msg, INJECT_CONTENT);
+    invokeGuest = onHandle;
+  } else {
+    bridge.mode = INJECT_PAGE;
+    bridge.post = bindEvents(webId, contentId, onHandle);
+    bridge.post.asString = isFirefox;
+  }
+  addEventListener.call(document, 'DOMContentLoaded', () => {
     state = 1;
     // Load scripts after being handled by listeners in web page
     Promise.resolve().then(bridge.load);
-  }, false);
+  }, { once: true });
+  return invokeGuest;
 }
 
 const store = {
@@ -39,6 +55,18 @@ const store = {
   values: {},
   callbacks: {},
 };
+
+const wrapperInfo = {
+  [INJECT_CONTENT]: { unsafeWindow: global },
+  [INJECT_PAGE]: { unsafeWindow: window },
+  // store the initial eval now (before the page scripts run) just in case
+  eval: {
+    [INJECT_CONTENT]: global.eval, // eslint-disable-line no-eval
+    [INJECT_PAGE]: window.eval, // eslint-disable-line no-eval
+  },
+};
+
+let gmApi;
 
 const handlers = {
   LoadScripts: onLoadScripts,
@@ -54,8 +82,7 @@ const handlers = {
   HttpRequested: onRequestCallback,
   TabClosed: onTabClosed,
   UpdatedValues(updates) {
-    Object.keys(updates)
-    .forEach((id) => {
+    forEach(objectKeys(updates), (id) => {
       if (store.values[id]) store.values[id] = updates[id];
     });
   },
@@ -93,8 +120,9 @@ function onLoadScripts(data) {
   }
   // reset load and checkLoad
   bridge.load = () => {
+    bridge.load = noop;
     run(end);
-    setTimeout(run, 0, idle);
+    setTimeout(runIdle);
   };
   const listMap = {
     'document-start': start,
@@ -110,83 +138,80 @@ function onLoadScripts(data) {
     });
     run(start);
   }
-  if (!state && includes(['interactive', 'complete'], document.readyState)) {
+  if (!state && includes(['interactive', 'complete'], readyStateGet.call(document))) {
     state = 1;
   }
   if (state) bridge.load();
 
   function buildCode(script) {
-    const requireKeys = script.meta.require || [];
     const pathMap = script.custom.pathMap || {};
+    const requireKeys = script.meta.require || [];
+    const requires = filter(map(requireKeys, key => data.require[pathMap[key] || key]), Boolean);
     const code = data.code[script.props.id] || '';
-    const unsafeWindow = bridge.mode === INJECT_CONTENT ? global : window;
-    const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache, unsafeWindow);
+    const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache);
     const id = getUniqId('VMin');
     const fnId = getUniqId('VMfn');
-    const wrapperInit = map(keys, name => `this["${name}"]=${name}`).join(';');
     const codeSlices = [
-      `${wrapperInit};with(this)((define,module,exports)=>{`,
-    ];
-    forEach(requireKeys, (key) => {
-      const requireCode = data.require[pathMap[key] || key];
-      if (requireCode) {
-        push(
-          codeSlices,
-          requireCode,
-          // Add `;` to a new line in case script ends with comment lines
-          ';',
-        );
-      }
-    });
-    push(
-      codeSlices,
+      `function(${
+        join(keys, ',')
+      }){${
+        join(map(keys, name => `this["${name}"]=${name};`), '')
+      }with(this)((define,module,exports)=>{`,
+      // 1. trying to avoid string concatenation of potentially huge code slices
+      // 2. adding `;` on a new line in case some required script ends with a line comment
+      ...concat([], ...map(requires, req => [req, '\n;'])),
       '(()=>{',
       code,
-      '})()})();',
-    );
-    const codeConcat = `function(${keys.join(',')}){${codeSlices.join('\n')}}`;
+      // adding a new line in case the code ends with a line comment
+      '\n})()})()}',
+    ];
     const name = script.custom.name || script.meta.name || script.props.id;
     const args = map(keys, key => wrapper[key]);
     attachFunction(fnId, () => {
       const func = window[id];
-      if (func) runCode(name, func, args, thisObj, codeConcat);
+      if (func) runCode(name, func, args, thisObj);
     });
-    bridge.post({ cmd: 'Inject', data: [id, codeConcat, fnId, bridge.mode, script.props.id] });
+    return [id, codeSlices, fnId, bridge.mode, script.props.id];
   }
   function run(list) {
-    while (list.length) buildCode(list.shift());
+    bridge.post({ cmd: 'InjectMulti', data: map(list, buildCode) });
+    list.length = 0;
+  }
+  async function runIdle() {
+    for (const script of idle) {
+      bridge.post({ cmd: 'Inject', data: buildCode(script) });
+      await new Promise(setTimeout);
+    }
+    // let GC sweep the no longer necessary stuff
+    gmApi = null;
+    idle.length = 0;
   }
 }
 
-function wrapGM(script, code, cache, unsafeWindow) {
+function wrapGM(script, code, cache) {
+  const { unsafeWindow } = wrapperInfo[bridge.mode];
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const gm = {};
   const grant = script.meta.grant || [];
-  const urls = {};
   let thisObj = gm;
   if (!grant.length || (grant.length === 1 && grant[0] === 'none')) {
     // @grant none
     grant.pop();
     gm.window = unsafeWindow;
   } else {
-    thisObj = getWrapper(unsafeWindow);
+    thisObj = getWrapper();
     gm.window = thisObj;
   }
-  if (!includes(grant, 'unsafeWindow')) push(grant, 'unsafeWindow');
-  if (!includes(grant, 'GM_info')) push(grant, 'GM_info');
-  if (includes(grant, 'window.close')) gm.window.close = () => { bridge.post({ cmd: 'TabClose' }); };
+  if (includes(grant, 'window.close')) {
+    gm.window.close = () => {
+      bridge.post({ cmd: 'TabClose' });
+    };
+  }
   const resources = script.meta.resources || {};
-  const dataDecoders = {
-    o: val => jsonLoad(val),
-    // deprecated
-    n: val => Number(val),
-    b: val => val === 'true',
-  };
-  const pathMap = script.custom.pathMap || {};
   const gmInfo = {
     uuid: script.props.uuid,
-    scriptMetaStr: code.match(METABLOCK_RE)[1] || '',
+    scriptMetaStr: stringMatch(code, METABLOCK_RE)[1] || '',
     scriptWillUpdate: !!script.config.shouldUpdate,
     scriptHandler: 'Violentmonkey',
     version: bridge.version,
@@ -198,7 +223,7 @@ function wrapGM(script, code, cache, unsafeWindow) {
       matches: [...script.meta.match],
       name: script.meta.name || '',
       namespace: script.meta.namespace || '',
-      resources: Object.keys(resources).map(name => ({
+      resources: map(objectKeys(resources), name => ({
         name,
         url: resources[name],
       })),
@@ -207,201 +232,207 @@ function wrapGM(script, code, cache, unsafeWindow) {
       version: script.meta.version || '',
     },
   };
-  const gmFunctions = {
-    unsafeWindow: { value: unsafeWindow },
-    GM_info: { value: gmInfo },
-    GM_deleteValue: {
-      value(key) {
-        const value = loadValues();
-        delete value[key];
-        dumpValue(key);
-      },
+  const grantedProps = {
+    unsafeWindow: propertyFromValue(unsafeWindow),
+    GM_info: propertyFromValue(gmInfo),
+  };
+  let selfData;
+  if (!gmApi) gmApi = createGmApiProps();
+  forEach(grant, (name) => {
+    let prop = gmApi.boundProps[name];
+    if (prop) {
+      const gmFunction = prop.value;
+      prop = assign({}, prop);
+      prop.value = (...args) => gmFunction.apply(selfData, args);
+      selfData = true;
+    } else {
+      prop = gmApi.props[name];
+    }
+    if (prop) grantedProps[name] = prop;
+  });
+  if (selfData) {
+    selfData = {
+      cache,
+      script,
+      resources,
+      id: script.props.id,
+      pathMap: script.custom.pathMap || {},
+      urls: {},
+    };
+  }
+  return {
+    thisObj,
+    wrapper: defineProperties(gm, grantedProps),
+    keys: objectKeys(grantedProps),
+  };
+}
+
+function createGmApiProps() {
+  const dataDecoders = {
+    o: val => jsonLoad(val),
+    // deprecated
+    n: val => Number(val),
+    b: val => val === 'true',
+  };
+
+  // these are bound to script data that we pass via |this|
+
+  const boundProps = {
+    GM_deleteValue(key) {
+      const value = loadValues(this);
+      delete value[key];
+      dumpValue(this, key);
     },
-    GM_getValue: {
-      value(key, def) {
-        const value = loadValues();
-        const raw = value[key];
-        if (raw) {
-          const type = raw[0];
-          const handle = dataDecoders[type];
-          let val = raw.slice(1);
-          try {
-            if (handle) val = handle(val);
-          } catch (e) {
-            if (process.env.DEBUG) log('warn', 'GM_getValue', e);
+    GM_getValue(key, def) {
+      const value = loadValues(this);
+      const raw = value[key];
+      if (raw) {
+        const type = raw[0];
+        const handle = dataDecoders[type];
+        let val = stringSlice(raw, 1);
+        try {
+          if (handle) val = handle(val);
+        } catch (e) {
+          if (process.env.DEBUG) log('warn', 'GM_getValue', e);
+        }
+        return val;
+      }
+      return def;
+    },
+    GM_listValues() {
+      return objectKeys(loadValues(this));
+    },
+    GM_setValue(key, val) {
+      const dumped = jsonDump(val);
+      const raw = dumped ? `o${dumped}` : null;
+      const value = loadValues(this);
+      value[key] = raw;
+      dumpValue(this, key, raw);
+    },
+    GM_getResourceText(name) {
+      if (name in this.resources) {
+        const key = this.resources[name];
+        const raw = this.cache[this.pathMap[key] || key];
+        if (!raw) return;
+        const i = stringLastIndexOf(raw, ',');
+        const lastPart = i < 0 ? raw : stringSlice(raw, i + 1);
+        return utf8decode(atob(lastPart));
+      }
+    },
+    GM_getResourceURL(name) {
+      if (name in this.resources) {
+        const key = this.resources[name];
+        let blobUrl = this.urls[key];
+        if (!blobUrl) {
+          const raw = this.cache[this.pathMap[key] || key];
+          if (raw) {
+            blobUrl = cache2blobUrl(raw);
+            this.urls[key] = blobUrl;
+          } else {
+            blobUrl = key;
           }
-          return val;
         }
-        return def;
-      },
+        return blobUrl;
+      }
     },
-    GM_listValues: {
-      value() {
-        return Object.keys(loadValues());
-      },
+    GM_log(...args) {
+      log('log', [this.script.meta.name || 'No name'], ...args);
     },
-    GM_setValue: {
-      value(key, val) {
-        const dumped = jsonDump(val);
-        const raw = dumped ? `o${dumped}` : null;
-        const value = loadValues();
-        value[key] = raw;
-        dumpValue(key, raw);
-      },
+    GM_registerMenuCommand(cap, func) {
+      const { id } = this;
+      const key = `${id}:${cap}`;
+      store.commands[key] = func;
+      bridge.post({ cmd: 'RegisterMenu', data: [id, cap] });
     },
-    GM_getResourceText: {
-      value(name) {
-        if (name in resources) {
-          const key = resources[name];
-          const raw = cache[pathMap[key] || key];
-          const text = raw && utf8decode(window.atob(raw.split(',').pop()));
-          return text;
-        }
-      },
-    },
-    GM_getResourceURL: {
-      value(name) {
-        if (name in resources) {
-          const key = resources[name];
-          let blobUrl = urls[key];
-          if (!blobUrl) {
-            const raw = cache[pathMap[key] || key];
-            if (raw) {
-              blobUrl = cache2blobUrl(raw);
-              urls[key] = blobUrl;
-            } else {
-              blobUrl = key;
-            }
-          }
-          return blobUrl;
-        }
-      },
-    },
-    GM_addStyle: {
-      value(css) {
-        let el = false;
-        const callbackId = registerCallback((styleId) => {
-          el = document.getElementById(styleId);
-        });
-        bridge.post({ cmd: 'AddStyle', data: { css, callbackId } });
-        // Mock a Promise without the need for polyfill
-        // It's not actually necessary because DOM messaging is synchronous
-        // but we keep it for compatibility with VM's 2017-2019 behavior
-        // https://github.com/violentmonkey/violentmonkey/issues/217
-        el.then = callback => callback(el);
-        return el;
-      },
-    },
-    GM_log: {
-      value(...args) {
-        log('log', [script.meta.name || 'No name'], ...args);
-      },
-    },
-    GM_openInTab: {
-      value(url, options) {
-        const data = options && typeof options === 'object' ? options : {
-          active: !options,
-        };
-        data.url = url;
-        return onTabCreate(data);
-      },
-    },
-    GM_registerMenuCommand: {
-      value(cap, func) {
-        const { id } = script.props;
-        const key = `${id}:${cap}`;
-        store.commands[key] = func;
-        bridge.post({ cmd: 'RegisterMenu', data: [id, cap] });
-      },
-    },
-    GM_unregisterMenuCommand: {
-      value(cap) {
-        const { id } = script.props;
-        const key = `${id}:${cap}`;
-        delete store.commands[key];
-        bridge.post({ cmd: 'UnregisterMenu', data: [id, cap] });
-      },
-    },
-    GM_xmlhttpRequest: {
-      value: onRequestCreate,
-    },
-    GM_download: {
-      value: onDownload,
-    },
-    GM_notification: {
-      value(text, title, image, onclick) {
-        const options = typeof text === 'object' ? text : {
-          text,
-          title,
-          image,
-          onclick,
-        };
-        if (!options.text) {
-          throw new Error('GM_notification: `text` is required!');
-        }
-        onNotificationCreate(options);
-      },
-    },
-    GM_setClipboard: {
-      value(data, type) {
-        bridge.post({
-          cmd: 'SetClipboard',
-          data: { type, data },
-        });
-      },
+    GM_unregisterMenuCommand(cap) {
+      const { id } = this;
+      const key = `${id}:${cap}`;
+      delete store.commands[key];
+      bridge.post({ cmd: 'UnregisterMenu', data: [id, cap] });
     },
   };
-  const keys = [];
-  forEach(grant, (name) => {
-    const prop = gmFunctions[name];
-    if (prop) {
-      push(keys, name);
-      addProperty(name, prop, gm);
-    }
+
+  const props = {
+    GM_addStyle(css) {
+      let el = false;
+      const callbackId = registerCallback((styleId) => {
+        el = getElementById.call(document, styleId);
+      });
+      bridge.post({ cmd: 'AddStyle', data: { css, callbackId } });
+      // Mock a Promise without the need for polyfill
+      // It's not actually necessary because DOM messaging is synchronous
+      // but we keep it for compatibility with VM's 2017-2019 behavior
+      // https://github.com/violentmonkey/violentmonkey/issues/217
+      el.then = callback => callback(el);
+      return el;
+    },
+    GM_openInTab(url, options) {
+      const data = options && typeof options === 'object' ? options : {
+        active: !options,
+      };
+      data.url = url;
+      return onTabCreate(data);
+    },
+    GM_xmlhttpRequest: onRequestCreate,
+    GM_download: onDownload,
+    GM_notification(text, title, image, onclick) {
+      const options = typeof text === 'object' ? text : {
+        text,
+        title,
+        image,
+        onclick,
+      };
+      if (!options.text) {
+        throw new Error('GM_notification: `text` is required!');
+      }
+      onNotificationCreate(options);
+    },
+    GM_setClipboard(data, type) {
+      bridge.post({
+        cmd: 'SetClipboard',
+        data: { type, data },
+      });
+    },
+  };
+  // convert to object property descriptors
+  forEach([props, boundProps], target => {
+    forEach(objectKeys(target), k => {
+      target[k] = propertyFromValue(target[k]);
+    });
   });
-  return { thisObj, wrapper: gm, keys };
-  function loadValues() {
-    return store.values[script.props.id];
+  return { props, boundProps };
+
+  function loadValues({ id }) {
+    return store.values[id];
   }
-  function propertyToString() {
-    return '[Violentmonkey property]';
-  }
-  function addProperty(name, prop, obj) {
-    if ('value' in prop) prop.writable = false;
-    prop.configurable = false;
-    Object.defineProperty(obj, name, prop);
-    if (typeof obj[name] === 'function') obj[name].toString = propertyToString;
-  }
-  function dumpValue(key, value) {
+  function dumpValue({ id }, key, value) {
     bridge.post({
       cmd: 'UpdateValue',
       data: {
-        id: script.props.id,
+        id,
         update: { key, value },
       },
     });
   }
 }
 
-/**
- * @desc Wrap helpers to prevent unexpected modifications.
- */
-function getWrapper(unsafeWindow) {
-  // http://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
-  // http://developer.mozilla.org/docs/Web/API/Window
-  const wrapper = {};
-  // Block special objects
-  forEach([
-    'browser',
-  ], (name) => {
-    wrapper[name] = undefined;
-  });
-  forEach([
-    // `eval` should be called directly so that it is run in current scope
-    'eval',
-  ], (name) => {
-    wrapper[name] = unsafeWindow[name];
-  });
+function propertyFromValue(value) {
+  const prop = {
+    writable: false,
+    configurable: false,
+    value,
+  };
+  if (typeof value === 'function') value.toString = propertyToString;
+  return prop;
+}
+
+function propertyToString() {
+  return '[Violentmonkey property]';
+}
+
+function createWrapperMethods(info) {
+  const { unsafeWindow } = info;
+  const methods = {};
   forEach([
     // 'uneval',
     'isFinite',
@@ -452,13 +483,36 @@ function getWrapper(unsafeWindow) {
   ], (name) => {
     const method = unsafeWindow[name];
     if (method) {
-      wrapper[name] = (...args) => method.apply(unsafeWindow, args);
+      methods[name] = (...args) => method.apply(unsafeWindow, args);
     }
   });
+  info.methods = methods;
+}
+
+/**
+ * @desc Wrap helpers to prevent unexpected modifications.
+ */
+function getWrapper() {
+  const info = wrapperInfo[bridge.mode];
+  const { unsafeWindow } = info;
+  if (!info.methods) createWrapperMethods(info);
+  // http://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
+  // http://developer.mozilla.org/docs/Web/API/Window
+  const wrapper = {
+    // Block special objects
+    browser: undefined,
+    // `eval` should be called directly so that it is run in current scope
+    eval: wrapperInfo.eval[bridge.mode],
+    ...info.methods,
+  };
+  if (!info.propsToWrap) {
+    info.propsToWrap = filter(bridge.props, p => !(p in wrapper));
+    bridge.props = null;
+  }
   function defineProtectedProperty(name) {
     let modified = false;
     let value;
-    Object.defineProperty(wrapper, name, {
+    defineProperty(wrapper, name, {
       get() {
         if (!modified) value = unsafeWindow[name];
         return value === unsafeWindow ? wrapper : value;
@@ -470,7 +524,7 @@ function getWrapper(unsafeWindow) {
     });
   }
   function defineReactedProperty(name) {
-    Object.defineProperty(wrapper, name, {
+    defineProperty(wrapper, name, {
       get() {
         const value = unsafeWindow[name];
         return value === unsafeWindow ? wrapper : value;
@@ -481,9 +535,11 @@ function getWrapper(unsafeWindow) {
     });
   }
   // Wrap properties
-  forEach(bridge.props, (name) => {
-    if (name in wrapper) return;
-    if (name.slice(0, 2) === 'on') defineReactedProperty(name);
+  // A major GC may hit here no matter how we define props
+  // all at once, in batches of 10, 100, 500, or one by one.
+  // TODO: try Proxy API if userscripts wouldn't notice the difference
+  forEach(info.propsToWrap, (name) => {
+    if (stringStarts(name, 'on')) defineReactedProperty(name);
     else defineProtectedProperty(name);
   });
   return wrapper;
@@ -492,7 +548,7 @@ function getWrapper(unsafeWindow) {
 function log(level, tags, ...args) {
   const tagList = ['Violentmonkey'];
   if (tags) push(tagList, ...tags);
-  const prefix = tagList.map(tag => `[${tag}]`).join('');
+  const prefix = join(map(tagList, tag => `[${tag}]`), '');
   console[level](prefix, ...args);
 }
 
@@ -514,12 +570,12 @@ function exposeVM() {
       delete checking[callback];
     }
   };
-  Object.defineProperty(Violentmonkey, 'getVersion', {
+  defineProperty(Violentmonkey, 'getVersion', {
     value: () => Promise.resolve({
       version: bridge.version,
     }),
   });
-  Object.defineProperty(Violentmonkey, 'isInstalled', {
+  defineProperty(Violentmonkey, 'isInstalled', {
     value: (name, namespace) => new Promise((resolve) => {
       key += 1;
       const callback = key;
@@ -534,7 +590,7 @@ function exposeVM() {
       });
     }),
   });
-  Object.defineProperty(window.external, 'Violentmonkey', {
+  defineProperty(window.external, 'Violentmonkey', {
     value: Violentmonkey,
   });
 }

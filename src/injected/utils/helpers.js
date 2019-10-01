@@ -2,37 +2,46 @@
 // Firefox sucks: `isFinite` is not defined on `window`, see violentmonkey/violentmonkey#300
 // eslint-disable-next-line no-restricted-properties
 export const {
-  console, CustomEvent, Promise, isFinite, Uint8Array,
+  console, Promise, isFinite, Uint8Array, setTimeout, atob, Blob, Error, Boolean,
 } = global;
 
 const arrayProto = Array.prototype;
 const objectProto = Object.prototype;
+const stringProto = String.prototype;
 
+// binding takes times so we need to keep the amount of bound methods low
+// TODO: investigate Babel macros/plugins API to make using safe functions much more convenient
 const bindThis = func => (thisObj, ...args) => func.apply(thisObj, args);
 
+export const concat = bindThis(arrayProto.concat);
+export const filter = bindThis(arrayProto.filter);
 export const forEach = bindThis(arrayProto.forEach);
-
+export const join = bindThis(arrayProto.join);
 export const map = bindThis(arrayProto.map);
-
 export const indexOf = bindThis(arrayProto.indexOf);
-
 export const push = bindThis(arrayProto.push);
+export const shift = bindThis(arrayProto.shift);
 
 export const includes = arrayProto.includes
   ? bindThis(arrayProto.includes)
   : (arr, item) => indexOf(arr, item) >= 0;
 
 export const toString = bindThis(objectProto.toString);
+export const stringCharCodeAt = bindThis(stringProto.charCodeAt);
+export const stringLastIndexOf = bindThis(stringProto.lastIndexOf);
+export const stringMatch = bindThis(stringProto.match);
+export const stringSlice = bindThis(stringProto.slice);
+export const stringStarts = bindThis(stringProto.startsWith);
 const numberToString = bindThis(Number.prototype.toString);
-const stringSlice = bindThis(String.prototype.slice);
-const stringCharCodeAt = bindThis(String.prototype.charCodeAt);
+const stringReplace = bindThis(stringProto.replace);
+const stringToLower = bindThis(stringProto.toLowerCase);
 const { fromCharCode } = String;
 
-export const { keys } = Object;
+export const { keys: objectKeys, defineProperty, defineProperties } = Object;
 export const assign = Object.assign || ((obj, ...args) => {
   forEach(args, (arg) => {
     if (arg) {
-      forEach(keys(arg), (key) => {
+      forEach(objectKeys(arg), (key) => {
         obj[key] = arg[key];
       });
     }
@@ -48,6 +57,8 @@ export const isArray = obj => (
   obj && typeof obj.length === 'number' && typeof obj.splice === 'function'
 );
 
+export const { warn } = console;
+
 export function encodeBody(body) {
   const cls = getType(body);
   let result;
@@ -60,15 +71,18 @@ export function encodeBody(body) {
       const item = iterator.next();
       if (item.done) break;
       const key = item.value;
-      const promise = Promise.all(body.getAll(key).map(value => encodeBody(value)))
+      const promise = Promise.all(map(body.getAll(key), encodeBody))
       .then(values => ({ key, values }));
-      promises.push(promise);
+      push(promises, promise);
     }
     result = Promise.all(promises)
-    .then(items => items.reduce((res, item) => {
-      res[item.key] = item.values;
+    .then((items) => {
+      const res = {};
+      forEach(items, (item) => {
+        res[item.key] = item.values;
+      });
       return res;
-    }, {}))
+    })
     .then(value => ({ cls, value }));
   } else if (includes(['blob', 'file'], cls)) {
     result = new Promise((resolve) => {
@@ -103,7 +117,7 @@ function getType(obj) {
   const type = typeof obj;
   if (type !== 'object') return type;
   const typeString = toString(obj); // [object TYPENAME]
-  return typeString.slice(8, -1).toLowerCase();
+  return stringToLower(stringSlice(typeString, 8, -1));
 }
 
 export function noop() {}
@@ -151,33 +165,34 @@ const escMap = {
 const escRE = /[\\"\u0000-\u001F\u2028\u2029]/g; // eslint-disable-line no-control-regex
 const escFunc = m => escMap[m] || `\\u${stringSlice(numberToString(stringCharCodeAt(m, 0) + 0x10000, 16), 1)}`;
 export const jsonLoad = JSON.parse;
+let jsonDumpFunction = jsonDumpSafe;
+// When running in the page context we must beware of sites that override Array#toJSON
+// leading to an invalid result, which is why our jsonDumpSafe() ignores toJSON.
+// Thus, we use the native JSON.stringify() only in the content script context and only until
+// a userscript is injected into this context (due to `@inject-into` and/or a CSP problem).
+export function setJsonDump({ native }) {
+  jsonDumpFunction = native ? JSON.stringify : jsonDumpSafe;
+}
 export function jsonDump(value) {
+  return jsonDumpFunction(value);
+}
+function jsonDumpSafe(value) {
   if (value == null) return 'null';
   const type = typeof value;
-  if (type === 'number') {
-    return isFinite(value) ? `${value}` : 'null';
-  }
+  if (type === 'number') return isFinite(value) ? `${value}` : 'null';
   if (type === 'boolean') return `${value}`;
   if (type === 'object') {
     if (isArray(value)) {
-      let res = '[';
-      forEach(value, (item, i) => {
-        if (i) res += ',';
-        res += jsonDump(item);
-      });
-      res += ']';
-      return res;
+      return `[${join(map(value, jsonDumpSafe), ',')}]`;
     }
     if (toString(value) === '[object Object]') {
-      let res = '{';
-      forEach(keys(value), (key, i) => {
-        if (i) res += ',';
-        res += `${jsonDump(key)}:${jsonDump(value[key])}`;
+      const res = map(objectKeys(value), (key) => {
+        const v = value[key];
+        return v !== undefined && `${jsonDumpSafe(key)}:${jsonDumpSafe(v)}`;
       });
-      res += '}';
-      return res;
+      // JSON.stringify skips undefined in objects i.e. {foo: undefined} produces {}
+      return `{${join(filter(res, Boolean), ',')}}`;
     }
   }
-  const escaped = `${value}`.replace(escRE, escFunc);
-  return `"${escaped}"`;
+  return `"${stringReplace(value, escRE, escFunc)}"`;
 }
