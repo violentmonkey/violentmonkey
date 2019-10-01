@@ -7,6 +7,7 @@ export default function initCache({
   // so we'll schedule trim() just once per event loop cycle,
   // and then trim() will trim the cache and reschedule itself to the earliest expiry time.
   let timer;
+  let minLifetime = -1;
   return {
     get, put, del, has, hit, destroy,
   };
@@ -20,7 +21,7 @@ export default function initCache({
         value,
         expiry: lifetime + performance.now(),
       };
-      if (!timer) timer = setTimeout(trim);
+      reschedule(lifetime);
     } else {
       delete cache[key];
     }
@@ -35,7 +36,7 @@ export default function initCache({
     const entry = cache[key];
     if (entry) {
       entry.expiry = performance.now() + lifetime;
-      if (!timer) timer = setTimeout(trim);
+      reschedule(lifetime);
     }
   }
   function destroy() {
@@ -43,19 +44,32 @@ export default function initCache({
     timer = 0;
     cache = {};
   }
+  function reschedule(lifetime) {
+    if (timer) {
+      if (lifetime >= minLifetime) return;
+      clearTimeout(timer);
+    }
+    minLifetime = lifetime;
+    timer = setTimeout(trim, lifetime);
+  }
   function trim() {
-    const now = performance.now();
-    let closest = Number.MAX_SAFE_INTEGER;
+    // next timer won't be able to run earlier than 10ms
+    // so we'll sweep the upcoming expired entries in this run
+    const now = performance.now() + 10;
+    let closestExpiry = Number.MAX_SAFE_INTEGER;
     for (const key in cache) {
       if (Object.hasOwnProperty.call(cache, key)) {
         const { expiry } = cache[key];
         if (expiry < now) {
           delete cache[key];
-        } else if (expiry < closest) {
-          closest = expiry;
+        } else if (expiry < closestExpiry) {
+          closestExpiry = expiry;
         }
       }
     }
-    timer = closest === Number.MAX_SAFE_INTEGER ? 0 : setTimeout(trim, closest - now);
+    minLifetime = closestExpiry - now;
+    timer = closestExpiry < Number.MAX_SAFE_INTEGER
+      ? setTimeout(trim, minLifetime)
+      : 0;
   }
 }
