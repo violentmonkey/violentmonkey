@@ -1,4 +1,5 @@
 import tldRules from 'tldjs/rules.json';
+import { JSDOM } from 'jsdom';
 
 global.window = global;
 
@@ -17,4 +18,8 @@ global.browser = {
   },
 };
 
-global.performance = { now: () => Date.now() };
+const domProps = Object.getOwnPropertyDescriptors(new JSDOM('').window);
+for (const k of Object.keys(domProps)) {
+  if (k.endsWith('Storage') || k in global) delete domProps[k];
+}
+Object.defineProperties(global, domProps);

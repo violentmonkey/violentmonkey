@@ -29,6 +29,7 @@
     "gulp-plumber": "^1.1.0",
     "gulp-uglify": "^3.0.2",
     "husky": "^3.0.5",
+    "jsdom": "^15.1.1",
     "js-yaml": "^3.13.1",
     "plugin-error": "^1.0.0",
     "tape": "^4.11.0",
