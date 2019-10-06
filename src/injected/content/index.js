@@ -1,9 +1,11 @@
 import { isFirefox } from '#/common/ua';
 import { getUniqId } from '#/common';
 import { INJECT_PAGE, INJECT_CONTENT, INJECT_AUTO } from '#/common/consts';
+import { bindEvents, sendMessage, attachFunction } from '../utils';
 import {
-  bindEvents, sendMessage, attachFunction, setJsonDump, jsonDump,
-} from '../utils';
+  setJsonDump, jsonDump, objectKeys, filter, forEach, includes, join,
+  append, createElement, setAttribute,
+} from '../utils/helpers';
 import bridge from './bridge';
 import { tabOpen, tabClose, tabClosed } from './tabs';
 import { onNotificationCreate, onNotificationClick, onNotificationClose } from './notifications';
@@ -37,10 +39,13 @@ function setBadge() {
   }));
 }
 
+// Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
+const { split } = String.prototype;
+
 const bgHandlers = {
   Command(data) {
-    const id = +data.split(':', 1)[0];
-    const realm = invokableIds.includes(id) && INJECT_CONTENT;
+    const id = +data::split(':', 1)[0];
+    const realm = invokableIds::includes(id) && INJECT_CONTENT;
     bridge.post({ cmd: 'Command', data, realm });
   },
   GetPopup: getPopup,
@@ -51,14 +56,14 @@ const bgHandlers = {
       { data: {}, present: false },
       { data: {}, present: false, realm: INJECT_CONTENT },
     ];
-    Object.keys(data).forEach((id) => {
-      const r = realms[invokableIds.includes(id) ? 1 : 0];
+    objectKeys(data)::forEach((id) => {
+      const r = realms[invokableIds::includes(id) ? 1 : 0];
       r.data[id] = data[id];
       r.present = true;
     });
     realms
-    .filter(r => r.present)
-    .forEach(({ data: d, realm }) => {
+    ::filter(r => r.present)
+    ::forEach(({ data: d, realm }) => {
       bridge.post({ cmd: 'UpdatedValues', data: d, realm });
     });
   },
@@ -201,7 +206,7 @@ const handlers = {
   HttpRequest: httpRequest,
   AbortRequest: abortRequest,
   Inject: injectScript,
-  InjectMulti: data => data.forEach(injectScript),
+  InjectMulti: data => data::forEach(injectScript),
   TabOpen: tabOpen,
   TabClose: tabClose,
   UpdateValue(data) {
@@ -231,12 +236,12 @@ const handlers = {
   },
   AddStyle({ css, callbackId }, realm) {
     const styleId = getUniqId('VMst');
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = css;
+    const style = document::createElement('style');
+    style::setAttribute('id', styleId);
+    style::append(css);
     // DOM spec allows any elements under documentElement
     // https://dom.spec.whatwg.org/#node-trees
-    (document.head || document.documentElement).appendChild(style);
+    (document.head || document.documentElement)::append(style);
     bridge.post({ cmd: 'Callback', data: { callbackId, payload: styleId }, realm });
   },
   Notification: onNotificationCreate,
@@ -294,7 +299,7 @@ function injectScript(data) {
   if (mode === INJECT_CONTENT) {
     sendMessage({
       cmd: 'InjectScript',
-      data: injectedCode.join(''),
+      data: injectedCode::join(''),
     });
   } else {
     inject(injectedCode, browser.extension.getURL(`/options/index.html#scripts/${scriptId}`));

@@ -2,123 +2,36 @@
 // Firefox sucks: `isFinite` is not defined on `window`, see violentmonkey/violentmonkey#300
 // eslint-disable-next-line no-restricted-properties
 export const {
-  console, Promise, isFinite, Uint8Array, setTimeout, atob, Blob, Error, Boolean,
+  // types
+  Blob, Boolean, Error, Promise, Uint8Array,
+  // props and methods
+  atob, console, isFinite, setTimeout,
 } = global;
 
-const arrayProto = Array.prototype;
-const objectProto = Object.prototype;
-const stringProto = String.prototype;
-
-// binding takes times so we need to keep the amount of bound methods low
-// TODO: investigate Babel macros/plugins API to make using safe functions much more convenient
-const bindThis = func => (thisObj, ...args) => func.apply(thisObj, args);
-
-export const concat = bindThis(arrayProto.concat);
-export const filter = bindThis(arrayProto.filter);
-export const forEach = bindThis(arrayProto.forEach);
-export const join = bindThis(arrayProto.join);
-export const map = bindThis(arrayProto.map);
-export const indexOf = bindThis(arrayProto.indexOf);
-export const push = bindThis(arrayProto.push);
-export const shift = bindThis(arrayProto.shift);
-
-export const includes = arrayProto.includes
-  ? bindThis(arrayProto.includes)
-  : (arr, item) => indexOf(arr, item) >= 0;
-
-export const toString = bindThis(objectProto.toString);
-export const stringCharCodeAt = bindThis(stringProto.charCodeAt);
-export const stringLastIndexOf = bindThis(stringProto.lastIndexOf);
-export const stringMatch = bindThis(stringProto.match);
-export const stringSlice = bindThis(stringProto.slice);
-export const stringStarts = bindThis(stringProto.startsWith);
-const numberToString = bindThis(Number.prototype.toString);
-const stringReplace = bindThis(stringProto.replace);
-const stringToLower = bindThis(stringProto.toLowerCase);
-const { fromCharCode } = String;
+export const {
+  filter, forEach, indexOf, join, map, push,
+  // arraySlice, // to differentiate from String::slice which we use much more often
+  includes = function _(item) { return this::indexOf(item) >= 0; },
+} = Array.prototype;
 
 export const { keys: objectKeys, defineProperty, defineProperties } = Object;
-export const assign = Object.assign || ((obj, ...args) => {
-  forEach(args, (arg) => {
-    if (arg) {
-      forEach(objectKeys(arg), (key) => {
-        obj[key] = arg[key];
-      });
-    }
-  });
-  return obj;
-});
+export const { charCodeAt, match, slice } = String.prototype;
+export const { toString: objectToString } = Object.prototype;
+const { toString: numberToString } = Number.prototype;
+const { replace } = String.prototype;
+export const { fromCharCode } = String;
+export const { warn } = console;
+export const { addEventListener } = EventTarget.prototype;
+export const { append, setAttribute } = Element.prototype;
+export const { createElement } = Document.prototype;
 
 export const isArray = obj => (
   // ES3 way, not reliable if prototype is modified
-  // toString(obj) === '[object Array]'
+  // Object's toString(obj) === '[object Array]'
   // #565 steamcommunity.com has overridden `Array.prototype`
   // support duck typing
   obj && typeof obj.length === 'number' && typeof obj.splice === 'function'
 );
-
-export const { warn } = console;
-
-export function encodeBody(body) {
-  const cls = getType(body);
-  let result;
-  if (cls === 'formdata') {
-    // FormData#keys is supported in Chrome >= 50
-    if (!body.keys) return {};
-    const promises = [];
-    const iterator = body.keys();
-    while (1) { // eslint-disable-line no-constant-condition
-      const item = iterator.next();
-      if (item.done) break;
-      const key = item.value;
-      const promise = Promise.all(map(body.getAll(key), encodeBody))
-      .then(values => ({ key, values }));
-      push(promises, promise);
-    }
-    result = Promise.all(promises)
-    .then((items) => {
-      const res = {};
-      forEach(items, (item) => {
-        res[item.key] = item.values;
-      });
-      return res;
-    })
-    .then(value => ({ cls, value }));
-  } else if (includes(['blob', 'file'], cls)) {
-    result = new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        // In Firefox, Uint8Array cannot be sliced if its data is read by FileReader
-        const array = new Uint8Array(reader.result);
-        let value = '';
-        for (let i = 0; i < array.length; i += 1) {
-          value += fromCharCode(array[i]);
-        }
-        resolve({
-          cls,
-          value,
-          type: body.type,
-          name: body.name,
-          lastModified: body.lastModified,
-        });
-      };
-      reader.readAsArrayBuffer(body);
-    });
-  } else if (body) {
-    result = {
-      cls,
-      value: jsonDump(body),
-    };
-  }
-  return Promise.resolve(result);
-}
-
-function getType(obj) {
-  const type = typeof obj;
-  if (type !== 'object') return type;
-  const typeString = toString(obj); // [object TYPENAME]
-  return stringToLower(stringSlice(typeString, 8, -1));
-}
 
 export function noop() {}
 
@@ -133,17 +46,17 @@ export function utf8decode(utftext) {
   let c2 = 0;
   let c3 = 0;
   while (i < utftext.length) {
-    c1 = stringCharCodeAt(utftext, i);
+    c1 = utftext::charCodeAt(i);
     if (c1 < 128) {
       string += fromCharCode(c1);
       i += 1;
     } else if (c1 > 191 && c1 < 224) {
-      c2 = stringCharCodeAt(utftext, i + 1);
+      c2 = utftext::charCodeAt(i + 1);
       string += fromCharCode(((c1 & 31) << 6) | (c2 & 63));
       i += 2;
     } else {
-      c2 = stringCharCodeAt(utftext, i + 1);
-      c3 = stringCharCodeAt(utftext, i + 2);
+      c2 = utftext::charCodeAt(i + 1);
+      c3 = utftext::charCodeAt(i + 2);
       string += fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
       i += 3;
     }
@@ -163,7 +76,7 @@ const escMap = {
   '\t': '\\t',
 };
 const escRE = /[\\"\u0000-\u001F\u2028\u2029]/g; // eslint-disable-line no-control-regex
-const escFunc = m => escMap[m] || `\\u${stringSlice(numberToString(stringCharCodeAt(m, 0) + 0x10000, 16), 1)}`;
+const escFunc = m => escMap[m] || `\\u${(m::charCodeAt(0) + 0x10000)::numberToString(16)::slice(1)}`;
 export const jsonLoad = JSON.parse;
 let jsonDumpFunction = jsonDumpSafe;
 // When running in the page context we must beware of sites that override Array#toJSON
@@ -183,16 +96,16 @@ function jsonDumpSafe(value) {
   if (type === 'boolean') return `${value}`;
   if (type === 'object') {
     if (isArray(value)) {
-      return `[${join(map(value, jsonDumpSafe), ',')}]`;
+      return `[${value::map(jsonDumpSafe)::join(',')}]`;
     }
-    if (toString(value) === '[object Object]') {
-      const res = map(objectKeys(value), (key) => {
+    if (value::objectToString() === '[object Object]') {
+      const res = objectKeys(value)::map((key) => {
         const v = value[key];
         return v !== undefined && `${jsonDumpSafe(key)}:${jsonDumpSafe(v)}`;
       });
       // JSON.stringify skips undefined in objects i.e. {foo: undefined} produces {}
-      return `{${join(filter(res, Boolean), ',')}}`;
+      return `{${res::filter(Boolean)::join(',')}}`;
     }
   }
-  return `"${stringReplace(value, escRE, escFunc)}"`;
+  return `"${value::replace(escRE, escFunc)}"`;
 }

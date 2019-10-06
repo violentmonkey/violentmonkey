@@ -14,4 +14,7 @@ module.exports = {
       useBuiltIns: false,
     }],
   ],
+  plugins: [
+    'transform-function-bind',
+  ],
 };

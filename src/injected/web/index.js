@@ -3,9 +3,9 @@ import {
   getUniqId, bindEvents, attachFunction, cache2blobUrl,
 } from '../utils';
 import {
-  includes, forEach, map, push, join, concat, filter, Boolean, utf8decode, jsonDump, jsonLoad, atob,
-  Promise, console, assign, objectKeys, setTimeout, Error, defineProperty, defineProperties,
-  stringLastIndexOf, stringMatch, stringSlice, stringStarts, noop,
+  includes, forEach, map, push, join, filter, Boolean, utf8decode, jsonDump, jsonLoad, atob,
+  Promise, console, objectKeys, setTimeout, Error, defineProperty, defineProperties,
+  match, slice, noop,
 } from '../utils/helpers';
 import bridge from './bridge';
 import { onRequestCreate, onRequestStart, onRequestCallback } from './requests';
@@ -19,10 +19,12 @@ import { onDownload } from './download';
 
 let state = 0;
 
-// rarely used so we'll do an explicit .call() later to reduce init time now
-const { addEventListener } = EventTarget.prototype;
+// Make sure to call safe::methods() in code that may run after userscripts
+
 const { getElementById } = Document.prototype;
-const readyStateGet = Object.getOwnPropertyDescriptor(Document.prototype, 'readyState').get;
+const { lastIndexOf, startsWith } = String.prototype;
+const { concat } = Array.prototype;
+const { Number } = global;
 
 export default function initialize(
   webId,
@@ -42,7 +44,7 @@ export default function initialize(
     bridge.post = bindEvents(webId, contentId, onHandle);
     bridge.post.asString = isFirefox;
   }
-  addEventListener.call(document, 'DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     state = 1;
     // Load scripts after being handled by listeners in web page
     Promise.resolve().then(bridge.load);
@@ -82,7 +84,7 @@ const handlers = {
   HttpRequested: onRequestCallback,
   TabClosed: onTabClosed,
   UpdatedValues(updates) {
-    forEach(objectKeys(updates), (id) => {
+    objectKeys(updates)::forEach((id) => {
       if (store.values[id]) store.values[id] = updates[id];
     });
   },
@@ -113,9 +115,9 @@ function onLoadScripts(data) {
   const idle = [];
   const end = [];
   bridge.version = data.version;
-  if (includes([
+  if ([
     'greasyfork.org',
-  ], window.location.host)) {
+  ].includes(window.location.host)) {
     exposeVM();
   }
   // reset load and checkLoad
@@ -130,15 +132,15 @@ function onLoadScripts(data) {
     'document-end': end,
   };
   if (data.scripts) {
-    forEach(data.scripts, (script) => {
+    data.scripts.forEach((script) => {
       const runAt = script.custom.runAt || script.meta.runAt;
       const list = listMap[runAt] || end;
-      push(list, script);
+      list.push(script);
       store.values[script.props.id] = data.values[script.props.id];
     });
     run(start);
   }
-  if (!state && includes(['interactive', 'complete'], readyStateGet.call(document))) {
+  if (!state && ['interactive', 'complete'].includes(document.readyState)) {
     state = 1;
   }
   if (state) bridge.load();
@@ -146,27 +148,27 @@ function onLoadScripts(data) {
   function buildCode(script) {
     const pathMap = script.custom.pathMap || {};
     const requireKeys = script.meta.require || [];
-    const requires = filter(map(requireKeys, key => data.require[pathMap[key] || key]), Boolean);
+    const requires = requireKeys::map(key => data.require[pathMap[key] || key])::filter(Boolean);
     const code = data.code[script.props.id] || '';
     const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache);
     const id = getUniqId('VMin');
     const fnId = getUniqId('VMfn');
     const codeSlices = [
       `function(${
-        join(keys, ',')
+        keys::join(',')
       }){${
-        join(map(keys, name => `this["${name}"]=${name};`), '')
+        keys::map(name => `this["${name}"]=${name};`)::join('')
       }with(this)((define,module,exports)=>{`,
       // 1. trying to avoid string concatenation of potentially huge code slices
       // 2. adding `;` on a new line in case some required script ends with a line comment
-      ...concat([], ...map(requires, req => [req, '\n;'])),
+      ...[]::concat(...requires::map(req => [req, '\n;'])),
       '(()=>{',
       code,
       // adding a new line in case the code ends with a line comment
       '\n})()})()}',
     ];
     const name = script.custom.name || script.meta.name || script.props.id;
-    const args = map(keys, key => wrapper[key]);
+    const args = keys::map(key => wrapper[key]);
     attachFunction(fnId, () => {
       const func = window[id];
       if (func) runCode(name, func, args, thisObj);
@@ -174,7 +176,7 @@ function onLoadScripts(data) {
     return [id, codeSlices, fnId, bridge.mode, script.props.id];
   }
   function run(list) {
-    bridge.post({ cmd: 'InjectMulti', data: map(list, buildCode) });
+    bridge.post({ cmd: 'InjectMulti', data: list::map(buildCode) });
     list.length = 0;
   }
   async function runIdle() {
@@ -197,13 +199,13 @@ function wrapGM(script, code, cache) {
   let thisObj = gm;
   if (!grant.length || (grant.length === 1 && grant[0] === 'none')) {
     // @grant none
-    grant.pop();
+    grant.length = 0;
     gm.window = unsafeWindow;
   } else {
     thisObj = getWrapper();
     gm.window = thisObj;
   }
-  if (includes(grant, 'window.close')) {
+  if (grant::includes('window.close')) {
     gm.window.close = () => {
       bridge.post({ cmd: 'TabClose' });
     };
@@ -211,7 +213,7 @@ function wrapGM(script, code, cache) {
   const resources = script.meta.resources || {};
   const gmInfo = {
     uuid: script.props.uuid,
-    scriptMetaStr: stringMatch(code, METABLOCK_RE)[1] || '',
+    scriptMetaStr: code::match(METABLOCK_RE)[1] || '',
     scriptWillUpdate: !!script.config.shouldUpdate,
     scriptHandler: 'Violentmonkey',
     version: bridge.version,
@@ -223,7 +225,7 @@ function wrapGM(script, code, cache) {
       matches: [...script.meta.match],
       name: script.meta.name || '',
       namespace: script.meta.namespace || '',
-      resources: map(objectKeys(resources), name => ({
+      resources: objectKeys(resources)::map(name => ({
         name,
         url: resources[name],
       })),
@@ -238,11 +240,11 @@ function wrapGM(script, code, cache) {
   };
   let selfData;
   if (!gmApi) gmApi = createGmApiProps();
-  forEach(grant, (name) => {
+  grant::forEach((name) => {
     let prop = gmApi.boundProps[name];
     if (prop) {
       const gmFunction = prop.value;
-      prop = assign({}, prop);
+      prop = { ...prop };
       prop.value = (...args) => gmFunction.apply(selfData, args);
       selfData = true;
     } else {
@@ -289,7 +291,7 @@ function createGmApiProps() {
       if (raw) {
         const type = raw[0];
         const handle = dataDecoders[type];
-        let val = stringSlice(raw, 1);
+        let val = raw::slice(1);
         try {
           if (handle) val = handle(val);
         } catch (e) {
@@ -314,8 +316,8 @@ function createGmApiProps() {
         const key = this.resources[name];
         const raw = this.cache[this.pathMap[key] || key];
         if (!raw) return;
-        const i = stringLastIndexOf(raw, ',');
-        const lastPart = i < 0 ? raw : stringSlice(raw, i + 1);
+        const i = raw::lastIndexOf(',');
+        const lastPart = i < 0 ? raw : raw::slice(i + 1);
         return utf8decode(atob(lastPart));
       }
     },
@@ -356,7 +358,7 @@ function createGmApiProps() {
     GM_addStyle(css) {
       let el = false;
       const callbackId = registerCallback((styleId) => {
-        el = getElementById.call(document, styleId);
+        el = document::getElementById(styleId);
       });
       bridge.post({ cmd: 'AddStyle', data: { css, callbackId } });
       // Mock a Promise without the need for polyfill
@@ -395,8 +397,8 @@ function createGmApiProps() {
     },
   };
   // convert to object property descriptors
-  forEach([props, boundProps], target => {
-    forEach(objectKeys(target), k => {
+  [props, boundProps].forEach(target => {
+    objectKeys(target).forEach(k => {
       target[k] = propertyFromValue(target[k]);
     });
   });
@@ -433,7 +435,7 @@ function propertyToString() {
 function createWrapperMethods(info) {
   const { unsafeWindow } = info;
   const methods = {};
-  forEach([
+  [
     // 'uneval',
     'isFinite',
     'isNaN',
@@ -480,7 +482,7 @@ function createWrapperMethods(info) {
     'setInterval',
     'setTimeout',
     'stop',
-  ], (name) => {
+  ]::forEach((name) => {
     const method = unsafeWindow[name];
     if (method) {
       methods[name] = (...args) => method.apply(unsafeWindow, args);
@@ -506,7 +508,7 @@ function getWrapper() {
     ...info.methods,
   };
   if (!info.propsToWrap) {
-    info.propsToWrap = filter(bridge.props, p => !(p in wrapper));
+    info.propsToWrap = bridge.props::filter(p => !(p in wrapper));
     bridge.props = null;
   }
   function defineProtectedProperty(name) {
@@ -538,8 +540,8 @@ function getWrapper() {
   // A major GC may hit here no matter how we define props
   // all at once, in batches of 10, 100, 500, or one by one.
   // TODO: try Proxy API if userscripts wouldn't notice the difference
-  forEach(info.propsToWrap, (name) => {
-    if (stringStarts(name, 'on')) defineReactedProperty(name);
+  info.propsToWrap::forEach((name) => {
+    if (name::startsWith('on')) defineReactedProperty(name);
     else defineProtectedProperty(name);
   });
   return wrapper;
@@ -547,8 +549,8 @@ function getWrapper() {
 
 function log(level, tags, ...args) {
   const tagList = ['Violentmonkey'];
-  if (tags) push(tagList, ...tags);
-  const prefix = join(map(tagList, tag => `[${tag}]`), '');
+  if (tags) tagList::push(...tags);
+  const prefix = tagList::map(tag => `[${tag}]`)::join('');
   console[level](prefix, ...args);
 }
 

@@ -1,4 +1,5 @@
 import { getUniqId, sendMessage } from './utils';
+import { addEventListener, match } from './utils/helpers';
 import initialize from './content';
 
 (function main() {
@@ -16,10 +17,13 @@ import initialize from './content';
 
   initBridge();
 
+  const { go } = History.prototype;
+  const { querySelector } = Document.prototype;
+  const { get: readyState } = Object.getOwnPropertyDescriptor(Document.prototype, 'readyState');
   // For installation
   // Firefox does not support `onBeforeRequest` for `file:`
   function checkJS() {
-    if (!document.querySelector('title')) {
+    if (!document::querySelector('title')) {
       // plain text
       sendMessage({
         cmd: 'ConfirmInstall',
@@ -30,13 +34,13 @@ import initialize from './content';
         },
       })
       .then(() => {
-        if (window.history.length > 1) window.history.go(-1);
+        if (window.history.length > 1) window.history::go(-1);
         else sendMessage({ cmd: 'TabClose' });
       });
     }
   }
-  if (/\.user\.js$/.test(window.location.pathname)) {
-    if (document.readyState === 'complete') checkJS();
-    else window.addEventListener('load', checkJS, false);
+  if (window.location.pathname::match(/\.user\.js$/)) {
+    if (document::readyState() === 'complete') checkJS();
+    else window::addEventListener('load', checkJS, { once: true });
   }
 }());

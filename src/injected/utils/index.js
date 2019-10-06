@@ -1,25 +1,24 @@
 import { getUniqId } from '#/common';
-import { jsonDump, jsonLoad } from './helpers';
+import { jsonDump, jsonLoad, addEventListener } from './helpers';
 
 export { getUniqId, jsonDump };
 export {
   sendMessage, request, throttle, cache2blobUrl,
 } from '#/common';
-export { setJsonDump } from './helpers';
 
 const { CustomEvent } = global;
-const { dispatchEvent, addEventListener } = EventTarget.prototype;
+const { dispatchEvent } = EventTarget.prototype;
 
 export function postData(destId, data, asString) {
   // Firefox issue: data must be stringified to avoid cross-origin problem
   const detail = asString ? jsonDump(data) : data;
   const e = new CustomEvent(destId, { detail });
-  dispatchEvent.call(document, e);
+  document::dispatchEvent(e);
 }
 
 /** @returns {PostDataFunction} */
 export function bindEvents(srcId, destId, handle) {
-  addEventListener.call(document, srcId, ({ detail }) => {
+  document::addEventListener(srcId, ({ detail }) => {
     // we use bridge.post() to send an object with cmd and data, never a literal string,
     // so |detail| being a string means it was sent from another context/realm (Firefox only)
     const data = typeof detail === 'string' ? jsonLoad(detail) : detail;
