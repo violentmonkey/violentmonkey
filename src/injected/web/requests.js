@@ -1,6 +1,6 @@
 import {
-  atob, forEach, includes, push, jsonDump, jsonLoad, objectToString, Blob, Uint8Array, warn,
-  charCodeAt, fromCharCode, match, slice, setAttribute,
+  atob, includes, join, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
+  setAttribute, warn, charCodeAt, fromCharCode, match, slice,
 } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -124,58 +124,49 @@ function getFullUrl(url) {
   return a::hrefGet();
 }
 
-function encodeBody(body) {
+const { keys, getAll } = FormData.prototype;
+const { FileReader } = global;
+const { readAsArrayBuffer } = FileReader.prototype;
+
+async function encodeBody(body) {
   const cls = getType(body);
-  let result;
-  if (cls === 'formdata') {
-    // FormData#keys is supported in Chrome >= 50
-    if (!body.keys) return {};
-    const promises = [];
-    const iterator = body.keys();
-    while (1) { // eslint-disable-line no-constant-condition
-      const item = iterator.next();
-      if (item.done) break;
-      const key = item.value;
-      const promise = Promise.all(body.getAll(key)::map(encodeBody))
-      .then(values => ({ key, values }));
-      promises::push(promise);
-    }
-    result = Promise.all(promises)
-    .then((items) => {
-      const res = {};
-      items::forEach((item) => {
-        res[item.key] = item.values;
-      });
-      return res;
-    })
-    .then(value => ({ cls, value }));
-  } else if (['blob', 'file']::includes(cls)) {
-    result = new Promise((resolve) => {
+  switch (cls) {
+  case 'formdata': {
+    const data = {};
+    const resolveKeyValues = async (key) => {
+      const values = body::getAll(key)::map(encodeBody);
+      data[key] = await Promise.all(values);
+    };
+    await Promise.all([...body::keys()]::map(resolveKeyValues));
+    return { cls, value: data };
+  }
+  case 'blob':
+  case 'file':
+    return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = () => {
-        // In Firefox, Uint8Array cannot be sliced if its data is read by FileReader
-        const array = new Uint8Array(reader.result);
-        let value = '';
-        for (let i = 0; i < array.length; i += 1) {
-          value += fromCharCode(array[i]);
+        const buf = reader.result;
+        const size = buf.byteLength;
+        // The max number of arguments varies between JS engines but it's >32k so 10k is safe
+        const stepSize = 10e3;
+        const stringChunks = [];
+        for (let from = 0; from < size; from += stepSize) {
+          const sourceChunk = new Uint8Array(buf, from, Math.min(stepSize, size - from));
+          stringChunks::push(fromCharCode(...sourceChunk));
         }
         resolve({
           cls,
-          value,
+          value: stringChunks::join(''),
           type: body.type,
           name: body.name,
           lastModified: body.lastModified,
         });
       };
-      reader.readAsArrayBuffer(body);
+      reader::readAsArrayBuffer(body);
     });
-  } else if (body) {
-    result = {
-      cls,
-      value: jsonDump(body),
-    };
+  default:
+    if (body) return { cls, value: jsonDump(body) };
   }
-  return Promise.resolve(result);
 }
 
 function getType(obj) {
