@@ -140,9 +140,14 @@ function checkInjectable() {
 }
 
 function injectScripts(contentId, webId, data, scriptLists) {
-  const props = Object.getOwnPropertyNames(window);
-  // combining directly to avoid GC due to a big intermediate object as there are thousands of props
-  Object.getOwnPropertyNames(global).forEach(key => !props.includes(key) && props.push(key));
+  let props = [];
+  // combining directly to avoid GC due to a big intermediate object
+  const addUniqProp = key => !props.includes(key) && props.push(key);
+  const windowProps = Object.getOwnPropertyNames(window);
+  // buggy Firefox may list duplicate props
+  if (isFirefox) windowProps.forEach(addUniqProp);
+  else props = windowProps;
+  Object.getOwnPropertyNames(global).forEach(addUniqProp);
   const args = [
     webId,
     contentId,
