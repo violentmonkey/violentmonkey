@@ -50,7 +50,11 @@
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/eclipse.css';
 import 'codemirror/mode/javascript/javascript';
-import 'codemirror/addon/comment/continuecomment';
+// Fixing a bug in CodeMirror's continuecomment-fix.js
+// https://github.com/codemirror/CodeMirror/pull/6022
+// TODO: remove when the fixed CM is shipped
+import '#/public/continuecomment-fix';
+// import 'codemirror/addon/comment/continuecomment';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/fold/foldcode';
