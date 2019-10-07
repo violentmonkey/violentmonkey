@@ -38,7 +38,7 @@
       </tooltip>
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
-      <div class="menu-item menu-area" @click="onFindSameDomainScripts">
+      <div class="menu-item menu-area menu-find" @click="onFindSameDomainScripts">
         <icon name="search"></icon>
         <div class="flex-1" v-text="i18n('menuFindScripts')"></div>
       </div>
@@ -52,7 +52,7 @@
       v-show="scripts.length"
       class="menu menu-scripts"
       :class="{expand: activeMenu === 'scripts'}">
-      <div class="menu-item menu-area" @click="toggleMenu('scripts')">
+      <div class="menu-item menu-area menu-group" @click="toggleMenu('scripts')">
         <div class="flex-auto" v-text="i18n('menuMatchedScripts')"></div>
         <icon name="arrow" class="icon-collapse"></icon>
       </div>
@@ -66,6 +66,7 @@
           <div
             class="menu-item menu-area"
             @click="onToggleScript(item)">
+            <img class="script-icon" :src="scriptIconUrl(item)" @error="scriptIconError">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
             <div class="flex-auto ellipsis" v-text="item.name" />
           </div>
@@ -157,6 +158,13 @@ export default {
     },
     getSymbolCheck(bool) {
       return `toggle-${bool ? 'on' : 'off'}`;
+    },
+    scriptIconUrl(item) {
+      const { icon } = item.data.meta;
+      return (item.data.custom.pathMap || {})[icon] || icon || '';
+    },
+    scriptIconError(event) {
+      event.target.src = '';
     },
     onToggle() {
       options.set('isApplied', !this.options.isApplied);

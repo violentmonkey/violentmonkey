@@ -55,6 +55,20 @@ footer {
   }
 }
 
+.script-icon {
+  &[src=""] {
+    display: none;
+  }
+  max-width: 1.25rem;
+  max-height: 1.25rem;
+  margin-left: .125rem;
+  position: absolute;
+  & + .icon {
+    margin-right: .75rem;
+    margin-left: 1.5rem;
+  }
+}
+
 .menu-buttons {
   align-items: center;
   padding: 8px;
@@ -99,6 +113,12 @@ footer {
       padding-right: 2rem;
     }
   }
+  &-find {
+    padding-left: 1.25rem;
+  }
+  &-group {
+    padding-left: 3.25rem;
+  }
   &.expand {
     background: #fbfbfb;
     > .submenu {
@@ -114,7 +134,6 @@ footer {
   display: none;
   min-height: 4rem;
   max-height: 30rem;
-  margin-left: 1rem;
   overflow-y: auto;
   background: white;
   border-top: 1px dashed #ddd;
@@ -149,7 +168,7 @@ footer {
     font-size: .8rem;
     color: #333;
     > .menu-item {
-      padding-left: 2rem;
+      padding-left: 3.25rem;
       > .icon {
         margin-right: .5rem;
       }
