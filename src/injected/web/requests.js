@@ -1,10 +1,10 @@
 import {
-  atob, includes, join, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
+  atob, includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
   setAttribute, warn, charCodeAt, fromCharCode, match, slice,
 } from '../utils/helpers';
 import bridge from './bridge';
 
-const map = {};
+const idMap = {};
 const queue = [];
 
 const NS_HTML = 'http://www.w3.org/1999/xhtml';
@@ -33,7 +33,7 @@ export function onRequestStart(id) {
 }
 
 export function onRequestCallback(res) {
-  const req = map[res.id];
+  const req = idMap[res.id];
   if (req) callback(req, res);
 }
 
@@ -82,7 +82,7 @@ function callback(req, res) {
     res.data.context = req.details.context;
     cb(res.data);
   }
-  if (res.type === 'loadend') delete map[req.id];
+  if (res.type === 'loadend') delete idMap[req.id];
 }
 
 function start(req, id) {
@@ -99,7 +99,7 @@ function start(req, id) {
     overrideMimeType: details.overrideMimeType,
   };
   req.id = id;
-  map[id] = req;
+  idMap[id] = req;
   const { responseType } = details;
   if (responseType) {
     if (['arraybuffer', 'blob']::includes(responseType)) {
