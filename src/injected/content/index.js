@@ -151,6 +151,7 @@ function injectScripts(contentId, webId, data, scriptLists) {
     props,
     isFirefox,
   ];
+  bridge.post.asString = isFirefox;
 
   const injectPage = scriptLists[INJECT_PAGE];
   const injectContent = scriptLists[INJECT_CONTENT];
@@ -176,7 +177,6 @@ function injectScripts(contentId, webId, data, scriptLists) {
   if (injectPage.length) {
     // Avoid using Function::apply in case it is shimmed
     inject(`(${VMInitInjection}())(${jsonDump(args).slice(1, -1)})`);
-    bridge.post.asString = isFirefox;
     bridge.post({
       cmd: 'LoadScripts',
       data: {
