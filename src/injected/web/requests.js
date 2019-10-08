@@ -12,7 +12,7 @@ const NS_HTML = 'http://www.w3.org/1999/xhtml';
 const { shift } = Array.prototype;
 const { toLowerCase } = String.prototype;
 const { createElementNS } = Document.prototype;
-const hrefGet = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
+const getHref = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
 
 export function onRequestCreate(details) {
   const req = {
@@ -121,7 +121,7 @@ function start(req, id) {
 function getFullUrl(url) {
   const a = document::createElementNS(NS_HTML, 'a');
   a::setAttribute('href', url);
-  return a::hrefGet();
+  return a::getHref();
 }
 
 const { keys, getAll } = FormData.prototype;
