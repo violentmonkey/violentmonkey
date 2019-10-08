@@ -4,13 +4,15 @@ import bridge from './bridge';
 
 const tabIds = {};
 const tabKeys = {};
+const realms = {};
 
-export function tabOpen({ key, data }) {
+export function tabOpen({ key, data }, realm) {
   data.url = getFullUrl(data.url, window.location.href);
   sendMessage({ cmd: 'TabOpen', data })
   .then(({ id }) => {
     tabIds[key] = id;
     tabKeys[id] = key;
+    realms[id] = realm;
   });
 }
 
@@ -23,9 +25,11 @@ export function tabClose(key) {
 
 export function tabClosed(id) {
   const key = tabKeys[id];
+  const realm = realms[id];
+  delete realms[id];
   delete tabKeys[id];
   delete tabIds[key];
   if (key) {
-    bridge.post({ cmd: 'TabClosed', data: key });
+    bridge.post({ cmd: 'TabClosed', data: key, realm });
   }
 }

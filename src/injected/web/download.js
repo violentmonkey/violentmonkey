@@ -1,5 +1,6 @@
 import { downloadBlob } from '#/common/download';
 import { onRequestCreate } from './requests';
+import { Blob, Error } from '../utils/helpers';
 
 export function onDownload(arg1, arg2) {
   let options;

@@ -8,8 +8,13 @@ module.exports = {
       exclude: [
         // for Firefox 52, see babel/babel#8204
         'transform-regenerator',
+        // all features of this transform are natively supported since Chrome 49, Firefox 52
+        'transform-parameters',
       ],
       useBuiltIns: false,
     }],
+  ],
+  plugins: [
+    'transform-function-bind',
   ],
 };
