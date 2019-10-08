@@ -12,7 +12,7 @@
     mod(CodeMirror);
 })(function(CodeMirror) {
   var nonspace = /\S/g;
-  var repeat = String.prototype.repeat || function (n) { return Array(n).join(this); };
+  var repeat = String.prototype.repeat || function (n) { return Array(n + 1).join(this); };
   function continueComment(cm) {
     if (cm.getOption("disableInput")) return CodeMirror.Pass;
     var ranges = cm.listSelections(), mode, inserts = [];
