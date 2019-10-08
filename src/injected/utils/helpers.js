@@ -9,9 +9,8 @@ export const {
 } = global;
 
 export const {
-  filter, forEach, indexOf, join, map, push,
+  filter, forEach, includes, indexOf, join, map, push,
   // arraySlice, // to differentiate from String::slice which we use much more often
-  includes = function _(item) { return this::indexOf(item) >= 0; },
 } = Array.prototype;
 
 export const { keys: objectKeys, defineProperty, defineProperties } = Object;
@@ -27,7 +26,7 @@ export const { createElement } = Document.prototype;
 
 export const isArray = obj => (
   // ES3 way, not reliable if prototype is modified
-  // Object's toString(obj) === '[object Array]'
+  // Object.prototype.toString.call(obj) === '[object Array]'
   // #565 steamcommunity.com has overridden `Array.prototype`
   // support duck typing
   obj && typeof obj.length === 'number' && typeof obj.splice === 'function'

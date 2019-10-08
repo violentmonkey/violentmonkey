@@ -19,7 +19,7 @@ import initialize from './content';
 
   const { go } = History.prototype;
   const { querySelector } = Document.prototype;
-  const { get: readyState } = Object.getOwnPropertyDescriptor(Document.prototype, 'readyState');
+  const { get: getReadyState } = Object.getOwnPropertyDescriptor(Document.prototype, 'readyState');
   // For installation
   // Firefox does not support `onBeforeRequest` for `file:`
   function checkJS() {
@@ -40,7 +40,7 @@ import initialize from './content';
     }
   }
   if (window.location.pathname::match(/\.user\.js$/)) {
-    if (document::readyState() === 'complete') checkJS();
+    if (document::getReadyState() === 'complete') checkJS();
     else window::addEventListener('load', checkJS, { once: true });
   }
 }());
