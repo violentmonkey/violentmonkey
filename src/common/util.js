@@ -20,28 +20,42 @@ export function memoize(func, resolver = toString) {
 }
 
 export function debounce(func, time) {
+  let startTime;
   let timer;
-  function run(thisObj, args) {
+  let callback;
+  function checkTime() {
     timer = null;
-    func.apply(thisObj, args);
+    if (performance.now() >= startTime) callback();
+    else checkTimer();
   }
-  return function debouncedFunction(...args) {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(run, time, this, args);
-  };
+  function checkTimer() {
+    if (!timer) {
+      const delta = startTime - performance.now();
+      timer = setTimeout(checkTime, delta);
+    }
+  }
+  function debouncedFunction(...args) {
+    startTime = performance.now() + time;
+    callback = () => {
+      callback = null;
+      func.apply(this, args);
+    };
+    checkTimer();
+  }
+  return debouncedFunction;
 }
 
 export function throttle(func, time) {
   let timer;
-  function run(thisObj, args) {
-    timer = null;
-    func.apply(thisObj, args);
-  }
-  return function throttledFunction(...args) {
+  function throttledFunction(...args) {
     if (!timer) {
-      timer = setTimeout(run, time, this, args);
+      func.apply(this, args);
+      timer = setTimeout(() => {
+        timer = null;
+      }, time);
     }
-  };
+  }
+  return throttledFunction;
 }
 
 export function noop() {}
