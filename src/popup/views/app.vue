@@ -222,6 +222,7 @@ export default {
           cmd: 'CacheNewScript',
           data: {
             url: currentTab.url.split('#')[0].split('?')[0],
+            name: `- ${domain}`,
           },
         })
       ) : Promise.resolve())

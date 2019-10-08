@@ -75,6 +75,8 @@ export function getDefaultCustom() {
 export function newScript(data) {
   const state = {
     url: '*://*/*',
+    name: '',
+    date: new Date().toLocaleString(),
     ...data,
   };
   const code = getOption('scriptTemplate')

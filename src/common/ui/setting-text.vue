@@ -1,5 +1,5 @@
 <template>
-  <textarea v-model="value" @change="onChange" :disabled="disabled" />
+  <textarea class="monospace-font" v-model="value" @change="onChange" :disabled="disabled" />
 </template>
 
 <script>

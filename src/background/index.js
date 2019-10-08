@@ -6,7 +6,7 @@ import {
   getRequestId, httpRequest, abortRequest, confirmInstall,
   newScript, parseMeta,
   setClipboard, checkUpdate,
-  getOption, getDefaultOption, setOption, hookOptions, getAllOptions,
+  getOption, setOption, hookOptions, getAllOptions,
   initialize, sendMessageOrIgnore,
 } from './utils';
 import { tabOpen, tabClose } from './utils/tabs';
@@ -22,15 +22,13 @@ import {
   setValueStore, updateValueStore, resetValueOpener, addValueOpener,
 } from './utils/values';
 import { setBadge } from './utils/icon';
+import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
 
 const VM_VER = browser.runtime.getManifest().version;
 
 hookOptions((changes) => {
   if ('autoUpdate' in changes) autoUpdate();
-  const SCRIPT_TEMPLATE = 'scriptTemplate';
-  if (SCRIPT_TEMPLATE in changes && !changes[SCRIPT_TEMPLATE]) {
-    setOption(SCRIPT_TEMPLATE, getDefaultOption(SCRIPT_TEMPLATE));
-  }
+  if (SCRIPT_TEMPLATE in changes) resetScriptTemplate(changes);
   sendMessageOrIgnore({
     cmd: 'UpdateOptions',
     data: changes,
