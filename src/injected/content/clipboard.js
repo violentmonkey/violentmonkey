@@ -1,4 +1,7 @@
+import { isFirefox } from '#/common/ua';
+import { sendMessage } from '../utils';
 import { addEventListener, warn } from '../utils/helpers';
+import bridge from './bridge';
 
 const { execCommand } = Document.prototype;
 const { setData } = DataTransfer.prototype;
@@ -7,6 +10,19 @@ const { preventDefault, removeEventListener, stopImmediatePropagation } = EventT
 
 let clipboardData;
 
+bridge.addHandlers({
+  SetClipboard(data) {
+    if (isFirefox) {
+      // Firefox does not support copy from background page.
+      // ref: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Interact_with_the_clipboard
+      // The dirty way will create a <textarea> element in web page and change the selection.
+      setClipboard(data);
+    } else {
+      sendMessage({ cmd: 'SetClipboard', data });
+    }
+  },
+});
+
 function onCopy(e) {
   e::stopImmediatePropagation();
   e::preventDefault();
@@ -14,7 +30,7 @@ function onCopy(e) {
   e::getClipboardData::setData(type || 'text/plain', data);
 }
 
-export default function setClipboard({ type, data }) {
+function setClipboard({ type, data }) {
   clipboardData = { type, data };
   document::addEventListener('copy', onCopy, false);
   const ret = document::execCommand('copy', false, null);

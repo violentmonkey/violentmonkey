@@ -9,11 +9,14 @@ export const {
 } = global;
 
 export const {
-  filter, forEach, includes, indexOf, join, map, push,
+  filter, findIndex, forEach, includes, indexOf, join, map, push, shift,
   // arraySlice, // to differentiate from String::slice which we use much more often
 } = Array.prototype;
 
-export const { keys: objectKeys, defineProperty, defineProperties } = Object;
+export const {
+  keys: objectKeys, values: objectValues, entries: objectEntries,
+  assign, defineProperty, defineProperties,
+} = Object;
 export const { charCodeAt, match, slice } = String.prototype;
 export const { toString: objectToString } = Object.prototype;
 const { toString: numberToString } = Number.prototype;
@@ -107,4 +110,11 @@ function jsonDumpSafe(value) {
     }
   }
   return `"${value::replace(escRE, escFunc)}"`;
+}
+
+export function log(level, tags, ...args) {
+  const tagList = ['Violentmonkey'];
+  if (tags) tagList::push(...tags);
+  const prefix = tagList::map(tag => `[${tag}]`)::join('');
+  console[level](prefix, ...args);
 }

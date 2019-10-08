@@ -1,6 +1,6 @@
 import {
   atob, includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
-  setAttribute, warn, charCodeAt, fromCharCode, match, slice,
+  setAttribute, warn, charCodeAt, fromCharCode, match, shift, slice,
 } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -9,10 +9,20 @@ const queue = [];
 
 const NS_HTML = 'http://www.w3.org/1999/xhtml';
 
-const { shift } = Array.prototype;
 const { toLowerCase } = String.prototype;
 const { createElementNS } = Document.prototype;
 const getHref = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
+
+bridge.addHandlers({
+  GotRequestId(id) {
+    const req = queue::shift();
+    if (req) start(req, id);
+  },
+  HttpRequested(res) {
+    const req = idMap[res.id];
+    if (req) callback(req, res);
+  },
+});
 
 export function onRequestCreate(details) {
   const req = {
@@ -25,16 +35,6 @@ export function onRequestCreate(details) {
   queue::push(req);
   bridge.post({ cmd: 'GetRequestId' });
   return req.req;
-}
-
-export function onRequestStart(id) {
-  const req = queue::shift();
-  if (req) start(req, id);
-}
-
-export function onRequestCallback(res) {
-  const req = idMap[res.id];
-  if (req) callback(req, res);
 }
 
 function reqAbort() {
