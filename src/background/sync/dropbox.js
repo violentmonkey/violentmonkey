@@ -8,6 +8,14 @@ const config = {
   redirect_uri: 'https://violentmonkey.github.io/auth_dropbox.html',
 };
 
+const escRE = /[\u007f-\uffff]/g; // eslint-disable-line no-control-regex
+const escFunc = m => `\\u${(m.charCodeAt(0) + 0x10000).toString(16).slice(1)}`;
+
+function jsonStringifySafe(obj) {
+  const string = JSON.stringify(obj);
+  return string.replace(escRE, escFunc);
+}
+
 const Dropbox = BaseService.extend({
   name: 'dropbox',
   displayName: 'Dropbox',
@@ -50,7 +58,7 @@ const Dropbox = BaseService.extend({
       method: 'POST',
       url: 'https://content.dropboxapi.com/2/files/download',
       headers: {
-        'Dropbox-API-Arg': JSON.stringify({
+        'Dropbox-API-Arg': jsonStringifySafe({
           path: `/${name}`,
         }),
       },
@@ -62,7 +70,7 @@ const Dropbox = BaseService.extend({
       method: 'POST',
       url: 'https://content.dropboxapi.com/2/files/upload',
       headers: {
-        'Dropbox-API-Arg': JSON.stringify({
+        'Dropbox-API-Arg': jsonStringifySafe({
           path: `/${name}`,
           mode: 'overwrite',
         }),
