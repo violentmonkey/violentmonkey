@@ -5,13 +5,17 @@ import { onTabCreate } from './tabs';
 import { onRequestCreate } from './requests';
 import { onDownload } from './download';
 import { onNotificationCreate } from './notifications';
-import { decodeValue, dumpValue, loadValues } from './gm-values';
 import {
-  slice, objectKeys, atob, Error, jsonDump, log, utf8decode,
+  decodeValue, dumpValue, loadValues, changeHooks,
+} from './gm-values';
+import {
+  findIndex, indexOf, slice, objectKeys, objectValues, objectEntries,
+  atob, Error, jsonDump, log, utf8decode,
 } from '../utils/helpers';
 
 const { getElementById } = Document.prototype;
 const { lastIndexOf } = String.prototype;
+const { hasOwnProperty } = Object.prototype;
 
 export function createGmApiProps() {
   // these are bound to script data that we pass via |this|
@@ -40,6 +44,54 @@ export function createGmApiProps() {
         id, key, val, raw, oldRaw: values[key],
       });
       values[key] = raw;
+    },
+    /**
+     * @callback GMValueChangeListener
+     * @param {String} key
+     * @param {any} oldValue - undefined = value was created
+     * @param {any} newValue - undefined = value was removed
+     * @param {boolean} remote - true = value was modified in another tab
+     */
+    /**
+     * @param {String} key - name of the value to monitor
+     * @param {GMValueChangeListener} fn - callback
+     * @returns {String} listenerId
+     */
+    GM_addValueChangeListener(key, fn) {
+      if (typeof key !== 'string') key = `${key}`;
+      if (typeof fn !== 'function') return;
+      let keyHooks = changeHooks[this.id];
+      if (!keyHooks) {
+        keyHooks = {};
+        changeHooks[this.id] = keyHooks;
+      }
+      let hooks = keyHooks[key];
+      if (!hooks) {
+        hooks = {};
+        keyHooks[key] = hooks;
+      }
+      const i = objectValues(hooks)::indexOf(fn);
+      let listenerId = i >= 0 && objectKeys(hooks)[i];
+      if (!listenerId) {
+        listenerId = getUniqId('VMvc');
+        hooks[listenerId] = fn;
+      }
+      return listenerId;
+    },
+    /**
+     * @param {String} listenerId
+     */
+    GM_removeValueChangeListener(listenerId) {
+      const keyHooks = changeHooks[this.id];
+      if (!keyHooks) return;
+      objectEntries(keyHooks)::findIndex(([key, hooks]) => {
+        if (listenerId in hooks) {
+          delete hooks[listenerId];
+          if (isEmpty(hooks)) delete keyHooks[key];
+          return true;
+        }
+      });
+      if (isEmpty(keyHooks)) delete changeHooks[this.id];
     },
     GM_getResourceText(name) {
       if (name in this.resources) {
@@ -156,4 +208,13 @@ function registerCallback(callback) {
     delete store.callbacks[callbackId];
   };
   return callbackId;
+}
+
+function isEmpty(obj) {
+  for (const key in obj) {
+    if (obj::hasOwnProperty(key)) {
+      return false;
+    }
+  }
+  return true;
 }
