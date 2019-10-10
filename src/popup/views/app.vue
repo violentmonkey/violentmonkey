@@ -7,7 +7,7 @@
         <img src="/public/images/icon128.png">
       </div>
       <div
-        class="flex-1 ml-1 ext-name"
+        class="flex-1 ext-name"
         :class="{disabled:!options.isApplied}"
         v-text="i18n('extName')"
       />

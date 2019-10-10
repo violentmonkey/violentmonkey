@@ -1,3 +1,24 @@
+$fontSize: 12px;
+$padding: 8px;
+$itemPaddingX: 14px;
+
+$scriptIconSize: 18px;
+$scriptIconMLR: 2px;
+
+$iconSize: 14px;
+$iconML: calc($scriptIconSize + 2 * $scriptIconMLR);
+$iconMR: 10px;
+
+$leftPaneWidth: calc($iconML + $iconSize + $iconMR);
+
+$logoSize: 32px;
+$logoMLR: calc(($leftPaneWidth - $logoSize) / 2);
+
+$topIconSize: 20px;
+
+$findIconSize: 16px;
+$findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
+
 body {
   width: 320px;
   max-width: 100%;
@@ -13,7 +34,7 @@ footer {
   height: 40px;
   line-height: 40px;
   text-align: center;
-  font-size: 12px;
+  font-size: $fontSize;
   color: #999;
   > span {
     cursor: pointer;
@@ -25,8 +46,9 @@ footer {
 
 .logo {
   text-align: center;
+  margin: 0 $logoMLR;
   img {
-    width: 32px;
+    width: $logoSize;
   }
   &.disabled > img {
     opacity: .5;
@@ -48,8 +70,6 @@ footer {
 }
 
 .ext-name {
-  margin-top: 12px;
-  font-size: 12px;
   &.disabled {
     color: gray;
   }
@@ -59,27 +79,27 @@ footer {
   &[src=""] {
     display: none;
   }
-  max-width: 1.25rem;
-  max-height: 1.25rem;
-  margin-left: .125rem;
+  max-width: $scriptIconSize;
+  max-height: $scriptIconSize;
+  margin-left: $scriptIconMLR;
   position: absolute;
   & + .icon {
-    margin-right: .75rem;
-    margin-left: 1.5rem;
+    margin-left: $iconML;
+    margin-right: $iconMR;
   }
 }
 
 .menu-buttons {
   align-items: center;
-  padding: 8px;
+  padding: $padding $padding $padding 0;
   background: white;
   > .menu-area {
-    padding: 8px;
+    padding: $padding;
   }
   .icon {
     display: block;
-    width: 20px;
-    height: 20px;
+    width: $topIconSize;
+    height: $topIconSize;
   }
 }
 
@@ -91,22 +111,22 @@ footer {
     display: flex;
     align-items: center;
     min-height: 2rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: $itemPaddingX;
+    padding-right: $itemPaddingX;
     text-align: left;
     white-space: nowrap;
     .submenu & {
       text-align: left;
     }
     .icon {
-      flex: 0 0 1rem;
+      flex: 0 0 $iconSize;
     }
     > .icon:first-child {
-      margin-right: 1rem;
+      margin-right: $iconMR;
     }
     > .flex-auto {
       &:last-child {
-        padding-right: 1rem;
+        padding-right: $itemPaddingX;
       }
     }
     > .flex-1 {
@@ -114,10 +134,17 @@ footer {
     }
   }
   &-find {
-    padding-left: 1.25rem;
+    padding-left: 0;
+    /* using the same selector as above to override it */
+    > .icon:first-child {
+      flex-basis: $findIconSize;
+      width: $findIconSize;
+      height: $findIconSize;
+      margin: 0 $iconMR 0 $findIconML;
+    }
   }
   &-group {
-    padding-left: 3.25rem;
+    padding-left: $leftPaneWidth;
   }
   &.expand {
     background: #fbfbfb;
@@ -150,7 +177,7 @@ footer {
     display: flex;
     position: absolute;
     top: .3rem;
-    right: 1rem;
+    right: $itemPaddingX;
   }
   &-button {
     padding: .2rem;
@@ -168,7 +195,7 @@ footer {
     font-size: .8rem;
     color: #333;
     > .menu-item {
-      padding-left: 3.25rem;
+      padding-left: $leftPaneWidth;
       > .icon {
         margin-right: .5rem;
       }
@@ -181,9 +208,9 @@ footer {
   max-width: 100%;
   left: 0;
   bottom: 0;
-  padding: 4px 8px;
+  padding: 4px $padding;
   word-wrap: break-word;
-  font-size: 12px;
+  font-size: $fontSize;
   line-height: 1;
   background: #fdfdfd;
   border: 1px solid #ddd;
@@ -194,5 +221,5 @@ footer {
 }
 
 .failure-reason {
-  padding: .75rem 1rem 0 3rem;
+  padding: .75rem $itemPaddingX 0 $leftPaneWidth;
 }
