@@ -284,6 +284,7 @@ const blacklist = [
   '//(?:(?:gist.|)github.com|greasyfork.org|openuserjs.org)/',
 ].map(re => new RegExp(re));
 const bypass = {};
+const extensionRoot = browser.runtime.getURL('/');
 
 browser.webRequest.onBeforeRequest.addListener((req) => {
   // onBeforeRequest fired for `file:`
@@ -291,6 +292,12 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
   // - does not work on Firefox
   const { url } = req;
   if (req.method === 'GET' && reUserScript.test(url)) {
+    // open a real URL for simplified userscript URL listed in devtools of the web page
+    if (url.startsWith(extensionRoot)) {
+      const id = +url.split('#').pop();
+      const redirectUrl = `${extensionRoot}options/index.html#scripts/${id}`;
+      return { redirectUrl };
+    }
     if (!bypass[url] && (
       whitelist.some(re => re.test(url)) || !blacklist.some(re => re.test(url))
     )) {

@@ -11,6 +11,8 @@ import {
 const VMInitInjection = window[process.env.INIT_FUNC_NAME];
 delete window[process.env.INIT_FUNC_NAME];
 
+const { encodeURIComponent } = global;
+const { replace } = String.prototype;
 const { remove } = Element.prototype;
 
 bridge.addHandlers({
@@ -126,7 +128,7 @@ const injectedScriptIntro = `(${
 })(${attachFunction},`;
 
 function injectScript(data) {
-  const [vId, codeSlices, vCallbackId, mode, scriptId] = data;
+  const [vId, codeSlices, vCallbackId, mode, scriptId, scriptName] = data;
   // trying to avoid string concatenation of potentially huge code slices as long as possible
   const injectedCode = [
     injectedScriptIntro,
@@ -140,7 +142,8 @@ function injectScript(data) {
       data: injectedCode::join(''),
     });
   } else {
-    inject(injectedCode, browser.extension.getURL(`/options/index.html#scripts/${scriptId}`));
+    const name = encodeURIComponent(scriptName::replace(/[#/]/g, ''));
+    inject(injectedCode, browser.extension.getURL(`${name}.user.js#${scriptId}`));
   }
 }
 

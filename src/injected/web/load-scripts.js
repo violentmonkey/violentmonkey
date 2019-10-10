@@ -74,7 +74,7 @@ bridge.addHandlers({
         const func = window[id];
         if (func) runCode(name, func, args, thisObj);
       });
-      return [id, codeSlices, fnId, bridge.mode, script.props.id];
+      return [id, codeSlices, fnId, bridge.mode, script.props.id, script.meta.name];
     }
 
     function run(list) {
