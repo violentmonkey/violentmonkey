@@ -273,7 +273,6 @@ export function confirmInstall(info) {
   });
 }
 
-const reUserScript = /\.user\.js([?#]|$)/;
 const whitelist = [
   '^https://greasyfork.org/scripts/[^/]*/code/[^/]*?\\.user\\.js([?#]|$)',
   '^https://openuserjs.org/install/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
@@ -291,7 +290,7 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
   // - works on Chrome
   // - does not work on Firefox
   const { url } = req;
-  if (req.method === 'GET' && reUserScript.test(url)) {
+  if (req.method === 'GET') {
     // open a real URL for simplified userscript URL listed in devtools of the web page
     if (url.startsWith(extensionRoot)) {
       const id = +url.split('#').pop();
@@ -331,6 +330,14 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     }
   }
 }, {
-  urls: ['<all_urls>'],
+  urls: [
+    // 1. *:// comprises only http/https
+    // 2. the API ignores #hash part
+    '*://*/*.user.js',
+    '*://*/*.user.js?*',
+    'file://*/*.user.js',
+    'file://*/*.user.js?*',
+    `${extensionRoot}*.user.js`,
+  ],
   types: ['main_frame'],
 }, ['blocking']);
