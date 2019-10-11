@@ -338,7 +338,15 @@ function createGmApiProps() {
       }
     },
     GM_log(...args) {
-      log('log', [this.script.meta.name || 'No name'], ...args);
+      let loglevel = 'log';
+      if (args[0] === 'error'
+        || args[0] === 'debug'
+        || args[0] === 'info'
+        || args[0] === 'log'
+        || args[0] === 'warn') {
+        loglevel = args.shift();
+      }
+      log(loglevel, [this.script.meta.name || 'No name'], ...args);
     },
     GM_registerMenuCommand(cap, func) {
       const { id } = this;
