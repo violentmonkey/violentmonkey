@@ -63,7 +63,7 @@
           </div>
         </dropdown>
         <div class="filter-search hidden-sm">
-          <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
+          <input type="search" :placeholder="i18n('labelSearchScript')" v-model="search">
           <icon name="search"></icon>
         </div>
       </header>
@@ -114,6 +114,7 @@ import { setRoute, lastRoute } from '#/common/router';
 import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
+import '../utils/hotkeys';
 
 const SORT_EXEC = { value: 'exec', title: i18n('filterExecutionOrder') };
 const SORT_ALPHA = { value: 'alpha', title: i18n('filterAlphabeticalOrder') };
@@ -427,7 +428,7 @@ export default {
     width: 100%;
     padding-left: .5rem;
     padding-right: 2rem;
-    line-height: 2;
+    height: 2rem;
   }
 }
 .filter-sort {

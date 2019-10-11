@@ -3,7 +3,8 @@
     class="script"
     :class="{ disabled: !script.config.enabled, removed: script.config.removed }"
     :draggable="draggable"
-    @dragstart.prevent="onDragStart">
+    @dragstart.prevent="onDragStart"
+    @keydownEnter="onEdit">
     <img class="script-icon hidden-xs" :src="safeIcon">
     <div class="script-info flex">
       <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
@@ -388,6 +389,9 @@ export default {
     .secondary {
       display: none;
     }
+  }
+  &.focused {
+    box-shadow: 1px 2px 9px gray;
   }
   &-buttons {
     line-height: 1;
