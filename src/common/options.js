@@ -15,6 +15,9 @@ function getOption(key, def) {
 }
 
 function setOption(key, value) {
+  // the updated options object will be propagated from the background script after a pause
+  // so meanwhile the local code should be able to see the new value using options.get()
+  objectSet(options, normalizeKeys(key), value);
   sendMessage({
     cmd: 'SetOptions',
     data: { key, value },
