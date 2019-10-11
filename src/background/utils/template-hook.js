@@ -11,15 +11,19 @@ const INITIAL_TEMPLATE = `\
 // ==/UserScript==
 `;
 
-// When updating from an old version, set the edited flag retroactively
-// TODO: remove this in 2020 as the majority of users will have an updated VM
 global.addEventListener('backgroundInitialized', () => {
-  if (getOption(SCRIPT_TEMPLATE_EDITED) == null) {
-    if (getOption(SCRIPT_TEMPLATE) === INITIAL_TEMPLATE) {
-      resetScriptTemplate();
-    } else {
-      setOption(SCRIPT_TEMPLATE_EDITED, true);
-    }
+  let edited = getOption(SCRIPT_TEMPLATE_EDITED);
+  // Preserve an edited template
+  if (edited) return;
+  const template = getOption(SCRIPT_TEMPLATE);
+  // When updating from an old version, set the edited flag retroactively
+  if (edited == null) {
+    edited = template !== INITIAL_TEMPLATE;
+    if (edited) setOption(SCRIPT_TEMPLATE_EDITED, true);
+    else resetScriptTemplate();
+  // When updating VM, update to the new default template
+  } else if (template !== getDefaultOption(SCRIPT_TEMPLATE)) {
+    resetScriptTemplate();
   }
 }, { once: true });
 
