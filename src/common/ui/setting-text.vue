@@ -1,5 +1,11 @@
 <template>
-  <textarea class="monospace-font" v-model="value" @change="onChange" :disabled="disabled" />
+  <textarea
+    class="monospace-font"
+    spellcheck="false"
+    v-model="value"
+    :disabled="disabled"
+    @change="onChange"
+  />
 </template>
 
 <script>
