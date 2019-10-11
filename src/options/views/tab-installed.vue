@@ -75,7 +75,8 @@
       <div class="flex-auto pos-rel">
         <div class="scripts abs-full">
           <script-item
-            v-for="script in filteredScripts"
+            v-for="script in sortedScripts"
+            v-show="!search || script.$cache.show !== false"
             :key="script.props.id"
             :class="{ removing: removing && removing.id === script.props.id }"
             :script="script"
@@ -167,7 +168,7 @@ export default {
       modal: null,
       menuNewActive: false,
       showRecycle: false,
-      filteredScripts: [],
+      sortedScripts: [],
       removing: null,
       // Speedup and deflicker for initial page load:
       // skip rendering the script list when starting in the editor.
@@ -186,7 +187,8 @@ export default {
       if (this.store.loading) {
         return i18n('msgLoading');
       }
-      if (!this.filteredScripts.length) {
+      const scripts = this.sortedScripts;
+      if (this.search ? !scripts.find(s => s.$cache.show !== false) : !scripts.length) {
         return i18n('labelNoSearchScripts');
       }
       return null;
@@ -205,11 +207,14 @@ export default {
     },
     onUpdate() {
       const { search, filters: { sort }, showRecycle } = this;
-      const lowerSearch = (search || '').toLowerCase();
       const scripts = showRecycle ? this.trash : this.scripts;
-      const filteredScripts = search
-        ? scripts.filter(script => script.$cache.search.includes(lowerSearch))
-        : scripts.slice();
+      const sortedScripts = [...scripts];
+      if (search) {
+        const lowerSearch = (search || '').toLowerCase();
+        for (const { $cache } of scripts) {
+          $cache.show = $cache.search.includes(lowerSearch);
+        }
+      }
       if (sort.value === SORT_ALPHA.value) {
         const showEnabledFirst = options.get('filters.showEnabledFirst');
         const getSortKey = (item) => {
@@ -220,7 +225,7 @@ export default {
           keys.push(item.$cache.lowerName);
           return keys.join('');
         };
-        filteredScripts.sort((a, b) => {
+        sortedScripts.sort((a, b) => {
           const nameA = getSortKey(a);
           const nameB = getSortKey(b);
           if (nameA < nameB) return -1;
@@ -229,9 +234,9 @@ export default {
         });
       } else if (sort.value === SORT_UPDATE.value) {
         const getSortKey = item => +item.props.lastUpdated || 0;
-        filteredScripts.sort((a, b) => getSortKey(b) - getSortKey(a));
+        sortedScripts.sort((a, b) => getSortKey(b) - getSortKey(a));
       }
-      this.filteredScripts = filteredScripts;
+      this.sortedScripts = sortedScripts;
     },
     updateLater() {
       this.debouncedUpdate();
@@ -347,7 +352,7 @@ export default {
     },
   },
   created() {
-    this.debouncedUpdate = debounce(this.onUpdate, 200);
+    this.debouncedUpdate = debounce(this.onUpdate, 100);
   },
   mounted() {
     // Ensure the correct UI is shown when mounted:
