@@ -61,6 +61,7 @@ import 'codemirror/addon/fold/comment-fold';
 import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
+import 'codemirror/keymap/sublime';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { debounce } from '#/common';
@@ -87,10 +88,6 @@ function getHandler(key) {
 ].forEach((key) => {
   CodeMirror.commands[key] = getHandler(key);
 });
-Object.assign(CodeMirror.keyMap.default, {
-  Tab: 'indentMore',
-  'Shift-Tab': 'indentLess',
-});
 
 const cmOptions = {
   continueComments: true,
@@ -103,6 +100,7 @@ const cmOptions = {
   matchBrackets: true,
   autoCloseBrackets: true,
   highlightSelectionMatches: true,
+  keyMap: 'sublime',
 };
 const searchOptions = {
   useRegex: false,
