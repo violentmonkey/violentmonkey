@@ -238,7 +238,7 @@ export default {
       this.placeholders = placeholders;
       const { cm } = this;
       if (!cm) return;
-      cm.off('change', this.onChange);
+      cm.off('changes', this.onChange);
       cm.setValue(this.content || '');
       placeholders.forEach(({
         line, start, body, length,
@@ -258,7 +258,7 @@ export default {
       });
       cm.getDoc().clearHistory();
       cm.focus();
-      cm.on('change', this.onChange);
+      cm.on('changes', this.onChange);
     },
     'search.state.query'() {
       this.debouncedFind();
