@@ -101,7 +101,9 @@ function updateBadge(tab, data = badges[tab.id]) {
   });
 }
 
-function updateState(tab, url = tab.url) {
+// Chrome 79+ uses pendingUrl while the tab connects to the newly navigated URL
+// https://groups.google.com/a/chromium.org/forum/#!topic/chromium-extensions/5zu_PT0arls
+function updateState(tab, url = tab.pendingUrl || tab.url) {
   const tabId = tab.id;
   const injectable = INJECTABLE_TAB_URL_RE.test(url);
   const blacklisted = injectable ? testBlacklist(url) : undefined;

@@ -304,7 +304,8 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
           confirmInstall({
             code,
             url,
-            from: tab && tab.url,
+            // Chrome 79+ uses pendingUrl while the tab connects to the newly navigated URL
+            from: tab && (tab.pendingUrl || tab.url),
           });
         } else {
           if (!bypass[url]) {
