@@ -10,7 +10,7 @@ import {
 } from './gm-values';
 import {
   findIndex, indexOf, slice, objectKeys, objectValues, objectEntries,
-  atob, Error, jsonDump, log, utf8decode,
+  atob, Error, jsonDump, logging, utf8decode,
 } from '../utils/helpers';
 
 const { getElementById } = Document.prototype;
@@ -119,9 +119,6 @@ export function createGmApiProps() {
         return blobUrl;
       }
     },
-    GM_log(...args) {
-      log('log', [this.script.meta.name || 'No name'], ...args);
-    },
     GM_registerMenuCommand(cap, func) {
       const { id } = this;
       const key = `${id}:${cap}`;
@@ -150,6 +147,7 @@ export function createGmApiProps() {
       el.then = callback => callback(el);
       return el;
     },
+    GM_log: logging.log,
     GM_openInTab(url, options) {
       const data = options && typeof options === 'object' ? options : {
         active: !options,

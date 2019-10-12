@@ -1,6 +1,6 @@
 import {
   atob, includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
-  setAttribute, warn, charCodeAt, fromCharCode, match, shift, slice,
+  setAttribute, log, charCodeAt, fromCharCode, match, shift, slice,
 } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -105,7 +105,7 @@ function start(req, id) {
     if (['arraybuffer', 'blob']::includes(responseType)) {
       payload.responseType = 'arraybuffer';
     } else if (!['json', 'text']::includes(responseType)) {
-      warn(`[Violentmonkey] Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
+      log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
   }
   encodeBody(details.data)

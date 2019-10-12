@@ -5,7 +5,7 @@ export const {
   // types
   Blob, Boolean, Error, Promise, Uint8Array,
   // props and methods
-  atob, console, isFinite, setTimeout,
+  atob, isFinite, setTimeout,
 } = global;
 
 export const {
@@ -22,10 +22,10 @@ export const { toString: objectToString } = Object.prototype;
 const { toString: numberToString } = Number.prototype;
 const { replace } = String.prototype;
 export const { fromCharCode } = String;
-export const { warn } = console;
 export const { addEventListener } = EventTarget.prototype;
 export const { append, setAttribute } = Element.prototype;
 export const { createElement } = Document.prototype;
+export const logging = assign({}, console);
 
 export const isArray = obj => (
   // ES3 way, not reliable if prototype is modified
@@ -116,5 +116,5 @@ export function log(level, tags, ...args) {
   const tagList = ['Violentmonkey'];
   if (tags) tagList::push(...tags);
   const prefix = tagList::map(tag => `[${tag}]`)::join('');
-  console[level](prefix, ...args);
+  logging[level](prefix, ...args);
 }

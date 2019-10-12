@@ -1,6 +1,6 @@
 import { isFirefox } from '#/common/ua';
 import { sendMessage } from '../utils';
-import { addEventListener, warn } from '../utils/helpers';
+import { addEventListener, logging } from '../utils/helpers';
 import bridge from './bridge';
 
 const { execCommand } = Document.prototype;
@@ -37,6 +37,6 @@ function setClipboard({ type, data }) {
   document::removeEventListener('copy', onCopy, false);
   clipboardData = null;
   if (process.env.DEBUG && !ret) {
-    warn('Copy failed!');
+    logging.warn('Copy failed!');
   }
 }
