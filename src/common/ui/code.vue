@@ -188,6 +188,7 @@ export default {
       type: Boolean,
       default: true,
     },
+    editing: Boolean,
   },
   components: {
     Tooltip,
@@ -279,14 +280,8 @@ export default {
     initialize(cm) {
       this.cm = cm;
       cm.setOption('readOnly', this.readonly);
+      // these are active only in the code nav tab
       cm.state.commands = Object.assign({
-        cancel: () => {
-          if (this.search.show) {
-            this.clearSearch();
-          } else {
-            cm.execCommand('close');
-          }
-        },
         find: this.find,
         findNext: this.findNext,
         findPrev: () => {
@@ -297,8 +292,20 @@ export default {
           this.replace(1);
         },
       }, this.commands);
+      // these are active in all nav tabs
       cm.setOption('extraKeys', {
         Esc: 'cancel',
+        F1: 'showHelp',
+      });
+      Object.assign(CodeMirror.commands, {
+        cancel: () => {
+          if (this.search.show) {
+            this.clearSearch();
+          } else {
+            cm.execCommand('close');
+          }
+        },
+        showHelp: this.commands.showHelp,
       });
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
@@ -307,25 +314,21 @@ export default {
     },
     onKeyDown(e) {
       const name = CodeMirror.keyName(e);
-      const { cm } = this;
-      if (!cm) return;
+      if (!this.cm) return;
       [
-        cm.options.extraKeys,
-        cm.options.keyMap,
-      ].some((keyMap) => {
-        let stop = false;
-        if (keyMap) {
-          CodeMirror.lookupKey(name, keyMap, (b) => {
-            if (cm.state.commands[b]) {
-              e.preventDefault();
-              e.stopPropagation();
-              cm.execCommand(b);
-              stop = true;
-            }
-          }, cm);
+        this.cm.options.extraKeys,
+        this.editing && this.cm.options.keyMap,
+      ].some(keyMap => keyMap && this.lookupKey(name, keyMap, e) === 'handled');
+    },
+    lookupKey(name, keyMap, e) {
+      return CodeMirror.lookupKey(name, keyMap, (b) => {
+        if (keyMap === this.cm.options.extraKeys || this.cm.state.commands[b]) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.cm.execCommand(b);
+          return true;
         }
-        return stop;
-      });
+      }, this.cm);
     },
     doSearch(reversed) {
       const { state } = this.search;
@@ -397,7 +400,11 @@ export default {
       Object.assign({}, this.cmOptions, options.get('editor')),
     ));
     this.debouncedFind = debounce(this.searchInPlace, 100);
-    if (this.global) window.addEventListener('keydown', this.onKeyDown, false);
+    if (this.global) {
+      // reroute a hotkey only when CM isn't focused and thus can't handle it
+      this.cm.on('blur', () => window.addEventListener('keydown', this.onKeyDown));
+      this.cm.on('focus', () => window.removeEventListener('keydown', this.onKeyDown));
+    }
     document.addEventListener('copy', this.onCopy, false);
   },
   beforeDestroy() {
