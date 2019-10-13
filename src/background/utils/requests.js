@@ -8,10 +8,28 @@ const requests = {};
 const verify = {};
 const specialHeaders = [
   'user-agent',
-  'referer',
-  'origin',
-  'host',
+  // https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name
+  // https://cs.chromium.org/?q=file:cc+symbol:IsForbiddenHeader%5Cb
+  'accept-charset',
+  'accept-encoding',
+  'access-control-request-headers',
+  'access-control-request-method',
+  'connection',
+  'content-length',
   'cookie',
+  'cookie2',
+  'date',
+  'dnt',
+  'expect',
+  'host',
+  'keep-alive',
+  'origin',
+  'referer',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade',
+  'via',
 ];
 // const tasks = {};
 
@@ -70,6 +88,7 @@ function xhrCallbackWrapper(req) {
 
 function isSpecialHeader(lowerHeader) {
   return specialHeaders.includes(lowerHeader)
+    || lowerHeader.startsWith('proxy-')
     || lowerHeader.startsWith('sec-');
 }
 
