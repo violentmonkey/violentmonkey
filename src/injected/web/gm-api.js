@@ -1,16 +1,16 @@
 import { cache2blobUrl, getUniqId } from '#/common';
+import { downloadBlob } from '#/common/download';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
 import { onRequestCreate } from './requests';
-import { onDownload } from './download';
 import { onNotificationCreate } from './notifications';
 import {
   decodeValue, dumpValue, loadValues, changeHooks,
 } from './gm-values';
 import {
   findIndex, indexOf, slice, objectKeys, objectValues, objectEntries,
-  atob, Error, jsonDump, logging, utf8decode,
+  atob, Error, jsonDump, logging, utf8decode, Blob,
 } from '../utils/helpers';
 
 const { getElementById } = Document.prototype;
@@ -131,6 +131,28 @@ export function createGmApiProps() {
       delete store.commands[key];
       bridge.post({ cmd: 'UnregisterMenu', data: [id, cap] });
     },
+    GM_download(arg1, name) {
+      const opts = typeof arg1 === 'string' ? { url: arg1, name } : arg1;
+      if (!opts || !opts.url) throw new Error('GM_download: Invalid parameter!');
+      return onRequestCreate({
+        method: 'GET',
+        responseType: 'arraybuffer',
+        url: opts.url,
+        headers: opts.headers,
+        timeout: opts.timeout,
+        onerror: opts.onerror,
+        onprogress: opts.onprogress,
+        ontimeout: opts.ontimeout,
+        onload(res) {
+          const blob = new Blob([res.response], { type: 'application/octet-stream' });
+          downloadBlob(blob, opts.name, opts.onload);
+        },
+      }, this.id);
+    },
+    GM_xmlhttpRequest(opts) {
+      if (!opts || !opts.url) throw new Error('GM_xmlhttpRequest: Invalid parameter!');
+      return onRequestCreate(opts, this.id);
+    },
   };
 
   const props = {
@@ -155,8 +177,6 @@ export function createGmApiProps() {
       data.url = url;
       return onTabCreate(data);
     },
-    GM_xmlhttpRequest: onRequestCreate,
-    GM_download: onDownload,
     GM_notification(text, title, image, onclick) {
       const options = typeof text === 'object' ? text : {
         text,

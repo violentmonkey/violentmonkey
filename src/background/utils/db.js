@@ -237,6 +237,11 @@ export function sortScripts() {
   });
 }
 
+// TODO: depromisify getScript and all dependent code
+export function getScriptByIdSync(id) {
+  return store.scriptMap[id];
+}
+
 export function getScript(where) {
   let script;
   if (where.id) {

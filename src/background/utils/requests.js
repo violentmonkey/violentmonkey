@@ -3,6 +3,7 @@ import {
 } from '#/common';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
+import { getScriptByIdSync } from './db';
 
 const requests = {};
 const verify = {};
@@ -112,7 +113,8 @@ export function httpRequest(details, cb) {
     const body = data ? decodeBody(data) : null;
     xhr.send(body);
   } catch (e) {
-    console.warn(e);
+    const { scriptId } = req;
+    console.warn(e, `in script id ${scriptId}, ${getScriptByIdSync(scriptId).meta.name}`);
   }
 }
 

@@ -24,8 +24,9 @@ bridge.addHandlers({
   },
 });
 
-export function onRequestCreate(details) {
+export function onRequestCreate(details, scriptId) {
   const req = {
+    scriptId,
     details,
     req: {
       abort: reqAbort,
@@ -86,9 +87,10 @@ function callback(req, res) {
 }
 
 function start(req, id) {
-  const { details } = req;
+  const { details, scriptId } = req;
   const payload = {
     id,
+    scriptId,
     anonymous: details.anonymous,
     method: details.method,
     url: details.url,
