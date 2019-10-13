@@ -1,4 +1,8 @@
-document.addEventListener('keydown', (e) => {
+export function toggle(enable) {
+  document[`${enable ? 'add' : 'remove'}EventListener`]('keydown', onKeyDown);
+}
+
+function onKeyDown(e) {
   if (e.altKey || e.shiftKey || e.metaKey) return;
   if (e.key.length === 1 && !e.ctrlKey
   || e.code === 'KeyF' && e.ctrlKey) {
@@ -39,4 +43,4 @@ document.addEventListener('keydown', (e) => {
   }
   default:
   }
-});
+}

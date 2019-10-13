@@ -114,7 +114,7 @@ import { setRoute, lastRoute } from '#/common/router';
 import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
-import '../utils/hotkeys';
+import * as Hotkeys from '../utils/hotkeys';
 
 const SORT_EXEC = { value: 'exec', title: i18n('filterExecutionOrder') };
 const SORT_ALPHA = { value: 'alpha', title: i18n('filterAlphabeticalOrder') };
@@ -325,6 +325,7 @@ export default {
           if (id) setRoute(tab, true);
         }
       }
+      Hotkeys.toggle(!id);
     },
     toggleRecycle() {
       this.showRecycle = !this.showRecycle;
