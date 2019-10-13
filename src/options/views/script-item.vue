@@ -368,16 +368,38 @@ export default {
 </script>
 
 <style>
+$rem: 14px;
+
+$iconSize: calc(3 * $rem);
+$iconSizeSmaller: calc(2 * $rem);
+$actionIconSize: calc(2 * $rem);
+
+$nameFontSize: $rem;
+
+$itemLineHeight: 1.5;
+$itemPadT: 12px;
+$itemPadB: 5px;
+$itemHeight: calc(
+  $nameFontSize * $itemLineHeight +
+  $actionIconSize + 2px /* icon borders */ +
+  $itemPadT + $itemPadB + 2px /* item borders */
+);
+
+$removedItemPadB: 10px;
+$removedItemHeight: calc(
+  $actionIconSize + 2px /* icon borders */ +
+  $itemPadT + $removedItemPadB + 2px /* item borders */
+);
+
 .script {
   position: relative;
   margin: 8px;
-  padding: 12px 10px 5px;
+  padding: $itemPadT 10px $itemPadB;
   border: 1px solid #ccc;
   border-radius: .3rem;
   transition: transform .5s;
   background: white;
-  /* image size + padding + margin + border + 1 */
-  height: calc(3rem + 28px);
+  height: $itemHeight;
   &:hover {
     border-color: darkgray;
   }
@@ -387,7 +409,7 @@ export default {
   }
   &.disabled,
   &.removed {
-    height: calc(2rem + 28px);
+    height: $removedItemHeight;
     background: #f0f0f0;
     color: #999;
   }
@@ -397,7 +419,7 @@ export default {
     }
   }
   &.removed {
-    padding-bottom: 10px;
+    padding-bottom: $removedItemPadB;
     .secondary {
       display: none;
     }
@@ -419,29 +441,29 @@ export default {
     }
   }
   &-info {
-    line-height: 1.5;
+    line-height: $itemLineHeight;
     align-items: center;
   }
   &-icon {
     position: absolute;
-    width: 3rem;
-    height: 3rem;
+    width: $iconSize;
+    height: $iconSize;
     top: 1rem;
     .disabled &,
     .removed & {
       filter: grayscale(.8);
     }
     .removed & {
-      width: 2rem;
-      height: 2rem;
+      width: $iconSizeSmaller;
+      height: $iconSizeSmaller;
     }
     ~ * {
-      margin-left: 3.5rem;
+      margin-left: calc($iconSize + $rem / 2);
     }
   }
   &-name {
     font-weight: 500;
-    font-size: 1rem;
+    font-size: $nameFontSize;
     .disabled & {
       color: gray;
     }
