@@ -409,7 +409,6 @@ $removedItemHeight: calc(
   }
   &.disabled,
   &.removed {
-    height: $removedItemHeight;
     background: #f0f0f0;
     color: #999;
   }
@@ -419,6 +418,7 @@ $removedItemHeight: calc(
     }
   }
   &.removed {
+    height: $removedItemHeight;
     padding-bottom: $removedItemPadB;
     .secondary {
       display: none;
