@@ -4,10 +4,10 @@
     :class="{ disabled: !script.config.enabled, removed: script.config.removed }"
     :draggable="draggable"
     @dragstart.prevent="onDragStart">
-    <template v-if="canRender">
-      <img class="script-icon hidden-xs" :src="safeIcon">
-      <div class="script-info flex">
-        <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
+    <img class="script-icon hidden-xs" :src="safeIcon">
+    <div class="script-info flex">
+      <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
+      <template v-if="canRender">
         <tooltip
           v-if="author"
           :content="i18n('labelAuthor') + script.meta.author"
@@ -33,7 +33,9 @@
             </span>
           </tooltip>
         </div>
-      </div>
+      </template>
+    </div>
+    <template v-if="canRender">
       <div class="script-buttons flex">
         <div class="flex-auto flex flex-wrap">
           <tooltip :content="i18n('buttonEdit')" align="start">
