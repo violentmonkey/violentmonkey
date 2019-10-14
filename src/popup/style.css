@@ -76,7 +76,7 @@ footer {
 }
 
 .script-icon {
-  &[src=""] {
+  &:not([src]) {
     display: none;
   }
   max-width: $scriptIconSize;
