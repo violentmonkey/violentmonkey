@@ -34,7 +34,7 @@ function expandKeyMap(res, ...maps) {
   maps.forEach((map) => {
     if (typeof map === 'string') map = CodeMirror.keyMap[map];
     Object.entries(map).forEach(([key, value]) => {
-      if (!res[key] && /^[a-z]+$/i.test(value)) {
+      if (!res[key] && /^[a-z]+$/i.test(value) && CodeMirror.commands[value]) {
         res[key] = value;
       }
     });
