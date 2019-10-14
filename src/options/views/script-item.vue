@@ -471,9 +471,8 @@ $removedItemHeight: calc(
     }
   }
   &-author {
-    > * {
-      vertical-align: middle;
-    }
+    display: flex;
+    align-items: center;
     > .ellipsis {
       display: inline-block;
       max-width: 100px;
