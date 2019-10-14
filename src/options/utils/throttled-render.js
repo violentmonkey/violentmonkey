@@ -1,7 +1,11 @@
+import { route } from '#/common/router';
+
 const MAX_BATCH_DURATION = 150;
 /** @type ThrottledVue[] */
 const queue = [];
-let startTime = performance.now();
+// When script list is the initial navigation of this tab, startTime should start now
+// so that the first batch is rendered earlier to compensate for main app init
+let startTime = route.pathname === 'scripts' ? performance.now() : 0;
 let batchSize = 0;
 let maxBatchSize = 0;
 let timer = 0;
@@ -32,7 +36,9 @@ export function unregister(component) {
 }
 
 function renderNextBatch() {
-  const count = Math.min(queue.length, batchSize);
+  // render at least 10 items in a theoretically possible case the main app init took more
+  // than MAX_BATCH_DURATION and the batchSize is 0
+  const count = Math.min(queue.length, Math.max(10, batchSize));
   for (let i = 0; i < count; i += 1) {
     queue[i].renderStage = 'check';
   }
