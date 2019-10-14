@@ -42,6 +42,14 @@ permissions:
   - storage
   - unlimitedStorage
   - clipboardWrite
+commands:
+  _execute_browser_action: {}
+  dashboard:
+    description: __MSG_menuDashboard__
+  settings:
+    description: __MSG_labelSettings__
+  newScript:
+    description: __MSG_menuNewScript__
 
 minimum_chrome_version: '55.0'
 

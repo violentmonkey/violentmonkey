@@ -23,6 +23,7 @@ import {
 } from './utils/values';
 import { setBadge } from './utils/icon';
 import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
+import './utils/commands';
 
 const VM_VER = browser.runtime.getManifest().version;
 
