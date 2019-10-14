@@ -105,7 +105,7 @@ export default {
       settings: {},
       commands: {
         save: this.save,
-        close: this.close,
+        close: () => this.close({ fromCM: true }),
         showHelp: () => {
           this.nav = 'keyboard';
         },
@@ -229,8 +229,8 @@ export default {
         showMessage({ text: err });
       });
     },
-    close() {
-      if (this.nav !== 'code') {
+    close({ fromCM } = {}) {
+      if (fromCM && this.nav !== 'code') {
         this.nav = 'code';
         return;
       }
