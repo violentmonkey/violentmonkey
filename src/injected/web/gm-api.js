@@ -202,7 +202,21 @@ export function createGmApiProps() {
       target[k] = propertyFromValue(target[k]);
     });
   });
-  return { props, boundProps };
+  return {
+    props,
+    boundProps,
+    gm4: {
+      getResourceURL: { async: true },
+      getValue: { async: true },
+      deleteValue: { async: true },
+      setValue: { async: true },
+      listValues: { async: true },
+      xmlHttpRequest: { alias: 'xmlhttpRequest' },
+      notification: true,
+      openInTab: true,
+      setClipboard: true,
+    },
+  };
 }
 
 export function propertyFromValue(value) {
