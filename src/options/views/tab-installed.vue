@@ -185,7 +185,7 @@ export default {
   computed: {
     message() {
       if (this.store.loading) {
-        return i18n('msgLoading');
+        return null;
       }
       const scripts = this.sortedScripts;
       if (this.search ? !scripts.find(s => s.$cache.show !== false) : !scripts.length) {
