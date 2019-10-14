@@ -96,6 +96,9 @@ button {
   &:active {
     background: #bfbfbf;
   }
+  &:focus {
+    border-color: #000;
+  }
   &[disabled] {
     color: #d0d0d0;
     border-color: #d0d0d0;

@@ -52,21 +52,7 @@
       </button>
     </div>
     <div v-show="showAdvanced">
-      <section>
-        <h3 v-text="i18n('labelEditor')"></h3>
-        <div class="mb-1">
-          <label>
-            <setting-check name="editor.lineWrapping" />
-            <span v-text="i18n('labelLineWrapping')"></span>
-          </label>
-        </div>
-        <div class="mb-1">
-          <label>
-            <span class="mr-1" v-text="i18n('labelIndentUnit')"></span>
-            <input type="number" min="1" class="w-1" v-model="indentUnit" />
-          </label>
-        </div>
-      </section>
+      <vm-editor />
       <vm-template />
       <vm-blacklist />
       <vm-css />
@@ -83,6 +69,7 @@ import Icon from '#/common/ui/icon';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
+import VmEditor from './vm-editor';
 import VmTemplate from './vm-template';
 import VmBlacklist from './vm-blacklist';
 import VmCss from './vm-css';
@@ -101,13 +88,6 @@ const items = [
       return value === 'auto' ? 'auto' : 'page';
     },
   },
-  {
-    name: 'indentUnit',
-    key: 'editor.indentUnit',
-    normalize(value) {
-      return +value || 2;
-    },
-  },
 ];
 const settings = {
   showAdvanced: false,
@@ -122,6 +102,7 @@ export default {
     VmImport,
     VmExport,
     VmSync,
+    VmEditor,
     VmTemplate,
     VmBlacklist,
     VmCss,

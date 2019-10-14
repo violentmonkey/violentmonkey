@@ -35,6 +35,11 @@
         v-text="i18n('editNavValues')"
         @click="nav = 'values'"
       />
+      <div
+        class="edit-nav-item"
+        :class="{active: nav === 'keyboard'}"
+        @click="nav = 'keyboard'"
+      >?</div>
       <div class="flex-auto pos-rel">
         <div
           v-if="tooLarge"
@@ -45,7 +50,7 @@
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
-        v-show="nav === 'code'" class="abs-full"
+        v-show="nav === 'code'" class="abs-full" ref="code" :editing="nav === 'code'"
         v-model="code" :commands="commands" @warnLarge="onWarnLarge"
       />
       <vm-settings
@@ -54,6 +59,10 @@
       />
       <vm-values
         :show="nav === 'values'" class="abs-full edit-body" :script="script"
+      />
+      <vm-keyboard
+        v-if="nav === 'keyboard'" class="abs-full edit-body"
+        :target="this.$refs.code"
       />
     </div>
   </div>
@@ -67,6 +76,7 @@ import { route } from '#/common/router';
 import { store, showMessage } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
+import VmKeyboard from './keyboard';
 
 function fromList(list) {
   return (list || []).join('\n');
@@ -83,6 +93,7 @@ export default {
     VmCode,
     VmSettings,
     VmValues,
+    VmKeyboard,
   },
   data() {
     return {
@@ -94,7 +105,10 @@ export default {
       settings: {},
       commands: {
         save: this.save,
-        close: this.close,
+        close: () => this.close({ fromCM: true }),
+        showHelp: () => {
+          this.nav = 'keyboard';
+        },
       },
     };
   },
@@ -115,6 +129,9 @@ export default {
       handler() {
         this.canSave = true;
       },
+    },
+    nav() {
+      setTimeout(() => this.nav === 'code' && this.$refs.code.cm.focus());
     },
   },
   created() {
@@ -212,7 +229,11 @@ export default {
         showMessage({ text: err });
       });
     },
-    close() {
+    close({ fromCM } = {}) {
+      if (fromCM && this.nav !== 'code') {
+        this.nav = 'code';
+        return;
+      }
       (this.canSave ? Promise.reject() : Promise.resolve())
       .catch(() => new Promise((resolve, reject) => {
         showMessage({

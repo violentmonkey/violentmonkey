@@ -115,6 +115,12 @@ descCustomCSS:
   message: >-
     Custom CSS for options page and script installation page. If you are not
     sure what this is for, please do not edit it.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: >-
+    Custom CodeMirror options in JSON object like {"indentUnit":2, "smartIndent":true}
+    however note that Violentmonkey doesn't support all of them.
+    Full list: https://codemirror.net/doc/manual.html#config
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Custom metadata
@@ -492,6 +498,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Custom style is updated.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: Editor options are updated.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Custom script template is updated.
