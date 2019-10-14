@@ -3,6 +3,7 @@ import {
 } from '#/common';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
+import { getScriptByIdSync } from './db';
 
 const requests = {};
 const verify = {};
@@ -131,7 +132,8 @@ export function httpRequest(details, cb) {
     const body = data ? decodeBody(data) : null;
     xhr.send(body);
   } catch (e) {
-    console.warn(e);
+    const { scriptId } = req;
+    console.warn(e, `in script id ${scriptId}, ${getScriptByIdSync(scriptId).meta.name}`);
   }
 }
 
@@ -292,7 +294,6 @@ export function confirmInstall(info) {
   });
 }
 
-const reUserScript = /\.user\.js([?#]|$)/;
 const whitelist = [
   '^https://greasyfork.org/scripts/[^/]*/code/[^/]*?\\.user\\.js([?#]|$)',
   '^https://openuserjs.org/install/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
@@ -303,13 +304,20 @@ const blacklist = [
   '//(?:(?:gist.|)github.com|greasyfork.org|openuserjs.org)/',
 ].map(re => new RegExp(re));
 const bypass = {};
+const extensionRoot = browser.runtime.getURL('/');
 
 browser.webRequest.onBeforeRequest.addListener((req) => {
   // onBeforeRequest fired for `file:`
   // - works on Chrome
   // - does not work on Firefox
   const { url } = req;
-  if (req.method === 'GET' && reUserScript.test(url)) {
+  if (req.method === 'GET') {
+    // open a real URL for simplified userscript URL listed in devtools of the web page
+    if (url.startsWith(extensionRoot)) {
+      const id = +url.split('#').pop();
+      const redirectUrl = `${extensionRoot}options/index.html#scripts/${id}`;
+      return { redirectUrl };
+    }
     if (!bypass[url] && (
       whitelist.some(re => re.test(url)) || !blacklist.some(re => re.test(url))
     )) {
@@ -344,6 +352,14 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     }
   }
 }, {
-  urls: ['<all_urls>'],
+  urls: [
+    // 1. *:// comprises only http/https
+    // 2. the API ignores #hash part
+    '*://*/*.user.js',
+    '*://*/*.user.js?*',
+    'file://*/*.user.js',
+    'file://*/*.user.js?*',
+    `${extensionRoot}*.user.js`,
+  ],
   types: ['main_frame'],
 }, ['blocking']);

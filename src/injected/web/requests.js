@@ -1,6 +1,6 @@
 import {
   atob, includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
-  setAttribute, warn, charCodeAt, fromCharCode, match, slice,
+  setAttribute, log, charCodeAt, fromCharCode, match, shift, slice,
 } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -9,13 +9,24 @@ const queue = [];
 
 const NS_HTML = 'http://www.w3.org/1999/xhtml';
 
-const { shift } = Array.prototype;
 const { toLowerCase } = String.prototype;
 const { createElementNS } = Document.prototype;
 const getHref = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
 
-export function onRequestCreate(details) {
+bridge.addHandlers({
+  GotRequestId(id) {
+    const req = queue::shift();
+    if (req) start(req, id);
+  },
+  HttpRequested(res) {
+    const req = idMap[res.id];
+    if (req) callback(req, res);
+  },
+});
+
+export function onRequestCreate(details, scriptId) {
   const req = {
+    scriptId,
     details,
     req: {
       abort: reqAbort,
@@ -25,16 +36,6 @@ export function onRequestCreate(details) {
   queue::push(req);
   bridge.post({ cmd: 'GetRequestId' });
   return req.req;
-}
-
-export function onRequestStart(id) {
-  const req = queue::shift();
-  if (req) start(req, id);
-}
-
-export function onRequestCallback(res) {
-  const req = idMap[res.id];
-  if (req) callback(req, res);
 }
 
 function reqAbort() {
@@ -86,9 +87,10 @@ function callback(req, res) {
 }
 
 function start(req, id) {
-  const { details } = req;
+  const { details, scriptId } = req;
   const payload = {
     id,
+    scriptId,
     anonymous: details.anonymous,
     method: details.method,
     url: details.url,
@@ -105,7 +107,7 @@ function start(req, id) {
     if (['arraybuffer', 'blob']::includes(responseType)) {
       payload.responseType = 'arraybuffer';
     } else if (!['json', 'text']::includes(responseType)) {
-      warn(`[Violentmonkey] Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
+      log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
   }
   encodeBody(details.data)

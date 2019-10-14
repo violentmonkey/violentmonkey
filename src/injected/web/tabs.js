@@ -3,6 +3,18 @@ import bridge from './bridge';
 let lastId = 0;
 const tabs = {};
 
+bridge.addHandlers({
+  TabClosed(key) {
+    const item = tabs[key];
+    if (item) {
+      item.closed = true;
+      const { onclose } = item;
+      if (onclose) onclose();
+      delete tabs[key];
+    }
+  },
+});
+
 export function onTabCreate(data) {
   lastId += 1;
   const key = lastId;
@@ -16,14 +28,4 @@ export function onTabCreate(data) {
   tabs[key] = item;
   bridge.post({ cmd: 'TabOpen', data: { key, data } });
   return item;
-}
-
-export function onTabClosed(key) {
-  const item = tabs[key];
-  if (item) {
-    item.closed = true;
-    const { onclose } = item;
-    if (onclose) onclose();
-    delete tabs[key];
-  }
 }
