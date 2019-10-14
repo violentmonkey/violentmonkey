@@ -37,6 +37,7 @@
 import { i18n } from '#/common';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
+import * as Hotkeys from '../utils/hotkeys';
 import Installed from './tab-installed';
 import Settings from './tab-settings';
 import About from './tab-about';
@@ -77,6 +78,7 @@ export default {
       document.title = title ? `${title} - ${extName}` : extName;
     },
     'store.route.paths'() {
+      Hotkeys.toggle(store.route.paths[0] === 'scripts' && !store.route.paths[1]);
       // First time showing the aside we need to tell v-if to keep it forever
       this.canRenderAside = true;
     },
