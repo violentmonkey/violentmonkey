@@ -36,7 +36,9 @@ export function unregister(component) {
 }
 
 function renderNextBatch() {
-  const count = Math.min(queue.length, batchSize);
+  // render at least 10 items in a theoretically possible case the main app init took more
+  // than MAX_BATCH_DURATION and the batchSize is 0
+  const count = Math.min(queue.length, Math.max(10, batchSize));
   for (let i = 0; i < count; i += 1) {
     queue[i].renderStage = 'check';
   }
