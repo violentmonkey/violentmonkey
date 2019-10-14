@@ -89,6 +89,12 @@ function getHandler(key) {
 ].forEach((key) => {
   CodeMirror.commands[key] = getHandler(key);
 });
+Object.assign(CodeMirror.keyMap.sublime, {
+  'Shift-Ctrl-/': 'commentSelection',
+});
+CodeMirror.commands.commentSelection = cm => {
+  cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
+};
 
 const cmOptions = {
   continueComments: true,
