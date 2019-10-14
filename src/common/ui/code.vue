@@ -90,6 +90,7 @@ function getHandler(key) {
   CodeMirror.commands[key] = getHandler(key);
 });
 Object.assign(CodeMirror.keyMap.sublime, {
+  Tab: 'indentMore',
   'Shift-Ctrl-/': 'commentSelection',
 });
 CodeMirror.commands.commentSelection = cm => {
