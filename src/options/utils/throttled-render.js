@@ -1,15 +1,20 @@
-const MAX_BATCH_DURATION = 200;
+const MAX_BATCH_DURATION = 150;
 /** @type ThrottledVue[] */
 const queue = [];
 let startTime = performance.now();
 let batchSize = 0;
+let maxBatchSize = 0;
 let timer = 0;
 
 /** @param { ThrottledVue } component */
 export function register(component) {
-  if (!startTime) startTime = performance.now();
+  // first run: calculate maxBatchSize as a number of items rendered within MAX_BATCH_DURATION
+  if (!maxBatchSize && !startTime) startTime = performance.now();
   if (component.renderStage === 'check') {
-    if (performance.now() - startTime < MAX_BATCH_DURATION) {
+    const show = maxBatchSize
+      ? batchSize < maxBatchSize
+      : performance.now() - startTime < MAX_BATCH_DURATION;
+    if (show) {
       batchSize += 1;
       component.renderStage = 'show';
       return false;
@@ -27,14 +32,15 @@ export function unregister(component) {
 }
 
 function renderNextBatch() {
-  const count = Math.min(queue.length, Math.max(10, batchSize));
+  const count = Math.min(queue.length, batchSize);
   for (let i = 0; i < count; i += 1) {
     queue[i].renderStage = 'check';
   }
   queue.splice(0, count);
   timer = queue.length && setTimeout(renderNextBatch);
-  startTime = 0;
+  maxBatchSize = Math.max(10, batchSize);
   batchSize = 0;
+  startTime = 0;
 }
 
 /**
