@@ -97,7 +97,7 @@ CodeMirror.commands.commentSelection = cm => {
   cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
 };
 
-const cmOptions = {
+export const cmOptions = {
   continueComments: true,
   styleActiveLine: true,
   foldGutter: true,

@@ -17,6 +17,9 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Confirm installation
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: Show editor state
 buttonDisable:
   description: Button to disable a script.
   message: Disable
@@ -118,8 +121,8 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Custom CodeMirror options in JSON object like {"indentUnit":2, "smartIndent":true}
-    however note that Violentmonkey doesn't support all of them.
+    Custom options for CodeMirror and addons in JSON object like {"indentUnit":2, "smartIndent":true}
+    however note that some of them may not work in Violentmonkey.
     Full list: https://codemirror.net/doc/manual.html#config
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
