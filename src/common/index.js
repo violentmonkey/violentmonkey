@@ -1,3 +1,5 @@
+import { noop } from './util';
+
 export * from './util';
 
 export function i18n(name, args) {
@@ -31,7 +33,8 @@ export function initHooks() {
   return { hook, fire };
 }
 
-export function sendMessage(payload) {
+export function sendMessage(payload, { retry } = {}) {
+  if (retry) return sendMessageRetry(payload);
   const promise = browser.runtime.sendMessage(payload)
   .then((res) => {
     const { data, error } = res || {};
@@ -42,6 +45,23 @@ export function sendMessage(payload) {
     if (process.env.DEBUG) console.warn(err);
   });
   return promise;
+}
+
+/**
+ * The active tab page and its [content] scripts load before the extension's
+ * persistent background script when Chrome starts with a URL via command line
+ * or when configured to restore the session, https://crbug.com/314686
+ */
+export async function sendMessageRetry(payload, retries = 10) {
+  const makePause = ms => new Promise(resolve => setTimeout(resolve, ms));
+  let pauseDuration = 10;
+  for (; retries > 0; retries -= 1) {
+    const data = await sendMessage(payload).catch(noop);
+    if (data) return data;
+    await makePause(pauseDuration);
+    pauseDuration *= 2;
+  }
+  throw new Error('Violentmonkey cannot connect to the background page.');
 }
 
 export function leftpad(input, length, pad = '0') {

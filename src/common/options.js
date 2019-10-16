@@ -3,7 +3,7 @@ import { objectGet, objectSet } from './object';
 
 let options = {};
 const hooks = initHooks();
-const ready = sendMessage({ cmd: 'GetAllOptions' })
+const ready = sendMessage({ cmd: 'GetAllOptions' }, { retry: true })
 .then((data) => {
   options = data;
   if (data) hooks.fire(data);

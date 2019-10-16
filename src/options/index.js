@@ -50,7 +50,7 @@ function initScript(script) {
 }
 
 function loadData() {
-  sendMessage({ cmd: 'GetData' })
+  sendMessage({ cmd: 'GetData' }, { retry: true })
   .then((data) => {
     const oldCache = store.cache || {};
     store.cache = data.cache;
