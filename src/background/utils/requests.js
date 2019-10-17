@@ -306,6 +306,12 @@ const blacklist = [
 const bypass = {};
 const extensionRoot = browser.runtime.getURL('/');
 
+browser.tabs.onCreated.addListener((tab) => {
+  if (/\.user\.js([?#]|$)/.test(tab.pendingUrl || tab.url)) {
+    cache.put(`autoclose:${tab.id}`, true, 1000);
+  }
+});
+
 browser.webRequest.onBeforeRequest.addListener((req) => {
   // onBeforeRequest fired for `file:`
   // - works on Chrome
@@ -334,6 +340,9 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
             // Chrome 79+ uses pendingUrl while the tab connects to the newly navigated URL
             from: tab && (tab.pendingUrl || tab.url),
           });
+          if (cache.has(`autoclose:${req.tabId}`)) {
+            browser.tabs.remove(req.tabId);
+          }
         } else {
           if (!bypass[url]) {
             bypass[url] = {
