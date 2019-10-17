@@ -2,7 +2,7 @@ import { getUniqId } from '#/common';
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import { bindEvents, sendMessage } from '../utils';
 import {
-  setJsonDump, objectKeys, filter, forEach, includes, append, createElement, setAttribute, noop,
+  setJsonDump, objectKeys, filter, forEach, includes, append, createElement, setAttribute,
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
@@ -22,25 +22,13 @@ export default async function initialize(contentId, webId) {
   bridge.post = bindEvents(contentId, webId, bridge.onHandle);
   bridge.destId = webId;
   setJsonDump({ native: true });
-  // The active web page tab and its content scripts load before the background script
-  // when Chrome starts with a URL (via command line or when configured to restore the session).
-  const makePause = ms => new Promise(resolve => setTimeout(resolve, ms));
-  let pauseDuration = 10;
-  let data;
-  const msg = {
+  const data = await sendMessage({
     cmd: 'GetInjected',
     data: {
       url: window.location.href,
       reset: IS_TOP,
     },
-  };
-  for (let retries = 10; retries > 0; retries -= 1) {
-    data = await sendMessage(msg).catch(noop);
-    if (data) break;
-    await makePause(pauseDuration);
-    pauseDuration *= 2;
-  }
-  if (!data) throw new Error('Violentmonkey cannot connect to the background page.');
+  }, { retry: true });
   const scriptLists = triageScripts(data);
   getPopup();
   setBadge();
