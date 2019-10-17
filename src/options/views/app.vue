@@ -78,7 +78,7 @@ export default {
       document.title = title ? `${title} - ${extName}` : extName;
     },
     'store.route.paths'() {
-      Hotkeys.toggle(store.route.paths[0] === 'scripts' && !store.route.paths[1]);
+      Hotkeys.routeChanged();
       // First time showing the aside we need to tell v-if to keep it forever
       this.canRenderAside = true;
     },

@@ -1,4 +1,9 @@
-export function toggle(enable) {
+import { route } from '#/common/router';
+
+routeChanged();
+
+export function routeChanged() {
+  const enable = !route.pathname || route.pathname === 'scripts';
   document[`${enable ? 'add' : 'remove'}EventListener`]('keydown', onKeyDown);
 }
 
