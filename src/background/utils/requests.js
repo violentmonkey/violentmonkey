@@ -1,6 +1,7 @@
 import {
   getUniqId, request, i18n, buffer2string,
 } from '#/common';
+import { isFirefox } from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
 import { getScriptByIdSync } from './db';
@@ -274,23 +275,18 @@ function decodeBody(obj) {
 //   types: ['xmlhttprequest'],
 // });
 
-export function confirmInstall(info) {
-  return (info.code
-    ? Promise.resolve(info.code)
-    : request(info.url).then(({ data }) => {
-      if (!isUserScript(data)) return Promise.reject(i18n('msgInvalidScript'));
-      return data;
-    })
-  )
-  .then((code) => {
-    cache.put(info.url, code, 3000);
-    const confirmKey = getUniqId();
-    cache.put(`confirm-${confirmKey}`, {
-      url: info.url,
-      from: info.from,
-    });
-    const optionsURL = browser.runtime.getURL('/confirm/index.html');
-    browser.tabs.create({ url: `${optionsURL}#${confirmKey}` });
+export async function confirmInstall(info, src = {}) {
+  const { url, from } = info;
+  const code = info.code || (await request(url)).data;
+  // TODO: display the error in UI
+  if (!isUserScript(code)) throw i18n('msgInvalidScript');
+  cache.put(url, code, 3000);
+  const confirmKey = getUniqId();
+  cache.put(`confirm-${confirmKey}`, { url, from });
+  browser.tabs.create({
+    url: `/confirm/index.html#${confirmKey}`,
+    index: src.tab ? src.tab.index + 1 : undefined,
+    ...src.tab && (!isFirefox || isFirefox >= 57) ? { openerTabId: src.tab.id } : {},
   });
 }
 
@@ -339,7 +335,7 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
             url,
             // Chrome 79+ uses pendingUrl while the tab connects to the newly navigated URL
             from: tab && (tab.pendingUrl || tab.url),
-          });
+          }, { tab });
           if (cache.has(`autoclose:${req.tabId}`)) {
             browser.tabs.remove(req.tabId);
           }
