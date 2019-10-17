@@ -51,6 +51,7 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/eclipse.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/comment/continuecomment';
+import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/fold/foldcode';
@@ -88,8 +89,15 @@ function getHandler(key) {
 ].forEach((key) => {
   CodeMirror.commands[key] = getHandler(key);
 });
+Object.assign(CodeMirror.keyMap.sublime, {
+  Tab: 'indentMore',
+  'Shift-Ctrl-/': 'commentSelection',
+});
+CodeMirror.commands.commentSelection = cm => {
+  cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
+};
 
-const cmOptions = {
+export const cmOptions = {
   continueComments: true,
   styleActiveLine: true,
   foldGutter: true,
