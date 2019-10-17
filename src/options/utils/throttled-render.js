@@ -5,7 +5,7 @@ const MAX_BATCH_DURATION = 150;
 const queue = [];
 // When script list is the initial navigation of this tab, startTime should start now
 // so that the first batch is rendered earlier to compensate for main app init
-let startTime = route.pathname === 'scripts' ? performance.now() : 0;
+let startTime = !route.pathname || route.pathname === 'scripts' ? performance.now() : 0;
 let batchSize = 0;
 let maxBatchSize = 0;
 let timer = 0;
