@@ -1,7 +1,7 @@
 import { INJECT_PAGE, INJECT_CONTENT, METABLOCK_RE } from '#/common/consts';
 import bridge from './bridge';
 import {
-  forEach, includes, match, objectKeys, map, defineProperties, filter, defineProperty,
+  forEach, includes, match, objectKeys, map, defineProperties, filter, defineProperty, slice,
 } from '../utils/helpers';
 import { createGmApiProps, propertyFromValue } from './gm-api';
 
@@ -47,7 +47,7 @@ export function wrapGM(script, code, cache) {
     };
   }
   const resources = script.meta.resources || {};
-  const gmInfo = {
+  const gmInfo = propertyFromValue({
     uuid: script.props.uuid,
     scriptMetaStr: code::match(METABLOCK_RE)[1] || '',
     scriptWillUpdate: !!script.config.shouldUpdate,
@@ -69,24 +69,33 @@ export function wrapGM(script, code, cache) {
       unwrap: false, // deprecated, always `false`
       version: script.meta.version || '',
     },
-  };
+  });
+  const gm4props = { info: gmInfo };
   const grantedProps = {
     unsafeWindow: propertyFromValue(unsafeWindow),
-    GM_info: propertyFromValue(gmInfo),
+    GM_info: gmInfo,
+    GM: propertyFromValue({}),
   };
   let selfData;
   if (!gmApi) gmApi = createGmApiProps();
   grant::forEach((name) => {
+    const gm4name = name::startsWith('GM.') && name::slice(3);
+    const gm4 = gmApi.gm4[gm4name];
+    if (gm4) name = `GM_${gm4.alias || gm4name}`;
     let prop = gmApi.boundProps[name];
     if (prop) {
       const gmFunction = prop.value;
       prop = { ...prop };
-      prop.value = (...args) => gmFunction.apply(selfData, args);
+      prop.value = gm4 && gm4.async
+        ? (async (...args) => gmFunction.apply(selfData, args))
+        : ((...args) => gmFunction.apply(selfData, args));
       selfData = true;
     } else {
       prop = gmApi.props[name];
     }
-    if (prop) grantedProps[name] = prop;
+    if (!prop) return;
+    if (gm4) gm4props[gm4name] = prop;
+    else grantedProps[name] = prop;
   });
   if (selfData) {
     selfData = {
@@ -98,6 +107,7 @@ export function wrapGM(script, code, cache) {
       urls: {},
     };
   }
+  defineProperties(grantedProps.GM.value, gm4props);
   return {
     thisObj,
     wrapper: defineProperties(gm, grantedProps),
