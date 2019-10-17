@@ -161,10 +161,10 @@ export default {
     },
     scriptIconUrl(item) {
       const { icon } = item.data.meta;
-      return (item.data.custom.pathMap || {})[icon] || icon || '';
+      return (item.data.custom.pathMap || {})[icon] || icon || null;
     },
     scriptIconError(event) {
-      event.target.src = '';
+      event.target.removeAttribute('src');
     },
     onToggle() {
       options.set('isApplied', !this.options.isApplied);
