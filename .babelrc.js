@@ -15,6 +15,6 @@ module.exports = {
     }],
   ],
   plugins: [
-    'transform-function-bind',
+    '@babel/plugin-proposal-function-bind',
   ],
 };
