@@ -46,6 +46,15 @@ exports.pages = {
   },
 };
 
+const splitVendor = name => ({
+  [name]: {
+    test: new RegExp(`node_modules[/\\\\]${name}`),
+    name: `public/lib/${name}`,
+    chunks: 'all',
+    priority: 100,
+  },
+});
+
 exports.devServer = false;
 exports.devtool = isProd ? false : 'inline-source-map';
 exports.optimization = {
@@ -55,6 +64,7 @@ exports.optimization = {
       common: {
         name: 'common',
         minChunks: 2,
+        enforce: true,
         chunks(chunk) {
           return ![
             'browser',
@@ -62,6 +72,9 @@ exports.optimization = {
           ].includes(chunk.name);
         },
       },
+      ...splitVendor('codemirror'),
+      ...splitVendor('tldjs'),
+      ...splitVendor('vue'),
     },
   },
 };
