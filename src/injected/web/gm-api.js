@@ -23,10 +23,11 @@ export function createGmApiProps() {
     GM_deleteValue(key) {
       const { id } = this;
       const values = loadValues(id);
-      dumpValue({
-        id, key, oldRaw: values[key],
-      });
+      const oldRaw = values[key];
       delete values[key];
+      dumpValue({
+        id, key, oldRaw,
+      });
     },
     GM_getValue(key, def) {
       const raw = loadValues(this.id)[key];
@@ -40,10 +41,11 @@ export function createGmApiProps() {
       const dumped = jsonDump(val);
       const raw = dumped ? `o${dumped}` : null;
       const values = loadValues(id);
-      dumpValue({
-        id, key, val, raw, oldRaw: values[key],
-      });
+      const oldRaw = values[key];
       values[key] = raw;
+      dumpValue({
+        id, key, val, raw, oldRaw,
+      });
     },
     /**
      * @callback GMValueChangeListener

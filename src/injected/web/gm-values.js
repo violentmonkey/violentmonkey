@@ -25,9 +25,10 @@ const dataDecoders = {
 bridge.addHandlers({
   UpdatedValues(updates) {
     objectKeys(updates)::forEach((id) => {
-      if (id in store.values) {
-        if (id in changeHooks) changedRemotely(id, updates);
+      const oldData = store.values[id];
+      if (oldData) {
         store.values[id] = updates[id];
+        if (id in changeHooks) changedRemotely(id, oldData, updates);
       }
     });
   },
@@ -74,9 +75,8 @@ function changedLocally(change) {
   }
 }
 
-function changedRemotely(id, updates) {
+function changedRemotely(id, oldData, updates) {
   const data = updates[id];
-  const oldData = loadValues(id);
   const keyHooks = changeHooks[id];
   // the remote id is a string, but all local data structures use a number
   id = +id;
