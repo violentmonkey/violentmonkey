@@ -1,11 +1,12 @@
 import {
-  getUniqId, request, i18n, buffer2string,
+  getUniqId, request, i18n, buffer2string, isEmpty,
 } from '#/common';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
 import { getScriptByIdSync } from './db';
 import { openerTabIdSupported } from './tabs';
 
+const VM_VERIFY = 'VM-Verify';
 const requests = {};
 const verify = {};
 const specialHeaders = [
@@ -34,6 +35,58 @@ const specialHeaders = [
   'via',
 ];
 // const tasks = {};
+const HeaderInjector = (() => {
+  const apiEvent = browser.webRequest.onBeforeSendHeaders;
+  /** @type chrome.webRequest.RequestFilter */
+  const apiFilter = {
+    urls: ['<all_urls>'],
+    types: ['xmlhttprequest'],
+    // -1 is browser.tabs.TAB_ID_NONE to limit the listener to requests from the bg script
+    tabId: -1,
+  };
+  const apiExtraOpts = [
+    'blocking',
+    'requestHeaders',
+    browser.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS,
+  ].filter(Boolean);
+  const headersToInject = {};
+  /** @param {chrome.webRequest.HttpHeader} header */
+  const isVmVerify = header => header.name === VM_VERIFY;
+  const isSendable = header => header.name !== VM_VERIFY;
+  const isSendableAnon = header => isSendable(header) && !/^cookie$/i.test(header.name);
+  /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
+  const onBeforeSendHeaders = ({ requestHeaders, requestId }) => {
+    // only the first call during a redirect/auth chain will have VM-Verify header
+    const reqId = requestHeaders.find(isVmVerify)?.value || verify[requestId];
+    const req = reqId && requests[reqId];
+    if (reqId && req) {
+      verify[requestId] = reqId;
+      req.coreId = requestId;
+      requestHeaders = requestHeaders
+      .concat(headersToInject[reqId] || [])
+      .filter(req.anonymous ? isSendableAnon : isSendable);
+    }
+    return { requestHeaders };
+  };
+  return {
+    add(reqId, headers) {
+      // need to set the entry even if it's empty [] so that 'if' check in del() runs only once
+      headersToInject[reqId] = headers;
+      // need the listener to get the requestId
+      if (!apiEvent.hasListener(onBeforeSendHeaders)) {
+        apiEvent.addListener(onBeforeSendHeaders, apiFilter, apiExtraOpts);
+      }
+    },
+    del(reqId) {
+      if (reqId in headersToInject) {
+        delete headersToInject[reqId];
+        if (isEmpty(headersToInject)) {
+          apiEvent.removeListener(onBeforeSendHeaders);
+        }
+      }
+    },
+  };
+})();
 
 export function getRequestId() {
   const id = getUniqId();
@@ -72,6 +125,7 @@ function xhrCallbackWrapper(req) {
       });
     }
     if (evt.type === 'loadend') clearRequest(req);
+    else if (xhr.readyState >= XMLHttpRequest.LOADING) HeaderInjector.del(req.id);
     lastPromise = lastPromise.then(() => {
       if (xhr.response && xhr.responseType === 'arraybuffer') {
         const contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream';
@@ -101,17 +155,18 @@ export function httpRequest(details, cb) {
   req.anonymous = details.anonymous;
   const { xhr } = req;
   try {
+    const vmHeaders = [];
     xhr.open(details.method, details.url, true, details.user || '', details.password || '');
-    xhr.setRequestHeader('VM-Verify', details.id);
+    xhr.setRequestHeader(VM_VERIFY, details.id);
     if (details.headers) {
-      Object.keys(details.headers).forEach((key) => {
-        const lowerKey = key.toLowerCase();
-        // `VM-` headers are reserved
-        if (lowerKey.startsWith('vm-')) return;
-        xhr.setRequestHeader(
-          isSpecialHeader(lowerKey) ? `VM-${key}` : key,
-          details.headers[key],
-        );
+      Object.entries(details.headers).forEach(([name, value]) => {
+        const lowerName = name.toLowerCase();
+        if (isSpecialHeader(lowerName)) {
+          vmHeaders.push({ name, value });
+        } else if (!lowerName.startsWith('vm-')) {
+          // `VM-` headers are reserved
+          xhr.setRequestHeader(name, value);
+        }
       });
     }
     if (details.timeout) xhr.timeout = details.timeout;
@@ -131,6 +186,7 @@ export function httpRequest(details, cb) {
     // req.finalUrl = details.url;
     const { data } = details;
     const body = data ? decodeBody(data) : null;
+    HeaderInjector.add(details.id, vmHeaders);
     xhr.send(body);
   } catch (e) {
     const { scriptId } = req;
@@ -141,6 +197,7 @@ export function httpRequest(details, cb) {
 function clearRequest(req) {
   if (req.coreId) delete verify[req.coreId];
   delete requests[req.id];
+  HeaderInjector.del(req.id);
 }
 
 export function abortRequest(id) {
@@ -186,62 +243,6 @@ function decodeBody(obj) {
 //   urls: ['<all_urls>'],
 //   types: ['xmlhttprequest'],
 // });
-
-// Modifications on headers
-{
-  function onBeforeSendHeaders(details) {
-    const headers = details.requestHeaders;
-    let newHeaders = [];
-    const vmHeaders = {};
-    headers.forEach((header) => {
-      // if (header.name === 'VM-Task') {
-      //   tasks[details.requestId] = header.value;
-      // } else
-      if (header.name.startsWith('VM-')) {
-        vmHeaders[header.name.slice(3)] = header.value;
-      } else {
-        newHeaders.push(header);
-      }
-    });
-    const reqId = vmHeaders.Verify;
-    if (reqId) {
-      const req = requests[reqId];
-      if (req) {
-        delete vmHeaders.Verify;
-        verify[details.requestId] = reqId;
-        req.coreId = details.requestId;
-        Object.keys(vmHeaders).forEach((name) => {
-          if (isSpecialHeader(name.toLowerCase())) {
-            newHeaders.push({ name, value: vmHeaders[name] });
-          }
-        });
-        if (req.anonymous) {
-          // Drop cookie in anonymous mode
-          newHeaders = newHeaders.filter(({ name }) => name.toLowerCase() !== 'cookie');
-        }
-      }
-    }
-    return { requestHeaders: newHeaders };
-  }
-  const filter = {
-    urls: ['<all_urls>'],
-    types: ['xmlhttprequest'],
-  };
-  try {
-    browser.webRequest.onBeforeSendHeaders.addListener(
-      onBeforeSendHeaders,
-      filter,
-      ['blocking', 'requestHeaders', 'extraHeaders'],
-    );
-  } catch {
-    // extraHeaders is supported since Chrome v72
-    browser.webRequest.onBeforeSendHeaders.addListener(
-      onBeforeSendHeaders,
-      filter,
-      ['blocking', 'requestHeaders'],
-    );
-  }
-}
 
 // tasks are not necessary now, turned off
 // Stop redirects
