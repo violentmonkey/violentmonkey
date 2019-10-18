@@ -26,9 +26,16 @@ import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
 import './utils/commands';
 
 const VM_VER = browser.runtime.getManifest().version;
+let isApplied;
+let injectInto;
 
 hookOptions((changes) => {
   if ('autoUpdate' in changes) autoUpdate();
+  if ('defaultInjectInto' in changes) injectInto = changes.defaultInjectInto;
+  if ('isApplied' in changes) {
+    isApplied = changes.isApplied;
+    togglePreinject(isApplied);
+  }
   if (SCRIPT_TEMPLATE in changes) resetScriptTemplate(changes);
   sendMessageOrIgnore({
     cmd: 'UpdateOptions',
@@ -92,23 +99,20 @@ const commands = {
       return data;
     });
   },
-  GetInjected({ url, reset }, src) {
-    const srcTab = src.tab || {};
-    if (reset && srcTab.id) resetValueOpener(srcTab.id);
+  async GetInjected({ url, reset }, src) {
+    const { id: tabId } = src.tab || {};
+    if (reset && tabId >= 0) resetValueOpener(tabId);
     const data = {
-      isApplied: getOption('isApplied'),
-      injectInto: getOption('defaultInjectInto'),
+      isApplied,
+      injectInto,
       version: VM_VER,
     };
-    if (!data.isApplied) return data;
-    const key = `getScriptsByURL:${url}`;
-    const cachedData = cache.get(key);
-    if (cachedData) cache.del(key);
-    return Promise.resolve(cachedData || getScriptsByURL(url))
-    .then((res) => {
-      addValueOpener(srcTab.id, Object.keys(res.values));
-      return Object.assign(data, res);
-    });
+    if (isApplied) {
+      const scripts = cache.get(`preinject:${url}`) || await getScriptsByURL(url);
+      addValueOpener(tabId, Object.keys(scripts.values));
+      Object.assign(data, scripts);
+    }
+    return data;
   },
   UpdateScriptInfo({ id, config }) {
     return updateScriptInfo(id, {
@@ -216,6 +220,24 @@ const commands = {
   TestBlacklist: testBlacklist,
 };
 
+function togglePreinject(enable) {
+  if (enable) {
+    browser.webRequest.onHeadersReceived.addListener(preinject, {
+      urls: ['*://*/*'],
+      types: ['main_frame', 'sub_frame'],
+    });
+  } else {
+    browser.webRequest.onHeadersReceived.removeListener(preinject);
+  }
+}
+
+async function preinject({ url }) {
+  const key = `preinject:${url}`;
+  if (!cache.has(key)) {
+    cache.put(key, await getScriptsByURL(url), 250);
+  }
+}
+
 initialize()
 .then(() => {
   browser.runtime.onMessage.addListener((req, src) => {
@@ -235,15 +257,9 @@ initialize()
     // undefined will be ignored
     return res || null;
   });
-  browser.webRequest.onHeadersReceived.addListener(async ({ url }) => {
-    const key = `getScriptsByURL:${url}`;
-    if (!cache.has(key)) {
-      cache.put(key, await getScriptsByURL(url), 250);
-    }
-  }, {
-    urls: ['*://*/*'],
-    types: ['main_frame', 'sub_frame'],
-  });
+  injectInto = getOption('defaultInjectInto');
+  isApplied = getOption('isApplied');
+  togglePreinject(isApplied);
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
   resetBlacklist();
