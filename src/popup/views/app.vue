@@ -68,7 +68,10 @@
             @click="onToggleScript(item)">
             <img class="script-icon" :src="scriptIconUrl(item)" @error="scriptIconError">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
-            <div class="flex-auto ellipsis" v-text="item.name" />
+            <div class="flex-auto ellipsis" v-text="item.name"
+                 @click.ctrl.exact.stop="onEditScript(item)"
+                 @contextmenu.exact.stop="onEditScript(item)"
+                 @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
           <div class="submenu-buttons">
             <div class="submenu-button" @click="onEditScript(item)">
