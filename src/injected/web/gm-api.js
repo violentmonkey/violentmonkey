@@ -1,4 +1,4 @@
-import { cache2blobUrl, getUniqId } from '#/common';
+import { cache2blobUrl, getUniqId, isEmpty } from '#/common';
 import { downloadBlob } from '#/common/download';
 import bridge from './bridge';
 import store from './store';
@@ -15,7 +15,6 @@ import {
 
 const { getElementById } = Document.prototype;
 const { lastIndexOf } = String.prototype;
-const { hasOwnProperty } = Object.prototype;
 
 export function createGmApiProps() {
   // these are bound to script data that we pass via |this|
@@ -242,13 +241,4 @@ function registerCallback(callback) {
     delete store.callbacks[callbackId];
   };
   return callbackId;
-}
-
-function isEmpty(obj) {
-  for (const key in obj) {
-    if (obj::hasOwnProperty(key)) {
-      return false;
-    }
-  }
-  return true;
 }
