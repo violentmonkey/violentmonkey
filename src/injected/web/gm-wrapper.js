@@ -207,6 +207,8 @@ function getWrapper() {
         modified = true;
         value = val;
       },
+      // Allow `defineProperty` and its family members
+      configurable: true,
     });
   }
 
