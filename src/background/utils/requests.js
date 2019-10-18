@@ -1,10 +1,10 @@
 import {
   getUniqId, request, i18n, buffer2string,
 } from '#/common';
-import { isFirefox } from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
 import { getScriptByIdSync } from './db';
+import { openerTabIdSupported } from './tabs';
 
 const requests = {};
 const verify = {};
@@ -286,7 +286,7 @@ export async function confirmInstall(info, src = {}) {
   browser.tabs.create({
     url: `/confirm/index.html#${confirmKey}`,
     index: src.tab ? src.tab.index + 1 : undefined,
-    ...src.tab && (!isFirefox || isFirefox >= 57) ? { openerTabId: src.tab.id } : {},
+    ...src.tab && openerTabIdSupported ? { openerTabId: src.tab.id } : {},
   });
 }
 
