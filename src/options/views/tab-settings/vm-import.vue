@@ -88,6 +88,10 @@ function getVMFile(entry, vmFile) {
           data.custom = more.custom;
           data.config = more.config || {};
           data.position = more.position;
+          data.props = {
+            lastModified: more.lastModified || +entry.lastModDate,
+            lastUpdated: more.lastUpdated || +entry.lastModDate,
+          };
           // Import data from older version
           if ('enabled' in more) data.config.enabled = more.enabled;
           if ('update' in more) data.config.shouldUpdate = more.update;
