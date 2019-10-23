@@ -81,9 +81,13 @@ function getWriter() {
 function addFile(writer, file) {
   return loadZip()
   .then(zip => new Promise((resolve) => {
-    writer.add(file.name, new zip.TextReader(file.content), () => {
-      resolve(writer);
-    });
+    writer.add(
+      file.name,
+      new zip.TextReader(file.content),
+      () => resolve(writer),
+      null,
+      { lastModDate: file.lastModDate },
+    );
   }));
 }
 
@@ -157,10 +161,13 @@ function exportData() {
         names[name] += 1;
         name = `${name}_${names[name]}`;
       } else names[name] = 1;
+      const { lastModified, lastUpdated } = script.props;
       const info = {
         custom: script.custom,
         config: script.config,
         position: script.props.position,
+        lastModified,
+        lastUpdated,
       };
       if (withValues) {
         // `values` are related to scripts by `props.id` in Violentmonkey,
@@ -172,6 +179,7 @@ function exportData() {
       return {
         name: `${name}.user.js`,
         content: code,
+        lastModDate: new Date(lastUpdated || lastModified),
       };
     });
     files.push({
