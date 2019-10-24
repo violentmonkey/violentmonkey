@@ -19,6 +19,9 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Confirmă instalarea
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: Afișează starea editorului
 buttonDisable:
   description: Button to disable a script.
   message: Dezactivează
@@ -42,7 +45,7 @@ buttonImportData:
   message: Importă din zip
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Instalează din URL
+  message: Instalează dintr-un URL
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Opțiuni
@@ -118,12 +121,19 @@ descCustomCSS:
     CSS personalizat pentru pagina cu opțiuni și pagina de instalare a
     scripturilor. Dacă nu ești sigur despre ce este vorba, te rugăm să nu
     editezi.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: >-
+    Opțiuni personalizate pentru CodeMirror și suplimente în obiecte JSON 
+    {"indentUnit":2, "smartIndent":true} Cu toate acestea, reține că unele 
+    dintre ele pot să nu funcționeze în Violentmonkey. Lista completă: 
+    https://codemirror.net/doc/manual.html#config
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadate personalizate
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Setările scriptului
+  message: Setări pentru script
 editNavCode:
   description: Label of code tab in script editor.
   message: Cod
@@ -147,18 +157,20 @@ extName:
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: ''
+  message: Trecut în lista neagră din setările Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: |-
+    Violentmonkey nu poate rula userscripturi în această pagină
+    (exemple uzuale: interfața de utilizare a browserului sau o extensie)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordinea alfabetică
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ordinea executărilor
+  message: ordinea executării
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: momentul ultimei actualizări
@@ -181,7 +193,7 @@ hintVacuum:
     cache.
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Instalează din $1
+  message: Instalează de pe $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Închide după instalare
@@ -250,10 +262,10 @@ labelEditor:
   message: Editor
 labelExclude:
   description: Label of @exclude rules.
-  message: Reguli @exclude
+  message: 'Reguli @exclude'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: Reguli @exclude-match
+  message: 'Reguli @exclude-match'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportă datele scripturilor
@@ -280,7 +292,7 @@ labelImportSettings:
   message: Importă setări
 labelInclude:
   description: Label of @include rules.
-  message: Reguli @include
+  message: 'Reguli @include'
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Unitate de indentare:'
@@ -304,7 +316,7 @@ labelLineWrapping:
   message: Desparte rândurile lungi
 labelMatch:
   description: Label of @match rules.
-  message: Reguli @match
+  message: 'Reguli @match'
 labelName:
   description: Label of script name.
   message: 'Nume:'
@@ -424,7 +436,7 @@ menuFindScripts:
   message: Găsește scripturi pentru acest site
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Scripturi care corespund paginii
+  message: Scripturi coincidente
 menuNewScript:
   description: Menu item to create a new script.
   message: Creează un script nou
@@ -481,8 +493,8 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Conflicte în namespace-ul scriptului! Te rugăm să modifici @name și
-    @namespace.
+    Conflicte în spațiul de nume al scriptului! Te rugăm să modifici @name
+    și @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -497,6 +509,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Stilul personalizat este actualizat.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: Opțiunile editorului sunt actualizate.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Șablonul personalizat pentru scripturi este actualizat.
