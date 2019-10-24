@@ -26,11 +26,13 @@ export function triageScripts(data) {
     [INJECT_CONTENT]: [],
   };
   if (data.scripts) {
-    data.scripts = data.scripts.filter((script) => {
-      bridge.ids.push(script.props.id);
-      if ((window.top === window || !script.meta.noframes) && script.config.enabled) {
-        bridge.enabledIds.push(script.props.id);
-        return true;
+    data.scripts = data.scripts.filter(({ meta, props, config }) => {
+      if (!meta.noframes || window.top === window) {
+        bridge.ids.push(props.id);
+        if (config.enabled) {
+          bridge.enabledIds.push(props.id);
+          return true;
+        }
       }
       return false;
     });
