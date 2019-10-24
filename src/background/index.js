@@ -99,9 +99,9 @@ const commands = {
       return data;
     });
   },
-  async GetInjected({ url, reset }, src) {
+  async GetInjected(url, src) {
     const { id: tabId } = src.tab || {};
-    if (reset && tabId >= 0) resetValueOpener(tabId);
+    if (src.frameId === 0) resetValueOpener(tabId);
     const data = {
       isApplied,
       injectInto,

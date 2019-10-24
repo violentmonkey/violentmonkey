@@ -4,7 +4,8 @@ export default {
   // ignoreGrant: false,
   lastUpdate: 0,
   lastModified: 0,
-  showBadge: 'unique', // '' | 'unique' | 'total'
+  /** @type 'unique' | 'total' | '' */
+  showBadge: 'unique',
   exportValues: true,
   closeAfterInstall: false,
   trackLocalFile: false,

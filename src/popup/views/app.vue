@@ -48,17 +48,18 @@
       v-if="failureReasonText"
       v-text="failureReasonText" />
     <div
-      v-if="store.injectable"
-      v-show="scripts.length"
+      v-for="scope in store.injectable && injectionScopes"
       class="menu menu-scripts"
-      :class="{expand: activeMenu === 'scripts'}">
-      <div class="menu-item menu-area menu-group" @click="toggleMenu('scripts')">
-        <div class="flex-auto" v-text="i18n('menuMatchedScripts')"></div>
+      :class="{ expand: activeMenu === scope.name }"
+      :data-type="scope.name"
+      :key="scope.name">
+      <div class="menu-item menu-area menu-group" @click="toggleMenu(scope.name)">
+        <div class="flex-auto" v-text="scope.title" :data-totals="scope.totals" />
         <icon name="arrow" class="icon-collapse"></icon>
       </div>
       <div class="submenu">
         <div
-          v-for="(item, index) in scripts"
+          v-for="(item, index) in scope.list"
           :key="index"
           :class="{ disabled: !item.data.config.enabled }"
           @mouseenter="message = item.name"
@@ -132,11 +133,27 @@ export default {
     };
   },
   computed: {
-    scripts() {
-      return this.store.scripts.map(script => ({
-        name: script.custom.name || getLocaleString(script.meta, 'name'),
-        data: script,
-      }));
+    injectionScopes() {
+      // returns "numEnabled / numTotal" or just "numTotal" if all are enabled
+      const getTotals = list => {
+        const numEnabled = list.reduce((num, script) => num + !!script.config.enabled, 0);
+        const numTotal = list.length;
+        return numEnabled < numTotal
+          ? `${numEnabled} / ${numTotal}`
+          : `${numTotal}`;
+      };
+      return [
+        ['scripts', i18n('menuMatchedScripts')],
+        ['frameScripts', i18n('menuMatchedFrameScripts')],
+      ].map(([name, title]) => this.store[name].length && {
+        name,
+        title,
+        list: this.store[name].map(script => ({
+          name: script.custom.name || getLocaleString(script.meta, 'name'),
+          data: script,
+        })),
+        totals: getTotals(this.store[name]),
+      }).filter(Boolean);
     },
     failureReason() {
       return [

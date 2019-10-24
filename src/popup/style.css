@@ -30,6 +30,12 @@ body {
   }
 }
 
+.page-popup {
+  /* hardcoded popup height in Chrome */
+  max-height: 600px;
+  overflow: hidden;
+}
+
 footer {
   height: 40px;
   line-height: 40px;
@@ -145,6 +151,9 @@ footer {
   }
   &-group {
     padding-left: $leftPaneWidth;
+    & [data-totals]::after {
+      content: ": " attr(data-totals);
+    }
   }
   &.expand {
     background: #fbfbfb;
@@ -221,5 +230,5 @@ footer {
 }
 
 .failure-reason {
-  padding: .75rem $itemPaddingX 0 $leftPaneWidth;
+  padding: .75rem $itemPaddingX .75rem $leftPaneWidth;
 }
