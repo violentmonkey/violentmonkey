@@ -45,6 +45,21 @@ test('debounce', (t) => {
   t.end();
 });
 
+test('debounce with invalid time', (t) => {
+  for (const time of [undefined, -100]) {
+    const log = [];
+    const fn = debounce((i) => {
+      log.push(i);
+    }, time);
+    for (let i = 0; i < 3; i += 1) {
+      fn(i);
+    }
+    mocker.clock.tick(500);
+    t.deepEqual(log, [2]);
+  }
+  t.end();
+});
+
 test('throttle', (t) => {
   const log = [];
   const fn = throttle((i) => {
@@ -60,5 +75,20 @@ test('throttle', (t) => {
     mocker.clock.tick(600);
   }
   t.deepEqual(log, [0, 3, 0, 1, 2]);
+  t.end();
+});
+
+test('throttle with invalid time', (t) => {
+  for (const time of [undefined, -100]) {
+    const log = [];
+    const fn = throttle((i) => {
+      log.push(i);
+    }, time);
+    for (let i = 0; i < 3; i += 1) {
+      fn(i);
+    }
+    mocker.clock.tick(500);
+    t.deepEqual(log, [0]);
+  }
   t.end();
 });

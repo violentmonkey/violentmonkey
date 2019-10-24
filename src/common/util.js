@@ -23,6 +23,7 @@ export function debounce(func, time) {
   let startTime;
   let timer;
   let callback;
+  time = Math.max(0, +time || 0);
   function checkTime() {
     timer = null;
     if (performance.now() >= startTime) callback();
@@ -46,13 +47,13 @@ export function debounce(func, time) {
 }
 
 export function throttle(func, time) {
-  let timer;
+  let lastTime = 0;
+  time = Math.max(0, +time || 0);
   function throttledFunction(...args) {
-    if (!timer) {
+    const now = performance.now();
+    if (lastTime + time < now) {
+      lastTime = now;
       func.apply(this, args);
-      timer = setTimeout(() => {
-        timer = null;
-      }, time);
     }
   }
   return throttledFunction;
