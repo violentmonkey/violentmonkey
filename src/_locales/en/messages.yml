@@ -431,6 +431,9 @@ menuFindScripts:
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Matched scripts
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: Sub-frames only scripts
 menuNewScript:
   description: Menu item to create a new script.
   message: Create a new script

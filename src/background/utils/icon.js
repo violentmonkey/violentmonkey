@@ -63,19 +63,18 @@ browser.tabs.onUpdated.addListener((tabId, info, tab) => {
   }
 });
 
-export function setBadge({ ids, reset }, src) {
-  const srcTab = src.tab || {};
-  let data = badges[srcTab.id];
-  if (data && data.blocked) return;
-  if (!data || reset) {
-    data = {
-      number: 0,
-      unique: 0,
-      idMap: {},
-    };
-    badges[srcTab.id] = data;
+export function setBadge(ids, src) {
+  const { id: tabId } = src.tab || {};
+  const data = badges[tabId] || {};
+  if (!data.idMap || src.frameId === 0) {
+    // 1) keeping data object to preserve data.blocked
+    // 2) 'total' and 'unique' must match showBadge in options-defaults.js
+    data.total = 0;
+    data.unique = 0;
+    data.idMap = {};
+    badges[tabId] = data;
   }
-  data.number += ids.length;
+  data.total += ids.length;
   if (ids) {
     ids.forEach((id) => {
       data.idMap[id] = 1;
@@ -83,23 +82,19 @@ export function setBadge({ ids, reset }, src) {
     data.unique = Object.keys(data.idMap).length;
   }
   browserAction.setBadgeBackgroundColor({
-    color: '#808',
-    tabId: srcTab.id,
+    color: data.blocked ? '#888' : '#808',
+    tabId,
   });
-  updateBadge(srcTab, data);
+  updateBadge(src.tab, data);
 }
 
 function updateBadge(tab, data = badges[tab.id]) {
-  if (!data) return;
-  let text;
-  if (!data.blocked) {
-    if (showBadge === 'total') text = data.number;
-    else if (showBadge) text = data.unique;
+  if (data) {
+    browserAction.setBadgeText({
+      text: `${data[showBadge] || ''}`,
+      tabId: tab.id,
+    });
   }
-  browserAction.setBadgeText({
-    text: `${text || ''}`,
-    tabId: tab.id,
-  });
 }
 
 // Chrome 79+ uses pendingUrl while the tab connects to the newly navigated URL

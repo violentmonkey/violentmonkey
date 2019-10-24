@@ -22,10 +22,7 @@ export default async function initialize(contentId, webId) {
   bridge.post = bindEvents(contentId, webId, bridge.onHandle);
   bridge.destId = webId;
   setJsonDump({ native: true });
-  const data = await sendCmd('GetInjected', {
-    url: window.location.href,
-    reset: IS_TOP,
-  }, null, { retry: true });
+  const data = await sendCmd('GetInjected', window.location.href, { retry: true });
   const scriptLists = triageScripts(data);
   getPopup();
   setBadge();
@@ -102,17 +99,11 @@ bridge.addHandlers({
 });
 
 function getPopup() {
-  // XXX: only scripts run in top level window are counted
-  if (IS_TOP) {
-    sendCmd('SetPopup', { ids: bridge.ids, menus });
-  }
+  sendCmd('SetPopup', { ids: bridge.ids, menus });
 }
 
-function setBadge() {
+async function setBadge() {
   // delay setBadge in frames so that they can be added to the initial count
-  new Promise(resolve => setTimeout(resolve, IS_TOP ? 0 : 300))
-  .then(() => sendCmd('SetBadge', {
-    ids: bridge.enabledIds,
-    reset: IS_TOP,
-  }));
+  if (!IS_TOP) await new Promise(resolve => setTimeout(resolve, 300));
+  sendCmd('SetBadge', bridge.enabledIds);
 }

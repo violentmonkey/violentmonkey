@@ -17,18 +17,36 @@ const vm = new Vue({
 .$mount();
 document.body.append(vm.$el);
 
+const allScriptIds = [];
+// SetPopup from a sub-frame may come first so we need to wait for the main page
+// because we only show the iframe menu for unique scripts that don't run in the main page
+const mutex = {};
+mutex.ready = new Promise(resolve => {
+  mutex.resolve = resolve;
+  // pages like Chrome Web Store may forbid injection in main page so we need a timeout
+  setTimeout(resolve, 100);
+});
+
 Object.assign(handlers, {
-  SetPopup(data, src) {
+  async SetPopup(data, src) {
     if (store.currentTab.id !== src.tab.id) return;
-    store.commands = Object.entries(data.menus)
-    .reduce((map, [id, values]) => {
-      map[id] = Object.keys(values).sort();
-      return map;
-    }, {});
-    sendCmd('GetMetas', data.ids)
-    .then((scripts) => {
-      store.scripts = scripts;
-    });
+    const isTop = src.frameId === 0;
+    const ids = isTop
+      ? data.ids
+      : (await mutex.ready, data.ids.filter(id => !allScriptIds.includes(id)));
+    allScriptIds.push(...ids);
+    if (isTop) {
+      mutex.resolve();
+      store.commands = Object.entries(data.menus)
+      .reduce((map, [id, values]) => {
+        map[id] = Object.keys(values).sort();
+        return map;
+      }, {});
+    }
+    if (ids.length) {
+      // frameScripts may be appended multiple times if iframes have unique scripts
+      store[isTop ? 'scripts' : 'frameScripts'].push(...await sendCmd('GetMetas', ids));
+    }
   },
 });
 
