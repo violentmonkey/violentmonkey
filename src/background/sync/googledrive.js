@@ -101,9 +101,9 @@ const GoogleDrive = BaseService.extend({
       .then(data => JSON.parse(data))
       .catch(err => this.handleMetaError(err))
       .then(data => Object.assign({}, metaItem, {
-        data,
-        uri: null,
         name: this.metaFile,
+        uri: null,
+        data,
       }));
       return Promise.all([gotMeta, remoteData, this.getLocalData()]);
     });
