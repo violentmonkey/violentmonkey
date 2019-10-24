@@ -1,5 +1,5 @@
 import { getFullUrl } from '#/common';
-import { sendMessage } from '../utils';
+import { sendCmd } from '../utils';
 import bridge from './bridge';
 
 const tabIds = {};
@@ -9,7 +9,7 @@ const realms = {};
 bridge.addHandlers({
   TabOpen({ key, data }, realm) {
     data.url = getFullUrl(data.url, window.location.href);
-    sendMessage({ cmd: 'TabOpen', data })
+    sendCmd('TabOpen', data)
     .then(({ id }) => {
       tabIds[key] = id;
       tabKeys[id] = key;
@@ -20,7 +20,7 @@ bridge.addHandlers({
     const id = tabIds[key];
     // !key => close current tab
     // id => close tab by id
-    if (!key || id) sendMessage({ cmd: 'TabClose', data: { id } });
+    if (!key || id) sendCmd('TabClose', { id });
   },
 });
 

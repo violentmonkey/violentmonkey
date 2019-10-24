@@ -1,5 +1,5 @@
 import { isFirefox } from '#/common/ua';
-import { sendMessage } from '../utils';
+import { sendCmd } from '../utils';
 import { addEventListener, logging } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -18,7 +18,7 @@ bridge.addHandlers({
       // The dirty way will create a <textarea> element in web page and change the selection.
       setClipboard(data);
     } else {
-      sendMessage({ cmd: 'SetClipboard', data });
+      sendCmd('SetClipboard', data);
     }
   },
 });

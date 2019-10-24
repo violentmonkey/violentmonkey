@@ -1,11 +1,11 @@
-import { sendMessage } from '../utils';
+import { sendCmd, sendMessage } from '../utils';
 import bridge from './bridge';
 
 const requests = {};
 
 bridge.addHandlers({
   GetRequestId(_, realm) {
-    sendMessage({ cmd: 'GetRequestId' })
+    sendCmd('GetRequestId')
     .then((id) => {
       requests[id] = realm;
       bridge.post({ cmd: 'GotRequestId', data: id, realm });

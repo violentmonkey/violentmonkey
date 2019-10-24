@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { i18n, sendMessage } from '#/common';
+import { i18n, sendCmd } from '#/common';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import handlers from '#/common/handlers';
 import * as tld from '#/common/tld';
@@ -25,10 +25,7 @@ Object.assign(handlers, {
       map[id] = Object.keys(values).sort();
       return map;
     }, {});
-    sendMessage({
-      cmd: 'GetMetas',
-      data: data.ids,
-    })
+    sendCmd('GetMetas', data.ids)
     .then((scripts) => {
       store.scripts = scripts;
     });
@@ -36,7 +33,7 @@ Object.assign(handlers, {
 });
 
 browser.tabs.query({ currentWindow: true, active: true })
-.then((tabs) => {
+.then(async (tabs) => {
   const currentTab = {
     id: tabs[0].id,
     url: tabs[0].url,
@@ -51,9 +48,6 @@ browser.tabs.query({ currentWindow: true, active: true })
   if (!INJECTABLE_TAB_URL_RE.test(currentTab.url)) {
     store.injectable = false;
   } else {
-    sendMessage({ cmd: 'TestBlacklist', data: currentTab.url })
-    .then((blocked) => {
-      if (blocked) store.blacklisted = true;
-    });
+    store.blacklisted = await sendCmd('TestBlacklist', currentTab.url);
   }
 });

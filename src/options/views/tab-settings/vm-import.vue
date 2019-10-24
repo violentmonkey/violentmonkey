@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { i18n, sendMessage } from '#/common';
+import { i18n, sendCmd } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
 import loadZip from '#/common/zip';
@@ -47,7 +47,7 @@ export default {
     vacuum() {
       this.vacuuming = true;
       this.labelVacuum = this.i18n('buttonVacuuming');
-      sendMessage({ cmd: 'Vacuum' })
+      sendCmd('Vacuum')
       .then(() => {
         this.vacuuming = false;
         this.labelVacuum = this.i18n('buttonVacuumed');
@@ -97,10 +97,7 @@ function getVMFile(entry, vmFile) {
           if ('update' in more) data.config.shouldUpdate = more.update;
         }
       }
-      sendMessage({
-        cmd: 'ParseScript',
-        data,
-      })
+      sendCmd('ParseScript', data)
       .then(() => resolve(true), () => resolve());
     });
   }));
@@ -152,17 +149,14 @@ function importData(file) {
     .then((count) => {
       forEachItem(vm.values, (valueStore, key) => {
         if (valueStore) {
-          sendMessage({
-            cmd: 'SetValueStore',
-            data: {
-              where: { uri: key },
-              valueStore,
-            },
+          sendCmd('SetValueStore', {
+            where: { uri: key },
+            valueStore,
           });
         }
       });
       showMessage({ text: i18n('msgImported', [count]) });
-      sendMessage({ cmd: 'CheckPosition' });
+      sendCmd('CheckPosition');
     });
   });
 }

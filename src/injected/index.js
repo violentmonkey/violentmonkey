@@ -1,4 +1,4 @@
-import { getUniqId, sendMessage } from './utils';
+import { getUniqId, sendCmd } from './utils';
 import { addEventListener, match } from './utils/helpers';
 import initialize from './content';
 
@@ -25,17 +25,14 @@ import initialize from './content';
   function checkJS() {
     if (!document::querySelector('title')) {
       // plain text
-      sendMessage({
-        cmd: 'ConfirmInstall',
-        data: {
-          code: document.body.textContent,
-          url: window.location.href,
-          from: document.referrer,
-        },
+      sendCmd('ConfirmInstall', {
+        code: document.body.textContent,
+        url: window.location.href,
+        from: document.referrer,
       })
       .then(() => {
         if (window.history.length > 1) window.history::go(-1);
-        else sendMessage({ cmd: 'TabClose' });
+        else sendCmd('TabClose');
       });
     }
   }

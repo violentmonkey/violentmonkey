@@ -103,7 +103,7 @@
 import Dropdown from 'vueleton/lib/dropdown/bundle';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import {
-  i18n, sendMessage, debounce,
+  i18n, sendCmd, debounce,
 } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
@@ -242,7 +242,7 @@ export default {
       this.debouncedUpdate();
     },
     updateAll() {
-      sendMessage({ cmd: 'CheckUpdateAll' });
+      sendCmd('CheckUpdateAll');
     },
     installFromURL() {
       new Promise((resolve, reject) => {
@@ -263,7 +263,7 @@ export default {
         });
       })
       .then((url) => {
-        if (url && url.includes('://')) return sendMessage({ cmd: 'ConfirmInstall', data: { url } });
+        if (url && url.includes('://')) return sendCmd('ConfirmInstall', { url });
       })
       .catch((err) => {
         if (err) showMessage({ text: err });
@@ -271,12 +271,9 @@ export default {
     },
     moveScript(data) {
       if (data.from === data.to) return;
-      sendMessage({
-        cmd: 'Move',
-        data: {
-          id: this.scripts[data.from].props.id,
-          offset: data.to - data.from,
-        },
+      sendCmd('Move', {
+        id: this.scripts[data.from].props.id,
+        offset: data.to - data.from,
       })
       .then(() => {
         const { scripts } = this;

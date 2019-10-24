@@ -1,6 +1,6 @@
 import { getUniqId } from '#/common';
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
-import { bindEvents, sendMessage } from '../utils';
+import { bindEvents, sendCmd, sendMessage } from '../utils';
 import {
   setJsonDump, objectKeys, filter, forEach, includes, append, createElement, setAttribute,
 } from '../utils/helpers';
@@ -22,13 +22,10 @@ export default async function initialize(contentId, webId) {
   bridge.post = bindEvents(contentId, webId, bridge.onHandle);
   bridge.destId = webId;
   setJsonDump({ native: true });
-  const data = await sendMessage({
-    cmd: 'GetInjected',
-    data: {
-      url: window.location.href,
-      reset: IS_TOP,
-    },
-  }, { retry: true });
+  const data = await sendCmd('GetInjected', {
+    url: window.location.href,
+    reset: IS_TOP,
+  }, null, { retry: true });
   const scriptLists = triageScripts(data);
   getPopup();
   setBadge();
@@ -97,7 +94,7 @@ bridge.addHandlers({
     bridge.post({ cmd: 'Callback', data: { callbackId, payload: styleId }, realm });
   },
   CheckScript({ name, namespace, callback }, realm) {
-    sendMessage({ cmd: 'CheckScript', data: { name, namespace } })
+    sendCmd('CheckScript', { name, namespace })
     .then((result) => {
       bridge.post({ cmd: 'ScriptChecked', data: { callback, result }, realm });
     });
@@ -107,21 +104,15 @@ bridge.addHandlers({
 function getPopup() {
   // XXX: only scripts run in top level window are counted
   if (IS_TOP) {
-    sendMessage({
-      cmd: 'SetPopup',
-      data: { ids: bridge.ids, menus },
-    });
+    sendCmd('SetPopup', { ids: bridge.ids, menus });
   }
 }
 
 function setBadge() {
   // delay setBadge in frames so that they can be added to the initial count
   new Promise(resolve => setTimeout(resolve, IS_TOP ? 0 : 300))
-  .then(() => sendMessage({
-    cmd: 'SetBadge',
-    data: {
-      ids: bridge.enabledIds,
-      reset: IS_TOP,
-    },
+  .then(() => sendCmd('SetBadge', {
+    ids: bridge.enabledIds,
+    reset: IS_TOP,
   }));
 }
