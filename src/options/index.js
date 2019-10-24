@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import {
-  sendMessage, i18n, getLocaleString, cache2blobUrl,
+  sendCmd, i18n, getLocaleString, cache2blobUrl,
 } from '#/common';
 import handlers from '#/common/handlers';
 import loadZip from '#/common/zip';
@@ -50,7 +50,7 @@ function initScript(script) {
 }
 
 function loadData() {
-  sendMessage({ cmd: 'GetData' }, { retry: true })
+  sendCmd('GetData', null, { retry: true })
   .then((data) => {
     const oldCache = store.cache || {};
     store.cache = data.cache;

@@ -1,5 +1,5 @@
 import { isFirefox } from '#/common/ua';
-import { getUniqId, sendMessage } from '#/common';
+import { getUniqId, sendCmd } from '#/common';
 import { INJECT_PAGE, INJECT_CONTENT, INJECT_AUTO } from '#/common/consts';
 import { attachFunction } from '../utils';
 import bridge from './bridge';
@@ -137,10 +137,7 @@ function injectScript(data) {
     `,"${vCallbackId}");`,
   ];
   if (mode === INJECT_CONTENT) {
-    sendMessage({
-      cmd: 'InjectScript',
-      data: injectedCode::join(''),
-    });
+    sendCmd('InjectScript', injectedCode::join(''));
   } else {
     const name = encodeURIComponent(scriptName::replace(/[#/]/g, ''));
     inject(injectedCode, browser.extension.getURL(`${name}.user.js#${scriptId}`));

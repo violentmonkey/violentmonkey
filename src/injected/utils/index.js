@@ -3,7 +3,7 @@ import { jsonDump, jsonLoad, addEventListener } from './helpers';
 
 export { getUniqId, jsonDump };
 export {
-  sendMessage, request, throttle, cache2blobUrl,
+  sendCmd, sendMessage, request, throttle, cache2blobUrl,
 } from '#/common';
 
 const { CustomEvent } = global;

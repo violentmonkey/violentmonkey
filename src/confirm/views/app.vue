@@ -37,7 +37,7 @@
 <script>
 import Dropdown from 'vueleton/lib/dropdown/bundle';
 import {
-  sendMessage, leftpad, request, buffer2string, isRemote, getFullUrl,
+  sendCmd, leftpad, request, buffer2string, isRemote, getFullUrl,
 } from '#/common';
 import options from '#/common/options';
 import initCache from '#/common/cache';
@@ -77,12 +77,7 @@ export default {
     .then(() => {
       const id = route.paths[0];
       this.guard = setInterval(() => {
-        sendMessage({
-          cmd: 'CacheHit',
-          data: {
-            key: `confirm-${id}`,
-          },
-        });
+        sendCmd('CacheHit', { key: `confirm-${id}` });
       }, 5000);
     }, () => {
       this.close();
@@ -100,10 +95,7 @@ export default {
   methods: {
     loadInfo() {
       const id = route.paths[0];
-      return sendMessage({
-        cmd: 'CacheLoad',
-        data: `confirm-${id}`,
-      })
+      return sendCmd('CacheLoad', `confirm-${id}`)
       .then((info) => {
         if (!info) return Promise.reject();
         this.info = info;
@@ -119,10 +111,7 @@ export default {
       });
     },
     parseMeta() {
-      return sendMessage({
-        cmd: 'ParseMeta',
-        data: this.code,
-      })
+      return sendCmd('ParseMeta', this.code)
       .then((script) => {
         const urls = Object.keys(script.resources)
         .map(key => script.resources[key]);
@@ -169,7 +158,7 @@ export default {
       });
     },
     close() {
-      sendMessage({ cmd: 'TabClose' });
+      sendCmd('TabClose');
     },
     getFile(url, { isBlob, useCache } = {}) {
       const cacheKey = isBlob ? `blob+${url}` : `text+${url}`;
@@ -186,10 +175,7 @@ export default {
       });
     },
     getScript(url) {
-      return sendMessage({
-        cmd: 'CacheLoad',
-        data: url,
-      })
+      return sendCmd('CacheLoad', url)
       .then(text => text || Promise.reject())
       .catch(() => this.getFile(url))
       .catch(() => {
@@ -203,15 +189,12 @@ export default {
     },
     installScript() {
       this.installable = false;
-      sendMessage({
-        cmd: 'ParseScript',
-        data: {
-          code: this.code,
-          url: this.info.url,
-          from: this.info.from,
-          require: this.require,
-          resources: this.resources,
-        },
+      sendCmd('ParseScript', {
+        code: this.code,
+        url: this.info.url,
+        from: this.info.from,
+        require: this.require,
+        resources: this.resources,
       })
       .then((result) => {
         this.message = `${result.update.message}[${this.getTimeString()}]`;

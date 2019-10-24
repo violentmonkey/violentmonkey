@@ -105,7 +105,7 @@
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import options from '#/common/options';
-import { getLocaleString, i18n, sendMessage } from '#/common';
+import { getLocaleString, i18n, sendCmd } from '#/common';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 
@@ -203,12 +203,9 @@ export default {
     onToggleScript(item) {
       const { data } = item;
       const enabled = !data.config.enabled;
-      sendMessage({
-        cmd: 'UpdateScriptInfo',
-        data: {
-          id: data.props.id,
-          config: { enabled },
-        },
+      sendCmd('UpdateScriptInfo', {
+        id: data.props.id,
+        config: { enabled },
       })
       .then(() => {
         data.config.enabled = enabled;
@@ -221,12 +218,9 @@ export default {
     onCreateScript() {
       const { currentTab, domain } = this.store;
       (domain ? (
-        sendMessage({
-          cmd: 'CacheNewScript',
-          data: {
-            url: currentTab.url.split('#')[0].split('?')[0],
-            name: `- ${domain}`,
-          },
+        sendCmd('CacheNewScript', {
+          url: currentTab.url.split('#')[0].split('?')[0],
+          name: `- ${domain}`,
         })
       ) : Promise.resolve())
       .then((id) => {

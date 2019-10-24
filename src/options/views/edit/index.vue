@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import { i18n, sendMessage, noop } from '#/common';
+import { i18n, sendCmd, noop } from '#/common';
 import { objectGet } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import { route } from '#/common/router';
@@ -140,14 +140,8 @@ export default {
   mounted() {
     const id = objectGet(this.script, 'props.id');
     (id
-      ? sendMessage({
-        cmd: 'GetScriptCode',
-        data: id,
-      })
-      : sendMessage({
-        cmd: 'NewScript',
-        data: route.paths[2],
-      })
+      ? sendCmd('GetScriptCode', id)
+      : sendCmd('NewScript', route.paths[2])
       .then(({ script, code }) => {
         this.script = script;
         return code;
@@ -208,19 +202,16 @@ export default {
         excludeMatch: toList(rawCustom.excludeMatch),
       });
       const id = objectGet(this.script, 'props.id');
-      return sendMessage({
-        cmd: 'ParseScript',
-        data: {
-          id,
-          custom,
-          config,
-          code: this.code,
-          // User created scripts MUST be marked `isNew` so that
-          // the backend is able to check namespace conflicts,
-          // otherwise the script with same namespace will be overridden
-          isNew: !id,
-          message: '',
-        },
+      return sendCmd('ParseScript', {
+        id,
+        custom,
+        config,
+        code: this.code,
+        // User created scripts MUST be marked `isNew` so that
+        // the backend is able to check namespace conflicts,
+        // otherwise the script with same namespace will be overridden
+        isNew: !id,
+        message: '',
       })
       .then((res) => {
         this.canSave = false;

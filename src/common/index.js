@@ -33,6 +33,10 @@ export function initHooks() {
   return { hook, fire };
 }
 
+export function sendCmd(cmd, data, options) {
+  return sendMessage({ cmd, data }, options);
+}
+
 export function sendMessage(payload, { retry } = {}) {
   if (retry) return sendMessageRetry(payload);
   const promise = browser.runtime.sendMessage(payload)

@@ -25,7 +25,7 @@
 
 <script>
 import Modal from 'vueleton/lib/modal/bundle';
-import { sendMessage, getLocaleString } from '#/common';
+import { sendCmd, getLocaleString } from '#/common';
 import { objectGet } from '#/common/object';
 import options from '#/common/options';
 import { isFirefox } from '#/common/ua';
@@ -141,11 +141,8 @@ function normalizeFilename(name) {
 
 function exportData() {
   const withValues = options.get('exportValues');
-  return sendMessage({
-    cmd: 'ExportZip',
-    data: {
-      values: withValues,
-    },
+  return sendCmd('ExportZip', {
+    values: withValues,
   })
   .then((data) => {
     const names = {};

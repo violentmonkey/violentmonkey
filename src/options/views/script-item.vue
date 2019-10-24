@@ -94,7 +94,7 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { sendMessage, getLocaleString, formatTime } from '#/common';
+import { sendCmd, getLocaleString, formatTime } from '#/common';
 import { objectGet } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import { store, throttledRender } from '../utils';
@@ -211,12 +211,9 @@ export default {
       this.$emit('edit', this.script.props.id);
     },
     markRemoved(removed) {
-      sendMessage({
-        cmd: 'MarkRemoved',
-        data: {
-          id: this.script.props.id,
-          removed,
-        },
+      sendCmd('MarkRemoved', {
+        id: this.script.props.id,
+        removed,
       });
     },
     onRemove() {
@@ -228,21 +225,15 @@ export default {
       this.markRemoved(0);
     },
     onEnable() {
-      sendMessage({
-        cmd: 'UpdateScriptInfo',
-        data: {
-          id: this.script.props.id,
-          config: {
-            enabled: this.script.config.enabled ? 0 : 1,
-          },
+      sendCmd('UpdateScriptInfo', {
+        id: this.script.props.id,
+        config: {
+          enabled: this.script.config.enabled ? 0 : 1,
         },
       });
     },
     onUpdate() {
-      sendMessage({
-        cmd: 'CheckUpdate',
-        data: this.script.props.id,
-      });
+      sendCmd('CheckUpdate', this.script.props.id);
     },
     onDragStart(e) {
       const el = e.currentTarget;
