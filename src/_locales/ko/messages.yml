@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: 저장
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: 지원 페이지
@@ -113,6 +116,9 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: 옵션 페이지와 스크립트 설치 페이지를 위한 커스텀 CSS입니다. 만약 이게 뭔지 모르신다면 수정하지 마세요.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: 커스텀 메타데이터
@@ -277,6 +283,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: ''
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: ''
@@ -295,6 +302,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: ''
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match 규칙'
@@ -415,6 +423,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 이 사이트를 위한 스크립트 찾기
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: 일치하는 스크립트들
@@ -463,6 +474,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: 불러오는 중 ...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: 스크립트 데이터를 불러오는 중...
@@ -488,6 +500,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: 커스텀 스타일 업데이트됨.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: ''

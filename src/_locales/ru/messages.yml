@@ -83,6 +83,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Сохранить
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: Страница поддержки
@@ -118,6 +121,9 @@ descCustomCSS:
   message: >-
     Пользовательский CSS для страницы настроек и страницы установки скрипта.
     Если Вы не знаете, что это такое, пожалуйста, не редактируйте его.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Пользовательские meta-данные
@@ -286,6 +292,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: Ширина отступа
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: Режим иньекции по умолчанию
@@ -304,6 +311,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Переносить длинные строки
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Правило @соответствия
@@ -424,6 +432,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Найти скрипты для сайта
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Совпадающие скрипты
@@ -472,6 +483,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Загрузка...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Загрузка данных скрипта...
@@ -497,6 +509,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Шаблон пользовательского стиля сохранен.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Шаблон пользовательского стиля обновлен.

@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: ''
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: ''
@@ -112,6 +115,9 @@ descBlacklist:
   message: ''
 descCustomCSS:
   description: Description of custom CSS section.
+  message: ''
+descEditorOptions:
+  description: Description of editor options JSON section.
   message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
@@ -279,6 +285,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: ''
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: ''
@@ -297,6 +304,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: ''
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Правила подударања
@@ -417,6 +425,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Пронађи скрипте за овај сајт
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: ''
@@ -465,6 +476,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Учитавање...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Учитавање скрипте...
@@ -489,6 +501,9 @@ msgSavedBlacklist:
   message: ''
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
+  message: ''
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
   message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.

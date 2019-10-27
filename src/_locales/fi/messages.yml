@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Tallenna
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: Tukisivu
@@ -115,6 +118,9 @@ descCustomCSS:
   message: >-
     Oma tyyli asetussivua ja skriptien asennussivua varten. Jos et ole varma,
     mitä olet tekemässä, älä muokkaa tätä.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Oma metadata
@@ -279,6 +285,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: Sisennysyksikkö
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: ''
@@ -297,6 +304,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Rivitä pitkät rivit
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match-säännöt'
@@ -417,6 +425,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Etsi skriptejä tälle sivustolle
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Täsmäävät skriptit
@@ -465,6 +476,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Ladataan ...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Ladataan skriptidataa...
@@ -492,6 +504,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Oma tyyli päivitetty.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Oma skriptipohja on päivitetty.

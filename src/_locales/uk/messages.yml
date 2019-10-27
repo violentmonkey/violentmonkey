@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Зберегти
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: Сторінка підтримки
@@ -117,6 +120,9 @@ descCustomCSS:
   message: >-
     Користувацькі стилі CSS для сторінки Налаштування і сторінки  встановлення
     скриптів. Якщо Ви не знаєте, що це, будь ласка, не редагуйте цей текст.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Користувацькі meta-дані
@@ -283,6 +289,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: ''
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: ''
@@ -301,6 +308,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: ''
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: 'Застосовувати на (правила збігів @match):'
@@ -421,6 +429,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Знайти скрипти для сайту
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Співпадаючі скрипти
@@ -469,6 +480,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Завантаження...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Завантаження скрипта...
@@ -494,6 +506,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Користувацькі стилі CSS збережено.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: ''

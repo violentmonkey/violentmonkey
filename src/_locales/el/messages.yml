@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Αποθήκευση
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: Βοήθεια
@@ -117,6 +120,9 @@ descCustomCSS:
   message: >-
     'Προσαρμοσμένη CSS για την σελίδα των επιλογών και την σελίδα εγκατάστασης
     σεναρίων. Αν δεν είστε σίγουρος(η) τι είναι αυτό, παρακαλώ μην το αλλάξετε.'
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Προσαρμοσμένα μεταδεδομένα
@@ -285,6 +291,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: ''
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: ''
@@ -303,6 +310,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: ''
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Κανόνες @match
@@ -423,6 +431,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Βρείτε σενάρια γι᾽ αυτήν την σελίδα
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Σενάρια που ταιριάζουν
@@ -471,6 +482,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Φόρτωση ...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Φόρτωση δεδομένων σεναρίου...
@@ -498,6 +510,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Το προσαρμοσμένο στυλ ενημερώθηκε.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: ''

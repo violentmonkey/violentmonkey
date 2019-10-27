@@ -17,9 +17,6 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Confirm installation
-buttonShowEditorState:
-  description: Button to show the list of currently used CodeMirror options.
-  message: Show editor state
 buttonDisable:
   description: Button to disable a script.
   message: Disable
@@ -83,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Save
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: Show editor state
 buttonSupport:
   description: Button to open support page.
   message: Support page
@@ -121,9 +121,10 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Custom options for CodeMirror and addons in JSON object like {"indentUnit":2, "smartIndent":true}
-    however note that some of them may not work in Violentmonkey.
-    Full list: https://codemirror.net/doc/manual.html#config
+    Custom options for CodeMirror and addons in JSON object like
+    {"indentUnit":2, "smartIndent":true} however note that some of them may not
+    work in Violentmonkey. Full list:
+    https://codemirror.net/doc/manual.html#config
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Custom metadata
@@ -290,6 +291,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Indent unit:'
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Default injection mode: '
@@ -308,6 +310,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Wrap long lines
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match rules'
@@ -428,12 +431,12 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Find scripts for this site
-menuMatchedScripts:
-  description: Label for menu listing matched scripts.
-  message: Matched scripts
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Sub-frames only scripts
+menuMatchedScripts:
+  description: Label for menu listing matched scripts.
+  message: Matched scripts
 menuNewScript:
   description: Menu item to create a new script.
   message: Create a new script
@@ -479,6 +482,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Loading ...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Loading script data...

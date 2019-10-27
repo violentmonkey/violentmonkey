@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: 保存
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: 支持页面
@@ -113,6 +116,9 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: 这里可以为管理页面和脚本安装页面设置自定义CSS。如果你不确定它的意思，请不要修改。
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: 自定义元数据
@@ -279,6 +285,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 缩进大小：
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 默认注入模式：
@@ -297,6 +304,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: 自动换行
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match 规则'
@@ -417,6 +425,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 为此站点查找脚本
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: 匹配的脚本
@@ -465,6 +476,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: 加载中 ...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: 正在加载脚本数据...
@@ -490,6 +502,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: 自定义样式已更新！
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: 自定义脚本模板已更新！

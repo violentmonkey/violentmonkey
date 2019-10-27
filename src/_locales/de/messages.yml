@@ -82,6 +82,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Speichern
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: Support-Seite
@@ -117,6 +120,9 @@ descCustomCSS:
   message: >-
     Benutzerdefiniertes CSS für die Seiten "Einstellungen" und "Installierte
     Skripte". Bitte nicht editieren, falls die Fachkenntnis hierüber fehlt.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Eigene Metadaten
@@ -281,6 +287,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: ''
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: ''
@@ -299,6 +306,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: ''
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Übereinstimmungen (@match)
@@ -419,6 +427,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Skripte für diese Seite finden
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Angewandte Skripte
@@ -467,6 +478,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Lade...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Skriptdaten werden geladen...
@@ -492,6 +504,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Benutzerdefiniertes CSS wurde gespeichert.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: ''

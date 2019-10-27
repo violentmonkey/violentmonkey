@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Lưu
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: Hỗ trợ
@@ -115,6 +118,9 @@ descCustomCSS:
   message: >-
     CSS tùy chỉnh cho trang tùy chọn và trang script đã cài đặt Nếu không hiểu
     rõ xin đừng sửa.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Tuỳ chỉnh thẻ dữ liệu
@@ -279,6 +285,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: Khoảng cách thụt lề
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Chế độ tiêm mặc định: '
@@ -297,6 +304,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Ngắt dòng dài
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Trùng khớp
@@ -417,6 +425,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Tìm script cho trang này
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Script trùng khớp
@@ -465,6 +476,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Đang tải ...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Đang tải thông tin script...
@@ -490,6 +502,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Giao diện tùy chỉnh đã cập nhật.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Script template tuỳ chỉnh đã được lưu

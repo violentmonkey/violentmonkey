@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Guardar
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: Página de suporte
@@ -115,6 +118,9 @@ descCustomCSS:
   message: >-
     CSS personalizado para as páginas de opções e de instalação de scripts. Se
     não tiver a certeza da utilidade disto, por favor, não altere.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadados personalizados
@@ -281,6 +287,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Unidade de indentação:'
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Modo de injeção predefinido: '
@@ -299,6 +306,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Moldar o texto em linhas compridas
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Regras @match
@@ -419,6 +427,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Procurar scripts para este site
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Scripts correspondidos
@@ -467,6 +478,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: A carregar...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: A carregar dados do script...
@@ -494,6 +506,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Estilo personalizado atualizado.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: O modelo de scripts personalizado foi atualizado.

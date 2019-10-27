@@ -19,9 +19,6 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Confirmă instalarea
-buttonShowEditorState:
-  description: Button to show the list of currently used CodeMirror options.
-  message: Afișează starea editorului
 buttonDisable:
   description: Button to disable a script.
   message: Dezactivează
@@ -85,6 +82,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Salvează
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: Afișează starea editorului
 buttonSupport:
   description: Button to open support page.
   message: Pagină de asistență
@@ -262,10 +262,10 @@ labelEditor:
   message: Editor
 labelExclude:
   description: Label of @exclude rules.
-  message: 'Reguli @exclude'
+  message: Reguli @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: 'Reguli @exclude-match'
+  message: Reguli @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportă datele scripturilor
@@ -292,10 +292,11 @@ labelImportSettings:
   message: Importă setări
 labelInclude:
   description: Label of @include rules.
-  message: 'Reguli @include'
+  message: Reguli @include
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Unitate de indentare:'
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Modul de injectare implicit: '
@@ -314,9 +315,10 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Desparte rândurile lungi
+  touched: false
 labelMatch:
   description: Label of @match rules.
-  message: 'Reguli @match'
+  message: Reguli @match
 labelName:
   description: Label of script name.
   message: 'Nume:'
@@ -434,6 +436,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Găsește scripturi pentru acest site
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Scripturi coincidente
@@ -482,6 +487,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Se încarcă...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Se încarcă datele scriptului...
@@ -493,8 +499,8 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Conflicte în spațiul de nume al scriptului! Te rugăm să modifici @name
-    și @namespace.
+    Conflicte în spațiul de nume al scriptului! Te rugăm să modifici @name și
+    @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no

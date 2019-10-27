@@ -83,6 +83,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Zapisz
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: Strona wsparcia technicznego
@@ -118,6 +121,9 @@ descCustomCSS:
   message: >-
     Niestandardowy CSS dla stron z opcjami i instalacją skryptu. Jeśli nie
     jesteś pewien/pewna co to jest, to nie edytuj tego.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Niestandardowe metadane
@@ -284,6 +290,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Jednostki wcięcia:'
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Domyślny tryb wstrzykiwania: '
@@ -302,6 +309,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Zawijaj długie linie
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Reguły @match
@@ -422,6 +430,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Znajdź skrypty dla tej strony
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Dopasowane skrypty
@@ -470,6 +481,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Wczytywanie ...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Wczytywanie skryptu...
@@ -495,6 +507,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Styl niestandardowy jest aktualizowany.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Niestandardowy szablon skryptu jest aktualizowany.
