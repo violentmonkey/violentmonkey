@@ -63,6 +63,7 @@ textarea {
   }
 }
 code {
+  padding: 0 .2em;
   background: #f7e999;
 }
 

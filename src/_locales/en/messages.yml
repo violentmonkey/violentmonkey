@@ -122,9 +122,10 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Custom options for CodeMirror and addons in JSON object like
-    {"indentUnit":2, "smartIndent":true} however note that some of them may not
-    work in Violentmonkey. Full list:
-    https://codemirror.net/doc/manual.html#config
+    <code>{"indentUnit":2, "smartIndent":true}</code> however note that some of
+    them may not work in Violentmonkey. See <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">full list</a>.
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Custom metadata
