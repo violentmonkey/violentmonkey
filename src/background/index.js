@@ -108,7 +108,7 @@ const commands = {
       version: VM_VER,
     };
     if (isApplied) {
-      const scripts = cache.get(`preinject:${url}`) || await getScriptsByURL(url);
+      const scripts = await (cache.get(`preinject:${url}`) || getScriptsByURL(url));
       addValueOpener(tabId, Object.keys(scripts.values));
       Object.assign(data, scripts);
     }
@@ -231,10 +231,13 @@ function togglePreinject(enable) {
   }
 }
 
-async function preinject({ url }) {
+function preinject({ url }) {
   const key = `preinject:${url}`;
   if (!cache.has(key)) {
-    cache.put(key, await getScriptsByURL(url), 250);
+    // GetInjected message will be sent soon by the content script
+    // and it may easily happen while getScriptsByURL is still waiting for browser.storage
+    // so we'll let GetInjected await this pending data by storing Promise in the cache
+    cache.put(key, getScriptsByURL(url), 250);
   }
 }
 
