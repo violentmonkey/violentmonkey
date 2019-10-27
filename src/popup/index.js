@@ -31,9 +31,8 @@ Object.assign(handlers, {
   async SetPopup(data, src) {
     if (store.currentTab.id !== src.tab.id) return;
     const isTop = src.frameId === 0;
-    const ids = isTop
-      ? data.ids
-      : (await mutex.ready, data.ids.filter(id => !allScriptIds.includes(id)));
+    if (!isTop) await mutex.ready;
+    const ids = data.ids.filter(id => !allScriptIds.includes(id));
     allScriptIds.push(...ids);
     if (isTop) {
       mutex.resolve();
