@@ -1,9 +1,6 @@
 import Modal from 'vueleton/lib/modal/bundle';
 import { route } from '#/common/router';
 import Message from '../views/message';
-import * as throttledRender from './throttled-render';
-
-export { throttledRender };
 
 export const store = {
   route,

@@ -97,7 +97,7 @@ import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { sendCmd, getLocaleString, formatTime } from '#/common';
 import { objectGet } from '#/common/object';
 import Icon from '#/common/ui/icon';
-import { store, throttledRender } from '../utils';
+import { store } from '../utils';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
 const PADDING = 10;
@@ -123,7 +123,11 @@ function loadImage(url) {
 }
 
 export default {
-  props: ['script', 'draggable'],
+  props: [
+    'script',
+    'draggable',
+    'visible',
+  ],
   components: {
     Icon,
     Tooltip,
@@ -131,8 +135,7 @@ export default {
   data() {
     return {
       safeIcon: DEFAULT_ICON,
-      /** @type ThrottledRenderStage */
-      renderStage: 'check',
+      canRender: this.visible,
     };
   },
   computed: {
@@ -145,9 +148,6 @@ export default {
         || script.meta.downloadURL
         || script.custom.lastInstallURL
       );
-    },
-    canRender() {
-      return this.renderStage === 'show' || !throttledRender.register(this);
     },
     homepageURL() {
       const { script } = this;
@@ -190,6 +190,12 @@ export default {
       return ret;
     },
   },
+  watch: {
+    visible(visible) {
+      // Leave it if the element is already rendered
+      if (visible) this.canRender = true;
+    },
+  },
   mounted() {
     const { icon } = this.script.meta;
     if (icon && icon !== this.safeIcon) {
@@ -202,9 +208,6 @@ export default {
         this.safeIcon = DEFAULT_ICON;
       });
     }
-  },
-  destroyed() {
-    throttledRender.unregister(this);
   },
   methods: {
     onEdit() {

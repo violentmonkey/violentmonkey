@@ -75,12 +75,13 @@
       <div class="flex-auto pos-rel">
         <div class="scripts abs-full">
           <script-item
-            v-for="script in sortedScripts"
+            v-for="(script, index) in sortedScripts"
             v-show="!search || script.$cache.show !== false"
             :key="script.props.id"
             :class="{ removing: removing && removing.id === script.props.id }"
             :script="script"
             :draggable="filters.sort.value === 'exec' && !script.config.removed"
+            :visible="index < batchRender.limit"
             @edit="onEditScript"
             @move="moveScript"
             @remove="onRemove"
@@ -148,6 +149,9 @@ options.ready.then(() => {
   filters.sort.set(options.get('filters.sort'));
 });
 
+const MAX_BATCH_DURATION = 100;
+let step = 0;
+
 export default {
   components: {
     ScriptItem,
@@ -173,6 +177,9 @@ export default {
       // Speedup and deflicker for initial page load:
       // skip rendering the script list when starting in the editor.
       canRenderScripts: !store.route.paths[1],
+      batchRender: {
+        limit: step,
+      },
     };
   },
   watch: {
@@ -237,6 +244,7 @@ export default {
         sortedScripts.sort((a, b) => getSortKey(b) - getSortKey(a));
       }
       this.sortedScripts = sortedScripts;
+      this.debouncedRender();
     },
     updateLater() {
       this.debouncedUpdate();
@@ -316,6 +324,7 @@ export default {
         if (!this.script) {
           // First time showing the list we need to tell v-if to keep it forever
           this.canRenderScripts = true;
+          this.debouncedRender();
           // Strip the invalid id from the URL so |App| can render the aside,
           // which was hidden to avoid flicker on initial page load directly into the editor.
           if (id) setRoute(tab, true);
@@ -347,9 +356,32 @@ export default {
         }, 300);
       });
     },
+    async renderScripts() {
+      if (!this.canRenderScripts) return;
+      const { length } = this.sortedScripts;
+      let limit = 9;
+      const batchRender = { limit };
+      this.batchRender = batchRender;
+      const startTime = performance.now();
+      // If we entered a new loop of rendering, this.batchRender will no longer be batchRender
+      while (limit < length && batchRender === this.batchRender) {
+        if (step) {
+          limit += step;
+        } else {
+          limit += 1;
+        }
+        batchRender.limit = limit;
+        await new Promise(resolve => this.$nextTick(resolve));
+        if (!step && performance.now() - startTime >= MAX_BATCH_DURATION) {
+          step = limit;
+        }
+        if (step) await new Promise(resolve => setTimeout(resolve));
+      }
+    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 100);
+    this.debouncedRender = debounce(this.renderScripts);
   },
   mounted() {
     // Ensure the correct UI is shown when mounted:
