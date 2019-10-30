@@ -105,6 +105,7 @@ function xhrCallbackWrapper(req) {
       id: req.id,
       type: evt.type,
       resType: xhr.responseType,
+      contentType: xhr.getResponseHeader('Content-Type') || 'application/octet-stream',
     };
     const data = {
       finalUrl: xhr.responseURL,
@@ -127,16 +128,9 @@ function xhrCallbackWrapper(req) {
     if (evt.type === 'loadend') clearRequest(req);
     else if (xhr.readyState >= XMLHttpRequest.LOADING) HeaderInjector.del(req.id);
     lastPromise = lastPromise.then(() => {
-      if (xhr.response && xhr.responseType === 'arraybuffer') {
-        const contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream';
-        const binstring = buffer2string(xhr.response);
-        data.response = `data:${contentType};base64,${window.btoa(binstring)}`;
-      } else {
-        // default `null` for blob and '' for text
-        data.response = xhr.response;
-      }
-    })
-    .then(() => {
+      data.response = xhr.response && xhr.responseType === 'arraybuffer'
+        ? buffer2string(xhr.response)
+        : xhr.response;
       if (req.cb) req.cb(res);
     });
   };
