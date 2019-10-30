@@ -72,11 +72,11 @@ export function getUniqId(prefix) {
 export function buffer2string(buffer) {
   const array = new window.Uint8Array(buffer);
   const sliceSize = 8192;
-  let str = '';
+  const slices = [];
   for (let i = 0; i < array.length; i += sliceSize) {
-    str += String.fromCharCode.apply(null, array.subarray(i, i + sliceSize));
+    slices.push(String.fromCharCode.apply(null, array.subarray(i, i + sliceSize)));
   }
-  return str;
+  return slices.join('');
 }
 
 export function compareVersion(ver1, ver2) {
