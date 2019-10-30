@@ -1,6 +1,6 @@
 import {
-  atob, includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
-  setAttribute, log, charCodeAt, fromCharCode, match, shift, slice,
+  includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
+  setAttribute, log, charCodeAt, fromCharCode, shift, slice, defineProperty,
 } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -9,6 +9,8 @@ const queue = [];
 
 const NS_HTML = 'http://www.w3.org/1999/xhtml';
 
+const { DOMParser } = global;
+const { parseFromString } = DOMParser.prototype;
 const { toLowerCase } = String.prototype;
 const { createElementNS } = Document.prototype;
 const getHref = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
@@ -42,43 +44,44 @@ function reqAbort() {
   bridge.post({ cmd: 'AbortRequest', data: this.id });
 }
 
-function parseData(req, details) {
-  if (req.resType) {
-    // blob or arraybuffer
-    const { response } = req.data;
-    if (response) {
-      const matches = response::match(/^data:([^;,]*);base64,/);
-      if (!matches) {
-        // invalid
-        req.data.response = null;
-      } else {
-        const raw = atob(response::slice(matches[0].length));
-        const arr = new Uint8Array(raw.length);
-        for (let i = 0; i < raw.length; i += 1) arr[i] = raw::charCodeAt(i);
-        if (details.responseType === 'blob') {
-          // blob
-          return new Blob([arr], { type: matches[1] });
-        }
-        // arraybuffer
-        return arr.buffer;
-      }
-    }
-  } else if (details.responseType === 'json') {
-    // json
-    return jsonLoad(req.data.response);
-  } else {
-    // text
-    return req.data.response;
+function parseData(response, req, details) {
+  const { responseType } = details;
+  if (responseType === 'json') {
+    return jsonLoad(response);
   }
+  if (responseType === 'document') {
+    const type = req.contentType.split(';', 1)[0] || 'text/html';
+    return new DOMParser()::parseFromString(response, type);
+  }
+  // arraybuffer, blob
+  if (req.resType && response) {
+    const len = response.length;
+    const arr = new Uint8Array(len);
+    for (let i = 0; i < len; i += 1) arr[i] = response::charCodeAt(i);
+    return responseType === 'blob'
+      ? new Blob([arr], { type: req.contentType })
+      : arr.buffer;
+  }
+  // text
+  return response;
 }
 
 // request object functions
 function callback(req, res) {
   const cb = req.details[`on${res.type}`];
   if (cb) {
-    if (res.data.response) {
-      if (!req.data) req.data = [parseData(res, req.details)];
-      [res.data.response] = req.data;
+    if (res.data.response
+        && !('rawResponse' in res)
+        && (req.details.responseType || 'text') !== 'text') {
+      res.rawResponse = res.data.response;
+      defineProperty(res.data, 'response', {
+        configurable: true,
+        get() {
+          const value = parseData(res.rawResponse, res, req.details);
+          defineProperty(this, 'response', { value });
+          return value;
+        },
+      });
     }
     res.data.context = req.details.context;
     cb(res.data);
@@ -106,7 +109,7 @@ function start(req, id) {
   if (responseType) {
     if (['arraybuffer', 'blob']::includes(responseType)) {
       payload.responseType = 'arraybuffer';
-    } else if (!['json', 'text']::includes(responseType)) {
+    } else if (!['document', 'json', 'text']::includes(responseType)) {
       log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
   }
