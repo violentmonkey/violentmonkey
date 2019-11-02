@@ -35,6 +35,11 @@
         v-text="i18n('editNavValues')"
         @click="nav = 'values'"
       />
+      <div
+        class="edit-nav-item"
+        :class="{active: nav === 'keyboard'}"
+        @click="nav = 'keyboard'"
+      >?</div>
       <div class="flex-auto pos-rel">
         <div
           v-if="tooLarge"
@@ -45,7 +50,7 @@
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
-        v-show="nav === 'code'" class="abs-full"
+        v-show="nav === 'code'" class="abs-full" ref="code" :editing="nav === 'code'"
         v-model="code" :commands="commands" @warnLarge="onWarnLarge"
       />
       <vm-settings
@@ -55,18 +60,23 @@
       <vm-values
         :show="nav === 'values'" class="abs-full edit-body" :script="script"
       />
+      <vm-keyboard
+        v-if="nav === 'keyboard'" class="abs-full edit-body"
+        :target="this.$refs.code"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { i18n, sendMessage, noop } from '#/common';
+import { i18n, sendCmd, noop } from '#/common';
 import { objectGet } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import { route } from '#/common/router';
 import { store, showMessage } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
+import VmKeyboard from './keyboard';
 
 function fromList(list) {
   return (list || []).join('\n');
@@ -83,6 +93,7 @@ export default {
     VmCode,
     VmSettings,
     VmValues,
+    VmKeyboard,
   },
   data() {
     return {
@@ -94,7 +105,10 @@ export default {
       settings: {},
       commands: {
         save: this.save,
-        close: this.close,
+        close: () => this.close({ fromCM: true }),
+        showHelp: () => {
+          this.nav = 'keyboard';
+        },
       },
     };
   },
@@ -116,6 +130,9 @@ export default {
         this.canSave = true;
       },
     },
+    nav() {
+      setTimeout(() => this.nav === 'code' && this.$refs.code.cm.focus());
+    },
   },
   created() {
     this.script = this.initial;
@@ -123,14 +140,8 @@ export default {
   mounted() {
     const id = objectGet(this.script, 'props.id');
     (id
-      ? sendMessage({
-        cmd: 'GetScriptCode',
-        data: id,
-      })
-      : sendMessage({
-        cmd: 'NewScript',
-        data: route.paths[2],
-      })
+      ? sendCmd('GetScriptCode', id)
+      : sendCmd('NewScript', route.paths[2])
       .then(({ script, code }) => {
         this.script = script;
         return code;
@@ -191,19 +202,16 @@ export default {
         excludeMatch: toList(rawCustom.excludeMatch),
       });
       const id = objectGet(this.script, 'props.id');
-      return sendMessage({
-        cmd: 'ParseScript',
-        data: {
-          id,
-          custom,
-          config,
-          code: this.code,
-          // User created scripts MUST be marked `isNew` so that
-          // the backend is able to check namespace conflicts,
-          // otherwise the script with same namespace will be overridden
-          isNew: !id,
-          message: '',
-        },
+      return sendCmd('ParseScript', {
+        id,
+        custom,
+        config,
+        code: this.code,
+        // User created scripts MUST be marked `isNew` so that
+        // the backend is able to check namespace conflicts,
+        // otherwise the script with same namespace will be overridden
+        isNew: !id,
+        message: '',
       })
       .then((res) => {
         this.canSave = false;
@@ -212,7 +220,11 @@ export default {
         showMessage({ text: err });
       });
     },
-    close() {
+    close({ fromCM } = {}) {
+      if (fromCM && this.nav !== 'code') {
+        this.nav = 'code';
+        return;
+      }
       (this.canSave ? Promise.reject() : Promise.resolve())
       .catch(() => new Promise((resolve, reject) => {
         showMessage({

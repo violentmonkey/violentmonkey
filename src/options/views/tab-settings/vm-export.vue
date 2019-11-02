@@ -25,12 +25,13 @@
 
 <script>
 import Modal from 'vueleton/lib/modal/bundle';
-import { sendMessage, getLocaleString } from '#/common';
+import { sendCmd, getLocaleString } from '#/common';
 import { objectGet } from '#/common/object';
 import options from '#/common/options';
 import { isFirefox } from '#/common/ua';
 import SettingCheck from '#/common/ui/setting-check';
 import { downloadBlob } from '#/common/download';
+import loadZip from '#/common/zip';
 import { store } from '../../utils';
 
 /**
@@ -69,19 +70,25 @@ export default {
 };
 
 function getWriter() {
-  return new Promise((resolve) => {
+  return loadZip()
+  .then(zip => new Promise((resolve) => {
     zip.createWriter(new zip.BlobWriter(), (writer) => {
       resolve(writer);
     });
-  });
+  }));
 }
 
 function addFile(writer, file) {
-  return new Promise((resolve) => {
-    writer.add(file.name, new zip.TextReader(file.content), () => {
-      resolve(writer);
-    });
-  });
+  return loadZip()
+  .then(zip => new Promise((resolve) => {
+    writer.add(
+      file.name,
+      new zip.TextReader(file.content),
+      () => resolve(writer),
+      null,
+      { lastModDate: file.lastModDate },
+    );
+  }));
 }
 
 function leftpad(src, length, pad = '0') {
@@ -134,11 +141,8 @@ function normalizeFilename(name) {
 
 function exportData() {
   const withValues = options.get('exportValues');
-  return sendMessage({
-    cmd: 'ExportZip',
-    data: {
-      values: withValues,
-    },
+  return sendCmd('ExportZip', {
+    values: withValues,
   })
   .then((data) => {
     const names = {};
@@ -154,10 +158,13 @@ function exportData() {
         names[name] += 1;
         name = `${name}_${names[name]}`;
       } else names[name] = 1;
+      const { lastModified, lastUpdated } = script.props;
       const info = {
         custom: script.custom,
         config: script.config,
         position: script.props.position,
+        lastModified,
+        lastUpdated,
       };
       if (withValues) {
         // `values` are related to scripts by `props.id` in Violentmonkey,
@@ -169,6 +176,7 @@ function exportData() {
       return {
         name: `${name}.user.js`,
         content: code,
+        lastModDate: new Date(lastUpdated || lastModified),
       };
     });
     files.push({

@@ -6,7 +6,7 @@ import {
   getRequestId, httpRequest, abortRequest, confirmInstall,
   newScript, parseMeta,
   setClipboard, checkUpdate,
-  getOption, getDefaultOption, setOption, hookOptions, getAllOptions,
+  getOption, setOption, hookOptions, getAllOptions,
   initialize, sendMessageOrIgnore,
 } from './utils';
 import { tabOpen, tabClose } from './utils/tabs';
@@ -17,32 +17,26 @@ import {
   getScriptByIds, moveScript, vacuum, parseScript, getScript,
   sortScripts, getValueStoresByIds,
 } from './utils/db';
-import { resetBlacklist } from './utils/tester';
+import { resetBlacklist, testBlacklist } from './utils/tester';
 import {
   setValueStore, updateValueStore, resetValueOpener, addValueOpener,
 } from './utils/values';
+import { setBadge } from './utils/icon';
+import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
+import './utils/commands';
 
 const VM_VER = browser.runtime.getManifest().version;
-
-// Firefox Android does not support such APIs, use noop
-const browserAction = [
-  'setIcon',
-  'setBadgeText',
-  'setBadgeBackgroundColor',
-].reduce((actions, key) => {
-  const fn = browser.browserAction[key];
-  actions[key] = fn ? fn.bind(browser.browserAction) : noop;
-  return actions;
-}, {});
+let isApplied;
+let injectInto;
 
 hookOptions((changes) => {
-  if ('isApplied' in changes) setIcon(changes.isApplied);
   if ('autoUpdate' in changes) autoUpdate();
-  if ('showBadge' in changes) updateBadges();
-  const SCRIPT_TEMPLATE = 'scriptTemplate';
-  if (SCRIPT_TEMPLATE in changes && !changes[SCRIPT_TEMPLATE]) {
-    setOption(SCRIPT_TEMPLATE, getDefaultOption(SCRIPT_TEMPLATE));
+  if ('defaultInjectInto' in changes) injectInto = changes.defaultInjectInto;
+  if ('isApplied' in changes) {
+    isApplied = changes.isApplied;
+    togglePreinject(isApplied);
   }
+  if (SCRIPT_TEMPLATE in changes) resetScriptTemplate(changes);
   sendMessageOrIgnore({
     cmd: 'UpdateOptions',
     data: changes,
@@ -105,20 +99,20 @@ const commands = {
       return data;
     });
   },
-  GetInjected({ url, reset }, src) {
-    const srcTab = src.tab || {};
-    if (reset && srcTab.id) resetValueOpener(srcTab.id);
+  async GetInjected(url, src) {
+    const { id: tabId } = src.tab || {};
+    if (src.frameId === 0) resetValueOpener(tabId);
     const data = {
-      isApplied: getOption('isApplied'),
-      injectInto: getOption('defaultInjectInto'),
+      isApplied,
+      injectInto,
       version: VM_VER,
     };
-    if (!data.isApplied) return data;
-    return getScriptsByURL(url)
-    .then((res) => {
-      addValueOpener(srcTab.id, Object.keys(res.values));
-      return Object.assign(data, res);
-    });
+    if (isApplied) {
+      const scripts = await (cache.get(`preinject:${url}`) || getScriptsByURL(url));
+      addValueOpener(tabId, Object.keys(scripts.values));
+      Object.assign(data, scripts);
+    }
+    return data;
   },
   UpdateScriptInfo({ id, config }) {
     return updateScriptInfo(id, {
@@ -223,7 +217,29 @@ const commands = {
       runAt: 'document_start',
     });
   },
+  TestBlacklist: testBlacklist,
 };
+
+function togglePreinject(enable) {
+  if (enable) {
+    browser.webRequest.onHeadersReceived.addListener(preinject, {
+      urls: ['*://*/*'],
+      types: ['main_frame', 'sub_frame'],
+    });
+  } else {
+    browser.webRequest.onHeadersReceived.removeListener(preinject);
+  }
+}
+
+function preinject({ url }) {
+  const key = `preinject:${url}`;
+  if (!cache.has(key)) {
+    // GetInjected message will be sent soon by the content script
+    // and it may easily happen while getScriptsByURL is still waiting for browser.storage
+    // so we'll let GetInjected await this pending data by storing Promise in the cache
+    cache.put(key, getScriptsByURL(url), 250);
+  }
+}
 
 initialize()
 .then(() => {
@@ -244,70 +260,12 @@ initialize()
     // undefined will be ignored
     return res || null;
   });
+  injectInto = getOption('defaultInjectInto');
+  isApplied = getOption('isApplied');
+  togglePreinject(isApplied);
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
   resetBlacklist();
   autoCheckRemove();
+  global.dispatchEvent(new Event('backgroundInitialized'));
 });
-
-// Common functions
-
-const badges = {};
-function setBadge({ ids, reset }, src) {
-  const srcTab = src.tab || {};
-  let data = !reset && badges[srcTab.id];
-  if (!data) {
-    data = {
-      number: 0,
-      unique: 0,
-      idMap: {},
-    };
-    badges[srcTab.id] = data;
-  }
-  data.number += ids.length;
-  if (ids) {
-    ids.forEach((id) => {
-      data.idMap[id] = 1;
-    });
-    data.unique = Object.keys(data.idMap).length;
-  }
-  browserAction.setBadgeBackgroundColor({
-    color: '#808',
-    tabId: srcTab.id,
-  });
-  updateBadge(srcTab.id);
-}
-function updateBadge(tabId) {
-  const data = badges[tabId];
-  if (data) {
-    const showBadge = getOption('showBadge');
-    let text;
-    if (showBadge === 'total') text = data.number;
-    else if (showBadge) text = data.unique;
-    browserAction.setBadgeText({
-      text: `${text || ''}`,
-      tabId,
-    });
-  }
-}
-function updateBadges() {
-  browser.tabs.query({})
-  .then((tabs) => {
-    tabs.forEach((tab) => {
-      updateBadge(tab.id);
-    });
-  });
-}
-browser.tabs.onRemoved.addListener((id) => {
-  delete badges[id];
-});
-
-function setIcon(isApplied) {
-  browserAction.setIcon({
-    path: {
-      19: `/public/images/icon19${isApplied ? '' : 'w'}.png`,
-      38: `/public/images/icon38${isApplied ? '' : 'w'}.png`,
-    },
-  });
-}
-setIcon(getOption('isApplied'));

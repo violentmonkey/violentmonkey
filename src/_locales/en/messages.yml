@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Save
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: Show editor state
 buttonSupport:
   description: Button to open support page.
   message: Support page
@@ -115,6 +118,14 @@ descCustomCSS:
   message: >-
     Custom CSS for options page and script installation page. If you are not
     sure what this is for, please do not edit it.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: >-
+    Custom options for CodeMirror and addons in JSON object like
+    <code>{"indentUnit":2, "smartIndent":true}</code> however note that some of
+    them may not work in Violentmonkey. See <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">full list</a>.
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Custom metadata
@@ -142,6 +153,16 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
+failureReasonBlacklisted:
+  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  message: Blacklisted in Violentmonkey's settings
+failureReasonNoninjectable:
+  description: >-
+    Shown for URLs that cannot be processed (same places as
+    failureBlacklistedUrl)
+  message: |-
+    Violentmonkey cannot run userscripts in this page
+    (common examples: browser UI or an extension)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alphabetical order
@@ -271,6 +292,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Indent unit:'
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Default injection mode: '
@@ -289,6 +311,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Wrap long lines
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match rules'
@@ -409,6 +432,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Find scripts for this site
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: Sub-frames only scripts
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Matched scripts
@@ -457,6 +483,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Loading ...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Loading script data...
@@ -482,6 +509,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Custom style is updated.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: Editor options are updated.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Custom script template is updated.

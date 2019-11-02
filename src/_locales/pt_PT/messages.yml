@@ -52,7 +52,7 @@ buttonOK:
   message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: Reciclagem
 buttonRemove:
   description: Button to remove a script.
   message: Remover
@@ -67,7 +67,7 @@ buttonReset:
   message: Redefinir
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: Restaurar
 buttonSave:
   description: Button to save modifications of a script.
   message: Guardar
@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Guardar
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: Mostrar estado do editor
 buttonSupport:
   description: Button to open support page.
   message: Página de suporte
@@ -115,6 +118,13 @@ descCustomCSS:
   message: >-
     CSS personalizado para as páginas de opções e de instalação de scripts. Se
     não tiver a certeza da utilidade disto, por favor, não altere.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: >-
+    Opções personalizadas para o CodeMirror e seus addons em formato JSON, tais
+    como: {"indentUnit":2, "smartIndent":true}. No entanto, tenha em atenção que
+    algumas poderão não funcionar com o Violentmonkey. Lista completa:
+    https://codemirror.net/doc/manual.html#config
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadados personalizados
@@ -142,6 +152,16 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
+failureReasonBlacklisted:
+  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  message: Na lista negra nas definições do Violentmonkey
+failureReasonNoninjectable:
+  description: >-
+    Shown for URLs that cannot be processed (same places as
+    failureBlacklistedUrl)
+  message: |-
+    O Violentmonkey não pode executar scripts de utilizador nesta página
+    (exemplos comuns: interface do navegador ou uma extensão)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordem alfabética
@@ -150,16 +170,16 @@ filterExecutionOrder:
   message: ordem de execução
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: data da última atualização
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: ''
+  message: Reciclagem
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Introduza o URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: ''
+  message: Os scripts removidos são mostrados aqui e mantidos por 7 dias.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Utilizar @downloadURL
@@ -273,6 +293,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Unidade de indentação:'
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Modo de injeção predefinido: '
@@ -291,6 +312,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Moldar o texto em linhas compridas
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Regras @match
@@ -319,7 +341,7 @@ labelRemoved:
   touched: false
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: ''
+  message: Removido a $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Substituir por: '
@@ -354,7 +376,7 @@ labelSync:
   message: Sincronizar
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: Utilizar conta anónima
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Autorizar
@@ -366,7 +388,7 @@ labelSyncDisabled:
   message: Nenhum
 labelSyncPassword:
   description: Label for input to hold password.
-  message: ''
+  message: 'Palavra-passe: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Reautorizar automaticamente quando expirar
@@ -379,13 +401,13 @@ labelSyncScriptStatus:
   message: Sincronizar estados dos scripts
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'URL do servidor: '
 labelSyncService:
   description: Label for sync service select.
   message: Sincronizar em
 labelSyncUsername:
   description: Label for input to hold username.
-  message: ''
+  message: 'Nome de utilizador: '
 labelTranslator:
   description: Label of translator.
   message: 'Tradução: '
@@ -411,6 +433,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Procurar scripts para este site
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Scripts correspondidos
@@ -459,6 +484,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: A carregar...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: A carregar dados do script...
@@ -486,6 +512,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Estilo personalizado atualizado.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: Opções do editor atualizadas.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: O modelo de scripts personalizado foi atualizado.

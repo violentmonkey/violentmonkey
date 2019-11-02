@@ -6,11 +6,15 @@ const { isProd } = require('@gera2ld/plaid/util');
  * - value.html: options object passed to HtmlWebpackPlugin.
  * - value.html.inlineSource: if true, JS and CSS files will be inlined in HTML.
  */
+const injectTo = item => {
+  if (!(item.attributes.src || '').endsWith('/index.js')) return 'head';
+};
 const htmlFactory = extra => options => ({
   ...options,
   title: 'Violentmonkey',
   ...extra,
   chunks: ['browser', ...options.chunks],
+  injectTo,
 });
 exports.pages = {
   'browser': {
@@ -22,11 +26,7 @@ exports.pages = {
   },
   'options/index': {
     entry: './src/options',
-    html: htmlFactory({
-      js: [
-        '/public/lib/zip.js/zip.js',
-      ],
-    }),
+    html: htmlFactory(),
   },
   'confirm/index': {
     entry: './src/confirm',
@@ -41,6 +41,15 @@ exports.pages = {
   },
 };
 
+const splitVendor = name => ({
+  [name]: {
+    test: new RegExp(`node_modules[/\\\\]${name}`),
+    name: `public/lib/${name}`,
+    chunks: 'all',
+    priority: 100,
+  },
+});
+
 exports.devServer = false;
 exports.devtool = isProd ? false : 'inline-source-map';
 exports.optimization = {
@@ -50,6 +59,7 @@ exports.optimization = {
       common: {
         name: 'common',
         minChunks: 2,
+        enforce: true,
         chunks(chunk) {
           return ![
             'browser',
@@ -57,6 +67,9 @@ exports.optimization = {
           ].includes(chunk.name);
         },
       },
+      ...splitVendor('codemirror'),
+      ...splitVendor('tldjs'),
+      ...splitVendor('vue'),
     },
   },
 };

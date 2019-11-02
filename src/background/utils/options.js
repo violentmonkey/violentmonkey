@@ -1,43 +1,8 @@
 import { initHooks, debounce, normalizeKeys } from '#/common';
 import { objectGet, objectSet } from '#/common/object';
+import defaults from '#/common/options-defaults';
 import { register } from './init';
 
-const defaults = {
-  isApplied: true,
-  autoUpdate: true,
-  // ignoreGrant: false,
-  lastUpdate: 0,
-  lastModified: 0,
-  showBadge: 'unique', // '' | 'unique' | 'total'
-  exportValues: true,
-  closeAfterInstall: false,
-  trackLocalFile: false,
-  autoReload: false,
-  features: null,
-  blacklist: null,
-  syncScriptStatus: true,
-  sync: null,
-  customCSS: null,
-  importSettings: true,
-  notifyUpdates: false,
-  version: null,
-  defaultInjectInto: 'page', // 'page' | 'auto',
-  filters: {
-    sort: 'exec',
-  },
-  editor: {
-    lineWrapping: false,
-    indentUnit: 2,
-  },
-  scriptTemplate: `\
-// ==UserScript==
-// @name New Script
-// @namespace Violentmonkey Scripts
-// @match {{url}}
-// @grant none
-// ==/UserScript==
-`,
-};
 let changes = {};
 const hooks = initHooks();
 const callHooksLater = debounce(callHooks, 100);
@@ -51,34 +16,6 @@ const init = browser.storage.local.get('options')
     console.log('options:', options); // eslint-disable-line no-console
   }
   if (!objectGet(options, 'version')) {
-    // v2.8.0+ stores options in browser.storage.local
-    // Upgrade from v2.7.x
-    if (process.env.DEBUG) {
-      console.log('Upgrade options...'); // eslint-disable-line no-console
-    }
-    try {
-      if (localStorage.length) {
-        Object.keys(defaults)
-        .forEach((key) => {
-          let value = localStorage.getItem(key);
-          if (value) {
-            try {
-              value = JSON.parse(value);
-            } catch (e) {
-              value = null;
-            }
-          }
-          if (value) {
-            if (process.env.DEBUG) {
-              console.log('Upgrade option:', key, value); // eslint-disable-line no-console
-            }
-            setOption(key, value);
-          }
-        });
-      }
-    } catch (e) {
-      // ignore security issue in Firefox
-    }
     setOption('version', 1);
   }
 })

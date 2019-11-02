@@ -11,13 +11,18 @@ function parse(pathInfo) {
   return { pathname, query, paths };
 }
 
+const stack = [];
 export const route = {};
+export const lastRoute = () => stack[stack.length - 1] || {};
+
 updateRoute();
 
 function updateRoute() {
   Object.assign(route, parse(window.location.hash.slice(1)));
 }
 
+// popstate should be the first to ensure hashchange listeners see the correct lastRoute
+window.addEventListener('popstate', () => stack.pop());
 window.addEventListener('hashchange', updateRoute, false);
 
 export function setRoute(hash, replace) {
@@ -26,6 +31,7 @@ export function setRoute(hash, replace) {
   if (replace) {
     window.history.replaceState('', null, hashString);
   } else {
+    stack.push(Object.assign({}, route));
     window.history.pushState('', null, hashString);
   }
   updateRoute();

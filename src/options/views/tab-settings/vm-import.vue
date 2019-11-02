@@ -18,9 +18,10 @@
 </template>
 
 <script>
-import { i18n, sendMessage } from '#/common';
+import { i18n, sendCmd } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
+import loadZip from '#/common/zip';
 import { showMessage } from '../../utils';
 
 export default {
@@ -46,7 +47,7 @@ export default {
     vacuum() {
       this.vacuuming = true;
       this.labelVacuum = this.i18n('buttonVacuuming');
-      sendMessage({ cmd: 'Vacuum' })
+      sendCmd('Vacuum')
       .then(() => {
         this.vacuuming = false;
         this.labelVacuum = this.i18n('buttonVacuumed');
@@ -76,7 +77,8 @@ function getVMConfig(text) {
 function getVMFile(entry, vmFile) {
   if (!entry.filename.endsWith('.user.js')) return;
   const vm = vmFile || {};
-  return new Promise((resolve) => {
+  return loadZip()
+  .then(zip => new Promise((resolve) => {
     const writer = new zip.TextWriter();
     entry.getData(writer, (text) => {
       const data = { code: text };
@@ -86,22 +88,24 @@ function getVMFile(entry, vmFile) {
           data.custom = more.custom;
           data.config = more.config || {};
           data.position = more.position;
+          data.props = {
+            lastModified: more.lastModified || +entry.lastModDate,
+            lastUpdated: more.lastUpdated || +entry.lastModDate,
+          };
           // Import data from older version
           if ('enabled' in more) data.config.enabled = more.enabled;
           if ('update' in more) data.config.shouldUpdate = more.update;
         }
       }
-      sendMessage({
-        cmd: 'ParseScript',
-        data,
-      })
+      sendCmd('ParseScript', data)
       .then(() => resolve(true), () => resolve());
     });
-  });
+  }));
 }
 
 function getVMFiles(entries) {
-  return new Promise((resolve) => {
+  return loadZip()
+  .then(zip => new Promise((resolve) => {
     const data = { entries };
     const i = entries.findIndex(entry => entry.filename && entry.filename.toLowerCase() === 'violentmonkey');
     if (i < 0) {
@@ -114,17 +118,18 @@ function getVMFiles(entries) {
       data.vm = getVMConfig(text);
       resolve(data);
     });
-  });
+  }));
 }
 
 function readZip(file) {
-  return new Promise((resolve, reject) => {
+  return loadZip()
+  .then(zip => new Promise((resolve, reject) => {
     zip.createReader(new zip.BlobReader(file), (res) => {
       res.getEntries((entries) => {
         resolve(entries);
       });
     }, (err) => { reject(err); });
-  });
+  }));
 }
 
 function importData(file) {
@@ -144,17 +149,14 @@ function importData(file) {
     .then((count) => {
       forEachItem(vm.values, (valueStore, key) => {
         if (valueStore) {
-          sendMessage({
-            cmd: 'SetValueStore',
-            data: {
-              where: { uri: key },
-              valueStore,
-            },
+          sendCmd('SetValueStore', {
+            where: { uri: key },
+            valueStore,
           });
         }
       });
       showMessage({ text: i18n('msgImported', [count]) });
-      sendMessage({ cmd: 'CheckPosition' });
+      sendCmd('CheckPosition');
     });
   });
 }

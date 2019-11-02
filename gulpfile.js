@@ -64,6 +64,7 @@ async function jsDev() {
 async function jsProd() {
   return require('@gera2ld/plaid-webpack/bin/build')({
     api: true,
+    keep: true,
   });
 }
 
@@ -73,10 +74,6 @@ function manifest() {
     const data = yaml.safeLoad(input);
     // Strip alphabetic suffix
     data.version = pkg.version.replace(/-[^.]*/, '');
-    if (process.env.TARGET === 'firefox') {
-      data.version += 'f';
-      data.applications.gecko.update_url = 'https://violentmonkey.top/static/updates.json';
-    }
     file.path = file.path.replace(/\.yml$/, '.json');
     return JSON.stringify(data);
   }))
@@ -141,6 +138,6 @@ const pack = gulp.parallel(manifest, copyFiles, copyI18n);
 
 exports.clean = clean;
 exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
-exports.build = gulp.parallel(pack, jsProd);
+exports.build = gulp.series(clean, gulp.parallel(pack, jsProd));
 exports.i18n = updateI18n;
 exports.check = checkI18n;

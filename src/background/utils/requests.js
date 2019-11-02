@@ -1,19 +1,92 @@
 import {
-  getUniqId, request, i18n, buffer2string,
+  getUniqId, request, i18n, buffer2string, isEmpty,
 } from '#/common';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
+import { getScriptByIdSync } from './db';
+import { openerTabIdSupported } from './tabs';
 
+const VM_VERIFY = 'VM-Verify';
 const requests = {};
 const verify = {};
 const specialHeaders = [
   'user-agent',
-  'referer',
-  'origin',
-  'host',
+  // https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name
+  // https://cs.chromium.org/?q=file:cc+symbol:IsForbiddenHeader%5Cb
+  'accept-charset',
+  'accept-encoding',
+  'access-control-request-headers',
+  'access-control-request-method',
+  'connection',
+  'content-length',
   'cookie',
+  'cookie2',
+  'date',
+  'dnt',
+  'expect',
+  'host',
+  'keep-alive',
+  'origin',
+  'referer',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade',
+  'via',
 ];
 // const tasks = {};
+const HeaderInjector = (() => {
+  const apiEvent = browser.webRequest.onBeforeSendHeaders;
+  /** @type chrome.webRequest.RequestFilter */
+  const apiFilter = {
+    urls: ['<all_urls>'],
+    types: ['xmlhttprequest'],
+    // -1 is browser.tabs.TAB_ID_NONE to limit the listener to requests from the bg script
+    tabId: -1,
+  };
+  const apiExtraOpts = [
+    'blocking',
+    'requestHeaders',
+    browser.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS,
+  ].filter(Boolean);
+  const headersToInject = {};
+  /** @param {chrome.webRequest.HttpHeader} header */
+  const isVmVerify = header => header.name === VM_VERIFY;
+  const isSendable = header => header.name !== VM_VERIFY;
+  const isSendableAnon = header => isSendable(header) && !/^cookie$/i.test(header.name);
+  /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
+  const onBeforeSendHeaders = ({ requestHeaders, requestId }) => {
+    // only the first call during a redirect/auth chain will have VM-Verify header
+    const reqId = requestHeaders.find(isVmVerify)?.value || verify[requestId];
+    const req = reqId && requests[reqId];
+    if (reqId && req) {
+      verify[requestId] = reqId;
+      req.coreId = requestId;
+      requestHeaders = requestHeaders
+      .concat(headersToInject[reqId] || [])
+      .filter(req.anonymous ? isSendableAnon : isSendable);
+    }
+    return { requestHeaders };
+  };
+  return {
+    add(reqId, headers) {
+      // need to set the entry even if it's empty [] so that 'if' check in del() runs only once
+      headersToInject[reqId] = headers;
+      // need the listener to get the requestId
+      if (!apiEvent.hasListener(onBeforeSendHeaders)) {
+        apiEvent.addListener(onBeforeSendHeaders, apiFilter, apiExtraOpts);
+      }
+    },
+    del(reqId) {
+      if (reqId in headersToInject) {
+        delete headersToInject[reqId];
+        if (isEmpty(headersToInject)) {
+          apiEvent.removeListener(onBeforeSendHeaders);
+        }
+      }
+    },
+  };
+})();
 
 export function getRequestId() {
   const id = getUniqId();
@@ -32,6 +105,7 @@ function xhrCallbackWrapper(req) {
       id: req.id,
       type: evt.type,
       resType: xhr.responseType,
+      contentType: xhr.getResponseHeader('Content-Type') || 'application/octet-stream',
     };
     const data = {
       finalUrl: xhr.responseURL,
@@ -52,17 +126,11 @@ function xhrCallbackWrapper(req) {
       });
     }
     if (evt.type === 'loadend') clearRequest(req);
+    else if (xhr.readyState >= XMLHttpRequest.LOADING) HeaderInjector.del(req.id);
     lastPromise = lastPromise.then(() => {
-      if (xhr.response && xhr.responseType === 'arraybuffer') {
-        const contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream';
-        const binstring = buffer2string(xhr.response);
-        data.response = `data:${contentType};base64,${window.btoa(binstring)}`;
-      } else {
-        // default `null` for blob and '' for text
-        data.response = xhr.response;
-      }
-    })
-    .then(() => {
+      data.response = xhr.response && xhr.responseType === 'arraybuffer'
+        ? buffer2string(xhr.response)
+        : xhr.response;
       if (req.cb) req.cb(res);
     });
   };
@@ -70,6 +138,7 @@ function xhrCallbackWrapper(req) {
 
 function isSpecialHeader(lowerHeader) {
   return specialHeaders.includes(lowerHeader)
+    || lowerHeader.startsWith('proxy-')
     || lowerHeader.startsWith('sec-');
 }
 
@@ -80,17 +149,18 @@ export function httpRequest(details, cb) {
   req.anonymous = details.anonymous;
   const { xhr } = req;
   try {
+    const vmHeaders = [];
     xhr.open(details.method, details.url, true, details.user || '', details.password || '');
-    xhr.setRequestHeader('VM-Verify', details.id);
+    xhr.setRequestHeader(VM_VERIFY, details.id);
     if (details.headers) {
-      Object.keys(details.headers).forEach((key) => {
-        const lowerKey = key.toLowerCase();
-        // `VM-` headers are reserved
-        if (lowerKey.startsWith('vm-')) return;
-        xhr.setRequestHeader(
-          isSpecialHeader(lowerKey) ? `VM-${key}` : key,
-          details.headers[key],
-        );
+      Object.entries(details.headers).forEach(([name, value]) => {
+        const lowerName = name.toLowerCase();
+        if (isSpecialHeader(lowerName)) {
+          vmHeaders.push({ name, value });
+        } else if (!lowerName.startsWith('vm-')) {
+          // `VM-` headers are reserved
+          xhr.setRequestHeader(name, value);
+        }
       });
     }
     if (details.timeout) xhr.timeout = details.timeout;
@@ -110,15 +180,18 @@ export function httpRequest(details, cb) {
     // req.finalUrl = details.url;
     const { data } = details;
     const body = data ? decodeBody(data) : null;
+    HeaderInjector.add(details.id, vmHeaders);
     xhr.send(body);
   } catch (e) {
-    console.warn(e);
+    const { scriptId } = req;
+    console.warn(e, `in script id ${scriptId}, ${getScriptByIdSync(scriptId).meta.name}`);
   }
 }
 
 function clearRequest(req) {
   if (req.coreId) delete verify[req.coreId];
   delete requests[req.id];
+  HeaderInjector.del(req.id);
 }
 
 export function abortRequest(id) {
@@ -165,62 +238,6 @@ function decodeBody(obj) {
 //   types: ['xmlhttprequest'],
 // });
 
-// Modifications on headers
-{
-  function onBeforeSendHeaders(details) {
-    const headers = details.requestHeaders;
-    let newHeaders = [];
-    const vmHeaders = {};
-    headers.forEach((header) => {
-      // if (header.name === 'VM-Task') {
-      //   tasks[details.requestId] = header.value;
-      // } else
-      if (header.name.startsWith('VM-')) {
-        vmHeaders[header.name.slice(3)] = header.value;
-      } else {
-        newHeaders.push(header);
-      }
-    });
-    const reqId = vmHeaders.Verify;
-    if (reqId) {
-      const req = requests[reqId];
-      if (req) {
-        delete vmHeaders.Verify;
-        verify[details.requestId] = reqId;
-        req.coreId = details.requestId;
-        Object.keys(vmHeaders).forEach((name) => {
-          if (isSpecialHeader(name.toLowerCase())) {
-            newHeaders.push({ name, value: vmHeaders[name] });
-          }
-        });
-        if (req.anonymous) {
-          // Drop cookie in anonymous mode
-          newHeaders = newHeaders.filter(({ name }) => name.toLowerCase() !== 'cookie');
-        }
-      }
-    }
-    return { requestHeaders: newHeaders };
-  }
-  const filter = {
-    urls: ['<all_urls>'],
-    types: ['xmlhttprequest'],
-  };
-  try {
-    browser.webRequest.onBeforeSendHeaders.addListener(
-      onBeforeSendHeaders,
-      filter,
-      ['blocking', 'requestHeaders', 'extraHeaders'],
-    );
-  } catch {
-    // extraHeaders is supported since Chrome v72
-    browser.webRequest.onBeforeSendHeaders.addListener(
-      onBeforeSendHeaders,
-      filter,
-      ['blocking', 'requestHeaders'],
-    );
-  }
-}
-
 // tasks are not necessary now, turned off
 // Stop redirects
 // browser.webRequest.onHeadersReceived.addListener(details => {
@@ -253,27 +270,21 @@ function decodeBody(obj) {
 //   types: ['xmlhttprequest'],
 // });
 
-export function confirmInstall(info) {
-  return (info.code
-    ? Promise.resolve(info.code)
-    : request(info.url).then(({ data }) => {
-      if (!isUserScript(data)) return Promise.reject(i18n('msgInvalidScript'));
-      return data;
-    })
-  )
-  .then((code) => {
-    cache.put(info.url, code, 3000);
-    const confirmKey = getUniqId();
-    cache.put(`confirm-${confirmKey}`, {
-      url: info.url,
-      from: info.from,
-    });
-    const optionsURL = browser.runtime.getURL('/confirm/index.html');
-    browser.tabs.create({ url: `${optionsURL}#${confirmKey}` });
+export async function confirmInstall(info, src = {}) {
+  const { url, from } = info;
+  const code = info.code || (await request(url)).data;
+  // TODO: display the error in UI
+  if (!isUserScript(code)) throw i18n('msgInvalidScript');
+  cache.put(url, code, 3000);
+  const confirmKey = getUniqId();
+  cache.put(`confirm-${confirmKey}`, { url, from });
+  browser.tabs.create({
+    url: `/confirm/index.html#${confirmKey}`,
+    index: src.tab ? src.tab.index + 1 : undefined,
+    ...src.tab && openerTabIdSupported ? { openerTabId: src.tab.id } : {},
   });
 }
 
-const reUserScript = /\.user\.js([?#]|$)/;
 const whitelist = [
   '^https://greasyfork.org/scripts/[^/]*/code/[^/]*?\\.user\\.js([?#]|$)',
   '^https://openuserjs.org/install/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
@@ -284,13 +295,26 @@ const blacklist = [
   '//(?:(?:gist.|)github.com|greasyfork.org|openuserjs.org)/',
 ].map(re => new RegExp(re));
 const bypass = {};
+const extensionRoot = browser.runtime.getURL('/');
+
+browser.tabs.onCreated.addListener((tab) => {
+  if (/\.user\.js([?#]|$)/.test(tab.pendingUrl || tab.url)) {
+    cache.put(`autoclose:${tab.id}`, true, 1000);
+  }
+});
 
 browser.webRequest.onBeforeRequest.addListener((req) => {
   // onBeforeRequest fired for `file:`
   // - works on Chrome
   // - does not work on Firefox
   const { url } = req;
-  if (req.method === 'GET' && reUserScript.test(url)) {
+  if (req.method === 'GET') {
+    // open a real URL for simplified userscript URL listed in devtools of the web page
+    if (url.startsWith(extensionRoot)) {
+      const id = +url.split('#').pop();
+      const redirectUrl = `${extensionRoot}options/index.html#scripts/${id}`;
+      return { redirectUrl };
+    }
     if (!bypass[url] && (
       whitelist.some(re => re.test(url)) || !blacklist.some(re => re.test(url))
     )) {
@@ -304,8 +328,12 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
           confirmInstall({
             code,
             url,
-            from: tab && tab.url,
-          });
+            // Chrome 79+ uses pendingUrl while the tab connects to the newly navigated URL
+            from: tab && (tab.pendingUrl || tab.url),
+          }, { tab });
+          if (cache.has(`autoclose:${req.tabId}`)) {
+            browser.tabs.remove(req.tabId);
+          }
         } else {
           if (!bypass[url]) {
             bypass[url] = {
@@ -324,6 +352,14 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     }
   }
 }, {
-  urls: ['<all_urls>'],
+  urls: [
+    // 1. *:// comprises only http/https
+    // 2. the API ignores #hash part
+    '*://*/*.user.js',
+    '*://*/*.user.js?*',
+    'file://*/*.user.js',
+    'file://*/*.user.js?*',
+    `${extensionRoot}*.user.js`,
+  ],
   types: ['main_frame'],
 }, ['blocking']);

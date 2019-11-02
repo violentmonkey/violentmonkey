@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { sendMessage } from '#/common';
+import { sendCmd } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
 import hookSetting from '#/common/hook-setting';
@@ -144,10 +144,7 @@ export default {
   },
   methods: {
     onSaveUserConfig() {
-      sendMessage({
-        cmd: 'SyncSetConfig',
-        data: this.state.userConfig,
-      });
+      sendCmd('SyncSetConfig', this.state.userConfig);
     },
     onSyncChange(e) {
       const { value } = e.target;
@@ -157,14 +154,14 @@ export default {
       const { service } = this;
       if (['authorized'].includes(service.authState)) {
         // revoke
-        sendMessage({ cmd: 'SyncRevoke' });
+        sendCmd('SyncRevoke');
       } else if (['unauthorized', 'error'].includes(service.authState)) {
         // authorize
-        sendMessage({ cmd: 'SyncAuthorize' });
+        sendCmd('SyncAuthorize');
       }
     },
     onSync() {
-      sendMessage({ cmd: 'SyncStart' });
+      sendCmd('SyncStart');
     },
     getMessage() {
       const { service } = this;

@@ -1,5 +1,12 @@
 <template>
-  <textarea v-model="value" @change="onChange" :disabled="disabled" />
+  <textarea
+    class="monospace-font"
+    spellcheck="false"
+    v-model="value"
+    :disabled="disabled"
+    :title="error"
+    @change="onChange"
+  />
 </template>
 
 <script>
@@ -9,6 +16,7 @@ import hookSetting from '../hook-setting';
 export default {
   props: {
     name: String,
+    json: Boolean,
     disabled: Boolean,
     sync: {
       type: Boolean,
@@ -18,26 +26,51 @@ export default {
   data() {
     return {
       value: null,
+      jsonValue: null,
+      error: null,
     };
   },
   created() {
-    // XXX compatible with old data format
-    const handle = value => (Array.isArray(value) ? value.join('\n') : (value || ''));
+    const handle = this.json
+      ? (value => JSON.stringify(value, null, '  '))
+      // XXX compatible with old data format
+      : (value => (Array.isArray(value) ? value.join('\n') : value || ''));
     this.value = handle(options.get(this.name));
     this.revoke = hookSetting(this.name, (value) => {
       this.value = handle(value);
     });
+    if (this.json) this.$watch('value', this.parseJson);
   },
   beforeDestroy() {
     this.revoke();
   },
   methods: {
-    onChange() {
-      if (this.sync) {
-        options.set(this.name, this.value);
+    parseJson() {
+      try {
+        this.jsonValue = JSON.parse(this.value);
+        this.error = null;
+      } catch (e) {
+        this.error = e.message || e;
       }
-      this.$emit('change', this.value);
+    },
+    onChange() {
+      if (this.error) return;
+      const value = this.json ? this.jsonValue : this.value;
+      if (this.sync) options.set(this.name, value);
+      this.$emit('change', value);
     },
   },
 };
 </script>
+
+<style>
+  textarea {
+    &[title] {
+      border-color: #4004;
+      background: #f001;
+      &:focus {
+        border-color: #400c;
+      }
+    }
+  }
+</style>

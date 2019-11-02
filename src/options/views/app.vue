@@ -1,6 +1,6 @@
 <template>
   <div class="page-options flex h-100">
-    <aside :class="{ 'show-aside': aside }">
+    <aside :class="{ 'show-aside': aside }" v-if="canRenderAside">
       <div v-if="aside" class="aside-backdrop visible-sm" @click="aside = false" />
       <div class="aside-content">
         <img src="/public/images/icon128.png">
@@ -37,6 +37,7 @@
 import { i18n } from '#/common';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
+import * as Hotkeys from '../utils/hotkeys';
 import Installed from './tab-installed';
 import Settings from './tab-settings';
 import About from './tab-about';
@@ -53,8 +54,12 @@ export default {
     Icon,
   },
   data() {
+    const [tab, tabFunc] = store.route.paths;
     return {
       aside: false,
+      // Speedup and deflicker for initial page load:
+      // skip rendering the aside when starting in the editor for a new script.
+      canRenderAside: tab !== 'scripts' || (tabFunc !== '_new' && !Number(tabFunc)),
       store,
     };
   },
@@ -71,6 +76,11 @@ export default {
   watch: {
     'store.title'(title) {
       document.title = title ? `${title} - ${extName}` : extName;
+    },
+    'store.route.paths'() {
+      Hotkeys.routeChanged();
+      // First time showing the aside we need to tell v-if to keep it forever
+      this.canRenderAside = true;
     },
   },
 };

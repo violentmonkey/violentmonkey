@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { i18n, sendMessage } from '#/common';
+import { i18n, sendCmd } from '#/common';
 import options from '#/common/options';
 import { showMessage } from '#/options/utils';
 import SettingText from '#/common/ui/setting-text';
@@ -24,7 +24,7 @@ export default {
     onSave() {
       options.set('blacklist', this.$refs.blacklist.value);
       showMessage({ text: i18n('msgSavedBlacklist') });
-      sendMessage({ cmd: 'BlacklistReset' });
+      sendCmd('BlacklistReset');
     },
   },
 };

@@ -1,6 +1,6 @@
 <template>
   <div class="tab-installed flex flex-col">
-    <div class="flex flex-col flex-auto">
+    <div class="flex flex-col flex-auto" v-if="canRenderScripts">
       <header class="flex">
         <div class="flex-auto" v-if="!showRecycle">
           <dropdown
@@ -63,7 +63,7 @@
           </div>
         </dropdown>
         <div class="filter-search hidden-sm">
-          <input type="text" :placeholder="i18n('labelSearchScript')" v-model="search">
+          <input type="search" :placeholder="i18n('labelSearchScript')" v-model="search">
           <icon name="search"></icon>
         </div>
       </header>
@@ -75,11 +75,13 @@
       <div class="flex-auto pos-rel">
         <div class="scripts abs-full">
           <script-item
-            v-for="script in filteredScripts"
+            v-for="(script, index) in sortedScripts"
+            v-show="!search || script.$cache.show !== false"
             :key="script.props.id"
             :class="{ removing: removing && removing.id === script.props.id }"
             :script="script"
             :draggable="filters.sort.value === 'exec' && !script.config.removed"
+            :visible="index < batchRender.limit"
             @edit="onEditScript"
             @move="moveScript"
             @remove="onRemove"
@@ -102,14 +104,14 @@
 import Dropdown from 'vueleton/lib/dropdown/bundle';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import {
-  i18n, sendMessage, debounce,
+  i18n, sendCmd, debounce,
 } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
 import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
 import LocaleGroup from '#/common/ui/locale-group';
-import { setRoute } from '#/common/router';
+import { setRoute, lastRoute } from '#/common/router';
 import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
@@ -143,9 +145,12 @@ const filters = {
 hookSetting('filters.sort', (value) => {
   filters.sort.set(value);
 });
-options.ready(() => {
+options.ready.then(() => {
   filters.sort.set(options.get('filters.sort'));
 });
+
+const MAX_BATCH_DURATION = 100;
+let step = 0;
 
 export default {
   components: {
@@ -167,26 +172,30 @@ export default {
       modal: null,
       menuNewActive: false,
       showRecycle: false,
-      filteredScripts: [],
+      sortedScripts: [],
       removing: null,
+      // Speedup and deflicker for initial page load:
+      // skip rendering the script list when starting in the editor.
+      canRenderScripts: !store.route.paths[1],
+      batchRender: {
+        limit: step,
+      },
     };
   },
   watch: {
     search: 'updateLater',
     'filters.sort.value': 'updateLater',
     showRecycle: 'onUpdate',
-    scripts() {
-      this.onUpdate();
-      this.onHashChange();
-    },
+    scripts: 'refreshUI',
     'store.route.paths.1': 'onHashChange',
   },
   computed: {
     message() {
       if (this.store.loading) {
-        return i18n('msgLoading');
+        return null;
       }
-      if (!this.filteredScripts.length) {
+      const scripts = this.sortedScripts;
+      if (this.search ? !scripts.find(s => s.$cache.show !== false) : !scripts.length) {
         return i18n('labelNoSearchScripts');
       }
       return null;
@@ -199,13 +208,20 @@ export default {
     },
   },
   methods: {
+    refreshUI() {
+      this.onUpdate();
+      this.onHashChange();
+    },
     onUpdate() {
       const { search, filters: { sort }, showRecycle } = this;
-      const lowerSearch = (search || '').toLowerCase();
       const scripts = showRecycle ? this.trash : this.scripts;
-      const filteredScripts = search
-        ? scripts.filter(script => script.$cache.search.includes(lowerSearch))
-        : scripts.slice();
+      const sortedScripts = [...scripts];
+      if (search) {
+        const lowerSearch = (search || '').toLowerCase();
+        for (const { $cache } of scripts) {
+          $cache.show = $cache.search.includes(lowerSearch);
+        }
+      }
       if (sort.value === SORT_ALPHA.value) {
         const showEnabledFirst = options.get('filters.showEnabledFirst');
         const getSortKey = (item) => {
@@ -216,7 +232,7 @@ export default {
           keys.push(item.$cache.lowerName);
           return keys.join('');
         };
-        filteredScripts.sort((a, b) => {
+        sortedScripts.sort((a, b) => {
           const nameA = getSortKey(a);
           const nameB = getSortKey(b);
           if (nameA < nameB) return -1;
@@ -225,15 +241,16 @@ export default {
         });
       } else if (sort.value === SORT_UPDATE.value) {
         const getSortKey = item => +item.props.lastUpdated || 0;
-        filteredScripts.sort((a, b) => getSortKey(b) - getSortKey(a));
+        sortedScripts.sort((a, b) => getSortKey(b) - getSortKey(a));
       }
-      this.filteredScripts = filteredScripts;
+      this.sortedScripts = sortedScripts;
+      this.debouncedRender();
     },
     updateLater() {
       this.debouncedUpdate();
     },
     updateAll() {
-      sendMessage({ cmd: 'CheckUpdateAll' });
+      sendCmd('CheckUpdateAll');
     },
     installFromURL() {
       new Promise((resolve, reject) => {
@@ -254,7 +271,7 @@ export default {
         });
       })
       .then((url) => {
-        if (url && url.includes('://')) return sendMessage({ cmd: 'ConfirmInstall', data: { url } });
+        if (url && url.includes('://')) return sendCmd('ConfirmInstall', { url });
       })
       .catch((err) => {
         if (err) showMessage({ text: err });
@@ -262,12 +279,9 @@ export default {
     },
     moveScript(data) {
       if (data.from === data.to) return;
-      sendMessage({
-        cmd: 'Move',
-        data: {
-          id: this.scripts[data.from].props.id,
-          offset: data.to - data.from,
-        },
+      sendCmd('Move', {
+        id: this.scripts[data.from].props.id,
+        offset: data.to - data.from,
       })
       .then(() => {
         const { scripts } = this;
@@ -293,15 +307,28 @@ export default {
       this.menuNewActive = active;
     },
     onEditScript(id) {
-      setRoute(['scripts', id].filter(Boolean).join('/'), true);
+      const pathname = ['scripts', id].filter(Boolean).join('/');
+      if (!id && pathname === lastRoute().pathname) {
+        window.history.back();
+      } else {
+        setRoute(pathname);
+      }
     },
     onHashChange() {
-      const id = this.store.route.paths[1];
+      const [tab, id] = this.store.route.paths;
       if (id === '_new') {
         this.script = {};
       } else {
         const nid = id && +id || null;
         this.script = nid && this.scripts.find(script => script.props.id === nid);
+        if (!this.script) {
+          // First time showing the list we need to tell v-if to keep it forever
+          this.canRenderScripts = true;
+          this.debouncedRender();
+          // Strip the invalid id from the URL so |App| can render the aside,
+          // which was hidden to avoid flicker on initial page load directly into the editor.
+          if (id) setRoute(tab, true);
+        }
       }
     },
     toggleRecycle() {
@@ -329,10 +356,38 @@ export default {
         }, 300);
       });
     },
+    async renderScripts() {
+      if (!this.canRenderScripts) return;
+      const { length } = this.sortedScripts;
+      let limit = 9;
+      const batchRender = { limit };
+      this.batchRender = batchRender;
+      const startTime = performance.now();
+      // If we entered a new loop of rendering, this.batchRender will no longer be batchRender
+      while (limit < length && batchRender === this.batchRender) {
+        if (step) {
+          limit += step;
+        } else {
+          limit += 1;
+        }
+        batchRender.limit = limit;
+        await new Promise(resolve => this.$nextTick(resolve));
+        if (!step && performance.now() - startTime >= MAX_BATCH_DURATION) {
+          step = limit;
+        }
+        if (step) await new Promise(resolve => setTimeout(resolve));
+      }
+    },
   },
   created() {
-    this.debouncedUpdate = debounce(this.onUpdate, 200);
-    this.onUpdate();
+    this.debouncedUpdate = debounce(this.onUpdate, 100);
+    this.debouncedRender = debounce(this.renderScripts);
+  },
+  mounted() {
+    // Ensure the correct UI is shown when mounted:
+    // * on subsequent navigation via history back/forward;
+    // * on first initialization in some weird case the scripts got loaded early.
+    if (!store.loading) this.refreshUI();
   },
 };
 </script>
@@ -401,7 +456,7 @@ export default {
     width: 100%;
     padding-left: .5rem;
     padding-right: 2rem;
-    line-height: 2;
+    height: 2rem;
   }
 }
 .filter-sort {

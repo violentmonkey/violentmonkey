@@ -302,7 +302,10 @@ export const BaseService = serviceFactory({
     return this.get({ name: this.metaFile })
     .then(data => JSON.parse(data))
     .catch(err => this.handleMetaError(err))
-    .then(data => data || {});
+    .then(data => ({
+      name: this.metaFile,
+      data,
+    }));
   },
   initToken() {
     this.prepareHeaders();
@@ -358,8 +361,8 @@ export const BaseService = serviceFactory({
   },
   getSyncData() {
     return this.getMeta()
-    .then(remoteMetaData => Promise.all([
-      { name: this.metaFile, data: remoteMetaData },
+    .then(remoteMeta => Promise.all([
+      remoteMeta,
       this.list(),
       this.getLocalData(),
     ]));
@@ -375,7 +378,7 @@ export const BaseService = serviceFactory({
     .then(() => this.getSyncData())
     .then(data => Promise.resolve(this.acquireLock()).then(() => data))
     .then(([remoteMeta, remoteData, localData]) => {
-      const { data: remoteMetaData } = remoteMeta;
+      const remoteMetaData = remoteMeta.data || {};
       const remoteMetaInfo = remoteMetaData.info || {};
       const remoteTimestamp = remoteMetaData.timestamp || 0;
       let remoteChanged = !remoteTimestamp

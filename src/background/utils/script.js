@@ -1,12 +1,10 @@
 import { encodeFilename } from '#/common';
+import { METABLOCK_RE } from '#/common/consts';
 import { getOption } from './options';
-
-const metaStart = '==UserScript==';
-const metaEnd = '==/UserScript==';
 
 export function isUserScript(text) {
   if (/^\s*</.test(text)) return false; // HTML
-  if (text.indexOf(metaStart) < 0) return false; // Lack of meta block
+  if (text.indexOf('// ==UserScript==') < 0) return false; // Lack of meta block
   return true;
 }
 
@@ -47,25 +45,16 @@ export function parseMeta(code) {
   .reduce((res, key) => Object.assign(res, {
     [key]: metaTypes[key].default(),
   }), {});
-  let flag = -1;
-  code.replace(/(?:^|\n)\s*\/\/\s*([@=]\S+)(.*)/g, (_match, group1, group2) => {
-    if (flag < 0 && group1 === metaStart) {
-      // start meta
-      flag = 1;
-    } else if (flag > 0 && group1 === metaEnd) {
-      // end meta
-      flag = 0;
-    }
-    if (flag === 1 && group1[0] === '@') {
-      const [keyName, locale] = group1.slice(1).split(':');
-      const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
-      const key = locale ? `${camelKey}:${locale.toLowerCase()}` : camelKey;
-      const val = group2.trim();
-      const metaType = metaTypes[key] || defaultType;
-      let oldValue = meta[key];
-      if (typeof oldValue === 'undefined') oldValue = metaType.default();
-      meta[key] = metaType.transform(oldValue, val);
-    }
+  const metaBody = code.match(METABLOCK_RE)[1] || '';
+  metaBody.replace(/(?:^|\n)\s*\/\/\x20(@\S+)(.*)/g, (_match, rawKey, rawValue) => {
+    const [keyName, locale] = rawKey.slice(1).split(':');
+    const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
+    const key = locale ? `${camelKey}:${locale.toLowerCase()}` : camelKey;
+    const val = rawValue.trim();
+    const metaType = metaTypes[key] || defaultType;
+    let oldValue = meta[key];
+    if (typeof oldValue === 'undefined') oldValue = metaType.default();
+    meta[key] = metaType.transform(oldValue, val);
   });
   meta.resources = meta.resource;
   delete meta.resource;
@@ -86,6 +75,8 @@ export function getDefaultCustom() {
 export function newScript(data) {
   const state = {
     url: '*://*/*',
+    name: '',
+    date: new Date().toLocaleString(),
     ...data,
   };
   const code = getOption('scriptTemplate')

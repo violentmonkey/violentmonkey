@@ -1,176 +1,63 @@
-import { isFirefox } from '#/common/ua';
 import { getUniqId } from '#/common';
-import { INJECT_PAGE, INJECT_CONTENT, INJECT_AUTO } from '#/common/consts';
+import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
+import { bindEvents, sendCmd, sendMessage } from '../utils';
 import {
-  bindEvents, sendMessage, attachFunction,
-} from '../utils';
+  setJsonDump, objectKeys, filter, forEach, includes, append, createElement, setAttribute,
+} from '../utils/helpers';
 import bridge from './bridge';
-import { tabOpen, tabClose, tabClosed } from './tabs';
-import { onNotificationCreate, onNotificationClick, onNotificationClose } from './notifications';
-import {
-  getRequestId, httpRequest, abortRequest, httpRequested,
-} from './requests';
-import dirtySetClipboard from './clipboard';
-import { inject } from './util';
+import './clipboard';
+import { injectScripts, triageScripts } from './inject';
+import './notifications';
+import './requests';
+import './tabs';
 
 const IS_TOP = window.top === window;
-
-// Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
-const VMInitInjection = window[process.env.INIT_FUNC_NAME];
-
-const ids = [];
-const enabledIds = [];
 const menus = {};
 
-function setBadge() {
-  // delay setBadge in frames so that they can be added to the initial count
-  new Promise(resolve => setTimeout(resolve, IS_TOP ? 0 : 300))
-  .then(() => sendMessage({
-    cmd: 'SetBadge',
-    data: {
-      ids: enabledIds,
-      reset: IS_TOP,
-    },
-  }));
+// Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
+const { split } = String.prototype;
+
+export default async function initialize(contentId, webId) {
+  // may be overriden in injectScripts
+  bridge.post = bindEvents(contentId, webId, bridge.onHandle);
+  bridge.destId = webId;
+  setJsonDump({ native: true });
+  const data = await sendCmd('GetInjected', window.location.href, { retry: true });
+  const scriptLists = triageScripts(data);
+  getPopup();
+  setBadge();
+  if (scriptLists[INJECT_PAGE].length || scriptLists[INJECT_CONTENT].length) {
+    injectScripts(contentId, webId, data, scriptLists);
+  }
 }
 
-const bgHandlers = {
+bridge.addBackgroundHandlers({
   Command(data) {
-    bridge.post({ cmd: 'Command', data });
+    const id = +data::split(':', 1)[0];
+    const realm = bridge.invokableIds::includes(id) && INJECT_CONTENT;
+    bridge.post({ cmd: 'Command', data, realm });
   },
   GetPopup: getPopup,
-  HttpRequested: httpRequested,
-  TabClosed: tabClosed,
   UpdatedValues(data) {
-    bridge.post({ cmd: 'UpdatedValues', data });
-  },
-  NotificationClick: onNotificationClick,
-  NotificationClose: onNotificationClose,
-};
-
-export default function initialize(contentId, webId) {
-  bridge.post = bindEvents(contentId, webId, onHandle);
-  bridge.destId = webId;
-
-  browser.runtime.onMessage.addListener((req, src) => {
-    const handle = bgHandlers[req.cmd];
-    if (handle) handle(req.data, src);
-  });
-
-  return sendMessage({
-    cmd: 'GetInjected',
-    data: {
-      url: window.location.href,
-      reset: IS_TOP,
-    },
-  })
-  .then((data) => {
-    const scriptLists = {
-      [INJECT_PAGE]: [],
-      [INJECT_CONTENT]: [],
-    };
-    if (data.scripts) {
-      data.scripts = data.scripts.filter((script) => {
-        ids.push(script.props.id);
-        if ((IS_TOP || !script.meta.noframes) && script.config.enabled) {
-          enabledIds.push(script.props.id);
-          return true;
-        }
-        return false;
-      });
-      let support;
-      data.scripts.forEach((script) => {
-        let injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
-        if (injectInto === INJECT_AUTO) {
-          if (!support) support = { injectable: checkInjectable() };
-          injectInto = support.injectable ? INJECT_PAGE : INJECT_CONTENT;
-        }
-        const list = scriptLists[injectInto];
-        if (list) list.push(script);
-      });
-    }
-    getPopup();
-    setBadge();
-    if (scriptLists[INJECT_PAGE].length || scriptLists[INJECT_CONTENT].length) {
-      injectScripts(contentId, webId, data, scriptLists);
-    }
-  });
-}
-
-function checkInjectable() {
-  // Check default namespace, `a.style` only exists in HTML namespace
-  if (!('style' in document.createElement('a'))) return false;
-  const id = getUniqId('VM-');
-  const detect = (domId) => {
-    const a = document.createElement('a');
-    a.id = domId;
-    document.documentElement.appendChild(a);
-  };
-  inject(`(${detect.toString()})(${JSON.stringify(id)})`);
-  const a = document.querySelector(`#${id}`);
-  const injectable = !!a;
-  if (a) a.parentNode.removeChild(a);
-  return injectable;
-}
-
-function injectScripts(contentId, webId, data, scriptLists) {
-  const props = {};
-  [
-    Object.getOwnPropertyNames(window),
-    Object.getOwnPropertyNames(global),
-  ].forEach((keys) => {
-    keys.forEach((key) => { props[key] = 1; });
-  });
-  const args = [
-    webId,
-    contentId,
-    Object.keys(props),
-  ];
-
-  const injectPage = scriptLists[INJECT_PAGE];
-  const injectContent = scriptLists[INJECT_CONTENT];
-  if (injectContent.length) {
-    VMInitInjection()(...args, INJECT_CONTENT);
-    bridge.ready.then(() => {
-      bridge.post({
-        cmd: 'LoadScripts',
-        data: {
-          ...data,
-          mode: INJECT_CONTENT,
-          scripts: injectContent,
-        },
-      });
+    const realms = [
+      { data: {}, present: false },
+      { data: {}, present: false, realm: INJECT_CONTENT },
+    ];
+    objectKeys(data)::forEach((id) => {
+      const r = realms[bridge.invokableIds::includes(id) ? 1 : 0];
+      r.data[id] = data[id];
+      r.present = true;
     });
-  }
-  if (injectPage.length) {
-    // Avoid using Function::apply in case it is shimmed
-    inject(`(${VMInitInjection.toString()}())(${args.map(arg => JSON.stringify(arg)).join(',')})`);
-    bridge.ready.then(() => {
-      bridge.post({
-        cmd: 'LoadScripts',
-        data: {
-          ...data,
-          mode: INJECT_PAGE,
-          scripts: injectPage,
-        },
-      });
+    realms
+    ::filter(r => r.present)
+    ::forEach(({ data: d, realm }) => {
+      bridge.post({ cmd: 'UpdatedValues', data: d, realm });
     });
-  }
-}
+  },
+});
 
-const handlers = {
-  GetRequestId: getRequestId,
-  HttpRequest: httpRequest,
-  AbortRequest: abortRequest,
-  Inject: injectScript,
-  TabOpen: tabOpen,
-  TabClose: tabClose,
-  Ready() {
-    bridge.ready = Promise.resolve();
-  },
-  UpdateValue(data) {
-    sendMessage({ cmd: 'UpdateValue', data });
-  },
+bridge.addHandlers({
+  UpdateValue: sendMessage,
   RegisterMenu(data) {
     if (IS_TOP) {
       const [id, cap] = data;
@@ -193,75 +80,30 @@ const handlers = {
     }
     getPopup();
   },
-  AddStyle({ css, callbackId }) {
-    let styleId = null;
-    if (document.head) {
-      styleId = getUniqId('VMst');
-      const style = document.createElement('style');
-      style.id = styleId;
-      style.textContent = css;
-      document.head.appendChild(style);
-    }
-    bridge.post({ cmd: 'Callback', data: { callbackId, payload: styleId } });
+  AddStyle({ css, callbackId }, realm) {
+    const styleId = getUniqId('VMst');
+    const style = document::createElement('style');
+    style::setAttribute('id', styleId);
+    style::append(css);
+    // DOM spec allows any elements under documentElement
+    // https://dom.spec.whatwg.org/#node-trees
+    (document.head || document.documentElement)::append(style);
+    bridge.post({ cmd: 'Callback', data: { callbackId, payload: styleId }, realm });
   },
-  Notification: onNotificationCreate,
-  SetClipboard(data) {
-    if (isFirefox) {
-      // Firefox does not support copy from background page.
-      // ref: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Interact_with_the_clipboard
-      // The dirty way will create a <textarea> element in web page and change the selection.
-      dirtySetClipboard(data);
-    } else {
-      sendMessage({ cmd: 'SetClipboard', data });
-    }
-  },
-  CheckScript({ name, namespace, callback }) {
-    sendMessage({ cmd: 'CheckScript', data: { name, namespace } })
+  CheckScript({ name, namespace, callback }, realm) {
+    sendCmd('CheckScript', { name, namespace })
     .then((result) => {
-      bridge.post({ cmd: 'ScriptChecked', data: { callback, result } });
+      bridge.post({ cmd: 'ScriptChecked', data: { callback, result }, realm });
     });
   },
-};
-
-bridge.ready = new Promise((resolve) => {
-  handlers.Ready = resolve;
 });
 
-function onHandle(req) {
-  const handle = handlers[req.cmd];
-  if (handle) handle(req.data);
-}
-
 function getPopup() {
-  // XXX: only scripts run in top level window are counted
-  if (IS_TOP) {
-    sendMessage({
-      cmd: 'SetPopup',
-      data: { ids, menus },
-    });
-  }
+  sendCmd('SetPopup', { ids: bridge.ids, menus });
 }
 
-function injectScript(data) {
-  const [vId, code, vCallbackId, mode, scriptId] = data;
-  const func = (attach, id, cb, callbackId) => {
-    attach(id, cb);
-    const callback = window[callbackId];
-    if (callback) callback();
-  };
-  const args = [
-    attachFunction.toString(),
-    JSON.stringify(vId),
-    code,
-    JSON.stringify(vCallbackId),
-  ];
-  const injectedCode = `!${func.toString()}(${args.join(',')})`;
-  if (mode === INJECT_CONTENT) {
-    sendMessage({
-      cmd: 'InjectScript',
-      data: injectedCode,
-    });
-  } else {
-    inject(injectedCode, browser.extension.getURL(`/options/index.html#scripts/${scriptId}`));
-  }
+async function setBadge() {
+  // delay setBadge in frames so that they can be added to the initial count
+  if (!IS_TOP) await new Promise(resolve => setTimeout(resolve, 300));
+  sendCmd('SetBadge', bridge.enabledIds);
 }

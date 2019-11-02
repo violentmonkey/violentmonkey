@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { sendMessage } from '#/common';
+import { sendCmd } from '#/common';
 import Icon from '#/common/ui/icon';
 
 const PAGE_SIZE = 25;
@@ -100,7 +100,7 @@ export default {
       return value;
     },
     refresh() {
-      sendMessage({ cmd: 'GetValueStore', data: this.script.props.id })
+      sendCmd('GetValueStore', this.script.props.id)
       .then((values) => {
         this.values = values;
         this.keys = Object.keys(values).sort();
@@ -109,14 +109,11 @@ export default {
     },
     updateValue({ key, value, isNew }) {
       const rawValue = value ? `o${value}` : '';
-      return sendMessage({
-        cmd: 'UpdateValue',
-        data: {
-          id: this.script.props.id,
-          update: {
-            key,
-            value: rawValue,
-          },
+      return sendCmd('UpdateValue', {
+        id: this.script.props.id,
+        update: {
+          key,
+          value: rawValue,
         },
       })
       .then(() => {

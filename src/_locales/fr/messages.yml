@@ -82,6 +82,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Sauvegarder
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: Page de support
@@ -118,6 +121,9 @@ descCustomCSS:
     CSS personnalisée pour la page d’options et pour la page d’installation de
     script. Si vous n'êtes pas certain·e de ce que vous faites, veuillez ne pas
     l’éditer.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadonnées personnalisées
@@ -145,6 +151,14 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
+failureReasonBlacklisted:
+  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  message: ''
+failureReasonNoninjectable:
+  description: >-
+    Shown for URLs that cannot be processed (same places as
+    failureBlacklistedUrl)
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordre alphabétique
@@ -278,6 +292,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: Taille de l’indentation
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Mode d’injection par défaut:'
@@ -296,6 +311,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Couper les longues lignes
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Règles @match
@@ -416,6 +432,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Chercher des scripts pour ce site
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Scripts associés
@@ -464,6 +483,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Chargement…
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Chargement des données du script...
@@ -489,6 +509,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Style personnalisé mis à jour.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Le modèle de script personnalisé a été mis à jour.

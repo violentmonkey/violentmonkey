@@ -18,7 +18,7 @@ options.hook((data) => {
     Vue.set(store, 'features', features);
   }
 });
-options.ready(() => reset('sync'));
+options.ready.then(() => reset('sync'));
 
 function reset(version) {
   if (objectGet(store, 'features.version') !== version) {

@@ -63,6 +63,7 @@ textarea {
   }
 }
 code {
+  padding: 0 .2em;
   background: #f7e999;
 }
 
@@ -95,6 +96,9 @@ button {
   }
   &:active {
     background: #bfbfbf;
+  }
+  &:focus {
+    border-color: #000;
   }
   &[disabled] {
     color: #d0d0d0;
@@ -242,6 +246,10 @@ button,
 
 .editor-code .CodeMirror {
   height: 100%;
+}
+
+.monospace-font,
+.editor-code .CodeMirror {
   /* Use `Courier New` to ensure `&nbsp;` has the same width as an original space. */
   font-family: "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", Courier, monospace;
 }

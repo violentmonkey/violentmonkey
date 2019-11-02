@@ -10,9 +10,9 @@ module.exports = {
     },
   },
   rules: {
+    'prefer-object-spread': 'off',
   },
   globals: {
     browser: true,
-    zip: true,
   },
 };

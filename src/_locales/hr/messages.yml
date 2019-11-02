@@ -80,6 +80,9 @@ buttonSaveClose:
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
   message: Sačuvaj
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: ''
 buttonSupport:
   description: Button to open support page.
   message: ''
@@ -115,6 +118,9 @@ descCustomCSS:
   message: >-
     Prilagođeni CSS za opcije stranice i stranicu instalacija skripte. Ako niste
     sigurni za što je ovo, ne dirajte.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Prilagođeni metadata podaci
@@ -142,6 +148,14 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
+failureReasonBlacklisted:
+  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  message: ''
+failureReasonNoninjectable:
+  description: >-
+    Shown for URLs that cannot be processed (same places as
+    failureBlacklistedUrl)
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ''
@@ -271,6 +285,7 @@ labelInclude:
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: ''
+  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: ''
@@ -289,6 +304,7 @@ labelLineNumber:
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: ''
+  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match rules'
@@ -409,6 +425,9 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Nađi skripte za ovaj sajt
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Matched skripte
@@ -457,6 +476,7 @@ msgLoadedData:
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Učitavam ...
+  touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
   message: Učitavam podatke skripte...
@@ -482,6 +502,9 @@ msgSavedBlacklist:
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Prilagođeni stil je obnovljen.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: ''
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: ''

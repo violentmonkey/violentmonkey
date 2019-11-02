@@ -11,19 +11,33 @@ hookOptions((changes) => {
 });
 const RE_HTTP_OR_HTTPS = /^https?$/i;
 
+/*
+ Simple FIFO queue for the results of testBlacklist, cached separately from the main |cache|
+ because the blacklist is updated only once in a while so its entries would be crowding
+ the main cache and reducing its performance (objects with lots of keys are slow to access).
+
+ We also don't need to auto-expire the entries after a timeout.
+ The only limit we're concerned with is the overall memory used.
+ The limit is specified in the amount of unicode characters (string length) for simplicity.
+ Disregarding deduplication due to interning, the actual memory used is approximately twice as big:
+ 2 * keyLength + objectStructureOverhead * objectCount
+*/
+const MAX_BL_CACHE_LENGTH = 100e3;
+let blCache = {};
+let blCacheSize = 0;
+
 /**
  * Test glob rules like `@include` and `@exclude`.
  */
 export function testGlob(url, rules) {
-  const lifetime = 60 * 1000;
   return rules.some((rule) => {
     const key = `re:${rule}`;
     let re = cache.get(key);
     if (re) {
-      cache.hit(key, lifetime);
+      cache.hit(key);
     } else {
       re = autoReg(rule);
-      cache.put(key, re, lifetime);
+      cache.put(key, re);
     }
     return re.test(url);
   });
@@ -33,15 +47,14 @@ export function testGlob(url, rules) {
  * Test match rules like `@match` and `@exclude_match`.
  */
 export function testMatch(url, rules) {
-  const lifetime = 60 * 1000;
   return rules.some((rule) => {
     const key = `match:${rule}`;
     let matcher = cache.get(key);
     if (matcher) {
-      cache.hit(key, lifetime);
+      cache.hit(key);
     } else {
       matcher = matchTester(rule);
-      cache.put(key, matcher, lifetime);
+      cache.put(key, matcher);
     }
     return matcher.test(url);
   });
@@ -64,6 +77,16 @@ export function testScript(url, script) {
   // @exclude
   ok = ok && !testGlob(url, exc);
   return ok;
+}
+
+function testRegExp(re, text) {
+  const key = `re-test:${re.source}:${text}`;
+  let res = cache.get(key);
+  if (!res) {
+    res = re.test(text) ? 1 : -1;
+    cache.put(key, res);
+  }
+  return res === 1;
 }
 
 function mergeLists(...args) {
@@ -94,7 +117,7 @@ function autoReg(str) {
     };
   }
   const re = new RegExp(`^${reStr}$`); // String with wildcards
-  return { test: tstr => re.test(tstr) };
+  return { test: tstr => testRegExp(re, tstr) };
 }
 
 function matchScheme(rule, data) {
@@ -153,7 +176,7 @@ function pathMatcher(rule) {
     else strRe = `^${strRe}(?:#|$)`;
   }
   const reRule = new RegExp(strRe);
-  return data => reRule.test(data);
+  return data => testRegExp(reRule, data);
 }
 function matchTester(rule) {
   let test;
@@ -186,11 +209,15 @@ function checkPrefix(prefix, rule) {
 }
 
 export function testBlacklist(url) {
-  for (let i = 0; i < blacklistRules.length; i += 1) {
-    const { test, reject } = blacklistRules[i];
-    if (test(url)) return reject;
+  let res = blCache[url];
+  if (res === undefined) {
+    const rule = blacklistRules.find(({ test }) => test(url));
+    if (rule) res = rule.reject;
+    updateBlacklistCache(url, res || false);
   }
+  return res;
 }
+
 export function resetBlacklist(list) {
   const rules = list == null ? getOption('blacklist') : list;
   if (process.env.DEBUG) {
@@ -244,4 +271,20 @@ export function resetBlacklist(list) {
     };
   })
   .filter(Boolean);
+  blCache = {};
+  blCacheSize = 0;
+}
+
+function updateBlacklistCache(key, value) {
+  blCache[key] = value;
+  blCacheSize += key.length;
+  if (blCacheSize > MAX_BL_CACHE_LENGTH) {
+    Object.keys(blCache)
+    .some((k) => {
+      blCacheSize -= blCache[k].length;
+      delete blCache[k];
+      // reduce the cache to 75% so that this function doesn't run too often.
+      return blCacheSize < MAX_BL_CACHE_LENGTH * 3 / 4;
+    });
+  }
 }
