@@ -112,10 +112,17 @@ import { store } from '../utils';
 
 const optionsData = {
   isApplied: options.get('isApplied'),
+  filtersPopup: options.get('filtersPopup') || {},
 };
 options.hook((changes) => {
   if ('isApplied' in changes) {
     optionsData.isApplied = changes.isApplied;
+  }
+  if ('filtersPopup' in changes) {
+    optionsData.filtersPopup = {
+      ...optionsData.filtersPopup,
+      ...changes.filtersPopup,
+    };
   }
 });
 
@@ -134,25 +141,39 @@ export default {
   },
   computed: {
     injectionScopes() {
-      // returns "numEnabled / numTotal" or just "numTotal" if all are enabled
-      const getTotals = list => {
-        const numEnabled = list.reduce((num, script) => num + !!script.config.enabled, 0);
-        const numTotal = list.length;
-        return numEnabled < numTotal
-          ? `${numEnabled} / ${numTotal}`
-          : `${numTotal}`;
-      };
+      const { sort, enabledFirst, hideDisabled } = this.options.filtersPopup;
+      const isSorted = sort === 'alpha' || enabledFirst;
       return [
         ['scripts', i18n('menuMatchedScripts')],
         ['frameScripts', i18n('menuMatchedFrameScripts')],
-      ].map(([name, title]) => this.store[name].length && {
-        name,
-        title,
-        list: this.store[name].map(script => ({
-          name: script.custom.name || getLocaleString(script.meta, 'name'),
-          data: script,
-        })),
-        totals: getTotals(this.store[name]),
+      ].map(([name, title]) => {
+        let list = this.store[name];
+        const numTotal = list.length;
+        const numEnabled = list.reduce((num, script) => num + script.config.enabled, 0);
+        if (hideDisabled) list = list.filter(script => script.config.enabled);
+        list = list.map((script, i) => {
+          const scriptName = script.custom.name || getLocaleString(script.meta, 'name');
+          return {
+            name: scriptName,
+            data: script,
+            key: isSorted && `${
+              enabledFirst && +!script.config.enabled
+            }${
+              sort === 'alpha' ? scriptName.toLowerCase() : `${1e6 + i}`.slice(1)
+            }`,
+          };
+        });
+        if (isSorted) {
+          list.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key));
+        }
+        return numTotal && {
+          name,
+          title,
+          list,
+          totals: numEnabled < numTotal
+            ? `${numEnabled} / ${numTotal}`
+            : `${numTotal}`,
+        };
       }).filter(Boolean);
     },
     failureReason() {

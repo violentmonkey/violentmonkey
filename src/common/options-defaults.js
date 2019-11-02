@@ -20,7 +20,14 @@ export default {
   version: null,
   defaultInjectInto: 'page', // 'page' | 'auto',
   filters: {
+    /** @type 'exec' | 'alpha' | 'update' */
     sort: 'exec',
+  },
+  filtersPopup: {
+    /** @type 'exec' | 'alpha' */
+    sort: 'exec',
+    enabledFirst: false,
+    hideDisabled: false,
   },
   editor: {
     lineWrapping: false,

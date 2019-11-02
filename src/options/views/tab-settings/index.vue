@@ -41,6 +41,21 @@
         </label>
         <a class="ml-1" href="https://violentmonkey.github.io/2018/11/23/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
       </div>
+      <div class="mb-1 multi-opt-row">
+        <label>
+          <span v-text="i18n('labelPopupSort')"></span>
+          <select v-model="popupSort">
+            <option value="exec" v-text="i18n('filterExecutionOrder')" />
+            <option value="alpha" v-text="i18n('filterAlphabeticalOrder')" />
+          </select>
+        </label>
+        <label>
+          <setting-check name="filtersPopup.enabledFirst" />{{i18n('optionPopupEnabledFirst')}}
+        </label>
+        <label>
+          <setting-check name="filtersPopup.hideDisabled" />{{i18n('optionPopupHideDisabled')}}
+        </label>
+      </div>
     </section>
     <vm-import></vm-import>
     <vm-export></vm-export>
@@ -87,6 +102,11 @@ const items = [
     normalize(value) {
       return value === 'auto' ? 'auto' : 'page';
     },
+  },
+  {
+    key: 'filtersPopup.sort',
+    name: 'popupSort',
+    normalize: value => value === 'exec' && value || 'alpha',
   },
 ];
 const settings = {
@@ -140,6 +160,13 @@ export default {
 <style>
 .tab-settings {
   overflow-y: auto;
+  .multi-opt-row {
+    display: flex;
+    align-items: center;
+    label {
+      margin-right: 1em;
+    }
+  }
   textarea {
     height: 10em;
   }
