@@ -160,9 +160,19 @@ export default {
 <style>
 .tab-settings {
   overflow-y: auto;
+  label {
+    display: inline-flex;
+    @media (min-width: 600px) {
+      align-items: center;
+    }
+    select {
+      margin-left: .5em;
+    }
+  }
   .multi-opt-row {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     label {
       margin-right: 1em;
     }
