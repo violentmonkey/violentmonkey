@@ -6,6 +6,9 @@ import { getOption } from './options';
 import { notify, sendMessageOrIgnore } from './message';
 
 const processes = {};
+const NO_HTTP_CACHE = {
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+};
 
 function doCheckUpdate(script) {
   const update = {
@@ -48,7 +51,7 @@ function doCheckUpdate(script) {
     }
     update.message = i18n('msgUpdating');
     sendMessageOrIgnore(res);
-    return request(downloadURL)
+    return request(downloadURL, { headers: NO_HTTP_CACHE })
     .then(({ data }) => data, () => {
       update.checking = false;
       update.message = i18n('msgErrorFetchingScript');
@@ -61,6 +64,7 @@ function doCheckUpdate(script) {
   sendMessageOrIgnore(res);
   return request(updateURL, {
     headers: {
+      ...NO_HTTP_CACHE,
       Accept: 'text/x-userscript-meta',
     },
   })
