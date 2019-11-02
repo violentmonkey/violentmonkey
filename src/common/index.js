@@ -92,8 +92,8 @@ const binaryTypes = [
 
 /**
  * Make a request.
- * @param {String} url
- * @param {Object} headers
+ * @param {string} url
+ * @param {RequestInit} options
  * @return Promise
  */
 export function request(url, options = {}) {
