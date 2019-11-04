@@ -470,7 +470,7 @@ msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: Importovaných položiek: $1
+  message: $1 importovaná/é/ých položka/ky/iek
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skript bol nainštalovaný.
