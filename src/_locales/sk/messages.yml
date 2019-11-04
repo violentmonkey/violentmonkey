@@ -82,7 +82,7 @@ buttonSaveCustomCSS:
   message: Uložiť
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: Zobraziť stav editora
 buttonSupport:
   description: Button to open support page.
   message: Stránka podpory
@@ -120,7 +120,12 @@ descCustomCSS:
     istí, čo to je, prosím, neupravujte to.
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    Vlastné možnosti pre CodeMirror a doplnky v JSON objekte like
+    <code>{"indentUnit":2, "smartIndent":true}</code> avšak niektoré nemusia byť
+    funkčné vo Violentmonkey. Pozri <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">celý zoznam</a>.
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Vlastné metadáta
@@ -150,12 +155,14 @@ extName:
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: ''
+  message: Na čiernej listine v nastaveniach Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: |-
+    Violentmonkey nemôže spustiť skripty na tejto stránke
+    (najčastejší prípad: rozhranie prehliadačia alebo rozšírenia)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: abecedne
@@ -247,16 +254,16 @@ labelEditValue:
   message: Úprava hodnoty skriptu
 labelEditing:
   description: Label for current editing script
-  message: Práve sa upravuje
+  message: 'Práve sa upravuje: '
 labelEditor:
   description: Label for Editor settings
   message: Editor
 labelExclude:
   description: Label of @exclude rules.
-  message: pravidlá @exclude
+  message: 'pravidlá @exclude'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: pravidlá @exclude-match
+  message: 'pravidlá @exclude-match'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportovať dáta skriptu
@@ -283,14 +290,14 @@ labelImportSettings:
   message: Importovať nastavenia
 labelInclude:
   description: Label of @include rules.
-  message: pravidlá @include
+  message: 'pravidlá @include'
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Zarážka:'
   touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: Predvolený režim injektovania
+  message: 'Predvolený režim vloženia: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Inštalovanie skriptu
@@ -309,7 +316,7 @@ labelLineWrapping:
   touched: false
 labelMatch:
   description: Label of @match rules.
-  message: pravidlá @match
+  message: 'pravidlá @match'
 labelName:
   description: Label of script name.
   message: 'Názov:'
@@ -429,7 +436,7 @@ menuFindScripts:
   message: Vyhľadať skripty pre túto stránku
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Iba skripty podrámcov
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Vyhovujúce skripty
@@ -463,7 +470,7 @@ msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: 'Importovaných položiek: $1'
+  message: $1 importovaná/é/ých položka/ky/iek
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skript bol nainštalovaný.
@@ -489,7 +496,7 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: 'Konflikt menného priestoru skriptu! Prosím, upravte @name a @namespace.'
+  message: Konflikt menného priestoru skriptu! Prosím, upravte @name a @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -506,7 +513,7 @@ msgSavedCustomCSS:
   message: Aktualizovaný vlastný štýl.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: Nastavenia editora boli aktualizované.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Šablóna nového skriptu bola uktualizovaná.
