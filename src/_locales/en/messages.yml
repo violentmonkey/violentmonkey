@@ -333,7 +333,7 @@ labelNotifyUpdates:
   message: Notify script updates
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: Sort scripts in popup by
+  message: Sort scripts in popup by $1
 labelRelated:
   description: Label of related links.
   message: 'Related links: '

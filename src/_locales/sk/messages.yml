@@ -260,10 +260,10 @@ labelEditor:
   message: Editor
 labelExclude:
   description: Label of @exclude rules.
-  message: 'pravidlá @exclude'
+  message: pravidlá @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: 'pravidlá @exclude-match'
+  message: pravidlá @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportovať dáta skriptu
@@ -290,7 +290,7 @@ labelImportSettings:
   message: Importovať nastavenia
 labelInclude:
   description: Label of @include rules.
-  message: 'pravidlá @include'
+  message: pravidlá @include
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Zarážka:'
@@ -316,7 +316,7 @@ labelLineWrapping:
   touched: false
 labelMatch:
   description: Label of @match rules.
-  message: 'pravidlá @match'
+  message: pravidlá @match
 labelName:
   description: Label of script name.
   message: 'Názov:'
@@ -333,6 +333,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Upozorňovať na aktualizácie skriptu
+labelPopupSort:
+  description: Label in the VM settings tab for script list sort order in popup
+  message: ''
 labelRelated:
   description: Label of related links.
   message: 'Súvisiace odkazy: '
@@ -496,7 +499,7 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Konflikt menného priestoru skriptu! Prosím, upravte @name a @namespace.
+  message: 'Konflikt menného priestoru skriptu! Prosím, upravte @name a @namespace.'
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -544,6 +547,12 @@ msgUpdating:
 noValues:
   description: Label shown when there is no value for current script.
   message: Nie je uložená žiadna hodnota
+optionPopupEnabledFirst:
+  description: Option to show enabled scripts first in popup.
+  message: ''
+optionPopupHideDisabled:
+  description: Option to hide disabled scripts in popup.
+  message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Zobraziť najskôr povolené skripty
