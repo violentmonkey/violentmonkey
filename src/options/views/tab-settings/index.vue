@@ -38,10 +38,10 @@
             <option value="page">page</option>
             <option value="auto">auto</option>
           </select>
+          <a class="ml-1" href="https://violentmonkey.github.io/2018/11/23/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
         </label>
-        <a class="ml-1" href="https://violentmonkey.github.io/2018/11/23/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
       </div>
-      <div class="mb-1 multi-opt-row">
+      <div class="mb-1">
         <label>
           <span v-text="i18n('labelPopupSort')"></span>
           <select v-model="popupSort">
@@ -49,11 +49,13 @@
             <option value="alpha" v-text="i18n('filterAlphabeticalOrder')" />
           </select>
         </label>
-        <label>
-          <setting-check name="filtersPopup.enabledFirst" />{{i18n('optionPopupEnabledFirst')}}
+        <label class="ml-1">
+          <setting-check name="filtersPopup.enabledFirst" />
+          <span v-text="i18n('optionPopupEnabledFirst')"></span>
         </label>
-        <label>
-          <setting-check name="filtersPopup.hideDisabled" />{{i18n('optionPopupHideDisabled')}}
+        <label class="ml-1">
+          <setting-check name="filtersPopup.hideDisabled" />
+          <span v-text="i18n('optionPopupHideDisabled')"></span>
         </label>
       </div>
     </section>
@@ -161,20 +163,9 @@ export default {
 .tab-settings {
   overflow-y: auto;
   label {
-    display: inline-flex;
-    @media (min-width: 600px) {
-      align-items: center;
-    }
-    select {
-      margin-left: .5em;
-    }
-  }
-  .multi-opt-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    label {
-      margin-right: 1em;
+    display: inline-block;
+    > * {
+      vertical-align: middle;
     }
   }
   textarea {
