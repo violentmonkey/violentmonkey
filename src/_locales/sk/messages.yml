@@ -297,7 +297,7 @@ labelIndentUnit:
   touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: Predvolený režim vloženia: 
+  message: 'Predvolený režim vloženia: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Inštalovanie skriptu
