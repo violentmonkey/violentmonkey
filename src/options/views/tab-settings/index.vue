@@ -43,11 +43,12 @@
       </div>
       <div class="mb-1">
         <label>
-          <span v-text="i18n('labelPopupSort')"></span>
-          <select v-model="popupSort">
-            <option value="exec" v-text="i18n('filterExecutionOrder')" />
-            <option value="alpha" v-text="i18n('filterAlphabeticalOrder')" />
-          </select>
+          <locale-group i18n-key="labelPopupSort">
+            <select v-model="popupSort">
+              <option value="exec" v-text="i18n('filterExecutionOrder')" />
+              <option value="alpha" v-text="i18n('filterAlphabeticalOrder')" />
+            </select>
+          </locale-group>
         </label>
         <label class="ml-1">
           <setting-check name="filtersPopup.enabledFirst" />
@@ -83,6 +84,7 @@ import SettingCheck from '#/common/ui/setting-check';
 import options from '#/common/options';
 import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
+import LocaleGroup from '#/common/ui/locale-group';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
@@ -129,6 +131,7 @@ export default {
     VmBlacklist,
     VmCss,
     SettingCheck,
+    LocaleGroup,
   },
   data() {
     return settings;

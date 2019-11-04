@@ -322,6 +322,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: 腳本更新時通知
+labelPopupSort:
+  description: Label in the VM settings tab for script list sort order in popup
+  message: ''
 labelRelated:
   description: Label of related links.
   message: 相關連結：
@@ -532,6 +535,12 @@ msgUpdating:
   message: 正在更新…
 noValues:
   description: Label shown when there is no value for current script.
+  message: ''
+optionPopupEnabledFirst:
+  description: Option to show enabled scripts first in popup.
+  message: ''
+optionPopupHideDisabled:
+  description: Option to hide disabled scripts in popup.
   message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
