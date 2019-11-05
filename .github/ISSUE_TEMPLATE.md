@@ -15,6 +15,10 @@ Note that issues without a reproduction may be closed immediately!
 
 ### What is the actual result?
 
+<!--
+If this is a bug report, please also provide logs in the console.
+-->
+
 ### Environment
 - Browser:
 - Browser version:
