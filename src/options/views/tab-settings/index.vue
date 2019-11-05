@@ -50,11 +50,11 @@
             </select>
           </locale-group>
         </label>
-        <label class="ml-1">
+        <label class="ml-2">
           <setting-check name="filtersPopup.enabledFirst" />
           <span v-text="i18n('optionPopupEnabledFirst')"></span>
         </label>
-        <label class="ml-1">
+        <label class="ml-2">
           <setting-check name="filtersPopup.hideDisabled" />
           <span v-text="i18n('optionPopupHideDisabled')"></span>
         </label>
