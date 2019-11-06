@@ -234,13 +234,24 @@ const WebDAV = BaseService.extend({
       .map((node) => {
         const prop = node.find('DAV:propstat').find('DAV:prop');
         const type = prop.find('DAV:resourcetype').find('DAV:collection') ? 'directory' : 'file';
-        const displayName = prop.find('DAV:displayname').text();
-        if (type === 'file' && isScriptFile(displayName)) {
-          const size = prop.find('DAV:getcontentlength');
-          return normalize({
-            name: displayName,
-            size: size ? +size.text() : 0,
-          });
+        if (type === 'file') {
+          let displayName;
+          const displayNameNode = prop.find('DAV:displayname');
+
+          if (displayNameNode !== undefined) {
+            displayName = displayNameNode.text();
+          } else {
+            const href = node.find('DAV:href').text();
+            displayName = decodeURIComponent(href.substring(href.lastIndexOf('/') + 1));
+          }
+
+          if (isScriptFile(displayName)) {
+            const size = prop.find('DAV:getcontentlength');
+            return normalize({
+              name: displayName,
+              size: size ? +size.text() : 0,
+            });
+          }
         }
         return null;
       })
