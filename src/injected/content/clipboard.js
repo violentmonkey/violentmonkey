@@ -3,10 +3,12 @@ import { sendCmd } from '../utils';
 import { addEventListener, logging } from '../utils/helpers';
 import bridge from './bridge';
 
-const { execCommand } = Document.prototype;
+// old Firefox defines it on a different prototype so we'll just grab it from document directly
+const { execCommand } = document;
 const { setData } = DataTransfer.prototype;
 const getClipboardData = Object.getOwnPropertyDescriptor(ClipboardEvent.prototype, 'clipboardData').get;
-const { preventDefault, removeEventListener, stopImmediatePropagation } = EventTarget.prototype;
+const { preventDefault, stopImmediatePropagation } = Event.prototype;
+const { removeEventListener } = EventTarget.prototype;
 
 let clipboardData;
 
@@ -27,7 +29,7 @@ function onCopy(e) {
   e::stopImmediatePropagation();
   e::preventDefault();
   const { type, data } = clipboardData;
-  e::getClipboardData::setData(type || 'text/plain', data);
+  e::getClipboardData()::setData(type || 'text/plain', data);
 }
 
 function setClipboard({ type, data }) {
