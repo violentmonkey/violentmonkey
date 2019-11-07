@@ -167,7 +167,11 @@ export function createGmApiProps() {
       // It's not actually necessary because DOM messaging is synchronous
       // but we keep it for compatibility with VM's 2017-2019 behavior
       // https://github.com/violentmonkey/violentmonkey/issues/217
-      el.then = callback => callback(el);
+      el.then = callback => {
+        // prevent infinite resolve loop
+        delete el.then;
+        callback(el);
+      };
       return el;
     },
     GM_log: logging.log,
@@ -216,6 +220,7 @@ export function createGmApiProps() {
       notification: true,
       openInTab: true,
       setClipboard: true,
+      addStyle: true, // gm4-polyfill.js sets it anyway
     },
   };
 }
