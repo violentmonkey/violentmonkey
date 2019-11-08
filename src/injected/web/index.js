@@ -20,6 +20,7 @@ export default function initialize(
 ) {
   let invokeGuest;
   bridge.props = props;
+  bridge.isFirefox = isFirefox;
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;
     bridge.post = msg => invokeHost(msg, INJECT_CONTENT);
