@@ -4,7 +4,8 @@ anchorAuthor:
 anchorTranslator:
   description: Translator shown on about tab.
   message: >-
-    <a href="http://greydus.tk" target="_blank" rel="noopener noreferrer">Greydus</a>
+    <a href="http://greydus.tk" target="_blank" rel="noopener
+    noreferrer">Greydus</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Todos/Ninguno
@@ -117,12 +118,15 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS personalizado para la página de opciones y la página de instalación de scripts. Si no está seguro de para qué sirve, por favor no lo edite.
+    CSS personalizado para la página de opciones y la página de instalación de
+    scripts. Si no está seguro de para qué sirve, por favor no lo edite.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Opciones personalizadas para CodeMirror y complementos en objetos JSON como
-    <code>{"indentUnit":2, "smartIndent":true}</code> sin embargo, tenga en cuenta que algunos de ellos pueden no funcionar en Violentmonkey. Mire la <a href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    <code>{"indentUnit":2, "smartIndent":true}</code> sin embargo, tenga en
+    cuenta que algunos de ellos pueden no funcionar en Violentmonkey. Mire la <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completa</a>.
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
@@ -184,7 +188,9 @@ hintUseDownloadURL:
   message: Usar @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Descarte la redundancia e intente volver a cargar los recursos que faltan en la memoria caché.
+  message: >-
+    Descarte la redundancia e intente volver a cargar los recursos que faltan en
+    la memoria caché.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Instalar desde $1
@@ -208,7 +214,9 @@ labelAuthor:
   message: 'Autor: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Recargar la pestaña actual después de activar/desactivar un script desde el menú
+  message: >-
+    Recargar la pestaña actual después de activar/desactivar un script desde el
+    menú
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates every 24 hours.
   message: Comprobar automáticamente las actualizaciones de los scripts cada díá
@@ -256,10 +264,10 @@ labelEditor:
   message: Editor
 labelExclude:
   description: Label of @exclude rules.
-  message: 'Reglas @exclude'
+  message: Reglas @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: 'Reglas @exclude-match'
+  message: Reglas @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportar datos de los scripts
@@ -286,7 +294,7 @@ labelImportSettings:
   message: Importar ajustes
 labelInclude:
   description: Label of @include rules.
-  message: 'Reglas @include'
+  message: Reglas @include
 labelIndentUnit:
   description: Label for editor option of indent unit size.
   message: 'Unidad de sangría:'
@@ -312,7 +320,7 @@ labelLineWrapping:
   touched: false
 labelMatch:
   description: Label of @match rules.
-  message: 'Reglas @match'
+  message: Reglas @match
 labelName:
   description: Label of script name.
   message: 'Nombre:'
@@ -495,7 +503,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: ¡Conflictos de espacio de nombres del script! Por favor, modifique @name y @namespace.
+  message: >-
+    ¡Conflictos de espacio de nombres del script! Por favor, modifique @name y
+    @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -582,4 +592,5 @@ visitWebsite:
 warnScriptLongLines:
   description: Warning message shown when script has lines that are too long to be edited.
   message: >-
-    Algunas líneas son demasiado largas y se abren en modo de sólo lectura. Por favor, edite con un editor externo.
+    Algunas líneas son demasiado largas y se abren en modo de sólo lectura. Por
+    favor, edite con un editor externo.
