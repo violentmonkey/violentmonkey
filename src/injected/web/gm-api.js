@@ -174,7 +174,7 @@ export function createGmApiProps() {
       };
       return el;
     },
-    GM_log: logging.log,
+    GM_log: (...args) => logging.log(...args),
     GM_openInTab(url, options) {
       const data = options && typeof options === 'object' ? options : {
         active: !options,
