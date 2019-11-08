@@ -90,12 +90,16 @@ function getHandler(key) {
   CodeMirror.commands[key] = getHandler(key);
 });
 Object.assign(CodeMirror.keyMap.sublime, {
-  Tab: 'indentMore',
   'Shift-Ctrl-/': 'commentSelection',
 });
 CodeMirror.commands.commentSelection = cm => {
   cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
 };
+// pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
+const { insertTab, insertSoftTab } = CodeMirror.commands;
+CodeMirror.commands.insertTab = cm => (
+  cm.options.indentWithTabs ? insertTab(cm) : insertSoftTab(cm)
+);
 
 export const cmOptions = {
   continueComments: true,
@@ -403,10 +407,10 @@ export default {
     },
   },
   mounted() {
-    this.initialize(CodeMirror(
-      this.$refs.code,
-      Object.assign({}, this.cmOptions, options.get('editor')),
-    ));
+    const opts = Object.assign({}, this.cmOptions, options.get('editor'));
+    this.initialize(CodeMirror(this.$refs.code, opts));
+    // pressing Tab key inside a line with no selection will reuse indent size
+    if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
     this.debouncedFind = debounce(this.searchInPlace, 100);
     if (this.global) {
       // reroute a hotkey only when CM isn't focused and thus can't handle it

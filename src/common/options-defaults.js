@@ -33,6 +33,7 @@ export default {
     lineWrapping: false,
     indentWithTabs: false,
     indentUnit: 2,
+    tabSize: 2,
     undoDepth: 200,
   },
   scriptTemplate: `\
