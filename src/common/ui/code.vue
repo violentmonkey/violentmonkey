@@ -90,12 +90,16 @@ function getHandler(key) {
   CodeMirror.commands[key] = getHandler(key);
 });
 Object.assign(CodeMirror.keyMap.sublime, {
-  Tab: 'indentMore',
   'Shift-Ctrl-/': 'commentSelection',
 });
 CodeMirror.commands.commentSelection = cm => {
   cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
 };
+// pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
+const { insertTab, insertSoftTab } = CodeMirror.commands;
+CodeMirror.commands.insertTab = cm => (
+  cm.options.indentWithTabs ? insertTab(cm) : insertSoftTab(cm)
+);
 
 export const cmOptions = {
   continueComments: true,
@@ -338,6 +342,17 @@ export default {
         }
       }, this.cm);
     },
+    findFillQuery(force) {
+      const { state } = this.search;
+      const { cm } = this;
+      if (!state.query || force) {
+        const sel = cm.listSelections();
+        // use the currently selected text if it's within one line
+        if (sel?.length === 1 && sel[0].anchor.line === sel[0].head.line) {
+          state.query = cm.getSelection();
+        }
+      }
+    },
     doSearch(reversed) {
       const { state } = this.search;
       const { cm } = this;
@@ -350,6 +365,7 @@ export default {
       this.doSearch();
     },
     find() {
+      this.findFillQuery(true);
       this.searchInPlace();
       this.$nextTick(() => {
         const { search } = this.$refs;
@@ -358,6 +374,7 @@ export default {
       });
     },
     findNext(reversed) {
+      this.findFillQuery();
       this.doSearch(reversed);
       this.$nextTick(() => {
         this.$refs.search.focus();
@@ -403,10 +420,10 @@ export default {
     },
   },
   mounted() {
-    this.initialize(CodeMirror(
-      this.$refs.code,
-      Object.assign({}, this.cmOptions, options.get('editor')),
-    ));
+    const opts = Object.assign({}, this.cmOptions, options.get('editor'));
+    this.initialize(CodeMirror(this.$refs.code, opts));
+    // pressing Tab key inside a line with no selection will reuse indent size
+    if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
     this.debouncedFind = debounce(this.searchInPlace, 100);
     if (this.global) {
       // reroute a hotkey only when CM isn't focused and thus can't handle it
