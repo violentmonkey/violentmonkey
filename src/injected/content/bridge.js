@@ -1,5 +1,5 @@
 import { sendMessage } from '#/common';
-import { INJECT_PAGE } from '#/common/consts';
+import { INJECT_PAGE, browser } from '#/common/consts';
 import { assign } from '../utils/helpers';
 
 /** @type {Object.<string, MessageFromGuestHandler>} */

@@ -12,3 +12,7 @@ export const CMD_SCRIPT_UPDATE = 'UpdateScript';
 export const METABLOCK_RE = /(?:^|\n)\s*\/\/\x20==UserScript==([\s\S]*?\n)\s*\/\/\x20==\/UserScript==|$/;
 
 export const INJECTABLE_TAB_URL_RE = /^(https?|file|ftps?):/;
+
+// `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
+// to prevent exposing them to userscripts with `@inject-into content`
+export const { browser } = global;
