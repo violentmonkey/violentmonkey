@@ -1,6 +1,9 @@
 import { isFirefox } from '#/common/ua';
 import { getUniqId, sendCmd } from '#/common';
-import { INJECT_PAGE, INJECT_CONTENT, INJECT_AUTO } from '#/common/consts';
+import {
+  INJECT_PAGE, INJECT_CONTENT, INJECT_AUTO,
+  browser,
+} from '#/common/consts';
 import { attachFunction } from '../utils';
 import bridge from './bridge';
 import {

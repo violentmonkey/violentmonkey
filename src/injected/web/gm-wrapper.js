@@ -184,8 +184,6 @@ function getWrapper() {
   // http://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
   // http://developer.mozilla.org/docs/Web/API/Window
   const wrapper = {
-    // Block special objects
-    browser: undefined,
     // `eval` should be called directly so that it is run in current scope
     eval: wrapperInfo.eval[bridge.mode],
     ...info.methods,

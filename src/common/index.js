@@ -1,3 +1,4 @@
+import { browser } from '#/common/consts';
 import { noop } from './util';
 
 export * from './util';
