@@ -43,7 +43,7 @@ function initScript(script) {
     getLocaleString(meta, 'description'),
     script.custom.name,
     script.custom.description,
-  ].filter(Boolean).join('\n').toLowerCase();
+  ].filter(Boolean).join('\n');
   const name = script.custom.name || localeName;
   const lowerName = name.toLowerCase();
   script.$cache = { search, name, lowerName };

@@ -63,7 +63,8 @@
           </div>
         </dropdown>
         <div class="filter-search hidden-sm">
-          <input type="search" :placeholder="i18n('labelSearchScript')" v-model="search">
+          <input type="search" :placeholder="i18n('labelSearchScript')" :title="searchError"
+                 v-model="search">
           <icon name="search"></icon>
         </div>
       </header>
@@ -152,6 +153,8 @@ options.ready.then(() => {
 const MAX_BATCH_DURATION = 100;
 let step = 0;
 
+let scriptCodeRetrieved = false;
+
 export default {
   components: {
     ScriptItem,
@@ -169,6 +172,7 @@ export default {
       filters,
       script: null,
       search: null,
+      searchError: null,
       modal: null,
       menuNewActive: false,
       showRecycle: false,
@@ -183,7 +187,7 @@ export default {
     };
   },
   watch: {
-    search: 'updateLater',
+    search: 'scheduleSearch',
     'filters.sort.value': 'updateLater',
     showRecycle: 'onUpdate',
     scripts: 'refreshUI',
@@ -213,15 +217,10 @@ export default {
       this.onHashChange();
     },
     onUpdate() {
-      const { search, filters: { sort }, showRecycle } = this;
+      const { filters: { sort }, showRecycle } = this;
       const scripts = showRecycle ? this.trash : this.scripts;
       const sortedScripts = [...scripts];
-      if (search) {
-        const lowerSearch = (search || '').toLowerCase();
-        for (const { $cache } of scripts) {
-          $cache.show = $cache.search.includes(lowerSearch);
-        }
-      }
+      if (this.search) this.performSearch(scripts);
       if (sort.value === SORT_ALPHA.value) {
         const showEnabledFirst = options.get('filters.showEnabledFirst');
         const getSortKey = (item) => {
@@ -378,6 +377,34 @@ export default {
         if (step) await makePause();
       }
     },
+    performSearch(scripts) {
+      let searchRE;
+      const [,
+        expr = this.search.replace(/[.+^*$?|\\()[\]{}]/g, '\\$&'),
+        flags = 'i',
+      ] = this.search.match(/^\/(.+?)\/(\w*)$|$/);
+      try {
+        searchRE = expr && new RegExp(expr, flags);
+        scripts.forEach(({ $cache }) => {
+          $cache.show = !expr || searchRE.test($cache.search) || searchRE.test($cache.code);
+        });
+        this.searchError = null;
+      } catch (err) {
+        this.searchError = err.message;
+      }
+    },
+    async scheduleSearch() {
+      if (!scriptCodeRetrieved) {
+        scriptCodeRetrieved = true;
+        const { scripts } = this.store;
+        const ids = scripts.map(script => `code:${script.props.id}`);
+        const data = await browser.storage.local.get(ids);
+        ids.forEach((id, index) => {
+          scripts[index].$cache.code = data[id];
+        });
+      }
+      this.debouncedUpdate();
+    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 100);
@@ -457,6 +484,9 @@ export default {
     padding-left: .5rem;
     padding-right: 2rem;
     height: 2rem;
+    &[title] {
+      outline: 1px solid red;
+    }
   }
 }
 .filter-sort {
