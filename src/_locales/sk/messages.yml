@@ -121,7 +121,7 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Vlastné možnosti pre CodeMirror a doplnky v JSON objekte like
+    Vlastné možnosti pre CodeMirror a doplnky v JSON objekte ako
     <code>{"indentUnit":2, "smartIndent":true}</code> avšak niektoré nemusia byť
     funkčné vo Violentmonkey. Pozri <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
@@ -165,7 +165,7 @@ failureReasonNoninjectable:
     (najčastejší prípad: rozhranie prehliadačia alebo rozšírenia)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: abecedne
+  message: abecedy
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: spustenia
@@ -335,7 +335,7 @@ labelNotifyUpdates:
   message: Upozorňovať na aktualizácie skriptu
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Zoradiť skripty vo vyskakovacom okne podľa $1
 labelRelated:
   description: Label of related links.
   message: 'Súvisiace odkazy: '
@@ -549,10 +549,10 @@ noValues:
   message: Nie je uložená žiadna hodnota
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Najskôr povolené
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: Skryť zakázané
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Zobraziť najskôr povolené skripty
