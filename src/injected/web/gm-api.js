@@ -227,13 +227,8 @@ export function createGmApiProps() {
 }
 
 export function propertyFromValue(value) {
-  const prop = {
-    writable: false,
-    configurable: false,
-    value,
-  };
   if (typeof value === 'function') value.toString = propertyToString;
-  return prop;
+  return { value };
 }
 
 function propertyToString() {
