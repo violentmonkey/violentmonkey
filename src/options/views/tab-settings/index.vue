@@ -38,8 +38,26 @@
             <option value="page">page</option>
             <option value="auto">auto</option>
           </select>
+          <a class="ml-1" href="https://violentmonkey.github.io/2018/11/23/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
         </label>
-        <a class="ml-1" href="https://violentmonkey.github.io/2018/11/23/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
+      </div>
+      <div class="mb-1">
+        <label>
+          <locale-group i18n-key="labelPopupSort">
+            <select v-model="popupSort">
+              <option value="exec" v-text="i18n('filterExecutionOrder')" />
+              <option value="alpha" v-text="i18n('filterAlphabeticalOrder')" />
+            </select>
+          </locale-group>
+        </label>
+        <label class="ml-2">
+          <setting-check name="filtersPopup.enabledFirst" />
+          <span v-text="i18n('optionPopupEnabledFirst')"></span>
+        </label>
+        <label class="ml-2">
+          <setting-check name="filtersPopup.hideDisabled" />
+          <span v-text="i18n('optionPopupHideDisabled')"></span>
+        </label>
       </div>
     </section>
     <vm-import></vm-import>
@@ -66,6 +84,7 @@ import SettingCheck from '#/common/ui/setting-check';
 import options from '#/common/options';
 import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
+import LocaleGroup from '#/common/ui/locale-group';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
@@ -88,6 +107,11 @@ const items = [
       return value === 'auto' ? 'auto' : 'page';
     },
   },
+  {
+    key: 'filtersPopup.sort',
+    name: 'popupSort',
+    normalize: value => value === 'exec' && value || 'alpha',
+  },
 ];
 const settings = {
   showAdvanced: false,
@@ -107,6 +131,7 @@ export default {
     VmBlacklist,
     VmCss,
     SettingCheck,
+    LocaleGroup,
   },
   data() {
     return settings;
@@ -140,6 +165,12 @@ export default {
 <style>
 .tab-settings {
   overflow-y: auto;
+  label {
+    display: inline-block;
+    > * {
+      vertical-align: middle;
+    }
+  }
   textarea {
     height: 10em;
   }

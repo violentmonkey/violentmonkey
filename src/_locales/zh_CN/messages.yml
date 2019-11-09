@@ -82,7 +82,7 @@ buttonSaveCustomCSS:
   message: 保存
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: 显示编辑器状态
 buttonSupport:
   description: Button to open support page.
   message: 支持页面
@@ -118,7 +118,11 @@ descCustomCSS:
   message: 这里可以为管理页面和脚本安装页面设置自定义CSS。如果你不确定它的意思，请不要修改。
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    CodeMirror及其扩展的自定义配置，使用一个JSON对象，如<code>{"indentUnit":2,
+    "smartIndent":true}</code>，注意某些配置可能不被支持。见<a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">完整列表</a>。
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: 自定义元数据
@@ -324,6 +328,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: 脚本更新时提示
+labelPopupSort:
+  description: Label in the VM settings tab for script list sort order in popup
+  message: 弹出菜单中的脚本按$1排序
 labelRelated:
   description: Label of related links.
   message: 相关链接：
@@ -427,7 +434,7 @@ menuFindScripts:
   message: 为此站点查找脚本
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: 仅在frame中执行的脚本
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: 匹配的脚本
@@ -504,7 +511,7 @@ msgSavedCustomCSS:
   message: 自定义样式已更新！
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: 编辑器配置已更新！
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: 自定义脚本模板已更新！
@@ -535,6 +542,12 @@ msgUpdating:
 noValues:
   description: Label shown when there is no value for current script.
   message: 没有存储数据
+optionPopupEnabledFirst:
+  description: Option to show enabled scripts first in popup.
+  message: 启用项优先
+optionPopupHideDisabled:
+  description: Option to hide disabled scripts in popup.
+  message: 隐藏禁用项
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 先显示被启用的脚本

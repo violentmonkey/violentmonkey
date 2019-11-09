@@ -167,10 +167,13 @@ export function createGmApiProps() {
       // It's not actually necessary because DOM messaging is synchronous
       // but we keep it for compatibility with VM's 2017-2019 behavior
       // https://github.com/violentmonkey/violentmonkey/issues/217
-      el.then = callback => callback(el);
+      el.then = callback => {
+        // prevent infinite resolve loop
+        delete el.then;
+        callback(el);
+      };
       return el;
     },
-    GM_log: logging.log,
     GM_openInTab(url, options) {
       const data = options && typeof options === 'object' ? options : {
         active: !options,
@@ -203,6 +206,8 @@ export function createGmApiProps() {
       target[k] = propertyFromValue(target[k]);
     });
   });
+  // not using propertyFromValue to keep native toString on the real console.log
+  props.GM_log = { value: logging.log };
   return {
     props,
     boundProps,
@@ -216,18 +221,14 @@ export function createGmApiProps() {
       notification: true,
       openInTab: true,
       setClipboard: true,
+      addStyle: true, // gm4-polyfill.js sets it anyway
     },
   };
 }
 
 export function propertyFromValue(value) {
-  const prop = {
-    writable: false,
-    configurable: false,
-    value,
-  };
   if (typeof value === 'function') value.toString = propertyToString;
-  return prop;
+  return { value };
 }
 
 function propertyToString() {

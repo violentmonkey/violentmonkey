@@ -9,7 +9,7 @@
 <script>
 import { i18n } from '#/common';
 
-const SEP = '￥￥';
+const SEP = '\x02';
 
 export default {
   props: ['i18nKey'],

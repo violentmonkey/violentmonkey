@@ -138,11 +138,16 @@ function injectScript(data) {
     ...codeSlices,
     `,"${vCallbackId}");`,
   ];
+  const name = encodeURIComponent(scriptName::replace(/[#/]/g, ''));
+  const sourceUrl = browser.extension.getURL(`${name}.user.js#${scriptId}`);
   if (mode === INJECT_CONTENT) {
+    injectedCode.push(
+      ';0\n//# sourceURL=', // Firefox: the injected script must return 0 at the end
+      sourceUrl,
+    );
     sendCmd('InjectScript', injectedCode::join(''));
   } else {
-    const name = encodeURIComponent(scriptName::replace(/[#/]/g, ''));
-    inject(injectedCode, browser.extension.getURL(`${name}.user.js#${scriptId}`));
+    inject(injectedCode, sourceUrl);
   }
 }
 

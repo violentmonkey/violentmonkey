@@ -9,6 +9,7 @@ html {
 }
 
 body {
+  overflow: hidden; // avoid flash of viewport caused by tooltip
   font-size: 1rem;
   background: white;
   color: black;
@@ -21,6 +22,7 @@ select,
 input,
 textarea {
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  font-size: 1rem;
 }
 
 h1 {

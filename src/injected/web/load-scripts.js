@@ -1,4 +1,5 @@
 import { getUniqId } from '#/common';
+import { INJECT_CONTENT } from '#/common/consts';
 import { attachFunction } from '../utils';
 import {
   filter, map, join, defineProperty, Boolean, Promise, setTimeout, log, noop,
@@ -27,6 +28,8 @@ bridge.addHandlers({
       run(end);
       setTimeout(runIdle);
     };
+    // Firefox doesn't display errors in content scripts https://bugzil.la/1410932
+    const tryCatchFFerrors = bridge.isFirefox && bridge.mode === INJECT_CONTENT;
     const listMap = {
       'document-start': start,
       'document-idle': idle,
@@ -58,6 +61,10 @@ bridge.addHandlers({
         `function(${
           keys::join(',')
         }){${
+          tryCatchFFerrors
+            ? 'try{'
+            : ''
+        }${
           keys::map(name => `this["${name}"]=${name};`)::join('')
         }with(this)((define,module,exports)=>{`,
         // 1. trying to avoid string concatenation of potentially huge code slices
@@ -66,7 +73,11 @@ bridge.addHandlers({
         '(()=>{',
         code,
         // adding a new line in case the code ends with a line comment
-        '\n})()})()}',
+        `\n})()})()${
+          tryCatchFFerrors
+            ? '}catch(e){console.error(e)}'
+            : ''
+        }}`,
       ];
       const name = script.custom.name || script.meta.name || script.props.id;
       const args = keys::map(key => wrapper[key]);

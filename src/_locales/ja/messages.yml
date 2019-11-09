@@ -325,6 +325,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: スクリプトの更新を通知する
+labelPopupSort:
+  description: Label in the VM settings tab for script list sort order in popup
+  message: ''
 labelRelated:
   description: Label of related links.
   message: '関連リンク: '
@@ -536,6 +539,12 @@ msgUpdating:
 noValues:
   description: Label shown when there is no value for current script.
   message: 値は保存されていません
+optionPopupEnabledFirst:
+  description: Option to show enabled scripts first in popup.
+  message: ''
+optionPopupHideDisabled:
+  description: Option to hide disabled scripts in popup.
+  message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 有効なスクリプトを先頭に表示

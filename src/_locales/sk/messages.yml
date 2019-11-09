@@ -82,7 +82,7 @@ buttonSaveCustomCSS:
   message: Uložiť
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: Zobraziť stav editora
 buttonSupport:
   description: Button to open support page.
   message: Stránka podpory
@@ -120,7 +120,12 @@ descCustomCSS:
     istí, čo to je, prosím, neupravujte to.
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    Vlastné možnosti pre CodeMirror a doplnky v JSON objekte like
+    <code>{"indentUnit":2, "smartIndent":true}</code> avšak niektoré nemusia byť
+    funkčné vo Violentmonkey. Pozri <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">celý zoznam</a>.
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Vlastné metadáta
@@ -150,12 +155,14 @@ extName:
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: ''
+  message: Na čiernej listine v nastaveniach Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: |-
+    Violentmonkey nemôže spustiť skripty na tejto stránke
+    (najčastejší prípad: rozhranie prehliadačia alebo rozšírenia)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: abecedne
@@ -247,7 +254,7 @@ labelEditValue:
   message: Úprava hodnoty skriptu
 labelEditing:
   description: Label for current editing script
-  message: Práve sa upravuje
+  message: 'Práve sa upravuje: '
 labelEditor:
   description: Label for Editor settings
   message: Editor
@@ -290,7 +297,7 @@ labelIndentUnit:
   touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: Predvolený režim injektovania
+  message: 'Predvolený režim vloženia: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Inštalovanie skriptu
@@ -326,6 +333,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Upozorňovať na aktualizácie skriptu
+labelPopupSort:
+  description: Label in the VM settings tab for script list sort order in popup
+  message: ''
 labelRelated:
   description: Label of related links.
   message: 'Súvisiace odkazy: '
@@ -429,7 +439,7 @@ menuFindScripts:
   message: Vyhľadať skripty pre túto stránku
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Iba skripty podrámcov
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Vyhovujúce skripty
@@ -506,7 +516,7 @@ msgSavedCustomCSS:
   message: Aktualizovaný vlastný štýl.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: Nastavenia editora boli aktualizované.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Šablóna nového skriptu bola uktualizovaná.
@@ -537,6 +547,12 @@ msgUpdating:
 noValues:
   description: Label shown when there is no value for current script.
   message: Nie je uložená žiadna hodnota
+optionPopupEnabledFirst:
+  description: Option to show enabled scripts first in popup.
+  message: ''
+optionPopupHideDisabled:
+  description: Option to hide disabled scripts in popup.
+  message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Zobraziť najskôr povolené skripty
