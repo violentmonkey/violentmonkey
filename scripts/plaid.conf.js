@@ -36,9 +36,6 @@ exports.pages = {
     entry: './src/popup',
     html: htmlFactory(),
   },
-  injected: {
-    entry: './src/injected',
-  },
 };
 
 const splitVendor = name => ({
@@ -60,12 +57,7 @@ exports.optimization = {
         name: 'common',
         minChunks: 2,
         enforce: true,
-        chunks(chunk) {
-          return ![
-            'browser',
-            'injected',
-          ].includes(chunk.name);
-        },
+        chunks: chunk => chunk.name !== 'browser',
       },
       ...splitVendor('codemirror'),
       ...splitVendor('tldjs'),
