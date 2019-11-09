@@ -174,7 +174,6 @@ export function createGmApiProps() {
       };
       return el;
     },
-    GM_log: logging.log,
     GM_openInTab(url, options) {
       const data = options && typeof options === 'object' ? options : {
         active: !options,
@@ -207,6 +206,8 @@ export function createGmApiProps() {
       target[k] = propertyFromValue(target[k]);
     });
   });
+  // not using propertyFromValue to keep native toString on the real console.log
+  props.GM_log = { value: logging.log };
   return {
     props,
     boundProps,
