@@ -47,17 +47,17 @@
             <locale-group i18n-key="labelFilterSort">
               <select :value="filters.sort.value" @change="onOrderChange">
                 <option
-                  v-for="option in filterOptions.sort"
-                  :key="option.value"
+                  v-for="(option, name) in filterOptions.sort"
                   v-text="option.title"
-                  :value="option.value">
+                  :key="name"
+                  :value="name">
                 </option>
               </select>
             </locale-group>
           </div>
-          <div v-if="filters.sort.value === 'alpha'">
+          <div v-show="currentSortCompare">
             <label>
-              <setting-check name="filters.showEnabledFirst" @change="updateLater"></setting-check>
+              <setting-check name="filters.showEnabledFirst" />
               <span v-text="i18n('optionShowEnabledFirst')"></span>
             </label>
           </div>
@@ -117,37 +117,57 @@ import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
 
-const SORT_EXEC = { value: 'exec', title: i18n('filterExecutionOrder') };
-const SORT_ALPHA = { value: 'alpha', title: i18n('filterAlphabeticalOrder') };
-const SORT_UPDATE = { value: 'update', title: i18n('filterLastUpdateOrder') };
 const filterOptions = {
-  sort: [
-    SORT_EXEC,
-    SORT_ALPHA,
-    SORT_UPDATE,
-  ],
+  sort: {
+    exec: {
+      title: i18n('filterExecutionOrder'),
+    },
+    alpha: {
+      title: i18n('filterAlphabeticalOrder'),
+      compare: (
+        { $cache: { lowerName: a } },
+        { $cache: { lowerName: b } },
+      ) => (a < b ? -1 : a > b),
+    },
+    update: {
+      title: i18n('filterLastUpdateOrder'),
+      compare: (
+        { props: { lastUpdated: a } },
+        { props: { lastUpdated: b } },
+      ) => (+b || 0) - (+a || 0),
+    },
+  },
 };
 const filters = {
+  showEnabledFirst: null,
   sort: {
     value: null,
     title: null,
     set(value) {
-      const option = filterOptions.sort.find(item => item.value === value);
-      const { sort } = filters;
-      if (!option) {
-        sort.set(filterOptions.sort[0].value);
-        return;
+      const option = filterOptions.sort[value];
+      if (option) {
+        filters.sort.value = value;
+        filters.sort.title = option.title;
+      } else {
+        filters.sort.set(Object.keys(filterOptions.sort)[0]);
       }
-      sort.value = option && option.value;
-      sort.title = option && option.title;
     },
   },
 };
+const combinedCompare = cmpFunc => (
+  filters.showEnabledFirst
+    ? ((a, b) => b.config.enabled - a.config.enabled || cmpFunc(a, b))
+    : cmpFunc
+);
+hookSetting('filters.showEnabledFirst', (value) => {
+  filters.showEnabledFirst = value;
+});
 hookSetting('filters.sort', (value) => {
   filters.sort.set(value);
 });
 options.ready.then(() => {
   filters.sort.set(options.get('filters.sort'));
+  filters.showEnabledFirst = options.get('filters.showEnabledFirst');
 });
 
 const MAX_BATCH_DURATION = 100;
@@ -189,11 +209,15 @@ export default {
   watch: {
     search: 'scheduleSearch',
     'filters.sort.value': 'updateLater',
+    'filters.showEnabledFirst': 'updateLater',
     showRecycle: 'onUpdate',
     scripts: 'refreshUI',
     'store.route.paths.1': 'onHashChange',
   },
   computed: {
+    currentSortCompare() {
+      return filterOptions.sort[filters.sort.value]?.compare;
+    },
     message() {
       if (this.store.loading) {
         return null;
@@ -217,32 +241,11 @@ export default {
       this.onHashChange();
     },
     onUpdate() {
-      const { filters: { sort }, showRecycle } = this;
-      const scripts = showRecycle ? this.trash : this.scripts;
-      const sortedScripts = [...scripts];
+      const scripts = [...this.showRecycle ? this.trash : this.scripts];
       if (this.search) this.performSearch(scripts);
-      if (sort.value === SORT_ALPHA.value) {
-        const showEnabledFirst = options.get('filters.showEnabledFirst');
-        const getSortKey = (item) => {
-          const keys = [];
-          if (showEnabledFirst) {
-            keys.push(item.config.enabled ? 0 : 1);
-          }
-          keys.push(item.$cache.lowerName);
-          return keys.join('');
-        };
-        sortedScripts.sort((a, b) => {
-          const nameA = getSortKey(a);
-          const nameB = getSortKey(b);
-          if (nameA < nameB) return -1;
-          if (nameA > nameB) return 1;
-          return 0;
-        });
-      } else if (sort.value === SORT_UPDATE.value) {
-        const getSortKey = item => +item.props.lastUpdated || 0;
-        sortedScripts.sort((a, b) => getSortKey(b) - getSortKey(a));
-      }
-      this.sortedScripts = sortedScripts;
+      const cmp = this.currentSortCompare;
+      if (cmp) scripts.sort(combinedCompare(cmp));
+      this.sortedScripts = scripts;
       this.debouncedRender();
     },
     updateLater() {
