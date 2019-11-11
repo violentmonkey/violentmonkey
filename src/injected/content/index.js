@@ -1,4 +1,4 @@
-import { getUniqId } from '#/common';
+import { getUniqId, makePause } from '#/common';
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import { bindEvents, sendCmd, sendMessage } from '../utils';
 import {
@@ -104,6 +104,6 @@ function getPopup() {
 
 async function setBadge() {
   // delay setBadge in frames so that they can be added to the initial count
-  if (!IS_TOP) await new Promise(resolve => setTimeout(resolve, 300));
+  if (!IS_TOP) await makePause(300);
   sendCmd('SetBadge', bridge.enabledIds);
 }

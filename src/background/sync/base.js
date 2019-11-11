@@ -1,5 +1,5 @@
 import {
-  debounce, normalizeKeys, request, noop,
+  debounce, normalizeKeys, request, noop, makePause,
 } from '#/common';
 import {
   objectGet, objectSet, objectPick, objectPurify,
@@ -322,14 +322,7 @@ export const BaseService = serviceFactory({
     let lastFetch = Promise.resolve();
     if (delay) {
       lastFetch = this.lastFetch
-      .then(ts => new Promise((resolve) => {
-        const delta = delay - (Date.now() - ts);
-        if (delta > 0) {
-          setTimeout(resolve, delta);
-        } else {
-          resolve();
-        }
-      }))
+      .then(ts => makePause(delay - (Date.now() - ts)))
       .then(() => Date.now());
       this.lastFetch = lastFetch;
     }

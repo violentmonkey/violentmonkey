@@ -58,7 +58,6 @@ export function sendMessage(payload, { retry } = {}) {
  * or when configured to restore the session, https://crbug.com/314686
  */
 export async function sendMessageRetry(payload, retries = 10) {
-  const makePause = ms => new Promise(resolve => setTimeout(resolve, ms));
   let pauseDuration = 10;
   for (; retries > 0; retries -= 1) {
     const data = await sendMessage(payload).catch(noop);
@@ -194,4 +193,18 @@ export function encodeFilename(name) {
 
 export function decodeFilename(filename) {
   return filename.replace(/-([0-9a-f]{2})/g, (_m, g) => String.fromCharCode(parseInt(g, 16)));
+}
+
+export async function getActiveTab() {
+  const [tab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  return tab;
+}
+
+export function makePause(ms) {
+  return ms < 0
+    ? Promise.resolve()
+    : new Promise(resolve => setTimeout(resolve, ms));
 }
