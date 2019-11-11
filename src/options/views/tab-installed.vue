@@ -104,7 +104,7 @@
 import Dropdown from 'vueleton/lib/dropdown/bundle';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import {
-  i18n, sendCmd, debounce,
+  i18n, sendCmd, debounce, makePause,
 } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
@@ -375,7 +375,7 @@ export default {
         if (!step && performance.now() - startTime >= MAX_BATCH_DURATION) {
           step = limit;
         }
-        if (step) await new Promise(resolve => setTimeout(resolve));
+        if (step) await makePause();
       }
     },
   },

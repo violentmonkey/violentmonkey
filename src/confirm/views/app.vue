@@ -37,7 +37,7 @@
 <script>
 import Dropdown from 'vueleton/lib/dropdown/bundle';
 import {
-  sendCmd, leftpad, request, buffer2string, isRemote, getFullUrl,
+  sendCmd, leftpad, request, buffer2string, isRemote, getFullUrl, makePause,
 } from '#/common';
 import options from '#/common/options';
 import initCache from '#/common/cache';
@@ -206,9 +206,7 @@ export default {
       });
     },
     trackLocalFile() {
-      new Promise((resolve) => {
-        setTimeout(resolve, 2000);
-      })
+      makePause(2000)
       .then(() => this.loadData(true))
       .then(this.parseMeta)
       .then(() => {
