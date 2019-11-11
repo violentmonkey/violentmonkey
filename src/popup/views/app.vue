@@ -216,21 +216,22 @@ export default {
       window.close();
     },
     onVisitWebsite() {
-      browser.tabs.create({
+      sendCmd('TabOpen', {
         url: 'https://violentmonkey.github.io/',
       });
       window.close();
     },
     onEditScript(item) {
-      browser.tabs.create({
-        url: browser.runtime.getURL(`/options/index.html#scripts/${item.data.props.id}`),
+      sendCmd('TabOpen', {
+        url: `/options/index.html#scripts/${item.data.props.id}`,
       });
       window.close();
     },
     onFindSameDomainScripts() {
-      browser.tabs.create({
+      sendCmd('TabOpen', {
         url: `https://greasyfork.org/scripts/by-site/${encodeURIComponent(this.store.domain)}`,
       });
+      window.close();
     },
     onCommand(id, cap) {
       browser.tabs.sendMessage(this.store.currentTab.id, {
@@ -253,21 +254,16 @@ export default {
     checkReload() {
       if (options.get('autoReload')) browser.tabs.reload(this.store.currentTab.id);
     },
-    onCreateScript() {
+    async onCreateScript() {
       const { currentTab, domain } = this.store;
-      (domain ? (
-        sendCmd('CacheNewScript', {
-          url: currentTab.url.split('#')[0].split('?')[0],
-          name: `- ${domain}`,
-        })
-      ) : Promise.resolve())
-      .then((id) => {
-        const path = ['scripts', '_new', id].filter(Boolean).join('/');
-        browser.tabs.create({
-          url: browser.runtime.getURL(`/options/index.html#${path}`),
-        });
-        window.close();
+      const id = domain && await sendCmd('CacheNewScript', {
+        url: currentTab.url.split(/[#?]/)[0],
+        name: `- ${domain}`,
       });
+      sendCmd('TabOpen', {
+        url: `/options/index.html#scripts/_new${id ? `/${id}` : ''}`,
+      });
+      window.close();
     },
   },
 };
