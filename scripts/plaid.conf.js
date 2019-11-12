@@ -38,10 +38,10 @@ exports.pages = {
   },
 };
 
-const splitVendor = name => ({
-  [name]: {
-    test: new RegExp(`node_modules[/\\\\]${name}`),
-    name: `public/lib/${name}`,
+const splitVendor = prefix => ({
+  [prefix]: {
+    test: new RegExp(`node_modules[/\\\\]${prefix}.*?\\.js`),
+    name: `public/lib/${prefix}`,
     chunks: 'all',
     priority: 100,
   },
