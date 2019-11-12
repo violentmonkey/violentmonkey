@@ -68,6 +68,7 @@ import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { debounce } from '#/common';
 import ToggleButton from '#/common/ui/toggle-button';
 import options from '#/common/options';
+import { isFirefox } from '#/common/ua';
 
 /* eslint-disable no-control-regex */
 const MAX_LINE_LENGTH = 50 * 1024;
@@ -92,14 +93,35 @@ function getHandler(key) {
 Object.assign(CodeMirror.keyMap.sublime, {
   'Shift-Ctrl-/': 'commentSelection',
 });
-CodeMirror.commands.commentSelection = cm => {
-  cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
-};
-// pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
+if (isFirefox) {
+  // cut the entire line on Shift-Del when nothing is selected, same as Ctrl-X or Ctrl-Ins
+  // * not needed in Chrome as it works correctly by default
+  // * not needed on MacOS which doesn't ship these shortcuts
+  CodeMirror.keyMap.pcSublime['Shift-Delete'] = 'cutToClipboardSelOrLine';
+}
 const { insertTab, insertSoftTab } = CodeMirror.commands;
-CodeMirror.commands.insertTab = cm => (
-  cm.options.indentWithTabs ? insertTab(cm) : insertSoftTab(cm)
-);
+Object.assign(CodeMirror.commands, {
+  commentSelection: (cm) => {
+    cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
+  },
+  cutToClipboardSelOrLine: async (cm) => {
+    if (!cm.somethingSelected()) {
+      cm.setSelections(
+        cm.listSelections()
+        .map(({ anchor: { line } }) => ({
+          anchor: { line, ch: 0 },
+          head: { line: line + 1, ch: 0 },
+        })),
+      );
+    }
+    await 0;
+    document.execCommand('cut');
+  },
+  // pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
+  insertTab: (cm) => {
+    (cm.options.indentWithTabs ? insertTab : insertSoftTab)(cm);
+  },
+});
 
 export const cmOptions = {
   continueComments: true,
