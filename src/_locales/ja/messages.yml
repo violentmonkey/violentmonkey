@@ -55,7 +55,7 @@ buttonOK:
   message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: ゴミ箱
 buttonRemove:
   description: Button to remove a script.
   message: 削除
@@ -70,7 +70,7 @@ buttonReset:
   message: リセット
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: 復元
 buttonSave:
   description: Button to save modifications of a script.
   message: 保存
@@ -85,7 +85,7 @@ buttonSaveCustomCSS:
   message: 保存
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: エディタの状態を表示
 buttonSupport:
   description: Button to open support page.
   message: サポートページ
@@ -151,12 +151,14 @@ extName:
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: ''
+  message: 設定によりブラックリストに登録されています
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: |-
+    Violentmonkeyはこのページでユーザースクリプトを実行しません
+    (一般的な例: ブラウザーUI や 拡張機能のページ)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: アルファベット順
@@ -327,7 +329,7 @@ labelNotifyUpdates:
   message: スクリプトの更新を通知する
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: ポップアップ内のスクリプトを $1 で並べ替え
 labelRelated:
   description: Label of related links.
   message: '関連リンク: '
@@ -508,7 +510,7 @@ msgSavedCustomCSS:
   message: カスタムスタイルが更新されました。
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: エディタのオプションが更新されました。
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: カスタムスクリプト (テンプレート) が更新されました。
@@ -541,10 +543,10 @@ noValues:
   message: 値は保存されていません
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: 有効なものを先頭に表示
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: 無効なものを非表示
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 有効なスクリプトを先頭に表示
