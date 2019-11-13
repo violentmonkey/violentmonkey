@@ -7,6 +7,11 @@ import { createGmApiProps, propertyFromValue } from './gm-api';
 
 const { startsWith } = String.prototype;
 
+// - Chrome, `global === window`
+// - Firefox, `global` is a sandbox, `global.window === window`:
+//   - some properties (like `isFinite`) are defined in `global` but not `window`
+//   - all `window` properties can be accessed from `global`
+
 let wrapperInfo = {
   [INJECT_CONTENT]: { unsafeWindow: global },
   [INJECT_PAGE]: { unsafeWindow: window },
@@ -193,13 +198,19 @@ function getWrapper() {
     bridge.props = null;
   }
 
+  function wrapWindowValue(value) {
+    // Return the window wrapper if the original value is the real `window`
+    // so that libraries depending on `window` will work as expected.
+    return value === window ? wrapper : value;
+  }
+
   function defineProtectedProperty(name) {
     let modified = false;
     let value;
     defineProperty(wrapper, name, {
       get() {
-        if (!modified) value = unsafeWindow[name];
-        return value === unsafeWindow ? wrapper : value;
+        if (!modified) value = wrapWindowValue(unsafeWindow[name]);
+        return value;
       },
       set(val) {
         modified = true;
@@ -213,8 +224,7 @@ function getWrapper() {
   function defineReactedProperty(name) {
     defineProperty(wrapper, name, {
       get() {
-        const value = unsafeWindow[name];
-        return value === unsafeWindow ? wrapper : value;
+        return wrapWindowValue(unsafeWindow[name]);
       },
       set(val) {
         unsafeWindow[name] = val;
