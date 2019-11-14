@@ -1,4 +1,4 @@
-import { request, buffer2string } from '#/common';
+import { request, buffer2string, ensureArray } from '#/common';
 import { browser } from './consts';
 
 const base = {
@@ -99,7 +99,7 @@ export default {
     ...base,
     prefix: 'scr:',
     async dump(items) {
-      items = (Array.isArray(items) ? items : [items]).filter(Boolean);
+      items = ensureArray(items).filter(Boolean);
       if (!items.length) return;
       const data = items.reduce((res, item) => {
         res[this.getKey(item.props.id)] = item;

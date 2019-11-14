@@ -117,3 +117,7 @@ export function isEmpty(obj) {
   }
   return true;
 }
+
+export function ensureArray(data) {
+  return Array.isArray(data) ? data : [data];
+}
