@@ -113,6 +113,7 @@ import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
 import LocaleGroup from '#/common/ui/locale-group';
 import { setRoute, lastRoute } from '#/common/router';
+import storage from '#/common/storage';
 import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, showMessage } from '../utils';
@@ -172,8 +173,6 @@ options.ready.then(() => {
 
 const MAX_BATCH_DURATION = 100;
 let step = 0;
-
-let scriptCodeRetrieved = false;
 
 export default {
   components: {
@@ -397,11 +396,10 @@ export default {
       }
     },
     async scheduleSearch() {
-      if (!scriptCodeRetrieved) {
-        scriptCodeRetrieved = true;
-        const { scripts } = this.store;
-        const ids = scripts.map(script => `code:${script.props.id}`);
-        const data = await browser.storage.local.get(ids);
+      const { scripts } = this.store;
+      if (scripts[0]?.$cache.code == null) {
+        const ids = scripts.map(({ props: { id } }) => id);
+        const data = await storage.code.getMulti(ids);
         ids.forEach((id, index) => {
           scripts[index].$cache.code = data[id];
         });
