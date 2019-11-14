@@ -1,5 +1,5 @@
-import { request, buffer2string, ensureArray } from '#/common';
 import { browser } from './consts';
+import { request, buffer2string, ensureArray } from './util';
 
 const base = {
   prefix: '',

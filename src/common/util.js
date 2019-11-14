@@ -121,3 +121,72 @@ export function isEmpty(obj) {
 export function ensureArray(data) {
   return Array.isArray(data) ? data : [data];
 }
+
+const binaryTypes = [
+  'blob',
+  'arraybuffer',
+];
+
+/**
+ * Make a request.
+ * @param {string} url
+ * @param {RequestInit} options
+ * @return Promise
+ */
+export function request(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const { responseType } = options;
+    xhr.open(options.method || 'GET', url, true);
+    if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
+    const headers = Object.assign({}, options.headers);
+    let { body } = options;
+    if (body && Object.prototype.toString.call(body) === '[object Object]') {
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(body);
+    }
+    Object.keys(headers).forEach((key) => {
+      xhr.setRequestHeader(key, headers[key]);
+    });
+    xhr.onload = () => {
+      const res = getResponse(xhr, {
+        // status for `file:` protocol will always be `0`
+        status: xhr.status || 200,
+      });
+      if (res.status > 300) {
+        reject(res);
+      } else {
+        resolve(res);
+      }
+    };
+    xhr.onerror = () => {
+      const res = getResponse(xhr, { status: -1 });
+      reject(res);
+    };
+    xhr.onabort = xhr.onerror;
+    xhr.ontimeout = xhr.onerror;
+    xhr.send(body);
+  });
+
+  function getResponse(xhr, extra) {
+    const { responseType } = options;
+    let data;
+    if (binaryTypes.includes(responseType)) {
+      data = xhr.response;
+    } else {
+      data = xhr.responseText;
+    }
+    if (responseType === 'json') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        // Ignore invalid JSON
+      }
+    }
+    return Object.assign({
+      url,
+      data,
+      xhr,
+    }, extra);
+  }
+}
