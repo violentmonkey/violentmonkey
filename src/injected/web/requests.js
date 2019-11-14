@@ -113,7 +113,10 @@ function start(req, id) {
       log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
   }
-  encodeBody(details.data)
+  encodeBody({
+    body: details.data,
+    binary: details.binary
+  })
   .then((body) => {
     payload.data = body;
     bridge.post({
@@ -133,8 +136,8 @@ const { keys, getAll } = FormData.prototype;
 const { FileReader } = global;
 const { readAsArrayBuffer } = FileReader.prototype;
 
-async function encodeBody(body) {
-  const cls = getType(body);
+async function encodeBody({body, binary}) {
+  const cls = binary ? 'blob' : getType(body);
   switch (cls) {
   case 'formdata': {
     const data = {};
