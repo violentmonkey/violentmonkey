@@ -89,7 +89,7 @@ function callback(req, res) {
   if (res.type === 'loadend') delete idMap[req.id];
 }
 
-function start(req, id) {
+async function start(req, id) {
   const { details, scriptId } = req;
   const payload = {
     id,
@@ -113,14 +113,11 @@ function start(req, id) {
       log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
   }
-  encodeBody(details.data)
-  .then((body) => {
-    payload.data = body;
-    bridge.post({
-      cmd: 'HttpRequest',
-      data: payload,
-    });
-  });
+  // TM/GM-compatibility: the `binary` option works only with a string `data`
+  payload.data = details.binary
+    ? { value: `${details.data}`, cls: 'blob' }
+    : await encodeBody(details.data);
+  bridge.post({ cmd: 'HttpRequest', data: payload });
 }
 
 function getFullUrl(url) {
