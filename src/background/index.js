@@ -1,4 +1,4 @@
-import { noop, getUniqId } from '#/common';
+import { noop, getUniqId, ensureArray } from '#/common';
 import { objectGet } from '#/common/object';
 import * as sync from './sync';
 import {
@@ -200,8 +200,7 @@ const commands = {
     }, {});
   },
   SetOptions(data) {
-    const items = Array.isArray(data) ? data : [data];
-    items.forEach((item) => { setOption(item.key, item.value); });
+    ensureArray(data).forEach(item => setOption(item.key, item.value));
   },
   ConfirmInstall: confirmInstall,
   CheckScript({ name, namespace }) {

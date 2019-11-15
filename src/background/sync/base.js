@@ -1,5 +1,5 @@
 import {
-  debounce, normalizeKeys, request, noop, makePause,
+  debounce, normalizeKeys, request, noop, makePause, ensureArray,
 } from '#/common';
 import {
   objectGet, objectSet, objectPick, objectPurify,
@@ -106,8 +106,7 @@ function serviceState(validStates, initialState, onChange) {
     return get();
   }
   function is(states) {
-    const stateArray = Array.isArray(states) ? states : [states];
-    return stateArray.includes(state);
+    return ensureArray(states).includes(state);
   }
   return { get, set, is };
 }
