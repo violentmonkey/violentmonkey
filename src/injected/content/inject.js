@@ -1,15 +1,22 @@
-import { isFirefox } from '#/common/ua';
-import { getUniqId, sendCmd } from '#/common';
 import {
-  INJECT_PAGE, INJECT_CONTENT, INJECT_AUTO,
+  INJECT_AUTO,
+  INJECT_CONTENT,
+  INJECT_INTERNAL_CONTENT,
+  INJECT_INTERNAL_PAGE,
+  INJECT_INTERNAL_WRAP,
+  INJECT_MAPPING,
+  INJECT_PAGE,
   browser,
 } from '#/common/consts';
+import { getUniqId, sendCmd } from '#/common';
+import { isFirefox } from '#/common/ua';
+
 import { attachFunction } from '../utils';
-import bridge from './bridge';
 import {
   forEach, join, jsonDump, setJsonDump, append, createElementNS, NS_HTML,
   charCodeAt, fromCharCode,
 } from '../utils/helpers';
+import bridge from './bridge';
 
 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
 const VMInitInjection = window[process.env.INIT_FUNC_NAME];
@@ -26,9 +33,12 @@ bridge.addHandlers({
 
 export function triageScripts(data) {
   const scriptLists = {
-    [INJECT_PAGE]: [],
-    [INJECT_CONTENT]: [],
+    [INJECT_INTERNAL_PAGE]: [],
+    [INJECT_INTERNAL_CONTENT]: [],
   };
+  // `INJECT_INTERNAL_WRAP` is a special case of `INJECT_INTERNAL_CONTENT`
+  // so we will just reuse the list to keep the execution orders
+  scriptLists[INJECT_INTERNAL_WRAP] = scriptLists[INJECT_INTERNAL_CONTENT];
   if (data.scripts) {
     data.scripts = data.scripts.filter(({ meta, props, config }) => {
       if (!meta.noframes || window.top === window) {
@@ -41,14 +51,19 @@ export function triageScripts(data) {
       return false;
     });
     let support;
-    data.scripts.forEach((script) => {
-      let injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
-      if (injectInto === INJECT_AUTO) {
+    const injectChecking = {
+      [INJECT_INTERNAL_PAGE]: () => {
         if (!support) support = { injectable: checkInjectable() };
-        injectInto = support.injectable ? INJECT_PAGE : INJECT_CONTENT;
-      }
-      const list = scriptLists[injectInto];
-      if (list) list.push(script);
+        return support.injectable;
+      },
+      [INJECT_INTERNAL_WRAP]: () => isFirefox,
+      [INJECT_INTERNAL_CONTENT]: () => true,
+    };
+    data.scripts.forEach((script) => {
+      const injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
+      const internalInjectInto = INJECT_MAPPING[injectInto] || INJECT_MAPPING[INJECT_AUTO];
+      const availableInjectInto = internalInjectInto.find(key => injectChecking[key]?.());
+      scriptLists[availableInjectInto]?.push({ script, injectInto: availableInjectInto });
     });
   }
   return scriptLists;
@@ -73,7 +88,7 @@ export function injectScripts(contentId, webId, data, scriptLists) {
   if (injectContent.length) {
     const invokeGuest = VMInitInjection()(...args, bridge.onHandle);
     const postViaBridge = bridge.post;
-    bridge.invokableIds.push(...injectContent.map(script => script.props.id));
+    bridge.invokableIds.push(...injectContent.map(({ script }) => script.props.id));
     bridge.post = msg => (
       msg.realm === INJECT_CONTENT
         ? invokeGuest(msg)
@@ -84,7 +99,7 @@ export function injectScripts(contentId, webId, data, scriptLists) {
       data: {
         ...data,
         mode: INJECT_CONTENT,
-        scripts: injectContent,
+        items: injectContent,
       },
       realm: INJECT_CONTENT,
     });
@@ -97,7 +112,7 @@ export function injectScripts(contentId, webId, data, scriptLists) {
       data: {
         ...data,
         mode: INJECT_PAGE,
-        scripts: injectPage,
+        items: injectPage,
       },
     });
   }

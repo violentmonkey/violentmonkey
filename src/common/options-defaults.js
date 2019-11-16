@@ -1,3 +1,5 @@
+import { INJECT_AUTO } from './consts';
+
 export default {
   isApplied: true,
   autoUpdate: true,
@@ -18,7 +20,8 @@ export default {
   importSettings: true,
   notifyUpdates: false,
   version: null,
-  defaultInjectInto: 'page', // 'page' | 'auto',
+  /** @type 'auto' | 'page' | 'content' */
+  defaultInjectInto: INJECT_AUTO,
   filters: {
     /** @type 'exec' | 'alpha' | 'update' */
     sort: 'exec',
