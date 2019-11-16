@@ -1,6 +1,7 @@
 <template>
   <textarea
     class="monospace-font"
+    :class="{'has-error': error}"
     spellcheck="false"
     v-model="value"
     :disabled="disabled"
@@ -62,15 +63,3 @@ export default {
   },
 };
 </script>
-
-<style>
-  textarea {
-    &[title] {
-      border-color: #4004;
-      background: #f001;
-      &:focus {
-        border-color: #400c;
-      }
-    }
-  }
-</style>

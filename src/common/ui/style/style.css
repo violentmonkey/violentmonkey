@@ -63,6 +63,13 @@ textarea {
   &:focus {
     border-color: darkgray;
   }
+  &.has-error {
+    border-color: #4004;
+    background: #f001;
+    &:focus {
+      border-color: #400c;
+    }
+  }
 }
 code {
   padding: 0 .2em;

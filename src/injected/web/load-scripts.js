@@ -39,11 +39,12 @@ bridge.addHandlers({
       'document-idle': idle,
       'document-end': end,
     };
-    if (data.scripts) {
-      data.scripts.forEach((script) => {
+    if (data.items) {
+      data.items.forEach((item) => {
+        const { script } = item;
         const runAt = script.custom.runAt || script.meta.runAt;
         const list = listMap[runAt] || end;
-        list.push(script);
+        list.push(item);
         store.values[script.props.id] = data.values[script.props.id];
       });
       run(start);
@@ -53,12 +54,12 @@ bridge.addHandlers({
     }
     if (store.state) bridge.load();
 
-    function buildCode(script) {
+    function buildCode({ script, injectInto }) {
       const pathMap = script.custom.pathMap || {};
       const requireKeys = script.meta.require || [];
       const requires = requireKeys::map(key => data.require[pathMap[key] || key])::filter(Boolean);
       const code = data.code[script.props.id] || '';
-      const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache);
+      const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache, injectInto);
       const id = getUniqId('VMin');
       const fnId = getUniqId('VMfn');
       const codeSlices = [
