@@ -1,18 +1,16 @@
 import {
   includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
   setAttribute, log, charCodeAt, fromCharCode, shift, slice, defineProperty,
+  createElementNS, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 
 const idMap = {};
 const queue = [];
 
-const NS_HTML = 'http://www.w3.org/1999/xhtml';
-
 const { DOMParser } = global;
 const { parseFromString } = DOMParser.prototype;
 const { toLowerCase } = String.prototype;
-const { createElementNS } = Document.prototype;
 const getHref = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
 
 bridge.addHandlers({

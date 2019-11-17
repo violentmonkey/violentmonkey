@@ -7,7 +7,7 @@ import {
 import { attachFunction } from '../utils';
 import bridge from './bridge';
 import {
-  forEach, join, jsonDump, setJsonDump, append, createElement,
+  forEach, join, jsonDump, setJsonDump, append, createElementNS, NS_HTML,
 } from '../utils/helpers';
 
 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
@@ -155,7 +155,7 @@ function injectScript(data) {
 }
 
 function inject(code, sourceUrl) {
-  const script = document::createElement('script');
+  const script = document::createElementNS(NS_HTML, 'script');
   // avoid string concatenation of |code| as it can be extremely long
   script::append(
     'document.currentScript.remove();',

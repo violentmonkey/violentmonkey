@@ -24,8 +24,10 @@ const { replace } = String.prototype;
 export const { fromCharCode } = String;
 export const { addEventListener } = EventTarget.prototype;
 export const { append, setAttribute } = Element.prototype;
-export const { createElement } = Document.prototype;
+export const { createElementNS } = Document.prototype;
 export const logging = assign({}, console);
+
+export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 
 export const isArray = obj => (
   // ES3 way, not reliable if prototype is modified
