@@ -231,7 +231,7 @@ export function propertyFromValue(value) {
   return { value };
 }
 
-function propertyToString() {
+export function propertyToString() {
   return '[Violentmonkey property]';
 }
 
