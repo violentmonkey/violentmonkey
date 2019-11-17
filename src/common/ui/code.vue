@@ -230,9 +230,8 @@ export default {
       .split('\n')
       .map((line, i) => {
         if (line.length > MAX_LINE_LENGTH) {
-          const matches = line.match(/^(\s*)(.*)$/);
-          const prefix = matches[1];
-          const body = matches[2];
+          const prefix = line.match(/^\s*/)[0];
+          const body = line.slice(prefix.length);
           const id = placeholders.length;
           const replaced = `${CTRL_OPEN}${id}${CTRL_CLOSE}`;
           const placeholder = {
