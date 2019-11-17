@@ -191,6 +191,13 @@ export function dumpValueStore(where, valueStore) {
   });
 }
 
+const gmValues = [
+  'GM_getValue', 'GM.getValue',
+  'GM_setValue', 'GM.setValue',
+  'GM_listValues', 'GM.listValues',
+  'GM_deleteValue', 'GM.deleteValue',
+];
+
 /**
  * @desc Get scripts to be injected to page with specific URL.
  */
@@ -214,17 +221,8 @@ export function getScriptsByURL(url) {
   });
   const enabledScripts = scripts
   .filter(script => script.config.enabled);
-  const gmValues = {
-    GM_getValue: 1,
-    GM_setValue: 1,
-    GM_listValues: 1,
-    GM_deleteValue: 1,
-  };
   const scriptsWithValue = enabledScripts
-  .filter((script) => {
-    const grant = objectGet(script, 'meta.grant');
-    return grant && grant.some(gm => gmValues[gm]);
-  });
+  .filter(script => script.meta.grant?.some(gm => gmValues.includes(gm)));
   return Promise.all([
     storage.require.getMulti(Object.keys(reqKeys)),
     storage.cache.getMulti(Object.keys(cacheKeys)),
