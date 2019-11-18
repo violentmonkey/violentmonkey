@@ -126,6 +126,9 @@ descEditorOptions:
     them may not work in Violentmonkey. See <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">full list</a>.
+editHowToHint:
+  description: The text of the how-to link in the editor header.
+  message: Use another editor?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Custom metadata
