@@ -40,18 +40,11 @@
         :class="{active: nav === 'keyboard'}"
         @click="nav = 'keyboard'"
       >?</div>
-      <div class="flex-auto pos-rel">
-        <div
-          v-if="tooLarge"
-          class="edit-warn text-red hidden-sm"
-          v-text="i18n('warnScriptLongLines')"
-        />
-      </div>
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
         v-show="nav === 'code'" class="abs-full" ref="code" :editing="nav === 'code'"
-        v-model="code" :commands="commands" @warnLarge="onWarnLarge"
+        v-model="code" :commands="commands"
       />
       <vm-settings
         v-show="nav === 'settings'" class="abs-full edit-body"
@@ -100,7 +93,6 @@ export default {
       nav: 'code',
       canSave: false,
       script: null,
-      tooLarge: false,
       code: '',
       settings: {},
       commands: {
@@ -248,9 +240,6 @@ export default {
     saveClose() {
       this.save().then(this.close);
     },
-    onWarnLarge(tooLarge) {
-      this.tooLarge = tooLarge;
-    },
   },
   beforeDestroy() {
     store.title = null;
@@ -280,14 +269,6 @@ export default {
       box-shadow: 0 -1px 1px #bbb;
     }
   }
-}
-
-.edit-warn {
-  position: absolute;
-  left: 0;
-  right: .5rem;
-  bottom: .5rem;
-  text-align: right;
 }
 
 @media (max-width: 767px) {

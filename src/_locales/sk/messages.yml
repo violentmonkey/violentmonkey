@@ -583,8 +583,3 @@ valueLabelValue:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Prejsť na stránku
-warnScriptLongLines:
-  description: Warning message shown when script has lines that are too long to be edited.
-  message: >-
-    Niektoré riadky sú príliš dlhé, otváram v režime iba na čítanie. Prosím,
-    upravte s externým editorom.
