@@ -3,7 +3,6 @@
     class="script"
     :class="{ disabled: !script.config.enabled, removed: script.config.removed }"
     :draggable="draggable"
-    @dragstart.prevent="onDragStart"
     @keydownEnter="onEdit">
     <img class="script-icon hidden-xs" :src="safeIcon">
     <div class="script-info flex">
@@ -98,11 +97,9 @@ import { sendCmd, getLocaleString, formatTime } from '#/common';
 import { objectGet } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
+import enableDragging from '../utils/dragging';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
-const PADDING = 10;
-const SCROLL_GAP = 10;
-
 const images = {};
 function loadImage(url) {
   if (!url) return Promise.reject();
@@ -208,6 +205,9 @@ export default {
         this.safeIcon = DEFAULT_ICON;
       });
     }
+    enableDragging(this.$el, {
+      onDrop: (from, to) => this.$emit('move', { from, to }),
+    });
   },
   methods: {
     onEdit() {
@@ -238,133 +238,13 @@ export default {
     onUpdate() {
       sendCmd('CheckUpdate', this.script.props.id);
     },
-    onDragStart(e) {
-      const el = e.currentTarget;
-      const parent = el.parentNode;
-      const rect = el.getBoundingClientRect();
-      const dragging = {
-        el,
-        offset: {
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-        },
-        delta: rect.height,
-        index: [].indexOf.call(parent.children, el),
-        elements: [].filter.call(parent.children, child => child !== el),
-        dragged: el.cloneNode(true),
-      };
-      this.dragging = dragging;
-      dragging.lastIndex = dragging.index;
-      const { dragged } = dragging;
-      dragged.classList.add('dragging');
-      dragged.style.left = `${rect.left}px`;
-      dragged.style.top = `${rect.top}px`;
-      dragged.style.width = `${rect.width}px`;
-      parent.appendChild(dragged);
-      el.classList.add('dragging-placeholder');
-      document.addEventListener('mousemove', this.onDragMouseMove, false);
-      document.addEventListener('mouseup', this.onDragMouseUp, false);
-    },
-    onDragMouseMove(e) {
-      const { dragging } = this;
-      const {
-        el, dragged, offset, elements, lastIndex,
-      } = dragging;
-      dragged.style.left = `${e.clientX - offset.x}px`;
-      dragged.style.top = `${e.clientY - offset.y}px`;
-      let hoveredIndex = elements.findIndex((item) => {
-        if (!item || item.classList.contains('dragging-moving')) return false;
-        const rect = item.getBoundingClientRect();
-        return (
-          e.clientX >= rect.left + PADDING
-          && e.clientX <= rect.left + rect.width - PADDING
-          && e.clientY >= rect.top + PADDING
-          && e.clientY <= rect.top + rect.height - PADDING
-        );
-      });
-      if (hoveredIndex >= 0) {
-        const hoveredEl = elements[hoveredIndex];
-        const isDown = hoveredIndex >= lastIndex;
-        let { delta } = dragging;
-        if (isDown) {
-          hoveredIndex += 1;
-          hoveredEl.parentNode.insertBefore(el, hoveredEl.nextElementSibling);
-        } else {
-          delta = -delta;
-          hoveredEl.parentNode.insertBefore(el, hoveredEl);
-        }
-        dragging.lastIndex = hoveredIndex;
-        this.onDragAnimate(dragging.elements.slice(
-          isDown ? lastIndex : hoveredIndex,
-          isDown ? hoveredIndex : lastIndex,
-        ), delta);
-      }
-      this.onDragScrollCheck(e.clientY);
-    },
-    onDragMouseUp() {
-      document.removeEventListener('mousemove', this.onDragMouseMove, false);
-      document.removeEventListener('mouseup', this.onDragMouseUp, false);
-      const { dragging } = this;
-      this.dragging = null;
-      dragging.dragged.remove();
-      dragging.el.classList.remove('dragging-placeholder');
-      this.$emit('move', {
-        from: dragging.index,
-        to: dragging.lastIndex,
-      });
-    },
-    onDragAnimate(elements, delta) {
-      elements.forEach((el) => {
-        if (!el) return;
-        el.classList.add('dragging-moving');
-        el.style.transition = 'none';
-        el.style.transform = `translateY(${delta}px)`;
-        el.addEventListener('transitionend', endAnimation, false);
-        setTimeout(() => {
-          el.style.transition = '';
-          el.style.transform = '';
-        });
-      });
-      function endAnimation(e) {
-        e.target.classList.remove('dragging-moving');
-        e.target.removeEventListener('transitionend', endAnimation, false);
-      }
-    },
-    onDragScrollCheck(y) {
-      const { dragging } = this;
-      let scrollSpeed = 0;
-      const offset = dragging.el.parentNode.getBoundingClientRect();
-      let delta = (y - (offset.bottom - SCROLL_GAP)) / SCROLL_GAP;
-      if (delta > 0) {
-        // scroll down
-        scrollSpeed = 1 + Math.min((delta * 5) | 0, 10);
-      } else {
-        // scroll up
-        delta = (offset.top + SCROLL_GAP - y) / SCROLL_GAP;
-        if (delta > 0) scrollSpeed = -1 - Math.min((delta * 5) | 0, 10);
-      }
-      dragging.scrollSpeed = scrollSpeed;
-      if (scrollSpeed) this.onDragScroll();
-    },
-    onDragScroll() {
-      const scroll = () => {
-        const { dragging } = this;
-        if (!dragging) return;
-        if (dragging.scrollSpeed) {
-          dragging.el.parentNode.scrollTop += dragging.scrollSpeed;
-          setTimeout(scroll, 32);
-        } else dragging.scrolling = false;
-      };
-      if (this.dragging && !this.dragging.scrolling) {
-        this.dragging.scrolling = true;
-        scroll();
-      }
-    },
   },
 };
 </script>
 
 <style>
+@import '../utils/dragging.css';
+
 $rem: 14px;
 
 $iconSize: calc(3 * $rem);
@@ -394,7 +274,18 @@ $removedItemHeight: calc(
   padding: $itemPadT 10px $itemPadB;
   border: 1px solid #ccc;
   border-radius: .3rem;
-  transition: transform .5s;
+  transition: transform .25s;
+  // added in Chrome 41, FF64
+  @media (pointer: coarse) {
+    transition: none;
+  }
+  // fallback for pre-FF64
+  .touch & {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
   background: white;
   height: $itemHeight;
   &:hover {
@@ -478,14 +369,6 @@ $removedItemHeight: calc(
   }
   &-message {
     white-space: nowrap;
-  }
-}
-.dragging {
-  position: fixed;
-  margin: 0;
-  z-index: 9;
-  &-placeholder {
-    visibility: hidden;
   }
 }
 
