@@ -8,6 +8,7 @@ import { attachFunction } from '../utils';
 import bridge from './bridge';
 import {
   forEach, join, jsonDump, setJsonDump, append, createElementNS, NS_HTML,
+  charCodeAt, fromCharCode,
 } from '../utils/helpers';
 
 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
@@ -132,6 +133,10 @@ const injectedScriptIntro = `(${
   }
 })(${attachFunction},`;
 
+// fullwidth range starts at 0xFF00
+// normal range starts at space char code 0x20
+const replaceWithFullWidthForm = s => fromCharCode(s::charCodeAt(0) - 0x20 + 0xFF00);
+
 function injectScript(data) {
   const [vId, codeSlices, vCallbackId, mode, scriptId, scriptName] = data;
   // trying to avoid string concatenation of potentially huge code slices as long as possible
@@ -141,7 +146,8 @@ function injectScript(data) {
     ...codeSlices,
     `,"${vCallbackId}");`,
   ];
-  const name = encodeURIComponent(scriptName::replace(/[#/]/g, ''));
+  // replace characters that have special meaning in a URL with their fullwidth forms
+  const name = encodeURIComponent(scriptName::replace(/[#/:?]/g, replaceWithFullWidthForm));
   const sourceUrl = browser.extension.getURL(`${name}.user.js#${scriptId}`);
   if (mode === INJECT_CONTENT) {
     injectedCode.push(
