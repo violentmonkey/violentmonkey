@@ -9,9 +9,6 @@ module.exports = {
       legacyDecorators: true,
     },
   },
-  rules: {
-    'prefer-object-spread': 'off',
-  },
   overrides: [{
     // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
     // to prevent exposing them to userscripts with `@inject-into content`
