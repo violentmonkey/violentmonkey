@@ -218,8 +218,8 @@ labelAutoReloadCurrentTab:
     Recargar la pestaña actual después de activar/desactivar un script desde el
     menú
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Comprobar automáticamente las actualizaciones de los scripts cada díá
+  description: Option to allow automatically checking scripts for updates.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Mostrar en el icono de la extensión: '

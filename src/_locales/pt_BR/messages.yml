@@ -207,8 +207,8 @@ labelAutoReloadCurrentTab:
     Recarregar o separador atual após ativar/desativar um script a partir do
     menu
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Procurar atualizações de scripts automaticamente todos os dias
+  description: Option to allow automatically checking scripts for updates.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: Exibir no Ícone

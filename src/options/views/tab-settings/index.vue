@@ -5,12 +5,6 @@
       <h3 v-text="i18n('labelGeneral')"></h3>
       <div class="mb-1">
         <label>
-          <setting-check name="autoUpdate" />
-          <span v-text="i18n('labelAutoUpdate')"></span>
-        </label>
-      </div>
-      <div class="mb-1">
-        <label>
           <setting-check name="autoReload" />
           <span v-text="i18n('labelAutoReloadCurrentTab')"></span>
         </label>
@@ -19,6 +13,13 @@
         <label>
           <setting-check name="notifyUpdates" />
           <span v-text="i18n('labelNotifyUpdates')"></span>
+        </label>
+      </div>
+      <div class="mb-1">
+        <label>
+          <locale-group i18n-key="labelAutoUpdate">
+            <input v-model="settings.autoUpdate" type="number" min=0 max=365 step=1 />
+          </locale-group>
         </label>
       </div>
       <div class="mb-1">
@@ -119,6 +120,10 @@ const items = [
     },
   },
   {
+    name: 'autoUpdate',
+    normalize: value => Math.max(0, Math.min(365, +value || 0)),
+  },
+  {
     name: 'defaultInjectInto',
     normalize(value) {
       return injectIntoOptions.includes(value) ? value : 'auto';
@@ -191,6 +196,10 @@ export default {
   }
   textarea {
     height: 10em;
+  }
+  input[type="number"] {
+    width: 3.5em;
+    padding-left: .25em;
   }
 }
 .show-advanced {
