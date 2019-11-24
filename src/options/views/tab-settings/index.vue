@@ -162,7 +162,9 @@ export default {
   methods: {
     getUpdater({ name, normalize }) {
       return (value, oldValue) => {
-        if (value !== oldValue) options.set(name, normalize(value));
+        value = normalize(value);
+        oldValue = normalize(oldValue);
+        if (value !== oldValue) options.set(name, value);
       };
     },
   },
