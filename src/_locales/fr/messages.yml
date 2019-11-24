@@ -212,8 +212,8 @@ labelAutoReloadCurrentTab:
     Recharger l’onglet courant après avoir activé/désactivé un script dans le
     menu
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Vérifier les mises à jour des scripts tous les jours.
+  description: Option to allow automatically checking scripts for updates.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Montrer sur le badge: '

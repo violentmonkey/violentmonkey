@@ -207,8 +207,8 @@ labelAutoReloadCurrentTab:
     Bir script dosyasını menüden açıp / kapattıktan sonra geçerli sekmeyi
     yeniden yükle
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Scriptleri her gün otomatik olarak kontrol et
+  description: Option to allow automatically checking scripts for updates.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: ''

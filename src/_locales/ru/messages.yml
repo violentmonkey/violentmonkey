@@ -212,8 +212,8 @@ labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Обновить текущую вкладку после включения или отключения скрипта из меню.
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Ежедневно проверять наличие обновлений скриптов.
+  description: Option to allow automatically checking scripts for updates.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Показывать на значке: '

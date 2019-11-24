@@ -2,7 +2,7 @@ import { INJECT_AUTO } from './consts';
 
 export default {
   isApplied: true,
-  autoUpdate: true,
+  autoUpdate: 1, // days, 0 = disable
   // ignoreGrant: false,
   lastUpdate: 0,
   lastModified: 0,

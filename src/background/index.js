@@ -55,23 +55,25 @@ function checkUpdateAll() {
   });
 }
 
-let autoUpdating;
+// setTimeout truncates the delay to a 32-bit signed integer so the max delay is ~24 days
+const TIMEOUT_MAX = 0x7FFF_FFFF;
+const TIMEOUT_24HOURS = 24 * 60 * 60 * 1000;
+
 function autoUpdate() {
-  if (autoUpdating) return;
-  autoUpdating = true;
-  check();
-  function check() {
-    new Promise((resolve, reject) => {
-      if (!getOption('autoUpdate')) return reject();
-      if (Date.now() - getOption('lastUpdate') >= 864e5) resolve(checkUpdateAll());
-    })
-    .then(() => setTimeout(check, 36e5), () => { autoUpdating = false; });
+  const interval = (+getOption('autoUpdate') || 0) * TIMEOUT_24HOURS;
+  if (!interval) return;
+  let elapsed = Date.now() - getOption('lastUpdate');
+  if (elapsed >= interval) {
+    checkUpdateAll();
+    elapsed = 0;
   }
+  clearTimeout(autoUpdate.timer);
+  autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
 }
 
 function autoCheckRemove() {
   checkRemove();
-  setTimeout(autoCheckRemove, 24 * 60 * 60 * 1000);
+  setTimeout(autoCheckRemove, TIMEOUT_24HOURS);
 }
 
 const commands = {
