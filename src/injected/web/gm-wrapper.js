@@ -1,5 +1,5 @@
 import {
-  INJECT_INTERNAL_PAGE, INJECT_INTERNAL_CONTENT, INJECT_INTERNAL_WRAP, METABLOCK_RE,
+  INJECT_INTERNAL_PAGE, INJECT_INTERNAL_CONTENT, METABLOCK_RE,
 } from '#/common/consts';
 import bridge from './bridge';
 import {
@@ -25,9 +25,6 @@ let wrapperInfo = {
     // run script in content context
     // `unsafeWindow === contentGlobal, contentGlobal.window === contentWindow`
     [INJECT_INTERNAL_CONTENT]: global,
-    // run script in content context, but access pageWindow with the Firefox specific `wrappedJSObject`
-    // `unsafeWindow === wrappedJSObject === pageWindow`
-    [INJECT_INTERNAL_WRAP]: global.wrappedJSObject || global,
   },
 };
 

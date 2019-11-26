@@ -4,13 +4,12 @@ export const INJECT_CONTENT = 'content';
 
 export const INJECT_INTERNAL_PAGE = 'page';
 export const INJECT_INTERNAL_CONTENT = 'content';
-export const INJECT_INTERNAL_WRAP = 'wrap';
 
 export const INJECT_MAPPING = {
   // `auto` tries to provide `window` from the real page as `unsafeWindow`
-  [INJECT_AUTO]: [INJECT_INTERNAL_PAGE, INJECT_INTERNAL_WRAP, INJECT_INTERNAL_CONTENT],
-  // inject into page context, if failed, try `wrap` mode for Firefox
-  [INJECT_PAGE]: [INJECT_INTERNAL_PAGE, INJECT_INTERNAL_WRAP],
+  [INJECT_AUTO]: [INJECT_INTERNAL_PAGE, INJECT_INTERNAL_CONTENT],
+  // inject into page context
+  [INJECT_PAGE]: [INJECT_INTERNAL_PAGE],
   // inject into content context only
   [INJECT_CONTENT]: [INJECT_INTERNAL_CONTENT],
 };
