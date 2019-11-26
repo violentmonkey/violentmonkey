@@ -215,7 +215,7 @@ labelAutoReloadCurrentTab:
   message: Obnoviť aktuálny list po vypnutí alebo zapnutí skriptu z menu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates.
-  message: ''
+  message: Kontrolovať aktualizácie skriptu každý $1 deň, pre zakázanie použite 0
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Zobraziť počítadlo: '
