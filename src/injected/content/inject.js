@@ -3,7 +3,6 @@ import {
   INJECT_CONTENT,
   INJECT_INTERNAL_CONTENT,
   INJECT_INTERNAL_PAGE,
-  INJECT_INTERNAL_WRAP,
   INJECT_MAPPING,
   INJECT_PAGE,
   browser,
@@ -36,9 +35,6 @@ export function triageScripts(data) {
     [INJECT_INTERNAL_PAGE]: [],
     [INJECT_INTERNAL_CONTENT]: [],
   };
-  // `INJECT_INTERNAL_WRAP` is a special case of `INJECT_INTERNAL_CONTENT`
-  // so we will just reuse the list to keep the execution orders
-  scriptLists[INJECT_INTERNAL_WRAP] = scriptLists[INJECT_INTERNAL_CONTENT];
   if (data.scripts) {
     data.scripts = data.scripts.filter(({ meta, props, config }) => {
       if (!meta.noframes || window.top === window) {
@@ -56,7 +52,6 @@ export function triageScripts(data) {
         if (!support) support = { injectable: checkInjectable() };
         return support.injectable;
       },
-      [INJECT_INTERNAL_WRAP]: () => isFirefox,
       [INJECT_INTERNAL_CONTENT]: () => true,
     };
     data.scripts.forEach((script) => {
