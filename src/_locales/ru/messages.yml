@@ -4,7 +4,7 @@ anchorAuthor:
 anchorTranslator:
   description: Translator shown on about tab.
   message: >-
-    wvxwxvw, <a https://github.com/wvxwxvw>wvxwxvw</a>, <a
+    <a href=https://github.com/wvxwxvw>wvxwxvw</a>, <a
     href=https://github.com/alexesprit>alexesprit</a>, <a
     href=https://github.com/bershan2>bershan2</a>, <a
     href=https://github.com/bogachenko>bogachenko</a>
@@ -116,7 +116,7 @@ confirmNotSaved:
     Нажмите OK, чтобы выйти или Отмена, чтобы вернуться.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: URL из этого списка не будет обрабатываться скриптами.
+  message: URL из этого списка не будут обрабатываться скриптами.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -126,7 +126,7 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Ваши параметры для CodeMirror и аддонов в объекте JSON, например
-    <code>{"indentUnit":2, "smartIndent":true}</code> однако заметьте,
+    <code>{"indentUnit":2, "smartIndent":true}</code> . Однако заметьте,
      некоторые из них могут не работать в Violentmonkey. Смотрите <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">полный список</a>.
@@ -158,7 +158,7 @@ extDescription:
   description: Description for this extension.
   message: >-
     Violentmonkey - менеджер пользовательских скриптов, позволяет контролировать
-    внешний вид и устранять проблемы сайтов.
+    внешний вид и устранять проблемы на сайтах.
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -305,7 +305,7 @@ labelIndentUnit:
   touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: Режим иньекции по умолчанию
+  message: Режим инъекции по умолчанию: 
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта
@@ -340,7 +340,7 @@ labelNoSearchScripts:
   message: Скрипты не найдены.
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Уведомлять об обновлениях скрипта
+  message: Уведомлять об обновлениях скриптов
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Сортировка во всплывающем окне по $1
@@ -397,7 +397,7 @@ labelSyncAuthorizing:
   message: Авторизация
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: Ничем
+  message: ничем
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Пароль: '
