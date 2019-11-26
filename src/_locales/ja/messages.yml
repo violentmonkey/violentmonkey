@@ -122,10 +122,10 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    CodeMirrorやアドオンのカスタムオプションとして、JSONオブジェクトを
-    <code>{"indentUnit":2, "smartIndent":true}</code> の様に指定します。
-    いくつかのオプションは Violentmonkey では動作しない可能性があります。
-    完全なリストは <a href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    CodeMirrorやアドオンのカスタムオプションとして、JSONオブジェクトを <code>{"indentUnit":2,
+    "smartIndent":true}</code> の様に指定します。 いくつかのオプションは Violentmonkey
+    では動作しない可能性があります。 完全なリストは <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">こちら</a> を参照してください。
 editHowToHint:
   description: The text of the how-to link in the editor header.
@@ -257,6 +257,7 @@ labelEditValue:
 labelEditing:
   description: Label for current editing script
   message: '編集中: '
+  touched: false
 labelEditor:
   description: Label for Editor settings
   message: エディタ

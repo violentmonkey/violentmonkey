@@ -123,6 +123,9 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: ''
+editHowToHint:
+  description: The text of the how-to link in the editor header.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Προσαρμοσμένα μεταδεδομένα
@@ -211,7 +214,7 @@ labelAutoReloadCurrentTab:
     Επαναφόρτωση τρέχουσας καρτέλας μετά την ενεργοποίηση/απενεργοποίηση ενός
     σεναρίου από το μενού
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates.
+  description: Option to allow automatically checking scripts for updates
   message: ''
 labelBadge:
   description: Label for option to show number on badge.
@@ -252,6 +255,7 @@ labelEditValue:
 labelEditing:
   description: Label for current editing script
   message: ''
+  touched: false
 labelEditor:
   description: Label for Editor settings
   message: ''

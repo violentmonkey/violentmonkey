@@ -126,6 +126,9 @@ descEditorOptions:
     funkčné vo Violentmonkey. Pozri <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">celý zoznam</a>.
+editHowToHint:
+  description: The text of the how-to link in the editor header.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Vlastné metadáta
@@ -214,8 +217,8 @@ labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Obnoviť aktuálny list po vypnutí alebo zapnutí skriptu z menu
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates.
-  message: Kontrolovať aktualizácie skriptu každý $1 deň, pre zakázanie použite 0
+  description: Option to allow automatically checking scripts for updates
+  message: 'Kontrolovať aktualizácie skriptu každý $1 deň, pre zakázanie použite 0'
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Zobraziť počítadlo: '
@@ -255,6 +258,7 @@ labelEditValue:
 labelEditing:
   description: Label for current editing script
   message: 'Práve sa upravuje: '
+  touched: false
 labelEditor:
   description: Label for Editor settings
   message: Editor

@@ -124,6 +124,9 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: ''
+editHowToHint:
+  description: The text of the how-to link in the editor header.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadonnées personnalisées
@@ -212,7 +215,7 @@ labelAutoReloadCurrentTab:
     Recharger l’onglet courant après avoir activé/désactivé un script dans le
     menu
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates.
+  description: Option to allow automatically checking scripts for updates
   message: ''
 labelBadge:
   description: Label for option to show number on badge.
@@ -253,6 +256,7 @@ labelEditValue:
 labelEditing:
   description: Label for current editing script
   message: 'En cours d’édition: '
+  touched: false
 labelEditor:
   description: Label for Editor settings
   message: Éditeur

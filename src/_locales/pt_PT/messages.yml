@@ -125,6 +125,9 @@ descEditorOptions:
     como: {"indentUnit":2, "smartIndent":true}. No entanto, tenha em atenção que
     algumas poderão não funcionar com o Violentmonkey. Lista completa:
     https://codemirror.net/doc/manual.html#config
+editHowToHint:
+  description: The text of the how-to link in the editor header.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadados personalizados
@@ -213,7 +216,7 @@ labelAutoReloadCurrentTab:
     Recarregar o separador atual após ativar/desativar um script a partir do
     menu
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates.
+  description: Option to allow automatically checking scripts for updates
   message: ''
 labelBadge:
   description: Label for option to show number on badge.
@@ -254,6 +257,7 @@ labelEditValue:
 labelEditing:
   description: Label for current editing script
   message: 'A editar: '
+  touched: false
 labelEditor:
   description: Label for Editor settings
   message: Editor

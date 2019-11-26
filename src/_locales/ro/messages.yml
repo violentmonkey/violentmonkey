@@ -128,6 +128,9 @@ descEditorOptions:
     {"indentUnit":2, "smartIndent":true} Cu toate acestea, reține că unele
     dintre ele pot să nu funcționeze în Violentmonkey. Lista completă:
     https://codemirror.net/doc/manual.html#config
+editHowToHint:
+  description: The text of the how-to link in the editor header.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadate personalizate
@@ -216,7 +219,7 @@ labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Reîncarcă fila actuală după activarea/dezactivarea unui script din meniu
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates.
+  description: Option to allow automatically checking scripts for updates
   message: ''
 labelBadge:
   description: Label for option to show number on badge.
@@ -257,6 +260,7 @@ labelEditValue:
 labelEditing:
   description: Label for current editing script
   message: 'Editare în prezent: '
+  touched: false
 labelEditor:
   description: Label for Editor settings
   message: Editor

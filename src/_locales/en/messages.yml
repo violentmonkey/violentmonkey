@@ -216,7 +216,7 @@ labelAutoReloadCurrentTab:
   message: Reload current tab after switching on/off a script from menu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: Check for script updates every $1 day(s), use 0 to disable
+  message: 'Check for script updates every $1 day(s), use 0 to disable'
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Display on badge: '
@@ -256,6 +256,7 @@ labelEditValue:
 labelEditing:
   description: Label for current editing script
   message: 'Current editing: '
+  touched: false
 labelEditor:
   description: Label for Editor settings
   message: Editor

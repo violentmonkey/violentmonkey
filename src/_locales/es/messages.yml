@@ -128,6 +128,9 @@ descEditorOptions:
     cuenta que algunos de ellos pueden no funcionar en Violentmonkey. Mire la <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completa</a>.
+editHowToHint:
+  description: The text of the how-to link in the editor header.
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadatos personalizados
@@ -218,7 +221,7 @@ labelAutoReloadCurrentTab:
     Recargar la pestaña actual después de activar/desactivar un script desde el
     menú
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates.
+  description: Option to allow automatically checking scripts for updates
   message: ''
 labelBadge:
   description: Label for option to show number on badge.
@@ -259,6 +262,7 @@ labelEditValue:
 labelEditing:
   description: Label for current editing script
   message: 'Edición actual: '
+  touched: false
 labelEditor:
   description: Label for Editor settings
   message: Editor
