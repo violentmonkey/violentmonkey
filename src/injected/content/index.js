@@ -1,8 +1,9 @@
-import { getUniqId } from '#/common';
+import { getUniqId, makePause } from '#/common';
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import { bindEvents, sendCmd, sendMessage } from '../utils';
 import {
-  setJsonDump, objectKeys, filter, forEach, includes, append, createElement, setAttribute,
+  setJsonDump, objectKeys, filter, forEach, includes, append, createElementNS, setAttribute,
+  NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
@@ -82,7 +83,7 @@ bridge.addHandlers({
   },
   AddStyle({ css, callbackId }, realm) {
     const styleId = getUniqId('VMst');
-    const style = document::createElement('style');
+    const style = document::createElementNS(NS_HTML, 'style');
     style::setAttribute('id', styleId);
     style::append(css);
     // DOM spec allows any elements under documentElement
@@ -104,6 +105,6 @@ function getPopup() {
 
 async function setBadge() {
   // delay setBadge in frames so that they can be added to the initial count
-  if (!IS_TOP) await new Promise(resolve => setTimeout(resolve, 300));
+  if (!IS_TOP) await makePause(300);
   sendCmd('SetBadge', bridge.enabledIds);
 }

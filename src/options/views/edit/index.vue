@@ -1,57 +1,48 @@
 <template>
   <div class="edit frame flex flex-col fixed-full">
-    <div class="flex flex-wrap edit-header mx-1 my-1">
-      <div class="edit-info text-right ellipsis">
-        <strong v-text="i18n('labelEditing')"></strong>
-        <em v-text="scriptName"></em>
-      </div>
-      <div class="flex-auto flex">
-        <div class="edit-hint flex-auto text-right ellipsis mr-1">
-          <a href="https://violentmonkey.github.io/2017/03/14/How-to-edit-scripts-with-your-favorite-editor/" target="_blank" rel="noopener noreferrer">How to edit with your favorite editor?</a>
-        </div>
-        <div class="edit-buttons">
-          <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"></button>
-          <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"></button>
-          <button v-text="i18n('buttonClose')" @click="close"></button>
-        </div>
-      </div>
-    </div>
-    <div class="flex mx-1">
-      <div
-        class="edit-nav-item"
-        :class="{active: nav === 'code'}"
-        v-text="i18n('editNavCode')"
-        @click="nav = 'code'"
-      />
-      <div
-        class="edit-nav-item"
-        :class="{active: nav === 'settings'}"
-        v-text="i18n('editNavSettings')"
-        @click="nav = 'settings'"
-      />
-      <div
-        class="edit-nav-item"
-        :class="{active: nav === 'values'}"
-        v-text="i18n('editNavValues')"
-        @click="nav = 'values'"
-      />
-      <div
-        class="edit-nav-item"
-        :class="{active: nav === 'keyboard'}"
-        @click="nav = 'keyboard'"
-      >?</div>
-      <div class="flex-auto pos-rel">
+    <div class="edit-header flex">
+      <nav>
         <div
-          v-if="tooLarge"
-          class="edit-warn text-red hidden-sm"
-          v-text="i18n('warnScriptLongLines')"
+          class="edit-nav-item"
+          :class="{active: nav === 'code'}"
+          v-text="i18n('editNavCode')"
+          @click="nav = 'code'"
         />
+        <div
+          class="edit-nav-item"
+          :class="{active: nav === 'settings'}"
+          v-text="i18n('editNavSettings')"
+          @click="nav = 'settings'"
+        />
+        <div
+          class="edit-nav-item"
+          :class="{active: nav === 'values'}"
+          v-text="i18n('editNavValues')"
+          @click="nav = 'values'"
+        />
+        <div
+          class="edit-nav-item"
+          :class="{active: nav === 'keyboard'}"
+          @click="nav = 'keyboard'"
+        >?</div>
+      </nav>
+      <div class="edit-name text-center ellipsis flex-1 mr-1" v-text="scriptName"/>
+      <div class="edit-hint text-right ellipsis mr-1">
+        <a href="https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/"
+           target="_blank"
+           rel="noopener noreferrer"
+           v-text="i18n('editHowToHint')"/>
+      </div>
+      <div class="edit-buttons mr-1">
+        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"/>
+        <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"/>
+        <button v-text="i18n('buttonClose')" @click="close"/>
       </div>
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
         v-show="nav === 'code'" class="abs-full" ref="code" :editing="nav === 'code'"
-        v-model="code" :commands="commands" @warnLarge="onWarnLarge"
+        v-model="code" :commands="commands"
       />
       <vm-settings
         v-show="nav === 'settings'" class="abs-full edit-body"
@@ -100,7 +91,6 @@ export default {
       nav: 'code',
       canSave: false,
       script: null,
-      tooLarge: false,
       code: '',
       settings: {},
       commands: {
@@ -248,9 +238,6 @@ export default {
     saveClose() {
       this.save().then(this.close);
     },
-    onWarnLarge(tooLarge) {
-      this.tooLarge = tooLarge;
-    },
   },
   beforeDestroy() {
     store.title = null;
@@ -261,6 +248,13 @@ export default {
 <style>
 .edit {
   z-index: 2000;
+  &-header {
+    align-items: center;
+    justify-content: space-between;
+  }
+  &-name {
+    font-weight: bold;
+  }
   &-body {
     padding: .5rem 1rem;
     overflow: auto;
@@ -282,18 +276,14 @@ export default {
   }
 }
 
-.edit-warn {
-  position: absolute;
-  left: 0;
-  right: .5rem;
-  bottom: .5rem;
-  text-align: right;
+@media (max-width: 767px) {
+  .edit-hint {
+    display: none;
+  }
 }
 
-@media (max-width: 767px) {
-  .edit-header > h2,
-  .edit-hint,
-  .edit-info {
+@media (max-width: 500px) {
+  .edit-name {
     display: none;
   }
 }

@@ -4,7 +4,7 @@ anchorAuthor:
 anchorTranslator:
   description: Translator shown on about tab.
   message: >-
-    <a href="http://www.forumit.ro/">Nicolae Crefelean</a>, <a 
+    <a href="http://www.forumit.ro/">Nicolae Crefelean</a>, <a
     href=mailto:cristian.silaghi@mozilla.ro>Cristian Silaghi</a>
 buttonAllNone:
   description: Button to select all scripts or none.
@@ -124,9 +124,9 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Opțiuni personalizate pentru CodeMirror și suplimente în obiecte JSON 
-    {"indentUnit":2, "smartIndent":true} Cu toate acestea, reține că unele 
-    dintre ele pot să nu funcționeze în Violentmonkey. Lista completă: 
+    Opțiuni personalizate pentru CodeMirror și suplimente în obiecte JSON
+    {"indentUnit":2, "smartIndent":true} Cu toate acestea, reține că unele
+    dintre ele pot să nu funcționeze în Violentmonkey. Lista completă:
     https://codemirror.net/doc/manual.html#config
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
@@ -216,8 +216,8 @@ labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Reîncarcă fila actuală după activarea/dezactivarea unui script din meniu
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: 'Caută zilnic actualizări pentru scripturi, în mod automat'
+  description: Option to allow automatically checking scripts for updates.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Afișează pe insignă: '
@@ -587,8 +587,3 @@ valueLabelValue:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Vizitează site-ul web
-warnScriptLongLines:
-  description: Warning message shown when script has lines that are too long to be edited.
-  message: >-
-    Unele rânduri sunt prea lungi, se deschide în modul numai citire. Te rugăm
-    să editezi cu un editor extern.

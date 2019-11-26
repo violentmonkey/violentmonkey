@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { i18n, sendCmd } from '#/common';
+import { i18n, sendCmd, getActiveTab } from '#/common';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import handlers from '#/common/handlers';
 import * as tld from '#/common/tld';
@@ -49,22 +49,18 @@ Object.assign(handlers, {
   },
 });
 
-browser.tabs.query({ currentWindow: true, active: true })
-.then(async (tabs) => {
-  const currentTab = {
-    id: tabs[0].id,
-    url: tabs[0].url,
-  };
-  store.currentTab = currentTab;
-  browser.tabs.sendMessage(currentTab.id, { cmd: 'GetPopup' });
-  if (/^https?:\/\//i.test(currentTab.url)) {
-    const matches = currentTab.url.match(/:\/\/([^/]*)/);
+getActiveTab()
+.then(async ({ id, url }) => {
+  store.currentTab = { id, url };
+  browser.tabs.sendMessage(id, { cmd: 'GetPopup' });
+  if (/^https?:\/\//i.test(url)) {
+    const matches = url.match(/:\/\/([^/]*)/);
     const domain = matches[1];
     store.domain = tld.getDomain(domain) || domain;
   }
-  if (!INJECTABLE_TAB_URL_RE.test(currentTab.url)) {
+  if (!INJECTABLE_TAB_URL_RE.test(url)) {
     store.injectable = false;
   } else {
-    store.blacklisted = await sendCmd('TestBlacklist', currentTab.url);
+    store.blacklisted = await sendCmd('TestBlacklist', url);
   }
 });

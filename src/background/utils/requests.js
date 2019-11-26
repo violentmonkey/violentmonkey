@@ -36,7 +36,6 @@ const specialHeaders = [
 ];
 // const tasks = {};
 const HeaderInjector = (() => {
-  const apiEvent = browser.webRequest.onBeforeSendHeaders;
   /** @type chrome.webRequest.RequestFilter */
   const apiFilter = {
     urls: ['<all_urls>'],
@@ -44,9 +43,7 @@ const HeaderInjector = (() => {
     // -1 is browser.tabs.TAB_ID_NONE to limit the listener to requests from the bg script
     tabId: -1,
   };
-  const apiExtraOpts = [
-    'blocking',
-    'requestHeaders',
+  const EXTRA_HEADERS = [
     browser.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS,
   ].filter(Boolean);
   const headersToInject = {};
@@ -54,34 +51,55 @@ const HeaderInjector = (() => {
   const isVmVerify = header => header.name === VM_VERIFY;
   const isSendable = header => header.name !== VM_VERIFY;
   const isSendableAnon = header => isSendable(header) && !/^cookie$/i.test(header.name);
-  /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
-  const onBeforeSendHeaders = ({ requestHeaders, requestId }) => {
-    // only the first call during a redirect/auth chain will have VM-Verify header
-    const reqId = requestHeaders.find(isVmVerify)?.value || verify[requestId];
-    const req = reqId && requests[reqId];
-    if (reqId && req) {
-      verify[requestId] = reqId;
-      req.coreId = requestId;
-      requestHeaders = requestHeaders
-      .concat(headersToInject[reqId] || [])
-      .filter(req.anonymous ? isSendableAnon : isSendable);
-    }
-    return { requestHeaders };
+  const apiEvents = {
+    onBeforeSendHeaders: {
+      options: ['requestHeaders', 'blocking', ...EXTRA_HEADERS],
+      /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
+      listener({ requestHeaders, requestId }) {
+        // only the first call during a redirect/auth chain will have VM-Verify header
+        const reqId = requestHeaders.find(isVmVerify)?.value || verify[requestId];
+        const req = reqId && requests[reqId];
+        if (reqId && req) {
+          verify[requestId] = reqId;
+          req.coreId = requestId;
+          requestHeaders = requestHeaders
+          .concat(headersToInject[reqId] || [])
+          .filter(req.anonymous ? isSendableAnon : isSendable);
+        }
+        return { requestHeaders };
+      },
+    },
+    onHeadersReceived: {
+      options: ['responseHeaders', ...EXTRA_HEADERS],
+      /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
+      listener({ responseHeaders, requestId }) {
+        const req = requests[verify[requestId]];
+        if (req) {
+          // mimic https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/getAllResponseHeaders
+          req.responseHeaders = responseHeaders
+          .map(({ name, value }) => `${name}: ${value}\r\n`)
+          .sort()
+          .join('');
+        }
+      },
+    },
   };
   return {
     add(reqId, headers) {
       // need to set the entry even if it's empty [] so that 'if' check in del() runs only once
       headersToInject[reqId] = headers;
       // need the listener to get the requestId
-      if (!apiEvent.hasListener(onBeforeSendHeaders)) {
-        apiEvent.addListener(onBeforeSendHeaders, apiFilter, apiExtraOpts);
-      }
+      Object.entries(apiEvents).forEach(([name, { listener, options }]) => {
+        browser.webRequest[name].addListener(listener, apiFilter, options);
+      });
     },
     del(reqId) {
       if (reqId in headersToInject) {
         delete headersToInject[reqId];
         if (isEmpty(headersToInject)) {
-          apiEvent.removeListener(onBeforeSendHeaders);
+          Object.entries(apiEvents).forEach(([name, { listener }]) => {
+            browser.webRequest[name].removeListener(listener);
+          });
         }
       }
     },
@@ -110,7 +128,7 @@ function xhrCallbackWrapper(req) {
     const data = {
       finalUrl: xhr.responseURL,
       readyState: xhr.readyState,
-      responseHeaders: xhr.getAllResponseHeaders(),
+      responseHeaders: req.responseHeaders || xhr.getAllResponseHeaders(),
       status: xhr.status,
       statusText: xhr.statusText,
     };

@@ -25,6 +25,8 @@ export default function initialize(
     bridge.mode = INJECT_CONTENT;
     bridge.post = msg => invokeHost(msg, INJECT_CONTENT);
     invokeGuest = bridge.onHandle;
+    global.chrome = undefined;
+    global.browser = undefined;
   } else {
     bridge.mode = INJECT_PAGE;
     bridge.post = bindEvents(webId, contentId, bridge.onHandle);

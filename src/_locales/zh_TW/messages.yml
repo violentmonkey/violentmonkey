@@ -203,8 +203,8 @@ labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: 從選單開啟或關閉腳本後自動重新整理當前頁面
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: 每天自動更新腳本
+  description: Option to allow automatically checking scripts for updates.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: ''
@@ -571,7 +571,4 @@ valueLabelValue:
   message: ''
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
-warnScriptLongLines:
-  description: Warning message shown when script has lines that are too long to be edited.
   message: ''

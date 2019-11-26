@@ -1,3 +1,4 @@
+import { browser } from '#/common/consts';
 import { noop } from './util';
 
 export * from './util';
@@ -57,7 +58,6 @@ export function sendMessage(payload, { retry } = {}) {
  * or when configured to restore the session, https://crbug.com/314686
  */
 export async function sendMessageRetry(payload, retries = 10) {
-  const makePause = ms => new Promise(resolve => setTimeout(resolve, ms));
   let pauseDuration = 10;
   for (; retries > 0; retries -= 1) {
     const data = await sendMessage(payload).catch(noop);
@@ -83,71 +83,6 @@ export function getLocaleString(meta, key) {
   .map(lang => meta[`${key}:${lang}`] || meta[`${key}:${lang.toLowerCase()}`])
   .find(Boolean);
   return localeMeta || meta[key] || '';
-}
-
-const binaryTypes = [
-  'blob',
-  'arraybuffer',
-];
-
-/**
- * Make a request.
- * @param {string} url
- * @param {RequestInit} options
- * @return Promise
- */
-export function request(url, options = {}) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    const { responseType } = options;
-    xhr.open(options.method || 'GET', url, true);
-    if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
-    const headers = Object.assign({}, options.headers);
-    let { body } = options;
-    if (body && Object.prototype.toString.call(body) === '[object Object]') {
-      headers['Content-Type'] = 'application/json';
-      body = JSON.stringify(body);
-    }
-    Object.keys(headers).forEach((key) => {
-      xhr.setRequestHeader(key, headers[key]);
-    });
-    xhr.onload = () => {
-      const res = getResponse(xhr, {
-        // status for `file:` protocol will always be `0`
-        status: xhr.status || 200,
-      });
-      if (res.status > 300) reject(res);
-      else resolve(res);
-    };
-    xhr.onerror = () => {
-      const res = getResponse(xhr, { status: -1 });
-      reject(res);
-    };
-    xhr.onabort = xhr.onerror;
-    xhr.ontimeout = xhr.onerror;
-    xhr.send(body);
-  });
-  function getResponse(xhr, extra) {
-    const { responseType } = options;
-    let data;
-    if (binaryTypes.includes(responseType)) {
-      data = xhr.response;
-    } else {
-      data = xhr.responseText;
-    }
-    if (responseType === 'json') {
-      try {
-        data = JSON.parse(data);
-      } catch (e) {
-        // Ignore invalid JSON
-      }
-    }
-    return Object.assign({
-      url,
-      data,
-      xhr,
-    }, extra);
-  }
 }
 
 export function getFullUrl(url, base) {
@@ -193,4 +128,18 @@ export function encodeFilename(name) {
 
 export function decodeFilename(filename) {
   return filename.replace(/-([0-9a-f]{2})/g, (_m, g) => String.fromCharCode(parseInt(g, 16)));
+}
+
+export async function getActiveTab() {
+  const [tab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  return tab;
+}
+
+export function makePause(ms) {
+  return ms < 0
+    ? Promise.resolve()
+    : new Promise(resolve => setTimeout(resolve, ms));
 }

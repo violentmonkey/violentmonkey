@@ -100,7 +100,8 @@ function str2RE(str) {
 
 function autoReg(str) {
   if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
-    return new RegExp(str.slice(1, -1)); // Regular-expression
+    const re = new RegExp(str.slice(1, -1));
+    return { test: tstr => testRegExp(re, tstr) };
   }
   const reStr = str2RE(str);
   if (tld.isReady() && str.includes('.tld/')) {

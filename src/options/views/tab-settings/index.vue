@@ -5,12 +5,6 @@
       <h3 v-text="i18n('labelGeneral')"></h3>
       <div class="mb-1">
         <label>
-          <setting-check name="autoUpdate" />
-          <span v-text="i18n('labelAutoUpdate')"></span>
-        </label>
-      </div>
-      <div class="mb-1">
-        <label>
           <setting-check name="autoReload" />
           <span v-text="i18n('labelAutoReloadCurrentTab')"></span>
         </label>
@@ -23,8 +17,15 @@
       </div>
       <div class="mb-1">
         <label>
+          <locale-group i18n-key="labelAutoUpdate">
+            <input v-model="settings.autoUpdate" type="number" min=0 max=365 step=1 />
+          </locale-group>
+        </label>
+      </div>
+      <div class="mb-1">
+        <label>
           <span v-text="i18n('labelBadge')"></span>
-          <select v-model="showBadge">
+          <select v-model="settings.showBadge">
             <option value="" v-text="i18n('labelBadgeNone')" />
             <option value="unique" v-text="i18n('labelBadgeUnique')" />
             <option value="total" v-text="i18n('labelBadgeTotal')" />
@@ -33,18 +34,8 @@
       </div>
       <div class="mb-1">
         <label>
-          <span v-text="i18n('labelInjectionMode')"></span>
-          <select v-model="defaultInjectInto">
-            <option value="page">page</option>
-            <option value="auto">auto</option>
-          </select>
-          <a class="ml-1" href="https://violentmonkey.github.io/2018/11/23/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
-        </label>
-      </div>
-      <div class="mb-1">
-        <label>
           <locale-group i18n-key="labelPopupSort">
-            <select v-model="popupSort">
+            <select v-model="settings['filtersPopup.sort']">
               <option value="exec" v-text="i18n('filterExecutionOrder')" />
               <option value="alpha" v-text="i18n('filterAlphabeticalOrder')" />
             </select>
@@ -70,6 +61,23 @@
       </button>
     </div>
     <div v-show="showAdvanced">
+      <section>
+        <h3 v-text="i18n('labelGeneral')"></h3>
+        <div class="mb-1">
+          <label>
+            <span v-text="i18n('labelInjectionMode')"></span>
+            <select v-model="settings.defaultInjectInto">
+              <option
+                v-for="option in injectIntoOptions"
+                :key="option"
+                :value="option"
+                v-text="option"
+              />
+            </select>
+            <a class="ml-1" href="https://violentmonkey.github.io/posts/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
+          </label>
+        </div>
+      </section>
       <vm-editor />
       <vm-template />
       <vm-blacklist />
@@ -80,6 +88,11 @@
 
 <script>
 import { debounce } from '#/common';
+import {
+  INJECT_AUTO,
+  INJECT_PAGE,
+  INJECT_CONTENT,
+} from '#/common/consts';
 import SettingCheck from '#/common/ui/setting-check';
 import options from '#/common/options';
 import hookSetting from '#/common/hook-setting';
@@ -93,6 +106,11 @@ import VmTemplate from './vm-template';
 import VmBlacklist from './vm-blacklist';
 import VmCss from './vm-css';
 
+const injectIntoOptions = [
+  INJECT_AUTO,
+  INJECT_PAGE,
+  INJECT_CONTENT,
+];
 const items = [
   {
     name: 'showBadge',
@@ -102,20 +120,21 @@ const items = [
     },
   },
   {
+    name: 'autoUpdate',
+    normalize: value => Math.max(0, Math.min(365, +value || 0)),
+  },
+  {
     name: 'defaultInjectInto',
     normalize(value) {
-      return value === 'auto' ? 'auto' : 'page';
+      return injectIntoOptions.includes(value) ? value : 'auto';
     },
   },
   {
-    key: 'filtersPopup.sort',
-    name: 'popupSort',
+    name: 'filtersPopup.sort',
     normalize: value => value === 'exec' && value || 'alpha',
   },
 ];
-const settings = {
-  showAdvanced: false,
-};
+const settings = {};
 items.forEach(({ name }) => {
   settings[name] = null;
 });
@@ -134,12 +153,18 @@ export default {
     LocaleGroup,
   },
   data() {
-    return settings;
+    return {
+      showAdvanced: false,
+      settings,
+      injectIntoOptions,
+    };
   },
   methods: {
-    getUpdater({ key, name, normalize }) {
+    getUpdater({ name, normalize }) {
       return (value, oldValue) => {
-        if (value !== oldValue) options.set(key || name, normalize(value));
+        value = normalize(value);
+        oldValue = normalize(oldValue);
+        if (value !== oldValue) options.set(name, value);
       };
     },
   },
@@ -147,12 +172,12 @@ export default {
     this.revokers = [];
     options.ready.then(() => {
       items.forEach((item) => {
-        const { name, key, normalize } = item;
-        settings[name] = normalize(options.get(key || name));
-        this.revokers.push(hookSetting(key, (value) => {
+        const { name, normalize } = item;
+        settings[name] = normalize(options.get(name));
+        this.revokers.push(hookSetting(name, (value) => {
           settings[name] = value;
         }));
-        this.$watch(name, debounce(this.getUpdater(item), 300));
+        this.$watch(() => settings[name], debounce(this.getUpdater(item), 300));
       });
     });
   },
@@ -173,6 +198,10 @@ export default {
   }
   textarea {
     height: 10em;
+  }
+  input[type="number"] {
+    width: 3.5em;
+    padding-left: .25em;
   }
 }
 .show-advanced {

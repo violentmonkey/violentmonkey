@@ -1,4 +1,6 @@
-import { INJECT_PAGE, INJECT_CONTENT, METABLOCK_RE } from '#/common/consts';
+import {
+  INJECT_INTERNAL_PAGE, INJECT_INTERNAL_CONTENT, INJECT_INTERNAL_WRAP, METABLOCK_RE,
+} from '#/common/consts';
 import bridge from './bridge';
 import {
   forEach, includes, match, objectKeys, map, defineProperties, filter, defineProperty, slice,
@@ -7,13 +9,25 @@ import { createGmApiProps, propertyFromValue } from './gm-api';
 
 const { startsWith } = String.prototype;
 
+// - Chrome, `global === window`
+// - Firefox, `global` is a sandbox, `global.window === window`:
+//   - some properties (like `isFinite`) are defined in `global` but not `window`
+//   - all `window` properties can be accessed from `global`
+
+// store the initial eval now (before the page scripts run) just in case
 let wrapperInfo = {
-  [INJECT_CONTENT]: { unsafeWindow: global },
-  [INJECT_PAGE]: { unsafeWindow: window },
-  // store the initial eval now (before the page scripts run) just in case
-  eval: {
-    [INJECT_CONTENT]: global.eval, // eslint-disable-line no-eval
-    [INJECT_PAGE]: window.eval, // eslint-disable-line no-eval
+  global,
+  eval: global.eval, // eslint-disable-line no-eval
+  unsafeWindow: {
+    // run script in page context
+    // `unsafeWindow === pageWindow === pageGlobal`
+    [INJECT_INTERNAL_PAGE]: global,
+    // run script in content context
+    // `unsafeWindow === contentGlobal, contentGlobal.window === contentWindow`
+    [INJECT_INTERNAL_CONTENT]: global,
+    // run script in content context, but access pageWindow with the Firefox specific `wrappedJSObject`
+    // `unsafeWindow === wrappedJSObject === pageWindow`
+    [INJECT_INTERNAL_WRAP]: global.wrappedJSObject || global,
   },
 };
 
@@ -26,8 +40,8 @@ export function deletePropsCache() {
   bridge.props = null;
 }
 
-export function wrapGM(script, code, cache) {
-  const { unsafeWindow } = wrapperInfo[bridge.mode];
+export function wrapGM(script, code, cache, injectInto) {
+  const unsafeWindow = wrapperInfo.unsafeWindow[injectInto];
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const gm = {};
@@ -53,7 +67,7 @@ export function wrapGM(script, code, cache) {
     scriptWillUpdate: !!script.config.shouldUpdate,
     scriptHandler: 'Violentmonkey',
     version: bridge.version,
-    injectInto: bridge.mode,
+    injectInto,
     script: {
       description: script.meta.description || '',
       excludes: [...script.meta.exclude],
@@ -116,7 +130,7 @@ export function wrapGM(script, code, cache) {
 }
 
 function createWrapperMethods(info) {
-  const { unsafeWindow } = info;
+  const { global } = info;
   const methods = {};
   [
     // 'uneval',
@@ -166,9 +180,9 @@ function createWrapperMethods(info) {
     'setTimeout',
     'stop',
   ]::forEach((name) => {
-    const method = unsafeWindow[name];
+    const method = global[name];
     if (method) {
-      methods[name] = (...args) => method.apply(unsafeWindow, args);
+      methods[name] = (...args) => method.apply(global, args);
     }
   });
   info.methods = methods;
@@ -178,21 +192,24 @@ function createWrapperMethods(info) {
  * @desc Wrap helpers to prevent unexpected modifications.
  */
 function getWrapper() {
-  const info = wrapperInfo[bridge.mode];
-  const { unsafeWindow } = info;
-  if (!info.methods) createWrapperMethods(info);
+  const { global } = wrapperInfo;
+  if (!wrapperInfo.methods) createWrapperMethods(wrapperInfo);
   // http://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
   // http://developer.mozilla.org/docs/Web/API/Window
   const wrapper = {
-    // Block special objects
-    browser: undefined,
     // `eval` should be called directly so that it is run in current scope
-    eval: wrapperInfo.eval[bridge.mode],
-    ...info.methods,
+    eval: wrapperInfo.eval,
+    ...wrapperInfo.methods,
   };
-  if (!info.propsToWrap) {
-    info.propsToWrap = bridge.props::filter(p => !(p in wrapper));
+  if (!wrapperInfo.propsToWrap) {
+    wrapperInfo.propsToWrap = bridge.props::filter(p => !(p in wrapper));
     bridge.props = null;
+  }
+
+  function wrapWindowValue(value) {
+    // Return the window wrapper if the original value is the real `window`
+    // so that libraries depending on `window` will work as expected.
+    return value === window ? wrapper : value;
   }
 
   function defineProtectedProperty(name) {
@@ -200,8 +217,8 @@ function getWrapper() {
     let value;
     defineProperty(wrapper, name, {
       get() {
-        if (!modified) value = unsafeWindow[name];
-        return value === unsafeWindow ? wrapper : value;
+        if (!modified) value = wrapWindowValue(global[name]);
+        return value;
       },
       set(val) {
         modified = true;
@@ -215,11 +232,10 @@ function getWrapper() {
   function defineReactedProperty(name) {
     defineProperty(wrapper, name, {
       get() {
-        const value = unsafeWindow[name];
-        return value === unsafeWindow ? wrapper : value;
+        return wrapWindowValue(global[name]);
       },
       set(val) {
-        unsafeWindow[name] = val;
+        global[name] = val;
       },
     });
   }
@@ -228,7 +244,7 @@ function getWrapper() {
   // A major GC may hit here no matter how we define props
   // all at once, in batches of 10, 100, 500, or one by one.
   // TODO: try Proxy API if userscripts wouldn't notice the difference
-  info.propsToWrap::forEach((name) => {
+  wrapperInfo.propsToWrap::forEach((name) => {
     if (name::startsWith('on')) {
       defineReactedProperty(name);
     } else {

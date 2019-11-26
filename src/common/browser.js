@@ -1,6 +1,6 @@
 import '#/common/polyfills';
 
-/* global chrome */
+const { chrome } = global;
 
 function wrapAsync(func, thisObj) {
   return (...args) => {

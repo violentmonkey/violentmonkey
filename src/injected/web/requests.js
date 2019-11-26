@@ -1,18 +1,16 @@
 import {
   includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
   setAttribute, log, charCodeAt, fromCharCode, shift, slice, defineProperty,
+  createElementNS, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 
 const idMap = {};
 const queue = [];
 
-const NS_HTML = 'http://www.w3.org/1999/xhtml';
-
 const { DOMParser } = global;
 const { parseFromString } = DOMParser.prototype;
 const { toLowerCase } = String.prototype;
-const { createElementNS } = Document.prototype;
 const getHref = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
 
 bridge.addHandlers({
@@ -89,7 +87,7 @@ function callback(req, res) {
   if (res.type === 'loadend') delete idMap[req.id];
 }
 
-function start(req, id) {
+async function start(req, id) {
   const { details, scriptId } = req;
   const payload = {
     id,
@@ -113,14 +111,11 @@ function start(req, id) {
       log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
   }
-  encodeBody(details.data)
-  .then((body) => {
-    payload.data = body;
-    bridge.post({
-      cmd: 'HttpRequest',
-      data: payload,
-    });
-  });
+  // TM/GM-compatibility: the `binary` option works only with a string `data`
+  payload.data = details.binary
+    ? { value: `${details.data}`, cls: 'blob' }
+    : await encodeBody(details.data);
+  bridge.post({ cmd: 'HttpRequest', data: payload });
 }
 
 function getFullUrl(url) {

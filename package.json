@@ -1,6 +1,6 @@
 {
   "name": "violentmonkey",
-  "version": "2.12.1",
+  "version": "2.12.2",
   "scripts": {
     "dev": "gulp dev",
     "prebuild": "yarn lint",
@@ -18,8 +18,8 @@
   "description": "Violentmonkey",
   "devDependencies": {
     "@babel/plugin-proposal-function-bind": "^7.2.0",
-    "@babel/register": "^7.6.2",
-    "@gera2ld/plaid": "~1.5.1",
+    "@babel/register": "^7.7.0",
+    "@gera2ld/plaid": "~1.5.3",
     "@gera2ld/plaid-vue": "~1.5.2",
     "@gera2ld/plaid-webpack": "~1.5.2",
     "@types/chrome": "latest",
@@ -30,7 +30,7 @@
     "gulp-filter": "^6.0.0",
     "gulp-plumber": "^1.1.0",
     "gulp-uglify": "^3.0.2",
-    "husky": "^3.0.9",
+    "husky": "^3.1.0",
     "js-yaml": "^3.13.1",
     "jsdom": "^15.2.1",
     "plugin-error": "^1.0.0",
@@ -50,9 +50,9 @@
   "homepage": "https://github.com/violentmonkey/violentmonkey",
   "license": "MIT",
   "dependencies": {
-    "@babel/runtime": "^7.6.3",
+    "@babel/runtime": "^7.7.2",
     "codemirror": "^5.49.2",
-    "core-js": "^3.3.6",
+    "core-js": "^3.4.1",
     "tldjs": "^2.3.1",
     "vue": "^2.6.10",
     "vueleton": "^1.0.3"

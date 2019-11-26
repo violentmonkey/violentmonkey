@@ -1,4 +1,4 @@
-import { noop } from '#/common';
+import { noop, getActiveTab } from '#/common';
 import { isFirefox, isAndroid } from '#/common/ua';
 
 // Firefox Android does not support `openerTabId` field, it fails if this field is passed
@@ -18,33 +18,29 @@ browser.tabs.onRemoved.addListener((id) => {
   }
 });
 
-export function tabOpen(data, src) {
+export async function tabOpen({
+  url,
+  active,
+  insert = true,
+}, src) {
+  // src.tab may be absent when invoked from popup (e.g. edit/create buttons)
   const {
+    id: openerTabId,
+    index,
+    windowId,
+  } = src.tab || await getActiveTab() || {};
+  const tab = await browser.tabs.create({
     url,
     active,
-    insert = true,
-  } = data;
-  const srcTab = src.tab || {};
-  const options = {
-    url,
-    active,
-    windowId: srcTab.windowId,
-  };
-  if (insert) {
-    options.index = srcTab.index + 1;
-  }
-  if (openerTabIdSupported) {
-    // XXX openerTabId seems buggy on Chrome
+    windowId,
+    ...insert && { index: index + 1 },
+    // XXX openerTabId seems buggy on Chrome, https://crbug.com/967150
     // It seems to do nothing even set successfully with `browser.tabs.update`.
-    // Reference: http://crbug.com/967150
-    options.openerTabId = srcTab.id;
-  }
-  return browser.tabs.create(options)
-  .then((tab) => {
-    const { id } = tab;
-    openers[id] = srcTab.id;
-    return { id };
+    ...openerTabIdSupported && { openerTabId },
   });
+  const { id } = tab;
+  openers[id] = openerTabId;
+  return { id };
 }
 
 export function tabClose(data, src) {

@@ -1,8 +1,9 @@
 import {
-  i18n, request, buffer2string, getFullUrl, isRemote, getRnd4,
+  i18n, getFullUrl, isRemote, getRnd4,
 } from '#/common';
 import { objectGet, objectSet } from '#/common/object';
 import { CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE } from '#/common/consts';
+import storage from '#/common/storage';
 import pluginEvents from '../plugin/events';
 import {
   getNameURI, parseMeta, newScript, getDefaultCustom,
@@ -13,117 +14,11 @@ import patchDB from './patch-db';
 import { setOption } from './options';
 import { sendMessageOrIgnore } from './message';
 
-function cacheOrFetch(handle) {
-  const requests = {};
-  return function cachedHandle(url, ...args) {
-    let promise = requests[url];
-    if (!promise) {
-      promise = handle.call(this, url, ...args)
-      .catch((err) => {
-        console.error(`Error fetching: ${url}`, err);
-      })
-      .then(() => {
-        delete requests[url];
-      });
-      requests[url] = promise;
-    }
-    return promise;
-  };
-}
-function ensureListArgs(handle) {
-  return function handleList(data) {
-    let items = Array.isArray(data) ? data : [data];
-    items = items.filter(Boolean);
-    if (!items.length) return Promise.resolve();
-    return handle.call(this, items);
-  };
-}
-
 const store = {};
-const storage = {
-  base: {
-    prefix: '',
-    getKey(id) {
-      return `${this.prefix}${id}`;
-    },
-    getOne(id) {
-      const key = this.getKey(id);
-      return browser.storage.local.get(key).then(data => data[key]);
-    },
-    getMulti(ids, def) {
-      return browser.storage.local.get(ids.map(id => this.getKey(id)))
-      .then((data) => {
-        const result = {};
-        ids.forEach((id) => { result[id] = data[this.getKey(id)] || def; });
-        return result;
-      });
-    },
-    set(id, value) {
-      if (!id) return Promise.resolve();
-      return browser.storage.local.set({
-        [this.getKey(id)]: value,
-      });
-    },
-    remove(id) {
-      if (!id) return Promise.resolve();
-      return browser.storage.local.remove(this.getKey(id));
-    },
-    removeMulti(ids) {
-      return browser.storage.local.remove(ids.map(id => this.getKey(id)));
-    },
-  },
+
+storage.script.onDump = (item) => {
+  store.scriptMap[item.props.id] = item;
 };
-storage.script = Object.assign({}, storage.base, {
-  prefix: 'scr:',
-  dump: ensureListArgs(function dump(items) {
-    const updates = {};
-    items.forEach((item) => {
-      updates[this.getKey(item.props.id)] = item;
-      store.scriptMap[item.props.id] = item;
-    });
-    return browser.storage.local.set(updates)
-    .then(() => items);
-  }),
-});
-storage.code = Object.assign({}, storage.base, {
-  prefix: 'code:',
-});
-storage.value = Object.assign({}, storage.base, {
-  prefix: 'val:',
-  dump(dict) {
-    const updates = {};
-    Object.keys(dict)
-    .forEach((id) => {
-      const value = dict[id];
-      updates[this.getKey(id)] = value;
-    });
-    return browser.storage.local.set(updates);
-  },
-});
-storage.require = Object.assign({}, storage.base, {
-  prefix: 'req:',
-  fetch: cacheOrFetch(function fetch(uri) {
-    return request(uri).then(({ data }) => this.set(uri, data));
-  }),
-});
-storage.cache = Object.assign({}, storage.base, {
-  prefix: 'cac:',
-  fetch: cacheOrFetch(function fetch(uri, check) {
-    return request(uri, { responseType: 'arraybuffer' })
-    .then(({ data: buffer, xhr }) => {
-      const contentType = (xhr.getResponseHeader('content-type') || '').split(';')[0];
-      const data = {
-        contentType,
-        buffer,
-        blob: options => new Blob([buffer], Object.assign({ type: contentType }, options)),
-        string: () => buffer2string(buffer),
-        base64: () => window.btoa(data.string()),
-      };
-      return (check ? Promise.resolve(check(data)) : Promise.resolve())
-      .then(() => this.set(uri, `${contentType},${data.base64()}`));
-    });
-  }),
-});
 
 register(initialize());
 
@@ -296,6 +191,13 @@ export function dumpValueStore(where, valueStore) {
   });
 }
 
+const gmValues = [
+  'GM_getValue', 'GM.getValue',
+  'GM_setValue', 'GM.setValue',
+  'GM_listValues', 'GM.listValues',
+  'GM_deleteValue', 'GM.deleteValue',
+];
+
 /**
  * @desc Get scripts to be injected to page with specific URL.
  */
@@ -319,17 +221,8 @@ export function getScriptsByURL(url) {
   });
   const enabledScripts = scripts
   .filter(script => script.config.enabled);
-  const gmValues = {
-    GM_getValue: 1,
-    GM_setValue: 1,
-    GM_listValues: 1,
-    GM_deleteValue: 1,
-  };
   const scriptsWithValue = enabledScripts
-  .filter((script) => {
-    const grant = objectGet(script, 'meta.grant');
-    return grant && grant.some(gm => gmValues[gm]);
-  });
+  .filter(script => script.meta.grant?.some(gm => gmValues.includes(gm)));
   return Promise.all([
     storage.require.getMulti(Object.keys(reqKeys)),
     storage.cache.getMulti(Object.keys(cacheKeys)),

@@ -213,8 +213,8 @@ labelAutoReloadCurrentTab:
     Recarregar o separador atual após ativar/desativar um script a partir do
     menu
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Procurar atualizações de scripts automaticamente todos os dias
+  description: Option to allow automatically checking scripts for updates.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Mostrar no ícone: '
@@ -584,8 +584,3 @@ valueLabelValue:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Visitar website
-warnScriptLongLines:
-  description: Warning message shown when script has lines that are too long to be edited.
-  message: >-
-    Algumas linhas são demasiado compridas; a abrir em modo só de leitura. Por
-    favor, edite com um editor externo.

@@ -3,9 +3,11 @@ import { INJECT_CONTENT } from '#/common/consts';
 import { attachFunction } from '../utils';
 import {
   filter, map, join, defineProperty, Boolean, Promise, setTimeout, log, noop,
+  objectEntries, jsonDump,
 } from '../utils/helpers';
 import bridge from './bridge';
 import store from './store';
+import { propertyToString } from './gm-api';
 import { deletePropsCache, wrapGM } from './gm-wrapper';
 
 const { concat } = Array.prototype;
@@ -29,17 +31,20 @@ bridge.addHandlers({
       setTimeout(runIdle);
     };
     // Firefox doesn't display errors in content scripts https://bugzil.la/1410932
-    const tryCatchFFerrors = bridge.isFirefox && bridge.mode === INJECT_CONTENT;
+    const isFirefoxContentMode = bridge.isFirefox && bridge.mode === INJECT_CONTENT;
+    // Firefox provides ComponentUtils functions in content scripts
+    const componentUtils = isFirefoxContentMode ? '' : makeComponentUtilsPolyfill();
     const listMap = {
       'document-start': start,
       'document-idle': idle,
       'document-end': end,
     };
-    if (data.scripts) {
-      data.scripts.forEach((script) => {
+    if (data.items) {
+      data.items.forEach((item) => {
+        const { script } = item;
         const runAt = script.custom.runAt || script.meta.runAt;
         const list = listMap[runAt] || end;
-        list.push(script);
+        list.push(item);
         store.values[script.props.id] = data.values[script.props.id];
       });
       run(start);
@@ -49,32 +54,32 @@ bridge.addHandlers({
     }
     if (store.state) bridge.load();
 
-    function buildCode(script) {
+    function buildCode({ script, injectInto }) {
       const pathMap = script.custom.pathMap || {};
       const requireKeys = script.meta.require || [];
       const requires = requireKeys::map(key => data.require[pathMap[key] || key])::filter(Boolean);
       const code = data.code[script.props.id] || '';
-      const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache);
+      const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache, injectInto);
       const id = getUniqId('VMin');
       const fnId = getUniqId('VMfn');
       const codeSlices = [
         `function(${
           keys::join(',')
         }){${
-          tryCatchFFerrors
+          isFirefoxContentMode
             ? 'try{'
             : ''
         }${
           keys::map(name => `this["${name}"]=${name};`)::join('')
-        }with(this)((define,module,exports)=>{`,
+        }with(this){${componentUtils}((define,module,exports)=>{`,
         // 1. trying to avoid string concatenation of potentially huge code slices
         // 2. adding `;` on a new line in case some required script ends with a line comment
         ...[]::concat(...requires::map(req => [req, '\n;'])),
         '(()=>{',
         code,
         // adding a new line in case the code ends with a line comment
-        `\n})()})()${
-          tryCatchFFerrors
+        `\n})()})()}${
+          isFirefoxContentMode
             ? '}catch(e){console.error(e)}'
             : ''
         }}`,
@@ -109,6 +114,30 @@ function runCode(name, func, args, thisObj) {
     log('info', [bridge.mode], name);
   }
   func.apply(thisObj, args);
+}
+
+// polyfills for Firefox's Components.utils functions exposed to userscripts
+// TODO: create it at build-time
+function makeComponentUtilsPolyfill() {
+  const funcs = objectEntries({
+    cloneInto: obj => obj,
+    createObjectIn: (targetScope, options) => {
+      const obj = {};
+      if (options?.defineAs) targetScope[options.defineAs] = obj;
+      return obj;
+    },
+    exportFunction: (func, targetScope, options) => {
+      if (options?.defineAs) targetScope[options.defineAs] = func;
+      return func;
+    },
+  });
+  return `var ${
+    funcs::map(([name, f]) => `${name}=${f}`)::join(',')
+  };${
+    funcs::map(([name]) => `${name}.toString=`)::join('')
+  }()=>${
+    jsonDump(propertyToString())
+  };`;
 }
 
 function exposeVM() {

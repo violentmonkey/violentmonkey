@@ -9,10 +9,23 @@ module.exports = {
       legacyDecorators: true,
     },
   },
-  rules: {
-    'prefer-object-spread': 'off',
-  },
-  globals: {
-    browser: true,
-  },
+  overrides: [{
+    // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
+    // to prevent exposing them to userscripts with `@inject-into content`
+    files: ['*'],
+    excludedFiles: [
+      'src/injected/**/*.js',
+      'src/injected/*.js',
+      'src/common/*.js',
+    ],
+    globals: {
+      browser: true,
+    },
+  }, {
+    // no restrictions in browser.js to check the global `browser`
+    files: ['browser.js'],
+    globals: {
+      browser: true,
+    },
+  }],
 };

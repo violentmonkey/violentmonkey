@@ -36,15 +36,12 @@ exports.pages = {
     entry: './src/popup',
     html: htmlFactory(),
   },
-  injected: {
-    entry: './src/injected',
-  },
 };
 
-const splitVendor = name => ({
-  [name]: {
-    test: new RegExp(`node_modules[/\\\\]${name}`),
-    name: `public/lib/${name}`,
+const splitVendor = prefix => ({
+  [prefix]: {
+    test: new RegExp(`node_modules[/\\\\]${prefix}.*?\\.js`),
+    name: `public/lib/${prefix}`,
     chunks: 'all',
     priority: 100,
   },
@@ -60,12 +57,7 @@ exports.optimization = {
         name: 'common',
         minChunks: 2,
         enforce: true,
-        chunks(chunk) {
-          return ![
-            'browser',
-            'injected',
-          ].includes(chunk.name);
-        },
+        chunks: chunk => chunk.name !== 'browser',
       },
       ...splitVendor('codemirror'),
       ...splitVendor('tldjs'),

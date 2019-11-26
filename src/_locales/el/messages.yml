@@ -211,8 +211,8 @@ labelAutoReloadCurrentTab:
     Επαναφόρτωση τρέχουσας καρτέλας μετά την ενεργοποίηση/απενεργοποίηση ενός
     σεναρίου από το μενού
 labelAutoUpdate:
-  description: Option to allow automatically checking scripts for updates every 24 hours.
-  message: Καθημερινός αυτόματος έλεγχος ενημερώσεων για τα σενάρια
+  description: Option to allow automatically checking scripts for updates.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Εμφάνιση στο εικονίδιο: '
@@ -581,7 +581,4 @@ valueLabelValue:
   message: ''
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
-warnScriptLongLines:
-  description: Warning message shown when script has lines that are too long to be edited.
   message: ''
