@@ -4,7 +4,7 @@ anchorAuthor:
 anchorTranslator:
   description: Translator shown on about tab.
   message: >-
-    wvxwxvw, <a https://github.com/wvxwxvw>wvxwxvw</a>, <a
+    <a href=https://github.com/wvxwxvw>wvxwxvw</a>, <a
     href=https://github.com/alexesprit>alexesprit</a>, <a
     href=https://github.com/bershan2>bershan2</a>, <a
     href=https://github.com/bogachenko>bogachenko</a>
@@ -108,7 +108,7 @@ buttonVacuumed:
   message: Кэш очищен
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Очистка данных кэша...
+  message: Очистка и сжатие кэша...
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -116,7 +116,7 @@ confirmNotSaved:
     Нажмите OK, чтобы выйти или Отмена, чтобы вернуться.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: URL из этого списка не будет обрабатываться скриптами.
+  message: URL из этого списка не будут обрабатываться скриптами.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -126,7 +126,7 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Ваши параметры для CodeMirror и аддонов в объекте JSON, например
-    <code>{"indentUnit":2, "smartIndent":true}</code> однако заметьте,
+    <code>{"indentUnit":2, "smartIndent":true}</code> . Однако заметьте,
      некоторые из них могут не работать в Violentmonkey. Смотрите <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">полный список</a>.
@@ -158,7 +158,7 @@ extDescription:
   description: Description for this extension.
   message: >-
     Violentmonkey - менеджер пользовательских скриптов, позволяет контролировать
-    внешний вид и устранять проблемы сайтов.
+    внешний вид и устранять проблемы на сайтах.
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -219,7 +219,7 @@ labelAuthor:
   message: 'Автор: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Обновить текущую вкладку после включения или отключения скрипта из меню.
+  message: Обновить текущую вкладку после включения или отключения скрипта из меню
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Проверять наличие обновлений скриптов каждые $1 дней, 0 для отключения'
@@ -274,7 +274,7 @@ labelExcludeMatch:
   message: '@exclude-match правила исключение соответствия'
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Экспорт скрипта
+  message: Экспорт данных скриптов
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
@@ -305,7 +305,7 @@ labelIndentUnit:
   touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: Режим иньекции по умолчанию
+  message: 'Режим инъекции по умолчанию: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта
@@ -317,14 +317,14 @@ labelLastUpdatedAt:
   message: Дата последнего обновления $1
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Номер строки:'
+  message: 'N строки: '
 labelLineWrapping:
   description: Label for editor option of line wrapping.
   message: Переносить длинные строки
   touched: false
 labelMatch:
   description: Label of @match rules.
-  message: '@match правило соответствия'
+  message: '@match правила соответствия'
 labelName:
   description: Label of script name.
   message: 'Имя:'
@@ -333,14 +333,14 @@ labelNoName:
   message: Нет имени
 labelNoScripts:
   description: Message shown when no script is installed.
-  message: 'К сожалению, у вас еще не установлено ни одного скрипта.'
+  message: 'К сожалению, скрипты у вас еще не установлены.'
   touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Скрипты не найдены.
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Уведомлять об обновлениях скрипта
+  message: Уведомлять об обновлениях скриптов
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Сортировка во всплывающем окне по $1
@@ -359,7 +359,7 @@ labelReplace:
   message: 'Заменить на: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Выполнить:'
+  message: 'Выполнить: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (по умолчанию)
@@ -397,7 +397,7 @@ labelSyncAuthorizing:
   message: Авторизация
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: Ничем
+  message: ничем
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Пароль: '
@@ -410,7 +410,7 @@ labelSyncRevoke:
   message: Отключить
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Синхронизировать статус скриптов.
+  message: Синхронизировать статус скриптов
 labelSyncServerUrl:
   description: Label for input to hold server URL.
   message: 'URL сервера: '
@@ -428,7 +428,7 @@ labelUpdateURL:
   message: 'URL обновления:'
 lastSync:
   description: Label for last sync timestamp.
-  message: Последняя синхронизация в $1.
+  message: Последняя синхронизация в $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Подробнее о шаблонах черного списка.
@@ -447,7 +447,7 @@ menuFindScripts:
   message: Найти скрипты для этого сайта
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: Только скрипты в суб-фреймах
+  message: Только суб-фреймы скриптов
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Совпадающие скрипты
@@ -481,7 +481,7 @@ msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: $1 скрипта импортировано.
+  message: $1 скриптов импортировано.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Скрипт установлен.
@@ -557,7 +557,7 @@ noValues:
   message: Значения не сохраняются
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: Первые включенные
+  message: Сначала включенные
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Скрыть отключенные
