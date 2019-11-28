@@ -264,13 +264,12 @@ export default {
     display: inline-block;
     padding: 8px 16px;
     cursor: pointer;
-    color: #bbb;
     &.active {
       background: white;
-      box-shadow: 0 -1px 1px #bbb;
-      color: #333;
+      box-shadow: 0 -1px 1px #888;
     }
-    &:hover {
+    &:not(.active):hover {
+      background: #fff8;
       box-shadow: 0 -1px 1px #bbb;
     }
   }
