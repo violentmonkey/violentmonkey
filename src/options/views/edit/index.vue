@@ -17,6 +17,7 @@
         <div
           class="edit-nav-item"
           :class="{active: nav === 'values'}"
+          v-if="scriptId"
           v-text="i18n('editNavValues')"
           @click="nav = 'values'"
         />
@@ -108,6 +109,9 @@ export default {
       const scriptName = custom && custom.name || meta && meta.name;
       store.title = scriptName;
       return scriptName;
+    },
+    scriptId() {
+      return this.script?.props?.id;
     },
   },
   watch: {
