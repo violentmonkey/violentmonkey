@@ -126,6 +126,12 @@ descEditorOptions:
     them may not work in Violentmonkey. See <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">full list</a>.
+editHelpDocumention:
+  description: Label in the editor help tab for the documentation link.
+  message: 'Documentation on userscript metadata block and <code>GM</code> API:'
+editHelpKeyboard:
+  description: Label in the editor help tab for the keyboard shortcuts.
+  message: 'Keyboard shortcuts:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: Use another editor?

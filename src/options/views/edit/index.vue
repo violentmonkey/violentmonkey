@@ -22,8 +22,8 @@
         />
         <div
           class="edit-nav-item"
-          :class="{active: nav === 'keyboard'}"
-          @click="nav = 'keyboard'"
+          :class="{active: nav === 'help'}"
+          @click="nav = 'help'"
         >?</div>
       </nav>
       <div class="edit-name text-center ellipsis flex-1 mr-1" v-text="scriptName"/>
@@ -51,8 +51,8 @@
       <vm-values
         :show="nav === 'values'" class="abs-full edit-body" :script="script"
       />
-      <vm-keyboard
-        v-if="nav === 'keyboard'" class="abs-full edit-body"
+      <vm-help
+        v-if="nav === 'help'" class="abs-full edit-body"
         :target="this.$refs.code"
       />
     </div>
@@ -67,7 +67,7 @@ import { route } from '#/common/router';
 import { store, showMessage } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
-import VmKeyboard from './keyboard';
+import VmHelp from './help';
 
 function fromList(list) {
   return (list || []).join('\n');
@@ -84,7 +84,7 @@ export default {
     VmCode,
     VmSettings,
     VmValues,
-    VmKeyboard,
+    VmHelp,
   },
   data() {
     return {
@@ -97,7 +97,7 @@ export default {
         save: this.save,
         close: () => this.close({ fromCM: true }),
         showHelp: () => {
-          this.nav = 'keyboard';
+          this.nav = 'help';
         },
       },
     };
