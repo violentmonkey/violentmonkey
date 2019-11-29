@@ -128,7 +128,7 @@ descEditorOptions:
     rel="noopener noreferrer">celý zoznam</a>.
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Chcete použiť iný editor?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Vlastné metadáta
