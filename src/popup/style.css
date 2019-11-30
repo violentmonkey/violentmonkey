@@ -24,7 +24,7 @@ body {
   max-width: 100%;
   /* Latest Chrome renders an extra blank for a nonexistent scrollbar */
   overflow: hidden;
-  background: #f8f8f8;
+  background: var(--fill-0-5);
   @media (min-width: 360px) {
     width: 100%;
   }
@@ -41,11 +41,11 @@ footer {
   line-height: 40px;
   text-align: center;
   font-size: $fontSize;
-  color: #999;
+  color: var(--fill-6);
   > span {
     cursor: pointer;
     &:hover {
-      color: #666;
+      color: var(--fill-9);
     }
   }
 }
@@ -65,19 +65,19 @@ footer {
   cursor: pointer;
   &:hover {
     background: cornflowerblue;
-    color: white;
+    color: var(--bg);
   }
   .disabled > & {
-    color: gray;
+    color: var(--fill-8);
     &:hover {
-      color: silver;
+      color: var(--fill-4);
     }
   }
 }
 
 .ext-name {
   &.disabled {
-    color: gray;
+    color: var(--fill-8);
   }
 }
 
@@ -98,7 +98,7 @@ footer {
 .menu-buttons {
   align-items: center;
   padding: $padding $padding $padding 0;
-  background: white;
+  background: var(--bg);
   > .menu-area {
     padding: $padding;
   }
@@ -110,8 +110,8 @@ footer {
 }
 
 .menu {
-  background: white;
-  border-top: 1px solid silver;
+  background: var(--bg);
+  border-top: 1px solid var(--fill-4);
   &-item {
     position: relative;
     display: flex;
@@ -156,7 +156,7 @@ footer {
     }
   }
   &.expand {
-    background: #fbfbfb;
+    background: var(--fill-0-5);
     > .submenu {
       display: block;
     }
@@ -171,8 +171,8 @@ footer {
   min-height: 4rem;
   max-height: 30rem;
   overflow-y: auto;
-  background: white;
-  border-top: 1px dashed #ddd;
+  background: var(--bg);
+  border-top: 1px dashed var(--fill-2);
   > * {
     position: relative;
     &:not(:hover) > .submenu-buttons {
@@ -190,10 +190,10 @@ footer {
   }
   &-button {
     padding: .2rem;
-    background: white;
+    background: var(--bg);
     cursor: pointer;
     &:hover {
-      color: white;
+      color: var(--bg);
       background: cornflowerblue;
     }
     .icon {
@@ -202,7 +202,7 @@ footer {
   }
   &-commands {
     font-size: .8rem;
-    color: #333;
+    color: var(--fill-12);
     > .menu-item {
       padding-left: $leftPaneWidth;
       > .icon {
@@ -221,8 +221,8 @@ footer {
   word-wrap: break-word;
   font-size: $fontSize;
   line-height: 1;
-  background: #fdfdfd;
-  border: 1px solid #ddd;
+  background: var(--fill-0-5);
+  border: 1px solid var(--fill-2);
   > div {
     max-height: 2em;
     overflow: hidden;

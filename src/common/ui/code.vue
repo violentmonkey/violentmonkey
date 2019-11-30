@@ -458,4 +458,126 @@ input[type=text].is-error {
   border: 1px solid #e85600;
   background: #e8560010;
 }
+
+@media (prefers-color-scheme: dark) {
+  // mostly copied from Monokai theme
+  .cm-s-eclipse {
+    &.CodeMirror {
+      color: var(--fg);
+      background: var(--bg);
+    }
+    .CodeMirror {
+      &-scrollbar-filler,
+      &-gutter-filler {
+        background: none;
+      }
+      &-gutters {
+        border-color: var(--fill-2);
+        background-color: var(--fill-0-5);
+      }
+      &-selected {
+        background: #49483e;
+      }
+      &-line::selection,
+      &-line::-moz-selection,
+      &-line > span::selection,
+      &-line > span::-moz-selection,
+      &&-line > span > span::selection,
+      &-line > span > span::-moz-selection {
+        background: rgba(73, 72, 62, .99);
+      }
+      &-guttermarker {
+        color: white;
+        &-subtle {
+          color: #d0d0d0;
+        }
+      }
+      &-linenumber {
+        color: #666;
+      }
+      &-cursor {
+        border-color: #f8f8f0;
+      }
+      &-activeline-background {
+        background: #1a1a1a;
+      }
+      &-matchingbracket {
+        outline: none;
+        background: #444;
+        color: yellow !important;
+      }
+    }
+    span {
+      &.cm-comment {
+        color: #75715e;
+      }
+      &.cm-atom {
+        color: #ae81ff;
+      }
+      &.cm-number {
+        color: #ae81ff;
+      }
+      &.cm-comment.cm-attribute {
+        color: #97b757;
+      }
+      &.cm-comment.cm-def {
+        color: #bc9262;
+      }
+      &.cm-comment.cm-tag {
+        color: #bc6283;
+      }
+      &.cm-comment.cm-type {
+        color: #5998a6;
+      }
+      &.cm-property,
+      &.cm-attribute {
+        color: #a6e22e;
+      }
+      &.cm-keyword {
+        color: #f92672;
+      }
+      &.cm-builtin {
+        color: #66d9ef;
+      }
+      &.cm-string {
+        color: #e6db74;
+      }
+      &.cm-string-2 {
+        color: #bcb149;
+      }
+      &.cm-variable {
+        color: #f8f8f2;
+      }
+      &.cm-variable-2 {
+        color: #9effff;
+      }
+      &.cm-variable-3,
+      &.cm-type {
+        color: #66d9ef;
+      }
+      &.cm-def {
+        color: #fd971f;
+      }
+      &.cm-bracket {
+        color: #f8f8f2;
+      }
+      &.cm-tag {
+        color: #f92672;
+      }
+      &.cm-header {
+        color: #ae81ff;
+      }
+      &.cm-link {
+        color: #ae81ff;
+      }
+      &.cm-error {
+        color: #f8f8f0;
+        background: #f92672;
+      }
+      &.cm-operator {
+        color: #999
+      }
+    }
+  }
+}
 </style>

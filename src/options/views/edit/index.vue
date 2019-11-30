@@ -262,19 +262,19 @@ export default {
   &-body {
     padding: .5rem 1rem;
     overflow: auto;
-    background: white;
+    background: var(--bg);
   }
   &-nav-item {
     display: inline-block;
     padding: 8px 16px;
     cursor: pointer;
     &.active {
-      background: white;
-      box-shadow: 0 -1px 1px #888;
+      background: var(--bg);
+      box-shadow: 0 -1px 1px var(--fill-7);
     }
     &:not(.active):hover {
-      background: #fff8;
-      box-shadow: 0 -1px 1px #bbb;
+      background: var(--fill-0-5);
+      box-shadow: 0 -1px 1px var(--fill-4);
     }
   }
 }
