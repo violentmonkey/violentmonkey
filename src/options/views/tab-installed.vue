@@ -428,7 +428,7 @@ export default {
     align-items: center;
     padding: 0 1rem;
     line-height: 1;
-    border-bottom: 1px solid darkgray;
+    border-bottom: 1px solid var(--fill-5);
   }
   .vl-dropdown-menu {
     white-space: nowrap;
@@ -439,7 +439,7 @@ export default {
 }
 .backdrop {
   text-align: center;
-  color: gray;
+  color: var(--fill-8);
 }
 .scripts {
   overflow-y: auto;
@@ -464,11 +464,11 @@ export default {
   width: 100%;
   padding: .5rem;
   text-decoration: none;
-  color: #666;
+  color: var(--fill-9);
   cursor: pointer;
   &:hover {
     color: inherit;
-    background: #fbfbfb;
+    background: var(--fill-0-5);
   }
 }
 .filter-search {
@@ -501,7 +501,7 @@ export default {
 
 .trash-hint {
   line-height: 1.5;
-  color: #999;
+  color: var(--fill-6);
 }
 
 .trash-animate {

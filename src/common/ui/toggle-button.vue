@@ -22,12 +22,12 @@ export default {
   font-size: 12px;
   line-height: 24px;
   text-align: center;
-  color: #333;
-  background: #ddd;
+  color: var(--fill-12);
+  background: var(--fill-2);
   cursor: pointer;
   &.active {
-    color: white;
-    background: #666;
+    color: var(--bg);
+    background: var(--fill-9);
   }
   &:hover {
     filter: brightness(.8);

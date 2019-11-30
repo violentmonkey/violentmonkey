@@ -272,7 +272,7 @@ $removedItemHeight: calc(
   position: relative;
   margin: 8px;
   padding: $itemPadT 10px $itemPadB;
-  border: 1px solid #ccc;
+  border: 1px solid var(--fill-3);
   border-radius: .3rem;
   transition: transform .25s;
   // added in Chrome 41, FF64
@@ -286,23 +286,23 @@ $removedItemHeight: calc(
   @media (prefers-reduced-motion: reduce) {
     transition: none;
   }
-  background: white;
+  background: var(--bg);
   height: $itemHeight;
   &:hover {
-    border-color: darkgray;
+    border-color: var(--fill-5);
   }
   .secondary {
-    color: gray;
+    color: var(--fill-8);
     font-size: small;
   }
   &.disabled,
   &.removed {
-    background: #f0f0f0;
-    color: #999;
+    background: var(--fill-1);
+    color: var(--fill-6);
   }
   &.disabled {
     .secondary {
-      color: darkgray;
+      color: var(--fill-5);
     }
   }
   &.removed {
@@ -313,11 +313,14 @@ $removedItemHeight: calc(
     }
   }
   &.focused {
-    box-shadow: 1px 2px 9px gray;
+    box-shadow: 1px 2px 9px var(--fill-8);
   }
   &-buttons {
     line-height: 1;
-    color: #3e4651;
+    color: hsl(215, 13%, 28%);
+    @media (prefers-color-scheme: dark) {
+      color: hsl(215, 10%, 55%);
+    }
     > .flex {
       align-items: center;
     }
@@ -325,7 +328,7 @@ $removedItemHeight: calc(
       display: none;
     }
     .disabled {
-      color: gainsboro;
+      color: var(--fill-2);
     }
     .icon {
       display: block;
@@ -343,6 +346,9 @@ $removedItemHeight: calc(
     .disabled &,
     .removed & {
       filter: grayscale(.8);
+      @media (prefers-color-scheme: dark) {
+        opacity: .5;
+      }
     }
     .removed & {
       width: $iconSizeSmaller;
@@ -356,7 +362,7 @@ $removedItemHeight: calc(
     font-weight: 500;
     font-size: $nameFontSize;
     .disabled & {
-      color: gray;
+      color: var(--fill-8);
     }
   }
   &-author {

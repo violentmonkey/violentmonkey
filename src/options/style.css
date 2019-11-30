@@ -11,15 +11,21 @@ aside {
   height: 100%;
   padding: 4rem 1rem 0;
   text-align: right;
-  border-right: 1px solid darkgray;
-  background: #fafafa;
+  border-right: 1px solid var(--fill-5);
+  @media (prefers-color-scheme: dark) {
+    border-color: var(--fill-3);
+  }
+  background: var(--fill-0-5);
   img {
     width: 5rem;
     height: 5rem;
   }
 }
 .aside-menu {
-  border-top: 1px solid #bbb;
+  border-top: 1px solid var(--fill-4);
+  @media (prefers-color-scheme: dark) {
+    border-color: var(--fill-3);
+  }
   > a {
     display: block;
     padding-top: .6rem;
@@ -27,10 +33,10 @@ aside {
     font-size: 1rem;
     font-weight: 500;
     text-decoration: none;
-    color: gray;
+    color: var(--fill-8);
     &.active,
     &:hover {
-      color: black;
+      color: var(--fg);
     }
   }
 }
@@ -41,8 +47,8 @@ aside {
   top: 1rem;
   left: 0;
   line-height: 2rem;
-  background: #fafafa;
-  color: darkgray;
+  background: var(--fill-0-5);
+  color: var(--fill-5);
   border: 1px solid currentColor;
   border-left: 0;
   border-radius: 0 1rem 1rem 0;
@@ -74,9 +80,6 @@ aside {
 .text-red {
   color: red;
 }
-.text-green {
-  color: green;
-}
 .text-right {
   text-align: right;
 }
@@ -85,14 +88,17 @@ section {
   margin-top: 2rem;
   padding: 1.2rem .8rem .8rem;
   border: none;
-  border-top: 1px solid silver;
+  border-top: 1px solid var(--fill-4);
+  @media (prefers-color-scheme: dark) {
+    border-color: var(--fill-3);
+  }
   > h3 {
     position: absolute;
     padding: 0 .2rem;
     top: -.6em;
     left: .8rem;
     line-height: 1;
-    background: white;
+    background: var(--bg);
   }
   > h4 {
     margin-bottom: .3rem;
@@ -105,7 +111,7 @@ section {
 .tab {
   position: relative;
   padding: 1.2rem;
-  background: white;
+  background: var(--bg);
 }
 
 input[type=checkbox] {

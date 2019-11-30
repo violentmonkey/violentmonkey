@@ -20,7 +20,7 @@
     </div>
     <div class="mb-1">
       <label v-text="i18n('labelCurrentLang')"></label>
-      <span class="text-green" v-text="language"></span> |
+      <span class="current" v-text="language"></span> |
       <a href="https://violentmonkey.github.io/localization/" target="_blank" rel="noopener noreferrer" v-text="i18n('labelHelpTranslate')"></a>
     </div>
   </div>
@@ -38,3 +38,12 @@ export default {
   },
 };
 </script>
+
+<style>
+  .current {
+    color: green;
+    @media (prefers-color-scheme: dark) {
+      color: greenyellow;
+    }
+  }
+</style>

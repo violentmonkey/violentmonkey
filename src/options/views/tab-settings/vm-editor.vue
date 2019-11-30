@@ -81,6 +81,6 @@ export default {
 <style>
   .dim-hint {
     font-size: .85rem;
-    color: gray;
+    color: var(--fill-8);
   }
 </style>

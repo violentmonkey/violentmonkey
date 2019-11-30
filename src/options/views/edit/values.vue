@@ -176,7 +176,7 @@ export default {
 <style>
 .edit-values {
   &-row {
-    border: 1px solid #ddd;
+    border: 1px solid var(--fill-2);
     &:not(:first-child) {
       border-top: 0;
     }
@@ -189,7 +189,7 @@ export default {
         max-width: 240px;
       }
       &:not(:first-child) {
-        border-left: 1px solid #ddd;
+        border-left: 1px solid var(--fill-2);
       }
     }
     :not(:hover) .edit-values-btn {
@@ -197,7 +197,7 @@ export default {
     }
   }
   &-empty {
-    color: #888;
+    color: var(--fill-7);
   }
   &-panel {
     position: absolute;
@@ -206,8 +206,8 @@ export default {
     width: 50%;
     height: 100%;
     padding: 8px;
-    box-shadow: -5px 0 5px #ddd;
-    background: white;
+    box-shadow: -5px 0 5px var(--fill-2);
+    background: var(--bg);
     z-index: 10;
     @media (max-width: 767px) {
       width: 100%;
@@ -226,8 +226,8 @@ export default {
     top: 0;
     right: 0;
     padding: 4px;
-    background: white;
-    box-shadow: -5px 0 5px white;
+    background: var(--bg);
+    box-shadow: -5px 0 5px var(--bg);
   }
 }
 </style>
