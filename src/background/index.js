@@ -170,7 +170,7 @@ const commands = {
   },
   GetRequestId: getRequestId,
   HttpRequest(details, src) {
-    httpRequest(details, (res) => {
+    httpRequest(details, src, (res) => {
       browser.tabs.sendMessage(src.tab.id, {
         cmd: 'HttpRequested',
         data: res,

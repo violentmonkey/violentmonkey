@@ -1,3 +1,4 @@
+import { objectPick } from '#/common/object';
 import {
   includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
   setAttribute, log, charCodeAt, fromCharCode, shift, slice, defineProperty,
@@ -92,14 +93,17 @@ async function start(req, id) {
   const payload = {
     id,
     scriptId,
-    anonymous: details.anonymous,
-    method: details.method,
-    url: details.url,
-    user: details.user,
-    password: details.password,
-    headers: details.headers,
-    timeout: details.timeout,
-    overrideMimeType: details.overrideMimeType,
+    ...objectPick(details, [
+      'anonymous',
+      'headers',
+      'method',
+      'overrideMimeType',
+      'password',
+      'timeout',
+      'url',
+      'user',
+      'withCredentials',
+    ]),
   };
   req.id = id;
   idMap[id] = req;
