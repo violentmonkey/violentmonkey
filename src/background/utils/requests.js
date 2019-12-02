@@ -1,6 +1,7 @@
 import {
   getUniqId, request, i18n, buffer2string, isEmpty,
 } from '#/common';
+import { isFirefox } from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
 import { getScriptByIdSync } from './db';
@@ -160,18 +161,28 @@ function isSpecialHeader(lowerHeader) {
     || lowerHeader.startsWith('sec-');
 }
 
-export function httpRequest(details, cb) {
-  const req = requests[details.id];
+/**
+ * @param {Object} details
+ * @param {chrome.runtime.MessageSender} src
+ * @param {function} cb
+ */
+export async function httpRequest(details, src, cb) {
+  const {
+    anonymous, data, headers, id, method,
+    overrideMimeType, password, responseType,
+    timeout, url, user, withCredentials,
+  } = details;
+  const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;
-  req.anonymous = details.anonymous;
+  req.anonymous = anonymous;
   const { xhr } = req;
   try {
     const vmHeaders = [];
-    xhr.open(details.method, details.url, true, details.user || '', details.password || '');
-    xhr.setRequestHeader(VM_VERIFY, details.id);
-    if (details.headers) {
-      Object.entries(details.headers).forEach(([name, value]) => {
+    xhr.open(method, url, true, user || '', password || '');
+    xhr.setRequestHeader(VM_VERIFY, id);
+    if (headers) {
+      Object.entries(headers).forEach(([name, value]) => {
         const lowerName = name.toLowerCase();
         if (isSpecialHeader(lowerName)) {
           vmHeaders.push({ name, value });
@@ -181,9 +192,23 @@ export function httpRequest(details, cb) {
         }
       });
     }
-    if (details.timeout) xhr.timeout = details.timeout;
-    if (details.responseType) xhr.responseType = 'arraybuffer';
-    if (details.overrideMimeType) xhr.overrideMimeType(details.overrideMimeType);
+    if (timeout) xhr.timeout = timeout;
+    if (responseType) xhr.responseType = 'arraybuffer';
+    if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
+    // Firefox doesn't send cookies,
+    // https://github.com/violentmonkey/violentmonkey/issues/606
+    if (isFirefox
+    && !anonymous
+    && !headers?.some(h => h.name.toLowerCase() === 'cookie')
+    && (withCredentials || new URL(url).origin === new URL(src.url).origin)) {
+      const cookies = await browser.cookies.getAll({ url, storeId: src.tab.cookieStoreId });
+      if (cookies.length) {
+        vmHeaders.push({
+          name: 'cookie',
+          value: cookies.map(c => `${c.name}=${c.value};`).join(' '),
+        });
+      }
+    }
     const callback = xhrCallbackWrapper(req);
     [
       'abort',
@@ -195,10 +220,8 @@ export function httpRequest(details, cb) {
       'timeout',
     ]
     .forEach((evt) => { xhr[`on${evt}`] = callback; });
-    // req.finalUrl = details.url;
-    const { data } = details;
     const body = data ? decodeBody(data) : null;
-    HeaderInjector.add(details.id, vmHeaders);
+    HeaderInjector.add(id, vmHeaders);
     xhr.send(body);
   } catch (e) {
     const { scriptId } = req;
