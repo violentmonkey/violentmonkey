@@ -179,6 +179,11 @@ export async function httpRequest(details, src, cb) {
   const { xhr } = req;
   try {
     const vmHeaders = [];
+    // Firefox doesn't send cookies,
+    // https://github.com/violentmonkey/violentmonkey/issues/606
+    let shouldSendCookies = isFirefox && !anonymous && (
+      withCredentials || new URL(url).origin === new URL(src.url).origin
+    );
     xhr.open(method, url, true, user || '', password || '');
     xhr.setRequestHeader(VM_VERIFY, id);
     if (headers) {
@@ -190,17 +195,15 @@ export async function httpRequest(details, src, cb) {
           // `VM-` headers are reserved
           xhr.setRequestHeader(name, value);
         }
+        if (lowerName === 'cookie') {
+          shouldSendCookies = false;
+        }
       });
     }
     if (timeout) xhr.timeout = timeout;
     if (responseType) xhr.responseType = 'arraybuffer';
     if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
-    // Firefox doesn't send cookies,
-    // https://github.com/violentmonkey/violentmonkey/issues/606
-    if (isFirefox
-    && !anonymous
-    && !headers?.some(h => h.name.toLowerCase() === 'cookie')
-    && (withCredentials || new URL(url).origin === new URL(src.url).origin)) {
+    if (shouldSendCookies) {
       const cookies = await browser.cookies.getAll({ url, storeId: src.tab.cookieStoreId });
       if (cookies.length) {
         vmHeaders.push({
