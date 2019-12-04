@@ -37,9 +37,15 @@
         </div>
       </div>
       <label class="mb-1" v-text="i18n('valueLabelKey')"></label>
-      <input type="text" v-model="current.key" :readOnly="!current.isNew">
+      <input type="text" v-model="current.key" :readOnly="!current.isNew"
+             ref="key"
+             spellcheck="false"
+             @keydown.esc.exact.stop="onCancel">
       <label class="mt-1 mb-1" v-text="i18n('valueLabelValue')"></label>
-      <textarea class="flex-auto" v-model="current.value"></textarea>
+      <textarea class="flex-auto" v-model="current.value"
+                ref="value"
+                spellcheck="false"
+                @keydown.esc.exact.stop="onCancel"/>
     </div>
   </div>
 </template>
@@ -86,6 +92,15 @@ export default {
   watch: {
     show(show) {
       if (show && !this.keys) this.refresh();
+    },
+    current(val) {
+      if (val) {
+        this.$nextTick(() => {
+          const el = this.$refs[val.isNew ? 'key' : 'value'];
+          el.setSelectionRange(0, 0);
+          el.focus();
+        });
+      }
     },
   },
   methods: {
