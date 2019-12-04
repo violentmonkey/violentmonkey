@@ -9,9 +9,11 @@
       <form class="inline-block mr-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
         <tooltip content="Ctrl-F">
+          <!-- id is required for the built-in autocomplete using entered values -->
           <input
             :class="{ 'is-error': !search.state.hasResult }"
-            type="text"
+            type="search"
+            id="editor-search"
             ref="search"
             v-model="search.state.query"
           />
@@ -25,7 +27,8 @@
       </form>
       <form class="inline-block mr-1" @submit.prevent="replace()" v-if="!readonly">
         <span v-text="i18n('labelReplace')"></span>
-        <input type="text" v-model="search.state.replace">
+        <!-- id is required for the built-in autocomplete using entered values -->
+        <input type="search" id="editor-replace" v-model="search.state.replace">
         <tooltip content="Shift-Ctrl-F">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>

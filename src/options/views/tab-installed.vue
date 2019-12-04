@@ -62,11 +62,12 @@
             </label>
           </div>
         </dropdown>
-        <div class="filter-search hidden-sm">
+        <!-- form and id are required for the built-in autocomplete using entered values -->
+        <form class="filter-search hidden-sm" @submit.prevent>
           <input type="search" :placeholder="i18n('labelSearchScript')" :title="searchError"
-                 v-model="search">
+                 v-model="search" id="installed-search">
           <icon name="search"></icon>
-        </div>
+        </form>
       </header>
       <div
         v-if="showRecycle"
