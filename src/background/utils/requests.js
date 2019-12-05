@@ -204,7 +204,11 @@ export async function httpRequest(details, src, cb) {
     if (responseType) xhr.responseType = 'arraybuffer';
     if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
     if (shouldSendCookies) {
-      const cookies = await browser.cookies.getAll({ url, storeId: src.tab.cookieStoreId });
+      const cookies = await browser.cookies.getAll({
+        url,
+        storeId: src.tab.cookieStoreId,
+        ...isFirefox >= 59 && { firstPartyDomain: null },
+      });
       if (cookies.length) {
         vmHeaders.push({
           name: 'cookie',
