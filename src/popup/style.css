@@ -231,4 +231,7 @@ footer {
 
 .failure-reason {
   padding: .75rem $itemPaddingX .75rem $leftPaneWidth;
+  code {
+    max-width: 100%;
+  }
 }
