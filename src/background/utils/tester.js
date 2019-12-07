@@ -203,17 +203,11 @@ function matchTester(rule) {
   return { test };
 }
 
-function checkPrefix(prefix, rule) {
-  if (rule.startsWith(prefix)) {
-    return rule.slice(prefix.length).trim();
-  }
-}
-
 export function testBlacklist(url) {
   let res = blCache[url];
   if (res === undefined) {
     const rule = blacklistRules.find(({ test }) => test(url));
-    if (rule) res = rule.reject;
+    res = rule?.reject && rule.text;
     updateBlacklistCache(url, res || false);
   }
   return res;
@@ -226,50 +220,16 @@ export function resetBlacklist(list) {
   }
   // XXX compatible with {Array} list in v2.6.1-
   blacklistRules = (Array.isArray(rules) ? rules : (rules || '').split('\n'))
-  .map((line) => {
-    const item = line.trim();
-    if (!item || item.startsWith('#')) return null;
-
-    /**
-     * @include and @match rules are added for people who need a whitelist.
-     */
-    // @include
-    const includeRule = checkPrefix('@include ', item);
-    if (includeRule) {
-      return {
-        test: autoReg(includeRule).test,
-        reject: false,
-      };
-    }
-    // @match
-    const matchRule = checkPrefix('@match ', item);
-    if (matchRule) {
-      return {
-        test: matchTester(matchRule).test,
-        reject: false,
-      };
-    }
-
-    // @exclude
-    const excludeRule = checkPrefix('@exclude ', item);
-    if (excludeRule) {
-      return {
-        test: autoReg(excludeRule).test,
-        reject: true,
-      };
-    }
-    // domains
-    if (item.indexOf('/') < 0) {
-      return {
-        test: matchTester(`*://${item}/*`).test,
-        reject: true,
-      };
-    }
-    // @exclude-match
-    return {
-      test: matchTester(item).test,
-      reject: true,
-    };
+  .map((text) => {
+    text = text.trim();
+    if (!text || text.startsWith('#')) return null;
+    const mode = text.startsWith('@') && text.split(/\s/, 1)[0];
+    const rule = mode ? text.slice(mode.length + 1).trim() : text;
+    const reject = mode !== '@include' && mode !== '@match'; // @include and @match = whitelist
+    const { test } = mode === '@include' || mode === '@exclude' && autoReg(rule)
+      || !mode && !rule.includes('/') && matchTester(`*://${rule}/*`) // domain
+      || matchTester(rule); // @match and @exclude-match
+    return { reject, test, text };
   })
   .filter(Boolean);
   blCache = {};

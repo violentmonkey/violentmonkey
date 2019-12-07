@@ -43,10 +43,10 @@
         <div class="flex-1" v-text="i18n('menuFindScripts')"></div>
       </div>
     </div>
-    <div
-      class="failure-reason"
-      v-if="failureReasonText"
-      v-text="failureReasonText" />
+    <div class="failure-reason" v-if="failureReasonText">
+      <span v-text="failureReasonText"/>
+      <code v-text="store.blacklisted" v-if="store.blacklisted" class="ellipsis inline-block"/>
+    </div>
     <div
       v-for="scope in store.injectable && injectionScopes"
       class="menu menu-scripts"
