@@ -334,9 +334,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Powiadamiaj o aktualizacjach skryptów
-labelPopupSort: Sortuj skrypty w wyskakującym okienku według $1
+labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Sortuj skrypty w wyskakującym okienku według $1
 labelRelated:
   description: Label of related links.
   message: 'Powiązane linki: '
