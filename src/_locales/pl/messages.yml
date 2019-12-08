@@ -6,7 +6,8 @@ anchorTranslator:
   message: >-
     <a href=mailto:cydziol@gmail.com>MISI90</a>, <a
     href=mailto:MyReksio@gmail.com>Piter432</a>, <a
-    href=mailto:hawkeye116477@gmail.com>hawkeye116477</a>
+    href=mailto:hawkeye116477@gmail.com>hawkeye116477</a>, <a
+    href=mailto:jojo05.87@gmail.com>jojoPL1987</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: Wszystkie/Żaden
@@ -55,7 +56,7 @@ buttonOK:
   message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: Kosz
 buttonRemove:
   description: Button to remove a script.
   message: Usuń
@@ -179,7 +180,7 @@ hintInputURL:
   message: 'Wprowadź adres URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: ''
+  message: Usunięte skrypty są wymienione tutaj i będą przechowywane przez 7 dni.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Użyj @downloadURL
@@ -214,7 +215,7 @@ labelAutoReloadCurrentTab:
   message: Odświeżaj bieżącą kartę po włączeniu/wyłączeniu skryptu z menu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: Sprawdzaj aktualizacje skryptów co $1 dni, użyj 0 aby wyłączyć
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Wyświetl na plakietce: '
@@ -266,7 +267,7 @@ labelExcludeMatch:
   message: Reguły @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Eksportuj dane skryptu
+  message: Eksportuj dane skryptów
 labelFeedback:
   description: Label of link to feedback page.
   message: Informacje zwrotne
@@ -335,7 +336,7 @@ labelNotifyUpdates:
   message: Powiadamiaj o aktualizacjach skryptów
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Sortuj skrypty w wyskakującym okienku według $1
 labelRelated:
   description: Label of related links.
   message: 'Powiązane linki: '
@@ -549,10 +550,10 @@ noValues:
   message: Żadna wartość nie jest przechowywana
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Najpierw włączone
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: Ukryj wyłączone
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Pokazuj najpierw włączone skrypty
