@@ -1,8 +1,17 @@
 import { noop, getActiveTab } from '#/common';
-import { isFirefox, isAndroid } from '#/common/ua';
+import { isFirefox } from '#/common/ua';
 
-// Firefox Android does not support `openerTabId` field, it fails if this field is passed
-export const openerTabIdSupported = !isFirefox || isFirefox >= 57 && !isAndroid;
+// eslint-disable-next-line import/no-mutable-exports
+export let openerTabIdSupported = !isFirefox;
+if (isFirefox) {
+  Promise.all([
+    browser.runtime.getBrowserInfo(),
+    browser.runtime.getPlatformInfo(),
+  ]).then(([{ name, version }, { os }]) => {
+    // Firefox Android does not support `openerTabId` field, it fails if this field is passed
+    openerTabIdSupported = name === 'Firefox' && parseFloat(version) >= 57 && os !== 'android';
+  });
+}
 
 const openers = {};
 
