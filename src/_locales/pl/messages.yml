@@ -442,7 +442,7 @@ menuFindScripts:
   message: Znajdź skrypty dla tej strony
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: Skrypty tylko w ramkach pomocniczych 
+  message: Skrypty tylko w ramkach pomocniczych
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Dopasowane skrypty
