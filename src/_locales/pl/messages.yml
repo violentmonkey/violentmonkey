@@ -162,7 +162,9 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message:  |-
+    Violentmonkey nie może uruchomić skryptów użytkownika na tej stronie
+    (możliwe przykłady: interfejs przeglądarki lub rozszerzenie)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: kolejności alfabetycznej
@@ -440,7 +442,7 @@ menuFindScripts:
   message: Znajdź skrypty dla tej strony
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Skrypty tylko w ramkach pomocniczych
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Dopasowane skrypty
