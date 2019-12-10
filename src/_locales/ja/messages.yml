@@ -127,6 +127,12 @@ descEditorOptions:
     では動作しない可能性があります。 完全なリストは <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">こちら</a> を参照してください。
+editHelpDocumention:
+  description: Label in the editor help tab for the documentation link.
+  message: ユーザースクリプトのメタデータブロックと <code>GM</code> API に関するドキュメント:
+editHelpKeyboard:
+  description: Label in the editor help tab for the keyboard shortcuts.
+  message: キーボード ショートカット
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: 別のエディタを使用しますか？
@@ -217,7 +223,7 @@ labelAutoReloadCurrentTab:
   message: メニューからスクリプトの有効/無効を切り替えたときに表示中のタブを更新する
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: スクリプトの更新を $1 日ごとに確認、0 を指定すると無効
+  message: スクリプトの更新を $1 日ごとに確認 (0 を指定すると無効)
 labelBadge:
   description: Label for option to show number on badge.
   message: 'バッジの表示: '
