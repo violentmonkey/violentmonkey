@@ -8,7 +8,6 @@ import {
   browser,
 } from '#/common/consts';
 import { getUniqId, sendCmd } from '#/common';
-import { isFirefox } from '#/common/ua';
 
 import { attachFunction } from '../utils';
 import {
@@ -74,9 +73,10 @@ export function injectScripts(contentId, webId, data, scriptLists) {
     webId,
     contentId,
     props,
-    isFirefox,
+    data.isFirefox,
   ];
-  bridge.post.asString = isFirefox;
+  bridge.isFirefox = data.isFirefox;
+  bridge.post.asString = data.isFirefox;
 
   const injectPage = scriptLists[INJECT_PAGE];
   const injectContent = scriptLists[INJECT_CONTENT];

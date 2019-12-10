@@ -1,4 +1,3 @@
-import { isFirefox } from '#/common/ua';
 import { sendCmd } from '../utils';
 import { addEventListener, logging } from '../utils/helpers';
 import bridge from './bridge';
@@ -14,7 +13,7 @@ let clipboardData;
 
 bridge.addHandlers({
   SetClipboard(data) {
-    if (isFirefox) {
+    if (bridge.isFirefox) {
       // Firefox does not support copy from background page.
       // ref: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Interact_with_the_clipboard
       // The dirty way will create a <textarea> element in web page and change the selection.
