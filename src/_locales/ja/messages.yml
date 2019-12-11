@@ -129,7 +129,7 @@ descEditorOptions:
     rel="noopener noreferrer">こちら</a> を参照してください。
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ユーザースクリプトのメタデータブロックと <code>GM</code> API に関するドキュメント:
+  message: 'ユーザースクリプトのメタデータブロックと <code>GM</code> API に関するドキュメント:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: キーボード ショートカット
