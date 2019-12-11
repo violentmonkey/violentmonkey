@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Update locale files
+      run: yarn && yarn i18n
+    - name: Upload to Transifex
+      run: 'curl -i -L --user api:$TRANSIFEX_TOKEN -X PUT -F file=@dist/_locales/en/messages.json https://www.transifex.com/api/2/project/violentmonkey-nex/resource/messagesjson/content/'
+      env:
+        TRANSIFEX_TOKEN: ${{SECRETS.TRANSIFEX_TOKEN}}
