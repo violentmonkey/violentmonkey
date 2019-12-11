@@ -1,13 +1,9 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
-const util = require('util');
 const Vinyl = require('vinyl');
 const PluginError = require('plugin-error');
 const through = require('through2');
 const yaml = require('js-yaml');
-
-const readFile = util.promisify(fs.readFile);
-const readdir = util.promisify(fs.readdir);
 
 const transformers = {
   '.yml': data => yaml.safeLoad(data),
@@ -20,30 +16,38 @@ class Locale {
     this.lang = lang;
     this.base = base;
     this.data = {};
+    this.desc = {};
   }
 
-  load() {
+  async load() {
     const localeDir = `${this.base}/${this.lang}`;
-    const data = {};
-    return readdir(localeDir)
-    .then(files => [this.defaultLocale].concat(files.filter(file => file !== this.defaultLocale)))
-    .then(files => files.reduce((promise, file) => promise.then(() => {
+    let files = await fs.readdir(localeDir);
+    files = [this.defaultLocale].concat(files.filter(file => file !== this.defaultLocale));
+    for (const file of files) {
       const ext = path.extname(file);
       const transformer = transformers[ext];
       if (transformer) {
-        return readFile(`${localeDir}/${file}`, 'utf8')
-        .then(res => { Object.assign(data, transformer(res)); }, err => {});
+        try {
+          const res = await fs.readFile(`${localeDir}/${file}`, 'utf8');
+          Object.assign(this.data, transformer(res));
+        } catch {
+          // ignore
+        }
       }
-    }), Promise.resolve()))
-    .then(() => Object.keys(data).reduce((desc, key) => {
-      this.data[key] = data[key].message;
-      desc[key] = desc[key] || data[key].description;
-      return desc;
-    }, {}));
+    }
+    Object.keys(this.data)
+    .forEach(key => {
+      this.desc[key] = this.desc[key] || this.data[key].description;
+    });
   }
 
-  get(key, def) {
-    return this.data[key] || def;
+  getMessage(key, def) {
+    const item = this.data[key];
+    return item && item.message || def;
+  }
+
+  get(key) {
+    return this.data[key];
   }
 
   dump(data, { extension }) {
@@ -62,67 +66,62 @@ class Locale {
 }
 
 class Locales {
-  constructor(base) {
+  constructor(options) {
+    this.options = options;
     this.defaultLang = 'en';
     this.newLocaleItem = 'NEW_LOCALE_ITEM';
-    this.base = base || '.';
+    this.base = options.base || '.';
     this.langs = [];
+    this.locales = {};
     this.data = {};
-    this.desc = {};
   }
 
-  load() {
-    return readdir(this.base)
-    .then(langs => {
-      this.langs = langs;
-      return Promise.all(langs.map(lang => {
-        const locale = this.data[lang] = new Locale(lang, this.base);
-        return locale.load();
-      }));
-    })
-    .then(data => {
-      const desc = data[this.langs.indexOf(this.defaultLang)];
-      Object.keys(desc).forEach(key => {
-        this.desc[key] = {
-          touched: false,
-          value: desc[key],
-        };
-      });
+  async load() {
+    const langs = await fs.readdir(this.base);
+    this.langs = langs;
+    await Promise.all(langs.map(async lang => {
+      const locale = new Locale(lang, this.base);
+      await locale.load();
+      this.locales[lang] = locale;
+    }));
+    const defaultData = this.locales[this.defaultLang];
+    Object.keys(defaultData.desc).forEach(key => {
+      this.data[key] = {
+        ...defaultData.data[key],
+        touched: this.options.markUntouched ? false : defaultData.get(key).touched !== false,
+      };
     });
   }
 
   getData(lang, options) {
     options = options || {};
     const data = {};
-    const langData = this.data[lang];
-    const defaultData = options.useDefaultLang && lang != this.defaultLang && this.data[this.defaultLang];
-    Object.keys(this.desc).forEach(key => {
-      if (options.touchedOnly && !this.desc[key].touched) return;
+    const langData = this.locales[lang];
+    const defaultData = options.useDefaultLang && lang != this.defaultLang && this.locales[this.defaultLang];
+    Object.keys(this.data).forEach(key => {
+      if (options.touchedOnly && !this.data[key].touched) return;
       data[key] = {
-        description: this.desc[key].value || this.newLocaleItem,
-        message: langData.get(key) || defaultData && defaultData.get(key) || '',
+        description: this.data[key].description || this.newLocaleItem,
+        message: langData.getMessage(key) || defaultData && defaultData.getMessage(key) || '',
       };
-      if (options.markUntouched && !this.desc[key].touched) data[key].touched = false;
+      if (options.markUntouched && !this.data[key].touched) data[key].touched = false;
     });
     return data;
   }
 
   dump(options) {
+    options = { ...this.options, ...options };
     return this.langs.map(lang => {
       const data = this.getData(lang, options);
-      const locale = this.data[lang];
-      const out = locale.dump(data, options);
-      return new Vinyl({
-        path: out.path,
-        contents: new Buffer(out.data),
-      });
+      const locale = this.locales[lang];
+      return locale.dump(data, options);
     });
   }
 
   touch(key) {
-    let item = this.desc[key];
-    if (!item) item = this.desc[key] = {
-      value: this.newLocaleItem,
+    let item = this.data[key];
+    if (!item) item = this.data[key] = {
+      description: this.newLocaleItem,
     };
     item.touched = true;
   }
@@ -140,10 +139,9 @@ function extract(options) {
     '.html': 'default',
     '.vue': 'default',
   };
+  const locales = new Locales(options);
 
-  const locales = new Locales(options.base);
-
-  function extract(data, types) {
+  function extractFile(data, types) {
     if (!Array.isArray(types)) types = [types];
     data = String(data);
     types.forEach(function (type) {
@@ -162,7 +160,7 @@ function extract(options) {
     if (file.isStream()) return this.emit('error', new PluginError('VM-i18n', 'Stream is not supported.'));
     const extname = path.extname(file.path);
     const type = types[extname];
-    type && extract(file.contents, type);
+    if (type) extractFile(file.contents, type);
     cb();
   }
 
@@ -172,12 +170,11 @@ function extract(options) {
       keys.forEach(key => {
         locales.touch(key);
       });
-      return locales.dump({
-        touchedOnly: options.touchedOnly,
-        useDefaultLang: options.useDefaultLang,
-        markUntouched: options.markUntouched,
-        extension: options.extension,
-      });
+      return locales.dump()
+      .map(out => new Vinyl({
+        path: out.path,
+        contents: new Buffer(out.data),
+      }));
     })
     .then(files => {
       files.forEach(file => {
@@ -191,6 +188,13 @@ function extract(options) {
   return through.obj(bufferContents, endStream);
 }
 
+function read(options) {
+  const stream = extract(options);
+  process.nextTick(() => stream.end());
+  return stream;
+}
+
 module.exports = {
   extract,
+  read,
 };

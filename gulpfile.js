@@ -92,23 +92,20 @@ function copyFiles() {
 }
 
 function checkI18n() {
-  return gulp.src(paths.templates)
-  .pipe(i18n.extract({
+  return i18n.read({
     base: 'src/_locales',
     extension: '.json',
-  }));
+  });
 }
 
 function copyI18n() {
-  return gulp.src(paths.templates)
-  .pipe(plumber(logError))
-  .pipe(i18n.extract({
+  return i18n.read({
     base: 'src/_locales',
     touchedOnly: true,
     useDefaultLang: true,
     markUntouched: false,
     extension: '.json',
-  }))
+  })
   .pipe(gulp.dest(`${DIST}/_locales`));
 }
 
@@ -139,5 +136,6 @@ const pack = gulp.parallel(manifest, copyFiles, copyI18n);
 exports.clean = clean;
 exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
 exports.build = gulp.series(clean, gulp.parallel(pack, jsProd));
-exports.i18n = gulp.parallel(updateI18n, copyI18n);
+exports.i18n = updateI18n;
 exports.check = checkI18n;
+exports.copyI18n = copyI18n;

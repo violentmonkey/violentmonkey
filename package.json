@@ -8,6 +8,7 @@
     "build:firefox": "cross-env TARGET=firefox yarn build",
     "analyze": "cross-env RUN_ENV=analyze npm run build",
     "i18n": "gulp i18n",
+    "copyI18n": "gulp copyI18n",
     "lint": "yarn lint:js && yarn lint:yml",
     "lint:js": "eslint --ext .js,.vue .",
     "lint:yml": "gulp check",
