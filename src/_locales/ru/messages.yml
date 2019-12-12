@@ -130,6 +130,12 @@ descEditorOptions:
      некоторые из них могут не работать в Violentmonkey. Смотрите <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">полный список</a>.
+editHelpDocumention:
+  description: Label in the editor help tab for the documentation link.
+  message: ''
+editHelpKeyboard:
+  description: Label in the editor help tab for the keyboard shortcuts.
+  message: ''
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: Использовать другой редактор?
@@ -155,7 +161,7 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Сохранить
 extDescription:
-  description: Description for this extension.
+  description: 'Description for this extension, will be displayed in web store'
   message: >-
     Violentmonkey - менеджер пользовательских скриптов, позволяет контролировать
     внешний вид и устранять проблемы на сайтах.

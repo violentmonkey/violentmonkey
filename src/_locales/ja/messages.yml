@@ -158,7 +158,7 @@ editValueSave:
   description: Button to save modification of a script value.
   message: 保存
 extDescription:
-  description: Description for this extension.
+  description: 'Description for this extension, will be displayed in web store'
   message: ブラウザでユーザースクリプトを利用できるようにします。
 extName:
   description: Name of this extension.

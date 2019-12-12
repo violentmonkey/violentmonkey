@@ -121,6 +121,12 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: ''
+editHelpDocumention:
+  description: Label in the editor help tab for the documentation link.
+  message: ''
+editHelpKeyboard:
+  description: Label in the editor help tab for the keyboard shortcuts.
+  message: ''
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: ''
@@ -146,7 +152,7 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Salva
 extDescription:
-  description: Description for this extension.
+  description: 'Description for this extension, will be displayed in web store'
   message: Introduce il supporto agli userscript per browser.
 extName:
   description: Name of this extension.

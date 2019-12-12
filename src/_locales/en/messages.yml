@@ -157,8 +157,8 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Save
 extDescription:
-  description: Description for this extension.
-  message: Provide userscript support for browsers.
+  description: 'Description for this extension, will be displayed in web store'
+  message: An open source userscript manager that supports a lot of browsers
 extName:
   description: Name of this extension.
   message: Violentmonkey

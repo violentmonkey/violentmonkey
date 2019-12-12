@@ -125,6 +125,12 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: ''
+editHelpDocumention:
+  description: Label in the editor help tab for the documentation link.
+  message: ''
+editHelpKeyboard:
+  description: Label in the editor help tab for the keyboard shortcuts.
+  message: ''
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: ''
@@ -150,7 +156,7 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Zapisz
 extDescription:
-  description: Description for this extension.
+  description: 'Description for this extension, will be displayed in web store'
   message: Zapewnia obsługę skryptów użytkownika dla przeglądarek.
 extName:
   description: Name of this extension.
@@ -162,7 +168,7 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message:  |-
+  message: |-
     Violentmonkey nie może uruchomić skryptów użytkownika na tej stronie
     (możliwe przykłady: interfejs przeglądarki lub rozszerzenie)
 filterAlphabeticalOrder:
@@ -217,7 +223,7 @@ labelAutoReloadCurrentTab:
   message: Odświeżaj bieżącą kartę po włączeniu/wyłączeniu skryptu z menu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: Sprawdzaj aktualizacje skryptów co $1 dni, użyj 0 aby wyłączyć
+  message: 'Sprawdzaj aktualizacje skryptów co $1 dni, użyj 0 aby wyłączyć'
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Wyświetl na plakietce: '

@@ -128,6 +128,12 @@ descEditorOptions:
     cuenta que algunos de ellos pueden no funcionar en Violentmonkey. Mire la <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completa</a>.
+editHelpDocumention:
+  description: Label in the editor help tab for the documentation link.
+  message: ''
+editHelpKeyboard:
+  description: Label in the editor help tab for the keyboard shortcuts.
+  message: ''
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: ''
@@ -153,7 +159,7 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Guardar
 extDescription:
-  description: Description for this extension.
+  description: 'Description for this extension, will be displayed in web store'
   message: Proporciona soporte de scripts de usuario para los navegadores
 extName:
   description: Name of this extension.

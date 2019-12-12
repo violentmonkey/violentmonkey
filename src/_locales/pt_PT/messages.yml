@@ -125,6 +125,12 @@ descEditorOptions:
     como: {"indentUnit":2, "smartIndent":true}. No entanto, tenha em atenção que
     algumas poderão não funcionar com o Violentmonkey. Lista completa:
     https://codemirror.net/doc/manual.html#config
+editHelpDocumention:
+  description: Label in the editor help tab for the documentation link.
+  message: ''
+editHelpKeyboard:
+  description: Label in the editor help tab for the keyboard shortcuts.
+  message: ''
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: ''
@@ -150,7 +156,7 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Guardar
 extDescription:
-  description: Description for this extension.
+  description: 'Description for this extension, will be displayed in web store'
   message: Oferece suporte a scripts de utilizador para navegadores.
 extName:
   description: Name of this extension.
