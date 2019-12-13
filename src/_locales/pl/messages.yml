@@ -133,7 +133,7 @@ editHelpKeyboard:
   message: ''
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Użycie innego edytora?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Niestandardowe metadane
