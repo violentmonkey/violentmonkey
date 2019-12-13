@@ -159,7 +159,7 @@ editValueSave:
   message: 保存
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: ブラウザでユーザースクリプトを利用できるようにします。
+  message: 多くのブラウザをサポートする、オープンソースの UserScript マネージャー
 extName:
   description: Name of this extension.
   message: Violentmonkey
