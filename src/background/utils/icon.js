@@ -1,5 +1,5 @@
 import { i18n, noop } from '#/common';
-import { isChrome } from '#/common/ua';
+import ua from '#/common/ua';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import { forEachTab } from './message';
 import { getOption, hookOptions } from './options';
@@ -26,7 +26,7 @@ let titleNoninjectable;
 
 // We'll cache the icon data in Chrome as it doesn't cache the data and takes up to 40ms
 // in our background page context to set the 4 icon sizes for each new tab opened
-const iconCache = isChrome && {};
+const iconCache = ua.isChrome && {};
 
 hookOptions((changes) => {
   if ('isApplied' in changes) {

@@ -1,17 +1,14 @@
 import { noop, getActiveTab } from '#/common';
-import { isFirefox } from '#/common/ua';
+import ua from '#/common/ua';
 
-// eslint-disable-next-line import/no-mutable-exports
-export let openerTabIdSupported = !isFirefox;
-if (isFirefox) {
-  Promise.all([
-    browser.runtime.getBrowserInfo(),
-    browser.runtime.getPlatformInfo(),
-  ]).then(([{ name, version }, { os }]) => {
-    // Firefox Android does not support `openerTabId` field, it fails if this field is passed
-    openerTabIdSupported = name === 'Firefox' && parseFloat(version) >= 57 && os !== 'android';
+// Firefox Android does not support `openerTabId` field, it fails if this field is passed
+ua.ready.then(() => {
+  Object.defineProperties(ua, {
+    openerTabIdSupported: {
+      value: ua.isChrome || ua.isFirefox >= 57 && ua.os !== 'android',
+    },
   });
-}
+});
 
 const openers = {};
 
@@ -45,7 +42,7 @@ export async function tabOpen({
     ...insert && { index: index + 1 },
     // XXX openerTabId seems buggy on Chrome, https://crbug.com/967150
     // It seems to do nothing even set successfully with `browser.tabs.update`.
-    ...openerTabIdSupported && { openerTabId },
+    ...ua.openerTabIdSupported && { openerTabId },
   });
   const { id } = tab;
   openers[id] = openerTabId;

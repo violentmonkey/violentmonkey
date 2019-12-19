@@ -65,6 +65,7 @@ export function wrapGM(script, code, cache, injectInto) {
     scriptHandler: 'Violentmonkey',
     version: bridge.version,
     injectInto,
+    platform: { ...bridge.ua },
     script: {
       description: script.meta.description || '',
       excludes: [...script.meta.exclude],
