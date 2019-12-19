@@ -1,11 +1,10 @@
 import {
   getUniqId, request, i18n, buffer2string, isEmpty,
 } from '#/common';
-import { isFirefox } from '#/common/ua';
+import ua from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
 import { getScriptByIdSync } from './db';
-import { openerTabIdSupported } from './tabs';
 
 const VM_VERIFY = 'VM-Verify';
 const requests = {};
@@ -181,7 +180,7 @@ export async function httpRequest(details, src, cb) {
     const vmHeaders = [];
     // Firefox doesn't send cookies,
     // https://github.com/violentmonkey/violentmonkey/issues/606
-    let shouldSendCookies = isFirefox && !anonymous && (
+    let shouldSendCookies = ua.isFirefox && !anonymous && (
       withCredentials || new URL(url).origin === new URL(src.url).origin
     );
     xhr.open(method, url, true, user || '', password || '');
@@ -207,7 +206,7 @@ export async function httpRequest(details, src, cb) {
       const cookies = await browser.cookies.getAll({
         url,
         storeId: src.tab.cookieStoreId,
-        ...isFirefox >= 59 && { firstPartyDomain: null },
+        ...ua.isFirefox >= 59 && { firstPartyDomain: null },
       });
       if (cookies.length) {
         vmHeaders.push({
@@ -329,7 +328,7 @@ export async function confirmInstall(info, src = {}) {
   browser.tabs.create({
     url: `/confirm/index.html#${confirmKey}`,
     index: src.tab ? src.tab.index + 1 : undefined,
-    ...src.tab && openerTabIdSupported ? { openerTabId: src.tab.id } : {},
+    ...src.tab && ua.openerTabIdSupported ? { openerTabId: src.tab.id } : {},
   });
 }
 

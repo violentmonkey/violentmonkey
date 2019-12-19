@@ -51,6 +51,7 @@ const meta = {
   },
   runtime: {
     getManifest: true,
+    getPlatformInfo: wrapAsync,
     getURL: true,
     openOptionsPage: wrapAsync,
     onMessage(onMessage) {

@@ -1,6 +1,6 @@
 import { noop, getUniqId, ensureArray } from '#/common';
 import { objectGet } from '#/common/object';
-import { isFirefox } from '#/common/ua';
+import ua from '#/common/ua';
 import * as sync from './sync';
 import {
   cache,
@@ -107,8 +107,9 @@ const commands = {
     if (src.frameId === 0) resetValueOpener(tabId);
     const data = {
       isApplied,
-      isFirefox,
       injectInto,
+      ua,
+      isFirefox: ua.isFirefox,
       version: VM_VER,
     };
     if (isApplied) {

@@ -28,7 +28,7 @@ import Modal from 'vueleton/lib/modal/bundle';
 import { sendCmd, getLocaleString } from '#/common';
 import { objectGet } from '#/common/object';
 import options from '#/common/options';
-import { isFirefox } from '#/common/ua';
+import ua from '#/common/ua';
 import SettingCheck from '#/common/ui/setting-check';
 import { downloadBlob } from '#/common/download';
 import loadZip from '#/common/zip';
@@ -38,7 +38,7 @@ import { store } from '../../utils';
  * Note:
  * - Firefox does not support multiline <select>
  */
-if (isFirefox) store.ffDownload = {};
+if (ua.isFirefox) store.ffDownload = {};
 
 export default {
   components: {
@@ -121,7 +121,7 @@ function getExportname() {
 function download(blob) {
   // Known issue: does not work on Firefox
   // https://bugzilla.mozilla.org/show_bug.cgi?id=1331176
-  if (isFirefox) {
+  if (ua.isFirefox) {
     const reader = new FileReader();
     reader.onload = () => {
       store.ffDownload = {

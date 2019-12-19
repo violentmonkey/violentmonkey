@@ -15,11 +15,13 @@ export default function initialize(
   webId,
   contentId,
   props,
+  ua,
   isFirefox,
   invokeHost,
 ) {
   let invokeGuest;
   bridge.props = props;
+  bridge.ua = ua;
   bridge.isFirefox = isFirefox;
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;

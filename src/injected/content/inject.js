@@ -73,6 +73,7 @@ export function injectScripts(contentId, webId, data, scriptLists) {
     webId,
     contentId,
     props,
+    data.ua,
     data.isFirefox,
   ];
   bridge.isFirefox = data.isFirefox;
