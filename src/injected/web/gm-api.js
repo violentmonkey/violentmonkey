@@ -125,6 +125,7 @@ export function createGmApiProps() {
       const key = `${id}:${cap}`;
       store.commands[key] = func;
       bridge.post({ cmd: 'RegisterMenu', data: [id, cap] });
+      return cap;
     },
     GM_unregisterMenuCommand(cap) {
       const { id } = this;
