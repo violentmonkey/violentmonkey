@@ -76,7 +76,7 @@ bridge.addHandlers({
       const [id, cap] = data;
       const commandMap = menus[id];
       if (commandMap) {
-        delete menus[cap];
+        delete commandMap[cap];
       }
     }
     getPopup();
