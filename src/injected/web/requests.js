@@ -30,7 +30,9 @@ export function onRequestCreate(details, scriptId) {
     scriptId,
     details,
     req: {
-      abort: reqAbort,
+      abort() {
+        reqAbort(req.id);
+      },
     },
   };
   details.url = getFullUrl(details.url);
@@ -39,8 +41,8 @@ export function onRequestCreate(details, scriptId) {
   return req.req;
 }
 
-function reqAbort() {
-  bridge.post({ cmd: 'AbortRequest', data: this.id });
+function reqAbort(id) {
+  bridge.post({ cmd: 'AbortRequest', data: id });
 }
 
 function parseData(response, req, details) {
