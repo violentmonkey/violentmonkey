@@ -68,7 +68,7 @@ export default {
     ...base,
     prefix: 'cac:',
     fetch: cacheOrFetch(async function fetch(uri, check) {
-      const { data: { buffer, xhr } } = await request(uri, { responseType: 'arraybuffer' });
+      const { data: buffer, xhr } = await request(uri, { responseType: 'arraybuffer' });
       const contentType = (xhr.getResponseHeader('content-type') || '').split(';')[0];
       const data = {
         contentType,
