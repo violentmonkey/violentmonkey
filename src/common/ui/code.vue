@@ -457,8 +457,8 @@ export default {
   white-space: pre;
 }
 
-input[type=text].is-error {
-  border: 1px solid #e85600;
+.editor-search .is-error {
+  border-color: #e85600;
   background: #e8560010;
 }
 
