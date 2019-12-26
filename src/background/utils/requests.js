@@ -49,24 +49,25 @@ const HeaderInjector = (() => {
   const headersToInject = {};
   /** @param {chrome.webRequest.HttpHeader} header */
   const isVmVerify = header => header.name === VM_VERIFY;
+  const isNotCookie = header => !/^cookie$/i.test(header.name);
   const isSendable = header => header.name !== VM_VERIFY;
-  const isSendableAnon = header => isSendable(header) && !/^cookie$/i.test(header.name);
+  const isSendableAnon = header => isSendable(header) && isNotCookie(header);
   const apiEvents = {
     onBeforeSendHeaders: {
       options: ['requestHeaders', 'blocking', ...EXTRA_HEADERS],
       /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
-      listener({ requestHeaders, requestId }) {
+      listener({ requestHeaders: headers, requestId }) {
         // only the first call during a redirect/auth chain will have VM-Verify header
-        const reqId = requestHeaders.find(isVmVerify)?.value || verify[requestId];
+        const reqId = headers.find(isVmVerify)?.value || verify[requestId];
         const req = reqId && requests[reqId];
         if (reqId && req) {
           verify[requestId] = reqId;
           req.coreId = requestId;
-          requestHeaders = requestHeaders
+          headers = (req.noNativeCookie ? headers.filter(isNotCookie) : headers)
           .concat(headersToInject[reqId] || [])
           .filter(req.anonymous ? isSendableAnon : isSendable);
         }
-        return { requestHeaders };
+        return { requestHeaders: headers };
       },
     },
     onHeadersReceived: {
@@ -209,6 +210,7 @@ export async function httpRequest(details, src, cb) {
         ...ua.isFirefox >= 59 && { firstPartyDomain: null },
       });
       if (cookies.length) {
+        req.noNativeCookie = true;
         vmHeaders.push({
           name: 'cookie',
           value: cookies.map(c => `${c.name}=${c.value};`).join(' '),
