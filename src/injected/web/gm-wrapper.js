@@ -50,6 +50,7 @@ export function wrapGM(script, code, cache, injectInto) {
     gm.window = unsafeWindow;
   } else {
     thisObj = getWrapper();
+    thisObj.wrappedJSObject = window.wrappedJSObject;
     gm.window = thisObj;
   }
   if (grant::includes('window.close')) {
