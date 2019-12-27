@@ -1,14 +1,13 @@
 <template>
   <div class="flex flex-col">
-    <div class="frame-block editor-search" v-show="search.show">
-      <button class="pull-right" @click="clearSearch">&times;</button>
-      <form class="inline-block mr-1" @submit.prevent="goToLine()">
+    <div class="frame-block editor-search flex" v-show="search.show">
+      <form @submit.prevent="goToLine()">
         <span v-text="i18n('labelLineNumber')"></span>
         <input type="text" class="w-1" v-model="search.line">
       </form>
-      <form class="inline-block mr-1" @submit.prevent="findNext()">
+      <form class="flex-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
-        <tooltip content="Ctrl-F">
+        <tooltip content="Ctrl-F" class="flex-1">
           <!-- id is required for the built-in autocomplete using entered values -->
           <input
             :class="{ 'is-error': !search.state.hasResult }"
@@ -25,10 +24,10 @@
           <button type="submit">&gt;</button>
         </tooltip>
       </form>
-      <form class="inline-block mr-1" @submit.prevent="replace()" v-if="!readonly">
+      <form class="flex-1" @submit.prevent="replace()" v-if="!readonly">
         <span v-text="i18n('labelReplace')"></span>
         <!-- id is required for the built-in autocomplete using entered values -->
-        <input type="search" id="editor-replace" v-model="search.state.replace">
+        <input class="flex-1" type="search" id="editor-replace" v-model="search.state.replace">
         <tooltip content="Shift-Ctrl-F">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
@@ -36,7 +35,7 @@
           <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
         </tooltip>
       </form>
-      <div class="inline-block">
+      <div>
         <tooltip :content="i18n('searchUseRegex')">
           <toggle-button v-model="searchOptions.useRegex">.*</toggle-button>
         </tooltip>
@@ -44,6 +43,7 @@
           <toggle-button v-model="searchOptions.caseSensitive">Aa</toggle-button>
         </tooltip>
       </div>
+      <button @click="clearSearch">&times;</button>
     </div>
     <div class="editor-code flex-auto" ref="code"></div>
   </div>
@@ -451,15 +451,25 @@ export default {
   }
 }
 
-.editor-search > .inline-block > * {
-  display: inline-block;
-  vertical-align: middle;
+.editor-search {
   white-space: pre;
-}
-
-.editor-search .is-error {
-  border-color: #e85600;
-  background: #e8560010;
+  flex-wrap: wrap; // wrap fields in a narrow window
+  > form,
+  > div {
+    display: flex;
+    align-items: center;
+    margin-right: .5rem;
+  }
+  input[type=search] {
+    min-width: 8em;
+  }
+  span > input { // a tooltip'ed input
+    width: 100%;
+  }
+  .is-error {
+    border-color: #e85600;
+    background: #e8560010;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

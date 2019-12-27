@@ -85,6 +85,7 @@ input[disabled] ~ * {
   opacity: .5;
 }
 input[type=text],
+input[type=search],
 input[type=password] {
   line-height: 1.5rem;
   &[disabled] {
@@ -97,6 +98,7 @@ textarea {
   width: 100%;
 }
 input[type=text],
+input[type=search],
 input[type=password],
 textarea {
   padding: 0 .5rem;
@@ -198,9 +200,6 @@ button,
   }
 }
 
-.pull-right {
-  float: right;
-}
 .inline-block {
   display: inline-block;
 }
