@@ -1,7 +1,7 @@
 import { objectPick } from '#/common/object';
 import {
-  includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Blob, Uint8Array,
-  setAttribute, log, charCodeAt, fromCharCode, shift, slice, defineProperty,
+  filter, includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Uint8Array,
+  setAttribute, log, fromCharCode, shift, slice, defineProperty,
   createElementNS, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -9,7 +9,8 @@ import bridge from './bridge';
 const idMap = {};
 const queue = [];
 
-const { DOMParser } = global;
+const { DOMParser, fetch } = global;
+const { blob: getBlob, arrayBuffer: getArrayBuffer } = Response.prototype;
 const { parseFromString } = DOMParser.prototype;
 const { toLowerCase } = String.prototype;
 const getHref = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
@@ -19,9 +20,9 @@ bridge.addHandlers({
     const req = queue::shift();
     if (req) start(req, id);
   },
-  HttpRequested(res) {
-    const req = idMap[res.id];
-    if (req) callback(req, res);
+  HttpRequested(msg) {
+    const req = idMap[msg.id];
+    if (req) callback(req, msg);
   },
 });
 
@@ -37,7 +38,18 @@ export function onRequestCreate(details, scriptId) {
   };
   details.url = getFullUrl(details.url);
   queue::push(req);
-  bridge.post({ cmd: 'GetRequestId' });
+  bridge.post({
+    cmd: 'GetRequestId',
+    data: [
+      'abort',
+      'error',
+      'load',
+      // 'loadend' will always be sent for internal cleanup
+      'progress',
+      'readystatechange',
+      'timeout',
+    ]::filter(e => typeof details[`on${e}`] === 'function'),
+  });
   return req.req;
 }
 
@@ -54,40 +66,44 @@ function parseData(response, req, details) {
     const type = req.contentType.split(';', 1)[0] || 'text/html';
     return new DOMParser()::parseFromString(response, type);
   }
-  // arraybuffer, blob
-  if (req.resType && response) {
-    const len = response.length;
-    const arr = new Uint8Array(len);
-    for (let i = 0; i < len; i += 1) arr[i] = response::charCodeAt(i);
-    return responseType === 'blob'
-      ? new Blob([arr], { type: req.contentType })
-      : arr.buffer;
-  }
-  // text
+  // arraybuffer, blob, text
   return response;
 }
 
 // request object functions
-function callback(req, res) {
-  const cb = req.details[`on${res.type}`];
+async function callback(req, msg) {
+  const cb = req.details[`on${msg.type}`];
   if (cb) {
-    if (res.data.response
-        && !('rawResponse' in res)
-        && (req.details.responseType || 'text') !== 'text') {
-      res.rawResponse = res.data.response;
-      defineProperty(res.data, 'response', {
+    const reqType = req.details.responseType;
+    const { data } = msg;
+    let { response } = data;
+    // the second message may be issued while blob is still being processed,
+    // so we'll temporarily store the Promise which can be awaited in the second message
+    const url = msg.isBlob && response;
+    if (url) {
+      response = (await fetch(url))::(reqType === 'blob' ? getBlob : getArrayBuffer)();
+    }
+    if (response && !('rawResponse' in req) && (reqType || 'text') !== 'text') {
+      req.rawResponse = response;
+    }
+    if (req.rawResponse?.then) {
+      req.rawResponse = await req.rawResponse;
+      bridge.post({ cmd: 'RevokeObjectURL', data: url });
+    }
+    if ('rawResponse' in req) {
+      defineProperty(data, 'response', {
         configurable: true,
         get() {
-          const value = parseData(res.rawResponse, res, req.details);
+          const value = parseData(req.rawResponse, msg, req.details);
           defineProperty(this, 'response', { value });
           return value;
         },
       });
     }
-    res.data.context = req.details.context;
-    cb(res.data);
+    data.context = req.details.context;
+    cb(data);
   }
-  if (res.type === 'loadend') delete idMap[req.id];
+  if (msg.type === 'loadend') delete idMap[req.id];
 }
 
 async function start(req, id) {
@@ -112,7 +128,7 @@ async function start(req, id) {
   const { responseType } = details;
   if (responseType) {
     if (['arraybuffer', 'blob']::includes(responseType)) {
-      payload.responseType = 'arraybuffer';
+      payload.responseType = 'blob';
     } else if (!['document', 'json', 'text']::includes(responseType)) {
       log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }

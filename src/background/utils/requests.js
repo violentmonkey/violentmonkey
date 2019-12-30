@@ -1,6 +1,7 @@
 import {
-  getUniqId, request, i18n, buffer2string, isEmpty,
+  getUniqId, request, i18n, isEmpty,
 } from '#/common';
+import { objectPick } from '#/common/object';
 import ua from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
@@ -107,10 +108,12 @@ const HeaderInjector = (() => {
   };
 })();
 
-export function getRequestId() {
+export function getRequestId(eventsToNotify = []) {
+  eventsToNotify.push('loadend');
   const id = getUniqId();
   requests[id] = {
     id,
+    eventsToNotify,
     xhr: new XMLHttpRequest(),
   };
   return id;
@@ -118,41 +121,48 @@ export function getRequestId() {
 
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
-  const { xhr } = req;
+  let blobUrl;
+  const { id, xhr } = req;
   return (evt) => {
-    const res = {
-      id: req.id,
-      type: evt.type,
-      resType: xhr.responseType,
-      contentType: xhr.getResponseHeader('Content-Type') || 'application/octet-stream',
-    };
+    if (evt.type === 'loadend') clearRequest(req);
+    if (!req.cb) return;
+    const isBlob = xhr.responseType === 'blob';
     const data = {
       finalUrl: xhr.responseURL,
       readyState: xhr.readyState,
       responseHeaders: req.responseHeaders || xhr.getAllResponseHeaders(),
       status: xhr.status,
       statusText: xhr.statusText,
+      response: isBlob && xhr.response ? getBlobUrl(req) : xhr.response,
+      ...getResponseText(),
+      ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
     };
-    res.data = data;
+    lastPromise = lastPromise.then(() => req.cb({
+      id,
+      data,
+      isBlob,
+      contentType: xhr.getResponseHeader('Content-Type') || 'application/octet-stream',
+      type: evt.type,
+    }));
+  };
+  function getBlobUrl() {
+    if (!blobUrl) {
+      blobUrl = URL.createObjectURL(xhr.response);
+      setTimeout(expireBlobUrl, 60e3);
+    }
+    return blobUrl;
+  }
+  function expireBlobUrl() {
+    URL.revokeObjectURL(blobUrl);
+    blobUrl = null;
+  }
+  function getResponseText() {
     try {
-      data.responseText = xhr.responseText;
+      return { responseText: xhr.responseText };
     } catch (e) {
       // ignore if responseText is unreachable
     }
-    if (evt.type === 'progress') {
-      ['lengthComputable', 'loaded', 'total'].forEach((key) => {
-        data[key] = evt[key];
-      });
-    }
-    if (evt.type === 'loadend') clearRequest(req);
-    else if (xhr.readyState >= XMLHttpRequest.LOADING) HeaderInjector.del(req.id);
-    lastPromise = lastPromise.then(() => {
-      data.response = xhr.response && xhr.responseType === 'arraybuffer'
-        ? buffer2string(xhr.response)
-        : xhr.response;
-      if (req.cb) req.cb(res);
-    });
-  };
+  }
 }
 
 function isSpecialHeader(lowerHeader) {
@@ -201,7 +211,7 @@ export async function httpRequest(details, src, cb) {
       });
     }
     if (timeout) xhr.timeout = timeout;
-    if (responseType) xhr.responseType = 'arraybuffer';
+    if (responseType) xhr.responseType = 'blob';
     if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
     if (shouldSendCookies) {
       const cookies = await browser.cookies.getAll({
@@ -218,16 +228,7 @@ export async function httpRequest(details, src, cb) {
       }
     }
     const callback = xhrCallbackWrapper(req);
-    [
-      'abort',
-      'error',
-      'load',
-      'loadend',
-      'progress',
-      'readystatechange',
-      'timeout',
-    ]
-    .forEach((evt) => { xhr[`on${evt}`] = callback; });
+    req.eventsToNotify.forEach(evt => { xhr[`on${evt}`] = callback; });
     const body = data ? decodeBody(data) : null;
     HeaderInjector.add(id, vmHeaders);
     xhr.send(body);
