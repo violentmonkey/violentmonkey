@@ -173,13 +173,15 @@ const commands = {
   },
   GetRequestId: getRequestId,
   HttpRequest(details, src) {
-    httpRequest(details, src, (res) => {
+    httpRequest(details, src, (res) => (
       browser.tabs.sendMessage(src.tab.id, {
         cmd: 'HttpRequested',
         data: res,
+      }, {
+        frameId: src.frameId,
       })
-      .catch(noop);
-    });
+      .catch(noop)
+    ));
   },
   AbortRequest: abortRequest,
   SetBadge: setBadge,

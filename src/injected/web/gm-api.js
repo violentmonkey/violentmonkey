@@ -1,5 +1,6 @@
 import { cache2blobUrl, getUniqId, isEmpty } from '#/common';
 import { downloadBlob } from '#/common/download';
+import { objectPick } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
@@ -10,7 +11,7 @@ import {
 } from './gm-values';
 import {
   findIndex, indexOf, slice, objectKeys, objectValues, objectEntries,
-  atob, Error, jsonDump, logging, utf8decode, Blob,
+  atob, Error, jsonDump, logging, utf8decode,
 } from '../utils/helpers';
 
 const { getElementById } = Document.prototype;
@@ -138,17 +139,17 @@ export function createGmApiProps() {
       if (!opts || !opts.url) throw new Error('GM_download: Invalid parameter!');
       return onRequestCreate({
         method: 'GET',
-        responseType: 'arraybuffer',
-        url: opts.url,
-        headers: opts.headers,
-        timeout: opts.timeout,
-        onerror: opts.onerror,
-        onprogress: opts.onprogress,
-        ontimeout: opts.ontimeout,
-        onload(res) {
-          const blob = new Blob([res.response], { type: 'application/octet-stream' });
-          downloadBlob(blob, opts.name, opts.onload);
-        },
+        responseType: 'blob',
+        overrideMimeType: 'application/octet-stream',
+        onload: res => downloadBlob(res.response, opts.name, () => opts.onload?.(res)),
+        ...objectPick(opts, [
+          'url',
+          'headers',
+          'timeout',
+          'onerror',
+          'onprogress',
+          'ontimeout',
+        ]),
       }, this.id);
     },
     GM_xmlhttpRequest(opts) {
