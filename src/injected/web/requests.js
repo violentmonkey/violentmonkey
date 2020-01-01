@@ -77,13 +77,11 @@ async function callback(req, msg) {
     const reqType = req.details.responseType;
     const { data } = msg;
     let { response } = data;
-    // the second message may be issued while blob is still being processed,
-    // so we'll temporarily store the Promise which can be awaited in the second message
     const url = msg.isBlob && response;
-    if (url) {
-      response = (await fetch(url))::(reqType === 'blob' ? getBlob : getArrayBuffer)();
-    }
     if (response && !('rawResponse' in req) && (reqType || 'text') !== 'text') {
+      // the second message may be issued while blob is still being processed,
+      // so we'll temporarily store the Promise which can be awaited in the second message
+      if (url) response = (await fetch(url))::(reqType === 'blob' ? getBlob : getArrayBuffer)();
       req.rawResponse = response;
     }
     if (req.rawResponse?.then) {
