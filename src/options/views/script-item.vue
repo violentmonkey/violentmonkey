@@ -1,7 +1,11 @@
 <template>
   <div
     class="script"
-    :class="{ disabled: !script.config.enabled, removed: script.config.removed }"
+    :class="{
+      disabled: !script.config.enabled,
+      removed: script.config.removed,
+      error: script.error,
+    }"
     :draggable="draggable"
     @keydownEnter="onEdit">
     <img class="script-icon hidden-xs" :src="safeIcon">
@@ -79,7 +83,7 @@
               <icon name="question"></icon>
             </a>
           </tooltip>
-          <div class="script-message" v-text="script.message"></div>
+          <div class="script-message" v-text="script.message" :title="script.error"></div>
         </div>
         <tooltip :content="i18n('buttonRemove')" align="end">
           <span class="btn-ghost" @click="onRemove">
@@ -314,6 +318,15 @@ $removedItemHeight: calc(
   }
   &.focused {
     box-shadow: 1px 2px 9px var(--fill-8);
+  }
+  &.error {
+    border-color: #f008;
+    [*|href="#refresh"] {
+      fill: #f00;
+    }
+    .script-message {
+      color: #f00a;
+    }
   }
   &-buttons {
     line-height: 1;
