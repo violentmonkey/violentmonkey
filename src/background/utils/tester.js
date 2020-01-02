@@ -242,7 +242,7 @@ function updateBlacklistCache(key, value) {
   if (blCacheSize > MAX_BL_CACHE_LENGTH) {
     Object.keys(blCache)
     .some((k) => {
-      blCacheSize -= blCache[k].length;
+      blCacheSize -= k.length;
       delete blCache[k];
       // reduce the cache to 75% so that this function doesn't run too often.
       return blCacheSize < MAX_BL_CACHE_LENGTH * 3 / 4;
