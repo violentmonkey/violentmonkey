@@ -1,5 +1,7 @@
 import { defaultImage, i18n, noop } from '#/common';
 
+export const commands = {};
+
 export function notify(options) {
   browser.notifications.create(options.id || 'ViolentMonkey', {
     type: 'basic',

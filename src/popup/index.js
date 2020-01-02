@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { i18n, sendCmd, getActiveTab } from '#/common';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import handlers from '#/common/handlers';
+import { objectMap } from '#/common/object';
 import * as tld from '#/common/tld';
 import '#/common/ui/style';
 import App from './views/app';
@@ -36,11 +37,7 @@ Object.assign(handlers, {
     allScriptIds.push(...ids);
     if (isTop) {
       mutex.resolve();
-      store.commands = Object.entries(data.menus)
-      .reduce((map, [id, values]) => {
-        map[id] = Object.keys(values).sort();
-        return map;
-      }, {});
+      store.commands = objectMap(data.menus, (key, value) => Object.keys(value).sort());
     }
     if (ids.length) {
       // frameScripts may be appended multiple times if iframes have unique scripts

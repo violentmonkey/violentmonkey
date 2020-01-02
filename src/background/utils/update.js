@@ -1,9 +1,20 @@
 import { i18n, request, compareVersion } from '#/common';
 import { CMD_SCRIPT_UPDATE } from '#/common/consts';
-import { parseScript } from './db';
+import { getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
-import { getOption } from './options';
-import { notify, sendMessageOrIgnore } from './message';
+import { getOption, setOption } from './options';
+import { commands, notify, sendMessageOrIgnore } from './message';
+
+Object.assign(commands, {
+  CheckUpdate(id) {
+    return checkUpdate(getScriptById(id));
+  },
+  CheckUpdateAll() {
+    setOption('lastUpdate', Date.now());
+    const toUpdate = getScripts().filter(item => item.config.shouldUpdate);
+    return Promise.all(toUpdate.map(checkUpdate));
+  },
+});
 
 const processes = {};
 const NO_HTTP_CACHE = {
@@ -28,7 +39,7 @@ export default function checkUpdate(script) {
 async function doCheckUpdate(script) {
   const { id } = script.props;
   try {
-    const { data: { update } } = await parseScript({
+    const { update } = await parseScript({
       id,
       code: await downloadUpdate(script),
       update: { checking: false },

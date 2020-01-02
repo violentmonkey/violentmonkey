@@ -1,31 +1,37 @@
 import { noop } from '#/common';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
+import { commands } from './message';
 
 const openers = {}; // scriptId: { openerId: 1, ... }
 const tabScripts = {}; // openerId: { scriptId: 1, ... }
 let cache;
 let timer;
 
-browser.tabs.onRemoved.addListener((id) => {
-  resetValueOpener(id);
+Object.assign(commands, {
+  async GetValueStore(id) {
+    const stores = await getValueStoresByIds([id]);
+    return stores[id] || {};
+  },
+  async SetValueStore({ where, valueStore }) {
+    // Value store will be replaced soon.
+    const store = await dumpValueStore(where, valueStore);
+    return broadcastUpdates(store);
+  },
+  UpdateValue({ id, update }) {
+    // Value will be updated to store later.
+    updateLater();
+    const { key, value } = update;
+    if (!cache) cache = {};
+    let updates = cache[id];
+    if (!updates) {
+      updates = {};
+      cache[id] = updates;
+    }
+    updates[key] = value || null;
+  },
 });
 
-export function updateValueStore(id, update) {
-  updateLater();
-  const { key, value } = update;
-  if (!cache) cache = {};
-  let updates = cache[id];
-  if (!updates) {
-    updates = {};
-    cache[id] = updates;
-  }
-  updates[key] = value || null;
-}
-
-export function setValueStore(where, value) {
-  return dumpValueStore(where, value)
-  .then(broadcastUpdates);
-}
+browser.tabs.onRemoved.addListener(resetValueOpener);
 
 export function resetValueOpener(openerId) {
   const scriptMap = tabScripts[openerId];
@@ -62,12 +68,12 @@ function updateLater() {
   }
 }
 
-function doUpdate() {
+async function doUpdate() {
   const currentCache = cache;
   cache = null;
   const ids = Object.keys(currentCache);
-  getValueStoresByIds(ids)
-  .then((valueStores) => {
+  try {
+    const valueStores = await getValueStoresByIds(ids);
     ids.forEach((id) => {
       const valueStore = valueStores[id] || {};
       valueStores[id] = valueStore;
@@ -78,16 +84,12 @@ function doUpdate() {
         else valueStore[key] = value;
       });
     });
-    return dumpValueStores(valueStores);
-  })
-  .then(broadcastUpdates)
-  .catch((err) => {
+    await broadcastUpdates(await dumpValueStores(valueStores));
+  } catch (err) {
     console.error('Values error:', err);
-  })
-  .then(() => {
-    timer = null;
-    if (cache) updateLater();
-  });
+  }
+  timer = null;
+  if (cache) updateLater();
 }
 
 function broadcastUpdates(updates) {

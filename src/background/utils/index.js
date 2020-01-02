@@ -1,10 +1,6 @@
 export { default as cache } from './cache';
-export { default as setClipboard } from './clipboard';
-export { default as checkUpdate } from './update';
 export { default as getEventEmitter } from './events';
-export * from './script';
-export * from './options';
-export * from './requests';
-export * from './search';
 export { initialize } from './init';
 export * from './message';
+export * from './options';
+export * from './search';
