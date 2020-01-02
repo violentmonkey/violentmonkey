@@ -1,6 +1,15 @@
 import * as tld from '#/common/tld';
 import cache from './cache';
+import { commands } from './message';
 import { getOption, hookOptions } from './options';
+
+Object.assign(commands, {
+  TestBlacklist: testBlacklist,
+});
+
+global.addEventListener('backgroundInitialized', () => {
+  resetBlacklist();
+}, { once: true });
 
 tld.initTLD(true);
 

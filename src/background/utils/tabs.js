@@ -1,5 +1,31 @@
 import { noop, getActiveTab } from '#/common';
 import ua from '#/common/ua';
+import { commands } from './message';
+
+const openers = {};
+
+Object.assign(commands, {
+  async TabOpen({ url, active, insert = true }, src) {
+    // src.tab may be absent when invoked from popup (e.g. edit/create buttons)
+    const { id: openerTabId, index, windowId } = src?.tab || await getActiveTab() || {};
+    const tab = await browser.tabs.create({
+      url,
+      active,
+      windowId,
+      ...insert && { index: index + 1 },
+      // XXX openerTabId seems buggy on Chrome, https://crbug.com/967150
+      // It seems to do nothing even set successfully with `browser.tabs.update`.
+      ...ua.openerTabIdSupported && { openerTabId },
+    });
+    const { id } = tab;
+    openers[id] = openerTabId;
+    return { id };
+  },
+  TabClose({ id } = {}, src) {
+    const tabId = id || src?.tab?.id;
+    if (tabId) browser.tabs.remove(tabId);
+  },
+});
 
 // Firefox Android does not support `openerTabId` field, it fails if this field is passed
 ua.ready.then(() => {
@@ -9,8 +35,6 @@ ua.ready.then(() => {
     },
   });
 });
-
-const openers = {};
 
 browser.tabs.onRemoved.addListener((id) => {
   const openerId = openers[id];
@@ -23,33 +47,3 @@ browser.tabs.onRemoved.addListener((id) => {
     delete openers[id];
   }
 });
-
-export async function tabOpen({
-  url,
-  active,
-  insert = true,
-}, src) {
-  // src.tab may be absent when invoked from popup (e.g. edit/create buttons)
-  const {
-    id: openerTabId,
-    index,
-    windowId,
-  } = src.tab || await getActiveTab() || {};
-  const tab = await browser.tabs.create({
-    url,
-    active,
-    windowId,
-    ...insert && { index: index + 1 },
-    // XXX openerTabId seems buggy on Chrome, https://crbug.com/967150
-    // It seems to do nothing even set successfully with `browser.tabs.update`.
-    ...ua.openerTabIdSupported && { openerTabId },
-  });
-  const { id } = tab;
-  openers[id] = openerTabId;
-  return { id };
-}
-
-export function tabClose(data, src) {
-  const tabId = (data && data.id) || (src.tab && src.tab.id);
-  if (tabId) browser.tabs.remove(tabId);
-}

@@ -1,15 +1,49 @@
 import {
-  getUniqId, request, i18n, isEmpty,
+  getUniqId, request, i18n, isEmpty, noop,
 } from '#/common';
 import { objectPick } from '#/common/object';
 import ua from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
-import { getScriptByIdSync } from './db';
+import { getScriptById } from './db';
+import { commands } from './message';
 
 const VM_VERIFY = 'VM-Verify';
 const requests = {};
 const verify = {};
+
+Object.assign(commands, {
+  ConfirmInstall: confirmInstall,
+  GetRequestId(eventsToNotify = []) {
+    eventsToNotify.push('loadend');
+    const id = getUniqId();
+    requests[id] = {
+      id,
+      eventsToNotify,
+      xhr: new XMLHttpRequest(),
+    };
+    return id;
+  },
+  HttpRequest(details, src) {
+    httpRequest(details, src, (res) => (
+      browser.tabs.sendMessage(src.tab.id, {
+        cmd: 'HttpRequested',
+        data: res,
+      }, {
+        frameId: src.frameId,
+      })
+      .catch(noop)
+    ));
+  },
+  AbortRequest(id) {
+    const req = requests[id];
+    if (req) {
+      req.xhr.abort();
+      clearRequest(req);
+    }
+  },
+});
+
 const specialHeaders = [
   'user-agent',
   // https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name
@@ -108,17 +142,6 @@ const HeaderInjector = (() => {
   };
 })();
 
-export function getRequestId(eventsToNotify = []) {
-  eventsToNotify.push('loadend');
-  const id = getUniqId();
-  requests[id] = {
-    id,
-    eventsToNotify,
-    xhr: new XMLHttpRequest(),
-  };
-  return id;
-}
-
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
   let blobUrl;
@@ -176,7 +199,7 @@ function isSpecialHeader(lowerHeader) {
  * @param {chrome.runtime.MessageSender} src
  * @param {function} cb
  */
-export async function httpRequest(details, src, cb) {
+async function httpRequest(details, src, cb) {
   const {
     anonymous, data, headers, id, method,
     overrideMimeType, password, responseType,
@@ -234,7 +257,7 @@ export async function httpRequest(details, src, cb) {
     xhr.send(body);
   } catch (e) {
     const { scriptId } = req;
-    console.warn(e, `in script id ${scriptId}, ${getScriptByIdSync(scriptId).meta.name}`);
+    console.warn(e, `in script id ${scriptId}, ${getScriptById(scriptId).meta.name}`);
   }
 }
 
@@ -242,14 +265,6 @@ function clearRequest(req) {
   if (req.coreId) delete verify[req.coreId];
   delete requests[req.id];
   HeaderInjector.del(req.id);
-}
-
-export function abortRequest(id) {
-  const req = requests[id];
-  if (req) {
-    req.xhr.abort();
-    clearRequest(req);
-  }
 }
 
 function decodeBody(obj) {
@@ -320,7 +335,7 @@ function decodeBody(obj) {
 //   types: ['xmlhttprequest'],
 // });
 
-export async function confirmInstall(info, src = {}) {
+async function confirmInstall(info, src = {}) {
   const { url, from } = info;
   const code = info.code || (await request(url)).data;
   // TODO: display the error in UI

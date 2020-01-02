@@ -1,7 +1,22 @@
-import { initHooks, debounce, normalizeKeys } from '#/common';
-import { objectGet, objectSet } from '#/common/object';
+import {
+  debounce, ensureArray, initHooks, normalizeKeys,
+} from '#/common';
+import { objectGet, objectSet, objectMap } from '#/common/object';
 import defaults from '#/common/options-defaults';
 import { register } from './init';
+import { commands } from './message';
+
+Object.assign(commands, {
+  GetAllOptions() {
+    return commands.GetOptions(defaults);
+  },
+  GetOptions(data) {
+    return objectMap(data, key => getOption(key));
+  },
+  SetOptions(data) {
+    ensureArray(data).forEach(item => setOption(item.key, item.value));
+  },
+});
 
 let changes = {};
 const hooks = initHooks();
@@ -69,13 +84,6 @@ export function setOption(key, value) {
       console.log('Options updated:', optionKey, value, options); // eslint-disable-line no-console
     }
   }
-}
-
-export function getAllOptions() {
-  return Object.keys(defaults).reduce((res, key) => {
-    res[key] = getOption(key);
-    return res;
-  }, {});
 }
 
 export const hookOptions = hooks.hook;

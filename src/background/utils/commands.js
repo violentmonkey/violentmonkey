@@ -1,5 +1,5 @@
 import { getActiveTab } from '#/common';
-import { tabOpen } from './tabs';
+import { commands } from './message';
 
 const ROUTES = {
   newScript: '#scripts/_new',
@@ -11,6 +11,6 @@ global.addEventListener('backgroundInitialized', () => {
     const tab = await getActiveTab();
     const optionsUrl = browser.runtime.getURL(browser.runtime.getManifest().options_ui.page);
     const url = `${optionsUrl}${ROUTES[cmd] || ''}`;
-    tabOpen({ url, insert: true }, { tab });
+    commands.TabOpen({ url, insert: true }, { tab });
   });
 }, { once: true });

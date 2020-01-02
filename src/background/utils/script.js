@@ -1,6 +1,27 @@
-import { encodeFilename } from '#/common';
+import { getUniqId, encodeFilename } from '#/common';
 import { METABLOCK_RE } from '#/common/consts';
+import { objectMap } from '#/common/object';
+import { commands } from './message';
 import { getOption } from './options';
+import cache from './cache';
+
+Object.assign(commands, {
+  CacheNewScript(data) {
+    const id = getUniqId();
+    cache.put(`new-${id}`, newScript(data));
+    return id;
+  },
+  InjectScript(code, src) {
+    return browser.tabs.executeScript(src.tab.id, {
+      code,
+      runAt: 'document_start',
+    });
+  },
+  NewScript(id) {
+    return id && cache.get(`new-${id}`) || newScript();
+  },
+  ParseMeta: parseMeta,
+});
 
 export function isUserScript(text) {
   if (/^\s*</.test(text)) return false; // HTML
@@ -41,10 +62,7 @@ const metaTypes = {
 };
 export function parseMeta(code) {
   // initialize meta
-  const meta = Object.keys(metaTypes)
-  .reduce((res, key) => Object.assign(res, {
-    [key]: metaTypes[key].default(),
-  }), {});
+  const meta = objectMap(metaTypes, (key, value) => value.default());
   const metaBody = code.match(METABLOCK_RE)[1] || '';
   metaBody.replace(/(?:^|\n)\s*\/\/\x20(@\S+)(.*)/g, (_match, rawKey, rawValue) => {
     const [keyName, locale] = rawKey.slice(1).split(':');

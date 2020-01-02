@@ -38,18 +38,21 @@ export function sendCmd(cmd, data, options) {
   return sendMessage({ cmd, data }, options);
 }
 
-export function sendMessage(payload, { retry } = {}) {
+// ignoreError is always `true` when sending from the background script because it's a broadcast
+export async function sendMessage(payload, { retry, ignoreError } = {}) {
   if (retry) return sendMessageRetry(payload);
-  const promise = browser.runtime.sendMessage(payload)
-  .then((res) => {
-    const { data, error } = res || {};
-    if (error) return Promise.reject(error);
+  try {
+    let promise = browser.runtime.sendMessage(payload);
+    if (ignoreError || window === browser.extension.getBackgroundPage?.()) {
+      promise = promise.catch(noop);
+    }
+    const { data, error } = await promise || {};
+    if (error) throw error;
     return data;
-  });
-  promise.catch((err) => {
-    if (process.env.DEBUG) console.warn(err);
-  });
-  return promise;
+  } catch (error) {
+    if (process.env.DEBUG) console.warn(error);
+    throw error;
+  }
 }
 
 /**

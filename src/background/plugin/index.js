@@ -8,9 +8,7 @@ import {
 export const script = {
   update(data) {
     // Update an existing script by ID
-    // data: {
-    //   id, code, message, isNew, config, custom, props, update,
-    // }
+    // { id, code, message, isNew, config, custom, props, update }
     return parseScript(data);
   },
   list() {

@@ -57,3 +57,10 @@ export function objectPick(obj, keys) {
     return res;
   }, {});
 }
+
+export function objectMap(obj, func) {
+  return Object.entries(obj).reduce((res, [key, value]) => {
+    res[key] = func(key, value);
+    return res;
+  }, {});
+}

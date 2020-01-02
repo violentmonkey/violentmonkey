@@ -1,5 +1,17 @@
 import initCache from '#/common/cache';
+import { commands } from './message';
 
-export default initCache({
+const cache = initCache({
   lifetime: 5 * 60 * 1000,
 });
+
+Object.assign(commands, {
+  CacheLoad(data) {
+    return cache.get(data) || null;
+  },
+  CacheHit(data) {
+    cache.hit(data.key, data.lifetime);
+  },
+});
+
+export default cache;

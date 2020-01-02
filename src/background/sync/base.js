@@ -1,6 +1,7 @@
 import {
   debounce, normalizeKeys, request, noop, makePause, ensureArray,
 } from '#/common';
+import { TIMEOUT_HOUR } from '#/common/consts';
 import {
   objectGet, objectSet, objectPick, objectPurify,
 } from '#/common/object';
@@ -16,7 +17,7 @@ import { script as pluginScript } from '../plugin';
 const serviceNames = [];
 const serviceClasses = [];
 const services = {};
-const autoSync = debounce(sync, 60 * 60 * 1000);
+const autoSync = debounce(sync, TIMEOUT_HOUR);
 let working = Promise.resolve();
 let syncConfig;
 
