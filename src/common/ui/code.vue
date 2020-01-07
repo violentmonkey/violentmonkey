@@ -78,19 +78,11 @@ const MAX_LINE_LENGTH = 50 * 1024;
 const CTRL_OPEN = '\x02'.repeat(256);
 const CTRL_CLOSE = '\x03'.repeat(256);
 
-function getHandler(key) {
-  return (cm) => {
-    const { commands } = cm.state;
-    const handle = commands && commands[key];
-    return handle && handle();
-  };
-}
-
 [
   'save', 'cancel', 'close',
   'find', 'findNext', 'findPrev', 'replace', 'replaceAll',
 ].forEach((key) => {
-  CodeMirror.commands[key] = getHandler(key);
+  CodeMirror.commands[key] = cm => cm.state.commands?.[key]?.();
 });
 Object.assign(CodeMirror.keyMap.sublime, {
   'Shift-Ctrl-/': 'commentSelection',
@@ -415,10 +407,7 @@ export default {
       e.stopImmediatePropagation();
     },
     getRealContent(text) {
-      return text.replace(/\x02+(\d+)\x03+/g, (_, id) => {
-        const placeholder = this.placeholders[id];
-        return placeholder && placeholder.body || '';
-      });
+      return text.replace(/\x02+(\d+)\x03+/g, (_, id) => this.placeholders[id]?.body || '');
     },
   },
   mounted() {
