@@ -31,10 +31,13 @@
             </span>
           </tooltip>
         </div>
-        <div class="flex-auto" v-else v-text="i18n('headerRecycleBin')" />
+        <div class="flex-auto" v-else
+             v-text="`${i18n('headerRecycleBin')}${trash.length ? ` (${trash.length})` : ''}`" />
         <tooltip :content="i18n('buttonRecycleBin')" placement="bottom">
-          <span class="btn-ghost" @click="toggleRecycle" :class="{active: showRecycle}" ref="trash">
+          <span class="btn-ghost trash-button" @click="toggleRecycle" ref="trash"
+                :class="{ active: showRecycle, filled: trash.length }">
             <icon name="trash"></icon>
+            <b v-if="trash.length" v-text="trash.length"/>
           </span>
         </tooltip>
         <dropdown align="right" class="filter-sort">
@@ -69,11 +72,11 @@
           <icon name="search"></icon>
         </form>
       </header>
-      <div
-        v-if="showRecycle"
-        class="trash-hint mx-1 my-1 text-center"
-        v-text="i18n('hintRecycleBin')"
-      />
+      <div v-if="showRecycle" class="trash-hint mx-1 my-1 flex flex-col">
+        <span v-text="i18n('hintRecycleBin')"/>
+        <a v-if="trash.length" v-text="i18n('buttonEmptyRecycleBin')" href="#"
+           @click.prevent="emptyRecycleBin"/>
+      </div>
       <div class="flex-auto pos-rel">
         <div class="scripts abs-full">
           <script-item
@@ -407,6 +410,23 @@ export default {
       }
       this.debouncedUpdate();
     },
+    async emptyRecycleBin() {
+      try {
+        await new Promise((resolve, reject) => showMessage({
+          text: i18n('buttonEmptyRecycleBin'),
+          buttons: [
+            { text: i18n('buttonOK'), onClick: resolve },
+            { text: i18n('buttonCancel'), onClick: reject },
+          ],
+          input: false,
+          onBackdropClick: reject,
+        }));
+        sendCmd('CheckRemove', { force: true });
+        store.scripts = store.scripts.filter(script => !script.config.removed);
+      } catch (e) {
+        // NOP
+      }
+    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 100);
@@ -500,9 +520,26 @@ export default {
   }
 }
 
+.trash-button {
+  position: relative;
+  b {
+    position: absolute;
+    font-size: 10px;
+    line-height: 1;
+    text-align: center;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+  }
+  &.active b {
+    display: none;
+  }
+}
+
 .trash-hint {
   line-height: 1.5;
   color: var(--fill-6);
+  place-items: center;
 }
 
 .trash-animate {
