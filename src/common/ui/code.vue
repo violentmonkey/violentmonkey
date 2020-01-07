@@ -432,11 +432,11 @@ export default {
       this.cm.on('blur', () => window.addEventListener('keydown', this.onKeyDown));
       this.cm.on('focus', () => window.removeEventListener('keydown', this.onKeyDown));
     }
-    document.addEventListener('copy', this.onCopy, false);
+    this.$refs.code.addEventListener('copy', this.onCopy);
   },
   beforeDestroy() {
     if (this.global) window.removeEventListener('keydown', this.onKeyDown, false);
-    document.removeEventListener('copy', this.onCopy, false);
+    this.$refs.code?.removeEventListener('copy', this.onCopy);
   },
 };
 </script>
