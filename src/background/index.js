@@ -224,6 +224,7 @@ const commands = {
     });
   },
   TestBlacklist: testBlacklist,
+  CheckRemove: checkRemove,
 };
 
 function togglePreinject(enable) {

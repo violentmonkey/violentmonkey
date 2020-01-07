@@ -256,12 +256,12 @@ export function getData() {
   .then(cache => ({ scripts, cache }));
 }
 
-export function checkRemove() {
+export function checkRemove({ force } = {}) {
   const now = Date.now();
   const toRemove = store.scripts.filter((script) => {
     if (!script.config.removed) return false;
     const lastModified = +script.props.lastModified || 0;
-    return now - lastModified > 7 * 24 * 60 * 60 * 1000;
+    return force || now - lastModified > 7 * 24 * 60 * 60 * 1000;
   });
   if (toRemove.length) {
     store.scripts = store.scripts.filter(script => !script.config.removed);
