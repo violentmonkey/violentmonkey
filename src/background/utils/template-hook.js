@@ -1,3 +1,4 @@
+import { postInitialize } from './init';
 import { getDefaultOption, getOption, setOption } from './options';
 
 export const SCRIPT_TEMPLATE = 'scriptTemplate';
@@ -11,7 +12,7 @@ const INITIAL_TEMPLATE = `\
 // ==/UserScript==
 `;
 
-global.addEventListener('backgroundInitialized', () => {
+postInitialize.push(() => {
   let edited = getOption(SCRIPT_TEMPLATE_EDITED);
   // Preserve an edited template
   if (edited) return;
@@ -25,7 +26,7 @@ global.addEventListener('backgroundInitialized', () => {
   } else if (template !== getDefaultOption(SCRIPT_TEMPLATE)) {
     resetScriptTemplate();
   }
-}, { once: true });
+});
 
 export function resetScriptTemplate(changes = {}) {
   const defaultTemplate = getDefaultOption(SCRIPT_TEMPLATE);

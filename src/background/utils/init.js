@@ -1,13 +1,11 @@
-const initializers = [];
+export const preInitialize = [];
+export const postInitialize = [];
 
-export function register(init) {
-  initializers.push(init);
-}
-
-export function initialize() {
-  return Promise.all(initializers.map((init) => {
-    if (typeof init === 'function') return init();
-    return init;
-  }))
-  .then(() => {});
+export async function initialize(main) {
+  const run = init => (typeof init === 'function' ? init() : init);
+  await Promise.all(preInitialize.map(run));
+  await run(main);
+  await Promise.all(postInitialize.map(run));
+  preInitialize.length = 0;
+  postInitialize.length = 0;
 }
