@@ -1,12 +1,12 @@
 import {
-  debounce, normalizeKeys, request, noop, makePause, ensureArray,
+  debounce, normalizeKeys, request, noop, makePause, ensureArray, sendCmd,
 } from '#/common';
 import { TIMEOUT_HOUR } from '#/common/consts';
 import {
   objectGet, objectSet, objectPick, objectPurify,
 } from '#/common/object';
 import {
-  getEventEmitter, getOption, setOption, hookOptions, sendMessageOrIgnore,
+  getEventEmitter, getOption, setOption, hookOptions,
 } from '../utils';
 import {
   sortScripts,
@@ -189,10 +189,7 @@ function extendService(options) {
 }
 
 const onStateChange = debounce(() => {
-  sendMessageOrIgnore({
-    cmd: 'UpdateSync',
-    data: getStates(),
-  });
+  sendCmd('UpdateSync', getStates());
 });
 
 export const BaseService = serviceFactory({

@@ -1,5 +1,5 @@
 import {
-  getUniqId, request, i18n, isEmpty, noop,
+  getUniqId, request, i18n, isEmpty, sendTabCmd,
 } from '#/common';
 import { objectPick } from '#/common/object';
 import ua from '#/common/ua';
@@ -25,14 +25,9 @@ Object.assign(commands, {
     return id;
   },
   HttpRequest(details, src) {
-    httpRequest(details, src, (res) => (
-      browser.tabs.sendMessage(src.tab.id, {
-        cmd: 'HttpRequested',
-        data: res,
-      }, {
-        frameId: src.frameId,
-      })
-      .catch(noop)
+    const { tab, frameId } = src;
+    httpRequest(details, src, res => (
+      sendTabCmd(tab.id, 'HttpRequested', res, { frameId })
     ));
   },
   AbortRequest(id) {
