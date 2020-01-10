@@ -1,6 +1,6 @@
 anchorAuthor:
   description: Author shown on about tab.
-  message: ''
+  message: '<a href=mailto:i@gerald.top>Gerald</a>'
 anchorTranslator:
   description: Translator shown on about tab.
   message: '<a href=mailto:i@gerald.top>Gerald</a>'
@@ -23,6 +23,9 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: 编辑
+buttonEmptyRecycleBin:
+  description: Button to empty the recycle bin.
+  message: 立即清空回收站！
 buttonEnable:
   description: Button to enable a script.
   message: 启用
@@ -125,13 +128,13 @@ descEditorOptions:
     rel="noopener noreferrer">完整列表</a>。
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: 用户脚本 metadata 区域和 <code>GM</code> API 的相关文档：
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 快捷键：
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: 使用其他编辑器？
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: 自定义元数据
@@ -155,7 +158,7 @@ editValueSave:
   message: 保存
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: 为浏览器提供用户脚本支持。
+  message: 一个开源的用户脚本管理器，支持很多浏览器
 extName:
   description: Name of this extension.
   message: 暴力猴
@@ -219,7 +222,7 @@ labelAutoReloadCurrentTab:
   message: 从菜单开启或关闭脚本后自动刷新当前页面
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: 每 $1 天检查一次脚本更新，0 表示禁用
 labelBadge:
   description: Label for option to show number on badge.
   message: 在扩展图标上显示：
@@ -283,7 +286,7 @@ labelGeneral:
   message: 通用
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Help with translation
 labelHomepage:
   description: Label for home page in about tab.
   message: 主页
