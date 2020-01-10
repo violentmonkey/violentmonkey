@@ -1,4 +1,4 @@
-import { noop, getActiveTab } from '#/common';
+import { getActiveTab, sendTabCmd } from '#/common';
 import ua from '#/common/ua';
 import { commands } from './message';
 
@@ -39,11 +39,7 @@ ua.ready.then(() => {
 browser.tabs.onRemoved.addListener((id) => {
   const openerId = openers[id];
   if (openerId) {
-    browser.tabs.sendMessage(openerId, {
-      cmd: 'TabClosed',
-      data: id,
-    })
-    .catch(noop);
+    sendTabCmd(openerId, 'TabClosed', id);
     delete openers[id];
   }
 });

@@ -1,4 +1,4 @@
-import { i18n, defaultImage, noop } from '#/common';
+import { i18n, defaultImage, sendTabCmd } from '#/common';
 import { commands } from './message';
 
 const openers = {};
@@ -20,22 +20,14 @@ Object.assign(commands, {
 browser.notifications.onClicked.addListener((id) => {
   const openerId = openers[id];
   if (openerId) {
-    browser.tabs.sendMessage(openerId, {
-      cmd: 'NotificationClick',
-      data: id,
-    })
-    .catch(noop);
+    sendTabCmd(openerId, 'NotificationClick', id);
   }
 });
 
 browser.notifications.onClosed.addListener((id) => {
   const openerId = openers[id];
   if (openerId) {
-    browser.tabs.sendMessage(openerId, {
-      cmd: 'NotificationClose',
-      data: id,
-    })
-    .catch(noop);
+    sendTabCmd(openerId, 'NotificationClose', id);
     delete openers[id];
   }
 });

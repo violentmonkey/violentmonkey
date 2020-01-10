@@ -1,9 +1,11 @@
-import { i18n, request, compareVersion } from '#/common';
+import {
+  i18n, request, compareVersion, sendCmd,
+} from '#/common';
 import { CMD_SCRIPT_UPDATE } from '#/common/consts';
 import { getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
-import { commands, notify, sendMessageOrIgnore } from './message';
+import { commands, notify } from './message';
 
 Object.assign(commands, {
   CheckUpdate(id) {
@@ -72,13 +74,7 @@ async function downloadUpdate(script) {
   if (!updateURL) throw false;
   let checkingMeta = true;
   const update = {};
-  const msg = {
-    cmd: CMD_SCRIPT_UPDATE,
-    data: {
-      where: { id: script.props.id },
-      update,
-    },
-  };
+  const result = { update, where: { id: script.props.id } };
   announce(i18n('msgCheckingForUpdate'));
   try {
     const { data } = await request(updateURL, OPTIONS.meta);
@@ -106,6 +102,6 @@ async function downloadUpdate(script) {
       // `null` is sendable in Chrome unlike `undefined`
       error: error?.url || error || null,
     });
-    sendMessageOrIgnore(msg);
+    sendCmd(CMD_SCRIPT_UPDATE, result);
   }
 }

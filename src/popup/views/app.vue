@@ -106,7 +106,9 @@
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import options from '#/common/options';
-import { getLocaleString, i18n, sendCmd } from '#/common';
+import {
+  getLocaleString, i18n, sendCmd, sendTabCmd,
+} from '#/common';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 
@@ -234,10 +236,7 @@ export default {
       window.close();
     },
     onCommand(id, cap) {
-      browser.tabs.sendMessage(this.store.currentTab.id, {
-        cmd: 'Command',
-        data: `${id}:${cap}`,
-      });
+      sendTabCmd(store.currentTab.id, 'Command', `${id}:${cap}`);
     },
     onToggleScript(item) {
       const { data } = item;

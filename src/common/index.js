@@ -34,8 +34,25 @@ export function initHooks() {
   return { hook, fire };
 }
 
+/**
+ * @param {string} cmd
+ * @param data
+ * @param {{retry?: boolean, ignoreError?: boolean}} [options]
+ * @return {Promise}
+ */
 export function sendCmd(cmd, data, options) {
   return sendMessage({ cmd, data }, options);
+}
+
+/**
+ * @param {number} tabId
+ * @param {string} cmd
+ * @param data
+ * @param {{frameId?: number}} [options]
+ * @return {Promise}
+ */
+export function sendTabCmd(tabId, cmd, data, options) {
+  return browser.tabs.sendMessage(tabId, { cmd, data }, options).catch(noop);
 }
 
 // ignoreError is always `true` when sending from the background script because it's a broadcast

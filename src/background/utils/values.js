@@ -1,4 +1,4 @@
-import { noop } from '#/common';
+import { sendTabCmd } from '#/common';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 import { commands } from './message';
 
@@ -96,12 +96,7 @@ function broadcastUpdates(updates) {
   if (updates) {
     const updatedOpeners = Object.keys(updates)
     .reduce((map, scriptId) => Object.assign(map, openers[scriptId]), {});
-    Object.keys(updatedOpeners).forEach((openerId) => {
-      browser.tabs.sendMessage(+openerId, {
-        cmd: 'UpdatedValues',
-        data: updates,
-      })
-      .catch(noop);
-    });
+    Object.keys(updatedOpeners)
+    .forEach(openerId => sendTabCmd(+openerId, 'UpdatedValues', updates));
   }
 }
