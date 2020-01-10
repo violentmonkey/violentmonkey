@@ -1,5 +1,9 @@
 name: Update translations from Transifex
 
+on:
+  schedule:
+    - cron: '0 1 * * 1'
+
 jobs:
   build:
 
@@ -7,6 +11,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install deps
+      run: yarn
     - name: Update translations
       run: 'node scripts/transifex.js'
       env:
@@ -16,3 +22,8 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: i18n-patch
+        title: Update locale files from Transifex
+        body: >-
+          Violentmonkey updates translations from Transifex every week automatically.
+
+          If you want to help with translation into your language, please visit [the transifex platform](https://www.transifex.com/projects/p/violentmonkey-nex/resource/messagesjson/).
