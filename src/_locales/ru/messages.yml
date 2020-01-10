@@ -27,6 +27,9 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: Редактировать
+buttonEmptyRecycleBin:
+  description: Button to empty the recycle bin.
+  message: ''
 buttonEnable:
   description: Button to enable a script.
   message: Включить

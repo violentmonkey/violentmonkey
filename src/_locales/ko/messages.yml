@@ -23,6 +23,9 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: 편집
+buttonEmptyRecycleBin:
+  description: Button to empty the recycle bin.
+  message: ''
 buttonEnable:
   description: Button to enable a script.
   message: 활성화
