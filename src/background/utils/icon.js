@@ -1,6 +1,7 @@
 import { i18n, noop } from '#/common';
 import ua from '#/common/ua';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
+import { postInitialize } from './init';
 import { commands, forEachTab } from './message';
 import { getOption, hookOptions } from './options';
 import { testBlacklist } from './tester';
@@ -46,8 +47,7 @@ hookOptions((changes) => {
   }
 });
 
-global.addEventListener('backgroundInitialized', function onInit(e) {
-  global.removeEventListener(e.type, onInit);
+postInitialize.push(() => {
   isApplied = getOption('isApplied');
   showBadge = getOption('showBadge');
   titleBlacklisted = i18n('failureReasonBlacklisted');

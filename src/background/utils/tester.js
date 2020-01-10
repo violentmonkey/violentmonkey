@@ -1,5 +1,6 @@
 import * as tld from '#/common/tld';
 import cache from './cache';
+import { postInitialize } from './init';
 import { commands } from './message';
 import { getOption, hookOptions } from './options';
 
@@ -7,9 +8,7 @@ Object.assign(commands, {
   TestBlacklist: testBlacklist,
 });
 
-global.addEventListener('backgroundInitialized', () => {
-  resetBlacklist();
-}, { once: true });
+postInitialize.push(resetBlacklist);
 
 tld.initTLD(true);
 

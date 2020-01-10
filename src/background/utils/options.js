@@ -3,7 +3,7 @@ import {
 } from '#/common';
 import { objectGet, objectSet, objectMap } from '#/common/object';
 import defaults from '#/common/options-defaults';
-import { register } from './init';
+import { preInitialize } from './init';
 import { commands } from './message';
 
 Object.assign(commands, {
@@ -23,8 +23,7 @@ const hooks = initHooks();
 const callHooksLater = debounce(callHooks, 100);
 
 let options = {};
-let ready = false;
-const init = browser.storage.local.get('options')
+let initPending = browser.storage.local.get('options')
 .then(({ options: data }) => {
   if (data && typeof data === 'object') options = data;
   if (process.env.DEBUG) {
@@ -33,11 +32,9 @@ const init = browser.storage.local.get('options')
   if (!objectGet(options, 'version')) {
     setOption('version', 1);
   }
-})
-.then(() => {
-  ready = true;
+  initPending = null;
 });
-register(init);
+preInitialize.push(initPending);
 
 function fireChange(keys, value) {
   objectSet(changes, keys, value);
@@ -63,8 +60,8 @@ export function getDefaultOption(key) {
 }
 
 export function setOption(key, value) {
-  if (!ready) {
-    init.then(() => {
+  if (initPending) {
+    initPending.then(() => {
       setOption(key, value);
     });
     return;

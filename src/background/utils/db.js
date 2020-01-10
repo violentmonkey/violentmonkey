@@ -8,7 +8,7 @@ import {
   getNameURI, parseMeta, newScript, getDefaultCustom,
 } from './script';
 import { testScript, testBlacklist } from './tester';
-import { register } from './init';
+import { preInitialize } from './init';
 import { commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
@@ -53,7 +53,7 @@ Object.assign(commands, {
   Vacuum: vacuum,
 });
 
-register(async () => {
+preInitialize.push(async () => {
   const { version: lastVersion } = await browser.storage.local.get('version');
   const { version } = browser.runtime.getManifest();
   if (!lastVersion) await patchDB();
