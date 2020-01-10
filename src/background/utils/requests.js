@@ -51,6 +51,7 @@ const HeaderInjector = (() => {
   /** @param {chrome.webRequest.HttpHeader} header */
   const isVmVerify = header => header.name === VM_VERIFY;
   const isNotCookie = header => !/^cookie$/i.test(header.name);
+  const isNotSetCookie = header => !/^set-cookie$/i.test(header.name);
   const isSendable = header => header.name !== VM_VERIFY;
   const isSendableAnon = header => isSendable(header) && isNotCookie(header);
   const apiEvents = {
@@ -72,16 +73,19 @@ const HeaderInjector = (() => {
       },
     },
     onHeadersReceived: {
-      options: ['responseHeaders', ...EXTRA_HEADERS],
+      options: ['responseHeaders', 'blocking', ...EXTRA_HEADERS],
       /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
-      listener({ responseHeaders, requestId }) {
+      listener({ responseHeaders: headers, requestId }) {
         const req = requests[verify[requestId]];
         if (req) {
+          const oldLength = headers.length;
+          if (req.anonymous) headers = headers.filter(isNotSetCookie);
           // mimic https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/getAllResponseHeaders
-          req.responseHeaders = responseHeaders
+          req.responseHeaders = headers
           .map(({ name, value }) => `${name}: ${value}\r\n`)
           .sort()
           .join('');
+          if (headers.length < oldLength) return { responseHeaders: headers };
         }
       },
     },
@@ -180,7 +184,7 @@ export async function httpRequest(details, src, cb) {
   const {
     anonymous, data, headers, id, method,
     overrideMimeType, password, responseType,
-    timeout, url, user, withCredentials,
+    timeout, url, user,
   } = details;
   const req = requests[id];
   if (!req || req.cb) return;
@@ -191,9 +195,7 @@ export async function httpRequest(details, src, cb) {
     const vmHeaders = [];
     // Firefox doesn't send cookies,
     // https://github.com/violentmonkey/violentmonkey/issues/606
-    let shouldSendCookies = ua.isFirefox && !anonymous && (
-      withCredentials || new URL(url).origin === new URL(src.url).origin
-    );
+    let shouldSendCookies = ua.isFirefox && !anonymous;
     xhr.open(method, url, true, user || '', password || '');
     xhr.setRequestHeader(VM_VERIFY, id);
     if (headers) {
