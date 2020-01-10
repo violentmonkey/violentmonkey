@@ -23,6 +23,9 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: Edit
+buttonEmptyRecycleBin:
+  description: Button to empty the recycle bin.
+  message: Empty recycle bin now!
 buttonEnable:
   description: Button to enable a script.
   message: Enable
@@ -53,9 +56,6 @@ buttonOK:
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Recycle Bin
-buttonEmptyRecycleBin:
-  description: Button to empty the recycle bin.
-  message: Empty recycle bin now!
 buttonRemove:
   description: Button to remove a script.
   message: Remove
