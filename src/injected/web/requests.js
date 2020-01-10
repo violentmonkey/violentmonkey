@@ -109,11 +109,14 @@ function callback(req, msg) {
 
 async function start(req, id) {
   const { details, scriptId } = req;
+  // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
+  // it's true by default per the standard/historical behavior of gmxhr
+  const { withCredentials = true, anonymous = !withCredentials } = details;
   const payload = {
     id,
     scriptId,
+    anonymous,
     ...objectPick(details, [
-      'anonymous',
       'headers',
       'method',
       'overrideMimeType',
@@ -121,7 +124,6 @@ async function start(req, id) {
       'timeout',
       'url',
       'user',
-      'withCredentials',
     ]),
   };
   req.id = id;
