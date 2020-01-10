@@ -2,6 +2,10 @@ const fs = require('fs').promises;
 const spawn = require('cross-spawn');
 const yaml = require('js-yaml');
 
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
 function transifexRequest(url, method = 'GET') {
   return new Promise((resolve, reject) => {
     const child = spawn('curl', [
@@ -12,15 +16,21 @@ function transifexRequest(url, method = 'GET') {
       method,
       `https://www.transifex.com${url}`,
     ], { stdio: ['ignore', 'pipe', 'inherit'] });
-    let stdout = [];
+    const stdoutBuffer = [];
     child.stdout.on('data', chunk => {
-      stdout.push(chunk);
+      stdoutBuffer.push(chunk);
     })
     child.on('exit', (code) => {
       if (code) {
         reject(code);
       } else {
-        resolve(JSON.parse(Buffer.concat(stdout).toString('utf8')));
+        const stdout = Buffer.concat(stdoutBuffer).toString('utf8');
+        try {
+          resolve(JSON.parse(stdout));
+        } catch (err) {
+          console.error('stdout: ' + stdout);
+          throw err;
+        }
       }
     });
   });
@@ -63,7 +73,8 @@ async function main() {
     process.stdout.write(`\rLoading translations (${finished}/${codes.length})...`);
   };
   showProgress();
-  await Promise.all(codes.map(async code => {
+  for (const code of codes) {
+    await delay(500);
     try {
       await extract(code);
     } catch (err) {
@@ -71,7 +82,7 @@ async function main() {
     }
     finished += 1;
     showProgress();
-  }));
+  }
   process.stdout.write('OK\n');
 }
 

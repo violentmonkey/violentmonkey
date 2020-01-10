@@ -173,7 +173,7 @@ function extract(options) {
       return locales.dump()
       .map(out => new Vinyl({
         path: out.path,
-        contents: new Buffer(out.data),
+        contents: Buffer.from(out.data),
       }));
     })
     .then(files => {

@@ -1,5 +1,9 @@
 name: Update translations from Transifex
 
+on:
+  schedule:
+    - cron: '0 1 * * 1'
+
 jobs:
   build:
 
@@ -7,6 +11,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install deps
+      run: yarn
     - name: Update translations
       run: 'node scripts/transifex.js'
       env:
