@@ -19,14 +19,14 @@ Object.assign(commands, {
 
 browser.notifications.onClicked.addListener((id) => {
   const openerId = openers[id];
-  if (openerId) {
+  if (openerId >= 0) {
     sendTabCmd(openerId, 'NotificationClick', id);
   }
 });
 
 browser.notifications.onClosed.addListener((id) => {
   const openerId = openers[id];
-  if (openerId) {
+  if (openerId >= 0) {
     sendTabCmd(openerId, 'NotificationClose', id);
     delete openers[id];
   }

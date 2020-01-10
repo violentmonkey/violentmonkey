@@ -23,7 +23,7 @@ Object.assign(commands, {
   },
   TabClose({ id } = {}, src) {
     const tabId = id || src?.tab?.id;
-    if (tabId) browser.tabs.remove(tabId);
+    if (tabId >= 0) browser.tabs.remove(tabId);
   },
 });
 
@@ -38,7 +38,7 @@ ua.ready.then(() => {
 
 browser.tabs.onRemoved.addListener((id) => {
   const openerId = openers[id];
-  if (openerId) {
+  if (openerId >= 0) {
     sendTabCmd(openerId, 'TabClosed', id);
     delete openers[id];
   }
