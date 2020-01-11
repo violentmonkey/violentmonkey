@@ -1,4 +1,5 @@
 import { parseMeta } from './script';
+import storage from '#/common/storage';
 
 export default () => new Promise((resolve, reject) => {
   console.info('Upgrade database...');
@@ -23,125 +24,63 @@ export default () => new Promise((resolve, reject) => {
     const tx = db.transaction(['scripts', 'require', 'cache', 'values']);
     const updates = {};
     let processing = 3;
-    const onCallback = () => {
+    const done = () => {
       processing -= 1;
       if (!processing) resolve(browser.storage.local.set(updates));
     };
-    getAllScripts(tx, (items) => {
+    const getAll = (storeName, callback) => {
+      const req = tx.objectStore(storeName).getAll();
+      req.onsuccess = () => callback(req.result);
+      req.onerror = reject;
+    };
+    getAll('scripts', (allScripts) => {
       const uriMap = {};
-      items.forEach(({ script, code }) => {
-        updates[`scr:${script.props.id}`] = script;
-        updates[`code:${script.props.id}`] = code;
-        uriMap[script.props.uri] = script.props.id;
+      allScripts.forEach((script) => {
+        const { code, id, uri } = script;
+        updates[`${storage.script.prefix}${id}`] = transformScript(script);
+        updates[`${storage.code.prefix}${id}`] = code;
+        uriMap[uri] = id;
       });
-      getAllValues(tx, (data) => {
-        data.forEach(({ id, values }) => {
-          updates[`val:${id}`] = values;
+      getAll('values', (allValues) => {
+        allValues.forEach(({ uri, values }) => {
+          const id = uriMap[uri];
+          if (id) updates[`${storage.value.prefix}${id}`] = values;
         });
-        onCallback();
-      }, uriMap);
-    });
-    getAllCache(tx, (cache) => {
-      cache.forEach(({ uri, data }) => {
-        updates[`cac:${uri}`] = data;
+        done();
       });
-      onCallback();
     });
-    getAllRequire(tx, (data) => {
-      data.forEach(({ uri, code }) => {
-        updates[`req:${uri}`] = code;
+    getAll('cache', (allCache) => {
+      allCache.forEach(({ uri, data }) => {
+        updates[`${storage.cache.prefix}${uri}`] = data;
       });
-      onCallback();
+      done();
     });
-  }
-  function getAllScripts(tx, callback) {
-    const os = tx.objectStore('scripts');
-    const list = [];
-    const req = os.openCursor();
-    req.onsuccess = (e) => {
-      const cursor = e.target.result;
-      if (cursor) {
-        const { value } = cursor;
-        list.push(transformScript(value));
-        cursor.continue();
-      } else {
-        callback(list);
-      }
-    };
-    req.onerror = reject;
-  }
-  function getAllCache(tx, callback) {
-    const os = tx.objectStore('cache');
-    const list = [];
-    const req = os.openCursor();
-    req.onsuccess = (e) => {
-      const cursor = e.target.result;
-      if (cursor) {
-        const { value: { uri, data } } = cursor;
-        list.push({ uri, data });
-        cursor.continue();
-      } else {
-        callback(list);
-      }
-    };
-    req.onerror = reject;
-  }
-  function getAllRequire(tx, callback) {
-    const os = tx.objectStore('require');
-    const list = [];
-    const req = os.openCursor();
-    req.onsuccess = (e) => {
-      const cursor = e.target.result;
-      if (cursor) {
-        const { value: { uri, code } } = cursor;
-        list.push({ uri, code });
-        cursor.continue();
-      } else {
-        callback(list);
-      }
-    };
-    req.onerror = reject;
-  }
-  function getAllValues(tx, callback, uriMap) {
-    const os = tx.objectStore('values');
-    const list = [];
-    const req = os.openCursor();
-    req.onsuccess = (e) => {
-      const cursor = e.target.result;
-      if (cursor) {
-        const { value: { uri, values } } = cursor;
-        const id = uriMap[uri];
-        if (id) list.push({ id, values });
-        cursor.continue();
-      } else {
-        callback(list);
-      }
-    };
-    req.onerror = reject;
+    getAll('require', (allRequire) => {
+      allRequire.forEach(({ uri, code }) => {
+        updates[`${storage.require.prefix}${uri}`] = code;
+      });
+      done();
+    });
   }
   function transformScript(script) {
-    const item = {
-      script: {
-        meta: parseMeta(script.code),
-        custom: Object.assign({
-          origInclude: true,
-          origExclude: true,
-          origMatch: true,
-          origExcludeMatch: true,
-        }, script.custom),
-        props: {
-          id: script.id,
-          uri: script.uri,
-          position: script.position,
-        },
-        config: {
-          enabled: script.enabled,
-          shouldUpdate: script.update,
-        },
+    return {
+      meta: parseMeta(script.code),
+      custom: Object.assign({
+        origInclude: true,
+        origExclude: true,
+        origMatch: true,
+        origExcludeMatch: true,
+      }, script.custom),
+      props: {
+        id: script.id,
+        uri: script.uri,
+        position: script.position,
       },
-      code: script.code,
+      config: {
+        enabled: script.enabled,
+        shouldUpdate: script.update,
+      },
     };
-    return item;
   }
 })
 // Ignore error
