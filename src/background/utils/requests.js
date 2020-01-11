@@ -50,8 +50,8 @@ const HeaderInjector = (() => {
   const headersToInject = {};
   /** @param {chrome.webRequest.HttpHeader} header */
   const isVmVerify = header => header.name === VM_VERIFY;
-  const isNotCookie = header => !/^cookie$/i.test(header.name);
-  const isNotSetCookie = header => !/^set-cookie$/i.test(header.name);
+  const isNotCookie = header => !/^cookie2?$/i.test(header.name);
+  const isNotSetCookie = header => !/^set-cookie2?$/i.test(header.name);
   const isSendable = header => header.name !== VM_VERIFY;
   const isSendableAnon = header => isSendable(header) && isNotCookie(header);
   const apiEvents = {
