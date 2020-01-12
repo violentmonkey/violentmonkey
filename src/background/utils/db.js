@@ -22,34 +22,69 @@ storage.script.onDump = (item) => {
 Object.assign(commands, {
   CheckPosition: sortScripts,
   CheckRemove: checkRemove,
+  /** @return {string | null} */
   CheckScript({ name, namespace }) {
     const script = getScript({ meta: { name, namespace } });
     return script && !script.config.removed
       ? script.meta.version
       : null;
   },
-  ExportZip({ values }) {
-    return getExportData(values);
+  /** @return {Promise<{ items: VMScript[], values? }>} */
+  async ExportZip({ values }) {
+    const scripts = getScripts();
+    const ids = scripts.map(getPropsId);
+    const codeMap = await storage.code.getMulti(ids);
+    return {
+      items: scripts.map(script => ({ script, code: codeMap[script.props.id] })),
+      values: values ? await storage.value.getMulti(ids) : undefined,
+    };
   },
-  GetScriptCode: getScriptCode,
-  GetMetas: getScriptByIds,
+  /** @return {Promise<string>} */
+  GetScriptCode(id) {
+    return storage.code.getOne(id);
+  },
+  /** @return {VMScript[]} */
+  GetMetas(ids) {
+    return ids.map(getScriptById).filter(Boolean);
+  },
+  /** @return {Promise<void>} */
   MarkRemoved({ id, removed }) {
-    return markRemoved(id, removed);
+    return updateScriptInfo(id, {
+      config: { removed: removed ? 1 : 0 },
+      props: { lastModified: Date.now() },
+    });
   },
+  /** @return {Promise<number>} */
   Move({ id, offset }) {
-    return moveScript(id, offset);
+    const script = getScriptById(id);
+    const index = store.scripts.indexOf(script);
+    store.scripts.splice(index, 1);
+    store.scripts.splice(index + offset, 0, script);
+    return normalizePosition();
   },
-  RemoveScript(id) {
-    return removeScript(id);
+  /** @return {Promise<void>} */
+  async RemoveScript(id) {
+    const i = store.scripts.indexOf(getScriptById(id));
+    if (i >= 0) {
+      store.scripts.splice(i, 1);
+      await Promise.all([
+        storage.script.remove(id),
+        storage.code.remove(id),
+        storage.value.remove(id),
+      ]);
+    }
+    return sendCmd('RemoveScript', id);
   },
   ParseMeta: parseMeta,
   ParseScript: parseScript,
+  /** @return {Promise<void>} */
   UpdateScriptInfo({ id, config }) {
     return updateScriptInfo(id, {
       config,
       props: { lastModified: Date.now() },
     });
   },
+  /** @return {Promise<void>} */
   Vacuum: vacuum,
 });
 
@@ -121,6 +156,11 @@ function getInt(val) {
   return +val || 0;
 }
 
+/** @return {?number} */
+function getPropsId(script) {
+  return script?.props.id;
+}
+
 /** @return {void} */
 function updateLastModified() {
   setOption('lastModified', Date.now());
@@ -170,16 +210,6 @@ export function getScript({ id, uri, meta }) {
 /** @return {VMScript[]} */
 export function getScripts() {
   return store.scripts.filter(script => !script.config.removed);
-}
-
-/** @return {VMScript[]} */
-export function getScriptByIds(ids) {
-  return ids.map(getScriptById).filter(Boolean);
-}
-
-/** @return {Promise<string>} */
-export function getScriptCode(id) {
-  return storage.code.getOne(id);
 }
 
 /**
@@ -244,8 +274,8 @@ export async function getScriptsByURL(url) {
   const [require, cache, values, code] = await Promise.all([
     storage.require.getMulti(Object.keys(reqKeys)),
     storage.cache.getMulti(Object.keys(cacheKeys)),
-    storage.value.getMulti(scriptsWithValue.map(script => script.props.id), {}),
-    storage.code.getMulti(enabledScripts.map(script => script.props.id)),
+    storage.value.getMulti(scriptsWithValue.map(getPropsId), {}),
+    storage.code.getMulti(enabledScripts.map(getPropsId)),
   ]);
   return {
     scripts,
@@ -286,60 +316,12 @@ export function checkRemove({ force } = {}) {
   ));
   if (toRemove.length) {
     store.scripts = store.scripts.filter(script => !script.config.removed);
-    const ids = toRemove.map(script => script.props.id);
+    const ids = toRemove.map(getPropsId);
     storage.script.removeMulti(ids);
     storage.code.removeMulti(ids);
     storage.value.removeMulti(ids);
   }
   return toRemove.length;
-}
-
-/** @return {Promise} */
-export async function removeScript(id) {
-  const i = store.scripts.indexOf(getScriptById(id));
-  if (i >= 0) {
-    store.scripts.splice(i, 1);
-    await Promise.all([
-      storage.script.remove(id),
-      storage.code.remove(id),
-      storage.value.remove(id),
-    ]);
-  }
-  return sendCmd('RemoveScript', id);
-}
-
-/** @return {Promise} */
-export function markRemoved(id, removed) {
-  return updateScriptInfo(id, {
-    config: {
-      removed: removed ? 1 : 0,
-    },
-    props: {
-      lastModified: Date.now(),
-    },
-  });
-}
-
-/** @return {Promise<number>} */
-export function moveScript(id, offset) {
-  const index = store.scripts.indexOf(getScriptById(id));
-  const step = offset > 0 ? 1 : -1;
-  const indexStart = index;
-  const indexEnd = index + offset;
-  const offsetI = Math.min(indexStart, indexEnd);
-  const offsetJ = Math.max(indexStart, indexEnd);
-  const updated = store.scripts.slice(offsetI, offsetJ + 1);
-  if (step > 0) {
-    updated.push(updated.shift());
-  } else {
-    updated.unshift(updated.pop());
-  }
-  store.scripts = [
-    ...store.scripts.slice(0, offsetI),
-    ...updated,
-    ...store.scripts.slice(offsetJ + 1),
-  ];
-  return normalizePosition();
 }
 
 /** @return {string} */
@@ -372,8 +354,8 @@ async function saveScript(script, code) {
     throw i18n('msgNamespaceConflict');
   }
   if (oldScript) {
-    script.config = Object.assign({}, oldScript.config, config);
-    script.props = Object.assign({}, oldScript.props, props);
+    script.config = { ...oldScript.config, ...config };
+    script.props = { ...oldScript.props, ...props };
     const index = store.scripts.indexOf(oldScript);
     store.scripts[index] = script;
   } else {
@@ -397,24 +379,10 @@ async function saveScript(script, code) {
 export async function updateScriptInfo(id, data) {
   const script = store.scriptMap[id];
   if (!script) throw null;
-  script.props = Object.assign({}, script.props, data.props);
-  script.config = Object.assign({}, script.config, data.config);
-  // script.custom = Object.assign({}, script.custom, data.custom);
+  script.props = { ...script.props, ...data.props };
+  script.config = { ...script.config, ...data.config };
   await storage.script.dump(script);
   return sendCmd(CMD_SCRIPT_UPDATE, { where: { id }, update: script });
-}
-
-/** @return {Promise} */
-export async function getExportData(withValues) {
-  const scripts = getScripts();
-  const ids = scripts.map(({ props: { id } }) => id);
-  const codeMap = await storage.code.getMulti(ids);
-  return {
-    items: scripts.map(script => ({ script, code: codeMap[script.props.id] })),
-    ...withValues && {
-      values: await storage.value.getMulti(ids),
-    },
-  };
 }
 
 /** @return {Promise} */
