@@ -32,7 +32,6 @@ export default function initialize(
   } else {
     bridge.mode = INJECT_PAGE;
     bridge.post = bindEvents(webId, contentId, bridge.onHandle);
-    bridge.post.asString = isFirefox;
   }
   document.addEventListener('DOMContentLoaded', async () => {
     store.state = 1;

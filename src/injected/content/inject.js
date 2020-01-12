@@ -77,7 +77,6 @@ export function injectScripts(contentId, webId, data, scriptLists) {
     data.isFirefox,
   ];
   bridge.isFirefox = data.isFirefox;
-  bridge.post.asString = data.isFirefox;
 
   const injectPage = scriptLists[INJECT_PAGE];
   const injectContent = scriptLists[INJECT_CONTENT];

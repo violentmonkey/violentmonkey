@@ -19,8 +19,9 @@ const menus = {};
 const { split } = String.prototype;
 
 export default async function initialize(contentId, webId) {
-  // may be overriden in injectScripts
-  bridge.post = bindEvents(contentId, webId, bridge.onHandle);
+  // 1) bridge.post may be overriden in injectScripts
+  // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
+  bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
   bridge.destId = webId;
   setJsonDump({ native: true });
   const data = await sendCmd('GetInjected', window.location.href, { retry: true });
