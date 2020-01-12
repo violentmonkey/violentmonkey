@@ -120,3 +120,16 @@ export function log(level, tags, ...args) {
   const prefix = tagList::map(tag => `[${tag}]`)::join('');
   logging[level](prefix, ...args);
 }
+
+// uses ::safe calls unlike buffer2string in #/common
+export function buffer2stringSafe(buf) {
+  const size = buf.byteLength;
+  // The max number of arguments varies between JS engines but it's >32k so 10k is safe
+  const stepSize = 10e3;
+  const stringChunks = [];
+  for (let from = 0; from < size; from += stepSize) {
+    const sourceChunk = new Uint8Array(buf, from, Math.min(stepSize, size - from));
+    stringChunks::push(fromCharCode(...sourceChunk));
+  }
+  return stringChunks::join('');
+}

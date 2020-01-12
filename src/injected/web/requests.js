@@ -1,7 +1,7 @@
 import { objectPick } from '#/common/object';
 import {
-  filter, includes, join, map, push, jsonDump, jsonLoad, objectToString, Promise, Uint8Array,
-  setAttribute, log, fromCharCode, shift, slice, defineProperty,
+  filter, includes, map, push, jsonDump, jsonLoad, objectToString, Promise, Uint8Array,
+  setAttribute, log, buffer2stringSafe, charCodeAt, shift, slice, defineProperty,
   createElementNS, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -9,8 +9,7 @@ import bridge from './bridge';
 const idMap = {};
 const queue = [];
 
-const { DOMParser, fetch } = global;
-const { blob: getBlob, arrayBuffer: getArrayBuffer } = Response.prototype;
+const { DOMParser } = global;
 const { parseFromString } = DOMParser.prototype;
 const { toLowerCase } = String.prototype;
 const getHref = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
@@ -40,15 +39,18 @@ export function onRequestCreate(details, scriptId) {
   queue::push(req);
   bridge.post({
     cmd: 'GetRequestId',
-    data: [
-      'abort',
-      'error',
-      'load',
-      // 'loadend' will always be sent for internal cleanup
-      'progress',
-      'readystatechange',
-      'timeout',
-    ]::filter(e => typeof details[`on${e}`] === 'function'),
+    data: {
+      eventsToNotify: [
+        'abort',
+        'error',
+        'load',
+        // 'loadend' will always be sent for internal cleanup
+        'progress',
+        'readystatechange',
+        'timeout',
+      ]::filter(e => typeof details[`on${e}`] === 'function'),
+      wantsBlob: details.responseType === 'blob',
+    },
   });
   return req.req;
 }
@@ -66,27 +68,28 @@ function parseData(response, req, details) {
     const type = req.contentType.split(';', 1)[0] || 'text/html';
     return new DOMParser()::parseFromString(response, type);
   }
-  // arraybuffer, blob, text
+  // arraybuffer, blob
+  if (req.isBlob) {
+    const len = response.length;
+    const arr = new Uint8Array(len);
+    for (let i = 0; i < len; i += 1) arr[i] = response::charCodeAt(i);
+    return responseType === 'blob'
+      ? new Blob([arr], { type: req.contentType })
+      : arr.buffer;
+  }
+  // text
   return response;
 }
 
 // request object functions
-async function callback(req, msg) {
+function callback(req, msg) {
   const cb = req.details[`on${msg.type}`];
   if (cb) {
-    const reqType = req.details.responseType;
     const { data } = msg;
-    let { response } = data;
-    const url = msg.isBlob && response;
-    if (response && !('rawResponse' in req) && (reqType || 'text') !== 'text') {
-      // the second message may be issued while blob is still being processed,
-      // so we'll temporarily store the Promise which can be awaited in the second message
-      if (url) response = (await fetch(url))::(reqType === 'blob' ? getBlob : getArrayBuffer)();
-      req.rawResponse = response;
-    }
-    if (req.rawResponse?.then) {
-      req.rawResponse = await req.rawResponse;
-      bridge.post({ cmd: 'RevokeObjectURL', data: url });
+    if (data.response
+    && !('rawResponse' in req)
+    && (req.details.responseType || 'text') !== 'text') {
+      req.rawResponse = data.response;
     }
     if ('rawResponse' in req) {
       defineProperty(data, 'response', {
@@ -164,24 +167,13 @@ async function encodeBody(body) {
   case 'file':
     return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onload = () => {
-        const buf = reader.result;
-        const size = buf.byteLength;
-        // The max number of arguments varies between JS engines but it's >32k so 10k is safe
-        const stepSize = 10e3;
-        const stringChunks = [];
-        for (let from = 0; from < size; from += stepSize) {
-          const sourceChunk = new Uint8Array(buf, from, Math.min(stepSize, size - from));
-          stringChunks::push(fromCharCode(...sourceChunk));
-        }
-        resolve({
-          cls,
-          value: stringChunks::join(''),
-          type: body.type,
-          name: body.name,
-          lastModified: body.lastModified,
-        });
-      };
+      reader.onload = () => resolve({
+        cls,
+        value: buffer2stringSafe(reader.result),
+        type: body.type,
+        name: body.name,
+        lastModified: body.lastModified,
+      });
       reader::readAsArrayBuffer(body);
     });
   default:
