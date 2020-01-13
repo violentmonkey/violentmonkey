@@ -14,7 +14,8 @@ Object.assign(commands, {
   CheckUpdateAll() {
     setOption('lastUpdate', Date.now());
     const toUpdate = getScripts().filter(item => item.config.shouldUpdate);
-    return Promise.all(toUpdate.map(checkUpdate));
+    const results = await Promise.all(toUpdate.map(checkUpdate));
+    return results.includes(true);
   },
 });
 
