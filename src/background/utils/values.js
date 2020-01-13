@@ -8,15 +8,18 @@ let cache;
 let timer;
 
 Object.assign(commands, {
+  /** @return {Promise<Object>} */
   async GetValueStore(id) {
     const stores = await getValueStoresByIds([id]);
     return stores[id] || {};
   },
+  /** @return {Promise<void>} */
   async SetValueStore({ where, valueStore }) {
     // Value store will be replaced soon.
     const store = await dumpValueStore(where, valueStore);
-    return broadcastUpdates(store);
+    broadcastUpdates(store);
   },
+  /** @return {Promise<void>} */
   UpdateValue({ id, update }) {
     // Value will be updated to store later.
     updateLater();

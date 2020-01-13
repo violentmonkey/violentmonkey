@@ -14,6 +14,7 @@ const verify = {};
 
 Object.assign(commands, {
   ConfirmInstall: confirmInstall,
+  /** @return {string} */
   GetRequestId(eventsToNotify = []) {
     eventsToNotify.push('loadend');
     const id = getUniqId();
@@ -24,12 +25,14 @@ Object.assign(commands, {
     };
     return id;
   },
+  /** @return {void} */
   HttpRequest(details, src) {
     const { tab, frameId } = src;
     httpRequest(details, src, res => (
       sendTabCmd(tab.id, 'HttpRequested', res, { frameId })
     ));
   },
+  /** @return {void} */
   AbortRequest(id) {
     const req = requests[id];
     if (req) {
