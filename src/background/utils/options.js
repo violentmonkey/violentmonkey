@@ -7,12 +7,15 @@ import { preInitialize } from './init';
 import { commands } from './message';
 
 Object.assign(commands, {
+  /** @return {Object} */
   GetAllOptions() {
     return commands.GetOptions(defaults);
   },
+  /** @return {Object} */
   GetOptions(data) {
     return objectMap(data, key => getOption(key));
   },
+  /** @return {void} */
   SetOptions(data) {
     ensureArray(data).forEach(item => setOption(item.key, item.value));
   },

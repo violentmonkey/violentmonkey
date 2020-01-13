@@ -5,6 +5,7 @@ import { commands } from './message';
 const openers = {};
 
 Object.assign(commands, {
+  /** @return {Promise<{ id: number }>} */
   async TabOpen({ url, active, insert = true }, src) {
     // src.tab may be absent when invoked from popup (e.g. edit/create buttons)
     const { id: openerTabId, index, windowId } = src?.tab || await getActiveTab() || {};
@@ -21,6 +22,7 @@ Object.assign(commands, {
     openers[id] = openerTabId;
     return { id };
   },
+  /** @return {void} */
   TabClose({ id } = {}, src) {
     const tabId = id || src?.tab?.id;
     if (tabId >= 0) browser.tabs.remove(tabId);

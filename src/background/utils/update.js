@@ -8,10 +8,12 @@ import { getOption, setOption } from './options';
 import { commands, notify } from './message';
 
 Object.assign(commands, {
+  /** @return {Promise<true?>} */
   CheckUpdate(id) {
     return checkUpdate(getScriptById(id));
   },
-  CheckUpdateAll() {
+  /** @return {Promise<boolean>} */
+  async CheckUpdateAll() {
     setOption('lastUpdate', Date.now());
     const toUpdate = getScripts().filter(item => item.config.shouldUpdate);
     const results = await Promise.all(toUpdate.map(checkUpdate));

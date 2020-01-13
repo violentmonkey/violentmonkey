@@ -6,17 +6,20 @@ import { getOption } from './options';
 import cache from './cache';
 
 Object.assign(commands, {
+  /** @return {string} */
   CacheNewScript(data) {
     const id = getUniqId();
     cache.put(`new-${id}`, newScript(data));
     return id;
   },
+  /** @return {Promise<Array>} */
   InjectScript(code, src) {
     return browser.tabs.executeScript(src.tab.id, {
       code,
       runAt: 'document_start',
     });
   },
+  /** @return {VMScript} */
   NewScript(id) {
     return id && cache.get(`new-${id}`) || newScript();
   },

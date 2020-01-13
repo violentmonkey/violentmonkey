@@ -34,12 +34,14 @@ hookOptions((changes) => {
 });
 
 Object.assign(commands, {
+  /** @return {Promise<Object>} */
   async GetData() {
     const data = await getData();
     data.sync = sync.getStates();
     data.version = VM_VER;
     return data;
   },
+  /** @return {Promise<Object>} */
   async GetInjected(url, src) {
     const { id: tabId } = src.tab || {};
     if (src.frameId === 0) resetValueOpener(tabId);

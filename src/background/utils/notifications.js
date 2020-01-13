@@ -4,6 +4,7 @@ import { commands } from './message';
 const openers = {};
 
 Object.assign(commands, {
+  /** @return {Promise<string>} */
   async Notification(data, src) {
     const srcTab = src.tab || {};
     const notificationId = await browser.notifications.create({

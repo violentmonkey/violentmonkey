@@ -22,7 +22,7 @@ storage.script.onDump = (item) => {
 Object.assign(commands, {
   CheckPosition: sortScripts,
   CheckRemove: checkRemove,
-  /** @return {string | null} */
+  /** @return {?string} */
   CheckScript({ name, namespace }) {
     const script = getScript({ meta: { name, namespace } });
     return script && !script.config.removed
@@ -102,14 +102,14 @@ preInitialize.push(async () => {
   const idMap = {};
   const uriMap = {};
   Object.entries(data).forEach(([key, script]) => {
-    if (key.startsWith('scr:')) {
+    if (key.startsWith(storage.script.prefix)) {
       // {
       //   meta,
       //   custom,
       //   props: { id, position, uri },
       //   config: { enabled, shouldUpdate },
       // }
-      const id = getInt(key.slice(4));
+      const id = getInt(key.slice(storage.script.prefix.length));
       if (!id || idMap[id]) {
         // ID conflicts!
         // Should not happen, discard duplicates.
@@ -190,12 +190,12 @@ export async function sortScripts() {
   return changed;
 }
 
-/** @return {VMScript} */
+/** @return {?VMScript} */
 export function getScriptById(id) {
   return store.scriptMap[id];
 }
 
-/** @return {VMScript} */
+/** @return {?VMScript} */
 export function getScript({ id, uri, meta }) {
   let script;
   if (id) {
@@ -215,7 +215,7 @@ export function getScripts() {
 /**
  * @desc Load values for batch updates.
  * @param {number[]} ids
- * @return {Promise}
+ * @return {Promise<Object>}
  */
 export function getValueStoresByIds(ids) {
   return storage.value.getMulti(ids);
@@ -224,7 +224,7 @@ export function getValueStoresByIds(ids) {
 /**
  * @desc Dump values for batch updates.
  * @param {Object} valueDict { id1: value1, id2: value2, ... }
- * @return {Promise}
+ * @return {Promise<Object>}
  */
 export async function dumpValueStores(valueDict) {
   if (process.env.DEBUG) console.info('Update value stores', valueDict);
@@ -232,7 +232,7 @@ export async function dumpValueStores(valueDict) {
   return valueDict;
 }
 
-/** @return {Promise<Object|undefined>} */
+/** @return {Promise<?Object>} */
 export async function dumpValueStore(where, valueStore) {
   const id = where.id || getScript(where)?.props.id;
   return id && dumpValueStores({ [id]: valueStore });
@@ -247,7 +247,7 @@ const gmValues = [
 
 /**
  * @desc Get scripts to be injected to page with specific URL.
- * @return {Promise}
+ * @return {Promise<{ scripts, require, cache, values, code }>}
  */
 export async function getScriptsByURL(url) {
   const scripts = testBlacklist(url)
@@ -299,7 +299,7 @@ function getIconUrls() {
 
 /**
  * @desc Get data for dashboard.
- * @return {Promise}
+ * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
 export async function getData() {
   return {
@@ -333,7 +333,7 @@ function getUUID(id) {
 /**
  * @param {VMScript} script
  * @param {string} code
- * @return {Promise<Array>} [VMScript, codeString]
+ * @return {Promise<VMScript[]>}
  */
 async function saveScript(script, code) {
   const config = script.config || {};
@@ -375,7 +375,7 @@ async function saveScript(script, code) {
   ]);
 }
 
-/** @return {Promise} */
+/** @return {Promise<void>} */
 export async function updateScriptInfo(id, data) {
   const script = store.scriptMap[id];
   if (!script) throw null;
@@ -385,7 +385,7 @@ export async function updateScriptInfo(id, data) {
   return sendCmd(CMD_SCRIPT_UPDATE, { where: { id }, update: script });
 }
 
-/** @return {Promise} */
+/** @return {Promise<{ isNew?, update, where }>} */
 export async function parseScript(src) {
   const meta = parseMeta(src.code);
   if (!meta.name) throw i18n('msgInvalidScript');
@@ -590,19 +590,19 @@ export async function vacuum() {
  * @property {string} description
  * @property {string} downloadURL
  * @property {string[]} exclude
- * @property {string[]} exclude-match
+ * @property {string[]} excludeMatch
  * @property {string[]} grant
  * @property {string} homepageURL
  * @property {string} icon
  * @property {string[]} include
- * @property {'auto' | 'page' | 'content'} inject-into
+ * @property {'auto' | 'page' | 'content'} injectInto
  * @property {string[]} match
  * @property {string} namespace
  * @property {string} name
  * @property {boolean} noframes
  * @property {string[]} require
  * @property {Object} resource
- * @property {VMScriptRunAt} run-at
+ * @property {VMScriptRunAt} runAt
  * @property {string} supportURL
  * @property {string} version
  */
