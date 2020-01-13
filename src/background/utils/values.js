@@ -38,7 +38,7 @@ export function resetValueOpener(openerId) {
   if (scriptMap) {
     Object.keys(scriptMap).forEach((scriptId) => {
       const map = openers[scriptId];
-      if (map >= 0) delete map[openerId];
+      if (map) delete map[openerId];
     });
     delete tabScripts[openerId];
   }
@@ -53,7 +53,7 @@ export function addValueOpener(openerId, scriptIds) {
   scriptIds.forEach((scriptId) => {
     scriptMap[scriptId] = 1;
     let openerMap = openers[scriptId];
-    if (openerMap === undefined) {
+    if (!openerMap) {
       openerMap = {};
       openers[scriptId] = openerMap;
     }
