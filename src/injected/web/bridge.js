@@ -7,8 +7,7 @@ export default {
   addHandlers(obj) {
     assign(handlers, obj);
   },
-  onHandle(obj) {
-    const handle = handlers[obj.cmd];
-    if (handle) handle(obj.data);
+  onHandle({ cmd, data }) {
+    handlers[cmd]?.(data);
   },
 };

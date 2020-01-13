@@ -22,18 +22,16 @@ import initialize from './content';
   const { get: getReadyState } = Object.getOwnPropertyDescriptor(Document.prototype, 'readyState');
   // For installation
   // Firefox does not support `onBeforeRequest` for `file:`
-  function checkJS() {
+  async function checkJS() {
     if (!document::querySelector('title')) {
       // plain text
-      sendCmd('ConfirmInstall', {
+      await sendCmd('ConfirmInstall', {
         code: document.body.textContent,
         url: window.location.href,
         from: document.referrer,
-      })
-      .then(() => {
-        if (window.history.length > 1) window.history::go(-1);
-        else sendCmd('TabClose');
       });
+      if (window.history.length > 1) window.history::go(-1);
+      else sendCmd('TabClose');
     }
   }
   if (window.location.pathname::match(/\.user\.js$/)) {

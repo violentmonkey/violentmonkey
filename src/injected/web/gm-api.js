@@ -62,16 +62,8 @@ export function createGmApiProps() {
     GM_addValueChangeListener(key, fn) {
       if (typeof key !== 'string') key = `${key}`;
       if (typeof fn !== 'function') return;
-      let keyHooks = changeHooks[this.id];
-      if (!keyHooks) {
-        keyHooks = {};
-        changeHooks[this.id] = keyHooks;
-      }
-      let hooks = keyHooks[key];
-      if (!hooks) {
-        hooks = {};
-        keyHooks[key] = hooks;
-      }
+      const keyHooks = changeHooks[this.id] || (changeHooks[this.id] = {});
+      const hooks = keyHooks[key] || (keyHooks[key] = {});
       const i = objectValues(hooks)::indexOf(fn);
       let listenerId = i >= 0 && objectKeys(hooks)[i];
       if (!listenerId) {
@@ -125,14 +117,14 @@ export function createGmApiProps() {
       const { id } = this;
       const key = `${id}:${cap}`;
       store.commands[key] = func;
-      bridge.post({ cmd: 'RegisterMenu', data: [id, cap] });
+      bridge.post('RegisterMenu', [id, cap]);
       return cap;
     },
     GM_unregisterMenuCommand(cap) {
       const { id } = this;
       const key = `${id}:${cap}`;
       delete store.commands[key];
-      bridge.post({ cmd: 'UnregisterMenu', data: [id, cap] });
+      bridge.post('UnregisterMenu', [id, cap]);
     },
     GM_download(arg1, name) {
       const opts = typeof arg1 === 'string' ? { url: arg1, name } : arg1;
@@ -164,7 +156,7 @@ export function createGmApiProps() {
       const callbackId = registerCallback((styleId) => {
         el = document::getElementById(styleId);
       });
-      bridge.post({ cmd: 'AddStyle', data: { css, callbackId } });
+      bridge.post('AddStyle', { css, callbackId });
       // Mock a Promise without the need for polyfill
       // It's not actually necessary because DOM messaging is synchronous
       // but we keep it for compatibility with VM's 2017-2019 behavior
@@ -196,10 +188,7 @@ export function createGmApiProps() {
       onNotificationCreate(options);
     },
     GM_setClipboard(data, type) {
-      bridge.post({
-        cmd: 'SetClipboard',
-        data: { type, data },
-      });
+      bridge.post('SetClipboard', { data, type });
     },
   };
   // convert to object property descriptors

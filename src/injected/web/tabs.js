@@ -8,8 +8,7 @@ bridge.addHandlers({
     const item = tabs[key];
     if (item) {
       item.closed = true;
-      const { onclose } = item;
-      if (onclose) onclose();
+      item.onclose?.();
       delete tabs[key];
     }
   },
@@ -22,10 +21,10 @@ export function onTabCreate(data) {
     onclose: null,
     closed: false,
     close() {
-      bridge.post({ cmd: 'TabClose', data: key });
+      bridge.post('TabClose', key);
     },
   };
   tabs[key] = item;
-  bridge.post({ cmd: 'TabOpen', data: { key, data } });
+  bridge.post('TabOpen', { key, data });
   return item;
 }

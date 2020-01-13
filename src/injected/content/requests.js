@@ -12,7 +12,7 @@ bridge.addHandlers({
   async GetRequestId({ eventsToNotify, wantsBlob }, realm) {
     const id = await sendCmd('GetRequestId', eventsToNotify);
     requests[id] = { realm, eventsToNotify, wantsBlob };
-    bridge.post({ cmd: 'GotRequestId', data: id, realm });
+    bridge.post('GotRequestId', id, realm);
   },
   HttpRequest: sendMessage,
   AbortRequest: sendMessage,
@@ -40,7 +40,7 @@ bridge.addBackgroundHandlers({
       if (isLoadEnd) await 0;
       msg.data.response = req.blob;
     }
-    bridge.post({ cmd: 'HttpRequested', data: msg, realm });
+    bridge.post('HttpRequested', msg, realm);
     if (isLoadEnd) delete requests[msg.id];
   },
 });

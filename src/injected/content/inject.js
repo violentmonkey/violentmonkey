@@ -84,31 +84,22 @@ export function injectScripts(contentId, webId, data, scriptLists) {
     const invokeGuest = VMInitInjection()(...args, bridge.onHandle);
     const postViaBridge = bridge.post;
     bridge.invokableIds.push(...injectContent.map(({ script }) => script.props.id));
-    bridge.post = msg => (
-      msg.realm === INJECT_CONTENT
-        ? invokeGuest(msg)
-        : postViaBridge(msg)
-    );
-    bridge.post({
-      cmd: 'LoadScripts',
-      data: {
-        ...data,
-        mode: INJECT_CONTENT,
-        items: injectContent,
-      },
-      realm: INJECT_CONTENT,
-    });
+    bridge.post = (cmd, params, realm) => {
+      (realm === INJECT_CONTENT ? invokeGuest : postViaBridge)({ cmd, data: params });
+    };
+    bridge.post('LoadScripts', {
+      ...data,
+      mode: INJECT_CONTENT,
+      items: injectContent,
+    }, INJECT_CONTENT);
   }
   if (injectPage.length) {
     // Avoid using Function::apply in case it is shimmed
     inject(`(${VMInitInjection}())(${jsonDump(args).slice(1, -1)})`);
-    bridge.post({
-      cmd: 'LoadScripts',
-      data: {
-        ...data,
-        mode: INJECT_PAGE,
-        items: injectPage,
-      },
+    bridge.post('LoadScripts', {
+      ...data,
+      mode: INJECT_PAGE,
+      items: injectPage,
     });
   }
   if (injectContent.length) {

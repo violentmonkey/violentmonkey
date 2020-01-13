@@ -25,7 +25,7 @@ export default function initialize(
   bridge.isFirefox = isFirefox;
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;
-    bridge.post = msg => invokeHost(msg, INJECT_CONTENT);
+    bridge.post = (cmd, data) => invokeHost({ cmd, data }, INJECT_CONTENT);
     invokeGuest = bridge.onHandle;
     global.chrome = undefined;
     global.browser = undefined;
@@ -44,11 +44,9 @@ export default function initialize(
 
 bridge.addHandlers({
   Command(data) {
-    const func = store.commands[data];
-    if (func) func();
+    store.commands[data]?.();
   },
   Callback({ callbackId, payload }) {
-    const func = store.callbacks[callbackId];
-    if (func) func(payload);
+    store.callbacks[callbackId]?.(payload);
   },
 });
