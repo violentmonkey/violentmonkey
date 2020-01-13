@@ -7,14 +7,12 @@ const tabKeys = {};
 const realms = {};
 
 bridge.addHandlers({
-  TabOpen({ key, data }, realm) {
+  async TabOpen({ key, data }, realm) {
     data.url = getFullUrl(data.url, window.location.href);
-    sendCmd('TabOpen', data)
-    .then(({ id }) => {
-      tabIds[key] = id;
-      tabKeys[id] = key;
-      realms[id] = realm;
-    });
+    const { id } = await sendCmd('TabOpen', data);
+    tabIds[key] = id;
+    tabKeys[id] = key;
+    realms[id] = realm;
   },
   TabClose(key) {
     const id = tabIds[key];
@@ -31,8 +29,6 @@ bridge.addBackgroundHandlers({
     delete realms[id];
     delete tabKeys[id];
     delete tabIds[key];
-    if (key) {
-      bridge.post({ cmd: 'TabClosed', data: key, realm });
-    }
+    if (key) bridge.post('TabClosed', key, realm);
   },
 });

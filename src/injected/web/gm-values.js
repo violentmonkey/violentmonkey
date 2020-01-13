@@ -16,9 +16,9 @@ let cleanupTimer;
 const CLEANUP_TIMEOUT = 10e3;
 
 const dataDecoders = {
-  o: val => jsonLoad(val),
+  o: jsonLoad,
   // deprecated
-  n: val => Number(val),
+  n: Number,
   b: val => val === 'true',
 };
 
@@ -43,12 +43,9 @@ export function dumpValue(change = {}) {
   const {
     id, key, raw, oldRaw,
   } = change;
-  bridge.post({
-    cmd: 'UpdateValue',
-    data: {
-      id,
-      update: { key, value: raw },
-    },
+  bridge.post('UpdateValue', {
+    id,
+    update: { key, value: raw },
   });
   if (raw !== oldRaw) changedLocally(change);
 }
@@ -67,8 +64,7 @@ export function decodeValue(raw) {
 
 // { id, key, val, raw, oldRaw }
 function changedLocally(change) {
-  const keyHooks = changeHooks[change.id];
-  const hooks = keyHooks && keyHooks[change.key];
+  const hooks = changeHooks[change.id]?.[change.key];
   if (hooks) {
     change.hooks = hooks;
     notifyChange(change);

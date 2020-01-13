@@ -54,9 +54,7 @@ export function wrapGM(script, code, cache, injectInto) {
     gm.window = thisObj;
   }
   if (grant::includes('window.close')) {
-    gm.window.close = () => {
-      bridge.post({ cmd: 'TabClose' });
-    };
+    gm.window.close = () => bridge.post('TabClose');
   }
   const resources = script.meta.resources || {};
   const gmInfo = propertyFromValue({

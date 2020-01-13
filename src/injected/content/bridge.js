@@ -22,13 +22,12 @@ export default {
   onHandle(req, realm) {
     const handle = handlers[req.cmd];
     if (handle === sendMessage) sendMessage(req);
-    else if (handle) handle(req.data, realm || INJECT_PAGE);
+    else handle?.(req.data, realm || INJECT_PAGE);
   },
 };
 
-browser.runtime.onMessage.addListener((req, src) => {
-  const handle = bgHandlers[req.cmd];
-  if (handle) handle(req.data, src);
+browser.runtime.onMessage.addListener(({ cmd, data }, src) => {
+  bgHandlers[cmd]?.(data, src);
 });
 
 /**

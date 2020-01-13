@@ -37,7 +37,7 @@ bridge.addBackgroundHandlers({
   Command(data) {
     const id = +data::split(':', 1)[0];
     const realm = bridge.invokableIds::includes(id) && INJECT_CONTENT;
-    bridge.post({ cmd: 'Command', data, realm });
+    bridge.post('Command', data, realm);
   },
   GetPopup: getPopup,
   UpdatedValues(data) {
@@ -53,7 +53,7 @@ bridge.addBackgroundHandlers({
     realms
     ::filter(r => r.present)
     ::forEach(({ data: d, realm }) => {
-      bridge.post({ cmd: 'UpdatedValues', data: d, realm });
+      bridge.post('UpdatedValues', d, realm);
     });
   },
 });
@@ -63,11 +63,7 @@ bridge.addHandlers({
   RegisterMenu(data) {
     if (IS_TOP) {
       const [id, cap] = data;
-      let commandMap = menus[id];
-      if (!commandMap) {
-        commandMap = {};
-        menus[id] = commandMap;
-      }
+      const commandMap = menus[id] || (menus[id] = {});
       commandMap[cap] = 1;
     }
     getPopup();
@@ -75,10 +71,7 @@ bridge.addHandlers({
   UnregisterMenu(data) {
     if (IS_TOP) {
       const [id, cap] = data;
-      const commandMap = menus[id];
-      if (commandMap) {
-        delete commandMap[cap];
-      }
+      delete menus[id]?.[cap];
     }
     getPopup();
   },
@@ -90,13 +83,11 @@ bridge.addHandlers({
     // DOM spec allows any elements under documentElement
     // https://dom.spec.whatwg.org/#node-trees
     (document.head || document.documentElement)::append(style);
-    bridge.post({ cmd: 'Callback', data: { callbackId, payload: styleId }, realm });
+    bridge.post('Callback', { callbackId, payload: styleId }, realm);
   },
-  CheckScript({ name, namespace, callback }, realm) {
-    sendCmd('CheckScript', { name, namespace })
-    .then((result) => {
-      bridge.post({ cmd: 'ScriptChecked', data: { callback, result }, realm });
-    });
+  async CheckScript({ name, namespace, callback }, realm) {
+    const result = await sendCmd('CheckScript', { name, namespace });
+    bridge.post('ScriptChecked', { callback, result }, realm);
   },
 });
 

@@ -94,13 +94,13 @@ bridge.addHandlers({
     }
 
     function run(list) {
-      bridge.post({ cmd: 'InjectMulti', data: list::map(buildCode) });
+      bridge.post('InjectMulti', list::map(buildCode));
       list.length = 0;
     }
 
     async function runIdle() {
       for (const script of idle) {
-        bridge.post({ cmd: 'Inject', data: buildCode(script) });
+        bridge.post('Inject', buildCode(script));
         await new Promise(setTimeout);
       }
       deletePropsCache();
@@ -163,14 +163,7 @@ function exposeVM() {
       key += 1;
       const callback = key;
       checking[callback] = resolve;
-      bridge.post({
-        cmd: 'CheckScript',
-        data: {
-          name,
-          namespace,
-          callback,
-        },
-      });
+      bridge.post('CheckScript', { name, namespace, callback });
     }),
   });
   defineProperty(window.external, 'Violentmonkey', {

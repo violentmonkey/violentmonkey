@@ -37,26 +37,23 @@ export function onRequestCreate(details, scriptId) {
   };
   details.url = getFullUrl(details.url);
   queue::push(req);
-  bridge.post({
-    cmd: 'GetRequestId',
-    data: {
-      eventsToNotify: [
-        'abort',
-        'error',
-        'load',
-        // 'loadend' will always be sent for internal cleanup
-        'progress',
-        'readystatechange',
-        'timeout',
-      ]::filter(e => typeof details[`on${e}`] === 'function'),
-      wantsBlob: details.responseType === 'blob',
-    },
+  bridge.post('GetRequestId', {
+    eventsToNotify: [
+      'abort',
+      'error',
+      'load',
+      // 'loadend' will always be sent for internal cleanup
+      'progress',
+      'readystatechange',
+      'timeout',
+    ]::filter(e => typeof details[`on${e}`] === 'function'),
+    wantsBlob: details.responseType === 'blob',
   });
   return req.req;
 }
 
 function reqAbort(id) {
-  bridge.post({ cmd: 'AbortRequest', data: id });
+  bridge.post('AbortRequest', id);
 }
 
 function parseData(response, req, details) {
@@ -140,7 +137,7 @@ async function start(req, id) {
   payload.data = details.binary
     ? { value: `${details.data}`, cls: 'blob' }
     : await encodeBody(details.data);
-  bridge.post({ cmd: 'HttpRequest', data: payload });
+  bridge.post('HttpRequest', payload);
 }
 
 function getFullUrl(url) {
