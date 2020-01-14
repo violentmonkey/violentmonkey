@@ -1,9 +1,8 @@
-import { getUniqId, makePause } from '#/common';
+import { getUniqId, makePause, isEmpty } from '#/common';
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import { bindEvents, sendCmd, sendMessage } from '../utils';
 import {
-  setJsonDump, objectKeys, filter, forEach, includes, append, createElementNS, setAttribute,
-  NS_HTML,
+  setJsonDump, objectKeys, forEach, includes, append, createElementNS, setAttribute, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
@@ -41,20 +40,14 @@ bridge.addBackgroundHandlers({
   },
   GetPopup: getPopup,
   UpdatedValues(data) {
-    const realms = [
-      { data: {}, present: false },
-      { data: {}, present: false, realm: INJECT_CONTENT },
-    ];
+    const dataPage = {};
+    const dataContent = {};
+    const { invokableIds } = bridge;
     objectKeys(data)::forEach((id) => {
-      const r = realms[bridge.invokableIds::includes(id) ? 1 : 0];
-      r.data[id] = data[id];
-      r.present = true;
+      (invokableIds::includes(id) ? dataContent : dataPage)[id] = data[id];
     });
-    realms
-    ::filter(r => r.present)
-    ::forEach(({ data: d, realm }) => {
-      bridge.post('UpdatedValues', d, realm);
-    });
+    if (!isEmpty(dataPage)) bridge.post('UpdatedValues', dataPage);
+    if (!isEmpty(dataContent)) bridge.post('UpdatedValues', dataContent, INJECT_CONTENT);
   },
 });
 
