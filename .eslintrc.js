@@ -15,17 +15,10 @@ module.exports = {
     files: ['*'],
     excludedFiles: [
       'src/injected/**/*.js',
-      'src/injected/*.js',
       'src/common/*.js',
     ],
     globals: {
-      browser: true,
-    },
-  }, {
-    // no restrictions in browser.js to check the global `browser`
-    files: ['browser.js'],
-    globals: {
-      browser: true,
+      browser: false,
     },
   }],
 };
