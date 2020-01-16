@@ -1,7 +1,7 @@
 import {
   debounce, ensureArray, initHooks, normalizeKeys,
 } from '#/common';
-import { objectGet, objectSet, objectMap } from '#/common/object';
+import { mapEntry, objectGet, objectSet } from '#/common/object';
 import defaults from '#/common/options-defaults';
 import { preInitialize } from './init';
 import { commands } from './message';
@@ -13,7 +13,7 @@ Object.assign(commands, {
   },
   /** @return {Object} */
   GetOptions(data) {
-    return objectMap(data, key => getOption(key));
+    return data::mapEntry(key => getOption(key));
   },
   /** @return {void} */
   SetOptions(data) {

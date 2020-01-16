@@ -2,6 +2,7 @@ import {
   i18n, getFullUrl, isRemote, getRnd4, sendCmd,
 } from '#/common';
 import { CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, TIMEOUT_WEEK } from '#/common/consts';
+import { forEachEntry, forEachValue } from '#/common/object';
 import storage from '#/common/storage';
 import pluginEvents from '../plugin/events';
 import {
@@ -101,7 +102,7 @@ preInitialize.push(async () => {
   };
   const idMap = {};
   const uriMap = {};
-  Object.entries(data).forEach(([key, script]) => {
+  data::forEachEntry(([key, script]) => {
     if (key.startsWith(storage.script.prefix)) {
       // {
       //   meta,
@@ -262,7 +263,7 @@ export async function getScriptsByURL(url) {
       script.meta.require.forEach((key) => {
         reqKeys[pathMap[key] || key] = 1;
       });
-      Object.values(script.meta.resources).forEach((key) => {
+      script.meta.resources::forEachValue((key) => {
         cacheKeys[pathMap[key] || key] = 1;
       });
     }
@@ -470,7 +471,7 @@ function fetchScriptResources(script, cache) {
     }
   });
   // @resource
-  Object.values(meta.resources).forEach((url) => {
+  meta.resources::forEachValue((url) => {
     const fullUrl = pathMap[url] || url;
     const cached = cache.resources?.[fullUrl];
     if (cached) {
@@ -540,7 +541,7 @@ export async function vacuum() {
     script.meta.require.forEach((url) => {
       touch(requireKeys, pathMap[url] || url);
     });
-    Object.values(script.meta.resources).forEach((url) => {
+    script.meta.resources::forEachValue((url) => {
       touch(cacheKeys, pathMap[url] || url);
     });
     const { icon } = script.meta;
@@ -550,8 +551,7 @@ export async function vacuum() {
     }
   });
   mappings.forEach(([substore, map]) => {
-    Object.keys(map).forEach((key) => {
-      const value = map[key];
+    map::forEachEntry(([key, value]) => {
       if (value < 0) {
         // redundant value
         substore.remove(key);

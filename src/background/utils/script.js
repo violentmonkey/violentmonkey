@@ -1,6 +1,6 @@
 import { getUniqId, encodeFilename } from '#/common';
 import { METABLOCK_RE } from '#/common/consts';
-import { objectMap } from '#/common/object';
+import { mapEntry } from '#/common/object';
 import { commands } from './message';
 import { getOption } from './options';
 import cache from './cache';
@@ -65,7 +65,7 @@ const metaTypes = {
 };
 export function parseMeta(code) {
   // initialize meta
-  const meta = objectMap(metaTypes, (key, value) => value.default());
+  const meta = metaTypes::mapEntry((key, value) => value.default());
   const metaBody = code.match(METABLOCK_RE)[1] || '';
   metaBody.replace(/(?:^|\n)\s*\/\/\x20(@\S+)(.*)/g, (_match, rawKey, rawValue) => {
     const [keyName, locale] = rawKey.slice(1).split(':');

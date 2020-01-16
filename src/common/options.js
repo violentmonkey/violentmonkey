@@ -1,6 +1,6 @@
 import defaults from '#/common/options-defaults';
 import { initHooks, sendCmd, normalizeKeys } from '.';
-import { objectGet, objectSet } from './object';
+import { forEachEntry, objectGet, objectSet } from './object';
 
 let options = {};
 const hooks = initHooks();
@@ -24,8 +24,8 @@ function setOption(key, value) {
 }
 
 function updateOptions(data) {
-  Object.keys(data).forEach((key) => {
-    objectSet(options, key, data[key]);
+  data::forEachEntry(([key, value]) => {
+    objectSet(options, key, value);
   });
   hooks.fire(data);
 }

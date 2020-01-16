@@ -2,6 +2,7 @@ import Vue from 'vue';
 import {
   sendCmd, i18n, getLocaleString, cache2blobUrl,
 } from '#/common';
+import { forEachEntry, forEachValue } from '#/common/object';
 import handlers from '#/common/handlers';
 import loadZip from '#/common/zip';
 import '#/common/ui/style';
@@ -60,8 +61,7 @@ function loadData() {
       store.scripts.forEach(initScript);
     }
     if (store.cache) {
-      Object.keys(store.cache).forEach((url) => {
-        const raw = store.cache[url];
+      store.cache::forEachEntry(([url, raw]) => {
         if (oldCache[url]) {
           store.cache[url] = oldCache[url];
           delete oldCache[url];
@@ -70,9 +70,7 @@ function loadData() {
         }
       });
     }
-    Object.values(oldCache).forEach((blobUrl) => {
-      URL.revokeObjectURL(blobUrl);
-    });
+    oldCache::forEachValue(URL.revokeObjectURL);
     store.loading = false;
   });
 }

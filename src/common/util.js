@@ -1,3 +1,5 @@
+import { forEachEntry } from './object';
+
 export function toString(param) {
   if (param == null) return '';
   return `${param}`;
@@ -145,8 +147,8 @@ export function request(url, options = {}) {
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify(body);
     }
-    Object.keys(headers).forEach((key) => {
-      xhr.setRequestHeader(key, headers[key]);
+    headers::forEachEntry(([name, value]) => {
+      xhr.setRequestHeader(name, value);
     });
     xhr.onload = () => {
       const res = getResponse(xhr, {
