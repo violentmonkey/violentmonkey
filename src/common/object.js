@@ -1,4 +1,8 @@
-import { normalizeKeys } from '.';
+export function normalizeKeys(key) {
+  if (key == null) return [];
+  if (Array.isArray(key)) return key;
+  return `${key}`.split('.').filter(Boolean);
+}
 
 export function objectGet(obj, rawKey, def) {
   const keys = normalizeKeys(rawKey);
@@ -40,10 +44,9 @@ export function objectPurify(obj) {
   if (Array.isArray(obj)) {
     obj.forEach(objectPurify);
   } else if (obj && typeof obj === 'object') {
-    Object.keys(obj).forEach((key) => {
-      const type = typeof obj[key];
-      if (type === 'undefined') delete obj[key];
-      else objectPurify(obj[key]);
+    obj::forEachEntry(([key, value]) => {
+      if (typeof value === 'undefined') delete obj[key];
+      else objectPurify(value);
     });
   }
   return obj;
@@ -57,9 +60,20 @@ export function objectPick(obj, keys) {
   }, {});
 }
 
-export function objectMap(obj, func) {
-  return Object.entries(obj).reduce((res, [key, value]) => {
+// invoked as obj::mapEntry((key, value) => transformedValue)
+export function mapEntry(func) {
+  return Object.entries(this).reduce((res, [key, value]) => {
     res[key] = func(key, value);
     return res;
   }, {});
+}
+
+// invoked as obj::forEachEntry(([key, value]) => {})
+export function forEachEntry(func) {
+  if (this) Object.entries(this).forEach(func);
+}
+
+// invoked as obj::forEachValue(value => {})
+export function forEachValue(func) {
+  if (this) Object.values(this).forEach(func);
 }

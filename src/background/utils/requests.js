@@ -1,7 +1,7 @@
 import {
   getUniqId, request, i18n, isEmpty, sendTabCmd,
 } from '#/common';
-import { objectPick } from '#/common/object';
+import { forEachEntry, objectPick } from '#/common/object';
 import ua from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
@@ -127,7 +127,7 @@ const HeaderInjector = (() => {
       // need to set the entry even if it's empty [] so that 'if' check in del() runs only once
       headersToInject[reqId] = headers;
       // need the listener to get the requestId
-      Object.entries(apiEvents).forEach(([name, { listener, options }]) => {
+      apiEvents::forEachEntry(([name, { listener, options }]) => {
         browser.webRequest[name].addListener(listener, apiFilter, options);
       });
     },
@@ -135,7 +135,7 @@ const HeaderInjector = (() => {
       if (reqId in headersToInject) {
         delete headersToInject[reqId];
         if (isEmpty(headersToInject)) {
-          Object.entries(apiEvents).forEach(([name, { listener }]) => {
+          apiEvents::forEachEntry(([name, { listener }]) => {
             browser.webRequest[name].removeListener(listener);
           });
         }
@@ -220,7 +220,7 @@ async function httpRequest(details, src, cb) {
     xhr.open(method, url, true, user || '', password || '');
     xhr.setRequestHeader(VM_VERIFY, id);
     if (headers) {
-      Object.entries(headers).forEach(([name, value]) => {
+      headers::forEachEntry(([name, value]) => {
         const lowerName = name.toLowerCase();
         if (isSpecialHeader(lowerName)) {
           vmHeaders.push({ name, value });
@@ -272,8 +272,8 @@ function decodeBody(obj) {
   if (cls === 'formdata') {
     const result = new FormData();
     if (value) {
-      Object.keys(value).forEach((key) => {
-        value[key].forEach((item) => {
+      value::forEachEntry(([key, items]) => {
+        items.forEach((item) => {
           result.append(key, decodeBody(item));
         });
       });

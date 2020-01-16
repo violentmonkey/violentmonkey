@@ -19,6 +19,7 @@
 
 <script>
 import CodeMirror from 'codemirror';
+import { forEachEntry } from '#/common/object';
 
 export default {
   props: ['target'],
@@ -41,7 +42,7 @@ function compareString(a, b, index) {
 function expandKeyMap(res, ...maps) {
   maps.forEach((map) => {
     if (typeof map === 'string') map = CodeMirror.keyMap[map];
-    Object.entries(map).forEach(([key, value]) => {
+    map::forEachEntry(([key, value]) => {
       if (!res[key] && /^[a-z]+$/i.test(value) && CodeMirror.commands[value]) {
         res[key] = value;
       }

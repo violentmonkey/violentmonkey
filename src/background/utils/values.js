@@ -1,5 +1,5 @@
 import { isEmpty, sendTabCmd } from '#/common';
-import { objectSet } from '#/common/object';
+import { forEachEntry, objectSet } from '#/common/object';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 import { commands } from './message';
 
@@ -34,7 +34,7 @@ browser.tabs.onRemoved.addListener(resetValueOpener);
 browser.tabs.onReplaced.addListener((addedId, removedId) => resetValueOpener(removedId));
 
 export function resetValueOpener(tabId) {
-  Object.entries(openers).forEach(([id, openerTabs]) => {
+  openers::forEachEntry(([id, openerTabs]) => {
     if (tabId in openerTabs) {
       delete openerTabs[tabId];
       if (isEmpty(openerTabs)) delete openers[id];
@@ -67,8 +67,7 @@ async function doUpdate() {
     ids.forEach((id) => {
       const valueStore = valueStores[id] || (valueStores[id] = {});
       const updates = currentCache[id] || {};
-      Object.keys(updates).forEach((key) => {
-        const history = updates[key];
+      updates::forEachEntry(([key, history]) => {
         if (!history) delete valueStore[key];
         else valueStore[key] = history[history.length - 1].value;
       });
@@ -83,8 +82,8 @@ async function doUpdate() {
 function broadcastUpdates(updates, oldCache = {}) {
   // group updates by frame
   const toSend = {};
-  Object.entries(updates).forEach(([id, data]) => {
-    Object.entries(openers[id]).forEach(([tabId, frames]) => {
+  updates::forEachEntry(([id, data]) => {
+    openers[id]::forEachEntry(([tabId, frames]) => {
       frames.forEach(frameId => {
         objectSet(toSend, [tabId, frameId, id],
           avoidInitiator(data, oldCache[id], tabId, frameId));
@@ -92,8 +91,8 @@ function broadcastUpdates(updates, oldCache = {}) {
     });
   });
   // send the grouped updates
-  Object.entries(toSend).forEach(([tabId, frames]) => {
-    Object.entries(frames).forEach(([frameId, frameData]) => {
+  toSend::forEachEntry(([tabId, frames]) => {
+    frames::forEachEntry(([frameId, frameData]) => {
       if (!isEmpty(frameData)) {
         sendTabCmd(+tabId, 'UpdatedValues', frameData, { frameId: +frameId });
       }
@@ -105,7 +104,7 @@ function avoidInitiator(data, history, tabId, frameId) {
   let clone;
   if (history) {
     const src = `${tabId}:${frameId}`;
-    Object.entries(data).forEach(([key, value]) => {
+    data::forEachEntry(([key, value]) => {
       if (history[key]?.some(h => h.value === value && h.src === src)) {
         if (!clone) clone = { ...data };
         delete clone[key];

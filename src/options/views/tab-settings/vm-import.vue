@@ -19,6 +19,7 @@
 
 <script>
 import { i18n, sendCmd } from '#/common';
+import { forEachEntry } from '#/common/object';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
 import loadZip from '#/common/zip';
@@ -58,8 +59,8 @@ export default {
 
 function forEachItem(obj, cb) {
   if (obj) {
-    Object.keys(obj).forEach((key) => {
-      cb(obj[key], key);
+    obj::forEachEntry(([key, value]) => {
+      cb(value, key);
     });
   }
 }

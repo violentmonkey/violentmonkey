@@ -3,7 +3,7 @@ import {
 } from '#/common';
 import { TIMEOUT_HOUR } from '#/common/consts';
 import {
-  objectGet, objectSet, objectPick, objectPurify,
+  forEachEntry, objectGet, objectSet, objectPick, objectPurify,
 } from '#/common/object';
 import {
   getEventEmitter, getOption, setOption, hookOptions,
@@ -79,9 +79,8 @@ function serviceConfig(name) {
   }
   function set(key, val) {
     if (typeof key === 'object') {
-      const data = key;
-      Object.keys(data).forEach((k) => {
-        syncConfig.set(getKeys(k), data[k]);
+      key::forEachEntry(([k, v]) => {
+        syncConfig.set(getKeys(k), v);
       });
     } else {
       syncConfig.set(getKeys(key), val);
@@ -429,8 +428,7 @@ export const BaseService = serviceFactory({
           delLocal.push({ local: item });
         }
       });
-      Object.keys(remoteItemMap).forEach((uri) => {
-        const item = remoteItemMap[uri];
+      remoteItemMap::forEachEntry(([uri, item]) => {
         const info = remoteMetaData.info[uri];
         if (outdated) {
           putLocal.push({ remote: item, info });
