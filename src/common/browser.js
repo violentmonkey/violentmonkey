@@ -96,6 +96,7 @@ if (!global.browser?.runtime?.sendMessage) {
       onCreated: true,
       onUpdated: true,
       onRemoved: true,
+      onReplaced: true,
       create: wrapAsync,
       get: wrapAsync,
       query: wrapAsync,

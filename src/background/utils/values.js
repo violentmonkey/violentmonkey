@@ -1,11 +1,11 @@
-import { sendTabCmd } from '#/common';
+import { isEmpty, sendTabCmd } from '#/common';
+import { objectSet } from '#/common/object';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 import { commands } from './message';
 
-const openers = {}; // scriptId: { openerId: 1, ... }
-const tabScripts = {}; // openerId: { scriptId: 1, ... }
-let cache;
-let timer;
+const openers = {}; // { scriptId: { tabId: [frameId, ... ], ... } }
+let cache; // { scriptId: { key: [{ value, src }, ... ], ... } }
+let updateScheduled;
 
 Object.assign(commands, {
   /** @return {Promise<Object>} */
@@ -17,89 +17,101 @@ Object.assign(commands, {
   async SetValueStore({ where, valueStore }) {
     // Value store will be replaced soon.
     const store = await dumpValueStore(where, valueStore);
-    broadcastUpdates(store);
+    if (store) broadcastUpdates(store);
   },
   /** @return {Promise<void>} */
-  UpdateValue({ id, update }) {
+  UpdateValue({ id, update: { key, value } }, src) {
     // Value will be updated to store later.
     updateLater();
-    const { key, value } = update;
-    if (!cache) cache = {};
-    let updates = cache[id];
-    if (!updates) {
-      updates = {};
-      cache[id] = updates;
-    }
-    updates[key] = value || null;
+    cache = objectSet(cache, [id, [key]], {
+      value: value || null,
+      src: `${src.tab.id}:${src.frameId}`,
+    });
   },
 });
 
 browser.tabs.onRemoved.addListener(resetValueOpener);
+browser.tabs.onReplaced.addListener((addedId, removedId) => resetValueOpener(removedId));
 
-export function resetValueOpener(openerId) {
-  const scriptMap = tabScripts[openerId];
-  if (scriptMap) {
-    Object.keys(scriptMap).forEach((scriptId) => {
-      const map = openers[scriptId];
-      if (map) delete map[openerId];
-    });
-    delete tabScripts[openerId];
-  }
-}
-
-export function addValueOpener(openerId, scriptIds) {
-  let scriptMap = tabScripts[openerId];
-  if (!scriptMap) {
-    scriptMap = {};
-    tabScripts[openerId] = scriptMap;
-  }
-  scriptIds.forEach((scriptId) => {
-    scriptMap[scriptId] = 1;
-    let openerMap = openers[scriptId];
-    if (!openerMap) {
-      openerMap = {};
-      openers[scriptId] = openerMap;
+export function resetValueOpener(tabId) {
+  Object.entries(openers).forEach(([id, openerTabs]) => {
+    if (tabId in openerTabs) {
+      delete openerTabs[tabId];
+      if (isEmpty(openerTabs)) delete openers[id];
     }
-    openerMap[openerId] = 1;
   });
 }
 
-function updateLater() {
-  if (!timer) {
-    timer = Promise.resolve().then(doUpdate);
-    // timer = setTimeout(doUpdate);
+export function addValueOpener(tabId, frameId, scriptIds) {
+  scriptIds.forEach((id) => {
+    objectSet(openers, [id, [tabId]], frameId);
+  });
+}
+
+async function updateLater() {
+  if (!updateScheduled) {
+    updateScheduled = true;
+    await 0;
+    doUpdate();
+    updateScheduled = false;
+    if (cache) updateLater();
   }
 }
 
 async function doUpdate() {
+  const ids = Object.keys(cache);
   const currentCache = cache;
   cache = null;
-  const ids = Object.keys(currentCache);
   try {
     const valueStores = await getValueStoresByIds(ids);
     ids.forEach((id) => {
-      const valueStore = valueStores[id] || {};
-      valueStores[id] = valueStore;
+      const valueStore = valueStores[id] || (valueStores[id] = {});
       const updates = currentCache[id] || {};
       Object.keys(updates).forEach((key) => {
-        const value = updates[key];
-        if (!value) delete valueStore[key];
-        else valueStore[key] = value;
+        const history = updates[key];
+        if (!history) delete valueStore[key];
+        else valueStore[key] = history[history.length - 1].value;
       });
     });
-    await broadcastUpdates(await dumpValueStores(valueStores));
+    await dumpValueStores(valueStores);
+    await broadcastUpdates(valueStores, currentCache);
   } catch (err) {
     console.error('Values error:', err);
   }
-  timer = null;
-  if (cache) updateLater();
 }
 
-function broadcastUpdates(updates) {
-  if (updates) {
-    const updatedOpeners = Object.keys(updates)
-    .reduce((map, scriptId) => Object.assign(map, openers[scriptId]), {});
-    Object.keys(updatedOpeners)
-    .forEach(openerId => sendTabCmd(+openerId, 'UpdatedValues', updates));
+function broadcastUpdates(updates, oldCache = {}) {
+  // group updates by frame
+  const toSend = {};
+  Object.entries(updates).forEach(([id, data]) => {
+    Object.entries(openers[id]).forEach(([tabId, frames]) => {
+      frames.forEach(frameId => {
+        objectSet(toSend, [tabId, frameId, id],
+          avoidInitiator(data, oldCache[id], tabId, frameId));
+      });
+    });
+  });
+  // send the grouped updates
+  Object.entries(toSend).forEach(([tabId, frames]) => {
+    Object.entries(frames).forEach(([frameId, frameData]) => {
+      if (!isEmpty(frameData)) {
+        sendTabCmd(+tabId, 'UpdatedValues', frameData, { frameId: +frameId });
+      }
+    });
+  });
+}
+
+function avoidInitiator(data, history, tabId, frameId) {
+  let clone;
+  if (history) {
+    const src = `${tabId}:${frameId}`;
+    Object.entries(data).forEach(([key, value]) => {
+      if (history[key]?.some(h => h.value === value && h.src === src)) {
+        if (!clone) clone = { ...data };
+        delete clone[key];
+      }
+    });
+    if (clone) data = clone;
   }
+  return !isEmpty(data) ? data : undefined; // undef will remove the key in objectSet
 }

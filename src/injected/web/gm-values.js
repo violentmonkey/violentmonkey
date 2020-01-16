@@ -1,19 +1,13 @@
 import bridge from './bridge';
 import store from './store';
 import {
-  jsonLoad, filter, forEach, push, slice,
-  objectKeys, objectValues, objectEntries, log, setTimeout,
+  jsonLoad, forEach, slice, objectKeys, objectValues, objectEntries, log,
 } from '../utils/helpers';
 
 const { Number } = global;
-const perfNow = performance.now.bind(performance);
 
 // Nested objects: scriptId -> keyName -> listenerId -> GMValueChangeListener
 export const changeHooks = {};
-let localChanges = [];
-let cleanupTimer;
-// wait until UpdatedValues message arrives (usually it happens in just a few milliseconds)
-const CLEANUP_TIMEOUT = 10e3;
 
 const dataDecoders = {
   o: jsonLoad,
@@ -47,7 +41,13 @@ export function dumpValue(change = {}) {
     id,
     update: { key, value: raw },
   });
-  if (raw !== oldRaw) changedLocally(change);
+  if (raw !== oldRaw) {
+    const hooks = changeHooks[id]?.[key];
+    if (hooks) {
+      change.hooks = hooks;
+      notifyChange(change);
+    }
+  }
 }
 
 export function decodeValue(raw) {
@@ -63,52 +63,19 @@ export function decodeValue(raw) {
 }
 
 // { id, key, val, raw, oldRaw }
-function changedLocally(change) {
-  const hooks = changeHooks[change.id]?.[change.key];
-  if (hooks) {
-    change.hooks = hooks;
-    notifyChange(change);
-  }
-}
-
 function changedRemotely(id, oldData, updates) {
   const data = updates[id];
-  const keyHooks = changeHooks[id];
-  // the remote id is a string, but all local data structures use a number
-  id = +id;
-  /**
-   * Since the script instance that produced the change already got its change reports
-   * (remote=false), we need to avoid re-reporting with the wrong remote=true parameter,
-   * so we coalesce the more detailed local changes to match the remote changes.
-   * For a contrived example let's look at this local history:
-   *     undefined 'a' - created
-   *     'a' 'b'       - changed
-   *     'b' undefined - deleted
-   * The remote history is debounced so it might look like:
-   *     undefined 'a'
-   *     'a' undefined
-   */
-  objectEntries(keyHooks)::forEach(([key, hooks]) => {
-    const oldRaw = oldData[key];
-    const raw = data[key];
-    if (raw === oldRaw) return;
-    let found;
-    let lookFor = oldRaw;
-    localChanges = localChanges::filter((ch) => {
-      if (found || ch.id !== id || ch.key !== key) return true;
-      if (ch.oldRaw !== lookFor) return;
-      lookFor = ch.raw;
-      found = lookFor === raw;
+  id = +id; // the remote id is a string, but all local data structures use a number
+  objectEntries(changeHooks[id])::forEach(([key, hooks]) => {
+    notifyChange({
+      id,
+      key,
+      hooks,
+      oldRaw: oldData[key],
+      raw: data[key],
+      remote: true,
     });
-    if (!found) {
-      notifyChange({
-        hooks, id, key, raw, oldRaw, remote: true,
-      });
-    }
   });
-  if (localChanges.length && !cleanupTimer) {
-    cleanupTimer = setTimeout(cleanupChanges, CLEANUP_TIMEOUT);
-  }
 }
 
 // { hooks, key, val, raw, oldRaw, remote }
@@ -119,18 +86,6 @@ function notifyChange(change) {
   const oldVal = oldRaw && decodeValue(oldRaw);
   const newVal = val == null && raw ? decodeValue(raw) : val;
   objectValues(hooks)::forEach(fn => tryCall(fn, key, oldVal, newVal, remote));
-  if (!remote) {
-    change.expiry = perfNow() + CLEANUP_TIMEOUT;
-    localChanges::push(change);
-  }
-}
-
-function cleanupChanges() {
-  const now = perfNow();
-  localChanges = localChanges::filter(ch => ch.expiry > now);
-  cleanupTimer = localChanges.length
-    ? setTimeout(cleanupChanges, CLEANUP_TIMEOUT)
-    : 0;
 }
 
 function tryCall(fn, ...args) {

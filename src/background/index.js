@@ -54,7 +54,7 @@ Object.assign(commands, {
     };
     if (isApplied) {
       const scripts = await (cache.get(`preinject:${url}`) || getScriptsByURL(url));
-      addValueOpener(tabId, Object.keys(scripts.values));
+      addValueOpener(tabId, src.frameId, Object.keys(scripts.values));
       Object.assign(data, scripts);
     }
     return data;
