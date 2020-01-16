@@ -50,9 +50,9 @@ export function createGmApiProps() {
     /**
      * @callback GMValueChangeListener
      * @param {String} key
-     * @param {any} oldValue - undefined = value was created
-     * @param {any} newValue - undefined = value was removed
-     * @param {boolean} remote - true = value was modified in another tab
+     * @param {?} oldValue - `undefined` means value was created
+     * @param {?} newValue - `undefined` means value was removed
+     * @param {boolean} remote - `true` means value was modified in another tab
      */
     /**
      * @param {String} key - name of the value to monitor
