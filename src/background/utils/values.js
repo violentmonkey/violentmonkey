@@ -1,5 +1,5 @@
 import { isEmpty, sendTabCmd } from '#/common';
-import { forEachEntry, objectSet } from '#/common/object';
+import { forEachEntry, objectPick, objectSet } from '#/common/object';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 import { commands } from './message';
 
@@ -20,13 +20,11 @@ Object.assign(commands, {
     if (store) broadcastUpdates(store);
   },
   /** @return {Promise<void>} */
-  UpdateValue({ id, update: { key, value } }, src) {
+  UpdateValue({ id, update: { key, value = null } }, src) {
     // Value will be updated to store later.
     updateLater();
-    cache = objectSet(cache, [id, [key]], {
-      value: value || null,
-      src: `${src.tab.id}:${src.frameId}`,
-    });
+    cache = objectSet(cache, [id, key, 'last'], value);
+    objectSet(cache, [id, key, src.tab.id, src.frameId], value);
   },
 });
 
@@ -67,9 +65,9 @@ async function doUpdate() {
     ids.forEach((id) => {
       const valueStore = valueStores[id] || (valueStores[id] = {});
       const updates = currentCache[id] || {};
-      updates::forEachEntry(([key, history]) => {
-        if (!history) delete valueStore[key];
-        else valueStore[key] = history[history.length - 1].value;
+      updates::forEachEntry(([key, { last }]) => {
+        if (!last) delete valueStore[key];
+        else valueStore[key] = last;
       });
     });
     await dumpValueStores(valueStores);
@@ -101,16 +99,20 @@ function broadcastUpdates(updates, oldCache = {}) {
 }
 
 function avoidInitiator(data, history, tabId, frameId) {
-  let clone;
   if (history) {
-    const src = `${tabId}:${frameId}`;
-    data::forEachEntry(([key, value]) => {
-      if (history[key]?.some(h => h.value === value && h.src === src)) {
-        if (!clone) clone = { ...data };
-        delete clone[key];
+    let toPick;
+    Object.keys(data).forEach((key, i, allKeys) => {
+      // Not sending `key` to this frame if its last recorded value is identical
+      const frameValue = history[key]?.[tabId]?.[frameId];
+      if (frameValue !== undefined && frameValue === data[key]) {
+        // ...sending the preceding different keys
+        if (!toPick) toPick = allKeys.slice(0, i);
+      } else {
+        // ...sending the subsequent different keys
+        if (toPick) toPick.push(key);
       }
     });
-    if (clone) data = clone;
+    if (toPick) data = objectPick(data, toPick);
   }
   return !isEmpty(data) ? data : undefined; // undef will remove the key in objectSet
 }
