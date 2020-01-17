@@ -5,7 +5,7 @@ import {
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 import { commands } from './message';
 
-const openers = {}; // { scriptId: { tabId: [frameId, ... ], ... } }
+const openers = {}; // { scriptId: { tabId: { frameId: 1, ... }, ... } }
 let cache; // { scriptId: { key: [{ value, src }, ... ], ... } }
 let updateScheduled;
 
@@ -44,7 +44,7 @@ export function resetValueOpener(tabId) {
 
 export function addValueOpener(tabId, frameId, scriptIds) {
   scriptIds.forEach((id) => {
-    objectSet(openers, [id, [tabId]], frameId);
+    objectSet(openers, [id, tabId, frameId], 1);
   });
 }
 
@@ -84,7 +84,7 @@ function broadcastUpdates(updates, oldCache = {}) {
   const toSend = {};
   updates::forEachEntry(([id, data]) => {
     openers[id]::forEachEntry(([tabId, frames]) => {
-      frames.forEach(frameId => {
+      frames::forEachKey(frameId => {
         objectSet(toSend, [tabId, frameId, id],
           avoidInitiator(data, oldCache[id], tabId, frameId));
       });

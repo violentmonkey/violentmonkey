@@ -23,15 +23,11 @@ export function objectSet(obj, rawKey, val) {
   if (!keys.length) return val;
   const root = obj || {};
   let sub = root;
-  let lastKey = keys.pop();
+  const lastKey = keys.pop();
   keys.forEach((key) => {
     sub = sub[key] || (sub[key] = {});
   });
-  if (Array.isArray(lastKey)) {
-    lastKey = lastKey[0];
-    sub = sub[lastKey] || (sub[lastKey] = []);
-    sub.push(val);
-  } else if (typeof val === 'undefined') {
+  if (typeof val === 'undefined') {
     delete sub[lastKey];
   } else {
     sub[lastKey] = val;
