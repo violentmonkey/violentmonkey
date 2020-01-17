@@ -21,4 +21,10 @@ module.exports = {
       browser: false,
     },
   }],
+  rules: {
+    'import/extensions': ['error', 'ignorePackages', {
+      js: 'never',
+      vue: 'never',
+    }],
+  },
 };
