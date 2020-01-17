@@ -1,3 +1,4 @@
+import defaults from '#/common/options-defaults';
 import { initHooks, sendCmd, normalizeKeys } from '.';
 import { objectGet, objectSet } from './object';
 
@@ -9,9 +10,9 @@ const ready = sendCmd('GetAllOptions', null, { retry: true })
   if (data) hooks.fire(data);
 });
 
-function getOption(key, def) {
+function getOption(key) {
   const keys = normalizeKeys(key);
-  return objectGet(options, keys, def);
+  return objectGet(options, keys) ?? objectGet(defaults, keys);
 }
 
 function setOption(key, value) {

@@ -66,10 +66,19 @@
           </div>
         </dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
-        <form class="filter-search hidden-sm" @submit.prevent>
-          <input type="search" :placeholder="i18n('labelSearchScript')" :title="searchError"
-                 v-model="search" id="installed-search">
-          <icon name="search"></icon>
+        <form class="filter-search hidden-sm flex" @submit.prevent>
+          <label>
+            <input type="search" :placeholder="i18n('labelSearchScript')" :title="searchError"
+                   v-model="search" id="installed-search">
+            <span :title="i18n('titleSearchHint')">
+              <icon name="search"></icon>
+            </span>
+          </label>
+          <select v-model="filters.searchScope" @change="onScopeChange">
+            <option value="name" v-text="i18n('filterScopeName')"/>
+            <option value="code" v-text="i18n('filterScopeCode')"/>
+            <option value="all" v-text="i18n('filterScopeAll')"/>
+          </select>
         </form>
       </header>
       <div v-if="showRecycle" class="trash-hint mx-1 my-1 flex flex-col">
@@ -144,6 +153,7 @@ const filterOptions = {
   },
 };
 const filters = {
+  searchScope: null,
   showEnabledFirst: null,
   sort: {
     value: null,
@@ -164,6 +174,9 @@ const combinedCompare = cmpFunc => (
     ? ((a, b) => b.config.enabled - a.config.enabled || cmpFunc(a, b))
     : cmpFunc
 );
+hookSetting('filters.searchScope', (value) => {
+  filters.searchScope = value;
+});
 hookSetting('filters.showEnabledFirst', (value) => {
   filters.showEnabledFirst = value;
 });
@@ -171,6 +184,7 @@ hookSetting('filters.sort', (value) => {
   filters.sort.set(value);
 });
 options.ready.then(() => {
+  filters.searchScope = options.get('filters.searchScope');
   filters.sort.set(options.get('filters.sort'));
   filters.showEnabledFirst = options.get('filters.showEnabledFirst');
 });
@@ -308,6 +322,10 @@ export default {
     onOrderChange(e) {
       options.set('filters.sort', e.target.value);
     },
+    onScopeChange(e) {
+      if (this.search) this.scheduleSearch();
+      options.set('filters.searchScope', e.target.value);
+    },
     onStateChange(active) {
       this.menuNewActive = active;
     },
@@ -389,10 +407,15 @@ export default {
         expr = this.search.replace(/[.+^*$?|\\()[\]{}]/g, '\\$&'),
         flags = 'i',
       ] = this.search.match(/^\/(.+?)\/(\w*)$|$/);
+      const scope = filters.searchScope;
+      const scopeName = scope === 'name' || scope === 'all';
+      const scopeCode = scope === 'code' || scope === 'all';
       try {
         searchRE = expr && new RegExp(expr, flags);
         scripts.forEach(({ $cache }) => {
-          $cache.show = !expr || searchRE.test($cache.search) || searchRE.test($cache.code);
+          $cache.show = !expr
+            || scopeName && searchRE.test($cache.search)
+            || scopeCode && searchRE.test($cache.code);
         });
         this.searchError = null;
       } catch (err) {
@@ -401,7 +424,7 @@ export default {
     },
     async scheduleSearch() {
       const { scripts } = this.store;
-      if (scripts[0]?.$cache.code == null) {
+      if (scripts[0]?.$cache.code == null && ['code', 'all'].includes(filters.searchScope)) {
         const ids = scripts.map(({ props: { id } }) => id);
         const data = await storage.code.getMulti(ids);
         ids.forEach((id, index) => {
@@ -493,21 +516,30 @@ export default {
   }
 }
 .filter-search {
-  position: relative;
-  width: 14rem;
+  height: 2rem;
+  label {
+    position: relative;
+  }
   .icon {
     position: absolute;
     height: 100%;
     top: 0;
     right: .5rem;
   }
-  > input {
-    width: 100%;
+  input {
+    width: 14rem;
     padding-left: .5rem;
     padding-right: 2rem;
-    height: 2rem;
+    height: 100%;
     &[title] {
       outline: 1px solid red;
+    }
+  }
+  select {
+    /* borders are copied from inputs in common/ui/style */
+    border: 1px solid var(--fill-3);
+    &:focus {
+      border-color: var(--fill-7);
     }
   }
 }

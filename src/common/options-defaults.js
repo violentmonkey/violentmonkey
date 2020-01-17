@@ -23,6 +23,8 @@ export default {
   /** @type 'auto' | 'page' | 'content' */
   defaultInjectInto: INJECT_AUTO,
   filters: {
+    /** @type 'name' | 'code' | 'all' */
+    searchScope: 'name',
     /** @type 'exec' | 'alpha' | 'update' */
     sort: 'exec',
   },
