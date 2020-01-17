@@ -168,17 +168,13 @@ export default {
       };
     },
   },
-  created() {
+  async created() {
     this.revokers = [];
-    options.ready.then(() => {
-      items.forEach((item) => {
-        const { name, normalize } = item;
-        settings[name] = normalize(options.get(name));
-        this.revokers.push(hookSetting(name, (value) => {
-          settings[name] = value;
-        }));
-        this.$watch(() => settings[name], debounce(this.getUpdater(item), 300));
-      });
+    await options.ready;
+    items.forEach((item) => {
+      const { name, normalize: transform } = item;
+      this.revokers.push(hookSetting(name, { target: settings, prop: name, transform }));
+      this.$watch(() => settings[name], debounce(this.getUpdater(item), 300));
     });
   },
   beforeDestroy() {

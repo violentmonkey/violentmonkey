@@ -6,6 +6,7 @@ let options = {};
 const hooks = initHooks();
 const ready = sendCmd('GetAllOptions', null, { retry: true })
 .then((data) => {
+  ready.indeed = true; // a workaround for inability to query native Promise state
   options = data;
   if (data) hooks.fire(data);
 });

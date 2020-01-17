@@ -32,14 +32,11 @@ export default {
     };
   },
   created() {
-    const handle = this.json
+    const transform = this.json
       ? (value => JSON.stringify(value, null, '  '))
       // XXX compatible with old data format
       : (value => (Array.isArray(value) ? value.join('\n') : value || ''));
-    this.value = handle(options.get(this.name));
-    this.revoke = hookSetting(this.name, (value) => {
-      this.value = handle(value);
-    });
+    this.revoke = hookSetting(this.name, { target: this, prop: 'value', transform });
     if (this.json) this.$watch('value', this.parseJson);
   },
   beforeDestroy() {
