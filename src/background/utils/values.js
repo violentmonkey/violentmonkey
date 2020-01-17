@@ -1,5 +1,7 @@
 import { isEmpty, sendTabCmd } from '#/common';
-import { forEachEntry, objectPick, objectSet } from '#/common/object';
+import {
+  forEachEntry, forEachKey, objectPick, objectSet,
+} from '#/common/object';
 import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
 import { commands } from './message';
 
@@ -101,7 +103,7 @@ function broadcastUpdates(updates, oldCache = {}) {
 function avoidInitiator(data, history, tabId, frameId) {
   if (history) {
     let toPick;
-    Object.keys(data).forEach((key, i, allKeys) => {
+    data::forEachKey((key, i, allKeys) => {
       // Not sending `key` to this frame if its last recorded value is identical
       const frameValue = history[key]?.[tabId]?.[frameId];
       if (frameValue !== undefined && frameValue === data[key]) {

@@ -2,7 +2,7 @@ import {
   i18n, getFullUrl, isRemote, getRnd4, sendCmd,
 } from '#/common';
 import { CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, TIMEOUT_WEEK } from '#/common/consts';
-import { forEachEntry, forEachValue } from '#/common/object';
+import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
 import storage from '#/common/storage';
 import pluginEvents from '../plugin/events';
 import {
@@ -514,7 +514,7 @@ export async function vacuum() {
     [storage.code, codeKeys],
   ];
   const data = await browser.storage.local.get();
-  Object.keys(data).forEach((key) => {
+  data::forEachKey((key) => {
     mappings.some(([substore, map]) => {
       const { prefix } = substore;
       if (key.startsWith(prefix)) {
