@@ -152,21 +152,24 @@ const filterOptions = {
     },
   },
 };
+const filtersSort = {
+  value: null,
+  title: null,
+};
 const filters = {
   searchScope: null,
   showEnabledFirst: null,
-  sort: {
-    value: null,
-    title: null,
-    set(value) {
-      const option = filterOptions.sort[value];
-      if (option) {
-        filters.sort.value = value;
-        filters.sort.title = option.title;
-      } else {
-        filters.sort.set(Object.keys(filterOptions.sort)[0]);
-      }
-    },
+  get sort() {
+    return filtersSort;
+  },
+  set sort(value) {
+    const option = filterOptions.sort[value];
+    if (option) {
+      filtersSort.value = value;
+      filtersSort.title = option.title;
+    } else {
+      filters.sort = Object.keys(filterOptions.sort)[0];
+    }
   },
 };
 const combinedCompare = cmpFunc => (
@@ -174,19 +177,8 @@ const combinedCompare = cmpFunc => (
     ? ((a, b) => b.config.enabled - a.config.enabled || cmpFunc(a, b))
     : cmpFunc
 );
-hookSetting('filters.searchScope', (value) => {
-  filters.searchScope = value;
-});
-hookSetting('filters.showEnabledFirst', (value) => {
-  filters.showEnabledFirst = value;
-});
-hookSetting('filters.sort', (value) => {
-  filters.sort.set(value);
-});
-options.ready.then(() => {
-  filters.searchScope = options.get('filters.searchScope');
-  filters.sort.set(options.get('filters.sort'));
-  filters.showEnabledFirst = options.get('filters.showEnabledFirst');
+Object.keys(filters).forEach(prop => {
+  hookSetting(`filters.${prop}`, { target: filters, prop });
 });
 
 const MAX_BATCH_DURATION = 100;

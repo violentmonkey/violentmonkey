@@ -34,14 +34,10 @@ export default {
       this.$emit('change', value);
     },
   },
-  created() {
-    options.ready.then(() => {
-      this.value = options.get(this.name);
-      this.revoke = hookSetting(this.name, (value) => {
-        this.value = value;
-      });
-      this.$watch('value', this.onChange);
-    });
+  async created() {
+    await options.ready;
+    this.revoke = hookSetting(this.name, { target: this, prop: 'value' });
+    this.$watch('value', this.onChange);
   },
   beforeDestroy() {
     if (this.revoke) this.revoke();
