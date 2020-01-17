@@ -73,6 +73,11 @@ export function forEachEntry(func) {
   if (this) Object.entries(this).forEach(func);
 }
 
+// invoked as obj::forEachKey(key => {})
+export function forEachKey(func) {
+  if (this) Object.keys(this).forEach(func);
+}
+
 // invoked as obj::forEachValue(value => {})
 export function forEachValue(func) {
   if (this) Object.values(this).forEach(func);

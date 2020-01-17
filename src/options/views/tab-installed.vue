@@ -125,6 +125,7 @@ import SettingCheck from '#/common/ui/setting-check';
 import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
 import LocaleGroup from '#/common/ui/locale-group';
+import { forEachKey } from '#/common/object';
 import { setRoute, lastRoute } from '#/common/router';
 import storage from '#/common/storage';
 import ScriptItem from './script-item';
@@ -177,7 +178,7 @@ const combinedCompare = cmpFunc => (
     ? ((a, b) => b.config.enabled - a.config.enabled || cmpFunc(a, b))
     : cmpFunc
 );
-Object.keys(filters).forEach(prop => {
+filters::forEachKey(prop => {
   hookSetting(`filters.${prop}`, { target: filters, prop });
 });
 
