@@ -35,8 +35,8 @@ export default {
     },
   },
   async created() {
-    await options.ready;
-    this.revoke = hookSetting(this.name, { target: this, prop: 'value' });
+    if (!options.ready.indeed) await options.ready;
+    this.revoke = hookSetting(this.name, val => { this.value = val; });
     this.$watch('value', this.onChange);
   },
   beforeDestroy() {

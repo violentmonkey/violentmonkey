@@ -31,12 +31,13 @@ export default {
       error: null,
     };
   },
-  created() {
-    const transform = this.json
+  async created() {
+    if (!options.ready.indeed) await options.ready;
+    const handle = this.json
       ? (value => JSON.stringify(value, null, '  '))
       // XXX compatible with old data format
       : (value => (Array.isArray(value) ? value.join('\n') : value || ''));
-    this.revoke = hookSetting(this.name, { target: this, prop: 'value', transform });
+    this.revoke = hookSetting(this.name, val => { this.value = handle(val); });
     if (this.json) this.$watch('value', this.parseJson);
   },
   beforeDestroy() {
