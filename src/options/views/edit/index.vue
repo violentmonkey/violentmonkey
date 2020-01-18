@@ -62,7 +62,7 @@
 
 <script>
 import { i18n, sendCmd, noop } from '#/common';
-import { objectGet } from '#/common/object';
+import { objectPick } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import { route } from '#/common/router';
 import { store, showMessage } from '../../utils';
@@ -70,14 +70,29 @@ import VmSettings from './settings';
 import VmValues from './values';
 import VmHelp from './help';
 
-function fromList(list) {
-  return (list || []).join('\n');
-}
-function toList(text) {
-  return text.split('\n')
+const CUSTOM_PROPS = [
+  'name',
+  'runAt',
+  'homepageURL',
+  'updateURL',
+  'downloadURL',
+  'origInclude',
+  'origExclude',
+  'origMatch',
+  'origExcludeMatch',
+];
+const CUSTOM_LISTS = [
+  'include',
+  'match',
+  'exclude',
+  'excludeMatch',
+];
+const fromList = list => list?.join('\n') || '';
+const toList = text => (
+  text.split('\n')
   .map(line => line.trim())
-  .filter(Boolean);
-}
+  .filter(Boolean)
+);
 
 export default {
   props: ['initial'],
@@ -131,88 +146,55 @@ export default {
   created() {
     this.script = this.initial;
   },
-  mounted() {
-    const id = objectGet(this.script, 'props.id');
-    (id
-      ? sendCmd('GetScriptCode', id)
-      : sendCmd('NewScript', route.paths[2])
-      .then(({ script, code }) => {
-        this.script = script;
-        return code;
-      })
-    )
-    .then((code) => {
+  async mounted() {
+    const id = this.script?.props?.id;
+    if (id) {
+      this.code = await sendCmd('GetScriptCode', id);
+    } else {
+      const { script, code } = await sendCmd('NewScript', route.paths[2]);
+      this.script = script;
       this.code = code;
-      const settings = {};
-      const { custom, config } = this.script;
-      settings.config = {
-        shouldUpdate: config.shouldUpdate,
-      };
-      settings.custom = [
-        'name',
-        'homepageURL',
-        'updateURL',
-        'downloadURL',
-        'origInclude',
-        'origExclude',
-        'origMatch',
-        'origExcludeMatch',
-      ].reduce((value, key) => {
-        value[key] = custom[key];
-        return value;
-      }, {
-        include: fromList(custom.include),
-        match: fromList(custom.match),
-        exclude: fromList(custom.exclude),
-        excludeMatch: fromList(custom.excludeMatch),
+    }
+    const { custom, config } = this.script;
+    this.settings = {
+      config: objectPick(config, [
+        'notifyUpdates',
+        'shouldUpdate',
+      ]),
+      custom: {
+        ...objectPick(custom, CUSTOM_PROPS),
+        ...objectPick(custom, CUSTOM_LISTS, fromList),
         runAt: custom.runAt || '',
-      });
-      this.settings = settings;
-      this.$nextTick(() => {
-        this.canSave = false;
-      });
+      },
+    };
+    this.$nextTick(() => {
+      this.canSave = false;
     });
   },
   methods: {
-    save() {
-      const { settings: { config, custom: rawCustom } } = this;
-      const custom = [
-        'name',
-        'runAt',
-        'homepageURL',
-        'updateURL',
-        'downloadURL',
-        'origInclude',
-        'origExclude',
-        'origMatch',
-        'origExcludeMatch',
-      ].reduce((val, key) => {
-        val[key] = rawCustom[key];
-        return val;
-      }, {
-        include: toList(rawCustom.include),
-        match: toList(rawCustom.match),
-        exclude: toList(rawCustom.exclude),
-        excludeMatch: toList(rawCustom.excludeMatch),
-      });
-      const id = objectGet(this.script, 'props.id');
-      return sendCmd('ParseScript', {
-        id,
-        custom,
-        config,
-        code: this.code,
-        // User created scripts MUST be marked `isNew` so that
-        // the backend is able to check namespace conflicts,
-        // otherwise the script with same namespace will be overridden
-        isNew: !id,
-        message: '',
-      })
-      .then((res) => {
+    async save() {
+      const { config, custom } = this.settings;
+      try {
+        const id = this.script?.props?.id;
+        const res = await sendCmd('ParseScript', {
+          id,
+          config,
+          code: this.code,
+          custom: {
+            ...objectPick(custom, CUSTOM_PROPS),
+            ...objectPick(custom, CUSTOM_LISTS, toList),
+          },
+          // User created scripts MUST be marked `isNew` so that
+          // the backend is able to check namespace conflicts,
+          // otherwise the script with same namespace will be overridden
+          isNew: !id,
+          message: '',
+        });
         this.canSave = false;
-        if (objectGet(res, 'where.id')) this.script = res.update;
-      }, (err) => {
+        if (res?.where?.id) this.script = res.update;
+      } catch (err) {
         showMessage({ text: err });
-      });
+      }
     },
     close({ fromCM } = {}) {
       if (fromCM && this.nav !== 'code') {

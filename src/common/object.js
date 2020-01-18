@@ -48,9 +48,10 @@ export function objectPurify(obj) {
   return obj;
 }
 
-export function objectPick(obj, keys) {
+export function objectPick(obj, keys, transform) {
   return keys.reduce((res, key) => {
-    const value = obj ? obj[key] : null;
+    let value = obj?.[key];
+    if (transform) value = transform(value);
     if (value != null) res[key] = value;
     return res;
   }, {});

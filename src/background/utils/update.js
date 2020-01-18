@@ -49,7 +49,7 @@ async function doCheckUpdate(script) {
       code: await downloadUpdate(script),
       update: { checking: false },
     });
-    if (getOption('notifyUpdates')) {
+    if (canNotify(script)) {
       notify({
         title: i18n('titleScriptUpdated'),
         body: i18n('msgScriptUpdated', [update.meta.name || i18n('labelNoName')]),
@@ -107,4 +107,11 @@ async function downloadUpdate(script) {
     });
     sendCmd(CMD_SCRIPT_UPDATE, result);
   }
+}
+
+function canNotify(script) {
+  const allowed = getOption('notifyUpdates');
+  return getOption('notifyUpdatesGlobal')
+    ? allowed
+    : script.config.notifyUpdates ?? allowed;
 }

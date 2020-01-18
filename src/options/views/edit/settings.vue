@@ -6,6 +6,11 @@
         <input type="checkbox" v-model="config.shouldUpdate">
         <span v-text="i18n('labelAllowUpdate')"></span>
       </label>
+      <label class="ml-2">
+        <input type="checkbox" v-model="config.notifyUpdates"
+               :indeterminate.prop="config.notifyUpdates == null">
+        <span v-text="i18n('labelNotifyUpdates')"/>
+      </label>
     </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
     <div class="form-group flex">
@@ -113,6 +118,11 @@ export default {
       };
     },
   },
+  watch: {
+    'config.notifyUpdates'(val, oldVal) {
+      if (val && oldVal === false) this.config.notifyUpdates = null;
+    },
+  },
 };
 </script>
 
@@ -128,6 +138,9 @@ export default {
     margin-bottom: .5em;
     &.vl-tooltip {
       display: block;
+    }
+    input[type=checkbox] + span {
+      user-select: none;
     }
     input[type=text] {
       display: block;
