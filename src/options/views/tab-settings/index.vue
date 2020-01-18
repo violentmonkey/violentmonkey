@@ -170,10 +170,10 @@ export default {
   },
   async created() {
     this.revokers = [];
-    await options.ready;
+    if (!options.ready.indeed) await options.ready;
     items.forEach((item) => {
-      const { name, normalize: transform } = item;
-      this.revokers.push(hookSetting(name, { target: settings, prop: name, transform }));
+      const { name, normalize } = item;
+      this.revokers.push(hookSetting(name, val => { settings[name] = normalize(val); }));
       this.$watch(() => settings[name], debounce(this.getUpdater(item), 300));
     });
   },

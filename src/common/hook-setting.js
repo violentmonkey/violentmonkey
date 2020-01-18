@@ -13,21 +13,12 @@ options.hook((data) => {
 });
 
 /**
- * When an option is updated elsewhere (or when a yet unresolved options.ready will be fired),
- * calls the specified `update` function or assigns the specified `prop` in `target` object.
- * Also, when the latter mode is used, option.get() is called explicitly right away,
- * but only if options.ready is resolved or `transform` function is specified.
- * @param {string} key - option name
- * @param {function(value) | { target, prop, transform }} update - either a function or the config object
- * @return {function}
- */
+ option.get() is called even if it's not ready (a null or default value will be used),
+ which shouldn't happen usually as we retrieve the options in browser.js the first thing,
+ so either do `await options.ready` beforehand or handle the empty/default value inside update()
+*/
 export default function hookSetting(key, update) {
-  const { target } = update;
-  if (target) {
-    const { prop, transform } = update;
-    update = value => { target[prop] = transform ? transform(value) : value; };
-    if (transform || options.ready.indeed) update(options.get(key));
-  }
+  update(options.get(key));
   const list = hooks[key] || (hooks[key] = []);
   list.push(update);
   return () => {

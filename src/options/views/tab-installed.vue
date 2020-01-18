@@ -178,8 +178,10 @@ const combinedCompare = cmpFunc => (
     ? ((a, b) => b.config.enabled - a.config.enabled || cmpFunc(a, b))
     : cmpFunc
 );
-filters::forEachKey(prop => {
-  hookSetting(`filters.${prop}`, { target: filters, prop });
+filters::forEachKey(key => {
+  hookSetting(`filters.${key}`, (val) => {
+    filters[key] = val;
+  });
 });
 
 const MAX_BATCH_DURATION = 100;
