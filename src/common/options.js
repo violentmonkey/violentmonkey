@@ -4,8 +4,10 @@ import { forEachEntry, objectGet, objectSet } from './object';
 
 let options = {};
 const hooks = initHooks();
-const ready = sendCmd('GetAllOptions', null, { retry: true })
+const ready = (global.allOptions || Promise.resolve())
+.then((data) => data || sendCmd('GetAllOptions', null, { retry: true }))
 .then((data) => {
+  delete global.allOptions;
   ready.indeed = true; // a workaround for inability to query native Promise state
   options = data;
   if (data) hooks.fire(data);
