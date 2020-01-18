@@ -25,7 +25,7 @@ export function objectSet(obj, rawKey, val) {
   let sub = root;
   const lastKey = keys.pop();
   keys.forEach((key) => {
-    sub = sub[key] || (sub[key] = {});
+    sub = sub[key] || (sub[key] = /^\d+$/.test(key) ? [] : {});
   });
   if (typeof val === 'undefined') {
     delete sub[lastKey];
