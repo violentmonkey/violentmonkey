@@ -110,3 +110,10 @@ if (!global.browser?.runtime?.sendMessage) {
   };
   global.browser = wrapAPIs(chrome, meta);
 }
+// prefetch the options while the current extension page loads
+/* global browser */
+if (browser.tabs) {
+  global.allOptions = browser.runtime.sendMessage({ cmd: 'GetAllOptions' })
+  .then(({ data }) => data)
+  .catch(() => {});
+}
