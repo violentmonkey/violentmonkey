@@ -72,7 +72,7 @@ export default {
 function getWriter() {
   return loadZip()
   .then(zip => new Promise((resolve) => {
-    zip.createWriter(new zip.BlobWriter(), (writer) => {
+    zip.createWriter(new zip.BlobWriter('application/octet-stream'), (writer) => {
       resolve(writer);
     });
   }));
