@@ -125,7 +125,7 @@ const GoogleDrive = BaseService.extend({
     if (url.startsWith(redirectUri)) {
       this.authState.set('authorizing');
       this.authorized({
-        code: url.split('#')[0].slice(redirectUri.length),
+        code: decodeURIComponent(url.split('#')[0].slice(redirectUri.length)),
       })
       .then(() => this.checkSync());
       return true;
