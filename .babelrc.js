@@ -6,6 +6,7 @@ module.exports = {
         modules: false,
       },
       useBuiltIns: false,
+      loose: true,
     }],
   ],
   plugins: [
