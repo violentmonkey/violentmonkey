@@ -56,25 +56,25 @@ export function objectPick(obj, keys) {
   }, {});
 }
 
-// invoked as obj::mapEntry((key, value) => transformedValue)
+// invoked as obj::mapEntry(([key, value], i, allEntries) => transformedValue)
 export function mapEntry(func) {
-  return Object.entries(this).reduce((res, [key, value]) => {
-    res[key] = func(key, value);
+  return Object.entries(this).reduce((res, entry, i, allEntries) => {
+    res[entry[0]] = func(entry, i, allEntries);
     return res;
   }, {});
 }
 
-// invoked as obj::forEachEntry(([key, value]) => {})
+// invoked as obj::forEachEntry(([key, value], i, allEntries) => {})
 export function forEachEntry(func) {
   if (this) Object.entries(this).forEach(func);
 }
 
-// invoked as obj::forEachKey(key => {})
+// invoked as obj::forEachKey(key => {}, i, allKeys)
 export function forEachKey(func) {
   if (this) Object.keys(this).forEach(func);
 }
 
-// invoked as obj::forEachValue(value => {})
+// invoked as obj::forEachValue(value => {}, i, allValues)
 export function forEachValue(func) {
   if (this) Object.values(this).forEach(func);
 }

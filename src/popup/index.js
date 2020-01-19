@@ -37,7 +37,7 @@ Object.assign(handlers, {
     allScriptIds.push(...ids);
     if (isTop) {
       mutex.resolve();
-      store.commands = data.menus::mapEntry((key, value) => Object.keys(value).sort());
+      store.commands = data.menus::mapEntry(([, value]) => Object.keys(value).sort());
     }
     if (ids.length) {
       // frameScripts may be appended multiple times if iframes have unique scripts
