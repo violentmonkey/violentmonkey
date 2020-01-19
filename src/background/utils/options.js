@@ -13,7 +13,7 @@ Object.assign(commands, {
   },
   /** @return {Object} */
   GetOptions(data) {
-    return data::mapEntry(key => getOption(key));
+    return data::mapEntry(([key]) => getOption(key));
   },
   /** @return {void} */
   SetOptions(data) {
