@@ -25,6 +25,9 @@
   --fill-13: #222;
   --fill-14: #111;
   --fill-15: #000;
+  --tooltip-color: white;
+  --tooltip-bg: rgba(0,0,0,.8);
+  --tooltip-border-color: transparent;
   @media (prefers-color-scheme: dark) {
     --fill-0: #222222;
     --fill-0-5: #272727;
@@ -43,6 +46,7 @@
     --fill-13: #a4a4a4;
     --fill-14: #aeaeae;
     --fill-15: #b8b8b8;
+    --tooltip-border-color: #8888;
   }
 }
 
@@ -108,7 +112,7 @@ textarea {
   }
   &.has-error {
     border-color: #4004;
-    background: #f001;
+    background: #f004;
     &:focus {
       border-color: #400c;
     }
@@ -307,8 +311,18 @@ button,
   font-family: "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", Courier, monospace;
 }
 
-.vl-tooltip {
-  z-index: 10000 !important;
+body .vl-tooltip {
+  z-index: 10000;
+  > i {
+    color: var(--tooltip-bg);
+    z-index: 1;
+  }
+  &-content {
+    margin: -1px;
+    border: 1px solid var(--tooltip-border-color);
+    color: var(--tooltip-color);
+    background: var(--tooltip-bg);
+  }
 }
 
 .vl-dropdown-menu {

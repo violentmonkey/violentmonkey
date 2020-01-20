@@ -67,13 +67,22 @@
         </dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
         <form class="filter-search hidden-sm flex" @submit.prevent>
-          <label>
-            <input type="search" :placeholder="i18n('labelSearchScript')" :title="searchError"
-                   v-model="search" id="installed-search">
-            <span :title="i18n('titleSearchHint')">
+          <tooltip placement="bottom">
+            <label>
+              <input
+                type="search"
+                :class="{'has-error': searchError}"
+                :placeholder="i18n('labelSearchScript')"
+                v-model="search"
+                id="installed-search">
               <icon name="search"></icon>
-            </span>
-          </label>
+            </label>
+            <pre
+              class="filter-search-tooltip"
+              slot="content"
+              v-text="searchError || i18n('titleSearchHint')">
+            </pre>
+          </tooltip>
           <select v-model="filters.searchScope" @change="onScopeChange">
             <option value="name" v-text="i18n('filterScopeName')"/>
             <option value="code" v-text="i18n('filterScopeCode')"/>
@@ -508,9 +517,9 @@ export default {
     padding-left: .5rem;
     padding-right: 2rem;
     height: 100%;
-    &[title] {
-      outline: 1px solid red;
-    }
+  }
+  &-tooltip {
+    white-space: pre-wrap;
   }
   select {
     /* borders are copied from inputs in common/ui/style */
