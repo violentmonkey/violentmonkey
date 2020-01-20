@@ -6,10 +6,10 @@
         <input type="checkbox" v-model="config.shouldUpdate">
         <span v-text="i18n('labelAllowUpdate')"></span>
       </label>
-      <label class="ml-2">
-        <span v-text="i18n('labelNotifyUpdates')"/>
+      <label class="flex">
+        <span v-text="i18n('labelNotifyUpdates')" class="mr-1"/>
         <select v-model="config.notifyUpdates">
-          <option value="" v-text="i18n('useGlobalSetting')"></option>
+          <option value="" v-text="i18n('useGlobalSetting')"/>
           <option value="1" v-text="i18n('buttonEnable')"/>
           <option value="0" v-text="i18n('buttonDisable')"/>
         </select>
