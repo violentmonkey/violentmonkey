@@ -325,6 +325,7 @@ button,
 }
 
 @media (prefers-color-scheme: dark) {
+  input[type="radio"],
   input[type="checkbox"] {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -344,6 +345,10 @@ button,
       bottom: 2px;
       position: absolute;
     }
+  }
+  input[type="radio"],
+  input[type="radio"]:checked::after {
+    border-radius: 1em;
   }
   input[type="text"],
   input[type="search"],

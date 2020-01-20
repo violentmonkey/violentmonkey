@@ -193,6 +193,15 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Name
+genericOff:
+  description: To indicate something is turned off or disabled, similar to 'no'.
+  message: off
+genericOn:
+  description: To indicate something is turned on or enabled, similar to 'yes'.
+  message: on
+genericUseGlobal:
+  description: To indicate some per-script option will use its analog in global settings.
+  message: use global setting
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Recycle Bin
@@ -353,6 +362,11 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notify script updates
+labelNotifyThisUpdated:
+  description: >-
+    A per-script option in editor to enable notification when this script is updated.
+    The text follows "Allow update" checkbox option so it's like a continuation of the phrase.
+  message: ', then notify:'
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ignore per-script notification ("settings" tab in editor)
@@ -602,9 +616,6 @@ titleSearchHint:
   message: |-
     * <Enter> key adds the text to autocomplete history
     * RegExp syntax is supported: /re/ and /re/flags
-useGlobalSetting:
-  description: Option to use the global setting for something that's customizable per-script.
-  message: Use global setting
 valueLabelKey:
   description: Label for key of a script value.
   message: Key (string)
