@@ -34,7 +34,7 @@
     "gulp-uglify": "^3.0.2",
     "husky": "^4.0.10",
     "js-yaml": "^3.13.1",
-    "jsdom": "^16.0.0",
+    "jsdom": "^16.0.1",
     "plugin-error": "^1.0.0",
     "tape": "^4.13.0",
     "through2": "^3.0.1",
@@ -57,7 +57,7 @@
     "core-js": "^3.6.4",
     "tldjs": "^2.3.1",
     "vue": "^2.6.11",
-    "vueleton": "^1.0.3"
+    "vueleton": "^1.0.4"
   },
   "engines": {
     "node": ">=10"
