@@ -7,9 +7,12 @@
         <span v-text="i18n('labelAllowUpdate')"></span>
       </label>
       <label class="ml-2">
-        <input type="checkbox" v-model="config.notifyUpdates"
-               :indeterminate.prop="config.notifyUpdates == null">
         <span v-text="i18n('labelNotifyUpdates')"/>
+        <select v-model="config.notifyUpdates">
+          <option value="" v-text="i18n('useGlobalSetting')"></option>
+          <option value="1" v-text="i18n('buttonEnable')"/>
+          <option value="0" v-text="i18n('buttonDisable')"/>
+        </select>
       </label>
     </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
@@ -116,11 +119,6 @@ export default {
         updateURL: objectGet(value, 'meta.updateURL') || i18n('hintUseDownloadURL'),
         downloadURL: objectGet(value, 'meta.downloadURL') || objectGet(value, 'custom.lastInstallURL'),
       };
-    },
-  },
-  watch: {
-    'config.notifyUpdates'(val, oldVal) {
-      if (val && oldVal === false) this.config.notifyUpdates = null;
     },
   },
 };

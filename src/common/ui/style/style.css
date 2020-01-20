@@ -114,20 +114,6 @@ textarea {
     }
   }
 }
-input[type=checkbox]:indeterminate::after {
-  content: "?";
-  font-weight: bold;
-  font-size: 11px;
-  line-height: 1;
-  color: var(--fg);
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  position: absolute;
-  text-align: center;
-}
 code {
   padding: 0 .2em;
   background: hsla(50, 100%, 50%, .35);

@@ -157,10 +157,10 @@ export default {
     }
     const { custom, config } = this.script;
     this.settings = {
-      config: objectPick(config, [
-        'notifyUpdates',
-        'shouldUpdate',
-      ]),
+      config: {
+        notifyUpdates: `${config.notifyUpdates ?? ''}`,
+        shouldUpdate: config.shouldUpdate,
+      },
       custom: {
         ...objectPick(custom, CUSTOM_PROPS),
         ...objectPick(custom, CUSTOM_LISTS, fromList),
@@ -174,11 +174,15 @@ export default {
   methods: {
     async save() {
       const { config, custom } = this.settings;
+      const { notifyUpdates } = config;
       try {
         const id = this.script?.props?.id;
         const res = await sendCmd('ParseScript', {
           id,
-          config,
+          config: {
+            ...config,
+            notifyUpdates: notifyUpdates ? +notifyUpdates : null,
+          },
           code: this.code,
           custom: {
             ...objectPick(custom, CUSTOM_PROPS),
