@@ -6,6 +6,14 @@
         <input type="checkbox" v-model="config.shouldUpdate">
         <span v-text="i18n('labelAllowUpdate')"></span>
       </label>
+      <label class="flex">
+        <span v-text="i18n('labelNotifyUpdates')" class="mr-1"/>
+        <select v-model="config.notifyUpdates">
+          <option value="" v-text="i18n('useGlobalSetting')"/>
+          <option value="1" v-text="i18n('buttonEnable')"/>
+          <option value="0" v-text="i18n('buttonDisable')"/>
+        </select>
+      </label>
     </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
     <div class="form-group flex">
@@ -128,6 +136,9 @@ export default {
     margin-bottom: .5em;
     &.vl-tooltip {
       display: block;
+    }
+    input[type=checkbox] + span {
+      user-select: none;
     }
     input[type=text] {
       display: block;

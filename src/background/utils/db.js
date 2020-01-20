@@ -573,6 +573,7 @@ export async function vacuum() {
  * @property {Boolean} enabled - stored as 0 or 1
  * @property {Boolean} removed - stored as 0 or 1
  * @property {Boolean} shouldUpdate - stored as 0 or 1
+ * @property {Boolean | null} notifyUpdates - stored as 0 or 1 or null (default) which means "use global setting"
  */
 /** @typedef VMScriptCustom *
  * @property {string[]} exclude

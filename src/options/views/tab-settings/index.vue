@@ -14,6 +14,10 @@
           <setting-check name="notifyUpdates" />
           <span v-text="i18n('labelNotifyUpdates')"></span>
         </label>
+        <label class="ml-2">
+          <setting-check name="notifyUpdatesGlobal" />
+          <span v-text="i18n('labelNotifyUpdatesGlobal')"></span>
+        </label>
       </div>
       <div class="mb-1">
         <label>

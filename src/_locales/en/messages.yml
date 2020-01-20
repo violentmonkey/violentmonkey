@@ -353,6 +353,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notify script updates
+labelNotifyUpdatesGlobal:
+  description: Option to prioritize global notification option over script's setting.
+  message: ignore per-script notification ("settings" tab in editor)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Sort scripts in popup by $1
@@ -599,6 +602,9 @@ titleSearchHint:
   message: |-
     * <Enter> key adds the text to autocomplete history
     * RegExp syntax is supported: /re/ and /re/flags
+useGlobalSetting:
+  description: Option to use the global setting for something that's customizable per-script.
+  message: Use global setting
 valueLabelKey:
   description: Label for key of a script value.
   message: Key (string)

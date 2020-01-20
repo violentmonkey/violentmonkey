@@ -19,6 +19,7 @@ export default {
   customCSS: null,
   importSettings: true,
   notifyUpdates: false,
+  notifyUpdatesGlobal: false, // `true` ignores script.config.notifyUpdates
   version: null,
   /** @type 'auto' | 'page' | 'content' */
   defaultInjectInto: INJECT_AUTO,
