@@ -583,7 +583,7 @@ export function setConfig(config) {
   const service = getService();
   if (service) {
     service.setUserConfig(config);
-    service.checkSync();
+    return service.checkSync();
   }
 }
 
