@@ -3,7 +3,7 @@ import { INJECT_CONTENT } from '#/common/consts';
 import { attachFunction } from '../utils';
 import {
   filter, map, join, defineProperty, Boolean, Promise, setTimeout, log, noop,
-  objectEntries, jsonDump,
+  objectEntries,
 } from '../utils/helpers';
 import bridge from './bridge';
 import store from './store';
@@ -136,7 +136,7 @@ function makeComponentUtilsPolyfill() {
   };${
     funcs::map(([name]) => `${name}.toString=`)::join('')
   }()=>${
-    jsonDump(propertyToString())
+    JSON.stringify(propertyToString())
   };`;
 }
 

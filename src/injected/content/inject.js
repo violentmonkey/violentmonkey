@@ -11,7 +11,7 @@ import { getUniqId, sendCmd } from '#/common';
 
 import { attachFunction } from '../utils';
 import {
-  forEach, join, jsonDump, setJsonDump, append, createElementNS, NS_HTML,
+  forEach, join, append, createElementNS, NS_HTML,
   charCodeAt, fromCharCode,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -95,18 +95,12 @@ export function injectScripts(contentId, webId, data, scriptLists) {
   }
   if (injectPage.length) {
     // Avoid using Function::apply in case it is shimmed
-    inject(`(${VMInitInjection}())(${jsonDump(args).slice(1, -1)})`);
+    inject(`(${VMInitInjection}())(${JSON.stringify(args).slice(1, -1)})`);
     bridge.post('LoadScripts', {
       ...data,
       mode: INJECT_PAGE,
       items: injectPage,
     });
-  }
-  if (injectContent.length) {
-    // content script userscripts will run in one of the next event loop cycles
-    // (we use browser.tabs.executeScript) so we need to switch to jsonDumpSafe because
-    // after this point we can't rely on JSON.stringify anymore, see the notes for setJsonDump
-    setJsonDump({ native: false });
   }
 }
 
@@ -119,7 +113,7 @@ function checkInjectable() {
     a.id = domId;
     document.documentElement.appendChild(a);
   };
-  inject(`(${detect})(${jsonDump(id)})`);
+  inject(`(${detect})(${JSON.stringify(id)})`);
   const a = document.querySelector(`#${id}`);
   const injectable = !!a;
   if (a) a.remove();
