@@ -3,11 +3,9 @@ import { INJECT_CONTENT } from '#/common/consts';
 import { attachFunction } from '../utils';
 import {
   filter, map, join, defineProperty, Boolean, Promise, setTimeout, log, noop,
-  objectEntries,
 } from '../utils/helpers';
 import bridge from './bridge';
 import store from './store';
-import { propertyToString } from './gm-api';
 import { deletePropsCache, wrapGM } from './gm-wrapper';
 
 const { concat } = Array.prototype;
@@ -32,8 +30,6 @@ bridge.addHandlers({
     };
     // Firefox doesn't display errors in content scripts https://bugzil.la/1410932
     const isFirefoxContentMode = bridge.isFirefox && bridge.mode === INJECT_CONTENT;
-    // Firefox provides ComponentUtils functions in content scripts
-    const componentUtils = isFirefoxContentMode ? '' : makeComponentUtilsPolyfill();
     const listMap = {
       'document-start': start,
       'document-idle': idle,
@@ -59,7 +55,7 @@ bridge.addHandlers({
       const requireKeys = script.meta.require || [];
       const requires = requireKeys::map(key => data.require[pathMap[key] || key])::filter(Boolean);
       const code = data.code[script.props.id] || '';
-      const { wrapper, thisObj, keys } = wrapGM(script, code, data.cache, injectInto);
+      const { gm, thisObj, keys } = wrapGM(script, code, data.cache, injectInto);
       const id = getUniqId('VMin');
       const fnId = getUniqId('VMfn');
       const codeSlices = [
@@ -71,7 +67,7 @@ bridge.addHandlers({
             : ''
         }${
           keys::map(name => `this["${name}"]=${name};`)::join('')
-        }with(this){${componentUtils}((define,module,exports)=>{`,
+        }with(this){((define,module,exports)=>{`,
         // 1. trying to avoid string concatenation of potentially huge code slices
         // 2. adding `;` on a new line in case some required script ends with a line comment
         ...[]::concat(...requires::map(req => [req, '\n;'])),
@@ -85,7 +81,7 @@ bridge.addHandlers({
         }}`,
       ];
       const name = script.custom.name || script.meta.name || script.props.id;
-      const args = keys::map(key => wrapper[key]);
+      const args = keys::map(key => gm[key]);
       attachFunction(fnId, () => {
         const func = window[id];
         if (func) runCode(name, func, args, thisObj);
@@ -117,28 +113,6 @@ function runCode(name, func, args, thisObj) {
 }
 
 // polyfills for Firefox's Components.utils functions exposed to userscripts
-// TODO: create it at build-time
-function makeComponentUtilsPolyfill() {
-  const funcs = objectEntries({
-    cloneInto: obj => obj,
-    createObjectIn: (targetScope, options) => {
-      const obj = {};
-      if (options?.defineAs) targetScope[options.defineAs] = obj;
-      return obj;
-    },
-    exportFunction: (func, targetScope, options) => {
-      if (options?.defineAs) targetScope[options.defineAs] = func;
-      return func;
-    },
-  });
-  return `var ${
-    funcs::map(([name, f]) => `${name}=${f}`)::join(',')
-  };${
-    funcs::map(([name]) => `${name}.toString=`)::join('')
-  }()=>${
-    JSON.stringify(propertyToString())
-  };`;
-}
 
 function exposeVM() {
   const Violentmonkey = {};

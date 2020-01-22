@@ -9,20 +9,20 @@ export const {
 } = global;
 
 export const {
-  filter, findIndex, forEach, includes, indexOf, join, map, push, shift,
+  concat, filter, findIndex, forEach, includes, indexOf, join, map, push, shift,
   // arraySlice, // to differentiate from String::slice which we use much more often
 } = Array.prototype;
 
 export const {
   keys: objectKeys, values: objectValues, entries: objectEntries,
-  assign, defineProperty, defineProperties,
+  assign, defineProperty, defineProperties, getOwnPropertyDescriptor: describeProperty,
 } = Object;
 export const { charCodeAt, match, slice } = String.prototype;
 export const { toString: objectToString } = Object.prototype;
 const { toString: numberToString } = Number.prototype;
 const { replace } = String.prototype;
 export const { fromCharCode } = String;
-export const { addEventListener } = EventTarget.prototype;
+export const { addEventListener, removeEventListener } = EventTarget.prototype;
 export const { append, setAttribute } = Element.prototype;
 export const { createElementNS } = Document.prototype;
 export const logging = assign({}, console);
