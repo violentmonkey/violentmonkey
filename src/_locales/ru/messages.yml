@@ -29,7 +29,7 @@ buttonEdit:
   message: Редактировать
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: 'Очистить корзину!'
 buttonEnable:
   description: Button to enable a script.
   message: Включить
@@ -166,8 +166,8 @@ editValueSave:
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
   message: >-
-    Violentmonkey - менеджер пользовательских скриптов, позволяет контролировать
-    внешний вид и устранять проблемы на сайтах.
+    Violentmonkey - менеджер пользовательских скриптов, с открытым исходным кодом,
+    который поддерживает множество браузеров.
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -190,6 +190,15 @@ filterExecutionOrder:
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: время обновления
+filterScopeAll:
+  description: Option in dashboard's search scope filter.
+  message: Все
+filterScopeCode:
+  description: Option in dashboard's search scope filter.
+  message: Код
+filterScopeName:
+  description: Option in dashboard's search scope filter.
+  message: Имя
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Корзина
@@ -280,7 +289,7 @@ labelExclude:
   message: '@exclude правила исключения'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match правила исключение соответствия'
+  message: '@exclude-match правила исключения соответствий'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Экспорт данных скриптов
@@ -350,6 +359,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Уведомлять об обновлениях скриптов
+labelNotifyUpdatesGlobal:
+  description: Option to prioritize global notification option over script's setting.
+  message: Игнорировать уведомления скриптов (вкладка "настройки" в редакторе)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Сортировка во всплывающем окне по $1
@@ -591,6 +603,14 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Обновление
+titleSearchHint:
+  description: Hover title for search icon in dashboard.
+  message: |-
+    * <Enter> добавляет текст в историю автозаполнения
+    * Поддерживается синтаксис RegExp: /re/ и /re/flags
+useGlobalSetting:
+  description: Option to use the global setting for something that's customizable per-script.
+  message: Использовать глобальные настройки
 valueLabelKey:
   description: Label for key of a script value.
   message: Ключ (строка)
