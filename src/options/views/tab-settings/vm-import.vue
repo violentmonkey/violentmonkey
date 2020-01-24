@@ -23,7 +23,7 @@ import { forEachEntry } from '#/common/object';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
 import loadZip from '#/common/zip';
-import { showMessage } from '../../utils';
+import { showConfirmation, showMessage } from '../../utils';
 
 let zip;
 
@@ -166,9 +166,14 @@ function initDragDrop(targetElement) {
   const onDrop = async evt => {
     evt.preventDefault();
     showAllowedState(false);
-    targetElement.disabled = true;
-    await importData(evt.dataTransfer.files[0]);
-    targetElement.disabled = false;
+    try {
+      // storing it now because `files` will be null after await
+      const file = evt.dataTransfer.files[0];
+      await showConfirmation(i18n('buttonImportData'));
+      targetElement.disabled = true;
+      await importData(file);
+      targetElement.disabled = false;
+    } catch (e) { /* NOP */ }
   };
   return () => {
     const isSettingsTab = window.location.hash === '#settings';

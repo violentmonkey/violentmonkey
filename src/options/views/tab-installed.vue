@@ -130,7 +130,7 @@ import { setRoute, lastRoute } from '#/common/router';
 import storage from '#/common/storage';
 import ScriptItem from './script-item';
 import Edit from './edit';
-import { store, showMessage } from '../utils';
+import { store, showConfirmation, showMessage } from '../utils';
 
 const filterOptions = {
   sort: {
@@ -266,30 +266,20 @@ export default {
     updateAll() {
       sendCmd('CheckUpdateAll');
     },
-    installFromURL() {
-      new Promise((resolve, reject) => {
-        showMessage({
-          text: i18n('hintInputURL'),
-          onBackdropClick: reject,
-          buttons: [
-            {
-              type: 'submit',
-              text: i18n('buttonOK'),
-              onClick: resolve,
-            },
-            {
-              text: i18n('buttonCancel'),
-              onClick: reject,
-            },
-          ],
+    async installFromURL() {
+      try {
+        let url = await showConfirmation(i18n('hintInputURL'), {
+          input: '',
+          ok: { type: 'submit' },
         });
-      })
-      .then((url) => {
-        if (url && url.includes('://')) return sendCmd('ConfirmInstall', { url });
-      })
-      .catch((err) => {
+        url = url?.trim();
+        if (url) {
+          if (!url.includes('://')) url = `https://${url}`;
+          if (new URL(url)) await sendCmd('ConfirmInstall', { url });
+        }
+      } catch (err) {
         if (err) showMessage({ text: err });
-      });
+      }
     },
     moveScript(data) {
       if (data.from === data.to) return;
@@ -430,15 +420,7 @@ export default {
     },
     async emptyRecycleBin() {
       try {
-        await new Promise((resolve, reject) => showMessage({
-          text: i18n('buttonEmptyRecycleBin'),
-          buttons: [
-            { text: i18n('buttonOK'), onClick: resolve },
-            { text: i18n('buttonCancel'), onClick: reject },
-          ],
-          input: false,
-          onBackdropClick: reject,
-        }));
+        await showConfirmation(i18n('buttonEmptyRecycleBin'));
         sendCmd('CheckRemove', { force: true });
         store.scripts = store.scripts.filter(script => !script.config.removed);
       } catch (e) {
