@@ -431,6 +431,9 @@ export default {
 </script>
 
 <style>
+$selectionBg: #d7d4f0; /* copied from codemirror.css */
+$selectionDarkBg: rgba(73, 72, 62, .99);
+
 /* compatible with old browsers, e.g. Maxthon 4.4, Chrome 50- */
 .editor-code.flex-auto {
   position: relative;
@@ -461,6 +464,17 @@ export default {
   }
 }
 
+/* fix contenteditable selection color bug */
+.cm-s-eclipse .CodeMirror-line {
+  ::selection {
+    background: $selectionBg;
+  }
+  /* must be used separately otherwise the entire rule is ignored in Chrome */
+  ::-moz-selection {
+    background: $selectionBg;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   // mostly copied from Monokai theme
   .cm-s-eclipse {
@@ -480,13 +494,14 @@ export default {
       &-selected {
         background: #49483e;
       }
-      &-line::selection,
-      &-line::-moz-selection,
-      &-line > span::selection,
-      &-line > span::-moz-selection,
-      &&-line > span > span::selection,
-      &-line > span > span::-moz-selection {
-        background: rgba(73, 72, 62, .99);
+      &-line {
+        ::selection {
+          background: $selectionDarkBg;
+        }
+        /* must be used separately otherwise the entire rule is ignored in Chrome */
+        ::-moz-selection {
+          background: $selectionDarkBg;
+        }
       }
       &-guttermarker {
         color: white;
