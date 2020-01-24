@@ -1,7 +1,7 @@
 <template>
   <section>
     <h3 v-text="i18n('labelDataImport')" />
-    <button v-text="i18n('buttonImportData')" @click="importFile" />
+    <button v-text="i18n('buttonImportData')" @click="importFile" ref="buttonImport"/>
     <button
       :title="i18n('hintVacuum')"
       @click="vacuum"
@@ -25,6 +25,8 @@ import SettingCheck from '#/common/ui/setting-check';
 import loadZip from '#/common/zip';
 import { showMessage } from '../../utils';
 
+let zip;
+
 export default {
   components: {
     SettingCheck,
@@ -40,30 +42,23 @@ export default {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.zip';
-      input.onchange = () => {
-        if (input.files && input.files.length) importData(input.files[0]);
-      };
+      input.onchange = () => importData(input.files?.[0]);
       input.click();
     },
-    vacuum() {
+    async vacuum() {
       this.vacuuming = true;
       this.labelVacuum = this.i18n('buttonVacuuming');
-      sendCmd('Vacuum')
-      .then(() => {
-        this.vacuuming = false;
-        this.labelVacuum = this.i18n('buttonVacuumed');
-      });
+      await sendCmd('Vacuum');
+      this.vacuuming = false;
+      this.labelVacuum = this.i18n('buttonVacuumed');
     },
   },
+  mounted() {
+    const toggleDragDrop = initDragDrop(this.$refs.buttonImport);
+    window.addEventListener('hashchange', toggleDragDrop);
+    toggleDragDrop();
+  },
 };
-
-function forEachItem(obj, cb) {
-  if (obj) {
-    obj::forEachEntry(([key, value]) => {
-      cb(value, key);
-    });
-  }
-}
 
 function getVMConfig(text) {
   let vm;
@@ -78,8 +73,7 @@ function getVMConfig(text) {
 function getVMFile(entry, vmFile) {
   if (!entry.filename.endsWith('.user.js')) return;
   const vm = vmFile || {};
-  return loadZip()
-  .then(zip => new Promise((resolve) => {
+  return new Promise((resolve) => {
     const writer = new zip.TextWriter();
     entry.getData(writer, (text) => {
       const data = { code: text };
@@ -101,14 +95,13 @@ function getVMFile(entry, vmFile) {
       sendCmd('ParseScript', data)
       .then(() => resolve(true), () => resolve());
     });
-  }));
+  });
 }
 
 function getVMFiles(entries) {
-  return loadZip()
-  .then(zip => new Promise((resolve) => {
+  return new Promise((resolve) => {
     const data = { entries };
-    const i = entries.findIndex(entry => entry.filename && entry.filename.toLowerCase() === 'violentmonkey');
+    const i = entries.findIndex(entry => entry.filename?.toLowerCase() === 'violentmonkey');
     if (i < 0) {
       data.vm = {};
       return resolve(data);
@@ -119,46 +112,78 @@ function getVMFiles(entries) {
       data.vm = getVMConfig(text);
       resolve(data);
     });
-  }));
+  });
 }
 
 function readZip(file) {
-  return loadZip()
-  .then(zip => new Promise((resolve, reject) => {
-    zip.createReader(new zip.BlobReader(file), (res) => {
-      res.getEntries((entries) => {
-        resolve(entries);
-      });
-    }, (err) => { reject(err); });
-  }));
-}
-
-function importData(file) {
-  readZip(file)
-  .then(getVMFiles)
-  .then((data) => {
-    const { vm, entries } = data;
-    if (options.get('importSettings')) {
-      const ignoreKeys = ['sync'];
-      forEachItem(vm.settings, (value, key) => {
-        if (ignoreKeys.includes(key)) return;
-        options.set(key, value);
-      });
-    }
-    return Promise.all(entries.map(entry => getVMFile(entry, vm)))
-    .then(res => res.filter(Boolean).length)
-    .then((count) => {
-      forEachItem(vm.values, (valueStore, key) => {
-        if (valueStore) {
-          sendCmd('SetValueStore', {
-            where: { uri: key },
-            valueStore,
-          });
-        }
-      });
-      showMessage({ text: i18n('msgImported', [count]) });
-      sendCmd('CheckPosition');
-    });
+  return new Promise((resolve, reject) => {
+    zip.createReader(
+      new zip.BlobReader(file),
+      reader => reader.getEntries(resolve),
+      reject,
+    );
   });
 }
+
+async function importData(file) {
+  if (!file) return;
+  zip = await loadZip();
+  const { vm, entries } = await getVMFiles(await readZip(file));
+  if (options.get('importSettings')) {
+    const ignoreKeys = ['sync'];
+    vm.settings::forEachEntry(([key, value]) => {
+      if (!ignoreKeys.includes(key)) {
+        options.set(key, value);
+      }
+    });
+  }
+  const results = await Promise.all(entries.map(entry => getVMFile(entry, vm)));
+  const count = results.filter(Boolean).length;
+  vm.values::forEachEntry(([uri, valueStore]) => {
+    if (valueStore) {
+      sendCmd('SetValueStore', { where: { uri }, valueStore });
+    }
+  });
+  showMessage({ text: i18n('msgImported', [count]) });
+  sendCmd('CheckPosition');
+  zip = null;
+}
+
+function initDragDrop(targetElement) {
+  let leaveTimer;
+  const showAllowedState = state => targetElement.classList.toggle('drop-allowed', state);
+  const onDragEnd = () => showAllowedState(false);
+  const onDragLeave = () => {
+    clearTimeout(leaveTimer);
+    leaveTimer = setTimeout(onDragEnd, 250);
+  };
+  const onDragOver = evt => {
+    clearTimeout(leaveTimer);
+    const hasFiles = evt.dataTransfer.types.includes('Files');
+    if (hasFiles) evt.preventDefault();
+    showAllowedState(hasFiles);
+  };
+  const onDrop = async evt => {
+    evt.preventDefault();
+    showAllowedState(false);
+    targetElement.disabled = true;
+    await importData(evt.dataTransfer.files[0]);
+    targetElement.disabled = false;
+  };
+  return () => {
+    const isSettingsTab = window.location.hash === '#settings';
+    const onOff = document[`${isSettingsTab ? 'add' : 'remove'}EventListener`];
+    document::onOff('dragend', onDragEnd);
+    document::onOff('dragleave', onDragLeave);
+    document::onOff('dragover', onDragOver);
+    document::onOff('drop', onDrop);
+  };
+}
 </script>
+
+<style>
+button.drop-allowed {
+  background-color: green;
+  color: white;
+}
+</style>
