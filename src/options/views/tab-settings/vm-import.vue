@@ -14,6 +14,12 @@
         <span v-text="i18n('labelImportSettings')"></span>
       </label>
     </div>
+    <table class="import-report">
+      <tr v-for="({ type, name, text }, i) in reports" :key="i" :data-type="type">
+        <td v-text="name" v-if="name"/>
+        <td v-text="text" :colspan="name ? null : 2"/>
+      </tr>
+    </table>
   </section>
 </template>
 
@@ -24,12 +30,15 @@ import SettingCheck from '#/common/ui/setting-check';
 import loadZipLibrary from '#/common/zip';
 import { showConfirmation, showMessage } from '../../utils';
 
+const reports = [];
+
 export default {
   components: {
     SettingCheck,
   },
   data() {
     return {
+      reports,
       vacuuming: false,
       labelVacuum: this.i18n('buttonVacuum'),
     };
@@ -59,13 +68,17 @@ export default {
 
 async function importBackup(file) {
   if (!file) return;
+  reports.length = 0;
   const USERJS_SUFFIX = '.user.js';
   const TM_OPTIONS_SUFFIX = '.options.json';
   const TM_STORAGE_SUFFIX = '.storage.json';
   const zip = await loadZipLibrary();
-  const entries = await getAllEntries();
-  const vm = await readJsonEntry(findEntry('violentmonkey')) || {};
+  const entries = await getAllEntries().catch(report) || [];
+  if (reports.length) return;
+  report('', file.name, 'info');
   const uriMap = {};
+  const total = entries.filter(entry => entry.filename?.endsWith(USERJS_SUFFIX)).length;
+  const vm = await readJsonEntry(findEntry('violentmonkey')) || {};
   if (!vm.scripts) vm.scripts = {};
   if (!vm.values) vm.values = {};
   await processAll(readTamperOptsEntry);
@@ -78,9 +91,7 @@ async function importBackup(file) {
   sendCmd('SetValueStores',
     objectToArray(vm.values, ([uri, store]) => store && ({ where: { uri }, store })));
   sendCmd('CheckPosition');
-  const count = Object.keys(uriMap).length;
-  const total = entries.filter(entry => entry.filename?.endsWith(USERJS_SUFFIX)).length;
-  showMessage({ text: i18n('msgImported', [count === total ? count : `${count} / ${total}`]) });
+  showMessage({ text: reportProgress() });
 
   function findEntry(lowerName) {
     return entries.find(_ => _.filename?.toLowerCase() === lowerName);
@@ -99,7 +110,7 @@ async function importBackup(file) {
     try {
       return JSON.parse(text);
     } catch (e) {
-      console.warn(name, e);
+      report(e, name, null);
     }
   }
   function processAll(transform) {
@@ -132,7 +143,10 @@ async function importBackup(file) {
         }
         try {
           uriMap[name] = (await sendCmd('ParseScript', data)).update.props.uri;
-        } catch (e) { /* NOP */ }
+          reportProgress(filename);
+        } catch (e) {
+          report(e, filename, 'script');
+        }
         resolve();
       });
     });
@@ -146,6 +160,7 @@ async function importBackup(file) {
     } = filename?.endsWith(TM_OPTIONS_SUFFIX) && await readJsonEntry(entry) || {};
     if (!meta || !opts) return;
     const ovr = opts.override || {};
+    reports[0].text = `Tampermonkey${TM_OPTIONS_SUFFIX}`;
     /** @type VMScript */
     vm.scripts[filename.slice(0, -TM_OPTIONS_SUFFIX.length)] = {
       config: {
@@ -154,10 +169,9 @@ async function importBackup(file) {
       },
       custom: {
         downloadURL: typeof meta.file_url === 'string' ? meta.file_url : undefined,
+        // customizing of @noframes isn't implemented yet
         noframes: !!ovr.noframes || (ovr.noframes == null ? undefined : false),
-        runAt: /^document-(start|end|idle)$/.test(opts.run_at)
-          ? opts.run_at
-          : undefined,
+        runAt: /^document-(start|end|idle)$/.test(opts.run_at) ? opts.run_at : undefined,
         exclude: toStringArray(ovr.use_excludes),
         include: toStringArray(ovr.use_includes),
         match: toStringArray(ovr.use_matches),
@@ -173,12 +187,24 @@ async function importBackup(file) {
     };
   }
   async function readTamperStoreEntry(entry) {
-    if (entry.filename?.endsWith(TM_STORAGE_SUFFIX)) {
-      const name = entry.filename.slice(0, -TM_STORAGE_SUFFIX.length);
+    const { filename } = entry;
+    if (filename?.endsWith(TM_STORAGE_SUFFIX)) {
+      reports[0].text = `Tampermonkey${TM_STORAGE_SUFFIX}`;
+      const name = filename.slice(0, -TM_STORAGE_SUFFIX.length);
       const uri = uriMap[name];
       const { data } = uri && await readJsonEntry(entry) || {};
       if (data) vm.values[uri] = data;
     }
+  }
+  function report(text, name, type = 'critical') {
+    reports.push({ text, name, type });
+  }
+  function reportProgress(filename = '') {
+    const count = Object.keys(uriMap).length;
+    const text = i18n('msgImported', [count === total ? count : `${count} / ${total}`]);
+    reports[0].name = text; // keeping the message in the first column so it doesn't jump around
+    reports[0].text = filename;
+    return text;
   }
   function toStringArray(data) {
     return ensureArray(data).filter(item => typeof item === 'string');
@@ -226,5 +252,35 @@ function initDragDrop(targetElement) {
 button.drop-allowed {
   background-color: green;
   color: white;
+}
+.import-report {
+  white-space: pre-wrap;
+  padding-top: 1rem;
+  font-size: 90%;
+  color: #c80;
+  &:empty {
+    display: none;
+  }
+  td {
+    padding: 1px .5em 3px;
+    vertical-align: top; // in case of super long multiline text
+  }
+  [data-type="critical"] {
+    color: #fff;
+    background-color: red;
+    font-weight: bold;
+  }
+  [data-type="script"] {
+    color: red;
+  }
+  [data-type="info"] {
+    color: blue;
+  }
+  @media (prefers-color-scheme: dark) {
+    color: #a83;
+    [data-type="info"] {
+      color: #fff;
+    }
+  }
 }
 </style>
