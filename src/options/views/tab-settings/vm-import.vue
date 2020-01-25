@@ -1,7 +1,7 @@
 <template>
   <section>
     <h3 v-text="i18n('labelDataImport')" />
-    <button v-text="i18n('buttonImportData')" @click="importFile" ref="buttonImport"/>
+    <button v-text="i18n('buttonImportData')" @click="pickBackup" ref="buttonImport"/>
     <button
       :title="i18n('hintVacuum')"
       @click="vacuum"
@@ -19,13 +19,10 @@
 
 <script>
 import { i18n, sendCmd } from '#/common';
-import { forEachEntry } from '#/common/object';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
-import loadZip from '#/common/zip';
+import loadZipLibrary from '#/common/zip';
 import { showConfirmation, showMessage } from '../../utils';
-
-let zip;
 
 export default {
   components: {
@@ -38,11 +35,11 @@ export default {
     };
   },
   methods: {
-    importFile() {
+    pickBackup() {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.zip';
-      input.onchange = () => importData(input.files?.[0]);
+      input.onchange = () => importBackup(input.files?.[0]);
       input.click();
     },
     async vacuum() {
@@ -60,25 +57,60 @@ export default {
   },
 };
 
-function getVMConfig(text) {
-  let vm;
-  try {
-    vm = JSON.parse(text);
-  } catch (e) {
-    console.warn('Error parsing ViolentMonkey configuration.');
+async function importBackup(file) {
+  if (!file) return;
+  const USERJS_SUFFIX = '.user.js';
+  const zip = await loadZipLibrary();
+  const entries = await getAllEntries();
+  const vm = await readJsonEntry(findEntry('violentmonkey')) || {};
+  if (!vm.scripts) vm.scripts = {};
+  if (!vm.values) vm.values = {};
+  const count = (await processAll(readScriptEntry)).filter(Boolean).length;
+  const total = entries.filter(entry => entry.filename?.endsWith(USERJS_SUFFIX)).length;
+  if (options.get('importSettings')) {
+    sendCmd('SetOptions',
+      objectToArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
   }
-  return vm || {};
-}
+  sendCmd('SetValueStores',
+    objectToArray(vm.values, ([uri, store]) => store && ({ where: { uri }, store })));
+  sendCmd('CheckPosition');
+  showMessage({ text: i18n('msgImported', [count === total ? count : `${count} / ${total}`]) });
 
-function getVMFile(entry, vmFile) {
-  if (!entry.filename.endsWith('.user.js')) return;
-  const vm = vmFile || {};
-  return new Promise((resolve) => {
-    const writer = new zip.TextWriter();
-    entry.getData(writer, (text) => {
-      const data = { code: text };
-      if (vm.scripts) {
-        const more = vm.scripts[entry.filename.slice(0, -8)];
+  function findEntry(lowerName) {
+    return entries.find(_ => _.filename?.toLowerCase() === lowerName);
+  }
+  function getAllEntries() {
+    return new Promise((resolve, reject) => {
+      zip.createReader(new zip.BlobReader(file),
+        reader => reader.getEntries(resolve),
+        reject);
+    });
+  }
+  function objectToArray(obj, transform) {
+    return Object.entries(obj || {}).map(transform).filter(Boolean);
+  }
+  function parseJson(text) {
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+  function processAll(transform) {
+    return Promise.all(entries.map(transform));
+  }
+  function readJsonEntry(entry) {
+    return entry && new Promise(resolve => {
+      entry.getData(new zip.TextWriter(), text => resolve(parseJson(text)));
+    });
+  }
+  function readScriptEntry(entry) {
+    const { filename } = entry;
+    return filename.endsWith(USERJS_SUFFIX) && new Promise((resolve) => {
+      entry.getData(new zip.TextWriter(), async (text) => {
+        const data = { code: text };
+        const name = filename.slice(0, -USERJS_SUFFIX.length);
+        const more = vm.scripts[name];
         if (more) {
           data.custom = more.custom;
           data.config = more.config || {};
@@ -91,62 +123,15 @@ function getVMFile(entry, vmFile) {
           if ('enabled' in more) data.config.enabled = more.enabled;
           if ('update' in more) data.config.shouldUpdate = more.update;
         }
-      }
-      sendCmd('ParseScript', data)
-      .then(() => resolve(true), () => resolve());
-    });
-  });
-}
-
-function getVMFiles(entries) {
-  return new Promise((resolve) => {
-    const data = { entries };
-    const i = entries.findIndex(entry => entry.filename?.toLowerCase() === 'violentmonkey');
-    if (i < 0) {
-      data.vm = {};
-      return resolve(data);
-    }
-    const writer = new zip.TextWriter();
-    entries[i].getData(writer, (text) => {
-      entries.splice(i, 1);
-      data.vm = getVMConfig(text);
-      resolve(data);
-    });
-  });
-}
-
-function readZip(file) {
-  return new Promise((resolve, reject) => {
-    zip.createReader(
-      new zip.BlobReader(file),
-      reader => reader.getEntries(resolve),
-      reject,
-    );
-  });
-}
-
-async function importData(file) {
-  if (!file) return;
-  zip = await loadZip();
-  const { vm, entries } = await getVMFiles(await readZip(file));
-  if (options.get('importSettings')) {
-    const ignoreKeys = ['sync'];
-    vm.settings::forEachEntry(([key, value]) => {
-      if (!ignoreKeys.includes(key)) {
-        options.set(key, value);
-      }
+        try {
+          await sendCmd('ParseScript', data);
+          resolve(true);
+        } catch (e) {
+          resolve();
+        }
+      });
     });
   }
-  const results = await Promise.all(entries.map(entry => getVMFile(entry, vm)));
-  const count = results.filter(Boolean).length;
-  vm.values::forEachEntry(([uri, valueStore]) => {
-    if (valueStore) {
-      sendCmd('SetValueStore', { where: { uri }, valueStore });
-    }
-  });
-  showMessage({ text: i18n('msgImported', [count]) });
-  sendCmd('CheckPosition');
-  zip = null;
 }
 
 function initDragDrop(targetElement) {
@@ -171,7 +156,7 @@ function initDragDrop(targetElement) {
       const file = evt.dataTransfer.files[0];
       await showConfirmation(i18n('buttonImportData'));
       targetElement.disabled = true;
-      await importData(file);
+      await importBackup(file);
       targetElement.disabled = false;
     } catch (e) { /* NOP */ }
   };
