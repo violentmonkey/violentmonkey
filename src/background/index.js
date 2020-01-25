@@ -91,7 +91,7 @@ function handleCommandMessage(req, src) {
       return { data };
     }, (error) => {
       if (process.env.DEBUG) console.error(error);
-      return { error };
+      return { error: error instanceof Error ? error.stack : error };
     });
   }
   // `undefined` is ignored so we're sending `null` instead
