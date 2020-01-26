@@ -69,33 +69,28 @@ export default {
 async function importBackup(file) {
   if (!file) return;
   reports.length = 0;
-  const USERJS_SUFFIX = '.user.js';
-  const TM_OPTIONS_SUFFIX = '.options.json';
-  const TM_STORAGE_SUFFIX = '.storage.json';
   const zip = await loadZipLibrary();
   const entries = await getAllEntries().catch(report) || [];
   if (reports.length) return;
   report('', file.name, 'info');
   const uriMap = {};
-  const total = entries.filter(entry => entry.filename?.endsWith(USERJS_SUFFIX)).length;
-  const vm = await readJsonEntry(findEntry('violentmonkey')) || {};
+  const total = entries.reduce((n, entry) => n + entry.filename?.endsWith('.user.js'), 0);
+  const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
+  const vm = await readContents(vmEntry) || {};
   if (!vm.scripts) vm.scripts = {};
   if (!vm.values) vm.values = {};
-  await processAll(readTamperOptsEntry);
-  await processAll(readScriptEntry);
-  await processAll(readTamperStoreEntry);
+  await processAll(readScriptOptions, '.options.json');
+  await processAll(readScript, '.user.js');
+  await processAll(readScriptStorage, '.storage.json');
   if (options.get('importSettings')) {
     sendCmd('SetOptions',
-      objectToArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
+      toObjectArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
   }
   sendCmd('SetValueStores',
-    objectToArray(vm.values, ([uri, store]) => store && ({ where: { uri }, store })));
+    toObjectArray(vm.values, ([uri, store]) => store && ({ where: { uri }, store })));
   sendCmd('CheckPosition');
   showMessage({ text: reportProgress() });
 
-  function findEntry(lowerName) {
-    return entries.find(_ => _.filename?.toLowerCase() === lowerName);
-  }
   function getAllEntries() {
     return new Promise((resolve, reject) => {
       zip.createReader(new zip.BlobReader(file),
@@ -103,66 +98,62 @@ async function importBackup(file) {
         reject);
     });
   }
-  function objectToArray(obj, transform) {
-    return Object.entries(obj || {}).map(transform).filter(Boolean);
-  }
-  function parseJson(text, name) {
+  function parseJson(text, entry) {
     try {
       return JSON.parse(text);
     } catch (e) {
-      report(e, name, null);
+      report(e, entry.filename, null);
     }
   }
-  function processAll(transform) {
-    return Promise.all(entries.map(transform));
+  function processAll(transform, suffix) {
+    return Promise.all(entries.map(async entry => {
+      const { filename } = entry;
+      if (filename?.endsWith(suffix)) {
+        const contents = await readContents(entry);
+        return contents && transform(entry, contents, filename.slice(0, -suffix.length));
+      }
+    }));
   }
-  function readJsonEntry(entry) {
+  function readContents(entry) {
     return entry && new Promise(resolve => {
-      entry.getData(new zip.TextWriter(),
-        text => resolve(parseJson(text, entry.filename)));
-    });
-  }
-  function readScriptEntry(entry) {
-    const { filename } = entry;
-    return filename.endsWith(USERJS_SUFFIX) && new Promise((resolve) => {
-      entry.getData(new zip.TextWriter(), async (text) => {
-        const data = { code: text };
-        const name = filename.slice(0, -USERJS_SUFFIX.length);
-        const more = vm.scripts[name];
-        if (more) {
-          data.custom = more.custom;
-          data.config = more.config || {};
-          data.position = more.position;
-          data.props = {
-            lastModified: more.lastModified || +entry.lastModDate,
-            lastUpdated: more.lastUpdated || +entry.lastModDate,
-          };
-          // Import data from older version
-          if ('enabled' in more) data.config.enabled = more.enabled;
-          if ('update' in more) data.config.shouldUpdate = more.update;
-        }
-        try {
-          uriMap[name] = (await sendCmd('ParseScript', data)).update.props.uri;
-          reportProgress(filename);
-        } catch (e) {
-          report(e, filename, 'script');
-        }
-        resolve();
+      entry.getData(new zip.TextWriter(), text => {
+        resolve(entry.filename.endsWith('.js') ? text : parseJson(text, entry));
       });
     });
   }
-  async function readTamperOptsEntry(entry) {
+  async function readScript(entry, code, name) {
     const { filename } = entry;
-    const {
-      meta,
-      settings = {},
-      options: opts,
-    } = filename?.endsWith(TM_OPTIONS_SUFFIX) && await readJsonEntry(entry) || {};
+    const more = vm.scripts[name];
+    const data = {
+      code,
+      ...more && {
+        custom: more.custom,
+        config: {
+          enabled: more.enabled ?? 1, // Import data from older version
+          shouldUpdate: more.update ?? 1, // Import data from older version
+          ...more.config,
+        },
+        position: more.position,
+        props: {
+          lastModified: more.lastModified || +entry.lastModDate,
+          lastUpdated: more.lastUpdated || +entry.lastModDate,
+        },
+      },
+    };
+    try {
+      uriMap[name] = (await sendCmd('ParseScript', data)).update.props.uri;
+      reportProgress(filename);
+    } catch (e) {
+      report(e, filename, 'script');
+    }
+  }
+  async function readScriptOptions(entry, json, name) {
+    const { meta, settings = {}, options: opts } = json;
     if (!meta || !opts) return;
     const ovr = opts.override || {};
-    reports[0].text = `Tampermonkey${TM_OPTIONS_SUFFIX}`;
+    reports[0].text = 'Tampermonkey';
     /** @type VMScript */
-    vm.scripts[filename.slice(0, -TM_OPTIONS_SUFFIX.length)] = {
+    vm.scripts[name] = {
       config: {
         enabled: settings.enabled !== false ? 1 : 0,
         shouldUpdate: opts.check_for_updates ? 1 : 0,
@@ -186,15 +177,9 @@ async function importBackup(file) {
       },
     };
   }
-  async function readTamperStoreEntry(entry) {
-    const { filename } = entry;
-    if (filename?.endsWith(TM_STORAGE_SUFFIX)) {
-      reports[0].text = `Tampermonkey${TM_STORAGE_SUFFIX}`;
-      const name = filename.slice(0, -TM_STORAGE_SUFFIX.length);
-      const uri = uriMap[name];
-      const { data } = uri && await readJsonEntry(entry) || {};
-      if (data) vm.values[uri] = data;
-    }
+  async function readScriptStorage(entry, json, name) {
+    reports[0].text = 'Tampermonkey';
+    vm.values[uriMap[name]] = json.data;
   }
   function report(text, name, type = 'critical') {
     reports.push({ text, name, type });
@@ -205,6 +190,9 @@ async function importBackup(file) {
     reports[0].name = text; // keeping the message in the first column so it doesn't jump around
     reports[0].text = filename;
     return text;
+  }
+  function toObjectArray(obj, transform) {
+    return Object.entries(obj || {}).map(transform).filter(Boolean);
   }
   function toStringArray(data) {
     return ensureArray(data).filter(item => typeof item === 'string');
