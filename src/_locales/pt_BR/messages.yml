@@ -177,6 +177,15 @@ filterExecutionOrder:
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: ''
+filterScopeAll:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeCode:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeName:
+  description: Option in dashboard's search scope filter.
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: ''
@@ -339,6 +348,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notificar sobre atualizações de scripts
+labelNotifyUpdatesGlobal:
+  description: Option to prioritize global notification option over script's setting.
+  message: ''
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: ''
@@ -582,6 +594,14 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Atualização
+titleSearchHint:
+  description: Hover title for search icon in dashboard.
+  message: ''
+useGlobalSetting:
+  description: >-
+    Option to use the global setting for something that's customizable
+    per-script.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: ''

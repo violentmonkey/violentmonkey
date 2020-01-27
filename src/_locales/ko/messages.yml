@@ -4,8 +4,8 @@ anchorAuthor:
 anchorTranslator:
   description: Translator shown on about tab.
   message: >-
-    <a href="mailto:LiteHell@protonmail.com">LiteHell</a>,
-    <a href="mailto:totoriato@gmail.com">toriato</a>
+    <a href="mailto:LiteHell@protonmail.com">LiteHell</a>, <a
+    href="mailto:totoriato@gmail.com">toriato</a>
 buttonAllNone:
   description: Button to select all scripts or none.
   message: 전체선택/해제
@@ -124,9 +124,9 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    CodeMirror 와 애드온의 설정은 <code>{"indentUnit":2, "smartIndent":true}</code> 
-    과 같은 JSON 오브젝트로 할 수 있으며 몇몇 설정은 Violentmonkey 에서 작동하지 않을 수 있습니다.
-    <a href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    CodeMirror 와 애드온의 설정은 <code>{"indentUnit":2, "smartIndent":true}</code>  과
+    같은 JSON 오브젝트로 할 수 있으며 몇몇 설정은 Violentmonkey 에서 작동하지 않을 수 있습니다. <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">전체 목록</a>을 확인하세요.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
@@ -183,6 +183,15 @@ filterExecutionOrder:
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: 최근 업데이트 순
+filterScopeAll:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeCode:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeName:
+  description: Option in dashboard's search scope filter.
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: 휴지통
@@ -260,7 +269,7 @@ labelDownloadURL:
   message: '다운로드 URL:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: '스크립트 변수 수정'
+  message: 스크립트 변수 수정
 labelEditing:
   description: Label for current editing script
   message: '현재 편집 중인 스크립트:'
@@ -288,10 +297,10 @@ labelGeneral:
   message: 일반
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: '번역으로 도와주기'
+  message: 번역으로 도와주기
 labelHomepage:
   description: Label for home page in about tab.
-  message: '홈페이지'
+  message: 홈페이지
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: '홈페이지 URL:'
@@ -307,7 +316,7 @@ labelIndentUnit:
   touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: '기본 인젝션 모드'
+  message: 기본 인젝션 모드
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: 스크립트 설치
@@ -322,7 +331,7 @@ labelLineNumber:
   message: '줄 번호: '
 labelLineWrapping:
   description: Label for editor option of line wrapping.
-  message: '자동 줄 바꿈'
+  message: 자동 줄 바꿈
   touched: false
 labelMatch:
   description: Label of @match rules.
@@ -343,6 +352,9 @@ labelNoSearchScripts:
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: 스크립트 업데이트 알림
+labelNotifyUpdatesGlobal:
+  description: Option to prioritize global notification option over script's setting.
+  message: ''
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: 팝업에서 $1 순서로 스크립트 나열하기
@@ -436,7 +448,7 @@ learnBlacklist:
   message: 블랙리스트 패턴에 대해 자세히 알아보기
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: '인젝션 모드에 대해 자세히 알아보기'
+  message: 인젝션 모드에 대해 자세히 알아보기
 menuCommands:
   description: Menu item to list script commands.
   message: 스크립트 명령어
@@ -568,10 +580,10 @@ optionShowEnabledFirst:
   message: 활성화된 스크립트 먼저 보여주기
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: '대소문자 확인하기'
+  message: 대소문자 확인하기
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: '정규표현식 사용하기'
+  message: 정규표현식 사용하기
 sideMenuAbout:
   description: 'Side menu: About'
   message: 정보
@@ -584,6 +596,14 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: 업데이트
+titleSearchHint:
+  description: Hover title for search icon in dashboard.
+  message: ''
+useGlobalSetting:
+  description: >-
+    Option to use the global setting for something that's customizable
+    per-script.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: 키 (문자열)
