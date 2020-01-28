@@ -1,4 +1,3 @@
-import { getFullUrl } from '#/common';
 import { sendCmd } from '../utils';
 import bridge from './bridge';
 
@@ -8,7 +7,6 @@ const realms = {};
 
 bridge.addHandlers({
   async TabOpen({ key, data }, realm) {
-    data.url = getFullUrl(data.url, window.location.href);
     const { id } = await sendCmd('TabOpen', data);
     tabIds[key] = id;
     tabKeys[id] = key;
