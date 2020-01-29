@@ -1,14 +1,16 @@
 import { getUniqId } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
-import { attachFunction } from '../utils';
 import {
-  filter, map, join, defineProperty, Boolean, Promise, setTimeout, log, noop,
+  filter, map, join, defineProperty, describeProperty, Boolean, Promise, setTimeout, log, noop,
 } from '../utils/helpers';
 import bridge from './bridge';
 import store from './store';
 import { deletePropsCache, wrapGM } from './gm-wrapper';
 
 const { concat } = Array.prototype;
+const { document } = global;
+const { get: getCurrentScript } = describeProperty(Document.prototype, 'currentScript');
+const { remove } = Element.prototype;
 
 bridge.addHandlers({
   LoadScripts(data) {
@@ -16,6 +18,8 @@ bridge.addHandlers({
     const start = [];
     const idle = [];
     const end = [];
+    bridge.isFirefox = data.isFirefox;
+    bridge.ua = data.ua;
     bridge.version = data.version;
     if ([
       'greasyfork.org',
@@ -54,12 +58,12 @@ bridge.addHandlers({
       const pathMap = script.custom.pathMap || {};
       const requireKeys = script.meta.require || [];
       const requires = requireKeys::map(key => data.require[pathMap[key] || key])::filter(Boolean);
-      const code = data.code[script.props.id] || '';
+      const scriptId = script.props.id;
+      const code = data.code[scriptId] || '';
       const { gm, thisObj, keys } = wrapGM(script, code, data.cache, injectInto);
       const id = getUniqId('VMin');
-      const fnId = getUniqId('VMfn');
       const codeSlices = [
-        `function(${
+        `window["${id}"]=function(${
           keys::join(',')
         }){${
           isFirefoxContentMode
@@ -80,13 +84,18 @@ bridge.addHandlers({
             : ''
         }}`,
       ];
-      const name = script.custom.name || script.meta.name || script.props.id;
+      const name = script.custom.name || script.meta.name || scriptId;
       const args = keys::map(key => gm[key]);
-      attachFunction(fnId, () => {
-        const func = window[id];
-        if (func) runCode(name, func, args, thisObj);
+      defineProperty(window, id, {
+        configurable: true,
+        set(func) {
+          delete window[id];
+          const el = document::getCurrentScript();
+          if (el) el::remove();
+          runCode(name, func, args, thisObj);
+        },
       });
-      return [id, codeSlices, fnId, bridge.mode, script.props.id, script.meta.name];
+      return [codeSlices, bridge.mode, scriptId, script.meta.name];
     }
 
     function run(list) {

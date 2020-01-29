@@ -16,14 +16,3 @@ export function bindEvents(srcId, destId, handle, cloneInto) {
     document::dispatchEvent(e);
   };
 }
-
-// it's injected as a string so only the page functions can be used
-export function attachFunction(id, cb) {
-  Object.defineProperty(window, id, {
-    value(...args) {
-      cb.apply(this, args);
-      delete window[id];
-    },
-    configurable: true,
-  });
-}

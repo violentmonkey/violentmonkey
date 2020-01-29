@@ -5,9 +5,8 @@ import {
   INJECT_PAGE,
   browser,
 } from '#/common/consts';
-import { getUniqId, sendCmd } from '#/common';
+import { sendCmd } from '#/common';
 
-import { attachFunction } from '../utils';
 import {
   forEach, join, append, createElementNS, NS_HTML,
   charCodeAt, fromCharCode,
@@ -27,7 +26,12 @@ bridge.addHandlers({
   InjectMulti: data => data::forEach(injectScript),
 });
 
-export default function injectScripts(contentId, webId, data) {
+export function injectPageSandbox(contentId, webId) {
+  inject(`(${VMInitInjection}())('${webId}','${contentId}')`,
+    browser.runtime.getURL('sandbox/injected-web.js'));
+}
+
+export function injectScripts(contentId, webId, data, isXml) {
   const injectPage = [];
   const injectContent = [];
   const scriptLists = {
@@ -45,7 +49,7 @@ export default function injectScripts(contentId, webId, data) {
     }
     return false;
   });
-  let injectable;
+  let injectable = isXml ? false : null;
   const injectChecking = {
     // eslint-disable-next-line no-return-assign
     [INJECT_PAGE]: () => injectable ?? (injectable = checkInjectable()),
@@ -57,14 +61,8 @@ export default function injectScripts(contentId, webId, data) {
     const availableInjectInto = internalInjectInto.find(key => injectChecking[key]?.());
     scriptLists[availableInjectInto]?.push({ script, injectInto: availableInjectInto });
   });
-  const args = [
-    webId,
-    contentId,
-    data.ua,
-    data.isFirefox,
-  ];
   if (injectContent.length) {
-    const invokeGuest = VMInitInjection()(...args, bridge.onHandle);
+    const invokeGuest = VMInitInjection()(webId, contentId, bridge.onHandle);
     const postViaBridge = bridge.post;
     bridge.invokableIds.push(...injectContent.map(({ script }) => script.props.id));
     bridge.post = (cmd, params, realm) => {
@@ -77,8 +75,6 @@ export default function injectScripts(contentId, webId, data) {
     }, INJECT_CONTENT);
   }
   if (injectPage.length) {
-    inject(`(${VMInitInjection}())(${JSON.stringify(args).slice(1, -1)})`,
-      browser.runtime.getURL('sandbox/injected-web.js'));
     bridge.post('LoadScripts', {
       ...data,
       mode: INJECT_PAGE,
@@ -88,53 +84,31 @@ export default function injectScripts(contentId, webId, data) {
 }
 
 function checkInjectable() {
-  // Check default namespace, `a.style` only exists in HTML namespace
-  if (!('style' in document.createElement('a'))) return false;
-  const id = getUniqId('VM-');
-  const detect = (domId) => {
-    const a = document.createElement('a');
-    a.id = domId;
-    document.documentElement.appendChild(a);
-  };
-  inject(`(${detect})(${JSON.stringify(id)})`);
-  const a = document.querySelector(`#${id}`);
-  const injectable = !!a;
-  if (a) a.remove();
-  return injectable;
+  let res = false;
+  bridge.addHandlers({
+    Pong() {
+      res = true;
+    },
+  });
+  bridge.post('Ping');
+  return res;
 }
-
-const injectedScriptIntro = `(${
-  (attach, id, cb, callbackId) => {
-    attach(id, cb);
-    const callback = window[callbackId];
-    if (callback) callback();
-  }
-})(${attachFunction},`;
 
 // fullwidth range starts at 0xFF00
 // normal range starts at space char code 0x20
 const replaceWithFullWidthForm = s => fromCharCode(s::charCodeAt(0) - 0x20 + 0xFF00);
 
-function injectScript(data) {
-  const [vId, codeSlices, vCallbackId, mode, scriptId, scriptName] = data;
-  // trying to avoid string concatenation of potentially huge code slices as long as possible
-  const injectedCode = [
-    injectedScriptIntro,
-    `"${vId}",`,
-    ...codeSlices,
-    `,"${vCallbackId}");`,
-  ];
+function injectScript([codeSlices, mode, scriptId, scriptName]) {
   // using fullwidth forms for special chars and those added by the newer RFC3986 spec for URI
   const name = encodeURIComponent(scriptName::replace(/[#&',/:;?@=]/g, replaceWithFullWidthForm));
   const sourceUrl = browser.extension.getURL(`${name}.user.js#${scriptId}`);
+  // trying to avoid string concatenation of potentially huge code slices for as long as possible
   if (mode === INJECT_CONTENT) {
-    injectedCode.push(
-      ';0\n//# sourceURL=', // Firefox: the injected script must return 0 at the end
-      sourceUrl,
-    );
-    sendCmd('InjectScript', injectedCode::join(''));
+    // Firefox: the injected script must return 0 at the end
+    codeSlices.push(`;0\n//# sourceURL=${sourceUrl}`);
+    sendCmd('InjectScript', codeSlices::join(''));
   } else {
-    inject(injectedCode, sourceUrl);
+    inject(codeSlices, sourceUrl);
   }
 }
 
@@ -142,7 +116,6 @@ function inject(code, sourceUrl) {
   const script = document::createElementNS(NS_HTML, 'script');
   // avoid string concatenation of |code| as it can be extremely long
   script::append(
-    'document.currentScript.remove();',
     ...typeof code === 'string' ? [code] : code,
     ...sourceUrl ? ['\n//# sourceURL=', sourceUrl] : [],
   );
