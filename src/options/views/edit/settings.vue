@@ -6,13 +6,13 @@
         <input type="checkbox" v-model="config.shouldUpdate">
         <span v-text="i18n('labelAllowUpdate')"></span>
       </label>
-      <label class="flex">
-        <span v-text="i18n('labelNotifyUpdates')" class="mr-1"/>
-        <select v-model="config.notifyUpdates">
-          <option value="" v-text="i18n('useGlobalSetting')"/>
-          <option value="1" v-text="i18n('buttonEnable')"/>
-          <option value="0" v-text="i18n('buttonDisable')"/>
-        </select>
+      <span v-text="i18n('labelNotifyThisUpdated')"/>
+      <label class="ml-1" :key="value" v-for="([text, value]) of [
+        [i18n('genericOn'), '1'],
+        [i18n('genericOff'), '0'],
+        [i18n('genericUseGlobal'), ''],
+      ]"><!-- make sure to place the input and span on one line with a space between -->
+        <input type="radio" :value="value" v-model="config.notifyUpdates"> <span v-text="text"/>
       </label>
     </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
