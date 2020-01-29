@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { sendCmd } from '#/common';
+import { noop, sendCmd } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
 import hookSetting from '#/common/hook-setting';
@@ -144,7 +144,7 @@ export default {
   },
   methods: {
     onSaveUserConfig() {
-      sendCmd('SyncSetConfig', this.state.userConfig);
+      sendCmd('SyncSetConfig', this.state.userConfig).catch(noop);
     },
     onSyncChange(e) {
       const { value } = e.target;
@@ -167,6 +167,7 @@ export default {
       const { service } = this;
       if (service.authState === 'initializing') return this.i18n('msgSyncInit');
       if (service.authState === 'error') return this.i18n('msgSyncInitError');
+      if (service.authState === 'unauthorized') return this.i18n('msgSyncInitError');
       if (service.syncState === 'error') return this.i18n('msgSyncError');
       if (service.syncState === 'ready') return this.i18n('msgSyncReady');
       if (service.syncState === 'syncing') {

@@ -115,14 +115,18 @@ const WebDAV = BaseService.extend({
   },
   initToken() {
     this.prepareHeaders();
-    const {
-      serverUrl, anonymous, username, password,
-    } = this.getUserConfig();
-    if (!/:\/\/.*?\/$/.test(serverUrl)) {
+    const config = this.getUserConfig();
+    let url = config.serverUrl?.trim() || '';
+    if (!url.includes('://')) url = `http://${url}`;
+    if (!url.endsWith('/')) url += '/';
+    try {
+      new URL(url); // eslint-disable-line no-new
+    } catch (e) {
       this.properties.serverUrl = null;
       return false;
     }
-    this.properties.serverUrl = `${serverUrl}Violentmonkey/`;
+    this.properties.serverUrl = `${url}Violentmonkey/`;
+    const { anonymous, username, password } = config;
     if (anonymous) return true;
     if (!username || !password) return false;
     const auth = window.btoa(`${username}:${password}`);
