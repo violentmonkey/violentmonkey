@@ -1,7 +1,7 @@
 import { getUniqId } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import {
-  filter, map, join, defineProperty, describeProperty, Boolean, Promise, setTimeout, log, noop,
+  filter, map, defineProperty, describeProperty, Boolean, Promise, setTimeout, log, noop,
 } from '../utils/helpers';
 import bridge from './bridge';
 import store from './store';
@@ -58,51 +58,54 @@ bridge.addHandlers({
       const pathMap = script.custom.pathMap || {};
       const requireKeys = script.meta.require || [];
       const requires = requireKeys::map(key => data.require[pathMap[key] || key])::filter(Boolean);
+      const requiresSlices = []::concat(...requires::map(req => [req, '\n;']));
       const scriptId = script.props.id;
       const code = data.code[scriptId] || '';
-      const { gm, thisObj, keys } = wrapGM(script, code, data.cache, injectInto);
+      const thisObj = wrapGM(script, code, data.cache, injectInto);
       const id = getUniqId('VMin');
       const codeSlices = [
-        `window["${id}"]=function(${
-          keys::join(',')
-        }){${
+        `(function(){${
           isFirefoxContentMode
             ? 'try{'
             : ''
-        }${
-          keys::map(name => `this["${name}"]=${name};`)::join('')
-        }with(this){((define,module,exports)=>{`,
+        // hiding module interface from @require'd scripts so they don't mistakenly use it
+        }with(this)((define,module,exports)=>{`,
         // 1. trying to avoid string concatenation of potentially huge code slices
         // 2. adding `;` on a new line in case some required script ends with a line comment
-        ...[]::concat(...requires::map(req => [req, '\n;'])),
-        '(()=>{',
+        ...requiresSlices,
+        // 3. adding a nested IIFE to support 'use strict' in the code when there are @requires
+        ...requiresSlices.length ? ['(()=>{'] : [],
         code,
         // adding a new line in case the code ends with a line comment
-        `\n})()})()}${
+        `\n${
+          requiresSlices.length ? '})()' : ''
+        }})()${
           isFirefoxContentMode
             ? '}catch(e){console.error(e)}'
             : ''
-        }}`,
+        }}).call(${id})`,
       ];
-      const name = script.custom.name || script.meta.name || scriptId;
-      const args = keys::map(key => gm[key]);
-      defineProperty(window, id, {
-        configurable: true,
-        set(func) {
-          delete window[id];
-          const el = document::getCurrentScript();
-          if (el) el::remove();
-          runCode(name, func, args, thisObj);
-        },
-      });
+      exposeThisObj(thisObj, id, process.env.DEBUG && script);
       return [codeSlices, bridge.mode, scriptId, script.meta.name];
     }
-
+    function exposeThisObj(thisObj, id, script) {
+      defineProperty(window, id, {
+        configurable: true,
+        get() {
+          if (process.env.DEBUG) {
+            log('info', [bridge.mode], script.custom.name || script.meta.name || script.props.id);
+          }
+          const el = document::getCurrentScript();
+          if (el) el::remove();
+          delete window[id];
+          return thisObj;
+        },
+      });
+    }
     function run(list) {
       bridge.post('InjectMulti', list::map(buildCode));
       list.length = 0;
     }
-
     async function runIdle() {
       for (const script of idle) {
         bridge.post('Inject', buildCode(script));
@@ -113,15 +116,6 @@ bridge.addHandlers({
     }
   },
 });
-
-function runCode(name, func, args, thisObj) {
-  if (process.env.DEBUG) {
-    log('info', [bridge.mode], name);
-  }
-  func.apply(thisObj, args);
-}
-
-// polyfills for Firefox's Components.utils functions exposed to userscripts
 
 function exposeVM() {
   const Violentmonkey = {};

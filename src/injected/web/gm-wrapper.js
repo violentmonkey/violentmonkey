@@ -1,21 +1,30 @@
 import { INJECT_CONTENT, METABLOCK_RE } from '#/common/consts';
 import bridge from './bridge';
 import {
-  filter, forEach, includes, map, match, slice, assign, defineProperty, defineProperties,
-  describeProperty, objectKeys, addEventListener, removeEventListener,
+  concat, filter, forEach, includes, indexOf, map, match, push, slice,
+  defineProperty, describeProperty, objectKeys,
+  addEventListener, removeEventListener,
 } from '../utils/helpers';
 import { makeGmApi } from './gm-api';
 
 const { Proxy } = global;
+const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
+const { splice } = Array.prototype;
 const { hasOwnProperty: has } = Object.prototype;
-const { startsWith } = String.prototype;
+const { replace, startsWith } = String.prototype;
 
 let gmApi;
 let gm4Api;
 let componentUtils;
-const propertyToString = {
-  toString: () => '[Violentmonkey property]',
+let windowClose;
+const vmOwnFuncToString = () => '[Violentmonkey property]';
+const vmOwnFunc = (func, toString) => {
+  func.toString = toString || vmOwnFuncToString;
+  return func;
 };
+const vmSandboxedFuncToString = nativeFunc => () => (
+  `${nativeFunc}`::replace('native code', 'Violentmonkey sandbox')
+);
 
 export function deletePropsCache() {
   // let GC sweep the no longer necessary stuff
@@ -27,29 +36,20 @@ export function deletePropsCache() {
 export function wrapGM(script, code, cache, injectInto) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-  const gm = {};
   const grant = script.meta.grant || [];
-  let thisObj = gm;
-  if (!grant.length || (grant.length === 1 && grant[0] === 'none')) {
-    // @grant none
+  if (grant.length === 1 && grant[0] === 'none') {
     grant.length = 0;
-    gm.window = global;
-  } else {
-    thisObj = makeGlobalWrapper();
-    gm.window = thisObj;
-  }
-  if (grant::includes('window.close')) {
-    gm.window.close = () => bridge.post('TabClose');
   }
   const resources = script.meta.resources || {};
   const gmInfo = makeGmInfo(script, code, resources, injectInto);
-  const gm4Props = { info: { value: gmInfo } };
-  const gm4Object = {};
-  const grantedProps = {
+  const gm = {
+    GM: { info: gmInfo },
+    GM_info: gmInfo,
+    unsafeWindow: global,
     ...componentUtils || (componentUtils = makeComponentUtils()),
-    unsafeWindow: { value: global },
-    GM_info: { value: gmInfo },
-    GM: { value: gm4Object },
+    ...grant::includes('window.close') && windowClose || (windowClose = {
+      close: vmOwnFunc(() => bridge.post('TabClose')),
+    }),
   };
   const context = {
     cache,
@@ -65,14 +65,12 @@ export function wrapGM(script, code, cache, injectInto) {
     const gm4 = gm4Api[gm4name];
     const method = gmApi[gm4 ? `GM_${gm4.alias || gm4name}` : name];
     if (method) {
-      const prop = makeGmMethodProp(method, context, gm4?.async);
-      if (gm4) gm4Props[gm4name] = prop;
-      else grantedProps[name] = prop;
+      const caller = makeGmMethodCaller(method, context, gm4?.async);
+      if (gm4) gm.GM[gm4name] = caller;
+      else gm[name] = caller;
     }
   });
-  defineProperties(gm4Object, gm4Props);
-  defineProperties(gm, grantedProps);
-  return { gm, thisObj, keys: objectKeys(grantedProps) };
+  return grant.length ? makeGlobalWrapper(gm) : gm;
 }
 
 function makeGmInfo({ config, meta, props }, code, resources, injectInto) {
@@ -102,16 +100,13 @@ function makeGmInfo({ config, meta, props }, code, resources, injectInto) {
   };
 }
 
-function makeGmMethodProp(gmMethod, context, isAsync) {
-  return {
-    // keeping the native console.log intact
-    value: gmMethod === gmApi.GM_log ? gmMethod : assign(
-      isAsync
-        ? (async (...args) => context::gmMethod(...args))
-        : ((...args) => context::gmMethod(...args)),
-      propertyToString,
-    ),
-  };
+function makeGmMethodCaller(gmMethod, context, isAsync) {
+  // keeping the native console.log intact
+  return gmMethod === gmApi.GM_log ? gmMethod : vmOwnFunc(
+    isAsync
+      ? (async (...args) => context::gmMethod(...args))
+      : ((...args) => context::gmMethod(...args)),
+  );
 }
 
 // https://html.spec.whatwg.org/multipage/window-object.html#the-window-object
@@ -181,78 +176,96 @@ const boundGlobals = [
   'setTimeout',
   'stop',
 ];
-const boundGlobalsRunner = {
-  apply: (fn, thisArg, args) => fn.apply(global, args),
-};
+const boundGlobalsRunner = (func, thisArg) => (...args) => thisArg::func(...args);
 /**
  * @desc Wrap helpers to prevent unexpected modifications.
  */
-function makeGlobalWrapper() {
-  const props = {};
+function makeGlobalWrapper(local) {
   const events = {};
-  const deleted = {};
-  // - Chrome, `global === window`
-  // - Firefox, `global` is a sandbox, `global.window === window`:
-  //   - some properties (like `isFinite`) are defined in `global` but not `window`
-  //   - all `window` properties can be accessed from `global`
-  const wrapper = new Proxy(props, {
+  const deleted = []; // using an array to skip building it in ownKeys()
+  const scopeSym = Symbol.unscopables;
+  /*
+   - Chrome, `global === window`
+   - Firefox, `global` is a sandbox, `global.window === window`:
+     - some properties (like `isFinite`) are defined in `global` but not `window`
+     - all `window` properties can be accessed from `global`
+  */
+  const wrapper = new Proxy(local, {
     defineProperty(_, name, info) {
-      if (unforgeableGlobals::includes(name) || isUnforgeableFrameIndex(name)) return false;
-      defineProperty(props, name, info);
-      if (name::startsWith('on')) {
+      if (typeof name !== 'symbol'
+      && (unforgeableGlobals::includes(name) || isUnforgeableFrameIndex(name))) return false;
+      defineProperty(local, name, info);
+      if (typeof name === 'string' && name::startsWith('on')) {
         setEventHandler(name::slice(2));
       }
-      delete deleted[name];
+      undelete(name);
       return true;
     },
     deleteProperty(_, name) {
-      if (unforgeableGlobals::includes(name) || deleted::has(name)) return false;
-      if (isUnforgeableFrameIndex(name)) return true;
-      if (global::has(name)) deleted[name] = 1;
-      return delete props[name];
+      if (unforgeableGlobals::includes(name)) return false;
+      if (isUnforgeableFrameIndex(name) || deleted::includes(name)) return true;
+      if (global::has(name)) deleted::push(name);
+      return delete local[name];
     },
     get(_, name) {
-      if (!deleted::has(name)) {
-        const value = props[name];
-        return value !== undefined || props::has(name) ? value : resolveProp(name);
-      }
+      const value = local[name];
+      return value !== undefined || name === scopeSym || deleted::includes(name) || local::has(name)
+        ? value
+        : resolveProp(name);
     },
     getOwnPropertyDescriptor(_, name) {
-      const desc = describeProperty(props, name) ?? describeProperty(wrapper[name]);
-      if (desc?.value === window) desc.value = wrapper;
-      return desc;
+      if (!deleted::includes(name)) {
+        const ownDesc = describeProperty(local, name);
+        const desc = ownDesc || describeProperty(global, name);
+        if (!desc) return;
+        if (desc.value === window) desc.value = wrapper;
+        // preventing spec violation by duplicating ~10 props like NaN, Infinity, etc.
+        if (!ownDesc && !desc.configurable) defineProperty(local, name, desc);
+        return desc;
+      }
     },
     has(_, name) {
-      return props::has(name)
-        || !deleted::has(name) && global::has(name);
+      return local::has(name)
+        || !deleted::includes(name) && global::has(name);
     },
     ownKeys() {
-      const modifiedKeys = objectKeys(props);
-      const deletedKeys = objectKeys(deleted);
-      let keys = objectKeys(global);
-      if (deletedKeys.length || modifiedKeys.length) {
-        keys = keys::filter(k => !deletedKeys::includes(k) && !modifiedKeys::includes(k));
-      }
-      return modifiedKeys.length ? [...keys, ...modifiedKeys] : keys;
+      return []::concat(
+        ...filterGlobals(getOwnPropertyNames),
+        ...filterGlobals(getOwnPropertySymbols),
+      );
     },
+    preventExtensions() {},
     set(_, name, value) {
       if (unforgeableGlobals::includes(name)) return false;
-      delete deleted[name];
+      undelete(name);
       if (readonlyGlobals::includes(name) || isUnforgeableFrameIndex(name)) return true;
-      props[name] = value;
-      if (name::startsWith('on') && window::has(name)) {
+      local[name] = value;
+      if (typeof name === 'string' && name::startsWith('on') && window::has(name)) {
         setEventHandler(name::slice(2), value);
       }
       return true;
     },
   });
+  function filterGlobals(describer) {
+    const globalKeys = describer(global);
+    const localKeys = describer(local);
+    return [
+      deleted.length
+        ? globalKeys::filter(key => !deleted::includes(key))
+        : globalKeys,
+      localKeys::filter(key => !globalKeys::includes(key)),
+    ];
+  }
   function resolveProp(name) {
     let value = global[name];
     if (value === window) {
       value = wrapper;
     } else if (boundGlobals::includes(name)) {
-      value = new Proxy(value, boundGlobalsRunner);
-      props[name] = value;
+      value = vmOwnFunc(
+        boundGlobalsRunner(value, global),
+        vmSandboxedFuncToString(value),
+      );
+      local[name] = value;
     }
     return value;
   }
@@ -261,10 +274,14 @@ function makeGlobalWrapper() {
     if (typeof value === 'function') {
       // the handler will be unique so that one script couldn't remove something global
       // like console.log set by another script
-      window::addEventListener(name, events[name] = (...args) => value.apply(window, args));
+      window::addEventListener(name, events[name] = boundGlobalsRunner(value, window));
     } else {
       delete events[name];
     }
+  }
+  function undelete(name) {
+    const i = deleted::indexOf(name);
+    if (i >= 0) deleted::splice(i, 1);
   }
   return wrapper;
 }
@@ -275,30 +292,21 @@ function makeGlobalWrapper() {
 function makeComponentUtils() {
   const source = bridge.mode === INJECT_CONTENT && global;
   return {
-    cloneInto: {
-      value: source.cloneInto || assign(
-        (obj) => obj,
-        propertyToString,
-      ),
-    },
-    createObjectIn: {
-      value: source.createObjectIn || assign(
-        (targetScope, { defineAs } = {}) => {
-          const obj = {};
-          if (defineAs) targetScope[defineAs] = obj;
-          return obj;
-        },
-        propertyToString,
-      ),
-    },
-    exportFunction: {
-      value: source.exportFunction || assign(
-        (func, targetScope, { defineAs } = {}) => {
-          if (defineAs) targetScope[defineAs] = func;
-          return func;
-        },
-        propertyToString,
-      ),
-    },
+    cloneInto: source.cloneInto || vmOwnFunc(
+      (obj) => obj,
+    ),
+    createObjectIn: source.createObjectIn || vmOwnFunc(
+      (targetScope, { defineAs } = {}) => {
+        const obj = {};
+        if (defineAs) targetScope[defineAs] = obj;
+        return obj;
+      },
+    ),
+    exportFunction: source.exportFunction || vmOwnFunc(
+      (func, targetScope, { defineAs } = {}) => {
+        if (defineAs) targetScope[defineAs] = func;
+        return func;
+      },
+    ),
   };
 }
