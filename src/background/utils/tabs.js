@@ -1,4 +1,4 @@
-import { getActiveTab, sendTabCmd } from '#/common';
+import { getActiveTab, sendTabCmd, getFullUrl } from '#/common';
 import ua from '#/common/ua';
 import { commands } from './message';
 
@@ -6,20 +6,26 @@ const openers = {};
 
 Object.assign(commands, {
   /** @return {Promise<{ id: number }>} */
-  async TabOpen({ url, active, insert = true }, src) {
+  async TabOpen({
+    url, active, container, insert = true, pinned,
+  }, src = {}) {
     // src.tab may be absent when invoked from popup (e.g. edit/create buttons)
-    const { id: openerTabId, index, windowId } = src?.tab || await getActiveTab() || {};
-    const tab = await browser.tabs.create({
-      url,
-      active,
-      windowId,
-      ...insert && { index: index + 1 },
+    const srcTab = src.tab || await getActiveTab() || {};
+    // src.url may be absent when invoked directly as commands.TabOpen
+    const isInternal = !src.url || src.url.startsWith(window.location.protocol);
+    const storeId = srcTab.cookieStoreId;
+    const { id } = await browser.tabs.create({
+      active: active !== false,
+      pinned: !!pinned,
+      url: isInternal ? url : getFullUrl(url, src.url),
+      windowId: srcTab.windowId,
+      ...storeId && { cookieStoreId: getContainerId(isInternal ? 0 : container) || storeId },
+      ...insert && { index: srcTab.index + 1 },
       // XXX openerTabId seems buggy on Chrome, https://crbug.com/967150
       // It seems to do nothing even set successfully with `browser.tabs.update`.
-      ...ua.openerTabIdSupported && { openerTabId },
+      ...ua.openerTabIdSupported && { openerTabId: srcTab.id },
     });
-    const { id } = tab;
-    openers[id] = openerTabId;
+    openers[id] = srcTab.id;
     return { id };
   },
   /** @return {void} */
@@ -45,3 +51,8 @@ browser.tabs.onRemoved.addListener((id) => {
     delete openers[id];
   }
 });
+
+function getContainerId(index) {
+  return index === 0 && 'firefox-default'
+         || index > 0 && `firefox-container-${index}`;
+}
