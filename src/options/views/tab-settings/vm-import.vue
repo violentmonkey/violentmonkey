@@ -1,7 +1,7 @@
 <template>
   <section>
     <h3 v-text="i18n('labelDataImport')" />
-    <button v-text="i18n('buttonImportData')" @click="importFile" />
+    <button v-text="i18n('buttonImportData')" @click="pickBackup" ref="buttonImport"/>
     <button
       :title="i18n('hintVacuum')"
       @click="vacuum"
@@ -14,16 +14,23 @@
         <span v-text="i18n('labelImportSettings')"></span>
       </label>
     </div>
+    <table class="import-report">
+      <tr v-for="({ type, name, text }, i) in reports" :key="i" :data-type="type">
+        <td v-text="name" v-if="name"/>
+        <td v-text="text" :colspan="name ? null : 2"/>
+      </tr>
+    </table>
   </section>
 </template>
 
 <script>
-import { i18n, sendCmd } from '#/common';
-import { forEachEntry } from '#/common/object';
+import { ensureArray, i18n, sendCmd } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
-import loadZip from '#/common/zip';
-import { showMessage } from '../../utils';
+import loadZipLibrary from '#/common/zip';
+import { showConfirmation, showMessage } from '../../utils';
+
+const reports = [];
 
 export default {
   components: {
@@ -31,134 +38,237 @@ export default {
   },
   data() {
     return {
+      reports,
       vacuuming: false,
       labelVacuum: this.i18n('buttonVacuum'),
     };
   },
   methods: {
-    importFile() {
+    pickBackup() {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.zip';
-      input.onchange = () => {
-        if (input.files && input.files.length) importData(input.files[0]);
-      };
+      input.onchange = () => importBackup(input.files?.[0]);
       input.click();
     },
-    vacuum() {
+    async vacuum() {
       this.vacuuming = true;
       this.labelVacuum = this.i18n('buttonVacuuming');
-      sendCmd('Vacuum')
-      .then(() => {
-        this.vacuuming = false;
-        this.labelVacuum = this.i18n('buttonVacuumed');
-      });
+      await sendCmd('Vacuum');
+      this.vacuuming = false;
+      this.labelVacuum = this.i18n('buttonVacuumed');
     },
+  },
+  mounted() {
+    const toggleDragDrop = initDragDrop(this.$refs.buttonImport);
+    window.addEventListener('hashchange', toggleDragDrop);
+    toggleDragDrop();
   },
 };
 
-function forEachItem(obj, cb) {
-  if (obj) {
-    obj::forEachEntry(([key, value]) => {
-      cb(value, key);
+async function importBackup(file) {
+  if (!file) return;
+  reports.length = 0;
+  const zip = await loadZipLibrary();
+  const entries = await getAllEntries().catch(report) || [];
+  if (reports.length) return;
+  report('', file.name, 'info');
+  const uriMap = {};
+  const total = entries.reduce((n, entry) => n + entry.filename?.endsWith('.user.js'), 0);
+  const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
+  const vm = await readContents(vmEntry) || {};
+  if (!vm.scripts) vm.scripts = {};
+  if (!vm.values) vm.values = {};
+  await processAll(readScriptOptions, '.options.json');
+  await processAll(readScript, '.user.js');
+  await processAll(readScriptStorage, '.storage.json');
+  if (options.get('importSettings')) {
+    sendCmd('SetOptions',
+      toObjectArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
+  }
+  sendCmd('SetValueStores',
+    toObjectArray(vm.values, ([uri, store]) => store && ({ where: { uri }, store })));
+  sendCmd('CheckPosition');
+  showMessage({ text: reportProgress() });
+
+  function getAllEntries() {
+    return new Promise((resolve, reject) => {
+      zip.createReader(new zip.BlobReader(file),
+        reader => reader.getEntries(resolve),
+        reject);
     });
   }
-}
-
-function getVMConfig(text) {
-  let vm;
-  try {
-    vm = JSON.parse(text);
-  } catch (e) {
-    console.warn('Error parsing ViolentMonkey configuration.');
+  function parseJson(text, entry) {
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      report(e, entry.filename, null);
+    }
   }
-  return vm || {};
-}
-
-function getVMFile(entry, vmFile) {
-  if (!entry.filename.endsWith('.user.js')) return;
-  const vm = vmFile || {};
-  return loadZip()
-  .then(zip => new Promise((resolve) => {
-    const writer = new zip.TextWriter();
-    entry.getData(writer, (text) => {
-      const data = { code: text };
-      if (vm.scripts) {
-        const more = vm.scripts[entry.filename.slice(0, -8)];
-        if (more) {
-          data.custom = more.custom;
-          data.config = more.config || {};
-          data.position = more.position;
-          data.props = {
-            lastModified: more.lastModified || +entry.lastModDate,
-            lastUpdated: more.lastUpdated || +entry.lastModDate,
-          };
-          // Import data from older version
-          if ('enabled' in more) data.config.enabled = more.enabled;
-          if ('update' in more) data.config.shouldUpdate = more.update;
-        }
+  function processAll(transform, suffix) {
+    return Promise.all(entries.map(async entry => {
+      const { filename } = entry;
+      if (filename?.endsWith(suffix)) {
+        const contents = await readContents(entry);
+        return contents && transform(entry, contents, filename.slice(0, -suffix.length));
       }
-      sendCmd('ParseScript', data)
-      .then(() => resolve(true), () => resolve());
+    }));
+  }
+  function readContents(entry) {
+    return entry && new Promise(resolve => {
+      entry.getData(new zip.TextWriter(), text => {
+        resolve(entry.filename.endsWith('.js') ? text : parseJson(text, entry));
+      });
     });
-  }));
-}
-
-function getVMFiles(entries) {
-  return loadZip()
-  .then(zip => new Promise((resolve) => {
-    const data = { entries };
-    const i = entries.findIndex(entry => entry.filename && entry.filename.toLowerCase() === 'violentmonkey');
-    if (i < 0) {
-      data.vm = {};
-      return resolve(data);
+  }
+  async function readScript(entry, code, name) {
+    const { filename } = entry;
+    const more = vm.scripts[name];
+    const data = {
+      code,
+      ...more && {
+        custom: more.custom,
+        config: {
+          enabled: more.enabled ?? 1, // Import data from older version
+          shouldUpdate: more.update ?? 1, // Import data from older version
+          ...more.config,
+        },
+        position: more.position,
+        props: {
+          lastModified: more.lastModified || +entry.lastModDate,
+          lastUpdated: more.lastUpdated || +entry.lastModDate,
+        },
+      },
+    };
+    try {
+      uriMap[name] = (await sendCmd('ParseScript', data)).update.props.uri;
+      reportProgress(filename);
+    } catch (e) {
+      report(e, filename, 'script');
     }
-    const writer = new zip.TextWriter();
-    entries[i].getData(writer, (text) => {
-      entries.splice(i, 1);
-      data.vm = getVMConfig(text);
-      resolve(data);
-    });
-  }));
+  }
+  async function readScriptOptions(entry, json, name) {
+    const { meta, settings = {}, options: opts } = json;
+    if (!meta || !opts) return;
+    const ovr = opts.override || {};
+    reports[0].text = 'Tampermonkey';
+    /** @type VMScript */
+    vm.scripts[name] = {
+      config: {
+        enabled: settings.enabled !== false ? 1 : 0,
+        shouldUpdate: opts.check_for_updates ? 1 : 0,
+      },
+      custom: {
+        downloadURL: typeof meta.file_url === 'string' ? meta.file_url : undefined,
+        // customizing of @noframes isn't implemented yet
+        noframes: !!ovr.noframes || (ovr.noframes == null ? undefined : false),
+        runAt: /^document-(start|end|idle)$/.test(opts.run_at) ? opts.run_at : undefined,
+        exclude: toStringArray(ovr.use_excludes),
+        include: toStringArray(ovr.use_includes),
+        match: toStringArray(ovr.use_matches),
+        origExclude: ovr.merge_excludes !== false, // will also set to true if absent
+        origInclude: ovr.merge_includes !== false,
+        origMatch: ovr.merge_matches !== false,
+      },
+      position: +settings.position || undefined,
+      props: {
+        lastModified: +meta.modified,
+        lastUpdated: +meta.modified,
+      },
+    };
+  }
+  async function readScriptStorage(entry, json, name) {
+    reports[0].text = 'Tampermonkey';
+    vm.values[uriMap[name]] = json.data;
+  }
+  function report(text, name, type = 'critical') {
+    reports.push({ text, name, type });
+  }
+  function reportProgress(filename = '') {
+    const count = Object.keys(uriMap).length;
+    const text = i18n('msgImported', [count === total ? count : `${count} / ${total}`]);
+    reports[0].name = text; // keeping the message in the first column so it doesn't jump around
+    reports[0].text = filename;
+    return text;
+  }
+  function toObjectArray(obj, transform) {
+    return Object.entries(obj || {}).map(transform).filter(Boolean);
+  }
+  function toStringArray(data) {
+    return ensureArray(data).filter(item => typeof item === 'string');
+  }
 }
 
-function readZip(file) {
-  return loadZip()
-  .then(zip => new Promise((resolve, reject) => {
-    zip.createReader(new zip.BlobReader(file), (res) => {
-      res.getEntries((entries) => {
-        resolve(entries);
-      });
-    }, (err) => { reject(err); });
-  }));
-}
-
-function importData(file) {
-  readZip(file)
-  .then(getVMFiles)
-  .then((data) => {
-    const { vm, entries } = data;
-    if (options.get('importSettings')) {
-      const ignoreKeys = ['sync'];
-      forEachItem(vm.settings, (value, key) => {
-        if (ignoreKeys.includes(key)) return;
-        options.set(key, value);
-      });
-    }
-    return Promise.all(entries.map(entry => getVMFile(entry, vm)))
-    .then(res => res.filter(Boolean).length)
-    .then((count) => {
-      forEachItem(vm.values, (valueStore, key) => {
-        if (valueStore) {
-          sendCmd('SetValueStore', {
-            where: { uri: key },
-            valueStore,
-          });
-        }
-      });
-      showMessage({ text: i18n('msgImported', [count]) });
-      sendCmd('CheckPosition');
-    });
-  });
+function initDragDrop(targetElement) {
+  let leaveTimer;
+  const showAllowedState = state => targetElement.classList.toggle('drop-allowed', state);
+  const onDragEnd = () => showAllowedState(false);
+  const onDragLeave = () => {
+    clearTimeout(leaveTimer);
+    leaveTimer = setTimeout(onDragEnd, 250);
+  };
+  const onDragOver = evt => {
+    clearTimeout(leaveTimer);
+    const hasFiles = evt.dataTransfer.types.includes('Files');
+    if (hasFiles) evt.preventDefault();
+    showAllowedState(hasFiles);
+  };
+  const onDrop = async evt => {
+    evt.preventDefault();
+    showAllowedState(false);
+    try {
+      // storing it now because `files` will be null after await
+      const file = evt.dataTransfer.files[0];
+      await showConfirmation(i18n('buttonImportData'));
+      targetElement.disabled = true;
+      await importBackup(file);
+      targetElement.disabled = false;
+    } catch (e) { /* NOP */ }
+  };
+  return () => {
+    const isSettingsTab = window.location.hash === '#settings';
+    const onOff = document[`${isSettingsTab ? 'add' : 'remove'}EventListener`];
+    document::onOff('dragend', onDragEnd);
+    document::onOff('dragleave', onDragLeave);
+    document::onOff('dragover', onDragOver);
+    document::onOff('drop', onDrop);
+  };
 }
 </script>
+
+<style>
+button.drop-allowed {
+  background-color: green;
+  color: white;
+}
+.import-report {
+  white-space: pre-wrap;
+  padding-top: 1rem;
+  font-size: 90%;
+  color: #c80;
+  &:empty {
+    display: none;
+  }
+  td {
+    padding: 1px .5em 3px;
+    vertical-align: top; // in case of super long multiline text
+  }
+  [data-type="critical"] {
+    color: #fff;
+    background-color: red;
+    font-weight: bold;
+  }
+  [data-type="script"] {
+    color: red;
+  }
+  [data-type="info"] {
+    color: blue;
+  }
+  @media (prefers-color-scheme: dark) {
+    color: #a83;
+    [data-type="info"] {
+      color: #fff;
+    }
+  }
+}
+</style>

@@ -41,7 +41,7 @@ if (!global.browser?.runtime?.sendMessage) {
         sendResponse({ data });
       }, (error) => {
         if (process.env.DEBUG) console.warn(error);
-        sendResponse({ error });
+        sendResponse({ error: error instanceof Error ? error.stack : error });
       })
       .catch(() => {}); // Ignore sendResponse error
       return true;

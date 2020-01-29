@@ -233,12 +233,6 @@ export async function dumpValueStores(valueDict) {
   return valueDict;
 }
 
-/** @return {Promise<?Object>} */
-export async function dumpValueStore(where, valueStore) {
-  const id = where.id || getScript(where)?.props.id;
-  return id && dumpValueStores({ [id]: valueStore });
-}
-
 const gmValues = [
   'GM_getValue', 'GM.getValue',
   'GM_setValue', 'GM.setValue',
@@ -576,6 +570,12 @@ export async function vacuum() {
  * @property {Boolean | null} notifyUpdates - stored as 0 or 1 or null (default) which means "use global setting"
  */
 /** @typedef VMScriptCustom *
+ * @property {string} name
+ * @property {string} downloadURL
+ * @property {string} homepageURL
+ * @property {string} lastInstallURL
+ * @property {string} updateURL
+ * @property {'auto' | 'page' | 'content'} injectInto
  * @property {string[]} exclude
  * @property {string[]} excludeMatch
  * @property {string[]} include

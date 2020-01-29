@@ -61,11 +61,11 @@
 </template>
 
 <script>
-import { i18n, sendCmd, noop } from '#/common';
+import { i18n, sendCmd } from '#/common';
 import { objectPick } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import { route } from '#/common/router';
-import { store, showMessage } from '../../utils';
+import { store, showConfirmation, showMessage } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
 import VmHelp from './help';
@@ -200,30 +200,15 @@ export default {
         showMessage({ text: err });
       }
     },
-    close({ fromCM } = {}) {
+    async close({ fromCM } = {}) {
       if (fromCM && this.nav !== 'code') {
         this.nav = 'code';
         return;
       }
-      (this.canSave ? Promise.reject() : Promise.resolve())
-      .catch(() => new Promise((resolve, reject) => {
-        showMessage({
-          input: false,
-          text: i18n('confirmNotSaved'),
-          buttons: [
-            {
-              text: i18n('buttonOK'),
-              onClick: resolve,
-            },
-            {
-              text: i18n('buttonCancel'),
-              onClick: reject,
-            },
-          ],
-          onBackdropClick: reject,
-        });
-      }))
-      .then(() => this.$emit('close'), noop);
+      try {
+        if (this.canSave) await showConfirmation(i18n('confirmNotSaved'));
+        this.$emit('close');
+      } catch (e) { /* NOP */ }
     },
     saveClose() {
       this.save().then(this.close);

@@ -2,7 +2,7 @@ import { isEmpty, sendTabCmd } from '#/common';
 import {
   forEachEntry, forEachKey, objectPick, objectSet,
 } from '#/common/object';
-import { getValueStoresByIds, dumpValueStores, dumpValueStore } from './db';
+import { getScript, getValueStoresByIds, dumpValueStores } from './db';
 import { commands } from './message';
 
 const openers = {}; // { scriptId: { tabId: { frameId: 1, ... }, ... } }
@@ -15,11 +15,17 @@ Object.assign(commands, {
     const stores = await getValueStoresByIds([id]);
     return stores[id] || {};
   },
-  /** @return {Promise<void>} */
-  async SetValueStore({ where, valueStore }) {
+  /** @param {{ where, store }[]} data
+   * @return {Promise<void>} */
+  async SetValueStores(data) {
     // Value store will be replaced soon.
-    const store = await dumpValueStore(where, valueStore);
-    if (store) broadcastUpdates(store);
+    const stores = data.reduce((res, { where, store }) => {
+      const id = where.id || getScript(where)?.props.id;
+      if (id) res[id] = store;
+      return res;
+    }, {});
+    await dumpValueStores(stores);
+    broadcastUpdates(stores);
   },
   /** @return {Promise<void>} */
   UpdateValue({ id, update: { key, value = null } }, src) {
