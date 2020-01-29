@@ -77,8 +77,8 @@ export default function injectScripts(contentId, webId, data) {
     }, INJECT_CONTENT);
   }
   if (injectPage.length) {
-    // Avoid using Function::apply in case it is shimmed
-    inject(`(${VMInitInjection}())(${JSON.stringify(args).slice(1, -1)})`);
+    inject(`(${VMInitInjection}())(${JSON.stringify(args).slice(1, -1)})`,
+      `${window.location.origin}/Violentmonkey.sandbox.js`);
     bridge.post('LoadScripts', {
       ...data,
       mode: INJECT_PAGE,
