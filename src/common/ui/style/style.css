@@ -204,6 +204,14 @@ button,
   }
 }
 
+ul,
+ol {
+  padding-left: 20px;
+}
+li {
+  line-height: 1.4;
+}
+
 .inline-block {
   display: inline-block;
 }

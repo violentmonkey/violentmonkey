@@ -1,13 +1,3 @@
-anchorAuthor:
-  description: Author shown on about tab.
-  message: '<a href=mailto:i@gerald.top>Gerald</a>'
-anchorTranslator:
-  description: Translator shown on about tab.
-  message: '<a href=mailto:i@gerald.top>Gerald</a>'
-buttonAllNone:
-  description: Button to select all scripts or none.
-  message: 全选/不选
-  touched: false
 buttonCancel:
   description: Cancel button on dialog.
   message: 取消
@@ -181,6 +171,24 @@ filterExecutionOrder:
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: 最近更新时间
+filterScopeAll:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeCode:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeName:
+  description: Option in dashboard's search scope filter.
+  message: ''
+genericOff:
+  description: 'To indicate something is turned off or disabled, similar to "no".'
+  message: ''
+genericOn:
+  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  message: ''
+genericUseGlobal:
+  description: To indicate some per-script option will use its analog in global settings.
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: 回收站
@@ -238,6 +246,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: 黑名单
+labelContributors:
+  description: Label for link to contributors.
+  message: ''
 labelCurrentLang:
   description: Label of current language.
   message: 当前语言：
@@ -259,10 +270,6 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: 编辑数据
-labelEditing:
-  description: Label for current editing script
-  message: 正在编辑：
-  touched: false
 labelEditor:
   description: Label for Editor settings
   message: 编辑器
@@ -299,10 +306,6 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: '@include 规则'
-labelIndentUnit:
-  description: Label for editor option of indent unit size.
-  message: 缩进大小：
-  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 默认注入模式：
@@ -318,10 +321,6 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 行号：
-labelLineWrapping:
-  description: Label for editor option of line wrapping.
-  message: 自动换行
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match 规则'
@@ -331,26 +330,27 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 名字为空
-labelNoScripts:
-  description: Message shown when no script is installed.
-  message: 奥欧，您还没有任何脚本~
-  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 未找到脚本！
+labelNotifyThisUpdated:
+  description: >-
+    A per-script option in editor to enable notification when this script is
+    updated. The text follows "Allow update" checkbox option so it's like a
+    continuation of the phrase.
+  message: ''
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: 脚本更新时提示
+labelNotifyUpdatesGlobal:
+  description: Option to prioritize global notification option over script's setting.
+  message: ''
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: 弹出菜单中的脚本按$1排序
 labelRelated:
   description: Label of related links.
   message: 相关链接：
-labelRemoved:
-  description: Label shown when a script is removed.
-  message: 【已删除】
-  touched: false
 labelRemovedAt:
   description: Label for the time when the script is removed.
   message: 于 $1 删除
@@ -363,10 +363,6 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: （默认）
-labelScriptEditor:
-  description: Shown in the title of the script editing page.
-  message: 脚本编辑器
-  touched: false
 labelScriptTemplate:
   description: Label for custom script template.
   message: 自定义脚本模板
@@ -379,10 +375,6 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: 设置
-labelShowBadge:
-  description: Option to show number of running scripts on the badge.
-  message: 在扩展图标上显示运行的脚本数
-  touched: false
 labelSync:
   description: Label for sync options.
   message: 同步
@@ -423,6 +415,7 @@ labelSyncUsername:
 labelTranslator:
   description: Label of translator.
   message: 翻译者：
+  touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 检查更新地址：
@@ -582,6 +575,9 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: 更新
+titleSearchHint:
+  description: Hover title for search icon in dashboard.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: 键名（字符串）
