@@ -1,5 +1,5 @@
 import { getUniqId, sendCmd } from './utils';
-import { addEventListener, match } from './utils/helpers';
+import { addEventListener, describeProperty, match } from './utils/helpers';
 import initialize from './content';
 
 (function main() {
@@ -19,7 +19,7 @@ import initialize from './content';
 
   const { go } = History.prototype;
   const { querySelector } = Document.prototype;
-  const { get: getReadyState } = Object.getOwnPropertyDescriptor(Document.prototype, 'readyState');
+  const { get: getReadyState } = describeProperty(Document.prototype, 'readyState');
   // For installation
   // Firefox does not support `onBeforeRequest` for `file:`
   async function checkJS() {

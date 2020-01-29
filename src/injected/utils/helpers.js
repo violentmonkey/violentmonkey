@@ -9,20 +9,20 @@ export const {
 } = global;
 
 export const {
-  filter, findIndex, forEach, includes, indexOf, join, map, push, shift,
+  concat, filter, findIndex, forEach, includes, indexOf, join, map, push, shift,
   // arraySlice, // to differentiate from String::slice which we use much more often
 } = Array.prototype;
 
 export const {
   keys: objectKeys, values: objectValues, entries: objectEntries,
-  assign, defineProperty, defineProperties,
+  assign, defineProperty, defineProperties, getOwnPropertyDescriptor: describeProperty,
 } = Object;
 export const { charCodeAt, match, slice } = String.prototype;
 export const { toString: objectToString } = Object.prototype;
 const { toString: numberToString } = Number.prototype;
 const { replace } = String.prototype;
 export const { fromCharCode } = String;
-export const { addEventListener } = EventTarget.prototype;
+export const { addEventListener, removeEventListener } = EventTarget.prototype;
 export const { append, setAttribute } = Element.prototype;
 export const { createElementNS } = Document.prototype;
 export const logging = assign({}, console);
@@ -82,30 +82,23 @@ const escMap = {
 const escRE = /[\\"\u0000-\u001F\u2028\u2029]/g; // eslint-disable-line no-control-regex
 const escFunc = m => escMap[m] || `\\u${(m::charCodeAt(0) + 0x10000)::numberToString(16)::slice(1)}`;
 export const jsonLoad = JSON.parse;
-let jsonDumpFunction = jsonDumpSafe;
 // When running in the page context we must beware of sites that override Array#toJSON
-// leading to an invalid result, which is why our jsonDumpSafe() ignores toJSON.
+// leading to an invalid result, which is why our jsonDump() ignores toJSON.
 // Thus, we use the native JSON.stringify() only in the content script context and only until
 // a userscript is injected into this context (due to `@inject-into` and/or a CSP problem).
-export function setJsonDump({ native }) {
-  jsonDumpFunction = native ? JSON.stringify : jsonDumpSafe;
-}
 export function jsonDump(value) {
-  return jsonDumpFunction(value);
-}
-function jsonDumpSafe(value) {
   if (value == null) return 'null';
   const type = typeof value;
   if (type === 'number') return isFinite(value) ? `${value}` : 'null';
   if (type === 'boolean') return `${value}`;
   if (type === 'object') {
     if (isArray(value)) {
-      return `[${value::map(jsonDumpSafe)::join(',')}]`;
+      return `[${value::map(jsonDump)::join(',')}]`;
     }
     if (value::objectToString() === '[object Object]') {
       const res = objectKeys(value)::map((key) => {
         const v = value[key];
-        return v !== undefined && `${jsonDumpSafe(key)}:${jsonDumpSafe(v)}`;
+        return v !== undefined && `${jsonDump(key)}:${jsonDump(v)}`;
       });
       // JSON.stringify skips undefined in objects i.e. {foo: undefined} produces {}
       return `{${res::filter(Boolean)::join(',')}}`;

@@ -1,8 +1,6 @@
 import {
   INJECT_AUTO,
   INJECT_CONTENT,
-  INJECT_INTERNAL_CONTENT,
-  INJECT_INTERNAL_PAGE,
   INJECT_MAPPING,
   INJECT_PAGE,
   browser,
@@ -11,7 +9,7 @@ import { getUniqId, sendCmd } from '#/common';
 
 import { attachFunction } from '../utils';
 import {
-  forEach, join, jsonDump, setJsonDump, append, createElementNS, NS_HTML,
+  forEach, join, append, createElementNS, NS_HTML,
   charCodeAt, fromCharCode,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -29,57 +27,42 @@ bridge.addHandlers({
   InjectMulti: data => data::forEach(injectScript),
 });
 
-export function triageScripts(data) {
+export default function injectScripts(contentId, webId, data) {
+  const injectPage = [];
+  const injectContent = [];
   const scriptLists = {
-    [INJECT_INTERNAL_PAGE]: [],
-    [INJECT_INTERNAL_CONTENT]: [],
+    [INJECT_PAGE]: injectPage,
+    [INJECT_CONTENT]: injectContent,
   };
-  if (data.scripts) {
-    data.scripts = data.scripts.filter(({ meta, props, config }) => {
-      if (!meta.noframes || window.top === window) {
-        bridge.ids.push(props.id);
-        if (config.enabled) {
-          bridge.enabledIds.push(props.id);
-          return true;
-        }
+  let { scripts } = data;
+  scripts = scripts.filter(({ meta, props, config }) => {
+    if (!meta.noframes || window.top === window) {
+      bridge.ids.push(props.id);
+      if (config.enabled) {
+        bridge.enabledIds.push(props.id);
+        return true;
       }
-      return false;
-    });
-    let support;
-    const injectChecking = {
-      [INJECT_INTERNAL_PAGE]: () => {
-        if (!support) support = { injectable: checkInjectable() };
-        return support.injectable;
-      },
-      [INJECT_INTERNAL_CONTENT]: () => true,
-    };
-    data.scripts.forEach((script) => {
-      const injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
-      const internalInjectInto = INJECT_MAPPING[injectInto] || INJECT_MAPPING[INJECT_AUTO];
-      const availableInjectInto = internalInjectInto.find(key => injectChecking[key]?.());
-      scriptLists[availableInjectInto]?.push({ script, injectInto: availableInjectInto });
-    });
-  }
-  return scriptLists;
-}
-
-export function injectScripts(contentId, webId, data, scriptLists) {
-  const props = [];
-  // combining directly to avoid GC due to a big intermediate object
-  const addUniqProp = key => !props.includes(key) && props.push(key);
-  // some browsers may list duplicate props within one window object!
-  [window, global].forEach(wnd => Object.getOwnPropertyNames(wnd).forEach(addUniqProp));
+    }
+    return false;
+  });
+  let injectable;
+  const injectChecking = {
+    // eslint-disable-next-line no-return-assign
+    [INJECT_PAGE]: () => injectable ?? (injectable = checkInjectable()),
+    [INJECT_CONTENT]: () => true,
+  };
+  scripts.forEach((script) => {
+    const injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
+    const internalInjectInto = INJECT_MAPPING[injectInto] || INJECT_MAPPING[INJECT_AUTO];
+    const availableInjectInto = internalInjectInto.find(key => injectChecking[key]?.());
+    scriptLists[availableInjectInto]?.push({ script, injectInto: availableInjectInto });
+  });
   const args = [
     webId,
     contentId,
-    props,
     data.ua,
     data.isFirefox,
   ];
-  bridge.isFirefox = data.isFirefox;
-
-  const injectPage = scriptLists[INJECT_PAGE];
-  const injectContent = scriptLists[INJECT_CONTENT];
   if (injectContent.length) {
     const invokeGuest = VMInitInjection()(...args, bridge.onHandle);
     const postViaBridge = bridge.post;
@@ -94,19 +77,13 @@ export function injectScripts(contentId, webId, data, scriptLists) {
     }, INJECT_CONTENT);
   }
   if (injectPage.length) {
-    // Avoid using Function::apply in case it is shimmed
-    inject(`(${VMInitInjection}())(${jsonDump(args).slice(1, -1)})`);
+    inject(`(${VMInitInjection}())(${JSON.stringify(args).slice(1, -1)})`,
+      `${window.location.origin}/Violentmonkey.sandbox.js`);
     bridge.post('LoadScripts', {
       ...data,
       mode: INJECT_PAGE,
       items: injectPage,
     });
-  }
-  if (injectContent.length) {
-    // content script userscripts will run in one of the next event loop cycles
-    // (we use browser.tabs.executeScript) so we need to switch to jsonDumpSafe because
-    // after this point we can't rely on JSON.stringify anymore, see the notes for setJsonDump
-    setJsonDump({ native: false });
   }
 }
 
@@ -119,7 +96,7 @@ function checkInjectable() {
     a.id = domId;
     document.documentElement.appendChild(a);
   };
-  inject(`(${detect})(${jsonDump(id)})`);
+  inject(`(${detect})(${JSON.stringify(id)})`);
   const a = document.querySelector(`#${id}`);
   const injectable = !!a;
   if (a) a.remove();

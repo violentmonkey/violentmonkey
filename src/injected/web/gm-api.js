@@ -17,9 +17,8 @@ import {
 const { getElementById } = Document.prototype;
 const { lastIndexOf } = String.prototype;
 
-export function createGmApiProps() {
-  // these are bound to script data that we pass via |this|
-  const boundProps = {
+export function makeGmApi() {
+  return [{
     GM_deleteValue(key) {
       const { id } = this;
       const values = loadValues(id);
@@ -148,9 +147,6 @@ export function createGmApiProps() {
       if (!opts || !opts.url) throw new Error('GM_xmlhttpRequest: Invalid parameter!');
       return onRequestCreate(opts, this.id);
     },
-  };
-
-  const props = {
     GM_addStyle(css) {
       let el = false;
       const callbackId = registerCallback((styleId) => {
@@ -190,40 +186,21 @@ export function createGmApiProps() {
     GM_setClipboard(data, type) {
       bridge.post('SetClipboard', { data, type });
     },
-  };
-  // convert to object property descriptors
-  [props, boundProps].forEach(target => {
-    objectKeys(target).forEach(k => {
-      target[k] = propertyFromValue(target[k]);
-    });
-  });
-  // not using propertyFromValue to keep native toString on the real console.log
-  props.GM_log = { value: logging.log };
-  return {
-    props,
-    boundProps,
-    gm4: {
-      getResourceURL: { async: true },
-      getValue: { async: true },
-      deleteValue: { async: true },
-      setValue: { async: true },
-      listValues: { async: true },
-      xmlHttpRequest: { alias: 'xmlhttpRequest' },
-      notification: true,
-      openInTab: true,
-      setClipboard: true,
-      addStyle: true, // gm4-polyfill.js sets it anyway
-    },
-  };
-}
-
-export function propertyFromValue(value) {
-  if (typeof value === 'function') value.toString = propertyToString;
-  return { value };
-}
-
-export function propertyToString() {
-  return '[Violentmonkey property]';
+    // using the native console.log so the output has a clickable link to the caller's source
+    GM_log: logging.log,
+  }, {
+    // Greasemonkey4 API polyfill
+    getResourceURL: { async: true },
+    getValue: { async: true },
+    deleteValue: { async: true },
+    setValue: { async: true },
+    listValues: { async: true },
+    xmlHttpRequest: { alias: 'xmlhttpRequest' },
+    notification: true,
+    openInTab: true,
+    setClipboard: true,
+    addStyle: true, // gm4-polyfill.js sets it anyway
+  }];
 }
 
 function registerCallback(callback) {

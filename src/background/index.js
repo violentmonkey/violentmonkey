@@ -42,9 +42,8 @@ Object.assign(commands, {
     return data;
   },
   /** @return {Promise<Object>} */
-  async GetInjected(url, src) {
-    const { id: tabId } = src.tab || {};
-    if (src.frameId === 0) resetValueOpener(tabId);
+  async GetInjected(_, { url, tab, frameId }) {
+    if (frameId === 0) resetValueOpener(tab.id);
     const data = {
       isApplied,
       injectInto,
@@ -54,7 +53,7 @@ Object.assign(commands, {
     };
     if (isApplied) {
       const scripts = await (cache.get(`preinject:${url}`) || getScriptsByURL(url));
-      addValueOpener(tabId, src.frameId, Object.keys(scripts.values));
+      addValueOpener(tab.id, frameId, Object.keys(scripts.values));
       Object.assign(data, scripts);
     }
     return data;

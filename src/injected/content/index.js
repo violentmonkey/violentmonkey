@@ -1,12 +1,12 @@
 import { getUniqId, makePause, isEmpty } from '#/common';
-import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
+import { INJECT_CONTENT } from '#/common/consts';
 import { bindEvents, sendCmd, sendMessage } from '../utils';
 import {
-  setJsonDump, objectKeys, forEach, includes, append, createElementNS, setAttribute, NS_HTML,
+  objectKeys, forEach, includes, append, createElementNS, setAttribute, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
-import { injectScripts, triageScripts } from './inject';
+import injectScripts from './inject';
 import './notifications';
 import './requests';
 import './tabs';
@@ -18,18 +18,15 @@ const menus = {};
 const { split } = String.prototype;
 
 export default async function initialize(contentId, webId) {
-  // 1) bridge.post may be overriden in injectScripts
+  const data = await sendCmd('GetInjected', null, { retry: true });
+  // 1) bridge.post may be overridden in injectScripts
   // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
   bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
   bridge.destId = webId;
-  setJsonDump({ native: true });
-  const data = await sendCmd('GetInjected', window.location.href, { retry: true });
-  const scriptLists = triageScripts(data);
+  bridge.isFirefox = data.isFirefox;
+  if (data.scripts) injectScripts(contentId, webId, data);
   getPopup();
   setBadge();
-  if (scriptLists[INJECT_PAGE].length || scriptLists[INJECT_CONTENT].length) {
-    injectScripts(contentId, webId, data, scriptLists);
-  }
 }
 
 bridge.addBackgroundHandlers({

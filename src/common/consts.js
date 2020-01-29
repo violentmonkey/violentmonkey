@@ -2,16 +2,13 @@ export const INJECT_AUTO = 'auto';
 export const INJECT_PAGE = 'page';
 export const INJECT_CONTENT = 'content';
 
-export const INJECT_INTERNAL_PAGE = 'page';
-export const INJECT_INTERNAL_CONTENT = 'content';
-
 export const INJECT_MAPPING = {
   // `auto` tries to provide `window` from the real page as `unsafeWindow`
-  [INJECT_AUTO]: [INJECT_INTERNAL_PAGE, INJECT_INTERNAL_CONTENT],
+  [INJECT_AUTO]: [INJECT_PAGE, INJECT_CONTENT],
   // inject into page context
-  [INJECT_PAGE]: [INJECT_INTERNAL_PAGE],
+  [INJECT_PAGE]: [INJECT_PAGE],
   // inject into content context only
-  [INJECT_CONTENT]: [INJECT_INTERNAL_CONTENT],
+  [INJECT_CONTENT]: [INJECT_CONTENT],
 };
 
 export const CMD_SCRIPT_ADD = 'AddScript';

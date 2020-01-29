@@ -1,7 +1,7 @@
 import { objectPick } from '#/common/object';
 import {
   filter, includes, map, push, jsonDump, jsonLoad, objectToString, Promise, Uint8Array,
-  setAttribute, log, buffer2stringSafe, charCodeAt, shift, slice, defineProperty,
+  setAttribute, log, buffer2stringSafe, charCodeAt, shift, slice, defineProperty, describeProperty,
   createElementNS, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -12,7 +12,7 @@ const queue = [];
 const { DOMParser } = global;
 const { parseFromString } = DOMParser.prototype;
 const { toLowerCase } = String.prototype;
-const getHref = Object.getOwnPropertyDescriptor(HTMLAnchorElement.prototype, 'href').get;
+const { get: getHref } = describeProperty(HTMLAnchorElement.prototype, 'href');
 
 bridge.addHandlers({
   GotRequestId(id) {
