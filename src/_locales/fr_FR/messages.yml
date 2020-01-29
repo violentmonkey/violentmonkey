@@ -1,15 +1,3 @@
-anchorAuthor:
-  description: Author shown on about tab.
-  message: '<a href=mailto:i@gerald.top>Gerald</a>'
-anchorTranslator:
-  description: Translator shown on about tab.
-  message: >-
-    <a href=mailto:germain.poirrier@gmail.com>BeardedBear</a>, <a
-    href=mailto:perso@hack-libre.org>ariasuni</a>
-buttonAllNone:
-  description: Button to select all scripts or none.
-  message: Tous/Aucun
-  touched: false
 buttonCancel:
   description: Cancel button on dialog.
   message: Annuler
@@ -180,6 +168,24 @@ filterExecutionOrder:
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: ''
+filterScopeAll:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeCode:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeName:
+  description: Option in dashboard's search scope filter.
+  message: ''
+genericOff:
+  description: 'To indicate something is turned off or disabled, similar to "no".'
+  message: ''
+genericOn:
+  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  message: ''
+genericUseGlobal:
+  description: To indicate some per-script option will use its analog in global settings.
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: ''
@@ -241,6 +247,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Liste noire
+labelContributors:
+  description: Label for link to contributors.
+  message: ''
 labelCurrentLang:
   description: Label of current language.
   message: 'Langue actuelle: '
@@ -262,10 +271,6 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Éditer la valeur du script
-labelEditing:
-  description: Label for current editing script
-  message: 'En cours d’édition: '
-  touched: false
 labelEditor:
   description: Label for Editor settings
   message: Éditeur
@@ -302,10 +307,6 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: Règles @include
-labelIndentUnit:
-  description: Label for editor option of indent unit size.
-  message: Taille de l’indentation
-  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Mode d’injection par défaut:'
@@ -321,10 +322,6 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Ligne n°.: '
-labelLineWrapping:
-  description: Label for editor option of line wrapping.
-  message: Couper les longues lignes
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: Règles @match
@@ -334,26 +331,27 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Pas de nom
-labelNoScripts:
-  description: Message shown when no script is installed.
-  message: 'Oups, vous n’avez pas encore de scripts.'
-  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Pas de script trouvé
+labelNotifyThisUpdated:
+  description: >-
+    A per-script option in editor to enable notification when this script is
+    updated. The text follows "Allow update" checkbox option so it's like a
+    continuation of the phrase.
+  message: ''
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notification de mise à jour de script
+labelNotifyUpdatesGlobal:
+  description: Option to prioritize global notification option over script's setting.
+  message: ''
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: ''
 labelRelated:
   description: Label of related links.
   message: 'Liens relatifs: '
-labelRemoved:
-  description: Label shown when a script is removed.
-  message: '[Supprimé]'
-  touched: false
 labelRemovedAt:
   description: Label for the time when the script is removed.
   message: ''
@@ -366,10 +364,6 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Défaut)
-labelScriptEditor:
-  description: Shown in the title of the script editing page.
-  message: Éditeur de script
-  touched: false
 labelScriptTemplate:
   description: Label for custom script template.
   message: Modèle de script personnalisé
@@ -382,10 +376,6 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Configuration
-labelShowBadge:
-  description: Option to show number of running scripts on the badge.
-  message: Afficher le nombre de scripts en cours sur l’icône
-  touched: false
 labelSync:
   description: Label for sync options.
   message: Synchronisation
@@ -426,6 +416,7 @@ labelSyncUsername:
 labelTranslator:
   description: Label of translator.
   message: 'Traducteur·ice·s: '
+  touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL de mise à jour:'
@@ -585,6 +576,9 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Mise à jour
+titleSearchHint:
+  description: Hover title for search icon in dashboard.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: Clé (chaine de caractères)

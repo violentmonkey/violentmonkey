@@ -1,13 +1,3 @@
-anchorAuthor:
-  description: Author shown on about tab.
-  message: '<a href=mailto:i@gerald.top>Gerald</a>'
-anchorTranslator:
-  description: Translator shown on about tab.
-  message: '<a href=mailto:i@gerald.top>Gerald</a>'
-buttonAllNone:
-  description: Button to select all scripts or none.
-  message: All/None
-  touched: false
 buttonCancel:
   description: Cancel button on dialog.
   message: Cancel
@@ -194,11 +184,11 @@ filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Name
 genericOff:
-  description: To indicate something is turned off or disabled, similar to 'no'.
-  message: off
+  description: 'To indicate something is turned off or disabled, similar to "no".'
+  message: 'off'
 genericOn:
-  description: To indicate something is turned on or enabled, similar to 'yes'.
-  message: on
+  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  message: 'on'
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: use global setting
@@ -259,6 +249,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Blacklist
+labelContributors:
+  description: Label for link to contributors.
+  message: Contributors
 labelCurrentLang:
   description: Label of current language.
   message: 'Current Language: '
@@ -280,10 +273,6 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Editing script value
-labelEditing:
-  description: Label for current editing script
-  message: 'Current editing: '
-  touched: false
 labelEditor:
   description: Label for Editor settings
   message: Editor
@@ -320,10 +309,6 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: '@include rules'
-labelIndentUnit:
-  description: Label for editor option of indent unit size.
-  message: 'Indent unit:'
-  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Default injection mode: '
@@ -339,10 +324,6 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Line no.: '
-labelLineWrapping:
-  description: Label for editor option of line wrapping.
-  message: Wrap long lines
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: '@match rules'
@@ -352,21 +333,18 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: No Name
-labelNoScripts:
-  description: Message shown when no script is installed.
-  message: 'Oops, you haven’t got any scripts yet.'
-  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: No script is found.
+labelNotifyThisUpdated:
+  description: >-
+    A per-script option in editor to enable notification when this script is
+    updated. The text follows "Allow update" checkbox option so it's like a
+    continuation of the phrase.
+  message: ', then notify:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notify script updates
-labelNotifyThisUpdated:
-  description: >-
-    A per-script option in editor to enable notification when this script is updated.
-    The text follows "Allow update" checkbox option so it's like a continuation of the phrase.
-  message: ', then notify:'
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ignore per-script notification ("settings" tab in editor)
@@ -376,10 +354,6 @@ labelPopupSort:
 labelRelated:
   description: Label of related links.
   message: 'Related links: '
-labelRemoved:
-  description: Label shown when a script is removed.
-  message: '[Removed]'
-  touched: false
 labelRemovedAt:
   description: Label for the time when the script is removed.
   message: Removed at $1
@@ -392,10 +366,6 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Default)
-labelScriptEditor:
-  description: Shown in the title of the script editing page.
-  message: Script Editor
-  touched: false
 labelScriptTemplate:
   description: Label for custom script template.
   message: Custom Script Template
@@ -408,10 +378,6 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Settings
-labelShowBadge:
-  description: Option to show number of running scripts on the badge.
-  message: Show number of running scripts on the badge
-  touched: false
 labelSync:
   description: Label for sync options.
   message: Sync
@@ -452,6 +418,7 @@ labelSyncUsername:
 labelTranslator:
   description: Label of translator.
   message: 'Translator: '
+  touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Update URL:'

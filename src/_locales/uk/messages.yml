@@ -1,13 +1,3 @@
-anchorAuthor:
-  description: Author shown on about tab.
-  message: '<a href=mailto:i@gerald.top>Gerald</a>'
-anchorTranslator:
-  description: Translator shown on about tab.
-  message: henaro aka ironwool
-buttonAllNone:
-  description: Button to select all scripts or none.
-  message: Обрати Все/Нічого
-  touched: false
 buttonCancel:
   description: Cancel button on dialog.
   message: Скасувати
@@ -181,6 +171,24 @@ filterExecutionOrder:
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: ''
+filterScopeAll:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeCode:
+  description: Option in dashboard's search scope filter.
+  message: ''
+filterScopeName:
+  description: Option in dashboard's search scope filter.
+  message: ''
+genericOff:
+  description: 'To indicate something is turned off or disabled, similar to "no".'
+  message: ''
+genericOn:
+  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  message: ''
+genericUseGlobal:
+  description: To indicate some per-script option will use its analog in global settings.
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: ''
@@ -238,6 +246,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Чорний список
+labelContributors:
+  description: Label for link to contributors.
+  message: ''
 labelCurrentLang:
   description: Label of current language.
   message: 'Поточна мова: '
@@ -259,10 +270,6 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: ''
-labelEditing:
-  description: Label for current editing script
-  message: ''
-  touched: false
 labelEditor:
   description: Label for Editor settings
   message: ''
@@ -299,10 +306,6 @@ labelImportSettings:
 labelInclude:
   description: Label of @include rules.
   message: 'Застосовувати на (правила включень @include):'
-labelIndentUnit:
-  description: Label for editor option of indent unit size.
-  message: ''
-  touched: false
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: ''
@@ -318,10 +321,6 @@ labelLastUpdatedAt:
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Номер рядка:'
-labelLineWrapping:
-  description: Label for editor option of line wrapping.
-  message: ''
-  touched: false
 labelMatch:
   description: Label of @match rules.
   message: 'Застосовувати на (правила збігів @match):'
@@ -331,26 +330,27 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Новий скрипт
-labelNoScripts:
-  description: Message shown when no script is installed.
-  message: У вас ще не встановлено жодного скрипта.
-  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Скрипти не знайдено.
+labelNotifyThisUpdated:
+  description: >-
+    A per-script option in editor to enable notification when this script is
+    updated. The text follows "Allow update" checkbox option so it's like a
+    continuation of the phrase.
+  message: ''
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Повідомляти про оновлення скриптів.
+labelNotifyUpdatesGlobal:
+  description: Option to prioritize global notification option over script's setting.
+  message: ''
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: ''
 labelRelated:
   description: Label of related links.
   message: 'Посилання: '
-labelRemoved:
-  description: Label shown when a script is removed.
-  message: '[Видалено]'
-  touched: false
 labelRemovedAt:
   description: Label for the time when the script is removed.
   message: ''
@@ -363,10 +363,6 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (за замовчуванням)
-labelScriptEditor:
-  description: Shown in the title of the script editing page.
-  message: Редактор скриптів
-  touched: false
 labelScriptTemplate:
   description: Label for custom script template.
   message: ''
@@ -379,10 +375,6 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Налаштування
-labelShowBadge:
-  description: Option to show number of running scripts on the badge.
-  message: Показувати кількість активних скриптів на значку.
-  touched: false
 labelSync:
   description: Label for sync options.
   message: Синхронізація з хмарним сховищем
@@ -423,6 +415,7 @@ labelSyncUsername:
 labelTranslator:
   description: Label of translator.
   message: 'Перекладачі: '
+  touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Адреса оновлення:'
@@ -582,6 +575,9 @@ sideMenuSettings:
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Оновлення
+titleSearchHint:
+  description: Hover title for search icon in dashboard.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: ''
