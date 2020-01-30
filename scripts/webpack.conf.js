@@ -62,15 +62,24 @@ const modify = (extra, init) => modifyWebpackConfig(
   },
 );
 
+// avoid running webpack bootstrap in a potentially hacked environment
+// after documentElement was replaced which triggered reinjection of content scripts
+const skipReinjectionHeader = `if (window[Symbol.for('${INIT_FUNC_NAME}')] !== 1)`;
+const skipReinjectionConfig = (config, test) => config.plugins.push(
+  new WrapperWebpackPlugin({
+    header: skipReinjectionHeader,
+    ...test && { test },
+  }));
+
 module.exports = Promise.all([
-  modify(),
+  modify(null, config => skipReinjectionConfig(config, /^browser\.js$/)),
   modify({
     pages: {
       injected: {
         entry: './src/injected',
       },
     },
-  }),
+  }, skipReinjectionConfig),
   modify({
     pages: {
       'injected-web': {
@@ -81,8 +90,8 @@ module.exports = Promise.all([
     config.output.libraryTarget = 'commonjs2';
     config.plugins.push(
       new WrapperWebpackPlugin({
-        header: `\
-          window.${INIT_FUNC_NAME} = function () {
+        header: `${skipReinjectionHeader}
+          window[Symbol.for('${INIT_FUNC_NAME}')] = function () {
             var module = { exports: {} };
           `,
         footer: `

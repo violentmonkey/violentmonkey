@@ -1,41 +1,31 @@
-import { getUniqId, sendCmd } from './utils';
-import { addEventListener, describeProperty, match } from './utils/helpers';
-import initialize from './content';
+import { sendCmd } from './utils';
+import './content';
 
-(function main() {
-  // Avoid running repeatedly due to new `document.documentElement`
-  const VM_KEY = '__Violentmonkey';
-  // Literal `1` guards against <html id="__Violentmonkey">, more info in browser.js
-  if (window[VM_KEY] === 1) return;
-  window[VM_KEY] = 1;
-
-  function initBridge() {
-    const contentId = getUniqId();
-    const webId = getUniqId();
-    initialize(contentId, webId);
-  }
-
-  initBridge();
-
+// Script installation
+// Firefox does not support `onBeforeRequest` for `file:`
+if (global.location.pathname.endsWith('.user.js')) {
   const { go } = History.prototype;
+  const { document, history } = global;
   const { querySelector } = Document.prototype;
-  const { get: getReadyState } = describeProperty(Document.prototype, 'readyState');
-  // For installation
-  // Firefox does not support `onBeforeRequest` for `file:`
-  async function checkJS() {
+  const referrer = document.referrer;
+  (async () => {
+    if (document.readyState !== 'complete') {
+      await new Promise(resolve => {
+        global.addEventListener('load', resolve, { once: true });
+      });
+    }
+    // plain text shouldn't have a <title>
     if (!document::querySelector('title')) {
-      // plain text
       await sendCmd('ConfirmInstall', {
         code: document.body.textContent,
-        url: window.location.href,
-        from: document.referrer,
+        url: global.location.href,
+        from: referrer,
       });
-      if (window.history.length > 1) window.history::go(-1);
-      else sendCmd('TabClose');
+      if (history.length > 1) {
+        history::go(-1);
+      } else {
+        sendCmd('TabClose');
+      }
     }
-  }
-  if (window.location.pathname::match(/\.user\.js$/)) {
-    if (document::getReadyState() === 'complete') checkJS();
-    else window::addEventListener('load', checkJS, { once: true });
-  }
-}());
+  })();
+}

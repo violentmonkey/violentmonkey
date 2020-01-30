@@ -17,7 +17,9 @@ const menus = {};
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 const { split } = String.prototype;
 
-export default async function initialize(contentId, webId) {
+(async () => {
+  const contentId = getUniqId();
+  const webId = getUniqId();
   // injecting right now before site scripts can mangle globals or intercept our contentId
   // except for XML documents as their appearance breaks, but first we're sending
   // a request for the data because injectPageSandbox takes ~5ms
@@ -32,7 +34,7 @@ export default async function initialize(contentId, webId) {
   if (data.scripts) injectScripts(contentId, webId, data, isXml);
   getPopup();
   setBadge();
-}
+})();
 
 bridge.addBackgroundHandlers({
   Command(data) {

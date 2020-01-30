@@ -8,14 +8,16 @@ import {
 import { sendCmd } from '#/common';
 
 import {
-  forEach, join, append, createElementNS, NS_HTML,
+  forEach, join, append, createElementNS, defineProperty, NS_HTML,
   charCodeAt, fromCharCode,
 } from '../utils/helpers';
 import bridge from './bridge';
 
 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
-const VMInitInjection = window[process.env.INIT_FUNC_NAME];
-delete window[process.env.INIT_FUNC_NAME];
+const VMInitInjection = window[Symbol.for(process.env.INIT_FUNC_NAME)];
+// To avoid running repeatedly due to new `document.documentElement`
+// (the symbol is undeletable so a userscript can't fool us on reinjection)
+defineProperty(window, Symbol.for(process.env.INIT_FUNC_NAME), { value: 1 });
 
 const { encodeURIComponent } = global;
 const { replace } = String.prototype;
