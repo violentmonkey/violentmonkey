@@ -42,7 +42,7 @@ export function onRequestCreate(details, scriptId) {
       'abort',
       'error',
       'load',
-      // 'loadend' will always be sent for internal cleanup
+      'loadend',
       'progress',
       'readystatechange',
       'timeout',

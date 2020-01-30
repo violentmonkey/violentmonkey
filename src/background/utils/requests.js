@@ -16,7 +16,6 @@ Object.assign(commands, {
   ConfirmInstall: confirmInstall,
   /** @return {string} */
   GetRequestId(eventsToNotify = []) {
-    eventsToNotify.push('loadend');
     const id = getUniqId();
     requests[id] = {
       id,
@@ -252,6 +251,7 @@ async function httpRequest(details, src, cb) {
     }
     const callback = xhrCallbackWrapper(req);
     req.eventsToNotify.forEach(evt => { xhr[`on${evt}`] = callback; });
+    xhr.onloadend = callback; // always send it for the internal cleanup
     const body = data ? decodeBody(data) : null;
     HeaderInjector.add(id, vmHeaders);
     xhr.send(body);
