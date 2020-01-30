@@ -78,7 +78,7 @@ export default function injectScripts(contentId, webId, data) {
   }
   if (injectPage.length) {
     inject(`(${VMInitInjection}())(${JSON.stringify(args).slice(1, -1)})`,
-      `${window.location.origin}/Violentmonkey.sandbox.js`);
+      browser.runtime.getURL('sandbox/injected-web.js'));
     bridge.post('LoadScripts', {
       ...data,
       mode: INJECT_PAGE,
