@@ -24,9 +24,8 @@ export function makeGmApi() {
       const values = loadValues(id);
       const oldRaw = values[key];
       delete values[key];
-      dumpValue({
-        id, key, oldRaw,
-      });
+      // using `undefined` to match the documentation and TM for GM_addValueChangeListener
+      dumpValue(id, key, undefined, null, oldRaw);
     },
     GM_getValue(key, def) {
       const raw = loadValues(this.id)[key];
@@ -42,9 +41,7 @@ export function makeGmApi() {
       const values = loadValues(id);
       const oldRaw = values[key];
       values[key] = raw;
-      dumpValue({
-        id, key, val, raw, oldRaw,
-      });
+      dumpValue(id, key, val, raw, oldRaw);
     },
     /**
      * @callback GMValueChangeListener

@@ -124,13 +124,8 @@ export default {
     },
     updateValue({ key, value, isNew }) {
       const rawValue = value ? `o${value}` : '';
-      return sendCmd('UpdateValue', {
-        id: this.script.props.id,
-        update: {
-          key,
-          value: rawValue,
-        },
-      })
+      const { id } = this.script.props;
+      return sendCmd('UpdateValue', { id, key, value: rawValue })
       .then(() => {
         if (value) {
           this.$set(this.values, key, rawValue);

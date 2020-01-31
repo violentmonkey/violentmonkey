@@ -1,7 +1,7 @@
 import bridge from './bridge';
 import store from './store';
 import {
-  jsonLoad, forEach, slice, objectKeys, objectValues, objectEntries, log,
+  jsonLoad, forEach, slice, objectValues, objectEntries, log,
 } from '../utils/helpers';
 
 const { Number } = global;
@@ -18,11 +18,14 @@ const dataDecoders = {
 
 bridge.addHandlers({
   UpdatedValues(updates) {
-    objectKeys(updates)::forEach((id) => {
+    const { partial } = updates;
+    objectEntries(updates)::forEach(([id, update]) => {
       const oldData = store.values[id];
       if (oldData) {
-        store.values[id] = updates[id];
-        if (id in changeHooks) changedRemotely(id, oldData, updates);
+        const keyHooks = changeHooks[id];
+        if (keyHooks) changedRemotely(keyHooks, oldData, update);
+        if (partial) applyPartialUpdate(oldData, update);
+        else store.values[id] = update;
       }
     });
   },
@@ -32,21 +35,11 @@ export function loadValues(id) {
   return store.values[id];
 }
 
-/** @type {function({ id, key, val, raw, oldRaw })} */
-export function dumpValue(change = {}) {
-  const {
-    id, key, raw, oldRaw,
-  } = change;
-  bridge.post('UpdateValue', {
-    id,
-    update: { key, value: raw },
-  });
+export function dumpValue(id, key, val, raw, oldRaw) {
+  bridge.post('UpdateValue', { id, key, value: raw });
   if (raw !== oldRaw) {
     const hooks = changeHooks[id]?.[key];
-    if (hooks) {
-      change.hooks = hooks;
-      notifyChange(change);
-    }
+    if (hooks) notifyChange(hooks, key, val, raw, oldRaw);
   }
 }
 
@@ -62,29 +55,31 @@ export function decodeValue(raw) {
   return val;
 }
 
-// { id, key, val, raw, oldRaw }
-function changedRemotely(id, oldData, updates) {
-  const data = updates[id];
-  id = +id; // the remote id is a string, but all local data structures use a number
-  objectEntries(changeHooks[id])::forEach(([key, hooks]) => {
-    notifyChange({
-      id,
-      key,
-      hooks,
-      oldRaw: oldData[key],
-      raw: data[key],
-      remote: true,
-    });
+function applyPartialUpdate(data, update) {
+  objectEntries(update)::forEach(([key, val]) => {
+    if (val) data[key] = val;
+    else delete data[key];
   });
 }
 
-// { hooks, key, val, raw, oldRaw, remote }
-function notifyChange(change) {
-  const {
-    hooks, key, val, raw, oldRaw, remote = false,
-  } = change;
-  const oldVal = oldRaw && decodeValue(oldRaw);
-  const newVal = val == null && raw ? decodeValue(raw) : val;
+function changedRemotely(keyHooks, data, update) {
+  objectEntries(update)::forEach(([key, raw]) => {
+    const hooks = keyHooks[key];
+    if (hooks) {
+      if (!raw) raw = undefined; // partial `update` currently uses null for deleted values
+      const oldRaw = data[key];
+      if (oldRaw !== raw) {
+        data[key] = raw; // will be deleted later in applyPartialUpdate if empty
+        notifyChange(hooks, key, undefined, raw, oldRaw, true);
+      }
+    }
+  });
+}
+
+function notifyChange(hooks, key, val, raw, oldRaw, remote = false) {
+  // converting `null` from messaging to `undefined` to match the documentation and TM
+  const oldVal = (oldRaw || undefined) && decodeValue(oldRaw);
+  const newVal = val === undefined && raw ? decodeValue(raw) : val;
   objectValues(hooks)::forEach(fn => tryCall(fn, key, oldVal, newVal, remote));
 }
 
