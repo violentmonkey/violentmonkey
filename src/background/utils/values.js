@@ -1,12 +1,10 @@
 import { isEmpty, sendTabCmd } from '#/common';
-import {
-  forEachEntry, forEachKey, objectPick, objectSet,
-} from '#/common/object';
+import { forEachEntry, forEachKey, objectSet } from '#/common/object';
 import { getScript, getValueStoresByIds, dumpValueStores } from './db';
 import { commands } from './message';
 
 const openers = {}; // { scriptId: { tabId: { frameId: 1, ... }, ... } }
-let cache; // { scriptId: { key: [{ value, src }, ... ], ... } }
+let cache = {}; // { scriptId: { key: { last: value, tabId: { frameId: value } } } }
 let updateScheduled;
 
 Object.assign(commands, {
@@ -24,15 +22,16 @@ Object.assign(commands, {
       if (id) res[id] = store;
       return res;
     }, {});
-    await dumpValueStores(stores);
-    broadcastUpdates(stores);
+    await Promise.all([
+      dumpValueStores(stores),
+      broadcastValueStores(groupStoresByFrame(stores)),
+    ]);
   },
-  /** @return {Promise<void>} */
-  UpdateValue({ id, update: { key, value = null } }, src) {
-    // Value will be updated to store later.
-    updateLater();
-    cache = objectSet(cache, [id, key, 'last'], value);
+  /** @return {void} */
+  UpdateValue({ id, key, value = null }, src) {
+    objectSet(cache, [id, key, 'last'], value);
     objectSet(cache, [id, key, src.tab.id, src.frameId], value);
+    updateLater();
   },
 });
 
@@ -55,72 +54,73 @@ export function addValueOpener(tabId, frameId, scriptIds) {
 }
 
 async function updateLater() {
-  if (!updateScheduled) {
+  while (!updateScheduled) {
     updateScheduled = true;
     await 0;
-    doUpdate();
+    const currentCache = cache;
+    cache = {};
+    await doUpdate(currentCache);
     updateScheduled = false;
-    if (cache) updateLater();
+    if (isEmpty(cache)) break;
   }
 }
 
-async function doUpdate() {
-  const ids = Object.keys(cache);
-  const currentCache = cache;
-  cache = null;
-  try {
-    const valueStores = await getValueStoresByIds(ids);
-    ids.forEach((id) => {
-      const valueStore = valueStores[id] || (valueStores[id] = {});
-      const updates = currentCache[id] || {};
-      updates::forEachEntry(([key, { last }]) => {
-        if (!last) delete valueStore[key];
-        else valueStore[key] = last;
+async function doUpdate(currentCache) {
+  const ids = Object.keys(currentCache);
+  const valueStores = await getValueStoresByIds(ids);
+  ids.forEach((id) => {
+    currentCache[id]::forEachEntry(([key, { last }]) => {
+      objectSet(valueStores, [id, key], last || undefined);
+    });
+  });
+  await Promise.all([
+    dumpValueStores(valueStores),
+    broadcastValueStores(groupCacheByFrame(currentCache), { partial: true }),
+  ]);
+}
+
+async function broadcastValueStores(tabFrameData, { partial } = {}) {
+  const tasks = [];
+  for (const [tabId, frames] of Object.entries(tabFrameData)) {
+    for (const [frameId, frameData] of Object.entries(frames)) {
+      if (!isEmpty(frameData)) {
+        if (partial) frameData.partial = true;
+        tasks.push(sendTabCmd(+tabId, 'UpdatedValues', frameData, { frameId: +frameId }));
+        if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
+      }
+    }
+  }
+  await Promise.all(tasks);
+}
+
+// Returns per tab/frame data with only the changed values
+function groupCacheByFrame(cacheData) {
+  const toSend = {};
+  cacheData::forEachEntry(([id, scriptData]) => {
+    const dataEntries = Object.entries(scriptData);
+    openers[id]::forEachEntry(([tabId, frames]) => {
+      frames::forEachKey((frameId) => {
+        dataEntries.forEach(([key, history]) => {
+          // Skipping this frame if its last recorded value is identical
+          if (history.last !== history[tabId]?.[frameId]) {
+            objectSet(toSend, [tabId, frameId, id, key], history.last);
+          }
+        });
       });
     });
-    await dumpValueStores(valueStores);
-    await broadcastUpdates(valueStores, currentCache);
-  } catch (err) {
-    console.error('Values error:', err);
-  }
+  });
+  return toSend;
 }
 
-function broadcastUpdates(updates, oldCache = {}) {
-  // group updates by frame
+// Returns per tab/frame data
+function groupStoresByFrame(stores) {
   const toSend = {};
-  updates::forEachEntry(([id, data]) => {
+  stores::forEachEntry(([id, store]) => {
     openers[id]::forEachEntry(([tabId, frames]) => {
       frames::forEachKey(frameId => {
-        objectSet(toSend, [tabId, frameId, id],
-          avoidInitiator(data, oldCache[id], tabId, frameId));
+        objectSet(toSend, [tabId, frameId, id], store);
       });
     });
   });
-  // send the grouped updates
-  toSend::forEachEntry(([tabId, frames]) => {
-    frames::forEachEntry(([frameId, frameData]) => {
-      if (!isEmpty(frameData)) {
-        sendTabCmd(+tabId, 'UpdatedValues', frameData, { frameId: +frameId });
-      }
-    });
-  });
-}
-
-function avoidInitiator(data, history, tabId, frameId) {
-  if (history) {
-    let toPick;
-    data::forEachKey((key, i, allKeys) => {
-      // Not sending `key` to this frame if its last recorded value is identical
-      const frameValue = history[key]?.[tabId]?.[frameId];
-      if (frameValue !== undefined && frameValue === data[key]) {
-        // ...sending the preceding different keys
-        if (!toPick) toPick = allKeys.slice(0, i);
-      } else {
-        // ...sending the subsequent different keys
-        if (toPick) toPick.push(key);
-      }
-    });
-    if (toPick) data = objectPick(data, toPick);
-  }
-  return !isEmpty(data) ? data : undefined; // undef will remove the key in objectSet
+  return toSend;
 }
