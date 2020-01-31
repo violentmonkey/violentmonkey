@@ -1,8 +1,9 @@
+import { hasOwnProperty as has } from '#/common';
 import { INJECT_CONTENT, METABLOCK_RE } from '#/common/consts';
 import bridge from './bridge';
 import {
   concat, filter, forEach, includes, indexOf, map, match, push, slice,
-  defineProperty, describeProperty, objectKeys,
+  defineProperty, describeProperty, objectKeys, replace,
   addEventListener, removeEventListener,
 } from '../utils/helpers';
 import { makeGmApi } from './gm-api';
@@ -10,8 +11,7 @@ import { makeGmApi } from './gm-api';
 const { Proxy } = global;
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { splice } = Array.prototype;
-const { hasOwnProperty: has } = Object.prototype;
-const { replace, startsWith } = String.prototype;
+const { startsWith } = String.prototype;
 
 let gmApi;
 let gm4Api;

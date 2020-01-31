@@ -2,6 +2,7 @@ import { getUniqId } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import {
   filter, map, defineProperty, describeProperty, Boolean, Promise, setTimeout, log, noop,
+  remove,
 } from '../utils/helpers';
 import bridge from './bridge';
 import store from './store';
@@ -10,7 +11,6 @@ import { deletePropsCache, wrapGM } from './gm-wrapper';
 const { concat } = Array.prototype;
 const { document } = global;
 const { get: getCurrentScript } = describeProperty(Document.prototype, 'currentScript');
-const { remove } = Element.prototype;
 
 bridge.addHandlers({
   LoadScripts(data) {

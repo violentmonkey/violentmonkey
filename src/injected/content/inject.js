@@ -9,7 +9,7 @@ import { sendCmd } from '#/common';
 
 import {
   forEach, join, append, createElementNS, defineProperty, NS_HTML,
-  charCodeAt, fromCharCode,
+  charCodeAt, fromCharCode, replace, remove,
 } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -20,8 +20,6 @@ const VMInitInjection = window[Symbol.for(process.env.INIT_FUNC_NAME)];
 defineProperty(window, Symbol.for(process.env.INIT_FUNC_NAME), { value: 1 });
 
 const { encodeURIComponent } = global;
-const { replace } = String.prototype;
-const { remove } = Element.prototype;
 
 bridge.addHandlers({
   Inject: injectScript,

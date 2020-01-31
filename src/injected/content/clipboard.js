@@ -1,5 +1,7 @@
 import { sendCmd } from '../utils';
-import { addEventListener, describeProperty, logging } from '../utils/helpers';
+import {
+  addEventListener, describeProperty, logging, removeEventListener,
+} from '../utils/helpers';
 import bridge from './bridge';
 
 // old Firefox defines it on a different prototype so we'll just grab it from document directly
@@ -7,7 +9,6 @@ const { execCommand } = document;
 const { setData } = DataTransfer.prototype;
 const { get: getClipboardData } = describeProperty(ClipboardEvent.prototype, 'clipboardData');
 const { preventDefault, stopImmediatePropagation } = Event.prototype;
-const { removeEventListener } = EventTarget.prototype;
 
 let clipboardData;
 
