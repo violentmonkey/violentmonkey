@@ -85,22 +85,20 @@ bridge.addHandlers({
             : ''
         }}).call(${id})`,
       ];
-      exposeThisObj(thisObj, id, process.env.DEBUG && script);
-      return [codeSlices, bridge.mode, scriptId, script.meta.name];
-    }
-    function exposeThisObj(thisObj, id, script) {
       defineProperty(window, id, {
         configurable: true,
         get() {
+          // deleting now to prevent interception via DOMNodeRemoved on el::remove()
+          delete window[id];
           if (process.env.DEBUG) {
             log('info', [bridge.mode], script.custom.name || script.meta.name || script.props.id);
           }
           const el = document::getCurrentScript();
           if (el) el::remove();
-          delete window[id];
           return thisObj;
         },
       });
+      return [codeSlices, bridge.mode, scriptId, script.meta.name];
     }
     function run(list) {
       bridge.post('InjectMulti', list::map(buildCode));
