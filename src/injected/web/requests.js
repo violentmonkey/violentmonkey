@@ -53,22 +53,22 @@ function reqAbort(id) {
   bridge.post('AbortRequest', id);
 }
 
-function parseData(response, req, details) {
+function parseData(response, msg, details) {
   const { responseType } = details;
   if (responseType === 'json') {
     return jsonLoad(response);
   }
   if (responseType === 'document') {
-    const type = req.contentType.split(';', 1)[0] || 'text/html';
+    const type = msg.contentType.split(';', 1)[0] || 'text/html';
     return new DOMParser()::parseFromString(response, type);
   }
   // arraybuffer, blob
-  if (req.numChunks) {
+  if (msg.numChunks) {
     const len = response.length;
     const arr = new Uint8Array(len);
     for (let i = 0; i < len; i += 1) arr[i] = response::charCodeAt(i);
     return responseType === 'blob'
-      ? new Blob([arr], { type: req.contentType })
+      ? new Blob([arr], { type: msg.contentType })
       : arr.buffer;
   }
   // text
