@@ -124,8 +124,8 @@ function injectScript(data) {
     ...codeSlices,
     `,"${vCallbackId}");`,
   ];
-  // replace characters that have special meaning in a URL with their fullwidth forms
-  const name = encodeURIComponent(scriptName::replace(/[#/:?]/g, replaceWithFullWidthForm));
+  // using fullwidth forms for special chars and those added by the newer RFC3986 spec for URI
+  const name = encodeURIComponent(scriptName::replace(/[#&',/:;?@=]/g, replaceWithFullWidthForm));
   const sourceUrl = browser.extension.getURL(`${name}.user.js#${scriptId}`);
   if (mode === INJECT_CONTENT) {
     injectedCode.push(
