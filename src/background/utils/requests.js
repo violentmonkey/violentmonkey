@@ -1,5 +1,5 @@
 import {
-  getUniqId, request, i18n, isEmpty, sendTabCmd,
+  buffer2string, getUniqId, request, i18n, isEmpty, sendTabCmd,
 } from '#/common';
 import { forEachEntry, objectPick } from '#/common/object';
 import ua from '#/common/ua';
@@ -143,50 +143,62 @@ const HeaderInjector = (() => {
   };
 })();
 
+const CHUNK_SIZE = 64e6; // slightly less than 64MiB
+
+function getChunk(response, index) {
+  return buffer2string(response, index * CHUNK_SIZE, CHUNK_SIZE);
+}
+
+function getResponseText(xhr) {
+  try {
+    return xhr.responseText;
+  } catch (e) {
+    // ignore if responseText is unreachable
+  }
+}
+
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
-  let blobUrl;
-  const { id, xhr } = req;
+  let bufferSent;
+  let contentType;
+  let numChunks;
+  const { id, isBuffer, xhr } = req;
+  const chainedCallback = (msg) => {
+    lastPromise = lastPromise.then(() => req.cb(msg));
+  };
   return (evt) => {
     if (evt.type === 'loadend') clearRequest(req);
     if (!req.cb) return;
-    const isBlob = xhr.responseType === 'blob';
-    const data = {
-      finalUrl: xhr.responseURL,
-      readyState: xhr.readyState,
-      responseHeaders: req.responseHeaders || xhr.getAllResponseHeaders(),
-      status: xhr.status,
-      statusText: xhr.statusText,
-      response: isBlob && xhr.response ? getBlobUrl(req) : xhr.response,
-      ...getResponseText(),
-      ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
-    };
-    lastPromise = lastPromise.then(() => req.cb({
+    const { response } = xhr;
+    if (isBuffer && response && !numChunks) {
+      numChunks = Math.ceil(response.byteLength / CHUNK_SIZE) || 1;
+    }
+    chainedCallback({
       id,
-      data,
-      isBlob,
-      contentType: xhr.getResponseHeader('Content-Type') || 'application/octet-stream',
+      numChunks,
+      contentType: contentType
+        || (contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream'),
+      data: !req.eventsToNotify.includes(evt.type) ? {} : {
+        finalUrl: xhr.responseURL,
+        readyState: xhr.readyState,
+        responseHeaders: req.responseHeaders || xhr.getAllResponseHeaders(),
+        status: xhr.status,
+        statusText: xhr.statusText,
+        response: numChunks && !bufferSent ? getChunk(response, 0) : response,
+        responseText: getResponseText(xhr),
+        ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
+      },
       type: evt.type,
-    }));
+    });
+    for (let i = 1; i < numChunks; i += 1) {
+      chainedCallback({
+        id,
+        chunk: getChunk(response, i),
+        isLastChunk: i === numChunks - 1,
+      });
+    }
+    bufferSent = !!numChunks;
   };
-  function getBlobUrl() {
-    if (!blobUrl) {
-      blobUrl = URL.createObjectURL(xhr.response);
-      setTimeout(expireBlobUrl, 60e3);
-    }
-    return blobUrl;
-  }
-  function expireBlobUrl() {
-    URL.revokeObjectURL(blobUrl);
-    blobUrl = null;
-  }
-  function getResponseText() {
-    try {
-      return { responseText: xhr.responseText };
-    } catch (e) {
-      // ignore if responseText is unreachable
-    }
-  }
 }
 
 function isSpecialHeader(lowerHeader) {
@@ -202,14 +214,14 @@ function isSpecialHeader(lowerHeader) {
  */
 async function httpRequest(details, src, cb) {
   const {
-    anonymous, data, headers, id, method,
-    overrideMimeType, password, responseType,
-    timeout, url, user,
+    anonymous, data, headers, id, isBuffer, method,
+    overrideMimeType, password, timeout, url, user,
   } = details;
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;
   req.anonymous = anonymous;
+  req.isBuffer = isBuffer;
   const { xhr } = req;
   try {
     const vmHeaders = [];
@@ -233,7 +245,7 @@ async function httpRequest(details, src, cb) {
       });
     }
     if (timeout) xhr.timeout = timeout;
-    if (responseType) xhr.responseType = 'blob';
+    if (isBuffer) xhr.responseType = 'arraybuffer';
     if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
     if (shouldSendCookies) {
       const cookies = await browser.cookies.getAll({
