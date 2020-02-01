@@ -2,10 +2,7 @@
 // for DOM elements with 'id' attribute which is a standard feature, more info:
 // https://github.com/mozilla/webextension-polyfill/pull/153
 // https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
-if (!global.browser?.runtime?.sendMessage
-// Also don't redefine our `browser` on content script reinjection due to new documentElement
-// because `chrome` was already deleted by us and now it can be spoofed by a userscript
-&& window[Symbol.for(process.env.INIT_FUNC_NAME)] !== 1) {
+if (!global.browser?.runtime?.sendMessage) {
   const { chrome, Promise } = global;
   const wrapAPIs = (source, meta = {}) => {
     return Object.entries(source)
