@@ -6,7 +6,7 @@ import {
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
-import injectScripts from './inject';
+import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
@@ -17,17 +17,24 @@ const menus = {};
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 const { split } = String.prototype;
 
-export default async function initialize(contentId, webId) {
-  const data = await sendCmd('GetInjected', null, { retry: true });
+(async () => {
+  const contentId = getUniqId();
+  const webId = getUniqId();
+  // injecting right now before site scripts can mangle globals or intercept our contentId
+  // except for XML documents as their appearance breaks, but first we're sending
+  // a request for the data because injectPageSandbox takes ~5ms
+  const dataPromise = sendCmd('GetInjected', null, { retry: true });
+  const isXml = document instanceof XMLDocument;
+  if (!isXml) injectPageSandbox(contentId, webId);
+  const data = await dataPromise;
   // 1) bridge.post may be overridden in injectScripts
   // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
   bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
-  bridge.destId = webId;
   bridge.isFirefox = data.isFirefox;
-  if (data.scripts) injectScripts(contentId, webId, data);
+  if (data.scripts) injectScripts(contentId, webId, data, isXml);
   getPopup();
   setBadge();
-}
+})();
 
 bridge.addBackgroundHandlers({
   Command(data) {

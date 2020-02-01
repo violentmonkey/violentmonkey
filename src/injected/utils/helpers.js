@@ -3,7 +3,7 @@
 // eslint-disable-next-line no-restricted-properties
 export const {
   // types
-  Blob, Boolean, Error, Promise, Uint8Array,
+  Boolean, Error, Promise, Uint8Array,
   // props and methods
   atob, isFinite, setTimeout,
 } = global;
@@ -15,15 +15,16 @@ export const {
 
 export const {
   keys: objectKeys, values: objectValues, entries: objectEntries,
-  assign, defineProperty, defineProperties, getOwnPropertyDescriptor: describeProperty,
+  assign, defineProperty, getOwnPropertyDescriptor: describeProperty,
 } = Object;
-export const { charCodeAt, match, slice } = String.prototype;
+export const {
+  charCodeAt, match, slice, replace,
+} = String.prototype;
 export const { toString: objectToString } = Object.prototype;
 const { toString: numberToString } = Number.prototype;
-const { replace } = String.prototype;
 export const { fromCharCode } = String;
 export const { addEventListener, removeEventListener } = EventTarget.prototype;
-export const { append, setAttribute } = Element.prototype;
+export const { append, remove, setAttribute } = Element.prototype;
 export const { createElementNS } = Document.prototype;
 export const logging = assign({}, console);
 

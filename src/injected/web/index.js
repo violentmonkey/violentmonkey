@@ -14,13 +14,9 @@ import './tabs';
 export default function initialize(
   webId,
   contentId,
-  ua,
-  isFirefox,
   invokeHost,
 ) {
   let invokeGuest;
-  bridge.ua = ua;
-  bridge.isFirefox = isFirefox;
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;
     bridge.post = (cmd, data) => invokeHost({ cmd, data }, INJECT_CONTENT);
@@ -30,6 +26,11 @@ export default function initialize(
   } else {
     bridge.mode = INJECT_PAGE;
     bridge.post = bindEvents(webId, contentId, bridge.onHandle);
+    bridge.addHandlers({
+      Ping() {
+        bridge.post('Pong');
+      },
+    });
   }
   document.addEventListener('DOMContentLoaded', async () => {
     store.state = 1;

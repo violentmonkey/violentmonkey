@@ -112,7 +112,7 @@ export function formatTime(duration) {
 }
 
 // used in an unsafe context so we need to save the original functions
-const { hasOwnProperty } = Object.prototype;
+export const { hasOwnProperty } = Object.prototype;
 export function isEmpty(obj) {
   for (const key in obj) {
     if (obj::hasOwnProperty(key)) {
