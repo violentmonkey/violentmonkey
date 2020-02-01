@@ -17,6 +17,7 @@ import './utils/requests';
 import './utils/script';
 import './utils/tabs';
 import './utils/tester';
+import './utils/toggle-page-sandbox';
 import './utils/update';
 
 const VM_VER = browser.runtime.getManifest().version;

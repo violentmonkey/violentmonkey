@@ -25,7 +25,15 @@ const { split } = String.prototype;
   // a request for the data because injectPageSandbox takes ~5ms
   const dataPromise = sendCmd('GetInjected', null, { retry: true });
   const isXml = document instanceof XMLDocument;
-  if (!isXml) injectPageSandbox(contentId, webId);
+  if (!isXml) {
+    if (global.chrome?.app) {
+      // the dynamic script added by chrome.declarativeContent already ran
+      if (!window.noPageSandbox) injectPageSandbox(contentId, webId);
+    } else {
+      // the dynamic script added by browser.contentScripts will run next and use this
+      window.injectPageSandbox = () => injectPageSandbox(contentId, webId);
+    }
+  }
   const data = await dataPromise;
   // 1) bridge.post may be overridden in injectScripts
   // 2) cloneInto is provided by Firefox in content scripts to expose data to the page

@@ -4,6 +4,7 @@ const log = require('fancy-log');
 const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const plumber = require('gulp-plumber');
+const rename = require('gulp-rename');
 const yaml = require('js-yaml');
 const webpack = require('webpack');
 const { isProd } = require('@gera2ld/plaid/util');
@@ -18,6 +19,7 @@ const paths = {
   copy: [
     'src/public/images/**',
     'src/public/lib/**',
+    ['src/injected/ondemand/*', ''],
   ],
   locales: [
     'src/_locales/**',
@@ -53,7 +55,7 @@ function clean() {
 
 function watch() {
   gulp.watch(paths.manifest, manifest);
-  gulp.watch(paths.copy, copyFiles);
+  gulp.watch(paths.copy.map(getSourcePath), copyFiles);
   gulp.watch(paths.locales.concat(paths.templates), copyI18n);
 }
 
@@ -82,12 +84,12 @@ function manifest() {
 
 function copyFiles() {
   const jsFilter = gulpFilter(['**/*.js'], { restore: true });
-  let stream = gulp.src(paths.copy, { base: 'src' });
+  let stream = gulp.src(paths.copy.map(getSourcePath), { base: 'src' });
   if (isProd) stream = stream
   .pipe(jsFilter)
   .pipe(uglify())
   .pipe(jsFilter.restore);
-  return stream
+  return paths.copy.reduce(setTargetPath, stream)
   .pipe(gulp.dest(DIST));
 }
 
@@ -124,6 +126,22 @@ function updateI18n() {
     extension: '.yml',
   }))
   .pipe(gulp.dest('src/_locales'));
+}
+
+function getSourcePath(p) {
+  return Array.isArray(p) ? p[0] : p;
+}
+
+function setTargetPath(stream, path) {
+  if (Array.isArray(path)) {
+    const [src, dst] = path;
+    const pathFilter = gulpFilter([src], { restore: true })
+    stream = stream
+    .pipe(pathFilter)
+    .pipe(rename({ dirname: dst }))
+    .pipe(pathFilter.restore);
+  }
+  return stream;
 }
 
 function logError(err) {

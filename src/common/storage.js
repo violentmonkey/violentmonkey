@@ -103,7 +103,7 @@ export default {
       if (!items.length) return;
       const data = items.reduce((res, item) => {
         res[this.getKey(item.props.id)] = item;
-        if (this.onDump) this.onDump(item);
+        this.onDump?.fire(item);
         return res;
       }, {});
       await base.dump(data);

@@ -1,5 +1,5 @@
 import {
-  i18n, getFullUrl, isRemote, getRnd4, sendCmd,
+  i18n, getFullUrl, getRnd4, initHooks, isRemote, sendCmd,
 } from '#/common';
 import { CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, TIMEOUT_WEEK } from '#/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
@@ -16,9 +16,9 @@ import { setOption } from './options';
 
 const store = {};
 
-storage.script.onDump = (item) => {
+(storage.script.onDump = initHooks()).hook((item) => {
   store.scriptMap[item.props.id] = item;
-};
+});
 
 Object.assign(commands, {
   CheckPosition: sortScripts,
