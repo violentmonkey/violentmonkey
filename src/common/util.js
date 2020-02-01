@@ -71,12 +71,14 @@ export function getUniqId(prefix) {
   return (prefix || '') + Date.now().toString(36) + getRnd4();
 }
 
-export function buffer2string(buffer) {
-  const array = new window.Uint8Array(buffer);
+export function buffer2string(buf, offset = 0, length = 1e99) {
+  // The max number of arguments varies between JS engines but it's >32k so we're safe
   const sliceSize = 8192;
   const slices = [];
-  for (let i = 0; i < array.length; i += sliceSize) {
-    slices.push(String.fromCharCode.apply(null, array.subarray(i, i + sliceSize)));
+  const end = Math.min(buf.byteLength, offset + length);
+  for (; offset < end; offset += sliceSize) {
+    slices.push(String.fromCharCode.apply(null,
+      new Uint8Array(buf, offset, Math.min(sliceSize, end - offset))));
   }
   return slices.join('');
 }

@@ -1,6 +1,6 @@
 import { objectPick } from '#/common/object';
 import {
-  filter, includes, map, push, jsonDump, jsonLoad, objectToString, Promise, Uint8Array,
+  filter, includes, map, push, jsonDump, jsonLoad, join, objectToString, Promise, Uint8Array,
   setAttribute, log, buffer2stringSafe, charCodeAt, shift, slice, defineProperty, describeProperty,
   createElementNS, NS_HTML,
 } from '../utils/helpers';
@@ -37,18 +37,15 @@ export function onRequestCreate(details, scriptId) {
   };
   details.url = getFullUrl(details.url);
   queue::push(req);
-  bridge.post('GetRequestId', {
-    eventsToNotify: [
-      'abort',
-      'error',
-      'load',
-      'loadend',
-      'progress',
-      'readystatechange',
-      'timeout',
-    ]::filter(e => typeof details[`on${e}`] === 'function'),
-    wantsBlob: details.responseType === 'blob',
-  });
+  bridge.post('GetRequestId', [
+    'abort',
+    'error',
+    'load',
+    'loadend',
+    'progress',
+    'readystatechange',
+    'timeout',
+  ]::filter(e => typeof details[`on${e}`] === 'function'));
   return req.req;
 }
 
@@ -56,22 +53,22 @@ function reqAbort(id) {
   bridge.post('AbortRequest', id);
 }
 
-function parseData(response, req, details) {
+function parseData(response, msg, details) {
   const { responseType } = details;
   if (responseType === 'json') {
     return jsonLoad(response);
   }
   if (responseType === 'document') {
-    const type = req.contentType.split(';', 1)[0] || 'text/html';
+    const type = msg.contentType.split(';', 1)[0] || 'text/html';
     return new DOMParser()::parseFromString(response, type);
   }
   // arraybuffer, blob
-  if (req.isBlob) {
+  if (msg.numChunks) {
     const len = response.length;
     const arr = new Uint8Array(len);
     for (let i = 0; i < len; i += 1) arr[i] = response::charCodeAt(i);
     return responseType === 'blob'
-      ? new Blob([arr], { type: req.contentType })
+      ? new Blob([arr], { type: msg.contentType })
       : arr.buffer;
   }
   // text
@@ -79,14 +76,17 @@ function parseData(response, req, details) {
 }
 
 // request object functions
-function callback(req, msg) {
-  const cb = req.details[`on${msg.type}`];
+async function callback(req, msg) {
+  if (msg.chunk) return receiveChunk(req, msg);
+  if (req.promise) await req.promise;
+  const cb = (req.details)[`on${msg.type}`];
   if (cb) {
-    const { data } = msg;
-    if (data.response
-    && !('rawResponse' in req)
-    && (req.details.responseType || 'text') !== 'text') {
-      req.rawResponse = data.response;
+    const { data, numChunks } = msg;
+    const { response } = data;
+    if (response && !('rawResponse' in req) && (req.details.responseType || 'text') !== 'text') {
+      req.rawResponse = numChunks > 1
+        ? await receiveAllChunks(req, response, numChunks)
+        : response;
     }
     if ('rawResponse' in req) {
       defineProperty(data, 'response', {
@@ -102,6 +102,24 @@ function callback(req, msg) {
     cb(data);
   }
   if (msg.type === 'loadend') delete idMap[req.id];
+}
+
+function receiveAllChunks(req, response) {
+  req.chunks = [response];
+  req.promise = new Promise(resolve => {
+    req.resolve = resolve;
+  });
+  return req.promise;
+}
+
+function receiveChunk(req, { chunk, isLastChunk }) {
+  const { chunks } = req;
+  chunks::push(chunk);
+  if (isLastChunk) {
+    delete req.promise;
+    delete req.chunks;
+    req.resolve(chunks::join(''));
+  }
 }
 
 async function start(req, id) {
@@ -128,7 +146,8 @@ async function start(req, id) {
   const { responseType } = details;
   if (responseType) {
     if (['arraybuffer', 'blob']::includes(responseType)) {
-      payload.responseType = 'blob';
+      payload.isBuffer = true;
+      req.isBuffer = true;
     } else if (!['document', 'json', 'text']::includes(responseType)) {
       log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
