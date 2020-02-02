@@ -13,9 +13,10 @@ Object.assign(commands, {
     return id;
   },
   /** @return {Promise<Array>} */
-  InjectScript(code, src) {
-    return browser.tabs.executeScript(src.tab.id, {
+  InjectScript(code, { tab, frameId }) {
+    return browser.tabs.executeScript(tab.id, {
       code,
+      frameId,
       runAt: 'document_start',
     });
   },
