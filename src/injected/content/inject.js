@@ -27,8 +27,26 @@ bridge.addHandlers({
 });
 
 export function injectPageSandbox(contentId, webId) {
-  inject(`(${VMInitInjection}())('${webId}','${contentId}')`,
-    browser.runtime.getURL('sandbox/injected-web.js'));
+  const doInject = () => {
+    inject(`(${VMInitInjection}())('${webId}','${contentId}')`,
+      browser.runtime.getURL('sandbox/injected-web.js'));
+  };
+  if (global.chrome?.app) {
+    // the dynamic script added by chrome.declarativeContent already ran
+    const KEY = 'noPageSandbox';
+    if (window[KEY]) delete window[KEY];
+    else doInject();
+  } else {
+    // the dynamic script added by browser.contentScripts will run next and use this
+    const KEY = 'injectPageSandbox';
+    defineProperty(window, KEY, {
+      configurable: true,
+      get() {
+        delete window[KEY];
+        doInject();
+      },
+    });
+  }
 }
 
 export function injectScripts(contentId, webId, data, isXml) {
