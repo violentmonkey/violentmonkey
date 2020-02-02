@@ -36,7 +36,6 @@
     "husky": "^4.0.10",
     "js-yaml": "^3.13.1",
     "jsdom": "^16.0.1",
-    "merge-stream": "^2.0.0",
     "plugin-error": "^1.0.0",
     "tape": "^4.13.0",
     "through2": "^3.0.1",
