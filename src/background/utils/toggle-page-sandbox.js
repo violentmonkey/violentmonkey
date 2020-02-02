@@ -79,7 +79,7 @@ postInitialize.push(() => {
   hookOptions(({ defaultInjectInto }) => {
     if (defaultInjectInto) {
       const newState = isPageMode(defaultInjectInto);
-      if (newState !== pageModePreferred) {
+      if (pageModePreferred !== newState) {
         pageModePreferred = newState;
         updateDecisionLater();
       }
