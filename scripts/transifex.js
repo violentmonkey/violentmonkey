@@ -42,7 +42,9 @@ async function getLanguages() {
 }
 
 async function loadRemote(lang) {
-  const result = await transifexRequest(`/api/2/project/violentmonkey-nex/resource/messagesjson/translation/${lang}/?mode=onlyreviewed`);
+  // Reference: https://docs.transifex.com/api/translations#downloading-and-uploading-translations
+  // Use translated messages since we don't have enough reviewers
+  const result = await transifexRequest(`/api/2/project/violentmonkey-nex/resource/messagesjson/translation/${lang}/?mode=onlytranslated`);
   const reviewed = JSON.parse(result.content);
   return reviewed;
 }
