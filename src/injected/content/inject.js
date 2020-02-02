@@ -66,7 +66,7 @@ export function injectScripts(contentId, webId, data, isXml) {
     const postViaBridge = bridge.post;
     bridge.invokableIds.push(...injectContent.map(({ script }) => script.props.id));
     bridge.post = (cmd, params, realm) => {
-      (realm === INJECT_CONTENT ? invokeGuest : postViaBridge)({ cmd, data: params });
+      (realm === INJECT_CONTENT ? invokeGuest : postViaBridge)(cmd, params);
     };
     bridge.post('LoadScripts', {
       ...data,

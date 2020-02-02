@@ -20,7 +20,7 @@ export default function initialize(
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;
     bridge.post = (cmd, data) => invokeHost({ cmd, data }, INJECT_CONTENT);
-    invokeGuest = bridge.onHandle;
+    invokeGuest = (cmd, data) => bridge.onHandle({ cmd, data });
     global.chrome = undefined;
     global.browser = undefined;
   } else {
