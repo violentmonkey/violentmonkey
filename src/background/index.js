@@ -8,6 +8,7 @@ import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
 import { resetValueOpener, addValueOpener } from './utils/values';
 import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
+import { PREINJECT_KEY, togglePreinject } from './utils/preinject';
 import './utils/clipboard';
 import './utils/hotkeys';
 import './utils/icon';
@@ -52,7 +53,7 @@ Object.assign(commands, {
       version: VM_VER,
     };
     if (isApplied) {
-      const scripts = await (cache.get(`preinject:${url}`) || getScriptsByURL(url));
+      const scripts = await (cache.get(`${PREINJECT_KEY}${url}`) || getScriptsByURL(url));
       addValueOpener(tab.id, frameId, Object.keys(scripts.values));
       Object.assign(data, scripts);
     }
@@ -107,27 +108,6 @@ function autoUpdate() {
   }
   clearTimeout(autoUpdate.timer);
   autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
-}
-
-function togglePreinject(enable) {
-  if (enable) {
-    browser.webRequest.onHeadersReceived.addListener(preinject, {
-      urls: ['*://*/*'],
-      types: ['main_frame', 'sub_frame'],
-    });
-  } else {
-    browser.webRequest.onHeadersReceived.removeListener(preinject);
-  }
-}
-
-function preinject({ url }) {
-  const key = `preinject:${url}`;
-  if (!cache.has(key)) {
-    // GetInjected message will be sent soon by the content script
-    // and it may easily happen while getScriptsByURL is still waiting for browser.storage
-    // so we'll let GetInjected await this pending data by storing Promise in the cache
-    cache.put(key, getScriptsByURL(url), 250);
-  }
 }
 
 initialize(() => {
