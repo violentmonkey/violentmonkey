@@ -8,7 +8,6 @@ const bgHandlers = {};
 
 export default {
   ids: [],
-  enabledIds: [],
   // userscripts running in the content script context are messaged via invokeGuest
   invokableIds: [],
   // {CommandName: sendMessage} will relay the request via sendMessage as is

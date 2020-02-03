@@ -1,4 +1,4 @@
-import { getUniqId, makePause, isEmpty } from '#/common';
+import { getUniqId, isEmpty } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import { bindEvents, sendCmd, sendMessage } from '../utils';
 import {
@@ -13,6 +13,7 @@ import './tabs';
 
 const IS_TOP = window.top === window;
 const menus = {};
+let isPopupShown;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 const { split } = String.prototype;
@@ -32,8 +33,8 @@ const { split } = String.prototype;
   bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
   bridge.isFirefox = data.isFirefox;
   if (data.scripts) injectScripts(contentId, webId, data, isXml);
-  getPopup();
-  setBadge();
+  isPopupShown = data.isPopupShown;
+  sendSetPopup();
 })();
 
 bridge.addBackgroundHandlers({
@@ -42,7 +43,10 @@ bridge.addBackgroundHandlers({
     const realm = bridge.invokableIds::includes(id) && INJECT_CONTENT;
     bridge.post('Command', data, realm);
   },
-  GetPopup: getPopup,
+  PopupShown(state) {
+    isPopupShown = state;
+    sendSetPopup();
+  },
   UpdatedValues(data) {
     const dataPage = {};
     const dataContent = {};
@@ -62,15 +66,15 @@ bridge.addHandlers({
       const [id, cap] = data;
       const commandMap = menus[id] || (menus[id] = {});
       commandMap[cap] = 1;
+      sendSetPopup();
     }
-    getPopup();
   },
   UnregisterMenu(data) {
     if (IS_TOP) {
       const [id, cap] = data;
       delete menus[id]?.[cap];
+      sendSetPopup();
     }
-    getPopup();
   },
   AddStyle({ css, callbackId }, realm) {
     const styleId = getUniqId('VMst');
@@ -88,12 +92,8 @@ bridge.addHandlers({
   },
 });
 
-function getPopup() {
-  sendCmd('SetPopup', { ids: bridge.ids, menus });
-}
-
-async function setBadge() {
-  // delay setBadge in frames so that they can be added to the initial count
-  if (!IS_TOP) await makePause(300);
-  sendCmd('SetBadge', bridge.enabledIds);
+function sendSetPopup() {
+  if (isPopupShown) {
+    sendCmd('SetPopup', { ids: bridge.ids, menus });
+  }
 }

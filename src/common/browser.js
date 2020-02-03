@@ -65,10 +65,12 @@ if (!global.browser?.runtime?.sendMessage) {
       create: wrapAsync,
     },
     runtime: {
+      connect: true,
       getManifest: true,
       getPlatformInfo: wrapAsync,
       getURL: true,
       openOptionsPage: wrapAsync,
+      onConnect: true,
       onMessage: onMessage => ({
         addListener: listener => onMessage.addListener(wrapMessageListener(listener)),
       }),

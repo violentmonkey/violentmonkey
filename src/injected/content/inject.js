@@ -38,24 +38,14 @@ export function injectScripts(contentId, webId, data, isXml) {
     [INJECT_PAGE]: injectPage,
     [INJECT_CONTENT]: injectContent,
   };
-  let { scripts } = data;
-  scripts = scripts.filter(({ meta, props, config }) => {
-    if (!meta.noframes || window.top === window) {
-      bridge.ids.push(props.id);
-      if (config.enabled) {
-        bridge.enabledIds.push(props.id);
-        return true;
-      }
-    }
-    return false;
-  });
+  bridge.ids = data.ids;
   let injectable = isXml ? false : null;
   const injectChecking = {
     // eslint-disable-next-line no-return-assign
     [INJECT_PAGE]: () => injectable ?? (injectable = checkInjectable()),
     [INJECT_CONTENT]: () => true,
   };
-  scripts.forEach((script) => {
+  data.scripts.forEach((script) => {
     const injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
     const internalInjectInto = INJECT_MAPPING[injectInto] || INJECT_MAPPING[INJECT_AUTO];
     const availableInjectInto = internalInjectInto.find(key => injectChecking[key]?.());

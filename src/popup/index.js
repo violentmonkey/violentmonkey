@@ -1,7 +1,5 @@
 import Vue from 'vue';
-import {
-  getActiveTab, i18n, sendCmd, sendTabCmd,
-} from '#/common';
+import { getActiveTab, i18n, sendCmd } from '#/common';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import handlers from '#/common/handlers';
 import { mapEntry } from '#/common/object';
@@ -51,7 +49,7 @@ Object.assign(handlers, {
 getActiveTab()
 .then(async ({ id, url }) => {
   store.currentTab = { id, url };
-  sendTabCmd(id, 'GetPopup');
+  browser.runtime.connect({ name: `${id}` });
   if (/^https?:\/\//i.test(url)) {
     const matches = url.match(/:\/\/([^/]*)/);
     const domain = matches[1];

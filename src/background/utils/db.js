@@ -242,43 +242,52 @@ const gmValues = [
 
 /**
  * @desc Get scripts to be injected to page with specific URL.
- * @return {Promise<{ scripts, require, cache, values, code }>}
+ * @return {Promise<{ cache, code, require, values, scripts, ids, enabledIds, withValueIds }>}
  */
-export async function getScriptsByURL(url) {
-  const scripts = testBlacklist(url)
+export async function getScriptsByURL(url, isTop) {
+  const allScripts = testBlacklist(url)
     ? []
-    : store.scripts.filter(script => !script.config.removed && testScript(url, script));
+    : store.scripts.filter(script => (
+      !script.config.removed
+      && (isTop || !script.meta.noframes)
+      && testScript(url, script)
+    ));
   const reqKeys = {};
   const cacheKeys = {};
+  const scripts = allScripts.filter(script => script.config.enabled);
   scripts.forEach((script) => {
-    if (script.config.enabled) {
-      if (!script.custom.pathMap) buildPathMap(script);
-      const { pathMap } = script.custom;
-      script.meta.require.forEach((key) => {
-        reqKeys[pathMap[key] || key] = 1;
-      });
-      script.meta.resources::forEachValue((key) => {
-        cacheKeys[pathMap[key] || key] = 1;
-      });
-    }
+    const { meta, custom } = script;
+    const { pathMap = buildPathMap(script) } = custom;
+    meta.require.forEach((key) => {
+      reqKeys[pathMap[key] || key] = 1;
+    });
+    meta.resources::forEachValue((key) => {
+      cacheKeys[pathMap[key] || key] = 1;
+    });
   });
-  const enabledScripts = scripts
-  .filter(script => script.config.enabled);
-  const scriptsWithValue = enabledScripts
-  .filter(script => script.meta.grant?.some(gm => gmValues.includes(gm)));
+  const ids = allScripts.map(getPropsId);
+  const enabledIds = scripts.map(getPropsId);
+  const withValueIds = scripts
+  .filter(script => script.meta.grant?.some(gm => gmValues.includes(gm)))
+  .map(getPropsId);
   const [require, cache, values, code] = await Promise.all([
     storage.require.getMulti(Object.keys(reqKeys)),
     storage.cache.getMulti(Object.keys(cacheKeys)),
-    storage.value.getMulti(scriptsWithValue.map(getPropsId), {}),
-    storage.code.getMulti(enabledScripts.map(getPropsId)),
+    storage.value.getMulti(withValueIds, {}),
+    storage.code.getMulti(enabledIds),
   ]);
-  return {
-    scripts,
-    require,
+  return Object.defineProperties({
     cache,
-    values,
     code,
-  };
+    enabledIds,
+    ids,
+    require,
+    scripts,
+    values,
+  }, {
+    // Hiding from the messaging API
+    withValueIds: { value: withValueIds },
+  });
 }
 
 /** @return {string[]} */
