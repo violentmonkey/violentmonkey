@@ -8,7 +8,9 @@ const API_CONFIG = {
 const TIME_AFTER_SEND = 1000; // longer as establishing connection to sites may take time
 const TIME_AFTER_RECEIVE = 250; // shorter as response body will be coming very soon
 
-export const PREINJECT_KEY = 'preinject:';
+export function getPreinjectKey(url, isTop) {
+  return `preinject${+isTop}:${url}`;
+}
 
 export function togglePreinject(enable) {
   // Using onSendHeaders because onHeadersReceived in Firefox fires *after* content scripts.
@@ -19,16 +21,17 @@ export function togglePreinject(enable) {
   browser.webRequest.onHeadersReceived[onOff](prolong, config);
 }
 
-function preinject({ url }) {
-  const key = `${PREINJECT_KEY}${url}`;
+function preinject({ url, frameId }) {
+  const isTop = !frameId;
+  const key = getPreinjectKey(url, isTop);
   if (!cache.has(key)) {
     // GetInjected message will be sent soon by the content script
     // and it may easily happen while getScriptsByURL is still waiting for browser.storage
     // so we'll let GetInjected await this pending data by storing Promise in the cache
-    cache.put(key, getScriptsByURL(url), TIME_AFTER_SEND);
+    cache.put(key, getScriptsByURL(url, isTop), TIME_AFTER_SEND);
   }
 }
 
-function prolong({ url }) {
-  cache.hit(`${PREINJECT_KEY}${url}`, TIME_AFTER_RECEIVE);
+function prolong({ url, frameId }) {
+  cache.hit(getPreinjectKey(url, !frameId), TIME_AFTER_RECEIVE);
 }

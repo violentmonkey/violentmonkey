@@ -2,13 +2,9 @@ import { i18n, noop } from '#/common';
 import ua from '#/common/ua';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import { postInitialize } from './init';
-import { commands, forEachTab } from './message';
+import { forEachTab } from './message';
 import { getOption, hookOptions } from './options';
 import { testBlacklist } from './tester';
-
-Object.assign(commands, {
-  SetBadge: setBadge,
-});
 
 // Firefox Android does not support such APIs, use noop
 
@@ -68,10 +64,10 @@ browser.tabs.onUpdated.addListener((tabId, info, tab) => {
   }
 });
 
-function setBadge(ids, src) {
-  const { id: tabId } = src.tab || {};
+export function setBadge(ids, { tab, frameId }) {
+  const tabId = tab.id;
   const data = badges[tabId] || {};
-  if (!data.idMap || src.frameId === 0) {
+  if (!data.idMap || frameId === 0) {
     // 1) keeping data object to preserve data.blocked
     // 2) 'total' and 'unique' must match showBadge in options-defaults.js
     data.total = 0;
@@ -90,7 +86,7 @@ function setBadge(ids, src) {
     color: data.blocked ? '#888' : '#808',
     tabId,
   });
-  updateBadge(src.tab, data);
+  updateBadge(tab, data);
 }
 
 function updateBadge(tab, data = badges[tab.id]) {

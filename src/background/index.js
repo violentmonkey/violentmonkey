@@ -1,17 +1,17 @@
-import { sendCmd, noop } from '#/common';
+import { sendCmd, sendTabCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
 import ua from '#/common/ua';
 import * as sync from './sync';
 import { cache, commands } from './utils';
 import { getData, checkRemove, getScriptsByURL } from './utils/db';
+import { setBadge } from './utils/icon';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
-import { resetValueOpener, addValueOpener } from './utils/values';
+import { getPreinjectKey, togglePreinject } from './utils/preinject';
 import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
-import { PREINJECT_KEY, togglePreinject } from './utils/preinject';
+import { resetValueOpener, addValueOpener } from './utils/values';
 import './utils/clipboard';
 import './utils/hotkeys';
-import './utils/icon';
 import './utils/notifications';
 import './utils/requests';
 import './utils/script';
@@ -20,6 +20,7 @@ import './utils/tester';
 import './utils/update';
 
 const VM_VER = browser.runtime.getManifest().version;
+const popupTabs = {}; // { tabId: 1 }
 let isApplied;
 let injectInto;
 
@@ -43,21 +44,26 @@ Object.assign(commands, {
     return data;
   },
   /** @return {Promise<Object>} */
-  async GetInjected(_, { url, tab, frameId }) {
-    if (frameId === 0) resetValueOpener(tab.id);
-    const data = {
+  async GetInjected(_, src) {
+    const { frameId, tab, url } = src;
+    const isTop = !frameId;
+    if (isTop) resetValueOpener(tab.id);
+    const res = {
       isApplied,
       injectInto,
       ua,
       isFirefox: ua.isFirefox,
+      isPopupShown: popupTabs[tab.id],
       version: VM_VER,
     };
     if (isApplied) {
-      const scripts = await (cache.get(`${PREINJECT_KEY}${url}`) || getScriptsByURL(url));
-      addValueOpener(tab.id, frameId, Object.keys(scripts.values));
-      Object.assign(data, scripts);
+      const key = getPreinjectKey(url, isTop);
+      const data = await (cache.get(key) || getScriptsByURL(url, isTop));
+      addValueOpener(tab.id, frameId, data.withValueIds);
+      setBadge(data.enabledIds, src);
+      Object.assign(res, data);
     }
-    return data;
+    return res;
   },
 });
 
@@ -99,8 +105,21 @@ function autoUpdate() {
   autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
 }
 
+function onPopupOpened(port) {
+  const tabId = +port.name;
+  popupTabs[tabId] = 1;
+  sendTabCmd(tabId, 'PopupShown', true);
+  port.onDisconnect.addListener(onPopupClosed);
+}
+
+function onPopupClosed({ name }) {
+  delete popupTabs[name];
+  sendTabCmd(+name, 'PopupShown', false);
+}
+
 initialize(() => {
   browser.runtime.onMessage.addListener(handleCommandMessage);
+  browser.runtime.onConnect.addListener(onPopupOpened);
   injectInto = getOption('defaultInjectInto');
   isApplied = getOption('isApplied');
   togglePreinject(isApplied);
