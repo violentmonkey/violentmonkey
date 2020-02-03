@@ -34,41 +34,32 @@ const MAX_BL_CACHE_LENGTH = 100e3;
 let blCache = {};
 let blCacheSize = 0;
 
+function testRules(url, rules, prefix, ruleBuilder) {
+  return rules.some(rule => {
+    const key = `${prefix}:${rule}`;
+    let matcher = cache.get(key);
+    if (matcher) cache.hit(key);
+    else cache.put(key, (matcher = ruleBuilder(rule)));
+    return matcher.test(url);
+  });
+}
+
 /**
  * Test glob rules like `@include` and `@exclude`.
  */
 export function testGlob(url, rules) {
-  return rules.some((rule) => {
-    const key = `re:${rule}`;
-    let re = cache.get(key);
-    if (re) {
-      cache.hit(key);
-    } else {
-      re = autoReg(rule);
-      cache.put(key, re);
-    }
-    return re.test(url);
-  });
+  return testRules(url, rules, 're', autoReg);
 }
 
 /**
  * Test match rules like `@match` and `@exclude_match`.
  */
 export function testMatch(url, rules) {
-  return rules.some((rule) => {
-    const key = `match:${rule}`;
-    let matcher = cache.get(key);
-    if (matcher) {
-      cache.hit(key);
-    } else {
-      matcher = matchTester(rule);
-      cache.put(key, matcher);
-    }
-    return matcher.test(url);
-  });
+  return testRules(url, rules, 'match', matchTester);
 }
 
 export function testScript(url, script) {
+  cache.batch(true);
   const { custom, meta } = script;
   const mat = mergeLists(custom.origMatch && meta.match, custom.match);
   const inc = mergeLists(custom.origInclude && meta.include, custom.include);
@@ -84,17 +75,8 @@ export function testScript(url, script) {
   ok = ok && !testMatch(url, excMat);
   // @exclude
   ok = ok && !testGlob(url, exc);
+  cache.batch(false);
   return ok;
-}
-
-function testRegExp(re, text) {
-  const key = `re-test:${re.source}:${text}`;
-  let res = cache.get(key);
-  if (!res) {
-    res = re.test(text) ? 1 : -1;
-    cache.put(key, res);
-  }
-  return res === 1;
 }
 
 function mergeLists(...args) {
@@ -106,10 +88,14 @@ function str2RE(str) {
   return re;
 }
 
+function bindRE(re) {
+  return re.test.bind(re);
+}
+
 function autoReg(str) {
   if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
     const re = new RegExp(str.slice(1, -1));
-    return { test: tstr => testRegExp(re, tstr) };
+    return { test: bindRE(re) };
   }
   const reStr = str2RE(str);
   if (tld.isReady() && str.includes('.tld/')) {
@@ -126,7 +112,7 @@ function autoReg(str) {
     };
   }
   const re = new RegExp(`^${reStr}$`); // String with wildcards
-  return { test: tstr => testRegExp(re, tstr) };
+  return { test: bindRE(re) };
 }
 
 function matchScheme(rule, data) {
@@ -184,9 +170,9 @@ function pathMatcher(rule) {
     if (iQuery < 0) strRe = `^${strRe}(?:[?#]|$)`;
     else strRe = `^${strRe}(?:#|$)`;
   }
-  const reRule = new RegExp(strRe);
-  return data => testRegExp(reRule, data);
+  return bindRE(new RegExp(strRe));
 }
+
 function matchTester(rule) {
   let test;
   if (rule === '<all_urls>') {
@@ -222,6 +208,7 @@ export function testBlacklist(url) {
 }
 
 export function resetBlacklist(list) {
+  cache.batch(true);
   const rules = list == null ? getOption('blacklist') : list;
   if (process.env.DEBUG) {
     console.info('Reset blacklist:', rules);
@@ -242,6 +229,7 @@ export function resetBlacklist(list) {
   .filter(Boolean);
   blCache = {};
   blCacheSize = 0;
+  cache.batch(false);
 }
 
 function updateBlacklistCache(key, value) {

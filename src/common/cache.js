@@ -1,3 +1,5 @@
+import { hasOwnProperty } from '#/common/util';
+
 export default function initCache({
   lifetime: defaultLifetime = 3000,
 } = {}) {
@@ -8,9 +10,19 @@ export default function initCache({
   // and then trim() will trim the cache and reschedule itself to the earliest expiry time.
   let timer;
   let minLifetime = -1;
+  // same goes for the performance.now() used by hit() and put() which is why we expose batch(true)
+  // to start an operation that reuses the same value of now(), and batch(false) to end it
+  let batchStarted;
+  let batchStartTime;
+  // eslint-disable-next-line no-return-assign
+  const getNow = () => batchStarted && batchStartTime || (batchStartTime = performance.now());
   return {
-    get, put, del, has, hit, destroy,
+    batch, get, put, del, has, hit, destroy,
   };
+  function batch(enable) {
+    batchStarted = enable;
+    batchStartTime = 0;
+  }
   function get(key, def) {
     const item = cache[key];
     return item ? item.value : def;
@@ -19,7 +31,7 @@ export default function initCache({
     if (value) {
       cache[key] = {
         value,
-        expiry: lifetime + performance.now(),
+        expiry: lifetime + getNow(),
       };
       reschedule(lifetime);
     } else {
@@ -30,12 +42,12 @@ export default function initCache({
     delete cache[key];
   }
   function has(key) {
-    return Object.hasOwnProperty.call(cache, key);
+    return cache::hasOwnProperty(key);
   }
   function hit(key, lifetime = defaultLifetime) {
     const entry = cache[key];
     if (entry) {
-      entry.expiry = performance.now() + lifetime;
+      entry.expiry = lifetime + getNow();
       reschedule(lifetime);
     }
   }
