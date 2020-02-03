@@ -36,7 +36,8 @@ const iconCache = ua.isChrome && {};
 hookOptions((changes) => {
   if ('isApplied' in changes) {
     isApplied = changes.isApplied;
-    setIcon();
+    setIcon(); // change the default icon
+    forEachTab(setIcon); // change the current tabs' icons
   }
   if ('showBadge' in changes) {
     showBadge = changes.showBadge;
