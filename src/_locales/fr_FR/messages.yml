@@ -15,7 +15,7 @@ buttonEdit:
   message: Éditer
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Empty recycle bin now!
 buttonEnable:
   description: Button to enable a script.
   message: Activer
@@ -45,7 +45,7 @@ buttonOK:
   message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: Recycle Bin
 buttonRemove:
   description: Button to remove a script.
   message: Supprimer
@@ -60,7 +60,7 @@ buttonReset:
   message: Réinitialiser
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: Restore
 buttonSave:
   description: Button to save modifications of a script.
   message: Sauvegarder
@@ -75,7 +75,7 @@ buttonSaveCustomCSS:
   message: Sauvegarder
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: Show editor state
 buttonSupport:
   description: Button to open support page.
   message: Page de support
@@ -114,16 +114,21 @@ descCustomCSS:
     l’éditer.
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    Custom options for CodeMirror and addons in JSON object like
+    <code>{"indentUnit":2, "smartIndent":true}</code> however note that some of
+    them may not work in Violentmonkey. See <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">full list</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: 'Documentation on userscript metadata block and <code>GM</code> API:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Keyboard shortcuts:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Use another editor?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadonnées personnalisées
@@ -147,18 +152,20 @@ editValueSave:
   message: Sauvegarder
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: Apporte un support userscript pour les navigateurs
+  message: An open source userscript manager that supports a lot of browsers
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: ''
+  message: Blacklisted in Violentmonkey's settings
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: |-
+    Violentmonkey cannot run userscripts in this page
+    (common examples: browser UI or an extension)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordre alphabétique
@@ -167,7 +174,7 @@ filterExecutionOrder:
   message: ordre d’exécution
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: last update time
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: ''
@@ -188,13 +195,13 @@ genericUseGlobal:
   message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: ''
+  message: Recycle Bin
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL source:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: ''
+  message: Scripts removed are listed here and will be kept for 7 days.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Utiliser @downloadURL
@@ -231,7 +238,7 @@ labelAutoReloadCurrentTab:
     menu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: 'Check for script updates every $1 day(s), use 0 to disable'
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Montrer sur le badge: '
@@ -348,13 +355,13 @@ labelNotifyUpdatesGlobal:
   message: ''
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Sort scripts in popup by $1
 labelRelated:
   description: Label of related links.
   message: 'Liens relatifs: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: ''
+  message: Removed at $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Remplacer par: '
@@ -381,7 +388,7 @@ labelSync:
   message: Synchronisation
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: Use anonymous account
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Autoriser
@@ -393,7 +400,7 @@ labelSyncDisabled:
   message: Aucun
 labelSyncPassword:
   description: Label for input to hold password.
-  message: ''
+  message: 'Password: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Réautoriser automatiquement à l’expiration
@@ -406,13 +413,13 @@ labelSyncScriptStatus:
   message: Synchroniser le statut du script
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'Server URL: '
 labelSyncService:
   description: Label for sync service select.
   message: Synchroniser sur
 labelSyncUsername:
   description: Label for input to hold username.
-  message: ''
+  message: 'Username: '
 labelTranslator:
   description: Label of translator.
   message: 'Traducteur·ice·s: '
@@ -441,7 +448,7 @@ menuFindScripts:
   message: Chercher des scripts pour ce site
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Sub-frames only scripts
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Scripts associés
@@ -518,7 +525,7 @@ msgSavedCustomCSS:
   message: Style personnalisé mis à jour.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: Editor options are updated.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Le modèle de script personnalisé a été mis à jour.
@@ -551,10 +558,10 @@ noValues:
   message: Aucune valeur n’est enregistrée
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Enabled first
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: Hide disabled
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Montrer les scripts activés en premier
@@ -587,4 +594,4 @@ valueLabelValue:
   message: Valeur (sérialisée comme JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Visit Website

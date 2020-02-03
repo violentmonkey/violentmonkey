@@ -15,7 +15,7 @@ buttonEdit:
   message: Редактировать
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Очистить корзину!
 buttonEnable:
   description: Button to enable a script.
   message: Включить
@@ -45,7 +45,7 @@ buttonOK:
   message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: Корзина.
+  message: Корзина
 buttonRemove:
   description: Button to remove a script.
   message: Удалить
@@ -109,22 +109,22 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Пользовательский CSS для страницы настроек и страницы установки скрипта.
-    Если вы не знаете, что это такое, не редактируйте его.
+    Пользовательский CSS для страницы настроек и страницы установки скриптов.
+    Если вы не знаете для чего это необходимо, не редактируйте это.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Ваши параметры для CodeMirror и аддонов в объекте JSON, например
-    <code>{"indentUnit":2, "smartIndent":true}</code> . Однако заметьте,
-     некоторые из них могут не работать в Violentmonkey. Смотрите <a
+    <code>{"indentUnit":2, "smartIndent":true}</code>Однако заметьте, некоторые
+    из них могут не работать в Violentmonkey Смотрите <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">полный список</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: 'Документация по блоку метаданных скриптов и <code>GM</code> API:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Сочетания клавиш:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: Использовать другой редактор?
@@ -142,18 +142,18 @@ editNavSettings:
   message: Настройки
 editNavValues:
   description: Label of values tab in script editor.
-  message: Значения
+  message: Данные
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: Отменить
+  message: Отмена
 editValueSave:
   description: Button to save modification of a script value.
   message: Сохранить
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
   message: >-
-    Violentmonkey - менеджер пользовательских скриптов, позволяет контролировать
-    внешний вид и устранять проблемы на сайтах.
+    Violentmonkey - менеджер пользовательских скриптов для множества браузеров,
+    с открытым исходным кодом.
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -175,25 +175,25 @@ filterExecutionOrder:
   message: порядку выполнения
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: время обновления
+  message: времени обновления
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Все
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Код
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Имя
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: выключено
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: включено
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: использовать глобальные настройки
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Корзина
@@ -202,22 +202,22 @@ hintInputURL:
   message: 'Введите URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: Удаленные скрипты будут храниться здесь до очистки.
+  message: Удаленные скрипты просуществуют еще 7 дней в этом списке.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Использовать @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Сбросить избыточность и перезагрузить недостающие ресурсы в кэше.
+  message: Сбросить избыточный кэш и попробовать подгрузить недостающие ресурсы.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Установить с $1
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Закрыть окно после установки
+  message: Закрыть после установки.
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Отслеживать локальный файл до закрытия этого окна
+  message: Отслеживать локальный файл до закрытия этого окна.
 labelAbout:
   description: Label shown on top of the about page.
   message: О расширении Violentmonkey
@@ -232,7 +232,7 @@ labelAuthor:
   message: 'Автор: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Обновить текущую вкладку после включения или отключения скрипта из меню
+  message: Обновить текущую вкладку после включения или отключения скрипта из меню.
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Проверять наличие обновлений скриптов каждые $1 дней, 0 для отключения'
@@ -244,16 +244,16 @@ labelBadgeNone:
   message: ничего
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: количество запущенных скриптов
+  message: кол-во запущенных скриптов
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: количество уникальных запущенных скриптов
+  message: кол-во уникальных запущенных скриптов
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Черный список
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Участники
 labelCurrentLang:
   description: Label of current language.
   message: 'Текущий язык: '
@@ -283,7 +283,7 @@ labelExclude:
   message: '@exclude правила исключения'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match правила исключение соответствия'
+  message: '@exclude-match правила исключения соответствий'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Экспорт данных скриптов
@@ -304,7 +304,7 @@ labelHomepage:
   message: Домашняя страница
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Домашняя страница:'
+  message: 'URL страницы скрипта:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Импорт настроек
@@ -316,7 +316,7 @@ labelInjectionMode:
   message: 'Режим инъекции по умолчанию: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Установка скрипта
+  message: Установка скрипта...
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Сохранить исходное соответствие
@@ -325,7 +325,7 @@ labelLastUpdatedAt:
   message: Дата последнего обновления $1
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'N строки: '
+  message: 'N строки:'
 labelMatch:
   description: Label of @match rules.
   message: '@match правила соответствия'
@@ -334,7 +334,7 @@ labelName:
   message: 'Имя:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Нет имени
+  message: Без имени
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Скрипты не найдены.
@@ -343,13 +343,13 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ' разрешить обновление'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Уведомлять об обновлениях скриптов
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: Игнорировать уведомления скриптов (вкладка настроек в редакторе)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Сортировка во всплывающем окне по $1
@@ -370,7 +370,7 @@ labelRunAtDefault:
   message: (по умолчанию)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: Пользовательский шаблон скрипта
+  message: Шаблон нового скрипта
 labelSearch:
   description: Label for search input in search box.
   message: 'Найти: '
@@ -388,10 +388,10 @@ labelSyncAnonymous:
   message: Анонимный аккаунт
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Подключить
+  message: Авторизироваться
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Авторизация
+  message: Авторизация...
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: ничем
@@ -404,19 +404,19 @@ labelSyncReauthorize:
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Отключить
+  message: Выйти
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Синхронизировать статус скриптов
+  message: Синхронизировать статус скриптов.
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'URL сервера: '
+  message: 'URL сервера:'
 labelSyncService:
   description: Label for sync service select.
   message: Синхронизировать с
 labelSyncUsername:
   description: Label for input to hold username.
-  message: 'Логин: '
+  message: 'Логин:'
 labelTranslator:
   description: Label of translator.
   message: 'Переводчики: '
@@ -429,7 +429,7 @@ lastSync:
   message: Последняя синхронизация в $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Подробнее о шаблонах черного списка.
+  message: Подробнее о шаблонах черного списка
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
   message: Подробнее о режимах инъекций
@@ -445,7 +445,7 @@ menuFindScripts:
   message: Найти скрипты для этого сайта
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: Только суб-фреймы скриптов
+  message: Суб-фреймы скриптов
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Совпадающие скрипты
@@ -466,12 +466,12 @@ msgErrorFetchingScript:
   message: Ошибка при загрузке скрипта!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Не удалось получить информацию об обновлении.
+  message: Не удается проверить наличие обновлений.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Ошибка загрузки данных скрипта.
+  message: Ошибка загрузки кода скрипта.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
   message: Ошибка загрузки зависимостей.
@@ -497,7 +497,7 @@ msgLoading:
   touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Загрузка данных скрипта...
+  message: Загрузка кода скрипта...
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Загрузка зависимостей... ($1/$2)
@@ -505,7 +505,7 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Конфликт пространства имен скриптов. Измените @name и @namespace.
+  message: Конфликт пространства имен скрипта. Измените @name и @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -516,16 +516,16 @@ msgNoUpdate:
   message: Обновления не найдены.
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: Черный список сохранен.
+  message: Чёрный список сохранен.
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Пользовательский стиль сохранен.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: Обновление параметров редактора.
+  message: Параметры редактора обновлены.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: Пользовательский шаблон обновлен.
+  message: Шаблон нового скрипта обновлен.
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Скрипт [$1] обновлен!'
@@ -537,7 +537,7 @@ msgSyncInit:
   message: Инициализация...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: Ошибка инициализации!
+  message: Ошибка инициализации синхронизации!
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Ожидание синхронизации...
@@ -582,13 +582,15 @@ titleScriptUpdated:
   message: Обновление
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * Клавиша <Enter> добавляет текст в историю автозаполнения.
+    * Поддерживается RegExp: /re/ и /re/flags
 valueLabelKey:
   description: Label for key of a script value.
   message: Ключ (строка)
 valueLabelValue:
   description: Label for value of a script value.
-  message: Значение (сериализованное как JSON)
+  message: Значение (в формате JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: Сайт Violentmonkey
+  message: Сайт расширения

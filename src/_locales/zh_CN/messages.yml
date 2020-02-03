@@ -173,22 +173,22 @@ filterLastUpdateOrder:
   message: 最近更新时间
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: 全部
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: 代码
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: 名字
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: 关
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: 开
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: 使用全局设置
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: 回收站
@@ -248,7 +248,7 @@ labelBlacklist:
   message: 黑名单
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: 贡献者
 labelCurrentLang:
   description: Label of current language.
   message: 当前语言：
@@ -338,13 +338,13 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ，然后提示：
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: 脚本更新时提示
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: 忽略每个脚本的提示（编辑器中的“设置”页）
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: 弹出菜单中的脚本按$1排序
@@ -577,7 +577,9 @@ titleScriptUpdated:
   message: 更新
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * <Enter> 键把文本加入自动补全历史
+    * 支持正则表达式：/re/ 和 /re/flags
 valueLabelKey:
   description: Label for key of a script value.
   message: 键名（字符串）

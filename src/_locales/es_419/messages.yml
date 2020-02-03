@@ -9,16 +9,16 @@ buttonConfirmInstallation:
   message: Confirmar instalación
 buttonDisable:
   description: Button to disable a script.
-  message: Desactivar
+  message: Deshabilitar
 buttonEdit:
   description: Button to edit a script.
   message: Editar
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: ¡Vaciar papelera de reciclaje ahora!
 buttonEnable:
   description: Button to enable a script.
-  message: Activar
+  message: Habilitar
 buttonExportData:
   description: Button to open the data export dialog.
   message: Exportar a zip
@@ -45,7 +45,7 @@ buttonOK:
   message: Aceptar
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: Papelera
+  message: Papelera de reciclaje
 buttonRemove:
   description: Button to remove a script.
   message: Eliminar
@@ -85,10 +85,10 @@ buttonUndo:
   touched: false
 buttonUpdate:
   description: Check a script for updates.
-  message: Comprobar actualizaciones
+  message: Buscar actualizaciones
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Comprobar si hay actualizaciones
+  message: Buscar todas las actualizaciones
 buttonVacuum:
   description: Button to vacuum extension data.
   message: Vaciar base de datos
@@ -105,7 +105,7 @@ confirmNotSaved:
     Haga clic en Aceptar para descartarlas o en Cancelar para mantenerlas.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: Las URLs en esta lista no serán inyectadas por los scripts.
+  message: Las URLs que coincidan en esta lista no serán inyectadas por los scripts.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -121,25 +121,27 @@ descEditorOptions:
     rel="noopener noreferrer">lista completa</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: >-
+    Documentación sobre el bloque de metadatos de userscript y la API de
+    <code>GM</code>:
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Atajos de teclado:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: ¿Usas otro editor?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadatos personalizados
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Ajustes del script
+  message: Configuración del script
 editNavCode:
   description: Label of code tab in script editor.
   message: Código
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: Ajustes
+  message: Configuración
 editNavValues:
   description: Label of values tab in script editor.
   message: Valores
@@ -151,19 +153,21 @@ editValueSave:
   message: Guardar
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: Proporciona soporte de scripts de usuario para los navegadores
+  message: >-
+    Un administrador de userscripts de código abierto que admite muchos
+    navegadores
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: En la lista negra de los ajustes de Violentmonkey
+  message: En la lista negra en la configuración de Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: |-
-    Violentmonkey no puede ejecutar scripts de usuario en esta página
+    Violentmonkey no puede ejecutar userscripts en esta página
     (casos comunes: interfaz de usuario del navegador o una extensión)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
@@ -176,13 +180,13 @@ filterLastUpdateOrder:
   message: tiempo de actualización más reciente
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Todo
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Código
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Nombre
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: ''
@@ -194,10 +198,10 @@ genericUseGlobal:
   message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: Papelera
+  message: Papelera de reciclaje
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'Introduzca la URL:'
+  message: 'Ingrese la URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Los scripts eliminados se enumeran aquí y se mantendrán durante 7 días.
@@ -237,7 +241,9 @@ labelAutoReloadCurrentTab:
     menú
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: >-
+    Buscar actualizaciones de los scripts cada $1 día(s), use 0 para
+    deshabilitar
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Mostrar en el icono de la extensión: '
@@ -288,7 +294,7 @@ labelExcludeMatch:
   message: Reglas @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Exportar datos de los scripts
+  message: Exportar datos del script
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
@@ -309,7 +315,7 @@ labelHomepageURL:
   message: 'URL de la página principal:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Importar ajustes
+  message: Importar configuración
 labelInclude:
   description: Label of @include rules.
   message: Reglas @include
@@ -351,10 +357,10 @@ labelNotifyUpdates:
   message: Notificar actualizaciones de scripts
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: ignorar notificación por script (pestaña "configuración" en el editor)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: Ordenar scripts en popup por $1
+  message: Ordenar los scripts en ventana emergente por $1
 labelRelated:
   description: Label of related links.
   message: 'Enlaces relacionados: '
@@ -378,10 +384,10 @@ labelSearch:
   message: 'Buscar: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Buscar scripts ...
+  message: Buscar scripts...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Ajustes
+  message: Configuración
 labelSync:
   description: Label for sync options.
   message: Sincronizar
@@ -441,28 +447,28 @@ menuCommands:
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: Abrir el panel de control
+  message: Abrir panel de control
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Buscar scripts para este sitio
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: Sólo scripts sub-frames
+  message: Solo scripts sub-frames
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Scripts emparejados
+  message: Scripts coincidentes
 menuNewScript:
   description: Menu item to create a new script.
   message: Crear un nuevo script
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: Scripts desactivados
+  message: Scripts deshabilitados
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
-  message: Scripts activados
+  message: Scripts habilitados
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Comprobando actualizaciones...
+  message: Buscar actualizaciones...
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: ¡Error al obtener el script!
@@ -514,7 +520,7 @@ msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Nueva versión encontrada.
+  message: Nueva versión disponible.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: No se han encontrado actualizaciones.
@@ -559,13 +565,13 @@ noValues:
   message: No se almacena ningún valor
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: Activados primero
+  message: Habilitados primero
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Ocultar desactivados
+  message: Ocultar deshabilitados
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Mostrar scripts activados primero
+  message: Mostrar scripts habilitados primero
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Distinguir mayúsculas y minúsculas
@@ -580,16 +586,18 @@ sideMenuInstalled:
   message: Scripts instalados
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Ajustes
+  message: Configuración
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Actualización
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * La clave <Enter> añade texto para auto-completar el historial
+    * Soporte para sintaxis RegExp: /re/ y /re/flags
 valueLabelKey:
   description: Label for key of a script value.
-  message: Clave (string)
+  message: Clave (cadena)
 valueLabelValue:
   description: Label for value of a script value.
   message: Valor (serializado como JSON)

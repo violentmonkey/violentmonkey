@@ -15,7 +15,7 @@ buttonEdit:
   message: Upraviť
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Vysypať kôš teraz!
 buttonEnable:
   description: Button to enable a script.
   message: Povoliť
@@ -121,10 +121,10 @@ descEditorOptions:
     rel="noopener noreferrer">celý zoznam</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: 'Dokumentácia k bloku metadát užívateľského skriptu a <code>GM</code> API:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Klávesové skratky:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: Chcete použiť iný editor?
@@ -151,7 +151,9 @@ editValueSave:
   message: Uložiť
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: Umožňuje inštaláciu skriptov v prehliadači.
+  message: >-
+    Správca užívateľských skriptov s otvoreným kódom a podporou viacerých
+    prehliadačov
 extName:
   description: Name of this extension.
   message: Violentmonkey

@@ -15,7 +15,7 @@ buttonEdit:
   message: Edytuj
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Opróżnij kosz teraz!
 buttonEnable:
   description: Button to enable a script.
   message: Włącz
@@ -100,9 +100,9 @@ buttonVacuuming:
   message: Czyszczenie danych...
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: >-
-    Modyfikacje w tym skrypcie nie zostały zapisane! Kliknij "OK", aby je
-    porzucić lub "Anuluj", aby je zostawić.
+  message: |-
+    Zmiany nie zostały zapisane!
+    Kliknij "OK", aby je porzucić lub "Anuluj", aby je zostawić.
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: 'Adresy URL, które są na tej liście, nie zostaną dołączone do skryptów.'
@@ -121,10 +121,12 @@ descEditorOptions:
     rel="noopener noreferrer">pełną listę</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: >-
+    Dokumentacja dotycząca bloku metadanych skryptu użytkownika i API
+    <code>GM</code>:
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Skróty klawiaturowe:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: Użycie innego edytora?
@@ -151,13 +153,15 @@ editValueSave:
   message: Zapisz
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: Zapewnia obsługę skryptów użytkownika dla przeglądarek.
+  message: >-
+    Menedżer skryptów użytkownika o otwartym kodzie źródłowym, który  obsługuje
+    wiele przeglądarek.
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: ''
+  message: ' Zablokowano w czarnej liście w ustawieniach Violentmonkey''a'
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
@@ -176,22 +180,22 @@ filterLastUpdateOrder:
   message: czasu ostatniej aktualizacji
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Wszystko
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Kod
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Nazwa
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: wył
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: wł
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: użyj globalnych ustawień
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Kosz
@@ -298,10 +302,10 @@ labelGeneral:
   message: Ogólne
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: Pomóż z tłumaczeniem
+  message: Pomóż w tłumaczeniu
 labelHomepage:
   description: Label for home page in about tab.
-  message: Strona główna
+  message: Strona domowa
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Adres URL strony głównej:'
@@ -322,7 +326,7 @@ labelKeepOriginal:
   message: Zachowaj oryginalne
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: Ostatnio zaktualizowany $1
+  message: Ostatnio zaktualizowano $1
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Linia nr:'
@@ -349,16 +353,18 @@ labelNotifyUpdates:
   message: Powiadamiaj o aktualizacjach skryptów
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: >-
+    Ignoruj ​​powiadomienia dla poszczególnych skryptów (zakładka „ustawienia” w
+    edytorze)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: Sortuj skrypty w wyskakującym okienku według $1
+  message: 'Sortuj skrypty w wyskakującym okienku wg $1 '
 labelRelated:
   description: Label of related links.
   message: 'Powiązane linki: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: ''
+  message: 'Usunięto  $1 '
 labelReplace:
   description: Label for replace input in search box.
   message: 'Zamień na: '
@@ -397,7 +403,7 @@ labelSyncDisabled:
   message: Żaden
 labelSyncPassword:
   description: Label for input to hold password.
-  message: 'Hasło: '
+  message: 'Hasło:'
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Automatycznie reautoryzuj po wygaśnięciu
@@ -410,13 +416,13 @@ labelSyncScriptStatus:
   message: Synchronizuj stan skryptu
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'Adres serwera: '
+  message: 'Adres serwera:'
 labelSyncService:
   description: Label for sync service select.
   message: Synchronizuj z
 labelSyncUsername:
   description: Label for input to hold username.
-  message: 'Nazwa użytkownika: '
+  message: 'Nazwa użytkownika:'
 labelTranslator:
   description: Label of translator.
   message: 'Tłumacze: '
@@ -445,7 +451,7 @@ menuFindScripts:
   message: Znajdź skrypty dla tej strony
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: Skrypty tylko w ramkach pomocniczych
+  message: Skrypty tylko w ramkach
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Dopasowane skrypty
@@ -582,7 +588,9 @@ titleScriptUpdated:
   message: Aktualizacja
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * Klawisz <Enter> dodaje tekst do historii auto-uzupełnienia
+    * Obsługiwana jest składnia RegExp: /re/ i /re/flags
 valueLabelKey:
   description: Label for key of a script value.
   message: Klucz (string)
