@@ -220,7 +220,13 @@ function makeGlobalWrapper(local) {
         if (!desc) return;
         if (desc.value === window) desc.value = wrapper;
         // preventing spec violation by duplicating ~10 props like NaN, Infinity, etc.
-        if (!ownDesc && !desc.configurable) defineProperty(local, name, desc);
+        if (!ownDesc && !desc.configurable) {
+          const { get } = desc;
+          if (typeof get === 'function') {
+            desc.get = (...args) => global::get(...args);
+          }
+          defineProperty(local, name, desc);
+        }
         return desc;
       }
     },
