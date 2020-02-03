@@ -42,6 +42,7 @@ export function onRequestCreate(details, scriptId) {
     'error',
     'load',
     'loadend',
+    'loadstart',
     'progress',
     'readystatechange',
     'timeout',
