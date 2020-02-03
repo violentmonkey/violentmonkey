@@ -51,20 +51,13 @@ export function sendTabCmd(tabId, cmd, data, options) {
 }
 
 // ignoreError is always `true` when sending from the background script because it's a broadcast
-export async function sendMessage(payload, { retry, ignoreError } = {}) {
+export function sendMessage(payload, { retry, ignoreError } = {}) {
   if (retry) return sendMessageRetry(payload);
-  try {
-    let promise = browser.runtime.sendMessage(payload);
-    if (ignoreError || window === browser.extension.getBackgroundPage?.()) {
-      promise = promise.catch(noop);
-    }
-    const { data, error } = await promise || {};
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    if (process.env.DEBUG) console.warn(error);
-    throw error;
+  let promise = browser.runtime.sendMessage(payload);
+  if (ignoreError || window === browser.extension.getBackgroundPage?.()) {
+    promise = promise.catch(noop);
   }
+  return promise;
 }
 
 /**
@@ -75,8 +68,12 @@ export async function sendMessage(payload, { retry, ignoreError } = {}) {
 export async function sendMessageRetry(payload, retries = 10) {
   let pauseDuration = 10;
   for (; retries > 0; retries -= 1) {
-    const data = await sendMessage(payload).catch(noop);
-    if (data) return data;
+    try {
+      const data = await sendMessage(payload);
+      if (data) return data;
+    } catch (e) {
+      if (typeof e === 'string') throw e; // not a connection error which is an object
+    }
     await makePause(pauseDuration);
     pauseDuration *= 2;
   }

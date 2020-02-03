@@ -76,26 +76,15 @@ const commandsToSyncIfTruthy = [
   'CheckUpdateAll',
 ];
 
-function handleCommandMessage(req, src) {
+async function handleCommandMessage(req, src) {
   const { cmd } = req;
-  const func = commands[cmd] || noop;
-  let res = func(req.data, src);
-  if (typeof res !== 'undefined') {
-    // If res is not instance of native Promise, browser APIs will not wait for it.
-    res = Promise.resolve(res)
-    .then(data => {
-      if (commandsToSync.includes(cmd)
-      || data && commandsToSyncIfTruthy.includes(cmd)) {
-        sync.sync();
-      }
-      return { data };
-    }, (error) => {
-      if (process.env.DEBUG) console.error(error);
-      return { error: error instanceof Error ? error.stack : error };
-    });
+  const res = await commands[cmd]?.(req.data, src);
+  if (commandsToSync.includes(cmd)
+  || res && commandsToSyncIfTruthy.includes(cmd)) {
+    sync.sync();
   }
-  // `undefined` is ignored so we're sending `null` instead
-  return res || null;
+  // `undefined` is not transferable, but `null` is
+  return res ?? null;
 }
 
 function autoUpdate() {
