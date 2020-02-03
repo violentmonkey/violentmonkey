@@ -15,7 +15,7 @@ buttonEdit:
   message: Modifica
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Svuota il cestino ora!
 buttonEnable:
   description: Button to enable a script.
   message: Abilita
@@ -45,7 +45,7 @@ buttonOK:
   message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: Cestino
 buttonRemove:
   description: Button to remove a script.
   message: Rimuovi
@@ -57,10 +57,10 @@ buttonReplaceAll:
   message: Tutti
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Reset
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: Ripristina
 buttonSave:
   description: Button to save modifications of a script.
   message: Salva
@@ -75,7 +75,7 @@ buttonSaveCustomCSS:
   message: Salva
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: Mostra lo stato dell'editor
 buttonSupport:
   description: Button to open support page.
   message: Supporto
@@ -113,7 +113,12 @@ descCustomCSS:
     sicuro di cosa sia, per favore non modificarlo.
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    Opzioni personalizzate per CodeMirror e addons in stile oggetti JSON
+    <code>{"indentUnit":2, "smartIndent":true}</code> tuttavia nota che alcuni
+    di loro potrebbero non funzionare in Violentmonkey. Vedi <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">lista completa</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: ''

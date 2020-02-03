@@ -15,7 +15,7 @@ buttonEdit:
   message: 編集
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: 今すぐゴミ箱を空にする
+  message: Empty recycle bin now!
 buttonEnable:
   description: Button to enable a script.
   message: 有効化
@@ -441,7 +441,7 @@ menuFindScripts:
   message: 表示しているサイト用のスクリプトを探す
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Sub-frames only scripts
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: このページで実行されるスクリプト

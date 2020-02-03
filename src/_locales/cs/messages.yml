@@ -1,6 +1,6 @@
 buttonCancel:
   description: Cancel button on dialog.
-  message: ''
+  message: Cancel
 buttonClose:
   description: Button to close window.
   message: Zavřít
@@ -24,10 +24,10 @@ buttonExportData:
   message: Zálohovat do souboru ZIP
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Filters
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Homepage
 buttonImportData:
   description: Button to choose a file for data import.
   message: Obnovit ze souboru ZIP
@@ -42,7 +42,7 @@ buttonNew:
   message: Nový
 buttonOK:
   description: OK button on dialog.
-  message: ''
+  message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: ''
@@ -66,19 +66,19 @@ buttonSave:
   message: Uložit
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: ''
+  message: Save
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Uložit a zavřít
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: ''
+  message: Save
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: ''
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Support page
 buttonUndo:
   description: Button to undo removement of a script.
   message: ''
@@ -105,10 +105,12 @@ confirmNotSaved:
     pro setrvání na této stránce.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: ''
+  message: URL matched in this list will not be injected by scripts.
 descCustomCSS:
   description: Description of custom CSS section.
-  message: ''
+  message: >-
+    Custom CSS for options page and script installation page. If you are not
+    sure what this is for, please do not edit it.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: ''
@@ -126,13 +128,13 @@ editLabelMeta:
   message: Vlastní metadata
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: Script settings
 editNavCode:
   description: Label of code tab in script editor.
-  message: ''
+  message: Code
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: ''
+  message: Settings
 editNavValues:
   description: Label of values tab in script editor.
   message: ''
@@ -158,10 +160,10 @@ failureReasonNoninjectable:
   message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: alphabetical order
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: execution order
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: ''
@@ -200,7 +202,7 @@ hintVacuum:
   message: Zbavit se nadbytečného a zkusit znovu načíst chybějící zdroje v mezipaměti.
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: Install from $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Zavřít po instalaci
@@ -239,7 +241,7 @@ labelBadgeUnique:
   message: ''
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: ''
+  message: Blacklist
 labelContributors:
   description: Label for link to contributors.
   message: ''
@@ -248,7 +250,7 @@ labelCurrentLang:
   message: 'Současný jazyk: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: ''
+  message: Custom Style
 labelDataExport:
   description: Section title of data export.
   message: Záloha dat
@@ -272,7 +274,7 @@ labelExclude:
   message: Výjimky
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: '@exclude-match rules'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Zálohovat data skriptu
@@ -281,10 +283,10 @@ labelFeedback:
   message: Zpětná vazba
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: Sort by $1
 labelGeneral:
   description: Label for general settings.
-  message: ''
+  message: General
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: ''
@@ -296,7 +298,7 @@ labelHomepageURL:
   message: 'Domovská stránka (URL):'
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: Import settings
 labelInclude:
   description: Label of @include rules.
   message: Zahrnout
@@ -308,13 +310,13 @@ labelInstall:
   message: Instaluji skript
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: ''
+  message: Keep original
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: ''
 labelLineNumber:
   description: Label for line number jumper.
-  message: ''
+  message: 'Line no.: '
 labelMatch:
   description: Label of @match rules.
   message: Přiřazení
@@ -326,7 +328,7 @@ labelNoName:
   message: Jméno skriptu nebylo určeno.
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: No script is found.
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
@@ -335,7 +337,7 @@ labelNotifyThisUpdated:
   message: ''
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: Notify script updates
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ''
@@ -365,25 +367,25 @@ labelSearch:
   message: 'Hledat: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: Search scripts...
 labelSettings:
   description: Label shown on the top of settings page
   message: Nastavení
 labelSync:
   description: Label for sync options.
-  message: ''
+  message: Sync
 labelSyncAnonymous:
   description: Label for using anonymous account.
   message: ''
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: ''
+  message: Authorize
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: ''
+  message: Authorizing
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: ''
+  message: None
 labelSyncPassword:
   description: Label for input to hold password.
   message: ''
@@ -393,16 +395,16 @@ labelSyncReauthorize:
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: ''
+  message: Revoke
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: ''
+  message: Sync script status
 labelSyncServerUrl:
   description: Label for input to hold server URL.
   message: ''
 labelSyncService:
   description: Label for sync service select.
-  message: ''
+  message: Sync to
 labelSyncUsername:
   description: Label for input to hold username.
   message: ''
@@ -415,10 +417,10 @@ labelUpdateURL:
   message: 'Aktualizace (URL):'
 lastSync:
   description: Label for last sync timestamp.
-  message: ''
+  message: Last sync at $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: Learn more about blacklist patterns.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
   message: ''
@@ -428,7 +430,7 @@ menuCommands:
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: Open Dashboard
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Najdi skripty pro tuto stránku
@@ -437,13 +439,13 @@ menuMatchedFrameScripts:
   message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: ''
+  message: Matched scripts
 menuNewScript:
   description: Menu item to create a new script.
   message: ''
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
-  message: ''
+  message: Scripts disabled
 menuScriptEnabled:
   description: 'Menu item showing the status of Violentmonkey, when enabled.'
   message: Skripty zapnuty
@@ -474,7 +476,7 @@ msgInstalled:
   message: Skript nainstalován.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: ''
+  message: Invalid script!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
@@ -494,7 +496,7 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: ''
+  message: Script namespace conflicts! Please modify @name and @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -505,10 +507,10 @@ msgNoUpdate:
   message: Aktualizace nenalezena.
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: ''
+  message: Blacklist updated.
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: ''
+  message: Custom style is updated.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: ''
@@ -517,22 +519,22 @@ msgSavedScriptTemplate:
   message: ''
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: 'Script [$1] is updated!'
 msgSyncError:
   description: Message shown when sync failed.
-  message: ''
+  message: Sync error!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: ''
+  message: Initializing...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: ''
+  message: Initializing error!
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: ''
+  message: Sync will start soon...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: ''
+  message: Sync in progress...
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Skript aktualizován.
@@ -550,7 +552,7 @@ optionPopupHideDisabled:
   message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Show enabled scripts first
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: ''
@@ -568,7 +570,7 @@ sideMenuSettings:
   message: Nastavení
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: ''
+  message: Update
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''

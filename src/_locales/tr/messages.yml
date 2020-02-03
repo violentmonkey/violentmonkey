@@ -24,7 +24,7 @@ buttonExportData:
   message: Zip olarak dışarı aktar
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Süzgeçler
 buttonHome:
   description: Button to open homepage.
   message: Anasayfa
@@ -160,10 +160,10 @@ failureReasonNoninjectable:
   message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: alfabetik sıra
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: çalıştırma sırası
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: ''
@@ -285,7 +285,7 @@ labelFeedback:
   message: Geribildirim
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: $1 ile sırala
 labelGeneral:
   description: Label for general settings.
   message: Genel
@@ -556,7 +556,7 @@ optionPopupHideDisabled:
   message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Önce etkin betikleri göster
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: ''

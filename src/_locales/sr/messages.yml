@@ -1,6 +1,6 @@
 buttonCancel:
   description: Cancel button on dialog.
-  message: ''
+  message: Откажи
 buttonClose:
   description: Button to close window.
   message: Затвори
@@ -24,10 +24,10 @@ buttonExportData:
   message: Извези као zip
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Филтери
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Почетна страница
 buttonImportData:
   description: Button to choose a file for data import.
   message: Увези из zip датотеке
@@ -42,7 +42,7 @@ buttonNew:
   message: Нова скрипта
 buttonOK:
   description: OK button on dialog.
-  message: ''
+  message: У реду
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: ''
@@ -66,19 +66,19 @@ buttonSave:
   message: Сачувај
 buttonSaveBlacklist:
   description: Button to save global blacklist.
-  message: ''
+  message: Сачувај
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Сачувај и затвори
 buttonSaveCustomCSS:
   description: Label for button to save custom CSS.
-  message: ''
+  message: Сачувај
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: ''
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Страница подршке
 buttonUndo:
   description: Button to undo removement of a script.
   message: ''
@@ -105,10 +105,12 @@ confirmNotSaved:
     Кликните на ОК да бисте их одбацили или на откажи за наставак.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: ''
+  message: Адресе које се подударају у овом списку неће убацити скрипта
 descCustomCSS:
   description: Description of custom CSS section.
-  message: ''
+  message: >-
+    Прилагођени CSS за страницу подешавања и страница за инсталирање скрипти.
+    Ако нисте сигурни чему служи, молимо не уређујте.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: ''
@@ -126,13 +128,13 @@ editLabelMeta:
   message: Прилагођени метаподаци
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: Подешавања скрипти
 editNavCode:
   description: Label of code tab in script editor.
-  message: ''
+  message: Код
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: ''
+  message: Подешавања
 editNavValues:
   description: Label of values tab in script editor.
   message: ''
@@ -158,10 +160,10 @@ failureReasonNoninjectable:
   message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: алфабету
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: реду извршења
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: ''
@@ -200,7 +202,7 @@ hintVacuum:
   message: Одбаци вишак и поново учитај недостајуће податке у кеш.
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: Инсталирај са $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Затвори након инсталације
@@ -241,7 +243,7 @@ labelBadgeUnique:
   message: ''
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: ''
+  message: Црна листа
 labelContributors:
   description: Label for link to contributors.
   message: ''
@@ -250,7 +252,7 @@ labelCurrentLang:
   message: 'Тренутни језик:'
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: ''
+  message: Прилагођени стил
 labelDataExport:
   description: Section title of data export.
   message: Извоз података
@@ -274,7 +276,7 @@ labelExclude:
   message: Правила изузимања
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: '@правила изузимања'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Извези податке скрипти
@@ -283,10 +285,10 @@ labelFeedback:
   message: Повратне информације
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: Сортирај по $1
 labelGeneral:
   description: Label for general settings.
-  message: ''
+  message: Опште
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: ''
@@ -298,7 +300,7 @@ labelHomepageURL:
   message: 'Адреса почетне странице:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: Увези подешавања
 labelInclude:
   description: Label of @include rules.
   message: Правила обухватања
@@ -310,13 +312,13 @@ labelInstall:
   message: Инсталирање скрипте
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: ''
+  message: Задржи оригинал
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: ''
 labelLineNumber:
   description: Label for line number jumper.
-  message: ''
+  message: 'Број линије:'
 labelMatch:
   description: Label of @match rules.
   message: Правила подударања
@@ -328,7 +330,7 @@ labelNoName:
   message: Без имена
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: Нема пронађених скрипти.
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
@@ -337,7 +339,7 @@ labelNotifyThisUpdated:
   message: ''
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: Обавести о ажурирањима скрипти
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ''
@@ -367,7 +369,7 @@ labelSearch:
   message: 'Тражи:'
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: Претрага скрипти...
 labelSettings:
   description: Label shown on the top of settings page
   message: Подешавања
@@ -379,13 +381,13 @@ labelSyncAnonymous:
   message: ''
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: ''
+  message: Одобри
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: ''
+  message: Одобравање
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: ''
+  message: Ниједна
 labelSyncPassword:
   description: Label for input to hold password.
   message: ''
@@ -395,16 +397,16 @@ labelSyncReauthorize:
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: ''
+  message: Опозови
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: ''
+  message: Статус синхронизовања скрипти
 labelSyncServerUrl:
   description: Label for input to hold server URL.
   message: ''
 labelSyncService:
   description: Label for sync service select.
-  message: ''
+  message: Синхронизуј са
 labelSyncUsername:
   description: Label for input to hold username.
   message: ''
@@ -420,7 +422,7 @@ lastSync:
   message: 'Последња синхронизација: $1'
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: Сазнајте више о обрасцима за црну листу
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
   message: ''
@@ -430,7 +432,7 @@ menuCommands:
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: Отвори контролну таблу
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Пронађи скрипте за овај сајт
@@ -439,7 +441,7 @@ menuMatchedFrameScripts:
   message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: ''
+  message: Скрипте које се подударају
 menuNewScript:
   description: Menu item to create a new script.
   message: ''
@@ -476,7 +478,7 @@ msgInstalled:
   message: Скрипта је инсталирана.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: ''
+  message: Неважећа скрипта!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
@@ -507,10 +509,10 @@ msgNoUpdate:
   message: Нема пронађених ажурирања.
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: ''
+  message: Црна листа је ажурирана
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: ''
+  message: Прилагођени стил је ажуриран.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: ''
@@ -519,7 +521,7 @@ msgSavedScriptTemplate:
   message: ''
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: 'Скрипта [$1] је ажурирана.'
 msgSyncError:
   description: Message shown when sync failed.
   message: Грешка при синхронизацији
@@ -528,10 +530,10 @@ msgSyncInit:
   message: Покретање...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: ''
+  message: Грешка при покретању!
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: ''
+  message: Синхронизација ће ускоро почети...
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Синхронизовање...
@@ -552,7 +554,7 @@ optionPopupHideDisabled:
   message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Прикажи прво омогућене скрипте
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: ''
@@ -570,7 +572,7 @@ sideMenuSettings:
   message: Подешавања
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: ''
+  message: Ажурирај
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''

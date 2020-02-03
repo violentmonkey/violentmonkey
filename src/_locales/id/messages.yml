@@ -6,7 +6,7 @@ buttonClose:
   message: Tutup
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: Konfirmasi pemasangan
+  message: Konfirmasi Pemasangan
 buttonDisable:
   description: Button to disable a script.
   message: Nonaktifkan
@@ -15,7 +15,7 @@ buttonEdit:
   message: Sunting
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Kosongkan keranjang sampah sekarang!
 buttonEnable:
   description: Button to enable a script.
   message: Aktifkan
@@ -24,10 +24,10 @@ buttonExportData:
   message: Ekspor ke zip
 buttonFilter:
   description: Button to show filters menu.
-  message: ''
+  message: Filter
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Situs Web
 buttonImportData:
   description: Button to choose a file for data import.
   message: Impor dari zip
@@ -45,7 +45,7 @@ buttonOK:
   message: OKE
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: Keranjang Sampah
 buttonRemove:
   description: Button to remove a script.
   message: Hapus
@@ -57,10 +57,10 @@ buttonReplaceAll:
   message: Semua
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Setel Ulang
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: Pulihkan
 buttonSave:
   description: Button to save modifications of a script.
   message: Simpan
@@ -78,7 +78,7 @@ buttonShowEditorState:
   message: ''
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Halaman Dukungan
 buttonUndo:
   description: Button to undo removement of a script.
   message: ''
@@ -113,19 +113,24 @@ descCustomCSS:
     yakin untuk apa ini, mohon jangan menyuntingnya.
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    Opsi khusus untuk CodeMirror dan pengaya dalam obyek JSON seperti
+    <code>{"indentUnit":2, "smartIndent":true}</code> tetapi harap diingat bahwa
+    beberapa mungkin tidak diterapkan di Violentmonkey. Lihat <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">daftar lengkap</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: 'Dokumentasi tentang blok metadata userscript dan API <code>GM</code>:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Pintasan kibor:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Gunakan penyunting lainnya?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: Kustom meta data
+  message: Metadata khusus
 editLabelSettings:
   description: Settings section in settings tab of script editor.
   message: Pengaturan skrip
@@ -137,63 +142,65 @@ editNavSettings:
   message: Pengaturan
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: Nilai
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: ''
+  message: Batal
 editValueSave:
   description: Button to save modification of a script value.
-  message: ''
+  message: Simpan
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: Menyediakan dukungan skrip pengguna untuk peramban.
+  message: Pengelola userscript bersumber terbuka yang mendukung banyak peramban
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: ''
+  message: Dalam daftar hitam di pengaturan Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: >-
+    Violentmonkey tidak bisa menjalankan userscript di halaman ini (contoh: UI
+    peramban atau ekstensi)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: Urutan abjad
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: Urutan eksekusi
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: terakhir diperbarui
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Semua
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Kode
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Nama
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: nonaktif
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: aktif
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: gunakan pengaturan global
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: ''
+  message: Keranjang Sampah
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Masukkan URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: ''
+  message: Skrip yang dihapus ditampilkan di sini dan akan disimpan selama 7 hari.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Gunakan @downloadURL
@@ -204,7 +211,7 @@ hintVacuum:
     cache.
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Install from $1
+  message: Pasang dari $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Tutup setelah pemasangan
@@ -216,7 +223,7 @@ labelAbout:
   message: Tentang Violentmonkey
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: Lanjutan
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Izinkan pembaruan
@@ -228,25 +235,25 @@ labelAutoReloadCurrentTab:
   message: Muat ulang tab saat ini setelah memilih hidupkan/matikan skrip dari menu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: 'Periksa pembaruan skrip setiap $1 hari, gunakan 0 untuk menonaktifkan'
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'Ditampilkan pada lencana:'
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: nihil
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: jumlah skrip yang berjalan
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: jumlah skrip unik yang berjalan
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Daftar hitam
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Kontributor
 labelCurrentLang:
   description: Label of current language.
   message: 'Bahasa Saat Ini: '
@@ -267,13 +274,13 @@ labelDownloadURL:
   message: 'URL Unduhan:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Menyunting nilai skrip
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Penyunting
 labelExclude:
   description: Label of @exclude rules.
-  message: Pengecualian
+  message: Aturan @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
   message: Aturan @exclude-match
@@ -282,31 +289,31 @@ labelExportScriptData:
   message: Ekspor data skrip
 labelFeedback:
   description: Label of link to feedback page.
-  message: Umpan Balik
+  message: Umpanbalik
 labelFilterSort:
   description: Label for sort filter.
-  message: ''
+  message: Urutkan menurut $1
 labelGeneral:
   description: Label for general settings.
   message: Umum
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Bantu menerjemahkan
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Situs Web
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'URL halaman rumah:'
+  message: 'URL Situs Web:'
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Impor pengaturan
 labelInclude:
   description: Label of @include rules.
-  message: Penyertaan
+  message: Aturan @include
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Mode injeksi baku:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Memasang skrip
@@ -315,22 +322,22 @@ labelKeepOriginal:
   message: Simpan yang asli
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: Terakhir diperbarui pada $1
 labelLineNumber:
   description: Label for line number jumper.
   message: 'No. Baris:'
 labelMatch:
   description: Label of @match rules.
-  message: Kecocokan
+  message: Aturan @match
 labelName:
   description: Label of script name.
   message: 'Nama:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Tanpa nama
+  message: Tanpa Nama
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: No script is found.
+  message: Tidak ada skrip yang ditemukan.
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
@@ -339,19 +346,19 @@ labelNotifyThisUpdated:
   message: ''
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Notify script updates
+  message: Beri tahu pembaruan skrip
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: abaikan notifikasi per skrip (tab "pengaturan" di dalam penyunting)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Urutkan skrip di popup menurut $1
 labelRelated:
   description: Label of related links.
   message: 'Tautan terkait: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: ''
+  message: Dihapus pada $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Ganti dengan: '
@@ -360,16 +367,16 @@ labelRunAt:
   message: 'Run-At:'
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Baku)
+  message: (Bawaan)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Templat Skrip Ubahsuai
 labelSearch:
   description: Label for search input in search box.
   message: 'Pencarian untuk: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Search scripts...
+  message: Cari skrip...
 labelSettings:
   description: Label shown on the top of settings page
   message: Pengaturan
@@ -378,7 +385,7 @@ labelSync:
   message: Sinkron
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: Gunakan akun anonim
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Izinkan
@@ -387,10 +394,10 @@ labelSyncAuthorizing:
   message: Mengizinkan
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: Tanpa
+  message: Nihil
 labelSyncPassword:
   description: Label for input to hold password.
-  message: ''
+  message: 'Sandi:'
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
@@ -403,13 +410,13 @@ labelSyncScriptStatus:
   message: Status sinkron skrip
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'URL Server: '
 labelSyncService:
   description: Label for sync service select.
   message: Sinkron ke
 labelSyncUsername:
   description: Label for input to hold username.
-  message: ''
+  message: 'Nama pengguna: '
 labelTranslator:
   description: Label of translator.
   message: 'Penerjemah: '
@@ -425,7 +432,7 @@ learnBlacklist:
   message: Pelajari lebih lanjut tantang pola daftar hitam.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Pelajari lebih lanjut tentang mode injeksi.
 menuCommands:
   description: Menu item to list script commands.
   message: Perintah script
@@ -438,13 +445,13 @@ menuFindScripts:
   message: Temukan skrip untuk situs ini
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Skrip hanya sub-frame
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Skrip yang cocok
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Buat skrip baru
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Skrip dinonaktifkan
@@ -467,7 +474,7 @@ msgErrorLoadingData:
   message: Kesalahan memuat data skrip.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: Kesalahan memuat dependensi.
+  message: Kesalahan saat memuat dependensi.
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
@@ -503,10 +510,10 @@ msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Ditemukan versi baru
+  message: Tersedia versi baru.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Tidak ada pembaruan ditemukan.
+  message: Pembaruan tidak tersedia.
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Daftar hitam diperbarui.
@@ -515,13 +522,13 @@ msgSavedCustomCSS:
   message: Gaya kustom diperbarui.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: Opsi penyunting telah diperbarui.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: Templat skrip ubahsuai telah diperbarui.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Script [$1] is updated!'
+  message: 'Script [$1] telah diperbarui!'
 msgSyncError:
   description: Message shown when sync failed.
   message: Kesalahan sinkron!
@@ -545,22 +552,22 @@ msgUpdating:
   message: Memperbarui...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: Tidak ada nilai yang disimpan
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Aktif di atas
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: Sembunyikan nonaktif
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Tampilkan skrip aktif terlebih dahulu
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: Sesuai besar kecil huruf
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Gunakan Regex
 sideMenuAbout:
   description: 'Side menu: About'
   message: Tentang
@@ -572,7 +579,7 @@ sideMenuSettings:
   message: Pengaturan
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: Update
+  message: Perbarui
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''
@@ -584,4 +591,4 @@ valueLabelValue:
   message: ''
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Kunjungi Situs Web
