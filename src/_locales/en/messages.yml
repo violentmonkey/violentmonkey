@@ -512,6 +512,13 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: No update found.
+msgNotSaved:
+  description: >-
+    Message shown when there are unsaved script modifications and the user clicks browser Back button,
+    which we cannot prevent due to technical reasons so we can only show this reminder.
+  message: |-
+    Modifications are not saved!
+    You can reopen the editor now and click the "save" button.
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Blacklist updated.

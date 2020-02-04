@@ -61,8 +61,8 @@
 </template>
 
 <script>
-import { i18n, sendCmd } from '#/common';
-import { objectPick } from '#/common/object';
+import { i18n, noop, sendCmd } from '#/common';
+import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import { route } from '#/common/router';
 import { store, showConfirmation, showMessage } from '../../utils';
@@ -70,6 +70,8 @@ import VmSettings from './settings';
 import VmValues from './values';
 import VmHelp from './help';
 
+const EDITOR_RECOVERY = 'editorRecovery';
+const EDITOR_RECOVERY_PERIOD = 60e3; // ms
 const CUSTOM_PROPS = [
   'name',
   'runAt',
@@ -93,6 +95,8 @@ const toList = text => (
   .map(line => line.trim())
   .filter(Boolean)
 );
+let saved;
+let recoveryTimer;
 
 export default {
   props: ['initial'],
@@ -130,14 +134,8 @@ export default {
     },
   },
   watch: {
-    code() {
-      this.canSave = true;
-    },
-    settings: {
-      deep: true,
-      handler() {
-        this.canSave = true;
-      },
+    canSave(val) {
+      this.toggleUnloadSentry(val);
     },
     nav() {
       setTimeout(() => this.nav === 'code' && this.$refs.code.cm.focus());
@@ -148,15 +146,17 @@ export default {
   },
   async mounted() {
     const id = this.script?.props?.id;
-    if (id) {
-      this.code = await sendCmd('GetScriptCode', id);
-    } else {
-      const { script, code } = await sendCmd('NewScript', route.paths[2]);
-      this.script = script;
-      this.code = code;
-    }
+    const [
+      dbData,
+      { [EDITOR_RECOVERY]: rec },
+    ] = await Promise.all([
+      sendCmd(id ? 'GetScriptCode' : 'NewScript', id || route.paths[2]),
+      browser.storage.local.get(EDITOR_RECOVERY),
+    ]);
+    if (!id) this.script = dbData.script;
     const { custom, config } = this.script;
-    this.settings = {
+    const dbCode = id ? dbData : dbData.code;
+    const dbSettings = {
       config: {
         notifyUpdates: `${config.notifyUpdates ?? ''}`,
         shouldUpdate: config.shouldUpdate,
@@ -167,23 +167,31 @@ export default {
         runAt: custom.runAt || '',
       },
     };
-    this.$nextTick(() => {
-      this.canSave = false;
-    });
+    const hasRec = rec?.id === id && rec.settings?.config && typeof rec.code === 'string';
+    const hasRecCode = hasRec && dbCode !== rec.code;
+    const hasRecSettings = hasRec && !deepEqual(dbSettings, rec.settings);
+    this.code = hasRecCode ? rec.code : dbCode;
+    this.settings = hasRecSettings ? rec.settings : dbSettings;
+    this.canSave = hasRecCode || hasRecSettings;
+    saved = { code: dbCode, settings: deepCopy(dbSettings) };
+    if (hasRec && !this.canSave) this.removeRecovery();
+    this.$watch('code', this.onChange);
+    this.$watch('settings', this.onChange, { deep: true });
   },
   methods: {
     async save() {
-      const { config, custom } = this.settings;
+      const { code, settings } = this;
+      const { config, custom } = settings;
       const { notifyUpdates } = config;
       try {
         const id = this.script?.props?.id;
         const res = await sendCmd('ParseScript', {
           id,
+          code,
           config: {
             ...config,
             notifyUpdates: notifyUpdates ? +notifyUpdates : null,
           },
-          code: this.code,
           custom: {
             ...objectPick(custom, CUSTOM_PROPS),
             ...objectPick(custom, CUSTOM_LISTS, toList),
@@ -194,7 +202,9 @@ export default {
           isNew: !id,
           message: '',
         });
+        saved = deepCopy({ code, settings });
         this.canSave = false;
+        this.removeRecovery();
         if (res?.where?.id) this.script = res.update;
       } catch (err) {
         showMessage({ text: err });
@@ -210,12 +220,51 @@ export default {
         this.$emit('close');
       } catch (e) { /* NOP */ }
     },
+    removeRecovery() {
+      browser.storage.local.remove(EDITOR_RECOVERY);
+    },
     saveClose() {
       this.save().then(this.close);
+    },
+    saveRecovery() {
+      if (this.canSave) {
+        browser.storage.local.set({
+          [EDITOR_RECOVERY]: {
+            id: this.script.props.id,
+            // need to clone reactive objects
+            ...objectPick(this, ['code', 'settings'], deepCopy),
+          },
+        });
+      }
+    },
+    toggleUnloadSentry(state) {
+      const onOff = `${state ? 'add' : 'remove'}EventListener`;
+      window[onOff]('beforeunload', this.onUnload);
+      window[onOff]('popstate', this.onUnload);
+      clearInterval(recoveryTimer);
+      if (state) recoveryTimer = setInterval(this.saveRecovery, EDITOR_RECOVERY_PERIOD);
+    },
+    onChange() {
+      this.canSave = this.code !== saved.code
+        || !deepEqual(this.settings, saved.settings);
+    },
+    /** @param {Event} e */
+    onUnload(e) {
+      // modern browser show their own message text
+      e.returnValue = i18n('confirmNotSaved');
+      // saving regardless of whether the user reloads the page, just in case
+      if (this.canSave) {
+        this.saveRecovery();
+      }
+      // popstate cannot be prevented
+      if (e.type === 'popstate') {
+        showConfirmation(i18n('msgNotSaved'), { cancel: false }).catch(noop);
+      }
     },
   },
   beforeDestroy() {
     store.title = null;
+    this.toggleUnloadSentry(false);
   },
 };
 </script>

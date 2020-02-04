@@ -42,9 +42,17 @@ export function showConfirmation(text, { ok, cancel, input = false } = {}) {
       input,
       text,
       buttons: [
-        { text: i18n('buttonOK'), onClick: resolve, ...ok },
-        { text: i18n('buttonCancel'), onClick: reject, ...cancel },
-      ],
+        ok !== false && {
+          text: i18n('buttonOK'),
+          onClick: resolve,
+          ...ok,
+        },
+        cancel !== false && {
+          text: i18n('buttonCancel'),
+          onClick: reject,
+          ...cancel,
+        },
+      ].filter(Boolean),
       onBackdropClick: reject,
     });
   });
