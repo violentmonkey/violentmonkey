@@ -13,6 +13,7 @@ export function showMessage(message) {
     on: {
       dismiss() {
         modal.close();
+        message.onDismiss?.();
       },
     },
   }), {
@@ -49,6 +50,7 @@ export function showConfirmation(text, { ok, cancel, input = false } = {}) {
         { text: i18n('buttonCancel'), onClick: reject, ...cancel },
       ],
       onBackdropClick: reject,
+      onDismiss: reject, // Esc key
     });
   });
 }
