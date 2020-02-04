@@ -62,7 +62,7 @@
 
 <script>
 import { i18n, sendCmd } from '#/common';
-import { objectPick } from '#/common/object';
+import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import { route } from '#/common/router';
 import { store, showConfirmation, showMessage } from '../../utils';
@@ -70,17 +70,17 @@ import VmSettings from './settings';
 import VmValues from './values';
 import VmHelp from './help';
 
-const CUSTOM_PROPS = [
-  'name',
-  'runAt',
-  'homepageURL',
-  'updateURL',
-  'downloadURL',
-  'origInclude',
-  'origExclude',
-  'origMatch',
-  'origExcludeMatch',
-];
+const CUSTOM_PROPS = {
+  name: '',
+  runAt: '',
+  homepageURL: '',
+  updateURL: '',
+  downloadURL: '',
+  origInclude: true,
+  origExclude: true,
+  origMatch: true,
+  origExcludeMatch: true,
+};
 const CUSTOM_LISTS = [
   'include',
   'match',
@@ -93,6 +93,8 @@ const toList = text => (
   .map(line => line.trim())
   .filter(Boolean)
 );
+let saved;
+let showingConfirmation;
 
 export default {
   props: ['initial'],
@@ -130,8 +132,8 @@ export default {
     },
   },
   watch: {
-    code() {
-      this.canSave = true;
+    canSave(val) {
+      this.toggleUnloadSentry(val);
     },
     // usually errors for resources
     'initial.error'(error) {
@@ -139,14 +141,8 @@ export default {
         showMessage({ text: `${this.initial.message}\n\n${error}` });
       }
     },
-    settings: {
-      deep: true,
-      handler() {
-        this.canSave = true;
-      },
-    },
     nav() {
-      setTimeout(() => this.nav === 'code' && this.$refs.code.cm.focus());
+      setTimeout(() => this.nav === 'code' && this.setFocusToCode());
     },
   },
   created() {
@@ -165,31 +161,35 @@ export default {
     this.settings = {
       config: {
         notifyUpdates: `${config.notifyUpdates ?? ''}`,
-        shouldUpdate: config.shouldUpdate,
+        // Needs to match Vue model type so deepEqual can work properly
+        shouldUpdate: Boolean(config.shouldUpdate),
       },
       custom: {
-        ...objectPick(custom, CUSTOM_PROPS),
+        // Adding placeholders for any missing values so deepEqual can work properly
+        ...CUSTOM_PROPS,
+        ...objectPick(custom, Object.keys(CUSTOM_PROPS)),
         ...objectPick(custom, CUSTOM_LISTS, fromList),
         runAt: custom.runAt || '',
       },
     };
-    this.$nextTick(() => {
-      this.canSave = false;
-    });
+    saved = objectPick(this, ['code', 'settings'], deepCopy);
+    this.$watch('code', this.onChange);
+    this.$watch('settings', this.onChange, { deep: true });
   },
   methods: {
     async save() {
-      const { config, custom } = this.settings;
+      const { code, settings } = this;
+      const { config, custom } = settings;
       const { notifyUpdates } = config;
       try {
         const id = this.script?.props?.id;
         const res = await sendCmd('ParseScript', {
           id,
+          code,
           config: {
             ...config,
             notifyUpdates: notifyUpdates ? +notifyUpdates : null,
           },
-          code: this.code,
           custom: {
             ...objectPick(custom, CUSTOM_PROPS),
             ...objectPick(custom, CUSTOM_LISTS, toList),
@@ -200,6 +200,7 @@ export default {
           isNew: !id,
           message: '',
         });
+        saved = deepCopy({ code, settings });
         this.canSave = false;
         if (res?.where?.id) this.script = res.update;
       } catch (err) {
@@ -212,16 +213,47 @@ export default {
         return;
       }
       try {
-        if (this.canSave) await showConfirmation(i18n('confirmNotSaved'));
+        if (this.canSave) {
+          showingConfirmation = true;
+          await showConfirmation(i18n('confirmNotSaved'));
+          store.route.pinned = false;
+        }
         this.$emit('close');
-      } catch (e) { /* NOP */ }
+      } catch (e) {
+        this.setFocusToCode();
+      } finally {
+        showingConfirmation = false;
+      }
     },
     saveClose() {
       this.save().then(this.close);
     },
+    setFocusToCode() {
+      this.$refs.code.cm.focus();
+    },
+    toggleUnloadSentry(state) {
+      const onOff = `${state ? 'add' : 'remove'}EventListener`;
+      global[onOff]('beforeunload', this.onUnload);
+      global[onOff]('popstate', this.onUnload);
+      store.route.pinned = state;
+    },
+    onChange() {
+      this.canSave = this.code !== saved.code
+        || !deepEqual(this.settings, saved.settings);
+    },
+    /** @param {Event} e */
+    onUnload(e) {
+      // modern browser show their own message text
+      e.returnValue = i18n('confirmNotSaved');
+      // popstate cannot be prevented so we pin current `route` and display a confirmation
+      if (e.type === 'popstate' && !showingConfirmation) {
+        this.close();
+      }
+    },
   },
   beforeDestroy() {
     store.title = null;
+    this.toggleUnloadSentry(false);
   },
 };
 </script>

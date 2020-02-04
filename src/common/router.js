@@ -1,5 +1,5 @@
-function parse(pathInfo) {
-  const [pathname, search = ''] = pathInfo.split('?');
+function parse(hash) {
+  const [pathname, search = ''] = hash.split('?');
   const query = search.split('&').reduce((res, seq) => {
     if (seq) {
       const [key, val] = seq.split('=');
@@ -8,7 +8,9 @@ function parse(pathInfo) {
     return res;
   }, {});
   const paths = pathname.split('/');
-  return { pathname, query, paths };
+  return {
+    hash, pathname, paths, query,
+  };
 }
 
 const stack = [];
@@ -18,7 +20,13 @@ export const lastRoute = () => stack[stack.length - 1] || {};
 updateRoute();
 
 function updateRoute() {
-  Object.assign(route, parse(window.location.hash.slice(1)));
+  const hash = window.location.hash.slice(1);
+  if (!route.pinned) {
+    Object.assign(route, parse(hash));
+  } else if (route.hash !== hash) {
+    // restore the pinned route
+    setRoute(route.hash);
+  }
 }
 
 // popstate should be the first to ensure hashchange listeners see the correct lastRoute

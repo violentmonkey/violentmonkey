@@ -89,3 +89,28 @@ export function forEachKey(func) {
 export function forEachValue(func) {
   if (this) objectValues(this)::forEach(func);
 }
+
+// Needed for Firefox's browser.storage API which fails on Vue observables
+export function deepCopy(src) {
+  return src && (
+    Array.isArray(src) && src.map(deepCopy)
+    || typeof src === 'object' && src::mapEntry(([, val]) => deepCopy(val))
+  ) || src;
+}
+
+// Simplified deep equality checker
+export function deepEqual(a, b) {
+  let res;
+  if (!a || !b || typeof a !== typeof b || typeof a !== 'object') {
+    res = a === b;
+  } else if (Array.isArray(a)) {
+    res = a.length === b.length
+      && a.every((item, i) => deepEqual(item, b[i]));
+  } else {
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+    res = keysA.length === keysB.length
+      && keysA.every(key => keysB.includes(key) && deepEqual(a[key], b[key]));
+  }
+  return res;
+}
