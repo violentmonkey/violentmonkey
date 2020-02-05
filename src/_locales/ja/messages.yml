@@ -174,22 +174,22 @@ filterLastUpdateOrder:
   message: 最終更新日順
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: すべて
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: コード
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: 名前
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: オフ
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: オン
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: グローバル設定を使用
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: ゴミ箱
@@ -249,7 +249,7 @@ labelBlacklist:
   message: ブラックリスト
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: 貢献者
 labelCurrentLang:
   description: Label of current language.
   message: '現在の言語: '
@@ -345,7 +345,7 @@ labelNotifyUpdates:
   message: スクリプトの更新を通知する
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: スクリプトごとの通知を無視する (エディタの "設定" タブ内)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: ポップアップ内のスクリプトを $1 で並べ替え
@@ -578,7 +578,9 @@ titleScriptUpdated:
   message: 更新
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * <Enter> キーでオートコンプリートの履歴にテキストを追加します。
+    * サポートしている正規表現の構文: /パターン/ 及び /パターン/フラグ
 valueLabelKey:
   description: Label for key of a script value.
   message: キー (文字列)
