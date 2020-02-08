@@ -17,6 +17,7 @@ let gmApi;
 let gm4Api;
 let componentUtils;
 let windowClose;
+const { toStringTag } = Symbol;
 const vmOwnFuncToString = () => '[Violentmonkey property]';
 const vmOwnFunc = (func, toString) => {
   func.toString = toString || vmOwnFuncToString;
@@ -190,6 +191,12 @@ function makeGlobalWrapper(local) {
      - some properties (like `isFinite`) are defined in `global` but not `window`
      - all `window` properties can be accessed from `global`
   */
+  if (bridge.isFirefox) {
+    // Firefox returns [object Object] so jQuery libs see our `window` proxy as a plain
+    // object and try to clone its recursive properties like `self` and `window`.
+    // Note that Chrome returns [object Window] so it's probably a bug in Firefox.
+    defineProperty(local, toStringTag, { get: () => 'Window' });
+  }
   const wrapper = new Proxy(local, {
     defineProperty(_, name, info) {
       if (typeof name !== 'symbol'
