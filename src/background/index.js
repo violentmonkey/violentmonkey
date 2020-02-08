@@ -127,4 +127,25 @@ initialize(() => {
   sync.initialize();
   checkRemove();
   setInterval(checkRemove, TIMEOUT_24HOURS);
+  if (ua.isChrome) {
+    // Using declarativeContent to run content scripts earlier than document_start
+    const api = global.chrome.declarativeContent;
+    api.onPageChanged.getRules(['inject'], rules => {
+      if (rules.length) return;
+      api.onPageChanged.addRules([{
+        id: 'inject',
+        conditions: [
+          new api.PageStateMatcher({
+            pageUrl: { urlContains: '://' }, // essentially like <all_urls>
+          }),
+        ],
+        actions: [
+          new api.RequestContentScript({
+            js: browser.runtime.getManifest().content_scripts[0].js,
+            // Not using `allFrames:true` as there's no improvement in frames
+          }),
+        ],
+      }]);
+    });
+  }
 });

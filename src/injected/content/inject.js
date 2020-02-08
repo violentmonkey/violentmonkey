@@ -8,7 +8,7 @@ import {
 import { sendCmd } from '#/common';
 
 import {
-  forEach, join, append, createElementNS, defineProperty, NS_HTML,
+  forEach, join, append, createElementNS, defineProperty, describeProperty, NS_HTML, DocProto,
   charCodeAt, fromCharCode, replace, remove,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -19,7 +19,11 @@ const VMInitInjection = window[Symbol.for(process.env.INIT_FUNC_NAME)];
 // (the symbol is undeletable so a userscript can't fool us on reinjection)
 defineProperty(window, Symbol.for(process.env.INIT_FUNC_NAME), { value: 1 });
 
-const { encodeURIComponent } = global;
+const { encodeURIComponent, document } = global;
+// Userscripts in content mode may redefine head and documentElement
+const { get: getHead } = describeProperty(DocProto, 'head');
+const { get: getDocElem } = describeProperty(DocProto, 'documentElement');
+const { appendChild } = DocProto; // same as Node.appendChild
 
 bridge.addHandlers({
   Inject: injectScript,
@@ -32,6 +36,8 @@ export function injectPageSandbox(contentId, webId) {
 }
 
 export function injectScripts(contentId, webId, data, isXml) {
+  // eslint-disable-next-line prefer-rest-params
+  if (!document::getDocElem()) return waitForDocElem(() => injectScripts(...arguments));
   const injectPage = [];
   const injectContent = [];
   const scriptLists = {
@@ -84,6 +90,16 @@ function checkInjectable() {
   return res;
 }
 
+function waitForDocElem(cb) {
+  const observer = new MutationObserver(() => {
+    if (document::getDocElem()) {
+      observer.disconnect();
+      cb();
+    }
+  });
+  observer.observe(document, { childList: true });
+}
+
 // fullwidth range starts at 0xFF00
 // normal range starts at space char code 0x20
 const replaceWithFullWidthForm = s => fromCharCode(s::charCodeAt(0) - 0x20 + 0xFF00);
@@ -109,6 +125,9 @@ function inject(code, sourceUrl) {
     ...typeof code === 'string' ? [code] : code,
     ...sourceUrl ? ['\n//# sourceURL=', sourceUrl] : [],
   );
-  document.documentElement::append(script);
+  const root = document::getHead() || document::getDocElem();
+  // When using declarativeContent there's no documentElement so we'll append to `document`
+  if (root) root::appendChild(script);
+  else document::appendChild(script);
   script::remove();
 }

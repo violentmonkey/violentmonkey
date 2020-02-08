@@ -25,7 +25,8 @@ const { toString: numberToString } = Number.prototype;
 export const { fromCharCode } = String;
 export const { addEventListener, removeEventListener } = EventTarget.prototype;
 export const { append, remove, setAttribute } = Element.prototype;
-export const { createElementNS } = Document.prototype;
+export const DocProto = Document.prototype;
+export const { createElementNS } = DocProto;
 export const logging = assign({}, console);
 
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
