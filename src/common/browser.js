@@ -62,6 +62,7 @@ if (!global.browser?.runtime?.sendMessage) {
     notifications: {
       onClicked: true,
       onClosed: true,
+      clear: wrapAsync,
       create: wrapAsync,
     },
     runtime: {

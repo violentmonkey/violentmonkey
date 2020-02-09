@@ -10,12 +10,18 @@ import {
   decodeValue, dumpValue, loadValues, changeHooks,
 } from './gm-values';
 import {
-  findIndex, indexOf, slice, objectKeys, objectValues, objectEntries,
+  findIndex, indexOf, slice, defineProperty, objectKeys, objectValues, objectEntries,
   atob, Error, jsonDump, logging, utf8decode,
 } from '../utils/helpers';
 
 const { getElementById } = Document.prototype;
 const { lastIndexOf } = String.prototype;
+
+const vmOwnFuncToString = () => '[Violentmonkey property]';
+export const vmOwnFunc = (func, toString) => {
+  defineProperty(func, 'toString', { value: toString || vmOwnFuncToString });
+  return func;
+};
 
 export function makeGmApi() {
   return [{
@@ -178,7 +184,13 @@ export function makeGmApi() {
       if (!options.text) {
         throw new Error('GM_notification: `text` is required!');
       }
-      onNotificationCreate(options);
+      const id = onNotificationCreate(options);
+      return {
+        remove: vmOwnFunc(() => new Promise(resolve => {
+          const callbackId = registerCallback(resolve);
+          bridge.post('RemoveNotification', { id, callbackId });
+        })),
+      };
     },
     GM_setClipboard(data, type) {
       bridge.post('SetClipboard', { data, type });

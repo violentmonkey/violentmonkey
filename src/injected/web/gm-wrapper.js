@@ -6,7 +6,7 @@ import {
   defineProperty, describeProperty, objectKeys, replace,
   addEventListener, removeEventListener,
 } from '../utils/helpers';
-import { makeGmApi } from './gm-api';
+import { makeGmApi, vmOwnFunc } from './gm-api';
 
 const { Proxy } = global;
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
@@ -18,11 +18,6 @@ let gm4Api;
 let componentUtils;
 let windowClose;
 const { toStringTag } = Symbol;
-const vmOwnFuncToString = () => '[Violentmonkey property]';
-const vmOwnFunc = (func, toString) => {
-  func.toString = toString || vmOwnFuncToString;
-  return func;
-};
 const vmSandboxedFuncToString = nativeFunc => () => (
   `${nativeFunc}`::replace('native code', 'Violentmonkey sandbox')
 );

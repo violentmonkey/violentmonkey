@@ -25,4 +25,5 @@ export function onNotificationCreate(options) {
     title: options.title,
     image: options.image,
   });
+  return lastId;
 }
