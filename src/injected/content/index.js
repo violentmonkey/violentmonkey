@@ -6,7 +6,7 @@ import {
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
-import { injectPageSandbox, injectScripts } from './inject';
+import { appendToRoot, injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
@@ -81,9 +81,7 @@ bridge.addHandlers({
     const style = document::createElementNS(NS_HTML, 'style');
     style::setAttribute('id', styleId);
     style::append(css);
-    // DOM spec allows any elements under documentElement
-    // https://dom.spec.whatwg.org/#node-trees
-    (document.head || document.documentElement)::append(style);
+    appendToRoot(style);
     return styleId;
   },
   CheckScript: sendCmd,

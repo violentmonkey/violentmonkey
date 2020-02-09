@@ -125,9 +125,14 @@ function inject(code, sourceUrl) {
     ...typeof code === 'string' ? [code] : code,
     ...sourceUrl ? ['\n//# sourceURL=', sourceUrl] : [],
   );
-  const root = document::getHead() || document::getDocElem();
   // When using declarativeContent there's no documentElement so we'll append to `document`
-  if (root) root::appendChild(script);
-  else document::appendChild(script);
+  if (!appendToRoot(script)) document::appendChild(script);
   script::remove();
+}
+
+export function appendToRoot(node) {
+  // DOM spec allows any elements under documentElement
+  // https://dom.spec.whatwg.org/#node-trees
+  const root = document::getHead() || document::getDocElem();
+  return root && root::appendChild(node);
 }
