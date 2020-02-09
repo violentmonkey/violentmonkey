@@ -151,11 +151,8 @@ export function makeGmApi() {
       return onRequestCreate(opts, this.id);
     },
     GM_addStyle(css) {
-      let el = false;
-      const callbackId = registerCallback((styleId) => {
-        el = document::getElementById(styleId);
-      });
-      bridge.post('AddStyle', { css, callbackId });
+      const id = bridge.sendSync('AddStyle', css);
+      const el = document::getElementById(id);
       // Mock a Promise without the need for polyfill
       // It's not actually necessary because DOM messaging is synchronous
       // but we keep it for compatibility with VM's 2017-2019 behavior
@@ -186,10 +183,7 @@ export function makeGmApi() {
       }
       const id = onNotificationCreate(options);
       return {
-        remove: vmOwnFunc(() => new Promise(resolve => {
-          const callbackId = registerCallback(resolve);
-          bridge.post('RemoveNotification', { id, callbackId });
-        })),
+        remove: vmOwnFunc(() => bridge.send('RemoveNotification', id)),
       };
     },
     GM_setClipboard(data, type) {
@@ -210,13 +204,4 @@ export function makeGmApi() {
     setClipboard: true,
     addStyle: true, // gm4-polyfill.js sets it anyway
   }];
-}
-
-function registerCallback(callback) {
-  const callbackId = getUniqId('VMcb');
-  store.callbacks[callbackId] = (payload) => {
-    callback(payload);
-    delete store.callbacks[callbackId];
-  };
-  return callbackId;
 }

@@ -117,29 +117,11 @@ bridge.addHandlers({
 
 function exposeVM() {
   const Violentmonkey = {};
-  const checking = {};
-  let key = 0;
-  bridge.addHandlers({
-    ScriptChecked({ callback, result }) {
-      const cb = checking[callback];
-      if (cb) {
-        cb(result);
-        delete checking[callback];
-      }
-    },
-  });
   defineProperty(Violentmonkey, 'getVersion', {
-    value: () => Promise.resolve({
-      version: bridge.version,
-    }),
+    value: async () => ({ version: bridge.version }),
   });
   defineProperty(Violentmonkey, 'isInstalled', {
-    value: (name, namespace) => new Promise((resolve) => {
-      key += 1;
-      const callback = key;
-      checking[callback] = resolve;
-      bridge.post('CheckScript', { name, namespace, callback });
-    }),
+    value: (name, namespace) => bridge.send('CheckScript', { name, namespace }),
   });
   defineProperty(window.external, 'Violentmonkey', {
     value: Violentmonkey,

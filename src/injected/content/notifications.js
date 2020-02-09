@@ -9,12 +9,11 @@ bridge.addHandlers({
     const nid = await sendCmd('Notification', options);
     notifications[nid] = { id: options.id, realm };
   },
-  async RemoveNotification({ id, callbackId }, realm) {
+  RemoveNotification(id) {
     const nid = objectEntries(notifications)::filter(([, val]) => val.id === id)[0]?.[0];
     if (nid) {
       delete notifications[nid];
-      const wasRemoved = await sendCmd('RemoveNotification', nid);
-      bridge.post('Callback', { callbackId, payload: wasRemoved }, realm);
+      return sendCmd('RemoveNotification', nid);
     }
   },
 });

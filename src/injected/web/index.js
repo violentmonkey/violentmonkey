@@ -46,6 +46,6 @@ bridge.addHandlers({
     store.commands[data]?.();
   },
   Callback({ callbackId, payload }) {
-    store.callbacks[callbackId]?.(payload);
+    bridge.callbacks[callbackId]?.(payload);
   },
 });

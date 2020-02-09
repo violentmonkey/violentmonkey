@@ -1,6 +1,6 @@
 import { getUniqId, isEmpty } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
-import { bindEvents, sendCmd, sendMessage } from '../utils';
+import { bindEvents, sendCmd } from '../utils';
 import {
   objectKeys, forEach, includes, append, createElementNS, setAttribute, NS_HTML,
 } from '../utils/helpers';
@@ -60,7 +60,7 @@ bridge.addBackgroundHandlers({
 });
 
 bridge.addHandlers({
-  UpdateValue: sendMessage,
+  UpdateValue: sendCmd,
   RegisterMenu(data) {
     if (IS_TOP) {
       const [id, cap] = data;
@@ -76,7 +76,7 @@ bridge.addHandlers({
       sendSetPopup();
     }
   },
-  AddStyle({ css, callbackId }, realm) {
+  AddStyle(css) {
     const styleId = getUniqId('VMst');
     const style = document::createElementNS(NS_HTML, 'style');
     style::setAttribute('id', styleId);
@@ -84,12 +84,9 @@ bridge.addHandlers({
     // DOM spec allows any elements under documentElement
     // https://dom.spec.whatwg.org/#node-trees
     (document.head || document.documentElement)::append(style);
-    bridge.post('Callback', { callbackId, payload: styleId }, realm);
+    return styleId;
   },
-  async CheckScript({ name, namespace, callback }, realm) {
-    const result = await sendCmd('CheckScript', { name, namespace });
-    bridge.post('ScriptChecked', { callback, result }, realm);
-  },
+  CheckScript: sendCmd,
 });
 
 function sendSetPopup() {
