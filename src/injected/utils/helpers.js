@@ -1,4 +1,6 @@
-// cache native properties to avoid being overridden, see violentmonkey/violentmonkey#151
+// caching native properties to avoid being overridden, see violentmonkey/violentmonkey#151
+import { numberToString } from '#/common';
+
 // Firefox sucks: `isFinite` is not defined on `window`, see violentmonkey/violentmonkey#300
 // eslint-disable-next-line no-restricted-properties
 export const {
@@ -21,7 +23,6 @@ export const {
   charCodeAt, match, slice, replace,
 } = String.prototype;
 export const { toString: objectToString } = Object.prototype;
-const { toString: numberToString } = Number.prototype;
 export const { fromCharCode } = String;
 export const { addEventListener, removeEventListener } = EventTarget.prototype;
 export const { append, remove, setAttribute } = Element.prototype;
