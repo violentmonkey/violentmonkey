@@ -1,5 +1,6 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import { bindEvents } from '../utils';
+import { defineProperty } from '../utils/helpers';
 import bridge from './bridge';
 import store from './store';
 import './gm-values';
@@ -31,6 +32,9 @@ export default function initialize(
         bridge.post('Pong');
       },
     });
+    if (window.location.host === 'greasyfork.org') {
+      exposeVM();
+    }
   }
   document.addEventListener('DOMContentLoaded', async () => {
     store.state = 1;
@@ -49,3 +53,16 @@ bridge.addHandlers({
     bridge.callbacks[callbackId]?.(payload);
   },
 });
+
+function exposeVM() {
+  const Violentmonkey = {};
+  defineProperty(Violentmonkey, 'version', {
+    value: process.env.VM_VER,
+  });
+  defineProperty(Violentmonkey, 'isInstalled', {
+    value: (name, namespace) => bridge.send('CheckScript', { name, namespace }),
+  });
+  defineProperty(window.external, 'Violentmonkey', {
+    value: Violentmonkey,
+  });
+}

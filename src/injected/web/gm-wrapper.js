@@ -75,7 +75,7 @@ function makeGmInfo({ config, meta, props }, code, resources, injectInto) {
     scriptMetaStr: code::match(METABLOCK_RE)[1] || '',
     scriptWillUpdate: !!config.shouldUpdate,
     scriptHandler: 'Violentmonkey',
-    version: bridge.version,
+    version: process.env.VM_VER,
     injectInto,
     platform: { ...bridge.ua },
     script: {

@@ -88,7 +88,7 @@ Object.assign(commands, {
 
 preInitialize.push(async () => {
   const { version: lastVersion } = await browser.storage.local.get('version');
-  const { version } = browser.runtime.getManifest();
+  const version = process.env.VM_VER;
   if (!lastVersion) await patchDB();
   if (version !== lastVersion) browser.storage.local.set({ version });
   const data = await browser.storage.local.get();

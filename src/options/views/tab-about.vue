@@ -26,7 +26,7 @@
 
 <script>
 const data = {
-  version: browser.runtime.getManifest().version,
+  version: process.env.VM_VER,
   language: browser.i18n.getUILanguage(),
 };
 

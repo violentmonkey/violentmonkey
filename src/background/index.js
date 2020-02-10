@@ -19,7 +19,6 @@ import './utils/tabs';
 import './utils/tester';
 import './utils/update';
 
-const VM_VER = browser.runtime.getManifest().version;
 const popupTabs = {}; // { tabId: 1 }
 let isApplied;
 let injectInto;
@@ -40,7 +39,6 @@ Object.assign(commands, {
   async GetData() {
     const data = await getData();
     data.sync = sync.getStates();
-    data.version = VM_VER;
     return data;
   },
   /** @return {Promise<Object>} */
@@ -54,7 +52,6 @@ Object.assign(commands, {
       ua,
       isFirefox: ua.isFirefox,
       isPopupShown: popupTabs[tab.id],
-      version: VM_VER,
     };
     if (isApplied) {
       const key = getPreinjectKey(url, isTop);

@@ -20,12 +20,6 @@ bridge.addHandlers({
     const end = [];
     bridge.isFirefox = data.isFirefox;
     bridge.ua = data.ua;
-    bridge.version = data.version;
-    if ([
-      'greasyfork.org',
-    ].includes(window.location.host)) {
-      exposeVM();
-    }
     // reset load and checkLoad
     bridge.load = () => {
       bridge.load = noop;
@@ -114,16 +108,3 @@ bridge.addHandlers({
     }
   },
 });
-
-function exposeVM() {
-  const Violentmonkey = {};
-  defineProperty(Violentmonkey, 'getVersion', {
-    value: async () => ({ version: bridge.version }),
-  });
-  defineProperty(Violentmonkey, 'isInstalled', {
-    value: (name, namespace) => bridge.send('CheckScript', { name, namespace }),
-  });
-  defineProperty(window.external, 'Violentmonkey', {
-    value: Violentmonkey,
-  });
-}
