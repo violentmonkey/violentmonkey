@@ -89,6 +89,8 @@ function checkInjectable() {
 const replaceWithFullWidthForm = s => fromCharCode(s::charCodeAt(0) - 0x20 + 0xFF00);
 
 function injectScript([codeSlices, mode, scriptId, scriptName]) {
+  // Firefox lists .user.js among our own content scripts so a space at start will group them
+  if (bridge.isFirefox) scriptName = ` ${scriptName}`;
   // using fullwidth forms for special chars and those added by the newer RFC3986 spec for URI
   const name = encodeURIComponent(scriptName::replace(/[#&',/:;?@=]/g, replaceWithFullWidthForm));
   const sourceUrl = browser.extension.getURL(`${name}.user.js#${scriptId}`);
