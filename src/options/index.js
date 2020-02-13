@@ -4,6 +4,7 @@ import {
 } from '#/common';
 import { forEachEntry, forEachValue } from '#/common/object';
 import handlers from '#/common/handlers';
+import options from '#/common/options';
 import loadZip from '#/common/zip';
 import '#/common/ui/style';
 import { store } from './utils';
@@ -50,29 +51,28 @@ function initScript(script) {
   script.$cache = { search, name, lowerName };
 }
 
-function loadData() {
-  sendCmd('GetData', null, { retry: true })
-  .then((data) => {
-    const oldCache = store.cache || {};
-    store.cache = data.cache;
-    store.sync = data.sync;
-    store.scripts = data.scripts;
-    if (store.scripts) {
-      store.scripts.forEach(initScript);
-    }
-    if (store.cache) {
-      store.cache::forEachEntry(([url, raw]) => {
-        if (oldCache[url]) {
-          store.cache[url] = oldCache[url];
-          delete oldCache[url];
-        } else {
-          store.cache[url] = cache2blobUrl(raw, { defaultType: 'image/png' });
-        }
-      });
-    }
-    oldCache::forEachValue(URL.revokeObjectURL);
-    store.loading = false;
-  });
+async function loadData() {
+  const data = await sendCmd('GetData', null, { retry: true });
+  if (!options.ready.indeed) await options.ready;
+  const oldCache = store.cache || {};
+  store.cache = data.cache;
+  store.sync = data.sync;
+  store.scripts = data.scripts;
+  if (store.scripts) {
+    store.scripts.forEach(initScript);
+  }
+  if (store.cache) {
+    store.cache::forEachEntry(([url, raw]) => {
+      if (oldCache[url]) {
+        store.cache[url] = oldCache[url];
+        delete oldCache[url];
+      } else {
+        store.cache[url] = cache2blobUrl(raw, { defaultType: 'image/png' });
+      }
+    });
+  }
+  oldCache::forEachValue(URL.revokeObjectURL);
+  store.loading = false;
 }
 
 function initMain() {
