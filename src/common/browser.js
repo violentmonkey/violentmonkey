@@ -142,6 +142,6 @@ if (!global.browser?.runtime?.sendMessage) {
 /* global browser */
 if (browser.tabs) {
   global.allOptions = browser.runtime.sendMessage({ cmd: 'GetAllOptions' })
-  .then(({ data }) => data)
+  .then(res => (global.chrome.app ? res.data : res)) // in Chrome we wrap `data` and `error`
   .catch(() => {});
 }
