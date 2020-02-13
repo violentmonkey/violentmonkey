@@ -28,7 +28,7 @@ if (!global.browser?.runtime?.sendMessage) {
           else resolve(res);
         });
       });
-      if (process.env.DEBUG) promise.catch(err => console.warn(args, err));
+      if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.message || err));
       return promise;
     };
   };
@@ -80,11 +80,7 @@ if (!global.browser?.runtime?.sendMessage) {
           if (error) throw error;
           return response;
         };
-        return (data) => {
-          const promise = promisifiedSendMessage(data).then(unwrapResponse);
-          if (process.env.DEBUG) promise.catch(console.warn);
-          return promise;
-        };
+        return data => promisifiedSendMessage(data).then(unwrapResponse);
       },
     },
     storage: {
