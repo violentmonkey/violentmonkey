@@ -111,10 +111,11 @@ textarea {
     border-color: var(--fill-7);
   }
   &.has-error {
-    border-color: #4004;
-    background: #f004;
+    // reminder: make sure all colors are readable in light/dark schemes
+    border-color: #8008;
+    background: #f002;
     &:focus {
-      border-color: #400c;
+      border-color: #f008;
     }
   }
 }
