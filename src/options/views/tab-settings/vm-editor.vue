@@ -37,10 +37,14 @@ export default {
       options.set('editor', defaults.editor);
     },
     toggleBoolean(event) {
-      const el = event.target;
-      const selection = el.value.slice(el.selectionStart, el.selectionEnd);
-      const toggled = selection === 'false' && 'true' || selection === 'true' && 'false';
-      if (toggled) document.execCommand('insertText', false, toggled);
+      const el = /** @type HTMLTextAreaElement */ event.target;
+      const { selectionStart: start, selectionEnd: end, value } = el;
+      const toggled = { false: 'true', true: 'false' }[value.slice(start, end)];
+      // FF can't run execCommand on textarea, https://bugzil.la/1220696#c24
+      if (toggled && !document.execCommand('insertText', false, toggled)) {
+        el.value = value.slice(0, start) + toggled + value.slice(end);
+        el.setSelectionRange(start + toggled.length, start + toggled.length);
+      }
     },
     async toggleStateHint() {
       if (this.hint) {
