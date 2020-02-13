@@ -111,7 +111,37 @@ if (!global.browser?.runtime?.sendMessage) {
     webRequest: true,
   };
   global.browser = wrapAPIs(chrome, meta);
+} else if (process.env.DEBUG && !global.chrome.app) {
+  let counter = 0;
+  const { runtime } = browser;
+  const { sendMessage, onMessage } = runtime;
+  const log = (type, args, id, isResponse) => console.info(
+    `%c${type}Message#%d${isResponse ? ' response' : ''}`,
+    isResponse ? '' : 'color:yellow',
+    id,
+    ...args,
+  );
+  runtime.sendMessage = (...args) => {
+    counter += 1;
+    const id = counter;
+    log('send', args, id);
+    const promise = runtime::sendMessage(...args);
+    promise.then(data => log('send', [data], id, true), console.warn);
+    return promise;
+  };
+  const { addListener } = onMessage;
+  onMessage.addListener = (listener) => onMessage::addListener((msg, sender) => {
+    counter += 1;
+    const id = counter;
+    const { frameId, tab, url } = sender;
+    log('on', [msg, { frameId, tab, url }], id);
+    const result = listener(msg, sender);
+    (typeof result?.then === 'function' ? result : Promise.resolve(result))
+    .then(data => log('on', [data], id, true), console.warn);
+    return result;
+  });
 }
+
 // prefetch the options while the current extension page loads
 /* global browser */
 if (browser.tabs) {
