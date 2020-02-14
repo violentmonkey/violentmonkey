@@ -6,6 +6,7 @@ import ua from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
 import { getScriptById } from './db';
+import { extensionRoot } from './init';
 import { commands } from './message';
 
 const VM_VERIFY = 'VM-Verify';
@@ -372,7 +373,6 @@ const blacklist = [
   '//(?:(?:gist.|)github.com|greasyfork.org|openuserjs.org)/',
 ].map(re => new RegExp(re));
 const bypass = {};
-const extensionRoot = browser.runtime.getURL('/');
 
 browser.tabs.onCreated.addListener((tab) => {
   if (/\.user\.js([?#]|$)/.test(tab.pendingUrl || tab.url)) {

@@ -92,7 +92,7 @@ export function makeGmApi() {
     GM_getResourceText(name) {
       if (name in this.resources) {
         const key = this.resources[name];
-        const raw = this.cache[this.pathMap[key] || key];
+        const raw = store.cache[this.pathMap[key] || key];
         if (!raw) return;
         const i = raw::lastIndexOf(',');
         const lastPart = i < 0 ? raw : raw::slice(i + 1);
@@ -104,7 +104,7 @@ export function makeGmApi() {
         const key = this.resources[name];
         let blobUrl = this.urls[key];
         if (!blobUrl) {
-          const raw = this.cache[this.pathMap[key] || key];
+          const raw = store.cache[this.pathMap[key] || key];
           if (raw) {
             blobUrl = cache2blobUrl(raw);
             this.urls[key] = blobUrl;

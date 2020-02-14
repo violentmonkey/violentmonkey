@@ -1,10 +1,9 @@
 import { hasOwnProperty as has } from '#/common';
-import { INJECT_CONTENT, METABLOCK_RE } from '#/common/consts';
+import { INJECT_CONTENT } from '#/common/consts';
 import bridge from './bridge';
 import {
-  concat, filter, forEach, includes, indexOf, map, match, push, slice,
-  defineProperty, describeProperty, objectKeys, replace,
-  addEventListener, removeEventListener,
+  concat, filter, forEach, includes, indexOf, map, push, slice, defineProperty, describeProperty,
+  objectKeys, replace, addEventListener, removeEventListener,
 } from '../utils/helpers';
 import { makeGmApi, vmOwnFunc } from './gm-api';
 
@@ -29,15 +28,16 @@ export function deletePropsCache() {
   componentUtils = null;
 }
 
-export function wrapGM(script, code, cache, injectInto) {
+export function wrapGM(script) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const grant = script.meta.grant || [];
   if (grant.length === 1 && grant[0] === 'none') {
     grant.length = 0;
   }
+  const id = script.props.id;
   const resources = script.meta.resources || {};
-  const gmInfo = makeGmInfo(script, code, resources, injectInto);
+  const gmInfo = makeGmInfo(script, resources);
   const gm = {
     GM: { info: gmInfo },
     GM_info: gmInfo,
@@ -48,10 +48,9 @@ export function wrapGM(script, code, cache, injectInto) {
     }),
   };
   const context = {
-    cache,
+    id,
     script,
     resources,
-    id: script.props.id,
     pathMap: script.custom.pathMap || {},
     urls: {},
   };
@@ -69,14 +68,15 @@ export function wrapGM(script, code, cache, injectInto) {
   return grant.length ? makeGlobalWrapper(gm) : gm;
 }
 
-function makeGmInfo({ config, meta, props }, code, resources, injectInto) {
+function makeGmInfo(script, resources) {
+  const { meta } = script;
   return {
-    uuid: props.uuid,
-    scriptMetaStr: code::match(METABLOCK_RE)[1] || '',
-    scriptWillUpdate: !!config.shouldUpdate,
+    uuid: script.props.uuid,
+    scriptMetaStr: script.metaStr,
+    scriptWillUpdate: !!script.config.shouldUpdate,
     scriptHandler: 'Violentmonkey',
     version: process.env.VM_VER,
-    injectInto,
+    injectInto: bridge.mode,
     platform: { ...bridge.ua },
     script: {
       description: meta.description || '',

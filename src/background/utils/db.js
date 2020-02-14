@@ -291,13 +291,13 @@ export async function getScriptsByURL(url, isTop) {
   return Object.defineProperties({
     cache,
     code,
-    enabledIds,
     ids,
     require,
     scripts,
     values,
   }, {
     // Hiding from the messaging API
+    enabledIds: { value: enabledIds },
     withValueIds: { value: withValueIds },
   });
 }

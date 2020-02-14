@@ -17,7 +17,7 @@ export default function initCache({
   // eslint-disable-next-line no-return-assign
   const getNow = () => batchStarted && batchStartTime || (batchStartTime = performance.now());
   return {
-    batch, get, put, del, has, hit, destroy,
+    batch, get, pop, put, del, has, hit, destroy,
   };
   function batch(enable) {
     batchStarted = enable;
@@ -26,6 +26,11 @@ export default function initCache({
   function get(key, def) {
     const item = cache[key];
     return item ? item.value : def;
+  }
+  function pop(key, def) {
+    const value = get(key, def);
+    del(key);
+    return value;
   }
   function put(key, value, lifetime = defaultLifetime) {
     if (value) {
@@ -37,6 +42,7 @@ export default function initCache({
     } else {
       delete cache[key];
     }
+    return value;
   }
   function del(key) {
     delete cache[key];

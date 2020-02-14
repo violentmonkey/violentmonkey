@@ -8,8 +8,8 @@ import {
 import { sendCmd } from '#/common';
 
 import {
-  forEach, join, append, createElementNS, defineProperty, describeProperty, NS_HTML, DocProto,
-  charCodeAt, fromCharCode, replace, remove,
+  forEach, push, defineProperty, describeProperty, objectEntries, setTimeout, append,
+  createElementNS, remove, DocProto, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -19,63 +19,79 @@ const VMInitInjection = window[Symbol.for(process.env.INIT_FUNC_NAME)];
 // (the symbol is undeletable so a userscript can't fool us on reinjection)
 defineProperty(window, Symbol.for(process.env.INIT_FUNC_NAME), { value: 1 });
 
-const { encodeURIComponent, document } = global;
+const { document } = global;
 // Userscripts in content mode may redefine head and documentElement
 const { get: getHead } = describeProperty(DocProto, 'head');
 const { get: getDocElem } = describeProperty(DocProto, 'documentElement');
 const { appendChild } = DocProto; // same as Node.appendChild
 
-bridge.addHandlers({
-  Inject: injectScript,
-  InjectMulti: data => data::forEach(injectScript),
-});
+export function appendToRoot(node) {
+  // DOM spec allows any elements under documentElement
+  // https://dom.spec.whatwg.org/#node-trees
+  const root = document::getHead() || document::getDocElem();
+  return root && root::appendChild(node);
+}
 
 export function injectPageSandbox(contentId, webId) {
-  inject(`(${VMInitInjection}())('${webId}','${contentId}')`,
-    browser.runtime.getURL('sandbox/injected-web.js'));
+  inject(`(${VMInitInjection}())('${webId}','${contentId}')\n//# sourceURL=${
+    browser.runtime.getURL('sandbox/injected-web.js')
+  }`);
 }
 
 export function injectScripts(contentId, webId, data, isXml) {
+  bridge.ids = data.ids;
   // eslint-disable-next-line prefer-rest-params
   if (!document::getDocElem()) return waitForDocElem(() => injectScripts(...arguments));
-  const injectPage = [];
-  const injectContent = [];
-  const scriptLists = {
-    [INJECT_PAGE]: injectPage,
-    [INJECT_CONTENT]: injectContent,
-  };
-  bridge.ids = data.ids;
   let injectable = isXml ? false : null;
-  const injectChecking = {
-    // eslint-disable-next-line no-return-assign
-    [INJECT_PAGE]: () => injectable ?? (injectable = checkInjectable()),
-    [INJECT_CONTENT]: () => true,
+  const bornReady = ['interactive', 'complete'].includes(document.readyState);
+  const INFO = {
+    cache: data.cache,
+    isFirefox: data.isFirefox,
+    ua: data.ua,
   };
-  data.scripts.forEach((script) => {
-    const injectInto = script.custom.injectInto || script.meta.injectInto || data.injectInto;
-    const internalInjectInto = INJECT_MAPPING[injectInto] || INJECT_MAPPING[INJECT_AUTO];
-    const availableInjectInto = internalInjectInto.find(key => injectChecking[key]?.());
-    scriptLists[availableInjectInto]?.push({ script, injectInto: availableInjectInto });
-  });
-  if (injectContent.length) {
-    const invokeGuest = VMInitInjection()(webId, contentId, bridge.onHandle);
-    const postViaBridge = bridge.post;
-    bridge.invokableIds.push(...injectContent.map(({ script }) => script.props.id));
-    bridge.post = (cmd, params, realm) => {
-      (realm === INJECT_CONTENT ? invokeGuest : postViaBridge)(cmd, params);
-    };
-    bridge.post('LoadScripts', {
-      ...data,
-      mode: INJECT_CONTENT,
-      items: injectContent,
-    }, INJECT_CONTENT);
-  }
-  if (injectPage.length) {
-    bridge.post('LoadScripts', {
-      ...data,
-      mode: INJECT_PAGE,
-      items: injectPage,
-    });
+  const realms = {
+    [INJECT_CONTENT]: {
+      injectable: () => true,
+      lists: { start: [], end: [], idle: [] },
+      ids: [],
+      info: INFO,
+    },
+    [INJECT_PAGE]: {
+      // eslint-disable-next-line no-return-assign
+      injectable: () => injectable ?? (injectable = checkInjectable()),
+      lists: { start: [], end: [], idle: [] },
+      ids: [],
+      info: INFO,
+    },
+  };
+  const triage = (script) => {
+    const { custom, meta } = script;
+    const desiredRealm = custom.injectInto || meta.injectInto || data.injectInto;
+    const internalRealm = INJECT_MAPPING[desiredRealm] || INJECT_MAPPING[INJECT_AUTO];
+    const realm = internalRealm.find(key => realms[key]?.injectable());
+    const { ids, lists } = realms[realm];
+    let runAt = bornReady ? 'start'
+      : `${custom.runAt || meta.runAt || ''}`.replace(/^document-/, '');
+    const list = lists[runAt] || lists[runAt = 'end'];
+    const action = realm === INJECT_PAGE && 'done'
+      || runAt !== 'start' && 'wait'
+      || '';
+    script.action = action;
+    ids::push(script.props.id);
+    list::push(script);
+    return [script.dataKey, action];
+  };
+  const feedback = data.scripts.map(triage);
+  setupContentInvoker(realms, contentId, webId);
+  sendCmd('InjectionFeedback', feedback);
+  injectAll(realms, 'start');
+  if (!bornReady && realms[INJECT_PAGE].ids.length) {
+    delete realms[INJECT_CONTENT];
+    document.addEventListener('DOMContentLoaded', async () => {
+      await 0;
+      injectAll(realms, 'end');
+      setTimeout(injectAll, 0, realms, 'idle');
+    }, { once: true });
   }
 }
 
@@ -90,6 +106,45 @@ function checkInjectable() {
   return res;
 }
 
+function inject(code) {
+  const script = document::createElementNS(NS_HTML, 'script');
+  // using a safe call to an existing method so we don't have to extract textContent setter
+  script::append(code);
+  // When using declarativeContent there's no documentElement so we'll append to `document`
+  if (!appendToRoot(script)) document::appendChild(script);
+  script::remove();
+}
+
+function injectAll(realms, runAt) {
+  objectEntries(realms)::forEach(([realm, realmData]) => {
+    const isPage = realm === INJECT_PAGE;
+    let { info } = realmData;
+    realmData.info = undefined;
+    objectEntries(realmData.lists)::forEach(([name, items]) => {
+      if ((!isPage || name === runAt) && items.length) {
+        bridge.post('ScriptData', { info, items }, realm);
+        info = undefined;
+        items::forEach(item => {
+          if (isPage) inject(item.code);
+          item.code = '';
+        });
+      }
+    });
+  });
+}
+
+function setupContentInvoker(realms, contentId, webId) {
+  const invokableIds = realms[INJECT_CONTENT].ids;
+  if (invokableIds.length) {
+    const invoke = {
+      [INJECT_CONTENT]: VMInitInjection()(webId, contentId, bridge.onHandle),
+    };
+    const postViaBridge = bridge.post;
+    bridge.invokableIds = invokableIds;
+    bridge.post = (cmd, params, realm) => (invoke[realm] || postViaBridge)(cmd, params);
+  }
+}
+
 function waitForDocElem(cb) {
   const observer = new MutationObserver(() => {
     if (document::getDocElem()) {
@@ -98,41 +153,4 @@ function waitForDocElem(cb) {
     }
   });
   observer.observe(document, { childList: true });
-}
-
-// fullwidth range starts at 0xFF00
-// normal range starts at space char code 0x20
-const replaceWithFullWidthForm = s => fromCharCode(s::charCodeAt(0) - 0x20 + 0xFF00);
-
-function injectScript([codeSlices, mode, scriptId, scriptName]) {
-  // using fullwidth forms for special chars and those added by the newer RFC3986 spec for URI
-  const name = encodeURIComponent(scriptName::replace(/[#&',/:;?@=]/g, replaceWithFullWidthForm));
-  const sourceUrl = browser.extension.getURL(`${name}.user.js#${scriptId}`);
-  // trying to avoid string concatenation of potentially huge code slices for as long as possible
-  if (mode === INJECT_CONTENT) {
-    // Firefox: the injected script must return 0 at the end
-    codeSlices.push(`;0\n//# sourceURL=${sourceUrl}`);
-    sendCmd('InjectScript', codeSlices::join(''));
-  } else {
-    inject(codeSlices, sourceUrl);
-  }
-}
-
-function inject(code, sourceUrl) {
-  const script = document::createElementNS(NS_HTML, 'script');
-  // avoid string concatenation of |code| as it can be extremely long
-  script::append(
-    ...typeof code === 'string' ? [code] : code,
-    ...sourceUrl ? ['\n//# sourceURL=', sourceUrl] : [],
-  );
-  // When using declarativeContent there's no documentElement so we'll append to `document`
-  if (!appendToRoot(script)) document::appendChild(script);
-  script::remove();
-}
-
-export function appendToRoot(node) {
-  // DOM spec allows any elements under documentElement
-  // https://dom.spec.whatwg.org/#node-trees
-  const root = document::getHead() || document::getDocElem();
-  return root && root::appendChild(node);
 }
