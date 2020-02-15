@@ -1,7 +1,7 @@
-import { objectPick } from '#/common/object';
+import { defineProperty, describeProperty, objectPick } from '#/common/object';
 import {
   filter, includes, map, push, jsonDump, jsonLoad, join, objectToString, Promise, Uint8Array,
-  setAttribute, log, buffer2stringSafe, charCodeAt, slice, defineProperty, describeProperty,
+  setAttribute, log, buffer2stringSafe, charCodeAt, slice,
   createElementNS, NS_HTML, Blob,
 } from '../utils/helpers';
 import bridge from './bridge';

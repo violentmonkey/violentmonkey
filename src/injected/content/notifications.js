@@ -1,5 +1,6 @@
+import { objectEntries } from '#/common/object';
 import { sendCmd } from '../utils';
-import { objectEntries, filter } from '../utils/helpers';
+import { filter } from '../utils/helpers';
 import bridge from './bridge';
 
 const notifications = {};

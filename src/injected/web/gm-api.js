@@ -1,6 +1,8 @@
 import { cache2blobUrl, getUniqId, isEmpty } from '#/common';
 import { downloadBlob } from '#/common/download';
-import { objectPick } from '#/common/object';
+import {
+  defineProperty, objectEntries, objectKeys, objectPick, objectValues,
+} from '#/common/object';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
@@ -10,8 +12,7 @@ import {
   decodeValue, dumpValue, loadValues, changeHooks,
 } from './gm-values';
 import {
-  findIndex, indexOf, slice, defineProperty, objectKeys, objectValues, objectEntries,
-  atob, Error, jsonDump, logging, utf8decode,
+  atob, findIndex, indexOf, jsonDump, logging, slice, utf8decode, Error,
 } from '../utils/helpers';
 
 const { getElementById } = Document.prototype;

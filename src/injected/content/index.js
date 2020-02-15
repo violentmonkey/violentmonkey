@@ -1,8 +1,9 @@
 import { getUniqId, isEmpty } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
+import { objectKeys } from '#/common/object';
 import { bindEvents, sendCmd } from '../utils';
 import {
-  objectKeys, forEach, includes, append, createElementNS, setAttribute, NS_HTML,
+  forEach, includes, append, createElementNS, setAttribute, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';

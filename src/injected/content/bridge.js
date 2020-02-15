@@ -1,6 +1,6 @@
 import { sendCmd } from '#/common';
 import { INJECT_PAGE, browser } from '#/common/consts';
-import { assign } from '../utils/helpers';
+import { assign } from '#/common/object';
 
 /** @type {Object.<string, MessageFromGuestHandler>} */
 const handlers = {};

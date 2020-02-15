@@ -1,8 +1,7 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
+import { defineProperty, describeProperty } from '#/common/object';
 import { bindEvents } from '../utils';
-import {
-  defineProperty, describeProperty, forEach, log, remove, Promise,
-} from '../utils/helpers';
+import { forEach, log, remove, Promise } from '../utils/helpers';
 import bridge from './bridge';
 import { wrapGM } from './gm-wrapper';
 import store from './store';

@@ -1,5 +1,6 @@
 import { getUniqId } from '#/common';
-import { assign, noop, Promise } from '../utils/helpers';
+import { assign } from '#/common/object';
+import { noop, Promise } from '../utils/helpers';
 
 const handlers = {};
 const callbacks = {};

@@ -1,9 +1,10 @@
 import { hasOwnProperty as has } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
+import { defineProperty, describeProperty, objectKeys } from '#/common/object';
 import bridge from './bridge';
 import {
-  concat, filter, forEach, includes, indexOf, map, push, slice, defineProperty, describeProperty,
-  objectKeys, replace, addEventListener, removeEventListener,
+  concat, filter, forEach, includes, indexOf, map, push, slice,
+  replace, addEventListener, removeEventListener,
 } from '../utils/helpers';
 import { makeGmApi, vmOwnFunc } from './gm-api';
 

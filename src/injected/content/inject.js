@@ -6,10 +6,11 @@ import {
   browser,
 } from '#/common/consts';
 import { sendCmd } from '#/common';
+import { defineProperty, describeProperty, forEachEntry, objectPick } from '#/common/object';
 
 import {
-  forEach, push, defineProperty, describeProperty, objectEntries, setTimeout, append,
-  createElementNS, remove, DocProto, NS_HTML,
+  forEach, push, setTimeout,
+  append, createElementNS, remove, DocProto, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -44,11 +45,7 @@ export function injectScripts(contentId, webId, data, isXml) {
   if (!document::getDocElem()) return waitForDocElem(() => injectScripts(...arguments));
   let injectable = isXml ? false : null;
   const bornReady = ['interactive', 'complete'].includes(document.readyState);
-  const INFO = {
-    cache: data.cache,
-    isFirefox: data.isFirefox,
-    ua: data.ua,
-  };
+  const INFO = objectPick(data, ['cache', 'isFirefox', 'ua']);
   const realms = {
     [INJECT_CONTENT]: {
       injectable: () => true,
@@ -116,11 +113,11 @@ function inject(code) {
 }
 
 function injectAll(realms, runAt) {
-  objectEntries(realms)::forEach(([realm, realmData]) => {
+  realms::forEachEntry(([realm, realmData]) => {
     const isPage = realm === INJECT_PAGE;
     let { info } = realmData;
     realmData.info = undefined;
-    objectEntries(realmData.lists)::forEach(([name, items]) => {
+    realmData.lists::forEachEntry(([name, items]) => {
       if ((!isPage || name === runAt) && items.length) {
         bridge.post('ScriptData', { info, items }, realm);
         info = undefined;
