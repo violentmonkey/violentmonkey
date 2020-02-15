@@ -252,12 +252,19 @@ export default {
     scripts() {
       return this.store.scripts.filter(script => !script.config.removed);
     },
+    searchNeedsCodeIds() {
+      return this.search
+        && ['code', 'all'].includes(filters.searchScope)
+        && this.store.scripts.filter(s => s.$cache.code == null).map(s => s.props.id);
+    },
     trash() {
       return this.store.scripts.filter(script => script.config.removed);
     },
   },
   methods: {
-    refreshUI() {
+    async refreshUI() {
+      const ids = this.searchNeedsCodeIds;
+      if (ids?.length) await this.getCodeFromStorage(ids);
       this.onUpdate();
       this.onHashChange();
     },
@@ -417,15 +424,15 @@ export default {
       }
     },
     async scheduleSearch() {
-      const { scripts } = this.store;
-      if (scripts[0]?.$cache.code == null && ['code', 'all'].includes(filters.searchScope)) {
-        const ids = scripts.map(({ props: { id } }) => id);
-        const data = await storage.code.getMulti(ids);
-        ids.forEach((id, index) => {
-          scripts[index].$cache.code = data[id];
-        });
-      }
+      const ids = this.searchNeedsCodeIds;
+      if (ids?.length) await this.getCodeFromStorage(ids);
       this.debouncedUpdate();
+    },
+    async getCodeFromStorage(ids) {
+      const data = await storage.code.getMulti(ids);
+      this.store.scripts.forEach(({ $cache, props: { id } }) => {
+        if (id in data) $cache.code = data[id];
+      });
     },
     async emptyRecycleBin() {
       try {
