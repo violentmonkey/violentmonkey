@@ -26,5 +26,12 @@ module.exports = {
       js: 'never',
       vue: 'never',
     }],
+    // copied from airbnb-base, replaced 4 with 8
+    'object-curly-newline': ['error', {
+      ObjectExpression: { minProperties: 8, multiline: true, consistent: true },
+      ObjectPattern: { minProperties: 8, multiline: true, consistent: true },
+      ImportDeclaration: { minProperties: 8, multiline: true, consistent: true },
+      ExportDeclaration: { minProperties: 8, multiline: true, consistent: true },
+    }],
   },
 };
