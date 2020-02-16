@@ -1,5 +1,5 @@
 <template>
-  <div class="message modal-content">
+  <div class="message modal-content" :class="{ multiline: /\n/.test(message.text) }">
     <div class="mb-1" v-if="message.text" v-text="message.text"></div>
     <form v-if="message.buttons" @submit.prevent>
       <input class="mb-1" type="text" v-if="message.input !== false" v-model="message.input">
@@ -67,9 +67,19 @@ export default {
 <style>
 .message {
   width: 18rem;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   border-bottom-left-radius: .2rem;
   border-bottom-right-radius: .2rem;
   box-shadow: 0 0 .2rem rgba(0,0,0,.2);
+  &.multiline {
+    width: auto;
+    max-width: 50vw;
+    &::first-line {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  }
   input {
     width: 100%;
   }
