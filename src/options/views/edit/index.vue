@@ -133,6 +133,12 @@ export default {
     code() {
       this.canSave = true;
     },
+    // usually errors for resources
+    'initial.error'(error) {
+      if (error) {
+        showMessage({ text: `${this.initial.message}\n\n${error}` });
+      }
+    },
     settings: {
       deep: true,
       handler() {

@@ -155,3 +155,7 @@ export function makePause(ms) {
     ? Promise.resolve()
     : new Promise(resolve => setTimeout(resolve, ms));
 }
+
+export function trueJoin(separator) {
+  return this.filter(Boolean).join(separator);
+}

@@ -1,18 +1,15 @@
-import {
-  i18n, getFullUrl, isRemote, getRnd4, sendCmd,
-} from '#/common';
+import { i18n, getFullUrl, isRemote, getRnd4, sendCmd, trueJoin } from '#/common';
 import { CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, TIMEOUT_WEEK } from '#/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
 import storage from '#/common/storage';
 import pluginEvents from '../plugin/events';
-import {
-  getNameURI, parseMeta, newScript, getDefaultCustom,
-} from './script';
+import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
 import { testScript, testBlacklist } from './tester';
 import { preInitialize } from './init';
 import { commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
+import './storage-fetch';
 
 const store = {};
 
@@ -102,6 +99,10 @@ preInitialize.push(async () => {
   };
   const idMap = {};
   const uriMap = {};
+  const mods = [];
+  const resUrls = [];
+  /** @this VMScriptCustom.pathMap */
+  const rememberUrl = function _(url) { resUrls.push(this[url] || url); };
   data::forEachEntry(([key, script]) => {
     if (key.startsWith(storage.script.prefix)) {
       // {
@@ -136,8 +137,19 @@ preInitialize.push(async () => {
       storeInfo.id = Math.max(storeInfo.id, id);
       storeInfo.position = Math.max(storeInfo.position, getInt(script.props.position));
       scripts.push(script);
+      // listing all known resource urls in order to remove unused mod keys
+      const {
+        custom: { pathMap = {} } = {},
+        meta = {},
+      } = script;
+      meta.require?.forEach(rememberUrl, pathMap);
+      Object.values(meta.resources || {}).forEach(rememberUrl, pathMap);
+      pathMap::rememberUrl(meta.icon);
+    } else if (key.startsWith(storage.mod.prefix)) {
+      mods.push(key.slice(storage.mod.prefix.length));
     }
   });
+  storage.mod.removeMulti(mods.filter(url => !resUrls.includes(url)));
   Object.assign(store, {
     scripts,
     storeInfo,
@@ -433,7 +445,7 @@ export async function parseScript(src) {
   if (src.position) script.props.position = +src.position;
   buildPathMap(script, src.url);
   await saveScript(script, src.code);
-  fetchScriptResources(script, src);
+  fetchResources(script, {}, src);
   Object.assign(result.update, script, src.update);
   result.where = { id: script.props.id };
   sendCmd(cmd, result);
@@ -460,48 +472,52 @@ function buildPathMap(script, base) {
   return pathMap;
 }
 
-/** @return {void} */
-function fetchScriptResources(script, cache) {
-  const { meta, custom: { pathMap } } = script;
-  // @require
-  meta.require.forEach((key) => {
-    const fullUrl = pathMap[key] || key;
-    const cached = cache.require?.[fullUrl];
-    if (cached) {
-      storage.require.set(fullUrl, cached);
-    } else {
-      storage.require.fetch(fullUrl);
+/** @return {Promise<?string>} resolves to error text if `resourceCache` is absent */
+export async function fetchResources(script, fetchOptions, resourceCache) {
+  const { custom: { pathMap }, meta } = script;
+  const snatch = (url, type, validator) => {
+    url = pathMap[url] || url;
+    const contents = resourceCache?.[type][url];
+    return contents != null && !validator
+      ? storage[type].set(url, contents) && null
+      : storage[type].fetch(url, fetchOptions, validator).catch(err => err);
+  };
+  const errors = await Promise.all([
+    ...meta.require.map(url => snatch(url, 'require')),
+    ...Object.values(meta.resources).map(url => snatch(url, 'cache')),
+    isRemote(meta.icon) && snatch(meta.icon, 'cache', validateImage),
+  ]);
+  if (!resourceCache) {
+    const error = errors.map(formatHttpError)::trueJoin('\n');
+    if (error) {
+      const message = i18n('msgErrorFetchingResource');
+      sendCmd(CMD_SCRIPT_UPDATE, {
+        update: { error, message },
+        where: { id: script.props.id },
+      });
+      return `${message}\n${error}`;
     }
-  });
-  // @resource
-  meta.resources::forEachValue((url) => {
-    const fullUrl = pathMap[url] || url;
-    const cached = cache.resources?.[fullUrl];
-    if (cached) {
-      storage.cache.set(fullUrl, cached);
-    } else {
-      storage.cache.fetch(fullUrl);
-    }
-  });
-  // @icon
-  if (isRemote(meta.icon)) {
-    const fullUrl = pathMap[meta.icon] || meta.icon;
-    storage.cache.fetch(fullUrl, ({ blob: getBlob }) => new Promise((resolve, reject) => {
-      const blob = getBlob();
-      const url = URL.createObjectURL(blob);
-      const image = new Image();
-      const free = () => URL.revokeObjectURL(url);
-      image.onload = () => {
-        free();
-        resolve();
-      };
-      image.onerror = () => {
-        free();
-        reject({ type: 'IMAGE_ERROR', url });
-      };
-      image.src = url;
-    }));
   }
+}
+
+/** @return {Promise<void>} resolves on success, rejects on error */
+function validateImage(url, buf, type) {
+  return new Promise((resolve, reject) => {
+    const blobUrl = URL.createObjectURL(new Blob([buf], { type }));
+    const onDone = (e) => {
+      URL.revokeObjectURL(blobUrl);
+      if (e.type === 'load') resolve();
+      else reject({ type: 'IMAGE_ERROR', url });
+    };
+    const image = new Image();
+    image.onload = onDone;
+    image.onerror = onDone;
+    image.src = blobUrl;
+  });
+}
+
+function formatHttpError(e) {
+  return e && [e.status && `HTTP${e.status}`, e.url]::trueJoin(' ') || e;
 }
 
 /** @return {Promise<void>} */

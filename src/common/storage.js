@@ -1,5 +1,5 @@
 import { browser } from './consts';
-import { request, buffer2string, ensureArray } from './util';
+import { ensureArray } from './util';
 
 const base = {
   prefix: '',
@@ -28,7 +28,9 @@ const base = {
       : Promise.resolve();
   },
   removeMulti(ids) {
-    return browser.storage.local.remove(ids.map(this.getKey, this));
+    return ids.length
+      ? browser.storage.local.remove(ids.map(this.getKey, this))
+      : Promise.resolve();
   },
   async dump(data) {
     const output = !this.prefix
@@ -42,24 +44,6 @@ const base = {
   },
 };
 
-const cacheOrFetch = (handle) => {
-  const requests = {};
-  return function cachedHandle(url, ...args) {
-    let promise = requests[url];
-    if (!promise) {
-      promise = handle.call(this, url, ...args)
-      .catch((err) => {
-        console.error(`Error fetching: ${url}`, err);
-      })
-      .then(() => {
-        delete requests[url];
-      });
-      requests[url] = promise;
-    }
-    return promise;
-  };
-};
-
 export default {
 
   base,
@@ -67,19 +51,6 @@ export default {
   cache: {
     ...base,
     prefix: 'cac:',
-    fetch: cacheOrFetch(async function fetch(uri, check) {
-      const { data: buffer, xhr } = await request(uri, { responseType: 'arraybuffer' });
-      const contentType = (xhr.getResponseHeader('content-type') || '').split(';')[0];
-      const data = {
-        contentType,
-        buffer,
-        blob: options => new Blob([buffer], Object.assign({ type: contentType }, options)),
-        string: () => buffer2string(buffer),
-        base64: () => window.btoa(data.string()),
-      };
-      if (check) await check(data);
-      return this.set(uri, `${contentType},${data.base64()}`);
-    }),
   },
 
   code: {
@@ -87,12 +58,15 @@ export default {
     prefix: 'code:',
   },
 
+  // last-modified HTTP header value per URL
+  mod: {
+    ...base,
+    prefix: 'mod:',
+  },
+
   require: {
     ...base,
     prefix: 'req:',
-    fetch: cacheOrFetch(async function fetch(uri) {
-      return this.set(uri, (await request(uri)).data);
-    }),
   },
 
   script: {
