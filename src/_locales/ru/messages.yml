@@ -343,7 +343,7 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ' разрешить обновление'
+  message: '. Уведомления об обновлениях:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Уведомлять об обновлениях скриптов
