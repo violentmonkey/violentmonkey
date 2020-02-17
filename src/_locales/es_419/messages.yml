@@ -189,13 +189,13 @@ filterScopeName:
   message: Nombre
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: desactivado
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: activado
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: usar configuración global
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Papelera de reciclaje
@@ -261,7 +261,7 @@ labelBlacklist:
   message: Lista negra
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Colaboradores
 labelCurrentLang:
   description: Label of current language.
   message: 'Idioma actual: '
@@ -351,7 +351,7 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', después notificar:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notificar actualizaciones de scripts

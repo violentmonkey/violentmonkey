@@ -15,7 +15,7 @@ buttonEdit:
   message: 編集
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: Empty recycle bin now!
+  message: 今ゴミ箱を空にする
 buttonEnable:
   description: Button to enable a script.
   message: 有効化
@@ -339,7 +339,7 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', then notify:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: スクリプトの更新を通知する
