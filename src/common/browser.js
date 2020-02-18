@@ -141,7 +141,8 @@ if (!global.browser?.runtime?.sendMessage) {
 // prefetch the options while the current extension page loads
 /* global browser */
 if (browser.tabs) {
+  const isChrome = !!global.chrome?.app; // saving it now before injected/web clears it
   global.allOptions = browser.runtime.sendMessage({ cmd: 'GetAllOptions' })
-  .then(res => (global.chrome.app ? res.data : res)) // in Chrome we wrap `data` and `error`
+  .then(res => (isChrome ? res.data : res)) // in Chrome we wrap `data` and `error`
   .catch(() => {});
 }
