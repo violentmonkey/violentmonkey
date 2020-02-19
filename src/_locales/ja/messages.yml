@@ -15,7 +15,7 @@ buttonEdit:
   message: 編集
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: Empty recycle bin now!
+  message: 今すぐゴミ箱を空にする
 buttonEnable:
   description: Button to enable a script.
   message: 有効化
