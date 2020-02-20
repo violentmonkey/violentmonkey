@@ -178,22 +178,22 @@ filterLastUpdateOrder:
   message: poslednej aktualizácie
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Všetko
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Kód
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Názov
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: vypnuté
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: zapnuté
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: použiť globálne nastavenie
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Kôš
@@ -255,7 +255,7 @@ labelBlacklist:
   message: Čierna listina
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Prispievatelia
 labelCurrentLang:
   description: Label of current language.
   message: 'Aktuálny jazyk: '
@@ -345,13 +345,13 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', potom upozorniť:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Upozorňovať na aktualizácie skriptu
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: ignorovať nastavenie upozornenia (záložka "Nastavenia" v editore)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Zoradiť skripty vo vyskakovacom okne podľa $1
@@ -584,7 +584,9 @@ titleScriptUpdated:
   message: Aktualizácia
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * kláves <Enter> pridá text do histórie automatického dopĺňania
+    * je podporovaná syntax RegExp: /re/ a /re/flags
 valueLabelKey:
   description: Label for key of a script value.
   message: Kľúč (reťazec)

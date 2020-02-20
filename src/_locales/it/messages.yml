@@ -121,13 +121,13 @@ descEditorOptions:
     rel="noopener noreferrer">lista completa</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: 'Documentation on userscript metadata block and <code>GM</code> API:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Keyboard shortcuts:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Use another editor?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadata personalizzato
@@ -151,18 +151,20 @@ editValueSave:
   message: Salva
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: Introduce il supporto agli userscript per browser.
+  message: An open source userscript manager that supports a lot of browsers
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: ''
+  message: Blacklisted in Violentmonkey's settings
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: |-
+    Violentmonkey cannot run userscripts in this page
+    (common examples: browser UI or an extension)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordine alfabetico
@@ -171,34 +173,34 @@ filterExecutionOrder:
   message: ordine di esecuzione
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: last update time
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: All
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Code
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Name
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: 'off'
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: 'on'
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: use global setting
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: ''
+  message: Recycle Bin
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL Input:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: ''
+  message: Scripts removed are listed here and will be kept for 7 days.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Utilizza @downloadURL
@@ -231,7 +233,7 @@ labelAutoReloadCurrentTab:
   message: Ricarica la scheda corrente dopo aver spento o acceso uno script dal menu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: 'Check for script updates every $1 day(s), use 0 to disable'
 labelBadge:
   description: Label for option to show number on badge.
   message: Mostra sull'icona
@@ -249,7 +251,7 @@ labelBlacklist:
   message: Blacklist
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Contributors
 labelCurrentLang:
   description: Label of current language.
   message: 'Linguaggio corrente: '
@@ -273,7 +275,7 @@ labelEditValue:
   message: Modifica valore per lo scipt
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Editor
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude rules'
@@ -294,7 +296,7 @@ labelGeneral:
   message: Generale
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Help with translation
 labelHomepage:
   description: Label for home page in about tab.
   message: Homepage
@@ -309,7 +311,7 @@ labelInclude:
   message: '@include rules'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Default injection mode: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Installando script
@@ -339,22 +341,22 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', then notify:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notifica aggiornamenti script
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: ignore per-script notification ("settings" tab in editor)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Sort scripts in popup by $1
 labelRelated:
   description: Label of related links.
   message: 'Link correlati: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: ''
+  message: Removed at $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Sostituisci con: '
@@ -366,7 +368,7 @@ labelRunAtDefault:
   message: (Default)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Custom Script Template
 labelSearch:
   description: Label for search input in search box.
   message: 'Cerca: '
@@ -381,7 +383,7 @@ labelSync:
   message: Sincronizzazione
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: Use anonymous account
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Autorizza
@@ -393,7 +395,7 @@ labelSyncDisabled:
   message: Nessuno
 labelSyncPassword:
   description: Label for input to hold password.
-  message: ''
+  message: 'Password: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
@@ -406,13 +408,13 @@ labelSyncScriptStatus:
   message: Sincronizza lo stato degli script
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'Server URL: '
 labelSyncService:
   description: Label for sync service select.
   message: Sincronizza con
 labelSyncUsername:
   description: Label for input to hold username.
-  message: ''
+  message: 'Username: '
 labelTranslator:
   description: Label of translator.
   message: 'Traduttore: '
@@ -428,7 +430,7 @@ learnBlacklist:
   message: Impara di più sui pattern blacklist.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Learn more about injection modes.
 menuCommands:
   description: Menu item to list script commands.
   message: Comandi script
@@ -441,13 +443,13 @@ menuFindScripts:
   message: Cerca script per questo sito
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Sub-frames only scripts
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Script corrispondenti
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Create a new script
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Script disabilitati
@@ -520,10 +522,10 @@ msgSavedCustomCSS:
   message: Stile personalizzato aggiornato.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: Editor options are updated.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: Custom script template is updated.
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Lo script [$1] è aggiornato!'
@@ -553,10 +555,10 @@ noValues:
   message: Nessun valore salvato
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Enabled first
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: Hide disabled
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Visualizza script abilitati per primi
@@ -580,7 +582,9 @@ titleScriptUpdated:
   message: Aggiornamento
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * <Enter> key adds the text to autocomplete history
+    * RegExp syntax is supported: /re/ and /re/flags
 valueLabelKey:
   description: Label for key of a script value.
   message: Chiave (stringa)
@@ -589,4 +593,4 @@ valueLabelValue:
   message: Valore (stringa JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Visit Website

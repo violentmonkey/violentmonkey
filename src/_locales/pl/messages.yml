@@ -168,7 +168,7 @@ failureReasonNoninjectable:
     failureBlacklistedUrl)
   message: |-
     Violentmonkey nie może uruchomić skryptów użytkownika na tej stronie
-    (możliwe przykłady: interfejs przeglądarki lub rozszerzenie)
+    (możliwe przykłady: interfejs przeglądarki lub rozszerzenia)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: kolejności alfabetycznej
@@ -180,7 +180,7 @@ filterLastUpdateOrder:
   message: czasu ostatniej aktualizacji
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: Wszystko
+  message: Wszędzie
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Kod
@@ -239,7 +239,7 @@ labelAutoReloadCurrentTab:
   message: Odświeżaj bieżącą kartę po włączeniu/wyłączeniu skryptu z menu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 'Sprawdzaj aktualizacje skryptów co $1 dni, użyj 0 aby wyłączyć'
+  message: 'Sprawdzaj aktualizacje skryptów co  $1 dni, użyj 0 aby wyłączyć'
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Wyświetl na plakietce: '
@@ -257,7 +257,7 @@ labelBlacklist:
   message: Czarna lista
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Współtwórcy
 labelCurrentLang:
   description: Label of current language.
   message: 'Używany język: '
@@ -347,7 +347,7 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', następnie powiadom:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Powiadamiaj o aktualizacjach skryptów
@@ -358,7 +358,7 @@ labelNotifyUpdatesGlobal:
     edytorze)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: 'Sortuj skrypty w wyskakującym okienku wg $1 '
+  message: 'Sortuj skrypty w wyskakującym okienku wg  $1 '
 labelRelated:
   description: Label of related links.
   message: 'Powiązane linki: '
