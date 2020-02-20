@@ -3,7 +3,7 @@
 // eslint-disable-next-line no-restricted-properties
 export const {
   // types
-  Boolean, Error, Promise, Uint8Array,
+  Blob, Boolean, Error, Promise, Uint8Array,
   // props and methods
   atob, isFinite, setTimeout,
 } = global;
