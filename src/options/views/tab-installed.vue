@@ -270,11 +270,12 @@ export default {
     },
     onUpdate() {
       const scripts = [...this.showRecycle ? this.trash : this.scripts];
-      if (this.search) this.performSearch(scripts);
+      const numFound = this.search ? this.performSearch(scripts) : scripts.length;
       const cmp = this.currentSortCompare;
       if (cmp) scripts.sort(combinedCompare(cmp));
       this.sortedScripts = scripts;
-      this.debouncedRender();
+      if (!step || numFound < step) this.renderScripts();
+      else this.debouncedRender();
     },
     updateLater() {
       this.debouncedUpdate();
@@ -389,21 +390,25 @@ export default {
       const startTime = performance.now();
       // If we entered a new loop of rendering, this.batchRender will no longer be batchRender
       while (limit < length && batchRender === this.batchRender) {
-        if (step) {
-          limit += step;
+        if (step && this.search) {
+          // Only visible items contribute to the batch size
+          for (let vis = 0; vis < step && limit < length; limit += 1) {
+            vis += this.sortedScripts[limit].$cache.show ? 1 : 0;
+          }
         } else {
-          limit += 1;
+          limit += step || 1;
         }
         batchRender.limit = limit;
         await new Promise(resolve => this.$nextTick(resolve));
         if (!step && performance.now() - startTime >= MAX_BATCH_DURATION) {
-          step = limit;
+          step = limit * 2; // the first batch is slow to render because it has more work to do
         }
-        if (step) await makePause();
+        if (step && limit < length) await makePause();
       }
     },
     performSearch(scripts) {
       let searchRE;
+      let count = 0;
       const [,
         expr = this.search.replace(/[.+^*$?|\\()[\]{}]/g, '\\$&'),
         flags = 'i',
@@ -417,11 +422,13 @@ export default {
           $cache.show = !expr
             || scopeName && searchRE.test($cache.search)
             || scopeCode && searchRE.test($cache.code);
+          count += $cache.show;
         });
         this.searchError = null;
       } catch (err) {
         this.searchError = err.message;
       }
+      return count;
     },
     async scheduleSearch() {
       const ids = this.searchNeedsCodeIds;
