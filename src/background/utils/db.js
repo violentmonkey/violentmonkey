@@ -445,7 +445,7 @@ export async function parseScript(src) {
   if (src.position) script.props.position = +src.position;
   buildPathMap(script, src.url);
   await saveScript(script, src.code);
-  fetchResources(script, {}, src);
+  fetchResources(script, src);
   Object.assign(result.update, script, src.update);
   result.where = { id: script.props.id };
   sendCmd(cmd, result);
@@ -473,7 +473,7 @@ function buildPathMap(script, base) {
 }
 
 /** @return {Promise<?string>} resolves to error text if `resourceCache` is absent */
-export async function fetchResources(script, reqOptions, resourceCache) {
+export async function fetchResources(script, resourceCache, reqOptions) {
   const { custom: { pathMap }, meta } = script;
   const snatch = (url, type, validator) => {
     url = pathMap[url] || url;

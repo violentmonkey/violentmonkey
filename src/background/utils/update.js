@@ -50,7 +50,7 @@ async function doCheckUpdate(script) {
     if (process.env.DEBUG) console.error(update);
   } finally {
     if (resOpts) {
-      msgErr = await fetchResources(script, resOpts);
+      msgErr = await fetchResources(script, null, resOpts);
       if (process.env.DEBUG && msgErr) console.error(msgErr);
     }
     if (msgOk || msgErr) {
