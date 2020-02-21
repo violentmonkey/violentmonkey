@@ -34,7 +34,7 @@ async function doCheckUpdate(script) {
   const { id } = script.props;
   let msgOk;
   let msgErr;
-  let resOpts;
+  let resourceOpts;
   try {
     const { update } = await parseScript({
       id,
@@ -42,15 +42,15 @@ async function doCheckUpdate(script) {
       update: { checking: false },
     });
     msgOk = canNotify(script) && i18n('msgScriptUpdated', [update.meta.name || i18n('labelNoName')]);
-    resOpts = { headers: NO_HTTP_CACHE };
+    resourceOpts = { headers: NO_HTTP_CACHE };
     return true;
   } catch (update) {
     // Either proceed with normal fetch on no-update or skip it altogether on error
-    resOpts = !update.error && !update.checking && {};
+    resourceOpts = !update.error && !update.checking && {};
     if (process.env.DEBUG) console.error(update);
   } finally {
-    if (resOpts) {
-      msgErr = await fetchResources(script, null, resOpts);
+    if (resourceOpts) {
+      msgErr = await fetchResources(script, null, resourceOpts);
       if (process.env.DEBUG && msgErr) console.error(msgErr);
     }
     if (msgOk || msgErr) {
