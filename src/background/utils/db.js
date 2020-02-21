@@ -473,14 +473,14 @@ function buildPathMap(script, base) {
 }
 
 /** @return {Promise<?string>} resolves to error text if `resourceCache` is absent */
-export async function fetchResources(script, fetchOptions, resourceCache) {
+export async function fetchResources(script, reqOptions, resourceCache) {
   const { custom: { pathMap }, meta } = script;
   const snatch = (url, type, validator) => {
     url = pathMap[url] || url;
     const contents = resourceCache?.[type][url];
     return contents != null && !validator
       ? storage[type].set(url, contents) && null
-      : storage[type].fetch(url, fetchOptions, validator).catch(err => err);
+      : storage[type].fetch(url, reqOptions, validator).catch(err => err);
   };
   const errors = await Promise.all([
     ...meta.require.map(url => snatch(url, 'require')),
