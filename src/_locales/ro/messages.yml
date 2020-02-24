@@ -15,7 +15,7 @@ buttonEdit:
   message: Editează
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Golește coșul de gunoi acum!
 buttonEnable:
   description: Button to enable a script.
   message: Activează
@@ -121,13 +121,15 @@ descEditorOptions:
     https://codemirror.net/doc/manual.html#config
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: >-
+    Documentație cu privire la blockurile metadatelor usescripturilor și
+    API-urile <code>GM</code>: 
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: Comenzi rapide de la tastatură
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Folosești un alt editor?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadate personalizate
@@ -151,7 +153,7 @@ editValueSave:
   message: Salvează
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: Oferă suport dedicat userscripturilor pentru browsere.
+  message: 'Un manager de userscripturi, open source, care suportă o grămadă de browsere'
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -176,22 +178,22 @@ filterLastUpdateOrder:
   message: momentul ultimei actualizări
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Toate
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Cod
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Nume
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: dezactivat
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: activat
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: folosește setarea globală
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Coș de reciclare
@@ -235,7 +237,9 @@ labelAutoReloadCurrentTab:
   message: Reîncarcă fila actuală după activarea/dezactivarea unui script din meniu
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: >-
+    Caută actualizări pentru scripturi la fiecare  $1 zi(le), folosește 0 pentru
+    a dezactiva
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Afișează pe insignă: '
@@ -253,7 +257,7 @@ labelBlacklist:
   message: Listă neagră
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Contribuitori
 labelCurrentLang:
   description: Label of current language.
   message: 'Limba actuală: '
@@ -343,16 +347,16 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', apoi notifică:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notifică la actualizările scripturilor
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: ignoră notificarea per script (fila „setări” în editor)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Sortează scripturile din popup după $1
 labelRelated:
   description: Label of related links.
   message: 'Linkuri relevante: '
@@ -445,7 +449,7 @@ menuFindScripts:
   message: Găsește scripturi pentru acest site
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Numai scripturi în sub-frame-uri
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Scripturi coincidente
@@ -557,10 +561,10 @@ noValues:
   message: Nu este stocată nicio valoare
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Mai întâi cele activate
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: Ascunde-le pe cele dezactivate
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Afișează mai întâi scripturile activate
@@ -584,7 +588,9 @@ titleScriptUpdated:
   message: Actualizare
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * Tasta <Enter> adaugă textul în istoricul completării automate
+    * Sintaxa RegExp este suportată: /re/ și /re/flags
 valueLabelKey:
   description: Label for key of a script value.
   message: Cheie (șir de caractere)
