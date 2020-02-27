@@ -194,7 +194,7 @@ export default {
         url: this.info.url,
         from: this.info.from,
         require: this.require,
-        resources: this.resources,
+        cache: this.resources,
       })
       .then((result) => {
         this.message = `${result.update.message}[${this.getTimeString()}]`;

@@ -22,9 +22,12 @@ export function showMessage(message) {
     // TODO: implement proper keyboard navigation, autofocus, and Enter/Esc in Modal module
     document.querySelector('.vl-modal button').focus();
   } else {
-    setTimeout(() => {
-      modal.close();
-    }, 2000);
+    const timer = setInterval(() => {
+      if (!document.querySelector('.vl-modal .modal-content:hover')) {
+        clearInterval(timer);
+        modal.close();
+      }
+    }, message.timeout || 2000);
   }
 }
 

@@ -95,6 +95,7 @@ function initMain() {
       const index = store.scripts.findIndex(item => item.props.id === data.where.id);
       if (index >= 0) {
         const updated = Object.assign({}, store.scripts[index], data.update);
+        if (updated.error && !data.update.error) updated.error = null;
         Vue.set(store.scripts, index, updated);
         initScript(updated);
       }

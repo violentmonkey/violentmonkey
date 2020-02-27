@@ -1,8 +1,6 @@
-import {
-  i18n, request, compareVersion, sendCmd,
-} from '#/common';
+import { i18n, request, compareVersion, sendCmd, trueJoin } from '#/common';
 import { CMD_SCRIPT_UPDATE } from '#/common/consts';
-import { getScriptById, getScripts, parseScript } from './db';
+import { fetchResources, getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
 import { commands, notify } from './message';
@@ -25,15 +23,6 @@ const processes = {};
 const NO_HTTP_CACHE = {
   'Cache-Control': 'no-cache, no-store, must-revalidate',
 };
-const OPTIONS = {
-  meta: {
-    headers: { ...NO_HTTP_CACHE, Accept: 'text/x-userscript-meta' },
-  },
-  script: {
-    headers: NO_HTTP_CACHE,
-  },
-};
-
 // resolves to true if successfully updated
 export default function checkUpdate(script) {
   const { id } = script.props;
@@ -43,61 +32,63 @@ export default function checkUpdate(script) {
 
 async function doCheckUpdate(script) {
   const { id } = script.props;
+  let msgOk;
+  let msgErr;
+  let resourceOpts;
   try {
     const { update } = await parseScript({
       id,
       code: await downloadUpdate(script),
       update: { checking: false },
     });
-    if (canNotify(script)) {
+    msgOk = canNotify(script) && i18n('msgScriptUpdated', [update.meta.name || i18n('labelNoName')]);
+    resourceOpts = { headers: NO_HTTP_CACHE };
+    return true;
+  } catch (update) {
+    // Either proceed with normal fetch on no-update or skip it altogether on error
+    resourceOpts = !update.error && !update.checking && {};
+    if (process.env.DEBUG) console.error(update);
+  } finally {
+    if (resourceOpts) {
+      msgErr = await fetchResources(script, null, resourceOpts);
+      if (process.env.DEBUG && msgErr) console.error(msgErr);
+    }
+    if (msgOk || msgErr) {
       notify({
         title: i18n('titleScriptUpdated'),
-        body: i18n('msgScriptUpdated', [update.meta.name || i18n('labelNoName')]),
+        body: [msgOk, msgErr]::trueJoin('\n'),
       });
     }
-    return true;
-  } catch (error) {
-    if (process.env.DEBUG) console.error(error);
-  } finally {
     delete processes[id];
   }
 }
 
-async function downloadUpdate(script) {
-  const downloadURL = (
-    script.custom.downloadURL
-    || script.meta.downloadURL
-    || script.custom.lastInstallURL
-  );
-  const updateURL = (
-    script.custom.updateURL
-    || script.meta.updateURL
-    || downloadURL
-  );
+async function downloadUpdate({ props: { id }, meta, custom }) {
+  const downloadURL = custom.downloadURL || meta.downloadURL || custom.lastInstallURL;
+  const updateURL = custom.updateURL || meta.updateURL || downloadURL;
   if (!updateURL) throw false;
-  let checkingMeta = true;
+  let errorMessage;
   const update = {};
-  const result = { update, where: { id: script.props.id } };
+  const result = { update, where: { id } };
   announce(i18n('msgCheckingForUpdate'));
   try {
-    const { data } = await request(updateURL, OPTIONS.meta);
-    const meta = parseMeta(data);
-    if (compareVersion(script.meta.version, meta.version) >= 0) {
+    const { data } = await request(updateURL, {
+      headers: { ...NO_HTTP_CACHE, Accept: 'text/x-userscript-meta' },
+    });
+    const { version } = parseMeta(data);
+    if (compareVersion(meta.version, version) >= 0) {
       announce(i18n('msgNoUpdate'), { checking: false });
     } else if (!downloadURL) {
       announce(i18n('msgNewVersion'), { checking: false });
     } else {
       announce(i18n('msgUpdating'));
-      checkingMeta = false;
-      return (await request(downloadURL, OPTIONS.script)).data;
+      errorMessage = i18n('msgErrorFetchingScript');
+      return (await request(downloadURL, { headers: NO_HTTP_CACHE })).data;
     }
   } catch (error) {
-    announce(
-      checkingMeta ? i18n('msgErrorFetchingUpdateInfo') : i18n('msgErrorFetchingScript'),
-      { error },
-    );
+    announce(errorMessage || i18n('msgErrorFetchingUpdateInfo'), { error });
   }
-  throw update.error;
+  throw update;
   function announce(message, { error, checking = !error } = {}) {
     Object.assign(update, {
       message,
