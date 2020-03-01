@@ -477,7 +477,7 @@ export async function fetchResources(script, resourceCache, reqOptions) {
   const { custom: { pathMap }, meta } = script;
   const snatch = (url, type, validator) => {
     url = pathMap[url] || url;
-    const contents = resourceCache?.[type][url];
+    const contents = resourceCache?.[type]?.[url];
     return contents != null && !validator
       ? storage[type].set(url, contents) && null
       : storage[type].fetch(url, reqOptions, validator).catch(err => err);
