@@ -17,7 +17,7 @@ Object.assign(commands, {
     const { id } = await browser.tabs.create({
       active: active !== false,
       pinned: !!pinned,
-      url: isInternal ? url : getFullUrl(url, src.url),
+      url: isInternal || url.startsWith('blob:') ? url : getFullUrl(url, src.url),
       windowId: srcTab.windowId,
       ...storeId && { cookieStoreId: getContainerId(isInternal ? 0 : container) || storeId },
       ...insert && { index: srcTab.index + 1 },
