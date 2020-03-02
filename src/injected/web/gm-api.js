@@ -1,6 +1,8 @@
 import { cache2blobUrl, getUniqId, isEmpty } from '#/common';
 import { downloadBlob } from '#/common/download';
-import { objectPick } from '#/common/object';
+import {
+  defineProperty, objectEntries, objectKeys, objectPick, objectValues,
+} from '#/common/object';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
@@ -10,12 +12,17 @@ import {
   decodeValue, dumpValue, loadValues, changeHooks,
 } from './gm-values';
 import {
-  findIndex, indexOf, slice, objectKeys, objectValues, objectEntries,
-  atob, Error, jsonDump, logging, utf8decode,
+  atob, findIndex, indexOf, jsonDump, logging, slice, utf8decode, Error,
 } from '../utils/helpers';
 
 const { getElementById } = Document.prototype;
 const { lastIndexOf } = String.prototype;
+
+const vmOwnFuncToString = () => '[Violentmonkey property]';
+export const vmOwnFunc = (func, toString) => {
+  defineProperty(func, 'toString', { value: toString || vmOwnFuncToString });
+  return func;
+};
 
 export function makeGmApi() {
   return [{
@@ -86,7 +93,7 @@ export function makeGmApi() {
     GM_getResourceText(name) {
       if (name in this.resources) {
         const key = this.resources[name];
-        const raw = this.cache[this.pathMap[key] || key];
+        const raw = store.cache[this.pathMap[key] || key];
         if (!raw) return;
         const i = raw::lastIndexOf(',');
         const lastPart = i < 0 ? raw : raw::slice(i + 1);
@@ -98,7 +105,7 @@ export function makeGmApi() {
         const key = this.resources[name];
         let blobUrl = this.urls[key];
         if (!blobUrl) {
-          const raw = this.cache[this.pathMap[key] || key];
+          const raw = store.cache[this.pathMap[key] || key];
           if (raw) {
             blobUrl = cache2blobUrl(raw);
             this.urls[key] = blobUrl;
@@ -145,11 +152,8 @@ export function makeGmApi() {
       return onRequestCreate(opts, this.id);
     },
     GM_addStyle(css) {
-      let el = false;
-      const callbackId = registerCallback((styleId) => {
-        el = document::getElementById(styleId);
-      });
-      bridge.post('AddStyle', { css, callbackId });
+      const id = bridge.sendSync('AddStyle', css);
+      const el = document::getElementById(id);
       // Mock a Promise without the need for polyfill
       // It's not actually necessary because DOM messaging is synchronous
       // but we keep it for compatibility with VM's 2017-2019 behavior
@@ -178,7 +182,10 @@ export function makeGmApi() {
       if (!options.text) {
         throw new Error('GM_notification: `text` is required!');
       }
-      onNotificationCreate(options);
+      const id = onNotificationCreate(options);
+      return {
+        remove: vmOwnFunc(() => bridge.send('RemoveNotification', id)),
+      };
     },
     GM_setClipboard(data, type) {
       bridge.post('SetClipboard', { data, type });
@@ -198,13 +205,4 @@ export function makeGmApi() {
     setClipboard: true,
     addStyle: true, // gm4-polyfill.js sets it anyway
   }];
-}
-
-function registerCallback(callback) {
-  const callbackId = getUniqId('VMcb');
-  store.callbacks[callbackId] = (payload) => {
-    callback(payload);
-    delete store.callbacks[callbackId];
-  };
-  return callbackId;
 }

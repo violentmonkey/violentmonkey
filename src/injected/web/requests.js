@@ -1,13 +1,12 @@
-import { objectPick } from '#/common/object';
+import { defineProperty, describeProperty, objectPick } from '#/common/object';
 import {
   filter, includes, map, push, jsonDump, jsonLoad, join, objectToString, Promise, Uint8Array,
-  setAttribute, log, buffer2stringSafe, charCodeAt, shift, slice, defineProperty, describeProperty,
+  setAttribute, log, buffer2stringSafe, charCodeAt, slice,
   createElementNS, NS_HTML, Blob,
 } from '../utils/helpers';
 import bridge from './bridge';
 
 const idMap = {};
-const queue = [];
 
 const { DOMParser } = global;
 const { parseFromString } = DOMParser.prototype;
@@ -15,10 +14,6 @@ const { toLowerCase } = String.prototype;
 const { get: getHref } = describeProperty(HTMLAnchorElement.prototype, 'href');
 
 bridge.addHandlers({
-  GotRequestId(id) {
-    const req = queue::shift();
-    if (req) start(req, id);
-  },
   HttpRequested(msg) {
     const req = idMap[msg.id];
     if (req) callback(req, msg);
@@ -31,13 +26,12 @@ export function onRequestCreate(details, scriptId) {
     details,
     req: {
       abort() {
-        reqAbort(req.id);
+        bridge.post('AbortRequest', req.id);
       },
     },
   };
   details.url = getFullUrl(details.url);
-  queue::push(req);
-  bridge.post('GetRequestId', [
+  const eventsToNotify = [
     'abort',
     'error',
     'load',
@@ -46,12 +40,10 @@ export function onRequestCreate(details, scriptId) {
     'progress',
     'readystatechange',
     'timeout',
-  ]::filter(e => typeof details[`on${e}`] === 'function'));
+  ]::filter(e => typeof details[`on${e}`] === 'function');
+  bridge.send('GetRequestId', eventsToNotify)
+  .then(id => start(req, id));
   return req.req;
-}
-
-function reqAbort(id) {
-  bridge.post('AbortRequest', id);
 }
 
 function parseData(response, msg, details) {

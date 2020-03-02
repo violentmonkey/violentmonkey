@@ -1,3 +1,13 @@
+export const {
+  assign,
+  defineProperty,
+  getOwnPropertyDescriptor: describeProperty,
+  entries: objectEntries,
+  keys: objectKeys,
+  values: objectValues,
+} = Object;
+const { forEach, reduce } = Array.prototype;
+
 export function normalizeKeys(key) {
   if (key == null) return [];
   if (Array.isArray(key)) return key;
@@ -49,7 +59,7 @@ export function objectPurify(obj) {
 }
 
 export function objectPick(obj, keys, transform) {
-  return keys.reduce((res, key) => {
+  return keys::reduce((res, key) => {
     let value = obj?.[key];
     if (transform) value = transform(value);
     if (value != null) res[key] = value;
@@ -59,7 +69,7 @@ export function objectPick(obj, keys, transform) {
 
 // invoked as obj::mapEntry(([key, value], i, allEntries) => transformedValue)
 export function mapEntry(func) {
-  return Object.entries(this).reduce((res, entry, i, allEntries) => {
+  return objectEntries(this)::reduce((res, entry, i, allEntries) => {
     res[entry[0]] = func(entry, i, allEntries);
     return res;
   }, {});
@@ -67,15 +77,15 @@ export function mapEntry(func) {
 
 // invoked as obj::forEachEntry(([key, value], i, allEntries) => {})
 export function forEachEntry(func) {
-  if (this) Object.entries(this).forEach(func);
+  if (this) objectEntries(this)::forEach(func);
 }
 
 // invoked as obj::forEachKey(key => {}, i, allKeys)
 export function forEachKey(func) {
-  if (this) Object.keys(this).forEach(func);
+  if (this) objectKeys(this)::forEach(func);
 }
 
 // invoked as obj::forEachValue(value => {}, i, allValues)
 export function forEachValue(func) {
-  if (this) Object.values(this).forEach(func);
+  if (this) objectValues(this)::forEach(func);
 }

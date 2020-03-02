@@ -1,4 +1,4 @@
-import { sendCmd, sendMessage } from '../utils';
+import { sendCmd } from '../utils';
 import bridge from './bridge';
 
 const requests = {};
@@ -7,10 +7,10 @@ bridge.addHandlers({
   async GetRequestId(eventsToNotify, realm) {
     const id = await sendCmd('GetRequestId', eventsToNotify);
     requests[id] = realm;
-    bridge.post('GotRequestId', id, realm);
+    return id;
   },
-  HttpRequest: sendMessage,
-  AbortRequest: sendMessage,
+  HttpRequest: sendCmd,
+  AbortRequest: sendCmd,
 });
 
 bridge.addBackgroundHandlers({

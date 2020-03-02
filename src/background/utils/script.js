@@ -12,14 +12,6 @@ Object.assign(commands, {
     cache.put(`new-${id}`, newScript(data));
     return id;
   },
-  /** @return {Promise<Array>} */
-  InjectScript(code, { tab, frameId }) {
-    return browser.tabs.executeScript(tab.id, {
-      code,
-      frameId,
-      runAt: 'document_start',
-    });
-  },
   /** @return {VMScript} */
   NewScript(id) {
     return id && cache.get(`new-${id}`) || newScript();

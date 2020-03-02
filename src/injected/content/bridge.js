@@ -1,16 +1,15 @@
-import { sendMessage } from '#/common';
+import { sendCmd } from '#/common';
 import { INJECT_PAGE, browser } from '#/common/consts';
-import { assign } from '../utils/helpers';
+import { assign } from '#/common/object';
 
 /** @type {Object.<string, MessageFromGuestHandler>} */
 const handlers = {};
 const bgHandlers = {};
-
-export default {
+const bridge = {
   ids: [],
   // userscripts running in the content script context are messaged via invokeGuest
   invokableIds: [],
-  // {CommandName: sendMessage} will relay the request via sendMessage as is
+  // {CommandName: sendCmd} will relay the request via sendCmd as is
   addHandlers(obj) {
     assign(handlers, obj);
   },
@@ -18,12 +17,22 @@ export default {
     assign(bgHandlers, obj);
   },
   // realm is provided when called directly via invokeHost
-  onHandle(req, realm) {
-    const handle = handlers[req.cmd];
-    if (handle === sendMessage) sendMessage(req);
-    else handle?.(req.data, realm || INJECT_PAGE);
+  async onHandle({ cmd, data }, realm) {
+    const handle = handlers[cmd];
+    if (!handle) throw new Error(`Invalid command: ${cmd}`);
+    const callbackId = data?.callbackId;
+    const payload = callbackId ? data.payload : data;
+    let res = handle === sendCmd ? sendCmd(cmd, payload) : handle(payload, realm || INJECT_PAGE);
+    if (typeof res?.then === 'function') {
+      res = await res;
+    }
+    if (callbackId && res !== undefined) {
+      bridge.post('Callback', { callbackId, payload: res }, realm);
+    }
   },
 };
+
+export default bridge;
 
 browser.runtime.onMessage.addListener(({ cmd, data }, src) => {
   bgHandlers[cmd]?.(data, src);

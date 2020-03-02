@@ -2,12 +2,12 @@ import { sendCmd, sendTabCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
 import ua from '#/common/ua';
 import * as sync from './sync';
-import { cache, commands } from './utils';
-import { getData, checkRemove, getScriptsByURL } from './utils/db';
+import { commands } from './utils';
+import { getData, checkRemove } from './utils/db';
 import { setBadge } from './utils/icon';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
-import { getPreinjectKey, togglePreinject } from './utils/preinject';
+import { getInjectedScripts } from './utils/preinject';
 import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
 import { resetValueOpener, addValueOpener } from './utils/values';
 import './utils/clipboard';
@@ -19,18 +19,12 @@ import './utils/tabs';
 import './utils/tester';
 import './utils/update';
 
-const VM_VER = browser.runtime.getManifest().version;
 const popupTabs = {}; // { tabId: 1 }
 let isApplied;
-let injectInto;
 
 hookOptions((changes) => {
   if ('autoUpdate' in changes) autoUpdate();
-  if ('defaultInjectInto' in changes) injectInto = changes.defaultInjectInto;
-  if ('isApplied' in changes) {
-    isApplied = changes.isApplied;
-    togglePreinject(isApplied);
-  }
+  if ('isApplied' in changes) isApplied = changes.isApplied;
   if (SCRIPT_TEMPLATE in changes) resetScriptTemplate(changes);
   sendCmd('UpdateOptions', changes);
 });
@@ -40,25 +34,19 @@ Object.assign(commands, {
   async GetData() {
     const data = await getData();
     data.sync = sync.getStates();
-    data.version = VM_VER;
     return data;
   },
   /** @return {Promise<Object>} */
   async GetInjected(_, src) {
     const { frameId, tab, url } = src;
-    const isTop = !frameId;
-    if (isTop) resetValueOpener(tab.id);
+    if (!frameId) resetValueOpener(tab.id);
     const res = {
-      isApplied,
-      injectInto,
       ua,
       isFirefox: ua.isFirefox,
       isPopupShown: popupTabs[tab.id],
-      version: VM_VER,
     };
     if (isApplied) {
-      const key = getPreinjectKey(url, isTop);
-      const data = await (cache.get(key) || getScriptsByURL(url, isTop));
+      const data = await getInjectedScripts(url, tab.id, frameId);
       addValueOpener(tab.id, frameId, data.withValueIds);
       setBadge(data.enabledIds, src);
       Object.assign(res, data);
@@ -120,11 +108,30 @@ function onPopupClosed({ name }) {
 initialize(() => {
   browser.runtime.onMessage.addListener(handleCommandMessage);
   browser.runtime.onConnect.addListener(onPopupOpened);
-  injectInto = getOption('defaultInjectInto');
   isApplied = getOption('isApplied');
-  togglePreinject(isApplied);
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
   checkRemove();
   setInterval(checkRemove, TIMEOUT_24HOURS);
+  if (ua.isChrome) {
+    // Using declarativeContent to run content scripts earlier than document_start
+    const api = global.chrome.declarativeContent;
+    api.onPageChanged.getRules(['inject'], rules => {
+      if (rules.length) return;
+      api.onPageChanged.addRules([{
+        id: 'inject',
+        conditions: [
+          new api.PageStateMatcher({
+            pageUrl: { urlContains: '://' }, // essentially like <all_urls>
+          }),
+        ],
+        actions: [
+          new api.RequestContentScript({
+            js: browser.runtime.getManifest().content_scripts[0].js,
+            // Not using `allFrames:true` as there's no improvement in frames
+          }),
+        ],
+      }]);
+    });
+  }
 });

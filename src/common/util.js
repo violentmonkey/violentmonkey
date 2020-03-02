@@ -1,5 +1,10 @@
 import { forEachEntry } from './object';
 
+// used in an unsafe context so we need to save the original functions
+const perfNow = performance.now.bind(performance);
+const { random, floor } = Math;
+export const { toString: numberToString } = Number.prototype;
+
 export function toString(param) {
   if (param == null) return '';
   return `${param}`;
@@ -28,17 +33,17 @@ export function debounce(func, time) {
   time = Math.max(0, +time || 0);
   function checkTime() {
     timer = null;
-    if (performance.now() >= startTime) callback();
+    if (perfNow() >= startTime) callback();
     else checkTimer();
   }
   function checkTimer() {
     if (!timer) {
-      const delta = startTime - performance.now();
+      const delta = startTime - perfNow();
       timer = setTimeout(checkTime, delta);
     }
   }
   function debouncedFunction(...args) {
-    startTime = performance.now() + time;
+    startTime = perfNow() + time;
     callback = () => {
       callback = null;
       func.apply(this, args);
@@ -52,7 +57,7 @@ export function throttle(func, time) {
   let lastTime = 0;
   time = Math.max(0, +time || 0);
   function throttledFunction(...args) {
-    const now = performance.now();
+    const now = perfNow();
     if (lastTime + time < now) {
       lastTime = now;
       func.apply(this, args);
@@ -67,8 +72,11 @@ export function getRnd4() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(-4);
 }
 
-export function getUniqId(prefix) {
-  return (prefix || '') + Date.now().toString(36) + getRnd4();
+export function getUniqId(prefix = 'VM') {
+  const now = perfNow();
+  return prefix
+    + floor((now - floor(now)) * 1e12)::numberToString(36)
+    + floor(random() * 1e12)::numberToString(36);
 }
 
 export function buffer2string(buf, offset = 0, length = 1e99) {

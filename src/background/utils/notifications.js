@@ -16,6 +16,9 @@ Object.assign(commands, {
     openers[notificationId] = srcTab.id;
     return notificationId;
   },
+  RemoveNotification(notificationId) {
+    return browser.notifications.clear(notificationId);
+  },
 });
 
 browser.notifications.onClicked.addListener((id) => {

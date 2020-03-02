@@ -1,4 +1,7 @@
-// cache native properties to avoid being overridden, see violentmonkey/violentmonkey#151
+// caching native properties to avoid being overridden, see violentmonkey/violentmonkey#151
+import { numberToString } from '#/common';
+import { assign, objectKeys } from '#/common/object';
+
 // Firefox sucks: `isFinite` is not defined on `window`, see violentmonkey/violentmonkey#300
 // eslint-disable-next-line no-restricted-properties
 export const {
@@ -9,23 +12,16 @@ export const {
 } = global;
 
 export const {
-  concat, filter, findIndex, forEach, includes, indexOf, join, map, push, shift,
+  concat, filter, findIndex, forEach, includes, indexOf, join, map, push,
   // arraySlice, // to differentiate from String::slice which we use much more often
 } = Array.prototype;
-
-export const {
-  keys: objectKeys, values: objectValues, entries: objectEntries,
-  assign, defineProperty, getOwnPropertyDescriptor: describeProperty,
-} = Object;
-export const {
-  charCodeAt, match, slice, replace,
-} = String.prototype;
+export const { charCodeAt, slice, replace } = String.prototype;
 export const { toString: objectToString } = Object.prototype;
-const { toString: numberToString } = Number.prototype;
 export const { fromCharCode } = String;
 export const { addEventListener, removeEventListener } = EventTarget.prototype;
 export const { append, remove, setAttribute } = Element.prototype;
-export const { createElementNS } = Document.prototype;
+export const DocProto = Document.prototype;
+export const { createElementNS } = DocProto;
 export const logging = assign({}, console);
 
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';

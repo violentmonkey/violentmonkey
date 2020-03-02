@@ -43,6 +43,7 @@ permissions:
   - unlimitedStorage
   - clipboardWrite
   - cookies
+  - declarativeContent
 commands:
   _execute_browser_action: {}
   dashboard:

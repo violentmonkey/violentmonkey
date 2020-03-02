@@ -1,4 +1,6 @@
+import { objectEntries } from '#/common/object';
 import { sendCmd } from '../utils';
+import { filter } from '../utils/helpers';
 import bridge from './bridge';
 
 const notifications = {};
@@ -7,6 +9,13 @@ bridge.addHandlers({
   async Notification(options, realm) {
     const nid = await sendCmd('Notification', options);
     notifications[nid] = { id: options.id, realm };
+  },
+  RemoveNotification(id) {
+    const nid = objectEntries(notifications)::filter(([, val]) => val.id === id)[0]?.[0];
+    if (nid) {
+      delete notifications[nid];
+      return sendCmd('RemoveNotification', nid);
+    }
   },
 });
 

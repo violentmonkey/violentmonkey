@@ -16,6 +16,9 @@ global.browser = {
       },
     },
   },
+  runtime: {
+    getURL: path => path,
+  },
 };
 
 const domProps = Object.getOwnPropertyDescriptors(new JSDOM('').window);

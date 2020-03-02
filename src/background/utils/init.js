@@ -1,3 +1,5 @@
+export const extensionRoot = browser.runtime.getURL('/');
+
 export const preInitialize = [];
 export const postInitialize = [];
 

@@ -1,7 +1,6 @@
 import { addEventListener } from './helpers';
 
-export { getUniqId } from '#/common';
-export { sendCmd, sendMessage, cache2blobUrl } from '#/common';
+export { sendCmd } from '#/common';
 
 const { CustomEvent } = global;
 const { dispatchEvent } = EventTarget.prototype;
