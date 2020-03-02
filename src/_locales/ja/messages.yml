@@ -458,7 +458,9 @@ msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: 更新を確認中…
 msgErrorFetchingResource:
-  description: Message shown when Violentmonkey fails fetching a resource/require/icon of the script.
+  description: >-
+    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    the script.
   message: リソースの取得中にエラーが発生しました!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
