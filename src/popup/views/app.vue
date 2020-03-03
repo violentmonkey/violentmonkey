@@ -48,7 +48,7 @@
       <code v-text="store.blacklisted" v-if="store.blacklisted" class="ellipsis inline-block"/>
     </div>
     <div
-      v-for="scope in store.injectable && injectionScopes"
+      v-for="scope in injectionScopes"
       class="menu menu-scripts"
       :class="{ expand: activeMenu === scope.name }"
       :data-type="scope.name"
@@ -146,9 +146,11 @@ export default {
       const { sort, enabledFirst, hideDisabled } = this.options.filtersPopup;
       const isSorted = sort === 'alpha' || enabledFirst;
       return [
-        ['scripts', i18n('menuMatchedScripts')],
+        store.injectable && ['scripts', i18n('menuMatchedScripts')],
         ['frameScripts', i18n('menuMatchedFrameScripts')],
-      ].map(([name, title]) => {
+      ]
+      .filter(Boolean)
+      .map(([name, title]) => {
         let list = this.store[name];
         const numTotal = list.length;
         const numEnabled = list.reduce((num, script) => num + script.config.enabled, 0);
