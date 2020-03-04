@@ -1,6 +1,7 @@
 import { i18n, noop } from '#/common';
 import ua from '#/common/ua';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
+import { objectPick } from '#/common/object';
 import { postInitialize } from './init';
 import { forEachTab } from './message';
 import { getOption, hookOptions } from './options';
@@ -8,16 +9,25 @@ import { testBlacklist } from './tester';
 
 // Firefox Android does not support such APIs, use noop
 
-const browserAction = [
-  'setIcon',
-  'setBadgeText',
-  'setBadgeBackgroundColor',
-  'setTitle',
-].reduce((actions, key) => {
-  const fn = browser.browserAction[key];
-  actions[key] = fn ? fn.bind(browser.browserAction) : noop;
-  return actions;
-}, {});
+const browserAction = (() => {
+  const api = browser.browserAction;
+  // Suppress the "no tab id" error when setting an icon/badge as it cannot be reliably prevented
+  const ignoreErrors = () => global.chrome.runtime.lastError;
+  // Some methods like setBadgeText added callbacks only in Chrome 67+.
+  const makeMethod = fn => (...args) => {
+    try {
+      api::fn(...args, ignoreErrors);
+    } catch (e) {
+      api::fn(...args);
+    }
+  };
+  return objectPick(api, [
+    'setIcon',
+    'setBadgeText',
+    'setBadgeBackgroundColor',
+    'setTitle',
+  ], fn => (fn ? makeMethod(fn) : noop));
+})();
 
 const badges = {};
 let isApplied;
