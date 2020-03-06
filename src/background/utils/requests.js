@@ -144,7 +144,7 @@ const HeaderInjector = (() => {
   };
 })();
 
-const CHUNK_SIZE = 64e6; // slightly less than 64MiB
+const CHUNK_SIZE = 30e6;
 
 function getChunk(response, index) {
   return buffer2string(response, index * CHUNK_SIZE, CHUNK_SIZE);
@@ -191,14 +191,16 @@ function xhrCallbackWrapper(req) {
       },
       type: evt.type,
     });
-    for (let i = 1; i < numChunks; i += 1) {
-      chainedCallback({
-        id,
-        chunk: getChunk(response, i),
-        isLastChunk: i === numChunks - 1,
-      });
+    if (!bufferSent) {
+      bufferSent = !!numChunks;
+      for (let i = 1; i < numChunks; i += 1) {
+        chainedCallback({
+          id,
+          chunk: getChunk(response, i),
+          isLastChunk: i === numChunks - 1,
+        });
+      }
     }
-    bufferSent = !!numChunks;
   };
 }
 
