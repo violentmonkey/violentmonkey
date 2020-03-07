@@ -202,3 +202,16 @@ export function request(url, options = {}) {
     }, extra);
   }
 }
+
+const SIMPLE_VALUE_TYPE = {
+  string: 's',
+  number: 'n',
+  boolean: 'b',
+};
+
+export function dumpScriptValue(value, jsonDump = JSON.stringify) {
+  if (value !== undefined) {
+    const simple = SIMPLE_VALUE_TYPE[typeof value];
+    return `${simple || 'o'}${simple ? value : jsonDump(value)}`;
+  }
+}

@@ -1,4 +1,4 @@
-import { cache2blobUrl, getUniqId, isEmpty } from '#/common';
+import { cache2blobUrl, dumpScriptValue, getUniqId, isEmpty } from '#/common';
 import { downloadBlob } from '#/common/download';
 import {
   defineProperty, objectEntries, objectKeys, objectPick, objectValues,
@@ -43,8 +43,7 @@ export function makeGmApi() {
     },
     GM_setValue(key, val) {
       const { id } = this;
-      const dumped = jsonDump(val);
-      const raw = dumped ? `o${dumped}` : null;
+      const raw = dumpScriptValue(val, jsonDump) || null;
       const values = loadValues(id);
       const oldRaw = values[key];
       values[key] = raw;

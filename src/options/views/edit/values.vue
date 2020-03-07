@@ -32,7 +32,10 @@
       <div class="flex mb-1">
         <h4 class="flex-auto" v-text="i18n('labelEditValue')"></h4>
         <div>
-          <button v-text="i18n('editValueSave')" @click="onSave"></button>
+          <button v-text="i18n('editValueSave')" @click="onSave"
+                  :class="{'has-error': current.error}"
+                  :title="current.error"
+                  :disabled="current.error"/>
           <button v-text="i18n('editValueCancel')" @click="onCancel"></button>
         </div>
       </div>
@@ -45,17 +48,29 @@
       <textarea class="flex-auto" v-model="current.value"
                 ref="value"
                 spellcheck="false"
+                @input="onChange"
                 @keydown.esc.exact.stop="onCancel"/>
     </div>
   </div>
 </template>
 
 <script>
-import { sendCmd } from '#/common';
+import { dumpScriptValue, sendCmd } from '#/common';
 import Icon from '#/common/ui/icon';
+import { showMessage } from '../../utils';
 
 const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;
+const MAX_JSON_DURATION = 10; // ms
+
+const reparseJson = (str) => {
+  try {
+    return JSON.stringify(JSON.parse(str), null, '  ');
+  } catch (e) {
+    // This shouldn't happen but the storage may get corrupted or modified directly
+    return str;
+  }
+};
 
 export default {
   props: ['show', 'script'],
@@ -109,6 +124,7 @@ export default {
       const type = value[0];
       value = value.slice(1);
       if (type === 's') value = JSON.stringify(value);
+      else if (!sliced) value = reparseJson(value);
       if (sliced && value.length > MAX_LENGTH) {
         value = value.slice(0, MAX_LENGTH);
       }
@@ -122,12 +138,12 @@ export default {
         this.page = 1;
       });
     },
-    updateValue({ key, value, isNew }) {
-      const rawValue = value ? `o${value}` : '';
+    updateValue({ key, isNew }) {
+      const rawValue = dumpScriptValue(this.current?.jsonValue) || '';
       const { id } = this.script.props;
       return sendCmd('UpdateValue', { id, key, value: rawValue })
       .then(() => {
-        if (value) {
+        if (rawValue) {
           this.$set(this.values, key, rawValue);
           if (isNew) this.keys.push(key);
         } else {
@@ -159,14 +175,38 @@ export default {
         value: this.getValue(key),
       };
     },
-    onSave() {
-      this.updateValue(this.current)
-      .then(() => {
-        this.current = null;
-      });
+    async onSave() {
+      const { current } = this;
+      if (current.jsonPaused) {
+        current.jsonPaused = false;
+        this.onChange();
+      }
+      if (current.error) {
+        const pos = +current.error.match(/position\s+(\d+)|$/)[1] || 0;
+        this.$refs.value.setSelectionRange(pos, pos + 1);
+        this.$refs.value.focus();
+        showMessage({ text: current.error });
+        return;
+      }
+      await this.updateValue(current);
+      this.current = null;
     },
     onCancel() {
       this.current = null;
+    },
+    onChange() {
+      const { current } = this;
+      current.error = null;
+      if (current.jsonPaused) return;
+      const t0 = performance.now();
+      const str = current.value.trim();
+      try {
+        current.jsonValue = str ? JSON.parse(str) : undefined;
+      } catch (e) {
+        current.error = e.message || e;
+        current.jsonValue = undefined;
+      }
+      current.jsonPaused = performance.now() - t0 > MAX_JSON_DURATION;
     },
   },
   created() {
