@@ -15,18 +15,20 @@ bridge.addHandlers({
 
 bridge.addBackgroundHandlers({
   HttpRequested(msg) {
-    const { id, numChunks, type } = msg;
+    const { id, isLastChunk, numChunks, type } = msg;
     const req = requests[id];
     if (req) {
       bridge.post('HttpRequested', msg, req.realm);
       // chunks may be sent in progress/load/loadend events
+      let { allChunks } = req;
       if (type === 'loadend') {
         req.ended = true;
-        req.allChunks = !numChunks || numChunks === 1;
-      } else {
-        req.allChunks = msg.isLastChunk;
+        allChunks = allChunks || !numChunks || numChunks === 1;
+      } else if (isLastChunk) {
+        allChunks = true;
       }
-      if (req.ended && req.allChunks) delete requests[id];
+      req.allChunks = allChunks;
+      if (req.ended && allChunks) delete requests[id];
     }
   },
 });
