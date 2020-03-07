@@ -10,7 +10,6 @@ export const changeHooks = {};
 
 const dataDecoders = {
   o: jsonLoad,
-  // deprecated
   n: Number,
   b: val => val === 'true',
 };

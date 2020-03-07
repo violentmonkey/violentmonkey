@@ -110,14 +110,6 @@ textarea {
   &:focus {
     border-color: var(--fill-7);
   }
-  &.has-error {
-    // reminder: make sure all colors are readable in light/dark schemes
-    border-color: #8008;
-    background: #f002;
-    &:focus {
-      border-color: #f008;
-    }
-  }
 }
 code {
   padding: 0 .2em;
@@ -345,6 +337,15 @@ body .vl-tooltip {
   padding: 1rem;
   background: var(--bg);
   box-shadow: 0 0 40px #000;
+}
+
+.has-error {
+  // reminder: make sure all colors are readable in light/dark schemes
+  border-color: #8008;
+  background: #f002;
+  &:focus {
+    border-color: #f008;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
