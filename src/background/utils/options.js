@@ -40,7 +40,11 @@ let initPending = browser.storage.local.get('options')
 preInitialize.push(initPending);
 
 function fireChange(keys, value) {
-  objectSet(changes, keys, value);
+  // Flattening key path so the subscribers can update nested values without overwriting the parent
+  const key = keys.join('.');
+  // Ensuring the correct order when updates were mixed like this: foo.bar=1; foo={bar:2}; foo.bar=3
+  delete changes[key];
+  changes[key] = value;
   callHooksLater();
 }
 
