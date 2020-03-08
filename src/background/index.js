@@ -49,7 +49,7 @@ Object.assign(commands, {
       const data = await getInjectedScripts(url, tab.id, frameId);
       addValueOpener(tab.id, frameId, data.withValueIds);
       setBadge(data.enabledIds, src);
-      Object.assign(res, data);
+      Object.assign(res, data.inject);
     }
     return res;
   },
