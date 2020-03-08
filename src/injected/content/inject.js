@@ -115,12 +115,10 @@ function inject(code) {
 function injectAll(realms, runAt) {
   realms::forEachEntry(([realm, realmData]) => {
     const isPage = realm === INJECT_PAGE;
-    let { info } = realmData;
-    realmData.info = undefined;
     realmData.lists::forEachEntry(([name, items]) => {
       if ((!isPage || name === runAt) && items.length) {
-        bridge.post('ScriptData', { info, items }, realm);
-        info = undefined;
+        bridge.post('ScriptData', { items, info: realmData.info }, realm);
+        realmData.info = undefined;
         items::forEach(item => {
           if (isPage) inject(item.code);
           item.code = '';
