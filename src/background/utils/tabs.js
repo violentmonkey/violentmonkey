@@ -13,17 +13,22 @@ Object.assign(commands, {
     const srcTab = src.tab || await getActiveTab() || {};
     // src.url may be absent when invoked directly as commands.TabOpen
     const isInternal = !src.url || src.url.startsWith(window.location.protocol);
-    const storeId = srcTab.cookieStoreId;
+    // only incognito storeId may be specified when opening in an incognito window
+    let storeId = srcTab.cookieStoreId;
+    const { incognito } = srcTab;
+    // Chrome can't open chrome-extension:// in incognito windows because VM uses `spanning` mode
+    const sameWindow = ua.isFirefox || !incognito;
+    storeId = storeId && !incognito && getContainerId(isInternal ? 0 : container) || storeId;
     const { id } = await browser.tabs.create({
       active: active !== false,
       pinned: !!pinned,
       url: isInternal || url.startsWith('blob:') ? url : getFullUrl(url, src.url),
-      windowId: srcTab.windowId,
-      ...storeId && { cookieStoreId: getContainerId(isInternal ? 0 : container) || storeId },
+      windowId: sameWindow ? srcTab.windowId : undefined,
+      ...storeId && { cookieStoreId: storeId },
       ...insert && { index: srcTab.index + 1 },
       // XXX openerTabId seems buggy on Chrome, https://crbug.com/967150
       // It seems to do nothing even set successfully with `browser.tabs.update`.
-      ...ua.openerTabIdSupported && { openerTabId: srcTab.id },
+      ...ua.openerTabIdSupported && sameWindow && { openerTabId: srcTab.id },
     });
     openers[id] = srcTab.id;
     return { id };
