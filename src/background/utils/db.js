@@ -254,7 +254,7 @@ const gmValues = [
 
 /**
  * @desc Get scripts to be injected to page with specific URL.
- * @return {Promise<{ cache, code, require, values, scripts, ids, enabledIds, withValueIds }>}
+ * @return {Promise<Object>}
  */
 export async function getScriptsByURL(url, isTop) {
   const allScripts = testBlacklist(url)
@@ -288,18 +288,20 @@ export async function getScriptsByURL(url, isTop) {
     storage.value.getMulti(withValueIds, {}),
     storage.code.getMulti(enabledIds),
   ]);
-  return Object.defineProperties({
-    cache,
+  return {
+    // these will be sent to injectScripts()
+    inject: {
+      cache,
+      ids,
+      scripts,
+    },
+    // these will be used only by bg/* and to augment the data above
     code,
-    ids,
+    enabledIds,
     require,
-    scripts,
     values,
-  }, {
-    // Hiding from the messaging API
-    enabledIds: { value: enabledIds },
-    withValueIds: { value: withValueIds },
-  });
+    withValueIds,
+  };
 }
 
 /** @return {string[]} */

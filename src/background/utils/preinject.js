@@ -92,14 +92,13 @@ function prolong({ url, frameId }) {
 
 async function prepare(url, isTop) {
   const data = await getScriptsByURL(url, isTop);
-  data.scripts = data.scripts.map(prepareScript, data);
-  data.injectInto = injectInto;
-  data.require = undefined;
+  data.inject.scripts.forEach(prepareScript, data);
+  data.inject.injectInto = injectInto;
   return data;
 }
 
 /** @this data */
-function prepareScript(script) {
+function prepareScript(script, index, scripts) {
   const { custom, meta, props } = script;
   const { id } = props;
   const { require, values } = this;
@@ -129,7 +128,7 @@ function prepareScript(script) {
   // Firefox lists .user.js among our own content scripts so a space at start will group them
   const sourceUrl = `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? ' ' : ''}${name}.user.js#${id}`;
   cache.put(dataKey, [slices, sourceUrl], TIME_KEEP_DATA);
-  return {
+  scripts[index] = {
     ...script,
     dataKey,
     code: isContent ? '' : [...slices, '(', dataKey, ')', sourceUrl].join(''),
