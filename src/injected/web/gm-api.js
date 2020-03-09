@@ -1,7 +1,6 @@
-import { cache2blobUrl, dumpScriptValue, getUniqId, isEmpty } from '#/common';
-import { downloadBlob } from '#/common/download';
+import { dumpScriptValue, getUniqId, isEmpty } from '#/common/util';
 import {
-  defineProperty, objectEntries, objectKeys, objectPick, objectValues,
+  assign, defineProperty, describeProperty, objectEntries, objectKeys, objectPick, objectValues,
 } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
@@ -12,12 +11,21 @@ import {
   decodeValue, dumpValue, loadValues, changeHooks,
 } from './gm-values';
 import {
-  atob, findIndex, indexOf, jsonDump, logging, slice, utf8decode, Error,
+  charCodeAt, jsonDump, logging, slice,
+  append, createElementNS, remove, setAttribute, NS_HTML,
 } from '../utils/helpers';
 
-const { getElementById } = Document.prototype;
-const { lastIndexOf } = String.prototype;
-
+const {
+  atob, setTimeout,
+  Blob, Error, TextDecoder, Uint8Array,
+  Array: { prototype: { findIndex, indexOf } },
+  Document: { prototype: { getElementById } },
+  HTMLElement: { prototype: { click } },
+  String: { prototype: { lastIndexOf } },
+  TextDecoder: { prototype: { decode: tdDecode } },
+  URL: { createObjectURL, revokeObjectURL },
+} = global;
+const { get: getDocElem } = describeProperty(Document.prototype, 'documentElement');
 const vmOwnFuncToString = () => '[Violentmonkey property]';
 export const vmOwnFunc = (func, toString) => {
   defineProperty(func, 'toString', { value: toString || vmOwnFuncToString });
@@ -90,30 +98,10 @@ export function makeGmApi() {
       if (isEmpty(keyHooks)) delete changeHooks[this.id];
     },
     GM_getResourceText(name) {
-      if (name in this.resources) {
-        const key = this.resources[name];
-        const raw = store.cache[this.pathMap[key] || key];
-        if (!raw) return;
-        const i = raw::lastIndexOf(',');
-        const lastPart = i < 0 ? raw : raw::slice(i + 1);
-        return utf8decode(atob(lastPart));
-      }
+      return getResource(this, name);
     },
     GM_getResourceURL(name) {
-      if (name in this.resources) {
-        const key = this.resources[name];
-        let blobUrl = this.urls[key];
-        if (!blobUrl) {
-          const raw = store.cache[this.pathMap[key] || key];
-          if (raw) {
-            blobUrl = cache2blobUrl(raw);
-            this.urls[key] = blobUrl;
-          } else {
-            blobUrl = key;
-          }
-        }
-        return blobUrl;
-      }
+      return getResource(this, name, true);
     },
     GM_registerMenuCommand(cap, func) {
       const { id } = this;
@@ -129,25 +117,24 @@ export function makeGmApi() {
       bridge.post('UnregisterMenu', [id, cap]);
     },
     GM_download(arg1, name) {
-      const opts = typeof arg1 === 'string' ? { url: arg1, name } : arg1;
-      if (!opts || !opts.url) throw new Error('GM_download: Invalid parameter!');
-      return onRequestCreate({
+      // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
+      const opts = assign({
         method: 'GET',
         responseType: 'blob',
         overrideMimeType: 'application/octet-stream',
-        onload: res => downloadBlob(res.response, opts.name, () => opts.onload?.(res)),
-        ...objectPick(opts, [
-          'url',
-          'headers',
-          'timeout',
-          'onerror',
-          'onprogress',
-          'ontimeout',
-        ]),
-      }, this.id);
+        onload: downloadBlob,
+      }, objectPick(typeof arg1 === 'string' ? { url: arg1, name } : arg1, [
+        'url',
+        'headers',
+        'timeout',
+        'onerror',
+        'onprogress',
+        'ontimeout',
+      ]));
+      opts.context = opts;
+      return onRequestCreate(opts, this.id);
     },
     GM_xmlhttpRequest(opts) {
-      if (!opts || !opts.url) throw new Error('GM_xmlhttpRequest: Invalid parameter!');
       return onRequestCreate(opts, this.id);
     },
     GM_addStyle(css) {
@@ -204,4 +191,49 @@ export function makeGmApi() {
     setClipboard: true,
     addStyle: true, // gm4-polyfill.js sets it anyway
   }];
+}
+
+function getResource(context, name, isBlob) {
+  const key = context.resources[name];
+  if (key) {
+    let res = isBlob && context.urls[key];
+    if (!res) {
+      const raw = store.cache[context.pathMap[key] || key];
+      if (raw) {
+        const dataPos = raw::lastIndexOf(',');
+        const bin = atob(dataPos < 0 ? raw : raw::slice(dataPos + 1));
+        const len = bin.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i += 1) {
+          bytes[i] = bin::charCodeAt(i);
+        }
+        if (isBlob) {
+          const type = dataPos < 0 ? '' : raw::slice(0, dataPos);
+          res = createObjectURL(new Blob([bytes], { type }));
+          context.urls[key] = res;
+        } else {
+          res = new TextDecoder()::tdDecode(bytes);
+        }
+      } else if (isBlob) {
+        res = key;
+      }
+    }
+    return res;
+  }
+}
+
+function downloadBlob(res) {
+  const { context: { name, onload }, response } = res;
+  const url = createObjectURL(response);
+  const a = document::createElementNS(NS_HTML, 'a');
+  a::setAttribute('hidden', '');
+  a::setAttribute('href', url);
+  if (name) a::setAttribute('download', name);
+  document::getDocElem()::append(a);
+  a::click();
+  setTimeout(() => {
+    a::remove(a);
+    revokeObjectURL(url);
+    onload?.(res);
+  }, 3000);
 }

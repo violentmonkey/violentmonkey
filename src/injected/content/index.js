@@ -36,7 +36,7 @@ const { split } = String.prototype;
   if (data.scripts) injectScripts(contentId, webId, data, isXml);
   isPopupShown = data.isPopupShown;
   sendSetPopup();
-})();
+})().catch(!global.chrome.app && console.error); // Firefox can't show exceptions in content scripts
 
 bridge.addBackgroundHandlers({
   Command(data) {

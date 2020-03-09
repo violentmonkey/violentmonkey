@@ -1,33 +1,32 @@
-import { hasOwnProperty as has } from '#/common';
+import { hasOwnProperty } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
-import { defineProperty, describeProperty, objectKeys } from '#/common/object';
+import { assign, defineProperty, describeProperty, objectKeys } from '#/common/object';
 import bridge from './bridge';
 import {
-  concat, filter, forEach, includes, indexOf, map, push, slice,
+  filter, forEach, includes, map, slice,
   replace, addEventListener, removeEventListener,
 } from '../utils/helpers';
 import { makeGmApi, vmOwnFunc } from './gm-api';
 
-const { Proxy } = global;
-const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
-const { splice } = Array.prototype;
-const { startsWith } = String.prototype;
+const {
+  Proxy,
+  Set, // 2x-3x faster lookup than object::has
+  Symbol: { toStringTag, iterator: iterSym },
+  Array: { prototype: { concat, slice: arraySlice } },
+  Function: { prototype: { bind } }, // function won't be stepped-into when debugging
+  Map: { prototype: { get: mapGet, has: mapHas, [iterSym]: mapIter } },
+  Set: { prototype: { delete: setDelete, has: setHas, [iterSym]: setIter } },
+  Object: { getOwnPropertyNames, getOwnPropertySymbols },
+  String: { prototype: { startsWith } },
+} = global;
 
 let gmApi;
 let gm4Api;
 let componentUtils;
 let windowClose;
-const { toStringTag } = Symbol;
 const vmSandboxedFuncToString = nativeFunc => () => (
   `${nativeFunc}`::replace('native code', 'Violentmonkey sandbox')
 );
-
-export function deletePropsCache() {
-  // let GC sweep the no longer necessary stuff
-  gmApi = null;
-  gm4Api = null;
-  componentUtils = null;
-}
 
 export function wrapGM(script) {
   // Add GM functions
@@ -39,15 +38,17 @@ export function wrapGM(script) {
   const id = script.props.id;
   const resources = script.meta.resources || {};
   const gmInfo = makeGmInfo(script, resources);
-  const gm = {
-    GM: { info: gmInfo },
-    GM_info: gmInfo,
-    unsafeWindow: global,
-    ...componentUtils || (componentUtils = makeComponentUtils()),
-    ...grant::includes('window.close') && windowClose || (windowClose = {
+  const gm = assign( // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
+    {
+      GM: { info: gmInfo },
+      GM_info: gmInfo,
+      unsafeWindow: global,
+    },
+    componentUtils || (componentUtils = makeComponentUtils()),
+    grant::includes('window.close') && windowClose || (windowClose = {
       close: vmOwnFunc(() => bridge.post('TabClose')),
     }),
-  };
+  );
   const context = {
     id,
     script,
@@ -78,12 +79,13 @@ function makeGmInfo(script, resources) {
     scriptHandler: 'Violentmonkey',
     version: process.env.VM_VER,
     injectInto: bridge.mode,
-    platform: { ...bridge.ua },
+    platform: assign({}, bridge.ua),
     script: {
       description: meta.description || '',
-      excludes: [...meta.exclude],
-      includes: [...meta.include],
-      matches: [...meta.match],
+      // using ::slice since array spreading can be broken via Array.prototype[Symbol.iterator]
+      excludes: meta.exclude::arraySlice(),
+      includes: meta.include::arraySlice(),
+      matches: meta.match::arraySlice(),
       name: meta.name || '',
       namespace: meta.namespace || '',
       resources: objectKeys(resources)::map(name => ({
@@ -102,66 +104,107 @@ function makeGmMethodCaller(gmMethod, context, isAsync) {
   return gmMethod === gmApi.GM_log ? gmMethod : vmOwnFunc(
     isAsync
       ? (async (...args) => context::gmMethod(...args))
-      : ((...args) => context::gmMethod(...args)),
+      : gmMethod::bind(context),
   );
 }
 
-// https://html.spec.whatwg.org/multipage/window-object.html#the-window-object
-// https://w3c.github.io/webappsec-secure-contexts/#monkey-patching-global-object
-// https://compat.spec.whatwg.org/#windoworientation-interface
-const readonlyGlobals = [
+const globalKeys = getOwnPropertyNames(window).filter(key => !isFrameIndex(key, true));
+/* Chrome and FF page mode: `global` is `window`
+   FF content mode: `global` is different, some props e.g. `isFinite` are defined only there */
+if (global !== window) {
+  const set = new Set(globalKeys);
+  getOwnPropertyNames(global).forEach(key => {
+    if (!isFrameIndex(key) && !set.has(key)) {
+      globalKeys.push(key);
+    }
+  });
+}
+const inheritedKeys = new Set([
+  ...getOwnPropertyNames(EventTarget.prototype),
+  ...getOwnPropertyNames(Object.prototype),
+]);
+inheritedKeys.has = setHas;
+
+/* These can be redefined but can't be assigned, see sandbox-globals.html */
+const readonlyKeys = [
   'applicationCache',
+  'caches',
   'closed',
+  'crossOriginIsolated',
+  'crypto',
   'customElements',
   'frameElement',
   'history',
+  'indexedDB',
   'isSecureContext',
+  'localStorage',
+  'mozInnerScreenX',
+  'mozInnerScreenY',
   'navigator',
-  'orientation',
+  'sessionStorage',
+  'speechSynthesis',
   'styleMedia',
-];
-// https://html.spec.whatwg.org/multipage/window-object.html
-// https://w3c.github.io/webappsec-trusted-types/dist/spec/#extensions-to-the-window-interface
-const unforgeableGlobals = [
+  'trustedTypes',
+].filter(key => key in global); // not using global[key] as some of these (caches) may throw
+
+/* These can't be redefined, see sandbox-globals.html */
+const unforgeables = new Map([
+  'Infinity',
+  'NaN',
   'document',
   'location',
   'top',
-  'trustedTypes',
+  'undefined',
   'window',
-];
-// the index strings that look exactly like integers can't be forged
-// but for example '011' doesn't look like 11 so it's allowed
-const isUnforgeableFrameIndex = name => typeof name !== 'symbol' && /^(0|[1-9]\d+)$/.test(name);
-// These can't run with an arbitrary object in `this` such as our wrapper
-// https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects
-// https://developer.mozilla.org/docs/Web/API/Window
-const boundGlobals = [
+].map(name => {
+  let thisObj;
+  const info = (
+    describeProperty(thisObj = global, name)
+    || describeProperty(thisObj = window, name)
+  );
+  // currently only one key is bound: `document`
+  if (info?.get) info.get = info.get::bind(thisObj);
+  return info && [name, info];
+}).filter(Boolean));
+unforgeables.has = mapHas;
+unforgeables[iterSym] = mapIter;
+
+/* ~50 methods like alert/fetch/moveBy that need `window` as `this`, see sandbox-globals.html */
+const boundMethods = new Map([
   'addEventListener',
   'alert',
   'atob',
   'blur',
   'btoa',
+  'cancelAnimationFrame',
+  'cancelIdleCallback',
+  'captureEvents',
   'clearInterval',
   'clearTimeout',
   'close',
   'confirm',
+  'createImageBitmap',
   'dispatchEvent',
+  'dump',
   'fetch',
   'find',
   'focus',
   'getComputedStyle',
-  'getDefaultComputedStyle', // Non-standard, Firefox only, used by jQuery
+  'getDefaultComputedStyle',
   'getSelection',
   'matchMedia',
   'moveBy',
   'moveTo',
   'open',
-  'openDialog',
+  'openDatabase',
   'postMessage',
   'print',
   'prompt',
+  'queueMicrotask',
+  'releaseEvents',
   'removeEventListener',
   'requestAnimationFrame',
+  'requestIdleCallback',
   'resizeBy',
   'resizeTo',
   'scroll',
@@ -170,23 +213,43 @@ const boundGlobals = [
   'scrollByPages',
   'scrollTo',
   'setInterval',
+  'setResizable',
   'setTimeout',
+  'sizeToContent',
   'stop',
-];
-const boundGlobalsRunner = (func, thisArg) => (...args) => thisArg::func(...args);
+  'updateCommands',
+  'webkitCancelAnimationFrame',
+  'webkitRequestAnimationFrame',
+  'webkitRequestFileSystem',
+  'webkitResolveLocalFileSystemURL',
+]
+.map((key) => {
+  const value = global[key];
+  return typeof value === 'function' && [
+    key,
+    vmOwnFunc(value::bind(global), vmSandboxedFuncToString(value)),
+  ];
+})
+.filter(Boolean));
+boundMethods.get = mapGet;
+
 /**
  * @desc Wrap helpers to prevent unexpected modifications.
  */
 function makeGlobalWrapper(local) {
   const events = {};
-  const deleted = []; // using an array to skip building it in ownKeys()
   const scopeSym = Symbol.unscopables;
-  /*
-   - Chrome, `global === window`
-   - Firefox, `global` is a sandbox, `global.window === window`:
-     - some properties (like `isFinite`) are defined in `global` but not `window`
-     - all `window` properties can be accessed from `global`
-  */
+  const globals = new Set(globalKeys);
+  globals[iterSym] = setIter;
+  globals.delete = setDelete;
+  globals.has = setHas;
+  const readonlys = new Set(readonlyKeys);
+  readonlys.delete = setDelete;
+  readonlys.has = setHas;
+  local.has = hasOwnProperty;
+  for (const [name, desc] of unforgeables) {
+    defineProperty(local, name, desc);
+  }
   if (bridge.isFirefox) {
     // Firefox returns [object Object] so jQuery libs see our `window` proxy as a plain
     // object and try to clone its recursive properties like `self` and `window`.
@@ -194,103 +257,81 @@ function makeGlobalWrapper(local) {
     defineProperty(local, toStringTag, { get: () => 'Window' });
   }
   const wrapper = new Proxy(local, {
-    defineProperty(_, name, info) {
-      if (typeof name !== 'symbol'
-      && (unforgeableGlobals::includes(name) || isUnforgeableFrameIndex(name))) return false;
-      defineProperty(local, name, info);
-      if (typeof name === 'string' && name::startsWith('on')) {
-        setEventHandler(name::slice(2));
+    defineProperty(_, name, desc) {
+      const isString = typeof name === 'string';
+      if (!isFrameIndex(name, isString)) {
+        defineProperty(local, name, desc);
+        if (isString) maybeSetEventHandler(name);
+        readonlys.delete(name);
       }
-      undelete(name);
       return true;
     },
     deleteProperty(_, name) {
-      if (unforgeableGlobals::includes(name)) return false;
-      if (isUnforgeableFrameIndex(name) || deleted::includes(name)) return true;
-      if (global::has(name)) deleted::push(name);
-      return delete local[name];
+      return !unforgeables.has(name)
+        && delete local[name]
+        && globals.delete(name);
     },
     get(_, name) {
-      const value = local[name];
-      return value !== undefined || name === scopeSym || deleted::includes(name) || local::has(name)
-        ? value
-        : resolveProp(name);
-    },
-    getOwnPropertyDescriptor(_, name) {
-      if (!deleted::includes(name)) {
-        const ownDesc = describeProperty(local, name);
-        const desc = ownDesc || describeProperty(global, name);
-        if (!desc) return;
-        if (desc.value === window) desc.value = wrapper;
-        // preventing spec violation by duplicating ~10 props like NaN, Infinity, etc.
-        if (!ownDesc && !desc.configurable) {
-          const { get } = desc;
-          if (typeof get === 'function') {
-            desc.get = (...args) => global::get(...args);
-          }
-          defineProperty(local, name, desc);
-        }
-        return desc;
+      if (name !== 'undefined' && name !== scopeSym) {
+        const value = local[name];
+        return value !== undefined || local.has(name)
+          ? value
+          : resolveProp(name);
       }
     },
+    getOwnPropertyDescriptor(_, name) {
+      const ownDesc = describeProperty(local, name);
+      const desc = ownDesc || globals.has(name) && describeProperty(global, name);
+      if (desc && desc.value === window) desc.value = wrapper;
+      return desc;
+    },
     has(_, name) {
-      return local::has(name)
-        || !deleted::includes(name) && global::has(name);
+      return name === 'undefined' || local.has(name) || globals.has(name);
     },
     ownKeys() {
-      return []::concat(
-        ...filterGlobals(getOwnPropertyNames),
-        ...filterGlobals(getOwnPropertySymbols),
+      return [...globals]::concat(
+        // using ::concat since array spreading can be broken via Array.prototype[Symbol.iterator]
+        getOwnPropertyNames(local)::filter(notIncludedIn, globals),
+        getOwnPropertySymbols(local)::filter(notIncludedIn, globals),
       );
     },
     preventExtensions() {},
     set(_, name, value) {
-      if (unforgeableGlobals::includes(name)) return false;
-      undelete(name);
-      if (readonlyGlobals::includes(name) || isUnforgeableFrameIndex(name)) return true;
-      local[name] = value;
-      if (typeof name === 'string' && name::startsWith('on') && window::has(name)) {
-        setEventHandler(name::slice(2), value);
+      const isString = typeof name === 'string';
+      if (!readonlys.has(name) && !isFrameIndex(name, isString)) {
+        local[name] = value;
+        if (isString) maybeSetEventHandler(name, value);
       }
       return true;
     },
   });
-  function filterGlobals(describer) {
-    const globalKeys = describer(global);
-    const localKeys = describer(local);
-    return [
-      deleted.length
-        ? globalKeys::filter(key => !deleted::includes(key))
-        : globalKeys,
-      localKeys::filter(key => !globalKeys::includes(key)),
-    ];
-  }
   function resolveProp(name) {
-    let value = global[name];
+    let value = boundMethods.get(name);
+    const canCopy = value || inheritedKeys.has(name) || globals.has(name);
+    if (!value && (canCopy || isFrameIndex(name, typeof name === 'string'))) {
+      value = global[name];
+    }
     if (value === window) {
       value = wrapper;
-    } else if (boundGlobals::includes(name)) {
-      value = vmOwnFunc(
-        boundGlobalsRunner(value, global),
-        vmSandboxedFuncToString(value),
-      );
+    }
+    if (canCopy && (typeof value === 'function' || typeof value === 'object' && value)) {
       local[name] = value;
     }
     return value;
   }
-  function setEventHandler(name, value) {
+  function maybeSetEventHandler(name, value) {
+    if (!name::startsWith('on') || !globals.has(name)) {
+      return;
+    }
+    name = name::slice(2);
     window::removeEventListener(name, events[name]);
     if (typeof value === 'function') {
       // the handler will be unique so that one script couldn't remove something global
       // like console.log set by another script
-      window::addEventListener(name, events[name] = boundGlobalsRunner(value, window));
+      window::addEventListener(name, events[name] = value::bind(window));
     } else {
       delete events[name];
     }
-  }
-  function undelete(name) {
-    const i = deleted::indexOf(name);
-    if (i >= 0) deleted::splice(i, 1);
   }
   return wrapper;
 }
@@ -318,4 +359,15 @@ function makeComponentUtils() {
       },
     ),
   };
+}
+
+/* The index strings that look exactly like integers can't be forged
+   but for example '011' doesn't look like 11 so it's allowed */
+function isFrameIndex(key, isString) {
+  return isString && key >= 0 && key <= 0xFFFF_FFFE && key === `${+key}`;
+}
+
+/** @this {Set} */
+function notIncludedIn(key) {
+  return !this.has(key);
 }
