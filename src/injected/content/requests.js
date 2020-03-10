@@ -1,12 +1,16 @@
 import { sendCmd } from '../utils';
+import { includes } from '../utils/helpers';
 import bridge from './bridge';
+
+const { fetch } = global;
+const { arrayBuffer: getArrayBuffer, blob: getBlob } = Response.prototype;
 
 const requests = {};
 
 bridge.addHandlers({
-  async GetRequestId(eventsToNotify, realm) {
+  async GetRequestId({ eventsToNotify, wantsBlob }, realm) {
     const id = await sendCmd('GetRequestId', eventsToNotify);
-    requests[id] = { realm };
+    requests[id] = { eventsToNotify, realm, wantsBlob };
     return id;
   },
   HttpRequest: sendCmd,
@@ -14,21 +18,46 @@ bridge.addHandlers({
 });
 
 bridge.addBackgroundHandlers({
-  HttpRequested(msg) {
-    const { id, isLastChunk, numChunks, type } = msg;
+  async HttpRequested(msg) {
+    const { id, numChunks, type } = msg;
     const req = requests[id];
-    if (req) {
-      bridge.post('HttpRequested', msg, req.realm);
-      // chunks may be sent in progress/load/loadend events
-      let { allChunks } = req;
-      if (type === 'loadend') {
-        req.ended = true;
-        allChunks = allChunks || !numChunks || numChunks === 1;
-      } else if (isLastChunk) {
-        allChunks = true;
-      }
-      req.allChunks = allChunks;
-      if (req.ended && allChunks) delete requests[id];
+    if (!req) return;
+    const isLoadEnd = type === 'loadend';
+    // only CONTENT realm can read blobs from an extension:// URL
+    const url = msg.chunkType === 'blob'
+      && !req.response
+      && req.eventsToNotify::includes(type)
+      && msg.data.response;
+    // messages will come while blob is fetched so we'll temporarily store the Promise
+    if (url) {
+      req.response = importBlob(url, req);
     }
+    // ...which can be awaited in these subsequent messages
+    if (req.response?.then) {
+      req.response = await req.response;
+    }
+    // ...and make sure loadend's bridge.post() runs last
+    if (isLoadEnd) {
+      await 0;
+    }
+    if (url) {
+      msg.data.response = req.response;
+    }
+    bridge.post('HttpRequested', msg, req.realm);
+    let { allChunks } = req;
+    if (isLoadEnd) {
+      req.ended = true;
+      allChunks = allChunks || !numChunks || numChunks === 1;
+    } else if (msg.isLastChunk) {
+      allChunks = true;
+    }
+    req.allChunks = allChunks;
+    if (req.ended && allChunks) delete requests[id];
   },
 });
+
+async function importBlob(url, { wantsBlob }) {
+  const data = await (await fetch(url))::(wantsBlob ? getBlob : getArrayBuffer)();
+  sendCmd('RevokeBlob', url);
+  return data;
+}
