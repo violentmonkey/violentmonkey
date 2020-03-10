@@ -5,7 +5,6 @@ import { forEachEntry, objectPick } from '#/common/object';
 import ua from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
-import { getScriptById } from './db';
 import { extensionRoot } from './init';
 import { commands } from './message';
 
@@ -38,6 +37,13 @@ Object.assign(commands, {
     if (req) {
       req.xhr.abort();
       clearRequest(req);
+    }
+  },
+  RevokeBlob(url) {
+    const timer = cache.pop(`xhrBlob:${url}`);
+    if (timer) {
+      clearTimeout(timer);
+      URL.revokeObjectURL(url);
     }
   },
 });
@@ -144,59 +150,79 @@ const HeaderInjector = (() => {
   };
 })();
 
-const CHUNK_SIZE = 30e6;
-
-function getChunk(response, index) {
-  return buffer2string(response, index * CHUNK_SIZE, CHUNK_SIZE);
-}
-
-function getResponseText(xhr) {
-  try {
-    return xhr.responseText;
-  } catch (e) {
-    // ignore if responseText is unreachable
-  }
-}
-
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
-  let bufferSent;
   let contentType;
   let numChunks;
-  const { id, isBuffer, xhr } = req;
+  let response;
+  let responseSent;
+  let responseTextSent;
+  let responseHeaders;
+  const { id, chunkType, xhr } = req;
+  // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
+  const chunkSize = 64e6 / 4;
+  const isBlob = chunkType === 'blob';
+  const getChunk = isBlob
+    ? () => {
+      const url = URL.createObjectURL(response);
+      cache.put(`xhrBlob:${url}`, setTimeout(commands.RevokeBlob, 60e3, url), 61e3);
+      return url;
+    }
+    : index => buffer2string(response, index * chunkSize, chunkSize);
+  const getResponseHeaders = () => {
+    const headers = req.responseHeaders || xhr.getAllResponseHeaders();
+    if (responseHeaders !== headers) {
+      responseHeaders = headers;
+      return { responseHeaders };
+    }
+  };
+  const getResponseText = () => {
+    try {
+      const text = xhr.responseText;
+      responseTextSent = !!text;
+      return { responseText: text === response ? ['same'] : text };
+    } catch (e) {
+      // ignore if responseText is unreachable
+    }
+  };
   const chainedCallback = (msg) => {
     lastPromise = lastPromise.then(() => req.cb(msg));
   };
   return (evt) => {
-    if (evt.type === 'loadend') clearRequest(req);
+    const type = evt.type;
+    if (type === 'loadend') clearRequest(req);
     if (!req.cb) return;
-    const { response } = xhr;
-    if (isBuffer && response && !numChunks) {
-      numChunks = Math.ceil(response.byteLength / CHUNK_SIZE) || 1;
+    if (!contentType) {
+      contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream';
     }
+    if (!response) {
+      response = xhr.response;
+    }
+    if (!numChunks && chunkType && response) {
+      numChunks = !isBlob && Math.ceil(response.byteLength / chunkSize) || 1;
+    }
+    const shouldNotify = req.eventsToNotify.includes(type);
     chainedCallback({
+      contentType,
       id,
+      chunkType,
       numChunks,
-      contentType: contentType
-        || (contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream'),
-      data: !req.eventsToNotify.includes(evt.type) ? {} : {
+      type,
+      data: shouldNotify && {
         finalUrl: xhr.responseURL,
-        readyState: xhr.readyState,
-        responseHeaders: req.responseHeaders || xhr.getAllResponseHeaders(),
-        status: xhr.status,
-        statusText: xhr.statusText,
-        response: numChunks && !bufferSent ? getChunk(response, 0) : response,
-        responseText: getResponseText(xhr),
+        ...getResponseHeaders(),
+        ...objectPick(xhr, ['readyState', 'status', 'statusText']),
+        ...!responseSent && { response: numChunks ? getChunk(0) : response },
+        ...!responseTextSent && getResponseText(xhr),
         ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
       },
-      type: evt.type,
     });
-    if (!bufferSent) {
-      bufferSent = !!numChunks;
+    if (!responseSent && shouldNotify) {
+      responseSent = !!response;
       for (let i = 1; i < numChunks; i += 1) {
         chainedCallback({
           id,
-          chunk: getChunk(response, i),
+          chunk: getChunk(i),
           isLastChunk: i === numChunks - 1,
         });
       }
@@ -216,64 +242,53 @@ function isSpecialHeader(lowerHeader) {
  * @param {function} cb
  */
 async function httpRequest(details, src, cb) {
-  const {
-    anonymous, data, headers, id, isBuffer, method,
-    overrideMimeType, password, timeout, url, user,
-  } = details;
+  const { id, chunkType, overrideMimeType, url } = details;
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;
-  req.anonymous = anonymous;
-  req.isBuffer = isBuffer;
+  req.anonymous = details.anonymous;
+  req.chunkType = chunkType && src.tab.incognito ? 'arraybuffer' : chunkType;
   const { xhr } = req;
-  try {
-    const vmHeaders = [];
-    // Firefox doesn't send cookies,
-    // https://github.com/violentmonkey/violentmonkey/issues/606
-    let shouldSendCookies = ua.isFirefox && !anonymous;
-    xhr.open(method, url, true, user || '', password || '');
-    xhr.setRequestHeader(VM_VERIFY, id);
-    if (headers) {
-      headers::forEachEntry(([name, value]) => {
-        const lowerName = name.toLowerCase();
-        if (isSpecialHeader(lowerName)) {
-          vmHeaders.push({ name, value });
-        } else if (!lowerName.startsWith('vm-')) {
-          // `VM-` headers are reserved
-          xhr.setRequestHeader(name, value);
-        }
-        if (lowerName === 'cookie') {
-          shouldSendCookies = false;
-        }
+  const vmHeaders = [];
+  // Firefox doesn't send cookies,
+  // https://github.com/violentmonkey/violentmonkey/issues/606
+  let shouldSendCookies = ua.isFirefox && !details.anonymous;
+  xhr.open(details.method, url, true, details.user || '', details.password || '');
+  xhr.setRequestHeader(VM_VERIFY, id);
+  details.headers::forEachEntry(([name, value]) => {
+    const lowerName = name.toLowerCase();
+    if (isSpecialHeader(lowerName)) {
+      vmHeaders.push({ name, value });
+    } else if (!lowerName.startsWith('vm-')) {
+      // `VM-` headers are reserved
+      xhr.setRequestHeader(name, value);
+    }
+    if (lowerName === 'cookie') {
+      shouldSendCookies = false;
+    }
+  });
+  xhr.responseType = req.chunkType || 'text';
+  xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, details.timeout)) || 0;
+  if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
+  if (shouldSendCookies) {
+    const cookies = await browser.cookies.getAll({
+      url,
+      storeId: src.tab.cookieStoreId,
+      ...ua.isFirefox >= 59 && { firstPartyDomain: null },
+    });
+    if (cookies.length) {
+      req.noNativeCookie = true;
+      vmHeaders.push({
+        name: 'cookie',
+        value: cookies.map(c => `${c.name}=${c.value};`).join(' '),
       });
     }
-    if (timeout) xhr.timeout = timeout;
-    if (isBuffer) xhr.responseType = 'arraybuffer';
-    if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
-    if (shouldSendCookies) {
-      const cookies = await browser.cookies.getAll({
-        url,
-        storeId: src.tab.cookieStoreId,
-        ...ua.isFirefox >= 59 && { firstPartyDomain: null },
-      });
-      if (cookies.length) {
-        req.noNativeCookie = true;
-        vmHeaders.push({
-          name: 'cookie',
-          value: cookies.map(c => `${c.name}=${c.value};`).join(' '),
-        });
-      }
-    }
-    const callback = xhrCallbackWrapper(req);
-    req.eventsToNotify.forEach(evt => { xhr[`on${evt}`] = callback; });
-    xhr.onloadend = callback; // always send it for the internal cleanup
-    const body = data ? decodeBody(data) : null;
-    HeaderInjector.add(id, vmHeaders);
-    xhr.send(body);
-  } catch (e) {
-    const { scriptId } = req;
-    console.warn(e, `in script id ${scriptId}, ${getScriptById(scriptId).meta.name}`);
   }
+  HeaderInjector.add(id, vmHeaders);
+  const callback = xhrCallbackWrapper(req);
+  req.eventsToNotify.forEach(evt => { xhr[`on${evt}`] = callback; });
+  xhr.onloadend = callback; // always send it for the internal cleanup
+  xhr.send(details.data ? decodeBody(details.data) : null);
 }
 
 function clearRequest(req) {

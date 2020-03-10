@@ -10,6 +10,7 @@ const idMap = {};
 
 const { DOMParser } = global;
 const { parseFromString } = DOMParser.prototype;
+const { then } = Promise.prototype;
 const { toLowerCase } = String.prototype;
 const { get: getHref } = describeProperty(HTMLAnchorElement.prototype, 'href');
 
@@ -31,18 +32,20 @@ export function onRequestCreate(details, scriptId) {
     },
   };
   details.url = getFullUrl(details.url);
-  const eventsToNotify = [
-    'abort',
-    'error',
-    'load',
-    'loadend',
-    'loadstart',
-    'progress',
-    'readystatechange',
-    'timeout',
-  ]::filter(e => typeof details[`on${e}`] === 'function');
-  bridge.send('GetRequestId', eventsToNotify)
-  .then(id => start(req, id));
+  bridge.send('GetRequestId', {
+    eventsToNotify: [
+      'abort',
+      'error',
+      'load',
+      'loadend',
+      'loadstart',
+      'progress',
+      'readystatechange',
+      'timeout',
+    ]::filter(e => typeof details[`on${e}`] === 'function'),
+    wantsBlob: details.responseType === 'blob',
+  })
+  ::then(id => start(req, id));
   return req.req;
 }
 
@@ -55,8 +58,8 @@ function parseData(response, msg, details) {
     const type = msg.contentType.split(';', 1)[0] || 'text/html';
     return new DOMParser()::parseFromString(response, type);
   }
-  // arraybuffer, blob
-  if (msg.numChunks) {
+  // arraybuffer/blob in incognito tabs is transferred as ArrayBuffer encoded in string chunks
+  if (msg.chunkType === 'arraybuffer') {
     const len = response.length;
     const arr = new Uint8Array(len);
     for (let i = 0; i < len; i += 1) arr[i] = response::charCodeAt(i);
@@ -64,34 +67,51 @@ function parseData(response, msg, details) {
       ? new Blob([arr], { type: msg.contentType })
       : arr.buffer;
   }
-  // text
+  // text, blob, arraybuffer
   return response;
 }
 
 // request object functions
 async function callback(req, msg) {
   if (msg.chunk) return receiveChunk(req, msg);
-  if (req.promise) await req.promise;
-  const cb = (req.details)[`on${msg.type}`];
+  const { chunksPromise, details } = req;
+  const cb = details[`on${msg.type}`];
+  if (chunksPromise) {
+    await chunksPromise;
+  }
   if (cb) {
-    const { data, numChunks } = msg;
-    const { response } = data;
-    if (response && !('rawResponse' in req) && (req.details.responseType || 'text') !== 'text') {
-      req.rawResponse = numChunks > 1
-        ? await receiveAllChunks(req, response, numChunks)
+    const { data } = msg;
+    const {
+      response,
+      responseHeaders: headers,
+      responseText: text,
+    } = data;
+    const isRawResponse = !('rawResponse' in req)
+      && (details.responseType || 'text') !== 'text'
+      && response;
+    if (isRawResponse) {
+      req.rawResponse = msg.numChunks > 1
+        ? receiveAllChunks(req, response, msg.numChunks)
         : response;
+    }
+    if (req.rawResponse?.then) {
+      req.rawResponse = await req.rawResponse;
     }
     if ('rawResponse' in req) {
       defineProperty(data, 'response', {
         configurable: true,
         get() {
-          const value = parseData(req.rawResponse, msg, req.details);
+          const value = parseData(req.rawResponse, msg, details);
           defineProperty(this, 'response', { value });
           return value;
         },
       });
     }
-    data.context = req.details.context;
+    if (headers != null) req.headers = headers;
+    if (text != null) req.text = text[0] === 'same' ? response : text;
+    data.context = details.context;
+    data.responseHeaders = req.headers;
+    data.responseText = req.text;
     cb(data);
   }
   if (msg.type === 'loadend') delete idMap[req.id];
@@ -99,17 +119,17 @@ async function callback(req, msg) {
 
 function receiveAllChunks(req, response) {
   req.chunks = [response];
-  req.promise = new Promise(resolve => {
+  req.chunksPromise = new Promise(resolve => {
     req.resolve = resolve;
   });
-  return req.promise;
+  return req.chunksPromise;
 }
 
 function receiveChunk(req, { chunk, isLastChunk }) {
   const { chunks } = req;
   chunks::push(chunk);
   if (isLastChunk) {
-    delete req.promise;
+    delete req.chunksPromise;
     delete req.chunks;
     req.resolve(chunks::join(''));
   }
@@ -139,8 +159,7 @@ async function start(req, id) {
   const { responseType } = details;
   if (responseType) {
     if (['arraybuffer', 'blob']::includes(responseType)) {
-      payload.isBuffer = true;
-      req.isBuffer = true;
+      payload.chunkType = 'blob';
     } else if (!['document', 'json', 'text']::includes(responseType)) {
       log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }
