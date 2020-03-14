@@ -1,31 +1,50 @@
 import { sendCmd } from './utils';
 import './content';
 
-// Script installation
-// Firefox does not support `onBeforeRequest` for `file:`
-if (global.location.pathname.endsWith('.user.js')) {
-  const { go } = History.prototype;
-  const { document, history } = global;
-  const { querySelector } = Document.prototype;
-  const referrer = document.referrer;
+// Script installation in Firefox as it does not support `onBeforeRequest` for `file:`
+if (!global.chrome.app
+&& global.top === window
+&& global.location.protocol === 'file:'
+&& global.location.pathname.endsWith('.user.js')) {
   (async () => {
-    if (document.readyState !== 'complete') {
-      await new Promise(resolve => {
-        global.addEventListener('load', resolve, { once: true });
-      });
+    const {
+      browser,
+      fetch,
+      history,
+      document: { referrer },
+      Response: { prototype: { text: getText } },
+      location: { href: url },
+    } = global;
+    const fetchOpts = { mode: 'same-origin' };
+    const response = await fetch(url, fetchOpts);
+    if (!/javascript|^text\/plain|^$/.test(response.headers.get('content-type') || '')) {
+      return;
     }
-    // plain text shouldn't have a <title>
-    if (!document::querySelector('title')) {
-      await sendCmd('ConfirmInstall', {
-        code: document.body.textContent,
-        url: global.location.href,
-        from: referrer,
-      });
-      if (history.length > 1) {
-        history::go(-1);
-      } else {
-        sendCmd('TabClose');
-      }
+    let code = await response.text();
+    if (!/==userscript==/i.test(code)) {
+      return;
     }
-  })();
+    await sendCmd('ConfirmInstall', { code, url, from: referrer });
+    // FF68+ doesn't allow extension pages to get file: URLs anymore so we need to track it here
+    // (detecting FF68 by a feature because we can't use getBrowserInfo here and UA may be altered)
+    if (browser.storage.managed) {
+      browser.runtime.onConnect.addListener(port => {
+        if (port.name !== 'FetchSelf') return;
+        let oldCode;
+        port.onMessage.addListener(async () => {
+          code = await (await fetch(url, fetchOpts))::getText();
+          if (code === oldCode) {
+            code = null;
+          } else {
+            oldCode = code;
+          }
+          port.postMessage(code);
+        });
+      });
+    } else if (history.length > 1) {
+      history.go(-1);
+    } else {
+      sendCmd('TabClose');
+    }
+  })().catch(console.error); // FF doesn't show exceptions in content scripts
 }
