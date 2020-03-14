@@ -1,6 +1,4 @@
-import {
-  buffer2string, getUniqId, request, i18n, isEmpty, sendTabCmd,
-} from '#/common';
+import { buffer2string, getUniqId, request, i18n, isEmpty, noop, sendTabCmd } from '#/common';
 import { forEachEntry, objectPick } from '#/common/object';
 import ua from '#/common/ua';
 import cache from './cache';
@@ -350,18 +348,19 @@ function decodeBody(obj) {
 //   types: ['xmlhttprequest'],
 // });
 
-async function confirmInstall(info, src = {}) {
-  const { url, from } = info;
-  const code = info.code || (await request(url)).data;
+async function confirmInstall({ code, from, url }, { tab = {} }) {
+  if (!code) code = (await request(url)).data;
   // TODO: display the error in UI
   if (!isUserScript(code)) throw i18n('msgInvalidScript');
   cache.put(url, code, 3000);
   const confirmKey = getUniqId();
-  cache.put(`confirm-${confirmKey}`, { url, from });
+  const tabId = tab.id;
+  cache.put(`confirm-${confirmKey}`, { url, from, tabId });
   browser.tabs.create({
     url: `/confirm/index.html#${confirmKey}`,
-    index: src.tab ? src.tab.index + 1 : undefined,
-    ...src.tab && ua.openerTabIdSupported ? { openerTabId: src.tab.id } : {},
+    index: tab.index + 1 || undefined,
+    active: !!tab.active,
+    ...tabId >= 0 && ua.openerTabIdSupported ? { openerTabId: tabId } : {},
   });
 }
 
@@ -374,66 +373,36 @@ const whitelist = [
 const blacklist = [
   '//(?:(?:gist.|)github.com|greasyfork.org|openuserjs.org)/',
 ].map(re => new RegExp(re));
-const bypass = {};
 
 browser.tabs.onCreated.addListener((tab) => {
-  if (/\.user\.js([?#]|$)/.test(tab.pendingUrl || tab.url)) {
-    cache.put(`autoclose:${tab.id}`, true, 1000);
+  // FF 68+ can't read file URLs directly so we need to keep the tab open
+  if (/\.user\.js([?#]|$)/.test(tab.pendingUrl || tab.url)
+  && !(ua.isFirefox >= 68 && tab.url.startsWith('file:'))) {
+    cache.put(`autoclose:${tab.id}`, true, 10e3);
   }
 });
 
 browser.webRequest.onBeforeRequest.addListener((req) => {
-  // onBeforeRequest fired for `file:`
-  // - works on Chrome
-  // - does not work on Firefox
-  const { url } = req;
-  if (req.method === 'GET') {
-    // open a real URL for simplified userscript URL listed in devtools of the web page
-    if (url.startsWith(extensionRoot)) {
-      const id = +url.split('#').pop();
-      const redirectUrl = `${extensionRoot}options/index.html#scripts/${id}`;
-      return { redirectUrl };
-    }
-    if (!bypass[url] && (
-      whitelist.some(re => re.test(url)) || !blacklist.some(re => re.test(url))
-    )) {
-      Promise.all([
-        request(url).catch(() => ({ data: '' })),
-        req.tabId < 0 ? Promise.resolve() : browser.tabs.get(req.tabId),
-      ])
-      .then(([{ data: code }, tab]) => {
-        const meta = parseMeta(code);
-        if (meta.name) {
-          confirmInstall({
-            code,
-            url,
-            // Chrome 79+ uses pendingUrl while the tab connects to the newly navigated URL
-            from: tab && (tab.pendingUrl || tab.url),
-          }, { tab });
-          if (cache.has(`autoclose:${req.tabId}`)) {
-            browser.tabs.remove(req.tabId);
-          }
-        } else {
-          if (!bypass[url]) {
-            bypass[url] = {
-              timer: setTimeout(() => {
-                delete bypass[url];
-              }, 10000),
-            };
-          }
-          if (tab && tab.id) {
-            browser.tabs.update(tab.id, { url });
-          }
-        }
-      });
-      // { cancel: true } will redirect to a blocked view
-      return { redirectUrl: 'javascript:history.back()' }; // eslint-disable-line no-script-url
-    }
+  const { method, tabId, url } = req;
+  if (method !== 'GET') {
+    return;
+  }
+  // open a real URL for simplified userscript URL listed in devtools of the web page
+  if (url.startsWith(extensionRoot)) {
+    const id = +url.split('#').pop();
+    const redirectUrl = `${extensionRoot}options/index.html#scripts/${id}`;
+    return { redirectUrl };
+  }
+  if (!cache.has(`bypass:${url}`)
+  && (!blacklist.some(matches, url) || whitelist.some(matches, url))) {
+    maybeInstallUserJs(tabId, url);
+    return { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url
   }
 }, {
   urls: [
     // 1. *:// comprises only http/https
     // 2. the API ignores #hash part
+    // 3. Firefox: onBeforeRequest does not work with file:// or moz-extension://
     '*://*/*.user.js',
     '*://*/*.user.js?*',
     'file://*/*.user.js',
@@ -442,3 +411,23 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
   ],
   types: ['main_frame'],
 }, ['blocking']);
+
+async function maybeInstallUserJs(tabId, url) {
+  const { data: code } = await request(url).catch(noop) || {};
+  if (parseMeta(code).name) {
+    const tab = tabId >= 0 && await browser.tabs.get(tabId) || {};
+    confirmInstall({ code, url, from: tab.url }, { tab });
+    if (cache.has(`autoclose:${tabId}`)
+    || tab.pendingUrl && tab.url === 'chrome://newtab/') {
+      browser.tabs.remove(tabId);
+    }
+  } else {
+    cache.put(`bypass:${url}`, true, 10e3);
+    if (tabId >= 0) browser.tabs.update(tabId, { url });
+  }
+}
+
+/** @this {string} */
+function matches(re) {
+  return re.test(this);
+}

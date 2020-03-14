@@ -15,7 +15,9 @@
             </label>
             <label>
               <setting-check name="trackLocalFile" :disabled="closeAfterInstall" />
-              <span class="ml-1" v-text="i18n('installOptionTrack')"></span>
+              <tooltip :content="trackTooltip" :disabled="!trackTooltip">
+                <span class="ml-1" v-text="i18n('installOptionTrack')"/>
+              </tooltip>
             </label>
           </dropdown>
           <button v-text="i18n('buttonConfirmInstallation')"
@@ -36,6 +38,7 @@
 
 <script>
 import Dropdown from 'vueleton/lib/dropdown/bundle';
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import {
   sendCmd, leftpad, request, buffer2string, isRemote, getFullUrl, makePause,
 } from '#/common';
@@ -44,14 +47,22 @@ import initCache from '#/common/cache';
 import VmCode from '#/common/ui/code';
 import SettingCheck from '#/common/ui/setting-check';
 import { route } from '#/common/router';
+import ua from '#/common/ua';
 
 const cache = initCache({});
+/** @type {chrome.runtime.Port} */
+let filePort;
+/** @type {function()} */
+let filePortResolve;
+/** @type {boolean} */
+let filePortNeeded;
 
 export default {
   components: {
     Dropdown,
     VmCode,
     SettingCheck,
+    Tooltip,
   },
   data() {
     return {
@@ -67,24 +78,26 @@ export default {
     };
   },
   computed: {
+    trackTooltip() {
+      return ua.isFirefox >= 68 ? this.i18n('installOptionTrackTooltip') : null;
+    },
     isLocal() {
       return !isRemote(this.info.url);
     },
   },
-  mounted() {
+  async mounted() {
     this.message = this.i18n('msgLoadingData');
-    this.loadInfo()
-    .then(() => {
-      const id = route.paths[0];
-      this.guard = setInterval(() => {
-        sendCmd('CacheHit', { key: `confirm-${id}` });
-      }, 5000);
-    }, () => {
+    const id = route.paths[0];
+    const key = `confirm-${id}`;
+    this.info = await sendCmd('CacheLoad', key);
+    if (!this.info) {
       this.close();
-      return Promise.reject();
-    })
-    .then(this.loadData)
-    .then(this.parseMeta);
+      return;
+    }
+    filePortNeeded = ua.isFirefox >= 68 && this.info?.url.startsWith('file:');
+    this.guard = setInterval(sendCmd, 5000, 'CacheHit', { key });
+    await this.loadData();
+    await this.parseMeta();
   },
   beforeDestroy() {
     if (this.guard) {
@@ -93,22 +106,13 @@ export default {
     }
   },
   methods: {
-    loadInfo() {
-      const id = route.paths[0];
-      return sendCmd('CacheLoad', `confirm-${id}`)
-      .then((info) => {
-        if (!info) return Promise.reject();
-        this.info = info;
-      });
-    },
-    loadData(changedOnly) {
+    async loadData(changedOnly) {
       this.installable = false;
-      const { code: oldCode } = this;
-      return this.getScript(this.info.url)
-      .then((code) => {
-        if (changedOnly && oldCode === code) return Promise.reject();
-        this.code = code;
-      });
+      const code = filePortNeeded
+        ? await new Promise(this.pingFilePort)
+        : await this.getScript(this.info.url);
+      if (code == null || changedOnly && this.code === code) throw 0;
+      this.code = code;
     },
     parseMeta() {
       return sendCmd('ParseMeta', this.code)
@@ -174,14 +178,13 @@ export default {
         return data;
       });
     },
-    getScript(url) {
-      return sendCmd('CacheLoad', url)
-      .then(text => text || Promise.reject())
-      .catch(() => this.getFile(url))
-      .catch(() => {
+    async getScript(url) {
+      try {
+        return await sendCmd('CacheLoad', url) || await this.getFile(url);
+      } catch (e) {
         this.message = this.i18n('msgErrorLoadingData');
         throw url;
-      });
+      }
     },
     getTimeString() {
       const now = new Date();
@@ -189,7 +192,7 @@ export default {
     },
     installScript() {
       this.installable = false;
-      sendCmd('ParseScript', {
+      return sendCmd('ParseScript', {
         code: this.code,
         url: this.info.url,
         from: this.info.from,
@@ -199,26 +202,40 @@ export default {
       .then((result) => {
         this.message = `${result.update.message}[${this.getTimeString()}]`;
         if (this.closeAfterInstall) this.close();
-        else if (this.isLocal && options.get('trackLocalFile')) this.trackLocalFile();
+        else if (this.isLocal) this.trackLocalFile();
       }, (err) => {
         this.message = `${err}`;
         this.installable = true;
       });
     },
-    trackLocalFile() {
-      makePause(2000)
-      .then(() => this.loadData(true))
-      .then(this.parseMeta)
-      .then(() => {
-        const track = options.get('trackLocalFile');
-        if (track) this.installScript();
-      }, () => {
-        this.trackLocalFile();
-      });
+    async trackLocalFile() {
+      if (this.tracking) return;
+      this.tracking = true;
+      while (options.get('trackLocalFile') && this.tracking !== 'stop') {
+        await makePause(500);
+        try {
+          await this.loadData(true);
+          await this.parseMeta();
+          await this.installScript();
+        } catch (e) { /* NOP */ }
+      }
+      this.tracking = false;
+      filePort?.disconnect();
+      filePort = null;
     },
     checkClose(value) {
       this.closeAfterInstall = value;
       if (value) options.set('trackLocalFile', false);
+    },
+    createFilePort() {
+      filePort = browser.tabs.connect(this.info.tabId, { name: 'FetchSelf' });
+      filePort.onMessage.addListener(code => { filePortResolve(code); });
+      filePort.onDisconnect.addListener(() => { this.tracking = 'stop'; });
+    },
+    pingFilePort(resolve) {
+      if (!filePort) this.createFilePort();
+      filePortResolve = resolve;
+      filePort.postMessage(null);
     },
   },
 };
