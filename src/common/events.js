@@ -1,9 +1,11 @@
 export default class EventEmitter {
+  /** @param {string[]} allowed */
   constructor(allowed) {
     this.events = {};
     this.allowed = allowed;
   }
 
+  /** @param {string} type */
   checkType(type) {
     if (this.allowed && !this.allowed.includes(type)) {
       throw new Error(`Unknown event type: ${type}`);

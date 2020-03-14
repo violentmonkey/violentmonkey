@@ -32,6 +32,7 @@ const targets = {
   }),
 };
 
+/** @param {string} resolved */
 function parseResolved(resolved) {
   let result;
   Object.entries(targets)
@@ -45,6 +46,7 @@ function parseResolved(resolved) {
   return result;
 }
 
+/** @param {string} targetName */
 function getProcessor(targetName) {
   const target = targets[targetName];
   return line => {
@@ -55,6 +57,7 @@ function getProcessor(targetName) {
   };
 }
 
+/** @param {string} name */
 async function transformLock(name) {
   const disallowChange = name.startsWith('=');
   const targetName = disallowChange ? name.slice(1) : name;

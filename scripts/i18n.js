@@ -97,7 +97,7 @@ class Locales {
     options = options || {};
     const data = {};
     const langData = this.locales[lang];
-    const defaultData = options.useDefaultLang && lang != this.defaultLang && this.locales[this.defaultLang];
+    const defaultData = options.useDefaultLang && lang !== this.defaultLang && this.locales[this.defaultLang];
     Object.keys(this.data).forEach(key => {
       if (options.touchedOnly && !this.data[key].touched) return;
       data[key] = {

@@ -2,10 +2,15 @@ const fs = require('fs').promises;
 const spawn = require('cross-spawn');
 const yaml = require('js-yaml');
 
-function delay(time) {
-  return new Promise(resolve => setTimeout(resolve, time));
+/** @param {number} durationMs */
+function delay(durationMs) {
+  return new Promise(resolve => setTimeout(resolve, durationMs));
 }
 
+/**
+ * @param {string} url
+ * @param {string} method
+ */
 function transifexRequest(url, method = 'GET') {
   return new Promise((resolve, reject) => {
     const child = spawn('curl', [
@@ -17,9 +22,7 @@ function transifexRequest(url, method = 'GET') {
       `https://www.transifex.com${url}`,
     ], { stdio: ['ignore', 'pipe', 'inherit'] });
     const stdoutBuffer = [];
-    child.stdout.on('data', chunk => {
-      stdoutBuffer.push(chunk);
-    })
+    child.stdout.on('data', chunk => stdoutBuffer.push(chunk));
     child.on('exit', (code) => {
       if (code) {
         reject(code);
@@ -41,6 +44,7 @@ async function getLanguages() {
   return result.teams;
 }
 
+/** @param {string} lang */
 async function loadRemote(lang) {
   // Reference: https://docs.transifex.com/api/translations#downloading-and-uploading-translations
   // Use translated messages since we don't have enough reviewers
@@ -49,6 +53,7 @@ async function loadRemote(lang) {
   return reviewed;
 }
 
+/** @param {string} lang */
 async function extract(lang) {
   const reviewed = await loadRemote(lang);
   const fullPath = `src/_locales/${lang}/messages.yml`;

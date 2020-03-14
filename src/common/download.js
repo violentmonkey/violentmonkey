@@ -1,3 +1,8 @@
+/**
+ * @param {string} url
+ * @param {string} name
+ * @param {function} callback
+ */
 export function downloadUrl(url, name, callback) {
   const a = document.createElement('a');
   a.style.display = 'none';
@@ -11,6 +16,11 @@ export function downloadUrl(url, name, callback) {
   }, 3000);
 }
 
+/**
+ * @param {object} blob
+ * @param {string} name
+ * @param {function} callback
+ */
 export function downloadBlob(blob, name, callback) {
   const url = URL.createObjectURL(blob);
   downloadUrl(url, name, () => {
