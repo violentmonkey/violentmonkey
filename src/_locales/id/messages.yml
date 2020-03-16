@@ -218,6 +218,11 @@ installOptionClose:
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
   message: Menelusuri berkas lokal sebelum jendela ini ditutup
+installOptionTrackTooltip:
+  description: >-
+    Tooltip in Firefox 68+ for the option to track the loading local file before
+    window is closed.
+  message: ''
 labelAbout:
   description: Label shown on top of the about page.
   message: Tentang Violentmonkey

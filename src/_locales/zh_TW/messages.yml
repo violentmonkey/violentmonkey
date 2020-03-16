@@ -207,6 +207,11 @@ installOptionClose:
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
   message: 本視窗關閉前跟蹤開啟的本地檔案同步更新
+installOptionTrackTooltip:
+  description: >-
+    Tooltip in Firefox 68+ for the option to track the loading local file before
+    window is closed.
+  message: ''
 labelAbout:
   description: Label shown on top of the about page.
   message: 關於暴力猴

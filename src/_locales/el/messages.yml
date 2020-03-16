@@ -213,6 +213,11 @@ installOptionClose:
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
   message: Παρακολούθηση του τοπικού αρχείου πριν αυτό το παράθυρο κλείσει
+installOptionTrackTooltip:
+  description: >-
+    Tooltip in Firefox 68+ for the option to track the loading local file before
+    window is closed.
+  message: ''
 labelAbout:
   description: Label shown on top of the about page.
   message: Περί του Violentmonkey
