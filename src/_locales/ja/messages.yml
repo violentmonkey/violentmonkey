@@ -218,7 +218,7 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: Firefox 68 以降では、ソースファイルタブを開いたままにしておく必要があります。
 labelAbout:
   description: Label shown on top of the about page.
   message: Violentmonkey について
