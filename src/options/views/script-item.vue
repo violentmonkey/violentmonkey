@@ -8,7 +8,7 @@
     }"
     :draggable="draggable"
     @keydownEnter="onEdit">
-    <img class="script-icon hidden-xs" :src="safeIcon">
+    <img class="script-icon hidden-xs" :src="safeIcon" @click="onEdit">
     <div class="script-info flex">
       <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
       <template v-if="canRender">
@@ -356,6 +356,7 @@ $removedItemHeight: calc(
     width: $iconSize;
     height: $iconSize;
     top: 1rem;
+    cursor: pointer;
     .disabled &,
     .removed & {
       filter: grayscale(.8);
