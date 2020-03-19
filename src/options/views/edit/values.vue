@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-values" v-show="show">
+  <div class="edit-values" ref="container">
     <div class="mb-1">
       <button @click="onNew">+</button>
       <div class="inline-block ml-2" v-if="totalPages > 1">
@@ -12,21 +12,23 @@
       <div class="edit-values-empty" v-if="!keys.length">
         <div v-text="i18n('noValues')"></div>
       </div>
-      <div
+      <a
         v-for="key in currentPage.data"
         :key="key"
         class="edit-values-row flex"
-        @click="onEdit(key)">
+        href="#"
+        @keydown.delete.ctrl.exact="onRemove(key)"
+        @click.prevent="onEdit(key)">
         <div class="ellipsis">
           <span v-text="key"></span>
-          <div class="edit-values-btn">
-            <span @click.stop="onRemove(key)">
-              <icon name="trash" />
-            </span>
+          <div class="edit-values-btn" @click.stop="onRemove(key)">
+            <tooltip :content="`Ctrl-Del: ${i18n('buttonRemove')}`">
+              <icon name="trash"/>
+            </tooltip>
           </div>
         </div>
         <div class="ellipsis flex-auto" v-text="getValue(key, true)"></div>
-      </div>
+      </a>
     </div>
     <div class="edit-values-panel flex flex-col" v-if="current">
       <div class="flex mb-1">
@@ -55,13 +57,17 @@
 </template>
 
 <script>
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { dumpScriptValue, sendCmd } from '#/common';
 import Icon from '#/common/ui/icon';
+import storage from '#/common/storage';
 import { showMessage } from '../../utils';
 
 const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;
 const MAX_JSON_DURATION = 10; // ms
+let scriptStorageKey;
+let focusedElement;
 
 const reparseJson = (str) => {
   try {
@@ -73,9 +79,10 @@ const reparseJson = (str) => {
 };
 
 export default {
-  props: ['show', 'script'],
+  props: ['active', 'script'],
   components: {
     Icon,
+    Tooltip,
   },
   data() {
     return {
@@ -105,16 +112,24 @@ export default {
     },
   },
   watch: {
-    show(show) {
-      if (show && !this.keys) this.refresh();
-    },
-    current(val) {
+    active(val) {
       if (val) {
+        storage.value.getOne(this.script.props.id).then(this.setData);
+        scriptStorageKey = storage.value.prefix + this.script?.props.id;
+        (focusedElement || this.$refs.container.querySelector('button')).focus();
+      }
+      browser.storage.onChanged[`${val ? 'add' : 'remove'}Listener`](this.onStorageChanged);
+    },
+    current(val, oldVal) {
+      if (val) {
+        focusedElement = document.activeElement;
         this.$nextTick(() => {
           const el = this.$refs[val.isNew ? 'key' : 'value'];
           el.setSelectionRange(0, 0);
           el.focus();
         });
+      } else if (oldVal) {
+        focusedElement?.focus();
       }
     },
   },
@@ -130,13 +145,10 @@ export default {
       }
       return value;
     },
-    refresh() {
-      sendCmd('GetValueStore', this.script.props.id)
-      .then((values) => {
-        this.values = values;
-        this.keys = Object.keys(values).sort();
-        this.page = 1;
-      });
+    setData(values = {}) {
+      this.values = values;
+      this.keys = Object.keys(values).sort();
+      this.page = Math.min(this.page, Math.ceil(this.keys.length / PAGE_SIZE)) || 1;
     },
     updateValue({ key, isNew }) {
       const rawValue = dumpScriptValue(this.current?.jsonValue) || '';
@@ -208,17 +220,25 @@ export default {
       }
       current.jsonPaused = performance.now() - t0 > MAX_JSON_DURATION;
     },
-  },
-  created() {
-    let unwatch;
-    const init = () => {
-      if (this.show) {
-        this.refresh();
-        if (unwatch) unwatch();
+    onStorageChanged(changes) {
+      const data = changes[scriptStorageKey]?.newValue;
+      if (data) {
+        this.setData(data);
+        const { current } = this;
+        if (current) {
+          const newText = this.getValue(current.key);
+          if (newText === current.value) {
+            current.isNew = false;
+          } else {
+            // Keeping the same this.current to avoid triggering `watch` observer
+            Object.keys(current)
+            .filter(k => k !== 'key' && k !== 'value')
+            .forEach(k => delete current[k]);
+            current.value = newText;
+          }
+        }
       }
-    };
-    unwatch = this.$watch('show', init);
-    init();
+    },
   },
 };
 </script>
@@ -227,6 +247,8 @@ export default {
 .edit-values {
   &-row {
     border: 1px solid var(--fill-2);
+    color: unset;
+    text-decoration: none;
     &:not(:first-child) {
       border-top: 0;
     }
@@ -242,8 +264,16 @@ export default {
         border-left: 1px solid var(--fill-2);
       }
     }
-    :not(:hover) .edit-values-btn {
-      display: none;
+    &:focus,
+    &:hover {
+      background-color: var(--fill-0-5);
+    }
+    &:focus {
+      text-decoration: underline;
+    }
+    &:focus .edit-values-btn,
+    &:hover .edit-values-btn {
+      display: block;
     }
   }
   &-empty {
@@ -276,8 +306,9 @@ export default {
     top: 0;
     right: 0;
     padding: 4px;
-    background: var(--bg);
-    box-shadow: -5px 0 5px var(--bg);
+    background: inherit;
+    box-shadow: 0 0 5px 5px var(--fill-0-5);
+    display: none;
   }
 }
 </style>

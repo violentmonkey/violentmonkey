@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-settings">
+  <div class="edit-settings" ref="container">
     <h4 v-text="i18n('editLabelSettings')"></h4>
     <div class="form-group">
       <label>
@@ -100,7 +100,7 @@ import { i18n } from '#/common';
 import { objectGet } from '#/common/object';
 
 export default {
-  props: ['value', 'settings'],
+  props: ['active', 'settings', 'value'],
   components: {
     Tooltip,
   },
@@ -119,6 +119,13 @@ export default {
         updateURL: objectGet(value, 'meta.updateURL') || i18n('hintUseDownloadURL'),
         downloadURL: objectGet(value, 'meta.downloadURL') || objectGet(value, 'custom.lastInstallURL'),
       };
+    },
+  },
+  watch: {
+    active(val) {
+      if (val) {
+        this.$refs.container.querySelector('input').focus();
+      }
     },
   },
 };
@@ -147,6 +154,9 @@ export default {
     > textarea {
       min-height: 5em;
     }
+  }
+  label:focus-within span {
+    text-decoration: underline;
   }
 }
 </style>

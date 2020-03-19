@@ -3,29 +3,11 @@
     <div class="edit-header flex">
       <nav>
         <div
-          class="edit-nav-item"
-          :class="{active: nav === 'code'}"
-          v-text="i18n('editNavCode')"
-          @click="nav = 'code'"
+          v-for="(label, navKey) in navItems" :key="navKey"
+          class="edit-nav-item" :class="{active: nav === navKey}"
+          v-text="label"
+          @click="nav = navKey"
         />
-        <div
-          class="edit-nav-item"
-          :class="{active: nav === 'settings'}"
-          v-text="i18n('editNavSettings')"
-          @click="nav = 'settings'"
-        />
-        <div
-          class="edit-nav-item"
-          :class="{active: nav === 'values'}"
-          v-if="scriptId"
-          v-text="i18n('editNavValues')"
-          @click="nav = 'values'"
-        />
-        <div
-          class="edit-nav-item"
-          :class="{active: nav === 'help'}"
-          @click="nav = 'help'"
-        >?</div>
       </nav>
       <div class="edit-name text-center ellipsis flex-1 mr-1" v-text="scriptName"/>
       <div class="edit-hint text-right ellipsis mr-1">
@@ -42,18 +24,31 @@
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code
-        v-show="nav === 'code'" class="abs-full" ref="code" :editing="nav === 'code'"
-        v-model="code" :commands="commands"
+        class="abs-full"
+        v-model="code"
+        ref="code"
+        v-show="nav === 'code'"
+        :active="nav === 'code'"
+        :commands="commands"
       />
       <vm-settings
-        v-show="nav === 'settings'" class="abs-full edit-body"
-        :value="script" :settings="settings"
+        class="abs-full edit-body"
+        v-show="nav === 'settings'"
+        :active="nav === 'settings'"
+        :settings="settings"
+        :value="script"
       />
       <vm-values
-        :show="nav === 'values'" class="abs-full edit-body" :script="script"
+        class="abs-full edit-body"
+        v-show="nav === 'values'"
+        :active="nav === 'values'"
+        :script="script"
       />
       <vm-help
-        v-if="nav === 'help'" class="abs-full edit-body"
+        class="abs-full edit-body"
+        v-show="nav === 'help'"
+        :active="nav === 'help'"
+        :navLabels="Object.values(navItems)"
         :target="this.$refs.code"
       />
     </div>
@@ -106,14 +101,14 @@ export default {
   },
   data() {
     return {
-      nav: 'code',
+      nav: '',
       canSave: false,
       script: null,
       code: '',
       settings: {},
       commands: {
         save: this.save,
-        close: () => this.close({ fromCM: true }),
+        close: this.close,
         showHelp: () => {
           this.nav = 'help';
         },
@@ -121,6 +116,12 @@ export default {
     };
   },
   computed: {
+    navItems: () => ({
+      code: i18n('editNavCode'),
+      settings: i18n('editNavSettings'),
+      values: i18n('editNavValues'),
+      help: '?',
+    }),
     scriptName() {
       const { custom, meta } = this.script || {};
       const scriptName = custom && custom.name || meta && meta.name;
@@ -141,14 +142,13 @@ export default {
         showMessage({ text: `${this.initial.message}\n\n${error}` });
       }
     },
-    nav() {
-      setTimeout(() => this.nav === 'code' && this.setFocusToCode());
-    },
   },
   created() {
     this.script = this.initial;
+    document.addEventListener('keydown', this.switchPanel);
   },
   async mounted() {
+    this.nav = 'code';
     const id = this.script?.props?.id;
     if (id) {
       this.code = await sendCmd('GetScriptCode', id);
@@ -207,11 +207,7 @@ export default {
         showMessage({ text: err });
       }
     },
-    async close({ fromCM } = {}) {
-      if (fromCM && this.nav !== 'code') {
-        this.nav = 'code';
-        return;
-      }
+    async close() {
       try {
         if (this.canSave) {
           showingConfirmation = true;
@@ -228,8 +224,18 @@ export default {
     saveClose() {
       this.save().then(this.close);
     },
-    setFocusToCode() {
-      this.$refs.code.cm.focus();
+    switchPanel(e) {
+      if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        if (e.altKey) {
+          const dir = e.code === 'PageDown' && 1 || e.code === 'PageUp' && -1;
+          if (dir) {
+            const keys = Object.keys(this.navItems);
+            this.nav = keys[(keys.indexOf(this.nav) + dir + keys.length) % keys.length];
+          }
+        } else if (e.code === 'Escape') {
+          this.nav = 'code';
+        }
+      }
     },
     toggleUnloadSentry(state) {
       const onOff = `${state ? 'add' : 'remove'}EventListener`;
@@ -254,6 +260,7 @@ export default {
   beforeDestroy() {
     store.title = null;
     this.toggleUnloadSentry(false);
+    document.removeEventListener('keydown', this.switchPanel);
   },
 };
 </script>

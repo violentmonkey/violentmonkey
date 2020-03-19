@@ -90,6 +90,7 @@ if (!global.browser?.runtime?.sendMessage) {
         set: wrapAsync,
         remove: wrapAsync,
       },
+      onChanged: true,
     },
     tabs: {
       onCreated: true,
