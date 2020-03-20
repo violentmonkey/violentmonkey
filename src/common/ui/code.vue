@@ -492,7 +492,14 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
   }
 }
 
+.cm-matchhighlight {
+  background-color: hsla(168, 100%, 50%, 0.15);
+}
+
 @media (prefers-color-scheme: dark) {
+  .cm-matchhighlight {
+    background-color: hsla(40, 100%, 50%, 0.1);
+  }
   // mostly copied from Monokai theme
   .cm-s-eclipse {
     &.CodeMirror {
