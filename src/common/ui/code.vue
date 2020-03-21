@@ -68,8 +68,10 @@ import 'codemirror/addon/selection/active-line';
 import 'codemirror/keymap/sublime';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { debounce } from '#/common';
 import ToggleButton from '#/common/ui/toggle-button';
+import { debounce } from '#/common';
+import { forEachEntry, deepEqual } from '#/common/object';
+import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
 
 /* eslint-disable no-control-regex */
@@ -424,12 +426,23 @@ export default {
     },
   },
   mounted() {
-    const opts = Object.assign({}, this.cmOptions, options.get('editor'));
+    let userOpts = options.get('editor');
+    const opts = { ...this.cmOptions, ...userOpts };
     this.initialize(CodeMirror(this.$refs.code, opts));
     // pressing Tab key inside a line with no selection will reuse indent size
     if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
     this.debouncedFind = debounce(this.searchInPlace, 100);
     this.$refs.code.addEventListener('copy', this.onCopy);
+    hookSetting('editor', (newUserOpts) => {
+      // Use defaults for keys that were present in the old userOpts but got deleted in newUserOpts
+      ({ ...this.cmOptions, ...newUserOpts })::forEachEntry(([key, val]) => {
+        if ((key in newUserOpts || key in userOpts)
+        && !deepEqual(this.cm.getOption(key), val)) {
+          this.cm.setOption(key, val);
+        }
+      });
+      userOpts = newUserOpts;
+    });
   },
 };
 </script>
