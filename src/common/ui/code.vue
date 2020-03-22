@@ -68,8 +68,10 @@ import 'codemirror/addon/selection/active-line';
 import 'codemirror/keymap/sublime';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { debounce } from '#/common';
 import ToggleButton from '#/common/ui/toggle-button';
+import { debounce } from '#/common';
+import { forEachEntry, deepEqual } from '#/common/object';
+import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
 
 /* eslint-disable no-control-regex */
@@ -179,6 +181,7 @@ function replaceAll(cm, state) {
 
 export default {
   props: {
+    active: Boolean,
     readonly: {
       type: Boolean,
       default: false,
@@ -191,11 +194,6 @@ export default {
       type: Object,
       default: null,
     },
-    global: {
-      type: Boolean,
-      default: true,
-    },
-    editing: Boolean,
   },
   components: {
     Tooltip,
@@ -217,6 +215,16 @@ export default {
     };
   },
   watch: {
+    active(val) {
+      const onOff = val ? 'on' : 'off';
+      this.cm[onOff]('blur', this.onKeyDownToggler);
+      this.cm[onOff]('focus', this.onKeyDownToggler);
+      if (val) {
+        this.cm?.focus();
+      } else {
+        window.removeEventListener('keydown', this.onKeyDown);
+      }
+    },
     value(value) {
       if (value === this.cached) return;
       this.cached = value;
@@ -318,12 +326,19 @@ export default {
       });
       this.$emit('ready', cm);
     },
+    /* reroute hotkeys back to CM when it isn't focused,
+       but ignore `window` blur (`evt` param is absent) */
+    onKeyDownToggler(cm, evt) {
+      if (evt) {
+        window[`${evt.type === 'blur' ? 'add' : 'remove'}EventListener`]('keydown', this.onKeyDown);
+      }
+    },
     onKeyDown(e) {
       const name = CodeMirror.keyName(e);
       if (!this.cm) return;
       [
         this.cm.options.extraKeys,
-        this.editing && this.cm.options.keyMap,
+        this.cm.options.keyMap,
       ].some(keyMap => keyMap && this.lookupKey(name, keyMap, e) === 'handled');
     },
     lookupKey(name, keyMap, e) {
@@ -411,21 +426,23 @@ export default {
     },
   },
   mounted() {
-    const opts = Object.assign({}, this.cmOptions, options.get('editor'));
+    let userOpts = options.get('editor');
+    const opts = { ...this.cmOptions, ...userOpts };
     this.initialize(CodeMirror(this.$refs.code, opts));
     // pressing Tab key inside a line with no selection will reuse indent size
     if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
     this.debouncedFind = debounce(this.searchInPlace, 100);
-    if (this.global) {
-      // reroute a hotkey only when CM isn't focused and thus can't handle it
-      this.cm.on('blur', () => window.addEventListener('keydown', this.onKeyDown));
-      this.cm.on('focus', () => window.removeEventListener('keydown', this.onKeyDown));
-    }
     this.$refs.code.addEventListener('copy', this.onCopy);
-  },
-  beforeDestroy() {
-    if (this.global) window.removeEventListener('keydown', this.onKeyDown, false);
-    this.$refs.code?.removeEventListener('copy', this.onCopy);
+    hookSetting('editor', (newUserOpts) => {
+      // Use defaults for keys that were present in the old userOpts but got deleted in newUserOpts
+      ({ ...this.cmOptions, ...newUserOpts })::forEachEntry(([key, val]) => {
+        if ((key in newUserOpts || key in userOpts)
+        && !deepEqual(this.cm.getOption(key), val)) {
+          this.cm.setOption(key, val);
+        }
+      });
+      userOpts = newUserOpts;
+    });
   },
 };
 </script>
@@ -475,7 +492,14 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
   }
 }
 
+.cm-matchhighlight {
+  background-color: hsla(168, 100%, 50%, 0.15);
+}
+
 @media (prefers-color-scheme: dark) {
+  .cm-matchhighlight {
+    background-color: hsla(40, 100%, 50%, 0.1);
+  }
   // mostly copied from Monokai theme
   .cm-s-eclipse {
     &.CodeMirror {
