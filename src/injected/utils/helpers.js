@@ -2,69 +2,28 @@
 import { numberToString } from '#/common';
 import { assign, objectKeys } from '#/common/object';
 
-// Firefox sucks: `isFinite` is not defined on `window`, see violentmonkey/violentmonkey#300
-// eslint-disable-next-line no-restricted-properties
-export const {
-  // types
-  Blob, Boolean, Error, Promise, Uint8Array,
-  // props and methods
-  atob, isFinite, setTimeout,
-} = global;
+export const { Promise } = global;
 
-export const {
-  concat, filter, findIndex, forEach, includes, indexOf, join, map, push,
-  // arraySlice, // to differentiate from String::slice which we use much more often
-} = Array.prototype;
+export const { filter, forEach, includes, join, map, push } = Array.prototype;
 export const { charCodeAt, slice, replace } = String.prototype;
 export const { toString: objectToString } = Object.prototype;
-export const { fromCharCode } = String;
 export const { addEventListener, removeEventListener } = EventTarget.prototype;
 export const { append, remove, setAttribute } = Element.prototype;
-export const DocProto = Document.prototype;
-export const { createElementNS } = DocProto;
+export const { createElementNS } = Document.prototype;
 export const logging = assign({}, console);
 
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 
-export const isArray = obj => (
+// Firefox defines `isFinite` on `global` not on `window`
+const { Boolean, Uint8Array, isFinite } = global; // eslint-disable-line no-restricted-properties
+const { fromCharCode } = String;
+const isArray = obj => (
   // ES3 way, not reliable if prototype is modified
   // Object.prototype.toString.call(obj) === '[object Array]'
   // #565 steamcommunity.com has overridden `Array.prototype`
   // support duck typing
   obj && typeof obj.length === 'number' && typeof obj.splice === 'function'
 );
-
-export function noop() {}
-
-/**
- * http://www.webtoolkit.info/javascript-utf8.html
- */
-export function utf8decode(utftext) {
-  /* eslint-disable no-bitwise */
-  let string = '';
-  let i = 0;
-  let c1 = 0;
-  let c2 = 0;
-  let c3 = 0;
-  while (i < utftext.length) {
-    c1 = utftext::charCodeAt(i);
-    if (c1 < 128) {
-      string += fromCharCode(c1);
-      i += 1;
-    } else if (c1 > 191 && c1 < 224) {
-      c2 = utftext::charCodeAt(i + 1);
-      string += fromCharCode(((c1 & 31) << 6) | (c2 & 63));
-      i += 2;
-    } else {
-      c2 = utftext::charCodeAt(i + 1);
-      c3 = utftext::charCodeAt(i + 2);
-      string += fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-      i += 3;
-    }
-  }
-  return string;
-  /* eslint-enable no-bitwise */
-}
 
 // Reference: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON#Polyfill
 const escMap = {

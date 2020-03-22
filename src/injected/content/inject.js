@@ -9,22 +9,22 @@ import { sendCmd } from '#/common';
 import { defineProperty, describeProperty, forEachEntry, objectPick } from '#/common/object';
 
 import {
-  forEach, push, setTimeout,
-  append, createElementNS, remove, DocProto, NS_HTML,
+  forEach, push,
+  append, createElementNS, remove, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 
 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
-const VMInitInjection = window[Symbol.for(process.env.INIT_FUNC_NAME)];
+const VMInitInjection = window[process.env.INIT_FUNC_NAME];
 // To avoid running repeatedly due to new `document.documentElement`
-// (the symbol is undeletable so a userscript can't fool us on reinjection)
-defineProperty(window, Symbol.for(process.env.INIT_FUNC_NAME), { value: 1 });
+// (the prop is undeletable so a userscript can't fool us on reinjection)
+defineProperty(window, process.env.INIT_FUNC_NAME, { value: 1 });
 
-const { document } = global;
+const { document, setTimeout } = global;
 // Userscripts in content mode may redefine head and documentElement
-const { get: getHead } = describeProperty(DocProto, 'head');
-const { get: getDocElem } = describeProperty(DocProto, 'documentElement');
-const { appendChild } = DocProto; // same as Node.appendChild
+const { get: getHead } = describeProperty(Document.prototype, 'head');
+const { get: getDocElem } = describeProperty(Document.prototype, 'documentElement');
+const { appendChild } = Document.prototype; // same as Node.appendChild
 
 export function appendToRoot(node) {
   // DOM spec allows any elements under documentElement
@@ -62,10 +62,12 @@ export function injectScripts(contentId, webId, data, isXml) {
     },
   };
   const triage = (script) => {
-    const { custom, meta } = script;
+    const { custom, dataKey, meta } = script;
     const desiredRealm = custom.injectInto || meta.injectInto || data.injectInto;
     const internalRealm = INJECT_MAPPING[desiredRealm] || INJECT_MAPPING[INJECT_AUTO];
     const realm = internalRealm.find(key => realms[key]?.injectable());
+    // If the script wants this specific realm, which is unavailable, we won't inject it at all
+    if (!realm) return [dataKey, 'done'];
     const { ids, lists } = realms[realm];
     let runAt = bornReady ? 'start'
       : `${custom.runAt || meta.runAt || ''}`.replace(/^document-/, '');
@@ -76,7 +78,7 @@ export function injectScripts(contentId, webId, data, isXml) {
     script.action = action;
     ids::push(script.props.id);
     list::push(script);
-    return [script.dataKey, action];
+    return [dataKey, action];
   };
   const feedback = data.scripts.map(triage);
   setupContentInvoker(realms, contentId, webId);

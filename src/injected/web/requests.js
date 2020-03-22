@@ -1,14 +1,14 @@
-import { defineProperty, describeProperty, objectPick } from '#/common/object';
+import { assign, defineProperty, describeProperty, objectPick } from '#/common/object';
 import {
-  filter, includes, map, push, jsonDump, jsonLoad, join, objectToString, Promise, Uint8Array,
+  filter, includes, map, push, jsonDump, jsonLoad, join, objectToString, Promise,
   setAttribute, log, buffer2stringSafe, charCodeAt, slice,
-  createElementNS, NS_HTML, Blob,
+  createElementNS, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 
 const idMap = {};
 
-const { DOMParser } = global;
+const { Blob, DOMParser, Error, Uint8Array } = global;
 const { parseFromString } = DOMParser.prototype;
 const { then } = Promise.prototype;
 const { toLowerCase } = String.prototype;
@@ -22,6 +22,7 @@ bridge.addHandlers({
 });
 
 export function onRequestCreate(details, scriptId) {
+  if (!details.url) throw new Error('Required parameter "url" is missing.');
   const req = {
     scriptId,
     details,
@@ -140,20 +141,19 @@ async function start(req, id) {
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
   const { withCredentials = true, anonymous = !withCredentials } = details;
-  const payload = {
+  const payload = assign({
     id,
     scriptId,
     anonymous,
-    ...objectPick(details, [
-      'headers',
-      'method',
-      'overrideMimeType',
-      'password',
-      'timeout',
-      'url',
-      'user',
-    ]),
-  };
+  }, objectPick(details, [
+    'headers',
+    'method',
+    'overrideMimeType',
+    'password',
+    'timeout',
+    'url',
+    'user',
+  ]));
   req.id = id;
   idMap[id] = req;
   const { responseType } = details;

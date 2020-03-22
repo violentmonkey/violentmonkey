@@ -1,0 +1,52 @@
+<p>Run it both in Chrome and FF</p>
+<textarea id="results" style="width:30em; height: 90%" spellcheck="false"></textarea>
+
+<script>
+const el = document.getElementById('results');
+el.value = [
+  function boundMethods() {
+    const keys = [];
+    /* global globalThis */
+    for (const k in globalThis) {
+      if (k >= 'a' && k <= 'z') {
+        const { value } = Object.getOwnPropertyDescriptor(globalThis, k)
+        || Object.getOwnPropertyDescriptor(EventTarget.prototype, k)
+        || Object.getOwnPropertyDescriptor(Object.prototype, k)
+        || {};
+        if (typeof value === 'function') {
+          if (k === 'createImageBitmap' || k === 'fetch') {
+            keys.push(k);
+          } else {
+            try {
+              globalThis[k].call({});
+            } catch (e) {
+              if (/Illegal invocation|implement interface/.test(e)) {
+                keys.push(k);
+              }
+            }
+          }
+        }
+      }
+    }
+    return keys.sort().map(k => `'${k}',`).join('\n');
+  },
+  function unforgeables() {
+    return Object.entries(Object.getOwnPropertyDescriptors(window))
+    .filter(([, v]) => !v.configurable)
+    .map(([k]) => `'${k}',`)
+    .sort()
+    .join('\n');
+  },
+  function readonlys() {
+    return Object.entries(Object.getOwnPropertyDescriptors(window))
+    .filter(([k, v]) => k >= 'a' && k <= 'z'
+      && k !== 'webkitStorageInfo' // deprecated
+      && v.get && !v.set && v.configurable)
+    .map(([k]) => `'${k}',`)
+    .sort()
+    .join('\n');
+  },
+].map(fn => `// ${fn.name}\n${fn()}\n`).join('\n');
+el.focus();
+el.select();
+</script>

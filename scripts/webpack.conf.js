@@ -67,7 +67,7 @@ const modify = (extra, init) => modifyWebpackConfig(
 
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
-const skipReinjectionHeader = `if (window[Symbol.for('${INIT_FUNC_NAME}')] !== 1)`;
+const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
 const skipReinjectionConfig = (config, test) => config.plugins.push(
   new WrapperWebpackPlugin({
     header: skipReinjectionHeader,
@@ -94,7 +94,7 @@ module.exports = Promise.all([
     config.plugins.push(
       new WrapperWebpackPlugin({
         header: `${skipReinjectionHeader}
-          window[Symbol.for('${INIT_FUNC_NAME}')] = function () {
+          window['${INIT_FUNC_NAME}'] = function () {
             var module = { exports: {} };
           `,
         footer: `

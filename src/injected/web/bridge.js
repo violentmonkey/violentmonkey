@@ -1,12 +1,12 @@
 import { getUniqId } from '#/common';
 import { assign } from '#/common/object';
-import { noop, Promise } from '../utils/helpers';
+import { Promise } from '../utils/helpers';
 
 const handlers = {};
 const callbacks = {};
 const bridge = {
   callbacks,
-  load: noop,
+  load: () => {},
   addHandlers(obj) {
     assign(handlers, obj);
   },
