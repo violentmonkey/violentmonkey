@@ -224,7 +224,9 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: >-
+    Fila fișierului sursă ar trebui să fie ținută deschisă în Firefox 68 și
+    versiunile mai noi.
 labelAbout:
   description: Label shown on top of the about page.
   message: Despre Violentmonkey
@@ -474,7 +476,7 @@ msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: ''
+  message: Eroare la preluarea resursei!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: Eroare la preluarea scriptului!
