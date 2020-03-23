@@ -224,7 +224,7 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: Karta so zdrojovým súborom by mala byť otvorená vo Firefoxe 68 a novšom.
 labelAbout:
   description: Label shown on top of the about page.
   message: Informácie o Violentmonkey

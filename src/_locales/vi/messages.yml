@@ -33,7 +33,7 @@ buttonImportData:
   message: Nhập từ tập tin zip
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Cài đăt từ URL
+  message: Cài đặt từ URL
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Tuỳ chọn
@@ -102,14 +102,14 @@ confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
     Thay đổi chưa được lưu!
-    Bấm OK để huỷ bỏ hoặc Cancel đế quay lại.
+    Bấm Đồng ý để không lưu hoặc Huỷ để quay lại và sửa.
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: URL trong danh sách này sẽ không bị bỏ qua.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS tùy chỉnh cho trang tùy chọn và trang script đã cài đặt Nếu không hiểu
+    CSS tùy chỉnh cho trang tùy chọn và trang script đã cài đặt. Nếu không hiểu
     rõ xin đừng sửa.
 descEditorOptions:
   description: Description of editor options JSON section.
@@ -124,7 +124,7 @@ editHelpDocumention:
   message: 'Các tài liệu về API đọc ở đây:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: Phím tắt
+  message: 'Phím tắt:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: Bạn có trình chỉnh sửa khác?
@@ -157,12 +157,12 @@ extName:
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: ''
+  message: Đã ở trong danh sách đen của Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: Violentmonkey không hoạt động ở đây.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: thứ tự bảng chứ cái
@@ -174,10 +174,10 @@ filterLastUpdateOrder:
   message: cập nhật cuối
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Hiện tất cả
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Cách viết mã
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Tên
@@ -213,12 +213,12 @@ installOptionClose:
   message: Đóng sau khi cài đặt xong
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Track local file before this window is closed
+  message: Theo dõi tệp cục bộ trước khi cửa sổ này đóng
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: Bạn cần Firefox 68 hoặc phiên bản cao hơn để mở.
 labelAbout:
   description: Label shown on top of the about page.
   message: Thông tin Violentmonkey
@@ -350,7 +350,9 @@ labelNotifyUpdates:
   message: Thông báo có cập nhật script
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: >-
+    Bỏ qua thông báo trên mỗi script (thay đổi trong cài đặt ở mục chỉnh sửa
+    script)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Sắp xếp scripts trong popup theo $1
@@ -405,13 +407,13 @@ labelSyncReauthorize:
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Revoke
+  message: Thu hồi
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Trạng thái đồng bộ script
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'URL máy chủ:'
 labelSyncService:
   description: Label for sync service select.
   message: Đồng bộ tới
@@ -446,7 +448,7 @@ menuFindScripts:
   message: Tìm script cho trang này
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Chỉ hoạt động ở Khung phụ
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Script trùng khớp
@@ -528,7 +530,7 @@ msgSavedCustomCSS:
   message: Giao diện tùy chỉnh đã cập nhật.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: Đã cập nhật cài đặt.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Script template tuỳ chỉnh đã được lưu
@@ -567,7 +569,7 @@ optionPopupHideDisabled:
   message: Ẩn script bị tắt
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Hiển thị script được bật trước
+  message: Hiển thị script được bật ở trước
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Phân biệt hoa thường
@@ -588,7 +590,7 @@ titleScriptUpdated:
   message: Cập nhật
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: Nhập chính xác hoặc gần giống nội dung cần tìm
 valueLabelKey:
   description: Label for key of a script value.
   message: Khóa (chuỗi)

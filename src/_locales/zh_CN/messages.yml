@@ -217,7 +217,7 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: 源文件页应在Firefox68或更高版本中保持打开。
 labelAbout:
   description: Label shown on top of the about page.
   message: 关于暴力猴
@@ -465,7 +465,7 @@ msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: ''
+  message: 获取资源发生错误！
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: 获取脚本发生错误！
