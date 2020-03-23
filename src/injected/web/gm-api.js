@@ -118,20 +118,29 @@ export function makeGmApi() {
     },
     GM_download(arg1, name) {
       // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
-      const opts = assign({
+      let opts = {};
+      let onload;
+      if (typeof arg1 === 'string') {
+        opts = { url: arg1, name };
+      } else if (arg1) {
+        name = arg1.name;
+        onload = arg1.onload;
+        opts = objectPick(arg1, [
+          'url',
+          'headers',
+          'timeout',
+          'onerror',
+          'onprogress',
+          'ontimeout',
+        ]);
+      }
+      assign(opts, {
+        context: { name, onload },
         method: 'GET',
         responseType: 'blob',
         overrideMimeType: 'application/octet-stream',
         onload: downloadBlob,
-      }, objectPick(typeof arg1 === 'string' ? { url: arg1, name } : arg1, [
-        'url',
-        'headers',
-        'timeout',
-        'onerror',
-        'onprogress',
-        'ontimeout',
-      ]));
-      opts.context = opts;
+      });
       return onRequestCreate(opts, this.id);
     },
     GM_xmlhttpRequest(opts) {
