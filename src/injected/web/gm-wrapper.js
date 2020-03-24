@@ -27,6 +27,8 @@ let windowClose;
 const vmSandboxedFuncToString = nativeFunc => () => (
   `${nativeFunc}`::replace('native code', 'Violentmonkey sandbox')
 );
+// making a local copy to avoid using webpack's import wrappers as .has() is invoked **a lot**
+const has = hasOwnProperty;
 
 export function wrapGM(script) {
   // Add GM functions
@@ -246,7 +248,6 @@ function makeGlobalWrapper(local) {
   const readonlys = new Set(readonlyKeys);
   readonlys.delete = setDelete;
   readonlys.has = setHas;
-  local.has = hasOwnProperty;
   if (bridge.isFirefox) {
     // Firefox returns [object Object] so jQuery libs see our `window` proxy as a plain
     // object and try to clone its recursive properties like `self` and `window`.
@@ -271,7 +272,7 @@ function makeGlobalWrapper(local) {
     get(_, name) {
       if (name !== 'undefined' && name !== scopeSym) {
         const value = local[name];
-        return value !== undefined || local.has(name)
+        return value !== undefined || local::has(name)
           ? value
           : resolveProp(name);
       }
@@ -292,7 +293,7 @@ function makeGlobalWrapper(local) {
       return desc;
     },
     has(_, name) {
-      return name === 'undefined' || local.has(name) || globals.has(name);
+      return name === 'undefined' || local::has(name) || globals.has(name);
     },
     ownKeys() {
       return [...globals]::concat(
