@@ -247,9 +247,6 @@ function makeGlobalWrapper(local) {
   readonlys.delete = setDelete;
   readonlys.has = setHas;
   local.has = hasOwnProperty;
-  for (const [name, desc] of unforgeables) {
-    defineProperty(local, name, desc);
-  }
   if (bridge.isFirefox) {
     // Firefox returns [object Object] so jQuery libs see our `window` proxy as a plain
     // object and try to clone its recursive properties like `self` and `window`.
@@ -282,7 +279,16 @@ function makeGlobalWrapper(local) {
     getOwnPropertyDescriptor(_, name) {
       const ownDesc = describeProperty(local, name);
       const desc = ownDesc || globals.has(name) && describeProperty(global, name);
-      if (desc && desc.value === window) desc.value = wrapper;
+      if (!desc) return;
+      if (desc.value === window) desc.value = wrapper;
+      // preventing spec violation by duplicating ~10 props like NaN, Infinity, etc.
+      if (!ownDesc && !desc.configurable) {
+        const { get } = desc;
+        if (typeof get === 'function') {
+          desc.get = (...args) => global::get(...args);
+        }
+        defineProperty(local, name, mapWindow(desc));
+      }
       return desc;
     },
     has(_, name) {
@@ -305,6 +311,16 @@ function makeGlobalWrapper(local) {
       return true;
     },
   });
+  for (const [name, desc] of unforgeables) {
+    defineProperty(local, name, mapWindow(desc));
+  }
+  function mapWindow(desc) {
+    if (desc && desc.value === window) {
+      desc = assign({}, desc);
+      desc.value = wrapper;
+    }
+    return desc;
+  }
   function resolveProp(name) {
     let value = boundMethods.get(name);
     const canCopy = value || inheritedKeys.has(name) || globals.has(name);
