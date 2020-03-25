@@ -191,7 +191,7 @@ export default {
             notifyUpdates: notifyUpdates ? +notifyUpdates : null,
           },
           custom: {
-            ...objectPick(custom, CUSTOM_PROPS),
+            ...objectPick(custom, Object.keys(CUSTOM_PROPS)),
             ...objectPick(custom, CUSTOM_LISTS, toList),
           },
           // User created scripts MUST be marked `isNew` so that
