@@ -1,5 +1,5 @@
 import defaults from '#/common/options-defaults';
-import { initHooks, sendCmd, normalizeKeys } from '.';
+import { initHooks, sendCmd } from '.';
 import { forEachEntry, objectGet, objectSet } from './object';
 
 let options = {};
@@ -14,14 +14,13 @@ const ready = (global.allOptions || Promise.resolve())
 });
 
 function getOption(key) {
-  const keys = normalizeKeys(key);
-  return objectGet(options, keys) ?? objectGet(defaults, keys);
+  return objectGet(options, key) ?? objectGet(defaults, key);
 }
 
 function setOption(key, value) {
   // the updated options object will be propagated from the background script after a pause
   // so meanwhile the local code should be able to see the new value using options.get()
-  objectSet(options, normalizeKeys(key), value);
+  objectSet(options, key, value);
   sendCmd('SetOptions', { key, value });
 }
 
