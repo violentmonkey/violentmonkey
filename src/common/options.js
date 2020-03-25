@@ -26,10 +26,13 @@ function setOption(key, value) {
 }
 
 function updateOptions(data) {
+  // Keys in `data` may be { flattened.like.this: 'foo' }
+  const expandedData = {};
   data::forEachEntry(([key, value]) => {
     objectSet(options, key, value);
+    objectSet(expandedData, key, value);
   });
-  hooks.fire(data);
+  hooks.fire(expandedData);
 }
 
 export default {
