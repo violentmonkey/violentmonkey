@@ -4,7 +4,7 @@ import { assign, defineProperty, describeProperty, objectKeys } from '#/common/o
 import bridge from './bridge';
 import {
   filter, forEach, includes, map, slice,
-  replace, addEventListener, removeEventListener,
+  addEventListener, removeEventListener,
 } from '../utils/helpers';
 import { makeGmApi, vmOwnFunc } from './gm-api';
 
@@ -24,9 +24,6 @@ let gmApi;
 let gm4Api;
 let componentUtils;
 let windowClose;
-const vmSandboxedFuncToString = nativeFunc => () => (
-  `${nativeFunc}`::replace('native code', 'Violentmonkey sandbox')
-);
 // making a local copy to avoid using webpack's import wrappers as .has() is invoked **a lot**
 const has = hasOwnProperty;
 
@@ -227,10 +224,7 @@ const boundMethods = new Map([
 ]
 .map((key) => {
   const value = global[key];
-  return typeof value === 'function' && [
-    key,
-    vmOwnFunc(value::bind(global), vmSandboxedFuncToString(value)),
-  ];
+  return typeof value === 'function' && [key, value::bind(global)];
 })
 .filter(Boolean));
 boundMethods.get = mapGet;
@@ -286,7 +280,7 @@ function makeGlobalWrapper(local) {
       if (!ownDesc && !desc.configurable) {
         const { get } = desc;
         if (typeof get === 'function') {
-          desc.get = (...args) => global::get(...args);
+          desc.get = get::bind(global);
         }
         defineProperty(local, name, mapWindow(desc));
       }
