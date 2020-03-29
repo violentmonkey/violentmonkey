@@ -46,7 +46,7 @@ Object.assign(commands, {
       isPopupShown: popupTabs[tab.id],
     };
     if (isApplied) {
-      const data = await getInjectedScripts(url, tab.id, frameId);
+      const data = await getInjectedScripts(url, !frameId);
       addValueOpener(tab.id, frameId, data.withValueIds);
       setBadge(data.enabledIds, src);
       Object.assign(res, data.inject);

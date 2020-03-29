@@ -57,8 +57,8 @@ Object.assign(commands, {
 });
 
 /** @return {Promise<Object>} */
-export function getInjectedScripts(url, tabId, frameId) {
-  return cache.pop(getKey(url, !frameId)) || prepare(url, tabId, !frameId);
+export function getInjectedScripts(url, isTop) {
+  return cache.pop(getKey(url, isTop)) || prepare(url, isTop);
 }
 
 function getKey(url, isTop) {
