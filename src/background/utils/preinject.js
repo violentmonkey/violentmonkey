@@ -6,6 +6,7 @@ import { getScriptsByURL } from './db';
 import { extensionRoot, postInitialize } from './init';
 import { commands } from './message';
 import { getOption, hookOptions } from './options';
+import { popupTabs } from './popup-tracker';
 
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
@@ -57,8 +58,8 @@ Object.assign(commands, {
 });
 
 /** @return {Promise<Object>} */
-export function getInjectedScripts(url, isTop) {
-  return cache.pop(getKey(url, isTop)) || prepare(url, isTop);
+export function getInjectedScripts(url, tabId, frameId) {
+  return cache.pop(getKey(url, !frameId)) || prepare(url, tabId, frameId, true);
 }
 
 function getKey(url, isTop) {
@@ -74,7 +75,7 @@ function togglePreinject(enable) {
   browser.webRequest.onHeadersReceived[onOff](prolong, config);
 }
 
-function preinject({ url, frameId }) {
+function preinject({ url, tabId, frameId }) {
   if (!INJECTABLE_TAB_URL_RE.test(url)) return;
   const isTop = !frameId;
   const key = getKey(url, isTop);
@@ -82,7 +83,7 @@ function preinject({ url, frameId }) {
     // GetInjected message will be sent soon by the content script
     // and it may easily happen while getScriptsByURL is still waiting for browser.storage
     // so we'll let GetInjected await this pending data by storing Promise in the cache
-    cache.put(key, prepare(url, isTop), TIME_AFTER_SEND);
+    cache.put(key, prepare(url, tabId, frameId), TIME_AFTER_SEND);
   }
 }
 
@@ -90,10 +91,17 @@ function prolong({ url, frameId }) {
   cache.hit(getKey(url, !frameId), TIME_AFTER_RECEIVE);
 }
 
-async function prepare(url, isTop) {
-  const data = await getScriptsByURL(url, isTop);
-  data.inject.scripts.forEach(prepareScript, data);
-  data.inject.injectInto = injectInto;
+async function prepare(url, tabId, frameId, isLate) {
+  const data = await getScriptsByURL(url, !frameId);
+  const { inject } = data;
+  inject.scripts.forEach(prepareScript, data);
+  inject.injectInto = injectInto;
+  inject.ua = ua;
+  inject.isFirefox = ua.isFirefox;
+  inject.isPopupShown = popupTabs[tabId];
+  if (!isLate && browser.contentScripts) {
+    registerScriptDataFF(data, url, !!frameId);
+  }
   return data;
 }
 
@@ -140,4 +148,15 @@ function prepareScript(script, index, scripts) {
 function replaceWithFullWidthForm(s) {
   // fullwidth range starts at 0xFF00, normal range starts at space char code 0x20
   return String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
+}
+
+function registerScriptDataFF(data, url, allFrames) {
+  data.registration = browser.contentScripts.register({
+    allFrames,
+    js: [{
+      code: `resolveData(${JSON.stringify(data.inject)})`,
+    }],
+    matches: url.split('#', 1),
+    runAt: 'document_start',
+  });
 }
