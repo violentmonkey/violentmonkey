@@ -1,4 +1,4 @@
-import { sendCmd, sendTabCmd } from '#/common';
+import { sendCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
 import ua from '#/common/ua';
 import * as sync from './sync';
@@ -19,7 +19,6 @@ import './utils/tabs';
 import './utils/tester';
 import './utils/update';
 
-const popupTabs = {}; // { tabId: 1 }
 let isApplied;
 
 hookOptions((changes) => {
@@ -40,16 +39,13 @@ Object.assign(commands, {
   async GetInjected(_, src) {
     const { frameId, tab, url } = src;
     if (!frameId) resetValueOpener(tab.id);
-    const res = {
-      ua,
-      isFirefox: ua.isFirefox,
-      isPopupShown: popupTabs[tab.id],
-    };
+    const res = {};
     if (isApplied) {
-      const data = await getInjectedScripts(url, !frameId);
+      const data = await getInjectedScripts(url, tab.id, frameId);
       addValueOpener(tab.id, frameId, data.withValueIds);
       setBadge(data.enabledIds, src);
       Object.assign(res, data.inject);
+      data.registration?.then(r => r.unregister());
     }
     return res;
   },
@@ -93,21 +89,8 @@ function autoUpdate() {
   autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
 }
 
-function onPopupOpened(port) {
-  const tabId = +port.name;
-  popupTabs[tabId] = 1;
-  sendTabCmd(tabId, 'PopupShown', true);
-  port.onDisconnect.addListener(onPopupClosed);
-}
-
-function onPopupClosed({ name }) {
-  delete popupTabs[name];
-  sendTabCmd(+name, 'PopupShown', false);
-}
-
 initialize(() => {
   browser.runtime.onMessage.addListener(handleCommandMessage);
-  browser.runtime.onConnect.addListener(onPopupOpened);
   isApplied = getOption('isApplied');
   setTimeout(autoUpdate, 2e4);
   sync.initialize();

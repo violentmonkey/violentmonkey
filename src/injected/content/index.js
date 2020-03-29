@@ -12,6 +12,7 @@ import './notifications';
 import './requests';
 import './tabs';
 
+const IS_FIREFOX = !global.chrome.app;
 const IS_TOP = window.top === window;
 const menus = {};
 let isPopupShown;
@@ -28,7 +29,10 @@ const { split } = String.prototype;
   const dataPromise = sendCmd('GetInjected', null, { retry: true });
   const isXml = document instanceof XMLDocument;
   if (!isXml) injectPageSandbox(contentId, webId);
-  const data = await dataPromise;
+  // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
+  const data = IS_FIREFOX && Event.prototype.composedPath
+    ? await getDataFF(dataPromise)
+    : await dataPromise;
   // 1) bridge.post may be overridden in injectScripts
   // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
   bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
@@ -36,7 +40,7 @@ const { split } = String.prototype;
   if (data.scripts) injectScripts(contentId, webId, data, isXml);
   isPopupShown = data.isPopupShown;
   sendSetPopup();
-})().catch(!global.chrome.app && console.error); // Firefox can't show exceptions in content scripts
+})().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
 
 bridge.addBackgroundHandlers({
   Command(data) {
@@ -92,4 +96,13 @@ function sendSetPopup() {
   if (isPopupShown) {
     sendCmd('SetPopup', { ids: bridge.ids, menus });
   }
+}
+
+async function getDataFF(viaMessaging) {
+  const data = await Promise.race([
+    new Promise(resolve => { global.resolveData = resolve; }),
+    viaMessaging,
+  ]);
+  delete global.resolveData;
+  return data;
 }
