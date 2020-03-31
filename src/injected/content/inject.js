@@ -26,6 +26,13 @@ const { get: getHead } = describeProperty(Document.prototype, 'head');
 const { get: getDocElem } = describeProperty(Document.prototype, 'documentElement');
 const { appendChild } = Document.prototype; // same as Node.appendChild
 
+bridge.addHandlers({
+  // FF bug workaround to enable processing of sourceURL in injected page scripts
+  InjectList(runAt) {
+    bridge.realms[INJECT_PAGE].lists[runAt]::forEach(item => inject(item.code));
+  },
+});
+
 export function appendToRoot(node) {
   // DOM spec allows any elements under documentElement
   // https://dom.spec.whatwg.org/#node-trees
@@ -91,6 +98,8 @@ export function injectScripts(contentId, webId, data, isXml) {
       injectAll(realms, 'end');
       setTimeout(injectAll, 0, realms, 'idle');
     }, { once: true });
+  } else {
+    bridge.realms = null;
   }
 }
 
@@ -115,19 +124,24 @@ function inject(code) {
 }
 
 function injectAll(realms, runAt) {
+  bridge.realms = realms;
   realms::forEachEntry(([realm, realmData]) => {
     const isPage = realm === INJECT_PAGE;
     realmData.lists::forEachEntry(([name, items]) => {
       if ((!isPage || name === runAt) && items.length) {
-        bridge.post('ScriptData', { items, info: realmData.info }, realm);
+        bridge.post('ScriptData', { items, runAt, info: realmData.info }, realm);
         realmData.info = undefined;
         items::forEach(item => {
-          if (isPage) inject(item.code);
+          // FF bug workaround to enable processing of sourceURL in injected page scripts
+          if (isPage && !bridge.isFirefox) inject(item.code);
           item.code = '';
         });
       }
     });
   });
+  if (runAt === 'idle') {
+    bridge.realms = null;
+  }
 }
 
 function setupContentInvoker(realms, contentId, webId) {

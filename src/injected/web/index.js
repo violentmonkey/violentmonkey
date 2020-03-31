@@ -54,7 +54,7 @@ bridge.addHandlers({
   Callback({ callbackId, payload }) {
     bridge.callbacks[callbackId]?.(payload);
   },
-  ScriptData({ info, items }) {
+  ScriptData({ info, items, runAt }) {
     if (info) {
       bridge.isFirefox = info.isFirefox;
       bridge.ua = info.ua;
@@ -62,6 +62,10 @@ bridge.addHandlers({
     }
     if (items) {
       items::forEach(createScriptData);
+      // FF bug workaround to enable processing of sourceURL in injected page scripts
+      if (bridge.isFirefox && bridge.mode === INJECT_PAGE) {
+        bridge.post('InjectList', runAt);
+      }
     }
   },
 });
