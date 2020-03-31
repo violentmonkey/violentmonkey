@@ -134,7 +134,7 @@ function prepareScript(script, index, scripts) {
     '})()}).call',
   ];
   // Firefox lists .user.js among our own content scripts so a space at start will group them
-  const sourceUrl = `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? ' ' : ''}${name}.user.js#${id}`;
+  const sourceUrl = `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? '%20' : ''}${name}.user.js#${id}`;
   cache.put(dataKey, [slices, sourceUrl], TIME_KEEP_DATA);
   scripts[index] = {
     ...script,
