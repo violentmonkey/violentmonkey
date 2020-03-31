@@ -32,27 +32,15 @@ Object.assign(commands, {
         cache.del(key);
         return;
       }
-      const [slices, sourceUrl] = cache.pop(key) || [];
-      if (!slices) { // see TIME_KEEP_DATA comment
-        return;
+      const code = cache.pop(key);
+      // see TIME_KEEP_DATA comment
+      if (code) {
+        browser.tabs.executeScript(tab.id, {
+          code,
+          frameId,
+          runAt: 'document_start',
+        });
       }
-      const needsCatch = ua.isFirefox;
-      const needsWait = action === 'wait';
-      const code = [
-        needsWait ? '(async()=>{' : '',
-        needsCatch ? 'try{' : '', // show content scripts errors in FF, https://bugzil.la/1410932
-        ...slices,
-        needsWait ? '(await ' : '(',
-        key,
-        needsCatch ? ')}catch(e){console.error(e)}' : ')',
-        needsWait ? '})()' : '',
-        sourceUrl,
-      ].join('');
-      browser.tabs.executeScript(tab.id, {
-        code,
-        frameId,
-        runAt: 'document_start',
-      });
     });
   },
 });
@@ -120,9 +108,9 @@ function prepareScript(script, index, scripts) {
   // adding `;` on a new line in case some required script ends with a line comment
   const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];
   const hasReqs = reqsSlices.length;
-  const slices = [
+  const injectedCode = [
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    '(function(){with(this)((define,module,exports)=>{',
+    `window.${dataKey}=function(log){try{with(this)((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs ? '(()=>{' : '',
@@ -131,15 +119,15 @@ function prepareScript(script, index, scripts) {
     // adding a new line in case the code ends with a line comment
     code.endsWith('\n') ? '' : '\n',
     hasReqs ? '})()' : '',
-    '})()}).call',
-  ];
-  // Firefox lists .user.js among our own content scripts so a space at start will group them
-  const sourceUrl = `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? '%20' : ''}${name}.user.js#${id}`;
-  cache.put(dataKey, [slices, sourceUrl], TIME_KEEP_DATA);
+    // Firefox lists .user.js among our own content scripts so a space at start will group them
+    '})()}catch(e){log(e)}}',
+    `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? '%20' : ''}${name}.user.js#${id}`,
+  ].join('');
+  cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
   scripts[index] = {
     ...script,
     dataKey,
-    code: isContent ? '' : [...slices, '(', dataKey, ')', sourceUrl].join(''),
+    code: isContent ? '' : injectedCode,
     metaStr: code.match(METABLOCK_RE)[1] || '',
     values: values[id],
   };

@@ -1,7 +1,7 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import { defineProperty, describeProperty } from '#/common/object';
 import { bindEvents } from '../utils';
-import { forEach, log, remove, Promise } from '../utils/helpers';
+import { forEach, log, logging, remove, Promise } from '../utils/helpers';
 import bridge from './bridge';
 import { wrapGM } from './gm-wrapper';
 import store from './store';
@@ -74,7 +74,7 @@ function createScriptData(item) {
   store.values[item.props.id] = item.values;
   defineProperty(window, item.dataKey, {
     configurable: true,
-    get() {
+    async set(fn) {
       // deleting now to prevent interception via DOMNodeRemoved on el::remove()
       delete window[item.dataKey];
       if (process.env.DEBUG) {
@@ -82,9 +82,10 @@ function createScriptData(item) {
       }
       const el = document::getCurrentScript();
       if (el) el::remove();
-      return item.action === 'wait'
-        ? (async () => await bridge.load && wrapGM(item))()
-        : wrapGM(item);
+      if (item.action === 'wait') {
+        await bridge.load;
+      }
+      wrapGM(item)::fn(logging.error);
     },
   });
 }
