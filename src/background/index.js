@@ -1,8 +1,9 @@
-import { sendCmd, sendTabCmd } from '#/common';
+import { sendCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
 import ua from '#/common/ua';
 import * as sync from './sync';
 import { commands } from './utils';
+import cache from './utils/cache';
 import { getData, checkRemove } from './utils/db';
 import { setBadge } from './utils/icon';
 import { initialize } from './utils/init';
@@ -19,7 +20,6 @@ import './utils/tabs';
 import './utils/tester';
 import './utils/update';
 
-const popupTabs = {}; // { tabId: 1 }
 let isApplied;
 
 hookOptions((changes) => {
@@ -40,18 +40,34 @@ Object.assign(commands, {
   async GetInjected(_, src) {
     const { frameId, tab, url } = src;
     if (!frameId) resetValueOpener(tab.id);
-    const res = {
-      ua,
-      isFirefox: ua.isFirefox,
-      isPopupShown: popupTabs[tab.id],
-    };
+    const res = {};
     if (isApplied) {
-      const data = await getInjectedScripts(url, !frameId);
+      const data = await getInjectedScripts(url, tab.id, frameId);
       addValueOpener(tab.id, frameId, data.withValueIds);
       setBadge(data.enabledIds, src);
       Object.assign(res, data.inject);
+      data.registration?.then(r => r.unregister());
+      // Injecting known content mode scripts without waiting for InjectionFeedback
+      const inContent = res.scripts.map(s => !s.code && [s.dataKey, true]).filter(Boolean);
+      if (inContent.length) {
+        // executeScript is slow (in FF at least) so this will run after the response is sent
+        Promise.resolve().then(() => commands.InjectionFeedback(inContent, src));
+      }
     }
     return res;
+  },
+  InjectionFeedback(feedback, { tab, frameId }) {
+    feedback.forEach(([key, needsInjection]) => {
+      const code = cache.pop(key);
+      // see TIME_KEEP_DATA comment
+      if (needsInjection && code) {
+        browser.tabs.executeScript(tab.id, {
+          code,
+          frameId,
+          runAt: 'document_start',
+        });
+      }
+    });
   },
 });
 
@@ -93,21 +109,8 @@ function autoUpdate() {
   autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
 }
 
-function onPopupOpened(port) {
-  const tabId = +port.name;
-  popupTabs[tabId] = 1;
-  sendTabCmd(tabId, 'PopupShown', true);
-  port.onDisconnect.addListener(onPopupClosed);
-}
-
-function onPopupClosed({ name }) {
-  delete popupTabs[name];
-  sendTabCmd(+name, 'PopupShown', false);
-}
-
 initialize(() => {
   browser.runtime.onMessage.addListener(handleCommandMessage);
-  browser.runtime.onConnect.addListener(onPopupOpened);
   isApplied = getOption('isApplied');
   setTimeout(autoUpdate, 2e4);
   sync.initialize();

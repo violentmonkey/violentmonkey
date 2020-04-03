@@ -4,8 +4,8 @@ import ua from '#/common/ua';
 import cache from './cache';
 import { getScriptsByURL } from './db';
 import { extensionRoot, postInitialize } from './init';
-import { commands } from './message';
 import { getOption, hookOptions } from './options';
+import { popupTabs } from './popup-tracker';
 
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
@@ -24,41 +24,9 @@ postInitialize.push(() => {
   togglePreinject(getOption('isApplied'));
 });
 
-Object.assign(commands, {
-  InjectionFeedback(feedback, { tab, frameId }) {
-    feedback.forEach(([key, action]) => {
-      if (action === 'done') {
-        cache.del(key);
-        return;
-      }
-      const [slices, sourceUrl] = cache.pop(key) || [];
-      if (!slices) { // see TIME_KEEP_DATA comment
-        return;
-      }
-      const needsCatch = ua.isFirefox;
-      const needsWait = action === 'wait';
-      const code = [
-        needsWait ? '(async()=>{' : '',
-        needsCatch ? 'try{' : '', // show content scripts errors in FF, https://bugzil.la/1410932
-        ...slices,
-        needsWait ? '(await ' : '(',
-        key,
-        needsCatch ? ')}catch(e){console.error(e)}' : ')',
-        needsWait ? '})()' : '',
-        sourceUrl,
-      ].join('');
-      browser.tabs.executeScript(tab.id, {
-        code,
-        frameId,
-        runAt: 'document_start',
-      });
-    });
-  },
-});
-
 /** @return {Promise<Object>} */
-export function getInjectedScripts(url, isTop) {
-  return cache.pop(getKey(url, isTop)) || prepare(url, isTop);
+export function getInjectedScripts(url, tabId, frameId) {
+  return cache.pop(getKey(url, !frameId)) || prepare(url, tabId, frameId, true);
 }
 
 function getKey(url, isTop) {
@@ -74,7 +42,7 @@ function togglePreinject(enable) {
   browser.webRequest.onHeadersReceived[onOff](prolong, config);
 }
 
-function preinject({ url, frameId }) {
+function preinject({ url, tabId, frameId }) {
   if (!INJECTABLE_TAB_URL_RE.test(url)) return;
   const isTop = !frameId;
   const key = getKey(url, isTop);
@@ -82,7 +50,7 @@ function preinject({ url, frameId }) {
     // GetInjected message will be sent soon by the content script
     // and it may easily happen while getScriptsByURL is still waiting for browser.storage
     // so we'll let GetInjected await this pending data by storing Promise in the cache
-    cache.put(key, prepare(url, isTop), TIME_AFTER_SEND);
+    cache.put(key, prepare(url, tabId, frameId), TIME_AFTER_SEND);
   }
 }
 
@@ -90,10 +58,17 @@ function prolong({ url, frameId }) {
   cache.hit(getKey(url, !frameId), TIME_AFTER_RECEIVE);
 }
 
-async function prepare(url, isTop) {
-  const data = await getScriptsByURL(url, isTop);
-  data.inject.scripts.forEach(prepareScript, data);
-  data.inject.injectInto = injectInto;
+async function prepare(url, tabId, frameId, isLate) {
+  const data = await getScriptsByURL(url, !frameId);
+  const { inject } = data;
+  inject.scripts.forEach(prepareScript, data);
+  inject.injectInto = injectInto;
+  inject.ua = ua;
+  inject.isFirefox = ua.isFirefox;
+  inject.isPopupShown = popupTabs[tabId];
+  if (!isLate && browser.contentScripts) {
+    registerScriptDataFF(data, url, !!frameId);
+  }
   return data;
 }
 
@@ -112,9 +87,9 @@ function prepareScript(script, index, scripts) {
   // adding `;` on a new line in case some required script ends with a line comment
   const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];
   const hasReqs = reqsSlices.length;
-  const slices = [
+  const injectedCode = [
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    '(function(){with(this)((define,module,exports)=>{',
+    `window.${dataKey}=function(log){try{with(this)((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs ? '(()=>{' : '',
@@ -123,15 +98,15 @@ function prepareScript(script, index, scripts) {
     // adding a new line in case the code ends with a line comment
     code.endsWith('\n') ? '' : '\n',
     hasReqs ? '})()' : '',
-    '})()}).call',
-  ];
-  // Firefox lists .user.js among our own content scripts so a space at start will group them
-  const sourceUrl = `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? ' ' : ''}${name}.user.js#${id}`;
-  cache.put(dataKey, [slices, sourceUrl], TIME_KEEP_DATA);
+    // Firefox lists .user.js among our own content scripts so a space at start will group them
+    '})()}catch(e){log(e)}}',
+    `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? '%20' : ''}${name}.user.js#${id}`,
+  ].join('');
+  cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
   scripts[index] = {
     ...script,
     dataKey,
-    code: isContent ? '' : [...slices, '(', dataKey, ')', sourceUrl].join(''),
+    code: isContent ? '' : injectedCode,
     metaStr: code.match(METABLOCK_RE)[1] || '',
     values: values[id],
   };
@@ -140,4 +115,15 @@ function prepareScript(script, index, scripts) {
 function replaceWithFullWidthForm(s) {
   // fullwidth range starts at 0xFF00, normal range starts at space char code 0x20
   return String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
+}
+
+function registerScriptDataFF(data, url, allFrames) {
+  data.registration = browser.contentScripts.register({
+    allFrames,
+    js: [{
+      code: `resolveData(${JSON.stringify(data.inject)})`,
+    }],
+    matches: url.split('#', 1),
+    runAt: 'document_start',
+  });
 }

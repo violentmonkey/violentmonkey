@@ -26,6 +26,13 @@ const { get: getHead } = describeProperty(Document.prototype, 'head');
 const { get: getDocElem } = describeProperty(Document.prototype, 'documentElement');
 const { appendChild } = Document.prototype; // same as Node.appendChild
 
+bridge.addHandlers({
+  // FF bug workaround to enable processing of sourceURL in injected page scripts
+  InjectList(runAt) {
+    bridge.realms[INJECT_PAGE].lists[runAt]::forEach(item => inject(item.code));
+  },
+});
+
 export function appendToRoot(node) {
   // DOM spec allows any elements under documentElement
   // https://dom.spec.whatwg.org/#node-trees
@@ -66,19 +73,19 @@ export function injectScripts(contentId, webId, data, isXml) {
     const desiredRealm = custom.injectInto || meta.injectInto || data.injectInto;
     const internalRealm = INJECT_MAPPING[desiredRealm] || INJECT_MAPPING[INJECT_AUTO];
     const realm = internalRealm.find(key => realms[key]?.injectable());
+    let needsInjection;
     // If the script wants this specific realm, which is unavailable, we won't inject it at all
-    if (!realm) return [dataKey, 'done'];
-    const { ids, lists } = realms[realm];
-    let runAt = bornReady ? 'start'
-      : `${custom.runAt || meta.runAt || ''}`.replace(/^document-/, '');
-    const list = lists[runAt] || lists[runAt = 'end'];
-    const action = realm === INJECT_PAGE && 'done'
-      || runAt !== 'start' && 'wait'
-      || '';
-    script.action = action;
-    ids::push(script.props.id);
-    list::push(script);
-    return [dataKey, action];
+    if (realm) {
+      const { ids, lists } = realms[realm];
+      let runAt = bornReady ? 'start'
+        : `${custom.runAt || meta.runAt || ''}`.replace(/^document-/, '');
+      const list = lists[runAt] || lists[runAt = 'end'];
+      script.action = realm === INJECT_CONTENT && (runAt === 'start' ? runAt : 'wait');
+      needsInjection = !!script.action;
+      ids::push(script.props.id);
+      list::push(script);
+    }
+    return [dataKey, needsInjection];
   };
   const feedback = data.scripts.map(triage);
   setupContentInvoker(realms, contentId, webId);
@@ -91,6 +98,8 @@ export function injectScripts(contentId, webId, data, isXml) {
       injectAll(realms, 'end');
       setTimeout(injectAll, 0, realms, 'idle');
     }, { once: true });
+  } else {
+    bridge.realms = null;
   }
 }
 
@@ -115,19 +124,24 @@ function inject(code) {
 }
 
 function injectAll(realms, runAt) {
+  bridge.realms = realms;
   realms::forEachEntry(([realm, realmData]) => {
     const isPage = realm === INJECT_PAGE;
     realmData.lists::forEachEntry(([name, items]) => {
       if ((!isPage || name === runAt) && items.length) {
-        bridge.post('ScriptData', { items, info: realmData.info }, realm);
+        bridge.post('ScriptData', { items, runAt, info: realmData.info }, realm);
         realmData.info = undefined;
         items::forEach(item => {
-          if (isPage) inject(item.code);
+          // FF bug workaround to enable processing of sourceURL in injected page scripts
+          if (isPage && !bridge.isFirefox) inject(item.code);
           item.code = '';
         });
       }
     });
   });
+  if (runAt === 'idle') {
+    bridge.realms = null;
+  }
 }
 
 function setupContentInvoker(realms, contentId, webId) {

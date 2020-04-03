@@ -1,7 +1,7 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import { defineProperty, describeProperty } from '#/common/object';
 import { bindEvents } from '../utils';
-import { forEach, log, remove, Promise } from '../utils/helpers';
+import { forEach, log, logging, remove, Promise } from '../utils/helpers';
 import bridge from './bridge';
 import { wrapGM } from './gm-wrapper';
 import store from './store';
@@ -54,7 +54,7 @@ bridge.addHandlers({
   Callback({ callbackId, payload }) {
     bridge.callbacks[callbackId]?.(payload);
   },
-  ScriptData({ info, items }) {
+  ScriptData({ info, items, runAt }) {
     if (info) {
       bridge.isFirefox = info.isFirefox;
       bridge.ua = info.ua;
@@ -62,27 +62,40 @@ bridge.addHandlers({
     }
     if (items) {
       items::forEach(createScriptData);
+      // FF bug workaround to enable processing of sourceURL in injected page scripts
+      if (bridge.isFirefox && bridge.mode === INJECT_PAGE) {
+        bridge.post('InjectList', runAt);
+      }
     }
   },
 });
 
 function createScriptData(item) {
-  store.values[item.props.id] = item.values;
-  defineProperty(window, item.dataKey, {
-    configurable: true,
-    get() {
-      // deleting now to prevent interception via DOMNodeRemoved on el::remove()
-      delete window[item.dataKey];
-      if (process.env.DEBUG) {
-        log('info', [bridge.mode], item.custom.name || item.meta.name || item.props.id);
-      }
-      const el = document::getCurrentScript();
-      if (el) el::remove();
-      return item.action === 'wait'
-        ? (async () => await bridge.load && wrapGM(item))()
-        : wrapGM(item);
-    },
-  });
+  const { dataKey, values } = item;
+  store.values[item.props.id] = values;
+  if (window[dataKey]) {
+    // executeScript ran earlier than GetInjected response (improbable but theoretically possible)
+    onCodeSet(item, window[dataKey]);
+  } else {
+    defineProperty(window, dataKey, {
+      configurable: true,
+      set: fn => onCodeSet(item, fn),
+    });
+  }
+}
+
+async function onCodeSet(item, fn) {
+  // deleting now to prevent interception via DOMNodeRemoved on el::remove()
+  delete window[item.dataKey];
+  if (process.env.DEBUG) {
+    log('info', [bridge.mode], item.custom.name || item.meta.name || item.props.id);
+  }
+  const el = document::getCurrentScript();
+  if (el) el::remove();
+  if (item.action === 'wait') {
+    await bridge.load;
+  }
+  wrapGM(item)::fn(logging.error);
 }
 
 function exposeVM() {
