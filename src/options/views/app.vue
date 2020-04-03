@@ -29,7 +29,9 @@
         </div>
       </div>
     </aside>
-    <component :is="tabComponent" class="tab flex-auto"></component>
+    <keep-alive>
+      <component :is="tabComponent" class="tab flex-auto"/>
+    </keep-alive>
   </div>
 </template>
 
