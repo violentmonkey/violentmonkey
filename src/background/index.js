@@ -3,6 +3,7 @@ import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
 import ua from '#/common/ua';
 import * as sync from './sync';
 import { commands } from './utils';
+import cache from './utils/cache';
 import { getData, checkRemove } from './utils/db';
 import { setBadge } from './utils/icon';
 import { initialize } from './utils/init';
@@ -46,8 +47,27 @@ Object.assign(commands, {
       setBadge(data.enabledIds, src);
       Object.assign(res, data.inject);
       data.registration?.then(r => r.unregister());
+      // Injecting known content mode scripts without waiting for InjectionFeedback
+      const inContent = res.scripts.map(s => !s.code && [s.dataKey, true]).filter(Boolean);
+      if (inContent.length) {
+        // executeScript is slow (in FF at least) so this will run after the response is sent
+        Promise.resolve().then(() => commands.InjectionFeedback(inContent, src));
+      }
     }
     return res;
+  },
+  InjectionFeedback(feedback, { tab, frameId }) {
+    feedback.forEach(([key, needsInjection]) => {
+      const code = cache.pop(key);
+      // see TIME_KEEP_DATA comment
+      if (needsInjection && code) {
+        browser.tabs.executeScript(tab.id, {
+          code,
+          frameId,
+          runAt: 'document_start',
+        });
+      }
+    });
   },
 });
 

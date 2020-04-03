@@ -71,23 +71,31 @@ bridge.addHandlers({
 });
 
 function createScriptData(item) {
-  store.values[item.props.id] = item.values;
-  defineProperty(window, item.dataKey, {
-    configurable: true,
-    async set(fn) {
-      // deleting now to prevent interception via DOMNodeRemoved on el::remove()
-      delete window[item.dataKey];
-      if (process.env.DEBUG) {
-        log('info', [bridge.mode], item.custom.name || item.meta.name || item.props.id);
-      }
-      const el = document::getCurrentScript();
-      if (el) el::remove();
-      if (item.action === 'wait') {
-        await bridge.load;
-      }
-      wrapGM(item)::fn(logging.error);
-    },
-  });
+  const { dataKey, values } = item;
+  store.values[item.props.id] = values;
+  if (window[dataKey]) {
+    // executeScript ran earlier than GetInjected response (improbable but theoretically possible)
+    onCodeSet(item, window[dataKey]);
+  } else {
+    defineProperty(window, dataKey, {
+      configurable: true,
+      set: fn => onCodeSet(item, fn),
+    });
+  }
+}
+
+async function onCodeSet(item, fn) {
+  // deleting now to prevent interception via DOMNodeRemoved on el::remove()
+  delete window[item.dataKey];
+  if (process.env.DEBUG) {
+    log('info', [bridge.mode], item.custom.name || item.meta.name || item.props.id);
+  }
+  const el = document::getCurrentScript();
+  if (el) el::remove();
+  if (item.action === 'wait') {
+    await bridge.load;
+  }
+  wrapGM(item)::fn(logging.error);
 }
 
 function exposeVM() {

@@ -4,7 +4,6 @@ import ua from '#/common/ua';
 import cache from './cache';
 import { getScriptsByURL } from './db';
 import { extensionRoot, postInitialize } from './init';
-import { commands } from './message';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
 
@@ -23,26 +22,6 @@ hookOptions(changes => {
 postInitialize.push(() => {
   injectInto = getOption('defaultInjectInto');
   togglePreinject(getOption('isApplied'));
-});
-
-Object.assign(commands, {
-  InjectionFeedback(feedback, { tab, frameId }) {
-    feedback.forEach(([key, action]) => {
-      if (action === 'done') {
-        cache.del(key);
-        return;
-      }
-      const code = cache.pop(key);
-      // see TIME_KEEP_DATA comment
-      if (code) {
-        browser.tabs.executeScript(tab.id, {
-          code,
-          frameId,
-          runAt: 'document_start',
-        });
-      }
-    });
-  },
 });
 
 /** @return {Promise<Object>} */

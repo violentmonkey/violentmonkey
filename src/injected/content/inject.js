@@ -73,19 +73,19 @@ export function injectScripts(contentId, webId, data, isXml) {
     const desiredRealm = custom.injectInto || meta.injectInto || data.injectInto;
     const internalRealm = INJECT_MAPPING[desiredRealm] || INJECT_MAPPING[INJECT_AUTO];
     const realm = internalRealm.find(key => realms[key]?.injectable());
+    let needsInjection;
     // If the script wants this specific realm, which is unavailable, we won't inject it at all
-    if (!realm) return [dataKey, 'done'];
-    const { ids, lists } = realms[realm];
-    let runAt = bornReady ? 'start'
-      : `${custom.runAt || meta.runAt || ''}`.replace(/^document-/, '');
-    const list = lists[runAt] || lists[runAt = 'end'];
-    const action = realm === INJECT_PAGE && 'done'
-      || runAt !== 'start' && 'wait'
-      || '';
-    script.action = action;
-    ids::push(script.props.id);
-    list::push(script);
-    return [dataKey, action];
+    if (realm) {
+      const { ids, lists } = realms[realm];
+      let runAt = bornReady ? 'start'
+        : `${custom.runAt || meta.runAt || ''}`.replace(/^document-/, '');
+      const list = lists[runAt] || lists[runAt = 'end'];
+      script.action = realm === INJECT_CONTENT && (runAt === 'start' ? runAt : 'wait');
+      needsInjection = !!script.action;
+      ids::push(script.props.id);
+      list::push(script);
+    }
+    return [dataKey, needsInjection];
   };
   const feedback = data.scripts.map(triage);
   setupContentInvoker(realms, contentId, webId);
