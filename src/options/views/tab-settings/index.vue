@@ -11,33 +11,6 @@
       </div>
       <div class="mb-1">
         <label>
-          <setting-check name="notifyUpdates" />
-          <span v-text="i18n('labelNotifyUpdates')"></span>
-        </label>
-        <label class="ml-2">
-          <setting-check name="notifyUpdatesGlobal" />
-          <span v-text="i18n('labelNotifyUpdatesGlobal')"></span>
-        </label>
-      </div>
-      <div class="mb-1">
-        <label>
-          <locale-group i18n-key="labelAutoUpdate">
-            <input v-model="settings.autoUpdate" type="number" min=0 max=365 step=1 />
-          </locale-group>
-        </label>
-      </div>
-      <div class="mb-1">
-        <label>
-          <span v-text="i18n('labelBadge')"></span>
-          <select v-model="settings.showBadge">
-            <option value="" v-text="i18n('labelBadgeNone')" />
-            <option value="unique" v-text="i18n('labelBadgeUnique')" />
-            <option value="total" v-text="i18n('labelBadgeTotal')" />
-          </select>
-        </label>
-      </div>
-      <div class="mb-1">
-        <label>
           <locale-group i18n-key="labelPopupSort">
             <select v-model="settings['filtersPopup.sort']">
               <option value="exec" v-text="i18n('filterExecutionOrder')" />
@@ -52,6 +25,36 @@
         <label class="ml-2">
           <setting-check name="filtersPopup.hideDisabled" />
           <span v-text="i18n('optionPopupHideDisabled')"></span>
+        </label>
+      </div>
+      <div class="mb-1">
+        <label>
+          <span v-text="i18n('labelBadge')"></span>
+          <select v-model="settings.showBadge">
+            <option value="" v-text="i18n('labelBadgeNone')" />
+            <option value="unique" v-text="i18n('labelBadgeUnique')" />
+            <option value="total" v-text="i18n('labelBadgeTotal')" />
+          </select>
+        </label>
+      </div>
+    </section>
+    <section>
+      <h3 v-text="i18n('titleScriptUpdated')"/>
+      <div class="mb-1">
+        <label>
+          <locale-group i18n-key="labelAutoUpdate">
+            <input v-model="settings.autoUpdate" type="number" min=0 max=365 step=1/>
+          </locale-group>
+        </label>
+      </div>
+      <div class="mb-1">
+        <label>
+          <setting-check name="notifyUpdates"/>
+          <span v-text="i18n('labelNotifyUpdates')"/>
+        </label>
+        <label class="ml-2">
+          <setting-check name="notifyUpdatesGlobal"/>
+          <span v-text="i18n('labelNotifyUpdatesGlobal')"/>
         </label>
       </div>
     </section>
