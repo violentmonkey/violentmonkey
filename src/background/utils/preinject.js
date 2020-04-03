@@ -66,7 +66,7 @@ async function prepare(url, tabId, frameId, isLate) {
   inject.ua = ua;
   inject.isFirefox = ua.isFirefox;
   inject.isPopupShown = popupTabs[tabId];
-  if (!isLate && injectInto !== INJECT_CONTENT && browser.contentScripts) {
+  if (!isLate && browser.contentScripts) {
     registerScriptDataFF(data, url, !!frameId);
   }
   return data;
