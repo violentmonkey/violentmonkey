@@ -245,7 +245,8 @@ async function httpRequest(details, src, cb) {
   if (!req || req.cb) return;
   req.cb = cb;
   req.anonymous = details.anonymous;
-  req.chunkType = chunkType && src.tab.incognito ? 'arraybuffer' : chunkType;
+  // Firefox applies page CSP even to content script fetches of own blobs https://bugzil.la/1294996
+  req.chunkType = chunkType && (src.tab.incognito || ua.isFirefox) ? 'arraybuffer' : chunkType;
   const { xhr } = req;
   const vmHeaders = [];
   // Firefox doesn't send cookies,
