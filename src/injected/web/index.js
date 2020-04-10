@@ -35,7 +35,7 @@ export default function initialize(
         bridge.post('Pong');
       },
     });
-    if (window.location.host === 'greasyfork.org') {
+    if (window.location.host === 'greasyfork.org' || window.location.host === 'sleazyfork.org') {
       exposeVM();
     }
   }
