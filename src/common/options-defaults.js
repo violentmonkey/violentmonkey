@@ -9,6 +9,10 @@ export default {
   /** @type 'unique' | 'total' | '' */
   showBadge: 'unique',
   exportValues: true,
+  expose: { // use percent-encoding for '.'
+    'greasyfork%2Eorg': true,
+    'sleazyfork%2Eorg': false,
+  },
   closeAfterInstall: false,
   trackLocalFile: false,
   autoReload: false,
