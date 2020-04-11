@@ -21,7 +21,7 @@
         @click.prevent="onEdit(key)">
         <div class="ellipsis">
           <span v-text="key"></span>
-          <div class="edit-values-btn" @click.stop="onRemove(key)">
+          <div class="edit-values-btn" @click.stop.prevent="onRemove(key)">
             <tooltip :content="`Ctrl-Del: ${i18n('buttonRemove')}`">
               <icon name="trash"/>
             </tooltip>
@@ -140,8 +140,8 @@ export default {
       this.keys = Object.keys(values).sort();
       this.page = Math.min(this.page, this.totalPages) || 1;
     },
-    updateValue({ key, isNew }) {
-      const rawValue = dumpScriptValue(this.current?.jsonValue) || '';
+    updateValue({ key, jsonValue, isNew }) {
+      const rawValue = dumpScriptValue(jsonValue) || '';
       const { id } = this.script.props;
       return sendCmd('UpdateValue', { id, key, value: rawValue })
       .then(() => {
