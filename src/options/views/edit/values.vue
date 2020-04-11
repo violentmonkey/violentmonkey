@@ -3,9 +3,9 @@
     <div class="mb-1">
       <button @click="onNew">+</button>
       <div class="inline-block ml-2" v-if="totalPages > 1">
-        <button :disabled="!hasPrevious" @click="page = currentPage.page - 1">&larr;</button>
-        <span class="mx-1" v-text="page"></span>
-        <button :disabled="!hasNext" @click="page = currentPage.page + 1">&rarr;</button>
+        <button :disabled="page === 1" @click="page -= 1">&larr;</button>
+        <span class="ml-1" v-text="page"/> / <span class="mr-1" v-text="totalPages"/>
+        <button :disabled="page >= totalPages" @click="page += 1">&rarr;</button>
       </div>
     </div>
     <div class="edit-values-table" v-if="keys">
@@ -13,7 +13,7 @@
         <div v-text="i18n('noValues')"></div>
       </div>
       <a
-        v-for="key in currentPage.data"
+        v-for="key in pageKeys"
         :key="key"
         class="edit-values-row flex"
         href="#"
@@ -21,7 +21,7 @@
         @click.prevent="onEdit(key)">
         <div class="ellipsis">
           <span v-text="key"></span>
-          <div class="edit-values-btn" @click.stop="onRemove(key)">
+          <div class="edit-values-btn" @click.stop.prevent="onRemove(key)">
             <tooltip :content="`Ctrl-Del: ${i18n('buttonRemove')}`">
               <icon name="trash"/>
             </tooltip>
@@ -88,27 +88,17 @@ export default {
     return {
       current: null,
       keys: null,
+      page: null,
       values: null,
     };
   },
   computed: {
     totalPages() {
-      if (!this.keys) return 0;
-      return Math.floor(this.keys.length / PAGE_SIZE) + 1;
+      return Math.ceil(this.keys?.length / PAGE_SIZE) || 0;
     },
-    currentPage() {
-      const page = Math.max(1, Math.min(this.page, this.totalPages));
-      const offset = PAGE_SIZE * (page - 1);
-      return {
-        page,
-        data: this.keys ? this.keys.slice(offset, offset + PAGE_SIZE) : null,
-      };
-    },
-    hasPrevious() {
-      return this.currentPage.page > 1;
-    },
-    hasNext() {
-      return this.currentPage.page < this.totalPages;
+    pageKeys() {
+      const offset = PAGE_SIZE * (this.page - 1);
+      return this.keys?.slice(offset, offset + PAGE_SIZE);
     },
   },
   watch: {
@@ -148,10 +138,10 @@ export default {
     setData(values = {}) {
       this.values = values;
       this.keys = Object.keys(values).sort();
-      this.page = Math.min(this.page, Math.ceil(this.keys.length / PAGE_SIZE)) || 1;
+      this.page = Math.min(this.page, this.totalPages) || 1;
     },
-    updateValue({ key, isNew }) {
-      const rawValue = dumpScriptValue(this.current?.jsonValue) || '';
+    updateValue({ key, jsonValue, isNew }) {
+      const rawValue = dumpScriptValue(jsonValue) || '';
       const { id } = this.script.props;
       return sendCmd('UpdateValue', { id, key, value: rawValue })
       .then(() => {

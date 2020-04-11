@@ -116,20 +116,19 @@ export default {
     };
   },
   computed: {
-    navItems: () => ({
-      code: i18n('editNavCode'),
-      settings: i18n('editNavSettings'),
-      values: i18n('editNavValues'),
-      help: '?',
-    }),
+    navItems() {
+      return {
+        code: i18n('editNavCode'),
+        settings: i18n('editNavSettings'),
+        ...this.script?.props?.id && { values: i18n('editNavValues') },
+        help: '?',
+      };
+    },
     scriptName() {
       const { custom, meta } = this.script || {};
       const scriptName = custom && custom.name || meta && meta.name;
       store.title = scriptName;
       return scriptName;
-    },
-    scriptId() {
-      return this.script?.props?.id;
     },
   },
   watch: {
