@@ -270,11 +270,12 @@ async function httpRequest(details, src, cb) {
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, details.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
   if (shouldSendCookies) {
-    const cookies = await browser.cookies.getAll({
+    const now = Date.now() / 1000;
+    const cookies = (await browser.cookies.getAll({
       url,
       storeId: src.tab.cookieStoreId,
       ...ua.isFirefox >= 59 && { firstPartyDomain: null },
-    });
+    })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
     if (cookies.length) {
       req.noNativeCookie = true;
       vmHeaders.push({
