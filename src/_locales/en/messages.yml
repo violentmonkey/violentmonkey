@@ -290,6 +290,9 @@ labelExcludeMatch:
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Export script data
+labelExposeStatus:
+  description: Option in advanced settings.
+  message: 'Expose installed version on userscript catalog sites: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback

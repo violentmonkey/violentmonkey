@@ -1,5 +1,6 @@
 import { sendCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
+import { forEachEntry, objectSet } from '#/common/object';
 import ua from '#/common/ua';
 import * as sync from './sync';
 import { commands } from './utils';
@@ -21,11 +22,32 @@ import './utils/tester';
 import './utils/update';
 
 let isApplied;
+const expose = {};
+
+const optionHandlers = {
+  autoUpdate,
+  expose(val) {
+    val::forEachEntry(([site, isExposed]) => {
+      expose[decodeURIComponent(site)] = isExposed;
+    });
+  },
+  isApplied(val) {
+    isApplied = val;
+  },
+  [SCRIPT_TEMPLATE](val, changes) {
+    resetScriptTemplate(changes);
+  },
+};
 
 hookOptions((changes) => {
-  if ('autoUpdate' in changes) autoUpdate();
-  if ('isApplied' in changes) isApplied = changes.isApplied;
-  if (SCRIPT_TEMPLATE in changes) resetScriptTemplate(changes);
+  changes::forEachEntry(function processChange([key, value]) {
+    const handler = optionHandlers[key];
+    if (handler) {
+      handler(value, changes);
+    } else if (key.includes('.')) {
+      objectSet({}, key, value)::forEachEntry(processChange);
+    }
+  });
   sendCmd('UpdateOptions', changes);
 });
 
@@ -40,7 +62,9 @@ Object.assign(commands, {
   async GetInjected(_, src) {
     const { frameId, tab, url } = src;
     if (!frameId) resetValueOpener(tab.id);
-    const res = {};
+    const res = {
+      expose: !frameId && url.startsWith('https://') && expose[url.split('/', 3)[2]],
+    };
     if (isApplied) {
       const data = await getInjectedScripts(url, tab.id, frameId);
       addValueOpener(tab.id, frameId, data.withValueIds);
@@ -111,7 +135,7 @@ function autoUpdate() {
 
 initialize(() => {
   browser.runtime.onMessage.addListener(handleCommandMessage);
-  isApplied = getOption('isApplied');
+  ['expose', 'isApplied'].forEach(key => optionHandlers[key](getOption(key)));
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
   checkRemove();

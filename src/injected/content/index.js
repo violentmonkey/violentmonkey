@@ -38,6 +38,7 @@ const { split } = String.prototype;
   bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
   bridge.isFirefox = data.isFirefox;
   if (data.scripts) injectScripts(contentId, webId, data, isXml);
+  if (data.expose) bridge.post('Expose');
   isPopupShown = data.isPopupShown;
   sendSetPopup();
 })().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts

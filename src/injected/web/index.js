@@ -35,9 +35,6 @@ export default function initialize(
         bridge.post('Pong');
       },
     });
-    if (window.location.host === 'greasyfork.org' || window.location.host === 'sleazyfork.org') {
-      exposeVM();
-    }
   }
   bridge.load = new Promise(resolve => {
     // waiting for the page handlers to run first
@@ -68,6 +65,18 @@ bridge.addHandlers({
       }
     }
   },
+  Expose() {
+    const Violentmonkey = {};
+    defineProperty(Violentmonkey, 'version', {
+      value: process.env.VM_VER,
+    });
+    defineProperty(Violentmonkey, 'isInstalled', {
+      value: (name, namespace) => bridge.send('CheckScript', { name, namespace }),
+    });
+    defineProperty(window.external, 'Violentmonkey', {
+      value: Violentmonkey,
+    });
+  },
 });
 
 function createScriptData(item) {
@@ -96,17 +105,4 @@ async function onCodeSet(item, fn) {
     await bridge.load;
   }
   wrapGM(item)::fn(logging.error);
-}
-
-function exposeVM() {
-  const Violentmonkey = {};
-  defineProperty(Violentmonkey, 'version', {
-    value: process.env.VM_VER,
-  });
-  defineProperty(Violentmonkey, 'isInstalled', {
-    value: (name, namespace) => bridge.send('CheckScript', { name, namespace }),
-  });
-  defineProperty(window.external, 'Violentmonkey', {
-    value: Violentmonkey,
-  });
 }

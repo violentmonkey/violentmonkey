@@ -84,6 +84,15 @@
             <a class="ml-1" href="https://violentmonkey.github.io/posts/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
           </label>
         </div>
+        <div class="mb-1">
+          <locale-group i18n-key="labelExposeStatus">
+            <label v-for="([key, host]) in expose" :key="host" class="mr-1 valign-tb">
+              <setting-check :name="`expose.${key}`"/>
+              <span v-text="host" class="mr-1"/>
+              <a :href="`https://${host}`" target="_blank" rel="noopener noreferrer">&nearr;</a>
+            </label>
+          </locale-group>
+        </div>
       </section>
       <vm-editor />
       <vm-template />
@@ -162,6 +171,7 @@ export default {
   data() {
     return {
       showAdvanced: false,
+      expose: null,
       settings,
       injectIntoOptions,
     };
@@ -183,6 +193,7 @@ export default {
       this.revokers.push(hookSetting(name, val => { settings[name] = normalize(val); }));
       this.$watch(() => settings[name], debounce(this.getUpdater(item), 300));
     });
+    this.expose = Object.keys(options.get('expose')).map(k => [k, decodeURIComponent(k)]);
   },
   beforeDestroy() {
     this.revokers.forEach((revoke) => { revoke(); });
@@ -197,6 +208,9 @@ export default {
     display: inline-block;
     > * {
       vertical-align: middle;
+    }
+    &.valign-tb * {
+      vertical-align: text-bottom;
     }
   }
   textarea {
