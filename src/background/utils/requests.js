@@ -377,7 +377,9 @@ async function confirmInstall({ code, from, url }, { tab = {} }) {
     url: `/confirm/index.html#${confirmKey}`,
     index: tab.index + 1 || undefined,
     active: !!tab.active,
-    ...tabId >= 0 && ua.openerTabIdSupported ? { openerTabId: tabId } : {},
+    ...tabId >= 0 && ua.openerTabIdSupported && !tab.incognito && {
+      openerTabId: tabId,
+    },
   });
 }
 
