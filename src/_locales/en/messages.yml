@@ -491,6 +491,9 @@ msgImported:
     Message shown after import. There is an argument referring to the count of
     scripts imported.
   message: $1 item(s) are imported.
+msgIncognitoChanges:
+  description: Message shown in popup and installation tab when opened in an incognito window.
+  message: Changes you make in the incognito mode also apply to your main profile.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script installed.

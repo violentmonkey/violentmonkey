@@ -6,7 +6,7 @@
           <span v-text="i18n('labelInstall')"></span> - <span v-text="i18n('extName')"></span>
         </h1>
         <div class="flex-auto"></div>
-        <div>
+        <div class="text-right">
           <dropdown class="confirm-options" align="right">
             <button slot="toggle" v-text="i18n('buttonInstallOptions')"></button>
             <label>
@@ -23,6 +23,7 @@
           <button v-text="i18n('buttonConfirmInstallation')"
           :disabled="!installable" @click="installScript"></button>
           <button v-text="i18n('buttonClose')" @click="close"></button>
+          <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
         </div>
       </div>
       <div class="flex">
@@ -242,6 +243,15 @@ export default {
 </script>
 
 <style>
+.page-confirm {
+  .incognito {
+    padding: .25em 0;
+    color: red;
+    @media (prefers-color-scheme: dark) {
+      color: orange;
+    }
+  }
+}
 .confirm-options {
   label {
     display: block;

@@ -94,6 +94,9 @@
         </div>
       </div>
     </div>
+    <div class="incognito"
+       v-if="store.currentTab && store.currentTab.incognito"
+       v-text="i18n('msgIncognitoChanges')"/>
     <footer>
       <span @click="onVisitWebsite" v-text="i18n('visitWebsite')" />
     </footer>
