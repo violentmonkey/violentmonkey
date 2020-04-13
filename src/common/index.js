@@ -143,8 +143,11 @@ export function decodeFilename(filename) {
 }
 
 export async function getActiveTab() {
-  return (await browser.tabs.query({ active: true, currentWindow: true }))[0]
-    || (await browser.tabs.query({ active: true }))[0];
+  const [tab] = await browser.tabs.query({
+    active: true,
+    lastFocusedWindow: true, // also gets incognito windows
+  });
+  return tab;
 }
 
 export function makePause(ms) {
