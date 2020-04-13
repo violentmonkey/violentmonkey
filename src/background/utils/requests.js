@@ -371,13 +371,13 @@ async function confirmInstall({ code, from, url }, { tab = {} }) {
   if (!isUserScript(code)) throw i18n('msgInvalidScript');
   cache.put(url, code, 3000);
   const confirmKey = getUniqId();
-  const tabId = tab.id;
-  cache.put(`confirm-${confirmKey}`, { url, from, tabId });
+  const { id: tabId, incognito } = tab;
+  cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId });
   browser.tabs.create({
     url: `/confirm/index.html#${confirmKey}`,
     index: tab.index + 1 || undefined,
     active: !!tab.active,
-    ...tabId >= 0 && ua.openerTabIdSupported && !tab.incognito && {
+    ...tabId >= 0 && ua.openerTabIdSupported && !incognito && {
       openerTabId: tabId,
     },
   });

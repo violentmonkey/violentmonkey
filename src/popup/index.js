@@ -47,9 +47,10 @@ Object.assign(handlers, {
 });
 
 getActiveTab()
-.then(async ({ id, url }) => {
-  store.currentTab = { id, url };
-  browser.runtime.connect({ name: `${id}` });
+.then(async (tab) => {
+  const { url } = tab;
+  store.currentTab = tab;
+  browser.runtime.connect({ name: `${tab.id}` });
   if (/^https?:\/\//i.test(url)) {
     const matches = url.match(/:\/\/([^/]*)/);
     const domain = matches[1];
