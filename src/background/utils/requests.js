@@ -373,7 +373,7 @@ async function confirmInstall({ code, from, url }, { tab = {} }) {
   const confirmKey = getUniqId();
   const { id: tabId, incognito } = tab;
   cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId });
-  browser.tabs.create({
+  const { windowId } = await browser.tabs.create({
     url: `/confirm/index.html#${confirmKey}`,
     index: tab.index + 1 || undefined,
     active: !!tab.active,
@@ -381,6 +381,9 @@ async function confirmInstall({ code, from, url }, { tab = {} }) {
       openerTabId: tabId,
     },
   });
+  if (windowId !== tab.windowId) {
+    await browser.windows.update(windowId, { focused: true });
+  }
 }
 
 const whitelist = [

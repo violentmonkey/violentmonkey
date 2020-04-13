@@ -107,6 +107,9 @@ if (!global.browser?.runtime?.sendMessage) {
       executeScript: wrapAsync,
     },
     webRequest: true,
+    windows: {
+      update: wrapAsync,
+    },
   };
   global.browser = wrapAPIs(chrome, meta);
 } else if (process.env.DEBUG && !global.chrome.app) {
