@@ -288,6 +288,9 @@ labelExcludeMatch:
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: スクリプトが保存したデータを含める
+labelExposeStatus:
+  description: Option in advanced settings.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: フィードバック

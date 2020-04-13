@@ -294,6 +294,9 @@ labelExcludeMatch:
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportovať dáta skriptu
+labelExposeStatus:
+  description: Option in advanced settings.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: Spätná väzba

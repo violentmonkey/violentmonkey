@@ -281,6 +281,9 @@ labelExcludeMatch:
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: 匯出腳本數據
+labelExposeStatus:
+  description: Option in advanced settings.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: 反饋

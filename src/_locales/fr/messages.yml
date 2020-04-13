@@ -295,6 +295,9 @@ labelExcludeMatch:
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exporter les données du script
+labelExposeStatus:
+  description: Option in advanced settings.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: Retour d’expérience

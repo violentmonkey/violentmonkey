@@ -222,7 +222,7 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: Вкладка исходного файла должна открываться в Firefox 68 и новее.
+  message: Вкладка исходного файла должна оставаться открытой в Firefox 68 и новее.
 labelAbout:
   description: Label shown on top of the about page.
   message: О расширении Violentmonkey
@@ -292,6 +292,9 @@ labelExcludeMatch:
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Экспорт данных скриптов
+labelExposeStatus:
+  description: Option in advanced settings.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
