@@ -19,7 +19,7 @@ Object.assign(commands, {
     // Chrome can't open chrome-extension:// in incognito windows because VM uses `spanning` mode
     const sameWindow = ua.isFirefox || !incognito;
     storeId = storeId && !incognito && getContainerId(isInternal ? 0 : container) || storeId;
-    const { id } = await browser.tabs.create({
+    const { id, windowId } = await browser.tabs.create({
       active: active !== false,
       pinned: !!pinned,
       url: isInternal || url.startsWith('blob:') ? url : getFullUrl(url, src.url),
@@ -30,6 +30,9 @@ Object.assign(commands, {
       // It seems to do nothing even set successfully with `browser.tabs.update`.
       ...ua.openerTabIdSupported && sameWindow && { openerTabId: srcTab.id },
     });
+    if (windowId !== srcTab.windowId && active !== false) {
+      await browser.windows.update(windowId, { focused: true });
+    }
     openers[id] = srcTab.id;
     return { id };
   },
