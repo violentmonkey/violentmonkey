@@ -290,7 +290,7 @@ labelExportScriptData:
   message: スクリプトが保存したデータを含める
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'インストールされたバージョンをユーザースクリプトカタログサイトに公開する: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: フィードバック
@@ -489,6 +489,9 @@ msgImported:
     Message shown after import. There is an argument referring to the count of
     scripts imported.
   message: $1個のスクリプトをインポートしました。
+msgIncognitoChanges:
+  description: Message shown in popup and installation tab when opened in an incognito window.
+  message: シークレットモードで行った変更は、メインのプロファイルにも適用されます。
 msgInstalled:
   description: Message shown when a script is installed.
   message: スクリプトがインストールされました。
