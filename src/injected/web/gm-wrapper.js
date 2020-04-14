@@ -267,7 +267,7 @@ function makeGlobalWrapper(local) {
       if (name !== 'undefined' && name !== scopeSym) {
         const value = local[name];
         // Browsers may use a getter for some property (not a `value`) that returns `window` object
-        if (value === window) return wrapper;
+        if (value === window && name !== 'unsafeWindow') return wrapper;
         return value !== undefined || local::has(name)
           ? value
           : resolveProp(name);
