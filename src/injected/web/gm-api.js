@@ -134,6 +134,9 @@ export function makeGmApi() {
           'ontimeout',
         ]);
       }
+      if (!name || typeof name !== 'string') {
+        throw new Error('Required parameter "name" is missing or not a string.');
+      }
       assign(opts, {
         context: { name, onload },
         method: 'GET',
