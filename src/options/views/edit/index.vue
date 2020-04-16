@@ -215,7 +215,7 @@ export default {
         }
         this.$emit('close');
       } catch (e) {
-        this.setFocusToCode();
+        this.$refs.code.cm.focus();
       } finally {
         showingConfirmation = false;
       }
