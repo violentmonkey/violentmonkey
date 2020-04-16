@@ -14,6 +14,7 @@
         <li><a href="https://violentmonkey.github.io" target="_blank" rel="noopener noreferrer" v-text="i18n('labelHomepage')"></a></li>
         <li><a href="https://github.com/violentmonkey/violentmonkey/issues" target="_blank" rel="noopener noreferrer" v-text="i18n('labelFeedback')"></a></li>
         <li><a href="https://github.com/violentmonkey/violentmonkey/graphs/contributors" target="_blank" rel="noopener noreferrer" v-text="i18n('labelContributors')"></a></li>
+        <li><a href="https://violentmonkey.github.io/privacy/" target="_blank" rel="noopener noreferrer" v-text="i18n('labelPrivacyPolicy')"></a></li>
       </ul>
     </div>
     <div class="mb-1">
