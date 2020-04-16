@@ -363,6 +363,9 @@ labelNotifyUpdatesGlobal:
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Zoradiť skripty vo vyskakovacom okne podľa $1
+labelPrivacyPolicy:
+  description: Label of link to privacy policy
+  message: ''
 labelRelated:
   description: Label of related links.
   message: 'Súvisiace odkazy: '
@@ -495,6 +498,11 @@ msgImported:
     Message shown after import. There is an argument referring to the count of
     scripts imported.
   message: 'Importovaných položiek: $1'
+msgIncognitoChanges:
+  description: >-
+    Message shown in popup and installation tab when opened in an incognito
+    window.
+  message: ''
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skript bol nainštalovaný.

@@ -359,6 +359,9 @@ labelNotifyUpdatesGlobal:
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Sort scripts in popup by $1
+labelPrivacyPolicy:
+  description: Label of link to privacy policy
+  message: Privacy Policy
 labelRelated:
   description: Label of related links.
   message: 'Related links: '
@@ -492,7 +495,9 @@ msgImported:
     scripts imported.
   message: $1 item(s) are imported.
 msgIncognitoChanges:
-  description: Message shown in popup and installation tab when opened in an incognito window.
+  description: >-
+    Message shown in popup and installation tab when opened in an incognito
+    window.
   message: Changes you make in the incognito mode also apply to your main profile.
 msgInstalled:
   description: Message shown when a script is installed.
