@@ -311,7 +311,7 @@ function makeGlobalWrapper(local) {
     },
   });
   for (const [name, desc] of unforgeables) {
-    if (desc.get && (name === 'top' || name === 'window')) {
+    if (desc.get && (name === 'window' || name === 'top' && window === window.top)) {
       delete desc.get;
       delete desc.set;
       desc.value = wrapper;
