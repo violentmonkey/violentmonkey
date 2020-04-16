@@ -101,7 +101,7 @@ export default {
   },
   data() {
     return {
-      nav: '',
+      nav: 'code',
       canSave: false,
       script: null,
       code: '',
