@@ -1,6 +1,6 @@
 <template>
   <div class="tab-about">
-    <h1>
+    <h1 class="mt-0">
       <span class="mr-1" v-text="i18n('labelAbout')"></span>
       <small v-text="`v${version}`"></small>
     </h1>

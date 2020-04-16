@@ -94,6 +94,7 @@ section {
   }
   > h3 {
     position: absolute;
+    margin: 0;
     padding: 0 .2rem;
     top: -.6em;
     left: .8rem;
@@ -111,6 +112,7 @@ section {
 .tab {
   position: relative;
   padding: 1.2rem;
+  overflow-y: auto;
   background: var(--bg);
 }
 
