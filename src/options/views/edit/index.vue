@@ -208,7 +208,7 @@ export default {
     },
     async close() {
       try {
-        if (this.canSave) {
+        if (store.route.pinned) {
           showingConfirmation = true;
           await showConfirmation(i18n('confirmNotSaved'));
           store.route.pinned = false;
