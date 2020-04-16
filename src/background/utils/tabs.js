@@ -37,7 +37,7 @@ Object.assign(commands, {
       pinned: !!pinned,
       ...storeId && { cookieStoreId: storeId },
       // Chrome can't open chrome-xxx: URLs in incognito windows
-      ...!incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url) && {
+      ...(!incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url)) && {
         windowId,
         ...insert && { index: srcTab.index + 1 },
         ...ua.openerTabIdSupported && { openerTabId: srcTab.id },
