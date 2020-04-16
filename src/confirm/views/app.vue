@@ -2,7 +2,7 @@
   <div class="page-confirm frame flex flex-col h-100">
     <div class="frame-block">
       <div class="flex">
-        <h1 class="hidden-sm">
+        <h1 class="mt-0 hidden-sm">
           <span v-text="i18n('labelInstall')"></span> - <span v-text="i18n('extName')"></span>
         </h1>
         <div class="flex-auto"></div>

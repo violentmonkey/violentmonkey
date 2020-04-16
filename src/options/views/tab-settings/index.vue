@@ -1,6 +1,6 @@
 <template>
   <div class="tab-settings">
-    <h1 v-text="i18n('labelSettings')"></h1>
+    <h1 class="mt-0" v-text="i18n('labelSettings')"></h1>
     <section>
       <h3 v-text="i18n('labelGeneral')"></h3>
       <div class="mb-1">
