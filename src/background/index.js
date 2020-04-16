@@ -134,7 +134,12 @@ function autoUpdate() {
 }
 
 initialize(() => {
-  browser.runtime.onMessage.addListener(handleCommandMessage);
+  browser.runtime.onMessage.addListener(
+    ua.isFirefox // in FF a rejected Promise value is transferred only if it's an Error object
+      ? (...args) => (
+        handleCommandMessage(...args).catch(e => { throw e instanceof Error ? e : new Error(e); }))
+      : handleCommandMessage,
+  );
   ['expose', 'isApplied'].forEach(key => optionHandlers[key](getOption(key)));
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
