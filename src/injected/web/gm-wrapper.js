@@ -270,8 +270,6 @@ function makeGlobalWrapper(local) {
     get(_, name) {
       if (name !== 'undefined' && name !== scopeSym) {
         const value = local[name];
-        // Browsers may use a getter for some property (not a `value`) that returns `window` object
-        if (value === window && name !== 'unsafeWindow') return wrapper;
         return value !== undefined || local::has(name)
           ? value
           : resolveProp(name);
@@ -313,6 +311,11 @@ function makeGlobalWrapper(local) {
     },
   });
   for (const [name, desc] of unforgeables) {
+    if (desc.get && (name === 'top' || name === 'window')) {
+      delete desc.get;
+      delete desc.set;
+      desc.value = wrapper;
+    }
     defineProperty(local, name, mapWindow(desc));
   }
   function mapWindow(desc) {
