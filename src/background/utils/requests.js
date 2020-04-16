@@ -252,7 +252,7 @@ async function httpRequest(details, src, cb) {
   // Firefox doesn't send cookies,
   // https://github.com/violentmonkey/violentmonkey/issues/606
   let shouldSendCookies = ua.isFirefox && !details.anonymous;
-  xhr.open(details.method, url, true, details.user || '', details.password || '');
+  xhr.open(details.method || 'GET', url, true, details.user || '', details.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);
   details.headers::forEachEntry(([name, value]) => {
     const lowerName = name.toLowerCase();
