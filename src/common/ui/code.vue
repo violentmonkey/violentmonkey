@@ -67,6 +67,8 @@ import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/keymap/sublime';
 import CodeMirror from 'codemirror';
+import prettier from 'prettier/standalone';
+import parserBabel from 'prettier/parser-babel';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
 import { debounce } from '#/common';
@@ -81,11 +83,49 @@ const CTRL_OPEN = '\x02'.repeat(256);
 const CTRL_CLOSE = '\x03'.repeat(256);
 
 [
-  'save', 'cancel', 'close',
+  'cancel', 'close',
   'find', 'findNext', 'findPrev', 'replace', 'replaceAll',
 ].forEach((key) => {
   CodeMirror.commands[key] = cm => cm.state.commands?.[key]?.();
 });
+
+// TODO: rethink this, maybe bind a keyboard shortcut to Format Code instead of
+// formatting on save.
+//
+CodeMirror.commands.save = (cm) => {
+  const code = cm.getDoc().getValue();
+  let formattedCode = code;
+
+  const cursor = cm.getCursor();
+
+  try {
+    formattedCode = prettier.format(code, {
+      parser: 'babel',
+      plugins: [parserBabel],
+      // TODO: support user defined options
+      singleQuote: true,
+      trailingComma: 'es5',
+    });
+  } catch (err) {
+    // TODO: handle errors, in case an error was found maybe show a modal
+    // or something a bit less obtrusive
+  }
+
+  cm.getDoc().setValue(formattedCode);
+
+  cm.setCursor(cursor);
+
+  // For some reason calling `save` syncronously doesn't save the updated value
+  // making the user have to hit Cmd+S again for the content to actaully be
+  // saved.
+  //
+  // TODO: find a suitable workaround
+  //
+  setTimeout(() => {
+    cm.state.commands?.save?.();
+  }, 500);
+};
+
 Object.assign(CodeMirror.keyMap.sublime, {
   'Shift-Ctrl-/': 'commentSelection',
 });
