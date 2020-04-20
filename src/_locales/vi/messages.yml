@@ -361,7 +361,7 @@ labelPopupSort:
   message: Sắp xếp scripts trong popup theo $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Chính sách bảo mật
 labelRelated:
   description: Label of related links.
   message: 'Liên kết gợi ý: '
@@ -498,7 +498,9 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: >-
+    Những thay đổi bạn thực hiện trong chế độ ẩn danh cũng áp dụng cho cài đặt
+    của bạn.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Đã cài đặt script.

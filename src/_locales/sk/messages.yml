@@ -296,7 +296,7 @@ labelExportScriptData:
   message: Exportovať dáta skriptu
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'Zobraziť nainštalovanú verziu v katalógoch užívateľských skriptov: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Spätná väzba
@@ -365,7 +365,7 @@ labelPopupSort:
   message: Zoradiť skripty vo vyskakovacom okne podľa $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Zásady ochrany osobných údajov
 labelRelated:
   description: Label of related links.
   message: 'Súvisiace odkazy: '
@@ -502,7 +502,7 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: 'Zmeny, ktoré vykonáte v režime inkognito budú použité aj v hlavnom profile.'
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skript bol nainštalovaný.

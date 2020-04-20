@@ -363,7 +363,7 @@ labelPopupSort:
   message: Сортировка во всплывающем окне по $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Политика конфиденциальности
 labelRelated:
   description: Label of related links.
   message: 'Ссылки по теме: '
@@ -500,7 +500,7 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: 'Изменения, в режиме инкогнито, применяются и к основному профилю.'
 msgInstalled:
   description: Message shown when a script is installed.
   message: Скрипт установлен.

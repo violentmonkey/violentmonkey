@@ -369,7 +369,7 @@ labelPopupSort:
   message: 'Sortuj skrypty w wyskakującym okienku wg  $1 '
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Polityka prywatności
 labelRelated:
   description: Label of related links.
   message: 'Powiązane linki: '
@@ -506,7 +506,9 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: >-
+    Zmiany, które wprowadzasz w trybie incognito, dotyczą również twojego
+    głównego profilu.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skrypt zainstalowany.

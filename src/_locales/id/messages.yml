@@ -363,7 +363,7 @@ labelPopupSort:
   message: Urutkan skrip di popup menurut $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Kebijakan Privasi
 labelRelated:
   description: Label of related links.
   message: 'Tautan terkait: '

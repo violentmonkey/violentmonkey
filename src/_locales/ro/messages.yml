@@ -300,7 +300,7 @@ labelExportScriptData:
   message: Exportă datele scripturilor
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'Expune versiunea instalată pe site-urile de catalog ale userscripturilor: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
@@ -506,7 +506,9 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: >-
+    Modificările pe care le faci în modul incognito se aplică și profilului
+    principal.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script instalat.
