@@ -1,5 +1,3 @@
-import { forEachEntry } from './object';
-
 // used in an unsafe context so we need to save the original functions
 const perfNow = performance.now.bind(performance);
 const { random, floor } = Math;
@@ -134,73 +132,37 @@ export function ensureArray(data) {
   return Array.isArray(data) ? data : [data];
 }
 
-const binaryTypes = [
-  'blob',
-  'arraybuffer',
-];
-
 /**
  * Make a request.
  * @param {string} url
  * @param {RequestInit} options
  * @return Promise
  */
-export function request(url, options = {}) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    const { responseType } = options;
-    xhr.open(options.method || 'GET', url, true);
-    if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
-    const headers = Object.assign({}, options.headers);
-    let { body } = options;
-    if (body && Object.prototype.toString.call(body) === '[object Object]') {
-      headers['Content-Type'] = 'application/json';
-      body = JSON.stringify(body);
-    }
-    headers::forEachEntry(([name, value]) => {
-      xhr.setRequestHeader(name, value);
-    });
-    xhr.onload = () => {
-      const res = getResponse(xhr, {
-        // status for `file:` protocol will always be `0`
-        status: xhr.status || 200,
-      });
-      if (res.status > 300) {
-        reject(res);
-      } else {
-        resolve(res);
-      }
-    };
-    xhr.onerror = () => {
-      const res = getResponse(xhr, { status: -1 });
-      reject(res);
-    };
-    xhr.onabort = xhr.onerror;
-    xhr.ontimeout = xhr.onerror;
-    xhr.send(body);
-  });
-
-  function getResponse(xhr, extra) {
-    const { responseType } = options;
-    let data;
-    if (binaryTypes.includes(responseType)) {
-      data = xhr.response;
-    } else {
-      data = xhr.responseText;
-    }
-    if (responseType === 'json') {
-      try {
-        data = JSON.parse(data);
-      } catch (e) {
-        // Ignore invalid JSON
-      }
-    }
-    return Object.assign({
-      url,
-      data,
-      xhr,
-    }, extra);
+export async function request(url, options = {}) {
+  options = Object.assign({}, options);
+  const { responseType, body } = options;
+  if (body && Object.prototype.toString.call(body) === '[object Object]') {
+    options.headers = Object.assign({}, options.headers);
+    options.headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(body);
   }
+  const result = {};
+  try {
+    const resp = await fetch(url, options);
+    const loadMethod = {
+      arraybuffer: 'arrayBuffer',
+      blob: 'blob',
+      json: 'json',
+    }[responseType] || 'text';
+    // status for `file:` protocol will always be `0`
+    result.status = resp.status || 200;
+    result.headers = resp.headers;
+    result.data = await resp[loadMethod]();
+  } catch {
+    result.status = -1;
+  }
+  if (result.status > 300) throw result;
+  return result;
 }
 
 const SIMPLE_VALUE_TYPE = {
