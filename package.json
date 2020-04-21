@@ -54,7 +54,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.9.2",
-    "codemirror": "^5.52.2",
+    "codemirror": "^5.53.0",
     "core-js": "^3.6.4",
     "tldjs": "^2.3.1",
     "vue": "^2.6.11",
