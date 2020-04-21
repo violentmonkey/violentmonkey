@@ -133,6 +133,14 @@ const WebDAV = BaseService.extend({
     this.headers.Authorization = `Basic ${auth}`;
     return true;
   },
+  loadData(options) {
+    // Bypassing login CSRF protection in Nextcloud / Owncloud by not sending cookies.
+    // We are not using web UI and cookie authentication, so we don't have to worry about that.
+    // See https://github.com/violentmonkey/violentmonkey/issues/976
+    return BaseService.prototype.loadData.call(this, Object.assign({
+      credentials: 'omit',
+    }, options));
+  },
   handleMetaError(res) {
     if (![
       404, // File not exists

@@ -139,16 +139,21 @@ export function ensureArray(data) {
  * @return Promise
  */
 export async function request(url, options = {}) {
-  options = Object.assign({}, options);
-  const { responseType, body } = options;
-  if (body && Object.prototype.toString.call(body) === '[object Object]') {
-    options.headers = Object.assign({}, options.headers);
-    options.headers['Content-Type'] = 'application/json';
-    options.body = JSON.stringify(body);
+  const { responseType } = options;
+  const init = {
+    method: options.method,
+    body: options.body,
+    headers: options.headers,
+    credentials: options.credentials,
+  };
+  if (init.body && Object.prototype.toString.call(init.body) === '[object Object]') {
+    init.headers = Object.assign({}, init.headers);
+    init.headers['Content-Type'] = 'application/json';
+    init.body = JSON.stringify(init.body);
   }
   const result = {};
   try {
-    const resp = await fetch(url, options);
+    const resp = await fetch(url, init);
     const loadMethod = {
       arraybuffer: 'arrayBuffer',
       blob: 'blob',
