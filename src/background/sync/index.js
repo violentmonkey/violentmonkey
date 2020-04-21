@@ -30,5 +30,4 @@ export {
   getStates,
   authorize,
   revoke,
-  setConfig,
 };

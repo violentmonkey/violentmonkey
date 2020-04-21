@@ -3,7 +3,7 @@ import {
 } from '#/common';
 import { TIMEOUT_HOUR } from '#/common/consts';
 import {
-  forEachEntry, objectGet, objectSet, objectPick, objectPurify,
+  forEachEntry, objectSet, objectPick, objectPurify,
 } from '#/common/object';
 import {
   getEventEmitter, getOption, setOption, hookOptions,
@@ -579,6 +579,6 @@ export function setConfig(config) {
 }
 
 hookOptions((data) => {
-  const value = objectGet(data, 'sync.current');
+  const value = data?.['sync.current'];
   if (value) initialize();
 });
