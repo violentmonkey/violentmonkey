@@ -215,16 +215,7 @@ export default {
     };
   },
   watch: {
-    active(val) {
-      const onOff = val ? 'on' : 'off';
-      this.cm[onOff]('blur', this.onKeyDownToggler);
-      this.cm[onOff]('focus', this.onKeyDownToggler);
-      if (val) {
-        this.cm?.focus();
-      } else {
-        window.removeEventListener('keydown', this.onKeyDown);
-      }
-    },
+    active: 'onActive',
     value(value) {
       if (value === this.cached) return;
       this.cached = value;
@@ -325,6 +316,16 @@ export default {
         e.stopPropagation();
       });
       this.$emit('ready', cm);
+    },
+    onActive(state) {
+      const onOff = state ? 'on' : 'off';
+      this.cm[onOff]('blur', this.onKeyDownToggler);
+      this.cm[onOff]('focus', this.onKeyDownToggler);
+      if (state) {
+        this.cm?.focus();
+      } else {
+        window.removeEventListener('keydown', this.onKeyDown);
+      }
     },
     /* reroute hotkeys back to CM when it isn't focused,
        but ignore `window` blur (`evt` param is absent) */
@@ -433,6 +434,7 @@ export default {
     if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
     this.debouncedFind = debounce(this.searchInPlace, 100);
     this.$refs.code.addEventListener('copy', this.onCopy);
+    this.onActive(true);
     hookSetting('editor', (newUserOpts) => {
       // Use defaults for keys that were present in the old userOpts but got deleted in newUserOpts
       ({ ...this.cmOptions, ...newUserOpts })::forEachEntry(([key, val]) => {
@@ -443,6 +445,9 @@ export default {
       });
       userOpts = newUserOpts;
     });
+  },
+  beforeDestroy() {
+    this.onActive(false);
   },
 };
 </script>
