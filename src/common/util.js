@@ -132,6 +132,44 @@ export function ensureArray(data) {
   return Array.isArray(data) ? data : [data];
 }
 
+const binaryTypes = [
+  'blob',
+  'arraybuffer',
+];
+export async function requestLocalFile(url, options = {}) {
+  // only GET method is allowed for local files
+  // headers is meaningless
+  return new Promise((resolve, reject) => {
+    const result = {};
+    const xhr = new XMLHttpRequest();
+    const { responseType } = options;
+    xhr.open('GET', url, true);
+    if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
+    xhr.onload = () => {
+      // status for `file:` protocol will always be `0`
+      result.status = xhr.status || 200;
+      result.data = binaryTypes.includes(responseType) ? xhr.response : xhr.responseText;
+      if (responseType === 'json') {
+        try {
+          result.data = JSON.parse(result.data);
+        } catch {
+          // ignore invalid JSON
+        }
+      }
+      if (result.status > 300) {
+        reject(result);
+      } else {
+        resolve(result);
+      }
+    };
+    xhr.onerror = () => {
+      result.status = -1;
+      reject(result);
+    };
+    xhr.send();
+  });
+}
+
 /**
  * Make a request.
  * @param {string} url
@@ -139,6 +177,8 @@ export function ensureArray(data) {
  * @return Promise
  */
 export async function request(url, options = {}) {
+  // fetch does not support local file
+  if (url.startsWith('file://')) return requestLocalFile(url, options);
   const { responseType } = options;
   const init = {
     method: options.method,
