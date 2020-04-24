@@ -3,7 +3,7 @@ import { forEachEntry, objectPick } from '#/common/object';
 import ua from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
-import { extensionRoot } from './init';
+import { extensionRoot, postInitialize } from './init';
 import { commands } from './message';
 
 const VM_VERIFY = 'VM-Verify';
@@ -77,8 +77,6 @@ const HeaderInjector = (() => {
   const apiFilter = {
     urls: ['<all_urls>'],
     types: ['xmlhttprequest'],
-    // -1 is browser.tabs.TAB_ID_NONE to limit the listener to requests from the bg script
-    tabId: -1,
   };
   const EXTRA_HEADERS = [
     browser.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS,
@@ -147,6 +145,13 @@ const HeaderInjector = (() => {
     },
   };
 })();
+
+// In Chrome 74+ the listener can't be attached during page load https://crbug.com/1074282
+if (ua.isChrome && TextEncoder.prototype.encodeInto) {
+  postInitialize.push(() => {
+    HeaderInjector.add(0);
+  });
+}
 
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
