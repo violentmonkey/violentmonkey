@@ -19,31 +19,31 @@
     </div>
     <p v-if="state" class="mt-1" v-text="state.message"></p>
     <fieldset class="mt-1" v-if="state && state.authType === 'password'">
-      <div class="sync-server-url">
-        <label v-text="i18n('labelSyncServerUrl')"></label>
+      <label class="sync-server-url">
+        <span v-text="i18n('labelSyncServerUrl')"></span>
         <input
           type="text"
           v-model="state.userConfig.serverUrl"
           :disabled="!state.canAuthorize || state.userConfig.anonymous"
         />
-      </div>
+      </label>
       <div class="mt-1">
-        <div class="inline-block mr-2">
-          <label v-text="i18n('labelSyncUsername')"></label>
+        <label class="mr-2">
+          <span v-text="i18n('labelSyncUsername')"></span>
           <input
             type="text"
             v-model="state.userConfig.username"
             :disabled="!state.canAuthorize || state.userConfig.anonymous"
           />
-        </div>
-        <div class="inline-block mr-2">
-          <label v-text="i18n('labelSyncPassword')"></label>
+        </label>
+        <label class="inline-block mr-2">
+          <span v-text="i18n('labelSyncPassword')"></span>
           <input
             type="password"
             v-model="state.userConfig.password"
             :disabled="!state.canAuthorize || state.userConfig.anonymous"
           />
-        </div>
+        </label>
         <label class="mr-2">
           <input
             type="checkbox"

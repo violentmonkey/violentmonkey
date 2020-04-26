@@ -50,7 +50,7 @@ const OneDrive = BaseService.extend({
   },
   handleMetaError(res) {
     if (res.status === 404) {
-      const header = res.xhr.getResponseHeader('WWW-Authenticate') || '';
+      const header = res.headers.get('WWW-Authenticate')?.[0] || '';
       if (/^Bearer realm="OneDriveAPI"/.test(header)) {
         return this.refreshToken().then(() => this.getMeta());
       }

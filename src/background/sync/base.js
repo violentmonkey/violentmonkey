@@ -3,7 +3,7 @@ import {
 } from '#/common';
 import { TIMEOUT_HOUR } from '#/common/consts';
 import {
-  forEachEntry, objectGet, objectSet, objectPick, objectPurify,
+  forEachEntry, objectSet, objectPick, objectPurify,
 } from '#/common/object';
 import {
   getEventEmitter, getOption, setOption, hookOptions,
@@ -311,10 +311,7 @@ export const BaseService = serviceFactory({
   },
   loadData(options) {
     const { progress } = this;
-    let { delay } = options;
-    if (delay == null) {
-      delay = this.delayTime;
-    }
+    const { delay = this.delayTime } = options;
     let lastFetch = Promise.resolve();
     if (delay) {
       lastFetch = this.lastFetch
@@ -325,17 +322,11 @@ export const BaseService = serviceFactory({
     progress.total += 1;
     onStateChange();
     return lastFetch.then(() => {
-      let { prefix } = options;
-      if (prefix == null) prefix = this.urlPrefix;
-      const headers = Object.assign({}, this.headers, options.headers);
+      options = Object.assign({}, options);
+      options.headers = Object.assign({}, this.headers, options.headers);
       let { url } = options;
-      if (url.startsWith('/')) url = prefix + url;
-      return request(url, {
-        headers,
-        method: options.method,
-        body: options.body,
-        responseType: options.responseType,
-      });
+      if (url.startsWith('/')) url = (options.prefix ?? this.urlPrefix) + url;
+      return request(url, options);
     })
     .then(({ data }) => ({ data }), error => ({ error }))
     .then(({ data, error }) => {
@@ -588,6 +579,6 @@ export function setConfig(config) {
 }
 
 hookOptions((data) => {
-  const value = objectGet(data, 'sync.current');
+  const value = data?.['sync.current'];
   if (value) initialize();
 });

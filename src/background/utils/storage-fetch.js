@@ -7,7 +7,7 @@ storage.cache.fetch = cacheOrFetch({
     return { ...options, responseType: 'arraybuffer' };
   },
   async transform(response, url, options, check) {
-    const contentType = (response.xhr.getResponseHeader('content-type') || '').split(';')[0];
+    const contentType = response.headers.get('content-type')?.[0];
     await check?.(url, response.data, contentType);
     return `${contentType},${btoa(buffer2string(response.data))}`;
   },
@@ -30,7 +30,7 @@ function cacheOrFetch(handlers = {}) {
     const [url, options] = args;
     try {
       const res = await request(url, init?.(options) || options);
-      if (await isModified(res.xhr, url)) {
+      if (await isModified(res, url)) {
         const result = transform ? await transform(res, ...args) : res.data;
         await this.set(url, result);
       }
@@ -43,10 +43,10 @@ function cacheOrFetch(handlers = {}) {
   }
 }
 
-async function isModified(xhr, url) {
-  const mod = xhr.getResponseHeader('etag')?.trim()
-  || +new Date(xhr.getResponseHeader('last-modified'))
-  || +new Date(xhr.getResponseHeader('date'));
+async function isModified(res, url) {
+  const mod = res.headers.get('etag')?.[0]?.trim()
+  || +new Date(res.headers.get('last-modified')?.[0])
+  || +new Date(res.headers.get('date')?.[0]);
   if (!mod || mod !== await storage.mod.getOne(url)) {
     if (mod) await storage.mod.set(url, mod);
     return true;
