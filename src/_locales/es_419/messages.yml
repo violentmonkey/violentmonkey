@@ -226,7 +226,9 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: >-
+    La pestaña del archivo fuente debe mantenerse abierta en Firefox 68 y
+    versiones posteriores.
 labelAbout:
   description: Label shown on top of the about page.
   message: Acerca de Violentmonkey
@@ -302,7 +304,7 @@ labelExportScriptData:
   message: Exportar datos del script
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'Exponer la versión instalada en los sitios del catálogo de userscripts: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
@@ -371,7 +373,7 @@ labelPopupSort:
   message: Ordenar los scripts en ventana emergente por $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Política de privacidad
 labelRelated:
   description: Label of related links.
   message: 'Enlaces relacionados: '
@@ -508,7 +510,9 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: >-
+    Los cambios que realices en el modo de incógnito también se aplican a tu
+    perfil principal.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script instalado.
