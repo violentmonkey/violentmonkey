@@ -226,7 +226,9 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: >-
+    Karta z podglądem źródła powinna pozostać otwarta przy korzystaniu z
+    Firefoksa w wersjach 68 i nowszych.
 labelAbout:
   description: Label shown on top of the about page.
   message: O rozszerzeniu Violentmonkey
@@ -298,7 +300,9 @@ labelExportScriptData:
   message: Eksportuj dane skryptów
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: >-
+    Pokazuj informację o obecnie zainstalowanej wersji skryptu na jego stronie
+    listingu w katalogach: $1
 labelFeedback:
   description: Label of link to feedback page.
   message: Informacje zwrotne
