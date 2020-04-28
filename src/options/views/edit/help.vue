@@ -16,48 +16,9 @@
 </template>
 
 <script>
-import CodeMirror from 'codemirror';
-import { forEachEntry } from '#/common/object';
-
 export default {
-  props: ['active', 'navLabels', 'target'],
-  data() {
-    return {
-      hotkeys: null,
-    };
-  },
-  watch: {
-    active(val) {
-      if (val && !this.hotkeys) {
-        const cmOpts = this.target.cm.options;
-        this.hotkeys = [
-          ['Alt-PageUp', ` ${this.navLabels.join(' < ')}`],
-          ['Alt-PageDown', ` ${this.navLabels.join(' > ')}`],
-          ...Object.entries(expandKeyMap({}, cmOpts.extraKeys, cmOpts.keyMap))
-          .sort((a, b) => compareString(a, b, 1) || compareString(a, b, 0)),
-        ];
-      }
-    },
-  },
+  props: ['hotkeys'],
 };
-
-function compareString(a, b, index) {
-  return a[index] < b[index] ? -1 : a[index] > b[index];
-}
-
-function expandKeyMap(res, ...maps) {
-  maps.forEach((map) => {
-    if (typeof map === 'string') map = CodeMirror.keyMap[map];
-    map::forEachEntry(([key, value]) => {
-      if (!res[key] && /^[a-z]+$/i.test(value) && CodeMirror.commands[value]) {
-        res[key] = value;
-      }
-    });
-    if (map.fallthrough) expandKeyMap(res, map.fallthrough);
-  });
-  delete res.fallthrough;
-  return res;
-}
 </script>
 
 <style>

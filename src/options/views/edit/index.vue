@@ -47,17 +47,16 @@
       <vm-help
         class="abs-full edit-body"
         v-show="nav === 'help'"
-        :active="nav === 'help'"
-        :navLabels="Object.values(navItems)"
-        :target="this.$refs.code"
+        :hotkeys="hotkeys"
       />
     </div>
   </div>
 </template>
 
 <script>
+import CodeMirror from 'codemirror';
 import { i18n, sendCmd } from '#/common';
-import { deepCopy, deepEqual, objectPick } from '#/common/object';
+import { deepCopy, deepEqual, forEachEntry, objectPick } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import { route } from '#/common/router';
 import { store, showConfirmation, showMessage } from '../../utils';
@@ -91,6 +90,24 @@ const toList = text => (
 let saved;
 let showingConfirmation;
 
+let K_SAVE; // deduced from the current CodeMirror keymap
+const K_PREV_PANEL = 'Alt-PageUp';
+const K_NEXT_PANEL = 'Alt-PageDown';
+const expandKeyMap = (res, ...maps) => {
+  maps.forEach((map) => {
+    if (typeof map === 'string') map = CodeMirror.keyMap[map];
+    map::forEachEntry(([key, value]) => {
+      if (!res[key] && /^[a-z]+$/i.test(value) && CodeMirror.commands[value]) {
+        res[key] = value;
+      }
+    });
+    if (map.fallthrough) expandKeyMap(res, map.fallthrough);
+  });
+  delete res.fallthrough;
+  return res;
+};
+const compareString = (a, b) => (a < b ? -1 : a > b);
+
 export default {
   props: ['initial'],
   components: {
@@ -113,6 +130,7 @@ export default {
           this.nav = 'help';
         },
       },
+      hotkeys: null,
     };
   },
   computed: {
@@ -174,6 +192,23 @@ export default {
     saved = objectPick(this, ['code', 'settings'], deepCopy);
     this.$watch('code', this.onChange);
     this.$watch('settings', this.onChange, { deep: true });
+    // hotkeys
+    {
+      const navLabels = Object.values(this.navItems);
+      const cmOpts = this.$refs.code.cm.options;
+      const hotkeys = [
+        [K_PREV_PANEL, ` ${navLabels.join(' < ')}`],
+        [K_NEXT_PANEL, ` ${navLabels.join(' > ')}`],
+        ...Object.entries(expandKeyMap({}, cmOpts.extraKeys, cmOpts.keyMap))
+        .sort((a, b) => compareString(a[1], b[1]) || compareString(a[0], b[0])),
+      ];
+      K_SAVE = hotkeys.find(([, cmd]) => cmd === 'save')?.[0];
+      if (!K_SAVE) {
+        K_SAVE = 'Ctrl-S';
+        hotkeys.unshift([K_SAVE, 'save']);
+      }
+      this.hotkeys = hotkeys;
+    }
   },
   methods: {
     async save() {
@@ -224,16 +259,23 @@ export default {
       this.save().then(this.close);
     },
     switchPanel(e) {
-      if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
-        if (e.altKey) {
-          const dir = e.code === 'PageDown' && 1 || e.code === 'PageUp' && -1;
-          if (dir) {
-            const keys = Object.keys(this.navItems);
-            this.nav = keys[(keys.indexOf(this.nav) + dir + keys.length) % keys.length];
-          }
-        } else if (e.code === 'Escape') {
-          this.nav = 'code';
-        }
+      const key = CodeMirror.keyName(e);
+      switch (key) {
+      case K_PREV_PANEL:
+      case K_NEXT_PANEL: {
+        const dir = key === K_NEXT_PANEL ? 1 : -1;
+        const keys = Object.keys(this.navItems);
+        this.nav = keys[(keys.indexOf(this.nav) + dir + keys.length) % keys.length];
+        break;
+      }
+      case K_SAVE:
+        if (this.canSave) this.save();
+        e.preventDefault();
+        break;
+      case 'Esc':
+        this.nav = 'code';
+        break;
+      default:
       }
     },
     toggleUnloadSentry(state) {
