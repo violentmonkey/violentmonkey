@@ -11,15 +11,6 @@ export const INJECT_MAPPING = {
   [INJECT_CONTENT]: [INJECT_CONTENT],
 };
 
-export const GRANT_NONE_ARGS = [
-  'GM',
-  'GM_info',
-  'unsafeWindow',
-  'cloneInto',
-  'createObjectIn',
-  'exportFunction',
-];
-
 export const CMD_SCRIPT_ADD = 'AddScript';
 export const CMD_SCRIPT_UPDATE = 'UpdateScript';
 

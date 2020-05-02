@@ -1,7 +1,5 @@
 import { getUniqId } from '#/common';
-import {
-  GRANT_NONE_ARGS, INJECT_CONTENT, INJECTABLE_TAB_URL_RE, METABLOCK_RE,
-} from '#/common/consts';
+import { INJECT_CONTENT, INJECTABLE_TAB_URL_RE, METABLOCK_RE } from '#/common/consts';
 import ua from '#/common/ua';
 import cache from './cache';
 import { getScriptsByURL } from './db';
@@ -89,15 +87,9 @@ function prepareScript(script, index, scripts) {
   // adding `;` on a new line in case some required script ends with a line comment
   const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];
   const hasReqs = reqsSlices.length;
-  const { grant } = meta;
-  const grantNone = !grant?.length || grant.length === 1 && grant[0] === 'none';
   const injectedCode = [
-    `window.${dataKey}=function(${dataKey}`,
-    grantNone ? `,${GRANT_NONE_ARGS.join(',')}` : '',
-    '){try{',
-    grantNone ? '' : 'with(this)',
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    '((define,module,exports)=>{',
+    `window.${dataKey}=function(log){try{with(this)((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs ? '(()=>{' : '',
@@ -107,14 +99,13 @@ function prepareScript(script, index, scripts) {
     code.endsWith('\n') ? '' : '\n',
     hasReqs ? '})()' : '',
     // Firefox lists .user.js among our own content scripts so a space at start will group them
-    `})()}catch(e){${dataKey}(e)}}`,
+    '})()}catch(e){log(e)}}',
     `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? '%20' : ''}${name}.user.js#${id}`,
   ].join('');
   cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
   scripts[index] = {
     ...script,
     dataKey,
-    grantNone,
     code: isContent ? '' : injectedCode,
     metaStr: code.match(METABLOCK_RE)[1] || '',
     values: values[id],
