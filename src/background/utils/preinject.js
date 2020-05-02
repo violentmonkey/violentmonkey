@@ -89,7 +89,7 @@ function prepareScript(script, index, scripts) {
   const hasReqs = reqsSlices.length;
   const injectedCode = [
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    `window.${dataKey}=function(log){try{with(this)((define,module,exports)=>{`,
+    `window.${dataKey}=function(${dataKey}){try{with(this)((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs ? '(()=>{' : '',
@@ -99,7 +99,7 @@ function prepareScript(script, index, scripts) {
     code.endsWith('\n') ? '' : '\n',
     hasReqs ? '})()' : '',
     // Firefox lists .user.js among our own content scripts so a space at start will group them
-    '})()}catch(e){log(e)}}',
+    `})()}catch(e){${dataKey}(e)}}`,
     `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? '%20' : ''}${name}.user.js#${id}`,
   ].join('');
   cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
