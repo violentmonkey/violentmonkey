@@ -1,11 +1,10 @@
 import { hasOwnProperty } from '#/common';
-import { GRANT_NONE_ARGS, INJECT_CONTENT } from '#/common/consts';
+import { INJECT_CONTENT } from '#/common/consts';
 import { assign, defineProperty, describeProperty, objectKeys } from '#/common/object';
 import bridge from './bridge';
 import {
-  filter, forEach, includes, map, push, slice,
+  filter, forEach, includes, map, slice,
   addEventListener, removeEventListener,
-  logging,
 } from '../utils/helpers';
 import { makeGmApi, vmOwnFunc } from './gm-api';
 
@@ -28,10 +27,13 @@ let windowClose;
 // making a local copy to avoid using webpack's import wrappers as .has() is invoked **a lot**
 const has = hasOwnProperty;
 
-export function wrapGmAndRun(script, scriptFunc) {
+export function wrapGM(script) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-  const grant = !script.grantNone && script.meta.grant || [];
+  const grant = script.meta.grant || [];
+  if (grant.length === 1 && grant[0] === 'none') {
+    grant.length = 0;
+  }
   const id = script.props.id;
   const resources = script.meta.resources || {};
   const gmInfo = makeGmInfo(script, resources);
@@ -64,13 +66,7 @@ export function wrapGmAndRun(script, scriptFunc) {
       else gm[name] = caller;
     }
   });
-  const args = [logging.error];
-  if (grant.length) {
-    scriptFunc.apply(makeGlobalWrapper(gm), args);
-  } else {
-    GRANT_NONE_ARGS::forEach(name => args::push(gm[name]));
-    scriptFunc.apply(global, args);
-  }
+  return grant.length ? makeGlobalWrapper(gm) : gm;
 }
 
 function makeGmInfo(script, resources) {

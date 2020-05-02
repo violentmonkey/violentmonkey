@@ -1,9 +1,9 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import { defineProperty, describeProperty } from '#/common/object';
 import { bindEvents } from '../utils';
-import { forEach, log, remove, Promise } from '../utils/helpers';
+import { forEach, log, logging, remove, Promise } from '../utils/helpers';
 import bridge from './bridge';
-import { wrapGmAndRun } from './gm-wrapper';
+import { wrapGM } from './gm-wrapper';
 import store from './store';
 import './gm-values';
 import './notifications';
@@ -104,5 +104,5 @@ async function onCodeSet(item, fn) {
   if (item.action === 'wait') {
     await bridge.load;
   }
-  wrapGmAndRun(item, fn);
+  wrapGM(item)::fn(logging.error);
 }
