@@ -1,0 +1,17 @@
+name: Upload translations to Transifex
+
+on:
+  pull_request_target:
+    types:
+      - closed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # if PR with label `i18n` is merged
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'i18n')
+    steps:
+      - name: Upload translations
+        run: node scripts/transifex push
+        env:
+          TRANSIFEX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
