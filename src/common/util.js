@@ -206,7 +206,7 @@ export async function request(url, options = {}) {
   } catch {
     result.status = -1;
   }
-  if (result.status > 300) throw result;
+  if (result.status < 0 || result.status > 300) throw result;
   return result;
 }
 

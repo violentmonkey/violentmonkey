@@ -86,6 +86,7 @@ async function downloadUpdate({ props: { id }, meta, custom }) {
       return (await request(downloadURL, { headers: NO_HTTP_CACHE })).data;
     }
   } catch (error) {
+    if (process.env.DEBUG) console.error(error);
     announce(errorMessage || i18n('msgErrorFetchingUpdateInfo'), { error });
   }
   throw update;
