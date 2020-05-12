@@ -47,6 +47,8 @@
     --fill-14: #aeaeae;
     --fill-15: #b8b8b8;
     --tooltip-border-color: #8888;
+    --scrollbar-bg: #1a1a1a;
+    --input-bg: #111;
   }
 }
 
@@ -365,7 +367,7 @@ body .vl-tooltip {
     appearance: none;
     width: 1em;
     height: 1em;
-    background: #111;
+    background: var(--input-bg);
     position: relative;
     border: 1px solid #555;
     &:checked::after {
@@ -389,26 +391,26 @@ body .vl-tooltip {
   input[type="password"],
   select,
   textarea {
-    background: #111;
+    background: var(--input-bg);
     color: var(--fg);
     border: 1px solid var(--fill-4);
   }
   ::-webkit-scrollbar {
     width: 14px;
     height: 14px;
-    background: #1a1a1a;
+    background: var(--scrollbar-bg);
     &-button:single-button {
-      background: radial-gradient(circle at center, #333 40%, #1a1a1a 40%);
+      background: radial-gradient(circle at center, #333 40%, var(--scrollbar-bg) 40%);
       &:hover {
-        background: radial-gradient(circle at center, #444 40%, #1a1a1a 40%);
+        background: radial-gradient(circle at center, #444 40%, var(--scrollbar-bg) 40%);
       }
       &:active {
-        background: radial-gradient(circle at center, #555 40%, #1a1a1a 40%);
+        background: radial-gradient(circle at center, #555 40%, var(--scrollbar-bg) 40%);
       }
     }
     &-track-piece {
       background: #333;
-      border: 4px solid #1a1a1a;
+      border: 4px solid var(--scrollbar-bg);
       border-radius: 8px;
       &:hover {
         background: #444;
@@ -418,7 +420,7 @@ body .vl-tooltip {
       }
     }
     &-thumb {
-      border: 3px solid #1a1a1a;
+      border: 3px solid var(--scrollbar-bg);
       border-radius: 8px;
       background: #555;
       &:hover {
@@ -430,7 +432,7 @@ body .vl-tooltip {
     }
   }
   :-webkit-autofill {
-    box-shadow: 0 0 0 1000px #111 inset;
+    box-shadow: 0 0 0 1000px var(--input-bg) inset;
     -webkit-text-fill-color: #fff;
   }
 }
