@@ -431,6 +431,12 @@ body .vl-tooltip {
       }
     }
   }
+  ::-webkit-resizer {
+    background: var(--input-bg) linear-gradient(-45deg,
+      transparent 3px, #888 3px, #888 4px, transparent 4px,
+      transparent 6px, #888 6px, #888 7px, transparent 7px) no-repeat;
+    border: 2px solid transparent;
+  }
   :-webkit-autofill {
     box-shadow: 0 0 0 1000px var(--input-bg) inset;
     -webkit-text-fill-color: #fff;
