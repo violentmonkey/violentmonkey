@@ -75,7 +75,9 @@
                  @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
           <div class="submenu-buttons">
-            <div class="submenu-button" @click="onEditScript(item)">
+            <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
+            <div class="submenu-button" @click="onEditScript(item)"
+                 :title="i18n('buttonEditClickHint')">
               <icon name="code"></icon>
             </div>
           </div>
