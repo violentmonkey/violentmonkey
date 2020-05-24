@@ -134,6 +134,9 @@ footer {
       margin-right: $iconMR;
     }
     > .flex-auto {
+      display: flex;
+      align-self: stretch;
+      align-items: center;
       &:last-child {
         padding-right: $itemPaddingX;
       }
