@@ -13,6 +13,9 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: Editează
+buttonEditClickHint:
+  description: Tooltip for the Edit button in popup.
+  message: ''
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Golește coșul de gunoi acum!
@@ -369,7 +372,7 @@ labelPopupSort:
   message: Sortează scripturile din popup după $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Politică de confidențialitate
 labelRelated:
   description: Label of related links.
   message: 'Linkuri relevante: '

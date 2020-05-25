@@ -13,6 +13,11 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: Modifica
+buttonEditClickHint:
+  description: Tooltip for the Edit button in popup.
+  message: >-
+    Puoi anche fare clic con il tasto destro, ctrl-clic, clic con la rotella sul
+    nome dello script.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Svuota il cestino ora!
@@ -220,7 +225,9 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: >-
+    La scheda del file sorgente deve essere mantenuta aperta in Firefox 68 e
+    versioni successive.
 labelAbout:
   description: Label shown on top of the about page.
   message: Riguardo Violentmonkey
@@ -292,7 +299,7 @@ labelExportScriptData:
   message: Esporta i dati degli script
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'Esporre la versione installata sui siti catalogo di userscript: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
@@ -361,7 +368,7 @@ labelPopupSort:
   message: Sort scripts in popup by $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Politica Sulla Riservatezza
 labelRelated:
   description: Label of related links.
   message: 'Link correlati: '
@@ -474,7 +481,7 @@ msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: ''
+  message: Errore durante il recupero della risorsa!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: Errore durante lo scaricamento dello script!
@@ -498,7 +505,9 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: >-
+    Le modifiche apportate in modalità di navigazione in incognito si applicano
+    anche al tuo profilo principale.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script installato.

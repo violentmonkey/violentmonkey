@@ -13,6 +13,9 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: Upraviť
+buttonEditClickHint:
+  description: Tooltip for the Edit button in popup.
+  message: ''
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Vysypať kôš teraz!

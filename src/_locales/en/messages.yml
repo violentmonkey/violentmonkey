@@ -15,7 +15,7 @@ buttonEdit:
   message: Edit
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: You can also Right-click, Ctrl-click, Wheel-click on the script name.
+  message: 'You can also Right-click, Ctrl-click, Wheel-click on the script name.'
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Empty recycle bin now!

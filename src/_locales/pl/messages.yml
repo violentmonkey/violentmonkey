@@ -13,6 +13,11 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: Edytuj
+buttonEditClickHint:
+  description: Tooltip for the Edit button in popup.
+  message: >-
+    Możesz także kliknąć prawym przyciskiem myszy, z Ctrl, kółkiem myszy na
+    nazwie skryptu.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Opróżnij kosz teraz!

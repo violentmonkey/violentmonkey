@@ -13,6 +13,9 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: Éditer
+buttonEditClickHint:
+  description: Tooltip for the Edit button in popup.
+  message: ''
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Vider la corbeille
