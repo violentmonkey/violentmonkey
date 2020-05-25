@@ -13,6 +13,9 @@ buttonDisable:
 buttonEdit:
   description: Button to edit a script.
   message: 编辑
+buttonEditClickHint:
+  description: Tooltip for the Edit button in popup.
+  message: ''
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: 立即清空回收站！
