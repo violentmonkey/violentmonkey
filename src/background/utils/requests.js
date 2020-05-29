@@ -3,7 +3,7 @@ import { forEachEntry, objectPick } from '#/common/object';
 import ua from '#/common/ua';
 import cache from './cache';
 import { isUserScript, parseMeta } from './script';
-import { extensionRoot, postInitialize } from './init';
+import { extensionRoot } from './init';
 import { commands } from './message';
 
 const VM_VERIFY = 'VM-Verify';
@@ -124,6 +124,12 @@ const HeaderInjector = (() => {
       },
     },
   };
+  // Chrome 74+ needs to have any extraHeaders listener at tab load start, https://crbug.com/1074282
+  // We're attaching a no-op in non-blocking mode so it's very lightweight and fast.
+  // TODO: check the version range (via feature detection?) when it's fixed in Chrome
+  if (ua.isChrome && TextEncoder.prototype.encodeInto) {
+    browser.webRequest.onBeforeSendHeaders.addListener(noop, apiFilter, ['extraHeaders']);
+  }
   return {
     add(reqId, headers) {
       // need to set the entry even if it's empty [] so that 'if' check in del() runs only once
@@ -145,13 +151,6 @@ const HeaderInjector = (() => {
     },
   };
 })();
-
-// In Chrome 74+ the listener can't be attached during page load https://crbug.com/1074282
-if (ua.isChrome && TextEncoder.prototype.encodeInto) {
-  postInitialize.push(() => {
-    HeaderInjector.add(0);
-  });
-}
 
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
