@@ -1,7 +1,12 @@
-import { i18n, getFullUrl, isRemote, getRnd4, sendCmd, trueJoin } from '#/common';
-import { CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, TIMEOUT_WEEK } from '#/common/consts';
+import {
+  compareVersion, i18n, getFullUrl, isRemote, getRnd4, sendCmd, trueJoin,
+} from '#/common';
+import {
+  CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK,
+} from '#/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
 import storage from '#/common/storage';
+import ua from '#/common/ua';
 import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
 import { testScript, testBlacklist } from './tester';
@@ -158,6 +163,13 @@ preInitialize.push(async () => {
       return map;
     }, {}),
   });
+  // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
+  if (version !== lastVersion
+  && ua.isFirefox
+  && data.options?.defaultInjectInto === INJECT_PAGE
+  && compareVersion(lastVersion, '02.12.07') <= 0) {
+    setOption('defaultInjectInto', INJECT_AUTO);
+  }
   if (process.env.DEBUG) {
     console.log('store:', store); // eslint-disable-line no-console
   }
