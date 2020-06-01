@@ -15,7 +15,7 @@ buttonEdit:
   message: Sunting
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: 'Anda juga bisa Klik-kanan, Ctrl-klik, Wheel-klik pada nama skrp.'
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Kosongkan keranjang sampah sekarang!
@@ -225,7 +225,7 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: Tab sumber berkas harus tetap terbuka di Firefox 68 dan terbaru.
 labelAbout:
   description: Label shown on top of the about page.
   message: Tentang Violentmonkey
@@ -297,7 +297,7 @@ labelExportScriptData:
   message: Ekspor data skrip
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'Bagikan versi skrip terpasang pada situs katalog userscript: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Umpanbalik
@@ -479,7 +479,7 @@ msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: ''
+  message: Kesalahan saat mengambil sumber daya!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: Kesalahan saat mengambil skrip!
@@ -503,7 +503,9 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: >-
+    Perubahan yang anda buat dalam mode penjelajahan Pribadi juga diterapkan ke
+    profil utama anda.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skrip telah terpasang.
@@ -606,7 +608,9 @@ titleScriptUpdated:
   message: Perbarui
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * <Enter> key menambahkan teks ke riwayat autocomplete
+    * Sintaksis RegExp didukung: /re/ dan /re/flags
 valueLabelKey:
   description: Label for key of a script value.
   message: ''

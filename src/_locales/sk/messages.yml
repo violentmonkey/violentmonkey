@@ -15,7 +15,9 @@ buttonEdit:
   message: Upraviť
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: >-
+    Tiež môžete použiť pravoklik, Ctrl + klik, kliknutie kolieskom na názov
+    skriptu.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Vysypať kôš teraz!

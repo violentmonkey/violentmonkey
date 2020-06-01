@@ -15,7 +15,9 @@ buttonEdit:
   message: Editează
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: >-
+    Poți și să faci clic dreapta, Ctrl+clic, clic pe rotiță pe numele
+    scriptului.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Golește coșul de gunoi acum!

@@ -15,7 +15,7 @@ buttonEdit:
   message: Редактировать
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: 'Вы также можете щелкнуть ПКМ, Ctrl+ЛКМ или СКМ на имени скрипта.'
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Очистить корзину!
