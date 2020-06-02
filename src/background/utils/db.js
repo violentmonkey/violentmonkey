@@ -167,7 +167,7 @@ preInitialize.push(async () => {
   if (version !== lastVersion
   && ua.isFirefox
   && data.options?.defaultInjectInto === INJECT_PAGE
-  && compareVersion(lastVersion, '02.12.07') <= 0) {
+  && compareVersion(lastVersion, '2.12.7') <= 0) {
     setOption('defaultInjectInto', INJECT_AUTO);
   }
   if (process.env.DEBUG) {
