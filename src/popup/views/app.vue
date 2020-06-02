@@ -70,6 +70,7 @@
             <img class="script-icon" :src="scriptIconUrl(item)" @error="scriptIconError">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
             <div class="flex-auto ellipsis" v-text="item.name"
+                 :class="{failed: item.data.failed}"
                  @click.ctrl.exact.stop="onEditScript(item)"
                  @contextmenu.exact.stop="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)" />
@@ -96,6 +97,12 @@
         </div>
       </div>
     </div>
+    <div class="failure-reason" v-if="store.injectionFailure">
+      <div v-text="i18n('menuInjectionFailed')"/>
+      <a v-text="i18n('menuInjectionFailedFix')" href="#"
+         v-if="store.injectionFailure.fixable"
+         @click.prevent="onInjectionFailureFix"/>
+    </div>
     <div class="incognito"
        v-if="store.currentTab && store.currentTab.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
@@ -110,10 +117,9 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
+import { INJECT_AUTO } from '#/common/consts';
 import options from '#/common/options';
-import {
-  getLocaleString, i18n, sendCmd, sendTabCmd,
-} from '#/common';
+import { getLocaleString, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 
@@ -269,6 +275,13 @@ export default {
       sendCmd('TabOpen', {
         url: `/options/index.html#scripts/_new${id ? `/${id}` : ''}`,
       });
+      window.close();
+    },
+    async onInjectionFailureFix() {
+      // TODO: promisify options.set, resolve on storage write, await it instead of makePause
+      options.set('defaultInjectInto', INJECT_AUTO);
+      await makePause(100);
+      await browser.tabs.reload();
       window.close();
     },
   },

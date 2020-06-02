@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { getActiveTab, i18n, sendCmd } from '#/common';
-import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
+import { INJECT_PAGE, INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import handlers from '#/common/handlers';
 import { mapEntry } from '#/common/object';
 import * as tld from '#/common/tld';
@@ -41,7 +41,18 @@ Object.assign(handlers, {
     }
     if (ids.length) {
       // frameScripts may be appended multiple times if iframes have unique scripts
-      store[isTop ? 'scripts' : 'frameScripts'].push(...await sendCmd('GetMetas', ids));
+      const scope = store[isTop ? 'scripts' : 'frameScripts'];
+      scope.push(...await sendCmd('GetMetas', ids));
+      data.failedIds.forEach(id => {
+        scope.forEach((script) => {
+          if (script.props.id === id) {
+            script.failed = true;
+            if (!store.injectionFailure) {
+              store.injectionFailure = { fixable: data.injectInto === INJECT_PAGE };
+            }
+          }
+        });
+      });
     }
   },
 });

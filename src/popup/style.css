@@ -144,6 +144,9 @@ footer {
     > .flex-1 {
       padding-right: 2rem;
     }
+    .failed {
+      text-decoration: line-through red;
+    }
   }
   &-find {
     padding-left: 0;

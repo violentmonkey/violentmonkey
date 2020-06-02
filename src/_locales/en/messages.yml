@@ -455,6 +455,12 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Find scripts for this site
+menuInjectionFailed:
+  description: Injection error.
+  message: Could not inject some scripts.
+menuInjectionFailedFix:
+  description: Injection error fix, shown in case the default mode is "page".
+  message: Retry in "auto" mode
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Sub-frames only scripts
