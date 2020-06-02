@@ -3,6 +3,7 @@ export const store = {
   frameScripts: [],
   commands: [],
   domain: '',
+  injectionFailure: null,
   injectable: true,
   blacklisted: false,
 };

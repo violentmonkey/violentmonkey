@@ -69,7 +69,7 @@ export function injectScripts(contentId, webId, data, isXml) {
     },
   };
   const triage = (script) => {
-    const { custom, dataKey, meta } = script;
+    const { custom, dataKey, meta, props: { id } } = script;
     const desiredRealm = custom.injectInto || meta.injectInto || data.injectInto;
     const internalRealm = INJECT_MAPPING[desiredRealm] || INJECT_MAPPING[INJECT_AUTO];
     const realm = internalRealm.find(key => realms[key]?.injectable());
@@ -82,8 +82,10 @@ export function injectScripts(contentId, webId, data, isXml) {
       const list = lists[runAt] || lists[runAt = 'end'];
       script.action = realm === INJECT_CONTENT && (runAt === 'start' ? runAt : 'wait');
       needsInjection = !!script.action;
-      ids::push(script.props.id);
+      ids::push(id);
       list::push(script);
+    } else {
+      bridge.failedIds.push(id);
     }
     return [dataKey, needsInjection];
   };

@@ -1,6 +1,6 @@
 import { getUniqId, isEmpty } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
-import { objectKeys } from '#/common/object';
+import { objectKeys, objectPick } from '#/common/object';
 import { bindEvents, sendCmd } from '../utils';
 import {
   forEach, includes, append, createElementNS, setAttribute, NS_HTML,
@@ -37,6 +37,7 @@ const { split } = String.prototype;
   // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
   bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
   bridge.isFirefox = data.isFirefox;
+  bridge.injectInto = data.injectInto;
   if (data.scripts) injectScripts(contentId, webId, data, isXml);
   if (data.expose) bridge.post('Expose');
   isPopupShown = data.isPopupShown;
@@ -95,7 +96,10 @@ bridge.addHandlers({
 
 function sendSetPopup() {
   if (isPopupShown) {
-    sendCmd('SetPopup', { ids: bridge.ids, menus });
+    sendCmd('SetPopup', {
+      menus,
+      ...objectPick(bridge, ['ids', 'failedIds', 'injectInto']),
+    });
   }
 }
 
