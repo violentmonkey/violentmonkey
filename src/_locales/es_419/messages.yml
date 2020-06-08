@@ -15,7 +15,9 @@ buttonEdit:
   message: Editar
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: >-
+    También puedes hacer clic derecho, clic en Ctrl, clic de la rueda en el
+    nombre del script.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: ¡Vaciar papelera de reciclaje ahora!
@@ -467,6 +469,12 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Buscar scripts para este sitio
+menuInjectionFailed:
+  description: Injection error.
+  message: No se pudieron inyectar algunos scripts.
+menuInjectionFailedFix:
+  description: 'Injection error fix, shown in case the default mode is "page".'
+  message: Reintentar en modo "automático"
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Solo scripts sub-frames
