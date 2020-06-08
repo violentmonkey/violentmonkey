@@ -452,6 +452,12 @@ menuDashboard:
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 이 사이트를 위한 스크립트 찾기
+menuInjectionFailed:
+  description: Injection error.
+  message: ''
+menuInjectionFailedFix:
+  description: 'Injection error fix, shown in case the default mode is "page".'
+  message: ''
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: 하위 프레임 스크립트들
