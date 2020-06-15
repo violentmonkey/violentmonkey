@@ -463,10 +463,10 @@ menuFindScripts:
   message: Vyhľadať skripty pre túto stránku
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: Nepodarilo sa injektovať niektoré skripty.
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: ''
+  message: Vyskúšať znova v režime "auto"
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Iba skripty podrámcov

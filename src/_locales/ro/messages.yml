@@ -467,10 +467,10 @@ menuFindScripts:
   message: Găsește scripturi pentru acest site
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: Nu s-a putut injecta unele scripturi.
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: ''
+  message: Reîncearcă în modul „auto”
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Numai scripturi în sub-frame-uri
