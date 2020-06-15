@@ -362,7 +362,7 @@ labelPopupSort:
   message: ポップアップ内のスクリプトを $1 で並べ替え
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: プライバシーポリシー
 labelRelated:
   description: Label of related links.
   message: '関連リンク: '
@@ -481,7 +481,7 @@ msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: リソースの取得中にエラーが発生しました!
+  message: リソースの取得中にエラーが発生しました
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: スクリプトの取得中にエラーが発生しました!
@@ -505,7 +505,7 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: シークレットモードで行った変更は、メインプロファイルにも適用されます。
 msgInstalled:
   description: Message shown when a script is installed.
   message: スクリプトがインストールされました。
