@@ -459,10 +459,10 @@ menuFindScripts:
   message: Найти скрипты для этого сайта
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: Не удалось внедрить некоторые скрипты.
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: ''
+  message: Повторите попытку в "авто" режиме
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Суб-фреймы скриптов
