@@ -865,10 +865,17 @@
     core-js-pure "^3.0.0"
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.9.2"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.9.2.tgz#d90df0583a3a252f09aaa619665367bae518db06"
   integrity sha512-NE2DtOdufG7R5vnfQUTehdTfNycfUANEtCa9PssN9O/xmTzP4E08UI797ixaei6hBEVL9BI/PsdJS5x7mWoB9Q==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
+"@babel/runtime@^7.10.4":
+  version "7.10.4"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.10.4.tgz#a6724f1a6b8d2f6ea5236dbfe58c7d7ea9c5eb99"
+  integrity sha512-UpTN5yUJr9b4EX2CnGNWIvER7Ab83ibv0pcvvHc4UOdrBI5jb8bj+32cCwPX6xu0mt2daFNjYhoi+X7beH0RSw==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -10035,11 +10042,11 @@ vue@^2.6.11:
   integrity sha512-VfPwgcGABbGAue9+sfrD4PuwFar7gPb1yl1UK1MwXoQPAw0BKSqWfoYCT/ThFrdEVWoI51dBuyCoiNU9bZDZxQ==
 
 vueleton@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/vueleton/-/vueleton-1.0.4.tgz#3da35f8bd8c33c349509bb090d67d2a7a8b19b7c"
-  integrity sha512-gZUvZq2rmj2CkUnlzhXf2nT/nvgUsU751M7S6+ZmBeGFvKiBvzSLfhShQsVku6BhVbglOF3kWJM1v0O21Raung==
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/vueleton/-/vueleton-1.0.5.tgz#2ddee43a510c1cb1127c2758e9ea1cb81806f4fb"
+  integrity sha512-pKkJOZQEK8+Jl05b6KAA37V04JsdtdW6OYge+F8uvp3C4UKmjJr3zD4ikLpluiIm69MSCkqcBSZF/svHRlVLyA==
   dependencies:
-    "@babel/runtime" "^7.8.3"
+    "@babel/runtime" "^7.10.4"
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"
