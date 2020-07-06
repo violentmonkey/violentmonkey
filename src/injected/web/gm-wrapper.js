@@ -23,9 +23,9 @@ const {
 let gmApi;
 let gm4Api;
 let componentUtils;
-let windowClose;
 // making a local copy to avoid using webpack's import wrappers as .has() is invoked **a lot**
 const has = hasOwnProperty;
+const IS_TOP = window.top === window;
 
 export function wrapGM(script) {
   // Add GM functions
@@ -36,18 +36,6 @@ export function wrapGM(script) {
   }
   const id = script.props.id;
   const resources = script.meta.resources || {};
-  const gmInfo = makeGmInfo(script, resources);
-  const gm = assign( // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
-    {
-      GM: { info: gmInfo },
-      GM_info: gmInfo,
-      unsafeWindow: global,
-    },
-    componentUtils || (componentUtils = makeComponentUtils()),
-    grant::includes('window.close') && windowClose || (windowClose = {
-      close: vmOwnFunc(() => bridge.post('TabClose')),
-    }),
-  );
   const context = {
     id,
     script,
@@ -55,6 +43,20 @@ export function wrapGM(script) {
     pathMap: script.custom.pathMap || {},
     urls: {},
   };
+  const gmInfo = makeGmInfo(script, resources);
+  const gm = {
+    GM: { info: gmInfo },
+    GM_info: gmInfo,
+    unsafeWindow: global,
+  };
+  if (!componentUtils) {
+    componentUtils = makeComponentUtils();
+  }
+  // not using ...spread as it calls Babel's polyfill that calls unsafe Object.xxx
+  assign(gm, componentUtils);
+  if (IS_TOP && grant::includes('window.close')) {
+    gm.close = vmOwnFunc(() => bridge.post('TabClose'));
+  }
   if (!gmApi) [gmApi, gm4Api] = makeGmApi();
   grant::forEach((name) => {
     const gm4name = name::startsWith('GM.') && name::slice(3);
@@ -307,7 +309,7 @@ function makeGlobalWrapper(local) {
     },
   });
   for (const [name, desc] of unforgeables) {
-    if (desc.get && (name === 'window' || name === 'top' && window === window.top)) {
+    if (desc.get && (name === 'window' || name === 'top' && IS_TOP)) {
       delete desc.get;
       delete desc.set;
       desc.value = wrapper;
