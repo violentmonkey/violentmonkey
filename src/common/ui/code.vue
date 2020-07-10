@@ -66,6 +66,9 @@ import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/keymap/sublime';
+import 'codemirror/addon/hint/show-hint.css';
+import 'codemirror/addon/hint/show-hint.js';
+import 'codemirror/addon/hint/anyword-hint.js';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
@@ -97,6 +100,10 @@ const { insertTab, insertSoftTab } = CodeMirror.commands;
 CodeMirror.commands.insertTab = cm => (
   cm.options.indentWithTabs ? insertTab(cm) : insertSoftTab(cm)
 );
+
+CodeMirror.commands.autocomplete = (cm) => {
+  cm.showHint({hint: CodeMirror.hint.anyword});
+};
 
 export const cmOptions = {
   continueComments: true,
@@ -301,6 +308,7 @@ export default {
       cm.setOption('extraKeys', {
         Esc: 'cancel',
         F1: 'showHelp',
+        "Ctrl-Space": "autocomplete",
       });
       Object.assign(CodeMirror.commands, {
         cancel: () => {
