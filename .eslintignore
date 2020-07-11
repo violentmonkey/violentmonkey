@@ -2,3 +2,6 @@
 !src/**
 !test/**
 src/public/**
+
+# temporary ignore javascript-mixed, which follows CodeMirror styles
+src/common/ui/code_extras/mode/javascript-mixed/**
