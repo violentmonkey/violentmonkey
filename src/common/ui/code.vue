@@ -67,8 +67,8 @@ import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/keymap/sublime';
 import 'codemirror/addon/hint/show-hint.css';
-import 'codemirror/addon/hint/show-hint.js';
-import 'codemirror/addon/hint/anyword-hint.js';
+import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
@@ -102,7 +102,7 @@ CodeMirror.commands.insertTab = cm => (
 );
 
 CodeMirror.commands.autocomplete = (cm) => {
-  cm.showHint({hint: CodeMirror.hint.anyword});
+  cm.showHint({ hint: CodeMirror.hint.anyword });
 };
 
 export const cmOptions = {
@@ -308,7 +308,7 @@ export default {
       cm.setOption('extraKeys', {
         Esc: 'cancel',
         F1: 'showHelp',
-        "Ctrl-Space": "autocomplete",
+        'Ctrl-Space': 'autocomplete',
       });
       Object.assign(CodeMirror.commands, {
         cancel: () => {
@@ -498,7 +498,8 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
 .CodeMirror-hints {
   z-index: 9999;
   /* consistent font with the rest, copied from .monospace-font rule from style/style.css */
-  font-family: "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", Courier, monospace;
+  font-family: "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono"
+                , "Courier New", Courier, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
