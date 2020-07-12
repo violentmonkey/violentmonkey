@@ -68,6 +68,7 @@ import 'codemirror/addon/selection/active-line';
 import 'codemirror/keymap/sublime';
 import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
@@ -101,8 +102,22 @@ CodeMirror.commands.insertTab = cm => (
   cm.options.indentWithTabs ? insertTab(cm) : insertSoftTab(cm)
 );
 
+function autoHintWithFallback(cm, options) {
+  var result = null;
+  var hintFn = cm.getHelper(cm.getCursor(), 'hint');
+  if (hintFn) {
+    result = hintFn(cm, options);
+  }
+  // fallback to anyword if default returns nothing
+  if (!result || result.list.length < 1) {
+    result = CodeMirror.hint.anyword(cm, options);
+  }
+  return result;
+}
+CodeMirror.registerHelper('hint', 'autoHintWithFallback',  autoHintWithFallback);
+
 CodeMirror.commands.autocomplete = (cm) => {
-  cm.showHint({ hint: CodeMirror.hint.anyword });
+  cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
 };
 
 export const cmOptions = {
