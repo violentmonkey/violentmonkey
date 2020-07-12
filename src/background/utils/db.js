@@ -455,7 +455,7 @@ export async function parseScript(src) {
   if (!meta.homepageURL && !script.custom.homepageURL && isRemote(src.from)) {
     script.custom.homepageURL = src.from;
   }
-  if (isRemote(src.url)) script.custom.lastInstallURL = src.url;
+  if (/^https?:\/\//.test(src.url)) script.custom.lastInstallURL = src.url;
   if (src.position) script.props.position = +src.position;
   buildPathMap(script, src.url);
   await saveScript(script, src.code);
