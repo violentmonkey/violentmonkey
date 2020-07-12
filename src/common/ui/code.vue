@@ -497,9 +497,6 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
 /* CodeMirror show-hints fix to work here */
 .CodeMirror-hints {
   z-index: 9999;
-  /* consistent font with the rest, copied from .monospace-font rule from style/style.css */
-  font-family: "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono"
-                , "Courier New", Courier, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
