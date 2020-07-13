@@ -12,16 +12,8 @@
   "use strict";
 
   function dbg() {
-    // console.debug.apply(console, arguments);
+    //console.debug.apply(console, arguments);
   }
-
-  /* TODOs
-  x refactor the mode switching logic to be more flexible and eaiser to read
-  x support extra spaces, e.g.,  between 'beforeend' and `html string` in insertAdjacentHTML case
-  x support element.innerHTML = `htm-string`;
-  x correctly handle single-line string template
-  x highlight arbitrary string template as html/css with inline comment hint: "html", "css"
-  */
 
   CodeMirror.defineMode("javascript-mixed", function (config, parserConfig) {
     var jsMode = CodeMirror.getMode(config, { name: "javascript" });
@@ -53,8 +45,9 @@
 
 
     function prepareReparseStringTemplateInLocalMode(stream, state) {
-      dbg('DBG: spit out beginning backtick as a token, and leave the rest of the text for local mode parsing');
-      stream.backUp(stream.current().length - 1); // backup parsed string, except the beginning backtick
+      dbg('Entering local hml/css mode...');
+      // spit out beginning backtick as a token, and leave the rest of the text for local mode parsing
+      stream.backUp(stream.current().length - 1);
 
       // workaround needed for 1-line string template,
       // to ensure the ending backtick is parsed correctly.
@@ -62,7 +55,7 @@
     }
 
     function exitLocalModeAndTokenEndingBacktick(stream, state) {
-      dbg('DBG: exiting local html/css mode...');
+      dbg('Exiting local html/css mode...');
       // parse the ending JS string template backtick in js mode
       return jsMode.token(stream, state.jsState);
     }
@@ -72,14 +65,14 @@
       state.localMode = state.localMode || modeToUse;
       state.localState = state.localState || CodeMirror.startState(state.localMode);
       var style = state.localMode.token(stream, state.localState);
-      dbg(`  local ${modeToUse.name} mode token result: `, stream.current());
+      dbg(`  local ${modeToUse.name} mode token - `, stream.current());
       return style;
     }
 
     function matchRule(rules, stream, state) {
       for (var r of rules) {
         if (r.curContext === (state.maybeLocalContext || '<start>')) {
-          // dbg('rule:', r.curContext, r.matchFn.toString());
+          // dbg('  rule:', r.curContext, r.matchFn.toString());
           var matched = r.run(stream, state);
           if (matched) { break; }
         }
@@ -236,7 +229,7 @@
         // when in local html/css context, skip js parsing,
         // so as not to mess up js tokenizer's state.
         tokStyle = jsMode.token(stream, state.jsState);
-        dbg(state.maybeLocalContext, state.jsState.lastType, stream.current(), `[${tokStyle}]`); window._jsState = state.jsState;
+        dbg('jsMode.token - ', state.maybeLocalContext, state.jsState.lastType, stream.current(), `[${tokStyle}]`);
         if (tokStyle === null) { // case the token is not relevant semantically, e.g., space or line break;
           // just return,  skip local mode match,
           // as such token is not reflected in stream/state so the local mode matcher
@@ -282,9 +275,7 @@
         // dbg(`${stream.pos}: ${stream.string.substring(stream.pos).substring(0, 15)}`, state.lastType);
         var tokSty = state.token(stream, state);
 
-        var tokTyp = state.jsState.lastType;
-        var tokStr = stream.string.substring(stream.start, stream.pos);
-        dbg(' <--', tokTyp, tokStr);
+        dbg('   <--', `[${tokSty}]`, stream.current());
         return tokSty;
       },
 
