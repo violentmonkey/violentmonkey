@@ -522,8 +522,8 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
     color: var(--fg);
   }
   li.CodeMirror-hint-active {
-    background: white ;
-    color: var(--fg);
+    background: var(--fg);
+    color: var(--bg);
   }
 }
 
