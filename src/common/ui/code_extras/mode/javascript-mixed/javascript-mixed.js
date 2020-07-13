@@ -47,14 +47,18 @@
     }());
 
 
-    function prepareReparseStringTemplateInLocalMode(stream, state) {
-      dbg('Entering local hml/css mode...');
+    function prepareReparseStringTemplateInLocalMode(modeToUse, stream, state) {
+      dbg(`Entering local ${modeToUse} mode...`);
       // spit out beginning backtick as a token, and leave the rest of the text for local mode parsing
       stream.backUp(stream.current().length - 1);
 
       // workaround needed for 1-line string template,
       // to ensure the ending backtick is parsed correctly.
       forceJsModeToQuasi(stream, state.jsState);
+
+      // switch to local mode for subsequent text
+      state.localMode = modeToUse;
+      state.localState = CodeMirror.startState(state.localMode);
     }
 
     function exitLocalModeAndTokenEndingBacktick(stream, state) {
@@ -63,12 +67,9 @@
       return jsMode.token(stream, state.jsState);
     }
 
-    function tokenInLocalMode(modeToUse, stream, state) {
-      // parse the text in local mode
-      state.localMode = state.localMode || modeToUse;
-      state.localState = state.localState || CodeMirror.startState(state.localMode);
+    function tokenInLocalMode(stream, state) {
       const style = state.localMode.token(stream, state.localState);
-      dbg(`  local ${modeToUse.name} mode token - `, stream.current());
+      dbg('  local mode token - ', stream.current());
       return style;
     }
 
@@ -134,18 +135,18 @@
             'css-2'),
           new Rule('css-2', () => tokTyp === 'quasi', // if it's a string template
             'css-in',
-            () => prepareReparseStringTemplateInLocalMode(stream, state)),
+            () => prepareReparseStringTemplateInLocalMode(cssMode, stream, state)),
           new Rule('css-in', () => stream.peek() === '`', // if it hits ending backtick for string template
             null, // then exiting local css mode
             () => { tokStyle = exitLocalModeAndTokenEndingBacktick(stream, state); },
-            () => { tokStyle = tokenInLocalMode(cssMode, stream, state); }), // else stay in local mode
+            () => { tokStyle = tokenInLocalMode(stream, state); }), // else stay in local mode
 
           // for pattern var someCSS = /* css */ `css-string`
           new Rule('<start>', () => jsTokStyle === 'comment' && (/^\/\*\s*css\s*\*\/$/i).test(tokStr),
             'css-21'),
           new Rule('css-21', () => tokTyp === 'quasi',
             'css-in',
-            () => prepareReparseStringTemplateInLocalMode(stream, state)),
+            () => prepareReparseStringTemplateInLocalMode(cssMode, stream, state)),
         ];
 
         matchRule(rules, stream, state);
@@ -184,11 +185,11 @@
             'html-4'),
           new Rule('html-4', () => tokTyp === 'quasi', // if it's a string template
             'html-in',
-            () => prepareReparseStringTemplateInLocalMode(stream, state)),
+            () => prepareReparseStringTemplateInLocalMode(htmlMode, stream, state)),
           new Rule('html-in', () => stream.peek() === '`', // if it hits ending backtick for string template
             null, // then exit local html mode
             () => { tokStyle = exitLocalModeAndTokenEndingBacktick(stream, state); },
-            () => { tokStyle = tokenInLocalMode(htmlMode, stream, state); }), // else stay in local mode
+            () => { tokStyle = tokenInLocalMode(stream, state); }), // else stay in local mode
 
           // for pattern elt.innerHTML = `html-string`
           // variation: outerHTML, +=
@@ -198,14 +199,14 @@
             'html-12'),
           new Rule('html-12', () => tokTyp === 'quasi',
             'html-in',
-            () => prepareReparseStringTemplateInLocalMode(stream, state)),
+            () => prepareReparseStringTemplateInLocalMode(htmlMode, stream, state)),
 
           // for pattern var someHTML = /* html */ `html-string`
           new Rule('<start>', () => jsTokStyle === 'comment' && (/^\/\*\s*html\s*\*\/$/i).test(tokStr),
             'html-21'),
           new Rule('html-21', () => tokTyp === 'quasi',
             'html-in',
-            () => prepareReparseStringTemplateInLocalMode(stream, state)),
+            () => prepareReparseStringTemplateInLocalMode(htmlMode, stream, state)),
         ];
 
         matchRule(rules, stream, state);
@@ -225,7 +226,7 @@
 
       // adapt the existing jsmode tokenizer with the wrapper state
       let tokStyle = null;
-      if (!['html-in', 'css-in'].includes(state.maybeLocalContext)) {
+      if (!state.localMode) {
         // when in local html/css context, skip js parsing,
         // so as not to mess up js tokenizer's state.
         tokStyle = jsMode.token(stream, state.jsState);
