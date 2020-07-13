@@ -102,19 +102,12 @@ CodeMirror.commands.insertTab = cm => (
   cm.options.indentWithTabs ? insertTab(cm) : insertSoftTab(cm)
 );
 
-function autoHintWithFallback(cm, options) {
-  var result = null;
-  var hintFn = cm.getHelper(cm.getCursor(), 'hint');
-  if (hintFn) {
-    result = hintFn(cm, options);
-  }
-  // fallback to anyword if default returns nothing
-  if (!result || result.list.length < 1) {
-    result = CodeMirror.hint.anyword(cm, options);
-  }
-  return result;
+function autoHintWithFallback(cm, opts) {
+  const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, opts);
+  // fallback to anyword if default returns nothing (or no default)
+  return result?.list.length ? result : CodeMirror.hint.anyword(cm, opts);
 }
-CodeMirror.registerHelper('hint', 'autoHintWithFallback',  autoHintWithFallback);
+CodeMirror.registerHelper('hint', 'autoHintWithFallback', autoHintWithFallback);
 
 CodeMirror.commands.autocomplete = (cm) => {
   cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
