@@ -127,7 +127,7 @@
           // - side-effects-not-matched: if not specified, defaulted to reset local mode matching
 
           // for pattern GM_addStyle(`css-string`);
-          new Rule('<start>', () => tokStr === 'GM_addStyle' && tokTyp === 'variable',
+          new Rule('<start>', () => tokTyp === 'variable' && tokStr === 'GM_addStyle',
            'css-1'),
           new Rule('css-1', () => tokTyp === '(' && tokStr === '(',
            'css-2'),
@@ -173,7 +173,7 @@
         // define the transition rules to enter local html mode;
         var rules = [
           // for pattern insertAdjacentHTML('beforeend', `html-string-template`);
-          new Rule('<start>', () => tokStr === 'insertAdjacentHTML' && tokTyp === 'variable',
+          new Rule('<start>', () => tokTyp === 'variable' && tokStr === 'insertAdjacentHTML',
                   'html-1'),
           new Rule('html-1', () => tokTyp === '(' && tokStr === '(',
                   'html-2'),
@@ -192,9 +192,9 @@
 
           // for pattern elt.innerHTML = `html-string`
           // variation: outerHTML, +=
-          new Rule('<start>', () => ['innerHTML', 'outerHTML'].includes(tokStr)  && jsTokStyle === 'property',
+          new Rule('<start>', () => jsTokStyle === 'property' && ['innerHTML', 'outerHTML'].includes(tokStr),
                    'html-11'),
-          new Rule('html-11', () => ['=', '+='].includes(tokStr) && tokTyp === 'operator',
+          new Rule('html-11', () => tokTyp === 'operator' && ['=', '+='].includes(tokStr),
                    'html-12'),
           new Rule('html-12', () => tokTyp === 'quasi',
                    'html-in',
