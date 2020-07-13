@@ -265,10 +265,8 @@
       },
 
       copyState(state) {
-        let local;
-        if (state.localState) {
-          local = CodeMirror.copyState(state.localMode, state.localState);
-        }
+        const local = (state.localState)
+          ? CodeMirror.copyState(state.localMode, state.localState) : null;
         return {
           token: state.token,
           localMode: state.localMode,
