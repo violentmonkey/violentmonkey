@@ -3,9 +3,9 @@
 
 (function(mod) {
   if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("codemirror/lib/codemirror"), require("codemirror/mode/xml/xml"), require("./javascript-patched"), require("codemirror/mode/css/css"));
+    mod(require("codemirror/lib/codemirror"), require("codemirror/mode/xml/xml"), require("codemirror/mode/javascript/javascript"), require("codemirror/mode/css/css"));
   else if (typeof define == "function" && define.amd) // AMD
-    define(["codemirror/lib/codemirror", "codemirror/mode/xml/xml", "./javascript-patched", "codemirror/mode/css/css"], mod);
+    define(["codemirror/lib/codemirror", "codemirror/mode/xml/xml", "codemirror/mode/javascript/javascript", "codemirror/mode/css/css"], mod);
   else // Plain browser env
     mod(CodeMirror);
 })(function(CodeMirror) {
@@ -26,7 +26,31 @@
   CodeMirror.defineMode("javascript-mixed", function (config, parserConfig) {
     var jsMode = CodeMirror.getMode(config, { name: "javascript" });
 
+
     var STYLE_PASS = 'XXX-PASS'; // indicate the css/html matcher does not return  local mode style
+
+    var forceJsModeToQuasi = (function() {
+      var tokenQuasi = null;
+      function getTokenQuasi(stream) {
+        if (tokenQuasi != null) {
+          return tokenQuasi;
+        }
+        // create a new stream of a non-ending (1st line of a multiline)
+        // string template to obtain tokenQuasi tokenizer
+        var dummyStream = new stream.constructor('`#dummy', 2, {});
+        var dummyState = jsMode.startState();
+        jsMode.token(dummyStream, dummyState);
+        tokenQuasi = dummyState.tokenize;
+        return tokenQuasi;
+      }
+
+      function forceJsModeToQuasi(stream, jsState) {
+        jsState.tokenize = getTokenQuasi(stream);
+      }
+
+      return forceJsModeToQuasi;
+    })();
+
 
     function prepareReparseStringTemplateInLocalMode(stream, state) {
       dbg('DBG: spit out beginning backtick as a token, and leave the rest of the text for local mode parsing');
@@ -34,7 +58,7 @@
 
       // workaround needed for 1-line string template,
       // to ensure the ending backtick is parsed correctly.
-      jsMode.forceContinueInQuasi(state.jsState);
+      forceJsModeToQuasi(stream, state.jsState);
     }
 
     function exitLocalModeAndTokenEndingBacktick(stream, state) {

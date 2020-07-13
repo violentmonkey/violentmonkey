@@ -52,7 +52,7 @@
 <script>
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/eclipse.css';
-import '#/common/ui/code_extras/mode/javascript-mixed/javascript-patched'; // patched version of 'codemirror/mode/javascript/javascript'
+import 'codemirror/mode/javascript/javascript'
 import 'codemirror/mode/css/css';
 import 'codemirror/mode/xml/xml';
 import '#/common/ui/code_extras/mode/javascript-mixed/javascript-mixed';
