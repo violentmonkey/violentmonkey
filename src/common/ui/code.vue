@@ -50,9 +50,9 @@
 </template>
 
 <script>
+import '#/common/ui/code_extras/mode/javascript-mixed/javascript-mixed';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/eclipse.css';
-import '#/common/ui/code_extras/mode/javascript-mixed/javascript-mixed';
 import 'codemirror/addon/comment/continuecomment';
 import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/edit/matchbrackets';
