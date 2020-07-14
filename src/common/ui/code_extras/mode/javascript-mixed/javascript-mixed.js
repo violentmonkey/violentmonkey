@@ -145,100 +145,90 @@
       }
     }
 
-    const cssMatcher = (function () {
-      const cssMode = CodeMirror.getMode(config, { name: 'css' });
 
-      // define the transition rules to enter local CSS mode;
-      const cssRules = [
-        // <current-context>, <match-criteria>, <next-context-if-matched>,
-        // <optional-side-effects-if-matched>,
-        // <optional-side-effects-not-matched>
-        //
-        // - side-effects-not-matched: if not specified, defaulted to reset local mode matching
+    const cssMode = CodeMirror.getMode(config, { name: 'css' });
 
-        // for pattern GM_addStyle(`css-string`);
-        new Rule('<start>', (c) => c.tokTyp === 'variable' && c.tokStr === 'GM_addStyle',
-          'css-1'),
-        new Rule('css-1', (c) => c.tokTyp === '(' && c.tokStr === '(',
-          'css-2'),
-        new Rule('css-2', (c) => c.tokTyp === 'quasi', // if it's a string template
-          'css-in',
-          (c) => prepareReparseStringTemplateInLocalMode(cssMode, c.stream, c.state)),
-        new Rule('css-in', (c) => c.stream.peek() === '`', // if it hits ending backtick for string template
-          null, // then exiting local css mode
-          (c) => { c.tokStyle = exitLocalModeAndTokenEndingBacktick(c.stream, c.state); },
-          (c) => { c.tokStyle = tokenInLocalMode(c.stream, c.state); }), // else stay in local mode
+    // define the transition rules to enter local CSS mode;
+    const cssRules = [
+      // <current-context>, <match-criteria>, <next-context-if-matched>,
+      // <optional-side-effects-if-matched>,
+      // <optional-side-effects-not-matched>
+      //
+      // - side-effects-not-matched: if not specified, defaulted to reset local mode matching
 
-        // for pattern var someCSS = /* css */ `css-string`
-        new Rule('<start>', (c) => c.jsTokStyle === 'comment' && (/^\/\*\s*css\s*\*\/$/i).test(c.tokStr),
-          'css-21'),
-        new Rule('css-21', (c) => c.tokTyp === 'quasi',
-          'css-in',
-          (c) => prepareReparseStringTemplateInLocalMode(cssMode, c.stream, c.state)),
+      // for pattern GM_addStyle(`css-string`);
+      new Rule('<start>', (c) => c.tokTyp === 'variable' && c.tokStr === 'GM_addStyle',
+        'css-1'),
+      new Rule('css-1', (c) => c.tokTyp === '(' && c.tokStr === '(',
+        'css-2'),
+      new Rule('css-2', (c) => c.tokTyp === 'quasi', // if it's a string template
+        'css-in',
+        (c) => prepareReparseStringTemplateInLocalMode(cssMode, c.stream, c.state)),
+      new Rule('css-in', (c) => c.stream.peek() === '`', // if it hits ending backtick for string template
+        null, // then exiting local css mode
+        (c) => { c.tokStyle = exitLocalModeAndTokenEndingBacktick(c.stream, c.state); },
+        (c) => { c.tokStyle = tokenInLocalMode(c.stream, c.state); }), // else stay in local mode
+
+      // for pattern var someCSS = /* css */ `css-string`
+      new Rule('<start>', (c) => c.jsTokStyle === 'comment' && (/^\/\*\s*css\s*\*\/$/i).test(c.tokStr),
+        'css-21'),
+      new Rule('css-21', (c) => c.tokTyp === 'quasi',
+        'css-in',
+        (c) => prepareReparseStringTemplateInLocalMode(cssMode, c.stream, c.state)),
+    ];
+
+    function maybeCssToken(stream, state, jsTokStyle) {
+      return matchRule(cssRules, stream, state, jsTokStyle);
+    }
+
+
+    const htmlMode = CodeMirror.getMode(config, {
+      name: 'xml',
+      htmlMode: true,
+      multilineTagIndentFactor: parserConfig.multilineTagIndentFactor,
+      multilineTagIndentPastTag: parserConfig.multilineTagIndentPastTag,
+    });
+
+    // define the transition rules to enter local html mode;
+    const htmlRules = [
+      // for pattern insertAdjacentHTML('beforeend', `html-string-template`);
+      new Rule('<start>', (c) => c.tokTyp === 'variable' && c.tokStr === 'insertAdjacentHTML',
+        'html-1'),
+      new Rule('html-1', (c) => c.tokTyp === '(' && c.tokStr === '(',
+        'html-2'),
+      new Rule('html-2', (c) => c.tokTyp === 'string', // e.g., 'beforeend', OPEN: consider to check value
+        'html-3'),
+      new Rule('html-3', (c) => c.tokTyp === ',' && c.tokStr === ',',
+        'html-4'),
+      new Rule('html-4', (c) => c.tokTyp === 'quasi', // if it's a string template
+        'html-in',
+        (c) => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)),
+      new Rule('html-in', (c) => c.stream.peek() === '`', // if it hits ending backtick for string template
+        null, // then exit local html mode
+        (c) => { c.tokStyle = exitLocalModeAndTokenEndingBacktick(c.stream, c.state); },
+        (c) => { c.tokStyle = tokenInLocalMode(c.stream, c.state); }), // else stay in local mode
+
+      // for pattern elt.innerHTML = `html-string`
+      // variation: outerHTML, +=
+      new Rule('<start>', (c) => c.jsTokStyle === 'property' && ['innerHTML', 'outerHTML'].includes(c.tokStr),
+        'html-11'),
+      new Rule('html-11', (c) => c.tokTyp === 'operator' && ['=', '+='].includes(c.tokStr),
+        'html-12'),
+      new Rule('html-12', (c) => c.tokTyp === 'quasi',
+        'html-in',
+        (c) => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)),
+
+      // for pattern var someHTML = /* html */ `html-string`
+      new Rule('<start>', (c) => c.jsTokStyle === 'comment' && (/^\/\*\s*html\s*\*\/$/i).test(c.tokStr),
+        'html-21'),
+      new Rule('html-21', (c) => c.tokTyp === 'quasi',
+        'html-in',
+        (c) => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)),
       ];
 
-      function maybeToken(stream, state, jsTokStyle) {
-        return matchRule(cssRules, stream, state, jsTokStyle);
-      }
-
-      return {
-        maybeToken,
-      };
-    }()); // cssMatcher
-
-    const htmlMatcher = (function () {
-      const htmlMode = CodeMirror.getMode(config, {
-        name: 'xml',
-        htmlMode: true,
-        multilineTagIndentFactor: parserConfig.multilineTagIndentFactor,
-        multilineTagIndentPastTag: parserConfig.multilineTagIndentPastTag,
-      });
-
-      // define the transition rules to enter local html mode;
-      const htmlRules = [
-        // for pattern insertAdjacentHTML('beforeend', `html-string-template`);
-        new Rule('<start>', (c) => c.tokTyp === 'variable' && c.tokStr === 'insertAdjacentHTML',
-          'html-1'),
-        new Rule('html-1', (c) => c.tokTyp === '(' && c.tokStr === '(',
-          'html-2'),
-        new Rule('html-2', (c) => c.tokTyp === 'string', // e.g., 'beforeend', OPEN: consider to check value
-          'html-3'),
-        new Rule('html-3', (c) => c.tokTyp === ',' && c.tokStr === ',',
-          'html-4'),
-        new Rule('html-4', (c) => c.tokTyp === 'quasi', // if it's a string template
-          'html-in',
-          (c) => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)),
-        new Rule('html-in', (c) => c.stream.peek() === '`', // if it hits ending backtick for string template
-          null, // then exit local html mode
-          (c) => { c.tokStyle = exitLocalModeAndTokenEndingBacktick(c.stream, c.state); },
-          (c) => { c.tokStyle = tokenInLocalMode(c.stream, c.state); }), // else stay in local mode
-
-        // for pattern elt.innerHTML = `html-string`
-        // variation: outerHTML, +=
-        new Rule('<start>', (c) => c.jsTokStyle === 'property' && ['innerHTML', 'outerHTML'].includes(c.tokStr),
-          'html-11'),
-        new Rule('html-11', (c) => c.tokTyp === 'operator' && ['=', '+='].includes(c.tokStr),
-          'html-12'),
-        new Rule('html-12', (c) => c.tokTyp === 'quasi',
-          'html-in',
-          (c) => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)),
-
-        // for pattern var someHTML = /* html */ `html-string`
-        new Rule('<start>', (c) => c.jsTokStyle === 'comment' && (/^\/\*\s*html\s*\*\/$/i).test(c.tokStr),
-          'html-21'),
-        new Rule('html-21', (c) => c.tokTyp === 'quasi',
-          'html-in',
-          (c) => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)),
-        ];
-
-      function maybeToken(stream, state, jsTokStyle) {
-        return matchRule(htmlRules, stream, state, jsTokStyle);
-      }
-
-      return {
-        maybeToken,
-      };
-    }()); // htmlMatcher
+    function maybeHtmlToken(stream, state, jsTokStyle) {
+      return matchRule(htmlRules, stream, state, jsTokStyle);
+    }
 
 
     function jsToken(stream, state) {
@@ -260,9 +250,9 @@
       }
 
       // match to see if it needs to switch to local html mode, return local mode style if applicable
-      let maybeLocalStyle = htmlMatcher.maybeToken(stream, state, tokStyle);
+      let maybeLocalStyle = maybeHtmlToken(stream, state, tokStyle);
       if (maybeLocalStyle === STYLE_PASS) {
-        maybeLocalStyle = cssMatcher.maybeToken(stream, state, tokStyle);
+        maybeLocalStyle = maybeCssToken(stream, state, tokStyle);
       }
 
       if (maybeLocalStyle !== STYLE_PASS) {
