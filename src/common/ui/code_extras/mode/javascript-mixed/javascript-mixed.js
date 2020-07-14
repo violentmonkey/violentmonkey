@@ -79,7 +79,7 @@
       const ctx = Rule.createRunContext(stream, state, jsTokStyle);
       for (const r of rules) {
         if (r.curContext === (state.maybeLocalContext || '<start>')) {
-          //dbg('  rule:', r.curContext, r.matchFn.toString());
+          //dbg('  rule:', r.curContext, r.match.toString());
           const matched = r.run(ctx);
           //dbg('  => rule output tokStyle', ctx.tokStyle);
           if (matched) {
@@ -91,28 +91,31 @@
     }
 
     class Rule {
-      constructor(curContext, matchFn, nextContext, caseMatchedFn, caseNotMatchedFn) {
-        this.curContext = curContext;
-        this.matchFn = matchFn;
-        this.nextContext = nextContext;
-        this.caseMatchedFn = caseMatchedFn; // optional
-        this.caseNotMatchedFn = caseNotMatchedFn; // optional
+      constructor(props) {
+        this.curContext = props.curContext;
+        // lambda for match condition
+        this.match = props.match;
+        this.nextContext = props.nextContext;
+        // optional, lambda for additional logic to run if matched
+        this.caseMatched = props.caseMatched;
+        // optional, lambda for additional logic to run if not matched
+        this.caseNotMatched = props.caseNotMatched;
       }
 
       run(ctx) {
         const state = ctx.state;
-        if (this.matchFn(ctx)) {
+        if (this.match(ctx)) {
           state.maybeLocalContext = this.nextContext;
           if (state.maybeLocalContext == null) {
             // local mode done, reset
             state.localMode = null;
             state.localState = null;
           }
-          if (this.caseMatchedFn) { this.caseMatchedFn(ctx); }
+          if (this.caseMatched) { this.caseMatched(ctx); }
           return true;
         } // case rule transition criteria not matched
-        if (this.caseNotMatchedFn) {
-          this.caseNotMatchedFn(ctx);
+        if (this.caseNotMatched) {
+          this.caseNotMatched(ctx);
         } else { // default not matched logic: reset local mode matching
           state.maybeLocalContext = null;
         }
@@ -126,7 +129,7 @@
         let _tokStr = null;
         Object.defineProperties(ctx, {
           'stream': { value: stream, writable: false },
-          'state': { value: state, writable: false },
+            'state': { value: state, writable: false },
           'jsTokStyle': { value: jsTokStyle, writable: false },
           'tokTyp': { get() { return state.jsState.lastType; } },
           'tokStr': { get() {
@@ -150,31 +153,43 @@
 
     // define the transition rules to enter local CSS mode;
     const cssRules = [
-      // <current-context>, <match-criteria>, <next-context-if-matched>,
-      // <optional-side-effects-if-matched>,
-      // <optional-side-effects-not-matched>
-      //
-      // - side-effects-not-matched: if not specified, defaulted to reset local mode matching
-
       // for pattern GM_addStyle(`css-string`);
-      new Rule('<start>', (c) => c.tokTyp === 'variable' && c.tokStr === 'GM_addStyle',
-        'css-1'),
-      new Rule('css-1', (c) => c.tokTyp === '(' && c.tokStr === '(',
-        'css-2'),
-      new Rule('css-2', (c) => c.tokTyp === 'quasi', // if it's a string template
-        'css-in',
-        (c) => prepareReparseStringTemplateInLocalMode(cssMode, c.stream, c.state)),
-      new Rule('css-in', (c) => c.stream.peek() === '`', // if it hits ending backtick for string template
-        null, // then exiting local css mode
-        (c) => { c.tokStyle = exitLocalModeAndTokenEndingBacktick(c.stream, c.state); },
-        (c) => { c.tokStyle = tokenInLocalMode(c.stream, c.state); }), // else stay in local mode
+      new Rule({
+        curContext: '<start>',
+        match: c => c.tokTyp === 'variable' && c.tokStr === 'GM_addStyle',
+        nextContext: 'css-1'
+      }),
+      new Rule({
+        curContext: 'css-1',
+        match: c => c.tokTyp === '(' && c.tokStr === '(',
+        nextContext: 'css-2'
+      }),
+      new Rule({
+        curContext: 'css-2',
+        match: c => c.tokTyp === 'quasi', // if it's a string template
+        nextContext: 'css-in',
+        caseMatched: c => prepareReparseStringTemplateInLocalMode(cssMode, c.stream, c.state)
+      }),
+      new Rule({
+        curContext: 'css-in',
+        match: c => c.stream.peek() === '`', // if it hits ending backtick for string template
+        nextContext: null, // then exit local css mode
+        caseMatched: c => { c.tokStyle = exitLocalModeAndTokenEndingBacktick(c.stream, c.state); },
+        caseNotMatched: c => { c.tokStyle = tokenInLocalMode(c.stream, c.state); } // else stay in local mode
+      }),
 
       // for pattern var someCSS = /* css */ `css-string`
-      new Rule('<start>', (c) => c.jsTokStyle === 'comment' && (/^\/\*\s*css\s*\*\/$/i).test(c.tokStr),
-        'css-21'),
-      new Rule('css-21', (c) => c.tokTyp === 'quasi',
-        'css-in',
-        (c) => prepareReparseStringTemplateInLocalMode(cssMode, c.stream, c.state)),
+      new Rule({
+        curContext: '<start>',
+        match: c => c.jsTokStyle === 'comment' && /^\/\*\s*css\s*\*\/$/i.test(c.tokStr),
+        nextContext: 'css-21'
+      }),
+      new Rule({
+        curContext: 'css-21',
+        match: c => c.tokTyp === 'quasi',
+        nextContext: 'css-in',
+        caseMatched: c => prepareReparseStringTemplateInLocalMode(cssMode, c.stream, c.state)
+      })
     ];
 
     function maybeCssToken(stream, state, jsTokStyle) {
@@ -192,39 +207,73 @@
     // define the transition rules to enter local html mode;
     const htmlRules = [
       // for pattern insertAdjacentHTML('beforeend', `html-string-template`);
-      new Rule('<start>', (c) => c.tokTyp === 'variable' && c.tokStr === 'insertAdjacentHTML',
-        'html-1'),
-      new Rule('html-1', (c) => c.tokTyp === '(' && c.tokStr === '(',
-        'html-2'),
-      new Rule('html-2', (c) => c.tokTyp === 'string', // e.g., 'beforeend', OPEN: consider to check value
-        'html-3'),
-      new Rule('html-3', (c) => c.tokTyp === ',' && c.tokStr === ',',
-        'html-4'),
-      new Rule('html-4', (c) => c.tokTyp === 'quasi', // if it's a string template
-        'html-in',
-        (c) => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)),
-      new Rule('html-in', (c) => c.stream.peek() === '`', // if it hits ending backtick for string template
-        null, // then exit local html mode
-        (c) => { c.tokStyle = exitLocalModeAndTokenEndingBacktick(c.stream, c.state); },
-        (c) => { c.tokStyle = tokenInLocalMode(c.stream, c.state); }), // else stay in local mode
+      new Rule({
+        curContext: '<start>',
+        match: c => c.tokTyp === 'variable' && c.tokStr === 'insertAdjacentHTML',
+        nextContext: 'html-1'
+      }),
+      new Rule({
+        curContext: 'html-1',
+        match: c => c.tokTyp === '(' && c.tokStr === '(',
+        nextContext: 'html-2'
+      }),
+      new Rule({
+        curContext: 'html-2',
+        match: c => c.tokTyp === 'string', // e.g., 'beforeend'
+        nextContext: 'html-3'
+      }),
+      new Rule({
+        curContext: 'html-3',
+        match: c => c.tokTyp === ',' && c.tokStr === ',',
+        nextContext: 'html-4'
+      }),
+      new Rule({
+        curContext: 'html-4',
+        match: c => c.tokTyp === 'quasi', // if it's a string template
+        nextContext: 'html-in',
+        caseMatched: c => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)
+      }),
+      new Rule({
+        curContext: 'html-in',
+        match: c => c.stream.peek() === '`', // if it hits ending backtick for string template
+        nextContext: null, // then exit local html mode
+        caseMatched: c => { c.tokStyle = exitLocalModeAndTokenEndingBacktick(c.stream, c.state); },
+        caseNotMatched: c => { c.tokStyle = tokenInLocalMode(c.stream, c.state); } // else stay in local mode
+      }),
+
 
       // for pattern elt.innerHTML = `html-string`
       // variation: outerHTML, +=
-      new Rule('<start>', (c) => c.jsTokStyle === 'property' && ['innerHTML', 'outerHTML'].includes(c.tokStr),
-        'html-11'),
-      new Rule('html-11', (c) => c.tokTyp === 'operator' && ['=', '+='].includes(c.tokStr),
-        'html-12'),
-      new Rule('html-12', (c) => c.tokTyp === 'quasi',
-        'html-in',
-        (c) => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)),
+      new Rule({
+        curContext: '<start>',
+        match: c => c.jsTokStyle === 'property' && ['innerHTML', 'outerHTML'].includes(c.tokStr),
+        nextContext: 'html-11'
+      }),
+      new Rule({
+        curContext: 'html-11',
+        match: c => c.tokTyp === 'operator' && ['=', '+='].includes(c.tokStr),
+        nextContext: 'html-12'
+      }),
+      new Rule({
+        curContext: 'html-12',
+        match: c => c.tokTyp === 'quasi',
+        nextContext: 'html-in',
+        caseMatched: c => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)
+      }),
 
       // for pattern var someHTML = /* html */ `html-string`
-      new Rule('<start>', (c) => c.jsTokStyle === 'comment' && (/^\/\*\s*html\s*\*\/$/i).test(c.tokStr),
-        'html-21'),
-      new Rule('html-21', (c) => c.tokTyp === 'quasi',
-        'html-in',
-        (c) => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)),
-      ];
+      new Rule({
+        curContext: '<start>',
+        match: c => c.jsTokStyle === 'comment' && /^\/\*\s*html\s*\*\/$/i.test(c.tokStr),
+        nextContext: 'html-21'
+      }),
+      new Rule({
+        curContext: 'html-21',
+        match: c => c.tokTyp === 'quasi',
+        nextContext: 'html-in',
+        caseMatched: c => prepareReparseStringTemplateInLocalMode(htmlMode, c.stream, c.state)
+      })
+    ];
 
     function maybeHtmlToken(stream, state, jsTokStyle) {
       return matchRule(htmlRules, stream, state, jsTokStyle);
