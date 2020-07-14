@@ -440,7 +440,7 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
 
 async function maybeInstallUserJs(tabId, url) {
   const { data: code } = await request(url).catch(noop) || {};
-  if (parseMeta(code).name) {
+  if (code && parseMeta(code).name) {
     const tab = tabId >= 0 && await browser.tabs.get(tabId) || {};
     confirmInstall({ code, url, from: tab.url }, { tab });
     if (cache.has(`autoclose:${tabId}`)
