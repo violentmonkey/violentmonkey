@@ -17,8 +17,9 @@
 }((CodeMirror) => {
   "use strict";
 
-  function dbg() {
-    // console.debug.apply(console, arguments);
+  function dbg(...args) {
+    // eslint-disable-next-line no-console
+    if (process.env.DEBUG || window.DEBUG_CM_JAVASCRIPT_MIXED) console.debug(...args);
   }
 
   CodeMirror.defineMode('javascript-mixed', (config, parserConfig) => {
