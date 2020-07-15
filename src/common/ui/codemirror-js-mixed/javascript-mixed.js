@@ -74,6 +74,42 @@
       return style;
     }
 
+    /* eslint max-classes-per-file: ["error", 2] */
+
+    // Holds input parameters and return values for a rule execution
+    class RunContext {
+      constructor(stream, state, jsTokStyle) {
+        /**
+         * @readonly
+         */
+        this.stream = stream;
+
+        /**
+         * @readonly
+         */
+        this.state = state;
+
+        /**
+         * @readonly
+         */
+        this.jsTokStyle = jsTokStyle;
+
+        /**
+         * The output of a rule execution - the only writable property
+         */
+        this.tokStyle = STYLE_PASS;
+      }
+
+      get tokTyp() { return this.state.jsState.lastType; }
+
+      get tokStr() {
+        if (this._tokStr == null) {
+          this._tokStr = this.stream.current();
+        }
+        return this._tokStr;
+      }
+    }
+
     class Rule {
       constructor(props) {
         this.curContext = props.curContext;
@@ -105,35 +141,10 @@
         }
         return false;
       }
-
-      // holds input parameters and return values for a rule execution
-      static createRunContext(stream, state, jsTokStyle) {
-        const ctx = {};
-
-        let _tokStr = null;
-        Object.defineProperties(ctx, {
-          stream: { value: stream, writable: false },
-          state: { value: state, writable: false },
-          jsTokStyle: { value: jsTokStyle, writable: false },
-          tokTyp: { get() { return state.jsState.lastType; } },
-          tokStr: {
-            get() {
-              if (_tokStr === null) {
-                _tokStr = stream.current();
-              }
-              return _tokStr;
-            },
-          },
-
-          // holds the output of a rule execution - the only writable property
-          tokStyle: { value: STYLE_PASS, writable: true },
-        });
-        return ctx;
-      }
     }
 
     function matchRule(rules, stream, state, jsTokStyle) {
-      const ctx = Rule.createRunContext(stream, state, jsTokStyle);
+      const ctx = new RunContext(stream, state, jsTokStyle);
       for (const r of rules) {
         if (r.curContext === (state.maybeLocalContext || '<start>')) {
           // dbg('  rule:', r.curContext, r.match.toString());
