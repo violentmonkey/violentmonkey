@@ -126,10 +126,8 @@
           },
 
           // holds the output of a rule execution - the only writable property
-          tokSyle: { writable: true },
+          tokStyle: { value: STYLE_PASS, writable: true },
         });
-        // somehow putting the value in defineProperties does not work
-        ctx.tokStyle = STYLE_PASS;
         return ctx;
       }
     }
