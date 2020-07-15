@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import '#/common/ui/code_extras/mode/javascript-mixed/javascript-mixed';
+import '#/common/ui/codemirror-js-mixed/javascript-mixed';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/eclipse.css';
 import 'codemirror/addon/comment/continuecomment';
