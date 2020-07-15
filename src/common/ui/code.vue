@@ -66,6 +66,10 @@ import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/keymap/sublime';
+import 'codemirror/addon/hint/show-hint.css';
+import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/javascript-hint';
+import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
@@ -97,6 +101,17 @@ const { insertTab, insertSoftTab } = CodeMirror.commands;
 CodeMirror.commands.insertTab = cm => (
   cm.options.indentWithTabs ? insertTab(cm) : insertSoftTab(cm)
 );
+
+function autoHintWithFallback(cm, opts) {
+  const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, opts);
+  // fallback to anyword if default returns nothing (or no default)
+  return result?.list.length ? result : CodeMirror.hint.anyword(cm, opts);
+}
+CodeMirror.registerHelper('hint', 'autoHintWithFallback', autoHintWithFallback);
+
+CodeMirror.commands.autocomplete = (cm) => {
+  cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
+};
 
 export const cmOptions = {
   continueComments: true,
@@ -301,6 +316,7 @@ export default {
       cm.setOption('extraKeys', {
         Esc: 'cancel',
         F1: 'showHelp',
+        'Ctrl-Space': 'autocomplete',
       });
       Object.assign(CodeMirror.commands, {
         cancel: () => {
@@ -483,6 +499,24 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
   .is-error {
     border-color: #e85600;
     background: #e8560010;
+  }
+}
+
+/* CodeMirror show-hints fix to work here */
+.CodeMirror-hints {
+  z-index: 9999;
+}
+
+@media (prefers-color-scheme: dark) {
+  .CodeMirror-hints {
+    background: var(--bg);
+  }
+  .CodeMirror-hint {
+    color: var(--fg);
+  }
+  li.CodeMirror-hint-active {
+    background: var(--fg);
+    color: var(--bg);
   }
 }
 
