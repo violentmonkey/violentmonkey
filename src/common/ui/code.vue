@@ -50,7 +50,6 @@
 </template>
 
 <script>
-import '#/common/ui/codemirror-js-mixed/javascript-mixed';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/eclipse.css';
 import 'codemirror/addon/comment/continuecomment';
@@ -70,6 +69,7 @@ import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
+import '#/common/ui/codemirror-js-mixed/javascript-mixed';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
