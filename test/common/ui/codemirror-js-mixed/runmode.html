@@ -1,0 +1,110 @@
+<!doctype html>
+
+<title>CodeMirror: Mode Runner</title>
+<meta charset="utf-8"/>
+
+<link rel="stylesheet" href="../../../../node_modules/codemirror/lib/codemirror.css">
+<script src="../../../../node_modules/codemirror/addon/runmode/runmode-standalone.js"></script>
+<script src="../../../../node_modules/codemirror/mode/css/css.js"></script>
+<script src="../../../../node_modules/codemirror/mode/javascript/javascript.js"></script>
+<script src="../../../../node_modules/codemirror/mode/xml/xml.js"></script>
+<script>
+  // Used by javascript-mixed
+  window.process = { env: { DEBUG: false } };
+</script>
+<script src="../../../../src/common/ui/codemirror-js-mixed/javascript-mixed.js"></script>
+
+<article>
+  <h1>Run CodeMirror Mode</h1>
+
+
+  <textarea id="code" style="width: 90%; height: 7em; border: 1px solid black; padding: .2em .4em;">
+// ==UserScript==
+// @name Test HTML/CSS highlights
+// ==/UserScript==
+
+document.body.insertAdjacentHTML('beforeend', `<div class="foo">
+  <p>hello <i>world</i></p>
+</div>`);
+someElt.insertAdjacentHTML('afterbegin', `<hr class="bar">`);
+
+GM_addStyle(`
+#some-id div {
+  color: #FF0000;
+  border-bottom: 1px solid gray;
+  z-index: 123;
+}`);
+GM_addStyle(` a { color: pink; }`);
+
+someElt.innerHTML = `<span id="bar">
+  123 <!-- html comments -->
+</span>`;
+
+// highlight arbitrary string template
+const someHTML = /* html */ `<br>
+  <hr class="acme">`;
+
+let someCSS = /* CSS  */ `.a:visited {
+  color: purple;
+}`;
+
+var end = true;
+  </textarea>
+
+  <br>
+  <button onclick="doHighlight();">Highlight!</button>
+  <select id="mode">
+    <option value="javascript-mixed">javascript-mixed</option>
+    <option value="javascript">javascript</option>
+  </select>
+
+  <hr>
+  <h3>Formatted codes</h3>
+  <pre id="output" class="cm-s-default"></pre>
+  <h3>Tokens</h3>
+  <textarea id="output-tokens" cols="60" rows="25" spellheck="false" style="display: none; border: 1px; solid gray;" readonly></textarea>
+  <h3>Token Statistics</h3>
+  <textarea id="output-stats" cols="60" rows="20" spellheck="false" style="display: none; border: 1px; solid gray;" readonly></textarea>
+  <script>
+    function doHighlight() {
+      const mode = document.getElementById("mode").value;
+      const code = document.getElementById("code").value;
+      // run the mode
+      CodeMirror.runMode(code, mode ,
+      document.getElementById("output"));
+
+      // run again for token output
+      const elOutTokens = document.getElementById('output-tokens');
+      elOutTokens.value ='';
+      elOutTokens.style.display = 'block';
+
+      window.styleStats = {};
+      window.styleTotal = 0;
+      // add // EOF to the end of the code to tokenize to signify the end of runMode
+      const EOF_HINT = '// EOF';
+      CodeMirror.runMode(`${code}\n${EOF_HINT}`, mode ,
+      function(text, style) {
+        if (text !== '// EOF') {
+          elOutTokens.value += `${`${style} | ${text}`.trimRight()}\n`;
+
+          styleStats[style] = (styleStats[style] ?? 0) + 1;
+          styleTotal++;
+        } else {
+          const elOutStats = document.getElementById('output-stats');
+          elOutStats.style.display = 'block';
+          elOutStats.value = JSON.stringify(window.styleStats, null, 4);
+          elOutStats.value += `\n    <total>: ${styleTotal}`;
+          }
+        });
+      }
+
+      function countStyleOfTypes(styleStatsMap, ...types) {
+        let total = 0;
+        for (let t of types) {
+          total += (styleStatsMap[t] ?? 0);
+        }
+        return total;
+      }
+
+    </script>
+  </article>

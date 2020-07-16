@@ -1,0 +1,218 @@
+comment | // ==UserScript==
+undefined |
+comment | // @name Test HTML/CSS highlights
+undefined |
+comment | // ==/UserScript==
+undefined |
+undefined |
+variable | document
+undefined | .
+property | body
+undefined | .
+property | insertAdjacentHTML
+undefined | (
+string | 'beforeend'
+undefined | ,
+null |
+string-2 | `
+tag bracket | <
+tag | div
+null |
+attribute | class
+null | =
+string | "foo"
+tag bracket | >
+undefined |
+null |
+tag bracket | <
+tag | p
+tag bracket | >
+null | hello
+tag bracket | <
+tag | i
+tag bracket | >
+null | world
+tag bracket | </
+tag | i
+tag bracket | >
+tag bracket | </
+tag | p
+tag bracket | >
+undefined |
+tag bracket | </
+tag | div
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+variable | someElt
+undefined | .
+property | insertAdjacentHTML
+undefined | (
+string | 'afterbegin'
+undefined | ,
+null |
+string-2 | `
+tag bracket | <
+tag | hr
+null |
+attribute | class
+null | =
+string | "bar"
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+undefined |
+builtin | #some-id
+null |
+tag | div
+null |
+null | {
+undefined |
+null |
+property | color
+null | :
+null |
+atom | #FF0000
+null | ;
+undefined |
+null |
+property | border-bottom
+null | :
+null |
+number | 1px
+null |
+atom | solid
+null |
+keyword | gray
+null | ;
+undefined |
+null |
+property | z-index
+null | :
+null |
+number | 123
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+null |
+tag | a
+null |
+null | {
+null |
+property | color
+null | :
+null |
+keyword | pink
+null | ;
+null |
+null | }
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+variable | someElt
+undefined | .
+property | innerHTML
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | span
+null |
+attribute | id
+null | =
+string | "bar"
+tag bracket | >
+undefined |
+null |
+null | 123
+comment | <!-- html comments -->
+undefined |
+tag bracket | </
+tag | span
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+comment | // highlight arbitrary string template
+undefined |
+keyword | const
+null |
+def | someHTML
+null |
+operator | =
+null |
+comment | /* html */
+null |
+string-2 | `
+tag bracket | <
+tag | br
+tag bracket | >
+undefined |
+null |
+tag bracket | <
+tag | hr
+null |
+attribute | class
+null | =
+string | "acme"
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+keyword | let
+null |
+def | someCSS
+null |
+operator | =
+null |
+comment | /* CSS  */
+null |
+string-2 | `
+qualifier | .a
+null | :
+variable-3 | visited
+null |
+null | {
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | purple
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+keyword | var
+null |
+def | end
+null |
+operator | =
+null |
+atom | true
+undefined | ;
+undefined |
+undefined |

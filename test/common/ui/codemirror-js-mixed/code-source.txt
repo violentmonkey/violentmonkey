@@ -1,0 +1,30 @@
+// ==UserScript==
+// @name Test HTML/CSS highlights
+// ==/UserScript==
+
+document.body.insertAdjacentHTML('beforeend', `<div class="foo">
+  <p>hello <i>world</i></p>
+</div>`);
+someElt.insertAdjacentHTML('afterbegin', `<hr class="bar">`);
+
+GM_addStyle(`
+#some-id div {
+  color: #FF0000;
+  border-bottom: 1px solid gray;
+  z-index: 123;
+}`);
+GM_addStyle(` a { color: pink; }`);
+
+someElt.innerHTML = `<span id="bar">
+  123 <!-- html comments -->
+</span>`;
+
+// highlight arbitrary string template
+const someHTML = /* html */ `<br>
+  <hr class="acme">`;
+
+let someCSS = /* CSS  */ `.a:visited {
+  color: purple;
+}`;
+
+var end = true;
