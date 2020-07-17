@@ -48,10 +48,15 @@
     })();
 
 
+    function tokenLength(stream) {
+      // usage: avoid string creation in call stream.current().length
+      return stream.pos - stream.start;
+    }
+
     function prepReparseStringTemplateInLocalMode(modeToUse, stream, state) {
       dbg(`Entering local ${modeToUse.name} mode...`);
       // spit out beginning backtick as a token, and leave the rest of the text for local mode parsing
-      stream.backUp(stream.current().length - 1);
+      stream.backUp(tokenLength(stream) - 1);
 
       // workaround needed for 1-line string template,
       // to ensure the ending backtick is parsed correctly.
@@ -79,7 +84,7 @@
       // dbg(`    ${stream.start}-${stream.pos}:\t${stream.current()}`);
       const oldPos = stream.pos;
       // spit out beginning beginning quote as a token, and leave the rest of the text for local mode parsing
-      stream.backUp(stream.current().length - 1); // TODO: don't use stream.current() to avoid  object creation
+      stream.backUp(tokenLength(stream) - 1);
 
       // switch to local mode for subsequent text
       state.localMode = modeToUse;
