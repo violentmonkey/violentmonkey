@@ -74,6 +74,39 @@
       return style;
     }
 
+    function prepReparsePlainStringInLocalMode(modeToUse, stream, state) {
+      dbg(`Entering local ${modeToUse.name} mode... (plain string)`);
+      // dbg(`    ${stream.start}-${stream.pos}:\t${stream.current()}`);
+      const oldPos = stream.pos;
+      // spit out beginning beginning quote as a token, and leave the rest of the text for local mode parsing
+      stream.backUp(stream.current().length - 1); // TODO: don't use stream.current() to avoid  object creation
+
+      // switch to local mode for subsequent text
+      state.localMode = modeToUse;
+      state.localState = CodeMirror.startState(state.localMode);
+      // use end quote position to detect the end of the local html mode
+      state.localState.localHtmlPlainStringEndPos = oldPos;
+    }
+
+    function exitLocalModeWithEndQuote(stream) {
+      dbg('Exiting local html/css mode... (plain string)');
+      // parse the ending JS string quote,
+      // cannot use the jsMode to parse, as it will be treated as the beginning of a string.
+      // so we simulate it here.
+      stream.next(); // should be single or double quote;
+      return 'string'; // the expected style
+    }
+
+    function tokenInLocalModePlainString(stream, state) {
+      const style = state.localMode.token(stream, state.localState);
+      if (stream.pos >= state.localState.localHtmlPlainStringEndPos) {
+        // backUp text beyond the string, plus one to exclude end quote
+        stream.backUp(stream.pos - state.localState.localHtmlPlainStringEndPos + 1);
+      }
+      dbg('  local mode token (plain string) - ', stream.current(), `[${style}]`);
+      return style;
+    }
+
     /* eslint max-classes-per-file: ["error", 2] */
 
     // Holds input parameters and return values for a rule execution
@@ -220,6 +253,14 @@
       multilineTagIndentPastTag: parserConfig.multilineTagIndentPastTag,
     });
 
+    // for tokenizing plain string, where matchClosing would cause too many false errors
+    // as the html often spans across multiple strings.
+    const htmlNoMatchClosingMode = CodeMirror.getMode(config, {
+      name: 'xml',
+      htmlMode: true,
+      matchClosing: false,
+    });
+
     // define the transition rules to enter local html mode;
     const htmlRules = [
       // for pattern insertAdjacentHTML('beforeend', `html-string-template`);
@@ -287,6 +328,23 @@
         match: ctx => ctx.type === 'quasi',
         nextContext: 'html-in',
         caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state),
+      }),
+
+      // for plain string (single or double quoted) that looks like html
+      // e.g., '<div class="foo">hello', "</div>", '  <hr/>', etc.
+      new Rule({
+        curContext: '<start>',
+        match: ctx => ctx.type === 'string' && /^['"]\s*<\/?[a-zA-Z0-9]+(\s|\/?>)/.test(ctx.text),
+        nextContext: 'html-str-in',
+        caseMatched: ctx => prepReparsePlainStringInLocalMode(htmlNoMatchClosingMode,
+          ctx.stream, ctx.state),
+      }),
+      new Rule({
+        curContext: 'html-str-in',
+        match: ctx => ctx.stream.start >= ctx.state.localState.localHtmlPlainStringEndPos - 1, // match the expected ending quote by position
+        nextContext: null, // then exit local html mode
+        caseMatched: ctx => { ctx.style = exitLocalModeWithEndQuote(ctx.stream, ctx.state); },
+        caseNotMatched: ctx => { ctx.style = tokenInLocalModePlainString(ctx.stream, ctx.state); }, // else stay local mode
       }),
     ];
 

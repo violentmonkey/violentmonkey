@@ -206,6 +206,213 @@ string-2 | `
 undefined | ;
 undefined |
 undefined |
+comment | // plain string support
+undefined |
+undefined |
+keyword | var
+null |
+def | uiHtml
+null |
+operator | =
+null |
+string | '
+tag bracket | <
+tag | h1
+tag bracket | >
+null | heading
+tag bracket | </
+tag | h1
+tag bracket | >
+string | '
+null |
+operator | +
+undefined |
+null |
+string | '
+tag bracket | <
+tag | span
+null |
+attribute | id
+null | =
+string | "someId"
+null |
+attribute | class
+null | =
+string | "foo"
+tag bracket | >
+null | time is:
+string | '
+null |
+operator | +
+null |
+variable | now
+null |
+operator | +
+null |
+string | '
+tag bracket | </
+tag | span
+tag bracket | >
+string | '
+null |
+operator | +
+undefined |
+null |
+string | '
+null |
+tag bracket | <
+tag | br
+tag bracket | >
+string | '
+null |
+operator | +
+null |
+comment | // leading spaces okay
+undefined |
+null |
+string | '
+tag bracket | <
+tag | br
+tag bracket | >
+string | '
+null |
+operator | +
+undefined |
+null |
+string | '
+tag bracket | <
+tag | br
+tag bracket | />
+string | '
+null |
+operator | +
+undefined |
+null |
+string | "
+tag bracket | <
+tag | br
+null |
+tag bracket | />
+string | "
+null |
+operator | +
+null |
+comment | // double-quoted string
+undefined |
+null |
+string | "
+tag bracket | </
+tag | div
+null |
+tag bracket | >
+string | "
+null |
+operator | +
+null |
+comment | // doesn't complain if there is no opening <div>
+undefined |
+null |
+string | '
+tag bracket | <
+tag | img
+null |
+attribute | alt
+null | =
+string | "Quotes \'in text\'"
+null |
+attribute | src
+null | =
+string | "bar.jpg"
+tag bracket | >
+string | '
+undefined | ;
+null |
+comment | // handle some escaping quotes well
+undefined |
+undefined |
+keyword | var
+null |
+def | dbgMsg
+null |
+operator | =
+null |
+string | '<-- output'
+undefined | ;
+null |
+comment | // doesn't get mistaken as html
+undefined |
+undefined |
+comment | // some limitations
+undefined |
+comment | //
+undefined |
+variable | someElt
+undefined | .
+property | innerHTML
+null |
+operator | =
+null |
+string | "
+tag bracket | <
+tag | br
+null |
+attribute | class
+null | =
+string | \
+string error | " foo\"
+tag bracket | >
+string | "
+null |
+operator | +
+null |
+comment | // does not hanlde some escaping well
+undefined |
+null |
+string | '
+tag bracket | <
+tag | div
+null |
+attribute | class
+null | =
+string | "
+string | '
+null |
+operator | +
+null |
+variable | classToUse
+null |
+operator | +
+null |
+string | '"></div>'
+null |
+operator | +
+null |
+comment | // doesn't detect if a string begins with a partial tag
+undefined |
+null |
+string | 'plain text <hr>'
+undefined | ;
+null |
+comment | // doesn't detect if some plain text at the beginning.
+undefined |
+undefined |
+variable | console
+undefined | .
+property | debug
+undefined | (
+string | '
+tag bracket | <
+tag | dbg
+tag bracket | >
+null |
+null | this is some debug statement
+string | '
+undefined | )
+undefined | ;
+null |
+comment | // mistaken as html as the string  starts with a tag
+undefined |
+undefined |
 keyword | var
 null |
 def | end

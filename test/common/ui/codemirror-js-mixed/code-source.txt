@@ -27,4 +27,25 @@ let someCSS = /* CSS  */ `.a:visited {
   color: purple;
 }`;
 
+// plain string support
+
+var uiHtml = '<h1>heading</h1>' +
+    '<span id="someId" class="foo">time is: ' + now + '</span>' +
+    '  <br>' + // leading spaces okay
+    '<br>' +
+    '<br/>' +
+    "<br />" + // double-quoted string
+    "</div  >" + // doesn't complain if there is no opening <div>
+    '<img alt="Quotes \'in text\'" src="bar.jpg">'; // handle some escaping quotes well
+
+var dbgMsg = '<-- output'; // doesn't get mistaken as html
+
+// some limitations
+//
+someElt.innerHTML = "<br class=\" foo\">" +  // does not hanlde some escaping well
+             '<div class="' + classToUse + '"></div>' + // doesn't detect if a string begins with a partial tag
+             'plain text <hr>'; // doesn't detect if some plain text at the beginning.
+
+console.debug('<dbg> this is some debug statement'); // mistaken as html as the string  starts with a tag
+
 var end = true;
