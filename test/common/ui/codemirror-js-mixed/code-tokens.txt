@@ -66,6 +66,46 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
+keyword | var
+null |
+def | insertPos
+null |
+operator | =
+null |
+string | 'afterbegin'
+undefined | ;
+null |
+comment | // variable also okay, extra spaces okay too
+undefined |
+variable | otherElt
+undefined | .
+property | insertAdjacentHTML
+null |
+undefined | (
+null |
+variable | insertPos
+undefined | ,
+null |
+string-2 | `
+tag bracket | <
+tag | div
+null |
+attribute | style
+null | =
+string | "margin: 1em;"
+tag bracket | >
+undefined |
+null |
+null | hello
+undefined |
+tag bracket | </
+tag | div
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
 variable | GM_addStyle
 undefined | (
 string-2 | `

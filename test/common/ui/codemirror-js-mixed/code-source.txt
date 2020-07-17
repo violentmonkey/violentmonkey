@@ -7,6 +7,11 @@ document.body.insertAdjacentHTML('beforeend', `<div class="foo">
 </div>`);
 someElt.insertAdjacentHTML('afterbegin', `<hr class="bar">`);
 
+var insertPos = 'afterbegin'; // variable also okay, extra spaces okay too
+otherElt.insertAdjacentHTML ( insertPos,  `<div style="margin: 1em;">
+  hello
+</div>`);
+
 GM_addStyle(`
 #some-id div {
   color: #FF0000;

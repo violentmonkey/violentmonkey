@@ -281,7 +281,7 @@
       }),
       new Rule({
         curContext: 'html-2',
-        match: ctx => ctx.type === 'string', // e.g., 'beforeend'
+        match: ctx => ['string', 'variable'].includes(ctx.type), // e.g., 'beforeend' or a variable with such value
         nextContext: 'html-3',
       }),
       new Rule({
