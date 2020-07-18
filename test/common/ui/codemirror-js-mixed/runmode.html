@@ -4,6 +4,7 @@
 <meta charset="utf-8"/>
 
 <link rel="stylesheet" href="../../../../node_modules/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="../../../../node_modules/codemirror/theme/blackboard.css">
 <script src="../../../../node_modules/codemirror/addon/runmode/runmode-standalone.js"></script>
 <script src="../../../../node_modules/codemirror/mode/css/css.js"></script>
 <script src="../../../../node_modules/codemirror/mode/javascript/javascript.js"></script>
@@ -86,8 +87,9 @@ var end = true;
 
   <hr>
   <h3>Formatted codes</h3>
-  <pre id="output" class="cm-s-default"></pre>
+  <pre id="output" class="CodeMirror cm-s-blackboard" style="height: auto;"></pre>
   <h3>Tokens</h3>
+  <pre>[style] | [text]</pre>
   <textarea id="output-tokens" cols="60" rows="25" spellheck="false" style="display: none; border: 1px; solid gray;" readonly></textarea>
   <h3>Token Statistics</h3>
   <textarea id="output-stats" cols="60" rows="20" spellheck="false" style="display: none; border: 1px; solid gray;" readonly></textarea>
@@ -96,8 +98,7 @@ var end = true;
       const mode = document.getElementById("mode").value;
       const code = document.getElementById("code").value;
       // run the mode
-      CodeMirror.runMode(code, mode ,
-      document.getElementById("output"));
+      CodeMirror.runMode(code, mode , document.getElementById("output"));
 
       // run again for token output
       const elOutTokens = document.getElementById('output-tokens');
