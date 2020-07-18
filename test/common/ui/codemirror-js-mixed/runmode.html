@@ -27,7 +27,8 @@
 document.body.insertAdjacentHTML('beforeend', `<div class="foo">
   <p>hello <i>world</i></p>
 </div>`);
-someElt.insertAdjacentHTML('afterbegin', `<hr class="bar">`);
+someElt.insertAdjacentHTML('afterbegin', `\
+<hr class="bar">`); // html can appear in second line
 
 var insertPos = 'afterbegin'; // variable also okay, extra spaces okay too
 otherElt.insertAdjacentHTML ( insertPos,  `<div style="margin: 1em;">
@@ -46,13 +47,19 @@ someElt.innerHTML = `<span id="bar">
   123 <!-- html comments -->
 </span>`;
 
-// highlight arbitrary string template
-const someHTML = /* html */ `<br>
+// highlight arbitrary string template with a inline comment as a hint
+const someHTML = /* html */ `\
+<br>
   <hr class="acme">`;
 
 let someCSS = /* CSS  */ `.a:visited {
   color: purple;
 }`;
+
+// auto detect html-like string template without the hint
+const otherHTML = `<div class="bar">
+  hello
+</div>`;
 
 // plain string support
 

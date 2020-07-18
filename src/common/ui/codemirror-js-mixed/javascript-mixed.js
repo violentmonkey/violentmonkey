@@ -351,6 +351,14 @@
         caseMatched: ctx => { ctx.style = exitLocalModeWithEndQuote(ctx.stream, ctx.state); },
         caseNotMatched: ctx => { ctx.style = tokenInLocalModePlainString(ctx.stream, ctx.state); }, // else stay local mode
       }),
+
+      // for HTML string template (without inline comment as a hint)
+      new Rule({
+        curContext: '<start>',
+        match: ctx => ctx.type === 'quasi' && /^[`]\s*<\/?[a-zA-Z0-9]+(\s|\/?>)/.test(ctx.text),
+        nextContext: 'html-in',
+        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state),
+      }),
     ];
 
     function maybeHtmlToken(stream, state, jsTokenStyle) {

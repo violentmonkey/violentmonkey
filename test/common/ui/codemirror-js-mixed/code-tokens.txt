@@ -54,6 +54,8 @@ string | 'afterbegin'
 undefined | ,
 null |
 string-2 | `
+null | \
+undefined |
 tag bracket | <
 tag | hr
 null |
@@ -64,6 +66,8 @@ tag bracket | >
 string-2 | `
 undefined | )
 undefined | ;
+null |
+comment | // html can appear in second line
 undefined |
 undefined |
 keyword | var
@@ -192,7 +196,7 @@ string-2 | `
 undefined | ;
 undefined |
 undefined |
-comment | // highlight arbitrary string template
+comment | // highlight arbitrary string template with a inline comment as a hint
 undefined |
 keyword | const
 null |
@@ -203,6 +207,8 @@ null |
 comment | /* html */
 null |
 string-2 | `
+null | \
+undefined |
 tag bracket | <
 tag | br
 tag bracket | >
@@ -242,6 +248,33 @@ keyword | purple
 null | ;
 undefined |
 null | }
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+comment | // auto detect html-like string template without the hint
+undefined |
+keyword | const
+null |
+def | otherHTML
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | div
+null |
+attribute | class
+null | =
+string | "bar"
+tag bracket | >
+undefined |
+null |
+null | hello
+undefined |
+tag bracket | </
+tag | div
+tag bracket | >
 string-2 | `
 undefined | ;
 undefined |
