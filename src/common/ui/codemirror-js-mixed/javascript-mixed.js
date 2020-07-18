@@ -266,6 +266,11 @@
       matchClosing: false,
     });
 
+    const [RE_HTML_PLAIN_STRING, RE_HTML_STRING_TEMPLATE] = (() => {
+      const reHtmlBaseStr = /\s*<\/?[a-zA-Z0-9]+(\s|\/?>)/.source;
+      return [new RegExp(`^['"]${reHtmlBaseStr}`), new RegExp(`^[\`]${reHtmlBaseStr}`)];
+    })();
+
     // define the transition rules to enter local html mode;
     const htmlRules = [
       // for pattern insertAdjacentHTML('beforeend', `html-string-template`);
@@ -339,7 +344,7 @@
       // e.g., '<div class="foo">hello', "</div>", '  <hr/>', etc.
       new Rule({
         curContext: '<start>',
-        match: ctx => ctx.type === 'string' && /^['"]\s*<\/?[a-zA-Z0-9]+(\s|\/?>)/.test(ctx.text),
+        match: ctx => ctx.type === 'string' && RE_HTML_PLAIN_STRING.test(ctx.text),
         nextContext: 'html-str-in',
         caseMatched: ctx => prepReparsePlainStringInLocalMode(htmlNoMatchClosingMode,
           ctx.stream, ctx.state),
@@ -355,7 +360,7 @@
       // for HTML string template (without inline comment as a hint)
       new Rule({
         curContext: '<start>',
-        match: ctx => ctx.type === 'quasi' && /^[`]\s*<\/?[a-zA-Z0-9]+(\s|\/?>)/.test(ctx.text),
+        match: ctx => ctx.type === 'quasi' && RE_HTML_STRING_TEMPLATE.test(ctx.text),
         nextContext: 'html-in',
         caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state),
       }),
