@@ -93,7 +93,7 @@ var end = true;
   </select>
 
   <hr>
-  <h3>Formatted codes</h3>
+  <h3>Formatted code<span id="tokenTime" style="margin-left: 1em; font-size: 70%; font-weight: normal; font-family monospace;"></span></h3>
   <pre id="output" class="CodeMirror cm-s-blackboard" style="height: auto;"></pre>
   <h3>Tokens</h3>
   <pre>[style] | [text]</pre>
@@ -104,8 +104,9 @@ var end = true;
     function doHighlight() {
       const mode = document.getElementById("mode").value;
       const code = document.getElementById("code").value;
+      const outEl = document.getElementById("output");
       // run the mode
-      CodeMirror.runMode(code, mode , document.getElementById("output"));
+      CodeMirror.runMode(code, mode , outEl);
 
       // run again for token output
       const elOutTokens = document.getElementById('output-tokens');
@@ -116,29 +117,41 @@ var end = true;
       window.styleTotal = 0;
       // add // EOF to the end of the code to tokenize to signify the end of runMode
       const EOF_HINT = '// EOF';
-      CodeMirror.runMode(`${code}\n${EOF_HINT}`, mode ,
-      function(text, style) {
-        if (text !== '// EOF') {
-          elOutTokens.value += `${`${style} | ${text}`.trimRight()}\n`;
+      let textOutTokens = '';
+      CodeMirror.runMode(`${code}\n${EOF_HINT}`, mode, function(text, style) {
+        if (text !== EOF_HINT) {
+          textOutTokens += `${`${style} | ${text}`.trimRight()}\n`;
 
           styleStats[style] = (styleStats[style] ?? 0) + 1;
           styleTotal++;
         } else {
+          elOutTokens.value = textOutTokens; // output the tokens text
+
           const elOutStats = document.getElementById('output-stats');
           elOutStats.style.display = 'block';
           elOutStats.value = JSON.stringify(window.styleStats, null, 4);
           elOutStats.value += `\n    <total>: ${styleTotal}`;
-          }
-        });
-      }
-
-      function countStyleOfTypes(styleStatsMap, ...types) {
-        let total = 0;
-        for (let t of types) {
-          total += (styleStatsMap[t] ?? 0);
         }
-        return total;
-      }
+      });
 
-    </script>
-  </article>
+      // an approximation of time to run the mode
+      // run separately to eliminate pollution from DOM operations on output
+      const timeStart = Date.now();
+      CodeMirror.runMode(`${code}\n${EOF_HINT}`, mode, function(text, style) {
+        if (text === EOF_HINT) {
+          const timeEnd = Date.now();
+          document.getElementById('tokenTime').innerText = `(${timeEnd-timeStart}ms)`;
+        }
+      });
+    }
+
+    function countStyleOfTypes(styleStatsMap, ...types) {
+      let total = 0;
+      for (let t of types) {
+        total += (styleStatsMap[t] ?? 0);
+      }
+      return total;
+    }
+
+  </script>
+</article>
