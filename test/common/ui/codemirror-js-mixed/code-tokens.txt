@@ -53,9 +53,9 @@ undefined | (
 string | 'afterbegin'
 undefined | ,
 null |
-string-2 | `
-null | \
+string-2 | `\
 undefined |
+string-2 |
 tag bracket | <
 tag | hr
 null |

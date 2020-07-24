@@ -53,10 +53,15 @@
       return stream.pos - stream.start;
     }
 
-    function prepReparseStringTemplateInLocalMode(modeToUse, stream, state) {
+    function prepReparseStringTemplateInLocalMode(modeToUse, stream, state,
+      hasBeginBacktick = true) {
       dbg(`Entering local ${modeToUse.name} mode...`);
-      // spit out beginning backtick as a token, and leave the rest of the text for local mode parsing
-      stream.backUp(tokenLength(stream) - 1);
+      if (hasBeginBacktick) {
+        // spit out beginning backtick as a token, and leave the rest of the text for local mode parsing
+        stream.backUp(tokenLength(stream) - 1);
+      } else {
+        stream.backUp(tokenLength(stream));
+      }
 
       // workaround needed for 1-line string template,
       // to ensure the ending backtick is parsed correctly.
@@ -266,65 +271,24 @@
       matchClosing: false,
     });
 
-    const [RE_HTML_PLAIN_STRING, RE_HTML_STRING_TEMPLATE] = (() => {
+    const [RE_HTML_BASE, RE_HTML_PLAIN_STRING, RE_HTML_STRING_TEMPLATE] = (() => {
       const reHtmlBaseStr = /\s*<\/?[a-zA-Z0-9]+(\s|\/?>)/.source;
-      return [new RegExp(`^['"]${reHtmlBaseStr}`), new RegExp(`^[\`]${reHtmlBaseStr}`)];
+      return [
+        new RegExp(reHtmlBaseStr),
+        new RegExp(`^['"]${reHtmlBaseStr}`),
+        new RegExp(`^[\`]${reHtmlBaseStr}`),
+      ];
     })();
 
     // define the transition rules to enter local html mode;
     const htmlRules = [
-      // for pattern insertAdjacentHTML('beforeend', `html-string-template`);
-      new Rule({
-        curContext: '<start>',
-        match: ctx => ctx.type === 'variable' && ctx.text === 'insertAdjacentHTML',
-        nextContext: 'html-1',
-      }),
-      new Rule({
-        curContext: 'html-1',
-        match: ctx => ctx.type === '(' && ctx.text === '(',
-        nextContext: 'html-2',
-      }),
-      new Rule({
-        curContext: 'html-2',
-        match: ctx => ['string', 'variable'].includes(ctx.type), // e.g., 'beforeend' or a variable with such value
-        nextContext: 'html-3',
-      }),
-      new Rule({
-        curContext: 'html-3',
-        match: ctx => ctx.type === ',' && ctx.text === ',',
-        nextContext: 'html-4',
-      }),
-      new Rule({
-        curContext: 'html-4',
-        match: ctx => ctx.type === 'quasi', // if it's a string template
-        nextContext: 'html-in',
-        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state),
-      }),
+      // inside a html string template
       new Rule({
         curContext: 'html-in',
         match: ctx => ctx.stream.peek() === '`', // if it hits ending backtick for string template
         nextContext: null, // then exit local html mode
         caseMatched: ctx => { ctx.style = exitLocalModeWithEndBacktick(ctx.stream, ctx.state); },
         caseNotMatched: ctx => { ctx.style = tokenInLocalMode(ctx.stream, ctx.state); }, // else stay in local mode
-      }),
-
-      // for pattern elt.innerHTML = `html-string`
-      // variation: outerHTML, +=
-      new Rule({
-        curContext: '<start>',
-        match: ctx => ctx.jsTokenStyle === 'property' && ['innerHTML', 'outerHTML'].includes(ctx.text),
-        nextContext: 'html-11',
-      }),
-      new Rule({
-        curContext: 'html-11',
-        match: ctx => ctx.type === 'operator' && ['=', '+='].includes(ctx.text),
-        nextContext: 'html-12',
-      }),
-      new Rule({
-        curContext: 'html-12',
-        match: ctx => ctx.type === 'quasi',
-        nextContext: 'html-in',
-        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state),
       }),
 
       // for pattern var someHTML = /* html */ `html-string`
@@ -364,6 +328,21 @@
         nextContext: 'html-in',
         caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state),
       }),
+
+      // for HTML string template (where first line is blank, html started in second line)
+      new Rule({
+        curContext: '<start>',
+        match: ctx => ctx.type === 'quasi' && /^[`](\\)?\s*$/.test(ctx.text), // first line is blank
+        nextContext: 'html-51',
+      }),
+      new Rule({
+        curContext: 'html-51',
+        match: ctx => ctx.type === 'quasi' && RE_HTML_BASE.test(ctx.text), // second line starts with a tag
+        nextContext: 'html-in',
+        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state,
+          false),
+      }),
+
     ];
 
     function maybeHtmlToken(stream, state, jsTokenStyle) {
@@ -387,6 +366,13 @@
           // will end up seeing previous token.
           return null;
         }
+      }
+
+      // optimization: short-circuit to skip local mode match when the rules won't cover
+      // Note: if the rules change (the <start> ones), the conditions here might need to be updated accordingly.
+      if (state.maybeLocalContext == null
+        && !['variable', 'comment', 'string', 'string-2'].includes(tokenStyle)) {
+        return tokenStyle;
       }
 
       // match to see if it needs to switch to local html mode, return local mode style if applicable
