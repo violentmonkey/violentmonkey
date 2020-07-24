@@ -60,4 +60,57 @@ someElt.innerHTML = "<br class=\" foo\">" +  // does not hanlde some escaping we
 
 console.debug('<dbg> this is some debug statement'); // mistaken as html as the string  starts with a tag
 
+//
+// Tests for handling js expression inside a string template,
+// especially those with nested string templates.
+
+// ensure backtick within a JS expression are tokenized as part of the expression,
+// rather than incorrectly ending the string template
+let someUi = `<section title="${trimLeft(`
+  Some title
+`)}">Hello World
+</section>`);
+
+// works too for backtick in the expression not at the beginning of a token/line.
+let someUi = `<section title="${trimLeft(`
+  Some title`)}">Hello World
+</section>`);
+
+// ensure simple case works too
+let someUi = `<section title="${someTitle}">Hello<section>`;
+
+// ensure nested case works too
+let someUi = `<section title="${trimLeft(`
+  Some title ${foo ? `val1` :`val2
+`}
+`)}">Hello World
+</section>`);
+
+// Limitation: could premature interpret closing the expression upon seeing }
+let someUi = `<section title="${trimLeft(`
+  Some title }
+`)}">Hello World
+</section>`);
+
+// for ease of comparison
+let someUi = `<section title="Some title">Hello World
+</section>`);
+
+const foo = 1;
+
+// works for CSS too
+GM_addStyle(`.foo {
+  content: "${someContent}";
+}`);
+
+GM_addStyle(`.foo {
+  content: "${trimBlanks(`
+  Some title
+`)}";
+}
+
+.bar {
+  border: 1px solid;
+}`);
+
 var end = true;

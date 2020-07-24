@@ -70,6 +70,13 @@
       // switch to local mode for subsequent text
       state.localMode = modeToUse;
       state.localState = CodeMirror.startState(state.localMode);
+      state.jsExprDepthInStringTemplate = 0;
+    }
+
+    function isEndBacktick(stream, state) {
+      // check it hits ending backtick for string template,
+      // ignoring the backticks that appear inside a JS expression.
+      return state.jsExprDepthInStringTemplate <= 0 && stream.peek() === '`';
     }
 
     function exitLocalModeWithEndBacktick(stream, state) {
@@ -80,7 +87,17 @@
 
     function tokenInLocalMode(stream, state) {
       const style = state.localMode.token(stream, state.localState);
-      dbg('  local mode token - ', stream.current(), `[${style}]`);
+      dbg('  local mode token - ', stream.current(), `[${style}]`, `jsExpr depth: ${state.jsExprDepthInStringTemplate}`);
+      const textLocalMode = stream.current();
+      if (/[^\\][$][{]|^[$][{]/.test(textLocalMode)) { // whether encounter js expression "${"
+        state.jsExprDepthInStringTemplate += 1;
+      }
+      if (/[}]/.test(textLocalMode)) { // encountering closing }
+        state.jsExprDepthInStringTemplate -= 1;
+        if (state.jsExprDepthInStringTemplate < 0) {
+          state.jsExprDepthInStringTemplate = 0;
+        }
+      }
       return style;
     }
 
@@ -231,7 +248,7 @@
       }),
       new Rule({
         curContext: 'css-in',
-        match: ctx => ctx.stream.peek() === '`', // if it hits ending backtick for string template
+        match: ctx => isEndBacktick(ctx.stream, ctx.state),
         nextContext: null, // then exit local css mode
         caseMatched: ctx => { ctx.style = exitLocalModeWithEndBacktick(ctx.stream, ctx.state); },
         caseNotMatched: ctx => { ctx.style = tokenInLocalMode(ctx.stream, ctx.state); }, // else stay in local mode
@@ -285,7 +302,7 @@
       // inside a html string template
       new Rule({
         curContext: 'html-in',
-        match: ctx => ctx.stream.peek() === '`', // if it hits ending backtick for string template
+        match: ctx => isEndBacktick(ctx.stream, ctx.state),
         nextContext: null, // then exit local html mode
         caseMatched: ctx => { ctx.style = exitLocalModeWithEndBacktick(ctx.stream, ctx.state); },
         caseNotMatched: ctx => { ctx.style = tokenInLocalMode(ctx.stream, ctx.state); }, // else stay in local mode
@@ -397,6 +414,7 @@
           localState: null,
           maybeLocalContext: null,
           jsState: state,
+          jsExprDepthInStringTemplate: 0,
         };
       },
 
@@ -409,6 +427,7 @@
           localState: local,
           maybeLocalContext: state.maybeLocalContext,
           jsState: CodeMirror.copyState(jsMode, state.jsState),
+          jsExprDepthInStringTemplate: state.jsExprDepthInStringTemplate,
         };
       },
 

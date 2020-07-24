@@ -486,6 +486,263 @@ null |
 comment | // mistaken as html as the string  starts with a tag
 undefined |
 undefined |
+comment | //
+undefined |
+comment | // Tests for handling js expression inside a string template,
+undefined |
+comment | // especially those with nested string templates.
+undefined |
+undefined |
+comment | // ensure backtick within a JS expression are tokenized as part of the expression,
+undefined |
+comment | // rather than incorrectly ending the string template
+undefined |
+keyword | let
+null |
+def | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "${trimLeft(`
+undefined |
+null |
+string | Some title
+undefined |
+string | `)}"
+tag bracket | >
+null | Hello World
+undefined |
+tag bracket | </
+tag | section
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+comment | // works too for backtick in the expression not at the beginning of a token/line.
+undefined |
+keyword | let
+null |
+def | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "${trimLeft(`
+undefined |
+null |
+string | Some title`)}"
+tag bracket | >
+null | Hello World
+undefined |
+tag bracket | </
+tag | section
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+comment | // ensure simple case works too
+undefined |
+keyword | let
+null |
+def | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "${someTitle}"
+tag bracket | >
+null | Hello
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+comment | // ensure nested case works too
+undefined |
+keyword | let
+null |
+def | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "${trimLeft(`
+undefined |
+null |
+string | Some title ${foo ? `val1` :`val2
+undefined |
+string | `}
+undefined |
+string | `)}"
+tag bracket | >
+null | Hello World
+undefined |
+tag bracket | </
+tag | section
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+comment | // Limitation: could premature interpret closing the expression upon seeing }
+undefined |
+keyword | let
+null |
+def | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "${trimLeft(`
+undefined |
+null |
+string | Some title }
+undefined |
+string-2 | `
+undefined | )
+undefined | }
+string | ">Hello World
+undefined |
+operator | <
+string-2 | /section>`);
+undefined |
+undefined |
+comment | // for ease of comparison
+undefined |
+keyword | let
+null |
+def | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "Some title"
+tag bracket | >
+null | Hello World
+undefined |
+tag bracket | </
+tag | section
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+keyword | const
+null |
+def | foo
+null |
+operator | =
+null |
+number | 1
+undefined | ;
+undefined |
+undefined |
+comment | // works for CSS too
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+qualifier | .foo
+null |
+null | {
+undefined |
+null |
+property | content
+null | :
+null |
+string | "${someContent}"
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+qualifier | .foo
+null |
+null | {
+undefined |
+null |
+property | content
+null | :
+null |
+string | "${trimBlanks(`
+undefined |
+null |
+variable | Some
+null |
+variable | title
+undefined |
+null | `
+null | )
+null | }
+string | ";
+undefined |
+null | }
+undefined |
+undefined |
+qualifier | .bar
+null |
+null | {
+undefined |
+null |
+property | border
+null | :
+null |
+number | 1px
+null |
+atom | solid
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
 keyword | var
 null |
 def | end
