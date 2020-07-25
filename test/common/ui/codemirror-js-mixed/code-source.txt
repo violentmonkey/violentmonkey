@@ -88,6 +88,20 @@ let someUi = `<section title="${trimLeft(`
 `)}">Hello World
 </section>`);
 
+// nested case 2
+let someUi = `<section title="${trimLeft(`
+  Some title
+  ${someExpr()}
+`)}">Hello World
+</section>`);
+
+// leading blank spaces before inner ending backtick
+let someUi = `<section title="${trimLeft(`
+  Some title
+  ${someExpr()}
+  `)}">Hello World
+</section>`);
+
 // } inside the expression is treated properly too
 let someUi = `<section title="${trimLeft(`
   Some title } the close curly bracket is not mistaken as the ending bracket

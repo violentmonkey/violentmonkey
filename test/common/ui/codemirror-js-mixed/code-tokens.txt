@@ -690,6 +690,97 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
+comment | // nested case 2
+undefined |
+keyword | let
+null |
+def | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "
+string-2 | ${
+variable | trimLeft
+undefined | (
+string-2 | `
+undefined |
+null |
+string-2 | Some title
+undefined |
+null |
+string-2 | ${
+variable | someExpr
+undefined | (
+undefined | )
+string-2 | }
+undefined |
+string-2 | `
+undefined | )
+string-2 | }
+string | "
+tag bracket | >
+null | Hello World
+undefined |
+tag bracket | </
+tag | section
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+comment | // leading blank spaces before inner ending backtick
+undefined |
+keyword | let
+null |
+def | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "
+string-2 | ${
+variable | trimLeft
+undefined | (
+string-2 | `
+undefined |
+null |
+string-2 | Some title
+undefined |
+null |
+string-2 | ${
+variable | someExpr
+undefined | (
+undefined | )
+string-2 | }
+undefined |
+null |
+string-2 | `
+undefined | )
+string-2 | }
+string | "
+tag bracket | >
+null | Hello World
+undefined |
+tag bracket | </
+tag | section
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
 comment | // } inside the expression is treated properly too
 undefined |
 keyword | let

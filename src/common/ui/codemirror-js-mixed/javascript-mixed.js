@@ -170,7 +170,12 @@
       if (style === 'string-2' && indexOfJsExprStart(text) >= 0) { // case nested ${
         state.jsExprDepthInStringTemplate += 1;
         dbg('    jsExprDepthInStringTemplate inc:', state.jsExprDepthInStringTemplate);
-      } else if (state.jsState.lastType === '}') { // case expression-ending }
+      } else if (style === 'string-2' && state.jsState.lastType === '}') { // case expression-ending }
+        // Note: must check BOTH style and lastType.
+        // If there are blank spaces after },
+        // when tokenizing the blank spaces, the style is null but the lastType remains to be }
+        // (the one with meaningful token)
+
         // once it reaches back to 0, the logic would treat the next token in parent local mode
         state.jsExprDepthInStringTemplate -= 1;
         dbg('    jsExprDepthInStringTemplate dec:', state.jsExprDepthInStringTemplate);
