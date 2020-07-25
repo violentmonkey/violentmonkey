@@ -88,6 +88,8 @@
       // END init
 
       /**
+       * Force html tokenizer to treat next token as attribute value.
+       *
        * Use case:
        * - html tokenizer encounters an js expression inside a complete attribute value
        * e.g., the value in class="foo ${someOtherClass()} bar"
@@ -96,6 +98,9 @@
        *   back to html tokenizer, e.g.  bar", in the above example
        * - we want html tokenizer process it as part of attribute value
        * - this function forces the tokenizer to do so.
+       *
+       * The use case and the solution are both analogous to forceJsModeToQuasi(),
+       * which handles tokenizing a single-line string template.
        */
       function forceHtmlModeToAttrContinuedState(stream, htmlState) {
         htmlState.state = attrContinuedState;
