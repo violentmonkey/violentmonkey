@@ -22,6 +22,8 @@ test('codemirror javascript-mixed regression', (t) => {
       if (text !== EOF_HINT) {
         tokenRes += `${`${style} | ${text}`.trimRight()}\n`;
       } else {
+        // write the output to a file for ease of manual diffs when regression happens
+        fs.writeFileSync(path.join(__dirname, 'code-tokens.out'), tokenRes, 'utf8');
         t.equal(tokenRes, expected);
         t.end();
       }
