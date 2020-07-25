@@ -730,6 +730,46 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "
+string-2 | ${
+variable | trimLeft
+undefined | (
+string-2 | `
+undefined |
+null |
+string-2 | Some title
+undefined |
+string-2 | }
+undefined |
+string-2 | the close curly bracket above (a standalone token) is not mistaken as the ending bracket
+undefined |
+string-2 | <br>other text
+undefined |
+string-2 | `
+undefined | )
+string-2 | }
+string | "
+tag bracket | >
+null | Hello World
+undefined |
+tag bracket | </
+tag | section
+tag bracket | >
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
 keyword | const
 null |
 def | foo

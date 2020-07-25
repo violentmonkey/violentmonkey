@@ -117,6 +117,14 @@ let someUi = `<section title="${trimLeft(`
 `)}">Hello World
 </section>`);
 
+someUi = `<section title="${trimLeft(`
+  Some title
+}
+the close curly bracket above (a standalone token) is not mistaken as the ending bracket
+<br>other text
+`)}">Hello World
+</section>`);
+
 const foo = 1;
 
 // works for CSS too

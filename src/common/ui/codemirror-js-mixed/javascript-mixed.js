@@ -165,7 +165,7 @@
       if (style === 'string-2' && indexOfJsExprStart(text) >= 0) { // case nested ${
         state.jsExprDepthInStringTemplate += 1;
         dbg('    jsExprDepthInStringTemplate inc:', state.jsExprDepthInStringTemplate);
-      } else if (style === 'string-2' && stream.current() === '}') { // case expression-ending }
+      } else if (state.jsState.lastType === '}') { // case expression-ending }
         // once it reaches back to 0, the logic would treat the next token in parent local mode
         state.jsExprDepthInStringTemplate -= 1;
         dbg('    jsExprDepthInStringTemplate dec:', state.jsExprDepthInStringTemplate);
