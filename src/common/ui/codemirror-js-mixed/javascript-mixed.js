@@ -23,6 +23,23 @@
   CodeMirror.defineMode('javascript-mixed', (config, parserConfig) => {
     const jsMode = CodeMirror.getMode(config, { name: 'javascript' });
 
+    const cssMode = CodeMirror.getMode(config, { name: 'css' });
+
+    const htmlMode = CodeMirror.getMode(config, {
+      name: 'xml',
+      htmlMode: true,
+      multilineTagIndentFactor: parserConfig.multilineTagIndentFactor,
+      multilineTagIndentPastTag: parserConfig.multilineTagIndentPastTag,
+    });
+
+    // for tokenizing plain string, where matchClosing would cause too many false errors
+    // as the html often spans across multiple strings.
+    const htmlNoMatchClosingMode = CodeMirror.getMode(config, {
+      name: 'xml',
+      htmlMode: true,
+      matchClosing: false,
+    });
+
     const STYLE_PASS = 'XXX-PASS'; // indicate the css/html matcher does not return  local mode style
 
     const forceJsModeToQuasi = (() => {
@@ -45,6 +62,50 @@
       }
 
       return _forceJsModeToQuasi;
+    })();
+
+    const htmlStateHelper = (() => {
+      // BEGIN init
+
+      // tried to obtain the states when the tokenizer encounters an *incomplete* attr value
+      // (that would end in second line)
+      const dummyStream1 = new CodeMirror.StringStream('<p class="someClass', 2, {});
+      const dummyState1 = htmlMode.startState();
+      while (dummyStream1.current() !== '<p class="someClass') {
+        htmlMode.token(dummyStream1, dummyState1);
+      }
+      const attrContinuedState = dummyState1.state;
+      const tokenForAttContinued = dummyState1.tokenize;
+
+      // record the state when the tokenizer encounters a *complete* attr value
+      const dummyStream2 = new CodeMirror.StringStream('<p class="otherClass"', 2, {});
+      const dummyState2 = htmlMode.startState();
+      while (dummyStream2.current() !== '<p class="otherClass"') {
+        htmlMode.token(dummyStream2, dummyState2);
+      }
+      const stateForAttrValue = dummyState2.state;
+
+      // END init
+
+      /**
+       * Use case:
+       * - html tokenizer encounters an js expression inside a complete attribute value
+       * e.g., the value in class="foo ${someOtherClass()} bar"
+       * - the html tokenizer would next expect another attribute or >
+       * - but since we locally process the js expression, and then pass the remaining text
+       *   back to html tokenizer, e.g.  bar", in the above example
+       * - we want html tokenizer process it as part of attribute value
+       * - this function forces the tokenizer to do so.
+       */
+      function forceHtmlModeToAttrContinuedState(stream, htmlState) {
+        htmlState.state = attrContinuedState;
+        htmlState.tokenize = tokenForAttContinued;
+      }
+
+      return {
+        forceHtmlModeToAttrContinuedState,
+        stateForAttrValue,
+      };
     })();
 
 
@@ -115,6 +176,14 @@
       return style;
     }
 
+    function ensureProperLocalModeStatePostJsExpr(stream, state) {
+      if (state.localMode === htmlMode
+        && state.localState.state === htmlStateHelper.stateForAttrValue) {
+        // case the js expresion is an attribute value
+        htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, state.localState);
+      }
+    }
+
     function tokenInLocalMode(stream, state) {
       if (state.inJsExprInStringTemplate) {
         return tokenJsExpressionInStringTemplate(stream, state);
@@ -128,6 +197,7 @@
         return style;
       }
       // case there is an js expression
+      ensureProperLocalModeStatePostJsExpr(stream, state);
       stream.backUp(textLocalMode.length - jsExprStart); // backup current token to exclude js expression, so that the next token starts with ${
       dbg('    js expression seen. adjusted local mode token  - ', stream.current(), `[${style}]`);
       state.inJsExprInStringTemplate = true;
@@ -262,8 +332,6 @@
       return ctx.style;
     }
 
-    const cssMode = CodeMirror.getMode(config, { name: 'css' });
-
     // define the transition rules to enter local CSS mode;
     const cssRules = [
       // for pattern GM_addStyle(`css-string`);
@@ -309,21 +377,6 @@
       return matchRule(cssRules, stream, state, jsTokenStyle);
     }
 
-
-    const htmlMode = CodeMirror.getMode(config, {
-      name: 'xml',
-      htmlMode: true,
-      multilineTagIndentFactor: parserConfig.multilineTagIndentFactor,
-      multilineTagIndentPastTag: parserConfig.multilineTagIndentPastTag,
-    });
-
-    // for tokenizing plain string, where matchClosing would cause too many false errors
-    // as the html often spans across multiple strings.
-    const htmlNoMatchClosingMode = CodeMirror.getMode(config, {
-      name: 'xml',
-      htmlMode: true,
-      matchClosing: false,
-    });
 
     const [RE_HTML_BASE, RE_HTML_PLAIN_STRING, RE_HTML_STRING_TEMPLATE] = (() => {
       const reHtmlBaseStr = /\s*<\/?[a-zA-Z0-9]+(\s|\/?>)/.source;

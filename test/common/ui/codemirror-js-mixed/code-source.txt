@@ -76,8 +76,10 @@ let someUi = `<section title="${trimLeft(`
   Some title`)}">Hello World
 </section>`);
 
-// ensure simple case works too
+// ensure simple cases work too
 let someUi = `<section title="${someTitle}">Hello<section>`;
+someUi = `<section title="prefix ${someTitle} suffix">Hello<section>`;
+someUi = `<section>${someTextFunc()}<section>`;
 
 // ensure nested case works too
 let someUi = `<section title="${trimLeft(`
@@ -86,14 +88,11 @@ let someUi = `<section title="${trimLeft(`
 `)}">Hello World
 </section>`);
 
-// Limitation: could premature interpret closing the expression upon seeing }
+// } inside the expression is treated properly too
 let someUi = `<section title="${trimLeft(`
-  Some title }
+  Some title } the close curly bracket is not mistaken as the ending bracket
+<br>other text
 `)}">Hello World
-</section>`);
-
-// for ease of comparison
-let someUi = `<section title="Some title">Hello World
 </section>`);
 
 const foo = 1;

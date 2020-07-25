@@ -509,12 +509,19 @@ tag | section
 null |
 attribute | title
 null | =
-string | "${trimLeft(`
+string | "
+string-2 | ${
+variable | trimLeft
+undefined | (
+string-2 | `
 undefined |
 null |
-string | Some title
+string-2 | Some title
 undefined |
-string | `)}"
+string-2 | `
+undefined | )
+string-2 | }
+string | "
 tag bracket | >
 null | Hello World
 undefined |
@@ -540,10 +547,17 @@ tag | section
 null |
 attribute | title
 null | =
-string | "${trimLeft(`
+string | "
+string-2 | ${
+variable | trimLeft
+undefined | (
+string-2 | `
 undefined |
 null |
-string | Some title`)}"
+string-2 | Some title`
+undefined | )
+string-2 | }
+string | "
 tag bracket | >
 null | Hello World
 undefined |
@@ -555,7 +569,7 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
-comment | // ensure simple case works too
+comment | // ensure simple cases work too
 undefined |
 keyword | let
 null |
@@ -569,9 +583,57 @@ tag | section
 null |
 attribute | title
 null | =
-string | "${someTitle}"
+string | "
+string-2 | ${
+variable | someTitle
+string-2 | }
+string | "
 tag bracket | >
 null | Hello
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | "prefix
+string-2 | ${
+variable | someTitle
+string-2 | }
+null |
+string | suffix"
+tag bracket | >
+null | Hello
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+tag bracket | >
+null |
+string-2 | ${
+variable | someTextFunc
+undefined | (
+undefined | )
+string-2 | }
 tag bracket | <
 tag | section
 tag bracket | >
@@ -593,14 +655,30 @@ tag | section
 null |
 attribute | title
 null | =
-string | "${trimLeft(`
+string | "
+string-2 | ${
+variable | trimLeft
+undefined | (
+string-2 | `
 undefined |
 null |
-string | Some title ${foo ? `val1` :`val2
+string-2 | Some title ${
+variable | foo
+null |
+operator | ?
+null |
+string-2 | `val1`
+null |
+undefined | :
+string-2 | `val2
 undefined |
-string | `}
+string-2 | `
+string-2 | }
 undefined |
-string | `)}"
+string-2 | `
+undefined | )
+string-2 | }
+string | "
 tag bracket | >
 null | Hello World
 undefined |
@@ -612,7 +690,7 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
-comment | // Limitation: could premature interpret closing the expression upon seeing }
+comment | // } inside the expression is treated properly too
 undefined |
 keyword | let
 null |
@@ -626,35 +704,21 @@ tag | section
 null |
 attribute | title
 null | =
-string | "${trimLeft(`
+string | "
+string-2 | ${
+variable | trimLeft
+undefined | (
+string-2 | `
 undefined |
 null |
-string | Some title }
+string-2 | Some title } the close curly bracket is not mistaken as the ending bracket
+undefined |
+string-2 | <br>other text
 undefined |
 string-2 | `
 undefined | )
-undefined | }
-string | ">Hello World
-undefined |
-operator | <
-string-2 | /section>`);
-undefined |
-undefined |
-comment | // for ease of comparison
-undefined |
-keyword | let
-null |
-def | someUi
-null |
-operator | =
-null |
-string-2 | `
-tag bracket | <
-tag | section
-null |
-attribute | title
-null | =
-string | "Some title"
+string-2 | }
+string | "
 tag bracket | >
 null | Hello World
 undefined |
@@ -689,8 +753,11 @@ null |
 property | content
 null | :
 null |
-string | "${someContent}"
-null | ;
+string | "
+string-2 | ${
+variable | someContent
+string-2 | }
+string | ";
 undefined |
 null | }
 string-2 | `
@@ -709,16 +776,18 @@ null |
 property | content
 null | :
 null |
-string | "${trimBlanks(`
+string | "
+string-2 | ${
+variable | trimBlanks
+undefined | (
+string-2 | `
 undefined |
 null |
-variable | Some
-null |
-variable | title
+string-2 | Some title
 undefined |
-null | `
-null | )
-null | }
+string-2 | `
+undefined | )
+string-2 | }
 string | ";
 undefined |
 null | }
