@@ -70,13 +70,14 @@
       // switch to local mode for subsequent text
       state.localMode = modeToUse;
       state.localState = CodeMirror.startState(state.localMode);
+      state.inJsExprInStringTemplate = false;
       state.jsExprDepthInStringTemplate = 0;
     }
 
     function isEndBacktick(stream, state) {
       // check it hits ending backtick for string template,
       // ignoring the backticks that appear inside a JS expression.
-      return state.jsExprDepthInStringTemplate <= 0 && stream.peek() === '`';
+      return !state.inJsExprInStringTemplate && stream.peek() === '`';
     }
 
     function exitLocalModeWithEndBacktick(stream, state) {
@@ -85,19 +86,55 @@
       return jsMode.token(stream, state.jsState);
     }
 
-    function tokenInLocalMode(stream, state) {
-      const style = state.localMode.token(stream, state.localState);
-      dbg('  local mode token - ', stream.current(), `[${style}]`, `jsExpr depth: ${state.jsExprDepthInStringTemplate}`);
-      const textLocalMode = stream.current();
-      if (/[^\\][$][{]|^[$][{]/.test(textLocalMode)) { // whether encounter js expression "${"
-        state.jsExprDepthInStringTemplate += 1;
+    function indexOfJsExprStart(text) {
+      // whether encounter js expression ${, but excluding cases that $ is escaped, i.e., \$
+      const jsExprMatch = text.match(/[^\\][$][{]|^[$][{]/);
+      if (!jsExprMatch) {
+        return -1;
       }
-      if (/[}]/.test(textLocalMode)) { // encountering closing }
+      // case there is an js expression
+      return jsExprMatch[0].charAt(0) === '$' ? jsExprMatch.index : jsExprMatch.index + 1;
+    }
+
+    function tokenJsExpressionInStringTemplate(stream, state) {
+      const style = jsMode.token(stream, state.jsState);
+      dbg('  local mode js expr token - ', stream.current(), `[${style}]`, state.jsState.lastType);
+      // track ${ , } to determine when the expression is complete.
+      const text = stream.current();
+      if (style === 'string-2' && indexOfJsExprStart(text) >= 0) { // case nested ${
+        state.jsExprDepthInStringTemplate += 1;
+        dbg('    jsExprDepthInStringTemplate inc:', state.jsExprDepthInStringTemplate);
+      } else if (style === 'string-2' && stream.current() === '}') { // case expression-ending }
+        // once it reaches back to 0, the logic would treat the next token in parent local mode
         state.jsExprDepthInStringTemplate -= 1;
-        if (state.jsExprDepthInStringTemplate < 0) {
-          state.jsExprDepthInStringTemplate = 0;
+        dbg('    jsExprDepthInStringTemplate dec:', state.jsExprDepthInStringTemplate);
+        if (state.jsExprDepthInStringTemplate <= 0) {
+          state.inJsExprInStringTemplate = false;
         }
       }
+      return style;
+    }
+
+    function tokenInLocalMode(stream, state) {
+      if (state.inJsExprInStringTemplate) {
+        return tokenJsExpressionInStringTemplate(stream, state);
+      }
+      // else normal local mode tokenization
+      const style = state.localMode.token(stream, state.localState);
+      dbg('  local mode token - ', stream.current(), `[${style}]`);
+      const textLocalMode = stream.current();
+      const jsExprStart = indexOfJsExprStart(textLocalMode);
+      if (jsExprStart < 0) {
+        return style;
+      }
+      // case there is an js expression
+      stream.backUp(textLocalMode.length - jsExprStart); // backup current token to exclude js expression, so that the next token starts with ${
+      dbg('    js expression seen. adjusted local mode token  - ', stream.current(), `[${style}]`);
+      state.inJsExprInStringTemplate = true;
+      // next time the tokenizer will see ${... , the js parser, currently in string template/quais mode
+      // would recognize it as an js expression and tokenie as such.
+      // Note: cannot increment state.jsExprDepthInStringTemplate yet,
+      // as the ${ to be handled by js tokenizer the next time
       return style;
     }
 
@@ -415,6 +452,7 @@
           maybeLocalContext: null,
           jsState: state,
           jsExprDepthInStringTemplate: 0,
+          inJsExprInStringTemplate: false,
         };
       },
 
@@ -428,6 +466,7 @@
           maybeLocalContext: state.maybeLocalContext,
           jsState: CodeMirror.copyState(jsMode, state.jsState),
           jsExprDepthInStringTemplate: state.jsExprDepthInStringTemplate,
+          inJsExprInStringTemplate: state.inJsExprInStringTemplate,
         };
       },
 
