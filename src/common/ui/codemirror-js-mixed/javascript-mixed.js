@@ -69,13 +69,21 @@
 
       // tried to obtain the states when the tokenizer encounters an *incomplete* attr value
       // (that would end in second line)
-      const dummyStream1 = new CodeMirror.StringStream('<p class="someClass', 2, {});
-      const dummyState1 = htmlMode.startState();
-      while (dummyStream1.current() !== '<p class="someClass') {
-        htmlMode.token(dummyStream1, dummyState1);
+      const dummyStream1a = new CodeMirror.StringStream('<p class="someClass', 2, {});
+      const dummyState1a = htmlMode.startState();
+      while (dummyStream1a.current() !== '<p class="someClass') {
+        htmlMode.token(dummyStream1a, dummyState1a);
       }
-      const attrContinuedState = dummyState1.state;
-      const tokenForAttContinued = dummyState1.tokenize;
+      const attrContinuedStateDoubleQuote = dummyState1a.state;
+      const tokenForAttContinuedDoublueQuote = dummyState1a.tokenize;
+
+      const dummyStream1b = new CodeMirror.StringStream('<p class=\'someClass', 2, {});
+      const dummyState1b = htmlMode.startState();
+      while (dummyStream1b.current() !== '<p class=\'someClass') {
+        htmlMode.token(dummyStream1b, dummyState1b);
+      }
+      const attrContinuedStateSingleQuote = dummyState1b.state;
+      const tokenForAttContinuedSingleQuote = dummyState1b.tokenize;
 
       // record the state when the tokenizer encounters a *complete* attr value
       const dummyStream2 = new CodeMirror.StringStream('<p class="otherClass"', 2, {});
@@ -83,7 +91,7 @@
       while (dummyStream2.current() !== '<p class="otherClass"') {
         htmlMode.token(dummyStream2, dummyState2);
       }
-      const stateForAttrValue = dummyState2.state;
+      const stateForAttrValue = dummyState2.state; // sinlge-quote attr val has the same state
 
       // END init
 
@@ -103,8 +111,21 @@
        * which handles tokenizing a single-line string template.
        */
       function forceHtmlModeToAttrContinuedState(stream, htmlState) {
-        htmlState.state = attrContinuedState;
-        htmlState.tokenize = tokenForAttContinued;
+        switch (stream.string.charAt(stream.start)) { // current token first char
+        case '"':
+          htmlState.state = attrContinuedStateDoubleQuote;
+          htmlState.tokenize = tokenForAttContinuedDoublueQuote;
+          break;
+        case "'":
+          htmlState.state = attrContinuedStateSingleQuote;
+          htmlState.tokenize = tokenForAttContinuedSingleQuote;
+          break;
+        default:
+          // eslint-disable-next-line no-console
+          console.warn('forceHtmlModeToAttrContinuedState() - expecting a double-quoted or single-quoted attribute value. Actual: ',
+            stream.current());
+          break;
+        }
       }
 
       return {

@@ -81,6 +81,11 @@ let someUi = `<section title="${someTitle}">Hello<section>`;
 someUi = `<section title="prefix ${someTitle} suffix">Hello<section>`;
 someUi = `<section>${someTextFunc()}<section>`;
 
+// different attribute value quoting styles
+someUi = `<section title='${someTitle}'>Hello<section>`;
+someUi = `<section id="${someId}" title='${someTitle}'>Hello<section>`;
+someUi = `<section id="${someId}" title='${someTitle}' col=${getCol()}>Hello<section>`;
+
 // ensure nested case works too
 let someUi = `<section title="${trimLeft(`
   Some title ${foo ? `val1` :`val2

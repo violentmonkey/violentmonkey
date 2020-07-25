@@ -641,6 +641,103 @@ string-2 | `
 undefined | ;
 undefined |
 undefined |
+comment | // different attribute value quoting styles
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | '
+string-2 | ${
+variable | someTitle
+string-2 | }
+string | '
+tag bracket | >
+null | Hello
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | id
+null | =
+string | "
+string-2 | ${
+variable | someId
+string-2 | }
+string | "
+null |
+attribute | title
+null | =
+string | '
+string-2 | ${
+variable | someTitle
+string-2 | }
+string | '
+tag bracket | >
+null | Hello
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | id
+null | =
+string | "
+string-2 | ${
+variable | someId
+string-2 | }
+string | "
+null |
+attribute | title
+null | =
+string | '
+string-2 | ${
+variable | someTitle
+string-2 | }
+string | '
+null |
+attribute | col
+null | =
+string |
+string-2 | ${
+variable | getCol
+undefined | (
+undefined | )
+string-2 | }
+tag bracket | >
+null | Hello
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+undefined |
 comment | // ensure nested case works too
 undefined |
 keyword | let
