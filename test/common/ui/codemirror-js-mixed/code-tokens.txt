@@ -738,6 +738,148 @@ string-2 | `
 undefined | ;
 undefined |
 undefined |
+comment | // js expressions in multi-lined attribute value
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | span
+null |
+attribute | title
+null | =
+string | "
+string-2 | ${
+variable | someVar
+string-2 | }
+undefined |
+null |
+string | "
+tag bracket | >
+null | text content
+tag bracket | </
+tag | span
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | span
+null |
+attribute | title
+null | =
+string | "
+undefined |
+string |
+string-2 | ${
+variable | someVar
+string-2 | }
+string | "
+tag bracket | >
+undefined |
+null |
+null | text content
+tag bracket | </
+tag | span
+tag bracket | >
+string-2 | `
+undefined |
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | span
+null |
+attribute | title
+null | =
+string | "
+undefined |
+null |
+string |
+string-2 | ${
+variable | someVar
+string-2 | }
+string | "
+tag bracket | >
+undefined |
+null |
+null | text content
+tag bracket | </
+tag | span
+tag bracket | >
+string-2 | `
+undefined |
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | span
+null |
+attribute | title
+null | =
+string | "foo
+undefined |
+null |
+string |
+string-2 | ${
+variable | someVar
+string-2 | }
+null |
+string | blah"
+tag bracket | >
+undefined |
+null |
+null | text content
+tag bracket | </
+tag | span
+tag bracket | >
+string-2 | `
+undefined |
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | span
+null |
+attribute | title
+null | =
+string | "foo
+undefined |
+null |
+string |
+string-2 | ${
+variable | someVar
+string-2 | }
+undefined |
+null |
+string | blah"
+tag bracket | >
+undefined |
+null |
+null | text content
+tag bracket | </
+tag | span
+tag bracket | >
+string-2 | `
+undefined |
+undefined |
 comment | // ensure nested case works too
 undefined |
 keyword | let

@@ -111,7 +111,10 @@
        * which handles tokenizing a single-line string template.
        */
       function forceHtmlModeToAttrContinuedState(stream, htmlState) {
-        switch (stream.string.charAt(stream.start)) { // current token first char
+        // Detect quote type by checking current token last char
+        // (use last char instead of first char, because last char also works for multi-lined char value
+        //  while fist char only works for the first line)
+        switch (stream.string.charAt(stream.pos - 1)) {
         case '"':
           htmlState.state = attrContinuedStateDoubleQuote;
           htmlState.tokenize = tokenForAttContinuedDoublueQuote;
@@ -121,11 +124,19 @@
           htmlState.tokenize = tokenForAttContinuedSingleQuote;
           break;
         default:
-          // eslint-disable-next-line no-console
-          console.warn('forceHtmlModeToAttrContinuedState() - expecting a double-quoted or single-quoted attribute value. Actual: ',
-            stream.current());
-          break;
+        // case it's part of a multi-lined attr value, and is not the last line yet
+        // (i.e., no quote at the end)
+        // nothing needs to be done as it's already in the proper state.
         }
+        // OPEN: the logic breaks down if the last character of the line happens to be a quote
+        // , but not the ending quote.
+        // E.g., the single quote in the following example is just part of the value
+        //  <p  title="foo bar
+        //  something '
+        //  def">
+        //
+        // To properly handle it, we need to know the quote type for the current attribute value.
+        // However, the quote type is not exposed by the underlying html tokenizer.
       }
 
       return {

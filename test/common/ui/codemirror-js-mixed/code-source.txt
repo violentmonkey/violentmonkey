@@ -86,6 +86,27 @@ someUi = `<section title='${someTitle}'>Hello<section>`;
 someUi = `<section id="${someId}" title='${someTitle}'>Hello<section>`;
 someUi = `<section id="${someId}" title='${someTitle}' col=${getCol()}>Hello<section>`;
 
+// js expressions in multi-lined attribute value
+someUi = `<span title="${someVar}
+  ">text content</span>`;
+
+someUi = `<span title="
+${someVar}">
+  text content</span>`
+
+someUi = `<span title="
+  ${someVar}">
+  text content</span>`
+
+someUi = `<span title="foo
+      ${someVar}  blah">
+  text content</span>`
+
+someUi = `<span title="foo
+      ${someVar}
+  blah">
+  text content</span>`
+
 // ensure nested case works too
 let someUi = `<section title="${trimLeft(`
   Some title ${foo ? `val1` :`val2
