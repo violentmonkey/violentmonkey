@@ -21,6 +21,9 @@ GM_addStyle(`
 }`);
 GM_addStyle(` a { color: pink; }`);
 
+// Greasemonkey v4 style of addStyle
+GM.addStyle(` a { color: pink; }`);
+
 someElt.innerHTML = `<span id="bar">
   123 <!-- html comments -->
 </span>`;

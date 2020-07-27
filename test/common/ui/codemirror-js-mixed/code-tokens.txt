@@ -170,6 +170,30 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
+comment | // Greasemonkey v4 style of addStyle
+undefined |
+variable | GM
+undefined | .
+property | addStyle
+undefined | (
+string-2 | `
+null |
+tag | a
+null |
+null | {
+null |
+property | color
+null | :
+null |
+keyword | pink
+null | ;
+null |
+null | }
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
 variable | someElt
 undefined | .
 property | innerHTML

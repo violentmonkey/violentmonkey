@@ -401,6 +401,35 @@
         caseNotMatched: ctx => { ctx.style = tokenInLocalMode(ctx.stream, ctx.state); }, // else stay in local mode
       }),
 
+      // for pattern GM.addStyle(`css-string`);
+      //   (i.e., Greasemonkey v4 style for GM_addStyle)
+      new Rule({
+        curContext: '<start>',
+        match: ctx => ctx.type === 'variable' && ctx.text === 'GM',
+        nextContext: 'css-31',
+      }),
+      new Rule({
+        curContext: 'css-31',
+        match: ctx => ctx.type === '.' && ctx.text === '.',
+        nextContext: 'css-32',
+      }),
+      new Rule({
+        curContext: 'css-32',
+        match: ctx => ctx.type === 'variable' && ctx.text === 'addStyle',
+        nextContext: 'css-33',
+      }),
+      new Rule({
+        curContext: 'css-33',
+        match: ctx => ctx.type === '(' && ctx.text === '(',
+        nextContext: 'css-34',
+      }),
+      new Rule({
+        curContext: 'css-34',
+        match: ctx => ctx.type === 'quasi', // if it's a string template
+        nextContext: 'css-in',
+        caseMatched: ctx => prepReparseStringTemplateInLocalMode(cssMode, ctx.stream, ctx.state),
+      }),
+
       // for pattern var someCSS = /* css */ `css-string`
       new Rule({
         curContext: '<start>',
