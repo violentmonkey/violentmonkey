@@ -64,6 +64,20 @@ console.debug('<dbg> this is some debug statement'); // mistaken as html as the 
 // Tests for handling js expression inside a string template,
 // especially those with nested string templates.
 
+// Ensure js expression inside tag text content are handled properly
+someUi = `<section title='foo'>${someText}<section>`;
+someUi =   `<section title='foo'>prefix${someText}suffix<section>`;
+someUi =   `<section title='foo'>prefix${someText}<section>`;
+someUi =   `<section title='foo'>${someText}suffix<section>`;
+someUi = `<section title='foo'>
+    ${someText}
+<section>`;
+// nested string template in tag text
+someUi = `<section title='foo'>
+    ${someCond ? `true-${someVarValue}`
+  : getFalseText()}
+<section>`;
+
 // ensure backtick within a JS expression are tokenized as part of the expression,
 // rather than incorrectly ending the string template
 let someUi = `<section title="${trimLeft(`

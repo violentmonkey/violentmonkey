@@ -493,6 +493,165 @@ undefined |
 comment | // especially those with nested string templates.
 undefined |
 undefined |
+comment | // Ensure js expression inside tag text content are handled properly
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | 'foo'
+tag bracket | >
+null |
+string-2 | ${
+variable | someText
+string-2 | }
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | 'foo'
+tag bracket | >
+null | prefix
+string-2 | ${
+variable | someText
+string-2 | }
+null | suffix
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | 'foo'
+tag bracket | >
+null | prefix
+string-2 | ${
+variable | someText
+string-2 | }
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | 'foo'
+tag bracket | >
+null |
+string-2 | ${
+variable | someText
+string-2 | }
+null | suffix
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | 'foo'
+tag bracket | >
+undefined |
+null |
+null |
+string-2 | ${
+variable | someText
+string-2 | }
+undefined |
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+comment | // nested string template in tag text
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | section
+null |
+attribute | title
+null | =
+string | 'foo'
+tag bracket | >
+undefined |
+null |
+null |
+string-2 | ${
+variable | someCond
+null |
+operator | ?
+null |
+string-2 | `true-${
+variable | someVarValue
+string-2 | }
+string-2 | `
+undefined |
+null |
+undefined | :
+null |
+variable | getFalseText
+undefined | (
+undefined | )
+string-2 | }
+undefined |
+tag bracket | <
+tag | section
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+undefined |
 comment | // ensure backtick within a JS expression are tokenized as part of the expression,
 undefined |
 comment | // rather than incorrectly ending the string template
