@@ -542,6 +542,7 @@
           // just return,  skip local mode match,
           // as such token is not reflected in stream/state so the local mode matcher
           // will end up seeing previous token.
+          // dbg('   <--', `[${tokenStyle}]`, stream.current());
           return null;
         }
       }
@@ -550,6 +551,7 @@
       // Note: if the rules change (the <start> ones), the conditions here might need to be updated accordingly.
       if (state.maybeLocalContext == null
         && !['variable', 'comment', 'string', 'string-2'].includes(tokenStyle)) {
+        // dbg('   <--', `[${tokenStyle}]`, stream.current());
         return tokenStyle;
       }
 
@@ -563,6 +565,7 @@
         tokenStyle = maybeLocalStyle;
       }
 
+      // dbg('   <--', `[${tokenStyle}]`, stream.current());
       return tokenStyle;
     }
 
@@ -570,7 +573,6 @@
       startState() {
         const state = CodeMirror.startState(jsMode);
         return {
-          token: jsToken,
           localMode: null,
           localState: null,
           maybeLocalContext: null,
@@ -584,7 +586,6 @@
         const local = (state.localState)
           ? CodeMirror.copyState(state.localMode, state.localState) : null;
         return {
-          token: state.token,
           localMode: state.localMode,
           localState: local,
           maybeLocalContext: state.maybeLocalContext,
@@ -594,13 +595,8 @@
         };
       },
 
-      token(stream, state) {
-        // dbg(`${stream.pos}: ${stream.string.substring(stream.pos).substring(0, 15)}`, state.lastType);
-        const tokenStyle = state.token(stream, state);
-
-        dbg('   <--', `[${tokenStyle}]`, stream.current());
-        return tokenStyle;
-      },
+      // token(stream, state)
+      token: jsToken,
 
       indent(state, textAfter, line) {
         dbg(`indent: "${textAfter}" "${line}"`);
