@@ -37,6 +37,12 @@ let someCSS = /* CSS  */ `.a:visited {
   color: purple;
 }`;
 
+// the inline comment hint also works for tagged string template
+let someCSS = String.raw /*css*/ `\
+#\some-id {
+  color: purple;
+}`;
+
 // auto detect html-like string template without the hint
 const otherHTML = `<div class="bar">
   hello

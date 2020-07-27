@@ -276,6 +276,39 @@ string-2 | `
 undefined | ;
 undefined |
 undefined |
+comment | // the inline comment hint also works for tagged string template
+undefined |
+keyword | let
+null |
+def | someCSS
+null |
+operator | =
+null |
+variable | String
+undefined | .
+property | raw
+null |
+comment | /*css*/
+null |
+string-2 | `
+tag | \
+undefined |
+builtin | #\some-id
+null |
+null | {
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | purple
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | ;
+undefined |
+undefined |
 comment | // auto detect html-like string template without the hint
 undefined |
 keyword | const
