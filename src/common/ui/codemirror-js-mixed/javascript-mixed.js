@@ -226,7 +226,7 @@
       }
     }
 
-    function tokenInLocalMode(stream, state) {
+    function tokenInLocalModeStringTemplate(stream, state) {
       if (state.inJsExprInStringTemplate) {
         return tokenJsExpressionInStringTemplate(stream, state);
       }
@@ -398,7 +398,9 @@
         match: ctx => isEndBacktick(ctx.stream, ctx.state),
         nextContext: null, // then exit local css mode
         caseMatched: ctx => { ctx.style = exitLocalModeWithEndBacktick(ctx.stream, ctx.state); },
-        caseNotMatched: ctx => { ctx.style = tokenInLocalMode(ctx.stream, ctx.state); }, // else stay in local mode
+        caseNotMatched: ctx => { // else stay in local mode
+          ctx.style = tokenInLocalModeStringTemplate(ctx.stream, ctx.state);
+        },
       }),
 
       // for pattern GM.addStyle(`css-string`);
@@ -466,7 +468,9 @@
         match: ctx => isEndBacktick(ctx.stream, ctx.state),
         nextContext: null, // then exit local html mode
         caseMatched: ctx => { ctx.style = exitLocalModeWithEndBacktick(ctx.stream, ctx.state); },
-        caseNotMatched: ctx => { ctx.style = tokenInLocalMode(ctx.stream, ctx.state); }, // else stay in local mode
+        caseNotMatched: ctx => { // else stay in local mode
+          ctx.style = tokenInLocalModeStringTemplate(ctx.stream, ctx.state);
+        },
       }),
 
       // for pattern var someHTML = /* html */ `html-string`
