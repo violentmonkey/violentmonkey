@@ -495,7 +495,7 @@ string | "
 null |
 operator | +
 null |
-comment | // does not hanlde some escaping well
+comment | // does not handle some escaping well
 undefined |
 null |
 string | '

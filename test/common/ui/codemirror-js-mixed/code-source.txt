@@ -63,7 +63,7 @@ var dbgMsg = '<-- output'; // doesn't get mistaken as html
 
 // some limitations
 //
-someElt.innerHTML = "<br class=\" foo\">" +  // does not hanlde some escaping well
+someElt.innerHTML = "<br class=\" foo\">" +  // does not handle some escaping well
              '<div class="' + classToUse + '"></div>' + // doesn't detect if a string begins with a partial tag
              'plain text <hr>'; // doesn't detect if some plain text at the beginning.
 

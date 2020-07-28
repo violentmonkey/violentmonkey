@@ -90,7 +90,7 @@ var dbgMsg = '<-- output'; // doesn't get mistaken as html
 
 // some limitations
 //
-someElt.innerHTML = "<br class=\" foo\">" +  // does not hanlde some escaping well
+someElt.innerHTML = "<br class=\" foo\">" +  // does not handle some escaping well
              '<div class="' + classToUse + '"></div>' + // doesn't detect if a string begins with a partial tag
              'plain text <hr>'; // doesn't detect if some plain text at the beginning.
 
@@ -220,17 +220,17 @@ var end = true;
 
   <hr>
   <details open>
-    <summary class="subhead">Formatted code<span id="tokenTime" style="margin-left: 1em; font-size: 70%; font-weight: normal; font-family monospace;"></span></summary>
+    <summary class="subhead">Formatted code<span id="tokenTime" style="margin-left: 1em; font-size: 70%; font-weight: normal; font-family: monospace;"></span></summary>
     <pre id="output" class="CodeMirror cm-s-blackboard" style="height: auto;"></pre>
   </details>
   <details open>
     <summary class="subhead">Tokens</summary>
     <pre>[style] | [text]</pre>
-    <textarea id="output-tokens" cols="60" rows="25" spellheck="false" style="display: none; border: 1px; solid gray;" readonly></textarea>
+    <textarea id="output-tokens" cols="60" rows="25" spellcheck="false" style="display: none; border: 1px solid gray;" readonly></textarea>
   </details>
   <details>
     <summary class="subhead">Token Statistics</summary>
-    <textarea id="output-stats" cols="60" rows="20" spellheck="false" style="display: none; border: 1px; solid gray;" readonly></textarea>
+    <textarea id="output-stats" cols="60" rows="20" spellcheck="false" style="display: none; border: 1px solid gray;" readonly></textarea>
   </details>
   <hr>
   <h3>Performance Test</h3>
