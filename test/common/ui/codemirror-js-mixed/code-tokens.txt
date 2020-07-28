@@ -1328,6 +1328,309 @@ undefined |
 undefined |
 comment | // works for CSS too
 undefined |
+undefined |
+comment | // js expression in CSS
+undefined |
+comment | // cases js expression in property value
+undefined |
+comment | /*css*/
+null |
+string-2 | `
+builtin | #m-popup
+null |
+null | {
+undefined |
+null |
+property | position
+null | :
+null |
+null |
+string-2 | ${
+variable | posVar
+null |
+operator | ?
+null |
+string | 'fixed'
+null |
+undefined | :
+null |
+string | 'absolute'
+string-2 | }
+null | ;
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | red
+null | ;
+null |
+comment | /* tokenization recover in subsequent line */
+undefined |
+null |
+property | background-color
+null | :
+null |
+null |
+string-2 | ${
+variable | backgroundColorVal
+string-2 | }
+null | ;
+undefined |
+null |
+property | border
+null | :
+null |
+number | 1px
+null |
+null |
+string-2 | ${
+variable | styleVarCall
+undefined | (
+variable | param1
+undefined | )
+string-2 | }
+null |
+null |
+string-2 | ${
+variable | borderColorVar
+string-2 | }
+null | ;
+undefined |
+null |
+property | margin-top
+null | :
+null |
+number | 1em
+null | ;
+undefined |
+null |
+property | font-family
+null | :
+null |
+null |
+string-2 | ${
+variable | preferredFont
+string-2 | }
+null | ,
+null |
+string | 'Times New Roman'
+null | ,
+null |
+variable | Times
+null | ,
+null |
+atom | serif
+null | ;
+undefined |
+null |
+property | margin-bottom
+null | :
+null |
+null |
+string-2 | ${
+variable | marginBot
+string-2 | }
+variable | em
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+comment | // cases js expression in property name
+undefined |
+comment | /*css*/
+null |
+string-2 | `
+builtin | #m-popup
+null |
+null | {
+undefined |
+null |
+property error |
+string-2 | border-${
+variable | leftOrRightVal
+string-2 | }
+null | :
+null |
+number | 1px
+null |
+atom | solid
+null | ;
+undefined |
+null |
+null |
+string-2 | ${
+variable | marginPropVar
+string-2 | }
+null | :
+null |
+number | 1px
+null | ;
+null |
+comment | /* some css comment */
+undefined |
+null |
+null |
+string-2 | ${
+variable | marginOrPaddingVar
+string-2 | }
+undefined | -
+property | left
+null | :
+null |
+number | 1px
+null | ;
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+undefined |
+comment | // case the js expression is for entire property-value
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+comment | /*css*/
+null |
+string-2 | `
+builtin | #m-popup
+null |
+null | {
+undefined |
+null |
+property | position
+null | :
+null |
+atom | fixed
+null | ;
+undefined |
+null |
+null |
+string-2 | ${
+variable | someCond
+null |
+operator | ?
+null |
+string | 'max-width: 100%;'
+null |
+undefined | :
+null |
+string | ''
+string-2 | }
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+undefined |
+comment | // case the js expression contains nested backticks (in js expression)
+undefined |
+comment | // ensure it does not screw up the the tokenization of the rest
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+comment | /*css*/
+null |
+string-2 | `
+builtin | #m-popup
+null |
+null | {
+undefined |
+null |
+property | position
+null | :
+null |
+atom | fixed
+null | ;
+undefined |
+null |
+null |
+string-2 | ${
+variable | someCond
+null |
+operator | ?
+null |
+string-2 | `max-width: ${
+variable | floor
+undefined | (
+variable | maxPct
+undefined | )
+string-2 | }
+string-2 | %;`
+null |
+undefined | :
+null |
+string | ''
+string-2 | }
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null |
+comment | /* sub case the nested string template spans multiple lines */
+undefined |
+null |
+null |
+string-2 | ${
+variable | someCond
+null |
+operator | ?
+null |
+string-2 | `max-width: ${
+variable | floor
+undefined | (
+undefined |
+variable | maxPct
+undefined | )
+string-2 | }
+string-2 | %;`
+null |
+undefined | :
+null |
+string | ''
+string-2 | }
+undefined |
+null |
+property | background-color
+null | :
+null |
+atom | #333
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | ;
+undefined |
+undefined |
+comment | // case the value of content (that css tokenizer treats it as long token)
+undefined |
 variable | GM_addStyle
 undefined | (
 string-2 | `
@@ -1339,17 +1642,40 @@ null |
 property | content
 null | :
 null |
-string | "
+null |
 string-2 | ${
-variable | someContent
+variable | someCond
+null |
+operator | ?
+null |
+variable | func1
+undefined | (
+undefined | )
+null |
+undefined | :
+null |
+variable | func2
+undefined | (
+undefined | )
 string-2 | }
-string | ";
+null | ;
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | red
+null | ;
 undefined |
 null | }
 string-2 | `
 undefined | )
 undefined | ;
 undefined |
+undefined |
+comment | // multi-line in content: js expression is tokenized correctly,
+undefined |
+comment | // a minor glitch for the end comma (see limitation in quoted string below)
 undefined |
 variable | GM_addStyle
 undefined | (
@@ -1376,6 +1702,13 @@ undefined | )
 string-2 | }
 string | ";
 undefined |
+null |
+atom | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
 null | }
 undefined |
 undefined |
@@ -1390,6 +1723,133 @@ null |
 number | 1px
 null |
 atom | solid
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+undefined |
+comment | // limitation when js expression is in a quoted string
+undefined |
+undefined |
+comment | // Ideally, we want to force css tokenizer to treat the text after the expression as string.
+undefined |
+comment | // But the required tokenizer, a closure of tokenString (with appropriate quote),
+undefined |
+comment | // is not accessible, not even indirectly.
+undefined |
+comment | // if it's accessible, we could have force the tokenizer by setting
+undefined |
+comment | //   cssState.tokenize = tokenString('"'); // for double quote variant
+undefined |
+undefined |
+comment | // sub-case the comma after end double-quote is  incorrectly tokenized as string
+undefined |
+comment | // , quite harmless
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+qualifier | .foo
+null |
+null | {
+undefined |
+null |
+property | content
+null | :
+null |
+string | "
+string-2 | ${
+variable | someContent
+string-2 | }
+string | ";
+undefined |
+null |
+atom | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+comment | // variation: after ${preferredFont}, ', ' is incorrectly tokenized as string, while Times New Roman
+undefined |
+comment | // is tokenized as variable
+undefined |
+comment | //, a tad noticeable but harmless
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+qualifier | .foo
+null |
+null | {
+undefined |
+null |
+property | font-family
+null | :
+null |
+string | '
+string-2 | ${
+variable | preferredFont
+string-2 | }
+string | ', '
+variable | Times
+null |
+variable | New
+null |
+variable | Roman
+string | ', Times, serif;
+undefined |
+null |
+atom | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+comment | // sub-case the suffix in the content is incorrectly tokenized as variable
+undefined |
+comment | //, a tad noticeable but harmless
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+qualifier | .foo
+null |
+null | {
+undefined |
+null |
+property | content
+null | :
+null |
+string | "prefix
+string-2 | ${
+variable | someContent
+string-2 | }
+null |
+variable | suffix
+string | ";
+undefined |
+null |
+atom | color
+null | :
+null |
+keyword | red
 null | ;
 undefined |
 null | }

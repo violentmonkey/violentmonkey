@@ -169,18 +169,96 @@ the close curly bracket above (a standalone token) is not mistaken as the ending
 const foo = 1;
 
 // works for CSS too
+
+// js expression in CSS
+// cases js expression in property value
+/*css*/ `#m-popup {
+  position: ${posVar ? 'fixed' : 'absolute'};
+  color: red; /* tokenization recover in subsequent line */
+  background-color: ${backgroundColorVal};
+  border: 1px ${styleVarCall(param1)} ${borderColorVar};
+  margin-top: 1em;
+  font-family: ${preferredFont}, 'Times New Roman', Times, serif;
+  margin-bottom: ${marginBot}em;
+}`;
+
+// cases js expression in property name
+/*css*/ `#m-popup {
+  border-${leftOrRightVal}: 1px solid;
+  ${marginPropVar}: 1px; /* some css comment */
+  ${marginOrPaddingVar}-left: 1px;
+  color: red;
+}`;
+
+
+// case the js expression is for entire property-value
+someUi = /*css*/ `#m-popup {
+  position: fixed;
+  ${someCond ? 'max-width: 100%;' : ''}
+  color: red;
+}`;
+
+
+// case the js expression contains nested backticks (in js expression)
+// ensure it does not screw up the the tokenization of the rest
+someUi = /*css*/ `#m-popup {
+  position: fixed;
+  ${someCond ? `max-width: ${floor(maxPct)}%;` : ''}
+  color: red;
+  /* sub case the nested string template spans multiple lines */
+  ${someCond ? `max-width: ${floor(
+maxPct)}%;` : ''}
+  background-color: #333;
+}`;
+
+// case the value of content (that css tokenizer treats it as long token)
 GM_addStyle(`.foo {
-  content: "${someContent}";
+  content: ${someCond ? func1() : func2()};
+  color: red;
 }`);
 
+// multi-line in content: js expression is tokenized correctly,
+// a minor glitch for the end comma (see limitation in quoted string below)
 GM_addStyle(`.foo {
   content: "${trimBlanks(`
   Some title
 `)}";
+  color: red;
 }
 
 .bar {
   border: 1px solid;
+}`);
+
+
+// limitation when js expression is in a quoted string
+
+// Ideally, we want to force css tokenizer to treat the text after the expression as string.
+// But the required tokenizer, a closure of tokenString (with appropriate quote),
+// is not accessible, not even indirectly.
+// if it's accessible, we could have force the tokenizer by setting
+//   cssState.tokenize = tokenString('"'); // for double quote variant
+
+// sub-case the comma after end double-quote is  incorrectly tokenized as string
+// , quite harmless
+GM_addStyle(`.foo {
+  content: "${someContent}";
+  color: red;
+}`);
+
+// variation: after ${preferredFont}, ', ' is incorrectly tokenized as string, while Times New Roman
+// is tokenized as variable
+//, a tad noticeable but harmless
+GM_addStyle(`.foo {
+  font-family: '${preferredFont}', 'Times New Roman', Times, serif;
+  color: red;
+}`);
+
+// sub-case the suffix in the content is incorrectly tokenized as variable
+//, a tad noticeable but harmless
+GM_addStyle(`.foo {
+  content: "prefix ${someContent} suffix";
+  color: red;
 }`);
 
 var end = true;

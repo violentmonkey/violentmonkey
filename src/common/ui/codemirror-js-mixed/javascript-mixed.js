@@ -184,6 +184,43 @@
       return jsMode.token(stream, state.jsState);
     }
 
+    // Local mode-specific helpers to handle js expression in string template
+    /**
+     * @return the position of '${' relative to the
+     *         current token start position, i.e., stream.start; -1 otherwise.
+     */
+    htmlMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
+      return indexOfJsExprStartInString(stream.current());
+    };
+
+    // eslint-disable-next-line max-len
+    htmlMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state) {
+      if (state.localState.state === htmlStateHelper.stateForAttrValue) {
+        // case the js expression is an attribute value
+        htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, state.localState);
+      }
+    };
+
+    cssMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
+      // In most cases, CSS tokenizer treats $ as a single token,
+      // detect ${ for those cases
+      if (stream.string.charAt(stream.pos) === '$'
+        && stream.string.charAt(stream.pos + 1) === '{') {
+        return 0;
+      }
+      // else look for ${ in the entire token.
+      //   It only works for limited cases such as content property value,
+      //   where CSS parser sees entire expression as string.
+      return indexOfJsExprStartInString(stream.current());
+    };
+
+    // eslint-disable-next-line max-len, no-unused-vars
+    cssMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state) {
+      // NO-OP: Ideally, we should handle the cases when JS expression is inside a quoted string, to force
+      // the text after the expression be tokenized as string, but CSS tokenizer does not expose it,
+      // not even in the indirect way (akin to what we do for HTML attributes, also quoted).
+    };
+
     function indexOfJsExprStartInString(text) {
       // whether encounter js expression ${, but excluding cases that $ is escaped, i.e., \$
       const jsExprMatch = text.match(/[^\\][$][{]|^[$][{]/);
@@ -217,35 +254,6 @@
       }
       return style;
     }
-
-    // Local mode-specific helpers to handle js expression in string template
-    /**
-     * @return the position of '${' relative to the
-     *         current token start position, i.e., stream.start; -1 otherwise.
-     */
-    htmlMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
-      return indexOfJsExprStartInString(stream.current());
-    };
-
-    // eslint-disable-next-line max-len
-    htmlMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state) {
-      if (state.localState.state === htmlStateHelper.stateForAttrValue) {
-        // case the js expression is an attribute value
-        htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, state.localState);
-      }
-    };
-
-    cssMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
-      // TODO: only works for limited cases such as content property value,
-      // where CSS parser sees entire expression as string.
-      return indexOfJsExprStartInString(stream.current());
-    };
-
-    // eslint-disable-next-line max-len
-    cssMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state) {
-      // TODO: proper implementation
-      if (stream && state) { return undefined; }
-    };
 
     function tokenInLocalModeStringTemplate(stream, state) {
       if (state.inJsExprInStringTemplate) {
