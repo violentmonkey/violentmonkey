@@ -75,7 +75,7 @@
         htmlMode.token(dummyStream1a, dummyState1a);
       }
       const attrContinuedStateDoubleQuote = dummyState1a.state;
-      const tokenForAttContinuedDoublueQuote = dummyState1a.tokenize;
+      const tokenForAttContinuedDoubleQuote = dummyState1a.tokenize;
 
       const dummyStream1b = new CodeMirror.StringStream('<p class=\'someClass', 2, {});
       const dummyState1b = htmlMode.startState();
@@ -91,7 +91,7 @@
       while (dummyStream2.current() !== '<p class="otherClass"') {
         htmlMode.token(dummyStream2, dummyState2);
       }
-      const stateForAttrValue = dummyState2.state; // sinlge-quote attr val has the same state
+      const stateForAttrValue = dummyState2.state; // single-quote attr val has the same state
 
       // END init
 
@@ -117,7 +117,7 @@
         switch (stream.string.charAt(stream.pos - 1)) {
         case '"':
           htmlState.state = attrContinuedStateDoubleQuote;
-          htmlState.tokenize = tokenForAttContinuedDoublueQuote;
+          htmlState.tokenize = tokenForAttContinuedDoubleQuote;
           break;
         case "'":
           htmlState.state = attrContinuedStateSingleQuote;
@@ -221,7 +221,7 @@
     function ensureProperLocalModeStatePostJsExpr(stream, state) {
       if (state.localMode === htmlMode
         && state.localState.state === htmlStateHelper.stateForAttrValue) {
-        // case the js expresion is an attribute value
+        // case the js expression is an attribute value
         htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, state.localState);
       }
     }
@@ -244,7 +244,7 @@
       dbg('    js expression seen. adjusted local mode token  - ', stream.current(), `[${style}]`);
       state.inJsExprInStringTemplate = true;
       // next time the tokenizer will see ${... , the js parser, currently in string template/quais mode
-      // would recognize it as an js expression and tokenie as such.
+      // would recognize it as an js expression and tokenize as such.
       // Note: cannot increment state.jsExprDepthInStringTemplate yet,
       // as the ${ to be handled by js tokenizer the next time
       return style;
@@ -535,7 +535,7 @@
     function jsToken(stream, state) {
       // dbg('jsToken -', `${stream.pos}: ${stream.string.substring(stream.pos).substring(0, 8)}`, state.lastType);
 
-      // adapt the existing jsmode tokenizer with the wrapper state
+      // adapt the existing jsMode tokenizer with the wrapper state
       let tokenStyle = null;
       if (!state.localMode) {
         // when in local html/css context, skip js parsing,
