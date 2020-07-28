@@ -184,7 +184,7 @@
       return jsMode.token(stream, state.jsState);
     }
 
-    function indexOfJsExprStart(text) {
+    function indexOfJsExprStartInString(text) {
       // whether encounter js expression ${, but excluding cases that $ is escaped, i.e., \$
       const jsExprMatch = text.match(/[^\\][$][{]|^[$][{]/);
       if (!jsExprMatch) {
@@ -199,7 +199,7 @@
       dbg('  local mode js expr token - ', stream.current(), `[${style}]`, state.jsState.lastType);
       // track ${ , } to determine when the expression is complete.
       const text = stream.current();
-      if (style === 'string-2' && indexOfJsExprStart(text) >= 0) { // case nested ${
+      if (style === 'string-2' && indexOfJsExprStartInString(text) >= 0) { // case nested ${
         state.jsExprDepthInStringTemplate += 1;
         dbg('    jsExprDepthInStringTemplate inc:', state.jsExprDepthInStringTemplate);
       } else if (style === 'string-2' && state.jsState.lastType === '}') { // case expression-ending }
@@ -218,13 +218,34 @@
       return style;
     }
 
-    function ensureProperLocalModeStatePostJsExpr(stream, state) {
-      if (state.localMode === htmlMode
-        && state.localState.state === htmlStateHelper.stateForAttrValue) {
+    // Local mode-specific helpers to handle js expression in string template
+    /**
+     * @return the position of '${' relative to the
+     *         current token start position, i.e., stream.start; -1 otherwise.
+     */
+    htmlMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
+      return indexOfJsExprStartInString(stream.current());
+    };
+
+    // eslint-disable-next-line max-len
+    htmlMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state) {
+      if (state.localState.state === htmlStateHelper.stateForAttrValue) {
         // case the js expression is an attribute value
         htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, state.localState);
       }
-    }
+    };
+
+    cssMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
+      // TODO: only works for limited cases such as content property value,
+      // where CSS parser sees entire expression as string.
+      return indexOfJsExprStartInString(stream.current());
+    };
+
+    // eslint-disable-next-line max-len
+    cssMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state) {
+      // TODO: proper implementation
+      if (stream && state) { return undefined; }
+    };
 
     function tokenInLocalModeStringTemplate(stream, state) {
       if (state.inJsExprInStringTemplate) {
@@ -233,14 +254,13 @@
       // else normal local mode tokenization
       const style = state.localMode.token(stream, state.localState);
       dbg('  local mode token - ', stream.current(), `[${style}]`);
-      const textLocalMode = stream.current();
-      const jsExprStart = indexOfJsExprStart(textLocalMode);
+      const jsExprStart = state.localMode.indexOfJsExprStartInStream(stream);
       if (jsExprStart < 0) {
         return style;
       }
       // case there is an js expression
-      ensureProperLocalModeStatePostJsExpr(stream, state);
-      stream.backUp(textLocalMode.length - jsExprStart); // backup current token to exclude js expression, so that the next token starts with ${
+      state.localMode.ensureProperLocalModeStatePostJsExpr(stream, state);
+      stream.backUp(tokenLength(stream) - jsExprStart); // backup current token to exclude js expression, so that the next token starts with ${
       dbg('    js expression seen. adjusted local mode token  - ', stream.current(), `[${style}]`);
       state.inJsExprInStringTemplate = true;
       // next time the tokenizer will see ${... , the js parser, currently in string template/quais mode
