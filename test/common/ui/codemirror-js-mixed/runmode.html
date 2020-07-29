@@ -9,6 +9,7 @@
 <script src="../../../../node_modules/codemirror/mode/css/css.js"></script>
 <script src="../../../../node_modules/codemirror/mode/javascript/javascript.js"></script>
 <script src="../../../../node_modules/codemirror/mode/xml/xml.js"></script>
+<script src="../../../../node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
 <script>
   // Used by javascript-mixed
   window.process = { env: { DEBUG: false } };
@@ -2816,7 +2817,7 @@ body[baidu] #s_lg_img_new{
     const modesToTest = (() => {
       const modes = [];
       for (modeName in CodeMirror.modes) {
-        if (!['null', 'xml', 'css', 'html'].includes(modeName)) {
+        if (!['null', 'xml', 'css', 'html', 'htmlmixed'].includes(modeName)) {
           modes.push(modeName);
         }
       }

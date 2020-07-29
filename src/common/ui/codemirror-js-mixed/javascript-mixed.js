@@ -5,11 +5,11 @@
 (function (mod) {
   if (typeof exports === 'object' && typeof module === 'object') { // CommonJS
     // eslint-disable-next-line global-require
-    mod(require('codemirror/lib/codemirror'), require('codemirror/mode/xml/xml'), require('codemirror/mode/javascript/javascript'), require('codemirror/mode/css/css'));
+    mod(require('codemirror/lib/codemirror'), require('codemirror/mode/xml/xml'), require('codemirror/mode/javascript/javascript'), require('codemirror/mode/css/css'), require('codemirror/mode/htmlmixed/htmlmixed'));
   // eslint-disable-next-line no-undef
   } else if (typeof define === 'function' && define.amd) { // AMD
     // eslint-disable-next-line no-undef
-    define(['codemirror/lib/codemirror', 'codemirror/mode/xml/xml', 'codemirror/mode/javascript/javascript', 'codemirror/mode/css/css'], mod);
+    define(['codemirror/lib/codemirror', 'codemirror/mode/xml/xml', 'codemirror/mode/javascript/javascript', 'codemirror/mode/css/css', 'codemirror/mode/htmlmixed/htmlmixed'], mod);
   } else { // Plain browser env
     // eslint-disable-next-line no-undef
     mod(CodeMirror);
@@ -20,20 +20,19 @@
     if (process.env.DEBUG) console.debug(...args);
   }
 
+  // eslint-disable-next-line no-unused-vars
   CodeMirror.defineMode('javascript-mixed', (config, parserConfig) => {
     const jsMode = CodeMirror.getMode(config, { name: 'javascript' });
 
     const cssMode = CodeMirror.getMode(config, { name: 'css' });
 
-    const htmlMode = CodeMirror.getMode(config, {
-      name: 'xml',
-      htmlMode: true,
-      multilineTagIndentFactor: parserConfig.multilineTagIndentFactor,
-      multilineTagIndentPastTag: parserConfig.multilineTagIndentPastTag,
-    });
+    // use htmlmixed to support highlighting css in <style> (and to a lesser extent, js in <script>)
+    const htmlmixedMode = CodeMirror.getMode(config, { name: 'htmlmixed' });
 
     // for tokenizing plain string, where matchClosing would cause too many false errors
     // as the html often spans across multiple strings.
+    // for plain string , use basic html mode so that it can support non-matching close tags
+    // mixed mode is unlikely to be very helpful for plain string anyway
     const htmlNoMatchClosingMode = CodeMirror.getMode(config, {
       name: 'xml',
       htmlMode: true,
@@ -70,28 +69,28 @@
       // tried to obtain the states when the tokenizer encounters an *incomplete* attr value
       // (that would end in second line)
       const dummyStream1a = new CodeMirror.StringStream('<p class="someClass', 2, {});
-      const dummyState1a = htmlMode.startState();
+      const dummyState1a = htmlmixedMode.startState();
       while (dummyStream1a.current() !== '<p class="someClass') {
-        htmlMode.token(dummyStream1a, dummyState1a);
+        htmlmixedMode.token(dummyStream1a, dummyState1a);
       }
-      const attrContinuedStateDoubleQuote = dummyState1a.state;
-      const tokenForAttContinuedDoubleQuote = dummyState1a.tokenize;
+      const attrContinuedStateDoubleQuote = dummyState1a.htmlState.state;
+      const tokenForAttContinuedDoubleQuote = dummyState1a.htmlState.tokenize;
 
       const dummyStream1b = new CodeMirror.StringStream('<p class=\'someClass', 2, {});
-      const dummyState1b = htmlMode.startState();
+      const dummyState1b = htmlmixedMode.startState();
       while (dummyStream1b.current() !== '<p class=\'someClass') {
-        htmlMode.token(dummyStream1b, dummyState1b);
+        htmlmixedMode.token(dummyStream1b, dummyState1b);
       }
-      const attrContinuedStateSingleQuote = dummyState1b.state;
-      const tokenForAttContinuedSingleQuote = dummyState1b.tokenize;
+      const attrContinuedStateSingleQuote = dummyState1b.htmlState.state;
+      const tokenForAttContinuedSingleQuote = dummyState1b.htmlState.tokenize;
 
       // record the state when the tokenizer encounters a *complete* attr value
       const dummyStream2 = new CodeMirror.StringStream('<p class="otherClass"', 2, {});
-      const dummyState2 = htmlMode.startState();
+      const dummyState2 = htmlmixedMode.startState();
       while (dummyStream2.current() !== '<p class="otherClass"') {
-        htmlMode.token(dummyStream2, dummyState2);
+        htmlmixedMode.token(dummyStream2, dummyState2);
       }
-      const stateForAttrValue = dummyState2.state; // single-quote attr val has the same state
+      const stateForAttrValue = dummyState2.htmlState.state; // single-quote attr val has the same state
 
       // END init
 
@@ -189,15 +188,15 @@
      * @return the position of '${' relative to the
      *         current token start position, i.e., stream.start; -1 otherwise.
      */
-    htmlMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
+    htmlmixedMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
       return indexOfJsExprStartInString(stream.current());
     };
 
     // eslint-disable-next-line max-len, no-unused-vars
-    htmlMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state, style) {
-      if (state.localState.state === htmlStateHelper.stateForAttrValue) {
+    htmlmixedMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state, style) {
+      if (state.localState.htmlState.state === htmlStateHelper.stateForAttrValue) {
         // case the js expression is an attribute value
-        htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, state.localState);
+        htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, state.localState.htmlState);
       }
     };
 
@@ -547,7 +546,7 @@
         curContext: 'html-21',
         match: ctx => ctx.type === 'quasi',
         nextContext: 'html-in',
-        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state),
+        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlmixedMode, ctx.stream, ctx.state),
       }),
 
       // for plain string (single or double quoted) that looks like html
@@ -572,7 +571,7 @@
         curContext: '<start>',
         match: ctx => ctx.type === 'quasi' && RE_HTML_STRING_TEMPLATE.test(ctx.text),
         nextContext: 'html-in',
-        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state),
+        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlmixedMode, ctx.stream, ctx.state),
       }),
 
       // for HTML string template (where first line is blank, html started in second line)
@@ -585,7 +584,7 @@
         curContext: 'html-51',
         match: ctx => ctx.type === 'quasi' && RE_HTML_BASE.test(ctx.text), // second line starts with a tag
         nextContext: 'html-in',
-        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlMode, ctx.stream, ctx.state,
+        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlmixedMode, ctx.stream, ctx.state,
           false),
       }),
 
