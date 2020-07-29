@@ -321,6 +321,34 @@
       return style;
     }
 
+    function indexOfBacktickInString(text) {
+      // whether encounter backtick ` (not those escaped)
+      const jsExprMatch = text.match(/[^\\][`]|^[`]/);
+      if (!jsExprMatch) {
+        return -1;
+      }
+      // case there is an js expression
+      return jsExprMatch[0].charAt(0) === '`' ? jsExprMatch.index : jsExprMatch.index + 1;
+    }
+
+    // For use of tokenInLocalModeStringTemplate,
+    // to handle cases that the token contains string template ending backtick, i.e.,
+    // bleeding over the string template
+    function excludeEndBacktickFromToken(stream, style) {
+      if (style === 'string-2') {
+        // the token is meant to be a string template, e.g., string template within <script> tag
+        // so do nothing
+        return;
+      }
+      const text = stream.current();
+      const backtickPos = indexOfBacktickInString(text);
+      if (backtickPos < 0) {
+        return;
+      }
+      dbg('  local mode token contains a backtick, exclude text starting with it:', text);
+      stream.backUp(text.length - backtickPos);
+    }
+
     function tokenInLocalModeStringTemplate(stream, state) {
       if (state.inJsExprInStringTemplate) {
         return tokenJsExpressionInStringTemplate(stream, state);
@@ -331,6 +359,7 @@
       // else normal local mode tokenization
       const style = state.localMode.token(stream, state.localState);
       dbg('  local mode token - ', stream.current(), `[${style}]`);
+      excludeEndBacktickFromToken(stream, style);
       const jsExprStart = state.localMode.indexOfJsExprStartInStream(stream, state);
       if (jsExprStart < 0) {
         return style;

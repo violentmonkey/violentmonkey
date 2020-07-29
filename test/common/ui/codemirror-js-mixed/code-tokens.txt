@@ -231,7 +231,7 @@ null |
 comment | /* html */
 null |
 string-2 | `
-null | \
+null | some text
 undefined |
 tag bracket | <
 tag | br
@@ -336,12 +336,160 @@ string-2 | `
 undefined | ;
 undefined |
 undefined |
+comment | // corner case: that  text after the last html tag / css rule.
+undefined |
+comment | // ensure they won't break subsequent highlighting
+undefined |
+variable | someHTML
+operator | =
+string-2 | `
+tag bracket | <
+tag | p
+tag bracket | >
+null | text
+tag bracket | </
+tag | p
+tag bracket | >
+null | \n
+string-2 | `
+undefined | ;
+undefined |
+variable | foo
+null |
+operator | =
+null |
+number | 1
+undefined | ;
+undefined |
+variable | someHTML
+operator | =
+string-2 | `
+tag bracket | <
+tag | p
+tag bracket | >
+null | text
+tag bracket | </
+tag | p
+tag bracket | >
+null | \n
+string-2 | `
+undefined | ;
+null |
+comment | // some comments after the template
+undefined |
+variable | foo
+null |
+operator | =
+null |
+number | 1
+undefined | ;
+undefined |
+variable | someHTML
+operator | =
+string-2 | `
+tag bracket | <
+tag | p
+tag bracket | >
+null | text
+tag bracket | </
+tag | p
+tag bracket | >
+null | more text post last tag
+string-2 | `
+undefined | ;
+undefined |
+variable | foo
+null |
+operator | =
+null |
+number | 1
+undefined | ;
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+qualifier | .foo
+null |
+null | {
+undefined |
+null |
+property | border
+null | :
+null |
+number | 1px
+null | ;
+undefined |
+null | }
+null |
+tag | acme
+string-2 | `
+undefined | ;
+undefined |
+variable | bar
+null |
+operator | =
+null |
+number | 1
+undefined | ;
+undefined |
+undefined |
+comment | // corner case: there are backticks within HTML string templates
+undefined |
+variable | someHTML
+operator | =
+string-2 | `
+tag bracket | <
+tag | p
+tag bracket | >
+null | text
+undefined |
+null |
+null | line 2 with \`, i.e., escaped backtick
+undefined |
+tag bracket | </
+tag | p
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | foo
+null |
+operator | =
+null |
+number | 1
+undefined | ;
+undefined |
+variable | someHTML
+operator | =
+string-2 | `
+tag bracket | <
+tag | p
+tag bracket | >
+null | text
+undefined |
+null |
+null | line 2 ended escaped backtick, i.e., \`
+undefined |
+tag bracket | </
+tag | p
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+variable | bar
+null |
+operator | =
+null |
+number | 1
+undefined | ;
+undefined |
+undefined |
 comment | // plain string support
 undefined |
 undefined |
 keyword | var
 null |
-def | uiHtml
+variable | uiHtml
 null |
 operator | =
 null |
@@ -462,7 +610,7 @@ undefined |
 undefined |
 keyword | var
 null |
-def | dbgMsg
+variable | dbgMsg
 null |
 operator | =
 null |
@@ -478,7 +626,7 @@ comment | //
 undefined |
 variable | someElt
 undefined | .
-property | innerHTML
+variable | innerHTML
 null |
 operator | =
 null |
@@ -528,7 +676,7 @@ undefined |
 undefined |
 variable | console
 undefined | .
-property | debug
+variable | debug
 undefined | (
 string | '
 tag bracket | <

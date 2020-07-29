@@ -57,7 +57,7 @@ someElt.innerHTML = `<span id="bar">
 </span>`;
 
 // highlight arbitrary string template with a inline comment as a hint
-const someHTML = /* html */ `\
+const someHTML = /* html */ `some text
 <br>
   <hr class="acme">`;
 
@@ -75,6 +75,29 @@ let someCSS = String.raw /*css*/ `\
 const otherHTML = `<div class="bar">
   hello
 </div>`;
+
+// corner case: that  text after the last html tag / css rule.
+// ensure they won't break subsequent highlighting
+someHTML=`<p>text</p>\n`;
+foo = 1;
+someHTML=`<p>text</p>\n`; // some comments after the template
+foo = 1;
+someHTML=`<p>text</p>more text post last tag`;
+foo = 1;
+GM_addStyle(`.foo {
+ border: 1px;
+} acme`;
+bar = 1;
+
+// corner case: there are backticks within HTML string templates
+someHTML=`<p>text
+  line 2 with \`, i.e., escaped backtick
+</p>`;
+foo = 1;
+someHTML=`<p>text
+  line 2 ended escaped backtick, i.e., \`
+</p>`;
+bar = 1;
 
 // plain string support
 
