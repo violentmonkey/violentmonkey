@@ -231,33 +231,38 @@ GM_addStyle(`.foo {
 }`);
 
 
-// limitation when js expression is in a quoted string
+// cases the js expression is in a quoted string in CSS
 
-// Ideally, we want to force css tokenizer to treat the text after the expression as string.
-// But the required tokenizer, a closure of tokenString (with appropriate quote),
-// is not accessible, not even indirectly.
-// if it's accessible, we could have force the tokenizer by setting
-//   cssState.tokenize = tokenString('"'); // for double quote variant
-
-// sub-case the comma after end double-quote is  incorrectly tokenized as string
-// , quite harmless
+// sub-case the js expression is the entire quoted string
 GM_addStyle(`.foo {
   content: "${someContent}";
   color: red;
 }`);
 
-// variation: after ${preferredFont}, ', ' is incorrectly tokenized as string, while Times New Roman
-// is tokenized as variable
-//, a tad noticeable but harmless
+// sub-case: additional quoted string after the js expression
 GM_addStyle(`.foo {
   font-family: '${preferredFont}', 'Times New Roman', Times, serif;
   color: red;
+}
+
+.bar {
+  font-family: '${preferredFont}', '${fallBackFont}', Times, serif;
+  color: red;
 }`);
 
-// sub-case the suffix in the content is incorrectly tokenized as variable
-//, a tad noticeable but harmless
+// sub-case the js expression has prefix / suffix
 GM_addStyle(`.foo {
   content: "prefix ${someContent} suffix";
+  color: red;
+}
+
+.bar {
+  content: "${someContent}suffix";
+  color: red;
+}
+
+.bar2 {
+  content: "prefix${someContent}";
   color: red;
 }`);
 

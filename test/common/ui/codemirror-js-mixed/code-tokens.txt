@@ -1356,6 +1356,7 @@ undefined | :
 null |
 string | 'absolute'
 string-2 | }
+null |
 null | ;
 undefined |
 null |
@@ -1375,6 +1376,7 @@ null |
 string-2 | ${
 variable | backgroundColorVal
 string-2 | }
+null |
 null | ;
 undefined |
 null |
@@ -1392,9 +1394,11 @@ undefined | )
 string-2 | }
 null |
 null |
+null |
 string-2 | ${
 variable | borderColorVar
 string-2 | }
+null |
 null | ;
 undefined |
 null |
@@ -1412,6 +1416,7 @@ null |
 string-2 | ${
 variable | preferredFont
 string-2 | }
+null |
 null | ,
 null |
 string | 'Times New Roman'
@@ -1431,6 +1436,7 @@ null |
 string-2 | ${
 variable | marginBot
 string-2 | }
+null |
 variable | em
 null | ;
 undefined |
@@ -1453,6 +1459,7 @@ property error |
 string-2 | border-${
 variable | leftOrRightVal
 string-2 | }
+null |
 null | :
 null |
 number | 1px
@@ -1465,6 +1472,7 @@ null |
 string-2 | ${
 variable | marginPropVar
 string-2 | }
+null |
 null | :
 null |
 number | 1px
@@ -1477,6 +1485,7 @@ null |
 string-2 | ${
 variable | marginOrPaddingVar
 string-2 | }
+null |
 undefined | -
 property | left
 null | :
@@ -1531,6 +1540,7 @@ null |
 string | ''
 string-2 | }
 undefined |
+null |
 null |
 property | color
 null | :
@@ -1587,6 +1597,7 @@ string | ''
 string-2 | }
 undefined |
 null |
+null |
 property | color
 null | :
 null |
@@ -1617,6 +1628,7 @@ null |
 string | ''
 string-2 | }
 undefined |
+null |
 null |
 property | background-color
 null | :
@@ -1658,6 +1670,7 @@ variable | func2
 undefined | (
 undefined | )
 string-2 | }
+null |
 null | ;
 undefined |
 null |
@@ -1700,10 +1713,11 @@ undefined |
 string-2 | `
 undefined | )
 string-2 | }
-string | ";
+string | "
+null | ;
 undefined |
 null |
-atom | color
+property | color
 null | :
 null |
 keyword | red
@@ -1732,23 +1746,10 @@ undefined | ;
 undefined |
 undefined |
 undefined |
-comment | // limitation when js expression is in a quoted string
+comment | // cases the js expression is in a quoted string in CSS
 undefined |
 undefined |
-comment | // Ideally, we want to force css tokenizer to treat the text after the expression as string.
-undefined |
-comment | // But the required tokenizer, a closure of tokenString (with appropriate quote),
-undefined |
-comment | // is not accessible, not even indirectly.
-undefined |
-comment | // if it's accessible, we could have force the tokenizer by setting
-undefined |
-comment | //   cssState.tokenize = tokenString('"'); // for double quote variant
-undefined |
-undefined |
-comment | // sub-case the comma after end double-quote is  incorrectly tokenized as string
-undefined |
-comment | // , quite harmless
+comment | // sub-case the js expression is the entire quoted string
 undefined |
 variable | GM_addStyle
 undefined | (
@@ -1765,10 +1766,11 @@ string | "
 string-2 | ${
 variable | someContent
 string-2 | }
-string | ";
+string | "
+null | ;
 undefined |
 null |
-atom | color
+property | color
 null | :
 null |
 keyword | red
@@ -1780,11 +1782,7 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
-comment | // variation: after ${preferredFont}, ', ' is incorrectly tokenized as string, while Times New Roman
-undefined |
-comment | // is tokenized as variable
-undefined |
-comment | //, a tad noticeable but harmless
+comment | // sub-case: additional quoted string after the js expression
 undefined |
 variable | GM_addStyle
 undefined | (
@@ -1801,16 +1799,58 @@ string | '
 string-2 | ${
 variable | preferredFont
 string-2 | }
-string | ', '
+string | '
+null | ,
+null |
+string | 'Times New Roman'
+null | ,
+null |
 variable | Times
+null | ,
 null |
-variable | New
-null |
-variable | Roman
-string | ', Times, serif;
+atom | serif
+null | ;
 undefined |
 null |
-atom | color
+property | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null | }
+undefined |
+undefined |
+qualifier | .bar
+null |
+null | {
+undefined |
+null |
+property | font-family
+null | :
+null |
+string | '
+string-2 | ${
+variable | preferredFont
+string-2 | }
+string | '
+null | ,
+null |
+string | '
+string-2 | ${
+variable | fallBackFont
+string-2 | }
+string | '
+null | ,
+null |
+variable | Times
+null | ,
+null |
+atom | serif
+null | ;
+undefined |
+null |
+property | color
 null | :
 null |
 keyword | red
@@ -1822,9 +1862,7 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
-comment | // sub-case the suffix in the content is incorrectly tokenized as variable
-undefined |
-comment | //, a tad noticeable but harmless
+comment | // sub-case the js expression has prefix / suffix
 undefined |
 variable | GM_addStyle
 undefined | (
@@ -1841,12 +1879,61 @@ string | "prefix
 string-2 | ${
 variable | someContent
 string-2 | }
-null |
-variable | suffix
-string | ";
+string |  suffix"
+null | ;
 undefined |
 null |
-atom | color
+property | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null | }
+undefined |
+undefined |
+qualifier | .bar
+null |
+null | {
+undefined |
+null |
+property | content
+null | :
+null |
+string | "
+string-2 | ${
+variable | someContent
+string-2 | }
+string | suffix"
+null | ;
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null | }
+undefined |
+undefined |
+qualifier | .bar2
+null |
+null | {
+undefined |
+null |
+property | content
+null | :
+null |
+string | "prefix
+string-2 | ${
+variable | someContent
+string-2 | }
+string | "
+null | ;
+undefined |
+null |
+property | color
 null | :
 null |
 keyword | red

@@ -193,8 +193,8 @@
       return indexOfJsExprStartInString(stream.current());
     };
 
-    // eslint-disable-next-line max-len
-    htmlMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state) {
+    // eslint-disable-next-line max-len, no-unused-vars
+    htmlMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state, style) {
       if (state.localState.state === htmlStateHelper.stateForAttrValue) {
         // case the js expression is an attribute value
         htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, state.localState);
@@ -215,10 +215,30 @@
     };
 
     // eslint-disable-next-line max-len, no-unused-vars
-    cssMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state) {
-      // NO-OP: Ideally, we should handle the cases when JS expression is inside a quoted string, to force
-      // the text after the expression be tokenized as string, but CSS tokenizer does not expose it,
-      // not even in the indirect way (akin to what we do for HTML attributes, also quoted).
+    cssMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state, style) {
+      // for case quoted string, remember the quote style, to be used in tokenizePostJsExpr
+      if (style === 'string') {
+        state.quoteCharSurroundJsExpr = stream.string.charAt(stream.start);
+      }
+
+      // Note: we want to force the text after the JS expression be tokenized as string (up till the end quote),
+      // but CSS tokenizer does not expose it, not even in the indirect way,
+      // (akin to what we do for HTML attributes, also quoted).
+      // We compensate it by remembering the state and do our own in tokenizePostJsExpr()
+    };
+
+    cssMode.tokenizePostJsExpr = function tokenizeRemainingStrPostJsExpr(stream, state) {
+      // Handle cases such as content: "suffix${someExpr()}prefix";
+      // to return prefix" as a string token in the above case
+      // regex: non-greedy match up to the immediate next quote char, to avoid over match
+      const matched = stream.match(new RegExp(`.*?${state.quoteCharSurroundJsExpr}`), true);
+      dbg('  css mode post js expr string token - ', stream.current());
+      // let the css tokenizer continue the next time
+      state.tokenizePostJsExpr = null;
+      state.quoteCharSurroundJsExpr = null;
+      // in the unexpected case (likely bugs) that we cannot find end quote, do nothing more
+      // and let parent mode tokenizer to do its work
+      return matched ? 'string' : null;
     };
 
     function indexOfJsExprStartInString(text) {
@@ -245,11 +265,15 @@
         // when tokenizing the blank spaces, the style is null but the lastType remains to be }
         // (the one with meaningful token)
 
-        // once it reaches back to 0, the logic would treat the next token in parent local mode
+        // once it reaches back to 0, the logic would let the parent local mode handle the next token
         state.jsExprDepthInStringTemplate -= 1;
         dbg('    jsExprDepthInStringTemplate dec:', state.jsExprDepthInStringTemplate);
         if (state.jsExprDepthInStringTemplate <= 0) {
           state.inJsExprInStringTemplate = false;
+          if (state.localMode.tokenizePostJsExpr) {
+            // unless the mode also explicitly specify a tokenizer.
+            state.tokenizePostJsExpr = state.localMode.tokenizePostJsExpr;
+          }
         }
       }
       return style;
@@ -259,6 +283,9 @@
       if (state.inJsExprInStringTemplate) {
         return tokenJsExpressionInStringTemplate(stream, state);
       }
+      if (state.tokenizePostJsExpr) {
+        return state.tokenizePostJsExpr(stream, state);
+      }
       // else normal local mode tokenization
       const style = state.localMode.token(stream, state.localState);
       dbg('  local mode token - ', stream.current(), `[${style}]`);
@@ -267,8 +294,11 @@
         return style;
       }
       // case there is an js expression
-      state.localMode.ensureProperLocalModeStatePostJsExpr(stream, state);
-      stream.backUp(tokenLength(stream) - jsExprStart); // backup current token to exclude js expression, so that the next token starts with ${
+      state.localMode.ensureProperLocalModeStatePostJsExpr(stream, state, style);
+      // backup current token to exclude js expression, so that the next token starts with ${
+      // MUST happen after ensureProperLocalModeStatePostJsExpr() call, as the ensure call
+      // might need to access the token before js expression exclusion
+      stream.backUp(tokenLength(stream) - jsExprStart);
       dbg('    js expression seen. adjusted local mode token  - ', stream.current(), `[${style}]`);
       state.inJsExprInStringTemplate = true;
       // next time the tokenizer will see ${... , the js parser, currently in string template/quais mode
@@ -611,6 +641,8 @@
           jsState: state,
           jsExprDepthInStringTemplate: 0,
           inJsExprInStringTemplate: false,
+          tokenizePostJsExpr: null,
+          quoteCharSurroundJsExpr: null,
         };
       },
 
@@ -624,6 +656,8 @@
           jsState: CodeMirror.copyState(jsMode, state.jsState),
           jsExprDepthInStringTemplate: state.jsExprDepthInStringTemplate,
           inJsExprInStringTemplate: state.inJsExprInStringTemplate,
+          tokenizePostJsExpr: state.tokenizePostJsExpr,
+          quoteCharSurroundJsExpr: state.quoteCharSurroundJsExpr,
         };
       },
 
