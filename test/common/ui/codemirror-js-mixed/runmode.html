@@ -211,7 +211,6 @@ const foo = 1;
 
 // cases js expression in property name
 /*css*/ `#m-popup {
-  border-${leftOrRightVal}: 1px solid;
   ${marginPropVar}: 1px; /* some css comment */
   ${marginOrPaddingVar}-left: 1px;
   color: red;
@@ -309,6 +308,25 @@ GM.addStyle(`\
 }
 `);
 
+// Limitation: cases js expression is a partial property name
+// tokenizer would indicate errors when there is none.
+GM_addStyle(`#m-popup {
+  border-${leftOrRightVal}: 1px solid;
+  color: red;
+}`);
+
+// Limitation: cases there are multiple js expressions in 1 quoted string
+// only the first one expression is tokenized as such. the rest are string
+GM_addStyle(`.bar3 {
+  content: "${someContent1}${someContent2}";
+  color: red;
+}
+.bar4 {
+  content: "prefix ${someContent1} foo ${someContent2} suffix";
+  color: red;
+}
+`);
+
 // Limitation: cases when numbers (with units) contain JS expressions
 // when there are JS expressions, there is no reliable way to
 // tell the resulting string would be a number
@@ -316,6 +334,7 @@ GM_addStyle(`.foo {
   font-size: 16px; /* for reference for normal styling */
   margin-bottom: ${marginBot}em;
   margin-top: 12${marginUnit};
+  margin-left: ${marginLeft}${marginUnit};
 }
 
 @media screen and (max-width: 300${unitVar}) {

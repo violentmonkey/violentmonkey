@@ -1455,19 +1455,6 @@ null |
 null | {
 undefined |
 null |
-property error |
-string-2 | border-${
-variable | leftOrRightVal
-string-2 | }
-null |
-null | :
-null |
-number | 1px
-null |
-atom | solid
-null | ;
-undefined |
-null |
 null |
 string-2 | ${
 variable | marginPropVar
@@ -2001,8 +1988,9 @@ null |
 null |
 keyword | and
 null |
+null | (
 null |
-string-2 | (${
+string-2 | ${
 variable | critieria2
 string-2 | }
 null |
@@ -2038,6 +2026,104 @@ null | ;
 undefined |
 null |
 null | }
+undefined |
+null | }
+undefined |
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+comment | // Limitation: cases js expression is a partial property name
+undefined |
+comment | // tokenizer would indicate errors when there is none.
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+builtin | #m-popup
+null |
+null | {
+undefined |
+null |
+property error | border-
+null |
+string-2 | ${
+variable | leftOrRightVal
+string-2 | }
+null |
+null | :
+null |
+number | 1px
+null |
+property error | solid
+null | ;
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null | }
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+comment | // Limitation: cases there are multiple js expressions in 1 quoted string
+undefined |
+comment | // only the first one expression is tokenized as such. the rest are string
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+qualifier | .bar3
+null |
+null | {
+undefined |
+null |
+property | content
+null | :
+null |
+string | "
+string-2 | ${
+variable | someContent1
+string-2 | }
+string | ${someContent2}"
+null | ;
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null | }
+undefined |
+qualifier | .bar4
+null |
+null | {
+undefined |
+null |
+property | content
+null | :
+null |
+string | "prefix
+string-2 | ${
+variable | someContent1
+string-2 | }
+string |  foo ${someContent2} suffix"
+null | ;
+undefined |
+null |
+property | color
+null | :
+null |
+keyword | red
+null | ;
 undefined |
 null | }
 undefined |
@@ -2084,8 +2170,25 @@ null |
 property | margin-top
 null | :
 null |
-number |
-string-2 | 12${
+number | 12
+null |
+string-2 | ${
+variable | marginUnit
+string-2 | }
+null |
+null | ;
+undefined |
+null |
+property | margin-left
+null | :
+null |
+null |
+string-2 | ${
+variable | marginLeft
+string-2 | }
+null |
+null |
+string-2 | ${
 variable | marginUnit
 string-2 | }
 null |
@@ -2104,8 +2207,9 @@ null | (
 property | max-width
 null | :
 null |
-number |
-string-2 | 300${
+number | 300
+null |
+string-2 | ${
 variable | unitVar
 string-2 | }
 null |

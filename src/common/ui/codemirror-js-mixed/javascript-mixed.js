@@ -204,8 +204,8 @@
     cssMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
       // In most cases, CSS tokenizer treats $ as a single token,
       // detect ${ for those cases
-      if (stream.string.charAt(stream.pos) === '$'
-        && stream.string.charAt(stream.pos + 1) === '{') {
+      if (stream.string.charAt(stream.start) === '$'
+        && stream.string.charAt(stream.start + 1) === '{') {
         return 0;
       }
       // else look for ${ in the entire token.
@@ -228,14 +228,20 @@
     };
 
     cssMode.tokenizePostJsExpr = function tokenizeRemainingStrPostJsExpr(stream, state) {
-      // Handle cases such as content: "suffix${someExpr()}prefix";
-      // to return prefix" as a string token in the above case
-      // regex: non-greedy match up to the immediate next quote char, to avoid over match
-      const matched = stream.match(new RegExp(`.*?${state.quoteCharSurroundJsExpr}`), true);
-      dbg('  css mode post js expr string token - ', stream.current());
-      // let the css tokenizer continue the next time
+      const quoteInUse = state.quoteCharSurroundJsExpr;
+      // first ensure, we let the css tokenizer continue the next time
       state.tokenizePostJsExpr = null;
       state.quoteCharSurroundJsExpr = null;
+
+      if (!quoteInUse) {
+        return null;
+      }
+
+      // Now handle quoted string cases such as content: "suffix${someExpr()}prefix";
+      // to return prefix" as a string token in the above case
+      // regex: non-greedy match up to the immediate next quote char, to avoid over match
+      const matched = stream.match(new RegExp(`.*?${quoteInUse}`), true);
+      dbg('  css mode post js expr string token - ', stream.current());
       // in the unexpected case (likely bugs) that we cannot find end quote, do nothing more
       // and let parent mode tokenizer to do its work
       return matched ? 'string' : null;
