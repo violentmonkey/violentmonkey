@@ -583,7 +583,8 @@
         curContext: 'html-21',
         match: ctx => ctx.type === 'quasi',
         nextContext: 'html-in',
-        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlmixedMode, ctx.stream, ctx.state),
+        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlmixedMode,
+          ctx.stream, ctx.state),
       }),
 
       // for plain string (single or double quoted) that looks like html
@@ -608,7 +609,8 @@
         curContext: '<start>',
         match: ctx => ctx.type === 'quasi' && RE_HTML_STRING_TEMPLATE.test(ctx.text),
         nextContext: 'html-in',
-        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlmixedMode, ctx.stream, ctx.state),
+        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlmixedMode,
+          ctx.stream, ctx.state),
       }),
 
       // for HTML string template (where first line is blank, html started in second line)
@@ -621,8 +623,8 @@
         curContext: 'html-51',
         match: ctx => ctx.type === 'quasi' && RE_HTML_BASE.test(ctx.text), // second line starts with a tag
         nextContext: 'html-in',
-        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlmixedMode, ctx.stream, ctx.state,
-          false),
+        caseMatched: ctx => prepReparseStringTemplateInLocalMode(htmlmixedMode,
+          ctx.stream, ctx.state, false),
       }),
 
     ];
