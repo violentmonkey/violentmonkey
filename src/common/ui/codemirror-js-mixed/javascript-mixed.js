@@ -171,10 +171,15 @@
       state.jsExprDepthInStringTemplate = 0;
     }
 
+    function tokenLastChar(stream) {
+      return stream.string.charAt(stream.pos - 1) || undefined;
+    }
+
     function isEndBacktick(stream, state) {
       // check it hits ending backtick for string template,
       // ignoring the backticks that appear inside a JS expression.
-      return !state.inJsExprInStringTemplate && stream.peek() === '`';
+      return !state.inJsExprInStringTemplate && stream.peek() === '`'
+        && tokenLastChar(stream) !== '\\'; // ensure it is not an escaped backtick (doesn't count)
     }
 
     function exitLocalModeWithEndBacktick(stream, state) {

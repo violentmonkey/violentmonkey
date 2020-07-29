@@ -369,8 +369,18 @@ someMixedHtml = `<div>123</div>
   }
 </style>
 <script>
+  const res = someFunc(arg1);
+  // case js expression is evaluated and
+  // the result, not the string template, is to be part of the script.
   const foo = someFunc(${someCond ? true : false});
+
+  // cases the script contains its own js string templates (thus escaping)
+  // limitation: it will screw up syntax highlighting for the rest of the script text
+  let bar1 = \`some content in string template\`;
+  let bar2 = \`\${someFunc() + 456}\`;
+  let bar3 = 123;
 </script>
+<p> Text after script tag <em>highlighted</em> correctly.</p>
 `;
 
 var end = true;

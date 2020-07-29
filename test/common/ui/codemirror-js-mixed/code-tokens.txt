@@ -2446,6 +2446,25 @@ undefined |
 null |
 keyword | const
 null |
+def | res
+null |
+operator | =
+null |
+variable | someFunc
+undefined | (
+variable | arg1
+undefined | )
+undefined | ;
+undefined |
+null |
+comment | // case js expression is evaluated and
+undefined |
+null |
+comment | // the result, not the string template, is to be part of the script.
+undefined |
+null |
+keyword | const
+null |
 def | foo
 null |
 operator | =
@@ -2467,9 +2486,50 @@ undefined | }
 undefined | )
 undefined | ;
 undefined |
+undefined |
+null |
+comment | // cases the script contains its own js string templates (thus escaping)
+undefined |
+null |
+comment | // limitation: it will screw up syntax highlighting for the rest of the script text
+undefined |
+null |
+keyword | let
+null |
+def | bar1
+null |
+operator | =
+null |
+undefined | \
+string-2 | `some content in string template\`;
+undefined |
+null |
+string-2 | let bar2 = \`\${someFunc() + 456}\`;
+undefined |
+null |
+string-2 | let bar3 = 123;
+undefined |
 null |
 tag bracket | </
 tag | script
+tag bracket | >
+undefined |
+tag bracket | <
+tag | p
+tag bracket | >
+null |
+null | Text after script tag
+tag bracket | <
+tag | em
+tag bracket | >
+null | highlighted
+tag bracket | </
+tag | em
+tag bracket | >
+null |
+null | correctly.
+tag bracket | </
+tag | p
 tag bracket | >
 undefined |
 string-2 | `
