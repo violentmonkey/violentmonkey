@@ -293,6 +293,44 @@ GM_addStyle(`.foo {
   color: red;
 }`);
 
+// Media queries
+GM.addStyle(`\
+@media screen and (max-width: ${maxWidthPlusUnit}) {
+  .side-nav {
+    display: none;
+  }
+}
+
+@media ${critieria1} and (${critieria2}: 600px) {
+  .side-nav {
+    display: ${displayVar};
+    background-color: darkblue;
+  }
+}
+`);
+
+// Limitation: cases when numbers (with units) contain JS expressions
+// when there are JS expressions, there is no reliable way to
+// tell the resulting string would be a number
+GM_addStyle(`.foo {
+  font-size: 16px; /* for reference for normal styling */
+  margin-bottom: ${marginBot}em;
+  margin-top: 12${marginUnit};
+}
+
+@media screen and (max-width: 300${unitVar}) {
+  .side-nav {
+    display: none;
+  }
+}
+
+@media screen and (max-width: ${maxWidthNoUnit}px) {
+  .side-nav {
+    display: block;
+  }
+}
+`);
+
 var end = true;
 </textarea>
 

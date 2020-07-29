@@ -1945,6 +1945,234 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
+comment | // Media queries
+undefined |
+variable | GM
+undefined | .
+property | addStyle
+undefined | (
+string-2 | `
+tag | \
+undefined |
+def | @media
+null |
+attribute | screen
+null |
+keyword | and
+null |
+null | (
+property | max-width
+null | :
+null |
+null |
+string-2 | ${
+variable | maxWidthPlusUnit
+string-2 | }
+null |
+null | )
+null |
+null | {
+undefined |
+null |
+qualifier | .side-nav
+null |
+null | {
+undefined |
+null |
+property | display
+null | :
+null |
+atom | none
+null | ;
+undefined |
+null |
+null | }
+undefined |
+null | }
+undefined |
+undefined |
+def | @media
+null |
+null |
+string-2 | ${
+variable | critieria1
+string-2 | }
+null |
+null |
+keyword | and
+null |
+null |
+string-2 | (${
+variable | critieria2
+string-2 | }
+null |
+null | :
+null |
+number | 600px
+null | )
+null |
+null | {
+undefined |
+null |
+qualifier | .side-nav
+null |
+null | {
+undefined |
+null |
+property | display
+null | :
+null |
+null |
+string-2 | ${
+variable | displayVar
+string-2 | }
+null |
+null | ;
+undefined |
+null |
+property | background-color
+null | :
+null |
+keyword | darkblue
+null | ;
+undefined |
+null |
+null | }
+undefined |
+null | }
+undefined |
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
+comment | // Limitation: cases when numbers (with units) contain JS expressions
+undefined |
+comment | // when there are JS expressions, there is no reliable way to
+undefined |
+comment | // tell the resulting string would be a number
+undefined |
+variable | GM_addStyle
+undefined | (
+string-2 | `
+qualifier | .foo
+null |
+null | {
+undefined |
+null |
+property | font-size
+null | :
+null |
+number | 16px
+null | ;
+null |
+comment | /* for reference for normal styling */
+undefined |
+null |
+property | margin-bottom
+null | :
+null |
+null |
+string-2 | ${
+variable | marginBot
+string-2 | }
+null |
+variable | em
+null | ;
+undefined |
+null |
+property | margin-top
+null | :
+null |
+number |
+string-2 | 12${
+variable | marginUnit
+string-2 | }
+null |
+null | ;
+undefined |
+null | }
+undefined |
+undefined |
+def | @media
+null |
+attribute | screen
+null |
+keyword | and
+null |
+null | (
+property | max-width
+null | :
+null |
+number |
+string-2 | 300${
+variable | unitVar
+string-2 | }
+null |
+null | )
+null |
+null | {
+undefined |
+null |
+qualifier | .side-nav
+null |
+null | {
+undefined |
+null |
+property | display
+null | :
+null |
+atom | none
+null | ;
+undefined |
+null |
+null | }
+undefined |
+null | }
+undefined |
+undefined |
+def | @media
+null |
+attribute | screen
+null |
+keyword | and
+null |
+null | (
+property | max-width
+null | :
+null |
+null |
+string-2 | ${
+variable | maxWidthNoUnit
+string-2 | }
+null |
+error | px
+null | )
+null |
+null | {
+undefined |
+null |
+qualifier | .side-nav
+null |
+null | {
+undefined |
+null |
+property | display
+null | :
+null |
+atom | block
+null | ;
+undefined |
+null |
+null | }
+undefined |
+null | }
+undefined |
+string-2 | `
+undefined | )
+undefined | ;
+undefined |
+undefined |
 keyword | var
 null |
 def | end
