@@ -184,23 +184,55 @@
     }
 
     // Local mode-specific helpers to handle js expression in string template
+    function curModeNameAndStateOfHtmlmixed(htmlmixedState) {
+      if (!htmlmixedState.localMode) {
+        return ['html', htmlmixedState.htmlState];
+      }
+      // else return local css / javascript name, state
+      return [htmlmixedState.localMode.name, htmlmixedState.localState];
+    }
+
     /**
      * @return the position of '${' relative to the
      *         current token start position, i.e., stream.start; -1 otherwise.
      */
-    htmlmixedMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
-      return indexOfJsExprStartInString(stream.current());
+    htmlmixedMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream, state) {
+      const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
+      switch (modeName) {
+      case 'html':
+        return indexOfJsExprStartInString(stream.current());
+      case 'css':
+        return cssMode.indexOfJsExprStartInStream(stream, modeState);
+      case 'javascript':
+        return -1; // let js mode handle ${ natively
+      default:
+        console.error('htmlmixedMode.indexOfJsExprStartInStream() - unrecognized mode:', modeName, modeState);
+      }
+      return -1; // should never reach here
     };
 
     // eslint-disable-next-line max-len, no-unused-vars
     htmlmixedMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state, style) {
-      if (state.localState.htmlState.state === htmlStateHelper.stateForAttrValue) {
-        // case the js expression is an attribute value
-        htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, state.localState.htmlState);
+      const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
+      switch (modeName) {
+      case 'html':
+        if (modeState.state === htmlStateHelper.stateForAttrValue) {
+          // case the js expression is an attribute value
+          htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, modeState);
+        }
+        break;
+      case 'css':
+        cssMode.ensureProperLocalModeStatePostJsExpr(stream, modeState, style);
+        break;
+      case 'javascript':
+        break; // NO-OP
+      default:
+        console.error('htmlmixedMode.ensureProperLocalModeStatePostJsExpr() - unrecognized mode:', modeName, modeState);
       }
     };
 
-    cssMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream) {
+    // eslint-disable-next-line no-unused-vars
+    cssMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream, state) {
       // In most cases, CSS tokenizer treats $ as a single token,
       // detect ${ for those cases
       if (stream.string.charAt(stream.start) === '$'
@@ -294,7 +326,7 @@
       // else normal local mode tokenization
       const style = state.localMode.token(stream, state.localState);
       dbg('  local mode token - ', stream.current(), `[${style}]`);
-      const jsExprStart = state.localMode.indexOfJsExprStartInStream(stream);
+      const jsExprStart = state.localMode.indexOfJsExprStartInStream(stream, state);
       if (jsExprStart < 0) {
         return style;
       }

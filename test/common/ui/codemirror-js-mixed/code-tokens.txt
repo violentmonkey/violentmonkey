@@ -2277,6 +2277,205 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
+comment | // Support highlighting css/javascript in <style>, <script> tags in html
+undefined |
+variable | someMixedHtml
+null |
+operator | =
+null |
+string-2 | `
+tag bracket | <
+tag | div
+tag bracket | >
+null | 123
+tag bracket | </
+tag | div
+tag bracket | >
+undefined |
+tag bracket | <
+tag | style
+tag bracket | >
+undefined |
+null |
+comment | /* embedded css in html string template, with js expressions */
+undefined |
+null |
+qualifier | .foo
+null |
+null | {
+undefined |
+null |
+property | background-color
+null | :
+null |
+atom | #333
+null | ;
+undefined |
+null |
+property | position
+null | :
+null |
+null |
+string-2 | ${
+variable | posVar
+null |
+operator | ?
+null |
+string | 'fixed'
+null |
+undefined | :
+null |
+string | 'absolute'
+string-2 | }
+null | ;
+undefined |
+null |
+property | border
+null | :
+null |
+number | 1px
+null |
+null |
+string-2 | ${
+variable | styleVarCall
+undefined | (
+variable | param1
+undefined | )
+string-2 | }
+null |
+null |
+string-2 | ${
+variable | borderColorVar
+string-2 | }
+null | ;
+undefined |
+null |
+property | font-family
+null | :
+null |
+string | '
+string-2 | ${
+variable | preferredFont
+string-2 | }
+string | ', '
+variable | Times
+null |
+variable | New
+null |
+variable | Roman
+string | ', Times, serif;
+undefined |
+null |
+null |
+string-2 | ${
+variable | someCond
+null |
+operator | ?
+null |
+string-2 | `max-width: ${
+variable | floor
+undefined | (
+variable | maxPct
+undefined | )
+string-2 | }
+string-2 | %;`
+null |
+undefined | :
+null |
+string | ''
+string-2 | }
+undefined |
+null |
+atom | color
+null | :
+null |
+keyword | red
+null | ;
+undefined |
+null |
+null |
+string-2 | ${
+variable | someCond
+null |
+operator | ?
+null |
+string-2 | `max-width: ${
+variable | floor
+undefined | (
+undefined |
+null |
+variable | maxPct
+undefined | )
+string-2 | }
+string-2 | %;`
+null |
+undefined | :
+null |
+string | ''
+string-2 | }
+undefined |
+null |
+null |
+string-2 | ${
+variable | borderPropName
+string-2 | }
+null | :
+null |
+number | 1px
+null | ;
+undefined |
+null |
+property | margin-top
+null | :
+null |
+number | 1em
+null | ;
+undefined |
+null |
+null | }
+undefined |
+null |
+tag bracket | </
+tag | style
+tag bracket | >
+undefined |
+tag bracket | <
+tag | script
+tag bracket | >
+undefined |
+null |
+keyword | const
+null |
+def | foo
+null |
+operator | =
+null |
+variable | someFunc
+undefined | (
+variable | $
+undefined | {
+variable | someCond
+null |
+operator | ?
+null |
+atom | true
+null |
+undefined | :
+null |
+atom | false
+undefined | }
+undefined | )
+undefined | ;
+undefined |
+null |
+tag bracket | </
+tag | script
+tag bracket | >
+undefined |
+string-2 | `
+undefined | ;
+undefined |
+undefined |
 keyword | var
 null |
 def | end

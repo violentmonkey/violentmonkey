@@ -323,4 +323,26 @@ GM_addStyle(`.foo {
 }
 `);
 
+// Support highlighting css/javascript in <style>, <script> tags in html
+someMixedHtml = `<div>123</div>
+<style>
+  /* embedded css in html string template, with js expressions */
+  .foo {
+    background-color: #333;
+    position: ${posVar ? 'fixed' : 'absolute'};
+    border: 1px ${styleVarCall(param1)} ${borderColorVar};
+    font-family: '${preferredFont}', 'Times New Roman', Times, serif;
+    ${someCond ? `max-width: ${floor(maxPct)}%;` : ''}
+    color: red;
+    ${someCond ? `max-width: ${floor(
+  maxPct)}%;` : ''}
+    ${borderPropName}: 1px;
+    margin-top: 1em;
+  }
+</style>
+<script>
+  const foo = someFunc(${someCond ? true : false});
+</script>
+`;
+
 var end = true;
