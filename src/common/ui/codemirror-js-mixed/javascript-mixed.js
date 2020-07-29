@@ -752,5 +752,5 @@
         return { state: state.localState || state.jsState, mode: state.localMode || jsMode };
       },
     };
-  }, 'javascript', 'xml', 'css');
+  }, 'javascript', 'xml', 'css', 'htmlmixed');
 }));
