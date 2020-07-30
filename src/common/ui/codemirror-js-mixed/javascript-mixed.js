@@ -74,7 +74,7 @@
         htmlmixedMode.token(dummyStream1a, dummyState1a);
       }
       const attrContinuedStateDoubleQuote = dummyState1a.htmlState.state;
-      const tokenForAttContinuedDoubleQuote = dummyState1a.htmlState.tokenize;
+      const tokenForAttrContinuedDoubleQuote = dummyState1a.htmlState.tokenize;
 
       const dummyStream1b = new CodeMirror.StringStream('<p class=\'someClass', 2, {});
       const dummyState1b = htmlmixedMode.startState();
@@ -82,7 +82,7 @@
         htmlmixedMode.token(dummyStream1b, dummyState1b);
       }
       const attrContinuedStateSingleQuote = dummyState1b.htmlState.state;
-      const tokenForAttContinuedSingleQuote = dummyState1b.htmlState.tokenize;
+      const tokenForAttrContinuedSingleQuote = dummyState1b.htmlState.tokenize;
 
       // record the state when the tokenizer encounters a *complete* attr value
       const dummyStream2 = new CodeMirror.StringStream('<p class="otherClass"', 2, {});
@@ -116,11 +116,11 @@
         switch (stream.string.charAt(stream.pos - 1)) {
         case '"':
           htmlState.state = attrContinuedStateDoubleQuote;
-          htmlState.tokenize = tokenForAttContinuedDoubleQuote;
+          htmlState.tokenize = tokenForAttrContinuedDoubleQuote;
           break;
         case "'":
           htmlState.state = attrContinuedStateSingleQuote;
-          htmlState.tokenize = tokenForAttContinuedSingleQuote;
+          htmlState.tokenize = tokenForAttrContinuedSingleQuote;
           break;
         default:
         // case it's part of a multi-lined attr value, and is not the last line yet
@@ -197,91 +197,93 @@
       return [htmlmixedState.localMode.name, htmlmixedState.localState];
     }
 
-    /**
-     * @return the position of '${' relative to the
-     *         current token start position, i.e., stream.start; -1 otherwise.
-     */
-    htmlmixedMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream, state) {
-      const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
-      switch (modeName) {
-      case 'html':
-        return indexOfJsExprStartInString(stream.current());
-      case 'css':
-        return cssMode.indexOfJsExprStartInStream(stream, modeState);
-      case 'javascript':
-        return -1; // let js mode handle ${ natively
-      default:
-        console.error('htmlmixedMode.indexOfJsExprStartInStream() - unrecognized mode:', modeName, modeState);
-      }
-      return -1; // should never reach here
-    };
-
-    // eslint-disable-next-line max-len, no-unused-vars
-    htmlmixedMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state, style) {
-      const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
-      switch (modeName) {
-      case 'html':
-        if (modeState.state === htmlStateHelper.stateForAttrValue) {
-          // case the js expression is an attribute value
-          htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, modeState);
+    Object.assign(htmlmixedMode, {
+      /**
+       * @return the position of '${' relative to the
+       *         current token start position, i.e., stream.start; -1 otherwise.
+       */
+      indexOfJsExprStartInStream(stream, state) {
+        const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
+        switch (modeName) {
+        case 'html':
+          return indexOfJsExprStartInString(stream.current());
+        case 'css':
+          return cssMode.indexOfJsExprStartInStream(stream, modeState);
+        case 'javascript':
+          return -1; // let js mode handle ${ natively
+        default:
+          console.error('htmlmixedMode.indexOfJsExprStartInStream() - unrecognized mode:', modeName, modeState);
         }
-        break;
-      case 'css':
-        cssMode.ensureProperLocalModeStatePostJsExpr(stream, modeState, style);
-        break;
-      case 'javascript':
-        break; // NO-OP
-      default:
-        console.error('htmlmixedMode.ensureProperLocalModeStatePostJsExpr() - unrecognized mode:', modeName, modeState);
-      }
-    };
+        return -1; // should never reach here
+      },
 
-    // eslint-disable-next-line no-unused-vars
-    cssMode.indexOfJsExprStartInStream = function indexOfJsExprStartInStream(stream, state) {
-      // In most cases, CSS tokenizer treats $ as a single token,
-      // detect ${ for those cases
-      if (stream.string.charAt(stream.start) === '$'
-        && stream.string.charAt(stream.start + 1) === '{') {
-        return 0;
-      }
-      // else look for ${ in the entire token.
-      //   It only works for limited cases such as content property value,
-      //   where CSS parser sees entire expression as string.
-      return indexOfJsExprStartInString(stream.current());
-    };
+      ensureProperLocalModeStatePostJsExpr(stream, state, style) {
+        const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
+        switch (modeName) {
+        case 'html':
+          if (modeState.state === htmlStateHelper.stateForAttrValue) {
+            // case the js expression is an attribute value
+            htmlStateHelper.forceHtmlModeToAttrContinuedState(stream, modeState);
+          }
+          break;
+        case 'css':
+          cssMode.ensureProperLocalModeStatePostJsExpr(stream, modeState, style);
+          break;
+        case 'javascript':
+          break; // NO-OP
+        default:
+          console.error('htmlmixedMode.ensureProperLocalModeStatePostJsExpr() - unrecognized mode:', modeName, modeState);
+        }
+      },
+    });
 
-    // eslint-disable-next-line max-len, no-unused-vars
-    cssMode.ensureProperLocalModeStatePostJsExpr = function ensureProperLocalModeStatePostJsExpr(stream, state, style) {
-      // for case quoted string, remember the quote style, to be used in tokenizePostJsExpr
-      if (style === 'string') {
-        state.quoteCharSurroundJsExpr = stream.string.charAt(stream.start);
-      }
+    Object.assign(cssMode, {
+      // eslint-disable-next-line no-unused-vars
+      indexOfJsExprStartInStream(stream, state) {
+        // In most cases, CSS tokenizer treats $ as a single token,
+        // detect ${ for those cases
+        if (stream.string.charAt(stream.start) === '$'
+          && stream.string.charAt(stream.start + 1) === '{') {
+          return 0;
+        }
+        // else look for ${ in the entire token.
+        //   It only works for limited cases such as content property value,
+        //   where CSS parser sees entire expression as string.
+        return indexOfJsExprStartInString(stream.current());
+      },
 
-      // Note: we want to force the text after the JS expression be tokenized as string (up till the end quote),
-      // but CSS tokenizer does not expose it, not even in the indirect way,
-      // (akin to what we do for HTML attributes, also quoted).
-      // We compensate it by remembering the state and do our own in tokenizePostJsExpr()
-    };
+      ensureProperLocalModeStatePostJsExpr(stream, state, style) {
+        // for case quoted string, remember the quote style, to be used in tokenizePostJsExpr
+        if (style === 'string') {
+          state.quoteCharSurroundJsExpr = stream.string.charAt(stream.start);
+        }
 
-    cssMode.tokenizePostJsExpr = function tokenizeRemainingStrPostJsExpr(stream, state) {
-      const quoteInUse = state.quoteCharSurroundJsExpr;
-      // first ensure, we let the css tokenizer continue the next time
-      state.tokenizePostJsExpr = null;
-      state.quoteCharSurroundJsExpr = null;
+        // Note: we want to force the text after the JS expression be tokenized as string (up till the end quote),
+        // but CSS tokenizer does not expose it, not even in the indirect way,
+        // (akin to what we do for HTML attributes, also quoted).
+        // We compensate it by remembering the state and do our own in tokenizePostJsExpr()
+      },
 
-      if (!quoteInUse) {
-        return null;
-      }
+      tokenizePostJsExpr(stream, state) {
+        const quoteInUse = state.quoteCharSurroundJsExpr;
+        // first ensure, we let the css tokenizer continue the next time
+        state.tokenizePostJsExpr = null;
+        state.quoteCharSurroundJsExpr = null;
 
-      // Now handle quoted string cases such as content: "suffix${someExpr()}prefix";
-      // to return prefix" as a string token in the above case
-      // regex: non-greedy match up to the immediate next quote char, to avoid over match
-      const matched = stream.match(new RegExp(`.*?${quoteInUse}`), true);
-      dbg('  css mode post js expr string token - ', stream.current());
-      // in the unexpected case (likely bugs) that we cannot find end quote, do nothing more
-      // and let parent mode tokenizer to do its work
-      return matched ? 'string' : null;
-    };
+        if (!quoteInUse) {
+          return null;
+        }
+
+        // Now handle quoted string cases such as content: "suffix${someExpr()}prefix";
+        // to return prefix" as a string token in the above case
+        // regex: non-greedy match up to the immediate next quote char, to avoid over match
+        const matched = stream.match(new RegExp(`.*?${quoteInUse}`), true);
+        dbg('  css mode post js expr string token - ', stream.current());
+        // in the unexpected case (likely bugs) that we cannot find end quote, do nothing more
+        // and let parent mode tokenizer to do its work
+        return matched ? 'string' : null;
+      },
+    });
 
     function indexOfJsExprStartInString(text) {
       // whether encounter js expression ${, but excluding cases that $ is escaped, i.e., \$
