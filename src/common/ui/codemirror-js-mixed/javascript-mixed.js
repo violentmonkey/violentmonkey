@@ -503,16 +503,15 @@
       }
     }
 
-    function matchRule(rules, stream, state, jsTokenStyle) {
+    function matchRule(ruleMap, stream, state, jsTokenStyle) {
       const ctx = RunContext.get(stream, state, jsTokenStyle);
+      const rules = ruleMap[state.maybeLocalContext || '<start>'];
       for (const r of rules) {
-        if (r.curContext === (state.maybeLocalContext || '<start>')) {
-          // dbg('  rule:', r.curContext, r.match.toString());
-          const matched = r.run(ctx);
-          // dbg('  => rule output tokenStyle', ctx.style);
-          if (matched) {
-            break;
-          }
+        // dbg('  rule:', r.curContext, r.match.toString());
+        const matched = r.run(ctx);
+        // dbg('  => rule output tokenStyle', ctx.style);
+        if (matched) {
+          break;
         }
       }
       return ctx.style;
@@ -589,10 +588,6 @@
         caseMatched: ctx => prepReparseStringTemplateInLocalMode(cssMode, ctx.stream, ctx.state),
       }),
     ];
-
-    function maybeCssToken(stream, state, jsTokenStyle) {
-      return matchRule(cssRules, stream, state, jsTokenStyle);
-    }
 
 
     const [RE_HTML_BASE, RE_HTML_PLAIN_STRING, RE_HTML_STRING_TEMPLATE] = (() => {
@@ -673,9 +668,18 @@
 
     ];
 
-    function maybeHtmlToken(stream, state, jsTokenStyle) {
-      return matchRule(htmlRules, stream, state, jsTokenStyle);
-    }
+    // a map of all rules, keyed by curContext for quick look up during matching
+    const allRuleMap = (() => {
+      const res = {};
+      for (const rules of [htmlRules, cssRules]) {
+        for (const rule of rules) {
+          const key = rule.curContext;
+          res[key] = res[key] || [];
+          res[key].push(rule);
+        }
+      }
+      return res;
+    })();
 
 
     function jsToken(stream, state) {
@@ -706,10 +710,7 @@
       }
 
       // match to see if it needs to switch to local html mode, return local mode style if applicable
-      let maybeLocalStyle = maybeHtmlToken(stream, state, tokenStyle);
-      if (maybeLocalStyle === STYLE_PASS) {
-        maybeLocalStyle = maybeCssToken(stream, state, tokenStyle);
-      }
+      const maybeLocalStyle = matchRule(allRuleMap, stream, state, tokenStyle);
 
       if (maybeLocalStyle !== STYLE_PASS) {
         tokenStyle = maybeLocalStyle;
