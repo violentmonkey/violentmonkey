@@ -3009,5 +3009,16 @@ body[baidu] #s_lg_img_new{
       return res;
     }
 
+    // Not used by web UI.
+    // Helper for developers to run profile from chrome devtools
+    async function doProfileForMode(modeName, numRuns) {
+      let res = await doPerformanceTestForMode(modeName, 5); // warmup
+      console.log('warm-up', res);
+      profile(`runMode_${modeName}_${numRuns}`);
+      res = await doPerformanceTestForMode(modeName, numRuns);
+      console.log('perftst', res);
+      profileEnd(`runMode_${modeName}_${numRuns}`);
+    }
+
   </script>
 </article>
