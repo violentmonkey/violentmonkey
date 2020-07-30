@@ -237,17 +237,17 @@
        * @return the position of '${' relative to the
        *         current token start position, i.e., stream.start; -1 otherwise.
        */
-      indexOfJsExprStartInStream(stream, state) {
+      indexOfJsExprStart(stream, state) {
         const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
         switch (modeName) {
         case 'html':
           return tokenIndexOfUnescaped(stream, '${');
         case 'css':
-          return cssMode.indexOfJsExprStartInStream(stream, modeState);
+          return cssMode.indexOfJsExprStart(stream, modeState);
         case 'javascript':
           return -1; // let js mode handle ${ natively
         default:
-          console.error('htmlmixedMode.indexOfJsExprStartInStream() - unrecognized mode:', modeName, modeState);
+          console.error('htmlmixedMode.indexOfJsExprStart() - unrecognized mode:', modeName, modeState);
         }
         return -1; // should never reach here
       },
@@ -274,7 +274,7 @@
 
     Object.assign(cssMode, {
       // eslint-disable-next-line no-unused-vars
-      indexOfJsExprStartInStream(stream, state) {
+      indexOfJsExprStart(stream, state) {
         // In most cases, CSS tokenizer treats $ as a single token,
         // detect ${ for those cases
         if (stream.string.charAt(stream.start) === '$'
@@ -375,7 +375,7 @@
       const style = state.localMode.token(stream, state.localState);
       dbg('  local mode token - ', stream.current(), `[${style}]`);
       excludeEndBacktickFromToken(stream, style);
-      const jsExprStart = state.localMode.indexOfJsExprStartInStream(stream, state);
+      const jsExprStart = state.localMode.indexOfJsExprStart(stream, state);
       if (jsExprStart < 0) {
         return style;
       }
