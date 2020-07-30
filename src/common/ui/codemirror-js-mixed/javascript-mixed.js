@@ -144,11 +144,50 @@
       };
     })();
 
+    // Helpers to access a stream's current token, without creating
+    // the string with stream.current() call.
 
     function tokenLength(stream) {
       // usage: avoid string creation in call stream.current().length
       return stream.pos - stream.start;
     }
+
+    function tokenLastChar(stream) {
+      return stream.string.charAt(stream.pos - 1) || undefined;
+    }
+
+    /**
+     * Return the index of searchValue within the current token, i.e., stream.current(),
+     * excluding those prefixed with escape. E.g., if searchValue is "${", it will ignore
+     * those string with the pattern of "\${", as the dollar sign is escaped.
+     *
+     * The returned index is relative to the token, rather than the entire stream.
+     */
+    function tokenIndexOfUnescaped(stream, searchValue) {
+      // comparing to the alternative of stream.current().match(searchValueRegex),
+      // this implementation avoids a substring creation and regex match
+      const searchEndIdxExclusive = stream.pos;
+      const tokenStartIdx = stream.start;
+      let searchStartIdx = stream.start;
+
+      while (searchStartIdx < searchEndIdxExclusive) {
+        const candidate = stream.string.indexOf(searchValue, searchStartIdx);
+        if (candidate < 0 || candidate >= searchEndIdxExclusive) {
+          return -1;
+        }
+        // ensure it's not an escaped one
+        if (stream.string.charAt(candidate - 1) !== '\\') {
+          // case find a match
+          return candidate - tokenStartIdx;
+        }
+        // else case an escaped ${, continue to search
+        searchStartIdx = candidate + searchValue.length;
+      }
+      return -1; // reach beyond token boundary
+    }
+
+
+    // Helpers to token string template in local mode
 
     function prepReparseStringTemplateInLocalMode(modeToUse, stream, state,
       hasBeginBacktick = true) {
@@ -169,10 +208,6 @@
       state.localState = CodeMirror.startState(state.localMode);
       state.inJsExprInStringTemplate = false;
       state.jsExprDepthInStringTemplate = 0;
-    }
-
-    function tokenLastChar(stream) {
-      return stream.string.charAt(stream.pos - 1) || undefined;
     }
 
     function isEndBacktick(stream, state) {
@@ -206,7 +241,7 @@
         const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
         switch (modeName) {
         case 'html':
-          return indexOfJsExprStartInString(stream.current());
+          return tokenIndexOfUnescaped(stream, '${');
         case 'css':
           return cssMode.indexOfJsExprStartInStream(stream, modeState);
         case 'javascript':
@@ -249,7 +284,7 @@
         // else look for ${ in the entire token.
         //   It only works for limited cases such as content property value,
         //   where CSS parser sees entire expression as string.
-        return indexOfJsExprStartInString(stream.current());
+        return tokenIndexOfUnescaped(stream, '${');
       },
 
       ensureProperLocalModeStatePostJsExpr(stream, state, style) {
@@ -285,22 +320,11 @@
       },
     });
 
-    function indexOfJsExprStartInString(text) {
-      // whether encounter js expression ${, but excluding cases that $ is escaped, i.e., \$
-      const jsExprMatch = text.match(/[^\\][$][{]|^[$][{]/);
-      if (!jsExprMatch) {
-        return -1;
-      }
-      // case there is an js expression
-      return jsExprMatch[0].charAt(0) === '$' ? jsExprMatch.index : jsExprMatch.index + 1;
-    }
-
     function tokenJsExpressionInStringTemplate(stream, state) {
       const style = jsMode.token(stream, state.jsState);
       dbg('  local mode js expr token - ', stream.current(), `[${style}]`, state.jsState.lastType);
       // track ${ , } to determine when the expression is complete.
-      const text = stream.current();
-      if (style === 'string-2' && indexOfJsExprStartInString(text) >= 0) { // case nested ${
+      if (style === 'string-2' && tokenIndexOfUnescaped(stream, '${') >= 0) { // case nested ${
         state.jsExprDepthInStringTemplate += 1;
         dbg('    jsExprDepthInStringTemplate inc:', state.jsExprDepthInStringTemplate);
       } else if (style === 'string-2' && state.jsState.lastType === '}') { // case expression-ending }
@@ -323,16 +347,6 @@
       return style;
     }
 
-    function indexOfBacktickInString(text) {
-      // whether encounter backtick ` (not those escaped)
-      const jsExprMatch = text.match(/[^\\][`]|^[`]/);
-      if (!jsExprMatch) {
-        return -1;
-      }
-      // case there is an js expression
-      return jsExprMatch[0].charAt(0) === '`' ? jsExprMatch.index : jsExprMatch.index + 1;
-    }
-
     // For use of tokenInLocalModeStringTemplate,
     // to handle cases that the token contains string template ending backtick, i.e.,
     // bleeding over the string template
@@ -342,13 +356,12 @@
         // so do nothing
         return;
       }
-      const text = stream.current();
-      const backtickPos = indexOfBacktickInString(text);
+      const backtickPos = tokenIndexOfUnescaped(stream, '`');
       if (backtickPos < 0) {
         return;
       }
-      dbg('  local mode token contains a backtick, exclude text starting with it:', text);
-      stream.backUp(text.length - backtickPos);
+      dbg('  local mode token contains a backtick, exclude text starting with it:', stream.current());
+      stream.backUp(tokenLength(stream) - backtickPos);
     }
 
     function tokenInLocalModeStringTemplate(stream, state) {
@@ -380,6 +393,9 @@
       // as the ${ to be handled by js tokenizer the next time
       return style;
     }
+
+
+    // Helpers to token plain string (single/double-quoted) in local mode
 
     function prepReparsePlainStringInLocalMode(modeToUse, stream, state) {
       dbg(`Entering local ${modeToUse.name} mode... (plain string)`);
