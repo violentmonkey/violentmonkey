@@ -416,7 +416,7 @@
 
     // Holds input parameters and return values for a rule execution
     class RunContext {
-      constructor(stream, state, jsTokenStyle) {
+      init(stream, state, jsTokenStyle) {
         /**
          * @readonly
          */
@@ -440,6 +440,8 @@
          * STYLE_PASS if the inner mode is not applicable.
          */
         this.style = STYLE_PASS;
+
+        this._text = null;
       }
 
       /**
@@ -453,7 +455,20 @@
         }
         return this._text;
       }
+
+      /**
+       * @return the singleton instance. It's used only by matchRule. Use a singleton
+       * to reduce object creation overhead
+       */
+      static get(stream, state, jsTokenStyle) {
+        if (!RunContext._singleton) {
+          RunContext._singleton = new RunContext();
+        }
+        RunContext._singleton.init(stream, state, jsTokenStyle);
+        return RunContext._singleton;
+      }
     }
+
 
     class Rule {
       constructor(props) {
@@ -489,7 +504,7 @@
     }
 
     function matchRule(rules, stream, state, jsTokenStyle) {
-      const ctx = new RunContext(stream, state, jsTokenStyle);
+      const ctx = RunContext.get(stream, state, jsTokenStyle);
       for (const r of rules) {
         if (r.curContext === (state.maybeLocalContext || '<start>')) {
           // dbg('  rule:', r.curContext, r.match.toString());
