@@ -1464,6 +1464,61 @@ undefined | )
 undefined | ;
 undefined |
 undefined |
+comment | // corner cases involving escaping
+undefined |
+comment | // - not a legit js expression, as the $ is escaped
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+variable | String
+undefined | .
+property | raw
+string-2 | `
+tag bracket | <
+tag | p
+tag bracket | >
+null | prefix\${expr1()}suffix2
+tag bracket | </
+tag | p
+tag bracket | >
+tag bracket | <
+tag | hr
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+comment | // - a legit js expression, the $ looks escaped, but it is not: the backslash itself is escaped
+undefined |
+variable | someUi
+null |
+operator | =
+null |
+variable | String
+undefined | .
+property | raw
+string-2 | `
+tag bracket | <
+tag | p
+tag bracket | >
+null | prefix\\
+string-2 | ${
+variable | expr1
+undefined | (
+undefined | )
+string-2 | }
+null | suffix
+tag bracket | </
+tag | p
+tag bracket | >
+tag bracket | <
+tag | hr
+tag bracket | >
+string-2 | `
+undefined | ;
+undefined |
+undefined |
 keyword | const
 null |
 def | foo

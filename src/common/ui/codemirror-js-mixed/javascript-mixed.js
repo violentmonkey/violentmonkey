@@ -156,6 +156,25 @@
       return stream.string.charAt(stream.pos - 1) || undefined;
     }
 
+    function tokenIsCharEscaped(stream, charPos) {
+      // assume charPos is within current token,
+      // i.e., stream.start <= charPos < stream.pos
+
+      // consider cases, for the 5 below:
+      //  0123\56  : escaped
+      //  012\\56  : not escaped
+      //  01\\\56  : escaped
+      let isEscaped = false;
+      for (let i = charPos - 1; i >= stream.start; i -= 1) {
+        if (stream.string.charAt(i) === '\\') {
+          isEscaped = !isEscaped;
+        } else {
+          break;
+        }
+      }
+      return isEscaped;
+    }
+
     /**
      * Return the index of searchValue within the current token, i.e., stream.current(),
      * excluding those prefixed with escape. E.g., if searchValue is "${", it will ignore
@@ -176,7 +195,8 @@
           return -1;
         }
         // ensure it's not an escaped one
-        if (stream.string.charAt(candidate - 1) !== '\\') {
+        if (candidate === tokenStartIdx // candidate is the start of the token, it is not escaped
+            || !tokenIsCharEscaped(stream, candidate)) {
           // case find a match
           return candidate - tokenStartIdx;
         }

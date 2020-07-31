@@ -217,6 +217,12 @@ the close curly bracket above (a standalone token) is not mistaken as the ending
 `)}">Hello World
 </section>`);
 
+// corner cases involving escaping
+// - not a legit js expression, as the $ is escaped
+someUi = String.raw`<p>prefix\${expr1()}suffix2</p><hr>`;
+// - a legit js expression, the $ looks escaped, but it is not: the backslash itself is escaped
+someUi = String.raw`<p>prefix\\${expr1()}suffix</p><hr>`;
+
 const foo = 1;
 
 // works for CSS too
