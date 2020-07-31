@@ -244,12 +244,12 @@
     }
 
     // Local mode-specific helpers to handle js expression in string template
-    function curModeNameAndStateOfHtmlmixed(htmlmixedState) {
-      if (!htmlmixedState.localMode) {
-        return ['html', htmlmixedState.htmlState];
-      }
-      // else return local css / javascript name, state
-      return [htmlmixedState.localMode.name, htmlmixedState.localState];
+    function curModeNameOfHtmlmixed(htmlmixedState) {
+      return (!htmlmixedState.localMode) ? 'html' : htmlmixedState.localMode.name;
+    }
+
+    function curModeStateOfHtmlmixed(htmlmixedState) {
+      return (!htmlmixedState.localMode) ? htmlmixedState.htmlState : htmlmixedState.localState;
     }
 
     Object.assign(htmlmixedMode, {
@@ -258,22 +258,24 @@
        *         current token start position, i.e., stream.start; -1 otherwise.
        */
       indexOfJsExprStart(stream, state) {
-        const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
+        const modeName = curModeNameOfHtmlmixed(state.localState);
         switch (modeName) {
         case 'html':
           return tokenIndexOfUnescaped(stream, '${');
         case 'css':
-          return cssMode.indexOfJsExprStart(stream, modeState);
+          // css state is in the localState of htmlmixed
+          return cssMode.indexOfJsExprStart(stream, curModeStateOfHtmlmixed(state.localState));
         case 'javascript':
           return -1; // let js mode handle ${ natively
         default:
-          console.error('htmlmixedMode.indexOfJsExprStart() - unrecognized mode:', modeName, modeState);
+          console.error('htmlmixedMode.indexOfJsExprStart() - unrecognized mode:', modeName);
         }
         return -1; // should never reach here
       },
 
       ensureProperLocalModeStatePostJsExpr(stream, state, style) {
-        const [modeName, modeState] = curModeNameAndStateOfHtmlmixed(state.localState);
+        const modeName = curModeNameOfHtmlmixed(state.localState);
+        const modeState = curModeStateOfHtmlmixed(state.localState);
         switch (modeName) {
         case 'html':
           if (modeState.state === htmlStateHelper.stateForAttrValue) {
@@ -287,7 +289,7 @@
         case 'javascript':
           break; // NO-OP
         default:
-          console.error('htmlmixedMode.ensureProperLocalModeStatePostJsExpr() - unrecognized mode:', modeName, modeState);
+          console.error('htmlmixedMode.ensureProperLocalModeStatePostJsExpr() - unrecognized mode:', modeName);
         }
       },
     });
@@ -742,7 +744,10 @@
       // optimization: short-circuit to skip local mode match when the rules won't cover
       // Note: if the rules change (the <start> ones), the conditions here might need to be updated accordingly.
       if (state.maybeLocalContext == null
-        && !['variable', 'comment', 'string', 'string-2'].includes(tokenStyle)) {
+          && tokenStyle !== 'variable'
+          && tokenStyle !== 'comment'
+          && tokenStyle !== 'string'
+          && tokenStyle !== 'string-2') {
         // dbg('   <--', `[${tokenStyle}]`, stream.current());
         return tokenStyle;
       }
