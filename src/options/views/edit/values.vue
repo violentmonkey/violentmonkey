@@ -2,6 +2,9 @@
   <div class="edit-values" ref="container">
     <div class="mb-1">
       <button @click="onNew">+</button>
+      <tooltip :content="i18n('editValueAllHint')" align="left">
+        <button @click="onEditAll" v-text="i18n('editValueAll')"/>
+      </tooltip>
       <div class="inline-block ml-2" v-if="totalPages > 1">
         <button :disabled="page === 1" @click="page -= 1">&larr;</button>
         <span class="ml-1" v-text="page"/> / <span class="mr-1" v-text="totalPages"/>
@@ -31,8 +34,8 @@
       </a>
     </div>
     <div class="edit-values-panel flex flex-col" v-if="current">
-      <div class="flex mb-1">
-        <h4 class="flex-auto" v-text="i18n('labelEditValue')"></h4>
+      <div class="control">
+        <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
         <div>
           <button v-text="i18n('editValueSave')" @click="onSave"
                   :class="{'has-error': current.error}"
@@ -41,17 +44,21 @@
           <button v-text="i18n('editValueCancel')" @click="onCancel"></button>
         </div>
       </div>
-      <label class="mb-1" v-text="i18n('valueLabelKey')"></label>
-      <input type="text" v-model="current.key" :readOnly="!current.isNew"
-             ref="key"
-             spellcheck="false"
-             @keydown.esc.exact.stop="onCancel">
-      <label class="mt-1 mb-1" v-text="i18n('valueLabelValue')"></label>
-      <textarea class="flex-auto" v-model="current.value"
-                ref="value"
-                spellcheck="false"
-                @input="onChange"
-                @keydown.esc.exact.stop="onCancel"/>
+      <label v-show="!current.isAll">
+        <span v-text="i18n('valueLabelKey')"/>
+        <input type="text" v-model="current.key" :readOnly="!current.isNew"
+               ref="key"
+               spellcheck="false"
+               @keydown.esc.exact.stop="onCancel">
+      </label>
+      <label>
+        <span v-text="current.isAll ? i18n('valueLabelValueAll') : i18n('valueLabelValue')"/>
+        <textarea v-model="current.value"
+                  ref="value"
+                  spellcheck="false"
+                  @input="onChange"
+                  @keydown.esc.exact.stop="onCancel"/>
+      </label>
     </div>
   </div>
 </template>
@@ -59,6 +66,7 @@
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { dumpScriptValue, sendCmd } from '#/common';
+import { mapEntry } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import storage from '#/common/storage';
 import { showMessage } from '../../utils';
@@ -177,6 +185,17 @@ export default {
         value: this.getValue(key),
       };
     },
+    onEditAll() {
+      this.current = {
+        isAll: true,
+        value: `{\n  ${
+          this.keys
+          .map(key => `${JSON.stringify(key)}: ${this.getValue(key)}`)
+          .join(',\n')
+          .replace(/\n/g, '\n  ') // also handles nested linebreaks inside objects/arrays
+        }\n}`,
+      };
+    },
     async onSave() {
       const { current } = this;
       if (current.jsonPaused) {
@@ -190,8 +209,17 @@ export default {
         showMessage({ text: current.error });
         return;
       }
-      await this.updateValue(current);
       this.current = null;
+      if (current.isAll) {
+        await sendCmd('SetValueStores', [{
+          where: {
+            id: this.script.props.id,
+          },
+          store: current.jsonValue::mapEntry(([, val]) => dumpScriptValue(val) || ''),
+        }]);
+      } else {
+        await this.updateValue(current);
+      }
     },
     onCancel() {
       this.current = null;
@@ -282,8 +310,32 @@ export default {
     @media (max-width: 767px) {
       width: 100%;
     }
+    > :not(:last-child) {
+      margin-bottom: .5em;
+    }
+    .control {
+      display: flex;
+      align-items: center;
+      h4 {
+        flex: auto;
+        width: 0;
+      }
+    }
     input {
       width: 100%;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      &:last-child,
+      &:last-child textarea {
+        flex: auto;
+        height: 0;
+      }
+      > textarea, input {
+        margin: .25em 0;
+        padding: .25em;
+      }
     }
     textarea {
       width: 100%;
