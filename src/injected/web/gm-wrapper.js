@@ -73,6 +73,37 @@ export function wrapGM(script) {
 
 function makeGmInfo(script, resources) {
   const { meta } = script;
+  const metaCopy = {};
+  objectKeys(meta)::forEach((key) => {
+    let val = meta[key];
+    switch (key) {
+    case 'match': // -> matches
+    case 'excludeMatch': // -> excludeMatches
+      key += 'e';
+    // fallthrough
+    case 'exclude': // -> excludes
+    case 'include': // -> includes
+      key += 's';
+      val = val::arraySlice(); // not using [...val] as it can be broken via Array#Symbol.iterator
+      break;
+    default:
+    }
+    metaCopy[key] = val;
+  });
+  [
+    'description',
+    'name',
+    'namespace',
+    'runAt',
+    'version',
+  ]::forEach((key) => {
+    if (!metaCopy[key]) metaCopy[key] = '';
+  });
+  metaCopy.resources = objectKeys(resources)::map(name => ({
+    name,
+    url: resources[name],
+  }));
+  metaCopy.unwrap = false; // deprecated, always `false`
   return {
     uuid: script.props.uuid,
     scriptMetaStr: script.metaStr,
@@ -81,22 +112,7 @@ function makeGmInfo(script, resources) {
     version: process.env.VM_VER,
     injectInto: bridge.mode,
     platform: assign({}, bridge.ua),
-    script: {
-      description: meta.description || '',
-      // using ::slice since array spreading can be broken via Array.prototype[Symbol.iterator]
-      excludes: meta.exclude::arraySlice(),
-      includes: meta.include::arraySlice(),
-      matches: meta.match::arraySlice(),
-      name: meta.name || '',
-      namespace: meta.namespace || '',
-      resources: objectKeys(resources)::map(name => ({
-        name,
-        url: resources[name],
-      })),
-      runAt: meta.runAt || '',
-      unwrap: false, // deprecated, always `false`
-      version: meta.version || '',
-    },
+    script: metaCopy,
   };
 }
 
