@@ -119,9 +119,9 @@ descEditorOptions:
   message: >-
     Aangepaste instellingen voor CodeMirror en uitbreidingen in json-objecten, zoals
     <code>{"indentUnit":2, "smartIndent":true}</code>. Let op: niet alle
-    werken gegarandeerd in Violentmonkey. See <a
+    werken gegarandeerd in Violentmonkey. Bekijk de <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">full list</a>.
+    rel="noopener noreferrer">volledige lijst</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentatie over gebruikersscript-metagegevensblokken en <code>GM</code> API:'
