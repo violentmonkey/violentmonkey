@@ -2,6 +2,7 @@ import { i18n, noop } from '#/common';
 import ua from '#/common/ua';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import { objectPick } from '#/common/object';
+import cache from './cache';
 import { postInitialize } from './init';
 import { forEachTab } from './message';
 import { getOption, hookOptions } from './options';
@@ -67,10 +68,15 @@ browser.tabs.onRemoved.addListener((id) => {
 });
 
 browser.tabs.onUpdated.addListener((tabId, info, tab) => {
+  const { url } = info;
+  if (url && ua.isFirefox) {
+    const badgeData = cache.pop(`badge:${tabId}${url}`);
+    if (badgeData) setBadge(...badgeData);
+  }
   if (info.status === 'loading'
       // at least about:newtab in Firefox may open without 'loading' status
       || info.favIconUrl && tab.url.startsWith('about:')) {
-    updateState(tab, info.url);
+    updateState(tab, url);
   }
 });
 
