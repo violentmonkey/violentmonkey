@@ -150,6 +150,12 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Wartości
+editValueAll:
+  description: Button to show/edit the entire script value storage.
+  message: Wszystko
+editValueAllHint:
+  description: Tooltip for the 'all' button.
+  message: Pokaż/edytuj całą pamięć wartości skryptu
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: Anuluj
@@ -291,6 +297,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Edytowanie wartości skryptu
+labelEditValueAll:
+  description: Label shown in the panel to edit the entire script value storage.
+  message: Edycja pamięci skryptów
 labelEditor:
   description: Label for Editor settings
   message: Edytor
@@ -635,6 +644,9 @@ valueLabelKey:
 valueLabelValue:
   description: Label for value of a script value.
   message: Wartość (serializowana jako JSON)
+valueLabelValueAll:
+  description: Label for input of entire script value storage.
+  message: Wszystkie wartości (serializowane jako JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Odwiedź stronę internetową rozszerzenia

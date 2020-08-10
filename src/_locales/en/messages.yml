@@ -146,15 +146,15 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Values
-editValueCancel:
-  description: Button to cancel modification of a script value.
-  message: Cancel
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: All
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: Show/edit the entire script value storage
+editValueCancel:
+  description: Button to cancel modification of a script value.
+  message: Cancel
 editValueSave:
   description: Button to save modification of a script value.
   message: Save
