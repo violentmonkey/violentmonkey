@@ -15,7 +15,7 @@ buttonEdit:
   message: 编辑
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: 你也可以右键点击、Ctrl+点击、滚轮点击脚本名字
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: 立即清空回收站！
@@ -143,6 +143,12 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: 数据
+editValueAll:
+  description: Button to show/edit the entire script value storage.
+  message: 全部
+editValueAllHint:
+  description: Tooltip for the 'all' button.
+  message: 展示/编辑脚本的所有数据
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: 取消
@@ -278,6 +284,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: 编辑数据
+labelEditValueAll:
+  description: Label shown in the panel to edit the entire script value storage.
+  message: 正在编辑脚本数据
 labelEditor:
   description: Label for Editor settings
   message: 编辑器
@@ -292,7 +301,7 @@ labelExportScriptData:
   message: 导出脚本数据
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 在用户脚本收录站点上暴露已安装的版本信息：$1
 labelFeedback:
   description: Label of link to feedback page.
   message: 反馈
@@ -361,7 +370,7 @@ labelPopupSort:
   message: 弹出菜单中的脚本按$1排序
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: 隐私策略
 labelRelated:
   description: Label of related links.
   message: 相关链接：
@@ -454,10 +463,10 @@ menuFindScripts:
   message: 为此站点查找脚本
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: 部分脚本无法注入。
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: ''
+  message: 使用“auto”模式重试
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: 仅在frame中执行的脚本
@@ -504,7 +513,7 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: 你在隐身模式下进行的修改也会应用到主配置中
 msgInstalled:
   description: Message shown when a script is installed.
   message: 脚本已安装。
@@ -616,6 +625,9 @@ valueLabelKey:
 valueLabelValue:
   description: Label for value of a script value.
   message: 键值（作为JSON序列化）
+valueLabelValueAll:
+  description: Label for input of entire script value storage.
+  message: 所有数据（JSON格式）
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: 访问网站

@@ -143,6 +143,12 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: 값
+editValueAll:
+  description: Button to show/edit the entire script value storage.
+  message: ''
+editValueAllHint:
+  description: Tooltip for the 'all' button.
+  message: ''
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: 취소
@@ -278,6 +284,9 @@ labelDownloadURL:
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: 스크립트 변수 수정
+labelEditValueAll:
+  description: Label shown in the panel to edit the entire script value storage.
+  message: ''
 labelEditor:
   description: Label for Editor settings
   message: 편집기
@@ -614,6 +623,9 @@ valueLabelKey:
 valueLabelValue:
   description: Label for value of a script value.
   message: 문자열 (JSON 으로 펼쳐진)
+valueLabelValueAll:
+  description: Label for input of entire script value storage.
+  message: ''
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: 웹 사이트 방문
