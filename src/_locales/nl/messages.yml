@@ -175,7 +175,7 @@ failureReasonNoninjectable:
     failureBlacklistedUrl)
   message: |-
     Violentmonkey kan geen gebruikersscripts uitvoeren op deze pagina
-    (voorbeelden: browservormgeving of een extensie)
+    (bijv. interne of extensiepagina's)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabetische volgorde
