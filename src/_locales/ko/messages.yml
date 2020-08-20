@@ -241,7 +241,7 @@ labelAuthor:
   message: '작성자: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: 메뉴에서 스크립트를 끄거나 키면 해당 탭을 새로고침
+  message: 메뉴에서 스크립트를 끄거나 켜면 해당 탭을 새로고침
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: '매 $1 일마다 업데이트합니다. (0 = 비활성화)'
