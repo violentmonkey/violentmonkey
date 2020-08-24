@@ -2410,6 +2410,11 @@ code-point-at@^1.0.0:
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
+codemirror-js-mixed@^0.9.2:
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/codemirror-js-mixed/-/codemirror-js-mixed-0.9.2.tgz#a369b03db197cf6bcc2516fa9ea3ce9d2bb2c479"
+  integrity sha512-ZmMp2/QM50CE6HoiU2CSTRwcJAamKVjXQzgbYjUjZAIZzFtrIigLwJBv8dlORYiIgpiYWIhTSR03C4i2c6zZnw==
+
 codemirror@^5.57.0:
   version "5.57.0"
   resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.57.0.tgz#d26365b72f909f5d2dbb6b1209349ca1daeb2d50"

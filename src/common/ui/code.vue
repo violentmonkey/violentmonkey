@@ -52,7 +52,7 @@
 <script>
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/eclipse.css';
-import 'codemirror/mode/javascript/javascript';
+import 'codemirror-js-mixed/mode/javascript-mixed/javascript-mixed';
 import 'codemirror/addon/comment/continuecomment';
 import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/edit/matchbrackets';
@@ -119,7 +119,7 @@ export const cmOptions = {
   foldGutter: true,
   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
   theme: 'eclipse',
-  mode: 'javascript',
+  mode: 'javascript-mixed',
   lineNumbers: true,
   matchBrackets: true,
   autoCloseBrackets: true,
