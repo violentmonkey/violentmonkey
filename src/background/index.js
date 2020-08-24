@@ -68,7 +68,10 @@ Object.assign(commands, {
     if (isApplied) {
       const data = await getInjectedScripts(url, tab.id, frameId);
       addValueOpener(tab.id, frameId, data.withValueIds);
-      setBadge(data.enabledIds, src);
+      const badgeData = [data.enabledIds, src];
+      setBadge(...badgeData);
+      // FF bug: the badge is reset because sometimes tabs get their real/internal url later
+      if (ua.isFirefox) cache.put(`badge:${tab.id}${url}`, badgeData);
       Object.assign(res, data.inject);
       data.registration?.then(r => r.unregister());
       // Injecting known content mode scripts without waiting for InjectionFeedback

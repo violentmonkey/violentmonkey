@@ -150,10 +150,10 @@ editNavValues:
   message: Hodnoty
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: ''
+  message: Všetko
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Zobraziť/upraviť celé úložisko hodnoty skriptu
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: Zrušiť
@@ -295,7 +295,7 @@ labelEditValue:
   message: Úprava hodnoty skriptu
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Úprava úložiska skriptu
 labelEditor:
   description: Label for Editor settings
   message: Editor
@@ -636,7 +636,7 @@ valueLabelValue:
   message: Hodnota (serializované ako JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Všetky hodnoty (serializované ako JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Prejsť na stránku
