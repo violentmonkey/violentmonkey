@@ -152,10 +152,10 @@ editNavValues:
   message: Valores
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: ''
+  message: Todo
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Mostrar/editar todo los valores de almacenamiento del script
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: Cancelar
@@ -200,10 +200,10 @@ filterScopeName:
   message: Nombre
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: desactivado
+  message: deshabilitado
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: activado
+  message: habilitado
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: usar configuración global
@@ -303,7 +303,7 @@ labelEditValue:
   message: Editar el valor del script
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Editar almacenamiento del script
 labelEditor:
   description: Label for Editor settings
   message: Editor
@@ -648,7 +648,7 @@ valueLabelValue:
   message: Valor (serializado como JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Todos los valores (serializados como JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Visitar sitio web
