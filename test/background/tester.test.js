@@ -114,6 +114,18 @@ test('host', (t) => {
     q.end();
   });
 
+  t.test('should ignore case', (q) => {
+    const script = buildScript({
+      meta: {
+        match: [
+          '*://GOOGLE.com/',
+        ],
+      },
+    });
+    q.ok(testScript('https://google.COM/', script), 'should ignore case');
+    q.end();
+  });
+
   t.end();
 });
 
@@ -179,6 +191,22 @@ test('path', (t) => {
     q.end();
   });
 
+  t.test('should be case-sensitive', (q) => {
+    const script = buildScript({
+      meta: {
+        match: [
+          'https://www.google.com/a?Query',
+          'https://www.google.com/b#Hash',
+        ],
+      },
+    });
+    q.ok(testScript('https://www.google.com/a?Query', script), 'query should be case-sensitive');
+    q.notOk(testScript('https://www.google.com/a?query', script), 'query should be case-sensitive');
+    q.ok(testScript('https://www.google.com/b#Hash', script), 'hash should be case-sensitive');
+    q.notOk(testScript('https://www.google.com/b#hash', script), 'hash should be case-sensitive');
+    q.end();
+  });
+
   t.end();
 });
 
@@ -222,6 +250,20 @@ test('include', (t) => {
     q.ok(testScript('https://www.google.com/', script), 'should match `.com`');
     q.ok(testScript('https://www.google.com.hk/', script), 'should match `.com.hk`');
     q.notOk(testScript('https://www.google.example.com/', script), 'should not match subdomains');
+    q.end();
+  });
+
+  t.test('should ignore case', (q) => {
+    const script = buildScript({
+      meta: {
+        include: [
+          'https://www.google.*',
+          '/regexp/',
+        ],
+      },
+    });
+    q.ok(testScript('https://www.GOOGLE.com/', script), 'should ignore case');
+    q.ok(testScript('https://www.REGEXP.com/', script), 'should ignore case');
     q.end();
   });
 });
@@ -306,6 +348,19 @@ test('exclude-match', (t) => {
     q.notOk(testScript('https://www.google.com/', script), 'should exclude `/`');
     q.notOk(testScript('https://www.google.com/hello/world', script), 'exclude by prefix');
     q.ok(testScript('https://www.hello.com/', script), 'not exclude by prefix');
+    q.end();
+  });
+
+  t.test('should ignore case only in host', (q) => {
+    const script = buildScript({
+      meta: {
+        match: [
+          '*://GOOGLE.com/FOO?BAR#HASH',
+        ],
+      },
+    });
+    q.ok(testScript('https://google.COM/FOO?BAR#HASH', script), 'should ignore case in host');
+    q.notOk(testScript('https://google.com/foo?bar#hash', script), 'should ignore case in host only');
     q.end();
   });
 });
