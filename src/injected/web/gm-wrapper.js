@@ -136,6 +136,10 @@ if (global !== window) {
     }
   });
 }
+// FF doesn't expose wrappedJSObject as own property so we add it explicitly
+if (global.wrappedJSObject) {
+  globalKeys.push('wrappedJSObject');
+}
 const inheritedKeys = new Set([
   ...getOwnPropertyNames(EventTarget.prototype),
   ...getOwnPropertyNames(Object.prototype),
