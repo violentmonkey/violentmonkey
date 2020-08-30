@@ -94,9 +94,11 @@ function bindRE(re) {
 
 function autoReg(str) {
   if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
-    const re = new RegExp(str.slice(1, -1));
+    const re = new RegExp(str.slice(1, -1), 'i');
     return { test: bindRE(re) };
   }
+  // glob mode: case-insensitive to match GM4 & Tampermonkey bugged behavior
+  str = str.toLowerCase();
   const reStr = str2RE(str);
   if (tld.isReady() && str.includes('.tld/')) {
     const reTldStr = reStr.replace('\\.tld/', '((?:\\.\\w+)+)/');
@@ -104,14 +106,14 @@ function autoReg(str) {
       test: (tstr) => {
         const matches = tstr.match(reTldStr);
         if (matches) {
-          const suffix = matches[1].slice(1);
+          const suffix = matches[1].slice(1).toLowerCase();
           if (tld.getPublicSuffix(suffix) === suffix) return true;
         }
         return false;
       },
     };
   }
-  const re = new RegExp(`^${reStr}$`); // String with wildcards
+  const re = new RegExp(`^${reStr}$`, 'i'); // String with wildcards
   return { test: bindRE(re) };
 }
 
@@ -144,17 +146,21 @@ function hostMatcher(rule) {
     base = base.slice(0, -4);
     suffix = RE_STR_TLD;
   }
-  const re = new RegExp(`^${prefix}${str2RE(base)}${suffix}$`);
+  const re = new RegExp(`^${prefix}${str2RE(base)}${suffix}$`, 'i');
+  let ruleLC;
   return (data) => {
     // * matches all
     if (rule === '*') return 1;
     // exact match
     if (rule === data) return 1;
+    // host matching is case-insensitive
+    if (!ruleLC) ruleLC = rule.toLowerCase();
+    if (ruleLC === data.toLowerCase()) return 1;
     const matches = data.match(re);
     if (matches) {
       const [, tldStr] = matches;
       if (!tldStr) return 1;
-      const tldSuffix = tldStr.slice(1);
+      const tldSuffix = tldStr.slice(1).toLowerCase();
       return tld.getPublicSuffix(tldSuffix) === tldSuffix;
     }
     return 0;
