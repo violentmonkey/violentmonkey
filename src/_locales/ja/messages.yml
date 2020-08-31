@@ -164,7 +164,7 @@ extName:
   message: Violentmonkey
 failureReasonBlacklisted:
   description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
-  message: 設定によりブラックリストに登録されています
+  message: 設定によりブロックリストに登録されています
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
@@ -260,7 +260,7 @@ labelBadgeUnique:
   message: 一意な実行中のスクリプト数
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: ブラックリスト
+  message: ブロックリスト
 labelContributors:
   description: Label for link to contributors.
   message: 貢献者
@@ -551,7 +551,7 @@ msgNoUpdate:
   message: 更新は見つかりませんでした。
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: ブラックリストを更新しました。
+  message: ブロックリストを更新しました。
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: カスタムスタイルが更新されました。
