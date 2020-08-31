@@ -104,9 +104,9 @@ function autoReg(str) {
     const reTldStr = reStr.replace('\\.tld/', '((?:\\.\\w+)+)/');
     return {
       test: (tstr) => {
-        const matches = tstr.match(reTldStr);
+        const matches = tstr.toLowerCase().match(reTldStr);
         if (matches) {
-          const suffix = matches[1].slice(1).toLowerCase();
+          const suffix = matches[1].slice(1);
           if (tld.getPublicSuffix(suffix) === suffix) return true;
         }
         return false;
