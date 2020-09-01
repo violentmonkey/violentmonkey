@@ -1,5 +1,4 @@
-Violentmonkey
-=============
+# Violentmonkey
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/jinjaccalgkegednnccohejagnlnfdag.svg)](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
 [![Firefox Add-ons](https://img.shields.io/amo/v/violentmonkey.svg)](https://addons.mozilla.org/firefox/addon/violentmonkey)
@@ -12,14 +11,17 @@ It works on browsers with [WebExtensions](https://developer.mozilla.org/en-US/Ad
 
 More details can be found [here](https://violentmonkey.github.io/).
 
-Related projects
----
+## Related projects
+
 - [Violentmonkey for Opera Presto](https://github.com/violentmonkey/violentmonkey-oex)
 - [Violentmonkey for Maxthon](https://github.com/violentmonkey/violentmonkey-mx)
 
-Development
----
-Make sure [Node.js](https://nodejs.org/) greater than v10.0 is installed.
+## Workflows
+
+### Development
+
+Make sure [Node.js](https://nodejs.org/) greater than v10.0 and Yarn v1.x is installed.
+
 ``` sh
 # Install dependencies
 $ yarn
@@ -27,10 +29,37 @@ $ yarn
 # Watch and compile
 $ yarn dev
 ```
+
 Then load the extension from 'dist/'.
 
-Build
----
+### Building
+
+After a new (pre)release is created, we should build the project and upload to web stores.
+
 ``` sh
+# Build for normal releases
 $ yarn build
+
+# Build for self-hosted release that has an update_url
+$ yarn build:selfHosted
+```
+
+### Prerelease
+
+```sh
+$ yarn bump
+```
+
+### Release
+
+```sh
+$ yarn version --patch
+```
+
+### Announcing updates
+
+Create a new `updates.json` so that self-hosted versions can be updated to the new version.
+
+```sh
+$ yarn update:selfHosted
 ```
