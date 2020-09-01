@@ -3,9 +3,9 @@
   "version": "2.12.7",
   "scripts": {
     "dev": "gulp dev",
-    "prebuild": "yarn lint",
+    "prebuild": "yarn ci",
     "build": "cross-env NODE_ENV=production gulp build",
-    "build:firefox": "cross-env TARGET=firefox yarn build",
+    "build:selfHosted": "cross-env TARGET=selfHosted yarn build",
     "analyze": "cross-env RUN_ENV=analyze npm run build",
     "i18n": "gulp i18n",
     "copyI18n": "gulp copyI18n",
@@ -14,7 +14,11 @@
     "lint:yml": "gulp check",
     "svgo": "plaid svgo",
     "test": "cross-env BABEL_ENV=test tape -r ./test/mock/register 'test/**/*.test.js'",
-    "transform": "locky yarn yarn"
+    "ci": "yarn lint && yarn test",
+    "transform": "locky yarn yarn",
+    "bump": "yarn ci && gulp bump --commit",
+    "preversion": "yarn ci && gulp bump --reset",
+    "update:selfHosted": "gulp updateVersions"
   },
   "description": "Violentmonkey",
   "devDependencies": {

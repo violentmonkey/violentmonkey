@@ -1,3 +1,4 @@
+const fs = require('fs').promises;
 const gulp = require('gulp');
 const del = require('del');
 const log = require('fancy-log');
@@ -5,11 +6,9 @@ const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const plumber = require('gulp-plumber');
 const yaml = require('js-yaml');
-const webpack = require('webpack');
 const { isProd } = require('@gera2ld/plaid/util');
-const webpackConfig = require('./scripts/webpack.conf');
+const spawn = require('cross-spawn');
 const i18n = require('./scripts/i18n');
-const string = require('./scripts/string');
 const pkg = require('./package.json');
 
 const DIST = 'dist';
@@ -26,26 +25,6 @@ const paths = {
     'src/**/*.@(js|html|json|yml|vue)',
   ],
 };
-
-function webpackCallback(err, stats) {
-  if (err) {
-    log('[FATAL]', err);
-    return;
-  }
-  if (stats.hasErrors()) {
-    log('[ERROR] webpack compilation failed\n', stats.toJson().errors.join('\n'));
-    return;
-  }
-  if (stats.hasWarnings()) {
-    log('[WARNING] webpack compilation has warnings\n', stats.toJson().warnings.join('\n'));
-  }
-  (Array.isArray(stats.stats) ? stats.stats : [stats])
-  .forEach(stat => {
-    const timeCost = (stat.endTime - stat.startTime) / 1000;
-    const chunks = Object.keys(stat.compilation.namedChunks).join(' ');
-    log(`Webpack built: [${timeCost.toFixed(3)}s] ${chunks}`);
-  });
-}
 
 function clean() {
   return del(DIST);
@@ -68,16 +47,76 @@ async function jsProd() {
   });
 }
 
-function manifest() {
-  return gulp.src(paths.manifest, { base: 'src' })
-  .pipe(string((input, file) => {
-    const data = yaml.safeLoad(input);
-    // Strip alphabetic suffix
-    data.version = pkg.version.replace(/-[^.]*/, '');
-    file.path = file.path.replace(/\.yml$/, '.json');
-    return JSON.stringify(data);
-  }))
-  .pipe(gulp.dest(DIST));
+/**
+ * Derive extension version from pkg.version and pkg.beta fields.
+ *
+ * > manifest.version = `${pkg.version}.${pkg.beta}`
+ */
+function getVersion() {
+  let version = pkg.version.replace(/-[^.]*/, '');
+  if (pkg.beta) version += `.${pkg.beta}`;
+  return version;
+}
+
+async function readManifest() {
+  const input = await fs.readFile(paths.manifest, 'utf8');
+  const data = yaml.safeLoad(input);
+  return data;
+}
+
+/**
+ * Versioning
+ *
+ * The version of extension is composed of `version` and `beta` fields in `package.json`, i.e.
+ *
+ * Note: prerelease is ignored and not recommended since both Chrome and Firefox do not support semver
+ *
+ */
+async function manifest() {
+  const data = await readManifest();
+  data.version = getVersion();
+  if (process.env.TARGET === 'selfHosted') {
+    data.browser_specific_settings.gecko.update_url = 'https://raw.githubusercontent.com/violentmonkey/violentmonkey/master/updates.json';
+  }
+  await fs.writeFile(`${DIST}/manifest.json`, JSON.stringify(data), 'utf8');
+}
+
+/**
+ * Bump `beta` in `package.json` to release a new beta version.
+ */
+async function bump() {
+  if (process.argv.includes('--reset')) {
+    delete pkg.beta;
+  } else {
+    pkg.beta = (+pkg.beta || 0) + 1;
+  }
+  await fs.writeFile('package.json', JSON.stringify(pkg, null, 2), 'utf8');
+  if (process.argv.includes('--commit')) {
+    const version = `v${getVersion()}`;
+    spawn.sync('git', ['commit', '-am', version]);
+    spawn.sync('git', ['tag', '-m', version, version]);
+  }
+}
+
+/**
+ * Create an update manifest file to announce a new self-hosted release.
+ */
+async function updateVersions() {
+  const manifest = await readManifest();
+  const version = getVersion();
+  const data = {
+    addons: {
+      [manifest.browser_specific_settings.gecko.id]: {
+        updates: [
+          {
+            version,
+            update_link: `https://github.com/violentmonkey/violentmonkey/releases/download/v${version}/violentmonkey-${version}-an.fx.xpi`,
+          },
+        ],
+      }
+    },
+  };
+  await fs.writeFile('updates.json', JSON.stringify(data, null, 2), 'utf8');
 }
 
 function copyFiles() {
@@ -139,3 +178,5 @@ exports.build = gulp.series(clean, gulp.parallel(pack, jsProd));
 exports.i18n = updateI18n;
 exports.check = checkI18n;
 exports.copyI18n = copyI18n;
+exports.bump = bump;
+exports.updateVersions = updateVersions;
