@@ -6,25 +6,39 @@ function delay(time) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
-function transifexRequest(url, {
-  method = 'GET',
-  responseType = 'json',
-  data = null,
-} = {}) {
+function defer() {
+  const deferred = {};
+  deferred.promise = new Promise((resolve, reject) => {
+    deferred.resolve = resolve;
+    deferred.reject = reject;
+  });
+  return deferred;
+}
+
+function memoize(fn) {
+  const cache = {};
+  function wrapped(...args) {
+    const key = args.toString();
+    let result = cache[key];
+    if (!result) {
+      result = { data: fn(...args) };
+      cache[key] = result;
+    }
+    return result.data;
+  }
+  return wrapped;
+}
+
+function exec(cmd, args, options) {
   return new Promise((resolve, reject) => {
-    const child = spawn('curl', [
-      '-sSL',
-      '--user',
-      `api:${process.env.TRANSIFEX_TOKEN}`,
-      '-X',
-      method,
-      '-H',
-      'Content-Type: application/json',
-      ...data == null ? [] : ['-d', '@-'],
-      `https://www.transifex.com${url}`,
-    ], { stdio: ['pipe', 'pipe', 'inherit'] });
-    if (data != null) {
-      child.stdin.write(JSON.stringify(data));
+    const { stdin, ...rest } = options || {};
+    const child = spawn(
+      cmd,
+      args,
+      { ...rest, stdio: ['pipe', 'pipe', 'inherit'] },
+    );
+    if (stdin != null) {
+      child.stdin.write(stdin);
       child.stdin.end();
     }
     const stdoutBuffer = [];
@@ -36,19 +50,49 @@ function transifexRequest(url, {
         reject(code);
         return;
       }
-      let result = Buffer.concat(stdoutBuffer).toString('utf8');
-      if (responseType === 'json') {
-        try {
-          result = JSON.parse(result);
-        } catch (err) {
-          console.error('stdout: ' + result);
-          reject(err);
-          return;
-        }
-      }
+      const result = Buffer.concat(stdoutBuffer).toString('utf8');
       resolve(result);
     });
   });
+}
+
+let lastRequest;
+async function transifexRequest(url, {
+  method = 'GET',
+  responseType = 'json',
+  data = null,
+} = {}) {
+  const deferred = defer();
+  const prevRequest = lastRequest;
+  lastRequest = deferred.promise;
+  try {
+    await prevRequest;
+    let result = await exec(
+      'curl',
+      [
+        '-sSL',
+        '--user',
+        `api:${process.env.TRANSIFEX_TOKEN}`,
+        '-X',
+        method,
+        '-H',
+        'Content-Type: application/json',
+        ...data == null ? [] : ['-d', '@-'],
+        `https://www.transifex.com${url}`,
+      ],
+      {
+        stdin: data ? JSON.stringify(data) : null,
+      },
+    );
+    if (responseType === 'json') {
+      result = JSON.parse(result);
+    }
+    deferred.resolve(delay(500));
+    return result;
+  } catch (err) {
+    deferred.reject(err);
+    throw err;
+  }
 }
 
 async function getLanguages() {
@@ -64,14 +108,33 @@ async function loadRemote(lang) {
   return remote;
 }
 
-async function loadData(lang) {
+const loadData = memoize(async function loadData(lang) {
   const remote = await loadRemote(lang);
   const filePath = `src/_locales/${lang}/messages.yml`;
   const local = yaml.safeLoad(await fs.readFile(filePath, 'utf8'));
-  return { lang, local, remote, filePath };
-}
+  return { local, remote, filePath };
+});
 
-async function pushTranslations({ local, remote, lang }) {
+const loadUpdatedLocales = memoize(async function loadUpdatedLocales() {
+  const diffUrl = process.env.DIFF_URL;
+  const result = await exec('curl', ['-sSL', diffUrl]);
+  // Example:
+  // diff --git a/src/_locales/ko/messages.yml b/src/_locales/ko/messages.yml
+  const codes = result.split('\n')
+    .map(line => {
+      const matches = line.match(/^diff --git a\/src\/_locales\/([^/]+)\/messages.yml b\/src\/_locales\/([^/]+)\/messages.yml$/);
+      const [, code1, code2] = matches || [];
+      return code1 === code2 && code1;
+    })
+    .filter(Boolean);
+  return codes;
+});
+
+async function pushTranslations(lang) {
+  const codes = await loadUpdatedLocales();
+  // Limit to languages changed in this PR only
+  if (!codes.includes(lang)) return;
+  const { local, remote } = await loadData(lang);
   const remoteUpdate = {};
   Object.entries(local)
   .forEach(([key, value]) => {
@@ -92,10 +155,13 @@ async function pushTranslations({ local, remote, lang }) {
       data: updates,
     });
     process.stdout.write('  finished\n');
+  } else {
+    process.stdout.write('up to date\n');
   }
 }
 
-async function pullTranslations({ local, remote, filePath }) {
+async function pullTranslations(code) {
+  const { local, remote, filePath } = await loadData(code);
   Object.entries(local)
   .forEach(([key, value]) => {
     const remoteMessage = remote[key] && remote[key].message;
@@ -117,24 +183,22 @@ async function main() {
     await fs.mkdir(`src/_locales/${code}`, { recursive: true });
   }
   spawn.sync('yarn', ['i18n'], { stdio: 'inherit' });
-  let finished = 0;
-  const showProgress = () => {
-    process.stdout.write(`\rLoading translations (${finished}/${codes.length})...`);
+  let current = 0;
+  const showProgress = (lang) => {
+    process.stdout.write(`\rLoading translations ${lang} (${current}/${codes.length})...`);
   };
-  showProgress();
   for (const code of codes) {
-    await delay(500);
+    current += 1;
+    showProgress(code);
     try {
-      const data = await loadData(code);
-      await handle(data);
+      await handle(code);
     } catch (err) {
       process.stderr.write(`\nError pulling ${code}\n`)
       console.error(err);
     }
-    finished += 1;
-    showProgress();
   }
-  process.stdout.write('OK\n');
+  showProgress('OK');
+  process.stdout.write('\n');
 }
 
 main();
