@@ -18,7 +18,7 @@ buttonEditClickHint:
   message: ''
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: '지금 휴지통 비우기!'
+  message: 지금 휴지통 비우기!
 buttonEnable:
   description: Button to enable a script.
   message: 활성화
@@ -115,8 +115,8 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    CodeMirror와 애드온의 설정은 <code>{"indentUnit":2, "smartIndent":true}</code> 와
-    같은 JSON 오브젝트로 할 수 있으며 몇몇 설정은 Violentmonkey 에서 작동하지 않을 수 있습니다. <a
+    CodeMirror와 애드온의 설정은 <code>{"indentUnit":2, "smartIndent":true}</code> 와 같은
+    JSON 오브젝트로 할 수 있으며 몇몇 설정은 Violentmonkey 에서 작동하지 않을 수 있습니다. <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">전체 목록</a>을 확인하세요.
 editHelpDocumention:
@@ -244,7 +244,7 @@ labelAutoReloadCurrentTab:
   message: 메뉴에서 스크립트를 끄거나 켜면 해당 탭을 새로고침
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: '매 $1 일마다 업데이트합니다. (0 = 비활성화)'
+  message: 매 $1 일마다 업데이트합니다. (0 = 비활성화)
 labelBadge:
   description: Label for option to show number on badge.
   message: 배지에 보일 숫자
@@ -466,7 +466,7 @@ menuInjectionFailed:
   message: 일부 스크립트를 삽입할 수 없습니다.
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: "자동" 모드로 재시도
+  message: '"자동" 모드로 재시도'
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: 하위 프레임 스크립트들
