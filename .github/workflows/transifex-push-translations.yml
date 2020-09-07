@@ -12,6 +12,8 @@ jobs:
     # if PR with label `i18n` is merged
     if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'i18n')
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Upload translations
         run: node scripts/transifex push
         env:
