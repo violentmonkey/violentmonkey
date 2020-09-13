@@ -55,9 +55,10 @@
 
 <script>
 import CodeMirror from 'codemirror';
-import { i18n, sendCmd } from '#/common';
+import { debounce, i18n, sendCmd } from '#/common';
 import { deepCopy, deepEqual, forEachEntry, objectPick } from '#/common/object';
 import VmCode from '#/common/ui/code';
+import options from '#/common/options';
 import { route } from '#/common/router';
 import { store, showConfirmation, showMessage } from '../../utils';
 import VmSettings from './settings';
@@ -89,6 +90,34 @@ const toList = text => (
 );
 let saved;
 let showingConfirmation;
+
+let shouldSavePositionOnSave;
+const savePosition = () => {
+  if (options.get('editorWindow')) {
+    options.set('editorWindowPos', {
+      left: window.screenX,
+      top: window.screenY,
+      width: window.outerWidth,
+      height: window.outerHeight,
+    });
+  }
+};
+/** @param {chrome.windows.Window} _ */
+const setupSavePosition = ({ id: curWndId, tabs }) => {
+  if (tabs.length === 1) {
+    const { onBoundsChanged } = global.chrome.windows;
+    if (onBoundsChanged) {
+      // triggered on moving/resizing, Chrome 86+
+      onBoundsChanged.addListener(wnd => {
+        if (wnd.id === curWndId) savePosition();
+      });
+    } else {
+      // triggered on resizing only
+      window.addEventListener('resize', debounce(savePosition, 100));
+      shouldSavePositionOnSave = true;
+    }
+  }
+};
 
 let K_SAVE; // deduced from the current CodeMirror keymap
 const K_PREV_PANEL = 'Alt-PageUp';
@@ -163,6 +192,9 @@ export default {
   created() {
     this.script = this.initial;
     document.addEventListener('keydown', this.switchPanel);
+    if (options.get('editorWindow') && global.history.length === 1) {
+      browser.windows?.getCurrent({ populate: true }).then(setupSavePosition);
+    }
   },
   async mounted() {
     this.nav = 'code';
@@ -212,6 +244,7 @@ export default {
   },
   methods: {
     async save() {
+      if (shouldSavePositionOnSave) savePosition();
       const { code, settings } = this;
       const { config, custom } = settings;
       const { notifyUpdates } = config;

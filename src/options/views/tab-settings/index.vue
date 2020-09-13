@@ -10,6 +10,18 @@
         </label>
       </div>
       <div class="mb-1">
+        <label class="mr-2" >
+          <setting-check name="editorWindow" />
+          <tooltip :content="editorWindowHint" :disabled="!editorWindowHint">
+            <span v-text="i18n('optionEditorWindow')"></span>
+          </tooltip>
+        </label>
+        <label>
+          <setting-check name="editorWindowSimple" />
+          <span v-text="i18n('optionEditorWindowSimple')"></span>
+        </label>
+      </div>
+      <div class="mb-1">
         <label>
           <locale-group i18n-key="labelPopupSort">
             <select v-model="settings['filtersPopup.sort']">
@@ -103,6 +115,7 @@
 </template>
 
 <script>
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { debounce } from '#/common';
 import {
   INJECT_AUTO,
@@ -167,6 +180,7 @@ export default {
     VmCss,
     SettingCheck,
     LocaleGroup,
+    Tooltip,
   },
   data() {
     return {
@@ -175,6 +189,11 @@ export default {
       settings,
       injectIntoOptions,
     };
+  },
+  computed: {
+    editorWindowHint() {
+      return global.chrome.windows?.onBoundsChanged ? null : this.i18n('optionEditorWindowHint');
+    },
   },
   methods: {
     getUpdater({ name, normalize }) {

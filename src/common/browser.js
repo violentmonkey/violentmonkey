@@ -108,6 +108,8 @@ if (!global.browser?.runtime?.sendMessage) {
     },
     webRequest: true,
     windows: {
+      create: wrapAsync,
+      getCurrent: wrapAsync,
       update: wrapAsync,
     },
   };

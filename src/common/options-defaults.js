@@ -46,6 +46,9 @@ export default {
     tabSize: 2,
     undoDepth: 200,
   },
+  editorWindow: false, // whether popup opens editor in a new window
+  editorWindowPos: {}, // { left, top, width, height }
+  editorWindowSimple: true, // whether to open a simplified popup or a normal browser window
   scriptTemplate: `\
 // ==UserScript==
 // @name        New script {{name}}

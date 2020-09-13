@@ -239,6 +239,7 @@ export default {
     onEditScript(item) {
       sendCmd('TabOpen', {
         url: `/options/index.html#scripts/${item.data.props.id}`,
+        maybeInWindow: true,
       });
       window.close();
     },
@@ -274,6 +275,7 @@ export default {
       });
       sendCmd('TabOpen', {
         url: `/options/index.html#scripts/_new${id ? `/${id}` : ''}`,
+        maybeInWindow: true,
       });
       window.close();
     },
