@@ -23,4 +23,5 @@ If this is a bug report, please also provide logs in the console.
 - Browser:
 - Browser version:
 - Violentmonkey version:
+- Violentmonkey [pre-release behavior](https://github.com/violentmonkey/violentmonkey/releases):
 - OS:
