@@ -531,8 +531,8 @@ msgIncognitoChanges:
     Message shown in popup and installation tab when opened in an incognito
     window.
   message: >-
-    Los cambios que realices en el modo de incógnito también se aplican a tu
-    perfil principal.
+    Los cambios que realices en el modo incógnito también se aplican a tu perfil
+    principal.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script instalado.
