@@ -157,9 +157,9 @@ function xhrCallbackWrapper(req) {
   let contentType;
   let numChunks;
   let response;
-  let responseSent;
-  let responseTextSent;
+  let responseText;
   let responseHeaders;
+  const sent = new Set([undefined]);
   const { id, chunkType, xhr } = req;
   // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
   const chunkSize = 64e6 / 4;
@@ -178,15 +178,6 @@ function xhrCallbackWrapper(req) {
       return { responseHeaders };
     }
   };
-  const getResponseText = () => {
-    try {
-      const text = xhr.responseText;
-      responseTextSent = !!text;
-      return { responseText: text === response ? ['same'] : text };
-    } catch (e) {
-      // ignore if responseText is unreachable
-    }
-  };
   const chainedCallback = (msg) => {
     lastPromise = lastPromise.then(() => req.cb(msg));
   };
@@ -197,13 +188,20 @@ function xhrCallbackWrapper(req) {
     if (!contentType) {
       contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream';
     }
-    if (!response) {
+    if (xhr.response !== response) {
       response = xhr.response;
-    }
-    if (!numChunks && chunkType && response) {
-      numChunks = !isBlob && Math.ceil(response.byteLength / chunkSize) || 1;
+      try {
+        responseText = xhr.responseText;
+        if (responseText === response) responseText = ['same'];
+      } catch (e) {
+        // ignore if responseText is unreachable
+      }
+      if (chunkType && response) {
+        numChunks = !isBlob && Math.ceil(response.byteLength / chunkSize) || 1;
+      }
     }
     const shouldNotify = req.eventsToNotify.includes(type);
+    const shouldSendResponse = shouldNotify && !sent.has(response);
     chainedCallback({
       contentType,
       id,
@@ -214,13 +212,15 @@ function xhrCallbackWrapper(req) {
         finalUrl: xhr.responseURL,
         ...getResponseHeaders(),
         ...objectPick(xhr, ['readyState', 'status', 'statusText']),
-        ...!responseSent && { response: numChunks ? getChunk(0) : response },
-        ...!responseTextSent && getResponseText(xhr),
+        ...shouldSendResponse && {
+          response: numChunks ? getChunk(0) : response,
+          responseText,
+        },
         ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
       },
     });
-    if (!responseSent && shouldNotify) {
-      responseSent = !!response;
+    if (shouldSendResponse) {
+      sent.add(response);
       for (let i = 1; i < numChunks; i += 1) {
         chainedCallback({
           id,
