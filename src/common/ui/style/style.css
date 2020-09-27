@@ -319,7 +319,7 @@ li {
 
 .monospace-font,
 .editor-code .CodeMirror,
-.CodeMirror-hints.eclipse /* use .eclipse as a workaround to override default CodeMirror-hints style */ {
+.CodeMirror-hints.default /* CSS specificity hack to override default CM style */ {
   /* Use `Courier New` to ensure `&nbsp;` has the same width as an original space. */
   font-family: "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", Courier, monospace;
 }
