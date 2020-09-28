@@ -596,6 +596,19 @@ msgUpdating:
 noValues:
   description: Label shown when there is no value for current script.
   message: Tidak ada nilai yang disimpan
+optionEditorWindow:
+  description: Label for the option in settings
+  message: Buka penyunting dari popup di jendela baru
+optionEditorWindowHint:
+  description: >-
+    Tooltip for optionEditorWindow in case the browser doesn't support
+    onBoundsChanged
+  message: >-
+    Posisi jendela penyunting hanya akan diingat pada saat mengubah ukuran atau
+    menyimpan
+optionEditorWindowSimple:
+  description: Label for the editor window type
+  message: Sembunyikan omnibox
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Aktif di atas
