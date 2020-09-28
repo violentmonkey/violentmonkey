@@ -604,6 +604,17 @@ msgUpdating:
 noValues:
   description: Label shown when there is no value for current script.
   message: Nu este stocată nicio valoare
+optionEditorWindow:
+  description: Label for the option in settings
+  message: ''
+optionEditorWindowHint:
+  description: >-
+    Tooltip for optionEditorWindow in case the browser doesn't support
+    onBoundsChanged
+  message: ''
+optionEditorWindowSimple:
+  description: Label for the editor window type
+  message: ''
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Mai întâi cele activate
