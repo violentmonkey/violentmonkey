@@ -600,6 +600,19 @@ msgUpdating:
 noValues:
   description: Label shown when there is no value for current script.
   message: Ohne gespeicherten Wert
+optionEditorWindow:
+  description: Label for the option in settings
+  message: Editor vom Pop-up aus in einem neuen Fenster öffnen
+optionEditorWindowHint:
+  description: >-
+    Tooltip for optionEditorWindow in case the browser doesn't support
+    onBoundsChanged
+  message: >-
+    Fensterposition des Editors wird nur beim Ändern der Größe oder Speichern
+    vorgemerkt
+optionEditorWindowSimple:
+  description: Label for the editor window type
+  message: Omnibox ausblenden
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Aktivierte zuerst

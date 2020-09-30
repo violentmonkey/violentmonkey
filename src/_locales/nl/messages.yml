@@ -112,16 +112,16 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Aangepaste CSS op de instellingen- en scriptinstallatiepagina's. Bij twijfel
+    Aangepaste css op de instellingen- en scriptinstallatiepagina's. Bij twijfel
     leeglaten.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Aangepaste instellingen voor CodeMirror en uitbreidingen in json-objecten,
     zoals <code>{"indentUnit":2, "smartIndent":true}</code>. Let op: niet alle
-    werken gegarandeerd in Violentmonkey. See <a
+    werken gegarandeerd in Violentmonkey. Bekijk de <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">full list</a>.
+    rel="noopener noreferrer">volledige lijst</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -162,7 +162,7 @@ editValueSave:
   message: Opslaan
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: Een open source gebruikersscriptbeheerder die diverse browsers ondersteunt
+  message: Een open source gebruikersscriptbeheerder voor diverse webbrowsers
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -181,7 +181,7 @@ filterAlphabeticalOrder:
   message: alfabetische volgorde
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: uitvoeringsvolgorde
+  message: uitvoervolgorde
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: onlangs bijgewerkt
@@ -226,7 +226,7 @@ installOptionClose:
   message: Sluiten na installatie
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Lokaal bestand volgen na sluiten van venster
+  message: Lokaal bestand bijhouden na sluiten van venster
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -592,6 +592,19 @@ msgUpdating:
 noValues:
   description: Label shown when there is no value for current script.
   message: Er is geen waarde opgeslagen
+optionEditorWindow:
+  description: Label for the option in settings
+  message: Bewerker in nieuw venster openen
+optionEditorWindowHint:
+  description: >-
+    Tooltip for optionEditorWindow in case the browser doesn't support
+    onBoundsChanged
+  message: >-
+    De vensterpositie van de bewerker wordt alleen onthouden na het aanpassen
+    van de afmetingen en bij het opslaan
+optionEditorWindowSimple:
+  description: Label for the editor window type
+  message: Omnibalk verbergen
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Ingeschakelde bovenaan
@@ -623,7 +636,7 @@ titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-
     * Druk op <Enter> om de tekst toe te voegen aan de auto-aanvulgeschiedenis
-    * Ondersteuning voor reguliere uitdrukkingen: /re/ en /re/flags
+    * Ondersteunt reguliere uitdrukkingen: /re/ en /re/flags
 valueLabelKey:
   description: Label for key of a script value.
   message: Sleutel (tekenreeks)
@@ -635,4 +648,4 @@ valueLabelValueAll:
   message: Alle waarden (in json-opmaak)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: Website bezoeken
+  message: Violentmonkey-website

@@ -51,7 +51,6 @@
 
 <script>
 import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/eclipse.css';
 import 'codemirror-js-mixed/mode/javascript-mixed/javascript-mixed';
 import 'codemirror/addon/comment/continuecomment';
 import 'codemirror/addon/comment/comment';
@@ -118,7 +117,7 @@ export const cmOptions = {
   styleActiveLine: true,
   foldGutter: true,
   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-  theme: 'eclipse',
+  theme: 'default',
   mode: 'javascript-mixed',
   lineNumbers: true,
   matchBrackets: true,
@@ -521,7 +520,7 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
 }
 
 /* fix contenteditable selection color bug */
-.cm-s-eclipse .CodeMirror-line {
+.CodeMirror .CodeMirror-line {
   ::selection {
     background: $selectionBg;
   }
@@ -540,7 +539,7 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
     background-color: hsla(40, 100%, 50%, 0.1);
   }
   // mostly copied from Monokai theme
-  .cm-s-eclipse {
+  .CodeMirror-wrap {
     &.CodeMirror {
       color: var(--fg);
       background: var(--bg);

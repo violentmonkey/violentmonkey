@@ -148,7 +148,7 @@ editNavValues:
   message: Các giá trị
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: ''
+  message: Tất cả
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: ''
@@ -592,6 +592,17 @@ msgUpdating:
 noValues:
   description: Label shown when there is no value for current script.
   message: Không có giá trị nào được lưu trữ
+optionEditorWindow:
+  description: Label for the option in settings
+  message: ''
+optionEditorWindowHint:
+  description: >-
+    Tooltip for optionEditorWindow in case the browser doesn't support
+    onBoundsChanged
+  message: ''
+optionEditorWindowSimple:
+  description: Label for the editor window type
+  message: ''
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Đã bật ở trước
