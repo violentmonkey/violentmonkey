@@ -122,6 +122,10 @@ descEditorOptions:
     them may not work in Violentmonkey. See <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">full list</a>.
+    To use a custom CodeMirror theme, specify its file name like
+    <code>"theme": "3024-day"</code> here and paste the
+    <a href="https://github.com/codemirror/CodeMirror/tree/master/theme" target="_blank"
+    rel="noopener noreferrer">actual theme's CSS</a> in "Custom Style" input below.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentation on userscript metadata block and <code>GM</code> API:'
