@@ -93,15 +93,15 @@ function bindRE(re) {
 }
 
 function autoReg(str) {
+  // regexp mode: case-insensitive per GM documentation
   if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
     const re = new RegExp(str.slice(1, -1), 'i');
     return { test: bindRE(re) };
   }
   // glob mode: case-insensitive to match GM4 & Tampermonkey bugged behavior
-  str = str.toLowerCase();
-  const reStr = str2RE(str);
+  const reStr = str2RE(str.toLowerCase());
   if (tld.isReady() && str.includes('.tld/')) {
-    const reTldStr = reStr.replace('\\.tld/', '((?:\\.\\w+)+)/');
+    const reTldStr = reStr.replace('\\.tld/', '((?:\\.[-\\w]+)+)/');
     return {
       test: (tstr) => {
         const matches = tstr.toLowerCase().match(reTldStr);
@@ -130,13 +130,18 @@ function matchScheme(rule, data) {
 }
 
 const RE_STR_ANY = '(?:|.*?\\.)';
-const RE_STR_TLD = '((?:\\.\\w+)+)';
+const RE_STR_TLD = '((?:\\.[-\\w]+)+)';
 function hostMatcher(rule) {
+  // * matches all
+  if (rule === '*') {
+    return () => 1;
+  }
   // *.example.com
   // www.google.*
   // www.google.tld
+  const ruleLC = rule.toLowerCase(); // host matching is case-insensitive
   let prefix = '';
-  let base = rule;
+  let base = ruleLC;
   let suffix = '';
   if (rule.startsWith('*.')) {
     base = base.slice(2);
@@ -146,21 +151,17 @@ function hostMatcher(rule) {
     base = base.slice(0, -4);
     suffix = RE_STR_TLD;
   }
-  const re = new RegExp(`^${prefix}${str2RE(base)}${suffix}$`, 'i');
-  let ruleLC;
+  const re = new RegExp(`^${prefix}${str2RE(base)}${suffix}$`);
   return (data) => {
-    // * matches all
-    if (rule === '*') return 1;
-    // exact match
-    if (rule === data) return 1;
-    // host matching is case-insensitive
-    if (!ruleLC) ruleLC = rule.toLowerCase();
-    if (ruleLC === data.toLowerCase()) return 1;
+    // exact match, case-insensitive
+    data = data.toLowerCase();
+    if (ruleLC === data) return 1;
+    // full check
     const matches = data.match(re);
     if (matches) {
       const [, tldStr] = matches;
       if (!tldStr) return 1;
-      const tldSuffix = tldStr.slice(1).toLowerCase();
+      const tldSuffix = tldStr.slice(1);
       return tld.getPublicSuffix(tldSuffix) === tldSuffix;
     }
     return 0;
