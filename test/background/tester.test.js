@@ -104,13 +104,16 @@ test('host', (t) => {
       meta: {
         match: [
           '*://www.google.tld/',
+          '*://www.dummy.TLD/', // testing for a mistake: `.tld` should be lowercase
         ],
       },
     });
     q.ok(testScript('https://www.google.com/', script), 'should match subdomains');
     q.ok(testScript('https://www.google.com.cn/', script), 'should match subdomains');
     q.ok(testScript('https://www.google.jp/', script), 'should match tld');
+    q.ok(testScript('https://www.google.no-ip.org/', script), 'should match a hyphened `no-ip.org` from Public Suffix List');
     q.notOk(testScript('https://www.google.example.com/', script), 'should not match subdomains');
+    q.notOk(testScript('https://www.dummy.com/', script), '`.tld` should be lowercase');
     q.end();
   });
 
@@ -249,6 +252,7 @@ test('include', (t) => {
     });
     q.ok(testScript('https://www.google.com/', script), 'should match `.com`');
     q.ok(testScript('https://www.google.com.hk/', script), 'should match `.com.hk`');
+    q.ok(testScript('https://www.google.no-ip.org/', script), 'should match a hyphened `no-ip.org` from Public Suffix List');
     q.notOk(testScript('https://www.google.example.com/', script), 'should not match subdomains');
     q.end();
   });
@@ -312,6 +316,7 @@ test('exclude', (t) => {
     });
     q.notOk(testScript('https://www.google.com/', script), 'should match `.com`');
     q.notOk(testScript('https://www.google.com.hk/', script), 'should match `.com.hk`');
+    q.notOk(testScript('https://www.google.no-ip.org/', script), 'should match a hyphened `no-ip.org` from Public Suffix List');
     q.ok(testScript('https://www.google.example.com/', script), 'should not match subdomains');
     q.end();
   });
