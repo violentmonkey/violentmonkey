@@ -539,52 +539,48 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
     background-color: hsla(40, 100%, 50%, 0.1);
   }
   // mostly copied from Monokai theme
-  .CodeMirror-wrap {
-    &.CodeMirror {
-      color: var(--fg);
-      background: var(--bg);
+  .CodeMirror {
+    color: var(--fg);
+    background: var(--bg);
+    &-scrollbar-filler,
+    &-gutter-filler {
+      background: none;
     }
-    .CodeMirror {
-      &-scrollbar-filler,
-      &-gutter-filler {
-        background: none;
+    &-gutters {
+      border-color: var(--fill-2);
+      background-color: var(--fill-0-5);
+    }
+    &-selected {
+      background: #49483e;
+    }
+    &-line {
+      ::selection {
+        background: $selectionDarkBg;
       }
-      &-gutters {
-        border-color: var(--fill-2);
-        background-color: var(--fill-0-5);
+      /* must be used separately otherwise the entire rule is ignored in Chrome */
+      ::-moz-selection {
+        background: $selectionDarkBg;
       }
-      &-selected {
-        background: #49483e;
+    }
+    &-guttermarker {
+      color: white;
+      &-subtle {
+        color: #d0d0d0;
       }
-      &-line {
-        ::selection {
-          background: $selectionDarkBg;
-        }
-        /* must be used separately otherwise the entire rule is ignored in Chrome */
-        ::-moz-selection {
-          background: $selectionDarkBg;
-        }
-      }
-      &-guttermarker {
-        color: white;
-        &-subtle {
-          color: #d0d0d0;
-        }
-      }
-      &-linenumber {
-        color: #666;
-      }
-      &-cursor {
-        border-color: #f8f8f0;
-      }
-      &-activeline-background {
-        background: #1a1a1a;
-      }
-      &-matchingbracket {
-        outline: none;
-        background: #444;
-        color: yellow !important;
-      }
+    }
+    &-linenumber {
+      color: #666;
+    }
+    &-cursor {
+      border-color: #f8f8f0;
+    }
+    &-activeline-background {
+      background: #1a1a1a;
+    }
+    &-matchingbracket {
+      outline: none;
+      background: #444;
+      color: yellow !important;
     }
     span {
       &.cm-comment {
