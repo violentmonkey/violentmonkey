@@ -598,15 +598,15 @@ noValues:
   message: Nie je uložená žiadna hodnota
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: Otvoriť editor z vyskakovacieho okna do nového okna
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: Poloha okna editora sa uloží iba pri zmene veľkosti alebo uložení
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Schovať pole omnibox
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Najskôr povolené

@@ -123,7 +123,12 @@ descEditorOptions:
     <code>{"indentUnit":2, "smartIndent":true}</code>, należy jednak pamiętać,
     że niektóre z nich mogą nie działać w Violentmonkey. Zobacz <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">pełną listę</a>.
+    rel="noopener noreferrer">pełną listę</a>. Aby użyć niestandardowego motywu
+    CodeMirror, podaj tutaj jego nazwę pliku, np. <code>"theme":
+    "3024-day"</code> i wklej poniżej<a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">CSS aktualnego motywu</a> w polu
+    "Styl niestandardowy".
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-

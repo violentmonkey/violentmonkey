@@ -118,7 +118,10 @@ descEditorOptions:
     CodeMirror及其扩展的自定义配置，使用一个JSON对象，如<code>{"indentUnit":2,
     "smartIndent":true}</code>，注意某些配置可能不被支持。见<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">完整列表</a>。
+    rel="noopener noreferrer">完整列表</a>。如果要使用CodeMirror的自定义主题，可以像<code>"theme":
+    "3024-day"</code>这样指定主题的名字，并把<a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">实际的主题CSS</a>粘贴到下面的“自定义样式”输入框。
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 用户脚本 metadata 区域和 <code>GM</code> API 的相关文档：
@@ -589,15 +592,15 @@ noValues:
   message: 没有存储数据
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: 从弹窗打开编辑器时创建新的窗口
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: 编辑器窗口的位置只会在调整窗口大小或保存时记住
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: 隐藏地址栏
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: 启用项优先

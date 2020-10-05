@@ -121,7 +121,12 @@ descEditorOptions:
     <code>{"indentUnit":2, "smartIndent":true}</code>, möglicherweise werden
     einige von ihnen jedoch nicht mit Violentmonkey funktionieren. Konsultiere
     die <a href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">vollständige Liste</a>.
+    rel="noopener noreferrer">vollständige Liste</a>. Um ein benutzerdefiniertes
+    CodeMirror-Theme zu benutzen, spezifiziere hier dessen Dateinamen ähnlich
+    wie <code>"theme":"3024-day"</code> und füge die <a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">tatsächliche Theme-CSS</a> in das
+    "Benutzerdefinierte Aussehen"-Eingabefeld unterhalb ein.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
