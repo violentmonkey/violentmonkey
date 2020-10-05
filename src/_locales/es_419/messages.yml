@@ -119,11 +119,16 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Opciones personalizadas para CodeMirror y complementos en objetos JSON como
-    <code>{"indentUnit":2, "smartIndent":true}</code> sin embargo, tenga en
-    cuenta que algunos de ellos pueden no funcionar en Violentmonkey. Mire la <a
+    Opciones personalizadas para el CodeMirror y complementos en objetos JSON
+    como <code>{"indentUnit":2, "smartIndent":true}</code> sin embargo ten en
+    cuenta que algunas de ellas pueden no funcionar en Violentmonkey. Ver <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">lista completa</a>.
+    rel="noopener noreferrer">lista completa</a>. Para usar un tema
+    personalizado de CodeMirror, especifica su nombre de archivo como
+    <code>"theme": "3024-day"</code> aquí y pega el <a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">CSS del tema actual</a> en la
+    entrada "Estilo personalizado" de abajo.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-

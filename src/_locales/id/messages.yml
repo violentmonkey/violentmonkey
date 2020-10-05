@@ -117,11 +117,16 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Opsi khusus untuk CodeMirror dan pengaya dalam obyek JSON seperti
-    <code>{"indentUnit":2, "smartIndent":true}</code> tetapi harap diingat bahwa
-    beberapa diantaranya mungkin tidak akan diterapkan di Violentmonkey. Lihat
-    <a href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">daftar lengkapnya di sini</a>.
+    Opsi khusus untuk CodeMirror dan addon di dalam obyek JSON seperti
+    <code>{"indentUnit":2, "smartIndent":true}</code> meskipun demikian beberapa
+    diantaranya mungkin tidak bisa digunakan di Violentmonkey. Lihat <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">daftar lengkap</a>. Untuk menggunakan tema
+    CodeMirror khusus, tulis nama berkasnya di sini <code>"theme":
+    "3024-day"</code> dan tempel <a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">kode CSS tema</a> di dalam kotak
+    "Gaya Khusus" di bawah.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentasi tentang blok data meta skrip dan API <code>GM</code>:'

@@ -119,9 +119,14 @@ descEditorOptions:
   message: >-
     Aangepaste instellingen voor CodeMirror en uitbreidingen in json-objecten,
     zoals <code>{"indentUnit":2, "smartIndent":true}</code>. Let op: niet alle
-    werken gegarandeerd in Violentmonkey. Bekijk de <a
+    werken gegarandeerd in Violentmonkey - bekijk de <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">volledige lijst</a>.
+    rel="noopener noreferrer">volledige lijst</a>. Je kunt een aangepast thema
+    gebruiken door de bestandsnaam ervan in te voeren. Voorbeeld: <code>"theme":
+    "3024-day"</code>. De inhoud van het <a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">css-bestand</a> kun je hieronder
+    plakken bij 'Aangepaste stijl'.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
