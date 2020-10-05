@@ -183,8 +183,12 @@ const unforgeables = new Map([
     describeProperty(thisObj = global, name)
     || describeProperty(thisObj = window, name)
   );
-  // currently only one key is bound: `document`
-  if (info?.get) info.get = info.get::bind(thisObj);
+  if (info) {
+    // currently only `document`
+    if (info.get) info.get = info.get::bind(thisObj);
+    // currently only `location`
+    if (info.set) info.set = info.set::bind(thisObj);
+  }
   return info && [name, info];
 }).filter(Boolean));
 unforgeables.has = mapHas;
