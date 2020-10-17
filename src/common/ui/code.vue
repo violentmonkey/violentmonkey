@@ -11,6 +11,7 @@
           <!-- id is required for the built-in autocomplete using entered values -->
           <input
             :class="{ 'is-error': !search.state.hasResult }"
+            :title="search.state.error"
             type="search"
             id="editor-search"
             ref="search"
@@ -148,7 +149,12 @@ function findNext(cm, state, reversed) {
       return;
     }
     if (query && searchOptions.useRegex) {
-      query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
+      try {
+        query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
+        state.error = null;
+      } catch (err) {
+        state.error = err;
+      }
     }
     const cOptions = {
       caseFold: !searchOptions.caseSensitive,
