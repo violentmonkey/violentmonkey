@@ -542,18 +542,18 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
   .CodeMirror {
     color: var(--fg);
     background: var(--bg);
-    &-scrollbar-filler,
-    &-gutter-filler {
+    & &-scrollbar-filler,
+    & &-gutter-filler {
       background: none;
     }
-    &-gutters {
+    & &-gutters {
       border-color: var(--fill-2);
       background-color: var(--fill-0-5);
     }
-    &-selected {
+    & &-selected {
       background: #49483e;
     }
-    &-line {
+    & &-line {
       ::selection {
         background: $selectionDarkBg;
       }
@@ -562,22 +562,22 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
         background: $selectionDarkBg;
       }
     }
-    &-guttermarker {
+    & &-guttermarker {
       color: white;
       &-subtle {
         color: #d0d0d0;
       }
     }
-    &-linenumber {
+    & &-linenumber {
       color: #666;
     }
-    &-cursor {
+    & &-cursor {
       border-color: #f8f8f0;
     }
-    &-activeline-background {
+    & &-activeline-background {
       background: #1a1a1a;
     }
-    &-matchingbracket {
+    & &-matchingbracket {
       outline: none;
       background: #444;
       color: yellow !important;
