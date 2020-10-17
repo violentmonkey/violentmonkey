@@ -201,26 +201,6 @@ function replaceAll(cm, state) {
   });
 }
 
-/** @this {CodeMirror} */
-function replacePlaceholder(p) {
-  if (!p.el) {
-    const { line, ch, body, length } = p;
-    const cm = this;
-    const span = document.createElement('span');
-    const marker = cm.markText({ line, ch }, { line, ch: ch + length }, { replacedWith: span });
-    span.className = 'too-long-placeholder';
-    span.title = i18n('editLongLineTooltip');
-    span.textContent = `${body.slice(0, maxDisplayLength)}...[${i18n('editLongLinePlaceholder')}]`;
-    span.onclick = () => {
-      if (!`${window.getSelection()}`) {
-        cm.setCursor(marker.find().from);
-        cm.focus();
-      }
-    };
-    p.el = span;
-  }
-}
-
 export default {
   props: {
     active: Boolean,
@@ -325,7 +305,24 @@ export default {
       return res;
     },
     renderPlaceholders() {
-      this.placeholders.forEach(replacePlaceholder, this.cm);
+      this.placeholders.forEach(p => {
+        if (!p.el) {
+          const { line, ch, body, length } = p;
+          const { cm } = this;
+          const el = document.createElement('span');
+          const marker = cm.markText({ line, ch }, { line, ch: ch + length }, { replacedWith: el });
+          el.className = 'too-long-placeholder';
+          el.title = i18n('editLongLineTooltip');
+          el.textContent = `${body.slice(0, maxDisplayLength)}...[${i18n('editLongLine')}]`;
+          el.onclick = () => {
+            if (!`${window.getSelection()}`) {
+              cm.setCursor(marker.find().from);
+              cm.focus();
+            }
+          };
+          p.el = el;
+        }
+      });
     },
     initialize(cm) {
       this.cm = cm;
