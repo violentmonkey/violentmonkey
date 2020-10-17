@@ -72,16 +72,17 @@ import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
-import { debounce } from '#/common';
+import { debounce, i18n } from '#/common';
 import { forEachEntry, deepEqual } from '#/common/object';
 import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
 
 /* eslint-disable no-control-regex */
-const MAX_LINE_LENGTH = 50 * 1024;
+let maxDisplayLength;
 // Make sure this is still the longest line in the doc
 const CTRL_OPEN = '\x02'.repeat(256);
 const CTRL_CLOSE = '\x03'.repeat(256);
+const CTRL_RE = new RegExp(`${CTRL_OPEN}(\\d+)${CTRL_CLOSE}`, 'g');
 
 [
   'save', 'cancel', 'close',
@@ -124,6 +125,7 @@ export const cmOptions = {
   autoCloseBrackets: true,
   highlightSelectionMatches: true,
   keyMap: 'sublime',
+  maxDisplayLength: 20_000,
 };
 const searchOptions = {
   useRegex: false,
@@ -193,6 +195,26 @@ function replaceAll(cm, state) {
   });
 }
 
+/** @this {CodeMirror} */
+function replacePlaceholder(p) {
+  if (!p.el) {
+    const { line, ch, body, length } = p;
+    const cm = this;
+    const span = document.createElement('span');
+    const marker = cm.markText({ line, ch }, { line, ch: ch + length }, { replacedWith: span });
+    span.className = 'too-long-placeholder';
+    span.title = i18n('editLongLineTooltip');
+    span.textContent = `${body.slice(0, maxDisplayLength)}...[${i18n('editLongLinePlaceholder')}]`;
+    span.onclick = () => {
+      if (!`${window.getSelection()}`) {
+        cm.setCursor(marker.find().from);
+        cm.focus();
+      }
+    };
+    p.el = span;
+  }
+}
+
 export default {
   props: {
     active: Boolean,
@@ -231,54 +253,19 @@ export default {
   watch: {
     active: 'onActive',
     value(value) {
-      if (value === this.cached) return;
-      this.cached = value;
-      const placeholders = [];
-      this.content = value.replace(/[\x02\x03]/g, '')
-      .split('\n')
-      .map((line, i) => {
-        if (line.length > MAX_LINE_LENGTH) {
-          const prefix = line.match(/^\s*/)[0];
-          const body = line.slice(prefix.length);
-          const id = placeholders.length;
-          const replaced = `${CTRL_OPEN}${id}${CTRL_CLOSE}`;
-          const placeholder = {
-            id,
-            body,
-            line: i,
-            start: prefix.length,
-            length: replaced.length,
-          };
-          placeholders.push(placeholder);
-          return `${prefix}${replaced}`;
-        }
-        return line;
-      })
-      .join('\n');
-      this.placeholders = placeholders;
       const { cm } = this;
       if (!cm) return;
-      cm.off('changes', this.onChange);
-      cm.setValue(this.content || '');
-      placeholders.forEach(({
-        line, start, body, length,
-      }) => {
-        const span = document.createElement('span');
-        span.textContent = `${body.slice(0, MAX_LINE_LENGTH)}...`;
-        const mark = cm.markText({ line, ch: start }, { line, ch: start + length }, {
-          replacedWith: span,
-        });
-        span.addEventListener('click', debounce(() => {
-          if (!window.getSelection().toString()) {
-            const { from } = mark.find();
-            cm.setCursor(from);
-            cm.focus();
-          }
-        }));
+      const lines = value.split('\n');
+      const modified = this.createPlaceholders({ text: lines, from: { line: 0 } });
+      cm.off('changes', this.onChanges);
+      cm.operation(() => {
+        cm.setValue(modified ? lines.join('\n') : value);
+        if (modified) this.renderPlaceholders();
       });
-      cm.getDoc().clearHistory();
+      cm.clearHistory();
+      cm.markClean();
       cm.focus();
-      cm.on('changes', this.onChange);
+      cm.on('changes', this.onChanges);
     },
     'search.state.query'() {
       this.debouncedFind();
@@ -291,13 +278,54 @@ export default {
     },
   },
   methods: {
-    onChange: debounce(function onChange() {
-      const content = this.getRealContent(this.cm.getValue());
-      this.cached = content;
-      this.$emit('input', content);
-    }, 200),
+    onBeforeChange(cm, change) {
+      if (this.createPlaceholders(change)) {
+        cm.on('change', this.onChange); // triggered before DOM is updated
+        change.update?.(null, null, change.text);
+      }
+      // TODO: remove placeholders that belong to a change beyond `undoDepth`
+    },
+    onChange(cm) {
+      cm.off('change', this.onChange);
+      this.renderPlaceholders();
+    },
+    onChanges(cm) {
+      this.$emit('code-dirty', !cm.isClean());
+    },
+    createPlaceholders(change) {
+      const { line } = change.from;
+      let res = false;
+      change.text.forEach((textLine, i) => {
+        if (textLine.includes(CTRL_OPEN)) {
+          textLine = this.getRealContent(textLine);
+        }
+        if (textLine.length > maxDisplayLength) {
+          res = true;
+          this.placeholderId += 1;
+          const id = this.placeholderId;
+          const prefix = textLine.match(/^\s*/)[0];
+          const body = textLine.slice(prefix.length);
+          const replaced = `${CTRL_OPEN}${id}${CTRL_CLOSE}`;
+          this.placeholders.set(id, {
+            body,
+            el: null,
+            line: line + i,
+            ch: prefix.length,
+            length: replaced.length,
+          });
+          change.text[i] = `${prefix}${replaced}`;
+        }
+      });
+      return res;
+    },
+    renderPlaceholders() {
+      this.placeholders.forEach(replacePlaceholder, this.cm);
+    },
     initialize(cm) {
       this.cm = cm;
+      this.placeholders = new Map();
+      this.placeholderId = 0;
+      maxDisplayLength = cm.options.maxDisplayLength;
       cm.setOption('readOnly', this.readonly);
       // these are active only in the code nav tab
       cm.state.commands = Object.assign({
@@ -330,6 +358,7 @@ export default {
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
       });
+      cm.on('beforeChange', this.onBeforeChange);
       this.$emit('ready', cm);
     },
     onActive(state) {
@@ -431,14 +460,17 @@ export default {
       cm.focus();
     },
     onCopy(e) {
-      if (!this.cm || !this.cm.somethingSelected()) return;
-      const text = this.getRealContent(this.cm.getSelection());
+      // CM already prepared the correct text in DOM selection, which is particularly
+      // important when using its lineWiseCopyCut option (on by default)
+      const sel = `${window.getSelection()}`;
+      if (!this.cm || !sel) return;
+      const text = this.getRealContent(sel);
       e.clipboardData.setData('text', text);
       e.preventDefault();
       e.stopImmediatePropagation();
     },
-    getRealContent(text) {
-      return text.replace(/\x02+(\d+)\x03+/g, (_, id) => this.placeholders[id]?.body || '');
+    getRealContent(text = this.cm.getValue()) {
+      return text.replace(CTRL_RE, (_, id) => this.placeholders.get(+id)?.body || '');
     },
   },
   mounted() {
@@ -499,6 +531,10 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
     border-color: #e85600;
     background: #e8560010;
   }
+}
+
+.too-long-placeholder {
+  font-style: italic;
 }
 
 /* CodeMirror show-hints fix to work here */
