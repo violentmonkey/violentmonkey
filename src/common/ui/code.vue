@@ -243,6 +243,7 @@ export default {
       if (!cm) return;
       const lines = value.split('\n');
       const modified = this.createPlaceholders({ text: lines, from: { line: 0 } });
+      cm.off('beforeChange', this.onBeforeChange);
       cm.off('changes', this.onChanges);
       cm.operation(() => {
         cm.setValue(modified ? lines.join('\n') : value);
@@ -252,6 +253,7 @@ export default {
       cm.markClean();
       cm.focus();
       cm.on('changes', this.onChanges);
+      cm.on('beforeChange', this.onBeforeChange);
     },
     'search.state.query'() {
       this.debouncedFind();
@@ -361,7 +363,6 @@ export default {
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
       });
-      cm.on('beforeChange', this.onBeforeChange);
       this.$emit('ready', cm);
     },
     onActive(state) {
