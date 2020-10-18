@@ -22,7 +22,8 @@ defineProperty(window, process.env.INIT_FUNC_NAME, { value: 1 });
 
 const { document, setTimeout } = global;
 // Userscripts in content mode may redefine head and documentElement
-const { get: getHead } = describeProperty(Document.prototype, 'head');
+const { get: getHead } = describeProperty(Document.prototype, 'head')
+  || describeProperty(HTMLDocument.prototype, 'head'); // old FF before 61;
 const { get: getDocElem } = describeProperty(Document.prototype, 'documentElement');
 const { appendChild } = Document.prototype; // same as Node.appendChild
 
