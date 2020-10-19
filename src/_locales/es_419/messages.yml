@@ -119,9 +119,9 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Opciones personalizadas para el CodeMirror y complementos en objetos JSON
-    como <code>{"indentUnit":2, "smartIndent":true}</code> sin embargo ten en
-    cuenta que algunas de ellas pueden no funcionar en Violentmonkey. Ver <a
+    Opciones personalizadas para CodeMirror y complementos en objetos JSON como
+    <code>{"indentUnit":2, "smartIndent":true}</code> sin embargo ten en cuenta
+    que algunas de ellas pueden no funcionar en Violentmonkey. Ver <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completa</a>. Para usar un tema
     personalizado de CodeMirror, especifica su nombre de archivo como

@@ -123,7 +123,12 @@ descEditorOptions:
     <code>{"indentUnit":2, "smartIndent":true}</code> avšak niektoré nemusia byť
     funkčné vo Violentmonkey. Pozri <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">celý zoznam</a>.
+    rel="noopener noreferrer">celý zoznam</a>. Pre použitie vlastného motívu pre
+    CodeMirror zadajte sem názov jeho súboru ako <code>"theme":3024-day"</code>
+    a vložte <a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">aktuálny motív CSS</a> do poľa
+    "Vlastný štýl" nižšie.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentácia k bloku metadát užívateľského skriptu a <code>GM</code> API:'
