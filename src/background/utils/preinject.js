@@ -118,11 +118,21 @@ function replaceWithFullWidthForm(s) {
   return String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
 }
 
+const resolveDataCodeStr = `(${(data) => {
+  const { vmResolve } = window;
+  if (vmResolve) {
+    vmResolve(data);
+  } else {
+    // running earlier than the main content script for whatever reason
+    window.vmData = data;
+  }
+}})`;
+
 function registerScriptDataFF(data, url, allFrames) {
   data.registration = browser.contentScripts.register({
     allFrames,
     js: [{
-      code: `resolveData(${JSON.stringify(data.inject)})`,
+      code: `${resolveDataCodeStr}(${JSON.stringify(data.inject)})`,
     }],
     matches: url.split('#', 1),
     runAt: 'document_start',

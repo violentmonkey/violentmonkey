@@ -104,10 +104,11 @@ function sendSetPopup() {
 }
 
 async function getDataFF(viaMessaging) {
-  const data = await Promise.race([
-    new Promise(resolve => { global.resolveData = resolve; }),
+  const data = window.vmData || await Promise.race([
+    new Promise(resolve => { window.vmResolve = resolve; }),
     viaMessaging,
   ]);
-  delete global.resolveData;
+  delete window.vmResolve;
+  delete window.vmData;
   return data;
 }
