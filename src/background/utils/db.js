@@ -1,5 +1,5 @@
 import {
-  compareVersion, i18n, getFullUrl, isRemote, getRnd4, sendCmd, trueJoin,
+  compareVersion, i18n, getFullUrl, isRemote, sendCmd, trueJoin,
 } from '#/common';
 import {
   CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK,
@@ -355,9 +355,15 @@ export function checkRemove({ force } = {}) {
 }
 
 /** @return {string} */
-function getUUID(id) {
-  const idSec = (id + 0x10bde6a2).toString(16).slice(-8);
-  return `${idSec}-${getRnd4()}-${getRnd4()}-${getRnd4()}-${getRnd4()}${getRnd4()}${getRnd4()}`;
+function getUUID() {
+  const rnd = new Uint16Array(8);
+  window.crypto.getRandomValues(rnd);
+  // xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
+  // We're using UUIDv4 variant 1 so N=4 and M=8
+  // See format_uuid_v3or5 in https://tools.ietf.org/rfc/rfc4122.txt
+  rnd[3] = rnd[1] & 0x0FFF | 0x4000; // eslint-disable-line no-bitwise
+  rnd[4] = rnd[2] & 0x3FFF | 0x8000; // eslint-disable-line no-bitwise
+  return '01-2-3-4-567'.replace(/\d/g, i => (rnd[i] + 0x1_0000).toString(16).slice(-4));
 }
 
 /**
@@ -378,7 +384,7 @@ async function saveScript(script, code) {
     oldScript = store.scriptMap[props.id];
   }
   props.uri = getNameURI(script);
-  props.uuid = props.uuid || getUUID(props.id);
+  props.uuid = props.uuid || getUUID();
   // Do not allow script with same name and namespace
   if (store.scripts.some(({ props: { id, uri } = {} }) => props.id !== id && props.uri === uri)) {
     throw i18n('msgNamespaceConflict');

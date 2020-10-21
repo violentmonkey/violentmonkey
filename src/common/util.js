@@ -66,10 +66,6 @@ export function throttle(func, time) {
 
 export function noop() {}
 
-export function getRnd4() {
-  return Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(-4);
-}
-
 export function getUniqId(prefix = 'VM') {
   const now = perfNow();
   return prefix
