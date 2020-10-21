@@ -30,6 +30,7 @@
         v-show="nav === 'code'"
         :active="nav === 'code'"
         :commands="commands"
+        @code-dirty="codeDirty = $event"
       />
       <vm-settings
         class="abs-full edit-body"
@@ -88,7 +89,7 @@ const toList = text => (
   .map(line => line.trim())
   .filter(Boolean)
 );
-let saved;
+let savedSettings;
 let showingConfirmation;
 
 let shouldSavePositionOnSave;
@@ -151,6 +152,7 @@ export default {
       canSave: false,
       script: null,
       code: '',
+      codeDirty: false,
       settings: {},
       commands: {
         save: this.save,
@@ -221,8 +223,8 @@ export default {
         runAt: custom.runAt || '',
       },
     };
-    saved = objectPick(this, ['code', 'settings'], deepCopy);
-    this.$watch('code', this.onChange);
+    savedSettings = deepCopy(this.settings);
+    this.$watch('codeDirty', this.onChange);
     this.$watch('settings', this.onChange, { deep: true });
     // hotkeys
     {
@@ -245,14 +247,15 @@ export default {
   methods: {
     async save() {
       if (shouldSavePositionOnSave) savePosition();
-      const { code, settings } = this;
+      const { settings } = this;
       const { config, custom } = settings;
       const { notifyUpdates } = config;
       try {
+        const codeComponent = this.$refs.code;
         const id = this.script?.props?.id;
         const res = await sendCmd('ParseScript', {
           id,
-          code,
+          code: codeComponent.getRealContent(),
           config: {
             ...config,
             notifyUpdates: notifyUpdates ? +notifyUpdates : null,
@@ -267,8 +270,9 @@ export default {
           isNew: !id,
           message: '',
         });
-        saved = deepCopy({ code, settings });
-        this.canSave = false;
+        savedSettings = deepCopy(settings);
+        codeComponent.cm.markClean();
+        this.codeDirty = false; // triggers onChange which sets canSave
         if (res?.where?.id) this.script = res.update;
       } catch (err) {
         showMessage({ text: err });
@@ -318,8 +322,7 @@ export default {
       store.route.pinned = state;
     },
     onChange() {
-      this.canSave = this.code !== saved.code
-        || !deepEqual(this.settings, saved.settings);
+      this.canSave = this.codeDirty || !deepEqual(this.settings, savedSettings);
     },
     /** @param {Event} e */
     onUnload(e) {

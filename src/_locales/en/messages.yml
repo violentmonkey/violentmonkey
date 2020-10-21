@@ -141,6 +141,15 @@ editLabelMeta:
 editLabelSettings:
   description: Settings section in settings tab of script editor.
   message: Script settings
+editLongLine:
+  description: Shown in the editor in lines that were cut due to being too long
+  message: Line is too long
+editLongLineTooltip:
+  description: Tooltip shown in the editor in lines that were cut due to being too long
+  message: |-
+    This line is too long so its text is collapsed to avoid delays when editing.
+    You can adjust the limit in advanced settings, for example:
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Code
