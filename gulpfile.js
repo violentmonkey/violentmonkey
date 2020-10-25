@@ -6,6 +6,7 @@ const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const plumber = require('gulp-plumber');
 const yaml = require('js-yaml');
+const Jimp = require('jimp');
 const { isProd } = require('@gera2ld/plaid/util');
 const spawn = require('cross-spawn');
 const i18n = require('./scripts/i18n');
@@ -15,7 +16,6 @@ const DIST = 'dist';
 const paths = {
   manifest: 'src/manifest.yml',
   copy: [
-    'src/public/images/**',
     'src/public/lib/**',
   ],
   locales: [
@@ -79,6 +79,32 @@ async function manifest() {
     data.browser_specific_settings.gecko.update_url = 'https://raw.githubusercontent.com/violentmonkey/violentmonkey/master/updates.json';
   }
   await fs.writeFile(`${DIST}/manifest.json`, JSON.stringify(data), 'utf8');
+}
+
+async function createIcons() {
+  const dist = `${DIST}/public/images`;
+  await fs.mkdir(dist, { recursive: true });
+  const icon = await Jimp.read('src/resources/icon.png');
+  const promises = [];
+  promises.push(...[
+    48, 128,
+  ].map(size => icon.clone().resize(size, size).write(`${dist}/icon${size}.png`)));
+  const gray = icon.clone().greyscale();
+  const transparent = icon.clone().fade(0.5);
+  promises.push(...[
+    19, 32, 38,
+  ].flatMap(size => [
+    icon.clone().resize(size, size).write(`${dist}/icon${size}.png`),
+    gray.clone().resize(size, size).write(`${dist}/icon${size}b.png`),
+    transparent.clone().resize(size, size).write(`${dist}/icon${size}w.png`),
+  ]));
+  const handle16 = image => image.clone().resize(18, 18).crop(1, 2, 16, 16);
+  promises.push(...[
+    handle16(icon).write(`${dist}/icon16.png`),
+    handle16(gray).write(`${dist}/icon16b.png`),
+    handle16(transparent).write(`${dist}/icon16w.png`),
+  ])
+  return Promise.all(promises);
 }
 
 /**
@@ -170,7 +196,7 @@ function logError(err) {
   return this.emit('end');
 }
 
-const pack = gulp.parallel(manifest, copyFiles, copyI18n);
+const pack = gulp.parallel(manifest, createIcons, copyFiles, copyI18n);
 
 exports.clean = clean;
 exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
