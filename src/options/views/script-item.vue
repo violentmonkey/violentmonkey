@@ -325,7 +325,7 @@ $removedItemHeight: calc(
       fill: #f00;
     }
     .script-message {
-      color: #f00a;
+      color: #f00;
     }
   }
   &-buttons {
