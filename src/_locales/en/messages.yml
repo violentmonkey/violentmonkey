@@ -205,6 +205,8 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Name
+genericError:
+  message: Error
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: 'off'
