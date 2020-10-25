@@ -73,7 +73,7 @@ async function downloadUpdate({ props: { id }, meta, custom }) {
   announce(i18n('msgCheckingForUpdate'));
   try {
     const { data } = await request(updateURL, {
-      headers: { ...NO_HTTP_CACHE, Accept: 'text/x-userscript-meta' },
+      headers: { ...NO_HTTP_CACHE, Accept: 'text/x-userscript-meta,*/*' },
     });
     const { version } = parseMeta(data);
     if (compareVersion(meta.version, version) >= 0) {
