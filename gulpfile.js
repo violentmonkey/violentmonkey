@@ -6,7 +6,7 @@ const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const plumber = require('gulp-plumber');
 const yaml = require('js-yaml');
-const Jimp = require('jimp');
+const Sharp = require('sharp');
 const { isProd } = require('@gera2ld/plaid/util');
 const spawn = require('cross-spawn');
 const i18n = require('./scripts/i18n');
@@ -82,29 +82,42 @@ async function manifest() {
 }
 
 async function createIcons() {
+  const ALPHA = .5;
   const dist = `${DIST}/public/images`;
   await fs.mkdir(dist, { recursive: true });
-  const icon = await Jimp.read('src/resources/icon.png');
-  const promises = [];
-  promises.push(...[
-    48, 128,
-  ].map(size => icon.clone().resize(size, size).write(`${dist}/icon${size}.png`)));
-  const gray = icon.clone().greyscale();
-  const transparent = icon.clone().fade(0.5);
-  promises.push(...[
-    19, 32, 38,
-  ].flatMap(size => [
-    icon.clone().resize(size, size).write(`${dist}/icon${size}.png`),
-    gray.clone().resize(size, size).write(`${dist}/icon${size}b.png`),
-    transparent.clone().resize(size, size).write(`${dist}/icon${size}w.png`),
-  ]));
-  const handle16 = image => image.clone().resize(18, 18).crop(1, 2, 16, 16);
-  promises.push(...[
-    handle16(icon).write(`${dist}/icon16.png`),
-    handle16(gray).write(`${dist}/icon16b.png`),
-    handle16(transparent).write(`${dist}/icon16w.png`),
-  ])
-  return Promise.all(promises);
+  const icon = Sharp('src/resources/icon.png');
+  const gray = icon.clone().grayscale();
+  const transparent = icon.clone().composite([{
+    input: Buffer.from([255, 255, 255, 256 * ALPHA]),
+    raw: { width: 1, height: 1, channels: 4 },
+    tile: true,
+    blend: 'dest-in',
+  }]);
+  const types = [
+    ['', icon],
+    ['b', gray],
+    ['w', transparent],
+  ];
+  const handle = (size, type = '', image = icon) => {
+    let res = image.clone().resize({ width: size });
+    if (size < 48) res = res.sharpen(size < 32 ? .5 : .25);
+    return res.toFile(`${dist}/icon${size}${type}.png`);
+  };
+  const handle16 = async ([type, image]) => {
+    const res = image.clone()
+    .resize({ width: 18 })
+    .sharpen(.5, 0)
+    .extract({ left: 1, top: 2, width: 16, height: 16 });
+    // darken the outer edge
+    return res.composite([{ input: await res.toBuffer(), blend: 'over' }])
+    .toFile(`${dist}/icon16${type}.png`);
+  };
+  return Promise.all([
+    handle(48),
+    handle(128),
+    ...types.map(handle16),
+    ...[19, 32, 38].flatMap(size => types.map(t => handle(size, ...t))),
+  ]);
 }
 
 /**
