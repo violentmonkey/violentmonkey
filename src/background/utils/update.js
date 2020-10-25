@@ -94,8 +94,8 @@ async function downloadUpdate({ props: { id }, meta, custom }) {
     Object.assign(update, {
       message,
       checking,
-      // `null` is sendable in Chrome unlike `undefined`
-      error: error?.url || error || null,
+      error: error ? `${i18n('genericError')} ${error.status}, ${error.url}` : null,
+      // `null` is transferable in Chrome unlike `undefined`
     });
     sendCmd(CMD_SCRIPT_UPDATE, result);
   }

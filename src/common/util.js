@@ -211,7 +211,7 @@ export async function request(url, options = {}) {
     init.headers['Content-Type'] = 'application/json';
     init.body = JSON.stringify(init.body);
   }
-  const result = {};
+  const result = { url, status: -1 };
   try {
     const resp = await fetch(url, init);
     const loadMethod = {
@@ -223,9 +223,7 @@ export async function request(url, options = {}) {
     result.status = resp.status || 200;
     result.headers = resp.headers;
     result.data = await resp[loadMethod]();
-  } catch {
-    result.status = -1;
-  }
+  } catch { /* NOP */ }
   if (result.status < 0 || result.status > 300) throw result;
   return result;
 }
