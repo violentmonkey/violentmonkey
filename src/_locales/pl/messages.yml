@@ -146,6 +146,12 @@ editLabelMeta:
 editLabelSettings:
   description: Settings section in settings tab of script editor.
   message: Ustawienia skryptu
+editLongLine:
+  description: Shown in the editor in lines that were cut due to being too long
+  message: ''
+editLongLineTooltip:
+  description: Tooltip shown in the editor in lines that were cut due to being too long
+  message: ''
 editNavCode:
   description: Label of code tab in script editor.
   message: Kod
@@ -203,6 +209,9 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Nazwa
+genericError:
+  description: Label for generic error.
+  message: ''
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: wył

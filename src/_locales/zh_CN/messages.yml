@@ -137,6 +137,12 @@ editLabelMeta:
 editLabelSettings:
   description: Settings section in settings tab of script editor.
   message: 脚本设置
+editLongLine:
+  description: Shown in the editor in lines that were cut due to being too long
+  message: ''
+editLongLineTooltip:
+  description: Tooltip shown in the editor in lines that were cut due to being too long
+  message: ''
 editNavCode:
   description: Label of code tab in script editor.
   message: 代码
@@ -192,6 +198,9 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: 名字
+genericError:
+  description: Label for generic error.
+  message: ''
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: 关
