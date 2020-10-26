@@ -146,10 +146,16 @@ editLabelSettings:
   message: Scriptinstellingen
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: Regel is te lang
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: >-
+    Deze regel is te lang. De tekst is ingeklapt om vertraging tijdens het typen
+    te voorkomen.
+
+    Je kunt deze beperking aanpassen in de geavanceerde instellingen. Voorbeeld:
+
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Code
@@ -207,7 +213,7 @@ filterScopeName:
   message: Naam
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Fout
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: uit
