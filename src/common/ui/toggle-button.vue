@@ -1,5 +1,9 @@
 <template>
-  <div class="toggle-button" :class="{active: value}" @click="onToggle">
+  <div class="toggle-button" :class="{active: value}"
+       tabindex="0"
+       @keypress.enter.exact="onToggle"
+       @keypress.space.exact="onToggle"
+       @click="onToggle">
     <slot></slot>
   </div>
 </template>
@@ -29,7 +33,7 @@ export default {
     color: var(--bg);
     background: var(--fill-9);
   }
-  &:hover {
+  &:focus, &:hover {
     filter: brightness(.8);
   }
 }
