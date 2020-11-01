@@ -1,21 +1,22 @@
 <template>
   <div class="flex flex-col">
+    <div class="editor-code flex-auto" ref="code"></div>
     <div class="frame-block editor-search flex" v-show="search.show">
       <form @submit.prevent="goToLine()">
         <span v-text="i18n('labelLineNumber')"></span>
-        <input type="text" class="w-1" v-model="search.line">
+        <input type="text" class="w-1" v-model="jumpPos">
       </form>
       <form class="flex-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
         <tooltip content="Ctrl-F" class="flex-1">
           <!-- id is required for the built-in autocomplete using entered values -->
           <input
-            :class="{ 'is-error': !search.state.hasResult }"
-            :title="search.state.error"
+            :class="{ 'is-error': !search.hasResult }"
+            :title="search.error"
             type="search"
             id="editor-search"
             ref="search"
-            v-model="search.state.query"
+            v-model="search.query"
           />
         </tooltip>
         <tooltip content="Shift-Ctrl-G">
@@ -28,7 +29,7 @@
       <form class="flex-1" @submit.prevent="replace()" v-if="!readonly">
         <span v-text="i18n('labelReplace')"></span>
         <!-- id is required for the built-in autocomplete using entered values -->
-        <input class="flex-1" type="search" id="editor-replace" v-model="search.state.replace">
+        <input class="flex-1" type="search" id="editor-replace" v-model="search.replace">
         <tooltip content="Shift-Ctrl-F">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
@@ -38,15 +39,14 @@
       </form>
       <div>
         <tooltip :content="i18n('searchUseRegex')">
-          <toggle-button v-model="searchOptions.useRegex">.*</toggle-button>
+          <toggle-button v-model="search.options.useRegex">.*</toggle-button>
         </tooltip>
         <tooltip :content="i18n('searchCaseSensitive')">
-          <toggle-button v-model="searchOptions.caseSensitive">Aa</toggle-button>
+          <toggle-button v-model="search.options.caseSensitive">Aa</toggle-button>
         </tooltip>
       </div>
       <button @click="clearSearch">&times;</button>
     </div>
-    <div class="editor-code flex-auto" ref="code"></div>
   </div>
 </template>
 
@@ -73,7 +73,7 @@ import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
-import { debounce, i18n } from '#/common';
+import { i18n } from '#/common';
 import { forEachEntry, deepEqual } from '#/common/object';
 import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
@@ -128,78 +128,6 @@ export const cmOptions = {
   keyMap: 'sublime',
   maxDisplayLength: 20_000,
 };
-const searchOptions = {
-  useRegex: false,
-  caseSensitive: false,
-};
-
-function findUnmarked(cursor, reversed) {
-  while (cursor.find(reversed)) {
-    const marks = cursor.doc.findMarksAt(cursor.from(), cursor.to());
-    if (!marks.length) return true;
-  }
-  return false;
-}
-
-function findNext(cm, state, reversed) {
-  cm.operation(() => {
-    let query = state.query || '';
-    if (!query) {
-      state.hasResult = true;
-      return;
-    }
-    if (query && searchOptions.useRegex) {
-      try {
-        query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
-        state.error = null;
-      } catch (err) {
-        state.error = err;
-      }
-    }
-    const cOptions = {
-      caseFold: !searchOptions.caseSensitive,
-    };
-    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo, cOptions);
-    if (!findUnmarked(cursor, reversed)) {
-      cursor = cm.getSearchCursor(
-        query,
-        reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
-        cOptions,
-      );
-      if (!findUnmarked(cursor, reversed)) {
-        state.hasResult = false;
-        return;
-      }
-    }
-    cm.setSelection(cursor.from(), cursor.to());
-    state.posFrom = cursor.from();
-    state.posTo = cursor.to();
-    state.hasResult = true;
-  });
-}
-function replaceOne(cm, state) {
-  const start = cm.getCursor('start');
-  const end = cm.getCursor('end');
-  state.posTo = state.posFrom;
-  findNext(cm, state);
-  const start2 = cm.getCursor('start');
-  const end2 = cm.getCursor('end');
-  if (
-    start.line === start2.line && start.ch === start2.ch
-    && end.line === end2.line && end.ch === end2.ch
-  ) {
-    cm.replaceRange(state.replace, start, end);
-    findNext(cm, state);
-  }
-}
-function replaceAll(cm, state) {
-  cm.operation(() => {
-    const query = state.query || '';
-    for (let cursor = cm.getSearchCursor(query); findUnmarked(cursor);) {
-      cursor.replace(state.replace);
-    }
-  });
-}
 
 export default {
   props: {
@@ -224,14 +152,16 @@ export default {
   data() {
     return {
       cmOptions,
-      searchOptions,
       content: '',
+      jumpPos: '',
       search: {
         show: false,
-        state: {
-          query: null,
-          replace: null,
-          hasResult: false,
+        query: '',
+        replace: null,
+        hasResult: false,
+        options: {
+          useRegex: false,
+          caseSensitive: false,
         },
       },
     };
@@ -255,13 +185,15 @@ export default {
       cm.on('changes', this.onChanges);
       cm.on('beforeChange', this.onBeforeChange);
     },
-    'search.state.query'() {
-      this.debouncedFind();
+    'search.query'() {
+      const { search } = this;
+      if (!search.queryFilled) this.doSearch({ pos: 'from' });
+      else search.queryFilled = null;
     },
-    searchOptions: {
+    'search.options': {
       deep: true,
       handler() {
-        this.debouncedFind();
+        this.doSearch({ pos: 'from' });
       },
     },
   },
@@ -401,30 +333,78 @@ export default {
       }, this.cm);
     },
     findFillQuery(force) {
-      const { state } = this.search;
-      const { cm } = this;
-      if (!state.query || force) {
+      const { cm, search } = this;
+      if (!search.query || force) {
         const sel = cm.listSelections();
         // use the currently selected text if it's within one line
-        if (sel?.length === 1 && sel[0].anchor.line === sel[0].head.line) {
-          state.query = cm.getSelection();
+        if (sel?.length === 1 && sel[0].anchor.line === sel[0].head.line && !sel[0].empty()) {
+          const query = cm.getSelection();
+          search.queryFilled = !!query;
+          search.query = query;
         }
+        search.show = true;
       }
     },
-    doSearch(reversed) {
-      const { state } = this.search;
-      const { cm } = this;
-      findNext(cm, state, reversed);
-      this.search.show = true;
+    /** @param {VMSearchOptions} opts */
+    doSearch(opts) {
+      const { search } = this;
+      search.hasResult = !search.query || !!this.doSearchInternal({ ...opts, wrapAround: true });
     },
-    searchInPlace() {
-      const { state } = this.search;
-      state.posTo = state.posFrom;
-      this.doSearch();
+    /**
+     * @typedef {Object} VMSearchOptions
+     * @property {boolean} [canSelect=true]
+     * @property {boolean} [reversed]
+     * @property {boolean} [wrapAround]
+     * @property {boolean} [reuseCursor]
+     * @property {{line:number,ch:number}} [pos]
+     */
+    /**
+     * @param {VMSearchOptions} opts
+     * @returns {?true}
+     */
+    doSearchInternal({ canSelect = true, reversed, wrapAround, pos, reuseCursor } = {}) {
+      const { cm, search } = this;
+      const { caseSensitive, useRegex } = search.options;
+      let retry = wrapAround ? 2 : 1;
+      if (!pos || typeof pos === 'string') {
+        pos = cm.getCursor(pos || (reversed ? 'from' : 'to'));
+      }
+      do {
+        let cur;
+        if (reuseCursor) {
+          cur = search.cursor;
+        } else {
+          let { query } = search;
+          if (useRegex) {
+            try {
+              query = new RegExp(query, caseSensitive ? '' : 'gi');
+              search.error = null;
+            } catch (err) {
+              search.error = err;
+              return;
+            }
+          }
+          cur = cm.getSearchCursor(query, pos, { caseFold: !caseSensitive });
+          search.cursor = cur;
+        }
+        while (cur.find(reversed)) {
+          if (!cm.findMarks(cur.from(), cur.to()).length) {
+            if (canSelect) this.reveal(cur.from(), cur.to(), true);
+            return true;
+          }
+        }
+        retry -= 1;
+        if (retry) {
+          pos = {
+            line: reversed ? cm.doc.size : 0,
+            ch: 0,
+          };
+        }
+      } while (retry);
     },
     find() {
       this.findFillQuery(true);
-      this.searchInPlace();
+      this.doSearch({ canSelect: false });
       this.$nextTick(() => {
         const { search } = this.$refs;
         search.select();
@@ -432,36 +412,65 @@ export default {
       });
     },
     findNext(reversed) {
+      const refocus = !this.search.query || !this.cm.hasFocus();
       this.findFillQuery();
-      this.doSearch(reversed);
-      this.$nextTick(() => {
-        this.$refs.search.focus();
-      });
+      this.doSearch({ reversed });
+      if (refocus) this.$nextTick(() => this.$refs.search.focus());
     },
     clearSearch() {
-      const { cm } = this;
-      cm.operation(() => {
-        const { state } = this.search;
-        state.posFrom = null;
-        state.posTo = null;
-        this.search.show = false;
-      });
-      cm.focus();
+      this.search.show = false;
+      this.cm.focus();
     },
     replace(all) {
-      const { cm } = this;
-      const { state } = this.search;
-      if (!state.query) {
+      const { cm, search } = this;
+      const { replace, query } = search;
+      search.show = true;
+      if (!query || replace == null) {
+        search.replace = '';
         this.find();
         return;
       }
-      (all ? replaceAll : replaceOne)(cm, state);
+      if (all) {
+        cm.operation(() => {
+          let opts = { pos: { line: 0, ch: 0 } };
+          while (this.doSearchInternal(opts)) {
+            search.cursor.replace(replace);
+            opts = { reuseCursor: true };
+          }
+        });
+      } else {
+        const { sel } = cm.doc;
+        this.doSearch({ pos: 'from' });
+        if (sel.somethingSelected() && sel.equals(cm.doc.sel)) {
+          cm.replaceSelection(replace);
+          this.doSearch();
+        }
+      }
+    },
+    /** Centers the selection if it's outside of viewport so it won't be at top/bottom randomly */
+    reveal(from, to, select) {
+      const { cm } = this;
+      const vpm = cm.options.viewportMargin;
+      const { viewFrom, viewTo } = cm.display;
+      const inView = from.line >= viewFrom + vpm
+        && (to.line < viewTo - Math.min(cm.doc.size - viewTo, vpm));
+      cm.scrollIntoView({ from, to },
+        inView ? cm.defaultTextHeight() * 2 : cm.display.wrapper.clientHeight / 2);
+      if (select) cm.setSelection(from, to);
     },
     goToLine() {
-      const { cm } = this;
-      const line = +this.search.line;
-      if (line > 0) cm.setCursor(line - 1, 0);
-      cm.focus();
+      const { cm, search, jumpPos } = this;
+      let [line, ch] = jumpPos.split(':').map(Number) || [];
+      if (line) {
+        line -= 1;
+        ch = ch ? ch - 1 : 0;
+        cm.operation(() => {
+          this.reveal({ line, ch }, { line, ch });
+          cm.setCursor(line, ch, { scroll: false });
+        });
+        search.show = false;
+        cm.focus();
+      }
     },
     onCopy(e) {
       // CM already prepared the correct text in DOM selection, which is particularly
@@ -483,7 +492,6 @@ export default {
     this.initialize(CodeMirror(this.$refs.code, opts));
     // pressing Tab key inside a line with no selection will reuse indent size
     if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
-    this.debouncedFind = debounce(this.searchInPlace, 100);
     this.$refs.code.addEventListener('copy', this.onCopy);
     this.onActive(true);
     hookSetting('editor', (newUserOpts) => {
@@ -531,7 +539,7 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
   span > input { // a tooltip'ed input
     width: 100%;
   }
-  .is-error {
+  .is-error, .is-error:focus {
     border-color: #e85600;
     background: #e8560010;
   }
