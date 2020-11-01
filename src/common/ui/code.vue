@@ -128,7 +128,7 @@ export default {
       search: {
         show: false,
         query: '',
-        replace: null,
+        replace: '',
         hasResult: false,
         options: {
           useRegex: false,
@@ -341,7 +341,6 @@ export default {
     },
     /**
      * @typedef {Object} VMSearchOptions
-     * @property {boolean} [canSelect=true]
      * @property {boolean} [reversed]
      * @property {boolean} [wrapAround]
      * @property {boolean} [reuseCursor]
@@ -351,7 +350,7 @@ export default {
      * @param {VMSearchOptions} opts
      * @returns {?true}
      */
-    doSearchInternal({ canSelect = true, reversed, wrapAround, pos, reuseCursor } = {}) {
+    doSearchInternal({ reversed, wrapAround, pos, reuseCursor } = {}) {
       const { cm, search } = this;
       const { caseSensitive, useRegex } = search.options;
       let retry = wrapAround ? 2 : 1;
@@ -377,8 +376,11 @@ export default {
           search.cursor = cur;
         }
         while (cur.find(reversed)) {
-          if (!cm.findMarks(cur.from(), cur.to()).length) {
-            if (canSelect) this.reveal(cur.from(), cur.to(), true);
+          const from = cur.from();
+          const to = cur.to();
+          if (!cm.findMarks(from, to).length) {
+            this.reveal(from, to);
+            cm.setSelection(from, to, { scroll: false });
             return true;
           }
         }
@@ -393,7 +395,7 @@ export default {
     },
     find() {
       this.findFillQuery(true);
-      this.doSearch({ canSelect: false });
+      this.doSearch({ pos: 'from' });
       this.$nextTick(() => {
         const { search } = this.$refs;
         search.select();
@@ -413,9 +415,8 @@ export default {
     replace(all) {
       const { cm, search } = this;
       const { replace, query } = search;
-      search.show = true;
-      if (!query || replace == null) {
-        search.replace = '';
+      if (!query || !search.show) {
+        search.show = true;
         this.find();
         return;
       }
@@ -436,8 +437,8 @@ export default {
         }
       }
     },
-    /** Centers the selection if it's outside of viewport so it won't be at top/bottom randomly */
-    reveal(from, to, select) {
+    /** Centers the selection if it's outside of viewport so the surrounding context is visible */
+    reveal(from, to) {
       const { cm } = this;
       const vpm = cm.options.viewportMargin;
       const { viewFrom, viewTo } = cm.display;
@@ -445,7 +446,6 @@ export default {
         && (to.line < viewTo - Math.min(cm.doc.size - viewTo, vpm));
       cm.scrollIntoView({ from, to },
         inView ? cm.defaultTextHeight() * 2 : cm.display.wrapper.clientHeight / 2);
-      if (select) cm.setSelection(from, to);
     },
     goToLine() {
       const { cm, search, jumpPos } = this;
