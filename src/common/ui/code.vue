@@ -8,7 +8,7 @@
       </form>
       <form class="flex-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
-        <tooltip content="Ctrl-F" class="flex-1">
+        <tooltip :content="tooltip.find" class="flex-1">
           <!-- id is required for the built-in autocomplete using entered values -->
           <input
             :class="{ 'is-error': !search.hasResult }"
@@ -19,10 +19,10 @@
             v-model="search.query"
           />
         </tooltip>
-        <tooltip content="Shift-Ctrl-G">
+        <tooltip :content="tooltip.findPrev">
           <button type="button" @click="findNext(1)">&lt;</button>
         </tooltip>
-        <tooltip content="Ctrl-G">
+        <tooltip :content="tooltip.findNext">
           <button type="submit">&gt;</button>
         </tooltip>
       </form>
@@ -30,10 +30,10 @@
         <span v-text="i18n('labelReplace')"></span>
         <!-- id is required for the built-in autocomplete using entered values -->
         <input class="flex-1" type="search" id="editor-replace" v-model="search.replace">
-        <tooltip content="Shift-Ctrl-F">
+        <tooltip :content="tooltip.replace">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
-        <tooltip content="Shift-Ctrl-R">
+        <tooltip :content="tooltip.replaceAll">
           <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
         </tooltip>
       </form>
@@ -163,6 +163,13 @@ export default {
           useRegex: false,
           caseSensitive: false,
         },
+      },
+      tooltip: {
+        find: '',
+        findPrev: '',
+        findNext: '',
+        replace: '',
+        replaceAll: '',
       },
     };
   },
@@ -485,11 +492,33 @@ export default {
     getRealContent(text = this.cm.getValue()) {
       return text.replace(CTRL_RE, (_, id) => this.placeholders.get(+id)?.body || '');
     },
+    expandKeyMap(res, ...maps) {
+      if (!res) {
+        const { keyMap, extraKeys } = this.cm.options;
+        maps = [extraKeys, keyMap];
+        res = {};
+      }
+      maps.forEach((map) => {
+        if (typeof map === 'string') map = CodeMirror.keyMap[map];
+        map::forEachEntry(([key, value]) => {
+          if (!res[key] && /^[a-z]+$/i.test(value) && CodeMirror.commands[value]) {
+            res[key] = value;
+          }
+        });
+        if (map.fallthrough) this.expandKeyMap(res, map.fallthrough);
+      });
+      delete res.fallthrough;
+      return res;
+    },
   },
   mounted() {
     let userOpts = options.get('editor');
     const opts = { ...this.cmOptions, ...userOpts };
     this.initialize(CodeMirror(this.$refs.code, opts));
+    this.expandKeyMap()::forEachEntry(([key, cmd]) => {
+      const tt = this.tooltip[cmd];
+      if (tt != null) this.tooltip[cmd] += `${tt ? ', ' : ''}${key}`;
+    });
     // pressing Tab key inside a line with no selection will reuse indent size
     if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
     this.$refs.code.addEventListener('copy', this.onCopy);
