@@ -282,7 +282,7 @@ export default {
         'Shift-Ctrl-/': 'commentSelection',
       });
       cm.on('keyHandled', (_cm, _name, e) => {
-        e.stopPropagation(); // FIXME: not needed? lookupKey seems enough
+        e.stopPropagation();
       });
       this.$emit('ready', cm);
     },
