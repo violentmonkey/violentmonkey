@@ -85,35 +85,6 @@ const CTRL_OPEN = '\x02'.repeat(256);
 const CTRL_CLOSE = '\x03'.repeat(256);
 const CTRL_RE = new RegExp(`${CTRL_OPEN}(\\d+)${CTRL_CLOSE}`, 'g');
 
-[
-  'save', 'cancel', 'close',
-  'find', 'findNext', 'findPrev', 'replace', 'replaceAll',
-].forEach((key) => {
-  CodeMirror.commands[key] = cm => cm.state.commands?.[key]?.();
-});
-Object.assign(CodeMirror.keyMap.sublime, {
-  'Shift-Ctrl-/': 'commentSelection',
-});
-CodeMirror.commands.commentSelection = cm => {
-  cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
-};
-// pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
-const { insertTab, insertSoftTab } = CodeMirror.commands;
-CodeMirror.commands.insertTab = cm => (
-  cm.options.indentWithTabs ? insertTab(cm) : insertSoftTab(cm)
-);
-
-function autoHintWithFallback(cm, opts) {
-  const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, opts);
-  // fallback to anyword if default returns nothing (or no default)
-  return result?.list.length ? result : CodeMirror.hint.anyword(cm, opts);
-}
-CodeMirror.registerHelper('hint', 'autoHintWithFallback', autoHintWithFallback);
-
-CodeMirror.commands.autocomplete = (cm) => {
-  cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
-};
-
 export const cmOptions = {
   continueComments: true,
   styleActiveLine: true,
@@ -273,23 +244,18 @@ export default {
       cm.setOption('readOnly', this.readonly);
       // these are active only in the code nav tab
       cm.state.commands = Object.assign({
-        find: this.find,
-        findNext: this.findNext,
-        findPrev: () => {
-          this.findNext(1);
-        },
-        replace: this.replace,
-        replaceAll: () => {
-          this.replace(1);
-        },
+        // call own methods explicitly to strip `cm` parameter passed by CodeMirror
+        find: () => this.find(),
+        findNext: () => this.findNext(),
+        findPrev: () => this.findNext(1),
+        replace: () => this.replace(),
+        replaceAll: () => this.replace(1),
       }, this.commands);
-      // these are active in all nav tabs
-      cm.setOption('extraKeys', {
-        Esc: 'cancel',
-        F1: 'showHelp',
-        'Ctrl-Space': 'autocomplete',
-      });
-      Object.assign(CodeMirror.commands, {
+      const { insertTab, insertSoftTab } = CodeMirror.commands;
+      Object.assign(CodeMirror.commands, cm.state.commands, {
+        autocomplete() {
+          cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
+        },
         cancel: () => {
           if (this.search.show) {
             this.clearSearch();
@@ -297,10 +263,26 @@ export default {
             cm.execCommand('close');
           }
         },
+        commentSelection() {
+          cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
+        },
+        insertTab() {
+          // pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
+          (cm.options.indentWithTabs ? insertTab : insertSoftTab)(cm);
+        },
         showHelp: this.commands.showHelp,
       });
+      // these are active in all nav tabs
+      cm.setOption('extraKeys', {
+        Esc: 'cancel',
+        F1: 'showHelp',
+        'Ctrl-Space': 'autocomplete',
+      });
+      Object.assign(CodeMirror.keyMap.sublime, {
+        'Shift-Ctrl-/': 'commentSelection',
+      });
       cm.on('keyHandled', (_cm, _name, e) => {
-        e.stopPropagation();
+        e.stopPropagation(); // FIXME: not needed? lookupKey seems enough
       });
       this.$emit('ready', cm);
     },
@@ -514,6 +496,11 @@ export default {
   mounted() {
     let userOpts = options.get('editor');
     const opts = { ...this.cmOptions, ...userOpts };
+    CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
+      const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
+      // fallback to anyword if default returns nothing (or no default)
+      return result?.list.length ? result : CodeMirror.hint.anyword(cm, ...args);
+    });
     this.initialize(CodeMirror(this.$refs.code, opts));
     this.expandKeyMap()::forEachEntry(([key, cmd]) => {
       const tt = this.tooltip[cmd];
