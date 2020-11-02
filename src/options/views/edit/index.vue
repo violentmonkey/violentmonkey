@@ -57,7 +57,7 @@
 <script>
 import CodeMirror from 'codemirror';
 import { debounce, i18n, sendCmd } from '#/common';
-import { deepCopy, deepEqual, forEachEntry, objectPick } from '#/common/object';
+import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import options from '#/common/options';
 import { route } from '#/common/router';
@@ -123,19 +123,6 @@ const setupSavePosition = ({ id: curWndId, tabs }) => {
 let K_SAVE; // deduced from the current CodeMirror keymap
 const K_PREV_PANEL = 'Alt-PageUp';
 const K_NEXT_PANEL = 'Alt-PageDown';
-const expandKeyMap = (res, ...maps) => {
-  maps.forEach((map) => {
-    if (typeof map === 'string') map = CodeMirror.keyMap[map];
-    map::forEachEntry(([key, value]) => {
-      if (!res[key] && /^[a-z]+$/i.test(value) && CodeMirror.commands[value]) {
-        res[key] = value;
-      }
-    });
-    if (map.fallthrough) expandKeyMap(res, map.fallthrough);
-  });
-  delete res.fallthrough;
-  return res;
-};
 const compareString = (a, b) => (a < b ? -1 : a > b);
 
 export default {
@@ -229,11 +216,10 @@ export default {
     // hotkeys
     {
       const navLabels = Object.values(this.navItems);
-      const cmOpts = this.$refs.code.cm.options;
       const hotkeys = [
         [K_PREV_PANEL, ` ${navLabels.join(' < ')}`],
         [K_NEXT_PANEL, ` ${navLabels.join(' > ')}`],
-        ...Object.entries(expandKeyMap({}, cmOpts.extraKeys, cmOpts.keyMap))
+        ...Object.entries(this.$refs.code.expandKeyMap())
         .sort((a, b) => compareString(a[1], b[1]) || compareString(a[0], b[0])),
       ];
       K_SAVE = hotkeys.find(([, cmd]) => cmd === 'save')?.[0];

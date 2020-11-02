@@ -1,52 +1,52 @@
 <template>
   <div class="flex flex-col">
+    <div class="editor-code flex-auto" ref="code"></div>
     <div class="frame-block editor-search flex" v-show="search.show">
       <form @submit.prevent="goToLine()">
         <span v-text="i18n('labelLineNumber')"></span>
-        <input type="text" class="w-1" v-model="search.line">
+        <input type="text" class="w-1" v-model="jumpPos">
       </form>
       <form class="flex-1" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
-        <tooltip content="Ctrl-F" class="flex-1">
+        <tooltip :content="tooltip.find" class="flex-1">
           <!-- id is required for the built-in autocomplete using entered values -->
           <input
-            :class="{ 'is-error': !search.state.hasResult }"
-            :title="search.state.error"
+            :class="{ 'is-error': !search.hasResult }"
+            :title="search.error"
             type="search"
             id="editor-search"
             ref="search"
-            v-model="search.state.query"
+            v-model="search.query"
           />
         </tooltip>
-        <tooltip content="Shift-Ctrl-G">
+        <tooltip :content="tooltip.findPrev">
           <button type="button" @click="findNext(1)">&lt;</button>
         </tooltip>
-        <tooltip content="Ctrl-G">
+        <tooltip :content="tooltip.findNext">
           <button type="submit">&gt;</button>
         </tooltip>
       </form>
       <form class="flex-1" @submit.prevent="replace()" v-if="!readonly">
         <span v-text="i18n('labelReplace')"></span>
         <!-- id is required for the built-in autocomplete using entered values -->
-        <input class="flex-1" type="search" id="editor-replace" v-model="search.state.replace">
-        <tooltip content="Shift-Ctrl-F">
+        <input class="flex-1" type="search" id="editor-replace" v-model="search.replace">
+        <tooltip :content="tooltip.replace">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
-        <tooltip content="Shift-Ctrl-R">
+        <tooltip :content="tooltip.replaceAll">
           <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
         </tooltip>
       </form>
       <div>
         <tooltip :content="i18n('searchUseRegex')">
-          <toggle-button v-model="searchOptions.useRegex">.*</toggle-button>
+          <toggle-button v-model="search.options.useRegex">.*</toggle-button>
         </tooltip>
         <tooltip :content="i18n('searchCaseSensitive')">
-          <toggle-button v-model="searchOptions.caseSensitive">Aa</toggle-button>
+          <toggle-button v-model="search.options.caseSensitive">Aa</toggle-button>
         </tooltip>
       </div>
       <button @click="clearSearch">&times;</button>
     </div>
-    <div class="editor-code flex-auto" ref="code"></div>
   </div>
 </template>
 
@@ -73,7 +73,7 @@ import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
-import { debounce, i18n } from '#/common';
+import { i18n } from '#/common';
 import { forEachEntry, deepEqual } from '#/common/object';
 import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
@@ -84,35 +84,6 @@ let maxDisplayLength;
 const CTRL_OPEN = '\x02'.repeat(256);
 const CTRL_CLOSE = '\x03'.repeat(256);
 const CTRL_RE = new RegExp(`${CTRL_OPEN}(\\d+)${CTRL_CLOSE}`, 'g');
-
-[
-  'save', 'cancel', 'close',
-  'find', 'findNext', 'findPrev', 'replace', 'replaceAll',
-].forEach((key) => {
-  CodeMirror.commands[key] = cm => cm.state.commands?.[key]?.();
-});
-Object.assign(CodeMirror.keyMap.sublime, {
-  'Shift-Ctrl-/': 'commentSelection',
-});
-CodeMirror.commands.commentSelection = cm => {
-  cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
-};
-// pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
-const { insertTab, insertSoftTab } = CodeMirror.commands;
-CodeMirror.commands.insertTab = cm => (
-  cm.options.indentWithTabs ? insertTab(cm) : insertSoftTab(cm)
-);
-
-function autoHintWithFallback(cm, opts) {
-  const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, opts);
-  // fallback to anyword if default returns nothing (or no default)
-  return result?.list.length ? result : CodeMirror.hint.anyword(cm, opts);
-}
-CodeMirror.registerHelper('hint', 'autoHintWithFallback', autoHintWithFallback);
-
-CodeMirror.commands.autocomplete = (cm) => {
-  cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
-};
 
 export const cmOptions = {
   continueComments: true,
@@ -128,78 +99,6 @@ export const cmOptions = {
   keyMap: 'sublime',
   maxDisplayLength: 20_000,
 };
-const searchOptions = {
-  useRegex: false,
-  caseSensitive: false,
-};
-
-function findUnmarked(cursor, reversed) {
-  while (cursor.find(reversed)) {
-    const marks = cursor.doc.findMarksAt(cursor.from(), cursor.to());
-    if (!marks.length) return true;
-  }
-  return false;
-}
-
-function findNext(cm, state, reversed) {
-  cm.operation(() => {
-    let query = state.query || '';
-    if (!query) {
-      state.hasResult = true;
-      return;
-    }
-    if (query && searchOptions.useRegex) {
-      try {
-        query = new RegExp(query, searchOptions.caseSensitive ? '' : 'i');
-        state.error = null;
-      } catch (err) {
-        state.error = err;
-      }
-    }
-    const cOptions = {
-      caseFold: !searchOptions.caseSensitive,
-    };
-    let cursor = cm.getSearchCursor(query, reversed ? state.posFrom : state.posTo, cOptions);
-    if (!findUnmarked(cursor, reversed)) {
-      cursor = cm.getSearchCursor(
-        query,
-        reversed ? CodeMirror.Pos(cm.lastLine()) : CodeMirror.Pos(cm.firstLine(), 0),
-        cOptions,
-      );
-      if (!findUnmarked(cursor, reversed)) {
-        state.hasResult = false;
-        return;
-      }
-    }
-    cm.setSelection(cursor.from(), cursor.to());
-    state.posFrom = cursor.from();
-    state.posTo = cursor.to();
-    state.hasResult = true;
-  });
-}
-function replaceOne(cm, state) {
-  const start = cm.getCursor('start');
-  const end = cm.getCursor('end');
-  state.posTo = state.posFrom;
-  findNext(cm, state);
-  const start2 = cm.getCursor('start');
-  const end2 = cm.getCursor('end');
-  if (
-    start.line === start2.line && start.ch === start2.ch
-    && end.line === end2.line && end.ch === end2.ch
-  ) {
-    cm.replaceRange(state.replace, start, end);
-    findNext(cm, state);
-  }
-}
-function replaceAll(cm, state) {
-  cm.operation(() => {
-    const query = state.query || '';
-    for (let cursor = cm.getSearchCursor(query); findUnmarked(cursor);) {
-      cursor.replace(state.replace);
-    }
-  });
-}
 
 export default {
   props: {
@@ -224,15 +123,24 @@ export default {
   data() {
     return {
       cmOptions,
-      searchOptions,
       content: '',
+      jumpPos: '',
       search: {
         show: false,
-        state: {
-          query: null,
-          replace: null,
-          hasResult: false,
+        query: '',
+        replace: '',
+        hasResult: false,
+        options: {
+          useRegex: false,
+          caseSensitive: false,
         },
+      },
+      tooltip: {
+        find: '',
+        findPrev: '',
+        findNext: '',
+        replace: '',
+        replaceAll: '',
       },
     };
   },
@@ -255,13 +163,15 @@ export default {
       cm.on('changes', this.onChanges);
       cm.on('beforeChange', this.onBeforeChange);
     },
-    'search.state.query'() {
-      this.debouncedFind();
+    'search.query'() {
+      const { search } = this;
+      if (!search.queryFilled) this.doSearch({ pos: 'from' });
+      else search.queryFilled = null;
     },
-    searchOptions: {
+    'search.options': {
       deep: true,
       handler() {
-        this.debouncedFind();
+        this.doSearch({ pos: 'from' });
       },
     },
   },
@@ -334,23 +244,18 @@ export default {
       cm.setOption('readOnly', this.readonly);
       // these are active only in the code nav tab
       cm.state.commands = Object.assign({
-        find: this.find,
-        findNext: this.findNext,
-        findPrev: () => {
-          this.findNext(1);
-        },
-        replace: this.replace,
-        replaceAll: () => {
-          this.replace(1);
-        },
+        // call own methods explicitly to strip `cm` parameter passed by CodeMirror
+        find: () => this.find(),
+        findNext: () => this.findNext(),
+        findPrev: () => this.findNext(1),
+        replace: () => this.replace(),
+        replaceAll: () => this.replace(1),
       }, this.commands);
-      // these are active in all nav tabs
-      cm.setOption('extraKeys', {
-        Esc: 'cancel',
-        F1: 'showHelp',
-        'Ctrl-Space': 'autocomplete',
-      });
-      Object.assign(CodeMirror.commands, {
+      const { insertTab, insertSoftTab } = CodeMirror.commands;
+      Object.assign(CodeMirror.commands, cm.state.commands, {
+        autocomplete() {
+          cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
+        },
         cancel: () => {
           if (this.search.show) {
             this.clearSearch();
@@ -358,7 +263,23 @@ export default {
             cm.execCommand('close');
           }
         },
+        commentSelection() {
+          cm.blockComment(cm.getCursor('from'), cm.getCursor('to'), { fullLines: false });
+        },
+        insertTab() {
+          // pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
+          (cm.options.indentWithTabs ? insertTab : insertSoftTab)(cm);
+        },
         showHelp: this.commands.showHelp,
+      });
+      // these are active in all nav tabs
+      cm.setOption('extraKeys', {
+        Esc: 'cancel',
+        F1: 'showHelp',
+        'Ctrl-Space': 'autocomplete',
+      });
+      Object.assign(CodeMirror.keyMap.sublime, {
+        'Shift-Ctrl-/': 'commentSelection',
       });
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
@@ -401,30 +322,80 @@ export default {
       }, this.cm);
     },
     findFillQuery(force) {
-      const { state } = this.search;
-      const { cm } = this;
-      if (!state.query || force) {
+      const { cm, search } = this;
+      if (!search.query || force) {
         const sel = cm.listSelections();
         // use the currently selected text if it's within one line
-        if (sel?.length === 1 && sel[0].anchor.line === sel[0].head.line) {
-          state.query = cm.getSelection();
+        if (sel?.length === 1 && sel[0].anchor.line === sel[0].head.line && !sel[0].empty()) {
+          const query = cm.getSelection();
+          search.queryFilled = !!query;
+          search.query = query;
         }
+        search.show = true;
       }
     },
-    doSearch(reversed) {
-      const { state } = this.search;
-      const { cm } = this;
-      findNext(cm, state, reversed);
-      this.search.show = true;
+    /** @param {VMSearchOptions} opts */
+    doSearch(opts) {
+      const { search } = this;
+      search.hasResult = !search.query || !!this.doSearchInternal({ ...opts, wrapAround: true });
     },
-    searchInPlace() {
-      const { state } = this.search;
-      state.posTo = state.posFrom;
-      this.doSearch();
+    /**
+     * @typedef {Object} VMSearchOptions
+     * @property {boolean} [reversed]
+     * @property {boolean} [wrapAround]
+     * @property {boolean} [reuseCursor]
+     * @property {{line:number,ch:number}} [pos]
+     */
+    /**
+     * @param {VMSearchOptions} opts
+     * @returns {?true}
+     */
+    doSearchInternal({ reversed, wrapAround, pos, reuseCursor } = {}) {
+      const { cm, search } = this;
+      const { caseSensitive, useRegex } = search.options;
+      let retry = wrapAround ? 2 : 1;
+      if (!pos || typeof pos === 'string') {
+        pos = cm.getCursor(pos || (reversed ? 'from' : 'to'));
+      }
+      do {
+        let cur;
+        if (reuseCursor) {
+          cur = search.cursor;
+        } else {
+          let { query } = search;
+          if (useRegex) {
+            try {
+              query = new RegExp(query, caseSensitive ? '' : 'gi');
+              search.error = null;
+            } catch (err) {
+              search.error = err;
+              return;
+            }
+          }
+          cur = cm.getSearchCursor(query, pos, { caseFold: !caseSensitive });
+          search.cursor = cur;
+        }
+        while (cur.find(reversed)) {
+          const from = cur.from();
+          const to = cur.to();
+          if (!cm.findMarks(from, to).length) {
+            this.reveal(from, to);
+            cm.setSelection(from, to, { scroll: false });
+            return true;
+          }
+        }
+        retry -= 1;
+        if (retry) {
+          pos = {
+            line: reversed ? cm.doc.size : 0,
+            ch: 0,
+          };
+        }
+      } while (retry);
     },
     find() {
       this.findFillQuery(true);
-      this.searchInPlace();
+      this.doSearch({ pos: 'from' });
       this.$nextTick(() => {
         const { search } = this.$refs;
         search.select();
@@ -432,36 +403,63 @@ export default {
       });
     },
     findNext(reversed) {
+      const refocus = !this.search.query || !this.cm.hasFocus();
       this.findFillQuery();
-      this.doSearch(reversed);
-      this.$nextTick(() => {
-        this.$refs.search.focus();
-      });
+      this.doSearch({ reversed });
+      if (refocus) this.$nextTick(() => this.$refs.search.focus());
     },
     clearSearch() {
-      const { cm } = this;
-      cm.operation(() => {
-        const { state } = this.search;
-        state.posFrom = null;
-        state.posTo = null;
-        this.search.show = false;
-      });
-      cm.focus();
+      this.search.show = false;
+      this.cm.focus();
     },
     replace(all) {
-      const { cm } = this;
-      const { state } = this.search;
-      if (!state.query) {
+      const { cm, search } = this;
+      const { replace, query } = search;
+      if (!query || !search.show) {
+        search.show = true;
         this.find();
         return;
       }
-      (all ? replaceAll : replaceOne)(cm, state);
+      if (all) {
+        cm.operation(() => {
+          let opts = { pos: { line: 0, ch: 0 } };
+          while (this.doSearchInternal(opts)) {
+            search.cursor.replace(replace);
+            opts = { reuseCursor: true };
+          }
+        });
+      } else {
+        const { sel } = cm.doc;
+        this.doSearch({ pos: 'from' });
+        if (sel.somethingSelected() && sel.equals(cm.doc.sel)) {
+          cm.replaceSelection(replace);
+          this.doSearch();
+        }
+      }
+    },
+    /** Centers the selection if it's outside of viewport so the surrounding context is visible */
+    reveal(from, to) {
+      const { cm } = this;
+      const vpm = cm.options.viewportMargin;
+      const { viewFrom, viewTo } = cm.display;
+      const inView = from.line >= viewFrom + vpm
+        && (to.line < viewTo - Math.min(cm.doc.size - viewTo, vpm));
+      cm.scrollIntoView({ from, to },
+        inView ? cm.defaultTextHeight() * 2 : cm.display.wrapper.clientHeight / 2);
     },
     goToLine() {
-      const { cm } = this;
-      const line = +this.search.line;
-      if (line > 0) cm.setCursor(line - 1, 0);
-      cm.focus();
+      const { cm, search, jumpPos } = this;
+      let [line, ch] = jumpPos.split(':').map(Number) || [];
+      if (line) {
+        line -= 1;
+        ch = ch ? ch - 1 : 0;
+        cm.operation(() => {
+          this.reveal({ line, ch }, { line, ch });
+          cm.setCursor(line, ch, { scroll: false });
+        });
+        search.show = false;
+        cm.focus();
+      }
     },
     onCopy(e) {
       // CM already prepared the correct text in DOM selection, which is particularly
@@ -476,14 +474,40 @@ export default {
     getRealContent(text = this.cm.getValue()) {
       return text.replace(CTRL_RE, (_, id) => this.placeholders.get(+id)?.body || '');
     },
+    expandKeyMap(res, ...maps) {
+      if (!res) {
+        const { keyMap, extraKeys } = this.cm.options;
+        maps = [extraKeys, keyMap];
+        res = {};
+      }
+      maps.forEach((map) => {
+        if (typeof map === 'string') map = CodeMirror.keyMap[map];
+        map::forEachEntry(([key, value]) => {
+          if (!res[key] && /^[a-z]+$/i.test(value) && CodeMirror.commands[value]) {
+            res[key] = value;
+          }
+        });
+        if (map.fallthrough) this.expandKeyMap(res, map.fallthrough);
+      });
+      delete res.fallthrough;
+      return res;
+    },
   },
   mounted() {
     let userOpts = options.get('editor');
     const opts = { ...this.cmOptions, ...userOpts };
+    CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
+      const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
+      // fallback to anyword if default returns nothing (or no default)
+      return result?.list.length ? result : CodeMirror.hint.anyword(cm, ...args);
+    });
     this.initialize(CodeMirror(this.$refs.code, opts));
+    this.expandKeyMap()::forEachEntry(([key, cmd]) => {
+      const tt = this.tooltip[cmd];
+      if (tt != null) this.tooltip[cmd] += `${tt ? ', ' : ''}${key}`;
+    });
     // pressing Tab key inside a line with no selection will reuse indent size
     if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
-    this.debouncedFind = debounce(this.searchInPlace, 100);
     this.$refs.code.addEventListener('copy', this.onCopy);
     this.onActive(true);
     hookSetting('editor', (newUserOpts) => {
@@ -531,7 +555,7 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
   span > input { // a tooltip'ed input
     width: 100%;
   }
-  .is-error {
+  .is-error, .is-error:focus {
     border-color: #e85600;
     background: #e8560010;
   }
