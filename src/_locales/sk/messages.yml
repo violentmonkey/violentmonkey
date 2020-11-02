@@ -146,10 +146,16 @@ editLabelSettings:
   message: Nastavenia skriptu
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: Riadok je príliš dlhý
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: >-
+    Tento riadok je príliš dlhý, takže jeho text je zbalený, aby sa predišlo
+    oneskoreniu pri úpravách.
+
+    Limit môžete upraviť v rozšírených nastaveniach, napríklad:
+
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Kód
@@ -209,7 +215,7 @@ filterScopeName:
   message: Názov
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Chyba
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: vypnuté

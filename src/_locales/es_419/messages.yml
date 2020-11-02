@@ -148,10 +148,16 @@ editLabelSettings:
   message: Configuración del script
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: La línea es demasiado larga
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: >-
+    Esta línea es demasiado larga, y el texto estará colapsado para evitar
+    retrasos en la edición.
+
+    Puedes ajustar el límite en la configuración avanzada, por ejemplo:
+
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Código
@@ -211,7 +217,7 @@ filterScopeName:
   message: Nombre
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Error
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: deshabilitado
