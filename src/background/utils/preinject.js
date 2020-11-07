@@ -14,13 +14,17 @@ const API_CONFIG = {
 const TIME_AFTER_SEND = 10e3; // longer as establishing connection to sites may take time
 const TIME_AFTER_RECEIVE = 1e3; // shorter as response body will be coming very soon
 const TIME_KEEP_DATA = 60e3; // 100ms should be enough but the tab may hang or get paused in debugger
+const extensionId = global.chrome.runtime.id;
 let injectInto;
+let instantInject;
 hookOptions(changes => {
   injectInto = changes.defaultInjectInto ?? injectInto;
   if ('isApplied' in changes) togglePreinject(changes.isApplied);
+  if ('instantInject' in changes) toggleInstantInject(changes.instantInject);
 });
 postInitialize.push(() => {
   injectInto = getOption('defaultInjectInto');
+  toggleInstantInject(getOption('instantInject'));
   togglePreinject(getOption('isApplied'));
 });
 
@@ -42,6 +46,19 @@ function togglePreinject(enable) {
   browser.webRequest.onHeadersReceived[onOff](prolong, config);
 }
 
+function toggleInstantInject(enable) {
+  instantInject = enable;
+  if (enable) {
+    browser.webRequest.onHeadersReceived.addListener(tryInstantInject, API_CONFIG, [
+      'blocking',
+      'responseHeaders',
+      browser.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS,
+    ].filter(Boolean));
+  } else {
+    browser.webRequest.onHeadersReceived.removeListener(prolong);
+  }
+}
+
 function preinject({ url, tabId, frameId }) {
   if (!INJECTABLE_TAB_URL_RE.test(url)) return;
   const isTop = !frameId;
@@ -58,6 +75,25 @@ function prolong({ url, frameId }) {
   cache.hit(getKey(url, !frameId), TIME_AFTER_RECEIVE);
 }
 
+function tryInstantInject({ url, frameId, responseHeaders }) {
+  const data = cache.get(getKey(url, !frameId));
+  if (data) {
+    return data.inject
+      ? setInstantCookie(data, responseHeaders)
+      : ua.isFirefox && data.then(res => setInstantCookie(res, responseHeaders));
+  }
+}
+
+function setInstantCookie(data, responseHeaders) {
+  const blobUrl = URL.createObjectURL(new Blob([JSON.stringify(data.inject)]));
+  setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
+  responseHeaders.push({
+    name: 'Set-Cookie',
+    value: `${extensionId}=${blobUrl.split('/').pop()}; SameSite=Lax`,
+  });
+  return { responseHeaders };
+}
+
 async function prepare(url, tabId, frameId, isLate) {
   const data = await getScriptsByURL(url, !frameId);
   const { inject } = data;
@@ -66,8 +102,12 @@ async function prepare(url, tabId, frameId, isLate) {
   inject.ua = ua;
   inject.isFirefox = ua.isFirefox;
   inject.isPopupShown = popupTabs[tabId];
-  if (!isLate && browser.contentScripts) {
-    registerScriptDataFF(data, url, !!frameId);
+  if (!isLate) {
+    if (instantInject) {
+      cache.put(getKey(url, !frameId), data, TIME_AFTER_SEND);
+    } else if (browser.contentScripts) {
+      registerScriptDataFF(data, url, !!frameId);
+    }
   }
   return data;
 }

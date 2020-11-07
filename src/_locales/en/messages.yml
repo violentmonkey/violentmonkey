@@ -351,6 +351,10 @@ labelInjectionMode:
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Installing script
+labelInstantInject:
+  message: Use instant injection mode (not recommended)
+labelInstantInjectHint:
+  message: Runs scripts at the real <document-start> reliably. Don't enable unless you do have a script that needs to run before the page starts loading and Violentmonkey is currently running it too late. This mode will be using the deprecated synchronous XHR so you'll see warnings in devtools console, although you can safely ignore them as the adverse affects it warns about are negligible in this case and you can hide the warnings for good by right-clicking one.
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Keep original

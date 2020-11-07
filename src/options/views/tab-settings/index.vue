@@ -83,6 +83,14 @@
       <section>
         <h3 v-text="i18n('labelGeneral')"></h3>
         <div class="mb-1">
+          <label class="mr-2" >
+            <setting-check name="instantInject" />
+            <tooltip :content="i18n('labelInstantInjectHint')">
+              <span v-text="i18n('labelInstantInject')"></span>
+            </tooltip>
+          </label>
+        </div>
+        <div class="mb-1">
           <label>
             <span v-text="i18n('labelInjectionMode')"></span>
             <select v-model="settings.defaultInjectInto">

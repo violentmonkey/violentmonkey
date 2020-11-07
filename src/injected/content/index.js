@@ -26,7 +26,7 @@ const { split } = String.prototype;
   // injecting right now before site scripts can mangle globals or intercept our contentId
   // except for XML documents as their appearance breaks, but first we're sending
   // a request for the data because injectPageSandbox takes ~5ms
-  const dataPromise = sendCmd('GetInjected', null, { retry: true });
+  const dataPromise = tryInstantInject() || sendCmd('GetInjected', null, { retry: true });
   const isXml = document instanceof XMLDocument;
   if (!isXml) injectPageSandbox(contentId, webId);
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
@@ -111,4 +111,21 @@ async function getDataFF(viaMessaging) {
   delete window.vmResolve;
   delete window.vmData;
   return data;
+}
+
+function tryInstantInject() {
+  try {
+    const { runtime } = global.chrome;
+    // this may throw due to CSP sandbox
+    const blobId = document.cookie.split(`${runtime.id}=`)[1]?.split(';', 1)[0];
+    if (blobId) {
+      document.cookie = `${runtime.id}=0; max-age=0; SameSite=Lax`; // this removes our cookie
+      const xhr = new XMLHttpRequest();
+      const url = `blob:${runtime.getURL(blobId)}`;
+      xhr.open('get', url, false); // `false` = synchronous
+      xhr.send();
+      URL.revokeObjectURL(url);
+      return JSON.parse(xhr.response);
+    }
+  } catch { /* NOP */ }
 }

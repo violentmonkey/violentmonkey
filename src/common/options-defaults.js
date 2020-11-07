@@ -27,6 +27,7 @@ export default {
   version: null,
   /** @type 'auto' | 'page' | 'content' */
   defaultInjectInto: INJECT_AUTO,
+  instantInject: false,
   filters: {
     /** @type 'name' | 'code' | 'all' */
     searchScope: 'name',
