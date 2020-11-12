@@ -1,4 +1,5 @@
 import { browser } from '#/common/consts';
+import { deepCopy } from './object';
 import { noop } from './util';
 
 export { normalizeKeys } from './object';
@@ -37,6 +38,13 @@ export function initHooks() {
  */
 export function sendCmd(cmd, data, options) {
   return sendMessage({ cmd, data }, options);
+}
+
+export function sendCmdDirectly(cmd, data, options) {
+  const bg = browser.extension.getBackgroundPage?.();
+  return bg && bg !== window
+    ? bg.handleCommandMessage(bg.deepCopy({ cmd, data })).then(deepCopy)
+    : sendCmd(cmd, data, options);
 }
 
 /**
@@ -111,22 +119,6 @@ export function getFullUrl(url, base) {
 
 export function isRemote(url) {
   return url && !(/^(file:|data:|https?:\/\/localhost[:/]|http:\/\/127\.0\.0\.1[:/])/.test(url));
-}
-
-export function cache2blobUrl(raw, { defaultType, type: overrideType } = {}) {
-  if (raw) {
-    const parts = `${raw}`.split(',');
-    const { length } = parts;
-    const b64 = parts[length - 1];
-    const type = overrideType || parts[length - 2] || defaultType || '';
-    // Binary string is not supported by blob constructor,
-    // so we have to transform it into array buffer.
-    const bin = window.atob(b64);
-    const arr = new window.Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i += 1) arr[i] = bin.charCodeAt(i);
-    const blob = new Blob([arr], { type });
-    return URL.createObjectURL(blob);
-  }
 }
 
 export function encodeFilename(name) {

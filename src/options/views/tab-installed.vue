@@ -137,6 +137,7 @@ import LocaleGroup from '#/common/ui/locale-group';
 import { forEachKey } from '#/common/object';
 import { setRoute, lastRoute } from '#/common/router';
 import storage from '#/common/storage';
+import { loadData } from '#/options';
 import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, showConfirmation, showMessage } from '../utils';
@@ -348,7 +349,10 @@ export default {
         this.script = nid && this.scripts.find(script => script.props.id === nid);
         if (!this.script) {
           // First time showing the list we need to tell v-if to keep it forever
-          this.canRenderScripts = true;
+          if (!this.canRenderScripts) {
+            loadData();
+            this.canRenderScripts = true;
+          }
           this.debouncedRender();
           // Strip the invalid id from the URL so |App| can render the aside,
           // which was hidden to avoid flicker on initial page load directly into the editor.

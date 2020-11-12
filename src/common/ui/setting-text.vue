@@ -31,8 +31,7 @@ export default {
       error: null,
     };
   },
-  async created() {
-    if (!options.ready.indeed) await options.ready;
+  created() {
     const handle = this.json
       ? (value => JSON.stringify(value, null, '  '))
       // XXX compatible with old data format

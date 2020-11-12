@@ -1,8 +1,6 @@
 import Vue from 'vue';
-import {
-  sendCmd, i18n, getLocaleString, cache2blobUrl,
-} from '#/common';
-import { forEachEntry, forEachValue } from '#/common/object';
+import { sendCmdDirectly, i18n, getLocaleString } from '#/common';
+import { forEachEntry } from '#/common/object';
 import handlers from '#/common/handlers';
 import options from '#/common/options';
 import loadZip from '#/common/zip';
@@ -51,27 +49,24 @@ function initScript(script) {
   script.$cache = { search, name, lowerName };
 }
 
-async function loadData() {
-  const data = await sendCmd('GetData', null, { retry: true });
-  if (!options.ready.indeed) await options.ready;
-  const oldCache = store.cache || {};
-  store.cache = data.cache;
-  store.sync = data.sync;
-  store.scripts = data.scripts;
-  if (store.scripts) {
-    store.scripts.forEach(initScript);
-  }
-  if (store.cache) {
-    store.cache::forEachEntry(([url, raw]) => {
-      if (oldCache[url]) {
-        store.cache[url] = oldCache[url];
-        delete oldCache[url];
-      } else {
-        store.cache[url] = cache2blobUrl(raw, { defaultType: 'image/png' });
-      }
+export async function loadData() {
+  const id = store.route.paths[1];
+  const params = id ? [+id].filter(Boolean) : null;
+  const [{ cache, scripts, sync }] = await Promise.all([
+    sendCmdDirectly('GetData', params, { retry: true }),
+    options.ready,
+  ]);
+  if (cache) {
+    const oldCache = store.cache || {};
+    cache::forEachEntry(([url, raw]) => {
+      const res = oldCache[url] || raw && `data:image/png;base64,${raw.split(',').pop()}`;
+      if (res) cache[url] = res;
     });
   }
-  oldCache::forEachValue(URL.revokeObjectURL);
+  scripts?.forEach(initScript);
+  store.scripts = scripts;
+  store.cache = cache;
+  store.sync = sync;
   store.loading = false;
 }
 
