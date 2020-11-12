@@ -145,7 +145,7 @@ export function decodeFilename(filename) {
 export async function getActiveTab() {
   const [tab] = await browser.tabs.query({
     active: true,
-    lastFocusedWindow: true, // also gets incognito windows
+    windowId: -2, // chrome.windows.WINDOW_ID_CURRENT works when debugging the popup in devtools
   });
   return tab;
 }
