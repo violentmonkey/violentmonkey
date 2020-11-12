@@ -204,9 +204,8 @@ export default {
       };
     },
   },
-  async created() {
+  created() {
     this.revokers = [];
-    if (!options.ready.indeed) await options.ready;
     items.forEach((item) => {
       const { name, normalize } = item;
       this.revokers.push(hookSetting(name, val => { settings[name] = normalize(val); }));

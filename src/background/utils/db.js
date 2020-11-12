@@ -331,9 +331,10 @@ function getIconUrls() {
  * @desc Get data for dashboard.
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
-export async function getData() {
+export async function getData(ids) {
+  const { scripts } = store;
   return {
-    scripts: store.scripts,
+    scripts: ids ? ids.map(getScriptById) : scripts,
     cache: await storage.cache.getMulti(getIconUrls()),
   };
 }

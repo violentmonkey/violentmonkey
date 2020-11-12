@@ -67,7 +67,7 @@
           <div
             class="menu-item menu-area"
             @click="onToggleScript(item)">
-            <img class="script-icon" :src="scriptIconUrl(item)" @error="scriptIconError">
+            <img class="script-icon" :src="item.data.safeIcon" @error="scriptIconError">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
             <div class="flex-auto ellipsis" v-text="item.name"
                  :class="{failed: item.data.failed}"
@@ -214,10 +214,6 @@ export default {
     },
     getSymbolCheck(bool) {
       return `toggle-${bool ? 'on' : 'off'}`;
-    },
-    scriptIconUrl(item) {
-      const { icon } = item.data.meta;
-      return (item.data.custom.pathMap || {})[icon] || icon || null;
     },
     scriptIconError(event) {
       event.target.removeAttribute('src');

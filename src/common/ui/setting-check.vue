@@ -34,8 +34,7 @@ export default {
       this.$emit('change', value);
     },
   },
-  async created() {
-    if (!options.ready.indeed) await options.ready;
+  created() {
     this.revoke = hookSetting(this.name, val => { this.value = val; });
     this.$watch('value', this.onChange);
   },

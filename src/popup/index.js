@@ -1,15 +1,15 @@
 import Vue from 'vue';
-import { getActiveTab, i18n, sendCmd } from '#/common';
+import { getActiveTab, i18n, sendCmdDirectly } from '#/common';
 import { INJECT_PAGE, INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import handlers from '#/common/handlers';
-import { mapEntry } from '#/common/object';
+import { loadScriptIcon } from '#/common/load-script-icon';
+import { forEachValue, mapEntry } from '#/common/object';
 import * as tld from '#/common/tld';
 import '#/common/ui/style';
 import App from './views/app';
 import { store } from './utils';
 
 tld.initTLD();
-
 Vue.prototype.i18n = i18n;
 
 const vm = new Vue({
@@ -30,7 +30,7 @@ mutex.ready = new Promise(resolve => {
 
 Object.assign(handlers, {
   async SetPopup(data, src) {
-    if (store.currentTab.id !== src.tab.id) return;
+    if (store.currentTab && store.currentTab.id !== src.tab.id) return;
     const isTop = src.frameId === 0;
     if (!isTop) await mutex.ready;
     const ids = data.ids.filter(id => !allScriptIds.includes(id));
@@ -42,7 +42,9 @@ Object.assign(handlers, {
     if (ids.length) {
       // frameScripts may be appended multiple times if iframes have unique scripts
       const scope = store[isTop ? 'scripts' : 'frameScripts'];
-      scope.push(...await sendCmd('GetMetas', ids));
+      const metas = data.metas || await sendCmdDirectly('GetMetas', ids);
+      metas.forEach(script => loadScriptIcon(script, { cache: store.cache }));
+      scope.push(...metas);
       data.failedIds.forEach(id => {
         scope.forEach((script) => {
           if (script.props.id === id) {
@@ -55,6 +57,10 @@ Object.assign(handlers, {
       });
     }
   },
+});
+
+sendCmdDirectly('CachePop', 'SetPopup').then((data) => {
+  data::forEachValue(val => handlers.SetPopup(...val));
 });
 
 getActiveTab()
@@ -70,6 +76,6 @@ getActiveTab()
   if (!INJECTABLE_TAB_URL_RE.test(url)) {
     store.injectable = false;
   } else {
-    store.blacklisted = await sendCmd('TestBlacklist', url);
+    store.blacklisted = await sendCmdDirectly('TestBlacklist', url);
   }
 });

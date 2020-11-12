@@ -1,6 +1,6 @@
 import { sendCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
-import { forEachEntry, objectSet } from '#/common/object';
+import { deepCopy, forEachEntry, objectSet } from '#/common/object';
 import ua from '#/common/ua';
 import * as sync from './sync';
 import { commands } from './utils';
@@ -53,8 +53,8 @@ hookOptions((changes) => {
 
 Object.assign(commands, {
   /** @return {Promise<Object>} */
-  async GetData() {
-    const data = await getData();
+  async GetData(ids) {
+    const data = await getData(ids);
     data.sync = sync.getStates();
     return data;
   },
@@ -137,6 +137,8 @@ function autoUpdate() {
 }
 
 initialize(() => {
+  global.handleCommandMessage = handleCommandMessage;
+  global.deepCopy = deepCopy;
   browser.runtime.onMessage.addListener(
     ua.isFirefox // in FF a rejected Promise value is transferred only if it's an Error object
       ? (...args) => (

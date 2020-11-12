@@ -12,6 +12,9 @@ Object.assign(commands, {
   CacheHit(data) {
     cache.hit(data.key, data.lifetime);
   },
+  CachePop(key) {
+    return cache.pop(key) || null;
+  },
 });
 
 export default cache;

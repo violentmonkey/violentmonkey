@@ -116,7 +116,7 @@ if (!global.browser?.runtime?.sendMessage) {
   global.browser = wrapAPIs(chrome, meta);
 } else if (process.env.DEBUG && !global.chrome.app) {
   let counter = 0;
-  const { runtime } = browser;
+  const { runtime } = global.browser;
   const { sendMessage, onMessage } = runtime;
   const log = (type, args, id, isResponse) => console.info(
     `%c${type}Message#%d${isResponse ? ' response' : ''}`,
@@ -143,10 +143,4 @@ if (!global.browser?.runtime?.sendMessage) {
     .then(data => log('on', [data], id, true), console.warn);
     return result;
   });
-}
-
-// prefetch the options while the current extension page loads
-/* global browser */
-if (browser.tabs) {
-  global.allOptions = browser.runtime.sendMessage({ cmd: 'GetAllOptions' }).catch(() => {});
 }

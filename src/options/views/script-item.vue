@@ -98,30 +98,12 @@
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { sendCmd, getLocaleString, formatTime } from '#/common';
-import { objectGet } from '#/common/object';
+import { loadScriptIcon } from '#/common/load-script-icon';
 import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 import enableDragging from '../utils/dragging';
 
 const DEFAULT_ICON = '/public/images/icon48.png';
-const images = {};
-function loadImage(url) {
-  if (!url) return Promise.reject();
-  let promise = images[url];
-  if (!promise) {
-    const cache = store.cache[url];
-    promise = cache
-      ? Promise.resolve(cache)
-      : new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(url);
-        img.onerror = () => reject(url);
-        img.src = url;
-      });
-    images[url] = promise;
-  }
-  return promise;
-}
 
 export default {
   props: [
@@ -198,17 +180,8 @@ export default {
     },
   },
   mounted() {
-    const { icon } = this.script.meta;
-    if (icon && icon !== this.safeIcon) {
-      const pathMap = objectGet(this.script, 'custom.pathMap') || {};
-      const fullUrl = pathMap[icon] || icon;
-      loadImage(fullUrl)
-      .then((url) => {
-        this.safeIcon = url;
-      }, () => {
-        this.safeIcon = DEFAULT_ICON;
-      });
-    }
+    loadScriptIcon(this.script, { default: DEFAULT_ICON, cache: store.cache })
+    .then(() => { this.safeIcon = this.script.safeIcon; });
     enableDragging(this.$el, {
       onDrop: (from, to) => this.$emit('move', { from, to }),
     });
