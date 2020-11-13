@@ -1,3 +1,5 @@
+$compactHeaderHeight: 3rem;
+
 html,
 body {
   height: 100%;
@@ -11,7 +13,8 @@ aside {
   height: 100%;
   padding: 4rem 1rem 0;
   text-align: right;
-  border-right: 1px solid var(--fill-5);
+  border: solid var(--fill-5);
+  border-width: 0 1px 0 0;
   @media (prefers-color-scheme: dark) {
     border-color: var(--fill-3);
   }
@@ -40,43 +43,6 @@ aside {
     }
   }
 }
-.aside-toggle {
-  position: absolute;
-  width: 1rem;
-  height: 2rem;
-  top: 1rem;
-  left: 0;
-  line-height: 2rem;
-  background: var(--fill-0-5);
-  color: var(--fill-5);
-  border: 1px solid currentColor;
-  border-left: 0;
-  border-radius: 0 1rem 1rem 0;
-  &-wrapper {
-    position: absolute;
-    width: 2rem;
-    height: 4rem;
-    top: 50%;
-    left: 100%;
-    margin-top: -2rem;
-  }
-  > .icon {
-    display: block;
-    margin-top: .4rem;
-    margin-left: -.1rem;
-  }
-  .show-aside & > .icon {
-    transform: rotateY(180deg);
-  }
-}
-.aside-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
 .text-red {
   color: red;
 }
@@ -149,14 +115,37 @@ input[type=checkbox] {
 }
 
 @media (max-width: 767px) {
+  .page-options {
+    flex-direction: column;
+  }
+  .tab {
+    width: auto !important;
+  }
   .aside-content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: translateX(-100%);
-    transition: transform .2s;
-    .show-aside > & {
-      transform: none;
+    display: flex;
+    width: auto;
+    height: $compactHeaderHeight;
+    padding: 0;
+    border-width: 0 0 1px 0;
+    img {
+      width: $compactHeaderHeight;
+      height: $compactHeaderHeight;
+      margin: 0 .5rem 0 1.25rem;
+    }
+    h1 {
+      align-self: center;
+      font-size: 1.25rem;
+      margin: 0;
+    }
+  }
+  .aside-menu {
+    display: flex;
+    border: none;
+    a {
+      padding: 0 0 0 1.5rem;
+      display: flex;
+      flex-direction: column; /* stretch to full height... */
+      justify-content: center; /* ...and center vertically */
     }
   }
 }

@@ -450,7 +450,7 @@ body .vl-tooltip {
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 500px) {
   .hidden-sm {
     display: none !important;
   }
