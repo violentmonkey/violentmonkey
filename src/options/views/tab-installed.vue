@@ -66,7 +66,7 @@
           </div>
         </dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
-        <form class="filter-search hidden-sm flex" @submit.prevent>
+        <form class="filter-search hidden-xs flex" @submit.prevent>
           <tooltip placement="bottom">
             <label>
               <input
@@ -528,6 +528,7 @@ export default {
   }
   input {
     width: 14rem;
+    max-width: calc(100vw - 16rem);
     padding-left: .5rem;
     padding-right: 2rem;
     height: 100%;
