@@ -11,6 +11,8 @@ import { defineProperty, describeProperty, forEachEntry, objectPick } from '#/co
 import {
   forEach, push,
   append, createElementNS, remove, NS_HTML,
+  addEventListener, removeEventListener,
+  log,
 } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -26,11 +28,12 @@ const { get: getHead } = describeProperty(Document.prototype, 'head')
   || describeProperty(HTMLDocument.prototype, 'head'); // old FF before 61;
 const { get: getDocElem } = describeProperty(Document.prototype, 'documentElement');
 const { appendChild } = Document.prototype; // same as Node.appendChild
+const stringIncludes = String.prototype.includes;
 
 bridge.addHandlers({
   // FF bug workaround to enable processing of sourceURL in injected page scripts
   InjectList(runAt) {
-    bridge.realms[INJECT_PAGE].lists[runAt]::forEach(item => inject(item.code));
+    bridge.realms[INJECT_PAGE].lists[runAt]::forEach(inject);
   },
 });
 
@@ -42,9 +45,11 @@ export function appendToRoot(node) {
 }
 
 export function injectPageSandbox(contentId, webId) {
-  inject(`(${VMInitInjection}())('${webId}','${contentId}')\n//# sourceURL=${
-    browser.runtime.getURL('sandbox/injected-web.js')
-  }`);
+  inject({
+    code: `(${VMInitInjection}())('${webId}','${contentId}')\n//# sourceURL=${
+      browser.runtime.getURL('sandbox/injected-web.js')
+    }`,
+  });
 }
 
 export function injectScripts(contentId, webId, data, isXml) {
@@ -117,12 +122,25 @@ function checkInjectable() {
   return res;
 }
 
-function inject(code) {
+function inject(item) {
   const script = document::createElementNS(NS_HTML, 'script');
+  // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
+  let onError;
+  if (bridge.isFirefox) {
+    onError = e => {
+      const { stack } = e.error;
+      if (typeof stack === 'string' && stack::stringIncludes(browser.runtime.getURL('/sandbox'))) {
+        log('error', [item.meta.name], e.error);
+        e.preventDefault();
+      }
+    };
+    window::addEventListener('error', onError);
+  }
   // using a safe call to an existing method so we don't have to extract textContent setter
-  script::append(code);
+  script::append(item.code);
   // When using declarativeContent there's no documentElement so we'll append to `document`
   if (!appendToRoot(script)) document::appendChild(script);
+  if (onError) window::removeEventListener('error', onError);
   script::remove();
 }
 
@@ -136,7 +154,7 @@ function injectAll(realms, runAt) {
         realmData.info = undefined;
         items::forEach(item => {
           // FF bug workaround to enable processing of sourceURL in injected page scripts
-          if (isPage && !bridge.isFirefox) inject(item.code);
+          if (isPage && !bridge.isFirefox) inject(item);
           item.code = '';
         });
       }
