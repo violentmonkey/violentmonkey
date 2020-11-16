@@ -119,11 +119,16 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Opzioni personalizzate per CodeMirror e addons in stile oggetti JSON
-    <code>{"indentUnit":2, "smartIndent":true}</code> tuttavia nota che alcuni
-    di loro potrebbero non funzionare in Violentmonkey. Vedi <a
+    Opzioni personalizzate per CodeMirror e in oggetti JSON, come
+    <code>{"indentUnit":2, "smartIndent":true}</code> tuttavia, alcune
+    potrebbero non funzionare in Violentmonkey. Vedi la <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">lista completa</a>.
+    rel="noopener noreferrer">lista intera</a>. Per usare un thema
+    personalizzato CodeMirror, specificane il file name, come ad esempio
+    <code>"theme": "3024-day"</code>qui e incolla <a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">il CSS del tema</a>in "Stile
+    personalizzato" sotto.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentation on userscript metadata block and <code>GM</code> API:'
@@ -141,10 +146,16 @@ editLabelSettings:
   message: Impostazioni script
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: La linea è troppo lunga
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: >-
+    La linea è troppo lunga, per cui il testo è stato ridotto per prevenire
+    ritardi durante l'editing.
+
+    Puoi impostarne il limite nelle impostazioni avanzate, per esempio:
+
+    "maxDisplayLength":20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Codice
@@ -202,7 +213,7 @@ filterScopeName:
   message: Name
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Errore
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: 'off'
@@ -353,7 +364,7 @@ labelKeepOriginal:
   message: Mantieni originale
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: 'Ultimo aggiornamento il:'
+  message: 'Ultimo aggiornamento: $1'
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Linea numero: '
@@ -603,21 +614,23 @@ msgUpdated:
   message: Script aggiornato.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Aggiornando...
+  message: Aggiornamento in corso...
 noValues:
   description: Label shown when there is no value for current script.
   message: Nessun valore salvato
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: Apri editor da popup ad una nuova finestra
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: >-
+    La posizione della finestra dell'editor sarà memorizzata solo su
+    ridimensionamento o salvataggio
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Nascondi omnibox
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Enabled first
