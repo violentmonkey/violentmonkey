@@ -15,7 +15,9 @@ buttonEdit:
   message: Éditer
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: >-
+    Vous pouvez faire un clic droit, ctrl-clic ou clic molette sur le nom du
+    script.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Vider la corbeille
@@ -118,11 +120,16 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Custom options for CodeMirror and addons in JSON object like
-    <code>{"indentUnit":2, "smartIndent":true}</code> however note that some of
-    them may not work in Violentmonkey. See <a
+    Options personnalisées pour CodeMirror et extensions dans un objet JSON
+    comme<code>{"indentUnit":2, "smartIndent":true}</code>, cependant notez que
+    certaines peuvent ne pas marcher dans Violentmonkey. Voir la<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">full list</a>.
+    rel="noopener noreferrer">liste complète</a>. Pour utiliser un thème
+    CodeMirror, spécifiez son nom de fichier comme <code>"theme":
+    "3024-day"</code> ici et collez le <a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">CSS du thème en lui-même</a> dans
+    le champ « Style personnalisé » ci-dessous.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentation on userscript metadata block and <code>GM</code> API:'
@@ -140,10 +147,16 @@ editLabelSettings:
   message: Paramètres du script
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: La ligne est trop longue
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: >-
+    Cette ligne est trop longue donc son texte est replié pour éviter les délais
+    pendant l’édition.
+
+    Vous pouvez ajuster la limite dans les paramètres avancés, par exemple:
+
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Code
@@ -155,10 +168,10 @@ editNavValues:
   message: Valeurs
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: ''
+  message: Tout
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Montrer/éditer toutes les données stockées du script
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: Annuler
@@ -199,7 +212,7 @@ filterScopeName:
   message: Nom
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Erreur
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: 'off'
@@ -305,7 +318,7 @@ labelEditValue:
   message: Éditer la valeur du script
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Éditer les données stockées du script
 labelEditor:
   description: Label for Editor settings
   message: Éditeur
@@ -391,7 +404,7 @@ labelPopupSort:
   message: Trier les scripts dans la popup par $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Politique de confidentialité
 labelRelated:
   description: Label of related links.
   message: "Liens utiles\_: "
@@ -484,10 +497,10 @@ menuFindScripts:
   message: Chercher des scripts pour ce site
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: Impossible d’injecter certains scripts.
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: ''
+  message: Réessayer en mode « auto »
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Scripts uniquement pour les sub-frames
@@ -612,15 +625,17 @@ noValues:
   message: Aucune valeur n’est enregistrée
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: Ouvrir l’éditeur depuis la popup dans une nouvelle fenêtre
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: >-
+    La position de la fenêtre de l’éditeur sera enregistré uniquement lors d’un
+    redimensionnement ou d’une sauvegarde
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Cacher l’omnibox
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Scripts activés en premier
@@ -659,7 +674,7 @@ valueLabelValue:
   message: Valeur (sérialisée comme JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Toutes les valeurs (sérialisées en JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Aller sur le site web
