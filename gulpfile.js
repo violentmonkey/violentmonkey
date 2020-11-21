@@ -85,7 +85,7 @@ async function createIcons() {
   const ALPHA = .5;
   const dist = `${DIST}/public/images`;
   await fs.mkdir(dist, { recursive: true });
-  const icon = Sharp('src/resources/icon.png');
+  const icon = Sharp(`src/resources/icon${pkg.beta ? '-beta' : ''}.png`);
   const gray = icon.clone().grayscale();
   const transparent = icon.clone().composite([{
     input: Buffer.from([255, 255, 255, 256 * ALPHA]),
