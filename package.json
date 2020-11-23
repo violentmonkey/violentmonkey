@@ -1,6 +1,7 @@
 {
   "name": "violentmonkey",
   "version": "2.12.7",
+  "beta": 18,
   "scripts": {
     "dev": "gulp dev",
     "prebuild": "yarn ci",
