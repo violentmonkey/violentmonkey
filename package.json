@@ -22,6 +22,7 @@
   },
   "description": "Violentmonkey",
   "devDependencies": {
+    "@actions/core": "^1.2.6",
     "@babel/plugin-proposal-function-bind": "^7.8.3",
     "@babel/register": "^7.9.0",
     "@gera2ld/locky": "^0.1.0",

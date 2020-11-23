@@ -44,15 +44,17 @@ $ yarn build
 $ yarn build:selfHosted
 ```
 
-### Prerelease
+## Release
+
+Just create a tag and push it.
+
+When a tag is pushed to GitHub, a (pre)release will be created with assets built by GitHub Actions.
 
 ```sh
+# Create a prerelease
 $ yarn bump
-```
 
-### Release
-
-```sh
+# Create a patch release
 $ yarn version --patch
 ```
 

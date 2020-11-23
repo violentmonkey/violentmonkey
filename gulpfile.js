@@ -10,6 +10,7 @@ const Sharp = require('sharp');
 const { isProd } = require('@gera2ld/plaid/util');
 const spawn = require('cross-spawn');
 const i18n = require('./scripts/i18n');
+const { getVersion } = require('./scripts/version-helper');
 const pkg = require('./package.json');
 
 const DIST = 'dist';
@@ -45,17 +46,6 @@ async function jsProd() {
     api: true,
     keep: true,
   });
-}
-
-/**
- * Derive extension version from pkg.version and pkg.beta fields.
- *
- * > manifest.version = `${pkg.version}.${pkg.beta}`
- */
-function getVersion() {
-  let version = pkg.version.replace(/-[^.]*/, '');
-  if (pkg.beta) version += `.${pkg.beta}`;
-  return version;
 }
 
 async function readManifest() {
