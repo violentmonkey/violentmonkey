@@ -57,7 +57,7 @@ async function readManifest() {
 /**
  * Versioning
  *
- * The version of extension is composed of `version` and `beta` fields in `package.json`, i.e.
+ * The version of extension is composed of `version` and `beta` fields in `package.json`.
  *
  * Note: prerelease is ignored and not recommended since both Chrome and Firefox do not support semver
  *
@@ -202,6 +202,7 @@ function logError(err) {
 const pack = gulp.parallel(manifest, createIcons, copyFiles, copyI18n);
 
 exports.clean = clean;
+exports.manifest = manifest;
 exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
 exports.build = gulp.series(clean, gulp.parallel(pack, jsProd));
 exports.i18n = updateI18n;

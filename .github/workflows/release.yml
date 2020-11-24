@@ -15,32 +15,26 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '15'
-      - name: Install deps
-        run: yarn
-      - name: Prepare environment variables
-        run: node scripts/action-helper.js
+      - name: Prepare
+        run: yarn && node scripts/action-helper.js
       - name: Build
         run: |
           yarn build
-          cd dist && zip -r ../$RELEASE_FILENAME.zip .
+          cd dist && zip -r ../$RELEASE_PREFIX-v$VERSION.zip . && cd ..
+
+          # Same as `yarn build:selfHosted` but only manifest is changed for now
+          TARGET=selfHosted npx gulp manifest
+          cd dist && zip -r ../$RELEASE_PREFIX-ffself-v$VERSION.zip . && cd ..
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ env.RELEASE_NAME }}
-          draft: false
-          prerelease: ${{ env.PRERELEASE }}
-          body: ${{ env.RELEASE_NOTE }}
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.RELEASE_FILENAME }}.zip
-          asset_name: ${{ env.RELEASE_FILENAME }}.zip
-          asset_content_type: application/zip
+        run: |
+          set -x
+          params=("-m" "$RELEASE_NAME" "-m" "$RELEASE_NOTE")
+          if [ "$PRERELEASE" = "true" ]; then
+            params+=("-p")
+          fi
+          for asset in ./*.zip; do
+            params+=("-a" "$asset")
+          done
+          hub release create "${params[@]}" v$VERSION

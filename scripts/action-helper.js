@@ -9,10 +9,9 @@ core.exportVariable('RELEASE_NAME', [
   beta && 'BETA',
   `v${version}`,
 ].filter(Boolean).join(' '));
-core.exportVariable('RELEASE_FILENAME', [
+core.exportVariable('RELEASE_PREFIX', [
   'Violentmonkey',
   beta && 'beta',
-  `v${version}`,
 ].filter(Boolean).join('-'));
 core.exportVariable('PRERELEASE', !!beta);
 
