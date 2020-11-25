@@ -42,7 +42,7 @@ export function sendCmd(cmd, data, options) {
 
 export function sendCmdDirectly(cmd, data, options) {
   const bg = browser.extension.getBackgroundPage?.();
-  return bg && bg !== window
+  return bg && bg !== window && bg.deepCopy
     ? bg.handleCommandMessage(bg.deepCopy({ cmd, data })).then(deepCopy)
     : sendCmd(cmd, data, options);
 }
