@@ -1,7 +1,13 @@
+import { browser } from '#/common/consts';
+
 // used in an unsafe context so we need to save the original functions
 const perfNow = performance.now.bind(performance);
 const { random, floor } = Math;
 export const { toString: numberToString } = Number.prototype;
+
+export function i18n(name, args) {
+  return browser.i18n.getMessage(name, args) || name;
+}
 
 export function toString(param) {
   if (param == null) return '';

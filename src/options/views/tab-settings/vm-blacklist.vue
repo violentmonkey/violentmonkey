@@ -11,7 +11,7 @@
 
 <script>
 import { sendCmd } from '#/common';
-import { showMessage } from '#/options/utils';
+import { showMessage } from '#/common/ui';
 import SettingText from '#/common/ui/setting-text';
 
 export default {

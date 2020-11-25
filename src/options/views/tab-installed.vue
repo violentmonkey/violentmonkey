@@ -130,6 +130,7 @@ import {
   i18n, sendCmd, debounce, makePause,
 } from '#/common';
 import options from '#/common/options';
+import { showConfirmation, showMessage } from '#/common/ui';
 import SettingCheck from '#/common/ui/setting-check';
 import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
@@ -140,7 +141,7 @@ import storage from '#/common/storage';
 import { loadData } from '#/options';
 import ScriptItem from './script-item';
 import Edit from './edit';
-import { store, showConfirmation, showMessage } from '../utils';
+import { store } from '../utils';
 
 const filterOptions = {
   sort: {

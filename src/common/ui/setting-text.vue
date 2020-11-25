@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { getUnloadSentry } from '#/common/router';
 import { deepEqual, objectGet } from '../object';
 import options from '../options';
 import defaults from '../options-defaults';
@@ -62,6 +63,11 @@ export default {
       return !deepEqual(this.parsedData.value, this.defaultValue || '');
     },
   },
+  watch: {
+    canSave(state) {
+      this.toggleUnloadSentry(state);
+    },
+  },
   created() {
     const handle = this.json
       ? (value => JSON.stringify(value, null, '  '))
@@ -72,9 +78,17 @@ export default {
       this.value = handle(val);
     });
     this.defaultValue = objectGet(defaults, this.name);
+    this.toggleUnloadSentry = getUnloadSentry(() => {
+      // Reset to saved value after confirming loss of data.
+      // The component won't be destroyed on tab change, so the changes are actually kept.
+      // Here we reset it to make sure the user loses the changes when leaving the settings tab.
+      // Otherwise the user may be confused about where the changes are after switching back.
+      this.value = handle(this.savedValue);
+    });
   },
   beforeDestroy() {
     this.revoke();
+    this.toggleUnloadSentry(false);
   },
   methods: {
     onChange() {

@@ -58,10 +58,11 @@
 import CodeMirror from 'codemirror';
 import { debounce, i18n, sendCmd } from '#/common';
 import { deepCopy, deepEqual, objectPick } from '#/common/object';
+import { showMessage } from '#/common/ui';
 import VmCode from '#/common/ui/code';
 import options from '#/common/options';
-import { route } from '#/common/router';
-import { store, showConfirmation, showMessage } from '../../utils';
+import { route, getUnloadSentry } from '#/common/router';
+import { store } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
 import VmHelp from './help';
@@ -90,7 +91,6 @@ const toList = text => (
   .filter(Boolean)
 );
 let savedSettings;
-let showingConfirmation;
 
 let shouldSavePositionOnSave;
 const savePosition = () => {
@@ -180,6 +180,9 @@ export default {
   },
   created() {
     this.script = this.initial;
+    this.toggleUnloadSentry = getUnloadSentry(null, () => {
+      this.$refs.code.cm.focus();
+    });
     document.addEventListener('keydown', this.switchPanel);
     if (options.get('editorWindow') && global.history.length === 1) {
       browser.windows?.getCurrent({ populate: true }).then(setupSavePosition);
@@ -264,19 +267,8 @@ export default {
         showMessage({ text: err });
       }
     },
-    async close() {
-      try {
-        if (store.route.pinned) {
-          showingConfirmation = true;
-          await showConfirmation(i18n('confirmNotSaved'));
-          store.route.pinned = false;
-        }
-        this.$emit('close');
-      } catch (e) {
-        this.$refs.code.cm.focus();
-      } finally {
-        showingConfirmation = false;
-      }
+    close() {
+      this.$emit('close');
     },
     saveClose() {
       this.save().then(this.close);
@@ -301,23 +293,8 @@ export default {
       default:
       }
     },
-    toggleUnloadSentry(state) {
-      const onOff = `${state ? 'add' : 'remove'}EventListener`;
-      global[onOff]('beforeunload', this.onUnload);
-      global[onOff]('popstate', this.onUnload);
-      store.route.pinned = state;
-    },
     onChange() {
       this.canSave = this.codeDirty || !deepEqual(this.settings, savedSettings);
-    },
-    /** @param {Event} e */
-    onUnload(e) {
-      // modern browser show their own message text
-      e.returnValue = i18n('confirmNotSaved');
-      // popstate cannot be prevented so we pin current `route` and display a confirmation
-      if (e.type === 'popstate' && !showingConfirmation) {
-        this.close();
-      }
     },
   },
   beforeDestroy() {

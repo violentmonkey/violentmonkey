@@ -5,9 +5,6 @@ import { noop } from './util';
 export { normalizeKeys } from './object';
 export * from './util';
 
-export function i18n(name, args) {
-  return browser.i18n.getMessage(name, args) || name;
-}
 export const defaultImage = '/public/images/icon128.png';
 
 export function initHooks() {
