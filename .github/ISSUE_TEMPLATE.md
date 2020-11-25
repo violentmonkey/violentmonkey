@@ -15,6 +15,8 @@ Note that issues without a reproduction may be closed immediately!
 
 ### What is the actual result?
 
+### What is the result in the [upcoming release](https://github.com/violentmonkey/violentmonkey/releases)?
+
 <!--
 If this is a bug report, please also provide logs in the console.
 -->
@@ -23,5 +25,4 @@ If this is a bug report, please also provide logs in the console.
 - Browser:
 - Browser version:
 - Violentmonkey version:
-- Violentmonkey [pre-release behavior](https://github.com/violentmonkey/violentmonkey/releases):
 - OS:
