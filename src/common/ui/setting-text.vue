@@ -56,10 +56,10 @@ export default {
       return { value, error };
     },
     canSave() {
-      return this.hasSave && !this.parsedData.error && !deepEqual(this.parsedData.value, this.savedValue || '');
+      return !this.parsedData.error && !deepEqual(this.parsedData.value, this.savedValue || '');
     },
     canReset() {
-      return this.hasReset && !deepEqual(this.parsedData.value, this.defaultValue || '');
+      return !deepEqual(this.parsedData.value, this.defaultValue || '');
     },
   },
   created() {
@@ -78,11 +78,11 @@ export default {
   },
   methods: {
     onChange() {
-      if (!this.parsedData.error) {
-        options.set(this.name, this.parsedData.value);
-      }
+      // Auto save if there is no `Save` button
+      if (!this.hasSave && this.canSave) this.onSave();
     },
     onSave() {
+      options.set(this.name, this.parsedData.value);
       this.$emit('save');
     },
     onReset() {
