@@ -2,20 +2,17 @@
   <section>
     <h3 v-text="i18n('labelEditor')"></h3>
     <p v-html="i18n('descEditorOptions')" />
-    <setting-text name="editor" ref="editor" :json="true" />
-    <button v-text="i18n('buttonSave')" @click="onSave"></button>
-    <button v-text="i18n('buttonReset')" @click="onReset"></button>
-    <button v-text="i18n('buttonShowEditorState')" @click="toggleStateHint" />
+    <setting-text name="editor" ref="editor" :json="true" :has-reset="true" @save="onSave">
+      <button v-text="i18n('buttonShowEditorState')" @click="toggleStateHint"/>
+    </setting-text>
     <pre v-text="hint" class="monospace-font dim-hint" />
   </section>
 </template>
 
 <script>
-import { i18n } from '#/common';
 import options from '#/common/options';
 import { showMessage } from '#/options/utils';
 import SettingText from '#/common/ui/setting-text';
-import defaults from '#/common/options-defaults';
 
 export default {
   data() {
@@ -29,12 +26,7 @@ export default {
   },
   methods: {
     onSave() {
-      const { jsonValue, error } = this.$refs.editor;
-      if (!error) options.set('editor', jsonValue);
-      showMessage({ text: error || i18n('msgSavedEditorOptions') });
-    },
-    onReset() {
-      options.set('editor', defaults.editor);
+      showMessage({ text: this.$refs.editor.error || this.i18n('msgSavedEditorOptions') });
     },
     toggleBoolean(event) {
       const el = /** @type HTMLTextAreaElement */ event.target;
@@ -44,6 +36,8 @@ export default {
       if (toggled && !document.execCommand('insertText', false, toggled)) {
         el.value = value.slice(0, start) + toggled + value.slice(end);
         el.setSelectionRange(start + toggled.length, start + toggled.length);
+        el.dispatchEvent(new Event('input'));
+        el.onblur = () => el.dispatchEvent(new Event('change'));
       }
     },
     async toggleStateHint() {
