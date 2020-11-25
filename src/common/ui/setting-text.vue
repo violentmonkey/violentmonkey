@@ -2,11 +2,11 @@
   <div>
     <textarea
       class="monospace-font"
-      :class="{'has-error': error}"
+      :class="{'has-error': parsedData.error}"
       spellcheck="false"
       v-model="value"
       :disabled="disabled"
-      :title="error"
+      :title="parsedData.error"
       @change="onChange"
     />
     <button v-if="hasSave" v-text="i18n('buttonSave')" @click="onSave"
@@ -37,11 +37,30 @@ export default {
   data() {
     return {
       value: null,
-      jsonValue: null,
-      error: null,
-      canSave: null,
-      canReset: null,
+      savedValue: null,
     };
+  },
+  computed: {
+    parsedData() {
+      let value;
+      let error;
+      if (this.json) {
+        try {
+          value = JSON.parse(this.value);
+        } catch (e) {
+          error = e.message || e;
+        }
+      } else {
+        value = this.value;
+      }
+      return { value, error };
+    },
+    canSave() {
+      return this.hasSave && !this.parsedData.error && !deepEqual(this.parsedData.value, this.savedValue || '');
+    },
+    canReset() {
+      return this.hasReset && !deepEqual(this.parsedData.value, this.defaultValue || '');
+    },
   },
   created() {
     const handle = this.json
@@ -49,34 +68,18 @@ export default {
       // XXX compatible with old data format
       : (value => (Array.isArray(value) ? value.join('\n') : value || ''));
     this.revoke = hookSetting(this.name, val => {
-      this.savedValue = val;
-      val = handle(val);
-      if (this.value !== val) this.value = val; // will call onInput
-      else this.onInput(val);
+      this.savedValue = Object.seal(val);
+      this.value = handle(val);
     });
     this.defaultValue = objectGet(defaults, this.name);
-    this.$watch('value', this.onInput);
   },
   beforeDestroy() {
     this.revoke();
   },
   methods: {
-    onInput(val) {
-      if (this.json) {
-        try {
-          val = JSON.parse(val);
-          this.jsonValue = val;
-          this.error = null;
-        } catch (e) {
-          this.error = e.message || e;
-        }
-      }
-      this.canSave = this.hasSave && !this.error && !deepEqual(val, this.savedValue || '');
-      this.canReset = this.hasReset && !deepEqual(val, this.defaultValue || '');
-    },
     onChange() {
-      if (!this.error) {
-        options.set(this.name, this.json ? this.jsonValue : this.value);
+      if (!this.parsedData.error) {
+        options.set(this.name, this.parsedData.value);
       }
     },
     onSave() {
