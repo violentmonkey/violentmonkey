@@ -28,10 +28,6 @@ export default {
     name: String,
     json: Boolean,
     disabled: Boolean,
-    sync: {
-      type: Boolean,
-      default: true,
-    },
     hasSave: {
       type: Boolean,
       default: true,
@@ -54,17 +50,18 @@ export default {
       : (value => (Array.isArray(value) ? value.join('\n') : value || ''));
     this.revoke = hookSetting(this.name, val => {
       this.savedValue = val;
-      const text = handle(val);
-      if (this.value !== text) this.value = text;
+      val = handle(val);
+      if (this.value !== val) this.value = val; // will call onInput
       else this.onInput(val);
     });
     this.defaultValue = objectGet(defaults, this.name);
+    this.$watch('value', this.onInput);
   },
   beforeDestroy() {
     this.revoke();
   },
-  watch: {
-    value(val) {
+  methods: {
+    onInput(val) {
       if (this.json) {
         try {
           val = JSON.parse(val);
@@ -74,25 +71,16 @@ export default {
           this.error = e.message || e;
         }
       }
-      this.onInput(val);
-    },
-  },
-  methods: {
-    /** `event` is absent when calling from save() */
-    onChange(event) {
-      if (!this.error) {
-        const value = this.json ? this.jsonValue : this.value;
-        if (this.sync || !event) options.set(this.name, value);
-        if (event) this.$emit('change', value);
-        return true;
-      }
-    },
-    onInput(val) {
       this.canSave = this.hasSave && !this.error && !deepEqual(val, this.savedValue || '');
       this.canReset = this.hasReset && !deepEqual(val, this.defaultValue || '');
     },
+    onChange() {
+      if (!this.error) {
+        options.set(this.name, this.json ? this.jsonValue : this.value);
+      }
+    },
     onSave() {
-      if (this.onChange()) this.$emit('save');
+      this.$emit('save');
     },
     onReset() {
       options.set(this.name, this.defaultValue);
