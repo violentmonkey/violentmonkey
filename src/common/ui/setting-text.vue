@@ -56,15 +56,18 @@ export default {
       }
       return { value, error };
     },
+    isDirty() {
+      return !deepEqual(this.parsedData.value, this.savedValue || '');
+    },
     canSave() {
-      return !this.parsedData.error && !deepEqual(this.parsedData.value, this.savedValue || '');
+      return !this.parsedData.error && this.isDirty;
     },
     canReset() {
       return !deepEqual(this.parsedData.value, this.defaultValue || '');
     },
   },
   watch: {
-    canSave(state) {
+    isDirty(state) {
       this.toggleUnloadSentry(state);
     },
   },
