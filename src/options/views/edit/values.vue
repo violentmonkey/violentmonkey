@@ -69,7 +69,7 @@ import { dumpScriptValue, sendCmd } from '#/common';
 import { mapEntry } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import storage from '#/common/storage';
-import { showMessage } from '../../utils';
+import { showMessage } from '#/common/ui';
 
 const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;

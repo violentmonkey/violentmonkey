@@ -28,7 +28,7 @@ import { ensureArray, i18n, sendCmd } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
 import loadZipLibrary from '#/common/zip';
-import { showConfirmation, showMessage } from '../../utils';
+import { showConfirmation, showMessage } from '#/common/ui';
 
 const reports = [];
 
