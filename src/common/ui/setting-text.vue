@@ -77,7 +77,7 @@ export default {
       // XXX compatible with old data format
       : (value => (Array.isArray(value) ? value.join('\n') : value || ''));
     this.revoke = hookSetting(this.name, val => {
-      this.savedValue = Object.seal(val);
+      this.savedValue = val;
       this.value = handle(val);
     });
     this.defaultValue = objectGet(defaults, this.name);
