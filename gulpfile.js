@@ -10,7 +10,7 @@ const Sharp = require('sharp');
 const { isProd } = require('@gera2ld/plaid/util');
 const spawn = require('cross-spawn');
 const i18n = require('./scripts/i18n');
-const { getVersion } = require('./scripts/version-helper');
+const { getVersion, isBeta } = require('./scripts/version-helper');
 const pkg = require('./package.json');
 
 const DIST = 'dist';
@@ -67,6 +67,10 @@ async function manifest() {
   data.version = getVersion();
   if (process.env.TARGET === 'selfHosted') {
     data.browser_specific_settings.gecko.update_url = 'https://raw.githubusercontent.com/violentmonkey/violentmonkey/master/updates.json';
+  }
+  if (isBeta()) {
+    // Do not support i18n in beta version
+    data.name = 'Violentmonkey BETA';
   }
   await fs.writeFile(`${DIST}/manifest.json`, JSON.stringify(data), 'utf8');
 }
