@@ -31,6 +31,7 @@ content_scripts:
       - injected.js
     matches:
       - <all_urls>
+      - file:///*/*
     run_at: document_start
     all_frames: true
 permissions:
