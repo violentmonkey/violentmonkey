@@ -16,7 +16,7 @@ buttonEdit:
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
   message: >-
-    Poți și să faci clic dreapta, Ctrl+clic, clic pe rotiță pe numele
+    Poți și să faci clic dreapta, Ctrl+clic, clic cu rotița pe numele
     scriptului.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
@@ -69,15 +69,9 @@ buttonRestore:
 buttonSave:
   description: Button to save modifications of a script.
   message: Salvează
-buttonSaveBlacklist:
-  description: Button to save global blacklist.
-  message: Salvează
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Salvează și închide
-buttonSaveCustomCSS:
-  description: Label for button to save custom CSS.
-  message: Salvează
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Afișează starea editorului
@@ -120,10 +114,16 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Opțiuni personalizate pentru CodeMirror și suplimente în obiecte JSON
-    {"indentUnit":2, "smartIndent":true} Cu toate acestea, reține că unele
-    dintre ele pot să nu funcționeze în Violentmonkey. Lista completă:
-    https://codemirror.net/doc/manual.html#config
+    Opțiuni personalizate pentru CodeMirror și suplimente într-un obiect JSON
+    precum <code>{"indentUnit":2, "smartIndent":true}</code>. Cu toate acestea,
+    reține că unele dintre ele pot să nu funcționeze în Violentmonkey. Vezi <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">lista completă</a>. Pentru a folosi o temă
+    CodeMirror personalizată, specifică numele fișierului acesteia ca
+    <code>"theme": "3024-day"</code> aici și lipește <a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">CSS-ul actual al temei</a> în
+    inputul „Stil personalizat” de mai jos.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -143,10 +143,16 @@ editLabelSettings:
   message: Setări pentru script
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: Rândul este prea lung
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: >-
+    Acest rând este prea lung, astfel că textul acestuia este restrâns pentru a
+    evita întârzierile la editare.
+
+    Poți ajusta limita în setările avansate, de exemplu:
+
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Cod
@@ -158,10 +164,10 @@ editNavValues:
   message: Valori
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: ''
+  message: Toate
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Afișează/editează toate valorile scriptului pentru spațiul de stocare
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: Anulează
@@ -183,7 +189,7 @@ failureReasonNoninjectable:
     failureBlacklistedUrl)
   message: |-
     Violentmonkey nu poate rula userscripturi în această pagină
-    (exemple uzuale: interfața de utilizare a browserului sau o extensie)
+    (exemple uzuale: interfața de utilizator a browserului sau o extensie)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordinea alfabetică
@@ -204,7 +210,7 @@ filterScopeName:
   message: Nume
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Eroare
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: dezactivat
@@ -308,7 +314,7 @@ labelEditValue:
   message: Editarea valorii scriptului
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Editarea spațiului de stocare a scriptului
 labelEditor:
   description: Label for Editor settings
   message: Editor
@@ -485,7 +491,7 @@ menuFindScripts:
   message: Găsește scripturi pentru acest site
 menuInjectionFailed:
   description: Injection error.
-  message: Nu s-a putut injecta unele scripturi.
+  message: Nu s-au putut injecta unele scripturi.
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
   message: Reîncearcă în modul „auto”
@@ -615,15 +621,17 @@ noValues:
   message: Nu este stocată nicio valoare
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: Deschide editorul din fereastra pop-up într-o fereastră nouă
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: >-
+    Poziția ferestrei editorului va fi ținută minte numai la redimensionare sau
+    salvare
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Ascunde caseta polivalentă
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Mai întâi cele activate
@@ -664,7 +672,7 @@ valueLabelValue:
   message: Valoare (serializată ca JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Toate valorile (serializate ca JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Vizitează site-ul web

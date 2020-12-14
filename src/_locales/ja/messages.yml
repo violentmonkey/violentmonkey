@@ -67,15 +67,9 @@ buttonRestore:
 buttonSave:
   description: Button to save modifications of a script.
   message: 保存
-buttonSaveBlacklist:
-  description: Button to save global blacklist.
-  message: 保存
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: 保存して閉じる
-buttonSaveCustomCSS:
-  description: Label for button to save custom CSS.
-  message: 保存
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: エディタの設定を表示

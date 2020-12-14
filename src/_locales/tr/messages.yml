@@ -67,15 +67,9 @@ buttonRestore:
 buttonSave:
   description: Button to save modifications of a script.
   message: Kaydet
-buttonSaveBlacklist:
-  description: Button to save global blacklist.
-  message: Kaydet
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Kaydet & Kapat
-buttonSaveCustomCSS:
-  description: Label for button to save custom CSS.
-  message: Kaydet
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Düzenleyici durumunu göster

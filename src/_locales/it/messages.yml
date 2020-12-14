@@ -69,15 +69,9 @@ buttonRestore:
 buttonSave:
   description: Button to save modifications of a script.
   message: Salva
-buttonSaveBlacklist:
-  description: Button to save global blacklist.
-  message: Salva
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Salva & Chiudi
-buttonSaveCustomCSS:
-  description: Label for button to save custom CSS.
-  message: Salva
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Mostra lo stato dell'editor

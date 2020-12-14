@@ -67,15 +67,9 @@ buttonRestore:
 buttonSave:
   description: Button to save modifications of a script.
   message: Simpan
-buttonSaveBlacklist:
-  description: Button to save global blacklist.
-  message: Simpan
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Simpan & Tutup
-buttonSaveCustomCSS:
-  description: Label for button to save custom CSS.
-  message: Simpan
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Tampilkan status penyunting
@@ -144,10 +138,15 @@ editLabelSettings:
   message: Pengaturan skrip
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: Baris terlalu panjang
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: >-
+    Baris ini terlalu panjang, teks diperpendek untuk menghindari penurunan
+    performa saat menyunting.
+
+    Anda bisa mengatur batasannya di dalam pengaturan lanjutan, contoh:
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Kode
@@ -205,7 +204,7 @@ filterScopeName:
   message: Nama
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Galat
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: nonaktif

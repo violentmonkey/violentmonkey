@@ -67,15 +67,9 @@ buttonRestore:
 buttonSave:
   description: Button to save modifications of a script.
   message: 저장
-buttonSaveBlacklist:
-  description: Button to save global blacklist.
-  message: 저장
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: 저장하고 닫기
-buttonSaveCustomCSS:
-  description: Label for button to save custom CSS.
-  message: 저장
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: 편집기 상태 보기

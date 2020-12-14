@@ -67,15 +67,9 @@ buttonRestore:
 buttonSave:
   description: Button to save modifications of a script.
   message: 保存
-buttonSaveBlacklist:
-  description: Button to save global blacklist.
-  message: 保存
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: 保存并关闭
-buttonSaveCustomCSS:
-  description: Label for button to save custom CSS.
-  message: 保存
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: 显示编辑器状态
@@ -139,10 +133,13 @@ editLabelSettings:
   message: 脚本设置
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: 此行过长
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: |-
+    此行过长所以文本被折叠以避免编辑时卡顿。
+    你可以在高级设置中修改这个限制，比如：
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: 代码
@@ -200,7 +197,7 @@ filterScopeName:
   message: 名字
 genericError:
   description: Label for generic error.
-  message: ''
+  message: 错误
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: 关
