@@ -22,11 +22,12 @@ initialize();
 
 function initialize() {
   initMain();
+  store.HiDPI = matchMedia('screen and (min-resolution: 144dpi)').matches;
   if (ua.isFirefox) { // Firefox doesn't show favicon
     const icons = browser.runtime.getManifest().browser_action.default_icon;
     const el = document.createElement('link');
     el.rel = 'icon';
-    el.href = icons[matchMedia('screen and (min-resolution: 144dpi)').matches ? 32 : 16];
+    el.href = icons[store.HiDPI ? 32 : 16];
     document.head.appendChild(el);
   }
   const vm = new Vue({
