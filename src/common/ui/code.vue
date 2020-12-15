@@ -281,6 +281,16 @@ export default {
       Object.assign(CodeMirror.keyMap.sublime, {
         'Shift-Ctrl-/': 'commentSelection',
       });
+      // Differentiate regexps and templates, TODO: remove when implemented in CodeMirror
+      const tokenizer = cm.doc.mode.token;
+      Object.assign(cm.doc.mode, {
+        token(stream, state) {
+          const res = this::tokenizer(stream, state);
+          return res === 'string-2' && state.jsState.lastType === 'regexp'
+            ? 'string-2 regexp'
+            : res;
+        },
+      });
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
       });
@@ -570,19 +580,6 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
   z-index: 9999;
 }
 
-@media (prefers-color-scheme: dark) {
-  .CodeMirror-hints {
-    background: var(--bg);
-  }
-  .CodeMirror-hint {
-    color: var(--fg);
-  }
-  li.CodeMirror-hint-active {
-    background: var(--fg);
-    color: var(--bg);
-  }
-}
-
 /* fix contenteditable selection color bug */
 .CodeMirror .CodeMirror-line {
   ::selection {
@@ -597,12 +594,36 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
 .cm-matchhighlight {
   background-color: hsla(168, 100%, 50%, 0.15);
 }
+div.CodeMirror span.CodeMirror-matchingbracket { /* the same selector used in codemirror.css */
+  color: unset;
+  background-color: hsla(102, 80%, 50%, 0.3);
+}
+.cm-s-default {
+  .cm-comment {
+    color: #918982;
+  }
+  .cm-string-2 { // template literal: `example`
+    color: #870;
+  }
+  .cm-string-2.cm-regexp {
+    color: #d60;
+  }
+}
 
 @media (prefers-color-scheme: dark) {
   .cm-matchhighlight {
     background-color: hsla(40, 100%, 50%, 0.1);
   }
-  // mostly copied from Monokai theme
+  .CodeMirror-hints {
+    background: var(--bg);
+  }
+  .CodeMirror-hint {
+    color: var(--fg);
+  }
+  li.CodeMirror-hint-active {
+    background: var(--fg);
+    color: var(--bg);
+  }
   .CodeMirror {
     color: var(--fg);
     background: var(--bg);
@@ -646,76 +667,80 @@ $selectionDarkBg: rgba(73, 72, 62, .99);
       background: #444;
       color: yellow !important;
     }
-    span {
-      &.cm-comment {
-        color: #75715e;
-      }
-      &.cm-atom {
-        color: #ae81ff;
-      }
-      &.cm-number {
-        color: #ae81ff;
-      }
-      &.cm-comment.cm-attribute {
-        color: #97b757;
-      }
-      &.cm-comment.cm-def {
-        color: #bc9262;
-      }
-      &.cm-comment.cm-tag {
-        color: #bc6283;
-      }
-      &.cm-comment.cm-type {
-        color: #5998a6;
-      }
-      &.cm-property,
-      &.cm-attribute {
-        color: #a6e22e;
-      }
-      &.cm-keyword {
-        color: #f92672;
-      }
-      &.cm-builtin {
-        color: #66d9ef;
-      }
-      &.cm-string {
-        color: #e6db74;
-      }
-      &.cm-string-2 {
-        color: #bcb149;
-      }
-      &.cm-variable {
-        color: #f8f8f2;
-      }
-      &.cm-variable-2 {
-        color: #9effff;
-      }
-      &.cm-variable-3,
-      &.cm-type {
-        color: #66d9ef;
-      }
-      &.cm-def {
-        color: #fd971f;
-      }
-      &.cm-bracket {
-        color: #f8f8f2;
-      }
-      &.cm-tag {
-        color: #f92672;
-      }
-      &.cm-header {
-        color: #ae81ff;
-      }
-      &.cm-link {
-        color: #ae81ff;
-      }
-      &.cm-error {
-        color: #f8f8f0;
-        background: #f92672;
-      }
-      &.cm-operator {
-        color: #999
-      }
+  }
+  .cm-s-default {
+    // mostly copied from Monokai theme
+    .cm-comment {
+      color: #75715e;
+    }
+    .cm-atom {
+      color: #ae81ff;
+    }
+    .cm-number {
+      color: #ae81ff;
+    }
+    .cm-comment.cm-attribute {
+      color: #97b757;
+    }
+    .cm-comment.cm-def {
+      color: #bc9262;
+    }
+    .cm-comment.cm-tag {
+      color: #bc6283;
+    }
+    .cm-comment.cm-type {
+      color: #5998a6;
+    }
+    .cm-property,
+    .cm-attribute {
+      color: #a6e22e;
+    }
+    .cm-keyword {
+      color: #f92672;
+    }
+    .cm-builtin {
+      color: #66d9ef;
+    }
+    .cm-string {
+      color: #e6db74;
+    }
+    .cm-string-2 {
+      color: #bcb149;
+    }
+    .cm-string-2.cm-regexp {
+      color: #ff00f7;
+    }
+    .cm-variable {
+      color: #f8f8f2;
+    }
+    .cm-variable-2 {
+      color: #9effff;
+    }
+    .cm-variable-3,
+    .cm-type {
+      color: #66d9ef;
+    }
+    .cm-def {
+      color: #fd971f;
+    }
+    .cm-bracket {
+      color: #f8f8f2;
+    }
+    .cm-tag {
+      color: #f92672;
+    }
+    .cm-header {
+      color: #ae81ff;
+    }
+    .cm-link {
+      color: #ae81ff;
+    }
+    .cm-error {
+      color: #f8f8f0;
+      background: #f92672;
+    }
+    .cm-operator {
+      color: #999
     }
   }
 }
