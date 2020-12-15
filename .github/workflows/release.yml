@@ -20,11 +20,11 @@ jobs:
       - name: Build
         run: |
           yarn build
-          cd dist && zip -r ../$RELEASE_PREFIX-v$VERSION.zip . && cd ..
+          cd dist && zip -r ../$RELEASE_PREFIX-webext-v$VERSION.zip . && cd ..
 
           # Same as `yarn build:selfHosted` but only manifest is changed for now
           TARGET=selfHosted npx gulp manifest
-          cd dist && zip -r ../$RELEASE_PREFIX-ffself-v$VERSION.zip . && cd ..
+          cd dist && zip -r ../$RELEASE_PREFIX-webext-ffself-v$VERSION.zip . && cd ..
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
