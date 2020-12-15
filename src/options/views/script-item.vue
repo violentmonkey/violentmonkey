@@ -103,8 +103,6 @@ import Icon from '#/common/ui/icon';
 import { store } from '../utils';
 import enableDragging from '../utils/dragging';
 
-const DEFAULT_ICON = '/public/images/icon48.png';
-
 export default {
   props: [
     'script',
@@ -117,7 +115,9 @@ export default {
   },
   data() {
     return {
-      safeIcon: DEFAULT_ICON,
+      safeIcon: `/public/images/icon${
+        store.HiDPI ? 128 : this.script.config.removed && 32 || 38
+      }.png`,
       canRender: this.visible,
     };
   },
@@ -180,8 +180,10 @@ export default {
     },
   },
   mounted() {
-    loadScriptIcon(this.script, { default: DEFAULT_ICON, cache: store.cache })
-    .then(() => { this.safeIcon = this.script.safeIcon; });
+    loadScriptIcon(this.script, { cache: store.cache }).then(() => {
+      const si = this.script.safeIcon;
+      if (si) this.safeIcon = si;
+    });
     enableDragging(this.$el, {
       onDrop: (from, to) => this.$emit('move', { from, to }),
     });
@@ -223,9 +225,9 @@ export default {
 @import '../utils/dragging.css';
 
 $rem: 14px;
-
-$iconSize: calc(3 * $rem);
-$iconSizeSmaller: calc(2 * $rem);
+// The icon should use the real size we generate in `dist` to ensure crispness
+$iconSize: 38px;
+$iconSizeSmaller: 32px;
 $actionIconSize: calc(2 * $rem);
 
 $nameFontSize: $rem;
@@ -328,7 +330,9 @@ $removedItemHeight: calc(
     position: absolute;
     width: $iconSize;
     height: $iconSize;
-    top: 1rem;
+    top: 0;
+    bottom: 0;
+    margin: auto;
     cursor: pointer;
     .disabled &,
     .removed & {
