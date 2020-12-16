@@ -40,11 +40,17 @@ if (!global.chrome.app
           }
           port.postMessage(code);
         });
+        port.onDisconnect.addListener(closeSelf);
       });
-    } else if (history.length > 1) {
-      history.go(-1);
     } else {
-      sendCmd('TabClose');
+      closeSelf();
+    }
+    function closeSelf() {
+      if (history.length > 1) {
+        history.go(-1);
+      } else {
+        sendCmd('TabClose');
+      }
     }
   })().catch(console.error); // FF doesn't show exceptions in content scripts
 }
