@@ -115,9 +115,7 @@ export default {
   },
   data() {
     return {
-      safeIcon: `/public/images/icon${
-        store.HiDPI ? 128 : this.script.config.removed && 32 || 38
-      }.png`,
+      safeIcon: null,
       canRender: this.visible,
     };
   },
@@ -181,8 +179,8 @@ export default {
   },
   mounted() {
     loadScriptIcon(this.script, { cache: store.cache }).then(() => {
-      const si = this.script.safeIcon;
-      if (si) this.safeIcon = si;
+      this.safeIcon = this.script.safeIcon
+        || `/public/images/icon${store.HiDPI ? 128 : this.script.config.removed && 32 || 38}.png`;
     });
     enableDragging(this.$el, {
       onDrop: (from, to) => this.$emit('move', { from, to }),
@@ -334,6 +332,9 @@ $removedItemHeight: calc(
     bottom: 0;
     margin: auto;
     cursor: pointer;
+    &:not([src]) {
+      visibility: hidden; // hiding the empty outline border while the image loads
+    }
     .disabled &,
     .removed & {
       filter: grayscale(.8);
