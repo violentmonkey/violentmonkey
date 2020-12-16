@@ -32,12 +32,11 @@ export function loadScriptIcon(script, {
   return promise;
 }
 
-async function fetchImage(url) {
-  try {
-    const blob = await (await fetch(url)).blob();
-    await createImageBitmap(blob);
-    return true;
-  } catch (e) {
-    return false;
-  }
+function fetchImage(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+  });
 }
