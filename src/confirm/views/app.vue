@@ -14,7 +14,9 @@
               <span class="ml-1" v-text="i18n('installOptionClose')"></span>
             </label>
             <label>
-              <setting-check name="trackLocalFile" :disabled="closeAfterInstall" />
+              <setting-check name="trackLocalFile"
+                             :disabled="closeAfterInstall || !isLocal"
+                             @change="trackLocalFile"/>
               <tooltip :content="trackTooltip" :disabled="!trackTooltip">
                 <span class="ml-1" v-text="i18n('installOptionTrack')"/>
               </tooltip>
@@ -68,6 +70,7 @@ export default {
   data() {
     return {
       installable: false,
+      installed: false,
       dependencyOK: false,
       closeAfterInstall: options.get('closeAfterInstall'),
       message: '',
@@ -202,15 +205,21 @@ export default {
       })
       .then((result) => {
         this.message = `${result.update.message}[${this.getTimeString()}]`;
-        if (this.closeAfterInstall) this.close();
-        else if (this.isLocal) this.trackLocalFile();
+        if (this.closeAfterInstall) {
+          this.close();
+        } else {
+          this.installed = true;
+          this.trackLocalFile();
+        }
       }, (err) => {
         this.message = `${err}`;
         this.installable = true;
       });
     },
     async trackLocalFile() {
-      if (this.tracking) return;
+      if (this.tracking || !this.isLocal || !this.installed) {
+        return;
+      }
       this.tracking = true;
       while (options.get('trackLocalFile') && this.tracking !== 'stop') {
         await makePause(500);
@@ -221,8 +230,6 @@ export default {
         } catch (e) { /* NOP */ }
       }
       this.tracking = false;
-      filePort?.disconnect();
-      filePort = null;
     },
     checkClose(value) {
       this.closeAfterInstall = value;
