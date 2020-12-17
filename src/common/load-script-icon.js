@@ -32,7 +32,17 @@ export function loadScriptIcon(script, {
   return promise;
 }
 
-function fetchImage(url) {
+async function fetchImage(url) {
+  /* The benefit of fetch+createImageBitmap is that it doesn't delay the popup in Chrome,
+     but it doesn't work with SVG so we're using DOM Image in case the modern method fails
+     or when the URL obviously contains an SVG */
+  if (!/^data:image\/svg|\.svgz?([#?].*)?$/.test(url)) {
+    try {
+      const blob = await (await fetch(url)).blob();
+      await createImageBitmap(blob);
+      return true;
+    } catch (e) { /* NOP */ }
+  }
   return new Promise((resolve) => {
     const img = new Image();
     img.src = url;
