@@ -268,12 +268,10 @@ function makeGlobalWrapper(local) {
   const readonlys = new Set(readonlyKeys);
   readonlys.delete = setDelete;
   readonlys.has = setHas;
-  if (bridge.isFirefox) {
-    // Firefox returns [object Object] so jQuery libs see our `window` proxy as a plain
-    // object and try to clone its recursive properties like `self` and `window`.
-    // Note that Chrome returns [object Window] so it's probably a bug in Firefox.
-    defineProperty(local, toStringTag, { get: () => 'Window' });
-  }
+  /* Browsers may return [object Object] for Object.prototype.toString(window)
+     on our `window` proxy so jQuery libs see it as a plain object and throw
+     when trying to clone its recursive properties like `self` and `window`. */
+  defineProperty(local, toStringTag, { get: () => 'Window' });
   const wrapper = new Proxy(local, {
     defineProperty(_, name, desc) {
       const isString = typeof name === 'string';
