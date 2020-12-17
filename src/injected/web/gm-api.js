@@ -1,6 +1,6 @@
 import { dumpScriptValue, getUniqId, isEmpty } from '#/common/util';
 import {
-  assign, defineProperty, describeProperty, objectEntries, objectKeys, objectPick, objectValues,
+  assign, defineProperty, objectEntries, objectKeys, objectPick, objectValues,
 } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
@@ -12,7 +12,7 @@ import {
 } from './gm-values';
 import {
   charCodeAt, jsonDump, logging, slice,
-  append, createElementNS, remove, setAttribute, NS_HTML,
+  createElementNS, setAttribute, NS_HTML,
 } from '../utils/helpers';
 
 const {
@@ -20,12 +20,12 @@ const {
   Blob, Error, TextDecoder, Uint8Array,
   Array: { prototype: { findIndex, indexOf } },
   Document: { prototype: { getElementById } },
-  HTMLElement: { prototype: { click } },
+  EventTarget: { prototype: { dispatchEvent } },
+  MouseEvent,
   String: { prototype: { lastIndexOf } },
   TextDecoder: { prototype: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
 } = global;
-const { get: getDocElem } = describeProperty(Document.prototype, 'documentElement');
 const vmOwnFuncToString = () => '[Violentmonkey property]';
 export const vmOwnFunc = (func, toString) => {
   defineProperty(func, 'toString', { value: toString || vmOwnFuncToString });
@@ -238,13 +238,10 @@ function downloadBlob(res) {
   const { context: { name, onload }, response } = res;
   const url = createObjectURL(response);
   const a = document::createElementNS(NS_HTML, 'a');
-  a::setAttribute('hidden', '');
   a::setAttribute('href', url);
   if (name) a::setAttribute('download', name);
-  document::getDocElem()::append(a);
-  a::click();
+  a::dispatchEvent(new MouseEvent('click'));
   setTimeout(() => {
-    a::remove(a);
     revokeObjectURL(url);
     onload?.(res);
   }, 3000);
