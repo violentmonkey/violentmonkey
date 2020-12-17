@@ -10,6 +10,10 @@
     />
     <div class="mt-1">
       <label>
+        <setting-check name="importScriptData" />
+        <span v-text="i18n('labelImportScriptData')"></span>
+      </label>
+      <label class="ml-2">
         <setting-check name="importSettings" />
         <span v-text="i18n('labelImportSettings')"></span>
       </label>
@@ -81,13 +85,15 @@ async function importBackup(file) {
   if (!vm.values) vm.values = {};
   await processAll(readScriptOptions, '.options.json');
   await processAll(readScript, '.user.js');
-  await processAll(readScriptStorage, '.storage.json');
+  if (options.get('importScriptData')) {
+    await processAll(readScriptStorage, '.storage.json');
+    sendCmd('SetValueStores',
+      toObjectArray(vm.values, ([uri, store]) => store && ({ where: { uri }, store })));
+  }
   if (options.get('importSettings')) {
     sendCmd('SetOptions',
       toObjectArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
   }
-  sendCmd('SetValueStores',
-    toObjectArray(vm.values, ([uri, store]) => store && ({ where: { uri }, store })));
   sendCmd('CheckPosition');
   showMessage({ text: reportProgress() });
 

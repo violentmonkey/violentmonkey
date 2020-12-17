@@ -21,6 +21,7 @@ export default {
   syncScriptStatus: true,
   sync: null,
   customCSS: null,
+  importScriptData: true,
   importSettings: true,
   notifyUpdates: false,
   notifyUpdatesGlobal: false, // `true` ignores script.config.notifyUpdates
