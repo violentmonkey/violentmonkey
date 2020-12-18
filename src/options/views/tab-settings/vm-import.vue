@@ -168,7 +168,7 @@ async function importBackup(file) {
         downloadURL: typeof meta.file_url === 'string' ? meta.file_url : undefined,
         // customizing of @noframes isn't implemented yet
         noframes: !!ovr.noframes || (ovr.noframes == null ? undefined : false),
-        runAt: /^document-(start|end|idle)$/.test(opts.run_at) ? opts.run_at : undefined,
+        runAt: /^document-(start|body|end|idle)$/.test(opts.run_at) ? opts.run_at : undefined,
         exclude: toStringArray(ovr.use_excludes),
         include: toStringArray(ovr.use_includes),
         match: toStringArray(ovr.use_matches),

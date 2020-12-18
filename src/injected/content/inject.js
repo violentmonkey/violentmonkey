@@ -62,14 +62,14 @@ export function injectScripts(contentId, webId, data, isXml) {
   const realms = {
     [INJECT_CONTENT]: {
       injectable: () => true,
-      lists: { start: [], end: [], idle: [] },
+      lists: { start: [], body: [], end: [], idle: [] },
       ids: [],
       info: INFO,
     },
     [INJECT_PAGE]: {
       // eslint-disable-next-line no-return-assign
       injectable: () => injectable ?? (injectable = checkInjectable()),
-      lists: { start: [], end: [], idle: [] },
+      lists: { start: [], body: [], end: [], idle: [] },
       ids: [],
       info: INFO,
     },
@@ -101,6 +101,9 @@ export function injectScripts(contentId, webId, data, isXml) {
   injectAll(realms, 'start');
   if (!bornReady && realms[INJECT_PAGE].ids.length) {
     delete realms[INJECT_CONTENT];
+    if (realms[INJECT_PAGE].lists.body.length) {
+      onDocumentBody(() => injectAll(realms, 'body'));
+    }
     document.addEventListener('DOMContentLoaded', async () => {
       await 0;
       injectAll(realms, 'end');
@@ -162,6 +165,26 @@ function injectAll(realms, runAt) {
   });
   if (runAt === 'idle') {
     bridge.realms = null;
+  }
+}
+
+function onDocumentBody(cb) {
+  if (document.body) {
+    cb();
+  } else {
+    // This function runs before any userscripts, but MutationObserver callback may run
+    // after content-mode userscripts so we'll have to use safe calls there
+    const { disconnect } = MutationObserver.prototype;
+    const { get: getBody } = describeProperty(Document.prototype, 'body')
+      || describeProperty(HTMLDocument.prototype, 'body'); // old FF before 61;
+    const mo = new MutationObserver(() => {
+      if (document::getBody()) {
+        mo::disconnect();
+        cb();
+      }
+    });
+    // documentElement may be absent yet so we'll play it safe
+    mo.observe(document, { childList: true, subtree: true });
   }
 }
 
