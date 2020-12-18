@@ -413,7 +413,7 @@ labelReplace:
   message: "Remplacer par\_: "
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: "Lancer à\_:"
+  message: "Lancer à\_: "
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Défaut)

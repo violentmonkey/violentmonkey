@@ -112,7 +112,7 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     CodeMirror  ve JSON eklentileri için <code>{"indentUnit":2,
-    "smartIndent":true}1</code> gibi özelleştirilmiş ayarlar, ancak bazıları 
+    "smartIndent":true}1</code> gibi özelleştirilmiş ayarlar, ancak bazıları
     Violentmonkey'de çalışmayabililir. Tüm listeyi görmek için <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">tıklayın</a>
@@ -395,7 +395,7 @@ labelReplace:
   message: 'Değiştir: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Çalışma yeri:'
+  message: 'Çalışma yeri: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Varsayılan)

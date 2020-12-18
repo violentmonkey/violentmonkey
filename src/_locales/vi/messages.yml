@@ -391,7 +391,7 @@ labelReplace:
   message: 'Thay thế bằng: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Chạy khi:'
+  message: 'Chạy khi: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Mặc định)

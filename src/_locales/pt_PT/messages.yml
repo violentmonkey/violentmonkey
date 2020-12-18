@@ -392,7 +392,7 @@ labelReplace:
   message: 'Substituir por: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Executar em:'
+  message: 'Executar em: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Predefinido)

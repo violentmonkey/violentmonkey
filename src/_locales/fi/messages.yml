@@ -384,7 +384,7 @@ labelReplace:
   message: 'Korvaa: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Ajoaika:'
+  message: 'Ajoaika: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Oletus)

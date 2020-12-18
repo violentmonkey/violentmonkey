@@ -408,7 +408,7 @@ labelReplace:
   message: 'Nahradiť: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Spustiť pri:'
+  message: 'Spustiť pri: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Predvolené)

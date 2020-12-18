@@ -416,7 +416,7 @@ labelReplace:
   message: 'Zamień na: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Moment uruchomienia:'
+  message: 'Moment uruchomienia: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (domyślny)
