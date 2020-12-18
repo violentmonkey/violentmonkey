@@ -75,5 +75,6 @@
       "pre-commit": "yarn transform -t",
       "pre-push": "yarn lint"
     }
-  }
+  },
+  "beta": 1
 }
