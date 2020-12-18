@@ -8,11 +8,14 @@ const pkg = require('../package.json');
 function getVersion() {
   let version = pkg.version.replace(/-[^.]*/, '');
   if (pkg.beta) version += `.${pkg.beta}`;
+  // Create a beta release with the same code as in stable release.
+  // Used in unlisted version.
+  else if (process.env.BETA) version += 'b';
   return version;
 }
 
 function isBeta() {
-  return pkg.beta > 0;
+  return process.env.BETA || pkg.beta > 0;
 }
 
 exports.getVersion = getVersion;

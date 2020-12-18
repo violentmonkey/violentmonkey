@@ -2,3 +2,5 @@
 node_modules/
 *.log
 /stats.json
+/tmp/
+/dist-assets/

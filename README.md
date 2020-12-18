@@ -57,11 +57,3 @@ $ yarn bump
 # Create a patch release
 $ yarn version --patch
 ```
-
-### Announcing updates
-
-Create a new `updates.json` so that self-hosted versions can be updated to the new version.
-
-```sh
-$ yarn update:selfHosted
-```

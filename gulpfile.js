@@ -5,12 +5,12 @@ const log = require('fancy-log');
 const gulpFilter = require('gulp-filter');
 const uglify = require('gulp-uglify');
 const plumber = require('gulp-plumber');
-const yaml = require('js-yaml');
 const Sharp = require('sharp');
 const { isProd } = require('@gera2ld/plaid/util');
 const spawn = require('cross-spawn');
 const i18n = require('./scripts/i18n');
 const { getVersion, isBeta } = require('./scripts/version-helper');
+const { buildManifest } = require('./scripts/manifest-helper');
 const pkg = require('./package.json');
 
 const DIST = 'dist';
@@ -48,12 +48,6 @@ async function jsProd() {
   });
 }
 
-async function readManifest() {
-  const input = await fs.readFile(paths.manifest, 'utf8');
-  const data = yaml.safeLoad(input);
-  return data;
-}
-
 /**
  * Versioning
  *
@@ -63,15 +57,7 @@ async function readManifest() {
  *
  */
 async function manifest() {
-  const data = await readManifest();
-  data.version = getVersion();
-  if (process.env.TARGET === 'selfHosted') {
-    data.browser_specific_settings.gecko.update_url = 'https://raw.githubusercontent.com/violentmonkey/violentmonkey/master/updates.json';
-  }
-  if (isBeta()) {
-    // Do not support i18n in beta version
-    data.name = 'Violentmonkey BETA';
-  }
+  const data = await buildManifest();
   await fs.writeFile(`${DIST}/manifest.json`, JSON.stringify(data), 'utf8');
 }
 
@@ -79,7 +65,7 @@ async function createIcons() {
   const ALPHA = .5;
   const dist = `${DIST}/public/images`;
   await fs.mkdir(dist, { recursive: true });
-  const icon = Sharp(`src/resources/icon${pkg.beta ? '-beta' : ''}.png`);
+  const icon = Sharp(`src/resources/icon${isBeta() ? '-beta' : ''}.png`);
   const gray = icon.clone().grayscale();
   const transparent = icon.clone().composite([{
     input: Buffer.from([255, 255, 255, 256 * ALPHA]),
@@ -129,27 +115,6 @@ async function bump() {
     spawn.sync('git', ['commit', '-am', version]);
     spawn.sync('git', ['tag', '-m', version, version]);
   }
-}
-
-/**
- * Create an update manifest file to announce a new self-hosted release.
- */
-async function updateVersions() {
-  const manifest = await readManifest();
-  const version = getVersion();
-  const data = {
-    addons: {
-      [manifest.browser_specific_settings.gecko.id]: {
-        updates: [
-          {
-            version,
-            update_link: `https://github.com/violentmonkey/violentmonkey/releases/download/v${version}/violentmonkey-${version}-an.fx.xpi`,
-          },
-        ],
-      }
-    },
-  };
-  await fs.writeFile('updates.json', JSON.stringify(data, null, 2), 'utf8');
 }
 
 function copyFiles() {
@@ -213,4 +178,3 @@ exports.i18n = updateI18n;
 exports.check = checkI18n;
 exports.copyI18n = copyI18n;
 exports.bump = bump;
-exports.updateVersions = updateVersions;

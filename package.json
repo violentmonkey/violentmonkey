@@ -5,7 +5,7 @@
     "dev": "gulp dev",
     "prebuild": "yarn ci",
     "build": "cross-env NODE_ENV=production gulp build",
-    "build:selfHosted": "cross-env TARGET=selfHosted yarn build",
+    "build:selfHosted": "cross-env TARGET=selfHosted BETA=1 yarn build",
     "analyze": "cross-env RUN_ENV=analyze npm run build",
     "i18n": "gulp i18n",
     "copyI18n": "gulp copyI18n",
@@ -17,8 +17,7 @@
     "ci": "yarn lint && yarn test",
     "transform": "locky yarn yarn",
     "bump": "yarn ci && gulp bump --commit",
-    "preversion": "yarn ci && gulp bump --reset",
-    "update:selfHosted": "gulp updateVersions"
+    "preversion": "yarn ci && gulp bump --reset"
   },
   "description": "Violentmonkey",
   "devDependencies": {
@@ -43,6 +42,7 @@
     "jsdom": "^16.2.1",
     "plugin-error": "^1.0.0",
     "sharp": "^0.26.2",
+    "sign-addon": "^3.1.0",
     "tape": "^4.13.2",
     "through2": "^3.0.1",
     "vinyl": "^2.1.0",
