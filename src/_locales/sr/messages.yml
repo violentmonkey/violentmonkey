@@ -380,10 +380,10 @@ labelRemovedAt:
   message: ''
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Замени са:'
+  message: 'Замени са: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Покрени:'
+  message: 'Покрени: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Подразумевано)

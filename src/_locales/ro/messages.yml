@@ -128,7 +128,7 @@ editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
     Documentație cu privire la blockurile metadatelor usescripturilor și
-    API-urile <code>GM</code>: 
+    API-urile <code>GM</code>:
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: Comenzi rapide de la tastatură
@@ -410,7 +410,7 @@ labelReplace:
   message: 'Înlocuiește cu: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Momentul rulării:'
+  message: 'Momentul rulării: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Implicit)

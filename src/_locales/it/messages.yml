@@ -403,7 +403,7 @@ labelReplace:
   message: 'Sostituisci con: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Esegui-In:'
+  message: 'Esegui-In: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Default)

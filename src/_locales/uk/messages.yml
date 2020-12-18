@@ -385,7 +385,7 @@ labelReplace:
   message: 'Замінити на: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Виконувати:'
+  message: 'Виконувати: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (за замовчуванням)

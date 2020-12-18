@@ -401,7 +401,7 @@ labelReplace:
   message: 'Vervangen door: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Uitvoeren op:'
+  message: 'Uitvoeren op: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (standaard)

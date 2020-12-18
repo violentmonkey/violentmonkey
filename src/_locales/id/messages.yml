@@ -402,7 +402,7 @@ labelReplace:
   message: 'Ganti dengan: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Run-At:'
+  message: 'Run-At: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Bawaan)

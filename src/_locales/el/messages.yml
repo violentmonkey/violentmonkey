@@ -387,7 +387,7 @@ labelReplace:
   message: 'Αντικατάσταση με: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Εκτέλεση κατά:'
+  message: 'Εκτέλεση κατά: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Προκαθορισμένο)
