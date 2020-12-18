@@ -28,6 +28,7 @@
         <select v-model="custom.runAt">
           <option value="" v-text="i18n('labelRunAtDefault')"></option>
           <option value="document-start">document-start</option>
+          <option value="document-body">document-body</option>
           <option value="document-end">document-end</option>
           <option value="document-idle">document-idle</option>
         </select>

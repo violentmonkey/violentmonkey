@@ -661,4 +661,8 @@ export async function vacuum() {
  * @property {string} uri
  * @property {string} uuid
  */
-/** @typedef {'document-start' | 'document-end' | 'document-idle'} VMScriptRunAt */
+/**
+ * @typedef {
+   'document-start' | 'document-body' | 'document-end' | 'document-idle'
+ } VMScriptRunAt
+ */
