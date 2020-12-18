@@ -390,15 +390,24 @@ async function confirmInstall({ code, from, url }, { tab = {} }) {
   }
 }
 
-const whitelist = [
-  '^https://greasyfork.org/scripts/[^/]*/code/[^/]*?\\.user\\.js([?#]|$)',
-  '^https://openuserjs.org/install/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
-  '^https://github.com/[^/]*/[^/]*/raw/[^/]*/[^/]*?\\.user\\.js([?#]|$)',
-  '^https://gist.github.com/.*?/[^/]*?.user.js([?#]|$)',
-].map(re => new RegExp(re));
-const blacklist = [
-  '//(?:(?:gist.|)github.com|greasyfork.org|openuserjs.org)/',
-].map(re => new RegExp(re));
+const whitelistRe = new RegExp(`^https://(${
+  [
+    'greasyfork\\.org/scripts/%/code/',
+    'openuserjs\\.org/install/%/',
+    'github\\.com/%/%/raw/%/',
+    'github\\.com/%/%/releases/%/download/',
+    'raw\\.githubusercontent\\.com(/%){3}/',
+    'gist\\.github\\.com/.*?/',
+  ].join('|')
+})%?\\.user\\.js([?#]|$)`.replace(/%/g, '[^/]*'));
+
+const blacklistRe = new RegExp(`^https://(${
+  [
+    '(gist\\.)?github\\.com',
+    'greasyfork\\.org',
+    'openuserjs\\.org',
+  ].join('|')
+})/`);
 
 browser.tabs.onCreated.addListener((tab) => {
   // FF 68+ can't read file URLs directly so we need to keep the tab open
@@ -420,7 +429,7 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     return { redirectUrl };
   }
   if (!cache.has(`bypass:${url}`)
-  && (!blacklist.some(matches, url) || whitelist.some(matches, url))) {
+  && (!blacklistRe.test(url) || whitelistRe.test(url))) {
     maybeInstallUserJs(tabId, url);
     return { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url
   }
@@ -451,9 +460,4 @@ async function maybeInstallUserJs(tabId, url) {
     cache.put(`bypass:${url}`, true, 10e3);
     if (tabId >= 0) browser.tabs.update(tabId, { url });
   }
-}
-
-/** @this {string} */
-function matches(re) {
-  return re.test(this);
 }
