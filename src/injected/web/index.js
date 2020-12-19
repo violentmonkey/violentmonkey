@@ -13,7 +13,12 @@ import './tabs';
 // Make sure to call safe::methods() in code that may run after userscripts
 
 const { document } = global;
+const { then } = Promise.prototype;
 const { get: getCurrentScript } = describeProperty(Document.prototype, 'currentScript');
+
+const sendSetTimeout = () => bridge.send('SetTimeout', 0);
+const resolvers = {};
+const waiters = {};
 
 export default function initialize(
   webId,
@@ -27,6 +32,9 @@ export default function initialize(
     invokeGuest = (cmd, data) => bridge.onHandle({ cmd, data });
     global.chrome = undefined;
     global.browser = undefined;
+    bridge.addHandlers({
+      RunAt: name => resolvers[name](),
+    });
   } else {
     bridge.mode = INJECT_PAGE;
     bridge.post = bindEvents(webId, contentId, bridge.onHandle);
@@ -36,11 +44,6 @@ export default function initialize(
       },
     });
   }
-  bridge.load = new Promise(resolve => {
-    // waiting for the page handlers to run first
-    bridge.loadResolve = async () => await 1 && resolve(1);
-    document.addEventListener('DOMContentLoaded', bridge.loadResolve, { once: true });
-  });
   return invokeGuest;
 }
 
@@ -58,6 +61,8 @@ bridge.addHandlers({
       store.cache = info.cache;
     }
     if (items) {
+      const { stage } = items[0];
+      if (stage) waiters[stage] = new Promise(resolve => { resolvers[stage] = resolve; });
       items::forEach(createScriptData);
       // FF bug workaround to enable processing of sourceURL in injected page scripts
       if (bridge.isFirefox && bridge.mode === INJECT_PAGE) {
@@ -82,8 +87,7 @@ bridge.addHandlers({
 function createScriptData(item) {
   const { dataKey, values } = item;
   store.values[item.props.id] = values;
-  if (window[dataKey]) {
-    // executeScript ran earlier than GetInjected response (improbable but theoretically possible)
+  if (window[dataKey]) { // executeScript ran before GetInjected response
     onCodeSet(item, window[dataKey]);
   } else {
     defineProperty(window, dataKey, {
@@ -94,15 +98,19 @@ function createScriptData(item) {
 }
 
 async function onCodeSet(item, fn) {
+  const { dataKey, stage } = item;
   // deleting now to prevent interception via DOMNodeRemoved on el::remove()
-  delete window[item.dataKey];
+  delete window[dataKey];
   if (process.env.DEBUG) {
     log('info', [bridge.mode], item.custom.name || item.meta.name || item.props.id);
   }
+  const run = () => wrapGM(item)::fn(logging.error);
   const el = document::getCurrentScript();
+  const wait = waiters[stage];
   if (el) el::remove();
-  if (item.action === 'wait') {
-    await bridge.load;
+  if (wait) {
+    waiters[stage] = (stage === 'idle' ? wait::then(sendSetTimeout) : wait)::then(run);
+  } else {
+    run();
   }
-  wrapGM(item)::fn(logging.error);
 }

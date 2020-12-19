@@ -6,10 +6,8 @@ import {
   browser,
 } from '#/common/consts';
 import { sendCmd } from '#/common';
-import { defineProperty, describeProperty, forEachEntry, objectPick } from '#/common/object';
-
+import { defineProperty, forEachKey, objectPick } from '#/common/object';
 import {
-  forEach, push,
   append, createElementNS, remove, NS_HTML,
   addEventListener, removeEventListener,
   log,
@@ -22,25 +20,25 @@ const VMInitInjection = window[process.env.INIT_FUNC_NAME];
 // (the prop is undeletable so a userscript can't fool us on reinjection)
 defineProperty(window, process.env.INIT_FUNC_NAME, { value: 1 });
 
-const { document, setTimeout } = global;
-// Userscripts in content mode may redefine head and documentElement
-const { get: getHead } = describeProperty(Document.prototype, 'head')
-  || describeProperty(HTMLDocument.prototype, 'head'); // old FF before 61;
-const { get: getDocElem } = describeProperty(Document.prototype, 'documentElement');
-const { appendChild } = Document.prototype; // same as Node.appendChild
+const { document } = global;
+const { appendChild, getElementsByTagName } = document;
 const stringIncludes = String.prototype.includes;
+
+const elemByTag = tag => document::getElementsByTagName(tag)[0];
+
+let contLists;
+let pgLists;
+let realms;
 
 bridge.addHandlers({
   // FF bug workaround to enable processing of sourceURL in injected page scripts
-  InjectList(runAt) {
-    bridge.realms[INJECT_PAGE].lists[runAt]::forEach(inject);
-  },
+  InjectList: injectList,
 });
 
 export function appendToRoot(node) {
   // DOM spec allows any elements under documentElement
   // https://dom.spec.whatwg.org/#node-trees
-  const root = document::getHead() || document::getDocElem();
+  const root = elemByTag('head') || elemByTag('html');
   return root && root::appendChild(node);
 }
 
@@ -55,26 +53,26 @@ export function injectPageSandbox(contentId, webId) {
 export function injectScripts(contentId, webId, data, isXml) {
   bridge.ids = data.ids;
   // eslint-disable-next-line prefer-rest-params
-  if (!document::getDocElem()) return waitForDocElem(() => injectScripts(...arguments));
+  if (!elemByTag('html')) return onElement('html', injectScripts, ...arguments);
   let injectable = isXml ? false : null;
   const bornReady = ['interactive', 'complete'].includes(document.readyState);
-  const INFO = objectPick(data, ['cache', 'isFirefox', 'ua']);
-  const realms = {
+  const info = objectPick(data, ['cache', 'isFirefox', 'ua']);
+  realms = {
     [INJECT_CONTENT]: {
       injectable: () => true,
-      lists: { start: [], body: [], end: [], idle: [] },
+      lists: contLists = { start: [], body: [], end: [], idle: [] },
       ids: [],
-      info: INFO,
+      info,
     },
     [INJECT_PAGE]: {
       // eslint-disable-next-line no-return-assign
       injectable: () => injectable ?? (injectable = checkInjectable()),
-      lists: { start: [], body: [], end: [], idle: [] },
+      lists: pgLists = { start: [], body: [], end: [], idle: [] },
       ids: [],
-      info: INFO,
+      info,
     },
   };
-  const triage = (script) => {
+  sendCmd('InjectionFeedback', data.scripts.map((script) => {
     const { custom, dataKey, meta, props: { id } } = script;
     const desiredRealm = custom.injectInto || meta.injectInto || data.injectInto;
     const internalRealm = INJECT_MAPPING[desiredRealm] || INJECT_MAPPING[INJECT_AUTO];
@@ -86,31 +84,25 @@ export function injectScripts(contentId, webId, data, isXml) {
       let runAt = bornReady ? 'start'
         : `${custom.runAt || meta.runAt || ''}`.replace(/^document-/, '');
       const list = lists[runAt] || lists[runAt = 'end'];
-      script.action = realm === INJECT_CONTENT && (runAt === 'start' ? runAt : 'wait');
-      needsInjection = !!script.action;
-      ids::push(id);
-      list::push(script);
+      needsInjection = realm === INJECT_CONTENT;
+      script.stage = needsInjection && runAt !== 'start' && runAt;
+      ids.push(id);
+      list.push(script);
     } else {
       bridge.failedIds.push(id);
     }
     return [dataKey, needsInjection];
-  };
-  const feedback = data.scripts.map(triage);
-  setupContentInvoker(realms, contentId, webId);
-  sendCmd('InjectionFeedback', feedback);
-  injectAll(realms, 'start');
-  if (!bornReady && realms[INJECT_PAGE].ids.length) {
-    delete realms[INJECT_CONTENT];
-    if (realms[INJECT_PAGE].lists.body.length) {
-      onDocumentBody(() => injectAll(realms, 'body'));
-    }
-    document.addEventListener('DOMContentLoaded', async () => {
-      await 0;
-      injectAll(realms, 'end');
-      setTimeout(injectAll, 0, realms, 'idle');
+  }));
+  setupContentInvoker(contentId, webId);
+  injectAll('start');
+  if (pgLists.body[0] || contLists.body[0]) {
+    onElement('body', injectAll, 'body');
+  }
+  if (pgLists.idle[0] || contLists.idle[0] || pgLists.end[0] || contLists.end[0]) {
+    document::addEventListener('DOMContentLoaded', () => {
+      injectAll('end');
+      injectAll('idle');
     }, { once: true });
-  } else {
-    bridge.realms = null;
   }
 }
 
@@ -147,48 +139,64 @@ function inject(item) {
   script::remove();
 }
 
-function injectAll(realms, runAt) {
-  bridge.realms = realms;
-  realms::forEachEntry(([realm, realmData]) => {
+function injectAll(runAt) {
+  const isStart = runAt === 'start';
+  // Not using destructuring of arrays because we don't know if @@iterator is safe.
+  realms::forEachKey((realm) => {
+    const realmData = realms[realm];
     const isPage = realm === INJECT_PAGE;
-    realmData.lists::forEachEntry(([name, items]) => {
-      if ((!isPage || name === runAt) && items.length) {
-        bridge.post('ScriptData', { items, runAt, info: realmData.info }, realm);
+    realmData.lists::forEachKey((name) => {
+      const items = realmData.lists[name];
+      // All lists for content mode are processed jointly when runAt='start'
+      if ((isPage ? name === runAt : isStart) && items.length) {
+        bridge.post('ScriptData', { items, runAt: name, info: realmData.info }, realm);
         realmData.info = undefined;
-        items::forEach(item => {
-          // FF bug workaround to enable processing of sourceURL in injected page scripts
-          if (isPage && !bridge.isFirefox) inject(item);
-          item.code = '';
-        });
+        if (isPage && !bridge.isFirefox) {
+          injectList(runAt);
+        }
       }
     });
   });
+  if (!isStart && contLists[runAt].length) {
+    bridge.post('RunAt', runAt, INJECT_CONTENT);
+  }
   if (runAt === 'idle') {
-    bridge.realms = null;
+    realms = null;
+    pgLists = null;
+    contLists = null;
   }
 }
 
-function onDocumentBody(cb) {
-  if (document.body) {
-    cb();
+async function injectList(runAt) {
+  const isIdle = runAt === 'idle';
+  const list = pgLists[runAt];
+  // Not using for-of because we don't know if @@iterator is safe.
+  for (let i = 0; i < list.length; i += 1) {
+    if (isIdle) await sendCmd('SetTimeout', 0);
+    inject(list[i]);
+  }
+}
+
+function onElement(tag, cb, ...args) {
+  const elems = document::getElementsByTagName(tag);
+  if (elems[0]) {
+    cb(...args);
   } else {
     // This function runs before any userscripts, but MutationObserver callback may run
     // after content-mode userscripts so we'll have to use safe calls there
     const { disconnect } = MutationObserver.prototype;
-    const { get: getBody } = describeProperty(Document.prototype, 'body')
-      || describeProperty(HTMLDocument.prototype, 'body'); // old FF before 61;
-    const mo = new MutationObserver(() => {
-      if (document::getBody()) {
-        mo::disconnect();
-        cb();
+    const observer = new MutationObserver(() => {
+      if (elems[0]) {
+        observer::disconnect();
+        cb(...args);
       }
     });
-    // documentElement may be absent yet so we'll play it safe
-    mo.observe(document, { childList: true, subtree: true });
+    // documentElement may be replaced so we'll observe the entire document
+    observer.observe(document, { childList: true, subtree: true });
   }
 }
 
-function setupContentInvoker(realms, contentId, webId) {
+function setupContentInvoker(contentId, webId) {
   const invokableIds = realms[INJECT_CONTENT].ids;
   if (invokableIds.length) {
     const invoke = {
@@ -198,14 +206,4 @@ function setupContentInvoker(realms, contentId, webId) {
     bridge.invokableIds = invokableIds;
     bridge.post = (cmd, params, realm) => (invoke[realm] || postViaBridge)(cmd, params);
   }
-}
-
-function waitForDocElem(cb) {
-  const observer = new MutationObserver(() => {
-    if (document::getDocElem()) {
-      observer.disconnect();
-      cb();
-    }
-  });
-  observer.observe(document, { childList: true });
 }

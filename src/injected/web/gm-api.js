@@ -16,7 +16,7 @@ import {
 } from '../utils/helpers';
 
 const {
-  atob, setTimeout,
+  atob,
   Blob, Error, TextDecoder, Uint8Array,
   Array: { prototype: { findIndex, indexOf } },
   Document: { prototype: { getElementById } },
@@ -234,15 +234,14 @@ function getResource(context, name, isBlob) {
   }
 }
 
-function downloadBlob(res) {
+async function downloadBlob(res) {
   const { context: { name, onload }, response } = res;
   const url = createObjectURL(response);
   const a = document::createElementNS(NS_HTML, 'a');
   a::setAttribute('href', url);
   if (name) a::setAttribute('download', name);
   a::dispatchEvent(new MouseEvent('click'));
-  setTimeout(() => {
-    revokeObjectURL(url);
-    onload?.(res);
-  }, 3000);
+  await bridge.send('SetTimeout', 3000);
+  revokeObjectURL(url);
+  onload?.(res);
 }

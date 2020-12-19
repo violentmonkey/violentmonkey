@@ -6,7 +6,6 @@ const handlers = {};
 const callbacks = {};
 const bridge = {
   callbacks,
-  load: () => {},
   addHandlers(obj) {
     assign(handlers, obj);
   },

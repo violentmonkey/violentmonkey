@@ -1,4 +1,4 @@
-import { sendCmd } from '#/common';
+import { makePause, sendCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
 import { deepCopy, forEachEntry, objectSet } from '#/common/object';
 import ua from '#/common/ua';
@@ -95,6 +95,14 @@ Object.assign(commands, {
         });
       }
     });
+  },
+  /**
+   * Timers in content scripts are shared with the web page so it can clear them.
+   * await sendCmd('SetTimeout', 100) in injected/content
+   * await bridge.send('SetTimeout', 100) in injected/web
+   */
+  SetTimeout(ms) {
+    return ms > 0 && makePause(ms);
   },
 });
 
