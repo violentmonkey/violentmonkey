@@ -92,6 +92,7 @@ bridge.addHandlers({
     return styleId;
   },
   CheckScript: sendCmd,
+  SetTimeout: sendCmd,
 });
 
 function sendSetPopup() {
