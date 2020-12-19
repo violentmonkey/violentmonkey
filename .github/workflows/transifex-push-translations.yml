@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     # if PR with label `i18n` is merged
-    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'i18n')
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'i18n')
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
