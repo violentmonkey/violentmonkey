@@ -9,7 +9,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Install deps
-        run: yarn
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '15'
       - name: CI
-        run: yarn ci
+        run: yarn && yarn ci
