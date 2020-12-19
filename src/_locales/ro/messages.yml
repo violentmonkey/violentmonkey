@@ -348,6 +348,9 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL pentru pagina de start:'
+labelImportScriptData:
+  description: Option to import script data along with scripts.
+  message: ''
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importă setări

@@ -327,6 +327,9 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL do website:'
+labelImportScriptData:
+  description: Option to import script data along with scripts.
+  message: ''
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importar definições

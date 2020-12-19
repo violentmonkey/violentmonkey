@@ -323,6 +323,9 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: '홈페이지 URL:'
+labelImportScriptData:
+  description: Option to import script data along with scripts.
+  message: ''
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: 불러오기 설정

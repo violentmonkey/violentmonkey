@@ -324,6 +324,9 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Liên kết trang chủ:'
+labelImportScriptData:
+  description: Option to import script data along with scripts.
+  message: ''
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Nhập cài đặt
