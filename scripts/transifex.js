@@ -117,6 +117,7 @@ const loadData = memoize(async function loadData(lang) {
 
 const loadUpdatedLocales = memoize(async function loadUpdatedLocales() {
   const diffUrl = process.env.DIFF_URL;
+  if (!diffUrl) return;
   const result = await exec('curl', ['-sSL', diffUrl]);
   // Example:
   // diff --git a/src/_locales/ko/messages.yml b/src/_locales/ko/messages.yml
@@ -133,7 +134,7 @@ const loadUpdatedLocales = memoize(async function loadUpdatedLocales() {
 async function pushTranslations(lang) {
   const codes = await loadUpdatedLocales();
   // Limit to languages changed in this PR only
-  if (!codes.includes(lang)) return;
+  if (codes && !codes.includes(lang)) return;
   const { local, remote } = await loadData(lang);
   const remoteUpdate = {};
   Object.entries(local)
@@ -194,7 +195,7 @@ async function main() {
       await handle(code);
     } catch (err) {
       process.stderr.write(`\nError pulling ${code}\n`)
-      console.error(err);
+      throw err;
     }
   }
   showProgress('OK');
