@@ -331,7 +331,7 @@ labelHomepageURL:
   message: 主页地址：
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: 导入脚本数据
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: 导入设置

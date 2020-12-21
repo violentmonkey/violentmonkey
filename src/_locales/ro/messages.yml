@@ -128,7 +128,7 @@ editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
     Documentație cu privire la blockurile metadatelor usescripturilor și
-    API-urile <code>GM</code>:
+    API-urile <code>GM</code>: 
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: Comenzi rapide de la tastatură

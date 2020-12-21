@@ -345,7 +345,7 @@ labelHomepageURL:
   message: 'Adresa domovskej stránky:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Importovať dáta skriptu
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importovať nastavenia
