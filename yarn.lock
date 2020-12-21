@@ -2455,10 +2455,10 @@ codemirror-js-mixed@^0.9.2:
   resolved "https://registry.yarnpkg.com/codemirror-js-mixed/-/codemirror-js-mixed-0.9.2.tgz#a369b03db197cf6bcc2516fa9ea3ce9d2bb2c479"
   integrity sha512-ZmMp2/QM50CE6HoiU2CSTRwcJAamKVjXQzgbYjUjZAIZzFtrIigLwJBv8dlORYiIgpiYWIhTSR03C4i2c6zZnw==
 
-codemirror@^5.58.2:
-  version "5.58.2"
-  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.58.2.tgz#ed54a1796de1498688bea1cdd4e9eeb187565d1b"
-  integrity sha512-K/hOh24cCwRutd1Mk3uLtjWzNISOkm4fvXiMO7LucCrqbh6aJDdtqUziim3MZUI6wOY0rvY1SlL1Ork01uMy6w==
+codemirror@^5.59.0:
+  version "5.59.0"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.59.0.tgz#6d8132055459aabf21d04cae5cf5c430e5c57bb9"
+  integrity sha512-UGzSkCacY9z0rSpQ3wnTWRN2nvRE6foDXnJltWW8pazInR/R+3gXHrao4IFQMv/bSBvFBxt8/HPpkpKAS54x5Q==
 
 collection-map@^1.0.0:
   version "1.0.0"
