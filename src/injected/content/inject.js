@@ -24,6 +24,7 @@ const { document } = global;
 const { appendChild, getElementsByTagName } = document;
 const stringIncludes = String.prototype.includes;
 
+/** When looking for documentElement, use '*' to also support XML pages */
 const elemByTag = tag => document::getElementsByTagName(tag)[0];
 
 let contLists;
@@ -38,7 +39,7 @@ bridge.addHandlers({
 export function appendToRoot(node) {
   // DOM spec allows any elements under documentElement
   // https://dom.spec.whatwg.org/#node-trees
-  const root = elemByTag('head') || elemByTag('html');
+  const root = elemByTag('head') || elemByTag('*');
   return root && root::appendChild(node);
 }
 
@@ -53,7 +54,7 @@ export function injectPageSandbox(contentId, webId) {
 export function injectScripts(contentId, webId, data, isXml) {
   bridge.ids = data.ids;
   // eslint-disable-next-line prefer-rest-params
-  if (!elemByTag('html')) return onElement('html', injectScripts, ...arguments);
+  if (!elemByTag('*')) return onElement('*', injectScripts, ...arguments);
   let injectable = isXml ? false : null;
   const bornReady = ['interactive', 'complete'].includes(document.readyState);
   const info = objectPick(data, ['cache', 'isFirefox', 'ua']);
