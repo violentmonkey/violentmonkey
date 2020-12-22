@@ -16,7 +16,10 @@ jobs:
         with:
           node-version: '15'
       - name: Prepare
-        run: yarn && node scripts/action-helper.js
+        run: |
+          # Continue only if the latest commit is tagged
+          [ "${GITHUB_REF#/refs/tags/}" = `git describe` ] || exit 1
+          yarn && node scripts/action-helper.js
       - name: Build
         run: |
           yarn build
