@@ -7,17 +7,23 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    continue-on-error: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '15'
-      - name: Install deps
-        run: yarn
+      - name: Prepare
+        run: |
+          # Continue only if files in src/ is changed
+          diff_url=https://github.com/violentmonkey/violentmonkey/compare/$COMMIT_BEFORE..$COMMIT_AFTER.diff
+          curl -fsSL $diff_url | grep '^diff --git a/src/' || exit 1
+          yarn
+        env:
+          COMMIT_BEFORE: ${{ github.event.before }}
+          COMMIT_AFTER: ${{ github.event.after }}
       - name: Update locale files
         run: yarn copyI18n
       - name: Upload to Transifex
