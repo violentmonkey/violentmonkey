@@ -254,11 +254,12 @@ footer {
 
 .extras-menu {
   position: fixed;
-  right: 0;
+  right: 1rem;
   box-shadow: 1px 1px 10px #0008;
   z-index: 100;
   background: var(--bg);
   color: var(--fg);
+  border: 1px solid var(--fill-6);
   & > * {
     cursor: pointer;
     display: block;
