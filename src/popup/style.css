@@ -144,8 +144,11 @@ footer {
     > .flex-1 {
       padding-right: 2rem;
     }
-    .failed {
+    .failed & {
       text-decoration: line-through red;
+    }
+    .removed & {
+      text-decoration: line-through;
     }
   }
   &-find {
@@ -250,8 +253,7 @@ footer {
 }
 
 .extras-menu {
-  display: none;
-  position: absolute;
+  position: fixed;
   right: 0;
   box-shadow: 1px 1px 10px #0008;
   z-index: 100;
@@ -278,15 +280,11 @@ footer {
   }
 }
 
-.extras-shown {
-  .script-name {
-    text-decoration: underline;
-  }
-  .extras-menu {
-    display: block;
-  }
+.extras-shown .script-name {
+  text-decoration: underline;
 }
 
-.removed {
-  text-decoration: line-through;
+.block-scroll {
+  pointer-events: none;
+  user-select: none;
 }

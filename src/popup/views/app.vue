@@ -1,6 +1,8 @@
 <template>
   <div
     class="page-popup"
+    @click="activeExtras && toggleExtras(null)"
+    @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
     :data-failure-reason="failureReason">
     <div class="flex menu-buttons">
       <div class="logo" :class="{disabled:!options.isApplied}">
@@ -50,7 +52,10 @@
     <div
       v-for="scope in injectionScopes"
       class="menu menu-scripts"
-      :class="{ expand: activeMenu === scope.name }"
+      :class="{
+        expand: activeMenu === scope.name,
+        'block-scroll': !!activeExtras,
+      }"
       :data-type="scope.name"
       :key="scope.name">
       <div class="menu-item menu-area menu-group" @click="toggleMenu(scope.name)">
@@ -59,51 +64,44 @@
       </div>
       <div class="submenu">
         <div
-          v-for="({ name, data, home }, index) in scope.list"
-          class="script"
+          v-for="(item, index) in scope.list"
           :key="index"
           :class="{
-            disabled: !data.config.enabled,
-            removed: data.config.removed,
-            'extras-shown': activeExtras === data,
+            disabled: !item.data.config.enabled,
+            failed: item.data.failed,
+            removed: item.data.config.removed,
+            'extras-shown': activeExtras === item,
           }"
-          @mouseenter="message = name"
+          @mouseenter="message = item.name"
           @mouseleave="message = ''">
           <div
             class="menu-item menu-area"
-            @click="onToggleScript(data)">
-            <img class="script-icon" :src="data.safeIcon" @error="scriptIconError">
-            <icon :name="getSymbolCheck(data.config.enabled)"></icon>
-            <div class="script-name flex-auto ellipsis" v-text="name"
-                 :class="{failed: data.failed}"
-                 @click.ctrl.exact.stop="onEditScript(data)"
-                 @contextmenu.exact.stop="onEditScript(data)"
-                 @mousedown.middle.exact.stop="onEditScript(data)" />
+            @click="onToggleScript(item)">
+            <img class="script-icon" :src="item.data.safeIcon" @error="scriptIconError">
+            <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
+            <div class="script-name flex-auto ellipsis" v-text="item.name"
+                 @click.ctrl.exact.stop="onEditScript(item)"
+                 @contextmenu.exact.stop="onEditScript(item)"
+                 @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
           <div class="submenu-buttons">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
-            <div class="submenu-button" @click="onEditScript(data)"
+            <div class="submenu-button" @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
               <icon name="code"></icon>
             </div>
-            <div class="submenu-button" @click="onToggleExtras(data, $event)">
+            <div class="submenu-button" @click.stop="toggleExtras(item, $event)">
               <icon name="more"/>
             </div>
-          </div>
-          <div class="extras-menu" @click="onToggleExtras(data, $event)">
-            <a v-if="home" :href="home" v-text="i18n('buttonHome')"
-               rel="noopener noreferrer" target="_blank"/>
-            <div v-text="data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
-                 @click="onRemoveScript(data)"/>
           </div>
           <div class="submenu-commands">
             <div
               class="menu-item menu-area"
-              v-for="(cap, i) in store.commands[data.props.id]"
+              v-for="(cap, i) in store.commands[item.data.props.id]"
               :key="i"
-              @click="onCommand(data.props.id, cap)"
+              @click="onCommand(item.data.props.id, cap)"
               @mouseenter="message = cap"
-              @mouseleave="message = name">
+              @mouseleave="message = item.name">
               <icon name="command" />
               <div class="flex-auto ellipsis" v-text="cap" />
             </div>
@@ -125,6 +123,12 @@
     </footer>
     <div class="message" v-if="message">
       <div v-text="message"></div>
+    </div>
+    <div v-if="activeExtras" class="extras-menu" ref="extrasMenu">
+      <a v-if="activeExtras.home" :href="activeExtras.home" v-text="i18n('buttonHome')"
+         rel="noopener noreferrer" target="_blank"/>
+      <div v-text="activeExtras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
+           @click="onRemoveScript(activeExtras)"/>
     </div>
   </div>
 </template>
@@ -229,6 +233,18 @@ export default {
     toggleMenu(name) {
       this.activeMenu = this.activeMenu === name ? null : name;
     },
+    toggleExtras(item, evt) {
+      this.activeExtras = this.activeExtras === item ? null : item;
+      if (this.activeExtras) {
+        this.$nextTick(() => {
+          const { extrasMenu } = this.$refs;
+          extrasMenu.style.top = `${
+            Math.min(window.innerHeight - extrasMenu.getBoundingClientRect().height,
+              evt.currentTarget.getBoundingClientRect().top + 16)
+          }px`;
+        });
+      }
+    },
     getSymbolCheck(bool) {
       return `toggle-${bool ? 'on' : 'off'}`;
     },
@@ -249,9 +265,9 @@ export default {
       });
       window.close();
     },
-    onEditScript(data) {
+    onEditScript(item) {
       sendCmd('TabOpen', {
-        url: `/options/index.html#scripts/${data.props.id}`,
+        url: `/options/index.html#scripts/${item.data.props.id}`,
         maybeInWindow: true,
       });
       window.close();
@@ -265,7 +281,8 @@ export default {
     onCommand(id, cap) {
       sendTabCmd(store.currentTab.id, 'Command', `${id}:${cap}`);
     },
-    onToggleScript(data) {
+    onToggleScript(item) {
+      const { data } = item;
       const enabled = !data.config.enabled;
       sendCmd('UpdateScriptInfo', {
         id: data.props.id,
@@ -298,26 +315,21 @@ export default {
       await browser.tabs.reload();
       window.close();
     },
-    onRemoveScript({ config, props: { id } }) {
+    onRemoveScript({ data: { config, props: { id } } }) {
       const removed = +!config.removed;
       config.removed = removed;
       sendCmd('MarkRemoved', { id, removed });
     },
-    onToggleExtras(data, evt) {
-      this.activeExtras = this.activeExtras === data ? null : data;
-      if (this.activeExtras) {
-        const el = evt.currentTarget;
-        const extrasMenu = el.closest('.script').querySelector('.extras-menu');
-        const container = el.closest('.submenu');
-        this.$nextTick(() => {
-          const { top, bottom } = extrasMenu.getBoundingClientRect();
-          const spill = top >= 0 && (container.getBoundingClientRect().bottom - bottom);
-          if (top < 0 || spill < 0) {
-            container.scrollTop += top < 0 ? top : -spill;
-          }
-        });
+  },
+  mounted() {
+    // close the extras menu on Escape key
+    window.addEventListener('keydown', evt => {
+      if (this.activeExtras
+      && evt.key === 'Escape' && !evt.shiftKey && !evt.ctrlKey && !evt.altKey && !evt.metaKey) {
+        evt.preventDefault();
+        this.toggleExtras(null);
       }
-    },
+    });
   },
 };
 </script>
