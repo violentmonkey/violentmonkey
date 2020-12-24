@@ -1,6 +1,8 @@
 <template>
   <div
     class="page-popup"
+    @click="activeExtras && toggleExtras(null)"
+    @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
     :data-failure-reason="failureReason">
     <div class="flex menu-buttons">
       <div class="logo" :class="{disabled:!options.isApplied}">
@@ -50,7 +52,10 @@
     <div
       v-for="scope in injectionScopes"
       class="menu menu-scripts"
-      :class="{ expand: activeMenu === scope.name }"
+      :class="{
+        expand: activeMenu === scope.name,
+        'block-scroll': !!activeExtras,
+      }"
       :data-type="scope.name"
       :key="scope.name">
       <div class="menu-item menu-area menu-group" @click="toggleMenu(scope.name)">
@@ -61,7 +66,12 @@
         <div
           v-for="(item, index) in scope.list"
           :key="index"
-          :class="{ disabled: !item.data.config.enabled }"
+          :class="{
+            disabled: !item.data.config.enabled,
+            failed: item.data.failed,
+            removed: item.data.config.removed,
+            'extras-shown': activeExtras === item,
+          }"
           @mouseenter="message = item.name"
           @mouseleave="message = ''">
           <div
@@ -69,8 +79,7 @@
             @click="onToggleScript(item)">
             <img class="script-icon" :src="item.data.safeIcon" @error="scriptIconError">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
-            <div class="flex-auto ellipsis" v-text="item.name"
-                 :class="{failed: item.data.failed}"
+            <div class="script-name flex-auto ellipsis" v-text="item.name"
                  @click.ctrl.exact.stop="onEditScript(item)"
                  @contextmenu.exact.stop="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)" />
@@ -80,6 +89,9 @@
             <div class="submenu-button" @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
               <icon name="code"></icon>
+            </div>
+            <div class="submenu-button" @click.stop="toggleExtras(item, $event)">
+              <icon name="more"/>
             </div>
           </div>
           <div class="submenu-commands">
@@ -111,6 +123,12 @@
     </footer>
     <div class="message" v-if="message">
       <div v-text="message"></div>
+    </div>
+    <div v-if="activeExtras" class="extras-menu" ref="extrasMenu">
+      <a v-if="activeExtras.home" :href="activeExtras.home" v-text="i18n('buttonHome')"
+         rel="noopener noreferrer" target="_blank"/>
+      <div v-text="activeExtras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
+           @click="onRemoveScript(activeExtras)"/>
     </div>
   </div>
 </template>
@@ -149,6 +167,7 @@ export default {
       store,
       options: optionsData,
       activeMenu: 'scripts',
+      activeExtras: null,
       message: null,
     };
   },
@@ -167,12 +186,14 @@ export default {
         const numEnabled = list.reduce((num, script) => num + script.config.enabled, 0);
         if (hideDisabled) list = list.filter(script => script.config.enabled);
         list = list.map((script, i) => {
-          const scriptName = script.custom.name || getLocaleString(script.meta, 'name');
+          const { config, custom, meta } = script;
+          const scriptName = custom.name || getLocaleString(meta, 'name');
           return {
             name: scriptName,
             data: script,
+            home: custom.homepageURL || meta.homepageURL || meta.homepage,
             key: isSorted && `${
-              enabledFirst && +!script.config.enabled
+              enabledFirst && +!config.enabled
             }${
               sort === 'alpha' ? scriptName.toLowerCase() : `${1e6 + i}`.slice(1)
             }`,
@@ -211,6 +232,18 @@ export default {
   methods: {
     toggleMenu(name) {
       this.activeMenu = this.activeMenu === name ? null : name;
+    },
+    toggleExtras(item, evt) {
+      this.activeExtras = this.activeExtras === item ? null : item;
+      if (this.activeExtras) {
+        this.$nextTick(() => {
+          const { extrasMenu } = this.$refs;
+          extrasMenu.style.top = `${
+            Math.min(window.innerHeight - extrasMenu.getBoundingClientRect().height,
+              evt.currentTarget.getBoundingClientRect().top + 16)
+          }px`;
+        });
+      }
     },
     getSymbolCheck(bool) {
       return `toggle-${bool ? 'on' : 'off'}`;
@@ -282,6 +315,21 @@ export default {
       await browser.tabs.reload();
       window.close();
     },
+    onRemoveScript({ data: { config, props: { id } } }) {
+      const removed = +!config.removed;
+      config.removed = removed;
+      sendCmd('MarkRemoved', { id, removed });
+    },
+  },
+  mounted() {
+    // close the extras menu on Escape key
+    window.addEventListener('keydown', evt => {
+      if (this.activeExtras
+      && evt.key === 'Escape' && !evt.shiftKey && !evt.ctrlKey && !evt.altKey && !evt.metaKey) {
+        evt.preventDefault();
+        this.toggleExtras(null);
+      }
+    });
   },
 };
 </script>

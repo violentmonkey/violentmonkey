@@ -144,8 +144,11 @@ footer {
     > .flex-1 {
       padding-right: 2rem;
     }
-    .failed {
+    .failed & {
       text-decoration: line-through red;
+    }
+    .removed & {
+      text-decoration: line-through;
     }
   }
   &-find {
@@ -184,7 +187,7 @@ footer {
   border-top: 1px dashed var(--fill-2);
   > * {
     position: relative;
-    &:not(:hover) > .submenu-buttons {
+    &:not(:hover):not(.extras-shown) > .submenu-buttons {
       visibility: hidden;
     }
     .menu-item {
@@ -194,11 +197,15 @@ footer {
   &-buttons {
     display: flex;
     position: absolute;
-    top: .3rem;
-    right: $itemPaddingX;
+    top: 0;
+    right: 0;
+    opacity: .5;
+    &:hover {
+      opacity: 1;
+    }
   }
   &-button {
-    padding: .2rem;
+    padding: .5rem;
     background: var(--bg);
     cursor: pointer;
     &:hover {
@@ -243,4 +250,42 @@ footer {
   code {
     max-width: 100%;
   }
+}
+
+.extras-menu {
+  position: fixed;
+  right: 1rem;
+  box-shadow: 1px 1px 10px #0008;
+  z-index: 100;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--fill-6);
+  & > * {
+    cursor: pointer;
+    display: block;
+    padding: .25rem 1rem;
+    text-decoration: none;
+    &:first-child {
+      padding-top: .75rem;
+    }
+    &:last-child {
+      padding-bottom: .75rem;
+    }
+    &:hover {
+      color: var(--bg);
+      background: cornflowerblue;
+    }
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.extras-shown .script-name {
+  text-decoration: underline;
+}
+
+.block-scroll {
+  pointer-events: none;
+  user-select: none;
 }
