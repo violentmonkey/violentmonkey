@@ -283,9 +283,10 @@ function makeGlobalWrapper(local) {
       return true;
     },
     deleteProperty(_, name) {
-      return !unforgeables.has(name)
-        && delete local[name]
-        && globals.delete(name);
+      if (!unforgeables.has(name) && delete local[name]) {
+        globals.delete(name);
+        return true;
+      }
     },
     get(_, name) {
       if (name !== 'undefined' && name !== scopeSym) {
