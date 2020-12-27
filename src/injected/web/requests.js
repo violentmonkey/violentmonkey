@@ -87,22 +87,20 @@ async function callback(req, msg) {
       responseHeaders: headers,
       responseText: text,
     } = data;
-    const isRawResponse = !('rawResponse' in req)
-      && (details.responseType || 'text') !== 'text'
-      && response;
-    if (isRawResponse) {
-      req.rawResponse = msg.numChunks > 1
+    const isText = (details.responseType || 'text') === 'text';
+    if (!isText && response && !('raw' in req)) {
+      req.raw = msg.numChunks > 1
         ? receiveAllChunks(req, response, msg.numChunks)
         : response;
     }
-    if (req.rawResponse?.then) {
-      req.rawResponse = await req.rawResponse;
+    if (req.raw?.then) {
+      req.raw = await req.raw;
     }
-    if ('rawResponse' in req) {
+    if ('raw' in req) {
       defineProperty(data, 'response', {
         configurable: true,
         get() {
-          const value = parseData(req.rawResponse, msg, details);
+          const value = parseData(req.raw, msg, details);
           defineProperty(this, 'response', { value });
           return value;
         },
@@ -113,6 +111,7 @@ async function callback(req, msg) {
     data.context = details.context;
     data.responseHeaders = req.headers;
     data.responseText = req.text;
+    if (isText) data.response = req.text;
     cb(data);
   }
   if (msg.type === 'loadend') delete idMap[req.id];
