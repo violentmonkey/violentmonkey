@@ -353,7 +353,7 @@ labelHomepageURL:
   message: 'URL de la página principal:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Importar datos del script
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importar configuración
