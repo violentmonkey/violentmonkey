@@ -1,7 +1,7 @@
 <template>
   <div class="tab-about">
     <h1 class="mt-0">
-      <span class="mr-1" v-text="i18n('labelAbout')"></span>
+      <span class="mr-1" v-text="name"></span>
       <small v-text="`v${version}`"></small>
     </h1>
     <p class="mb-2" v-text="i18n('extDescription')"></p>
@@ -26,14 +26,16 @@
 </template>
 
 <script>
-const data = {
-  version: process.env.VM_VER,
-  language: browser.i18n.getUILanguage(),
-};
+
 
 export default {
   data() {
-    return data;
+    const manifest = browser.runtime.getManifest();
+    return {
+      name: manifest.name,
+      version: manifest.version,
+      language: browser.i18n.getUILanguage(),
+    };
   },
 };
 </script>
