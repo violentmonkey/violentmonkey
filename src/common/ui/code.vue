@@ -474,8 +474,8 @@ export default {
     onCopy(e) {
       // CM already prepared the correct text in DOM selection, which is particularly
       // important when using its lineWiseCopyCut option (on by default)
-      const sel = `${window.getSelection()}`;
-      if (!this.cm || !sel) return;
+      const sel = `${window.getSelection()}` || this.cm?.getSelection();
+      if (!sel) return;
       const text = this.getRealContent(sel);
       e.clipboardData.setData('text', text);
       e.preventDefault();
