@@ -104,7 +104,13 @@ async function onCodeSet(item, fn) {
   if (process.env.DEBUG) {
     log('info', [bridge.mode], item.custom.name || item.meta.name || item.props.id);
   }
-  const run = () => wrapGM(item)::fn(logging.error);
+  const handleError = err => {
+    logging.error(err);
+    if (!stage && err?.name === 'TypeError' && err.message === 'document.head is null' && document.head === null) {
+      logging.warn('👆 This script may be using `document-start` improperly, if you are the script author, please read https://violentmonkey.github.io/api/metadata-block/#run-at for more details');
+    }
+  };
+  const run = () => wrapGM(item)::fn(handleError);
   const el = document::getCurrentScript();
   const wait = waiters[stage];
   if (el) el::remove();
