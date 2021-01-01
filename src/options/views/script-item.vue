@@ -231,6 +231,7 @@ $actionIconSize: calc(2 * $rem);
 $nameFontSize: $rem;
 
 $itemLineHeight: 1.5;
+$itemMargin: 8px;
 $itemPadT: 12px;
 $itemPadB: 5px;
 $itemHeight: calc(
@@ -247,7 +248,7 @@ $removedItemHeight: calc(
 
 .script {
   position: relative;
-  margin: 8px;
+  margin: $itemMargin;
   padding: $itemPadT 10px $itemPadB;
   border: 1px solid var(--fill-3);
   border-radius: .3rem;
@@ -373,6 +374,28 @@ $removedItemHeight: calc(
 @media (max-width: 319px) {
   .script-icon ~ * {
     margin-left: 0;
+  }
+}
+
+@media (min-width: 1300px) { // for 1366x768
+  .scripts {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .script {
+    width: calc(100% / 2 - (2 * $itemMargin));
+  }
+}
+
+@media (min-width: 1900px) { // for 1920x1080
+  .script {
+    width: calc(100% / 3 - (2 * $itemMargin));
+  }
+}
+
+@media (min-width: 2500px) { // for 2560x1440
+  .script {
+    width: calc(100% / 4 - (2 * $itemMargin));
   }
 }
 </style>
