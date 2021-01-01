@@ -17,7 +17,7 @@ export default function initCache({
   // eslint-disable-next-line no-return-assign
   const getNow = () => batchStarted && batchStartTime || (batchStartTime = performance.now());
   return {
-    batch, get, pop, put, del, has, hit, destroy,
+    batch, get, getValues, pop, put, del, has, hit, destroy,
   };
   function batch(enable) {
     batchStarted = enable;
@@ -26,6 +26,9 @@ export default function initCache({
   function get(key, def) {
     const item = cache[key];
     return item ? item.value : def;
+  }
+  function getValues() {
+    return Object.values(cache).map(item => item.value);
   }
   function pop(key, def) {
     const value = get(key, def);
