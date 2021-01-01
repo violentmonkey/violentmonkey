@@ -1,7 +1,7 @@
 import { getUniqId } from '#/common';
 import { INJECT_CONTENT, INJECTABLE_TAB_URL_RE, METABLOCK_RE } from '#/common/consts';
+import initCache from '#/common/cache';
 import ua from '#/common/ua';
-import cache from './cache';
 import { getScriptsByURL } from './db';
 import { extensionRoot, postInitialize } from './init';
 import { getOption, hookOptions } from './options';
@@ -14,6 +14,7 @@ const API_CONFIG = {
 const TIME_AFTER_SEND = 10e3; // longer as establishing connection to sites may take time
 const TIME_AFTER_RECEIVE = 1e3; // shorter as response body will be coming very soon
 const TIME_KEEP_DATA = 60e3; // 100ms should be enough but the tab may hang or get paused in debugger
+const cache = initCache({ lifetime: TIME_KEEP_DATA });
 let injectInto;
 hookOptions(changes => {
   injectInto = changes.defaultInjectInto ?? injectInto;
@@ -24,13 +25,22 @@ postInitialize.push(() => {
   togglePreinject(getOption('isApplied'));
 });
 
+export function clearPreinjectData() {
+  if (ua.isFirefox) {
+    for (const data of cache.getValues()) {
+      data.registration?.then(r => r.unregister());
+    }
+  }
+  cache.destroy();
+}
+
 /** @return {Promise<Object>} */
 export function getInjectedScripts(url, tabId, frameId) {
   return cache.pop(getKey(url, !frameId)) || prepare(url, tabId, frameId, true);
 }
 
 function getKey(url, isTop) {
-  return `preinject${+isTop}:${url}`;
+  return isTop ? url : `-${url}`;
 }
 
 function togglePreinject(enable) {

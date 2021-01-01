@@ -9,7 +9,7 @@ import { getData, checkRemove } from './utils/db';
 import { setBadge } from './utils/icon';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
-import { getInjectedScripts } from './utils/preinject';
+import { clearPreinjectData, getInjectedScripts } from './utils/preinject';
 import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
 import { resetValueOpener, addValueOpener } from './utils/values';
 import './utils/clipboard';
@@ -124,9 +124,12 @@ const commandsToSyncIfTruthy = [
 async function handleCommandMessage(req, src) {
   const { cmd } = req;
   const res = await commands[cmd]?.(req.data, src);
-  if (commandsToSync.includes(cmd)
-  || res && commandsToSyncIfTruthy.includes(cmd)) {
+  const maybeChanged = commandsToSync.includes(cmd);
+  if (maybeChanged || res && commandsToSyncIfTruthy.includes(cmd)) {
     sync.sync();
+  }
+  if (maybeChanged) {
+    clearPreinjectData();
   }
   // `undefined` is not transferable, but `null` is
   return res ?? null;
