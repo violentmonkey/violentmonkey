@@ -239,6 +239,7 @@ installOptionTrackTooltip:
 labelAbout:
   description: Label shown on top of the about page.
   message: 关于暴力猴
+  touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
   message: 高级
