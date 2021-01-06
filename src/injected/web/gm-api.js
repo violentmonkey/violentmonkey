@@ -234,14 +234,18 @@ function getResource(context, name, isBlob) {
   }
 }
 
-async function downloadBlob(res) {
+function downloadBlob(res) {
   const { context: { name, onload }, response } = res;
   const url = createObjectURL(response);
   const a = document::createElementNS(NS_HTML, 'a');
   a::setAttribute('href', url);
   if (name) a::setAttribute('download', name);
   a::dispatchEvent(new MouseEvent('click'));
+  revokeBlobAfterTimeout(url);
+  onload?.(res);
+}
+
+async function revokeBlobAfterTimeout(url) {
   await bridge.send('SetTimeout', 3000);
   revokeObjectURL(url);
-  onload?.(res);
 }
