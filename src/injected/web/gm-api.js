@@ -11,7 +11,7 @@ import {
   decodeValue, dumpValue, loadValues, changeHooks,
 } from './gm-values';
 import {
-  charCodeAt, jsonDump, logging, slice,
+  charCodeAt, jsonDump, log, logging, slice,
   createElementNS, setAttribute, NS_HTML,
 } from '../utils/helpers';
 
@@ -245,7 +245,7 @@ function downloadBlob(res) {
   downloadChain = downloadChain::then(async () => {
     a::dispatchEvent(new MouseEvent('click'));
     revokeBlobAfterTimeout(url);
-    onload?.(res);
+    try { onload?.(res); } catch (e) { log('error', ['GM_download', 'callback'], e); }
     await bridge.send('SetTimeout', 100);
   });
 }
