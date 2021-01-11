@@ -234,6 +234,7 @@ installOptionTrackTooltip:
 labelAbout:
   description: Label shown on top of the about page.
   message: Thông tin Violentmonkey
+  touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
   message: Nâng cao
