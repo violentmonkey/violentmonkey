@@ -22,6 +22,7 @@ const {
   Document: { prototype: { getElementById } },
   EventTarget: { prototype: { dispatchEvent } },
   MouseEvent,
+  Promise: { prototype: { then } },
   String: { prototype: { lastIndexOf } },
   TextDecoder: { prototype: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
@@ -31,6 +32,7 @@ export const vmOwnFunc = (func, toString) => {
   defineProperty(func, 'toString', { value: toString || vmOwnFuncToString });
   return func;
 };
+let downloadChain = Promise.resolve();
 
 export function makeGmApi() {
   return [{
@@ -240,9 +242,12 @@ function downloadBlob(res) {
   const a = document::createElementNS(NS_HTML, 'a');
   a::setAttribute('href', url);
   if (name) a::setAttribute('download', name);
-  a::dispatchEvent(new MouseEvent('click'));
-  revokeBlobAfterTimeout(url);
-  onload?.(res);
+  downloadChain = downloadChain::then(async () => {
+    a::dispatchEvent(new MouseEvent('click'));
+    revokeBlobAfterTimeout(url);
+    onload?.(res);
+    await bridge.send('SetTimeout', 100);
+  });
 }
 
 async function revokeBlobAfterTimeout(url) {
