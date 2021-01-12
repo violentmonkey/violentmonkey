@@ -9,7 +9,7 @@ import { getData, checkRemove } from './utils/db';
 import { setBadge } from './utils/icon';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
-import { clearPreinjectData, getInjectedScripts } from './utils/preinject';
+import { getInjectedScripts } from './utils/preinject';
 import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
 import { resetValueOpener, addValueOpener } from './utils/values';
 import './utils/clipboard';
@@ -83,19 +83,6 @@ Object.assign(commands, {
     }
     return res;
   },
-  InjectionFeedback(feedback, { tab, frameId }) {
-    feedback.forEach(([key, needsInjection]) => {
-      const code = cache.pop(key);
-      // see TIME_KEEP_DATA comment
-      if (needsInjection && code) {
-        browser.tabs.executeScript(tab.id, {
-          code,
-          frameId,
-          runAt: 'document_start',
-        });
-      }
-    });
-  },
   /**
    * Timers in content scripts are shared with the web page so it can clear them.
    * await sendCmd('SetTimeout', 100) in injected/content
@@ -124,12 +111,9 @@ const commandsToSyncIfTruthy = [
 async function handleCommandMessage(req, src) {
   const { cmd } = req;
   const res = await commands[cmd]?.(req.data, src);
-  const maybeChanged = commandsToSync.includes(cmd);
-  if (maybeChanged || res && commandsToSyncIfTruthy.includes(cmd)) {
+  if (commandsToSync.includes(cmd)
+  || res && commandsToSyncIfTruthy.includes(cmd)) {
     sync.sync();
-  }
-  if (maybeChanged) {
-    clearPreinjectData();
   }
   // `undefined` is not transferable, but `null` is
   return res ?? null;
