@@ -1,9 +1,11 @@
 import { getUniqId } from '#/common';
 import { INJECT_CONTENT, INJECTABLE_TAB_URL_RE, METABLOCK_RE } from '#/common/consts';
 import initCache from '#/common/cache';
+import storage from '#/common/storage';
 import ua from '#/common/ua';
 import { getScriptsByURL } from './db';
 import { extensionRoot, postInitialize } from './init';
+import { commands } from './message';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
 
@@ -25,14 +27,46 @@ postInitialize.push(() => {
   togglePreinject(getOption('isApplied'));
 });
 
-export function clearPreinjectData() {
-  if (ua.isFirefox) {
-    for (const data of cache.getValues()) {
-      data.registration?.then(r => r.unregister());
-    }
+Object.assign(commands, {
+  InjectionFeedback(feedback, { tab, frameId }) {
+    feedback.forEach(([key, needsInjection]) => {
+      const code = cache.pop(key);
+      // see TIME_KEEP_DATA comment
+      if (needsInjection && code) {
+        browser.tabs.executeScript(tab.id, {
+          code,
+          frameId,
+          runAt: 'document_start',
+        });
+      }
+    });
+  },
+});
+
+// Keys of the object returned by getScriptsByURL()
+const propsToClear = {
+  [storage.cache.prefix]: 'cacheKeys',
+  [storage.code.prefix]: true,
+  [storage.require.prefix]: 'reqKeys',
+  [storage.script.prefix]: true,
+  [storage.value.prefix]: 'withValueIds',
+};
+browser.storage.onChanged.addListener(changes => {
+  const dbKeys = Object.keys(changes);
+  const cacheValues = cache.getValues();
+  const dirty = cacheValues.some(data => data.inject
+    && dbKeys.some((key) => {
+      const prefix = key.slice(0, key.indexOf(':') + 1);
+      const prop = propsToClear[prefix];
+      key = key.slice(prefix.length);
+      return prop === true
+        || data[prop]?.includes(prefix === storage.value.prefix ? +key : key);
+    }));
+  if (dirty) {
+    cacheValues.forEach(data => data.registration?.then(r => r.unregister()));
+    cache.destroy();
   }
-  cache.destroy();
-}
+});
 
 /** @return {Promise<Object>} */
 export function getInjectedScripts(url, tabId, frameId) {

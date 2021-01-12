@@ -276,17 +276,17 @@ export async function getScriptsByURL(url, isTop) {
       && (isTop || !script.meta.noframes)
       && testScript(url, script)
     ));
-  const reqKeys = {};
-  const cacheKeys = {};
+  const reqKeys = [];
+  const cacheKeys = [];
   const scripts = allScripts.filter(script => script.config.enabled);
   scripts.forEach((script) => {
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
     meta.require.forEach((key) => {
-      reqKeys[pathMap[key] || key] = 1;
+      pushUnique(reqKeys, pathMap[key] || key);
     });
     meta.resources::forEachValue((key) => {
-      cacheKeys[pathMap[key] || key] = 1;
+      pushUnique(cacheKeys, pathMap[key] || key);
     });
   });
   const ids = allScripts.map(getPropsId);
@@ -295,8 +295,8 @@ export async function getScriptsByURL(url, isTop) {
   .filter(script => script.meta.grant?.some(gm => gmValues.includes(gm)))
   .map(getPropsId);
   const [require, cache, values, code] = await Promise.all([
-    storage.require.getMulti(Object.keys(reqKeys)),
-    storage.cache.getMulti(Object.keys(cacheKeys)),
+    storage.require.getMulti(reqKeys),
+    storage.cache.getMulti(cacheKeys),
     storage.value.getMulti(withValueIds, {}),
     storage.code.getMulti(enabledIds),
   ]);
@@ -308,12 +308,18 @@ export async function getScriptsByURL(url, isTop) {
       scripts,
     },
     // these will be used only by bg/* and to augment the data above
+    cacheKeys,
     code,
     enabledIds,
+    reqKeys,
     require,
     values,
     withValueIds,
   };
+}
+
+function pushUnique(arr, elem) {
+  if (!arr.includes(elem)) arr.push(elem);
 }
 
 /** @return {string[]} */
