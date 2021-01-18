@@ -42,7 +42,8 @@ Object.assign(handlers, {
     if (ids.length) {
       // frameScripts may be appended multiple times if iframes have unique scripts
       const scope = store[isTop ? 'scripts' : 'frameScripts'];
-      const metas = data.metas || await sendCmdDirectly('GetMetas', ids);
+      const metas = data.metas?.filter(({ props: { id } }) => ids.includes(id))
+        || await sendCmdDirectly('GetMetas', ids);
       metas.forEach(script => loadScriptIcon(script, { cache: store.cache }));
       scope.push(...metas);
       data.failedIds.forEach(id => {
