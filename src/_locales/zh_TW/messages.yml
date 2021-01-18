@@ -519,7 +519,7 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: 在隱私模式做的變更也會套用到主設定檔。
 msgInstalled:
   description: Message shown when a script is installed.
   message: 腳本已安裝。
@@ -600,10 +600,10 @@ optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: 只有在調整大小或儲存時才會記住編輯器視窗位置
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: 隱藏網址列
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: 先顯示啟用的腳本
@@ -638,13 +638,13 @@ titleSearchHint:
     * 支援正規表示式語法：/re/ 和 /re/flags
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: 鍵（字串）
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: 值（作為 JSON 序列化）
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: 所有值（作為 JSON 序列化）
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: 訪問網站
