@@ -3,7 +3,7 @@ import { CMD_SCRIPT_UPDATE } from '#/common/consts';
 import { fetchResources, getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
-import { commands, notify } from './message';
+import { commands } from './message';
 
 Object.assign(commands, {
   /** @return {Promise<true?>} */
@@ -45,6 +45,7 @@ async function doCheckUpdate(script) {
     resourceOpts = { headers: NO_HTTP_CACHE };
     return true;
   } catch (update) {
+    msgErr = update.error;
     // Either proceed with normal fetch on no-update or skip it altogether on error
     resourceOpts = !update.error && !update.checking && {};
     if (process.env.DEBUG) console.error(update);
@@ -54,9 +55,11 @@ async function doCheckUpdate(script) {
       if (process.env.DEBUG && msgErr) console.error(msgErr);
     }
     if (msgOk || msgErr) {
-      notify({
-        title: i18n('titleScriptUpdated'),
-        body: [msgOk, msgErr]::trueJoin('\n'),
+      commands.Notification({
+        title: `${i18n('titleScriptUpdated')} - ${i18n('extName')}`,
+        text: [msgOk, msgErr]::trueJoin('\n'),
+      }, undefined, {
+        onClick: () => commands.OpenEditor(id),
       });
     }
     delete processes[id];

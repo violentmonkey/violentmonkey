@@ -7,6 +7,12 @@ import { getOption } from './options';
 const openers = {};
 
 Object.assign(commands, {
+  OpenEditor(pathId) {
+    return commands.TabOpen({
+      url: `/options/index.html#scripts/${pathId}`,
+      maybeInWindow: true,
+    });
+  },
   /** @return {Promise<{ id: number }>} */
   async TabOpen({
     url,
