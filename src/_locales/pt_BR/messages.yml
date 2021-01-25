@@ -18,7 +18,7 @@ buttonEditClickHint:
   message: ''
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Limpar a lixeira agora!
 buttonEnable:
   description: Button to enable a script.
   message: Ativar
@@ -48,7 +48,7 @@ buttonOK:
   message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: Lixeira
 buttonRemove:
   description: Button to remove a script.
   message: Remover
@@ -60,10 +60,10 @@ buttonReplaceAll:
   message: Tudo
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Resetar
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: Restaurar
 buttonSave:
   description: Button to save modifications of a script.
   message: Salvar
@@ -72,7 +72,7 @@ buttonSaveClose:
   message: Salvar e fechar
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: Estado do editor
 buttonSupport:
   description: Button to open support page.
   message: Página de suporte
@@ -116,10 +116,10 @@ editHelpDocumention:
   message: ''
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Atalhos do teclado:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Usar outro editor?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadados personalizados
@@ -128,7 +128,7 @@ editLabelSettings:
   message: Definições do script
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: Linha muito longa
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
   message: ''
@@ -140,10 +140,10 @@ editNavSettings:
   message: Definições
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: Valores
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: ''
+  message: Tudo
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: ''
@@ -178,7 +178,7 @@ filterLastUpdateOrder:
   message: ''
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Tudo
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: ''
@@ -190,16 +190,16 @@ genericError:
   message: ''
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: ''
+  message: Desativado
 genericOn:
   description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: ''
+  message: Ativado
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: ''
+  message: Lixeira
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Coloque o URL:'
@@ -264,7 +264,7 @@ labelBlacklist:
   message: Lista negra
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Contribuidores
 labelCurrentLang:
   description: Label of current language.
   message: 'Idioma atual: '
@@ -315,7 +315,7 @@ labelGeneral:
   message: Gerais
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Ajude com a tradução
 labelHomepage:
   description: Label for home page in about tab.
   message: ''
@@ -375,7 +375,7 @@ labelPopupSort:
   message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Política de Privacidade
 labelRelated:
   description: Label of related links.
   message: 'Links relacionados: '
@@ -420,7 +420,7 @@ labelSyncDisabled:
   message: Nenhum
 labelSyncPassword:
   description: Label for input to hold password.
-  message: ''
+  message: 'Senha:'
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Reautorizar automaticamente quando expirar
@@ -439,7 +439,7 @@ labelSyncService:
   message: Sincronizar em
 labelSyncUsername:
   description: Label for input to hold username.
-  message: ''
+  message: Nome de usuário
 labelTranslator:
   description: Label of translator.
   message: 'Tradução: '
@@ -455,7 +455,7 @@ learnBlacklist:
   message: Saiba mais sobre os padrões para a lista negra.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Saiba mais sobre os modos de injeção
 menuCommands:
   description: Menu item to list script commands.
   message: Comandos do script
@@ -468,10 +468,10 @@ menuFindScripts:
   message: Procurar scripts para este site
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: Não pode injetar alguns scripts
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: ''
+  message: Tentar novamente no modo "automático"
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: ''
@@ -480,7 +480,7 @@ menuMatchedScripts:
   message: Scripts correspondidos
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Criar novo script
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Scripts desativados
@@ -563,7 +563,7 @@ msgSavedCustomCSS:
   message: Estilo personalizado atualizado.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: Opções de editor estão atualizadas.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: ''
@@ -607,10 +607,10 @@ optionEditorWindowSimple:
   message: ''
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Ativar primeiro
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: Esconder desativado(s)
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Mostrar scripts ativos primeiro
@@ -646,4 +646,4 @@ valueLabelValueAll:
   message: ''
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Visitar Site
