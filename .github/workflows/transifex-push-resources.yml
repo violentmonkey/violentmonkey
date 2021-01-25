@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - src/**
 
 jobs:
   build:
@@ -14,23 +16,9 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '15'
-      - name: Prepare
-        run: |
-          # Continue only if files in src/ is changed
-          diff_url=https://github.com/violentmonkey/violentmonkey/compare/$COMMIT_BEFORE..$COMMIT_AFTER.diff
-          if ! curl -fsSL $diff_url | grep -q '^diff --git a/src/'; then
-            echo SKIP_REST=1 >> $GITHUB_ENV
-            exit 0
-          fi
-          yarn
-        env:
-          COMMIT_BEFORE: ${{ github.event.before }}
-          COMMIT_AFTER: ${{ github.event.after }}
       - name: Update locale files
-        if: ${{ !env.SKIP_REST }}
-        run: yarn copyI18n
+        run: yarn && yarn copyI18n
       - name: Upload to Transifex
-        if: ${{ !env.SKIP_REST }}
         run: 'curl -i -L --user api:$TRANSIFEX_TOKEN -X PUT -F file=@dist/_locales/en/messages.json https://www.transifex.com/api/2/project/violentmonkey-nex/resource/messagesjson/content/'
         env:
           TRANSIFEX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
