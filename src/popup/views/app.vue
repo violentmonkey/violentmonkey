@@ -266,10 +266,7 @@ export default {
       window.close();
     },
     onEditScript(item) {
-      sendCmd('TabOpen', {
-        url: `/options/index.html#scripts/${item.data.props.id}`,
-        maybeInWindow: true,
-      });
+      sendCmd('OpenEditor', item.data.props.id);
       window.close();
     },
     onFindSameDomainScripts() {
@@ -302,10 +299,7 @@ export default {
         url: currentTab.url.split(/[#?]/)[0],
         name: `- ${domain}`,
       });
-      sendCmd('TabOpen', {
-        url: `/options/index.html#scripts/_new${id ? `/${id}` : ''}`,
-        maybeInWindow: true,
-      });
+      sendCmd('OpenEditor', `_new${id ? `/${id}` : ''}`);
       window.close();
     },
     async onInjectionFailureFix() {

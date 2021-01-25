@@ -5,15 +5,14 @@ const openers = {};
 
 Object.assign(commands, {
   /** @return {Promise<string>} */
-  async Notification(data, src) {
-    const srcTab = src.tab || {};
+  async Notification(data, src, bgExtras) {
     const notificationId = await browser.notifications.create({
       type: 'basic',
       title: data.title || i18n('extName'),
       message: data.text,
       iconUrl: data.image || defaultImage,
     });
-    openers[notificationId] = srcTab.id;
+    openers[notificationId] = bgExtras?.onClick || src.tab.id;
     return notificationId;
   },
   RemoveNotification(notificationId) {
@@ -26,12 +25,15 @@ browser.notifications.onClicked.addListener((id) => {
   if (openerId >= 0) {
     sendTabCmd(openerId, 'NotificationClick', id);
   }
+  if (typeof openerId === 'function') {
+    openerId();
+  }
 });
 
 browser.notifications.onClosed.addListener((id) => {
   const openerId = openers[id];
+  delete openers[id];
   if (openerId >= 0) {
     sendTabCmd(openerId, 'NotificationClose', id);
-    delete openers[id];
   }
 });
