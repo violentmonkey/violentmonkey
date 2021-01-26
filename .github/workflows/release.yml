@@ -27,14 +27,21 @@ jobs:
           TARGET=selfHosted BETA=1 npx gulp manifest
           cd dist && zip -r ../$TEMP_DIR/$ASSET_SELF_HOSTED_ZIP . && cd ..
       - name: Sign AMO
+        id: signAMO
         continue-on-error: true
         run: |
+          mkdir -p $TEMP_DIR/updates
           node scripts/amo-sign
-          hub release edit beta -p -m '' -a $TEMP_DIR/updates.json
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AMO_KEY: ${{ secrets.AMO_KEY }}
           AMO_SECRET: ${{ secrets.AMO_SECRET }}
+      - name: Update updates.json
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        if: steps.signAMO.outcome == 'success'
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: updates
+          FOLDER: ${{ env.TEMP_DIR }}/updates
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
