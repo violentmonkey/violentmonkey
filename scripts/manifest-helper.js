@@ -12,7 +12,7 @@ async function buildManifest() {
   const data = await readManifest();
   data.version = getVersion();
   if (process.env.TARGET === 'selfHosted') {
-    data.browser_specific_settings.gecko.update_url = 'https://github.com/violentmonkey/violentmonkey/releases/download/beta/updates.json';
+    data.browser_specific_settings.gecko.update_url = 'https://raw.githubusercontent.com/violentmonkey/violentmonkey/updates/updates.json';
   }
   if (isBeta()) {
     // Do not support i18n in beta version
