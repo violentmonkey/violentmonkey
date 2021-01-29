@@ -83,13 +83,16 @@ async function createIcons() {
     if (size < 48) res = res.sharpen(size < 32 ? .5 : .25);
     return res.toFile(`${dist}/icon${size}${type}.png`);
   };
+  const darkenOuterEdge = async img => img.composite([{
+    input: await img.toBuffer(),
+    blend: 'over',
+  }]);
   const handle16 = async ([type, image]) => {
     const res = image.clone()
     .resize({ width: 18 })
     .sharpen(.5, 0)
     .extract({ left: 1, top: 2, width: 16, height: 16 });
-    // darken the outer edge
-    return res.composite([{ input: await res.toBuffer(), blend: 'over' }])
+    return (type === 'w' ? res : await darkenOuterEdge(res))
     .toFile(`${dist}/icon16${type}.png`);
   };
   return Promise.all([
