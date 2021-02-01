@@ -42,7 +42,7 @@
           <span v-text="i18n('labelKeepOriginal')"/>
         </label>
       </div>
-      <textarea v-model="custom[name]" :rows="countRows(name)" spellcheck="false"/>
+      <textarea v-model="custom[name]" spellcheck="false" ref="area"/>
     </div>
   </div>
 </template>
@@ -51,6 +51,11 @@
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { i18n } from '#/common';
 import { objectGet } from '#/common/object';
+
+function fitAreaHeight(el) {
+  el.style.height = 0;
+  el.style.height = `${Math.max(el.scrollHeight, 30) + 16}px`;
+}
 
 export default {
   props: ['active', 'settings', 'value'],
@@ -94,13 +99,14 @@ export default {
     active(val) {
       if (val) {
         this.$refs.container.querySelector('input').focus();
+        this.$refs.area.forEach(fitAreaHeight);
       }
     },
   },
-  methods: {
-    countRows(name) {
-      return 2 + (this.settings.custom?.[name]?.match(/\n/g)?.length || 0);
-    },
+  mounted() {
+    this.$refs.area.forEach((el) => {
+      el.oninput = () => fitAreaHeight(el);
+    });
   },
 };
 </script>
