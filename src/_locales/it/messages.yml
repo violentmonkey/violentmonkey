@@ -173,7 +173,7 @@ editValueSave:
   message: Salva
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
-  message: An open source userscript manager that supports a lot of browsers
+  message: Un gestore open source di userscript che supporta molti browser
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -225,7 +225,7 @@ hintInputURL:
   message: 'URL Input:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: Scripts removed are listed here and will be kept for 7 days.
+  message: Gli script rimossi sono elencati qui e verranno conservati per 7 giorni.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Utilizza @downloadURL
@@ -284,7 +284,7 @@ labelBlacklist:
   message: Blacklist
 labelContributors:
   description: Label for link to contributors.
-  message: Contributors
+  message: Contributori
 labelCurrentLang:
   description: Label of current language.
   message: 'Linguaggio corrente: '
@@ -335,7 +335,7 @@ labelGeneral:
   message: Generale
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: Help with translation
+  message: Aiuta con la traduzione
 labelHomepage:
   description: Label for home page in about tab.
   message: Homepage
@@ -344,7 +344,7 @@ labelHomepageURL:
   message: 'URL Homepage:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Importa i dati dello script
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importa impostazioni
