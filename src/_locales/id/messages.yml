@@ -106,7 +106,7 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS khusus untuk halaman opsi dan halaman pemasangan skrip. Jika anda tidak
+    CSS khusus untuk halaman opsi dan halaman pemasangan skrip. Jika Anda tidak
     yakin untuk apa ini, mohon jangan menyuntingnya.
 descEditorOptions:
   description: Description of editor options JSON section.
@@ -538,8 +538,8 @@ msgIncognitoChanges:
     Message shown in popup and installation tab when opened in an incognito
     window.
   message: >-
-    Perubahan yang anda buat dalam mode penjelajahan Pribadi juga diterapkan ke
-    profil utama anda.
+    Perubahan yang Anda buat dalam mode penjelajahan Pribadi juga diterapkan ke
+    profil utama Anda.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skrip telah terpasang.
