@@ -16,6 +16,7 @@ const IS_FIREFOX = !global.chrome.app;
 const IS_TOP = window.top === window;
 const menus = {};
 let isPopupShown;
+let pendingSetPopup;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 const { split } = String.prototype;
@@ -73,14 +74,14 @@ bridge.addHandlers({
       const [id, cap] = data;
       const commandMap = menus[id] || (menus[id] = {});
       commandMap[cap] = 1;
-      sendSetPopup();
+      sendSetPopup(true);
     }
   },
   UnregisterMenu(data) {
     if (IS_TOP) {
       const [id, cap] = data;
       delete menus[id]?.[cap];
-      sendSetPopup();
+      sendSetPopup(true);
     }
   },
   AddStyle(css) {
@@ -95,8 +96,15 @@ bridge.addHandlers({
   SetTimeout: sendCmd,
 });
 
-function sendSetPopup() {
+async function sendSetPopup(isDelayed) {
   if (isPopupShown) {
+    if (isDelayed) {
+      if (pendingSetPopup) return;
+      // Preventing flicker in popup when scripts re-register menus
+      pendingSetPopup = sendCmd('SetTimeout', 0);
+      await pendingSetPopup;
+      pendingSetPopup = null;
+    }
     sendCmd('SetPopup', {
       menus,
       ...objectPick(bridge, ['ids', 'failedIds', 'injectInto']),
