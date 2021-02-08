@@ -351,7 +351,7 @@ labelHomepageURL:
   message: 'URL pentru pagina de start:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Importă datele scripturilor
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importă setări
