@@ -30,17 +30,17 @@ Object.assign(commands, {
     // only incognito storeId may be specified when opening in an incognito window
     const { incognito, windowId } = srcTab;
     // Chrome can't open chrome-xxx: URLs in incognito windows
-    const canOpenIncognito = !incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url);
     let storeId = srcTab.cookieStoreId;
     if (storeId && !incognito) {
       storeId = getContainerId(isInternal ? 0 : container) || storeId;
     }
     if (storeId) storeId = { cookieStoreId: storeId };
     if (!url.startsWith('blob:')) {
-      // URL needs to be expanded to check the protocol for 'chrome' below
+      // URL needs to be expanded for `canOpenIncognito` below
       if (!isInternal) url = getFullUrl(url, srcUrl);
       else if (!/^\w+:/.test(url)) url = browser.runtime.getURL(url);
     }
+    const canOpenIncognito = !incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url);
     let newTab;
     if (maybeInWindow && browser.windows && getOption('editorWindow')) {
       const wndOpts = {
