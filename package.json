@@ -14,12 +14,12 @@
     "lint:js": "eslint --ext .js,.vue .",
     "lint:yml": "gulp check",
     "svgo": "plaid svgo",
-    "test": "cross-env BABEL_ENV=test tape -r ./test/mock/register 'test/**/*.test.js'",
+    "test": "cross-env BABEL_ENV=test tape -r ./test/mock/register \"test/**/*.test.js\"",
     "ci": "run-s lint test",
     "transform": "locky yarn yarn",
     "bumpVersion": "gulp bump",
-    "bump": "run-s ci 'bumpVersion --commit'",
-    "preversion": "run-s ci 'bumpVersion --reset'"
+    "bump": "run-s ci \"bumpVersion --commit\"",
+    "preversion": "run-s ci \"bumpVersion --reset\""
   },
   "devDependencies": {
     "@actions/core": "^1.2.6",
