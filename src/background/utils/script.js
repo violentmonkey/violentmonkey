@@ -56,6 +56,11 @@ const metaTypes = {
     transform: () => true,
   },
 };
+const metaOptionalTypes = {
+  antifeature: arrayType,
+  compatible: arrayType,
+  connect: arrayType,
+};
 export function parseMeta(code) {
   // initialize meta
   const meta = metaTypes::mapEntry(([, value]) => value.default());
@@ -65,7 +70,7 @@ export function parseMeta(code) {
     const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
     const key = locale ? `${camelKey}:${locale.toLowerCase()}` : camelKey;
     const val = rawValue.trim();
-    const metaType = metaTypes[key] || defaultType;
+    const metaType = metaTypes[key] || metaOptionalTypes[key] || defaultType;
     let oldValue = meta[key];
     if (typeof oldValue === 'undefined') oldValue = metaType.default();
     meta[key] = metaType.transform(oldValue, val);
