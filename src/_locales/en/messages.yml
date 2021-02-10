@@ -583,6 +583,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Script [$1] is updated!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: Show/hide
 msgSyncError:
   description: Message shown when sync failed.
   message: Sync error!
