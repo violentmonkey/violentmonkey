@@ -23,7 +23,7 @@
               <dt v-text="`@${name}`"/>
               <dd v-if="Array.isArray(list)" class="flex flex-col">
                 <a v-for="(url, i) in list" :key="name + i" :href="url" v-text="url"
-                   rel="noopener noreferrer" target="_blank"/>
+                   rel="noopener noreferrer" target="_blank" :data-ok="url in urlsOK"/>
               </dd>
               <dd v-else v-text="list" class="ellipsis"/>
             </dl>
@@ -111,6 +111,7 @@ export default {
       listsShown: true,
       name: '...',
       safeIcon: null,
+      urlsOK: {},
     };
   },
   computed: {
@@ -184,26 +185,33 @@ export default {
         this.require = {};
         this.resources = {};
         let finished = 0;
+        // All resources may finish quickly so we delay the status to avoid flicker
+        const STATUS_DELAY = 500;
+        const startTime = performance.now();
         const updateStatus = () => {
-          this.message = this.i18n('msgLoadingDependency', [finished, length]);
+          if (performance.now() - startTime > STATUS_DELAY) {
+            this.message = this.i18n('msgLoadingDependency', [finished, length]);
+          }
         };
         /** @returns {string|undefined} URL in case of error or `undefined` on success */
         const download = async (url, target, isBlob) => {
           const fullUrl = getFullUrl(url, this.info.url);
           try {
             target[fullUrl] = await this.getFile(fullUrl, { isBlob, useCache: true });
+            this.urlsOK[url] = true;
             finished += 1;
             updateStatus();
           } catch (e) {
             return url;
           }
         };
-        updateStatus();
+        const delayedStatus = setTimeout(updateStatus, STATUS_DELAY);
         const promises = [
           ...script.require.map(url => download(url, this.require, false)),
           ...urls.map(url => download(url, this.resources, true)),
         ];
         const error = (await Promise.all(promises))::trueJoin('\n');
+        clearTimeout(delayedStatus);
         if (error) throw error;
         this.error = null;
         this.dependencyOK = true;
@@ -356,6 +364,9 @@ $infoIconSize: 18px;
       max-height: 10vh;
       min-height: 1.5rem;
       overflow-y: auto;
+      a:not([data-ok]) {
+        color: var(--fill-8);
+      }
     }
   }
   [data-collapsed] {
