@@ -51,6 +51,7 @@ const propsToClear = {
   [storage.script.prefix]: true,
   [storage.value.prefix]: 'withValueIds',
 };
+
 browser.storage.onChanged.addListener(changes => {
   const dbKeys = Object.keys(changes);
   const cacheValues = cache.getValues();
@@ -63,10 +64,14 @@ browser.storage.onChanged.addListener(changes => {
         || data[prop]?.includes(prefix === storage.value.prefix ? +key : key);
     }));
   if (dirty) {
-    cacheValues.forEach(data => data.registration?.then(r => r.unregister()));
-    cache.destroy();
+    clearCache(cacheValues);
   }
 });
+
+function clearCache(cacheValues = cache.getValues()) {
+  cacheValues.forEach(data => data.registration?.then(r => r.unregister()));
+  cache.destroy();
+}
 
 /** @return {Promise<Object>} */
 export function getInjectedScripts(url, tabId, frameId) {
@@ -84,6 +89,7 @@ function togglePreinject(enable) {
   const config = enable ? API_CONFIG : undefined;
   browser.webRequest.onSendHeaders[onOff](preinject, config);
   browser.webRequest.onHeadersReceived[onOff](prolong, config);
+  clearCache();
 }
 
 function preinject({ url, tabId, frameId }) {
