@@ -252,7 +252,7 @@ export default {
       event.target.removeAttribute('src');
     },
     onToggle() {
-      options.set('isApplied', !this.options.isApplied);
+      options.set('isApplied', optionsData.isApplied = !optionsData.isApplied);
       this.checkReload();
     },
     onManage() {
