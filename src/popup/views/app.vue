@@ -46,6 +46,11 @@
       </div>
     </div>
     <div class="failure-reason" v-if="failureReasonText">
+      <tooltip v-if="injectionScopes[0] && !options.isApplied"
+            :content="i18n('labelAutoReloadCurrentTabDisabled')"
+            class="reload-hint" align="start" placement="bottom">
+        <icon name="info"/>
+      </tooltip>
       <span v-text="failureReasonText"/>
       <code v-text="store.blacklisted" v-if="store.blacklisted" class="ellipsis inline-block"/>
     </div>

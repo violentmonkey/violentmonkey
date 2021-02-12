@@ -252,6 +252,15 @@ footer {
   }
 }
 
+.reload-hint {
+  .icon {
+    position: absolute;
+    left: $findIconML;
+    width: $findIconSize;
+    height: $findIconSize;
+  }
+}
+
 .extras-menu {
   position: fixed;
   right: 1rem;
