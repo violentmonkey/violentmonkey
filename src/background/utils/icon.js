@@ -69,7 +69,7 @@ browser.tabs.onRemoved.addListener((id) => {
 
 browser.tabs.onUpdated.addListener((tabId, info, tab) => {
   const { url } = info;
-  if (url && ua.isFirefox) {
+  if (url && ua.isFirefox && isApplied) {
     const badgeData = cache.pop(`badge:${tabId}${url}`);
     if (badgeData) setBadge(...badgeData);
   }
