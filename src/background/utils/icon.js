@@ -61,6 +61,7 @@ postInitialize.push(() => {
   titleBlacklisted = i18n('failureReasonBlacklisted');
   titleNoninjectable = i18n('failureReasonNoninjectable');
   forEachTab(updateState);
+  if (!isApplied) setIcon(); // sets the dimmed icon as default
 });
 
 browser.tabs.onRemoved.addListener((id) => {
