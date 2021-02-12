@@ -103,10 +103,6 @@ export const cmOptions = {
 export default {
   props: {
     active: Boolean,
-    focus: {
-      type: Boolean,
-      default: true,
-    },
     readonly: {
       type: Boolean,
       default: false,
@@ -163,7 +159,7 @@ export default {
       });
       cm.clearHistory();
       cm.markClean();
-      if (this.focus) cm.focus();
+      cm.focus();
       cm.on('changes', this.onChanges);
       cm.on('beforeChange', this.onBeforeChange);
     },
@@ -305,7 +301,7 @@ export default {
       this.cm[onOff]('blur', this.onKeyDownToggler);
       this.cm[onOff]('focus', this.onKeyDownToggler);
       if (state) {
-        if (this.focus) this.cm?.focus();
+        this.cm?.focus();
       } else {
         window.removeEventListener('keydown', this.onKeyDown);
       }

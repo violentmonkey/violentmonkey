@@ -55,7 +55,7 @@
       <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
     </div>
     <div class="frame-block flex-auto pos-rel">
-      <vm-code class="abs-full" readonly :value="code" :commands="commands" :focus="false" />
+      <vm-code class="abs-full" readonly :value="code" :commands="commands" />
     </div>
   </div>
 </template>
@@ -336,8 +336,6 @@ $infoIconSize: 18px;
       position: absolute;
       margin-left: calc(-1 * $imgSize / 2 - $infoIconSize / 2 - $imgGapR);
       cursor: pointer;
-      [data-collapsed] & {
-      }
       .icon {
         width: $infoIconSize;
         height: $infoIconSize;
