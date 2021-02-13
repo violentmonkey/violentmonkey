@@ -94,6 +94,7 @@ bridge.addHandlers({
   },
   CheckScript: sendCmd,
   SetTimeout: sendCmd,
+  TabFocus: sendCmd,
 });
 
 async function sendSetPopup(isDelayed) {

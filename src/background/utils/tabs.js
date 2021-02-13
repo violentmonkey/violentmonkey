@@ -79,6 +79,9 @@ Object.assign(commands, {
     const tabId = id || src?.tab?.id;
     if (tabId >= 0) browser.tabs.remove(tabId);
   },
+  TabFocus(_, src) {
+    browser.tabs.update(src.tab.id, { active: true }).catch(noop);
+  },
 });
 
 // Firefox Android does not support `openerTabId` field, it fails if this field is passed

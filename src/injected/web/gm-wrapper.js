@@ -54,8 +54,13 @@ export function wrapGM(script) {
   }
   // not using ...spread as it calls Babel's polyfill that calls unsafe Object.xxx
   assign(gm, componentUtils);
-  if (IS_TOP && grant::includes('window.close')) {
-    gm.close = vmOwnFunc(() => bridge.post('TabClose'));
+  if (IS_TOP) {
+    if (grant::includes('window.close')) {
+      gm.close = vmOwnFunc(() => bridge.post('TabClose'));
+    }
+    if (grant::includes('window.focus')) {
+      gm.focus = vmOwnFunc(() => bridge.post('TabFocus'));
+    }
   }
   if (!gmApi) [gmApi, gm4Api] = makeGmApi();
   grant::forEach((name) => {
