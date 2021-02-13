@@ -227,7 +227,7 @@ test('include', (t) => {
     q.end();
   });
 
-  t.test('should include by regexp', (q) => {
+  t.test('should include by glob', (q) => {
     const script = buildScript({
       meta: {
         include: [
@@ -239,6 +239,20 @@ test('include', (t) => {
     q.ok(testScript('https://www.google.com/', script), 'should match `/`');
     q.ok(testScript('https://www.google.com/hello/world', script), 'include by prefix');
     q.notOk(testScript('https://www.hello.com/', script), 'not include by prefix');
+    q.end();
+  });
+
+  t.test('should include by regexp', (q) => {
+    const script = buildScript({
+      meta: {
+        include: [
+          '/invalid-regexp(/',
+          '/https://www\\.google\\.com/.*/',
+        ],
+      },
+    });
+    q.ok(testScript('https://www.google.com/', script), 'should ignore the invalid regexp and match target');
+    q.notOk(testScript('https://www.hello.com/', script), 'should not match nontarget');
     q.end();
   });
 
@@ -288,7 +302,7 @@ test('exclude', (t) => {
     q.end();
   });
 
-  t.test('should include by regexp', (q) => {
+  t.test('should include by glob', (q) => {
     const script = buildScript({
       meta: {
         match: [
@@ -338,7 +352,7 @@ test('exclude-match', (t) => {
     q.end();
   });
 
-  t.test('should include by regexp', (q) => {
+  t.test('should include by glob', (q) => {
     const script = buildScript({
       meta: {
         match: [
