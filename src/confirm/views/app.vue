@@ -136,8 +136,12 @@ export default {
     filePortNeeded = ua.isFirefox >= 68 && url.startsWith('file:');
     this.guard = setInterval(sendCmd, 5000, 'CacheHit', { key });
     await this.loadData();
-    await this.parseMeta();
-    this.heading = this.i18n('labelInstall');
+    if (!await this.parseMeta()) {
+      let retries = 2;
+      do await makePause(3000);
+      while (!await this.loadDeps() && (retries -= 1));
+    }
+    if (this.installable) this.heading = this.i18n('labelInstall');
   },
   beforeDestroy() {
     if (this.guard) {
@@ -155,72 +159,76 @@ export default {
       this.code = code;
     },
     async parseMeta() {
-      try {
-        /** @type {VMScriptMeta} */
-        const script = await sendCmd('ParseMeta', this.code);
-        const urls = Object.values(script.resources);
-        const length = script.require.length + urls.length;
-        this.name = [getLocaleString(script, 'name'), script.version]::trueJoin(', ');
-        this.descr = getLocaleString(script, 'description');
-        this.lists = objectPick(script, [
-          'antifeature',
-          'grant',
-          'match',
-          'include',
-          'exclude',
-          'excludeMatch',
-          'compatible',
-          'connect',
-        ], list => (
-          list
-          ?.map(s => [s.replace(/^\W+/, '') || s, s])
-          .sort(([a], [b]) => (a < b ? -1 : a > b))
-          .map(([, s]) => s)
-          .join('\n')
-          || ''
-        ));
-        this.lists.require = [...new Set(script.require)];
-        this.lists.resource = [...new Set(urls)];
-        this.meta = script;
-        loadScriptIcon(this);
-        this.require = {};
-        this.resources = {};
-        let finished = 0;
-        // All resources may finish quickly so we delay the status to avoid flicker
-        const STATUS_DELAY = 500;
-        const startTime = performance.now();
-        const updateStatus = () => {
-          if (performance.now() - startTime > STATUS_DELAY) {
-            this.message = this.i18n('msgLoadingDependency', [finished, length]);
-          }
-        };
-        /** @returns {string|undefined} URL in case of error or `undefined` on success */
-        const download = async (url, target, isBlob) => {
-          const fullUrl = getFullUrl(url, this.info.url);
-          try {
-            target[fullUrl] = await this.getFile(fullUrl, { isBlob, useCache: true });
-            this.urlsOK[url] = true;
-            finished += 1;
-            updateStatus();
-          } catch (e) {
-            return url;
-          }
-        };
-        const delayedStatus = setTimeout(updateStatus, STATUS_DELAY);
-        const promises = [
-          ...script.require.map(url => download(url, this.require, false)),
-          ...urls.map(url => download(url, this.resources, true)),
-        ];
-        const error = (await Promise.all(promises))::trueJoin('\n');
-        clearTimeout(delayedStatus);
-        if (error) throw error;
+      /** @type {VMScriptMeta} */
+      const script = await sendCmd('ParseMeta', this.code);
+      const urls = Object.values(script.resources);
+      this.name = [getLocaleString(script, 'name'), script.version]::trueJoin(', ');
+      this.descr = getLocaleString(script, 'description');
+      this.lists = objectPick(script, [
+        'antifeature',
+        'grant',
+        'match',
+        'include',
+        'exclude',
+        'excludeMatch',
+        'compatible',
+        'connect',
+      ], list => (
+        list
+        ?.map(s => [s.replace(/^\W+/, '') || s, s])
+        .sort(([a], [b]) => (a < b ? -1 : a > b))
+        .map(([, s]) => s)
+        .join('\n')
+        || ''
+      ));
+      this.lists.require = [...new Set(script.require)];
+      this.lists.resource = [...new Set(urls)];
+      this.meta = script;
+      return this.loadDeps();
+    },
+    async loadDeps() {
+      if (!this.safeIcon) loadScriptIcon(this);
+      const { require, resource } = this.lists;
+      this.require = {};
+      this.resources = {};
+      const length = require.length + resource.length;
+      let finished = 0;
+      // All resources may finish quickly so we delay the status to avoid flicker
+      const STATUS_DELAY = 500;
+      const startTime = performance.now();
+      const updateStatus = () => {
+        if (performance.now() - startTime > STATUS_DELAY) {
+          this.message = this.i18n('msgLoadingDependency', [finished, length]);
+        }
+      };
+      /** @returns {string|undefined} URL in case of error or `undefined` on success */
+      const download = async (url, target, isBlob) => {
+        const fullUrl = getFullUrl(url, this.info.url);
+        try {
+          target[fullUrl] = await this.getFile(fullUrl, { isBlob, useCache: true });
+          this.urlsOK[url] = true;
+          finished += 1;
+          updateStatus();
+        } catch (e) {
+          return url;
+        }
+      };
+      const delayedStatus = setTimeout(updateStatus, STATUS_DELAY);
+      const promises = [
+        ...require.map(url => download(url, this.require, false)),
+        ...resource.map(url => download(url, this.resources, true)),
+      ];
+      const error = (await Promise.all(promises))::trueJoin('\n');
+      clearTimeout(delayedStatus);
+      if (error) {
+        this.message = this.i18n('msgErrorLoadingDependency');
+        this.error = error;
+      } else {
         this.error = null;
         this.dependencyOK = true;
         this.installable = true;
         this.message = null;
-      } catch (err) {
-        this.message = this.i18n('msgErrorLoadingDependency');
-        this.error = err.message || err;
+        return true;
       }
     },
     close() {
