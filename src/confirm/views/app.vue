@@ -19,7 +19,8 @@
                 <icon name="info"/>
               </div>
             </tooltip>
-            <dl v-for="(list, name) in lists" :key="name" :hidden="!list.length" tabindex="0">
+            <dl v-for="(list, name) in lists" :key="name"
+                :data-type="name" :hidden="!list.length" tabindex="0">
               <dt v-text="`@${name}`"/>
               <dd v-if="Array.isArray(list)" class="flex flex-col">
                 <a v-for="(url, i) in list" :key="name + i" :href="url" v-text="url"
@@ -354,6 +355,12 @@ $infoIconSize: 18px;
     margin-top: 1rem;
     dl {
       margin: 0 1rem 1rem 0;
+      &[data-type="antifeature"] {
+        border: 1px solid rgba(255, 0, 0, .5);
+        background: rgba(255, 0, 0, .05);
+        margin-top: -3px;
+        padding: 2px 6px;
+      }
     }
     dt {
       font-weight: bold;
