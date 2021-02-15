@@ -52,7 +52,7 @@ hookOptions((changes) => {
 });
 
 Object.assign(commands, {
-  /** @return {Promise<Object>} */
+  /** @return {Promise<{ scripts: VMScript[], cache: Object, sync: Object }>} */
   async GetData(ids) {
     const data = await getData(ids);
     data.sync = sync.getStates();

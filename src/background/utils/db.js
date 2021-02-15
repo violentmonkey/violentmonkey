@@ -46,10 +46,6 @@ Object.assign(commands, {
   GetScriptCode(id) {
     return storage.code.getOne(id);
   },
-  /** @return {VMScript[]} */
-  GetMetas(ids) {
-    return ids.map(getScriptById).filter(Boolean);
-  },
   /** @return {Promise<void>} */
   MarkRemoved({ id, removed }) {
     return updateScriptInfo(id, {
@@ -323,14 +319,11 @@ function pushUnique(arr, elem) {
 }
 
 /** @return {string[]} */
-function getIconUrls() {
-  return store.scripts.reduce((res, script) => {
-    const { icon } = script.meta;
-    if (isRemote(icon)) {
-      res.push(script.custom.pathMap?.[icon] || icon);
-    }
-    return res;
-  }, []);
+function getIconUrls(ids) {
+  return store.scripts.map((script) => {
+    const icon = (!ids || ids.includes(script.props.id)) && script.meta.icon;
+    return isRemote(icon) && (script.custom.pathMap?.[icon] || icon);
+  }).filter(Boolean);
 }
 
 /**
@@ -341,7 +334,7 @@ export async function getData(ids) {
   const { scripts } = store;
   return {
     scripts: ids ? ids.map(getScriptById) : scripts,
-    cache: await storage.cache.getMulti(getIconUrls()),
+    cache: await storage.cache.getMulti(getIconUrls(ids)),
   };
 }
 

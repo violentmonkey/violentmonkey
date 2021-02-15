@@ -5,6 +5,7 @@ import handlers from '#/common/handlers';
 import { loadScriptIcon } from '#/common/load-script-icon';
 import { forEachValue, mapEntry } from '#/common/object';
 import * as tld from '#/common/tld';
+import ua from '#/common/ua';
 import '#/common/ui/style';
 import App from './views/app';
 import { store } from './utils';
@@ -42,9 +43,14 @@ Object.assign(handlers, {
     if (ids.length) {
       // frameScripts may be appended multiple times if iframes have unique scripts
       const scope = store[isTop ? 'scripts' : 'frameScripts'];
-      const metas = data.metas?.filter(({ props: { id } }) => ids.includes(id))
-        || await sendCmdDirectly('GetMetas', ids);
-      metas.forEach(script => loadScriptIcon(script, { cache: store.cache }));
+      const metas = data.scripts?.filter(({ props: { id } }) => ids.includes(id))
+        || (Object.assign(data, await sendCmdDirectly('GetData', ids))).scripts;
+      data.cache = data.cache::mapEntry(([, raw]) => (
+        raw.startsWith('data:') ? raw : `data:image/png;base64,${raw.split(',').pop()}`
+      ));
+      if (ua.isFirefox) metas.forEach(script => { script.safeIcon = null; });
+      // Load actual icons separately, otherwise the popup may be delayed in some browsers
+      setTimeout(() => metas.forEach(script => loadScriptIcon(script, data)));
       scope.push(...metas);
       data.failedIds.forEach(id => {
         scope.forEach((script) => {
