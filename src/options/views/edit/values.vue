@@ -275,7 +275,7 @@ export default {
       padding: 4px 6px;
       &:first-child {
         position: relative;
-        width: 30%;
+        flex: 0 0 30%;
         max-width: 240px;
       }
       &:not(:first-child) {
