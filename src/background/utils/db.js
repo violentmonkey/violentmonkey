@@ -46,10 +46,6 @@ Object.assign(commands, {
   GetScriptCode(id) {
     return storage.code.getOne(id);
   },
-  /** @return {VMScript[]} */
-  GetMetas(ids) {
-    return ids.map(getScriptById).filter(Boolean);
-  },
   /** @return {Promise<void>} */
   MarkRemoved({ id, removed }) {
     return updateScriptInfo(id, {
@@ -322,27 +318,33 @@ function pushUnique(arr, elem) {
   if (!arr.includes(elem)) arr.push(elem);
 }
 
-/** @return {string[]} */
-function getIconUrls() {
-  return store.scripts.reduce((res, script) => {
-    const { icon } = script.meta;
-    if (isRemote(icon)) {
-      res.push(script.custom.pathMap?.[icon] || icon);
-    }
-    return res;
-  }, []);
-}
-
 /**
  * @desc Get data for dashboard.
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
 export async function getData(ids) {
-  const { scripts } = store;
+  const scripts = ids ? ids.map(getScriptById) : store.scripts;
   return {
-    scripts: ids ? ids.map(getScriptById) : scripts,
-    cache: await storage.cache.getMulti(getIconUrls()),
+    scripts,
+    cache: await getIconCache(scripts),
   };
+}
+
+function getIconCache(scripts) {
+  const iconUrls = [];
+  scripts.forEach((script) => {
+    const { icon } = script.meta;
+    if (isRemote(icon)) {
+      iconUrls.push(script.custom.pathMap?.[icon] || icon);
+    }
+  });
+  return iconUrls.length
+    ? storage.cache.getMulti(iconUrls, undefined, addDataUriPrefix)
+    : {};
+}
+
+function addDataUriPrefix(key, val) {
+  return val && `data:image/png;base64,${val.split(',').pop()}`;
 }
 
 /** @return {number} */

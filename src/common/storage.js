@@ -10,10 +10,17 @@ const base = {
     const key = this.getKey(id);
     return browser.storage.local.get(key).then(data => data[key]);
   },
-  async getMulti(ids, def) {
+  /**
+   * @param {string[]} ids
+   * @param {?} def
+   * @param {function(id:string, val:?):?} transform
+   * @returns {Promise<Object>}
+   */
+  async getMulti(ids, def, transform) {
     const data = await browser.storage.local.get(ids.map(this.getKey, this));
     return ids.reduce((res, id) => {
-      res[id] = data[this.getKey(id)] || def;
+      const val = data[this.getKey(id)];
+      res[id] = transform ? transform(id, val) : (val || def);
       return res;
     }, {});
   },

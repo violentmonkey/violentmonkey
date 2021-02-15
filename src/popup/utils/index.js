@@ -1,5 +1,4 @@
 export const store = {
-  cache: {},
   scripts: [],
   frameScripts: [],
   commands: [],

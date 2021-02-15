@@ -1,5 +1,6 @@
 import { getActiveTab, sendTabCmd } from '#/common';
 import cache from './cache';
+import { getData } from './db';
 import { postInitialize } from './init';
 import { commands } from './message';
 
@@ -30,7 +31,7 @@ async function prefetchSetPopup() {
   const tabId = (await getActiveTab()).id;
   sendTabCmd(tabId, 'PopupShown', true);
   commands.SetPopup = async (data, src) => {
-    data.metas = commands.GetMetas(data.ids);
+    Object.assign(data, await getData(data.ids));
     cache.put('SetPopup', Object.assign({ [src.frameId]: [data, src] }, cache.get('SetPopup')));
   };
 }
