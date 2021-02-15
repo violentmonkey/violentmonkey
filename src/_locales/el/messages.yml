@@ -40,6 +40,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Επιλογές
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: Νέο
@@ -248,6 +249,11 @@ labelAutoReloadCurrentTab:
   message: >-
     Επαναφόρτωση τρέχουσας καρτέλας μετά την ενεργοποίηση/απενεργοποίηση ενός
     σεναρίου από το μενού
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: ''
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: ''
@@ -534,6 +540,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: Φορτώθηκαν δεδομένα σεναρίου.
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Φόρτωση ...
@@ -574,6 +581,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Το σενάριο [$1] είναι ενημερωμένο!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: ''
 msgSyncError:
   description: Message shown when sync failed.
   message: Σφάλμα συγχρονισμού!

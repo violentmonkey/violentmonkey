@@ -42,6 +42,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Možnosti
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: Nový
@@ -266,6 +267,11 @@ labelAuthor:
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Obnoviť aktuálny list po vypnutí alebo zapnutí skriptu z menu
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: ''
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Kontrolovať aktualizácie skriptu každý $1 deň, pre zakázanie použite 0'
@@ -552,6 +558,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: Dáta skriptu načítané.
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Načítavam ...
@@ -590,6 +597,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Skript [$1] bol aktualizovaný!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: ''
 msgSyncError:
   description: Message shown when sync failed.
   message: Chyba synchronizácie!
