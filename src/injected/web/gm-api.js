@@ -202,6 +202,7 @@ export function makeGmApi() {
     xmlHttpRequest: { alias: 'xmlhttpRequest' },
     notification: true,
     openInTab: true,
+    registerMenuCommand: true,
     setClipboard: true,
     addStyle: true, // gm4-polyfill.js sets it anyway
   }];
