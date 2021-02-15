@@ -42,6 +42,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Opcje
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: Nowy skrypt
@@ -270,6 +271,11 @@ labelAuthor:
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Odświeżaj bieżącą kartę po włączeniu/wyłączeniu skryptu z menu
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: Bieżące skrypty będą działać do momentu ponownego załadowania karty
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Sprawdzaj aktualizacje skryptów co  $1 dni, użyj 0 aby wyłączyć'
@@ -562,6 +568,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: Skrypt wczytany.
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Wczytywanie ...
@@ -600,6 +607,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Skrypt [$1] jest aktualizowany!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: Pokaż/ukryj
 msgSyncError:
   description: Message shown when sync failed.
   message: Błąd synchronizacji!

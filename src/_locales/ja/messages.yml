@@ -40,6 +40,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: オプション
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: 新規作成
@@ -247,6 +248,11 @@ labelAuthor:
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: メニューからスクリプトの有効/無効を切り替えたときに表示中のタブを更新する
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: ''
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: スクリプトの更新を $1 日ごとに確認 (0 を指定すると無効)
@@ -533,6 +539,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: スクリプトを取得しました。
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: 読み込み中…
@@ -571,6 +578,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: スクリプト「$1」が更新されました!
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: ''
 msgSyncError:
   description: Message shown when sync failed.
   message: 同期エラー!
