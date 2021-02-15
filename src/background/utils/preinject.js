@@ -52,9 +52,9 @@ const propsToClear = {
   [storage.value.prefix]: 'withValueIds',
 };
 
-browser.storage.onChanged.addListener(changes => {
+browser.storage.onChanged.addListener(async changes => {
   const dbKeys = Object.keys(changes);
-  const cacheValues = cache.getValues();
+  const cacheValues = await Promise.all(cache.getValues());
   const dirty = cacheValues.some(data => data.inject
     && dbKeys.some((key) => {
       const prefix = key.slice(0, key.indexOf(':') + 1);
@@ -68,7 +68,8 @@ browser.storage.onChanged.addListener(changes => {
   }
 });
 
-function clearCache(cacheValues = cache.getValues()) {
+async function clearCache(cacheValues) {
+  if (!cacheValues) cacheValues = await Promise.all(cache.getValues());
   cacheValues.forEach(data => data.registration?.then(r => r.unregister()));
   cache.destroy();
 }
