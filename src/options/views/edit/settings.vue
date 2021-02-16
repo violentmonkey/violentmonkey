@@ -91,7 +91,7 @@ export default {
         ['include', 'origInclude', i18n('labelInclude')],
         ['match', 'origMatch', i18n('labelMatch')],
         ['exclude', 'origExclude', i18n('labelExclude')],
-        ['exclude-match', 'origExcludeMatch', i18n('labelExcludeMatch')],
+        ['excludeMatch', 'origExcludeMatch', i18n('labelExcludeMatch')],
       ];
     },
   },
