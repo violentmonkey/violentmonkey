@@ -77,9 +77,10 @@ Object.assign(commands, {
   ParseMeta: parseMeta,
   ParseScript: parseScript,
   /** @return {Promise<void>} */
-  UpdateScriptInfo({ id, config }) {
+  UpdateScriptInfo({ id, config, custom }) {
     return updateScriptInfo(id, {
       config,
+      custom,
       props: { lastModified: Date.now() },
     });
   },
@@ -426,6 +427,7 @@ export async function updateScriptInfo(id, data) {
   if (!script) throw null;
   script.props = { ...script.props, ...data.props };
   script.config = { ...script.config, ...data.config };
+  script.custom = { ...script.custom, ...data.custom };
   await storage.script.dump(script);
   return sendCmd(CMD_SCRIPT_UPDATE, { where: { id }, update: script });
 }

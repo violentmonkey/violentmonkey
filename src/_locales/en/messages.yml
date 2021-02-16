@@ -499,6 +499,15 @@ menuMatchedScripts:
 menuNewScript:
   description: Menu item to create a new script.
   message: Create a new script
+menuExclude:
+  description: Shown in popup menu after clicking script's "..." dropdown so try to keep the label short.
+  message: Exclude...
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: |-
+    The current tab will auto-reload if you enabled this option in general settings.
+    To apply changes to all other tabs please reload them manually.
+    Use "Settings" tab of the editor for more flexibility.
 menuScriptDisabled:
   description: 'Menu item showing the status of Violentmonkey, when disabled.'
   message: Scripts disabled

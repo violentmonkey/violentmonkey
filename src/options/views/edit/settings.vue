@@ -51,11 +51,7 @@
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { i18n } from '#/common';
 import { objectGet } from '#/common/object';
-
-function fitAreaHeight(el) {
-  el.style.height = 0;
-  el.style.height = `${Math.max(el.scrollHeight, 30) + 16}px`;
-}
+import { autofitElementsHeight } from '#/common/ui';
 
 export default {
   props: ['active', 'settings', 'value'],
@@ -99,14 +95,9 @@ export default {
     active(val) {
       if (val) {
         this.$refs.container.querySelector('input').focus();
-        this.$refs.area.forEach(fitAreaHeight);
+        autofitElementsHeight(this.$refs.area);
       }
     },
-  },
-  mounted() {
-    this.$refs.area.forEach((el) => {
-      el.oninput = () => fitAreaHeight(el);
-    });
   },
 };
 </script>
