@@ -8,7 +8,7 @@
     }"
     :draggable="draggable"
     @keydownEnter="onEdit">
-    <img class="script-icon hidden-xs" :src="safeIcon" @click="onEdit">
+    <img class="script-icon hidden-xs" :src="script.safeIcon" @click="onEdit">
     <div class="script-info flex">
       <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
       <template v-if="canRender">
@@ -98,9 +98,7 @@
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { sendCmd, getLocaleString, formatTime } from '#/common';
-import { loadScriptIcon } from '#/common/load-script-icon';
 import Icon from '#/common/ui/icon';
-import { store } from '../utils';
 import enableDragging from '../utils/dragging';
 
 export default {
@@ -115,7 +113,6 @@ export default {
   },
   data() {
     return {
-      safeIcon: null,
       canRender: this.visible,
     };
   },
@@ -178,10 +175,6 @@ export default {
     },
   },
   mounted() {
-    loadScriptIcon(this.script, { cache: store.cache }).then(() => {
-      this.safeIcon = this.script.safeIcon
-        || `/public/images/icon${store.HiDPI ? 128 : this.script.config.removed && 32 || 38}.png`;
-    });
     enableDragging(this.$el, {
       onDrop: (from, to) => this.$emit('move', { from, to }),
     });
