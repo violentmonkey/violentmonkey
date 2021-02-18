@@ -366,7 +366,7 @@ export default {
       await sendCmd('UpdateScriptInfo', {
         id: item.data.props.id,
         custom: {
-          excludeMatch: item.excludesValue.trim().split(/[\r\t\x20]*\n\s*/).filter(Boolean),
+          excludeMatch: item.excludesValue.split('\n').map(line => line.trim()).filter(Boolean),
         },
       });
       item.excludesValue = null;
