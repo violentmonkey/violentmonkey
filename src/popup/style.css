@@ -296,8 +296,11 @@ footer {
     margin: .5rem .5rem 0 0;
   }
   details {
-    ::marker {
-      content: none;
+    summary {
+      &::-webkit-details-marker /* Chrome before 86 */ {
+        content: none;
+      }
+      list-style-type: none; /* modern Chrome and FF */
     }
     &[open] {
       padding-top: .25rem;
