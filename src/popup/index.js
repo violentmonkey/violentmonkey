@@ -57,6 +57,13 @@ sendCmdDirectly('CachePop', 'SetPopup').then((data) => {
   data::forEachValue(val => handlers.SetPopup(...val));
 });
 
+if (!CSS.supports?.('(selector(::marker))')) {
+  /* Since new Chrome prints a deprecation warning for ::-webkit-details-marker, we'll add it here
+   * only for old Chrome i.e. when the new syntax is not supported. Ideally this could have been
+   * specified in @supports rule but postcss doesn't recognize the CSS4 selector() syntax. */
+  document.styleSheets[0].insertRule('.excludes-menu ::-webkit-details-marker {display:none}');
+}
+
 getActiveTab()
 .then(async (tab) => {
   const { url } = tab;

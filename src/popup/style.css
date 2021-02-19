@@ -297,10 +297,7 @@ footer {
   }
   details {
     summary {
-      &::-webkit-details-marker /* Chrome before 86 */ {
-        content: none;
-      }
-      list-style-type: none; /* modern Chrome and FF */
+      list-style-type: none;
     }
     &[open] {
       padding-top: .25rem;
