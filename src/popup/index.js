@@ -57,10 +57,9 @@ sendCmdDirectly('CachePop', 'SetPopup').then((data) => {
   data::forEachValue(val => handlers.SetPopup(...val));
 });
 
-if (!CSS.supports?.('(selector(::marker))')) {
-  /* Since new Chrome prints a deprecation warning for ::-webkit-details-marker, we'll add it here
-   * only for old Chrome i.e. when the new syntax is not supported. Ideally this could have been
-   * specified in @supports rule but postcss doesn't recognize the CSS4 selector() syntax. */
+/* Since new Chrome prints a warning when ::-webkit-details-marker is used,
+ * we add it only for old Chrome, which is detected via feature added in 89. */
+if (!CSS.supports?.('list-style-type', 'disclosure-open')) {
   document.styleSheets[0].insertRule('.excludes-menu ::-webkit-details-marker {display:none}');
 }
 
