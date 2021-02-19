@@ -7,8 +7,9 @@ import { forEachValue, mapEntry } from '#/common/object';
 import * as tld from '#/common/tld';
 import '#/common/ui/style';
 import App from './views/app';
-import { store } from './utils';
+import { mutex, store } from './utils';
 
+mutex.init();
 tld.initTLD();
 Vue.prototype.i18n = i18n;
 
@@ -18,23 +19,15 @@ const vm = new Vue({
 .$mount();
 document.body.append(vm.$el);
 
-const allScriptIds = [];
-// SetPopup from a sub-frame may come first so we need to wait for the main page
-// because we only show the iframe menu for unique scripts that don't run in the main page
-const mutex = {};
-mutex.ready = new Promise(resolve => {
-  mutex.resolve = resolve;
-  // pages like Chrome Web Store may forbid injection in main page so we need a timeout
-  setTimeout(resolve, 100);
-});
-
 Object.assign(handlers, {
   async SetPopup(data, src) {
     if (store.currentTab && store.currentTab.id !== src.tab.id) return;
+    /* SetPopup from a sub-frame may come first so we need to wait for the main page
+     * because we only show the iframe menu for unique scripts that don't run in the main page */
     const isTop = src.frameId === 0;
     if (!isTop) await mutex.ready;
-    const ids = data.ids.filter(id => !allScriptIds.includes(id));
-    allScriptIds.push(...ids);
+    const ids = data.ids.filter(id => !store.scriptIds.includes(id));
+    store.scriptIds.push(...ids);
     if (isTop) {
       mutex.resolve();
       store.commands = data.menus::mapEntry(([, value]) => Object.keys(value).sort());

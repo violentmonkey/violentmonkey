@@ -59,7 +59,7 @@
       class="menu menu-scripts"
       :class="{
         expand: activeMenu === scope.name,
-        'block-scroll': !!activeExtras,
+        'block-scroll': activeExtras,
       }"
       :data-type="scope.name"
       :key="scope.name">
@@ -76,7 +76,9 @@
             failed: item.data.failed,
             removed: item.data.config.removed,
             'extras-shown': activeExtras === item,
+            'excludes-shown': item.excludesValue,
           }"
+          class="script"
           @mouseenter="message = item.name"
           @mouseleave="message = ''">
           <div
@@ -97,6 +99,25 @@
             </div>
             <div class="submenu-button" @click.stop="toggleExtras(item, $event)">
               <icon name="more"/>
+            </div>
+          </div>
+          <div v-if="item.excludesValue != null" class="excludes-menu flex flex-col">
+            <textarea v-model="item.excludesValue" spellcheck="false"/>
+            <div>
+              <button v-text="i18n('buttonOK')" @click="onExcludeSave(item)"/>
+              <button v-text="i18n('buttonCancel')" @click="item.excludesValue = null"/>
+              <!-- not using tooltip to preserve line breaks -->
+              <details>
+                <summary><icon name="info"/></summary>
+                <small>
+                  <span v-text="i18n('menuExcludeHint')"/>
+                  <ul class="monospace-font mt-1">
+                    <li>https://www.foo.com/path/*bar*</li>
+                    <li>*://www.foo.com/*</li>
+                    <li>*://*.foo.com/*</li>
+                  </ul>
+                </small>
+              </details>
             </div>
           </div>
           <div class="submenu-commands">
@@ -132,6 +153,7 @@
     <div v-if="activeExtras" class="extras-menu" ref="extrasMenu">
       <a v-if="activeExtras.home" :href="activeExtras.home" v-text="i18n('buttonHome')"
          rel="noopener noreferrer" target="_blank"/>
+      <div v-text="i18n('menuExclude')" @click="onExclude"/>
       <div v-text="activeExtras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
            @click="onRemoveScript(activeExtras)"/>
     </div>
@@ -143,8 +165,11 @@ import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { INJECT_AUTO } from '#/common/consts';
 import options from '#/common/options';
 import { getLocaleString, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
+import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
-import { store } from '../utils';
+import { mutex, store } from '../utils';
+
+const SCRIPT_CLS = '.script';
 
 const optionsData = {
   isApplied: options.get('isApplied'),
@@ -202,6 +227,7 @@ export default {
             }${
               sort === 'alpha' ? scriptName.toLowerCase() : `${1e6 + i}`.slice(1)
             }`,
+            excludesValue: null,
           };
         });
         if (isSorted) {
@@ -241,6 +267,7 @@ export default {
     toggleExtras(item, evt) {
       this.activeExtras = this.activeExtras === item ? null : item;
       if (this.activeExtras) {
+        item.el = evt.target.closest(SCRIPT_CLS);
         this.$nextTick(() => {
           const { extrasMenu } = this.$refs;
           extrasMenu.style.top = `${
@@ -293,7 +320,13 @@ export default {
       });
     },
     checkReload() {
-      if (options.get('autoReload')) browser.tabs.reload(this.store.currentTab.id);
+      if (options.get('autoReload')) {
+        browser.tabs.reload(store.currentTab.id);
+        store.scriptIds.length = 0;
+        store.scripts.length = 0;
+        store.frameScripts.length = 0;
+        mutex.init();
+      }
     },
     async onCreateScript() {
       const { currentTab, domain } = this.store;
@@ -315,6 +348,29 @@ export default {
       const removed = +!config.removed;
       config.removed = removed;
       sendCmd('MarkRemoved', { id, removed });
+    },
+    onExclude() {
+      const item = this.activeExtras;
+      item.excludesValue = [
+        ...item.data.custom.excludeMatch || [],
+        `${store.currentTab.url.split('#')[0]}*`,
+      ].join('\n');
+      this.$nextTick(() => {
+        // not using $refs because multiple items may show textareas
+        const area = item.el.querySelector('textarea');
+        autofitElementsHeight([area]);
+        area.focus();
+      });
+    },
+    async onExcludeSave(item) {
+      await sendCmd('UpdateScriptInfo', {
+        id: item.data.props.id,
+        custom: {
+          excludeMatch: item.excludesValue.split('\n').map(line => line.trim()).filter(Boolean),
+        },
+      });
+      item.excludesValue = null;
+      this.checkReload();
     },
   },
   mounted() {
