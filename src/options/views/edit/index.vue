@@ -45,6 +45,11 @@
         :active="nav === 'values'"
         :script="script"
       />
+      <vm-externals
+        class="abs-full"
+        v-if="nav === 'externals'"
+        :script="script"
+      />
       <vm-help
         class="abs-full edit-body"
         v-show="nav === 'help'"
@@ -56,7 +61,7 @@
 
 <script>
 import CodeMirror from 'codemirror';
-import { debounce, i18n, sendCmd } from '#/common';
+import { debounce, i18n, isEmpty, sendCmd, trueJoin } from '#/common';
 import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import { showMessage } from '#/common/ui';
 import VmCode from '#/common/ui/code';
@@ -65,6 +70,7 @@ import { route, getUnloadSentry } from '#/common/router';
 import { store } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
+import VmExternals from './externals';
 import VmHelp from './help';
 
 const CUSTOM_PROPS = {
@@ -131,6 +137,7 @@ export default {
     VmCode,
     VmSettings,
     VmValues,
+    VmExternals,
     VmHelp,
   },
   data() {
@@ -153,10 +160,14 @@ export default {
   },
   computed: {
     navItems() {
+      const { meta, props } = this.script || {};
+      const req = meta?.require.length && '@require';
+      const res = !isEmpty(meta.resources) && '@resource';
       return {
         code: i18n('editNavCode'),
         settings: i18n('editNavSettings'),
-        ...this.script?.props?.id && { values: i18n('editNavValues') },
+        ...props?.id && { values: i18n('editNavValues') },
+        ...(req || res) && { externals: [req, res]::trueJoin('/') },
         help: '?',
       };
     },
@@ -268,8 +279,12 @@ export default {
         showMessage({ text: err });
       }
     },
-    close() {
-      this.$emit('close');
+    close(cm) {
+      if (cm && this.nav !== 'code') {
+        this.nav = 'code';
+      } else {
+        this.$emit('close');
+      }
     },
     saveClose() {
       this.save().then(this.close);
