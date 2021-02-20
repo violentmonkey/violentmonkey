@@ -1,5 +1,5 @@
 import { browser } from './consts';
-import { ensureArray } from './util';
+import { buffer2string, ensureArray } from './util';
 
 const base = {
   prefix: '',
@@ -58,6 +58,30 @@ export default {
   cache: {
     ...base,
     prefix: 'cac:',
+    /**
+     * @param {Response} response
+     * @param {boolean} [noJoin]
+     * @returns {string|string[]}
+     */
+    makeRaw(response, noJoin) {
+      const type = (response.headers.get('content-type') || '').split(';')[0] || '';
+      const body = btoa(buffer2string(response.data));
+      return noJoin ? [type, body] : `${type},${body}`;
+    },
+    /**
+     * @param {string} url
+     * @param {string} [raw] - raw value in storage.cache
+     * @returns {?string}
+     */
+    makeDataUri(url, raw) {
+      if (url.startsWith('data:')) return url;
+      if (raw?.startsWith('i')) {
+        const i = raw.lastIndexOf(',');
+        const type = raw.startsWith('image/') ? raw.slice(0, i) : 'image/png';
+        return `data:${type};base64,${raw.slice(i + 1)}`;
+      }
+      return raw;
+    },
   },
 
   code: {

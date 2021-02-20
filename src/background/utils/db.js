@@ -340,12 +340,8 @@ function getIconCache(scripts) {
     }
   });
   return iconUrls.length
-    ? storage.cache.getMulti(iconUrls, undefined, addDataUriPrefix)
+    ? storage.cache.getMulti(iconUrls, undefined, storage.cache.makeDataUri)
     : {};
-}
-
-function addDataUriPrefix(key, val) {
-  return val && `data:image/png;base64,${val.split(',').pop()}`;
 }
 
 /** @return {number} */

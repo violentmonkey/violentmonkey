@@ -62,11 +62,12 @@
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import Icon from '#/common/ui/icon';
 import {
-  sendCmd, leftpad, request, buffer2string, isRemote, getFullUrl, makePause,
+  sendCmd, leftpad, request, isRemote, getFullUrl, makePause,
   getLocaleString, trueJoin,
 } from '#/common';
 import options from '#/common/options';
 import initCache from '#/common/cache';
+import storage from '#/common/storage';
 import VmCode from '#/common/ui/code';
 import SettingCheck from '#/common/ui/setting-check';
 import { loadScriptIcon } from '#/common/load-script-icon';
@@ -231,19 +232,19 @@ export default {
     close() {
       sendCmd('TabClose');
     },
-    getFile(url, { isBlob, useCache } = {}) {
+    async getFile(url, { isBlob, useCache } = {}) {
       const cacheKey = isBlob ? `blob+${url}` : `text+${url}`;
       if (useCache && cache.has(cacheKey)) {
-        return Promise.resolve(cache.get(cacheKey));
+        return cache.get(cacheKey);
       }
-      return request(url, {
+      const response = await request(url, {
         responseType: isBlob ? 'arraybuffer' : null,
-      })
-      .then(({ data }) => (isBlob ? window.btoa(buffer2string(data)) : data))
-      .then((data) => {
-        if (useCache) cache.put(cacheKey, data);
-        return data;
       });
+      const data = isBlob
+        ? storage.cache.makeRaw(response)
+        : response.data;
+      if (useCache) cache.put(cacheKey, data);
+      return data;
     },
     async getScript(url) {
       try {
