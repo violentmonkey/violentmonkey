@@ -93,6 +93,9 @@ hr {
   border: none;
   border-top: 1px solid var(--fill-7);
 }
+input[type=checkbox] {
+  margin-right: .2em;
+}
 input[disabled] ~ * {
   opacity: .5;
 }

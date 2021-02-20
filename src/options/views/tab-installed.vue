@@ -59,10 +59,8 @@
             </locale-group>
           </div>
           <div v-show="currentSortCompare">
-            <label>
-              <setting-check name="filters.showEnabledFirst" />
-              <span v-text="i18n('optionShowEnabledFirst')"></span>
-            </label>
+            <setting-check name="filters.showEnabledFirst"
+                           :label="i18n('optionShowEnabledFirst')" />
           </div>
         </dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
