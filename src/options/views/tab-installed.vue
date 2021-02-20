@@ -550,7 +550,7 @@ export default {
 .filter-sort {
   .vl-dropdown-menu {
     padding: 1rem;
-    > * {
+    > :nth-last-child(n + 2) {
       margin-bottom: .5rem;
     }
   }

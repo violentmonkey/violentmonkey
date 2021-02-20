@@ -9,28 +9,26 @@
     :draggable="draggable"
     @keydownEnter="onEdit">
     <img class="script-icon hidden-xs" :src="script.safeIcon" @click="onEdit">
-    <div class="script-info flex">
+    <div class="script-info flex ml-1c">
       <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
       <template v-if="canRender">
-        <tooltip
-          v-if="author"
-          :content="i18n('labelAuthor') + script.meta.author"
-          class="script-author ml-1 hidden-sm"
-          align="end">
-          <icon name="author"></icon>
+        <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
+                 class="script-author ml-1c hidden-sm"
+                 align="end">
+          <icon name="author" />
           <a
             v-if="author.email"
-            class="ellipsis ml-1"
+            class="ellipsis"
             :href="`mailto:${author.email}`"
             v-text="author.name"
           />
-          <span class="ellipsis ml-1" v-else v-text="author.name"></span>
+          <span class="ellipsis" v-else v-text="author.name" />
         </tooltip>
-        <tooltip class="ml-1 hidden-sm" :content="updatedAt.title" align="end">
+        <tooltip class="hidden-sm ml-1c" :content="updatedAt.title" align="end">
           <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
-          <span class="ml-1" v-text="updatedAt.show"></span>
+          <span v-text="updatedAt.show"></span>
         </tooltip>
-        <div v-if="script.config.removed" class="ml-1">
+        <div v-if="script.config.removed">
           <tooltip :content="i18n('buttonRestore')" placement="left">
             <span class="btn-ghost" @click="onRestore">
               <icon name="undo"></icon>

@@ -3,11 +3,10 @@
     <div class="mb-1" v-if="message.text" v-text="message.text"></div>
     <form v-if="message.buttons" @submit.prevent>
       <input class="mb-1" type="text" v-if="message.input !== false" v-model="message.input">
-      <div>
+      <div class="mr-1c">
         <button
           v-for="(button, index) in message.buttons"
           :key="index"
-          class="mr-1"
           :type="button.type || 'button'"
           v-text="button.text"
           @click="onButtonClick(button)"
