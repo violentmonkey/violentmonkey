@@ -1,6 +1,6 @@
 <template>
   <div class="edit frame flex flex-col fixed-full">
-    <div class="edit-header flex">
+    <div class="edit-header flex mr-1 mr-1c">
       <nav>
         <div
           v-for="(label, navKey) in navItems" :key="navKey"
@@ -9,14 +9,14 @@
           @click="nav = navKey"
         />
       </nav>
-      <div class="edit-name text-center ellipsis flex-1 mr-1" v-text="scriptName"/>
-      <div class="edit-hint text-right ellipsis mr-1">
+      <div class="edit-name text-center ellipsis flex-1" v-text="scriptName"/>
+      <div class="edit-hint text-right ellipsis">
         <a href="https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/"
            target="_blank"
            rel="noopener noreferrer"
            v-text="i18n('editHowToHint')"/>
       </div>
-      <div class="edit-buttons mr-1">
+      <div class="edit-buttons">
         <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"/>
         <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"/>
         <button v-text="i18n('buttonClose')" @click="close"/>

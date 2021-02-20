@@ -1,12 +1,12 @@
 <template>
-  <div class="tab-settings">
+  <div class="tab-settings mb-1c">
     <h1 class="mt-0" v-text="i18n('labelSettings')"></h1>
-    <section>
+    <section class="mb-1c">
       <h3 v-text="i18n('labelGeneral')"></h3>
-      <div class="mb-1">
+      <div>
         <setting-check name="autoReload" :label="i18n('labelAutoReloadCurrentTab')" />
       </div>
-      <div class="mb-1">
+      <div>
         <setting-check name="editorWindow" class="mr-2">
           <tooltip :content="editorWindowHint" :disabled="!editorWindowHint">
             <span v-text="i18n('optionEditorWindow')"></span>
@@ -14,7 +14,7 @@
         </setting-check>
         <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')" />
       </div>
-      <div class="mb-1">
+      <div class="ml-2c">
         <label>
           <locale-group i18n-key="labelPopupSort">
             <select v-model="settings['filtersPopup.sort']">
@@ -23,12 +23,10 @@
             </select>
           </locale-group>
         </label>
-        <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
-                       class="ml-2" />
-        <setting-check name="filtersPopup.hideDisabled" :label="i18n('optionPopupHideDisabled')"
-                       class="ml-2" />
+        <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')" />
+        <setting-check name="filtersPopup.hideDisabled" :label="i18n('optionPopupHideDisabled')" />
       </div>
-      <div class="mb-1">
+      <div>
         <label>
           <span v-text="i18n('labelBadge')"></span>
           <select v-model="settings.showBadge">
@@ -39,16 +37,16 @@
         </label>
       </div>
     </section>
-    <section>
+    <section class="mb-1c">
       <h3 v-text="i18n('titleScriptUpdated')"/>
-      <div class="mb-1">
+      <div>
         <label>
           <locale-group i18n-key="labelAutoUpdate">
             <input v-model="settings.autoUpdate" type="number" min=0 max=365 step=1/>
           </locale-group>
         </label>
       </div>
-      <div class="mb-1">
+      <div>
         <setting-check name="notifyUpdates" :label="i18n('labelNotifyUpdates')" />
         <setting-check name="notifyUpdatesGlobal" :label="i18n('labelNotifyUpdatesGlobal')"
                        class="ml-2" />
@@ -64,9 +62,9 @@
       </button>
     </div>
     <div v-show="showAdvanced">
-      <section>
+      <section class="mb-1c">
         <h3 v-text="i18n('labelGeneral')"></h3>
-        <div class="mb-1">
+        <div>
           <label>
             <span v-text="i18n('labelInjectionMode')"></span>
             <select v-model="settings.defaultInjectInto">
@@ -80,11 +78,11 @@
             <a class="ml-1" href="https://violentmonkey.github.io/posts/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
           </label>
         </div>
-        <div class="mb-1">
-          <locale-group i18n-key="labelExposeStatus">
+        <div>
+          <locale-group i18n-key="labelExposeStatus" class="mr-1c">
             <setting-check v-for="([key, host]) in expose" :key="host"
-                           :name="`expose.${key}`" class="mr-1 valign-tb">
-              <span v-text="host" class="mr-1" />
+                           :name="`expose.${key}`" class="mr-1c valign-tb">
+              <span v-text="host" />
               <a :href="`https://${host}`" target="_blank" rel="noopener noreferrer">&nearr;</a>
             </setting-check>
           </locale-group>

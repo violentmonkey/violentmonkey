@@ -8,9 +8,9 @@
       :disabled="vacuuming"
       v-text="labelVacuum"
     />
-    <div class="mt-1">
+    <div class="mt-1 ml-2c">
       <setting-check name="importScriptData" :label="i18n('labelImportScriptData')" />
-      <setting-check name="importSettings" :label="i18n('labelImportSettings')" class="ml-2" />
+      <setting-check name="importSettings" :label="i18n('labelImportSettings')" />
     </div>
     <table class="import-report">
       <tr v-for="({ type, name, text }, i) in reports" :key="i" :data-type="type">

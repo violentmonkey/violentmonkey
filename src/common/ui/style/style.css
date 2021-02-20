@@ -243,35 +243,35 @@ li {
 .pos-rel {
   position: relative;
 }
-.ml-1 {
+.ml-1, .ml-1c > :nth-child(n + 2) {
   margin-left: .5em;
 }
-.mr-1 {
+.mr-1, .mr-1c > :nth-last-child(n + 2) {
   margin-right: .5em;
 }
-.ml-2 {
+.ml-2, .ml-2c > :nth-child(n + 2) {
   margin-left: 1em;
 }
-.mr-2 {
+.mr-2, .mr-2c > :nth-last-child(n + 2) {
   margin-right: 1em;
 }
-.mt-0 {
+.mt-0, .mt-0c > :nth-child(n + 2) {
   margin-top: 0;
 }
-.mt-1 {
+.mt-1, .mt-1c > :nth-child(n + 2) {
   margin-top: .5em;
 }
-.mb-1 {
+.mb-1, .mb-1c > :nth-last-child(n + 2) {
   margin-bottom: .5em;
 }
-.mb-2 {
+.mb-2, .mb-2c > :nth-last-child(n + 2) {
   margin-bottom: 1em;
 }
-.mx-1 {
+.mx-1, .mx-1c > * {
   margin-left: .5em;
   margin-right: .5em;
 }
-.my-1 {
+.my-1, .my-1c > * {
   margin-top: .5em;
   margin-bottom: .5em;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-help">
+  <div class="edit-help mb-2c">
     <div>
       <h3 v-html="i18n('editHelpDocumention')"/>
       <a href="https://violentmonkey.github.io/api/"
@@ -23,9 +23,6 @@ export default {
 
 <style>
 .edit-help {
-  > * {
-    margin-bottom: 1em;
-  }
   h3 {
     margin: .5em 0;
   }

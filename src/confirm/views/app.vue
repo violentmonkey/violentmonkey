@@ -36,7 +36,7 @@
         <div class="image flex">
           <img :src="safeIcon">
         </div>
-        <div class="actions flex flex-wrap">
+        <div class="actions flex flex-wrap mr-2c">
           <button v-text="i18n('buttonConfirmInstallation')" @click="installScript"
                   :disabled="!installable"/>
           <button v-text="i18n('buttonClose')" @click="close"/>
@@ -404,9 +404,6 @@ $infoIconSize: 18px;
   .actions {
     align-items: center;
     margin: .5rem 0;
-    > * {
-      margin-right: 1rem;
-    }
     > button:first-of-type:not(:disabled) {
       font-weight: bold;
     }
