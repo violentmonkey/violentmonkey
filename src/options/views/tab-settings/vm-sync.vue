@@ -62,10 +62,7 @@
       </div>
     </fieldset>
     <div class="mt-1">
-      <label>
-        <setting-check name="syncScriptStatus" />
-        <span v-text="i18n('labelSyncScriptStatus')"></span>
-      </label>
+      <setting-check name="syncScriptStatus" :label="i18n('labelSyncScriptStatus')" />
     </div>
   </section>
 </template>

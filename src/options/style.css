@@ -82,10 +82,6 @@ section {
   background: var(--bg);
 }
 
-input[type=checkbox] {
-  margin-right: .2em;
-}
-
 .vl-modal {
   z-index: 3000;
 }

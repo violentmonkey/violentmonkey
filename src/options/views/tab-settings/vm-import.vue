@@ -9,14 +9,8 @@
       v-text="labelVacuum"
     />
     <div class="mt-1">
-      <label>
-        <setting-check name="importScriptData" />
-        <span v-text="i18n('labelImportScriptData')"></span>
-      </label>
-      <label class="ml-2">
-        <setting-check name="importSettings" />
-        <span v-text="i18n('labelImportSettings')"></span>
-      </label>
+      <setting-check name="importScriptData" :label="i18n('labelImportScriptData')" />
+      <setting-check name="importSettings" :label="i18n('labelImportSettings')" class="ml-2" />
     </div>
     <table class="import-report">
       <tr v-for="({ type, name, text }, i) in reports" :key="i" :data-type="type">

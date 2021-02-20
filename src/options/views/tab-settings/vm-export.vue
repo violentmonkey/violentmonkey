@@ -3,10 +3,7 @@
     <h3 v-text="i18n('labelDataExport')"></h3>
     <button v-text="i18n('buttonExportData')" @click="exportData" :disabled="exporting"></button>
     <div class="mt-1">
-      <label>
-        <setting-check name="exportValues" />
-        <span v-text="i18n('labelExportScriptData')"></span>
-      </label>
+      <setting-check name="exportValues" :label="i18n('labelExportScriptData')" />
     </div>
     <modal
       v-if="store.ffDownload"

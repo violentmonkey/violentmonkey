@@ -4,22 +4,15 @@
     <section>
       <h3 v-text="i18n('labelGeneral')"></h3>
       <div class="mb-1">
-        <label>
-          <setting-check name="autoReload" />
-          <span v-text="i18n('labelAutoReloadCurrentTab')"></span>
-        </label>
+        <setting-check name="autoReload" :label="i18n('labelAutoReloadCurrentTab')" />
       </div>
       <div class="mb-1">
-        <label class="mr-2" >
-          <setting-check name="editorWindow" />
+        <setting-check name="editorWindow" class="mr-2">
           <tooltip :content="editorWindowHint" :disabled="!editorWindowHint">
             <span v-text="i18n('optionEditorWindow')"></span>
           </tooltip>
-        </label>
-        <label>
-          <setting-check name="editorWindowSimple" />
-          <span v-text="i18n('optionEditorWindowSimple')"></span>
-        </label>
+        </setting-check>
+        <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')" />
       </div>
       <div class="mb-1">
         <label>
@@ -30,14 +23,10 @@
             </select>
           </locale-group>
         </label>
-        <label class="ml-2">
-          <setting-check name="filtersPopup.enabledFirst" />
-          <span v-text="i18n('optionPopupEnabledFirst')"></span>
-        </label>
-        <label class="ml-2">
-          <setting-check name="filtersPopup.hideDisabled" />
-          <span v-text="i18n('optionPopupHideDisabled')"></span>
-        </label>
+        <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
+                       class="ml-2" />
+        <setting-check name="filtersPopup.hideDisabled" :label="i18n('optionPopupHideDisabled')"
+                       class="ml-2" />
       </div>
       <div class="mb-1">
         <label>
@@ -60,14 +49,9 @@
         </label>
       </div>
       <div class="mb-1">
-        <label>
-          <setting-check name="notifyUpdates"/>
-          <span v-text="i18n('labelNotifyUpdates')"/>
-        </label>
-        <label class="ml-2">
-          <setting-check name="notifyUpdatesGlobal"/>
-          <span v-text="i18n('labelNotifyUpdatesGlobal')"/>
-        </label>
+        <setting-check name="notifyUpdates" :label="i18n('labelNotifyUpdates')" />
+        <setting-check name="notifyUpdatesGlobal" :label="i18n('labelNotifyUpdatesGlobal')"
+                       class="ml-2" />
       </div>
     </section>
     <vm-import></vm-import>
@@ -98,11 +82,11 @@
         </div>
         <div class="mb-1">
           <locale-group i18n-key="labelExposeStatus">
-            <label v-for="([key, host]) in expose" :key="host" class="mr-1 valign-tb">
-              <setting-check :name="`expose.${key}`"/>
-              <span v-text="host" class="mr-1"/>
+            <setting-check v-for="([key, host]) in expose" :key="host"
+                           :name="`expose.${key}`" class="mr-1 valign-tb">
+              <span v-text="host" class="mr-1" />
               <a :href="`https://${host}`" target="_blank" rel="noopener noreferrer">&nearr;</a>
-            </label>
+            </setting-check>
           </locale-group>
         </div>
       </section>

@@ -40,17 +40,14 @@
           <button v-text="i18n('buttonConfirmInstallation')" @click="installScript"
                   :disabled="!installable"/>
           <button v-text="i18n('buttonClose')" @click="close"/>
-          <label>
-            <setting-check name="closeAfterInstall" @change="checkClose" />
-            <span class="ml-1" v-text="i18n('installOptionClose')"/>
-          </label>
-          <label>
-            <setting-check name="trackLocalFile" @change="trackLocalFile"
-                           :disabled="closeAfterInstall || !isLocal"/>
+          <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
+                         @change="checkClose" />
+          <setting-check name="trackLocalFile" @change="trackLocalFile"
+                         :disabled="closeAfterInstall || !isLocal">
             <tooltip :content="trackTooltip" :disabled="!trackTooltip">
-              <span class="ml-1" v-text="i18n('installOptionTrack')"/>
+              <span v-text="i18n('installOptionTrack')"/>
             </tooltip>
-          </label>
+          </setting-check>
         </div>
       </div>
       <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
