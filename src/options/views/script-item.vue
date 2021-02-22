@@ -372,6 +372,7 @@ $removedItemHeight: calc(
   .scripts {
     display: flex;
     flex-wrap: wrap;
+    align-content: flex-start;
   }
   .script {
     width: calc(100% / 2 - (2 * $itemMargin));
