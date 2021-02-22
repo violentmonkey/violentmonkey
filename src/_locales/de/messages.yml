@@ -114,12 +114,12 @@ descEditorOptions:
   message: >-
     Benutzerdefinierte Optionen für CodeMirror und Add-ons in JSON Object wie
     <code>{"indentUnit":2, "smartIndent":true}</code>, möglicherweise werden
-    einige von ihnen jedoch nicht mit Violentmonkey funktionieren. Konsultiere
-    die <a href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">vollständige Liste</a>. Um ein benutzerdefiniertes
-    CodeMirror-Theme zu benutzen, spezifiziere hier dessen Dateinamen ähnlich
-    wie <code>"theme":"3024-day"</code> und füge die <a
-    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    einige von ihnen jedoch nicht mit Violentmonkey funktionieren. Konsultieren
+    Sie die <a href="https://codemirror.net/doc/manual.html#config"
+    target="_blank" rel="noopener noreferrer">vollständige Liste</a>. Um ein
+    benutzerdefiniertes CodeMirror-Theme zu benutzen, spezifizieren Sie hier
+    dessen Dateinamen ähnlich wie <code>"theme":"3024-day"</code> und fügen Sie
+    die <a href="https://github.com/codemirror/CodeMirror/tree/master/theme"
     target="_blank" rel="noopener noreferrer">tatsächliche Theme-CSS</a> in das
     "Benutzerdefinierte Aussehen"-Eingabefeld unterhalb ein.
 editHelpDocumention:
@@ -494,6 +494,21 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Dashboard öffnen
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: Ausschließen...
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: >-
+    Der gegenwärtige Tab lädt automatisch neu, falls Sie diese Option in den
+    Allgemeinen Einstellungen aktiviert haben.
+
+    Um die Änderungen für sonstige Tabs zu übernehmen, laden Sie diese bitte
+    manuell neu.
+
+    Nutzen Sie für mehr Flexibilität den "Einstellungen"-Tab des Editors.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Skripte für diese Seite finden
@@ -531,7 +546,7 @@ msgErrorFetchingScript:
   message: Fehler beim Abruf der neuen Version!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Fehler beim Abrufen der Aktualisierungsinformationen.
+  message: Abruf der Aktualisierungsinformationen fehlgeschlagen.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
@@ -578,7 +593,7 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Konflikt beim Namen des Skripts! Bitte @name und @namespace ändern.
+  message: Namensraum-Konflikte! Bitte ändern Sie @name und @namespace des Skripts.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no

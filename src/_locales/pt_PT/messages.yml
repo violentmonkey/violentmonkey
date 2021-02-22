@@ -475,6 +475,14 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Abrir painel
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: ''
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Procurar scripts para este site

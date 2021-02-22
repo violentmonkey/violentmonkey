@@ -232,7 +232,7 @@ hintUseDownloadURL:
   message: '@downloadURL gebruiken'
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Wis de overbodige gegevens en probeer de ontbrekende bronnen te heralden.
+  message: Wis de overbodige gegevens en probeer de ontbrekende bronnen te herladen.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Installeren van $1
@@ -487,6 +487,20 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Controlepaneel openen
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: Uitsluiten...
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: >-
+    Als je deze instelling hebt ingeschakeld, dan zal het huidige tabblad
+    automatisch worden herladen.
+
+    Herlaad de andere tabbladen handmatig om de wijzigingen toe te passen.
+
+    Op het tabblad 'Instellingen' van de bewerker heb je meer flexibiliteit.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Scripts voor deze site zoeken

@@ -271,7 +271,7 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: 'Aktuálne skripty budú spustené, kým kartu znovu nenačítate'
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Kontrolovať aktualizácie skriptu každý $1 deň, pre zakázanie použite 0'
@@ -491,6 +491,14 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Otvoriť Dashboard
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: ''
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Vyhľadať skripty pre túto stránku
@@ -599,7 +607,7 @@ msgScriptUpdated:
   message: 'Skript [$1] bol aktualizovaný!'
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Zobraziť/skryť
 msgSyncError:
   description: Message shown when sync failed.
   message: Chyba synchronizácie!
