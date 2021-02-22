@@ -499,6 +499,20 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Otwórz panel sterowania
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: Wyklucz...
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: >-
+    Bieżąca karta zostanie automatycznie odświeżona, jeśli włączysz tę opcję w
+    ustawieniach ogólnych.
+
+    Aby zastosować zmiany we wszystkich innych kartach, odśwież je ręcznie.
+
+    Aby uzyskać większą elastyczność, użyj zakładki „Ustawienia” w edytorze.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Znajdź skrypty dla tej strony

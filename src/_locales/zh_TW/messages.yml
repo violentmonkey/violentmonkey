@@ -470,6 +470,14 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: 打開控制台
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: ''
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 為此站點查詢腳本
