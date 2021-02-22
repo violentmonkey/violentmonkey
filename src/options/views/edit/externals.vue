@@ -50,16 +50,21 @@ export default {
         img = raw;
       } else {
         [contentType, code] = raw.split(',');
-        if (contentType.startsWith('t')) {
-          code = atob(code);
-          if (/[\x80-\xFF]/.test(code)) {
-            const len = code.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i += 1) {
-              bytes[i] = code.charCodeAt(i);
-            }
-            code = new TextDecoder().decode(bytes);
+        if (code == null) { // workaround for bugs in old VM, see 2e135cf7
+          const fileExt = url.match(/\.(\w+)([#&?]|$)/)?.[1] || '';
+          contentType = /^(png|jpe?g|bmp|svgz?|gz|zip)$/i.test(fileExt)
+            ? ''
+            : `text/${fileExt.toLowerCase()}`;
+          code = raw;
+        }
+        code = atob(code);
+        if (/[\x80-\xFF]/.test(code)) {
+          const len = code.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i += 1) {
+            bytes[i] = code.charCodeAt(i);
           }
+          code = new TextDecoder().decode(bytes);
         }
       }
       this.img = img;

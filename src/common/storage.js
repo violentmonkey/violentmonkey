@@ -75,7 +75,7 @@ export default {
      */
     makeDataUri(url, raw) {
       if (url.startsWith('data:')) return url;
-      if (raw?.startsWith('i')) {
+      if (/^(i,|image\/)/.test(raw)) { // workaround for bugs in old VM, see 2e135cf7
         const i = raw.lastIndexOf(',');
         const type = raw.startsWith('image/') ? raw.slice(0, i) : 'image/png';
         return `data:${type};base64,${raw.slice(i + 1)}`;
