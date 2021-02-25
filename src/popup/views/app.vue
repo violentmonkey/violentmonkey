@@ -306,6 +306,7 @@ export default {
     },
     onCommand(id, cap) {
       sendTabCmd(store.currentTab.id, 'Command', `${id}:${cap}`);
+      window.close();
     },
     onToggleScript(item) {
       const { data } = item;
