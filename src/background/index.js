@@ -73,7 +73,6 @@ Object.assign(commands, {
       // FF bug: the badge is reset because sometimes tabs get their real/internal url later
       if (ua.isFirefox) cache.put(`badge:${tab.id}${url}`, badgeData);
       Object.assign(res, data.inject);
-      data.registration?.then(r => r.unregister());
       // Injecting known content mode scripts without waiting for InjectionFeedback
       const inContent = res.scripts.map(s => !s.code && [s.dataKey, true]).filter(Boolean);
       if (inContent.length) {
