@@ -16,7 +16,14 @@ const API_CONFIG = {
 const TIME_AFTER_SEND = 10e3; // longer as establishing connection to sites may take time
 const TIME_AFTER_RECEIVE = 1e3; // shorter as response body will be coming very soon
 const TIME_KEEP_DATA = 60e3; // 100ms should be enough but the tab may hang or get paused in debugger
-const cache = initCache({ lifetime: TIME_KEEP_DATA });
+const cacheCode = initCache({ lifetime: TIME_KEEP_DATA });
+const cache = initCache({
+  lifetime: TIME_KEEP_DATA,
+  async onDispose(promise) {
+    const data = await promise;
+    data.unregister?.();
+  },
+});
 let injectInto;
 hookOptions(changes => {
   injectInto = changes.defaultInjectInto ?? injectInto;
@@ -30,7 +37,7 @@ postInitialize.push(() => {
 Object.assign(commands, {
   InjectionFeedback(feedback, { tab, frameId }) {
     feedback.forEach(([key, needsInjection]) => {
-      const code = cache.pop(key);
+      const code = cacheCode.pop(key);
       // see TIME_KEEP_DATA comment
       if (needsInjection && code) {
         browser.tabs.executeScript(tab.id, {
@@ -64,13 +71,12 @@ browser.storage.onChanged.addListener(async changes => {
         || data[prop]?.includes(prefix === storage.value.prefix ? +key : key);
     }));
   if (dirty) {
-    clearCache(cacheValues);
+    clearCache();
   }
 });
 
-async function clearCache(cacheValues) {
-  if (!cacheValues) cacheValues = await Promise.all(cache.getValues());
-  cacheValues.forEach(data => data.registration?.then(r => r.unregister()));
+function clearCache() {
+  cacheCode.destroy();
   cache.destroy();
 }
 
@@ -154,7 +160,7 @@ function prepareScript(script, index, scripts) {
     // Firefox lists .user.js among our own content scripts so a space at start will group them
     `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? '%20' : ''}${name}.user.js#${id}`,
   ].join('');
-  cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
+  cacheCode.put(dataKey, injectedCode, TIME_KEEP_DATA);
   scripts[index] = {
     ...script,
     dataKey,
@@ -180,7 +186,7 @@ const resolveDataCodeStr = `(${(data) => {
 }})`;
 
 function registerScriptDataFF(data, url, allFrames) {
-  data.registration = browser.contentScripts.register({
+  const promise = browser.contentScripts.register({
     allFrames,
     js: [{
       code: `${resolveDataCodeStr}(${JSON.stringify(data.inject)})`,
@@ -188,4 +194,9 @@ function registerScriptDataFF(data, url, allFrames) {
     matches: url.split('#', 1),
     runAt: 'document_start',
   });
+  data.unregister = async () => {
+    data.unregister = null;
+    const r = await promise;
+    r.unregister();
+  };
 }

@@ -1,9 +1,8 @@
-import { hasOwnProperty } from '#/common/util';
-
 export default function initCache({
   lifetime: defaultLifetime = 3000,
+  onDispose,
 } = {}) {
-  let cache = {};
+  let cache = Object.create(null);
   // setTimeout call is very expensive when done frequently,
   // 1000 calls performed for 50 scripts consume 50ms on each tab load,
   // so we'll schedule trim() just once per event loop cycle,
@@ -43,15 +42,19 @@ export default function initCache({
       };
       reschedule(lifetime);
     } else {
-      delete cache[key];
+      del(key);
     }
     return value;
   }
   function del(key) {
-    delete cache[key];
+    const data = cache[key];
+    if (data) {
+      delete cache[key];
+      onDispose?.(data.value, key);
+    }
   }
   function has(key) {
-    return cache::hasOwnProperty(key);
+    return cache[key];
   }
   function hit(key, lifetime = defaultLifetime) {
     const entry = cache[key];
@@ -61,9 +64,18 @@ export default function initCache({
     }
   }
   function destroy() {
+    // delete all keys to make sure onDispose is called for each value
+    if (onDispose) {
+      // cache inherits null so we don't need to check hasOwnProperty
+      // eslint-disable-next-line guard-for-in
+      for (const key in cache) {
+        del(key);
+      }
+    } else {
+      cache = Object.create(null);
+    }
     clearTimeout(timer);
     timer = 0;
-    cache = {};
   }
   function reschedule(lifetime) {
     if (timer) {
@@ -78,14 +90,13 @@ export default function initCache({
     // so we'll sweep the upcoming expired entries in this run
     const now = performance.now() + 10;
     let closestExpiry = Number.MAX_SAFE_INTEGER;
+    // eslint-disable-next-line guard-for-in
     for (const key in cache) {
-      if (Object.hasOwnProperty.call(cache, key)) {
-        const { expiry } = cache[key];
-        if (expiry < now) {
-          delete cache[key];
-        } else if (expiry < closestExpiry) {
-          closestExpiry = expiry;
-        }
+      const { expiry } = cache[key];
+      if (expiry < now) {
+        del(key);
+      } else if (expiry < closestExpiry) {
+        closestExpiry = expiry;
       }
     }
     minLifetime = closestExpiry - now;
