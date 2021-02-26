@@ -162,7 +162,7 @@ export default {
     navItems() {
       const { meta, props } = this.script || {};
       const req = meta?.require.length && '@require';
-      const res = !isEmpty(meta.resources) && '@resource';
+      const res = !isEmpty(meta?.resources) && '@resource';
       return {
         code: i18n('editNavCode'),
         settings: i18n('editNavSettings'),
