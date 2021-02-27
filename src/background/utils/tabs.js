@@ -1,4 +1,5 @@
 import { getActiveTab, noop, sendTabCmd, getFullUrl } from '#/common';
+import * as tld from '#/common/tld';
 import ua from '#/common/ua';
 import { extensionRoot } from './init';
 import { commands } from './message';
@@ -7,7 +8,29 @@ import { getOption } from './options';
 const openers = {};
 
 Object.assign(commands, {
-  OpenEditor(pathId) {
+  /**
+   * @param {string} [pathId] - path or id to add to #scripts route in dashboard,
+     if absent a new script will be created for `url` and `domain`
+   * @param {string} [url] - url to create a new script for, defaults to active tab's url
+   * @param {string} [domain] - url domain part, if absent it's extracted from url
+   * @returns {Promise<{id: number}>}
+   */
+  async OpenEditor({ pathId, url, domain } = {}) {
+    if (!pathId) {
+      if (!url) {
+        const tab = await getActiveTab() || {};
+        url = tab.pendingUrl || tab.url || '';
+      }
+      if (!domain) {
+        domain = url.match(/^https?:\/\/([^/]+)|$/)[1];
+        domain = domain && tld.getDomain(domain) || domain;
+      }
+      const id = domain && commands.CacheNewScript({
+        url: url.split(/[#?]/)[0],
+        name: `- ${domain}`,
+      });
+      pathId = `_new${id ? `/${id}` : ''}`;
+    }
     return commands.TabOpen({
       url: `/options/index.html#scripts/${pathId}`,
       maybeInWindow: true,

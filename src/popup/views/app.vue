@@ -295,7 +295,7 @@ export default {
       window.close();
     },
     onEditScript(item) {
-      sendCmd('OpenEditor', item.data.props.id);
+      sendCmd('OpenEditor', { pathId: item.data.props.id });
       window.close();
     },
     onFindSameDomainScripts() {
@@ -330,12 +330,8 @@ export default {
       }
     },
     async onCreateScript() {
-      const { currentTab, domain } = this.store;
-      const id = domain && await sendCmd('CacheNewScript', {
-        url: currentTab.url.split(/[#?]/)[0],
-        name: `- ${domain}`,
-      });
-      sendCmd('OpenEditor', `_new${id ? `/${id}` : ''}`);
+      const { currentTab: { url }, domain } = this.store;
+      sendCmd('OpenEditor', { url, domain });
       window.close();
     },
     async onInjectionFailureFix() {
