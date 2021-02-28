@@ -16,7 +16,7 @@ async function buildManifest() {
   }
   if (isBeta()) {
     // Do not support i18n in beta version
-    data.name = 'Violentmonkey BETA';
+    data.name = data.browser_action.default_title = 'Violentmonkey BETA';
   }
   return data;
 }
