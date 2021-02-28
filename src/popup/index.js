@@ -1,16 +1,14 @@
 import Vue from 'vue';
-import { getActiveTab, i18n, sendCmdDirectly } from '#/common';
+import { i18n, sendCmdDirectly } from '#/common';
 import { INJECT_PAGE, INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import handlers from '#/common/handlers';
 import { loadScriptIcon } from '#/common/load-script-icon';
 import { forEachValue, mapEntry } from '#/common/object';
-import * as tld from '#/common/tld';
 import '#/common/ui/style';
 import App from './views/app';
 import { mutex, store } from './utils';
 
 mutex.init();
-tld.initTLD();
 Vue.prototype.i18n = i18n;
 
 const vm = new Vue({
@@ -63,19 +61,14 @@ if (!CSS.supports?.('list-style-type', 'disclosure-open')) {
   document.styleSheets[0].insertRule('.excludes-menu ::-webkit-details-marker {display:none}');
 }
 
-getActiveTab()
-.then(async (tab) => {
-  const { url } = tab;
+sendCmdDirectly('GetTabDomain')
+.then(async ({ tab, domain }) => {
   store.currentTab = tab;
+  store.domain = domain;
   browser.runtime.connect({ name: `${tab.id}` });
-  if (/^https?:\/\//i.test(url)) {
-    const matches = url.match(/:\/\/([^/]*)/);
-    const domain = matches[1];
-    store.domain = tld.getDomain(domain) || domain;
-  }
-  if (!INJECTABLE_TAB_URL_RE.test(url)) {
+  if (!INJECTABLE_TAB_URL_RE.test(tab.url)) {
     store.injectable = false;
   } else {
-    store.blacklisted = await sendCmdDirectly('TestBlacklist', url);
+    store.blacklisted = await sendCmdDirectly('TestBlacklist', tab.url);
   }
 });

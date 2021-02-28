@@ -1,6 +1,7 @@
-import { makePause, sendCmd } from '#/common';
+import { getActiveTab, makePause, sendCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
 import { deepCopy, forEachEntry, objectSet } from '#/common/object';
+import * as tld from '#/common/tld';
 import ua from '#/common/ua';
 import * as sync from './sync';
 import { commands } from './utils';
@@ -81,6 +82,16 @@ Object.assign(commands, {
       }
     }
     return res;
+  },
+  /** @return {Promise<Object>} */
+  async GetTabDomain() {
+    const tab = await getActiveTab() || {};
+    const url = tab.pendingUrl || tab.url || '';
+    const host = url.match(/^https?:\/\/([^/]+)|$/)[1];
+    return {
+      tab,
+      domain: host && tld.getDomain(host) || host,
+    };
   },
   /**
    * Timers in content scripts are shared with the web page so it can clear them.
