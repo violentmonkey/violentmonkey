@@ -495,10 +495,16 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Vylúčiť
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    Aktuálna karta sa automaticky obnoví, ak povolíte túto možnosť v
+    nastaveniach.
+
+    Ak chcete použiť zmeny na všetkých ostatných kartách, obnovte ich ručne.
+
+    Pre väčšiu flexibilitu použite kartu „Nastavenia“ editora.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Vyhľadať skripty pre túto stránku

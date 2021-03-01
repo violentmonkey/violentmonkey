@@ -268,7 +268,7 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: Skrip konten akan terus berjalan sampai Anda memuat ulang tab
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Periksa pembaruan skrip setiap $1 hari, gunakan 0 untuk menonaktifkan'
@@ -492,10 +492,16 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Pengecualian...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    Tab saat ini akan otomatis dimuat ulang jika Anda mengaktifkan opsi ini di
+    dalam pengaturan umum.
+
+    Untuk menerapkan perubahan ke semua tab, silakan muat ulang secara manual.
+
+    Gunakan tab "Pengaturan" dari penyunting untuk opsi lainnya.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Temukan skrip untuk situs ini
@@ -606,7 +612,7 @@ msgScriptUpdated:
   message: 'Skrip [$1] diperbarui!'
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Tampilkan/Sembunyikan
 msgSyncError:
   description: Message shown when sync failed.
   message: Kesalahan sinkron!
