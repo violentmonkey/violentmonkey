@@ -274,7 +274,7 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: Scripturile actuale vor continua să ruleze până când reîncarci fila
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: >-
@@ -500,10 +500,17 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Exclude...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    Fila actuală se va reîncărca automat dacă ai activat această opțiune în
+    setările generale.
+
+    Pentru a aplica modificări la toate celelalte file, te rugăm să le reîncarci
+    manual.
+
+    Folosește fila „Setări” a editorului pentru mai multă flexibilitate.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Găsește scripturi pentru acest site
@@ -616,7 +623,7 @@ msgScriptUpdated:
   message: 'Scriptul [$1] este actualizat!'
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Afișează/ascunde
 msgSyncError:
   description: Message shown when sync failed.
   message: Eroare la sincronizare!
