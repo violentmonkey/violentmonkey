@@ -277,7 +277,7 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: Los scripts actuales seguirán ejecutándose hasta que recargues la pestaña
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: >-
@@ -503,10 +503,17 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Excluir...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    La pestaña actual se recargará automáticamente si habilitaste esta opción en
+    la configuración general.
+
+    Para aplicar los cambios a todas las demás pestañas, recargarlas
+    manualmente.
+
+    Utiliza la pestaña "Configuración" del editor para mayor flexibilidad.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Buscar scripts para este sitio
@@ -619,7 +626,7 @@ msgScriptUpdated:
   message: '¡El script [$1] está actualizado!'
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Mostrar/ocultar
 msgSyncError:
   description: Message shown when sync failed.
   message: ¡Error de sincronización!
