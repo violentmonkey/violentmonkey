@@ -41,9 +41,9 @@
           </span>
         </tooltip>
         <dropdown align="right" class="filter-sort">
-          <tooltip :content="i18n('buttonFilter')" placement="bottom" slot="toggle">
+          <tooltip :content="i18n('labelSettings')" placement="bottom" slot="toggle">
             <span class="btn-ghost">
-              <icon name="filter"></icon>
+              <icon name="cog"/>
             </span>
           </tooltip>
           <div>
@@ -61,6 +61,10 @@
           <div v-show="currentSortCompare">
             <setting-check name="filters.showEnabledFirst"
                            :label="i18n('optionShowEnabledFirst')" />
+          </div>
+          <div class="mr-2c">
+            <setting-check name="filters.viewTable" :label="i18n('labelViewTable')" />
+            <setting-check name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
           </div>
         </dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
@@ -94,7 +98,7 @@
            @click.prevent="emptyRecycleBin"/>
       </div>
       <div class="flex-auto pos-rel">
-        <div class="scripts abs-full">
+        <div class="scripts abs-full" :data-columns="numColumns" :data-table="filters.viewTable">
           <script-item
             v-for="(script, index) in sortedScripts"
             v-show="!search || script.$cache.show !== false"
@@ -103,6 +107,7 @@
             :script="script"
             :draggable="filters.sort.value === 'exec' && !script.config.removed"
             :visible="index < batchRender.limit"
+            :name-clickable="filters.viewTable"
             @edit="onEditScript"
             @move="moveScript"
             @remove="onRemove"
@@ -169,6 +174,8 @@ const filtersSort = {
 const filters = {
   searchScope: null,
   showEnabledFirst: null,
+  viewSingleColumn: null,
+  viewTable: null,
   get sort() {
     return filtersSort;
   },
@@ -192,6 +199,17 @@ filters::forEachKey(key => {
     filters[key] = val;
   });
 });
+
+const columnsForTableMode = [
+  1600, // 1680x1050
+  2500, // 2560x1440
+  3400, // 3440x1440
+];
+const columnsForCardsMode = [
+  1300, // 1366x768
+  1900, // 1920x1080
+  2500, // 2560x1440
+];
 
 const MAX_BATCH_DURATION = 100;
 let step = 0;
@@ -225,12 +243,15 @@ export default {
       batchRender: {
         limit: step,
       },
+      numColumns: null,
     };
   },
   watch: {
     search: 'scheduleSearch',
     'filters.sort.value': 'updateLater',
     'filters.showEnabledFirst': 'updateLater',
+    'filters.viewSingleColumn': 'adjustScriptWidth',
+    'filters.viewTable': 'adjustScriptWidth',
     showRecycle: 'onUpdate',
     scripts: 'refreshUI',
     'store.route.paths.1': 'onHashChange',
@@ -453,6 +474,11 @@ export default {
         // NOP
       }
     },
+    adjustScriptWidth() {
+      const widths = filters.viewTable ? columnsForTableMode : columnsForCardsMode;
+      this.numColumns = filters.viewSingleColumn ? 1
+        : widths.findIndex(w => window.innerWidth < w) + 1 || widths.length;
+    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 100);
@@ -463,6 +489,8 @@ export default {
     // * on subsequent navigation via history back/forward;
     // * on first initialization in some weird case the scripts got loaded early.
     if (!store.loading) this.refreshUI();
+    global.addEventListener('resize', this.adjustScriptWidth);
+    this.adjustScriptWidth();
   },
 };
 </script>
@@ -490,6 +518,11 @@ export default {
 }
 .scripts {
   overflow-y: auto;
+  &:not([data-columns="1"]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+  }
 }
 .backdrop > *,
 .backdrop::after {
