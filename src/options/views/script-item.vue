@@ -10,7 +10,8 @@
     @keydownEnter="onEdit">
     <img class="script-icon hidden-xs" :src="script.safeIcon" @click="onEdit">
     <div class="script-info flex ml-1c">
-      <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"></div>
+      <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"
+           @click.exact="nameClickable && onEdit()"/>
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
                  class="script-author ml-1c hidden-sm"
@@ -37,8 +38,8 @@
         </div>
       </template>
     </div>
-    <template v-if="canRender">
-      <div class="script-buttons flex">
+    <div class="script-buttons flex">
+      <template v-if="canRender">
         <div class="flex-auto flex flex-wrap">
           <tooltip :content="i18n('buttonEdit')" align="start">
             <span class="btn-ghost" @click="onEdit">
@@ -88,8 +89,8 @@
             <icon name="trash"></icon>
           </span>
         </tooltip>
-      </div>
-    </template>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -104,6 +105,7 @@ export default {
     'script',
     'draggable',
     'visible',
+    'nameClickable',
   ],
   components: {
     Icon,
@@ -330,9 +332,7 @@ $removedItemHeight: calc(
     .disabled &,
     .removed & {
       filter: grayscale(.8);
-      @media (prefers-color-scheme: dark) {
-        opacity: .5;
-      }
+      opacity: .5;
     }
     .removed & {
       width: $iconSizeSmaller;
@@ -362,32 +362,106 @@ $removedItemHeight: calc(
   }
 }
 
+.scripts {
+  &[data-columns="2"] .script {
+    width: calc(100% / 2 - (2 * $itemMargin));
+  }
+  &[data-columns="3"] .script {
+    width: calc(100% / 3 - (2 * $itemMargin));
+  }
+  &[data-columns="4"] .script {
+    width: calc(100% / 4 - (2 * $itemMargin));
+  }
+  &[data-table] {
+    &[data-columns="1"] .script {
+      margin: 0;
+      border-left: none;
+      border-right: none;
+    }
+    &[data-columns="1"], &[data-columns="3"] {
+      .script:nth-child(even) {
+        background-color: var(--fill-0-5);
+      }
+    }
+    &[data-columns="2"] .script {
+      &:nth-child(4n + 2),
+      &:nth-child(4n + 3) {
+        background-color: var(--fill-0-5);
+      }
+    }
+    &[data-columns="4"] .script {
+      &:nth-child(8n + 2),
+      &:nth-child(8n + 4),
+      &:nth-child(8n + 5),
+      &:nth-child(8n + 7) {
+        background-color: var(--fill-0-5);
+      }
+    }
+    .script {
+      display: flex;
+      align-items: center;
+      height: 2.5rem;
+      margin: 0 $itemMargin;
+      padding: 0 calc(2 * $itemMargin) 0 $itemMargin;
+      border-top: none;
+      border-radius: 0;
+      background: none;
+      &-name {
+        cursor: pointer;
+      }
+      &-icon {
+        width: 2rem;
+        height: 2rem;
+        order: 1;
+        position: static;
+        margin-left: .5rem;
+      }
+      &-info {
+        order: 2;
+        flex: 1;
+        margin-left: .5rem;
+        line-height: 1;
+        > :last-child { /* author + version */
+          align-items: center;
+          display: flex;
+          > * {
+            width: 5rem;
+            text-align: right;
+            color: var(--fill-8);
+          }
+          > :last-child { /* version */
+            width: 3.5rem;
+          }
+        }
+      }
+      &-buttons {
+        margin: 0;
+        min-width: 14rem;
+        > .flex {
+          width: auto;
+          > :first-child { /* edit button */
+            display: none;
+          }
+        }
+      }
+      &-author > .ellipsis {
+        max-width: 15vw;
+      }
+      &-message:not(:empty) {
+        position: absolute;
+        right: 0;
+        font-size: smaller;
+        padding: 1px .5em 2px;
+        border-radius: .5em;
+        border: 1px solid var(--fill-5);
+        background: var(--bg);
+      }
+    }
+  }
+}
 @media (max-width: 319px) {
   .script-icon ~ * {
     margin-left: 0;
-  }
-}
-
-@media (min-width: 1300px) { // for 1366x768
-  .scripts {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-  }
-  .script {
-    width: calc(100% / 2 - (2 * $itemMargin));
-  }
-}
-
-@media (min-width: 1900px) { // for 1920x1080
-  .script {
-    width: calc(100% / 3 - (2 * $itemMargin));
-  }
-}
-
-@media (min-width: 2500px) { // for 2560x1440
-  .script {
-    width: calc(100% / 4 - (2 * $itemMargin));
   }
 }
 </style>
