@@ -1,5 +1,5 @@
 <template>
-  <label>
+  <label class="setting-check">
     <input type="checkbox" v-model="value" :disabled="disabled">
     <slot>
       <span v-text="label" />
@@ -49,3 +49,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.setting-check {
+  display: inline-flex;
+}
+</style>
