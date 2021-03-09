@@ -420,7 +420,7 @@ $removedItemHeight: calc(
         order: 2;
         flex: 1;
         margin-left: .5rem;
-        line-height: 1;
+        line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
         > :last-child { /* author + version */
           align-items: center;
           display: flex;
