@@ -98,7 +98,10 @@
            @click.prevent="emptyRecycleBin"/>
       </div>
       <div class="flex-auto pos-rel">
-        <div class="scripts abs-full" :data-columns="numColumns" :data-table="filters.viewTable">
+        <div class="scripts abs-full"
+             :style="`--num-columns:${numColumns}`"
+             :data-columns="numColumns"
+             :data-table="filters.viewTable">
           <script-item
             v-for="(script, index) in sortedScripts"
             v-show="!search || script.$cache.show !== false"
@@ -200,19 +203,11 @@ filters::forEachKey(key => {
   });
 });
 
-const columnsForTableMode = [
-  1600, // 1680x1050
-  2500, // 2560x1440
-  3400, // 3440x1440
-];
-const columnsForCardsMode = [
-  1300, // 1366x768
-  1900, // 1920x1080
-  2500, // 2560x1440
-];
-
 const MAX_BATCH_DURATION = 100;
 let step = 0;
+
+let columnsForTableMode = [];
+let columnsForCardsMode = [];
 
 export default {
   components: {
@@ -477,7 +472,7 @@ export default {
     adjustScriptWidth() {
       const widths = filters.viewTable ? columnsForTableMode : columnsForCardsMode;
       this.numColumns = filters.viewSingleColumn ? 1
-        : widths.findIndex(w => window.innerWidth < w) + 1 || widths.length;
+        : widths.findIndex(w => window.innerWidth < w) + 1 || widths.length + 1;
     },
   },
   created() {
@@ -489,13 +484,30 @@ export default {
     // * on subsequent navigation via history back/forward;
     // * on first initialization in some weird case the scripts got loaded early.
     if (!store.loading) this.refreshUI();
-    global.addEventListener('resize', this.adjustScriptWidth);
+    if (!columnsForCardsMode.length) {
+      const re = /--columns-(cards|table):\s*([\d,\s]+)/g;
+      for (const { cssRules } of document.styleSheets) {
+        for (const rule of cssRules) {
+          let m = rule.selectorText === ':root' && re.exec(rule.cssText);
+          for (; m; m = re.exec(rule.cssText)) {
+            const widths = m[2].split(',').map(Number).filter(Boolean);
+            if (m[1] === 'table') columnsForTableMode = widths;
+            else columnsForCardsMode = widths;
+          }
+        }
+      }
+      global.addEventListener('resize', this.adjustScriptWidth);
+    }
     this.adjustScriptWidth();
   },
 };
 </script>
 
 <style>
+:root {
+  --columns-cards: 1300, 1900, 2500; // 1366x768, 1920x1080, 2560x1440
+  --columns-table: 1600, 2500, 3400; // 1680x1050, 2560x1440, 3440x1440
+}
 .tab.tab-installed {
   padding: 0;
   header {
@@ -518,11 +530,6 @@ export default {
 }
 .scripts {
   overflow-y: auto;
-  &:not([data-columns="1"]) {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-  }
 }
 .backdrop > *,
 .backdrop::after {

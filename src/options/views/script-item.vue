@@ -363,14 +363,15 @@ $removedItemHeight: calc(
 }
 
 .scripts {
-  &[data-columns="2"] .script {
-    width: calc(100% / 2 - (2 * $itemMargin));
-  }
-  &[data-columns="3"] .script {
-    width: calc(100% / 3 - (2 * $itemMargin));
-  }
-  &[data-columns="4"] .script {
-    width: calc(100% / 4 - (2 * $itemMargin));
+  &:not([data-columns="1"]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    padding: 0 $itemMargin;
+    .script {
+      // --num-columns is set in tab-installed.vue
+      width: calc(100% / var(--num-columns) - (2 * $itemMargin));
+    }
   }
   &[data-table] {
     &[data-columns="1"] .script {
