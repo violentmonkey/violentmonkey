@@ -36,7 +36,7 @@ export default {
     /** @type boolean */
     viewSingleColumn: false,
     /** @type boolean */
-    viewTable: true,
+    viewTable: false,
   },
   filtersPopup: {
     /** @type 'exec' | 'alpha' */
