@@ -360,7 +360,11 @@ function makeGlobalWrapper(local) {
     if (value === window) {
       value = wrapper;
     }
-    if (canCopy && (typeof value === 'function' || typeof value === 'object' && value)) {
+    if (canCopy && (
+      typeof value === 'function'
+      || typeof value === 'object' && value && name !== 'event'
+      // window.event contains the current event so it's always different
+    )) {
       local[name] = value;
     }
     return value;
