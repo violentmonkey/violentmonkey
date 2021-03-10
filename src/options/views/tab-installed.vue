@@ -484,18 +484,12 @@ export default {
     // * on subsequent navigation via history back/forward;
     // * on first initialization in some weird case the scripts got loaded early.
     if (!store.loading) this.refreshUI();
+    /* Extract --columns-cards and --columns-table from `:root` or `html` selector.
+     * CustomCSS may override it. The last non-empty definition is used regardless of !important */
     if (!columnsForCardsMode.length) {
-      const re = /--columns-(cards|table):\s*([\d,\s]+)/g;
-      for (const { cssRules } of document.styleSheets) {
-        for (const rule of cssRules) {
-          let m = rule.selectorText === ':root' && re.exec(rule.cssText);
-          for (; m; m = re.exec(rule.cssText)) {
-            const widths = m[2].split(',').map(Number).filter(Boolean);
-            if (m[1] === 'table') columnsForTableMode = widths;
-            else columnsForCardsMode = widths;
-          }
-        }
-      }
+      const style = getComputedStyle(document.documentElement);
+      [columnsForCardsMode, columnsForTableMode] = ['cards', 'table']
+      .map(type => style.getPropertyValue(`--columns-${type}`)?.split(',').map(Number).filter(Boolean) || []);
       global.addEventListener('resize', this.adjustScriptWidth);
     }
     this.adjustScriptWidth();
