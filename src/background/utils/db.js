@@ -144,6 +144,7 @@ preInitialize.push(async () => {
         custom: { pathMap = {} } = {},
         meta = {},
       } = script;
+      meta.grant = [...new Set(meta.grant || [])]; // deduplicate
       meta.require?.forEach(rememberUrl, pathMap);
       Object.values(meta.resources || {}).forEach(rememberUrl, pathMap);
       pathMap::rememberUrl(meta.icon);
