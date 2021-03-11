@@ -218,7 +218,7 @@ function getResource(context, name, isBlob) {
       if (raw) {
         const dataPos = raw::lastIndexOf(',');
         const bin = atob(dataPos < 0 ? raw : raw::slice(dataPos + 1));
-        if (isBlob || /[\x80-\xFF]/::test(res)) {
+        if (isBlob || /[\x80-\xFF]/::test(bin)) {
           const len = bin.length;
           const bytes = new Uint8Array(len);
           for (let i = 0; i < len; i += 1) {
