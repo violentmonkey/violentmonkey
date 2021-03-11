@@ -484,8 +484,7 @@ export default {
     // * on subsequent navigation via history back/forward;
     // * on first initialization in some weird case the scripts got loaded early.
     if (!store.loading) this.refreshUI();
-    /* Extract --columns-cards and --columns-table from `:root` or `html` selector.
-     * CustomCSS may override it. The last non-empty definition is used regardless of !important */
+    // Extract --columns-cards and --columns-table from `:root` or `html` selector. CustomCSS may override it.
     if (!columnsForCardsMode.length) {
       const style = getComputedStyle(document.documentElement);
       [columnsForCardsMode, columnsForTableMode] = ['cards', 'table']
