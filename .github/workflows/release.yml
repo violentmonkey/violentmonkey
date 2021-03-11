@@ -35,6 +35,7 @@ jobs:
         env:
           AMO_KEY: ${{ secrets.AMO_KEY }}
           AMO_SECRET: ${{ secrets.AMO_SECRET }}
+          BETA: 1
       - name: Update updates.json
         uses: JamesIves/github-pages-deploy-action@4.1.0
         if: steps.signAMO.outcome == 'success'
