@@ -27,3 +27,12 @@ for (const k of Object.keys(domProps)) {
 }
 delete domProps.performance;
 Object.defineProperties(global, domProps);
+
+global.URL = {
+  _cache: {},
+  createObjectURL(blob) {
+    const blobUrl = `blob:${Math.random()}`;
+    URL._cache[blobUrl] = blob;
+    return blobUrl;
+  },
+};

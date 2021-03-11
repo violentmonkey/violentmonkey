@@ -655,7 +655,7 @@ export async function vacuum() {
  * @property {string} name
  * @property {boolean} noframes
  * @property {string[]} require
- * @property {Object} resource
+ * @property {Object} resources
  * @property {VMScriptRunAt} runAt
  * @property {string} supportURL
  * @property {string} version
