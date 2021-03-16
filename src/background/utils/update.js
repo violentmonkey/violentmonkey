@@ -1,5 +1,6 @@
 import { i18n, request, compareVersion, sendCmd, trueJoin } from '#/common';
 import { CMD_SCRIPT_UPDATE } from '#/common/consts';
+import ua from '#/common/ua';
 import { fetchResources, getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
@@ -25,9 +26,13 @@ async function checkAllAndNotify(scripts) {
   const notes = [];
   const results = await Promise.all(scripts.map(item => checkUpdate(item, notes)));
   if (notes.length === 1) {
-    notifySingle(notes[0]);
+    notify(notes[0]);
   } else if (notes.length) {
-    notifyMulti(notes);
+    notify({
+      // FF doesn't show notifications of type:'list' so we'll use `text` everywhere
+      text: notes.map(n => n.text).join('\n'),
+      onClick: browser.runtime.openOptionsPage,
+    });
   }
   return results;
 }
@@ -123,22 +128,17 @@ function canNotify(script) {
     : script.config.notifyUpdates ?? allowed;
 }
 
-function notifySingle({ script, text }) {
-  commands.Notification({ text }, undefined, {
-    onClick: () => commands.OpenEditor(script.props.id),
-  });
-}
-
-function notifyMulti(notes) {
+function notify({
+  script,
+  text,
+  onClick = () => commands.OpenEditor(script.props.id),
+}) {
   commands.Notification({
-    text: i18n('titleScriptUpdated'),
+    text,
+    // FF doesn't show the name of the extension in the title of the notification
+    title: ua.isFirefox ? `${i18n('titleScriptUpdated')} - ${i18n('extName')}` : '',
   }, undefined, {
-    type: 'list',
-    items: notes.map(n => ({
-      title: getName(n.script),
-      message: n.text,
-    })),
-    onClick: browser.runtime.openOptionsPage,
+    onClick,
   });
 }
 

@@ -1,20 +1,19 @@
-import { defaultImage, sendTabCmd } from '#/common';
+import { i18n, defaultImage, sendTabCmd } from '#/common';
+import ua from '#/common/ua';
 import { commands } from './message';
 
 const openers = {};
 
 Object.assign(commands, {
   /** @return {Promise<string>} */
-  async Notification(data, src, bgExtras = {}) {
-    const { items, onClick, type } = bgExtras;
+  async Notification(data, src, bgExtras) {
     const notificationId = await browser.notifications.create({
-      type: type || 'basic',
-      title: data.title || '',
+      type: 'basic',
+      title: data.title || (ua.isFirefox ? i18n('extName') : ''), // Chrome already shows the name
       message: data.text,
       iconUrl: data.image || defaultImage,
-      ...items && { items },
     });
-    openers[notificationId] = onClick || src.tab.id;
+    openers[notificationId] = bgExtras?.onClick || src.tab.id;
     return notificationId;
   },
   RemoveNotification(notificationId) {
