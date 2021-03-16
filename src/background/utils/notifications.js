@@ -1,4 +1,5 @@
 import { i18n, defaultImage, sendTabCmd } from '#/common';
+import ua from '#/common/ua';
 import { commands } from './message';
 
 const openers = {};
@@ -8,7 +9,7 @@ Object.assign(commands, {
   async Notification(data, src, bgExtras) {
     const notificationId = await browser.notifications.create({
       type: 'basic',
-      title: data.title || i18n('extName'),
+      title: data.title || (ua.isFirefox ? i18n('extName') : ''), // Chrome already shows the name
       message: data.text,
       iconUrl: data.image || defaultImage,
     });
