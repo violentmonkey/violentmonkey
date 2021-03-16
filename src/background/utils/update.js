@@ -7,30 +7,44 @@ import { commands } from './message';
 
 Object.assign(commands, {
   /** @return {Promise<true?>} */
-  CheckUpdate(id) {
-    return checkUpdate(getScriptById(id));
+  async CheckUpdate(id) {
+    const script = getScriptById(id);
+    const results = await checkAllAndNotify([script]);
+    return results[0];
   },
   /** @return {Promise<boolean>} */
   async CheckUpdateAll() {
     setOption('lastUpdate', Date.now());
     const toUpdate = getScripts().filter(item => item.config.shouldUpdate);
-    const results = await Promise.all(toUpdate.map(checkUpdate));
+    const results = await checkAllAndNotify(toUpdate);
     return results.includes(true);
   },
 });
+
+async function checkAllAndNotify(scripts) {
+  const notes = [];
+  const results = await Promise.all(scripts.map(item => checkUpdate(item, notes)));
+  if (notes.length === 1) {
+    notifySingle(notes[0]);
+  } else if (notes.length) {
+    notifyMulti(notes);
+  }
+  return results;
+}
 
 const processes = {};
 const NO_HTTP_CACHE = {
   'Cache-Control': 'no-cache, no-store, must-revalidate',
 };
+
 // resolves to true if successfully updated
-export default function checkUpdate(script) {
+function checkUpdate(script, notes) {
   const { id } = script.props;
-  const promise = processes[id] || (processes[id] = doCheckUpdate(script));
+  const promise = processes[id] || (processes[id] = doCheckUpdate(script, notes));
   return promise;
 }
 
-async function doCheckUpdate(script) {
+async function doCheckUpdate(script, notes) {
   const { id } = script.props;
   let msgOk;
   let msgErr;
@@ -41,7 +55,7 @@ async function doCheckUpdate(script) {
       code: await downloadUpdate(script),
       update: { checking: false },
     });
-    msgOk = canNotify(script) && i18n('msgScriptUpdated', [update.meta.name || i18n('labelNoName')]);
+    msgOk = canNotify(script) && i18n('msgScriptUpdated', [getName(update)]);
     resourceOpts = { headers: NO_HTTP_CACHE };
     return true;
   } catch (update) {
@@ -55,11 +69,9 @@ async function doCheckUpdate(script) {
       if (process.env.DEBUG && msgErr) console.error(msgErr);
     }
     if (msgOk || msgErr) {
-      commands.Notification({
-        title: `${i18n('titleScriptUpdated')} - ${i18n('extName')}`,
+      notes.push({
+        script,
         text: [msgOk, msgErr]::trueJoin('\n'),
-      }, undefined, {
-        onClick: () => commands.OpenEditor(id),
       });
     }
     delete processes[id];
@@ -109,4 +121,27 @@ function canNotify(script) {
   return getOption('notifyUpdatesGlobal')
     ? allowed
     : script.config.notifyUpdates ?? allowed;
+}
+
+function notifySingle({ script, text }) {
+  commands.Notification({ text }, undefined, {
+    onClick: () => commands.OpenEditor(script.props.id),
+  });
+}
+
+function notifyMulti(notes) {
+  commands.Notification({
+    text: i18n('titleScriptUpdated'),
+  }, undefined, {
+    type: 'list',
+    items: notes.map(n => ({
+      title: getName(n.script),
+      message: n.text,
+    })),
+    onClick: browser.runtime.openOptionsPage,
+  });
+}
+
+function getName(script) {
+  return script.custom.name || script.meta.name || `#${script.props.id}`;
 }

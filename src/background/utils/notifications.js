@@ -1,18 +1,20 @@
-import { i18n, defaultImage, sendTabCmd } from '#/common';
+import { defaultImage, sendTabCmd } from '#/common';
 import { commands } from './message';
 
 const openers = {};
 
 Object.assign(commands, {
   /** @return {Promise<string>} */
-  async Notification(data, src, bgExtras) {
+  async Notification(data, src, bgExtras = {}) {
+    const { items, onClick, type } = bgExtras;
     const notificationId = await browser.notifications.create({
-      type: 'basic',
-      title: data.title || i18n('extName'),
+      type: type || 'basic',
+      title: data.title || '',
       message: data.text,
       iconUrl: data.image || defaultImage,
+      ...items && { items },
     });
-    openers[notificationId] = bgExtras?.onClick || src.tab.id;
+    openers[notificationId] = onClick || src.tab.id;
     return notificationId;
   },
   RemoveNotification(notificationId) {
