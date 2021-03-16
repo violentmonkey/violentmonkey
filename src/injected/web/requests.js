@@ -87,7 +87,7 @@ async function callback(req, msg) {
       responseHeaders: headers,
       responseText: text,
     } = data;
-    const isText = (details.responseType || 'text') === 'text';
+    const isText = ['json', 'text']::includes(details.responseType || 'text');
     if (!isText && response && !('raw' in req)) {
       req.raw = msg.numChunks > 1
         ? receiveAllChunks(req, response, msg.numChunks)
