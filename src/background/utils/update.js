@@ -60,7 +60,7 @@ async function doCheckUpdate(script, notes) {
       code: await downloadUpdate(script),
       update: { checking: false },
     });
-    msgOk = canNotify(script) && i18n('msgScriptUpdated', [getName(update)]);
+    msgOk = i18n('msgScriptUpdated', [getName(update)]);
     resourceOpts = { headers: NO_HTTP_CACHE };
     return true;
   } catch (update) {
@@ -73,7 +73,7 @@ async function doCheckUpdate(script, notes) {
       msgErr = await fetchResources(script, null, resourceOpts);
       if (process.env.DEBUG && msgErr) console.error(msgErr);
     }
-    if (msgOk || msgErr) {
+    if (canNotify(script) && (msgOk || msgErr)) {
       notes.push({
         script,
         text: [msgOk, msgErr]::trueJoin('\n'),
