@@ -159,7 +159,7 @@ function xhrCallbackWrapper(req) {
   let response;
   let responseText;
   let responseHeaders;
-  const sent = new Set([undefined]);
+  let sent = false;
   const { id, chunkType, xhr } = req;
   // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
   const chunkSize = 64e6 / 4;
@@ -201,7 +201,8 @@ function xhrCallbackWrapper(req) {
       }
     }
     const shouldNotify = req.eventsToNotify.includes(type);
-    const shouldSendResponse = shouldNotify && !sent.has(response);
+    // only send response when XHR is complete
+    const shouldSendResponse = xhr.readyState === 4 && shouldNotify && !sent;
     chainedCallback({
       contentType,
       id,
@@ -220,12 +221,12 @@ function xhrCallbackWrapper(req) {
       },
     });
     if (shouldSendResponse) {
-      sent.add(response);
+      sent = true;
       for (let i = 1; i < numChunks; i += 1) {
         chainedCallback({
           id,
+          chunkIndex: i,
           chunk: getChunk(i),
-          isLastChunk: i === numChunks - 1,
         });
       }
     }
