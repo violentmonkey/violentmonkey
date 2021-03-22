@@ -31,18 +31,22 @@ const { split } = String.prototype;
   const isXml = document instanceof XMLDocument;
   if (!isXml) injectPageSandbox(contentId, webId);
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
-  const data = IS_FIREFOX && Event.prototype.composedPath
+  const scriptData = IS_FIREFOX && Event.prototype.composedPath
     ? await getDataFF(dataPromise)
     : await dataPromise;
   // 1) bridge.post may be overridden in injectScripts
   // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
   bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
-  bridge.isFirefox = data.isFirefox;
-  bridge.injectInto = data.injectInto;
-  if (data.scripts) injectScripts(contentId, webId, data, isXml);
-  if (data.expose) bridge.post('Expose');
-  isPopupShown = data.isPopupShown;
+  bridge.isFirefox = scriptData.isFirefox;
+  bridge.injectInto = scriptData.injectInto;
+  if (scriptData.scripts) injectScripts(contentId, webId, scriptData, isXml);
+  isPopupShown = scriptData.isPopupShown;
   sendSetPopup();
+  // scriptData is the successor of the two ways to request scripts in Firefox,
+  // but it may not contain everything returned by `GetInjected`, for example `expose`.
+  // Use the slower but more complete `injectData` to continue.
+  const injectData = await dataPromise;
+  if (injectData.expose) bridge.post('Expose');
 })().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
 
 bridge.addBackgroundHandlers({
