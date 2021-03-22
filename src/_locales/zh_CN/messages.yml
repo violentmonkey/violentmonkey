@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: 筛选
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: 主页
@@ -369,6 +370,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 名字为空
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 未找到脚本！
@@ -461,6 +463,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 检查更新地址：
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: 单列视图
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: 表格视图
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步时间为 $1

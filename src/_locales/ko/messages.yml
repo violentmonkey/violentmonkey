@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: 필터
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: 홈페이지
@@ -363,6 +364,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 이름 없음
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 스크립트를 찾을 수 없습니다.
@@ -455,6 +457,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: '업데이트 URL:'
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: ''
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: $1에 마지막으로 동기화됨

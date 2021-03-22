@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: Фильтры
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: Домашняя страница
@@ -113,10 +114,15 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Ваши параметры для CodeMirror и аддонов в объекте JSON, например
-    <code>{"indentUnit":2, "smartIndent":true}</code>Однако заметьте, некоторые
-    из них могут не работать в Violentmonkey Смотрите <a
+    <code>{"indentUnit":2, "smartIndent":true}.</code>Однако заметьте, некоторые
+    из них могут не работать в Violentmonkey. Смотрите <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">полный список</a>.
+    rel="noopener noreferrer">полный список</a>. Чтобы использовать
+    настраиваемую тему CodeMirror, укажите имя файла, например<code> "theme":
+    "3024-day"</code> и вставьте <a
+    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    target="_blank" rel="noopener noreferrer">CSS актуальной темы</a> темы в
+    поле "Пользовательский стиль" ниже.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Документация по блоку метаданных скриптов и <code>GM</code> API:'
@@ -134,10 +140,14 @@ editLabelSettings:
   message: Настройки скрипта
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: Слишком длинная строка
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: |-
+    Эта строка слишком длинная и ее текст свернут,
+    чтобы избежать задержек при редактировании.
+    Вы можете настроить лимит в доп. настройках,
+    например:\"maxDisplayLength\": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Код
@@ -149,10 +159,10 @@ editNavValues:
   message: Данные
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: ''
+  message: Все
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Показать/отредактировать хранилище значений скрипта
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: Отмена
@@ -197,7 +207,7 @@ filterScopeName:
   message: Имя
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Ошибка
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: выключено
@@ -256,7 +266,7 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: Текущие скрипты будут работать до перезагрузки вкладки.
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Проверять наличие обновлений скриптов каждые $1 дней, 0 для отключения'
@@ -301,7 +311,7 @@ labelEditValue:
   message: Редактировать скрипт
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Редактирование хранилища скриптов
 labelEditor:
   description: Label for Editor settings
   message: Редактор
@@ -316,7 +326,7 @@ labelExportScriptData:
   message: Экспорт данных скриптов
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'Публиковать установленную версию в каталоге userscripts: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
@@ -337,7 +347,7 @@ labelHomepageURL:
   message: 'URL страницы скрипта:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Импорт данных скрипта
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Импорт настроек
@@ -368,6 +378,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Без имени
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Скрипты не найдены.
@@ -460,6 +471,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL обновления:'
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: ''
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: Последняя синхронизация в $1
@@ -480,10 +499,15 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Исключать...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: |-
+    Текущая вкладка будет автоматически перезагружена,
+    если вы включили эту опцию в общих настройках.
+    Чтобы применить изменения к остальным вкладкам,
+    перезагрузите их вручную.
+    Настраивается в \"Настройки\" редактора.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Найти скрипты для этого сайта
@@ -592,7 +616,7 @@ msgScriptUpdated:
   message: 'Скрипт [$1] обновлен!'
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Показать/скрыть
 msgSyncError:
   description: Message shown when sync failed.
   message: Ошибка синхронизации.
@@ -619,15 +643,17 @@ noValues:
   message: Значения не сохраняются
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: Из всплывающего окна открывать редактор в новом окне
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: >-
+    Положение окна редактора будет запоминаться только при изменении размера или
+    сохранении
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Скрыть омнибокс
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Сначала включенные
@@ -668,7 +694,7 @@ valueLabelValue:
   message: Значение (в формате JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Все значения (в формате JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Сайт расширения

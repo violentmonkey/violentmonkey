@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: Filters
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: Website
@@ -379,6 +380,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Naamloos
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Er zijn geen scripts gevonden.
@@ -471,6 +473,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Bijwerk-url:'
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: Eén kolom
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: Tabelweergave
 lastSync:
   description: Label for last sync timestamp.
   message: Gesynchroniseerd op $1
