@@ -9,17 +9,28 @@ import { commands } from './message';
 const VM_VERIFY = 'VM-Verify';
 const requests = {};
 const verify = {};
+const tabRequests = {};
 
 Object.assign(commands, {
   ConfirmInstall: confirmInstall,
   /** @return {string} */
-  GetRequestId(eventsToNotify = []) {
+  GetRequestId(eventsToNotify = [], src) {
     const id = getUniqId();
+    const tabId = src.tab?.id;
     requests[id] = {
       id,
+      tabId,
       eventsToNotify,
       xhr: new XMLHttpRequest(),
     };
+    if (tabId) {
+      let set = tabRequests[tabId];
+      if (!set) {
+        set = new Set();
+        tabRequests[tabId] = set;
+      }
+      set.add(id);
+    }
     return id;
   },
   /** @return {void} */
@@ -300,6 +311,7 @@ function clearRequest(req) {
   if (req.coreId) delete verify[req.coreId];
   delete requests[req.id];
   HeaderInjector.del(req.id);
+  tabRequests[req.tabId]?.delete(req.id);
 }
 
 function decodeBody(obj) {
@@ -460,5 +472,25 @@ async function maybeInstallUserJs(tabId, url) {
   } else {
     cache.put(`bypass:${url}`, true, 10e3);
     if (tabId >= 0) browser.tabs.update(tabId, { url });
+  }
+}
+
+browser.tabs.onUpdated.addListener((tabId, changes) => {
+  if (changes.status === 'loading') {
+    clearRequestsByTabId(tabId);
+  }
+});
+
+browser.tabs.onRemoved.addListener((tabId) => {
+  clearRequestsByTabId(tabId);
+});
+
+function clearRequestsByTabId(tabId) {
+  const set = tabRequests[tabId];
+  if (set) {
+    delete tabRequests[tabId];
+    for (const id of set) {
+      commands.AbortRequest(id);
+    }
   }
 }
