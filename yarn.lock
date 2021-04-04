@@ -884,6 +884,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.13.10":
+  version "7.13.10"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.13.10.tgz#47d42a57b6095f4468da440388fdbad8bebf0d7d"
+  integrity sha512-4QPkjJq6Ns3V/RgpEahRk+AGfL0eO6RHHtTWoNNr5mO49G6B5+X6d6THgWEAvTrznU5xYpbAlVKRYcsCgh/Akw==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/template@^7.8.3", "@babel/template@^7.8.6":
   version "7.8.6"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.8.6.tgz#86b22af15f828dfb086474f964dcc3e39c43ce2b"
@@ -930,7 +937,7 @@
 "@gera2ld/locky@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@gera2ld/locky/-/locky-0.1.1.tgz#b4e073fcaa09e7707ae9ebe1dcaedd28ef573cdd"
-  integrity sha1-tOBz/KoJ53B66evh3K7dKO9XPN0=
+  integrity sha512-UDVph84c8rgRv4PzPzjiADdc0tfx0ZoH2f4cp+Vxvap0GGiLLyDR+e6RIEjVIMWMg+i+KtwpgWm4ukqy5eNxxA==
   dependencies:
     commander "^5.0.0"
 
@@ -1124,6 +1131,13 @@
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.2.tgz#690a1475b84f2a884fd07cd797c00f5f31356ea8"
   integrity sha512-ce5d3q03Ex0sy4R14722Rmt6MT07Ua+k4FwDfdcToYJcMKNtRVQvJ6JCAPdAmAnbRb6CsX6aYb9m96NGod9uTw==
+
+"@violentmonkey/shortcut@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@violentmonkey/shortcut/-/shortcut-1.2.3.tgz#69babec2a5228361e7496390254926289d8a3b34"
+  integrity sha512-3B7wrsH3Q9WOAPT/RCBCrWCjBf8T7Ngeo8h5voU+E2MaV+5EMNEbD0E/DZ/sPYgKfGJPKWmBPPcYsZbywWnahA==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
 
 "@vue/component-compiler-utils@^3.1.0":
   version "3.1.1"

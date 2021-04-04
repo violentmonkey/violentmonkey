@@ -35,7 +35,6 @@ aside {
     padding-bottom: .6rem;
     font-size: 1rem;
     font-weight: 500;
-    text-decoration: none;
     color: var(--fill-8);
     &.active,
     &:hover {
