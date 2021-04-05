@@ -481,10 +481,10 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Jeden stĺpec
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Tabuľkové zobrazenie
 lastSync:
   description: Label for last sync timestamp.
   message: Posledná synchronizácia $1
