@@ -128,7 +128,7 @@
             @update="handleActionUpdate"
             @move="moveScript"
             @scrollDelta="handleSmoothScroll"
-            @toggleHint="showHotkeys = !showHotkeys"
+            @tiptoggle.native="showHotkeys = !showHotkeys"
           />
         </div>
         <div
@@ -538,6 +538,7 @@ export default {
       sendCmd('CheckUpdate', script.props.id);
     },
     handleSmoothScroll(delta) {
+      if (!delta) return;
       const el = this.$refs.scriptList;
       el.scroll({
         top: el.scrollTop + delta,
@@ -578,7 +579,6 @@ export default {
         if (this.selectedScript) this.showHotkeys = !this.showHotkeys;
       }, [
         ['enter', `${conditionAll} && scriptFocus`],
-        ['?', conditionNotSearch, true],
       ]),
       ...registerHotkey(() => {
         this.showHotkeys = false;

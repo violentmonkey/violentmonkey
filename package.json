@@ -67,7 +67,7 @@
     "core-js": "^3.6.4",
     "tldjs": "^2.3.1",
     "vue": "^2.6.11",
-    "vueleton": "^1.0.4"
+    "vueleton": "^1.0.6"
   },
   "engines": {
     "node": ">=10"

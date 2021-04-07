@@ -19,11 +19,23 @@ function handleFocus(e) {
 function handleBlur(e) {
   if (isInput(e.target)) {
     keyboardService.setContext('inputFocus', false);
+  } else {
+    const event = new CustomEvent('tiphide', {
+      bubbles: true,
+    });
+    e.target.dispatchEvent(event);
   }
 }
 
 function handleEscape() {
   document.activeElement.blur();
+}
+
+export function toggleTip(el) {
+  const event = new CustomEvent('tiptoggle', {
+    bubbles: true,
+  });
+  el.dispatchEvent(event);
 }
 
 function bindKeys() {
@@ -36,5 +48,11 @@ function bindKeys() {
     activeElement.click();
   }, {
     condition: '!inputFocus',
+  });
+  keyboardService.register('?', () => {
+    toggleTip(document.activeElement);
+  }, {
+    condition: '!inputFocus',
+    caseSensitive: true,
   });
 }

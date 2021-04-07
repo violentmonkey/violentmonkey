@@ -80,7 +80,7 @@
               class="btn-ghost"
               @click="onUpdate"
               :data-hotkey="hotkeys.update"
-              :tabIndex="tabIndex">
+              :tabIndex="canUpdate ? tabIndex : -1">
               <icon name="refresh"></icon>
             </a>
           </tooltip>
@@ -91,12 +91,12 @@
               target="_blank"
               rel="noopener noreferrer"
               :href="homepageURL"
-              :tabIndex="tabIndex">
+              :tabIndex="homepageURL ? tabIndex : -1">
               <icon name="home"></icon>
             </a>
           </tooltip>
           <tooltip :disabled="!description" :content="description" align="start">
-            <a class="btn-ghost" :tabIndex="tabIndex">
+            <a class="btn-ghost" :tabIndex="description ? tabIndex : -1" @click="toggleTip">
               <icon name="info"></icon>
             </a>
           </tooltip>
@@ -108,7 +108,7 @@
               class="btn-ghost"
               target="_blank"
               rel="noopener noreferrer"
-              :tabIndex="tabIndex"
+              :tabIndex="script.meta.supportURL ? tabIndex : -1"
               :href="script.meta.supportURL">
               <icon name="question"></icon>
             </a>
@@ -129,7 +129,7 @@
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { getLocaleString, formatTime } from '#/common';
 import Icon from '#/common/ui/icon';
-import { keyboardService, isInput } from '#/common/keyboard';
+import { keyboardService, isInput, toggleTip } from '#/common/keyboard';
 import enableDragging from '../utils/dragging';
 
 const itemMargin = 8;
@@ -219,15 +219,18 @@ export default {
         const rect = $el.getBoundingClientRect();
         const pRect = $el.parentNode.getBoundingClientRect();
         let delta = 0;
-        if (rect.bottom > pRect.bottom) {
+        if (rect.bottom > pRect.bottom - itemMargin) {
           delta += rect.bottom - pRect.bottom + itemMargin;
-        } else if (rect.top < pRect.top) {
+        } else if (rect.top < pRect.top + itemMargin) {
           delta -= pRect.top - rect.top + itemMargin;
         }
+        if (!isInput(document.activeElement)) {
+          // focus without scrolling, then scroll smoothly
+          const { scrollTop } = $el.parentNode;
+          $el.focus();
+          $el.parentNode.scrollTop = scrollTop;
+        }
         this.$emit('scrollDelta', delta);
-        this.$nextTick(() => {
-          if (!isInput(document.activeElement)) $el.focus();
-        });
       }
     },
   },
@@ -257,6 +260,9 @@ export default {
     },
     onBlur() {
       keyboardService.setContext('scriptFocus', false);
+    },
+    toggleTip(e) {
+      toggleTip(e.target);
     },
   },
 };
