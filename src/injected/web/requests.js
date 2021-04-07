@@ -205,7 +205,7 @@ async function encodeBody(body) {
       reader::readAsArrayBuffer(body);
     });
   default:
-    if (body) return { cls, value: jsonDump(body) };
+    if (body != null) return { cls, value: jsonDump(body) };
   }
 }
 
