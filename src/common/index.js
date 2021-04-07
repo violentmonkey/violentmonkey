@@ -102,6 +102,10 @@ export function getLocaleString(meta, key) {
   return localeMeta || meta[key] || '';
 }
 
+export function getScriptName(script) {
+  return script.custom.name || getLocaleString(script.meta, 'name') || `#${script.props.id}`;
+}
+
 export function getFullUrl(url, base) {
   const obj = new URL(url, base);
   // Use protocol whitelist to filter URLs

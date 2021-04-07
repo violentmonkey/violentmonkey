@@ -164,7 +164,7 @@
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { INJECT_AUTO } from '#/common/consts';
 import options from '#/common/options';
-import { getLocaleString, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
+import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
 import { mutex, store } from '../utils';
@@ -217,7 +217,7 @@ export default {
         if (hideDisabled) list = list.filter(script => script.config.enabled);
         list = list.map((script, i) => {
           const { config, custom, meta } = script;
-          const scriptName = custom.name || getLocaleString(meta, 'name');
+          const scriptName = getScriptName(script);
           return {
             name: scriptName,
             data: script,

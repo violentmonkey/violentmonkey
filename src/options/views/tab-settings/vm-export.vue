@@ -22,7 +22,7 @@
 
 <script>
 import Modal from 'vueleton/lib/modal/bundle';
-import { sendCmd, getLocaleString } from '#/common';
+import { getScriptName, sendCmd } from '#/common';
 import { objectGet } from '#/common/object';
 import options from '#/common/options';
 import ua from '#/common/ua';
@@ -59,9 +59,6 @@ export default {
       .then(() => {
         this.exporting = false;
       });
-    },
-    getName(item) {
-      return item.script.custom.name || getLocaleString(item.script.meta, 'name');
     },
   },
 };
@@ -154,7 +151,7 @@ function exportData() {
     delete vm.settings.sync;
     if (withValues) vm.values = {};
     const files = (objectGet(data, 'items') || []).map(({ script, code }) => {
-      let name = normalizeFilename(script.custom.name || script.meta.name || script.props.id);
+      let name = normalizeFilename(getScriptName(script));
       if (names[name]) {
         names[name] += 1;
         name = `${name}_${names[name]}`;

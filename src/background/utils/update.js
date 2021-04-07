@@ -1,4 +1,4 @@
-import { i18n, request, compareVersion, sendCmd, trueJoin } from '#/common';
+import { getScriptName, i18n, request, compareVersion, sendCmd, trueJoin } from '#/common';
 import { CMD_SCRIPT_UPDATE } from '#/common/consts';
 import ua from '#/common/ua';
 import { fetchResources, getScriptById, getScripts, parseScript } from './db';
@@ -60,7 +60,7 @@ async function doCheckUpdate(script, notes) {
       code: await downloadUpdate(script),
       update: { checking: false },
     });
-    msgOk = i18n('msgScriptUpdated', [getName(update)]);
+    msgOk = i18n('msgScriptUpdated', [getScriptName(update)]);
     resourceOpts = { headers: NO_HTTP_CACHE };
     return true;
   } catch (update) {
@@ -140,8 +140,4 @@ function notify({
   }, undefined, {
     onClick,
   });
-}
-
-function getName(script) {
-  return script.custom.name || script.meta.name || `#${script.props.id}`;
 }

@@ -61,7 +61,7 @@
 
 <script>
 import CodeMirror from 'codemirror';
-import { debounce, i18n, isEmpty, sendCmd, trueJoin } from '#/common';
+import { debounce, getScriptName, i18n, isEmpty, sendCmd, trueJoin } from '#/common';
 import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import { showMessage } from '#/common/ui';
 import VmCode from '#/common/ui/code';
@@ -172,8 +172,7 @@ export default {
       };
     },
     scriptName() {
-      const { custom, meta } = this.script || {};
-      const scriptName = custom && custom.name || meta && meta.name;
+      const scriptName = this.script && getScriptName(this.script);
       store.title = scriptName;
       return scriptName;
     },

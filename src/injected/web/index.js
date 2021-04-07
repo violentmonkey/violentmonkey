@@ -102,7 +102,7 @@ async function onCodeSet(item, fn) {
   // deleting now to prevent interception via DOMNodeRemoved on el::remove()
   delete window[dataKey];
   if (process.env.DEBUG) {
-    log('info', [bridge.mode], item.custom.name || item.meta.name || item.props.id);
+    log('info', [bridge.mode], item.displayName);
   }
   const run = () => wrapGM(item)::fn(logging.error);
   const el = document::getCurrentScript();

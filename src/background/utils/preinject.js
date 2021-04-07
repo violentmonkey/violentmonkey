@@ -1,4 +1,4 @@
-import { getUniqId } from '#/common';
+import { getScriptName, getUniqId } from '#/common';
 import { INJECT_CONTENT, INJECTABLE_TAB_URL_RE, METABLOCK_RE } from '#/common/consts';
 import initCache from '#/common/cache';
 import storage from '#/common/storage';
@@ -136,7 +136,8 @@ function prepareScript(script, index, scripts) {
   const { require, values } = this;
   const code = this.code[id];
   const dataKey = getUniqId('VMin');
-  const name = encodeURIComponent(meta.name.replace(/[#&',/:;?@=]/g, replaceWithFullWidthForm));
+  const displayName = getScriptName(script);
+  const name = encodeURIComponent(displayName.replace(/[#&',/:;?@=]/g, replaceWithFullWidthForm));
   const isContent = (custom.injectInto || meta.injectInto || injectInto) === INJECT_CONTENT;
   const pathMap = custom.pathMap || {};
   const reqs = meta.require?.map(key => require[pathMap[key] || key]).filter(Boolean);
@@ -164,6 +165,7 @@ function prepareScript(script, index, scripts) {
   scripts[index] = {
     ...script,
     dataKey,
+    displayName,
     code: isContent ? '' : injectedCode,
     metaStr: code.match(METABLOCK_RE)[1] || '',
     values: values[id],
