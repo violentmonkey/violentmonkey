@@ -22,9 +22,9 @@
       <label class="sync-server-url">
         <span v-text="i18n('labelSyncServerUrl')"></span>
         <input
-          type="text"
+          type="url"
           v-model="state.userConfig.serverUrl"
-          :disabled="!state.canAuthorize || state.userConfig.anonymous"
+          :disabled="!state.canAuthorize"
         />
       </label>
       <div class="mr-2c">
