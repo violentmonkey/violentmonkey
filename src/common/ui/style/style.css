@@ -100,6 +100,7 @@ input[disabled] ~ * {
   opacity: .5;
 }
 input[type=text],
+input[type=url],
 input[type=search],
 input[type=password] {
   line-height: 1.5rem;
@@ -113,6 +114,7 @@ textarea {
   width: 100%;
 }
 input[type=text],
+input[type=url],
 input[type=search],
 input[type=password],
 textarea {
@@ -390,6 +392,7 @@ body .vl-tooltip {
     border-radius: 1em;
   }
   input[type="text"],
+  input[type="url"],
   input[type="search"],
   input[type="number"],
   input[type="password"],
