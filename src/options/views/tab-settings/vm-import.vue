@@ -68,13 +68,14 @@ async function importBackup(file) {
   if (!file) return;
   reports.length = 0;
   const zip = await loadZipLibrary();
-  const entries = await getAllEntries().catch(report) || [];
+  const reader = new zip.ZipReader(new zip.BlobReader(file));
+  const entries = await reader.getEntries().catch(report) || [];
   if (reports.length) return;
   report('', file.name, 'info');
   const uriMap = {};
   const total = entries.reduce((n, entry) => n + entry.filename?.endsWith('.user.js'), 0);
   const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
-  const vm = await readContents(vmEntry) || {};
+  const vm = vmEntry && await readContents(vmEntry) || {};
   if (!vm.scripts) vm.scripts = {};
   if (!vm.values) vm.values = {};
   await processAll(readScriptOptions, '.options.json');
@@ -90,14 +91,8 @@ async function importBackup(file) {
   }
   sendCmd('CheckPosition');
   showMessage({ text: reportProgress() });
+  await reader.close();
 
-  function getAllEntries() {
-    return new Promise((resolve, reject) => {
-      zip.createReader(new zip.BlobReader(file),
-        reader => reader.getEntries(resolve),
-        reject);
-    });
-  }
   function parseJson(text, entry) {
     try {
       return JSON.parse(text);
@@ -114,12 +109,9 @@ async function importBackup(file) {
       }
     }));
   }
-  function readContents(entry) {
-    return entry && new Promise(resolve => {
-      entry.getData(new zip.TextWriter(), text => {
-        resolve(entry.filename.endsWith('.js') ? text : parseJson(text, entry));
-      });
-    });
+  async function readContents(entry) {
+    const text = await entry.getData(new zip.TextWriter());
+    return entry.filename.endsWith('.js') ? text : parseJson(text, entry);
   }
   async function readScript(entry, code, name) {
     const { filename } = entry;

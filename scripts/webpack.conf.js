@@ -75,7 +75,10 @@ const skipReinjectionConfig = (config, test) => config.plugins.push(
   }));
 
 module.exports = Promise.all([
-  modify(null, config => skipReinjectionConfig(config, /^browser\.js$/)),
+  modify(null, config => {
+    config.output.publicPath = '/';
+    skipReinjectionConfig(config, /^browser\.js$/);
+  }),
   modify({
     pages: {
       injected: {

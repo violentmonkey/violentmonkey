@@ -62,6 +62,7 @@ exports.optimization = {
       ...splitVendor('codemirror'),
       ...splitVendor('tldjs'),
       ...splitVendor('vue'),
+      ...splitVendor('@zip'),
     },
   },
 };
