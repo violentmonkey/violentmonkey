@@ -3,7 +3,6 @@ import { sendCmdDirectly, i18n, getLocaleString } from '#/common';
 import handlers from '#/common/handlers';
 import { loadScriptIcon } from '#/common/load-script-icon';
 import options from '#/common/options';
-import loadZip from '#/common/zip';
 import '#/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
@@ -25,11 +24,6 @@ function initialize() {
   })
   .$mount();
   document.body.append(vm.$el);
-  loadZip()
-  .then((zip) => {
-    store.zip = zip;
-    zip.workerScriptsPath = '/public/lib/zip.js/';
-  });
 }
 
 async function initScript(script) {

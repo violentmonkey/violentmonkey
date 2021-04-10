@@ -2,11 +2,8 @@ const fs = require('fs').promises;
 const gulp = require('gulp');
 const del = require('del');
 const log = require('fancy-log');
-const gulpFilter = require('gulp-filter');
-const uglify = require('gulp-uglify');
 const plumber = require('gulp-plumber');
 const Sharp = require('sharp');
-const { isProd } = require('@gera2ld/plaid/util');
 const spawn = require('cross-spawn');
 const i18n = require('./scripts/i18n');
 const { getVersion, isBeta } = require('./scripts/version-helper');
@@ -16,9 +13,6 @@ const pkg = require('./package.json');
 const DIST = 'dist';
 const paths = {
   manifest: 'src/manifest.yml',
-  copy: [
-    'src/public/lib/**',
-  ],
   locales: [
     'src/_locales/**',
   ],
@@ -33,7 +27,6 @@ function clean() {
 
 function watch() {
   gulp.watch(paths.manifest, manifest);
-  gulp.watch(paths.copy, copyFiles);
   gulp.watch(paths.locales.concat(paths.templates), copyI18n);
 }
 
@@ -120,17 +113,6 @@ async function bump() {
   }
 }
 
-function copyFiles() {
-  const jsFilter = gulpFilter(['**/*.js'], { restore: true });
-  let stream = gulp.src(paths.copy, { base: 'src' });
-  if (isProd) stream = stream
-  .pipe(jsFilter)
-  .pipe(uglify())
-  .pipe(jsFilter.restore);
-  return stream
-  .pipe(gulp.dest(DIST));
-}
-
 function checkI18n() {
   return i18n.read({
     base: 'src/_locales',
@@ -171,7 +153,7 @@ function logError(err) {
   return this.emit('end');
 }
 
-const pack = gulp.parallel(manifest, createIcons, copyFiles, copyI18n);
+const pack = gulp.parallel(manifest, createIcons, copyI18n);
 
 exports.clean = clean;
 exports.manifest = manifest;

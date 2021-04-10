@@ -109,6 +109,7 @@ import options from '#/common/options';
 import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
 import LocaleGroup from '#/common/ui/locale-group';
+import loadZip from '#/common/zip';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
@@ -194,6 +195,8 @@ export default {
       this.$watch(() => settings[name], debounce(this.getUpdater(item), 300));
     });
     this.expose = Object.keys(options.get('expose')).map(k => [k, decodeURIComponent(k)]);
+    // Preload zip.js when user visits settings tab
+    loadZip();
   },
   beforeDestroy() {
     this.revokers.forEach((revoke) => { revoke(); });
