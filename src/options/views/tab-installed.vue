@@ -516,6 +516,14 @@ export default {
   .vl-dropdown.active .vl-tooltip-wrap {
     display: none;
   }
+  @media (max-width: 500px) { // same size as `hidden-sm` in #/common/ui/style/style.css
+    .vl-dropdown-right .vl-dropdown-menu {
+      position: fixed;
+      top: auto;
+      left: 0;
+      right: auto;
+    }
+  }
 }
 .backdrop {
   text-align: center;
