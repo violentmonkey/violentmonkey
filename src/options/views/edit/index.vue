@@ -172,7 +172,8 @@ export default {
       };
     },
     scriptName() {
-      const scriptName = this.script && getScriptName(this.script);
+      const { script } = this;
+      const scriptName = script?.meta && getScriptName(script);
       store.title = scriptName;
       return scriptName;
     },
