@@ -456,7 +456,7 @@ body .vl-tooltip {
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 500px) { /* This value is also used in other files */
   .hidden-sm {
     display: none !important;
   }
