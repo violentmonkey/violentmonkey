@@ -153,12 +153,20 @@ function logError(err) {
   return this.emit('end');
 }
 
+function copyZip() {
+  return gulp.src([
+    'node_modules/@zip.js/zip.js/dist/zip-no-worker.min.js',
+    'node_modules/@zip.js/zip.js/dist/z-worker.js',
+  ])
+    .pipe(gulp.dest(`${DIST}/public/lib`));
+}
+
 const pack = gulp.parallel(manifest, createIcons, copyI18n);
 
 exports.clean = clean;
 exports.manifest = manifest;
-exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
-exports.build = gulp.series(clean, gulp.parallel(pack, jsProd));
+exports.dev = gulp.series(gulp.parallel(copyZip, pack, jsDev), watch);
+exports.build = gulp.series(clean, gulp.parallel(copyZip, pack, jsProd));
 exports.i18n = updateI18n;
 exports.check = checkI18n;
 exports.copyI18n = copyI18n;
