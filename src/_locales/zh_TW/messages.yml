@@ -251,7 +251,7 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: 目前的腳本會繼續執行，直到您重新載入分頁
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 每 $1 天檢查腳本更新，用 0 停用
@@ -484,7 +484,7 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: 排除...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: ''
@@ -596,7 +596,7 @@ msgScriptUpdated:
   message: 腳本【$1】已更新！
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: 顯示/隱藏
 msgSyncError:
   description: Message shown when sync failed.
   message: 同步出錯！
