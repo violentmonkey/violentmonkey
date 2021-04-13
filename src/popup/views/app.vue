@@ -19,6 +19,7 @@
         :content="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
         placement="bottom"
         align="end"
+        :tabIndex="tabIndex"
         @click.native="onToggle">
         <icon :name="getSymbolCheck(options.isApplied)"></icon>
       </tooltip>
@@ -27,6 +28,7 @@
         :content="i18n('menuDashboard')"
         placement="bottom"
         align="end"
+        :tabIndex="tabIndex"
         @click.native="onManage">
         <icon name="cog"></icon>
       </tooltip>
@@ -35,12 +37,16 @@
         :content="i18n('menuNewScript')"
         placement="bottom"
         align="end"
+        :tabIndex="tabIndex"
         @click.native="onCreateScript">
         <icon name="plus"></icon>
       </tooltip>
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
-      <div class="menu-item menu-area menu-find" @click="onFindSameDomainScripts">
+      <div
+        class="menu-item menu-area menu-find"
+        :tabIndex="tabIndex"
+        @click="onFindSameDomainScripts">
         <icon name="search"></icon>
         <div class="flex-1" v-text="i18n('menuFindScripts')"></div>
       </div>
@@ -63,7 +69,10 @@
       }"
       :data-type="scope.name"
       :key="scope.name">
-      <div class="menu-item menu-area menu-group" @click="toggleMenu(scope.name)">
+      <div
+        class="menu-item menu-area menu-group"
+        :tabIndex="tabIndex"
+        @click="toggleMenu(scope.name)">
         <div class="flex-auto" v-text="scope.title" :data-totals="scope.totals" />
         <icon name="arrow" class="icon-collapse"></icon>
       </div>
@@ -77,12 +86,18 @@
             removed: item.data.config.removed,
             'extras-shown': activeExtras === item,
             'excludes-shown': item.excludesValue,
+            focused: focusedItem === item,
           }"
           class="script"
-          @mouseenter="message = item.name"
-          @mouseleave="message = ''">
+          @mouseenter="activeItem = item; message = item.name"
+          @mouseleave="activeItem = null; message = ''">
           <div
             class="menu-item menu-area"
+            :tabIndex="tabIndex"
+            @focus="focusedItem = item; activeItem = item; message = item.name"
+            @blur="focusedItem = null; message = ''"
+            @mouseenter="focusedItem = item"
+            @mouseleave="focusedItem = null"
             @click="onToggleScript(item)">
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
@@ -91,13 +106,16 @@
                  @contextmenu.exact.stop="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
-          <div class="submenu-buttons">
+          <div class="submenu-buttons" v-show="activeExtras === item || activeItem === item">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
-            <div class="submenu-button" @click="onEditScript(item)"
+            <div class="submenu-button" :tabIndex="tabIndex" @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
               <icon name="code"></icon>
             </div>
-            <div class="submenu-button" @click.stop="toggleExtras(item, $event)">
+            <div
+              class="submenu-button"
+              :tabIndex="tabIndex"
+              @click.stop="toggleExtras(item, $event)">
               <icon name="more"/>
             </div>
           </div>
@@ -125,7 +143,10 @@
               class="menu-item menu-area"
               v-for="(cap, i) in store.commands[item.data.props.id]"
               :key="i"
+              :tabIndex="tabIndex"
               @click="onCommand(item.data.props.id, cap)"
+              @focus="message = cap"
+              @blur="message = item.name"
               @mouseenter="message = cap"
               @mouseleave="message = item.name">
               <icon name="command" />
@@ -145,16 +166,17 @@
        v-if="store.currentTab && store.currentTab.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
     <footer>
-      <span @click="onVisitWebsite" v-text="i18n('visitWebsite')" />
+      <span :tabIndex="tabIndex" @click="onVisitWebsite" v-text="i18n('visitWebsite')" />
     </footer>
     <div class="message" v-if="message">
       <div v-text="message"></div>
     </div>
     <div v-if="activeExtras" class="extras-menu" ref="extrasMenu">
-      <a v-if="activeExtras.home" :href="activeExtras.home" v-text="i18n('buttonHome')"
+      <a v-if="activeExtras.home" tabindex="0" :href="activeExtras.home" v-text="i18n('buttonHome')"
          rel="noopener noreferrer" target="_blank"/>
-      <div v-text="i18n('menuExclude')" @click="onExclude"/>
+      <div v-text="i18n('menuExclude')" tabindex="0" @click="onExclude"/>
       <div v-text="activeExtras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
+           tabindex="0"
            @click="onRemoveScript(activeExtras)"/>
     </div>
   </div>
@@ -167,6 +189,7 @@ import options from '#/common/options';
 import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
+import { keyboardService } from '#/common/keyboard';
 import { mutex, store } from '../utils';
 
 const SCRIPT_CLS = '.script';
@@ -197,8 +220,10 @@ export default {
       store,
       options: optionsData,
       activeMenu: 'scripts',
+      activeItem: null,
       activeExtras: null,
       message: null,
+      focusedItem: null,
     };
   },
   computed: {
@@ -259,6 +284,9 @@ export default {
         || ''
       );
     },
+    tabIndex() {
+      return this.activeExtras ? -1 : 0;
+    },
   },
   methods: {
     toggleMenu(name) {
@@ -266,13 +294,14 @@ export default {
     },
     toggleExtras(item, evt) {
       this.activeExtras = this.activeExtras === item ? null : item;
+      keyboardService.setContext('activeExtras', this.activeExtras);
       if (this.activeExtras) {
         item.el = evt.target.closest(SCRIPT_CLS);
         this.$nextTick(() => {
           const { extrasMenu } = this.$refs;
           extrasMenu.style.top = `${
             Math.min(window.innerHeight - extrasMenu.getBoundingClientRect().height,
-              evt.currentTarget.getBoundingClientRect().top + 16)
+              (evt.currentTarget || evt.target).getBoundingClientRect().top + 16)
           }px`;
         });
       }
@@ -370,14 +399,15 @@ export default {
     },
   },
   mounted() {
-    // close the extras menu on Escape key
-    window.addEventListener('keydown', evt => {
-      if (this.activeExtras
-      && evt.key === 'Escape' && !evt.shiftKey && !evt.ctrlKey && !evt.altKey && !evt.metaKey) {
-        evt.preventDefault();
-        this.toggleExtras(null);
-      }
+    keyboardService.enable();
+    keyboardService.register('escape', () => {
+      this.toggleExtras(null);
+    }, {
+      condition: 'activeExtras',
     });
+  },
+  beforeDestroy() {
+    keyboardService.disable();
   },
 };
 </script>
