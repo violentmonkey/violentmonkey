@@ -475,17 +475,14 @@ async function maybeInstallUserJs(tabId, url) {
   }
 }
 
-browser.tabs.onUpdated.addListener((tabId, changes) => {
-  if (changes.status === 'loading') {
-    clearRequestsByTabId(tabId);
-  }
-});
+// In Firefox with production code of Violentmonkey, scripts can be injected before `tabs.onUpdated` is fired.
+// Ref: https://github.com/violentmonkey/violentmonkey/issues/1255
 
 browser.tabs.onRemoved.addListener((tabId) => {
   clearRequestsByTabId(tabId);
 });
 
-function clearRequestsByTabId(tabId) {
+export function clearRequestsByTabId(tabId) {
   const set = tabRequests[tabId];
   if (set) {
     delete tabRequests[tabId];

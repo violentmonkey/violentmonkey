@@ -13,10 +13,10 @@ import { getOption, hookOptions } from './utils/options';
 import { getInjectedScripts } from './utils/preinject';
 import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
 import { resetValueOpener, addValueOpener } from './utils/values';
+import { clearRequestsByTabId } from './utils/requests';
 import './utils/clipboard';
 import './utils/hotkeys';
 import './utils/notifications';
-import './utils/requests';
 import './utils/script';
 import './utils/tabs';
 import './utils/tester';
@@ -62,7 +62,10 @@ Object.assign(commands, {
   /** @return {Promise<Object>} */
   async GetInjected(_, src) {
     const { frameId, tab, url } = src;
-    if (!frameId) resetValueOpener(tab.id);
+    if (!frameId) {
+      resetValueOpener(tab.id);
+      clearRequestsByTabId(tab.id);
+    }
     const res = {
       expose: !frameId && url.startsWith('https://') && expose[url.split('/', 3)[2]],
     };
