@@ -89,6 +89,7 @@
             focused: focusedItem === item,
           }"
           class="script"
+          @mouseover="blur"
           @mouseenter="activeItem = item; message = item.name"
           @mouseleave="activeItem = null; message = ''">
           <div
@@ -123,7 +124,7 @@
             <textarea v-model="item.excludesValue" spellcheck="false"/>
             <div>
               <button v-text="i18n('buttonOK')" @click="onExcludeSave(item)"/>
-              <button v-text="i18n('buttonCancel')" @click="item.excludesValue = null"/>
+              <button v-text="i18n('buttonCancel')" @click="onExcludeClose(item)"/>
               <!-- not using tooltip to preserve line breaks -->
               <details>
                 <summary><icon name="info"/></summary>
@@ -146,9 +147,9 @@
               :tabIndex="tabIndex"
               @click="onCommand(item.data.props.id, cap)"
               @focus="message = cap"
-              @blur="message = item.name"
+              @blur="message = ''"
               @mouseenter="message = cap"
-              @mouseleave="message = item.name">
+              @mouseleave="message = ''">
               <icon name="command" />
               <div class="flex-auto ellipsis" v-text="cap" />
             </div>
@@ -168,7 +169,7 @@
     <footer>
       <span :tabIndex="tabIndex" @click="onVisitWebsite" v-text="i18n('visitWebsite')" />
     </footer>
-    <div class="message" v-if="message">
+    <div class="message" v-show="message">
       <div v-text="message"></div>
     </div>
     <div v-if="activeExtras" class="extras-menu" ref="extrasMenu">
@@ -189,7 +190,7 @@ import options from '#/common/options';
 import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
-import { keyboardService } from '#/common/keyboard';
+import { keyboardService, isInput } from '#/common/keyboard';
 import { mutex, store } from '../utils';
 
 const SCRIPT_CLS = '.script';
@@ -209,6 +210,18 @@ options.hook((changes) => {
     };
   }
 });
+
+function compareBy(...keys) {
+  return (a, b) => {
+    for (const key of keys) {
+      const ka = key(a);
+      const kb = key(b);
+      if (ka < kb) return -1;
+      if (ka > kb) return 1;
+    }
+    return 0;
+  };
+}
 
 export default {
   components: {
@@ -387,6 +400,10 @@ export default {
         area.focus();
       });
     },
+    onExcludeClose(item) {
+      item.excludesValue = null;
+      this.focus(item);
+    },
     async onExcludeSave(item) {
       await sendCmd('UpdateScriptInfo', {
         id: item.data.props.id,
@@ -394,20 +411,80 @@ export default {
           excludeMatch: item.excludesValue.split('\n').map(line => line.trim()).filter(Boolean),
         },
       });
-      item.excludesValue = null;
+      this.onExcludeClose(item);
       this.checkReload();
+    },
+    navigate(dir) {
+      const { activeElement } = document;
+      const items = Array.from(this.$el.querySelectorAll('[tabindex="0"]'))
+      .map(el => ({
+        el,
+        rect: el.getBoundingClientRect(),
+      }))
+      .filter(({ rect }) => rect.width && rect.height);
+      items.sort(compareBy(item => item.rect.top, item => item.rect.left));
+      let index = items.findIndex(({ el }) => el === activeElement);
+      const findItemIndex = (step, test) => {
+        for (let i = index + step; i >= 0 && i < items.length; i += step) {
+          if (test(items[index], items[i])) return i;
+        }
+      };
+      if (index < 0) {
+        index = 0;
+      } else if (dir === 'u' || dir === 'd') {
+        const step = dir === 'u' ? -1 : 1;
+        index = findItemIndex(step, (a, b) => (a.rect.top - b.rect.top) * step < 0);
+        if (dir === 'u') {
+          while (index > 0 && items[index - 1].rect.top === items[index].rect.top) index -= 1;
+        }
+      } else {
+        const step = dir === 'l' ? -1 : 1;
+        index = findItemIndex(step, (a, b) => (a.rect.left - b.rect.left) * step < 0);
+      }
+      items[index]?.el.focus();
+    },
+    focus(item) {
+      item?.el?.querySelector('.menu-area')?.focus();
+    },
+    blur() {
+      const { activeElement } = document;
+      if (activeElement && !isInput(activeElement)) activeElement.blur();
     },
   },
   mounted() {
     keyboardService.enable();
-    keyboardService.register('escape', () => {
-      this.toggleExtras(null);
-    }, {
-      condition: 'activeExtras',
-    });
+    this.disposeList = [
+      keyboardService.register('escape', () => {
+        this.toggleExtras(null);
+        this.focus(this.activeItem);
+      }, {
+        condition: 'activeExtras',
+      }),
+      keyboardService.register('up', () => {
+        this.navigate('u');
+      }, {
+        condition: '!inputFocus',
+      }),
+      keyboardService.register('down', () => {
+        this.navigate('d');
+      }, {
+        condition: '!inputFocus',
+      }),
+      keyboardService.register('left', () => {
+        this.navigate('l');
+      }, {
+        condition: '!inputFocus',
+      }),
+      keyboardService.register('right', () => {
+        this.navigate('r');
+      }, {
+        condition: '!inputFocus',
+      }),
+    ];
   },
   beforeDestroy() {
     keyboardService.disable();
+    this.disposeList?.forEach(dispose => { dispose(); });
   },
 };
 </script>

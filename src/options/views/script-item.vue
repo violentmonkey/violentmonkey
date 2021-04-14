@@ -226,9 +226,7 @@ export default {
         }
         if (!isInput(document.activeElement)) {
           // focus without scrolling, then scroll smoothly
-          const { scrollTop } = $el.parentNode;
-          $el.focus();
-          $el.parentNode.scrollTop = scrollTop;
+          $el.focus({ preventScroll: true });
         }
         this.$emit('scrollDelta', delta);
       }
