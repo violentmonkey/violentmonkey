@@ -127,8 +127,12 @@ async function importBackup(file) {
         },
         position: more.position,
         props: {
-          lastModified: more.lastModified || +entry.lastModDate,
-          lastUpdated: more.lastUpdated || +entry.lastModDate,
+          lastModified: more.lastModified
+            || more.props.lastModified // Import data from Tampermonkey
+            || +entry.lastModDate,
+          lastUpdated: more.lastUpdated
+            || more.props.lastUpdated // Import data from Tampermonkey
+            || +entry.lastModDate,
         },
       },
     };
