@@ -128,10 +128,10 @@ async function importBackup(file) {
         position: more.position,
         props: {
           lastModified: more.lastModified
-            || more.props.lastModified // Import data from Tampermonkey
+            || more?.props.lastModified // Import data from Tampermonkey
             || +entry.lastModDate,
           lastUpdated: more.lastUpdated
-            || more.props.lastUpdated // Import data from Tampermonkey
+            || more?.props.lastUpdated // Import data from Tampermonkey
             || +entry.lastModDate,
         },
       },
