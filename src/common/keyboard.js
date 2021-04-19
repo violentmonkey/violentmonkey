@@ -56,3 +56,19 @@ function bindKeys() {
     caseSensitive: true,
   });
 }
+
+/**
+ * Note: This is only used in Firefox to work around the issue that <a> cannot be focused.
+ * Ref: https://stackoverflow.com/a/11713537/4238335
+ */
+export function handleTabNavigation(dir) {
+  const els = Array.from(document.querySelectorAll('[tabindex="0"],a[href],button,input,select,textarea'))
+  .filter(el => {
+    if (el.tabIndex < 0) return false;
+    const rect = el.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  });
+  let index = els.indexOf(document.activeElement);
+  index = (index + dir + els.length) % els.length;
+  els[index].focus();
+}

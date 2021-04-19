@@ -158,7 +158,8 @@ import LocaleGroup from '#/common/ui/locale-group';
 import { forEachKey } from '#/common/object';
 import { setRoute, lastRoute } from '#/common/router';
 import storage from '#/common/storage';
-import { keyboardService } from '#/common/keyboard';
+import { keyboardService, handleTabNavigation } from '#/common/keyboard';
+import ua from '#/common/ua';
 import { loadData } from '#/options';
 import ScriptItem from './script-item';
 import Edit from './edit';
@@ -564,6 +565,14 @@ export default {
     }
     this.adjustScriptWidth();
     this.disposeList = [
+      ...ua.isFirefox ? [
+        keyboardService.register('tab', () => {
+          handleTabNavigation(1);
+        }),
+        keyboardService.register('s-tab', () => {
+          handleTabNavigation(-1);
+        }),
+      ] : [],
       ...registerHotkey(() => {
         this.$refs.search?.focus();
       }, [
