@@ -5,13 +5,25 @@
       disabled: !script.config.enabled,
       removed: script.config.removed,
       error: script.error,
+      focused: focused,
+      hotkeys: focused && showHotkeys,
     }"
+    :tabIndex="tabIndex"
     :draggable="draggable"
-    @keydownEnter="onEdit">
-    <img class="script-icon hidden-xs" :src="script.safeIcon" @click="onEdit">
+    @focus="onFocus"
+    @blur="onBlur">
+    <div class="script-icon hidden-xs">
+      <a @click="onEdit" :data-hotkey="hotkeys.edit" data-hotkey-table tabIndex="-1">
+        <img :src="script.safeIcon">
+      </a>
+    </div>
     <div class="script-info flex ml-1c">
-      <div class="script-name ellipsis flex-auto" v-text="script.$cache.name"
-           @click.exact="nameClickable && onEdit()"/>
+      <span
+        class="script-name ellipsis flex-auto"
+        v-text="script.$cache.name"
+        @click.exact="nameClickable && onEdit()"
+        :tabIndex="nameClickable ? tabIndex : -1"
+      />
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
                  class="script-author ml-1c hidden-sm"
@@ -22,6 +34,7 @@
             class="ellipsis"
             :href="`mailto:${author.email}`"
             v-text="author.name"
+            :tabIndex="tabIndex"
           />
           <span class="ellipsis" v-else v-text="author.name" />
         </tooltip>
@@ -31,9 +44,13 @@
         </tooltip>
         <div v-if="script.config.removed">
           <tooltip :content="i18n('buttonRestore')" placement="left">
-            <span class="btn-ghost" @click="onRestore">
+            <a
+              class="btn-ghost"
+              @click="onRestore"
+              :data-hotkey="hotkeys.restore"
+              :tabIndex="tabIndex">
               <icon name="undo"></icon>
-            </span>
+            </a>
           </tooltip>
         </div>
       </template>
@@ -42,33 +59,46 @@
       <template v-if="canRender">
         <div class="flex-auto flex flex-wrap">
           <tooltip :content="i18n('buttonEdit')" align="start">
-            <span class="btn-ghost" @click="onEdit">
+            <a class="btn-ghost" @click="onEdit" :data-hotkey="hotkeys.edit" :tabIndex="tabIndex">
               <icon name="code"></icon>
-            </span>
+            </a>
           </tooltip>
           <tooltip :content="labelEnable" align="start">
-            <span class="btn-ghost" @click="onEnable">
+            <a
+              class="btn-ghost"
+              @click="onToggle"
+              :data-hotkey="hotkeys.toggle"
+              :tabIndex="tabIndex">
               <icon :name="`toggle-${script.config.enabled ? 'on' : 'off'}`"></icon>
-            </span>
+            </a>
           </tooltip>
           <tooltip
             :disabled="!canUpdate || script.checking"
             :content="i18n('buttonUpdate')"
             align="start">
-            <span class="btn-ghost" @click="onUpdate">
+            <a
+              class="btn-ghost"
+              @click="onUpdate"
+              :data-hotkey="hotkeys.update"
+              :tabIndex="canUpdate ? tabIndex : -1">
               <icon name="refresh"></icon>
-            </span>
+            </a>
           </tooltip>
           <span class="sep"></span>
           <tooltip :disabled="!homepageURL" :content="i18n('buttonHome')" align="start">
-            <a class="btn-ghost" target="_blank" rel="noopener noreferrer" :href="homepageURL">
+            <a
+              class="btn-ghost"
+              target="_blank"
+              rel="noopener noreferrer"
+              :href="homepageURL"
+              :tabIndex="homepageURL ? tabIndex : -1">
               <icon name="home"></icon>
             </a>
           </tooltip>
           <tooltip :disabled="!description" :content="description" align="start">
-            <span class="btn-ghost">
+            <a class="btn-ghost" :tabIndex="description ? tabIndex : -1" @click="toggleTip">
               <icon name="info"></icon>
-            </span>
+            </a>
           </tooltip>
           <tooltip
             :disabled="!script.meta.supportURL"
@@ -78,6 +108,7 @@
               class="btn-ghost"
               target="_blank"
               rel="noopener noreferrer"
+              :tabIndex="script.meta.supportURL ? tabIndex : -1"
               :href="script.meta.supportURL">
               <icon name="question"></icon>
             </a>
@@ -85,9 +116,9 @@
           <div class="script-message" v-text="script.message" :title="script.error"></div>
         </div>
         <tooltip :content="i18n('buttonRemove')" align="end">
-          <span class="btn-ghost" @click="onRemove">
+          <a class="btn-ghost" @click="onRemove" :data-hotkey="hotkeys.remove" :tabIndex="tabIndex">
             <icon name="trash"></icon>
-          </span>
+          </a>
         </tooltip>
       </template>
     </div>
@@ -96,9 +127,12 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { sendCmd, getLocaleString, formatTime } from '#/common';
+import { getLocaleString, formatTime } from '#/common';
 import Icon from '#/common/ui/icon';
+import { keyboardService, isInput, toggleTip } from '#/common/keyboard';
 import enableDragging from '../utils/dragging';
+
+const itemMargin = 8;
 
 export default {
   props: [
@@ -106,6 +140,9 @@ export default {
     'draggable',
     'visible',
     'nameClickable',
+    'focused',
+    'hotkeys',
+    'showHotkeys',
   ],
   components: {
     Icon,
@@ -167,11 +204,32 @@ export default {
       }
       return ret;
     },
+    tabIndex() {
+      return this.focused ? 0 : -1;
+    },
   },
   watch: {
     visible(visible) {
       // Leave it if the element is already rendered
       if (visible) this.canRender = true;
+    },
+    focused(value, prevValue) {
+      const { $el } = this;
+      if (value && !prevValue && $el) {
+        const rect = $el.getBoundingClientRect();
+        const pRect = $el.parentNode.getBoundingClientRect();
+        let delta = 0;
+        if (rect.bottom > pRect.bottom - itemMargin) {
+          delta += rect.bottom - pRect.bottom + itemMargin;
+        } else if (rect.top < pRect.top + itemMargin) {
+          delta -= pRect.top - rect.top + itemMargin;
+        }
+        if (!isInput(document.activeElement)) {
+          // focus without scrolling, then scroll smoothly
+          $el.focus({ preventScroll: true });
+        }
+        this.$emit('scrollDelta', delta);
+      }
     },
   },
   mounted() {
@@ -181,32 +239,28 @@ export default {
   },
   methods: {
     onEdit() {
-      this.$emit('edit', this.script.props.id);
-    },
-    markRemoved(removed) {
-      sendCmd('MarkRemoved', {
-        id: this.script.props.id,
-        removed,
-      });
+      this.$emit('edit', this.script);
     },
     onRemove() {
-      const rect = this.$el.getBoundingClientRect();
-      this.markRemoved(1);
-      this.$emit('remove', this.script.props.id, rect);
+      this.$emit('remove', this.script);
     },
     onRestore() {
-      this.markRemoved(0);
+      this.$emit('restore', this.script);
     },
-    onEnable() {
-      sendCmd('UpdateScriptInfo', {
-        id: this.script.props.id,
-        config: {
-          enabled: this.script.config.enabled ? 0 : 1,
-        },
-      });
+    onToggle() {
+      this.$emit('toggle', this.script);
     },
     onUpdate() {
-      sendCmd('CheckUpdate', this.script.props.id);
+      this.$emit('update', this.script);
+    },
+    onFocus() {
+      keyboardService.setContext('scriptFocus', true);
+    },
+    onBlur() {
+      keyboardService.setContext('scriptFocus', false);
+    },
+    toggleTip(e) {
+      toggleTip(e.target);
     },
   },
 };
@@ -241,7 +295,7 @@ $removedItemHeight: calc(
 
 .script {
   position: relative;
-  margin: $itemMargin;
+  margin: $itemMargin 0 0 $itemMargin;
   padding: $itemPadT 10px $itemPadB;
   border: 1px solid var(--fill-3);
   border-radius: .3rem;
@@ -284,7 +338,13 @@ $removedItemHeight: calc(
     }
   }
   &.focused {
-    box-shadow: 1px 2px 9px var(--fill-8);
+    // bring the focused item to the front so that the box-shadow will not be overlapped
+    // by the next item
+    z-index: 1;
+    box-shadow: 1px 2px 9px var(--fill-7);
+    &:focus {
+      box-shadow: 1px 2px 9px var(--fill-9);
+    }
   }
   &.error {
     border-color: #f008;
@@ -309,6 +369,9 @@ $removedItemHeight: calc(
     }
     .disabled {
       color: var(--fill-2);
+      [data-hotkey]::after {
+        content: none;
+      }
     }
     .icon {
       display: block;
@@ -326,8 +389,16 @@ $removedItemHeight: calc(
     bottom: 0;
     margin: auto;
     cursor: pointer;
-    &:not([src]) {
-      visibility: hidden; // hiding the empty outline border while the image loads
+    a {
+      display: block;
+    }
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      &:not([src]) {
+        visibility: hidden; // hiding the empty outline border while the image loads
+      }
     }
     .disabled &,
     .removed & {
@@ -362,16 +433,33 @@ $removedItemHeight: calc(
   }
 }
 
+.hotkeys [data-hotkey] {
+  position: relative;
+  &::after {
+    content: attr(data-hotkey);
+    position: absolute;
+    left: 50%;
+    bottom: 80%;
+    transform-origin: bottom;
+    transform: translate(-50%,0);
+    padding: .2em;
+    background: #fe6;
+    color: #333;
+    border: 1px solid #880;
+    border-radius: .2em;
+    font-size: .8rem;
+    line-height: 1;
+  }
+}
+
 .scripts {
-  &:not([data-columns="1"]) {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    padding: 0 $itemMargin;
-    .script {
-      // --num-columns is set in tab-installed.vue
-      width: calc(100% / var(--num-columns) - (2 * $itemMargin));
-    }
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  padding: 0 $itemMargin $itemMargin 0;
+  .script {
+    // --num-columns is set in tab-installed.vue
+    width: calc(100% / var(--num-columns) - $itemMargin);
   }
   &[data-table] {
     &[data-columns="1"] .script {
@@ -402,7 +490,7 @@ $removedItemHeight: calc(
       display: flex;
       align-items: center;
       height: 2.5rem;
-      margin: 0 $itemMargin;
+      margin: 0 0 0 $itemMargin;
       padding: 0 calc(2 * $itemMargin) 0 $itemMargin;
       border-top: none;
       border-radius: 0;
@@ -414,7 +502,7 @@ $removedItemHeight: calc(
         width: 2rem;
         height: 2rem;
         order: 1;
-        position: static;
+        position: relative;
         margin-left: .5rem;
       }
       &-info {
@@ -457,6 +545,11 @@ $removedItemHeight: calc(
         border: 1px solid var(--fill-5);
         background: var(--bg);
       }
+    }
+  }
+  &:not([data-table]) {
+    [data-hotkey-table]::after {
+      content: none;
     }
   }
 }

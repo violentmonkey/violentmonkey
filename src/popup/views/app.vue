@@ -19,6 +19,7 @@
         :content="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
         placement="bottom"
         align="end"
+        :tabIndex="tabIndex"
         @click.native="onToggle">
         <icon :name="getSymbolCheck(options.isApplied)"></icon>
       </tooltip>
@@ -27,6 +28,7 @@
         :content="i18n('menuDashboard')"
         placement="bottom"
         align="end"
+        :tabIndex="tabIndex"
         @click.native="onManage">
         <icon name="cog"></icon>
       </tooltip>
@@ -35,12 +37,16 @@
         :content="i18n('menuNewScript')"
         placement="bottom"
         align="end"
+        :tabIndex="tabIndex"
         @click.native="onCreateScript">
         <icon name="plus"></icon>
       </tooltip>
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
-      <div class="menu-item menu-area menu-find" @click="onFindSameDomainScripts">
+      <div
+        class="menu-item menu-area menu-find"
+        :tabIndex="tabIndex"
+        @click="onFindSameDomainScripts">
         <icon name="search"></icon>
         <div class="flex-1" v-text="i18n('menuFindScripts')"></div>
       </div>
@@ -63,7 +69,10 @@
       }"
       :data-type="scope.name"
       :key="scope.name">
-      <div class="menu-item menu-area menu-group" @click="toggleMenu(scope.name)">
+      <div
+        class="menu-item menu-area menu-group"
+        :tabIndex="tabIndex"
+        @click="toggleMenu(scope.name)">
         <div class="flex-auto" v-text="scope.title" :data-totals="scope.totals" />
         <icon name="arrow" class="icon-collapse"></icon>
       </div>
@@ -77,12 +86,19 @@
             removed: item.data.config.removed,
             'extras-shown': activeExtras === item,
             'excludes-shown': item.excludesValue,
+            focused: focusedItem === item,
           }"
           class="script"
-          @mouseenter="message = item.name"
-          @mouseleave="message = ''">
+          @mouseover="blur"
+          @mouseenter="activeItem = item; message = item.name"
+          @mouseleave="activeItem = null; message = ''">
           <div
             class="menu-item menu-area"
+            :tabIndex="tabIndex"
+            @focus="focusedItem = item; activeItem = item; message = item.name"
+            @blur="focusedItem = null; message = ''"
+            @mouseenter="focusedItem = item"
+            @mouseleave="focusedItem = null"
             @click="onToggleScript(item)">
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
@@ -91,13 +107,16 @@
                  @contextmenu.exact.stop="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
-          <div class="submenu-buttons">
+          <div class="submenu-buttons" v-show="activeExtras === item || activeItem === item">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
-            <div class="submenu-button" @click="onEditScript(item)"
+            <div class="submenu-button" :tabIndex="tabIndex" @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
               <icon name="code"></icon>
             </div>
-            <div class="submenu-button" @click.stop="toggleExtras(item, $event)">
+            <div
+              class="submenu-button"
+              :tabIndex="tabIndex"
+              @click.stop="toggleExtras(item, $event)">
               <icon name="more"/>
             </div>
           </div>
@@ -105,7 +124,7 @@
             <textarea v-model="item.excludesValue" spellcheck="false"/>
             <div>
               <button v-text="i18n('buttonOK')" @click="onExcludeSave(item)"/>
-              <button v-text="i18n('buttonCancel')" @click="item.excludesValue = null"/>
+              <button v-text="i18n('buttonCancel')" @click="onExcludeClose(item)"/>
               <!-- not using tooltip to preserve line breaks -->
               <details>
                 <summary><icon name="info"/></summary>
@@ -125,9 +144,12 @@
               class="menu-item menu-area"
               v-for="(cap, i) in store.commands[item.data.props.id]"
               :key="i"
+              :tabIndex="tabIndex"
               @click="onCommand(item.data.props.id, cap)"
+              @focus="message = cap"
+              @blur="message = ''"
               @mouseenter="message = cap"
-              @mouseleave="message = item.name">
+              @mouseleave="message = ''">
               <icon name="command" />
               <div class="flex-auto ellipsis" v-text="cap" />
             </div>
@@ -145,16 +167,17 @@
        v-if="store.currentTab && store.currentTab.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
     <footer>
-      <span @click="onVisitWebsite" v-text="i18n('visitWebsite')" />
+      <span :tabIndex="tabIndex" @click="onVisitWebsite" v-text="i18n('visitWebsite')" />
     </footer>
-    <div class="message" v-if="message">
+    <div class="message" v-show="message">
       <div v-text="message"></div>
     </div>
     <div v-if="activeExtras" class="extras-menu" ref="extrasMenu">
-      <a v-if="activeExtras.home" :href="activeExtras.home" v-text="i18n('buttonHome')"
+      <a v-if="activeExtras.home" tabindex="0" :href="activeExtras.home" v-text="i18n('buttonHome')"
          rel="noopener noreferrer" target="_blank"/>
-      <div v-text="i18n('menuExclude')" @click="onExclude"/>
+      <div v-text="i18n('menuExclude')" tabindex="0" @click="onExclude"/>
       <div v-text="activeExtras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
+           tabindex="0"
            @click="onRemoveScript(activeExtras)"/>
     </div>
   </div>
@@ -167,6 +190,7 @@ import options from '#/common/options';
 import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
+import { keyboardService, isInput } from '#/common/keyboard';
 import { mutex, store } from '../utils';
 
 const SCRIPT_CLS = '.script';
@@ -187,6 +211,18 @@ options.hook((changes) => {
   }
 });
 
+function compareBy(...keys) {
+  return (a, b) => {
+    for (const key of keys) {
+      const ka = key(a);
+      const kb = key(b);
+      if (ka < kb) return -1;
+      if (ka > kb) return 1;
+    }
+    return 0;
+  };
+}
+
 export default {
   components: {
     Icon,
@@ -197,8 +233,10 @@ export default {
       store,
       options: optionsData,
       activeMenu: 'scripts',
+      activeItem: null,
       activeExtras: null,
       message: null,
+      focusedItem: null,
     };
   },
   computed: {
@@ -259,6 +297,9 @@ export default {
         || ''
       );
     },
+    tabIndex() {
+      return this.activeExtras ? -1 : 0;
+    },
   },
   methods: {
     toggleMenu(name) {
@@ -266,13 +307,14 @@ export default {
     },
     toggleExtras(item, evt) {
       this.activeExtras = this.activeExtras === item ? null : item;
+      keyboardService.setContext('activeExtras', this.activeExtras);
       if (this.activeExtras) {
         item.el = evt.target.closest(SCRIPT_CLS);
         this.$nextTick(() => {
           const { extrasMenu } = this.$refs;
           extrasMenu.style.top = `${
             Math.min(window.innerHeight - extrasMenu.getBoundingClientRect().height,
-              evt.currentTarget.getBoundingClientRect().top + 16)
+              (evt.currentTarget || evt.target).getBoundingClientRect().top + 16)
           }px`;
         });
       }
@@ -358,6 +400,10 @@ export default {
         area.focus();
       });
     },
+    onExcludeClose(item) {
+      item.excludesValue = null;
+      this.focus(item);
+    },
     async onExcludeSave(item) {
       await sendCmd('UpdateScriptInfo', {
         id: item.data.props.id,
@@ -365,19 +411,80 @@ export default {
           excludeMatch: item.excludesValue.split('\n').map(line => line.trim()).filter(Boolean),
         },
       });
-      item.excludesValue = null;
+      this.onExcludeClose(item);
       this.checkReload();
+    },
+    navigate(dir) {
+      const { activeElement } = document;
+      const items = Array.from(this.$el.querySelectorAll('[tabindex="0"]'))
+      .map(el => ({
+        el,
+        rect: el.getBoundingClientRect(),
+      }))
+      .filter(({ rect }) => rect.width && rect.height);
+      items.sort(compareBy(item => item.rect.top, item => item.rect.left));
+      let index = items.findIndex(({ el }) => el === activeElement);
+      const findItemIndex = (step, test) => {
+        for (let i = index + step; i >= 0 && i < items.length; i += step) {
+          if (test(items[index], items[i])) return i;
+        }
+      };
+      if (index < 0) {
+        index = 0;
+      } else if (dir === 'u' || dir === 'd') {
+        const step = dir === 'u' ? -1 : 1;
+        index = findItemIndex(step, (a, b) => (a.rect.top - b.rect.top) * step < 0);
+        if (dir === 'u') {
+          while (index > 0 && items[index - 1].rect.top === items[index].rect.top) index -= 1;
+        }
+      } else {
+        const step = dir === 'l' ? -1 : 1;
+        index = findItemIndex(step, (a, b) => (a.rect.left - b.rect.left) * step < 0);
+      }
+      items[index]?.el.focus();
+    },
+    focus(item) {
+      item?.el?.querySelector('.menu-area')?.focus();
+    },
+    blur() {
+      const { activeElement } = document;
+      if (activeElement && !isInput(activeElement)) activeElement.blur();
     },
   },
   mounted() {
-    // close the extras menu on Escape key
-    window.addEventListener('keydown', evt => {
-      if (this.activeExtras
-      && evt.key === 'Escape' && !evt.shiftKey && !evt.ctrlKey && !evt.altKey && !evt.metaKey) {
-        evt.preventDefault();
+    keyboardService.enable();
+    this.disposeList = [
+      keyboardService.register('escape', () => {
         this.toggleExtras(null);
-      }
-    });
+        this.focus(this.activeItem);
+      }, {
+        condition: 'activeExtras',
+      }),
+      keyboardService.register('up', () => {
+        this.navigate('u');
+      }, {
+        condition: '!inputFocus',
+      }),
+      keyboardService.register('down', () => {
+        this.navigate('d');
+      }, {
+        condition: '!inputFocus',
+      }),
+      keyboardService.register('left', () => {
+        this.navigate('l');
+      }, {
+        condition: '!inputFocus',
+      }),
+      keyboardService.register('right', () => {
+        this.navigate('r');
+      }, {
+        condition: '!inputFocus',
+      }),
+    ];
+  },
+  beforeDestroy() {
+    keyboardService.disable();
+    this.disposeList?.forEach(dispose => { dispose(); });
   },
 };
 </script>

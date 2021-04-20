@@ -66,6 +66,7 @@ footer {
 
 .menu-area {
   cursor: pointer;
+  &:focus,
   &:hover {
     background: cornflowerblue;
     color: var(--bg);
@@ -187,9 +188,6 @@ footer {
   border-top: 1px dashed var(--fill-2);
   > * {
     position: relative;
-    &:not(:hover):not(.extras-shown) > .submenu-buttons {
-      visibility: hidden;
-    }
     .menu-item {
       padding-left: 0;
     }
@@ -199,15 +197,15 @@ footer {
     position: absolute;
     top: 0;
     right: 0;
-    opacity: .5;
-    &:hover {
-      opacity: 1;
+    .focused > & {
+      opacity: .5;
     }
   }
   &-button {
     padding: .5rem;
     background: var(--bg);
     cursor: pointer;
+    &:focus,
     &:hover {
       color: var(--bg);
       background: cornflowerblue;
@@ -280,6 +278,7 @@ footer {
     &:last-child {
       padding-bottom: .75rem;
     }
+    &:focus,
     &:hover {
       color: var(--bg);
       background: cornflowerblue;

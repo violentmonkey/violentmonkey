@@ -60,10 +60,10 @@
 </template>
 
 <script>
-import CodeMirror from 'codemirror';
 import { debounce, getScriptName, i18n, isEmpty, sendCmd, trueJoin } from '#/common';
 import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import { showMessage } from '#/common/ui';
+import { keyboardService } from '#/common/keyboard';
 import VmCode from '#/common/ui/code';
 import options from '#/common/options';
 import { route, getUnloadSentry } from '#/common/router';
@@ -179,8 +179,12 @@ export default {
     },
   },
   watch: {
+    nav(val) {
+      keyboardService.setContext('tabCode', val === 'code');
+    },
     canSave(val) {
       this.toggleUnloadSentry(val);
+      keyboardService.setContext('canSave', val);
     },
     // usually errors for resources
     'initial.error'(error) {
@@ -194,7 +198,6 @@ export default {
     this.toggleUnloadSentry = getUnloadSentry(null, () => {
       this.$refs.code.cm.focus();
     });
-    document.addEventListener('keydown', this.switchPanel);
     if (options.get('editorWindow') && global.history.length === 1) {
       browser.windows?.getCurrent({ populate: true }).then(setupSavePosition);
     }
@@ -243,6 +246,16 @@ export default {
       }
       this.hotkeys = hotkeys;
     }
+    this.disposeList = [
+      keyboardService.register('a-pageup', this.switchPrevPanel),
+      keyboardService.register('a-pagedown', this.switchNextPanel),
+      keyboardService.register('ctrlcmd-s', this.save, {
+        condition: 'canSave',
+      }),
+      keyboardService.register('escape', () => { this.nav = 'code'; }, {
+        condition: '!tabCode',
+      }),
+    ];
   },
   methods: {
     async save() {
@@ -289,25 +302,15 @@ export default {
     saveClose() {
       this.save().then(this.close);
     },
-    switchPanel(e) {
-      const key = CodeMirror.keyName(e);
-      switch (key) {
-      case K_PREV_PANEL:
-      case K_NEXT_PANEL: {
-        const dir = key === K_NEXT_PANEL ? 1 : -1;
-        const keys = Object.keys(this.navItems);
-        this.nav = keys[(keys.indexOf(this.nav) + dir + keys.length) % keys.length];
-        break;
-      }
-      case K_SAVE:
-        if (this.canSave) this.save();
-        e.preventDefault();
-        break;
-      case 'Esc':
-        this.nav = 'code';
-        break;
-      default:
-      }
+    switchPanel(step) {
+      const keys = Object.keys(this.navItems);
+      this.nav = keys[(keys.indexOf(this.nav) + step + keys.length) % keys.length];
+    },
+    switchPrevPanel() {
+      this.switchPanel(-1);
+    },
+    switchNextPanel() {
+      this.switchPanel(1);
     },
     onChange() {
       this.canSave = this.codeDirty || !deepEqual(this.settings, savedSettings);
@@ -316,7 +319,9 @@ export default {
   beforeDestroy() {
     store.title = null;
     this.toggleUnloadSentry(false);
-    document.removeEventListener('keydown', this.switchPanel);
+    this.disposeList?.forEach(dispose => {
+      dispose();
+    });
   },
 };
 </script>

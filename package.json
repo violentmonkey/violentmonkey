@@ -60,13 +60,14 @@
   "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.9.2",
+    "@violentmonkey/shortcut": "^1.2.3",
     "@zip.js/zip.js": "^2.2.26",
     "codemirror": "5.61.0",
     "codemirror-js-mixed": "^0.9.2",
     "core-js": "^3.6.4",
     "tldjs": "^2.3.1",
     "vue": "^2.6.11",
-    "vueleton": "^1.0.4"
+    "vueleton": "^1.0.6"
   },
   "engines": {
     "node": ">=10"
