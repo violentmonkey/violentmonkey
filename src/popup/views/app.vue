@@ -3,6 +3,8 @@
     class="page-popup"
     @click="activeExtras && toggleExtras(null)"
     @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
+    @mouseenter.capture="delegateMouseEnter"
+    @focus.capture="updateMessage"
     :data-failure-reason="failureReason">
     <div class="flex menu-buttons">
       <div class="logo" :class="{disabled:!options.isApplied}">
@@ -86,19 +88,13 @@
             removed: item.data.config.removed,
             'extras-shown': activeExtras === item,
             'excludes-shown': item.excludesValue,
-            focused: focusedItem === item,
           }"
-          class="script"
-          @mouseover="blur"
-          @mouseenter="activeItem = item; message = item.name"
-          @mouseleave="activeItem = null; message = ''">
+          class="script">
           <div
             class="menu-item menu-area"
             :tabIndex="tabIndex"
-            @focus="focusedItem = item; activeItem = item; message = item.name"
-            @blur="focusedItem = null; message = ''"
-            @mouseenter="focusedItem = item"
-            @mouseleave="focusedItem = null"
+            :data-message="item.name"
+            @focus="focusedId = item.id"
             @click="onToggleScript(item)">
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
@@ -107,7 +103,7 @@
                  @contextmenu.exact.stop="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
-          <div class="submenu-buttons" v-show="activeExtras === item || activeItem === item">
+          <div class="submenu-buttons" v-show="activeExtras === item || focusedId === item.id">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
             <div class="submenu-button" :tabIndex="tabIndex" @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
@@ -145,11 +141,8 @@
               v-for="(cap, i) in store.commands[item.data.props.id]"
               :key="i"
               :tabIndex="tabIndex"
-              @click="onCommand(item.data.props.id, cap)"
-              @focus="message = cap"
-              @blur="message = ''"
-              @mouseenter="message = cap"
-              @mouseleave="message = ''">
+              :data-message="cap"
+              @click="onCommand(item.data.props.id, cap)">
               <icon name="command" />
               <div class="flex-auto ellipsis" v-text="cap" />
             </div>
@@ -167,7 +160,7 @@
        v-if="store.currentTab && store.currentTab.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
     <footer>
-      <span :tabIndex="tabIndex" @click="onVisitWebsite" v-text="i18n('visitWebsite')" />
+      <a href="https://violentmonkey.github.io/" :tabIndex="tabIndex" @click.prevent="onVisitWebsite" v-text="i18n('visitWebsite')" />
     </footer>
     <div class="message" v-show="message">
       <div v-text="message"></div>
@@ -190,7 +183,7 @@ import options from '#/common/options';
 import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
-import { keyboardService, isInput } from '#/common/keyboard';
+import { keyboardService } from '#/common/keyboard';
 import { mutex, store } from '../utils';
 
 const SCRIPT_CLS = '.script';
@@ -233,10 +226,9 @@ export default {
       store,
       options: optionsData,
       activeMenu: 'scripts',
-      activeItem: null,
       activeExtras: null,
       message: null,
-      focusedItem: null,
+      focusedId: null,
     };
   },
   computed: {
@@ -257,6 +249,7 @@ export default {
           const { config, custom, meta } = script;
           const scriptName = getScriptName(script);
           return {
+            id: `${name}/${script.props.id}`,
             name: scriptName,
             data: script,
             home: custom.homepageURL || meta.homepageURL || meta.homepage,
@@ -446,19 +439,33 @@ export default {
     focus(item) {
       item?.el?.querySelector('.menu-area')?.focus();
     },
-    blur() {
-      const { activeElement } = document;
-      if (activeElement && !isInput(activeElement)) activeElement.blur();
+    delegateMouseEnter(e) {
+      const { target } = e;
+      if (target.tabIndex >= 0) target.focus();
+    },
+    updateMessage() {
+      this.message = document.activeElement?.dataset.message || '';
     },
   },
   mounted() {
     keyboardService.enable();
     this.disposeList = [
       keyboardService.register('escape', () => {
+        const item = this.activeExtras;
         this.toggleExtras(null);
-        this.focus(this.activeItem);
+        this.focus(item);
       }, {
         condition: 'activeExtras',
+      }),
+      keyboardService.register('escape', () => {
+        const { body, activeElement } = document;
+        if (activeElement !== body && body.contains(activeElement)) {
+          activeElement.blur();
+        } else {
+          window.close();
+        }
+      }, {
+        condition: '!activeExtras',
       }),
       keyboardService.register('up', () => {
         this.navigate('u');
