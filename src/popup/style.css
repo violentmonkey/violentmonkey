@@ -30,6 +30,13 @@ body {
   }
 }
 
+a {
+  &,
+  &:focus {
+    color: inherit;
+  }
+}
+
 .page-popup {
   /* hardcoded popup height in Chrome */
   max-height: 600px;
@@ -45,12 +52,6 @@ footer {
   text-align: center;
   font-size: $fontSize;
   color: var(--fill-6);
-  > span {
-    cursor: pointer;
-    &:hover {
-      color: var(--fill-9);
-    }
-  }
 }
 
 .logo {
@@ -66,14 +67,13 @@ footer {
 
 .menu-area {
   cursor: pointer;
-  &:focus,
-  &:hover {
+  &:focus {
     background: cornflowerblue;
     color: var(--bg);
   }
   .disabled > & {
     color: var(--fill-8);
-    &:hover {
+    &:focus {
       color: var(--fill-4);
     }
   }
@@ -197,18 +197,17 @@ footer {
     position: absolute;
     top: 0;
     right: 0;
-    .focused > & {
-      opacity: .5;
-    }
   }
   &-button {
     padding: .5rem;
     background: var(--bg);
     cursor: pointer;
-    &:focus,
-    &:hover {
+    &:focus {
       color: var(--bg);
       background: cornflowerblue;
+    }
+    &:not(:focus) {
+      opacity: .5;
     }
     .icon {
       display: block;
@@ -278,14 +277,10 @@ footer {
     &:last-child {
       padding-bottom: .75rem;
     }
-    &:focus,
-    &:hover {
+    &:focus {
       color: var(--bg);
       background: cornflowerblue;
     }
-  }
-  a:hover {
-    text-decoration: underline;
   }
 }
 
