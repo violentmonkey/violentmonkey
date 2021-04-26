@@ -4,6 +4,7 @@
     @click="activeExtras && toggleExtras(null)"
     @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
     @mouseenter.capture="delegateMouseEnter"
+    @mouseleave.capture="delegateMouseLeave"
     @focus.capture="updateMessage"
     :data-failure-reason="failureReason">
     <div class="flex menu-buttons">
@@ -15,34 +16,28 @@
         :class="{disabled:!options.isApplied}"
         v-text="i18n('extName')"
       />
-      <tooltip
+      <span
         class="menu-area"
         :class="{disabled:!options.isApplied}"
-        :content="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
-        placement="bottom"
-        align="end"
+        :data-message="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
         :tabIndex="tabIndex"
         @click.native="onToggle">
         <icon :name="getSymbolCheck(options.isApplied)"></icon>
-      </tooltip>
-      <tooltip
+      </span>
+      <span
         class="menu-area"
-        :content="i18n('menuDashboard')"
-        placement="bottom"
-        align="end"
+        :data-message="i18n('menuDashboard')"
         :tabIndex="tabIndex"
         @click.native="onManage">
         <icon name="cog"></icon>
-      </tooltip>
-      <tooltip
+      </span>
+      <span
         class="menu-area"
-        :content="i18n('menuNewScript')"
-        placement="bottom"
-        align="end"
+        :data-message="i18n('menuNewScript')"
         :tabIndex="tabIndex"
         @click.native="onCreateScript">
         <icon name="plus"></icon>
-      </tooltip>
+      </span>
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
       <div
@@ -183,7 +178,7 @@ import options from '#/common/options';
 import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
-import { keyboardService } from '#/common/keyboard';
+import { keyboardService, isInput } from '#/common/keyboard';
 import { mutex, store } from '../utils';
 
 const SCRIPT_CLS = '.script';
@@ -442,6 +437,10 @@ export default {
     delegateMouseEnter(e) {
       const { target } = e;
       if (target.tabIndex >= 0) target.focus();
+    },
+    delegateMouseLeave(e) {
+      const { target } = e;
+      if (target === document.activeElement && !isInput(target)) target.blur();
     },
     updateMessage() {
       this.message = document.activeElement?.dataset.message || '';
