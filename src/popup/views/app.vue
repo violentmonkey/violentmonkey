@@ -15,34 +15,28 @@
         :class="{disabled:!options.isApplied}"
         v-text="i18n('extName')"
       />
-      <tooltip
+      <span
         class="menu-area"
         :class="{disabled:!options.isApplied}"
-        :content="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
-        placement="bottom"
-        align="end"
+        :data-message="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
         :tabIndex="tabIndex"
         @click.native="onToggle">
         <icon :name="getSymbolCheck(options.isApplied)"></icon>
-      </tooltip>
-      <tooltip
+      </span>
+      <span
         class="menu-area"
-        :content="i18n('menuDashboard')"
-        placement="bottom"
-        align="end"
+        :data-message="i18n('menuDashboard')"
         :tabIndex="tabIndex"
         @click.native="onManage">
         <icon name="cog"></icon>
-      </tooltip>
-      <tooltip
+      </span>
+      <span
         class="menu-area"
-        :content="i18n('menuNewScript')"
-        placement="bottom"
-        align="end"
+        :data-message="i18n('menuNewScript')"
         :tabIndex="tabIndex"
         @click.native="onCreateScript">
         <icon name="plus"></icon>
-      </tooltip>
+      </span>
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
       <div
