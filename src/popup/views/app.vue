@@ -4,6 +4,7 @@
     @click="activeExtras && toggleExtras(null)"
     @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
     @mouseenter.capture="delegateMouseEnter"
+    @mouseleave.capture="delegateMouseLeave"
     @focus.capture="updateMessage"
     :data-failure-reason="failureReason">
     <div class="flex menu-buttons">
@@ -177,7 +178,7 @@ import options from '#/common/options';
 import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
-import { keyboardService } from '#/common/keyboard';
+import { keyboardService, isInput } from '#/common/keyboard';
 import { mutex, store } from '../utils';
 
 const SCRIPT_CLS = '.script';
@@ -436,6 +437,10 @@ export default {
     delegateMouseEnter(e) {
       const { target } = e;
       if (target.tabIndex >= 0) target.focus();
+    },
+    delegateMouseLeave(e) {
+      const { target } = e;
+      if (target === document.activeElement && !isInput(target)) target.blur();
     },
     updateMessage() {
       this.message = document.activeElement?.dataset.message || '';
