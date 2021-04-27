@@ -21,21 +21,21 @@
         :class="{disabled:!options.isApplied}"
         :data-message="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
         :tabIndex="tabIndex"
-        @click.native="onToggle">
+        @click="onToggle">
         <icon :name="getSymbolCheck(options.isApplied)"></icon>
       </span>
       <span
         class="menu-area"
         :data-message="i18n('menuDashboard')"
         :tabIndex="tabIndex"
-        @click.native="onManage">
+        @click="onManage">
         <icon name="cog"></icon>
       </span>
       <span
         class="menu-area"
         :data-message="i18n('menuNewScript')"
         :tabIndex="tabIndex"
-        @click.native="onCreateScript">
+        @click="onCreateScript">
         <icon name="plus"></icon>
       </span>
     </div>
