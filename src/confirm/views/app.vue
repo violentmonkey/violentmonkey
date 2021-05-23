@@ -2,36 +2,55 @@
   <div class="page-confirm frame flex flex-col h-100">
     <div class="frame-block">
       <div class="flex">
-        <h1 class="mt-0 hidden-sm">
-          <span v-text="i18n('labelInstall')"></span> - <span v-text="i18n('extName')"></span>
-        </h1>
-        <div class="flex-auto"></div>
-        <div class="text-right">
-          <dropdown class="confirm-options" align="right">
-            <button slot="toggle" v-text="i18n('buttonInstallOptions')"></button>
-            <label>
-              <setting-check name="closeAfterInstall" @change="checkClose" />
-              <span class="ml-1" v-text="i18n('installOptionClose')"></span>
-            </label>
-            <label>
-              <setting-check name="trackLocalFile"
-                             :disabled="closeAfterInstall || !isLocal"
-                             @change="trackLocalFile"/>
-              <tooltip :content="trackTooltip" :disabled="!trackTooltip">
-                <span class="ml-1" v-text="i18n('installOptionTrack')"/>
-              </tooltip>
-            </label>
-          </dropdown>
-          <button v-text="i18n('buttonConfirmInstallation')"
-          :disabled="!installable" @click="installScript"></button>
-          <button v-text="i18n('buttonClose')" @click="close"></button>
-          <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
+        <div class="image">
+          <img src="/public/images/icon128.png">
+        </div>
+        <div class="info">
+          <h1>
+            <div v-text="heading"/>
+            <div class="ellipsis" v-text="name"/>
+          </h1>
+          <a class="url ellipsis" v-text="decodedUrl"
+             :title="info.url" :href="info.url" @click.prevent />
+          <p class="descr" v-text="descr"/>
+          <div class="lists flex flex-wrap" :data-collapsed="!listsShown">
+            <tooltip :content="i18n('msgShowHide')" placement="top" v-if="lists">
+              <div class="toggle" @click="listsShown = !listsShown">
+                <icon name="info"/>
+              </div>
+            </tooltip>
+            <dl v-for="(list, name) in lists" :key="name"
+                :data-type="name" :hidden="!list.length" tabindex="0">
+              <dt v-text="`@${name}`"/>
+              <dd v-if="Array.isArray(list)" class="flex flex-col">
+                <a v-for="(url, i) in list" :key="name + i" :href="url" v-text="url"
+                   rel="noopener noreferrer" target="_blank" :data-ok="url in urlsOK"/>
+              </dd>
+              <dd v-else v-text="list" class="ellipsis"/>
+            </dl>
+          </div>
+          <div v-text="message" :title="error"/>
         </div>
       </div>
       <div class="flex">
-        <div class="ellipsis flex-auto mr-2" :title="info.url" v-text="info.url"></div>
-        <div v-text="message"></div>
+        <div class="image flex">
+          <img :src="safeIcon">
+        </div>
+        <div class="actions flex flex-wrap mr-2c">
+          <button v-text="i18n('buttonConfirmInstallation')" @click="installScript"
+                  :disabled="!installable"/>
+          <button v-text="i18n('buttonClose')" @click="close"/>
+          <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
+                         @change="checkClose" />
+          <setting-check name="trackLocalFile" @change="trackLocalFile"
+                         :disabled="closeAfterInstall || !isLocal">
+            <tooltip :content="trackTooltip" :disabled="!trackTooltip">
+              <span v-text="i18n('installOptionTrack')"/>
+            </tooltip>
+          </setting-check>
+        </div>
       </div>
+      <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
     </div>
     <div class="frame-block flex-auto pos-rel">
       <vm-code class="abs-full" readonly :value="code" :commands="commands" />
@@ -40,15 +59,19 @@
 </template>
 
 <script>
-import Dropdown from 'vueleton/lib/dropdown/bundle';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
+import Icon from '#/common/ui/icon';
 import {
-  sendCmd, leftpad, request, buffer2string, isRemote, getFullUrl, makePause,
+  sendCmd, leftpad, request, isRemote, getFullUrl, makePause,
+  getLocaleString, trueJoin,
 } from '#/common';
 import options from '#/common/options';
 import initCache from '#/common/cache';
+import storage from '#/common/storage';
 import VmCode from '#/common/ui/code';
 import SettingCheck from '#/common/ui/setting-check';
+import { loadScriptIcon } from '#/common/load-script-icon';
+import { objectPick } from '#/common/object';
 import { route } from '#/common/router';
 import ua from '#/common/ua';
 
@@ -62,7 +85,7 @@ let filePortNeeded;
 
 export default {
   components: {
-    Dropdown,
+    Icon,
     VmCode,
     SettingCheck,
     Tooltip,
@@ -79,6 +102,15 @@ export default {
         close: this.close,
       },
       info: {},
+      decodedUrl: '...',
+      descr: '',
+      error: null,
+      heading: this.i18n('msgLoadingData'),
+      lists: null,
+      listsShown: true,
+      name: '...',
+      safeIcon: null,
+      urlsOK: {},
     };
   },
   computed: {
@@ -90,7 +122,6 @@ export default {
     },
   },
   async mounted() {
-    this.message = this.i18n('msgLoadingData');
     const id = route.paths[0];
     const key = `confirm-${id}`;
     this.info = await sendCmd('CacheLoad', key);
@@ -98,10 +129,17 @@ export default {
       this.close();
       return;
     }
-    filePortNeeded = ua.isFirefox >= 68 && this.info?.url.startsWith('file:');
+    const { url } = this.info;
+    this.decodedUrl = decodeURIComponent(url);
+    filePortNeeded = ua.isFirefox >= 68 && url.startsWith('file:');
     this.guard = setInterval(sendCmd, 5000, 'CacheHit', { key });
     await this.loadData();
-    await this.parseMeta();
+    if (!await this.parseMeta()) {
+      let retries = 2;
+      do await makePause(3000);
+      while (!await this.loadDeps() && (retries -= 1));
+    }
+    if (this.installable) this.heading = this.i18n('labelInstall');
   },
   beforeDestroy() {
     if (this.guard) {
@@ -118,69 +156,95 @@ export default {
       if (code == null || changedOnly && this.code === code) throw 0;
       this.code = code;
     },
-    parseMeta() {
-      return sendCmd('ParseMeta', this.code)
-      .then((script) => {
-        const urls = Object.keys(script.resources)
-        .map(key => script.resources[key]);
-        const length = script.require.length + urls.length;
-        if (!length) return;
-        let finished = 0;
-        const error = [];
-        const updateStatus = () => {
+    async parseMeta() {
+      /** @type {VMScriptMeta} */
+      const script = await sendCmd('ParseMeta', this.code);
+      const urls = Object.values(script.resources);
+      this.name = [getLocaleString(script, 'name'), script.version]::trueJoin(', ');
+      this.descr = getLocaleString(script, 'description');
+      this.lists = objectPick(script, [
+        'antifeature',
+        'grant',
+        'match',
+        'include',
+        'exclude',
+        'excludeMatch',
+        'compatible',
+        'connect',
+      ], list => (
+        list
+        ?.map(s => [s.replace(/^\W+/, '') || s, s])
+        .sort(([a], [b]) => (a < b ? -1 : a > b))
+        .map(([, s]) => s)
+        .join('\n')
+        || ''
+      ));
+      this.lists.require = [...new Set(script.require)];
+      this.lists.resource = [...new Set(urls)];
+      this.meta = script;
+      return this.loadDeps();
+    },
+    async loadDeps() {
+      if (!this.safeIcon) loadScriptIcon(this);
+      const { require, resource } = this.lists;
+      this.require = {};
+      this.resources = {};
+      const length = require.length + resource.length;
+      let finished = 0;
+      // All resources may finish quickly so we delay the status to avoid flicker
+      const STATUS_DELAY = 500;
+      const startTime = performance.now();
+      const updateStatus = () => {
+        if (performance.now() - startTime > STATUS_DELAY) {
           this.message = this.i18n('msgLoadingDependency', [finished, length]);
-        };
-        updateStatus();
-        this.require = {};
-        this.resources = {};
-        const promises = script.require.map((url) => {
-          const fullUrl = getFullUrl(url, this.info.url);
-          return this.getFile(fullUrl, { useCache: true }).then((res) => {
-            this.require[fullUrl] = res;
-          });
-        })
-        .concat(urls.map((url) => {
-          const fullUrl = getFullUrl(url, this.info.url);
-          return this.getFile(fullUrl, { isBlob: true, useCache: true })
-          .then((res) => {
-            this.resources[fullUrl] = res;
-          });
-        }))
-        .map(promise => promise.then(() => {
+        }
+      };
+      /** @returns {string|undefined} URL in case of error or `undefined` on success */
+      const download = async (url, target, isBlob) => {
+        const fullUrl = getFullUrl(url, this.info.url);
+        try {
+          target[fullUrl] = await this.getFile(fullUrl, { isBlob, useCache: true });
+          this.urlsOK[url] = true;
           finished += 1;
           updateStatus();
-        }, (url) => {
-          error.push(url);
-        }));
-        return Promise.all(promises).then(() => {
-          if (error.length) return Promise.reject(error.join('\n'));
-          this.dependencyOK = true;
-        });
-      })
-      .then(() => {
-        this.message = this.i18n('msgLoadedData');
+        } catch (e) {
+          return url;
+        }
+      };
+      const delayedStatus = setTimeout(updateStatus, STATUS_DELAY);
+      const promises = [
+        ...require.map(url => download(url, this.require, false)),
+        ...resource.map(url => download(url, this.resources, true)),
+      ];
+      const error = (await Promise.all(promises))::trueJoin('\n');
+      clearTimeout(delayedStatus);
+      if (error) {
+        this.message = this.i18n('msgErrorLoadingDependency');
+        this.error = error;
+      } else {
+        this.error = null;
+        this.dependencyOK = true;
         this.installable = true;
-      }, (err) => {
-        this.message = this.i18n('msgErrorLoadingDependency', [err]);
-        return Promise.reject();
-      });
+        this.message = null;
+        return true;
+      }
     },
     close() {
       sendCmd('TabClose');
     },
-    getFile(url, { isBlob, useCache } = {}) {
+    async getFile(url, { isBlob, useCache } = {}) {
       const cacheKey = isBlob ? `blob+${url}` : `text+${url}`;
       if (useCache && cache.has(cacheKey)) {
-        return Promise.resolve(cache.get(cacheKey));
+        return cache.get(cacheKey);
       }
-      return request(url, {
+      const response = await request(url, {
         responseType: isBlob ? 'arraybuffer' : null,
-      })
-      .then(({ data }) => (isBlob ? window.btoa(buffer2string(data)) : data))
-      .then((data) => {
-        if (useCache) cache.put(cacheKey, data);
-        return data;
       });
+      const data = isBlob
+        ? storage.cache.makeRaw(response)
+        : response.data;
+      if (useCache) cache.put(cacheKey, data);
+      return data;
     },
     async getScript(url) {
       try {
@@ -250,7 +314,101 @@ export default {
 </script>
 
 <style>
+$imgSize: 48px;
+$imgGapR: 14px;
+$infoIconSize: 18px;
+
 .page-confirm {
+  h1 {
+    line-height: 1.3;
+    margin: .25rem 0;
+  }
+  a:not(:hover) {
+    color: unset;
+    text-decoration: none;
+  }
+  p {
+    margin-top: 1rem;
+  }
+  .image {
+    flex: 0 0 $imgSize;
+    align-items: center;
+    justify-content: center;
+    min-height: $imgSize; // reserve the height so it doesn't shift when the icon loads
+    padding: 0 $imgGapR 0 .25rem;
+    box-sizing: content-box;
+    img {
+      max-width: 100%;
+    }
+  }
+  .info {
+    overflow: hidden;
+    .descr {
+      max-height: 4rem;
+      overflow-y: auto;
+    }
+    .toggle {
+      position: absolute;
+      margin-left: calc(-1 * $imgSize / 2 - $infoIconSize / 2 - $imgGapR);
+      cursor: pointer;
+      .icon {
+        width: $infoIconSize;
+        height: $infoIconSize;
+      }
+    }
+  }
+  .lists {
+    margin-top: 1rem;
+    dl {
+      margin: 0 1rem 1rem 0;
+      &[data-type="antifeature"] {
+        border: 1px solid rgba(255, 0, 0, .5);
+        background: rgba(255, 0, 0, .05);
+        margin-top: -3px;
+        padding: 2px 6px;
+      }
+    }
+    dt {
+      font-weight: bold;
+    }
+    dd {
+      white-space: pre;
+      min-width: 5rem;
+      max-height: 10vh;
+      min-height: 1.5rem;
+      overflow-y: auto;
+      a:not([data-ok]) {
+        color: var(--fill-8);
+      }
+    }
+  }
+  [data-collapsed] {
+    dd {
+      display: none;
+    }
+    dl:focus dd {
+      display: flex;
+      position: absolute;
+      max-height: 50vh;
+      z-index: 100;
+      background: var(--fill-0-5);
+      box-shadow: 1px 3px 9px rgba(128, 128, 128, .5);
+      padding: .5rem;
+    }
+    dt {
+      cursor: pointer;
+    }
+    .toggle {
+      opacity: .3;
+    }
+  }
+  .actions {
+    align-items: center;
+    margin: .5rem 0;
+    > button:first-of-type:not(:disabled) {
+      font-weight: bold;
+    }
+  }
   .incognito {
     padding: .25em 0;
     color: red;

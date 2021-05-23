@@ -28,6 +28,7 @@
   --tooltip-color: white;
   --tooltip-bg: rgba(0,0,0,.8);
   --tooltip-border-color: transparent;
+  --focus-border-color: var(--fill-12);
   @media (prefers-color-scheme: dark) {
     --fill-0: #222222;
     --fill-0-5: #272727;
@@ -84,8 +85,13 @@ h1, h2, h3 {
 }
 a {
   color: dodgerblue;
+  text-decoration: none;
   @media (prefers-color-scheme: dark) {
     color: #7baaff;
+  }
+  &:focus,
+  &:hover {
+    text-decoration: underline;
   }
 }
 hr {
@@ -93,11 +99,31 @@ hr {
   border: none;
   border-top: 1px solid var(--fill-7);
 }
+input[type=checkbox] {
+  margin-right: .2em;
+  &:focus + * {
+    text-decoration: underline;
+  }
+}
+button,
+input[type="text"],
+input[type="search"],
+input[type="number"],
+input[type="password"],
+select,
+textarea {
+  border: 1px solid var(--fill-3);
+  &:focus {
+    border-color: var(--focus-border-color);
+  }
+}
 input[disabled] ~ * {
   opacity: .5;
 }
 input[type=text],
+input[type=url],
 input[type=search],
+input[type=number],
 input[type=password] {
   line-height: 1.5rem;
   &[disabled] {
@@ -110,14 +136,12 @@ textarea {
   width: 100%;
 }
 input[type=text],
+input[type=url],
 input[type=search],
+input[type=number],
 input[type=password],
 textarea {
   padding: 0 .5rem;
-  border: 1px solid var(--fill-3);
-  &:focus {
-    border-color: var(--fill-7);
-  }
 }
 code {
   padding: 0 .2em;
@@ -160,9 +184,6 @@ button {
   &:active {
     background: var(--fill-5);
   }
-  &:focus {
-    border-color: var(--fg);
-  }
   &[disabled] {
     opacity: .5;
   }
@@ -184,6 +205,7 @@ button,
   color: inherit;
   border: 1px solid transparent;
   cursor: pointer;
+  &:focus,
   &:hover {
     border-color: var(--fill-5);
     background: var(--bg);
@@ -196,6 +218,11 @@ button,
     background: var(--fill-1);
     border-color: var(--fill-4);
   }
+}
+
+span:focus,
+a:focus {
+  text-decoration: underline;
 }
 
 .sep {
@@ -240,35 +267,35 @@ li {
 .pos-rel {
   position: relative;
 }
-.ml-1 {
+.ml-1, .ml-1c > :nth-child(n + 2) {
   margin-left: .5em;
 }
-.mr-1 {
+.mr-1, .mr-1c > :nth-last-child(n + 2) {
   margin-right: .5em;
 }
-.ml-2 {
+.ml-2, .ml-2c > :nth-child(n + 2) {
   margin-left: 1em;
 }
-.mr-2 {
+.mr-2, .mr-2c > :nth-last-child(n + 2) {
   margin-right: 1em;
 }
-.mt-0 {
+.mt-0, .mt-0c > :nth-child(n + 2) {
   margin-top: 0;
 }
-.mt-1 {
+.mt-1, .mt-1c > :nth-child(n + 2) {
   margin-top: .5em;
 }
-.mb-1 {
+.mb-1, .mb-1c > :nth-last-child(n + 2) {
   margin-bottom: .5em;
 }
-.mb-2 {
+.mb-2, .mb-2c > :nth-last-child(n + 2) {
   margin-bottom: 1em;
 }
-.mx-1 {
+.mx-1, .mx-1c > * {
   margin-left: .5em;
   margin-right: .5em;
 }
-.my-1 {
+.my-1, .my-1c > * {
   margin-top: .5em;
   margin-bottom: .5em;
 }
@@ -370,7 +397,7 @@ body .vl-tooltip {
     height: 1em;
     background: var(--input-bg);
     position: relative;
-    border: 1px solid #555;
+    border: 1px solid var(--fill-3);
     &:checked::after {
       content: "";
       background: var(--fg);
@@ -381,12 +408,16 @@ body .vl-tooltip {
       bottom: 2px;
       position: absolute;
     }
+    &:focus {
+      border-color: var(--focus-border-color);
+    }
   }
   input[type="radio"],
   input[type="radio"]:checked::after {
     border-radius: 1em;
   }
   input[type="text"],
+  input[type="url"],
   input[type="search"],
   input[type="number"],
   input[type="password"],
@@ -394,7 +425,10 @@ body .vl-tooltip {
   textarea {
     background: var(--input-bg);
     color: var(--fg);
-    border: 1px solid var(--fill-4);
+    border: 1px solid var(--fill-3);
+    &:focus {
+      border-color: var(--focus-border-color);
+    }
   }
   ::-webkit-scrollbar {
     width: 14px;
@@ -450,7 +484,7 @@ body .vl-tooltip {
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 500px) { /* This value is also used in other files */
   .hidden-sm {
     display: none !important;
   }

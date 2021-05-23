@@ -1,18 +1,26 @@
 import { memoize } from './util';
 
-function loadScript(url) {
+function loadJS(url) {
   return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = url;
-    script.onload = () => resolve();
-    script.onerror = () => reject();
-    document.body.append(script);
+    const el = document.createElement('script');
+    el.src = url;
+    el.onload = resolve;
+    el.onerror = reject;
+    document.body.append(el);
   });
 }
 
 const loadZip = memoize(async () => {
-  await loadScript('/public/lib/zip.js/zip.js');
-  return window.zip;
+  await loadJS('/public/lib/zip-no-worker.min.js');
+  const { zip } = window;
+  const workerScripts = ['/public/lib/z-worker.js'];
+  zip.configure({
+    workerScripts: {
+      deflate: workerScripts,
+      inflate: workerScripts,
+    },
+  });
+  return zip;
 });
 
 export default loadZip;

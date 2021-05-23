@@ -7,6 +7,25 @@ import { getOption } from './options';
 const openers = {};
 
 Object.assign(commands, {
+  /**
+   * @param {string} [pathId] - path or id to add to #scripts route in dashboard,
+     if absent a new script will be created for active tab's URL
+   * @returns {Promise<{id: number}>}
+   */
+  async OpenEditor(pathId) {
+    if (!pathId) {
+      const { tab, domain } = await commands.GetTabDomain();
+      const id = domain && commands.CacheNewScript({
+        url: (tab.pendingUrl || tab.url).split(/[#?]/)[0],
+        name: `- ${domain}`,
+      });
+      pathId = `_new${id ? `/${id}` : ''}`;
+    }
+    return commands.TabOpen({
+      url: `/options/index.html#scripts/${pathId}`,
+      maybeInWindow: true,
+    });
+  },
   /** @return {Promise<{ id: number }>} */
   async TabOpen({
     url,
@@ -24,17 +43,17 @@ Object.assign(commands, {
     // only incognito storeId may be specified when opening in an incognito window
     const { incognito, windowId } = srcTab;
     // Chrome can't open chrome-xxx: URLs in incognito windows
-    const canOpenIncognito = !incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url);
     let storeId = srcTab.cookieStoreId;
     if (storeId && !incognito) {
       storeId = getContainerId(isInternal ? 0 : container) || storeId;
     }
     if (storeId) storeId = { cookieStoreId: storeId };
     if (!url.startsWith('blob:')) {
-      // URL needs to be expanded to check the protocol for 'chrome' below
+      // URL needs to be expanded for `canOpenIncognito` below
       if (!isInternal) url = getFullUrl(url, srcUrl);
       else if (!/^\w+:/.test(url)) url = browser.runtime.getURL(url);
     }
+    const canOpenIncognito = !incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url);
     let newTab;
     if (maybeInWindow && browser.windows && getOption('editorWindow')) {
       const wndOpts = {
@@ -72,6 +91,9 @@ Object.assign(commands, {
   TabClose({ id } = {}, src) {
     const tabId = id || src?.tab?.id;
     if (tabId >= 0) browser.tabs.remove(tabId);
+  },
+  TabFocus(_, src) {
+    browser.tabs.update(src.tab.id, { active: true }).catch(noop);
   },
 });
 

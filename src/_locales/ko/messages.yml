@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: 필터
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: 홈페이지
@@ -40,6 +41,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: 옵션
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: 새로운 유저스크립트
@@ -246,6 +248,11 @@ labelAuthor:
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: 메뉴에서 스크립트를 끄거나 켜면 해당 탭을 새로고침
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: ''
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 매 $1 일마다 업데이트합니다. (0 = 비활성화)
@@ -357,6 +364,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 이름 없음
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 스크립트를 찾을 수 없습니다.
@@ -449,6 +457,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: '업데이트 URL:'
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: ''
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: $1에 마지막으로 동기화됨
@@ -465,6 +481,14 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: 대시보드 열기
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: ''
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 이 사이트를 위한 스크립트 찾기
@@ -532,6 +556,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: 스크립트 데이터 불러옴.
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: 불러오는 중 ...
@@ -570,6 +595,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: '스크립트 [$1]이(가) 업데이트됨!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: ''
 msgSyncError:
   description: Message shown when sync failed.
   message: 동기화 오류!

@@ -9,17 +9,28 @@ import { commands } from './message';
 const VM_VERIFY = 'VM-Verify';
 const requests = {};
 const verify = {};
+const tabRequests = {};
 
 Object.assign(commands, {
   ConfirmInstall: confirmInstall,
   /** @return {string} */
-  GetRequestId(eventsToNotify = []) {
+  GetRequestId(eventsToNotify = [], src) {
     const id = getUniqId();
+    const tabId = src.tab?.id;
     requests[id] = {
       id,
+      tabId,
       eventsToNotify,
       xhr: new XMLHttpRequest(),
     };
+    if (tabId) {
+      let set = tabRequests[tabId];
+      if (!set) {
+        set = new Set();
+        tabRequests[tabId] = set;
+      }
+      set.add(id);
+    }
     return id;
   },
   /** @return {void} */
@@ -159,7 +170,7 @@ function xhrCallbackWrapper(req) {
   let response;
   let responseText;
   let responseHeaders;
-  const sent = new Set([undefined]);
+  let sent = false;
   const { id, chunkType, xhr } = req;
   // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
   const chunkSize = 64e6 / 4;
@@ -201,7 +212,8 @@ function xhrCallbackWrapper(req) {
       }
     }
     const shouldNotify = req.eventsToNotify.includes(type);
-    const shouldSendResponse = shouldNotify && !sent.has(response);
+    // only send response when XHR is complete
+    const shouldSendResponse = xhr.readyState === 4 && shouldNotify && !sent;
     chainedCallback({
       contentType,
       id,
@@ -220,12 +232,12 @@ function xhrCallbackWrapper(req) {
       },
     });
     if (shouldSendResponse) {
-      sent.add(response);
+      sent = true;
       for (let i = 1; i < numChunks; i += 1) {
         chainedCallback({
           id,
+          chunkIndex: i,
           chunk: getChunk(i),
-          isLastChunk: i === numChunks - 1,
         });
       }
     }
@@ -299,6 +311,7 @@ function clearRequest(req) {
   if (req.coreId) delete verify[req.coreId];
   delete requests[req.id];
   HeaderInjector.del(req.id);
+  tabRequests[req.tabId]?.delete(req.id);
 }
 
 function decodeBody(obj) {
@@ -459,5 +472,22 @@ async function maybeInstallUserJs(tabId, url) {
   } else {
     cache.put(`bypass:${url}`, true, 10e3);
     if (tabId >= 0) browser.tabs.update(tabId, { url });
+  }
+}
+
+// In Firefox with production code of Violentmonkey, scripts can be injected before `tabs.onUpdated` is fired.
+// Ref: https://github.com/violentmonkey/violentmonkey/issues/1255
+
+browser.tabs.onRemoved.addListener((tabId) => {
+  clearRequestsByTabId(tabId);
+});
+
+export function clearRequestsByTabId(tabId) {
+  const set = tabRequests[tabId];
+  if (set) {
+    delete tabRequests[tabId];
+    for (const id of set) {
+      commands.AbortRequest(id);
+    }
   }
 }

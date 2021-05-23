@@ -2,11 +2,8 @@ const fs = require('fs').promises;
 const gulp = require('gulp');
 const del = require('del');
 const log = require('fancy-log');
-const gulpFilter = require('gulp-filter');
-const uglify = require('gulp-uglify');
 const plumber = require('gulp-plumber');
 const Sharp = require('sharp');
-const { isProd } = require('@gera2ld/plaid/util');
 const spawn = require('cross-spawn');
 const i18n = require('./scripts/i18n');
 const { getVersion, isBeta } = require('./scripts/version-helper');
@@ -16,9 +13,6 @@ const pkg = require('./package.json');
 const DIST = 'dist';
 const paths = {
   manifest: 'src/manifest.yml',
-  copy: [
-    'src/public/lib/**',
-  ],
   locales: [
     'src/_locales/**',
   ],
@@ -33,7 +27,6 @@ function clean() {
 
 function watch() {
   gulp.watch(paths.manifest, manifest);
-  gulp.watch(paths.copy, copyFiles);
   gulp.watch(paths.locales.concat(paths.templates), copyI18n);
 }
 
@@ -83,13 +76,16 @@ async function createIcons() {
     if (size < 48) res = res.sharpen(size < 32 ? .5 : .25);
     return res.toFile(`${dist}/icon${size}${type}.png`);
   };
+  const darkenOuterEdge = async img => img.composite([{
+    input: await img.toBuffer(),
+    blend: 'over',
+  }]);
   const handle16 = async ([type, image]) => {
     const res = image.clone()
     .resize({ width: 18 })
     .sharpen(.5, 0)
     .extract({ left: 1, top: 2, width: 16, height: 16 });
-    // darken the outer edge
-    return res.composite([{ input: await res.toBuffer(), blend: 'over' }])
+    return (type === 'w' ? res : await darkenOuterEdge(res))
     .toFile(`${dist}/icon16${type}.png`);
   };
   return Promise.all([
@@ -115,17 +111,6 @@ async function bump() {
     spawn.sync('git', ['commit', '-am', version]);
     spawn.sync('git', ['tag', '-m', version, version]);
   }
-}
-
-function copyFiles() {
-  const jsFilter = gulpFilter(['**/*.js'], { restore: true });
-  let stream = gulp.src(paths.copy, { base: 'src' });
-  if (isProd) stream = stream
-  .pipe(jsFilter)
-  .pipe(uglify())
-  .pipe(jsFilter.restore);
-  return stream
-  .pipe(gulp.dest(DIST));
 }
 
 function checkI18n() {
@@ -168,12 +153,20 @@ function logError(err) {
   return this.emit('end');
 }
 
-const pack = gulp.parallel(manifest, createIcons, copyFiles, copyI18n);
+function copyZip() {
+  return gulp.src([
+    'node_modules/@zip.js/zip.js/dist/zip-no-worker.min.js',
+    'node_modules/@zip.js/zip.js/dist/z-worker.js',
+  ])
+    .pipe(gulp.dest(`${DIST}/public/lib`));
+}
+
+const pack = gulp.parallel(manifest, createIcons, copyI18n);
 
 exports.clean = clean;
 exports.manifest = manifest;
-exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
-exports.build = gulp.series(clean, gulp.parallel(pack, jsProd));
+exports.dev = gulp.series(gulp.parallel(copyZip, pack, jsDev), watch);
+exports.build = gulp.series(clean, gulp.parallel(copyZip, pack, jsProd));
 exports.i18n = updateI18n;
 exports.check = checkI18n;
 exports.copyI18n = copyI18n;

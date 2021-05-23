@@ -126,7 +126,7 @@ function inject(item) {
     onError = e => {
       const { stack } = e.error;
       if (typeof stack === 'string' && stack::stringIncludes(browser.runtime.getURL('/sandbox'))) {
-        log('error', [item.meta.name], e.error);
+        log('error', [item.displayName], e.error);
         e.preventDefault();
       }
     };

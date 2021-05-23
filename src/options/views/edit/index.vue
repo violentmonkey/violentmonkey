@@ -1,6 +1,6 @@
 <template>
   <div class="edit frame flex flex-col fixed-full">
-    <div class="edit-header flex">
+    <div class="edit-header flex mr-1 mr-1c">
       <nav>
         <div
           v-for="(label, navKey) in navItems" :key="navKey"
@@ -9,14 +9,14 @@
           @click="nav = navKey"
         />
       </nav>
-      <div class="edit-name text-center ellipsis flex-1 mr-1" v-text="scriptName"/>
-      <div class="edit-hint text-right ellipsis mr-1">
+      <div class="edit-name text-center ellipsis flex-1" v-text="scriptName"/>
+      <div class="edit-hint text-right ellipsis">
         <a href="https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/"
            target="_blank"
            rel="noopener noreferrer"
            v-text="i18n('editHowToHint')"/>
       </div>
-      <div class="edit-buttons mr-1">
+      <div class="edit-buttons">
         <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"/>
         <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"/>
         <button v-text="i18n('buttonClose')" @click="close"/>
@@ -45,6 +45,11 @@
         :active="nav === 'values'"
         :script="script"
       />
+      <vm-externals
+        class="abs-full"
+        v-if="nav === 'externals'"
+        :script="script"
+      />
       <vm-help
         class="abs-full edit-body"
         v-show="nav === 'help'"
@@ -55,16 +60,17 @@
 </template>
 
 <script>
-import CodeMirror from 'codemirror';
-import { debounce, i18n, sendCmd } from '#/common';
+import { debounce, getScriptName, i18n, isEmpty, sendCmd, trueJoin } from '#/common';
 import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import { showMessage } from '#/common/ui';
+import { keyboardService } from '#/common/keyboard';
 import VmCode from '#/common/ui/code';
 import options from '#/common/options';
 import { route, getUnloadSentry } from '#/common/router';
 import { store } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
+import VmExternals from './externals';
 import VmHelp from './help';
 
 const CUSTOM_PROPS = {
@@ -131,6 +137,7 @@ export default {
     VmCode,
     VmSettings,
     VmValues,
+    VmExternals,
     VmHelp,
   },
   data() {
@@ -153,23 +160,31 @@ export default {
   },
   computed: {
     navItems() {
+      const { meta, props } = this.script || {};
+      const req = meta?.require.length && '@require';
+      const res = !isEmpty(meta?.resources) && '@resource';
       return {
         code: i18n('editNavCode'),
         settings: i18n('editNavSettings'),
-        ...this.script?.props?.id && { values: i18n('editNavValues') },
+        ...props?.id && { values: i18n('editNavValues') },
+        ...(req || res) && { externals: [req, res]::trueJoin('/') },
         help: '?',
       };
     },
     scriptName() {
-      const { custom, meta } = this.script || {};
-      const scriptName = custom && custom.name || meta && meta.name;
+      const { script } = this;
+      const scriptName = script?.meta && getScriptName(script);
       store.title = scriptName;
       return scriptName;
     },
   },
   watch: {
+    nav(val) {
+      keyboardService.setContext('tabCode', val === 'code');
+    },
     canSave(val) {
       this.toggleUnloadSentry(val);
+      keyboardService.setContext('canSave', val);
     },
     // usually errors for resources
     'initial.error'(error) {
@@ -183,7 +198,6 @@ export default {
     this.toggleUnloadSentry = getUnloadSentry(null, () => {
       this.$refs.code.cm.focus();
     });
-    document.addEventListener('keydown', this.switchPanel);
     if (options.get('editorWindow') && global.history.length === 1) {
       browser.windows?.getCurrent({ populate: true }).then(setupSavePosition);
     }
@@ -232,6 +246,16 @@ export default {
       }
       this.hotkeys = hotkeys;
     }
+    this.disposeList = [
+      keyboardService.register('a-pageup', this.switchPrevPanel),
+      keyboardService.register('a-pagedown', this.switchNextPanel),
+      keyboardService.register('ctrlcmd-s', this.save, {
+        condition: 'canSave',
+      }),
+      keyboardService.register('escape', () => { this.nav = 'code'; }, {
+        condition: '!tabCode',
+      }),
+    ];
   },
   methods: {
     async save() {
@@ -268,31 +292,25 @@ export default {
         showMessage({ text: err });
       }
     },
-    close() {
-      this.$emit('close');
+    close(cm) {
+      if (cm && this.nav !== 'code') {
+        this.nav = 'code';
+      } else {
+        this.$emit('close');
+      }
     },
     saveClose() {
       this.save().then(this.close);
     },
-    switchPanel(e) {
-      const key = CodeMirror.keyName(e);
-      switch (key) {
-      case K_PREV_PANEL:
-      case K_NEXT_PANEL: {
-        const dir = key === K_NEXT_PANEL ? 1 : -1;
-        const keys = Object.keys(this.navItems);
-        this.nav = keys[(keys.indexOf(this.nav) + dir + keys.length) % keys.length];
-        break;
-      }
-      case K_SAVE:
-        if (this.canSave) this.save();
-        e.preventDefault();
-        break;
-      case 'Esc':
-        this.nav = 'code';
-        break;
-      default:
-      }
+    switchPanel(step) {
+      const keys = Object.keys(this.navItems);
+      this.nav = keys[(keys.indexOf(this.nav) + step + keys.length) % keys.length];
+    },
+    switchPrevPanel() {
+      this.switchPanel(-1);
+    },
+    switchNextPanel() {
+      this.switchPanel(1);
     },
     onChange() {
       this.canSave = this.codeDirty || !deepEqual(this.settings, savedSettings);
@@ -301,7 +319,9 @@ export default {
   beforeDestroy() {
     store.title = null;
     this.toggleUnloadSentry(false);
-    document.removeEventListener('keydown', this.switchPanel);
+    this.disposeList?.forEach(dispose => {
+      dispose();
+    });
   },
 };
 </script>

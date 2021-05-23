@@ -30,6 +30,13 @@ body {
   }
 }
 
+a {
+  &,
+  &:focus {
+    color: inherit;
+  }
+}
+
 .page-popup {
   /* hardcoded popup height in Chrome */
   max-height: 600px;
@@ -45,12 +52,6 @@ footer {
   text-align: center;
   font-size: $fontSize;
   color: var(--fill-6);
-  > span {
-    cursor: pointer;
-    &:hover {
-      color: var(--fill-9);
-    }
-  }
 }
 
 .logo {
@@ -66,13 +67,13 @@ footer {
 
 .menu-area {
   cursor: pointer;
-  &:hover {
+  &:focus {
     background: cornflowerblue;
     color: var(--bg);
   }
   .disabled > & {
     color: var(--fill-8);
-    &:hover {
+    &:focus {
       color: var(--fill-4);
     }
   }
@@ -187,9 +188,6 @@ footer {
   border-top: 1px dashed var(--fill-2);
   > * {
     position: relative;
-    &:not(:hover):not(.extras-shown) > .submenu-buttons {
-      visibility: hidden;
-    }
     .menu-item {
       padding-left: 0;
     }
@@ -199,18 +197,17 @@ footer {
     position: absolute;
     top: 0;
     right: 0;
-    opacity: .5;
-    &:hover {
-      opacity: 1;
-    }
   }
   &-button {
     padding: .5rem;
     background: var(--bg);
     cursor: pointer;
-    &:hover {
+    &:focus {
       color: var(--bg);
       background: cornflowerblue;
+    }
+    &:not(:focus) {
+      opacity: .5;
     }
     .icon {
       display: block;
@@ -252,6 +249,15 @@ footer {
   }
 }
 
+.reload-hint {
+  .icon {
+    position: absolute;
+    left: $findIconML;
+    width: $findIconSize;
+    height: $findIconSize;
+  }
+}
+
 .extras-menu {
   position: fixed;
   right: 1rem;
@@ -271,13 +277,37 @@ footer {
     &:last-child {
       padding-bottom: .75rem;
     }
-    &:hover {
+    &:focus {
       color: var(--bg);
       background: cornflowerblue;
     }
   }
-  a:hover {
-    text-decoration: underline;
+}
+
+.excludes-menu {
+  padding: .25rem .5rem .25rem $leftPaneWidth;
+  button {
+    margin: .5rem .5rem 0 0;
+  }
+  details {
+    summary {
+      list-style-type: none;
+    }
+    &[open] {
+      padding-top: .25rem;
+      summary {
+        position: absolute;
+        left: calc($leftPaneWidth - $scriptIconSize - $iconMR);
+      }
+    }
+    &:not([open]) {
+      display: inline;
+    }
+  }
+  .icon {
+    cursor: pointer;
+    width: $scriptIconSize;
+    height: $scriptIconSize;
   }
 }
 

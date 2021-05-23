@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: Filters
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: Website
@@ -40,6 +41,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Opties
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: Nieuw
@@ -231,7 +233,7 @@ hintUseDownloadURL:
   message: '@downloadURL gebruiken'
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Wis de overbodige gegevens en probeer de ontbrekende bronnen te heralden.
+  message: Wis de overbodige gegevens en probeer de ontbrekende bronnen te herladen.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Installeren van $1
@@ -262,6 +264,11 @@ labelAuthor:
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Huidig tabblad herladen na in-/uitschakelen van een script
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: De huidige scripts worden uitgevoerd totdat je het tabblad herlaadt
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Elke $1 dag(en) controleren op updates (0 = uitschakelen)
@@ -373,6 +380,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Naamloos
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Er zijn geen scripts gevonden.
@@ -465,6 +473,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Bijwerk-url:'
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: Eén kolom
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: Tabelweergave
 lastSync:
   description: Label for last sync timestamp.
   message: Gesynchroniseerd op $1
@@ -481,6 +497,20 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Controlepaneel openen
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: Uitsluiten...
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: >-
+    Als je deze instelling hebt ingeschakeld, dan zal het huidige tabblad
+    automatisch worden herladen.
+
+    Herlaad de andere tabbladen handmatig om de wijzigingen toe te passen.
+
+    Op het tabblad 'Instellingen' van de bewerker heb je meer flexibiliteit.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Scripts voor deze site zoeken
@@ -548,6 +578,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: De scriptgegevens zijn geladen.
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: ''
@@ -586,6 +617,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: '[$1] is bijgewerkt!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: Tonen/Verbergen
 msgSyncError:
   description: Message shown when sync failed.
   message: Synchronisatiefout!

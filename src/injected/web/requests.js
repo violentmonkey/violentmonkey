@@ -1,6 +1,6 @@
 import { assign, defineProperty, describeProperty, objectPick } from '#/common/object';
 import {
-  filter, includes, map, push, jsonDump, jsonLoad, join, objectToString, Promise,
+  filter, includes, map, jsonDump, jsonLoad, join, objectToString, Promise,
   setAttribute, log, buffer2stringSafe, charCodeAt, slice,
   createElementNS, NS_HTML,
 } from '../utils/helpers';
@@ -87,7 +87,7 @@ async function callback(req, msg) {
       responseHeaders: headers,
       responseText: text,
     } = data;
-    const isText = (details.responseType || 'text') === 'text';
+    const isText = ['text']::includes(details.responseType || 'text');
     if (!isText && response && !('raw' in req)) {
       req.raw = msg.numChunks > 1
         ? receiveAllChunks(req, response, msg.numChunks)
@@ -96,41 +96,40 @@ async function callback(req, msg) {
     if (req.raw?.then) {
       req.raw = await req.raw;
     }
-    if ('raw' in req) {
-      defineProperty(data, 'response', {
-        configurable: true,
-        get() {
-          const value = parseData(req.raw, msg, details);
-          defineProperty(this, 'response', { value });
-          return value;
-        },
-      });
-    }
+    defineProperty(data, 'response', {
+      configurable: true,
+      get() {
+        const value = 'raw' in req ? parseData(req.raw, msg, details) : response;
+        defineProperty(this, 'response', { value });
+        return value;
+      },
+    });
     if (headers != null) req.headers = headers;
     if (text != null) req.text = text[0] === 'same' ? response : text;
     data.context = details.context;
     data.responseHeaders = req.headers;
     data.responseText = req.text;
-    if (isText) data.response = req.text;
     cb(data);
   }
   if (msg.type === 'loadend') delete idMap[req.id];
 }
 
-function receiveAllChunks(req, response) {
+function receiveAllChunks(req, response, numChunks) {
   req.chunks = [response];
+  req.numChunks = numChunks;
   req.chunksPromise = new Promise(resolve => {
     req.resolve = resolve;
   });
   return req.chunksPromise;
 }
 
-function receiveChunk(req, { chunk, isLastChunk }) {
-  const { chunks } = req;
-  chunks::push(chunk);
-  if (isLastChunk) {
+function receiveChunk(req, { chunk, chunkIndex }) {
+  const { chunks, numChunks } = req;
+  chunks[chunkIndex] = chunk;
+  if (chunkIndex === numChunks - 1) {
     delete req.chunksPromise;
     delete req.chunks;
+    delete req.numChunks;
     req.resolve(chunks::join(''));
   }
 }
@@ -206,7 +205,7 @@ async function encodeBody(body) {
       reader::readAsArrayBuffer(body);
     });
   default:
-    if (body) return { cls, value: jsonDump(body) };
+    if (body != null) return { cls, value: jsonDump(body) };
   }
 }
 

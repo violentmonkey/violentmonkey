@@ -1,4 +1,4 @@
-import { buffer2string, request } from '#/common';
+import { request } from '#/common';
 import storage from '#/common/storage';
 
 /** @type { function(url, options, check): Promise<void> } or throws on error */
@@ -7,9 +7,9 @@ storage.cache.fetch = cacheOrFetch({
     return { ...options, responseType: 'arraybuffer' };
   },
   async transform(response, url, options, check) {
-    const contentType = response.headers.get('content-type')?.[0];
-    await check?.(url, response.data, contentType);
-    return `${contentType},${btoa(buffer2string(response.data))}`;
+    const [type, body] = storage.cache.makeRaw(response, true);
+    await check?.(url, response.data, type);
+    return `${type},${body}`;
   },
 });
 
@@ -43,10 +43,10 @@ function cacheOrFetch(handlers = {}) {
   }
 }
 
-async function isModified(res, url) {
-  const mod = res.headers.get('etag')?.[0]?.trim()
-  || +new Date(res.headers.get('last-modified')?.[0])
-  || +new Date(res.headers.get('date')?.[0]);
+async function isModified({ headers }, url) {
+  const mod = headers.get('etag')
+  || +new Date(headers.get('last-modified'))
+  || +new Date(headers.get('date'));
   if (!mod || mod !== await storage.mod.getOne(url)) {
     if (mod) await storage.mod.set(url, mod);
     return true;

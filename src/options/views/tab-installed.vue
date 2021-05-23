@@ -8,43 +8,49 @@
             :class="{active: menuNewActive}"
             @stateChange="onStateChange">
             <tooltip :content="i18n('buttonNew')" placement="bottom" align="start" slot="toggle">
-              <span class="btn-ghost">
+              <a class="btn-ghost" tabindex="0">
                 <icon name="plus"></icon>
-              </span>
+              </a>
             </tooltip>
-            <div
+            <a
               class="dropdown-menu-item"
               v-text="i18n('buttonNew')"
-              @click.prevent="onEditScript('_new')"
+              tabindex="0"
+              @click.prevent="editScript('_new')"
             />
             <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank" rel="noopener noreferrer"></a>
             <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank" rel="noopener noreferrer"></a>
-            <div
+            <a
               class="dropdown-menu-item"
               v-text="i18n('buttonInstallFromURL')"
+              tabindex="0"
               @click.prevent="installFromURL"
             />
           </dropdown>
           <tooltip :content="i18n('buttonUpdateAll')" placement="bottom" align="start">
-            <span class="btn-ghost" @click="updateAll">
+            <a class="btn-ghost" tabindex="0" @click="updateAll">
               <icon name="refresh"></icon>
-            </span>
+            </a>
           </tooltip>
         </div>
         <div class="flex-auto" v-else
              v-text="`${i18n('headerRecycleBin')}${trash.length ? ` (${trash.length})` : ''}`" />
         <tooltip :content="i18n('buttonRecycleBin')" placement="bottom">
-          <span class="btn-ghost trash-button" @click="toggleRecycle" ref="trash"
-                :class="{ active: showRecycle, filled: trash.length }">
-            <icon name="trash"></icon>
+          <a
+            class="btn-ghost trash-button"
+            :class="{ active: showRecycle, filled: trash.length }"
+            @click="showRecycle = !showRecycle"
+            tabindex="0"
+          >
+            <icon name="trash" :class="{ 'trash-animate': removing }"></icon>
             <b v-if="trash.length" v-text="trash.length"/>
-          </span>
+          </a>
         </tooltip>
         <dropdown align="right" class="filter-sort">
-          <tooltip :content="i18n('buttonFilter')" placement="bottom" slot="toggle">
-            <span class="btn-ghost">
-              <icon name="filter"></icon>
-            </span>
+          <tooltip :content="i18n('labelSettings')" placement="bottom" slot="toggle">
+            <a class="btn-ghost" tabindex="0">
+              <icon name="cog"/>
+            </a>
           </tooltip>
           <div>
             <locale-group i18n-key="labelFilterSort">
@@ -59,10 +65,12 @@
             </locale-group>
           </div>
           <div v-show="currentSortCompare">
-            <label>
-              <setting-check name="filters.showEnabledFirst" />
-              <span v-text="i18n('optionShowEnabledFirst')"></span>
-            </label>
+            <setting-check name="filters.showEnabledFirst"
+                           :label="i18n('optionShowEnabledFirst')" />
+          </div>
+          <div class="mr-2c">
+            <setting-check name="filters.viewTable" :label="i18n('labelViewTable')" />
+            <setting-check name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
           </div>
         </dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
@@ -74,6 +82,7 @@
                 :class="{'has-error': searchError}"
                 :placeholder="i18n('labelSearchScript')"
                 v-model="search"
+                ref="search"
                 id="installed-search">
               <icon name="search"></icon>
             </label>
@@ -96,18 +105,30 @@
            @click.prevent="emptyRecycleBin"/>
       </div>
       <div class="flex-auto pos-rel">
-        <div class="scripts abs-full">
+        <div class="scripts abs-full"
+             ref="scriptList"
+             :style="`--num-columns:${numColumns}`"
+             :data-columns="numColumns"
+             :data-table="filters.viewTable">
           <script-item
             v-for="(script, index) in sortedScripts"
             v-show="!search || script.$cache.show !== false"
             :key="script.props.id"
-            :class="{ removing: removing && removing.id === script.props.id }"
+            :focused="selectedScript === script"
+            :showHotkeys="showHotkeys"
             :script="script"
             :draggable="filters.sort.value === 'exec' && !script.config.removed"
             :visible="index < batchRender.limit"
-            @edit="onEditScript"
+            :nameClickable="filters.viewTable"
+            :hotkeys="scriptHotkeys"
+            @edit="handleActionEdit"
+            @remove="handleActionRemove"
+            @restore="handleActionRestore"
+            @toggle="handleActionToggle"
+            @update="handleActionUpdate"
             @move="moveScript"
-            @remove="onRemove"
+            @scrollDelta="handleSmoothScroll"
+            @tiptoggle.native="showHotkeys = !showHotkeys"
           />
         </div>
         <div
@@ -118,8 +139,7 @@
         </div>
       </div>
     </div>
-    <edit v-if="script" :initial="script" @close="onEditScript()"></edit>
-    <div class="trash-animate" v-if="removing" :style="removing.animation" />
+    <edit v-if="script" :initial="script" @close="editScript()"></edit>
   </div>
 </template>
 
@@ -138,6 +158,8 @@ import LocaleGroup from '#/common/ui/locale-group';
 import { forEachKey } from '#/common/object';
 import { setRoute, lastRoute } from '#/common/router';
 import storage from '#/common/storage';
+import { keyboardService, handleTabNavigation } from '#/common/keyboard';
+import ua from '#/common/ua';
 import { loadData } from '#/options';
 import ScriptItem from './script-item';
 import Edit from './edit';
@@ -171,6 +193,8 @@ const filtersSort = {
 const filters = {
   searchScope: null,
   showEnabledFirst: null,
+  viewSingleColumn: null,
+  viewTable: null,
   get sort() {
     return filtersSort;
   },
@@ -198,6 +222,26 @@ filters::forEachKey(key => {
 const MAX_BATCH_DURATION = 100;
 let step = 0;
 
+let columnsForTableMode = [];
+let columnsForCardsMode = [];
+
+const conditionAll = 'tabScripts';
+const conditionSearch = `${conditionAll} && inputFocus`;
+const conditionNotSearch = `${conditionAll} && !inputFocus`;
+const conditionScriptFocused = `${conditionNotSearch} && selectedScript && !showRecycle`;
+const conditionScriptFocusedRecycle = `${conditionNotSearch} && selectedScript && showRecycle`;
+const conditionHotkeys = `${conditionNotSearch} && selectedScript && showHotkeys`;
+const scriptHotkeys = {
+  edit: 'e',
+  toggle: 'space',
+  update: 'r',
+  restore: 'r',
+  remove: 'x',
+};
+const registerHotkey = (callback, items) => items.map(([key, condition, caseSensitive]) => (
+  keyboardService.register(key, callback, { condition, caseSensitive })
+));
+
 export default {
   components: {
     ScriptItem,
@@ -210,9 +254,12 @@ export default {
   },
   data() {
     return {
+      scriptHotkeys,
       store,
       filterOptions,
       filters,
+      filteredScripts: [],
+      focusedIndex: -1,
       script: null,
       search: null,
       searchError: null,
@@ -220,26 +267,43 @@ export default {
       menuNewActive: false,
       showRecycle: false,
       sortedScripts: [],
-      removing: null,
+      removing: false,
+      showHotkeys: false,
       // Speedup and deflicker for initial page load:
       // skip rendering the script list when starting in the editor.
       canRenderScripts: !store.route.paths[1],
       batchRender: {
         limit: step,
       },
+      numColumns: null,
     };
   },
   watch: {
     search: 'scheduleSearch',
     'filters.sort.value': 'updateLater',
     'filters.showEnabledFirst': 'updateLater',
-    showRecycle: 'onUpdate',
+    'filters.viewSingleColumn': 'adjustScriptWidth',
+    'filters.viewTable': 'adjustScriptWidth',
+    showRecycle(value) {
+      keyboardService.setContext('showRecycle', value);
+      this.focusedIndex = -1;
+      this.onUpdate();
+    },
     scripts: 'refreshUI',
     'store.route.paths.1': 'onHashChange',
+    selectedScript(script) {
+      keyboardService.setContext('selectedScript', script);
+    },
+    showHotkeys(value) {
+      keyboardService.setContext('showHotkeys', value);
+    },
   },
   computed: {
     currentSortCompare() {
       return filterOptions.sort[filters.sort.value]?.compare;
+    },
+    selectedScript() {
+      return this.filteredScripts[this.focusedIndex];
     },
     message() {
       if (this.store.loading) {
@@ -276,6 +340,8 @@ export default {
       const cmp = this.currentSortCompare;
       if (cmp) scripts.sort(combinedCompare(cmp));
       this.sortedScripts = scripts;
+      this.filteredScripts = this.search ? scripts.filter(({ $cache }) => $cache.show) : scripts;
+      this.selectScript(this.focusedIndex);
       if (!step || numFound < step) this.renderScripts();
       else this.debouncedRender();
     },
@@ -333,7 +399,7 @@ export default {
     onStateChange(active) {
       this.menuNewActive = active;
     },
-    onEditScript(id) {
+    editScript(id) {
       const pathname = ['scripts', id].filter(Boolean).join('/');
       if (!id && pathname === lastRoute().pathname) {
         window.history.back();
@@ -360,31 +426,6 @@ export default {
           if (id) setRoute(tab, true);
         }
       }
-    },
-    toggleRecycle() {
-      this.showRecycle = !this.showRecycle;
-    },
-    onRemove(id, rect) {
-      const { trash } = this.$refs;
-      if (!trash || this.removing) return;
-      const trashRect = trash.getBoundingClientRect();
-      this.removing = {
-        id,
-        animation: {
-          width: `${trashRect.width}px`,
-          height: `${trashRect.height}px`,
-          top: `${trashRect.top}px`,
-          left: `${trashRect.left}px`,
-          transform: `translate(${rect.left - trashRect.left}px,${rect.top - trashRect.top}px) scale(${rect.width / trashRect.width},${rect.height / trashRect.height})`,
-          transition: 'transform .3s',
-        },
-      };
-      setTimeout(() => {
-        this.removing.animation.transform = 'translate(0,0) scale(1,1)';
-        setTimeout(() => {
-          this.removing = null;
-        }, 300);
-      });
     },
     async renderScripts() {
       if (!this.canRenderScripts) return;
@@ -455,6 +496,56 @@ export default {
         // NOP
       }
     },
+    adjustScriptWidth() {
+      const widths = filters.viewTable ? columnsForTableMode : columnsForCardsMode;
+      this.numColumns = filters.viewSingleColumn ? 1
+        : widths.findIndex(w => window.innerWidth < w) + 1 || widths.length + 1;
+    },
+    selectScript(index) {
+      index = Math.min(index, this.filteredScripts.length - 1);
+      index = Math.max(index, -1);
+      if (index !== this.focusedIndex) {
+        this.focusedIndex = index;
+      }
+    },
+    markRemove(script, removed) {
+      sendCmd('MarkRemoved', {
+        id: script.props.id,
+        removed,
+      });
+    },
+    handleActionEdit(script) {
+      this.editScript(script.props.id);
+    },
+    handleActionRemove(script) {
+      this.markRemove(script, 1);
+      this.removing = true;
+      setTimeout(() => {
+        this.removing = false;
+      }, 1000);
+    },
+    handleActionRestore(script) {
+      this.markRemove(script, 0);
+    },
+    handleActionToggle(script) {
+      sendCmd('UpdateScriptInfo', {
+        id: script.props.id,
+        config: {
+          enabled: script.config.enabled ? 0 : 1,
+        },
+      });
+    },
+    handleActionUpdate(script) {
+      sendCmd('CheckUpdate', script.props.id);
+    },
+    handleSmoothScroll(delta) {
+      if (!delta) return;
+      const el = this.$refs.scriptList;
+      el.scroll({
+        top: el.scrollTop + delta,
+        behavior: 'smooth',
+      });
+    },
   },
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 100);
@@ -465,11 +556,134 @@ export default {
     // * on subsequent navigation via history back/forward;
     // * on first initialization in some weird case the scripts got loaded early.
     if (!store.loading) this.refreshUI();
+    // Extract --columns-cards and --columns-table from `:root` or `html` selector. CustomCSS may override it.
+    if (!columnsForCardsMode.length) {
+      const style = getComputedStyle(document.documentElement);
+      [columnsForCardsMode, columnsForTableMode] = ['cards', 'table']
+      .map(type => style.getPropertyValue(`--columns-${type}`)?.split(',').map(Number).filter(Boolean) || []);
+      global.addEventListener('resize', this.adjustScriptWidth);
+    }
+    this.adjustScriptWidth();
+    this.disposeList = [
+      ...ua.isFirefox ? [
+        keyboardService.register('tab', () => {
+          handleTabNavigation(1);
+        }),
+        keyboardService.register('s-tab', () => {
+          handleTabNavigation(-1);
+        }),
+      ] : [],
+      ...registerHotkey(() => {
+        this.$refs.search?.focus();
+      }, [
+        ['ctrlcmd-f', conditionAll],
+        ['/', conditionNotSearch, true],
+      ]),
+      ...registerHotkey(() => {
+        this.$refs.search?.blur();
+      }, [
+        ['enter', conditionSearch],
+      ]),
+      ...registerHotkey(() => {
+        if (this.selectedScript) this.showHotkeys = !this.showHotkeys;
+      }, [
+        ['enter', `${conditionAll} && scriptFocus`],
+      ]),
+      ...registerHotkey(() => {
+        this.showHotkeys = false;
+      }, [
+        ['escape', conditionHotkeys],
+        ['q', conditionHotkeys, true],
+      ]),
+      ...registerHotkey(() => {
+        let index = this.focusedIndex;
+        if (index < 0) index = 0;
+        else index += this.numColumns;
+        if (index < this.filteredScripts.length) {
+          this.selectScript(index);
+        }
+      }, [
+        ['ctrlcmd-down', conditionAll],
+        ['down', conditionAll],
+        ['j', conditionNotSearch, true],
+      ]),
+      ...registerHotkey(() => {
+        const index = this.focusedIndex - this.numColumns;
+        if (index >= 0) {
+          this.selectScript(index);
+        }
+      }, [
+        ['ctrlcmd-up', conditionAll],
+        ['up', conditionAll],
+        ['k', conditionNotSearch, true],
+      ]),
+      ...registerHotkey(() => {
+        this.selectScript(this.focusedIndex - 1);
+      }, [
+        ['ctrlcmd-left', conditionAll],
+        ['left', conditionNotSearch],
+        ['h', conditionNotSearch, true],
+      ]),
+      ...registerHotkey(() => {
+        this.selectScript(this.focusedIndex + 1);
+      }, [
+        ['ctrlcmd-right', conditionAll],
+        ['right', conditionNotSearch],
+        ['l', conditionNotSearch, true],
+      ]),
+      ...registerHotkey(() => {
+        this.selectScript(0);
+      }, [
+        ['ctrlcmd-home', conditionAll],
+        ['g g', conditionNotSearch, true],
+      ]),
+      ...registerHotkey(() => {
+        this.selectScript(this.filteredScripts.length - 1);
+      }, [
+        ['ctrlcmd-end', conditionAll],
+        ['G', conditionNotSearch, true],
+      ]),
+      ...registerHotkey(() => {
+        this.handleActionEdit(this.selectedScript);
+      }, [
+        [scriptHotkeys.edit, conditionScriptFocused, true],
+      ]),
+      ...registerHotkey(() => {
+        this.handleActionRemove(this.selectedScript);
+      }, [
+        ['delete', conditionScriptFocused],
+        [scriptHotkeys.remove, conditionScriptFocused, true],
+      ]),
+      ...registerHotkey(() => {
+        this.handleActionUpdate(this.selectedScript);
+      }, [
+        [scriptHotkeys.update, conditionScriptFocused, true],
+      ]),
+      ...registerHotkey(() => {
+        this.handleActionToggle(this.selectedScript);
+      }, [
+        [scriptHotkeys.toggle, conditionScriptFocused, true],
+      ]),
+      ...registerHotkey(() => {
+        this.handleActionRestore(this.selectedScript);
+      }, [
+        [scriptHotkeys.restore, conditionScriptFocusedRecycle, true],
+      ]),
+    ];
+  },
+  beforeDestroy() {
+    this.disposeList?.forEach(dispose => {
+      dispose();
+    });
   },
 };
 </script>
 
 <style>
+:root {
+  --columns-cards: 1300, 1900, 2500; // 1366x768, 1920x1080, 2560x1440
+  --columns-table: 1600, 2500, 3400; // 1680x1050, 2560x1440, 3440x1440
+}
 .tab.tab-installed {
   padding: 0;
   header {
@@ -484,6 +698,14 @@ export default {
   }
   .vl-dropdown.active .vl-tooltip-wrap {
     display: none;
+  }
+  @media (max-width: 500px) { // same size as `hidden-sm` in #/common/ui/style/style.css
+    .vl-dropdown-right .vl-dropdown-menu {
+      position: fixed;
+      top: auto;
+      left: 0;
+      right: auto;
+    }
   }
 }
 .backdrop {
@@ -515,6 +737,7 @@ export default {
   text-decoration: none;
   color: var(--fill-9);
   cursor: pointer;
+  &:focus,
   &:hover {
     color: inherit;
     background: var(--fill-0-5);
@@ -541,18 +764,11 @@ export default {
   &-tooltip {
     white-space: pre-wrap;
   }
-  select {
-    /* borders are copied from inputs in common/ui/style */
-    border: 1px solid var(--fill-3);
-    &:focus {
-      border-color: var(--fill-7);
-    }
-  }
 }
 .filter-sort {
   .vl-dropdown-menu {
     padding: 1rem;
-    > * {
+    > :nth-last-child(n + 2) {
       margin-bottom: .5rem;
     }
   }
@@ -581,12 +797,15 @@ export default {
 }
 
 .trash-animate {
-  position: fixed;
-  background: rgba(0,0,0,.1);
-  transform-origin: top left;
+  animation: .5s linear rotate;
 }
 
-.script.removing {
-  opacity: .2;
+@keyframes rotate {
+  0% {
+    transform: scale(1.2) rotate(0);
+  }
+  100% {
+    transform: scale(1.2) rotate(360deg);
+  }
 }
 </style>

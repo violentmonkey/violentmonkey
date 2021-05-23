@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: Filter
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: Situs Web
@@ -40,6 +41,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Opsi
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: Baru
@@ -106,7 +108,7 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS khusus untuk halaman opsi dan halaman pemasangan skrip. Jika anda tidak
+    CSS khusus untuk halaman opsi dan halaman pemasangan skrip. Jika Anda tidak
     yakin untuk apa ini, mohon jangan menyuntingnya.
 descEditorOptions:
   description: Description of editor options JSON section.
@@ -263,6 +265,11 @@ labelAutoReloadCurrentTab:
   message: >-
     Muat ulang tab saat ini setelah memilih mengaktif/nonaktifkan skrip dari
     menu
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: Skrip konten akan terus berjalan sampai Anda memuat ulang tab
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Periksa pembaruan skrip setiap $1 hari, gunakan 0 untuk menonaktifkan'
@@ -374,6 +381,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Tanpa Nama
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Tidak ada skrip yang ditemukan.
@@ -466,6 +474,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL Pembaruan:'
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: Kolom tunggal
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: Tampilan tabel
 lastSync:
   description: Label for last sync timestamp.
   message: Sinkron terakhir pada $1
@@ -482,6 +498,20 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Buka Dasbor
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: Pengecualian...
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: >-
+    Tab saat ini akan otomatis dimuat ulang jika Anda mengaktifkan opsi ini di
+    dalam pengaturan umum.
+
+    Untuk menerapkan perubahan ke semua tab, silakan muat ulang secara manual.
+
+    Gunakan tab "Pengaturan" dari penyunting untuk opsi lainnya.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Temukan skrip untuk situs ini
@@ -538,8 +568,8 @@ msgIncognitoChanges:
     Message shown in popup and installation tab when opened in an incognito
     window.
   message: >-
-    Perubahan yang anda buat dalam mode penjelajahan Pribadi juga diterapkan ke
-    profil utama anda.
+    Perubahan yang Anda buat dalam mode penjelajahan Pribadi juga diterapkan ke
+    profil utama Anda.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skrip telah terpasang.
@@ -551,6 +581,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: Data skrip telah dimuat.
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Memuat ...
@@ -589,6 +620,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Skrip [$1] diperbarui!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: Tampilkan/Sembunyikan
 msgSyncError:
   description: Message shown when sync failed.
   message: Kesalahan sinkron!

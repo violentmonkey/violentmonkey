@@ -33,6 +33,10 @@ export default {
     searchScope: 'name',
     /** @type 'exec' | 'alpha' | 'update' */
     sort: 'exec',
+    /** @type boolean */
+    viewSingleColumn: false,
+    /** @type boolean */
+    viewTable: false,
   },
   filtersPopup: {
     /** @type 'exec' | 'alpha' */

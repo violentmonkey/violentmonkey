@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: Filter
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: Homepage
@@ -40,6 +41,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Optionen
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: Neu
@@ -113,12 +115,12 @@ descEditorOptions:
   message: >-
     Benutzerdefinierte Optionen für CodeMirror und Add-ons in JSON Object wie
     <code>{"indentUnit":2, "smartIndent":true}</code>, möglicherweise werden
-    einige von ihnen jedoch nicht mit Violentmonkey funktionieren. Konsultiere
-    die <a href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">vollständige Liste</a>. Um ein benutzerdefiniertes
-    CodeMirror-Theme zu benutzen, spezifiziere hier dessen Dateinamen ähnlich
-    wie <code>"theme":"3024-day"</code> und füge die <a
-    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
+    einige von ihnen jedoch nicht mit Violentmonkey funktionieren. Konsultieren
+    Sie die <a href="https://codemirror.net/doc/manual.html#config"
+    target="_blank" rel="noopener noreferrer">vollständige Liste</a>. Um ein
+    benutzerdefiniertes CodeMirror-Theme zu benutzen, spezifizieren Sie hier
+    dessen Dateinamen ähnlich wie <code>"theme":"3024-day"</code> und fügen Sie
+    die <a href="https://github.com/codemirror/CodeMirror/tree/master/theme"
     target="_blank" rel="noopener noreferrer">tatsächliche Theme-CSS</a> in das
     "Benutzerdefinierte Aussehen"-Eingabefeld unterhalb ein.
 editHelpDocumention:
@@ -265,6 +267,11 @@ labelAuthor:
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: Nach dem Ein-/Ausschalten eines Skripts den aktuellen Tab neu laden
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: Gegenwärtig ausgeführte Skripte bleiben aktiv bis der Tab neu geladen wird
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: >-
@@ -378,6 +385,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Ohne Name
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Kein Skript gefunden.
@@ -472,6 +480,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Update-URL:'
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: Einspaltig
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: Tabellenansicht
 lastSync:
   description: Label for last sync timestamp.
   message: Letzter Sync am $1
@@ -488,6 +504,21 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Dashboard öffnen
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: Ausschließen...
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: >-
+    Der gegenwärtige Tab lädt automatisch neu, falls Sie diese Option in den
+    Allgemeinen Einstellungen aktiviert haben.
+
+    Um die Änderungen für sonstige Tabs zu übernehmen, laden Sie diese bitte
+    manuell neu.
+
+    Nutzen Sie für mehr Flexibilität den "Einstellungen"-Tab des Editors.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Skripte für diese Seite finden
@@ -525,7 +556,7 @@ msgErrorFetchingScript:
   message: Fehler beim Abruf der neuen Version!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Fehler beim Abrufen der Aktualisierungsinformationen.
+  message: Abruf der Aktualisierungsinformationen fehlgeschlagen.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
@@ -557,6 +588,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: Skriptdaten geladen.
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Lade...
@@ -571,7 +603,7 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Konflikt beim Namen des Skripts! Bitte @name und @namespace ändern.
+  message: Namensraum-Konflikte! Bitte ändern Sie @name und @namespace des Skripts.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -595,6 +627,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Skript [$1] wurde aktualisiert!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: Anzeigen/ausblenden
 msgSyncError:
   description: Message shown when sync failed.
   message: Sync fehlgeschlagen!

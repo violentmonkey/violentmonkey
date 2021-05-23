@@ -1,15 +1,14 @@
 import Vue from 'vue';
-import { getActiveTab, i18n, sendCmdDirectly } from '#/common';
+import { i18n, sendCmdDirectly } from '#/common';
 import { INJECT_PAGE, INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import handlers from '#/common/handlers';
 import { loadScriptIcon } from '#/common/load-script-icon';
 import { forEachValue, mapEntry } from '#/common/object';
-import * as tld from '#/common/tld';
 import '#/common/ui/style';
 import App from './views/app';
-import { store } from './utils';
+import { mutex, store } from './utils';
 
-tld.initTLD();
+mutex.init();
 Vue.prototype.i18n = i18n;
 
 const vm = new Vue({
@@ -18,23 +17,15 @@ const vm = new Vue({
 .$mount();
 document.body.append(vm.$el);
 
-const allScriptIds = [];
-// SetPopup from a sub-frame may come first so we need to wait for the main page
-// because we only show the iframe menu for unique scripts that don't run in the main page
-const mutex = {};
-mutex.ready = new Promise(resolve => {
-  mutex.resolve = resolve;
-  // pages like Chrome Web Store may forbid injection in main page so we need a timeout
-  setTimeout(resolve, 100);
-});
-
 Object.assign(handlers, {
   async SetPopup(data, src) {
     if (store.currentTab && store.currentTab.id !== src.tab.id) return;
+    /* SetPopup from a sub-frame may come first so we need to wait for the main page
+     * because we only show the iframe menu for unique scripts that don't run in the main page */
     const isTop = src.frameId === 0;
     if (!isTop) await mutex.ready;
-    const ids = data.ids.filter(id => !allScriptIds.includes(id));
-    allScriptIds.push(...ids);
+    const ids = data.ids.filter(id => !store.scriptIds.includes(id));
+    store.scriptIds.push(...ids);
     if (isTop) {
       mutex.resolve();
       store.commands = data.menus::mapEntry(([, value]) => Object.keys(value).sort());
@@ -42,9 +33,9 @@ Object.assign(handlers, {
     if (ids.length) {
       // frameScripts may be appended multiple times if iframes have unique scripts
       const scope = store[isTop ? 'scripts' : 'frameScripts'];
-      const metas = data.metas?.filter(({ props: { id } }) => ids.includes(id))
-        || await sendCmdDirectly('GetMetas', ids);
-      metas.forEach(script => loadScriptIcon(script, { cache: store.cache }));
+      const metas = data.scripts?.filter(({ props: { id } }) => ids.includes(id))
+        || (Object.assign(data, await sendCmdDirectly('GetData', ids))).scripts;
+      metas.forEach(script => loadScriptIcon(script, data.cache));
       scope.push(...metas);
       data.failedIds.forEach(id => {
         scope.forEach((script) => {
@@ -64,19 +55,20 @@ sendCmdDirectly('CachePop', 'SetPopup').then((data) => {
   data::forEachValue(val => handlers.SetPopup(...val));
 });
 
-getActiveTab()
-.then(async (tab) => {
-  const { url } = tab;
+/* Since new Chrome prints a warning when ::-webkit-details-marker is used,
+ * we add it only for old Chrome, which is detected via feature added in 89. */
+if (!CSS.supports?.('list-style-type', 'disclosure-open')) {
+  document.styleSheets[0].insertRule('.excludes-menu ::-webkit-details-marker {display:none}');
+}
+
+sendCmdDirectly('GetTabDomain')
+.then(async ({ tab, domain }) => {
   store.currentTab = tab;
+  store.domain = domain;
   browser.runtime.connect({ name: `${tab.id}` });
-  if (/^https?:\/\//i.test(url)) {
-    const matches = url.match(/:\/\/([^/]*)/);
-    const domain = matches[1];
-    store.domain = tld.getDomain(domain) || domain;
-  }
-  if (!INJECTABLE_TAB_URL_RE.test(url)) {
+  if (!INJECTABLE_TAB_URL_RE.test(tab.url)) {
     store.injectable = false;
   } else {
-    store.blacklisted = await sendCmdDirectly('TestBlacklist', url);
+    store.blacklisted = await sendCmdDirectly('TestBlacklist', tab.url);
   }
 });

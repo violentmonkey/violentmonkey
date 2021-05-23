@@ -33,7 +33,7 @@
         <div class="ellipsis flex-auto" v-text="getValue(key, true)"></div>
       </a>
     </div>
-    <div class="edit-values-panel flex flex-col" v-if="current">
+    <div class="edit-values-panel flex flex-col mb-1c" v-if="current">
       <div class="control">
         <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
         <div>
@@ -275,7 +275,7 @@ export default {
       padding: 4px 6px;
       &:first-child {
         position: relative;
-        width: 30%;
+        flex: 0 0 30%;
         max-width: 240px;
       }
       &:not(:first-child) {
@@ -309,9 +309,6 @@ export default {
     z-index: 10;
     @media (max-width: 767px) {
       width: 100%;
-    }
-    > :not(:last-child) {
-      margin-bottom: .5em;
     }
     .control {
       display: flex;

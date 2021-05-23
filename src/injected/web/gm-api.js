@@ -23,6 +23,7 @@ const {
   EventTarget: { prototype: { dispatchEvent } },
   MouseEvent,
   Promise: { prototype: { then } },
+  RegExp: { prototype: { test } },
   String: { prototype: { lastIndexOf } },
   TextDecoder: { prototype: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
@@ -202,6 +203,7 @@ export function makeGmApi() {
     xmlHttpRequest: { alias: 'xmlhttpRequest' },
     notification: true,
     openInTab: true,
+    registerMenuCommand: true,
     setClipboard: true,
     addStyle: true, // gm4-polyfill.js sets it anyway
   }];
@@ -216,17 +218,21 @@ function getResource(context, name, isBlob) {
       if (raw) {
         const dataPos = raw::lastIndexOf(',');
         const bin = atob(dataPos < 0 ? raw : raw::slice(dataPos + 1));
-        const len = bin.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i += 1) {
-          bytes[i] = bin::charCodeAt(i);
-        }
-        if (isBlob) {
-          const type = dataPos < 0 ? '' : raw::slice(0, dataPos);
-          res = createObjectURL(new Blob([bytes], { type }));
-          context.urls[key] = res;
-        } else {
-          res = new TextDecoder()::tdDecode(bytes);
+        if (isBlob || /[\x80-\xFF]/::test(bin)) {
+          const len = bin.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i += 1) {
+            bytes[i] = bin::charCodeAt(i);
+          }
+          if (isBlob) {
+            const type = dataPos < 0 ? '' : raw::slice(0, dataPos);
+            res = createObjectURL(new Blob([bytes], { type }));
+            context.urls[key] = res;
+          } else {
+            res = new TextDecoder()::tdDecode(bytes);
+          }
+        } else { // pure ASCII
+          res = bin;
         }
       } else if (isBlob) {
         res = key;

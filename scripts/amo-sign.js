@@ -20,13 +20,16 @@ async function main() {
   });
   if (!result.success) {
     console.error(result);
-    process.exitCode = 1;
-    return;
+    if (!result.errorDetails?.startsWith('Version already exists.')) {
+      process.exitCode = 1;
+      return;
+    }
   }
-  const fileName = path.basename(result.downloadedFiles[0]);
+  // const fileName = path.basename(result.downloadedFiles[0]);
+  const fileName = `violentmonkey-${version}-an+fx.xpi`;
   const url = `https://github.com/violentmonkey/violentmonkey/releases/download/v${rawVersion}/${fileName}`;
   const updates = await buildUpdatesList(version, url);
-  await fs.writeFile(path.join(process.env.TEMP_DIR, 'updates.json'), JSON.stringify(updates, null, 2), 'utf8');
+  await fs.writeFile(path.join(process.env.TEMP_DIR, 'updates/updates.json'), JSON.stringify(updates, null, 2), 'utf8');
 }
 
 main();

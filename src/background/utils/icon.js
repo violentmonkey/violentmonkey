@@ -4,9 +4,20 @@ import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import { objectPick } from '#/common/object';
 import cache from './cache';
 import { postInitialize } from './init';
-import { forEachTab } from './message';
+import { commands, forEachTab } from './message';
 import { getOption, hookOptions } from './options';
 import { testBlacklist } from './tester';
+
+// storing in `cache` only for the duration of page load in case there are 2+ identical urls
+const CACHE_DURATION = 1000;
+
+Object.assign(commands, {
+  async GetImageData(url) {
+    const key = `GetImageData:${url}`;
+    return cache.get(key)
+      || cache.put(key, loadImageData(url, { base64: true }).catch(noop), CACHE_DURATION);
+  },
+});
 
 // Firefox Android does not support such APIs, use noop
 
@@ -61,6 +72,7 @@ postInitialize.push(() => {
   titleBlacklisted = i18n('failureReasonBlacklisted');
   titleNoninjectable = i18n('failureReasonNoninjectable');
   forEachTab(updateState);
+  if (!isApplied) setIcon(); // sets the dimmed icon as default
 });
 
 browser.tabs.onRemoved.addListener((id) => {
@@ -69,7 +81,7 @@ browser.tabs.onRemoved.addListener((id) => {
 
 browser.tabs.onUpdated.addListener((tabId, info, tab) => {
   const { url } = info;
-  if (url && ua.isFirefox) {
+  if (url && ua.isFirefox && isApplied) {
     const badgeData = cache.pop(`badge:${tabId}${url}`);
     if (badgeData) setBadge(...badgeData);
   }
@@ -151,19 +163,23 @@ async function setIcon(tab = {}, data = {}) {
   });
 }
 
-function loadImageData(path) {
-  return new Promise(resolve => {
+function loadImageData(path, { base64 } = {}) {
+  return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = path;
     img.onload = () => {
       const { width, height } = img;
+      if (!width) { // FF reports 0 for SVG
+        resolve(path);
+        return;
+      }
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = width;
       canvas.height = height;
-      ctx.clearRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0, width, height);
-      resolve(ctx.getImageData(0, 0, width, height));
+      resolve(base64 ? canvas.toDataURL() : ctx.getImageData(0, 0, width, height));
     };
+    img.onerror = reject;
   });
 }

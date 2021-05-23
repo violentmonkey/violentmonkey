@@ -1,5 +1,10 @@
 <template>
-  <input type="checkbox" v-model="value" :disabled="disabled">
+  <label class="setting-check">
+    <input type="checkbox" v-model="value" :disabled="disabled">
+    <slot>
+      <span v-text="label" />
+    </slot>
+  </label>
 </template>
 
 <script>
@@ -9,6 +14,7 @@ import hookSetting from '../hook-setting';
 export default {
   props: {
     name: String,
+    label: String,
     disabled: Boolean,
     sync: {
       type: Boolean,
@@ -43,3 +49,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.setting-check {
+  display: inline-flex;
+}
+</style>

@@ -1,5 +1,5 @@
 import { browser } from './consts';
-import { ensureArray } from './util';
+import { buffer2string, ensureArray } from './util';
 
 const base = {
   prefix: '',
@@ -10,10 +10,17 @@ const base = {
     const key = this.getKey(id);
     return browser.storage.local.get(key).then(data => data[key]);
   },
-  async getMulti(ids, def) {
+  /**
+   * @param {string[]} ids
+   * @param {?} def
+   * @param {function(id:string, val:?):?} transform
+   * @returns {Promise<Object>}
+   */
+  async getMulti(ids, def, transform) {
     const data = await browser.storage.local.get(ids.map(this.getKey, this));
     return ids.reduce((res, id) => {
-      res[id] = data[this.getKey(id)] || def;
+      const val = data[this.getKey(id)];
+      res[id] = transform ? transform(id, val) : (val || def);
       return res;
     }, {});
   },
@@ -51,6 +58,30 @@ export default {
   cache: {
     ...base,
     prefix: 'cac:',
+    /**
+     * @param {Response} response
+     * @param {boolean} [noJoin]
+     * @returns {string|string[]}
+     */
+    makeRaw(response, noJoin) {
+      const type = (response.headers.get('content-type') || '').split(';')[0] || '';
+      const body = btoa(buffer2string(response.data));
+      return noJoin ? [type, body] : `${type},${body}`;
+    },
+    /**
+     * @param {string} url
+     * @param {string} [raw] - raw value in storage.cache
+     * @returns {?string}
+     */
+    makeDataUri(url, raw) {
+      if (url.startsWith('data:')) return url;
+      if (/^(i,|image\/)/.test(raw)) { // workaround for bugs in old VM, see 2e135cf7
+        const i = raw.lastIndexOf(',');
+        const type = raw.startsWith('image/') ? raw.slice(0, i) : 'image/png';
+        return `data:${type};base64,${raw.slice(i + 1)}`;
+      }
+      return raw;
+    },
   },
 
   code: {

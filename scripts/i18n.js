@@ -27,8 +27,14 @@ class Locale {
       const ext = path.extname(file);
       const transformer = transformers[ext];
       if (transformer) {
-        const res = await fs.readFile(`${localeDir}/${file}`, 'utf8');
-        Object.assign(this.data, transformer(res));
+        try {
+          const res = await fs.readFile(`${localeDir}/${file}`, 'utf8');
+          Object.assign(this.data, transformer(res));
+        } catch (err) {
+          if (err.code !== 'ENOENT') {
+            throw err;
+          }
+        }
       }
     }
     Object.keys(this.data)

@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: 筛选
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: 主页
@@ -40,6 +41,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: 选项
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: 新建
@@ -252,6 +254,11 @@ labelAuthor:
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: 从菜单开启或关闭脚本后自动刷新当前页面
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: 当前脚本在你刷新页面前将保持运行
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 每 $1 天检查一次脚本更新，0 表示禁用
@@ -363,6 +370,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 名字为空
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 未找到脚本！
@@ -455,6 +463,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 检查更新地址：
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: 单列视图
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: 表格视图
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步时间为 $1
@@ -471,6 +487,17 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: 打开控制台
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: 排除...
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: |-
+    如果你在设置中开启了相关选项，那么当前标签页将会自动重载。
+    其他标签页则需要手动刷新才能应用这些更新。
+    在脚本编辑器中的“设置”页可以进行更多配置。
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 为此站点查找脚本
@@ -538,6 +565,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: 脚本数据已加载。
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: 加载中 ...
@@ -576,6 +604,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 脚本【$1】已更新！
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: ' 显示/隐藏'
 msgSyncError:
   description: Message shown when sync failed.
   message: 同步出错！

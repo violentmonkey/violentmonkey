@@ -1,30 +1,31 @@
 {
   "name": "violentmonkey",
-  "version": "2.12.9",
+  "description": "Violentmonkey",
+  "version": "2.13.0",
   "scripts": {
     "dev": "gulp dev",
     "prebuild": "yarn ci",
     "build": "cross-env NODE_ENV=production gulp build",
-    "build:selfHosted": "cross-env TARGET=selfHosted BETA=1 yarn build",
-    "analyze": "cross-env RUN_ENV=analyze npm run build",
+    "build:selfHosted": "cross-env TARGET=selfHosted BETA=1 run-s build",
+    "analyze": "cross-env RUN_ENV=analyze run-s build",
     "i18n": "gulp i18n",
     "copyI18n": "gulp copyI18n",
-    "lint": "yarn lint:js && yarn lint:yml",
+    "lint": "run-s lint:js lint:yml",
     "lint:js": "eslint --ext .js,.vue .",
     "lint:yml": "gulp check",
     "svgo": "plaid svgo",
-    "test": "cross-env BABEL_ENV=test tape -r ./test/mock/register 'test/**/*.test.js'",
-    "ci": "yarn lint && yarn test",
+    "test": "cross-env BABEL_ENV=test tape -r ./test/mock/register \"test/**/*.test.js\"",
+    "ci": "run-s lint test",
     "transform": "locky yarn yarn",
-    "bump": "yarn ci && gulp bump --commit",
-    "preversion": "yarn ci && gulp bump --reset"
+    "bumpVersion": "gulp bump",
+    "bump": "run-s ci \"bumpVersion --commit\"",
+    "preversion": "run-s ci \"bumpVersion --reset\""
   },
-  "description": "Violentmonkey",
   "devDependencies": {
     "@actions/core": "^1.2.6",
     "@babel/plugin-proposal-function-bind": "^7.8.3",
     "@babel/register": "^7.9.0",
-    "@gera2ld/locky": "^0.1.0",
+    "@gera2ld/locky": "^0.1.1",
     "@gera2ld/plaid": "~1.5.6",
     "@gera2ld/plaid-vue": "~1.5.5",
     "@gera2ld/plaid-webpack": "~1.5.5",
@@ -34,12 +35,11 @@
     "del": "^5.1.0",
     "fancy-log": "^1.3.2",
     "gulp": "^4.0.2",
-    "gulp-filter": "^6.0.0",
     "gulp-plumber": "^1.1.0",
-    "gulp-uglify": "^3.0.2",
     "husky": "^4.2.3",
     "js-yaml": "^3.13.1",
     "jsdom": "^16.2.1",
+    "npm-run-all": "^4.1.5",
     "plugin-error": "^1.0.0",
     "sharp": "^0.26.2",
     "sign-addon": "^3.1.0",
@@ -60,12 +60,14 @@
   "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.9.2",
-    "codemirror": "5.59.0",
+    "@violentmonkey/shortcut": "^1.2.3",
+    "@zip.js/zip.js": "^2.2.26",
+    "codemirror": "5.61.0",
     "codemirror-js-mixed": "^0.9.2",
     "core-js": "^3.6.4",
     "tldjs": "^2.3.1",
     "vue": "^2.6.11",
-    "vueleton": "^1.0.4"
+    "vueleton": "^1.0.6"
   },
   "engines": {
     "node": ">=10"
@@ -75,6 +77,5 @@
       "pre-commit": "yarn transform -t",
       "pre-push": "yarn lint"
     }
-  },
-  "beta": 3
+  }
 }

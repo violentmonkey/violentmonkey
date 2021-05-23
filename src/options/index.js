@@ -1,9 +1,8 @@
 import Vue from 'vue';
 import { sendCmdDirectly, i18n, getLocaleString } from '#/common';
-import { forEachEntry } from '#/common/object';
 import handlers from '#/common/handlers';
+import { loadScriptIcon } from '#/common/load-script-icon';
 import options from '#/common/options';
-import loadZip from '#/common/zip';
 import '#/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
@@ -12,7 +11,6 @@ Vue.prototype.i18n = i18n;
 
 Object.assign(store, {
   loading: false,
-  cache: {},
   scripts: [],
   sync: [],
   title: null,
@@ -26,14 +24,9 @@ function initialize() {
   })
   .$mount();
   document.body.append(vm.$el);
-  loadZip()
-  .then((zip) => {
-    store.zip = zip;
-    zip.workerScriptsPath = '/public/lib/zip.js/';
-  });
 }
 
-function initScript(script) {
+async function initScript(script) {
   const meta = script.meta || {};
   const localeName = getLocaleString(meta, 'name');
   const search = [
@@ -47,6 +40,11 @@ function initScript(script) {
   const name = script.custom.name || localeName;
   const lowerName = name.toLowerCase();
   script.$cache = { search, name, lowerName };
+  if (!await loadScriptIcon(script, store.cache)) {
+    script.safeIcon = `/public/images/icon${
+      store.HiDPI ? 128 : script.config.removed && 32 || 38
+    }.png`;
+  }
 }
 
 export async function loadData() {
@@ -56,16 +54,9 @@ export async function loadData() {
     sendCmdDirectly('GetData', params, { retry: true }),
     options.ready,
   ]);
-  if (cache) {
-    const oldCache = store.cache || {};
-    cache::forEachEntry(([url, raw]) => {
-      const res = oldCache[url] || raw && `data:image/png;base64,${raw.split(',').pop()}`;
-      if (res) cache[url] = res;
-    });
-  }
+  store.cache = cache;
   scripts?.forEach(initScript);
   store.scripts = scripts;
-  store.cache = cache;
   store.sync = sync;
   store.loading = false;
 }

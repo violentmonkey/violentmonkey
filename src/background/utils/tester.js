@@ -95,8 +95,9 @@ function bindRE(re) {
 function autoReg(str) {
   // regexp mode: case-insensitive per GM documentation
   if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
-    const re = new RegExp(str.slice(1, -1), 'i');
-    return { test: bindRE(re) };
+    let re;
+    try { re = new RegExp(str.slice(1, -1), 'i'); } catch (e) { /* ignore */ }
+    return { test: re ? bindRE(re) : () => false };
   }
   // glob mode: case-insensitive to match GM4 & Tampermonkey bugged behavior
   const reStr = str2RE(str.toLowerCase());

@@ -1,6 +1,7 @@
-import { makePause, sendCmd } from '#/common';
+import { getActiveTab, makePause, sendCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
 import { deepCopy, forEachEntry, objectSet } from '#/common/object';
+import * as tld from '#/common/tld';
 import ua from '#/common/ua';
 import * as sync from './sync';
 import { commands } from './utils';
@@ -12,10 +13,10 @@ import { getOption, hookOptions } from './utils/options';
 import { getInjectedScripts } from './utils/preinject';
 import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
 import { resetValueOpener, addValueOpener } from './utils/values';
+import { clearRequestsByTabId } from './utils/requests';
 import './utils/clipboard';
 import './utils/hotkeys';
 import './utils/notifications';
-import './utils/requests';
 import './utils/script';
 import './utils/tabs';
 import './utils/tester';
@@ -52,7 +53,7 @@ hookOptions((changes) => {
 });
 
 Object.assign(commands, {
-  /** @return {Promise<Object>} */
+  /** @return {Promise<{ scripts: VMScript[], cache: Object, sync: Object }>} */
   async GetData(ids) {
     const data = await getData(ids);
     data.sync = sync.getStates();
@@ -61,7 +62,10 @@ Object.assign(commands, {
   /** @return {Promise<Object>} */
   async GetInjected(_, src) {
     const { frameId, tab, url } = src;
-    if (!frameId) resetValueOpener(tab.id);
+    if (!frameId) {
+      resetValueOpener(tab.id);
+      clearRequestsByTabId(tab.id);
+    }
     const res = {
       expose: !frameId && url.startsWith('https://') && expose[url.split('/', 3)[2]],
     };
@@ -73,7 +77,6 @@ Object.assign(commands, {
       // FF bug: the badge is reset because sometimes tabs get their real/internal url later
       if (ua.isFirefox) cache.put(`badge:${tab.id}${url}`, badgeData);
       Object.assign(res, data.inject);
-      data.registration?.then(r => r.unregister());
       // Injecting known content mode scripts without waiting for InjectionFeedback
       const inContent = res.scripts.map(s => !s.code && [s.dataKey, true]).filter(Boolean);
       if (inContent.length) {
@@ -82,6 +85,16 @@ Object.assign(commands, {
       }
     }
     return res;
+  },
+  /** @return {Promise<Object>} */
+  async GetTabDomain() {
+    const tab = await getActiveTab() || {};
+    const url = tab.pendingUrl || tab.url || '';
+    const host = url.match(/^https?:\/\/([^/]+)|$/)[1];
+    return {
+      tab,
+      domain: host && tld.getDomain(host) || host,
+    };
   },
   /**
    * Timers in content scripts are shared with the web page so it can clear them.

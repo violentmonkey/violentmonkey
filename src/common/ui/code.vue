@@ -97,7 +97,10 @@ export const cmOptions = {
   autoCloseBrackets: true,
   highlightSelectionMatches: true,
   keyMap: 'sublime',
-  maxDisplayLength: 20_000,
+  /* Limiting the max length to avoid delays while CodeMirror tries to make sense of a long line.
+   * 100kB is fast enough for the main editor (moreover such long lines are rare in the main script),
+   * and is big enough to include most of popular minified libraries for the `@resource/@require` viewer. */
+  maxDisplayLength: 100_000,
 };
 
 export default {
@@ -111,6 +114,7 @@ export default {
       type: String,
       default: '',
     },
+    mode: String,
     commands: {
       type: Object,
       default: null,
@@ -146,6 +150,9 @@ export default {
   },
   watch: {
     active: 'onActive',
+    mode(value) {
+      this.cm.setOption('mode', value || cmOptions.mode);
+    },
     value(value) {
       const { cm } = this;
       if (!cm) return;
@@ -270,7 +277,7 @@ export default {
           // pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
           (cm.options.indentWithTabs ? insertTab : insertSoftTab)(cm);
         },
-        showHelp: this.commands.showHelp,
+        showHelp: this.commands?.showHelp,
       });
       // these are active in all nav tabs
       cm.setOption('extraKeys', {
@@ -505,7 +512,7 @@ export default {
   },
   mounted() {
     let userOpts = options.get('editor');
-    const opts = { ...this.cmOptions, ...userOpts };
+    const opts = { ...this.cmOptions, ...userOpts, mode: this.mode || cmOptions.mode };
     CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
       const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
       // fallback to anyword if default returns nothing (or no default)

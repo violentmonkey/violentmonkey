@@ -28,6 +28,7 @@ buttonExportData:
 buttonFilter:
   description: Button to show filters menu.
   message: Süzgeçler
+  touched: false
 buttonHome:
   description: Button to open homepage.
   message: Anasayfa
@@ -40,6 +41,7 @@ buttonInstallFromURL:
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Ayarlar
+  touched: false
 buttonNew:
   description: Button to create a new script.
   message: Yeni
@@ -251,6 +253,11 @@ labelAutoReloadCurrentTab:
   message: >-
     Bir script dosyasını menüden açıp / kapattıktan sonra geçerli sekmeyi
     yeniden yükle
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    disabled.
+  message: ''
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Script güncellemelerini $1 günde bir kontrol et, kapatmak için 0 seçin'
@@ -362,6 +369,7 @@ labelName:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: İsimsiz
+  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Script bulunamadı.
@@ -456,6 +464,14 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Güncelleme URL:'
+labelViewSingleColumn:
+  description: >-
+    Label for option in dashboard script list to show the scripts in single
+    column.
+  message: ''
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: Son eşitleme zamanı $1
@@ -472,6 +488,14 @@ menuCommands:
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Paneli Aç
+menuExclude:
+  description: >-
+    Shown in popup menu after clicking script's "..." dropdown so try to keep
+    the label short.
+  message: ''
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Bu siteye özel scriptleri bul
@@ -539,6 +563,7 @@ msgLoadedData:
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
   message: Script verileri yüklendi.
+  touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
   message: Yükleniyor ...
@@ -579,6 +604,9 @@ msgSavedScriptTemplate:
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 'Script [$1] güncellendi!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: ''
 msgSyncError:
   description: Message shown when sync failed.
   message: Eşitleme hatası!
