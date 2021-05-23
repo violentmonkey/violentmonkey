@@ -11,7 +11,7 @@ import {
   decodeValue, dumpValue, loadValues, changeHooks,
 } from './gm-values';
 import {
-  charCodeAt, jsonDump, logging, slice,
+  charCodeAt, jsonDump, log, logging, slice,
   createElementNS, setAttribute, NS_HTML,
 } from '../utils/helpers';
 
@@ -22,6 +22,7 @@ const {
   Document: { prototype: { getElementById } },
   EventTarget: { prototype: { dispatchEvent } },
   MouseEvent,
+  Promise: { prototype: { then } },
   String: { prototype: { lastIndexOf } },
   TextDecoder: { prototype: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
@@ -31,6 +32,7 @@ export const vmOwnFunc = (func, toString) => {
   defineProperty(func, 'toString', { value: toString || vmOwnFuncToString });
   return func;
 };
+let downloadChain = Promise.resolve();
 
 export function makeGmApi() {
   return [{
@@ -234,14 +236,21 @@ function getResource(context, name, isBlob) {
   }
 }
 
-async function downloadBlob(res) {
+function downloadBlob(res) {
   const { context: { name, onload }, response } = res;
   const url = createObjectURL(response);
   const a = document::createElementNS(NS_HTML, 'a');
   a::setAttribute('href', url);
   if (name) a::setAttribute('download', name);
-  a::dispatchEvent(new MouseEvent('click'));
+  downloadChain = downloadChain::then(async () => {
+    a::dispatchEvent(new MouseEvent('click'));
+    revokeBlobAfterTimeout(url);
+    try { onload?.(res); } catch (e) { log('error', ['GM_download', 'callback'], e); }
+    await bridge.send('SetTimeout', 100);
+  });
+}
+
+async function revokeBlobAfterTimeout(url) {
   await bridge.send('SetTimeout', 3000);
   revokeObjectURL(url);
-  onload?.(res);
 }
