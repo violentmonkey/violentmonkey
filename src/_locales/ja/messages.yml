@@ -15,7 +15,7 @@ buttonEdit:
   message: 編集
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: 'スクリプト名を右クリック、 [Ctrl] キーを押しながらクリック、ホイールでクリックすることもできます。'
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: 今すぐゴミ箱を空にする
@@ -133,10 +133,13 @@ editLabelSettings:
   message: スクリプト別の設定
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: 行が長すぎます
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: |-
+    この行は長すぎるため、編集時の遅延を避けるためにテキストが折りたたまれています。
+    次のような詳細設定で制限を調整できます。
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: コード
@@ -148,10 +151,10 @@ editNavValues:
   message: 値
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: ''
+  message: すべて
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: スクリプトの値の保存全体を表示／編集する
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: キャンセル
@@ -194,7 +197,7 @@ filterScopeName:
   message: 名前
 genericError:
   description: Label for generic error.
-  message: ''
+  message: エラー
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: オフ
@@ -253,7 +256,7 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: 現在のスクリプトは、タブを再ロードするまで実行され続けます。
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: スクリプトの更新を $1 日ごとに確認 (0 を指定すると無効)
@@ -298,7 +301,7 @@ labelEditValue:
   message: スクリプトの値を編集中
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: スクリプトストレージの編集
 labelEditor:
   description: Label for Editor settings
   message: エディタ
@@ -313,7 +316,7 @@ labelExportScriptData:
   message: スクリプトが保存したデータを含める
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: ユーザスクリプトカタログサイトにインストールされているバージョンを公開する： $1
 labelFeedback:
   description: Label of link to feedback page.
   message: フィードバック
@@ -334,7 +337,7 @@ labelHomepageURL:
   message: 'ホームページのURL:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: スクリプトデータのインポート
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Violentmonkey の設定もインポートする
@@ -462,10 +465,10 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: 単一列
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: 表形式
 lastSync:
   description: Label for last sync timestamp.
   message: $1 に同期
@@ -486,19 +489,22 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: 除外…
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: |2-
+     一般設定でこのオプションを有効にすると、現在のタブが自動再ロードされます。
+    他のすべてのタブに変更を適用するには、手動で再ロードしてください。
+    柔軟性を高めるには、エディタの「設定」タブを使用します。 
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 表示しているサイト用のスクリプトを探す
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: 一部のスクリプトを注入できませんでした。
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: ''
+  message: 「自動」モードで再試行してください
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Sub-frames only scripts
@@ -598,7 +604,7 @@ msgScriptUpdated:
   message: スクリプト「$1」が更新されました!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: 表示/非表示
 msgSyncError:
   description: Message shown when sync failed.
   message: 同期エラー!
@@ -625,15 +631,15 @@ noValues:
   message: 値は保存されていません
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: 新しいウィンドウのポップアップからエディターを開く
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: エディタウィンドウの位置は、サイズ変更または保存時にのみ記憶されます
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: オムニボックスを表示しない
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: 有効なものを先頭に表示
@@ -674,7 +680,7 @@ valueLabelValue:
   message: 値 (JSONとしてシリアル化された)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: すべての値 (JSONとしてシリアル化)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: ウェブサイトを開く

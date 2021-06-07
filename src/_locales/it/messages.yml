@@ -270,7 +270,9 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: >-
+    Gli script correnti continueranno a funzionare fino a quando non
+    ricaricherai la scheda
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Check for script updates every $1 day(s), use 0 to disable'
@@ -479,10 +481,10 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Colonna singola
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Guarda come tabella
 lastSync:
   description: Label for last sync timestamp.
   message: Ultima sincronizzazione il $1
@@ -503,10 +505,16 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Escludi...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    La scheda corrente verrà ricaricata automaticamente se hai abilitato questa
+    opzione nelle impostazioni generali.
+
+    Per applicare le modifiche a tutte le altre schede, ricaricarle manualmente.
+
+    Usa la scheda "Impostazioni" dell'editor per una maggiore flessibilità.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Cerca script per questo sito
@@ -619,7 +627,7 @@ msgScriptUpdated:
   message: 'Lo script [$1] è aggiornato!'
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Mostra/nascondi
 msgSyncError:
   description: Message shown when sync failed.
   message: Errore sincronizzazione!
