@@ -8,6 +8,7 @@ const bgHandlers = {};
 const bridge = {
   ids: [],
   // userscripts running in the content script context are messaged via invokeGuest
+  /** @type Number[] */
   invokableIds: [],
   failedIds: [],
   // {CommandName: sendCmd} will relay the request via sendCmd as is

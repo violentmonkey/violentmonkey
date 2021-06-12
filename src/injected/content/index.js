@@ -64,7 +64,7 @@ bridge.addBackgroundHandlers({
     const dataContent = {};
     const { invokableIds } = bridge;
     objectKeys(data)::forEach((id) => {
-      (invokableIds::includes(id) ? dataContent : dataPage)[id] = data[id];
+      (invokableIds::includes(+id) ? dataContent : dataPage)[id] = data[id];
     });
     if (!isEmpty(dataPage)) bridge.post('UpdatedValues', dataPage);
     if (!isEmpty(dataContent)) bridge.post('UpdatedValues', dataContent, INJECT_CONTENT);
