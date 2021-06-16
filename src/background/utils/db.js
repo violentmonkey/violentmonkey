@@ -386,7 +386,7 @@ async function saveScript(script, code) {
     oldScript = store.scriptMap[props.id];
   }
   props.uri = getNameURI(script);
-  props.uuid = props.uuid || getUUID();
+  props.uuid = props.uuid || crypto.randomUUID?.() || getUUID();
   // Do not allow script with same name and namespace
   if (store.scripts.some(({ props: { id, uri } = {} }) => props.id !== id && props.uri === uri)) {
     throw i18n('msgNamespaceConflict');
