@@ -241,13 +241,16 @@ export default {
     onStorageChanged(changes) {
       const data = changes[scriptStorageKey]?.newValue;
       if (data) {
-        this.setData(data);
         const { current } = this;
+        const oldText = current && this.getValue(current.key);
+        this.setData(data);
         if (current) {
           const newText = this.getValue(current.key);
-          if (newText === current.value) {
+          const curText = current.value;
+          if (curText === newText) {
             current.isNew = false;
-          } else {
+          } else if (curText === oldText) {
+            // Updating the current value only if it wasn't yet changed by the user.
             // Keeping the same this.current to avoid triggering `watch` observer
             Object.keys(current)
             .filter(k => k !== 'key' && k !== 'value')
