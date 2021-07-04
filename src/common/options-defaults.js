@@ -6,8 +6,11 @@ export default {
   // ignoreGrant: false,
   lastUpdate: 0,
   lastModified: 0,
-  /** @type 'unique' | 'total' | '' */
+  /** @typedef {'unique' | 'total' | ''} VMBadgeMode */
+  /** @type VMBadgeMode */
   showBadge: 'unique',
+  badgeColor: '#880088',
+  badgeColorBlocked: '#888888',
   exportValues: true,
   expose: { // use percent-encoding for '.'
     'greasyfork%2Eorg': true,

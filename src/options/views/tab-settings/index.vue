@@ -26,7 +26,7 @@
         <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')" />
         <setting-check name="filtersPopup.hideDisabled" :label="i18n('optionPopupHideDisabled')" />
       </div>
-      <div>
+      <div class="mr-2c">
         <label>
           <span v-text="i18n('labelBadge')"></span>
           <select v-model="settings.showBadge">
@@ -34,6 +34,14 @@
             <option value="unique" v-text="i18n('labelBadgeUnique')" />
             <option value="total" v-text="i18n('labelBadgeTotal')" />
           </select>
+        </label>
+        <label class="mr-1c">
+          <span v-text="i18n('labelBadgeColors')"/>
+          <tooltip v-for="(title, name) in badgeColors" :key="name" :content="title">
+            <input type="color" v-model="settings[name]">
+          </tooltip>
+          <button v-text="i18n('buttonReset')" v-show="isCustomBadgeColor"
+                  @click="onResetBadgeColors"/>
         </label>
       </div>
     </section>
@@ -98,14 +106,16 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { debounce } from '#/common';
+import { debounce, i18n } from '#/common';
 import {
   INJECT_AUTO,
   INJECT_PAGE,
   INJECT_CONTENT,
 } from '#/common/consts';
 import SettingCheck from '#/common/ui/setting-check';
+import { forEachKey } from '#/common/object';
 import options from '#/common/options';
+import optionsDefaults from '#/common/options-defaults';
 import hookSetting from '#/common/hook-setting';
 import Icon from '#/common/ui/icon';
 import LocaleGroup from '#/common/ui/locale-group';
@@ -123,6 +133,10 @@ const injectIntoOptions = [
   INJECT_PAGE,
   INJECT_CONTENT,
 ];
+const badgeColors = {
+  badgeColor: i18n('titleBadgeColor'),
+  badgeColorBlocked: i18n('titleBadgeColorBlocked'),
+};
 const items = [
   {
     name: 'showBadge',
@@ -138,13 +152,17 @@ const items = [
   {
     name: 'defaultInjectInto',
     normalize(value) {
-      return injectIntoOptions.includes(value) ? value : 'auto';
+      return injectIntoOptions.includes(value) ? value : optionsDefaults.defaultInjectInto;
     },
   },
   {
     name: 'filtersPopup.sort',
     normalize: value => value === 'exec' && value || 'alpha',
   },
+  ...['badgeColor', 'badgeColorBlocked'].map(name => ({
+    name,
+    normalize: value => (/^#[0-9a-f]{6}$/i.test(value) ? value : optionsDefaults[name]),
+  })),
 ];
 const settings = {};
 items.forEach(({ name }) => {
@@ -170,12 +188,16 @@ export default {
       showAdvanced: false,
       expose: null,
       settings,
+      badgeColors,
       injectIntoOptions,
     };
   },
   computed: {
     editorWindowHint() {
       return global.chrome.windows?.onBoundsChanged ? null : this.i18n('optionEditorWindowHint');
+    },
+    isCustomBadgeColor() {
+      return Object.keys(badgeColors).some(name => settings[name] !== optionsDefaults[name]);
     },
   },
   methods: {
@@ -185,6 +207,11 @@ export default {
         oldValue = normalize(oldValue);
         if (value !== oldValue) options.set(name, value);
       };
+    },
+    onResetBadgeColors() {
+      badgeColors::forEachKey(name => {
+        settings[name] = optionsDefaults[name];
+      });
     },
   },
   created() {
