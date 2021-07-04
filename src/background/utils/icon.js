@@ -42,9 +42,21 @@ const browserAction = (() => {
 })();
 
 const badges = {};
+const KEY_IS_APPLIED = 'isApplied';
+const KEY_SHOW_BADGE = 'showBadge';
+const KEY_BADGE_COLOR = 'badgeColor';
+const KEY_BADGE_COLOR_BLOCKED = 'badgeColorBlocked';
+/** @type boolean */
 let isApplied;
+/** @type VMBadgeMode */
 let showBadge;
+/** @type string */
+let badgeColor;
+/** @type string */
+let badgeColorBlocked;
+/** @type string */
 let titleBlacklisted;
+/** @type string */
 let titleNoninjectable;
 
 // We'll cache the icon data in Chrome as it doesn't cache the data and takes up to 40ms
@@ -52,14 +64,23 @@ let titleNoninjectable;
 const iconCache = ua.isChrome && {};
 
 hookOptions((changes) => {
-  if ('isApplied' in changes) {
-    isApplied = changes.isApplied;
+  let v;
+  if ((v = changes[KEY_IS_APPLIED]) != null) {
+    isApplied = v;
     setIcon(); // change the default icon
     forEachTab(setIcon); // change the current tabs' icons
   }
-  if ('showBadge' in changes) {
-    showBadge = changes.showBadge;
+  if ((v = changes[KEY_SHOW_BADGE]) != null) {
+    showBadge = v;
     forEachTab(updateBadge);
+  }
+  if ((v = changes[KEY_BADGE_COLOR])) {
+    badgeColor = v;
+    forEachTab(updateBadgeColor);
+  }
+  if ((v = changes[KEY_BADGE_COLOR_BLOCKED])) {
+    badgeColorBlocked = v;
+    forEachTab(updateBadgeColor);
   }
   if ('blacklist' in changes) {
     forEachTab(updateState);
@@ -67,8 +88,10 @@ hookOptions((changes) => {
 });
 
 postInitialize.push(() => {
-  isApplied = getOption('isApplied');
-  showBadge = getOption('showBadge');
+  isApplied = getOption(KEY_IS_APPLIED);
+  showBadge = getOption(KEY_SHOW_BADGE);
+  badgeColor = getOption(KEY_BADGE_COLOR);
+  badgeColorBlocked = getOption(KEY_BADGE_COLOR_BLOCKED);
   titleBlacklisted = i18n('failureReasonBlacklisted');
   titleNoninjectable = i18n('failureReasonNoninjectable');
   forEachTab(updateState);
@@ -110,10 +133,7 @@ export function setBadge(ids, { tab, frameId }) {
     });
     data.unique = Object.keys(data.idMap).length;
   }
-  browserAction.setBadgeBackgroundColor({
-    color: data.blocked ? '#888' : '#808',
-    tabId,
-  });
+  updateBadgeColor(tab, data);
   updateBadge(tab, data);
 }
 
@@ -121,6 +141,15 @@ function updateBadge(tab, data = badges[tab.id]) {
   if (data) {
     browserAction.setBadgeText({
       text: `${data[showBadge] || ''}`,
+      tabId: tab.id,
+    });
+  }
+}
+
+function updateBadgeColor(tab, data = badges[tab.id]) {
+  if (data) {
+    browserAction.setBadgeBackgroundColor({
+      color: data.blocked ? badgeColorBlocked : badgeColor,
       tabId: tab.id,
     });
   }

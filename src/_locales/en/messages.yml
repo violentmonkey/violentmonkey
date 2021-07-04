@@ -269,6 +269,9 @@ labelAutoUpdate:
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Display on badge: '
+labelBadgeColors:
+  description: Label for option group to set badge colors.
+  message: 'Badge colors: '
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: none
@@ -673,6 +676,12 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Settings
+titleBadgeColor:
+  description: Tooltip for option to set badge color.
+  message: 'Normal badge color'
+titleBadgeColorBlocked:
+  description: Tooltip for option to set badge color of non-injectable tabs.
+  message: 'Badge color when the site is non-injectable (blacklisted or unsupported)'
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Update
