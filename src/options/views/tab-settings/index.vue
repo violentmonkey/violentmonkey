@@ -35,12 +35,12 @@
             <option value="total" v-text="i18n('labelBadgeTotal')" />
           </select>
         </label>
-        <label class="mr-1c">
+        <label>
           <span v-text="i18n('labelBadgeColors')"/>
           <tooltip v-for="(title, name) in badgeColors" :key="name" :content="title">
             <input type="color" v-model="settings[name]">
           </tooltip>
-          <button v-text="i18n('buttonReset')" v-show="isCustomBadgeColor"
+          <button v-text="i18n('buttonReset')" v-show="isCustomBadgeColor" class="ml-1"
                   @click="onResetBadgeColors"/>
         </label>
       </div>
