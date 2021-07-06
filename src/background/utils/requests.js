@@ -341,7 +341,7 @@ async function httpRequest(details, src, cb) {
       url,
       storeId: req.storeId,
       ...ua.isFirefox >= 59 && { firstPartyDomain: null },
-    })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!;
+    })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
     if (cookies.length) {
       vmHeaders.push({
         name: 'cookie',
