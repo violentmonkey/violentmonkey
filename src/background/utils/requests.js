@@ -135,10 +135,9 @@ const HeaderInjector = (() => {
       },
     },
   };
-  // Chrome 74+ needs to have any extraHeaders listener at tab load start, https://crbug.com/1074282
+  // Chrome 74-91 needs an extraHeaders listener at tab load start, https://crbug.com/1074282
   // We're attaching a no-op in non-blocking mode so it's very lightweight and fast.
-  // TODO: check the version range (via feature detection?) when it's fixed in Chrome
-  if (ua.isChrome && TextEncoder.prototype.encodeInto) {
+  if (ua.isChrome >= 74 && ua.isChrome <= 91) {
     browser.webRequest.onBeforeSendHeaders.addListener(noop, apiFilter, ['extraHeaders']);
   }
   return {
