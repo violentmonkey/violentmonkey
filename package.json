@@ -30,6 +30,7 @@
     "@gera2ld/plaid-vue": "~1.5.5",
     "@gera2ld/plaid-webpack": "~1.5.5",
     "@types/chrome": "0.0.101",
+    "@types/firefox-webext-browser": "82.0.0",
     "cross-env": "^7.0.2",
     "cross-spawn": "^7.0.1",
     "del": "^5.1.0",

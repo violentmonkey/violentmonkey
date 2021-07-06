@@ -56,7 +56,11 @@ if (!global.browser?.runtime?.sendMessage) {
   const meta = {
     browserAction: true,
     commands: true,
-    cookies: true,
+    cookies: {
+      getAll: wrapAsync,
+      getAllCookieStores: wrapAsync,
+      set: wrapAsync,
+    },
     extension: true,
     i18n: true,
     notifications: {
