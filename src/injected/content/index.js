@@ -96,7 +96,7 @@ bridge.addHandlers({
     appendToRoot(style);
     return styleId;
   },
-  CheckScript: sendCmd,
+  GetScript: sendCmd,
   SetTimeout: sendCmd,
   TabFocus: sendCmd,
 });

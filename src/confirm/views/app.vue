@@ -1,5 +1,5 @@
 <template>
-  <div class="page-confirm frame flex flex-col h-100">
+  <div class="page-confirm frame flex flex-col h-100" :class="{ reinstall }">
     <div class="frame-block">
       <div class="flex">
         <div class="image">
@@ -7,7 +7,10 @@
         </div>
         <div class="info">
           <h1>
-            <div v-text="heading"/>
+            <div>
+              <span v-text="heading"/>
+              <span v-text="i18n('msgSameCode')" style="font-weight:normal" v-if="sameCode"/>
+            </div>
             <div class="ellipsis" v-text="name"/>
           </h1>
           <a class="url ellipsis" v-text="decodedUrl"
@@ -37,8 +40,12 @@
           <img :src="safeIcon">
         </div>
         <div class="actions flex flex-wrap mr-2c">
-          <button v-text="i18n('buttonConfirmInstallation')" @click="installScript"
-                  :disabled="!installable"/>
+          <button
+            id="confirm"
+            v-text="reinstall
+              ? i18n('buttonConfirmReinstallation')
+              : i18n('buttonConfirmInstallation')"
+            @click="installScript" :disabled="!installable"/>
           <button v-text="i18n('buttonClose')" @click="close"/>
           <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
                          @change="checkClose" />
@@ -62,7 +69,7 @@
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import Icon from '#/common/ui/icon';
 import {
-  sendCmd, leftpad, request, isRemote, getFullUrl, makePause,
+  sendCmdDirectly, request, isRemote, getFullUrl, makePause,
   getLocaleString, trueJoin,
 } from '#/common';
 import options from '#/common/options';
@@ -71,7 +78,7 @@ import storage from '#/common/storage';
 import VmCode from '#/common/ui/code';
 import SettingCheck from '#/common/ui/setting-check';
 import { loadScriptIcon } from '#/common/load-script-icon';
-import { objectPick } from '#/common/object';
+import { deepEqual, objectPick } from '#/common/object';
 import { route } from '#/common/router';
 import ua from '#/common/ua';
 
@@ -94,7 +101,6 @@ export default {
     return {
       installable: false,
       installed: false,
-      dependencyOK: false,
       closeAfterInstall: options.get('closeAfterInstall'),
       message: '',
       code: '',
@@ -109,7 +115,9 @@ export default {
       lists: null,
       listsShown: true,
       name: '...',
+      reinstall: false,
       safeIcon: null,
+      sameCode: false,
       urlsOK: {},
     };
   },
@@ -124,7 +132,7 @@ export default {
   async mounted() {
     const id = route.paths[0];
     const key = `confirm-${id}`;
-    this.info = await sendCmd('CacheLoad', key);
+    this.info = await sendCmdDirectly('CacheLoad', key);
     if (!this.info) {
       this.close();
       return;
@@ -132,14 +140,22 @@ export default {
     const { url } = this.info;
     this.decodedUrl = decodeURIComponent(url);
     filePortNeeded = ua.isFirefox >= 68 && url.startsWith('file:');
-    this.guard = setInterval(sendCmd, 5000, 'CacheHit', { key });
+    this.guard = setInterval(sendCmdDirectly, 5000, 'CacheHit', { key });
     await this.loadData();
-    if (!await this.parseMeta()) {
-      let retries = 2;
-      do await makePause(3000);
-      while (!await this.loadDeps() && (retries -= 1));
+    await this.parseMeta();
+    await Promise.all([
+      this.checkSameCode(),
+      (async () => {
+        let retries = 2;
+        while (retries && !await this.loadDeps()) {
+          await makePause(3000);
+          retries -= 1;
+        }
+      })(),
+    ]);
+    if (this.installable) {
+      this.heading = this.reinstall ? this.i18n('labelReinstall') : this.i18n('labelInstall');
     }
-    if (this.installable) this.heading = this.i18n('labelInstall');
   },
   beforeDestroy() {
     if (this.guard) {
@@ -158,7 +174,7 @@ export default {
     },
     async parseMeta() {
       /** @type {VMScriptMeta} */
-      const script = await sendCmd('ParseMeta', this.code);
+      const script = await sendCmdDirectly('ParseMeta', this.code);
       const urls = Object.values(script.resources);
       this.name = [getLocaleString(script, 'name'), script.version]::trueJoin(', ');
       this.descr = getLocaleString(script, 'description');
@@ -182,11 +198,15 @@ export default {
       this.lists.require = [...new Set(script.require)];
       this.lists.resource = [...new Set(urls)];
       this.meta = script;
-      return this.loadDeps();
     },
     async loadDeps() {
       if (!this.safeIcon) loadScriptIcon(this);
       const { require, resource } = this.lists;
+      if (this.require
+          && deepEqual(require.slice().sort(), Object.keys(this.require).sort())
+          && deepEqual(resource.slice().sort(), Object.keys(this.resources).sort())) {
+        return;
+      }
       this.require = {};
       this.resources = {};
       const length = require.length + resource.length;
@@ -223,14 +243,13 @@ export default {
         this.error = error;
       } else {
         this.error = null;
-        this.dependencyOK = true;
         this.installable = true;
         this.message = null;
         return true;
       }
     },
     close() {
-      sendCmd('TabClose');
+      sendCmdDirectly('TabClose');
     },
     async getFile(url, { isBlob, useCache } = {}) {
       const cacheKey = isBlob ? `blob+${url}` : `text+${url}`;
@@ -248,37 +267,35 @@ export default {
     },
     async getScript(url) {
       try {
-        return await sendCmd('CacheLoad', url) || await this.getFile(url);
+        return await sendCmdDirectly('CacheLoad', url) || await this.getFile(url);
       } catch (e) {
         this.message = this.i18n('msgErrorLoadingData');
         throw url;
       }
     },
-    getTimeString() {
-      const now = new Date();
-      return `${leftpad(now.getHours(), 2)}:${leftpad(now.getMinutes(), 2)}:${leftpad(now.getSeconds(), 2)}`;
-    },
-    installScript() {
+    async installScript() {
       this.installable = false;
-      return sendCmd('ParseScript', {
-        code: this.code,
-        url: this.info.url,
-        from: this.info.from,
-        require: this.require,
-        cache: this.resources,
-      })
-      .then((result) => {
-        this.message = `${result.update.message}[${this.getTimeString()}]`;
+      try {
+        const { update } = await sendCmdDirectly('ParseScript', {
+          code: this.code,
+          url: this.info.url,
+          from: this.info.from,
+          require: this.require,
+          cache: this.resources,
+        });
+        const time = new Date().toLocaleTimeString(['fr']);
+        const time0 = this.confirmedTime || (this.confirmedTime = time);
+        this.message = `${update.message} ${time0}${time0 === time ? '' : ` --> ${time}`}`;
         if (this.closeAfterInstall) {
           this.close();
         } else {
           this.installed = true;
           this.trackLocalFile();
         }
-      }, (err) => {
+      } catch (err) {
         this.message = `${err}`;
         this.installable = true;
-      });
+      }
     },
     async trackLocalFile() {
       if (this.tracking || !this.isLocal || !this.installed) {
@@ -290,7 +307,9 @@ export default {
         try {
           await this.loadData(true);
           await this.parseMeta();
+          await this.loadDeps();
           await this.installScript();
+          this.sameCode = false;
         } catch (e) { /* NOP */ }
       }
       this.tracking = false;
@@ -298,6 +317,12 @@ export default {
     checkClose(value) {
       this.closeAfterInstall = value;
       if (value) options.set('trackLocalFile', false);
+    },
+    async checkSameCode() {
+      const { name, namespace } = this.meta;
+      const old = await sendCmdDirectly('GetScript', { meta: { name, namespace } });
+      this.reinstall = !!old;
+      this.sameCode = old && this.code === await sendCmdDirectly('GetScriptCode', old.props.id);
     },
     createFilePort() {
       filePort = browser.tabs.connect(this.info.tabId, { name: 'FetchSelf' });
@@ -405,15 +430,49 @@ $infoIconSize: 18px;
   .actions {
     align-items: center;
     margin: .5rem 0;
-    > button:first-of-type:not(:disabled) {
+    > #confirm:not(:disabled) {
       font-weight: bold;
     }
   }
   .incognito {
     padding: .25em 0;
     color: red;
-    @media (prefers-color-scheme: dark) {
+  }
+  #confirm {
+    background: #d4e2d4;
+    border-color: #75a775;
+    color: darkgreen;
+    &:hover {
+      border-color: #488148;
+    }
+  }
+  &.reinstall #confirm {
+    background: #d1e0ea;
+    border-color: #6699ce;
+    color: #004fc5;
+    &:hover {
+      border-color: #35699f;
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    .incognito {
       color: orange;
+    }
+    #confirm {
+      background: #3a5d3a;
+      border-color: #598059;
+      color: #9cd89c;
+      &:hover {
+        border-color: #80a980;
+      }
+    }
+    &.reinstall #confirm {
+      background: #224a73;
+      border-color: #3d6996;
+      color: #9fcdfd;
+      &:hover {
+        border-color: #608cb8;
+      }
     }
   }
 }
