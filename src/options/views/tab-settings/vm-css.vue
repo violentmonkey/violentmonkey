@@ -2,7 +2,7 @@
   <section>
     <h3 v-text="i18n('labelCustomCSS')"></h3>
     <p v-html="i18n('descCustomCSS')"></p>
-    <setting-text name="customCSS" @save="onSave"/>
+    <setting-text name="customCSS" cm-mode="css" @save="onSave"/>
   </section>
 </template>
 

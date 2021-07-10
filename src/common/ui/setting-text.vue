@@ -1,6 +1,19 @@
 <template>
   <div>
+    <div v-if="cmMode" class="setting-code pos-rel">
+      <vm-code
+        v-model="value"
+        ref="code"
+        class="abs-full"
+        :class="{'has-error': parsedData.error}"
+        :commands="{ save: onSave }"
+        :disabled="disabled"
+        :title="parsedData.error"
+        @change="onChange"
+      />
+    </div>
     <textarea
+      v-else
       class="monospace-font"
       :class="{'has-error': parsedData.error}"
       spellcheck="false"
@@ -18,6 +31,7 @@
 </template>
 
 <script>
+import VmCode from '#/common/ui/code';
 import { getUnloadSentry } from '#/common/router';
 import { deepEqual, objectGet } from '../object';
 import options from '../options';
@@ -27,6 +41,7 @@ import hookSetting from '../hook-setting';
 export default {
   props: {
     name: String,
+    cmMode: String,
     json: Boolean,
     disabled: Boolean,
     hasSave: {
@@ -40,6 +55,9 @@ export default {
       value: null,
       savedValue: null,
     };
+  },
+  components: {
+    VmCode,
   },
   computed: {
     parsedData() {
@@ -89,6 +107,20 @@ export default {
       this.value = handle(this.savedValue);
     });
   },
+  mounted() {
+    if (this.cmMode) {
+      const { code } = this.$refs;
+      const elAdvHidden = code.$el.closest('[style*="display:"]');
+      const { cm } = code;
+      cm.setOption('mode', this.cmMode);
+      if (elAdvHidden) {
+        new MutationObserver((_mutations, observer) => {
+          observer.disconnect();
+          cm.refresh();
+        }).observe(elAdvHidden, { attributes: true, attributeFilter: ['style'] });
+      }
+    }
+  },
   beforeDestroy() {
     this.revoke();
     this.toggleUnloadSentry(false);
@@ -108,3 +140,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.setting-code {
+  height: 300px;
+}
+</style>
