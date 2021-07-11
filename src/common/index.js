@@ -37,8 +37,32 @@ export function sendCmd(cmd, data, options) {
   return sendMessage({ cmd, data }, options);
 }
 
+// These need `src` parameter so we'll use sendCmd for them. We could have forged `src` via
+// browser.tabs.getCurrent but there's no need as they normally use only a tiny amount of data.
+const COMMANDS_WITH_SRC = [
+  'ConfirmInstall',
+  'Notification',
+  'TabClose',
+  'TabFocus',
+  'TabOpen',
+  'UpdateValue',
+/*
+  These are used only by content scripts where sendCmdDirectly can't be used anyway
+  'GetInjected',
+  'GetRequestId',
+  'HttpRequest',
+  'InjectionFeedback',
+  'SetPopup',
+*/
+];
+
+/**
+ * Sends the command+data directly so it's synchronous and faster than sendCmd thanks to deepCopy.
+ * WARNING! Make sure `cmd` handler doesn't use `src` or `cmd` is listed in COMMANDS_WITH_SRC.
+ */
 export function sendCmdDirectly(cmd, data, options) {
-  const bg = browser.extension.getBackgroundPage?.();
+  const bg = !COMMANDS_WITH_SRC.includes(cmd)
+    && browser.extension.getBackgroundPage?.();
   return bg && bg !== window && bg.deepCopy
     ? bg.handleCommandMessage(bg.deepCopy({ cmd, data })).then(deepCopy)
     : sendCmd(cmd, data, options);

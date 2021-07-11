@@ -7,6 +7,9 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Confirm installation
+buttonConfirmReinstallation:
+  description: Button to confirm re-installation when the script is already installed.
+  message: Confirm re-installation
 buttonDisable:
   description: Button to disable a script.
   message: Disable
@@ -359,6 +362,9 @@ labelInjectionMode:
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Installing script
+labelReinstall:
+  description: Shown in the title of the confirm page while trying to install a script that's already installed.
+  message: Re-installing script
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Keep original
@@ -599,6 +605,9 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: No update found.
+msgSameCode:
+  description: Shown inside the title when re-installing a script that's already installed.
+  message: ' (code is the same)'
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Blacklist updated.

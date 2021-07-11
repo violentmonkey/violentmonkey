@@ -25,13 +25,8 @@ storage.script.onDump = (item) => {
 Object.assign(commands, {
   CheckPosition: sortScripts,
   CheckRemove: checkRemove,
-  /** @return {?string} */
-  CheckScript({ name, namespace }) {
-    const script = getScript({ meta: { name, namespace } });
-    return script && !script.config.removed
-      ? script.meta.version
-      : null;
-  },
+  /** @return {VMScript} */
+  GetScript: getScript,
   /** @return {Promise<{ items: VMScript[], values? }>} */
   async ExportZip({ values }) {
     const scripts = getScripts();

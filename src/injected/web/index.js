@@ -76,7 +76,10 @@ bridge.addHandlers({
       value: process.env.VM_VER,
     });
     defineProperty(Violentmonkey, 'isInstalled', {
-      value: (name, namespace) => bridge.send('CheckScript', { name, namespace }),
+      async value(name, namespace) {
+        const script = await bridge.send('GetScript', { meta: { name, namespace } });
+        return script && !script.config.removed ? script.meta.version : null;
+      },
     });
     defineProperty(window.external, 'Violentmonkey', {
       value: Violentmonkey,
