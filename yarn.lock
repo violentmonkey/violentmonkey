@@ -1125,10 +1125,10 @@
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.2.tgz#690a1475b84f2a884fd07cd797c00f5f31356ea8"
   integrity sha512-ce5d3q03Ex0sy4R14722Rmt6MT07Ua+k4FwDfdcToYJcMKNtRVQvJ6JCAPdAmAnbRb6CsX6aYb9m96NGod9uTw==
 
-"@violentmonkey/shortcut@^1.2.3":
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/@violentmonkey/shortcut/-/shortcut-1.2.3.tgz#69babec2a5228361e7496390254926289d8a3b34"
-  integrity sha512-3B7wrsH3Q9WOAPT/RCBCrWCjBf8T7Ngeo8h5voU+E2MaV+5EMNEbD0E/DZ/sPYgKfGJPKWmBPPcYsZbywWnahA==
+"@violentmonkey/shortcut@^1.2.4":
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/@violentmonkey/shortcut/-/shortcut-1.2.4.tgz#79ccc864c97fb5a41ee8ca8e6577d3f58ece657a"
+  integrity sha512-+yIk0ncpidohABMdYozrLtWqjKAdTwj93lcUK3RFgsirzVVABQbZy5+SqlmOvFqeaLnf17RHqnycjCTWeTlmQA==
   dependencies:
     "@babel/runtime" "^7.13.10"
 
