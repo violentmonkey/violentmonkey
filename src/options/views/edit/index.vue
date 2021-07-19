@@ -254,9 +254,7 @@ export default {
     this.disposeList = [
       keyboardService.register('a-pageup', this.switchPrevPanel),
       keyboardService.register('a-pagedown', this.switchNextPanel),
-      keyboardService.register('ctrlcmd-s', this.save, {
-        condition: 'canSave',
-      }),
+      keyboardService.register(K_SAVE.replace('Ctrl-', 'ctrlcmd-'), this.save),
       keyboardService.register('escape', () => { this.nav = 'code'; }, {
         condition: '!tabCode',
       }),
@@ -264,6 +262,7 @@ export default {
   },
   methods: {
     async save() {
+      if (!this.canSave) return;
       if (shouldSavePositionOnSave) savePosition();
       const { settings } = this;
       const { config, custom } = settings;
