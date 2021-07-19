@@ -90,7 +90,12 @@ const CUSTOM_LISTS = [
   'exclude',
   'excludeMatch',
 ];
-const fromList = list => list?.join('\n') || '';
+const fromList = list => (
+  list
+    // Adding a new row so the user can click it and type, just like in an empty textarea.
+    ? `${list.join('\n')}\n`
+    : ''
+);
 const toList = text => (
   text.split('\n')
   .map(line => line.trim())

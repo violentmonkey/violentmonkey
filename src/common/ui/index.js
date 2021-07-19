@@ -60,5 +60,9 @@ export function autofitElementsHeight(elems) {
 /** @this {HTMLTextAreaElement} */
 function autofitSingleElementHeight() {
   this.style.height = 0;
-  this.style.height = `${Math.max(this.scrollHeight, 30) + 16}px`;
+  this.style.height = `${
+    Math.max(this.scrollHeight, 30)
+    + (this.offsetHeight - this.clientHeight) // borders
+    + 2 // some air for the cursor
+  }px`;
 }
