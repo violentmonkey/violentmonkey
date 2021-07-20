@@ -84,6 +84,8 @@ let maxDisplayLength;
 const CTRL_OPEN = '\x02'.repeat(256);
 const CTRL_CLOSE = '\x03'.repeat(256);
 const CTRL_RE = new RegExp(`${CTRL_OPEN}(\\d+)${CTRL_CLOSE}`, 'g');
+const PLACEHOLDER_CLS = 'too-long-placeholder';
+const PLACEHOLDER_SYM = Symbol('P');
 
 export const cmOptions = {
   continueComments: true,
@@ -230,7 +232,8 @@ export default {
           const { cm } = this;
           const el = document.createElement('span');
           const marker = cm.markText({ line, ch }, { line, ch: ch + length }, { replacedWith: el });
-          el.className = 'too-long-placeholder';
+          marker[PLACEHOLDER_SYM] = true;
+          el.className = PLACEHOLDER_CLS;
           el.title = i18n('editLongLineTooltip');
           el.textContent = `${body.slice(0, maxDisplayLength)}...[${i18n('editLongLine')}]`;
           el.onclick = () => {
@@ -395,7 +398,7 @@ export default {
         while (cur.find(reversed)) {
           const from = cur.from();
           const to = cur.to();
-          if (!cm.findMarks(from, to).length) {
+          if (!cm.findMarks(from, to, m => m[PLACEHOLDER_SYM]).length) {
             this.reveal(from, to);
             cm.setSelection(from, to, { scroll: false });
             return true;
