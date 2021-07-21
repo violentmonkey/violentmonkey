@@ -62,7 +62,7 @@
     "@babel/runtime": "^7.9.2",
     "@violentmonkey/shortcut": "^1.2.4",
     "@zip.js/zip.js": "^2.2.26",
-    "codemirror": "5.62.0",
+    "codemirror": "5.62.1",
     "codemirror-js-mixed": "^0.9.2",
     "core-js": "^3.6.4",
     "tldjs": "^2.3.1",
