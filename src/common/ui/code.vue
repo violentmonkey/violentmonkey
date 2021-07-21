@@ -85,7 +85,8 @@ const CTRL_OPEN = '\x02'.repeat(256);
 const CTRL_CLOSE = '\x03'.repeat(256);
 const CTRL_RE = new RegExp(`${CTRL_OPEN}(\\d+)${CTRL_CLOSE}`, 'g');
 const PLACEHOLDER_CLS = 'too-long-placeholder';
-const PLACEHOLDER_SYM = Symbol('P');
+// To identify our CodeMirror markers we're using a Symbol since it's always unique
+const PLACEHOLDER_SYM = Symbol(PLACEHOLDER_CLS);
 
 export const cmOptions = {
   continueComments: true,
