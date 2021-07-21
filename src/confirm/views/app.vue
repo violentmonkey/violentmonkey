@@ -26,7 +26,8 @@
                 :data-type="name" :hidden="!list.length" tabindex="0">
               <dt v-text="`@${name}`"/>
               <dd v-if="Array.isArray(list)" class="flex flex-col">
-                <a v-for="(url, i) in list" :key="name + i" :href="url" v-text="url"
+                <a v-for="(url, i) in list" :key="name + i"
+                   :href="url" v-text="decodeURIComponent(url)"
                    rel="noopener noreferrer" target="_blank" :data-ok="url in urlsOK"/>
               </dd>
               <dd v-else v-text="list" class="ellipsis"/>
