@@ -316,7 +316,7 @@ export default {
       return null;
     },
     scripts() {
-      return this.store.scripts.filter(script => !script.config.removed);
+      return this.store.installedScripts;
     },
     searchNeedsCodeIds() {
       return this.search
@@ -324,7 +324,7 @@ export default {
         && this.store.scripts.filter(s => s.$cache.code == null).map(s => s.props.id);
     },
     trash() {
-      return this.store.scripts.filter(script => script.config.removed);
+      return this.store.removedScripts;
     },
   },
   methods: {

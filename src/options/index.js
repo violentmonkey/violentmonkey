@@ -11,7 +11,6 @@ Vue.prototype.i18n = i18n;
 
 Object.assign(store, {
   loading: false,
-  scripts: [],
   sync: [],
   title: null,
 });

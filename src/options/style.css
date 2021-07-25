@@ -41,6 +41,9 @@ aside {
       color: var(--fg);
     }
   }
+  [data-num-scripts]::before {
+    content: '(' attr(data-num-scripts) ') ';
+  }
 }
 .text-red {
   color: red;
