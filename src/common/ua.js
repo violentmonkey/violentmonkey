@@ -5,7 +5,7 @@ import { browser } from './consts';
 // and for browser.runtime.getBrowserInfo in Firefox 51+
 
 /** @typedef UA
- * @property {Boolean} isChrome
+ * @property {false | number} isChrome - Chrome/ium version number or `false`
  * @property {Boolean | number} isFirefox - boolean initially, Firefox version number when ready
  * @property {chrome.runtime.PlatformInfo.arch} arch
  * @property {chrome.runtime.PlatformInfo.os} os
@@ -18,7 +18,7 @@ export default ua;
 // using non-enumerable properties that won't be sent to content scripts via GetInjected
 Object.defineProperties(ua, {
   isChrome: {
-    value: !!window.chrome?.app,
+    value: global.chrome?.app && +navigator.userAgent.match(/Chrom\S+?\/(\d+)|$/)[1] || false,
   },
   isFirefox: {
     // will be replaced with the version number in ready()

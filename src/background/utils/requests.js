@@ -96,9 +96,42 @@ const HeaderInjector = (() => {
   /** @param {chrome.webRequest.HttpHeader} header */
   const isVmVerify = header => header.name === VM_VERIFY;
   const isNotCookie = header => !/^cookie2?$/i.test(header.name);
-  const isNotSetCookie = header => !/^set-cookie2?$/i.test(header.name);
   const isSendable = header => header.name !== VM_VERIFY;
   const isSendableAnon = header => isSendable(header) && isNotCookie(header);
+  const RE_SET_COOKIE = /^set-cookie2?$/i;
+  const RE_SET_COOKIE_VALUE = /^\s*(?:__(Secure|Host)-)?([^=\s]+)\s*=\s*(")?([!#-+\--:<-[\]-~]*)\3(.*)/;
+  const RE_SET_COOKIE_ATTR = /\s*;?\s*(\w+)(?:=(")?([!#-+\--:<-[\]-~]*)\2)?/y;
+  const SAME_SITE_MAP = {
+    strict: 'strict',
+    lax: 'lax',
+    none: 'no_restriction',
+  };
+  /** @returns void */
+  const setCookieInStore = (headerValue, req, url) => {
+    let m = RE_SET_COOKIE_VALUE.exec(headerValue);
+    if (m) {
+      const [, prefix, name, , value, optStr] = m;
+      const opt = {};
+      const isHost = prefix === 'Host';
+      RE_SET_COOKIE_ATTR.lastIndex = 0;
+      while ((m = RE_SET_COOKIE_ATTR.exec(optStr))) {
+        opt[m[1].toLowerCase()] = m[3];
+      }
+      const sameSite = opt.sameSite?.toLowerCase();
+      browser.cookies.set({
+        url,
+        name,
+        value,
+        domain: isHost ? undefined : opt.domain,
+        expirationDate: Math.max(0, +new Date(opt['max-age'] * 1000 || opt.expires)) || undefined,
+        httpOnly: 'httponly' in opt,
+        path: isHost ? '/' : opt.path,
+        sameSite: SAME_SITE_MAP[sameSite],
+        secure: url.startsWith('https:') && (!!prefix || sameSite === 'none' || 'secure' in opt),
+        storeId: req.storeId,
+      });
+    }
+  };
   const apiEvents = {
     onBeforeSendHeaders: {
       options: ['requestHeaders', 'blocking', ...EXTRA_HEADERS],
@@ -120,25 +153,29 @@ const HeaderInjector = (() => {
     onHeadersReceived: {
       options: ['responseHeaders', 'blocking', ...EXTRA_HEADERS],
       /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
-      listener({ responseHeaders: headers, requestId }) {
+      listener({ responseHeaders: headers, requestId, url }) {
         const req = requests[verify[requestId]];
         if (req) {
-          const oldLength = headers.length;
-          if (req.anonymous) headers = headers.filter(isNotSetCookie);
+          if (req.anonymous || req.storeId) {
+            headers = headers.filter(h => (
+              !RE_SET_COOKIE.test(h.name)
+              || !req.storeId
+              || setCookieInStore(h.value, req, url)
+            ));
+          }
           // mimic https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/getAllResponseHeaders
           req.responseHeaders = headers
           .map(({ name, value }) => `${name}: ${value}\r\n`)
           .sort()
           .join('');
-          if (headers.length < oldLength) return { responseHeaders: headers };
+          return { responseHeaders: headers };
         }
       },
     },
   };
-  // Chrome 74+ needs to have any extraHeaders listener at tab load start, https://crbug.com/1074282
+  // Chrome 74-91 needs an extraHeaders listener at tab load start, https://crbug.com/1074282
   // We're attaching a no-op in non-blocking mode so it's very lightweight and fast.
-  // TODO: check the version range (via feature detection?) when it's fixed in Chrome
-  if (ua.isChrome && TextEncoder.prototype.encodeInto) {
+  if (ua.isChrome >= 74 && ua.isChrome <= 91) {
     browser.webRequest.onBeforeSendHeaders.addListener(noop, apiFilter, ['extraHeaders']);
   }
   return {
@@ -252,22 +289,24 @@ function isSpecialHeader(lowerHeader) {
 
 /**
  * @param {Object} details
- * @param {chrome.runtime.MessageSender} src
+ * @param {chrome.runtime.MessageSender | browser.runtime.MessageSender} src
  * @param {function} cb
  */
 async function httpRequest(details, src, cb) {
-  const { id, chunkType, overrideMimeType, url } = details;
+  const { tab } = src;
+  const { incognito } = tab;
+  const { anonymous, id, chunkType, overrideMimeType, url } = details;
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;
-  req.anonymous = details.anonymous;
+  req.anonymous = anonymous;
   // Firefox applies page CSP even to content script fetches of own blobs https://bugzil.la/1294996
-  req.chunkType = chunkType && (src.tab.incognito || ua.isFirefox) ? 'arraybuffer' : chunkType;
+  req.chunkType = chunkType && (incognito || ua.isFirefox) ? 'arraybuffer' : chunkType;
   const { xhr } = req;
   const vmHeaders = [];
-  // Firefox doesn't send cookies,
-  // https://github.com/violentmonkey/violentmonkey/issues/606
-  let shouldSendCookies = ua.isFirefox && !details.anonymous;
+  // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
+  // Both Chrome & FF need explicit routing of cookies in containers or incognito
+  let shouldSendCookies = !anonymous && (incognito || ua.isFirefox);
   xhr.open(details.method || 'GET', url, true, details.user || '', details.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);
   details.headers::forEachEntry(([name, value]) => {
@@ -286,14 +325,24 @@ async function httpRequest(details, src, cb) {
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, details.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
   if (shouldSendCookies) {
+    req.noNativeCookie = true;
+    for (const store of await browser.cookies.getAllCookieStores()) {
+      if (store.tabIds.includes(tab.id)) {
+        if (ua.isFirefox ? store.id !== 'firefox-default' : store.id !== '0') {
+          /* Cookie routing. For the main store we rely on the browser.
+           * The ids are hard-coded as `stores` may omit the main store if no such tabs are open. */
+          req.storeId = store.id;
+        }
+        break;
+      }
+    }
     const now = Date.now() / 1000;
     const cookies = (await browser.cookies.getAll({
       url,
-      storeId: src.tab.cookieStoreId,
+      storeId: req.storeId,
       ...ua.isFirefox >= 59 && { firstPartyDomain: null },
     })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
     if (cookies.length) {
-      req.noNativeCookie = true;
       vmHeaders.push({
         name: 'cookie',
         value: cookies.map(c => `${c.name}=${c.value};`).join(' '),
