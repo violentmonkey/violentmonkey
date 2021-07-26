@@ -10,6 +10,7 @@
             :key="tab.name"
             :href="`#${tab.name}`"
             :class="{active: tab === current}"
+            :data-num-scripts="tab.name === 'scripts' && store.installedScripts.length || null"
             v-text="tab.label"
           />
         </div>

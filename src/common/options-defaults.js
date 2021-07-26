@@ -34,6 +34,8 @@ export default {
   filters: {
     /** @type 'name' | 'code' | 'all' */
     searchScope: 'name',
+    /** @type boolean */
+    showOrder: false,
     /** @type 'exec' | 'alpha' | 'update' */
     sort: 'exec',
     /** @type boolean */

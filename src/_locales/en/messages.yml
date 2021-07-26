@@ -432,6 +432,9 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Settings
+labelShowOrder:
+  description: Label for option in dashboard -> script list
+  message: Show execution order positions
 labelSync:
   description: Label for sync options.
   message: Sync

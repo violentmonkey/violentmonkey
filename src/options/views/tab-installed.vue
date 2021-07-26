@@ -68,6 +68,9 @@
             <setting-check name="filters.showEnabledFirst"
                            :label="i18n('optionShowEnabledFirst')" />
           </div>
+          <div>
+            <setting-check name="filters.showOrder" :label="i18n('labelShowOrder')" />
+          </div>
           <div class="mr-2c">
             <setting-check name="filters.viewTable" :label="i18n('labelViewTable')" />
             <setting-check name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
@@ -109,6 +112,7 @@
              ref="scriptList"
              :style="`--num-columns:${numColumns}`"
              :data-columns="numColumns"
+             :data-show-order="filters.showOrder"
              :data-table="filters.viewTable">
           <script-item
             v-for="(script, index) in sortedScripts"
@@ -193,6 +197,7 @@ const filtersSort = {
 const filters = {
   searchScope: null,
   showEnabledFirst: null,
+  showOrder: null,
   viewSingleColumn: null,
   viewTable: null,
   get sort() {
@@ -316,7 +321,7 @@ export default {
       return null;
     },
     scripts() {
-      return this.store.scripts.filter(script => !script.config.removed);
+      return this.store.installedScripts;
     },
     searchNeedsCodeIds() {
       return this.search
@@ -324,7 +329,7 @@ export default {
         && this.store.scripts.filter(s => s.$cache.code == null).map(s => s.props.id);
     },
     trash() {
-      return this.store.scripts.filter(script => script.config.removed);
+      return this.store.removedScripts;
     },
   },
   methods: {

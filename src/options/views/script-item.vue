@@ -18,6 +18,7 @@
       </a>
     </div>
     <div class="script-info flex ml-1c">
+      <span class="script-order" v-text="script.props.position"/>
       <span
         class="script-name ellipsis flex-auto"
         v-text="script.$cache.name"
@@ -551,6 +552,12 @@ $removedItemHeight: calc(
     [data-hotkey-table]::after {
       content: none;
     }
+  }
+  &[data-show-order] .script-order::after {
+    content: '. ';
+  }
+  &:not([data-show-order]) .script-order {
+    display: none;
   }
 }
 @media (max-width: 319px) {
