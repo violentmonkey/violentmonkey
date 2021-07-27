@@ -398,7 +398,7 @@ $infoIconSize: 18px;
       font-weight: bold;
     }
     dd {
-      white-space: pre;
+      white-space: pre-wrap;
       min-width: 5rem;
       max-height: 10vh;
       min-height: 1.5rem;
