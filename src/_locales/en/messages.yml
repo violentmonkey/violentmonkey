@@ -185,7 +185,7 @@ failureReasonNoninjectable:
     failureBlacklistedUrl)
   message: |-
     Violentmonkey cannot run userscripts in this page
-    (common examples: browser UI or an extension)
+    (common examples: browser UI, an extension, blocked via policies, a search engine site in Opera)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alphabetical order
