@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { i18n, sendCmdDirectly } from '#/common';
-import { INJECT_PAGE, INJECTABLE_TAB_URL_RE } from '#/common/consts';
+import { INJECT_PAGE } from '#/common/consts';
 import handlers from '#/common/handlers';
 import { loadScriptIcon } from '#/common/load-script-icon';
 import { forEachValue, mapEntry } from '#/common/object';
@@ -29,6 +29,8 @@ Object.assign(handlers, {
     if (isTop) {
       mutex.resolve();
       store.commands = data.menus::mapEntry(([, value]) => Object.keys(value).sort());
+      // executeScript may(?) fail in a discarded or lazy-loaded tab, which is actually injectable
+      store.injectable = true;
     }
     if (ids.length) {
       // frameScripts may be appended multiple times if iframes have unique scripts
@@ -61,12 +63,18 @@ if (!CSS.supports?.('list-style-type', 'disclosure-open')) {
   document.styleSheets[0].insertRule('.excludes-menu ::-webkit-details-marker {display:none}');
 }
 
-sendCmdDirectly('GetTabDomain')
-.then(async ({ tab, domain }) => {
+Promise.all([
+  sendCmdDirectly('GetTabDomain'),
+  browser.tabs.executeScript({ code: '1', runAt: 'document_start' }).catch(() => []),
+])
+.then(async ([
+  { tab, domain },
+  [injectable],
+]) => {
   store.currentTab = tab;
   store.domain = domain;
   browser.runtime.connect({ name: `${tab.id}` });
-  if (!INJECTABLE_TAB_URL_RE.test(tab.url)) {
+  if (!injectable) {
     store.injectable = false;
   } else {
     store.blacklisted = await sendCmdDirectly('TestBlacklist', tab.url);
