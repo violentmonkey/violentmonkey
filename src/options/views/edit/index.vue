@@ -48,7 +48,7 @@
       <vm-externals
         class="abs-full"
         v-if="nav === 'externals'"
-        :script="script"
+        v-model="script"
       />
       <vm-help
         class="abs-full edit-body"
@@ -70,7 +70,7 @@ import { route, getUnloadSentry } from '#/common/router';
 import { store } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
-import VmExternals from './externals';
+import VmExternals from '#/common/ui/externals';
 import VmHelp from './help';
 
 const CUSTOM_PROPS = {

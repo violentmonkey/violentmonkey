@@ -434,17 +434,13 @@ async function confirmInstall({ code, from, url }, { tab = {} }) {
   if (!isUserScript(code)) throw i18n('msgInvalidScript');
   cache.put(url, code, 3000);
   const confirmKey = getUniqId();
-  const { id: tabId, incognito } = tab;
+  const { active, id: tabId, incognito } = tab;
   cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId });
-  const { windowId } = await browser.tabs.create({
+  const { windowId } = await commands.TabOpen({
     url: `/confirm/index.html#${confirmKey}`,
-    index: tab.index + 1 || undefined,
-    active: !!tab.active,
-    ...tabId >= 0 && ua.openerTabIdSupported && !incognito && {
-      openerTabId: tabId,
-    },
-  });
-  if (windowId !== tab.windowId) {
+    active: !!active,
+  }, { tab });
+  if (active && windowId !== tab.windowId) {
     await browser.windows.update(windowId, { focused: true });
   }
 }

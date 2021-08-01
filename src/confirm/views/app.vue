@@ -25,15 +25,9 @@
             <dl v-for="(list, name) in lists" :key="name"
                 :data-type="name" :hidden="!list.length" tabindex="0">
               <dt v-text="`@${name}`"/>
-              <dd v-if="Array.isArray(list)" class="flex flex-col">
-                <a v-for="(url, i) in list" :key="name + i"
-                   :href="url" v-text="decodeURIComponent(url)"
-                   rel="noopener noreferrer" target="_blank" :data-ok="url in urlsOK"/>
-              </dd>
-              <dd v-else v-text="list" class="ellipsis"/>
+              <dd v-text="list" class="ellipsis"/>
             </dl>
           </div>
-          <div v-text="message" :title="error"/>
         </div>
       </div>
       <div class="flex">
@@ -48,20 +42,30 @@
               : i18n('buttonConfirmInstallation')"
             @click="installScript" :disabled="!installable"/>
           <button v-text="i18n('buttonClose')" @click="close"/>
-          <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
-                         @change="checkClose" />
-          <setting-check name="trackLocalFile" @change="trackLocalFile"
-                         :disabled="closeAfterInstall || !isLocal">
-            <tooltip :content="trackTooltip" :disabled="!trackTooltip">
-              <span v-text="i18n('installOptionTrack')"/>
-            </tooltip>
-          </setting-check>
+          <div class="flex flex-col my-1">
+            <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
+                           @change="checkClose" />
+            <setting-check name="trackLocalFile" @change="trackLocalFile"
+                           :disabled="closeAfterInstall || !isLocal">
+              <tooltip :content="trackTooltip" :disabled="!trackTooltip">
+                <span v-text="i18n('installOptionTrack')"/>
+              </tooltip>
+            </setting-check>
+          </div>
+          <div v-text="message" v-if="message" :title="error" class="status"/>
         </div>
       </div>
       <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
     </div>
     <div class="frame-block flex-auto pos-rel">
-      <vm-code class="abs-full" readonly :value="code" :commands="commands" />
+      <vm-externals
+        v-if="script"
+        v-model="script"
+        class="abs-full"
+        :cm-options="cmOptions"
+        :commands="commands"
+        :install="{ code, deps, url: info.url }"
+      />
     </div>
   </div>
 </template>
@@ -76,7 +80,7 @@ import {
 import options from '#/common/options';
 import initCache from '#/common/cache';
 import storage from '#/common/storage';
-import VmCode from '#/common/ui/code';
+import VmExternals from '#/common/ui/externals';
 import SettingCheck from '#/common/ui/setting-check';
 import { loadScriptIcon } from '#/common/load-script-icon';
 import { deepEqual, objectPick } from '#/common/object';
@@ -94,7 +98,7 @@ let filePortNeeded;
 export default {
   components: {
     Icon,
-    VmCode,
+    VmExternals,
     SettingCheck,
     Tooltip,
   },
@@ -104,12 +108,16 @@ export default {
       installed: false,
       closeAfterInstall: options.get('closeAfterInstall'),
       message: '',
+      cmOptions: {
+        lineWrapping: true,
+      },
       code: '',
       commands: {
         close: this.close,
       },
       info: {},
       decodedUrl: '...',
+      deps: {}, // combines `this.require` and `this.resources` = all loaded deps
       descr: '',
       error: null,
       heading: this.i18n('msgLoadingData'),
@@ -119,7 +127,7 @@ export default {
       reinstall: false,
       safeIcon: null,
       sameCode: false,
-      urlsOK: {},
+      script: null,
     };
   },
   computed: {
@@ -175,11 +183,10 @@ export default {
     },
     async parseMeta() {
       /** @type {VMScriptMeta} */
-      const script = await sendCmdDirectly('ParseMeta', this.code);
-      const urls = Object.values(script.resources);
-      this.name = [getLocaleString(script, 'name'), script.version]::trueJoin(', ');
-      this.descr = getLocaleString(script, 'description');
-      this.lists = objectPick(script, [
+      const meta = await sendCmdDirectly('ParseMeta', this.code);
+      this.name = [getLocaleString(meta, 'name'), meta.version]::trueJoin(', ');
+      this.descr = getLocaleString(meta, 'description');
+      this.lists = objectPick(meta, [
         'antifeature',
         'grant',
         'match',
@@ -196,13 +203,14 @@ export default {
         .join('\n')
         || ''
       ));
-      this.lists.require = [...new Set(script.require)];
-      this.lists.resource = [...new Set(urls)];
-      this.meta = script;
+      this.script = { meta, custom: {}, props: {} };
+      this.loadedDeps = {};
     },
     async loadDeps() {
-      if (!this.safeIcon) loadScriptIcon(this);
-      const { require, resource } = this.lists;
+      if (!this.safeIcon) loadScriptIcon(this.script);
+      const { meta } = this.script;
+      const require = [...new Set(meta.require)];
+      const resource = [...new Set(Object.values(meta.resources))];
       if (this.require
           && deepEqual(require.slice().sort(), Object.keys(this.require).sort())
           && deepEqual(resource.slice().sort(), Object.keys(this.resources).sort())) {
@@ -224,8 +232,9 @@ export default {
       const download = async (url, target, isBlob) => {
         const fullUrl = getFullUrl(url, this.info.url);
         try {
-          target[fullUrl] = await this.getFile(fullUrl, { isBlob, useCache: true });
-          this.urlsOK[url] = true;
+          const file = await this.getFile(fullUrl, { isBlob, useCache: true });
+          target[fullUrl] = file;
+          this.deps[url] = file;
           finished += 1;
           updateStatus();
         } catch (e) {
@@ -320,7 +329,7 @@ export default {
       if (value) options.set('trackLocalFile', false);
     },
     async checkSameCode() {
-      const { name, namespace } = this.meta;
+      const { name, namespace } = this.script.meta || {};
       const old = await sendCmdDirectly('GetScript', { meta: { name, namespace } });
       this.reinstall = !!old;
       this.sameCode = old && this.code === await sendCmdDirectly('GetScriptCode', old.props.id);
@@ -392,6 +401,7 @@ $infoIconSize: 18px;
         background: rgba(255, 0, 0, .05);
         margin-top: -3px;
         padding: 2px 6px;
+        flex: 10em 1;
       }
     }
     dt {
@@ -403,9 +413,6 @@ $infoIconSize: 18px;
       max-height: 10vh;
       min-height: 1.5rem;
       overflow-y: auto;
-      a:not([data-ok]) {
-        color: var(--fill-8);
-      }
     }
   }
   [data-collapsed] {
@@ -430,9 +437,14 @@ $infoIconSize: 18px;
   }
   .actions {
     align-items: center;
-    margin: .5rem 0;
-    > #confirm:not(:disabled) {
-      font-weight: bold;
+    label {
+      align-items: center;
+    }
+    .status {
+      border-left: 5px solid darkorange;
+      padding: .5em;
+      color: #d33a00;
+      animation: fade-in .5s 1 both;
     }
   }
   .incognito {
@@ -440,6 +452,7 @@ $infoIconSize: 18px;
     color: red;
   }
   #confirm {
+    font-weight: bold;
     background: #d4e2d4;
     border-color: #75a775;
     color: darkgreen;
@@ -453,6 +466,20 @@ $infoIconSize: 18px;
     color: #004fc5;
     &:hover {
       border-color: #35699f;
+    }
+  }
+  .edit-externals {
+    > select {
+      padding: 0;
+      background: var(--fill-1);
+      border-width: 0 0 2px 0;
+      option::before {
+        color: darkviolet;
+        font-weight: bold;
+      }
+      option[data-is-main]::before {
+        color: var(--fg);
+      }
     }
   }
   @media (prefers-color-scheme: dark) {
@@ -475,6 +502,16 @@ $infoIconSize: 18px;
         border-color: #608cb8;
       }
     }
+    .edit-externals {
+      > select {
+        option::before {
+          color: #c34ec3;
+        }
+        option[data-is-main]::before {
+          color: var(--fg);
+        }
+      }
+    }
   }
 }
 .confirm-options {
@@ -483,6 +520,14 @@ $infoIconSize: 18px;
   }
   .vl-dropdown-menu {
     width: 13rem;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 </style>

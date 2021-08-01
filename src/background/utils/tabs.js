@@ -26,7 +26,7 @@ Object.assign(commands, {
       maybeInWindow: true,
     });
   },
-  /** @return {Promise<{ id: number }>} */
+  /** @return {Promise<{ id: number } | chrome.tabs.Tab>} new tab is returned for internal calls */
   async TabOpen({
     url,
     active = true,
@@ -69,23 +69,26 @@ Object.assign(commands, {
         || hasPos && await browser.windows.create(wndOpts);
       newTab = wnd.tabs[0];
     }
-    const { id, windowId: newWindowId } = newTab || await browser.tabs.create({
-      url,
-      // normalizing as boolean because the API requires strict types
-      active: !!active,
-      pinned: !!pinned,
-      ...storeId,
-      ...canOpenIncognito && {
-        windowId,
-        ...insert && { index: srcTab.index + 1 },
-        ...ua.openerTabIdSupported && { openerTabId: srcTab.id },
-      },
-    });
-    if (active && newWindowId !== windowId) {
-      await browser.windows.update(newWindowId, { focused: true });
+    if (!newTab) {
+      newTab = await browser.tabs.create({
+        url,
+        // normalizing as boolean because the API requires strict types
+        active: !!active,
+        pinned: !!pinned,
+        ...storeId,
+        ...canOpenIncognito && {
+          windowId,
+          ...insert && { index: srcTab.index + 1 },
+          ...ua.openerTabIdSupported && { openerTabId: srcTab.id },
+        },
+      });
+    }
+    const { id } = newTab;
+    if (active && newTab.windowId !== windowId) {
+      await browser.windows.update(newTab.windowId, { focused: true });
     }
     openers[id] = srcTab.id;
-    return { id };
+    return isInternal ? newTab : { id };
   },
   /** @return {void} */
   TabClose({ id } = {}, src) {

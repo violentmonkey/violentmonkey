@@ -88,7 +88,7 @@ const PLACEHOLDER_CLS = 'too-long-placeholder';
 // To identify our CodeMirror markers we're using a Symbol since it's always unique
 const PLACEHOLDER_SYM = Symbol(PLACEHOLDER_CLS);
 
-export const cmOptions = {
+const cmDefaults = {
   continueComments: true,
   styleActiveLine: true,
   foldGutter: true,
@@ -122,6 +122,7 @@ export default {
       type: Object,
       default: null,
     },
+    cmOptions: Object,
   },
   components: {
     Tooltip,
@@ -129,7 +130,7 @@ export default {
   },
   data() {
     return {
-      cmOptions,
+      cmDefaults,
       content: '',
       jumpPos: '',
       search: {
@@ -154,7 +155,7 @@ export default {
   watch: {
     active: 'onActive',
     mode(value) {
-      this.cm.setOption('mode', value || cmOptions.mode);
+      this.cm.setOption('mode', value || cmDefaults.mode);
     },
     value(value) {
       const { cm } = this;
@@ -516,7 +517,13 @@ export default {
   },
   mounted() {
     let userOpts = options.get('editor');
-    const opts = { ...this.cmOptions, ...userOpts, mode: this.mode || cmOptions.mode };
+    const internalOpts = this.cmOptions || {};
+    const opts = {
+      ...cmDefaults,
+      ...userOpts,
+      ...internalOpts, // internal options passed via `props` have the highest priority
+      mode: this.mode || cmDefaults.mode,
+    };
     CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
       const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
       // fallback to anyword if default returns nothing (or no default)
@@ -533,8 +540,9 @@ export default {
     this.onActive(true);
     hookSetting('editor', (newUserOpts) => {
       // Use defaults for keys that were present in the old userOpts but got deleted in newUserOpts
-      ({ ...this.cmOptions, ...newUserOpts })::forEachEntry(([key, val]) => {
+      ({ ...cmDefaults, ...newUserOpts })::forEachEntry(([key, val]) => {
         if ((key in newUserOpts || key in userOpts)
+        && !(key in internalOpts)
         && !deepEqual(this.cm.getOption(key), val)) {
           this.cm.setOption(key, val);
         }
