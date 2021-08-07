@@ -79,14 +79,24 @@ export function getUniqId(prefix = 'VM') {
     + floor(random() * 1e12)::numberToString(36);
 }
 
+/**
+ * @param {ArrayBuffer|Uint8Array|Array} buf
+ * @param {number} [offset]
+ * @param {number} [length]
+ * @return {string} a binary string i.e. one byte per character
+ */
 export function buffer2string(buf, offset = 0, length = 1e99) {
   // The max number of arguments varies between JS engines but it's >32k so we're safe
   const sliceSize = 8192;
   const slices = [];
-  const end = Math.min(buf.byteLength, offset + length);
+  const arrayLen = buf.length; // present on Uint8Array/Array
+  const end = Math.min(arrayLen || buf.byteLength, offset + length);
+  const needsSlicing = arrayLen == null || offset || end > sliceSize;
   for (; offset < end; offset += sliceSize) {
     slices.push(String.fromCharCode.apply(null,
-      new Uint8Array(buf, offset, Math.min(sliceSize, end - offset))));
+      needsSlicing
+        ? new Uint8Array(buf, offset, Math.min(sliceSize, end - offset))
+        : buf));
   }
   return slices.join('');
 }

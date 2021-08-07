@@ -10,6 +10,7 @@ const VM_VERIFY = 'VM-Verify';
 const requests = {};
 const verify = {};
 const tabRequests = {};
+let encoder;
 
 Object.assign(commands, {
   ConfirmInstall: confirmInstall,
@@ -163,11 +164,7 @@ const HeaderInjector = (() => {
               || setCookieInStore(h.value, req, url)
             ));
           }
-          // mimic https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/getAllResponseHeaders
-          req.responseHeaders = headers
-          .map(({ name, value }) => `${name}: ${value}\r\n`)
-          .sort()
-          .join('');
+          req.responseHeaders = headers.map(encodeWebRequestHeader).join('');
           return { responseHeaders: headers };
         }
       },
@@ -539,4 +536,27 @@ export function clearRequestsByTabId(tabId) {
       commands.AbortRequest(id);
     }
   }
+}
+
+/**
+ * Imitating https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/getAllResponseHeaders
+ * Per the specification https://tools.ietf.org/html/rfc7230 the header name is within ASCII,
+ * but we'll try encoding it, if necessary, to handle invalid server responses.
+ */
+function encodeWebRequestHeader({ name, value, binaryValue }) {
+  return `${string2byteString(name)}: ${
+    binaryValue
+      ? buffer2string(binaryValue)
+      : string2byteString(value)
+  }\r\n`;
+}
+
+/**
+ * Returns a UTF8-encoded binary string i.e. one byte per character.
+ * Returns the original string in case it was already within ASCII.
+ */
+function string2byteString(str) {
+  if (!/[\u0080-\uFFFF]/.test(str)) return str;
+  if (!encoder) encoder = new TextEncoder();
+  return buffer2string(encoder.encode(str));
 }
