@@ -157,7 +157,8 @@ async function start(req, id) {
   const { responseType } = details;
   if (responseType) {
     if (['arraybuffer', 'blob']::includes(responseType)) {
-      payload.chunkType = 'blob';
+      // Firefox can send Blob/ArrayBuffer directly but Chrome can't
+      payload.chunkType = bridge.isFirefox ? responseType : 'blob';
     } else if (!['document', 'json', 'text']::includes(responseType)) {
       log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
     }

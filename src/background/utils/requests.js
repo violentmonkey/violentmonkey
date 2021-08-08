@@ -297,13 +297,16 @@ async function httpRequest(details, src, cb) {
   if (!req || req.cb) return;
   req.cb = cb;
   req.anonymous = anonymous;
-  // Firefox applies page CSP even to content script fetches of own blobs https://bugzil.la/1294996
-  req.chunkType = chunkType && (incognito || ua.isFirefox) ? 'arraybuffer' : chunkType;
   const { xhr } = req;
   const vmHeaders = [];
+  const FF = ua.isFirefox;
+  // Firefox can send Blob/ArrayBuffer directly...
+  const chunkTypeToUse = chunkType && incognito && !FF ? 'arraybuffer' : chunkType;
+  // ...so it won't need chunking afterwards.
+  if (!FF) req.chunkType = chunkTypeToUse;
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
-  let shouldSendCookies = !anonymous && (incognito || ua.isFirefox);
+  let shouldSendCookies = !anonymous && (incognito || FF);
   xhr.open(details.method || 'GET', url, true, details.user || '', details.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);
   details.headers::forEachEntry(([name, value]) => {
@@ -318,14 +321,14 @@ async function httpRequest(details, src, cb) {
       shouldSendCookies = false;
     }
   });
-  xhr.responseType = req.chunkType || 'text';
+  xhr.responseType = chunkTypeToUse || 'text';
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, details.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
   if (shouldSendCookies) {
     req.noNativeCookie = true;
     for (const store of await browser.cookies.getAllCookieStores()) {
       if (store.tabIds.includes(tab.id)) {
-        if (ua.isFirefox ? store.id !== 'firefox-default' : store.id !== '0') {
+        if (FF ? store.id !== 'firefox-default' : store.id !== '0') {
           /* Cookie routing. For the main store we rely on the browser.
            * The ids are hard-coded as `stores` may omit the main store if no such tabs are open. */
           req.storeId = store.id;
@@ -337,7 +340,7 @@ async function httpRequest(details, src, cb) {
     const cookies = (await browser.cookies.getAll({
       url,
       storeId: req.storeId,
-      ...ua.isFirefox >= 59 && { firstPartyDomain: null },
+      ...FF >= 59 && { firstPartyDomain: null },
     })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
     if (cookies.length) {
       vmHeaders.push({
