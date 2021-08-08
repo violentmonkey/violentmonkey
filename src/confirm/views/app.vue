@@ -258,10 +258,10 @@ export default {
         return cache.get(cacheKey);
       }
       const response = await request(url, {
-        responseType: isBlob ? 'arraybuffer' : null,
+        responseType: isBlob ? 'blob' : null,
       });
       const data = isBlob
-        ? storage.cache.makeRaw(response)
+        ? await storage.cache.makeRaw(response)
         : response.data;
       if (useCache) cache.put(cacheKey, data);
       return data;

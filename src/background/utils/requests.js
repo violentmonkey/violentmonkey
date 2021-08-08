@@ -1,4 +1,6 @@
-import { buffer2string, getUniqId, request, i18n, isEmpty, noop, sendTabCmd } from '#/common';
+import {
+  blob2base64, buffer2string, getUniqId, request, i18n, isEmpty, noop, sendTabCmd,
+} from '#/common';
 import { forEachEntry, objectPick } from '#/common/object';
 import ua from '#/common/ua';
 import cache from './cache';
@@ -35,9 +37,9 @@ Object.assign(commands, {
     return id;
   },
   /** @return {void} */
-  HttpRequest(details, src) {
+  HttpRequest(opts, src) {
     const { tab, frameId } = src;
-    httpRequest(details, src, res => (
+    httpRequest(opts, src, res => (
       sendTabCmd(tab.id, 'HttpRequested', res, { frameId })
     ));
   },
@@ -197,34 +199,36 @@ const HeaderInjector = (() => {
   };
 })();
 
+const CHUNK_SIZE = 64e6 / 4;
+
+async function blob2chunk(response, index) {
+  return blob2base64(response, index * CHUNK_SIZE, CHUNK_SIZE);
+}
+
+function blob2objectUrl(response) {
+  const url = URL.createObjectURL(response);
+  cache.put(`xhrBlob:${url}`, setTimeout(commands.RevokeBlob, 60e3, url), 61e3);
+  return url;
+}
+
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
   let contentType;
+  let dataSize;
   let numChunks;
   let response;
   let responseText;
   let responseHeaders;
   let sent = false;
-  const { id, chunkType, xhr } = req;
+  const { id, blobbed, chunked, xhr } = req;
   // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
-  const chunkSize = 64e6 / 4;
-  const isBlob = chunkType === 'blob';
-  const getChunk = isBlob
-    ? () => {
-      const url = URL.createObjectURL(response);
-      cache.put(`xhrBlob:${url}`, setTimeout(commands.RevokeBlob, 60e3, url), 61e3);
-      return url;
-    }
-    : index => buffer2string(response, index * chunkSize, chunkSize);
+  const getChunk = blobbed && blob2objectUrl || chunked && blob2chunk;
   const getResponseHeaders = () => {
     const headers = req.responseHeaders || xhr.getAllResponseHeaders();
     if (responseHeaders !== headers) {
       responseHeaders = headers;
       return { responseHeaders };
     }
-  };
-  const chainedCallback = (msg) => {
-    lastPromise = lastPromise.then(() => req.cb(msg));
   };
   return (evt) => {
     const type = evt.type;
@@ -241,17 +245,22 @@ function xhrCallbackWrapper(req) {
       } catch (e) {
         // ignore if responseText is unreachable
       }
-      if (chunkType && response) {
-        numChunks = !isBlob && Math.ceil(response.byteLength / chunkSize) || 1;
+      if ((blobbed || chunked) && response) {
+        dataSize = response.size;
+        numChunks = chunked && Math.ceil(dataSize / CHUNK_SIZE) || 1;
       }
     }
     const shouldNotify = req.eventsToNotify.includes(type);
     // only send response when XHR is complete
     const shouldSendResponse = xhr.readyState === 4 && shouldNotify && !sent;
-    chainedCallback({
+    lastPromise = lastPromise
+    .then(() => shouldSendResponse && numChunks && getChunk(response, 0))
+    .then(chunk => req.cb({
+      blobbed,
+      chunked,
       contentType,
+      dataSize,
       id,
-      chunkType,
       numChunks,
       type,
       data: shouldNotify && {
@@ -259,20 +268,19 @@ function xhrCallbackWrapper(req) {
         ...getResponseHeaders(),
         ...objectPick(xhr, ['readyState', 'status', 'statusText']),
         ...shouldSendResponse && {
-          response: numChunks ? getChunk(0) : response,
+          response: chunk || response,
           responseText,
         },
         ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
       },
-    });
+    }));
     if (shouldSendResponse) {
       sent = true;
       for (let i = 1; i < numChunks; i += 1) {
-        chainedCallback({
-          id,
-          chunkIndex: i,
-          chunk: getChunk(i),
-        });
+        const last = i === numChunks - 1;
+        lastPromise = lastPromise
+        .then(() => getChunk(response, i)) // eslint-disable-line no-loop-func
+        .then(data => req.cb({ id, chunk: { data, i, last } }));
       }
     }
   };
@@ -285,14 +293,14 @@ function isSpecialHeader(lowerHeader) {
 }
 
 /**
- * @param {Object} details
+ * @param {Object} opts
  * @param {chrome.runtime.MessageSender | browser.runtime.MessageSender} src
  * @param {function} cb
  */
-async function httpRequest(details, src, cb) {
+async function httpRequest(opts, src, cb) {
   const { tab } = src;
   const { incognito } = tab;
-  const { anonymous, id, chunkType, overrideMimeType, url } = details;
+  const { anonymous, id, overrideMimeType, responseType, url } = opts;
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;
@@ -300,16 +308,17 @@ async function httpRequest(details, src, cb) {
   const { xhr } = req;
   const vmHeaders = [];
   const FF = ua.isFirefox;
-  // Firefox can send Blob/ArrayBuffer directly...
-  const chunkTypeToUse = chunkType && incognito && !FF ? 'arraybuffer' : chunkType;
-  // ...so it won't need chunking afterwards.
-  if (!FF) req.chunkType = chunkTypeToUse;
+  // Firefox can send Blob/ArrayBuffer directly
+  const chunked = !FF && incognito;
+  // Chrome can't fetch Blob URL in incognito so we use chunks
+  req.blobbed = responseType && !FF && !incognito;
+  req.chunked = chunked;
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
   let shouldSendCookies = !anonymous && (incognito || FF);
-  xhr.open(details.method || 'GET', url, true, details.user || '', details.password || '');
+  xhr.open(opts.method || 'GET', url, true, opts.user || '', opts.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);
-  details.headers::forEachEntry(([name, value]) => {
+  opts.headers::forEachEntry(([name, value]) => {
     const lowerName = name.toLowerCase();
     if (isSpecialHeader(lowerName)) {
       vmHeaders.push({ name, value });
@@ -321,8 +330,8 @@ async function httpRequest(details, src, cb) {
       shouldSendCookies = false;
     }
   });
-  xhr.responseType = chunkTypeToUse || 'text';
-  xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, details.timeout)) || 0;
+  xhr.responseType = chunked && 'blob' || responseType || 'text';
+  xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
   if (shouldSendCookies) {
     req.noNativeCookie = true;
@@ -353,7 +362,7 @@ async function httpRequest(details, src, cb) {
   const callback = xhrCallbackWrapper(req);
   req.eventsToNotify.forEach(evt => { xhr[`on${evt}`] = callback; });
   xhr.onloadend = callback; // always send it for the internal cleanup
-  xhr.send(details.data ? decodeBody(details.data) : null);
+  xhr.send(opts.data ? decodeBody(opts.data) : null);
 }
 
 function clearRequest(req) {
@@ -377,9 +386,11 @@ function decodeBody(obj) {
     return result;
   }
   if (['blob', 'file'].includes(cls)) {
+    if (typeof value !== 'string') return value;
+    const str = atob(value);
     const { type, name, lastModified } = obj;
-    const array = new Uint8Array(value.length);
-    for (let i = 0; i < value.length; i += 1) array[i] = value.charCodeAt(i);
+    const array = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i += 1) array[i] = str.charCodeAt(i);
     const data = [array.buffer];
     if (cls === 'file') return new File(data, name, { type, lastModified });
     return new Blob(data, { type });
