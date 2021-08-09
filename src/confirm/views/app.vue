@@ -2,8 +2,16 @@
   <div class="page-confirm frame flex flex-col h-100" :class="{ reinstall }">
     <div class="frame-block">
       <div class="flex">
-        <div class="image">
+        <div class="image flex flex-col self-start mb-2c">
           <img src="/public/images/icon128.png">
+          <div class="mr-1c">
+            <tooltip v-for="([url, icon, title]) in icons" :key="icon"
+                     :content="title" placement="bottom" align="left">
+              <a target="_blank" :href="url">
+                <icon :name="icon"/>
+              </a>
+            </tooltip>
+          </div>
         </div>
         <div class="info">
           <h1>
@@ -17,11 +25,11 @@
              :title="info.url" :href="info.url" @click.prevent />
           <p class="descr" v-text="descr"/>
           <div class="lists flex flex-wrap" :data-collapsed="!listsShown">
-            <tooltip :content="i18n('msgShowHide')" placement="top" v-if="lists">
-              <div class="toggle" @click="listsShown = !listsShown">
+            <div class="toggle" @click="listsShown = !listsShown">
+              <tooltip :content="i18n('msgShowHide')" placement="bottom" align="left" v-if="lists">
                 <icon name="info"/>
-              </div>
-            </tooltip>
+              </tooltip>
+            </div>
             <dl v-for="(list, name) in lists" :key="name"
                 :data-type="name" :hidden="!list.length" tabindex="0">
               <dt v-text="`@${name}`"/>
@@ -136,6 +144,13 @@ export default {
     },
     isLocal() {
       return !isRemote(this.info.url);
+    },
+    icons() {
+      const { homepageURL, supportURL } = this.script?.meta || {};
+      return [
+        homepageURL && [homepageURL, 'home', this.i18n('labelHomepage')],
+        supportURL && [supportURL, 'question', this.i18n('buttonSupport')],
+      ].filter(Boolean);
     },
   },
   async mounted() {
@@ -368,6 +383,9 @@ $infoIconSize: 18px;
   p {
     margin-top: 1rem;
   }
+  .self-start {
+    align-self: flex-start;
+  }
   .image {
     flex: 0 0 $imgSize;
     align-items: center;
@@ -389,11 +407,11 @@ $infoIconSize: 18px;
       position: absolute;
       margin-left: calc(-1 * $imgSize / 2 - $infoIconSize / 2 - $imgGapR);
       cursor: pointer;
-      .icon {
-        width: $infoIconSize;
-        height: $infoIconSize;
-      }
     }
+  }
+  .icon {
+    width: $infoIconSize;
+    height: $infoIconSize;
   }
   .lists {
     margin-top: 1rem;
@@ -523,6 +541,14 @@ $infoIconSize: 18px;
   }
   .vl-dropdown-menu {
     width: 13rem;
+  }
+}
+.vl-tooltip-bottom {
+  > i {
+    margin-left: 10px;
+  }
+  &.vl-tooltip-align-left {
+    margin-left: -13px;
   }
 }
 @keyframes fade-in {
