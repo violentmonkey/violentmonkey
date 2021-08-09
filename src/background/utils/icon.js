@@ -179,9 +179,11 @@ async function setIcon(tab = {}, data = {}) {
   const iconData = {};
   for (const n of [16, 19, 32, 38]) {
     const path = `/public/images/icon${n}${mod}.png`;
-    let icon = iconCache ? iconCache[path] : path;
-    if (!icon) {
-      icon = await loadImageData(path);
+    // Caching the promise to avoid multiple parallel calls at startup
+    let icon = (iconCache ? iconCache[path] : path)
+      || (iconCache[path] = loadImageData(path));
+    if (icon.then) {
+      icon = await icon;
       iconCache[path] = icon;
     }
     iconData[n] = icon;
@@ -199,7 +201,7 @@ async function loadImageData(url, { base64 } = {}) {
   if (!/^data:image\/svg|\.svgz?$/i.test(url)) {
     const f = await fetch(url, { credentials: 'omit' });
     if (!/\/svg/i.test(f.headers.get('content-type'))) {
-      img = createImageBitmap(await f.blob());
+      img = await createImageBitmap(await f.blob());
     }
   }
   if (!img) {
@@ -211,7 +213,7 @@ async function loadImageData(url, { base64 } = {}) {
     });
   }
   const { width, height } = img;
-  if (!width) return url; // FF reports 0 for SVG
+  if (!width) return; // FF reports 0 for SVG
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   canvas.width = width;
