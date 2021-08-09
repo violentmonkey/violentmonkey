@@ -192,23 +192,30 @@ async function setIcon(tab = {}, data = {}) {
   });
 }
 
-function loadImageData(path, { base64 } = {}) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.src = path;
-    img.onload = () => {
-      const { width, height } = img;
-      if (!width) { // FF reports 0 for SVG
-        resolve(path);
-        return;
-      }
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
-      resolve(base64 ? canvas.toDataURL() : ctx.getImageData(0, 0, width, height));
-    };
-    img.onerror = reject;
-  });
+async function loadImageData(url, { base64 } = {}) {
+  let img;
+  /* Fetching via blob to strip CORS headers that prevent extraction due to "tainted canvas".
+   * Unless this is an SVG, which is not supported by createImageBitmap */
+  if (!/^data:image\/svg|\.svgz?$/i.test(url)) {
+    const f = await fetch(url, { credentials: 'omit' });
+    if (!/\/svg/i.test(f.headers.get('content-type'))) {
+      img = createImageBitmap(await f.blob());
+    }
+  }
+  if (!img) {
+    await new Promise((resolve, reject) => {
+      img = new Image();
+      img.src = url;
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+  }
+  const { width, height } = img;
+  if (!width) return url; // FF reports 0 for SVG
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = width;
+  canvas.height = height;
+  ctx.drawImage(img, 0, 0, width, height);
+  return base64 ? canvas.toDataURL() : ctx.getImageData(0, 0, width, height);
 }
