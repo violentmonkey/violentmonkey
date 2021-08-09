@@ -207,10 +207,13 @@ export default {
       this.loadedDeps = {};
     },
     async loadDeps() {
-      if (!this.safeIcon) loadScriptIcon(this.script);
-      const { meta } = this.script;
+      const { script } = this;
+      const { meta } = script;
       const require = [...new Set(meta.require)];
       const resource = [...new Set(Object.values(meta.resources))];
+      if (!this.safeIcon) {
+        loadScriptIcon(script).then(url => { this.safeIcon = url; });
+      }
       if (this.require
           && deepEqual(require.slice().sort(), Object.keys(this.require).sort())
           && deepEqual(resource.slice().sort(), Object.keys(this.resources).sort())) {
