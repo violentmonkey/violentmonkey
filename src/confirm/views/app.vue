@@ -401,7 +401,7 @@ $infoIconSize: 18px;
         background: rgba(255, 0, 0, .05);
         margin-top: -3px;
         padding: 2px 6px;
-        flex: 10em 1;
+        max-width: 25em;
       }
     }
     dt {
