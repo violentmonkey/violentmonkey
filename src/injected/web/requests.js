@@ -165,10 +165,11 @@ async function start(req, id) {
     id,
     scriptId,
     anonymous,
-    // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
-    data: (opts.binary || typeof data !== 'object') && [`${data}`]
+    data: data == null && []
+      // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
+      || (opts.binary || typeof data !== 'object') && [`${data}`]
       // FF can send any cloneable data directly
-      || (bridge.isFirefox || !data) && [data]
+      || (bridge.isFirefox) && [data]
       // TODO: support huge data by splitting it to multiple messages
       || await encodeBody(data),
     responseType: getResponseType(opts),
