@@ -3,11 +3,12 @@ import { INJECT_CONTENT } from '#/common/consts';
 import { objectKeys, objectPick } from '#/common/object';
 import { bindEvents, sendCmd } from '../utils';
 import {
-  forEach, includes, append, createElementNS, setAttribute, NS_HTML,
+  forEach, includes,
+  append, appendChild, createElementNS, elemByTag, setAttribute, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
-import { appendToRoot, injectPageSandbox, injectScripts } from './inject';
+import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
@@ -88,13 +89,19 @@ bridge.addHandlers({
       sendSetPopup(true);
     }
   },
-  AddStyle(css) {
-    const styleId = getUniqId('VMst');
-    const style = document::createElementNS(NS_HTML, 'style');
-    style::setAttribute('id', styleId);
-    style::append(css);
-    appendToRoot(style);
-    return styleId;
+  AddElement([parentIndex, tag, props]) {
+    try {
+      const el = document::createElementNS(NS_HTML, tag);
+      if (props) {
+        objectKeys(props)::forEach(key => (
+          key === 'textContent' ? el::append(props[key])
+            : el::setAttribute(key, props[key])
+        ));
+      }
+      elemByTag('*', parentIndex)::appendChild(el);
+    } catch (e) {
+      return e.stack;
+    }
   },
   GetScript: sendCmd,
   SetTimeout: sendCmd,
