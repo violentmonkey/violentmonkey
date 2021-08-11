@@ -14,7 +14,6 @@ const { then } = Promise.prototype;
 const { blob: resBlob } = Response.prototype;
 const { get: getHref } = describeProperty(HTMLAnchorElement.prototype, 'href');
 const { readAsDataURL } = FileReader.prototype;
-const { get: frGetResult } = describeProperty(FileReader.prototype, 'result');
 
 bridge.addHandlers({
   HttpRequested(msg) {
@@ -214,7 +213,7 @@ async function encodeBody(body) {
   const reader = new FileReader();
   return new Promise((resolve) => {
     reader::addEventListener('load', () => resolve([
-      reader::frGetResult(),
+      reader.result,
       wasBlob ? 'blob' : blob.type,
     ]));
     reader::readAsDataURL(blob);
