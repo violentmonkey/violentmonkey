@@ -168,8 +168,8 @@ async function start(req, id) {
     data: data == null && []
       // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
       || (opts.binary || typeof data !== 'object') && [`${data}`]
-      // FF can send any cloneable data directly
-      || (bridge.isFirefox) && [data]
+      // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
+      || (bridge.isFirefox >= 56) && [data]
       // TODO: support huge data by splitting it to multiple messages
       || await encodeBody(data),
     responseType: getResponseType(opts),
