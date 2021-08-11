@@ -9,6 +9,7 @@ import { extensionRoot } from './init';
 import { commands } from './message';
 
 const VM_VERIFY = 'VM-Verify';
+/** @type {Object<string,VMHttpRequest>} */
 const requests = {};
 const verify = {};
 const tabRequests = {};
@@ -109,7 +110,11 @@ const HeaderInjector = (() => {
     lax: 'lax',
     none: 'no_restriction',
   };
-  /** @returns void */
+  /**
+   * @param {string} headerValue
+   * @param {VMHttpRequest} req
+   * @param {string} url
+   */
   const setCookieInStore = (headerValue, req, url) => {
     let m = RE_SET_COOKIE_VALUE.exec(headerValue);
     if (m) {
@@ -211,6 +216,7 @@ function blob2objectUrl(response) {
   return url;
 }
 
+/** @param {VMHttpRequest} req */
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
   let contentType;
@@ -310,6 +316,7 @@ async function httpRequest(opts, src, cb) {
   const FF = ua.isFirefox;
   // Firefox can send Blob/ArrayBuffer directly
   const chunked = !FF && incognito;
+  const [body, contentType] = decodeBody(opts.data);
   // Chrome can't fetch Blob URL in incognito so we use chunks
   req.blobbed = responseType && !FF && !incognito;
   req.chunked = chunked;
@@ -318,6 +325,7 @@ async function httpRequest(opts, src, cb) {
   let shouldSendCookies = !anonymous && (incognito || FF);
   xhr.open(opts.method || 'GET', url, true, opts.user || '', opts.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);
+  if (contentType) xhr.setRequestHeader('Content-Type', contentType);
   opts.headers::forEachEntry(([name, value]) => {
     const lowerName = name.toLowerCase();
     if (isSpecialHeader(lowerName)) {
@@ -362,9 +370,10 @@ async function httpRequest(opts, src, cb) {
   const callback = xhrCallbackWrapper(req);
   req.eventsToNotify.forEach(evt => { xhr[`on${evt}`] = callback; });
   xhr.onloadend = callback; // always send it for the internal cleanup
-  xhr.send(opts.data ? decodeBody(opts.data) : null);
+  xhr.send(body);
 }
 
+/** @param {VMHttpRequest} req */
 function clearRequest(req) {
   if (req.coreId) delete verify[req.coreId];
   delete requests[req.id];
@@ -372,30 +381,28 @@ function clearRequest(req) {
   tabRequests[req.tabId]?.delete(req.id);
 }
 
-function decodeBody(obj) {
-  const { cls, value } = obj;
-  if (cls === 'formdata') {
-    const result = new FormData();
-    if (value) {
-      value::forEachEntry(([key, items]) => {
-        items.forEach((item) => {
-          result.append(key, decodeBody(item));
-        });
-      });
+/** Polyfill for Chrome's inability to send complex types over extension messaging */
+function decodeBody([body, type]) {
+  if (type === 'query') {
+    type = 'application/x-www-form-urlencoded';
+  } else if (type) {
+    // 5x times faster than fetch() which wastes time on inter-process communication
+    const bin = atob(body.slice(body.indexOf(',') + 1));
+    const len = bin.length;
+    const res = new Uint8Array(len);
+    for (let i = 0; i < len; i += 1) {
+      res[i] = bin.charCodeAt(i);
     }
-    return result;
+    if (type === 'blob') {
+      type = '';
+    } else {
+      type = body.match(/^data:(.+?);base64/)[1].replace(/(boundary=)[^;]+/,
+        // using a function so it runs only if "boundary" was found
+        (_, p1) => p1 + String.fromCharCode(...res.slice(2, res.indexOf(13))));
+    }
+    body = res;
   }
-  if (['blob', 'file'].includes(cls)) {
-    if (typeof value !== 'string') return value;
-    const str = atob(value);
-    const { type, name, lastModified } = obj;
-    const array = new Uint8Array(str.length);
-    for (let i = 0; i < str.length; i += 1) array[i] = str.charCodeAt(i);
-    const data = [array.buffer];
-    if (cls === 'file') return new File(data, name, { type, lastModified });
-    return new Blob(data, { type });
-  }
-  if (value) return JSON.parse(value);
+  return [body, type];
 }
 
 // Watch URL redirects
@@ -574,3 +581,18 @@ function string2byteString(str) {
   if (!encoder) encoder = new TextEncoder();
   return buffer2string(encoder.encode(str));
 }
+
+/** @typedef {{
+  anonymous: boolean
+  blobbed: boolean
+  cb: function(Object)
+  chunked: boolean
+  coreId: number
+  eventsToNotify: string[]
+  id: number
+  noNativeCookie: boolean
+  responseHeaders: string
+  storeId: string
+  tabId: number
+  xhr: XMLHttpRequest
+}} VMHttpRequest */

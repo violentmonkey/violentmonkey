@@ -1,22 +1,20 @@
 import { assign, defineProperty, describeProperty, objectPick } from '#/common/object';
 import {
-  filter, forEach, includes, map, jsonDump, jsonLoad, objectToString, Promise,
-  setAttribute, log, charCodeAt, slice,
-  createElementNS, NS_HTML,
+  Promise, charCodeAt, filter, forEach, includes, jsonLoad, log,
+  NS_HTML, addEventListener, createElementNS, setAttribute,
 } from '../utils/helpers';
 import bridge from './bridge';
 
 const idMap = {};
 
 export const { atob } = global;
-const { Blob, DOMParser, Error, FileReader, Uint8Array } = global;
+const { Blob, DOMParser, Error, FileReader, Response, Uint8Array } = global;
 const { parseFromString } = DOMParser.prototype;
 const { then } = Promise.prototype;
-const { indexOf, toLowerCase } = String.prototype;
+const { blob: resBlob } = Response.prototype;
 const { get: getHref } = describeProperty(HTMLAnchorElement.prototype, 'href');
-const { keys, getAll } = FormData.prototype;
 const { readAsDataURL } = FileReader.prototype;
-const promiseAll = Promise.all;
+const { get: frGetResult } = describeProperty(FileReader.prototype, 'result');
 
 bridge.addHandlers({
   HttpRequested(msg) {
@@ -155,11 +153,20 @@ async function start(req, id) {
   const { opts, scriptId } = req;
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
-  const { withCredentials = true, anonymous = !withCredentials } = opts;
-  const payload = assign({
+  const { data, withCredentials = true, anonymous = !withCredentials } = opts;
+  req.id = id;
+  idMap[id] = req;
+  bridge.post('HttpRequest', assign({
     id,
     scriptId,
     anonymous,
+    // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
+    data: (opts.binary || typeof data !== 'object') && [`${data}`]
+      // FF can send any cloneable data directly
+      || (bridge.isFirefox || !data) && [data]
+      // TODO: support huge data by splitting it to multiple messages
+      || await encodeBody(data),
+    responseType: getResponseType(opts),
   }, objectPick(opts, [
     'headers',
     'method',
@@ -168,22 +175,7 @@ async function start(req, id) {
     'timeout',
     'url',
     'user',
-  ]));
-  req.id = id;
-  idMap[id] = req;
-  const { responseType } = opts;
-  if (responseType) {
-    if (['arraybuffer', 'blob']::includes(responseType)) {
-      payload.responseType = responseType;
-    } else if (!['document', 'json', 'text']::includes(responseType)) {
-      log('warn', null, `Unknown responseType "${responseType}", see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.`);
-    }
-  }
-  // TM/GM-compatibility: the `binary` option works only with a string `data`
-  payload.data = opts.binary
-    ? { value: `${opts.data}`, cls: 'blob' }
-    : await encodeBody(opts.data);
-  bridge.post('HttpRequest', payload);
+  ])));
 }
 
 function getFullUrl(url) {
@@ -192,37 +184,33 @@ function getFullUrl(url) {
   return a::getHref();
 }
 
-async function encodeBody(body) {
-  const cls = body::objectToString()::slice(8, -1)::toLowerCase(); // [object TYPENAME]
-  switch (cls) {
-  case 'formdata': {
-    const data = {};
-    const resolveKeyValues = async (key) => {
-      const values = body::getAll(key)::map(encodeBody);
-      data[key] = await promiseAll(values);
-    };
-    await promiseAll([...body::keys()]::map(resolveKeyValues));
-    return { cls, value: data };
-  }
+function getResponseType({ responseType = '' }) {
+  switch (responseType) {
+  case 'arraybuffer':
   case 'blob':
-  case 'file':
-    // TODO: implement BufferSource (ArrayBuffer, DataView, typed arrays)
-    return {
-      cls,
-      type: body.type,
-      name: body.name,
-      lastModified: body.lastModified,
-      // Firefox can send Blob/File/BufferSource directly
-      value: bridge.isFirefox ? body : await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const res = reader.result;
-          resolve(res::slice(res::indexOf(',') + 1));
-        };
-        reader::readAsDataURL(body);
-      }),
-    };
+    return responseType;
+  case 'document':
+  case 'json':
+  case 'text':
+  case '':
+    break;
   default:
-    if (body != null) return { cls, value: jsonDump(body) };
+    log('warn', null, `Unknown responseType "${responseType}",`
+      + ' see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.');
   }
+  return '';
+}
+
+/** Polyfill for Chrome's inability to send complex types over extension messaging */
+async function encodeBody(body) {
+  const wasBlob = body instanceof Blob;
+  const blob = wasBlob ? body : await new Response(body)::resBlob();
+  const reader = new FileReader();
+  return new Promise((resolve) => {
+    reader::addEventListener('load', () => resolve([
+      reader::frGetResult(),
+      wasBlob ? 'blob' : blob.type,
+    ]));
+    reader::readAsDataURL(blob);
+  });
 }
