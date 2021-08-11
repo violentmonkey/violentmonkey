@@ -1,6 +1,6 @@
 import { assign, defineProperty, describeProperty, objectPick } from '#/common/object';
 import {
-  Promise, charCodeAt, filter, forEach, includes, jsonLoad, log,
+  Promise, charCodeAt, filter, forEach, jsonLoad, log, replace,
   NS_HTML, addEventListener, createElementNS, setAttribute,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -52,32 +52,38 @@ export function onRequestCreate(opts, scriptId) {
   return req.req;
 }
 
-function parseData(req, msg, opts) {
-  const response = req.raw;
-  const { responseType } = opts;
-  if (responseType === 'json') {
-    return jsonLoad(response);
-  }
-  if (responseType === 'document') {
-    const type = msg.contentType.split(';', 1)[0] || 'text/html';
-    return new DOMParser()::parseFromString(response, type);
-  }
-  // arraybuffer/blob in incognito tabs is transferred as ArrayBuffer encoded in string chunks
-  if (msg.chunked) {
+function parseData(req, msg) {
+  let res;
+  const { raw, opts: { responseType } } = req;
+  if (responseType === 'text') {
+    res = raw;
+  } else if (responseType === 'json') {
+    res = jsonLoad(raw);
+  } else if (responseType === 'document') {
+    const type = msg.contentType::replace(/^[^;]+/)?.[0] || 'text/html';
+    res = new DOMParser()::parseFromString(raw, type);
+  } else if (msg.chunked) {
+    // arraybuffer/blob in incognito tabs is transferred as ArrayBuffer encoded in string chunks
     const arr = new Uint8Array(req.dataSize);
     let dstIndex = 0;
-    response::forEach((chunk) => {
+    raw::forEach((chunk) => {
       const len = (chunk = atob(chunk)).length;
       for (let j = 0; j < len; j += 1, dstIndex += 1) {
         arr[dstIndex] = chunk::charCodeAt(j);
       }
     });
-    return responseType === 'blob'
+    res = responseType === 'blob'
       ? new Blob([arr], { type: msg.contentType })
       : arr.buffer;
+  } else {
+    // text, blob, arraybuffer
+    res = raw;
   }
-  // text, blob, arraybuffer
-  return response;
+  // `response` is sent only when changed so we need to remember it for response-less events
+  req.response = res;
+  // `raw` is decoded once per `response` change so we reuse the result just like native XHR
+  delete req.raw;
+  return res;
 }
 
 // request object functions
@@ -98,8 +104,7 @@ async function callback(req, msg) {
       responseHeaders: headers,
       responseText: text,
     } = data;
-    const isText = ['text']::includes(opts.responseType || 'text');
-    if (!isText && response && !('raw' in req)) {
+    if (response && !('raw' in req)) {
       req.raw = msg.chunked
         ? receiveAllChunks(req, response, msg)
         : response;
@@ -110,7 +115,7 @@ async function callback(req, msg) {
     defineProperty(data, 'response', {
       configurable: true,
       get() {
-        const value = 'raw' in req ? parseData(req, msg, opts) : response;
+        const value = 'raw' in req ? parseData(req, msg) : req.response;
         defineProperty(this, 'response', { value });
         return value;
       },
