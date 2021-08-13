@@ -17,16 +17,6 @@ export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 /** When looking for documentElement, use '*' to also support XML pages */
 export const elemByTag = (tag, i) => document::getElementsByTagName(tag)[i || 0];
 
-export const findElementIndex = (elem) => {
-  for (
-    let el, i = 0, elems = document::getElementsByTagName('*');
-    (el = elems[i]);
-    i += 1
-  ) {
-    if (el === elem) return i;
-  }
-};
-
 // Firefox defines `isFinite` on `global` not on `window`
 const { Boolean, Uint8Array, isFinite } = global; // eslint-disable-line no-restricted-properties
 const { fromCharCode } = String;

@@ -89,7 +89,7 @@ bridge.addHandlers({
       sendSetPopup(true);
     }
   },
-  AddElement([parentIndex, tag, props]) {
+  AddElement([tag, props, id, parentIndex]) {
     try {
       const el = document::createElementNS(NS_HTML, tag);
       if (props) {
@@ -98,7 +98,8 @@ bridge.addHandlers({
             : el::setAttribute(key, props[key])
         ));
       }
-      elemByTag('*', parentIndex)::appendChild(el);
+      if (id) el::setAttribute('id', id);
+      elemByTag('*', id ? 0 : parentIndex)::appendChild(el);
     } catch (e) {
       return e.stack;
     }

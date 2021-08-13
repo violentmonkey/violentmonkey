@@ -13,7 +13,7 @@ import {
 } from './gm-values';
 import {
   charCodeAt, jsonDump, log, logging, slice,
-  createElementNS, elemByTag, findElementIndex, setAttribute, NS_HTML,
+  createElementNS, getElementsByTagName, elemByTag, setAttribute, NS_HTML,
 } from '../utils/helpers';
 
 const {
@@ -28,6 +28,8 @@ const {
   TextDecoder: { prototype: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
 } = global;
+const { getElementById, getRootNode } = document;
+const { removeAttribute } = Element.prototype;
 const { get: getLastElementChild } = describeProperty(Element.prototype, 'lastElementChild');
 
 const vmOwnFuncToString = () => '[Violentmonkey property]';
@@ -219,10 +221,32 @@ function addElement(parent, tag, attributes) {
       ? elemByTag('head')
       : elemByTag('body') || elemByTag('*');
   }
-  const error = bridge.sendSync('AddElement', [findElementIndex(parent), tag, attributes]);
-  // DOM error in content script can't be caught by a userscript so we rethrow it here
+  let parentIndex = -1;
+  if (parent::getRootNode() === document) {
+    for (
+      let el, i = 0, elems = document::getElementsByTagName('*');
+      (el = elems[i]);
+      i += 1
+    ) {
+      if (el === parent) {
+        parentIndex = i;
+        break;
+      }
+    }
+  }
+  const id = parentIndex < 0 && getUniqId('VMel');
+  const error = bridge.sendSync('AddElement', [tag, attributes, id, parentIndex]);
+  // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
   if (error) throw new Error(error);
-  const el = parent::getLastElementChild();
+  const el = id ? document::getElementById(id) : parent::getLastElementChild();
+  if (id) {
+    parent.appendChild(el);
+    if (attributes && 'id' in attributes) {
+      el::setAttribute(attributes.id);
+    } else {
+      el::removeAttribute(id);
+    }
+  }
   /* A Promise polyfill is not actually necessary because DOM messaging is synchronous,
      but we keep it for compatibility with GM_addStyle in VM of 2017-2019
      https://github.com/violentmonkey/violentmonkey/issues/217
