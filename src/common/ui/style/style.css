@@ -15,7 +15,7 @@
   --fill-3: #ccc;
   --fill-4: #bbb;
   --fill-5: #aaa;
-  --fill-6: #bbb;
+  --fill-6: #999;
   --fill-7: #888;
   --fill-8: #777;
   --fill-9: #666;
@@ -30,23 +30,24 @@
   --tooltip-border-color: transparent;
   --focus-border-color: var(--fill-12);
   @media (prefers-color-scheme: dark) {
-    --fill-0: #222222;
-    --fill-0-5: #272727;
-    --fill-1: #2c2c2c; // step = 0x0A
-    --fill-2: #363636;
-    --fill-3: #404040;
-    --fill-4: #4a4a4a;
-    --fill-5: #545454;
-    --fill-6: #5e5e5e;
-    --fill-7: #686868;
-    --fill-8: #727272;
-    --fill-9: #7c7c7c;
-    --fill-10: #868686;
-    --fill-11: #909090;
-    --fill-12: #9a9a9a;
-    --fill-13: #a4a4a4;
-    --fill-14: #aeaeae;
-    --fill-15: #b8b8b8;
+    --fg: var(--fill-11);
+    --fill-0: #1e1e1e;
+    --fill-0-5: #262626;
+    --fill-1: #2d2d2d; // step = 0x0F
+    --fill-2: #3c3c3c;
+    --fill-3: #4b4b4b;
+    --fill-4: #5a5a5a;
+    --fill-5: #696969;
+    --fill-6: #787878;
+    --fill-7: #878787;
+    --fill-8: #969696;
+    --fill-9: #a5a5a5;
+    --fill-10: #b4b4b4;
+    --fill-11: #c3c3c3;
+    --fill-12: #d2d2d2;
+    --fill-13: #e1e1e1;
+    --fill-14: #f0f0f0;
+    --fill-15: #ffffff;
     --tooltip-border-color: #8888;
     --scrollbar-bg: #1a1a1a;
     --input-bg: #111;
