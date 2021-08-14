@@ -1,4 +1,4 @@
-import { sendCmd } from '../utils';
+import { sendCmd } from '#/common';
 import bridge from './bridge';
 
 const tabIds = {};

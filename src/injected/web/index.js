@@ -1,7 +1,7 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import { defineProperty, describeProperty } from '#/common/object';
 import { bindEvents } from '../utils';
-import { forEach, log, logging, remove, Promise } from '../utils/helpers';
+import { document, forEach, log, logging, remove, Promise, then } from '../utils/helpers';
 import bridge from './bridge';
 import { wrapGM } from './gm-wrapper';
 import store from './store';
@@ -12,8 +12,6 @@ import './tabs';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 
-const { document } = global;
-const { then } = Promise.prototype;
 const { get: getCurrentScript } = describeProperty(Document.prototype, 'currentScript');
 
 const sendSetTimeout = () => bridge.send('SetTimeout', 0);

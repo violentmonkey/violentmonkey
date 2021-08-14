@@ -11,23 +11,20 @@ import {
   decodeValue, dumpValue, loadValues, changeHooks,
 } from './gm-values';
 import {
-  charCodeAt, jsonDump, log, logging, slice,
-  appendChild, createElementNS, elemByTag, setAttribute, NS_HTML,
+  Error, Uint8Array, charCodeAt, jsonDump, log, logging, slice, then,
+  NS_HTML, appendChild, createElementNS, document, elemByTag, remove, setAttribute,
 } from '../utils/helpers';
 
 const {
-  Blob, Error, TextDecoder, Uint8Array,
-  Array: { prototype: { findIndex, indexOf } },
-  Document: { prototype: { getElementById } },
-  EventTarget: { prototype: { dispatchEvent } },
-  MouseEvent,
-  Promise: { prototype: { then } },
+  Blob, MouseEvent, TextDecoder,
   RegExp: { prototype: { test } },
-  String: { prototype: { lastIndexOf } },
   TextDecoder: { prototype: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
 } = global;
-const { remove, removeAttribute } = Element.prototype;
+const { findIndex, indexOf } = [];
+const { lastIndexOf } = '';
+const { dispatchEvent, getElementById } = document;
+const { removeAttribute } = Element.prototype;
 
 const vmOwnFuncToString = () => '[Violentmonkey property]';
 export const vmOwnFunc = (func, toString) => {

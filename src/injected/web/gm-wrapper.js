@@ -12,13 +12,15 @@ const {
   Proxy,
   Set, // 2x-3x faster lookup than object::has
   Symbol: { toStringTag, iterator: iterSym },
-  Array: { prototype: { concat, slice: arraySlice } },
-  Function: { prototype: { bind } }, // function won't be stepped-into when debugging
   Map: { prototype: { get: mapGet, has: mapHas, [iterSym]: mapIter } },
   Set: { prototype: { delete: setDelete, has: setHas, [iterSym]: setIter } },
   Object: { getOwnPropertyNames, getOwnPropertySymbols },
-  String: { prototype: { startsWith } },
 } = global;
+/** A bound function won't be stepped-into when debugging.
+ * Destructuring a random function reference instead of the long `Function.prototype` */
+const { bind } = Proxy;
+const { concat, slice: arraySlice } = [];
+const { startsWith } = '';
 
 let gmApi;
 let gm4Api;

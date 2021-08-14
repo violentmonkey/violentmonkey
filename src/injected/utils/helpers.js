@@ -2,18 +2,20 @@
 import { numberToString } from '#/common';
 import { assign, objectKeys } from '#/common/object';
 
-export const { Promise } = global;
-
-export const { filter, forEach, includes, join, map, push } = Array.prototype;
-export const { charCodeAt, slice, replace } = String.prototype;
-export const { toString: objectToString } = Object.prototype;
-export const { addEventListener, removeEventListener } = EventTarget.prototype;
+/* per spec `document` can change only in about:blank but we don't inject there
+   https://html.spec.whatwg.org/multipage/window-object.html#dom-document-dev */
+export const { document, Error, Promise, Uint8Array } = global;
+export const { then } = Promise.prototype;
+export const { filter, forEach, includes, join, map, push } = [];
+export const { charCodeAt, slice, replace } = '';
+export const { toString: objectToString } = {};
 export const { append, appendChild, remove, setAttribute } = Element.prototype;
-export const { createElementNS, getElementsByTagName } = document;
+export const {
+  addEventListener, createElementNS, getElementsByTagName, removeEventListener,
+} = document;
 export const logging = assign({}, console);
 
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
-
 /** When looking for documentElement, use '*' to also support XML pages */
 export const elemByTag = (tag, i) => document::getElementsByTagName(tag)[i || 0];
 

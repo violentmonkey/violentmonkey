@@ -1,6 +1,7 @@
 import { assign, defineProperty, describeProperty, objectPick } from '#/common/object';
 import {
-  Promise, charCodeAt, filter, forEach, jsonLoad, log, replace,
+  Error, Promise, Uint8Array,
+  charCodeAt, filter, forEach, jsonLoad, log, replace, then,
   NS_HTML, addEventListener, createElementNS, setAttribute,
 } from '../utils/helpers';
 import bridge from './bridge';
@@ -8,9 +9,8 @@ import bridge from './bridge';
 const idMap = {};
 
 export const { atob } = global;
-const { Blob, DOMParser, Error, FileReader, Response, Uint8Array } = global;
+const { Blob, DOMParser, FileReader, Response } = global;
 const { parseFromString } = DOMParser.prototype;
-const { then } = Promise.prototype;
 const { blob: resBlob } = Response.prototype;
 const { get: getHref } = describeProperty(HTMLAnchorElement.prototype, 'href');
 const { readAsDataURL } = FileReader.prototype;

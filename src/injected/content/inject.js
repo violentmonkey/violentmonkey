@@ -9,7 +9,7 @@ import { sendCmd } from '#/common';
 import { defineProperty, forEachKey, objectPick } from '#/common/object';
 import {
   append, appendChild, createElementNS, elemByTag, remove, NS_HTML,
-  addEventListener, removeEventListener,
+  addEventListener, document, removeEventListener,
   log,
 } from '../utils/helpers';
 import bridge from './bridge';

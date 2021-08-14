@@ -1,9 +1,9 @@
-import { getUniqId, isEmpty } from '#/common';
+import { getUniqId, isEmpty, sendCmd } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import { objectKeys, objectPick } from '#/common/object';
-import { bindEvents, sendCmd } from '../utils';
+import { bindEvents } from '../utils';
 import {
-  forEach, includes, append, createElementNS, setAttribute, NS_HTML,
+  forEach, includes, append, createElementNS, document, setAttribute, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
@@ -19,7 +19,7 @@ let isPopupShown;
 let pendingSetPopup;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
-const { split } = String.prototype;
+const { split } = '';
 
 (async () => {
   const contentId = getUniqId();
