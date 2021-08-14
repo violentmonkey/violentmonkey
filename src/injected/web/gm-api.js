@@ -224,13 +224,14 @@ function webAddElement(parent, tag, attributes, useId) {
   // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
   let error = bridge.sendSync('AddElement', [tag, attributes, id]);
   if (!error) {
-    el = document::getElementById(id);
-    if (!parent) {
-      parent = /^(script|style|link|meta)$/i.test(tag)
-        && elemByTag('head') || elemByTag('body') || elemByTag('*');
-    }
     try {
-      parent::appendChild(el);
+      el = document::getElementById(id);
+      if (!parent && !/^(script|style|link|meta)$/i.test(tag)) {
+        parent = elemByTag('body');
+      }
+      if (parent) {
+        parent::appendChild(el);
+      }
     } catch (e) {
       error = e.stack;
       el::remove();
