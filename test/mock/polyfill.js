@@ -27,6 +27,7 @@ for (const k of Object.keys(domProps)) {
 }
 delete domProps.performance;
 Object.defineProperties(global, domProps);
+global.Response = { prototype: {} };
 
 global.URL = {
   _cache: {},

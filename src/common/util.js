@@ -101,6 +101,25 @@ export function buffer2string(buf, offset = 0, length = 1e99) {
   return slices.join('');
 }
 
+/**
+ * Faster than buffer2string+btoa: 2x in Chrome, 10x in FF
+ * @param {Blob} blob
+ * @param {number} [offset]
+ * @param {number} [length]
+ * @return {Promise<string>} base64-encoded contents
+ */
+export function blob2base64(blob, offset = 0, length = 1e99) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    const needsSlicing = offset || length < blob.size;
+    reader.readAsDataURL(needsSlicing ? blob.slice(offset, offset + length) : blob);
+    reader.onload = () => {
+      const res = reader.result;
+      resolve(res.slice(res.indexOf(',') + 1));
+    };
+  });
+}
+
 const VERSION_RE = /^(.*?)-([-.0-9a-z]+)|$/i;
 const DIGITS_RE = /^\d+$/; // using regexp to avoid +'1e2' being parsed as 100
 
@@ -206,11 +225,17 @@ export async function requestLocalFile(url, options = {}) {
   });
 }
 
+/** @typedef {{
+  url: string
+  status: number
+  headers: Headers
+  data: string|ArrayBuffer|Blob|Object
+}} VMRequestResponse */
 /**
  * Make a request.
  * @param {string} url
  * @param {RequestInit} options
- * @return Promise
+ * @return Promise<VMRequestResponse>
  */
 export async function request(url, options = {}) {
   // fetch does not support local file

@@ -5,7 +5,7 @@ import {
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
-import { onRequestCreate } from './requests';
+import { atob, onRequestCreate } from './requests';
 import { onNotificationCreate } from './notifications';
 import {
   decodeValue, dumpValue, loadValues, changeHooks,
@@ -16,7 +16,6 @@ import {
 } from '../utils/helpers';
 
 const {
-  atob,
   Blob, Error, TextDecoder, Uint8Array,
   Array: { prototype: { findIndex, indexOf } },
   Document: { prototype: { getElementById } },

@@ -4,10 +4,10 @@ import storage from '#/common/storage';
 /** @type { function(url, options, check): Promise<void> } or throws on error */
 storage.cache.fetch = cacheOrFetch({
   init(options) {
-    return { ...options, responseType: 'arraybuffer' };
+    return { ...options, responseType: 'blob' };
   },
   async transform(response, url, options, check) {
-    const [type, body] = storage.cache.makeRaw(response, true);
+    const [type, body] = await storage.cache.makeRaw(response, true);
     await check?.(url, response.data, type);
     return `${type},${body}`;
   },
