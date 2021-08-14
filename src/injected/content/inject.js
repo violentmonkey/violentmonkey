@@ -8,7 +8,7 @@ import {
 import { sendCmd } from '#/common';
 import { defineProperty, forEachKey, objectPick } from '#/common/object';
 import {
-  append, createElementNS, remove, NS_HTML,
+  append, appendChild, createElementNS, elemByTag, remove, NS_HTML,
   addEventListener, removeEventListener,
   log,
 } from '../utils/helpers';
@@ -20,12 +20,7 @@ const VMInitInjection = window[process.env.INIT_FUNC_NAME];
 // (the prop is undeletable so a userscript can't fool us on reinjection)
 defineProperty(window, process.env.INIT_FUNC_NAME, { value: 1 });
 
-const { document } = global;
-const { appendChild, getElementsByTagName } = document;
 const stringIncludes = String.prototype.includes;
-
-/** When looking for documentElement, use '*' to also support XML pages */
-const elemByTag = tag => document::getElementsByTagName(tag)[0];
 
 let contLists;
 let pgLists;
@@ -179,15 +174,14 @@ async function injectList(runAt) {
 }
 
 function onElement(tag, cb, ...args) {
-  const elems = document::getElementsByTagName(tag);
-  if (elems[0]) {
+  if (elemByTag(tag)) {
     cb(...args);
   } else {
     // This function runs before any userscripts, but MutationObserver callback may run
     // after content-mode userscripts so we'll have to use safe calls there
     const { disconnect } = MutationObserver.prototype;
     const observer = new MutationObserver(() => {
-      if (elems[0]) {
+      if (elemByTag(tag)) {
         observer::disconnect();
         cb(...args);
       }

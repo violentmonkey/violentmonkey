@@ -88,13 +88,22 @@ bridge.addHandlers({
       sendSetPopup(true);
     }
   },
-  AddStyle(css) {
-    const styleId = getUniqId('VMst');
-    const style = document::createElementNS(NS_HTML, 'style');
-    style::setAttribute('id', styleId);
-    style::append(css);
-    appendToRoot(style);
-    return styleId;
+  AddElement([tag, attributes, id]) {
+    try {
+      const el = document::createElementNS(NS_HTML, tag);
+      el::setAttribute('id', id);
+      if (attributes) {
+        objectKeys(attributes)::forEach(key => {
+          if (key === 'textContent') el::append(attributes[key]);
+          else if (key !== 'id') el::setAttribute(key, attributes[key]);
+        });
+      }
+      appendToRoot(el);
+    } catch (e) {
+      // A page-mode userscript can't catch DOM errors in a content script so we pass it explicitly
+      // TODO: maybe move try/catch to bridge.onHandle and use bridge.sendSync in all web commands
+      return e.stack;
+    }
   },
   GetScript: sendCmd,
   SetTimeout: sendCmd,
