@@ -5,29 +5,27 @@ import {
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
-import { onRequestCreate } from './requests';
+import { atob, onRequestCreate } from './requests';
 import { onNotificationCreate } from './notifications';
 import {
   decodeValue, dumpValue, loadValues, changeHooks,
 } from './gm-values';
 import {
-  charCodeAt, jsonDump, log, logging, slice,
-  createElementNS, setAttribute, NS_HTML,
+  Error, Uint8Array, charCodeAt, jsonDump, log, logging, slice, then,
+  NS_HTML, appendChild, createElementNS, document, elemByTag, remove, setAttribute,
 } from '../utils/helpers';
 
 const {
-  atob,
-  Blob, Error, TextDecoder, Uint8Array,
-  Array: { prototype: { findIndex, indexOf } },
-  Document: { prototype: { getElementById } },
-  EventTarget: { prototype: { dispatchEvent } },
-  MouseEvent,
-  Promise: { prototype: { then } },
+  Blob, MouseEvent, TextDecoder,
   RegExp: { prototype: { test } },
-  String: { prototype: { lastIndexOf } },
   TextDecoder: { prototype: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
 } = global;
+const { findIndex, indexOf } = [];
+const { lastIndexOf } = '';
+const { dispatchEvent, getElementById } = document;
+const { removeAttribute } = Element.prototype;
+
 const vmOwnFuncToString = () => '[Violentmonkey property]';
 export const vmOwnFunc = (func, toString) => {
   defineProperty(func, 'toString', { value: toString || vmOwnFuncToString });
@@ -152,20 +150,26 @@ export function makeGmApi() {
     GM_xmlhttpRequest(opts) {
       return onRequestCreate(opts, this.id);
     },
-    GM_addStyle(css) {
-      const id = bridge.sendSync('AddStyle', css);
-      const el = document::getElementById(id);
-      // Mock a Promise without the need for polyfill
-      // It's not actually necessary because DOM messaging is synchronous
-      // but we keep it for compatibility with VM's 2017-2019 behavior
-      // https://github.com/violentmonkey/violentmonkey/issues/217
-      el.then = callback => {
-        // prevent infinite resolve loop
-        delete el.then;
-        callback(el);
-      };
-      return el;
-    },
+    /**
+     * Bypasses site's CSP for inline `style`, `link`, and `script`.
+     * @param {Node} [parent]
+     * @param {string} tag
+     * @param {Object} [attributes]
+     * @returns {HTMLElement} it also has .then() so it should be compatible with TM
+     */
+    GM_addElement: (parent, tag, attributes) => (
+      typeof parent === 'string'
+        ? webAddElement(undefined, parent, tag)
+        : webAddElement(parent, tag, attributes)
+    ),
+    /**
+     * Bypasses site's CSP for inline `style`.
+     * @param {string} css
+     * @returns {HTMLElement} it also has .then() so it should be compatible with TM and old VM
+     */
+    GM_addStyle: css => (
+      webAddElement(undefined, 'style', { textContent: css }, getUniqId('VMst'))
+    ),
     GM_openInTab(url, options) {
       const data = options && typeof options === 'object' ? options : {
         active: !options,
@@ -206,7 +210,52 @@ export function makeGmApi() {
     registerMenuCommand: true,
     setClipboard: true,
     addStyle: true, // gm4-polyfill.js sets it anyway
+    addElement: true, // TM sets it
   }];
+}
+
+function webAddElement(parent, tag, attributes, useId) {
+  const id = useId || getUniqId('VMel');
+  let el;
+  // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
+  let error = bridge.sendSync('AddElement', [tag, attributes, id]);
+  if (!error) {
+    try {
+      el = document::getElementById(id);
+      if (!parent && !/^(script|style|link|meta)$/i.test(tag)) {
+        parent = elemByTag('body');
+      }
+      if (parent) {
+        parent::appendChild(el);
+      }
+    } catch (e) {
+      error = e.stack;
+      el::remove();
+    }
+  }
+  if (error) {
+    throw new Error(error);
+  }
+  if (!useId) {
+    if (attributes && 'id' in attributes) {
+      el::setAttribute('id', attributes.id);
+    } else {
+      el::removeAttribute('id');
+    }
+  }
+  /* A Promise polyfill is not actually necessary because DOM messaging is synchronous,
+     but we keep it for compatibility with GM_addStyle in VM of 2017-2019
+     https://github.com/violentmonkey/violentmonkey/issues/217
+     as well as for GM_addElement in Tampermonkey. */
+  defineProperty(el, 'then', {
+    configurable: true,
+    value(callback) {
+      // prevent infinite resolve loop
+      delete el.then;
+      callback(el);
+    },
+  });
+  return el;
 }
 
 function getResource(context, name, isBlob) {

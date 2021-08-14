@@ -1,5 +1,5 @@
 import { browser } from './consts';
-import { buffer2string, ensureArray } from './util';
+import { blob2base64, ensureArray } from './util';
 
 const base = {
   prefix: '',
@@ -59,13 +59,13 @@ export default {
     ...base,
     prefix: 'cac:',
     /**
-     * @param {Response} response
+     * @param {VMRequestResponse} response
      * @param {boolean} [noJoin]
      * @returns {string|string[]}
      */
-    makeRaw(response, noJoin) {
+    async makeRaw(response, noJoin) {
       const type = (response.headers.get('content-type') || '').split(';')[0] || '';
-      const body = btoa(buffer2string(response.data));
+      const body = await blob2base64(response.data);
       return noJoin ? [type, body] : `${type},${body}`;
     },
     /**

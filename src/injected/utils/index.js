@@ -1,9 +1,6 @@
-import { addEventListener } from './helpers';
+import { addEventListener, document } from './helpers';
 
-export { sendCmd } from '#/common';
-
-const { CustomEvent } = global;
-const { dispatchEvent } = EventTarget.prototype;
+const { CustomEvent, dispatchEvent } = global;
 
 export function bindEvents(srcId, destId, handle, cloneInto) {
   document::addEventListener(srcId, e => handle(e.detail));

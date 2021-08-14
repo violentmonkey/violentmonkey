@@ -2,21 +2,25 @@
 import { numberToString } from '#/common';
 import { assign, objectKeys } from '#/common/object';
 
-export const { Promise } = global;
-
-export const { filter, forEach, includes, join, map, push } = Array.prototype;
-export const { charCodeAt, slice, replace } = String.prototype;
-export const { toString: objectToString } = Object.prototype;
-export const { addEventListener, removeEventListener } = EventTarget.prototype;
-export const { append, remove, setAttribute } = Element.prototype;
-export const { createElementNS } = Document.prototype;
+/* per spec `document` can change only in about:blank but we don't inject there
+   https://html.spec.whatwg.org/multipage/window-object.html#dom-document-dev */
+export const { document, Error, Promise, Uint8Array } = global;
+export const { then } = Promise.prototype;
+export const { filter, forEach, includes, join, map, push } = [];
+export const { charCodeAt, slice, replace } = '';
+export const { toString: objectToString } = {};
+export const { append, appendChild, remove, setAttribute } = Element.prototype;
+export const {
+  addEventListener, createElementNS, getElementsByTagName, removeEventListener,
+} = document;
 export const logging = assign({}, console);
 
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
+/** When looking for documentElement, use '*' to also support XML pages */
+export const elemByTag = (tag, i) => document::getElementsByTagName(tag)[i || 0];
 
 // Firefox defines `isFinite` on `global` not on `window`
-const { Boolean, Uint8Array, isFinite } = global; // eslint-disable-line no-restricted-properties
-const { fromCharCode } = String;
+const { Boolean, isFinite } = global; // eslint-disable-line no-restricted-properties
 const isArray = obj => (
   // ES3 way, not reliable if prototype is modified
   // Object.prototype.toString.call(obj) === '[object Array]'
@@ -68,17 +72,4 @@ export function log(level, tags, ...args) {
   if (tags) tagList::push(...tags);
   const prefix = tagList::map(tag => `[${tag}]`)::join('');
   logging[level](prefix, ...args);
-}
-
-// uses ::safe calls unlike buffer2string in #/common
-export function buffer2stringSafe(buf) {
-  const size = buf.byteLength;
-  // The max number of arguments varies between JS engines but it's >32k so 10k is safe
-  const stepSize = 10e3;
-  const stringChunks = [];
-  for (let from = 0; from < size; from += stepSize) {
-    const sourceChunk = new Uint8Array(buf, from, Math.min(stepSize, size - from));
-    stringChunks::push(fromCharCode(...sourceChunk));
-  }
-  return stringChunks::join('');
 }

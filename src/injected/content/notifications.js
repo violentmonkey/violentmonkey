@@ -1,5 +1,5 @@
+import { sendCmd } from '#/common';
 import { objectEntries } from '#/common/object';
-import { sendCmd } from '../utils';
 import { filter } from '../utils/helpers';
 import bridge from './bridge';
 

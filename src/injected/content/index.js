@@ -1,9 +1,9 @@
-import { getUniqId, isEmpty } from '#/common';
+import { getUniqId, isEmpty, sendCmd } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import { objectKeys, objectPick } from '#/common/object';
-import { bindEvents, sendCmd } from '../utils';
+import { bindEvents } from '../utils';
 import {
-  forEach, includes, append, createElementNS, setAttribute, NS_HTML,
+  forEach, includes, append, createElementNS, document, setAttribute, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
@@ -19,7 +19,7 @@ let isPopupShown;
 let pendingSetPopup;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
-const { split } = String.prototype;
+const { split } = '';
 
 (async () => {
   const contentId = getUniqId();
@@ -88,13 +88,22 @@ bridge.addHandlers({
       sendSetPopup(true);
     }
   },
-  AddStyle(css) {
-    const styleId = getUniqId('VMst');
-    const style = document::createElementNS(NS_HTML, 'style');
-    style::setAttribute('id', styleId);
-    style::append(css);
-    appendToRoot(style);
-    return styleId;
+  AddElement([tag, attributes, id]) {
+    try {
+      const el = document::createElementNS(NS_HTML, tag);
+      el::setAttribute('id', id);
+      if (attributes) {
+        objectKeys(attributes)::forEach(key => {
+          if (key === 'textContent') el::append(attributes[key]);
+          else if (key !== 'id') el::setAttribute(key, attributes[key]);
+        });
+      }
+      appendToRoot(el);
+    } catch (e) {
+      // A page-mode userscript can't catch DOM errors in a content script so we pass it explicitly
+      // TODO: maybe move try/catch to bridge.onHandle and use bridge.sendSync in all web commands
+      return e.stack;
+    }
   },
   GetScript: sendCmd,
   SetTimeout: sendCmd,

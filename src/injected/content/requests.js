@@ -1,4 +1,4 @@
-import { sendCmd } from '../utils';
+import { sendCmd } from '#/common';
 import { includes } from '../utils/helpers';
 import bridge from './bridge';
 
@@ -19,12 +19,12 @@ bridge.addHandlers({
 
 bridge.addBackgroundHandlers({
   async HttpRequested(msg) {
-    const { id, numChunks, type } = msg;
+    const { blobbed, id, numChunks, type } = msg;
     const req = requests[id];
     if (!req) return;
     const isLoadEnd = type === 'loadend';
     // only CONTENT realm can read blobs from an extension:// URL
-    const url = msg.chunkType === 'blob'
+    const url = blobbed
       && !req.response
       && req.eventsToNotify::includes(type)
       && msg.data.response;
@@ -37,22 +37,24 @@ bridge.addBackgroundHandlers({
       req.response = await req.response;
     }
     // ...and make sure loadend's bridge.post() runs last
-    if (isLoadEnd) {
+    if (isLoadEnd && blobbed) {
       await 0;
     }
     if (url) {
       msg.data.response = req.response;
     }
     bridge.post('HttpRequested', msg, req.realm);
-    let { allChunks } = req;
+    // If the user in incognito supplied only `onloadend` then it arrives first, followed by chunks
     if (isLoadEnd) {
-      req.ended = true;
-      allChunks = allChunks || !numChunks || numChunks === 1;
-    } else if (msg.isLastChunk) {
-      allChunks = true;
+      req.gotLoadEnd = true;
+      req.gotChunks = req.gotChunks || (numChunks || 0) <= 1;
+    } else if (msg.chunk?.last) {
+      req.gotChunks = true;
     }
-    req.allChunks = allChunks;
-    if (req.ended && allChunks) delete requests[id];
+    // If the user supplied any event before `loadend`, all chunks finish before `loadend` arrives
+    if (req.gotLoadEnd && req.gotChunks) {
+      delete requests[id];
+    }
   },
 });
 

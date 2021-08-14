@@ -1,4 +1,4 @@
-import { sendCmd } from './utils';
+import { sendCmd } from '#/common';
 import './content';
 
 // Script installation in Firefox as it does not support `onBeforeRequest` for `file:`
