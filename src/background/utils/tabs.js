@@ -21,10 +21,17 @@ Object.assign(commands, {
       });
       pathId = `_new${id ? `/${id}` : ''}`;
     }
-    return commands.TabOpen({
-      url: `/options/index.html#scripts/${pathId}`,
-      maybeInWindow: true,
-    });
+    const url = `${extensionRoot}options/index.html#scripts/${pathId}`;
+    // Firefox until v56 doesn't support moz-extension:// pattern in browser.tabs.query()
+    for (const view of browser.extension.getViews()) {
+      if (view.location.href === url) {
+        const tab = await view.browser.tabs.getCurrent();
+        browser.tabs.update(tab.id, { active: true });
+        browser.windows.update(tab.windowId, { focused: true });
+        return tab;
+      }
+    }
+    return commands.TabOpen({ url, maybeInWindow: true });
   },
   /** @return {Promise<{ id: number }>} */
   async TabOpen({
@@ -51,7 +58,7 @@ Object.assign(commands, {
     if (!url.startsWith('blob:')) {
       // URL needs to be expanded for `canOpenIncognito` below
       if (!isInternal) url = getFullUrl(url, srcUrl);
-      else if (!/^\w+:/.test(url)) url = browser.runtime.getURL(url);
+      else if (!/^[-\w]+:/.test(url)) url = browser.runtime.getURL(url);
     }
     const canOpenIncognito = !incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url);
     let newTab;
