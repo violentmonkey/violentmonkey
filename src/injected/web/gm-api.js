@@ -28,7 +28,7 @@ const {
   TextDecoder: { prototype: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
 } = global;
-const { removeAttribute } = Element.prototype;
+const { remove, removeAttribute } = Element.prototype;
 
 const vmOwnFuncToString = () => '[Violentmonkey property]';
 export const vmOwnFunc = (func, toString) => {
@@ -159,8 +159,7 @@ export function makeGmApi() {
      * @param {Node} [parent]
      * @param {string} tag
      * @param {Object} [attributes]
-     * @returns {HTMLElement}
-     * @throws {Error} if DOM exception occurred
+     * @returns {HTMLElement} it also has .then() so it should be compatible with TM
      */
     GM_addElement: (parent, tag, attributes) => (
       typeof parent === 'string'
@@ -170,8 +169,7 @@ export function makeGmApi() {
     /**
      * Bypasses site's CSP for inline `style`.
      * @param {string} css
-     * @returns {HTMLElement}
-     * @throws {Error} if DOM exception occurred
+     * @returns {HTMLElement} it also has .then() so it should be compatible with TM and old VM
      */
     GM_addStyle: css => (
       webAddElement(undefined, 'style', { textContent: css }, getUniqId('VMst'))
@@ -222,15 +220,25 @@ export function makeGmApi() {
 
 function webAddElement(parent, tag, attributes, useId) {
   const id = useId || getUniqId('VMel');
-  const error = bridge.sendSync('AddElement', [tag, attributes, id]);
+  let el;
   // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
-  if (error) throw new Error(error);
-  const el = document::getElementById(id);
-  if (!parent) {
-    parent = /^(script|style|link|meta)$/i.test(tag)
-      && elemByTag('head') || elemByTag('body') || elemByTag('*');
+  let error = bridge.sendSync('AddElement', [tag, attributes, id]);
+  if (!error) {
+    el = document::getElementById(id);
+    if (!parent) {
+      parent = /^(script|style|link|meta)$/i.test(tag)
+        && elemByTag('head') || elemByTag('body') || elemByTag('*');
+    }
+    try {
+      parent::appendChild(el);
+    } catch (e) {
+      error = e.stack;
+      el::remove();
+    }
   }
-  parent::appendChild(el);
+  if (error) {
+    throw new Error(error);
+  }
   if (!useId) {
     if (attributes && 'id' in attributes) {
       el::setAttribute('id', attributes.id);
