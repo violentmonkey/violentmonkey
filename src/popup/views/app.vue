@@ -136,8 +136,12 @@
               v-for="(cap, i) in store.commands[item.data.props.id]"
               :key="i"
               :tabIndex="tabIndex"
+              :data-cmd="`${item.data.props.id}:${cap}`"
               :data-message="cap"
-              @click="onCommand(item.data.props.id, cap)">
+              @mousedown="onCommand"
+              @mouseup="onCommand"
+              @keydown.enter="onCommand"
+              @keydown.space="onCommand">
               <icon name="command" />
               <div class="flex-auto ellipsis" v-text="cap" />
             </div>
@@ -176,12 +180,14 @@ import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { INJECT_AUTO } from '#/common/consts';
 import options from '#/common/options';
 import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
+import { objectPick } from '#/common/object';
 import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
 import { keyboardService, isInput } from '#/common/keyboard';
 import { mutex, store } from '../utils';
 
 const SCRIPT_CLS = '.script';
+let mousedownElement;
 
 const optionsData = {
   isApplied: options.get('isApplied'),
@@ -223,6 +229,8 @@ export default {
       activeMenu: 'scripts',
       activeExtras: null,
       message: null,
+      /** @type HTMLElement */
+      mousedown: null,
       focusedId: null,
     };
   },
@@ -334,9 +342,18 @@ export default {
       });
       window.close();
     },
-    onCommand(id, cap) {
-      sendTabCmd(store.currentTab.id, 'Command', `${id}:${cap}`);
-      window.close();
+    onCommand(evt) {
+      const { type, currentTarget: el } = evt;
+      if (type === 'mousedown') {
+        mousedownElement = el;
+        evt.preventDefault();
+      } else if (type === 'keydown' || mousedownElement === el) {
+        sendTabCmd(store.currentTab.id, 'Command', [
+          el.dataset.cmd,
+          objectPick(evt, ['type', 'button', 'shiftKey', 'altKey', 'ctrlKey', 'metaKey', 'key', 'keyCode', 'code']),
+        ]);
+        window.close();
+      }
     },
     onToggleScript(item) {
       const { data } = item;

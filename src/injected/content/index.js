@@ -51,7 +51,8 @@ const { split } = '';
 
 bridge.addBackgroundHandlers({
   Command(data) {
-    const id = +data::split(':', 1)[0];
+    const [cmd] = data;
+    const id = +cmd::split(':', 1)[0];
     const realm = bridge.invokableIds::includes(id) && INJECT_CONTENT;
     bridge.post('Command', data, realm);
   },
