@@ -62,7 +62,12 @@ Object.assign(commands, {
     }
     const canOpenIncognito = !incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url);
     let newTab;
-    if (maybeInWindow && browser.windows && getOption('editorWindow')) {
+    if (maybeInWindow
+        && browser.windows
+        && getOption('editorWindow')
+        /* cookieStoreId in windows.create() is supported since FF64 https://bugzil.la/1393570
+         * and a workaround is too convoluted to add it for such an ancient version */
+        && (!storeId || ua.isFirefox >= 64)) {
       const wndOpts = {
         url,
         incognito: canOpenIncognito && incognito,
