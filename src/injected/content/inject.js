@@ -31,7 +31,7 @@ bridge.addHandlers({
   InjectList: injectList,
 });
 
-function appendToRoot(node) {
+export function appendToRoot(node) {
   // DOM spec allows any elements under documentElement
   // https://dom.spec.whatwg.org/#node-trees
   const root = elemByTag('head') || elemByTag('*');

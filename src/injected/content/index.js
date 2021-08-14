@@ -3,12 +3,11 @@ import { INJECT_CONTENT } from '#/common/consts';
 import { objectKeys, objectPick } from '#/common/object';
 import { bindEvents, sendCmd } from '../utils';
 import {
-  forEach, includes,
-  append, appendChild, createElementNS, elemByTag, setAttribute, NS_HTML,
+  forEach, includes, append, createElementNS, setAttribute, NS_HTML,
 } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
-import { injectPageSandbox, injectScripts } from './inject';
+import { appendToRoot, injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
@@ -89,18 +88,20 @@ bridge.addHandlers({
       sendSetPopup(true);
     }
   },
-  AddElement([tag, props, id, parentIndex]) {
+  AddElement([tag, attributes, id]) {
     try {
       const el = document::createElementNS(NS_HTML, tag);
-      if (props) {
-        objectKeys(props)::forEach(key => (
-          key === 'textContent' ? el::append(props[key])
-            : el::setAttribute(key, props[key])
-        ));
+      el::setAttribute('id', id);
+      if (attributes) {
+        objectKeys(attributes)::forEach(key => {
+          if (key === 'textContent') el::append(attributes[key]);
+          else if (key !== 'id') el::setAttribute(key, attributes[key]);
+        });
       }
-      if (id) el::setAttribute('id', id);
-      elemByTag('*', id ? 0 : parentIndex)::appendChild(el);
+      appendToRoot(el);
     } catch (e) {
+      // A page-mode userscript can't catch DOM errors in a content script so we pass it explicitly
+      // TODO: maybe move try/catch to bridge.onHandle and use bridge.sendSync in all web commands
       return e.stack;
     }
   },

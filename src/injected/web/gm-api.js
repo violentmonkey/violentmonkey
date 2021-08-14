@@ -1,7 +1,6 @@
 import { dumpScriptValue, getUniqId, isEmpty } from '#/common/util';
 import {
-  assign, defineProperty, describeProperty,
-  objectEntries, objectKeys, objectPick, objectValues,
+  assign, defineProperty, objectEntries, objectKeys, objectPick, objectValues,
 } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
@@ -13,13 +12,14 @@ import {
 } from './gm-values';
 import {
   charCodeAt, jsonDump, log, logging, slice,
-  createElementNS, getElementsByTagName, elemByTag, setAttribute, NS_HTML,
+  appendChild, createElementNS, elemByTag, setAttribute, NS_HTML,
 } from '../utils/helpers';
 
 const {
   atob,
   Blob, Error, TextDecoder, Uint8Array,
   Array: { prototype: { findIndex, indexOf } },
+  Document: { prototype: { getElementById } },
   EventTarget: { prototype: { dispatchEvent } },
   MouseEvent,
   Promise: { prototype: { then } },
@@ -28,9 +28,7 @@ const {
   TextDecoder: { prototype: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
 } = global;
-const { getElementById, getRootNode } = document;
 const { removeAttribute } = Element.prototype;
-const { get: getLastElementChild } = describeProperty(Element.prototype, 'lastElementChild');
 
 const vmOwnFuncToString = () => '[Violentmonkey property]';
 export const vmOwnFunc = (func, toString) => {
@@ -162,14 +160,21 @@ export function makeGmApi() {
      * @param {string} tag
      * @param {Object} [attributes]
      * @returns {HTMLElement}
+     * @throws {Error} if DOM exception occurred
      */
     GM_addElement: (parent, tag, attributes) => (
       typeof parent === 'string'
-        ? addElement(undefined, parent, tag)
-        : addElement(parent, tag, attributes)
+        ? webAddElement(undefined, parent, tag)
+        : webAddElement(parent, tag, attributes)
     ),
+    /**
+     * Bypasses site's CSP for inline `style`.
+     * @param {string} css
+     * @returns {HTMLElement}
+     * @throws {Error} if DOM exception occurred
+     */
     GM_addStyle: css => (
-      addElement(undefined, 'style', { textContent: css, id: getUniqId('VMst') })
+      webAddElement(undefined, 'style', { textContent: css }, getUniqId('VMst'))
     ),
     GM_openInTab(url, options) {
       const data = options && typeof options === 'object' ? options : {
@@ -215,32 +220,18 @@ export function makeGmApi() {
   }];
 }
 
-function addElement(parent, tag, attributes) {
-  if (!parent) {
-    parent = tag === 'script' || tag === 'style' || tag === 'link' || tag === 'meta'
-      ? elemByTag('head')
-      : elemByTag('body') || elemByTag('*');
-  }
-  let parentIndex = -1;
-  if (parent::getRootNode() === document) {
-    for (
-      let el, i = 0, elems = document::getElementsByTagName('*');
-      (el = elems[i]);
-      i += 1
-    ) {
-      if (el === parent) {
-        parentIndex = i;
-        break;
-      }
-    }
-  }
-  const id = parentIndex < 0 && getUniqId('VMel');
-  const error = bridge.sendSync('AddElement', [tag, attributes, id, parentIndex]);
+function webAddElement(parent, tag, attributes, useId) {
+  const id = useId || getUniqId('VMel');
+  const error = bridge.sendSync('AddElement', [tag, attributes, id]);
   // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
   if (error) throw new Error(error);
-  const el = id ? document::getElementById(id) : parent::getLastElementChild();
-  if (id) {
-    parent.appendChild(el);
+  const el = document::getElementById(id);
+  if (!parent) {
+    parent = /^(script|style|link|meta)$/i.test(tag)
+      && elemByTag('head') || elemByTag('body') || elemByTag('*');
+  }
+  parent::appendChild(el);
+  if (!useId) {
     if (attributes && 'id' in attributes) {
       el::setAttribute(attributes.id);
     } else {
@@ -251,11 +242,14 @@ function addElement(parent, tag, attributes) {
      but we keep it for compatibility with GM_addStyle in VM of 2017-2019
      https://github.com/violentmonkey/violentmonkey/issues/217
      as well as for GM_addElement in Tampermonkey. */
-  el.then = callback => {
-    // prevent infinite resolve loop
-    delete el.then;
-    callback(el);
-  };
+  defineProperty(el, 'then', {
+    configurable: true,
+    value(callback) {
+      // prevent infinite resolve loop
+      delete el.then;
+      callback(el);
+    },
+  });
   return el;
 }
 
