@@ -233,9 +233,9 @@ function webAddElement(parent, tag, attributes, useId) {
   parent::appendChild(el);
   if (!useId) {
     if (attributes && 'id' in attributes) {
-      el::setAttribute(attributes.id);
+      el::setAttribute('id', attributes.id);
     } else {
-      el::removeAttribute(id);
+      el::removeAttribute('id');
     }
   }
   /* A Promise polyfill is not actually necessary because DOM messaging is synchronous,
