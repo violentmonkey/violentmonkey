@@ -120,6 +120,15 @@ export function blob2base64(blob, offset = 0, length = 1e99) {
   });
 }
 
+export function string2uint8array(str) {
+  const len = str.length;
+  const array = new Uint8Array(len);
+  for (let i = 0; i < len; i += 1) {
+    array[i] = str.charCodeAt(i);
+  }
+  return array;
+}
+
 const VERSION_RE = /^(.*?)-([-.0-9a-z]+)|$/i;
 const DIGITS_RE = /^\d+$/; // using regexp to avoid +'1e2' being parsed as 100
 

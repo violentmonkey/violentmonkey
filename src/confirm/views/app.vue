@@ -171,10 +171,17 @@ export default {
       this.checkSameCode(),
       (async () => {
         let retries = 2;
-        while (retries && !await this.loadDeps()) {
+        while (!await this.loadDeps() && retries) {
           await makePause(3000);
           retries -= 1;
         }
+        this.allDeps.forEach(list => {
+          list.forEach(u => {
+            if (this.deps[u] == null) {
+              this.$set(this.deps, u, false);
+            }
+          });
+        });
       })(),
     ]);
     if (this.installable) {
@@ -219,13 +226,13 @@ export default {
         || ''
       ));
       this.script = { meta, custom: {}, props: {} };
-      this.loadedDeps = {};
+      this.allDeps = [
+        [...new Set(meta.require)],
+        [...new Set(Object.values(meta.resources))],
+      ];
     },
     async loadDeps() {
-      const { script } = this;
-      const { meta } = script;
-      const require = [...new Set(meta.require)];
-      const resource = [...new Set(Object.values(meta.resources))];
+      const { script, allDeps: [require, resource] } = this;
       if (!this.safeIcon) {
         loadScriptIcon(script).then(url => { this.safeIcon = url; });
       }
@@ -489,20 +496,6 @@ $infoIconSize: 18px;
       border-color: #35699f;
     }
   }
-  .edit-externals {
-    > select {
-      padding: 0;
-      background: var(--fill-1);
-      border-width: 0 0 2px 0;
-      option::before {
-        color: darkviolet;
-        font-weight: bold;
-      }
-      option[data-is-main]::before {
-        color: var(--fg);
-      }
-    }
-  }
   @media (prefers-color-scheme: dark) {
     .incognito {
       color: orange;
@@ -521,16 +514,6 @@ $infoIconSize: 18px;
       color: #9fcdfd;
       &:hover {
         border-color: #608cb8;
-      }
-    }
-    .edit-externals {
-      > select {
-        option::before {
-          color: #c34ec3;
-        }
-        option[data-is-main]::before {
-          color: var(--fg);
-        }
       }
     }
   }

@@ -1,19 +1,24 @@
 <template>
   <div class="edit-externals flex flex-col">
-    <select v-model="index"
-            v-if="!install || all.length > 1"
-            :size="Math.max(2, all.length)"
-            :data-size="all.length">
-      <option
-        v-for="([type, url], i) of all" :key="i"
-        v-text="decodeURIComponent(url)"
-        class="ellipsis"
-        :disabled="i > 0 && install && !(url in install.deps)"
-        :data-is-main="!i && install ? '' : null"
-        :data-type="type"
-        :value="i"/>
-    </select>
-    <div class="contents pos-rel h-100">
+    <div v-if="!install || all.length > 1" class="select"
+         :data-has-main="install ? '' : null">
+      <dl v-for="([type, url, contents], i) of all" :key="i"
+          class="flex"
+          :class="{
+            active: index === i,
+            loading: install && i && !(url in install.deps),
+            error: contents === false,
+          }"
+          @click="contents !== false && (index = i)">
+        <dt v-text="type"/>
+        <dd class="ellipsis flex-1">
+          <a :href="url" target="_blank">&nearr;</a>
+          <span v-text="decodeURIComponent(url)"/>
+        </dd>
+        <dd v-if="contents" v-text="formatLength(contents)" class="ml-2"/>
+      </dl>
+    </div>
+    <div class="contents pos-rel flex-auto">
       <img v-if="img" :src="img">
       <vm-code
         class="abs-full"
@@ -28,27 +33,29 @@
 </template>
 
 <script>
+import { string2uint8array } from '#/common';
 import { objectEntries } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import storage from '#/common/storage';
 
 export default {
-  props: ['value', 'cmOptions', 'commands', 'install'],
+  props: ['value', 'cmOptions', 'commands', 'install', 'errors'],
   components: { VmCode },
   computed: {
     all() {
-      const { url: mainUrl } = this.install || {};
+      const { code, deps = this.deps, url: mainUrl } = this.install || {};
       const { require = [], resources = {} } = this.value.meta || {};
       return [
-        ...mainUrl ? [[this.i18n('editNavCode'), mainUrl]] : [],
-        ...require.map(url => ['@require', url]),
-        ...objectEntries(resources).map(([name, url]) => [`@resource ${name}`, url]),
+        ...mainUrl ? [[this.i18n('editNavCode'), mainUrl, code]] : [],
+        ...require.map(url => ['@require', url, deps[url]]),
+        ...objectEntries(resources).map(([name, url]) => [`@resource ${name}`, url, deps[url]]),
       ];
     },
   },
   data() {
     return {
       code: null,
+      deps: {},
       img: null,
       index: null,
       mode: null,
@@ -90,18 +97,14 @@ export default {
           }
           code = atob(code);
           if (/[\x80-\xFF]/.test(code)) {
-            const len = code.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i += 1) {
-              bytes[i] = code.charCodeAt(i);
-            }
-            code = new TextDecoder().decode(bytes);
+            code = new TextDecoder().decode(string2uint8array(code));
           }
         }
       }
       this.img = img;
       this.mode = contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null;
       this.code = code;
+      this.$set(this.deps, url, code);
     },
     value() {
       this.$nextTick(() => {
@@ -112,39 +115,74 @@ export default {
   async mounted() {
     this.index = 0;
   },
+  methods: {
+    formatLength(str) {
+      const len = str?.length;
+      return !len ? ''
+        : len < 1024 && `${len} B`
+        || len < 1024 * 1024 && `${len >> 10} k` // eslint-disable-line no-bitwise
+        || `${len >> 20} M`; // eslint-disable-line no-bitwise
+    },
+  },
 };
 </script>
 
 <style>
-$optPad: 1rem;
+$outerPadX: 1rem;
 $mainEntryBorder: 6px double;
-
 .edit-externals {
   border-top: $mainEntryBorder var(--fill-8);
-  > select {
+  > .select {
     min-height: 1.25rem;
     max-height: 15vh;
-    padding: 1rem 0;
     overflow-y: auto;
-    border: solid var(--fill-3);
-    border-width: 2px 0 2px 0;
-    &[data-size="1"] {
-      padding-bottom: 0;
+    border-bottom: 2px solid var(--fill-3);
+    padding-bottom: calc($outerPadX/2);
+    &[data-has-main] dl:first-child {
+      padding-top: .5em;
+      padding-bottom: .5em;
+      border-bottom: 2px solid var(--fill-5);
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      &:not(.active) {
+        background: var(--fill-0);
+      }
     }
-    option {
-      padding-right: $optPad;
-      &:checked {
-        font-weight: bold;
+    dl {
+      padding-right: $outerPadX;
+      align-items: center;
+      white-space: nowrap;
+      &.active {
+        background: rgba(255, 165, 0, .25);
+        color: var(--fill-15);
       }
-      &::before {
-        content: attr(data-type);
-        color: var(--fill-8);
-        margin-right: .5em;
-        padding: 0 .5em 0 $optPad;
-        font-family: monospace;
+      &.loading dd {
+        color: var(--fill-7);
       }
-      &[data-is-main] {
-        border-bottom: $mainEntryBorder var(--fill-7);
+      &.error dd {
+        color: red;
+      }
+      &:not(.error) {
+        cursor: pointer;
+        &:hover dd {
+          text-decoration: underline;
+          a {
+            text-decoration: none;
+          }
+        }
+      }
+    }
+    dt {
+      color: darkviolet;
+      margin-left: $outerPadX;
+      font-family: monospace;
+    }
+    a {
+      padding: 0 .5em;
+      cursor: alias;
+      &:hover {
+        background: var(--fill-3);
       }
     }
   }
@@ -154,6 +192,16 @@ $mainEntryBorder: 6px double;
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    .select {
+      &.error dd {
+        color: #ff4747;
+      }
+      dt {
+        color: #c34ec3;
+      }
     }
   }
 }

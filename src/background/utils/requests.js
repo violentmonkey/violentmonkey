@@ -1,5 +1,6 @@
 import {
   blob2base64, buffer2string, getUniqId, request, i18n, isEmpty, noop, sendTabCmd,
+  string2uint8array,
 } from '#/common';
 import { forEachEntry, objectPick } from '#/common/object';
 import ua from '#/common/ua';
@@ -387,12 +388,7 @@ function decodeBody([body, type]) {
     type = 'application/x-www-form-urlencoded';
   } else if (type) {
     // 5x times faster than fetch() which wastes time on inter-process communication
-    const bin = atob(body.slice(body.indexOf(',') + 1));
-    const len = bin.length;
-    const res = new Uint8Array(len);
-    for (let i = 0; i < len; i += 1) {
-      res[i] = bin.charCodeAt(i);
-    }
+    const res = string2uint8array(atob(body.slice(body.indexOf(',') + 1)));
     if (type === 'blob') {
       type = '';
     } else {
