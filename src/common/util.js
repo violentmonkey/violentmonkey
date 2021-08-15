@@ -1,9 +1,13 @@
+/* SAFETY WARNING! Exports used by `injected` must make ::safe() calls,
+   when accessed after the initial event loop task in `injected/web`
+   or after the first content-mode userscript runs in `injected/content` */
+
 import { browser } from '#/common/consts';
 
 // used in an unsafe context so we need to save the original functions
 const perfNow = performance.now.bind(performance);
 const { random, floor } = Math;
-export const { toString: numberToString } = Number.prototype;
+export const { toString: numberToString } = 0;
 
 export function i18n(name, args) {
   return browser.i18n.getMessage(name, args) || name;
@@ -173,7 +177,7 @@ export function formatTime(duration) {
 }
 
 // used in an unsafe context so we need to save the original functions
-export const { hasOwnProperty } = Object.prototype;
+export const { hasOwnProperty } = {};
 export function isEmpty(obj) {
   for (const key in obj) {
     if (obj::hasOwnProperty(key)) {
