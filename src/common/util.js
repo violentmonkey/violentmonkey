@@ -1,9 +1,13 @@
+/* SAFETY WARNING! Exports used by `injected` must make ::safe() calls,
+   when accessed after the initial event loop task in `injected/web`
+   or after the first content-mode userscript runs in `injected/content` */
+
 import { browser } from '#/common/consts';
 
 // used in an unsafe context so we need to save the original functions
 const perfNow = performance.now.bind(performance);
 const { random, floor } = Math;
-export const { toString: numberToString } = Number.prototype;
+export const { toString: numberToString } = 0;
 
 export function i18n(name, args) {
   return browser.i18n.getMessage(name, args) || name;
@@ -173,7 +177,7 @@ export function formatTime(duration) {
 }
 
 // used in an unsafe context so we need to save the original functions
-export const { hasOwnProperty } = Object.prototype;
+export const { hasOwnProperty } = {};
 export function isEmpty(obj) {
   for (const key in obj) {
     if (obj::hasOwnProperty(key)) {
@@ -225,6 +229,13 @@ export async function requestLocalFile(url, options = {}) {
   });
 }
 
+/**
+ * Excludes `text/html` to avoid LINK header that Chrome uses to prefetch js and css,
+ * because GreasyFork's 404 error response causes CSP violations in console of our page.
+ */
+const FORCED_ACCEPT = {
+  'greasyfork.org': 'application/javascript, text/plain, text/css',
+};
 /** @typedef {{
   url: string
   status: number
@@ -240,18 +251,21 @@ export async function requestLocalFile(url, options = {}) {
 export async function request(url, options = {}) {
   // fetch does not support local file
   if (url.startsWith('file://')) return requestLocalFile(url, options);
-  const { responseType } = options;
+  const { body, credentials, headers, method, responseType } = options;
+  const isBodyObj = body && body::({}).toString() === '[object Object]';
+  const hostname = url.split('/', 3)[2];
+  const accept = FORCED_ACCEPT[hostname];
   const init = {
-    method: options.method,
-    body: options.body,
-    headers: options.headers,
-    credentials: options.credentials,
+    credentials,
+    method,
+    body: isBodyObj ? JSON.stringify(body) : body,
+    headers: isBodyObj || accept
+      ? Object.assign({},
+        headers,
+        isBodyObj && { 'Content-Type': 'application/json' },
+        accept && { accept })
+      : headers,
   };
-  if (init.body && Object.prototype.toString.call(init.body) === '[object Object]') {
-    init.headers = Object.assign({}, init.headers);
-    init.headers['Content-Type'] = 'application/json';
-    init.body = JSON.stringify(init.body);
-  }
   const result = { url, status: -1 };
   try {
     const resp = await fetch(url, init);

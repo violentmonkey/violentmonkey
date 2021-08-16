@@ -1,4 +1,5 @@
 import { getActiveTab, noop, sendTabCmd, getFullUrl } from '#/common';
+import { deepCopy } from '#/common/object';
 import ua from '#/common/ua';
 import { extensionRoot } from './init';
 import { commands } from './message';
@@ -21,10 +22,18 @@ Object.assign(commands, {
       });
       pathId = `_new${id ? `/${id}` : ''}`;
     }
-    return commands.TabOpen({
-      url: `/options/index.html#scripts/${pathId}`,
-      maybeInWindow: true,
-    });
+    const url = `${extensionRoot}options/index.html#scripts/${pathId}`;
+    // Firefox until v56 doesn't support moz-extension:// pattern in browser.tabs.query()
+    for (const view of browser.extension.getViews()) {
+      if (view.location.href === url) {
+        // deep-copying to avoid dead objects
+        const tab = deepCopy(await view.browser.tabs.getCurrent());
+        browser.tabs.update(tab.id, { active: true });
+        browser.windows.update(tab.windowId, { focused: true });
+        return tab;
+      }
+    }
+    return commands.TabOpen({ url, maybeInWindow: true });
   },
   /** @return {Promise<{ id: number }>} */
   async TabOpen({
@@ -51,11 +60,16 @@ Object.assign(commands, {
     if (!url.startsWith('blob:')) {
       // URL needs to be expanded for `canOpenIncognito` below
       if (!isInternal) url = getFullUrl(url, srcUrl);
-      else if (!/^\w+:/.test(url)) url = browser.runtime.getURL(url);
+      else if (!/^[-\w]+:/.test(url)) url = browser.runtime.getURL(url);
     }
     const canOpenIncognito = !incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url);
     let newTab;
-    if (maybeInWindow && browser.windows && getOption('editorWindow')) {
+    if (maybeInWindow
+        && browser.windows
+        && getOption('editorWindow')
+        /* cookieStoreId in windows.create() is supported since FF64 https://bugzil.la/1393570
+         * and a workaround is too convoluted to add it for such an ancient version */
+        && (!storeId || ua.isFirefox >= 64)) {
       const wndOpts = {
         url,
         incognito: canOpenIncognito && incognito,
