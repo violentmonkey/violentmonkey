@@ -175,13 +175,6 @@ export default {
           await makePause(3000);
           retries -= 1;
         }
-        this.allDeps.forEach(list => {
-          list.forEach(u => {
-            if (this.deps[u] == null) {
-              this.$set(this.deps, u, false);
-            }
-          });
-        });
       })(),
     ]);
     if (this.installable) {
@@ -263,6 +256,7 @@ export default {
           finished += 1;
           updateStatus();
         } catch (e) {
+          this.deps[url] = false;
           return url;
         }
       };
