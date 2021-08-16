@@ -103,6 +103,7 @@ if (!global.browser?.runtime?.sendMessage) {
       onReplaced: true,
       create: wrapAsync,
       get: wrapAsync,
+      getCurrent: wrapAsync,
       query: wrapAsync,
       reload: wrapAsync,
       remove: wrapAsync,

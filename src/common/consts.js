@@ -1,3 +1,7 @@
+/* SAFETY WARNING! Exports used by `injected` must make ::safe() calls,
+   when accessed after the initial event loop task in `injected/web`
+   or after the first content-mode userscript runs in `injected/content` */
+
 export const INJECT_AUTO = 'auto';
 export const INJECT_PAGE = 'page';
 export const INJECT_CONTENT = 'content';

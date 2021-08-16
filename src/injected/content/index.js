@@ -1,6 +1,6 @@
 import { getUniqId, isEmpty, sendCmd } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
-import { objectKeys, objectPick } from '#/common/object';
+import { assign, objectKeys, objectPick } from '#/common/object';
 import { bindEvents } from '../utils';
 import {
   forEach, includes, append, createElementNS, document, setAttribute, NS_HTML,
@@ -51,7 +51,8 @@ const { split } = '';
 
 bridge.addBackgroundHandlers({
   Command(data) {
-    const id = +data::split(':', 1)[0];
+    const [cmd] = data;
+    const id = +cmd::split(':', 1)[0];
     const realm = bridge.invokableIds::includes(id) && INJECT_CONTENT;
     bridge.post('Command', data, realm);
   },
@@ -119,10 +120,7 @@ async function sendSetPopup(isDelayed) {
       await pendingSetPopup;
       pendingSetPopup = null;
     }
-    sendCmd('SetPopup', {
-      menus,
-      ...objectPick(bridge, ['ids', 'failedIds', 'injectInto']),
-    });
+    sendCmd('SetPopup', assign(menus, objectPick(bridge, ['ids', 'failedIds', 'injectInto'])));
   }
 }
 
