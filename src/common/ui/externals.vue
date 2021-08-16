@@ -141,21 +141,17 @@ $mainEntryBorder: 6px double;
     &[data-has-main] dl:first-child {
       padding-top: .5em;
       padding-bottom: .5em;
-      border-bottom: 2px solid var(--fill-5);
-      font-weight: bold;
+      border-bottom: 1px solid var(--fill-3);
       position: sticky;
       top: 0;
-      &:not(.active) {
-        background: var(--fill-0);
-      }
+      background: var(--fill-0);
     }
     dl {
       padding-right: $outerPadX;
       align-items: center;
       white-space: nowrap;
       &.active {
-        background: rgba(255, 165, 0, .25);
-        color: var(--fill-15);
+        font-weight: bold;
       }
       &.loading dd {
         color: var(--fill-7);
