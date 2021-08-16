@@ -229,6 +229,13 @@ export async function requestLocalFile(url, options = {}) {
   });
 }
 
+/**
+ * Excludes `text/html` to avoid LINK header that Chrome uses to prefetch js and css,
+ * because GreasyFork's 404 error response causes CSP violations in console of our page.
+ */
+const FORCED_ACCEPT = {
+  'greasyfork.org': 'application/javascript, text/plain, text/css',
+};
 /** @typedef {{
   url: string
   status: number
@@ -244,18 +251,21 @@ export async function requestLocalFile(url, options = {}) {
 export async function request(url, options = {}) {
   // fetch does not support local file
   if (url.startsWith('file://')) return requestLocalFile(url, options);
-  const { responseType } = options;
+  const { body, credentials, headers, method, responseType } = options;
+  const isBodyObj = body && body::({}).toString() === '[object Object]';
+  const hostname = url.split('/', 3)[2];
+  const accept = FORCED_ACCEPT[hostname];
   const init = {
-    method: options.method,
-    body: options.body,
-    headers: options.headers,
-    credentials: options.credentials,
+    credentials,
+    method,
+    body: isBodyObj ? JSON.stringify(body) : body,
+    headers: isBodyObj || accept
+      ? Object.assign({},
+        headers,
+        isBodyObj && { 'Content-Type': 'application/json' },
+        accept && { accept })
+      : headers,
   };
-  if (init.body && Object.prototype.toString.call(init.body) === '[object Object]') {
-    init.headers = Object.assign({}, init.headers);
-    init.headers['Content-Type'] = 'application/json';
-    init.body = JSON.stringify(init.body);
-  }
   const result = { url, status: -1 };
   try {
     const resp = await fetch(url, init);
