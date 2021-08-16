@@ -260,11 +260,10 @@ export async function request(url, options = {}) {
     method,
     body: isBodyObj ? JSON.stringify(body) : body,
     headers: isBodyObj || accept
-      ? {
-        ...headers,
-        ...isBodyObj && { 'Content-Type': 'application/json' },
-        ...accept && { accept },
-      }
+      ? Object.assign({},
+        headers,
+        isBodyObj && { 'Content-Type': 'application/json' },
+        accept && { accept })
       : headers,
   };
   const result = { url, status: -1 };
