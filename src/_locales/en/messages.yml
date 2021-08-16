@@ -183,9 +183,11 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: |-
+  message: >-
     Violentmonkey cannot run userscripts in this page
-    (common examples: browser UI, an extension, blocked via policies, a search engine site in Opera)
+
+    (common examples: browser UI, an extension, blocked via policies, a search
+    engine site in Opera)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alphabetical order
@@ -362,9 +364,6 @@ labelInjectionMode:
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Installing script
-labelReinstall:
-  description: Shown in the title of the confirm page while trying to install a script that's already installed.
-  message: Re-installing script
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Keep original
@@ -405,6 +404,11 @@ labelPopupSort:
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Privacy Policy
+labelReinstall:
+  description: >-
+    Shown in the title of the confirm page while trying to install a script
+    that's already installed.
+  message: Re-installing script
 labelRelated:
   description: Label of related links.
   message: 'Related links: '
@@ -690,10 +694,10 @@ sideMenuSettings:
   message: Settings
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: 'Normal badge color'
+  message: Normal badge color
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: 'Badge color when the site is non-injectable (blacklisted or unsupported)'
+  message: Badge color when the site is non-injectable (blacklisted or unsupported)
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Update

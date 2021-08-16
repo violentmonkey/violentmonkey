@@ -7,6 +7,9 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Installatie bevestigen
+buttonConfirmReinstallation:
+  description: Button to confirm re-installation when the script is already installed.
+  message: Herinstallatie bevestigen
 buttonDisable:
   description: Button to disable a script.
   message: Uitschakelen
@@ -186,9 +189,11 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: |-
+  message: >-
     Violentmonkey kan geen gebruikersscripts uitvoeren op deze pagina
-    (bijv. interne of extensiepagina's)
+
+    (bijv. interne of extensiepagina's, of vanwege een blokkadebeleid of
+    bepaalde Opera-zoekmachine)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabetische volgorde
@@ -275,6 +280,9 @@ labelAutoUpdate:
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Tonen op embleem: '
+labelBadgeColors:
+  description: Label for option group to set badge colors.
+  message: 'Embleemkleuren:'
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: niks
@@ -402,6 +410,11 @@ labelPopupSort:
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Privacybeleid
+labelReinstall:
+  description: >-
+    Shown in the title of the confirm page while trying to install a script
+    that's already installed.
+  message: Bezig met herinstalleren…
 labelRelated:
   description: Label of related links.
   message: 'Gerelateerde links: '
@@ -429,6 +442,9 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Instellingen
+labelShowOrder:
+  description: Label for option in dashboard -> script list
+  message: Uitvoervolgorde tonen
 labelSync:
   description: Label for sync options.
   message: Synchroniseren
@@ -602,6 +618,9 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Er is geen nieuwe versie beschikbaar.
+msgSameCode:
+  description: Shown inside the title when re-installing a script that's already installed.
+  message: (de code is precies hetzelfde)
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: De zwarte lijst is bijgewerkt.
@@ -681,6 +700,14 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Instellingen
+titleBadgeColor:
+  description: Tooltip for option to set badge color.
+  message: Normale embleemkleur
+titleBadgeColorBlocked:
+  description: Tooltip for option to set badge color of non-injectable tabs.
+  message: >-
+    De kleur die wordt gebruikt als de code niet kan worden toegevoegd aan de
+    site (zwarte lijst of niet-ondersteund)
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Bijwerken
