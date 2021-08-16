@@ -2,8 +2,16 @@
   <div class="page-confirm frame flex flex-col h-100" :class="{ reinstall }">
     <div class="frame-block">
       <div class="flex">
-        <div class="image">
+        <div class="image flex flex-col self-start mb-2c">
           <img src="/public/images/icon128.png">
+          <div class="mr-1c">
+            <tooltip v-for="([url, icon, title]) in icons" :key="icon"
+                     :content="title" placement="bottom" align="left">
+              <a target="_blank" :href="url">
+                <icon :name="icon"/>
+              </a>
+            </tooltip>
+          </div>
         </div>
         <div class="info">
           <h1>
@@ -17,23 +25,17 @@
              :title="info.url" :href="info.url" @click.prevent />
           <p class="descr" v-text="descr"/>
           <div class="lists flex flex-wrap" :data-collapsed="!listsShown">
-            <tooltip :content="i18n('msgShowHide')" placement="top" v-if="lists">
-              <div class="toggle" @click="listsShown = !listsShown">
+            <div class="toggle" @click="listsShown = !listsShown">
+              <tooltip :content="i18n('msgShowHide')" placement="bottom" align="left" v-if="lists">
                 <icon name="info"/>
-              </div>
-            </tooltip>
+              </tooltip>
+            </div>
             <dl v-for="(list, name) in lists" :key="name"
                 :data-type="name" :hidden="!list.length" tabindex="0">
               <dt v-text="`@${name}`"/>
-              <dd v-if="Array.isArray(list)" class="flex flex-col">
-                <a v-for="(url, i) in list" :key="name + i"
-                   :href="url" v-text="decodeURIComponent(url)"
-                   rel="noopener noreferrer" target="_blank" :data-ok="url in urlsOK"/>
-              </dd>
-              <dd v-else v-text="list" class="ellipsis"/>
+              <dd v-text="list" class="ellipsis"/>
             </dl>
           </div>
-          <div v-text="message" :title="error"/>
         </div>
       </div>
       <div class="flex">
@@ -48,20 +50,30 @@
               : i18n('buttonConfirmInstallation')"
             @click="installScript" :disabled="!installable"/>
           <button v-text="i18n('buttonClose')" @click="close"/>
-          <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
-                         @change="checkClose" />
-          <setting-check name="trackLocalFile" @change="trackLocalFile"
-                         :disabled="closeAfterInstall || !isLocal">
-            <tooltip :content="trackTooltip" :disabled="!trackTooltip">
-              <span v-text="i18n('installOptionTrack')"/>
-            </tooltip>
-          </setting-check>
+          <div class="flex flex-col my-1">
+            <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
+                           @change="checkClose" />
+            <setting-check name="trackLocalFile" @change="trackLocalFile"
+                           :disabled="closeAfterInstall || !isLocal">
+              <tooltip :content="trackTooltip" :disabled="!trackTooltip">
+                <span v-text="i18n('installOptionTrack')"/>
+              </tooltip>
+            </setting-check>
+          </div>
+          <div v-text="message" v-if="message" :title="error" class="status"/>
         </div>
       </div>
       <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
     </div>
     <div class="frame-block flex-auto pos-rel">
-      <vm-code class="abs-full" readonly :value="code" :commands="commands" />
+      <vm-externals
+        v-if="script"
+        v-model="script"
+        class="abs-full"
+        :cm-options="cmOptions"
+        :commands="commands"
+        :install="{ code, deps, url: info.url }"
+      />
     </div>
   </div>
 </template>
@@ -76,25 +88,30 @@ import {
 import options from '#/common/options';
 import initCache from '#/common/cache';
 import storage from '#/common/storage';
-import VmCode from '#/common/ui/code';
+import VmExternals from '#/common/ui/externals';
 import SettingCheck from '#/common/ui/setting-check';
 import { loadScriptIcon } from '#/common/load-script-icon';
 import { deepEqual, objectPick } from '#/common/object';
 import { route } from '#/common/router';
 import ua from '#/common/ua';
 
-const cache = initCache({});
+const KEEP_INFO_DELAY = 5000;
+const RETRY_DELAY = 3000;
+const RETRY_COUNT = 2;
+const MAX_TITLE_NAME_LEN = 100;
+const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 /** @type {chrome.runtime.Port} */
 let filePort;
 /** @type {function()} */
 let filePortResolve;
 /** @type {boolean} */
 let filePortNeeded;
+let basicTitle;
 
 export default {
   components: {
     Icon,
-    VmCode,
+    VmExternals,
     SettingCheck,
     Tooltip,
   },
@@ -104,12 +121,16 @@ export default {
       installed: false,
       closeAfterInstall: options.get('closeAfterInstall'),
       message: '',
+      cmOptions: {
+        lineWrapping: true,
+      },
       code: '',
       commands: {
         close: this.close,
       },
       info: {},
       decodedUrl: '...',
+      deps: {}, // combines `this.require` and `this.resources` = all loaded deps
       descr: '',
       error: null,
       heading: this.i18n('msgLoadingData'),
@@ -119,7 +140,7 @@ export default {
       reinstall: false,
       safeIcon: null,
       sameCode: false,
-      urlsOK: {},
+      script: null,
     };
   },
   computed: {
@@ -128,6 +149,13 @@ export default {
     },
     isLocal() {
       return !isRemote(this.info.url);
+    },
+    icons() {
+      const { homepageURL, supportURL } = this.script?.meta || {};
+      return [
+        homepageURL && [homepageURL, 'home', this.i18n('labelHomepage')],
+        supportURL && [supportURL, 'question', this.i18n('buttonSupport')],
+      ].filter(Boolean);
     },
   },
   async mounted() {
@@ -141,15 +169,15 @@ export default {
     const { url } = this.info;
     this.decodedUrl = decodeURIComponent(url);
     filePortNeeded = ua.isFirefox >= 68 && url.startsWith('file:');
-    this.guard = setInterval(sendCmdDirectly, 5000, 'CacheHit', { key });
+    this.guard = setInterval(sendCmdDirectly, KEEP_INFO_DELAY, 'CacheHit', { key });
     await this.loadData();
     await this.parseMeta();
     await Promise.all([
       this.checkSameCode(),
       (async () => {
-        let retries = 2;
-        while (retries && !await this.loadDeps()) {
-          await makePause(3000);
+        let retries = RETRY_COUNT;
+        while (!await this.loadDeps() && retries) {
+          await makePause(RETRY_DELAY);
           retries -= 1;
         }
       })(),
@@ -175,11 +203,14 @@ export default {
     },
     async parseMeta() {
       /** @type {VMScriptMeta} */
-      const script = await sendCmdDirectly('ParseMeta', this.code);
-      const urls = Object.values(script.resources);
-      this.name = [getLocaleString(script, 'name'), script.version]::trueJoin(', ');
-      this.descr = getLocaleString(script, 'description');
-      this.lists = objectPick(script, [
+      const meta = await sendCmdDirectly('ParseMeta', this.code);
+      const name = getLocaleString(meta, 'name');
+      document.title = `${name.slice(0, MAX_TITLE_NAME_LEN)}${name.length > MAX_TITLE_NAME_LEN ? '...' : ''} - ${
+        basicTitle || (basicTitle = document.title)
+      }`;
+      this.name = [name, meta.version]::trueJoin(', ');
+      this.descr = getLocaleString(meta, 'description');
+      this.lists = objectPick(meta, [
         'antifeature',
         'grant',
         'match',
@@ -196,13 +227,17 @@ export default {
         .join('\n')
         || ''
       ));
-      this.lists.require = [...new Set(script.require)];
-      this.lists.resource = [...new Set(urls)];
-      this.meta = script;
+      this.script = { meta, custom: {}, props: {} };
+      this.allDeps = [
+        [...new Set(meta.require)],
+        [...new Set(Object.values(meta.resources))],
+      ];
     },
     async loadDeps() {
-      if (!this.safeIcon) loadScriptIcon(this);
-      const { require, resource } = this.lists;
+      const { script, allDeps: [require, resource] } = this;
+      if (!this.safeIcon) {
+        loadScriptIcon(script).then(url => { this.safeIcon = url; });
+      }
       if (this.require
           && deepEqual(require.slice().sort(), Object.keys(this.require).sort())
           && deepEqual(resource.slice().sort(), Object.keys(this.resources).sort())) {
@@ -224,11 +259,13 @@ export default {
       const download = async (url, target, isBlob) => {
         const fullUrl = getFullUrl(url, this.info.url);
         try {
-          target[fullUrl] = await this.getFile(fullUrl, { isBlob, useCache: true });
-          this.urlsOK[url] = true;
+          const file = await this.getFile(fullUrl, { isBlob, useCache: true });
+          target[fullUrl] = file;
+          this.deps[url] = file;
           finished += 1;
           updateStatus();
         } catch (e) {
+          this.deps[url] = false;
           return url;
         }
       };
@@ -320,7 +357,7 @@ export default {
       if (value) options.set('trackLocalFile', false);
     },
     async checkSameCode() {
-      const { name, namespace } = this.meta;
+      const { name, namespace } = this.script.meta || {};
       const old = await sendCmdDirectly('GetScript', { meta: { name, namespace } });
       this.reinstall = !!old;
       this.sameCode = old && this.code === await sendCmdDirectly('GetScriptCode', old.props.id);
@@ -356,6 +393,9 @@ $infoIconSize: 18px;
   p {
     margin-top: 1rem;
   }
+  .self-start {
+    align-self: flex-start;
+  }
   .image {
     flex: 0 0 $imgSize;
     align-items: center;
@@ -365,6 +405,7 @@ $infoIconSize: 18px;
     box-sizing: content-box;
     img {
       max-width: 100%;
+      max-height: 100%;
     }
   }
   .info {
@@ -377,11 +418,11 @@ $infoIconSize: 18px;
       position: absolute;
       margin-left: calc(-1 * $imgSize / 2 - $infoIconSize / 2 - $imgGapR);
       cursor: pointer;
-      .icon {
-        width: $infoIconSize;
-        height: $infoIconSize;
-      }
     }
+  }
+  .icon {
+    width: $infoIconSize;
+    height: $infoIconSize;
   }
   .lists {
     margin-top: 1rem;
@@ -392,6 +433,7 @@ $infoIconSize: 18px;
         background: rgba(255, 0, 0, .05);
         margin-top: -3px;
         padding: 2px 6px;
+        max-width: 25em;
       }
     }
     dt {
@@ -403,9 +445,6 @@ $infoIconSize: 18px;
       max-height: 10vh;
       min-height: 1.5rem;
       overflow-y: auto;
-      a:not([data-ok]) {
-        color: var(--fill-8);
-      }
     }
   }
   [data-collapsed] {
@@ -430,9 +469,14 @@ $infoIconSize: 18px;
   }
   .actions {
     align-items: center;
-    margin: .5rem 0;
-    > #confirm:not(:disabled) {
-      font-weight: bold;
+    label {
+      align-items: center;
+    }
+    .status {
+      border-left: 5px solid darkorange;
+      padding: .5em;
+      color: #d33a00;
+      animation: fade-in .5s 1 both;
     }
   }
   .incognito {
@@ -440,6 +484,7 @@ $infoIconSize: 18px;
     color: red;
   }
   #confirm {
+    font-weight: bold;
     background: #d4e2d4;
     border-color: #75a775;
     color: darkgreen;
@@ -483,6 +528,22 @@ $infoIconSize: 18px;
   }
   .vl-dropdown-menu {
     width: 13rem;
+  }
+}
+.vl-tooltip-bottom {
+  > i {
+    margin-left: 10px;
+  }
+  &.vl-tooltip-align-left {
+    margin-left: -13px;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 </style>

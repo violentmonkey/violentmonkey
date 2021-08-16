@@ -58,7 +58,7 @@ export default {
       const opts = {};
       Object.entries({
         ...(await import('codemirror')).defaults,
-        ...(await import('#/common/ui/code')).cmOptions,
+        ...(await import('#/common/ui/code')).default.data().cmDefaults,
         ...options.get('editor'),
       })
       // sort by keys alphabetically to make it more readable

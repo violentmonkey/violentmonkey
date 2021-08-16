@@ -1,5 +1,6 @@
 import {
   blob2base64, buffer2string, getUniqId, request, i18n, isEmpty, noop, sendTabCmd,
+  string2uint8array,
 } from '#/common';
 import { forEachEntry, objectPick } from '#/common/object';
 import ua from '#/common/ua';
@@ -387,12 +388,7 @@ function decodeBody([body, type]) {
     type = 'application/x-www-form-urlencoded';
   } else if (type) {
     // 5x times faster than fetch() which wastes time on inter-process communication
-    const bin = atob(body.slice(body.indexOf(',') + 1));
-    const len = bin.length;
-    const res = new Uint8Array(len);
-    for (let i = 0; i < len; i += 1) {
-      res[i] = bin.charCodeAt(i);
-    }
+    const res = string2uint8array(atob(body.slice(body.indexOf(',') + 1)));
     if (type === 'blob') {
       type = '';
     } else {
@@ -455,17 +451,13 @@ async function confirmInstall({ code, from, url }, { tab = {} }) {
   if (!isUserScript(code)) throw i18n('msgInvalidScript');
   cache.put(url, code, 3000);
   const confirmKey = getUniqId();
-  const { id: tabId, incognito } = tab;
+  const { active, id: tabId, incognito } = tab;
   cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId });
-  const { windowId } = await browser.tabs.create({
+  const { windowId } = await commands.TabOpen({
     url: `/confirm/index.html#${confirmKey}`,
-    index: tab.index + 1 || undefined,
-    active: !!tab.active,
-    ...tabId >= 0 && ua.openerTabIdSupported && !incognito && {
-      openerTabId: tabId,
-    },
-  });
-  if (windowId !== tab.windowId) {
+    active: !!active,
+  }, { tab });
+  if (active && windowId !== tab.windowId) {
     await browser.windows.update(windowId, { focused: true });
   }
 }
