@@ -229,8 +229,6 @@ export default {
       activeMenu: 'scripts',
       activeExtras: null,
       message: null,
-      /** @type HTMLElement */
-      mousedown: null,
       focusedId: null,
     };
   },
