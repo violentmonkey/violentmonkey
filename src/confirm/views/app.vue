@@ -98,6 +98,7 @@ import ua from '#/common/ua';
 const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;
 const RETRY_COUNT = 2;
+const MAX_TITLE_NAME_LEN = 100;
 const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 /** @type {chrome.runtime.Port} */
 let filePort;
@@ -105,6 +106,7 @@ let filePort;
 let filePortResolve;
 /** @type {boolean} */
 let filePortNeeded;
+let basicTitle;
 
 export default {
   components: {
@@ -202,7 +204,11 @@ export default {
     async parseMeta() {
       /** @type {VMScriptMeta} */
       const meta = await sendCmdDirectly('ParseMeta', this.code);
-      this.name = [getLocaleString(meta, 'name'), meta.version]::trueJoin(', ');
+      const name = getLocaleString(meta, 'name');
+      document.title = `${name.slice(0, MAX_TITLE_NAME_LEN)}${name.length > MAX_TITLE_NAME_LEN ? '...' : ''} - ${
+        basicTitle || (basicTitle = document.title)
+      }`;
+      this.name = [name, meta.version]::trueJoin(', ');
       this.descr = getLocaleString(meta, 'description');
       this.lists = objectPick(meta, [
         'antifeature',
