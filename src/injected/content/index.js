@@ -1,6 +1,6 @@
 import { getUniqId, isEmpty, sendCmd } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
-import { objectKeys, objectPick } from '#/common/object';
+import { assign, objectKeys, objectPick } from '#/common/object';
 import { bindEvents } from '../utils';
 import {
   forEach, includes, append, createElementNS, document, setAttribute, NS_HTML,
@@ -119,10 +119,7 @@ async function sendSetPopup(isDelayed) {
       await pendingSetPopup;
       pendingSetPopup = null;
     }
-    sendCmd('SetPopup', {
-      menus,
-      ...objectPick(bridge, ['ids', 'failedIds', 'injectInto']),
-    });
+    sendCmd('SetPopup', assign(menus, objectPick(bridge, ['ids', 'failedIds', 'injectInto'])));
   }
 }
 
