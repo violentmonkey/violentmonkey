@@ -229,20 +229,9 @@ export async function requestLocalFile(url, options = {}) {
  * Excludes `text/html` to avoid LINK header that Chrome uses to prefetch js and css,
  * because GreasyFork's 404 error response causes CSP violations in console of our page.
  */
-const FORCED_ACCEPT = [
-  'application/*',
-  'text/javascript',
-  'text/ecmascript',
-  'text/plain',
-  'text/css',
-].join(',');
-/**
- * WARNING! Rework this if a newly added host offers content not covered by FORCED_ACCEPT,
- * e.g. if github starts to add LINK, userscripts may use it to load `image/*` and so on.
- */
-const FORCED_ACCEPT_HOSTS = [
-  'greasyfork.org',
-];
+const FORCED_ACCEPT = {
+  'greasyfork.org': 'application/javascript, text/plain, text/css',
+};
 /** @typedef {{
   url: string
   status: number
@@ -260,16 +249,17 @@ export async function request(url, options = {}) {
   if (url.startsWith('file://')) return requestLocalFile(url, options);
   const { body, credentials, headers, method, responseType } = options;
   const isBodyObj = body && body::({}).toString() === '[object Object]';
-  const isForcedAccept = FORCED_ACCEPT_HOSTS.includes(url.split('/', 3)[2]);
+  const hostname = url.split('/', 3)[2];
+  const accept = FORCED_ACCEPT[hostname];
   const init = {
     credentials,
     method,
     body: isBodyObj ? JSON.stringify(body) : body,
-    headers: isBodyObj || isForcedAccept
+    headers: isBodyObj || accept
       ? {
         ...headers,
         ...isBodyObj && { 'Content-Type': 'application/json' },
-        ...isForcedAccept && { Accept: FORCED_ACCEPT },
+        ...accept && { accept },
       }
       : headers,
   };
