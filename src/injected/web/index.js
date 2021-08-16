@@ -12,6 +12,7 @@ import './tabs';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 
+const { KeyboardEvent, MouseEvent } = global;
 const { get: getCurrentScript } = describeProperty(Document.prototype, 'currentScript');
 
 const sendSetTimeout = () => bridge.send('SetTimeout', 0);
@@ -46,8 +47,9 @@ export default function initialize(
 }
 
 bridge.addHandlers({
-  Command(data) {
-    store.commands[data]?.();
+  Command([cmd, evt]) {
+    const constructor = evt.key ? KeyboardEvent : MouseEvent;
+    store.commands[cmd]?.(new constructor(evt.type, evt));
   },
   Callback({ callbackId, payload }) {
     bridge.callbacks[callbackId]?.(payload);
