@@ -95,7 +95,10 @@ import { deepEqual, objectPick } from '#/common/object';
 import { route } from '#/common/router';
 import ua from '#/common/ua';
 
-const cache = initCache({});
+const KEEP_INFO_DELAY = 5000;
+const RETRY_DELAY = 3000;
+const RETRY_COUNT = 2;
+const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 /** @type {chrome.runtime.Port} */
 let filePort;
 /** @type {function()} */
@@ -164,15 +167,15 @@ export default {
     const { url } = this.info;
     this.decodedUrl = decodeURIComponent(url);
     filePortNeeded = ua.isFirefox >= 68 && url.startsWith('file:');
-    this.guard = setInterval(sendCmdDirectly, 5000, 'CacheHit', { key });
+    this.guard = setInterval(sendCmdDirectly, KEEP_INFO_DELAY, 'CacheHit', { key });
     await this.loadData();
     await this.parseMeta();
     await Promise.all([
       this.checkSameCode(),
       (async () => {
-        let retries = 2;
+        let retries = RETRY_COUNT;
         while (!await this.loadDeps() && retries) {
-          await makePause(3000);
+          await makePause(RETRY_DELAY);
           retries -= 1;
         }
       })(),
