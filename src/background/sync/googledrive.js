@@ -6,6 +6,7 @@ import { objectGet } from '#/common/object';
 import { dumpQuery, notify } from '../utils';
 import {
   getURI, getItemFilename, BaseService, register, isScriptFile,
+  openAuthPage,
 } from './base';
 
 const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0IjoiTjBEbTZJOEV3bkJaeE1xMUpuMHN3UER0In0='));
@@ -118,7 +119,7 @@ const GoogleDrive = BaseService.extend({
     };
     if (!this.config.get('refresh_token')) params.prompt = 'consent';
     const url = `https://accounts.google.com/o/oauth2/v2/auth?${dumpQuery(params)}`;
-    browser.tabs.create({ url });
+    openAuthPage(url, config.redirect_uri);
   },
   checkAuth(url) {
     const redirectUri = `${config.redirect_uri}?code=`;

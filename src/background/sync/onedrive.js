@@ -4,6 +4,7 @@ import { objectGet } from '#/common/object';
 import { dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
+  openAuthPage,
 } from './base';
 
 const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ=='));
@@ -106,7 +107,7 @@ const OneDrive = BaseService.extend({
       redirect_uri: config.redirect_uri,
     };
     const url = `https://login.live.com/oauth20_authorize.srf?${dumpQuery(params)}`;
-    browser.tabs.create({ url });
+    openAuthPage(url, config.redirect_uri);
   },
   checkAuth(url) {
     const redirectUri = `${config.redirect_uri}?code=`;

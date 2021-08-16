@@ -548,23 +548,17 @@ function syncOne(service) {
   if (service.authState.is(['idle', 'error'])) return service.checkSync();
   if (service.authState.is('authorized')) return service.startSync();
 }
+
 export function sync() {
   const service = getService();
   return service && Promise.resolve(syncOne(service)).then(autoSync);
-}
-
-export function checkAuthUrl(url) {
-  return serviceNames.some((name) => {
-    const service = services[name];
-    const authorized = service.checkAuth && service.checkAuth(url);
-    return authorized;
-  });
 }
 
 export function authorize() {
   const service = getService();
   if (service) service.authorize();
 }
+
 export function revoke() {
   const service = getService();
   if (service) service.revoke();
@@ -576,6 +570,32 @@ export function setConfig(config) {
     service.setUserConfig(config);
     return service.checkSync();
   }
+}
+
+export async function openAuthPage(url, redirectUri) {
+  unregisterWebRequest(); // otherwise our new tabId will be ignored
+  browser.webRequest.onBeforeRequest.addListener(onBeforeRequest, {
+    urls: [`${redirectUri}*`],
+    types: ['main_frame'],
+    tabId: (await browser.tabs.create({ url })).id,
+  }, ['blocking']);
+}
+
+/**
+ * @param {chrome.webRequest.WebResponseDetails} info
+ * @returns {chrome.webRequest.BlockingResponse}
+ */
+function onBeforeRequest(info) {
+  if (getService().checkAuth?.(info.url)) {
+    browser.tabs.remove(info.tabId);
+    // If we unregister without setTimeout, API will ignore { cancel: true }
+    setTimeout(unregisterWebRequest, 0);
+    return { cancel: true };
+  }
+}
+
+function unregisterWebRequest() {
+  browser.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
 }
 
 hookOptions((data) => {
