@@ -111,6 +111,7 @@ Object.assign(commands, {
   },
   TabFocus(_, src) {
     browser.tabs.update(src.tab.id, { active: true }).catch(noop);
+    browser.windows.update(src.tab.windowId, { focused: true }).catch(noop);
   },
 });
 
