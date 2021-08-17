@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import '#/common/browser';
 import { i18n, sendCmdDirectly } from '#/common';
 import { INJECT_PAGE } from '#/common/consts';
 import handlers from '#/common/handlers';

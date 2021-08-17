@@ -13,6 +13,7 @@ const VM_VER = require('../package.json').version.replace(/-[^.]*/, '');
 const definitions = new webpack.DefinePlugin({
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
   'process.env.DEBUG': JSON.stringify(process.env.DEBUG || false),
+  'process.env.DEV': JSON.stringify(!isProd),
   'process.env.VM_VER': JSON.stringify(VM_VER),
 });
 const minimizerOptions = {
@@ -44,21 +45,18 @@ const minimizer = isProd && [
   }),
 ];
 
-const modify = (extra, init) => modifyWebpackConfig(
+const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
     config.plugins.push(definitions);
+    if (!entry) init = page;
     if (init) init(config);
     return config;
   }, {
     projectConfig: {
       ...mergedConfig,
-      ...extra,
+      ...entry && { pages: { [page]: { entry }} },
       optimization: {
         ...mergedConfig.optimization,
-        ...(extra || {}).pages && {
-          runtimeChunk: false,
-          splitChunks: false,
-        },
         minimizer,
       },
     },
@@ -68,31 +66,17 @@ const modify = (extra, init) => modifyWebpackConfig(
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
 const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
-const skipReinjectionConfig = (config, test) => config.plugins.push(
-  new WrapperWebpackPlugin({
-    header: skipReinjectionHeader,
-    ...test && { test },
-  }));
-
 module.exports = Promise.all([
-  modify(null, config => {
+  modify((config) => {
     config.output.publicPath = '/';
-    skipReinjectionConfig(config, /^browser\.js$/);
   }),
-  modify({
-    pages: {
-      injected: {
-        entry: './src/injected',
-      },
-    },
-  }, skipReinjectionConfig),
-  modify({
-    pages: {
-      'injected-web': {
-        entry: './src/injected/web',
-      },
-    },
-  }, (config) => {
+  modify('injected', './src/injected', (config) => {
+    config.plugins.push(
+      new WrapperWebpackPlugin({
+        header: skipReinjectionHeader,
+      }));
+  }),
+  modify('injected-web', './src/injected/web', (config) => {
     config.output.libraryTarget = 'commonjs2';
     config.plugins.push(
       new WrapperWebpackPlugin({

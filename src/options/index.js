@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import '#/common/browser';
 import { sendCmdDirectly, i18n, getLocaleString } from '#/common';
 import handlers from '#/common/handlers';
 import { loadScriptIcon } from '#/common/load-script-icon';

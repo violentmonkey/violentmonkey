@@ -1,5 +1,3 @@
-import { browser } from './consts';
-
 // UA can be overridden by about:config in FF or devtools in Chrome
 // so we'll test for window.chrome.app which is only defined in Chrome
 // and for browser.runtime.getBrowserInfo in Firefox 51+

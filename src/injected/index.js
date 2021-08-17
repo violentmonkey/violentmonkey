@@ -1,3 +1,4 @@
+import '#/common/browser';
 import { sendCmd } from '#/common';
 import './content';
 

@@ -1,125 +1,128 @@
-// Since this also runs in a content script we'll guard against implicit global variables
-// for DOM elements with 'id' attribute which is a standard feature, more info:
-// https://github.com/mozilla/webextension-polyfill/pull/153
-// https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
+/*
+ Since this also runs in a content script we'll guard against implicit global variables
+ for DOM elements with 'id' attribute which is a standard feature, more info:
+ https://github.com/mozilla/webextension-polyfill/pull/153
+ https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
+*/
 if (!global.browser?.runtime?.sendMessage) {
-  const { chrome, Promise } = global;
-  const wrapAPIs = (source, meta = {}) => {
-    return Object.entries(source)
-    .reduce((target, [key, value]) => {
-      const metaVal = meta[key];
-      if (metaVal) {
-        if (typeof metaVal === 'function') {
-          value = source::metaVal(value);
-        } else if (typeof metaVal === 'object' && typeof value === 'object') {
-          value = wrapAPIs(value, metaVal);
+  // region Chrome
+  const { chrome, Error, Promise, Proxy } = global;
+  const { bind } = Proxy;
+  /** onXXX like onMessage */
+  const isApiEvent = key => key[0] === 'o' && key[1] === 'n';
+  /** API types or enums or literal constants */
+  const isFunction = val => typeof val === 'function';
+  const isObject = val => typeof val === 'object';
+  const wrapAsync = (thisArg, func, preprocessorFunc) => (
+    (...args) => {
+      let resolve;
+      let reject;
+      /* Using resolve/reject to call API in the scope of this function, not inside Promise,
+         because an API validation exception is thrown synchronously both in Chrome and FF
+         so the caller can use try/catch to detect it like we've been doing in icon.js */
+      const promise = new Promise((_resolve, _reject) => {
+        resolve = _resolve;
+        reject = _reject;
+      });
+      // Make the error messages actually useful by capturing a real stack
+      const stackInfo = new Error();
+      thisArg::func(...args, (response) => {
+        let err = chrome.runtime.lastError;
+        if (err) {
+          err = err.message;
+        } else if (preprocessorFunc) {
+          err = preprocessorFunc(response, resolve);
+        } else {
+          resolve(response);
         }
-        target[key] = value;
-      }
-      return target;
-    }, {});
-  };
-  const wrapAsync = function wrapAsync(func) {
-    return (...args) => {
-      const promise = new Promise((resolve, reject) => {
-        this::func(...args, (res) => {
-          const err = chrome.runtime.lastError;
-          if (err) reject(err);
-          else resolve(res);
-        });
+        // Prefer `reject` over `throw` which stops debugger in 'pause on exceptions' mode
+        if (err) reject(new Error(`${err}\n${stackInfo.stack}`));
       });
       if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.message || err));
       return promise;
-    };
-  };
-  const wrapMessageListener = listener => (message, sender, sendResponse) => {
-    if (process.env.DEBUG) console.info('receive', message);
-    const result = listener(message, sender);
-    if (typeof result?.then === 'function') {
-      result.then((data) => {
-        if (process.env.DEBUG) console.info('send', data);
-        sendResponse({ data });
-      }, (error) => {
-        if (process.env.DEBUG) console.warn(error);
-        sendResponse({ error: error instanceof Error ? error.stack : error });
-      })
-      .catch(() => {}); // Ignore sendResponse error
-      return true;
     }
-    if (typeof result !== 'undefined') {
-      // In some browsers (e.g Chrome 56, Vivaldi), the listener in
-      // popup pages are not properly cleared after closed.
-      // They may send `undefined` before the real response is sent.
+  );
+  /** @returns {?} error */
+  const unwrapResponse = (response, resolve) => (
+    !response && 'null response'
+    || response.error
+    || resolve(response.data)
+  );
+  const sendResponseAsync = async (result, sendResponse) => {
+    try {
+      result = await result;
+      if (process.env.DEBUG) console.info('send', result);
       sendResponse({ data: result });
+    } catch (err) {
+      if (process.env.DEBUG) console.warn(err);
+      sendResponse({ error: err instanceof Error ? err.stack : err });
     }
   };
-  const meta = {
-    browserAction: true,
-    commands: true,
-    cookies: {
-      getAll: wrapAsync,
-      getAllCookieStores: wrapAsync,
-      set: wrapAsync,
-    },
-    extension: true,
-    i18n: true,
-    notifications: {
-      onClicked: true,
-      onClosed: true,
-      clear: wrapAsync,
-      create: wrapAsync,
-    },
-    runtime: {
-      connect: true,
-      getManifest: true,
-      getPlatformInfo: wrapAsync,
-      getURL: true,
-      openOptionsPage: wrapAsync,
-      onConnect: true,
-      onMessage: onMessage => ({
-        addListener: listener => onMessage.addListener(wrapMessageListener(listener)),
-      }),
-      sendMessage(sendMessage) {
-        const promisifiedSendMessage = wrapAsync(sendMessage);
-        const unwrapResponse = ({ data: response, error } = {}) => {
-          if (error) throw error;
-          return response;
-        };
-        return data => promisifiedSendMessage(data).then(unwrapResponse);
-      },
-    },
-    storage: {
-      local: {
-        get: wrapAsync,
-        set: wrapAsync,
-        remove: wrapAsync,
-      },
-      onChanged: true,
-    },
-    tabs: {
-      onCreated: true,
-      onUpdated: true,
-      onRemoved: true,
-      onReplaced: true,
-      create: wrapAsync,
-      get: wrapAsync,
-      getCurrent: wrapAsync,
-      query: wrapAsync,
-      reload: wrapAsync,
-      remove: wrapAsync,
-      sendMessage: wrapAsync,
-      update: wrapAsync,
-      executeScript: wrapAsync,
-    },
-    webRequest: true,
-    windows: {
-      create: wrapAsync,
-      getCurrent: wrapAsync,
-      update: wrapAsync,
-    },
+  const DIRECT = 1;
+  const proxifyValue = (target, key, groupName, src, metaVal) => {
+    const srcVal = src[key];
+    if (srcVal === undefined) return;
+    let res;
+    if (isFunction(metaVal)) {
+      res = metaVal;
+    } else if (metaVal === DIRECT) {
+      res = isFunction(srcVal)
+        ? srcVal::bind(src)
+        : srcVal;
+    } else if (isFunction(srcVal)) {
+      res = isApiEvent(groupName)
+        ? srcVal::bind(src)
+        : wrapAsync(src, srcVal);
+    } else if (isObject(srcVal)) {
+      res = proxifyGroup(key, srcVal, metaVal); // eslint-disable-line no-use-before-define
+    } else {
+      res = srcVal;
+    }
+    target[key] = res;
+    return res;
   };
-  global.browser = wrapAPIs(chrome, meta);
+  const proxifyGroup = (groupName, src, meta) => new Proxy({}, {
+    get: (target, key) => (
+      target[key]
+      ?? proxifyValue(target, key, groupName, src, meta?.[key])
+    ),
+  });
+  const { runtime, tabs } = chrome;
+  global.browser = proxifyGroup('', chrome, {
+    extension: DIRECT, // we don't use its async methods
+    i18n: DIRECT, // we don't use its async methods
+    runtime: {
+      connect: DIRECT,
+      getManifest: DIRECT,
+      getURL: DIRECT,
+      onMessage: {
+        addListener(listener) {
+          runtime.onMessage.addListener((message, sender, sendResponse) => {
+            if (process.env.DEBUG) console.info('receive', message);
+            const result = listener(message, sender);
+            if (result && isFunction(result.then)) {
+              sendResponseAsync(result, sendResponse);
+              return true;
+            }
+            if (result !== undefined) {
+              // In some browsers (e.g Chrome 56, Vivaldi), the listener in
+              // popup pages are not properly cleared after closed.
+              // They may send `undefined` before the real response is sent.
+              sendResponse({ data: result });
+            }
+          });
+        },
+      },
+      sendMessage: wrapAsync(runtime, runtime.sendMessage, unwrapResponse),
+    },
+    tabs: tabs && {
+      connect: DIRECT,
+      sendMessage: wrapAsync(tabs, tabs.sendMessage, unwrapResponse),
+    },
+  });
+  // endregion
 } else if (process.env.DEBUG && !global.chrome.app) {
+  // region Firefox
   let counter = 0;
   const { runtime } = global.browser;
   const { sendMessage, onMessage } = runtime;
@@ -148,4 +151,5 @@ if (!global.browser?.runtime?.sendMessage) {
     .then(data => log('on', [data], id, true), console.warn);
     return result;
   });
+  // endregion
 }

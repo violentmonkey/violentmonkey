@@ -6,37 +6,21 @@ const { isProd } = require('@gera2ld/plaid/util');
  * - value.html: options object passed to HtmlWebpackPlugin.
  * - value.html.inlineSource: if true, JS and CSS files will be inlined in HTML.
  */
-const injectTo = item => {
-  if (!(item.attributes.src || '').endsWith('/index.js')) return 'head';
-};
-const htmlFactory = extra => options => ({
-  ...options,
-  title: 'Violentmonkey',
-  ...extra,
-  chunks: ['browser', ...options.chunks],
-  injectTo,
-});
-exports.pages = {
-  'browser': {
-    entry: './src/common/browser',
+exports.pages = [
+  'background',
+  'confirm',
+  'options',
+  'popup',
+].reduce((res, name) => Object.assign(res, {
+  [`${name}/index`]: {
+    entry: `./src/${name}`,
+    html: options => ({
+      ...options,
+      title: 'Violentmonkey',
+      injectTo: item => (item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head',
+    }),
   },
-  'background/index': {
-    entry: './src/background',
-    html: htmlFactory(),
-  },
-  'options/index': {
-    entry: './src/options',
-    html: htmlFactory(),
-  },
-  'confirm/index': {
-    entry: './src/confirm',
-    html: htmlFactory(),
-  },
-  'popup/index': {
-    entry: './src/popup',
-    html: htmlFactory(),
-  },
-};
+}), {});
 
 const splitVendor = prefix => ({
   [prefix]: {
@@ -57,7 +41,7 @@ exports.optimization = {
         name: 'common',
         minChunks: 2,
         enforce: true,
-        chunks: chunk => chunk.name !== 'browser',
+        chunks: 'all',
       },
       ...splitVendor('codemirror'),
       ...splitVendor('tldjs'),

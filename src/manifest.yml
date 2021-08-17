@@ -26,7 +26,6 @@ options_ui:
   open_in_tab: true
 content_scripts:
   - js:
-      - browser.js
       - injected-web.js
       - injected.js
     matches:
