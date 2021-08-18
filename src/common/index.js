@@ -164,11 +164,18 @@ export function decodeFilename(filename) {
 }
 
 export async function getActiveTab() {
-  const [tab] = await browser.tabs.query({
-    active: true,
-    windowId: -2, // chrome.windows.WINDOW_ID_CURRENT works when debugging the popup in devtools
-  });
-  return tab;
+  return (
+    await browser.tabs.query({
+      active: true,
+      currentWindow: true,
+    })
+  )[0] || (
+    // Chrome bug workaround when an undocked devtools window is focused
+    await browser.tabs.query({
+      active: true,
+      windowId: (await browser.windows.getCurrent()).id,
+    })
+  )[0];
 }
 
 export function makePause(ms) {
