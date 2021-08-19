@@ -13,7 +13,6 @@ const VM_VER = require('../package.json').version.replace(/-[^.]*/, '');
 const definitions = new webpack.DefinePlugin({
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
   'process.env.DEBUG': JSON.stringify(process.env.DEBUG || false),
-  'process.env.DEV': JSON.stringify(!isProd),
   'process.env.VM_VER': JSON.stringify(VM_VER),
 });
 const minimizerOptions = {
