@@ -1,9 +1,7 @@
-/*
- Since this also runs in a content script we'll guard against implicit global variables
- for DOM elements with 'id' attribute which is a standard feature, more info:
- https://github.com/mozilla/webextension-polyfill/pull/153
- https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
-*/
+// Since this also runs in a content script we'll guard against implicit global variables
+// for DOM elements with 'id' attribute which is a standard feature, more info:
+// https://github.com/mozilla/webextension-polyfill/pull/153
+// https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
 if (!global.browser?.runtime?.sendMessage) {
   // region Chrome
   const { chrome, Error, Promise, Proxy } = global;
