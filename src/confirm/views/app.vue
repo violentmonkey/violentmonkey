@@ -168,7 +168,9 @@ export default {
     }
     const { url } = this.info;
     this.decodedUrl = decodeURIComponent(url);
-    filePortNeeded = ua.isFirefox >= 68 && url.startsWith('file:');
+    /* sendCmdDirectly makes the page load so fast that ua.isFirefox is still a boolean,
+       so we'll detect FF68 that stopped allowing file: scheme in fetch() via a CSS feature */
+    filePortNeeded = url.startsWith('file:') && ua.isFirefox && CSS.supports('counter-set', 'none');
     this.guard = setInterval(sendCmdDirectly, KEEP_INFO_DELAY, 'CacheHit', { key });
     await this.loadData();
     await this.parseMeta();
