@@ -29,7 +29,7 @@ if (!global.browser?.runtime?.sendMessage) {
         if (err) {
           err = err.message;
         } else if (preprocessorFunc) {
-          err = preprocessorFunc(response, resolve);
+          err = preprocessorFunc(resolve, response);
         } else {
           resolve(response);
         }
@@ -39,12 +39,6 @@ if (!global.browser?.runtime?.sendMessage) {
       if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.message || err));
       return promise;
     }
-  );
-  /** @returns {?} error */
-  const unwrapResponse = (response, resolve) => (
-    !response && 'null response'
-    || response.error
-    || resolve(response.data)
   );
   const sendResponseAsync = async (result, sendResponse) => {
     try {
@@ -56,21 +50,42 @@ if (!global.browser?.runtime?.sendMessage) {
       sendResponse({ error: err instanceof Error ? err.stack : err });
     }
   };
-  const DIRECT = 1;
+  const wrapMessageListener = (listener, message, sender, sendResponse) => {
+    if (process.env.DEBUG) console.info('receive', message);
+    const result = listener(message, sender);
+    if (result && isFunction(result.then)) {
+      sendResponseAsync(result, sendResponse);
+      return true;
+    }
+    if (result !== undefined) {
+      // In some browsers (e.g Chrome 56, Vivaldi), the listener in
+      // popup pages are not properly cleared after closed.
+      // They may send `undefined` before the real response is sent.
+      sendResponse({ data: result });
+    }
+  };
+  /** @returns {?} error */
+  const unwrapResponse = (resolve, response) => (
+    !response && 'null response'
+    || response.error
+    || resolve(response.data)
+  );
   const proxifyValue = (target, key, groupName, src, metaVal) => {
     const srcVal = src[key];
     if (srcVal === undefined) return;
     let res;
-    if (isFunction(metaVal)) {
-      res = metaVal;
-    } else if (metaVal === DIRECT) {
+    if (metaVal === 0) {
       res = isFunction(srcVal)
         ? srcVal::bind(src)
         : srcVal;
     } else if (isFunction(srcVal)) {
-      res = isApiEvent(groupName)
-        ? srcVal::bind(src)
-        : wrapAsync(src, srcVal);
+      if (!isApiEvent(groupName)) {
+        res = wrapAsync(src, srcVal, metaVal);
+      } else if (metaVal) {
+        res = listener => src::srcVal(metaVal::bind(null, listener));
+      } else {
+        res = srcVal::bind(src);
+      }
     } else if (isObject(srcVal)) {
       res = proxifyGroup(key, srcVal, metaVal); // eslint-disable-line no-use-before-define
     } else {
@@ -85,37 +100,27 @@ if (!global.browser?.runtime?.sendMessage) {
       ?? proxifyValue(target, key, groupName, src, meta?.[key])
     ),
   });
-  const { runtime, tabs } = chrome;
+  /**
+   * 0 = non-async method or the entire group
+   * function = preprocessor,
+   *   for onXXX methods: (listener, ...originalArgs): void
+   *   for async methods: (resolve, data): any - a truthy return value goes into reject()
+   */
   global.browser = proxifyGroup('', chrome, {
-    extension: DIRECT, // we don't use its async methods
-    i18n: DIRECT, // we don't use its async methods
+    extension: 0, // we don't use its async methods
+    i18n: 0, // we don't use its async methods
     runtime: {
-      connect: DIRECT,
-      getManifest: DIRECT,
-      getURL: DIRECT,
+      connect: 0,
+      getManifest: 0,
+      getURL: 0,
       onMessage: {
-        addListener(listener) {
-          runtime.onMessage.addListener((message, sender, sendResponse) => {
-            if (process.env.DEBUG) console.info('receive', message);
-            const result = listener(message, sender);
-            if (result && isFunction(result.then)) {
-              sendResponseAsync(result, sendResponse);
-              return true;
-            }
-            if (result !== undefined) {
-              // In some browsers (e.g Chrome 56, Vivaldi), the listener in
-              // popup pages are not properly cleared after closed.
-              // They may send `undefined` before the real response is sent.
-              sendResponse({ data: result });
-            }
-          });
-        },
+        addListener: wrapMessageListener,
       },
-      sendMessage: wrapAsync(runtime, runtime.sendMessage, unwrapResponse),
+      sendMessage: unwrapResponse,
     },
-    tabs: tabs && {
-      connect: DIRECT,
-      sendMessage: wrapAsync(tabs, tabs.sendMessage, unwrapResponse),
+    tabs: {
+      connect: 0,
+      sendMessage: unwrapResponse,
     },
   });
   // endregion
