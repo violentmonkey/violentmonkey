@@ -452,11 +452,16 @@ async function confirmInstall({ code, from, url }, { tab = {} }) {
   cache.put(url, code, 3000);
   const confirmKey = getUniqId();
   const { active, id: tabId, incognito } = tab;
+  // Not testing tab.pendingUrl because it will be always equal to `url`
+  const canReplaceCurTab = (!incognito || ua.isFirefox) && (
+    url === from
+    || cache.has(`autoclose:${tabId}`)
+    || /^(chrome:\/\/(newtab|startpage)\/|about:(home|newtab))$/.test(from));
   cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId });
-  const { windowId } = await commands.TabOpen({
-    url: `/confirm/index.html#${confirmKey}`,
-    active: !!active,
-  }, { tab });
+  const confirmUrl = `/confirm/index.html#${confirmKey}`;
+  const { windowId } = canReplaceCurTab
+    ? await browser.tabs.update(tabId, { url: confirmUrl })
+    : await commands.TabOpen({ url: confirmUrl, active: !!active }, { tab });
   if (active && windowId !== tab.windowId) {
     await browser.windows.update(windowId, { focused: true });
   }
@@ -524,10 +529,6 @@ async function maybeInstallUserJs(tabId, url) {
   if (code && parseMeta(code).name) {
     const tab = tabId >= 0 && await browser.tabs.get(tabId) || {};
     confirmInstall({ code, url, from: tab.url }, { tab });
-    if (cache.has(`autoclose:${tabId}`)
-    || tab.pendingUrl && tab.url === 'chrome://newtab/') {
-      browser.tabs.remove(tabId);
-    }
   } else {
     cache.put(`bypass:${url}`, true, 10e3);
     if (tabId >= 0) browser.tabs.update(tabId, { url });
