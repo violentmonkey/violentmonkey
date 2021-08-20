@@ -11,6 +11,30 @@ if (!global.browser?.runtime?.sendMessage) {
   /** API types or enums or literal constants */
   const isFunction = val => typeof val === 'function';
   const isObject = val => typeof val === 'object';
+  const proxifyValue = (target, key, groupName, src, metaVal) => {
+    const srcVal = src[key];
+    if (srcVal === undefined) return;
+    let res;
+    if (isFunction(metaVal)) {
+      res = metaVal(src, srcVal);
+    } else if (isFunction(srcVal)) {
+      res = metaVal === 0 || isApiEvent(groupName)
+        ? srcVal::bind(src)
+        : wrapAsync(src, srcVal); // eslint-disable-line no-use-before-define
+    } else if (isObject(srcVal) && metaVal !== 0) {
+      res = proxifyGroup(key, srcVal, metaVal); // eslint-disable-line no-use-before-define
+    } else {
+      res = srcVal;
+    }
+    target[key] = res;
+    return res;
+  };
+  const proxifyGroup = (groupName, src, meta) => new Proxy({}, {
+    get: (target, key) => (
+      target[key]
+      ?? proxifyValue(target, key, groupName, src, meta?.[key])
+    ),
+  });
   const wrapAsync = (thisArg, func, preprocessorFunc) => (
     (...args) => {
       let resolve;
@@ -24,7 +48,7 @@ if (!global.browser?.runtime?.sendMessage) {
       });
       // Make the error messages actually useful by capturing a real stack
       const stackInfo = new Error();
-      // Using (...results) for API methods (not used currently) that return several results
+      // Using (...results) for API callbacks that return several results (we don't use them though)
       thisArg::func(...args, (...results) => {
         let err = chrome.runtime.lastError;
         if (err) {
@@ -51,7 +75,7 @@ if (!global.browser?.runtime?.sendMessage) {
       sendResponse({ error: err instanceof Error ? err.stack : err });
     }
   };
-  const wrapMessageListener = (listener, message, sender, sendResponse) => {
+  const onMessageListener = (listener, message, sender, sendResponse) => {
     if (process.env.DEBUG) console.info('receive', message);
     const result = listener(message, sender);
     if (result && isFunction(result.then)) {
@@ -71,41 +95,12 @@ if (!global.browser?.runtime?.sendMessage) {
     || response.error
     || resolve(response.data)
   );
-  const proxifyValue = (target, key, groupName, src, metaVal) => {
-    const srcVal = src[key];
-    if (srcVal === undefined) return;
-    let res;
-    if (metaVal === 0) {
-      res = isFunction(srcVal)
-        ? srcVal::bind(src)
-        : srcVal;
-    } else if (isFunction(srcVal)) {
-      if (!isApiEvent(groupName)) {
-        res = wrapAsync(src, srcVal, metaVal);
-      } else if (metaVal) {
-        res = listener => src::srcVal(metaVal::bind(null, listener));
-      } else {
-        res = srcVal::bind(src);
-      }
-    } else if (isObject(srcVal)) {
-      res = proxifyGroup(key, srcVal, metaVal); // eslint-disable-line no-use-before-define
-    } else {
-      res = srcVal;
-    }
-    target[key] = res;
-    return res;
-  };
-  const proxifyGroup = (groupName, src, meta) => new Proxy({}, {
-    get: (target, key) => (
-      target[key]
-      ?? proxifyValue(target, key, groupName, src, meta?.[key])
-    ),
-  });
+  const wrapSendMessage = (runtime, sendMessage) => (
+    wrapAsync(runtime, sendMessage, unwrapResponse)
+  );
   /**
    * 0 = non-async method or the entire group
-   * function = preprocessor,
-   *   for onXXX methods: (listener, ...originalArgs): void
-   *   for async methods: (resolve, ...originalArgs): any - a truthy return value goes into reject()
+   * function = transformer like (originalObj, originalFunc): function
    */
   global.browser = proxifyGroup('', chrome, {
     extension: 0, // we don't use its async methods
@@ -115,13 +110,15 @@ if (!global.browser?.runtime?.sendMessage) {
       getManifest: 0,
       getURL: 0,
       onMessage: {
-        addListener: wrapMessageListener,
+        addListener: (onMessage, addListener) => (
+          listener => onMessage::addListener(onMessageListener::bind(null, listener))
+        ),
       },
-      sendMessage: unwrapResponse,
+      sendMessage: wrapSendMessage,
     },
     tabs: {
       connect: 0,
-      sendMessage: unwrapResponse,
+      sendMessage: wrapSendMessage,
     },
   });
   // endregion
