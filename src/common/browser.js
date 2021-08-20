@@ -24,14 +24,15 @@ if (!global.browser?.runtime?.sendMessage) {
       });
       // Make the error messages actually useful by capturing a real stack
       const stackInfo = new Error();
-      thisArg::func(...args, (response) => {
+      // Using (...results) for API methods (not used currently) that return several results
+      thisArg::func(...args, (...results) => {
         let err = chrome.runtime.lastError;
         if (err) {
           err = err.message;
         } else if (preprocessorFunc) {
-          err = preprocessorFunc(resolve, response);
+          err = preprocessorFunc(resolve, ...results);
         } else {
-          resolve(response);
+          resolve(results[0]);
         }
         // Prefer `reject` over `throw` which stops debugger in 'pause on exceptions' mode
         if (err) reject(new Error(`${err}\n${stackInfo.stack}`));
@@ -104,7 +105,7 @@ if (!global.browser?.runtime?.sendMessage) {
    * 0 = non-async method or the entire group
    * function = preprocessor,
    *   for onXXX methods: (listener, ...originalArgs): void
-   *   for async methods: (resolve, data): any - a truthy return value goes into reject()
+   *   for async methods: (resolve, ...originalArgs): any - a truthy return value goes into reject()
    */
   global.browser = proxifyGroup('', chrome, {
     extension: 0, // we don't use its async methods
