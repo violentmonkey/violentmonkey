@@ -1,4 +1,3 @@
-import { browser } from './consts';
 import { blob2base64, ensureArray } from './util';
 
 const base = {

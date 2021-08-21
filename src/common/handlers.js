@@ -1,4 +1,3 @@
-import { browser } from '#/common/consts';
 import options from './options';
 
 const handlers = {
