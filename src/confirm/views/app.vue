@@ -45,9 +45,11 @@
         <div class="actions flex flex-wrap mr-2c">
           <button
             id="confirm"
+            ref="confirm"
             v-text="reinstall
               ? i18n('buttonConfirmReinstallation')
               : i18n('buttonConfirmInstallation')"
+            :data-hotkey="confirmHotkey"
             @click="installScript" :disabled="!installable"/>
           <button v-text="i18n('buttonClose')" @click="close"/>
           <div class="flex flex-col my-1">
@@ -85,6 +87,7 @@ import {
   sendCmdDirectly, request, isRemote, getFullUrl, makePause,
   getLocaleString, trueJoin,
 } from '#/common';
+import { keyboardService } from '#/common/keyboard';
 import options from '#/common/options';
 import initCache from '#/common/cache';
 import storage from '#/common/storage';
@@ -99,6 +102,7 @@ const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;
 const RETRY_COUNT = 2;
 const MAX_TITLE_NAME_LEN = 100;
+const CONFIRM_HOTKEY = `${/Mac/.test(navigator.platform) ? 'Cmd' : 'Ctrl'}-Enter`;
 const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 /** @type {chrome.runtime.Port} */
 let filePort;
@@ -128,6 +132,7 @@ export default {
       commands: {
         close: this.close,
       },
+      confirmHotkey: CONFIRM_HOTKEY,
       info: {},
       decodedUrl: '...',
       deps: {}, // combines `this.require` and `this.resources` = all loaded deps
@@ -187,12 +192,17 @@ export default {
     if (this.installable) {
       this.heading = this.reinstall ? this.i18n('labelReinstall') : this.i18n('labelInstall');
     }
+    this.disposeList = [
+      keyboardService.register(CONFIRM_HOTKEY, () => this.$refs.confirm.click()),
+    ];
+    keyboardService.enable();
   },
   beforeDestroy() {
     if (this.guard) {
       clearInterval(this.guard);
       this.guard = null;
     }
+    this.disposeList?.forEach(dispose => dispose());
   },
   methods: {
     async loadData(changedOnly) {
@@ -492,6 +502,11 @@ $infoIconSize: 18px;
     color: darkgreen;
     &:hover {
       border-color: #488148;
+    }
+    &::after {
+      content: " (" attr(data-hotkey) ")";
+      opacity: .75;
+      font-weight: normal;
     }
   }
   &.reinstall #confirm {
