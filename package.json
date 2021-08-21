@@ -79,5 +79,5 @@
       "pre-push": "yarn lint"
     }
   },
-  "beta": 2
+  "beta": 3
 }
