@@ -13,7 +13,7 @@
             </div>
             <div class="ellipsis" v-text="name"/>
           </h1>
-          <div :href="info.url">
+          <div class="flex">
             <tooltip :content="i18n('editNavCode')" class="abs-center" placement="right">
               <icon name="code"/>
             </tooltip>
