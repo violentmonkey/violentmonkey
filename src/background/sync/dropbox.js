@@ -1,6 +1,7 @@
 import { loadQuery, dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
+  openAuthPage,
 } from './base';
 
 const config = {
@@ -100,7 +101,7 @@ const Dropbox = BaseService.extend({
       redirect_uri: config.redirect_uri,
     };
     const url = `https://www.dropbox.com/oauth2/authorize?${dumpQuery(params)}`;
-    browser.tabs.create({ url });
+    openAuthPage(url, config.redirect_uri);
   },
   authorized(raw) {
     const data = loadQuery(raw);

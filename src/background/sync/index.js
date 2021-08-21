@@ -1,5 +1,4 @@
 import {
-  checkAuthUrl,
   initialize,
   sync,
   getStates,
@@ -18,10 +17,6 @@ Object.assign(commands, {
   SyncRevoke: revoke,
   SyncStart: sync,
   SyncSetConfig: setConfig,
-});
-
-browser.tabs.onUpdated.addListener((tabId, changes) => {
-  if (changes.url && checkAuthUrl(changes.url)) browser.tabs.remove(tabId);
 });
 
 export {
