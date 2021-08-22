@@ -7,6 +7,9 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Установить
+buttonConfirmReinstallation:
+  description: Button to confirm re-installation when the script is already installed.
+  message: Установить заново
 buttonDisable:
   description: Button to disable a script.
   message: Выключить
@@ -184,9 +187,11 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: |-
+  message: >-
     Violentmonkey не может запускать скрипты на этой странице
-    (например: UI браузера или расширения)
+
+    (например: UI браузера, расширение, блокировка настройками политики,
+    поисковой сайт в Opera)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: алфавитному порядку
@@ -273,6 +278,9 @@ labelAutoUpdate:
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Показывать на значке: '
+labelBadgeColors:
+  description: Label for option group to set badge colors.
+  message: 'Цвета значка: '
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: ничего
@@ -400,6 +408,11 @@ labelPopupSort:
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Политика конфиденциальности
+labelReinstall:
+  description: >-
+    Shown in the title of the confirm page while trying to install a script
+    that's already installed.
+  message: Повторная установка скрипта
 labelRelated:
   description: Label of related links.
   message: 'Ссылки по теме: '
@@ -427,6 +440,9 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Настройки
+labelShowOrder:
+  description: Label for option in dashboard -> script list
+  message: Показывать позиции порядка выполнения
 labelSync:
   description: Label for sync options.
   message: Синхронизация
@@ -475,10 +491,10 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Один столбец
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Табличный вид
 lastSync:
   description: Label for last sync timestamp.
   message: Последняя синхронизация в $1
@@ -599,6 +615,9 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Обновления не найдены.
+msgSameCode:
+  description: Shown inside the title when re-installing a script that's already installed.
+  message: ' (код такой же)'
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Чёрный список сохранен.
@@ -678,6 +697,14 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Настройки
+titleBadgeColor:
+  description: Tooltip for option to set badge color.
+  message: Цвет обычного значка
+titleBadgeColorBlocked:
+  description: Tooltip for option to set badge color of non-injectable tabs.
+  message: |-
+    Цвет значка, если скрипты не запустились
+    (страница в черном списке или вообще не скриптуемая)
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Обновление

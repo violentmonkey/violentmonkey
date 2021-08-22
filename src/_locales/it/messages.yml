@@ -7,6 +7,9 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Conferma installazione
+buttonConfirmReinstallation:
+  description: Button to confirm re-installation when the script is already installed.
+  message: ''
 buttonDisable:
   description: Button to disable a script.
   message: Disabilita
@@ -279,6 +282,9 @@ labelAutoUpdate:
 labelBadge:
   description: Label for option to show number on badge.
   message: Mostra sull'icona
+labelBadgeColors:
+  description: Label for option group to set badge colors.
+  message: ''
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: Nulla
@@ -406,6 +412,11 @@ labelPopupSort:
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Politica Sulla Riservatezza
+labelReinstall:
+  description: >-
+    Shown in the title of the confirm page while trying to install a script
+    that's already installed.
+  message: ''
 labelRelated:
   description: Label of related links.
   message: 'Link correlati: '
@@ -433,6 +444,9 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Impostazioni
+labelShowOrder:
+  description: Label for option in dashboard -> script list
+  message: ''
 labelSync:
   description: Label for sync options.
   message: Sincronizzazione
@@ -610,6 +624,9 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Aggiornamento non trovato.
+msgSameCode:
+  description: Shown inside the title when re-installing a script that's already installed.
+  message: ''
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Blacklist aggiornata.
@@ -689,6 +706,12 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Impostazioni
+titleBadgeColor:
+  description: Tooltip for option to set badge color.
+  message: ''
+titleBadgeColorBlocked:
+  description: Tooltip for option to set badge color of non-injectable tabs.
+  message: ''
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Aggiornamento
