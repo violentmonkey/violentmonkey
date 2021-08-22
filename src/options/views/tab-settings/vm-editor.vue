@@ -2,7 +2,8 @@
   <section>
     <h3 v-text="i18n('labelEditor')"></h3>
     <p v-html="i18n('descEditorOptions')" />
-    <setting-text name="editor" ref="editor" :json="true" :has-reset="true" @save="onSave">
+    <setting-text name="editor" ref="editor" mode="application/json" :json="true" :has-reset="true"
+                  @save="onSave">
       <button v-text="i18n('buttonShowEditorState')" @click="toggleStateHint"/>
     </setting-text>
     <pre v-text="hint" class="monospace-font dim-hint" />

@@ -5,13 +5,12 @@
       {{i18n('descBlacklist')}}
       <a href="https://violentmonkey.github.io/posts/smart-rules-for-blacklist/#blacklist-patterns" target="_blank" rel="noopener noreferrer" v-text="i18n('learnBlacklist')"></a>
     </p>
-    <setting-text name="blacklist" @save="onSave"/>
+    <setting-text name="blacklist" @save="onSave" :msg-on-save="i18n('msgSavedBlacklist')"/>
   </section>
 </template>
 
 <script>
 import { sendCmd } from '#/common';
-import { showMessage } from '#/common/ui';
 import SettingText from '#/common/ui/setting-text';
 
 export default {
@@ -20,7 +19,6 @@ export default {
   },
   methods: {
     onSave() {
-      showMessage({ text: this.i18n('msgSavedBlacklist') });
       sendCmd('BlacklistReset');
     },
   },
