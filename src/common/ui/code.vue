@@ -74,9 +74,10 @@ import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
 import { i18n } from '#/common';
-import { forEachEntry, deepEqual } from '#/common/object';
+import { deepEqual, forEachEntry, objectPick } from '#/common/object';
 import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
+import storage from '#/common/storage';
 
 /* eslint-disable no-control-regex */
 let maxDisplayLength;
@@ -87,7 +88,6 @@ const CTRL_RE = new RegExp(`${CTRL_OPEN}(\\d+)${CTRL_CLOSE}`, 'g');
 const PLACEHOLDER_CLS = 'too-long-placeholder';
 // To identify our CodeMirror markers we're using a Symbol since it's always unique
 const PLACEHOLDER_SYM = Symbol(PLACEHOLDER_CLS);
-
 const cmDefaults = {
   continueComments: true,
   styleActiveLine: true,
@@ -516,6 +516,9 @@ export default {
     },
   },
   mounted() {
+    storage.base.getOne('editorSearch').then(prev => {
+      if (prev) Object.assign(this.search, { queryFilled: true }, prev);
+    });
     let userOpts = options.get('editor');
     const internalOpts = this.cmOptions || {};
     const opts = {
@@ -552,6 +555,7 @@ export default {
   },
   beforeDestroy() {
     this.onActive(false);
+    storage.base.set('editorSearch', objectPick(this.search, ['query', 'replace', 'options']));
   },
 };
 </script>
