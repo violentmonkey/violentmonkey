@@ -191,9 +191,11 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: |-
+  message: >-
     Violentmonkey nemôže spustiť skripty na tejto stránke
-    (najčastejší prípad: rozhranie prehliadačia alebo rozšírenia)
+
+    (najčastejší prípad: rozhranie prehliadača alebo rozšírenia, blokované cez
+    politiku, web vyhľadávača v Opere)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: abecedy
@@ -446,7 +448,7 @@ labelSettings:
   message: Nastavenia
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Zobraziť poradie vykonania príkazu
 labelSync:
   description: Label for sync options.
   message: Synchronizácia
