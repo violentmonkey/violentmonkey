@@ -180,8 +180,8 @@ failureReasonNoninjectable:
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: |-
-    暴力猴无法在此页面执行用户脚本
-    （如：浏览器界面、扩展页面）
+    暴力猴无法在当前页面执行用户脚本
+    （常见原因：浏览器/扩展内置页面、被策略屏蔽、Opera 下的搜索页面需要特殊设置）
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 字母顺序
@@ -270,7 +270,7 @@ labelBadge:
   message: 在扩展图标上显示：
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 徽标颜色：
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: 无
@@ -432,7 +432,7 @@ labelSettings:
   message: 设置
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: 显示执行序号
 labelSync:
   description: Label for sync options.
   message: 同步
@@ -685,10 +685,10 @@ sideMenuSettings:
   message: 设置
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: 正常情况下的徽标颜色
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: 页面无法注入脚本（列入黑名单或不支持）时的徽标颜色
 titleScriptUpdated:
   description: Notification title for script updates.
   message: 更新
