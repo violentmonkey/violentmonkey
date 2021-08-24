@@ -2,16 +2,8 @@
   <div class="page-confirm frame flex flex-col h-100" :class="{ reinstall }">
     <div class="frame-block">
       <div class="flex">
-        <div class="image flex flex-col self-start mb-2c">
+        <div class="image">
           <img src="/public/images/icon128.png">
-          <div class="mr-1c">
-            <tooltip v-for="([url, icon, title]) in icons" :key="icon"
-                     :content="title" placement="bottom" align="left">
-              <a target="_blank" :href="url">
-                <icon :name="icon"/>
-              </a>
-            </tooltip>
-          </div>
         </div>
         <div class="info">
           <h1>
@@ -21,11 +13,22 @@
             </div>
             <div class="ellipsis" v-text="name"/>
           </h1>
-          <a class="url ellipsis" v-text="decodedUrl"
-             :title="info.url" :href="info.url" @click.prevent />
+          <div class="flex">
+            <tooltip :content="i18n('editNavCode')" class="abs-center" placement="right">
+              <icon name="code"/>
+            </tooltip>
+            <span class="ellipsis" v-text="info.url ? decodeURIComponent(info.url) : '...'"/>
+          </div>
+          <a v-for="([url, icon, title]) in icons" :key="icon"
+             class="flex" target="_blank" :href="url">
+            <tooltip :content="title" class="abs-center" placement="right">
+              <icon :name="icon"/>
+            </tooltip>
+            <span class="ellipsis" v-text="decodeURIComponent(url)"/>
+          </a>
           <p class="descr" v-text="descr"/>
           <div class="lists flex flex-wrap" :data-collapsed="!listsShown">
-            <div class="toggle" @click="listsShown = !listsShown">
+            <div class="toggle abs-center" @click="listsShown = !listsShown">
               <tooltip :content="i18n('msgShowHide')" placement="bottom" align="left" v-if="lists">
                 <icon name="info"/>
               </tooltip>
@@ -45,9 +48,11 @@
         <div class="actions flex flex-wrap mr-2c">
           <button
             id="confirm"
+            ref="confirm"
             v-text="reinstall
               ? i18n('buttonConfirmReinstallation')
               : i18n('buttonConfirmInstallation')"
+            :data-hotkey="confirmHotkey"
             @click="installScript" :disabled="!installable"/>
           <button v-text="i18n('buttonClose')" @click="close"/>
           <div class="flex flex-col my-1">
@@ -85,6 +90,7 @@ import {
   sendCmdDirectly, request, isRemote, getFullUrl, makePause,
   getLocaleString, trueJoin,
 } from '#/common';
+import { keyboardService } from '#/common/keyboard';
 import options from '#/common/options';
 import initCache from '#/common/cache';
 import storage from '#/common/storage';
@@ -99,6 +105,7 @@ const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;
 const RETRY_COUNT = 2;
 const MAX_TITLE_NAME_LEN = 100;
+const CONFIRM_HOTKEY = `${/Mac/.test(navigator.platform) ? 'Cmd' : 'Ctrl'}-Enter`;
 const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 /** @type {chrome.runtime.Port} */
 let filePort;
@@ -128,8 +135,8 @@ export default {
       commands: {
         close: this.close,
       },
+      confirmHotkey: CONFIRM_HOTKEY,
       info: {},
-      decodedUrl: '...',
       deps: {}, // combines `this.require` and `this.resources` = all loaded deps
       descr: '',
       error: null,
@@ -167,7 +174,6 @@ export default {
       return;
     }
     const { url } = this.info;
-    this.decodedUrl = decodeURIComponent(url);
     /* sendCmdDirectly makes the page load so fast that ua.isFirefox is still a boolean,
        so we'll detect FF68 that stopped allowing file: scheme in fetch() via a CSS feature */
     filePortNeeded = url.startsWith('file:') && ua.isFirefox && CSS.supports('counter-set', 'none');
@@ -187,12 +193,17 @@ export default {
     if (this.installable) {
       this.heading = this.reinstall ? this.i18n('labelReinstall') : this.i18n('labelInstall');
     }
+    this.disposeList = [
+      keyboardService.register(CONFIRM_HOTKEY, () => this.$refs.confirm.click()),
+    ];
+    keyboardService.enable();
   },
   beforeDestroy() {
     if (this.guard) {
       clearInterval(this.guard);
       this.guard = null;
     }
+    this.disposeList?.forEach(dispose => dispose());
   },
   methods: {
     async loadData(changedOnly) {
@@ -416,7 +427,7 @@ $infoIconSize: 18px;
       max-height: 4rem;
       overflow-y: auto;
     }
-    .toggle {
+    .abs-center {
       position: absolute;
       margin-left: calc(-1 * $imgSize / 2 - $infoIconSize / 2 - $imgGapR);
       cursor: pointer;
@@ -492,6 +503,11 @@ $infoIconSize: 18px;
     color: darkgreen;
     &:hover {
       border-color: #488148;
+    }
+    &::after {
+      content: " (" attr(data-hotkey) ")";
+      opacity: .75;
+      font-weight: normal;
     }
   }
   &.reinstall #confirm {
