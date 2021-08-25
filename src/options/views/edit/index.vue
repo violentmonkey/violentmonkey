@@ -218,6 +218,7 @@ export default {
       this.code = code;
     }
     const { custom, config } = this.script;
+    const { noframes } = custom;
     this.settings = {
       config: {
         notifyUpdates: `${config.notifyUpdates ?? ''}`,
@@ -230,6 +231,7 @@ export default {
         ...objectPick(custom, Object.keys(CUSTOM_PROPS)),
         ...objectPick(custom, CUSTOM_LISTS, fromList),
         runAt: custom.runAt || '',
+        noframes: noframes == null ? '' : +noframes, // it was boolean in old VM
       },
     };
     savedSettings = deepCopy(this.settings);
@@ -267,6 +269,7 @@ export default {
       const { settings } = this;
       const { config, custom } = settings;
       const { notifyUpdates } = config;
+      const { noframes } = custom;
       try {
         const codeComponent = this.$refs.code;
         const id = this.script?.props?.id;
@@ -280,6 +283,7 @@ export default {
           custom: {
             ...objectPick(custom, Object.keys(CUSTOM_PROPS)),
             ...objectPick(custom, CUSTOM_LISTS, toList),
+            noframes: noframes ? +noframes : null,
           },
           // User created scripts MUST be marked `isNew` so that
           // the backend is able to check namespace conflicts,

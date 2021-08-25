@@ -266,7 +266,7 @@ export async function getScriptsByURL(url, isTop) {
     ? []
     : store.scripts.filter(script => (
       !script.config.removed
-      && (isTop || !script.meta.noframes)
+      && (isTop || !(script.custom.noframes ?? script.meta.noframes))
       && testScript(url, script)
     ));
   const reqKeys = [];
@@ -624,6 +624,7 @@ export async function vacuum() {
  * @property {string} lastInstallURL
  * @property {string} updateURL
  * @property {'auto' | 'page' | 'content'} injectInto
+ * @property {null | 1 | 0} noframes - null or absence == default (script's value)
  * @property {string[]} exclude
  * @property {string[]} excludeMatch
  * @property {string[]} include
