@@ -62,10 +62,16 @@ export function objectPurify(obj) {
   return obj;
 }
 
+/**
+ * @param {{}} obj
+ * @param {string[]} keys
+ * @param {function(value,key):?} [transform]
+ * @returns {{}}
+ */
 export function objectPick(obj, keys, transform) {
   return keys::reduce((res, key) => {
     let value = obj?.[key];
-    if (transform) value = transform(value);
+    if (transform) value = transform(value, key);
     if (value != null) res[key] = value;
     return res;
   }, {});

@@ -1,54 +1,64 @@
 import { deepCopy, forEachEntry } from '#/common/object';
 import { blob2base64, ensureArray } from './util';
 
-const browserStorageLocal = browser.storage.local;
 /** @type VMCache */
 let dataCache;
+const browserStorageLocal = browser.storage.local;
+const onStorageChanged = changes => {
+  changes::forEachEntry(([key, { newValue }]) => {
+    if (newValue == null) {
+      dataCache.del(key);
+    } else {
+      dataCache.put(key, newValue);
+    }
+  });
+};
 
 const base = {
   prefix: '',
   setDataCache(val) {
     dataCache = val;
+    browser.storage.onChanged.addListener(onStorageChanged);
   },
   getKey(id) {
     return `${this.prefix}${id}`;
   },
-  getOne(id) {
-    const key = this.getKey(id);
-    return dataCache?.has(key) ? deepCopy(dataCache.get(key))
-      : browserStorageLocal.get(key).then(data => data[key]);
+  async getOne(id) {
+    return (await this.getMulti([id]))[id];
   },
   /**
    * @param {string[]} ids
-   * @param {?} def
-   * @param {function(id:string, val:?):?} transform
+   * @param {?} [def]
+   * @param {function(id:string, val:?):?} [transform]
    * @returns {Promise<Object>}
    */
   async getMulti(ids, def, transform) {
+    const res = {};
     const data = {};
-    const keys = [];
+    const missingKeys = [];
     ids.forEach(id => {
       const key = this.getKey(id);
-      const isCached = dataCache?.has(key);
-      if (isCached) data[key] = deepCopy(dataCache.get(key));
-      else keys.push(key);
+      const cached = dataCache?.get(key);
+      res[id] = key;
+      if (cached != null) {
+        data[key] = deepCopy(cached);
+      } else {
+        missingKeys.push(key);
+      }
     });
-    if (keys.length) {
-      Object.assign(data, await browserStorageLocal.get(keys));
+    if (missingKeys.length) {
+      Object.assign(data, await browserStorageLocal.get(missingKeys));
     }
-    return ids.reduce((res, id) => {
-      const val = data[this.getKey(id)];
-      res[id] = transform ? transform(id, val) : (val || def);
-      return res;
-    }, {});
+    res::forEachEntry(([id, key]) => {
+      res[id] = transform
+        ? transform(id, data[key])
+        : data[key] ?? deepCopy(def);
+    });
+    return res;
   },
   // Must be `async` to ensure a Promise is returned when `if` doesn't match
   async set(id, value) {
-    if (id) {
-      const key = this.getKey(id);
-      dataCache?.put(key, deepCopy(value));
-      return browserStorageLocal.set({ [key]: value });
-    }
+    if (id) return this.dump({ [id]: value });
   },
   // Must be `async` to ensure a Promise is returned when `if` doesn't match
   async remove(id) {
@@ -64,8 +74,8 @@ const base = {
   },
   async dump(data) {
     const output = {};
-    data::forEachEntry(([key, value]) => {
-      key = this.getKey(key);
+    data::forEachEntry(([id, value]) => {
+      const key = this.getKey(id);
       output[key] = value;
       dataCache?.put(key, deepCopy(value));
     });

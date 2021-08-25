@@ -17,6 +17,7 @@ Object.assign(commands, {
     return cache.get(key)
       || cache.put(key, loadImageData(url, { base64: true }).catch(noop), CACHE_DURATION);
   },
+  SetBadge: setBadge,
 });
 
 // Firefox Android does not support such APIs, use noop
@@ -104,10 +105,6 @@ browser.tabs.onRemoved.addListener((id) => {
 
 browser.tabs.onUpdated.addListener((tabId, info, tab) => {
   const { url } = info;
-  if (url && ua.isFirefox && isApplied) {
-    const badgeData = cache.pop(`badge:${tabId}${url}`);
-    if (badgeData) setBadge(...badgeData);
-  }
   if (info.status === 'loading'
       // at least about:newtab in Firefox may open without 'loading' status
       || info.favIconUrl && tab.url.startsWith('about:')) {
@@ -115,7 +112,7 @@ browser.tabs.onUpdated.addListener((tabId, info, tab) => {
   }
 });
 
-export function setBadge(ids, { tab, frameId }) {
+function setBadge(ids, { tab, frameId }) {
   const tabId = tab.id;
   const data = badges[tabId] || {};
   if (!data.idMap || frameId === 0) {

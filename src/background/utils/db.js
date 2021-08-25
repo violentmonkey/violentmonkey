@@ -4,7 +4,7 @@ import {
 import {
   CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK,
 } from '#/common/consts';
-import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
+import { forEachEntry, forEachKey, forEachValue, objectPick } from '#/common/object';
 import storage from '#/common/storage';
 import ua from '#/common/ua';
 import pluginEvents from '../plugin/events';
@@ -102,6 +102,7 @@ preInitialize.push(async () => {
   /** @this VMScriptCustom.pathMap */
   const rememberUrl = function _(url) { resUrls.push(this[url] || url); };
   data::forEachEntry(([key, script]) => {
+    dataCache.put(key, script);
     if (key.startsWith(storage.script.prefix)) {
       // {
       //   meta,
@@ -251,16 +252,13 @@ export async function dumpValueStores(valueDict) {
   return valueDict;
 }
 
-const gmValues = [
-  'GM_getValue', 'GM.getValue',
-  'GM_setValue', 'GM.setValue',
-  'GM_listValues', 'GM.listValues',
-  'GM_deleteValue', 'GM.deleteValue',
-];
-
+export const ENV_CACHE_KEYS = 'cacheKeys';
+export const ENV_REQ_KEYS = 'reqKeys';
+export const ENV_VALUE_IDS = 'valueIds';
+const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Value)$/;
+const RUN_AT_RE = /^document-(start|body|end|idle)$/;
 /**
  * @desc Get scripts to be injected to page with specific URL.
- * @return {Promise<Object>}
  */
 export async function getScriptsByURL(url, isTop) {
   const allScripts = testBlacklist(url)
@@ -270,50 +268,74 @@ export async function getScriptsByURL(url, isTop) {
       && (isTop || !script.meta.noframes)
       && testScript(url, script)
     ));
-  const reqKeys = [];
-  const cacheKeys = [];
-  const scripts = allScripts.filter(script => script.config.enabled);
-  scripts.forEach((script) => {
+  const allIds = [];
+  /** @namespace VMScriptByUrlData */
+  const [envStart, envDelayed] = [0, 1].map(() => ({
+    ids: [],
+    /** @type {VMInjectedScript[]} */
+    scripts: [],
+    [ENV_CACHE_KEYS]: [],
+    [ENV_REQ_KEYS]: [],
+    [ENV_VALUE_IDS]: [],
+  }));
+  allScripts.forEach((script) => {
+    const { id } = script.props;
+    allIds.push(id);
+    if (!script.config.enabled) return;
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
-    meta.require.forEach((key) => {
-      pushUnique(reqKeys, pathMap[key] || key);
-    });
-    meta.resources::forEachValue((key) => {
-      pushUnique(cacheKeys, pathMap[key] || key);
-    });
+    const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
+    const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
+    env.ids.push(id);
+    if (meta.grant?.some(GMVALUES_RE.test, GMVALUES_RE)) {
+      env[ENV_VALUE_IDS].push(id);
+    }
+    for (const [list, name] of [
+      [meta.require, ENV_REQ_KEYS],
+      [Object.values(meta.resources), ENV_CACHE_KEYS],
+    ]) {
+      list.forEach(key => {
+        key = pathMap[key] || key;
+        if (!envStart[name].includes(key)) {
+          env[name].push(key);
+        }
+      });
+    }
+    /** @namespace VMInjectedScript */
+    env.scripts.push({ ...script, runAt });
   });
-  const ids = allScripts.map(getPropsId);
-  const enabledIds = scripts.map(getPropsId);
-  const withValueIds = scripts
-  .filter(script => script.meta.grant?.some(gm => gmValues.includes(gm)))
-  .map(getPropsId);
-  const [require, cache, values, code] = await Promise.all([
-    storage.require.getMulti(reqKeys),
-    storage.cache.getMulti(cacheKeys),
-    storage.value.getMulti(withValueIds, {}),
-    storage.code.getMulti(enabledIds),
-  ]);
+  if (envDelayed.ids.length) {
+    envDelayed.promise = readEnvironmentData(envDelayed);
+  }
+  /** @namespace VMScriptByUrlData */
   return {
-    // these will be sent to injectScripts()
-    inject: {
-      cache,
-      ids,
-      scripts,
-    },
-    // these will be used only by bg/* and to augment the data above
-    cacheKeys,
-    code,
-    enabledIds,
-    reqKeys,
-    require,
-    values,
-    withValueIds,
+    ...envStart,
+    ...await readEnvironmentData(envStart),
+    allIds,
+    envDelayed,
   };
 }
 
-function pushUnique(arr, elem) {
-  if (!arr.includes(elem)) arr.push(elem);
+async function readEnvironmentData(env) {
+  /** @typedef {{ cache:{}, code:{}, require:{}, value:{} }} VMScriptByUrlData */
+  const storageRoutes = [
+    ['cache', env[ENV_CACHE_KEYS]],
+    ['code', env.ids],
+    ['require', env[ENV_REQ_KEYS]],
+    ['value', env[ENV_VALUE_IDS], {}],
+  ];
+  const keys = [].concat(
+    ...storageRoutes.map(([name, src]) => (
+      src.map(id => storage[name].getKey(id))
+    )),
+  );
+  const data = await storage.base.getMulti(keys);
+  storageRoutes.forEach(([name, src]) => {
+    env[name] = objectPick({}, src, (_, srcId) => (
+      data[storage[name].getKey(srcId)]
+    ));
+  });
+  return env;
 }
 
 /**

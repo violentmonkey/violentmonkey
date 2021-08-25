@@ -51,15 +51,21 @@ if (!global.browser?.runtime?.sendMessage) {
       // Using (...results) for API callbacks that return several results (we don't use them though)
       thisArg::func(...args, (...results) => {
         let err = chrome.runtime.lastError;
+        let isRuntime;
         if (err) {
           err = err.message;
+          isRuntime = true;
         } else if (preprocessorFunc) {
           err = preprocessorFunc(resolve, ...results);
         } else {
           resolve(results[0]);
         }
         // Prefer `reject` over `throw` which stops debugger in 'pause on exceptions' mode
-        if (err) reject(new Error(`${err}\n${stackInfo.stack}`));
+        if (err) {
+          err = new Error(`${err}\n${stackInfo.stack}`);
+          err.isRuntime = isRuntime;
+          reject(err);
+        }
       });
       if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.message || err));
       return promise;

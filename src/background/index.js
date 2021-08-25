@@ -1,55 +1,35 @@
 import '#/common/browser';
 import { getActiveTab, makePause, sendCmd } from '#/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '#/common/consts';
-import { deepCopy, forEachEntry, objectSet } from '#/common/object';
+import { deepCopy } from '#/common/object';
 import * as tld from '#/common/tld';
 import ua from '#/common/ua';
 import * as sync from './sync';
 import { commands } from './utils';
-import cache from './utils/cache';
 import { getData, checkRemove } from './utils/db';
-import { setBadge } from './utils/icon';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
+import { popupTabs } from './utils/popup-tracker';
 import { getInjectedScripts } from './utils/preinject';
 import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
 import { resetValueOpener, addValueOpener } from './utils/values';
 import { clearRequestsByTabId } from './utils/requests';
 import './utils/clipboard';
 import './utils/hotkeys';
+import './utils/icon';
 import './utils/notifications';
 import './utils/script';
 import './utils/tabs';
 import './utils/tester';
 import './utils/update';
 
-let isApplied;
-const expose = {};
-
-const optionHandlers = {
-  autoUpdate,
-  expose(val) {
-    val::forEachEntry(([site, isExposed]) => {
-      expose[decodeURIComponent(site)] = isExposed;
-    });
-  },
-  isApplied(val) {
-    isApplied = val;
-  },
-  [SCRIPT_TEMPLATE](val, changes) {
-    resetScriptTemplate(changes);
-  },
-};
-
 hookOptions((changes) => {
-  changes::forEachEntry(function processChange([key, value]) {
-    const handler = optionHandlers[key];
-    if (handler) {
-      handler(value, changes);
-    } else if (key.includes('.')) {
-      objectSet({}, key, value)::forEachEntry(processChange);
-    }
-  });
+  if ('autoUpdate' in changes) {
+    autoUpdate();
+  }
+  if (SCRIPT_TEMPLATE in changes) {
+    resetScriptTemplate(changes);
+  }
   sendCmd('UpdateOptions', changes);
 });
 
@@ -62,29 +42,20 @@ Object.assign(commands, {
   },
   /** @return {Promise<Object>} */
   async GetInjected(_, src) {
-    const { frameId, tab, url } = src;
+    const { frameId, url, tab: { id: tabId } } = src;
     if (!frameId) {
-      resetValueOpener(tab.id);
-      clearRequestsByTabId(tab.id);
+      resetValueOpener(tabId);
+      clearRequestsByTabId(tabId);
     }
-    const res = {
-      expose: !frameId && url.startsWith('https://') && expose[url.split('/', 3)[2]],
-    };
-    if (isApplied) {
-      const data = await getInjectedScripts(url, tab.id, frameId);
-      addValueOpener(tab.id, frameId, data.withValueIds);
-      const badgeData = [data.enabledIds, src];
-      setBadge(...badgeData);
-      // FF bug: the badge is reset because sometimes tabs get their real/internal url later
-      if (ua.isFirefox) cache.put(`badge:${tab.id}${url}`, badgeData);
-      Object.assign(res, data.inject);
-      // Injecting known content mode scripts without waiting for InjectionFeedback
-      const inContent = res.scripts.map(s => !s.code && [s.dataKey, true]).filter(Boolean);
-      if (inContent.length) {
-        // executeScript is slow (in FF at least) so this will run after the response is sent
-        Promise.resolve().then(() => commands.InjectionFeedback(inContent, src));
-      }
+    const res = await getInjectedScripts(url, tabId, frameId);
+    const { feedback, gmVal } = res._tmp;
+    res.isPopupShown = popupTabs[tabId];
+    // Injecting known content scripts without waiting for InjectionFeedback message.
+    // Running in a separate task because it may take a long time to serialize data.
+    if (feedback.length) {
+      setTimeout(commands.InjectionFeedback, 0, { feedback }, src);
     }
+    addValueOpener(tabId, frameId, gmVal);
     return res;
   },
   /** @return {Promise<Object>} */
@@ -154,7 +125,6 @@ initialize(() => {
         handleCommandMessage(...args).catch(e => { throw e instanceof Error ? e : new Error(e); }))
       : handleCommandMessage,
   );
-  ['expose', 'isApplied'].forEach(key => optionHandlers[key](getOption(key)));
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
   checkRemove();
