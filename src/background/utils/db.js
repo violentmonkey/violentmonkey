@@ -15,9 +15,10 @@ import { commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
 import './storage-fetch';
+import dataCache from './cache';
 
 const store = {};
-
+storage.base.setDataCache(dataCache);
 storage.script.onDump = (item) => {
   store.scriptMap[item.props.id] = item;
 };
