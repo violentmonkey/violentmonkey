@@ -157,8 +157,8 @@ const items = {
   'filtersPopup.hideDisabled': {
     enum: {
       '': i18n('optionPopupShowDisabled'),
-      hide: i18n('optionPopupHideDisabled'),
       group: i18n('optionPopupGroupDisabled'),
+      hide: i18n('optionPopupHideDisabled'),
     },
   },
   'filtersPopup.sort': {
