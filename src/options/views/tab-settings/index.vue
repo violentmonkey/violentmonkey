@@ -17,27 +17,33 @@
       <div class="ml-2c">
         <label>
           <locale-group i18n-key="labelPopupSort">
-            <select v-model="settings['filtersPopup.sort']">
-              <option value="exec" v-text="i18n('filterExecutionOrder')" />
-              <option value="alpha" v-text="i18n('filterAlphabeticalOrder')" />
+            <select v-for="opt in ['filtersPopup.sort']" v-model="settings[opt]" :key="opt">
+              <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
+                      :value="value" v-text="title" />
             </select>
           </locale-group>
         </label>
-        <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')" />
-        <setting-check name="filtersPopup.hideDisabled" :label="i18n('optionPopupHideDisabled')" />
+        <label>
+          <select v-for="opt in ['filtersPopup.hideDisabled']" v-model="settings[opt]" :key="opt">
+            <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
+                    :value="value" v-text="title" />
+          </select>
+        </label>
+        <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
+                       :disabled="!!settings['filtersPopup.hideDisabled']" />
       </div>
       <div class="mr-2c">
         <label>
           <span v-text="i18n('labelBadge')"></span>
-          <select v-model="settings.showBadge">
-            <option value="" v-text="i18n('labelBadgeNone')" />
-            <option value="unique" v-text="i18n('labelBadgeUnique')" />
-            <option value="total" v-text="i18n('labelBadgeTotal')" />
+          <select v-for="opt in ['showBadge']" v-model="settings[opt]" :key="opt">
+            <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
+                    :value="value" v-text="title" />
           </select>
         </label>
         <label>
           <span v-text="i18n('labelBadgeColors')"/>
-          <tooltip v-for="(title, name) in badgeColors" :key="name" :content="title">
+          <tooltip v-for="(title, name) in items.badgeColor.enum" :key="`bc:${name}`"
+                   :content="title">
             <input type="color" v-model="settings[name]">
           </tooltip>
           <button v-text="i18n('buttonReset')" v-show="isCustomBadgeColor" class="ml-1"
@@ -75,13 +81,9 @@
         <div>
           <label>
             <span v-text="i18n('labelInjectionMode')"></span>
-            <select v-model="settings.defaultInjectInto">
-              <option
-                v-for="option in injectIntoOptions"
-                :key="option"
-                :value="option"
-                v-text="option"
-              />
+            <select v-for="opt in ['defaultInjectInto']" v-model="settings[opt]" :key="opt">
+              <option v-for="(_, mode) in items[opt].enum" :key="`${opt}:${mode}`"
+                      :value="mode" v-text="mode" />
             </select>
             <a class="ml-1" href="https://violentmonkey.github.io/posts/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
           </label>
@@ -106,14 +108,10 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { debounce, i18n } from '#/common';
-import {
-  INJECT_AUTO,
-  INJECT_PAGE,
-  INJECT_CONTENT,
-} from '#/common/consts';
+import { debounce, hasOwnProperty, i18n } from '#/common';
+import { INJECT_AUTO, INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import SettingCheck from '#/common/ui/setting-check';
-import { forEachKey } from '#/common/object';
+import { forEachEntry, mapEntry } from '#/common/object';
 import options from '#/common/options';
 import optionsDefaults from '#/common/options-defaults';
 import hookSetting from '#/common/hook-setting';
@@ -128,45 +126,64 @@ import VmTemplate from './vm-template';
 import VmBlacklist from './vm-blacklist';
 import VmCss from './vm-css';
 
-const injectIntoOptions = [
-  INJECT_AUTO,
-  INJECT_PAGE,
-  INJECT_CONTENT,
-];
-const badgeColors = {
+const badgeColorEnum = {
   badgeColor: i18n('titleBadgeColor'),
   badgeColorBlocked: i18n('titleBadgeColorBlocked'),
 };
-const items = [
-  {
-    name: 'showBadge',
-    normalize(value) {
-      if (!value) return '';
-      return value === 'total' ? 'total' : 'unique';
-    },
-  },
-  {
-    name: 'autoUpdate',
+const badgeColorNames = Object.keys(badgeColorEnum);
+const badgeColorItem = {
+  enum: badgeColorEnum, // exposing to the template
+  normalize: (value, name) => (
+    /^#[0-9a-f]{6}$/i.test(value) ? value : optionsDefaults[name]
+  ),
+};
+const items = {
+  autoUpdate: {
     normalize: value => Math.max(0, Math.min(365, +value || 0)),
   },
-  {
-    name: 'defaultInjectInto',
-    normalize(value) {
-      return injectIntoOptions.includes(value) ? value : optionsDefaults.defaultInjectInto;
+  defaultInjectInto: {
+    enum: {
+      [INJECT_AUTO]: '',
+      [INJECT_PAGE]: '',
+      [INJECT_CONTENT]: '',
     },
   },
-  {
-    name: 'filtersPopup.sort',
-    normalize: value => value === 'exec' && value || 'alpha',
+  showBadge: {
+    enum: {
+      '': i18n('labelBadgeNone'),
+      unique: i18n('labelBadgeUnique'),
+      total: i18n('labelBadgeTotal'),
+    },
   },
-  ...['badgeColor', 'badgeColorBlocked'].map(name => ({
-    name,
-    normalize: value => (/^#[0-9a-f]{6}$/i.test(value) ? value : optionsDefaults[name]),
-  })),
-];
-const settings = {};
-items.forEach(({ name }) => {
-  settings[name] = null;
+  'filtersPopup.hideDisabled': {
+    enum: {
+      '': i18n('optionPopupShowDisabled'),
+      group: i18n('optionPopupGroupDisabled'),
+      hide: i18n('optionPopupHideDisabled'),
+    },
+  },
+  'filtersPopup.sort': {
+    enum: {
+      exec: i18n('filterExecutionOrder'),
+      alpha: i18n('filterAlphabeticalOrder'),
+    },
+  },
+};
+const normalizeEnum = (value, name) => (
+  items[name].enum::hasOwnProperty(value)
+    ? value
+    : Object.keys(items[name].enum)[0]
+);
+const getItemUpdater = (name, normalize) => (
+  debounce((value, oldValue) => {
+    value = normalize(value, name);
+    oldValue = normalize(oldValue, name);
+    if (value !== oldValue) options.set(name, value);
+  }, 300)
+);
+const settings = items::mapEntry(() => null);
+badgeColorNames.forEach(name => {
+  items[name] = badgeColorItem;
 });
 
 export default {
@@ -187,9 +204,8 @@ export default {
     return {
       showAdvanced: false,
       expose: null,
+      items,
       settings,
-      badgeColors,
-      injectIntoOptions,
     };
   },
   computed: {
@@ -197,29 +213,21 @@ export default {
       return global.chrome.windows?.onBoundsChanged ? null : this.i18n('optionEditorWindowHint');
     },
     isCustomBadgeColor() {
-      return Object.keys(badgeColors).some(name => settings[name] !== optionsDefaults[name]);
+      return badgeColorNames.some(name => settings[name] !== optionsDefaults[name]);
     },
   },
   methods: {
-    getUpdater({ name, normalize }) {
-      return (value, oldValue) => {
-        value = normalize(value);
-        oldValue = normalize(oldValue);
-        if (value !== oldValue) options.set(name, value);
-      };
-    },
     onResetBadgeColors() {
-      badgeColors::forEachKey(name => {
+      badgeColorNames.forEach(name => {
         settings[name] = optionsDefaults[name];
       });
     },
   },
   created() {
     this.revokers = [];
-    items.forEach((item) => {
-      const { name, normalize } = item;
-      this.revokers.push(hookSetting(name, val => { settings[name] = normalize(val); }));
-      this.$watch(() => settings[name], debounce(this.getUpdater(item), 300));
+    items::forEachEntry(([name, { normalize = normalizeEnum }]) => {
+      this.revokers.push(hookSetting(name, val => { settings[name] = normalize(val, name); }));
+      this.$watch(() => settings[name], getItemUpdater(name, normalize));
     });
     this.expose = Object.keys(options.get('expose')).map(k => [k, decodeURIComponent(k)]);
     // Preload zip.js when user visits settings tab

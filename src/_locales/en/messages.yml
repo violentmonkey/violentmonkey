@@ -533,6 +533,9 @@ menuInjectionFailedFix:
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Sub-frames only scripts
+menuMatchedDisabledScripts:
+  description: Label for menu listing matched disabled scripts when the option to group disabled scripts is selected.
+  message: Matched disabled scripts
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Matched scripts
@@ -671,9 +674,15 @@ optionEditorWindowSimple:
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Enabled first
+optionPopupGroupDisabled:
+  description: Option to group disabled scripts in popup.
+  message: Group disabled scripts
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Hide disabled
+  message: Hide disabled scripts
+optionPopupShowDisabled:
+  description: Option to show disabled scripts in popup.
+  message: Show disabled scripts
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Show enabled scripts first
