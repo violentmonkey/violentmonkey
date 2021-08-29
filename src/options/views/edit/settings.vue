@@ -16,24 +16,30 @@
       </label>
     </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
-    <div class="form-group">
-      <label v-text="i18n('labelRunAt')"></label>
-      <tooltip content="@run-at" placement="right">
-        <select v-model="custom.runAt">
-          <option value="" v-text="i18n('labelRunAtDefault')"></option>
-          <option value="document-start">document-start</option>
-          <option value="document-body">document-body</option>
-          <option value="document-end">document-end</option>
-          <option value="document-idle">document-idle</option>
-        </select>
-      </tooltip>
-    </div>
-    <div class="form-group" v-for="([ name, label ]) in textInputs" :key="name">
-      <label v-text="label"/>
-      <tooltip :content="`@${name}`" placement="right" class="mr-tooltip">
+    <tooltip content="@run-at" placement="right" class="form-group fit-width">
+      <label v-text="i18n('labelRunAt')"/>
+      <select v-model="custom.runAt">
+        <option value="" v-text="i18n('labelRunAtDefault')"></option>
+        <option value="document-start">document-start</option>
+        <option value="document-body">document-body</option>
+        <option value="document-end">document-end</option>
+        <option value="document-idle">document-idle</option>
+      </select>
+    </tooltip>
+    <tooltip content="@noframes" placement="right" class="form-group fit-width">
+      <label v-text="i18n('labelNoFrames')"/>
+      <select v-model="custom.noframes">
+        <option value="" v-text="i18n('labelRunAtDefault')"/>
+        <option value="0" v-text="i18n('genericOn')"/>
+        <option value="1" v-text="i18n('genericOff')"/>
+      </select>
+    </tooltip>
+    <tooltip v-for="([ name, label ]) in textInputs" :key="name"
+             :content="`@${name}`" placement="right"
+             class="form-group mr-tooltip">
+        <label v-text="label"/>
         <input type="text" v-model="custom[name]" :placeholder="placeholders[name]">
-      </tooltip>
-    </div>
+    </tooltip>
     <div class="form-group" v-for="([ name, orig, label ]) in textAreas" :key="name">
       <div>
         <span v-text="label"/>
@@ -103,6 +109,7 @@ export default {
 </script>
 
 <style>
+$leftColWidth: 11em;
 .edit-settings {
   &.edit-body { // using 2 classes to ensure we override .edit-body in index.vue
     column-width: 50em;
@@ -129,11 +136,19 @@ export default {
     &:not(.condensed) {
       > :nth-child(1) {
         display: flex;
-        flex: 0 0 11em;
+        flex: 0 0 $leftColWidth;
         flex-direction: column;
       }
-      > :nth-child(2) {
+      > :nth-child(2):not(select) {
         flex-grow: 1;
+      }
+    }
+    &.fit-width {
+      display: block;
+      width: fit-content;
+      > :nth-child(1) {
+        display: inline-block;
+        width: $leftColWidth;
       }
     }
   }
@@ -141,9 +156,7 @@ export default {
     text-decoration: underline;
   }
 }
-@media (min-width: 768px) {
-  .mr-tooltip {
-    margin-right: 10em;
-  }
+.mr-tooltip {
+  margin-right: 6em;
 }
 </style>
