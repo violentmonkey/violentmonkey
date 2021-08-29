@@ -70,8 +70,8 @@
         class="menu-item menu-area menu-group"
         :tabIndex="tabIndex"
         @click="toggleMenu(scope.name)">
-        <div class="flex-auto" v-text="scope.title" :data-totals="scope.totals" />
         <icon name="arrow" class="icon-collapse"></icon>
+        <div class="flex-auto" v-text="scope.title" :data-totals="scope.totals" />
       </div>
       <div class="submenu">
         <div
@@ -236,16 +236,26 @@ export default {
     injectionScopes() {
       const { sort, enabledFirst, hideDisabled } = this.options.filtersPopup;
       const isSorted = sort === 'alpha' || enabledFirst;
+      const { injectable } = store;
+      const groupDisabled = hideDisabled === 'group';
       return [
-        store.injectable && ['scripts', i18n('menuMatchedScripts')],
+        injectable && ['scripts', i18n('menuMatchedScripts'), groupDisabled || null],
+        injectable && groupDisabled && ['disabled', i18n('menuMatchedDisabledScripts'), false],
         ['frameScripts', i18n('menuMatchedFrameScripts')],
       ]
       .filter(Boolean)
-      .map(([name, title]) => {
-        let list = this.store[name];
+      .map(([name, title, groupByEnabled]) => {
+        let list = store[name] || store.scripts;
+        if (groupByEnabled != null) {
+          list = list.filter(script => !script.config.enabled === !groupByEnabled);
+        }
         const numTotal = list.length;
-        const numEnabled = list.reduce((num, script) => num + script.config.enabled, 0);
-        if (hideDisabled) list = list.filter(script => script.config.enabled);
+        const numEnabled = groupByEnabled == null
+          ? list.reduce((num, script) => num + script.config.enabled, 0)
+          : numTotal;
+        if (hideDisabled === 'hide' || hideDisabled === true) {
+          list = list.filter(script => script.config.enabled);
+        }
         list = list.map((script, i) => {
           const { config, custom, meta } = script;
           const scriptName = getScriptName(script);

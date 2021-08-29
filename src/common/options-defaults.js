@@ -29,14 +29,14 @@ export default {
   notifyUpdates: false,
   notifyUpdatesGlobal: false, // `true` ignores script.config.notifyUpdates
   version: null,
-  /** @type 'auto' | 'page' | 'content' */
+  /** @type {'auto' | 'page' | 'content'} */
   defaultInjectInto: INJECT_AUTO,
   filters: {
-    /** @type 'name' | 'code' | 'all' */
+    /** @type {'name' | 'code' | 'all'} */
     searchScope: 'name',
     /** @type boolean */
     showOrder: false,
-    /** @type 'exec' | 'alpha' | 'update' */
+    /** @type {'exec' | 'alpha' | 'update'} */
     sort: 'exec',
     /** @type boolean */
     viewSingleColumn: false,
@@ -44,10 +44,11 @@ export default {
     viewTable: false,
   },
   filtersPopup: {
-    /** @type 'exec' | 'alpha' */
+    /** @type {'exec' | 'alpha'} */
     sort: 'exec',
     enabledFirst: false,
-    hideDisabled: false,
+    /** @type {'' | 'hide' | 'group'} where '' = show */
+    hideDisabled: '',
   },
   editor: {
     lineWrapping: false,

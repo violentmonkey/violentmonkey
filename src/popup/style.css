@@ -19,12 +19,15 @@ $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
 
+$menuTitleBorderBottom: 1px dashed var(--fill-3);
+
 body {
   width: 320px;
   max-width: 100%;
   /* Latest Chrome renders an extra blank for a nonexistent scrollbar */
   overflow: hidden;
   background: var(--fill-0-5);
+  font-weight: normal;
   @media (min-width: 360px) {
     width: 100%;
   }
@@ -116,6 +119,9 @@ footer {
 .menu {
   background: var(--bg);
   border-top: 1px solid var(--fill-4);
+  &:not(.expand) + footer {
+    border-top: $menuTitleBorderBottom;
+  }
   &-item {
     position: relative;
     display: flex;
@@ -130,6 +136,11 @@ footer {
     }
     .icon {
       flex: 0 0 $iconSize;
+      &.icon-collapse {
+        flex: 0 0 $findIconSize;
+        width: $findIconSize;
+        height: $findIconSize;
+      }
     }
     > .icon:first-child {
       margin-right: $iconMR;
@@ -163,15 +174,16 @@ footer {
     }
   }
   &-group {
-    padding-left: $leftPaneWidth;
+    padding-left: $findIconML;
     & [data-totals]::after {
       content: ": " attr(data-totals);
     }
   }
   &.expand {
-    background: var(--fill-0-5);
+    background: var(--fill-1);
     > .submenu {
       display: block;
+      border-color: var(--fill-4);
     }
     .icon-collapse {
       transform: rotateZ(90deg);
@@ -185,7 +197,7 @@ footer {
   max-height: 30rem;
   overflow-y: auto;
   background: var(--bg);
-  border-top: 1px dashed var(--fill-2);
+  border-top: $menuTitleBorderBottom;
   > * {
     position: relative;
     .menu-item {
