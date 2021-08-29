@@ -29,7 +29,8 @@
                     :value="value" v-text="title" />
           </select>
         </label>
-        <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')" />
+        <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
+                       :disabled="!!settings['filtersPopup.hideDisabled']" />
       </div>
       <div class="mr-2c">
         <label>
