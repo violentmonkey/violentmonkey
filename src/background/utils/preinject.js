@@ -37,10 +37,10 @@ postInitialize.push(() => {
 });
 
 Object.assign(commands, {
-  async InjectionFeedback({ fbId, feedback, pageInjectable }, src) {
+  async InjectionFeedback({ feedId, feedback, pageInjectable }, src) {
     feedback.forEach(processFeedback, src);
-    if (fbId) {
-      const env = await cache.pop(fbId);
+    if (feedId) {
+      const env = await cache.pop(feedId);
       if (env) {
         const { scripts } = env;
         env.forceContent = !pageInjectable;
@@ -174,10 +174,10 @@ async function prepareScripts(url, tabId, frameId, isLate, res) {
   const { envDelayed, scripts } = data;
   const feedback = scripts.map(prepareScript, data).filter(Boolean);
   const more = envDelayed.promise;
-  const fbId = getUniqId(`${tabId}:${frameId}:`);
+  const feedId = getUniqId(`${tabId}:${frameId}:`);
   /** @namespace VMGetInjectedData */
   Object.assign(res, {
-    fbId,
+    feedId,
     hasMore: !!more,
     injectInto,
     scripts,
@@ -196,7 +196,7 @@ async function prepareScripts(url, tabId, frameId, isLate, res) {
   if (!isLate && browser.contentScripts) {
     registerScriptDataFF(data, res, url, !!frameId);
   }
-  if (more) cache.put(fbId, more);
+  if (more) cache.put(feedId, more);
   return res;
 }
 

@@ -107,7 +107,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
   });
   const moreData = sendCmd('InjectionFeedback', {
     feedback,
-    fbId: data.fbId,
+    feedId: data.feedId,
     pageInjectable: pageInjectable ?? (hasMore && checkInjectable()),
   });
   // saving while safe
