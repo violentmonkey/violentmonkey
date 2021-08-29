@@ -23,8 +23,9 @@
   },
   "devDependencies": {
     "@actions/core": "^1.2.6",
-    "@babel/plugin-proposal-function-bind": "^7.8.3",
-    "@babel/register": "^7.9.0",
+    "@babel/plugin-proposal-function-bind": "^7.14.5",
+    "@babel/register": "^7.15.3",
+    "@babel/runtime": "^7.15.3",
     "@gera2ld/locky": "^0.1.1",
     "@gera2ld/plaid": "~1.5.6",
     "@gera2ld/plaid-vue": "~1.5.5",
@@ -60,12 +61,10 @@
   "homepage": "https://github.com/violentmonkey/violentmonkey",
   "license": "MIT",
   "dependencies": {
-    "@babel/runtime": "^7.9.2",
     "@violentmonkey/shortcut": "^1.2.4",
-    "@zip.js/zip.js": "^2.2.26",
-    "codemirror": "5.62.1",
+    "@zip.js/zip.js": "^2.3.8",
+    "codemirror": "5.62.3",
     "codemirror-js-mixed": "^0.9.2",
-    "core-js": "^3.6.4",
     "tldjs": "^2.3.1",
     "vue": "^2.6.11",
     "vueleton": "^1.0.6"
