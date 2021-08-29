@@ -316,22 +316,23 @@ export async function getScriptsByURL(url, isTop) {
   };
 }
 
+/** @typedef {{ cache:{}, code:{}, require:{}, value:{} }} VMScriptByUrlData */
+const STORAGE_ROUTES = Object.entries({
+  cache: ENV_CACHE_KEYS,
+  code: 'ids',
+  require: ENV_REQ_KEYS,
+  value: ENV_VALUE_IDS,
+});
+
 async function readEnvironmentData(env) {
-  /** @typedef {{ cache:{}, code:{}, require:{}, value:{} }} VMScriptByUrlData */
-  const storageRoutes = [
-    ['cache', env[ENV_CACHE_KEYS]],
-    ['code', env.ids],
-    ['require', env[ENV_REQ_KEYS]],
-    ['value', env[ENV_VALUE_IDS], {}],
-  ];
   const keys = [].concat(
-    ...storageRoutes.map(([name, src]) => (
-      src.map(id => storage[name].getKey(id))
+    ...STORAGE_ROUTES.map(([name, src]) => (
+      env[src].map(id => storage[name].getKey(id))
     )),
   );
   const data = await storage.base.getMulti(keys);
-  storageRoutes.forEach(([name, src]) => {
-    env[name] = objectPick({}, src, (_, srcId) => (
+  STORAGE_ROUTES.forEach(([name, src]) => {
+    env[name] = objectPick({}, env[src], (_, srcId) => (
       data[storage[name].getKey(srcId)]
     ));
   });
