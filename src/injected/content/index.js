@@ -38,6 +38,7 @@ const { split } = '';
   // 1) bridge.post may be overridden in injectScripts
   // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
   bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
+  bridge.ids = data.ids;
   bridge.isFirefox = data.info.isFirefox;
   bridge.injectInto = data.injectInto;
   if (data.scripts) injectScripts(contentId, webId, data, isXml);

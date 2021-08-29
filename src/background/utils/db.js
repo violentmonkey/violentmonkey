@@ -268,7 +268,7 @@ export async function getScriptsByURL(url, isTop) {
       && (isTop || !(script.custom.noframes ?? script.meta.noframes))
       && testScript(url, script)
     ));
-  const allIds = [];
+  const disabledIds = [];
   /** @namespace VMScriptByUrlData */
   const [envStart, envDelayed] = [0, 1].map(() => ({
     ids: [],
@@ -280,8 +280,10 @@ export async function getScriptsByURL(url, isTop) {
   }));
   allScripts.forEach((script) => {
     const { id } = script.props;
-    allIds.push(id);
-    if (!script.config.enabled) return;
+    if (!script.config.enabled) {
+      disabledIds.push(id);
+      return;
+    }
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
@@ -311,7 +313,7 @@ export async function getScriptsByURL(url, isTop) {
   return {
     ...envStart,
     ...await readEnvironmentData(envStart),
-    allIds,
+    disabledIds,
     envDelayed,
   };
 }

@@ -48,14 +48,14 @@ Object.assign(commands, {
       clearRequestsByTabId(tabId);
     }
     const res = await getInjectedScripts(url, tabId, frameId);
-    const { feedback, gmVal } = res._tmp;
+    const { feedback, valOpIds } = res._tmp;
     res.isPopupShown = popupTabs[tabId];
     // Injecting known content scripts without waiting for InjectionFeedback message.
     // Running in a separate task because it may take a long time to serialize data.
     if (feedback.length) {
       setTimeout(commands.InjectionFeedback, 0, { feedback }, src);
     }
-    addValueOpener(tabId, frameId, gmVal);
+    addValueOpener(tabId, frameId, valOpIds);
     return res;
   },
   /** @return {Promise<Object>} */

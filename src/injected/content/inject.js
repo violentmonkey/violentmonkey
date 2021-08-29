@@ -8,7 +8,6 @@ import {
 } from '../utils/helpers';
 import bridge from './bridge';
 
-const { window } = global;
 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
 const VMInitInjection = window[process.env.INIT_FUNC_NAME];
 // To avoid running repeatedly due to new `document.documentElement`
@@ -17,7 +16,7 @@ defineProperty(window, process.env.INIT_FUNC_NAME, { value: 1 });
 
 const stringIncludes = ''.includes;
 const resolvedPromise = Promise.resolve();
-
+const { runningIds } = bridge;
 let contLists;
 let pgLists;
 /** @type {Object<string,VMInjectionRealm>} */
@@ -31,6 +30,7 @@ bridge.addHandlers({
   // FF bug workaround to enable processing of sourceURL in injected page scripts
   InjectList: injectList,
   Run(id, realm) {
+    runningIds::push(id);
     bridge.ids::push(id);
     if (realm === INJECT_CONTENT) {
       bridge.invokableIds::push(id);
@@ -42,10 +42,10 @@ bridge.addHandlers({
 });
 
 function throttledSetBadge() {
-  const num = bridge.ids.length;
+  const num = runningIds.length;
   if (numBadgesSent < num) {
     numBadgesSent = num;
-    return sendCmd('SetBadge', bridge.ids)::then(() => {
+    return sendCmd('SetBadge', runningIds)::then(() => {
       badgePromise = throttledSetBadge();
     });
   }
@@ -100,7 +100,6 @@ export async function injectScripts(contentId, webId, data, isXml) {
       realmData.lists[script.runAt].push(script); // 'start' or 'body' per getScriptsByURL()
       realmData.is = true;
     } else {
-      bridge.ids.push(id);
       bridge.failedIds.push(id);
     }
     return [script.dataKey, realm === INJECT_CONTENT];

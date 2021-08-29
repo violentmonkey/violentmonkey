@@ -177,10 +177,11 @@ async function prepareScripts(url, tabId, frameId, isLate, res) {
   const feedId = getUniqId(`${tabId}:${frameId}:`);
   /** @namespace VMGetInjectedData */
   Object.assign(res, {
-    feedId,
-    hasMore: !!more,
+    feedId, // InjectionFeedback id for envDelayed
     injectInto,
     scripts,
+    hasMore: !!more, // tells content bridge to expect envDelayed
+    ids: data.disabledIds, // content bridge adds the actually running ids and sends via SetPopup
     info: {
       cache: data.cache,
       isFirefox: ua.isFirefox,
@@ -190,7 +191,7 @@ async function prepareScripts(url, tabId, frameId, isLate, res) {
   Object.defineProperty(res, '_tmp', {
     value: {
       feedback,
-      gmVal: data[ENV_VALUE_IDS].concat(envDelayed[ENV_VALUE_IDS]), // modifying in-place
+      valOpIds: [...data[ENV_VALUE_IDS], ...envDelayed[ENV_VALUE_IDS]],
     },
   });
   if (!isLate && browser.contentScripts) {
