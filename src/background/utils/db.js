@@ -4,7 +4,7 @@ import {
 import {
   CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK,
 } from '#/common/consts';
-import { forEachEntry, forEachKey, forEachValue, objectPick } from '#/common/object';
+import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
 import storage from '#/common/storage';
 import ua from '#/common/ua';
 import pluginEvents from '../plugin/events';
@@ -316,7 +316,10 @@ export async function getScriptsByURL(url, isTop) {
   };
 }
 
-/** @typedef {{ cache:{}, code:{}, require:{}, value:{} }} VMScriptByUrlData */
+/**
+ * Object keys == areas in `storage` module.
+ * @namespace VMScriptByUrlData
+ */
 const STORAGE_ROUTES = Object.entries({
   cache: ENV_CACHE_KEYS,
   code: 'ids',
@@ -325,16 +328,18 @@ const STORAGE_ROUTES = Object.entries({
 });
 
 async function readEnvironmentData(env) {
-  const keys = [].concat(
-    ...STORAGE_ROUTES.map(([name, src]) => (
-      env[src].map(id => storage[name].getKey(id))
-    )),
-  );
+  const keys = [];
+  STORAGE_ROUTES.forEach(([area, srcIds]) => {
+    env[srcIds].forEach(id => {
+      keys.push(storage[area].getKey(id));
+    });
+  });
   const data = await storage.base.getMulti(keys);
-  STORAGE_ROUTES.forEach(([name, src]) => {
-    env[name] = objectPick({}, env[src], (_, srcId) => (
-      data[storage[name].getKey(srcId)]
-    ));
+  STORAGE_ROUTES.forEach(([area, srcIds]) => {
+    env[area] = {};
+    env[srcIds].forEach(id => {
+      env[area][id] = data[storage[area].getKey(id)];
+    });
   });
   return env;
 }
