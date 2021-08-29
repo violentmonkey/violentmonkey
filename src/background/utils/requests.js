@@ -486,11 +486,35 @@ const blacklistRe = new RegExp(`^https://(${
   ].join('|')
 })/`);
 
+const resolveVirtualUrl = url => (
+  `${extensionRoot}options/index.html#scripts/${+url.split('#')[1]}`
+);
+// FF can't intercept virtual .user.js URL via webRequest, so we redirect it explicitly
+const virtualUrlRe = ua.isFirefox && new RegExp((
+  `^(view-source:)?(${extensionRoot.replace('://', '$&)?')}[^/]*\\.user\\.js#\\d+`
+));
+const maybeRedirectVirtualUrlFF = virtualUrlRe && ((tabId, src) => {
+  if (virtualUrlRe.test(src)) {
+    browser.tabs.update(tabId, { url: resolveVirtualUrl(src) });
+  }
+});
+if (virtualUrlRe) {
+  const listener = (tabId, { url }) => url && maybeRedirectVirtualUrlFF(tabId, url);
+  const apiEvent = browser.tabs.onUpdated;
+  const addListener = apiEvent.addListener.bind(apiEvent, listener);
+  try { addListener({ properties: ['url'] }); } catch (e) { addListener(); }
+}
+
 browser.tabs.onCreated.addListener((tab) => {
-  // FF 68+ can't read file URLs directly so we need to keep the tab open
-  if (/\.user\.js([?#]|$)/.test(tab.pendingUrl || tab.url)
-  && !(ua.isFirefox >= 68 && tab.url.startsWith('file:'))) {
-    cache.put(`autoclose:${tab.id}`, true, 10e3);
+  const { id, title, url } = tab;
+  /* Determining if this tab can be auto-closed (replaced, actually).
+     FF>=68 allows reading file: URL only in the tab's content script so the tab must stay open. */
+  if ((!url.startsWith('file:') || ua.isFirefox < 68)
+      && /\.user\.js([?#]|$)/.test(tab.pendingUrl || url)) {
+    cache.put(`autoclose:${id}`, true, 10e3);
+  }
+  if (virtualUrlRe && url === 'about:blank') {
+    maybeRedirectVirtualUrlFF(id, title);
   }
 });
 
@@ -501,9 +525,7 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
   }
   // open a real URL for simplified userscript URL listed in devtools of the web page
   if (url.startsWith(extensionRoot)) {
-    const id = +url.split('#').pop();
-    const redirectUrl = `${extensionRoot}options/index.html#scripts/${id}`;
-    return { redirectUrl };
+    return { redirectUrl: resolveVirtualUrl(url) };
   }
   if (!cache.has(`bypass:${url}`)
   && (!blacklistRe.test(url) || whitelistRe.test(url))) {
