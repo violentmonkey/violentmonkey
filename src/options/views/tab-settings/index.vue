@@ -30,7 +30,7 @@
           </select>
         </label>
         <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
-                       :disabled="!!settings['filtersPopup.hideDisabled']" />
+                       v-show="!settings['filtersPopup.hideDisabled']" />
       </div>
       <div class="mr-2c">
         <label>
