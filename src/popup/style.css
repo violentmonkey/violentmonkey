@@ -19,8 +19,6 @@ $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
 
-$menuTitleBorderBottom: 1px dashed var(--fill-3);
-
 body {
   width: 320px;
   max-width: 100%;
@@ -118,9 +116,8 @@ footer {
 
 .menu {
   background: var(--bg);
-  border-top: 1px solid var(--fill-4);
-  &:not(.expand) + footer {
-    border-top: $menuTitleBorderBottom;
+  &, &:not(.expand) + footer {
+    border-top: 1px solid var(--fill-4);
   }
   &-item {
     position: relative;
@@ -175,6 +172,7 @@ footer {
   }
   &-group {
     padding-left: $findIconML;
+    color: slategray;
     & [data-totals]::after {
       content: ": " attr(data-totals);
     }
@@ -197,7 +195,7 @@ footer {
   max-height: 30rem;
   overflow-y: auto;
   background: var(--bg);
-  border-top: $menuTitleBorderBottom;
+  border-top: 1px dashed var(--fill-3);
   > * {
     position: relative;
     .menu-item {
