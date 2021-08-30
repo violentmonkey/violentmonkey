@@ -393,6 +393,9 @@ labelMatch:
 labelName:
   description: Label of script name.
   message: 'Nazwa skryptu:'
+labelNoFrames:
+  description: Label of script @noframes properties in custom meta data.
+  message: ''
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Bez nazwy
@@ -546,6 +549,11 @@ menuInjectionFailed:
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
   message: Spróbuj ponownie w trybie „auto”
+menuMatchedDisabledScripts:
+  description: >-
+    Label for menu listing matched disabled scripts when the option to group
+    disabled scripts is selected.
+  message: ''
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Skrypty tylko w ramkach
@@ -691,9 +699,15 @@ optionEditorWindowSimple:
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Najpierw włączone
+optionPopupGroupDisabled:
+  description: Option to group disabled scripts in popup.
+  message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Ukryj wyłączone
+optionPopupShowDisabled:
+  description: Option to show disabled scripts in popup.
+  message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Pokazuj najpierw włączone skrypty
