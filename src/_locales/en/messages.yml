@@ -271,6 +271,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Check for script updates every $1 day(s), use 0 to disable'
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: Backup
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Display on badge: '

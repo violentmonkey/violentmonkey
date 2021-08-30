@@ -1,6 +1,5 @@
 <template>
-  <section>
-    <h3 v-text="i18n('labelDataExport')"></h3>
+  <div>
     <button v-text="i18n('buttonExportData')" @click="handleExport" :disabled="exporting"></button>
     <div class="mt-1">
       <setting-check name="exportValues" :label="i18n('labelExportScriptData')" />
@@ -17,7 +16,7 @@
         </a>
       </div>
     </modal>
-  </section>
+  </div>
 </template>
 
 <script>

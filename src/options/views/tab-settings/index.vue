@@ -67,8 +67,11 @@
                        class="ml-2" />
       </div>
     </section>
-    <vm-import></vm-import>
-    <vm-export></vm-export>
+    <section class="mb-2c">
+      <h3 v-text="i18n('labelBackup')" />
+      <vm-import></vm-import>
+      <vm-export></vm-export>
+    </section>
     <vm-sync></vm-sync>
     <div class="show-advanced">
       <button @click="showAdvanced = !showAdvanced">
