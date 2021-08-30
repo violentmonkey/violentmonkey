@@ -19,6 +19,8 @@ $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
 
+$footerHeight: 40px;
+
 body {
   width: 320px;
   max-width: 100%;
@@ -48,8 +50,8 @@ a {
 }
 
 footer {
-  height: 40px;
-  line-height: 40px;
+  height: $footerHeight;
+  line-height: $footerHeight;
   text-align: center;
   font-size: $fontSize;
   color: var(--fill-6);
@@ -68,6 +70,7 @@ footer {
 
 .menu-area {
   cursor: pointer;
+  &:hover,
   &:focus {
     background: cornflowerblue;
     color: var(--bg);
@@ -162,8 +165,13 @@ footer {
   }
   &-find {
     padding-left: 0;
-    /* using the same selector as above to override it */
-    > .icon:first-child {
+    cursor: default;
+    a {
+      display: flex;
+      align-items: center;
+      align-self: stretch;
+    }
+    .icon {
       flex-basis: $findIconSize;
       width: $findIconSize;
       height: $findIconSize;
@@ -172,7 +180,7 @@ footer {
   }
   &-group {
     padding-left: $findIconML;
-    color: slategray;
+    color: steelblue;
     & [data-totals]::after {
       content: ": " attr(data-totals);
     }
@@ -243,11 +251,11 @@ footer {
   padding: 4px $padding;
   word-wrap: break-word;
   font-size: $fontSize;
-  line-height: 1;
+  line-height: 1.2; /* lower values cut descender in "g" */
   background: var(--fill-0-5);
   border: 1px solid var(--fill-2);
   > div {
-    max-height: 2em;
+    max-height: $footerHeight;
     overflow: hidden;
   }
 }
