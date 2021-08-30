@@ -40,12 +40,14 @@
       </span>
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
-      <div
-        class="menu-item menu-area menu-find"
-        :tabIndex="tabIndex"
-        @click="onFindSameDomainScripts">
-        <icon name="search"></icon>
-        <div class="flex-1" v-text="i18n('menuFindScripts')"></div>
+      <div class="menu-item menu-area menu-find" :tabIndex="tabIndex">
+        <template v-for="(url, text, i) in findUrls">
+          <a :key="url" target="_blank" :class="{ ellipsis: !i, 'mr-1': !i, 'ml-1': i }"
+             :href="url" :data-message="url.split('://')[1]">
+            <icon name="search" v-if="!i"/>{{text}}
+          </a>
+          <template v-if="!i">/</template>
+        </template>
       </div>
     </div>
     <div class="failure-reason" v-if="failureReasonText">
@@ -301,6 +303,13 @@ export default {
         || ''
       );
     },
+    findUrls() {
+      const query = encodeURIComponent(store.domain);
+      return {
+        [`${i18n('menuFindScripts')} (GF)`]: `https://greasyfork.org/scripts/by-site/${query}`,
+        OUJS: `https://openuserjs.org/?q=${query}`,
+      };
+    },
     tabIndex() {
       return this.activeExtras ? -1 : 0;
     },
@@ -342,12 +351,6 @@ export default {
     },
     onEditScript(item) {
       sendCmd('OpenEditor', item.data.props.id);
-      window.close();
-    },
-    onFindSameDomainScripts() {
-      sendCmd('TabOpen', {
-        url: `https://greasyfork.org/scripts/by-site/${encodeURIComponent(this.store.domain)}`,
-      });
       window.close();
     },
     onCommand(evt) {

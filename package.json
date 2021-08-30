@@ -62,7 +62,7 @@
   "license": "MIT",
   "dependencies": {
     "@violentmonkey/shortcut": "^1.2.4",
-    "@zip.js/zip.js": "^2.3.8",
+    "@zip.js/zip.js": "^2.3.9",
     "codemirror": "5.62.3",
     "codemirror-js-mixed": "^0.9.2",
     "tldjs": "^2.3.1",

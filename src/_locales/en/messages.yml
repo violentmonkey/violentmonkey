@@ -381,7 +381,7 @@ labelName:
   message: 'Name:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: "Run in frames: "
+  message: 'Run in frames: '
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: No Name
@@ -533,12 +533,14 @@ menuInjectionFailed:
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
   message: Retry in "auto" mode
+menuMatchedDisabledScripts:
+  description: >-
+    Label for menu listing matched disabled scripts when the option to group
+    disabled scripts is selected.
+  message: Matched disabled scripts
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Sub-frames only scripts
-menuMatchedDisabledScripts:
-  description: Label for menu listing matched disabled scripts when the option to group disabled scripts is selected.
-  message: Matched disabled scripts
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Matched scripts

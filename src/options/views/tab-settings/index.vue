@@ -7,12 +7,13 @@
         <setting-check name="autoReload" :label="i18n('labelAutoReloadCurrentTab')" />
       </div>
       <div>
-        <setting-check name="editorWindow" class="mr-2">
+        <setting-check name="editorWindow" class="mr-2" ref="EW">
           <tooltip :content="editorWindowHint" :disabled="!editorWindowHint">
             <span v-text="i18n('optionEditorWindow')"></span>
           </tooltip>
         </setting-check>
-        <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')" />
+        <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')"
+                       v-show="($refs.EW || {}).value"/>
       </div>
       <div class="ml-2c">
         <label>
@@ -30,7 +31,7 @@
           </select>
         </label>
         <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
-                       :disabled="!!settings['filtersPopup.hideDisabled']" />
+                       v-show="!settings['filtersPopup.hideDisabled']" />
       </div>
       <div class="mr-2c">
         <label>

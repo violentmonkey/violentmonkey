@@ -384,6 +384,9 @@ labelMatch:
 labelName:
   description: Label of script name.
   message: 'Nama:'
+labelNoFrames:
+  description: Label of script @noframes properties in custom meta data.
+  message: ''
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Tanpa Nama
@@ -535,6 +538,11 @@ menuInjectionFailed:
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
   message: Ulangi dalam mode "otomatis"
+menuMatchedDisabledScripts:
+  description: >-
+    Label for menu listing matched disabled scripts when the option to group
+    disabled scripts is selected.
+  message: ''
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Skrip hanya sub-frame
@@ -680,9 +688,15 @@ optionEditorWindowSimple:
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Aktif di atas
+optionPopupGroupDisabled:
+  description: Option to group disabled scripts in popup.
+  message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Sembunyikan nonaktif
+optionPopupShowDisabled:
+  description: Option to show disabled scripts in popup.
+  message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Tampilkan skrip aktif di atas
