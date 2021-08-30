@@ -9,7 +9,7 @@ buttonConfirmInstallation:
   message: Confirmă instalarea
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: ''
+  message: Confirmă reinstalarea
 buttonDisable:
   description: Button to disable a script.
   message: Dezactivează
@@ -192,9 +192,11 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: |-
+  message: >-
     Violentmonkey nu poate rula userscripturi în această pagină
-    (exemple uzuale: interfața de utilizator a browserului sau o extensie)
+
+    (exemple uzuale: interfața de utilizator a browserului, o extensie, blocat
+    via politici, un site al unui motor de căutare în Opera)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordinea alfabetică
@@ -289,7 +291,7 @@ labelBadge:
   message: 'Afișează pe insignă: '
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 'Culori pentru insignă:'
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: nimic
@@ -392,6 +394,9 @@ labelMatch:
 labelName:
   description: Label of script name.
   message: 'Nume:'
+labelNoFrames:
+  description: Label of script @noframes properties in custom meta data.
+  message: ''
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Fără nume
@@ -421,7 +426,7 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: Reinstalarea scriptului
 labelRelated:
   description: Label of related links.
   message: 'Linkuri relevante: '
@@ -451,7 +456,7 @@ labelSettings:
   message: Setări
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Afișează pozițiile ordinii executării
 labelSync:
   description: Label for sync options.
   message: Sincronizare
@@ -544,9 +549,14 @@ menuInjectionFailed:
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
   message: Reîncearcă în modul „auto”
+menuMatchedDisabledScripts:
+  description: >-
+    Label for menu listing matched disabled scripts when the option to group
+    disabled scripts is selected.
+  message: ''
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: Numai scripturi în sub-frame-uri
+  message: Scripturi numai pentru sub-frame-uri
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Scripturi coincidente
@@ -632,7 +642,7 @@ msgNoUpdate:
   message: Nu au fost găsite actualizări.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: (codul este la fel)
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Lista neagră este actualizată.
@@ -691,9 +701,15 @@ optionEditorWindowSimple:
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Mai întâi cele activate
+optionPopupGroupDisabled:
+  description: Option to group disabled scripts in popup.
+  message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Ascunde-le pe cele dezactivate
+optionPopupShowDisabled:
+  description: Option to show disabled scripts in popup.
+  message: ''
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Afișează mai întâi scripturile activate
@@ -714,10 +730,12 @@ sideMenuSettings:
   message: Setări
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: Culoare normală a insignei
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: >-
+    Culoarea insignei atunci când site-ul este neinjectabil (pe lista neagră sau
+    nesuportat)
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Actualizare
