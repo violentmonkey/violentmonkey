@@ -180,7 +180,10 @@ footer {
   }
   &-group {
     padding-left: $findIconML;
-    color: steelblue;
+    color: #4a7792;
+    @media (prefers-color-scheme: dark) {
+      color: #eee;
+    }
     & [data-totals]::after {
       content: ": " attr(data-totals);
     }
