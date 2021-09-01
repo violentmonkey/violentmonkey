@@ -40,7 +40,7 @@
           <span class="ellipsis" v-else v-text="author.name" />
         </tooltip>
         <tooltip class="hidden-sm ml-1c" :content="updatedAt.title" align="end">
-          <span v-text="script.meta.version ? `v${script.meta.version}` : ''"></span>
+          <span class="ellipsis" v-text="script.meta.version ? `v${script.meta.version}` : ''"/>
           <span v-text="updatedAt.show"></span>
         </tooltip>
         <div v-if="script.config.removed">
@@ -313,6 +313,7 @@ $removedItemHeight: calc(
     transition: none;
   }
   background: var(--bg);
+  width: calc((100% - $itemMargin) / var(--num-columns) - $itemMargin);
   height: $itemHeight;
   &:hover {
     border-color: var(--fill-5);
@@ -424,6 +425,7 @@ $removedItemHeight: calc(
   &-author {
     display: flex;
     align-items: center;
+    max-width: 30%;
     > .ellipsis {
       display: inline-block;
       max-width: 100px;
@@ -457,16 +459,14 @@ $removedItemHeight: calc(
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  padding: 0 $itemMargin $itemMargin 0;
-  .script {
-    // --num-columns is set in tab-installed.vue
-    width: calc(100% / var(--num-columns) - $itemMargin);
-  }
+  padding: 0 0 $itemMargin 0;
   &[data-table] {
-    &[data-columns="1"] .script {
-      margin: 0;
+    &[data-columns="1"] .script,
+    &[data-columns="2"] .script:nth-child(odd),
+    &[data-columns="3"] .script:nth-child(3n + 1),
+    &[data-columns="4"] .script:nth-child(4n + 1) {
       border-left: none;
-      border-right: none;
+      margin-left: 0;
     }
     &[data-columns="1"], &[data-columns="3"] {
       .script:nth-child(even) {
@@ -491,11 +491,24 @@ $removedItemHeight: calc(
       display: flex;
       align-items: center;
       height: 2.5rem;
-      margin: 0 0 0 $itemMargin;
+      // --num-columns is set in tab-installed.vue
+      width: calc((100% - $itemMargin * (var(--num-columns) - 1)) / var(--num-columns));
+      margin: -1px 0 0 $itemMargin;
       padding: 0 calc(2 * $itemMargin) 0 $itemMargin;
-      border-top: none;
       border-radius: 0;
       background: none;
+      &:hover::after {
+        // using a separate element with z-index higher than a sibling's overlapped border
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        right: -1px;
+        bottom: -1px;
+        border: 1px solid var(--fill-6);
+        pointer-events: none;
+        z-index: 99999999;
+      }
       &-name {
         cursor: pointer;
       }
