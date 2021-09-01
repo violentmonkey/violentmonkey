@@ -1,13 +1,15 @@
-import { getScriptName, getUniqId } from '#/common';
-import { INJECT_CONTENT, INJECTABLE_TAB_URL_RE, METABLOCK_RE } from '#/common/consts';
+import { getScriptName, getUniqId, hasOwnProperty } from '#/common';
+import {
+  INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECTABLE_TAB_URL_RE, METABLOCK_RE,
+} from '#/common/consts';
 import initCache from '#/common/cache';
+import { forEachEntry, objectSet } from '#/common/object';
 import storage from '#/common/storage';
 import ua from '#/common/ua';
-import { getScriptsByURL } from './db';
+import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_VALUE_IDS } from './db';
 import { extensionRoot, postInitialize } from './init';
 import { commands } from './message';
 import { getOption, hookOptions } from './options';
-import { popupTabs } from './popup-tracker';
 
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
@@ -19,44 +21,58 @@ const TIME_KEEP_DATA = 60e3; // 100ms should be enough but the tab may hang or g
 const cacheCode = initCache({ lifetime: TIME_KEEP_DATA });
 const cache = initCache({
   lifetime: TIME_KEEP_DATA,
-  async onDispose(promise) {
-    const data = await promise;
-    data.unregister?.();
-  },
+  onDispose: async promise => (await promise).rcsPromise?.unregister(),
 });
+const KEY_EXPOSE = 'expose';
+const KEY_INJECT_INTO = 'defaultInjectInto';
+const KEY_IS_APPLIED = 'isApplied';
+const expose = {};
+let isApplied;
 let injectInto;
-hookOptions(changes => {
-  injectInto = changes.defaultInjectInto ?? injectInto;
-  if ('isApplied' in changes) togglePreinject(changes.isApplied);
-});
+hookOptions(onOptionChanged);
 postInitialize.push(() => {
-  injectInto = getOption('defaultInjectInto');
-  togglePreinject(getOption('isApplied'));
+  for (const key of [KEY_EXPOSE, KEY_INJECT_INTO, KEY_IS_APPLIED]) {
+    onOptionChanged({ [key]: getOption(key) });
+  }
 });
 
 Object.assign(commands, {
-  InjectionFeedback(feedback, { tab, frameId }) {
-    feedback.forEach(([key, needsInjection]) => {
-      const code = cacheCode.pop(key);
-      // see TIME_KEEP_DATA comment
-      if (needsInjection && code) {
-        browser.tabs.executeScript(tab.id, {
-          code,
-          frameId,
-          runAt: 'document_start',
-        });
+  async InjectionFeedback({ feedId, feedback, pageInjectable }, src) {
+    feedback.forEach(processFeedback, src);
+    if (feedId) {
+      const env = await cache.pop(feedId);
+      if (env) {
+        const { scripts } = env;
+        env.forceContent = !pageInjectable;
+        scripts.map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
+        return {
+          info: { cache: env.cache },
+          scripts,
+        };
       }
-    });
+    }
   },
 });
 
-// Keys of the object returned by getScriptsByURL()
+/** @this {chrome.runtime.MessageSender} */
+function processFeedback([key, needsInjection]) {
+  const code = cacheCode.pop(key);
+  // see TIME_KEEP_DATA comment
+  if (needsInjection && code) {
+    browser.tabs.executeScript(this.tab.id, {
+      code,
+      frameId: this.frameId,
+      runAt: 'document_start',
+    });
+  }
+}
+
 const propsToClear = {
-  [storage.cache.prefix]: 'cacheKeys',
+  [storage.cache.prefix]: ENV_CACHE_KEYS,
   [storage.code.prefix]: true,
-  [storage.require.prefix]: 'reqKeys',
+  [storage.require.prefix]: ENV_REQ_KEYS,
   [storage.script.prefix]: true,
-  [storage.value.prefix]: 'withValueIds',
+  [storage.value.prefix]: ENV_VALUE_IDS,
 };
 
 browser.storage.onChanged.addListener(async changes => {
@@ -71,13 +87,37 @@ browser.storage.onChanged.addListener(async changes => {
         || data[prop]?.includes(prefix === storage.value.prefix ? +key : key);
     }));
   if (dirty) {
-    clearCache();
+    cache.destroy();
   }
 });
 
-function clearCache() {
-  cacheCode.destroy();
-  cache.destroy();
+function normalizeInjectInto(value) {
+  return INJECT_MAPPING::hasOwnProperty(value)
+    ? value
+    : injectInto || INJECT_AUTO;
+}
+
+function onOptionChanged(changes) {
+  changes::forEachEntry(([key, value]) => {
+    switch (key) {
+    case KEY_INJECT_INTO:
+      injectInto = normalizeInjectInto(value);
+      cache.destroy();
+      break;
+    case KEY_IS_APPLIED:
+      togglePreinject(value);
+      break;
+    case KEY_EXPOSE:
+      value::forEachEntry(([site, isExposed]) => {
+        expose[decodeURIComponent(site)] = isExposed;
+      });
+      break;
+    default:
+      if (key.includes('.')) { // used by `expose.url`
+        onOptionChanged(objectSet({}, key, value));
+      }
+    }
+  });
 }
 
 /** @return {Promise<Object>} */
@@ -90,16 +130,17 @@ function getKey(url, isTop) {
 }
 
 function togglePreinject(enable) {
+  isApplied = enable;
   // Using onSendHeaders because onHeadersReceived in Firefox fires *after* content scripts.
   // And even in Chrome a site may be so fast that preinject on onHeadersReceived won't be useful.
   const onOff = `${enable ? 'add' : 'remove'}Listener`;
   const config = enable ? API_CONFIG : undefined;
-  browser.webRequest.onSendHeaders[onOff](preinject, config);
-  browser.webRequest.onHeadersReceived[onOff](prolong, config);
-  clearCache();
+  browser.webRequest.onSendHeaders[onOff](onSendHeaders, config);
+  browser.webRequest.onHeadersReceived[onOff](onHeadersReceived, config);
+  cache.destroy();
 }
 
-function preinject({ url, tabId, frameId }) {
+function onSendHeaders({ url, tabId, frameId }) {
   if (!INJECTABLE_TAB_URL_RE.test(url)) return;
   const isTop = !frameId;
   const key = getKey(url, isTop);
@@ -111,34 +152,66 @@ function preinject({ url, tabId, frameId }) {
   }
 }
 
-function prolong({ url, frameId }) {
-  cache.hit(getKey(url, !frameId), TIME_AFTER_RECEIVE);
+/** @param {chrome.webRequest.WebResponseHeadersDetails} info */
+function onHeadersReceived(info) {
+  cache.hit(getKey(info.url, !info.frameId), TIME_AFTER_RECEIVE);
 }
 
-async function prepare(url, tabId, frameId, isLate) {
+function prepare(url, tabId, frameId, isLate) {
+  /** @namespace VMGetInjectedData */
+  const res = {
+    expose: !frameId
+      && url.startsWith('https://')
+      && expose[url.split('/', 3)[2]],
+  };
+  return isApplied
+    ? prepareScripts(url, tabId, frameId, isLate, res)
+    : res;
+}
+
+async function prepareScripts(url, tabId, frameId, isLate, res) {
   const data = await getScriptsByURL(url, !frameId);
-  const { inject } = data;
-  inject.scripts.forEach(prepareScript, data);
-  inject.injectInto = injectInto;
-  inject.ua = ua;
-  inject.isFirefox = ua.isFirefox;
-  inject.isPopupShown = popupTabs[tabId];
+  const { envDelayed, scripts } = data;
+  const feedback = scripts.map(prepareScript, data).filter(Boolean);
+  const more = envDelayed.promise;
+  const feedId = getUniqId(`${tabId}:${frameId}:`);
+  /** @namespace VMGetInjectedData */
+  Object.assign(res, {
+    feedId, // InjectionFeedback id for envDelayed
+    injectInto,
+    scripts,
+    hasMore: !!more, // tells content bridge to expect envDelayed
+    ids: data.disabledIds, // content bridge adds the actually running ids and sends via SetPopup
+    info: {
+      cache: data.cache,
+      isFirefox: ua.isFirefox,
+      ua,
+    },
+  });
+  Object.defineProperty(res, '_tmp', {
+    value: {
+      feedback,
+      valOpIds: [...data[ENV_VALUE_IDS], ...envDelayed[ENV_VALUE_IDS]],
+    },
+  });
   if (!isLate && browser.contentScripts) {
-    registerScriptDataFF(data, url, !!frameId);
+    registerScriptDataFF(data, res, url, !!frameId);
   }
-  return data;
+  if (more) cache.put(feedId, more);
+  return res;
 }
 
-/** @this data */
-function prepareScript(script, index, scripts) {
+/** @this {VMScriptByUrlData} */
+function prepareScript(script) {
   const { custom, meta, props } = script;
   const { id } = props;
-  const { require, values } = this;
+  const { forceContent, require, value } = this;
   const code = this.code[id];
   const dataKey = getUniqId('VMin');
   const displayName = getScriptName(script);
-  const name = encodeURIComponent(displayName.replace(/[#&',/:;?@=]/g, replaceWithFullWidthForm));
-  const isContent = (custom.injectInto || meta.injectInto || injectInto) === INJECT_CONTENT;
+  const name = encodeURIComponent(displayName.replace(/[#&',/:;?@=+]/g, replaceWithFullWidthForm));
+  const realm = normalizeInjectInto(custom.injectInto || meta.injectInto);
+  const isContent = realm === INJECT_CONTENT || forceContent && realm === INJECT_AUTO;
   const pathMap = custom.pathMap || {};
   const reqs = meta.require?.map(key => require[pathMap[key] || key]).filter(Boolean);
   // trying to avoid progressive string concatenation of potentially huge code slices
@@ -151,7 +224,6 @@ function prepareScript(script, index, scripts) {
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs ? '(()=>{' : '',
-    // TODO: move code above @require
     code,
     // adding a new line in case the code ends with a line comment
     code.endsWith('\n') ? '' : '\n',
@@ -162,14 +234,17 @@ function prepareScript(script, index, scripts) {
     `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? '%20' : ''}${name}.user.js#${id}`,
   ].join('');
   cacheCode.put(dataKey, injectedCode, TIME_KEEP_DATA);
-  scripts[index] = {
-    ...script,
+  /** @namespace VMInjectedScript */
+  Object.assign(script, {
     dataKey,
     displayName,
-    code: isContent ? '' : injectedCode,
+    // code will be `true` if the desired realm is PAGE which is not injectable
+    code: isContent ? '' : forceContent || injectedCode,
+    injectInto: realm,
     metaStr: code.match(METABLOCK_RE)[1] || '',
-    values: values[id],
-  };
+    values: value[id],
+  });
+  return isContent && [dataKey, true];
 }
 
 function replaceWithFullWidthForm(s) {
@@ -178,27 +253,25 @@ function replaceWithFullWidthForm(s) {
 }
 
 const resolveDataCodeStr = `(${(data) => {
-  const { vmResolve } = window;
+  // not using `window` because this code can't reach its replacement set by guardGlobals
+  const { vmResolve } = this;
   if (vmResolve) {
     vmResolve(data);
   } else {
     // running earlier than the main content script for whatever reason
-    window.vmData = data;
+    this.vmData = data;
   }
 }})`;
 
-function registerScriptDataFF(data, url, allFrames) {
-  const promise = browser.contentScripts.register({
+// TODO: rework the whole thing to register scripts individually with real `matches`
+function registerScriptDataFF(data, inject, url, allFrames) {
+  data::forEachEntry(([key]) => delete data[key]); // releasing the contents for garbage collection
+  data.rcsPromise = browser.contentScripts.register({
     allFrames,
     js: [{
-      code: `${resolveDataCodeStr}(${JSON.stringify(data.inject)})`,
+      code: `${resolveDataCodeStr}(${JSON.stringify(inject)})`,
     }],
     matches: url.split('#', 1),
     runAt: 'document_start',
   });
-  data.unregister = async () => {
-    data.unregister = null;
-    const r = await promise;
-    r.unregister();
-  };
 }

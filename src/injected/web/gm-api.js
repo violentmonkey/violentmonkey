@@ -263,7 +263,7 @@ function getResource(context, name, isBlob) {
   if (key) {
     let res = isBlob && context.urls[key];
     if (!res) {
-      const raw = store.cache[context.pathMap[key] || key];
+      const raw = bridge.cache[context.pathMap[key] || key];
       if (raw) {
         const dataPos = raw::lastIndexOf(',');
         const bin = atob(dataPos < 0 ? raw : raw::slice(dataPos + 1));

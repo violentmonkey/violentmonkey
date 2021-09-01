@@ -15,6 +15,7 @@ export default function initCache({
   let batchStartTime;
   // eslint-disable-next-line no-return-assign
   const getNow = () => batchStarted && batchStartTime || (batchStartTime = performance.now());
+  /** @namespace VMCache */
   return {
     batch, get, getValues, pop, put, del, has, hit, destroy,
   };

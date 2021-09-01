@@ -5,6 +5,7 @@ import { Promise } from '../utils/helpers';
 const handlers = {};
 const callbacks = {};
 const bridge = {
+  cache: {},
   callbacks,
   addHandlers(obj) {
     assign(handlers, obj);

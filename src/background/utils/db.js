@@ -15,9 +15,10 @@ import { commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
 import './storage-fetch';
+import dataCache from './cache';
 
 const store = {};
-
+storage.base.setDataCache(dataCache);
 storage.script.onDump = (item) => {
   store.scriptMap[item.props.id] = item;
 };
@@ -101,6 +102,7 @@ preInitialize.push(async () => {
   /** @this VMScriptCustom.pathMap */
   const rememberUrl = function _(url) { resUrls.push(this[url] || url); };
   data::forEachEntry(([key, script]) => {
+    dataCache.put(key, script);
     if (key.startsWith(storage.script.prefix)) {
       // {
       //   meta,
@@ -250,16 +252,13 @@ export async function dumpValueStores(valueDict) {
   return valueDict;
 }
 
-const gmValues = [
-  'GM_getValue', 'GM.getValue',
-  'GM_setValue', 'GM.setValue',
-  'GM_listValues', 'GM.listValues',
-  'GM_deleteValue', 'GM.deleteValue',
-];
-
+export const ENV_CACHE_KEYS = 'cacheKeys';
+export const ENV_REQ_KEYS = 'reqKeys';
+export const ENV_VALUE_IDS = 'valueIds';
+const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Value)$/;
+const RUN_AT_RE = /^document-(start|body|end|idle)$/;
 /**
  * @desc Get scripts to be injected to page with specific URL.
- * @return {Promise<Object>}
  */
 export async function getScriptsByURL(url, isTop) {
   const allScripts = testBlacklist(url)
@@ -269,50 +268,82 @@ export async function getScriptsByURL(url, isTop) {
       && (isTop || !(script.custom.noframes ?? script.meta.noframes))
       && testScript(url, script)
     ));
-  const reqKeys = [];
-  const cacheKeys = [];
-  const scripts = allScripts.filter(script => script.config.enabled);
-  scripts.forEach((script) => {
+  const disabledIds = [];
+  /** @namespace VMScriptByUrlData */
+  const [envStart, envDelayed] = [0, 1].map(() => ({
+    ids: [],
+    /** @type {VMInjectedScript[]} */
+    scripts: [],
+    [ENV_CACHE_KEYS]: [],
+    [ENV_REQ_KEYS]: [],
+    [ENV_VALUE_IDS]: [],
+  }));
+  allScripts.forEach((script) => {
+    const { id } = script.props;
+    if (!script.config.enabled) {
+      disabledIds.push(id);
+      return;
+    }
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
-    meta.require.forEach((key) => {
-      pushUnique(reqKeys, pathMap[key] || key);
-    });
-    meta.resources::forEachValue((key) => {
-      pushUnique(cacheKeys, pathMap[key] || key);
-    });
+    const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
+    const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
+    env.ids.push(id);
+    if (meta.grant?.some(GMVALUES_RE.test, GMVALUES_RE)) {
+      env[ENV_VALUE_IDS].push(id);
+    }
+    for (const [list, name] of [
+      [meta.require, ENV_REQ_KEYS],
+      [Object.values(meta.resources), ENV_CACHE_KEYS],
+    ]) {
+      list.forEach(key => {
+        key = pathMap[key] || key;
+        if (!envStart[name].includes(key)) {
+          env[name].push(key);
+        }
+      });
+    }
+    /** @namespace VMInjectedScript */
+    env.scripts.push({ ...script, runAt });
   });
-  const ids = allScripts.map(getPropsId);
-  const enabledIds = scripts.map(getPropsId);
-  const withValueIds = scripts
-  .filter(script => script.meta.grant?.some(gm => gmValues.includes(gm)))
-  .map(getPropsId);
-  const [require, cache, values, code] = await Promise.all([
-    storage.require.getMulti(reqKeys),
-    storage.cache.getMulti(cacheKeys),
-    storage.value.getMulti(withValueIds, {}),
-    storage.code.getMulti(enabledIds),
-  ]);
+  if (envDelayed.ids.length) {
+    envDelayed.promise = readEnvironmentData(envDelayed);
+  }
+  /** @namespace VMScriptByUrlData */
   return {
-    // these will be sent to injectScripts()
-    inject: {
-      cache,
-      ids,
-      scripts,
-    },
-    // these will be used only by bg/* and to augment the data above
-    cacheKeys,
-    code,
-    enabledIds,
-    reqKeys,
-    require,
-    values,
-    withValueIds,
+    ...envStart,
+    ...await readEnvironmentData(envStart),
+    disabledIds,
+    envDelayed,
   };
 }
 
-function pushUnique(arr, elem) {
-  if (!arr.includes(elem)) arr.push(elem);
+/**
+ * Object keys == areas in `storage` module.
+ * @namespace VMScriptByUrlData
+ */
+const STORAGE_ROUTES = Object.entries({
+  cache: ENV_CACHE_KEYS,
+  code: 'ids',
+  require: ENV_REQ_KEYS,
+  value: ENV_VALUE_IDS,
+});
+
+async function readEnvironmentData(env) {
+  const keys = [];
+  STORAGE_ROUTES.forEach(([area, srcIds]) => {
+    env[srcIds].forEach(id => {
+      keys.push(storage[area].getKey(id));
+    });
+  });
+  const data = await storage.base.getMulti(keys);
+  STORAGE_ROUTES.forEach(([area, srcIds]) => {
+    env[area] = {};
+    env[srcIds].forEach(id => {
+      env[area][id] = data[storage[area].getKey(id)];
+    });
+  });
+  return env;
 }
 
 /**

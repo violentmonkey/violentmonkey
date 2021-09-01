@@ -1,5 +1,5 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
-import { defineProperty, describeProperty } from '#/common/object';
+import { assign, defineProperty, describeProperty } from '#/common/object';
 import { bindEvents } from '../utils';
 import { document, forEach, log, logging, remove, Promise, then } from '../utils/helpers';
 import bridge from './bridge';
@@ -12,6 +12,7 @@ import './tabs';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 
+const { window } = global;
 const { KeyboardEvent, MouseEvent } = global;
 const { get: getCurrentScript } = describeProperty(Document.prototype, 'currentScript');
 
@@ -56,9 +57,8 @@ bridge.addHandlers({
   },
   ScriptData({ info, items, runAt }) {
     if (info) {
-      bridge.isFirefox = info.isFirefox;
-      bridge.ua = info.ua;
-      store.cache = info.cache;
+      assign(info.cache, bridge.cache);
+      assign(bridge, info);
     }
     if (items) {
       const { stage } = items[0];
@@ -88,8 +88,8 @@ bridge.addHandlers({
 });
 
 function createScriptData(item) {
-  const { dataKey, values } = item;
-  store.values[item.props.id] = values;
+  const { dataKey } = item;
+  store.values[item.props.id] = item.values || {};
   if (window[dataKey]) { // executeScript ran before GetInjected response
     onCodeSet(item, window[dataKey]);
   } else {
@@ -107,7 +107,10 @@ async function onCodeSet(item, fn) {
   if (process.env.DEBUG) {
     log('info', [bridge.mode], item.displayName);
   }
-  const run = () => wrapGM(item)::fn(logging.error);
+  const run = () => {
+    wrapGM(item)::fn(logging.error);
+    bridge.post('Run', item.props.id);
+  };
   const el = document::getCurrentScript();
   const wait = waiters[stage];
   if (el) el::remove();

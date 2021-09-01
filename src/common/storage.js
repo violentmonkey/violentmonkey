@@ -1,51 +1,85 @@
+import { deepCopy, forEachEntry } from '#/common/object';
 import { blob2base64, ensureArray } from './util';
+
+/** @type VMCache */
+let dataCache;
+const browserStorageLocal = browser.storage.local;
+const onStorageChanged = changes => {
+  changes::forEachEntry(([key, { newValue }]) => {
+    if (newValue == null) {
+      dataCache.del(key);
+    } else {
+      dataCache.put(key, newValue);
+    }
+  });
+};
 
 const base = {
   prefix: '',
+  setDataCache(val) {
+    dataCache = val;
+    browser.storage.onChanged.addListener(onStorageChanged);
+  },
   getKey(id) {
     return `${this.prefix}${id}`;
   },
-  getOne(id) {
-    const key = this.getKey(id);
-    return browser.storage.local.get(key).then(data => data[key]);
+  async getOne(id) {
+    return (await this.getMulti([id]))[id];
   },
   /**
    * @param {string[]} ids
-   * @param {?} def
-   * @param {function(id:string, val:?):?} transform
+   * @param {?} [def]
+   * @param {function(id:string, val:?):?} [transform]
    * @returns {Promise<Object>}
    */
   async getMulti(ids, def, transform) {
-    const data = await browser.storage.local.get(ids.map(this.getKey, this));
-    return ids.reduce((res, id) => {
-      const val = data[this.getKey(id)];
-      res[id] = transform ? transform(id, val) : (val || def);
-      return res;
-    }, {});
+    const res = {};
+    const data = {};
+    const missingKeys = [];
+    ids.forEach(id => {
+      const key = this.getKey(id);
+      const cached = dataCache?.get(key);
+      res[id] = key;
+      if (cached != null) {
+        data[key] = deepCopy(cached);
+      } else {
+        missingKeys.push(key);
+      }
+    });
+    if (missingKeys.length) {
+      Object.assign(data, await browserStorageLocal.get(missingKeys));
+    }
+    res::forEachEntry(([id, key]) => {
+      res[id] = transform
+        ? transform(id, data[key])
+        : data[key] ?? deepCopy(def);
+    });
+    return res;
   },
-  set(id, value) {
-    return id
-      ? browser.storage.local.set({ [this.getKey(id)]: value })
-      : Promise.resolve();
+  // Must be `async` to ensure a Promise is returned when `if` doesn't match
+  async set(id, value) {
+    if (id) return this.dump({ [id]: value });
   },
-  remove(id) {
-    return id
-      ? browser.storage.local.remove(this.getKey(id))
-      : Promise.resolve();
+  // Must be `async` to ensure a Promise is returned when `if` doesn't match
+  async remove(id) {
+    if (id) return this.removeMulti([id]);
   },
-  removeMulti(ids) {
-    return ids.length
-      ? browser.storage.local.remove(ids.map(this.getKey, this))
-      : Promise.resolve();
+  // Must be `async` to ensure a Promise is returned when `if` doesn't match
+  async removeMulti(ids) {
+    if (ids.length) {
+      const keys = ids.map(this.getKey, this);
+      if (dataCache) keys.forEach(dataCache.del);
+      return browserStorageLocal.remove(keys);
+    }
   },
   async dump(data) {
-    const output = !this.prefix
-      ? data
-      : Object.entries(data).reduce((res, [key, value]) => {
-        res[this.getKey(key)] = value;
-        return res;
-      }, {});
-    await browser.storage.local.set(output);
+    const output = {};
+    data::forEachEntry(([id, value]) => {
+      const key = this.getKey(id);
+      output[key] = value;
+      dataCache?.put(key, deepCopy(value));
+    });
+    await browserStorageLocal.set(output);
     return data;
   },
 };

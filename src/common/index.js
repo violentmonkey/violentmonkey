@@ -105,7 +105,7 @@ export async function sendMessageRetry(payload, retries = 10) {
       const data = await sendMessage(payload);
       if (data) return data;
     } catch (e) {
-      if (typeof e === 'string') throw e; // not a connection error which is an object
+      if (!e.isRuntime) throw e;
     }
     await makePause(pauseDuration);
     pauseDuration *= 2;

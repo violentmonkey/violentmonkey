@@ -7,7 +7,8 @@ import { Error } from '../utils/helpers';
 const handlers = {};
 const bgHandlers = {};
 const bridge = {
-  ids: [],
+  ids: [], // all ids including the disabled ones for SetPopup
+  runningIds: [],
   // userscripts running in the content script context are messaged via invokeGuest
   /** @type Number[] */
   invokableIds: [],
