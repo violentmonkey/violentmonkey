@@ -653,9 +653,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Initializing error!
-msgSyncNotConfigured:
-  description: Message shown when the selected sync provider hasn't been configured yet.
-  message: Not configured yet.
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: Not authorized yet.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Sync will start soon...

@@ -129,7 +129,7 @@ export default {
       const { service } = this;
       if (service) {
         const canAuthorize = ['idle', 'error'].includes(service.syncState)
-          && ['not-configured', 'unauthorized', 'error', 'authorized'].includes(service.authState);
+          && ['no-auth', 'unauthorized', 'error', 'authorized'].includes(service.authState);
         const canSync = canAuthorize && service.authState === 'authorized';
         return {
           message: this.getMessage(),
@@ -156,7 +156,7 @@ export default {
       if (['authorized'].includes(service.authState)) {
         // revoke
         sendCmd('SyncRevoke');
-      } else if (['not-configured', 'unauthorized', 'error'].includes(service.authState)) {
+      } else if (['no-auth', 'unauthorized', 'error'].includes(service.authState)) {
         // authorize
         sendCmd('SyncAuthorize');
       }
@@ -167,7 +167,7 @@ export default {
     getMessage() {
       const { service } = this;
       if (service.authState === 'initializing') return this.i18n('msgSyncInit');
-      if (service.authState === 'not-configured') return this.i18n('msgSyncNotConfigured');
+      if (service.authState === 'no-auth') return this.i18n('msgSyncNoAuthYet');
       if (service.authState === 'error') return this.i18n('msgSyncInitError');
       if (service.authState === 'unauthorized') return this.i18n('msgSyncInitError');
       if (service.syncState === 'error') return this.i18n('msgSyncError');

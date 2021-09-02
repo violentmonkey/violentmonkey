@@ -210,7 +210,7 @@ export const BaseService = serviceFactory({
     this.config = serviceConfig(this.name);
     this.authState = serviceState([
       'idle',
-      'not-configured',
+      'no-auth',
       'initializing',
       'authorizing', // in case some services require asynchronous requests to get access_tokens
       'authorized',
@@ -270,12 +270,12 @@ export const BaseService = serviceFactory({
   prepare() {
     this.authState.set('initializing');
     return (this.initToken() ? Promise.resolve(this.user()) : Promise.reject({
-      type: 'not-configured',
+      type: 'no-auth',
     }))
     .then(() => {
       this.authState.set('authorized');
     }, (err) => {
-      if (['not-configured', 'unauthorized'].includes(err?.type)) {
+      if (['no-auth', 'unauthorized'].includes(err?.type)) {
         this.authState.set(err.type);
       } else {
         console.error(err);
