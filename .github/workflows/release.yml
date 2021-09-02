@@ -26,7 +26,7 @@ jobs:
           # Same as `yarn build:selfHosted` but only manifest is changed for now
           TARGET=selfHosted BETA=1 npx gulp manifest
           cd dist && zip -r ../$TEMP_DIR/$ASSET_SELF_HOSTED_ZIP . && cd ..
-      - name: Sign AMO
+      - name: AMO Beta
         id: signAMO
         continue-on-error: true
         run: |
@@ -43,6 +43,15 @@ jobs:
           branch: updates
           folder: ${{ env.TEMP_DIR }}/updates
           commit-message: Update to ${{ env.VERSION }} 🚀
+      - name: CWS Beta
+        continue-on-error: true
+        run: |
+          npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_BETA --source $ASSETS_DIR/$ASSET_ZIP --auto-publish
+        env:
+          EXTENSION_ID_BETA: opokoaglpekkimldnlggpoagmjegichg
+          CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
