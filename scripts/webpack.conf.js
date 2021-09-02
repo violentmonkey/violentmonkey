@@ -10,10 +10,22 @@ const INIT_FUNC_NAME = 'VMInitInjection';
 // Copied from gulpfile.js: strip alphabetic suffix
 const VM_VER = require('../package.json').version.replace(/-[^.]*/, '');
 
+const pickEnvs = (items) => {
+  return Object.assign({}, ...items.map(({ key, def }) => ({
+    [`process.env.${key}`]: JSON.stringify(process.env[key] ?? def),
+  })));
+};
+
 const definitions = new webpack.DefinePlugin({
+  ...pickEnvs([
+    { key: 'DEBUG', def: false },
+    { key: 'VM_VER' },
+    { key: 'SYNC_GOOGLE_CLIENT_ID' },
+    { key: 'SYNC_GOOGLE_CLIENT_SECRET' },
+    { key: 'SYNC_ONEDRIVE_CLIENT_ID' },
+    { key: 'SYNC_ONEDRIVE_CLIENT_SECRET' },
+  ]),
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
-  'process.env.DEBUG': JSON.stringify(process.env.DEBUG || false),
-  'process.env.VM_VER': JSON.stringify(VM_VER),
 });
 const minimizerOptions = {
   cache: true,

@@ -9,12 +9,12 @@ import {
   openAuthPage,
 } from './base';
 
-const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0IjoiTjBEbTZJOEV3bkJaeE1xMUpuMHN3UER0In0='));
-const config = Object.assign({
-  client_id: '590447512361-05hjbhnf8ua3iha55e5pgqg15om0cpef.apps.googleusercontent.com',
+const config = {
+  client_id: process.env.SYNC_GOOGLE_CLIENT_ID,
+  client_secret: process.env.SYNC_GOOGLE_CLIENT_SECRET,
   redirect_uri: 'https://violentmonkey.github.io/auth_googledrive.html',
   scope: 'https://www.googleapis.com/auth/drive.appdata',
-}, SECRET_KEY);
+};
 const UNAUTHORIZED = { status: 'UNAUTHORIZED' };
 
 const GoogleDrive = BaseService.extend({

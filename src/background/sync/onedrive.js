@@ -7,11 +7,11 @@ import {
   openAuthPage,
 } from './base';
 
-const SECRET_KEY = JSON.parse(window.atob('eyJjbGllbnRfc2VjcmV0Ijoiajl4M09WRXRIdmhpSEtEV09HcXV5TWZaS2s5NjA0MEgifQ=='));
-const config = Object.assign({
-  client_id: '000000004418358A',
+const config = {
+  client_id: process.env.SYNC_ONEDRIVE_CLIENT_ID,
+  client_secret: process.env.SYNC_ONEDRIVE_CLIENT_SECRET,
   redirect_uri: 'https://violentmonkey.github.io/auth_onedrive.html',
-}, SECRET_KEY);
+};
 
 const OneDrive = BaseService.extend({
   name: 'onedrive',
