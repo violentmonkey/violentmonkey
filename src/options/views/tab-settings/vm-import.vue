@@ -1,14 +1,10 @@
 <template>
-  <section>
-    <h3 v-text="i18n('labelDataImport')" />
+  <div>
     <button v-text="i18n('buttonImportData')" @click="pickBackup" ref="buttonImport"/>
-    <button
-      :title="i18n('hintVacuum')"
-      @click="vacuum"
-      :disabled="vacuuming"
-      v-text="labelVacuum"
-    />
-    <div class="mt-1 ml-2c">
+    <tooltip :content="i18n('hintVacuum')">
+      <button @click="vacuum" :disabled="vacuuming" v-text="labelVacuum" />
+    </tooltip>
+    <div class="mt-1 flex flex-col">
       <setting-check name="importScriptData" :label="i18n('labelImportScriptData')" />
       <setting-check name="importSettings" :label="i18n('labelImportSettings')" />
     </div>
@@ -18,10 +14,11 @@
         <td v-text="text" :colspan="name ? null : 2"/>
       </tr>
     </table>
-  </section>
+  </div>
 </template>
 
 <script>
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { ensureArray, i18n, sendCmd } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
@@ -33,6 +30,7 @@ const reports = [];
 export default {
   components: {
     SettingCheck,
+    Tooltip,
   },
   data() {
     return {
