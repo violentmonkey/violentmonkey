@@ -11,15 +11,18 @@ const INIT_FUNC_NAME = 'VMInitInjection';
 const VM_VER = require('../package.json').version.replace(/-[^.]*/, '');
 
 const pickEnvs = (items) => {
-  return Object.assign({}, ...items.map(({ key, def }) => ({
-    [`process.env.${key}`]: JSON.stringify(process.env[key] ?? def),
+  return Object.assign({}, ...items.map(x => ({
+    [`process.env.${x.key}`]: JSON.stringify(
+      'val' in x ? x.val
+        : process.env[x.key] ?? x.def
+    ),
   })));
 };
 
 const definitions = new webpack.DefinePlugin({
   ...pickEnvs([
     { key: 'DEBUG', def: false },
-    { key: 'VM_VER' },
+    { key: 'VM_VER', val: VM_VER },
     { key: 'SYNC_GOOGLE_CLIENT_ID' },
     { key: 'SYNC_GOOGLE_CLIENT_SECRET' },
     { key: 'SYNC_ONEDRIVE_CLIENT_ID' },
