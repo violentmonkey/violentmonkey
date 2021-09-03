@@ -34,7 +34,6 @@
 
 <script>
 import { string2uint8array } from '#/common';
-import { objectEntries } from '#/common/object';
 import VmCode from '#/common/ui/code';
 import storage from '#/common/storage';
 
@@ -48,7 +47,7 @@ export default {
       return [
         ...mainUrl ? [[this.i18n('editNavCode'), mainUrl, code]] : [],
         ...require.map(url => ['@require', url, deps[`0${url}`]]),
-        ...objectEntries(resources).map(([id, url]) => [`@resource ${id}`, url, deps[`1${url}`]]),
+        ...Object.entries(resources).map(([id, url]) => [`@resource ${id}`, url, deps[`1${url}`]]),
       ];
     },
   },

@@ -1,10 +1,8 @@
 import { getUniqId, isEmpty, sendCmd } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
-import { assign, objectKeys, objectPick } from '#/common/object';
+import { objectPick } from '#/common/object';
 import { bindEvents } from '../utils';
-import {
-  forEach, includes, append, createElementNS, document, setAttribute, NS_HTML,
-} from '../utils/helpers';
+import { NS_HTML } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
 import { appendToRoot, injectPageSandbox, injectScripts } from './inject';

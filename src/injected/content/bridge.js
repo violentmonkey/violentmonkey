@@ -1,7 +1,5 @@
 import { sendCmd } from '#/common';
 import { INJECT_PAGE, browser } from '#/common/consts';
-import { assign } from '#/common/object';
-import { Error } from '../utils/helpers';
 
 /** @type {Object.<string, MessageFromGuestHandler>} */
 const handlers = {};

@@ -1,11 +1,5 @@
-import { hasOwnProperty } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
-import { assign, defineProperty, describeProperty, objectKeys } from '#/common/object';
 import bridge from './bridge';
-import {
-  filter, forEach, includes, map, slice,
-  addEventListener, removeEventListener,
-} from '../utils/helpers';
 import { makeGmApi, vmOwnFunc } from './gm-api';
 
 const {
@@ -25,8 +19,6 @@ const { startsWith } = '';
 let gmApi;
 let gm4Api;
 let componentUtils;
-// making a local copy to avoid using webpack's import wrappers as .has() is invoked **a lot**
-const has = hasOwnProperty;
 const IS_TOP = window.top === window;
 
 export function wrapGM(script) {
@@ -296,7 +288,7 @@ function makeGlobalWrapper(local) {
     get(_, name) {
       if (name !== 'undefined' && name !== scopeSym) {
         const value = local[name];
-        return value !== undefined || local::has(name)
+        return value !== undefined || local::hasOwnProperty(name)
           ? value
           : resolveProp(name);
       }
@@ -317,7 +309,7 @@ function makeGlobalWrapper(local) {
       return desc;
     },
     has(_, name) {
-      return name === 'undefined' || local::has(name) || globals.has(name);
+      return name === 'undefined' || local::hasOwnProperty(name) || globals.has(name);
     },
     ownKeys() {
       return [...globals]::concat(

@@ -1,9 +1,5 @@
-import { assign, defineProperty, describeProperty, objectPick } from '#/common/object';
-import {
-  Error, Promise, Uint8Array,
-  charCodeAt, filter, forEach, jsonLoad, log, replace, then,
-  NS_HTML, addEventListener, createElementNS, setAttribute,
-} from '../utils/helpers';
+import { objectPick } from '#/common/object';
+import { log, NS_HTML } from '../utils/helpers';
 import bridge from './bridge';
 
 const idMap = {};
@@ -57,7 +53,7 @@ function parseData(req, msg) {
   if (responseType === 'text') {
     res = raw;
   } else if (responseType === 'json') {
-    res = jsonLoad(raw);
+    res = jsonParse(raw);
   } else if (responseType === 'document') {
     const type = msg.contentType::replace(/^[^;]+/)?.[0] || 'text/html';
     res = new DOMParser()::parseFromString(raw, type);

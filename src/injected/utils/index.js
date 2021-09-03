@@ -1,7 +1,3 @@
-import { addEventListener, document } from './helpers';
-
-const { CustomEvent, dispatchEvent } = global;
-
 export function bindEvents(srcId, destId, handle, cloneInto) {
   document::addEventListener(srcId, e => handle(e.detail));
   const pageContext = cloneInto && document.defaultView;

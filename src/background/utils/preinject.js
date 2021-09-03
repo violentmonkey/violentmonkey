@@ -1,4 +1,4 @@
-import { getScriptName, getUniqId, hasOwnProperty } from '#/common';
+import { getScriptName, getUniqId } from '#/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECTABLE_TAB_URL_RE, METABLOCK_RE,
 } from '#/common/consts';

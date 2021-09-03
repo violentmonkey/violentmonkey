@@ -1,11 +1,7 @@
 import { INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser } from '#/common/consts';
 import { sendCmd } from '#/common';
-import { defineProperty, describeProperty, forEachKey } from '#/common/object';
-import {
-  append, appendChild, createElementNS, elemByTag, remove, NS_HTML,
-  addEventListener, document, removeEventListener,
-  forEach, log, Promise, push, then,
-} from '../utils/helpers';
+import { forEachKey } from '#/common/object';
+import { elemByTag, NS_HTML, log } from '../utils/helpers';
 import bridge from './bridge';
 
 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
