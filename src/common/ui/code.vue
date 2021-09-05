@@ -558,7 +558,7 @@ export default {
 
 <style>
 $selectionBg: #d7d4f0; /* copied from codemirror.css */
-$selectionDarkBg: rgba(73, 72, 62, .99);
+$selectionDarkBg: rgba(80, 75, 65, .99);
 
 /* compatible with old browsers, e.g. Maxthon 4.4, Chrome 50- */
 .editor-code.flex-auto {
@@ -632,6 +632,7 @@ div.CodeMirror span.CodeMirror-matchingbracket { /* the same selector used in co
 @media (prefers-color-scheme: dark) {
   .cm-matchhighlight {
     background-color: hsla(40, 100%, 50%, 0.1);
+    border-bottom-color: hsla(40, 100%, 50%, 0.25);
   }
   .CodeMirror-hints {
     background: var(--bg);
@@ -655,7 +656,7 @@ div.CodeMirror span.CodeMirror-matchingbracket { /* the same selector used in co
       background-color: var(--fill-0-5);
     }
     & &-selected {
-      background: #49483e;
+      background: $selectionDarkBg;
     }
     & &-line {
       ::selection {
