@@ -506,10 +506,12 @@ export default {
   },
   mounted() {
     let userOpts = options.get('editor');
+    const theme = options.get('editorThemeName');
     const internalOpts = this.cmOptions || {};
     const opts = {
       ...cmDefaults,
       ...userOpts,
+      ...theme && { theme },
       ...internalOpts, // internal options passed via `props` have the highest priority
       mode: this.mode || cmDefaults.mode,
     };
@@ -547,6 +549,11 @@ export default {
         else search.queryFilled = null;
       });
       this.$watch('search.options', searchAgain, { deep: true });
+    });
+    hookSetting('editorThemeName', val => {
+      if (val != null && val !== this.cm.options.theme) {
+        this.cm.setOption('theme', val);
+      }
     });
   },
   beforeDestroy() {

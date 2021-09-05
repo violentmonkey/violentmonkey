@@ -265,6 +265,12 @@ li {
 .flex-1 {
   flex: 1;
 }
+.center-items {
+  align-items: center;
+}
+.stretch-self {
+  align-self: stretch;
+}
 .pos-rel {
   position: relative;
 }

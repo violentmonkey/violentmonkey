@@ -195,12 +195,6 @@ export default {
 </script>
 
 <style>
-.center-items {
-  align-items: center;
-}
-.stretch-self {
-  align-self: stretch;
-}
 .sync-server-url {
   > input {
     width: 400px;
