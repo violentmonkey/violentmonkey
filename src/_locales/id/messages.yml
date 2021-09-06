@@ -276,6 +276,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Periksa pembaruan skrip setiap $1 hari, gunakan 0 untuk menonaktifkan'
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Ditampilkan pada lencana: '
@@ -306,9 +309,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Ekspor Data
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Impor Data
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Donasi
@@ -657,6 +662,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Kesalahan saat memulai!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Sinkronisasi akan segera dimulai...

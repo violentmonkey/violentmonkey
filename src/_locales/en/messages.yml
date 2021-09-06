@@ -304,9 +304,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Data Export
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Data Import
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Donate

@@ -277,6 +277,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Elke $1 dag(en) controleren op updates (0 = uitschakelen)
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: Back-ups
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Tonen op embleem: '
@@ -307,9 +310,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Gegevens exporteren
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Gegevens importeren
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Doneren
@@ -387,7 +392,7 @@ labelName:
   message: 'Naam:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Uitvoeren in frames:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Naamloos
@@ -543,7 +548,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Uitgeschakelde compatibele scripts
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Alleen scripts met onderliggende frames
@@ -656,6 +661,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Initialisatiefout!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: Nog niet geautoriseerd.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: De synchronisatie begint spoedig...
@@ -689,13 +697,13 @@ optionPopupEnabledFirst:
   message: Ingeschakelde bovenaan
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Uitgeschakelde scripts groeperen
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Uitgeschakelde verbergen
+  message: Uitgeschakelde scripts verbergen
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Uitgeschakelde scripts tonen
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Ingeschakelde scripts bovenaan

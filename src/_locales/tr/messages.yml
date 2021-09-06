@@ -264,6 +264,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Script güncellemelerini $1 günde bir kontrol et, kapatmak için 0 seçin'
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Simge üzerinde göster:'
@@ -294,9 +297,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Veri dışarı aktar
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Veri içeri aktar
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Bağış yap
@@ -641,6 +646,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Başlatma error!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Eşitleme az sonra başlayacak...

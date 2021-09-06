@@ -289,6 +289,9 @@ labelAutoUpdate:
   message: >-
     Buscar actualizaciones de los scripts cada $1 día(s), use 0 para
     deshabilitar
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Mostrar en el icono de la extensión: '
@@ -319,9 +322,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Exportar datos
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Importar datos
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Donar
@@ -673,6 +678,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: ¡Error al iniciar la sincronización!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: La sincronización iniciará pronto...

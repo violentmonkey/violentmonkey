@@ -265,6 +265,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 每 $1 天检查一次脚本更新，0 表示禁用
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 在扩展图标上显示：
@@ -295,9 +298,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: 数据导出
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: 数据导入
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: 捐助
@@ -641,6 +646,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: 初始化失败！
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: 即将开始同步...

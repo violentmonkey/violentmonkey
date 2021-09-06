@@ -263,6 +263,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: スクリプトの更新を $1 日ごとに確認 (0 を指定すると無効)
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'バッジの表示: '
@@ -293,9 +296,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: エクスポート
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: インポート
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: 寄付
@@ -639,6 +644,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: 初期化エラー!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: 同期を開始中…

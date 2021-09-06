@@ -283,6 +283,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Sprawdzaj aktualizacje skryptów co  $1 dni, użyj 0 aby wyłączyć'
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: Kopia zapasowa
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Wyświetl na plakietce: '
@@ -313,9 +316,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Eksport danych
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Import danych
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Dotacja
@@ -395,7 +400,7 @@ labelName:
   message: 'Nazwa skryptu:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Uruchom w ramkach:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Bez nazwy
@@ -668,6 +673,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Błąd inicjalizacji!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: Jeszcze nie autoryzowano.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Synchronizacja rozpocznie się wkrótce...
@@ -701,13 +709,13 @@ optionPopupEnabledFirst:
   message: Najpierw włączone
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Grupuj wyłączone skrypty
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Ukryj wyłączone
+  message: Ukryj wyłączone skrypty
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Pokaż wyłączone skrypty
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Pokazuj najpierw włączone skrypty

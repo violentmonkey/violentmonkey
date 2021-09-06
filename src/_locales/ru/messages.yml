@@ -275,6 +275,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Проверять наличие обновлений скриптов каждые $1 дней, 0 для отключения'
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Показывать на значке: '
@@ -305,9 +308,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Экспорт данных
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Импорт данных
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Поддержать разработку
@@ -653,6 +658,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Ошибка инициализации синхронизации!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Ожидание синхронизации...
