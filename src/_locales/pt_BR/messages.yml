@@ -257,6 +257,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: ''
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: Exibir no Ícone
@@ -287,9 +290,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Exportar dados
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Importar dados
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Fazer uma doação
@@ -632,6 +637,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Erro de inicialização!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: A sincronização será iniciada em breve...

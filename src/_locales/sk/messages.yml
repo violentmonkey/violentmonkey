@@ -281,6 +281,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Kontrolovať aktualizácie skriptu každý $1 deň, pre zakázanie použite 0'
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: Záloha
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Zobraziť počítadlo: '
@@ -311,9 +314,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Export dát
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Import dát
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Podporiť
@@ -391,7 +396,7 @@ labelName:
   message: 'Názov:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Spustiť v rámoch:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Bez názvu
@@ -547,7 +552,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Zodpovedajúce zakázané skripty
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Iba skripty podrámcov
@@ -660,6 +665,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Chyba inicializácie!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: Zatiaľ nie je autorizovaný.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Synchronizácia sa spustí o chvíľu...
@@ -691,13 +699,13 @@ optionPopupEnabledFirst:
   message: Najskôr povolené
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Zoskupiť zakázané skripty
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Skryť zakázané
+  message: Skryť zakázané skripty
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Zobraziť zakázané skripty
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Zobraziť najskôr povolené skripty

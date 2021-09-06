@@ -282,6 +282,9 @@ labelAutoUpdate:
   message: >-
     Auf Skript-Aktualisierungen jede(n) $1Tag(e) prüfen, 0 eingeben um zu
     deaktivieren
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: Backup
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Auf dem Symbol anzeigen: '
@@ -312,9 +315,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Datenexport
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Datenimport
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Spenden
@@ -392,7 +397,7 @@ labelName:
   message: 'Name:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'In Frames ausführen:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Ohne Name
@@ -551,7 +556,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Gematchte deaktivierte Skripte
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Subframe-spezifische Skripte
@@ -666,6 +671,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Initialisierung fehlgeschlagen!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: Noch nicht autorisiert.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Sync startet in Kürze...
@@ -699,13 +707,13 @@ optionPopupEnabledFirst:
   message: Aktivierte zuerst
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Deaktivierte Skripte gruppieren
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Deaktivierte ausblenden
+  message: Deaktivierte Skripte ausblenden
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Deaktivierte Skripte anzeigen
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Aktivierte Skripte zuerst anzeigen

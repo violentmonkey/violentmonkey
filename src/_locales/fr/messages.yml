@@ -282,6 +282,9 @@ labelAutoUpdate:
   message: >-
     Vérifier les mises à jour de scripts tous les $1 jour(s), renseigner 0 pour
     désactiver
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: "Montrer sur le badge\_: "
@@ -312,9 +315,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: Export de données
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: Import de données
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: Dons
@@ -659,6 +664,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: "Erreur d’initialisation\_!"
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: La synchronisation va bientôt démarrer…

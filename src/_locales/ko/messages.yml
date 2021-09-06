@@ -259,6 +259,9 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 매 $1 일마다 업데이트합니다. (0 = 비활성화)
+labelBackup:
+  description: Label of the import/export section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 배지에 보일 숫자
@@ -289,9 +292,11 @@ labelCustomCSS:
 labelDataExport:
   description: Section title of data export.
   message: 데이터 내보내기
+  touched: false
 labelDataImport:
   description: Section title of data import.
   message: 데이터 불러오기
+  touched: false
 labelDonate:
   description: Label of link to donate page.
   message: 기부
@@ -632,6 +637,9 @@ msgSyncInit:
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: 초기화 오류!
+msgSyncNoAuthYet:
+  description: Message shown when the selected sync provider hasn't been authorized yet.
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: 동기화가 곧 시작합니다....
