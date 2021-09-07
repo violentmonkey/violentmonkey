@@ -441,10 +441,9 @@ $infoIconSize: 18px;
     margin-top: 1rem;
     dl {
       margin: 0 1rem 1rem 0;
-      &[data-type="antifeature"] {
+      &[data-type="antifeature"] dd {
         border: 1px solid rgba(255, 0, 0, .5);
         background: rgba(255, 0, 0, .05);
-        margin-top: -3px;
         padding: 2px 6px;
         max-width: 25em;
       }
