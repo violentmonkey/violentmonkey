@@ -174,17 +174,6 @@ export default {
       cm.on('changes', this.onChanges);
       cm.on('beforeChange', this.onBeforeChange);
     },
-    'search.query'() {
-      const { search } = this;
-      if (!search.queryFilled) this.doSearch({ pos: 'from' });
-      else search.queryFilled = null;
-    },
-    'search.options': {
-      deep: true,
-      handler() {
-        this.doSearch({ pos: 'from' });
-      },
-    },
   },
   methods: {
     onBeforeChange(cm, change) {
@@ -516,9 +505,6 @@ export default {
     },
   },
   mounted() {
-    storage.base.getOne('editorSearch').then(prev => {
-      if (prev) Object.assign(this.search, { queryFilled: true }, prev);
-    });
     let userOpts = options.get('editor');
     const internalOpts = this.cmOptions || {};
     const opts = {
@@ -551,6 +537,16 @@ export default {
         }
       });
       userOpts = newUserOpts;
+    });
+    storage.base.getOne('editorSearch').then(prev => {
+      const searchAgain = () => this.doSearch({ pos: 'from' });
+      const { search } = this;
+      if (prev) Object.assign(search, prev);
+      this.$watch('search.query', () => {
+        if (!search.queryFilled) searchAgain();
+        else search.queryFilled = null;
+      });
+      this.$watch('search.options', searchAgain, { deep: true });
     });
   },
   beforeDestroy() {
