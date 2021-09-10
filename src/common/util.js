@@ -113,10 +113,12 @@ export function buffer2string(buf, offset = 0, length = 1e99) {
  * @return {Promise<string>} base64-encoded contents
  */
 export function blob2base64(blob, offset = 0, length = 1e99) {
-  return new Promise(resolve => {
+  if (offset || length < blob.size) {
+    blob = blob.slice(offset, offset + length);
+  }
+  return !blob.size ? '' : new Promise(resolve => {
     const reader = new FileReader();
-    const needsSlicing = offset || length < blob.size;
-    reader.readAsDataURL(needsSlicing ? blob.slice(offset, offset + length) : blob);
+    reader.readAsDataURL(blob);
     reader.onload = () => {
       const res = reader.result;
       resolve(res.slice(res.indexOf(',') + 1));
