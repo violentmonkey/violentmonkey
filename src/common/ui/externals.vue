@@ -125,7 +125,7 @@ export default {
       return !len ? ''
         : len < 1024 && `${len} B`
         || len < 1024 * 1024 && `${len >> 10} k` // eslint-disable-line no-bitwise
-        || `${len >> 20} M`; // eslint-disable-line no-bitwise
+        || `${+(len / (1024 * 1024)).toFixed(1)} M`; // allow fractions for megabytes
     },
   },
 };
