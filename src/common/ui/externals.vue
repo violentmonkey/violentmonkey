@@ -15,7 +15,7 @@
           <a :href="url" target="_blank">&nearr;</a>
           <span v-text="decodeURIComponent(url)"/>
         </dd>
-        <dd v-if="contents" v-text="formatLength(contents)" class="ml-2"/>
+        <dd v-if="contents" v-text="formatLength(contents, type)" class="ml-2"/>
       </dl>
     </div>
     <div class="contents pos-rel flex-auto">
@@ -117,8 +117,11 @@ export default {
     this.index = 0;
   },
   methods: {
-    formatLength(str) {
-      const len = str?.length;
+    formatLength(str, type) {
+      let len = str?.length;
+      if (type.startsWith('@resource')) {
+        len = Math.round((len - str.indexOf(',') - 1) * 6 / 8); // base64 uses 6 bits out of 8
+      }
       return !len ? ''
         : len < 1024 && `${len} B`
         || len < 1024 * 1024 && `${len >> 10} k` // eslint-disable-line no-bitwise
