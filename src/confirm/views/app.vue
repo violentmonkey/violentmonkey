@@ -413,7 +413,7 @@ $infoIconSize: 18px;
     flex: 0 0 $imgSize;
     align-items: center;
     justify-content: center;
-    min-height: $imgSize; // reserve the height so it doesn't shift when the icon loads
+    height: $imgSize; // reserve the height so it doesn't shift when the icon loads
     padding: 0 $imgGapR 0 .25rem;
     box-sizing: content-box;
     img {
