@@ -107,40 +107,32 @@
         <a v-if="trash.length" v-text="i18n('buttonEmptyRecycleBin')" href="#"
            @click.prevent="emptyRecycleBin"/>
       </div>
-      <div class="flex-auto pos-rel">
-        <div class="scripts abs-full"
-             ref="scriptList"
-             :style="`--num-columns:${numColumns}`"
-             :data-columns="numColumns"
-             :data-show-order="filters.showOrder"
-             :data-table="filters.viewTable">
-          <script-item
-            v-for="(script, index) in sortedScripts"
-            v-show="!search || script.$cache.show !== false"
-            :key="script.props.id"
-            :focused="selectedScript === script"
-            :showHotkeys="showHotkeys"
-            :script="script"
-            :draggable="filters.sort.value === 'exec' && !script.config.removed"
-            :visible="index < batchRender.limit"
-            :nameClickable="filters.viewTable"
-            :hotkeys="scriptHotkeys"
-            @edit="handleActionEdit"
-            @remove="handleActionRemove"
-            @restore="handleActionRestore"
-            @toggle="handleActionToggle"
-            @update="handleActionUpdate"
-            @move="moveScript"
-            @scrollDelta="handleSmoothScroll"
-            @tiptoggle.native="showHotkeys = !showHotkeys"
-          />
-        </div>
-        <div
-          class="backdrop abs-full"
-          :class="{mask: store.loading}"
-          v-show="message">
-          <div v-html="message"></div>
-        </div>
+      <div class="scripts flex-auto"
+           ref="scriptList"
+           :style="`--num-columns:${numColumns}`"
+           :data-columns="numColumns"
+           :data-show-order="filters.showOrder"
+           :data-table="filters.viewTable">
+        <script-item
+          v-for="(script, index) in sortedScripts"
+          v-show="!search || script.$cache.show !== false"
+          :key="script.props.id"
+          :focused="selectedScript === script"
+          :showHotkeys="showHotkeys"
+          :script="script"
+          :draggable="filters.sort.value === 'exec' && !script.config.removed"
+          :visible="index < batchRender.limit"
+          :nameClickable="filters.viewTable"
+          :hotkeys="scriptHotkeys"
+          @edit="handleActionEdit"
+          @remove="handleActionRemove"
+          @restore="handleActionRestore"
+          @toggle="handleActionToggle"
+          @update="handleActionUpdate"
+          @move="moveScript"
+          @scrollDelta="handleSmoothScroll"
+          @tiptoggle.native="showHotkeys = !showHotkeys"
+        />
       </div>
     </div>
     <edit v-if="script" :initial="script" @close="editScript()"></edit>

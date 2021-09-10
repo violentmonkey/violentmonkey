@@ -3,7 +3,7 @@
     <aside :class="{ 'show-aside': aside }" v-if="canRenderAside">
       <div class="aside-content">
         <img src="/public/images/icon128.png">
-        <h1 class="hidden-xs" v-text="i18n('extName')"></h1>
+        <h1 class="hidden-sm" v-text="i18n('extName')"/>
         <div class="aside-menu">
           <a
             v-for="tab in tabs"

@@ -39,9 +39,10 @@
           />
           <span class="ellipsis" v-else v-text="author.name" />
         </tooltip>
-        <tooltip class="hidden-sm ml-1c" :content="updatedAt.title" align="end">
-          <span class="ellipsis" v-text="script.meta.version ? `v${script.meta.version}` : ''"/>
-          <span v-text="updatedAt.show"></span>
+        <span class="version ellipsis"
+              v-text="script.meta.version ? `v${script.meta.version}` : ''"/>
+        <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">
+          {{ updatedAt.show }}
         </tooltip>
         <div v-if="script.config.removed">
           <tooltip :content="i18n('buttonRestore')" placement="left">
@@ -384,12 +385,9 @@ $removedItemHeight: calc(
     align-items: center;
   }
   &-icon {
-    position: absolute;
     width: $iconSize;
     height: $iconSize;
-    top: 0;
-    bottom: 0;
-    margin: auto;
+    float: left;
     cursor: pointer;
     a {
       display: block;
@@ -410,9 +408,6 @@ $removedItemHeight: calc(
     .removed & {
       width: $iconSizeSmaller;
       height: $iconSizeSmaller;
-    }
-    ~ * {
-      margin-left: calc($iconSize + $rem / 2);
     }
   }
   &-name {
@@ -507,7 +502,7 @@ $removedItemHeight: calc(
         bottom: -1px;
         border: 1px solid var(--fill-6);
         pointer-events: none;
-        z-index: 99999999;
+        z-index: 2;
       }
       &-name {
         cursor: pointer;
@@ -516,7 +511,6 @@ $removedItemHeight: calc(
         width: 2rem;
         height: 2rem;
         order: 1;
-        position: relative;
         margin-left: .5rem;
       }
       &-info {
@@ -524,17 +518,13 @@ $removedItemHeight: calc(
         flex: 1;
         margin-left: .5rem;
         line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
-        > :last-child { /* author + version */
-          align-items: center;
-          display: flex;
-          > * {
-            width: 5rem;
-            text-align: right;
-            color: var(--fill-8);
-          }
-          > :last-child { /* version */
-            width: 3.5rem;
-          }
+        .updated, .version {
+          width: 6em;
+          text-align: right;
+          color: var(--fill-8);
+        }
+        .updated {
+          width: 3em;
         }
       }
       &-buttons {
@@ -552,9 +542,11 @@ $removedItemHeight: calc(
       }
       &-message:not(:empty) {
         position: absolute;
-        right: 0;
+        right: .5em;
+        top: 2em;
+        z-index: 3;
         font-size: smaller;
-        padding: 1px .5em 2px;
+        padding: 1px .5em;
         border-radius: .5em;
         border: 1px solid var(--fill-5);
         background: var(--bg);
@@ -571,11 +563,6 @@ $removedItemHeight: calc(
   }
   &:not([data-show-order]) .script-order {
     display: none;
-  }
-}
-@media (max-width: 319px) {
-  .script-icon ~ * {
-    margin-left: 0;
   }
 }
 </style>
