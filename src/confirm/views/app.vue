@@ -137,7 +137,7 @@ export default {
       },
       confirmHotkey: CONFIRM_HOTKEY,
       info: {},
-      deps: {}, // combines `this.require` and `this.resources` = all loaded deps
+      deps: {}, // combines `this.require` and `this.resources` = all actually loaded deps
       descr: '',
       error: null,
       heading: this.i18n('msgLoadingData'),
@@ -271,14 +271,15 @@ export default {
       /** @returns {string|undefined} URL in case of error or `undefined` on success */
       const download = async (url, target, isBlob) => {
         const fullUrl = getFullUrl(url, this.info.url);
+        const depsUrl = `${+isBlob}${url}`; // the same URL may be listed in both categories
         try {
           const file = await this.getFile(fullUrl, { isBlob, useCache: true });
           target[fullUrl] = file;
-          this.deps[url] = file;
+          this.deps[depsUrl] = file;
           finished += 1;
           updateStatus();
         } catch (e) {
-          this.deps[url] = false;
+          this.deps[depsUrl] = false;
           return url;
         }
       };

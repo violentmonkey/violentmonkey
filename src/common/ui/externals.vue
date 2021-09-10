@@ -47,8 +47,8 @@ export default {
       const { require = [], resources = {} } = this.value.meta || {};
       return [
         ...mainUrl ? [[this.i18n('editNavCode'), mainUrl, code]] : [],
-        ...require.map(url => ['@require', url, deps[url]]),
-        ...objectEntries(resources).map(([name, url]) => [`@resource ${name}`, url, deps[url]]),
+        ...require.map(url => ['@require', url, deps[`0${url}`]]),
+        ...objectEntries(resources).map(([id, url]) => [`@resource ${id}`, url, deps[`1${url}`]]),
       ];
     },
   },
@@ -68,6 +68,7 @@ export default {
       const { install } = this;
       const isMain = install && !index;
       const isReq = !isMain && type === '@require';
+      const depsUrl = `${+!isReq}${url}`;
       let code;
       let contentType;
       let img;
@@ -76,7 +77,7 @@ export default {
         code = install.code;
       } else {
         if (install) {
-          raw = install.deps[url];
+          raw = install.deps[depsUrl];
         } else {
           const key = this.value.custom.pathMap?.[url] || url;
           raw = await storage[isReq ? 'require' : 'cache'].getOne(key);
@@ -104,7 +105,7 @@ export default {
       this.img = img;
       this.mode = contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null;
       this.code = code;
-      this.$set(this.deps, url, code);
+      this.$set(this.deps, depsUrl, code);
     },
     value() {
       this.$nextTick(() => {
