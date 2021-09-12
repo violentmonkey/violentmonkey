@@ -383,15 +383,13 @@ function clearRequest(req) {
 }
 
 /** Polyfill for Chrome's inability to send complex types over extension messaging */
-function decodeBody([body, type]) {
+function decodeBody([body, type, wasBlob]) {
   if (type === 'query') {
     type = 'application/x-www-form-urlencoded';
   } else if (type) {
     // 5x times faster than fetch() which wastes time on inter-process communication
     const res = string2uint8array(atob(body.slice(body.indexOf(',') + 1)));
-    if (type === 'blob') {
-      type = '';
-    } else {
+    if (!wasBlob) {
       type = body.match(/^data:(.+?);base64/)[1].replace(/(boundary=)[^;]+/,
         // using a function so it runs only if "boundary" was found
         (_, p1) => p1 + String.fromCharCode(...res.slice(2, res.indexOf(13))));

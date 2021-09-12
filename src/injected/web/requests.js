@@ -214,7 +214,8 @@ async function encodeBody(body) {
   return new Promise((resolve) => {
     reader::addEventListener('load', () => resolve([
       reader.result,
-      wasBlob ? 'blob' : blob.type,
+      blob.type,
+      wasBlob,
     ]));
     reader::readAsDataURL(blob);
   });
