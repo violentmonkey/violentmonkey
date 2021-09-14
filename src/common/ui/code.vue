@@ -73,7 +73,7 @@ import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
-import { i18n } from '#/common';
+import { debounce, i18n } from '#/common';
 import { deepEqual, forEachEntry, objectPick } from '#/common/object';
 import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
@@ -541,14 +541,21 @@ export default {
       userOpts = newUserOpts;
     });
     storage.base.getOne('editorSearch').then(prev => {
-      const searchAgain = () => this.doSearch({ pos: 'from' });
       const { search } = this;
+      const saveSearchLater = debounce(() => {
+        storage.base.set('editorSearch', objectPick(search, ['query', 'replace', 'options']));
+      }, 500);
+      const searchAgain = () => {
+        saveSearchLater();
+        this.doSearch({ pos: 'from' });
+      };
       if (prev) Object.assign(search, prev);
       this.$watch('search.query', () => {
         if (!search.queryFilled) searchAgain();
         else search.queryFilled = null;
       });
       this.$watch('search.options', searchAgain, { deep: true });
+      this.$watch('search.replace', saveSearchLater);
     });
     hookSetting('editorThemeName', val => {
       if (val != null && val !== this.cm.options.theme) {
@@ -558,7 +565,6 @@ export default {
   },
   beforeDestroy() {
     this.onActive(false);
-    storage.base.set('editorSearch', objectPick(this.search, ['query', 'replace', 'options']));
   },
 };
 </script>
