@@ -1,0 +1,719 @@
+buttonCancel:
+  description: Cancel button on dialog.
+  message: Ləğv et
+buttonClose:
+  description: Button to close window.
+  message: Bağla
+buttonConfirmInstallation:
+  description: Button to confirm installation of a script.
+  message: Yükləməni təsdiqlə
+buttonConfirmReinstallation:
+  description: Button to confirm re-installation when the script is already installed.
+  message: Yenidən qurulmasını təsdiq edin
+buttonDisable:
+  description: Button to disable a script.
+  message: Deaktif
+buttonEdit:
+  description: Button to edit a script.
+  message: Düzəliş et
+buttonEditClickHint:
+  description: Tooltip for the Edit button in popup.
+  message: 'Əlavə olaraq, ssenari adına sağ siçan, Ctrl düymələri, Təkər düyməsi ilə klikləyə bilərsiniz.' 
+buttonEmptyRecycleBin:
+  description: Button to empty the recycle bin.
+  message: Silinən fayılları tamamilə sil!
+buttonEnable:
+  description: Button to enable a script.
+  message: Aktif
+buttonExportData:
+  description: Button to open the data export dialog.
+  message: Zip olaraq çölə köçür
+buttonFilter:
+  description: Button to show filters menu.
+  message: Süzgəçlər
+  touched: false
+buttonHome:
+  description: Button to open homepage.
+  message: Ana Səhifə
+buttonImportData:
+  description: Button to choose a file for data import.
+  message: Faylı içəri zip şəklinə yüklə
+buttonInstallFromURL:
+  description: Button to ask for URL of a user script.
+  message: URL vasitəsi ilə yüklə
+buttonInstallOptions:
+  description: Button to show options of installation confirm page.
+  message: Tənzimləmələr
+  touched: false
+buttonNew:
+  description: Button to create a new script.
+  message: Təzə
+buttonOK:
+  description: OK button on dialog.
+  message: Yaxşı
+buttonRecycleBin:
+  description: Button to list scripts in recycle bin.
+  message: Silinənlər
+buttonRemove:
+  description: Button to remove a script.
+  message: Sil
+buttonReplace:
+  description: Button to replace the current match.
+  message: Dəyişdir
+buttonReplaceAll:
+  description: Button to replace all matches.
+  message: Hamısı
+buttonReset:
+  description: Button to reset to default values.
+  message: Sıfırla
+buttonRestore:
+  description: Button to restore a removed script.
+  message: Geri Yüklə
+buttonSave:
+  description: Button to save modifications of a script.
+  message: Yadda Saxla
+buttonSaveClose:
+  description: Button to save modifications of a script and then close the editing page.
+  message: Yadda Saxla və Bağla
+buttonShowEditorState:
+  description: Button to show the list of currently used CodeMirror options.
+  message: Redaktor statusunu göstərin 
+buttonSupport:
+  description: Button to open support page.
+  message: Dəstək Səhifəsi
+buttonUndo:
+  description: Button to undo removement of a script.
+  message: Geri Al
+  touched: false
+buttonUpdate:
+  description: Check a script for updates.
+  message: Aktuallaşdırmaları yoxla
+buttonUpdateAll:
+  description: Check all scripts for updates.
+  message: Təzə aktuallaşdırmaları yoxla 
+buttonVacuum:
+  description: Button to vacuum extension data.
+  message: Məlumatları al
+buttonVacuumed:
+  description: Message shown when data is vacuumed.
+  message: Məlumatları içəri köçürüldü
+buttonVacuuming:
+  description: Message shown when data vacuum is in progress.
+  message: Məlumatları içəri köçürülür...
+confirmNotSaved:
+  description: Confirm message shown when there are unsaved script modifications.
+  message: |-
+    Tənzimləmələr qeyd edilmədi!
+    Nəzərə almamaq üçün Təsdiq et'ə basın və ya Ləğv et ilə tənzimləmələri təzədən redaktə edin.
+descBlacklist:
+  description: HTML Description for the global blacklist.
+  message: Siyahıdakı URL girişləri ssenari tərəfindən əlavə edilməyəcək .
+descCustomCSS:
+  description: Description of custom CSS section.
+  message: >-
+    Seçimlər səhifəsi və ssenari yükləmə səhifəsi üçün etibarlı CSS.  Əgər nə
+    etdiyinizdən əmin deyilsinizsə, redaktə etməyin.
+descEditorOptions:
+  description: Description of editor options JSON section.
+  message: >-
+    CodeMirror  və JSON əlavələr üçün  <code>{"indentUnit":2,
+    "smartIndent":true}1</code> kimi xüsusi parametrlər, ancaq bəziləri
+    Şiddətli Meymun'da işləməyəbilər. Bütün siyahını görmək üçün <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">səhifəsinə gedin</a>
+editHelpDocumention:
+  description: Label in the editor help tab for the documentation link.
+  message: 'İstifadəçi Ssenari məlumat bloku və <code>GM</code> API sənədləri:'
+editHelpKeyboard:
+  description: Label in the editor help tab for the keyboard shortcuts.
+  message: 'Klaviatura qısayolları:'
+editHowToHint:
+  description: The text of the how-to link in the editor header.
+  message: Başqa redaktor istifadə et?
+editLabelMeta:
+  description: Metadata section in settings tab of script editor.
+  message: Etibarlı məlumat
+editLabelSettings:
+  description: Settings section in settings tab of script editor.
+  message: Ssenari tənzimləmələri
+editLongLine:
+  description: Shown in the editor in lines that were cut due to being too long
+  message: Sətir çox uzundur 
+editLongLineTooltip:
+  description: Tooltip shown in the editor in lines that were cut due to being too long
+  message:|-
+     Bu sətir çox uzun olduğu üçün mətni redaktə edərkən gecikmələrin qarşısını almaq üçün yığışdırılmışdır.
+     İnkişaf etmiş parametrlərdə limiti tənzimləyə bilərsiniz, məsələn:
+     "maxDisplayLength": 20000 
+editNavCode:
+  description: Label of code tab in script editor.
+  message: Kod
+editNavSettings:
+  description: Label of settings tab in script editor.
+  message: Tənzimləmələr
+editNavValues:
+  description: Label of values tab in script editor.
+  message: Dəyərlər
+editValueAll:
+  description: Button to show/edit the entire script value storage.
+  message: Hamısı
+editValueAllHint:
+  description: Tooltip for the 'all' button.
+  message: Bütün ssenari dəyəri saxlamasını göstər/redaktə et 
+editValueCancel:
+  description: Button to cancel modification of a script value.
+  message: İmtina et
+editValueSave:
+  description: Button to save modification of a script value.
+  message: Yadda Saxla
+extDescription:
+  description: 'Description for this extension, will be displayed in web store'
+  message: Bir çox brauzer dəstəkləyən açıq mənbəə istifadəçi ssenari icraçısı
+extName:
+  description: Name of this extension.
+  message: Şiddətli Meymun
+failureReasonBlacklisted:
+  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  message: Şiddətli Meymun, tənzimləmələrində Qara Siyahıya əlavə olunub
+failureReasonNoninjectable:
+  description: >-
+    Sİşlənə bilməyən URL -lər üçün göstərilir (uğursuzluq 
+    Qara Siyahıya salınmış URL ilə eyni yerlər) 
+  message: |-
+    Şiddətli Meymun bu səhifədə istifadəçi ssenariləri 
+    işlədə bilmir (məsələn: brauzer interfeysi və ya plagin səhifəsi)
+filterAlphabeticalOrder:
+  description: Label for option to sort scripts in alphabetical order.
+  message: əlifba ardıcıllığı 
+filterExecutionOrder:
+  description: Label for option to sort scripts in execution order.
+  message: işləmə ardıcıllığı
+filterLastUpdateOrder:
+  description: Label for option to sort scripts by last update time.
+  message: son aktuallaşdırma vaxtı
+filterScopeAll:
+  description: Option in dashboard's search scope filter.
+  message: Hamısı
+filterScopeCode:
+  description: Option in dashboard's search scope filter.
+  message: Kod
+filterScopeName:
+  description: Option in dashboard's search scope filter.
+  message: Ad
+genericError:
+  description: Label for generic error.
+  message: Xəta
+genericOff:
+  description: 'To indicate something is turned off or disabled, similar to "no".'
+  message: bağlı
+genericOn:
+  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  message: açıq
+genericUseGlobal:
+  description: To indicate some per-script option will use its analog in global settings.
+  message: ümumi tənzimləmələri istifadə et
+headerRecycleBin:
+  description: Text shown in the header when scripts in recycle bin are listed.
+  message: Silinənlər
+hintInputURL:
+  description: Hint for a prompt box to input URL of a user script.
+  message: 'URL Girişi:'
+hintRecycleBin:
+  description: Hint for recycle bin.
+  message: Silinən ssenarilər 7 gün ərzində burda siyahılanacaq və saxlanacaq.
+hintUseDownloadURL:
+  description: Shown as a place holder for @updateURL when it is not assigned
+  message: '@downloadURL İstifadə et'
+hintVacuum:
+  description: Hint for vacuuming data.
+  message: Artıqlığı atın və itkin mənbələri gizli yerdən təzədən yükləməyi sınayın.
+installFrom:
+  description: Label for button to install script from a userscript site.
+  message: $1 tərəfindən yükləndi
+installOptionClose:
+  description: Option to close confirm window after installation.
+  message: Quraşdırıldıqdan sonra bağlayın 
+installOptionTrack:
+  description: Option to track the loading local file before window is closed.
+  message: Bu pəncərə bağlanmadan əvvəl yerli faylı izləyin
+installOptionTrackTooltip:
+  description: >-
+    Yerli faylın yüklənməsini əvvəlcədən izləmək imkanı üçün Firefox 68+ -da işarə
+     pəncərə bağlıdır. 
+  message: Firefox 68 ve sonrası için kaynak sekmesi açık tutulmalıdır.
+labelAbout:
+  description: Label shown on top of the about page.
+  message: Şiddətli Meymun haqqında
+  touched: false
+labelAdvanced:
+  description: Label for button to show advanced settings.
+  message: Təkminləşmiş
+labelAllowUpdate:
+  description: Option to allow checking updates for a script.
+  message: Aktuallaşdırmalara icazə ver
+labelAuthor:
+  description: Label of author shown in the details of a script.
+  message: 'Müəllif:'
+labelAutoReloadCurrentTab:
+  description: Option to reload current tab after a script is switched on or off from menu.
+  message: >-
+    Menyudan bir ssenari faylını açdıqdan/bağladıqdan sonra cari bölməni
+     təzədən yüklə 
+labelAutoReloadCurrentTabDisabled:
+  description: >-
+    Şiddətli Meymun avtomatik yenidən yüklənərsə söndürüldükdən sonra menyudakı göstərişlər
+     passiv.
+  message: ''
+labelAutoUpdate:
+  description: Option to allow automatically checking scripts for updates
+  message: 'Ssenari aktuallaşdırmalarını $1 gündə bir dəfə yoxla, bağlamaq üçün 0 seçin'
+labelBadge:
+  description: Label for option to show number on badge.
+  message: 'Nişanda göstərin:'
+labelBadgeColors:
+  description: Label for option group to set badge colors.
+  message: 'Nişan rəngləri:' 
+labelBadgeNone:
+  description: Option to display nothing on badge.
+  message: heç nə 
+labelBadgeTotal:
+  description: Option to display total number of running scripts on badge.
+  message: işləyən ssenari sayı
+labelBadgeUnique:
+  description: Option to display number of unique running scripts on badge.
+  message: işləyən unikal ssenari sayı
+labelBlacklist:
+  description: Label for global blacklist settings in security section.
+  message: Qara Siyahı
+labelContributors:
+  description: Label for link to contributors.
+  message: İştirakçılar 
+labelCurrentLang:
+  description: Label of current language.
+  message: 'Cari Dil :'
+labelCustomCSS:
+  description: Label for custom CSS section.
+  message: Cari Stil 
+labelDataExport:
+  description: Section title of data export.
+  message: Məlumatları ixrac edin 
+labelDataImport:
+  description: Section title of data import.
+  message: Məlumatları idxal edin 
+labelDonate:
+  description: Label of link to donate page.
+  message: Dəstək ol
+labelDownloadURL:
+  description: Label of script @downloadURL in custom meta data.
+  message: 'Yükləmə URL:'
+labelEditValue:
+  description: Label shown in the panel to edit a script value.
+  message: Ssenari dəyəri redaktə et
+labelEditValueAll:
+  description: Label shown in the panel to edit the entire script value storage.
+  message: 'Ssenari saxlama redaktəsi '
+labelEditor:
+  description: Label for Editor settings
+  message: Tənzimləyici 
+labelExclude:
+  description: Label of @exclude rules.
+  message: '@istisna etmək  qanunları'
+labelExcludeMatch:
+  description: Label of @exclude-match rules.
+  message: '@matçı istisna etmək qanunları'
+labelExportScriptData:
+  description: Option to export script data along with scripts.
+  message: Ssenari məlumatlarını ixrac edin 
+labelExposeStatus:
+  description: Option in advanced settings.
+  message: 'Quraşdırılmış versiyanı istifadəçi ssenari kataloq saytında göstərin: $1'
+labelFeedback:
+  description: Label of link to feedback page.
+  message: Əlaqə
+labelFilterSort:
+  description: Label for sort filter.
+  message: $1 ilə sırala
+labelGeneral:
+  description: Label for general settings.
+  message: Ümumi
+labelHelpTranslate:
+  description: Label for link to localization guide in about tab
+  message: Tərcümə etməyə kömək edin 
+labelHomepage:
+  description: Label for home page in about tab.
+  message: Ana Səhifə
+labelHomepageURL:
+  description: Label of script @homepageURL in custom meta data.
+  message: 'Ana Səhifə URL:'
+labelImportScriptData:
+  description: Option to import script data along with scripts.
+  message: 'Ssenari məlumatlarını idxal edin '
+labelImportSettings:
+  description: Label for option to import settings from zip file.
+  message: Parametrləri idxal edin 
+labelInclude:
+  description: Label of @include rules.
+  message: '@daxil etmək qaydaları'
+labelInjectionMode:
+  description: Label for default option to inject scripts.
+  message: 'Standart enjeksiyon rejimi:'
+labelInstall:
+  description: Shown in the title of the confirm page while trying to install a script.
+  message: Ssenari yüklənir
+labelKeepOriginal:
+  description: Option to keep the original match or ignore rules.
+  message: Orijinalı saxla
+labelLastUpdatedAt:
+  description: Label shown on last updated time.
+  message: 'Son aktuallaşdırma $1 '
+labelLineNumber:
+  description: Label for line number jumper.
+  message: 'Sətir nömrəsi: '
+labelMatch:
+  description: Label of @match rules.
+  message: '@matç qanunları'
+labelName:
+  description: Label of script name.
+  message: 'Ad:'
+labelNoName:
+  description: Text as the name of a script when no @name is assigned.
+  message: Adsız
+  touched: false
+labelNoSearchScripts:
+  description: Message shown when no script is found in search results.
+  message: Ssenari mövcud deyil.
+labelNotifyThisUpdated:
+  description: >-
+   Bu ssenari olduqda bildirişi aktiv etmək üçün redaktorda hər bir ssenari seçimi
+     təzələndi. Mətni "Təzələməyə icazə ver" təsdiq qutusu seçimini izləyir, buna görə də
+     ifadənin davamı. 
+  message: ', və bildiriş göstərin:'
+labelNotifyUpdates:
+  description: Option to show notification when script is updated.
+  message: Ssenari aktuallaşdırmalarını xəbər ver
+labelNotifyUpdatesGlobal:
+  description: Option to prioritize global notification option over script's setting.
+  message: >-
+    heç bir ssenari üçün bildiriş qəbul etməsinə məhəl qoymayın (redaktordakı "parametrlər"
+    nişanında)
+labelPopupSort:
+  description: Label in the VM settings tab for script list sort order in popup
+  message: Açılan siyahıda ssenariləri $1 göstər
+labelPrivacyPolicy:
+  description: Label of link to privacy policy
+  message: Məxfilik Müqaviləsi 
+labelReinstall:
+  description: >-
+    Bir ssenari qurmağa çalışarkən təsdiq səhifəsinin başlığında göstərilir
+     bu artıq quraşdırılıb.
+  message: Ssenari yenidən qurulur 
+labelRelated:
+  description: Label of related links.
+  message: 'Əlaqələr:'
+labelRemovedAt:
+  description: Label for the time when the script is removed.
+  message: $1 tarixində silindi
+labelReplace:
+  description: Label for replace input in search box.
+  message: 'Dəyişdir: '
+labelRunAt:
+  description: Label of script @run-at properties in custom meta data.
+  message: 'İşləmə yeri: '
+labelRunAtDefault:
+  description: Shown when custom @run-at is not assigned.
+  message: (Standart)
+labelScriptTemplate:
+  description: Label for custom script template.
+  message: Təkminləşdirilmiş Ssenari Şablonu
+labelSearch:
+  description: Label for search input in search box.
+  message: 'Axtarış: '
+labelSearchScript:
+  description: Placeholder for script search box.
+  message: Ssenari Axtarılır...
+labelSettings:
+  description: Label shown on the top of settings page
+  message: Tənzimləmələr
+labelShowOrder:
+  description: Label for option in dashboard -> script list
+  message: İcra əmri mövqelərini göstərin
+labelSync:
+  description: Label for sync options.
+  message: Sinxronizasiya 
+labelSyncAnonymous:
+  description: Label for using anonymous account.
+  message: Anonim hesab istifadə et
+labelSyncAuthorize:
+  description: Label for button to authorize a service.
+  message: İcazə ver
+labelSyncAuthorizing:
+  description: Label for button when authorization is in progress.
+  message: İcazə verilir 
+labelSyncDisabled:
+  description: Label for option to disable sync service.
+  message: Yox
+labelSyncPassword:
+  description: Label for input to hold password.
+  message: 'Şifrə:'
+labelSyncReauthorize:
+  description: Option to reauthorize sync service when expired.
+  message: Müddəti bitdikdə avtomatik olaraq yenidən icazə verin 
+  touched: false
+labelSyncRevoke:
+  description: Label for button to revoke authorization for a service.
+  message: Ləğv edildi
+labelSyncScriptStatus:
+  description: Label for option to sync script status.
+  message: Ssenari sinxronizasiya vəziyyəti
+labelSyncServerUrl:
+  description: Label for input to hold server URL.
+  message: 'Server Adresi:'
+labelSyncService:
+  description: Label for sync service select.
+  message: Bərabərləşdirici
+labelSyncUsername:
+  description: Label for input to hold username.
+  message: 'İstifadəçi adı:'
+labelTranslator:
+  description: Label of translator.
+  message: 'Tərcümə Edən: '
+  touched: true
+labelUpdateURL:
+  description: Label of script @updateURL in custom meta data.
+  message: 'Aktuallaşdırma URL:'
+labelViewSingleColumn:
+  description: >-
+    Ssenariləri tək göstərmək üçün ssenari siyahısında seçim etiketi
+     sütun.
+  message: Tək sütun 
+labelViewTable:
+  description: Label for option in dashboard script list to show the scripts as a table.
+  message: Masa görünüşü 
+lastSync:
+  description: Label for last sync timestamp.
+  message: Son sinxronizasiya vaxtı $1
+learnBlacklist:
+  description: Refers to a link to introduce blacklist patterns.
+  message: Qara siyahı şablonları haqqında daha çox məlumat əldə edin.
+learnInjectionMode:
+  description: Refers to a link to introduce injection modes.
+  message: Enjeksiyon rejimi haqqında daha çox məlumat əldə edin.
+menuCommands:
+  description: Menu item to list script commands.
+  message: Ssenari əmrləri
+  touched: false
+menuDashboard:
+  description: Label for menu item to open dashboard.
+  message: Paneli Aç
+menuExclude:
+  description: >-
+   Ssenarinin "..." açılır düyməsini vurduqdan sonra açılan menyuda göstərilir, buna görə də saxlamağa çalışın
+     qısa etiket. 
+  message: İstisna et ... 
+menuExcludeHint:
+  description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
+  message:>-
+     Ümumiyyətlə bu seçimi aktiv etsəniz, cari nişan avtomatik olaraq yenidən yüklənəcək
+     parametrlər.
+
+     Bütün digər nişanlardakı dəyişiklikləri tətbiq etmək üçün onları əl ilə yenidən yükləyin.
+
+     Daha çox rahatlıq üçün redaktorun "Tənzimləmələr" nişanını istifadə edin. 
+menuFindScripts:
+  description: Menu item to find scripts for a site.
+  message: Bu sayta xas olan ssenariləri tapın 
+menuInjectionFailed:
+  description: Injection error.
+  message: Enjeksiyon xətası
+menuInjectionFailedFix:
+  description: 'Injection error fix, shown in case the default mode is "page".'
+  message: "Avtomatik" rejimində yenidən cəhd edin 
+menuMatchedFrameScripts:
+  description: Label for menu listing matching scripts in sub-frames.
+  message: Alt çərçivələr yalnız ssenarilərdir 
+menuMatchedScripts:
+  description: Label for menu listing matched scripts.
+  message: Seçilən ssenarilər
+menuNewScript:
+  description: Menu item to create a new script.
+  message: Təzə ssenari yarat
+menuScriptDisabled:
+  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  message: Ssenarilər deaktif edildi
+menuScriptEnabled:
+  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  message: Ssenarilər aktif edildi
+msgCheckingForUpdate:
+  description: Message shown when a script is being checked for updates by version numbers.
+  message: Aktuallaşdırmalar yoxlanılır...
+msgErrorFetchingResource:
+  description: >-
+   Şiddətli Meymun mənbəə/tələb/işarəsini əldə edə bilmədikdə mesaj göstərilir
+     ssenari. 
+  message: Mənbəə aktuallaşdırma xətası!
+msgErrorFetchingScript:
+  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  message: Ssenari aktuallaşdırma xətası!
+msgErrorFetchingUpdateInfo:
+  description: Message shown when Violentmonkey fails fetching version data of the script.
+  message: Məlumatları aktuallaşdıranda xəta yarandı.
+msgErrorLoadingData:
+  description: >-
+    Message shown on confirm page when the script to be installed cannot be
+    loaded.
+  message: Ssenari məlumatı yüklənərkən xəta baş verdi.
+msgErrorLoadingDependency:
+  description: Message shown when not all requirements are loaded successfully.
+  message: Ssenari yükləməsində məlumatlar tam yüklənmədi.
+msgImported:
+  description: >-
+    Mesaj idxaldan sonra göstərilir. Sayına aid bir mübahisə var
+     ssenarilər idxal olunur. 
+  message: $1 ədəd içəri köçürüldü.
+msgIncognitoChanges:
+  description: >-
+    Gizli rejimdə açıldıqda mesaj popup və quraşdırma nişanında göstərilir
+     pəncərə 
+  message: Gizli rejimdə etdiyiniz dəyişikliklər də orijinal profilinizə təsir edir. 
+msgInstalled:
+  description: Message shown when a script is installed.
+  message: Ssenari yükləndi.
+msgInvalidScript:
+  description: Message shown when script is invalid.
+  message: Etibarsız Ssenari!
+msgLoadedData:
+  description: >-
+    Message shown in the confirm page when a javascript file to be installed is
+    loaded.
+  message: Ssenari məlumatları yükləndi.
+  touched: false
+msgLoading:
+  description: Message shown in the options page before script list is loaded.
+  message: Yüklənir ...
+  touched: false
+msgLoadingData:
+  description: Message shown on confirm page when the script to be installed is loading.
+  message: Ssenari məlumatları yüklənir...
+msgLoadingDependency:
+  description: Message shown on confirm page when the requirements are being downloaded.
+  message: Məlumatlar yüklənir... ($1/$2)
+msgNamespaceConflict:
+  description: >-
+    Təzə ssenari ad sahəsi mövcud olanla ziddiyyət təşkil etdikdə mesaj göstərilir. 
+  message: >-
+    Ssenari adı ilə bağlı fikir ayrılığı! Zəhmət olmasa @name və @namespace sahələrini doldurun.
+     redaktə edin. 
+msgNewVersion:
+  description: >-
+    Təzə bir ssenari versiyası tapıldıqda @updateURL tərəfindən göstərilən mesaj
+      @downloadURL təmin edilir. 
+  message: Təzə versiyası tapıldı.
+msgNoUpdate:
+  description: Message shown when there is no new version of a script.
+  message: Aktuallaşdırma tapılmadı.
+msgSameCode:
+  description: Shown inside the title when re-installing a script that's already installed.
+  message: '(kod eynidir)' 
+msgSavedBlacklist:
+  description: Message shown when blacklist are saved.
+  message: Qara siyahı aktuallaşdı.
+msgSavedCustomCSS:
+  description: Message shown when custom CSS is saved.
+  message: Etibarlı stil aktuallaşdı.
+msgSavedEditorOptions:
+  description: Message shown when editor options are saved.
+  message: Tənzimləyici parametrləri yadda saxlandı.
+msgSavedScriptTemplate:
+  description: Message shown when custom script template is saved.
+  message: Xüsusi ssenari şablonu saxlanıldı.
+msgScriptUpdated:
+  description: Notification message for script updates.
+  message: 'Ssenari [$1] aktuallaşdı!'
+msgShowHide:
+  description: Tooltip or text shown on a toggle that shows/hides stuff
+  message: Göstər/gizlət
+msgSyncError:
+  description: Message shown when sync failed.
+  message: Sinxronizasiya xətası!
+msgSyncInit:
+  description: Message shown when sync service is initializing.
+  message: Başladılır...
+msgSyncInitError:
+  description: Message shown when sync fails in initialization.
+  message: Başlatma xətası!
+msgSyncReady:
+  description: Message shown when sync will start soon.
+  message: Sinxronizasiya birazdan başlayacaq...
+msgSyncing:
+  description: Message shown when sync is in progress.
+  message: Hal hazırda sinxronizasiya edilir...
+msgUpdated:
+  description: Message shown when a script is updated/reinstalled.
+  message: Ssenari aktuallaşdı.
+msgUpdating:
+  description: Message shown when a new version of script is being fetched.
+  message: Aktuallaşır...
+noValues:
+  description: Label shown when there is no value for current script.
+  message: Qeydə alınan dəyər yoxdur.
+optionEditorWindow:
+  description: Label for the option in settings
+  message: Redaktoru açılan pəncərədən yeni bir pəncərədə açın 
+optionEditorWindowHint:
+  description: >-
+    Brauzerin onBoundsChanged -i dəstəkləmədiyi təqdirdə Redaktor Pəncərəsi
+    seçimi üçün işarə 
+  message: Redaktor pəncərəsinin mövqeyi yalnız ölçüsünü dəyişərkən və ya saxlayanda xatırlanacaq 
+optionEditorWindowSimple:
+  description: Label for the editor window type
+  message: Omniboxu gizlət 
+optionPopupEnabledFirst:
+  description: Option to show enabled scripts first in popup.
+  message: Əvvəlcə effektiv ssenarilər
+optionPopupHideDisabled:
+  description: Option to hide disabled scripts in popup.
+  message: Effektiv olmayan ssenariləri gizlət
+optionShowEnabledFirst:
+  description: Option to show enabled scripts first in alphabetical order.
+  message: Əvvəlcə effektiv skriptləri göstərin 
+searchCaseSensitive:
+  description: Option to perform a case-sensitive search
+  message: Böyük/kiçik hərif həssaslığı
+searchUseRegex:
+  description: Option to perform a regular expression search
+  message: Regex istifadə et
+sideMenuAbout:
+  description: 'Side menu: About'
+  message: Haqqında
+sideMenuInstalled:
+  description: 'Side menu: Installed scripts'
+  message: Yüklənən Ssenarilər
+sideMenuSettings:
+  description: 'Side menu: Settings'
+  message: Parametrlər
+titleBadgeColor:
+  description: Tooltip for option to set badge color.
+  message: Normal nişan rəngi 
+titleBadgeColorBlocked:
+  description: Tooltip for option to set badge color of non-injectable tabs.
+  message: Sayt enjektə edilmədikdə nişan rəngi (qara siyahıda və ya dəstəklənməyən) 
+titleScriptUpdated:
+  description: Notification title for script updates.
+  message: Aktuallaşdırma
+titleSearchHint:
+  description: Hover title for search icon in dashboard.
+  message: |-
+    * <Enter> düyməsi avtomatik tamamlama tarixçəsinə mətn əlavə edir 
+    * RegExp sintaksis dəstəklənir: /re/ ve /re/flags
+valueLabelKey:
+  description: Label for key of a script value.
+  message: Açar (string)
+valueLabelValue:
+  description: Label for value of a script value.
+  message: Dəyər (JSON kimi yazılır)
+valueLabelValueAll:
+  description: Label for input of entire script value storage.
+  message: Bütün dəyərlər (JSON olaraq seriallaşdırılmışdır) 
+visitWebsite:
+  description: Label for link to open Violentmonkey website.
+  message: Saytı ziyarət edin 
