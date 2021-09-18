@@ -172,6 +172,7 @@ const items = {
       alpha: i18n('filterAlphabeticalOrder'),
     },
   },
+  ...badgeColorEnum::mapEntry(() => badgeColorItem),
 };
 const normalizeEnum = (value, name) => (
   items[name].enum::hasOwnProperty(value)
@@ -186,9 +187,6 @@ const getItemUpdater = (name, normalize) => (
   }, 300)
 );
 const settings = items::mapEntry(() => null);
-badgeColorNames.forEach(name => {
-  items[name] = badgeColorItem;
-});
 
 export default {
   components: {
