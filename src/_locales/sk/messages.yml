@@ -13,6 +13,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: Zakázať
+buttonDownloadThemes:
+  description: Button in Violentmonkey settings for editor.
+  message: Stiahnuť motívy
 buttonEdit:
   description: Button to edit a script.
   message: Upraviť
@@ -119,15 +122,10 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Vlastné možnosti pre CodeMirror a doplnky v JSON objekte ako
-    <code>{"indentUnit":2, "smartIndent":true}</code> avšak niektoré nemusia byť
-    funkčné vo Violentmonkey. Pozri <a
+    <code>{"indentUnit":2, "smartIndent":true}</code> avšak niektoré z nich
+    nemusia byť funkčné vo Violentmonkey. Pozri <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">celý zoznam</a>. Pre použitie vlastného motívu pre
-    CodeMirror zadajte sem názov jeho súboru ako <code>"theme":3024-day"</code>
-    a vložte <a
-    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
-    target="_blank" rel="noopener noreferrer">aktuálny motív CSS</a> do poľa
-    "Vlastný štýl" nižšie.
+    rel="noopener noreferrer">celý zoznam</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentácia k bloku metadát užívateľského skriptu a <code>GM</code> API:'
@@ -494,6 +492,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Používateľské meno: '
+labelTheme:
+  description: Label for the visual theme option.
+  message: 'Motív:'
 labelTranslator:
   description: Label of translator.
   message: 'Prekladateľ: '
