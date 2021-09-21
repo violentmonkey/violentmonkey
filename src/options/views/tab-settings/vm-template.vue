@@ -1,7 +1,7 @@
 <template>
   <section>
     <h3 v-text="i18n('labelScriptTemplate')"></h3>
-    <setting-text name="scriptTemplate" @save="onSave"/>
+    <setting-text name="scriptTemplate" @save="onSave" has-reset />
   </section>
 </template>
 
