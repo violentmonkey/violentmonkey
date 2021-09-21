@@ -4,7 +4,7 @@
 
 import { browser } from '#/common/consts';
 import { deepCopy } from './object';
-import { noop } from './util';
+import { i18n, noop } from './util';
 
 export { normalizeKeys } from './object';
 export * from './util';
@@ -131,7 +131,8 @@ export function getLocaleString(meta, key) {
 }
 
 export function getScriptName(script) {
-  return script.custom.name || getLocaleString(script.meta, 'name') || `#${script.props.id}`;
+  return script.custom.name || getLocaleString(script.meta, 'name')
+    || `#${script.props.id ?? i18n('labelNoName')}`;
 }
 
 export function getFullUrl(url, base) {

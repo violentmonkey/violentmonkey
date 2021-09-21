@@ -62,7 +62,8 @@ if (!global.browser?.runtime?.sendMessage) {
         }
         // Prefer `reject` over `throw` which stops debugger in 'pause on exceptions' mode
         if (err) {
-          err = new Error(`${err}\n${stackInfo.stack}`);
+          // Using \n\n so the calling code can strip the stack easily if needed
+          err = new Error(`${err}\n\n${stackInfo.stack}`);
           err.isRuntime = isRuntime;
           reject(err);
         }

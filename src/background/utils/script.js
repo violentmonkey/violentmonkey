@@ -110,6 +110,7 @@ export function newScript(data) {
       shouldUpdate: 1,
     },
     meta: parseMeta(code),
+    props: {},
   };
   return { script, code };
 }

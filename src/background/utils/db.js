@@ -458,7 +458,7 @@ export async function updateScriptInfo(id, data) {
 /** @return {Promise<{ isNew?, update, where }>} */
 export async function parseScript(src) {
   const meta = parseMeta(src.code);
-  if (!meta.name) throw i18n('msgInvalidScript');
+  if (!meta.name) throw `${i18n('msgInvalidScript')}\n${i18n('labelNoName')}`;
   const result = {
     update: {
       message: src.message == null ? i18n('msgUpdated') : src.message || '',

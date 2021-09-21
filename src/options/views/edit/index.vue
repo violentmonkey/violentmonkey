@@ -297,7 +297,8 @@ export default {
         this.canSave = false; // ...and set it explicitly in case codeDirty was false
         if (res?.where?.id) this.script = res.update;
       } catch (err) {
-        showMessage({ text: err });
+        // Stripping stack info added by browser.js
+        showMessage({ text: `${err.message || err}`.split('\n\n')[0] });
       }
     },
     close(cm) {
