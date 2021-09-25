@@ -10,3 +10,4 @@ const {
   window,
 } = this || {};
 export const { hasOwnProperty } = {};
+export const safeCall = hasOwnProperty.call.bind(hasOwnProperty.call);
