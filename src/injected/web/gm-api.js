@@ -293,7 +293,7 @@ function downloadBlob(res) {
   downloadChain = downloadChain::then(async () => {
     a::dispatchEvent(new MouseEvent('click'));
     revokeBlobAfterTimeout(url);
-    try { onload?.(res); } catch (e) { log('error', ['GM_download', 'callback'], e); }
+    try { if (onload) onload(res); } catch (e) { log('error', ['GM_download', 'callback'], e); }
     await bridge.send('SetTimeout', 100);
   });
 }

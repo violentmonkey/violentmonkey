@@ -89,6 +89,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
   };
   const feedback = data.scripts.map((script) => {
     const { id } = script.props;
+    // eslint-disable-next-line no-restricted-syntax
     const realm = INJECT_MAPPING[script.injectInto].find(key => realms[key]?.injectable());
     // If the script wants this specific realm, which is unavailable, we won't inject it at all
     if (realm) {

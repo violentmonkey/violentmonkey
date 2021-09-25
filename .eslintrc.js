@@ -50,6 +50,9 @@ module.exports = {
       'no-restricted-syntax': ['error', {
         selector: 'ObjectExpression > ExperimentalSpreadProperty',
         message: 'Object spread in an unsafe environment',
+      }, {
+        selector: 'OptionalCallExpression',
+        message: 'Optional call in an unsafe environment',
       }],
     },
   }],

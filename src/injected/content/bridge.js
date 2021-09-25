@@ -37,7 +37,8 @@ const bridge = {
 export default bridge;
 
 browser.runtime.onMessage.addListener(({ cmd, data }, src) => {
-  bgHandlers[cmd]?.(data, src);
+  const fn = bgHandlers[cmd];
+  if (fn) fn(data, src);
 });
 
 /**

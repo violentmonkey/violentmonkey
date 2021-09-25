@@ -48,10 +48,12 @@ export default function initialize(
 bridge.addHandlers({
   Command([cmd, evt]) {
     const constructor = evt.key ? KeyboardEvent : MouseEvent;
-    store.commands[cmd]?.(new constructor(evt.type, evt));
+    const fn = store.commands[cmd];
+    if (fn) fn(new constructor(evt.type, evt));
   },
   Callback({ callbackId, payload }) {
-    bridge.callbacks[callbackId]?.(payload);
+    const fn = bridge.callbacks[callbackId];
+    if (fn) fn(payload);
   },
   ScriptData({ info, items, runAt }) {
     if (info) {

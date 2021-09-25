@@ -9,7 +9,8 @@ const bridge = {
     assign(handlers, obj);
   },
   onHandle({ cmd, data }) {
-    handlers[cmd]?.(data);
+    const fn = handlers[cmd];
+    if (fn) fn(data);
   },
   send(cmd, data) {
     return new Promise(resolve => {

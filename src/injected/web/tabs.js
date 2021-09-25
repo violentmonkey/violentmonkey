@@ -8,8 +8,9 @@ bridge.addHandlers({
     const item = tabs[key];
     if (item) {
       item.closed = true;
-      item.onclose?.();
       delete tabs[key];
+      const fn = item.onclose;
+      if (fn) fn();
     }
   },
 });
