@@ -80,14 +80,27 @@ const modify = (page, entry, init) => modifyWebpackConfig(
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
 const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
+const [globalsCommonHeader, globalsInjectedHeader] = [
+  './src/common/safe-globals.js',
+  './src/injected/safe-injected-globals.js',
+].map(path =>
+  require('fs').readFileSync(path, {encoding: 'utf8'}).replace(/export const/g, 'const'));
+
 module.exports = Promise.all([
   modify((config) => {
     config.output.publicPath = '/';
+    config.plugins.push(
+      new WrapperWebpackPlugin({
+        header: `{ ${globalsCommonHeader}`,
+        footer: `}`,
+        test: /^(?!injected|public).*\.js$/,
+      }));
   }),
   modify('injected', './src/injected', (config) => {
     config.plugins.push(
       new WrapperWebpackPlugin({
-        header: skipReinjectionHeader,
+        header: `${skipReinjectionHeader} { ${globalsCommonHeader};${globalsInjectedHeader}`,
+        footer: `}`,
       }));
   }),
   modify('injected-web', './src/injected/web', (config) => {
@@ -97,6 +110,8 @@ module.exports = Promise.all([
         header: `${skipReinjectionHeader}
           window['${INIT_FUNC_NAME}'] = function () {
             var module = { exports: {} };
+            ${globalsCommonHeader}
+            ${globalsInjectedHeader}
           `,
         footer: `
             var exports = module.exports;

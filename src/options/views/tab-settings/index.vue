@@ -112,7 +112,7 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { debounce, hasOwnProperty, i18n } from '#/common';
+import { debounce, i18n } from '#/common';
 import { INJECT_AUTO, INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import SettingCheck from '#/common/ui/setting-check';
 import { forEachEntry, mapEntry } from '#/common/object';

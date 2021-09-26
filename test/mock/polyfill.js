@@ -37,3 +37,8 @@ global.URL = {
     return blobUrl;
   },
 };
+
+const globalsCommon = require('#/common/safe-globals');
+const globalsInjected = require('#/injected/safe-injected-globals');
+
+Object.assign(global, globalsCommon, globalsInjected);

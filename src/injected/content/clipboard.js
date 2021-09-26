@@ -1,6 +1,5 @@
 import { sendCmd } from '#/common';
-import { describeProperty } from '#/common/object';
-import { addEventListener, document, logging, removeEventListener } from '../utils/helpers';
+import { logging } from '../utils/helpers';
 import bridge from './bridge';
 
 // old Firefox defines it on a different prototype so we'll just grab it from document directly

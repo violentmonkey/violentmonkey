@@ -10,6 +10,6 @@ module.exports = {
     }],
   ],
   plugins: [
-    '@babel/plugin-proposal-function-bind',
+    './scripts/babel-plugin-safe-bind.js',
   ],
 };

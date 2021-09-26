@@ -2,15 +2,12 @@
    when accessed after the initial event loop task in `injected/web`
    or after the first content-mode userscript runs in `injected/content` */
 
-export const {
-  assign,
-  defineProperty,
-  getOwnPropertyDescriptor: describeProperty,
+const {
   entries: objectEntries,
   keys: objectKeys,
   values: objectValues,
 } = Object;
-const { forEach, reduce } = Array.prototype;
+const { forEach, reduce } = [];
 
 export function normalizeKeys(key) {
   if (key == null) return [];

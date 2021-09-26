@@ -1,5 +1,4 @@
 import { sendCmd } from '#/common';
-import { includes } from '../utils/helpers';
 import bridge from './bridge';
 
 const { fetch } = global;

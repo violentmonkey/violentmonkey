@@ -1,7 +1,6 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
-import { assign, defineProperty, describeProperty } from '#/common/object';
 import { bindEvents } from '../utils';
-import { document, forEach, log, logging, remove, Promise, then } from '../utils/helpers';
+import { log, logging } from '../utils/helpers';
 import bridge from './bridge';
 import { wrapGM } from './gm-wrapper';
 import store from './store';
@@ -12,7 +11,6 @@ import './tabs';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 
-const { window } = global;
 const { KeyboardEvent, MouseEvent } = global;
 const { get: getCurrentScript } = describeProperty(Document.prototype, 'currentScript');
 
@@ -50,10 +48,12 @@ export default function initialize(
 bridge.addHandlers({
   Command([cmd, evt]) {
     const constructor = evt.key ? KeyboardEvent : MouseEvent;
-    store.commands[cmd]?.(new constructor(evt.type, evt));
+    const fn = store.commands[cmd];
+    if (fn) fn(new constructor(evt.type, evt));
   },
   Callback({ callbackId, payload }) {
-    bridge.callbacks[callbackId]?.(payload);
+    const fn = bridge.callbacks[callbackId];
+    if (fn) fn(payload);
   },
   ScriptData({ info, items, runAt }) {
     if (info) {

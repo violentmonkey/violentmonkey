@@ -5,13 +5,15 @@ const notifications = {};
 
 bridge.addHandlers({
   NotificationClicked(id) {
-    notifications[id]?.onclick?.();
+    const fn = notifications[id]?.onclick;
+    if (fn) fn();
   },
   NotificationClosed(id) {
     const options = notifications[id];
     if (options) {
       delete notifications[id];
-      options.ondone?.();
+      const fn = options.ondone;
+      if (fn) fn();
     }
   },
 });

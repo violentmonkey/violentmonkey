@@ -1,7 +1,7 @@
-import { forEachEntry, objectValues } from '#/common/object';
+import { forEachEntry } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
-import { jsonLoad, forEach, slice, log } from '../utils/helpers';
+import { log } from '../utils/helpers';
 
 const { Number } = global;
 
@@ -9,7 +9,7 @@ const { Number } = global;
 export const changeHooks = {};
 
 const dataDecoders = {
-  o: jsonLoad,
+  o: jsonParse,
   n: Number,
   b: val => val === 'true',
 };

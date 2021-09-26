@@ -1,19 +1,12 @@
 import { dumpScriptValue, getUniqId, isEmpty } from '#/common/util';
-import {
-  assign, defineProperty, objectEntries, objectKeys, objectPick, objectValues,
-} from '#/common/object';
+import { objectPick } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
 import { atob, onRequestCreate } from './requests';
 import { onNotificationCreate } from './notifications';
-import {
-  decodeValue, dumpValue, loadValues, changeHooks,
-} from './gm-values';
-import {
-  Error, Uint8Array, charCodeAt, jsonDump, log, logging, slice, then,
-  NS_HTML, appendChild, createElementNS, document, elemByTag, remove, setAttribute,
-} from '../utils/helpers';
+import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
+import { jsonDump, log, logging, NS_HTML, elemByTag } from '../utils/helpers';
 
 const {
   Blob, MouseEvent, TextDecoder,
@@ -300,7 +293,7 @@ function downloadBlob(res) {
   downloadChain = downloadChain::then(async () => {
     a::dispatchEvent(new MouseEvent('click'));
     revokeBlobAfterTimeout(url);
-    try { onload?.(res); } catch (e) { log('error', ['GM_download', 'callback'], e); }
+    try { if (onload) onload(res); } catch (e) { log('error', ['GM_download', 'callback'], e); }
     await bridge.send('SetTimeout', 100);
   });
 }
