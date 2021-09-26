@@ -1,3 +1,4 @@
+import { getUniqId } from '#/common';
 import { objectPick } from '#/common/object';
 import { log, NS_HTML } from '../utils/helpers';
 import bridge from './bridge';
@@ -20,31 +21,19 @@ bridge.addHandlers({
 
 export function onRequestCreate(opts, scriptId) {
   if (!opts.url) throw new Error('Required parameter "url" is missing.');
+  const id = getUniqId(`VMxhr${scriptId}`);
   const req = {
+    id,
     scriptId,
     opts,
-    req: {
-      abort() {
-        bridge.post('AbortRequest', req.id);
-      },
+  };
+  start(req);
+  return {
+    abort() {
+      req._aborted = true;
+      bridge.post('AbortRequest', id);
     },
   };
-  opts.url = getFullUrl(opts.url);
-  bridge.send('GetRequestId', {
-    eventsToNotify: [
-      'abort',
-      'error',
-      'load',
-      'loadend',
-      'loadstart',
-      'progress',
-      'readystatechange',
-      'timeout',
-    ]::filter(e => typeof opts[`on${e}`] === 'function'),
-    wantsBlob: opts.responseType === 'blob',
-  })
-  ::then(id => start(req, id));
-  return req.req;
 }
 
 function parseData(req, msg) {
@@ -149,12 +138,11 @@ function receiveChunk(req, { data, i, last }) {
   }
 }
 
-async function start(req, id) {
-  const { opts, scriptId } = req;
+async function start(req) {
+  const { id, opts, scriptId } = req;
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
   const { data, withCredentials = true, anonymous = !withCredentials } = opts;
-  req.id = id;
   idMap[id] = req;
   bridge.post('HttpRequest', assign({
     id,
@@ -167,14 +155,25 @@ async function start(req, id) {
       || (bridge.isFirefox >= 56) && [data]
       // TODO: support huge data by splitting it to multiple messages
       || await encodeBody(data),
+    eventsToNotify: [
+      'abort',
+      'error',
+      'load',
+      'loadend',
+      'loadstart',
+      'progress',
+      'readystatechange',
+      'timeout',
+    ]::filter(e => typeof opts[`on${e}`] === 'function'),
     responseType: getResponseType(opts),
+    url: getFullUrl(opts.url),
+    wantsBlob: opts.responseType === 'blob',
   }, objectPick(opts, [
     'headers',
     'method',
     'overrideMimeType',
     'password',
     'timeout',
-    'url',
     'user',
   ])));
 }

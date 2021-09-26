@@ -18,31 +18,19 @@ let encoder;
 
 Object.assign(commands, {
   ConfirmInstall: confirmInstall,
-  /** @return {string} */
-  GetRequestId(eventsToNotify = [], src) {
-    const id = getUniqId();
-    const tabId = src.tab?.id;
+  /** @return {void} */
+  HttpRequest(opts, src) {
+    const { tab: { id: tabId }, frameId } = src;
+    const { id, eventsToNotify } = opts;
     requests[id] = {
       id,
       tabId,
       eventsToNotify,
       xhr: new XMLHttpRequest(),
     };
-    if (tabId) {
-      let set = tabRequests[tabId];
-      if (!set) {
-        set = new Set();
-        tabRequests[tabId] = set;
-      }
-      set.add(id);
-    }
-    return id;
-  },
-  /** @return {void} */
-  HttpRequest(opts, src) {
-    const { tab, frameId } = src;
+    (tabRequests[tabId] || (tabRequests[tabId] = {}))[id] = 1;
     httpRequest(opts, src, res => (
-      sendTabCmd(tab.id, 'HttpRequested', res, { frameId })
+      sendTabCmd(tabId, 'HttpRequested', res, { frameId })
     ));
   },
   /** @return {void} */
@@ -378,8 +366,8 @@ async function httpRequest(opts, src, cb) {
 function clearRequest(req) {
   if (req.coreId) delete verify[req.coreId];
   delete requests[req.id];
+  delete (tabRequests[req.tabId] || {})[req.id];
   HeaderInjector.del(req.id);
-  tabRequests[req.tabId]?.delete(req.id);
 }
 
 /** Polyfill for Chrome's inability to send complex types over extension messaging */
@@ -566,9 +554,7 @@ export function clearRequestsByTabId(tabId) {
   const set = tabRequests[tabId];
   if (set) {
     delete tabRequests[tabId];
-    for (const id of set) {
-      commands.AbortRequest(id);
-    }
+    set::forEachEntry(([id]) => commands.AbortRequest(id));
   }
 }
 

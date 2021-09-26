@@ -7,12 +7,14 @@ const { arrayBuffer: getArrayBuffer, blob: getBlob } = Response.prototype;
 const requests = {};
 
 bridge.addHandlers({
-  async GetRequestId({ eventsToNotify, wantsBlob }, realm) {
-    const id = await sendCmd('GetRequestId', eventsToNotify);
-    requests[id] = { eventsToNotify, realm, wantsBlob };
-    return id;
+  HttpRequest(opts, realm) {
+    requests[opts.id] = {
+      realm,
+      eventsToNotify: opts.eventsToNotify,
+      wantsBlob: opts.wantsBlob,
+    };
+    sendCmd('HttpRequest', opts);
   },
-  HttpRequest: sendCmd,
   AbortRequest: sendCmd,
 });
 
