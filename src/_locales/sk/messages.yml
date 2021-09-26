@@ -398,7 +398,6 @@ labelNoFrames:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Bez názvu
-  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Nenašiel sa žiadny skript.

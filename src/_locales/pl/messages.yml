@@ -15,7 +15,7 @@ buttonDisable:
   message: Wyłącz
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: ''
+  message: Pobierz motywy
 buttonEdit:
   description: Button to edit a script.
   message: Edytuj
@@ -407,7 +407,6 @@ labelNoFrames:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Bez nazwy
-  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Nie znaleziono skryptu.
@@ -465,7 +464,7 @@ labelSettings:
   message: Ustawienia
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Pokaż kolejność wykonywania
 labelSync:
   description: Label for sync options.
   message: Synchronizacja
@@ -505,7 +504,7 @@ labelSyncUsername:
   message: 'Nazwa użytkownika:'
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Motyw:'
 labelTranslator:
   description: Label of translator.
   message: 'Tłumacze: '
@@ -564,7 +563,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Dopasowane wyłączone skrypty
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Skrypty tylko w ramkach

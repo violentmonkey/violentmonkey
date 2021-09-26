@@ -381,7 +381,6 @@ labelNoFrames:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 이름 없음
-  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 스크립트를 찾을 수 없습니다.
