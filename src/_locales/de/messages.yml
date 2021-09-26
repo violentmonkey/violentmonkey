@@ -398,8 +398,7 @@ labelNoFrames:
   message: 'In Frames ausführen:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Ohne Name
-  touched: false
+  message: Ohne Namen
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Kein Skript gefunden.

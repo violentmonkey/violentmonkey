@@ -395,7 +395,6 @@ labelNoFrames:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Χωρίς Όνομα
-  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Δεν βρέθηκε σενάριο.

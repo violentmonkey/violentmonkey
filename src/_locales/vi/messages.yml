@@ -382,7 +382,6 @@ labelNoFrames:
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Không có tên
-  touched: false
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Không thấy script nào
