@@ -13,6 +13,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: Vypnout
+buttonDownloadThemes:
+  description: Button in Violentmonkey settings for editor.
+  message: ''
 buttonEdit:
   description: Button to edit a script.
   message: Upravit
@@ -467,6 +470,9 @@ labelSyncService:
   message: Sync to
 labelSyncUsername:
   description: Label for input to hold username.
+  message: ''
+labelTheme:
+  description: Label for the visual theme option.
   message: ''
 labelTranslator:
   description: Label of translator.

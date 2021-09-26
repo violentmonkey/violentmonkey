@@ -13,6 +13,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: Deaktivieren
+buttonDownloadThemes:
+  description: Button in Violentmonkey settings for editor.
+  message: Themes herunterladen
 buttonEdit:
   description: Button to edit a script.
   message: Bearbeiten
@@ -120,12 +123,7 @@ descEditorOptions:
     <code>{"indentUnit":2, "smartIndent":true}</code>, möglicherweise werden
     einige von ihnen jedoch nicht mit Violentmonkey funktionieren. Konsultieren
     Sie die <a href="https://codemirror.net/doc/manual.html#config"
-    target="_blank" rel="noopener noreferrer">vollständige Liste</a>. Um ein
-    benutzerdefiniertes CodeMirror-Theme zu benutzen, spezifizieren Sie hier
-    dessen Dateinamen ähnlich wie <code>"theme":"3024-day"</code> und fügen Sie
-    die <a href="https://github.com/codemirror/CodeMirror/tree/master/theme"
-    target="_blank" rel="noopener noreferrer">tatsächliche Theme-CSS</a> in das
-    "Benutzerdefinierte Aussehen"-Eingabefeld unterhalb ein.
+    target="_blank" rel="noopener noreferrer">vollständige Liste</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -497,6 +495,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Benutzername: '
+labelTheme:
+  description: Label for the visual theme option.
+  message: 'Theme: '
 labelTranslator:
   description: Label of translator.
   message: 'Übersetzer: '

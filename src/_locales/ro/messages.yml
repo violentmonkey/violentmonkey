@@ -13,6 +13,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: Dezactivează
+buttonDownloadThemes:
+  description: Button in Violentmonkey settings for editor.
+  message: Descarcă teme
 buttonEdit:
   description: Button to edit a script.
   message: Editează
@@ -119,16 +122,11 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Opțiuni personalizate pentru CodeMirror și suplimente într-un obiect JSON
-    precum <code>{"indentUnit":2, "smartIndent":true}</code>. Cu toate acestea,
-    reține că unele dintre ele pot să nu funcționeze în Violentmonkey. Vezi <a
+    Opțiuni personalizate pentru CodeMirror și suplimente în obiecte JSON precum
+    <code>{"indentUnit":2, "smartIndent":true}</code> Cu toate acestea, reține
+    că unele dintre ele pot să nu funcționeze în Violentmonkey. Vezi <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">lista completă</a>. Pentru a folosi o temă
-    CodeMirror personalizată, specifică numele fișierului acesteia ca
-    <code>"theme": "3024-day"</code> aici și lipește <a
-    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
-    target="_blank" rel="noopener noreferrer">CSS-ul actual al temei</a> în
-    inputul „Stil personalizat” de mai jos.
+    rel="noopener noreferrer">lista completă</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -288,7 +286,7 @@ labelAutoUpdate:
     a dezactiva
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: Backup
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Afișează pe insignă: '
@@ -374,7 +372,7 @@ labelImportScriptData:
   message: Importă datele scripturilor
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Importă setări
+  message: Importă setările
 labelInclude:
   description: Label of @include rules.
   message: Reguli @include
@@ -401,7 +399,7 @@ labelName:
   message: 'Nume:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: Rulează în frame-uri
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Fără nume
@@ -499,6 +497,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Nume de utilizator: '
+labelTheme:
+  description: Label for the visual theme option.
+  message: 'Temă:'
 labelTranslator:
   description: Label of translator.
   message: 'Traducător: '
@@ -558,7 +559,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Scripturi dezactivate coincidente
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Scripturi numai pentru sub-frame-uri
@@ -677,7 +678,7 @@ msgSyncInitError:
   message: Eroare la inițializare!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: Neautorizat încă.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Sincronizarea va începe în curând...
@@ -711,13 +712,13 @@ optionPopupEnabledFirst:
   message: Mai întâi cele activate
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Grupează scripturile dezactivate
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Ascunde-le pe cele dezactivate
+  message: Ascunde scripturile dezactivate
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Afișează scripturile dezactivate
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Afișează mai întâi scripturile activate
@@ -742,7 +743,7 @@ titleBadgeColor:
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: >-
-    Culoarea insignei atunci când site-ul este neinjectabil (pe lista neagră sau
+    Culoarea insignei atunci când site-ul este neinjectabil (în lista neagră sau
     nesuportat)
 titleScriptUpdated:
   description: Notification title for script updates.
