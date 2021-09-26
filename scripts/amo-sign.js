@@ -17,6 +17,7 @@ async function main() {
     channel: 'unlisted',
     downloadDir: process.env.ASSETS_DIR,
     id: manifest.browser_specific_settings.gecko.id,
+    timeout: 30 * 60e3, // 30 minutes
   });
   if (!result.success) {
     console.error(result);
