@@ -9,13 +9,13 @@ buttonConfirmInstallation:
   message: Conferma installazione
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: ''
+  message: Conferma reinstallazione
 buttonDisable:
   description: Button to disable a script.
   message: Disabilita
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: ''
+  message: Scarica temi
 buttonEdit:
   description: Button to edit a script.
   message: Modifica
@@ -121,16 +121,11 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Opzioni personalizzate per CodeMirror e in oggetti JSON, come
-    <code>{"indentUnit":2, "smartIndent":true}</code> tuttavia, alcune
-    potrebbero non funzionare in Violentmonkey. Vedi la <a
-    href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">lista intera</a>. Per usare un thema
-    personalizzato CodeMirror, specificane il file name, come ad esempio
-    <code>"theme": "3024-day"</code>qui e incolla <a
-    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
-    target="_blank" rel="noopener noreferrer">il CSS del tema</a>in "Stile
-    personalizzato" sotto.
+    Opzioni personalizzate per CodeMirror e componenti aggiuntivi in oggetto
+    JSON, come <code>{"indentUnit":2, "smartIndent":true}</code>, tuttavia,
+    tieni presente che alcuni di essi potrebbero non funzionare in
+    Violentmonkey. Vedi <a href="https://codemirror.net/doc/manual.html#config"
+    target="_blank" rel="noopener noreferrer">elenco completo</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentation on userscript metadata block and <code>GM</code> API:'
@@ -192,9 +187,11 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: |-
-    Violentmonkey cannot run userscripts in this page
-    (common examples: browser UI or an extension)
+  message: >-
+    Violentmonkey non può eseguire script utente in questa pagina
+
+    (esempi comuni: interfaccia utente del browser, una estensione, bloccato
+    tramite criteri, un sito di motore di ricerca in Opera)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordine alfabetico
@@ -284,13 +281,13 @@ labelAutoUpdate:
   message: 'Check for script updates every $1 day(s), use 0 to disable'
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: Backup
 labelBadge:
   description: Label for option to show number on badge.
   message: Mostra sull'icona
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 'Colori badge:'
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: Nulla
@@ -397,10 +394,10 @@ labelName:
   message: 'Nome:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Esegui in frame:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Senza nome
+  message: Senza Nome
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Nessuno script trovato.
@@ -426,7 +423,7 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: Reinstallazione dello script
 labelRelated:
   description: Label of related links.
   message: 'Link correlati: '
@@ -456,7 +453,7 @@ labelSettings:
   message: Impostazioni
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Mostra le posizioni degli ordini di esecuzione
 labelSync:
   description: Label for sync options.
   message: Sincronizzazione
@@ -496,7 +493,7 @@ labelSyncUsername:
   message: 'Username: '
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Tema:'
 labelTranslator:
   description: Label of translator.
   message: 'Traduttore: '
@@ -555,7 +552,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Script disabilitati abbinati
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Sub-frames only scripts
@@ -644,7 +641,7 @@ msgNoUpdate:
   message: Aggiornamento non trovato.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: (il codice è lo stesso)
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Blacklist aggiornata.
@@ -674,7 +671,7 @@ msgSyncInitError:
   message: Errore inizializzazione!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: Non ancora autorizzato.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: La sincronizzazione partirà presto...
@@ -708,13 +705,13 @@ optionPopupEnabledFirst:
   message: Enabled first
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Gruppo script disabilitati
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Hide disabled
+  message: Nascondi script disabilitati
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Mostra script disabilitati
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Visualizza script abilitati per primi
@@ -735,10 +732,12 @@ sideMenuSettings:
   message: Impostazioni
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: Colore badge normale
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: >-
+    Colore del badge quando il sito non è iniettabile (nella lista nera o non
+    supportato)
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Aggiornamento
