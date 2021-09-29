@@ -65,7 +65,7 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { dumpScriptValue, sendCmd } from '#/common';
+import { dumpScriptValue, sendCmdDirectly } from '#/common';
 import { mapEntry } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import storage from '#/common/storage';
@@ -151,7 +151,7 @@ export default {
     updateValue({ key, jsonValue, isNew }) {
       const rawValue = dumpScriptValue(jsonValue) || '';
       const { id } = this.script.props;
-      return sendCmd('UpdateValue', { id, key, value: rawValue })
+      return sendCmdDirectly('UpdateValue', { id, key, value: rawValue })
       .then(() => {
         if (rawValue) {
           this.$set(this.values, key, rawValue);
@@ -211,7 +211,7 @@ export default {
       }
       this.current = null;
       if (current.isAll) {
-        await sendCmd('SetValueStores', [{
+        await sendCmdDirectly('SetValueStores', [{
           where: {
             id: this.script.props.id,
           },

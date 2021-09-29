@@ -19,7 +19,7 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { ensureArray, i18n, sendCmd } from '#/common';
+import { ensureArray, i18n, sendCmdDirectly } from '#/common';
 import options from '#/common/options';
 import SettingCheck from '#/common/ui/setting-check';
 import loadZipLibrary from '#/common/zip';
@@ -50,7 +50,7 @@ export default {
     async vacuum() {
       this.vacuuming = true;
       this.labelVacuum = this.i18n('buttonVacuuming');
-      await sendCmd('Vacuum');
+      await sendCmdDirectly('Vacuum');
       this.vacuuming = false;
       this.labelVacuum = this.i18n('buttonVacuumed');
     },
@@ -80,14 +80,14 @@ async function importBackup(file) {
   await processAll(readScript, '.user.js');
   if (options.get('importScriptData')) {
     await processAll(readScriptStorage, '.storage.json');
-    sendCmd('SetValueStores',
+    sendCmdDirectly('SetValueStores',
       toObjectArray(vm.values, ([uri, store]) => store && ({ where: { uri }, store })));
   }
   if (options.get('importSettings')) {
-    sendCmd('SetOptions',
+    sendCmdDirectly('SetOptions',
       toObjectArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
   }
-  sendCmd('CheckPosition');
+  sendCmdDirectly('CheckPosition');
   showMessage({ text: reportProgress() });
   await reader.close();
 
@@ -135,7 +135,7 @@ async function importBackup(file) {
       },
     };
     try {
-      uriMap[name] = (await sendCmd('ParseScript', data)).update.props.uri;
+      uriMap[name] = (await sendCmdDirectly('ParseScript', data)).update.props.uri;
       reportProgress(filename);
     } catch (e) {
       report(e, filename, 'script');

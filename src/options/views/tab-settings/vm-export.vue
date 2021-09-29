@@ -21,7 +21,7 @@
 
 <script>
 import Modal from 'vueleton/lib/modal/bundle';
-import { getScriptName, sendCmd } from '#/common';
+import { getScriptName, sendCmdDirectly } from '#/common';
 import { objectGet } from '#/common/object';
 import options from '#/common/options';
 import ua from '#/common/ua';
@@ -115,7 +115,7 @@ function normalizeFilename(name) {
 
 async function exportData() {
   const withValues = options.get('exportValues');
-  const data = await sendCmd('ExportZip', {
+  const data = await sendCmdDirectly('ExportZip', {
     values: withValues,
   });
   const names = {};
