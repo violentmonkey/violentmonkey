@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { debounce, getScriptName, i18n, isEmpty, sendCmd, trueJoin } from '#/common';
+import { debounce, getScriptName, i18n, isEmpty, sendCmdDirectly, trueJoin } from '#/common';
 import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import { showMessage } from '#/common/ui';
 import { keyboardService } from '#/common/keyboard';
@@ -211,9 +211,9 @@ export default {
     this.nav = 'code';
     const id = this.script?.props?.id;
     if (id) {
-      this.code = await sendCmd('GetScriptCode', id);
+      this.code = await sendCmdDirectly('GetScriptCode', id);
     } else {
-      const { script, code } = await sendCmd('NewScript', route.paths[2]);
+      const { script, code } = await sendCmdDirectly('NewScript', route.paths[2]);
       this.script = script;
       this.code = code;
     }
@@ -273,7 +273,7 @@ export default {
       try {
         const codeComponent = this.$refs.code;
         const id = this.script?.props?.id;
-        const res = await sendCmd('ParseScript', {
+        const res = await sendCmdDirectly('ParseScript', {
           id,
           code: codeComponent.getRealContent(),
           config: {
