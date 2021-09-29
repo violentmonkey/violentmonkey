@@ -23,9 +23,11 @@ Object.assign(commands, {
 // Firefox Android does not support such APIs, use noop
 
 const browserAction = (() => {
-  const api = browser.browserAction;
+  const { chrome } = global;
+  // Using `chrome` namespace in order to skip our browser.js polyfill in Chrome
+  const api = chrome.browserAction;
   // Suppress the "no tab id" error when setting an icon/badge as it cannot be reliably prevented
-  const ignoreErrors = () => global.chrome.runtime.lastError;
+  const ignoreErrors = () => chrome.runtime.lastError;
   // Some methods like setBadgeText added callbacks only in Chrome 67+.
   const makeMethod = fn => (...args) => {
     try {
