@@ -68,25 +68,25 @@ const iconCache = ua.isChrome && {};
 
 hookOptions((changes) => {
   let v;
+  const jobs = [];
   if ((v = changes[KEY_IS_APPLIED]) != null) {
     isApplied = v;
     setIcon(); // change the default icon
-    forEachTab(setIcon); // change the current tabs' icons
+    jobs.push(setIcon); // change the current tabs' icons
   }
   if ((v = changes[KEY_SHOW_BADGE]) != null) {
     showBadge = v;
-    forEachTab(updateBadge);
+    jobs.push(updateBadge);
   }
-  if ((v = changes[KEY_BADGE_COLOR])) {
-    badgeColor = v;
-    forEachTab(updateBadgeColor);
-  }
-  if ((v = changes[KEY_BADGE_COLOR_BLOCKED])) {
-    badgeColorBlocked = v;
-    forEachTab(updateBadgeColor);
+  if ((v = changes[KEY_BADGE_COLOR]) && (badgeColor = v)
+  || (v = changes[KEY_BADGE_COLOR_BLOCKED]) && (badgeColorBlocked = v)) {
+    jobs.push(updateBadgeColor);
   }
   if ('blacklist' in changes) {
-    forEachTab(updateState);
+    jobs.push(updateState);
+  }
+  if (jobs.length) {
+    forEachTab(tab => jobs.forEach(fn => fn(tab)));
   }
 });
 
