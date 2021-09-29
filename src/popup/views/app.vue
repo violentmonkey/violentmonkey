@@ -479,20 +479,14 @@ export default {
     this.disposeList = [
       keyboardService.register('escape', () => {
         const item = this.activeExtras;
-        this.toggleExtras(null);
-        this.focus(item);
-      }, {
-        condition: 'activeExtras',
-      }),
-      keyboardService.register('escape', () => {
-        const { body, activeElement } = document;
-        if (activeElement !== body && body.contains(activeElement)) {
-          activeElement.blur();
+        if (item) {
+          this.toggleExtras(null);
+          this.focus(item);
+        } else if (document.activeElement?.value) {
+          document.activeElement.blur();
         } else {
           window.close();
         }
-      }, {
-        condition: '!activeExtras',
       }),
       keyboardService.register('up', () => {
         this.navigate('u');
