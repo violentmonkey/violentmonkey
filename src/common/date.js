@@ -8,7 +8,7 @@ const getDayOfYear = date => Math.floor((date - new Date(getYear(date), 0, 1)) /
 const getWeekOfYear = date => Math.floor((date - new Date(getYear(date), 0, 1)) / WEEK_MS) + 1;
 const toLocaleString = (date, opts) => date.toLocaleString([navigator.language], opts);
 
-/** @type {Object< string, (Date,...number[])=>string >} */
+/** @type {Object<string,(Date)=>string>} */
 export const DATE_FMT = {
   M: date => date.getMonth() + 1, // 1 2 ... 11 12
   MM: date => pad2(date.getMonth() + 1), // 01 02 ... 11 12
