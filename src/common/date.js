@@ -44,15 +44,21 @@ export const DATE_FMT = {
   },
 };
 
+let re;
+
 export function formatDate(tpl, date = new Date()) {
-  const re = DATE_FMT._ || (
-    DATE_FMT._ = new RegExp(`${
+  if (!re) {
+    re = new RegExp(`${
       // moment.js escaping for [literal text]
       /\[([^[\]]*)]/.source
     }|${
       // Matching longest first to allow omitting separators e.g. HHMM
       Object.keys(DATE_FMT).sort((a, b) => b.length - a.length).join('|')
-    }`, 'g')
-  );
-  return tpl?.replace(re, (s, literal) => DATE_FMT[s]?.(date) ?? literal ?? s);
+    }`, 'g');
+  }
+  return tpl?.replace(re, (s, literal) => (
+    DATE_FMT::hasOwnProperty(s)
+      ? DATE_FMT[s](date)
+      : literal ?? s
+  ));
 }
