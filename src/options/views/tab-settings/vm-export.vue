@@ -4,12 +4,12 @@
       <button v-text="i18n('buttonExportData')" @click="handleExport" :disabled="exporting"/>
       <setting-text name="exportNameTemplate" ref="tpl" has-reset :has-save="false" :rows="1"
                     class="tpl flex flex-1 center-items mr-1c"/>
-      <span v-text="getFileName()"/>
       <tooltip :content="i18n('msgDateFormatInfo', dateTokens)" placement="left">
         <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank">
           <icon name="info"/>
         </a>
       </tooltip>
+      <span v-text="getFileName()"/>
     </div>
     <div class="mt-1">
       <setting-check name="exportValues" :label="i18n('labelExportScriptData')" />
