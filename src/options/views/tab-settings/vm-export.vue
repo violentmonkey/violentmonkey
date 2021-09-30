@@ -170,6 +170,7 @@ async function exportData() {
     height: 18px;
   }
   .tpl {
+    max-width: 30em;
     textarea {
       height: auto;
       resize: none;
