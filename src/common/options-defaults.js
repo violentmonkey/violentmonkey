@@ -12,6 +12,7 @@ export default {
   badgeColor: '#880088',
   badgeColorBlocked: '#888888',
   exportValues: true,
+  exportNameTemplate: '[violentmonkey]_YYYY-MM-DD_HH.mm.ss',
   expose: { // use percent-encoding for '.'
     'greasyfork%2Eorg': true,
     'sleazyfork%2Eorg': false,

@@ -5,6 +5,7 @@
       :class="{'has-error': parsedData.error}"
       spellcheck="false"
       v-model="value"
+      :rows="rows"
       :disabled="disabled"
       :title="parsedData.error"
       @change="onChange"
@@ -34,6 +35,7 @@ export default {
       default: true,
     },
     hasReset: Boolean,
+    rows: Number,
   },
   data() {
     return {

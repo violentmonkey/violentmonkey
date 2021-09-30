@@ -1,6 +1,16 @@
 <template>
-  <div>
-    <button v-text="i18n('buttonExportData')" @click="handleExport" :disabled="exporting"></button>
+  <div class="export">
+    <div class="flex flex-wrap center-items mr-1c">
+      <button v-text="i18n('buttonExportData')" @click="handleExport" :disabled="exporting"/>
+      <setting-text name="exportNameTemplate" ref="tpl" has-reset :has-save="false" :rows="1"
+                    class="tpl flex flex-1 center-items mr-1c"/>
+      <span v-text="getFileName()"/>
+      <tooltip :content="i18n('msgDateFormatInfo', dateTokens)" placement="left">
+        <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank">
+          <icon name="info"/>
+        </a>
+      </tooltip>
+    </div>
     <div class="mt-1">
       <setting-check name="exportValues" :label="i18n('labelExportScriptData')" />
     </div>
@@ -9,7 +19,7 @@
       transition="in-out"
       :visible="!!store.ffDownload.url"
       @close="store.ffDownload = {}">
-      <div class="export-modal modal-content">
+      <div class="modal-content">
         <a :download="store.ffDownload.name" :href="store.ffDownload.url">
           Right click and save as<br />
           <strong>scripts.zip</strong>
@@ -21,11 +31,15 @@
 
 <script>
 import Modal from 'vueleton/lib/modal/bundle';
+import Tooltip from 'vueleton/lib/tooltip/bundle';
+import Icon from '#/common/ui/icon';
 import { getScriptName, sendCmdDirectly } from '#/common';
+import { formatDate, DATE_FMT } from '#/common/date';
 import { objectGet } from '#/common/object';
 import options from '#/common/options';
 import ua from '#/common/ua';
 import SettingCheck from '#/common/ui/setting-check';
+import SettingText from '#/common/ui/setting-text';
 import { downloadBlob } from '#/common/download';
 import loadZip from '#/common/zip';
 import { store } from '../../utils';
@@ -39,56 +53,35 @@ if (ua.isFirefox) store.ffDownload = {};
 export default {
   components: {
     SettingCheck,
+    SettingText,
+    Icon,
     Modal,
+    Tooltip,
   },
   data() {
     return {
       store,
+      dateTokens: Object.keys(DATE_FMT).join(', '),
       exporting: false,
     };
   },
   methods: {
     async handleExport() {
-      this.exporting = true;
       try {
-        const blob = await exportData();
-        download(blob);
-      } catch (err) {
-        console.error(err);
+        this.exporting = true;
+        download(await exportData(), this.getFileName());
+      } finally {
+        this.exporting = false;
       }
-      this.exporting = false;
+    },
+    getFileName() {
+      const { tpl } = this.$refs;
+      return tpl && `${formatDate(tpl.parsedData.value)}.zip`;
     },
   },
 };
 
-function leftpad(src, length, pad = '0') {
-  let str = `${src}`;
-  while (str.length < length) str = pad + str;
-  return str;
-}
-
-function getTimestamp() {
-  const date = new Date();
-  return `${
-    date.getFullYear()
-  }-${
-    leftpad(date.getMonth() + 1, 2)
-  }-${
-    leftpad(date.getDate(), 2)
-  }_${
-    leftpad(date.getHours(), 2)
-  }.${
-    leftpad(date.getMinutes(), 2)
-  }.${
-    leftpad(date.getSeconds(), 2)
-  }`;
-}
-
-function getExportname() {
-  return `scripts_${getTimestamp()}.zip`;
-}
-
-function download(blob) {
+function download(blob, fileName) {
   /* Old FF can't download blobs https://bugzil.la/1420419, fixed by enabling OOP:
    * v56 in Windows https://bugzil.la/1357486
    * v61 in MacOS https://bugzil.la/1385403
@@ -99,13 +92,13 @@ function download(blob) {
     const reader = new FileReader();
     reader.onload = () => {
       store.ffDownload = {
-        name: getExportname(),
+        name: fileName,
         url: reader.result,
       };
     };
     reader.readAsDataURL(blob);
   } else {
-    downloadBlob(blob, getExportname());
+    downloadBlob(blob, fileName);
   }
 }
 
@@ -168,7 +161,22 @@ async function exportData() {
 </script>
 
 <style>
-.export-modal {
-  width: 13rem;
+.export {
+  .modal-content {
+    width: 13rem;
+  }
+  .icon {
+    width: 18px;
+    height: 18px;
+  }
+  .tpl {
+    textarea {
+      height: auto;
+      resize: none;
+      white-space: nowrap;
+      overflow: hidden;
+      min-width: 10em;
+    }
+  }
 }
 </style>
