@@ -5,9 +5,10 @@
       :class="{'has-error': parsedData.error}"
       spellcheck="false"
       v-model="value"
-      :rows="rows"
       :disabled="disabled"
       :title="parsedData.error"
+      :placeholder="placeholder"
+      :rows="rows"
       @change="onChange"
     />
     <button v-if="hasSave" v-text="i18n('buttonSave')" @click="onSave"
@@ -40,6 +41,7 @@ export default {
   data() {
     return {
       value: null,
+      placeholder: null,
       savedValue: null,
     };
   },
@@ -78,11 +80,13 @@ export default {
       ? (value => JSON.stringify(value, null, '  '))
       // XXX compatible with old data format
       : (value => (Array.isArray(value) ? value.join('\n') : value || ''));
+    const defaultValue = objectGet(defaults, this.name);
     this.revoke = hookSetting(this.name, val => {
       this.savedValue = val;
       this.value = handle(val);
     });
-    this.defaultValue = objectGet(defaults, this.name);
+    this.defaultValue = defaultValue;
+    this.placeholder = handle(defaultValue);
     this.toggleUnloadSentry = getUnloadSentry(() => {
       // Reset to saved value after confirming loss of data.
       // The component won't be destroyed on tab change, so the changes are actually kept.

@@ -56,7 +56,7 @@ export function formatDate(tpl, date = new Date()) {
       Object.keys(DATE_FMT).sort((a, b) => b.length - a.length).join('|')
     }`, 'g');
   }
-  return tpl?.replace(re, (s, literal) => (
+  return tpl.replace(re, (s, literal) => (
     DATE_FMT::hasOwnProperty(s)
       ? DATE_FMT[s](date)
       : literal ?? s
