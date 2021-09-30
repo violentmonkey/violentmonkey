@@ -76,7 +76,7 @@ export default {
     },
     getFileName() {
       const { tpl } = this.$refs;
-      return tpl && `${formatDate(tpl.value.trim() || tpl.defaultValue)}.zip`;
+      return tpl && `${formatDate(tpl.value?.trim() || tpl.defaultValue)}.zip`;
     },
   },
 };
