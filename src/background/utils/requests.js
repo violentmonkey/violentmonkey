@@ -305,9 +305,10 @@ async function httpRequest(opts, src, cb) {
   const FF = ua.isFirefox;
   // Firefox can send Blob/ArrayBuffer directly
   const chunked = !FF && incognito;
+  const blobbed = responseType && !FF && !incognito;
   const [body, contentType] = decodeBody(opts.data);
   // Chrome can't fetch Blob URL in incognito so we use chunks
-  req.blobbed = responseType && !FF && !incognito;
+  req.blobbed = blobbed;
   req.chunked = chunked;
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
@@ -327,7 +328,7 @@ async function httpRequest(opts, src, cb) {
       shouldSendCookies = false;
     }
   });
-  xhr.responseType = chunked && 'blob' || responseType || 'text';
+  xhr.responseType = (chunked || blobbed) && 'blob' || responseType || 'text';
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
   if (shouldSendCookies) {
