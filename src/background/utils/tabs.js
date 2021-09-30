@@ -18,7 +18,7 @@ Object.assign(commands, {
       const { tab, domain } = await commands.GetTabDomain();
       const id = domain && commands.CacheNewScript({
         url: (tab.pendingUrl || tab.url).split(/[#?]/)[0],
-        name: `- ${domain}`,
+        name: `${getOption('scriptTemplateEdited') ? '' : '- '}${domain}`,
       });
       pathId = `_new${id ? `/${id}` : ''}`;
     }
