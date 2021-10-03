@@ -163,13 +163,11 @@ export function makeGmApi() {
     GM_addStyle: css => (
       webAddElement(undefined, 'style', { textContent: css }, getUniqId('VMst'))
     ),
-    GM_openInTab(url, options) {
-      const data = options && typeof options === 'object' ? options : {
-        active: !options,
-      };
-      data.url = url;
-      return onTabCreate(data);
-    },
+    GM_openInTab: (url, options) => (
+      onTabCreate(options && typeof options === 'object'
+        ? assign({}, options, { url })
+        : { active: !options, url })
+    ),
     GM_notification(text, title, image, onclick) {
       const options = typeof text === 'object' ? text : {
         text,

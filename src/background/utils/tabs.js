@@ -57,10 +57,11 @@ Object.assign(commands, {
       storeId = getContainerId(isInternal ? 0 : container) || storeId;
     }
     if (storeId) storeId = { cookieStoreId: storeId };
-    if (!url.startsWith('blob:')) {
-      // URL needs to be expanded for `canOpenIncognito` below
-      if (!isInternal) url = getFullUrl(url, srcUrl);
-      else if (!/^[-\w]+:/.test(url)) url = browser.runtime.getURL(url);
+    // URL needs to be expanded for `canOpenIncognito` below
+    if (!/^[-\w]+:/.test(url)) {
+      url = isInternal
+        ? browser.runtime.getURL(url)
+        : getFullUrl(url, srcUrl);
     }
     const canOpenIncognito = !incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url);
     let newTab;
