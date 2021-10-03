@@ -15,7 +15,7 @@ buttonDisable:
   message: Wyłącz
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: Pobierz motywy
+  message: Pobierz motyw
 buttonEdit:
   description: Button to edit a script.
   message: Edytuj
@@ -582,6 +582,9 @@ menuScriptEnabled:
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: Sprawdzanie aktualizacji...
+msgDateFormatInfo:
+  description: Help text of the info icon in VM settings for the export file name.
+  message: ''
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of

@@ -567,6 +567,11 @@ menuScriptEnabled:
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: Bezig met controleren op updates...
+msgDateFormatInfo:
+  description: Help text of the info icon in VM settings for the export file name.
+  message: >-
+    Klik om de MomentJS-documentatie te lezen. Toegestane sleutels: $1. Gebruik
+    [vierkante haakjes] om letterlijke tekst te beschermen.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of

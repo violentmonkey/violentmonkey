@@ -555,6 +555,9 @@ menuScriptEnabled:
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: 更新を確認中…
+msgDateFormatInfo:
+  description: Help text of the info icon in VM settings for the export file name.
+  message: ''
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
