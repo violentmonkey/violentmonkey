@@ -579,7 +579,9 @@ msgCheckingForUpdate:
   message: Se caută actualizări...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    Dă clic pentru a deschide documentația MomentJS. Indicative permise: $1.
+    Folosește [paranteze pătrate] pentru a proteja textul literal.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of

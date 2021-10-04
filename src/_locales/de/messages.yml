@@ -577,7 +577,9 @@ msgCheckingForUpdate:
   message: Prüfe auf Aktualisierungen...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    Klicken, um die MomentJS-Dokumentation zu öffnen. Erlaubte Token: $1. Nutzen
+    Sie [eckige Klammern] um tatsächlichen Text zu schützen.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
