@@ -38,7 +38,8 @@ bridge.addHandlers({
     if (!bfCacheWired) {
       bfCacheWired = true;
       window::addEventListener('pageshow', evt => {
-        if (evt.persisted) {
+        // isTrusted is `unforgeable` per DOM spec so we don't need to safeguard its getter
+        if (evt.isTrusted && evt.persisted) {
           sendCmd('SetBadge', runningIds);
         }
       });
