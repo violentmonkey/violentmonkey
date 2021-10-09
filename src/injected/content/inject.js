@@ -21,6 +21,7 @@ let realms;
 let pageInjectable;
 let badgePromise;
 let numBadgesSent = 0;
+let bfCacheWired;
 
 bridge.addHandlers({
   // FF bug workaround to enable processing of sourceURL in injected page scripts
@@ -33,6 +34,14 @@ bridge.addHandlers({
     }
     if (!badgePromise) {
       badgePromise = resolvedPromise::then(throttledSetBadge);
+    }
+    if (!bfCacheWired) {
+      bfCacheWired = true;
+      window::addEventListener('pageshow', evt => {
+        if (evt.persisted) {
+          sendCmd('SetBadge', runningIds);
+        }
+      });
     }
   },
 });
