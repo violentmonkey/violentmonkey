@@ -75,10 +75,12 @@ footer {
     background: cornflowerblue;
     color: var(--bg);
   }
+  .script:not(.disabled):not(.runs) & .script-name,
   .disabled:not(.runs) > & {
     color: var(--fill-8);
+    &:hover,
     &:focus {
-      color: var(--fill-4);
+      color: var(--fill-2);
     }
   }
 }
