@@ -54,21 +54,19 @@ export function appendToRoot(node) {
   return root && root::appendChild(node);
 }
 
-export function injectPageSandbox(contentId, webId) {
+export function injectPageSandbox() {
   inject({
-    code: `(${VMInitInjection}())('${webId}','${contentId}')\n//# sourceURL=${
+    code: `(${VMInitInjection}())('${bridge.webId}','${bridge.contentId}')\n//# sourceURL=${
       browser.runtime.getURL('sandbox/injected-web.js')
     }`,
   });
 }
 
 /**
- * @param {string} contentId
- * @param {string} webId
  * @param {VMGetInjectedData} data
  * @param {boolean} isXml
  */
-export async function injectScripts(contentId, webId, data, isXml) {
+export async function injectScripts(data, isXml) {
   // eslint-disable-next-line prefer-rest-params
   if (!elemByTag('*')) return onElement('*', injectScripts, ...arguments);
   const { hasMore, info } = data;
@@ -108,8 +106,9 @@ export async function injectScripts(contentId, webId, data, isXml) {
   });
   // saving while safe
   const getReadyState = hasMore && describeProperty(Document.prototype, 'readyState').get;
-  if (realms[INJECT_CONTENT].is) {
-    setupContentInvoker(contentId, webId);
+  const hasInvoker = realms[INJECT_CONTENT].is;
+  if (hasInvoker) {
+    setupContentInvoker();
   }
   injectAll('start');
   const onBody = (pgLists.body[0] || contLists.body[0])
@@ -117,7 +116,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
   // document-end, -idle
   if (hasMore) {
     data = await moreData;
-    if (data) await injectDelayedScripts(data, getReadyState);
+    if (data) await injectDelayedScripts(data, getReadyState, hasInvoker);
   }
   if (onBody) {
     await onBody;
@@ -127,16 +126,18 @@ export async function injectScripts(contentId, webId, data, isXml) {
   contLists = null;
 }
 
-async function injectDelayedScripts({ info, scripts }, getReadyState) {
+async function injectDelayedScripts({ info, scripts }, getReadyState, hasInvoker) {
   realms::forEachKey(r => {
-    realms[r].info = info;
+    assign(realms[r].info, info);
   });
+  let needsInvoker;
   scripts::forEach(script => {
     const { code, runAt } = script;
     if (code && !pageInjectable) {
       bridge.failedIds::push(script.props.id);
     } else {
       (code ? pgLists : contLists)[runAt]::push(script);
+      if (!code) needsInvoker = true;
     }
     script.stage = !code && runAt;
   });
@@ -144,6 +145,9 @@ async function injectDelayedScripts({ info, scripts }, getReadyState) {
     await new Promise(resolve => {
       document::addEventListener('DOMContentLoaded', resolve, { once: true });
     });
+  }
+  if (needsInvoker && !hasInvoker) {
+    setupContentInvoker();
   }
   injectAll('end');
   injectAll('idle');
@@ -239,8 +243,8 @@ function onElement(tag, cb, ...args) {
   });
 }
 
-function setupContentInvoker(contentId, webId) {
-  const invokeContent = VMInitInjection()(webId, contentId, bridge.onHandle);
+function setupContentInvoker() {
+  const invokeContent = VMInitInjection()(bridge.webId, bridge.contentId, bridge.onHandle);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm) => (
     (realm === INJECT_CONTENT ? invokeContent : postViaBridge)(cmd, params)
