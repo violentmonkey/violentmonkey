@@ -28,7 +28,11 @@ const { split } = '';
   // injecting right now before site scripts can mangle globals or intercept our contentId
   // except for XML documents as their appearance breaks, but first we're sending
   // a request for the data because injectPageSandbox takes ~5ms
-  const dataPromise = sendCmd('GetInjected', null, { retry: true });
+  const dataPromise = sendCmd('GetInjected',
+    /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
+     * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
+    IS_FIREFOX && global.location.href,
+    { retry: true });
   const isXml = document instanceof XMLDocument;
   if (!isXml) injectPageSandbox();
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath

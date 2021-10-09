@@ -41,8 +41,9 @@ Object.assign(commands, {
     return data;
   },
   /** @return {Promise<Object>} */
-  async GetInjected(_, src) {
-    const { frameId, url, tab: { id: tabId } } = src;
+  async GetInjected(url, src) {
+    const { frameId, tab: { id: tabId } } = src;
+    if (!url) url = src.url;
     if (!frameId) {
       resetValueOpener(tabId);
       clearRequestsByTabId(tabId);
