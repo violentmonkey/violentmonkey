@@ -83,6 +83,7 @@
             disabled: !item.data.config.enabled,
             failed: item.data.failed,
             removed: item.data.config.removed,
+            runs: item.data.runs,
             'extras-shown': activeExtras === item,
             'excludes-shown': item.excludesValue,
           }"

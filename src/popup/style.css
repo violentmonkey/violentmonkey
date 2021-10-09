@@ -75,7 +75,7 @@ footer {
     background: cornflowerblue;
     color: var(--bg);
   }
-  .disabled > & {
+  .disabled:not(.runs) > & {
     color: var(--fill-8);
     &:focus {
       color: var(--fill-4);

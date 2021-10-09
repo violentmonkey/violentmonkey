@@ -122,7 +122,7 @@ async function sendSetPopup(isDelayed) {
       pendingSetPopup = null;
     }
     sendCmd('SetPopup',
-      assign({ menus }, objectPick(bridge, ['ids', 'failedIds', 'injectInto'])));
+      assign({ menus }, objectPick(bridge, ['ids', 'failedIds', 'runningIds', 'injectInto'])));
   }
 }
 

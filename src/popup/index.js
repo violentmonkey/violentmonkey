@@ -38,18 +38,18 @@ Object.assign(handlers, {
       const scope = store[isTop ? 'scripts' : 'frameScripts'];
       const metas = data.scripts?.filter(({ props: { id } }) => ids.includes(id))
         || (Object.assign(data, await sendCmdDirectly('GetData', ids))).scripts;
-      metas.forEach(script => loadScriptIcon(script, data.cache));
-      scope.push(...metas);
-      data.failedIds.forEach(id => {
-        scope.forEach((script) => {
-          if (script.props.id === id) {
-            script.failed = true;
-            if (!store.injectionFailure) {
-              store.injectionFailure = { fixable: data.injectInto === INJECT_PAGE };
-            }
+      metas.forEach(script => {
+        loadScriptIcon(script, data.cache);
+        const { id } = script.props;
+        script.runs = data.runningIds.includes(id);
+        if (data.failedIds.includes(id)) {
+          script.failed = true;
+          if (!store.injectionFailure) {
+            store.injectionFailure = { fixable: data.injectInto === INJECT_PAGE };
           }
-        });
+        }
       });
+      scope.push(...metas);
     }
   },
 });
