@@ -191,7 +191,6 @@ function injectAll(runAt) {
     const items = realmData.lists[runAt];
     if (items.length) {
       bridge.post('ScriptData', { items, runAt, info: realmData.info }, realm);
-      realmData.info = undefined;
       if (realm === INJECT_PAGE && !bridge.isFirefox) {
         injectList(runAt);
       }
