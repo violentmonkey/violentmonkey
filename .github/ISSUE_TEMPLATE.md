@@ -15,7 +15,7 @@ Note that issues without a reproduction may be closed immediately!
 
 ### What is the actual result?
 
-### What is the result in the [upcoming release](https://github.com/violentmonkey/violentmonkey/releases)?  WARNING! Do an export in settings before testing!
+### What is the result in the [upcoming release](https://github.com/violentmonkey/violentmonkey/releases)?<br>WARNING! Do an export in settings before testing!
 
 <!--
 If this is a bug report, please also provide logs in the console.
