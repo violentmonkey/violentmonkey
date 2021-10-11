@@ -10,6 +10,16 @@
         <span class="ml-1" v-text="page"/> / <span class="mr-1" v-text="totalPages"/>
         <button :disabled="page >= totalPages" @click="page += 1">&rarr;</button>
       </div>
+      <span class="ml-2 mr-2c">
+        <template v-if="totalPages > 1">
+          <span><kbd>PageUp</kbd>: ←</span>
+          <span><kbd>PageDown</kbd>: →</span>
+        </template>
+        <span><kbd>Tab</kbd>: ↓</span>
+        <span><kbd>Shift-Tab</kbd>: ↑</span>
+        <span><kbd>Enter</kbd>: {{i18n('buttonEdit')}}</span>
+        <span><kbd>Ctrl-Del</kbd>: {{i18n('buttonRemove')}}</span>
+      </span>
     </div>
     <div class="edit-values-table" v-if="keys">
       <div class="edit-values-empty" v-if="!keys.length">
@@ -25,9 +35,7 @@
         <div class="ellipsis">
           <span v-text="key"></span>
           <div class="edit-values-btn" @click.stop.prevent="onRemove(key)">
-            <tooltip :content="`Ctrl-Del: ${i18n('buttonRemove')}`">
-              <icon name="trash"/>
-            </tooltip>
+            <icon name="trash"/>
           </div>
         </div>
         <div class="ellipsis flex-auto" v-text="getValue(key, true)"></div>
@@ -66,6 +74,7 @@
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { dumpScriptValue, sendCmdDirectly } from '#/common';
+import { keyboardService } from '#/common/keyboard';
 import { mapEntry } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import storage from '#/common/storage';
@@ -83,6 +92,12 @@ const reparseJson = (str) => {
   } catch (e) {
     // This shouldn't happen but the storage may get corrupted or modified directly
     return str;
+  }
+};
+const getActiveElement = () => document.activeElement;
+const flipPage = (vm, dir) => {
+  if (getActiveElement()?.selectionEnd == null) {
+    vm.page = Math.max(1, Math.min(vm.totalPages, vm.page + dir));
   }
 };
 
@@ -115,12 +130,18 @@ export default {
         storage.value.getOne(this.script.props.id).then(this.setData);
         scriptStorageKey = storage.value.prefix + this.script?.props.id;
         (focusedElement || this.$refs.container.querySelector('button')).focus();
+        this.disposeList = [
+          keyboardService.register('pageup', () => flipPage(this, -1)),
+          keyboardService.register('pagedown', () => flipPage(this, 1)),
+        ];
+      } else {
+        this.disposeList?.forEach(dispose => dispose());
       }
       browser.storage.onChanged[`${val ? 'add' : 'remove'}Listener`](this.onStorageChanged);
     },
     current(val, oldVal) {
       if (val) {
-        focusedElement = document.activeElement;
+        focusedElement = getActiveElement();
         this.initial = val.value;
         this.$nextTick(() => {
           const el = this.$refs[val.isNew ? 'key' : 'value'];
