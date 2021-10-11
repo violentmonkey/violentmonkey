@@ -9,13 +9,13 @@ buttonConfirmInstallation:
   message: Confirmar instalação
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: ''
+  message: Confirmar reinstalação
 buttonDisable:
   description: Button to disable a script.
   message: Desativar
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: ''
+  message: Baixar temas
 buttonEdit:
   description: Button to edit a script.
   message: Editar
@@ -121,7 +121,9 @@ descEditorOptions:
   message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: >-
+    Documentação sobre o bloco de metadados do userscript e a API
+    <code>GM</code>:
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: 'Atalhos do teclado:'
@@ -154,7 +156,7 @@ editValueAll:
   message: Tudo
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Exibir/editar todo o armazenamento de valores do script
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: Cancelar
@@ -183,19 +185,19 @@ filterExecutionOrder:
   message: ordem de execução
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: data da última atualização
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Tudo
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Código
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: ''
+  message: Nome
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Erro
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: Desativado
@@ -204,7 +206,7 @@ genericOn:
   message: Ativado
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: usar opção global
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Lixeira
@@ -259,10 +261,10 @@ labelAutoReloadCurrentTabDisabled:
   message: ''
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: 'Verificar atualizações de scripts a cada $1 dia(s), use 0 para desativar'
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: Backup
 labelBadge:
   description: Label for option to show number on badge.
   message: Exibir no Ícone
@@ -306,13 +308,13 @@ labelDownloadURL:
   message: 'URL de download:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Editando valor do script
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Editando armazenamento do script
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Editor
 labelExclude:
   description: Label of @exclude rules.
   message: Regras @exclude
@@ -339,13 +341,13 @@ labelHelpTranslate:
   message: Ajude com a tradução
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Website
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL do website:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Importar dados dos scripts
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importar definições
@@ -354,7 +356,7 @@ labelInclude:
   message: Regras @include
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: ''
+  message: 'Modo padrão de injeção de script:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Instalando o script
@@ -375,10 +377,10 @@ labelName:
   message: 'Nome:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Executar em frames:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Sem nome
+  message: Sem Nome
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Nenhum script encontrado.
@@ -387,7 +389,7 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', então avise:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notificar sobre atualizações de scripts
@@ -396,7 +398,7 @@ labelNotifyUpdatesGlobal:
   message: ''
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Ordenar scripts no popup por $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Política de Privacidade
@@ -404,13 +406,13 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: Reinstalando o script
 labelRelated:
   description: Label of related links.
   message: 'Links relacionados: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: ''
+  message: Removido em $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Substituir por: '
@@ -422,7 +424,7 @@ labelRunAtDefault:
   message: (Padrão)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Modelo de Script Customizado
 labelSearch:
   description: Label for search input in search box.
   message: 'Localizar: '
@@ -434,13 +436,13 @@ labelSettings:
   message: Configurações
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Mostrar posições na ordem de execução
 labelSync:
   description: Label for sync options.
   message: Sincronizar
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: Utilizar conta anônima
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Autorizar
@@ -465,7 +467,7 @@ labelSyncScriptStatus:
   message: Sincronizar estados dos scripts
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'URL do servidor: '
 labelSyncService:
   description: Label for sync service select.
   message: Sincronizar em
@@ -474,7 +476,7 @@ labelSyncUsername:
   message: Nome de usuário
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Tema: '
 labelTranslator:
   description: Label of translator.
   message: 'Tradução: '
@@ -486,10 +488,10 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Uma coluna
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Ver como tabela
 lastSync:
   description: Label for last sync timestamp.
   message: 'Última sincronização: $1'
@@ -510,10 +512,17 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Excluir...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    A aba atual irá se recarregar automaticamente se você ativar esta opção nas
+    configurações gerais.
+
+    Para aplicar mudanças a todas as demais abas, por favor recarregue-as
+    manualmente.
+
+    Use a aba "Configurações" do editor para ter mais flexibilidade.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Procurar scripts para este site
@@ -553,7 +562,7 @@ msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: ''
+  message: Erro ao carregar recurso!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: Erro ao obter script!
@@ -635,7 +644,7 @@ msgScriptUpdated:
   message: '[$1] foi atualizado!'
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Mostrar/Esconder
 msgSyncError:
   description: Message shown when sync failed.
   message: Erro de sincronização!
@@ -679,22 +688,22 @@ optionPopupEnabledFirst:
   message: Ativar primeiro
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Agrupar scripts desativados
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Esconder desativado(s)
+  message: Esconder scripts desativados
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Mostrar scripts desativados
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Mostrar scripts ativos primeiro
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: Respeitar maiúsculas/minúsculas
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Usar expressão regular
 sideMenuAbout:
   description: 'Side menu: About'
   message: Sobre
@@ -718,13 +727,13 @@ titleSearchHint:
   message: ''
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Chave (texto)
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: Valor (serializado em JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Todos os valores (serializados em JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Visitar Site
