@@ -15,7 +15,7 @@ buttonDisable:
   message: Выключить
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: ''
+  message: Скачать темы
 buttonEdit:
   description: Button to edit a script.
   message: Редактировать
@@ -119,16 +119,11 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Ваши параметры для CodeMirror и аддонов в объекте JSON, например
-    <code>{"indentUnit":2, "smartIndent":true}.</code>Однако заметьте, некоторые
-    из них могут не работать в Violentmonkey. Смотрите <a
+    Опции для редактора CodeMirror и его дополнений в формате JSON, например
+    <code>{"indentUnit":2, "smartIndent":true}</code>. Имейте в виду, что
+    некоторые опции могут не работать в Violentmonkey. См. <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">полный список</a>. Чтобы использовать
-    настраиваемую тему CodeMirror, укажите имя файла, например<code> "theme":
-    "3024-day"</code> и вставьте <a
-    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
-    target="_blank" rel="noopener noreferrer">CSS актуальной темы</a> темы в
-    поле "Пользовательский стиль" ниже.
+    rel="noopener noreferrer">полный список</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Документация по блоку метаданных скриптов и <code>GM</code> API:'
@@ -280,7 +275,7 @@ labelAutoUpdate:
   message: 'Проверять наличие обновлений скриптов каждые $1 дней, 0 для отключения'
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: Резервная копия
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Показывать на значке: '
@@ -342,7 +337,7 @@ labelExportScriptData:
   message: Экспорт данных скриптов
 labelExposeStatus:
   description: Option in advanced settings.
-  message: 'Публиковать установленную версию в каталоге userscripts: $1'
+  message: 'Показывать версию установленного скрипта на сайтах каталогов скриптов:: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
@@ -393,10 +388,10 @@ labelName:
   message: 'Имя:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Запускать во фреймах:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Без имени
+  message: Безымянный
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: Скрипты не найдены.
@@ -492,7 +487,7 @@ labelSyncUsername:
   message: 'Логин:'
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Тема:'
 labelTranslator:
   description: Label of translator.
   message: 'Переводчики: '
@@ -550,7 +545,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Совпадающие отключенные скрипты
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Суб-фреймы скриптов
@@ -668,7 +663,7 @@ msgSyncInitError:
   message: Ошибка инициализации синхронизации!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: Еще не авторизован
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Ожидание синхронизации...
@@ -702,13 +697,13 @@ optionPopupEnabledFirst:
   message: Сначала включенные
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Группировать отключенные скрипты
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Скрыть отключенные
+  message: Скрыть отключенные скрипты
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Показать отключенные скрипты
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Сначала показать включенные скрипты

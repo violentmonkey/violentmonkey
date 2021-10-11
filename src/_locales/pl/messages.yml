@@ -294,7 +294,7 @@ labelBadge:
   message: 'Wyświetl na plakietce: '
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: 'Kolory odznak:'
+  message: 'Kolory plakietki:'
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: nic
@@ -584,7 +584,9 @@ msgCheckingForUpdate:
   message: Sprawdzanie aktualizacji...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    Kliknij, aby otworzyć dokumentację MomentJS. Dozwolone tokeny: $1. Użyj
+    [nawiasów kwadratowych], aby chronić nieprzenośny tekst.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
