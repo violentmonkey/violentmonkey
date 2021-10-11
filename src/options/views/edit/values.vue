@@ -40,7 +40,7 @@
           <button v-text="i18n('editValueSave')" @click="onSave"
                   :class="{'has-error': current.error}"
                   :title="current.error"
-                  :disabled="current.error"/>
+                  :disabled="current.error || current.value === initial"/>
           <button v-text="i18n('editValueCancel')" @click="onCancel"></button>
         </div>
       </div>
@@ -121,6 +121,7 @@ export default {
     current(val, oldVal) {
       if (val) {
         focusedElement = document.activeElement;
+        this.initial = val.value;
         this.$nextTick(() => {
           const el = this.$refs[val.isNew ? 'key' : 'value'];
           el.setSelectionRange(0, 0);
