@@ -11,4 +11,5 @@ export const store = {
     return store.scripts.filter(script => script.config.removed);
   },
   HiDPI: isHiDPI,
+  storageSize: 0,
 };

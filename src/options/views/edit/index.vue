@@ -60,7 +60,10 @@
 </template>
 
 <script>
-import { debounce, getScriptName, i18n, isEmpty, sendCmdDirectly, trueJoin } from '#/common';
+import {
+  debounce, formatByteLength, getScriptName, i18n, isEmpty,
+  sendCmdDirectly, trueJoin,
+} from '#/common';
 import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import { showMessage } from '#/common/ui';
 import { keyboardService } from '#/common/keyboard';
@@ -168,10 +171,13 @@ export default {
       const { meta, props } = this.script || {};
       const req = meta?.require.length && '@require';
       const res = !isEmpty(meta?.resources) && '@resource';
+      const size = store.storageSize;
       return {
         code: i18n('editNavCode'),
         settings: i18n('editNavSettings'),
-        ...props?.id && { values: i18n('editNavValues') },
+        ...props?.id && {
+          values: i18n('editNavValues') + (size ? ` (${formatByteLength(size)})` : ''),
+        },
         ...(req || res) && { externals: [req, res]::trueJoin('/') },
         help: '?',
       };
@@ -208,6 +214,7 @@ export default {
     }
   },
   async mounted() {
+    store.storageSize = 0;
     this.nav = 'code';
     const id = this.script?.props?.id;
     if (id) {

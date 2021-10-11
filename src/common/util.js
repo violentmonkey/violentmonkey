@@ -187,6 +187,13 @@ export function formatTime(duration) {
   return `${duration | 0}${unitInfo[0]}`;
 }
 
+export const formatByteLength = len => (
+  !len ? ''
+    : len < 1024 && `${len} B`
+    || len < 1024 * 1024 && `${len >> 10} k` // eslint-disable-line no-bitwise
+    || `${+(len / (1024 * 1024)).toFixed(1)} M` // allow fractions for megabytes
+);
+
 export function isEmpty(obj) {
   for (const key in obj) {
     if (obj::hasOwnProperty(key)) {

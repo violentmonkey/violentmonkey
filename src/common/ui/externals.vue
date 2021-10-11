@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { string2uint8array } from '#/common';
+import { formatByteLength, string2uint8array } from '#/common';
 import VmCode from '#/common/ui/code';
 import storage from '#/common/storage';
 
@@ -121,10 +121,7 @@ export default {
       if (type.startsWith('@resource')) {
         len = Math.round((len - str.indexOf(',') - 1) * 6 / 8); // base64 uses 6 bits out of 8
       }
-      return !len ? ''
-        : len < 1024 && `${len} B`
-        || len < 1024 * 1024 && `${len >> 10} k` // eslint-disable-line no-bitwise
-        || `${+(len / (1024 * 1024)).toFixed(1)} M`; // allow fractions for megabytes
+      return formatByteLength(len);
     },
   },
 };

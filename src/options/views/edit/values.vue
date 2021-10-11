@@ -39,6 +39,7 @@
           </div>
         </div>
         <div class="ellipsis flex-auto" v-text="getValue(key, true)"></div>
+        <pre v-text="getLength(key)"/>
       </a>
     </div>
     <div class="edit-values-panel flex flex-col mb-1c" v-if="current">
@@ -73,12 +74,13 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { dumpScriptValue, sendCmdDirectly } from '#/common';
+import { dumpScriptValue, formatByteLength, sendCmdDirectly } from '#/common';
 import { keyboardService } from '#/common/keyboard';
 import { mapEntry } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import storage from '#/common/storage';
 import { showMessage } from '#/common/ui';
+import { store } from '../../utils';
 
 const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;
@@ -154,6 +156,10 @@ export default {
     },
   },
   methods: {
+    getLength(key) {
+      const len = this.values[key].length - 1;
+      return len < 10_000 ? len : formatByteLength(len);
+    },
     getValue(key, sliced) {
       let value = this.values[key];
       const type = value[0];
@@ -169,6 +175,10 @@ export default {
       this.values = values;
       this.keys = Object.keys(values).sort();
       this.page = Math.min(this.page, this.totalPages) || 1;
+      this.calcSize();
+    },
+    calcSize() {
+      store.storageSize = this.keys.reduce((sum, key) => sum + this.values[key].length - 1, 0);
     },
     updateValue({ key, jsonValue, isNew }) {
       const rawValue = dumpScriptValue(jsonValue) || '';
@@ -183,6 +193,7 @@ export default {
           if (i >= 0) this.keys.splice(i, 1);
           this.$delete(this.values, key);
         }
+        this.calcSize();
       });
     },
     onNew() {
@@ -280,6 +291,8 @@ export default {
             current.value = newText;
           }
         }
+      } else {
+        store.storageSize = 0;
       }
     },
   },
@@ -306,6 +319,10 @@ export default {
       &:not(:first-child) {
         border-left: 1px solid var(--fill-2);
       }
+    }
+    pre {
+      width: 5em;
+      text-align: right;
     }
     &:focus,
     &:hover {
