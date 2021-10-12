@@ -129,9 +129,12 @@ export default {
   watch: {
     active(val) {
       if (val) {
-        storage.value.getOne(this.script.props.id).then(this.setData);
+        storage.value.getOne(this.script.props.id).then(data => {
+          // Focusing explicitly when the values UI becomes active again
+          if (this.page) this.autofocus();
+          this.setData(data);
+        });
         scriptStorageKey = storage.value.prefix + this.script?.props.id;
-        (focusedElement || this.$refs.container.querySelector('button')).focus();
         this.disposeList = [
           keyboardService.register('pageup', () => flipPage(this, -1)),
           keyboardService.register('pagedown', () => flipPage(this, 1)),
@@ -154,8 +157,18 @@ export default {
         focusedElement?.focus();
       }
     },
+    page() {
+      focusedElement = null;
+      this.autofocus();
+    },
   },
   methods: {
+    autofocus() {
+      this.$nextTick(() => {
+        (focusedElement || this.$refs.container.querySelector(this.keys?.length ? 'a' : 'button'))
+        .focus();
+      });
+    },
     getLength(key) {
       const len = this.values[key].length - 1;
       return len < 10_000 ? len : formatByteLength(len);
