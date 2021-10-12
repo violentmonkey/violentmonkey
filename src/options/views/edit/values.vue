@@ -29,9 +29,9 @@
         v-for="key in pageKeys"
         :key="key"
         class="edit-values-row flex"
-        href="#"
+        tabindex="0"
         @keydown.delete.ctrl.exact="onRemove(key)"
-        @click.prevent="onEdit(key)">
+        @click="onEdit(key)">
         <div class="ellipsis">
           <span v-text="key"></span>
           <div class="edit-values-btn" @click.stop.prevent="onRemove(key)">
@@ -317,7 +317,7 @@ export default {
   &-row {
     border: 1px solid var(--fill-2);
     color: unset;
-    text-decoration: none;
+    cursor: pointer;
     &:not(:first-child) {
       border-top: 0;
     }

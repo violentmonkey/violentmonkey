@@ -104,8 +104,8 @@
       </header>
       <div v-if="showRecycle" class="trash-hint mx-1 my-1 flex flex-col">
         <span v-text="i18n('hintRecycleBin')"/>
-        <a v-if="trash.length" v-text="i18n('buttonEmptyRecycleBin')" href="#"
-           @click.prevent="emptyRecycleBin"/>
+        <a v-if="trash.length" v-text="i18n('buttonEmptyRecycleBin')" tabindex="0"
+           @click="emptyRecycleBin"/>
       </div>
       <div class="scripts flex-auto"
            ref="scriptList"
