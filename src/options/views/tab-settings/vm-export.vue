@@ -9,7 +9,7 @@
           <icon name="info"/>
         </a>
       </tooltip>
-      <span v-text="getFileName()"/>
+      <span hidden v-text="getFileName()"/>
     </div>
     <div class="mt-1">
       <setting-check name="exportValues" :label="i18n('labelExportScriptData')" />
@@ -166,11 +166,15 @@ async function exportData() {
     width: 13rem;
   }
   .icon {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
+    fill: var(--fg);
   }
   .tpl {
     max-width: 30em;
+    &:focus-within ~ [hidden] {
+      display: initial;
+    }
     textarea {
       height: auto;
       resize: none;
