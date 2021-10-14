@@ -9,6 +9,7 @@ const TerserPlugin = isProd && require('terser-webpack-plugin');
  * - value.html.inlineSource: if true, JS and CSS files will be inlined in HTML.
  */
 exports.pages = [
+  'background',
   'confirm',
   'options',
   'popup',
@@ -59,6 +60,7 @@ exports.optimization = {
         ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
         chunks: 'all',
         minChunks: 2,
+        priority: 100,
       },
       common: {
         name: 'common',

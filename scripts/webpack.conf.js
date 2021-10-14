@@ -58,16 +58,15 @@ const [globalsCommonHeader, globalsInjectedHeader] = [
   './src/injected/safe-injected-globals.js',
 ].map(path =>
   require('fs').readFileSync(path, {encoding: 'utf8'}).replace(/export const/g, 'const'));
-const globalWrapper = new WrapperWebpackPlugin({
-  header: `{ ${globalsCommonHeader}`,
-  footer: `}`,
-  test: /^(?!injected|public).*\.js$/,
-});
 
 module.exports = Promise.all([
   modify((config) => {
     config.output.publicPath = '/';
-    config.plugins.push(globalWrapper);
+    config.plugins.push(new WrapperWebpackPlugin({
+      header: `{ ${globalsCommonHeader}`,
+      footer: `}`,
+      test: /^(?!injected|public).*\.js$/,
+    }));
     /* Embedding as <style> to ensure uiTheme option doesn't cause FOUC.
      * Note that in production build there's no <head> in html but document.head is still
      * auto-created per the specification so our styles will be placed correctly anyway. */
@@ -77,21 +76,22 @@ module.exports = Promise.all([
         position: 'before',
       },
     }));
-  }),
-  modify('background', './src/background', (config) => {
-    config.plugins.push(globalWrapper);
     config.plugins.push(new class ListBackgroundScripts {
       apply(compiler) {
         compiler.hooks.afterEmit.tap(this.constructor.name, compilation => {
-          const path = `${compilation.outputOptions.path}/manifest.json`;
+          const dist = compilation.outputOptions.path;
+          const path = `${dist}/manifest.json`;
           const manifest = JSON.parse(fs.readFileSync(path, {encoding: 'utf8'}));
-          const scripts = [...compilation.entrypoints.values()][0].chunks.map(c => c.files[0]);
+          const bgId = 'background/index';
+          const bgEntry = compilation.entrypoints.get(bgId);
+          const scripts = bgEntry.chunks.map(c => c.files[0]);
           if (`${manifest.background.scripts}` !== `${scripts}`) {
             manifest.background.scripts = scripts;
             fs.writeFileSync(path,
               JSON.stringify(manifest, null, isProd ? 0 : 2),
               {encoding: 'utf8'});
           }
+          fs.unlinkSync(`${dist}/${bgId}.html`);
         });
       }
     });
