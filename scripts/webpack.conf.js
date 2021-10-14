@@ -1,8 +1,9 @@
 const { modifyWebpackConfig, shallowMerge, defaultOptions } = require('@gera2ld/plaid');
 const { isProd } = require('@gera2ld/plaid/util');
+const fs = require('fs');
 const webpack = require('webpack');
 const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const HTMLInlineCSSWebpackPlugin = require('html-inline-css-webpack-plugin').default;
 const projectConfig = require('./plaid.conf');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
@@ -30,34 +31,6 @@ const definitions = new webpack.DefinePlugin({
   ]),
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
 });
-const minimizerOptions = {
-  cache: true,
-  parallel: true,
-  sourceMap: true,
-  terserOptions: {
-    output: {
-      ascii_only: true,
-    },
-  },
-};
-const minimizer = isProd && [
-  new TerserPlugin({
-    chunkFilter: ({ name }) => !name.startsWith('public/'),
-    ...minimizerOptions,
-    terserOptions: {
-      ...minimizerOptions.terserOptions,
-      compress: {
-        ecma: 6,
-        // 'safe' since we don't rely on function prototypes
-        unsafe_arrows: true,
-      },
-    },
-  }),
-  new TerserPlugin({
-    chunkFilter: ({ name }) => name.startsWith('public/'),
-    ...minimizerOptions,
-  }),
-];
 
 const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
@@ -69,10 +42,6 @@ const modify = (page, entry, init) => modifyWebpackConfig(
     projectConfig: {
       ...mergedConfig,
       ...entry && { pages: { [page]: { entry }} },
-      optimization: {
-        ...mergedConfig.optimization,
-        minimizer,
-      },
     },
   },
 );
@@ -85,16 +54,43 @@ const [globalsCommonHeader, globalsInjectedHeader] = [
   './src/injected/safe-injected-globals.js',
 ].map(path =>
   require('fs').readFileSync(path, {encoding: 'utf8'}).replace(/export const/g, 'const'));
+const globalWrapper = new WrapperWebpackPlugin({
+  header: `{ ${globalsCommonHeader}`,
+  footer: `}`,
+  test: /^(?!injected|public).*\.js$/,
+});
 
 module.exports = Promise.all([
   modify((config) => {
     config.output.publicPath = '/';
-    config.plugins.push(
-      new WrapperWebpackPlugin({
-        header: `{ ${globalsCommonHeader}`,
-        footer: `}`,
-        test: /^(?!injected|public).*\.js$/,
-      }));
+    config.plugins.push(globalWrapper);
+    /* Embedding as <style> to ensure uiTheme option doesn't cause FOUC.
+     * Note that in production build there's no <head> in html but document.head is still
+     * auto-created per the specification so our styles will be placed correctly anyway. */
+    config.plugins.push(new HTMLInlineCSSWebpackPlugin({
+      replace: {
+        target: '<body>',
+        position: 'before',
+      },
+    }));
+  }),
+  modify('background', './src/background', (config) => {
+    config.plugins.push(globalWrapper);
+    config.plugins.push(new class ListBackgroundScripts {
+      apply(compiler) {
+        compiler.hooks.afterEmit.tap(this.constructor.name, compilation => {
+          const path = `${compilation.outputOptions.path}/manifest.json`;
+          const manifest = JSON.parse(fs.readFileSync(path, {encoding: 'utf8'}));
+          const scripts = [...compilation.entrypoints.values()][0].chunks.map(c => c.files[0]);
+          if (`${manifest.background.scripts}` !== `${scripts}`) {
+            manifest.background.scripts = scripts;
+            fs.writeFileSync(path,
+              JSON.stringify(manifest, null, isProd ? 0 : 2),
+              {encoding: 'utf8'});
+          }
+        });
+      }
+    });
   }),
   modify('injected', './src/injected', (config) => {
     config.plugins.push(

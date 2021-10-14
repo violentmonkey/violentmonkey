@@ -2,7 +2,7 @@
   <div class="tab-settings mb-1c">
     <h1 class="mt-0" v-text="i18n('labelSettings')"></h1>
     <section class="mb-1c">
-      <h3 v-text="i18n('labelGeneral')"></h3>
+      <h3 v-text="i18n('optionPopup')"/>
       <div>
         <setting-check name="autoReload" :label="i18n('labelAutoReloadCurrentTab')" />
       </div>
@@ -82,6 +82,16 @@
     <div v-show="showAdvanced">
       <section class="mb-1c">
         <h3 v-text="i18n('labelGeneral')"></h3>
+        <div>
+          <label>
+            <locale-group i18n-key="optionUiTheme">
+              <select v-for="opt in ['uiTheme']" v-model="settings[opt]" :key="opt">
+                <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
+                        :value="value" v-text="title" />
+              </select>
+            </locale-group>
+          </label>
+        </div>
         <div>
           <label>
             <span v-text="i18n('labelInjectionMode')"></span>
@@ -170,6 +180,13 @@ const items = {
     enum: {
       exec: i18n('filterExecutionOrder'),
       alpha: i18n('filterAlphabeticalOrder'),
+    },
+  },
+  uiTheme: {
+    enum: {
+      '': i18n('optionUiThemeAuto'),
+      dark: i18n('optionUiThemeDark'),
+      light: i18n('optionUiThemeLight'),
     },
   },
   ...badgeColorEnum::mapEntry(() => badgeColorItem),

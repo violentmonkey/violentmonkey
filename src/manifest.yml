@@ -19,7 +19,7 @@ browser_action:
   default_title: __MSG_extName__
   default_popup: popup/index.html
 background:
-  page: background/index.html
+  scripts: []
 options_page: options/index.html
 options_ui:
   page: options/index.html

@@ -1,4 +1,6 @@
 const { isProd } = require('@gera2ld/plaid/util');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const TerserPlugin = isProd && require('terser-webpack-plugin');
 
 /**
  * For each entry, `key` is the chunk name, `value` has following properties:
@@ -7,7 +9,6 @@ const { isProd } = require('@gera2ld/plaid/util');
  * - value.html.inlineSource: if true, JS and CSS files will be inlined in HTML.
  */
 exports.pages = [
-  'background',
   'confirm',
   'options',
   'popup',
@@ -21,6 +22,17 @@ exports.pages = [
     }),
   },
 }), {});
+
+const minimizerOptions = {
+  cache: true,
+  parallel: true,
+  sourceMap: true,
+  terserOptions: {
+    output: {
+      ascii_only: true,
+    },
+  },
+};
 
 const splitVendor = prefix => ({
   [prefix]: {
@@ -48,4 +60,34 @@ exports.optimization = {
       ...splitVendor('vue'),
     },
   },
+  minimizer: isProd && [
+    // apply `postcss-combine-media-query`
+    new OptimizeCssAssetsPlugin({
+      cssProcessor: require('postcss')([
+        require('postcss-combine-media-query'),
+        require('cssnano'),
+      ]),
+    }),
+    // Minifying Violentmonkey code
+    new TerserPlugin({
+      chunkFilter: ({ name }) => !name.startsWith('public/'),
+      ...minimizerOptions,
+      terserOptions: {
+        ...minimizerOptions.terserOptions,
+        compress: {
+          ecma: 6,
+          // 'safe' since we don't rely on function prototypes
+          unsafe_arrows: true,
+        },
+      },
+    }),
+    // Minifying non-Violentmonkey code
+    new TerserPlugin({
+      chunkFilter: ({ name }) => name.startsWith('public/'),
+      ...minimizerOptions,
+    }),
+  ],
+};
+exports.styleOptions = {
+  extract: true, // Will be embedded as <style> to ensure uiTheme option doesn't cause FOUC
 };
