@@ -201,7 +201,7 @@ const getItemUpdater = (name, normalize) => (
     value = normalize(value, name);
     oldValue = normalize(oldValue, name);
     if (value !== oldValue) options.set(name, value);
-  }, 300)
+  }, 50)
 );
 const settings = items::mapEntry(() => null);
 
