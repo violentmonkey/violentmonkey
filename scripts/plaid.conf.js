@@ -56,7 +56,7 @@ exports.optimization = {
           /src\/common\/(ui|keyboard|load-script-icon)/,
           'node_modules/@violentmonkey/shortcut',
           'node_modules/vue',
-        ].map(re => re.source || re).join('|')),
+        ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
         chunks: 'all',
         minChunks: 2,
       },
