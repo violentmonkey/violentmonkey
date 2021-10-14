@@ -34,6 +34,10 @@ const definitions = new webpack.DefinePlugin({
 
 const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
+    config.node = {
+      process: false,
+      setImmediate: false,
+    };
     config.plugins.push(definitions);
     if (!entry) init = page;
     if (init) init(config);

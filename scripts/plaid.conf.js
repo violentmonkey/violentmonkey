@@ -36,7 +36,7 @@ const minimizerOptions = {
 
 const splitVendor = prefix => ({
   [prefix]: {
-    test: new RegExp(`node_modules[/\\\\]${prefix}.*?\\.js`),
+    test: new RegExp(`node_modules[/\\\\]${prefix}`),
     name: `public/lib/${prefix}`,
     chunks: 'all',
     priority: 100,
@@ -49,6 +49,17 @@ exports.optimization = {
   runtimeChunk: false,
   splitChunks: {
     cacheGroups: {
+      'common-ui': {
+        name: 'common-ui',
+        test: new RegExp([
+          /\bsvg/,
+          /src\/common\/(ui|keyboard|load-script-icon)/,
+          'node_modules/@violentmonkey/shortcut',
+          'node_modules/vue',
+        ].map(re => re.source || re).join('|')),
+        chunks: 'all',
+        minChunks: 2,
+      },
       common: {
         name: 'common',
         minChunks: 2,
@@ -57,7 +68,6 @@ exports.optimization = {
       },
       ...splitVendor('codemirror'),
       ...splitVendor('tldjs'),
-      ...splitVendor('vue'),
     },
   },
   minimizer: isProd && [
