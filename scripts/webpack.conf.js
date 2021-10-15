@@ -3,7 +3,7 @@ const { isProd } = require('@gera2ld/plaid/util');
 const fs = require('fs');
 const webpack = require('webpack');
 const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
-const HTMLInlineCSSWebpackPlugin = require('html-inline-css-webpack-plugin').default;
+const HTMLInlineCSSWebpackPlugin = isProd && require('html-inline-css-webpack-plugin').default;
 const projectConfig = require('./plaid.conf');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
@@ -70,7 +70,7 @@ module.exports = Promise.all([
     /* Embedding as <style> to ensure uiTheme option doesn't cause FOUC.
      * Note that in production build there's no <head> in html but document.head is still
      * auto-created per the specification so our styles will be placed correctly anyway. */
-    config.plugins.push(new HTMLInlineCSSWebpackPlugin({
+    if (isProd) config.plugins.push(new HTMLInlineCSSWebpackPlugin({
       replace: {
         target: '<body>',
         position: 'before',
@@ -91,7 +91,9 @@ module.exports = Promise.all([
               JSON.stringify(manifest, null, isProd ? 0 : 2),
               {encoding: 'utf8'});
           }
-          fs.unlinkSync(`${dist}/${bgId}.html`);
+          try {
+            fs.unlinkSync(`${dist}/${bgId}.html`);
+          } catch (e) {}
         });
       }
     });

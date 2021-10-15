@@ -73,7 +73,10 @@ exports.optimization = {
     },
   },
   minimizer: isProd && [
-    // apply `postcss-combine-media-query`
+    /* Combining @media (prefers-color-scheme: dark) into one query.
+     * WARNING! html-inline-css-webpack-plugin doesn't detect CSS from mini-css-extract-plugin
+     * in `watch` build so it's only enabled in prod. If we see a difference between the two,
+     * we should remove this plugin or fix the above-mentioned problem. */
     new OptimizeCssAssetsPlugin({
       cssProcessor: require('postcss')([
         require('postcss-combine-media-query'),
@@ -99,7 +102,4 @@ exports.optimization = {
       ...minimizerOptions,
     }),
   ],
-};
-exports.styleOptions = {
-  extract: true, // Will be embedded as <style> to ensure uiTheme option doesn't cause FOUC
 };
