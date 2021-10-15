@@ -6,9 +6,13 @@ let styleTheme;
 /** @type {CSSMediaRule[]} */
 let darkMediaRules;
 let localStorage = {};
-/* Accessing `localStorage` throws in Private Browsing mode and when DOM storage is disabled.
- * Since it allows object-like access, we'll map it to a variable or use a dummy on exception. */
-try { ({ localStorage } = global); } catch (e) { /* keep the dummy object */ }
+/* Accessing `localStorage` in may throw in Private Browsing mode or if dom.storage is disabled.
+ * Since it allows object-like access, we'll map it to a variable with a fallback to a dummy. */
+try {
+  (localStorage = global.localStorage || {}).foo; // eslint-disable-line babel/no-unused-expressions
+} catch (e) {
+  /* keep the dummy object */
+}
 
 const THEME_KEY = 'editorTheme';
 const UI_THEME_KEY = 'uiTheme';
