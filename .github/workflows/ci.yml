@@ -1,16 +1,24 @@
 name: CI
 
-on:
-  - pull_request
+on: [push, pull_request]
 
 jobs:
   ci:
     runs-on: ubuntu-latest
-    steps:
+
+    steps: 
       - name: Checkout code
         uses: actions/checkout@v2
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v2
         with:
           node-version: '15'
+
       - name: CI
-        run: yarn && yarn ci
+        run: yarn && yarn build
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'violentmonkey-${{github.sha}}'
+          path: 'dist/*'
+          if-no-files-found: error
