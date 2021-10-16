@@ -77,8 +77,6 @@ export function injectPageSandbox() {
  * @param {boolean} isXml
  */
 export async function injectScripts(data, isXml) {
-  // eslint-disable-next-line prefer-rest-params
-  if (!elemByTag('*')) return onElement('*', injectScripts, ...arguments);
   const { hasMore, info } = data;
   pageInjectable = isXml ? false : null;
   realms = {
@@ -120,20 +118,23 @@ export async function injectScripts(data, isXml) {
   if (hasInvoker) {
     setupContentInvoker();
   }
-  injectAll('start');
-  const onBody = (pgLists.body[0] || contLists.body[0])
-    && onElement('body', injectAll, 'body');
-  // document-end, -idle
-  if (hasMore) {
-    data = await moreData;
-    if (data) await injectDelayedScripts(data, getReadyState, hasInvoker);
-  }
-  if (onBody) {
-    await onBody;
-  }
-  realms = null;
-  pgLists = null;
-  contLists = null;
+  // Using a callback to avoid a microtask tick when the root element exists or appears.
+  onElement('*', async () => {
+    injectAll('start');
+    const onBody = (pgLists.body[0] || contLists.body[0])
+      && onElement('body', injectAll, 'body');
+    // document-end, -idle
+    if (hasMore) {
+      data = await moreData;
+      if (data) await injectDelayedScripts(data, getReadyState, hasInvoker);
+    }
+    if (onBody) {
+      await onBody;
+    }
+    realms = null;
+    pgLists = null;
+    contLists = null;
+  });
 }
 
 async function injectDelayedScripts({ info, scripts }, getReadyState, hasInvoker) {

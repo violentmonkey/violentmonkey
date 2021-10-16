@@ -1,6 +1,7 @@
 export function bindEvents(srcId, destId, handle, cloneInto) {
-  document::addEventListener(srcId, e => handle(e.detail));
+  const getDetail = describeProperty(CustomEvent.prototype, 'detail').get;
   const pageContext = cloneInto && document.defaultView;
+  document::addEventListener(srcId, e => handle(e::getDetail()));
   return (cmd, params) => {
     const data = { cmd, data: params };
     const detail = cloneInto ? cloneInto(data, pageContext) : data;
