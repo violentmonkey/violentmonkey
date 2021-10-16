@@ -24,25 +24,26 @@ jobs:
           node-version: '15'
 
       - name: Build
-        id: build
         run: yarn && yarn build
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: nyaa8/package-version@v1
+      - uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+      - uses: actions/upload-artifact@v2
+        continue-on-error: true
         with:
-          name: 'violentmonkey-${{github.sha}}'
+          name: 'Violentmonkey-test-webext-v${{ env.PACKAGE_VERSION }}-git${{ steps.short-sha.outputs.sha }}'
           path: 'dist/*'
           if-no-files-found: error
           retention-days: 30
 
-      - uses: marceloprado/has-changed-path@v1
-        if: always() && steps.build.outcome == 'success'
+      - name: Upload to Transifex
+        uses: marceloprado/has-changed-path@v1
         id: changed-path-src
         with:
           paths: src
-
-      - name: Upload to Transifex
-        if: steps.changed-path-src.outputs.changed == 'true'
+      - if: steps.changed-path-src.outputs.changed == 'true'
         run: 'curl -i -L --user api:$TRANSIFEX_TOKEN -X PUT -F file=@dist/_locales/en/messages.json https://www.transifex.com/api/2/project/violentmonkey-nex/resource/messagesjson/content/'
         env:
           TRANSIFEX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
