@@ -153,7 +153,9 @@ async function injectDelayedScripts({ info, scripts }, getReadyState, hasInvoker
   });
   if (document::getReadyState() === 'loading') {
     await new Promise(resolve => {
-      document::addEventListener('DOMContentLoaded', resolve, { once: true });
+      /* Since most sites listen to DOMContentLoaded on `document`, we let them run first
+       * by listening on `window` which follows `document` when the event bubbles up. */
+      window::addEventListener('DOMContentLoaded', resolve, { once: true });
     });
   }
   if (needsInvoker && !hasInvoker) {
