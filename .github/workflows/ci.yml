@@ -16,14 +16,15 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
-    steps: 
+    steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: '15'
 
-      - name: CI
+      - name: Build
+        id: build
         run: yarn && yarn build
 
       - name: Upload Artifact
@@ -33,3 +34,15 @@ jobs:
           path: 'dist/*'
           if-no-files-found: error
           retention-days: 30
+
+      - uses: marceloprado/has-changed-path@v1
+        if: always() && steps.build.outcome == 'success'
+        id: changed-path-src
+        with:
+          paths: src
+
+      - name: Upload to Transifex
+        if: steps.changed-path-src.outputs.changed == 'true'
+        run: 'curl -i -L --user api:$TRANSIFEX_TOKEN -X PUT -F file=@dist/_locales/en/messages.json https://www.transifex.com/api/2/project/violentmonkey-nex/resource/messagesjson/content/'
+        env:
+          TRANSIFEX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
