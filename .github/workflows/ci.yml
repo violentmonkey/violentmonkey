@@ -1,6 +1,16 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+    tags-ignore:
+      - 'v*' # version-tagged commits are releases which have their own workflow
+    paths-ignore:
+      - '.github/**' # this ci.yml is also excluded so you need to re-run it explicitly if necessary
+      - LICENSE
+      - README.md
+  pull_request:
+    branches: [master]
 
 jobs:
   ci:
@@ -22,3 +32,4 @@ jobs:
           name: 'violentmonkey-${{github.sha}}'
           path: 'dist/*'
           if-no-files-found: error
+          retention-days: 30
