@@ -11,6 +11,7 @@ const { preventDefault, stopImmediatePropagation } = Event.prototype;
 let clipboardData;
 
 bridge.addHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   SetClipboard(data) {
     if (bridge.isFirefox) {
       // Firefox does not support copy from background page.

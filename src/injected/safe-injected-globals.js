@@ -17,3 +17,5 @@ export const {
   values: objectValues,
 } = Object;
 export const { parse: jsonParse } = JSON;
+// Using __proto__ because Object.create(null) may be spoofed
+export const createNullObj = () => ({ __proto__: null });

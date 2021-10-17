@@ -12,12 +12,21 @@ const {
 } = global;
 /** A bound function won't be stepped-into when debugging.
  * Destructuring a random function reference instead of the long `Function.prototype` */
-const { bind } = Proxy;
+const { apply, bind } = Proxy;
 const { concat, slice: arraySlice } = [];
 const { startsWith } = '';
 
+// Greasemonkey4 API polyfill exceptions for async (value=0) and alias (value='string')
+const gm4Api = {
+  __proto__: null, // Object.create(null) may be spoofed
+  getResourceURL: 0,
+  getValue: 0,
+  deleteValue: 0,
+  setValue: 0,
+  listValues: 0,
+  xmlHttpRequest: 'xmlhttpRequest',
+};
 let gmApi;
-let gm4Api;
 let componentUtils;
 const IS_TOP = window.top === window;
 
@@ -29,17 +38,21 @@ export function wrapGM(script) {
     grant.length = 0;
   }
   const id = script.props.id;
-  const resources = script.meta.resources || {};
+  const resources = script.meta.resources || createNullObj();
   const context = {
     id,
     script,
     resources,
-    pathMap: script.custom.pathMap || {},
-    urls: {},
+    pathMap: script.custom.pathMap || createNullObj(),
+    urls: createNullObj(),
   };
   const gmInfo = makeGmInfo(script, resources);
   const gm = {
-    GM: { info: gmInfo },
+    __proto__: null, // Object.create(null) may be spoofed
+    GM: {
+      __proto__: null,
+      info: gmInfo,
+    },
     GM_info: gmInfo,
     unsafeWindow: global,
   };
@@ -54,14 +67,14 @@ export function wrapGM(script) {
   if (grant::includes('window.focus')) {
     gm.focus = vmOwnFunc(() => bridge.post('TabFocus'));
   }
-  if (!gmApi) [gmApi, gm4Api] = makeGmApi();
+  if (!gmApi) gmApi = makeGmApi();
   grant::forEach((name) => {
     const gm4name = name::startsWith('GM.') && name::slice(3);
     const gm4 = gm4Api[gm4name];
-    const method = gmApi[gm4 ? `GM_${gm4.alias || gm4name}` : name];
+    const method = gmApi[gm4name ? `GM_${gm4 || gm4name}` : name];
     if (method) {
-      const caller = makeGmMethodCaller(method, context, gm4?.async);
-      if (gm4) gm.GM[gm4name] = caller;
+      const caller = makeGmMethodCaller(method, context, gm4 === 0);
+      if (gm4name) gm.GM[gm4name] = caller;
       else gm[name] = caller;
     }
   });
@@ -117,7 +130,7 @@ function makeGmMethodCaller(gmMethod, context, isAsync) {
   // keeping the native console.log intact
   return gmMethod === gmApi.GM_log ? gmMethod : vmOwnFunc(
     isAsync
-      ? (async (...args) => context::gmMethod(...args))
+      ? (async (...args) => gmMethod::apply(context, args))
       : gmMethod::bind(context),
   );
 }
@@ -256,7 +269,7 @@ boundMethods.get = mapGet;
  * @desc Wrap helpers to prevent unexpected modifications.
  */
 function makeGlobalWrapper(local) {
-  const events = {};
+  const events = createNullObj();
   const scopeSym = Symbol.unscopables;
   const globals = new Set(globalKeys);
   globals[iterSym] = setIter;
@@ -328,14 +341,16 @@ function makeGlobalWrapper(local) {
       return true;
     },
   });
-  for (const [name, desc] of unforgeables) {
+  unforgeables::forEach(entry => {
+    const name = entry[0];
+    const desc = entry[1];
     if (name === 'window' || name === 'top' && IS_TOP) {
       delete desc.get;
       delete desc.set;
       desc.value = wrapper;
     }
     defineProperty(local, name, mapWindow(desc));
-  }
+  });
   function mapWindow(desc) {
     if (desc && desc.value === window) {
       desc = assign({}, desc);

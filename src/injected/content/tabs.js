@@ -6,6 +6,7 @@ const tabKeys = {};
 const realms = {};
 
 bridge.addHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   async TabOpen({ key, data }, realm) {
     const { id } = await sendCmd('TabOpen', data);
     tabIds[key] = id;
@@ -21,6 +22,7 @@ bridge.addHandlers({
 });
 
 bridge.addBackgroundHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   TabClosed(id) {
     const key = tabKeys[id];
     const realm = realms[id];

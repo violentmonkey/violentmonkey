@@ -6,7 +6,7 @@ import { log } from '../utils/helpers';
 const { Number } = global;
 
 // Nested objects: scriptId -> keyName -> listenerId -> GMValueChangeListener
-export const changeHooks = {};
+export const changeHooks = createNullObj();
 
 const dataDecoders = {
   o: jsonParse,
@@ -15,9 +15,12 @@ const dataDecoders = {
 };
 
 bridge.addHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   UpdatedValues(updates) {
     const { partial } = updates;
-    updates::forEachEntry(([id, update]) => {
+    updates::forEachEntry(entry => {
+      const id = entry[0];
+      const update = entry[1];
       const oldData = store.values[id];
       if (oldData) {
         const keyHooks = changeHooks[id];
@@ -54,16 +57,20 @@ export function decodeValue(raw) {
 }
 
 function applyPartialUpdate(data, update) {
-  update::forEachEntry(([key, val]) => {
+  update::forEachEntry(entry => {
+    const key = entry[0];
+    const val = entry[1];
     if (val) data[key] = val;
     else delete data[key];
   });
 }
 
 function changedRemotely(keyHooks, data, update) {
-  update::forEachEntry(([key, raw]) => {
+  update::forEachEntry(entry => {
+    const key = entry[0];
     const hooks = keyHooks[key];
     if (hooks) {
+      let raw = entry[1];
       if (!raw) raw = undefined; // partial `update` currently uses null for deleted values
       const oldRaw = data[key];
       if (oldRaw !== raw) {
@@ -78,13 +85,11 @@ function notifyChange(hooks, key, val, raw, oldRaw, remote = false) {
   // converting `null` from messaging to `undefined` to match the documentation and TM
   const oldVal = (oldRaw || undefined) && decodeValue(oldRaw);
   const newVal = val === undefined && raw ? decodeValue(raw) : val;
-  objectValues(hooks)::forEach(fn => tryCall(fn, key, oldVal, newVal, remote));
-}
-
-function tryCall(fn, ...args) {
-  try {
-    fn(...args);
-  } catch (e) {
-    log('error', ['GM_addValueChangeListener', 'callback'], e);
-  }
+  objectValues(hooks)::forEach(fn => {
+    try {
+      fn(key, oldVal, newVal, remote);
+    } catch (e) {
+      log('error', ['GM_addValueChangeListener', 'callback'], e);
+    }
+  });
 }

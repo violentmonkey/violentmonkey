@@ -46,7 +46,7 @@ Object.assign(commands, {
         env.forceContent = !pageInjectable;
         scripts.map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
         return {
-          info: { cache: env.cache },
+          cache: env.cache,
           scripts,
         };
       }
@@ -242,7 +242,7 @@ function prepareScript(script) {
     code: isContent ? '' : forceContent || injectedCode,
     injectInto: realm,
     metaStr: code.match(METABLOCK_RE)[1] || '',
-    values: value[id],
+    values: value[id] || null,
   });
   return isContent && [dataKey, true];
 }

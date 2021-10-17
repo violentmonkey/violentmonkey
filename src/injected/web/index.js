@@ -15,8 +15,8 @@ const { KeyboardEvent, MouseEvent } = global;
 const { get: getCurrentScript } = describeProperty(Document.prototype, 'currentScript');
 
 const sendSetTimeout = () => bridge.send('SetTimeout', 0);
-const resolvers = {};
-const waiters = {};
+const resolvers = createNullObj();
+const waiters = createNullObj();
 
 export default function initialize(
   webId,
@@ -46,7 +46,10 @@ export default function initialize(
 }
 
 bridge.addHandlers({
-  Command([cmd, evt]) {
+  __proto__: null, // Object.create(null) may be spoofed
+  Command(data) {
+    const cmd = data[0];
+    const evt = data[1];
     const constructor = evt.key ? KeyboardEvent : MouseEvent;
     const fn = store.commands[cmd];
     if (fn) fn(new constructor(evt.type, evt));
@@ -71,19 +74,13 @@ bridge.addHandlers({
     }
   },
   Expose() {
-    const Violentmonkey = {};
-    defineProperty(Violentmonkey, 'version', {
-      value: process.env.VM_VER,
-    });
-    defineProperty(Violentmonkey, 'isInstalled', {
-      async value(name, namespace) {
+    window.external.Violentmonkey = {
+      version: process.env.VM_VER,
+      async isInstalled(name, namespace) {
         const script = await bridge.send('GetScript', { meta: { name, namespace } });
         return script && !script.config.removed ? script.meta.version : null;
       },
-    });
-    defineProperty(window.external, 'Violentmonkey', {
-      value: Violentmonkey,
-    });
+    };
   },
 });
 

@@ -1,10 +1,12 @@
 import { sendCmd } from '#/common';
 import { INJECT_PAGE, browser } from '#/common/consts';
 
+// {CommandName: sendCmd} will relay the request via sendCmd as is
 /** @type {Object.<string, MessageFromGuestHandler>} */
-const handlers = {};
-const bgHandlers = {};
+const handlers = createNullObj();
+const bgHandlers = createNullObj();
 const bridge = {
+  __proto__: null, // Object.create(null) may be spoofed
   ids: [], // all ids including the disabled ones for SetPopup
   runningIds: [],
   // userscripts running in the content script context are messaged via invokeGuest

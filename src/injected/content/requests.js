@@ -4,9 +4,10 @@ import bridge from './bridge';
 const { fetch } = global;
 const { arrayBuffer: getArrayBuffer, blob: getBlob } = Response.prototype;
 
-const requests = {};
+const requests = createNullObj();
 
 bridge.addHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   HttpRequest(opts, realm) {
     requests[opts.id] = {
       realm,
@@ -19,6 +20,7 @@ bridge.addHandlers({
 });
 
 bridge.addBackgroundHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   async HttpRequested(msg) {
     const { blobbed, id, numChunks, type } = msg;
     const req = requests[id];

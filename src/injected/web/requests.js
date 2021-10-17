@@ -13,6 +13,7 @@ const { get: getHref } = describeProperty(HTMLAnchorElement.prototype, 'href');
 const { readAsDataURL } = FileReader.prototype;
 
 bridge.addHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   HttpRequested(msg) {
     const req = idMap[msg.id];
     if (req) callback(req, msg);
@@ -30,7 +31,6 @@ export function onRequestCreate(opts, scriptId) {
   start(req);
   return {
     abort() {
-      req._aborted = true;
       bridge.post('AbortRequest', id);
     },
   };

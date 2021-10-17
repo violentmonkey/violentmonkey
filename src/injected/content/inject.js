@@ -24,6 +24,7 @@ let numBadgesSent = 0;
 let bfCacheWired;
 
 bridge.addHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   // FF bug workaround to enable processing of sourceURL in injected page scripts
   InjectList: injectList,
   Run(id, realm) {
@@ -80,16 +81,19 @@ export async function injectScripts(data, isXml) {
   const { hasMore, info } = data;
   pageInjectable = isXml ? false : null;
   realms = {
+    __proto__: null, // Object.create(null) may be spoofed
     /** @namespace VMInjectionRealm */
     [INJECT_CONTENT]: {
       injectable: () => true,
       /** @namespace VMRunAtLists */
       lists: contLists = { start: [], body: [], end: [], idle: [] },
+      is: 0,
       info,
     },
     [INJECT_PAGE]: {
       injectable: () => pageInjectable ?? checkInjectable(),
       lists: pgLists = { start: [], body: [], end: [], idle: [] },
+      is: 0,
       info,
     },
   };
@@ -137,9 +141,9 @@ export async function injectScripts(data, isXml) {
   });
 }
 
-async function injectDelayedScripts({ info, scripts }, getReadyState, hasInvoker) {
+async function injectDelayedScripts({ cache, scripts }, getReadyState, hasInvoker) {
   realms::forEachKey(r => {
-    assign(realms[r].info, info);
+    realms[r].info.cache = cache;
   });
   let needsInvoker;
   scripts::forEach(script => {
@@ -241,14 +245,11 @@ function onElement(tag, cb, ...args) {
     } else {
       const observer = new MutationObserver(() => {
         if (elemByTag(tag)) {
-          observer::disconnect(); // eslint-disable-line no-use-before-define
+          observer.disconnect();
           cb(...args);
           resolve();
         }
       });
-      // This function starts before any content-mode userscripts, but observer's callback
-      // will run after document-start content-mode userscripts, so we'll use safe calls.
-      const { disconnect } = observer;
       // documentElement may be replaced so we'll observe the entire document
       observer.observe(document, { childList: true, subtree: true });
     }

@@ -53,6 +53,9 @@ module.exports = {
       }, {
         selector: 'OptionalCallExpression',
         message: 'Optional call in an unsafe environment',
+      }, {
+        selector: 'ArrayPattern',
+        message: 'Array destructuring in an unsafe environment',
       }],
     },
   }],

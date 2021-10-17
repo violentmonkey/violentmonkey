@@ -52,9 +52,9 @@ const { split } = '';
 })().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
 
 bridge.addBackgroundHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   Command(data) {
-    const [cmd] = data;
-    const id = +cmd::split(':', 1)[0];
+    const id = +data[0]::split(':', 1)[0];
     const realm = invokableIds::includes(id) && INJECT_CONTENT;
     bridge.post('Command', data, realm);
   },
@@ -63,8 +63,8 @@ bridge.addBackgroundHandlers({
     sendSetPopup();
   },
   UpdatedValues(data) {
-    const dataPage = {};
-    const dataContent = {};
+    const dataPage = createNullObj();
+    const dataContent = createNullObj();
     objectKeys(data)::forEach((id) => {
       (invokableIds::includes(+id) ? dataContent : dataPage)[id] = data[id];
     });
@@ -74,10 +74,12 @@ bridge.addBackgroundHandlers({
 });
 
 bridge.addHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   UpdateValue: sendCmd,
   RegisterMenu(data) {
     if (IS_TOP) {
-      const [id, cap] = data;
+      const id = data[0];
+      const cap = data[1];
       const commandMap = menus[id] || (menus[id] = {});
       commandMap[cap] = 1;
       sendSetPopup(true);
@@ -85,12 +87,13 @@ bridge.addHandlers({
   },
   UnregisterMenu(data) {
     if (IS_TOP) {
-      const [id, cap] = data;
+      const id = data[0];
+      const cap = data[1];
       delete menus[id]?.[cap];
       sendSetPopup(true);
     }
   },
-  AddElement([tag, attributes, id]) {
+  AddElement({ tag, attributes, id }) {
     try {
       const el = document::createElementNS(NS_HTML, tag);
       el::setAttribute('id', id);

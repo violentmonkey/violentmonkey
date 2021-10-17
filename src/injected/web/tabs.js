@@ -1,9 +1,10 @@
 import bridge from './bridge';
 
 let lastId = 0;
-const tabs = {};
+const tabs = createNullObj();
 
 bridge.addHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   TabClosed(key) {
     const item = tabs[key];
     if (item) {

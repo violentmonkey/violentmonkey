@@ -4,6 +4,7 @@ let lastId = 0;
 const notifications = {};
 
 bridge.addHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
   NotificationClicked(id) {
     const fn = notifications[id]?.onclick;
     if (fn) fn();

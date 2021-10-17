@@ -1,9 +1,10 @@
 import { getUniqId } from '#/common';
 
-const handlers = {};
-const callbacks = {};
+const handlers = createNullObj();
+const callbacks = createNullObj();
 const bridge = {
-  cache: {},
+  __proto__: null, // Object.create(null) may be spoofed
+  cache: createNullObj(),
   callbacks,
   addHandlers(obj) {
     assign(handlers, obj);

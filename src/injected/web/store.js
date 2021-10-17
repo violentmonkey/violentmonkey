@@ -1,5 +1,6 @@
 export default {
-  commands: {},
-  values: {},
+  __proto__: null, // Object.create(null) may be spoofed
+  commands: createNullObj(),
+  values: createNullObj(),
   state: 0,
 };

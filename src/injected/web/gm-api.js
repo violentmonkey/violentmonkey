@@ -27,7 +27,7 @@ export const vmOwnFunc = (func, toString) => {
 let downloadChain = Promise.resolve();
 
 export function makeGmApi() {
-  return [{
+  return {
     GM_deleteValue(key) {
       const { id } = this;
       const values = loadValues(id);
@@ -66,8 +66,8 @@ export function makeGmApi() {
     GM_addValueChangeListener(key, fn) {
       if (typeof key !== 'string') key = `${key}`;
       if (typeof fn !== 'function') return;
-      const keyHooks = changeHooks[this.id] || (changeHooks[this.id] = {});
-      const hooks = keyHooks[key] || (keyHooks[key] = {});
+      const keyHooks = changeHooks[this.id] || (changeHooks[this.id] = createNullObj());
+      const hooks = keyHooks[key] || (keyHooks[key] = createNullObj());
       const i = objectValues(hooks)::indexOf(fn);
       let listenerId = i >= 0 && objectKeys(hooks)[i];
       if (!listenerId) {
@@ -82,7 +82,9 @@ export function makeGmApi() {
     GM_removeValueChangeListener(listenerId) {
       const keyHooks = changeHooks[this.id];
       if (!keyHooks) return;
-      objectEntries(keyHooks)::findIndex(([key, hooks]) => {
+      objectEntries(keyHooks)::findIndex(keyHook => {
+        const key = keyHook[0];
+        const hooks = keyHook[1];
         if (listenerId in hooks) {
           delete hooks[listenerId];
           if (isEmpty(hooks)) delete keyHooks[key];
@@ -188,28 +190,14 @@ export function makeGmApi() {
     },
     // using the native console.log so the output has a clickable link to the caller's source
     GM_log: logging.log,
-  }, {
-    // Greasemonkey4 API polyfill
-    getResourceURL: { async: true },
-    getValue: { async: true },
-    deleteValue: { async: true },
-    setValue: { async: true },
-    listValues: { async: true },
-    xmlHttpRequest: { alias: 'xmlhttpRequest' },
-    notification: true,
-    openInTab: true,
-    registerMenuCommand: true,
-    setClipboard: true,
-    addStyle: true, // gm4-polyfill.js sets it anyway
-    addElement: true, // TM sets it
-  }];
+  };
 }
 
 function webAddElement(parent, tag, attributes, useId) {
   const id = useId || getUniqId('VMel');
   let el;
   // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
-  let error = bridge.sendSync('AddElement', [tag, attributes, id]);
+  let error = bridge.sendSync('AddElement', { tag, attributes, id });
   if (!error) {
     try {
       el = document::getElementById(id);
