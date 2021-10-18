@@ -55,7 +55,7 @@ async function manifest() {
 }
 
 async function createIcons() {
-  const ALPHA = .5;
+  const ALPHA = 0.5;
   const dist = `${DIST}/public/images`;
   await fs.mkdir(dist, { recursive: true });
   const icon = Sharp(`src/resources/icon${isBeta() ? '-beta' : ''}.png`);
@@ -73,7 +73,7 @@ async function createIcons() {
   ];
   const handle = (size, type = '', image = icon) => {
     let res = image.clone().resize({ width: size });
-    if (size < 48) res = res.sharpen(size < 32 ? .5 : .25);
+    if (size < 48) res = res.sharpen(size < 32 ? 0.5 : 0.25);
     return res.toFile(`${dist}/icon${size}${type}.png`);
   };
   const darkenOuterEdge = async img => img.composite([{
@@ -83,7 +83,7 @@ async function createIcons() {
   const handle16 = async ([type, image]) => {
     const res = image.clone()
     .resize({ width: 18 })
-    .sharpen(.5, 0)
+    .sharpen(0.5, 0)
     .extract({ left: 1, top: 2, width: 16, height: 16 });
     return (type === 'w' ? res : await darkenOuterEdge(res))
     .toFile(`${dist}/icon16${type}.png`);
@@ -158,7 +158,7 @@ function copyZip() {
     'node_modules/@zip.js/zip.js/dist/zip-no-worker.min.js',
     'node_modules/@zip.js/zip.js/dist/z-worker.js',
   ])
-    .pipe(gulp.dest(`${DIST}/public/lib`));
+  .pipe(gulp.dest(`${DIST}/public/lib`));
 }
 
 const pack = gulp.parallel(manifest, createIcons, copyI18n);

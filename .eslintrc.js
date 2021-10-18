@@ -58,6 +58,17 @@ module.exports = {
         message: 'Array destructuring in an unsafe environment',
       }],
     },
+  }, {
+    // build scripts
+    files: [
+      '*.js',
+      'scripts/*.js',
+    ],
+    env: { node: true },
+    rules: {
+      'global-require': 0,
+      'import/newline-after-import': 0,
+    }
   }],
   rules: {
     'import/extensions': ['error', 'ignorePackages', {

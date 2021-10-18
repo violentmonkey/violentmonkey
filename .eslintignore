@@ -1,4 +1,8 @@
 **/*.js
 !src/**
 !test/**
+!scripts/fake-dep-loader.js
+!scripts/plaid.conf.js
+!scripts/webpack.conf.js
+!gulpfile.js
 src/public/**

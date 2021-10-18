@@ -15,7 +15,7 @@ const pickEnvs = (items) => {
   return Object.assign({}, ...items.map(x => ({
     [`process.env.${x.key}`]: JSON.stringify(
       'val' in x ? x.val
-        : process.env[x.key] ?? x.def
+        : process.env[x.key] ?? x.def,
     ),
   })));
 };
@@ -79,7 +79,7 @@ const modify = (page, entry, init) => modifyWebpackConfig(
   }, {
     projectConfig: {
       ...mergedConfig,
-      ...entry && { pages: { [page]: { entry }} },
+      ...entry && { pages: { [page]: { entry } } },
     },
   },
 );
@@ -94,18 +94,20 @@ module.exports = Promise.all([
     /* Embedding as <style> to ensure uiTheme option doesn't cause FOUC.
      * Note that in production build there's no <head> in html but document.head is still
      * auto-created per the specification so our styles will be placed correctly anyway. */
-    if (isProd) config.plugins.push(new HTMLInlineCSSWebpackPlugin({
-      replace: {
-        target: '<body>',
-        position: 'before',
-      },
-    }));
+    if (isProd) {
+      config.plugins.push(new HTMLInlineCSSWebpackPlugin({
+        replace: {
+          target: '<body>',
+          position: 'before',
+        },
+      }));
+    }
     config.plugins.push(new class ListBackgroundScripts {
       apply(compiler) {
         compiler.hooks.afterEmit.tap(this.constructor.name, compilation => {
           const dist = compilation.outputOptions.path;
           const path = `${dist}/manifest.json`;
-          const manifest = JSON.parse(fs.readFileSync(path, {encoding: 'utf8'}));
+          const manifest = JSON.parse(fs.readFileSync(path, { encoding: 'utf8' }));
           const bgId = 'background/index';
           const bgEntry = compilation.entrypoints.get(bgId);
           const scripts = bgEntry.chunks.map(c => c.files[0]);
@@ -113,14 +115,12 @@ module.exports = Promise.all([
             manifest.background.scripts = scripts;
             fs.writeFileSync(path,
               JSON.stringify(manifest, null, isProd ? 0 : 2),
-              {encoding: 'utf8'});
+              { encoding: 'utf8' });
           }
-          try {
-            fs.unlinkSync(`${dist}/${bgId}.html`);
-          } catch (e) {}
+          fs.promises.unlink(`${dist}/${bgId}.html`).catch(() => {});
         });
       }
-    });
+    }());
   }),
   modify('injected', './src/injected', (config) => {
     addWrapper(config, getGlobals => ({

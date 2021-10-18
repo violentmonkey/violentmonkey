@@ -19,7 +19,7 @@ exports.pages = [
     html: options => ({
       ...options,
       title: 'Violentmonkey',
-      injectTo: item => (item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head',
+      injectTo: item => ((item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head'),
     }),
   },
 }), {});
