@@ -711,6 +711,9 @@ optionEditorWindowHint:
 optionEditorWindowSimple:
   description: Label for the editor window type
   message: Ascunde caseta polivalentă
+optionPopup:
+  description: Label of the popup menu section in settings.
+  message: Meniul și pictograma pentru popup
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Mai întâi cele activate
@@ -726,6 +729,18 @@ optionPopupShowDisabled:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Afișează mai întâi scripturile activate
+optionUiTheme:
+  description: Label for the theme selector in Advanced settings.
+  message: 'Temă pentru UI:'
+optionUiThemeAuto:
+  description: Name of a theme selector value in settings.
+  message: automată
+optionUiThemeDark:
+  description: Name of a theme selector value in settings.
+  message: întunecată
+optionUiThemeLight:
+  description: Name of a theme selector value in settings.
+  message: deschisă
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Sensibil la scrierea cu litere mari și mici

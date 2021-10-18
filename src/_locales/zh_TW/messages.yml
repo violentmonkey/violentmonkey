@@ -673,6 +673,9 @@ optionEditorWindowHint:
 optionEditorWindowSimple:
   description: Label for the editor window type
   message: 隱藏網址列
+optionPopup:
+  description: Label of the popup menu section in settings.
+  message: ''
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: 先顯示啟用的腳本
@@ -688,6 +691,18 @@ optionPopupShowDisabled:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 先顯示啟用的腳本
+optionUiTheme:
+  description: Label for the theme selector in Advanced settings.
+  message: ''
+optionUiThemeAuto:
+  description: Name of a theme selector value in settings.
+  message: ''
+optionUiThemeDark:
+  description: Name of a theme selector value in settings.
+  message: ''
+optionUiThemeLight:
+  description: Name of a theme selector value in settings.
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 區分大小寫

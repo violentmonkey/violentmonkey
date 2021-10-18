@@ -121,16 +121,11 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Niestandardowe opcje CodeMirror i dodatków w obiekcie JSON, takie jak
+    Niestandardowe opcje dla CodeMirror i dodatków w obiekcie JSON, takie jak
     <code>{"indentUnit":2, "smartIndent":true}</code>, należy jednak pamiętać,
     że niektóre z nich mogą nie działać w Violentmonkey. Zobacz <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">pełną listę</a>. Aby użyć niestandardowego motywu
-    CodeMirror, podaj tutaj jego nazwę pliku, np. <code>"theme":
-    "3024-day"</code> i wklej poniżej <a
-    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
-    target="_blank" rel="noopener noreferrer">CSS aktualnego motywu</a> w polu
-    "Styl niestandardowy".
+    rel="noopener noreferrer">pełną listę</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -196,9 +191,11 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: |-
-    Violentmonkey nie może uruchomić skryptów użytkownika na tej stronie
-    (możliwe przykłady: interfejs przeglądarki lub rozszerzenia)
+  message: >-
+    Violentmonkey nie może uruchamiać skryptów użytkownika na tej stronie
+
+    (pospolite przykłady: interfejs przeglądarki, rozszerzenia, zablokowane
+    przez zasady, strona wyszukiwarki w Operze)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: kolejności alfabetycznej
@@ -714,6 +711,9 @@ optionEditorWindowHint:
 optionEditorWindowSimple:
   description: Label for the editor window type
   message: Ukryj omnibox
+optionPopup:
+  description: Label of the popup menu section in settings.
+  message: ''
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Najpierw włączone
@@ -729,6 +729,18 @@ optionPopupShowDisabled:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Pokazuj najpierw włączone skrypty
+optionUiTheme:
+  description: Label for the theme selector in Advanced settings.
+  message: 'Motyw interfejsu:'
+optionUiThemeAuto:
+  description: Name of a theme selector value in settings.
+  message: automatyczny
+optionUiThemeDark:
+  description: Name of a theme selector value in settings.
+  message: ciemny
+optionUiThemeLight:
+  description: Name of a theme selector value in settings.
+  message: jasny
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Rozróżnianie wielkości liter
