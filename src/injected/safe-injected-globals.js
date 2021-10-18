@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 // Not exporting the built-in globals because this also runs in node
-const { CustomEvent, Error, dispatchEvent } = this || {};
+const { CustomEvent, Error, dispatchEvent } = globalThis;
 export const { createElementNS, getElementsByTagName } = document;
 export const { then } = Promise.prototype;
 export const { filter, forEach, includes, join, map, push } = [];
