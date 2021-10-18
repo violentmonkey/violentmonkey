@@ -32,6 +32,40 @@ const definitions = new webpack.DefinePlugin({
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
 });
 
+// avoid running webpack bootstrap in a potentially hacked environment
+// after documentElement was replaced which triggered reinjection of content scripts
+const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
+// {entryName: path}
+const entryGlobals = {
+  common: './src/common/safe-globals.js',
+  injected: './src/injected/safe-injected-globals.js',
+};
+
+/**
+ * Adds a watcher for files in entryGlobals to properly recompile the project on changes.
+ */
+const addWrapper = (config, name, callback) => {
+  if (!callback) { callback = name; name = ''; }
+  const globals = Object.entries(entryGlobals).filter(([key]) => name === key || !name);
+  const dirs = globals.map(([key]) => key).join('|');
+  config.module.rules.push({
+    test: new RegExp(`/(${dirs})/index\\.js$`.replace(/\//g, /[/\\]/.source)),
+    use: [{
+      loader: './scripts/fake-dep-loader.js',
+      options: {
+        files: globals.map(([, path]) => path),
+      },
+    }],
+  });
+  const reader = () => (
+    globals.map(([, path]) => (
+      fs.readFileSync(path, { encoding: 'utf8' })
+      .replace(/export\s+(?=const\s)/g, '')
+    ))
+  ).join('\n');
+  config.plugins.push(new WrapperWebpackPlugin(callback(reader)));
+};
+
 const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
     config.node = {
@@ -50,21 +84,11 @@ const modify = (page, entry, init) => modifyWebpackConfig(
   },
 );
 
-// avoid running webpack bootstrap in a potentially hacked environment
-// after documentElement was replaced which triggered reinjection of content scripts
-const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
-const [globalsCommonHeader, globalsInjectedHeader] = [
-  './src/common/safe-globals.js',
-  './src/injected/safe-injected-globals.js',
-].map(path =>
-  require('fs').readFileSync(path, {encoding: 'utf8'}).replace(/export const/g, 'const'));
-
 module.exports = Promise.all([
   modify((config) => {
-    config.output.publicPath = '/';
-    config.plugins.push(new WrapperWebpackPlugin({
-      header: `{ ${globalsCommonHeader}`,
-      footer: `}`,
+    addWrapper(config, 'common', getGlobals => ({
+      header: () => `{ ${getGlobals()}`,
+      footer: '}',
       test: /^(?!injected|public).*\.js$/,
     }));
     /* Embedding as <style> to ensure uiTheme option doesn't cause FOUC.
@@ -99,27 +123,22 @@ module.exports = Promise.all([
     });
   }),
   modify('injected', './src/injected', (config) => {
-    config.plugins.push(
-      new WrapperWebpackPlugin({
-        header: `${skipReinjectionHeader} { ${globalsCommonHeader};${globalsInjectedHeader}`,
-        footer: `}`,
-      }));
+    addWrapper(config, getGlobals => ({
+      header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
+      footer: '}',
+    }));
   }),
   modify('injected-web', './src/injected/web', (config) => {
     config.output.libraryTarget = 'commonjs2';
-    config.plugins.push(
-      new WrapperWebpackPlugin({
-        header: `${skipReinjectionHeader}
-          window['${INIT_FUNC_NAME}'] = function () {
-            var module = { exports: {} };
-            ${globalsCommonHeader}
-            ${globalsInjectedHeader}
-          `,
-        footer: `
-            var exports = module.exports;
-            return exports.__esModule ? exports['default'] : exports;
-          };0;`,
-      }),
-    );
+    addWrapper(config, getGlobals => ({
+      header: () => `${skipReinjectionHeader}
+        window['${INIT_FUNC_NAME}'] = function () {
+          var module = { exports: {} };
+          ${getGlobals()}`,
+      footer: `
+          module = module.exports;
+          return module.__esModule ? module.default : module;
+        };0;`,
+    }));
   }),
 ]);
