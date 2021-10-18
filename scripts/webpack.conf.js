@@ -10,6 +10,16 @@ const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 const INIT_FUNC_NAME = 'VMInitInjection';
 // Copied from gulpfile.js: strip alphabetic suffix
 const VM_VER = require('../package.json').version.replace(/-[^.]*/, '');
+const WEBPACK_OPTS = {
+  node: {
+    process: false,
+    setImmediate: false,
+  },
+  performance: {
+    maxEntrypointSize: 1e6,
+    maxAssetSize: 0.5e6,
+  },
+};
 
 const pickEnvs = (items) => {
   return Object.assign({}, ...items.map(x => ({
@@ -68,10 +78,7 @@ const addWrapper = (config, name, callback) => {
 
 const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
-    config.node = {
-      process: false,
-      setImmediate: false,
-    };
+    Object.assign(config, WEBPACK_OPTS);
     config.plugins.push(definitions);
     if (!entry) init = page;
     if (init) init(config);
@@ -101,6 +108,10 @@ module.exports = Promise.all([
           position: 'before',
         },
       }));
+      config.plugins.find(p => (
+        p.constructor.name === 'MiniCssExtractPlugin'
+        && Object.assign(p.options, { ignoreOrder: true })
+      ));
     }
     config.plugins.push(new class ListBackgroundScripts {
       apply(compiler) {
