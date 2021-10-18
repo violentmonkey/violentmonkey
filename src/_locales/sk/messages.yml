@@ -699,6 +699,9 @@ optionEditorWindowHint:
 optionEditorWindowSimple:
   description: Label for the editor window type
   message: Schovať pole omnibox
+optionPopup:
+  description: Label of the popup menu section in settings.
+  message: Vyskakovacia ponuka a ikona
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Najskôr povolené
@@ -714,6 +717,18 @@ optionPopupShowDisabled:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Zobraziť najskôr povolené skripty
+optionUiTheme:
+  description: Label for the theme selector in Advanced settings.
+  message: 'Motív rozhrania:'
+optionUiThemeAuto:
+  description: Name of a theme selector value in settings.
+  message: automatický
+optionUiThemeDark:
+  description: Name of a theme selector value in settings.
+  message: tmavý
+optionUiThemeLight:
+  description: Name of a theme selector value in settings.
+  message: svetlý
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Rozlišovať veľké a malé písmená

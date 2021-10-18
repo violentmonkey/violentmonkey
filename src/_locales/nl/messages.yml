@@ -697,6 +697,9 @@ optionEditorWindowHint:
 optionEditorWindowSimple:
   description: Label for the editor window type
   message: Omnibalk verbergen
+optionPopup:
+  description: Label of the popup menu section in settings.
+  message: Pop-upmenu en pictogram
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Ingeschakelde bovenaan
@@ -712,6 +715,18 @@ optionPopupShowDisabled:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Ingeschakelde scripts bovenaan
+optionUiTheme:
+  description: Label for the theme selector in Advanced settings.
+  message: 'Thema:'
+optionUiThemeAuto:
+  description: Name of a theme selector value in settings.
+  message: Automatisch
+optionUiThemeDark:
+  description: Name of a theme selector value in settings.
+  message: Donker
+optionUiThemeLight:
+  description: Name of a theme selector value in settings.
+  message: Licht
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Hoofdlettergevoelig

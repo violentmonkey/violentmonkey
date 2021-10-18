@@ -682,6 +682,9 @@ optionEditorWindowHint:
 optionEditorWindowSimple:
   description: Label for the editor window type
   message: Ocultar omnibox
+optionPopup:
+  description: Label of the popup menu section in settings.
+  message: ''
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Ativado primeiro
@@ -697,6 +700,18 @@ optionPopupShowDisabled:
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Mostrar scripts ativos primeiro
+optionUiTheme:
+  description: Label for the theme selector in Advanced settings.
+  message: ''
+optionUiThemeAuto:
+  description: Name of a theme selector value in settings.
+  message: ''
+optionUiThemeDark:
+  description: Name of a theme selector value in settings.
+  message: ''
+optionUiThemeLight:
+  description: Name of a theme selector value in settings.
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Respeitar maiúsculas/minúsculas
