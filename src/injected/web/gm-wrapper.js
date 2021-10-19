@@ -15,20 +15,22 @@ const {
 const { apply, bind } = Proxy;
 const { concat, slice: arraySlice } = [];
 const { startsWith } = '';
-
-// Greasemonkey4 API polyfill exceptions for async (value=0) and alias (value='string')
-const gm4Api = {
+/** Name in Greasemonkey4 -> name in GM */
+const GM4_ALIAS = {
   __proto__: null, // Object.create(null) may be spoofed
-  getResourceURL: 0,
-  getValue: 0,
-  deleteValue: 0,
-  setValue: 0,
-  listValues: 0,
+  getResourceUrl: 'getResourceURL',
   xmlHttpRequest: 'xmlhttpRequest',
 };
+const GM4_ASYNC = [
+  'getResourceUrl',
+  'getValue',
+  'deleteValue',
+  'setValue',
+  'listValues',
+];
+const IS_TOP = window.top === window;
 let gmApi;
 let componentUtils;
-const IS_TOP = window.top === window;
 
 export function wrapGM(script) {
   // Add GM functions
@@ -67,15 +69,16 @@ export function wrapGM(script) {
   if (grant::includes('window.focus')) {
     gm.focus = vmOwnFunc(() => bridge.post('TabFocus'));
   }
-  if (!gmApi) gmApi = makeGmApi();
+  if (!gmApi && grant.length) gmApi = makeGmApi();
   grant::forEach((name) => {
     const gm4name = name::startsWith('GM.') && name::slice(3);
-    const gm4 = gm4Api[gm4name];
-    const method = gmApi[gm4name ? `GM_${gm4 || gm4name}` : name];
-    if (method) {
-      const caller = makeGmMethodCaller(method, context, gm4 === 0);
-      if (gm4name) gm.GM[gm4name] = caller;
-      else gm[name] = caller;
+    const fn = gmApi[gm4name ? `GM_${GM4_ALIAS[gm4name] || gm4name}` : name];
+    if (fn) {
+      if (gm4name) {
+        gm.GM[gm4name] = makeGmMethodCaller(fn, context, GM4_ASYNC::includes(gm4name));
+      } else {
+        gm[name] = makeGmMethodCaller(fn, context);
+      }
     }
   });
   return grant.length ? makeGlobalWrapper(gm) : gm;
