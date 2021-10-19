@@ -77,13 +77,17 @@ var _default = (0, _helperPluginUtils.declare)(api => {
       }) {
         const bind = node.callee;
         if (!_core.types.isBindExpression(bind)) return;
-        const context = inferBindContext(bind, scope);
         // ORIGINAL:
+        // const context = inferBindContext(bind, scope);
         // node.callee = _core.types.memberExpression(bind.callee, _core.types.identifier("call"));
         // node.arguments.unshift(context);
         // MODIFIED to use safeCall created in safe-globals.js:
+        const object = bind.object || bind.callee.object;
+        const context = scope.isStatic(object) && _core.types.isSuper(object)
+          ? _core.types.thisExpression()
+          : object;
         node.callee = _core.types.identifier("safeCall");
-        node.arguments.unshift(bind.callee, context);
+        node.arguments.unshift(bind.callee, _core.types.cloneNode(context));
       },
 
       BindExpression(path) {
