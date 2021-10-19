@@ -59,14 +59,16 @@ const COMMANDS_WITH_SRC = [
   'SetPopup',
 */
 ];
+// Used in safe context
+// eslint-disable-next-line no-restricted-syntax
+const getBgPage = () => browser.extension.getBackgroundPage?.();
 
 /**
  * Sends the command+data directly so it's synchronous and faster than sendCmd thanks to deepCopy.
  * WARNING! Make sure `cmd` handler doesn't use `src` or `cmd` is listed in COMMANDS_WITH_SRC.
  */
 export function sendCmdDirectly(cmd, data, options) {
-  const bg = !COMMANDS_WITH_SRC.includes(cmd)
-    && browser.extension.getBackgroundPage?.();
+  const bg = !COMMANDS_WITH_SRC.includes(cmd) && getBgPage();
   return bg && bg !== window && bg.deepCopy
     ? bg.handleCommandMessage(bg.deepCopy({ cmd, data })).then(deepCopy)
     : sendCmd(cmd, data, options);
@@ -87,7 +89,7 @@ export function sendTabCmd(tabId, cmd, data, options) {
 export function sendMessage(payload, { retry, ignoreError } = {}) {
   if (retry) return sendMessageRetry(payload);
   let promise = browser.runtime.sendMessage(payload);
-  if (ignoreError || window === browser.extension.getBackgroundPage?.()) {
+  if (ignoreError || window === getBgPage()) {
     promise = promise.catch(noop);
   }
   return promise;

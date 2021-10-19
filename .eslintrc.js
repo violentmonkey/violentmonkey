@@ -10,12 +10,15 @@ const unsafeSharedEnvironment = [
   'src/common/object.js',
   'src/common/util.js',
 ];
+const unsafeAndSharedEnvironment = [
+  ...unsafeEnvironment,
+  ...unsafeSharedEnvironment,
+];
 const commonGlobals = getGlobals('src/common/safe-globals.js');
 const injectedGlobals = {
   ...commonGlobals,
   ...getGlobals('src/injected/safe-injected-globals.js'),
 };
-
 module.exports = {
   root: true,
   extends: [
@@ -31,14 +34,19 @@ module.exports = {
     // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
     // to prevent exposing them to userscripts with `@inject-into content`
     files: ['*'],
-    excludedFiles: [...unsafeEnvironment, ...unsafeSharedEnvironment],
+    excludedFiles: unsafeAndSharedEnvironment,
     globals: {
       browser: false,
       ...commonGlobals,
     },
   }, {
+    files: unsafeSharedEnvironment,
+    globals: commonGlobals,
+  }, {
     files: unsafeEnvironment,
     globals: injectedGlobals,
+  }, {
+    files: unsafeAndSharedEnvironment,
     rules: {
       // Whitelisting our safe globals
       'no-restricted-globals': ['error',
@@ -56,6 +64,9 @@ module.exports = {
       }, {
         selector: 'ArrayPattern',
         message: 'Array destructuring in an unsafe environment',
+      }, {
+        selector: 'CallExpression > SpreadElement',
+        message: 'Array spreading in an unsafe environment',
       }],
     },
   }, {

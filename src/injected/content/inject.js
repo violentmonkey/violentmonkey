@@ -65,19 +65,21 @@ export function appendToRoot(node) {
   return root && root::appendChild(node);
 }
 
-export function injectPageSandbox() {
+export function injectPageSandbox(contentId, webId) {
   inject({
-    code: `(${VMInitInjection}())('${bridge.webId}','${bridge.contentId}')\n//# sourceURL=${
+    code: `(${VMInitInjection}())('${webId}','${contentId}')\n//# sourceURL=${
       browser.runtime.getURL('sandbox/injected-web.js')
     }`,
   });
 }
 
 /**
+ * @param {string} contentId
+ * @param {string} webId
  * @param {VMGetInjectedData} data
  * @param {boolean} isXml
  */
-export async function injectScripts(data, isXml) {
+export async function injectScripts(contentId, webId, data, isXml) {
   const { hasMore, info } = data;
   pageInjectable = isXml ? false : null;
   realms = {
@@ -117,20 +119,20 @@ export async function injectScripts(data, isXml) {
     pageInjectable: pageInjectable ?? (hasMore && checkInjectable()),
   });
   // saving while safe
-  const getReadyState = hasMore && describeProperty(Document.prototype, 'readyState').get;
+  const getReadyState = hasMore && describeProperty(Document[Prototype], 'readyState').get;
   const hasInvoker = realms[INJECT_CONTENT].is;
   if (hasInvoker) {
-    setupContentInvoker();
+    setupContentInvoker(contentId, webId);
   }
   // Using a callback to avoid a microtask tick when the root element exists or appears.
-  onElement('*', async () => {
+  await onElement('*', async () => {
     injectAll('start');
     const onBody = (pgLists.body[0] || contLists.body[0])
       && onElement('body', injectAll, 'body');
     // document-end, -idle
     if (hasMore) {
       data = await moreData;
-      if (data) await injectDelayedScripts(data, getReadyState, hasInvoker);
+      if (data) await injectDelayedScripts(!hasInvoker && contentId, webId, data, getReadyState);
     }
     if (onBody) {
       await onBody;
@@ -141,7 +143,7 @@ export async function injectScripts(data, isXml) {
   });
 }
 
-async function injectDelayedScripts({ cache, scripts }, getReadyState, hasInvoker) {
+async function injectDelayedScripts(contentId, webId, { cache, scripts }, getReadyState) {
   realms::forEachKey(r => {
     realms[r].info.cache = cache;
   });
@@ -163,8 +165,8 @@ async function injectDelayedScripts({ cache, scripts }, getReadyState, hasInvoke
       window::addEventListener('DOMContentLoaded', resolve, { once: true });
     });
   }
-  if (needsInvoker && !hasInvoker) {
-    setupContentInvoker();
+  if (needsInvoker && contentId) {
+    setupContentInvoker(contentId, webId);
   }
   injectAll('end');
   injectAll('idle');
@@ -234,19 +236,19 @@ async function injectList(runAt) {
 /**
  * @param {string} tag
  * @param {function} cb - callback runs immediately, unlike a chained then()
- * @param {?} [args]
+ * @param {?} [arg]
  * @returns {Promise<void>}
  */
-function onElement(tag, cb, ...args) {
+function onElement(tag, cb, arg) {
   return new Promise(resolve => {
     if (elemByTag(tag)) {
-      cb(...args);
+      cb(arg);
       resolve();
     } else {
       const observer = new MutationObserver(() => {
         if (elemByTag(tag)) {
           observer.disconnect();
-          cb(...args);
+          cb(arg);
           resolve();
         }
       });
@@ -256,8 +258,8 @@ function onElement(tag, cb, ...args) {
   });
 }
 
-function setupContentInvoker() {
-  const invokeContent = VMInitInjection()(bridge.webId, bridge.contentId, bridge.onHandle);
+function setupContentInvoker(contentId, webId) {
+  const invokeContent = VMInitInjection()(webId, contentId, bridge.onHandle);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm) => (
     (realm === INJECT_CONTENT ? invokeContent : postViaBridge)(cmd, params)

@@ -21,10 +21,8 @@ let pendingSetPopup;
 const { split } = '';
 
 (async () => {
-  const eventIds = [
-    bridge.contentId = getUniqId(),
-    bridge.webId = getUniqId(),
-  ];
+  const contentId = getUniqId();
+  const webId = getUniqId();
   // injecting right now before site scripts can mangle globals or intercept our contentId
   // except for XML documents as their appearance breaks, but first we're sending
   // a request for the data because injectPageSandbox takes ~5ms
@@ -34,20 +32,20 @@ const { split } = '';
     IS_FIREFOX && global.location.href,
     { retry: true });
   const isXml = document instanceof XMLDocument;
-  if (!isXml) injectPageSandbox();
+  if (!isXml) injectPageSandbox(contentId, webId);
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
-  const data = IS_FIREFOX && Event.prototype.composedPath
+  const data = IS_FIREFOX && Event[Prototype].composedPath
     ? await getDataFF(dataPromise)
     : await dataPromise;
   // 1) bridge.post may be overridden in injectScripts
   // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
-  bridge.post = bindEvents(...eventIds, bridge.onHandle, global.cloneInto);
+  bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
   bridge.ids = data.ids;
   bridge.isFirefox = data.info.isFirefox;
   bridge.injectInto = data.injectInto;
-  if (data.scripts) injectScripts(data, isXml);
-  if (data.expose) bridge.post('Expose');
   isPopupShown = data.isPopupShown;
+  if (data.expose) bridge.post('Expose');
+  if (data.scripts) await injectScripts(contentId, webId, data, isXml);
   sendSetPopup();
 })().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
 

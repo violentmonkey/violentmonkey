@@ -7,10 +7,10 @@ const idMap = {};
 
 export const { atob } = global;
 const { Blob, DOMParser, FileReader, Response } = global;
-const { parseFromString } = DOMParser.prototype;
-const { blob: resBlob } = Response.prototype;
-const { get: getHref } = describeProperty(HTMLAnchorElement.prototype, 'href');
-const { readAsDataURL } = FileReader.prototype;
+const { parseFromString } = DOMParser[Prototype];
+const { blob: resBlob } = Response[Prototype];
+const { get: getHref } = describeProperty(HTMLAnchorElement[Prototype], 'href');
+const { readAsDataURL } = FileReader[Prototype];
 
 bridge.addHandlers({
   __proto__: null, // Object.create(null) may be spoofed

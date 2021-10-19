@@ -14,6 +14,7 @@ const INIT_FUNC_NAME = 'VMInitInjection';
 const VM_VER = require('../package.json').version.replace(/-[^.]*/, '');
 const WEBPACK_OPTS = {
   node: {
+    global: false,
     process: false,
     setImmediate: false,
   },

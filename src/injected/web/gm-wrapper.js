@@ -6,13 +6,10 @@ const {
   Proxy,
   Set, // 2x-3x faster lookup than object::has
   Symbol: { toStringTag, iterator: iterSym },
-  Map: { prototype: { get: mapGet, has: mapHas, [iterSym]: mapIter } },
-  Set: { prototype: { delete: setDelete, has: setHas, [iterSym]: setIter } },
+  Map: { [Prototype]: { get: mapGet, has: mapHas, [iterSym]: mapIter } },
+  Set: { [Prototype]: { delete: setDelete, has: setHas, [iterSym]: setIter } },
   Object: { getOwnPropertyNames, getOwnPropertySymbols },
 } = global;
-/** A bound function won't be stepped-into when debugging.
- * Destructuring a random function reference instead of the long `Function.prototype` */
-const { apply, bind } = Proxy;
 const { concat, slice: arraySlice } = [];
 const { startsWith } = '';
 /** Name in Greasemonkey4 -> name in GM */
@@ -154,8 +151,8 @@ if (global.wrappedJSObject) {
   globalKeys.push('wrappedJSObject');
 }
 const inheritedKeys = new Set([
-  ...getOwnPropertyNames(EventTarget.prototype),
-  ...getOwnPropertyNames(Object.prototype),
+  ...getOwnPropertyNames(EventTarget[Prototype]),
+  ...getOwnPropertyNames(Object[Prototype]),
 ]);
 inheritedKeys.has = setHas;
 

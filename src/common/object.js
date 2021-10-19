@@ -46,19 +46,6 @@ export function objectSet(obj, rawKey, val) {
   return root;
 }
 
-export function objectPurify(obj) {
-  // Remove keys with undefined values
-  if (Array.isArray(obj)) {
-    obj.forEach(objectPurify);
-  } else if (obj && typeof obj === 'object') {
-    obj::forEachEntry(([key, value]) => {
-      if (typeof value === 'undefined') delete obj[key];
-      else objectPurify(value);
-    });
-  }
-  return obj;
-}
-
 /**
  * @param {{}} obj
  * @param {string[]} keys
@@ -101,6 +88,8 @@ export function forEachValue(func) {
 export function deepCopy(src) {
   return src && (
     Array.isArray(src) && src.map(deepCopy)
+    // Used in safe context
+    // eslint-disable-next-line no-restricted-syntax
     || typeof src === 'object' && src::mapEntry(([, val]) => deepCopy(val))
   ) || src;
 }

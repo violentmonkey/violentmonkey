@@ -51,9 +51,8 @@ export function jsonDump(value) {
   return `"${value::replace(escRE, escFunc)}"`;
 }
 
-export function log(level, tags, ...args) {
-  const tagList = ['Violentmonkey'];
-  if (tags) tagList::push(...tags);
-  const prefix = tagList::map(tag => `[${tag}]`)::join('');
-  logging[level](prefix, ...args);
+/** args is [tags?, ...rest] */
+export function log(level, ...args) {
+  args[0] = `[Violentmonkey]${args[0] ? `[${args[0]::join('][')}]` : ''}`;
+  logging[level]::apply(logging, args);
 }

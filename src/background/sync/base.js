@@ -3,7 +3,7 @@ import {
 } from '#/common';
 import { TIMEOUT_HOUR } from '#/common/consts';
 import {
-  forEachEntry, objectSet, objectPick, objectPurify,
+  forEachEntry, objectSet, objectPick,
 } from '#/common/object';
 import {
   getEventEmitter, getOption, setOption, hookOptions,
@@ -173,6 +173,19 @@ function parseScriptData(raw) {
     data.code = raw;
   }
   return data;
+}
+
+function objectPurify(obj) {
+  // Remove keys with undefined values
+  if (Array.isArray(obj)) {
+    obj.forEach(objectPurify);
+  } else if (obj && typeof obj === 'object') {
+    obj::forEachEntry(([key, value]) => {
+      if (typeof value === 'undefined') delete obj[key];
+      else objectPurify(value);
+    });
+  }
+  return obj;
 }
 
 function serviceFactory(base) {

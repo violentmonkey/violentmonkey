@@ -10,14 +10,14 @@ import { jsonDump, log, logging, NS_HTML, elemByTag } from '../utils/helpers';
 
 const {
   Blob, MouseEvent, TextDecoder,
-  RegExp: { prototype: { test } },
-  TextDecoder: { prototype: { decode: tdDecode } },
+  RegExp: { [Prototype]: { test } },
+  TextDecoder: { [Prototype]: { decode: tdDecode } },
   URL: { createObjectURL, revokeObjectURL },
 } = global;
-const { findIndex, indexOf } = [];
+const { findIndex } = [];
 const { lastIndexOf } = '';
 const { dispatchEvent, getElementById } = document;
-const { removeAttribute } = Element.prototype;
+const { removeAttribute } = Element[Prototype];
 
 const vmOwnFuncToString = () => '[Violentmonkey property]';
 export const vmOwnFunc = (func, toString) => {

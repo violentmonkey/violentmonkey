@@ -5,7 +5,8 @@
 if (!global.browser?.runtime?.sendMessage) {
   // region Chrome
   const { chrome, Error, Promise, Proxy } = global;
-  const { bind } = Proxy;
+  const MESSAGE = 'message';
+  const STACK = 'stack';
   /** onXXX like onMessage */
   const isApiEvent = key => key[0] === 'o' && key[1] === 'n';
   /** API types or enums or literal constants */
@@ -47,60 +48,72 @@ if (!global.browser?.runtime?.sendMessage) {
         reject = _reject;
       });
       // Make the error messages actually useful by capturing a real stack
-      const stackInfo = new Error();
-      // Using (...results) for API callbacks that return several results (we don't use them though)
-      thisArg::func(...args, (...results) => {
-        let err = chrome.runtime.lastError;
-        let isRuntime;
-        if (err) {
-          err = err.message;
-          isRuntime = true;
-        } else if (preprocessorFunc) {
-          err = preprocessorFunc(resolve, ...results);
-        } else {
-          resolve(results[0]);
-        }
+      const stackInfo = new Error(`callstack before invoking ${func.name || 'chrome API'}:`);
+      // A single parameter `result` is fine because we don't use API that return more
+      args[args.length] = result => {
+        const runtimeErr = chrome.runtime.lastError;
+        const err = runtimeErr || (
+          preprocessorFunc
+            ? preprocessorFunc(resolve, result)
+            : resolve(result)
+        );
         // Prefer `reject` over `throw` which stops debugger in 'pause on exceptions' mode
         if (err) {
-          // Using \n\n so the calling code can strip the stack easily if needed
-          err = new Error(`${err}\n\n${stackInfo.stack}`);
-          err.isRuntime = isRuntime;
-          reject(err);
+          if (!runtimeErr) stackInfo[STACK] = `${err[1]}\n${stackInfo[STACK]}`;
+          stackInfo[MESSAGE] = runtimeErr ? err[MESSAGE] : `${err[0]}`;
+          stackInfo.isRuntime = !!runtimeErr;
+          reject(stackInfo);
         }
-      });
-      if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.message || err));
+      };
+      func::apply(thisArg, args);
+      if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.[MESSAGE] || err));
       return promise;
     }
   );
+  // Both result and error must be explicitly specified to avoid prototype eavesdropping
+  const wrapSuccess = result => [
+    result,
+    null,
+  ];
+  // Both result and error must be explicitly specified to avoid prototype eavesdropping
+  const wrapError = err => process.env.DEBUG && console.warn(err) || [
+    null,
+    err instanceof Error
+      ? [err[MESSAGE], err[STACK]]
+      : [err, ''],
+  ];
   const sendResponseAsync = async (result, sendResponse) => {
     try {
       result = await result;
       if (process.env.DEBUG) console.info('send', result);
-      sendResponse({ data: result });
+      sendResponse(wrapSuccess(result));
     } catch (err) {
-      if (process.env.DEBUG) console.warn(err);
-      sendResponse({ error: err instanceof Error ? err.stack : err });
+      sendResponse(wrapError(err));
     }
   };
   const onMessageListener = (listener, message, sender, sendResponse) => {
     if (process.env.DEBUG) console.info('receive', message);
-    const result = listener(message, sender);
-    if (result && isFunction(result.then)) {
-      sendResponseAsync(result, sendResponse);
-      return true;
-    }
-    if (result !== undefined) {
+    try {
+      const result = listener(message, sender);
+      if (result instanceof Promise) {
+        sendResponseAsync(result, sendResponse);
+        return true;
+      }
       // In some browsers (e.g Chrome 56, Vivaldi), the listener in
       // popup pages are not properly cleared after closed.
       // They may send `undefined` before the real response is sent.
-      sendResponse({ data: result });
+      if (result !== undefined) {
+        sendResponse(wrapSuccess(result));
+      }
+    } catch (err) {
+      sendResponse(wrapError(err));
     }
   };
   /** @returns {?} error */
   const unwrapResponse = (resolve, response) => (
     !response && 'null response'
-    || response.error
-    || resolve(response.data)
+    || response[1] // error created in wrapError
+    || resolve(response[0]) // result created in wrapSuccess
   );
   const wrapSendMessage = (runtime, sendMessage) => (
     wrapAsync(runtime, sendMessage, unwrapResponse)
@@ -131,6 +144,7 @@ if (!global.browser?.runtime?.sendMessage) {
   // endregion
 } else if (process.env.DEBUG && !global.chrome.app) {
   // region Firefox
+  /* eslint-disable no-restricted-syntax */// this is a debug-only section
   let counter = 0;
   const { runtime } = global.browser;
   const { sendMessage, onMessage } = runtime;
@@ -159,5 +173,6 @@ if (!global.browser?.runtime?.sendMessage) {
     .then(data => log('on', [data], id, true), console.warn);
     return result;
   });
+  /* eslint-enable no-restricted-syntax */
   // endregion
 }

@@ -2,7 +2,7 @@ import { sendCmd } from '#/common';
 import bridge from './bridge';
 
 const { fetch } = global;
-const { arrayBuffer: getArrayBuffer, blob: getBlob } = Response.prototype;
+const { arrayBuffer: getArrayBuffer, blob: getBlob } = Response[Prototype];
 
 const requests = createNullObj();
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-const globalThis = (function _() { return this || {}; }());
+const global = (function _() { return this || {}; }());
 // Not exporting the built-in globals because this also runs in node
 const {
   Array, Boolean, Object, Promise, Uint8Array,
@@ -9,6 +9,7 @@ const {
      https://html.spec.whatwg.org/multipage/window-object.html#dom-document-dev */
   document,
   window,
-} = globalThis;
+} = global;
 export const { hasOwnProperty } = {};
-export const safeCall = hasOwnProperty.call.bind(hasOwnProperty.call);
+export const { apply, bind, call } = hasOwnProperty;
+export const safeCall = call.bind(call);

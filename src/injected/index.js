@@ -13,7 +13,7 @@ if (!global.chrome.app
       fetch,
       history,
       document: { referrer },
-      Response: { prototype: { text: getText } },
+      Response: { [Prototype]: { text: getText } },
       location: { href: url },
     } = global;
     const fetchOpts = { mode: 'same-origin' };

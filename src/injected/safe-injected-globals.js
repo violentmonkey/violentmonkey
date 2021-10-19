@@ -1,12 +1,14 @@
 /* eslint-disable no-unused-vars */
 
 // Not exporting the built-in globals because this also runs in node
-const { CustomEvent, Error, dispatchEvent } = globalThis;
+// Not using destructuring to allow removal of unused variables during minification
+const { CustomEvent, Error, dispatchEvent } = global;
+export const Prototype = 'prototype';
 export const { createElementNS, getElementsByTagName } = document;
-export const { then } = Promise.prototype;
-export const { filter, forEach, includes, join, map, push } = [];
+export const { then } = Promise[Prototype];
+export const { filter, forEach, includes, indexOf, join, map, push } = [];
 export const { charCodeAt, slice, replace } = '';
-export const { append, appendChild, remove, setAttribute } = Element.prototype;
+export const { append, appendChild, remove, setAttribute } = Element[Prototype];
 export const { toString: objectToString } = {};
 export const {
   assign,
