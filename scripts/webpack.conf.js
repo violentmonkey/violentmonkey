@@ -4,6 +4,8 @@ const fs = require('fs');
 const webpack = require('webpack');
 const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
 const HTMLInlineCSSWebpackPlugin = isProd && require('html-inline-css-webpack-plugin').default;
+const TerserPlugin = isProd && require('terser-webpack-plugin');
+const deepmerge = isProd && require('deepmerge');
 const projectConfig = require('./plaid.conf');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
@@ -18,6 +20,16 @@ const WEBPACK_OPTS = {
   performance: {
     maxEntrypointSize: 1e6,
     maxAssetSize: 0.5e6,
+  },
+};
+const minimizerOptions = {
+  cache: true,
+  parallel: true,
+  sourceMap: true,
+  terserOptions: {
+    output: {
+      ascii_only: true,
+    },
   },
 };
 
@@ -80,6 +92,25 @@ const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
     Object.assign(config, WEBPACK_OPTS);
     config.plugins.push(definitions);
+    config.optimization.minimizer.find((m, i, arr) => (
+      m.constructor.name === 'TerserPlugin' && arr.splice(i, 1)
+    ));
+    config.optimization.minimizer.push(...!isProd ? [] : [
+      new TerserPlugin({
+        chunkFilter: ({ name }) => name.startsWith('public/'),
+        ...minimizerOptions,
+      }),
+      new TerserPlugin(deepmerge.all([{}, minimizerOptions, {
+        chunkFilter: ({ name }) => !name.startsWith('public/'),
+        terserOptions: {
+          compress: {
+            ecma: 8, // ES2017 Object.entries and so on
+            passes: 2, // necessary now since we removed plaid's minimizer
+            unsafe_arrows: true, // it's 'safe' since we don't rely on function prototypes
+          },
+        },
+      }])),
+    ]);
     if (!entry) init = page;
     if (init) init(config);
     return config;

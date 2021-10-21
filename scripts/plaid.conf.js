@@ -1,6 +1,5 @@
 const { isProd } = require('@gera2ld/plaid/util');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const TerserPlugin = isProd && require('terser-webpack-plugin');
 
 /**
  * For each entry, `key` is the chunk name, `value` has following properties:
@@ -23,17 +22,6 @@ exports.pages = [
     }),
   },
 }), {});
-
-const minimizerOptions = {
-  cache: true,
-  parallel: true,
-  sourceMap: true,
-  terserOptions: {
-    output: {
-      ascii_only: true,
-    },
-  },
-};
 
 const splitVendor = prefix => ({
   [prefix]: {
@@ -82,24 +70,6 @@ exports.optimization = {
         require('postcss-combine-media-query'),
         require('cssnano'),
       ]),
-    }),
-    // Minifying Violentmonkey code
-    new TerserPlugin({
-      chunkFilter: ({ name }) => !name.startsWith('public/'),
-      ...minimizerOptions,
-      terserOptions: {
-        ...minimizerOptions.terserOptions,
-        compress: {
-          ecma: 6,
-          // 'safe' since we don't rely on function prototypes
-          unsafe_arrows: true,
-        },
-      },
-    }),
-    // Minifying non-Violentmonkey code
-    new TerserPlugin({
-      chunkFilter: ({ name }) => name.startsWith('public/'),
-      ...minimizerOptions,
     }),
   ],
 };
