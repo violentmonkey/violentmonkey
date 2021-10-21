@@ -31,8 +31,8 @@ export function showMessage(message) {
  * @param {string} text - the text to display in the modal
  * @param {Object} cfg
  * @param {string | false} [cfg.input=false] if not false, shows a text input with this string
- * @param {Object} [cfg.ok] additional props for the Ok button
- * @param {Object} [cfg.cancel] additional props for the Cancel button
+ * @param {?Object|false} [cfg.ok] additional props for the Ok button or `false` to remove it
+ * @param {?Object|false} [cfg.cancel] same for the Cancel button
  * @return {Promise<?string>} resolves on Ok to `false` or the entered string, rejects otherwise
  */
 export function showConfirmation(text, { ok, cancel, input = false } = {}) {
@@ -41,9 +41,9 @@ export function showConfirmation(text, { ok, cancel, input = false } = {}) {
       input,
       text,
       buttons: [
-        { text: i18n('buttonOK'), onClick: resolve, ...ok },
-        { text: i18n('buttonCancel'), onClick: reject, ...cancel },
-      ],
+        ok !== false && { text: i18n('buttonOK'), onClick: resolve, ...ok },
+        cancel !== false && { text: i18n('buttonCancel'), onClick: reject, ...cancel },
+      ].filter(Boolean),
       onBackdropClick: reject,
       onDismiss: reject, // Esc key
     });

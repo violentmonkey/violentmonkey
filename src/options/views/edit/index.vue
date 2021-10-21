@@ -65,7 +65,7 @@ import {
   sendCmdDirectly, trueJoin,
 } from '#/common';
 import { deepCopy, deepEqual, objectPick } from '#/common/object';
-import { showMessage } from '#/common/ui';
+import { showConfirmation, showMessage } from '#/common/ui';
 import { keyboardService } from '#/common/keyboard';
 import VmCode from '#/common/ui/code';
 import options from '#/common/options';
@@ -304,8 +304,9 @@ export default {
         this.canSave = false; // ...and set it explicitly in case codeDirty was false
         if (res?.where?.id) this.script = res.update;
       } catch (err) {
-        // Stripping stack info added by browser.js
-        showMessage({ text: `${err.message || err}`.split('\n\n')[0] });
+        showConfirmation(`${err.message || err}`, {
+          cancel: false,
+        });
       }
     },
     close(cm) {
