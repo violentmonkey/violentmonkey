@@ -622,7 +622,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Script namespace conflicts! Please modify @name and @namespace.
+  message: |-
+    A script like this is already installed or is still in the Recycle Bin.
+    Please either use a different @name and @namespace here or edit that script instead.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
