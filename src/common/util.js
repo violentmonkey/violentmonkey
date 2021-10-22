@@ -257,6 +257,10 @@ export async function requestLocalFile(url, options = {}) {
 const FORCED_ACCEPT = {
   'greasyfork.org': 'application/javascript, text/plain, text/css',
 };
+
+export const isRemote = url => url
+  && !(/^(file:|data:|https?:\/\/(localhost|127\.0\.0\.1[:/]))/.test(url));
+
 /** @typedef {{
   url: string,
   status: number,
@@ -272,13 +276,13 @@ const FORCED_ACCEPT = {
 export async function request(url, options = {}) {
   // fetch does not support local file
   if (url.startsWith('file://')) return requestLocalFile(url, options);
-  const { body, credentials, headers, method, responseType } = options;
+  const { body, headers, responseType } = options;
   const isBodyObj = body && body::({}).toString() === '[object Object]';
   const hostname = url.split('/', 3)[2];
   const accept = FORCED_ACCEPT[hostname];
   const init = {
-    credentials,
-    method,
+    cache: isRemote(url) ? undefined : 'no-cache',
+    ...options, /* Used in safe context */// eslint-disable-line no-restricted-syntax
     body: isBodyObj ? JSON.stringify(body) : body,
     headers: isBodyObj || accept
       ? Object.assign({},

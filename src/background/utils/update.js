@@ -38,9 +38,6 @@ async function checkAllAndNotify(scripts) {
 }
 
 const processes = {};
-const NO_HTTP_CACHE = {
-  'Cache-Control': 'no-cache, no-store, must-revalidate',
-};
 
 // resolves to true if successfully updated
 function checkUpdate(script, notes) {
@@ -61,7 +58,7 @@ async function doCheckUpdate(script, notes) {
       update: { checking: false },
     });
     msgOk = i18n('msgScriptUpdated', [getScriptName(update)]);
-    resourceOpts = { headers: NO_HTTP_CACHE };
+    resourceOpts = { cache: 'no-cache' };
     return true;
   } catch (update) {
     msgErr = update.error;
@@ -93,7 +90,9 @@ async function downloadUpdate({ props: { id }, meta, custom }) {
   announce(i18n('msgCheckingForUpdate'));
   try {
     const { data } = await request(updateURL, {
-      headers: { ...NO_HTTP_CACHE, Accept: 'text/x-userscript-meta,*/*' },
+      // TODO: do a HEAD request first to get ETag header and compare to storage.mod
+      cache: 'no-cache',
+      headers: { Accept: 'text/x-userscript-meta,*/*' },
     });
     const { version } = parseMeta(data);
     if (compareVersion(meta.version, version) >= 0) {
@@ -103,7 +102,7 @@ async function downloadUpdate({ props: { id }, meta, custom }) {
     } else {
       announce(i18n('msgUpdating'));
       errorMessage = i18n('msgErrorFetchingScript');
-      return (await request(downloadURL, { headers: NO_HTTP_CACHE })).data;
+      return (await request(downloadURL, { cache: 'no-cache' })).data;
     }
   } catch (error) {
     if (process.env.DEBUG) console.error(error);

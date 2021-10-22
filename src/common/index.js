@@ -149,10 +149,6 @@ export function getFullUrl(url, base) {
   return obj.href;
 }
 
-export function isRemote(url) {
-  return url && !(/^(file:|data:|https?:\/\/localhost[:/]|http:\/\/127\.0\.0\.1[:/])/.test(url));
-}
-
 export function encodeFilename(name) {
   // `escape` generated URI has % in it
   return name.replace(/[-\\/:*?"<>|%\s]/g, (m) => {
