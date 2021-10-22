@@ -50,9 +50,11 @@ export default {
     async vacuum() {
       this.vacuuming = true;
       this.labelVacuum = this.i18n('buttonVacuuming');
-      const num = await sendCmdDirectly('Vacuum');
+      const { fixes, errors } = await sendCmdDirectly('Vacuum');
+      const errorText = errors?.join('\n');
       this.vacuuming = false;
-      this.labelVacuum = this.i18n('buttonVacuumed') + (num ? ` (${num})` : '');
+      this.labelVacuum = this.i18n('buttonVacuumed') + (fixes ? ` (${fixes})` : '');
+      if (errorText) showMessage({ text: errorText });
     },
   },
   mounted() {

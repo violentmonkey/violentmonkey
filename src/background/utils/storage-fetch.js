@@ -14,7 +14,14 @@ storage.cache.fetch = cacheOrFetch({
 });
 
 /** @type { function(url, options): Promise<void> } or throws on error */
-storage.require.fetch = cacheOrFetch();
+storage.require.fetch = cacheOrFetch({
+  transform: ({ data }, url) => (
+    /^\s*</.test(data)
+      ? Promise.reject(`NOT_JS: ${url} "${
+        data.slice(0, 100).trim().replace(/[\x20\t]*[\r\n]\s*/g, ' ')}"`)
+      : data
+  ),
+});
 
 function cacheOrFetch(handlers = {}) {
   const requests = {};

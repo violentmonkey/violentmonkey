@@ -1,5 +1,5 @@
 import {
-  compareVersion, i18n, getFullUrl, isRemote, sendCmd, trueJoin,
+  compareVersion, i18n, getFullUrl, getScriptName, isRemote, sendCmd, trueJoin,
 } from '#/common';
 import {
   CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK,
@@ -557,7 +557,7 @@ export async function fetchResources(script, resourceCache, reqOptions) {
     ...Object.values(meta.resources).map(url => snatch(url, 'cache')),
     isRemote(meta.icon) && snatch(meta.icon, 'cache', validateImage),
   ]);
-  if (!resourceCache) {
+  if (!resourceCache.ignoreDepsErrors) {
     const error = errors.map(formatHttpError)::trueJoin('\n');
     if (error) {
       const message = i18n('msgErrorFetchingResource');
@@ -577,7 +577,7 @@ function validateImage(url, buf, type) {
     const onDone = (e) => {
       URL.revokeObjectURL(blobUrl);
       if (e.type === 'load') resolve();
-      else reject({ type: 'IMAGE_ERROR', url });
+      else reject(`IMAGE_ERROR: ${url}`);
     };
     const image = new Image();
     image.onload = onDone;
@@ -600,6 +600,7 @@ export async function vacuum(data) {
   let numFixes = 0;
   let resolveSelf;
   _vacuuming = new Promise(r => { resolveSelf = r; });
+  const result = {};
   const toFetch = [];
   const keysToRemove = [];
   const valueKeys = {};
@@ -624,29 +625,29 @@ export async function vacuum(data) {
       return false;
     });
   });
-  const touch = (obj, key) => {
+  const touch = (obj, key, scriptId) => {
     if (obj[key] < 0) {
       obj[key] = 1;
     } else if (!obj[key]) {
-      obj[key] = 2;
+      obj[key] = 2 + scriptId;
     }
   };
   store.scripts.forEach((script) => {
     const { id } = script.props;
-    touch(codeKeys, id);
-    touch(valueKeys, id);
+    touch(codeKeys, id, id);
+    touch(valueKeys, id, id);
     if (!script.custom.pathMap) buildPathMap(script);
     const { pathMap } = script.custom;
     script.meta.require.forEach((url) => {
-      touch(requireKeys, pathMap[url] || url);
+      touch(requireKeys, pathMap[url] || url, id);
     });
     script.meta.resources::forEachValue((url) => {
-      touch(cacheKeys, pathMap[url] || url);
+      touch(cacheKeys, pathMap[url] || url, id);
     });
     const { icon } = script.meta;
     if (isRemote(icon)) {
       const fullUrl = pathMap[icon] || icon;
-      touch(cacheKeys, fullUrl);
+      touch(cacheKeys, fullUrl, id);
     }
   });
   mappings.forEach(([substore, map]) => {
@@ -655,21 +656,26 @@ export async function vacuum(data) {
         // redundant value
         keysToRemove.push(substore.getKey(key));
         numFixes += 1;
-      } else if (value === 2 && substore.fetch) {
+      } else if (value >= 2 && substore.fetch) {
         // missing resource
         keysToRemove.push(storage.mod.getKey(key));
-        toFetch.push(substore.fetch(key));
+        toFetch.push(substore.fetch(key).catch(err => `${
+          getScriptName(getScriptById(value - 2))
+        }: ${
+          formatHttpError(err)
+        }`));
         numFixes += 1;
       }
     });
   });
   if (numFixes) {
     await storage.base.removeMulti(keysToRemove); // Removing `mod` before fetching
-    await Promise.all(toFetch);
+    result.errors = (await Promise.all(toFetch)).filter(Boolean);
   }
   _vacuuming = null;
-  resolveSelf(numFixes);
-  return numFixes;
+  result.fixes = numFixes;
+  resolveSelf(result);
+  return result;
 }
 
 /** @typedef VMScript
