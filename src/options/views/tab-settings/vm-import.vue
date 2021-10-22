@@ -50,9 +50,9 @@ export default {
     async vacuum() {
       this.vacuuming = true;
       this.labelVacuum = this.i18n('buttonVacuuming');
-      await sendCmdDirectly('Vacuum');
+      const num = await sendCmdDirectly('Vacuum');
       this.vacuuming = false;
-      this.labelVacuum = this.i18n('buttonVacuumed');
+      this.labelVacuum = this.i18n('buttonVacuumed') + (num ? ` (${num})` : '');
     },
   },
   mounted() {
