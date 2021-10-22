@@ -280,9 +280,10 @@ export async function request(url, options = {}) {
   const isBodyObj = body && body::({}).toString() === '[object Object]';
   const hostname = url.split('/', 3)[2];
   const accept = FORCED_ACCEPT[hostname];
-  const init = {
+  // Not using ...spread because Babel mistakenly adds its polyfill to injected-web
+  const init = Object.assign({
     cache: isRemote(url) ? undefined : 'no-cache',
-    ...options, /* Used in safe context */// eslint-disable-line no-restricted-syntax
+  }, options, {
     body: isBodyObj ? JSON.stringify(body) : body,
     headers: isBodyObj || accept
       ? Object.assign({},
@@ -290,7 +291,7 @@ export async function request(url, options = {}) {
         isBodyObj && { 'Content-Type': 'application/json' },
         accept && { accept })
       : headers,
-  };
+  });
   const result = { url, status: -1 };
   try {
     const resp = await fetch(url, init);

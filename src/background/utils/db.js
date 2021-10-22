@@ -557,7 +557,7 @@ export async function fetchResources(script, resourceCache, reqOptions) {
     ...Object.values(meta.resources).map(url => snatch(url, 'cache')),
     isRemote(meta.icon) && snatch(meta.icon, 'cache', validateImage),
   ]);
-  if (!resourceCache.ignoreDepsErrors) {
+  if (!resourceCache?.ignoreDepsErrors) {
     const error = errors.map(formatHttpError)::trueJoin('\n');
     if (error) {
       const message = i18n('msgErrorFetchingResource');

@@ -57,7 +57,7 @@ module.exports = {
          Ideally, `eslint-plugin-compat` should be used but I couldn't make it work. */
       'no-restricted-syntax': ['error', {
         selector: 'ObjectExpression > ExperimentalSpreadProperty',
-        message: 'Object spread in an unsafe environment',
+        message: 'Object spread adds a polyfill in injected* even if unused by it',
       }, {
         selector: 'OptionalCallExpression',
         message: 'Optional call in an unsafe environment',
