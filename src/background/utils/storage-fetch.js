@@ -17,8 +17,7 @@ storage.cache.fetch = cacheOrFetch({
 storage.require.fetch = cacheOrFetch({
   transform: ({ data }, url) => (
     /^\s*</.test(data)
-      ? Promise.reject(`NOT_JS: ${url} "${
-        data.slice(0, 100).trim().replace(/[\x20\t]*[\r\n]\s*/g, ' ')}"`)
+      ? Promise.reject(`NOT_JS: ${url} "${data.slice(0, 100).trim().replace(/\s{2,}/g, ' ')}"`)
       : data
   ),
 });
