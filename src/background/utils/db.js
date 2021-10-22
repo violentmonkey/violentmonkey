@@ -11,7 +11,7 @@ import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
 import { testScript, testBlacklist } from './tester';
 import { preInitialize } from './init';
-import { commands } from './message';
+import { commands, notify } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
 import './storage-fetch';
@@ -80,7 +80,7 @@ Object.assign(commands, {
       props: { lastModified: Date.now() },
     });
   },
-  /** @return {Promise<void>} */
+  /** @return {Promise<number>} */
   Vacuum: vacuum,
 });
 
@@ -168,6 +168,7 @@ preInitialize.push(async () => {
   if (process.env.DEBUG) {
     console.log('store:', store); // eslint-disable-line no-console
   }
+  vacuum(data);
   return sortScripts();
 });
 
@@ -328,8 +329,9 @@ const STORAGE_ROUTES = Object.entries({
   require: ENV_REQ_KEYS,
   value: ENV_VALUE_IDS,
 });
+const retriedStorageKeys = {};
 
-async function readEnvironmentData(env) {
+async function readEnvironmentData(env, isRetry) {
   const keys = [];
   STORAGE_ROUTES.forEach(([area, srcIds]) => {
     env[srcIds].forEach(id => {
@@ -337,12 +339,26 @@ async function readEnvironmentData(env) {
     });
   });
   const data = await storage.base.getMulti(keys);
-  STORAGE_ROUTES.forEach(([area, srcIds]) => {
+  for (const [area, srcIds] of STORAGE_ROUTES) {
     env[area] = {};
-    env[srcIds].forEach(id => {
-      env[area][id] = data[storage[area].getKey(id)];
-    });
-  });
+    for (const id of env[srcIds]) {
+      const val = data[storage[area].getKey(id)];
+      env[area][id] = val;
+      if (val == null && area !== 'value' && retriedStorageKeys[area + id] !== 2) {
+        const err = `The "${area}" storage is missing "${id}"!`;
+        const err2 = 'Vacuuming did not help. Please reinstall the affected scripts.';
+        retriedStorageKeys[area + id] = isRetry ? 2 : 1;
+        if (!isRetry) {
+          console.warn(err, 'Vacuuming...');
+          if (await vacuum()) {
+            return readEnvironmentData(env, true);
+          }
+        }
+        console.error(err, err2);
+        notify({ title: err, body: err2 });
+      }
+    }
+  }
   return env;
 }
 
@@ -574,8 +590,18 @@ function formatHttpError(e) {
   return e && [e.status && `HTTP${e.status}`, e.url]::trueJoin(' ') || e;
 }
 
-/** @return {Promise<void>} */
-export async function vacuum() {
+let _vacuuming;
+/**
+ * @param {Object} [data]
+ * @return {Promise<number>}
+ */
+export async function vacuum(data) {
+  if (_vacuuming) return _vacuuming;
+  let numFixes = 0;
+  let resolveSelf;
+  _vacuuming = new Promise(r => { resolveSelf = r; });
+  const toFetch = [];
+  const keysToRemove = [];
   const valueKeys = {};
   const cacheKeys = {};
   const requireKeys = {};
@@ -586,7 +612,7 @@ export async function vacuum() {
     [storage.require, requireKeys],
     [storage.code, codeKeys],
   ];
-  const data = await browser.storage.local.get();
+  if (!data) data = await browser.storage.local.get();
   data::forEachKey((key) => {
     mappings.some(([substore, map]) => {
       const { prefix } = substore;
@@ -627,13 +653,23 @@ export async function vacuum() {
     map::forEachEntry(([key, value]) => {
       if (value < 0) {
         // redundant value
-        substore.remove(key);
+        keysToRemove.push(substore.getKey(key));
+        numFixes += 1;
       } else if (value === 2 && substore.fetch) {
         // missing resource
-        substore.fetch(key);
+        keysToRemove.push(storage.mod.getKey(key));
+        toFetch.push(substore.fetch(key));
+        numFixes += 1;
       }
     });
   });
+  if (numFixes) {
+    await storage.base.removeMulti(keysToRemove); // Removing `mod` before fetching
+    await Promise.all(toFetch);
+  }
+  _vacuuming = null;
+  resolveSelf(numFixes);
+  return numFixes;
 }
 
 /** @typedef VMScript

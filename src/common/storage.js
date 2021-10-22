@@ -14,6 +14,7 @@ const onStorageChanged = changes => {
   });
 };
 
+/** @namespace VMStorageBase */
 const base = {
   prefix: '',
   setDataCache(val) {

@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 
 // Not exporting the built-in globals because this also runs in node
-// Not using destructuring to allow removal of unused variables during minification
 const { CustomEvent, Error, dispatchEvent } = global;
 export const Prototype = 'prototype';
 export const { createElementNS, getElementsByTagName } = document;

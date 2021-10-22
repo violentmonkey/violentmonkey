@@ -19,13 +19,13 @@ storage.require.fetch = cacheOrFetch();
 function cacheOrFetch(handlers = {}) {
   const requests = {};
   const { init, transform } = handlers;
-  /** @this storage.<area> */
+  /** @this VMStorageBase */
   return function cacheOrFetchHandler(...args) {
     const [url] = args;
     const promise = requests[url] || (requests[url] = this::doFetch(...args));
     return promise;
   };
-  /** @this storage.<area> */
+  /** @this VMStorageBase */
   async function doFetch(...args) {
     const [url, options] = args;
     try {
