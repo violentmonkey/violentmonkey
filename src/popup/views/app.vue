@@ -14,7 +14,7 @@
       <div
         class="flex-1 ext-name"
         :class="{disabled:!options.isApplied}"
-        v-text="i18n('extName')"
+        v-text="name"
       />
       <span
         class="menu-area"
@@ -189,6 +189,8 @@ import Icon from '#/common/ui/icon';
 import { keyboardService, isInput } from '#/common/keyboard';
 import { mutex, store } from '../utils';
 
+const manifest = browser.runtime.getManifest();
+const NAME = `${manifest.name} ${manifest.version}`;
 const SCRIPT_CLS = '.script';
 let mousedownElement;
 
@@ -233,6 +235,7 @@ export default {
       activeExtras: null,
       message: null,
       focusedId: null,
+      name: NAME,
     };
   },
   computed: {
