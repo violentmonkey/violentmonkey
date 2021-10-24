@@ -1,6 +1,6 @@
 <template>
   <div class="edit frame flex flex-col fixed-full">
-    <div class="edit-header flex mr-1 mr-1c">
+    <div class="edit-header flex mr-1c">
       <nav>
         <div
           v-for="(label, navKey) in navItems" :key="navKey"
@@ -349,6 +349,7 @@ export default {
   &-header {
     align-items: center;
     justify-content: space-between;
+    border-bottom: 1px solid var(--fill-3);
   }
   &-name {
     font-weight: bold;
@@ -369,6 +370,37 @@ export default {
     &:not(.active):hover {
       background: var(--fill-0-5);
       box-shadow: 0 -1px 1px var(--fill-4);
+    }
+  }
+  .edit-externals {
+    --border: 0;
+    .select {
+      padding-top: 0.5em;
+      @media (max-width: 1599px) {
+        resize: vertical;
+        &[style*=height] {
+          max-height: 80%;
+        }
+        &[style*=width] {
+          width: auto !important;
+        }
+      }
+    }
+    @media (min-width: 1600px) {
+      flex-direction: row;
+      .select {
+        resize: horizontal;
+        min-width: 15em;
+        width: 30%;
+        max-height: none;
+        border-bottom: none;
+        &[style*=height] {
+          height: auto !important;
+        }
+        &[style*=width] {
+          max-width: 80%;
+        }
+      }
     }
   }
 }

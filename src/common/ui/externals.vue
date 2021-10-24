@@ -18,7 +18,7 @@
         <dd v-if="contents" v-text="formatLength(contents, type)" class="ml-2"/>
       </dl>
     </div>
-    <div class="contents pos-rel flex-auto">
+    <div class="contents pos-rel flex-1">
       <img v-if="img" :src="img">
       <vm-code
         class="abs-full"
@@ -131,7 +131,8 @@ export default {
 $outerPadX: 1rem;
 $mainEntryBorder: 6px double;
 .edit-externals {
-  border-top: $mainEntryBorder var(--fill-8);
+  --border: $mainEntryBorder var(--fill-8);
+  border-top: var(--border);
   > .select {
     min-height: 1.25rem;
     max-height: 15vh;

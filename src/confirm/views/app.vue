@@ -70,7 +70,7 @@
       </div>
       <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
     </div>
-    <div class="frame-block flex-auto pos-rel">
+    <div class="frame-block flex-1 pos-rel">
       <vm-externals
         v-if="script"
         v-model="script"
@@ -537,6 +537,46 @@ $infoIconSize: 18px;
       &:hover {
         border-color: #608cb8;
       }
+    }
+  }
+  .edit-externals .select {
+    resize: vertical;
+    &[style] {
+      max-height: 80%;
+    }
+  }
+  @media (max-width: 1599px) {
+    >:first-child {
+      min-height: 5em;
+      max-height: 80vh;
+      width: auto !important; // resetting the inline style attribute if the user resized it
+      resize: vertical;
+      overflow-y: auto;
+    }
+  }
+  @media (min-width: 1600px) {
+    flex-direction: row;
+    >:first-child {
+      min-width: 30em;
+      max-width: 80%;
+      width: 40%;
+      height: auto !important; // resetting the inline style attribute if the user resized it
+      resize: horizontal;
+      overflow: hidden;
+    }
+    .info .descr {
+      max-height: 20vh;
+    }
+    .lists {
+      overflow-y: auto;
+      max-height: 75vh;
+    }
+    .lists dd {
+      max-height: 30vh;
+    }
+    .edit-externals {
+      border-top: none;
+      border-left: var(--border);
     }
   }
 }
