@@ -38,7 +38,7 @@ Object.entries(envs).forEach(([key, value]) => {
 
 function listCommits() {
   const exec = cmd => childProcess.execSync(cmd, {encoding: 'utf8'}).trim();
-  const thisTag = exec('git describe --abbrev=0');
+  const thisTag = exec('git describe --abbrev=0 --tags');
   const prevTag = exec(`git describe --abbrev=0 --tags "${thisTag}^"`);
   return exec(`git log --oneline --skip=1 --reverse "${prevTag}...${thisTag}"`)
   .split('\n')
