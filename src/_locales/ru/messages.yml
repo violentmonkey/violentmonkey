@@ -337,7 +337,7 @@ labelExportScriptData:
   message: Экспорт данных скриптов
 labelExposeStatus:
   description: Option in advanced settings.
-  message: 'Показывать версию установленного скрипта на сайтах каталогов скриптов:: $1'
+  message: 'Показывать версию установленного скрипта на сайтах каталогов скриптов: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
@@ -712,16 +712,16 @@ optionShowEnabledFirst:
   message: Сначала показать включенные скрипты
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: 'Интерфейс:'
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: автоматически
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: темный
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: светлый
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: С учетом регистра

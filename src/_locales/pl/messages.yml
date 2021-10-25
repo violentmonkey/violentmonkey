@@ -15,7 +15,7 @@ buttonDisable:
   message: Wyłącz
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: Pobierz motyw
+  message: Pobierz motywy
 buttonEdit:
   description: Button to edit a script.
   message: Edytuj
@@ -641,7 +641,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Konflikty przestrzeni nazw skryptu! Proszę zmodyfikować @name i @namespace.
+  message: |-
+    Taki skrypt jest już zainstalowany lub wciąż znajduje się w Koszu.
+    Użyj innego @name i @namespace tutaj lub lub zamiast tego edytuj ten skrypt.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
