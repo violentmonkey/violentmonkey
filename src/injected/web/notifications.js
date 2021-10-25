@@ -19,7 +19,7 @@ bridge.addHandlers({
   },
 });
 
-export function onNotificationCreate(options) {
+export function onNotificationCreate(options, context) {
   lastId += 1;
   notifications[lastId] = options;
   bridge.post('Notification', {
@@ -27,6 +27,6 @@ export function onNotificationCreate(options) {
     text: options.text,
     title: options.title,
     image: options.image,
-  });
+  }, context);
   return lastId;
 }

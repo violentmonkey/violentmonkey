@@ -20,18 +20,19 @@ bridge.addHandlers({
   },
 });
 
-export function onRequestCreate(opts, scriptId) {
+export function onRequestCreate(opts, context) {
   if (!opts.url) throw new Error('Required parameter "url" is missing.');
+  const scriptId = context.id;
   const id = getUniqId(`VMxhr${scriptId}`);
   const req = {
     id,
     scriptId,
     opts,
   };
-  start(req);
+  start(req, context);
   return {
     abort() {
-      bridge.post('AbortRequest', id);
+      bridge.post('AbortRequest', id, context);
     },
   };
 }
@@ -138,7 +139,7 @@ function receiveChunk(req, { data, i, last }) {
   }
 }
 
-async function start(req) {
+async function start(req, context) {
   const { id, opts, scriptId } = req;
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
@@ -175,7 +176,7 @@ async function start(req) {
     'password',
     'timeout',
     'user',
-  ])));
+  ])), context);
 }
 
 function getFullUrl(url) {

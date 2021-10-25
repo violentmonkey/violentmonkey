@@ -16,7 +16,7 @@ bridge.addHandlers({
     };
     sendCmd('HttpRequest', opts);
   },
-  AbortRequest: sendCmd,
+  AbortRequest: true,
 });
 
 bridge.addBackgroundHandlers({

@@ -1,10 +1,18 @@
 import { sendCmd } from '#/common';
 import { INJECT_PAGE, browser } from '#/common/consts';
 
-// {CommandName: sendCmd} will relay the request via sendCmd as is
+const allow = createNullObj();
 /** @type {Object.<string, MessageFromGuestHandler>} */
 const handlers = createNullObj();
 const bgHandlers = createNullObj();
+const onScripts = [];
+const assignHandlers = (dest, src, force) => {
+  if (force) {
+    assign(dest, src);
+  } else {
+    onScripts.push(() => assign(dest, src));
+  }
+};
 const bridge = {
   __proto__: null, // Object.create(null) may be spoofed
   ids: [], // all ids including the disabled ones for SetPopup
@@ -13,21 +21,29 @@ const bridge = {
   /** @type Number[] */
   invokableIds: [],
   failedIds: [],
-  // {CommandName: sendCmd} will relay the request via sendCmd as is
-  addHandlers(obj) {
-    assign(handlers, obj);
+  onScripts,
+  /** Without `force` handlers will be added only when userscripts are about to be injected. */
+  addHandlers(obj, force) {
+    assignHandlers(handlers, obj, force);
   },
-  addBackgroundHandlers(obj) {
-    assign(bgHandlers, obj);
+  /** { CommandName: true } will relay the request via sendCmd as is.
+   * Without `force` handlers will be added only when userscripts are about to be injected. */
+  addBackgroundHandlers(obj, force) {
+    assignHandlers(bgHandlers, obj, force);
+  },
+  allow(cmd, dataKey) {
+    (allow[cmd] || (allow[cmd] = createNullObj()))[dataKey] = true;
   },
   // realm is provided when called directly via invokeHost
-  async onHandle({ cmd, data }, realm) {
+  async onHandle({ cmd, data, dataKey }, realm) {
     const handle = handlers[cmd];
-    if (!handle) throw new Error(`Invalid command: ${cmd}`);
+    if (!handle || !allow[cmd]?.[dataKey]) {
+      throw new Error(`[Violentmonkey] Invalid command: "${cmd}" on ${global.location.host}`);
+    }
     const callbackId = data?.callbackId;
     const payload = callbackId ? data.payload : data;
-    let res = handle === sendCmd ? sendCmd(cmd, payload) : handle(payload, realm || INJECT_PAGE);
-    if (typeof res?.then === 'function') {
+    let res = handle === true ? sendCmd(cmd, payload) : handle(payload, realm || INJECT_PAGE);
+    if (res instanceof Promise) {
       res = await res;
     }
     if (callbackId && res !== undefined) {

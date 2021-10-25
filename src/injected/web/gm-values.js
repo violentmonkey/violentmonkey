@@ -36,8 +36,8 @@ export function loadValues(id) {
   return store.values[id];
 }
 
-export function dumpValue(id, key, val, raw, oldRaw) {
-  bridge.post('UpdateValue', { id, key, value: raw });
+export function dumpValue(id, key, val, raw, oldRaw, context) {
+  bridge.post('UpdateValue', { id, key, value: raw }, context);
   if (raw !== oldRaw) {
     const hooks = changeHooks[id]?.[key];
     if (hooks) notifyChange(hooks, key, val, raw, oldRaw);

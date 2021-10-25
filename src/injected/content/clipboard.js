@@ -1,43 +1,32 @@
-import { sendCmd } from '#/common';
-import { logging } from '../utils/helpers';
+import { log } from '../utils/helpers';
 import bridge from './bridge';
 
-// old Firefox defines it on a different prototype so we'll just grab it from document directly
-const { execCommand } = document;
-const { setData } = DataTransfer[Prototype];
-const { get: getClipboardData } = describeProperty(ClipboardEvent[Prototype], 'clipboardData');
-const { preventDefault, stopImmediatePropagation } = Event[Prototype];
-
-let clipboardData;
-
-bridge.addHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
-  SetClipboard(data) {
-    if (bridge.isFirefox) {
-      // Firefox does not support copy from background page.
-      // ref: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Interact_with_the_clipboard
-      // The dirty way will create a <textarea> element in web page and change the selection.
-      setClipboard(data);
-    } else {
-      sendCmd('SetClipboard', data);
-    }
-  },
-});
-
-function onCopy(e) {
-  e::stopImmediatePropagation();
-  e::preventDefault();
-  const { type, data } = clipboardData;
-  e::getClipboardData()::setData(type || 'text/plain', data);
-}
-
-function setClipboard({ type, data }) {
-  clipboardData = { type, data };
-  document::addEventListener('copy', onCopy, false);
-  const ret = document::execCommand('copy', false, null);
-  document::removeEventListener('copy', onCopy, false);
-  clipboardData = null;
-  if (process.env.DEBUG && !ret) {
-    logging.warn('Copy failed!');
+bridge.onScripts.push(() => {
+  let setClipboard;
+  if (bridge.isFirefox) {
+    let clipboardData;
+    // old Firefox defines it on a different prototype so we'll just grab it from document directly
+    const { execCommand } = document;
+    const { setData } = DataTransfer[Prototype];
+    const { get: getClipboardData } = describeProperty(ClipboardEvent[Prototype], 'clipboardData');
+    const { preventDefault, stopImmediatePropagation } = Event[Prototype];
+    const onCopy = e => {
+      e::stopImmediatePropagation();
+      e::preventDefault();
+      e::getClipboardData()::setData(clipboardData.type || 'text/plain', clipboardData.data);
+    };
+    setClipboard = params => {
+      clipboardData = params;
+      document::addEventListener('copy', onCopy);
+      if (!document::execCommand('copy') && process.env.DEBUG) {
+        log('warn', null, 'GM_setClipboard failed!');
+      }
+      document::removeEventListener('copy', onCopy);
+      clipboardData = null;
+    };
   }
-}
+  bridge.addHandlers({
+    __proto__: null, // Object.create(null) may be spoofed
+    SetClipboard: setClipboard || true,
+  }, true);
+});

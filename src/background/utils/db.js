@@ -42,6 +42,12 @@ Object.assign(commands, {
   GetScriptCode(id) {
     return storage.code.getOne(id);
   },
+  GetScriptVer(opts) {
+    const script = getScript(opts);
+    return script && !script.config.removed
+      ? script.meta.version
+      : null;
+  },
   /** @return {Promise<void>} */
   MarkRemoved({ id, removed }) {
     return updateScriptInfo(id, {
@@ -139,7 +145,7 @@ preInitialize.push(async () => {
       // listing all known resource urls in order to remove unused mod keys
       const {
         custom: { pathMap = {} } = {},
-        meta = {},
+        meta = script.meta = {},
       } = script;
       meta.grant = [...new Set(meta.grant || [])]; // deduplicate
       meta.require?.forEach(rememberUrl, pathMap);
@@ -290,7 +296,7 @@ export async function getScriptsByURL(url, isTop) {
     const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
     const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
     env.ids.push(id);
-    if (meta.grant?.some(GMVALUES_RE.test, GMVALUES_RE)) {
+    if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
       env[ENV_VALUE_IDS].push(id);
     }
     for (const [list, name] of [

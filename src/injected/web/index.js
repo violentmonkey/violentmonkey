@@ -24,9 +24,12 @@ export default function initialize(
   invokeHost,
 ) {
   let invokeGuest;
+  bridge.dataKey = contentId;
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;
-    bridge.post = (cmd, data) => invokeHost({ cmd, data }, INJECT_CONTENT);
+    bridge.post = (cmd, data, context) => {
+      invokeHost({ cmd, data, dataKey: (context || bridge).dataKey }, INJECT_CONTENT);
+    };
     invokeGuest = (cmd, data) => bridge.onHandle({ cmd, data });
     global.chrome = undefined;
     global.browser = undefined;
@@ -35,7 +38,7 @@ export default function initialize(
     });
   } else {
     bridge.mode = INJECT_PAGE;
-    bridge.post = bindEvents(webId, contentId, bridge.onHandle);
+    bindEvents(webId, contentId, bridge);
     bridge.addHandlers({
       Ping() {
         bridge.post('Pong');
@@ -76,10 +79,9 @@ bridge.addHandlers({
   Expose() {
     window.external.Violentmonkey = {
       version: process.env.VM_VER,
-      async isInstalled(name, namespace) {
-        const script = await bridge.send('GetScript', { meta: { name, namespace } });
-        return script && !script.config.removed ? script.meta.version : null;
-      },
+      isInstalled: (name, namespace) => (
+        bridge.send('GetScriptVer', { meta: { name, namespace } })
+      ),
     };
   },
 });
@@ -105,8 +107,8 @@ async function onCodeSet(item, fn) {
     log('info', [bridge.mode], item.displayName);
   }
   const run = () => {
+    bridge.post('Run', item.props.id, item);
     wrapGM(item)::fn(logging.error);
-    bridge.post('Run', item.props.id);
   };
   const el = document::getCurrentScript();
   const wait = waiters[stage];

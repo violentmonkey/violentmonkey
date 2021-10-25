@@ -37,17 +37,38 @@ const { split } = '';
   const data = IS_FIREFOX && Event[Prototype].composedPath
     ? await getDataFF(dataPromise)
     : await dataPromise;
+  const { allow } = bridge;
   // 1) bridge.post may be overridden in injectScripts
   // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
-  bridge.post = bindEvents(contentId, webId, bridge.onHandle, global.cloneInto);
+  bindEvents(contentId, webId, bridge, global.cloneInto);
+  bridge.contentId = contentId;
   bridge.ids = data.ids;
   bridge.isFirefox = data.info.isFirefox;
   bridge.injectInto = data.injectInto;
   isPopupShown = data.isPopupShown;
-  if (data.expose) bridge.post('Expose');
-  if (data.scripts) await injectScripts(contentId, webId, data, isXml);
+  if (data.expose) {
+    allow('GetScriptVer', contentId);
+    bridge.addHandlers({ GetScriptVer: true }, true);
+    bridge.post('Expose');
+  }
+  if (data.scripts) {
+    bridge.onScripts.forEach(fn => fn());
+    allow('SetTimeout', contentId);
+    allow('InjectList', contentId);
+    allow('Pong', contentId);
+    await injectScripts(contentId, webId, data, isXml);
+  }
+  bridge.onScripts = null;
   sendSetPopup();
 })().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
+
+bridge.addBackgroundHandlers({
+  __proto__: null, // Object.create(null) may be spoofed
+  PopupShown(state) {
+    isPopupShown = state;
+    sendSetPopup();
+  },
+}, true);
 
 bridge.addBackgroundHandlers({
   __proto__: null, // Object.create(null) may be spoofed
@@ -55,10 +76,6 @@ bridge.addBackgroundHandlers({
     const id = +data[0]::split(':', 1)[0];
     const realm = invokableIds::includes(id) && INJECT_CONTENT;
     bridge.post('Command', data, realm);
-  },
-  PopupShown(state) {
-    isPopupShown = state;
-    sendSetPopup();
   },
   UpdatedValues(data) {
     const dataPage = createNullObj();
@@ -73,7 +90,6 @@ bridge.addBackgroundHandlers({
 
 bridge.addHandlers({
   __proto__: null, // Object.create(null) may be spoofed
-  UpdateValue: sendCmd,
   RegisterMenu(data) {
     if (IS_TOP) {
       const id = data[0];
@@ -108,9 +124,9 @@ bridge.addHandlers({
       return e.stack;
     }
   },
-  GetScript: sendCmd,
-  SetTimeout: sendCmd,
-  TabFocus: sendCmd,
+  SetTimeout: true,
+  TabFocus: true,
+  UpdateValue: true,
 });
 
 async function sendSetPopup(isDelayed) {

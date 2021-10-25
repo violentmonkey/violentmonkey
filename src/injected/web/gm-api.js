@@ -34,7 +34,7 @@ export function makeGmApi() {
       const oldRaw = values[key];
       delete values[key];
       // using `undefined` to match the documentation and TM for GM_addValueChangeListener
-      dumpValue(id, key, undefined, null, oldRaw);
+      dumpValue(id, key, undefined, null, oldRaw, this);
     },
     GM_getValue(key, def) {
       const raw = loadValues(this.id)[key];
@@ -49,7 +49,7 @@ export function makeGmApi() {
       const values = loadValues(id);
       const oldRaw = values[key];
       values[key] = raw;
-      dumpValue(id, key, val, raw, oldRaw);
+      dumpValue(id, key, val, raw, oldRaw, this);
     },
     /**
      * @callback GMValueChangeListener
@@ -103,14 +103,14 @@ export function makeGmApi() {
       const { id } = this;
       const key = `${id}:${cap}`;
       store.commands[key] = func;
-      bridge.post('RegisterMenu', [id, cap]);
+      bridge.post('RegisterMenu', [id, cap], this);
       return cap;
     },
     GM_unregisterMenuCommand(cap) {
       const { id } = this;
       const key = `${id}:${cap}`;
       delete store.commands[key];
-      bridge.post('UnregisterMenu', [id, cap]);
+      bridge.post('UnregisterMenu', [id, cap], this);
     },
     GM_download(arg1, name) {
       // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
@@ -140,10 +140,10 @@ export function makeGmApi() {
         overrideMimeType: 'application/octet-stream',
         onload: downloadBlob,
       });
-      return onRequestCreate(opts, this.id);
+      return onRequestCreate(opts, this);
     },
     GM_xmlhttpRequest(opts) {
-      return onRequestCreate(opts, this.id);
+      return onRequestCreate(opts, this);
     },
     /**
      * Bypasses site's CSP for inline `style`, `link`, and `script`.
@@ -152,24 +152,27 @@ export function makeGmApi() {
      * @param {Object} [attributes]
      * @returns {HTMLElement} it also has .then() so it should be compatible with TM
      */
-    GM_addElement: (parent, tag, attributes) => (
-      typeof parent === 'string'
-        ? webAddElement(undefined, parent, tag)
-        : webAddElement(parent, tag, attributes)
-    ),
+    GM_addElement(parent, tag, attributes) {
+      return typeof parent === 'string'
+        ? webAddElement(null, parent, tag, this)
+        : webAddElement(parent, tag, attributes, this);
+    },
     /**
      * Bypasses site's CSP for inline `style`.
      * @param {string} css
      * @returns {HTMLElement} it also has .then() so it should be compatible with TM and old VM
      */
-    GM_addStyle: css => (
-      webAddElement(undefined, 'style', { textContent: css }, getUniqId('VMst'))
-    ),
-    GM_openInTab: (url, options) => (
-      onTabCreate(options && typeof options === 'object'
-        ? assign({}, options, { url })
-        : { active: !options, url })
-    ),
+    GM_addStyle(css) {
+      return webAddElement(null, 'style', { textContent: css }, this, getUniqId('VMst'));
+    },
+    GM_openInTab(url, options) {
+      return onTabCreate(
+        options && typeof options === 'object'
+          ? assign({}, options, { url })
+          : { active: !options, url },
+        this,
+      );
+    },
     GM_notification(text, title, image, onclick) {
       const options = typeof text === 'object' ? text : {
         text,
@@ -180,24 +183,24 @@ export function makeGmApi() {
       if (!options.text) {
         throw new Error('GM_notification: `text` is required!');
       }
-      const id = onNotificationCreate(options);
+      const id = onNotificationCreate(options, this);
       return {
-        remove: vmOwnFunc(() => bridge.send('RemoveNotification', id)),
+        remove: vmOwnFunc(() => bridge.send('RemoveNotification', id, this)),
       };
     },
     GM_setClipboard(data, type) {
-      bridge.post('SetClipboard', { data, type });
+      bridge.post('SetClipboard', { data, type }, this);
     },
     // using the native console.log so the output has a clickable link to the caller's source
     GM_log: logging.log,
   };
 }
 
-function webAddElement(parent, tag, attributes, useId) {
+function webAddElement(parent, tag, attributes, context, useId) {
   const id = useId || getUniqId('VMel');
   let el;
   // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
-  let error = bridge.sendSync('AddElement', { tag, attributes, id });
+  let error = bridge.sendSync('AddElement', { tag, attributes, id }, context);
   if (!error) {
     try {
       el = document::getElementById(id);

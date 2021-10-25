@@ -42,6 +42,7 @@ export function wrapGM(script) {
     id,
     script,
     resources,
+    dataKey: script.dataKey,
     pathMap: script.custom.pathMap || createNullObj(),
     urls: createNullObj(),
   };
@@ -61,10 +62,10 @@ export function wrapGM(script) {
   // not using ...spread as it calls Babel's polyfill that calls unsafe Object.xxx
   assign(gm, componentUtils);
   if (grant::includes('window.close')) {
-    gm.close = vmOwnFunc(() => bridge.post('TabClose'));
+    gm.close = vmOwnFunc(() => bridge.post('TabClose', 0, context));
   }
   if (grant::includes('window.focus')) {
-    gm.focus = vmOwnFunc(() => bridge.post('TabFocus'));
+    gm.focus = vmOwnFunc(() => bridge.post('TabFocus', 0, context));
   }
   if (!gmApi && grant.length) gmApi = makeGmApi();
   grant::forEach((name) => {

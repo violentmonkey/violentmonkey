@@ -5,14 +5,15 @@ import { elemByTag, NS_HTML, log } from '../utils/helpers';
 import bridge from './bridge';
 
 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
-const VMInitInjection = window[process.env.INIT_FUNC_NAME];
+let VMInitInjection = window[process.env.INIT_FUNC_NAME];
 // To avoid running repeatedly due to new `document.documentElement`
 // (the prop is undeletable so a userscript can't fool us on reinjection)
 defineProperty(window, process.env.INIT_FUNC_NAME, { value: 1 });
 
+const regexpTest = RegExp[Prototype].test;
 const stringIncludes = ''.includes;
 const resolvedPromise = Promise.resolve();
-const { runningIds } = bridge;
+const { allow, runningIds } = bridge;
 let contLists;
 let pgLists;
 /** @type {Object<string,VMInjectionRealm>} */
@@ -108,6 +109,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
       const realmData = realms[realm];
       realmData.lists[script.runAt].push(script); // 'start' or 'body' per getScriptsByURL()
       realmData.is = true;
+      allowCommands(script);
     } else {
       bridge.failedIds.push(id);
     }
@@ -168,6 +170,7 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }, getRea
   if (needsInvoker && contentId) {
     setupContentInvoker(contentId, webId);
   }
+  scripts::forEach(allowCommands);
   injectAll('end');
   injectAll('idle');
 }
@@ -177,7 +180,7 @@ function checkInjectable() {
     Pong() {
       pageInjectable = true;
     },
-  });
+  }, true);
   bridge.post('Ping');
   return pageInjectable;
 }
@@ -264,4 +267,40 @@ function setupContentInvoker(contentId, webId) {
   bridge.post = (cmd, params, realm) => (
     (realm === INJECT_CONTENT ? invokeContent : postViaBridge)(cmd, params)
   );
+  VMInitInjection = null; // release for GC
+}
+
+/**
+ * @param {VMInjectedScript | VMScript} script
+ */
+function allowCommands(script) {
+  const { dataKey } = script;
+  allow('Run', dataKey);
+  script.meta.grant::forEach(grant => {
+    const gm = /^GM[._]/::regexpTest(grant) && grant::slice(3);
+    if (grant === 'GM_xmlhttpRequest' || grant === 'GM.xmlHttpRequest' || gm === 'download') {
+      allow('AbortRequest', dataKey);
+      allow('HttpRequest', dataKey);
+    } else if (grant === 'window.close') {
+      allow('TabClose', dataKey);
+    } else if (grant === 'window.focus') {
+      allow('TabFocus', dataKey);
+    } else if (gm === 'addElement' || gm === 'addStyle') {
+      allow('AddElement', dataKey);
+    } else if (gm === 'setValue' || gm === 'deleteValue') {
+      allow('UpdateValue', dataKey);
+    } else if (gm === 'notification') {
+      allow('Notification', dataKey);
+      allow('RemoveNotification', dataKey);
+    } else if (gm === 'openInTab') {
+      allow('TabOpen', dataKey);
+      allow('TabClose', dataKey);
+    } else if (gm === 'registerMenuCommand') {
+      allow('RegisterMenu', dataKey);
+    } else if (gm === 'setClipboard') {
+      allow('SetClipboard', dataKey);
+    } else if (gm === 'unregisterMenuCommand') {
+      allow('UnregisterMenu', dataKey);
+    }
+  });
 }
