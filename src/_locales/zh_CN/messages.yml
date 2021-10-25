@@ -15,7 +15,7 @@ buttonDisable:
   message: 禁用
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: ''
+  message: 下载主题
 buttonEdit:
   description: Button to edit a script.
   message: 编辑
@@ -117,13 +117,10 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    CodeMirror及其扩展的自定义配置，使用一个JSON对象，如<code>{"indentUnit":2,
-    "smartIndent":true}</code>，注意某些配置可能不被支持。见<a
+    在 JSON 对象中为 CodeMirror 和附加组件提供自定义选项，如 {"indentUnit":2,
+    "smartIndent":true}<code>，但请注意，其中一些选项在 Violentmonkey 中可能不起作用。 查看<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">完整列表</a>。如果要使用CodeMirror的自定义主题，可以像<code>"theme":
-    "3024-day"</code>这样指定主题的名字，并把<a
-    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
-    target="_blank" rel="noopener noreferrer">实际的主题CSS</a>粘贴到下面的“自定义样式”输入框。
+    rel="noopener noreferrer">完整列表</a>。
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 用户脚本 metadata 区域和 <code>GM</code> API 的相关文档：
@@ -270,7 +267,7 @@ labelAutoUpdate:
   message: 每 $1 天检查一次脚本更新，0 表示禁用
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: 备份
 labelBadge:
   description: Label for option to show number on badge.
   message: 在扩展图标上显示：
@@ -383,7 +380,7 @@ labelName:
   message: 名字：
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: "在帧中运行:\_"
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 名字为空
@@ -482,7 +479,7 @@ labelSyncUsername:
   message: 用户名：
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: '主题:'
 labelTranslator:
   description: Label of translator.
   message: 翻译者：
@@ -538,7 +535,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: 匹配的禁用脚本
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: 仅在frame中执行的脚本
@@ -559,7 +556,7 @@ msgCheckingForUpdate:
   message: 正在检查更新...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: '单击打开 MomentJS 文档。允许的标记：$1。使用 [方括号] 保护明文文本。'
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -656,7 +653,7 @@ msgSyncInitError:
   message: 初始化失败！
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: 还没有授权。
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: 即将开始同步...
@@ -685,34 +682,34 @@ optionEditorWindowSimple:
   message: 隐藏地址栏
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: 弹出式菜单和图标
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: 启用项优先
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: 分组禁用的脚本
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: 隐藏禁用项
+  message: 隐藏禁用的脚本
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: 显示禁用的脚本
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 先显示被启用的脚本
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: "UI 主题:\_"
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: 自动
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: 暗
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: 亮
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 区分大小写

@@ -26,7 +26,7 @@ buttonEditClickHint:
     scriptului.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: Golește coșul de gunoi acum!
+  message: Golește coșul de reciclare acum!
 buttonEnable:
   description: Button to enable a script.
   message: Activează
@@ -640,8 +640,11 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Conflicte în spațiul de nume al scriptului! Te rugăm să modifici @name și
-    @namespace.
+    Un script precum acesta este instalat deja sau se află încă în coșul de
+    reciclare.
+
+    Te rugăm fie să folosești aici un alt @name și @namespace, fie să editezi în
+    schimb scriptul respectiv.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no

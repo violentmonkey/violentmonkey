@@ -637,7 +637,12 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Namensraum-Konflikte! Bitte ändern Sie @name und @namespace des Skripts.
+  message: >-
+    Ein Skript wie dieses ist bereits installiert oder befindet sich noch im
+    Papierkorb.
+
+    Bitte wählen Sie hier einen anderen @name und @namespace, oder editieren Sie
+    stattdessen das existierende Skript.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no

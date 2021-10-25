@@ -627,7 +627,11 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Er zijn script-namespaceconflicten! Pas @name and @namespace aan.
+  message: >-
+    Er is al een vergelijkbaar script geïnstalleerd of in de prullenbak
+    geplaatst.
+
+    Kies een andere @name en @namespace of bewerk het andere script.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
