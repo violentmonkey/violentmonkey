@@ -24,8 +24,10 @@ envs.ASSET_ZIP = `${envs.RELEASE_PREFIX}-webext-v${envs.VERSION}.zip`;
 envs.ASSET_SELF_HOSTED_ZIP = `${envs.RELEASE_PREFIX}-webext-ffself-v${envs.VERSION}.zip`;
 
 envs.RELEASE_NOTE = beta ? `\
-**This is a beta release of Violentmonkey, use it at your own risk.**<br>\
-If you already use Violentmonkey, click \`Export to zip\` in settings before installing the beta.
+**This is a beta release of Violentmonkey (also in [WebStore](\
+https://chrome.google.com/webstore/detail/violentmonkey-beta/opokoaglpekkimldnlggpoagmjegichg\
+)), use it at your own risk.**<br>\
+If you already use Violentmonkey, click \`Export to zip\` in settings before installing the beta.<br>\
 
 ${listCommits()}
 ` : `\
