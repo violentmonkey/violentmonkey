@@ -11,8 +11,8 @@ const projectConfig = require('./plaid.conf');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
 const INIT_FUNC_NAME = 'VMInitInjection';
-// Copied from gulpfile.js: strip alphabetic suffix
-const VM_VER = require('../package.json').version.replace(/-[^.]*/, '');
+// eslint-disable-next-line import/no-dynamic-require
+const VM_VER = require(`${defaultOptions.distDir}/manifest.json`).version;
 const WEBPACK_OPTS = {
   node: {
     global: false,

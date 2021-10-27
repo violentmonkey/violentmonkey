@@ -51,6 +51,7 @@ async function jsProd() {
  */
 async function manifest() {
   const data = await buildManifest();
+  await fs.mkdir(DIST).catch(() => {});
   await fs.writeFile(`${DIST}/manifest.json`, JSON.stringify(data), 'utf8');
 }
 
@@ -161,12 +162,13 @@ function copyZip() {
   .pipe(gulp.dest(`${DIST}/public/lib`));
 }
 
-const pack = gulp.parallel(manifest, createIcons, copyI18n);
+const pack = gulp.parallel(createIcons, copyI18n, copyZip);
 
 exports.clean = clean;
 exports.manifest = manifest;
-exports.dev = gulp.series(gulp.parallel(copyZip, pack, jsDev), watch);
-exports.build = gulp.series(clean, gulp.parallel(copyZip, pack, jsProd));
+// Making sure `manifest` finishes before its `version` is used by webpack.conf.js
+exports.dev = gulp.series(manifest, gulp.parallel(pack, jsDev), watch);
+exports.build = gulp.series(clean, manifest, gulp.parallel(pack, jsProd));
 exports.i18n = updateI18n;
 exports.check = checkI18n;
 exports.copyI18n = copyI18n;
