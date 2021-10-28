@@ -6,6 +6,7 @@ const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
 const HTMLInlineCSSWebpackPlugin = isProd && require('html-inline-css-webpack-plugin').default;
 const TerserPlugin = isProd && require('terser-webpack-plugin');
 const deepmerge = isProd && require('deepmerge');
+const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
 const projectConfig = require('./plaid.conf');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
@@ -23,7 +24,7 @@ const WEBPACK_OPTS = {
     maxAssetSize: 0.5e6,
   },
 };
-const minimizerOptions = {
+const MIN_OPTS = {
   cache: true,
   parallel: true,
   sourceMap: true,
@@ -33,6 +34,20 @@ const minimizerOptions = {
     },
   },
 };
+const MIN_OPTS_PUBLIC = isProd && {
+  chunkFilter: ({ name }) => name.startsWith('public/'),
+  ...MIN_OPTS,
+};
+const MIN_OPTS_MAIN = isProd && deepmerge.all([{}, MIN_OPTS, {
+  chunkFilter: ({ name }) => !name.startsWith('public/'),
+  terserOptions: {
+    compress: {
+      ecma: 8, // ES2017 Object.entries and so on
+      passes: 2, // necessary now since we removed plaid's minimizer
+      unsafe_arrows: true, // it's 'safe' since we don't rely on function prototypes
+    },
+  },
+}]);
 
 const pickEnvs = (items) => {
   return Object.assign({}, ...items.map(x => ({
@@ -97,20 +112,8 @@ const modify = (page, entry, init) => modifyWebpackConfig(
       m.constructor.name === 'TerserPlugin' && arr.splice(i, 1)
     ));
     config.optimization.minimizer.push(...!isProd ? [] : [
-      new TerserPlugin({
-        chunkFilter: ({ name }) => name.startsWith('public/'),
-        ...minimizerOptions,
-      }),
-      new TerserPlugin(deepmerge.all([{}, minimizerOptions, {
-        chunkFilter: ({ name }) => !name.startsWith('public/'),
-        terserOptions: {
-          compress: {
-            ecma: 8, // ES2017 Object.entries and so on
-            passes: 2, // necessary now since we removed plaid's minimizer
-            unsafe_arrows: true, // it's 'safe' since we don't rely on function prototypes
-          },
-        },
-      }])),
+      new TerserPlugin(MIN_OPTS_PUBLIC),
+      new TerserPlugin(MIN_OPTS_MAIN),
     ]);
     if (!entry) init = page;
     if (init) init(config);
@@ -145,32 +148,16 @@ module.exports = Promise.all([
         && Object.assign(p.options, { ignoreOrder: true })
       ));
     }
-    config.plugins.push(new class ListBackgroundScripts {
-      apply(compiler) {
-        compiler.hooks.afterEmit.tap(this.constructor.name, compilation => {
-          const dist = compilation.outputOptions.path;
-          const path = `${dist}/manifest.json`;
-          const manifest = JSON.parse(fs.readFileSync(path, { encoding: 'utf8' }));
-          const bgId = 'background/index';
-          const bgEntry = compilation.entrypoints.get(bgId);
-          const scripts = bgEntry.chunks.map(c => c.files[0]);
-          if (`${manifest.background.scripts}` !== `${scripts}`) {
-            manifest.background.scripts = scripts;
-            fs.writeFileSync(path,
-              JSON.stringify(manifest, null, isProd ? 0 : 2),
-              { encoding: 'utf8' });
-          }
-          fs.promises.unlink(`${dist}/${bgId}.html`).catch(() => {});
-        });
-      }
-    }());
+    config.plugins.push(new ListBackgroundScriptsPlugin());
   }),
+
   modify('injected', './src/injected', (config) => {
     addWrapper(config, getGlobals => ({
       header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
       footer: '}',
     }));
   }),
+
   modify('injected-web', './src/injected/web', (config) => {
     config.output.libraryTarget = 'commonjs2';
     addWrapper(config, getGlobals => ({

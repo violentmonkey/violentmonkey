@@ -16,7 +16,9 @@ async function buildManifest() {
   }
   if (isBeta()) {
     // Do not support i18n in beta version
-    data.name = data.browser_action.default_title = 'Violentmonkey BETA';
+    const name = 'Violentmonkey BETA';
+    data.name = name;
+    data.browser_action.default_title = name;
   }
   return data;
 }
@@ -32,12 +34,37 @@ async function buildUpdatesList(version, url) {
             update_link: url,
           },
         ],
-      }
+      },
     },
   };
   return data;
 }
 
+class ListBackgroundScriptsPlugin {
+  constructor({ minify } = {}) {
+    this.minify = minify;
+  }
+
+  apply(compiler) {
+    compiler.hooks.afterEmit.tap(this.constructor.name, async compilation => {
+      const dist = compilation.outputOptions.path;
+      const path = `${dist}/manifest.json`;
+      const manifest = JSON.parse(await fs.readFile(path, { encoding: 'utf8' }));
+      const bgId = 'background/index';
+      const bgEntry = compilation.entrypoints.get(bgId);
+      const scripts = bgEntry.chunks.map(c => c.files[0]);
+      if (`${manifest.background.scripts}` !== `${scripts}`) {
+        manifest.background.scripts = scripts;
+        await fs.writeFile(path,
+          JSON.stringify(manifest, null, this.minify ? 0 : 2),
+          { encoding: 'utf8' });
+      }
+      await fs.unlink(`${dist}/${bgId}.html`).catch(() => {});
+    });
+  }
+}
+
 exports.readManifest = readManifest;
 exports.buildManifest = buildManifest;
 exports.buildUpdatesList = buildUpdatesList;
+exports.ListBackgroundScriptsPlugin = ListBackgroundScriptsPlugin;
