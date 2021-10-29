@@ -45,7 +45,8 @@ function parseData(req, msg) {
   } else if (responseType === 'json') {
     res = jsonParse(raw);
   } else if (responseType === 'document') {
-    const type = msg.contentType::replace(/^[^;]+/)?.[0] || 'text/html';
+    // Cutting everything after , or ; and trimming whitespace
+    const type = msg.contentType::replace(/[,;].*|\s+/g, '') || 'text/html';
     res = new DOMParser()::parseFromString(raw, type);
   } else if (msg.chunked) {
     // arraybuffer/blob in incognito tabs is transferred as ArrayBuffer encoded in string chunks
