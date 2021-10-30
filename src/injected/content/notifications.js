@@ -5,7 +5,6 @@ import { createNullObj } from '../util';
 const notifications = createNullObj();
 
 bridge.addHandlers({
-  __proto__: null,
   async Notification(options, realm) {
     const nid = await sendCmd('Notification', options);
     notifications[nid] = { id: options.id, realm };
@@ -21,7 +20,6 @@ bridge.addHandlers({
 });
 
 bridge.addBackgroundHandlers({
-  __proto__: null,
   NotificationClick(nid) {
     const n = notifications[nid];
     if (n) bridge.post('NotificationClicked', n.id, n.realm);

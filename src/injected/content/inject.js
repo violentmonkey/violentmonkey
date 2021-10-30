@@ -6,7 +6,7 @@ import { allowCommands, appendToRoot, onElement } from './util-content';
 import { NS_HTML, log } from '../util';
 
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
-const stringIncludes = ''.includes;
+const VAULT_SEED_NAME = INIT_FUNC_NAME + process.env.VAULT_ID_NAME;
 let contLists;
 let pgLists;
 /** @type {Object<string,VMInjectionRealm>} */
@@ -35,11 +35,9 @@ window::on(INIT_FUNC_NAME, evt => {
     frameEventDocument = null;
   }
 });
-
 bridge.addHandlers({
-  __proto__: null,
   // FF bug workaround to enable processing of sourceURL in injected page scripts
-  InjectList: injectList,
+  InjectList: IS_FIREFOX && injectList,
 });
 
 export function injectPageSandbox(contentId, webId) {
@@ -168,7 +166,7 @@ function inject(item) {
   if (IS_FIREFOX) {
     onError = e => {
       const { stack } = e.error;
-      if (typeof stack === 'string' && stack::stringIncludes(browser.runtime.getURL('/sandbox'))) {
+      if (!stack || `${stack}`.includes(browser.runtime.getURL(''))) {
         log('error', [item.displayName], e.error);
         e.preventDefault();
       }

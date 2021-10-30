@@ -5,7 +5,6 @@ let lastId = 0;
 const tabs = createNullObj();
 
 bridge.addHandlers({
-  __proto__: null,
   TabClosed(key) {
     const item = tabs[key];
     if (item) {

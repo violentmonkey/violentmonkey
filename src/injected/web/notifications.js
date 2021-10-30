@@ -5,7 +5,6 @@ let lastId = 0;
 const notifications = createNullObj();
 
 bridge.addHandlers({
-  __proto__: null,
   NotificationClicked(id) {
     const fn = notifications[id]?.onclick;
     if (fn) fn();

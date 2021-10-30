@@ -8,7 +8,6 @@ const { arrayBuffer: getArrayBuffer, blob: getBlob } = Response[PROTO];
 const requests = createNullObj();
 
 bridge.addHandlers({
-  __proto__: null,
   HttpRequest(opts, realm) {
     requests[opts.id] = {
       realm,
@@ -21,7 +20,6 @@ bridge.addHandlers({
 });
 
 bridge.addBackgroundHandlers({
-  __proto__: null,
   async HttpRequested(msg) {
     const { blobbed, id, numChunks, type } = msg;
     const req = requests[id];

@@ -49,7 +49,6 @@ export default function initialize(
 }
 
 bridge.addHandlers({
-  __proto__: null,
   Command({ id, cap, evt }) {
     const constructor = evt.key ? KeyboardEventSafe : MouseEventSafe;
     const fn = store.commands[`${id}:${cap}`];

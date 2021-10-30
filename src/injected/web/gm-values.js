@@ -14,7 +14,6 @@ const dataDecoders = {
 };
 
 bridge.addHandlers({
-  __proto__: null,
   UpdatedValues(updates) {
     const { partial } = updates;
     updates::forEachEntry(entry => {

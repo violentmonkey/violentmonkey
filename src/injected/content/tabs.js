@@ -7,7 +7,6 @@ const tabKeys = createNullObj();
 const realms = createNullObj();
 
 bridge.addHandlers({
-  __proto__: null,
   async TabOpen({ key, data }, realm) {
     const { id } = await sendCmd('TabOpen', data);
     tabIds[key] = id;
@@ -23,7 +22,6 @@ bridge.addHandlers({
 });
 
 bridge.addBackgroundHandlers({
-  __proto__: null,
   TabClosed(id) {
     const key = tabKeys[id];
     const realm = realms[id];

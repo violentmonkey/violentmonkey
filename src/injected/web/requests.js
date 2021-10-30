@@ -10,7 +10,6 @@ const { get: getHref } = describeProperty(HTMLAnchorElement[PROTO], 'href');
 const { readAsDataURL } = FileReader[PROTO];
 
 bridge.addHandlers({
-  __proto__: null,
   HttpRequested(msg) {
     const req = idMap[msg.id];
     if (req) callback(req, msg);

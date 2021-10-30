@@ -54,8 +54,8 @@ let pendingSetPopup;
   if (data.scripts) {
     bridge.onScripts.forEach(fn => fn());
     allow('SetTimeout', contentId);
-    allow('InjectList', contentId);
     allow('Pong', contentId);
+    if (IS_FIREFOX) allow('InjectList', contentId);
     await injectScripts(contentId, webId, data, isXml);
   }
   bridge.onScripts = null;
@@ -63,7 +63,6 @@ let pendingSetPopup;
 })().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
 
 bridge.addBackgroundHandlers({
-  __proto__: null,
   PopupShown(state) {
     isPopupShown = state;
     sendSetPopup();
@@ -71,7 +70,6 @@ bridge.addBackgroundHandlers({
 }, true);
 
 bridge.addBackgroundHandlers({
-  __proto__: null,
   Command(data) {
     const realm = invokableIds::includes(data.id) && INJECT_CONTENT;
     bridge.post('Command', data, realm);
@@ -88,7 +86,6 @@ bridge.addBackgroundHandlers({
 });
 
 bridge.addHandlers({
-  __proto__: null,
   RegisterMenu({ id, cap }) {
     if (IS_TOP) {
       const commandMap = menus[id] || (menus[id] = createNullObj());

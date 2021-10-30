@@ -26,7 +26,6 @@ bridge.onScripts.push(() => {
     };
   }
   bridge.addHandlers({
-    __proto__: null,
     SetClipboard: setClipboard || true,
   }, true);
 });
