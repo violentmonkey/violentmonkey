@@ -1,14 +1,35 @@
+const vmOwnFuncToString = () => '[Violentmonkey property]';
+
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 export const CALLBACK_ID = '__CBID';
-
 /** Using __proto__ because Object.create(null) may be spoofed */
 export const createNullObj = () => ({ __proto__: null });
 export const promiseResolve = () => (async () => {})();
+export const vmOwnFunc = (func, toString) => (
+  defineProperty(func, 'toString', { value: toString || vmOwnFuncToString })
+);
 export const getOwnProp = (obj, key) => (
   obj::hasOwnProperty(key)
     ? obj[key]
     : undefined
 );
+/** Workaround for array eavesdropping via prototype setters like '0','1',...
+ * on `push` and `arr[i] = 123`, as well as via getters if you read beyond
+ * its length or from an unassigned `hole`. */
+export const setOwnProp = (obj, key, value) => (
+  defineProperty(obj, key, {
+    value,
+    configurable: true,
+    enumerable: true,
+    writable: true,
+  })
+);
+/** @param {Window} wnd */
+export const isSameOriginWindow = wnd => (
+  describeProperty(wnd.location, 'href').get
+);
+// Avoiding the need to safe-guard a bunch of methods so we use just one
+export const getUniqIdSafe = (prefix = 'VM') => `${prefix}${mathRandom()}`;
 
 export const bindEvents = (srcId, destId, bridge, cloneInto) => {
   /* Using a separate event for `node` because CustomEvent can't transfer nodes,
@@ -45,13 +66,6 @@ export const log = (level, ...args) => {
   args[0] = s;
   logging[level]::apply(logging, args);
 };
-
-/** Workaround for array eavesdropping via prototype setters like '0','1',...
- * on `push` and `arr[i] = 123`, as well as via getters if you read beyond
- * its length or from an unassigned `hole`. */
-export function safePush(value) {
-  defineProperty(this, this.length, { value, writable: true, configurable: true });
-}
 
 /**
  * Picks into `this`

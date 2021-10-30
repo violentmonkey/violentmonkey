@@ -1,13 +1,6 @@
-/* SAFETY WARNING! Exports used by `injected` must make ::safe() calls,
-   when accessed after the initial event loop task in `injected/web`
-   or after the first content-mode userscript runs in `injected/content` */
+// SAFETY WARNING! Exports used by `injected` must make ::safe() calls
 
 import { browser } from '#/common/consts';
-
-// used in an unsafe context so we need to save the original functions
-const perfNow = performance.now.bind(performance);
-const { random, floor } = Math;
-const { toString: numberToString } = 0;
 
 export const isPromise = val => val::objectToString() === '[object Promise]';
 export const isFunction = val => typeof val === 'function';
@@ -46,17 +39,17 @@ export function debounce(func, time) {
   time = Math.max(0, +time || 0);
   function checkTime() {
     timer = null;
-    if (perfNow() >= startTime) callback();
+    if (performance.now() >= startTime) callback();
     else checkTimer();
   }
   function checkTimer() {
     if (!timer) {
-      const delta = startTime - perfNow();
+      const delta = startTime - performance.now();
       timer = setTimeout(checkTime, delta);
     }
   }
   function debouncedFunction(...args) {
-    startTime = perfNow() + time;
+    startTime = performance.now() + time;
     callback = () => {
       callback = null;
       func.apply(this, args);
@@ -70,7 +63,7 @@ export function throttle(func, time) {
   let lastTime = 0;
   time = Math.max(0, +time || 0);
   function throttledFunction(...args) {
-    const now = perfNow();
+    const now = performance.now();
     if (lastTime + time < now) {
       lastTime = now;
       func.apply(this, args);
@@ -82,10 +75,10 @@ export function throttle(func, time) {
 export function noop() {}
 
 export function getUniqId(prefix = 'VM') {
-  const now = perfNow();
+  const now = performance.now();
   return prefix
-    + floor((now - floor(now)) * 1e12)::numberToString(36)
-    + floor(random() * 1e12)::numberToString(36);
+    + Math.floor((now - Math.floor(now)) * 1e12).toString(36)
+    + Math.floor(Math.random() * 1e12).toString(36);
 }
 
 /**
@@ -313,6 +306,7 @@ export async function request(url, options = {}) {
 }
 
 const SIMPLE_VALUE_TYPE = {
+  __proto__: null,
   string: 's',
   number: 'n',
   boolean: 'b',

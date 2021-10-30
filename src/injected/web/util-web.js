@@ -2,7 +2,6 @@ import { createNullObj } from '../util';
 import bridge from '#/injected/web/bridge';
 import { INJECT_CONTENT } from '#/common/consts';
 
-const vmOwnFuncToString = () => '[Violentmonkey property]';
 // Firefox defines `isFinite` on `global` not on `window`
 const { isFinite } = global; // eslint-disable-line no-restricted-properties
 const { toString: numberToString } = 0;
@@ -98,11 +97,6 @@ export const FastLookup = (hubs = createNullObj()) => {
     );
     return hub;
   }
-};
-
-export const vmOwnFunc = (func, toString) => {
-  defineProperty(func, 'toString', { value: toString || vmOwnFuncToString });
-  return func;
 };
 
 /**

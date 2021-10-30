@@ -58,14 +58,12 @@ export const appendToRoot = node => {
  */
 export const onElement = (tag, cb, arg) => new PromiseSafe(resolve => {
   if (elemByTag(tag)) {
-    cb(arg);
-    resolve();
+    resolve(cb(arg));
   } else {
     const observer = new MutationObserver(() => {
       if (elemByTag(tag)) {
         observer.disconnect();
-        cb(arg);
-        resolve();
+        resolve(cb(arg));
       }
     });
     // documentElement may be replaced so we'll observe the entire document

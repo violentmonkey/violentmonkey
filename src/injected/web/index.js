@@ -1,12 +1,15 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
-import { bindEvents, createNullObj, log } from '../util';
 import bridge from './bridge';
 import store from './store';
+import { makeGmApiWrapper } from './gm-api-wrapper';
 import './gm-values';
 import './notifications';
 import './requests';
 import './tabs';
-import { makeGmApiWrapper } from './gm-api-wrapper';
+import {
+  bindEvents, createNullObj, getUniqIdSafe,
+  isSameOriginWindow, log, setOwnProp, vmOwnFunc,
+} from '../util';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 
@@ -36,7 +39,7 @@ export default function initialize(
     bridge.mode = INJECT_PAGE;
     bindEvents(webId, contentId, bridge);
     bridge.addHandlers({
-      /** @this {Node} contentDocument */
+      /** @this {Node} contentWindow */
       Frame(id) {
         this[id] = VAULT;
       },
@@ -44,6 +47,15 @@ export default function initialize(
         bridge.post('Pong');
       },
     });
+    setOwnProp(window, 'open', vmOwnFunc(function open(...args) {
+      const wnd = openWindow::apply(this, args);
+      const vaultId = wnd && isSameOriginWindow(wnd) && getUniqIdSafe();
+      if (vaultId) {
+        wnd[vaultId] = VAULT;
+        bridge.post('VaultId', vaultId, undefined, wnd);
+      }
+      return wnd;
+    }, funcToString::bind(openWindow)));
   }
   return invokeGuest;
 }

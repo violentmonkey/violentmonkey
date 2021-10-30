@@ -30,7 +30,9 @@ export const {
   getOwnPropertyDescriptor: describeProperty,
   keys: objectKeys,
 } = Object;
+export const { random: mathRandom } = Math;
 export const regexpTest = RegExp[PROTO].test;
+export const { toStringTag } = Symbol; // used by ProtectWebpackBootstrapPlugin
 export const getDetail = describeProperty(CustomEventSafe[PROTO], 'detail').get;
 export const getRelatedTarget = describeProperty(MouseEventSafe[PROTO], 'relatedTarget').get;
 export const logging = assign({ __proto__: null }, console);

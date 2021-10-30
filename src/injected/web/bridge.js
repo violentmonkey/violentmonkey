@@ -1,5 +1,4 @@
-import { getUniqId } from '#/common';
-import { CALLBACK_ID, createNullObj } from '../util';
+import { CALLBACK_ID, createNullObj, getUniqIdSafe } from '../util';
 
 const handlers = createNullObj();
 const callbacks = createNullObj();
@@ -19,7 +18,7 @@ const bridge = {
   },
   send(cmd, data, context, node) {
     return new PromiseSafe(resolve => {
-      const id = getUniqId();
+      const id = getUniqIdSafe();
       callbacks[id] = resolve;
       bridge.post(cmd, { [CALLBACK_ID]: id, data }, context, node);
     });

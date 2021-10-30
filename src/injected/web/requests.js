@@ -1,5 +1,5 @@
-import { getUniqId, isFunction } from '#/common';
-import { NS_HTML, createNullObj, getOwnProp, log, pickIntoThis } from '../util';
+import { isFunction } from '#/common';
+import { NS_HTML, createNullObj, getOwnProp, getUniqIdSafe, log, pickIntoThis } from '../util';
 import bridge from './bridge';
 
 const idMap = createNullObj();
@@ -19,7 +19,7 @@ bridge.addHandlers({
 export function onRequestCreate(opts, context) {
   if (!opts.url) throw new ErrorSafe('Required parameter "url" is missing.');
   const scriptId = context.id;
-  const id = getUniqId(`VMxhr${scriptId}`);
+  const id = getUniqIdSafe(`VMxhr${scriptId}`);
   const req = {
     __proto__: null,
     id,

@@ -1,8 +1,8 @@
 import { isFunction } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import bridge from './bridge';
-import { FastLookup, vmOwnFunc } from './util-web';
-import { createNullObj, safePush } from '../util';
+import { FastLookup } from './util-web';
+import { createNullObj, setOwnProp, vmOwnFunc } from '../util';
 
 /** The index strings that look exactly like integers can't be forged
  * but for example '011' doesn't look like 11 so it's allowed */
@@ -38,7 +38,7 @@ const globalKeys = (function makeGlobalKeys() {
     && kWrappedJSObject in global
     && !globalKeysSet.has(kWrappedJSObject)) {
     globalKeysSet.add(kWrappedJSObject);
-    if (ok) names::safePush(kWrappedJSObject);
+    if (ok) setOwnProp(names, names.length, kWrappedJSObject);
   }
   return ok ? names : globalKeysSet.toArray();
 }());
@@ -244,9 +244,9 @@ function makeOwnKeys(local, globals) {
   const names = getOwnPropertyNames(local)::filter(notIncludedIn, globals);
   const symbols = getOwnPropertySymbols(local)::filter(notIncludedIn, globals);
   const frameIndexes = [];
-  for (let i = 0; (global[i] || 0)::objectToString() === '[object Window]'; i += 1) {
-    if (!(i in local)) {
-      frameIndexes::safePush(`${i}`);
+  for (let i = 0, s; (global[s = `${i}`] || 0)::objectToString() === '[object Window]'; i += 1) {
+    if (!(s in local)) {
+      setOwnProp(frameIndexes, s, s);
     }
   }
   return []::concat(

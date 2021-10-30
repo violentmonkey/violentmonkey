@@ -1,9 +1,9 @@
 import { INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser } from '#/common/consts';
-import { getUniqId, sendCmd } from '#/common';
+import { sendCmd } from '#/common';
 import { forEachKey } from '#/common/object';
 import bridge from './bridge';
 import { allowCommands, appendToRoot, onElement } from './util-content';
-import { NS_HTML, log } from '../util';
+import { NS_HTML, getUniqIdSafe, isSameOriginWindow, log } from '../util';
 
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
 const VAULT_SEED_NAME = INIT_FUNC_NAME + process.env.VAULT_ID_NAME;
@@ -13,7 +13,7 @@ let pgLists;
 let realms;
 /** @type boolean */
 let pageInjectable;
-let frameEventDocument;
+let frameEventWnd;
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
@@ -26,22 +26,27 @@ defineProperty(window, INIT_FUNC_NAME, {
   writable: false,
 });
 window::on(INIT_FUNC_NAME, evt => {
-  if (!frameEventDocument) {
-    // injectPageSandbox's first event is the frame's document
-    frameEventDocument = evt::getRelatedTarget();
+  if (!frameEventWnd) {
+    // setupVaultId's first event is the frame's contentWindow
+    frameEventWnd = evt::getRelatedTarget();
   } else {
-    // injectPageSandbox's second event is the vaultId
-    bridge.post('Frame', evt::getDetail(), INJECT_PAGE, frameEventDocument);
-    frameEventDocument = null;
+    // setupVaultId's second event is the vaultId
+    bridge.post('Frame', evt::getDetail(), INJECT_PAGE, frameEventWnd);
+    frameEventWnd = null;
   }
 });
 bridge.addHandlers({
   // FF bug workaround to enable processing of sourceURL in injected page scripts
   InjectList: IS_FIREFOX && injectList,
+  /** @this {Node} window */
+  VaultId(vaultId) {
+    this[VAULT_SEED_NAME] = vaultId; // goes into the isolated world of the content scripts
+  },
 });
 
 export function injectPageSandbox(contentId, webId) {
-  const vaultId = !IS_TOP && setupVaultId() || '';
+  const vaultId = window[VAULT_SEED_NAME] || !IS_TOP && setupVaultId() || '';
+  delete window[VAULT_SEED_NAME];
   inject({
     code: `(${VMInitInjection}('${vaultId}',${IS_FIREFOX}))('${webId}','${contentId}')`
       + `\n//# sourceURL=${browser.runtime.getURL('sandbox/injected-web.js')}`,
@@ -117,6 +122,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
     pgLists = null;
     contLists = null;
   });
+  VMInitInjection = null; // release for GC
 }
 
 async function injectDelayedScripts(contentId, webId, { cache, scripts }, getReadyState) {
@@ -221,17 +227,16 @@ function setupContentInvoker(contentId, webId) {
       : postViaBridge;
     fn(cmd, params, undefined, node);
   };
-  VMInitInjection = null; // release for GC
 }
 
 function setupVaultId() {
   const { parent } = window;
   // Testing for same-origin parent without throwing an exception.
-  if (describeProperty(parent.location, 'href').get) {
-    const vaultId = getUniqId();
+  if (isSameOriginWindow(parent)) {
+    const vaultId = getUniqIdSafe();
     // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
     // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
-    parent::fire(new MouseEventSafe(INIT_FUNC_NAME, { relatedTarget: document }));
+    parent::fire(new MouseEventSafe(INIT_FUNC_NAME, { relatedTarget: window }));
     parent::fire(new CustomEventSafe(INIT_FUNC_NAME, { detail: vaultId }));
     return vaultId;
   }

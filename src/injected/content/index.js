@@ -1,4 +1,4 @@
-import { getUniqId, isEmpty, sendCmd } from '#/common';
+import { isEmpty, sendCmd } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import bridge from './bridge';
 import './clipboard';
@@ -7,7 +7,7 @@ import './notifications';
 import './requests';
 import './tabs';
 import { elemByTag } from './util-content';
-import { NS_HTML, bindEvents, createNullObj, promiseResolve } from '../util';
+import { NS_HTML, bindEvents, createNullObj, getUniqIdSafe, promiseResolve } from '../util';
 
 const { invokableIds, runningIds } = bridge;
 const menus = createNullObj();
@@ -22,8 +22,8 @@ let pendingSetPopup;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 (async () => {
-  const contentId = getUniqId();
-  const webId = getUniqId();
+  const contentId = getUniqIdSafe();
+  const webId = getUniqIdSafe();
   // injecting right now before site scripts can mangle globals or intercept our contentId
   // except for XML documents as their appearance breaks, but first we're sending
   // a request for the data because injectPageSandbox takes ~5ms
@@ -58,6 +58,7 @@ let pendingSetPopup;
     if (IS_FIREFOX) allow('InjectList', contentId);
     await injectScripts(contentId, webId, data, isXml);
   }
+  allow('VaultId', contentId);
   bridge.onScripts = null;
   sendSetPopup();
 })().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts

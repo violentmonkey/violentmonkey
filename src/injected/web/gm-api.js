@@ -1,12 +1,15 @@
-import { dumpScriptValue, getUniqId, isEmpty } from '#/common/util';
+import { dumpScriptValue, isEmpty } from '#/common/util';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
 import { onRequestCreate } from './requests';
 import { onNotificationCreate } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
-import { jsonDump, vmOwnFunc } from './util-web';
-import { NS_HTML, createNullObj, promiseResolve, log, pickIntoThis } from '../util';
+import { jsonDump } from './util-web';
+import {
+  NS_HTML, createNullObj, getUniqIdSafe, log,
+  pickIntoThis, promiseResolve, vmOwnFunc,
+} from '../util';
 
 const {
   TextDecoder,
@@ -62,7 +65,7 @@ export function makeGmApi() {
       const i = objectValues(hooks)::indexOf(fn);
       let listenerId = i >= 0 && objectKeys(hooks)[i];
       if (!listenerId) {
-        listenerId = getUniqId('VMvc');
+        listenerId = getUniqIdSafe('VMvc');
         hooks[listenerId] = fn;
       }
       return listenerId;
@@ -154,7 +157,7 @@ export function makeGmApi() {
      * @returns {HTMLElement} it also has .then() so it should be compatible with TM and old VM
      */
     GM_addStyle(css) {
-      return webAddElement(null, 'style', { textContent: css, id: getUniqId('VMst') }, this);
+      return webAddElement(null, 'style', { textContent: css, id: getUniqIdSafe('VMst') }, this);
     },
     GM_openInTab(url, options) {
       return onTabCreate(
@@ -191,7 +194,7 @@ export function makeGmApi() {
 function webAddElement(parent, tag, attrs, context) {
   let el;
   let errorInfo;
-  const cbId = getUniqId();
+  const cbId = getUniqIdSafe();
   bridge.callbacks[cbId] = function _(res) {
     el = this;
     errorInfo = res;

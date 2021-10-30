@@ -1,8 +1,8 @@
 import bridge from './bridge';
 import { makeGmApi } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
-import { makeComponentUtils, vmOwnFunc } from './util-web';
-import { createNullObj } from '../util';
+import { makeComponentUtils } from './util-web';
+import { createNullObj, vmOwnFunc } from '../util';
 
 /** Name in Greasemonkey4 -> name in GM */
 const GM4_ALIAS = {

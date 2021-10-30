@@ -22,6 +22,7 @@ export let
   fire,
   off,
   on,
+  openWindow,
   // Symbol
   scopeSym,
   toStringTag,
@@ -53,16 +54,13 @@ export let
   charCodeAt,
   slice,
   replace,
-  // Set.prototype
-  setDelete,
-  /** @type {Set.prototype.forEach} */
-  setForEach,
-  setHas,
   // document
   createElementNS,
   // various methods
   safeCall,
+  funcToString,
   jsonParse,
+  mathRandom,
   regexpTest,
   then,
   logging,
@@ -83,8 +81,8 @@ export const VAULT = (() => {
   let i = -1;
   let res;
   if (process.env.VAULT_ID) {
-    res = document[process.env.VAULT_ID];
-    delete document[process.env.VAULT_ID];
+    res = window[process.env.VAULT_ID];
+    delete window[process.env.VAULT_ID];
   }
   if (!res) {
     res = { __proto__: null };
@@ -96,7 +94,7 @@ export const VAULT = (() => {
     ErrorSafe = res[i += 1] || window.Error,
     KeyboardEventSafe = res[i += 1] || window.KeyboardEvent,
     MouseEventSafe = res[i += 1] || window.MouseEvent,
-    Object = res[i += 1] || window.Object, // minification and guarding webpack Object(import) calls
+    Object = res[i += 1] || window.Object,
     PromiseSafe = res[i += 1] || window.Promise,
     ProxySafe = res[i += 1] || global.Proxy, // In FF content mode it's not equal to window.Proxy
     Uint8ArraySafe = res[i += 1] || window.Uint8Array,
@@ -104,6 +102,7 @@ export const VAULT = (() => {
     fire = res[i += 1] || window.dispatchEvent,
     off = res[i += 1] || window.removeEventListener,
     on = res[i += 1] || window.addEventListener,
+    openWindow = res[i += 1] || window.open,
     // Symbol
     scopeSym = res[i += 1] || Symbol.unscopables,
     toStringTag = res[i += 1] || Symbol.toStringTag,
@@ -137,7 +136,9 @@ export const VAULT = (() => {
     createElementNS = res[i += 1] || document.createElementNS,
     // various methods
     safeCall = res[i += 1] || Object.call.bind(Object.call),
+    funcToString = res[i += 1] || safeCall.toString,
     jsonParse = res[i += 1] || JSON.parse,
+    mathRandom = res[i += 1] || Math.random,
     regexpTest = res[i += 1] || RegExp[PROTO].test,
     then = res[i += 1] || PromiseSafe[PROTO].then,
     logging = res[i += 1] || assign({ __proto__: null }, console),

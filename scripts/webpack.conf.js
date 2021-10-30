@@ -7,6 +7,7 @@ const HTMLInlineCSSWebpackPlugin = isProd && require('html-inline-css-webpack-pl
 const TerserPlugin = isProd && require('terser-webpack-plugin');
 const deepmerge = isProd && require('deepmerge');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
+const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
 const projectConfig = require('./plaid.conf');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
@@ -81,6 +82,7 @@ const defsObj = {
     { key: 'SYNC_ONEDRIVE_CLIENT_SECRET' },
   ]),
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
+  'process.env.VAULT_ID_NAME': JSON.stringify(VAULT_ID),
   'process.env.VAULT_ID': VAULT_ID,
 };
 const defsRe = new RegExp(`\\b(${Object.keys(defsObj).join('|').replace(/\./g, '\\.')})\\b`, 'g');
@@ -175,6 +177,7 @@ module.exports = Promise.all([
   }),
 
   modify('injected', './src/injected', (config) => {
+    config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapper(config, 'injected/content', getGlobals => ({
       header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
       footer: '}',
@@ -184,14 +187,15 @@ module.exports = Promise.all([
   modify('injected-web', './src/injected/web', (config) => {
     // TODO: replace WebPack's Object.*, .call(), .apply() with safe calls
     config.output.libraryTarget = 'commonjs2';
+    config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapper(config, 'injected/web', getGlobals => ({
       header: () => `${skipReinjectionHeader}
         window['${INIT_FUNC_NAME}'] = function (${VAULT_ID}, IS_FIREFOX) {
-          var module = { exports: {} };
+          const module = { __proto__: null };
           ${getGlobals()}`,
       footer: `
-          module = module.exports;
-          return module.__esModule ? module.default : module;
+          const { exports } = module;
+          return exports.__esModule ? exports.default : exports;
         };0;`,
     }));
   }),

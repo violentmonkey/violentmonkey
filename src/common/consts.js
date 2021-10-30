@@ -1,12 +1,11 @@
-/* SAFETY WARNING! Exports used by `injected` must make ::safe() calls,
-   when accessed after the initial event loop task in `injected/web`
-   or after the first content-mode userscript runs in `injected/content` */
+// SAFETY WARNING! Exports used by `injected` must make ::safe() calls
 
 export const INJECT_AUTO = 'auto';
 export const INJECT_PAGE = 'page';
 export const INJECT_CONTENT = 'content';
 
 export const INJECT_MAPPING = {
+  __proto__: null,
   // `auto` tries to provide `window` from the real page as `unsafeWindow`
   [INJECT_AUTO]: [INJECT_PAGE, INJECT_CONTENT],
   // inject into page context
