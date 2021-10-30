@@ -6,7 +6,7 @@ import './gm-values';
 import './notifications';
 import './requests';
 import './tabs';
-import { makeGmApiWrapper } from './gm-wrapper';
+import { makeGmApiWrapper } from './gm-api-wrapper';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 

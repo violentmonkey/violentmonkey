@@ -1,6 +1,6 @@
 import test from 'tape';
 import { buffer2string } from '#/common';
-import { makeGmApiWrapper } from '#/injected/web/gm-wrapper';
+import { makeGmApiWrapper } from '#/injected/web/gm-api-wrapper';
 import bridge from '#/injected/web/bridge';
 
 const stringAsBase64 = str => btoa(buffer2string(new TextEncoder().encode(str).buffer));
