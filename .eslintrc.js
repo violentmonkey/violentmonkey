@@ -1,24 +1,28 @@
 const acorn = require('acorn');
-const unsafeEnvironment = [
-  'src/injected/**/*.js',
-];
-// some functions are used by `injected`
-const unsafeSharedEnvironment = [
+const FILES_INJECTED = [`src/injected/**/*.js`];
+const FILES_CONTENT = [`src/injected/content/**/*.js`];
+const FILES_WEB = [`src/injected/web/**/*.js`];
+  // some functions are used by `injected`
+const FILES_SHARED = [
   'src/common/browser.js',
   'src/common/consts.js',
   'src/common/index.js',
   'src/common/object.js',
   'src/common/util.js',
 ];
-const unsafeAndSharedEnvironment = [
-  ...unsafeEnvironment,
-  ...unsafeSharedEnvironment,
-];
-const commonGlobals = getGlobals('src/common/safe-globals.js');
-const injectedGlobals = {
-  ...commonGlobals,
-  ...getGlobals('src/injected/safe-injected-globals.js'),
+
+const GLOBALS_COMMON = getGlobals('src/common/safe-globals.js');
+const GLOBALS_INJECTED = getGlobals(`src/injected/safe-globals-injected.js`);
+const GLOBALS_CONTENT = {
+  ...getGlobals(`src/injected/content/safe-globals-content.js`),
+  ...GLOBALS_INJECTED,
 };
+const GLOBALS_WEB = {
+  ...getGlobals(`src/injected/web/safe-globals-web.js`),
+  ...GLOBALS_INJECTED,
+  IS_FIREFOX: false, // passed as a parameter to VMInitInjection in webpack.conf.js
+};
+
 module.exports = {
   root: true,
   extends: [
@@ -34,24 +38,30 @@ module.exports = {
     // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
     // to prevent exposing them to userscripts with `@inject-into content`
     files: ['*'],
-    excludedFiles: unsafeAndSharedEnvironment,
+    excludedFiles: [...FILES_INJECTED, ...FILES_SHARED],
     globals: {
       browser: false,
-      ...commonGlobals,
+      ...GLOBALS_COMMON,
     },
   }, {
-    files: unsafeSharedEnvironment,
-    globals: commonGlobals,
+    files: FILES_SHARED,
+    globals: GLOBALS_COMMON,
   }, {
-    files: unsafeEnvironment,
-    globals: injectedGlobals,
+    files: FILES_WEB,
+    globals: GLOBALS_WEB,
   }, {
-    files: unsafeAndSharedEnvironment,
+    files: FILES_CONTENT,
+    globals: GLOBALS_CONTENT,
+  }, {
+    files: FILES_INJECTED,
+    excludedFiles: [...FILES_CONTENT, ...FILES_WEB],
+    // intersection of globals in CONTENT and WEB
+    globals: Object.keys(GLOBALS_CONTENT).reduce((res, key) => (
+      Object.assign(res, key in GLOBALS_WEB && { [key]: false })
+    ), {}),
+  }, {
+    files: [...FILES_INJECTED, ...FILES_SHARED],
     rules: {
-      // Whitelisting our safe globals
-      'no-restricted-globals': ['error',
-        ...require('confusing-browser-globals').filter(x => injectedGlobals[x] == null),
-      ],
       /* Our .browserslistrc targets old browsers so the compiled code for {...objSpread} uses
          babel's polyfill that calls methods like `Object.assign` instead of our safe `assign`.
          Ideally, `eslint-plugin-compat` should be used but I couldn't make it work. */
@@ -60,13 +70,14 @@ module.exports = {
         message: 'Object spread adds a polyfill in injected* even if unused by it',
       }, {
         selector: 'OptionalCallExpression',
-        message: 'Optional call in an unsafe environment',
+        message: 'Optional call uses .call(), which may be spoofed/broken in an unsafe environment',
+        // TODO: write a Babel plugin to use safeCall for this.
       }, {
         selector: 'ArrayPattern',
-        message: 'Array destructuring in an unsafe environment',
+        message: 'Destructuring via Symbol.iterator may be spoofed/broken in an unsafe environment',
       }, {
-        selector: 'CallExpression > SpreadElement',
-        message: 'Array spreading in an unsafe environment',
+        selector: ':matches(ArrayExpression, CallExpression) > SpreadElement',
+        message: 'Spreading via Symbol.iterator may be spoofed/broken in an unsafe environment',
       }],
     },
   }, {
@@ -100,8 +111,11 @@ module.exports = {
 function getGlobals(fileName) {
   const text = require('fs').readFileSync(fileName, { encoding: 'utf8' });
   const res = {};
-  acorn.parse(text, { ecmaVersion: 2018, sourceType: 'module' }).body.forEach(body => {
-    (body.declaration || body).declarations.forEach(function processId({ id: { name, properties } }) {
+  const tree = acorn.parse(text, { ecmaVersion: 2018, sourceType: 'module' });
+  tree.body.forEach(body => {
+    const { declarations } = body.declaration || body;
+    if (!declarations) return;
+    declarations.forEach(function processId({ id: { left, properties, name = left && left.name } }) {
       if (name) {
         // const NAME = whatever
         res[name] = false;

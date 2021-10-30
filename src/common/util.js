@@ -9,6 +9,9 @@ const perfNow = performance.now.bind(performance);
 const { random, floor } = Math;
 const { toString: numberToString } = 0;
 
+export const isPromise = val => val::objectToString() === '[object Promise]';
+export const isFunction = val => typeof val === 'function';
+
 export function i18n(name, args) {
   return browser.i18n.getMessage(name, args) || name;
 }

@@ -1,12 +1,13 @@
 import { sendCmd } from '#/common';
 import bridge from './bridge';
+import { createNullObj } from '../util';
 
-const tabIds = {};
-const tabKeys = {};
-const realms = {};
+const tabIds = createNullObj();
+const tabKeys = createNullObj();
+const realms = createNullObj();
 
 bridge.addHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   async TabOpen({ key, data }, realm) {
     const { id } = await sendCmd('TabOpen', data);
     tabIds[key] = id;
@@ -22,7 +23,7 @@ bridge.addHandlers({
 });
 
 bridge.addBackgroundHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   TabClosed(id) {
     const key = tabKeys[id];
     const realm = realms[id];

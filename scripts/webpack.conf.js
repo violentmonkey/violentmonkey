@@ -10,7 +10,15 @@ const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
 const projectConfig = require('./plaid.conf');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
-const INIT_FUNC_NAME = 'VMInitInjection';
+// Avoiding collisions with globals of a content-mode userscript
+const INIT_FUNC_NAME = `Violentmonkey:${
+  Buffer.from(
+    new Uint32Array(2)
+    .map(() => Math.random() * (2 ** 32))
+    .buffer,
+  ).toString('base64')
+}`;
+const VAULT_ID = '__VAULT_ID__';
 // eslint-disable-next-line import/no-dynamic-require
 const VM_VER = require(`${defaultOptions.distDir}/manifest.json`).version;
 const WEBPACK_OPTS = {
@@ -29,6 +37,11 @@ const MIN_OPTS = {
   parallel: true,
   sourceMap: true,
   terserOptions: {
+    compress: {
+      // `terser` often inlines big one-time functions inside a small "hot" function
+      reduce_funcs: false,
+      reduce_vars: false,
+    },
     output: {
       ascii_only: true,
     },
@@ -58,7 +71,7 @@ const pickEnvs = (items) => {
   })));
 };
 
-const definitions = new webpack.DefinePlugin({
+const defsObj = {
   ...pickEnvs([
     { key: 'DEBUG', def: false },
     { key: 'VM_VER', val: VM_VER },
@@ -68,39 +81,47 @@ const definitions = new webpack.DefinePlugin({
     { key: 'SYNC_ONEDRIVE_CLIENT_SECRET' },
   ]),
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
-});
+  'process.env.VAULT_ID': VAULT_ID,
+};
+const defsRe = new RegExp(`\\b(${Object.keys(defsObj).join('|').replace(/\./g, '\\.')})\\b`, 'g');
+const definitions = new webpack.DefinePlugin(defsObj);
 
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
 const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
 // {entryName: path}
 const entryGlobals = {
-  common: './src/common/safe-globals.js',
-  injected: './src/injected/safe-injected-globals.js',
+  common: [
+    './src/common/safe-globals.js',
+  ],
+  'injected/content': [
+    './src/injected/safe-globals-injected.js',
+    './src/injected/content/safe-globals-content.js',
+  ],
+  'injected/web': [
+    './src/injected/safe-globals-injected.js',
+    './src/injected/web/safe-globals-web.js',
+  ],
 };
 
 /**
  * Adds a watcher for files in entryGlobals to properly recompile the project on changes.
  */
 const addWrapper = (config, name, callback) => {
-  if (!callback) { callback = name; name = ''; }
-  const globals = Object.entries(entryGlobals).filter(([key]) => name === key || !name);
-  const dirs = globals.map(([key]) => key).join('|');
   config.module.rules.push({
-    test: new RegExp(`/(${dirs})/index\\.js$`.replace(/\//g, /[/\\]/.source)),
+    test: new RegExp(`/${name}/.*?\\.js$`.replace(/\//g, /[/\\]/.source)),
     use: [{
       loader: './scripts/fake-dep-loader.js',
-      options: {
-        files: globals.map(([, path]) => path),
-      },
+      options: { files: entryGlobals[name] },
     }],
   });
   const reader = () => (
-    globals.map(([, path]) => (
-      fs.readFileSync(path, { encoding: 'utf8' })
-      .replace(/export\s+(?=const\s)/g, '')
-    ))
-  ).join('\n');
+    entryGlobals[name]
+    .map(path => fs.readFileSync(path, { encoding: 'utf8' }))
+    .join('\n')
+    .replace(/export\s+(?=(const|let)\s)/g, '')
+    .replace(defsRe, s => defsObj[s])
+  );
   config.plugins.push(new WrapperWebpackPlugin(callback(reader)));
 };
 
@@ -148,21 +169,24 @@ module.exports = Promise.all([
         && Object.assign(p.options, { ignoreOrder: true })
       ));
     }
-    config.plugins.push(new ListBackgroundScriptsPlugin());
+    config.plugins.push(new ListBackgroundScriptsPlugin({
+      minify: false, // keeping readable
+    }));
   }),
 
   modify('injected', './src/injected', (config) => {
-    addWrapper(config, getGlobals => ({
+    addWrapper(config, 'injected/content', getGlobals => ({
       header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
       footer: '}',
     }));
   }),
 
   modify('injected-web', './src/injected/web', (config) => {
+    // TODO: replace WebPack's Object.*, .call(), .apply() with safe calls
     config.output.libraryTarget = 'commonjs2';
-    addWrapper(config, getGlobals => ({
+    addWrapper(config, 'injected/web', getGlobals => ({
       header: () => `${skipReinjectionHeader}
-        window['${INIT_FUNC_NAME}'] = function () {
+        window['${INIT_FUNC_NAME}'] = function (${VAULT_ID}, IS_FIREFOX) {
           var module = { exports: {} };
           ${getGlobals()}`,
       footer: `

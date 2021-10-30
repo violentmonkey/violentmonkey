@@ -2,14 +2,17 @@
 // so we'll test for window.chrome.app which is only defined in Chrome
 // and for browser.runtime.getBrowserInfo in Firefox 51+
 
-/** @typedef UA
+/** @typedef UAExtras
  * @property {false | number} isChrome - Chrome/ium version number or `false`
  * @property {Boolean | number} isFirefox - boolean initially, Firefox version number when ready
+ */
+/** @typedef UAInjected
  * @property {chrome.runtime.PlatformInfo.arch} arch
  * @property {chrome.runtime.PlatformInfo.os} os
  * @property {string} browserName
  * @property {string} browserVersion
  */
+/** @type {UAInjected & UAExtras} */
 const ua = {};
 export default ua;
 

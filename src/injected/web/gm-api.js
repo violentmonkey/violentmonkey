@@ -1,33 +1,24 @@
 import { dumpScriptValue, getUniqId, isEmpty } from '#/common/util';
-import { objectPick } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
-import { atob, onRequestCreate } from './requests';
+import { onRequestCreate } from './requests';
 import { onNotificationCreate } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
-import { jsonDump, log, logging, NS_HTML, elemByTag } from '../utils/helpers';
+import { jsonDump, vmOwnFunc } from './util-web';
+import { NS_HTML, createNullObj, promiseResolve, log, pickIntoThis } from '../util';
 
 const {
-  Blob, MouseEvent, TextDecoder,
-  RegExp: { [Prototype]: { test } },
-  TextDecoder: { [Prototype]: { decode: tdDecode } },
+  TextDecoder,
   URL: { createObjectURL, revokeObjectURL },
 } = global;
-const { findIndex } = [];
-const { lastIndexOf } = '';
-const { dispatchEvent, getElementById } = document;
-const { removeAttribute } = Element[Prototype];
-
-const vmOwnFuncToString = () => '[Violentmonkey property]';
-export const vmOwnFunc = (func, toString) => {
-  defineProperty(func, 'toString', { value: toString || vmOwnFuncToString });
-  return func;
-};
-let downloadChain = Promise.resolve();
+const { decode: tdDecode } = TextDecoder[PROTO];
+const { indexOf: stringIndexOf } = '';
+let downloadChain = promiseResolve();
 
 export function makeGmApi() {
   return {
+    __proto__: null,
     GM_deleteValue(key) {
       const { id } = this;
       const values = loadValues(id);
@@ -82,15 +73,14 @@ export function makeGmApi() {
     GM_removeValueChangeListener(listenerId) {
       const keyHooks = changeHooks[this.id];
       if (!keyHooks) return;
-      objectEntries(keyHooks)::findIndex(keyHook => {
-        const key = keyHook[0];
-        const hooks = keyHook[1];
+      for (const key in keyHooks) { /* proto is null */// eslint-disable-line guard-for-in
+        const hooks = keyHooks[key];
         if (listenerId in hooks) {
           delete hooks[listenerId];
           if (isEmpty(hooks)) delete keyHooks[key];
-          return true;
+          break;
         }
-      });
+      }
       if (isEmpty(keyHooks)) delete changeHooks[this.id];
     },
     GM_getResourceText(name) {
@@ -103,25 +93,26 @@ export function makeGmApi() {
       const { id } = this;
       const key = `${id}:${cap}`;
       store.commands[key] = func;
-      bridge.post('RegisterMenu', [id, cap], this);
+      bridge.post('RegisterMenu', { id, cap }, this);
       return cap;
     },
     GM_unregisterMenuCommand(cap) {
       const { id } = this;
       const key = `${id}:${cap}`;
       delete store.commands[key];
-      bridge.post('UnregisterMenu', [id, cap], this);
+      bridge.post('UnregisterMenu', { id, cap }, this);
     },
     GM_download(arg1, name) {
       // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
-      let opts = {};
+      const opts = createNullObj();
       let onload;
       if (typeof arg1 === 'string') {
-        opts = { url: arg1, name };
+        opts.url = arg1;
+        opts.name = name;
       } else if (arg1) {
         name = arg1.name;
         onload = arg1.onload;
-        opts = objectPick(arg1, [
+        opts::pickIntoThis(arg1, [
           'url',
           'headers',
           'timeout',
@@ -131,7 +122,7 @@ export function makeGmApi() {
         ]);
       }
       if (!name || typeof name !== 'string') {
-        throw new Error('Required parameter "name" is missing or not a string.');
+        throw new ErrorSafe('Required parameter "name" is missing or not a string.');
       }
       assign(opts, {
         context: { name, onload },
@@ -163,25 +154,26 @@ export function makeGmApi() {
      * @returns {HTMLElement} it also has .then() so it should be compatible with TM and old VM
      */
     GM_addStyle(css) {
-      return webAddElement(null, 'style', { textContent: css }, this, getUniqId('VMst'));
+      return webAddElement(null, 'style', { textContent: css, id: getUniqId('VMst') }, this);
     },
     GM_openInTab(url, options) {
       return onTabCreate(
         options && typeof options === 'object'
-          ? assign({}, options, { url })
+          ? assign(createNullObj(), options, { url })
           : { active: !options, url },
         this,
       );
     },
     GM_notification(text, title, image, onclick) {
       const options = typeof text === 'object' ? text : {
+        __proto__: null,
         text,
         title,
         image,
         onclick,
       };
       if (!options.text) {
-        throw new Error('GM_notification: `text` is required!');
+        throw new ErrorSafe('GM_notification: `text` is required!');
       }
       const id = onNotificationCreate(options, this);
       return {
@@ -196,34 +188,20 @@ export function makeGmApi() {
   };
 }
 
-function webAddElement(parent, tag, attributes, context, useId) {
-  const id = useId || getUniqId('VMel');
+function webAddElement(parent, tag, attrs, context) {
   let el;
+  let errorInfo;
+  const cbId = getUniqId();
+  bridge.callbacks[cbId] = function _(res) {
+    el = this;
+    errorInfo = res;
+  };
+  bridge.post('AddElement', { tag, attrs, cbId }, context, parent);
   // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
-  let error = bridge.sendSync('AddElement', { tag, attributes, id }, context);
-  if (!error) {
-    try {
-      el = document::getElementById(id);
-      if (!parent && !/^(script|style|link|meta)$/i.test(tag)) {
-        parent = elemByTag('body');
-      }
-      if (parent) {
-        parent::appendChild(el);
-      }
-    } catch (e) {
-      error = e.stack;
-      el::remove();
-    }
-  }
-  if (error) {
-    throw new Error(error);
-  }
-  if (!useId) {
-    if (attributes && 'id' in attributes) {
-      el::setAttribute('id', attributes.id);
-    } else {
-      el::removeAttribute('id');
-    }
+  if (errorInfo) {
+    const err = new ErrorSafe(errorInfo[0]);
+    err.stack += `\n${errorInfo[1]}`;
+    throw err;
   }
   /* A Promise polyfill is not actually necessary because DOM messaging is synchronous,
      but we keep it for compatibility with GM_addStyle in VM of 2017-2019
@@ -247,17 +225,18 @@ function getResource(context, name, isBlob) {
     if (!res) {
       const raw = bridge.cache[context.pathMap[key] || key];
       if (raw) {
-        const dataPos = raw::lastIndexOf(',');
-        const bin = atob(dataPos < 0 ? raw : raw::slice(dataPos + 1));
-        if (isBlob || /[\x80-\xFF]/::test(bin)) {
+        // TODO: move into `content`
+        const dataPos = raw::stringIndexOf(',');
+        const bin = window::atobSafe(dataPos < 0 ? raw : raw::slice(dataPos + 1));
+        if (isBlob || /[\x80-\xFF]/::regexpTest(bin)) {
           const len = bin.length;
-          const bytes = new Uint8Array(len);
+          const bytes = new Uint8ArraySafe(len);
           for (let i = 0; i < len; i += 1) {
             bytes[i] = bin::charCodeAt(i);
           }
           if (isBlob) {
             const type = dataPos < 0 ? '' : raw::slice(0, dataPos);
-            res = createObjectURL(new Blob([bytes], { type }));
+            res = createObjectURL(new BlobSafe([bytes], { type }));
             context.urls[key] = res;
           } else {
             res = new TextDecoder()::tdDecode(bytes);
@@ -274,13 +253,14 @@ function getResource(context, name, isBlob) {
 }
 
 function downloadBlob(res) {
+  // TODO: move into `content`
   const { context: { name, onload }, response } = res;
   const url = createObjectURL(response);
   const a = document::createElementNS(NS_HTML, 'a');
   a::setAttribute('href', url);
   if (name) a::setAttribute('download', name);
   downloadChain = downloadChain::then(async () => {
-    a::dispatchEvent(new MouseEvent('click'));
+    a::fire(new MouseEventSafe('click'));
     revokeBlobAfterTimeout(url);
     try { if (onload) onload(res); } catch (e) { log('error', ['GM_download', 'callback'], e); }
     await bridge.send('SetTimeout', 100);

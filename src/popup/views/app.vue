@@ -139,7 +139,7 @@
               v-for="(cap, i) in store.commands[item.data.props.id]"
               :key="i"
               :tabIndex="tabIndex"
-              :data-cmd="`${item.data.props.id}:${cap}`"
+              :CMD.prop="{ id: item.data.props.id, cap }"
               :data-message="cap"
               @mousedown="onCommand"
               @mouseup="onCommand"
@@ -363,10 +363,11 @@ export default {
         mousedownElement = el;
         evt.preventDefault();
       } else if (type === 'keydown' || mousedownElement === el) {
-        sendTabCmd(store.currentTab.id, 'Command', [
-          el.dataset.cmd,
-          objectPick(evt, ['type', 'button', 'shiftKey', 'altKey', 'ctrlKey', 'metaKey', 'key', 'keyCode', 'code']),
-        ]);
+        sendTabCmd(store.currentTab.id, 'Command', {
+          ...el.CMD,
+          evt: objectPick(evt, ['type', 'button', 'shiftKey', 'altKey', 'ctrlKey', 'metaKey',
+            'key', 'keyCode', 'code']),
+        });
         window.close();
       }
     },

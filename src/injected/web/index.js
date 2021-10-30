@@ -1,18 +1,14 @@
 import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
-import { bindEvents } from '../utils';
-import { log, logging } from '../utils/helpers';
+import { bindEvents, createNullObj, log } from '../util';
 import bridge from './bridge';
-import { wrapGM } from './gm-wrapper';
 import store from './store';
 import './gm-values';
 import './notifications';
 import './requests';
 import './tabs';
+import { makeGmApiWrapper } from './gm-wrapper';
 
 // Make sure to call safe::methods() in code that may run after userscripts
-
-const { KeyboardEvent, MouseEvent } = global;
-const { get: getCurrentScript } = describeProperty(Document.prototype, 'currentScript');
 
 const sendSetTimeout = () => bridge.send('SetTimeout', 0);
 const resolvers = createNullObj();
@@ -27,10 +23,10 @@ export default function initialize(
   bridge.dataKey = contentId;
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;
-    bridge.post = (cmd, data, context) => {
-      invokeHost({ cmd, data, dataKey: (context || bridge).dataKey }, INJECT_CONTENT);
+    bridge.post = (cmd, data, context, node) => {
+      invokeHost({ cmd, data, node, dataKey: (context || bridge).dataKey }, INJECT_CONTENT);
     };
-    invokeGuest = (cmd, data) => bridge.onHandle({ cmd, data });
+    invokeGuest = (cmd, data, realm, node) => bridge.onHandle({ cmd, data, node });
     global.chrome = undefined;
     global.browser = undefined;
     bridge.addHandlers({
@@ -40,6 +36,10 @@ export default function initialize(
     bridge.mode = INJECT_PAGE;
     bindEvents(webId, contentId, bridge);
     bridge.addHandlers({
+      /** @this {Node} contentDocument */
+      Frame(id) {
+        this[id] = VAULT;
+      },
       Ping() {
         bridge.post('Pong');
       },
@@ -49,29 +49,29 @@ export default function initialize(
 }
 
 bridge.addHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
-  Command(data) {
-    const cmd = data[0];
-    const evt = data[1];
-    const constructor = evt.key ? KeyboardEvent : MouseEvent;
-    const fn = store.commands[cmd];
+  __proto__: null,
+  Command({ id, cap, evt }) {
+    const constructor = evt.key ? KeyboardEventSafe : MouseEventSafe;
+    const fn = store.commands[`${id}:${cap}`];
     if (fn) fn(new constructor(evt.type, evt));
   },
-  Callback({ callbackId, payload }) {
-    const fn = bridge.callbacks[callbackId];
-    if (fn) fn(payload);
+  /** @this {Node} */
+  Callback({ id, data }) {
+    const fn = bridge.callbacks[id];
+    delete bridge.callbacks[id];
+    if (fn) this::fn(data);
   },
   ScriptData({ info, items, runAt }) {
     if (info) {
-      assign(info.cache, bridge.cache);
+      info.cache = assign(createNullObj(), info.cache, bridge.cache);
       assign(bridge, info);
     }
     if (items) {
       const { stage } = items[0];
-      if (stage) waiters[stage] = new Promise(resolve => { resolvers[stage] = resolve; });
+      if (stage) waiters[stage] = new PromiseSafe(resolve => { resolvers[stage] = resolve; });
       items::forEach(createScriptData);
       // FF bug workaround to enable processing of sourceURL in injected page scripts
-      if (bridge.isFirefox && bridge.mode === INJECT_PAGE) {
+      if (IS_FIREFOX && bridge.mode === INJECT_PAGE) {
         bridge.post('InjectList', runAt);
       }
     }
@@ -88,7 +88,7 @@ bridge.addHandlers({
 
 function createScriptData(item) {
   const { dataKey } = item;
-  store.values[item.props.id] = item.values || {};
+  store.values[item.props.id] = item.values || createNullObj();
   if (window[dataKey]) { // executeScript ran before GetInjected response
     onCodeSet(item, window[dataKey]);
   } else {
@@ -108,7 +108,7 @@ async function onCodeSet(item, fn) {
   }
   const run = () => {
     bridge.post('Run', item.props.id, item);
-    wrapGM(item)::fn(logging.error);
+    makeGmApiWrapper(item)::fn(logging.error);
   };
   const el = document::getCurrentScript();
   const wait = waiters[stage];

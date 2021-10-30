@@ -1,21 +1,20 @@
 import { forEachEntry } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
-import { log } from '../utils/helpers';
-
-const { Number } = global;
+import { createNullObj, log } from '../util';
 
 // Nested objects: scriptId -> keyName -> listenerId -> GMValueChangeListener
 export const changeHooks = createNullObj();
 
 const dataDecoders = {
+  __proto__: null,
   o: jsonParse,
-  n: Number,
+  n: val => +val,
   b: val => val === 'true',
 };
 
 bridge.addHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   UpdatedValues(updates) {
     const { partial } = updates;
     updates::forEachEntry(entry => {
@@ -51,7 +50,7 @@ export function decodeValue(raw) {
   try {
     if (handle) val = handle(val);
   } catch (e) {
-    if (process.env.DEBUG) log('warn', 'GM_getValue', e);
+    if (process.env.DEBUG) log('warn', ['GM_getValue'], e);
   }
   return val;
 }

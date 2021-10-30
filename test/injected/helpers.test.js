@@ -1,5 +1,5 @@
 import test from 'tape';
-import { jsonDump } from '#/injected/utils/helpers';
+import { jsonDump } from '#/injected/web/util-web';
 
 test('jsonDump', (t) => {
   // eslint-disable-next-line no-restricted-syntax

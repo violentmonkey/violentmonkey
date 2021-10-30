@@ -21,7 +21,11 @@ const TIME_KEEP_DATA = 60e3; // 100ms should be enough but the tab may hang or g
 const cacheCode = initCache({ lifetime: TIME_KEEP_DATA });
 const cache = initCache({
   lifetime: TIME_KEEP_DATA,
-  onDispose: async promise => (await promise).rcsPromise?.unregister(),
+  onDispose: async promise => {
+    const data = await promise;
+    const rcs = await data?.rcsPromise;
+    rcs?.unregister();
+  },
 });
 const KEY_EXPOSE = 'expose';
 const KEY_INJECT_INTO = 'defaultInjectInto';
@@ -40,7 +44,10 @@ Object.assign(commands, {
   async InjectionFeedback({ feedId, feedback, pageInjectable }, src) {
     feedback.forEach(processFeedback, src);
     if (feedId) {
-      const env = await cache.pop(feedId);
+      // cache cleanup when getDataFF outruns GetInjected
+      cache.del(feedId.cacheKey);
+      // envDelayed
+      const env = await cache.pop(feedId.envKey);
       if (env) {
         const { scripts } = env;
         env.forceContent = !pageInjectable;
@@ -122,7 +129,8 @@ function onOptionChanged(changes) {
 
 /** @return {Promise<Object>} */
 export function getInjectedScripts(url, tabId, frameId) {
-  return cache.pop(getKey(url, !frameId)) || prepare(url, tabId, frameId, true);
+  const key = getKey(url, !frameId);
+  return cache.pop(key) || prepare(key, url, tabId, frameId, true);
 }
 
 function getKey(url, isTop) {
@@ -148,7 +156,7 @@ function onSendHeaders({ url, tabId, frameId }) {
     // GetInjected message will be sent soon by the content script
     // and it may easily happen while getScriptsByURL is still waiting for browser.storage
     // so we'll let GetInjected await this pending data by storing Promise in the cache
-    cache.put(key, prepare(url, tabId, frameId), TIME_AFTER_SEND);
+    cache.put(key, prepare(key, url, tabId, frameId), TIME_AFTER_SEND);
   }
 }
 
@@ -157,47 +165,50 @@ function onHeadersReceived(info) {
   cache.hit(getKey(info.url, !info.frameId), TIME_AFTER_RECEIVE);
 }
 
-function prepare(url, tabId, frameId, isLate) {
-  /** @namespace VMGetInjectedData */
+function prepare(key, url, tabId, frameId, isLate) {
   const res = {
-    expose: !frameId
-      && url.startsWith('https://')
-      && expose[url.split('/', 3)[2]],
+    /** @namespace VMGetInjectedData */
+    inject: {
+      expose: !frameId
+        && url.startsWith('https://')
+        && expose[url.split('/', 3)[2]],
+    },
   };
   return isApplied
-    ? prepareScripts(url, tabId, frameId, isLate, res)
+    ? prepareScripts(res, key, url, tabId, frameId, isLate)
     : res;
 }
 
-async function prepareScripts(url, tabId, frameId, isLate, res) {
+async function prepareScripts(res, cacheKey, url, tabId, frameId, isLate) {
   const data = await getScriptsByURL(url, !frameId);
   const { envDelayed, scripts } = data;
   const feedback = scripts.map(prepareScript, data).filter(Boolean);
   const more = envDelayed.promise;
-  const feedId = getUniqId(`${tabId}:${frameId}:`);
+  const envKey = getUniqId(`${tabId}:${frameId}:`);
+  const { inject } = res;
   /** @namespace VMGetInjectedData */
-  Object.assign(res, {
-    feedId, // InjectionFeedback id for envDelayed
+  Object.assign(inject, {
     injectInto,
     scripts,
+    feedId: {
+      cacheKey, // InjectionFeedback cache key for cleanup when getDataFF outruns GetInjected
+      envKey, // InjectionFeedback cache key for envDelayed
+    },
     hasMore: !!more, // tells content bridge to expect envDelayed
     ids: data.disabledIds, // content bridge adds the actually running ids and sends via SetPopup
     info: {
       cache: data.cache,
-      isFirefox: ua.isFirefox,
       ua,
     },
   });
-  Object.defineProperty(res, '_tmp', {
-    value: {
-      feedback,
-      valOpIds: [...data[ENV_VALUE_IDS], ...envDelayed[ENV_VALUE_IDS]],
-    },
+  Object.assign(res, {
+    feedback,
+    valOpIds: [...data[ENV_VALUE_IDS], ...envDelayed[ENV_VALUE_IDS]],
+    rcsPromise: !isLate && IS_FIREFOX
+      ? registerScriptDataFF(inject, url, !!frameId)
+      : null,
   });
-  if (!isLate && browser.contentScripts) {
-    registerScriptDataFF(data, res, url, !!frameId);
-  }
-  if (more) cache.put(feedId, more);
+  if (more) cache.put(envKey, more);
   return res;
 }
 
@@ -252,8 +263,9 @@ function replaceWithFullWidthForm(s) {
   return String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
 }
 
-const resolveDataCodeStr = `(${(data) => {
-  // not using `window` because this code can't reach its replacement set by guardGlobals
+const resolveDataCodeStr = `(${function _(data) {
+  /* `function` is required to compile `this`, and `this` is required because our safe-globals
+   * shadows `window` so its name is minified and hence inaccessible here */
   const { vmResolve } = this;
   if (vmResolve) {
     vmResolve(data);
@@ -264,9 +276,8 @@ const resolveDataCodeStr = `(${(data) => {
 }})`;
 
 // TODO: rework the whole thing to register scripts individually with real `matches`
-function registerScriptDataFF(data, inject, url, allFrames) {
-  data::forEachEntry(([key]) => delete data[key]); // releasing the contents for garbage collection
-  data.rcsPromise = browser.contentScripts.register({
+function registerScriptDataFF(inject, url, allFrames) {
+  return browser.contentScripts?.register({
     allFrames,
     js: [{
       code: `${resolveDataCodeStr}(${JSON.stringify(inject)})`,

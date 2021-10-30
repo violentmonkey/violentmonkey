@@ -1,10 +1,11 @@
 import bridge from './bridge';
+import { createNullObj } from '../util';
 
 let lastId = 0;
 const tabs = createNullObj();
 
 bridge.addHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   TabClosed(key) {
     const item = tabs[key];
     if (item) {

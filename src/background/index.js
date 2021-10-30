@@ -48,16 +48,15 @@ Object.assign(commands, {
       resetValueOpener(tabId);
       clearRequestsByTabId(tabId);
     }
-    const res = await getInjectedScripts(url, tabId, frameId);
-    const { feedback, valOpIds } = res._tmp;
-    res.isPopupShown = popupTabs[tabId];
+    const { feedback, inject, valOpIds } = await getInjectedScripts(url, tabId, frameId);
+    inject.isPopupShown = popupTabs[tabId];
     // Injecting known content scripts without waiting for InjectionFeedback message.
     // Running in a separate task because it may take a long time to serialize data.
     if (feedback.length) {
       setTimeout(commands.InjectionFeedback, 0, { feedback }, src);
     }
     addValueOpener(tabId, frameId, valOpIds);
-    return res;
+    return inject;
   },
   /** @return {Promise<Object>} */
   async GetTabDomain() {
@@ -133,10 +132,17 @@ initialize(() => {
   if (ua.isChrome) {
     // Using declarativeContent to run content scripts earlier than document_start
     const api = global.chrome.declarativeContent;
-    api.onPageChanged.getRules(['inject'], rules => {
-      if (rules.length) return;
+    api.onPageChanged.getRules(async ([rule]) => {
+      const id = rule?.id;
+      const newId = process.env.INIT_FUNC_NAME;
+      if (id === newId) {
+        return;
+      }
+      if (id) {
+        await browser.declarativeContent.onPageChanged.removeRules([id]);
+      }
       api.onPageChanged.addRules([{
-        id: 'inject',
+        id: newId,
         conditions: [
           new api.PageStateMatcher({
             pageUrl: { urlContains: '://' }, // essentially like <all_urls>

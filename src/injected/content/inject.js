@@ -1,76 +1,52 @@
 import { INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser } from '#/common/consts';
-import { sendCmd } from '#/common';
+import { getUniqId, sendCmd } from '#/common';
 import { forEachKey } from '#/common/object';
-import { elemByTag, NS_HTML, log } from '../utils/helpers';
 import bridge from './bridge';
+import { allowCommands, appendToRoot, onElement } from './util-content';
+import { NS_HTML, log } from '../util';
 
-// Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1408996
-let VMInitInjection = window[process.env.INIT_FUNC_NAME];
-// To avoid running repeatedly due to new `document.documentElement`
-// (the prop is undeletable so a userscript can't fool us on reinjection)
-defineProperty(window, process.env.INIT_FUNC_NAME, { value: 1 });
-
-const regexpTest = RegExp[Prototype].test;
+const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
 const stringIncludes = ''.includes;
-const resolvedPromise = Promise.resolve();
-const { allow, runningIds } = bridge;
 let contLists;
 let pgLists;
 /** @type {Object<string,VMInjectionRealm>} */
 let realms;
 /** @type boolean */
 let pageInjectable;
-let badgePromise;
-let numBadgesSent = 0;
-let bfCacheWired;
+let frameEventDocument;
 
-bridge.addHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
-  // FF bug workaround to enable processing of sourceURL in injected page scripts
-  InjectList: injectList,
-  Run(id, realm) {
-    runningIds::push(id);
-    bridge.ids::push(id);
-    if (realm === INJECT_CONTENT) {
-      bridge.invokableIds::push(id);
-    }
-    if (!badgePromise) {
-      badgePromise = resolvedPromise::then(throttledSetBadge);
-    }
-    if (!bfCacheWired) {
-      bfCacheWired = true;
-      window::addEventListener('pageshow', evt => {
-        // isTrusted is `unforgeable` per DOM spec so we don't need to safeguard its getter
-        if (evt.isTrusted && evt.persisted) {
-          sendCmd('SetBadge', runningIds);
-        }
-      });
-    }
-  },
+// https://bugzil.la/1408996
+let VMInitInjection = window[INIT_FUNC_NAME];
+/** Avoid running repeatedly due to new `documentElement` or with declarativeContent in Chrome.
+ * The prop's mode is overridden to be unforgeable by a userscript in content mode. */
+defineProperty(window, INIT_FUNC_NAME, {
+  value: 1,
+  configurable: false,
+  enumerable: false,
+  writable: false,
+});
+window::on(INIT_FUNC_NAME, evt => {
+  if (!frameEventDocument) {
+    // injectPageSandbox's first event is the frame's document
+    frameEventDocument = evt::getRelatedTarget();
+  } else {
+    // injectPageSandbox's second event is the vaultId
+    bridge.post('Frame', evt::getDetail(), INJECT_PAGE, frameEventDocument);
+    frameEventDocument = null;
+  }
 });
 
-function throttledSetBadge() {
-  const num = runningIds.length;
-  if (numBadgesSent < num) {
-    numBadgesSent = num;
-    return sendCmd('SetBadge', runningIds)::then(() => {
-      badgePromise = throttledSetBadge();
-    });
-  }
-}
-
-export function appendToRoot(node) {
-  // DOM spec allows any elements under documentElement
-  // https://dom.spec.whatwg.org/#node-trees
-  const root = elemByTag('head') || elemByTag('*');
-  return root && root::appendChild(node);
-}
+bridge.addHandlers({
+  __proto__: null,
+  // FF bug workaround to enable processing of sourceURL in injected page scripts
+  InjectList: injectList,
+});
 
 export function injectPageSandbox(contentId, webId) {
+  const vaultId = !IS_TOP && setupVaultId() || '';
   inject({
-    code: `(${VMInitInjection}())('${webId}','${contentId}')\n//# sourceURL=${
-      browser.runtime.getURL('sandbox/injected-web.js')
-    }`,
+    code: `(${VMInitInjection}('${vaultId}',${IS_FIREFOX}))('${webId}','${contentId}')`
+      + `\n//# sourceURL=${browser.runtime.getURL('sandbox/injected-web.js')}`,
   });
 }
 
@@ -84,7 +60,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
   const { hasMore, info } = data;
   pageInjectable = isXml ? false : null;
   realms = {
-    __proto__: null, // Object.create(null) may be spoofed
+    __proto__: null,
     /** @namespace VMInjectionRealm */
     [INJECT_CONTENT]: {
       injectable: () => true,
@@ -121,7 +97,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
     pageInjectable: pageInjectable ?? (hasMore && checkInjectable()),
   });
   // saving while safe
-  const getReadyState = hasMore && describeProperty(Document[Prototype], 'readyState').get;
+  const getReadyState = hasMore && describeProperty(Document[PROTO], 'readyState').get;
   const hasInvoker = realms[INJECT_CONTENT].is;
   if (hasInvoker) {
     setupContentInvoker(contentId, webId);
@@ -129,7 +105,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
   // Using a callback to avoid a microtask tick when the root element exists or appears.
   await onElement('*', async () => {
     injectAll('start');
-    const onBody = (pgLists.body[0] || contLists.body[0])
+    const onBody = (pgLists.body.length || contLists.body.length)
       && onElement('body', injectAll, 'body');
     // document-end, -idle
     if (hasMore) {
@@ -161,10 +137,10 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }, getRea
     script.stage = !code && runAt;
   });
   if (document::getReadyState() === 'loading') {
-    await new Promise(resolve => {
+    await new PromiseSafe(resolve => {
       /* Since most sites listen to DOMContentLoaded on `document`, we let them run first
        * by listening on `window` which follows `document` when the event bubbles up. */
-      window::addEventListener('DOMContentLoaded', resolve, { once: true });
+      window::on('DOMContentLoaded', resolve, { once: true });
     });
   }
   if (needsInvoker && contentId) {
@@ -189,7 +165,7 @@ function inject(item) {
   const script = document::createElementNS(NS_HTML, 'script');
   // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
   let onError;
-  if (bridge.isFirefox) {
+  if (IS_FIREFOX) {
     onError = e => {
       const { stack } = e.error;
       if (typeof stack === 'string' && stack::stringIncludes(browser.runtime.getURL('/sandbox'))) {
@@ -197,13 +173,13 @@ function inject(item) {
         e.preventDefault();
       }
     };
-    window::addEventListener('error', onError);
+    window::on('error', onError);
   }
   // using a safe call to an existing method so we don't have to extract textContent setter
   script::append(item.code);
   // When using declarativeContent there's no documentElement so we'll append to `document`
   if (!appendToRoot(script)) document::appendChild(script);
-  if (onError) window::removeEventListener('error', onError);
+  if (onError) window::off('error', onError);
   script::remove();
 }
 
@@ -211,9 +187,11 @@ function injectAll(runAt) {
   realms::forEachKey((realm) => {
     const realmData = realms[realm];
     const items = realmData.lists[runAt];
+    const { info } = realmData;
     if (items.length) {
-      bridge.post('ScriptData', { items, runAt, info: realmData.info }, realm);
-      if (realm === INJECT_PAGE && !bridge.isFirefox) {
+      bridge.post('ScriptData', { info, items, runAt }, realm);
+      info.cache = null;
+      if (realm === INJECT_PAGE && !IS_FIREFOX) {
         injectList(runAt);
       }
     }
@@ -236,71 +214,27 @@ async function injectList(runAt) {
   }
 }
 
-/**
- * @param {string} tag
- * @param {function} cb - callback runs immediately, unlike a chained then()
- * @param {?} [arg]
- * @returns {Promise<void>}
- */
-function onElement(tag, cb, arg) {
-  return new Promise(resolve => {
-    if (elemByTag(tag)) {
-      cb(arg);
-      resolve();
-    } else {
-      const observer = new MutationObserver(() => {
-        if (elemByTag(tag)) {
-          observer.disconnect();
-          cb(arg);
-          resolve();
-        }
-      });
-      // documentElement may be replaced so we'll observe the entire document
-      observer.observe(document, { childList: true, subtree: true });
-    }
-  });
-}
-
 function setupContentInvoker(contentId, webId) {
-  const invokeContent = VMInitInjection()(webId, contentId, bridge.onHandle);
+  const invokeContent = VMInitInjection('', IS_FIREFOX)(webId, contentId, bridge.onHandle);
   const postViaBridge = bridge.post;
-  bridge.post = (cmd, params, realm) => (
-    (realm === INJECT_CONTENT ? invokeContent : postViaBridge)(cmd, params)
-  );
+  bridge.post = (cmd, params, realm, node) => {
+    const fn = realm === INJECT_CONTENT
+      ? invokeContent
+      : postViaBridge;
+    fn(cmd, params, undefined, node);
+  };
   VMInitInjection = null; // release for GC
 }
 
-/**
- * @param {VMInjectedScript | VMScript} script
- */
-function allowCommands(script) {
-  const { dataKey } = script;
-  allow('Run', dataKey);
-  script.meta.grant::forEach(grant => {
-    const gm = /^GM[._]/::regexpTest(grant) && grant::slice(3);
-    if (grant === 'GM_xmlhttpRequest' || grant === 'GM.xmlHttpRequest' || gm === 'download') {
-      allow('AbortRequest', dataKey);
-      allow('HttpRequest', dataKey);
-    } else if (grant === 'window.close') {
-      allow('TabClose', dataKey);
-    } else if (grant === 'window.focus') {
-      allow('TabFocus', dataKey);
-    } else if (gm === 'addElement' || gm === 'addStyle') {
-      allow('AddElement', dataKey);
-    } else if (gm === 'setValue' || gm === 'deleteValue') {
-      allow('UpdateValue', dataKey);
-    } else if (gm === 'notification') {
-      allow('Notification', dataKey);
-      allow('RemoveNotification', dataKey);
-    } else if (gm === 'openInTab') {
-      allow('TabOpen', dataKey);
-      allow('TabClose', dataKey);
-    } else if (gm === 'registerMenuCommand') {
-      allow('RegisterMenu', dataKey);
-    } else if (gm === 'setClipboard') {
-      allow('SetClipboard', dataKey);
-    } else if (gm === 'unregisterMenuCommand') {
-      allow('UnregisterMenu', dataKey);
-    }
-  });
+function setupVaultId() {
+  const { parent } = window;
+  // Testing for same-origin parent without throwing an exception.
+  if (describeProperty(parent.location, 'href').get) {
+    const vaultId = getUniqId();
+    // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
+    // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
+    parent::fire(new MouseEventSafe(INIT_FUNC_NAME, { relatedTarget: document }));
+    parent::fire(new CustomEventSafe(INIT_FUNC_NAME, { detail: vaultId }));
+    return vaultId;
+  }
 }

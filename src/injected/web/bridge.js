@@ -1,37 +1,29 @@
 import { getUniqId } from '#/common';
+import { CALLBACK_ID, createNullObj } from '../util';
 
 const handlers = createNullObj();
 const callbacks = createNullObj();
+/**
+ * @property {UAInjected} ua
+ */
 const bridge = {
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   cache: createNullObj(),
   callbacks,
   addHandlers(obj) {
     assign(handlers, obj);
   },
-  onHandle({ cmd, data }) {
+  onHandle({ cmd, data, node }) {
     const fn = handlers[cmd];
-    if (fn) fn(data);
+    if (fn) node::fn(data);
   },
-  send(cmd, data, context) {
-    return new Promise(resolve => {
-      postWithCallback(cmd, data, context, resolve);
+  send(cmd, data, context, node) {
+    return new PromiseSafe(resolve => {
+      const id = getUniqId();
+      callbacks[id] = resolve;
+      bridge.post(cmd, { [CALLBACK_ID]: id, data }, context, node);
     });
   },
-  sendSync(cmd, data, context) {
-    let res;
-    postWithCallback(cmd, data, context, payload => { res = payload; });
-    return res;
-  },
 };
-
-function postWithCallback(cmd, data, context, cb) {
-  const id = getUniqId();
-  callbacks[id] = (payload) => {
-    delete callbacks[id];
-    cb(payload);
-  };
-  bridge.post(cmd, { callbackId: id, payload: data }, context);
-}
 
 export default bridge;

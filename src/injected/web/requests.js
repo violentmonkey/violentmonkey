@@ -1,19 +1,16 @@
-import { getUniqId } from '#/common';
-import { objectPick } from '#/common/object';
-import { log, NS_HTML } from '../utils/helpers';
+import { getUniqId, isFunction } from '#/common';
+import { NS_HTML, createNullObj, getOwnProp, log, pickIntoThis } from '../util';
 import bridge from './bridge';
 
-const idMap = {};
-
-export const { atob } = global;
-const { Blob, DOMParser, FileReader, Response } = global;
-const { parseFromString } = DOMParser[Prototype];
-const { blob: resBlob } = Response[Prototype];
-const { get: getHref } = describeProperty(HTMLAnchorElement[Prototype], 'href');
-const { readAsDataURL } = FileReader[Prototype];
+const idMap = createNullObj();
+const { DOMParser, FileReader, Response } = global;
+const { parseFromString } = DOMParser[PROTO];
+const { blob: resBlob } = Response[PROTO];
+const { get: getHref } = describeProperty(HTMLAnchorElement[PROTO], 'href');
+const { readAsDataURL } = FileReader[PROTO];
 
 bridge.addHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   HttpRequested(msg) {
     const req = idMap[msg.id];
     if (req) callback(req, msg);
@@ -21,10 +18,11 @@ bridge.addHandlers({
 });
 
 export function onRequestCreate(opts, context) {
-  if (!opts.url) throw new Error('Required parameter "url" is missing.');
+  if (!opts.url) throw new ErrorSafe('Required parameter "url" is missing.');
   const scriptId = context.id;
   const id = getUniqId(`VMxhr${scriptId}`);
   const req = {
+    __proto__: null,
     id,
     scriptId,
     opts,
@@ -50,16 +48,17 @@ function parseData(req, msg) {
     res = new DOMParser()::parseFromString(raw, type);
   } else if (msg.chunked) {
     // arraybuffer/blob in incognito tabs is transferred as ArrayBuffer encoded in string chunks
-    const arr = new Uint8Array(req.dataSize);
+    // TODO: move this block in content if the speed is the same for very big data
+    const arr = new Uint8ArraySafe(req.dataSize);
     let dstIndex = 0;
     raw::forEach((chunk) => {
-      const len = (chunk = atob(chunk)).length;
+      const len = (chunk = window::atobSafe(chunk)).length;
       for (let j = 0; j < len; j += 1, dstIndex += 1) {
         arr[dstIndex] = chunk::charCodeAt(j);
       }
     });
     res = responseType === 'blob'
-      ? new Blob([arr], { type: msg.contentType })
+      ? new BlobSafe([arr], { type: msg.contentType })
       : arr.buffer;
   } else {
     // text, blob, arraybuffer
@@ -107,7 +106,8 @@ async function callback(req, msg) {
       },
     });
     if (headers != null) req.headers = headers;
-    if (text != null) req.text = text[0] === 'same' ? response : text;
+    // Spoofed String/Array index getters won't be called within length, length itself is unforgeable
+    if (text != null) req.text = text.length && text[0] === 'same' ? response : text;
     data.context = opts.context;
     data.responseHeaders = req.headers;
     data.responseText = req.text;
@@ -121,7 +121,7 @@ function receiveAllChunks(req, response, { dataSize, numChunks }) {
   req.dataSize = dataSize;
   if (numChunks > 1) {
     req.chunks = res;
-    req.chunksPromise = new Promise(resolve => {
+    req.chunksPromise = new PromiseSafe(resolve => {
       req.resolve = resolve;
     });
     res = req.chunksPromise;
@@ -146,7 +146,8 @@ async function start(req, context) {
   // it's true by default per the standard/historical behavior of gmxhr
   const { data, withCredentials = true, anonymous = !withCredentials } = opts;
   idMap[id] = req;
-  bridge.post('HttpRequest', assign({
+  bridge.post('HttpRequest', {
+    __proto__: null,
     id,
     scriptId,
     anonymous,
@@ -154,7 +155,7 @@ async function start(req, context) {
       // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
       || (opts.binary || typeof data !== 'object') && [`${data}`]
       // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
-      || (bridge.isFirefox >= 56) && [data]
+      || IS_FIREFOX && bridge.ua.browserVersion >= 56 && [data]
       // TODO: support huge data by splitting it to multiple messages
       || await encodeBody(data),
     eventsToNotify: [
@@ -166,18 +167,18 @@ async function start(req, context) {
       'progress',
       'readystatechange',
       'timeout',
-    ]::filter(e => typeof opts[`on${e}`] === 'function'),
+    ]::filter(key => isFunction(getOwnProp(opts, `on${key}`))),
     responseType: getResponseType(opts),
     url: getFullUrl(opts.url),
     wantsBlob: opts.responseType === 'blob',
-  }, objectPick(opts, [
+  }::pickIntoThis(opts, [
     'headers',
     'method',
     'overrideMimeType',
     'password',
     'timeout',
     'user',
-  ])), context);
+  ]), context);
 }
 
 function getFullUrl(url) {
@@ -205,11 +206,11 @@ function getResponseType({ responseType = '' }) {
 
 /** Polyfill for Chrome's inability to send complex types over extension messaging */
 async function encodeBody(body) {
-  const wasBlob = body instanceof Blob;
+  const wasBlob = body::objectToString() === '[object Blob]';
   const blob = wasBlob ? body : await new Response(body)::resBlob();
   const reader = new FileReader();
-  return new Promise((resolve) => {
-    reader::addEventListener('load', () => resolve([
+  return new PromiseSafe((resolve) => {
+    reader::on('load', () => resolve([
       reader.result,
       blob.type,
       wasBlob,

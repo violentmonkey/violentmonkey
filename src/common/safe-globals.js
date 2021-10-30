@@ -1,15 +1,27 @@
 /* eslint-disable no-unused-vars */
 
-const global = (function _() { return this || {}; }());
-// Not exporting the built-in globals because this also runs in node
+/**
+ * This file is used by entire `src` except `injected`.
+ * `global` is used instead of WebPack's polyfill which we disable in webpack.conf.js.
+ * `safeCall` is used by our modified babel-plugin-safe-bind.js.
+ * Standard globals are extracted for better minification and marginally improved lookup speed.
+ * Not exporting NodeJS built-in globals as this file is imported in the test scripts.
+ * WARNING! Don't use modern JS syntax like ?. or ?? as this file isn't preprocessed by Babel.
+ */
+
+const global = (function _() {
+  return this || globalThis; // eslint-disable-line no-undef
+}());
 const {
-  Array, Boolean, Object, Promise, Uint8Array,
-  addEventListener, removeEventListener,
-  /* per spec `document` can change only in about:blank but we don't inject there
-     https://html.spec.whatwg.org/multipage/window-object.html#dom-document-dev */
+  Boolean,
+  Error,
+  Object,
+  Promise,
   document,
   window,
 } = global;
-export const { hasOwnProperty } = {};
-export const { apply, bind, call } = hasOwnProperty;
-export const safeCall = call.bind(call);
+export const PromiseSafe = Promise; // alias used by browser.js
+export const ErrorSafe = Error; // alias used by browser.js
+export const { hasOwnProperty, toString: objectToString } = {};
+export const safeCall = Object.call.bind(Object.call);
+export const IS_FIREFOX = !global.chrome.app;

@@ -1,6 +1,6 @@
 import test from 'tape';
 import { buffer2string } from '#/common';
-import { wrapGM } from '#/injected/web/gm-wrapper';
+import { makeGmApiWrapper } from '#/injected/web/gm-wrapper';
 import bridge from '#/injected/web/bridge';
 
 const stringAsBase64 = str => btoa(buffer2string(new TextEncoder().encode(str).buffer));
@@ -30,7 +30,7 @@ const script = {
     },
   },
 };
-const wrapper = wrapGM(script);
+const wrapper = makeGmApiWrapper(script);
 bridge.cache = {
   [script.meta.resources.foo]: `text/plain,${stringAsBase64(RESOURCE_TEXT)}`,
 };

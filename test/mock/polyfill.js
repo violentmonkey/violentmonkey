@@ -1,8 +1,8 @@
 import tldRules from 'tldjs/rules.json';
 import { JSDOM } from 'jsdom';
 
-global.window = global;
-
+global.window = new JSDOM('').window;
+global.chrome = {};
 global.browser = {
   storage: {
     local: {
@@ -21,7 +21,7 @@ global.browser = {
   },
 };
 
-const domProps = Object.getOwnPropertyDescriptors(new JSDOM('').window);
+const domProps = Object.getOwnPropertyDescriptors(window);
 for (const k of Object.keys(domProps)) {
   if (k.endsWith('Storage') || k in global) delete domProps[k];
 }
@@ -38,7 +38,8 @@ global.URL = {
   },
 };
 
-const globalsCommon = require('#/common/safe-globals');
-const globalsInjected = require('#/injected/safe-injected-globals');
-
-Object.assign(global, globalsCommon, globalsInjected);
+global.__VAULT_ID__ = false;
+Object.assign(global, require('#/common/safe-globals'));
+Object.assign(global, require('#/injected/safe-globals-injected'));
+Object.assign(global, require('#/injected/content/safe-globals-content'));
+Object.assign(global, require('#/injected/web/safe-globals-web'));

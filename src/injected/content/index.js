@@ -1,25 +1,26 @@
 import { getUniqId, isEmpty, sendCmd } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
-import { objectPick } from '#/common/object';
-import { bindEvents } from '../utils';
-import { NS_HTML } from '../utils/helpers';
 import bridge from './bridge';
 import './clipboard';
-import { appendToRoot, injectPageSandbox, injectScripts } from './inject';
+import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
+import { elemByTag } from './util-content';
+import { NS_HTML, bindEvents, createNullObj, promiseResolve } from '../util';
 
-const IS_FIREFOX = !global.chrome.app;
-const IS_TOP = window.top === window;
-const { invokableIds } = bridge;
-const menus = {};
+const { invokableIds, runningIds } = bridge;
+const menus = createNullObj();
+const resolvedPromise = promiseResolve();
+let ids;
+let injectInto;
+let badgePromise;
+let numBadgesSent = 0;
+let bfCacheWired;
 let isPopupShown;
 let pendingSetPopup;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
-const { split } = '';
-
 (async () => {
   const contentId = getUniqId();
   const webId = getUniqId();
@@ -33,18 +34,17 @@ const { split } = '';
     { retry: true });
   const isXml = document instanceof XMLDocument;
   if (!isXml) injectPageSandbox(contentId, webId);
+  // Binding now so iframe's injectPageSandbox can call our bridge.post before `data` is received
+  bindEvents(contentId, webId, bridge, global.cloneInto);
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
-  const data = IS_FIREFOX && Event[Prototype].composedPath
+  const data = IS_FIREFOX && Event[PROTO].composedPath
     ? await getDataFF(dataPromise)
     : await dataPromise;
   const { allow } = bridge;
-  // 1) bridge.post may be overridden in injectScripts
-  // 2) cloneInto is provided by Firefox in content scripts to expose data to the page
-  bindEvents(contentId, webId, bridge, global.cloneInto);
-  bridge.contentId = contentId;
-  bridge.ids = data.ids;
-  bridge.isFirefox = data.info.isFirefox;
-  bridge.injectInto = data.injectInto;
+  ids = data.ids;
+  injectInto = data.injectInto;
+  bridge.ids = ids;
+  bridge.injectInto = injectInto;
   isPopupShown = data.isPopupShown;
   if (data.expose) {
     allow('GetScriptVer', contentId);
@@ -63,7 +63,7 @@ const { split } = '';
 })().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
 
 bridge.addBackgroundHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   PopupShown(state) {
     isPopupShown = state;
     sendSetPopup();
@@ -71,10 +71,9 @@ bridge.addBackgroundHandlers({
 }, true);
 
 bridge.addBackgroundHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   Command(data) {
-    const id = +data[0]::split(':', 1)[0];
-    const realm = invokableIds::includes(id) && INJECT_CONTENT;
+    const realm = invokableIds::includes(data.id) && INJECT_CONTENT;
     bridge.post('Command', data, realm);
   },
   UpdatedValues(data) {
@@ -89,45 +88,77 @@ bridge.addBackgroundHandlers({
 });
 
 bridge.addHandlers({
-  __proto__: null, // Object.create(null) may be spoofed
-  RegisterMenu(data) {
+  __proto__: null,
+  RegisterMenu({ id, cap }) {
     if (IS_TOP) {
-      const id = data[0];
-      const cap = data[1];
-      const commandMap = menus[id] || (menus[id] = {});
+      const commandMap = menus[id] || (menus[id] = createNullObj());
       commandMap[cap] = 1;
       sendSetPopup(true);
     }
   },
-  UnregisterMenu(data) {
+  UnregisterMenu({ id, cap }) {
     if (IS_TOP) {
-      const id = data[0];
-      const cap = data[1];
       delete menus[id]?.[cap];
       sendSetPopup(true);
     }
   },
-  AddElement({ tag, attributes, id }) {
+  /** @this {Node} */
+  AddElement({ tag, attrs, cbId }, realm) {
+    let el;
+    let res;
     try {
-      const el = document::createElementNS(NS_HTML, tag);
-      el::setAttribute('id', id);
-      if (attributes) {
-        objectKeys(attributes)::forEach(key => {
-          if (key === 'textContent') el::append(attributes[key]);
-          else if (key !== 'id') el::setAttribute(key, attributes[key]);
+      const parent = this
+        || /^(script|style|link|meta)$/i::regexpTest(tag) && elemByTag('head')
+        || elemByTag('body')
+        || elemByTag('*');
+      el = document::createElementNS(NS_HTML, tag);
+      if (attrs) {
+        objectKeys(attrs)::forEach(key => {
+          if (key === 'textContent') el::append(attrs[key]);
+          else el::setAttribute(key, attrs[key]);
         });
       }
-      appendToRoot(el);
+      parent::appendChild(el);
     } catch (e) {
       // A page-mode userscript can't catch DOM errors in a content script so we pass it explicitly
       // TODO: maybe move try/catch to bridge.onHandle and use bridge.sendSync in all web commands
-      return e.stack;
+      res = [`${e}`, e.stack];
+    }
+    bridge.post('Callback', { id: cbId, data: res }, realm, el);
+  },
+  Run(id, realm) {
+    runningIds::push(id);
+    ids::push(id);
+    if (realm === INJECT_CONTENT) {
+      invokableIds::push(id);
+    }
+    if (!badgePromise) {
+      badgePromise = resolvedPromise::then(throttledSetBadge);
+    }
+    if (!bfCacheWired) {
+      bfCacheWired = true;
+      window::on('pageshow', evt => {
+        // isTrusted is `unforgeable` per DOM spec so we don't need to safeguard its getter
+        if (evt.isTrusted && evt.persisted) {
+          sendCmd('SetBadge', runningIds);
+        }
+      });
     }
   },
   SetTimeout: true,
   TabFocus: true,
   UpdateValue: true,
 });
+
+function throttledSetBadge() {
+  const num = runningIds.length;
+  if (numBadgesSent < num) {
+    numBadgesSent = num;
+    return sendCmd('SetBadge', runningIds)::then(() => {
+      badgePromise = throttledSetBadge();
+    });
+  }
+}
 
 async function sendSetPopup(isDelayed) {
   if (isPopupShown) {
@@ -138,17 +169,23 @@ async function sendSetPopup(isDelayed) {
       await pendingSetPopup;
       pendingSetPopup = null;
     }
-    sendCmd('SetPopup',
-      assign({ menus }, objectPick(bridge, ['ids', 'failedIds', 'runningIds', 'injectInto'])));
+    sendCmd('SetPopup', {
+      ids,
+      injectInto,
+      menus,
+      runningIds,
+      failedIds: bridge.failedIds,
+    });
   }
 }
 
 async function getDataFF(viaMessaging) {
-  const data = window.vmData || await Promise.race([
-    new Promise(resolve => { window.vmResolve = resolve; }),
+  // In Firefox we set data on global `this` which is not equal to `window`
+  const data = global.vmData || await PromiseSafe.race([
+    new PromiseSafe(resolve => { global.vmResolve = resolve; }),
     viaMessaging,
   ]);
-  delete window.vmResolve;
-  delete window.vmData;
+  delete global.vmResolve;
+  delete global.vmData;
   return data;
 }

@@ -4,7 +4,7 @@
 <script>
 const el = document.getElementById('results');
 el.value = [
-  function boundMethods() {
+  function boundMethods(isHeader) {
     const keys = [];
     /* global globalThis */
     for (const k in globalThis) {
@@ -28,25 +28,38 @@ el.value = [
         }
       }
     }
-    return keys.sort().map(k => `'${k}',`).join('\n');
+    return {
+      header: "const MAYBE = vmOwnFunc; // something that can't be imitated by the page\n",
+      keys: keys,
+      value: 'MAYBE',
+    };
   },
   function unforgeables() {
     return Object.entries(Object.getOwnPropertyDescriptors(window))
     .filter(([, v]) => !v.configurable)
-    .map(([k]) => `'${k}',`)
-    .sort()
-    .join('\n');
+    .map(([k]) => k);
   },
-  function readonlys() {
+  function readonlyKeys() {
     return Object.entries(Object.getOwnPropertyDescriptors(window))
     .filter(([k, v]) => k >= 'a' && k <= 'z'
       && k !== 'webkitStorageInfo' // deprecated
       && v.get && !v.set && v.configurable)
-    .map(([k]) => `'${k}',`)
-    .sort()
-    .join('\n');
+    .map(([k]) => k);
   },
-].map(fn => `// ${fn.name}\n${fn()}\n`).join('\n');
+].map(fn => {
+  let res = fn();
+  if (Array.isArray(res)) res = { keys: res };
+  return `${res.header || ''}const ${fn.name} = {
+  __proto__: null,
+${
+  res.keys.sort()
+  .map(k => `  ${k}: ${res.value || 1},`)
+  .join('\n')
+}
+}
+`;
+}).join('\n');
+
 el.focus();
 el.select();
 </script>

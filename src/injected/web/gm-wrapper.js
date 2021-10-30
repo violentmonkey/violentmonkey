@@ -1,43 +1,38 @@
+import { isFunction } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import bridge from './bridge';
-import { makeGmApi, vmOwnFunc } from './gm-api';
+import { makeGmApi } from './gm-api';
+import { FastLookup, makeComponentUtils, vmOwnFunc } from './util-web';
+import { createNullObj, safePush } from '../util';
 
-const {
-  Proxy,
-  Set, // 2x-3x faster lookup than object::has
-  Symbol: { toStringTag, iterator: iterSym },
-  Map: { [Prototype]: { get: mapGet, has: mapHas, [iterSym]: mapIter } },
-  Set: { [Prototype]: { delete: setDelete, has: setHas, [iterSym]: setIter } },
-  Object: { getOwnPropertyNames, getOwnPropertySymbols },
-} = global;
-const { concat, slice: arraySlice } = [];
-const { startsWith } = '';
 /** Name in Greasemonkey4 -> name in GM */
 const GM4_ALIAS = {
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   getResourceUrl: 'getResourceURL',
   xmlHttpRequest: 'xmlhttpRequest',
 };
-const GM4_ASYNC = [
-  'getResourceUrl',
-  'getValue',
-  'deleteValue',
-  'setValue',
-  'listValues',
-];
-const IS_TOP = window.top === window;
+const GM4_ASYNC = {
+  __proto__: null,
+  getResourceUrl: 1,
+  getValue: 1,
+  deleteValue: 1,
+  setValue: 1,
+  listValues: 1,
+};
 let gmApi;
 let componentUtils;
 
-export function wrapGM(script) {
+export function makeGmApiWrapper(script) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-  const grant = script.meta.grant || [];
+  const { meta } = script;
+  const grant = meta.grant || [];
   if (grant.length === 1 && grant[0] === 'none') {
     grant.length = 0;
   }
-  const id = script.props.id;
-  const resources = script.meta.resources || createNullObj();
+  const { id } = script.props;
+  const resources = meta.resources || createNullObj();
+  /** @namespace VMInjectedScriptContext */
   const context = {
     id,
     script,
@@ -48,7 +43,7 @@ export function wrapGM(script) {
   };
   const gmInfo = makeGmInfo(script, resources);
   const gm = {
-    __proto__: null, // Object.create(null) may be spoofed
+    __proto__: null,
     GM: {
       __proto__: null,
       info: gmInfo,
@@ -59,21 +54,22 @@ export function wrapGM(script) {
   if (!componentUtils) {
     componentUtils = makeComponentUtils();
   }
-  // not using ...spread as it calls Babel's polyfill that calls unsafe Object.xxx
   assign(gm, componentUtils);
-  if (grant::includes('window.close')) {
+  if (grant::indexOf('window.close') >= 0) {
     gm.close = vmOwnFunc(() => bridge.post('TabClose', 0, context));
   }
-  if (grant::includes('window.focus')) {
+  if (grant::indexOf('window.focus') >= 0) {
     gm.focus = vmOwnFunc(() => bridge.post('TabFocus', 0, context));
   }
   if (!gmApi && grant.length) gmApi = makeGmApi();
   grant::forEach((name) => {
-    const gm4name = name::startsWith('GM.') && name::slice(3);
+    // Spoofed String index getters won't be called within length, length itself is unforgeable
+    const gm4name = name.length > 3 && name[2] === '.' && name[0] === 'G' && name[1] === 'M'
+      && name::slice(3);
     const fn = gmApi[gm4name ? `GM_${GM4_ALIAS[gm4name] || gm4name}` : name];
     if (fn) {
       if (gm4name) {
-        gm.GM[gm4name] = makeGmMethodCaller(fn, context, GM4_ASYNC::includes(gm4name));
+        gm.GM[gm4name] = makeGmMethodCaller(fn, context, GM4_ASYNC[gm4name]);
       } else {
         gm[name] = makeGmMethodCaller(fn, context);
       }
@@ -83,19 +79,21 @@ export function wrapGM(script) {
 }
 
 function makeGmInfo(script, resources) {
+  // TODO: move into background.js
   const { meta } = script;
-  const metaCopy = {};
+  const metaCopy = createNullObj();
+  let val;
   objectKeys(meta)::forEach((key) => {
-    let val = meta[key];
+    val = meta[key];
     switch (key) {
     case 'match': // -> matches
     case 'excludeMatch': // -> excludeMatches
       key += 'e';
-    // fallthrough
+      // fallthrough
     case 'exclude': // -> excludes
     case 'include': // -> includes
       key += 's';
-      val = val::arraySlice(); // not using [...val] as it can be broken via Array#Symbol.iterator
+      val = []::concat(val);
       break;
     default:
     }
@@ -110,10 +108,11 @@ function makeGmInfo(script, resources) {
   ]::forEach((key) => {
     if (!metaCopy[key]) metaCopy[key] = '';
   });
-  metaCopy.resources = objectKeys(resources)::map(name => ({
-    name,
-    url: resources[name],
-  }));
+  val = objectKeys(resources);
+  val::forEach((name, i) => {
+    val[i] = { name, url: resources[name] };
+  });
+  metaCopy.resources = val;
   metaCopy.unwrap = false; // deprecated, always `false`
   return {
     uuid: script.props.uuid,
@@ -136,296 +135,303 @@ function makeGmMethodCaller(gmMethod, context, isAsync) {
   );
 }
 
-const globalKeys = getOwnPropertyNames(window).filter(key => !isFrameIndex(key, true));
-/* Chrome and FF page mode: `global` is `window`
-   FF content mode: `global` is different, some props e.g. `isFinite` are defined only there */
-if (global !== window) {
-  const set = new Set(globalKeys);
-  getOwnPropertyNames(global).forEach(key => {
-    if (!isFrameIndex(key) && !set.has(key)) {
-      globalKeys.push(key);
+const globalKeysSet = FastLookup();
+const globalKeys = (function makeGlobalKeys() {
+  const kWrappedJSObject = 'wrappedJSObject';
+  const names = getOwnPropertyNames(window);
+  // True if `names` is usable as is, but FF is bugged: its names have duplicates
+  let ok = !IS_FIREFOX;
+  names::forEach(key => {
+    if (isFrameIndex(key, true)) {
+      ok = false;
+    } else {
+      globalKeysSet.add(key);
     }
   });
-}
-// FF doesn't expose wrappedJSObject as own property so we add it explicitly
-if (global.wrappedJSObject) {
-  globalKeys.push('wrappedJSObject');
-}
-const inheritedKeys = new Set([
-  ...getOwnPropertyNames(EventTarget[Prototype]),
-  ...getOwnPropertyNames(Object[Prototype]),
-]);
-inheritedKeys.has = setHas;
-
+  /* Chrome and FF page mode: `global` is `window`
+     FF content mode: `global` is different, some props e.g. `isFinite` are defined only there */
+  if (global !== window) {
+    getOwnPropertyNames(global)::forEach(key => {
+      if (!isFrameIndex(key, true)) {
+        globalKeysSet.add(key);
+        ok = false;
+      }
+    });
+  }
+  // wrappedJSObject is not included in getOwnPropertyNames so we add it explicitly.
+  if (IS_FIREFOX
+    && bridge.mode === INJECT_CONTENT
+    && kWrappedJSObject in global
+    && !globalKeysSet.has(kWrappedJSObject)) {
+    globalKeysSet.add(kWrappedJSObject);
+    if (ok) names::safePush(kWrappedJSObject);
+  }
+  return ok ? names : globalKeysSet.toArray();
+}());
+const inheritedKeys = createNullObj();
 /* These can be redefined but can't be assigned, see sandbox-globals.html */
-const readonlyKeys = [
-  'applicationCache',
-  'caches',
-  'closed',
-  'crossOriginIsolated',
-  'crypto',
-  'customElements',
-  'frameElement',
-  'history',
-  'indexedDB',
-  'isSecureContext',
-  'localStorage',
-  'mozInnerScreenX',
-  'mozInnerScreenY',
-  'navigator',
-  'sessionStorage',
-  'speechSynthesis',
-  'styleMedia',
-  'trustedTypes',
-].filter(key => key in global); // not using global[key] as some of these (caches) may throw
-
+const readonlyKeys = {
+  __proto__: null,
+  applicationCache: 1,
+  caches: 1,
+  closed: 1,
+  crossOriginIsolated: 1,
+  crypto: 1,
+  customElements: 1,
+  frameElement: 1,
+  history: 1,
+  indexedDB: 1,
+  isSecureContext: 1,
+  localStorage: 1,
+  mozInnerScreenX: 1,
+  mozInnerScreenY: 1,
+  navigator: 1,
+  sessionStorage: 1,
+  speechSynthesis: 1,
+  styleMedia: 1,
+  trustedTypes: 1,
+};
 /* These can't be redefined, see sandbox-globals.html */
-const unforgeables = new Map([
-  'Infinity',
-  'NaN',
-  'document',
-  'location',
-  'top',
-  'undefined',
-  'window',
-].map(name => {
+const unforgeables = {
+  __proto__: null,
+  Infinity: 1,
+  NaN: 1,
+  document: 1,
+  location: 1,
+  top: 1,
+  undefined: 1,
+  window: 1,
+};
+/* ~50 methods like alert/fetch/moveBy that need `window` as `this`, see sandbox-globals.html */
+const MAYBE = vmOwnFunc; // something that can't be imitated by the page
+const boundMethods = {
+  __proto__: null,
+  addEventListener: MAYBE,
+  alert: MAYBE,
+  atobSafe: MAYBE,
+  blur: MAYBE,
+  btoa: MAYBE,
+  cancelAnimationFrame: MAYBE,
+  cancelIdleCallback: MAYBE,
+  captureEvents: MAYBE,
+  clearInterval: MAYBE,
+  clearTimeout: MAYBE,
+  close: MAYBE,
+  confirm: MAYBE,
+  createImageBitmap: MAYBE,
+  dispatchEvent: MAYBE,
+  dump: MAYBE,
+  fetch: MAYBE,
+  find: MAYBE,
+  focus: MAYBE,
+  getComputedStyle: MAYBE,
+  getDefaultComputedStyle: MAYBE,
+  getSelection: MAYBE,
+  matchMedia: MAYBE,
+  moveBy: MAYBE,
+  moveTo: MAYBE,
+  open: MAYBE,
+  openDatabase: MAYBE,
+  postMessage: MAYBE,
+  print: MAYBE,
+  prompt: MAYBE,
+  queueMicrotask: MAYBE,
+  releaseEvents: MAYBE,
+  removeEventListener: MAYBE,
+  requestAnimationFrame: MAYBE,
+  requestIdleCallback: MAYBE,
+  resizeBy: MAYBE,
+  resizeTo: MAYBE,
+  scroll: MAYBE,
+  scrollBy: MAYBE,
+  scrollByLines: MAYBE,
+  scrollByPages: MAYBE,
+  scrollTo: MAYBE,
+  setInterval: MAYBE,
+  setResizable: MAYBE,
+  setTimeout: MAYBE,
+  sizeToContent: MAYBE,
+  stop: MAYBE,
+  updateCommands: MAYBE,
+  webkitCancelAnimationFrame: MAYBE,
+  webkitRequestAnimationFrame: MAYBE,
+  webkitRequestFileSystem: MAYBE,
+  webkitResolveLocalFileSystemURL: MAYBE,
+};
+
+for (const name in unforgeables) { /* proto is null */// eslint-disable-line guard-for-in
   let thisObj;
   const info = (
     describeProperty(thisObj = global, name)
     || describeProperty(thisObj = window, name)
   );
   if (info) {
-    // currently only `document`
+    // currently only `document` and `window`
     if (info.get) info.get = info.get::bind(thisObj);
     // currently only `location`
     if (info.set) info.set = info.set::bind(thisObj);
+    unforgeables[name] = info;
+  } else {
+    delete unforgeables[name];
   }
-  return info && [name, info];
-}).filter(Boolean));
-unforgeables.has = mapHas;
-unforgeables[iterSym] = mapIter;
-
-/* ~50 methods like alert/fetch/moveBy that need `window` as `this`, see sandbox-globals.html */
-const boundMethods = new Map([
-  'addEventListener',
-  'alert',
-  'atob',
-  'blur',
-  'btoa',
-  'cancelAnimationFrame',
-  'cancelIdleCallback',
-  'captureEvents',
-  'clearInterval',
-  'clearTimeout',
-  'close',
-  'confirm',
-  'createImageBitmap',
-  'dispatchEvent',
-  'dump',
-  'fetch',
-  'find',
-  'focus',
-  'getComputedStyle',
-  'getDefaultComputedStyle',
-  'getSelection',
-  'matchMedia',
-  'moveBy',
-  'moveTo',
-  'open',
-  'openDatabase',
-  'postMessage',
-  'print',
-  'prompt',
-  'queueMicrotask',
-  'releaseEvents',
-  'removeEventListener',
-  'requestAnimationFrame',
-  'requestIdleCallback',
-  'resizeBy',
-  'resizeTo',
-  'scroll',
-  'scrollBy',
-  'scrollByLines',
-  'scrollByPages',
-  'scrollTo',
-  'setInterval',
-  'setResizable',
-  'setTimeout',
-  'sizeToContent',
-  'stop',
-  'updateCommands',
-  'webkitCancelAnimationFrame',
-  'webkitRequestAnimationFrame',
-  'webkitRequestFileSystem',
-  'webkitResolveLocalFileSystemURL',
-]
-.map((key) => {
-  const value = global[key];
-  return typeof value === 'function' && [key, value::bind(global)];
-})
-.filter(Boolean));
-boundMethods.get = mapGet;
+}
+[EventTarget, Object]::forEach(src => {
+  getOwnPropertyNames(src[PROTO])::forEach(key => {
+    inheritedKeys[key] = 1;
+  });
+});
 
 /**
  * @desc Wrap helpers to prevent unexpected modifications.
  */
-function makeGlobalWrapper(local) {
+export function makeGlobalWrapper(local) {
   const events = createNullObj();
-  const scopeSym = Symbol.unscopables;
-  const globals = new Set(globalKeys);
-  globals[iterSym] = setIter;
-  globals.delete = setDelete;
-  globals.has = setHas;
-  const readonlys = new Set(readonlyKeys);
-  readonlys.delete = setDelete;
-  readonlys.has = setHas;
+  const readonlys = assign(createNullObj(), readonlyKeys);
+  let globals = globalKeysSet; // will be copied only if modified
   /* Browsers may return [object Object] for Object.prototype.toString(window)
      on our `window` proxy so jQuery libs see it as a plain object and throw
      when trying to clone its recursive properties like `self` and `window`. */
   defineProperty(local, toStringTag, { get: () => 'Window' });
-  const wrapper = new Proxy(local, {
+  const wrapper = new ProxySafe(local, {
     defineProperty(_, name, desc) {
       const isString = typeof name === 'string';
       if (!isFrameIndex(name, isString)) {
         defineProperty(local, name, desc);
-        if (isString) maybeSetEventHandler(name);
-        readonlys.delete(name);
+        if (isString) setEventHandler(name);
+        delete readonlys[name];
       }
       return true;
     },
     deleteProperty(_, name) {
-      if (!unforgeables.has(name) && delete local[name]) {
-        globals.delete(name);
+      if (!(name in unforgeables) && delete local[name]) {
+        if (globals.has(name)) {
+          if (globals === globalKeysSet) {
+            globals = globalKeysSet.clone();
+          }
+          globals.delete(name);
+        }
         return true;
       }
     },
-    get(_, name) {
-      if (name !== 'undefined' && name !== scopeSym) {
-        const value = local[name];
-        return value !== undefined || local::hasOwnProperty(name)
-          ? value
-          : resolveProp(name);
-      }
-    },
+    // Reducing "steppability" so it doesn't get in the way of debugging other parts of our code.
+    // eslint-disable-next-line no-return-assign, no-nested-ternary
+    get: (_, name) => (name === 'undefined' || name === scopeSym ? undefined
+      : (_ = local[name]) !== undefined || name in local ? _
+        : resolveProp(name, wrapper, globals, local)
+    ),
     getOwnPropertyDescriptor(_, name) {
       const ownDesc = describeProperty(local, name);
       const desc = ownDesc || globals.has(name) && describeProperty(global, name);
       if (!desc) return;
-      if (desc.value === window) desc.value = wrapper;
-      // preventing spec violation by duplicating ~10 props like NaN, Infinity, etc.
+      if (desc.value === window) {
+        desc.value = wrapper;
+      }
+      // preventing spec violation - we must mirror an unknown unforgeable prop
       if (!ownDesc && !desc.configurable) {
         const { get } = desc;
-        if (typeof get === 'function') {
-          desc.get = get::bind(global);
-        }
-        defineProperty(local, name, mapWindow(desc));
+        if (get) desc.get = get::bind(global);
+        defineProperty(local, name, desc);
       }
       return desc;
     },
-    has(_, name) {
-      return name === 'undefined' || local::hasOwnProperty(name) || globals.has(name);
-    },
-    ownKeys() {
-      return [...globals]::concat(
-        // using ::concat since array spreading can be broken via Array.prototype[Symbol.iterator]
-        getOwnPropertyNames(local)::filter(notIncludedIn, globals),
-        getOwnPropertySymbols(local)::filter(notIncludedIn, globals),
-      );
-    },
+    has: (_, name) => name === 'undefined' || name in local || globals.has(name),
+    ownKeys: () => makeOwnKeys(local, globals),
     preventExtensions() {},
     set(_, name, value) {
       const isString = typeof name === 'string';
-      if (!readonlys.has(name) && !isFrameIndex(name, isString)) {
+      let readonly = readonlys[name];
+      if (readonly === 1) {
+        readonly = globals.has(name) ? 2 : 0;
+        readonlys[name] = readonly;
+      }
+      if (!readonly && !isFrameIndex(name, isString)) {
         local[name] = value;
-        if (isString) maybeSetEventHandler(name, value);
+        if (isString) setEventHandler(name, value, globals, events);
       }
       return true;
     },
   });
-  unforgeables::forEach(entry => {
-    const name = entry[0];
-    const desc = entry[1];
+  for (const name in unforgeables) { /* proto is null */// eslint-disable-line guard-for-in
+    const desc = unforgeables[name];
     if (name === 'window' || name === 'top' && IS_TOP) {
       delete desc.get;
       delete desc.set;
       desc.value = wrapper;
     }
-    defineProperty(local, name, mapWindow(desc));
-  });
-  function mapWindow(desc) {
-    if (desc && desc.value === window) {
-      desc = assign({}, desc);
-      desc.value = wrapper;
-    }
-    return desc;
-  }
-  function resolveProp(name) {
-    let value = boundMethods.get(name);
-    const canCopy = value || inheritedKeys.has(name) || globals.has(name);
-    if (!value && (canCopy || isFrameIndex(name, typeof name === 'string'))) {
-      value = global[name];
-    }
-    if (value === window) {
-      value = wrapper;
-    }
-    if (canCopy && (
-      typeof value === 'function'
-      || typeof value === 'object' && value && name !== 'event'
-      // window.event contains the current event so it's always different
-    )) {
-      local[name] = value;
-    }
-    return value;
-  }
-  function maybeSetEventHandler(name, value) {
-    if (!name::startsWith('on') || !globals.has(name)) {
-      return;
-    }
-    name = name::slice(2);
-    window::removeEventListener(name, events[name]);
-    if (typeof value === 'function') {
-      // the handler will be unique so that one script couldn't remove something global
-      // like console.log set by another script
-      window::addEventListener(name, events[name] = value::bind(window));
-    } else {
-      delete events[name];
-    }
+    defineProperty(local, name, desc);
   }
   return wrapper;
 }
 
-// Adding the polyfills in Chrome (always as it doesn't provide them)
-// and in Firefox page mode (while preserving the native ones in content mode)
-// for compatibility with many [old] scripts that use these utils blindly
-function makeComponentUtils() {
-  const source = bridge.mode === INJECT_CONTENT && global;
-  return {
-    cloneInto: source.cloneInto || vmOwnFunc(
-      (obj) => obj,
-    ),
-    createObjectIn: source.createObjectIn || vmOwnFunc(
-      (targetScope, { defineAs } = {}) => {
-        const obj = {};
-        if (defineAs) targetScope[defineAs] = obj;
-        return obj;
-      },
-    ),
-    exportFunction: source.exportFunction || vmOwnFunc(
-      (func, targetScope, { defineAs } = {}) => {
-        if (defineAs) targetScope[defineAs] = func;
-        return func;
-      },
-    ),
-  };
+function makeOwnKeys(local, globals) {
+  /** Note that arrays can be eavesdropped via prototype setters like '0','1',...
+   * on `push` and `arr[i] = 123`, as well as via getters if you read beyond
+   * its length or from an unassigned `hole`. */
+  const names = getOwnPropertyNames(local)::filter(notIncludedIn, globals);
+  const symbols = getOwnPropertySymbols(local)::filter(notIncludedIn, globals);
+  const frameIndexes = [];
+  for (let i = 0; (global[i] || 0)::objectToString() === '[object Window]'; i += 1) {
+    if (!(i in local)) {
+      frameIndexes::safePush(`${i}`);
+    }
+  }
+  return []::concat(
+    globals === globalKeysSet ? globalKeys : globals.toArray(),
+    frameIndexes,
+    names,
+    symbols,
+  );
 }
 
-/* The index strings that look exactly like integers can't be forged
-   but for example '011' doesn't look like 11 so it's allowed */
+function resolveProp(name, wrapper, globals, local) {
+  let value = boundMethods[name];
+  if (value === MAYBE) {
+    value = window[name];
+    if (isFunction(value)) {
+      value = value::bind(window);
+    }
+    boundMethods[name] = value;
+  }
+  const canCopy = value || name in inheritedKeys || globals.has(name);
+  if (!value && (canCopy || isFrameIndex(name, typeof name === 'string'))) {
+    value = global[name];
+  }
+  if (value === window) {
+    value = wrapper;
+  }
+  if (canCopy && (
+    isFunction(value)
+    || typeof value === 'object' && value && name !== 'event'
+    // window.event contains the current event so it's always different
+  )) {
+    local[name] = value;
+  }
+  return value;
+}
+
+function setEventHandler(name, value, globals, events) {
+  // Spoofed String index getters won't be called within length, length itself is unforgeable
+  if (name.length < 3 || name[0] !== 'o' || name[1] !== 'n' || !globals.has(name)) {
+    return;
+  }
+  name = name::slice(2);
+  window::off(name, events[name]);
+  if (isFunction(value)) {
+    // the handler will be unique so that one script couldn't remove something global
+    // like console.log set by another script
+    window::on(name, events[name] = value::bind(window));
+  } else {
+    delete events[name];
+  }
+}
+
+/** The index strings that look exactly like integers can't be forged
+ * but for example '011' doesn't look like 11 so it's allowed */
 function isFrameIndex(key, isString) {
   return isString && key >= 0 && key <= 0xFFFF_FFFE && key === `${+key}`;
 }
 
-/** @this {Set} */
+/** @this {FastLookup|Set} */
 function notIncludedIn(key) {
   return !this.has(key);
 }

@@ -1,5 +1,6 @@
-import { sendCmd } from '#/common';
+import { isPromise, sendCmd } from '#/common';
 import { INJECT_PAGE, browser } from '#/common/consts';
+import { CALLBACK_ID, createNullObj, getOwnProp } from '../util';
 
 const allow = createNullObj();
 /** @type {Object.<string, MessageFromGuestHandler>} */
@@ -14,7 +15,7 @@ const assignHandlers = (dest, src, force) => {
   }
 };
 const bridge = {
-  __proto__: null, // Object.create(null) may be spoofed
+  __proto__: null,
   ids: [], // all ids including the disabled ones for SetPopup
   runningIds: [],
   // userscripts running in the content script context are messaged via invokeGuest
@@ -35,19 +36,23 @@ const bridge = {
     (allow[cmd] || (allow[cmd] = createNullObj()))[dataKey] = true;
   },
   // realm is provided when called directly via invokeHost
-  async onHandle({ cmd, data, dataKey }, realm) {
+  async onHandle({ cmd, data, dataKey, node }, realm) {
     const handle = handlers[cmd];
     if (!handle || !allow[cmd]?.[dataKey]) {
-      throw new Error(`[Violentmonkey] Invalid command: "${cmd}" on ${global.location.host}`);
+      throw new ErrorSafe(`[Violentmonkey] Invalid command: "${cmd}" on ${global.location.host}`);
     }
-    const callbackId = data?.callbackId;
-    const payload = callbackId ? data.payload : data;
-    let res = handle === true ? sendCmd(cmd, payload) : handle(payload, realm || INJECT_PAGE);
-    if (res instanceof Promise) {
+    const callbackId = data && data::getOwnProp(CALLBACK_ID);
+    if (callbackId) {
+      data = data.data;
+    }
+    let res = handle === true
+      ? sendCmd(cmd, data)
+      : node::handle(data, realm || INJECT_PAGE);
+    if (res && isPromise(res)) {
       res = await res;
     }
-    if (callbackId && res !== undefined) {
-      bridge.post('Callback', { callbackId, payload: res }, realm);
+    if (callbackId) {
+      bridge.post('Callback', { id: callbackId, data: res }, realm);
     }
   },
 };

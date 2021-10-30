@@ -3,8 +3,7 @@ import { sendCmd } from '#/common';
 import './content';
 
 // Script installation in Firefox as it does not support `onBeforeRequest` for `file:`
-if (!global.chrome.app
-&& global.top === window
+if (IS_FIREFOX && IS_TOP
 && global.location.protocol === 'file:'
 && global.location.pathname.endsWith('.user.js')) {
   (async () => {
@@ -13,7 +12,7 @@ if (!global.chrome.app
       fetch,
       history,
       document: { referrer },
-      Response: { [Prototype]: { text: getText } },
+      Response: { [PROTO]: { text: getText } },
       location: { href: url },
     } = global;
     const fetchOpts = { mode: 'same-origin' };
