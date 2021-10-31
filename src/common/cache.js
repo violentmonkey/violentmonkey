@@ -23,8 +23,11 @@ export default function initCache({
     batchStarted = enable;
     batchStartTime = 0;
   }
-  function get(key, def) {
+  function get(key, def, shouldHit = true) {
     const item = cache[key];
+    if (item && shouldHit) {
+      reschedule(item, defaultLifetime);
+    }
     return item ? item.value : def;
   }
   function getValues() {
@@ -36,15 +39,7 @@ export default function initCache({
     return value;
   }
   function put(key, value, lifetime = defaultLifetime) {
-    if (value) {
-      cache[key] = {
-        value,
-        expiry: lifetime + getNow(),
-      };
-      reschedule(lifetime);
-    } else {
-      del(key);
-    }
+    reschedule(cache[key] = { value }, lifetime);
     return value;
   }
   function del(key) {
@@ -60,8 +55,7 @@ export default function initCache({
   function hit(key, lifetime = defaultLifetime) {
     const entry = cache[key];
     if (entry) {
-      entry.expiry = lifetime + getNow();
-      reschedule(lifetime);
+      reschedule(entry, lifetime);
     }
   }
   function destroy() {
@@ -78,7 +72,8 @@ export default function initCache({
     clearTimeout(timer);
     timer = 0;
   }
-  function reschedule(lifetime) {
+  function reschedule(entry, lifetime) {
+    entry.expiry = lifetime + getNow();
     if (timer) {
       if (lifetime >= minLifetime) return;
       clearTimeout(timer);

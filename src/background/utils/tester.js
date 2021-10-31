@@ -37,9 +37,7 @@ let blCacheSize = 0;
 function testRules(url, rules, prefix, ruleBuilder) {
   return rules.some(rule => {
     const key = `${prefix}:${rule}`;
-    let matcher = cache.get(key);
-    if (matcher) cache.hit(key);
-    else cache.put(key, (matcher = ruleBuilder(rule)));
+    const matcher = cache.get(key) || cache.put(key, ruleBuilder(rule));
     return matcher.test(url);
   });
 }
