@@ -1,9 +1,7 @@
 import { isPromise, sendCmd } from '#/common';
 import { INJECT_PAGE, browser } from '#/common/consts';
-import { CALLBACK_ID, createNullObj, getOwnProp } from '../util';
 
-const allow = createNullObj();
-/** @type {Object.<string, MessageFromGuestHandler>} */
+const allowed = createNullObj();
 const handlers = createNullObj();
 const bgHandlers = createNullObj();
 const onScripts = [];
@@ -14,6 +12,10 @@ const assignHandlers = (dest, src, force) => {
     onScripts.push(() => assign(dest, src));
   }
 };
+const allowCmd = (cmd, dataKey) => {
+  (allowed[cmd] || (allowed[cmd] = createNullObj()))[dataKey] = true;
+};
+
 const bridge = {
   __proto__: null,
   ids: [], // all ids including the disabled ones for SetPopup
@@ -22,8 +24,15 @@ const bridge = {
   /** @type Number[] */
   invokableIds: [],
   failedIds: [],
+  cache: createNullObj(),
+  pathMaps: createNullObj(),
   onScripts,
-  /** Without `force` handlers will be added only when userscripts are about to be injected. */
+  allowCmd,
+  /**
+   * Without `force` handlers will be added only when userscripts are about to be injected.
+   * @param {Object.<string, MessageFromGuestHandler>} obj
+   * @param {boolean} [force]
+   */
   addHandlers(obj, force) {
     assignHandlers(handlers, obj, force);
   },
@@ -32,13 +41,43 @@ const bridge = {
   addBackgroundHandlers(obj, force) {
     assignHandlers(bgHandlers, obj, force);
   },
-  allow(cmd, dataKey) {
-    (allow[cmd] || (allow[cmd] = createNullObj()))[dataKey] = true;
+  /**
+   * @param {VMInjectedScript | VMScript} script
+   */
+  allowScript({ dataKey, meta }) {
+    allowCmd('Run', dataKey);
+    meta.grant::forEach(grant => {
+      const gm = /^GM[._]/::regexpTest(grant) && grant::slice(3);
+      if (grant === 'GM_xmlhttpRequest' || grant === 'GM.xmlHttpRequest' || gm === 'download') {
+        allowCmd('AbortRequest', dataKey);
+        allowCmd('HttpRequest', dataKey);
+      } else if (grant === 'window.close') {
+        allowCmd('TabClose', dataKey);
+      } else if (grant === 'window.focus') {
+        allowCmd('TabFocus', dataKey);
+      } else if (gm === 'addElement' || gm === 'addStyle') {
+        allowCmd('AddElement', dataKey);
+      } else if (gm === 'setValue' || gm === 'deleteValue') {
+        allowCmd('UpdateValue', dataKey);
+      } else if (gm === 'notification') {
+        allowCmd('Notification', dataKey);
+        allowCmd('RemoveNotification', dataKey);
+      } else if (gm === 'openInTab') {
+        allowCmd('TabOpen', dataKey);
+        allowCmd('TabClose', dataKey);
+      } else if (gm === 'registerMenuCommand') {
+        allowCmd('RegisterMenu', dataKey);
+      } else if (gm === 'setClipboard') {
+        allowCmd('SetClipboard', dataKey);
+      } else if (gm === 'unregisterMenuCommand') {
+        allowCmd('UnregisterMenu', dataKey);
+      }
+    });
   },
   // realm is provided when called directly via invokeHost
   async onHandle({ cmd, data, dataKey, node }, realm) {
     const handle = handlers[cmd];
-    if (!handle || !allow[cmd]?.[dataKey]) {
+    if (!handle || !allowed[cmd]?.[dataKey]) {
       throw new ErrorSafe(`[Violentmonkey] Invalid command: "${cmd}" on ${global.location.host}`);
     }
     const callbackId = data && getOwnProp(data, CALLBACK_ID);

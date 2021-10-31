@@ -1,7 +1,6 @@
 import { forEachEntry } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
-import { createNullObj, log } from '../util';
 
 // Nested objects: scriptId -> keyName -> listenerId -> GMValueChangeListener
 export const changeHooks = createNullObj();

@@ -1,5 +1,3 @@
-import { CALLBACK_ID, createNullObj, getUniqIdSafe } from '../util';
-
 const handlers = createNullObj();
 const callbacks = createNullObj();
 /**
@@ -7,7 +5,6 @@ const callbacks = createNullObj();
  */
 const bridge = {
   __proto__: null,
-  cache: createNullObj(),
   callbacks,
   addHandlers(obj) {
     assign(handlers, obj);
@@ -18,11 +15,21 @@ const bridge = {
   },
   send(cmd, data, context, node) {
     return new PromiseSafe(resolve => {
-      const id = getUniqIdSafe();
-      callbacks[id] = resolve;
-      bridge.post(cmd, { [CALLBACK_ID]: id, data }, context, node);
+      postWithCallback(cmd, data, context, node, resolve);
     });
   },
+  syncCall: postWithCallback,
 };
+
+function postWithCallback(cmd, data, context, node, cb, customCallbackId) {
+  const id = getUniqIdSafe();
+  callbacks[id] = cb;
+  if (customCallbackId) {
+    setOwnProp(data, customCallbackId, id);
+  } else {
+    data = { [CALLBACK_ID]: id, data };
+  }
+  bridge.post(cmd, data, context, node);
+}
 
 export default bridge;

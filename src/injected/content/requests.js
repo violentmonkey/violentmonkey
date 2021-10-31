@@ -1,67 +1,139 @@
-import { sendCmd } from '#/common';
+import { isPromise, sendCmd } from '#/common';
 import bridge from './bridge';
-import { createNullObj } from '../util';
+import { getFullUrl, makeElem } from './util-content';
 
-const { fetch } = global;
-const { arrayBuffer: getArrayBuffer, blob: getBlob } = Response[PROTO];
+const {
+  fetch: fetchSafe,
+} = global;
+const { arrayBuffer: getArrayBuffer, blob: getBlob } = ResponseProto;
+const { createObjectURL, revokeObjectURL } = URL;
 
 const requests = createNullObj();
+let downloadChain = promiseResolve();
 
 bridge.addHandlers({
-  HttpRequest(opts, realm) {
-    requests[opts.id] = {
+  HttpRequest(msg, realm) {
+    requests[msg.id] = {
+      __proto__: null,
       realm,
-      eventsToNotify: opts.eventsToNotify,
-      wantsBlob: opts.wantsBlob,
-    };
-    sendCmd('HttpRequest', opts);
+    }::pickIntoThis(msg, [
+      'eventsToNotify',
+      'fileName',
+      'wantsBlob',
+    ]);
+    msg.url = getFullUrl(msg.url);
+    sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,
 });
 
 bridge.addBackgroundHandlers({
   async HttpRequested(msg) {
-    const { blobbed, id, numChunks, type } = msg;
+    const { id } = msg;
     const req = requests[id];
     if (!req) return;
+    const { chunk } = msg;
+    if (chunk) {
+      receiveChunk(req, chunk);
+      return;
+    }
+    const { blobbed, data, chunked, type } = msg;
     const isLoadEnd = type === 'loadend';
     // only CONTENT realm can read blobs from an extension:// URL
-    const url = blobbed
-      && !req.response
+    const response = data
       && req.eventsToNotify::includes(type)
-      && msg.data.response;
+      && data.response;
     // messages will come while blob is fetched so we'll temporarily store the Promise
-    if (url) {
-      req.response = importBlob(url, req);
+    const importing = response && (blobbed || chunked);
+    if (importing) {
+      req.bin = blobbed
+        ? importBlob(req, response)
+        : receiveAllChunks(req, msg);
     }
     // ...which can be awaited in these subsequent messages
-    if (req.response?.then) {
-      req.response = await req.response;
+    if (isPromise(req.bin)) {
+      req.bin = await req.bin;
     }
-    // ...and make sure loadend's bridge.post() runs last
-    if (isLoadEnd && blobbed) {
-      await 0;
-    }
-    if (url) {
-      msg.data.response = req.response;
-    }
-    bridge.post('HttpRequested', msg, req.realm);
     // If the user in incognito supplied only `onloadend` then it arrives first, followed by chunks
     if (isLoadEnd) {
+      // loadend's bridge.post() should run last
+      await 0;
       req.gotLoadEnd = true;
-      req.gotChunks = req.gotChunks || (numChunks || 0) <= 1;
-    } else if (msg.chunk?.last) {
-      req.gotChunks = true;
     }
     // If the user supplied any event before `loadend`, all chunks finish before `loadend` arrives
+    if ((msg.numChunks || 0) <= 1) {
+      req.gotChunks = true;
+    }
+    if (importing) {
+      data.response = req.bin;
+    }
+    const fileName = type === 'load' && req.bin && req.fileName;
+    if (fileName) {
+      req.fileName = '';
+      await downloadBlob(req.bin, fileName);
+    }
+    bridge.post('HttpRequested', msg, req.realm);
     if (req.gotLoadEnd && req.gotChunks) {
       delete requests[id];
     }
   },
 });
 
-async function importBlob(url, { wantsBlob }) {
-  const data = await (await fetch(url))::(wantsBlob ? getBlob : getArrayBuffer)();
+async function importBlob(req, url) {
+  const data = await (await fetchSafe(url))::(req.wantsBlob ? getBlob : getArrayBuffer)();
   sendCmd('RevokeBlob', url);
   return data;
+}
+
+function downloadBlob(blob, fileName) {
+  const url = createObjectURL(blob);
+  const a = makeElem('a', {
+    href: url,
+    download: fileName,
+  });
+  const res = downloadChain::then(() => {
+    a::fire(new MouseEventSafe('click'));
+    revokeBlobAfterTimeout(url);
+  });
+  // Frequent downloads are ignored in Chrome and possibly other browsers
+  downloadChain = res::then(sendCmd('SetTimeout', 150));
+  return res;
+}
+
+async function revokeBlobAfterTimeout(url) {
+  await sendCmd('SetTimeout', 3000);
+  revokeObjectURL(url);
+}
+
+/** ArrayBuffer/Blob in Chrome incognito is transferred in string chunks */
+function receiveAllChunks(req, msg) {
+  req::pickIntoThis(msg, ['dataSize', 'contentType']);
+  req.chunks = [msg.data.response];
+  return msg.numChunks > 1
+    ? new PromiseSafe(resolve => { req.resolve = resolve; })
+    : decodeChunks(req);
+}
+
+function receiveChunk(req, { data, i, last }) {
+  setOwnProp(req.chunks, i, data);
+  if (last) {
+    req.gotChunks = true;
+    req.resolve(decodeChunks(req));
+    delete req.resolve;
+  }
+}
+
+function decodeChunks(req) {
+  const arr = new Uint8ArraySafe(req.dataSize);
+  let dstIndex = 0;
+  req.chunks::forEach(chunk => {
+    chunk = atobSafe(chunk);
+    for (let len = chunk.length, i = 0; i < len; i += 1, dstIndex += 1) {
+      arr[dstIndex] = chunk::charCodeAt(i);
+    }
+  });
+  delete req.chunks;
+  return req.wantsBlob
+    ? new BlobSafe([arr], { type: req.contentType })
+    : arr.buffer;
 }

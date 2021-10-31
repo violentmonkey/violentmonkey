@@ -6,7 +6,6 @@
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.
  * Standard globals are extracted for better minification and marginally improved lookup speed.
  * Not exporting NodeJS built-in globals as this file is imported in the test scripts.
- * WARNING! Don't use modern JS syntax like ?. or ?? as this file isn't preprocessed by Babel.
  */
 
 const global = (function _() {

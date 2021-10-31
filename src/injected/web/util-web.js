@@ -1,6 +1,5 @@
-import { createNullObj } from '../util';
-import bridge from '#/injected/web/bridge';
 import { INJECT_CONTENT } from '#/common/consts';
+import bridge from './bridge';
 
 // Firefox defines `isFinite` on `global` not on `window`
 const { isFinite } = global; // eslint-disable-line no-restricted-properties
@@ -87,7 +86,11 @@ export const FastLookup = (hubs = createNullObj()) => {
       delete getHub(val)?.[val];
     },
     has: val => getHub(val)?.[val],
-    toArray: () => concat::apply([], objectValues(hubs)::map(objectKeys)),
+    toArray: () => {
+      const values = objectValues(hubs);
+      values::forEach((val, i) => { values[i] = objectKeys(val); });
+      return concat::apply([], values);
+    },
   };
   function getHub(val, autoCreate) {
     const group = val.length ? val[0] : ''; // length is unforgeable, index getters aren't

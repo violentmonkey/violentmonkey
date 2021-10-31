@@ -6,5 +6,6 @@
 !scripts/plaid.conf.js
 !scripts/webpack.conf.js
 !scripts/webpack-protect-bootstrap-plugin.js
+!scripts/webpack-util.js
 !gulpfile.js
 src/public/**

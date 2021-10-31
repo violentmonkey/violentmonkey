@@ -1,24 +1,17 @@
 const { modifyWebpackConfig, shallowMerge, defaultOptions } = require('@gera2ld/plaid');
 const { isProd } = require('@gera2ld/plaid/util');
-const fs = require('fs');
 const webpack = require('webpack');
-const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
 const HTMLInlineCSSWebpackPlugin = isProd && require('html-inline-css-webpack-plugin').default;
 const TerserPlugin = isProd && require('terser-webpack-plugin');
 const deepmerge = isProd && require('deepmerge');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
+const { addWrapperWithGlobals, getUniqIdB64 } = require('./webpack-util');
 const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
 const projectConfig = require('./plaid.conf');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
 // Avoiding collisions with globals of a content-mode userscript
-const INIT_FUNC_NAME = `Violentmonkey:${
-  Buffer.from(
-    new Uint32Array(2)
-    .map(() => Math.random() * (2 ** 32))
-    .buffer,
-  ).toString('base64')
-}`;
+const INIT_FUNC_NAME = `Violentmonkey:${getUniqIdB64()}`;
 const VAULT_ID = '__VAULT_ID__';
 const HANDSHAKE_ID = '__HANDSHAKE_ID__';
 // eslint-disable-next-line import/no-dynamic-require
@@ -88,47 +81,11 @@ const defsObj = {
   'process.env.HANDSHAKE_ID': HANDSHAKE_ID,
   'process.env.HANDSHAKE_ACK': '1',
 };
-const defsRe = new RegExp(`\\b(${Object.keys(defsObj).join('|').replace(/\./g, '\\.')})\\b`, 'g');
 const definitions = new webpack.DefinePlugin(defsObj);
 
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
 const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
-// {entryName: path}
-const entryGlobals = {
-  common: [
-    './src/common/safe-globals.js',
-  ],
-  'injected/content': [
-    './src/injected/safe-globals-injected.js',
-    './src/injected/content/safe-globals-content.js',
-  ],
-  'injected/web': [
-    './src/injected/safe-globals-injected.js',
-    './src/injected/web/safe-globals-web.js',
-  ],
-};
-
-/**
- * Adds a watcher for files in entryGlobals to properly recompile the project on changes.
- */
-const addWrapper = (config, name, callback) => {
-  config.module.rules.push({
-    test: new RegExp(`/${name}/.*?\\.js$`.replace(/\//g, /[/\\]/.source)),
-    use: [{
-      loader: './scripts/fake-dep-loader.js',
-      options: { files: entryGlobals[name] },
-    }],
-  });
-  const reader = () => (
-    entryGlobals[name]
-    .map(path => fs.readFileSync(path, { encoding: 'utf8' }))
-    .join('\n')
-    .replace(/export\s+(?=(const|let)\s)/g, '')
-    .replace(defsRe, s => defsObj[s])
-  );
-  config.plugins.push(new WrapperWebpackPlugin(callback(reader)));
-};
 
 const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
@@ -154,7 +111,7 @@ const modify = (page, entry, init) => modifyWebpackConfig(
 
 module.exports = Promise.all([
   modify((config) => {
-    addWrapper(config, 'common', getGlobals => ({
+    addWrapperWithGlobals('common', config, defsObj, getGlobals => ({
       header: () => `{ ${getGlobals()}`,
       footer: '}',
       test: /^(?!injected|public).*\.js$/,
@@ -181,7 +138,7 @@ module.exports = Promise.all([
 
   modify('injected', './src/injected', (config) => {
     config.plugins.push(new ProtectWebpackBootstrapPlugin());
-    addWrapper(config, 'injected/content', getGlobals => ({
+    addWrapperWithGlobals('injected/content', config, defsObj, getGlobals => ({
       header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
       footer: '}',
     }));
@@ -191,7 +148,7 @@ module.exports = Promise.all([
     // TODO: replace WebPack's Object.*, .call(), .apply() with safe calls
     config.output.libraryTarget = 'commonjs2';
     config.plugins.push(new ProtectWebpackBootstrapPlugin());
-    addWrapper(config, 'injected/web', getGlobals => ({
+    addWrapperWithGlobals('injected/web', config, defsObj, getGlobals => ({
       header: () => `${skipReinjectionHeader}
         window['${INIT_FUNC_NAME}'] = function (IS_FIREFOX,${HANDSHAKE_ID},${VAULT_ID}) {
           const module = { __proto__: null };

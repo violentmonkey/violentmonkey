@@ -2,23 +2,17 @@ import { isEmpty, sendCmd } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import bridge from './bridge';
 import './clipboard';
+import { sendSetPopup } from './gm-api-content';
 import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
-import { elemByTag } from './util-content';
-import { NS_HTML, createNullObj, getUniqIdSafe, promiseResolve } from '../util';
 
 const { invokableIds, runningIds } = bridge;
-const menus = createNullObj();
 const resolvedPromise = promiseResolve();
-let ids;
-let injectInto;
 let badgePromise;
 let numBadgesSent = 0;
 let bfCacheWired;
-let isPopupShown;
-let pendingSetPopup;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 (async () => {
@@ -38,34 +32,26 @@ let pendingSetPopup;
   const data = IS_FIREFOX && Event[PROTO].composedPath
     ? await getDataFF(dataPromise)
     : await dataPromise;
-  const { allow } = bridge;
-  ids = data.ids;
-  injectInto = data.injectInto;
-  bridge.ids = ids;
-  bridge.injectInto = injectInto;
-  isPopupShown = data.isPopupShown;
+  const { allowCmd } = bridge;
+  allowCmd('VaultId', contentId);
+  bridge::pickIntoThis(data, [
+    'ids',
+    'injectInto',
+  ]);
   if (data.expose) {
-    allow('GetScriptVer', contentId);
+    allowCmd('GetScriptVer', contentId);
     bridge.addHandlers({ GetScriptVer: true }, true);
     bridge.post('Expose');
   }
   if (data.scripts) {
-    bridge.onScripts.forEach(fn => fn());
-    allow('SetTimeout', contentId);
-    if (IS_FIREFOX) allow('InjectList', contentId);
+    bridge.onScripts.forEach(fn => fn(data));
+    allowCmd('SetTimeout', contentId);
+    if (IS_FIREFOX) allowCmd('InjectList', contentId);
     await injectScripts(contentId, webId, data);
   }
-  allow('VaultId', contentId);
   bridge.onScripts = null;
   sendSetPopup();
 })().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
-
-bridge.addBackgroundHandlers({
-  PopupShown(state) {
-    isPopupShown = state;
-    sendSetPopup();
-  },
-}, true);
 
 bridge.addBackgroundHandlers({
   Command(data) {
@@ -84,46 +70,9 @@ bridge.addBackgroundHandlers({
 });
 
 bridge.addHandlers({
-  RegisterMenu({ id, cap }) {
-    if (IS_TOP) {
-      const commandMap = menus[id] || (menus[id] = createNullObj());
-      commandMap[cap] = 1;
-      sendSetPopup(true);
-    }
-  },
-  UnregisterMenu({ id, cap }) {
-    if (IS_TOP) {
-      delete menus[id]?.[cap];
-      sendSetPopup(true);
-    }
-  },
-  /** @this {Node} */
-  AddElement({ tag, attrs, cbId }, realm) {
-    let el;
-    let res;
-    try {
-      const parent = this
-        || /^(script|style|link|meta)$/i::regexpTest(tag) && elemByTag('head')
-        || elemByTag('body')
-        || elemByTag('*');
-      el = document::createElementNS(NS_HTML, tag);
-      if (attrs) {
-        objectKeys(attrs)::forEach(key => {
-          if (key === 'textContent') el::append(attrs[key]);
-          else el::setAttribute(key, attrs[key]);
-        });
-      }
-      parent::appendChild(el);
-    } catch (e) {
-      // A page-mode userscript can't catch DOM errors in a content script so we pass it explicitly
-      // TODO: maybe move try/catch to bridge.onHandle and use bridge.sendSync in all web commands
-      res = [`${e}`, e.stack];
-    }
-    bridge.post('Callback', { id: cbId, data: res }, realm, el);
-  },
   Run(id, realm) {
     runningIds::push(id);
-    ids::push(id);
+    bridge.ids::push(id);
     if (realm === INJECT_CONTENT) {
       invokableIds::push(id);
     }
@@ -151,25 +100,6 @@ function throttledSetBadge() {
     numBadgesSent = num;
     return sendCmd('SetBadge', runningIds)::then(() => {
       badgePromise = throttledSetBadge();
-    });
-  }
-}
-
-async function sendSetPopup(isDelayed) {
-  if (isPopupShown) {
-    if (isDelayed) {
-      if (pendingSetPopup) return;
-      // Preventing flicker in popup when scripts re-register menus
-      pendingSetPopup = sendCmd('SetTimeout', 0);
-      await pendingSetPopup;
-      pendingSetPopup = null;
-    }
-    sendCmd('SetPopup', {
-      ids,
-      injectInto,
-      menus,
-      runningIds,
-      failedIds: bridge.failedIds,
     });
   }
 }

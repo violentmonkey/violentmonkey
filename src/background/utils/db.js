@@ -279,7 +279,7 @@ export async function getScriptsByURL(url, isTop) {
   /** @namespace VMScriptByUrlData */
   const [envStart, envDelayed] = [0, 1].map(() => ({
     ids: [],
-    /** @type {VMInjectedScript[]} */
+    /** @type {(VMScript & VMInjectedScript)[]} */
     scripts: [],
     [ENV_CACHE_KEYS]: [],
     [ENV_REQ_KEYS]: [],

@@ -29,7 +29,7 @@ Object.assign(commands, {
       xhr: new XMLHttpRequest(),
     };
     (tabRequests[tabId] || (tabRequests[tabId] = {}))[id] = 1;
-    httpRequest(opts, src, res => (
+    httpRequest(opts, src, res => requests[id] && (
       sendTabCmd(tabId, 'HttpRequested', res, { frameId })
     ));
   },
@@ -227,13 +227,12 @@ function xhrCallbackWrapper(req) {
   };
   return (evt) => {
     const type = evt.type;
-    if (type === 'loadend') clearRequest(req);
-    if (!req.cb) return;
     if (!contentType) {
       contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream';
     }
     if (xhr.response !== response) {
       response = xhr.response;
+      sent = false;
       try {
         responseText = xhr.responseText;
         if (responseText === response) responseText = ['same'];
@@ -248,36 +247,44 @@ function xhrCallbackWrapper(req) {
     const shouldNotify = req.eventsToNotify.includes(type);
     // only send response when XHR is complete
     const shouldSendResponse = xhr.readyState === 4 && shouldNotify && !sent;
-    lastPromise = lastPromise
-    .then(() => shouldSendResponse && numChunks && getChunk(response, 0))
-    .then(chunk => req.cb({
-      blobbed,
-      chunked,
-      contentType,
-      dataSize,
-      id,
-      numChunks,
-      type,
-      data: shouldNotify && {
-        finalUrl: xhr.responseURL,
-        ...getResponseHeaders(),
-        ...objectPick(xhr, ['readyState', 'status', 'statusText']),
-        ...shouldSendResponse && {
-          response: chunk || response,
-          responseText,
+    lastPromise = lastPromise.then(async () => {
+      await req.cb({
+        blobbed,
+        chunked,
+        contentType,
+        dataSize,
+        id,
+        numChunks,
+        type,
+        data: shouldNotify && {
+          finalUrl: xhr.responseURL,
+          ...getResponseHeaders(),
+          ...objectPick(xhr, ['readyState', 'status', 'statusText']),
+          ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
+          response: shouldSendResponse
+            ? numChunks && await getChunk(response, 0) || response
+            : null,
+          responseText: shouldSendResponse
+            ? responseText
+            : null,
         },
-        ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
-      },
-    }));
-    if (shouldSendResponse) {
-      sent = true;
-      for (let i = 1; i < numChunks; i += 1) {
-        const last = i === numChunks - 1;
-        lastPromise = lastPromise
-        .then(() => getChunk(response, i)) // eslint-disable-line no-loop-func
-        .then(data => req.cb({ id, chunk: { data, i, last } }));
+      });
+      if (shouldSendResponse) {
+        for (let i = 1; i < numChunks; i += 1) {
+          await req.cb({
+            id,
+            chunk: {
+              i,
+              data: await getChunk(response, i),
+              last: i + 1 === numChunks,
+            },
+          });
+        }
       }
-    }
+      if (type === 'loadend') {
+        clearRequest(req);
+      }
+    });
   };
 }
 

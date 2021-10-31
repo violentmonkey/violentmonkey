@@ -190,6 +190,7 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, isLate) {
   Object.assign(inject, {
     injectInto,
     scripts,
+    cache: data.cache,
     feedId: {
       cacheKey, // InjectionFeedback cache key for cleanup when getDataFF outruns GetInjected
       envKey, // InjectionFeedback cache key for envDelayed
@@ -197,7 +198,6 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, isLate) {
     hasMore: !!more, // tells content bridge to expect envDelayed
     ids: data.disabledIds, // content bridge adds the actually running ids and sends via SetPopup
     info: {
-      cache: data.cache,
       ua,
     },
   });

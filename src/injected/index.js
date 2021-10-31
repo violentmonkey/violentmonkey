@@ -3,25 +3,25 @@ import { sendCmd } from '#/common';
 import './content';
 
 // Script installation in Firefox as it does not support `onBeforeRequest` for `file:`
-if (IS_FIREFOX && IS_TOP
-&& global.location.protocol === 'file:'
-&& global.location.pathname.endsWith('.user.js')) {
+const url = IS_FIREFOX && IS_TOP && global.location.href;
+if (url
+&& /^file:/::regexpTest(url)
+&& /\.user\.js$/::regexpTest(url)) {
   (async () => {
     const {
       browser,
       fetch,
       history,
       document: { referrer },
-      Response: { [PROTO]: { text: getText } },
-      location: { href: url },
     } = global;
+    const { text: getText } = ResponseProto;
     const fetchOpts = { mode: 'same-origin' };
     const response = await fetch(url, fetchOpts);
-    if (!/javascript|^text\/plain|^$/.test(response.headers.get('content-type') || '')) {
+    if (!/javascript|^text\/plain|^$/::regexpTest(response.headers.get('content-type') || '')) {
       return;
     }
-    let code = await response.text();
-    if (!/==userscript==/i.test(code)) {
+    let code = await response::getText();
+    if (!/==userscript==/i::regexpTest(code)) {
       return;
     }
     await sendCmd('ConfirmInstall', { code, url, from: referrer });

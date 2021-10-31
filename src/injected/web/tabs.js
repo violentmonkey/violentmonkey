@@ -1,5 +1,4 @@
 import bridge from './bridge';
-import { createNullObj } from '../util';
 
 let lastId = 0;
 const tabs = createNullObj();

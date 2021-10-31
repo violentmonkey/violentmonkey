@@ -2,7 +2,6 @@ import bridge from './bridge';
 import { makeGmApi } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
 import { makeComponentUtils } from './util-web';
-import { createNullObj, vmOwnFunc } from '../util';
 
 /** Name in Greasemonkey4 -> name in GM */
 const GM4_ALIAS = {
@@ -21,6 +20,10 @@ const GM4_ASYNC = {
 let gmApi;
 let componentUtils;
 
+/**
+ * @param {VMScript & VMInjectedScript} script
+ * @returns {Object}
+ */
 export function makeGmApiWrapper(script) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
@@ -30,15 +33,14 @@ export function makeGmApiWrapper(script) {
     grant.length = 0;
   }
   const { id } = script.props;
-  const resources = meta.resources || createNullObj();
-  /** @namespace VMInjectedScriptContext */
+  const resources = assign(createNullObj(), meta.resources);
+  /** @namespace VMInjectedScript.Context */
   const context = {
     id,
     script,
     resources,
     dataKey: script.dataKey,
-    pathMap: script.custom.pathMap || createNullObj(),
-    urls: createNullObj(),
+    resCache: createNullObj(),
   };
   const gmInfo = makeGmInfo(script, resources);
   const gm = {

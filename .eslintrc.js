@@ -1,6 +1,10 @@
-const acorn = require('acorn');
+const { readGlobalsFile } = require('./scripts/webpack-util');
+
 const FILES_INJECTED = [`src/injected/**/*.js`];
-const FILES_CONTENT = [`src/injected/content/**/*.js`];
+const FILES_CONTENT = [
+  'src/injected/*.js',
+  'src/injected/content/**/*.js',
+];
 const FILES_WEB = [`src/injected/web/**/*.js`];
   // some functions are used by `injected`
 const FILES_SHARED = [
@@ -108,14 +112,19 @@ module.exports = {
   },
 };
 
-function getGlobals(fileName) {
-  const text = require('fs').readFileSync(fileName, { encoding: 'utf8' });
+function getGlobals(filename) {
   const res = {};
-  const tree = acorn.parse(text, { ecmaVersion: 2018, sourceType: 'module' });
-  tree.body.forEach(body => {
+  const { ast } = readGlobalsFile(filename, { ast: true });
+  ast.program.body.forEach(body => {
     const { declarations } = body.declaration || body;
     if (!declarations) return;
-    declarations.forEach(function processId({ id: { left, properties, name = left && left.name } }) {
+    declarations.forEach(function processId({
+      id: {
+        left,
+        properties,
+        name = left && left.name,
+      },
+    }) {
       if (name) {
         // const NAME = whatever
         res[name] = false;

@@ -4,21 +4,21 @@
 /**
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.
  * `export` is stripped in the final output and is only used for our NodeJS test scripts.
- * WARNING! Don't use modern JS syntax like ?. or ?? as this file isn't preprocessed by Babel.
  */
 
 export let
   // window
   BlobSafe,
   CustomEventSafe,
+  DOMParserSafe,
   ErrorSafe,
+  FileReaderSafe,
   KeyboardEventSafe,
   MouseEventSafe,
   Object,
   PromiseSafe,
   ProxySafe,
-  Uint8ArraySafe,
-  atobSafe,
+  ResponseSafe,
   fire,
   off,
   on,
@@ -46,28 +46,30 @@ export let
   filter,
   forEach,
   indexOf,
-  map,
   // Element.prototype
   remove,
-  setAttribute,
   // String.prototype
   charCodeAt,
   slice,
   replace,
-  // document
-  createElementNS,
-  // various methods
+  // safeCall
   safeCall,
+  // various methods
+  createObjectURL,
   funcToString,
   jsonParse,
-  mathRandom,
-  regexpTest,
-  then,
   logging,
+  mathRandom,
+  parseFromString, // DOMParser
+  readAsDataURL, // FileReader
+  safeResponseBlob, // Response - safe = "safe global" to disambiguate the name
+  then,
   // various getters
-  getDetail,
-  getRelatedTarget,
-  getCurrentScript;
+  getBlobType, // Blob
+  getCurrentScript, // Document
+  getDetail, // CustomEvent
+  getReaderResult, // FileReader
+  getRelatedTarget; // MouseEvent
 
 /**
  * VAULT consists of the parent's safe globals to protect our communications/globals
@@ -91,14 +93,15 @@ export const VAULT = (() => {
     // window
     BlobSafe = res[i += 1] || window.Blob,
     CustomEventSafe = res[i += 1] || window.CustomEvent,
+    DOMParserSafe = res[i += 1] || window.DOMParser,
     ErrorSafe = res[i += 1] || window.Error,
+    FileReaderSafe = res[i += 1] || window.FileReader,
     KeyboardEventSafe = res[i += 1] || window.KeyboardEvent,
     MouseEventSafe = res[i += 1] || window.MouseEvent,
     Object = res[i += 1] || window.Object,
     PromiseSafe = res[i += 1] || window.Promise,
     ProxySafe = res[i += 1] || global.Proxy, // In FF content mode it's not equal to window.Proxy
-    Uint8ArraySafe = res[i += 1] || window.Uint8Array,
-    atobSafe = res[i += 1] || window.atob,
+    ResponseSafe = res[i += 1] || window.Response,
     fire = res[i += 1] || window.dispatchEvent,
     off = res[i += 1] || window.removeEventListener,
     on = res[i += 1] || window.addEventListener,
@@ -124,28 +127,30 @@ export const VAULT = (() => {
     filter = res[i += 1] || ArrayP.filter,
     forEach = res[i += 1] || ArrayP.forEach,
     indexOf = res[i += 1] || ArrayP.indexOf,
-    map = res[i += 1] || ArrayP.map,
     // Element.prototype
     remove = res[i += 1] || (ElementP = Element[PROTO]).remove,
-    setAttribute = res[i += 1] || ElementP.setAttribute,
     // String.prototype
     charCodeAt = res[i += 1] || (StringP = String[PROTO]).charCodeAt,
     slice = res[i += 1] || StringP.slice,
     replace = res[i += 1] || StringP.replace,
-    // document
-    createElementNS = res[i += 1] || document.createElementNS,
-    // various methods
+    // safeCall
     safeCall = res[i += 1] || Object.call.bind(Object.call),
+    // various methods
+    createObjectURL = res[i += 1] || URL.createObjectURL,
     funcToString = res[i += 1] || safeCall.toString,
     jsonParse = res[i += 1] || JSON.parse,
-    mathRandom = res[i += 1] || Math.random,
-    regexpTest = res[i += 1] || RegExp[PROTO].test,
-    then = res[i += 1] || PromiseSafe[PROTO].then,
     logging = res[i += 1] || assign({ __proto__: null }, console),
+    mathRandom = res[i += 1] || Math.random,
+    parseFromString = res[i += 1] || DOMParserSafe[PROTO].parseFromString,
+    readAsDataURL = res[i += 1] || FileReaderSafe[PROTO].readAsDataURL,
+    safeResponseBlob = res[i += 1] || ResponseSafe[PROTO].blob,
+    then = res[i += 1] || PromiseSafe[PROTO].then,
     // various getters
-    getDetail = res[i += 1] || describeProperty(CustomEventSafe[PROTO], 'detail').get,
-    getRelatedTarget = res[i += 1] || describeProperty(MouseEventSafe[PROTO], 'relatedTarget').get,
+    getBlobType = res[i += 1] || describeProperty(BlobSafe[PROTO], 'type').get,
     getCurrentScript = res[i += 1] || describeProperty(Document[PROTO], 'currentScript').get,
+    getDetail = res[i += 1] || describeProperty(CustomEventSafe[PROTO], 'detail').get,
+    getReaderResult = res[i += 1] || describeProperty(FileReaderSafe[PROTO], 'result').get,
+    getRelatedTarget = res[i += 1] || describeProperty(MouseEventSafe[PROTO], 'relatedTarget').get,
   ];
   return res;
 })();

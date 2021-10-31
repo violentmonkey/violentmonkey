@@ -2,7 +2,6 @@ import { isFunction } from '#/common';
 import { INJECT_CONTENT } from '#/common/consts';
 import bridge from './bridge';
 import { FastLookup } from './util-web';
-import { createNullObj, setOwnProp, vmOwnFunc } from '../util';
 
 /** The index strings that look exactly like integers can't be forged
  * but for example '011' doesn't look like 11 so it's allowed */

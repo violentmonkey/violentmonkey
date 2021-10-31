@@ -1,4 +1,4 @@
-import { dumpScriptValue, isEmpty } from '#/common/util';
+import { dumpScriptValue, isEmpty, isFunction } from '#/common/util';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
@@ -6,18 +6,6 @@ import { onRequestCreate } from './requests';
 import { onNotificationCreate } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
 import { jsonDump } from './util-web';
-import {
-  NS_HTML, createNullObj, getUniqIdSafe, log,
-  pickIntoThis, promiseResolve, vmOwnFunc,
-} from '../util';
-
-const {
-  TextDecoder,
-  URL: { createObjectURL, revokeObjectURL },
-} = global;
-const { decode: tdDecode } = TextDecoder[PROTO];
-const { indexOf: stringIndexOf } = '';
-let downloadChain = promiseResolve();
 
 export function makeGmApi() {
   return {
@@ -128,13 +116,13 @@ export function makeGmApi() {
         throw new ErrorSafe('Required parameter "name" is missing or not a string.');
       }
       assign(opts, {
-        context: { name, onload },
         method: 'GET',
         responseType: 'blob',
         overrideMimeType: 'application/octet-stream',
-        onload: downloadBlob,
+        // Must be present and a function to trigger downloadBlob in content bridge
+        onload: isFunction(onload) ? onload : (() => {}),
       });
-      return onRequestCreate(opts, this);
+      return onRequestCreate(opts, this, name);
     },
     GM_xmlhttpRequest(opts) {
       return onRequestCreate(opts, this);
@@ -194,12 +182,10 @@ export function makeGmApi() {
 function webAddElement(parent, tag, attrs, context) {
   let el;
   let errorInfo;
-  const cbId = getUniqIdSafe();
-  bridge.callbacks[cbId] = function _(res) {
+  bridge.syncCall('AddElement', { tag, attrs }, context, parent, function _(res) {
     el = this;
     errorInfo = res;
-  };
-  bridge.post('AddElement', { tag, attrs, cbId }, context, parent);
+  }, 'cbId');
   // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
   if (errorInfo) {
     const err = new ErrorSafe(errorInfo[0]);
@@ -222,55 +208,19 @@ function webAddElement(parent, tag, attrs, context) {
 }
 
 function getResource(context, name, isBlob) {
-  const key = context.resources[name];
+  const { id, resCache, resources } = context;
+  const key = resources[name];
   if (key) {
-    let res = isBlob && context.urls[key];
+    let res = resCache[key];
     if (!res) {
-      const raw = bridge.cache[context.pathMap[key] || key];
-      if (raw) {
-        // TODO: move into `content`
-        const dataPos = raw::stringIndexOf(',');
-        const bin = window::atobSafe(dataPos < 0 ? raw : raw::slice(dataPos + 1));
-        if (isBlob || /[\x80-\xFF]/::regexpTest(bin)) {
-          const len = bin.length;
-          const bytes = new Uint8ArraySafe(len);
-          for (let i = 0; i < len; i += 1) {
-            bytes[i] = bin::charCodeAt(i);
-          }
-          if (isBlob) {
-            const type = dataPos < 0 ? '' : raw::slice(0, dataPos);
-            res = createObjectURL(new BlobSafe([bytes], { type }));
-            context.urls[key] = res;
-          } else {
-            res = new TextDecoder()::tdDecode(bytes);
-          }
-        } else { // pure ASCII
-          res = bin;
-        }
-      } else if (isBlob) {
-        res = key;
+      bridge.syncCall('GetResource', { id, isBlob, key }, context, null, response => {
+        res = response;
+      });
+      if (res !== true && isBlob) {
+        res = createObjectURL(res);
       }
+      resCache[key] = res;
     }
-    return res;
+    return res === true ? key : res;
   }
-}
-
-function downloadBlob(res) {
-  // TODO: move into `content`
-  const { context: { name, onload }, response } = res;
-  const url = createObjectURL(response);
-  const a = document::createElementNS(NS_HTML, 'a');
-  a::setAttribute('href', url);
-  if (name) a::setAttribute('download', name);
-  downloadChain = downloadChain::then(async () => {
-    a::fire(new MouseEventSafe('click'));
-    revokeBlobAfterTimeout(url);
-    try { if (onload) onload(res); } catch (e) { log('error', ['GM_download', 'callback'], e); }
-    await bridge.send('SetTimeout', 100);
-  });
-}
-
-async function revokeBlobAfterTimeout(url) {
-  await bridge.send('SetTimeout', 3000);
-  revokeObjectURL(url);
 }

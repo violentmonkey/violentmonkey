@@ -28,16 +28,6 @@ for (const k of Object.keys(domProps)) {
 delete domProps.performance;
 Object.defineProperties(global, domProps);
 global.Response = { prototype: {} };
-
-global.URL = {
-  _cache: {},
-  createObjectURL(blob) {
-    const blobUrl = `blob:${Math.random()}`;
-    URL._cache[blobUrl] = blob;
-    return blobUrl;
-  },
-};
-
 global.__VAULT_ID__ = false;
 Object.assign(global, require('#/common/safe-globals'));
 Object.assign(global, require('#/injected/safe-globals-injected'));

@@ -1,43 +1,3 @@
-import bridge from './bridge';
-import { getOwnProp } from '../util';
-
-const { allow } = bridge;
-
-/**
- * @param {VMInjectedScript | VMScript} script
- */
-export const allowCommands = script => {
-  const { dataKey } = script;
-  allow('Run', dataKey);
-  script.meta.grant::forEach(grant => {
-    const gm = /^GM[._]/::regexpTest(grant) && grant::slice(3);
-    if (grant === 'GM_xmlhttpRequest' || grant === 'GM.xmlHttpRequest' || gm === 'download') {
-      allow('AbortRequest', dataKey);
-      allow('HttpRequest', dataKey);
-    } else if (grant === 'window.close') {
-      allow('TabClose', dataKey);
-    } else if (grant === 'window.focus') {
-      allow('TabFocus', dataKey);
-    } else if (gm === 'addElement' || gm === 'addStyle') {
-      allow('AddElement', dataKey);
-    } else if (gm === 'setValue' || gm === 'deleteValue') {
-      allow('UpdateValue', dataKey);
-    } else if (gm === 'notification') {
-      allow('Notification', dataKey);
-      allow('RemoveNotification', dataKey);
-    } else if (gm === 'openInTab') {
-      allow('TabOpen', dataKey);
-      allow('TabClose', dataKey);
-    } else if (gm === 'registerMenuCommand') {
-      allow('RegisterMenu', dataKey);
-    } else if (gm === 'setClipboard') {
-      allow('SetClipboard', dataKey);
-    } else if (gm === 'unregisterMenuCommand') {
-      allow('UnregisterMenu', dataKey);
-    }
-  });
-};
-
 /** When looking for documentElement, use '*' to also support XML pages
  * Note that we avoid spoofed prototype getters by using hasOwnProperty, and not using `length`
  * as it searches for ALL matching nodes when this tag wasn't cached internally. */
@@ -70,3 +30,37 @@ export const onElement = (tag, cb, arg) => new PromiseSafe(resolve => {
     observer.observe(document, { childList: true, subtree: true });
   }
 });
+
+export const makeElem = (tag, attrs) => {
+  const el = document::createElementNS(NS_HTML, tag);
+  if (attrs) {
+    objectKeys(attrs)::forEach(key => {
+      if (key === 'textContent') el::append(attrs[key]);
+      else el::setAttribute(key, attrs[key]);
+    });
+  }
+  return el;
+};
+
+export const getFullUrl = url => (
+  makeElem('a', { href: url })::getHref()
+);
+
+export const decodeResource = (raw, isBlob) => {
+  let res;
+  const pos = raw::stringIndexOf(',');
+  const bin = atobSafe(pos < 0 ? raw : raw::slice(pos + 1));
+  if (isBlob || /[\x80-\xFF]/::regexpTest(bin)) {
+    const len = bin.length;
+    const bytes = new Uint8ArraySafe(len);
+    for (let i = 0; i < len; i += 1) {
+      bytes[i] = bin::charCodeAt(i);
+    }
+    res = isBlob
+      ? new BlobSafe([bytes], { type: pos < 0 ? '' : raw::slice(0, pos) })
+      : new TextDecoderSafe()::tdDecode(bytes);
+  } else { // pure ASCII
+    res = bin;
+  }
+  return res;
+};

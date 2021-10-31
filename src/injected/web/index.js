@@ -6,10 +6,7 @@ import './gm-values';
 import './notifications';
 import './requests';
 import './tabs';
-import {
-  bindEvents, createNullObj, getUniqIdSafe,
-  isSameOriginWindow, log, setOwnProp, vmOwnFunc,
-} from '../util';
+import { bindEvents } from '../util';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 
@@ -78,7 +75,6 @@ bridge.addHandlers({
   },
   ScriptData({ info, items, runAt }) {
     if (info) {
-      info.cache = assign(createNullObj(), info.cache, bridge.cache);
       assign(bridge, info);
     }
     if (items) {

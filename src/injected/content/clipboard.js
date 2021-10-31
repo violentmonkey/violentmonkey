@@ -1,4 +1,3 @@
-import { log } from '../util';
 import bridge from './bridge';
 
 bridge.onScripts.push(() => {

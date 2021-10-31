@@ -2,11 +2,8 @@ import { INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser } from '#/common/c
 import { sendCmd } from '#/common';
 import { forEachKey } from '#/common/object';
 import bridge from './bridge';
-import { allowCommands, appendToRoot, onElement } from './util-content';
-import {
-  NS_HTML, bindEvents, fireBridgeEvent,
-  getUniqIdSafe, isSameOriginWindow, log,
-} from '../util';
+import { appendToRoot, onElement } from './util-content';
+import { bindEvents, fireBridgeEvent } from '../util';
 
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
 const VAULT_SEED_NAME = INIT_FUNC_NAME + process.env.VAULT_ID_NAME;
@@ -111,16 +108,19 @@ export async function injectScripts(contentId, webId, data) {
       info,
     },
   };
+  assign(bridge.cache, data.cache);
   const feedback = data.scripts.map((script) => {
     const { id } = script.props;
     // eslint-disable-next-line no-restricted-syntax
     const realm = INJECT_MAPPING[script.injectInto].find(key => realms[key]?.injectable);
     // If the script wants this specific realm, which is unavailable, we won't inject it at all
     if (realm) {
+      const { pathMap } = script.custom;
       const realmData = realms[realm];
       realmData.lists[script.runAt].push(script); // 'start' or 'body' per getScriptsByURL()
       realmData.is = true;
-      allowCommands(script);
+      if (pathMap) bridge.pathMaps[id] = pathMap;
+      bridge.allowScript(script);
     } else {
       bridge.failedIds.push(id);
     }
@@ -158,9 +158,7 @@ export async function injectScripts(contentId, webId, data) {
 }
 
 async function injectDelayedScripts(contentId, webId, { cache, scripts }, getReadyState) {
-  realms::forEachKey(r => {
-    realms[r].info.cache = cache;
-  });
+  assign(bridge.cache, cache);
   let needsInvoker;
   scripts::forEach(script => {
     const { code, runAt } = script;
@@ -182,7 +180,7 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }, getRea
   if (needsInvoker && contentId) {
     setupContentInvoker(contentId, webId);
   }
-  scripts::forEach(allowCommands);
+  scripts::forEach(bridge.allowScript);
   injectAll('end');
   injectAll('idle');
 }
@@ -216,7 +214,6 @@ function injectAll(runAt) {
     const { info } = realmData;
     if (items.length) {
       bridge.post('ScriptData', { info, items, runAt }, realm);
-      info.cache = null;
       if (realm === INJECT_PAGE && !IS_FIREFOX) {
         injectList(runAt);
       }
