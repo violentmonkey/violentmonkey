@@ -31,22 +31,35 @@ window::on(INIT_FUNC_NAME, evt => {
     frameEventWnd = evt::getRelatedTarget();
   } else {
     // setupVaultId's second event is the vaultId
-    bridge.post('Frame', evt::getDetail(), INJECT_PAGE, frameEventWnd);
+    bridge.post('WriteVault', evt::getDetail(), INJECT_PAGE, frameEventWnd);
     frameEventWnd = null;
   }
 });
 bridge.addHandlers({
-  // FF bug workaround to enable processing of sourceURL in injected page scripts
+  /**
+   * FF bug workaround to enable processing of sourceURL in injected page scripts
+   */
   InjectList: IS_FIREFOX && injectList,
-  /** @this {Node} window */
-  VaultId(vaultId) {
-    this[VAULT_SEED_NAME] = vaultId; // goes into the isolated world of the content scripts
+  /**
+   * Writes the value into the isolated world of the intercepted window
+   * @this {Node} window
+   */
+  VaultId(id) {
+    this[VAULT_SEED_NAME] = { id, parent: window };
   },
 });
 
 export function injectPageSandbox(contentId, webId) {
-  const vaultId = window[VAULT_SEED_NAME] || !IS_TOP && setupVaultId() || '';
-  delete window[VAULT_SEED_NAME];
+  let vaultId = window[VAULT_SEED_NAME];
+  if (vaultId) {
+    delete window[VAULT_SEED_NAME];
+    vaultId = tellParentToWriteVault(vaultId.parent, vaultId.id);
+  } else {
+    vaultId = !IS_TOP
+      && isSameOriginWindow(window.parent)
+      && tellParentToWriteVault(window.parent, getUniqIdSafe())
+      || '';
+  }
   inject({
     code: `(${VMInitInjection}('${vaultId}',${IS_FIREFOX}))('${webId}','${contentId}')`
       + `\n//# sourceURL=${browser.runtime.getURL('sandbox/injected-web.js')}`,
@@ -229,15 +242,10 @@ function setupContentInvoker(contentId, webId) {
   };
 }
 
-function setupVaultId() {
-  const { parent } = window;
-  // Testing for same-origin parent without throwing an exception.
-  if (isSameOriginWindow(parent)) {
-    const vaultId = getUniqIdSafe();
-    // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
-    // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
-    parent::fire(new MouseEventSafe(INIT_FUNC_NAME, { relatedTarget: window }));
-    parent::fire(new CustomEventSafe(INIT_FUNC_NAME, { detail: vaultId }));
-    return vaultId;
-  }
+function tellParentToWriteVault(parent, vaultId) {
+  // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
+  // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
+  parent::fire(new MouseEventSafe(INIT_FUNC_NAME, { relatedTarget: window }));
+  parent::fire(new CustomEventSafe(INIT_FUNC_NAME, { detail: vaultId }));
+  return vaultId;
 }

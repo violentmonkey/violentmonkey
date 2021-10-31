@@ -40,7 +40,7 @@ export default function initialize(
     bindEvents(webId, contentId, bridge);
     bridge.addHandlers({
       /** @this {Node} contentWindow */
-      Frame(id) {
+      WriteVault(id) {
         this[id] = VAULT;
       },
       Ping() {
@@ -51,7 +51,6 @@ export default function initialize(
       const wnd = openWindow::apply(this, args);
       const vaultId = wnd && isSameOriginWindow(wnd) && getUniqIdSafe();
       if (vaultId) {
-        wnd[vaultId] = VAULT;
         bridge.post('VaultId', vaultId, undefined, wnd);
       }
       return wnd;

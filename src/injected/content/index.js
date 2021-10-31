@@ -33,9 +33,9 @@ let pendingSetPopup;
     IS_FIREFOX && global.location.href,
     { retry: true });
   const isXml = document instanceof XMLDocument;
-  if (!isXml) injectPageSandbox(contentId, webId);
-  // Binding now so iframe's injectPageSandbox can call our bridge.post before `data` is received
+  // Binding now so injectPageSandbox can call our bridge.post before `data` is received
   bindEvents(contentId, webId, bridge, global.cloneInto);
+  if (!isXml) injectPageSandbox(contentId, webId);
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
   const data = IS_FIREFOX && Event[PROTO].composedPath
     ? await getDataFF(dataPromise)
