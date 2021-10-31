@@ -20,6 +20,7 @@ const INIT_FUNC_NAME = `Violentmonkey:${
   ).toString('base64')
 }`;
 const VAULT_ID = '__VAULT_ID__';
+const HANDSHAKE_ID = '__HANDSHAKE_ID__';
 // eslint-disable-next-line import/no-dynamic-require
 const VM_VER = require(`${defaultOptions.distDir}/manifest.json`).version;
 const WEBPACK_OPTS = {
@@ -84,6 +85,8 @@ const defsObj = {
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
   'process.env.VAULT_ID_NAME': JSON.stringify(VAULT_ID),
   'process.env.VAULT_ID': VAULT_ID,
+  'process.env.HANDSHAKE_ID': HANDSHAKE_ID,
+  'process.env.HANDSHAKE_ACK': '1',
 };
 const defsRe = new RegExp(`\\b(${Object.keys(defsObj).join('|').replace(/\./g, '\\.')})\\b`, 'g');
 const definitions = new webpack.DefinePlugin(defsObj);
@@ -190,7 +193,7 @@ module.exports = Promise.all([
     config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapper(config, 'injected/web', getGlobals => ({
       header: () => `${skipReinjectionHeader}
-        window['${INIT_FUNC_NAME}'] = function (${VAULT_ID}, IS_FIREFOX) {
+        window['${INIT_FUNC_NAME}'] = function (IS_FIREFOX,${HANDSHAKE_ID},${VAULT_ID}) {
           const module = { __proto__: null };
           ${getGlobals()}`,
       footer: `

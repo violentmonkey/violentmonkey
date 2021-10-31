@@ -7,7 +7,7 @@ import './notifications';
 import './requests';
 import './tabs';
 import { elemByTag } from './util-content';
-import { NS_HTML, bindEvents, createNullObj, getUniqIdSafe, promiseResolve } from '../util';
+import { NS_HTML, createNullObj, getUniqIdSafe, promiseResolve } from '../util';
 
 const { invokableIds, runningIds } = bridge;
 const menus = createNullObj();
@@ -33,8 +33,6 @@ let pendingSetPopup;
     IS_FIREFOX && global.location.href,
     { retry: true });
   const isXml = document instanceof XMLDocument;
-  // Binding now so injectPageSandbox can call our bridge.post before `data` is received
-  bindEvents(contentId, webId, bridge, global.cloneInto);
   if (!isXml) injectPageSandbox(contentId, webId);
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
   const data = IS_FIREFOX && Event[PROTO].composedPath
@@ -54,9 +52,8 @@ let pendingSetPopup;
   if (data.scripts) {
     bridge.onScripts.forEach(fn => fn());
     allow('SetTimeout', contentId);
-    allow('Pong', contentId);
     if (IS_FIREFOX) allow('InjectList', contentId);
-    await injectScripts(contentId, webId, data, isXml);
+    await injectScripts(contentId, webId, data);
   }
   allow('VaultId', contentId);
   bridge.onScripts = null;

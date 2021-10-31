@@ -23,6 +23,14 @@ export default function initialize(
   invokeHost,
 ) {
   let invokeGuest;
+  if (process.env.HANDSHAKE_ID) {
+    window::on(process.env.HANDSHAKE_ID + process.env.HANDSHAKE_ACK, e => {
+      e = e::getDetail();
+      webId = e[0];
+      contentId = e[1];
+    }, { once: true });
+    window::fire(new CustomEventSafe(process.env.HANDSHAKE_ID));
+  }
   bridge.dataKey = contentId;
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;
@@ -42,9 +50,6 @@ export default function initialize(
       /** @this {Node} contentWindow */
       WriteVault(id) {
         this[id] = VAULT;
-      },
-      Ping() {
-        bridge.post('Pong');
       },
     });
     setOwnProp(window, 'open', vmOwnFunc(function open(...args) {

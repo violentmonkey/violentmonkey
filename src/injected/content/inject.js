@@ -3,7 +3,10 @@ import { sendCmd } from '#/common';
 import { forEachKey } from '#/common/object';
 import bridge from './bridge';
 import { allowCommands, appendToRoot, onElement } from './util-content';
-import { NS_HTML, getUniqIdSafe, isSameOriginWindow, log } from '../util';
+import {
+  NS_HTML, bindEvents, fireBridgeEvent,
+  getUniqIdSafe, isSameOriginWindow, log,
+} from '../util';
 
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
 const VAULT_SEED_NAME = INIT_FUNC_NAME + process.env.VAULT_ID_NAME;
@@ -50,6 +53,19 @@ bridge.addHandlers({
 });
 
 export function injectPageSandbox(contentId, webId) {
+  const { cloneInto } = global;
+  /* A page can read our script's textContent in a same-origin iframe via DOMNodeRemoved event.
+   * Directly preventing it would require redefining ~20 DOM methods in the parent.
+   * Instead, we'll send the ids via a temporary handshakeId event, to which the web-bridge
+   * will listen only during its initial phase using vault-protected DOM methods. */
+  const handshakeId = getUniqIdSafe();
+  const handshaker = () => {
+    pageInjectable = true;
+    bindEvents(contentId, webId, bridge, cloneInto);
+    fireBridgeEvent(handshakeId + process.env.HANDSHAKE_ACK, [webId, contentId], cloneInto);
+  };
+  /* The vault contains safe methods that we got from the highest same-origin parent,
+   * where our code ran at document_start so it definitely predated the page scripts. */
   let vaultId = window[VAULT_SEED_NAME];
   if (vaultId) {
     delete window[VAULT_SEED_NAME];
@@ -60,33 +76,36 @@ export function injectPageSandbox(contentId, webId) {
       && tellParentToWriteVault(window.parent, getUniqIdSafe())
       || '';
   }
+  /* With `once` the listener is removed before DOMNodeInserted is dispatched by appendChild,
+   * otherwise a same-origin parent page could use it to spoof the handshake. */
+  window::on(handshakeId, handshaker, { capture: true, once: true });
   inject({
-    code: `(${VMInitInjection}('${vaultId}',${IS_FIREFOX}))('${webId}','${contentId}')`
+    code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
       + `\n//# sourceURL=${browser.runtime.getURL('sandbox/injected-web.js')}`,
   });
+  // Clean up in case CSP prevented the script from running
+  window::off(handshakeId, handshaker, true);
 }
 
 /**
  * @param {string} contentId
  * @param {string} webId
  * @param {VMGetInjectedData} data
- * @param {boolean} isXml
  */
-export async function injectScripts(contentId, webId, data, isXml) {
+export async function injectScripts(contentId, webId, data) {
   const { hasMore, info } = data;
-  pageInjectable = isXml ? false : null;
   realms = {
     __proto__: null,
     /** @namespace VMInjectionRealm */
     [INJECT_CONTENT]: {
-      injectable: () => true,
+      injectable: true,
       /** @namespace VMRunAtLists */
       lists: contLists = { start: [], body: [], end: [], idle: [] },
       is: 0,
       info,
     },
     [INJECT_PAGE]: {
-      injectable: () => pageInjectable ?? checkInjectable(),
+      injectable: pageInjectable,
       lists: pgLists = { start: [], body: [], end: [], idle: [] },
       is: 0,
       info,
@@ -95,7 +114,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
   const feedback = data.scripts.map((script) => {
     const { id } = script.props;
     // eslint-disable-next-line no-restricted-syntax
-    const realm = INJECT_MAPPING[script.injectInto].find(key => realms[key]?.injectable());
+    const realm = INJECT_MAPPING[script.injectInto].find(key => realms[key]?.injectable);
     // If the script wants this specific realm, which is unavailable, we won't inject it at all
     if (realm) {
       const realmData = realms[realm];
@@ -109,8 +128,8 @@ export async function injectScripts(contentId, webId, data, isXml) {
   });
   const moreData = sendCmd('InjectionFeedback', {
     feedback,
+    pageInjectable,
     feedId: data.feedId,
-    pageInjectable: pageInjectable ?? (hasMore && checkInjectable()),
   });
   // saving while safe
   const getReadyState = hasMore && describeProperty(Document[PROTO], 'readyState').get;
@@ -168,16 +187,6 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }, getRea
   injectAll('idle');
 }
 
-function checkInjectable() {
-  bridge.addHandlers({
-    Pong() {
-      pageInjectable = true;
-    },
-  }, true);
-  bridge.post('Ping');
-  return pageInjectable;
-}
-
 function inject(item) {
   const script = document::createElementNS(NS_HTML, 'script');
   // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
@@ -232,7 +241,7 @@ async function injectList(runAt) {
 }
 
 function setupContentInvoker(contentId, webId) {
-  const invokeContent = VMInitInjection('', IS_FIREFOX)(webId, contentId, bridge.onHandle);
+  const invokeContent = VMInitInjection(IS_FIREFOX)(webId, contentId, bridge.onHandle);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm, node) => {
     const fn = realm === INJECT_CONTENT
