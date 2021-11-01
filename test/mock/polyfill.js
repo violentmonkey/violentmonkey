@@ -20,14 +20,13 @@ global.browser = {
     getURL: path => path,
   },
 };
-
+if (!window.Response) window.Response = { prototype: {} };
 const domProps = Object.getOwnPropertyDescriptors(window);
 for (const k of Object.keys(domProps)) {
   if (k.endsWith('Storage') || k in global) delete domProps[k];
 }
 delete domProps.performance;
 Object.defineProperties(global, domProps);
-global.Response = { prototype: {} };
 global.__VAULT_ID__ = false;
 Object.assign(global, require('#/common/safe-globals'));
 Object.assign(global, require('#/injected/safe-globals-injected'));
