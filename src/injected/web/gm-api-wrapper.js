@@ -56,10 +56,10 @@ export function makeGmApiWrapper(script) {
     componentUtils = makeComponentUtils();
   }
   assign(gm, componentUtils);
-  if (grant::indexOf('window.close') >= 0) {
+  if (grant::indexOf(WINDOW_CLOSE) >= 0) {
     gm.close = vmOwnFunc(() => bridge.post('TabClose', 0, context));
   }
-  if (grant::indexOf('window.focus') >= 0) {
+  if (grant::indexOf(WINDOW_FOCUS) >= 0) {
     gm.focus = vmOwnFunc(() => bridge.post('TabFocus', 0, context));
   }
   if (!gmApi && grant.length) gmApi = makeGmApi();

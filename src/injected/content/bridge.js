@@ -2,6 +2,7 @@ import { isPromise, sendCmd } from '#/common';
 import { INJECT_PAGE, browser } from '#/common/consts';
 
 const allowed = createNullObj();
+const dataKeyNameMap = createNullObj();
 const handlers = createNullObj();
 const bgHandlers = createNullObj();
 const onScripts = [];
@@ -14,6 +15,34 @@ const assignHandlers = (dest, src, force) => {
 };
 const allowCmd = (cmd, dataKey) => {
   (allowed[cmd] || (allowed[cmd] = createNullObj()))[dataKey] = true;
+};
+const XHR = ['HttpRequest', 'AbortRequest'];
+const ADD_ELEMENT = ['AddElement'];
+const UPDATE_VALUE = ['UpdateValue'];
+const TAB_CLOSE = ['TabClose'];
+const GET_RESOURCE = ['GetResource'];
+const GM_CMD = {
+  __proto__: null,
+  addElement: ADD_ELEMENT,
+  addStyle: ADD_ELEMENT,
+  deleteValue: UPDATE_VALUE,
+  download: XHR,
+  getResourceText: GET_RESOURCE,
+  getResourceURL: GET_RESOURCE, // also allows the misspelled GM.getResourceURL for compatibility
+  notification: ['Notification', 'RemoveNotification'],
+  openInTab: ['TabOpen', TAB_CLOSE],
+  registerMenuCommand: ['RegisterMenu'],
+  setClipboard: ['SetClipboard'],
+  setValue: UPDATE_VALUE,
+  unregisterMenuCommand: ['UnregisterMenu'],
+};
+const GRANT_CMD = {
+  __proto__: null,
+  'GM.getResourceUrl': GET_RESOURCE,
+  'GM.xmlHttpRequest': XHR,
+  'GM_xmlhttpRequest': XHR, // eslint-disable-line quote-props
+  [WINDOW_CLOSE]: TAB_CLOSE,
+  [WINDOW_FOCUS]: ['TabFocus'],
 };
 
 const bridge = {
@@ -46,39 +75,19 @@ const bridge = {
    */
   allowScript({ dataKey, meta }) {
     allowCmd('Run', dataKey);
+    dataKeyNameMap[dataKey] = meta.name;
     meta.grant::forEach(grant => {
-      const gm = /^GM[._]/::regexpTest(grant) && grant::slice(3);
-      if (grant === 'GM_xmlhttpRequest' || grant === 'GM.xmlHttpRequest' || gm === 'download') {
-        allowCmd('AbortRequest', dataKey);
-        allowCmd('HttpRequest', dataKey);
-      } else if (grant === 'window.close') {
-        allowCmd('TabClose', dataKey);
-      } else if (grant === 'window.focus') {
-        allowCmd('TabFocus', dataKey);
-      } else if (gm === 'addElement' || gm === 'addStyle') {
-        allowCmd('AddElement', dataKey);
-      } else if (gm === 'setValue' || gm === 'deleteValue') {
-        allowCmd('UpdateValue', dataKey);
-      } else if (gm === 'notification') {
-        allowCmd('Notification', dataKey);
-        allowCmd('RemoveNotification', dataKey);
-      } else if (gm === 'openInTab') {
-        allowCmd('TabOpen', dataKey);
-        allowCmd('TabClose', dataKey);
-      } else if (gm === 'registerMenuCommand') {
-        allowCmd('RegisterMenu', dataKey);
-      } else if (gm === 'setClipboard') {
-        allowCmd('SetClipboard', dataKey);
-      } else if (gm === 'unregisterMenuCommand') {
-        allowCmd('UnregisterMenu', dataKey);
-      }
+      const cmds = GRANT_CMD[grant]
+        || /^GM[._]/::regexpTest(grant) && GM_CMD[grant::slice(3)];
+      if (cmds) cmds::forEach(cmd => allowCmd(cmd, dataKey));
     });
   },
   // realm is provided when called directly via invokeHost
   async onHandle({ cmd, data, dataKey, node }, realm) {
     const handle = handlers[cmd];
     if (!handle || !allowed[cmd]?.[dataKey]) {
-      throw new ErrorSafe(`[Violentmonkey] Invalid command: "${cmd}" on ${global.location.host}`);
+      // TODO: maybe remove this check if our VAULT is reliable
+      log('info', null, `Invalid command: "${cmd}" from "${dataKeyNameMap[dataKey] || '?'}"`);
     }
     const callbackId = data && getOwnProp(data, CALLBACK_ID);
     if (callbackId) {
