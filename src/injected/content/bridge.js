@@ -41,7 +41,7 @@ const bridge = {
     if (!handle || !allow[cmd]?.[dataKey]) {
       throw new ErrorSafe(`[Violentmonkey] Invalid command: "${cmd}" on ${global.location.host}`);
     }
-    const callbackId = data && data::getOwnProp(CALLBACK_ID);
+    const callbackId = data && getOwnProp(data, CALLBACK_ID);
     if (callbackId) {
       data = data.data;
     }
