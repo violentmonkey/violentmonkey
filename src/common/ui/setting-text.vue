@@ -1,6 +1,7 @@
 <template>
   <div>
     <textarea
+      ref="text"
       class="monospace-font"
       :class="{'has-error': parsedData.error}"
       spellcheck="false"
@@ -109,7 +110,20 @@ export default {
       this.$emit('save');
     },
     onReset() {
-      options.set(this.name, this.defaultValue);
+      const el = this.$refs.text;
+      /* Focusing to allow quick Ctrl-Z to undo.
+       * Focusing also prevents layout shift when `reset` button auto-hides. */
+      el.focus();
+      if (!this.hasSave) {
+        // No save button = something rather trivial e.g. the export file name
+        options.set(this.name, this.defaultValue);
+      } else {
+        // Save button exists = let the user undo the input
+        el.select();
+        if (!document.execCommand('insertText', false, this.placeholder)) {
+          this.value = this.placeholder;
+        }
+      }
     },
   },
 };
