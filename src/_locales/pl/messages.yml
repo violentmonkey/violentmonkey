@@ -715,7 +715,7 @@ optionEditorWindowSimple:
   message: Ukryj omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: Menu podręczne i ikona
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Najpierw włączone
