@@ -107,14 +107,18 @@ const toList = text => (
 let savedSettings;
 
 let shouldSavePositionOnSave;
-const savePosition = () => {
+/** @param {chrome.windows.Window} [wnd] */
+const savePosition = async wnd => {
   if (options.get('editorWindow')) {
-    options.set('editorWindowPos', {
-      left: window.screenX,
-      top: window.screenY,
-      width: window.outerWidth,
-      height: window.outerHeight,
-    });
+    if (!wnd) wnd = await browser.windows.getCurrent();
+    /* chrome.windows API can't set both the state and coords, so we have to choose:
+     * either we save the min/max state and lose the coords on restore,
+     * or we lose the min/max state and save the normal coords.
+     * Let's assume those who use a window prefer it at a certain position most of the time,
+     * and occasionally minimize/maximize it, but wouldn't want to save the state. */
+    if (wnd.state === 'normal') {
+      options.set('editorWindowPos', objectPick(wnd, ['left', 'top', 'width', 'height']));
+    }
   }
 };
 /** @param {chrome.windows.Window} _ */
@@ -124,7 +128,7 @@ const setupSavePosition = ({ id: curWndId, tabs }) => {
     if (onBoundsChanged) {
       // triggered on moving/resizing, Chrome 86+
       onBoundsChanged.addListener(wnd => {
-        if (wnd.id === curWndId) savePosition();
+        if (wnd.id === curWndId) savePosition(wnd);
       });
     } else {
       // triggered on resizing only
