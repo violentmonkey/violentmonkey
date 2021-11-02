@@ -27,7 +27,9 @@ envs.RELEASE_NOTE = beta ? `\
 **This is a beta release of Violentmonkey (also in [WebStore](\
 https://chrome.google.com/webstore/detail/violentmonkey-beta/opokoaglpekkimldnlggpoagmjegichg\
 )), use it at your own risk.**<br>\
-If you already use Violentmonkey, click \`Export to zip\` in settings before installing the beta.<br>\
+If you already use Violentmonkey, click \`Export to zip\` in settings before installing the beta.
+
+Notable changes:
 
 ${listCommits()}
 ` : `\
@@ -44,7 +46,7 @@ function listCommits() {
   const prevTag = exec(`git describe --abbrev=0 --tags "${thisTag}^"`);
   return exec(`git log --oneline --skip=1 --reverse "${prevTag}...${thisTag}"`)
   .split('\n')
-  .map((str, i) => `${str.split(/\s/, 2)[1]}${10000 + i}\n${str}`)
+  .map((str, i) => `${str.split(/\s/, 2)[1]}${10000 + i}\n* ${str}`)
   .sort()
   .map(str => str.split('\n')[1])
   .join('\n');
