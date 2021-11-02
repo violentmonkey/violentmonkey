@@ -2,29 +2,28 @@
   <div class="edit-values" ref="container">
     <div class="mb-1">
       <button @click="onNew">+</button>
-      <tooltip :content="i18n('editValueAllHint')" align="left">
-        <button @click="onEditAll" v-text="i18n('editValueAll')"/>
-      </tooltip>
       <div class="inline-block ml-2" v-if="totalPages > 1">
         <button :disabled="page === 1" @click="page -= 1">&larr;</button>
         <span class="ml-1" v-text="page"/> / <span class="mr-1" v-text="totalPages"/>
         <button :disabled="page >= totalPages" @click="page += 1">&rarr;</button>
       </div>
       <span class="ml-2 mr-2c">
-        <template v-if="totalPages > 1">
-          <span><kbd>PageUp</kbd>: ←</span>
-          <span><kbd>PageDown</kbd>: →</span>
-        </template>
-        <span><kbd>Tab</kbd>: ↓</span>
-        <span><kbd>Shift-Tab</kbd>: ↑</span>
-        <span><kbd>Enter</kbd>: {{i18n('buttonEdit')}}</span>
+        <span>
+          <template v-if="totalPages > 1">
+            <kbd>PageUp</kbd>, <kbd>PageDown</kbd>,
+          </template>
+          <kbd>↑</kbd>, <kbd>↓</kbd>, <kbd>Tab</kbd>, <kbd>Shift-Tab</kbd>,
+        </span>
+        <span><kbd>Enter</kbd>: {{i18n('buttonEdit')}},</span>
         <span><kbd>Ctrl-Del</kbd>: {{i18n('buttonRemove')}}</span>
       </span>
     </div>
-    <div class="edit-values-table" v-if="keys">
-      <div class="edit-values-empty" v-if="!keys.length">
-        <div v-text="i18n('noValues')"></div>
-      </div>
+    <div class="edit-values-table" v-if="keys"
+         @keydown.down.exact="onUpDown"
+         @keydown.up.exact="onUpDown">
+      <a
+        class="edit-values-row flex"
+        @click="onEditAll" tabindex="0" v-text="i18n('editValueAllHint')"/>
       <a
         v-for="key in pageKeys"
         :key="key"
@@ -42,6 +41,7 @@
         <pre v-text="getLength(key)"/>
       </a>
     </div>
+    <div class="edit-values-empty mt-1" v-if="!keys.length" v-text="i18n('noValues')"/>
     <div class="edit-values-panel flex flex-col mb-1c" v-if="current">
       <div class="control">
         <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
@@ -62,6 +62,7 @@
       </label>
       <label>
         <span v-text="current.isAll ? i18n('valueLabelValueAll') : i18n('valueLabelValue')"/>
+        <!-- TODO: use CodeMirror in json mode -->
         <textarea v-model="current.value"
                   ref="value"
                   spellcheck="false"
@@ -73,8 +74,7 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { dumpScriptValue, formatByteLength, sendCmdDirectly } from '#/common';
+import { dumpScriptValue, formatByteLength, isEmpty, sendCmdDirectly } from '#/common';
 import { keyboardService } from '#/common/keyboard';
 import { mapEntry } from '#/common/object';
 import Icon from '#/common/ui/icon';
@@ -98,16 +98,14 @@ const reparseJson = (str) => {
 };
 const getActiveElement = () => document.activeElement;
 const flipPage = (vm, dir) => {
-  if (getActiveElement()?.selectionEnd == null) {
-    vm.page = Math.max(1, Math.min(vm.totalPages, vm.page + dir));
-  }
+  vm.page = Math.max(1, Math.min(vm.totalPages, vm.page + dir));
 };
+const conditionNotEdit = { condition: '!edit' };
 
 export default {
   props: ['active', 'script'],
   components: {
     Icon,
-    Tooltip,
   },
   data() {
     return {
@@ -126,18 +124,25 @@ export default {
       return this.keys?.slice(offset, offset + PAGE_SIZE);
     },
   },
+  mounted() {
+    this.$refs.container.addEventListener('focusin', evt => {
+      keyboardService.setContext('edit', 'selectionEnd' in evt.target);
+    });
+  },
   watch: {
     active(val) {
       if (val) {
         storage.value.getOne(this.script.props.id).then(data => {
-          // Focusing explicitly when the values UI becomes active again
-          if (this.page) this.autofocus();
           this.setData(data);
+          if (!isEmpty(data)) {
+            this.onEditAll();
+          }
+          this.autofocus();
         });
         scriptStorageKey = storage.value.prefix + this.script?.props.id;
         this.disposeList = [
-          keyboardService.register('pageup', () => flipPage(this, -1)),
-          keyboardService.register('pagedown', () => flipPage(this, 1)),
+          keyboardService.register('pageup', () => flipPage(this, -1), conditionNotEdit),
+          keyboardService.register('pagedown', () => flipPage(this, 1), conditionNotEdit),
         ];
       } else {
         this.disposeList?.forEach(dispose => dispose());
@@ -308,6 +313,9 @@ export default {
         store.storageSize = 0;
       }
     },
+    onUpDown(evt) {
+      evt.target[`${evt.key === 'ArrowUp' ? 'previous' : 'next'}Sibling`]?.focus();
+    },
   },
 };
 </script>
@@ -317,7 +325,9 @@ export default {
   &-row {
     border: 1px solid var(--fill-2);
     color: unset;
-    cursor: pointer;
+    &:first-child {
+      padding: 8px 6px;
+    }
     &:not(:first-child) {
       border-top: 0;
     }

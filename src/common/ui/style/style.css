@@ -225,6 +225,10 @@ span:focus,
 a:focus {
   text-decoration: underline;
 }
+a[tabindex="0"] {
+  cursor: pointer;
+  color: inherit;
+}
 
 .sep {
   &::after {
