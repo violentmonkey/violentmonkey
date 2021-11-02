@@ -29,13 +29,15 @@ bridge.addHandlers({
 
 bridge.addBackgroundHandlers({
   async HttpRequested(msg) {
-    const { id } = msg;
+    const { id, chunk } = msg;
     const req = requests[id];
     if (!req) return;
-    const { chunk } = msg;
     if (chunk) {
       receiveChunk(req, chunk);
       return;
+    }
+    if ((msg.numChunks || 1) === 1) {
+      req.gotChunks = true;
     }
     const { blobbed, data, chunked, type } = msg;
     const isLoadEnd = type === 'loadend';
@@ -55,14 +57,11 @@ bridge.addBackgroundHandlers({
       req.bin = await req.bin;
     }
     // If the user in incognito supplied only `onloadend` then it arrives first, followed by chunks
+    // If the user supplied any event before `loadend`, all chunks finish before `loadend` arrives
     if (isLoadEnd) {
       // loadend's bridge.post() should run last
       await 0;
       req.gotLoadEnd = true;
-    }
-    // If the user supplied any event before `loadend`, all chunks finish before `loadend` arrives
-    if ((msg.numChunks || 0) <= 1) {
-      req.gotChunks = true;
     }
     if (importing) {
       data.response = req.bin;
@@ -108,31 +107,33 @@ async function revokeBlobAfterTimeout(url) {
 /** ArrayBuffer/Blob in Chrome incognito is transferred in string chunks */
 function receiveAllChunks(req, msg) {
   req::pickIntoThis(msg, ['dataSize', 'contentType']);
-  req.chunks = [msg.data.response];
-  return msg.numChunks > 1
+  req.arr = new Uint8ArraySafe(req.dataSize);
+  processChunk(req, msg.data.response, 0);
+  return !req.gotChunks
     ? new PromiseSafe(resolve => { req.resolve = resolve; })
-    : decodeChunks(req);
+    : finishChunks(req);
 }
 
-function receiveChunk(req, { data, i, last }) {
-  setOwnProp(req.chunks, i, data);
+function receiveChunk(req, { data, pos, last }) {
+  processChunk(req, data, pos);
   if (last) {
     req.gotChunks = true;
-    req.resolve(decodeChunks(req));
+    req.resolve(finishChunks(req));
     delete req.resolve;
   }
 }
 
-function decodeChunks(req) {
-  const arr = new Uint8ArraySafe(req.dataSize);
-  let dstIndex = 0;
-  req.chunks::forEach(chunk => {
-    chunk = atobSafe(chunk);
-    for (let len = chunk.length, i = 0; i < len; i += 1, dstIndex += 1) {
-      arr[dstIndex] = chunk::charCodeAt(i);
-    }
-  });
-  delete req.chunks;
+function processChunk(req, data, pos) {
+  const { arr } = req;
+  data = atobSafe(data);
+  for (let len = data.length, i = 0; i < len; i += 1, pos += 1) {
+    arr[pos] = data::charCodeAt(i);
+  }
+}
+
+function finishChunks(req) {
+  const { arr } = req;
+  delete req.arr;
   return req.wantsBlob
     ? new BlobSafe([arr], { type: req.contentType })
     : arr.buffer;

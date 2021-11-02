@@ -193,7 +193,9 @@ const HeaderInjector = (() => {
   };
 })();
 
-const CHUNK_SIZE = 64e6 / 4;
+/* 1MB takes ~20ms to encode/decode so it doesn't block the process of the extension and web page,
+ * which lets us and them be responsive to other events or user input. */
+const CHUNK_SIZE = 1e6;
 
 async function blob2chunk(response, index) {
   return blob2base64(response, index * CHUNK_SIZE, CHUNK_SIZE);
@@ -274,7 +276,7 @@ function xhrCallbackWrapper(req) {
           await req.cb({
             id,
             chunk: {
-              i,
+              pos: i * CHUNK_SIZE,
               data: await getChunk(response, i),
               last: i + 1 === numChunks,
             },
