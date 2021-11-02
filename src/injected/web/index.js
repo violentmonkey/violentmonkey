@@ -103,7 +103,7 @@ function createScriptData(item) {
   if (window[dataKey]) { // executeScript ran before GetInjected response
     onCodeSet(item, window[dataKey]);
   } else {
-    defineProperty(window, dataKey, {
+    safeDefineProperty(window, dataKey, {
       configurable: true,
       set: fn => onCodeSet(item, fn),
     });

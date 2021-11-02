@@ -134,15 +134,17 @@ const boundMethods = {
 
 for (const name in unforgeables) { /* proto is null */// eslint-disable-line guard-for-in
   let thisObj;
-  const info = (
+  let info = (
     describeProperty(thisObj = global, name)
     || describeProperty(thisObj = window, name)
   );
+  let fn;
   if (info) {
+    info = assign(createNullObj(), info);
     // currently only `document` and `window`
-    if (info.get) info.get = info.get::bind(thisObj);
+    if ((fn = info.get)) info.get = fn::bind(thisObj);
     // currently only `location`
-    if (info.set) info.set = info.set::bind(thisObj);
+    if ((fn = info.set)) info.set = fn::bind(thisObj);
     unforgeables[name] = info;
   } else {
     delete unforgeables[name];
@@ -164,12 +166,12 @@ export function makeGlobalWrapper(local) {
   /* Browsers may return [object Object] for Object.prototype.toString(window)
      on our `window` proxy so jQuery libs see it as a plain object and throw
      when trying to clone its recursive properties like `self` and `window`. */
-  defineProperty(local, toStringTag, { get: () => 'Window' });
+  safeDefineProperty(local, toStringTag, { get: () => 'Window' });
   const wrapper = new ProxySafe(local, {
     defineProperty(_, name, desc) {
       const isString = typeof name === 'string';
       if (!isFrameIndex(name, isString)) {
-        defineProperty(local, name, desc);
+        safeDefineProperty(local, name, desc);
         if (isString) setEventHandler(name);
         delete readonlys[name];
       }
@@ -196,14 +198,14 @@ export function makeGlobalWrapper(local) {
       const ownDesc = describeProperty(local, name);
       const desc = ownDesc || globals.has(name) && describeProperty(global, name);
       if (!desc) return;
-      if (desc.value === window) {
+      if (getOwnProp(desc, 'value') === window) {
         desc.value = wrapper;
       }
       // preventing spec violation - we must mirror an unknown unforgeable prop
-      if (!ownDesc && !desc.configurable) {
-        const { get } = desc;
+      if (!ownDesc && !getOwnProp(desc, 'configurable')) {
+        const get = getOwnProp(desc, 'get');
         if (get) desc.get = get::bind(global);
-        defineProperty(local, name, desc);
+        safeDefineProperty(local, name, desc);
       }
       return desc;
     },
@@ -231,6 +233,7 @@ export function makeGlobalWrapper(local) {
       delete desc.set;
       desc.value = wrapper;
     }
+    /* proto is already null */// eslint-disable-next-line no-restricted-syntax
     defineProperty(local, name, desc);
   }
   return wrapper;

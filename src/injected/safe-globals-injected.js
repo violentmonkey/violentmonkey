@@ -30,6 +30,7 @@ export const getOwnProp = (obj, key) => (
  * its length or from an unassigned `hole`. */
 export const setOwnProp = (obj, key, value) => (
   defineProperty(obj, key, {
+    __proto__: null,
     value,
     configurable: true,
     enumerable: true,
@@ -45,7 +46,10 @@ export const createNullObj = () => ({ __proto__: null });
 export const promiseResolve = () => (async () => {})();
 
 export const vmOwnFunc = (func, toString) => (
-  defineProperty(func, 'toString', { value: toString || vmOwnFuncToString })
+  defineProperty(func, 'toString', {
+    __proto__: null,
+    value: toString || vmOwnFuncToString,
+  })
 );
 
 /** @param {Window} wnd */
@@ -80,3 +84,12 @@ export function pickIntoThis(obj, keys) {
   }
   return this;
 }
+
+/**
+ * Object.defineProperty seems to be inherently broken: it reads inherited props from desc
+ * (even though the purpose of this API is to define own props) and then complains when it finds
+ * invalid props like an inherited setter when you only provide `{value}`.
+ */
+export const safeDefineProperty = (obj, key, desc) => (
+  defineProperty(obj, key, assign(createNullObj(), desc))
+);

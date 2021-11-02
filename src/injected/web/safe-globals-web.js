@@ -1,5 +1,5 @@
-/* eslint-disable camelcase, one-var, one-var-declaration-per-line, no-unused-vars,
-   prefer-const, import/no-mutable-exports */
+/* eslint-disable one-var, one-var-declaration-per-line, no-unused-vars,
+   prefer-const, import/no-mutable-exports, no-restricted-syntax */
 
 /**
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.

@@ -63,9 +63,10 @@ function callback(req, msg) {
       req.raw = response;
     }
     defineProperty(data, 'response', {
+      __proto__: null,
       get() {
         const value = 'raw' in req ? parseData(req, msg) : req.response;
-        defineProperty(this, 'response', { value });
+        defineProperty(this, 'response', { value, __proto__: null });
         return value;
       },
     });

@@ -196,7 +196,7 @@ function webAddElement(parent, tag, attrs, context) {
      but we keep it for compatibility with GM_addStyle in VM of 2017-2019
      https://github.com/violentmonkey/violentmonkey/issues/217
      as well as for GM_addElement in Tampermonkey. */
-  defineProperty(el, 'then', {
+  safeDefineProperty(el, 'then', {
     configurable: true,
     value(callback) {
       // prevent infinite resolve loop
