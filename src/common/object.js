@@ -1,12 +1,3 @@
-// SAFETY WARNING! Exports used by `injected` must make ::safe() calls
-
-const {
-  entries: objectEntries,
-  keys: objectKeys,
-  values: objectValues,
-} = Object;
-const { forEach, reduce } = [];
-
 export function normalizeKeys(key) {
   if (key == null) return [];
   if (Array.isArray(key)) return key;
@@ -51,7 +42,7 @@ export function objectSet(obj, rawKey, val) {
  * @returns {{}}
  */
 export function objectPick(obj, keys, transform) {
-  return keys::reduce((res, key) => {
+  return keys.reduce((res, key) => {
     let value = obj?.[key];
     if (transform) value = transform(value, key);
     if (value != null) res[key] = value;
@@ -61,7 +52,7 @@ export function objectPick(obj, keys, transform) {
 
 // invoked as obj::mapEntry(([key, value], i, allEntries) => transformedValue)
 export function mapEntry(func) {
-  return objectEntries(this)::reduce((res, entry, i, allEntries) => {
+  return Object.entries(this).reduce((res, entry, i, allEntries) => {
     res[entry[0]] = func(entry, i, allEntries);
     return res;
   }, {});
@@ -69,17 +60,17 @@ export function mapEntry(func) {
 
 // invoked as obj::forEachEntry(([key, value], i, allEntries) => {})
 export function forEachEntry(func) {
-  if (this) objectEntries(this)::forEach(func);
+  if (this) Object.entries(this).forEach(func);
 }
 
 // invoked as obj::forEachKey(key => {}, i, allKeys)
 export function forEachKey(func) {
-  if (this) objectKeys(this)::forEach(func);
+  if (this) Object.keys(this).forEach(func);
 }
 
 // invoked as obj::forEachValue(value => {}, i, allValues)
 export function forEachValue(func) {
-  if (this) objectValues(this)::forEach(func);
+  if (this) Object.values(this).forEach(func);
 }
 
 // Needed for Firefox's browser.storage API which fails on Vue observables

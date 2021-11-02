@@ -1,4 +1,3 @@
-import { isFunction } from '#/common';
 import bridge from './bridge';
 
 const idMap = createNullObj();
@@ -66,7 +65,7 @@ function callback(req, msg) {
       __proto__: null,
       get() {
         const value = 'raw' in req ? parseData(req, msg) : req.response;
-        defineProperty(this, 'response', { value, __proto__: null });
+        defineProperty(this, 'response', { __proto__: null, value });
         return value;
       },
     });

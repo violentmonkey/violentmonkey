@@ -1,4 +1,4 @@
-import { INJECT_CONTENT } from '#/common/consts';
+import { INJECT_CONTENT } from '../util';
 import bridge from './bridge';
 
 // Firefox defines `isFinite` on `global` not on `window`

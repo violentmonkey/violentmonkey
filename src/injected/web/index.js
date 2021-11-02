@@ -1,4 +1,3 @@
-import { INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
 import bridge from './bridge';
 import store from './store';
 import { makeGmApiWrapper } from './gm-api-wrapper';
@@ -6,7 +5,7 @@ import './gm-values';
 import './notifications';
 import './requests';
 import './tabs';
-import { bindEvents } from '../util';
+import { bindEvents, INJECT_PAGE, INJECT_CONTENT } from '../util';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 

@@ -1,4 +1,3 @@
-import { forEachEntry } from '#/common/object';
 import bridge from './bridge';
 import store from './store';
 
@@ -15,11 +14,10 @@ const dataDecoders = {
 bridge.addHandlers({
   UpdatedValues(updates) {
     const { partial } = updates;
-    updates::forEachEntry(entry => {
-      const id = entry[0];
-      const update = entry[1];
+    objectKeys(updates)::forEach(id => {
       const oldData = store.values[id];
       if (oldData) {
+        const update = updates[id];
         const keyHooks = changeHooks[id];
         if (keyHooks) changedRemotely(keyHooks, oldData, update);
         if (partial) applyPartialUpdate(oldData, update);
@@ -54,20 +52,18 @@ export function decodeValue(raw) {
 }
 
 function applyPartialUpdate(data, update) {
-  update::forEachEntry(entry => {
-    const key = entry[0];
-    const val = entry[1];
+  objectKeys(update)::forEach(key => {
+    const val = update[key];
     if (val) data[key] = val;
     else delete data[key];
   });
 }
 
 function changedRemotely(keyHooks, data, update) {
-  update::forEachEntry(entry => {
-    const key = entry[0];
+  objectKeys(update)::forEach(key => {
     const hooks = keyHooks[key];
     if (hooks) {
-      let raw = entry[1];
+      let raw = update[key];
       if (!raw) raw = undefined; // partial `update` currently uses null for deleted values
       const oldRaw = data[key];
       if (oldRaw !== raw) {

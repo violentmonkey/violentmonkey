@@ -1,4 +1,4 @@
-// SAFETY WARNING! Exports used by `injected` must make ::safe() calls
+// SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
 import { browser } from '#/common/consts';
 import { deepCopy } from './object';
@@ -30,6 +30,7 @@ export function initHooks() {
 }
 
 /**
+ * Used by `injected`
  * @param {string} cmd
  * @param data
  * @param {{retry?: boolean, ignoreError?: boolean}} [options]
@@ -83,6 +84,7 @@ export function sendTabCmd(tabId, cmd, data, options) {
   return browser.tabs.sendMessage(tabId, { cmd, data }, options).catch(noop);
 }
 
+// Used by `injected`
 // ignoreError is always `true` when sending from the background script because it's a broadcast
 export function sendMessage(payload, { retry, ignoreError } = {}) {
   if (retry) return sendMessageRetry(payload);
@@ -94,6 +96,7 @@ export function sendMessage(payload, { retry, ignoreError } = {}) {
 }
 
 /**
+ * Used by `injected`
  * The active tab page and its [content] scripts load before the extension's
  * persistent background script when Chrome starts with a URL via command line
  * or when configured to restore the session, https://crbug.com/314686

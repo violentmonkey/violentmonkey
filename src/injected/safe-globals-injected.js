@@ -4,6 +4,7 @@
  * This file is used by both `injected` and `injected-web` entries.
  * `global` is used instead of WebPack's polyfill which we disable in webpack.conf.js.
  * `export` is stripped in the final output and is only used for our NodeJS test scripts.
+ * WARNING! Don't use exported functions from #/common anywhere in injected!
  */
 
 const global = (function _() {
@@ -18,6 +19,10 @@ export const WINDOW_CLOSE = 'window.close';
 export const WINDOW_FOCUS = 'window.focus';
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 export const CALLBACK_ID = '__CBID';
+
+export const isPromise = val => val::objectToString() === '[object Promise]';
+
+export const isFunction = val => typeof val === 'function';
 
 export const getOwnProp = (obj, key) => (
   obj::hasOwnProperty(key)

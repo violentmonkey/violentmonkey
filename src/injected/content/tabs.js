@@ -1,4 +1,4 @@
-import { sendCmd } from '#/common';
+import { sendCmd } from '../util';
 import bridge from './bridge';
 
 const tabIds = createNullObj();

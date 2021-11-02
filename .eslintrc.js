@@ -6,13 +6,11 @@ const FILES_CONTENT = [
   'src/injected/content/**/*.js',
 ];
 const FILES_WEB = [`src/injected/web/**/*.js`];
-  // some functions are used by `injected`
+/* Note that `injected` uses several more `common` files indirectly, but we check just these
+ * two automatically because they are trivial by design and must always pass the check */
 const FILES_SHARED = [
   'src/common/browser.js',
   'src/common/consts.js',
-  'src/common/index.js',
-  'src/common/object.js',
-  'src/common/util.js',
 ];
 
 const GLOBALS_COMMON = getGlobals('src/common/safe-globals.js');
@@ -66,6 +64,9 @@ module.exports = {
   }, {
     files: [...FILES_INJECTED, ...FILES_SHARED],
     rules: {
+      'no-restricted-imports': ['error', {
+        patterns: ['*/common', '*/common/*'],
+      }],
       /* Our .browserslistrc targets old browsers so the compiled code for {...objSpread} uses
          babel's polyfill that calls methods like `Object.assign` instead of our safe `assign`.
          Ideally, `eslint-plugin-compat` should be used but I couldn't make it work. */
@@ -82,6 +83,16 @@ module.exports = {
       }, {
         selector: ':matches(ArrayExpression, CallExpression) > SpreadElement',
         message: 'Spreading via Symbol.iterator may be spoofed/broken in an unsafe environment',
+      }, {
+        selector: '[callee.object.name="Object"], MemberExpression[object.name="Object"]',
+        message: 'Using potentially spoofed methods in an unsafe environment',
+        // TODO: auto-generate the rule using GLOBALS
+      }, {
+        selector: `CallExpression[callee.name="defineProperty"]:not(${[
+          '[arguments.2.properties.0.key.name="__proto__"]',
+          ':has(CallExpression[callee.name="createNullObj"])'
+        ].join(',')})`,
+        message: 'Prototype of descriptor may be spoofed/broken in an unsafe environment',
       }],
     },
   }, {

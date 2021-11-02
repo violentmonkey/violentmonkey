@@ -1,9 +1,6 @@
-// SAFETY WARNING! Exports used by `injected` must make ::safe() calls
+// SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
 import { browser } from '#/common/consts';
-
-export const isPromise = val => val::objectToString() === '[object Promise]';
-export const isFunction = val => typeof val === 'function';
 
 export function i18n(name, args) {
   return browser.i18n.getMessage(name, args) || name;
@@ -195,6 +192,7 @@ export const formatByteLength = len => (
     || `${+(len / (1024 * 1024)).toFixed(1)} M` // allow fractions for megabytes
 );
 
+// Used by `injected`
 export function isEmpty(obj) {
   for (const key in obj) {
     if (obj::hasOwnProperty(key)) {
@@ -305,6 +303,7 @@ export async function request(url, options = {}) {
   return result;
 }
 
+// Used by `injected`
 const SIMPLE_VALUE_TYPE = {
   __proto__: null,
   string: 's',
@@ -312,6 +311,7 @@ const SIMPLE_VALUE_TYPE = {
   boolean: 'b',
 };
 
+// Used by `injected`
 export function dumpScriptValue(value, jsonDump = JSON.stringify) {
   if (value !== undefined) {
     const simple = SIMPLE_VALUE_TYPE[typeof value];

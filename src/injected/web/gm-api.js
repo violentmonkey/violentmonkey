@@ -1,4 +1,4 @@
-import { dumpScriptValue, isEmpty, isFunction } from '#/common/util';
+import { dumpScriptValue, isEmpty } from '../util';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';

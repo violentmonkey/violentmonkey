@@ -1,5 +1,4 @@
-import { isPromise, sendCmd } from '#/common';
-import { INJECT_PAGE, browser } from '#/common/consts';
+import { INJECT_PAGE, browser, sendCmd } from '../util';
 
 const allowed = createNullObj();
 const dataKeyNameMap = createNullObj();

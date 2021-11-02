@@ -1,5 +1,4 @@
-import { isEmpty, sendCmd } from '#/common';
-import { INJECT_CONTENT } from '#/common/consts';
+import { isEmpty, sendCmd, INJECT_CONTENT } from '../util';
 import bridge from './bridge';
 import './clipboard';
 import { sendSetPopup } from './gm-api-content';

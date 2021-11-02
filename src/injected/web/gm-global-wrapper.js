@@ -1,5 +1,4 @@
-import { isFunction } from '#/common';
-import { INJECT_CONTENT } from '#/common/consts';
+import { INJECT_CONTENT } from '../util';
 import bridge from './bridge';
 import { FastLookup } from './util-web';
 

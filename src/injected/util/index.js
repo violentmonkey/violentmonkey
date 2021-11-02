@@ -1,3 +1,17 @@
+/* eslint-disable no-restricted-imports */
+
+/* WARNING!
+ * Make sure all re-exported functions survive in a spoofed/broken environment:
+ * use only ::safe() globals that are initialized in a corresponding safe-globals* file,
+ * use __proto__:null or get/set own props explicitly. */
+
+export {
+  dumpScriptValue,
+  isEmpty,
+  sendCmd,
+} from '#/common';
+export * from '#/common/consts';
+
 export const fireBridgeEvent = (eventId, msg, cloneInto) => {
   const detail = cloneInto ? cloneInto(msg, document) : msg;
   const evtMain = new CustomEventSafe(eventId, { detail });

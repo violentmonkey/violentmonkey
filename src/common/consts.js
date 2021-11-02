@@ -1,4 +1,4 @@
-// SAFETY WARNING! Exports used by `injected` must make ::safe() calls
+// SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
 export const INJECT_AUTO = 'auto';
 export const INJECT_PAGE = 'page';

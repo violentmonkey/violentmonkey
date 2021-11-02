@@ -1,4 +1,4 @@
-import { isPromise, sendCmd } from '#/common';
+import { sendCmd } from '../util';
 import bridge from './bridge';
 import { getFullUrl, makeElem } from './util-content';
 

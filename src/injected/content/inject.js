@@ -1,9 +1,9 @@
-import { INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser } from '#/common/consts';
-import { sendCmd } from '#/common';
-import { forEachKey } from '#/common/object';
 import bridge from './bridge';
 import { appendToRoot, onElement } from './util-content';
-import { bindEvents, fireBridgeEvent } from '../util';
+import {
+  bindEvents, fireBridgeEvent,
+  INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser, sendCmd,
+} from '../util';
 
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
 const VAULT_SEED_NAME = INIT_FUNC_NAME + process.env.VAULT_ID_NAME;
@@ -209,7 +209,7 @@ function inject(item) {
 }
 
 function injectAll(runAt) {
-  realms::forEachKey((realm) => {
+  for (const realm in realms) { /* proto is null */// eslint-disable-line guard-for-in
     const realmData = realms[realm];
     const items = realmData.lists[runAt];
     const { info } = realmData;
@@ -219,7 +219,7 @@ function injectAll(runAt) {
         injectList(runAt);
       }
     }
-  });
+  }
   if (runAt !== 'start' && contLists[runAt].length) {
     bridge.post('RunAt', runAt, INJECT_CONTENT);
   }
