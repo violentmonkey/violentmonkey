@@ -318,6 +318,8 @@ export default {
         this.nav = 'code';
       } else {
         this.$emit('close');
+        // FF doesn't emit `blur` when CodeMirror's textarea is removed
+        if (IS_FIREFOX) document.activeElement?.blur();
       }
     },
     saveClose() {

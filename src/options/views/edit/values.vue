@@ -41,7 +41,7 @@
         <pre v-text="getLength(key)"/>
       </a>
     </div>
-    <div class="edit-values-empty mt-1" v-if="!keys.length" v-text="i18n('noValues')"/>
+    <div class="edit-values-empty mt-1" v-if="keys && !keys.length" v-text="i18n('noValues')"/>
     <div class="edit-values-panel flex flex-col mb-1c" v-if="current">
       <div class="control">
         <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
