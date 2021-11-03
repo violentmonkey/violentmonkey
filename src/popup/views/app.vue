@@ -92,7 +92,7 @@
             class="menu-item menu-area"
             :tabIndex="tabIndex"
             :data-message="item.name"
-            @focus="focusedId = item.id"
+            @focus="focusedItem = item"
             @click="onToggleScript(item)">
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
@@ -101,7 +101,7 @@
                  @contextmenu.exact.stop="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
-          <div class="submenu-buttons" v-show="activeExtras === item || focusedId === item.id">
+          <div class="submenu-buttons" v-show="activeExtras === item || focusedItem === item">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
             <div class="submenu-button" :tabIndex="tabIndex" @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
@@ -234,7 +234,7 @@ export default {
       activeMenu: 'scripts',
       activeExtras: null,
       message: null,
-      focusedId: null,
+      focusedItem: null,
       name: NAME,
     };
   },
@@ -510,6 +510,11 @@ export default {
       }),
       keyboardService.register('right', () => {
         this.navigate('r');
+      }, {
+        condition: '!inputFocus',
+      }),
+      keyboardService.register('e', () => {
+        this.onEditScript(this.focusedItem);
       }, {
         condition: '!inputFocus',
       }),

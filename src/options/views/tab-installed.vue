@@ -229,7 +229,7 @@ const conditionScriptFocused = `${conditionNotSearch} && selectedScript && !show
 const conditionScriptFocusedRecycle = `${conditionNotSearch} && selectedScript && showRecycle`;
 const conditionHotkeys = `${conditionNotSearch} && selectedScript && showHotkeys`;
 const scriptHotkeys = {
-  edit: 'e',
+  edit: 'e,Enter',
   toggle: 'space',
   update: 'r',
   restore: 'r',
@@ -238,6 +238,11 @@ const scriptHotkeys = {
 const registerHotkey = (callback, items) => items.map(([key, condition, caseSensitive]) => (
   keyboardService.register(key, callback, { condition, caseSensitive })
 ));
+const explodeKeys = (multi, ...args) => (
+  multi
+  .split(/\s*,\s*/)
+  .map(key => [key, ...args])
+);
 
 export default {
   components: {
@@ -582,11 +587,6 @@ export default {
         ['enter', conditionSearch],
       ]),
       ...registerHotkey(() => {
-        if (this.selectedScript) this.showHotkeys = !this.showHotkeys;
-      }, [
-        ['enter', `${conditionAll} && scriptFocus`],
-      ]),
-      ...registerHotkey(() => {
         this.showHotkeys = false;
       }, [
         ['escape', conditionHotkeys],
@@ -642,9 +642,7 @@ export default {
       ]),
       ...registerHotkey(() => {
         this.handleActionEdit(this.selectedScript);
-      }, [
-        [scriptHotkeys.edit, conditionScriptFocused, true],
-      ]),
+      }, explodeKeys(scriptHotkeys.edit, conditionScriptFocused, true)),
       ...registerHotkey(() => {
         this.handleActionRemove(this.selectedScript);
       }, [

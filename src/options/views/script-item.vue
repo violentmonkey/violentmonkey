@@ -402,8 +402,10 @@ $removedItemHeight: calc(
     }
     .disabled &,
     .removed & {
-      filter: grayscale(.8);
-      opacity: .5;
+      img {
+        filter: grayscale(.8);
+        opacity: .5;
+      }
     }
     .removed & {
       width: $iconSizeSmaller;
@@ -445,7 +447,7 @@ $removedItemHeight: calc(
     color: #333;
     border: 1px solid #880;
     border-radius: .2em;
-    font-size: .8rem;
+    font: .8rem monospace; // monospace usually provides differentiation between l and I, 0 and O
     line-height: 1;
   }
 }
