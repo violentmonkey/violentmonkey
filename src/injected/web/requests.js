@@ -94,7 +94,7 @@ async function start(req, context, fileName) {
     fileName,
     data: data == null && []
       // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
-      || (opts.binary || typeof data !== 'object') && [`${data}`]
+      || (opts.binary || !isObject(data)) && [`${data}`]
       // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
       || IS_FIREFOX && bridge.ua.browserVersion >= 56 && [data]
       // TODO: support huge data by splitting it to multiple messages

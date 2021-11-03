@@ -95,7 +95,7 @@ const bridge = {
     let res = handle === true
       ? sendCmd(cmd, data)
       : node::handle(data, realm || INJECT_PAGE);
-    if (res && isPromise(res)) {
+    if (isPromise(res)) {
       res = await res;
     }
     if (callbackId) {

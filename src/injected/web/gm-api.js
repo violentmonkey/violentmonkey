@@ -46,8 +46,8 @@ export function makeGmApi() {
      * @returns {String} listenerId
      */
     GM_addValueChangeListener(key, fn) {
-      if (typeof key !== 'string') key = `${key}`;
-      if (typeof fn !== 'function') return;
+      if (!isString(key)) key = `${key}`;
+      if (!isFunction(fn)) return;
       const keyHooks = changeHooks[this.id] || (changeHooks[this.id] = createNullObj());
       const hooks = keyHooks[key] || (keyHooks[key] = createNullObj());
       const i = objectValues(hooks)::indexOf(fn);
@@ -97,7 +97,7 @@ export function makeGmApi() {
       // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
       const opts = createNullObj();
       let onload;
-      if (typeof arg1 === 'string') {
+      if (isString(arg1)) {
         opts.url = arg1;
         opts.name = name;
       } else if (arg1) {
@@ -112,7 +112,7 @@ export function makeGmApi() {
           'ontimeout',
         ]);
       }
-      if (!name || typeof name !== 'string') {
+      if (!name || !isString(name)) {
         throw new ErrorSafe('Required parameter "name" is missing or not a string.');
       }
       assign(opts, {
@@ -135,7 +135,7 @@ export function makeGmApi() {
      * @returns {HTMLElement} it also has .then() so it should be compatible with TM
      */
     GM_addElement(parent, tag, attributes) {
-      return typeof parent === 'string'
+      return isString(parent)
         ? webAddElement(null, parent, tag, this)
         : webAddElement(parent, tag, attributes, this);
     },
@@ -149,14 +149,14 @@ export function makeGmApi() {
     },
     GM_openInTab(url, options) {
       return onTabCreate(
-        options && typeof options === 'object'
+        isObject(options)
           ? assign(createNullObj(), options, { url })
           : { active: !options, url },
         this,
       );
     },
     GM_notification(text, title, image, onclick) {
-      const options = typeof text === 'object' ? text : {
+      const options = isObject(text) ? text : {
         __proto__: null,
         text,
         title,

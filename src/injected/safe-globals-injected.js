@@ -20,9 +20,10 @@ export const WINDOW_FOCUS = 'window.focus';
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 export const CALLBACK_ID = '__CBID';
 
-export const isPromise = val => val::objectToString() === '[object Promise]';
-
 export const isFunction = val => typeof val === 'function';
+export const isObject = val => val !== null && typeof val === 'object';
+export const isPromise = val => val && val::objectToString() === '[object Promise]';
+export const isString = val => typeof val === 'string';
 
 export const getOwnProp = (obj, key) => (
   obj::hasOwnProperty(key)

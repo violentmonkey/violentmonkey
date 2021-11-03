@@ -10,7 +10,7 @@ const { toString: numberToString } = 0;
  */
 const isArray = obj => obj
   && typeof obj.length === 'number'
-  && typeof obj.splice === 'function';
+  && isFunction(obj.splice);
 // Reference: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON#Polyfill
 const escMap = {
   '"': '\\"',

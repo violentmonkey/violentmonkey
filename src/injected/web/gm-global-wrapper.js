@@ -4,8 +4,7 @@ import { FastLookup } from './util-web';
 
 /** The index strings that look exactly like integers can't be forged
  * but for example '011' doesn't look like 11 so it's allowed */
-const isFrameIndex = (key, isString) => isString
-  && key >= 0 && key <= 0xFFFF_FFFE && key === `${+key}`;
+const isFrameIndex = key => key >= 0 && key <= 0xFFFF_FFFE && key === `${+key}`;
 
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
@@ -14,7 +13,7 @@ const globalKeys = (function makeGlobalKeys() {
   // True if `names` is usable as is, but FF is bugged: its names have duplicates
   let ok = !IS_FIREFOX;
   names::forEach(key => {
-    if (isFrameIndex(key, true)) {
+    if (isFrameIndex(key)) {
       ok = false;
     } else {
       globalKeysSet.add(key);
@@ -24,7 +23,7 @@ const globalKeys = (function makeGlobalKeys() {
      FF content mode: `global` is different, some props e.g. `isFinite` are defined only there */
   if (global !== window) {
     getOwnPropertyNames(global)::forEach(key => {
-      if (!isFrameIndex(key, true)) {
+      if (!isFrameIndex(key)) {
         globalKeysSet.add(key);
         ok = false;
       }
@@ -167,11 +166,12 @@ export function makeGlobalWrapper(local) {
      when trying to clone its recursive properties like `self` and `window`. */
   safeDefineProperty(local, toStringTag, { get: () => 'Window' });
   const wrapper = new ProxySafe(local, {
+    __proto__: null,
     defineProperty(_, name, desc) {
-      const isString = typeof name === 'string';
-      if (!isFrameIndex(name, isString)) {
+      const isStr = isString(name);
+      if (!isStr || !isFrameIndex(name)) {
         safeDefineProperty(local, name, desc);
-        if (isString) setEventHandler(name);
+        if (isStr) setEventHandler(name);
         delete readonlys[name];
       }
       return true;
@@ -212,15 +212,15 @@ export function makeGlobalWrapper(local) {
     ownKeys: () => makeOwnKeys(local, globals),
     preventExtensions() {},
     set(_, name, value) {
-      const isString = typeof name === 'string';
+      const isStr = isString(name);
       let readonly = readonlys[name];
       if (readonly === 1) {
         readonly = globals.has(name) ? 2 : 0;
         readonlys[name] = readonly;
       }
-      if (!readonly && !isFrameIndex(name, isString)) {
+      if (!readonly && (!isStr || !isFrameIndex(name))) {
         local[name] = value;
-        if (isString) setEventHandler(name, value, globals, events);
+        if (isStr) setEventHandler(name, value, globals, events);
       }
       return true;
     },
@@ -268,15 +268,14 @@ function resolveProp(name, wrapper, globals, local) {
     boundMethods[name] = value;
   }
   const canCopy = value || name in inheritedKeys || globals.has(name);
-  if (!value && (canCopy || isFrameIndex(name, typeof name === 'string'))) {
+  if (!value && (canCopy || isString(name) && isFrameIndex(name))) {
     value = global[name];
   }
   if (value === window) {
     value = wrapper;
   }
   if (canCopy && (
-    isFunction(value)
-    || typeof value === 'object' && value && name !== 'event'
+    isFunction(value) || isObject(value) && name !== 'event'
     // window.event contains the current event so it's always different
   )) {
     local[name] = value;
