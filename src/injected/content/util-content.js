@@ -33,7 +33,9 @@ export const onElement = (tag, cb, arg) => new PromiseSafe(resolve => {
 
 export const makeElem = (tag, attrs) => {
   const el = document::createElementNS(NS_HTML, tag);
-  if (attrs) {
+  if (attrs && isString(attrs)) {
+    el::append(attrs);
+  } else if (attrs) {
     objectKeys(attrs)::forEach(key => {
       if (key === 'textContent') el::append(attrs[key]);
       else el::setAttribute(key, attrs[key]);

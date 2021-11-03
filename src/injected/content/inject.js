@@ -1,5 +1,5 @@
 import bridge from './bridge';
-import { appendToRoot, onElement } from './util-content';
+import { appendToRoot, makeElem, onElement } from './util-content';
 import {
   bindEvents, fireBridgeEvent,
   INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser, sendCmd,
@@ -14,6 +14,8 @@ let realms;
 /** @type boolean */
 let pageInjectable;
 let frameEventWnd;
+let elShadow;
+let elShadowRoot;
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
@@ -187,7 +189,8 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }, getRea
 }
 
 function inject(item) {
-  const script = document::createElementNS(NS_HTML, 'script');
+  const realScript = makeElem('script', item.code);
+  let script = realScript;
   // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
   let onError;
   if (IS_FIREFOX) {
@@ -200,11 +203,20 @@ function inject(item) {
     };
     window::on('error', onError);
   }
-  // using a safe call to an existing method so we don't have to extract textContent setter
-  script::append(item.code);
+  // Hiding the script's code from mutation events like DOMNodeInserted or DOMNodeRemoved
+  if (attachShadow) {
+    if (!elShadow) {
+      elShadow = makeElem('div');
+      elShadowRoot = elShadow::attachShadow({ mode: 'closed' });
+      elShadowRoot::appendChild(makeElem('style', ':host { display: none !important }'));
+    }
+    elShadowRoot::appendChild(realScript);
+    script = elShadow;
+  }
   // When using declarativeContent there's no documentElement so we'll append to `document`
   if (!appendToRoot(script)) document::appendChild(script);
   if (onError) window::off('error', onError);
+  if (attachShadow) realScript::remove();
   script::remove();
 }
 

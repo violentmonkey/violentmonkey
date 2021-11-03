@@ -27,7 +27,7 @@ export const { forEach, includes, push } = [];
 export const { createElementNS, getElementsByTagName } = document;
 export const { then } = Promise[PROTO];
 export const { charCodeAt, indexOf: stringIndexOf, slice } = '';
-export const { append, appendChild, remove, setAttribute } = Element[PROTO];
+export const { append, appendChild, attachShadow, remove, setAttribute } = Element[PROTO];
 export const {
   assign,
   defineProperty,
