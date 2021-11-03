@@ -1,4 +1,3 @@
-import { isEmpty, sendCmd, INJECT_CONTENT } from '../util';
 import bridge from './bridge';
 import './clipboard';
 import { sendSetPopup } from './gm-api-content';
@@ -6,6 +5,8 @@ import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
+import { sendCmd } from './util-content';
+import { isEmpty, INJECT_CONTENT } from '../util';
 
 const { invokableIds, runningIds } = bridge;
 const resolvedPromise = promiseResolve();

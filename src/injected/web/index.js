@@ -33,7 +33,10 @@ export default function initialize(
     bridge.post = (cmd, data, context, node) => {
       invokeHost({ cmd, data, node, dataKey: (context || bridge).dataKey }, INJECT_CONTENT);
     };
-    invokeGuest = (cmd, data, realm, node) => bridge.onHandle({ cmd, data, node });
+    invokeGuest = (cmd, data, realm, node) => {
+      if (process.env.DEBUG) console.info('[bridge.guest.content] received', { cmd, data, node });
+      bridge.onHandle({ cmd, data, node });
+    };
     global.chrome = undefined;
     global.browser = undefined;
     bridge.addHandlers({

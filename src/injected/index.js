@@ -1,5 +1,5 @@
 import '#/common/browser'; // eslint-disable-line no-restricted-imports
-import { sendCmd } from './util';
+import { sendCmd } from '#/common'; // eslint-disable-line no-restricted-imports
 import './content';
 
 // Script installation in Firefox as it does not support `onBeforeRequest` for `file:`

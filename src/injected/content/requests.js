@@ -1,6 +1,5 @@
-import { sendCmd } from '../util';
 import bridge from './bridge';
-import { getFullUrl, makeElem } from './util-content';
+import { getFullUrl, makeElem, sendCmd } from './util-content';
 
 const {
   fetch: fetchSafe,

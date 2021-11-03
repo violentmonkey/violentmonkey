@@ -1,6 +1,5 @@
-import { sendCmd } from '../util';
 import bridge from './bridge';
-import { decodeResource, elemByTag, makeElem } from './util-content';
+import { decodeResource, elemByTag, makeElem, sendCmd } from './util-content';
 
 const menus = createNullObj();
 let setPopupThrottle;

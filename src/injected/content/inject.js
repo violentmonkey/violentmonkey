@@ -1,8 +1,8 @@
 import bridge from './bridge';
-import { appendToRoot, makeElem, onElement } from './util-content';
+import { appendToRoot, makeElem, onElement, sendCmd } from './util-content';
 import {
   bindEvents, fireBridgeEvent,
-  INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser, sendCmd,
+  INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser,
 } from '../util';
 
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;

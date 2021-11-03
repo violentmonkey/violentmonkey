@@ -8,7 +8,6 @@
 export {
   dumpScriptValue,
   isEmpty,
-  sendCmd,
 } from '#/common';
 export * from '#/common/consts';
 
@@ -23,6 +22,10 @@ export const bindEvents = (srcId, destId, bridge, cloneInto) => {
    * whereas MouseEvent (and some others) can't transfer objects without stringification. */
   let incomingNodeEvent;
   window::on(srcId, e => {
+    if (process.env.DEBUG) {
+      console.info(`[bridge.${bridge.ids ? 'host' : 'guest.web'}] received`,
+        incomingNodeEvent ? e::getRelatedTarget() : e::getDetail());
+    }
     if (!incomingNodeEvent) {
       // CustomEvent is the main message
       const data = e::getDetail();

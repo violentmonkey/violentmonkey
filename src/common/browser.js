@@ -154,8 +154,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
   const { runtime } = global.browser;
   const { sendMessage, onMessage } = runtime;
   const log = (type, args, id, isResponse) => console.info(
-    `%c${type}Message#%d${isResponse ? ' response' : ''}`,
-    isResponse ? '' : 'color:yellow',
+    `${type}Message#%d${isResponse ? ' response' : ''}`,
     id,
     ...args,
   );
