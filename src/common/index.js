@@ -58,8 +58,6 @@ const COMMANDS_WITH_SRC = [
   'SetPopup',
 */
 ];
-// Used in safe context
-// eslint-disable-next-line no-restricted-syntax
 const getBgPage = () => browser.extension.getBackgroundPage?.();
 
 /**
@@ -85,11 +83,11 @@ export function sendTabCmd(tabId, cmd, data, options) {
 }
 
 // Used by `injected`
-// ignoreError is always `true` when sending from the background script because it's a broadcast
-export function sendMessage(payload, { retry, ignoreError } = {}) {
+export function sendMessage(payload, { retry } = {}) {
   if (retry) return sendMessageRetry(payload);
   let promise = browser.runtime.sendMessage(payload);
-  if (ignoreError || window === getBgPage()) {
+  // Ignoring errors when sending from the background script because it's a broadcast
+  if (!process.env.IS_INJECTED && window === getBgPage()) {
     promise = promise.catch(noop);
   }
   return promise;

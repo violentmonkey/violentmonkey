@@ -45,8 +45,7 @@ bridge.addHandlers({
 
   RegisterMenu({ id, cap }) {
     if (IS_TOP) {
-      const commandMap = menus[id] || (menus[id] = createNullObj());
-      commandMap[cap] = 1;
+      ensureNestedProp(menus, id, cap, 1);
       sendSetPopup(true);
     }
   },

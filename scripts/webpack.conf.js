@@ -81,8 +81,6 @@ const defsObj = {
   'process.env.HANDSHAKE_ID': HANDSHAKE_ID,
   'process.env.HANDSHAKE_ACK': '1',
 };
-const definitions = new webpack.DefinePlugin(defsObj);
-
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
 const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
@@ -90,7 +88,11 @@ const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
 const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
     Object.assign(config, WEBPACK_OPTS);
-    config.plugins.push(definitions);
+    config.plugins.push(new webpack.DefinePlugin({
+      ...defsObj,
+      // Conditional compilation to remove unsafe and unused stuff from `injected`
+      'process.env.IS_INJECTED': JSON.stringify(/injected/.test(page) && page),
+    }));
     config.optimization.minimizer.find((m, i, arr) => (
       m.constructor.name === 'TerserPlugin' && arr.splice(i, 1)
     ));

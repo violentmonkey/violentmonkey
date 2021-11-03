@@ -49,6 +49,16 @@ export const vmOwnFuncToString = () => '[Violentmonkey property]';
 /** Using __proto__ because Object.create(null) may be spoofed */
 export const createNullObj = () => ({ __proto__: null });
 
+export const ensureNestedProp = (obj, bucketId, key, defaultValue) => {
+  const bucket = obj[bucketId] || (
+    obj[bucketId] = createNullObj()
+  );
+  const val = bucket[key] ?? (
+    bucket[key] = (defaultValue ?? createNullObj())
+  );
+  return val;
+};
+
 export const promiseResolve = () => (async () => {})();
 
 export const vmOwnFunc = (func, toString) => (
@@ -76,6 +86,7 @@ export const log = (level, ...args) => {
 
 /**
  * Picks into `this`
+ * WARNING! `this` must use __proto__:null or already have own properties on the picked keys.
  * @param {Object} obj
  * @param {string[]} keys
  * @returns {Object} same object as `this`

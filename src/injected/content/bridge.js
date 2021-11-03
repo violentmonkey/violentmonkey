@@ -13,7 +13,7 @@ const assignHandlers = (dest, src, force) => {
   }
 };
 const allowCmd = (cmd, dataKey) => {
-  (allowed[cmd] || (allowed[cmd] = createNullObj()))[dataKey] = true;
+  ensureNestedProp(allowed, cmd, dataKey, true);
 };
 const XHR = ['HttpRequest', 'AbortRequest'];
 const ADD_ELEMENT = ['AddElement'];

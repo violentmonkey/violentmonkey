@@ -48,8 +48,7 @@ export function makeGmApi() {
     GM_addValueChangeListener(key, fn) {
       if (!isString(key)) key = `${key}`;
       if (!isFunction(fn)) return;
-      const keyHooks = changeHooks[this.id] || (changeHooks[this.id] = createNullObj());
-      const hooks = keyHooks[key] || (keyHooks[key] = createNullObj());
+      const hooks = ensureNestedProp(changeHooks, this.id, key);
       const i = objectValues(hooks)::indexOf(fn);
       let listenerId = i >= 0 && objectKeys(hooks)[i];
       if (!listenerId) {
