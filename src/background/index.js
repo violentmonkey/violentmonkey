@@ -41,7 +41,7 @@ Object.assign(commands, {
     return data;
   },
   /** @return {Promise<Object>} */
-  async GetInjected(url, src) {
+  async GetInjected({ url, forceContent }, src) {
     const { frameId, tab } = src;
     const tabId = tab.id;
     if (!url) url = src.url || tab.url;
@@ -49,7 +49,8 @@ Object.assign(commands, {
       resetValueOpener(tabId);
       clearRequestsByTabId(tabId);
     }
-    const { feedback, inject, valOpIds } = await getInjectedScripts(url, tabId, frameId);
+    const res = await getInjectedScripts(url, tabId, frameId, forceContent);
+    const { feedback, inject, valOpIds } = res;
     inject.isPopupShown = popupTabs[tabId];
     // Injecting known content scripts without waiting for InjectionFeedback message.
     // Running in a separate task because it may take a long time to serialize data.

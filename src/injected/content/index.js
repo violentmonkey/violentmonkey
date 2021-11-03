@@ -18,16 +18,17 @@ let bfCacheWired;
 (async () => {
   const contentId = getUniqIdSafe();
   const webId = getUniqIdSafe();
-  // injecting right now before site scripts can mangle globals or intercept our contentId
-  // except for XML documents as their appearance breaks, but first we're sending
-  // a request for the data because injectPageSandbox takes ~5ms
-  const dataPromise = sendCmd('GetInjected',
+  const dataPromise = sendCmd('GetInjected', {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
-    IS_FIREFOX && global.location.href,
-    { retry: true });
-  const isXml = document instanceof XMLDocument;
-  if (!isXml) injectPageSandbox(contentId, webId);
+    url: IS_FIREFOX && global.location.href,
+    // XML document's appearance breaks when script elements are added
+    forceContent: document instanceof XMLDocument
+    /* Don't autorun `page` mode userscripts when the extension was installed/updated in Firefox
+     * since sites can spoof JS environment and easily impersonate a userscript in `page` mode. */
+      || IS_FIREFOX && !isDocumentLoading()
+      || !injectPageSandbox(contentId, webId),
+  }, { retry: true });
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
   const data = IS_FIREFOX && Event[PROTO].composedPath
     ? await getDataFF(dataPromise)

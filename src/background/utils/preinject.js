@@ -3,7 +3,7 @@ import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECTABLE_TAB_URL_RE, METABLOCK_RE,
 } from '#/common/consts';
 import initCache from '#/common/cache';
-import { forEachEntry, objectSet } from '#/common/object';
+import { forEachEntry, objectPick, objectSet } from '#/common/object';
 import storage from '#/common/storage';
 import ua from '#/common/ua';
 import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_VALUE_IDS } from './db';
@@ -41,7 +41,7 @@ postInitialize.push(() => {
 });
 
 Object.assign(commands, {
-  async InjectionFeedback({ feedId, feedback, pageInjectable }, src) {
+  async InjectionFeedback({ feedId, feedback, forceContent }, src) {
     feedback.forEach(processFeedback, src);
     if (feedId) {
       // cache cleanup when getDataFF outruns GetInjected
@@ -49,13 +49,9 @@ Object.assign(commands, {
       // envDelayed
       const env = await cache.pop(feedId.envKey);
       if (env) {
-        const { scripts } = env;
-        env.forceContent = !pageInjectable;
-        scripts.map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
-        return {
-          cache: env.cache,
-          scripts,
-        };
+        env.forceContent = forceContent;
+        env.scripts.map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
+        return objectPick(env, ['cache', 'scripts']);
       }
     }
   },
@@ -128,9 +124,9 @@ function onOptionChanged(changes) {
 }
 
 /** @return {Promise<Object>} */
-export function getInjectedScripts(url, tabId, frameId) {
+export function getInjectedScripts(url, tabId, frameId, forceContent) {
   const key = getKey(url, !frameId);
-  return cache.pop(key) || prepare(key, url, tabId, frameId, true);
+  return cache.pop(key) || prepare(key, url, tabId, frameId, forceContent);
 }
 
 function getKey(url, isTop) {
@@ -165,7 +161,7 @@ function onHeadersReceived(info) {
   cache.hit(getKey(info.url, !info.frameId), TIME_AFTER_RECEIVE);
 }
 
-function prepare(key, url, tabId, frameId, isLate) {
+function prepare(key, url, tabId, frameId, forceContent) {
   const res = {
     /** @namespace VMGetInjectedData */
     inject: {
@@ -175,13 +171,15 @@ function prepare(key, url, tabId, frameId, isLate) {
     },
   };
   return isApplied
-    ? prepareScripts(res, key, url, tabId, frameId, isLate)
+    ? prepareScripts(res, key, url, tabId, frameId, forceContent)
     : res;
 }
 
-async function prepareScripts(res, cacheKey, url, tabId, frameId, isLate) {
+async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) {
   const data = await getScriptsByURL(url, !frameId);
   const { envDelayed, scripts } = data;
+  const isLate = forceContent != null;
+  data.forceContent = forceContent;
   const feedback = scripts.map(prepareScript, data).filter(Boolean);
   const more = envDelayed.promise;
   const envKey = getUniqId(`${tabId}:${frameId}:`);

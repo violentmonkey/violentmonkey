@@ -10,8 +10,9 @@ import { bindEvents, INJECT_PAGE, INJECT_CONTENT } from '../util';
 // Make sure to call safe::methods() in code that may run after userscripts
 
 const sendSetTimeout = () => bridge.send('SetTimeout', 0);
-const resolvers = createNullObj();
-const waiters = createNullObj();
+// Waiting for injection of content mode scripts that don't run on document-start
+let resolvers;
+let waiters;
 
 export default function initialize(
   webId,
@@ -29,6 +30,8 @@ export default function initialize(
   }
   bridge.dataKey = contentId;
   if (invokeHost) {
+    resolvers = createNullObj();
+    waiters = createNullObj();
     bridge.mode = INJECT_CONTENT;
     bridge.post = (cmd, data, context, node) => {
       invokeHost({ cmd, data, node, dataKey: (context || bridge).dataKey }, INJECT_CONTENT);
@@ -80,8 +83,9 @@ bridge.addHandlers({
       assign(bridge, info);
     }
     if (items) {
-      const { stage } = items[0];
-      if (stage) waiters[stage] = new PromiseSafe(resolve => { resolvers[stage] = resolve; });
+      if (waiters && runAt !== 'start') {
+        waiters[runAt] = new PromiseSafe(resolve => { resolvers[runAt] = resolve; });
+      }
       items::forEach(createScriptData);
       // FF bug workaround to enable processing of sourceURL in injected page scripts
       if (IS_FIREFOX && bridge.mode === INJECT_PAGE) {
@@ -124,7 +128,7 @@ async function onCodeSet(item, fn) {
     makeGmApiWrapper(item)::fn(logging.error);
   };
   const el = document::getCurrentScript();
-  const wait = waiters[stage];
+  const wait = waiters?.[stage];
   if (el) el::remove();
   if (wait) {
     waiters[stage] = (stage === 'idle' ? wait::then(sendSetTimeout) : wait)::then(run);

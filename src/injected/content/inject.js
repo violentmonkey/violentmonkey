@@ -85,6 +85,7 @@ export function injectPageSandbox(contentId, webId) {
   });
   // Clean up in case CSP prevented the script from running
   window::off(handshakeId, handshaker, true);
+  return pageInjectable;
 }
 
 /**
@@ -131,11 +132,10 @@ export async function injectScripts(contentId, webId, data) {
   });
   const moreData = sendCmd('InjectionFeedback', {
     feedback,
-    pageInjectable,
     feedId: data.feedId,
+    forceContent: !pageInjectable,
   });
   // saving while safe
-  const getReadyState = hasMore && describeProperty(Document[PROTO], 'readyState').get;
   const hasInvoker = realms[INJECT_CONTENT].is;
   if (hasInvoker) {
     setupContentInvoker(contentId, webId);
@@ -148,7 +148,7 @@ export async function injectScripts(contentId, webId, data) {
     // document-end, -idle
     if (hasMore) {
       data = await moreData;
-      if (data) await injectDelayedScripts(!hasInvoker && contentId, webId, data, getReadyState);
+      if (data) await injectDelayedScripts(!hasInvoker && contentId, webId, data);
     }
     if (onBody) {
       await onBody;
@@ -160,18 +160,19 @@ export async function injectScripts(contentId, webId, data) {
   VMInitInjection = null; // release for GC
 }
 
-async function injectDelayedScripts(contentId, webId, { cache, scripts }, getReadyState) {
+async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
   assign(bridge.cache, cache);
   let needsInvoker;
   scripts::forEach(script => {
     const { code, runAt } = script;
-    if (code && !pageInjectable) {
-      bridge.failedIds::push(script.props.id);
+    if (!code) {
+      needsInvoker = true;
+      contLists[runAt]::push(script);
+    } else if (pageInjectable) {
+      pgLists[runAt]::push(script);
     } else {
-      (code ? pgLists : contLists)[runAt]::push(script);
-      if (!code) needsInvoker = true;
+      bridge.failedIds::push(script.props.id);
     }
-    script.stage = !code && runAt;
   });
   if (document::getReadyState() === 'loading') {
     await new PromiseSafe(resolve => {
@@ -179,6 +180,7 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }, getRea
        * by listening on `window` which follows `document` when the event bubbles up. */
       window::on('DOMContentLoaded', resolve, { once: true });
     });
+    await 0; // let the site's listeners on `window` run first
   }
   if (needsInvoker && contentId) {
     setupContentInvoker(contentId, webId);

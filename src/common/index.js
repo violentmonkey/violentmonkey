@@ -106,7 +106,9 @@ export async function sendMessageRetry(payload, retries = 10) {
       const data = await sendMessage(payload);
       if (data) return data;
     } catch (e) {
-      if (!e.isRuntime) throw e;
+      if (!`${e}`.includes('Could not establish connection.')) {
+        throw e;
+      }
     }
     await makePause(pauseDuration);
     pauseDuration *= 2;
