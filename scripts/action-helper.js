@@ -4,6 +4,7 @@ const { getVersion, isBeta } = require('./version-helper');
 
 const version = getVersion();
 const beta = isBeta();
+const ci = core.getInput('type') === 'ci';
 
 const envs = {
   VERSION: version,
@@ -18,12 +19,13 @@ const envs = {
   PRERELEASE: !!beta,
   TEMP_DIR: 'tmp',
   ASSETS_DIR: 'dist-assets',
+  GIT_DESCRIBE: ci && exec('git describe --abbrev=7'),
 };
 
 envs.ASSET_ZIP = `${envs.RELEASE_PREFIX}-webext-v${envs.VERSION}.zip`;
 envs.ASSET_SELF_HOSTED_ZIP = `${envs.RELEASE_PREFIX}-webext-ffself-v${envs.VERSION}.zip`;
 
-envs.RELEASE_NOTE = beta ? `\
+envs.RELEASE_NOTE = beta && !ci ? `\
 **This is a beta release of Violentmonkey (also in [WebStore](\
 https://chrome.google.com/webstore/detail/violentmonkey-beta/opokoaglpekkimldnlggpoagmjegichg\
 )), use it at your own risk.**<br>\
@@ -41,7 +43,6 @@ Object.entries(envs).forEach(([key, value]) => {
 });
 
 function listCommits() {
-  const exec = cmd => childProcess.execSync(cmd, {encoding: 'utf8'}).trim();
   const thisTag = exec('git describe --abbrev=0 --tags');
   const prevTag = exec(`git describe --abbrev=0 --tags "${thisTag}^"`);
   return exec(`git log --oneline --skip=1 --reverse "${prevTag}...${thisTag}"`)
@@ -50,4 +51,8 @@ function listCommits() {
   .sort()
   .map(str => str.split('\n')[1])
   .join('\n');
+}
+
+function exec(cmd) {
+  return childProcess.execSync(cmd, { encoding: 'utf8' }).trim();
 }

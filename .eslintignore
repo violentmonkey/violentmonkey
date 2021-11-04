@@ -1,6 +1,7 @@
 **/*.js
 !src/**
 !test/**
+!scripts/action-helper.js
 !scripts/fake-dep-loader.js
 !scripts/manifest-helper.js
 !scripts/plaid.conf.js
