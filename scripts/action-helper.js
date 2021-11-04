@@ -4,7 +4,7 @@ const { getVersion, isBeta } = require('./version-helper');
 
 const version = getVersion();
 const beta = isBeta();
-const ci = core.getInput('type') === 'ci';
+const ci = process.argv.includes('ci');
 
 const envs = {
   VERSION: version,

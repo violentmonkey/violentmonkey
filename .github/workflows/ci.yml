@@ -29,9 +29,7 @@ jobs:
         run: yarn && yarn build
 
       - name: Get version and SHA
-        run: node scripts/action-helper.js
-        with:
-          type: ci
+        run: node scripts/action-helper.js ci
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         continue-on-error: true
