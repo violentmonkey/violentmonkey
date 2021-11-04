@@ -19,7 +19,8 @@ const envs = {
   PRERELEASE: !!beta,
   TEMP_DIR: 'tmp',
   ASSETS_DIR: 'dist-assets',
-  GIT_DESCRIBE: ci && exec('git describe --abbrev=7'),
+  GIT_DESCRIBE: ci && exec('git describe --abbrev=7')
+    || `v${version}-${exec('git rev-parse HEAD').slice(0, 7)}`,
 };
 
 envs.ASSET_ZIP = `${envs.RELEASE_PREFIX}-webext-v${envs.VERSION}.zip`;
@@ -54,5 +55,9 @@ function listCommits() {
 }
 
 function exec(cmd) {
-  return childProcess.execSync(cmd, { encoding: 'utf8' }).trim();
+  try {
+    return childProcess.execSync(cmd, { encoding: 'utf8' }).trim();
+  } catch (e) {
+    // ignore
+  }
 }
