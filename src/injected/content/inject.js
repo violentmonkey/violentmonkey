@@ -5,8 +5,14 @@ import {
   INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser,
 } from '../util';
 
+/* In FF, content scripts running in a same-origin frame cannot directly call parent's functions
+ * so we'll use the extension's UUID, which is unique per computer in FF, for messages
+ * like VAULT_WRITER to avoid interception by sites that can add listeners for all of our
+ * INIT_FUNC_NAME ids even though we change it now with each release. */
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
-const VAULT_SEED_NAME = INIT_FUNC_NAME + process.env.VAULT_ID_NAME;
+const VM_UUID = browser.runtime.getURL('');
+const VAULT_SEED_NAME = `${VM_UUID}VS`;
+const VAULT_WRITER = `${VM_UUID}VW`;
 let contLists;
 let pgLists;
 /** @type {Object<string,VMInjectionRealm>} */
@@ -28,16 +34,25 @@ defineProperty(window, INIT_FUNC_NAME, {
   enumerable: false,
   writable: false,
 });
-window::on(INIT_FUNC_NAME, evt => {
-  if (!frameEventWnd) {
-    // setupVaultId's first event is the frame's contentWindow
-    frameEventWnd = evt::getRelatedTarget();
-  } else {
-    // setupVaultId's second event is the vaultId
-    bridge.post('WriteVault', evt::getDetail(), INJECT_PAGE, frameEventWnd);
-    frameEventWnd = null;
-  }
-});
+if (IS_FIREFOX) {
+  window::on(VAULT_WRITER, evt => {
+    evt::stopImmediatePropagation();
+    if (!frameEventWnd) {
+      // setupVaultId's first event is the frame's contentWindow
+      frameEventWnd = evt::getRelatedTarget();
+    } else {
+      // setupVaultId's second event is the vaultId
+      tellBridgeToWriteVault(evt::getDetail(), frameEventWnd);
+      frameEventWnd = null;
+    }
+  }, true);
+} else {
+  safeDefineProperty(global, VAULT_WRITER, {
+    configurable: false,
+    value: tellBridgeToWriteVault,
+  });
+}
+
 bridge.addHandlers({
   /**
    * FF bug workaround to enable processing of sourceURL in injected page scripts
@@ -81,7 +96,7 @@ export function injectPageSandbox(contentId, webId) {
   window::on(handshakeId, handshaker, { capture: true, once: true });
   inject({
     code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
-      + `\n//# sourceURL=${browser.runtime.getURL('sandbox/injected-web.js')}`,
+      + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`,
   });
   // Clean up in case CSP prevented the script from running
   window::off(handshakeId, handshaker, true);
@@ -198,7 +213,7 @@ function inject(item) {
   if (IS_FIREFOX) {
     onError = e => {
       const { stack } = e.error;
-      if (!stack || `${stack}`.includes(browser.runtime.getURL(''))) {
+      if (!stack || `${stack}`.includes(VM_UUID)) {
         log('error', [item.displayName], e.error);
         e.preventDefault();
       }
@@ -264,9 +279,16 @@ function setupContentInvoker(contentId, webId) {
 }
 
 function tellParentToWriteVault(parent, vaultId) {
-  // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
   // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
-  parent::fire(new MouseEventSafe(INIT_FUNC_NAME, { relatedTarget: window }));
-  parent::fire(new CustomEventSafe(INIT_FUNC_NAME, { detail: vaultId }));
+  if (IS_FIREFOX) {
+    parent::fire(new MouseEventSafe(VAULT_WRITER, { relatedTarget: window }));
+    parent::fire(new CustomEventSafe(VAULT_WRITER, { detail: vaultId }));
+  } else {
+    parent[VAULT_WRITER](vaultId, window);
+  }
   return vaultId;
+}
+
+function tellBridgeToWriteVault(vaultId, wnd) {
+  bridge.post('WriteVault', vaultId, INJECT_PAGE, wnd);
 }

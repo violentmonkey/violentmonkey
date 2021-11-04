@@ -25,7 +25,7 @@ export default function initialize(
       e = e::getDetail();
       webId = e[0];
       contentId = e[1];
-    }, { once: true });
+    }, { __proto__: null, once: true, capture: true });
     window::fire(new CustomEventSafe(process.env.HANDSHAKE_ID));
   }
   bridge.dataKey = contentId;

@@ -63,6 +63,7 @@ export let
   parseFromString, // DOMParser
   readAsDataURL, // FileReader
   safeResponseBlob, // Response - safe = "safe global" to disambiguate the name
+  stopImmediatePropagation,
   then,
   // various getters
   getBlobType, // Blob
@@ -144,6 +145,7 @@ export const VAULT = (() => {
     parseFromString = res[i += 1] || DOMParserSafe[PROTO].parseFromString,
     readAsDataURL = res[i += 1] || FileReaderSafe[PROTO].readAsDataURL,
     safeResponseBlob = res[i += 1] || ResponseSafe[PROTO].blob,
+    stopImmediatePropagation = res[i += 1] || Event[PROTO].stopImmediatePropagation,
     then = res[i += 1] || PromiseSafe[PROTO].then,
     // various getters
     getBlobType = res[i += 1] || describeProperty(BlobSafe[PROTO], 'type').get,
