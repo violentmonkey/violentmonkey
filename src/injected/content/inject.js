@@ -48,7 +48,6 @@ if (IS_FIREFOX) {
   }, true);
 } else {
   safeDefineProperty(global, VAULT_WRITER, {
-    configurable: false,
     value: tellBridgeToWriteVault,
   });
 }
@@ -74,8 +73,9 @@ export function injectPageSandbox(contentId, webId) {
    * Instead, we'll send the ids via a temporary handshakeId event, to which the web-bridge
    * will listen only during its initial phase using vault-protected DOM methods. */
   const handshakeId = getUniqIdSafe();
-  const handshaker = () => {
+  const handshaker = evt => {
     pageInjectable = true;
+    evt::stopImmediatePropagation();
     bindEvents(contentId, webId, bridge, cloneInto);
     fireBridgeEvent(handshakeId + process.env.HANDSHAKE_ACK, [webId, contentId], cloneInto);
   };

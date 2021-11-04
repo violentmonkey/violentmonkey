@@ -18,7 +18,7 @@ class WebpackProtectBootstrapPlugin {
         'installedModules = {};',
         `installedModules = ${NULL_OBJ}; \
          for (let i = 0, c, str = "cdmnoprt"; i < str.length && (c = str[i++]);) \
-           defineProperty(${requireFn}, c, { value: undefined, writable: true });`,
+           defineProperty(${requireFn}, c, { ${NULL_PROTO}, value: undefined, writable: true });`,
       ]]));
       hooks.moduleObj.tap(NAME, src => replace(src, [[
         'exports: {}',
@@ -31,7 +31,7 @@ class WebpackProtectBootstrapPlugin {
       hooks.requireExtensions.tap(NAME, src => replace(src, [
         ["(typeof Symbol !== 'undefined' && Symbol.toStringTag)", '(true)'],
         ['Symbol.toStringTag', 'toStringTag'],
-        ['Object.defineProperty', 'defineProperty'],
+        [/Object\.(defineProperty\([^){\n]+{)/g, `$1${NULL_PROTO},`],
         ['Object.create(null)', NULL_OBJ],
         ['for(var key in value)', 'for(const key in value)'],
         ['function(key) { return value[key]; }.bind(null, key)',
