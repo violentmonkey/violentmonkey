@@ -1,25 +1,25 @@
 $fontSize: 12px;
 $padding: 8px;
 $itemPaddingX: 14px;
-
 $scriptIconSize: 18px;
 $scriptIconMLR: 2px;
-
 $iconSize: 14px;
 $iconML: calc($scriptIconSize + 2 * $scriptIconMLR);
 $iconMR: 10px;
-
 $leftPaneWidth: calc($iconML + $iconSize + $iconMR);
-
 $logoSize: 32px;
 $logoMLR: calc(($leftPaneWidth - $logoSize) / 2);
-
 $topIconSize: 20px;
-
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
-
 $footerHeight: 40px;
+
+$hoverColor: var(--bg);
+$hoverBack: cornflowerblue;
+$hoverButtonInactiveBack: #a0c1fd;
+$DARKhoverColor: var(--fill-15);
+$DARKhoverBack: #404c5c;
+$DARKhoverButtonInactiveBack: #5b6979;
 
 body {
   width: 320px;
@@ -72,8 +72,12 @@ footer {
   cursor: pointer;
   &:hover,
   &:focus {
-    background: cornflowerblue;
-    color: var(--bg);
+    background: $hoverBack;
+    color: $hoverColor;
+    @media (prefers-color-scheme: dark) {
+      background: $DARKhoverBack;
+      color: $DARKhoverColor;
+    }
   }
   .script:not(.disabled):not(.runs) & .script-name,
   .disabled:not(.runs) > & {
@@ -227,10 +231,13 @@ footer {
     cursor: pointer;
     &:focus {
       color: var(--bg);
-      background: cornflowerblue;
+      background: $hoverBack;
     }
-    &:not(:focus) {
-      opacity: .5;
+    .menu-item:hover + .submenu-buttons &:not(:focus) {
+      background: $hoverButtonInactiveBack;
+      @media (prefers-color-scheme: dark) {
+        background: $DARKhoverButtonInactiveBack;
+      }
     }
     .icon {
       display: block;
