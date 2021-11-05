@@ -54,14 +54,6 @@ export default function initialize(
         this[id] = VAULT;
       },
     });
-    setOwnProp(window, 'open', vmOwnFunc(function open(...args) {
-      const wnd = openWindow::apply(this, args);
-      const vaultId = wnd && isSameOriginWindow(wnd) && getUniqIdSafe();
-      if (vaultId) {
-        bridge.post('VaultId', vaultId, undefined, wnd);
-      }
-      return wnd;
-    }, funcToString::bind(openWindow)));
   }
   return invokeGuest;
 }

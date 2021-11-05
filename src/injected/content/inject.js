@@ -11,7 +11,6 @@ import {
  * INIT_FUNC_NAME ids even though we change it now with each release. */
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
 const VM_UUID = browser.runtime.getURL('');
-const VAULT_SEED_NAME = `${VM_UUID}VS`;
 const VAULT_WRITER = `${VM_UUID}VW`;
 let contLists;
 let pgLists;
@@ -57,13 +56,6 @@ bridge.addHandlers({
    * FF bug workaround to enable processing of sourceURL in injected page scripts
    */
   InjectList: IS_FIREFOX && injectList,
-  /**
-   * Writes the value into the isolated world of the intercepted window
-   * @this {Node} window
-   */
-  VaultId(id) {
-    this[VAULT_SEED_NAME] = { id, parent: window };
-  },
 });
 
 export function injectPageSandbox(contentId, webId) {
@@ -81,16 +73,11 @@ export function injectPageSandbox(contentId, webId) {
   };
   /* The vault contains safe methods that we got from the highest same-origin parent,
    * where our code ran at document_start so it definitely predated the page scripts. */
-  let vaultId = window[VAULT_SEED_NAME];
-  if (vaultId) {
-    delete window[VAULT_SEED_NAME];
-    vaultId = tellParentToWriteVault(vaultId.parent, vaultId.id);
-  } else {
-    vaultId = !IS_TOP
-      && isSameOriginWindow(window.parent)
-      && tellParentToWriteVault(window.parent, getUniqIdSafe())
-      || '';
-  }
+  const parent = window.opener || !IS_TOP && window.parent;
+  const vaultId = parent
+    && isSameOriginWindow(parent)
+    && tellParentToWriteVault(parent, getUniqIdSafe())
+    || '';
   /* With `once` the listener is removed before DOMNodeInserted is dispatched by appendChild,
    * otherwise a same-origin parent page could use it to spoof the handshake. */
   window::on(handshakeId, handshaker, { capture: true, once: true });
