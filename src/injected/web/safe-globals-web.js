@@ -83,33 +83,40 @@ export const VAULT = (() => {
   let StringP;
   let i = -1;
   let res;
+  let src = window;
+  let srcFF;
   if (process.env.VAULT_ID) {
     res = window[process.env.VAULT_ID];
     delete window[process.env.VAULT_ID];
   }
   if (!res) {
-    res = { __proto__: null };
+    res = createNullObj();
+  } else if (!isFunction(res[0])) {
+    src = res[0];
+    res = createNullObj();
   }
+  srcFF = global === window ? src : global;
   res = [
     // window
-    BlobSafe = res[i += 1] || window.Blob,
-    CustomEventSafe = res[i += 1] || window.CustomEvent,
-    DOMParserSafe = res[i += 1] || window.DOMParser,
-    ErrorSafe = res[i += 1] || window.Error,
-    FileReaderSafe = res[i += 1] || window.FileReader,
-    KeyboardEventSafe = res[i += 1] || window.KeyboardEvent,
-    MouseEventSafe = res[i += 1] || window.MouseEvent,
-    Object = res[i += 1] || window.Object,
-    PromiseSafe = res[i += 1] || window.Promise,
-    ProxySafe = res[i += 1] || global.Proxy, // In FF content mode it's not equal to window.Proxy
-    ResponseSafe = res[i += 1] || window.Response,
-    fire = res[i += 1] || window.dispatchEvent,
-    off = res[i += 1] || window.removeEventListener,
-    on = res[i += 1] || window.addEventListener,
-    openWindow = res[i += 1] || window.open,
+    BlobSafe = res[i += 1] || src.Blob,
+    CustomEventSafe = res[i += 1] || src.CustomEvent,
+    DOMParserSafe = res[i += 1] || src.DOMParser,
+    ErrorSafe = res[i += 1] || src.Error,
+    FileReaderSafe = res[i += 1] || src.FileReader,
+    KeyboardEventSafe = res[i += 1] || src.KeyboardEvent,
+    MouseEventSafe = res[i += 1] || src.MouseEvent,
+    Object = res[i += 1] || src.Object,
+    PromiseSafe = res[i += 1] || src.Promise,
+    // In FF content mode global.Proxy !== window.Proxy
+    ProxySafe = res[i += 1] || srcFF.Proxy,
+    ResponseSafe = res[i += 1] || src.Response,
+    fire = res[i += 1] || src.dispatchEvent,
+    off = res[i += 1] || src.removeEventListener,
+    on = res[i += 1] || src.addEventListener,
+    openWindow = res[i += 1] || src.open,
     // Symbol
-    scopeSym = res[i += 1] || Symbol.unscopables,
-    toStringTag = res[i += 1] || Symbol.toStringTag,
+    scopeSym = res[i += 1] || srcFF.Symbol.unscopables,
+    toStringTag = res[i += 1] || srcFF.Symbol.toStringTag,
     // Object
     describeProperty = res[i += 1] || Object.getOwnPropertyDescriptor,
     defineProperty = res[i += 1] || Object.defineProperty,
@@ -124,32 +131,32 @@ export const VAULT = (() => {
     hasOwnProperty = res[i += 1] || Object[PROTO].hasOwnProperty,
     objectToString = res[i += 1] || Object[PROTO].toString,
     // Array.prototype
-    concat = res[i += 1] || (ArrayP = Array[PROTO]).concat,
+    concat = res[i += 1] || (ArrayP = src.Array[PROTO]).concat,
     filter = res[i += 1] || ArrayP.filter,
     forEach = res[i += 1] || ArrayP.forEach,
     indexOf = res[i += 1] || ArrayP.indexOf,
     // Element.prototype
-    remove = res[i += 1] || (ElementP = Element[PROTO]).remove,
+    remove = res[i += 1] || (ElementP = src.Element[PROTO]).remove,
     // String.prototype
-    charCodeAt = res[i += 1] || (StringP = String[PROTO]).charCodeAt,
+    charCodeAt = res[i += 1] || (StringP = srcFF.String[PROTO]).charCodeAt,
     slice = res[i += 1] || StringP.slice,
     replace = res[i += 1] || StringP.replace,
     // safeCall
     safeCall = res[i += 1] || Object.call.bind(Object.call),
     // various methods
-    createObjectURL = res[i += 1] || URL.createObjectURL,
+    createObjectURL = res[i += 1] || src.URL.createObjectURL,
     funcToString = res[i += 1] || safeCall.toString,
-    jsonParse = res[i += 1] || JSON.parse,
+    jsonParse = res[i += 1] || src.JSON.parse,
     logging = res[i += 1] || assign({ __proto__: null }, console),
-    mathRandom = res[i += 1] || Math.random,
+    mathRandom = res[i += 1] || srcFF.Math.random,
     parseFromString = res[i += 1] || DOMParserSafe[PROTO].parseFromString,
     readAsDataURL = res[i += 1] || FileReaderSafe[PROTO].readAsDataURL,
     safeResponseBlob = res[i += 1] || ResponseSafe[PROTO].blob,
-    stopImmediatePropagation = res[i += 1] || Event[PROTO].stopImmediatePropagation,
+    stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
     then = res[i += 1] || PromiseSafe[PROTO].then,
     // various getters
     getBlobType = res[i += 1] || describeProperty(BlobSafe[PROTO], 'type').get,
-    getCurrentScript = res[i += 1] || describeProperty(Document[PROTO], 'currentScript').get,
+    getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
     getDetail = res[i += 1] || describeProperty(CustomEventSafe[PROTO], 'detail').get,
     getReaderResult = res[i += 1] || describeProperty(FileReaderSafe[PROTO], 'result').get,
     getRelatedTarget = res[i += 1] || describeProperty(MouseEventSafe[PROTO], 'relatedTarget').get,

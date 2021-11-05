@@ -6,13 +6,6 @@ export { sendCmd } from '#/common';
  * as it searches for ALL matching nodes when this tag wasn't cached internally. */
 export const elemByTag = tag => getOwnProp(document::getElementsByTagName(tag), 0);
 
-export const appendToRoot = node => {
-  // DOM spec allows any elements under documentElement
-  // https://dom.spec.whatwg.org/#node-trees
-  const root = elemByTag('head') || elemByTag('*');
-  return root && root::appendChild(node);
-};
-
 /**
  * @param {string} tag
  * @param {function} cb - callback runs immediately, unlike a chained then()

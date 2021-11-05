@@ -1,5 +1,5 @@
 import bridge from './bridge';
-import { appendToRoot, makeElem, onElement, sendCmd } from './util-content';
+import { elemByTag, makeElem, onElement, sendCmd } from './util-content';
 import {
   bindEvents, fireBridgeEvent,
   INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser,
@@ -12,6 +12,8 @@ import {
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
 const VM_UUID = browser.runtime.getURL('');
 const VAULT_WRITER = `${VM_UUID}VW`;
+const VAULT_WRITE_ACK = `${VAULT_WRITER}+`;
+const DISPLAY_NONE = 'display:none!important';
 let contLists;
 let pgLists;
 /** @type {Object<string,VMInjectionRealm>} */
@@ -42,6 +44,7 @@ if (IS_FIREFOX) {
     } else {
       // setupVaultId's second event is the vaultId
       tellBridgeToWriteVault(evt::getDetail(), frameEventWnd);
+      frameEventWnd::fire(new CustomEventSafe(VAULT_WRITE_ACK));
       frameEventWnd = null;
     }
   }, true);
@@ -60,34 +63,52 @@ bridge.addHandlers({
 
 export function injectPageSandbox(contentId, webId) {
   const { cloneInto } = global;
-  /* A page can read our script's textContent in a same-origin iframe via DOMNodeRemoved event.
+  const isSpoofable = document.referrer.startsWith(`${window.location.origin}/`);
+  const vaultId = isSpoofable && getUniqIdSafe();
+  const handshakeId = getUniqIdSafe();
+  if (isSpoofable && (
+    !WriteVaultFromOpener(window.opener, vaultId)
+    && !WriteVaultFromOpener(!IS_TOP && window.parent, vaultId)
+  )) {
+    /* Sites can do window.open(sameOriginUrl,'iframeNameOrNewWindowName').opener=null, spoof JS
+     * environment and easily hack into our communication channel before our content scripts run.
+     * Content scripts will see `document.opener = null`, not the original opener, so we have
+     * to use an iframe to extract the safe globals. */
+    inject({ code: `parent["${vaultId}"] = [this]` }, () => {
+      // Skipping page injection in FF if our script element was blocked by site's CSP
+      if (!IS_FIREFOX || window.wrappedJSObject[vaultId]) {
+        startHandshake();
+      }
+      contentId = false;
+    });
+  }
+  if (contentId) {
+    startHandshake();
+  }
+  return pageInjectable;
+
+  /** A page can read our script's textContent in a same-origin iframe via DOMNodeRemoved event.
    * Directly preventing it would require redefining ~20 DOM methods in the parent.
    * Instead, we'll send the ids via a temporary handshakeId event, to which the web-bridge
-   * will listen only during its initial phase using vault-protected DOM methods. */
-  const handshakeId = getUniqIdSafe();
-  const handshaker = evt => {
+   * will listen only during its initial phase using vault-protected DOM methods.
+   * TODO: simplify this when strict_min_version >= 63 (attachShadow in FF) */
+  function startHandshake() {
+    /* With `once` the listener is removed before DOMNodeInserted is dispatched by appendChild,
+     * otherwise a same-origin parent page could use it to spoof the handshake. */
+    window::on(handshakeId, handshaker, { capture: true, once: true });
+    inject({
+      code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
+        + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`,
+    });
+    // Clean up in case CSP prevented the script from running
+    window::off(handshakeId, handshaker, true);
+  }
+  function handshaker(evt) {
     pageInjectable = true;
     evt::stopImmediatePropagation();
     bindEvents(contentId, webId, bridge, cloneInto);
     fireBridgeEvent(handshakeId + process.env.HANDSHAKE_ACK, [webId, contentId], cloneInto);
-  };
-  /* The vault contains safe methods that we got from the highest same-origin parent,
-   * where our code ran at document_start so it definitely predated the page scripts. */
-  const parent = window.opener || !IS_TOP && window.parent;
-  const vaultId = parent
-    && isSameOriginWindow(parent)
-    && tellParentToWriteVault(parent, getUniqIdSafe())
-    || '';
-  /* With `once` the listener is removed before DOMNodeInserted is dispatched by appendChild,
-   * otherwise a same-origin parent page could use it to spoof the handshake. */
-  window::on(handshakeId, handshaker, { capture: true, once: true });
-  inject({
-    code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
-      + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`,
-  });
-  // Clean up in case CSP prevented the script from running
-  window::off(handshakeId, handshaker, true);
-  return pageInjectable;
+  }
 }
 
 /**
@@ -192,11 +213,16 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
   injectAll('idle');
 }
 
-function inject(item) {
+function inject(item, iframeCb) {
+  const root = elemByTag('*');
+  // In Chrome injectPageSandbox calls inject() another time while the first one still runs
+  const isAdded = root && elShadow && root::elemByTag('*') === elShadow;
   const realScript = makeElem('script', item.code);
-  let script = realScript;
-  // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
+  let el = realScript;
   let onError;
+  let iframe;
+  let iframeLoader;
+  // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
   if (IS_FIREFOX) {
     onError = e => {
       const { stack } = e.error;
@@ -212,16 +238,44 @@ function inject(item) {
     if (!elShadow) {
       elShadow = makeElem('div');
       elShadowRoot = elShadow::attachShadow({ mode: 'closed' });
-      elShadowRoot::appendChild(makeElem('style', ':host { display: none !important }'));
+      elShadowRoot::appendChild(makeElem('style', `:host { ${DISPLAY_NONE} }`));
+      if (iframeCb) {
+        iframe = makeElem('iframe', {
+          /* Preventing other content scripts in Chrome */// eslint-disable-next-line no-script-url
+          src: 'javascript:void 0',
+          sandbox: 'allow-scripts allow-same-origin',
+          style: DISPLAY_NONE,
+        });
+        iframeLoader = () => {
+          iframeLoader = null;
+          iframe.contentDocument::getElementsByTagName('*')[0]::appendChild(realScript);
+          iframeCb();
+          realScript::remove();
+          iframe::remove();
+        };
+        /* In Chrome, when an empty iframe is inserted into document, `load` is fired synchronously,
+         * then `DOMNodeInserted`, also synchronously, then appendChild finishes, then our
+         * subsequent code runs. So, we have to use `load` event to run our script,
+         * otherwise it can be easily intercepted via DOMNodeInserted. */
+        if (!IS_FIREFOX) {
+          iframe::on('load', iframeLoader, { once: true });
+        }
+        elShadowRoot::appendChild(iframe);
+      }
     }
-    elShadowRoot::appendChild(realScript);
-    script = elShadow;
+    if (!iframe) {
+      elShadowRoot::appendChild(realScript);
+    }
+    el = elShadow;
   }
   // When using declarativeContent there's no documentElement so we'll append to `document`
-  if (!appendToRoot(script)) document::appendChild(script);
+  if (!isAdded) (root || document)::appendChild(el);
+  if (iframeLoader) iframeLoader();
   if (onError) window::off('error', onError);
+  // Clean up in case something didn't load
+  if (iframe) iframe::remove();
   if (attachShadow) realScript::remove();
-  script::remove();
+  el::remove();
 }
 
 function injectAll(runAt) {
@@ -265,15 +319,22 @@ function setupContentInvoker(contentId, webId) {
   };
 }
 
-function tellParentToWriteVault(parent, vaultId) {
-  // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
-  if (IS_FIREFOX) {
-    parent::fire(new MouseEventSafe(VAULT_WRITER, { relatedTarget: window }));
-    parent::fire(new CustomEventSafe(VAULT_WRITER, { detail: vaultId }));
-  } else {
-    parent[VAULT_WRITER](vaultId, window);
+function WriteVaultFromOpener(opener, vaultId) {
+  let ok;
+  if (opener && describeProperty(opener.location, 'href').get) {
+    // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
+    if (IS_FIREFOX) {
+      const setOk = () => { ok = true; };
+      window::on(VAULT_WRITE_ACK, setOk, true);
+      opener::fire(new MouseEventSafe(VAULT_WRITER, { relatedTarget: window }));
+      opener::fire(new CustomEventSafe(VAULT_WRITER, { detail: vaultId }));
+      window::off(VAULT_WRITE_ACK, setOk, true);
+    } else {
+      ok = opener[VAULT_WRITER];
+      if (ok) ok(vaultId, window);
+    }
   }
-  return vaultId;
+  return ok;
 }
 
 function tellBridgeToWriteVault(vaultId, wnd) {

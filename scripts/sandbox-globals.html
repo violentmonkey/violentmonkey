@@ -4,7 +4,7 @@
 <script>
 const el = document.getElementById('results');
 el.value = [
-  function boundMethods(isHeader) {
+  function boundMethods() {
     const keys = [];
     /* global globalThis */
     for (const k in globalThis) {
@@ -53,11 +53,9 @@ el.value = [
   __proto__: null,
 ${
   res.keys.sort()
-  .map(k => `  ${k}: ${res.value || 1},`)
-  .join('\n')
-}
-}
-`;
+  .map(k => `  ${k}: ${res.value || 1},\n`)
+  .join('')
+}};\n`;
 }).join('\n');
 
 el.focus();

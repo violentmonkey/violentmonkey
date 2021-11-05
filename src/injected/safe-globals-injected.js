@@ -69,11 +69,6 @@ export const vmOwnFunc = (func, toString) => (
   })
 );
 
-/** @param {Window} wnd */
-export const isSameOriginWindow = wnd => (
-  describeProperty(wnd.location, 'href').get
-);
-
 // Avoiding the need to safe-guard a bunch of methods so we use just one
 export const getUniqIdSafe = (prefix = 'VM') => `${prefix}${mathRandom()}`;
 
