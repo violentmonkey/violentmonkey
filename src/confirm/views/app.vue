@@ -72,6 +72,7 @@
     </div>
     <div class="frame-block flex-1 pos-rel">
       <vm-externals
+        ref="externals"
         v-if="script"
         v-model="script"
         class="abs-full"
@@ -114,6 +115,7 @@ let filePortResolve;
 /** @type {boolean} */
 let filePortNeeded;
 let basicTitle;
+let cachedCodePromise;
 
 export default {
   components: {
@@ -177,6 +179,7 @@ export default {
     /* sendCmdDirectly makes the page load so fast that ua.isFirefox is still a boolean,
        so we'll detect FF68 that stopped allowing file: scheme in fetch() via a CSS feature */
     filePortNeeded = url.startsWith('file:') && ua.isFirefox && CSS.supports('counter-set', 'none');
+    cachedCodePromise = sendCmdDirectly('CachePop', url);
     this.guard = setInterval(sendCmdDirectly, KEEP_INFO_DELAY, 'CacheHit', { key });
     await this.loadData();
     await this.parseMeta();
@@ -212,7 +215,26 @@ export default {
         ? await new Promise(this.pingFilePort)
         : await this.getScript(this.info.url);
       if (code == null || changedOnly && this.code === code) throw 0;
+      this.setCode(code);
+    },
+    setCode(code) {
+      const lines = code.split(/\r?\n/);
+      const cm = this.$refs.externals?.$refs.code?.cm;
+      let i = -1;
+      let isDiff;
+      if (cm) {
+        cm.eachLine(({ text }) => {
+          isDiff = text !== lines[i += 1];
+          return isDiff;
+        });
+      }
       this.code = code;
+      if (isDiff || cm && i < lines.length - 1) {
+        this.$nextTick(() => {
+          cm.setCursor(i);
+          cm.scrollIntoView(null, cm.display.lastWrapHeight / 3);
+        });
+      }
     },
     async parseMeta() {
       /** @type {VMScriptMeta} */
@@ -319,10 +341,12 @@ export default {
     },
     async getScript(url) {
       try {
-        return await sendCmdDirectly('CacheLoad', url) || await this.getFile(url);
+        return cachedCodePromise && await cachedCodePromise || await this.getFile(url);
       } catch (e) {
         this.message = this.i18n('msgErrorLoadingData');
         throw url;
+      } finally {
+        cachedCodePromise = null;
       }
     },
     async installScript() {
@@ -353,6 +377,7 @@ export default {
       if (this.tracking || !this.isLocal || !this.installed) {
         return;
       }
+      cachedCodePromise = null; // always re-read because the file may have changed since then
       this.tracking = true;
       while (options.get('trackLocalFile') && this.tracking !== 'stop') {
         await makePause(500);

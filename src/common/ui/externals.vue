@@ -106,6 +106,9 @@ export default {
       this.code = code;
       this.$set(this.deps, depsUrl, code);
     },
+    'install.code'(val) {
+      this.code = val;
+    },
     value() {
       this.$nextTick(() => {
         if (this.index >= this.all.length) this.index = 0;
