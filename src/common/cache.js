@@ -26,7 +26,7 @@ export default function initCache({
   function get(key, def, shouldHit = true) {
     const item = cache[key];
     if (item && shouldHit) {
-      reschedule(item, defaultLifetime);
+      reschedule(item, item.lifetime);
     }
     return item ? item.value : def;
   }
@@ -38,8 +38,8 @@ export default function initCache({
     del(key);
     return value;
   }
-  function put(key, value, lifetime = defaultLifetime) {
-    reschedule(cache[key] = { value }, lifetime);
+  function put(key, value, lifetime) {
+    reschedule(cache[key] = lifetime ? { value, lifetime } : { value }, lifetime);
     return value;
   }
   function del(key) {
@@ -52,7 +52,7 @@ export default function initCache({
   function has(key) {
     return cache[key];
   }
-  function hit(key, lifetime = defaultLifetime) {
+  function hit(key, lifetime) {
     const entry = cache[key];
     if (entry) {
       reschedule(entry, lifetime);
@@ -72,7 +72,7 @@ export default function initCache({
     clearTimeout(timer);
     timer = 0;
   }
-  function reschedule(entry, lifetime) {
+  function reschedule(entry, lifetime = defaultLifetime) {
     entry.expiry = lifetime + getNow();
     if (timer) {
       if (lifetime >= minLifetime) return;
