@@ -11,8 +11,8 @@ import {
  * INIT_FUNC_NAME ids even though we change it now with each release. */
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
 const VM_UUID = browser.runtime.getURL('');
-const VAULT_WRITER = `${VM_UUID}VW`;
-const VAULT_WRITE_ACK = `${VAULT_WRITER}+`;
+const VAULT_WRITER = `${IS_FIREFOX ? VM_UUID : INIT_FUNC_NAME}VW`;
+const VAULT_WRITER_ACK = `${VAULT_WRITER}+`;
 const DISPLAY_NONE = 'display:none!important';
 let contLists;
 let pgLists;
@@ -44,7 +44,7 @@ if (IS_FIREFOX) {
     } else {
       // setupVaultId's second event is the vaultId
       tellBridgeToWriteVault(evt::getDetail(), frameEventWnd);
-      frameEventWnd::fire(new CustomEventSafe(VAULT_WRITE_ACK));
+      frameEventWnd::fire(new CustomEventSafe(VAULT_WRITER_ACK));
       frameEventWnd = null;
     }
   }, true);
@@ -63,11 +63,11 @@ bridge.addHandlers({
 
 export function injectPageSandbox(contentId, webId) {
   const { cloneInto } = global;
-  const { opener } = window;
   const vaultId = getUniqIdSafe();
   const handshakeId = getUniqIdSafe();
-  if (!WriteVaultFromOpener(opener, vaultId)
-  && !WriteVaultFromOpener(!IS_TOP && window.parent, vaultId)) {
+  if (useOpener(window.opener) || useOpener(!IS_TOP && window.parent)) {
+    startHandshake();
+  } else {
     /* Sites can do window.open(sameOriginUrl,'iframeNameOrNewWindowName').opener=null, spoof JS
      * environment and easily hack into our communication channel before our content scripts run.
      * Content scripts will see `document.opener = null`, not the original opener, so we have
@@ -78,14 +78,27 @@ export function injectPageSandbox(contentId, webId) {
       if (!IS_FIREFOX || window.wrappedJSObject[vaultId]) {
         startHandshake();
       }
-      contentId = false;
     });
-  }
-  if (contentId) {
-    startHandshake();
   }
   return pageInjectable;
 
+  function useOpener(opener) {
+    let ok;
+    if (opener && describeProperty(opener.location, 'href').get) {
+      // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
+      if (IS_FIREFOX) {
+        const setOk = () => { ok = true; };
+        window::on(VAULT_WRITER_ACK, setOk, true);
+        opener::fire(new MouseEventSafe(VAULT_WRITER, { relatedTarget: window }));
+        opener::fire(new CustomEventSafe(VAULT_WRITER, { detail: vaultId }));
+        window::off(VAULT_WRITER_ACK, setOk, true);
+      } else {
+        ok = opener[VAULT_WRITER];
+        if (ok) ok(vaultId, window);
+      }
+    }
+    return ok;
+  }
   /** A page can read our script's textContent in a same-origin iframe via DOMNodeRemoved event.
    * Directly preventing it would require redefining ~20 DOM methods in the parent.
    * Instead, we'll send the ids via a temporary handshakeId event, to which the web-bridge
@@ -316,24 +329,6 @@ function setupContentInvoker(contentId, webId) {
       : postViaBridge;
     fn(cmd, params, undefined, node);
   };
-}
-
-function WriteVaultFromOpener(opener, vaultId) {
-  let ok;
-  if (opener && describeProperty(opener.location, 'href').get) {
-    // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
-    if (IS_FIREFOX) {
-      const setOk = () => { ok = true; };
-      window::on(VAULT_WRITE_ACK, setOk, true);
-      opener::fire(new MouseEventSafe(VAULT_WRITER, { relatedTarget: window }));
-      opener::fire(new CustomEventSafe(VAULT_WRITER, { detail: vaultId }));
-      window::off(VAULT_WRITE_ACK, setOk, true);
-    } else {
-      ok = opener[VAULT_WRITER];
-      if (ok) ok(vaultId, window);
-    }
-  }
-  return ok;
 }
 
 function tellBridgeToWriteVault(vaultId, wnd) {
