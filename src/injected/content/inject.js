@@ -63,11 +63,12 @@ bridge.addHandlers({
 
 export function injectPageSandbox(contentId, webId) {
   const { cloneInto } = global;
-  const isSpoofable = document.referrer.startsWith(`${window.location.origin}/`);
+  const { opener } = window;
+  const isSpoofable = opener || document.referrer.startsWith(`${window.location.origin}/`);
   const vaultId = isSpoofable && getUniqIdSafe();
   const handshakeId = getUniqIdSafe();
   if (isSpoofable && (
-    !WriteVaultFromOpener(window.opener, vaultId)
+    !WriteVaultFromOpener(opener, vaultId)
     && !WriteVaultFromOpener(!IS_TOP && window.parent, vaultId)
   )) {
     /* Sites can do window.open(sameOriginUrl,'iframeNameOrNewWindowName').opener=null, spoof JS
