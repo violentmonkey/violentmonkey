@@ -64,17 +64,15 @@ bridge.addHandlers({
 export function injectPageSandbox(contentId, webId) {
   const { cloneInto } = global;
   const { opener } = window;
-  const isSpoofable = opener || document.referrer.startsWith(`${window.location.origin}/`);
-  const vaultId = isSpoofable && getUniqIdSafe();
+  const vaultId = getUniqIdSafe();
   const handshakeId = getUniqIdSafe();
-  if (isSpoofable && (
-    !WriteVaultFromOpener(opener, vaultId)
-    && !WriteVaultFromOpener(!IS_TOP && window.parent, vaultId)
-  )) {
+  if (!WriteVaultFromOpener(opener, vaultId)
+  && !WriteVaultFromOpener(!IS_TOP && window.parent, vaultId)) {
     /* Sites can do window.open(sameOriginUrl,'iframeNameOrNewWindowName').opener=null, spoof JS
      * environment and easily hack into our communication channel before our content scripts run.
      * Content scripts will see `document.opener = null`, not the original opener, so we have
-     * to use an iframe to extract the safe globals. */
+     * to use an iframe to extract the safe globals. Detection via document.referrer won't work
+     * is it can be emptied by the opener page, too. */
     inject({ code: `parent["${vaultId}"] = [this]` }, () => {
       // Skipping page injection in FF if our script element was blocked by site's CSP
       if (!IS_FIREFOX || window.wrappedJSObject[vaultId]) {
@@ -217,7 +215,7 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
 function inject(item, iframeCb) {
   const root = elemByTag('*');
   // In Chrome injectPageSandbox calls inject() another time while the first one still runs
-  const isAdded = root && elShadow && root::elemByTag('*') === elShadow;
+  const isAdded = root && elShadow && (root === elShadow || root::elemByTag('*') === elShadow);
   const realScript = makeElem('script', item.code);
   let el = realScript;
   let onError;
