@@ -1,5 +1,4 @@
 const { isProd } = require('@gera2ld/plaid/util');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 /**
  * For each entry, `key` is the chunk name, `value` has following properties:
@@ -60,16 +59,11 @@ exports.optimization = {
       ...splitVendor('tldjs'),
     },
   },
-  minimizer: isProd && [
-    /* Combining @media (prefers-color-scheme: dark) into one query.
-     * WARNING! html-inline-css-webpack-plugin doesn't detect CSS from mini-css-extract-plugin
-     * in `watch` build so it's only enabled in prod. If we see a difference between the two,
-     * we should remove this plugin or fix the above-mentioned problem. */
-    new OptimizeCssAssetsPlugin({
-      cssProcessor: require('postcss')([
-        require('postcss-combine-media-query'),
-        require('cssnano'),
-      ]),
-    }),
-  ],
+};
+exports.styleOptions = {
+  /* Files in extensions aren't cached so there's no point in extracting separate css,
+   * other than minifying, but the gain is negligible. P.S. Extracting+inlining back in html
+   * doesn't keep the correct order of style elements which breaks appearance when
+   * using style-ext-html-webpack-plugin or html-inline-css-webpack-plugin. */
+  extract: false,
 };

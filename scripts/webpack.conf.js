@@ -1,7 +1,6 @@
 const { modifyWebpackConfig, shallowMerge, defaultOptions } = require('@gera2ld/plaid');
 const { isProd } = require('@gera2ld/plaid/util');
 const webpack = require('webpack');
-const HTMLInlineCSSWebpackPlugin = isProd && require('html-inline-css-webpack-plugin').default;
 const TerserPlugin = isProd && require('terser-webpack-plugin');
 const deepmerge = isProd && require('deepmerge');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
@@ -118,21 +117,6 @@ module.exports = Promise.all([
       footer: '}',
       test: /^(?!injected|public).*\.js$/,
     }));
-    /* Embedding as <style> to ensure uiTheme option doesn't cause FOUC.
-     * Note that in production build there's no <head> in html but document.head is still
-     * auto-created per the specification so our styles will be placed correctly anyway. */
-    if (isProd) {
-      config.plugins.push(new HTMLInlineCSSWebpackPlugin({
-        replace: {
-          target: '<body>',
-          position: 'before',
-        },
-      }));
-      config.plugins.find(p => (
-        p.constructor.name === 'MiniCssExtractPlugin'
-        && Object.assign(p.options, { ignoreOrder: true })
-      ));
-    }
     config.plugins.push(new ListBackgroundScriptsPlugin({
       minify: false, // keeping readable
     }));
