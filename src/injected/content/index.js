@@ -18,18 +18,15 @@ let bfCacheWired;
 async function init() {
   const contentId = getUniqIdSafe();
   const webId = getUniqIdSafe();
-  const pageInfo = {
+  const xhrData = getXhrInjection();
+  const pageInfo = !xhrData?.forceContent && {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
     url: IS_FIREFOX && global.location.href,
     // XML document's appearance breaks when script elements are added
     forceContent: document instanceof XMLDocument
-    /* Don't autorun `page` mode userscripts when the extension was installed/updated in Firefox
-     * since sites can spoof JS environment and easily impersonate a userscript in `page` mode. */
-      || IS_FIREFOX && !isDocumentLoading()
       || !injectPageSandbox(contentId, webId),
   };
-  const xhrData = getXhrInjection();
   const dataPromise = !xhrData && sendCmd('GetInjected', pageInfo, { retry: true });
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
   const data = xhrData || (

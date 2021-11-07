@@ -1,6 +1,7 @@
 import { getScriptName, getUniqId } from '#/common';
 import {
-  INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECTABLE_TAB_URL_RE, METABLOCK_RE,
+  INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
+  INJECTABLE_TAB_URL_RE, METABLOCK_RE,
 } from '#/common/consts';
 import initCache from '#/common/cache';
 import { forEachEntry, objectPick, objectSet } from '#/common/object';
@@ -27,8 +28,10 @@ const cache = initCache({
     rcs?.unregister();
   },
 });
+const INJECT_INTO = 'injectInto';
+// KEY_XXX for hooked options
 const KEY_EXPOSE = 'expose';
-const KEY_INJECT_INTO = 'defaultInjectInto';
+const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
 const KEY_IS_APPLIED = 'isApplied';
 const KEY_XHR_INJECT = 'xhrInject';
 const expose = {};
@@ -37,7 +40,7 @@ let injectInto;
 let xhrInject;
 hookOptions(onOptionChanged);
 postInitialize.push(() => {
-  for (const key of [KEY_EXPOSE, KEY_INJECT_INTO, KEY_IS_APPLIED, KEY_XHR_INJECT]) {
+  for (const key of [KEY_EXPOSE, KEY_DEF_INJECT_INTO, KEY_IS_APPLIED, KEY_XHR_INJECT]) {
     onOptionChanged({ [key]: getOption(key) });
   }
 });
@@ -96,7 +99,7 @@ browser.storage.onChanged.addListener(async changes => {
   }
 });
 
-function normalizeInjectInto(value) {
+function normalizeRealm(value) {
   return INJECT_MAPPING::hasOwnProperty(value)
     ? value
     : injectInto || INJECT_AUTO;
@@ -105,8 +108,8 @@ function normalizeInjectInto(value) {
 function onOptionChanged(changes) {
   changes::forEachEntry(([key, value]) => {
     switch (key) {
-    case KEY_INJECT_INTO:
-      injectInto = normalizeInjectInto(value);
+    case KEY_DEF_INJECT_INTO:
+      injectInto = normalizeRealm(value);
       cache.destroy();
       break;
     case KEY_XHR_INJECT:
@@ -179,21 +182,32 @@ function onSendHeaders({ url, tabId, frameId }) {
 /** @param {chrome.webRequest.WebResponseHeadersDetails} info */
 function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
-  const injection = xhrInject && cache.get(key)?.inject;
+  const data = xhrInject && cache.get(key);
   cache.hit(key, TIME_AFTER_RECEIVE);
-  if (injection) {
-    const blobUrl = URL.createObjectURL(new Blob([JSON.stringify(injection)]));
-    const { responseHeaders } = info;
-    responseHeaders.push({
-      name: 'Set-Cookie',
-      value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
-    });
-    setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
-    return { responseHeaders };
+  return data?.inject && prepareXhrBlob(info, data);
+}
+
+/**
+ * @param {chrome.webRequest.WebResponseHeadersDetails} info
+ * @param {VMGetInjectedDataContainer} data
+ */
+function prepareXhrBlob({ url, responseHeaders }, data) {
+  if (url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
+    forceContentInjection(data);
   }
+  const blobUrl = URL.createObjectURL(new Blob([
+    JSON.stringify(data.inject),
+  ]));
+  responseHeaders.push({
+    name: 'Set-Cookie',
+    value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
+  });
+  setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
+  return { responseHeaders };
 }
 
 function prepare(key, url, tabId, frameId, forceContent) {
+  /** @namespace VMGetInjectedDataContainer */
   const res = {
     /** @namespace VMGetInjectedData */
     inject: {
@@ -218,8 +232,8 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   const { inject } = res;
   /** @namespace VMGetInjectedData */
   Object.assign(inject, {
-    injectInto,
     scripts,
+    [INJECT_INTO]: injectInto,
     cache: data.cache,
     feedId: {
       cacheKey, // InjectionFeedback cache key for cleanup when getDataFF outruns GetInjected
@@ -231,6 +245,7 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
       ua,
     },
   });
+  /** @namespace VMGetInjectedDataContainer */
   Object.assign(res, {
     feedback,
     valOpIds: [...data[ENV_VALUE_IDS], ...envDelayed[ENV_VALUE_IDS]],
@@ -252,7 +267,7 @@ function prepareScript(script) {
   const dataKey = getUniqId('VMin');
   const displayName = getScriptName(script);
   const name = encodeURIComponent(displayName.replace(/[#&',/:;?@=+]/g, replaceWithFullWidthForm));
-  const realm = normalizeInjectInto(custom.injectInto || meta.injectInto);
+  const realm = normalizeRealm(custom[INJECT_INTO] || meta[INJECT_INTO]);
   const isContent = realm === INJECT_CONTENT || forceContent && realm === INJECT_AUTO;
   const pathMap = custom.pathMap || {};
   const reqs = meta.require?.map(key => require[pathMap[key] || key]).filter(Boolean);
@@ -282,7 +297,7 @@ function prepareScript(script) {
     displayName,
     // code will be `true` if the desired realm is PAGE which is not injectable
     code: isContent ? '' : forceContent || injectedCode,
-    injectInto: realm,
+    [INJECT_INTO]: realm,
     metaStr: code.match(METABLOCK_RE)[1] || '',
     values: value[id] || null,
   });
@@ -315,5 +330,30 @@ function registerScriptDataFF(inject, url, allFrames) {
     }],
     matches: url.split('#', 1),
     runAt: 'document_start',
+  });
+}
+
+/** @param {chrome.webRequest.HttpHeader[]} responseHeaders */
+function detectStrictCsp(responseHeaders) {
+  return responseHeaders.some(({ name, value }) => (
+    /^content-security-policy$/i.test(name)
+    && /^.(?!.*'unsafe-inline')/.test( // true if not empty and without 'unsafe-inline'
+      value.match(/(?:^|;)\s*script-src-elem\s[^;]+/)
+      || value.match(/(?:^|;)\s*script-src\s[^;]+/)
+      || value.match(/(?:^|;)\s*default-src\s[^;]+/)
+      || '',
+    )
+  ));
+}
+
+/** @param {VMGetInjectedDataContainer} data */
+function forceContentInjection(data) {
+  /** @type VMGetInjectedData */
+  const inject = data.inject;
+  inject.forceContent = true;
+  inject.scripts.forEach(scr => {
+    const realm = normalizeRealm(scr.custom[INJECT_INTO] || scr.meta[INJECT_INTO]);
+    scr.code = realm === INJECT_PAGE || ''; // `true` will put it into failedIds
+    data.feedback.push([scr.dataKey, true]);
   });
 }
