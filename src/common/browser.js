@@ -70,7 +70,19 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
           reject(stackInfo);
         }
       };
-      func::apply(thisArg, args);
+      if (process.env.IS_INJECTED) {
+        try {
+          func::apply(thisArg, args);
+        } catch (e) {
+          if (e[MESSAGE] === 'Extension context invalidated.') {
+            console.error('Please reload the tab to restore Violentmonkey API for userscripts.');
+          } else {
+            throw e;
+          }
+        }
+      } else {
+        func::apply(thisArg, args);
+      }
       if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.[MESSAGE] || err));
       return promise;
     }
