@@ -4,15 +4,9 @@ import bridge from './bridge';
 // Firefox defines `isFinite` on `global` not on `window`
 const { isFinite } = global; // eslint-disable-line no-restricted-properties
 const { toString: numberToString } = 0;
-/**
- * Using duck typing for #565 steamcommunity.com has overridden `Array.prototype`
- * If prototype is modified Object.prototype.toString.call(obj) won't give '[object Array]'
- */
-const isArray = obj => obj
-  && typeof obj.length === 'number'
-  && isFunction(obj.splice);
 // Reference: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON#Polyfill
 const escMap = {
+  __proto__: null,
   '"': '\\"',
   '\\': '\\\\',
   '\b': '\\b',
@@ -44,7 +38,7 @@ export const jsonDump = value => {
     res = `"${value::replace(escRE, escFunc)}"`;
     break;
   case 'object':
-    if (isArray(value)) {
+    if (ArrayIsArray(value)) {
       res = '[';
       value::forEach(v => { res += `${res.length > 1 ? ',' : ''}${jsonDump(v) ?? 'null'}`; });
       res += ']';
@@ -108,23 +102,25 @@ export const FastLookup = (hubs = createNullObj()) => {
  * for compatibility with many [old] scripts that use these utils blindly
  */
 export const makeComponentUtils = () => {
-  const {
-    cloneInto = obj => obj,
-    createObjectIn = (targetScope, { defineAs } = {}) => {
-      const obj = {};
-      if (defineAs) targetScope[defineAs] = obj;
-      return obj;
-    },
-    exportFunction = (func, targetScope, { defineAs } = {}) => {
-      if (defineAs) targetScope[defineAs] = func;
-      return func;
-    },
-  } = IS_FIREFOX && bridge.mode === INJECT_CONTENT
-    ? global
-    : createNullObj();
+  const CLONE_INTO = 'cloneInto';
+  const CREATE_OBJECT_IN = 'createObjectIn';
+  const EXPORT_FUNCTION = 'exportFunction';
+  const src = IS_FIREFOX && bridge.mode === INJECT_CONTENT && global;
+  const defineIn = !src && ((target, as, val) => {
+    if (as && (as = getOwnProp(as, 'defineAs'))) {
+      setOwnProp(target, as, val);
+    }
+    return val;
+  });
   return {
-    cloneInto,
-    createObjectIn,
-    exportFunction,
+    [CLONE_INTO]: src && src[CLONE_INTO] || (
+      obj => obj
+    ),
+    [CREATE_OBJECT_IN]: src && src[CREATE_OBJECT_IN] || (
+      (target, as) => defineIn(target, as, {})
+    ),
+    [EXPORT_FUNCTION]: src && src[EXPORT_FUNCTION] || (
+      (func, target, as) => defineIn(target, as, func)
+    ),
   };
 };

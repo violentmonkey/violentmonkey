@@ -57,6 +57,7 @@ export let
   // various methods
   createObjectURL,
   funcToString,
+  ArrayIsArray,
   jsonParse,
   logging,
   mathRandom,
@@ -146,6 +147,7 @@ export const VAULT = (() => {
     // various methods
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     funcToString = res[i += 1] || safeCall.toString,
+    ArrayIsArray = res[i += 1] || src.Array.isArray,
     jsonParse = res[i += 1] || src.JSON.parse,
     logging = res[i += 1] || assign({ __proto__: null }, console),
     mathRandom = res[i += 1] || srcFF.Math.random,
