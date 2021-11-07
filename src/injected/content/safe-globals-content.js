@@ -46,4 +46,6 @@ export const getRelatedTarget = describeProperty(MouseEventSafe[PROTO], 'related
 export const getReadyState = describeProperty(Document[PROTO], 'readyState').get;
 export const isDocumentLoading = () => !/^(inter|compl)/::regexpTest(document::getReadyState());
 export const logging = assign(createNullObj(), console);
-export const IS_FIREFOX = !global.chrome.app;
+export const { chrome } = global;
+export const IS_FIREFOX = !chrome.app;
+export const VM_UUID = chrome.runtime.getURL('');

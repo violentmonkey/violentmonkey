@@ -4,7 +4,7 @@ export { sendCmd } from '#/common';
 /** When looking for documentElement, use '*' to also support XML pages
  * Note that we avoid spoofed prototype getters by using hasOwnProperty, and not using `length`
  * as it searches for ALL matching nodes when this tag wasn't cached internally. */
-export const elemByTag = tag => getOwnProp(document::getElementsByTagName(tag), 0);
+export const elemByTag = (tag, i) => getOwnProp(document::getElementsByTagName(tag), i || 0);
 
 /**
  * @param {string} tag

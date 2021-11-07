@@ -500,6 +500,17 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Table view
+labelXhrInject:
+  message: Synchronous (not recommended)
+labelXhrInjectHint:
+  message: >-
+    Forcibly runs scripts early at the real `@run-at document-start`.
+    Same as Instant injection mode in Tampermonkey. Enable only if you have a script
+    that needs to run before the page starts loading and currently it's running too late.
+    This mode is using the deprecated synchronous XHR, so in Chrome/Chromium you'll
+    see warnings in devtools console, although you can safely ignore them
+    as the adverse affects are negligible in this case.
+    You can hide the warnings for good by right-clicking one.
 lastSync:
   description: Label for last sync timestamp.
   message: Last sync at $1

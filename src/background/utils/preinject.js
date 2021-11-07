@@ -30,12 +30,14 @@ const cache = initCache({
 const KEY_EXPOSE = 'expose';
 const KEY_INJECT_INTO = 'defaultInjectInto';
 const KEY_IS_APPLIED = 'isApplied';
+const KEY_XHR_INJECT = 'xhrInject';
 const expose = {};
 let isApplied;
 let injectInto;
+let xhrInject;
 hookOptions(onOptionChanged);
 postInitialize.push(() => {
-  for (const key of [KEY_EXPOSE, KEY_INJECT_INTO, KEY_IS_APPLIED]) {
+  for (const key of [KEY_EXPOSE, KEY_INJECT_INTO, KEY_IS_APPLIED, KEY_XHR_INJECT]) {
     onOptionChanged({ [key]: getOption(key) });
   }
 });
@@ -107,6 +109,10 @@ function onOptionChanged(changes) {
       injectInto = normalizeInjectInto(value);
       cache.destroy();
       break;
+    case KEY_XHR_INJECT:
+      toggleXhrInject(value);
+      cache.destroy();
+      break;
     case KEY_IS_APPLIED:
       togglePreinject(value);
       break;
@@ -140,8 +146,22 @@ function togglePreinject(enable) {
   const onOff = `${enable ? 'add' : 'remove'}Listener`;
   const config = enable ? API_CONFIG : undefined;
   browser.webRequest.onSendHeaders[onOff](onSendHeaders, config);
-  browser.webRequest.onHeadersReceived[onOff](onHeadersReceived, config);
+  if (!isApplied || !xhrInject) { // will be registered in toggleXhrInject
+    browser.webRequest.onHeadersReceived[onOff](onHeadersReceived, config);
+  }
   cache.destroy();
+}
+
+function toggleXhrInject(enable) {
+  xhrInject = enable;
+  browser.webRequest.onHeadersReceived.removeListener(onHeadersReceived);
+  if (enable) {
+    browser.webRequest.onHeadersReceived.addListener(onHeadersReceived, API_CONFIG, [
+      'blocking',
+      'responseHeaders',
+      browser.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS,
+    ].filter(Boolean));
+  }
 }
 
 function onSendHeaders({ url, tabId, frameId }) {
@@ -158,7 +178,19 @@ function onSendHeaders({ url, tabId, frameId }) {
 
 /** @param {chrome.webRequest.WebResponseHeadersDetails} info */
 function onHeadersReceived(info) {
-  cache.hit(getKey(info.url, !info.frameId), TIME_AFTER_RECEIVE);
+  const key = getKey(info.url, !info.frameId);
+  const injection = xhrInject && cache.get(key)?.inject;
+  cache.hit(key, TIME_AFTER_RECEIVE);
+  if (injection) {
+    const blobUrl = URL.createObjectURL(new Blob([JSON.stringify(injection)]));
+    const { responseHeaders } = info;
+    responseHeaders.push({
+      name: 'Set-Cookie',
+      value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
+    });
+    setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
+    return { responseHeaders };
+  }
 }
 
 function prepare(key, url, tabId, frameId, forceContent) {
@@ -202,11 +234,12 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   Object.assign(res, {
     feedback,
     valOpIds: [...data[ENV_VALUE_IDS], ...envDelayed[ENV_VALUE_IDS]],
-    rcsPromise: !isLate && IS_FIREFOX
+    rcsPromise: !isLate && !xhrInject && IS_FIREFOX
       ? registerScriptDataFF(inject, url, !!frameId)
       : null,
   });
   if (more) cache.put(envKey, more);
+  cache.put(cacheKey, res); // necessary for the synchronous onHeadersReceived
   return res;
 }
 

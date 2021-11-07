@@ -92,7 +92,7 @@
             </locale-group>
           </label>
         </div>
-        <div>
+        <div class="mr-2c">
           <label>
             <span v-text="i18n('labelInjectionMode')"></span>
             <select v-for="opt in ['defaultInjectInto']" v-model="settings[opt]" :key="opt">
@@ -100,6 +100,12 @@
                       :value="mode" v-text="mode" />
             </select>
             <a class="ml-1" href="https://violentmonkey.github.io/posts/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
+          </label>
+          <label>
+            <setting-check name="xhrInject"/>
+            <tooltip :content="i18n('labelXhrInjectHint')">
+              <span v-text="i18n('labelXhrInject')"/>
+            </tooltip>
           </label>
         </div>
         <div>

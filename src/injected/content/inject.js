@@ -2,7 +2,7 @@ import bridge from './bridge';
 import { elemByTag, makeElem, onElement, sendCmd } from './util-content';
 import {
   bindEvents, fireBridgeEvent,
-  INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE, browser,
+  INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
 } from '../util';
 
 /* In FF, content scripts running in a same-origin frame cannot directly call parent's functions
@@ -10,7 +10,6 @@ import {
  * like VAULT_WRITER to avoid interception by sites that can add listeners for all of our
  * INIT_FUNC_NAME ids even though we change it now with each release. */
 const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
-const VM_UUID = browser.runtime.getURL('');
 const VAULT_WRITER = `${IS_FIREFOX ? VM_UUID : INIT_FUNC_NAME}VW`;
 const VAULT_WRITER_ACK = `${VAULT_WRITER}+`;
 const DISPLAY_NONE = 'display:none!important';
@@ -229,7 +228,7 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
 function inject(item, iframeCb) {
   const root = elemByTag('*');
   // In Chrome injectPageSandbox calls inject() another time while the first one still runs
-  const isAdded = root && (root === scriptDiv || root::elemByTag('*') === scriptDiv);
+  const isAdded = root && scriptDiv && (root === scriptDiv || elemByTag('*', 1) === scriptDiv);
   const script = makeElem('script', item.code);
   let onError;
   let iframe;
@@ -277,6 +276,8 @@ function inject(item, iframeCb) {
       iframe::on('load', iframeLoader, { once: true });
     }
     scriptDivRoot::appendChild(iframe);
+  } else {
+    scriptDivRoot::appendChild(script);
   }
   if (!isAdded) {
     // When using declarativeContent there's no documentElement so we'll append to `document`
