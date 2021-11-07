@@ -2,7 +2,6 @@ import tldRules from 'tldjs/rules.json';
 import { JSDOM } from 'jsdom';
 
 global.window = new JSDOM('').window;
-global.chrome = {};
 global.browser = {
   storage: {
     local: {
@@ -18,6 +17,11 @@ global.browser = {
   },
   runtime: {
     getURL: path => path,
+  },
+};
+global.chrome = {
+  runtime: {
+    getURL: browser.runtime.getURL,
   },
 };
 if (!window.Response) window.Response = { prototype: {} };
