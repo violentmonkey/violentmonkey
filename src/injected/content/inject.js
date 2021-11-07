@@ -14,6 +14,7 @@ const VM_UUID = browser.runtime.getURL('');
 const VAULT_WRITER = `${IS_FIREFOX ? VM_UUID : INIT_FUNC_NAME}VW`;
 const VAULT_WRITER_ACK = `${VAULT_WRITER}+`;
 const DISPLAY_NONE = 'display:none!important';
+const safeDateNow = Date.now;
 let contLists;
 let pgLists;
 /** @type {Object<string,VMInjectionRealm>} */
@@ -21,8 +22,8 @@ let realms;
 /** @type boolean */
 let pageInjectable;
 let frameEventWnd;
-let elShadow;
-let elShadowRoot;
+let scriptDiv;
+let scriptDivRoot;
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
@@ -228,9 +229,8 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
 function inject(item, iframeCb) {
   const root = elemByTag('*');
   // In Chrome injectPageSandbox calls inject() another time while the first one still runs
-  const isAdded = root && elShadow && (root === elShadow || root::elemByTag('*') === elShadow);
-  const realScript = makeElem('script', item.code);
-  let el = realScript;
+  const isAdded = root && (root === scriptDiv || root::elemByTag('*') === scriptDiv);
+  const script = makeElem('script', item.code);
   let onError;
   let iframe;
   let iframeLoader;
@@ -245,49 +245,51 @@ function inject(item, iframeCb) {
     };
     window::on('error', onError);
   }
-  // Hiding the script's code from mutation events like DOMNodeInserted or DOMNodeRemoved
-  if (attachShadow) {
-    if (!elShadow) {
-      elShadow = makeElem('div');
-      elShadowRoot = elShadow::attachShadow({ mode: 'closed' });
-      elShadowRoot::appendChild(makeElem('style', `:host { ${DISPLAY_NONE} }`));
-      if (iframeCb) {
-        iframe = makeElem('iframe', {
-          /* Preventing other content scripts in Chrome */// eslint-disable-next-line no-script-url
-          src: 'javascript:void 0',
-          sandbox: 'allow-scripts allow-same-origin',
-          style: DISPLAY_NONE,
-        });
-        iframeLoader = () => {
-          iframeLoader = null;
-          iframe.contentDocument::getElementsByTagName('*')[0]::appendChild(realScript);
-          iframeCb();
-          realScript::remove();
-          iframe::remove();
-        };
-        /* In Chrome, when an empty iframe is inserted into document, `load` is fired synchronously,
-         * then `DOMNodeInserted`, also synchronously, then appendChild finishes, then our
-         * subsequent code runs. So, we have to use `load` event to run our script,
-         * otherwise it can be easily intercepted via DOMNodeInserted. */
-        if (!IS_FIREFOX) {
-          iframe::on('load', iframeLoader, { once: true });
-        }
-        elShadowRoot::appendChild(iframe);
-      }
+  if (!scriptDiv) {
+    scriptDiv = makeElem('div');
+    if (attachShadow) {
+      // Hiding the script's code from mutation events like DOMNodeInserted or DOMNodeRemoved
+      scriptDivRoot = scriptDiv::attachShadow({ mode: 'closed' });
+      scriptDivRoot::appendChild(makeElem('style', `:host { ${DISPLAY_NONE} }`));
+    } else {
+      scriptDivRoot = scriptDiv;
     }
-    if (!iframe) {
-      elShadowRoot::appendChild(realScript);
-    }
-    el = elShadow;
   }
-  // When using declarativeContent there's no documentElement so we'll append to `document`
-  if (!isAdded) (root || document)::appendChild(el);
+  if (iframeCb) {
+    iframe = makeElem('iframe', {
+      /* Preventing other content scripts in Chrome */// eslint-disable-next-line no-script-url
+      src: 'javascript:void 0',
+      sandbox: 'allow-scripts allow-same-origin',
+      style: DISPLAY_NONE,
+    });
+    iframeLoader = () => {
+      iframeLoader = null;
+      iframe.contentDocument::getElementsByTagName('*')[0]::appendChild(script);
+      iframeCb();
+      script::remove();
+      iframe::remove();
+    };
+    /* In Chrome, when an empty iframe is inserted into document, `load` is fired synchronously,
+     * then `DOMNodeInserted`, also synchronously, then appendChild finishes, then our
+     * subsequent code runs. So, we have to use `load` event to run our script,
+     * otherwise it can be easily intercepted via DOMNodeInserted. */
+    if (!IS_FIREFOX) {
+      iframe::on('load', iframeLoader, { once: true });
+    }
+    scriptDivRoot::appendChild(iframe);
+  }
+  if (!isAdded) {
+    // When using declarativeContent there's no documentElement so we'll append to `document`
+    (root || document)::appendChild(scriptDiv);
+    // Mimic jQuery's sequence: add a div, then set an id
+    scriptDiv::setAttribute('id', `sizzle${safeDateNow()}`);
+  }
   if (iframeLoader) iframeLoader();
   if (onError) window::off('error', onError);
   // Clean up in case something didn't load
   if (iframe) iframe::remove();
-  if (attachShadow) realScript::remove();
-  el::remove();
+  script::remove();
+  scriptDiv::remove();
 }
 
 function injectAll(runAt) {
