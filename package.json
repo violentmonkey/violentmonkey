@@ -77,7 +77,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "yarn transform -t",
-      "pre-push": "yarn lint"
+      "pre-push": "run-p lint test"
     }
   },
   "beta": 11
