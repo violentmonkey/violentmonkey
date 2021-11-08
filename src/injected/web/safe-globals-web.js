@@ -149,7 +149,7 @@ export const VAULT = (() => {
     funcToString = res[i += 1] || safeCall.toString,
     ArrayIsArray = res[i += 1] || src.Array.isArray,
     jsonParse = res[i += 1] || src.JSON.parse,
-    logging = res[i += 1] || assign({ __proto__: null }, console),
+    logging = res[i += 1] || assign({ __proto__: null }, src.console),
     mathRandom = res[i += 1] || srcFF.Math.random,
     parseFromString = res[i += 1] || DOMParserSafe[PROTO].parseFromString,
     readAsDataURL = res[i += 1] || FileReaderSafe[PROTO].readAsDataURL,
