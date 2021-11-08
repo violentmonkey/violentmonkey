@@ -6,7 +6,6 @@ import {
 } from '#/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
 import storage from '#/common/storage';
-import ua from '#/common/ua';
 import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
 import { testScript, testBlacklist } from './tester';
@@ -166,7 +165,7 @@ preInitialize.push(async () => {
   });
   // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
   if (version !== lastVersion
-  && ua.isFirefox
+  && IS_FIREFOX
   && data.options?.defaultInjectInto === INJECT_PAGE
   && compareVersion(lastVersion, '2.12.7') <= 0) {
     setOption('defaultInjectInto', INJECT_AUTO);

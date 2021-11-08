@@ -288,7 +288,7 @@ function prepareScript(script) {
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
     `})()}catch(e){${dataKey}(e)}};0`,
     // Firefox lists .user.js among our own content scripts so a space at start will group them
-    `\n//# sourceURL=${extensionRoot}${ua.isFirefox ? '%20' : ''}${name}.user.js#${id}`,
+    `\n//# sourceURL=${extensionRoot}${IS_FIREFOX ? '%20' : ''}${name}.user.js#${id}`,
   ].join('');
   cacheCode.put(dataKey, injectedCode, TIME_KEEP_DATA);
   /** @namespace VMInjectedScript */

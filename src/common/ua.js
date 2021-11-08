@@ -3,8 +3,9 @@
 // and for browser.runtime.getBrowserInfo in Firefox 51+
 
 /** @typedef UAExtras
- * @property {false | number} isChrome - Chrome/ium version number or `false`
- * @property {Boolean | number} isFirefox - boolean initially, Firefox version number when ready
+ * @property {number|NaN} chrome - Chrome/ium version number
+ * @property {number|NaN} firefox - derived from UA string initially, a real number when `ready`
+ * @property {Promise<void>} ready - resolves when `browser` API returns real versions
  */
 /** @typedef UAInjected
  * @property {chrome.runtime.PlatformInfo.arch} arch
@@ -18,13 +19,12 @@ export default ua;
 
 // using non-enumerable properties that won't be sent to content scripts via GetInjected
 Object.defineProperties(ua, {
-  isChrome: {
-    value: global.chrome?.app && +navigator.userAgent.match(/Chrom\S+?\/(\d+)|$/)[1] || false,
+  chrome: {
+    value: matchNavUA(true),
   },
-  isFirefox: {
-    // will be replaced with the version number in ready()
-    value: !!browser.runtime.getBrowserInfo,
-    configurable: true,
+  firefox: {
+    value: matchNavUA(), // will be replaced with the real version number in ready()
+    writable: true,
   },
   ready: {
     value: Promise.all([
@@ -35,13 +35,17 @@ Object.defineProperties(ua, {
         arch,
         os,
         browserName: name?.toLowerCase() || 'chrome',
-        browserVersion: version || navigator.userAgent.match(/Chrom\S+?\/(\S+)|$/)[1],
+        browserVersion: version || matchNavUA(true, true),
       });
-      if (ua.isFirefox) {
-        Object.defineProperty(ua, 'isFirefox', {
-          value: parseFloat(version),
-        });
+      if (IS_FIREFOX) {
+        ua.firefox = parseFloat(version) || 0;
       }
     }),
   },
 });
+
+function matchNavUA(asChrome, asString) {
+  const re = new RegExp(`\\s${asChrome ? 'Chrom(e|ium)' : 'Firefox'}/(\\d+[.0-9]*)|$`, 'i');
+  const ver = navigator.userAgent.match(re).pop();
+  return asString ? ver : parseFloat(ver);
+}

@@ -48,7 +48,7 @@ import { store } from '../../utils';
  * Note:
  * - Firefox does not support multiline <select>
  */
-if (ua.isFirefox) store.ffDownload = {};
+if (IS_FIREFOX) store.ffDownload = {};
 
 export default {
   components: {
@@ -86,7 +86,7 @@ function download(blob, fileName) {
    * v56 in Windows https://bugzil.la/1357486
    * v61 in MacOS https://bugzil.la/1385403
    * v63 in Linux https://bugzil.la/1357487 */
-  const FF = ua.isFirefox;
+  const FF = ua.firefox;
   // eslint-disable-next-line no-nested-ternary
   if (FF && (ua.os === 'win' ? FF < 56 : ua.os === 'mac' ? FF < 61 : FF < 63)) {
     const reader = new FileReader();

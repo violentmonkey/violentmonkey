@@ -1,6 +1,5 @@
 import { getScriptName, i18n, request, compareVersion, sendCmd, trueJoin } from '#/common';
 import { CMD_SCRIPT_UPDATE } from '#/common/consts';
-import ua from '#/common/ua';
 import { fetchResources, getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
@@ -135,7 +134,7 @@ function notify({
   commands.Notification({
     text,
     // FF doesn't show the name of the extension in the title of the notification
-    title: ua.isFirefox ? `${i18n('titleScriptUpdated')} - ${i18n('extName')}` : '',
+    title: IS_FIREFOX ? `${i18n('titleScriptUpdated')} - ${i18n('extName')}` : '',
   }, undefined, {
     onClick,
   });

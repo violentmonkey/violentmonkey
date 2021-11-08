@@ -1,5 +1,4 @@
 import { i18n, noop } from '#/common';
-import ua from '#/common/ua';
 import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
 import { objectPick } from '#/common/object';
 import cache from './cache';
@@ -64,7 +63,7 @@ let titleNoninjectable;
 
 // We'll cache the icon data in Chrome as it doesn't cache the data and takes up to 40ms
 // in our background page context to set the 4 icon sizes for each new tab opened
-const iconCache = ua.isChrome && {};
+const iconCache = !IS_FIREFOX && {};
 
 hookOptions((changes) => {
   let v;

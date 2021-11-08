@@ -1,4 +1,3 @@
-import ua from '#/common/ua';
 
 const SCROLL_GAP = 50;
 // px per one 60fps frame so the max is ~1200px per second (~one page)
@@ -66,7 +65,7 @@ function onTouchMoveDetect(e) {
   onTouchEndDetect();
   if (e === 'timer') {
     original::onDragStart(longPressEvent);
-    if (ua.isFirefox && parentCanScroll()) {
+    if (IS_FIREFOX && parentCanScroll()) {
       // FF bug workaround: prevent the script list container from scrolling on drag
       parent.scrollTop += 1;
       parent.scrollTop -= 1;

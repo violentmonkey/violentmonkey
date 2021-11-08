@@ -155,7 +155,6 @@ import { forEachKey } from '#/common/object';
 import { setRoute, lastRoute } from '#/common/router';
 import storage from '#/common/storage';
 import { keyboardService, handleTabNavigation } from '#/common/keyboard';
-import ua from '#/common/ua';
 import { loadData } from '#/options';
 import ScriptItem from './script-item';
 import Edit from './edit';
@@ -567,7 +566,7 @@ export default {
     }
     this.adjustScriptWidth();
     this.disposeList = [
-      ...ua.isFirefox ? [
+      ...IS_FIREFOX ? [
         keyboardService.register('tab', () => {
           handleTabNavigation(1);
         }),

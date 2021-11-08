@@ -138,6 +138,7 @@ export default {
         close: this.close,
       },
       confirmHotkey: CONFIRM_HOTKEY,
+      /** @type VMConfirmCache */
       info: {},
       deps: {}, // combines `this.require` and `this.resources` = all actually loaded deps
       descr: '',
@@ -154,7 +155,7 @@ export default {
   },
   computed: {
     trackTooltip() {
-      return ua.isFirefox >= 68 ? this.i18n('installOptionTrackTooltip') : null;
+      return ua.firefox >= 68 ? this.i18n('installOptionTrackTooltip') : null;
     },
     isLocal() {
       return !isRemote(this.info.url);
@@ -170,16 +171,16 @@ export default {
   async mounted() {
     const id = route.paths[0];
     const key = `confirm-${id}`;
-    this.info = await sendCmdDirectly('CacheLoad', key);
-    if (!this.info) {
+    const info = await sendCmdDirectly('CacheLoad', key);
+    this.info = info;
+    if (!info) {
       this.close();
       return;
     }
-    const { url } = this.info;
-    /* sendCmdDirectly makes the page load so fast that ua.isFirefox is still a boolean,
-       so we'll detect FF68 that stopped allowing file: scheme in fetch() via a CSS feature */
-    filePortNeeded = url.startsWith('file:') && ua.isFirefox && CSS.supports('counter-set', 'none');
-    cachedCodePromise = sendCmdDirectly('CachePop', url);
+    /* sendCmdDirectly makes the page load so fast that the local `ua` is still unverified,
+       so we use the background `ua` to check for FF68 that disallows file: scheme in fetch() */
+    filePortNeeded = info.ff >= 68 && info.url.startsWith('file:');
+    cachedCodePromise = sendCmdDirectly('CachePop', info.url);
     this.guard = setInterval(sendCmdDirectly, KEEP_INFO_DELAY, 'CacheHit', { key });
     await this.loadData();
     await this.parseMeta();

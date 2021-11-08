@@ -63,19 +63,19 @@ Object.assign(commands, {
         ? browser.runtime.getURL(url)
         : getFullUrl(url, srcUrl);
     }
-    const canOpenIncognito = !incognito || ua.isFirefox || !/^(chrome[-\w]*):/.test(url);
+    const canOpenIncognito = !incognito || IS_FIREFOX || !/^(chrome[-\w]*):/.test(url);
     let newTab;
     if (maybeInWindow
         && browser.windows
         && getOption('editorWindow')
         /* cookieStoreId in windows.create() is supported since FF64 https://bugzil.la/1393570
          * and a workaround is too convoluted to add it for such an ancient version */
-        && (!storeId || ua.isFirefox >= 64)) {
+        && (!storeId || ua.firefox >= 64)) {
       const wndOpts = {
         url,
         incognito: canOpenIncognito && incognito,
         ...getOption('editorWindowSimple') && { type: 'popup' },
-        ...ua.isChrome && { focused: !!active }, // FF doesn't support this
+        ...!IS_FIREFOX && { focused: !!active }, // FF doesn't support this
         ...storeId,
       };
       const pos = getOption('editorWindowPos');
@@ -122,7 +122,7 @@ Object.assign(commands, {
 ua.ready.then(() => {
   Object.defineProperties(ua, {
     openerTabIdSupported: {
-      value: ua.isChrome || ua.isFirefox >= 57 && ua.os !== 'android',
+      value: !IS_FIREFOX || ua.firefox >= 57 && ua.os !== 'android',
     },
   });
 });
