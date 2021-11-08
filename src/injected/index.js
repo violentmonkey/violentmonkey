@@ -20,6 +20,7 @@ if (url
     if (!/javascript|^text\/plain|^$/::regexpTest(response.headers.get('content-type') || '')) {
       return;
     }
+    let oldCode;
     let code = await response::getText();
     if (!/==userscript==/i::regexpTest(code)) {
       return;
@@ -28,9 +29,9 @@ if (url
     // FF68+ doesn't allow extension pages to get file: URLs anymore so we need to track it here
     // (detecting FF68 by a feature because we can't use getBrowserInfo here and UA may be altered)
     if (browser.storage.managed) {
+      /** @param {chrome.runtime.Port} */
       browser.runtime.onConnect.addListener(port => {
         if (port.name !== 'FetchSelf') return;
-        let oldCode;
         port.onMessage.addListener(async () => {
           code = await (await fetch(url, fetchOpts))::getText();
           if (code === oldCode) {
@@ -40,7 +41,13 @@ if (url
           }
           port.postMessage(code);
         });
-        port.onDisconnect.addListener(closeSelf);
+        port.onDisconnect.addListener(async () => {
+          oldCode = null;
+          // The user may have reloaded the Confirm page so let's check
+          if (!await sendCmd('CheckInstallerTab', port.sender.tab.id)) {
+            closeSelf();
+          }
+        });
       });
     } else {
       closeSelf();

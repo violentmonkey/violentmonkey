@@ -10,6 +10,7 @@ import { extensionRoot } from './init';
 import { commands } from './message';
 
 const VM_VERIFY = 'VM-Verify';
+const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 /** @type {Object<string,VMHttpRequest>} */
 const requests = {};
 const verify = {};
@@ -18,6 +19,11 @@ let encoder;
 
 Object.assign(commands, {
   ConfirmInstall: confirmInstall,
+  async CheckInstallerTab(tabId, src) {
+    const tab = IS_FIREFOX && (src.url || '').startsWith('file:')
+      && await browser.tabs.get(tabId).catch(noop);
+    return tab && (tab.pendingUrl || tab.url || '').startsWith(CONFIRM_URL_BASE);
+  },
   /** @return {void} */
   HttpRequest(opts, src) {
     const { tab: { id: tabId }, frameId } = src;
@@ -454,7 +460,7 @@ async function confirmInstall({ code, from, url }, { tab = {} }) {
     || /^(chrome:\/\/(newtab|startpage)\/|about:(home|newtab))$/.test(from));
   /** @namespace VMConfirmCache */
   cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId, ff: ua.firefox });
-  const confirmUrl = `/confirm/index.html#${confirmKey}`;
+  const confirmUrl = CONFIRM_URL_BASE + confirmKey;
   const { windowId } = canReplaceCurTab
     ? await browser.tabs.update(tabId, { url: confirmUrl })
     : await commands.TabOpen({ url: confirmUrl, active: !!active }, { tab });
