@@ -160,6 +160,7 @@ editNavValues:
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: All
+  touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: Show/edit the entire script value storage
@@ -501,14 +502,16 @@ labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Table view
 labelXhrInject:
+  description: NEW_LOCALE_ITEM
   message: Synchronous
 labelXhrInjectHint:
+  description: NEW_LOCALE_ITEM
   message: >-
-    Enable only if you have a script that needs to run before the page starts loading
-    and currently it's running too late. Just like Instant injection mode in Tampermonkey,
-    this option is using the deprecated synchronous XHR, so in Chrome/Chromium you'll
-    see warnings in devtools console, although you can safely ignore them
-    as the adverse affects are negligible in this case.
+    Enable only if you have a script that needs to run before the page starts
+    loading and currently it's running too late. Just like Instant injection
+    mode in Tampermonkey, this option is using the deprecated synchronous XHR,
+    so in Chrome/Chromium you'll see warnings in devtools console, although you
+    can safely ignore them as the adverse affects are negligible in this case.
     You can hide the warnings for good by right-clicking one.
 lastSync:
   description: Label for last sync timestamp.

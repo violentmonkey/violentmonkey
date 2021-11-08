@@ -9,13 +9,13 @@ buttonConfirmInstallation:
   message: Konfirmasi pemasangan
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: ''
+  message: Konfirmasi pemasangan ulang
 buttonDisable:
   description: Button to disable a script.
   message: Nonaktifkan
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: ''
+  message: Unduh tema
 buttonEdit:
   description: Button to edit a script.
   message: Sunting
@@ -167,6 +167,7 @@ editNavValues:
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Semua
+  touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: Tampilkan/sunting keseluruhan penyimpanan nilai skrip
@@ -281,13 +282,13 @@ labelAutoUpdate:
   message: 'Periksa pembaruan skrip setiap $1 hari, gunakan 0 untuk menonaktifkan'
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: Cadangkan
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Ditampilkan pada lencana: '
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 'Warna lencana:'
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: tidak ada
@@ -394,7 +395,7 @@ labelName:
   message: 'Nama:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Berjalan di dalam frame:'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Tanpa Nama
@@ -423,7 +424,7 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: Memasang ulang skrip
 labelRelated:
   description: Label of related links.
   message: 'Tautan terkait: '
@@ -453,7 +454,7 @@ labelSettings:
   message: Pengaturan
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Tampilkan posisi urutan dijalankan
 labelSync:
   description: Label for sync options.
   message: Sinkronisasi
@@ -493,7 +494,7 @@ labelSyncUsername:
   message: 'Nama pengguna: '
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Tema:'
 labelTranslator:
   description: Label of translator.
   message: 'Penerjemah: '
@@ -509,6 +510,12 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Tampilan tabel
+labelXhrInject:
+  description: NEW_LOCALE_ITEM
+  message: ''
+labelXhrInjectHint:
+  description: NEW_LOCALE_ITEM
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: Sinkron terakhir pada $1
@@ -642,7 +649,7 @@ msgNoUpdate:
   message: Pembaruan tidak tersedia.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: (kode sama)
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Daftar hitam diperbarui.
@@ -672,7 +679,7 @@ msgSyncInitError:
   message: Kesalahan saat memulai!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: Belum diotorisasi.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Sinkronisasi akan segera dimulai...
@@ -703,7 +710,7 @@ optionEditorWindowSimple:
   message: Sembunyikan omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: Ikon dan menu popup
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Aktif di atas
@@ -721,16 +728,16 @@ optionShowEnabledFirst:
   message: Tampilkan skrip aktif di atas
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: 'Tema UI:'
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: otomatis
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: gelap
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: terang
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Sesuai besar kecil huruf
@@ -748,7 +755,7 @@ sideMenuSettings:
   message: Pengaturan
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: Warna lencana normal
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: ''

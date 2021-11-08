@@ -171,6 +171,7 @@ editNavValues:
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Tout
+  touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: Montrer/éditer toutes les données stockées du script
@@ -516,6 +517,12 @@ labelViewSingleColumn:
   message: ''
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
+  message: ''
+labelXhrInject:
+  description: NEW_LOCALE_ITEM
+  message: ''
+labelXhrInjectHint:
+  description: NEW_LOCALE_ITEM
   message: ''
 lastSync:
   description: Label for last sync timestamp.

@@ -165,6 +165,7 @@ editNavValues:
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Všetko
+  touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: Zobraziť/upraviť celé úložisko hodnoty skriptu
@@ -509,6 +510,12 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Tabuľkové zobrazenie
+labelXhrInject:
+  description: NEW_LOCALE_ITEM
+  message: ''
+labelXhrInjectHint:
+  description: NEW_LOCALE_ITEM
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: Posledná synchronizácia $1
