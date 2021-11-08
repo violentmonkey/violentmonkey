@@ -27,7 +27,7 @@ const escFunc = m => escMap[m] || escCharCode(m::charCodeAt(0));
  * Thus, we use the native JSON.stringify() only in the content script context and only until
  * a userscript is injected into this context (due to `@inject-into` and/or a CSP problem).
  */
-export const jsonDump = (value, stack = []) => {
+export const jsonDump = (value, stack) => {
   let res;
   switch (value === null ? (res = 'null') : typeof value) {
   case 'bigint':
@@ -41,6 +41,9 @@ export const jsonDump = (value, stack = []) => {
     res = `"${value::replace(escRE, escFunc)}"`;
     break;
   case 'object':
+    if (!stack) {
+      stack = []; // Creating the array here, only when type is object.
+    }
     if (stack::indexOf(value) >= 0) {
       throw new ErrorSafe('Converting circular structure to JSON');
     }
