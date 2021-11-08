@@ -1,6 +1,6 @@
 import { getScriptName, getUniqId } from '#/common';
 import {
-  INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
+  INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING,
   INJECTABLE_TAB_URL_RE, METABLOCK_RE,
 } from '#/common/consts';
 import initCache from '#/common/cache';
@@ -240,6 +240,10 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
       envKey, // InjectionFeedback cache key for envDelayed
     },
     hasMore: !!more, // tells content bridge to expect envDelayed
+    forceContent: forceContent || ( // Trying to skip page sandbox when xhrInject is on:
+      feedback.length === scripts.length // ...when all `envStart` scripts are `content`,
+      && envDelayed.scripts.every(scr => isContentRealm(scr, forceContent)) // and `envDelayed` too.
+    ),
     ids: data.disabledIds, // content bridge adds the actually running ids and sends via SetPopup
     info: {
       ua,
@@ -267,8 +271,7 @@ function prepareScript(script) {
   const dataKey = getUniqId('VMin');
   const displayName = getScriptName(script);
   const name = encodeURIComponent(displayName.replace(/[#&',/:;?@=+]/g, replaceWithFullWidthForm));
-  const realm = normalizeRealm(custom[INJECT_INTO] || meta[INJECT_INTO]);
-  const isContent = realm === INJECT_CONTENT || forceContent && realm === INJECT_AUTO;
+  const isContent = isContentRealm(script, forceContent);
   const pathMap = custom.pathMap || {};
   const reqs = meta.require?.map(key => require[pathMap[key] || key]).filter(Boolean);
   // trying to avoid progressive string concatenation of potentially huge code slices
@@ -297,7 +300,6 @@ function prepareScript(script) {
     displayName,
     // code will be `true` if the desired realm is PAGE which is not injectable
     code: isContent ? '' : forceContent || injectedCode,
-    [INJECT_INTO]: realm,
     metaStr: code.match(METABLOCK_RE)[1] || '',
     values: value[id] || null,
   });
@@ -352,8 +354,15 @@ function forceContentInjection(data) {
   const inject = data.inject;
   inject.forceContent = true;
   inject.scripts.forEach(scr => {
-    const realm = normalizeRealm(scr.custom[INJECT_INTO] || scr.meta[INJECT_INTO]);
-    scr.code = realm === INJECT_PAGE || ''; // `true` will put it into failedIds
+    // When script wants `page`, the result below will be `true` so the script goes into `failedIds`
+    scr.code = !isContentRealm(scr, true) || '';
     data.feedback.push([scr.dataKey, true]);
   });
+}
+
+function isContentRealm(scr, forceContent) {
+  const realm = scr[INJECT_INTO] || (
+    scr[INJECT_INTO] = normalizeRealm(scr.custom[INJECT_INTO] || scr.meta[INJECT_INTO])
+  );
+  return realm === INJECT_CONTENT || forceContent && realm === INJECT_AUTO;
 }
