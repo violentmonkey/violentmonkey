@@ -168,6 +168,7 @@ editNavValues:
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Toate
+  touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: Afișează/editează toate valorile scriptului pentru spațiul de stocare
@@ -514,6 +515,19 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Vizualizare tip listă
+labelXhrInject:
+  description: NEW_LOCALE_ITEM
+  message: Sincronă
+labelXhrInjectHint:
+  description: NEW_LOCALE_ITEM
+  message: >-
+    Activează doar dacă ai un script care trebuie să ruleze înainte ca pagina să
+    înceapă să se încarce și în prezent rulează prea târziu. La fel ca și modul
+    de injectare instantanee din Tampermonkey, această opțiune utilizează XHR
+    sincron, care este perimat, astfel încât în Chrome/Chromium vei vedea
+    avertismente în consola devtools, deși le poți ignora în siguranță, deoarece
+    efectele adverse sunt neglijabile în acest caz. Poți ascunde definitiv
+    avertismentele dând clic dreapta pe una.
 lastSync:
   description: Label for last sync timestamp.
   message: Ultima sincronizare în $1
