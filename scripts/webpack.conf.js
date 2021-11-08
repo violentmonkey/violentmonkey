@@ -75,7 +75,6 @@ const defsObj = {
     { key: 'SYNC_ONEDRIVE_CLIENT_SECRET' },
   ]),
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
-  'process.env.VAULT_ID_NAME': JSON.stringify(VAULT_ID),
   'process.env.VAULT_ID': VAULT_ID,
   'process.env.HANDSHAKE_ID': HANDSHAKE_ID,
   'process.env.HANDSHAKE_ACK': '1',
