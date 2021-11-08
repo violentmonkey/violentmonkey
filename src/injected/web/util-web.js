@@ -1,9 +1,6 @@
 import { INJECT_CONTENT } from '../util';
 import bridge from './bridge';
 
-// Firefox defines `isFinite` on `global` not on `window`
-const { isFinite } = global; // eslint-disable-line no-restricted-properties
-const { toString: numberToString } = 0;
 // Reference: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON#Polyfill
 const escMap = {
   __proto__: null,
@@ -15,21 +12,27 @@ const escMap = {
   '\r': '\\r',
   '\t': '\\t',
 };
-const escRE = /[\\"\u0000-\u001F\u2028\u2029]/g; // eslint-disable-line no-control-regex
-const escFunc = m => escMap[m] || `\\u${(m::charCodeAt(0) + 0x10000)::numberToString(16)::slice(1)}`;
+// TODO: handle \u2028\u2029 when Chrome's JSON.stringify starts to escape them
+const escRE = /[\\"\u0000-\u001F]/g; // eslint-disable-line no-control-regex
+const hex = '0123456789ABCDEF';
+const escCharCode = num => `\\u00${
+  hex[num >> 4] // eslint-disable-line no-bitwise
+}${
+  hex[num % 16]
+}`;
+const escFunc = m => escMap[m] || escCharCode(m::charCodeAt(0));
 /**
  * When running in the page context we must beware of sites that override Array#toJSON
  * leading to an invalid result, which is why our jsonDump() ignores toJSON.
  * Thus, we use the native JSON.stringify() only in the content script context and only until
  * a userscript is injected into this context (due to `@inject-into` and/or a CSP problem).
  */
-export const jsonDump = value => {
-  if (value == null) return 'null';
+export const jsonDump = (value, stack = []) => {
   let res;
-  switch (typeof value) {
+  switch (value === null ? (res = 'null') : typeof value) {
   case 'bigint':
   case 'number':
-    res = isFinite(value) ? `${value}` : 'null';
+    res = safeIsFinite(value) ? `${value}` : 'null';
     break;
   case 'boolean':
     res = `${value}`;
@@ -38,14 +41,21 @@ export const jsonDump = value => {
     res = `"${value::replace(escRE, escFunc)}"`;
     break;
   case 'object':
+    if (stack::indexOf(value) >= 0) {
+      throw new ErrorSafe('Converting circular structure to JSON');
+    }
+    setOwnProp(stack, stack.length, value);
     if (ArrayIsArray(value)) {
       res = '[';
-      value::forEach(v => { res += `${res.length > 1 ? ',' : ''}${jsonDump(v) ?? 'null'}`; });
+      // Must enumerate all values to include holes in sparse arrays
+      for (let i = 0, len = value.length; i < len; i += 1) {
+        res += `${i ? ',' : ''}${jsonDump(value[i], stack) ?? 'null'}`;
+      }
       res += ']';
     } else {
       res = '{';
-      objectKeys(value)::forEach(key => {
-        const v = jsonDump(value[key]);
+      objectKeys(value)::forEach((key) => {
+        const v = jsonDump(value[key], stack);
         // JSON.stringify skips keys with `undefined` or incompatible values
         if (v !== undefined) {
           res += `${res.length > 1 ? ',' : ''}${jsonDump(key)}:${v}`;
@@ -53,6 +63,7 @@ export const jsonDump = value => {
       });
       res += '}';
     }
+    stack.length -= 1;
     break;
   default:
   }

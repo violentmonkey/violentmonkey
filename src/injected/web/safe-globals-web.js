@@ -23,6 +23,7 @@ export let
   off,
   on,
   openWindow,
+  safeIsFinite,
   // Symbol
   scopeSym,
   toStringTag,
@@ -112,6 +113,7 @@ export const VAULT = (() => {
     ProxySafe = res[i += 1] || srcFF.Proxy,
     ResponseSafe = res[i += 1] || src.Response,
     fire = res[i += 1] || src.dispatchEvent,
+    safeIsFinite = res[i += 1] || srcFF.isFinite, // Firefox defines `isFinite` on `global`
     off = res[i += 1] || src.removeEventListener,
     on = res[i += 1] || src.addEventListener,
     openWindow = res[i += 1] || src.open,
