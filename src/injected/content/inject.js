@@ -198,13 +198,15 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
   let needsInvoker;
   scripts::forEach(script => {
     const { code, runAt } = script;
+    const { id } = script.props;
     if (!code) {
       needsInvoker = true;
       contLists[runAt]::push(script);
     } else if (pageInjectable) {
       pgLists[runAt]::push(script);
     } else {
-      bridge.failedIds::push(script.props.id);
+      bridge.failedIds::push(id);
+      bridge.ids::push(id);
     }
   });
   if (document::getReadyState() === 'loading') {
