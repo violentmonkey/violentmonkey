@@ -18,28 +18,28 @@
         <span><kbd>Ctrl-Del</kbd>: {{i18n('buttonRemove')}}</span>
       </span>
     </div>
-    <div class="edit-values-table" v-if="keys"
+    <div class="edit-values-table"
          @keydown.down.exact="onUpDown"
          @keydown.up.exact="onUpDown">
       <a
+        ref="editAll"
         class="edit-values-row flex"
         @click="onEditAll" tabindex="0" v-text="i18n('editValueAllHint')"/>
-      <a
+      <div
         v-for="key in pageKeys"
         :key="key"
         class="edit-values-row flex"
-        tabindex="0"
         @keydown.delete.ctrl.exact="onRemove(key)"
         @click="onEdit(key)">
         <div class="ellipsis">
-          <span v-text="key"></span>
+          <a v-text="key" tabindex="0"/>
           <div class="edit-values-btn" @click.stop.prevent="onRemove(key)">
             <icon name="trash"/>
           </div>
         </div>
         <div class="ellipsis flex-auto" v-text="getValue(key, true)"></div>
         <pre v-text="getLength(key)"/>
-      </a>
+      </div>
     </div>
     <div class="edit-values-empty mt-1" v-if="keys && !keys.length" v-text="i18n('noValues')"/>
     <div class="edit-values-panel flex flex-col mb-1c" v-if="current">
@@ -74,9 +74,9 @@
 </template>
 
 <script>
-import { dumpScriptValue, formatByteLength, isEmpty, sendCmdDirectly } from '#/common';
-import { keyboardService } from '#/common/keyboard';
-import { mapEntry } from '#/common/object';
+import { dumpScriptValue, formatByteLength, sendCmdDirectly } from '#/common';
+import { handleTabNavigation, keyboardService } from '#/common/keyboard';
+import { deepEqual, mapEntry } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import storage from '#/common/storage';
 import { showMessage } from '#/common/ui';
@@ -132,12 +132,11 @@ export default {
   watch: {
     active(val) {
       if (val) {
+        (this.current ? this.$refs.value : focusedElement)?.focus();
         storage.value.getOne(this.script.props.id).then(data => {
-          this.setData(data);
-          if (!isEmpty(data)) {
-            this.onEditAll();
+          if (!this.values && this.setData(data) && this.keys.length) {
+            this.autofocus(true);
           }
-          this.autofocus();
         });
         scriptStorageKey = storage.value.prefix + this.script?.props.id;
         this.disposeList = [
@@ -168,10 +167,9 @@ export default {
     },
   },
   methods: {
-    autofocus() {
+    autofocus(andClick) {
       this.$nextTick(() => {
-        (focusedElement || this.$refs.container.querySelector(this.keys?.length ? 'a' : 'button'))
-        .focus();
+        this.$refs.editAll[andClick ? 'click' : 'focus']();
       });
     },
     getLength(key) {
@@ -189,11 +187,22 @@ export default {
       }
       return value;
     },
+    getValueAll() {
+      return `{\n  ${
+        this.keys
+        .map(key => `${JSON.stringify(key)}: ${this.getValue(key)}`)
+        .join(',\n')
+        .replace(/\n/g, '\n  ') // also handles nested linebreaks inside objects/arrays
+      }\n}`;
+    },
     setData(values = {}) {
-      this.values = values;
-      this.keys = Object.keys(values).sort();
-      this.page = Math.min(this.page, this.totalPages) || 1;
-      this.calcSize();
+      if (!deepEqual(this.values, values)) {
+        this.values = values;
+        this.keys = Object.keys(values).sort();
+        this.page = Math.min(this.page, this.totalPages) || 1;
+        this.calcSize();
+        return true;
+      }
     },
     calcSize() {
       store.storageSize = this.keys.reduce((sum, key) => sum + this.values[key].length - 1, 0);
@@ -239,12 +248,7 @@ export default {
     onEditAll() {
       this.current = {
         isAll: true,
-        value: `{\n  ${
-          this.keys
-          .map(key => `${JSON.stringify(key)}: ${this.getValue(key)}`)
-          .join(',\n')
-          .replace(/\n/g, '\n  ') // also handles nested linebreaks inside objects/arrays
-        }\n}`,
+        value: this.getValueAll(),
       };
     },
     async onSave() {
@@ -293,10 +297,12 @@ export default {
       const data = changes[scriptStorageKey]?.newValue;
       if (data) {
         const { current } = this;
-        const oldText = current && this.getValue(current.key);
+        const currentKey = current?.key;
+        const valueGetter = current && (currentKey ? this.getValue : this.getValueAll);
+        const oldText = valueGetter && valueGetter(currentKey);
         this.setData(data);
         if (current) {
-          const newText = this.getValue(current.key);
+          const newText = valueGetter(currentKey);
           const curText = current.value;
           if (curText === newText) {
             current.isNew = false;
@@ -314,7 +320,9 @@ export default {
       }
     },
     onUpDown(evt) {
-      evt.target[`${evt.key === 'ArrowUp' ? 'previous' : 'next'}Sibling`]?.focus();
+      handleTabNavigation(evt.key === 'ArrowDown' && 1
+        || evt.target !== this.$refs.editAll && -1
+        || 0); // Prevents Up from escaping the table since we don't listen for Down outside
     },
   },
 };
@@ -324,7 +332,7 @@ export default {
 .edit-values {
   &-row {
     border: 1px solid var(--fill-2);
-    color: unset;
+    cursor: pointer;
     &:first-child {
       padding: 8px 6px;
     }
@@ -350,6 +358,9 @@ export default {
     &:focus,
     &:hover {
       background-color: var(--fill-0-5);
+      a {
+        text-decoration: underline;
+      }
     }
     &:focus {
       text-decoration: underline;

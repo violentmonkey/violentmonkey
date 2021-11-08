@@ -227,7 +227,6 @@ a:focus {
 }
 a[tabindex="0"] {
   cursor: pointer;
-  color: inherit;
 }
 
 .sep {
