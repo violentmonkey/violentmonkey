@@ -80,5 +80,5 @@
       "pre-push": "run-p lint test"
     }
   },
-  "beta": 11
+  "beta": 12
 }
