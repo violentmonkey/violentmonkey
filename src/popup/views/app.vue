@@ -93,6 +93,8 @@
             :tabIndex="tabIndex"
             :data-message="item.name"
             @focus="focusedItem = item"
+            @keydown.enter.exact.stop="onEditScript(item)"
+            @keydown.space.exact.stop="onToggleScript(item)"
             @click="onToggleScript(item)">
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
@@ -493,26 +495,11 @@ export default {
           window.close();
         }
       }),
-      keyboardService.register('up', () => {
-        this.navigate('u');
-      }, {
-        condition: '!inputFocus',
-      }),
-      keyboardService.register('down', () => {
-        this.navigate('d');
-      }, {
-        condition: '!inputFocus',
-      }),
-      keyboardService.register('left', () => {
-        this.navigate('l');
-      }, {
-        condition: '!inputFocus',
-      }),
-      keyboardService.register('right', () => {
-        this.navigate('r');
-      }, {
-        condition: '!inputFocus',
-      }),
+      ...['up', 'down', 'left', 'right'].map(key => (
+        keyboardService.register(key,
+          this.navigate.bind(this, key[0]),
+          { condition: '!inputFocus' })
+      )),
       keyboardService.register('e', () => {
         this.onEditScript(this.focusedItem);
       }, {
