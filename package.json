@@ -14,7 +14,7 @@
     "lint:js": "eslint --ext .js,.vue .",
     "lint:yml": "gulp check",
     "svgo": "plaid svgo",
-    "test": "cross-env BABEL_ENV=test tape -r ./test/mock/register \"test/**/*.test.js\"",
+    "test": "cross-env BABEL_ENV=test tape -r ./test/mock/register \"test/**/*.test.js\" | tap-summary",
     "ci": "run-s lint test",
     "transform": "locky yarn yarn",
     "bumpVersion": "gulp bump",
@@ -48,6 +48,7 @@
     "sharp": "^0.26.2",
     "sign-addon": "^3.1.0",
     "tape": "^4.13.2",
+    "tap-summary": "^4.0.0",
     "through2": "^3.0.1",
     "vinyl": "^2.1.0",
     "wrapper-webpack-plugin": "2.1.0"
