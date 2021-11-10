@@ -117,8 +117,8 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    在 JSON 对象中为 CodeMirror 和附加组件提供自定义选项，如 {"indentUnit":2,
-    "smartIndent":true}<code>，但请注意，其中一些选项在 Violentmonkey 中可能不起作用。 查看<a
+    在 JSON 对象中为 CodeMirror 和附加组件提供自定义选项，如 <code>{"indentUnit":2,
+    "smartIndent":true}</code>，但请注意，其中一些选项在 Violentmonkey 中可能不起作用。 查看<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">完整列表</a>。
 editHelpDocumention:
