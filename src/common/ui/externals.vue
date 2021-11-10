@@ -21,6 +21,7 @@
     <div class="contents pos-rel flex-1">
       <img v-if="img" :src="img">
       <vm-code
+        v-show="!img"
         class="abs-full"
         v-model="code"
         ref="code"
