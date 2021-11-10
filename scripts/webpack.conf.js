@@ -28,6 +28,7 @@ const WEBPACK_OPTS = {
 };
 const MIN_OPTS = {
   cache: true,
+  extractComments: false,
   parallel: true,
   sourceMap: true,
   terserOptions: {
@@ -38,15 +39,17 @@ const MIN_OPTS = {
     },
     output: {
       ascii_only: true,
+      comments: false,
+      wrap_func_args: false, // disabling a premature optimization designed for old browsers
     },
   },
 };
 const MIN_OPTS_PUBLIC = isProd && {
-  chunkFilter: ({ name }) => name.startsWith('public/'),
+  include: 'public/',
   ...MIN_OPTS,
 };
 const MIN_OPTS_MAIN = isProd && deepmerge.all([{}, MIN_OPTS, {
-  chunkFilter: ({ name }) => !name.startsWith('public/'),
+  exclude: 'public/',
   terserOptions: {
     compress: {
       ecma: 8, // ES2017 Object.entries and so on
