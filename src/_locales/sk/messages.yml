@@ -128,7 +128,7 @@ descEditorOptions:
     rel="noopener noreferrer">celý zoznam</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: 'Dokumentácia k bloku metadát užívateľského skriptu a <code>GM</code> API:'
+  message: 'Dokumentácia k bloku metadát požívateľského skriptu a <code>GM</code> API:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: 'Klávesové skratky:'
@@ -178,7 +178,7 @@ editValueSave:
 extDescription:
   description: 'Description for this extension, will be displayed in web store'
   message: >-
-    Správca užívateľských skriptov s otvoreným kódom a podporou viacerých
+    Správca používateľských skriptov s otvoreným kódom a podporou viacerých
     prehliadačov
 extName:
   description: Name of this extension.
@@ -344,7 +344,7 @@ labelExportScriptData:
   message: Exportovať dáta skriptu
 labelExposeStatus:
   description: Option in advanced settings.
-  message: 'Zobraziť nainštalovanú verziu v katalógoch užívateľských skriptov: $1'
+  message: 'Zobraziť nainštalovanú verziu v katalógoch používateľských skriptov: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Spätná väzba
@@ -488,7 +488,7 @@ labelSyncServerUrl:
   message: 'Server URL: '
 labelSyncService:
   description: Label for sync service select.
-  message: Synchronizovať na
+  message: Synchronizovať s
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Používateľské meno: '
@@ -512,10 +512,17 @@ labelViewTable:
   message: Tabuľkové zobrazenie
 labelXhrInject:
   description: NEW_LOCALE_ITEM
-  message: ''
+  message: Synchrónne
 labelXhrInjectHint:
   description: NEW_LOCALE_ITEM
-  message: ''
+  message: >-
+    Povoľte iba vtedy, ak máte skript, ktorý sa musí spustiť pred začatím
+    načítavania stránky a v súčasnosti sa spúšťa príliš neskoro. Rovnako ako
+    režim okamžitého injektovania v Tampermonkey, aj táto možnosť používa
+    zastaraný synchrónny XHR, takže v prehliadači Chrome/Chromium sa v konzole
+    vývojárskych nástrojoch zobrazia varovania, hoci ich môžete pokojne
+    ignorovať, pretože nepriaznivé účinky sú v tomto prípade zanedbateľné.
+    Varovania môžete natrvalo skryť kliknutím pravým tlačidlom myši.
 lastSync:
   description: Label for last sync timestamp.
   message: Posledná synchronizácia $1

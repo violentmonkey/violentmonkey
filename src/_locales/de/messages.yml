@@ -515,10 +515,17 @@ labelViewTable:
   message: Tabellenansicht
 labelXhrInject:
   description: NEW_LOCALE_ITEM
-  message: ''
+  message: Synchron
 labelXhrInjectHint:
   description: NEW_LOCALE_ITEM
-  message: ''
+  message: >-
+    Nur aktivieren, falls Sie ein Skript haben, das vor dem Laden der Seite
+    ausgeführt werden muss und dies gegenwärtig zu spät passiert. Ebenso wie
+    Tampermonkeys Modus der "Sofortigen Injektion" nutzt diese Option das
+    veraltete synchrone XHR, daher werden Sie in Chrome/Chromium Warnungen in
+    der DevTools-Konsole sehen, jedoch können Sie diese gefahrlos ignorieren, da
+    nachteilige Effekte in diesem Fall vernachlässigbar sind. Sie können die
+    Warnungen mit einem Rechtsklick auf eine dieser dauerhaft ausblenden.
 lastSync:
   description: Label for last sync timestamp.
   message: Letzter Sync am $1
