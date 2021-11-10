@@ -146,7 +146,7 @@ textarea {
 }
 code {
   padding: 0 .2em;
-  background: hsla(50, 100%, 50%, .35);
+  background: hsla(45, 75%, 75%, .25);
   @media (prefers-color-scheme: dark) {
     background: hsla(40, 100%, 50%, .2);
   }
@@ -354,6 +354,7 @@ li {
   height: 100%;
 }
 
+code,
 .monospace-font,
 .editor-code .CodeMirror,
 .CodeMirror-hints.default /* CSS specificity hack to override default CM style */ {
