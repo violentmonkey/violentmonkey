@@ -16,54 +16,76 @@
       </label>
     </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
-    <tooltip content="@run-at" placement="right" class="form-group fit-width">
-      <label v-text="i18n('labelRunAt')"/>
-      <select v-model="custom.runAt">
-        <option value="" v-text="i18n('labelRunAtDefault')"></option>
-        <option value="document-start">document-start</option>
-        <option value="document-body">document-body</option>
-        <option value="document-end">document-end</option>
-        <option value="document-idle">document-idle</option>
-      </select>
-    </tooltip>
-    <tooltip content="@noframes" placement="right" class="form-group fit-width">
-      <label v-text="i18n('labelNoFrames')"/>
-      <select v-model="custom.noframes">
-        <option value="" v-text="i18n('labelRunAtDefault')"/>
-        <option value="0" v-text="i18n('genericOn')"/>
-        <option value="1" v-text="i18n('genericOff')"/>
-      </select>
-    </tooltip>
-    <tooltip v-for="([ name, label ]) in textInputs" :key="name"
-             :content="`@${name}`" placement="right"
-             class="form-group mr-tooltip">
-        <label v-text="label"/>
-        <input type="text" v-model="custom[name]" :placeholder="placeholders[name]">
-    </tooltip>
-    <div class="form-group" v-for="([ name, orig, label ]) in textAreas" :key="name">
-      <div>
-        <span v-text="label"/>
-        <label class="ml-2">
-          <input type="checkbox" v-model="custom[orig]">
-          <span v-text="i18n('labelKeepOriginal')"/>
-        </label>
-      </div>
-      <textarea v-model="custom[name]" spellcheck="false" ref="area"/>
-    </div>
+    <!-- Using tables to auto-adjust width, which differs substantially between languages -->
+    <table>
+      <tr>
+        <td>
+          <code>@run-at</code>
+          <p v-text="i18n('labelRunAt')"/>
+        </td>
+        <td>
+          <select v-model="custom.runAt">
+            <option value="" v-text="i18n('labelRunAtDefault')"></option>
+            <option value="document-start">document-start</option>
+            <option value="document-body">document-body</option>
+            <option value="document-end">document-end</option>
+            <option value="document-idle">document-idle</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <code>@<s style="color: var(--fill-6)">no</s>frames</code>
+          <p v-text="i18n('labelNoFrames')"/>
+        </td>
+        <td>
+          <select v-model="custom.noframes">
+            <option value="" v-text="i18n('labelRunAtDefault')"/>
+            <option value="0" v-text="i18n('genericOn')"/>
+            <option value="1" v-text="i18n('genericOff')"/>
+          </select>
+        </td>
+      </tr>
+      <tr v-for="([ name, label ]) in textInputs" :key="name">
+        <td>
+          <code v-text="`@${name}`"/>
+          <p v-text="label"/>
+        </td>
+        <td>
+          <input type="text" v-model="custom[name]" :placeholder="placeholders[name]">
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr v-for="([ name, orig, labelA, code, labelB ]) in textAreas" :key="name">
+        <td>
+          <p>
+            <span v-text="labelA"/>
+            <code v-text="code"/>
+            <span v-text="labelB"/>
+          </p>
+          <label>
+            <input type="checkbox" v-model="custom[orig]">
+            <span v-text="i18n('labelKeepOriginal')"/>
+          </label>
+        </td>
+        <td>
+          <textarea v-model="custom[name]" spellcheck="false" ref="area"/>
+        </td>
+      </tr>
+    </table>
   </div>
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { i18n } from '#/common';
 import { objectGet } from '#/common/object';
 import { autofitElementsHeight } from '#/common/ui';
 
+const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
+
 export default {
   props: ['active', 'settings', 'value'],
-  components: {
-    Tooltip,
-  },
   computed: {
     custom() {
       return this.settings.custom || {};
@@ -90,10 +112,10 @@ export default {
     },
     textAreas() {
       return [
-        ['include', 'origInclude', i18n('labelInclude')],
-        ['match', 'origMatch', i18n('labelMatch')],
-        ['exclude', 'origExclude', i18n('labelExclude')],
-        ['excludeMatch', 'origExcludeMatch', i18n('labelExcludeMatch')],
+        ['include', 'origInclude', ...highlightMetaKeys(i18n('labelInclude'))],
+        ['match', 'origMatch', ...highlightMetaKeys(i18n('labelMatch'))],
+        ['exclude', 'origExclude', ...highlightMetaKeys(i18n('labelExclude'))],
+        ['excludeMatch', 'origExcludeMatch', ...highlightMetaKeys(i18n('labelExcludeMatch'))],
       ];
     },
   },
@@ -109,54 +131,49 @@ export default {
 </script>
 
 <style>
-$leftColWidth: 11em;
+$leftColWidth: 12rem;
 .edit-settings {
   &.edit-body { // using 2 classes to ensure we override .edit-body in index.vue
-    column-width: 50em;
-    column-gap: 4em;
-    padding-left: 4em;
-    padding-right: 4em;
+    $GAP: 4em;
+    $PAD: 4em;
+    column-width: calc((1920px - $GAP - $PAD * 2) / 2);
+    column-gap: $GAP;
+    padding-left: $PAD;
+    padding-right: $PAD;
   }
   h4 {
     margin: 2em 0 1em;
   }
-  .form-group {
-    display: flex;
-    position: relative;
-    margin-bottom: .5em;
-    break-inside: avoid-column;
-    align-items: center;
+  table {
+    border-spacing: 0 1em;
+    break-inside: avoid;
+  }
+  tr {
+    margin-bottom: 1em;
+    > :nth-child(1) {
+      white-space: nowrap;
+      break-inside: avoid-column;
+      padding-right: .5em;
+      > :nth-child(2) {
+        margin-left: 1em;
+      }
+    }
+    > :nth-child(2) {
+      width: 100%;
+    }
     input[type=checkbox] + span {
       user-select: none;
     }
     input[type=text] {
-      display: block;
       width: 100%;
     }
-    &:not(.condensed) {
-      > :nth-child(1) {
-        display: flex;
-        flex: 0 0 $leftColWidth;
-        flex-direction: column;
-      }
-      > :nth-child(2):not(select) {
-        flex-grow: 1;
-      }
-    }
-    &.fit-width {
-      display: block;
-      width: fit-content;
-      > :nth-child(1) {
-        display: inline-block;
-        width: $leftColWidth;
-      }
-    }
   }
-  label:focus-within span {
+  tr:focus-within code {
     text-decoration: underline;
   }
-}
-.mr-tooltip {
-  margin-right: 6em;
+  code {
+    background: none;
+    font-weight: bold;
+  }
 }
 </style>
