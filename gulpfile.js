@@ -128,6 +128,7 @@ function copyI18n() {
     useDefaultLang: true,
     markUntouched: false,
     extension: '.json',
+    stripDescriptions: true,
   })
   .pipe(gulp.dest(`${DIST}/_locales`));
 }

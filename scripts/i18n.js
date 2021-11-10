@@ -52,8 +52,15 @@ class Locale {
     return this.data[key];
   }
 
-  dump(data, { extension }) {
+  dump(data, { extension, stripDescriptions }) {
     if (extension === '.json') {
+      if (stripDescriptions) {
+        data = Object.entries(data).reduce((res, [key, value]) => {
+          const { description, ...stripped } = value;
+          res[key] = stripped;
+          return res;
+        }, {});
+      }
       data = JSON.stringify(data, null, 2);
     } else if (extension === '.yml') {
       data = yaml.safeDump(data, { sortKeys: true });
