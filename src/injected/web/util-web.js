@@ -42,12 +42,12 @@ export const jsonDump = (value, stack) => {
     break;
   case 'object':
     if (!stack) {
-      stack = []; // Creating the array here, only when type is object.
-    }
-    if (stack::indexOf(value) >= 0) {
+      stack = [value]; // Creating the array here, only when type is object.
+    } else if (stack::indexOf(value) >= 0) {
       throw new ErrorSafe('Converting circular structure to JSON');
+    } else {
+      setOwnProp(stack, stack.length, value);
     }
-    setOwnProp(stack, stack.length, value);
     if (ArrayIsArray(value)) {
       res = '[';
       // Must enumerate all values to include holes in sparse arrays
