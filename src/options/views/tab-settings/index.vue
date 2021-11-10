@@ -104,7 +104,9 @@
           <label>
             <setting-check name="xhrInject"/>
             <tooltip :content="i18n('labelXhrInjectHint')">
-              <span v-text="i18n('labelXhrInject')"/>
+              <locale-group i18n-key="labelXhrInject">
+                <code>page</code>
+              </locale-group>
             </tooltip>
           </label>
         </div>
