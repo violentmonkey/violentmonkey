@@ -508,10 +508,16 @@ labelViewTable:
   message: Tabelweergave
 labelXhrInject:
   description: NEW_LOCALE_ITEM
-  message: ''
+  message: Synchroon
 labelXhrInjectHint:
   description: NEW_LOCALE_ITEM
-  message: ''
+  message: >-
+    Schakel deze optie alleen in als je een script hebt dat dient te worden
+    uitgevoerd vóórdat de pagina wordt geladen en het momenteel niet wordt
+    uitgevoerd. Dit is vergelijkbaar met de injectiemodus van Tampermonkey en
+    maakt gebruik van de verouderde synchrone XHR. Hierdoor kan het gebeuren dat
+    je Chrome-/Chromium-console waarschuwingen toont - deze kun je echter
+    negeren. Rechtsklik op een waarschuwing om deze nooit meer te tonen.
 lastSync:
   description: Label for last sync timestamp.
   message: Gesynchroniseerd op $1
