@@ -208,7 +208,7 @@ export function makeGlobalWrapper(local) {
       }
       return desc;
     },
-    has: (_, name) => name === 'undefined' || name in local || globals.has(name),
+    has: (_, name) => name in local || name in inheritedKeys || globals.has(name),
     ownKeys: () => makeOwnKeys(local, globals),
     preventExtensions() {},
     set(_, name, value) {
