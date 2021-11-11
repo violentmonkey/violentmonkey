@@ -317,14 +317,6 @@
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/plugin-syntax-export-namespace-from" "^7.8.3"
 
-"@babel/plugin-proposal-function-bind@^7.14.5":
-  version "7.14.5"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-function-bind/-/plugin-proposal-function-bind-7.14.5.tgz#83bbc684312bf82bda46ec7cb52dc226e891833f"
-  integrity sha512-PSQk5JImi81nFAzIebCEqkd0aiP9LDVKLCIH+0yR66JV8cQ1oZ8IRK9NNaA5nw9sjo0cPXxuBPCqgqcpugR8tA==
-  dependencies:
-    "@babel/helper-plugin-utils" "^7.14.5"
-    "@babel/plugin-syntax-function-bind" "^7.14.5"
-
 "@babel/plugin-proposal-function-sent@^7.8.0":
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-function-sent/-/plugin-proposal-function-sent-7.8.3.tgz#341fd532b7eadbbbdd8bcb715150f279a779f14f"
@@ -5094,14 +5086,6 @@ html-entities@^1.2.1:
   resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.2.1.tgz#0df29351f0721163515dfb9e5543e5f6eed5162f"
   integrity sha1-DfKTUfByEWNRXfueVUPl9u7VFi8=
 
-html-inline-css-webpack-plugin@^1.11.1:
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/html-inline-css-webpack-plugin/-/html-inline-css-webpack-plugin-1.11.1.tgz#e2aa6329687a108e90df6a30b65ad72d65731c03"
-  integrity sha512-P4GjZ4fxGn8Rm53TrYBUvjPMoOQAOzVGdVb8OKfrGkHyeTBl+M0+H0q6rjhiVZuF0I1MFUErc4N9hidcLlC1kg==
-  dependencies:
-    lodash "^4.17.15"
-    tslib "^1.9.3"
-
 html-minifier-terser@^5.0.1:
   version "5.0.4"
   resolved "https://registry.yarnpkg.com/html-minifier-terser/-/html-minifier-terser-5.0.4.tgz#e8cc02748acb983bd7912ea9660bd31c0702ec32"
@@ -7777,13 +7761,6 @@ postcss-colormin@^4.0.3:
     has "^1.0.0"
     postcss "^7.0.0"
     postcss-value-parser "^3.0.0"
-
-postcss-combine-media-query@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/postcss-combine-media-query/-/postcss-combine-media-query-1.0.1.tgz#99a8c4477c31b5e20061c6509bb18165c0f8066e"
-  integrity sha512-DFSXuYy3ltDkC2esIF0ORoS9DCjlyfWhtoQkG9brZMuJY1ABOER95sm3dvccR6IEgSrYX4RgqiHD4Lq3JGrxyw==
-  dependencies:
-    postcss "^7.0.21"
 
 postcss-convert-values@^4.0.1:
   version "4.0.1"
@@ -10501,11 +10478,6 @@ tslib@^1.10.0, tslib@^1.9.0:
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.11.1.tgz#eb15d128827fbee2841549e171f45ed338ac7e35"
   integrity sha512-aZW88SY8kQbU7gpV19lN24LtXh/yD4ZZg6qieAJDDg+YBsJcSmLGK9QpnUjAKVG/xefmvJGd1WUmfpT/g6AJGA==
-
-tslib@^1.9.3:
-  version "1.14.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
-  integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
 tty-browserify@0.0.0:
   version "0.0.0"
