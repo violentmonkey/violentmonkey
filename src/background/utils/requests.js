@@ -310,7 +310,7 @@ function isSpecialHeader(lowerHeader) {
 async function httpRequest(opts, src, cb) {
   const { tab } = src;
   const { incognito } = tab;
-  const { anonymous, id, overrideMimeType, responseType, url } = opts;
+  const { anonymous, id, overrideMimeType, xhrType, url } = opts;
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;
@@ -319,7 +319,7 @@ async function httpRequest(opts, src, cb) {
   const vmHeaders = [];
   // Firefox can send Blob/ArrayBuffer directly
   const chunked = !IS_FIREFOX && incognito;
-  const blobbed = responseType && !IS_FIREFOX && !incognito;
+  const blobbed = xhrType && !IS_FIREFOX && !incognito;
   const [body, contentType] = decodeBody(opts.data);
   // Chrome can't fetch Blob URL in incognito so we use chunks
   req.blobbed = blobbed;
@@ -342,7 +342,7 @@ async function httpRequest(opts, src, cb) {
       shouldSendCookies = false;
     }
   });
-  xhr.responseType = (chunked || blobbed) && 'blob' || responseType || 'text';
+  xhr.responseType = (chunked || blobbed) && 'blob' || xhrType || 'text';
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
   if (shouldSendCookies) {

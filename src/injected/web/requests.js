@@ -109,8 +109,7 @@ async function start(req, context, fileName) {
       'readystatechange',
       'timeout',
     ]::filter(key => isFunction(getOwnProp(opts, `on${key}`))),
-    responseType: getResponseType(opts),
-    wantsBlob: opts.responseType === 'blob',
+    xhrType: getResponseType(opts.responseType),
   }::pickIntoThis(opts, [
     'headers',
     'method',

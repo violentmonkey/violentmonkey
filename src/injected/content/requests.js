@@ -15,10 +15,10 @@ bridge.addHandlers({
     requests[msg.id] = {
       __proto__: null,
       realm,
+      wantsBlob: msg.xhrType === 'blob',
     }::pickIntoThis(msg, [
       'eventsToNotify',
       'fileName',
-      'wantsBlob',
     ]);
     msg.url = getFullUrl(msg.url);
     sendCmd('HttpRequest', msg);
