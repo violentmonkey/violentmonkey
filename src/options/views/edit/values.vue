@@ -18,7 +18,7 @@
         <span><kbd>Ctrl-Del</kbd>: {{i18n('buttonRemove')}}</span>
       </span>
     </div>
-    <div class="edit-values-table"
+    <div class="edit-values-table main"
          @keydown.down.exact="onUpDown"
          @keydown.up.exact="onUpDown">
       <a
@@ -33,15 +33,28 @@
         @click="onEdit(key)">
         <div class="ellipsis">
           <a v-text="key" tabindex="0"/>
-          <div class="edit-values-btn" @click.stop.prevent="onRemove(key)">
-            <icon name="trash"/>
-          </div>
         </div>
         <div class="ellipsis flex-auto" v-text="getValue(key, true)"></div>
         <pre v-text="getLength(key)"/>
+        <div class="del" @click.stop="onRemove(key)">
+          <icon name="trash"/>
+        </div>
       </div>
     </div>
-    <div class="edit-values-empty mt-1" v-if="keys && !keys.length" v-text="i18n('noValues')"/>
+    <h3 v-text="i18n('headerRecycleBin')" v-if="trash"/>
+    <div class="edit-values-table trash"
+         @keydown.down.exact="onUpDown"
+         @keydown.up.exact="onUpDown"
+         v-if="trash">
+      <div v-for="([key, val, displayVal, len], trashKey) in trash" :key="trashKey"
+           class="edit-values-row flex"
+           @click="onRestore(trashKey)">
+        <a class="ellipsis" v-text="key" tabindex="0"/>
+        <s class="ellipsis flex-auto" v-text="displayVal"/>
+        <pre v-text="len"/>
+      </div>
+    </div>
+    <div class="edit-values-empty mt-1" v-if="!keys.length" v-text="i18n('noValues')"/>
     <div class="edit-values-panel flex flex-col mb-1c" v-if="current">
       <div class="control">
         <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
@@ -74,7 +87,7 @@
 </template>
 
 <script>
-import { dumpScriptValue, formatByteLength, sendCmdDirectly } from '#/common';
+import { dumpScriptValue, formatByteLength, isEmpty, sendCmdDirectly } from '#/common';
 import { handleTabNavigation, keyboardService } from '#/common/keyboard';
 import { deepEqual, mapEntry } from '#/common/object';
 import Icon from '#/common/ui/icon';
@@ -110,18 +123,21 @@ export default {
   data() {
     return {
       current: null,
-      keys: null,
       page: null,
       values: null,
+      trash: null,
     };
   },
   computed: {
+    keys() {
+      return Object.keys(this.values || {}).sort();
+    },
     totalPages() {
-      return Math.ceil(this.keys?.length / PAGE_SIZE) || 0;
+      return Math.ceil(this.keys.length / PAGE_SIZE);
     },
     pageKeys() {
       const offset = PAGE_SIZE * (this.page - 1);
-      return this.keys?.slice(offset, offset + PAGE_SIZE);
+      return this.keys.slice(offset, offset + PAGE_SIZE);
     },
   },
   mounted() {
@@ -198,7 +214,6 @@ export default {
     setData(values = {}) {
       if (!deepEqual(this.values, values)) {
         this.values = values;
-        this.keys = Object.keys(values).sort();
         this.page = Math.min(this.page, this.totalPages) || 1;
         this.calcSize();
         return true;
@@ -207,17 +222,17 @@ export default {
     calcSize() {
       store.storageSize = this.keys.reduce((sum, key) => sum + this.values[key].length - 1, 0);
     },
-    updateValue({ key, jsonValue, isNew }) {
-      const rawValue = dumpScriptValue(jsonValue) || '';
+    updateValue({
+      key,
+      jsonValue,
+      rawValue = dumpScriptValue(jsonValue) || '',
+    }) {
       const { id } = this.script.props;
       return sendCmdDirectly('UpdateValue', { id, key, value: rawValue })
       .then(() => {
         if (rawValue) {
           this.$set(this.values, key, rawValue);
-          if (isNew) this.keys.push(key);
         } else {
-          const i = this.keys.indexOf(key);
-          if (i >= 0) this.keys.splice(i, 1);
           this.$delete(this.values, key);
         }
         this.calcSize();
@@ -230,13 +245,24 @@ export default {
         value: '',
       };
     },
-    onRemove(key) {
-      this.updateValue({ key })
-      .then(() => {
-        if (this.current && this.current.key === key) {
-          this.current = null;
-        }
-      });
+    async onRemove(key) {
+      (this.trash || (this.trash = {}))[key + Math.random()] = [
+        key,
+        this.values[key],
+        this.getValue(key, true),
+        this.getLength(key),
+      ];
+      await this.updateValue({ key });
+      if (this.current?.key === key) {
+        this.current = null;
+      }
+    },
+    onRestore(trashKey) {
+      const { trash } = this;
+      const [key, rawValue] = trash[trashKey];
+      delete trash[trashKey];
+      if (isEmpty(trash)) this.trash = null;
+      this.updateValue({ key, rawValue });
     },
     onEdit(key) {
       this.current = {
@@ -333,7 +359,7 @@ export default {
   &-row {
     border: 1px solid var(--fill-2);
     cursor: pointer;
-    &:first-child {
+    .main > &:first-child {
       padding: 8px 6px;
     }
     &:not(:first-child) {
@@ -368,6 +394,10 @@ export default {
     &:focus .edit-values-btn,
     &:hover .edit-values-btn {
       display: block;
+    }
+    .del:active {
+      color: #fff;
+      background: red;
     }
   }
   &-empty {
@@ -415,15 +445,6 @@ export default {
       word-break: break-all;
       resize: none;
     }
-  }
-  &-btn {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 4px;
-    background: inherit;
-    box-shadow: 0 0 5px 5px var(--fill-0-5);
-    display: none;
   }
 }
 </style>
