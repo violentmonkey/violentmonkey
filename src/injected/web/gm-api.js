@@ -195,15 +195,12 @@ function webAddElement(parent, tag, attrs, context) {
      but we keep it for compatibility with GM_addStyle in VM of 2017-2019
      https://github.com/violentmonkey/violentmonkey/issues/217
      as well as for GM_addElement in Tampermonkey. */
-  safeDefineProperty(el, 'then', {
-    configurable: true,
-    value(callback) {
-      // prevent infinite resolve loop
-      delete el.then;
-      callback(el);
-    },
-  });
-  return el;
+  return setOwnProp(el, 'then', async cb => (
+    // Preventing infinite resolve loop
+    delete el.then
+    // Native Promise ignores non-function
+    && (isFunction(cb) ? cb(el) : el)
+  ));
 }
 
 function getResource(context, name, isBlob) {

@@ -1,11 +1,11 @@
 import { INJECT_CONTENT } from '../util';
 import bridge from './bridge';
-import { FastLookup } from './util-web';
+import { FastLookup, safeConcat } from './util-web';
 
 /** The index strings that look exactly like integers can't be forged
  * but for example '011' doesn't look like 11 so it's allowed */
 const isFrameIndex = key => key >= 0 && key <= 0xFFFF_FFFE && key === `${+key}`;
-
+const scopeSym = SymbolSafe.unscopables;
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
   const kWrappedJSObject = 'wrappedJSObject';
@@ -164,7 +164,7 @@ export function makeGlobalWrapper(local) {
   /* Browsers may return [object Object] for Object.prototype.toString(window)
      on our `window` proxy so jQuery libs see it as a plain object and throw
      when trying to clone its recursive properties like `self` and `window`. */
-  safeDefineProperty(local, toStringTag, { get: () => 'Window' });
+  safeDefineProperty(local, toStringTagSym, { get: () => 'Window' });
   const wrapper = new ProxySafe(local, {
     __proto__: null,
     defineProperty(_, name, desc) {
@@ -245,12 +245,13 @@ function makeOwnKeys(local, globals) {
   const names = getOwnPropertyNames(local)::filter(notIncludedIn, globals);
   const symbols = getOwnPropertySymbols(local)::filter(notIncludedIn, globals);
   const frameIndexes = [];
-  for (let i = 0, s; (global[s = `${i}`] || 0)::objectToString() === '[object Window]'; i += 1) {
+  for (let i = 0, s; getObjectTypeTag(global[s = `${i}`]) === 'Window'; i += 1) {
     if (!(s in local)) {
       setOwnProp(frameIndexes, s, s);
     }
   }
-  return []::concat(
+  return safeConcat(
+    [],
     globals === globalKeysSet ? globalKeys : globals.toArray(),
     frameIndexes,
     names,

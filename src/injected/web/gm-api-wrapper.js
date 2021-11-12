@@ -1,7 +1,7 @@
 import bridge from './bridge';
 import { makeGmApi } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
-import { makeComponentUtils } from './util-web';
+import { makeComponentUtils, safeConcat } from './util-web';
 
 /** Name in Greasemonkey4 -> name in GM */
 const GM4_ALIAS = {
@@ -28,7 +28,7 @@ export function makeGmApiWrapper(script) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const { meta } = script;
-  const grant = meta.grant || [];
+  const grant = meta.grant;
   if (grant.length === 1 && grant[0] === 'none') {
     grant.length = 0;
   }
@@ -64,9 +64,7 @@ export function makeGmApiWrapper(script) {
   }
   if (!gmApi && grant.length) gmApi = makeGmApi();
   grant::forEach((name) => {
-    // Spoofed String index getters won't be called within length, length itself is unforgeable
-    const gm4name = name.length > 3 && name[2] === '.' && name[0] === 'G' && name[1] === 'M'
-      && name::slice(3);
+    const gm4name = name::slice(0, 3) === 'GM.' && name::slice(3);
     const fn = gmApi[gm4name ? `GM_${GM4_ALIAS[gm4name] || gm4name}` : name];
     if (fn) {
       if (gm4name) {
@@ -94,7 +92,7 @@ function makeGmInfo(script, resources) {
     case 'exclude': // -> excludes
     case 'include': // -> includes
       key += 's';
-      val = []::concat(val);
+      val = safeConcat([], val);
       break;
     default:
     }

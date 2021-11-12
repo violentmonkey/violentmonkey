@@ -1,6 +1,16 @@
 import { INJECT_CONTENT } from '../util';
 import bridge from './bridge';
 
+const isConcatSpreadableSym = SymbolSafe.isConcatSpreadable;
+
+export const safeConcat = (dest, ...arrays) => {
+  if (!dest[isConcatSpreadableSym]) {
+    setOwnProp(dest, isConcatSpreadableSym, true);
+    arrays::forEach(arr => setOwnProp(arr, isConcatSpreadableSym, true));
+  }
+  return concat::apply(dest, arrays);
+};
+
 // Reference: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON#Polyfill
 const escMap = {
   __proto__: null,
@@ -38,7 +48,7 @@ export const jsonDump = (value, stack) => {
     res = `${value}`;
     break;
   case 'string':
-    res = `"${value::replace(escRE, escFunc)}"`;
+    res = `"${escRE::regexpReplace(value, escFunc)}"`;
     break;
   case 'object':
     if (!stack) {
@@ -97,7 +107,7 @@ export const FastLookup = (hubs = createNullObj()) => {
     toArray: () => {
       const values = objectValues(hubs);
       values::forEach((val, i) => { values[i] = objectKeys(val); });
-      return concat::apply([], values);
+      return safeConcat([], values);
     },
   };
   function getHub(val, autoCreate) {

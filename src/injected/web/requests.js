@@ -36,7 +36,7 @@ function parseData(req, msg) {
   case 'document':
     res = new DOMParserSafe()::parseFromString(res,
       // Cutting everything after , or ; and trimming whitespace
-      msg.contentType::replace(/[,;].*|\s+/g, '') || 'text/html');
+      /[,;].*|\s+/g::regexpReplace(msg.contentType, '') || 'text/html');
     break;
   default:
   }
@@ -70,11 +70,10 @@ function callback(req, msg) {
       },
     });
     if (headers != null) req.headers = headers;
-    // Spoofed String/Array index getters won't be called within length, length itself is unforgeable
-    if (text != null) req.text = text.length && text[0] === 'same' ? response : text;
-    data.context = opts.context;
-    data.responseHeaders = req.headers;
-    data.responseText = req.text;
+    if (text != null) req.text = getOwnProp(text, 0) === 'same' ? response : text;
+    setOwnProp(data, 'context', opts.context);
+    setOwnProp(data, 'responseHeaders', req.headers);
+    setOwnProp(data, 'responseText', req.text);
     cb(data);
   }
   if (msg.type === 'loadend') delete idMap[req.id];
@@ -144,7 +143,7 @@ function getResponseType({ responseType = '' }) {
  * and ReadableStream, which Chrome can't transfer to isolated world via CustomEvent.
  */
 async function encodeBody(body) {
-  const wasBlob = body::objectToString() === '[object Blob]';
+  const wasBlob = getObjectTypeTag(body) === 'Blob';
   const blob = wasBlob ? body : await new ResponseSafe(body)::safeResponseBlob();
   const reader = new FileReaderSafe();
   return new PromiseSafe(resolve => {

@@ -37,7 +37,7 @@ export const {
 } = Object;
 export const { random: mathRandom } = Math;
 export const regexpTest = RegExp[PROTO].test;
-export const { toStringTag } = Symbol; // used by ProtectWebpackBootstrapPlugin
+export const { toStringTag: toStringTagSym } = Symbol; // used by ProtectWebpackBootstrapPlugin
 export const { decode: tdDecode } = TextDecoderSafe[PROTO];
 export const { stopImmediatePropagation } = Event[PROTO];
 export const { get: getHref } = describeProperty(HTMLAnchorElement[PROTO], 'href');

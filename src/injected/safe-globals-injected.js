@@ -20,9 +20,12 @@ export const WINDOW_FOCUS = 'window.focus';
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 export const CALLBACK_ID = '__CBID';
 
+export const getObjectTypeTag = val => val && val::objectToString()::slice(8, -1);
+
 export const isFunction = val => typeof val === 'function';
 export const isObject = val => val !== null && typeof val === 'object';
-export const isPromise = val => val && val::objectToString() === '[object Promise]';
+// TODO: maybe use `val[toStringTagSym]` when strict_min_version > 78
+export const isPromise = val => getObjectTypeTag(val) === 'Promise';
 export const isString = val => typeof val === 'string';
 
 export const getOwnProp = (obj, key) => (

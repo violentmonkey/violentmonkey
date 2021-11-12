@@ -1,5 +1,5 @@
 /* eslint-disable one-var, one-var-declaration-per-line, no-unused-vars,
-   prefer-const, import/no-mutable-exports, no-restricted-syntax */
+   prefer-const, import/no-mutable-exports */
 
 /**
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.
@@ -19,14 +19,14 @@ export let
   PromiseSafe,
   ProxySafe,
   ResponseSafe,
+  SymbolSafe,
   fire,
   off,
   on,
   openWindow,
   safeIsFinite,
   // Symbol
-  scopeSym,
-  toStringTag,
+  toStringTagSym,
   // Object
   apply,
   assign,
@@ -52,7 +52,6 @@ export let
   // String.prototype
   charCodeAt,
   slice,
-  replace,
   // safeCall
   safeCall,
   // various methods
@@ -66,6 +65,7 @@ export let
   readAsDataURL, // FileReader
   safeResponseBlob, // Response - safe = "safe global" to disambiguate the name
   stopImmediatePropagation,
+  regexpReplace,
   then,
   // various getters
   getBlobType, // Blob
@@ -82,11 +82,12 @@ export let
 export const VAULT = (() => {
   let ArrayP;
   let ElementP;
+  let ObjectSafe;
   let StringP;
   let i = -1;
+  let call;
   let res;
-  let src = window;
-  let srcFF;
+  let src = global; // FF defines some stuff only on `global` in content mode
   if (process.env.VAULT_ID) {
     res = window[process.env.VAULT_ID];
     delete window[process.env.VAULT_ID];
@@ -97,7 +98,6 @@ export const VAULT = (() => {
     src = res[0];
     res = createNullObj();
   }
-  srcFF = global === window ? src : global;
   res = [
     // window
     BlobSafe = res[i += 1] || src.Blob,
@@ -109,30 +109,28 @@ export const VAULT = (() => {
     MouseEventSafe = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
     PromiseSafe = res[i += 1] || src.Promise,
+    SymbolSafe = res[i += 1] || src.Symbol,
     // In FF content mode global.Proxy !== window.Proxy
-    ProxySafe = res[i += 1] || srcFF.Proxy,
+    ProxySafe = res[i += 1] || src.Proxy,
     ResponseSafe = res[i += 1] || src.Response,
     fire = res[i += 1] || src.dispatchEvent,
-    safeIsFinite = res[i += 1] || srcFF.isFinite, // Firefox defines `isFinite` on `global`
+    safeIsFinite = res[i += 1] || src.isFinite, // Firefox defines `isFinite` on `global`
     off = res[i += 1] || src.removeEventListener,
     on = res[i += 1] || src.addEventListener,
     openWindow = res[i += 1] || src.open,
-    // Symbol
-    scopeSym = res[i += 1] || srcFF.Symbol.unscopables,
-    toStringTag = res[i += 1] || srcFF.Symbol.toStringTag,
-    // Object
-    describeProperty = res[i += 1] || Object.getOwnPropertyDescriptor,
-    defineProperty = res[i += 1] || Object.defineProperty,
-    getOwnPropertyNames = res[i += 1] || Object.getOwnPropertyNames,
-    getOwnPropertySymbols = res[i += 1] || Object.getOwnPropertySymbols,
-    assign = res[i += 1] || Object.assign,
-    objectKeys = res[i += 1] || Object.keys,
-    objectValues = res[i += 1] || Object.values,
-    apply = res[i += 1] || Object.apply,
-    bind = res[i += 1] || Object.bind,
+    // Object - using ObjectSafe to pacify eslint without disabling the rule
+    defineProperty = (ObjectSafe = Object) && res[i += 1] || ObjectSafe.defineProperty,
+    describeProperty = res[i += 1] || ObjectSafe.getOwnPropertyDescriptor,
+    getOwnPropertyNames = res[i += 1] || ObjectSafe.getOwnPropertyNames,
+    getOwnPropertySymbols = res[i += 1] || ObjectSafe.getOwnPropertySymbols,
+    assign = res[i += 1] || ObjectSafe.assign,
+    objectKeys = res[i += 1] || ObjectSafe.keys,
+    objectValues = res[i += 1] || ObjectSafe.values,
+    apply = res[i += 1] || ObjectSafe.apply,
+    bind = res[i += 1] || ObjectSafe.bind,
     // Object.prototype
-    hasOwnProperty = res[i += 1] || Object[PROTO].hasOwnProperty,
-    objectToString = res[i += 1] || Object[PROTO].toString,
+    hasOwnProperty = res[i += 1] || ObjectSafe[PROTO].hasOwnProperty,
+    objectToString = res[i += 1] || ObjectSafe[PROTO].toString,
     // Array.prototype
     concat = res[i += 1] || (ArrayP = src.Array[PROTO]).concat,
     filter = res[i += 1] || ArrayP.filter,
@@ -141,22 +139,22 @@ export const VAULT = (() => {
     // Element.prototype
     remove = res[i += 1] || (ElementP = src.Element[PROTO]).remove,
     // String.prototype
-    charCodeAt = res[i += 1] || (StringP = srcFF.String[PROTO]).charCodeAt,
+    charCodeAt = res[i += 1] || (StringP = src.String[PROTO]).charCodeAt,
     slice = res[i += 1] || StringP.slice,
-    replace = res[i += 1] || StringP.replace,
     // safeCall
-    safeCall = res[i += 1] || Object.call.bind(Object.call),
+    safeCall = res[i += 1] || (call = ObjectSafe.call).bind(call),
     // various methods
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     funcToString = res[i += 1] || safeCall.toString,
     ArrayIsArray = res[i += 1] || src.Array.isArray,
     jsonParse = res[i += 1] || src.JSON.parse,
     logging = res[i += 1] || assign({ __proto__: null }, src.console),
-    mathRandom = res[i += 1] || srcFF.Math.random,
+    mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || DOMParserSafe[PROTO].parseFromString,
     readAsDataURL = res[i += 1] || FileReaderSafe[PROTO].readAsDataURL,
     safeResponseBlob = res[i += 1] || ResponseSafe[PROTO].blob,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
+    regexpReplace = res[i += 1] || src.RegExp[PROTO][SymbolSafe.replace],
     then = res[i += 1] || PromiseSafe[PROTO].then,
     // various getters
     getBlobType = res[i += 1] || describeProperty(BlobSafe[PROTO], 'type').get,
@@ -165,5 +163,7 @@ export const VAULT = (() => {
     getReaderResult = res[i += 1] || describeProperty(FileReaderSafe[PROTO], 'result').get,
     getRelatedTarget = res[i += 1] || describeProperty(MouseEventSafe[PROTO], 'relatedTarget').get,
   ];
+  // Well-known Symbols are unforgeable
+  toStringTagSym = SymbolSafe.toStringTag;
   return res;
 })();

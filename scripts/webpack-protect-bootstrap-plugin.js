@@ -2,7 +2,7 @@ const escapeStringRegexp = require('escape-string-regexp');
 
 /**
  * WARNING! The following globals must be correctly assigned using wrapper-webpack-plugin.
- * toStringTag = Symbol.toStringTag
+ * toStringTagSym = Symbol.toStringTag
  * defineProperty = Object.defineProperty
  * hasOwnProperty = Object.prototype.hasOwnProperty
  * safeCall = Function.prototype.call.bind(Function.prototype.call)
@@ -30,7 +30,7 @@ class WebpackProtectBootstrapPlugin {
       ]]));
       hooks.requireExtensions.tap(NAME, src => replace(src, [
         ["(typeof Symbol !== 'undefined' && Symbol.toStringTag)", '(true)'],
-        ['Symbol.toStringTag', 'toStringTag'],
+        ['Symbol.toStringTag', 'toStringTagSym'],
         [/Object\.(defineProperty\([^){\n]+{)/g, `$1${NULL_PROTO},`],
         ['Object.create(null)', NULL_OBJ],
         ['for(var key in value)', 'for(const key in value)'],
