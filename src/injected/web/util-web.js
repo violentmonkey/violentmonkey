@@ -4,10 +4,10 @@ import bridge from './bridge';
 const isConcatSpreadableSym = SymbolSafe.isConcatSpreadable;
 
 export const safeConcat = (dest, ...arrays) => {
-  if (!dest[isConcatSpreadableSym]) {
-    setOwnProp(dest, isConcatSpreadableSym, true);
-    arrays::forEach(arr => setOwnProp(arr, isConcatSpreadableSym, true));
-  }
+  /* A page can use a getter on Array.prototype that returns false when checked by our code
+   * (detectable via `new Error().stack`), so we'll just always set this symbol on our arrays. */
+  setOwnProp(dest, isConcatSpreadableSym, true);
+  arrays::forEach(arr => setOwnProp(arr, isConcatSpreadableSym, true));
   return concat::apply(dest, arrays);
 };
 
