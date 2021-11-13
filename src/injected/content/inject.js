@@ -249,6 +249,7 @@ function inject(item, iframeCb) {
       /* Preventing other content scripts */// eslint-disable-next-line no-script-url
       src: 'javascript:void 0',
       sandbox: 'allow-same-origin allow-scripts',
+      style: 'display:none!important',
     });
     /* In FF the opener receives DOMNodeInserted attached at creation so it can see window[0] */
     if (!IS_FIREFOX) {
