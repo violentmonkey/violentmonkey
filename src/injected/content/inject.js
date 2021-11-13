@@ -71,9 +71,9 @@ export function injectPageSandbox(contentId, webId) {
      * Content scripts will see `document.opener = null`, not the original opener, so we have
      * to use an iframe to extract the safe globals. Detection via document.referrer won't work
      * is it can be emptied by the opener page, too. */
-    inject({ code: `parent["${vaultId}"] = [this]` }, () => {
+    inject({ code: `parent["${vaultId}"] = [this]` }, ok => {
       // Skipping page injection in FF if our script element was blocked by site's CSP
-      if (!IS_FIREFOX || window.wrappedJSObject[vaultId]) {
+      if (ok && (!IS_FIREFOX || window.wrappedJSObject[vaultId])) {
         startHandshake();
       }
     });
@@ -243,9 +243,13 @@ function inject(item, iframeCb) {
       : div
   );
   let iframe;
+  let iframeDoc;
   if (iframeCb) {
-    /* Preventing other content scripts */// eslint-disable-next-line no-script-url
-    iframe = makeElem('iframe', { src: 'javascript:void 0' });
+    iframe = makeElem('iframe', {
+      /* Preventing other content scripts */// eslint-disable-next-line no-script-url
+      src: 'javascript:void 0',
+      sandbox: 'allow-same-origin allow-scripts',
+    });
     /* In FF the opener receives DOMNodeInserted attached at creation so it can see window[0] */
     if (!IS_FIREFOX) {
       divRoot::appendChild(iframe);
@@ -266,8 +270,9 @@ function inject(item, iframeCb) {
   if (iframeCb) {
     injectedRoot = divRoot;
     if (IS_FIREFOX) divRoot::appendChild(iframe);
-    iframe.contentDocument::getElementsByTagName('*')[0]::appendChild(script);
-    iframeCb();
+    iframeDoc = iframe.contentDocument;
+    (iframeDoc ? iframeDoc::getElementsByTagName('*')[0] : divRoot)::appendChild(script);
+    iframeCb(iframeDoc);
     iframe::remove();
     injectedRoot = null;
   }
