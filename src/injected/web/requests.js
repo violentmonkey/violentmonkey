@@ -120,7 +120,7 @@ async function start(req, context, fileName) {
   ]), context);
 }
 
-function getResponseType({ responseType = '' }) {
+function getResponseType(responseType = '') {
   switch (responseType) {
   case 'arraybuffer':
   case 'blob':
