@@ -80,7 +80,8 @@ function callback(req, msg) {
 }
 
 async function start(req, context, fileName) {
-  const { id, opts, scriptId } = req;
+  const { id, scriptId } = req;
+  const opts = assign(createNullObj(), req.opts);
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
   const { data, withCredentials = true, anonymous = !withCredentials } = opts;
