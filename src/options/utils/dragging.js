@@ -86,7 +86,7 @@ function onDragStart(e) {
   const rect = original.getBoundingClientRect();
   const parentRect = parent.getBoundingClientRect();
   dragged = original.cloneNode(true);
-  elements = [...parent.children];
+  elements = parent.children::[].filter(el => el.style.display !== 'none');
   index = elements.indexOf(original);
   lastIndex = index;
   elements.splice(index, 1);
@@ -143,7 +143,10 @@ function animate(hoveredIndex) {
     el.style.transition = 'none';
     el.style.transform = `translateY(${delta}px)`;
   });
-  setTimeout(() => group.forEach(el => el.removeAttribute('style')));
+  setTimeout(() => group.forEach(({ style }) => {
+    style.removeProperty('transition');
+    style.removeProperty('transform');
+  }));
   lastIndex = hoveredIndex;
 }
 

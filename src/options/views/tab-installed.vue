@@ -120,7 +120,7 @@
           :focused="selectedScript === script"
           :showHotkeys="showHotkeys"
           :script="script"
-          :draggable="filters.sort.value === 'exec' && !script.config.removed"
+          :draggable="!showRecycle && filters.sort.value === 'exec'"
           :visible="index < batchRender.limit"
           :nameClickable="filters.viewTable"
           :hotkeys="scriptHotkeys"
@@ -142,9 +142,7 @@
 <script>
 import Dropdown from 'vueleton/lib/dropdown/bundle';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import {
-  i18n, sendCmd, debounce, makePause,
-} from '#/common';
+import { i18n, sendCmdDirectly, debounce, makePause } from '#/common';
 import options from '#/common/options';
 import { showConfirmation, showMessage } from '#/common/ui';
 import SettingCheck from '#/common/ui/setting-check';
@@ -350,7 +348,7 @@ export default {
       this.debouncedUpdate();
     },
     updateAll() {
-      sendCmd('CheckUpdateAll');
+      sendCmdDirectly('CheckUpdateAll');
     },
     async installFromURL() {
       try {
@@ -361,34 +359,26 @@ export default {
         url = url?.trim();
         if (url) {
           if (!url.includes('://')) url = `https://${url}`;
-          if (new URL(url)) await sendCmd('ConfirmInstall', { url });
+          if (new URL(url)) await sendCmdDirectly('ConfirmInstall', { url });
         }
       } catch (err) {
         if (err) showMessage({ text: err });
       }
     },
-    moveScript(data) {
-      if (data.from === data.to) return;
-      sendCmd('Move', {
-        id: this.scripts[data.from].props.id,
-        offset: data.to - data.from,
-      })
-      .then(() => {
-        const { scripts } = this;
-        const i = Math.min(data.from, data.to);
-        const j = Math.max(data.from, data.to);
-        const seq = [
-          scripts.slice(0, i),
-          scripts.slice(i, j + 1),
-          scripts.slice(j + 1),
-        ];
-        if (i === data.to) {
-          seq[1].unshift(seq[1].pop());
-        } else {
-          seq[1].push(seq[1].shift());
-        }
-        this.store.scripts = [...seq.flat(), ...this.trash];
-      });
+    async moveScript({ from, to }) {
+      if (from === to) return;
+      const scripts = this.filteredScripts;
+      const allScripts = store.scripts;
+      const script = scripts[from];
+      const aFrom = allScripts.indexOf(script);
+      const aTo = allScripts.indexOf(scripts[to]);
+      const { id } = script.props;
+      if (await sendCmdDirectly('Move', { id, offset: aTo - aFrom })) {
+        allScripts.splice(aFrom, 1);
+        allScripts.splice(aTo, 0, script);
+        allScripts.forEach((scr, i) => { scr.props.position = i + 1; });
+        if (this.search) this.onUpdate();
+      }
     },
     onOrderChange(e) {
       options.set('filters.sort', e.target.value);
@@ -491,7 +481,7 @@ export default {
     async emptyRecycleBin() {
       try {
         await showConfirmation(i18n('buttonEmptyRecycleBin'));
-        sendCmd('CheckRemove', { force: true });
+        sendCmdDirectly('CheckRemove', { force: true });
         store.scripts = store.scripts.filter(script => !script.config.removed);
       } catch (e) {
         // NOP
@@ -510,7 +500,7 @@ export default {
       }
     },
     markRemove(script, removed) {
-      sendCmd('MarkRemoved', {
+      sendCmdDirectly('MarkRemoved', {
         id: script.props.id,
         removed,
       });
@@ -529,7 +519,7 @@ export default {
       this.markRemove(script, 0);
     },
     handleActionToggle(script) {
-      sendCmd('UpdateScriptInfo', {
+      sendCmdDirectly('UpdateScriptInfo', {
         id: script.props.id,
         config: {
           enabled: script.config.enabled ? 0 : 1,
@@ -537,7 +527,7 @@ export default {
       });
     },
     handleActionUpdate(script) {
-      sendCmd('CheckUpdate', script.props.id);
+      sendCmdDirectly('CheckUpdate', script.props.id);
     },
     handleSmoothScroll(delta) {
       if (!delta) return;
