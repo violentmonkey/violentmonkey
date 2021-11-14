@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1 # v1 keeps tags
         with:
-          fetch-depth: 100 # for `action-helper`
+          fetch-depth: 250 # for `action-helper`
           # persist-credentials: false # not implemented in v1
       - uses: actions/setup-node@v2
         with:
