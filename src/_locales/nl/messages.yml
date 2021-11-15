@@ -507,10 +507,12 @@ labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Tabelweergave
 labelXhrInject:
-  description: NEW_LOCALE_ITEM
-  message: Synchroon
+  description: >-
+    (`$1` will be shown as `page`) Option in Advanced settings to enable
+    synchronous injection.
+  message: Synchrone $1modus
 labelXhrInjectHint:
-  description: NEW_LOCALE_ITEM
+  description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
     Schakel deze optie alleen in als je een script hebt dat dient te worden
     uitgevoerd vóórdat de pagina wordt geladen en het momenteel niet wordt

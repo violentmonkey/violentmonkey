@@ -516,10 +516,12 @@ labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Vizualizare tip listă
 labelXhrInject:
-  description: NEW_LOCALE_ITEM
+  description: >-
+    (`$1` will be shown as `page`) Option in Advanced settings to enable
+    synchronous injection.
   message: Sincronă
 labelXhrInjectHint:
-  description: NEW_LOCALE_ITEM
+  description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
     Activează doar dacă ai un script care trebuie să ruleze înainte ca pagina să
     înceapă să se încarce și în prezent rulează prea târziu. La fel ca și modul

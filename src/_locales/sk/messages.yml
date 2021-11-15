@@ -511,10 +511,12 @@ labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Tabuľkové zobrazenie
 labelXhrInject:
-  description: NEW_LOCALE_ITEM
-  message: Synchrónne
+  description: >-
+    (`$1` will be shown as `page`) Option in Advanced settings to enable
+    synchronous injection.
+  message: Synchrónny režim $1
 labelXhrInjectHint:
-  description: NEW_LOCALE_ITEM
+  description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
     Povoľte iba vtedy, ak máte skript, ktorý sa musí spustiť pred začatím
     načítavania stránky a v súčasnosti sa spúšťa príliš neskoro. Rovnako ako
