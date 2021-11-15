@@ -503,7 +503,8 @@ labelViewTable:
   message: Table view
 labelXhrInject:
   description: >-
-    (`$1` will be shown as `page`) Option in Advanced settings to enable synchronous injection.
+    (`$1` will be shown as `page`) Option in Advanced settings to enable
+    synchronous injection.
   message: Synchronous $1 mode
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
