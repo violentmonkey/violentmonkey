@@ -1,5 +1,5 @@
 <template>
-  <section class="mt-1c">
+  <section class="mb-1c">
     <h3 v-text="i18n('labelSync')"></h3>
     <div v-if="state" class="flex flex-wrap center-items">
       <span v-text="i18n('labelSyncService')"></span>

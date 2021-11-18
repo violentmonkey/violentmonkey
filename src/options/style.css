@@ -1,4 +1,6 @@
 $compactHeaderHeight: 3rem;
+$tabPad: 2rem;
+$sectionBorder: 1px solid var(--fill-2);
 
 html,
 body {
@@ -52,22 +54,14 @@ aside {
   text-align: right;
 }
 section {
-  position: relative;
-  margin-top: 2rem;
-  padding: 1.2rem .8rem .8rem;
-  border: none;
-  border-top: 1px solid var(--fill-4);
-  @media (prefers-color-scheme: dark) {
-    border-color: var(--fill-3);
-  }
+  padding: 0 0 $tabPad;
   > h3 {
-    position: absolute;
-    margin: 0;
-    padding: 0 .2rem;
-    top: -.6em;
-    left: .8rem;
-    line-height: 1;
-    background: var(--bg);
+    background: linear-gradient(to right, var(--fill-1), transparent);
+    border-top: $sectionBorder;
+    line-height: 2;
+    padding: 0 $tabPad;
+    margin: 0 calc(-1 * $tabPad);
+    margin-bottom: calc($tabPad * .75) !important;
   }
   > h4 {
     margin-bottom: .3rem;
@@ -76,10 +70,32 @@ section {
     margin-bottom: .3rem;
   }
 }
-
+@media (min-width: 1600px) {
+  .tab-settings[data-show-advanced] {
+    padding-top: 0;
+    > * {
+      width: calc(50% - $tabPad * 1.5); // Not using CSS columns due to bugs with overflow-y: auto
+    }
+    h1 {
+      margin-top: $tabPad;
+    }
+    details {
+      position: absolute;
+      top: 0;
+      right: $tabPad;
+      &::before {
+        content: '';
+        height: 100%;
+        position: absolute;
+        margin-left: calc(-1 * $tabPad);
+        border-left: $sectionBorder;
+      }
+    }
+  }
+}
 .tab {
   position: relative;
-  padding: 1.2rem;
+  padding: $tabPad $tabPad 0;
   overflow-y: auto;
   background: var(--bg);
 }

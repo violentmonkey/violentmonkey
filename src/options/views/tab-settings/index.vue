@@ -1,6 +1,6 @@
 <template>
-  <div class="tab-settings mb-1c">
-    <h1 class="mt-0" v-text="i18n('labelSettings')"></h1>
+  <div class="tab-settings" :data-show-advanced="settings.showAdvanced">
+    <h1 v-text="i18n('labelSettings')"></h1>
     <section class="mb-1c">
       <h3 v-text="i18n('optionPopup')"/>
       <div>
@@ -33,7 +33,7 @@
         <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
                        v-show="!settings['filtersPopup.hideDisabled']" />
       </div>
-      <div class="mr-2c">
+      <div>
         <label>
           <span v-text="i18n('labelBadge')"></span>
           <select v-for="opt in ['showBadge']" v-model="settings[opt]" :key="opt">
@@ -41,6 +41,8 @@
                     :value="value" v-text="title" />
           </select>
         </label>
+      </div>
+      <div>
         <label>
           <span v-text="i18n('labelBadgeColors')"/>
           <tooltip v-for="(title, name) in items.badgeColor.enum" :key="`bc:${name}`"
@@ -73,13 +75,11 @@
       <vm-export></vm-export>
     </section>
     <vm-sync></vm-sync>
-    <div class="show-advanced">
-      <button @click="showAdvanced = !showAdvanced">
-        <span v-text="i18n('labelAdvanced')"></span>
-        <icon name="arrow" :class="{ rotate: showAdvanced }" />
-      </button>
-    </div>
-    <div v-show="showAdvanced">
+    <details v-for="(obj, key) in {showAdvanced: settings}" :key="key" :open="obj[key]">
+      <summary @click.prevent="obj[key] = !obj[key]">
+        <component v-text="i18n('labelAdvanced')" class="inline-block"
+                   :is="obj[key] ? 'h1' : 'h3'"/>
+      </summary>
       <section class="mb-1c">
         <h3 v-text="i18n('labelGeneral')"></h3>
         <div>
@@ -124,7 +124,7 @@
       <vm-template />
       <vm-blacklist />
       <vm-css />
-    </div>
+    </details>
   </div>
 </template>
 
@@ -137,7 +137,6 @@ import { forEachEntry, mapEntry } from '#/common/object';
 import options from '#/common/options';
 import optionsDefaults from '#/common/options-defaults';
 import hookSetting from '#/common/hook-setting';
-import Icon from '#/common/ui/icon';
 import LocaleGroup from '#/common/ui/locale-group';
 import loadZip from '#/common/zip';
 import VmImport from './vm-import';
@@ -169,6 +168,9 @@ const items = {
       [INJECT_PAGE]: '',
       [INJECT_CONTENT]: '',
     },
+  },
+  showAdvanced: {
+    normalize: value => value,
   },
   showBadge: {
     enum: {
@@ -215,7 +217,6 @@ const settings = items::mapEntry(() => null);
 
 export default {
   components: {
-    Icon,
     VmImport,
     VmExport,
     VmSync,
@@ -229,7 +230,6 @@ export default {
   },
   data() {
     return {
-      showAdvanced: false,
       expose: null,
       items,
       settings,
@@ -285,11 +285,20 @@ export default {
     width: 3.5em;
     padding-left: .25em;
   }
-}
-.show-advanced {
-  margin: 20px 0;
-  .rotate {
-    transform: rotate(-90deg);
+  h1 {
+    margin-top: 0;
+  }
+  summary {
+    cursor: pointer;
+    margin-left: -1em;
+    user-select: none;
+    &:focus > *,
+    &:hover > * {
+      text-decoration: underline;
+    }
+    h3 {
+      margin-top: 0;
+    }
   }
 }
 </style>
