@@ -21,6 +21,8 @@
       <tr>
         <td>
           <code>@run-at</code>
+        </td>
+        <td>
           <p v-text="i18n('labelRunAt')"/>
         </td>
         <td>
@@ -36,6 +38,8 @@
       <tr>
         <td>
           <code>@<s style="color: var(--fill-6)">no</s>frames</code>
+        </td>
+        <td>
           <p v-text="i18n('labelNoFrames')"/>
         </td>
         <td>
@@ -49,6 +53,8 @@
       <tr v-for="([ name, label ]) in textInputs" :key="name">
         <td>
           <code v-text="`@${name}`"/>
+        </td>
+        <td>
           <p v-text="label"/>
         </td>
         <td>
@@ -134,8 +140,8 @@ export default {
 $leftColWidth: 12rem;
 .edit-settings {
   &.edit-body { // using 2 classes to ensure we override .edit-body in index.vue
-    $GAP: 4em;
-    $PAD: 4em;
+    $GAP: 4rem;
+    $PAD: 2rem;
     column-width: calc((1920px - $GAP - $PAD * 2) / 2);
     column-gap: $GAP;
     padding-left: $PAD;
@@ -150,15 +156,15 @@ $leftColWidth: 12rem;
   }
   tr {
     margin-bottom: 1em;
-    > :nth-child(1) {
+    > td {
       white-space: nowrap;
       break-inside: avoid-column;
-      padding-right: .5em;
+      padding-right: 1em;
       > :nth-child(2) {
-        margin-left: 1em;
+        margin-left: 4em;
       }
     }
-    > :nth-child(2) {
+    > :last-child {
       width: 100%;
     }
     input[type=checkbox] + span {
@@ -174,6 +180,10 @@ $leftColWidth: 12rem;
   code {
     background: none;
     font-weight: bold;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 2em;
   }
 }
 </style>
