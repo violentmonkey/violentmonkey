@@ -76,7 +76,7 @@
           </label>
         </td>
         <td>
-          <textarea v-model="custom[name]" spellcheck="false" ref="area"/>
+          <textarea v-model="custom[name]" spellcheck="false" :rows="CalcRows(custom[name])"/>
         </td>
       </tr>
     </table>
@@ -86,7 +86,6 @@
 <script>
 import { i18n } from '#/common';
 import { objectGet } from '#/common/object';
-import { autofitElementsHeight } from '#/common/ui';
 
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
 
@@ -129,7 +128,6 @@ export default {
     active(val) {
       if (val) {
         this.$refs.container.querySelector('input').focus();
-        autofitElementsHeight(this.$refs.area);
       }
     },
   },
@@ -180,10 +178,6 @@ $leftColWidth: 12rem;
   code {
     background: none;
     font-weight: bold;
-  }
-  textarea {
-    resize: vertical;
-    min-height: 2em;
   }
 }
 </style>

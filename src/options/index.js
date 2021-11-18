@@ -1,14 +1,12 @@
 import Vue from 'vue';
 import '#/common/browser';
-import { sendCmdDirectly, i18n, getLocaleString } from '#/common';
+import { sendCmdDirectly, getLocaleString } from '#/common';
 import handlers from '#/common/handlers';
 import { loadScriptIcon } from '#/common/load-script-icon';
 import options from '#/common/options';
 import '#/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
-
-Vue.prototype.i18n = i18n;
 
 Object.assign(store, {
   loading: false,

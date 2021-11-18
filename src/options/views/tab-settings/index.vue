@@ -278,9 +278,6 @@ export default {
       vertical-align: text-bottom;
     }
   }
-  textarea {
-    height: 10em;
-  }
   input[type="number"] {
     width: 3.5em;
     padding-left: .25em;

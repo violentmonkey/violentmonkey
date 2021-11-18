@@ -96,7 +96,7 @@ const CUSTOM_LISTS = [
 const fromList = list => (
   list
     // Adding a new row so the user can click it and type, just like in an empty textarea.
-    ? `${list.join('\n')}\n`
+    ? `${list.join('\n')}${list.length ? '\n' : ''}`
     : ''
 );
 const toList = text => (

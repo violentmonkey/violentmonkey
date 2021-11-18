@@ -9,7 +9,7 @@
       :disabled="disabled"
       :title="parsedData.error"
       :placeholder="placeholder"
-      :rows="rows"
+      :rows="rows || CalcRows(value)"
       @change="onChange"
     />
     <button v-if="hasSave" v-text="i18n('buttonSave')" @click="onSave"

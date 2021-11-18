@@ -1,3 +1,5 @@
+import Vue from 'vue';
+import { i18n } from '#/common';
 import options from '../../options';
 import './style.css';
 
@@ -73,3 +75,6 @@ options.hook((changes) => {
     style = setStyle(v, style);
   }
 });
+
+Vue.prototype.i18n = i18n;
+Vue.prototype.CalcRows = val => val && (val.match(/\n.|$/g).length + 1);

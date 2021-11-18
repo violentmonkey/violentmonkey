@@ -70,6 +70,11 @@ section {
     margin-bottom: .3rem;
   }
 }
+textarea:not([rows="1"]) {
+  resize: vertical;
+  min-height: 2em;
+  max-height: 50vh;
+}
 @media (min-width: 1600px) {
   .tab-settings[data-show-advanced] {
     padding-top: 0;

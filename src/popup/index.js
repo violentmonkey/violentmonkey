@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import '#/common/browser';
-import { i18n, sendCmdDirectly } from '#/common';
+import { sendCmdDirectly } from '#/common';
 import { INJECT_PAGE } from '#/common/consts';
 import handlers from '#/common/handlers';
 import { loadScriptIcon } from '#/common/load-script-icon';
@@ -10,7 +10,6 @@ import App from './views/app';
 import { mutex, store } from './utils';
 
 mutex.init();
-Vue.prototype.i18n = i18n;
 
 const vm = new Vue({
   render: h => h(App),

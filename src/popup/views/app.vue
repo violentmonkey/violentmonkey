@@ -117,7 +117,8 @@
             </div>
           </div>
           <div v-if="item.excludesValue != null" class="excludes-menu flex flex-col">
-            <textarea v-model="item.excludesValue" spellcheck="false"/>
+            <textarea v-model="item.excludesValue" spellcheck="false"
+                      :rows="CalcRows(item.excludesValue)"/>
             <div>
               <button v-text="i18n('buttonOK')" @click="onExcludeSave(item)"/>
               <button v-text="i18n('buttonCancel')" @click="onExcludeClose(item)"/>
@@ -186,7 +187,6 @@ import { INJECT_AUTO } from '#/common/consts';
 import options from '#/common/options';
 import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import { objectPick } from '#/common/object';
-import { autofitElementsHeight } from '#/common/ui';
 import Icon from '#/common/ui/icon';
 import { keyboardService, isInput } from '#/common/keyboard';
 import { mutex, store } from '../utils';
@@ -418,9 +418,7 @@ export default {
       ].join('\n');
       this.$nextTick(() => {
         // not using $refs because multiple items may show textareas
-        const area = item.el.querySelector('textarea');
-        autofitElementsHeight([area]);
-        area.focus();
+        item.el.querySelector('textarea').focus();
       });
     },
     onExcludeClose(item) {
