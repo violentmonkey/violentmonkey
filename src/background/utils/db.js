@@ -607,7 +607,9 @@ export async function vacuum(data) {
   _vacuuming = new Promise(r => { resolveSelf = r; });
   const result = {};
   const toFetch = [];
-  const keysToRemove = [];
+  const keysToRemove = [
+    'editorThemeNames', // TODO: remove in 2022
+  ];
   const valueKeys = {};
   const cacheKeys = {};
   const requireKeys = {};

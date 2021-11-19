@@ -42,6 +42,15 @@ function addWrapperWithGlobals(name, config, defsObj, callback) {
   config.plugins.push(new WrapperWebpackPlugin(callback(reader)));
 }
 
+function getCodeMirrorThemes() {
+  const name = 'neo.css';
+  return fs.readdirSync(
+    require.resolve(`codemirror/theme/${name}`).slice(0, -name.length),
+    { withFileTypes: true },
+  ).map(e => e.isFile() && e.name.endsWith('.css') && e.name.slice(0, -4))
+  .filter(Boolean);
+}
+
 function getUniqIdB64() {
   return Buffer.from(
     new Uint32Array(2)
@@ -65,5 +74,6 @@ function readGlobalsFile(filename, babelOpts = {}) {
 }
 
 exports.addWrapperWithGlobals = addWrapperWithGlobals;
+exports.getCodeMirrorThemes = getCodeMirrorThemes;
 exports.getUniqIdB64 = getUniqIdB64;
 exports.readGlobalsFile = readGlobalsFile;

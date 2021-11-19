@@ -6,10 +6,8 @@
       <select v-model="theme" :disabled="busy" :title="css">
         <option :value="DEFAULT" v-text="i18n('labelRunAtDefault')"/>
         <option value="" v-text="i18n('labelBadgeNone')"/>
-        <option v-if="!themes && theme && theme !== DEFAULT" v-text="theme" data-active/>
-        <option v-for="(name, i) in themes" :key="`th:${i}`" v-text="name"/>
+        <option v-for="name in themes" :key="name" v-text="name"/>
       </select>
-      <button @click="getThemes" :disabled="busy" v-text="i18n('buttonDownloadThemes')"/>
       <a :href="ghURL" target="_blank">&nearr;</a>
       <p v-text="error"/>
     </div>
@@ -24,13 +22,12 @@
 <script>
 import options from '#/common/options';
 import hookSetting from '#/common/hook-setting';
-import storage from '#/common/storage';
 import { showMessage } from '#/common/ui';
 import SettingText from '#/common/ui/setting-text';
 
 const keyThemeCSS = 'editorTheme';
 const keyThemeNAME = 'editorThemeName';
-const keyThemeNAMES = 'editorThemeNames';
+const THEMES = process.env.CODEMIRROR_THEMES;
 const gh = 'github.com';
 const ghREPO = 'codemirror/CodeMirror';
 const ghBRANCH = 'master';
@@ -42,8 +39,8 @@ const createData = () => ({
   busy: false,
   error: null,
   css: null,
-  theme: DEFAULT,
-  themes: [],
+  theme: null,
+  themes: THEMES,
   DEFAULT,
   ghURL,
 });
@@ -73,18 +70,13 @@ export default {
   async mounted() {
     this.$refs.editor.$el.addEventListener('dblclick', this.toggleBoolean);
     if (!this.revokers) {
-      [this.themes] = await Promise.all([
-        storage.base.getOne(keyThemeNAMES),
-        options.ready,
-      ]);
       this.css = makeTextPreview(options.get(keyThemeCSS));
       this.revokers = [
         ['theme', keyThemeNAME],
-      ].map(([prop, opt]) => {
-        const setValue = val => { this[prop] = val ?? createData()[prop]; };
-        setValue(options.get(opt));
-        return hookSetting(opt, setValue);
-      });
+      ].map(([prop, opt]) => hookSetting(opt, val => {
+        this[prop] = val ?? createData()[prop];
+      }));
+      await options.ready; // Waiting for hookSetting to set the value before watching for changes
       this.$watch('theme', async val => {
         const url = val && val !== DEFAULT
           && `https://raw.githubusercontent.com/${ghREPO}/${ghBRANCH}/${ghPATH}/${val}.css`;
@@ -108,16 +100,6 @@ export default {
       } finally {
         this.busy = false;
         this.$nextTick(() => el?.focus());
-      }
-    },
-    async getThemes() {
-      const apiThemesUrl = `https://api.${gh}/repos/${ghREPO}/contents/${ghPATH}`;
-      const themes = (await this.fetch(apiThemesUrl, 'json'))
-      ?.map(file => /[-\w]+\.css$/.test(file.name) && file.type === 'file' && file.name.slice(0, -4))
-      .filter(name => name && name !== DEFAULT);
-      if (themes) {
-        this.themes = themes;
-        storage.base.set(keyThemeNAMES, themes);
       }
     },
     onSave() {
