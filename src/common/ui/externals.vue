@@ -6,7 +6,7 @@
           class="flex"
           :class="{
             active: index === i,
-            loading: install && i && !(url in install.deps),
+            loading: install && i && contents == null,
             error: contents === false,
           }"
           @click="contents !== false && (index = i)">
