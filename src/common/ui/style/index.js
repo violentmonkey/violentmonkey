@@ -77,4 +77,8 @@ options.hook((changes) => {
 });
 
 Vue.prototype.i18n = i18n;
-Vue.prototype.CalcRows = val => val && (val.match(/\n.|$/g).length + 1);
+/** @returns {?number} Number of lines + 1 if the last line is not empty */
+Vue.prototype.CalcRows = val => val && (
+  val.match(/$/gm).length
+  + !val.endsWith('\n')
+);
