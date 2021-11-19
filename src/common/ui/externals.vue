@@ -149,7 +149,7 @@ $mainEntryBorder: 6px double;
       border-bottom: 1px solid var(--fill-3);
       position: sticky;
       top: 0;
-      background: var(--fill-0);
+      background: var(--bg);
     }
     dl {
       padding-right: $outerPadX;
@@ -157,6 +157,7 @@ $mainEntryBorder: 6px double;
       white-space: nowrap;
       &.active {
         font-weight: bold;
+        color: blue;
       }
       &.loading dd {
         color: var(--fill-7);
@@ -175,7 +176,7 @@ $mainEntryBorder: 6px double;
       }
     }
     dt {
-      color: darkviolet;
+      color: darkblue;
       margin-left: $outerPadX;
       font-family: monospace;
     }
@@ -199,6 +200,12 @@ $mainEntryBorder: 6px double;
     .select {
       &.error dd {
         color: #ff4747;
+      }
+      dl.active {
+        color: coral;
+        dt {
+          color: hotpink;
+        }
       }
       dt {
         color: #c34ec3;
