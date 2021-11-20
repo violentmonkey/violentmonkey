@@ -17,7 +17,7 @@ class WebpackProtectBootstrapPlugin {
       hooks.localVars.tap(NAME, src => replace(src, [[
         'installedModules = {};',
         `installedModules = ${NULL_OBJ}; \
-         for (let i = 0, c, str = "cdmnoprt"; i < str.length && (c = str[i++]);) \
+         for (let i = 0, c, str = "cdmnoprst"; i < str.length && (c = str[i++]);) \
            defineProperty(${requireFn}, c, { ${NULL_PROTO}, value: undefined, writable: true });`,
       ]]));
       hooks.moduleObj.tap(NAME, src => replace(src, [[

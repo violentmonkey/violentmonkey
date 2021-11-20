@@ -148,7 +148,7 @@ for (const name in unforgeables) { /* proto is null */// eslint-disable-line gua
     delete unforgeables[name];
   }
 }
-[EventTarget, Object]::forEach(src => {
+[EventTargetSafe, Object]::forEach(src => {
   getOwnPropertyNames(src[PROTO])::forEach(key => {
     inheritedKeys[key] = 1;
   });
