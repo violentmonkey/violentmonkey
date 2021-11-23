@@ -79,7 +79,7 @@ const boundMethods = {
   __proto__: null,
   addEventListener: MAYBE,
   alert: MAYBE,
-  atobSafe: MAYBE,
+  atob: MAYBE,
   blur: MAYBE,
   btoa: MAYBE,
   cancelAnimationFrame: MAYBE,
