@@ -10,9 +10,9 @@ bridge.addHandlers({
 });
 
 export function onRequestCreate(opts, context, fileName) {
-  if (!opts.url) throw new ErrorSafe('Required parameter "url" is missing.');
+  if (!opts.url) throw new SafeError('Required parameter "url" is missing.');
   const scriptId = context.id;
-  const id = getUniqIdSafe(`VMxhr${scriptId}`);
+  const id = safeGetUniqId(`VMxhr${scriptId}`);
   const req = {
     __proto__: null,
     id,
@@ -34,7 +34,7 @@ function parseData(req, msg) {
     res = jsonParse(res);
     break;
   case 'document':
-    res = new DOMParserSafe()::parseFromString(res,
+    res = new SafeDOMParser()::parseFromString(res,
       // Cutting everything after , or ; and trimming whitespace
       /[,;].*|\s+/g::regexpReplace(msg.contentType, '') || 'text/html');
     break;
@@ -145,9 +145,9 @@ function getResponseType(responseType = '') {
  */
 async function encodeBody(body) {
   const wasBlob = getObjectTypeTag(body) === 'Blob';
-  const blob = wasBlob ? body : await new ResponseSafe(body)::safeResponseBlob();
-  const reader = new FileReaderSafe();
-  return new PromiseSafe(resolve => {
+  const blob = wasBlob ? body : await new SafeResponse(body)::safeResponseBlob();
+  const reader = new SafeFileReader();
+  return new SafePromise(resolve => {
     reader::on('load', () => resolve([
       reader::getReaderResult(),
       blob::getBlobType(),

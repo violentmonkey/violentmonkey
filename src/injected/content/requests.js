@@ -2,7 +2,7 @@ import bridge from './bridge';
 import { getFullUrl, makeElem, sendCmd } from './util-content';
 
 const {
-  fetch: fetchSafe,
+  fetch: safeFetch,
 } = global;
 const { arrayBuffer: getArrayBuffer, blob: getBlob } = ResponseProto;
 const { createObjectURL, revokeObjectURL } = URL;
@@ -78,7 +78,7 @@ bridge.addBackgroundHandlers({
 });
 
 async function importBlob(req, url) {
-  const data = await (await fetchSafe(url))::(req.wantsBlob ? getBlob : getArrayBuffer)();
+  const data = await (await safeFetch(url))::(req.wantsBlob ? getBlob : getArrayBuffer)();
   sendCmd('RevokeBlob', url);
   return data;
 }
@@ -90,7 +90,7 @@ function downloadBlob(blob, fileName) {
     download: fileName,
   });
   const res = downloadChain::then(() => {
-    a::fire(new MouseEventSafe('click'));
+    a::fire(new SafeMouseEvent('click'));
     revokeBlobAfterTimeout(url);
   });
   // Frequent downloads are ignored in Chrome and possibly other browsers
@@ -106,10 +106,10 @@ async function revokeBlobAfterTimeout(url) {
 /** ArrayBuffer/Blob in Chrome incognito is transferred in string chunks */
 function receiveAllChunks(req, msg) {
   req::pickIntoThis(msg, ['dataSize', 'contentType']);
-  req.arr = new Uint8ArraySafe(req.dataSize);
+  req.arr = new SafeUint8Array(req.dataSize);
   processChunk(req, msg.data.response, 0);
   return !req.gotChunks
-    ? new PromiseSafe(resolve => { req.resolve = resolve; })
+    ? new SafePromise(resolve => { req.resolve = resolve; })
     : finishChunks(req);
 }
 
@@ -124,7 +124,7 @@ function receiveChunk(req, { data, pos, last }) {
 
 function processChunk(req, data, pos) {
   const { arr } = req;
-  data = atobSafe(data);
+  data = safeAtob(data);
   for (let len = data.length, i = 0; i < len; i += 1, pos += 1) {
     arr[pos] = data::charCodeAt(i);
   }
@@ -134,6 +134,6 @@ function finishChunks(req) {
   const { arr } = req;
   delete req.arr;
   return req.wantsBlob
-    ? new BlobSafe([arr], { type: req.contentType })
+    ? new SafeBlob([arr], { type: req.contentType })
     : arr.buffer;
 }

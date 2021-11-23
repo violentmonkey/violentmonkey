@@ -4,8 +4,8 @@
 // https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
 if (!IS_FIREFOX && !global.browser?.runtime) {
   // region Chrome
-  const { chrome, Proxy: ProxySafe } = global;
-  const { apply, bind } = ProxySafe;
+  const { chrome, Proxy: SafeProxy } = global;
+  const { apply, bind } = SafeProxy;
   const MESSAGE = 'message';
   const STACK = 'stack';
   const isSyncMethodName = key => key === 'addListener'
@@ -33,7 +33,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
     target[key] = res;
     return res;
   };
-  const proxifyGroup = (src, meta) => new ProxySafe({}, {
+  const proxifyGroup = (src, meta) => new SafeProxy({}, {
     get: (group, key) => group[key] ?? proxifyValue(group, key, src, meta?.[key]),
   });
   /**
@@ -48,12 +48,12 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
       /* Using resolve/reject to call API in the scope of this function, not inside Promise,
          because an API validation exception is thrown synchronously both in Chrome and FF
          so the caller can use try/catch to detect it like we've been doing in icon.js */
-      const promise = new PromiseSafe((_resolve, _reject) => {
+      const promise = new SafePromise((_resolve, _reject) => {
         resolve = _resolve;
         reject = _reject;
       });
       // Make the error messages actually useful by capturing a real stack
-      const stackInfo = new ErrorSafe(`callstack before invoking ${func.name || 'chrome API'}:`);
+      const stackInfo = new SafeError(`callstack before invoking ${func.name || 'chrome API'}:`);
       // A single parameter `result` is fine because we don't use API that return more
       args[args.length] = result => {
         const runtimeErr = chrome.runtime.lastError;
@@ -95,7 +95,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
   // Both result and error must be explicitly specified to avoid prototype eavesdropping
   const wrapError = err => process.env.DEBUG && console.warn(err) || [
     null,
-    err instanceof ErrorSafe
+    err instanceof SafeError
       ? [err[MESSAGE], err[STACK]]
       : [err, ''],
   ];
@@ -185,7 +185,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
     const { frameId, tab, url } = sender;
     log('on', [msg, { frameId, tab, url }], id);
     const result = listener(msg, sender);
-    (typeof result?.then === 'function' ? result : PromiseSafe.resolve(result))
+    (typeof result?.then === 'function' ? result : SafePromise.resolve(result))
     .then(data => log('on', [data], id, true), console.warn);
     return result;
   });

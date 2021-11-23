@@ -19,8 +19,8 @@ const {
   document,
   window,
 } = global;
-export const PromiseSafe = Promise; // alias used by browser.js
-export const ErrorSafe = Error; // alias used by browser.js
+export const SafePromise = Promise; // alias used by browser.js
+export const SafeError = Error; // alias used by browser.js
 export const { hasOwnProperty, toString: objectToString } = {};
 export const safeCall = Object.call.bind(Object.call);
 export const IS_FIREFOX = !global.chrome.app;

@@ -6,27 +6,27 @@
  */
 
 export const {
-  Blob: BlobSafe,
-  CustomEvent: CustomEventSafe,
+  Blob: SafeBlob,
+  CustomEvent: SafeCustomEvent,
   Error, // for #/common e.g. in sendMessage
-  MouseEvent: MouseEventSafe,
+  MouseEvent: SafeMouseEvent,
   Object, // for minification and guarding webpack Object(import) calls
-  Promise: PromiseSafe,
-  TextDecoder: TextDecoderSafe,
-  Uint8Array: Uint8ArraySafe,
-  atob: atobSafe,
+  Promise: SafePromise,
+  TextDecoder: SafeTextDecoder,
+  Uint8Array: SafeUint8Array,
+  atob: safeAtob,
   addEventListener: on,
   dispatchEvent: fire,
   removeEventListener: off,
 } = global;
-export const ErrorSafe = Error;
+export const SafeError = Error;
 export const ResponseProto = Response[PROTO];
 export const { hasOwnProperty, toString: objectToString } = {};
 export const { apply, call } = hasOwnProperty;
 export const safeCall = call.bind(call);
 export const { forEach, includes, push } = [];
 export const { createElementNS, getElementsByTagName } = document;
-export const { then } = PromiseSafe[PROTO];
+export const { then } = SafePromise[PROTO];
 export const { charCodeAt, indexOf: stringIndexOf, slice } = '';
 export const { append, appendChild, attachShadow, remove, setAttribute } = Element[PROTO];
 export const {
@@ -38,11 +38,11 @@ export const {
 export const { random: mathRandom } = Math;
 export const regexpTest = RegExp[PROTO].test;
 export const { toStringTag: toStringTagSym } = Symbol; // used by ProtectWebpackBootstrapPlugin
-export const { decode: tdDecode } = TextDecoderSafe[PROTO];
+export const { decode: tdDecode } = SafeTextDecoder[PROTO];
 export const { stopImmediatePropagation } = Event[PROTO];
 export const { get: getHref } = describeProperty(HTMLAnchorElement[PROTO], 'href');
-export const getDetail = describeProperty(CustomEventSafe[PROTO], 'detail').get;
-export const getRelatedTarget = describeProperty(MouseEventSafe[PROTO], 'relatedTarget').get;
+export const getDetail = describeProperty(SafeCustomEvent[PROTO], 'detail').get;
+export const getRelatedTarget = describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get;
 export const getReadyState = describeProperty(Document[PROTO], 'readyState').get;
 export const isDocumentLoading = () => !/^(inter|compl)/::regexpTest(document::getReadyState());
 export const logging = assign(createNullObj(), console);

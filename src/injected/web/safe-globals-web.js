@@ -8,23 +8,21 @@
 
 export let
   // window
-  BlobSafe,
-  CustomEventSafe,
-  DOMParserSafe,
-  ErrorSafe,
-  EventTargetSafe,
-  FileReaderSafe,
-  KeyboardEventSafe,
-  MouseEventSafe,
+  SafeCustomEvent,
+  SafeDOMParser,
+  SafeError,
+  SafeEventTarget,
+  SafeFileReader,
+  SafeKeyboardEvent,
+  SafeMouseEvent,
   Object,
-  PromiseSafe,
-  ProxySafe,
-  ResponseSafe,
-  SymbolSafe,
+  SafePromise,
+  SafeProxy,
+  SafeResponse,
+  SafeSymbol,
   fire,
   off,
   on,
-  openWindow,
   safeIsFinite,
   // Symbol
   toStringTagSym,
@@ -83,7 +81,7 @@ export let
 export const VAULT = (() => {
   let ArrayP;
   let ElementP;
-  let ObjectSafe;
+  let SafeObject;
   let StringP;
   let i = -1;
   let call;
@@ -101,38 +99,36 @@ export const VAULT = (() => {
   }
   res = [
     // window
-    BlobSafe = res[i += 1] || src.Blob,
-    CustomEventSafe = res[i += 1] || src.CustomEvent,
-    DOMParserSafe = res[i += 1] || src.DOMParser,
-    ErrorSafe = res[i += 1] || src.Error,
-    EventTargetSafe = res[i += 1] || src.EventTarget,
-    FileReaderSafe = res[i += 1] || src.FileReader,
-    KeyboardEventSafe = res[i += 1] || src.KeyboardEvent,
-    MouseEventSafe = res[i += 1] || src.MouseEvent,
+    SafeCustomEvent = res[i += 1] || src.CustomEvent,
+    SafeDOMParser = res[i += 1] || src.DOMParser,
+    SafeError = res[i += 1] || src.Error,
+    SafeEventTarget = res[i += 1] || src.EventTarget,
+    SafeFileReader = res[i += 1] || src.FileReader,
+    SafeKeyboardEvent = res[i += 1] || src.KeyboardEvent,
+    SafeMouseEvent = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
-    PromiseSafe = res[i += 1] || src.Promise,
-    SymbolSafe = res[i += 1] || src.Symbol,
+    SafePromise = res[i += 1] || src.Promise,
+    SafeSymbol = res[i += 1] || src.Symbol,
     // In FF content mode global.Proxy !== window.Proxy
-    ProxySafe = res[i += 1] || src.Proxy,
-    ResponseSafe = res[i += 1] || src.Response,
+    SafeProxy = res[i += 1] || src.Proxy,
+    SafeResponse = res[i += 1] || src.Response,
     fire = res[i += 1] || src.dispatchEvent,
     safeIsFinite = res[i += 1] || src.isFinite, // Firefox defines `isFinite` on `global`
     off = res[i += 1] || src.removeEventListener,
     on = res[i += 1] || src.addEventListener,
-    openWindow = res[i += 1] || src.open,
-    // Object - using ObjectSafe to pacify eslint without disabling the rule
-    defineProperty = (ObjectSafe = Object) && res[i += 1] || ObjectSafe.defineProperty,
-    describeProperty = res[i += 1] || ObjectSafe.getOwnPropertyDescriptor,
-    getOwnPropertyNames = res[i += 1] || ObjectSafe.getOwnPropertyNames,
-    getOwnPropertySymbols = res[i += 1] || ObjectSafe.getOwnPropertySymbols,
-    assign = res[i += 1] || ObjectSafe.assign,
-    objectKeys = res[i += 1] || ObjectSafe.keys,
-    objectValues = res[i += 1] || ObjectSafe.values,
-    apply = res[i += 1] || ObjectSafe.apply,
-    bind = res[i += 1] || ObjectSafe.bind,
+    // Object - using SafeObject to pacify eslint without disabling the rule
+    defineProperty = (SafeObject = Object) && res[i += 1] || SafeObject.defineProperty,
+    describeProperty = res[i += 1] || SafeObject.getOwnPropertyDescriptor,
+    getOwnPropertyNames = res[i += 1] || SafeObject.getOwnPropertyNames,
+    getOwnPropertySymbols = res[i += 1] || SafeObject.getOwnPropertySymbols,
+    assign = res[i += 1] || SafeObject.assign,
+    objectKeys = res[i += 1] || SafeObject.keys,
+    objectValues = res[i += 1] || SafeObject.values,
+    apply = res[i += 1] || SafeObject.apply,
+    bind = res[i += 1] || SafeObject.bind,
     // Object.prototype
-    hasOwnProperty = res[i += 1] || ObjectSafe[PROTO].hasOwnProperty,
-    objectToString = res[i += 1] || ObjectSafe[PROTO].toString,
+    hasOwnProperty = res[i += 1] || SafeObject[PROTO].hasOwnProperty,
+    objectToString = res[i += 1] || SafeObject[PROTO].toString,
     // Array.prototype
     concat = res[i += 1] || (ArrayP = src.Array[PROTO]).concat,
     filter = res[i += 1] || ArrayP.filter,
@@ -144,7 +140,7 @@ export const VAULT = (() => {
     charCodeAt = res[i += 1] || (StringP = src.String[PROTO]).charCodeAt,
     slice = res[i += 1] || StringP.slice,
     // safeCall
-    safeCall = res[i += 1] || (call = ObjectSafe.call).bind(call),
+    safeCall = res[i += 1] || (call = SafeObject.call).bind(call),
     // various methods
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     funcToString = res[i += 1] || safeCall.toString,
@@ -152,20 +148,20 @@ export const VAULT = (() => {
     jsonParse = res[i += 1] || src.JSON.parse,
     logging = res[i += 1] || assign({ __proto__: null }, src.console),
     mathRandom = res[i += 1] || src.Math.random,
-    parseFromString = res[i += 1] || DOMParserSafe[PROTO].parseFromString,
-    readAsDataURL = res[i += 1] || FileReaderSafe[PROTO].readAsDataURL,
-    safeResponseBlob = res[i += 1] || ResponseSafe[PROTO].blob,
+    parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
+    readAsDataURL = res[i += 1] || SafeFileReader[PROTO].readAsDataURL,
+    safeResponseBlob = res[i += 1] || SafeResponse[PROTO].blob,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    regexpReplace = res[i += 1] || src.RegExp[PROTO][SymbolSafe.replace],
-    then = res[i += 1] || PromiseSafe[PROTO].then,
+    regexpReplace = res[i += 1] || src.RegExp[PROTO][SafeSymbol.replace],
+    then = res[i += 1] || SafePromise[PROTO].then,
     // various getters
-    getBlobType = res[i += 1] || describeProperty(BlobSafe[PROTO], 'type').get,
+    getBlobType = res[i += 1] || describeProperty(src.Blob[PROTO], 'type').get,
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
-    getDetail = res[i += 1] || describeProperty(CustomEventSafe[PROTO], 'detail').get,
-    getReaderResult = res[i += 1] || describeProperty(FileReaderSafe[PROTO], 'result').get,
-    getRelatedTarget = res[i += 1] || describeProperty(MouseEventSafe[PROTO], 'relatedTarget').get,
+    getDetail = res[i += 1] || describeProperty(SafeCustomEvent[PROTO], 'detail').get,
+    getReaderResult = res[i += 1] || describeProperty(SafeFileReader[PROTO], 'result').get,
+    getRelatedTarget = res[i += 1] || describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get,
   ];
   // Well-known Symbols are unforgeable
-  toStringTagSym = SymbolSafe.toStringTag;
+  toStringTagSym = SafeSymbol.toStringTag;
   return res;
 })();

@@ -14,7 +14,7 @@ const bridge = {
     if (fn) node::fn(data);
   },
   send(cmd, data, context, node) {
-    return new PromiseSafe(resolve => {
+    return new SafePromise(resolve => {
       postWithCallback(cmd, data, context, node, resolve);
     });
   },
@@ -22,7 +22,7 @@ const bridge = {
 };
 
 function postWithCallback(cmd, data, context, node, cb, customCallbackId) {
-  const id = getUniqIdSafe();
+  const id = safeGetUniqId();
   callbacks[id] = cb;
   if (customCallbackId) {
     setOwnProp(data, customCallbackId, id);

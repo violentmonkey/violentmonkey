@@ -1,7 +1,7 @@
 import { INJECT_CONTENT } from '../util';
 import bridge from './bridge';
 
-const isConcatSpreadableSym = SymbolSafe.isConcatSpreadable;
+const isConcatSpreadableSym = SafeSymbol.isConcatSpreadable;
 
 export const safeConcat = (dest, ...arrays) => {
   /* A page can use a getter on Array.prototype that returns false when checked by our code
@@ -54,7 +54,7 @@ export const jsonDump = (value, stack) => {
     if (!stack) {
       stack = [value]; // Creating the array here, only when type is object.
     } else if (stack::indexOf(value) >= 0) {
-      throw new ErrorSafe('Converting circular structure to JSON');
+      throw new SafeError('Converting circular structure to JSON');
     } else {
       setOwnProp(stack, stack.length, value);
     }

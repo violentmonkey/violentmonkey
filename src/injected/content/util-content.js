@@ -12,7 +12,7 @@ export const elemByTag = (tag, i) => getOwnProp(document::getElementsByTagName(t
  * @param {?} [arg]
  * @returns {Promise<void>}
  */
-export const onElement = (tag, cb, arg) => new PromiseSafe(resolve => {
+export const onElement = (tag, cb, arg) => new SafePromise(resolve => {
   if (elemByTag(tag)) {
     resolve(cb(arg));
   } else {
@@ -47,16 +47,16 @@ export const getFullUrl = url => (
 export const decodeResource = (raw, isBlob) => {
   let res;
   const pos = raw::stringIndexOf(',');
-  const bin = atobSafe(pos < 0 ? raw : raw::slice(pos + 1));
+  const bin = safeAtob(pos < 0 ? raw : raw::slice(pos + 1));
   if (isBlob || /[\x80-\xFF]/::regexpTest(bin)) {
     const len = bin.length;
-    const bytes = new Uint8ArraySafe(len);
+    const bytes = new SafeUint8Array(len);
     for (let i = 0; i < len; i += 1) {
       bytes[i] = bin::charCodeAt(i);
     }
     res = isBlob
-      ? new BlobSafe([bytes], { type: pos < 0 ? '' : raw::slice(0, pos) })
-      : new TextDecoderSafe()::tdDecode(bytes);
+      ? new SafeBlob([bytes], { type: pos < 0 ? '' : raw::slice(0, pos) })
+      : new SafeTextDecoder()::tdDecode(bytes);
   } else { // pure ASCII
     res = bin;
   }

@@ -42,7 +42,7 @@ if (IS_FIREFOX) {
     } else {
       // setupVaultId's second event is the vaultId
       tellBridgeToWriteVault(evt::getDetail(), frameEventWnd);
-      frameEventWnd::fire(new CustomEventSafe(VAULT_WRITER_ACK));
+      frameEventWnd::fire(new SafeCustomEvent(VAULT_WRITER_ACK));
       frameEventWnd = null;
     }
   }, true);
@@ -61,8 +61,8 @@ bridge.addHandlers({
 
 export function injectPageSandbox(contentId, webId) {
   const { cloneInto } = global;
-  const vaultId = getUniqIdSafe();
-  const handshakeId = getUniqIdSafe();
+  const vaultId = safeGetUniqId();
+  const handshakeId = safeGetUniqId();
   if (useOpener(window.opener) || useOpener(!IS_TOP && window.parent)) {
     startHandshake();
   } else {
@@ -87,8 +87,8 @@ export function injectPageSandbox(contentId, webId) {
       if (IS_FIREFOX) {
         const setOk = () => { ok = true; };
         window::on(VAULT_WRITER_ACK, setOk, true);
-        opener::fire(new MouseEventSafe(VAULT_WRITER, { relatedTarget: window }));
-        opener::fire(new CustomEventSafe(VAULT_WRITER, { detail: vaultId }));
+        opener::fire(new SafeMouseEvent(VAULT_WRITER, { relatedTarget: window }));
+        opener::fire(new SafeCustomEvent(VAULT_WRITER, { detail: vaultId }));
         window::off(VAULT_WRITER_ACK, setOk, true);
       } else {
         ok = opener[VAULT_WRITER];
@@ -210,7 +210,7 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
     }
   });
   if (document::getReadyState() === 'loading') {
-    await new PromiseSafe(resolve => {
+    await new SafePromise(resolve => {
       /* Since most sites listen to DOMContentLoaded on `document`, we let them run first
        * by listening on `window` which follows `document` when the event bubbles up. */
       window::on('DOMContentLoaded', resolve, { once: true });

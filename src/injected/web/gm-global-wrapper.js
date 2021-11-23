@@ -5,7 +5,7 @@ import { FastLookup, safeConcat } from './util-web';
 /** The index strings that look exactly like integers can't be forged
  * but for example '011' doesn't look like 11 so it's allowed */
 const isFrameIndex = key => key >= 0 && key <= 0xFFFF_FFFE && key === `${+key}`;
-const scopeSym = SymbolSafe.unscopables;
+const scopeSym = SafeSymbol.unscopables;
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
   const kWrappedJSObject = 'wrappedJSObject';
@@ -148,7 +148,7 @@ for (const name in unforgeables) { /* proto is null */// eslint-disable-line gua
     delete unforgeables[name];
   }
 }
-[EventTargetSafe, Object]::forEach(src => {
+[SafeEventTarget, Object]::forEach(src => {
   getOwnPropertyNames(src[PROTO])::forEach(key => {
     inheritedKeys[key] = 1;
   });
@@ -165,7 +165,7 @@ export function makeGlobalWrapper(local) {
      on our `window` proxy so jQuery libs see it as a plain object and throw
      when trying to clone its recursive properties like `self` and `window`. */
   safeDefineProperty(local, toStringTagSym, { get: () => 'Window' });
-  const wrapper = new ProxySafe(local, {
+  const wrapper = new SafeProxy(local, {
     __proto__: null,
     defineProperty(_, name, desc) {
       const isStr = isString(name);

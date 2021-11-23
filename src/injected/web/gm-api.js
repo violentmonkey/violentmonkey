@@ -52,7 +52,7 @@ export function makeGmApi() {
       const i = objectValues(hooks)::indexOf(fn);
       let listenerId = i >= 0 && objectKeys(hooks)[i];
       if (!listenerId) {
-        listenerId = getUniqIdSafe('VMvc');
+        listenerId = safeGetUniqId('VMvc');
         hooks[listenerId] = fn;
       }
       return listenerId;
@@ -112,7 +112,7 @@ export function makeGmApi() {
         ]);
       }
       if (!name || !isString(name)) {
-        throw new ErrorSafe('Required parameter "name" is missing or not a string.');
+        throw new SafeError('Required parameter "name" is missing or not a string.');
       }
       assign(opts, {
         method: 'GET',
@@ -144,7 +144,7 @@ export function makeGmApi() {
      * @returns {HTMLElement} it also has .then() so it should be compatible with TM and old VM
      */
     GM_addStyle(css) {
-      return webAddElement(null, 'style', { textContent: css, id: getUniqIdSafe('VMst') }, this);
+      return webAddElement(null, 'style', { textContent: css, id: safeGetUniqId('VMst') }, this);
     },
     GM_openInTab(url, options) {
       return onTabCreate(
@@ -163,7 +163,7 @@ export function makeGmApi() {
         onclick,
       };
       if (!options.text) {
-        throw new ErrorSafe('GM_notification: `text` is required!');
+        throw new SafeError('GM_notification: `text` is required!');
       }
       const id = onNotificationCreate(options, this);
       return {
@@ -187,7 +187,7 @@ function webAddElement(parent, tag, attrs, context) {
   }, 'cbId');
   // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
   if (errorInfo) {
-    const err = new ErrorSafe(errorInfo[0]);
+    const err = new SafeError(errorInfo[0]);
     err.stack += `\n${errorInfo[1]}`;
     throw err;
   }

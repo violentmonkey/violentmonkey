@@ -26,7 +26,7 @@ export default function initialize(
       webId = e[0];
       contentId = e[1];
     }, { __proto__: null, once: true, capture: true });
-    window::fire(new CustomEventSafe(process.env.HANDSHAKE_ID));
+    window::fire(new SafeCustomEvent(process.env.HANDSHAKE_ID));
   }
   bridge.dataKey = contentId;
   if (invokeHost) {
@@ -60,7 +60,7 @@ export default function initialize(
 
 bridge.addHandlers({
   Command({ id, cap, evt }) {
-    const constructor = evt.key ? KeyboardEventSafe : MouseEventSafe;
+    const constructor = evt.key ? SafeKeyboardEvent : SafeMouseEvent;
     const fn = store.commands[`${id}:${cap}`];
     if (fn) fn(new constructor(evt.type, evt));
   },
@@ -76,7 +76,7 @@ bridge.addHandlers({
     }
     if (items) {
       if (waiters && runAt !== 'start') {
-        waiters[runAt] = new PromiseSafe(resolve => { resolvers[runAt] = resolve; });
+        waiters[runAt] = new SafePromise(resolve => { resolvers[runAt] = resolve; });
       }
       items::forEach(createScriptData);
       // FF bug workaround to enable processing of sourceURL in injected page scripts

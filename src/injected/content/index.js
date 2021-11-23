@@ -16,8 +16,8 @@ let bfCacheWired;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 async function init() {
-  const contentId = getUniqIdSafe();
-  const webId = getUniqIdSafe();
+  const contentId = safeGetUniqId();
+  const webId = safeGetUniqId();
   const xhrData = getXhrInjection();
   const pageInfo = !xhrData?.forceContent && {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
@@ -110,8 +110,8 @@ function throttledSetBadge() {
 
 async function getDataFF(viaMessaging) {
   // In Firefox we set data on global `this` which is not equal to `window`
-  const data = global.vmData || await PromiseSafe.race([
-    new PromiseSafe(resolve => { global.vmResolve = resolve; }),
+  const data = global.vmData || await SafePromise.race([
+    new SafePromise(resolve => { global.vmResolve = resolve; }),
     viaMessaging,
   ]);
   delete global.vmResolve;

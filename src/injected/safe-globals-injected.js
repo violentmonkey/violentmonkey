@@ -73,7 +73,7 @@ export const vmOwnFunc = (func, toString) => (
 );
 
 // Avoiding the need to safe-guard a bunch of methods so we use just one
-export const getUniqIdSafe = (prefix = 'VM') => `${prefix}${mathRandom()}`;
+export const safeGetUniqId = (prefix = 'VM') => `${prefix}${mathRandom()}`;
 
 /** args is [tags?, ...rest] */
 export const log = (level, ...args) => {
