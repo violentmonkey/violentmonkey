@@ -564,6 +564,11 @@ $infoIconSize: 18px;
         border-color: #608cb8;
       }
     }
+    .actions {
+      .status {
+        color: darkorange;
+      }
+    }
   }
   .edit-externals .select {
     resize: vertical;
