@@ -399,33 +399,9 @@ body .vl-tooltip {
 }
 
 @media (prefers-color-scheme: dark) {
-  input[type="radio"],
-  input[type="checkbox"] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    width: 1em;
-    height: 1em;
-    background: var(--input-bg);
-    position: relative;
-    border: 1px solid var(--fill-3);
-    &:checked::after {
-      content: "";
-      background: var(--fg);
-      border: 1px solid var(--bg);
-      top: 2px;
-      left: 2px;
-      right: 2px;
-      bottom: 2px;
-      position: absolute;
-    }
-    &:focus {
-      border-color: var(--focus-border-color);
-    }
-  }
-  input[type="radio"],
-  input[type="radio"]:checked::after {
-    border-radius: 1em;
+  input[type="radio"]:not(:checked),
+  input[type="checkbox"]:not(:checked) {
+    filter: invert(1);
   }
   input[type="text"],
   input[type="url"],
