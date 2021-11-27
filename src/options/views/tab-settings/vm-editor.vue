@@ -34,16 +34,6 @@ const ghBRANCH = 'master';
 const ghPATH = 'theme';
 const ghURL = `https://${gh}/${ghREPO}/tree/${ghBRANCH}/${ghPATH}`;
 const DEFAULT = 'default';
-const createData = () => ({
-  hint: null,
-  busy: false,
-  error: null,
-  css: null,
-  theme: null,
-  themes: THEMES,
-  DEFAULT,
-  ghURL,
-});
 const previewLINES = 20;
 const previewLENGTH = 100;
 const makeTextPreview = css => (
@@ -59,7 +49,18 @@ const makeTextPreview = css => (
 );
 
 export default {
-  data: createData,
+  data() {
+    return {
+      hint: null,
+      busy: false,
+      error: null,
+      css: null,
+      theme: null,
+      themes: THEMES,
+      DEFAULT,
+      ghURL,
+    };
+  },
   components: {
     SettingText,
   },
@@ -72,10 +73,8 @@ export default {
     if (!this.revokers) {
       this.css = makeTextPreview(options.get(keyThemeCSS));
       this.revokers = [
-        ['theme', keyThemeNAME],
-      ].map(([prop, opt]) => hookSetting(opt, val => {
-        this[prop] = val ?? createData()[prop];
-      }));
+        hookSetting(keyThemeNAME, val => { this.theme = val ?? DEFAULT; }),
+      ];
       await options.ready; // Waiting for hookSetting to set the value before watching for changes
       this.$watch('theme', async val => {
         const url = val && val !== DEFAULT
