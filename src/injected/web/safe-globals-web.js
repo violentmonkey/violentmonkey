@@ -64,6 +64,7 @@ export let
   readAsDataURL, // FileReader
   safeResponseBlob, // Response - safe = "safe global" to disambiguate the name
   stopImmediatePropagation,
+  regexpExec, // used by replace() internally
   regexpReplace,
   then,
   // various getters
@@ -81,6 +82,7 @@ export let
 export const VAULT = (() => {
   let ArrayP;
   let ElementP;
+  let RegExpP;
   let SafeObject;
   let StringP;
   let i = -1;
@@ -152,7 +154,8 @@ export const VAULT = (() => {
     readAsDataURL = res[i += 1] || SafeFileReader[PROTO].readAsDataURL,
     safeResponseBlob = res[i += 1] || SafeResponse[PROTO].blob,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    regexpReplace = res[i += 1] || src.RegExp[PROTO][SafeSymbol.replace],
+    regexpExec = res[i += 1] || (RegExpP = src.RegExp[PROTO]).exec,
+    regexpReplace = res[i += 1] || RegExpP[SafeSymbol.replace],
     then = res[i += 1] || SafePromise[PROTO].then,
     // various getters
     getBlobType = res[i += 1] || describeProperty(src.Blob[PROTO], 'type').get,

@@ -1,6 +1,7 @@
 import bridge from './bridge';
 
 const idMap = createNullObj();
+const contentTypeRe = setOwnProp(/[,;].*|\s+/g, 'exec', regexpExec);
 
 bridge.addHandlers({
   HttpRequested(msg) {
@@ -36,7 +37,7 @@ function parseData(req, msg) {
   case 'document':
     res = new SafeDOMParser()::parseFromString(res,
       // Cutting everything after , or ; and trimming whitespace
-      /[,;].*|\s+/g::regexpReplace(msg.contentType, '') || 'text/html');
+      contentTypeRe::regexpReplace(msg.contentType, '') || 'text/html');
     break;
   default:
   }

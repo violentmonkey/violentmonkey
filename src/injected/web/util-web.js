@@ -23,7 +23,8 @@ const escMap = {
   '\t': '\\t',
 };
 // TODO: handle \u2028\u2029 when Chrome's JSON.stringify starts to escape them
-const escRE = /[\\"\u0000-\u001F]/g; // eslint-disable-line no-control-regex
+// eslint-disable-next-line no-control-regex
+const escRE = setOwnProp(/[\\"\u0000-\u001F]/g, 'exec', regexpExec);
 const hex = '0123456789ABCDEF';
 const escCharCode = num => `\\u00${
   hex[num >> 4] // eslint-disable-line no-bitwise
