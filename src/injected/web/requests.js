@@ -1,7 +1,6 @@
 import bridge from './bridge';
 
 const idMap = createNullObj();
-const contentTypeRe = setOwnProp(/[,;].*|\s+/g, 'exec', regexpExec);
 
 bridge.addHandlers({
   HttpRequested(msg) {
@@ -32,12 +31,10 @@ function parseData(req, msg) {
   let res = req.raw;
   switch (req.opts.responseType) {
   case 'json':
-    res = jsonParse(res);
+    res = SafeJSON.parse(res);
     break;
   case 'document':
-    res = new SafeDOMParser()::parseFromString(res,
-      // Cutting everything after , or ; and trimming whitespace
-      contentTypeRe::regexpReplace(msg.contentType, '') || 'text/html');
+    res = new SafeDOMParser()::parseFromString(res, getContentType(msg) || 'text/html');
     break;
   default:
   }
@@ -46,6 +43,22 @@ function parseData(req, msg) {
   // `raw` is decoded once per `response` change so we reuse the result just like native XHR
   delete req.raw;
   return res;
+}
+
+/**
+ * Not using RegExp because it internally depends on proto stuff that can be easily broken,
+ * and safe-guarding all of it is ridiculously disproportional.
+ */
+function getContentType(msg) {
+  const type = msg.contentType || '';
+  const len = type.length;
+  let i = 0;
+  let c;
+  // Cutting everything after , or ; or whitespace
+  while (i < len && (c = type[i]) !== ',' && c !== ';' && c > ' ') {
+    i += 1;
+  }
+  return type::slice(0, i);
 }
 
 // request object functions

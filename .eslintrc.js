@@ -25,6 +25,38 @@ const GLOBALS_WEB = {
   IS_FIREFOX: false, // passed as a parameter to VMInitInjection in webpack.conf.js
 };
 
+const INJECTED_RULES = {
+  'no-restricted-imports': ['error', {
+    patterns: ['*/common', '*/common/*'],
+  }],
+  'no-restricted-syntax': [
+    'error', {
+      selector: 'ObjectExpression > ExperimentalSpreadProperty',
+      message: 'Object spread adds a polyfill in injected* even if unused by it',
+    }, {
+      selector: 'OptionalCallExpression',
+      message: 'Optional call uses .call(), which may be spoofed/broken in an unsafe environment',
+      // TODO: write a Babel plugin to use safeCall for this.
+    }, {
+      selector: 'ArrayPattern',
+      message: 'Destructuring via Symbol.iterator may be spoofed/broken in an unsafe environment',
+    }, {
+      selector: ':matches(ArrayExpression, CallExpression) > SpreadElement',
+      message: 'Spreading via Symbol.iterator may be spoofed/broken in an unsafe environment',
+    }, {
+      selector: '[callee.object.name="Object"], MemberExpression[object.name="Object"]',
+      message: 'Using potentially spoofed methods in an unsafe environment',
+      // TODO: auto-generate the rule using GLOBALS
+    }, {
+      selector: `CallExpression[callee.name="defineProperty"]:not(${[
+        '[arguments.2.properties.0.key.name="__proto__"]',
+        ':has(CallExpression[callee.name="createNullObj"])'
+      ].join(',')})`,
+      message: 'Prototype of descriptor may be spoofed/broken in an unsafe environment',
+    }
+  ],
+};
+
 module.exports = {
   root: true,
   extends: [
@@ -63,37 +95,19 @@ module.exports = {
     ), {}),
   }, {
     files: [...FILES_INJECTED, ...FILES_SHARED],
+    rules: INJECTED_RULES,
+  }, {
+    files: FILES_WEB,
     rules: {
-      'no-restricted-imports': ['error', {
-        patterns: ['*/common', '*/common/*'],
-      }],
-      /* Our .browserslistrc targets old browsers so the compiled code for {...objSpread} uses
-         babel's polyfill that calls methods like `Object.assign` instead of our safe `assign`.
-         Ideally, `eslint-plugin-compat` should be used but I couldn't make it work. */
-      'no-restricted-syntax': ['error', {
-        selector: 'ObjectExpression > ExperimentalSpreadProperty',
-        message: 'Object spread adds a polyfill in injected* even if unused by it',
-      }, {
-        selector: 'OptionalCallExpression',
-        message: 'Optional call uses .call(), which may be spoofed/broken in an unsafe environment',
-        // TODO: write a Babel plugin to use safeCall for this.
-      }, {
-        selector: 'ArrayPattern',
-        message: 'Destructuring via Symbol.iterator may be spoofed/broken in an unsafe environment',
-      }, {
-        selector: ':matches(ArrayExpression, CallExpression) > SpreadElement',
-        message: 'Spreading via Symbol.iterator may be spoofed/broken in an unsafe environment',
-      }, {
-        selector: '[callee.object.name="Object"], MemberExpression[object.name="Object"]',
-        message: 'Using potentially spoofed methods in an unsafe environment',
-        // TODO: auto-generate the rule using GLOBALS
-      }, {
-        selector: `CallExpression[callee.name="defineProperty"]:not(${[
-          '[arguments.2.properties.0.key.name="__proto__"]',
-          ':has(CallExpression[callee.name="createNullObj"])'
-        ].join(',')})`,
-        message: 'Prototype of descriptor may be spoofed/broken in an unsafe environment',
-      }],
+      ...INJECTED_RULES,
+      'no-restricted-syntax': [
+        ...INJECTED_RULES['no-restricted-syntax'],
+        {
+          selector: '[regex], NewExpression[callee.name="RegExp"]',
+          message: 'RegExp internally depends on a *ton* of stuff that may be spoofed or broken',
+          // https://262.ecma-international.org/12.0/#sec-regexpexec
+        },
+      ],
     },
   }, {
     // build scripts

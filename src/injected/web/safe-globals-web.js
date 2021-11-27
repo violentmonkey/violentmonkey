@@ -13,6 +13,7 @@ export let
   SafeError,
   SafeEventTarget,
   SafeFileReader,
+  SafeJSON,
   SafeKeyboardEvent,
   SafeMouseEvent,
   Object,
@@ -23,7 +24,6 @@ export let
   fire,
   off,
   on,
-  safeIsFinite,
   // Symbol
   toStringTagSym,
   // Object
@@ -57,15 +57,12 @@ export let
   createObjectURL,
   funcToString,
   ArrayIsArray,
-  jsonParse,
   logging,
   mathRandom,
   parseFromString, // DOMParser
   readAsDataURL, // FileReader
   safeResponseBlob, // Response - safe = "safe global" to disambiguate the name
   stopImmediatePropagation,
-  regexpExec, // used by replace() internally
-  regexpReplace,
   then,
   // various getters
   getBlobType, // Blob
@@ -82,7 +79,6 @@ export let
 export const VAULT = (() => {
   let ArrayP;
   let ElementP;
-  let RegExpP;
   let SafeObject;
   let StringP;
   let i = -1;
@@ -106,6 +102,7 @@ export const VAULT = (() => {
     SafeError = res[i += 1] || src.Error,
     SafeEventTarget = res[i += 1] || src.EventTarget,
     SafeFileReader = res[i += 1] || src.FileReader,
+    SafeJSON = res[i += 1] || src.JSON,
     SafeKeyboardEvent = res[i += 1] || src.KeyboardEvent,
     SafeMouseEvent = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
@@ -115,7 +112,6 @@ export const VAULT = (() => {
     SafeProxy = res[i += 1] || src.Proxy,
     SafeResponse = res[i += 1] || src.Response,
     fire = res[i += 1] || src.dispatchEvent,
-    safeIsFinite = res[i += 1] || src.isFinite, // Firefox defines `isFinite` on `global`
     off = res[i += 1] || src.removeEventListener,
     on = res[i += 1] || src.addEventListener,
     // Object - using SafeObject to pacify eslint without disabling the rule
@@ -147,15 +143,12 @@ export const VAULT = (() => {
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     funcToString = res[i += 1] || safeCall.toString,
     ArrayIsArray = res[i += 1] || src.Array.isArray,
-    jsonParse = res[i += 1] || src.JSON.parse,
     logging = res[i += 1] || assign({ __proto__: null }, src.console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     readAsDataURL = res[i += 1] || SafeFileReader[PROTO].readAsDataURL,
     safeResponseBlob = res[i += 1] || SafeResponse[PROTO].blob,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    regexpExec = res[i += 1] || (RegExpP = src.RegExp[PROTO]).exec,
-    regexpReplace = res[i += 1] || RegExpP[SafeSymbol.replace],
     then = res[i += 1] || SafePromise[PROTO].then,
     // various getters
     getBlobType = res[i += 1] || describeProperty(src.Blob[PROTO], 'type').get,

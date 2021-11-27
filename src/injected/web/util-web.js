@@ -11,47 +11,15 @@ export const safeConcat = (dest, ...arrays) => {
   return concat::apply(dest, arrays);
 };
 
-// Reference: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON#Polyfill
-const escMap = {
-  __proto__: null,
-  '"': '\\"',
-  '\\': '\\\\',
-  '\b': '\\b',
-  '\f': '\\f',
-  '\n': '\\n',
-  '\r': '\\r',
-  '\t': '\\t',
-};
-// TODO: handle \u2028\u2029 when Chrome's JSON.stringify starts to escape them
-// eslint-disable-next-line no-control-regex
-const escRE = setOwnProp(/[\\"\u0000-\u001F]/g, 'exec', regexpExec);
-const hex = '0123456789ABCDEF';
-const escCharCode = num => `\\u00${
-  hex[num >> 4] // eslint-disable-line no-bitwise
-}${
-  hex[num % 16]
-}`;
-const escFunc = m => escMap[m] || escCharCode(m::charCodeAt(0));
 /**
  * When running in the page context we must beware of sites that override Array#toJSON
  * leading to an invalid result, which is why our jsonDump() ignores toJSON.
- * Thus, we use the native JSON.stringify() only in the content script context and only until
- * a userscript is injected into this context (due to `@inject-into` and/or a CSP problem).
  */
 export const jsonDump = (value, stack) => {
   let res;
-  switch (value === null ? (res = 'null') : typeof value) {
-  case 'bigint':
-  case 'number':
-    res = safeIsFinite(value) ? `${value}` : 'null';
-    break;
-  case 'boolean':
-    res = `${value}`;
-    break;
-  case 'string':
-    res = `"${escRE::regexpReplace(value, escFunc)}"`;
-    break;
-  case 'object':
+  if (value === null) {
+    res = 'null';
+  } else if (typeof value === 'object') {
     if (!stack) {
       stack = [value]; // Creating the array here, only when type is object.
     } else if (stack::indexOf(value) >= 0) {
@@ -78,8 +46,8 @@ export const jsonDump = (value, stack) => {
       res += '}';
     }
     stack.length -= 1;
-    break;
-  default:
+  } else if (value !== undefined) {
+    res = SafeJSON.stringify(value);
   }
   return res;
 };
