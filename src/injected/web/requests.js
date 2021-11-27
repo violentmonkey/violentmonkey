@@ -1,7 +1,8 @@
 import bridge from './bridge';
 
 const idMap = createNullObj();
-const contentTypeRe = setOwnProp(/[,;].*|\s+/g, 'exec', regexpExec);
+const contentTypeRe = setProtoOf(/[,;].*|\s+/g, null);
+contentTypeRe.global = true;
 
 bridge.addHandlers({
   HttpRequested(msg) {

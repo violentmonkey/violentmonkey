@@ -82,7 +82,6 @@ export let
 export const VAULT = (() => {
   let ArrayP;
   let ElementP;
-  let RegExpP;
   let SafeObject;
   let StringP;
   let i = -1;
@@ -123,6 +122,7 @@ export const VAULT = (() => {
     describeProperty = res[i += 1] || SafeObject.getOwnPropertyDescriptor,
     getOwnPropertyNames = res[i += 1] || SafeObject.getOwnPropertyNames,
     getOwnPropertySymbols = res[i += 1] || SafeObject.getOwnPropertySymbols,
+    setProtoOf = res[i += 1] || SafeObject.setPrototypeOf,
     assign = res[i += 1] || SafeObject.assign,
     objectKeys = res[i += 1] || SafeObject.keys,
     objectValues = res[i += 1] || SafeObject.values,
@@ -148,14 +148,13 @@ export const VAULT = (() => {
     funcToString = res[i += 1] || safeCall.toString,
     ArrayIsArray = res[i += 1] || src.Array.isArray,
     jsonParse = res[i += 1] || src.JSON.parse,
-    logging = res[i += 1] || assign({ __proto__: null }, src.console),
+    logging = res[i += 1] || assign(createNullObj(), src.console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     readAsDataURL = res[i += 1] || SafeFileReader[PROTO].readAsDataURL,
     safeResponseBlob = res[i += 1] || SafeResponse[PROTO].blob,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    regexpExec = res[i += 1] || (RegExpP = src.RegExp[PROTO]).exec,
-    regexpReplace = res[i += 1] || RegExpP[SafeSymbol.replace],
+    regexpReplace = res[i += 1] || src.RegExp[PROTO][SafeSymbol.replace],
     then = res[i += 1] || SafePromise[PROTO].then,
     // various getters
     getBlobType = res[i += 1] || describeProperty(src.Blob[PROTO], 'type').get,
