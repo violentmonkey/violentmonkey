@@ -28,7 +28,7 @@ Object.assign(handlers, {
     store.scriptIds.push(...ids);
     if (isTop) {
       mutex.resolve();
-      store.commands = data.menus::mapEntry(([, value]) => Object.keys(value).sort());
+      store.commands = data.menus::mapEntry(([, value]) => Object.keys(value));
       // executeScript may(?) fail in a discarded or lazy-loaded tab, which is actually injectable
       store.injectable = true;
     }
