@@ -57,9 +57,10 @@
           <button v-text="i18n('buttonClose')" @click="close"/>
           <div class="flex flex-col my-1">
             <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
-                           @change="checkClose" />
-            <setting-check name="trackLocalFile" @change="trackLocalFile"
-                           :disabled="closeAfterInstall || !isLocal">
+                           :disabled="isLocal && ($refs.trackLocalFile || {}).value"
+                           ref="closeAfterInstall" />
+            <setting-check name="trackLocalFile" @change="trackLocalFile" ref="trackLocalFile"
+                           :disabled="!isLocal">
               <tooltip :content="trackTooltip" :disabled="!trackTooltip">
                 <span v-text="i18n('installOptionTrack')"/>
               </tooltip>
@@ -128,7 +129,6 @@ export default {
     return {
       installable: false,
       installed: false,
-      closeAfterInstall: options.get('closeAfterInstall'),
       message: '',
       cmOptions: {
         lineWrapping: true,
@@ -363,7 +363,7 @@ export default {
         const time = new Date().toLocaleTimeString(['fr']);
         const time0 = this.confirmedTime || (this.confirmedTime = time);
         this.message = `${update.message} ${time0}${time0 === time ? '' : ` --> ${time}`}`;
-        if (this.closeAfterInstall) {
+        if (this.$refs.closeAfterInstall.value) {
           this.close();
         } else {
           this.installed = true;
@@ -391,10 +391,6 @@ export default {
         } catch (e) { /* NOP */ }
       }
       this.tracking = false;
-    },
-    checkClose(value) {
-      this.closeAfterInstall = value;
-      if (value) options.set('trackLocalFile', false);
     },
     async checkSameCode() {
       const { name, namespace } = this.script.meta || {};
