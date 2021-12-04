@@ -27,7 +27,7 @@ export const INJECTABLE_TAB_URL_RE = /^(https?|file|ftps?):/;
 
 // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
 // to prevent exposing them to userscripts with `@inject-into content`
-export const { browser } = global;
+export const browser = process.env.IS_INJECTED !== 'injected-web' && global.browser;
 
 // setTimeout truncates the delay to a 32-bit signed integer so the max delay is ~24 days
 export const TIMEOUT_MAX = 0x7FFF_FFFF;
