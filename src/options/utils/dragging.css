@@ -8,15 +8,9 @@
     z-index: 9;
     transition: none;
     pointer-events: none;
-    background-color: hsl(34, 75%, 93%);
+    background: hsl(34, 75%, 93%) !important;
     @media (prefers-color-scheme: dark) {
-      background: hsl(34, 15%, 15%);
-    }
-    &.disabled {
-      background-color: hsl(34, 30%, 88%);
-      @media (prefers-color-scheme: dark) {
-        background: hsl(34, 10%, 12%);
-      }
+      background: hsl(33, 11%, 31%) !important;
     }
   }
   &-noscroll {
