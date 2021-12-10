@@ -76,8 +76,8 @@ export function makeGmApi() {
     GM_getResourceText(name) {
       return getResource(this, name);
     },
-    GM_getResourceURL(name) {
-      return getResource(this, name, true);
+    GM_getResourceURL(name, isBlobUrl = true) {
+      return getResource(this, name, !!isBlobUrl);
     },
     GM_registerMenuCommand(cap, func) {
       const { id } = this;
@@ -206,16 +206,18 @@ function webAddElement(parent, tag, attrs, context) {
 function getResource(context, name, isBlob) {
   const { id, resCache, resources } = context;
   const key = resources[name];
+  const bucketKey = isBlob == null ? 0 : 1 + isBlob;
   if (key) {
-    let res = resCache[key];
+    let res = ensureNestedProp(resCache, bucketKey, key, false);
     if (!res) {
       bridge.syncCall('GetResource', { id, isBlob, key }, context, null, response => {
         res = response;
       });
       if (res !== true && isBlob) {
+        // Creating Blob URL in page context to make it accessible for page userscripts
         res = createObjectURL(res);
       }
-      resCache[key] = res;
+      ensureNestedProp(resCache, bucketKey, key, res);
     }
     return res === true ? key : res;
   }

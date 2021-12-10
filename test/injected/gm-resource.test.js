@@ -17,5 +17,8 @@ const DATA = `text/plain,${stringAsBase64(RESOURCE_TEXT)}`;
 test('@resource decoding', async (t) => {
   t.equal(decodeResource(DATA), RESOURCE_TEXT, 'GM_getResourceText');
   t.equal(await blobAsText(decodeResource(DATA, true)), RESOURCE_TEXT, 'GM_getResourceURL');
+  t.equal(decodeResource(DATA, false),
+    `data:${DATA.replace(',', ';base64,')}`,
+    'GM_getResourceURL as dataUrl');
   t.end();
 });

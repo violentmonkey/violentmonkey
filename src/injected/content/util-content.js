@@ -47,15 +47,20 @@ export const getFullUrl = url => (
 export const decodeResource = (raw, isBlob) => {
   let res;
   const pos = raw::stringIndexOf(',');
-  const bin = safeAtob(pos < 0 ? raw : raw::slice(pos + 1));
-  if (isBlob || /[\x80-\xFF]/::regexpTest(bin)) {
+  const mimeType = pos < 0 ? '' : raw::slice(0, pos);
+  const mimeData = pos < 0 ? raw : raw::slice(pos + 1);
+  const isDataUrl = isBlob === false;
+  const bin = !isDataUrl && safeAtob(mimeData);
+  if (isDataUrl) {
+    res = `data:${mimeType};base64,${mimeData}`;
+  } else if (isBlob != null || /[\x80-\xFF]/::regexpTest(bin)) {
     const len = bin.length;
     const bytes = new SafeUint8Array(len);
     for (let i = 0; i < len; i += 1) {
       bytes[i] = bin::charCodeAt(i);
     }
     res = isBlob
-      ? new SafeBlob([bytes], { type: pos < 0 ? '' : raw::slice(0, pos) })
+      ? new SafeBlob([bytes], { type: mimeType })
       : new SafeTextDecoder()::tdDecode(bytes);
   } else { // pure ASCII
     res = bin;
