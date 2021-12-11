@@ -49,11 +49,11 @@ export const decodeResource = (raw, isBlob) => {
   const pos = raw::stringIndexOf(',');
   const mimeType = pos < 0 ? '' : raw::slice(0, pos);
   const mimeData = pos < 0 ? raw : raw::slice(pos + 1);
-  const isDataUrl = isBlob === false;
-  const bin = !isDataUrl && safeAtob(mimeData);
-  if (isDataUrl) {
-    res = `data:${mimeType};base64,${mimeData}`;
-  } else if (isBlob != null || /[\x80-\xFF]/::regexpTest(bin)) {
+  if (isBlob === false) {
+    return `data:${mimeType};base64,${mimeData}`;
+  }
+  const bin = safeAtob(mimeData);
+  if (isBlob || /[\x80-\xFF]/::regexpTest(bin)) {
     const len = bin.length;
     const bytes = new SafeUint8Array(len);
     for (let i = 0; i < len; i += 1) {
