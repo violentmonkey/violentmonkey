@@ -586,30 +586,34 @@ export function setConfig(config) {
   }
 }
 
+let unregister;
+
 export async function openAuthPage(url, redirectUri) {
-  unregisterWebRequest(); // otherwise our new tabId will be ignored
-  browser.webRequest.onBeforeRequest.addListener(onBeforeRequest, {
+  unregister?.(); // otherwise our new tabId will be ignored
+  const tabId = (await browser.tabs.create({ url })).id;
+  /**
+   * @param {chrome.webRequest.WebResponseDetails} info
+   * @returns {chrome.webRequest.BlockingResponse}
+   */
+  const handler = (info) => {
+    if (getService().checkAuth?.(info.url)) {
+      // When onBeforeRequest occurs for initial requests intercepted by service worker,
+      // info.tabId will be -1 on Chromium based browsers, use tabId instead.
+      // tested on Chrome / Edge / Brave
+      browser.tabs.remove(tabId);
+      // If we unregister without setTimeout, API will ignore { cancel: true }
+      setTimeout(unregister, 0);
+      return { cancel: true };
+    }
+  };
+  unregister = () => {
+    browser.webRequest.onBeforeRequest.removeListener(handler);
+  };
+  browser.webRequest.onBeforeRequest.addListener(handler, {
+    // Do not filter by tabId here, see above
     urls: [`${redirectUri}*`],
-    types: ['main_frame'],
-    tabId: (await browser.tabs.create({ url })).id,
+    types: ['main_frame', 'xmlhttprequest'], // fetch request in service worker
   }, ['blocking']);
-}
-
-/**
- * @param {chrome.webRequest.WebResponseDetails} info
- * @returns {chrome.webRequest.BlockingResponse}
- */
-function onBeforeRequest(info) {
-  if (getService().checkAuth?.(info.url)) {
-    browser.tabs.remove(info.tabId);
-    // If we unregister without setTimeout, API will ignore { cancel: true }
-    setTimeout(unregisterWebRequest, 0);
-    return { cancel: true };
-  }
-}
-
-function unregisterWebRequest() {
-  browser.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
 }
 
 hookOptions((data) => {
