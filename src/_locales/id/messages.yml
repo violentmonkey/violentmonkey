@@ -16,6 +16,7 @@ buttonDisable:
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Unduh tema
+  touched: false
 buttonEdit:
   description: Button to edit a script.
   message: Sunting
