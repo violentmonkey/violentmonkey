@@ -80,8 +80,15 @@ export function makeGmApiWrapper(script) {
 function makeGmInfo(script, resources) {
   // TODO: move into background.js
   const { meta } = script;
-  // Using __proto__:null to guard against prototype spoofing
-  const metaCopy = createNullObj();
+  const { ua } = bridge;
+  /* Making a copy with a standard Object prototype.
+   * Not using assign({}, obj) because it can be spoofed/broken via Object prototype.
+   * Not using JSON.stringify+parse as it calls toJSON which may break arrays inside. */
+  const metaCopy = {};
+  const uaCopy = {};
+  objectKeys(ua)::forEach(key => {
+    setOwnProp(uaCopy, key, ua[key]);
+  });
   let val;
   objectKeys(meta)::forEach((key) => {
     val = meta[key];
@@ -97,7 +104,7 @@ function makeGmInfo(script, resources) {
       break;
     default:
     }
-    metaCopy[key] = val;
+    setOwnProp(metaCopy, key, val);
   });
   [
     'description',
@@ -106,14 +113,14 @@ function makeGmInfo(script, resources) {
     'runAt',
     'version',
   ]::forEach((key) => {
-    if (!metaCopy[key]) metaCopy[key] = '';
+    if (!getOwnProp(metaCopy, key)) setOwnProp(metaCopy, key, '');
   });
   val = objectKeys(resources);
   val::forEach((name, i) => {
     val[i] = { name, url: resources[name] };
   });
-  metaCopy.resources = val;
-  metaCopy.unwrap = false; // deprecated, always `false`
+  setOwnProp(metaCopy, 'resources', val);
+  setOwnProp(metaCopy, 'unwrap', false); // deprecated, always `false`
   return {
     // No __proto__:null because it's a standard object for userscripts
     uuid: script.props.uuid,
@@ -122,8 +129,8 @@ function makeGmInfo(script, resources) {
     scriptHandler: 'Violentmonkey',
     version: process.env.VM_VER,
     injectInto: bridge.mode,
-    platform: assign({}, bridge.ua),
-    script: assign({}, metaCopy),
+    platform: uaCopy,
+    script: metaCopy,
   };
 }
 
