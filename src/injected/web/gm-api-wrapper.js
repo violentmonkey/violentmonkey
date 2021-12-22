@@ -80,6 +80,7 @@ export function makeGmApiWrapper(script) {
 function makeGmInfo(script, resources) {
   // TODO: move into background.js
   const { meta } = script;
+  // Using __proto__:null to guard against prototype spoofing
   const metaCopy = createNullObj();
   let val;
   objectKeys(meta)::forEach((key) => {
@@ -114,6 +115,7 @@ function makeGmInfo(script, resources) {
   metaCopy.resources = val;
   metaCopy.unwrap = false; // deprecated, always `false`
   return {
+    // No __proto__:null because it's a standard object for userscripts
     uuid: script.props.uuid,
     scriptMetaStr: script.metaStr,
     scriptWillUpdate: !!script.config.shouldUpdate,
@@ -121,7 +123,7 @@ function makeGmInfo(script, resources) {
     version: process.env.VM_VER,
     injectInto: bridge.mode,
     platform: assign({}, bridge.ua),
-    script: metaCopy,
+    script: assign({}, metaCopy),
   };
 }
 
