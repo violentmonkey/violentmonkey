@@ -114,13 +114,14 @@ function makeGmInfo(script, resources) {
   metaCopy.resources = val;
   metaCopy.unwrap = false; // deprecated, always `false`
   return {
+    __proto__: null,
     uuid: script.props.uuid,
     scriptMetaStr: script.metaStr,
     scriptWillUpdate: !!script.config.shouldUpdate,
     scriptHandler: 'Violentmonkey',
     version: process.env.VM_VER,
     injectInto: bridge.mode,
-    platform: assign({}, bridge.ua),
+    platform: assign(createNullObj(), bridge.ua),
     script: metaCopy,
   };
 }

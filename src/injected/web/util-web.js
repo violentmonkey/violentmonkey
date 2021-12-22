@@ -47,7 +47,7 @@ export const jsonDump = (value, stack) => {
     }
     stack.length -= 1;
   } else if (value !== undefined) {
-    res = SafeJSON.stringify(value);
+    res = SafeJSONStringify(value);
   }
   return res;
 };

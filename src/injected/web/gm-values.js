@@ -6,7 +6,7 @@ export const changeHooks = createNullObj();
 
 const dataDecoders = {
   __proto__: null,
-  o: SafeJSON.parse,
+  o: SafeJSONParse,
   n: val => +val,
   b: val => val === 'true',
 };

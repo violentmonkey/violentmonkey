@@ -31,7 +31,7 @@ function parseData(req, msg) {
   let res = req.raw;
   switch (req.opts.responseType) {
   case 'json':
-    res = SafeJSON.parse(res);
+    res = SafeJSONParse(res);
     break;
   case 'document':
     res = new SafeDOMParser()::parseFromString(res, getContentType(msg) || 'text/html');
