@@ -53,6 +53,8 @@ export let
   slice,
   // safeCall
   safeCall,
+  // various values
+  builtinGlobals,
   // various methods
   createObjectURL,
   funcToString,
@@ -85,6 +87,7 @@ export const VAULT = (() => {
   let call;
   let res;
   let src = global; // FF defines some stuff only on `global` in content mode
+  let srcWindow = window;
   if (process.env.VAULT_ID) {
     res = window[process.env.VAULT_ID];
     delete window[process.env.VAULT_ID];
@@ -92,7 +95,9 @@ export const VAULT = (() => {
   if (!res) {
     res = createNullObj();
   } else if (!isFunction(res[0])) {
+    // injectPageSandbox iframe's `this` and `window`
     src = res[0];
+    srcWindow = res[1];
     res = createNullObj();
   }
   res = [
@@ -159,5 +164,9 @@ export const VAULT = (() => {
   ];
   // Well-known Symbols are unforgeable
   toStringTagSym = SafeSymbol.toStringTag;
+  builtinGlobals = [
+    getOwnPropertyNames(srcWindow),
+    src !== srcWindow && getOwnPropertyNames(src),
+  ];
   return res;
 })();

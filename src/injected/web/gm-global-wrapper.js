@@ -9,11 +9,16 @@ const scopeSym = SafeSymbol.unscopables;
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
   const kWrappedJSObject = 'wrappedJSObject';
-  const names = getOwnPropertyNames(window);
+  const isContentMode = !process.env.HANDSHAKE_ID;
+  const names = builtinGlobals[0]; // `window` keys
   // True if `names` is usable as is, but FF is bugged: its names have duplicates
   let ok = !IS_FIREFOX;
   names::forEach(key => {
-    if (isFrameIndex(key)) {
+    if (isFrameIndex(key)
+      || isContentMode && (
+        key === process.env.INIT_FUNC_NAME || key === 'browser' || key === 'chrome'
+      )
+    ) {
       ok = false;
     } else {
       globalKeysSet.add(key);
@@ -22,7 +27,7 @@ const globalKeys = (function makeGlobalKeys() {
   /* Chrome and FF page mode: `global` is `window`
      FF content mode: `global` is different, some props e.g. `isFinite` are defined only there */
   if (global !== window) {
-    getOwnPropertyNames(global)::forEach(key => {
+    builtinGlobals[1]::forEach(key => {
       if (!isFrameIndex(key)) {
         globalKeysSet.add(key);
         ok = false;
@@ -153,6 +158,7 @@ for (const name in unforgeables) { /* proto is null */// eslint-disable-line gua
     inheritedKeys[key] = 1;
   });
 });
+builtinGlobals = null; // eslint-disable-line no-global-assign
 
 /**
  * @desc Wrap helpers to prevent unexpected modifications.

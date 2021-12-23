@@ -260,6 +260,7 @@ export async function dumpValueStores(valueDict) {
 
 export const ENV_CACHE_KEYS = 'cacheKeys';
 export const ENV_REQ_KEYS = 'reqKeys';
+export const ENV_SCRIPTS = 'scripts';
 export const ENV_VALUE_IDS = 'valueIds';
 const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Value)$/;
 const RUN_AT_RE = /^document-(start|body|end|idle)$/;
@@ -279,9 +280,9 @@ export async function getScriptsByURL(url, isTop) {
   const [envStart, envDelayed] = [0, 1].map(() => ({
     ids: [],
     /** @type {(VMScript & VMInjectedScript)[]} */
-    scripts: [],
     [ENV_CACHE_KEYS]: [],
     [ENV_REQ_KEYS]: [],
+    [ENV_SCRIPTS]: [],
     [ENV_VALUE_IDS]: [],
   }));
   allScripts.forEach((script) => {
@@ -310,7 +311,7 @@ export async function getScriptsByURL(url, isTop) {
       });
     }
     /** @namespace VMInjectedScript */
-    env.scripts.push({ ...script, runAt });
+    env[ENV_SCRIPTS].push({ ...script, runAt });
   });
   if (envDelayed.ids.length) {
     envDelayed.promise = readEnvironmentData(envDelayed);

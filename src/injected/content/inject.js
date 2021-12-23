@@ -9,14 +9,13 @@ import {
  * so we'll use the extension's UUID, which is unique per computer in FF, for messages
  * like VAULT_WRITER to avoid interception by sites that can add listeners for all of our
  * INIT_FUNC_NAME ids even though we change it now with each release. */
-const INIT_FUNC_NAME = process.env.INIT_FUNC_NAME;
 const VAULT_WRITER = `${IS_FIREFOX ? VM_UUID : INIT_FUNC_NAME}VW`;
 const VAULT_WRITER_ACK = `${VAULT_WRITER}+`;
 let contLists;
 let pgLists;
 /** @type {Object<string,VMInjectionRealm>} */
 let realms;
-/** @type boolean */
+/** @type {?boolean} */
 let pageInjectable;
 let frameEventWnd;
 /** @type ShadowRoot */
@@ -60,6 +59,7 @@ bridge.addHandlers({
 });
 
 export function injectPageSandbox(contentId, webId) {
+  pageInjectable = false;
   const { cloneInto } = global;
   const vaultId = safeGetUniqId();
   const handshakeId = safeGetUniqId();
@@ -71,7 +71,7 @@ export function injectPageSandbox(contentId, webId) {
      * Content scripts will see `document.opener = null`, not the original opener, so we have
      * to use an iframe to extract the safe globals. Detection via document.referrer won't work
      * is it can be emptied by the opener page, too. */
-    inject({ code: `parent["${vaultId}"] = [this]` }, ok => {
+    inject({ code: `parent["${vaultId}"] = [this, window]` }, ok => {
       // Skipping page injection in FF if our script element was blocked by site's CSP
       if (ok && (!IS_FIREFOX || window.wrappedJSObject[vaultId])) {
         startHandshake();
@@ -125,31 +125,37 @@ export function injectPageSandbox(contentId, webId) {
  * @param {string} contentId
  * @param {string} webId
  * @param {VMGetInjectedData} data
+ * @param {boolean} isXml
  */
-export async function injectScripts(contentId, webId, data) {
+export async function injectScripts(contentId, webId, data, isXml) {
   const { hasMore, info } = data;
   realms = {
     __proto__: null,
     /** @namespace VMInjectionRealm */
     [INJECT_CONTENT]: {
-      injectable: true,
       /** @namespace VMRunAtLists */
       lists: contLists = { start: [], body: [], end: [], idle: [] },
       is: 0,
       info,
     },
     [INJECT_PAGE]: {
-      injectable: pageInjectable,
       lists: pgLists = { start: [], body: [], end: [], idle: [] },
       is: 0,
       info,
     },
   };
   assign(bridge.cache, data.cache);
+  if (isXml) {
+    pageInjectable = false;
+  }
+  if (data[INJECT_PAGE] && pageInjectable == null) {
+    injectPageSandbox(contentId, webId);
+  }
   const feedback = data.scripts.map((script) => {
     const { id } = script.props;
-    // eslint-disable-next-line no-restricted-syntax
-    const realm = INJECT_MAPPING[script.injectInto].find(key => realms[key]?.injectable);
+    const realm = INJECT_MAPPING[script.injectInto].find(key => (
+      key === INJECT_CONTENT || pageInjectable
+    ));
     // If the script wants this specific realm, which is unavailable, we won't inject it at all
     if (realm) {
       const { pathMap } = script.custom;
@@ -168,7 +174,6 @@ export async function injectScripts(contentId, webId, data) {
     feedId: data.feedId,
     forceContent: !pageInjectable,
   });
-  // saving while safe
   const hasInvoker = realms[INJECT_CONTENT].is;
   if (hasInvoker) {
     setupContentInvoker(contentId, webId);

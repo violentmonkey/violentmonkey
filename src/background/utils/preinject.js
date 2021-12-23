@@ -1,13 +1,13 @@
 import { getScriptName, getUniqId } from '#/common';
 import {
-  INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING,
+  INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
   INJECTABLE_TAB_URL_RE, METABLOCK_RE,
 } from '#/common/consts';
 import initCache from '#/common/cache';
 import { forEachEntry, objectPick, objectSet } from '#/common/object';
 import storage from '#/common/storage';
 import ua from '#/common/ua';
-import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_VALUE_IDS } from './db';
+import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_IDS } from './db';
 import { extensionRoot, postInitialize } from './init';
 import { commands } from './message';
 import { getOption, hookOptions } from './options';
@@ -28,6 +28,7 @@ const cache = initCache({
     rcs?.unregister();
   },
 });
+const FORCE_CONTENT = 'forceContent';
 const INJECT_INTO = 'injectInto';
 // KEY_XXX for hooked options
 const KEY_EXPOSE = 'expose';
@@ -46,7 +47,7 @@ postInitialize.push(() => {
 });
 
 Object.assign(commands, {
-  async InjectionFeedback({ feedId, feedback, forceContent }, src) {
+  async InjectionFeedback({ feedId, feedback, [FORCE_CONTENT]: forceContent }, src) {
     feedback.forEach(processFeedback, src);
     if (feedId) {
       // cache cleanup when getDataFF outruns GetInjected
@@ -54,9 +55,9 @@ Object.assign(commands, {
       // envDelayed
       const env = await cache.pop(feedId.envKey);
       if (env) {
-        env.forceContent = forceContent;
-        env.scripts.map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
-        return objectPick(env, ['cache', 'scripts']);
+        env[FORCE_CONTENT] = forceContent;
+        env[ENV_SCRIPTS].map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
+        return objectPick(env, ['cache', ENV_SCRIPTS]);
       }
     }
   },
@@ -225,7 +226,7 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   const data = await getScriptsByURL(url, !frameId);
   const { envDelayed, scripts } = data;
   const isLate = forceContent != null;
-  data.forceContent = forceContent;
+  data[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
   const feedback = scripts.map(prepareScript, data).filter(Boolean);
   const more = envDelayed.promise;
   const envKey = getUniqId(`${tabId}:${frameId}:`);
@@ -234,16 +235,16 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   Object.assign(inject, {
     scripts,
     [INJECT_INTO]: injectInto,
+    [INJECT_PAGE]: !forceContent && (
+      scripts.some(isPageRealm, data)
+      || envDelayed[ENV_SCRIPTS].some(isPageRealm, data)
+    ),
     cache: data.cache,
     feedId: {
       cacheKey, // InjectionFeedback cache key for cleanup when getDataFF outruns GetInjected
       envKey, // InjectionFeedback cache key for envDelayed
     },
     hasMore: !!more, // tells content bridge to expect envDelayed
-    forceContent: forceContent || ( // Trying to skip page sandbox when xhrInject is on:
-      feedback.length === scripts.length // ...when all `envStart` scripts are `content`,
-      && envDelayed.scripts.every(scr => isContentRealm(scr, forceContent)) // and `envDelayed` too.
-    ),
     ids: data.disabledIds, // content bridge adds the actually running ids and sends via SetPopup
     info: {
       ua,
@@ -266,7 +267,7 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
 function prepareScript(script) {
   const { custom, meta, props } = script;
   const { id } = props;
-  const { forceContent, require, value } = this;
+  const { [FORCE_CONTENT]: forceContent, require, value } = this;
   const code = this.code[id];
   const dataKey = getUniqId('VMin');
   const displayName = getScriptName(script);
@@ -352,7 +353,7 @@ function detectStrictCsp(responseHeaders) {
 function forceContentInjection(data) {
   /** @type VMGetInjectedData */
   const inject = data.inject;
-  inject.forceContent = true;
+  inject[FORCE_CONTENT] = true;
   inject.scripts.forEach(scr => {
     // When script wants `page`, the result below will be `true` so the script goes into `failedIds`
     scr.code = !isContentRealm(scr, true) || '';
@@ -365,4 +366,9 @@ function isContentRealm(scr, forceContent) {
     scr[INJECT_INTO] = normalizeRealm(scr.custom[INJECT_INTO] || scr.meta[INJECT_INTO])
   );
   return realm === INJECT_CONTENT || forceContent && realm === INJECT_AUTO;
+}
+
+/** @this {VMScriptByUrlData} */
+function isPageRealm(scr) {
+  return !isContentRealm(scr, this[FORCE_CONTENT]);
 }

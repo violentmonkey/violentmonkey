@@ -85,7 +85,9 @@ const defsObj = {
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
-const skipReinjectionHeader = `if (window['${INIT_FUNC_NAME}'] !== 1)`;
+const skipReinjectionHeader = `{
+  const INIT_FUNC_NAME = '${INIT_FUNC_NAME}';
+  if (window[INIT_FUNC_NAME] !== 1)`;
 
 const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
@@ -129,7 +131,7 @@ module.exports = Promise.all([
     config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapperWithGlobals('injected/content', config, defsObj, getGlobals => ({
       header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
-      footer: '}',
+      footer: '}}',
     }));
   }),
 
@@ -139,13 +141,13 @@ module.exports = Promise.all([
     config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapperWithGlobals('injected/web', config, defsObj, getGlobals => ({
       header: () => `${skipReinjectionHeader}
-        window['${INIT_FUNC_NAME}'] = function (IS_FIREFOX,${HANDSHAKE_ID},${VAULT_ID}) {
+        window[INIT_FUNC_NAME] = function (IS_FIREFOX,${HANDSHAKE_ID},${VAULT_ID}) {
           const module = { __proto__: null };
           ${getGlobals()}`,
       footer: `
           const { exports } = module;
           return exports.__esModule ? exports.default : exports;
-        };0;`,
+        }};0;`,
     }));
   }),
 ]);

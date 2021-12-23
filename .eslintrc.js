@@ -16,6 +16,7 @@ const FILES_SHARED = [
 const GLOBALS_COMMON = getGlobals('src/common/safe-globals.js');
 const GLOBALS_INJECTED = getGlobals(`src/injected/safe-globals-injected.js`);
 const GLOBALS_CONTENT = {
+  INIT_FUNC_NAME: false,
   ...getGlobals(`src/injected/content/safe-globals-content.js`),
   ...GLOBALS_INJECTED,
 };

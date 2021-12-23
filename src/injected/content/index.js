@@ -18,16 +18,17 @@ let bfCacheWired;
 async function init() {
   const contentId = safeGetUniqId();
   const webId = safeGetUniqId();
+  const isXml = document instanceof XMLDocument;
   const xhrData = getXhrInjection();
-  const pageInfo = !xhrData?.forceContent && {
+  const dataPromise = !xhrData && sendCmd('GetInjected', {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
     url: IS_FIREFOX && global.location.href,
     // XML document's appearance breaks when script elements are added
-    forceContent: document instanceof XMLDocument
-      || !injectPageSandbox(contentId, webId),
-  };
-  const dataPromise = !xhrData && sendCmd('GetInjected', pageInfo, { retry: true });
+    forceContent: isXml,
+  }, {
+    retry: true,
+  });
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
   const data = xhrData || (
     IS_FIREFOX && Event[PROTO].composedPath
@@ -35,12 +36,11 @@ async function init() {
       : await dataPromise
   );
   const { allowCmd } = bridge;
-  allowCmd('VaultId', contentId);
   bridge::pickIntoThis(data, [
     'ids',
     'injectInto',
   ]);
-  if (data.expose) {
+  if (data.expose && !isXml && injectPageSandbox(contentId, webId)) {
     allowCmd('GetScriptVer', contentId);
     bridge.addHandlers({ GetScriptVer: true }, true);
     bridge.post('Expose');
@@ -49,7 +49,7 @@ async function init() {
     bridge.onScripts.forEach(fn => fn(data));
     allowCmd('SetTimeout', contentId);
     if (IS_FIREFOX) allowCmd('InjectList', contentId);
-    await injectScripts(contentId, webId, data);
+    await injectScripts(contentId, webId, data, isXml);
   }
   bridge.onScripts = null;
   sendSetPopup();
@@ -121,7 +121,7 @@ async function getDataFF(viaMessaging) {
 
 function getXhrInjection() {
   try {
-    const quotedKey = `"${process.env.INIT_FUNC_NAME}"`;
+    const quotedKey = `"${INIT_FUNC_NAME}"`;
     // Accessing document.cookie may throw due to CSP sandbox
     const cookieValue = document.cookie.split(`${quotedKey}=`)[1];
     const blobId = cookieValue && cookieValue.split(';', 1)[0];
