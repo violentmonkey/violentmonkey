@@ -56,9 +56,9 @@ export let
   // various values
   builtinGlobals,
   // various methods
+  arrayIsArray,
   createObjectURL,
   funcToString,
-  ArrayIsArray,
   logging,
   mathRandom,
   parseFromString, // DOMParser
@@ -147,7 +147,7 @@ export const VAULT = (() => {
     // various methods
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     funcToString = res[i += 1] || safeCall.toString,
-    ArrayIsArray = res[i += 1] || src.Array.isArray,
+    arrayIsArray = res[i += 1] || src.Array.isArray,
     logging = res[i += 1] || assign({ __proto__: null }, src.console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,

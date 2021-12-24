@@ -27,7 +27,7 @@ export const jsonDump = (value, stack) => {
     } else {
       setOwnProp(stack, stack.length, value);
     }
-    if (ArrayIsArray(value)) {
+    if (arrayIsArray(value)) {
       res = '[';
       // Must enumerate all values to include holes in sparse arrays
       for (let i = 0, len = value.length; i < len; i += 1) {
