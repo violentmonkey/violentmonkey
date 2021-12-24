@@ -16,6 +16,7 @@ buttonDisable:
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Pobierz motywy
+  touched: false
 buttonEdit:
   description: Button to edit a script.
   message: Edytuj

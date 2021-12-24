@@ -16,6 +16,7 @@ buttonDisable:
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: 下载主题
+  touched: false
 buttonEdit:
   description: Button to edit a script.
   message: 编辑

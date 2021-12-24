@@ -16,6 +16,7 @@ buttonDisable:
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Descarcă teme
+  touched: false
 buttonEdit:
   description: Button to edit a script.
   message: Editează
@@ -519,7 +520,7 @@ labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: Sincronă
+  message: Mod $1 sincron
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
