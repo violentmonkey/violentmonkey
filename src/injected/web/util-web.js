@@ -40,14 +40,14 @@ export const jsonDump = (value, stack) => {
         const v = jsonDump(value[key], stack);
         // JSON.stringify skips keys with `undefined` or incompatible values
         if (v !== undefined) {
-          res += `${res.length > 1 ? ',' : ''}${jsonDump(key)}:${v}`;
+          res += `${res.length > 1 ? ',' : ''}${jsonStringify(key)}:${v}`;
         }
       });
       res += '}';
     }
     stack.length -= 1;
   } else if (value !== undefined) {
-    res = SafeJSON.stringify(value);
+    res = jsonStringify(value);
   }
   return res;
 };

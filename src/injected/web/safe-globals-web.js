@@ -13,7 +13,6 @@ export let
   SafeError,
   SafeEventTarget,
   SafeFileReader,
-  SafeJSON,
   SafeKeyboardEvent,
   SafeMouseEvent,
   Object,
@@ -59,6 +58,8 @@ export let
   arrayIsArray,
   createObjectURL,
   funcToString,
+  jsonParse,
+  jsonStringify,
   logging,
   mathRandom,
   parseFromString, // DOMParser
@@ -82,6 +83,7 @@ export const VAULT = (() => {
   let ArrayP;
   let ElementP;
   let SafeObject;
+  let SafeJSON;
   let StringP;
   let i = -1;
   let call;
@@ -168,5 +170,9 @@ export const VAULT = (() => {
     getOwnPropertyNames(srcWindow),
     src !== srcWindow && getOwnPropertyNames(src),
   ];
+  /* Exporting the functions separately instead of exporting SafeJSON as its props may be broken
+   * by the page if it gains access to any other object from the vault e.g. a thrown SafeError. */
+  jsonParse = SafeJSON.parse;
+  jsonStringify = SafeJSON.stringify;
   return res;
 })();
