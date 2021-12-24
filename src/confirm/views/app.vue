@@ -57,10 +57,10 @@
           <button v-text="i18n('buttonClose')" @click="close"/>
           <div class="flex flex-col my-1">
             <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
-                           :disabled="isLocal && ($refs.trackLocalFile || {}).value"
+                           :data-disabled="isLocal && ($refs.trackLocalFile || {}).value"
                            ref="closeAfterInstall" />
             <setting-check name="trackLocalFile" @change="trackLocalFile" ref="trackLocalFile"
-                           :disabled="!isLocal">
+                           :data-disabled="!isLocal">
               <tooltip :content="trackTooltip" :disabled="!trackTooltip">
                 <span v-text="i18n('installOptionTrack')"/>
               </tooltip>
@@ -501,6 +501,9 @@ $infoIconSize: 18px;
     .toggle {
       opacity: .3;
     }
+  }
+  [data-disabled] {
+    opacity: .4
   }
   .actions {
     align-items: center;
