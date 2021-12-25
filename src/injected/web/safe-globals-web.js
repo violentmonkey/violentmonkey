@@ -97,9 +97,9 @@ export const VAULT = (() => {
   if (!res) {
     res = createNullObj();
   } else if (!isFunction(res[0])) {
-    // injectPageSandbox iframe's `this` and `window`
+    // injectPageSandbox iframe's `global` is `window` because it's in page mode
     src = res[0];
-    srcWindow = res[1];
+    srcWindow = src;
     res = createNullObj();
   }
   res = [
@@ -163,13 +163,14 @@ export const VAULT = (() => {
     getDetail = res[i += 1] || describeProperty(SafeCustomEvent[PROTO], 'detail').get,
     getReaderResult = res[i += 1] || describeProperty(SafeFileReader[PROTO], 'result').get,
     getRelatedTarget = res[i += 1] || describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get,
+    // various values
+    builtinGlobals = res[i += 1] || [
+      getOwnPropertyNames(srcWindow),
+      src !== srcWindow && getOwnPropertyNames(src),
+    ],
   ];
   // Well-known Symbols are unforgeable
   toStringTagSym = SafeSymbol.toStringTag;
-  builtinGlobals = [
-    getOwnPropertyNames(srcWindow),
-    src !== srcWindow && getOwnPropertyNames(src),
-  ];
   /* Exporting the functions separately instead of exporting SafeJSON as its props may be broken
    * by the page if it gains access to any other object from the vault e.g. a thrown SafeError. */
   jsonParse = SafeJSON.parse;
