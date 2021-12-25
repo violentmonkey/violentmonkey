@@ -83,7 +83,6 @@ export const VAULT = (() => {
   let ArrayP;
   let ElementP;
   let SafeObject;
-  let SafeJSON;
   let StringP;
   let i = -1;
   let call;
@@ -109,7 +108,6 @@ export const VAULT = (() => {
     SafeError = res[i += 1] || src.Error,
     SafeEventTarget = res[i += 1] || src.EventTarget,
     SafeFileReader = res[i += 1] || src.FileReader,
-    SafeJSON = res[i += 1] || src.JSON,
     SafeKeyboardEvent = res[i += 1] || src.KeyboardEvent,
     SafeMouseEvent = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
@@ -150,6 +148,10 @@ export const VAULT = (() => {
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     funcToString = res[i += 1] || safeCall.toString,
     arrayIsArray = res[i += 1] || src.Array.isArray,
+    /* Exporting JSON methods separately instead of exporting SafeJSON as its props may be broken
+     * by the page if it gains access to any Object from the vault e.g. a thrown SafeError. */
+    jsonParse = res[i += 1] || src.JSON.parse,
+    jsonStringify = res[i += 1] || src.JSON.stringify,
     logging = res[i += 1] || assign({ __proto__: null }, src.console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
@@ -171,9 +173,5 @@ export const VAULT = (() => {
   ];
   // Well-known Symbols are unforgeable
   toStringTagSym = SafeSymbol.toStringTag;
-  /* Exporting the functions separately instead of exporting SafeJSON as its props may be broken
-   * by the page if it gains access to any other object from the vault e.g. a thrown SafeError. */
-  jsonParse = SafeJSON.parse;
-  jsonStringify = SafeJSON.stringify;
   return res;
 })();
