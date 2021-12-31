@@ -1,4 +1,4 @@
-import { getScriptName, getUniqId } from '#/common';
+import { getScriptName, getUniqId, trueJoin } from '#/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
   INJECTABLE_TAB_URL_RE, METABLOCK_RE,
@@ -282,19 +282,20 @@ function prepareScript(script) {
   const wrap = !meta.unwrap;
   const injectedCode = [
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    wrap ? `window.${dataKey}=function(${dataKey}){try{with(this)((define,module,exports)=>{` : '',
+    wrap && `window.${dataKey}=function(${dataKey}){try{with(this)((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
-    hasReqs && wrap ? '(()=>{' : '',
+    hasReqs && wrap && '(()=>{',
     code,
     // adding a new line in case the code ends with a line comment
-    code.endsWith('\n') || !wrap ? '' : '\n',
-    hasReqs && wrap ? '})()' : '',
+    !code.endsWith('\n') && '\n',
+    hasReqs && wrap && '})()',
+    wrap && `})()}catch(e){${dataKey}(e)}}`,
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
-    wrap ? `})()}catch(e){${dataKey}(e)}};0` : '',
+    IS_FIREFOX && ';0',
     // Firefox lists .user.js among our own content scripts so a space at start will group them
     `\n//# sourceURL=${extensionRoot}${IS_FIREFOX ? '%20' : ''}${name}.user.js#${id}`,
-  ].join('');
+  ]::trueJoin('');
   cacheCode.put(dataKey, injectedCode, TIME_KEEP_DATA);
   /** @namespace VMInjectedScript */
   Object.assign(script, {
