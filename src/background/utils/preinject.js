@@ -35,6 +35,9 @@ const KEY_EXPOSE = 'expose';
 const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
 const KEY_IS_APPLIED = 'isApplied';
 const KEY_XHR_INJECT = 'xhrInject';
+const REPLACE_URL_CHAR = IS_FIREFOX
+  ? /[#&',/:;?=+]/g // FF shows `@` fine as ASCII but mangles it as full-width
+  : /[#&',/:;?@=+]/g;
 const expose = {};
 let isApplied;
 let injectInto;
@@ -270,7 +273,7 @@ function prepareScript(script) {
   const code = this.code[id];
   const dataKey = getUniqId('VMin');
   const displayName = getScriptName(script);
-  const name = encodeURIComponent(displayName.replace(/[#&',/:;?@=+]/g, replaceWithFullWidthForm));
+  const name = encodeURIComponent(displayName.replace(REPLACE_URL_CHAR, replaceWithFullWidthForm));
   const isContent = isContentRealm(script, forceContent);
   const pathMap = custom.pathMap || {};
   const reqs = meta.require?.map(key => require[pathMap[key] || key]).filter(Boolean);
