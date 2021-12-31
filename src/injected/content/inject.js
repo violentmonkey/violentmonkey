@@ -4,6 +4,7 @@ import {
   bindEvents, fireBridgeEvent,
   INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
 } from '../util';
+import { Run } from './cmd-run';
 
 /* In FF, content scripts running in a same-origin frame cannot directly call parent's functions
  * so we'll use the extension's UUID, which is unique per computer in FF, for messages
@@ -168,7 +169,11 @@ export async function injectScripts(contentId, webId, data, isXml) {
     } else {
       bridge.failedIds.push(id);
     }
-    return [script.dataKey, realm === INJECT_CONTENT, runAt];
+    return [
+      script.dataKey,
+      realm === INJECT_CONTENT && runAt,
+      script.meta.unwrap && id,
+    ];
   });
   const moreData = sendCmd('InjectionFeedback', {
     feedback,
@@ -314,6 +319,9 @@ async function injectList(runAt) {
       if (runAt === 'end') await 0;
       inject(item);
       item.code = '';
+      if (item.meta?.unwrap) {
+        Run(item.props.id);
+      }
     }
   }
 }

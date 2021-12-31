@@ -7,12 +7,9 @@ import './requests';
 import './tabs';
 import { sendCmd } from './util-content';
 import { isEmpty, INJECT_CONTENT } from '../util';
+import { Run } from './cmd-run';
 
-const { invokableIds, runningIds } = bridge;
-const resolvedPromise = promiseResolve();
-let badgePromise;
-let numBadgesSent = 0;
-let bfCacheWired;
+const { invokableIds } = bridge;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 async function init() {
@@ -60,6 +57,7 @@ bridge.addBackgroundHandlers({
     const realm = invokableIds::includes(data.id) && INJECT_CONTENT;
     bridge.post('Command', data, realm);
   },
+  Run: id => Run(id, INJECT_CONTENT),
   UpdatedValues(data) {
     const dataPage = createNullObj();
     const dataContent = createNullObj();
@@ -72,41 +70,13 @@ bridge.addBackgroundHandlers({
 });
 
 bridge.addHandlers({
-  Run(id, realm) {
-    runningIds::push(id);
-    bridge.ids::push(id);
-    if (realm === INJECT_CONTENT) {
-      invokableIds::push(id);
-    }
-    if (!badgePromise) {
-      badgePromise = resolvedPromise::then(throttledSetBadge);
-    }
-    if (!bfCacheWired) {
-      bfCacheWired = true;
-      window::on('pageshow', evt => {
-        // isTrusted is `unforgeable` per DOM spec so we don't need to safeguard its getter
-        if (evt.isTrusted && evt.persisted) {
-          sendCmd('SetBadge', runningIds);
-        }
-      });
-    }
-  },
+  Run,
   SetTimeout: true,
   TabFocus: true,
   UpdateValue: true,
 });
 
 init().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
-
-function throttledSetBadge() {
-  const num = runningIds.length;
-  if (numBadgesSent < num) {
-    numBadgesSent = num;
-    return sendCmd('SetBadge', runningIds)::then(() => {
-      badgePromise = throttledSetBadge();
-    });
-  }
-}
 
 async function getDataFF(viaMessaging) {
   // In Firefox we set data on global `this` which is not equal to `window`

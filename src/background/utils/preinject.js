@@ -1,4 +1,4 @@
-import { getScriptName, getUniqId, trueJoin } from '#/common';
+import { getScriptName, getUniqId, sendTabCmd, trueJoin } from '#/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
   INJECTABLE_TAB_URL_RE, METABLOCK_RE,
@@ -64,15 +64,14 @@ Object.assign(commands, {
 });
 
 /** @this {chrome.runtime.MessageSender} */
-function processFeedback([key, needsInjection, runAt]) {
+async function processFeedback([key, runAt, unwrappedId]) {
   const code = cacheCode.pop(key);
   // see TIME_KEEP_DATA comment
-  if (needsInjection && code) {
-    browser.tabs.executeScript(this.tab.id, {
-      code,
-      frameId: this.frameId,
-      runAt: `document_${runAt === 'body' ? 'start' : runAt}`,
-    });
+  if (runAt && code) {
+    const { frameId, tab: { id: tabId } } = this;
+    runAt = `document_${runAt === 'body' ? 'start' : runAt}`;
+    browser.tabs.executeScript(tabId, { code, frameId, runAt });
+    if (unwrappedId) sendTabCmd(tabId, 'Run', unwrappedId, { frameId });
   }
 }
 
@@ -306,7 +305,11 @@ function prepareScript(script) {
     metaStr: code.match(METABLOCK_RE)[1] || '',
     values: value[id] || null,
   });
-  return isContent && [dataKey, true, script.runAt];
+  return isContent && [
+    dataKey,
+    script.runAt,
+    !wrap && id, // unwrapped scripts need an explicit `Run` message
+  ];
 }
 
 function replaceWithFullWidthForm(s) {
