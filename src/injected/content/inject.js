@@ -4,6 +4,7 @@ import {
   bindEvents, fireBridgeEvent,
   INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
 } from '../util';
+import { Run } from './cmd-run';
 
 /* In FF, content scripts running in a same-origin frame cannot directly call parent's functions
  * so we'll use the extension's UUID, which is unique per computer in FF, for messages
@@ -156,18 +157,23 @@ export async function injectScripts(contentId, webId, data, isXml) {
     const realm = INJECT_MAPPING[script.injectInto].find(key => (
       key === INJECT_CONTENT || pageInjectable
     ));
+    const { runAt } = script;
     // If the script wants this specific realm, which is unavailable, we won't inject it at all
     if (realm) {
       const { pathMap } = script.custom;
       const realmData = realms[realm];
-      realmData.lists[script.runAt].push(script); // 'start' or 'body' per getScriptsByURL()
+      realmData.lists[runAt].push(script); // 'start' or 'body' per getScriptsByURL()
       realmData.is = true;
       if (pathMap) bridge.pathMaps[id] = pathMap;
       bridge.allowScript(script);
     } else {
       bridge.failedIds.push(id);
     }
-    return [script.dataKey, realm === INJECT_CONTENT];
+    return [
+      script.dataKey,
+      realm === INJECT_CONTENT && runAt,
+      script.meta.unwrap && id,
+    ];
   });
   const moreData = sendCmd('InjectionFeedback', {
     feedback,
@@ -313,6 +319,9 @@ async function injectList(runAt) {
       if (runAt === 'end') await 0;
       inject(item);
       item.code = '';
+      if (item.meta?.unwrap) {
+        Run(item.props.id);
+      }
     }
   }
 }

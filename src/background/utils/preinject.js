@@ -1,4 +1,4 @@
-import { getScriptName, getUniqId } from '#/common';
+import { getScriptName, getUniqId, sendTabCmd, trueJoin } from '#/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
   INJECTABLE_TAB_URL_RE, METABLOCK_RE,
@@ -35,6 +35,9 @@ const KEY_EXPOSE = 'expose';
 const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
 const KEY_IS_APPLIED = 'isApplied';
 const KEY_XHR_INJECT = 'xhrInject';
+const BAD_URL_CHAR = IS_FIREFOX
+  ? /[#&',/:;?=+]/g // FF shows `@` fine as ASCII but mangles it as full-width
+  : /[#&',/:;?=+@]/g;
 const expose = {};
 let isApplied;
 let injectInto;
@@ -64,15 +67,14 @@ Object.assign(commands, {
 });
 
 /** @this {chrome.runtime.MessageSender} */
-function processFeedback([key, needsInjection]) {
+async function processFeedback([key, runAt, unwrappedId]) {
   const code = cacheCode.pop(key);
   // see TIME_KEEP_DATA comment
-  if (needsInjection && code) {
-    browser.tabs.executeScript(this.tab.id, {
-      code,
-      frameId: this.frameId,
-      runAt: 'document_start',
-    });
+  if (runAt && code) {
+    const { frameId, tab: { id: tabId } } = this;
+    runAt = `document_${runAt === 'body' ? 'start' : runAt}`;
+    browser.tabs.executeScript(tabId, { code, frameId, runAt });
+    if (unwrappedId) sendTabCmd(tabId, 'Run', unwrappedId, { frameId });
   }
 }
 
@@ -271,7 +273,7 @@ function prepareScript(script) {
   const code = this.code[id];
   const dataKey = getUniqId('VMin');
   const displayName = getScriptName(script);
-  const name = encodeURIComponent(displayName.replace(/[#&',/:;?@=+]/g, replaceWithFullWidthForm));
+  const name = encodeURIComponent(displayName.replace(BAD_URL_CHAR, replaceWithFullWidthForm));
   const isContent = isContentRealm(script, forceContent);
   const pathMap = custom.pathMap || {};
   const reqs = meta.require?.map(key => require[pathMap[key] || key]).filter(Boolean);
@@ -279,21 +281,23 @@ function prepareScript(script) {
   // adding `;` on a new line in case some required script ends with a line comment
   const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];
   const hasReqs = reqsSlices.length;
+  const wrap = !meta.unwrap;
   const injectedCode = [
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    `window.${dataKey}=function(${dataKey}){try{with(this)((define,module,exports)=>{`,
+    wrap && `window.${dataKey}=function(${dataKey}){try{with(this)((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
-    hasReqs ? '(()=>{' : '',
+    hasReqs && wrap && '(()=>{',
     code,
     // adding a new line in case the code ends with a line comment
-    code.endsWith('\n') ? '' : '\n',
-    hasReqs ? '})()' : '',
+    !code.endsWith('\n') && '\n',
+    hasReqs && wrap && '})()',
+    wrap && `})()}catch(e){${dataKey}(e)}}`,
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
-    `})()}catch(e){${dataKey}(e)}};0`,
+    IS_FIREFOX && ';0',
     // Firefox lists .user.js among our own content scripts so a space at start will group them
     `\n//# sourceURL=${extensionRoot}${IS_FIREFOX ? '%20' : ''}${name}.user.js#${id}`,
-  ].join('');
+  ]::trueJoin('');
   cacheCode.put(dataKey, injectedCode, TIME_KEEP_DATA);
   /** @namespace VMInjectedScript */
   Object.assign(script, {
@@ -304,7 +308,11 @@ function prepareScript(script) {
     metaStr: code.match(METABLOCK_RE)[1] || '',
     values: value[id] || null,
   });
-  return isContent && [dataKey, true];
+  return isContent && [
+    dataKey,
+    script.runAt,
+    !wrap && id, // unwrapped scripts need an explicit `Run` message
+  ];
 }
 
 function replaceWithFullWidthForm(s) {
