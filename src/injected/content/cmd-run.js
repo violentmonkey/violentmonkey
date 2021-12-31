@@ -1,5 +1,5 @@
-import { sendCmd } from './util-content';
 import bridge from './bridge';
+import { sendCmd } from './util-content';
 import { INJECT_CONTENT } from '../util';
 
 const { runningIds } = bridge;
