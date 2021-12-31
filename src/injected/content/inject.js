@@ -156,18 +156,19 @@ export async function injectScripts(contentId, webId, data, isXml) {
     const realm = INJECT_MAPPING[script.injectInto].find(key => (
       key === INJECT_CONTENT || pageInjectable
     ));
+    const { runAt } = script;
     // If the script wants this specific realm, which is unavailable, we won't inject it at all
     if (realm) {
       const { pathMap } = script.custom;
       const realmData = realms[realm];
-      realmData.lists[script.runAt].push(script); // 'start' or 'body' per getScriptsByURL()
+      realmData.lists[runAt].push(script); // 'start' or 'body' per getScriptsByURL()
       realmData.is = true;
       if (pathMap) bridge.pathMaps[id] = pathMap;
       bridge.allowScript(script);
     } else {
       bridge.failedIds.push(id);
     }
-    return [script.dataKey, realm === INJECT_CONTENT];
+    return [script.dataKey, realm === INJECT_CONTENT, runAt];
   });
   const moreData = sendCmd('InjectionFeedback', {
     feedback,

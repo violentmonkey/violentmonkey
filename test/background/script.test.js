@@ -9,7 +9,6 @@ const baseMeta = {
   require: [],
   grant: [],
   resources: {},
-  noframes: false,
 };
 
 test('parseMeta', (t) => {

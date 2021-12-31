@@ -100,7 +100,7 @@ function createScriptData(item) {
   store.values[item.props.id] = item.values || createNullObj();
   if (window[dataKey]) { // executeScript ran before GetInjected response
     onCodeSet(item, window[dataKey]);
-  } else {
+  } else if (!item.meta.unwrap) {
     safeDefineProperty(window, dataKey, {
       configurable: true,
       set: fn => onCodeSet(item, fn),

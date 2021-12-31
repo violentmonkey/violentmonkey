@@ -64,14 +64,14 @@ Object.assign(commands, {
 });
 
 /** @this {chrome.runtime.MessageSender} */
-function processFeedback([key, needsInjection]) {
+function processFeedback([key, needsInjection, runAt]) {
   const code = cacheCode.pop(key);
   // see TIME_KEEP_DATA comment
   if (needsInjection && code) {
     browser.tabs.executeScript(this.tab.id, {
       code,
       frameId: this.frameId,
-      runAt: 'document_start',
+      runAt: `document_${runAt === 'body' ? 'start' : runAt}`,
     });
   }
 }
@@ -279,18 +279,19 @@ function prepareScript(script) {
   // adding `;` on a new line in case some required script ends with a line comment
   const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];
   const hasReqs = reqsSlices.length;
+  const wrap = !meta.unwrap;
   const injectedCode = [
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    `window.${dataKey}=function(${dataKey}){try{with(this)((define,module,exports)=>{`,
+    wrap ? `window.${dataKey}=function(${dataKey}){try{with(this)((define,module,exports)=>{` : '',
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
-    hasReqs ? '(()=>{' : '',
+    hasReqs && wrap ? '(()=>{' : '',
     code,
     // adding a new line in case the code ends with a line comment
-    code.endsWith('\n') ? '' : '\n',
-    hasReqs ? '})()' : '',
+    code.endsWith('\n') || !wrap ? '' : '\n',
+    hasReqs && wrap ? '})()' : '',
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
-    `})()}catch(e){${dataKey}(e)}};0`,
+    wrap ? `})()}catch(e){${dataKey}(e)}};0` : '',
     // Firefox lists .user.js among our own content scripts so a space at start will group them
     `\n//# sourceURL=${extensionRoot}${IS_FIREFOX ? '%20' : ''}${name}.user.js#${id}`,
   ].join('');
@@ -304,7 +305,7 @@ function prepareScript(script) {
     metaStr: code.match(METABLOCK_RE)[1] || '',
     values: value[id] || null,
   });
-  return isContent && [dataKey, true];
+  return isContent && [dataKey, true, script.runAt];
 }
 
 function replaceWithFullWidthForm(s) {

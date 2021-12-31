@@ -32,6 +32,10 @@ const arrayType = {
     return res;
   },
 };
+const booleanType = {
+  default: () => false,
+  transform: () => true,
+};
 const defaultType = {
   default: () => null,
   transform: (res, val) => (res == null ? val : res),
@@ -51,15 +55,13 @@ const metaTypes = {
     },
   },
   grant: arrayType,
-  noframes: {
-    default: () => false,
-    transform: () => true,
-  },
 };
 const metaOptionalTypes = {
   antifeature: arrayType,
   compatible: arrayType,
   connect: arrayType,
+  noframes: booleanType,
+  unwrap: booleanType,
 };
 export function parseMeta(code) {
   // initialize meta
