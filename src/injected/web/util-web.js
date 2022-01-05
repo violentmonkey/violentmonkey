@@ -76,7 +76,7 @@ export const FastLookup = (hubs = createNullObj()) => {
     toArray: () => {
       const values = objectValues(hubs);
       values::forEach((val, i) => { values[i] = objectKeys(val); });
-      return safeConcat([], values);
+      return safeConcat::apply([], values);
     },
   };
   function getHub(val, autoCreate) {
