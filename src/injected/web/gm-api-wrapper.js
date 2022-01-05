@@ -100,7 +100,7 @@ function makeGmInfo(script, resources) {
     case 'exclude': // -> excludes
     case 'include': // -> includes
       key += 's';
-      val = safeConcat([], val);
+      val = safeConcat(val);
       break;
     default:
     }

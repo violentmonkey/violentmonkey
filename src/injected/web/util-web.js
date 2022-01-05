@@ -3,11 +3,13 @@ import bridge from './bridge';
 
 const isConcatSpreadableSym = SafeSymbol.isConcatSpreadable;
 
-export const safeConcat = (dest, ...arrays) => {
+export const safeConcat = (...arrays) => {
+  const dest = [];
   /* A page can use a getter on Array.prototype that returns false when checked by our code
    * (detectable via `new Error().stack`), so we'll just always set this symbol on our arrays. */
   setOwnProp(dest, isConcatSpreadableSym, true);
   arrays::forEach(arr => setOwnProp(arr, isConcatSpreadableSym, true));
+  // Using a dummy [] is simpler/safer/faster than (getOwnProp(arrays, 0), arrays::slice(1))
   return concat::apply(dest, arrays);
 };
 
@@ -76,7 +78,7 @@ export const FastLookup = (hubs = createNullObj()) => {
     toArray: () => {
       const values = objectValues(hubs);
       values::forEach((val, i) => { values[i] = objectKeys(val); });
-      return safeConcat::apply([], values);
+      return safeConcat::apply(null, values);
     },
   };
   function getHub(val, autoCreate) {

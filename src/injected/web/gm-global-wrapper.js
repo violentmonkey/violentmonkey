@@ -257,7 +257,6 @@ function makeOwnKeys(local, globals) {
     }
   }
   return safeConcat(
-    [],
     globals === globalKeysSet ? globalKeys : globals.toArray(),
     frameIndexes,
     names,
