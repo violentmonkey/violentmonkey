@@ -598,16 +598,16 @@ function string2byteString(str) {
 }
 
 /** @typedef {{
-  anonymous: boolean
-  blobbed: boolean
-  cb: function(Object)
-  chunked: boolean
-  coreId: number
-  eventsToNotify: string[]
-  id: number
-  noNativeCookie: boolean
-  responseHeaders: string
-  storeId: string
-  tabId: number
-  xhr: XMLHttpRequest
+  anonymous: boolean,
+  blobbed: boolean,
+  cb: function(Object),
+  chunked: boolean,
+  coreId: number,
+  eventsToNotify: string[],
+  id: number,
+  noNativeCookie: boolean,
+  responseHeaders: string,
+  storeId: string,
+  tabId: number,
+  xhr: XMLHttpRequest,
 }} VMHttpRequest */
