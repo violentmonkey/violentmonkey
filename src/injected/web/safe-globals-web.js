@@ -152,13 +152,13 @@ export const VAULT = (() => {
      * by the page if it gains access to any Object from the vault e.g. a thrown SafeError. */
     jsonParse = res[i += 1] || src.JSON.parse,
     jsonStringify = res[i += 1] || src.JSON.stringify,
-    logging = res[i += 1] || assign({ __proto__: null }, src.console),
+    logging = res[i += 1] || assign(createNullObj(), src.console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     readAsDataURL = res[i += 1] || SafeFileReader[PROTO].readAsDataURL,
     safeResponseBlob = res[i += 1] || SafeResponse[PROTO].blob,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    then = res[i += 1] || SafePromise[PROTO].then,
+    then = res[i += 1] || SafeObject.freeze(SafePromise[PROTO]).then,
     // various getters
     getBlobType = res[i += 1] || describeProperty(src.Blob[PROTO], 'type').get,
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
