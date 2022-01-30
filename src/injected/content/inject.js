@@ -168,6 +168,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
       bridge.allowScript(script);
     } else {
       bridge.failedIds.push(id);
+      bridge.ids.push(id);
     }
     return [
       script.dataKey,
