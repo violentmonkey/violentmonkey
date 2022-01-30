@@ -201,14 +201,14 @@ footer {
       border-color: var(--fill-4);
     }
     .icon-collapse {
-      transform: rotateZ(90deg);
+      transform: rotate(90deg);
     }
   }
 }
 
 .submenu {
   display: none;
-  min-height: 4rem;
+  min-height: 2rem;
   max-height: 30rem;
   overflow-y: auto;
   background: var(--bg);
@@ -273,7 +273,8 @@ footer {
 }
 
 .failure-reason {
-  padding: .75rem $itemPaddingX .75rem $leftPaneWidth;
+  padding: .5rem $itemPaddingX .5rem $leftPaneWidth;
+  background: hsla(30, 100%, 50%, .2);
   code {
     max-width: 100%;
   }
