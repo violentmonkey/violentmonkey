@@ -139,13 +139,14 @@ const HeaderInjector = (() => {
     onBeforeSendHeaders: {
       options: ['requestHeaders', 'blocking', ...EXTRA_HEADERS],
       /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
-      listener({ requestHeaders: headers, requestId }) {
+      listener({ requestHeaders: headers, requestId, url }) {
         // only the first call during a redirect/auth chain will have VM-Verify header
         const reqId = headers.find(isVmVerify)?.value || verify[requestId];
         const req = reqId && requests[reqId];
         if (reqId && req) {
           verify[requestId] = reqId;
           req.coreId = requestId;
+          req.url = url; // remember redirected URL with #hash as it's stripped in XHR.responseURL
           headers = (req.noNativeCookie ? headers.filter(isNotCookie) : headers)
           .concat(headersToInject[reqId] || [])
           .filter(req.anonymous ? isSendableAnon : isSendable);
@@ -265,7 +266,7 @@ function xhrCallbackWrapper(req) {
         numChunks,
         type,
         data: shouldNotify && {
-          finalUrl: xhr.responseURL,
+          finalUrl: req.url,
           ...getResponseHeaders(),
           ...objectPick(xhr, ['readyState', 'status', 'statusText']),
           ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
@@ -609,5 +610,6 @@ function string2byteString(str) {
   responseHeaders: string,
   storeId: string,
   tabId: number,
+  url: string,
   xhr: XMLHttpRequest,
 }} VMHttpRequest */
