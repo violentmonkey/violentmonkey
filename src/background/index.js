@@ -53,10 +53,12 @@ Object.assign(commands, {
     inject.isPopupShown = popupTabs[tabId];
     // Injecting known content scripts without waiting for InjectionFeedback message.
     // Running in a separate task because it may take a long time to serialize data.
-    if (feedback.length) {
+    if (feedback?.length) {
       setTimeout(commands.InjectionFeedback, 0, { feedback }, src);
     }
-    addValueOpener(tabId, frameId, valOpIds);
+    if (valOpIds) {
+      addValueOpener(tabId, frameId, valOpIds);
+    }
     return inject;
   },
   /** @return {Promise<Object>} */
