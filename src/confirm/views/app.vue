@@ -93,7 +93,6 @@ import {
   getLocaleString, trueJoin,
 } from '#/common';
 import { keyboardService } from '#/common/keyboard';
-import options from '#/common/options';
 import initCache from '#/common/cache';
 import storage from '#/common/storage';
 import VmExternals from '#/common/ui/externals';
@@ -363,11 +362,11 @@ export default {
         const time = new Date().toLocaleTimeString(['fr']);
         const time0 = this.confirmedTime || (this.confirmedTime = time);
         this.message = `${update.message} ${time0}${time0 === time ? '' : ` --> ${time}`}`;
-        if (this.$refs.closeAfterInstall.value) {
-          this.close();
-        } else {
-          this.installed = true;
+        this.installed = true;
+        if (this.isLocal && this.$refs.trackLocalFile.value) {
           this.trackLocalFile();
+        } else if (this.$refs.closeAfterInstall.value) {
+          this.close();
         }
       } catch (err) {
         this.message = `${err}`;
@@ -380,7 +379,7 @@ export default {
       }
       cachedCodePromise = null; // always re-read because the file may have changed since then
       this.tracking = true;
-      while (options.get('trackLocalFile') && this.tracking !== 'stop') {
+      while (this.$refs.trackLocalFile.value && this.tracking !== 'stop') {
         await makePause(500);
         try {
           await this.loadData(true);
