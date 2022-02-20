@@ -195,13 +195,15 @@ footer {
     }
   }
   &.expand {
-    background: var(--fill-1);
     > .submenu {
       display: block;
       border-color: var(--fill-4);
     }
     .icon-collapse {
       transform: rotate(90deg);
+    }
+    > .menu-group {
+      font-weight: bold;
     }
   }
 }
