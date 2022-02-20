@@ -277,7 +277,7 @@ function resolveProp(name, wrapper, globals, local) {
   if (!value && (canCopy || isString(name) && isFrameIndex(name))) {
     value = global[name];
   }
-  if (value === window) {
+  if (value === window || name === 'globalThis') {
     value = wrapper;
   }
   if (canCopy && (
