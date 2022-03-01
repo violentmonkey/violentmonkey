@@ -9,20 +9,20 @@ buttonConfirmInstallation:
   message: Xác nhận cài đặt
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: ''
+  message: Xác nhận cài đặt lại
 buttonDisable:
   description: Button to disable a script.
   message: Vô hiệu hoá
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: ''
+  message: Tải xuống chủ đề
   touched: false
 buttonEdit:
   description: Button to edit a script.
   message: Sửa
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: 'Bạn có thể bấm chuột phải, giữ Ctrl và click, bấm chuột giữa vào tên script.'
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Thùng rác trống!
@@ -145,7 +145,10 @@ editLongLine:
   message: ''
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: |-
+     Dòng này quá dài nên văn bản của nó được thu gọn để tránh bị chậm trễ khi chỉnh sửa.
+     Bạn có thể điều chỉnh giới hạn trong cài đặt nâng cao, ví dụ:
+     "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Mã nguồn
@@ -161,7 +164,7 @@ editValueAll:
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Hiển thị/chỉnh sửa toàn bộ bộ lưu trữ giá trị script
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: Huỷ
@@ -202,7 +205,7 @@ filterScopeName:
   message: Tên
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Lỗi
 genericOff:
   description: 'To indicate something is turned off or disabled, similar to "no".'
   message: tắt
@@ -261,19 +264,19 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: Những script hiện tại sẽ vẫn tiếp tục chạy cho đến khi bạn tải lại thẻ
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 'Kiểm tra cập nhật mỗi  $1 ngày, 0 = tắt'
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: Sao lưu
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Hiển thị ở huy hiệu: '
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 'Màu huy hiệu: '
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: Không có gì
@@ -314,7 +317,7 @@ labelEditValue:
   message: Sửa giá trị script
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Đang chỉnh sửa lưu trữ script
 labelEditor:
   description: Label for Editor settings
   message: Trình chỉnh sửa
@@ -329,7 +332,7 @@ labelExportScriptData:
   message: Xuất dữ liệu script
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'Hiển thị phiên bản đã cài đặt trên các trang web danh mục phiên bản người dùng: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Phản hồi
@@ -350,7 +353,7 @@ labelHomepageURL:
   message: 'Liên kết trang chủ:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Nhập dữ liệu script
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Nhập cài đặt
@@ -380,7 +383,7 @@ labelName:
   message: 'Tên:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Chạy trong frames: '
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Không có tên
@@ -411,7 +414,7 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: Cài đặt lại script
 labelRelated:
   description: Label of related links.
   message: 'Liên kết gợi ý: '
@@ -441,7 +444,7 @@ labelSettings:
   message: Cài đặt
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Hiển thị thứ tự sắp xếp thực thi
 labelSync:
   description: Label for sync options.
   message: Đồng bộ
@@ -481,7 +484,7 @@ labelSyncUsername:
   message: 'Tài khoản:'
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Giao diện: '
 labelTranslator:
   description: Label of translator.
   message: 'Dịch bởi: '
@@ -493,18 +496,24 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Một cột
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Chế độ xem bảng
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: Chế độ đồng bộ $1
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: ''
+  message: >-
+    Chỉ bật nếu bạn có một tập lệnh cần chạy trước khi trang bắt đầu
+    đang tải và hiện nó đang chạy quá muộn. Cũng giống như tiêm tức thì
+    trong Tampermonkey, tùy chọn này đang sử dụng XHR đồng bộ không được dùng nữa,
+    vì vậy trong Chrome / Chromium, bạn sẽ thấy cảnh báo trong bảng điều khiển devtools, mặc dù bạn
+    có thể bỏ qua chúng một cách an toàn vì các tác động xấu là không đáng kể trong trường hợp này.
+    Bạn có thể ẩn các cảnh báo bằng cách nhấp chuột phải vào một cảnh báo.
 lastSync:
   description: Label for last sync timestamp.
   message: Đồng bộ cuối lúc $1
@@ -525,24 +534,30 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Bỏ qua...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    Tab hiện tại sẽ tự động tải lại nếu bạn đã bật tùy chọn này nói chung
+    cài đặt.
+
+    Để áp dụng các thay đổi cho tất cả các tab khác, vui lòng tải lại chúng theo cách thủ công.
+
+    Sử dụng tab "Cài đặt" của trình chỉnh sửa để linh hoạt hơn.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Tìm script cho trang này
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: Không thể tiêm một số script
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: ''
+  message: Thử lại ở chế độ "tự động"
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Các script bị vô hiệu hóa phù hợp
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Chỉ hoạt động ở Khung phụ
@@ -563,7 +578,9 @@ msgCheckingForUpdate:
   message: Đang kiểm tra cập nhật...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    Nhấp để mở tài liệu MomentJS. Mã thông báo được phép: $1. Sử dụng [hình vuông
+    ngoặc] để bảo vệ văn bản theo nghĩa đen.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -632,7 +649,7 @@ msgNoUpdate:
   message: Không có cập nhật mới.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: ' (mã nguồn không đổi)'
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Danh sách đen đã cập nhật.
@@ -650,7 +667,7 @@ msgScriptUpdated:
   message: 'Script [$1] đã được cập nhật!'
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Hiện/ẩn
 msgSyncError:
   description: Message shown when sync failed.
   message: Đồng bộ lỗi!
@@ -662,7 +679,7 @@ msgSyncInitError:
   message: Khởi tạo lỗi!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: Chưa được ủy quyền.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Đồng bộ sẽ chạy sớm...
@@ -680,45 +697,45 @@ noValues:
   message: Không có giá trị nào được lưu trữ
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: Mở trình chỉnh sửa trong popup ở của sổ mới
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: Editor window position will be remembered only on resizing or saving
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Vị trí cửa sổ trình chỉnh sửa sẽ chỉ được ghi nhớ khi thay đổi kích thước hoặc lưu
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: Popup menu và icon
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Đã bật ở trước
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Nhóm các script bị vô hiệu hoá
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Ẩn script bị tắt
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Ẩn script bị vô hiệu hoá
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Hiển thị script được bật ở trước
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: 'Chủ đề UI'
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: Tự động
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: Tối
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: Sáng
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Phân biệt hoa thường
@@ -736,10 +753,10 @@ sideMenuSettings:
   message: Cài đặt
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: Màu huy hiệu bình thường
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: Màu huy hiệu khi trang web không thể đưa vào (danh sách đen hoặc không được hỗ trợ)
 titleScriptUpdated:
   description: Notification title for script updates.
   message: Cập nhật
@@ -754,7 +771,7 @@ valueLabelValue:
   message: Giá trị (đã đưa về dạng JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Tất cả giá trị (đã đưa về dạng JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Truy cập trang web
