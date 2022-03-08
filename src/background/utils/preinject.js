@@ -284,7 +284,7 @@ function prepareScript(script) {
   const wrap = !meta.unwrap;
   const injectedCode = [
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    wrap && `window.${dataKey}=function(${dataKey}){try{with(this)((define,module,exports)=>{`,
+    wrap && `window.${dataKey}=function(module,${dataKey}){try{with(module)((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs && wrap && '(()=>{',

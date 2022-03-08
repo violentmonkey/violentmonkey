@@ -117,7 +117,9 @@ async function onCodeSet(item, fn) {
   }
   const run = () => {
     bridge.post('Run', item.props.id, item);
-    makeGmApiWrapper(item)::fn(logging.error);
+    const wrapper = makeGmApiWrapper(item);
+    const thisArg = item.meta.grant.length ? wrapper : global;
+    thisArg::fn(wrapper, logging.error);
   };
   const el = document::getCurrentScript();
   const wait = waiters?.[stage];
