@@ -12,13 +12,11 @@ export let
   SafeDOMParser,
   SafeError,
   SafeEventTarget,
-  SafeFileReader,
   SafeKeyboardEvent,
   SafeMouseEvent,
   Object,
   SafePromise,
   SafeProxy,
-  SafeResponse,
   SafeSymbol,
   fire,
   off,
@@ -63,15 +61,11 @@ export let
   logging,
   mathRandom,
   parseFromString, // DOMParser
-  readAsDataURL, // FileReader
-  safeResponseBlob, // Response - safe = "safe global" to disambiguate the name
   stopImmediatePropagation,
   then,
   // various getters
-  getBlobType, // Blob
   getCurrentScript, // Document
   getDetail, // CustomEvent
-  getReaderResult, // FileReader
   getRelatedTarget; // MouseEvent
 
 /**
@@ -107,7 +101,6 @@ export const VAULT = (() => {
     SafeDOMParser = res[i += 1] || src.DOMParser,
     SafeError = res[i += 1] || src.Error,
     SafeEventTarget = res[i += 1] || src.EventTarget,
-    SafeFileReader = res[i += 1] || src.FileReader,
     SafeKeyboardEvent = res[i += 1] || src.KeyboardEvent,
     SafeMouseEvent = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
@@ -115,7 +108,6 @@ export const VAULT = (() => {
     SafeSymbol = res[i += 1] || src.Symbol,
     // In FF content mode global.Proxy !== window.Proxy
     SafeProxy = res[i += 1] || src.Proxy,
-    SafeResponse = res[i += 1] || src.Response,
     fire = res[i += 1] || src.dispatchEvent,
     off = res[i += 1] || src.removeEventListener,
     on = res[i += 1] || src.addEventListener,
@@ -155,15 +147,11 @@ export const VAULT = (() => {
     logging = res[i += 1] || assign(createNullObj(), src.console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
-    readAsDataURL = res[i += 1] || SafeFileReader[PROTO].readAsDataURL,
-    safeResponseBlob = res[i += 1] || SafeResponse[PROTO].blob,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
     then = res[i += 1] || SafeObject.freeze(SafePromise[PROTO]).then,
     // various getters
-    getBlobType = res[i += 1] || describeProperty(src.Blob[PROTO], 'type').get,
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
     getDetail = res[i += 1] || describeProperty(SafeCustomEvent[PROTO], 'detail').get,
-    getReaderResult = res[i += 1] || describeProperty(SafeFileReader[PROTO], 'result').get,
     getRelatedTarget = res[i += 1] || describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get,
     // various values
     builtinGlobals = res[i += 1] || [

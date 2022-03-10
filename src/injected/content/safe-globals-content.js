@@ -12,6 +12,7 @@ export const {
   MouseEvent: SafeMouseEvent,
   Object, // for minification and guarding webpack Object(import) calls
   Promise: SafePromise,
+  Response: SafeResponse,
   TextDecoder: SafeTextDecoder,
   Uint8Array: SafeUint8Array,
   atob: safeAtob,
@@ -20,7 +21,7 @@ export const {
   removeEventListener: off,
 } = global;
 export const SafeError = Error;
-export const ResponseProto = Response[PROTO];
+export const ResponseProto = SafeResponse[PROTO];
 export const { hasOwnProperty, toString: objectToString } = {};
 export const { apply, call } = hasOwnProperty;
 export const safeCall = call.bind(call);

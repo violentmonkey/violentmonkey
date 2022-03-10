@@ -93,7 +93,7 @@ function callback(req, msg) {
   if (msg.type === 'loadend') delete idMap[req.id];
 }
 
-async function start(req, context, fileName) {
+function start(req, context, fileName) {
   const { id, scriptId } = req;
   const opts = assign(createNullObj(), req.opts);
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
@@ -111,8 +111,11 @@ async function start(req, context, fileName) {
       || (opts.binary || !isObject(data)) && [`${data}`]
       // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
       || IS_FIREFOX && bridge.ua.browserVersion >= 56 && [data]
-      // TODO: support huge data by splitting it to multiple messages
-      || await encodeBody(data),
+      /* Chrome can't directly transfer FormData to isolated world so we explode it,
+       * trusting its iterator is usable because the only reason for a site to break it
+       * is to fight a userscript, which it can do by breaking FormData constructor anyway */
+      // eslint-disable-next-line no-restricted-syntax
+      || (getObjectTypeTag(data) === 'FormData' ? [[...data], 'fd'] : [data, 'bin']),
     eventsToNotify: [
       'abort',
       'error',
@@ -150,23 +153,4 @@ function getResponseType(responseType = '') {
       + ' see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.');
   }
   return '';
-}
-
-/**
- * Polyfill for Chrome's inability to send complex types over extension messaging.
- * We're encoding the body here, not in content, because we want to support FormData
- * and ReadableStream, which Chrome can't transfer to isolated world via CustomEvent.
- */
-async function encodeBody(body) {
-  const wasBlob = getObjectTypeTag(body) === 'Blob';
-  const blob = wasBlob ? body : await new SafeResponse(body)::safeResponseBlob();
-  const reader = new SafeFileReader();
-  return new SafePromise(resolve => {
-    reader::on('load', () => resolve([
-      reader::getReaderResult(),
-      blob::getBlobType(),
-      wasBlob,
-    ]));
-    reader::readAsDataURL(blob);
-  });
 }

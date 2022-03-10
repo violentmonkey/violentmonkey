@@ -3,15 +3,21 @@ import { getFullUrl, makeElem, sendCmd } from './util-content';
 
 const {
   fetch: safeFetch,
+  FileReader: SafeFileReader,
+  FormData: SafeFormData,
 } = global;
 const { arrayBuffer: getArrayBuffer, blob: getBlob } = ResponseProto;
 const { createObjectURL, revokeObjectURL } = URL;
+const getBlobType = describeProperty(SafeBlob[PROTO], 'type').get;
+const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
+const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
+const fdAppend = SafeFormData[PROTO].append;
 
 const requests = createNullObj();
 let downloadChain = promiseResolve();
 
 bridge.addHandlers({
-  HttpRequest(msg, realm) {
+  async HttpRequest(msg, realm) {
     requests[msg.id] = {
       __proto__: null,
       realm,
@@ -21,6 +27,10 @@ bridge.addHandlers({
       'fileName',
     ]);
     msg.url = getFullUrl(msg.url);
+    if (msg.data[1]) {
+      // TODO: support huge data by splitting it to multiple messages
+      msg.data = await encodeBody(msg.data[0], msg.data[1]);
+    }
     sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,
@@ -136,4 +146,24 @@ function finishChunks(req) {
   return req.wantsBlob
     ? new SafeBlob([arr], { type: req.contentType })
     : arr.buffer;
+}
+
+/** Doing it here because vault's SafeResponse+blob() doesn't work in injected-web */
+async function encodeBody(body, mode) {
+  if (mode === 'fd') {
+    const fd = new SafeFormData();
+    body::forEach(entry => fd::fdAppend(entry[0], entry[1]));
+    body = fd;
+  }
+  const wasBlob = body instanceof SafeBlob;
+  const blob = wasBlob ? body : await new SafeResponse(body)::getBlob();
+  const reader = new SafeFileReader();
+  return new SafePromise(resolve => {
+    reader::on('load', () => resolve([
+      reader::getReaderResult(),
+      blob::getBlobType(),
+      wasBlob,
+    ]));
+    reader::readAsDataURL(blob);
+  });
 }
