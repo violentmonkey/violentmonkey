@@ -25,7 +25,7 @@ buttonEditClickHint:
   message: 'Você também pode clicar com o botão direito do mouse, Ctrl, roda do mouse, no nome do script.'
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: A Lixeira está vazia agora!
+  message: Limpar a lixeira agora!
 buttonEnable:
   description: Button to enable a script.
   message: Ativar
@@ -41,7 +41,7 @@ buttonHome:
   message: Página inicial
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Importar do zip
+  message: Importar a partir do zip
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
   message: Instalar a partir da URL
@@ -72,7 +72,7 @@ buttonReset:
   message: Resetar
 buttonRestore:
   description: Button to restore a removed script.
-  message: Restaura
+  message: Restaurar
 buttonSave:
   description: Button to save modifications of a script.
   message: Salvar
@@ -97,13 +97,13 @@ buttonUpdateAll:
   message: Verificar atualizações para todos
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Base de dados Vacuum
+  message: Limpar base de dados
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Dados vacuumed
+  message: Dados otimizados
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Vacuuming dados...
+  message: Otimizando os dados...
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -130,7 +130,7 @@ editHelpDocumention:
   message: 'Documentação sobre bloco de metadados de script do usuário e API <code>GM</code>:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: 'Atalhos de teclado:'
+  message: 'Teclas de Atalhos:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: Usar outro editor?
@@ -301,7 +301,7 @@ labelCurrentLang:
   message: 'Idioma atual: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message:  Personalizar estilo
+  message: Personalizar estilo
 labelDataExport:
   description: Section title of data export.
   message: Exportar dados
@@ -501,7 +501,7 @@ labelViewSingleColumn:
   message: Coluna única
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: Ver tabela
+  message: Ver como tabela
 labelXhrInject:
   description: >-
     ('$1' será mostrado como 'página') Opção em configurações avançadas para ativar
@@ -554,7 +554,7 @@ menuInjectionFailed:
   message: Não podemos injetar alguns scripts.
 menuInjectionFailedFix:
   description: 'Injection error fix, shown in case the default mode is "page".'
-  message: Tente novamente no modo "automático"
+  message: Tentar novamente no modo "automático"
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
@@ -718,7 +718,7 @@ optionPopupEnabledFirst:
   message: Ativar primeiro
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: Grupo de Scripts desativados 
+  message: Agrupar scripts desativados
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Ocultar scripts desativados
@@ -742,7 +742,7 @@ optionUiThemeLight:
   message: Claro
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: Caixa sensível
+  message: Respeitar maiúsculas/minúsculas
 searchUseRegex:
   description: Option to perform a regular expression search
   message: Usar Regex
