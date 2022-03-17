@@ -49,7 +49,6 @@ bridge.addBackgroundHandlers({
       req.gotChunks = true;
     }
     const { blobbed, data, chunked, type } = msg;
-    const isLoadEnd = type === 'loadend';
     // only CONTENT realm can read blobs from an extension:// URL
     const response = data
       && req.eventsToNotify::includes(type)
@@ -67,9 +66,7 @@ bridge.addBackgroundHandlers({
     }
     // If the user in incognito supplied only `onloadend` then it arrives first, followed by chunks
     // If the user supplied any event before `loadend`, all chunks finish before `loadend` arrives
-    if (isLoadEnd) {
-      // loadend's bridge.post() should run last
-      await 0;
+    if (type === 'loadend') {
       req.gotLoadEnd = true;
     }
     if (importing) {

@@ -107,9 +107,9 @@ const bridge = {
 
 export default bridge;
 
-browser.runtime.onMessage.addListener(({ cmd, data }, src) => {
+browser.runtime.onMessage.addListener(async ({ cmd, data }, src) => {
   const fn = bgHandlers[cmd];
-  if (fn) fn(data, src);
+  if (fn) await fn(data, src); // awaiting to let the sender know when we're done
 });
 
 /**
