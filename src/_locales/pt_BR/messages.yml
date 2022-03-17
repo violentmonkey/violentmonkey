@@ -540,12 +540,12 @@ menuExclude:
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: >-
-    A aba atual será recarregada automaticamente se você ativar essa opção em Configurações
+    A aba atual será recarregada automaticamente se você ativar essa opção em configurações 
     gerais.
-
+    
     Para aplicar alterações em todas as outras abas, recarregue-as manualmente.
-
-Use a guia "Configurações" do editor para obter mais flexibilidade.
+    
+    Use a aba "Configurações" do editor para obter mais flexibilidade.
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Encontar scripts para este site
