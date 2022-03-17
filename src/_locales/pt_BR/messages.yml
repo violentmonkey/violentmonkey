@@ -504,9 +504,9 @@ labelViewTable:
   message: Ver como tabela
 labelXhrInject:
   description: >-
-    ('$1' será mostrado como 'página') Opção em configurações avançadas para ativar
-    a síncronia injeção.
-  message: Synchronous $1 mode
+    (`$1` will be shown as `page`) Option in Advanced settings to enable
+    synchronous injection.
+  message: Modo síncrono $ 1
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
