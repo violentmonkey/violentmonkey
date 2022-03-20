@@ -192,6 +192,11 @@ export const formatByteLength = len => (
     || `${+(len / (1024 * 1024)).toFixed(1)} M` // allow fractions for megabytes
 );
 
+export const isUnsafeGmNeeded = code => (
+  /\w+\.(?:\[['"`])?GM[_.]\w+\s*(.)?/.test(code)
+  && RegExp.$1 !== '=' // ignoring assignments e.g. in GM4 polyfills
+);
+
 // Used by `injected`
 export function isEmpty(obj) {
   for (const key in obj) {

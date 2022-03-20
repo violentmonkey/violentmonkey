@@ -66,6 +66,20 @@
               </tooltip>
             </setting-check>
           </div>
+          <div class="safeties flex flex-col my-1">
+            <label>
+              <tooltip :content="i18n('configSafeIncludeHint')">
+                <input type="checkbox" v-model="safeInclude">
+                <span v-text="i18n('configSafeIncludeLabel')"/>
+              </tooltip>
+            </label>
+            <label>
+              <tooltip :content="i18n('configSafeGMHint')">
+                <input type="checkbox" v-model="safeGM">
+                <span v-text="i18n('configSafeGMLabel')"/>
+              </tooltip>
+            </label>
+          </div>
           <div v-text="message" v-if="message" :title="error" class="status"/>
         </div>
       </div>
@@ -90,7 +104,7 @@ import Tooltip from 'vueleton/lib/tooltip/bundle';
 import Icon from '#/common/ui/icon';
 import {
   sendCmdDirectly, request, isRemote, getFullUrl, makePause,
-  getLocaleString, trueJoin,
+  getLocaleString, isUnsafeGmNeeded, trueJoin,
 } from '#/common';
 import { keyboardService } from '#/common/keyboard';
 import initCache from '#/common/cache';
@@ -150,6 +164,9 @@ export default {
       safeIcon: null,
       sameCode: false,
       script: null,
+      hasUnsafeGM: null,
+      safeGM: true,
+      safeInclude: true,
     };
   },
   computed: {
@@ -237,6 +254,7 @@ export default {
       }
     },
     async parseMeta() {
+      this.safeGM = !isUnsafeGmNeeded(this.code);
       /** @type {VMScriptMeta} */
       const meta = await sendCmdDirectly('ParseMeta', this.code);
       const name = getLocaleString(meta, 'name');
@@ -300,6 +318,9 @@ export default {
           this.deps[depsUrl] = file;
           finished += 1;
           updateStatus();
+          if (!isBlob && isUnsafeGmNeeded(file)) {
+            this.safeGM = false;
+          }
         } catch (e) {
           this.deps[depsUrl] = false;
           return url;
@@ -354,6 +375,7 @@ export default {
       try {
         const { update } = await sendCmdDirectly('ParseScript', {
           code: this.code,
+          config: objectPick(this, ['safeGM', 'safeInclude'], Number),
           url: this.info.url,
           from: this.info.from,
           require: this.require,

@@ -56,6 +56,11 @@ export function testMatch(url, rules) {
   return testRules(url, rules, 'match', matchTester);
 }
 
+/**
+ * @param {string} url
+ * @param {VMScript} script
+ * @return {boolean}
+ */
 export function testScript(url, script) {
   cache.batch(true);
   const { custom, meta } = script;
@@ -68,7 +73,7 @@ export function testScript(url, script) {
   // @match
   ok = ok || testMatch(url, mat);
   // @include
-  ok = ok || testGlob(url, inc);
+  ok = ok || (script.config.safeInclude ? testMatch : testGlob)(url, inc);
   // @exclude-match
   ok = ok && !testMatch(url, excMat);
   // @exclude
