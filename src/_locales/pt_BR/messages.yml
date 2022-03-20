@@ -187,7 +187,7 @@ failureReasonNoninjectable:
   message: >-
     Violentmonkey não pode executar scripts de usuários nesta página
 
-	(exemplos comuns: interface do navegador, uma extensão, bloqueada via políticas, uma motor de pesquisa 
+    (Como por exemplos comuns á interface do navegador, uma extensão, bloqueada via políticas, uma motor de pesquisa 
   de site no Opera)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
