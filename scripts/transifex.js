@@ -111,7 +111,7 @@ async function loadRemote(lang) {
 const loadData = memoize(async function loadData(lang) {
   const remote = await loadRemote(lang);
   const filePath = `src/_locales/${lang}/messages.yml`;
-  const local = yaml.safeLoad(await fs.readFile(filePath, 'utf8'));
+  const local = yaml.load(await fs.readFile(filePath, 'utf8'));
   return { local, remote, filePath };
 });
 
