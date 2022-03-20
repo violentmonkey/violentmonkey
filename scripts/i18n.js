@@ -6,7 +6,7 @@ const through = require('through2');
 const yaml = require('js-yaml');
 
 const transformers = {
-  '.yml': data => yaml.safeLoad(data),
+  '.yml': data => yaml.load(data),
   '.json': data => JSON.parse(data),
 };
 
@@ -63,7 +63,7 @@ class Locale {
       }
       data = JSON.stringify(data, null, 2);
     } else if (extension === '.yml') {
-      data = yaml.safeDump(data, { sortKeys: true });
+      data = yaml.dump(data, { sortKeys: true });
     } else {
       throw 'Unknown extension name!';
     }
