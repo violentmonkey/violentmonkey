@@ -60,7 +60,10 @@
 </template>
 
 <script>
-import { debounce, formatByteLength, getScriptName, i18n, isEmpty, sendCmdDirectly, trueJoin } from '#/common';
+import {
+  debounce, formatByteLength, getScriptName, i18n, isEmpty,
+  sendCmdDirectly, trueJoin,
+} from '#/common';
 import { deepCopy, deepEqual, objectPick } from '#/common/object';
 import { showConfirmation, showMessage } from '#/common/ui';
 import { keyboardService } from '#/common/keyboard';
@@ -74,6 +77,7 @@ import VmExternals from '#/common/ui/externals';
 import VmHelp from './help';
 
 // Matching the internal 0/1 to Vue model boolean so deepEqual can work properly
+// 1 = enabled by default, 0 = disabled by default
 const BOOLEAN_CONFIG = {
   safeGM: 1,
   safeInclude: 1,
