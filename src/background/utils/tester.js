@@ -36,7 +36,7 @@ let blCacheSize = 0;
 
 function testRules(url, rules, isMatch, safeInclude) {
   return rules?.some(rule => {
-    const safe = isMatch || safeInclude && /[*?]/.test(rule) && rule.match(RE_MATCH_PARTS);
+    const safe = isMatch || safeInclude && rule.match(RE_MATCH_PARTS);
     const ruleBuilder = safe ? matchTester : autoReg;
     const key = `${safe ? 'match' : 're'}:${rule}`;
     const matcher = cache.get(key) || cache.put(key, ruleBuilder(rule));

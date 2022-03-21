@@ -3,6 +3,7 @@ import {
   isRemote, compareVersion, debounce, throttle,
 } from '#/common';
 import { mocker } from '../mock';
+import { getGmApiKeys } from '#/../scripts/webpack-util';
 
 test('isRemote', (t) => {
   t.notOk(isRemote());
@@ -135,5 +136,18 @@ test('throttle with invalid time', (t) => {
     mocker.clock.tick(500);
     t.deepEqual(log, [0]);
   }
+  t.end();
+});
+
+test('process.env.GM_UNSAFE_RE', (t) => {
+  const re = new RegExp(getGmApiKeys().unsafeRe);
+  t.ok(re.test('window.GM_info'));
+  t.ok(re.test('window.GM_info.script'));
+  t.ok(re.test('window [ "GM_info" ] . script'));
+  t.ok(re.test('typeof window.GM == "undefined"'));
+  t.notOk(re.test('GM_info'));
+  t.notOk(re.test('window.GM_info2'));
+  t.notOk(re.test('window.GM_xmlhttpRequest = {}'));
+  t.notOk(re.test('typeof GM == "undefined"'));
   t.end();
 });
