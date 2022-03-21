@@ -164,7 +164,6 @@ export default {
       safeIcon: null,
       sameCode: false,
       script: null,
-      hasUnsafeGM: null,
       safeGM: true,
       safeInclude: true,
     };
