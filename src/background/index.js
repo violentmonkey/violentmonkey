@@ -5,7 +5,7 @@ import { deepCopy } from '#/common/object';
 import * as tld from '#/common/tld';
 import * as sync from './sync';
 import { commands } from './utils';
-import { getData, checkRemove } from './utils/db';
+import { getData, getSizes, checkRemove } from './utils/db';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
 import { popupTabs } from './utils/popup-tracker';
@@ -39,6 +39,7 @@ Object.assign(commands, {
     data.sync = sync.getStates();
     return data;
   },
+  GetSizes: getSizes,
   /** @return {Promise<Object>} */
   async GetInjected({ url, forceContent }, src) {
     const { frameId, tab } = src;
