@@ -168,7 +168,7 @@ async function pullTranslations(code) {
     const remoteMessage = remote[key] && remote[key].message;
     if (remoteMessage) value.message = remoteMessage;
   });
-  await fs.writeFile(filePath, yaml.safeDump(local), 'utf8');
+  await fs.writeFile(filePath, yaml.dump(local), 'utf8');
 }
 
 async function main() {
