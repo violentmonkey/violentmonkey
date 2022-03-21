@@ -78,6 +78,7 @@
         <!-- TODO: use CodeMirror in json mode -->
         <textarea v-model="current.value"
                   ref="value"
+                  class="h100 monospace-font"
                   spellcheck="false"
                   @input="onChange"
                   @keydown.esc.exact.stop="onCancel"/>

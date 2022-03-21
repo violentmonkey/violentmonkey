@@ -71,7 +71,7 @@ section {
     margin-bottom: .3rem;
   }
 }
-textarea:not([rows="1"]) {
+textarea:not([rows="1"]):not(.h100) {
   resize: vertical;
   min-height: 2em;
   max-height: 50vh;
