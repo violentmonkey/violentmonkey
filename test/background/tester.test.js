@@ -288,6 +288,9 @@ test('include', (t) => {
 
   t.test('unsafe include', (q) => {
     const script = buildScript({
+      config: {
+        safeInclude: 0,
+      },
       meta: {
         include: [
           'https://*.google.com/*',

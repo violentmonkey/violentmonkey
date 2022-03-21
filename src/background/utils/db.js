@@ -154,7 +154,7 @@ preInitialize.push(async () => {
       Object.values(meta.resources || {}).forEach(rememberUrl, pathMap);
       pathMap::rememberUrl(meta.icon);
       if (script.config?.safeGM == null) {
-        toWrite[id] = script;
+        toWrite[key] = script;
         script.config = {
           ...script.config,
           safeGM: +(
