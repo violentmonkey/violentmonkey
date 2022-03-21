@@ -287,7 +287,7 @@ function prepareScript(script) {
     // using the same order of params as in makeGmApiWrapper's `gm`
     wrap && `window.${dataKey}=function(${dataKey},module,unsafeWindow,GM,${[
       'GM_info',
-      ...meta.grant.filter(GM_KEYS_RE.test, GM_KEYS_RE),
+      ...new Set(meta.grant.filter(GM_KEYS_RE.test, GM_KEYS_RE)),
     ]::trueJoin(',')}){try{with(module)((define,module,exports)=>{`,
     // hiding module interface from @require'd scripts so they don't mistakenly use it
     ...reqsSlices,
