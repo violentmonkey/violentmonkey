@@ -62,10 +62,12 @@ function initSize(sz, { $cache }) {
   let total = 0;
   $cache.sizes = Object.entries(sz).map(([key, val]) => {
     total += val;
-    return val && `${SIZE_TITLES[key] || key}: ${formatByteLength(val)}`
-    .replace(/[^B]$/, '$&B')
-    .replace(/\s/g, '\xA0');
-  })::trueJoin(', ');
+    return val && `${
+      SIZE_TITLES[key] || key
+    }: ${
+      formatByteLength(val).replace(/[^B]$/, '$&B')
+    }.`.replace(/\s/g, '\xA0');
+  })::trueJoin(' ');
   $cache.sizeNum = total;
   $cache.size = formatByteLength(total, true).replace(' ', '');
 }
