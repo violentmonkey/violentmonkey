@@ -148,7 +148,10 @@ export const VAULT = (() => {
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    then = res[i += 1] || SafeObject.freeze(SafePromise[PROTO]).then,
+    then = res[i += 1] || (
+      // Freezing SafePromise in page context to avoid spoofing via eval on an object from vault
+      src !== global ? SafeObject.freeze(SafePromise[PROTO]) : SafePromise[PROTO]
+    ).then,
     // various getters
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
     getDetail = res[i += 1] || describeProperty(SafeCustomEvent[PROTO], 'detail').get,
