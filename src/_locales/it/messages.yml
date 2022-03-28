@@ -177,13 +177,13 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Salva
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: Un gestore open source di userscript che supporta molti browser
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: Blacklisted in Violentmonkey's settings
 failureReasonNoninjectable:
   description: >-
@@ -212,14 +212,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Name
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: Errore
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: 'off'
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: 'on'
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -280,7 +283,7 @@ labelAutoReloadCurrentTabDisabled:
     ricaricherai la scheda
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 'Check for script updates every $1 day(s), use 0 to disable'
+  message: Check for script updates every $1 day(s), use 0 to disable
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
@@ -515,10 +518,18 @@ labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: Modalità $1 sincrona
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: ''
+  message: >-
+    Abilita solo se hai uno script che deve essere eseguito prima che la pagina
+    inizi a caricarsi e attualmente viene eseguito troppo tardi. Proprio come la
+    modalità di iniezione istantanea in Tampermonkey, questa opzione sta usando
+    il deprecato XHR sincrono, quindi in Chrome/Chromium vedrete degli avvisi
+    nella console di devtools, anche se potete tranquillamente ignorarli poiché
+    gli effetti negativi sono trascurabili in questo caso. Puoi nascondere
+    definitivamente gli avvisi cliccando con il tasto destro del mouse su uno di
+    essi.
 lastSync:
   description: Label for last sync timestamp.
   message: Ultima sincronizzazione il $1
@@ -556,7 +567,7 @@ menuInjectionFailed:
   description: Injection error.
   message: Impossibile iniettare alcuni script.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Riprovare in modalità "auto"
 menuMatchedDisabledScripts:
   description: >-
@@ -573,10 +584,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Create a new script
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Script disabilitati
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Script abilitati
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -673,7 +684,7 @@ msgSavedScriptTemplate:
   message: Custom script template is updated.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Lo script [$1] è aggiornato!'
+  message: Lo script [$1] è aggiornato!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Mostra/nascondi

@@ -169,13 +169,13 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Kaydet
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: Bir çok tarayıcı destekleyen açık kaynak userscript yöneticisi
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: Violentmonkey ayarlarında Kara listeye eklenmiş
 failureReasonNoninjectable:
   description: >-
@@ -202,14 +202,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: İsim
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: ''
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: kapalı
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: açık
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -268,7 +271,7 @@ labelAutoReloadCurrentTabDisabled:
   message: ''
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 'Script güncellemelerini $1 günde bir kontrol et, kapatmak için 0 seçin'
+  message: Script güncellemelerini $1 günde bir kontrol et, kapatmak için 0 seçin
 labelBackup:
   description: Label of the import/export section in settings.
   message: ''
@@ -540,7 +543,7 @@ menuInjectionFailed:
   description: Injection error.
   message: ''
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: ''
 menuMatchedDisabledScripts:
   description: >-
@@ -557,10 +560,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Yeni script oluştur
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Scriptler deaktif edildi
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Scriptler aktif edildi
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -651,7 +654,7 @@ msgSavedScriptTemplate:
   message: Özelleştirilmiş script şablonu kaydedildi.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Script [$1] güncellendi!'
+  message: Script [$1] güncellendi!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: ''

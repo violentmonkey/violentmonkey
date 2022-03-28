@@ -22,7 +22,7 @@ buttonEdit:
   message: Sunting
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: 'Anda juga bisa Klik-kanan, Ctrl-klik, Wheel-klik pada nama skrip.'
+  message: Anda juga bisa Klik-kanan, Ctrl-klik, Wheel-klik pada nama skrip.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Kosongkan keranjang sampah sekarang!
@@ -179,13 +179,13 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Simpan
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: Pengelola userscript sumber terbuka yang mendukung banyak peramban
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: Dalam daftar hitam di pengaturan Violentmonkey
 failureReasonNoninjectable:
   description: >-
@@ -212,14 +212,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Nama
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: Galat
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: nonaktif
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: aktif
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -280,7 +283,7 @@ labelAutoReloadCurrentTabDisabled:
   message: Skrip konten akan terus berjalan sampai Anda memuat ulang tab
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 'Periksa pembaruan skrip setiap $1 hari, gunakan 0 untuk menonaktifkan'
+  message: Periksa pembaruan skrip setiap $1 hari, gunakan 0 untuk menonaktifkan
 labelBackup:
   description: Label of the import/export section in settings.
   message: Cadangkan
@@ -556,7 +559,7 @@ menuInjectionFailed:
   description: Injection error.
   message: Tidak bisa menginjeksi beberapa skrip.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Ulangi dalam mode "otomatis"
 menuMatchedDisabledScripts:
   description: >-
@@ -573,10 +576,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Buat skrip baru
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Skrip dinonaktifkan
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Skrip diaktifkan
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -667,7 +670,7 @@ msgSavedScriptTemplate:
   message: Templat skrip khusus diperbarui.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Skrip [$1] diperbarui!'
+  message: Skrip [$1] diperbarui!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Tampilkan/Sembunyikan

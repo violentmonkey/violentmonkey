@@ -166,13 +166,13 @@ editValueSave:
   description: Button to save modification of a script value.
   message: 저장
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: 유저스크립트를 실행합니다.
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: Violentmonkey 블랙리스트 목록에 추가되어 있습니다
 failureReasonNoninjectable:
   description: >-
@@ -199,14 +199,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: 이름
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: ''
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: 끄기
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: 켜기
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -533,7 +536,7 @@ menuInjectionFailed:
   description: Injection error.
   message: 일부 스크립트를 삽입할 수 없습니다.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: '"자동" 모드로 재시도'
 menuMatchedDisabledScripts:
   description: >-
@@ -550,10 +553,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: 새 스크립트 만들기
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: 스크립트들 비활성화됨
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: 스크립트들 활성화됨
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -642,7 +645,7 @@ msgSavedScriptTemplate:
   message: 스크립트 템플릿이 업데이트됨.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: '스크립트 [$1]이(가) 업데이트됨!'
+  message: 스크립트 [$1]이(가) 업데이트됨!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: ''

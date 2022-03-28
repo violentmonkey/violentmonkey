@@ -177,7 +177,7 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Uložiť
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: >-
     Správca používateľských skriptov s otvoreným kódom a podporou viacerých
     prehliadačov
@@ -185,7 +185,7 @@ extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: Na čiernej listine v nastaveniach Violentmonkey
 failureReasonNoninjectable:
   description: >-
@@ -214,14 +214,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Názov
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: Chyba
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: vypnuté
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: zapnuté
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -277,10 +280,10 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: 'Aktuálne skripty budú spustené, kým kartu znovu nenačítate'
+  message: Aktuálne skripty budú spustené, kým kartu znovu nenačítate
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 'Kontrolovať aktualizácie skriptu každý $1 deň, pre zakázanie použite 0'
+  message: Kontrolovať aktualizácie skriptu každý $1 deň, pre zakázanie použite 0
 labelBackup:
   description: Label of the import/export section in settings.
   message: Záloha
@@ -563,7 +566,7 @@ menuInjectionFailed:
   description: Injection error.
   message: Nepodarilo sa injektovať niektoré skripty.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Vyskúšať znova v režime "auto"
 menuMatchedDisabledScripts:
   description: >-
@@ -580,10 +583,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Vytvoriť nový skript
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Skripty sú zakázané
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Skripty sú povolené
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -621,7 +624,7 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: 'Zmeny, ktoré vykonáte v režime inkognito budú použité aj v hlavnom profile.'
+  message: Zmeny, ktoré vykonáte v režime inkognito budú použité aj v hlavnom profile.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Skript bol nainštalovaný.
@@ -678,7 +681,7 @@ msgSavedScriptTemplate:
   message: Šablóna nového skriptu bola uktualizovaná.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Skript [$1] bol aktualizovaný!'
+  message: Skript [$1] bol aktualizovaný!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Zobraziť/skryť

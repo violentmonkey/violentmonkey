@@ -22,7 +22,7 @@ buttonEdit:
   message: Bearbeiten
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: 'Auch Rechts-, Strg- und Mausrad-Klicks auf den Skriptnamen sind möglich.'
+  message: Auch Rechts-, Strg- und Mausrad-Klicks auf den Skriptnamen sind möglich.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Papierkorb jetzt leeren!
@@ -178,13 +178,13 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Speichern
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
-  message: 'Ein quelloffener Benutzerskript-Manager, der viele Browser unterstützt.'
+  description: Description for this extension, will be displayed in web store
+  message: Ein quelloffener Benutzerskript-Manager, der viele Browser unterstützt.
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: In den Violentmonkey-Einstellungen geblacklistet
 failureReasonNoninjectable:
   description: >-
@@ -213,14 +213,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Name
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: Fehler
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: aus
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: an
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -250,7 +253,7 @@ installOptionClose:
   message: Nach der Installation schließen
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: 'Lokale Datei tracken, bis dieses Fenster geschlossen wird'
+  message: Lokale Datei tracken, bis dieses Fenster geschlossen wird
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -299,7 +302,7 @@ labelBadgeTotal:
   message: Anzahl angewandter Skripte
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: 'Anzahl angewandter, einzigartiger Skripte'
+  message: Anzahl angewandter, einzigartiger Skripte
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Blacklist
@@ -567,7 +570,7 @@ menuInjectionFailed:
   description: Injection error.
   message: Einige Skripte konnten nicht injiziert werden.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Im "Auto"-Modus erneut versuchen
 menuMatchedDisabledScripts:
   description: >-
@@ -584,10 +587,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Ein neues Skript erstellen
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Skripte deaktiviert
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Skripte aktiviert
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -685,7 +688,7 @@ msgSavedScriptTemplate:
   message: Benutzerdefinierte Skriptvorlage wurde aktualisiert.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Skript [$1] wurde aktualisiert!'
+  message: Skript [$1] wurde aktualisiert!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Anzeigen/ausblenden

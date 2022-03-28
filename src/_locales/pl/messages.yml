@@ -113,7 +113,7 @@ confirmNotSaved:
     Kliknij "OK", aby je porzucić lub "Anuluj", aby je zostawić.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: 'Adresy URL, które są na tej liście, nie zostaną dołączone do skryptów.'
+  message: Adresy URL, które są na tej liście, nie zostaną dołączone do skryptów.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -179,7 +179,7 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Zapisz
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: >-
     Menedżer skryptów użytkownika o otwartym kodzie źródłowym, który  obsługuje
     wiele przeglądarek.
@@ -187,7 +187,7 @@ extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: ' Zablokowano w czarnej liście w ustawieniach Violentmonkey''a'
 failureReasonNoninjectable:
   description: >-
@@ -216,14 +216,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Nazwa
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: Błąd
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: wył
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: wł
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -284,7 +287,7 @@ labelAutoReloadCurrentTabDisabled:
   message: Bieżące skrypty będą działać do momentu ponownego załadowania karty
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 'Sprawdzaj aktualizacje skryptów co  $1 dni, użyj 0 aby wyłączyć'
+  message: Sprawdzaj aktualizacje skryptów co  $1 dni, użyj 0 aby wyłączyć
 labelBackup:
   description: Label of the import/export section in settings.
   message: Kopia zapasowa
@@ -571,7 +574,7 @@ menuInjectionFailed:
   description: Injection error.
   message: Nie można wstrzyknąć niektórych skryptów.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Spróbuj ponownie w trybie „auto”
 menuMatchedDisabledScripts:
   description: >-
@@ -588,10 +591,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Utwórz nowy skrypt
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Skrypty wyłączone
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Skrypty włączone
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -686,7 +689,7 @@ msgSavedScriptTemplate:
   message: Niestandardowy szablon skryptu jest aktualizowany.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Skrypt [$1] jest aktualizowany!'
+  message: Skrypt [$1] jest aktualizowany!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Pokaż/ukryj
