@@ -177,6 +177,10 @@ const filterOptions = {
         { props: { lastUpdated: b } },
       ) => (+b || 0) - (+a || 0),
     },
+    size: {
+      title: i18n('filterSize'),
+      compare: (a, b) => b.$cache.sizeNum - a.$cache.sizeNum,
+    },
   },
 };
 const filtersSort = {

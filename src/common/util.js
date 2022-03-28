@@ -185,9 +185,9 @@ export function formatTime(duration) {
   return `${duration | 0}${unitInfo[0]}`;
 }
 
-export const formatByteLength = len => (
+export const formatByteLength = (len, noBytes) => (
   !len ? ''
-    : len < 1024 && `${len} B`
+    : !noBytes && len < 1024 && `${len} B`
     || len < 1024 * 1024 && `${len >> 10} k` // eslint-disable-line no-bitwise
     || `${+(len / (1024 * 1024)).toFixed(1)} M` // allow fractions for megabytes
 );
