@@ -1,636 +1,640 @@
 buttonCancel:
   description: Cancel button on dialog.
-  message: Annuleren
+  message: Mégse
 buttonClose:
   description: Button to close window.
-  message: Sluiten
+  message: Bezár
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: Installatie bevestigen
+  message: Telepítés megerősítése
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: Herinstallatie bevestigen
+  message: Újratelepítés megerősítése
 buttonDisable:
   description: Button to disable a script.
-  message: Uitschakelen
+  message: Kikapcsol
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: 'Thema''s downloaden:'
+  message: ''
   touched: false
 buttonEdit:
   description: Button to edit a script.
-  message: Bewerken
+  message: Szerkeszt
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: Je kunt tevens rechts-, middel- of Ctrl-klikken op de scriptnaam.
+  message: >-
+    Használhatod a jobb klikket, a CTRL+klikket és a görgő klikket a szkript
+    nevén.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: Leeg de prullenbak!
+  message: Kuka kiűrítése most!
 buttonEnable:
   description: Button to enable a script.
-  message: Inschakelen
+  message: Bekapcsol
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Exporteren naar zip-bestand
+  message: Exportálás zip-ként
 buttonFilter:
   description: Button to show filters menu.
-  message: Filters
+  message: ''
   touched: false
 buttonHome:
   description: Button to open homepage.
-  message: Website
+  message: Kezdőlap
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Importeren uit zip-bestand
+  message: Importálás zip-ből
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Installeren van url
+  message: Telepítés URL-ről
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
-  message: Opties
+  message: ''
   touched: false
 buttonNew:
   description: Button to create a new script.
-  message: Nieuw
+  message: Új
 buttonOK:
   description: OK button on dialog.
-  message: Oké
+  message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: Prullenbak
+  message: Kuka
 buttonRemove:
   description: Button to remove a script.
-  message: Verwijderen
+  message: Eltávolít
 buttonReplace:
   description: Button to replace the current match.
-  message: Vervangen
+  message: Lecserél
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: Alles
+  message: Összes
 buttonReset:
   description: Button to reset to default values.
-  message: Standaardwaarden
+  message: Visszaállít
 buttonRestore:
   description: Button to restore a removed script.
-  message: Herstellen
+  message: Helyreállít
 buttonSave:
   description: Button to save modifications of a script.
-  message: Opslaan
+  message: Mentés
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: Opslaan en sluiten
+  message: Mentés & Bezárás
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: Bewerkstatus tonen
+  message: Szerkesztő állapotának mutatása
 buttonSupport:
   description: Button to open support page.
-  message: Ondersteuningspagina
+  message: Támogatói oldal
 buttonUndo:
   description: Button to undo removement of a script.
   message: ''
   touched: false
 buttonUpdate:
   description: Check a script for updates.
-  message: Controleren op updates
+  message: Frissítések keresése
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Alle scripts controleren op updates
+  message: Frissítések keresése (mindenhez)
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Databank opschonen
+  message: Adatbázis felszívása
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: De databank is opgeschoond
+  message: Adatbázis felszívva
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Bezig met opschonen...
+  message: Adatok felszívása...
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: |-
-    De aanpassingen zijn niet opgeslagen!
-    Klik op oké om ze te verwerpen of annuleren om door te gaan.
+  message: >-
+    Szerkesztések nincsenek mentve!
+
+    Kattints az OK gombra, hogy eldobd őket, vagy a Mégse gombra, ha maradni
+    akarsz a szerkesztőben.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: Scripts worden niet uitgevoerd op url's die op deze lijst staan.
+  message: Azok az URL-ek listája, amelyek egyátalán nem lesznek kiegészítve.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Aangepaste css op de instellingen- en scriptinstallatiepagina's. Bij twijfel
-    leeglaten.
+    Egyedi CSS az opciók és szkript telepítési oldalra. Ha nem tudod mire van
+    ez, akkor ne nyúlj hozzá.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Aangepaste instellingen voor CodeMirror en uitbreidingen in json-objecten,
-    zoals <code>{"indentUnit":2, "smartIndent":true}</code>. Let op: niet alle
-    werken gegarandeerd in Violentmonkey. Bekijk de <a
+    Egyedi opciók CodeMirror és bővítményei számára JSON objektként, mint
+    <code>{"indentUnit":2, "smartIndent":true}</code>, viszont figyelj arra,
+    hogy van amelyik nem működik Violentmonkey-on belül. Teljes lista <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">volledige lijst</a>.
+    rel="noopener noreferrer">elérhetősége</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
-    Documentatie over gebruikersscript-metagegevensblokken en <code>GM</code>
-    API:
+    Dokumentáció a felhasználói szkript metaadat blokkjához és a <code>GM</code>
+    API-hoz:
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: 'Sneltoetsen:'
+  message: 'Gyorsbillentyűk:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: Andere bewerker?
+  message: Másik szerkesztőt szeretnél használni?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: Aangepaste metagegevens
+  message: Egyedi metaadat
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Scriptinstellingen
+  message: Szkript beállítások
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: Regel is te lang
+  message: Sor túl hosszú
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
   message: >-
-    Deze regel is te lang. De tekst is ingeklapt om vertraging tijdens het typen
-    te voorkomen.
+    Ez a sor túl hosszú, ezért a szöveg benne összeesett, hogy ne lassuljon le a
+    szerkesztő.
 
-    Je kunt deze beperking aanpassen in de geavanceerde instellingen. Voorbeeld:
+    A határt átállíthatod a haladó beállításokon, például:
 
     "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
-  message: Code
+  message: Kód
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: Instellingen
+  message: Beállítások
 editNavValues:
   description: Label of values tab in script editor.
-  message: Waarden
+  message: Értékek
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: Alles
+  message: ''
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: Alle scriptwaarden tonen/aanpassen
+  message: Teljes értéktároló lista mutatása / szerkesztése
 editValueCancel:
   description: Button to cancel modification of a script value.
-  message: Annuleren
+  message: Mégse
 editValueSave:
   description: Button to save modification of a script value.
-  message: Opslaan
+  message: Mentés
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: Een open source gebruikersscriptbeheerder voor diverse webbrowsers
+  message: Egy nyilt forráskódú felhasználó szkript kezelő, ami sok böngészőt támogat
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Staat op Violentmonkey's zwarte lijst
+  message: A Violentmonkey beállításainak feketelistáján található
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey kan geen gebruikersscripts uitvoeren op deze pagina
+    Violentmonkey nem tud futtatni felhasználói szkriptet ezen az oldalon
 
-    (bijv. interne of extensiepagina's, of vanwege een blokkadebeleid of
-    bepaalde Opera-zoekmachine)
+    (gyakori példák: böngésző UI, bővítmény, rendelkezés miatt blokkolt,
+    keresőoldal Operában)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: alfabetische volgorde
+  message: abécésorrend
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: uitvoervolgorde
+  message: futtatási sorrend
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: onlangs bijgewerkt
+  message: legutóbbi frissítési idő
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: Alle
+  message: Minden
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: Code
+  message: Kód
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: Naam
+  message: Név
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: size
 genericError:
   description: Label for generic error.
-  message: Fout
+  message: Hiba
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
-  message: uit
+  message: ki
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
-  message: aan
+  message: be
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: algemene instelling volgen
+  message: globális beállítás használata
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: Prullenbak
+  message: Kuka
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'Invoer-url:'
+  message: 'Írd be az URL-t:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: Verwijderde scripts worden hier getoond en 7 dagen bewaard.
+  message: Kitörölt szkriptek itt találhatók és megmaradnak 7 napig.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: '@downloadURL gebruiken'
+  message: '@downloadURL használata'
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Wis de overbodige gegevens en probeer de ontbrekende bronnen te herladen.
+  message: Redundanciák elhagyása és a gyorsítótárból hiányzó erőforrások újratöltése.
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: Installeren van $1
+  message: 'Telepítés innen: $1'
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Sluiten na installatie
+  message: Bezárás telepítés után
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Lokaal bestand bijhouden na sluiten van venster
+  message: Helyi fájl megfigyelése amíg ez az ablak nem záródik be
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: In Firefox 68 en nieuwer moet het brontabblad geopend blijven.
+  message: The source file tab should be kept open in Firefox 68 and newer.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Over Violentmonkey
+  message: ''
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: Geavanceerd
+  message: Haladó
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Updates toestaan
+  message: Allow update
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 'Auteur: '
+  message: 'Készítő:'
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Huidig tabblad herladen na in-/uitschakelen van een script
+  message: Reload current tab after switching on/off a script from menu
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: De huidige scripts worden uitgevoerd totdat je het tabblad herlaadt
+  message: Current scripts will keep running until you reload the tab
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: Elke $1 dag(en) controleren op updates (0 = uitschakelen)
+  message: Check for script updates every $1 day(s), use 0 to disable
 labelBackup:
   description: Label of the import/export section in settings.
-  message: Back-ups
+  message: Backup
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Tonen op embleem: '
+  message: 'Display on badge: '
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: 'Embleemkleuren:'
+  message: 'Badge colors: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: niks
+  message: none
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: aantal actieve scripts
+  message: number of running scripts
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: aantal unieke actieve scripts
+  message: number of unique running scripts
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Zwarte lijst
+  message: Blacklist
 labelContributors:
   description: Label for link to contributors.
-  message: Bijdragers
+  message: Contributors
 labelCurrentLang:
   description: Label of current language.
-  message: 'Huidige taal: '
+  message: 'Current Language: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Aangepaste stijl
+  message: Custom Style
 labelDataExport:
   description: Section title of data export.
-  message: Gegevens exporteren
+  message: ''
   touched: false
 labelDataImport:
   description: Section title of data import.
-  message: Gegevens importeren
+  message: ''
   touched: false
 labelDonate:
   description: Label of link to donate page.
-  message: Doneren
+  message: Donate
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'Download-url:'
+  message: 'Download URL:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: Scriptwaarde aanpassen
+  message: Editing script value
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: Scriptopslag aanpassen
+  message: Editing script storage
 labelEditor:
   description: Label for Editor settings
-  message: Bewerker
+  message: Editor
 labelExclude:
   description: Label of @exclude rules.
-  message: '@exclude-regels'
+  message: '@exclude rules'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match-regels'
+  message: '@exclude-match rules'
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Scriptgegevens exporteren
+  message: Export script data
 labelExposeStatus:
   description: Option in advanced settings.
-  message: 'Geïnstalleerde versies tonen aan gebruikersscriptsites: $1'
+  message: 'Expose installed version on userscript catalog sites: $1'
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
 labelFilterSort:
   description: Label for sort filter.
-  message: Sorteren op $1
+  message: Sort by $1
 labelGeneral:
   description: Label for general settings.
-  message: Algemeen
+  message: General
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: Helpen met vertalen
+  message: Help with translation
 labelHomepage:
   description: Label for home page in about tab.
-  message: Website
+  message: Homepage
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Website-url:'
+  message: 'Homepage URL:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: Scriptgegevens importeren
+  message: Import script data
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Instellingen importeren
+  message: Import settings
 labelInclude:
   description: Label of @include rules.
-  message: '@include-regels'
+  message: '@include rules'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: 'Standaard injectiemodus: '
+  message: 'Default injection mode: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Scriptinstallatie
+  message: Installing script
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Origineel behouden
+  message: Keep original
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: Bijgewerkt op $1
+  message: Last updated at $1
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Regelnummer: '
+  message: 'Line no.: '
 labelMatch:
   description: Label of @match rules.
-  message: '@match-regels'
+  message: '@match rules'
 labelName:
   description: Label of script name.
-  message: 'Naam:'
+  message: 'Name:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: 'Uitvoeren in frames:'
+  message: 'Run in frames: '
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Naamloos
+  message: No Name
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: Er zijn geen scripts gevonden.
+  message: No script is found.
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ', en melden:'
+  message: ', then notify:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Melding tonen bij scriptupdates
+  message: Notify script updates
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: per-scriptmeldingen negeren (tabblad 'instellingen' in de bewerker)
+  message: ignore per-script notification ("settings" tab in editor)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: Scripts in pop-up sorteren op $1
+  message: Sort scripts in popup by $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: Privacybeleid
+  message: Privacy Policy
 labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: Bezig met herinstalleren…
+  message: Re-installing script
 labelRelated:
   description: Label of related links.
-  message: 'Gerelateerde links: '
+  message: 'Related links: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: Verwijderd op $1
+  message: Removed at $1
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Vervangen door: '
+  message: 'Replace with: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Uitvoeren op: '
+  message: 'Run-At: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (standaard)
+  message: (Default)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: Aangepast scriptsjabloon
+  message: Custom Script Template
 labelSearch:
   description: Label for search input in search box.
-  message: 'Zoeken naar: '
+  message: 'Search for: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Zoeken naar scripts...
+  message: Search scripts...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Instellingen
+  message: Settings
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: Uitvoervolgorde tonen
+  message: Show execution order positions
 labelSync:
   description: Label for sync options.
-  message: Synchroniseren
+  message: Sync
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: Anoniem account gebruiken
+  message: Use anonymous account
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Goedkeuren
+  message: Authorize
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Bezig met goedkeuren
+  message: Authorizing
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: Niets
+  message: None
 labelSyncPassword:
   description: Label for input to hold password.
-  message: 'Wachtwoord: '
+  message: 'Password: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Intrekken
+  message: Revoke
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Scriptstatus synchroniseren
+  message: Sync script status
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'Server-url: '
+  message: 'Server URL: '
 labelSyncService:
   description: Label for sync service select.
-  message: Synchroniseren naar
+  message: Sync to
 labelSyncUsername:
   description: Label for input to hold username.
-  message: 'Gebruikersnaam: '
+  message: 'Username: '
 labelTheme:
   description: Label for the visual theme option.
-  message: 'Thema:'
+  message: 'Theme: '
 labelTranslator:
   description: Label of translator.
   message: ''
   touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'Bijwerk-url:'
+  message: 'Update URL:'
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: Eén kolom
+  message: Single column
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: Tabelweergave
+  message: Table view
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: Synchrone $1modus
+  message: Synchronous $1 mode
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
-    Schakel deze optie alleen in als je een script hebt dat dient te worden
-    uitgevoerd vóórdat de pagina wordt geladen en het momenteel niet wordt
-    uitgevoerd. Dit is vergelijkbaar met de injectiemodus van Tampermonkey en
-    maakt gebruik van de verouderde synchrone XHR. Hierdoor kan het gebeuren dat
-    je Chrome-/Chromium-console waarschuwingen toont - deze kun je echter
-    negeren. Rechtsklik op een waarschuwing om deze nooit meer te tonen.
+    Enable only if you have a script that needs to run before the page starts
+    loading and currently it's running too late. Just like Instant injection
+    mode in Tampermonkey, this option is using the deprecated synchronous XHR,
+    so in Chrome/Chromium you'll see warnings in devtools console, although you
+    can safely ignore them as the adverse affects are negligible in this case.
+    You can hide the warnings for good by right-clicking one.
 lastSync:
   description: Label for last sync timestamp.
-  message: Gesynchroniseerd op $1
+  message: Last sync at $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Meer informatie over zwartelijstpatronen.
+  message: Learn more about blacklist patterns.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: Meer informatie over injectiemodi.
+  message: Learn more about injection modes.
 menuCommands:
   description: Menu item to list script commands.
   message: ''
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: Controlepaneel openen
+  message: Open Dashboard
 menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: Uitsluiten...
+  message: Exclude...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: >-
-    Als je deze instelling hebt ingeschakeld, dan zal het huidige tabblad
-    automatisch worden herladen.
+    The current tab will auto-reload if you enabled this option in general
+    settings.
 
-    Herlaad de andere tabbladen handmatig om de wijzigingen toe te passen.
+    To apply changes to all other tabs please reload them manually.
 
-    Op het tabblad 'Instellingen' van de bewerker heb je meer flexibiliteit.
+    Use "Settings" tab of the editor for more flexibility.
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Scripts voor deze site zoeken
+  message: Find scripts for this site
 menuInjectionFailed:
   description: Injection error.
-  message: Enkele scripts kunnen niet worden geïnjecteerd.
+  message: Could not inject some scripts.
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
-  message: Opnieuw proberen in 'automatische' modus
+  message: Retry in "auto" mode
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: Uitgeschakelde compatibele scripts
+  message: Matched disabled scripts
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: Alleen scripts met onderliggende frames
+  message: Sub-frames only scripts
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Compatibele scripts
+  message: Matched scripts
 menuNewScript:
   description: Menu item to create a new script.
-  message: Script schrijven
+  message: Create a new script
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: Scripts zijn uitgeschakeld
+  message: Scripts disabled
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: Scripts zijn ingeschakeld
+  message: Scripts enabled
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Bezig met controleren op updates...
+  message: Checking for updates...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
   message: >-
-    Klik om de MomentJS-documentatie te lezen. Toegestane sleutels: $1. Gebruik
-    [vierkante haakjes] om letterlijke tekst te beschermen.
+    Click to open MomentJS documentation. Allowed tokens: $1. Use [square
+    brackets] to protect literal text.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: De bron kan niet worden opgehaald!
+  message: Error fetching resource!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Het script kan niet worden opgehaald!
+  message: Error fetching script!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: De update-informatie kan niet worden opgehaald.
+  message: Failed fetching update information.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: De scriptgegevens kunnen niet worden geladen.
+  message: Error loading script data.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: De afhankelijkheden kunnen niet worden geladen.
+  message: Error loading dependencies.
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: $1 item(s) geïmporteerd.
+  message: $1 item(s) are imported.
 msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: Aanpassingen in incognitomodus worden tevens toegepast op het hoofdprofiel.
+  message: Changes you make in the incognito mode also apply to your main profile.
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Het script is geïnstalleerd.
+  message: Script installed.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Het script is ongeldig!
+  message: Invalid script!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: De scriptgegevens zijn geladen.
+  message: ''
   touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
@@ -638,158 +642,154 @@ msgLoading:
   touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Bezig met laden van scriptgegevens...
+  message: Loading script data...
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: Bezig met laden van afhankelijkheden... ($1/$2)
+  message: Loading dependencies... ($1/$2)
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Er is al een vergelijkbaar script geïnstalleerd of in de prullenbak
-    geplaatst.
+    A script like this is already installed or is still in the Recycle Bin.
 
-    Kies een andere @name en @namespace of bewerk het andere script.
+    Please either use a different @name and @namespace here or edit that script
+    instead.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Er is een nieuwe versie beschikbaar.
+  message: New version found.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Er is geen nieuwe versie beschikbaar.
+  message: No update found.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: (de code is precies hetzelfde)
+  message: ' (code is the same)'
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: De zwarte lijst is bijgewerkt.
+  message: Blacklist updated.
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: De aangepaste stijl is bijgewerkt.
+  message: Custom style is updated.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: De bewerkerinstellingen zijn opgeslagen.
+  message: Editor options are updated.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: Het aangepaste scriptsjabloon is bijgewerkt.
+  message: Custom script template is updated.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: '[$1] is bijgewerkt!'
+  message: Script [$1] is updated!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: Tonen/Verbergen
+  message: Show/hide
 msgSyncError:
   description: Message shown when sync failed.
-  message: Synchronisatiefout!
+  message: Sync error!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Bezig met initialiseren...
+  message: Initializing...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: Initialisatiefout!
+  message: Initializing error!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: Nog niet geautoriseerd.
+  message: Not authorized yet.
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: De synchronisatie begint spoedig...
+  message: Sync will start soon...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Bezig met synchroniseren...
+  message: Sync in progress...
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Het script is bijgewerkt.
+  message: Script updated.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Bezig met bijwerken...
+  message: Updating...
 noValues:
   description: Label shown when there is no value for current script.
-  message: Er is geen waarde opgeslagen
+  message: No value is stored
 optionEditorWindow:
   description: Label for the option in settings
-  message: Bewerker in nieuw venster openen
+  message: Open editor from popup in a new window
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: >-
-    De vensterpositie van de bewerker wordt alleen onthouden na het aanpassen
-    van de afmetingen en bij het opslaan
+  message: Editor window position will be remembered only on resizing or saving
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: Omnibalk verbergen
+  message: Hide omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: Pop-upmenu en pictogram
+  message: Popup menu and icon
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: Ingeschakelde bovenaan
+  message: Enabled first
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: Uitgeschakelde scripts groeperen
+  message: Group disabled scripts
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Uitgeschakelde scripts verbergen
+  message: Hide disabled scripts
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: Uitgeschakelde scripts tonen
+  message: Show disabled scripts
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Ingeschakelde scripts bovenaan
+  message: Show enabled scripts first
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: 'Thema:'
+  message: 'UI theme: '
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: Automatisch
+  message: automatic
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: Donker
+  message: dark
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: Licht
+  message: light
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: Hoofdlettergevoelig
+  message: Case sensitive
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: Reguliere uitdrukkingen gebruiken
+  message: Use Regex
 sideMenuAbout:
   description: 'Side menu: About'
-  message: Over
+  message: About
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: Geïnstalleerde scripts
+  message: Installed scripts
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: Instellingen
+  message: Settings
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: Normale embleemkleur
+  message: Normal badge color
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: >-
-    De kleur die wordt gebruikt als de code niet kan worden toegevoegd aan de
-    site (zwarte lijst of niet-ondersteund)
+  message: Badge color when the site is non-injectable (blacklisted or unsupported)
 titleScriptUpdated:
   description: Notification title for script updates.
-  message: Bijwerken
+  message: Update
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-
-    * Druk op <Enter> om de tekst toe te voegen aan de auto-aanvulgeschiedenis
-    * Ondersteunt reguliere uitdrukkingen: /re/ en /re/flags
+    * <Enter> key adds the text to autocomplete history
+    * RegExp syntax is supported: /re/ and /re/flags
 valueLabelKey:
   description: Label for key of a script value.
-  message: Sleutel (tekenreeks)
+  message: Key (string)
 valueLabelValue:
   description: Label for value of a script value.
-  message: Waarde (in json-opmaak)
+  message: Value (serialized as JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: Alle waarden (in json-opmaak)
+  message: All values (serialized as JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: Violentmonkey-website
+  message: Visit Website

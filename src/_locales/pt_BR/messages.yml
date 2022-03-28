@@ -22,7 +22,9 @@ buttonEdit:
   message: Editar
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: 'Você também pode clicar com o botão direito do mouse, Ctrl, roda do mouse, no nome do script.'
+  message: >-
+    Você também pode clicar com o botão direito do mouse, Ctrl, roda do mouse,
+    no nome do script.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Limpar a lixeira agora!
@@ -115,19 +117,21 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Personalzar CSS para página de opções e página de instalação de script. Se você não tem
-    certeza do que é isso, por favor, não edite.
+    Personalzar CSS para página de opções e página de instalação de script. Se
+    você não tem certeza do que é isso, por favor, não edite.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Opções personalizadas para CodeMirror e addons em objeto JSON como
-    <code>{"indentUnit":2, "smartIndent":true}</code> no entanto 
-    note que alguns
-    deles podem não funcionar no Violentmonkey.
-    Consulte à <a href="https://codemirror.net/doc/manual.html#config" target="_blank" rel="noopener noreferrer">lista completa</a>.
+    <code>{"indentUnit":2, "smartIndent":true}</code> no entanto  note que
+    alguns deles podem não funcionar no Violentmonkey. Consulte à <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">lista completa</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: 'Documentação sobre bloco de metadados de script do usuário e API <code>GM</code>:'
+  message: >-
+    Documentação sobre bloco de metadados de script do usuário e API
+    <code>GM</code>:
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: 'Teclas de Atalhos:'
@@ -145,9 +149,12 @@ editLongLine:
   message: A linha é muito longa.
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: |-
-    Esta linha é muito longa, por isso seu texto foi encolhido para evitar atrasos na edição.
+  message: >-
+    Esta linha é muito longa, por isso seu texto foi encolhido para evitar
+    atrasos na edição.
+
     Você pode ajustar o limite em configurações avançadas, por exemplo:
+
     "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
@@ -172,13 +179,15 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Salvar
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
-  message: Um gerenciador de script de usuário de código aberto que tem suporte à muitos navegadores
+  description: Description for this extension, will be displayed in web store
+  message: >-
+    Um gerenciador de script de usuário de código aberto que tem suporte à
+    muitos navegadores
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: Configurações de Lista negra do Violentmonkey
 failureReasonNoninjectable:
   description: >-
@@ -186,9 +195,9 @@ failureReasonNoninjectable:
     failureBlacklistedUrl)
   message: >-
     Violentmonkey não pode executar scripts de usuários nesta página
-    
-    (Como exemplos comuns á interface do navegador, uma extensão bloqueada via políticas, motor de pesquisa
-    de site no Opera)
+
+    (Como exemplos comuns á interface do navegador, uma extensão bloqueada via
+    políticas, motor de pesquisa de site no Opera)
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: Ordem alfabética
@@ -207,15 +216,18 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Nome
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: Erro
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
-  message: 'Desligado'
+  description: To indicate something is turned off or disabled, similar to "no".
+  message: Desligado
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
-  message: 'Ligado'
+  description: To indicate something is turned on or enabled, similar to "yes".
+  message: Ligado
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: Usar configuração global
@@ -247,7 +259,9 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: A aba de arquivos de origem deve ser mantida aberta no Firefox 68 e mais novos.
+  message: >-
+    A aba de arquivos de origem deve ser mantida aberta no Firefox 68 e mais
+    novos.
 labelAbout:
   description: Label shown on top of the about page.
   message: Sobre o Violentmonkey
@@ -271,7 +285,9 @@ labelAutoReloadCurrentTabDisabled:
   message: Os scripts atuais continuarão em execução até que você recarregue a aba
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 'Verificar se há atualizações de script a cada $1 dia(s), use 0 para desativar'
+  message: >-
+    Verificar se há atualizações de script a cada $1 dia(s), use 0 para
+    desativar
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
@@ -289,7 +305,7 @@ labelBadgeTotal:
   message: Número de scripts em execução
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: Número de scripts únicos em execução 
+  message: Número de scripts únicos em execução
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Lista negra
@@ -510,12 +526,13 @@ labelXhrInject:
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
-    Ativar somente se você tiver um script que precisa ser executado antes da página começar o
-    carregamento e atualmente está iniciando tarde demais. Assim como a modo de injeção instantânea
-    no Tampermonkey, esta opção está usando o XHR síncromo preterido,
-    assim no Chrome/Chromium você verá avisos no console devtools, embora você
-    pode ignorá-los com segurança, pois os efeitos adversos são insignificantes neste caso.
-    Você pode ocultar os avisos para sempre clicando com o botão direito do mouse.
+    Ativar somente se você tiver um script que precisa ser executado antes da
+    página começar o carregamento e atualmente está iniciando tarde demais.
+    Assim como a modo de injeção instantânea no Tampermonkey, esta opção está
+    usando o XHR síncromo preterido, assim no Chrome/Chromium você verá avisos
+    no console devtools, embora você pode ignorá-los com segurança, pois os
+    efeitos adversos são insignificantes neste caso. Você pode ocultar os avisos
+    para sempre clicando com o botão direito do mouse.
 lastSync:
   description: Label for last sync timestamp.
   message: Última sincronização em $1
@@ -540,11 +557,11 @@ menuExclude:
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: >-
-    A aba atual será recarregada automaticamente se você ativar essa opção em configurações 
-    gerais.
-    
+    A aba atual será recarregada automaticamente se você ativar essa opção em
+    configurações  gerais.
+
     Para aplicar alterações em todas as outras abas, recarregue-as manualmente.
-    
+
     Use a aba "Configurações" do editor para obter mais flexibilidade.
 menuFindScripts:
   description: Menu item to find scripts for a site.
@@ -553,7 +570,7 @@ menuInjectionFailed:
   description: Injection error.
   message: Não podemos injetar alguns scripts.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Tentar novamente no modo "automático"
 menuMatchedDisabledScripts:
   description: >-
@@ -570,10 +587,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Crie um novo script
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Scripts desativados
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Scripts ativados
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -581,8 +598,8 @@ msgCheckingForUpdate:
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
   message: >-
-    Clique para abrir a documentação do MomentJS. Tokens permitidos: $1. Use [colchetes] 
-    para proteger texto literal.
+    Clique para abrir a documentação do MomentJS. Tokens permitidos: $1. Use
+    [colchetes]  para proteger texto literal.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -611,7 +628,9 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: Alterações que você faz no modo de navegação anônima também se aplicam ao seu perfil principal.
+  message: >-
+    Alterações que você faz no modo de navegação anônima também se aplicam ao
+    seu perfil principal.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Script instalado.
@@ -638,11 +657,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: >-
+  message: |-
     Um script como este já está instalado ou ainda está na Lixeira.
-    
-    Por favor, use um @name e @namespace diferente aqui ou edite 
-    esse script.
+    Por favor, use um @name e @namespace diferente aqui ou edite  esse script.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -668,7 +685,7 @@ msgSavedScriptTemplate:
   message: Modelo de script personalizado foi atualizado.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Script [$1] foi atualizado!'
+  message: Script [$1] foi atualizado!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Mostrar/Ocultar
@@ -706,7 +723,9 @@ optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: A posição da janela do editor será lembrada apenas em redimensionando ou salvando
+  message: >-
+    A posição da janela do editor será lembrada apenas em redimensionando ou
+    salvando
 optionEditorWindowSimple:
   description: Label for the editor window type
   message: Ocultar omnibox

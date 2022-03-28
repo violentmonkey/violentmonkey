@@ -184,7 +184,7 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Guardar
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: >-
     Un administrador de userscripts de código abierto que admite muchos
     navegadores
@@ -192,7 +192,7 @@ extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: En la lista negra en la configuración de Violentmonkey
 failureReasonNoninjectable:
   description: >-
@@ -221,14 +221,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Nombre
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: Error
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: deshabilitado
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: habilitado
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -578,7 +581,7 @@ menuInjectionFailed:
   description: Injection error.
   message: No se pudieron inyectar algunos scripts.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Reintentar en modo "automático"
 menuMatchedDisabledScripts:
   description: >-
@@ -595,10 +598,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Crear un nuevo script
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Scripts deshabilitados
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Scripts habilitados
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -693,7 +696,7 @@ msgSavedScriptTemplate:
   message: La plantilla de script personalizado está actualizada.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: '¡El script [$1] está actualizado!'
+  message: ¡El script [$1] está actualizado!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Mostrar/ocultar

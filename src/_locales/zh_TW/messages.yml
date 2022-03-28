@@ -165,13 +165,13 @@ editValueSave:
   description: Button to save modification of a script value.
   message: 儲存
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: 開放原始碼的使用者腳本管理器，支援多種瀏覽器
 extName:
   description: Name of this extension.
   message: 暴力猴
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: 在暴力猴的設定被加入黑名單
 failureReasonNoninjectable:
   description: >-
@@ -198,14 +198,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: 名稱
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: 錯誤
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: 關閉
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: 開啟
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -532,7 +535,7 @@ menuInjectionFailed:
   description: Injection error.
   message: 無法注入一些腳本。
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: 在「自動」模式重試
 menuMatchedDisabledScripts:
   description: >-
@@ -549,10 +552,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: 建立新腳本
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: 腳本已停用
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: 腳本已啟用
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.

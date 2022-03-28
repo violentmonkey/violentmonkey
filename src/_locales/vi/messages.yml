@@ -22,7 +22,7 @@ buttonEdit:
   message: Sửa
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: 'Bạn có thể bấm chuột phải, giữ Ctrl và click, bấm chuột giữa vào tên script.'
+  message: Bạn có thể bấm chuột phải, giữ Ctrl và click, bấm chuột giữa vào tên script.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Thùng rác trống!
@@ -175,13 +175,13 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Lưu
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: Hỗ trợ chạy userscript trên trình duyệt.
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: Đã ở trong danh sách đen của Violentmonkey
 failureReasonNoninjectable:
   description: >-
@@ -206,14 +206,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Tên
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: Lỗi
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: tắt
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: bật
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -270,7 +273,7 @@ labelAutoReloadCurrentTabDisabled:
   message: Những script hiện tại sẽ vẫn tiếp tục chạy cho đến khi bạn tải lại thẻ
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 'Kiểm tra cập nhật mỗi  $1 ngày, 0 = tắt'
+  message: Kiểm tra cập nhật mỗi  $1 ngày, 0 = tắt
 labelBackup:
   description: Label of the import/export section in settings.
   message: Sao lưu
@@ -558,7 +561,7 @@ menuInjectionFailed:
   description: Injection error.
   message: Không thể tiêm một số script
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Thử lại ở chế độ "tự động"
 menuMatchedDisabledScripts:
   description: >-
@@ -575,10 +578,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Tạo script mới
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Đã vô hiệu hoá script
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Đã kích hoạt script
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -671,7 +674,7 @@ msgSavedScriptTemplate:
   message: Script template tuỳ chỉnh đã được lưu
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Script [$1] đã được cập nhật!'
+  message: Script [$1] đã được cập nhật!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Hiện/ẩn

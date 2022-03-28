@@ -22,7 +22,7 @@ buttonEdit:
   message: Edit
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: 'You can also Right-click, Ctrl-click, Wheel-click on the script name.'
+  message: You can also Right-click, Ctrl-click, Wheel-click on the script name.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Empty recycle bin now!
@@ -172,13 +172,13 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Save
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
+  description: Description for this extension, will be displayed in web store
   message: An open source userscript manager that supports a lot of browsers
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: Blacklisted in Violentmonkey's settings
 failureReasonNoninjectable:
   description: >-
@@ -214,10 +214,10 @@ genericError:
   description: Label for generic error.
   message: Error
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: 'off'
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: 'on'
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -274,7 +274,7 @@ labelAutoReloadCurrentTabDisabled:
   message: Current scripts will keep running until you reload the tab
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 'Check for script updates every $1 day(s), use 0 to disable'
+  message: Check for script updates every $1 day(s), use 0 to disable
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
@@ -556,7 +556,7 @@ menuInjectionFailed:
   description: Injection error.
   message: Could not inject some scripts.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Retry in "auto" mode
 menuMatchedDisabledScripts:
   description: >-
@@ -573,10 +573,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Create a new script
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Scripts disabled
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Scripts enabled
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -671,7 +671,7 @@ msgSavedScriptTemplate:
   message: Custom script template is updated.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Script [$1] is updated!'
+  message: Script [$1] is updated!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Show/hide

@@ -180,13 +180,13 @@ editValueSave:
   description: Button to save modification of a script value.
   message: Salvează
 extDescription:
-  description: 'Description for this extension, will be displayed in web store'
-  message: 'Un manager de userscripturi, open source, care suportă o grămadă de browsere'
+  description: Description for this extension, will be displayed in web store
+  message: Un manager de userscripturi, open source, care suportă o grămadă de browsere
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
-  description: 'Shown for blacklisted URLs (in the extension icon tooltip, in the popup)'
+  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: Trecut în lista neagră din setările Violentmonkey
 failureReasonNoninjectable:
   description: >-
@@ -215,14 +215,17 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Nume
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: ''
 genericError:
   description: Label for generic error.
   message: Eroare
 genericOff:
-  description: 'To indicate something is turned off or disabled, similar to "no".'
+  description: To indicate something is turned off or disabled, similar to "no".
   message: dezactivat
 genericOn:
-  description: 'To indicate something is turned on or enabled, similar to "yes".'
+  description: To indicate something is turned on or enabled, similar to "yes".
   message: activat
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -569,7 +572,7 @@ menuInjectionFailed:
   description: Injection error.
   message: Nu s-au putut injecta unele scripturi.
 menuInjectionFailedFix:
-  description: 'Injection error fix, shown in case the default mode is "page".'
+  description: Injection error fix, shown in case the default mode is "page".
   message: Reîncearcă în modul „auto”
 menuMatchedDisabledScripts:
   description: >-
@@ -586,10 +589,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Creează un script nou
 menuScriptDisabled:
-  description: 'Menu item showing the status of Violentmonkey, when disabled.'
+  description: Menu item showing the status of Violentmonkey, when disabled.
   message: Scripturi dezactivate
 menuScriptEnabled:
-  description: 'Menu item showing the status of Violentmonkey, when enabled.'
+  description: Menu item showing the status of Violentmonkey, when enabled.
   message: Scripturi activate
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -687,7 +690,7 @@ msgSavedScriptTemplate:
   message: Șablonul personalizat pentru scripturi este actualizat.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 'Scriptul [$1] este actualizat!'
+  message: Scriptul [$1] este actualizat!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Afișează/ascunde
