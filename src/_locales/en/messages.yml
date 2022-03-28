@@ -224,6 +224,9 @@ filterScopeCode:
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Name
+filterSize:
+  description: Label for option to sort scripts by size.
+  message: size
 genericError:
   description: Label for generic error.
   message: Error

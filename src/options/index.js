@@ -1,12 +1,18 @@
 import Vue from 'vue';
 import '#/common/browser';
-import { sendCmdDirectly, getLocaleString } from '#/common';
+import { formatByteLength, getLocaleString, i18n, sendCmdDirectly, trueJoin } from '#/common';
 import handlers from '#/common/handlers';
 import { loadScriptIcon } from '#/common/load-script-icon';
 import options from '#/common/options';
 import '#/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
+
+const SIZE_TITLES = {
+  c: i18n('editNavCode'),
+  i: i18n('editNavSettings'),
+  v: i18n('editNavValues'),
+};
 
 Object.assign(store, {
   loading: false,
@@ -24,6 +30,9 @@ function initialize() {
   document.body.append(vm.$el);
 }
 
+/**
+ * @param {VMScript} script
+ */
 async function initScript(script) {
   const meta = script.meta || {};
   const localeName = getLocaleString(meta, 'name');
@@ -45,15 +54,48 @@ async function initScript(script) {
   }
 }
 
+/**
+ * @param {VMScriptSizeInfo} sz
+ * @param {VMScript} script
+ */
+function initSize(sz, { $cache }) {
+  let total = 0;
+  $cache.sizes = Object.entries(sz).map(([key, val]) => {
+    total += val;
+    return val && `${
+      SIZE_TITLES[key] || key
+    }: ${
+      formatByteLength(val).replace(/[^B]$/, '$&B')
+    }.`.replace(/\s/g, '\xA0');
+  })::trueJoin(' ');
+  $cache.sizeNum = total;
+  $cache.size = formatByteLength(total, true).replace(' ', '');
+}
+
+/**
+ * @param {VMScript} script
+ */
+async function initScriptAndSize(script) {
+  const res = initScript(script);
+  const [sz] = await sendCmdDirectly('GetSizes', [script.props.id]);
+  initSize(sz, script);
+  return res;
+}
+
 export async function loadData() {
   const id = store.route.paths[1];
   const params = id ? [+id].filter(Boolean) : null;
-  const [{ cache, scripts, sync }] = await Promise.all([
+  const [
+    { cache, scripts, sync },
+    sizes,
+  ] = await Promise.all([
     sendCmdDirectly('GetData', params, { retry: true }),
+    sendCmdDirectly('GetSizes', params, { retry: true }),
     options.ready,
   ]);
   store.cache = cache;
-  scripts?.forEach(initScript);
+  scripts.forEach(initScript);
+  sizes.forEach((sz, i) => initSize(sz, scripts[i]));
   store.scripts = scripts;
   store.sync = sync;
   store.loading = false;
@@ -69,19 +111,19 @@ function initMain() {
     UpdateSync(data) {
       store.sync = data;
     },
-    AddScript({ update }) {
+    async AddScript({ update }) {
       update.message = '';
-      initScript(update);
+      await initScriptAndSize(update);
       store.scripts.push(update);
     },
-    UpdateScript(data) {
+    async UpdateScript(data) {
       if (!data) return;
       const index = store.scripts.findIndex(item => item.props.id === data.where.id);
       if (index >= 0) {
         const updated = Object.assign({}, store.scripts[index], data.update);
         if (updated.error && !data.update.error) updated.error = null;
+        await initScriptAndSize(updated);
         Vue.set(store.scripts, index, updated);
-        initScript(updated);
       }
     },
     RemoveScript(id) {

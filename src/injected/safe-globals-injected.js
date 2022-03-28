@@ -20,19 +20,29 @@ export const WINDOW_FOCUS = 'window.focus';
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 export const CALLBACK_ID = '__CBID';
 
-export const getObjectTypeTag = val => val && val::objectToString()::slice(8, -1);
+export const getObjectTypeTag = val => {
+  // objectToString may call @@toStringTag getter which may throw
+  try {
+    return val && val::objectToString()::slice(8, -1);
+  } catch (e) { /* NOP */ }
+};
 
 export const isFunction = val => typeof val === 'function';
 export const isObject = val => val !== null && typeof val === 'object';
-// TODO: maybe use `val[toStringTagSym]` when strict_min_version > 78
-export const isPromise = val => getObjectTypeTag(val) === 'Promise';
+export const isPromise = val => {
+  // Checking if val is thenable per JS spec
+  if (isObject(val)) {
+    try { return isFunction(val.then); } catch (e) { /* NOP */ }
+  }
+};
 export const isString = val => typeof val === 'string';
 
-export const getOwnProp = (obj, key) => (
-  obj::hasOwnProperty(key)
-    ? obj[key]
-    : undefined
-);
+export const getOwnProp = (obj, key) => {
+  // obj may be a Proxy that throws in has() or its getter throws
+  try {
+    if (obj::hasOwnProperty(key)) return obj[key];
+  } catch (e) { /* NOP */ }
+};
 
 /** Workaround for array eavesdropping via prototype setters like '0','1',...
  * on `push` and `arr[i] = 123`, as well as via getters if you read beyond

@@ -4,7 +4,7 @@ const { getVersion, isBeta } = require('./version-helper');
 
 async function readManifest() {
   const input = await fs.readFile('src/manifest.yml', 'utf8');
-  const data = yaml.safeLoad(input);
+  const data = yaml.load(input);
   return data;
 }
 

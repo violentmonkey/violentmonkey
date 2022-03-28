@@ -41,6 +41,9 @@
         </tooltip>
         <span class="version ellipsis"
               v-text="script.meta.version ? `v${script.meta.version}` : ''"/>
+        <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end">
+          {{ script.$cache.size }}
+        </tooltip>
         <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">
           {{ updatedAt.show }}
         </tooltip>
@@ -520,6 +523,10 @@ $removedItemHeight: calc(
         flex: 1;
         margin-left: .5rem;
         line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
+        .size {
+          width: 3em;
+          text-align: right;
+        }
         .updated, .version {
           width: 6em;
           text-align: right;
@@ -558,6 +565,11 @@ $removedItemHeight: calc(
   &:not([data-table]) {
     [data-hotkey-table]::after {
       content: none;
+    }
+    .size {
+      position: absolute;
+      bottom: 10px;
+      right: 40px;
     }
   }
   &[data-show-order] .script-order::after {

@@ -291,6 +291,15 @@ export async function getScriptsByURL(url, isTop) {
       && (isTop || !(script.custom.noframes ?? script.meta.noframes))
       && testScript(url, script)
     ));
+  return getScriptEnv(allScripts);
+}
+
+/**
+ * @param {VMScript[]} scripts
+ * @param {boolean} [isCombined]
+ * @return {Promise<VMScriptByUrlData>}
+ */
+async function getScriptEnv(scripts, isCombined) {
   const disabledIds = [];
   /** @namespace VMScriptByUrlData */
   const [envStart, envDelayed] = [0, 1].map(() => ({
@@ -301,16 +310,16 @@ export async function getScriptsByURL(url, isTop) {
     [ENV_SCRIPTS]: [],
     [ENV_VALUE_IDS]: [],
   }));
-  allScripts.forEach((script) => {
+  scripts.forEach((script) => {
     const { id } = script.props;
-    if (!script.config.enabled) {
+    if (!isCombined && !script.config.enabled) {
       disabledIds.push(id);
       return;
     }
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
-    const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
+    const env = isCombined || runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
     env.ids.push(id);
     if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
       env[ENV_VALUE_IDS].push(id);
@@ -327,7 +336,7 @@ export async function getScriptsByURL(url, isTop) {
       });
     }
     /** @namespace VMInjectedScript */
-    env[ENV_SCRIPTS].push({ ...script, runAt });
+    env[ENV_SCRIPTS].push(isCombined ? script : { ...script, runAt });
   });
   if (envDelayed.ids.length) {
     envDelayed.promise = readEnvironmentData(envDelayed);
@@ -396,17 +405,36 @@ export async function getData(ids) {
   };
 }
 
+/**
+ * @param {VMScript[]} scripts
+ * @return {Promise<{}>}
+ */
 function getIconCache(scripts) {
-  const iconUrls = [];
-  scripts.forEach((script) => {
-    const { icon } = script.meta;
-    if (isRemote(icon)) {
-      iconUrls.push(script.custom.pathMap?.[icon] || icon);
-    }
-  });
-  return iconUrls.length
-    ? storage.cache.getMulti(iconUrls, undefined, storage.cache.makeDataUri)
-    : {};
+  return storage.cache.getMulti(
+    scripts.reduce((res, { custom, meta: { icon } }) => {
+      if (isRemote(icon)) res.push(custom.pathMap?.[icon] || icon);
+      return res;
+    }, []),
+    undefined,
+    storage.cache.makeDataUri,
+  );
+}
+
+export async function getSizes(ids) {
+  const scripts = ids ? ids.map(getScriptById) : store.scripts;
+  const { cache, code, value, require } = await getScriptEnv(scripts, true);
+  return scripts.map(({
+    meta,
+    custom: { pathMap = {} },
+    props: { id },
+  }, index) => /** @namespace VMScriptSizeInfo */ ({
+    c: code[id]?.length,
+    i: JSON.stringify(scripts[index]).length - 2,
+    v: JSON.stringify(value[id] || {}).length - 2,
+    '@require': meta.require?.reduce((len, v) => len + (require[pathMap[v] || v]?.length || 0), 0),
+    '@resource': Object.values(meta.resources || {})
+    .reduce((len, v) => len + (cache[pathMap[v] || v]?.length || 0), 0),
+  }));
 }
 
 /** @return {number} */
