@@ -185,12 +185,12 @@ export function formatTime(duration) {
   return `${duration | 0}${unitInfo[0]}`;
 }
 
-export const formatByteLength = (len, noBytes) => (
-  !len ? ''
-    : !noBytes && len < 1024 && `${len} B`
-    || len < 1024 * 1024 && `${len >> 10} k` // eslint-disable-line no-bitwise
-    || `${+(len / (1024 * 1024)).toFixed(1)} M` // allow fractions for megabytes
-);
+export function formatByteLength(len, noBytes) {
+  if (!len) return '';
+  if (len < 1024 && !noBytes) return `${len} B`;
+  if ((len /= 1024) < 1024) return `${Math.round(len)} k`;
+  return `${+(len / 1024).toFixed(1)} M`;
+}
 
 // Used by `injected`
 export function isEmpty(obj) {
