@@ -4,7 +4,7 @@ on:
   push:
     branches: [master]
     tags-ignore:
-      - '*.*' # version-tagged commits are releases which have their own workflow
+      - v* # version-tagged commits are releases which have their own workflow
     paths-ignore:
       - '.github/**' # this ci.yml is also excluded so you need to re-run it explicitly if necessary
       - LICENSE
@@ -26,6 +26,11 @@ jobs:
           node-version: '15'
 
       - name: Build
+        env:
+          SYNC_GOOGLE_CLIENT_ID: ${{ secrets.SYNC_GOOGLE_CLIENT_ID }}
+          SYNC_GOOGLE_CLIENT_SECRET: ${{ secrets.SYNC_GOOGLE_CLIENT_SECRET }}
+          SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
+          SYNC_ONEDRIVE_CLIENT_SECRET: ${{ secrets.SYNC_ONEDRIVE_CLIENT_SECRET }}
         run: yarn && yarn build
 
       - name: Get version and SHA
