@@ -43,7 +43,6 @@ jobs:
           name: 'Violentmonkey-test-webext-${{ env.GIT_DESCRIBE }}'
           path: 'dist/*'
           if-no-files-found: error
-          retention-days: 30
 
       - name: Upload to Transifex - check src
         uses: marceloprado/has-changed-path@v1
