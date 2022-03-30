@@ -19,6 +19,11 @@ jobs:
       - name: Prepare
         run: yarn && node scripts/action-helper.js
       - name: Build
+        env:
+          SYNC_GOOGLE_CLIENT_ID: ${{ secrets.SYNC_GOOGLE_CLIENT_ID }}
+          SYNC_GOOGLE_CLIENT_SECRET: ${{ secrets.SYNC_GOOGLE_CLIENT_SECRET }}
+          SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
+          SYNC_ONEDRIVE_CLIENT_SECRET: ${{ secrets.SYNC_ONEDRIVE_CLIENT_SECRET }}
         run: |
           yarn build
           mkdir -p $ASSETS_DIR $TEMP_DIR
