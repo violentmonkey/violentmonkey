@@ -218,7 +218,7 @@ filterScopeName:
   message: Név
 filterSize:
   description: Label for option to sort scripts by size.
-  message: size
+  message: méret
 genericError:
   description: Label for generic error.
   message: Hiba
@@ -259,7 +259,9 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: The source file tab should be kept open in Firefox 68 and newer.
+  message: >-
+    A forrásfájl lapnak nyitva kellene maradnia Firefox 68 és későbbi
+    verzióknál.
 labelAbout:
   description: Label shown on top of the about page.
   message: ''
@@ -269,51 +271,51 @@ labelAdvanced:
   message: Haladó
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Allow update
+  message: Frissítés engedélyezése
 labelAuthor:
   description: Label of author shown in the details of a script.
   message: 'Készítő:'
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Reload current tab after switching on/off a script from menu
+  message: Jelenlegi lap újratöltése egy szkript be/kikapcsolása után a menüben
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: Current scripts will keep running until you reload the tab
+  message: Jelenlegi szkriptek futni fognak addig, amíg újra nincs töltve a lap
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: Check for script updates every $1 day(s), use 0 to disable
+  message: Keress szkript frissítéseket minde $1 napon, használj 0-t hogy kikapcsold
 labelBackup:
   description: Label of the import/export section in settings.
-  message: Backup
+  message: Biztonsági mentés
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Display on badge: '
+  message: 'Jelvényen mutat: '
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: 'Badge colors: '
+  message: 'Jelvény színek: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: none
+  message: nem
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: number of running scripts
+  message: futó szkriptek száma
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: number of unique running scripts
+  message: egyedi futó szkriptek száma
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Blacklist
+  message: Feketelista
 labelContributors:
   description: Label for link to contributors.
-  message: Contributors
+  message: Közreműködők
 labelCurrentLang:
   description: Label of current language.
-  message: 'Current Language: '
+  message: 'Jelenlegi nyelv: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Custom Style
+  message: Egyedi stílus
 labelDataExport:
   description: Section title of data export.
   message: ''
@@ -324,67 +326,67 @@ labelDataImport:
   touched: false
 labelDonate:
   description: Label of link to donate page.
-  message: Donate
+  message: Támogass minket
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'Download URL:'
+  message: 'Letöltési URL:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: Editing script value
+  message: Szkript érték szerkesztése
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: Editing script storage
+  message: Szkript értéktároló szerkesztése
 labelEditor:
   description: Label for Editor settings
-  message: Editor
+  message: Szerkesztő
 labelExclude:
   description: Label of @exclude rules.
-  message: '@exclude rules'
+  message: '@exclude szabályok'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match rules'
+  message: '@exclude-match szabályok'
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Export script data
+  message: Szkript adatok exportálása
 labelExposeStatus:
   description: Option in advanced settings.
-  message: 'Expose installed version on userscript catalog sites: $1'
+  message: 'Telepített verzió bejelentése a felhasználói szkript katalógus oldalakon: $1'
 labelFeedback:
   description: Label of link to feedback page.
-  message: Feedback
+  message: Visszajelzés
 labelFilterSort:
   description: Label for sort filter.
-  message: Sort by $1
+  message: 'Sorrend: $1'
 labelGeneral:
   description: Label for general settings.
-  message: General
+  message: Általános
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: Help with translation
+  message: Segíts a fordítással
 labelHomepage:
   description: Label for home page in about tab.
-  message: Homepage
+  message: Oldal
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'Homepage URL:'
+  message: 'Weboldal:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: Import script data
+  message: Szkript adatok importálása
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Import settings
+  message: Beállítások importálása
 labelInclude:
   description: Label of @include rules.
-  message: '@include rules'
+  message: '@include szabályok'
 labelInjectionMode:
   description: Label for default option to inject scripts.
-  message: 'Default injection mode: '
+  message: 'Kiegészítési módszer: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Installing script
+  message: 'Szkript telepítése:'
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Keep original
+  message: Eredeti megtartása
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: Last updated at $1

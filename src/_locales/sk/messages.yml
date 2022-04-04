@@ -216,7 +216,7 @@ filterScopeName:
   message: Názov
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: veľkosť
 genericError:
   description: Label for generic error.
   message: Chyba
