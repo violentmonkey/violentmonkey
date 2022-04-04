@@ -214,7 +214,7 @@ filterScopeName:
   message: Naam
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: omvang
 genericError:
   description: Label for generic error.
   message: Fout
