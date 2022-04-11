@@ -1,18 +1,13 @@
-import { isEmpty, sendTabCmd } from '#/common';
+import { isEmpty, makePause, sendTabCmd } from '#/common';
 import { forEachEntry, forEachKey, objectSet } from '#/common/object';
 import { getScript, getValueStoresByIds, dumpValueStores } from './db';
 import { commands } from './message';
 
 const openers = {}; // { scriptId: { tabId: { frameId: 1, ... }, ... } }
 let cache = {}; // { scriptId: { key: { last: value, tabId: { frameId: value } } } }
-let updateScheduled;
+let cacheUpd;
 
 Object.assign(commands, {
-  /** @return {Promise<Object>} */
-  async GetValueStore(id) {
-    const stores = await getValueStoresByIds([id]);
-    return stores[id] || {};
-  },
   /** @param {{ where, store }[]} data
    * @return {Promise<void>} */
   async SetValueStores(data) {
@@ -54,28 +49,36 @@ export function addValueOpener(tabId, frameId, scriptIds) {
 }
 
 async function updateLater() {
-  while (!updateScheduled) {
-    updateScheduled = true;
-    await 0;
-    const currentCache = cache;
+  while (!cacheUpd) {
+    await makePause(0);
+    cacheUpd = cache;
     cache = {};
-    await doUpdate(currentCache);
-    updateScheduled = false;
+    await doUpdate();
+    cacheUpd = null;
     if (isEmpty(cache)) break;
   }
 }
 
-async function doUpdate(currentCache) {
-  const ids = Object.keys(currentCache);
-  const valueStores = await getValueStoresByIds(ids);
-  ids.forEach((id) => {
-    currentCache[id]::forEachEntry(([key, { last }]) => {
+async function doUpdate() {
+  const toSend = {};
+  const valueStores = await getValueStoresByIds(Object.keys(cacheUpd));
+  cacheUpd::forEachEntry(([id, scriptData]) => {
+    scriptData::forEachEntry(([key, history]) => {
+      const { last } = history;
       objectSet(valueStores, [id, key], last || undefined);
+      openers[id]::forEachEntry(([tabId, frames]) => {
+        const tabHistory = history[tabId] || {};
+        frames::forEachKey((frameId) => {
+          if (tabHistory[frameId] !== last) {
+            objectSet(toSend, [tabId, frameId, id, key], last);
+          }
+        });
+      });
     });
   });
   await Promise.all([
     dumpValueStores(valueStores),
-    broadcastValueStores(groupCacheByFrame(currentCache), { partial: true }),
+    broadcastValueStores(toSend, { partial: true }),
   ]);
 }
 
@@ -83,33 +86,12 @@ async function broadcastValueStores(tabFrameData, { partial } = {}) {
   const tasks = [];
   for (const [tabId, frames] of Object.entries(tabFrameData)) {
     for (const [frameId, frameData] of Object.entries(frames)) {
-      if (!isEmpty(frameData)) {
-        if (partial) frameData.partial = true;
-        tasks.push(sendTabCmd(+tabId, 'UpdatedValues', frameData, { frameId: +frameId }));
-        if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
-      }
+      if (partial) frameData.partial = true;
+      tasks.push(sendTabCmd(+tabId, 'UpdatedValues', frameData, { frameId: +frameId }));
+      if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
     }
   }
   await Promise.all(tasks);
-}
-
-// Returns per tab/frame data with only the changed values
-function groupCacheByFrame(cacheData) {
-  const toSend = {};
-  cacheData::forEachEntry(([id, scriptData]) => {
-    const dataEntries = Object.entries(scriptData);
-    openers[id]::forEachEntry(([tabId, frames]) => {
-      frames::forEachKey((frameId) => {
-        dataEntries.forEach(([key, history]) => {
-          // Skipping this frame if its last recorded value is identical
-          if (history.last !== history[tabId]?.[frameId]) {
-            objectSet(toSend, [tabId, frameId, id, key], history.last);
-          }
-        });
-      });
-    });
-  });
-  return toSend;
 }
 
 // Returns per tab/frame data
