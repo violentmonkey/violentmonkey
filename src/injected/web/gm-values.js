@@ -20,7 +20,7 @@ bridge.addHandlers({
         const update = updates[id];
         const keyHooks = changeHooks[id];
         if (keyHooks) changedRemotely(keyHooks, oldData, update);
-        if (partial) applyPartialUpdate(oldData, update);
+        else if (partial) applyPartialUpdate(oldData, update);
         else store.values[id] = update;
       }
     });
@@ -61,15 +61,12 @@ function applyPartialUpdate(data, update) {
 
 function changedRemotely(keyHooks, data, update) {
   objectKeys(update)::forEach(key => {
-    const hooks = keyHooks[key];
-    if (hooks) {
-      let raw = update[key];
-      if (!raw) raw = undefined; // partial `update` currently uses null for deleted values
-      const oldRaw = data[key];
-      if (oldRaw !== raw) {
-        data[key] = raw; // will be deleted later in applyPartialUpdate if empty
-        notifyChange(hooks, key, undefined, raw, oldRaw, true);
-      }
+    const raw = update[key] || undefined; // partial `update` currently uses null for deleted values
+    const oldRaw = data[key];
+    if (oldRaw !== raw) {
+      if (raw) data[key] = raw; else delete data[key];
+      const hooks = keyHooks[key];
+      if (hooks) notifyChange(hooks, key, undefined, raw, oldRaw, true);
     }
   });
 }
