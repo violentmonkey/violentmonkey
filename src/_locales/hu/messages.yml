@@ -389,75 +389,75 @@ labelKeepOriginal:
   message: Eredeti megtartása
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: Last updated at $1
+  message: 'Legutoljára frissítve: $1'
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Line no.: '
+  message: 'Sorszám: '
 labelMatch:
   description: Label of @match rules.
-  message: '@match rules'
+  message: '@match szabályok'
 labelName:
   description: Label of script name.
-  message: 'Name:'
+  message: 'Név:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: 'Run in frames: '
+  message: 'Futtatás iframe-en: '
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: No Name
+  message: Nincs név
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: No script is found.
+  message: Nincs szkript találva.
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ', then notify:'
+  message: ', majd jelzés:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Notify script updates
+  message: Szkript frissítés jelzése
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ignore per-script notification ("settings" tab in editor)
+  message: szkriptenkénti szabályok ignorálása ("Beállítások" lap a szerkesztőben)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: Sort scripts in popup by $1
+  message: 'Felugró szkriptek rendezése az alábbiak szerint: $1'
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: Privacy Policy
+  message: Adatvédelmi irányelvek
 labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: Re-installing script
+  message: Szkript újratelepítése
 labelRelated:
   description: Label of related links.
-  message: 'Related links: '
+  message: 'Kapcsolódó linkek: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: Removed at $1
+  message: 'Törölve: $1'
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Replace with: '
+  message: 'Lecserélve ezzel: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Run-At: '
+  message: 'Futtatás ekkor: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: (Default)
+  message: (Alapértelmezett)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: Custom Script Template
+  message: Egyedi szkript sablon
 labelSearch:
   description: Label for search input in search box.
-  message: 'Search for: '
+  message: 'Keresés erre: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Search scripts...
+  message: Szkriptek keresése...
 labelSettings:
   description: Label shown on the top of settings page
-  message: Settings
+  message: Beállítások
 labelShowOrder:
   description: Label for option in dashboard -> script list
   message: Show execution order positions
