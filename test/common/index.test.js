@@ -13,6 +13,17 @@ test('isRemote', (t) => {
   t.notOk(isRemote('http://localhost/a.user.js'));
   t.notOk(isRemote('https://localhost/a.user.js'));
   t.notOk(isRemote('http://127.0.0.1/a.user.js'));
+  t.notOk(isRemote('http://127.0.0.1:5555/a.user.js'));
+  t.notOk(isRemote('http://192.168.1.32/a.user.js'));
+  t.notOk(isRemote('http://172.16.0.1/a.user.js'));
+  t.notOk(isRemote('http://10.0.0.1/a.user.js'));
+  t.notOk(isRemote('http://[::1]/a.user.js'));
+  t.notOk(isRemote('http://[fe80::6996:2ba9:37e6:8762]/a.user.js'));
+  t.notOk(isRemote('http://[fc00::90:90]/a.user.js'));
+  t.notOk(isRemote('http://example.test/a.user.js'));
+  t.notOk(isRemote('https://example.example/a.user.js'));
+  t.notOk(isRemote('http://example.invalid/a.user.js'));
+  t.notOk(isRemote('https://example.localhost/a.user.js'));
   t.end();
 });
 
