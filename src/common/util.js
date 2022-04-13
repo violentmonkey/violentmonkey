@@ -252,19 +252,8 @@ const FORCED_ACCEPT = {
   'greasyfork.org': 'application/javascript, text/plain, text/css',
 };
 
-export const isRemote = url => {
-  try {
-    const { protocol, hostname } = new URL(url);
-    return !['file:', 'data:'].includes(protocol)
-      && !['localhost', '127.0.0.1', '[::1]', ''].includes(hostname)
-      && !hostname.startsWith('192.168.') && !hostname.startsWith('172.16.') && !hostname.startsWith('10.0.')
-      && !hostname.startsWith('[fe80::') && !hostname.startsWith('[fc00::')
-      && !hostname.endsWith('.test') && !hostname.endsWith('.example')
-      && !hostname.endsWith('.invalid') && !hostname.endsWith('.localhost');
-  } catch (_) {
-    return false;
-  }
-};
+export const isRemote = url => url
+  && !(/^(file:\/\/|data:|https?:\/\/(localhost|127\.0\.0\.1|(192\.168|172\.16|10\.0)\.[0-9]+\.[0-9]+|\[(::1|(fe80|fc00)::[.:0-9a-f]+)\]|.+\.(test|example|invalid|localhost))(:[0-9]+|\/|$))/i.test(url));
 
 /** @typedef {{
   url: string,
