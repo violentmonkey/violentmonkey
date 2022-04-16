@@ -207,9 +207,12 @@ export function makeGlobalWrapper(local) {
         desc.value = wrapper;
       }
       // preventing spec violation - we must mirror an unknown unforgeable prop
-      if (!ownDesc && !getOwnProp(desc, 'configurable')) {
+      // preventing error for libs like ReactDOM that hook window.event
+      if (!ownDesc && (!getOwnProp(desc, 'configurable') || name === 'event')) {
         const get = getOwnProp(desc, 'get');
+        const set = getOwnProp(desc, 'set'); // for window.event
         if (get) desc.get = get::bind(global);
+        if (set) desc.set = set::bind(global);
         safeDefineProperty(local, name, desc);
       }
       return desc;
