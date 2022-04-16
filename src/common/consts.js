@@ -14,9 +14,6 @@ export const INJECT_MAPPING = {
   [INJECT_CONTENT]: [INJECT_CONTENT],
 };
 
-export const CMD_SCRIPT_ADD = 'AddScript';
-export const CMD_SCRIPT_UPDATE = 'UpdateScript';
-
 // Allow metadata lines to start with WHITESPACE? '//' SPACE
 // Allow anything to follow the predefined text of the metaStart/End
 // The SPACE must be on the same line and specifically \x20 as \s would also match \r\n\t

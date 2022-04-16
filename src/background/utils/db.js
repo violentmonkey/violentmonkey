@@ -1,9 +1,7 @@
 import {
   compareVersion, i18n, getFullUrl, getScriptName, isRemote, sendCmd, trueJoin,
 } from '#/common';
-import {
-  CMD_SCRIPT_ADD, CMD_SCRIPT_UPDATE, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK,
-} from '#/common/consts';
+import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '#/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
 import storage from '#/common/storage';
 import pluginEvents from '../plugin/events';
@@ -502,7 +500,7 @@ export async function updateScriptInfo(id, data) {
   script.config = { ...script.config, ...data.config };
   script.custom = { ...script.custom, ...data.custom };
   await storage.script.dump(script);
-  return sendCmd(CMD_SCRIPT_UPDATE, { where: { id }, update: script });
+  return sendCmd('UpdateScript', { where: { id }, update: script });
 }
 
 /** @return {Promise<{ isNew?, update, where }>} */
@@ -514,7 +512,6 @@ export async function parseScript(src) {
       message: src.message == null ? i18n('msgUpdated') : src.message || '',
     },
   };
-  let cmd = CMD_SCRIPT_UPDATE;
   let script;
   const oldScript = await getScript({ id: src.id, meta });
   if (oldScript) {
@@ -522,7 +519,6 @@ export async function parseScript(src) {
     script = { ...oldScript };
   } else {
     ({ script } = newScript());
-    cmd = CMD_SCRIPT_ADD;
     result.isNew = true;
     result.update.message = i18n('msgInstalled');
   }
@@ -552,7 +548,7 @@ export async function parseScript(src) {
   fetchResources(script, src);
   Object.assign(result.update, script, src.update);
   result.where = { id: script.props.id };
-  sendCmd(cmd, result);
+  sendCmd('UpdateScript', result);
   pluginEvents.emit('scriptChanged', result);
   return result;
 }
@@ -595,7 +591,7 @@ export async function fetchResources(script, resourceCache, reqOptions) {
     const error = errors.map(formatHttpError)::trueJoin('\n');
     if (error) {
       const message = i18n('msgErrorFetchingResource');
-      sendCmd(CMD_SCRIPT_UPDATE, {
+      sendCmd('UpdateScript', {
         update: { error, message },
         where: { id: script.props.id },
       });

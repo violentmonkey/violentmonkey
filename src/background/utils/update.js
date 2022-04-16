@@ -1,5 +1,4 @@
 import { getScriptName, i18n, request, compareVersion, sendCmd, trueJoin } from '#/common';
-import { CMD_SCRIPT_UPDATE } from '#/common/consts';
 import { fetchResources, getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
@@ -115,7 +114,7 @@ async function downloadUpdate({ props: { id }, meta, custom }) {
       error: error ? `${i18n('genericError')} ${error.status}, ${error.url}` : null,
       // `null` is transferable in Chrome unlike `undefined`
     });
-    sendCmd(CMD_SCRIPT_UPDATE, result);
+    sendCmd('UpdateScript', result);
   }
 }
 

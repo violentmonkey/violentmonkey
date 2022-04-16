@@ -111,19 +111,18 @@ function initMain() {
     UpdateSync(data) {
       store.sync = data;
     },
-    async AddScript({ update }) {
+    async UpdateScript({ update, where } = {}) {
+      if (!update) return;
       update.message = '';
-      await initScriptAndSize(update);
-      store.scripts.push(update);
-    },
-    async UpdateScript(data) {
-      if (!data) return;
-      const index = store.scripts.findIndex(item => item.props.id === data.where.id);
-      if (index >= 0) {
-        const updated = Object.assign({}, store.scripts[index], data.update);
-        if (updated.error && !data.update.error) updated.error = null;
-        await initScriptAndSize(updated);
-        Vue.set(store.scripts, index, updated);
+      const { scripts } = store;
+      const index = scripts.findIndex(item => item.props.id === where.id);
+      const updated = Object.assign({}, scripts[index], update);
+      if (updated.error && !update.error) updated.error = null;
+      await initScriptAndSize(updated);
+      if (index < 0) {
+        scripts.push(updated);
+      } else {
+        Vue.set(scripts, index, updated);
       }
     },
     RemoveScript(id) {
