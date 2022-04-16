@@ -235,6 +235,17 @@ function initDragDrop(targetElement) {
 button.drop-allowed {
   background-color: green;
   color: white;
+  animation: outline-zoom-in .25s cubic-bezier(0, .5, 0, .75);
+}
+@keyframes outline-zoom-in {
+  from {
+    outline: 20px solid rgba(0, 128, 0);
+    outline-offset: 200px;
+  }
+  to {
+    outline: 1px solid rgba(0, 128, 0, 0);
+    outline-offset: 0;
+  }
 }
 .import-report {
   white-space: pre-wrap;

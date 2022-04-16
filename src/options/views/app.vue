@@ -31,9 +31,11 @@ import Installed from './tab-installed';
 import Settings from './tab-settings';
 import About from './tab-about';
 
+const SETTINGS = 'settings';
+const SCRIPTS = 'scripts';
 const tabs = [
-  { name: 'scripts', comp: Installed, label: i18n('sideMenuInstalled') },
-  { name: 'settings', comp: Settings, label: i18n('sideMenuSettings') },
+  { name: SCRIPTS, comp: Installed, label: i18n('sideMenuInstalled') },
+  { name: SETTINGS, comp: Settings, label: i18n('sideMenuSettings') },
   { name: 'about', comp: About, label: i18n('sideMenuAbout') },
 ];
 const extName = i18n('extName');
@@ -50,7 +52,7 @@ export default {
       aside: false,
       // Speedup and deflicker for initial page load:
       // skip rendering the aside when starting in the editor for a new script.
-      canRenderAside: name !== 'scripts' || (tabFunc !== '_new' && !Number(tabFunc)),
+      canRenderAside: name !== SCRIPTS || (tabFunc !== '_new' && !Number(tabFunc)),
       store,
     };
   },
@@ -75,7 +77,7 @@ export default {
   },
   methods: {
     updateContext() {
-      const isScriptsTab = this.current.name === 'scripts';
+      const isScriptsTab = this.current.name === SCRIPTS;
       const { paths } = this.store.route;
       keyboardService.setContext('editScript', isScriptsTab && paths[1]);
       keyboardService.setContext('tabScripts', isScriptsTab && !paths[1]);
@@ -85,6 +87,13 @@ export default {
       const switchTo = this.tabs[(index + step + this.tabs.length) % this.tabs.length];
       window.location.hash = switchTo?.name || '';
     },
+  },
+  created() {
+    document.addEventListener('dragover', evt => {
+      if (this.current !== SETTINGS && evt.dataTransfer.types.includes('Files')) {
+        window.location.hash = `#${SETTINGS}`;
+      }
+    });
   },
   mounted() {
     this.disposeList = [
