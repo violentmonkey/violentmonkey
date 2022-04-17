@@ -41,6 +41,7 @@ Object.assign(handlers, {
         loadScriptIcon(script, data.cache);
         const { id } = script.props;
         script.runs = data.runningIds.includes(id);
+        script.pageUrl = src.url; // each frame has its own URL
         if (data.failedIds.includes(id)) {
           script.failed = true;
           if (!store.injectionFailure) {

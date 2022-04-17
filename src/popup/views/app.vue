@@ -414,7 +414,7 @@ export default {
       const item = this.activeExtras;
       item.excludesValue = [
         ...item.data.custom.excludeMatch || [],
-        `${store.currentTab.url.split('#')[0]}*`,
+        `${item.data.pageUrl.split('#')[0]}*`,
       ].join('\n');
       this.$nextTick(() => {
         // not using $refs because multiple items may show textareas
