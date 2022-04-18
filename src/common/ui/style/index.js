@@ -16,8 +16,6 @@ try {
   /* keep the dummy object */
 }
 
-const THEME_KEY = 'editorTheme';
-const UI_THEME_KEY = 'uiTheme';
 const CACHE_KEY = 'cacheCustomCSS';
 
 const setStyle = (css, elem) => {
@@ -25,22 +23,10 @@ const setStyle = (css, elem) => {
     elem = document.createElement('style');
     document.documentElement.appendChild(elem);
   }
-  if (css || elem) {
-    css = css || '';
-    if (elem.textContent !== css) {
-      elem.textContent = css;
-    }
-    if (localStorage[CACHE_KEY] !== css) {
-      localStorage[CACHE_KEY] = css;
-    }
+  if ((css || elem) && elem.textContent !== css) {
+    elem.textContent = css;
   }
   return elem;
-};
-
-const setCmTheme = (css) => {
-  if (!global.location.pathname.startsWith('/popup')) {
-    styleTheme = setStyle(css ?? options.get(THEME_KEY), styleTheme);
-  }
 };
 
 const setUiTheme = theme => {
@@ -61,18 +47,22 @@ const setUiTheme = theme => {
   darkMediaRules.forEach(rule => { rule.media.mediaText = mediaText; });
 };
 
-setStyle(localStorage[CACHE_KEY]);
+style = setStyle(localStorage[CACHE_KEY] || '');
 
 options.hook((changes) => {
   let v;
-  if ((v = changes[THEME_KEY]) != null) {
-    setCmTheme(v);
+  if ((v = changes.editorTheme) != null
+  && !global.location.pathname.startsWith('/popup')) {
+    styleTheme = setStyle(v, styleTheme);
   }
-  if ((v = changes[UI_THEME_KEY]) != null) {
+  if ((v = changes.uiTheme) != null) {
     setUiTheme(v);
   }
   if ((v = changes.customCSS) != null) {
     style = setStyle(v, style);
+    if (localStorage[CACHE_KEY] !== v) {
+      localStorage[CACHE_KEY] = v;
+    }
   }
 });
 
