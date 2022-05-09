@@ -223,7 +223,7 @@ filterScopeName:
   message: Nombre
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: tamaño
 genericError:
   description: Label for generic error.
   message: Error
