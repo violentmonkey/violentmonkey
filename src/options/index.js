@@ -113,13 +113,13 @@ function initMain() {
     },
     async UpdateScript({ update, where } = {}) {
       if (!update) return;
-      update.message = '';
       const { scripts } = store;
       const index = scripts.findIndex(item => item.props.id === where.id);
       const updated = Object.assign({}, scripts[index], update);
       if (updated.error && !update.error) updated.error = null;
       await initScriptAndSize(updated);
       if (index < 0) {
+        update.message = '';
         scripts.push(updated);
       } else {
         Vue.set(scripts, index, updated);
