@@ -76,7 +76,9 @@ export function forEachValue(func) {
 // Needed for Firefox's browser.storage API which fails on Vue observables
 export function deepCopy(src) {
   return src && (
-    Array.isArray(src) && src.map(deepCopy)
+    /* Not using `map` because its result belongs to the `window` of the source,
+     * so it becomes "dead object" in Firefox after GC collects it. */
+    Array.isArray(src) && Array.from(src, deepCopy)
     // Used in safe context
     // eslint-disable-next-line no-restricted-syntax
     || typeof src === 'object' && src::mapEntry(([, val]) => deepCopy(val))
