@@ -9,6 +9,7 @@ import { isUserScript, parseMeta } from './script';
 import { extensionRoot } from './init';
 import { commands } from './message';
 
+const VM_ORIGIN = extensionRoot.slice(0, -1);
 const VM_VERIFY = 'VM-Verify';
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 /** @type {Object<string,VMHttpRequest>} */
@@ -95,7 +96,8 @@ const HeaderInjector = (() => {
   /** @param {chrome.webRequest.HttpHeader} header */
   const isVmVerify = ({ name }) => name.startsWith(VM_VERIFY) && (name in verify);
   const isNotCookie = header => !/^cookie2?$/i.test(header.name);
-  const isSendable = header => !isVmVerify(header);
+  const isSendable = header => !isVmVerify(header)
+    && !(/^origin$/i.test(header.name) && header.value === VM_ORIGIN);
   const isSendableAnon = header => isSendable(header) && isNotCookie(header);
   const RE_SET_COOKIE = /^set-cookie2?$/i;
   const RE_SET_COOKIE_VALUE = /^\s*(?:__(Secure|Host)-)?([^=\s]+)\s*=\s*(")?([!#-+\--:<-[\]-~]*)\3(.*)/;
