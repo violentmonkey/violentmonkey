@@ -394,7 +394,7 @@ function clearRequest(req) {
 function decodeBody([body, type, wasBlob]) {
   if (type === 'query') {
     type = 'application/x-www-form-urlencoded';
-  } else if (type) {
+  } else if (type != null) {
     // 5x times faster than fetch() which wastes time on inter-process communication
     const res = string2uint8array(atob(body.slice(body.indexOf(',') + 1)));
     if (!wasBlob) {
