@@ -93,9 +93,9 @@ const HeaderInjector = (() => {
   ].filter(Boolean);
   const headersToInject = {};
   /** @param {chrome.webRequest.HttpHeader} header */
-  const isVmVerify = header => header.name === VM_VERIFY;
+  const isVmVerify = ({ name }) => name.startsWith(VM_VERIFY) && (name in verify);
   const isNotCookie = header => !/^cookie2?$/i.test(header.name);
-  const isSendable = header => header.name !== VM_VERIFY;
+  const isSendable = header => !isVmVerify(header);
   const isSendableAnon = header => isSendable(header) && isNotCookie(header);
   const RE_SET_COOKIE = /^set-cookie2?$/i;
   const RE_SET_COOKIE_VALUE = /^\s*(?:__(Secure|Host)-)?([^=\s]+)\s*=\s*(")?([!#-+\--:<-[\]-~]*)\3(.*)/;
@@ -318,6 +318,7 @@ async function httpRequest(opts, src, cb) {
   req.anonymous = anonymous;
   const { xhr } = req;
   const vmHeaders = [];
+  const vmVerifyName = getUniqId(VM_VERIFY);
   // Firefox can send Blob/ArrayBuffer directly
   const chunked = !IS_FIREFOX && incognito;
   const blobbed = xhrType && !IS_FIREFOX && !incognito;
@@ -329,7 +330,8 @@ async function httpRequest(opts, src, cb) {
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
   let shouldSendCookies = !anonymous && (incognito || IS_FIREFOX);
   xhr.open(opts.method || 'GET', url, true, opts.user || '', opts.password || '');
-  xhr.setRequestHeader(VM_VERIFY, id);
+  xhr.setRequestHeader(vmVerifyName, id);
+  verify[vmVerifyName] = null;
   if (contentType) xhr.setRequestHeader('Content-Type', contentType);
   opts.headers::forEachEntry(([name, value]) => {
     const lowerName = name.toLowerCase();
