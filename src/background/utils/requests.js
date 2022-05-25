@@ -339,8 +339,7 @@ async function httpRequest(opts, src, cb) {
     const lowerName = name.toLowerCase();
     if (isSpecialHeader(lowerName)) {
       vmHeaders.push({ name, value });
-    } else if (!lowerName.startsWith('vm-')) {
-      // `VM-` headers are reserved
+    } else {
       xhr.setRequestHeader(name, value);
     }
     if (lowerName === 'cookie') {
