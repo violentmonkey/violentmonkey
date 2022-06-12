@@ -29,7 +29,8 @@ export const bindEvents = (srcId, destId, bridge, cloneInto) => {
     }
     if (!incomingNodeEvent) {
       // CustomEvent is the main message
-      const data = e::getDetail();
+      const detail = e::getDetail();
+      const data = cloneInto ? cloneInto(detail, window) : detail;
       incomingNodeEvent = data.node && data;
       if (!incomingNodeEvent) bridge.onHandle(data);
     } else {
