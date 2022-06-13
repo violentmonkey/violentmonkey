@@ -218,7 +218,7 @@ filterScopeName:
   message: Nome
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: Tamanho
 genericError:
   description: Label for generic error.
   message: Erro
@@ -343,10 +343,10 @@ labelEditor:
   message: Editor
 labelExclude:
   description: Label of @exclude rules.
-  message: '@exclude rules'
+  message: '@excluir regras'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match rules'
+  message: '@excluir jogo de regras'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportar dados do script
@@ -379,7 +379,7 @@ labelImportSettings:
   message: Importar configurações
 labelInclude:
   description: Label of @include rules.
-  message: '@include rules'
+  message: '@incluir regras'
 labelInjectionMode:
   description: Label for default option to inject scripts.
   message: 'Modo de injeção padrão: '
@@ -522,7 +522,7 @@ labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: Modo síncrono $ 1
+  message: Modo síncrono $1
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
