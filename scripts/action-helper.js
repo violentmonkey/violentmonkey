@@ -46,13 +46,19 @@ Object.entries(envs).forEach(([key, value]) => {
 function listCommits() {
   const thisTag = exec('git describe --abbrev=0 --tags');
   const prevTag = exec(`git describe --abbrev=0 --tags "${thisTag}^"`);
-  return exec(`git log --oneline --skip=1 --reverse "${prevTag}...${thisTag}"`)
+  const tagRange = `${prevTag}...${thisTag}`;
+  const list = exec(`git log --oneline --skip=1 --reverse "${tagRange}"`)
   .replace(/</g, '\\<')
   .split('\n')
   .map((str, i) => `${str.split(/\s/, 2)[1]}${10000 + i}\n* ${str}`)
   .sort()
   .map(str => str.split('\n')[1])
   .join('\n');
+  return `${list}\n\nCommit log: ${
+    process.env.GITHUB_SERVER_URL || 'https://github.com'
+  }/${
+    process.env.GITHUB_REPOSITORY || 'violentmonkey/violentmonkey'
+  }/compare/${tagRange}`;
 }
 
 function exec(cmd) {
