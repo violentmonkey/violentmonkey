@@ -12,7 +12,7 @@ postInitialize.push(resetBlacklist);
 
 tld.initTLD(true);
 
-const RE_MATCH_PARTS = /(.*?):\/\/([^/]*)\/(.*)/;
+const RE_MATCH_PARTS = /^([^/:]*):\/\/([^/]*)\/(.*)$/;
 let blacklistRules = [];
 hookOptions((changes) => {
   if ('blacklist' in changes) resetBlacklist(changes.blacklist || '');
@@ -34,51 +34,41 @@ const MAX_BL_CACHE_LENGTH = 100e3;
 let blCache = {};
 let blCacheSize = 0;
 
-function testRules(url, rules, prefix, ruleBuilder) {
-  return rules.some(rule => {
-    const key = `${prefix}:${rule}`;
+function testRules(url, rules, isMatch, safeInclude) {
+  return rules?.some(rule => {
+    const safe = isMatch || safeInclude && rule.match(RE_MATCH_PARTS);
+    const ruleBuilder = safe ? matchTester : autoReg;
+    const key = `${safe ? 'match' : 're'}:${rule}`;
     const matcher = cache.get(key) || cache.put(key, ruleBuilder(rule));
     return matcher.test(url);
   });
 }
 
 /**
- * Test glob rules like `@include` and `@exclude`.
+ * @param {string} url
+ * @param {VMScript} script
+ * @return {boolean}
  */
-export function testGlob(url, rules) {
-  return testRules(url, rules, 're', autoReg);
-}
-
-/**
- * Test match rules like `@match` and `@exclude_match`.
- */
-export function testMatch(url, rules) {
-  return testRules(url, rules, 'match', matchTester);
-}
-
 export function testScript(url, script) {
   cache.batch(true);
-  const { custom, meta } = script;
-  const mat = mergeLists(custom.origMatch && meta.match, custom.match);
-  const inc = mergeLists(custom.origInclude && meta.include, custom.include);
-  const exc = mergeLists(custom.origExclude && meta.exclude, custom.exclude);
-  const excMat = mergeLists(custom.origExcludeMatch && meta.excludeMatch, custom.excludeMatch);
+  const { custom, meta, config: { safeInclude = 1 } } = script;
   // match all if no @match or @include rule
-  let ok = !mat.length && !inc.length;
+  let ok = !custom.match?.length && !(custom.origMatch ? meta.match?.length : 0)
+    && !custom.include?.length && !(custom.origInclude ? meta.include?.length : 0);
   // @match
-  ok = ok || testMatch(url, mat);
+  ok = ok || testRules(url, custom.match, true)
+    || custom.origMatch && testRules(url, meta.match, true);
   // @include
-  ok = ok || testGlob(url, inc);
+  ok = ok || testRules(url, custom.include, false, safeInclude)
+    || custom.origInclude && testRules(url, meta.include, false, safeInclude);
   // @exclude-match
-  ok = ok && !testMatch(url, excMat);
+  ok = ok && !testRules(url, custom.excludeMatch, true)
+    && !(custom.origExcludeMatch && testRules(url, meta.excludeMatch, true));
   // @exclude
-  ok = ok && !testGlob(url, exc);
+  ok = ok && !testRules(url, custom.exclude, false)
+    && !(custom.origExclude && testRules(url, meta.exclude, false));
   cache.batch(false);
   return ok;
-}
-
-function mergeLists(...args) {
-  return args.reduce((res, item) => (item ? res.concat(item) : res), []);
 }
 
 function str2RE(str) {

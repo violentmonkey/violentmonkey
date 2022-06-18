@@ -192,6 +192,8 @@ export function formatByteLength(len, noBytes) {
   return `${+(len / 1024).toFixed(1)} M`;
 }
 
+export const isUnsafeGmNeeded = code => (process.env.GM_UNSAFE_RE).test(code);
+
 // Used by `injected`
 export function isEmpty(obj) {
   for (const key in obj) {

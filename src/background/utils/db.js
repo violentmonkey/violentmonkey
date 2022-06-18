@@ -1,5 +1,7 @@
 import {
-  compareVersion, i18n, getFullUrl, getScriptName, isRemote, sendCmd, trueJoin,
+  compareVersion, i18n, getFullUrl, getScriptName,
+  isEmpty, isRemote, isUnsafeGmNeeded,
+  sendCmd, trueJoin,
 } from '#/common';
 import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '#/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
@@ -101,6 +103,7 @@ preInitialize.push(async () => {
   const idMap = {};
   const uriMap = {};
   const mods = [];
+  const toWrite = {};
   const resUrls = [];
   /** @this VMScriptCustom.pathMap */
   const rememberUrl = function _(url) { resUrls.push(this[url] || url); };
@@ -148,11 +151,24 @@ preInitialize.push(async () => {
       meta.require?.forEach(rememberUrl, pathMap);
       Object.values(meta.resources || {}).forEach(rememberUrl, pathMap);
       pathMap::rememberUrl(meta.icon);
+      if (script.config?.safeGM == null) {
+        toWrite[key] = script;
+        script.config = {
+          ...script.config,
+          safeGM: +(
+            !isUnsafeGmNeeded(data[storage.code.prefix + id])
+            && !meta.require?.some(url => (
+              isUnsafeGmNeeded(data[storage.require.prefix + (pathMap[url] || url)])
+            ))
+          ),
+        };
+      }
     } else if (key.startsWith(storage.mod.prefix)) {
       mods.push(key.slice(storage.mod.prefix.length));
     }
   });
   storage.mod.removeMulti(mods.filter(url => !resUrls.includes(url)));
+  if (!isEmpty(toWrite)) storage.base.dump(toWrite);
   Object.assign(store, {
     scripts,
     storeInfo,
@@ -719,6 +735,8 @@ export async function vacuum(data) {
 /** @typedef VMScriptConfig *
  * @property {Boolean} enabled - stored as 0 or 1
  * @property {Boolean} removed - stored as 0 or 1
+ * @property {Boolean} safeGM - don't expose GM on Proxy wrapper - stored as 0 or 1
+ * @property {Boolean} safeInclude - @include treated as @match - stored as 0 or 1
  * @property {Boolean} shouldUpdate - stored as 0 or 1
  * @property {Boolean | null} notifyUpdates - stored as 0 or 1 or null (default) which means "use global setting"
  */

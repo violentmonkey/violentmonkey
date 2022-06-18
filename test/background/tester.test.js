@@ -6,6 +6,7 @@ test.onFinish(cache.destroy);
 
 function buildScript(props) {
   return Object.assign({
+    config: {},
     custom: {
       origInclude: true,
       origExclude: true,
@@ -282,6 +283,35 @@ test('include', (t) => {
     });
     q.ok(testScript('https://www.GOOGLE.com/', script), 'should ignore case');
     q.ok(testScript('https://www.REGEXP.com/', script), 'should ignore case');
+    q.end();
+  });
+
+  t.test('unsafe include', (q) => {
+    const script = buildScript({
+      config: {
+        safeInclude: 0,
+      },
+      meta: {
+        include: [
+          'https://*.google.com/*',
+        ],
+      },
+    });
+    q.ok(testScript('https://www.google.com/foo', script), 'should match * in host name');
+    q.ok(testScript('https://hacked/www.google.com/foo', script), 'should match * also in path');
+    q.end();
+  });
+
+  t.test('safe include (enabled by default)', (q) => {
+    const script = buildScript({
+      meta: {
+        include: [
+          'https://*.google.com/*',
+        ],
+      },
+    });
+    q.ok(testScript('https://www.google.com/foo', script), 'should match * in host name');
+    q.notOk(testScript('https://hacked/www.google.com/foo', script), 'should not match * in path');
     q.end();
   });
 });

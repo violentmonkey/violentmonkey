@@ -4,7 +4,9 @@ const webpack = require('webpack');
 const TerserPlugin = isProd && require('terser-webpack-plugin');
 const deepmerge = isProd && require('deepmerge');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
-const { addWrapperWithGlobals, getCodeMirrorThemes, getUniqIdB64 } = require('./webpack-util');
+const {
+  addWrapperWithGlobals, getCodeMirrorThemes, getGmApiKeys, getUniqIdB64,
+} = require('./webpack-util');
 const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
 const projectConfig = require('./plaid.conf');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
@@ -82,6 +84,10 @@ const defsObj = {
   'process.env.HANDSHAKE_ID': HANDSHAKE_ID,
   'process.env.HANDSHAKE_ACK': '1',
   'process.env.CODEMIRROR_THEMES': JSON.stringify(getCodeMirrorThemes()),
+  ...(({ keys, unsafeRe } = getGmApiKeys()) => ({
+    'process.env.GM_UNSAFE_RE': `/${unsafeRe}/`,
+    'process.env.GM_KEYS_RE': `/^GM_(${keys})$/`,
+  }))(),
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts

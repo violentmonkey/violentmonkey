@@ -38,6 +38,7 @@ const KEY_XHR_INJECT = 'xhrInject';
 const BAD_URL_CHAR = IS_FIREFOX
   ? /[#&',/:;?=+]/g // FF shows `@` fine as ASCII but mangles it as full-width
   : /[#&',/:;?=+@]/g;
+const GM_KEYS_RE = process.env.GM_KEYS_RE;
 const expose = {};
 let isApplied;
 let injectInto;
@@ -283,8 +284,12 @@ function prepareScript(script) {
   const hasReqs = reqsSlices.length;
   const wrap = !meta.unwrap;
   const injectedCode = [
+    // using the same order of params as in makeGmApiWrapper's `gm`
+    wrap && `window.${dataKey}=function(${dataKey},module,unsafeWindow,GM,${[
+      'GM_info',
+      ...new Set(meta.grant.filter(GM_KEYS_RE.test, GM_KEYS_RE)),
+    ]::trueJoin(',')}){try{with(module)((define,module,exports)=>{`,
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    wrap && `window.${dataKey}=function(module,${dataKey}){try{with(module)((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs && wrap && '(()=>{',

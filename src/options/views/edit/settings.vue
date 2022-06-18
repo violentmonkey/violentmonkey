@@ -1,7 +1,7 @@
 <template>
   <div class="edit-settings" ref="container">
     <h4 v-text="i18n('editLabelSettings')"></h4>
-    <div class="form-group condensed">
+    <div>
       <label>
         <input type="checkbox" v-model="config.shouldUpdate">
         <span v-text="i18n('labelAllowUpdate')"></span>
@@ -13,6 +13,22 @@
         [i18n('genericUseGlobal'), ''],
       ]"><!-- make sure to place the input and span on one line with a space between -->
         <input type="radio" :value="value" v-model="config.notifyUpdates"> <span v-text="text"/>
+      </label>
+    </div>
+    <div class="safeties">
+      <label>
+        <tooltip :content="i18n('configSafeIncludeHint')" placement="right">
+          <input type="checkbox" v-model="config.safeInclude">
+          <span v-text="i18n('configSafeIncludeLabel')"/>
+        </tooltip>
+      </label>
+    </div>
+    <div class="safeties">
+      <label>
+        <tooltip :content="i18n('configSafeGMHint')" placement="right">
+          <input type="checkbox" v-model="config.safeGM">
+          <span v-text="i18n('configSafeGMLabel')"/>
+        </tooltip>
       </label>
     </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
@@ -84,6 +100,7 @@
 </template>
 
 <script>
+import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { i18n } from '#/common';
 import { objectGet } from '#/common/object';
 
@@ -91,6 +108,9 @@ const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || 
 
 export default {
   props: ['active', 'settings', 'value'],
+  components: {
+    Tooltip,
+  },
   computed: {
     custom() {
       return this.settings.custom || {};

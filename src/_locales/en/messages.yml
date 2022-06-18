@@ -104,6 +104,23 @@ buttonVacuumed:
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Vacuuming data...
+configSafeGMHint:
+  description: Tooltip for an option in installer and editor settings.
+  message: >-
+    If enabled, GM_xxx are defined as standard variables, not as `window.GM_xxx`.
+    Disabling is unsafe, but may be necessary while waiting for the author
+    to update the script to use the safe approach.
+configSafeGMLabel:
+  description: Label for an option in installer and editor settings.
+  message: Safe usage of GM_xxx
+configSafeIncludeHint:
+  description: Tooltip for an option in installer and editor settings.
+  message: >-
+    If enabled, @include with "*" in the host part is treated like @match.
+    Disabling is unsafe, but may be necessary while you wait for the author to migrate to @match.
+configSafeIncludeLabel:
+  description: Label for an option in installer and editor settings.
+  message: Safe matching of @include
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-

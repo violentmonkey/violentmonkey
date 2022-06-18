@@ -1,6 +1,6 @@
 <template>
   <div class="edit frame flex flex-col fixed-full">
-    <div class="edit-header flex mr-1c">
+    <div class="edit-header flex mr-1 mr-1c">
       <nav>
         <div
           v-for="(label, navKey) in navItems" :key="navKey"
@@ -76,6 +76,13 @@ import VmValues from './values';
 import VmExternals from '#/common/ui/externals';
 import VmHelp from './help';
 
+// Matching the internal 0/1 to Vue model boolean so deepEqual can work properly
+// 1 = enabled by default, 0 = disabled by default
+const BOOLEAN_CONFIG = {
+  safeGM: 1,
+  safeInclude: 1,
+  shouldUpdate: 1,
+};
 const CUSTOM_PROPS = {
   name: '',
   runAt: '',
@@ -233,8 +240,8 @@ export default {
     this.settings = {
       config: {
         notifyUpdates: `${config.notifyUpdates ?? ''}`,
-        // Needs to match Vue model type so deepEqual can work properly
-        shouldUpdate: Boolean(config.shouldUpdate),
+        ...objectPick(config, Object.keys(BOOLEAN_CONFIG),
+          (val, key) => Boolean(val ?? BOOLEAN_CONFIG[key])),
       },
       custom: {
         // Adding placeholders for any missing values so deepEqual can work properly
@@ -289,6 +296,7 @@ export default {
           code: codeComponent.getRealContent(),
           config: {
             ...config,
+            ...objectPick(config, Object.keys(BOOLEAN_CONFIG), Number),
             notifyUpdates: notifyUpdates ? +notifyUpdates : null,
           },
           custom: {

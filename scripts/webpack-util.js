@@ -16,6 +16,7 @@ const entryGlobals = {
     './src/injected/web/safe-globals-web.js',
   ],
 };
+const gmApiPath = './src/injected/web/gm-api.js';
 
 /**
  * Adds a watcher for files in entryGlobals to properly recompile the project on changes.
@@ -51,6 +52,20 @@ function getCodeMirrorThemes() {
   .filter(Boolean);
 }
 
+function getGmApiKeys() {
+  const keys = [
+    ...new Set(fs.readFileSync(gmApiPath, 'utf8').match(/\bGM_\w+/g)),
+  ].join('|').replace(/GM_/g, '');
+  return {
+    keys,
+    unsafeRe: [
+      /\w+\s*(\.\s*|\[\s*['"`])GM/,
+      `(\\b|_(${keys}|info)\\b)`,
+      /(['"`]\s*])?\s*(?!=[^=])(\S|$)/, // ignoring assignments e.g. in GM4 polyfills
+    ].map(r => r.source || r).join(''),
+  };
+}
+
 function getUniqIdB64() {
   return Buffer.from(
     new Uint32Array(2)
@@ -75,5 +90,6 @@ function readGlobalsFile(filename, babelOpts = {}) {
 
 exports.addWrapperWithGlobals = addWrapperWithGlobals;
 exports.getCodeMirrorThemes = getCodeMirrorThemes;
+exports.getGmApiKeys = getGmApiKeys;
 exports.getUniqIdB64 = getUniqIdB64;
 exports.readGlobalsFile = readGlobalsFile;

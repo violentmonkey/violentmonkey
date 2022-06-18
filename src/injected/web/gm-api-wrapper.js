@@ -33,6 +33,8 @@ export function makeGmApiWrapper(script) {
     grant.length = 0;
   }
   const { id } = script.props;
+  const hasGrant = grant.length > 0;
+  const grantSafeGM = hasGrant && +script.config.safeGM !== 0;
   const resources = assign(createNullObj(), meta.resources);
   /** @namespace VMInjectedScript.Context */
   const context = {
@@ -45,24 +47,26 @@ export function makeGmApiWrapper(script) {
   const gmInfo = makeGmInfo(script, resources);
   const gm = {
     __proto__: null,
+    // same order of keys as in preinject.js::prepareScript
+    unsafeWindow: global,
     GM: {
       __proto__: null,
       info: gmInfo,
     },
     GM_info: gmInfo,
-    unsafeWindow: global,
   };
+  let wrapper = createNullObj();
   if (!componentUtils) {
     componentUtils = makeComponentUtils();
   }
-  assign(gm, componentUtils);
+  assign(wrapper, componentUtils);
   if (grant::indexOf(WINDOW_CLOSE) >= 0) {
-    gm.close = vmOwnFunc(() => bridge.post('TabClose', 0, context));
+    wrapper.close = vmOwnFunc(() => bridge.post('TabClose', 0, context));
   }
   if (grant::indexOf(WINDOW_FOCUS) >= 0) {
-    gm.focus = vmOwnFunc(() => bridge.post('TabFocus', 0, context));
+    wrapper.focus = vmOwnFunc(() => bridge.post('TabFocus', 0, context));
   }
-  if (!gmApi && grant.length) gmApi = makeGmApi();
+  if (!gmApi && hasGrant) gmApi = makeGmApi();
   grant::forEach((name) => {
     const gm4name = name::slice(0, 3) === 'GM.' && name::slice(3);
     const fn = gmApi[gm4name ? `GM_${GM4_ALIAS[gm4name] || gm4name}` : name];
@@ -74,7 +78,12 @@ export function makeGmApiWrapper(script) {
       }
     }
   });
-  return grant.length ? makeGlobalWrapper(gm) : gm;
+  if (!grantSafeGM) assign(wrapper, gm);
+  if (hasGrant) wrapper = makeGlobalWrapper(wrapper);
+  return {
+    thisArg: hasGrant ? wrapper : global,
+    args: safeConcat([logging.error, wrapper], objectValues(gm)),
+  };
 }
 
 function makeGmInfo(script, resources) {

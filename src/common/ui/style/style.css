@@ -398,6 +398,10 @@ body .vl-tooltip {
   }
 }
 
+.safeties input:not(:checked) + * {
+  color: red;
+}
+
 @media (prefers-color-scheme: dark) {
   input[type="radio"]:not(:checked),
   input[type="checkbox"]:not(:checked) {
