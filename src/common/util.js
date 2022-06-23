@@ -253,7 +253,7 @@ const FORCED_ACCEPT = {
 };
 
 export const isRemote = url => url
-  && !(/^(file:\/\/|data:|https?:\/\/(localhost|127\.0\.0\.1|(192\.168|172\.16|10\.0)\.[0-9]+\.[0-9]+|\[(::1|(fe80|fc00)::[.:0-9a-f]+)\]|.+\.(test|example|invalid|localhost))(:[0-9]+|\/|$))/i.test(url));
+  && !(/^(file:\/\/|data:|https?:\/\/([^@/]*@)?(localhost|127\.0\.0\.1|(192\.168|172\.16|10\.0)\.[0-9]+\.[0-9]+|\[(::1|(fe80|fc00)::[.:0-9a-f]+)\]|.+\.(test|example|invalid|localhost))(:[0-9]+|\/|$))/i.test(url));
 
 /** @typedef {{
   url: string,
@@ -272,23 +272,25 @@ export async function request(url, options = {}) {
   if (url.startsWith('file://')) return requestLocalFile(url, options);
   const { body, headers, responseType } = options;
   const isBodyObj = body && body::({}).toString() === '[object Object]';
-  const hostname = url.split('/', 3)[2];
+  const [, scheme, auth, hostname, urlTail] = url.match(/^([-\w]+:\/\/)([^@/]*@)?([^/]*)(.*)/);
   const accept = FORCED_ACCEPT[hostname];
   // Not using ...spread because Babel mistakenly adds its polyfill to injected-web
   const init = Object.assign({
     cache: isRemote(url) ? undefined : 'no-cache',
   }, options, {
     body: isBodyObj ? JSON.stringify(body) : body,
-    headers: isBodyObj || accept
+    headers: isBodyObj || accept || auth
       ? Object.assign({},
         headers,
         isBodyObj && { 'Content-Type': 'application/json' },
+        auth && { Authorization: `Basic ${btoa(decodeURIComponent(auth.slice(0, -1)))}` },
         accept && { accept })
       : headers,
   });
   const result = { url, status: -1 };
   try {
-    const resp = await fetch(url, init);
+    const urlNoAuth = auth ? scheme + hostname + urlTail : url;
+    const resp = await fetch(urlNoAuth, init);
     const loadMethod = {
       arraybuffer: 'arrayBuffer',
       blob: 'blob',
