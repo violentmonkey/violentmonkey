@@ -23,6 +23,7 @@ const envs = {
     || `v${version}-${exec('git rev-parse HEAD').slice(0, 7)}`,
 };
 
+envs.SOURCE_ZIP = `${envs.RELEASE_PREFIX}-${envs.VERSION}-source.zip`;
 envs.ASSET_ZIP = `${envs.RELEASE_PREFIX}-webext-v${envs.VERSION}.zip`;
 envs.ASSET_CWS_BETA_ZIP = `${envs.RELEASE_PREFIX}-webext-beta-v${envs.VERSION}.zip`;
 envs.ASSET_SELF_HOSTED_ZIP = `${envs.RELEASE_PREFIX}-webext-ffself-v${envs.VERSION}.zip`;

@@ -9,15 +9,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v1 # v1 keeps tags
         with:
           fetch-depth: 250 # for `action-helper`
           # persist-credentials: false # not implemented in v1
+
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
+
       - name: Prepare
         run: yarn && node scripts/action-helper.js
+
       - name: Build
         env:
           SYNC_GOOGLE_CLIENT_ID: ${{ secrets.SYNC_GOOGLE_CLIENT_ID }}
@@ -26,6 +30,9 @@ jobs:
           SYNC_ONEDRIVE_CLIENT_SECRET: ${{ secrets.SYNC_ONEDRIVE_CLIENT_SECRET }}
         run: |
           mkdir -p $ASSETS_DIR $TEMP_DIR
+
+          # Create source zip
+          git archive @ --format=zip > $TEMP_DIR/$SOURCE_ZIP
 
           # Build for release, also upload to GitHub assets
           yarn build
@@ -40,22 +47,23 @@ jobs:
           # Same as `yarn build:selfHosted` but only manifest is changed by now
           TARGET=selfHosted BETA=1 npx gulp manifest
           cd dist && zip -r ../$TEMP_DIR/$ASSET_SELF_HOSTED_ZIP . && cd ..
+
       - name: Publish to AMO
         id: signAMO
         continue-on-error: true
         run: |
           mkdir -p $TEMP_DIR/updates
           if [ "$PRERELEASE" != "true" ]; then
-              # Publish listed version
-              # XXX cannot submit source code yet, see mozilla/sign-addon#409
-              # node scripts/amo-sign
-              echo Please publish to AMO manually
+              # Publish listed version, ignore error since we don't need to download it
+              node scripts/amo-upload.mjs || 0
           fi
-          # Always publish unlisted version
-          BETA=1 node scripts/amo-sign
+          # Publish unlisted version
+          BETA=1 node scripts/amo-upload.mjs
         env:
           AMO_KEY: ${{ secrets.AMO_KEY }}
           AMO_SECRET: ${{ secrets.AMO_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Update updates.json
         uses: JamesIves/github-pages-deploy-action@4.1.0
         if: steps.signAMO.outcome == 'success'
@@ -63,6 +71,7 @@ jobs:
           branch: updates
           folder: ${{ env.TEMP_DIR }}/updates
           commit-message: Update to ${{ env.VERSION }} 🚀
+
       - name: Publish to CWS
         continue-on-error: true
         run: |
@@ -79,16 +88,9 @@ jobs:
           CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
-      - name: Create Release
+
+      - name: Create/Update Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -x
-          params=("-m" "$RELEASE_NAME" "-m" "$RELEASE_NOTE")
-          if [ "$PRERELEASE" = "true" ]; then
-            params+=("-p")
-          fi
-          for asset in $ASSETS_DIR/*; do
-            params+=("-a" "$asset")
-          done
-          hub release create "${params[@]}" v$VERSION
+          node -e 'require("./scripts/release-helper").uploadAssets()';
