@@ -35,6 +35,7 @@ function cacheOrFetch(handlers = {}) {
   async function doFetch(...args) {
     const [url, options] = args;
     try {
+      if (url.startsWith('data:')) return;
       const res = await request(url, init?.(options) || options);
       if (await isModified(res, url)) {
         const result = transform ? await transform(res, ...args) : res.data;

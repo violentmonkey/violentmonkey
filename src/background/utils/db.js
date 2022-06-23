@@ -1,5 +1,6 @@
 import {
-  compareVersion, i18n, getFullUrl, getScriptName, isRemote, sendCmd, trueJoin,
+  compareVersion, dataUri2text, i18n,
+  getFullUrl, getScriptName, isRemote, sendCmd, trueJoin,
 } from '#/common';
 import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '#/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
@@ -348,14 +349,18 @@ async function readEnvironmentData(env, isRetry) {
   const keys = [];
   STORAGE_ROUTES.forEach(([area, srcIds]) => {
     env[srcIds].forEach(id => {
-      keys.push(storage[area].getKey(id));
+      if (!/^data:/.test(id)) {
+        keys.push(storage[area].getKey(id));
+      }
     });
   });
   const data = await storage.base.getMulti(keys);
   for (const [area, srcIds] of STORAGE_ROUTES) {
     env[area] = {};
     for (const id of env[srcIds]) {
-      const val = data[storage[area].getKey(id)];
+      const val = /^data:/.test(id)
+        ? area !== 'require' && id || dataUri2text(id)
+        : data[storage[area].getKey(id)];
       env[area][id] = val;
       if (val == null && area !== 'value' && retriedStorageKeys[area + id] !== 2) {
         const err = `The "${area}" storage is missing "${id}"!`;

@@ -121,6 +121,16 @@ export function blob2base64(blob, offset = 0, length = 1e99) {
   });
 }
 
+export function dataUri2text(url) {
+  const i = url.indexOf(','); // a non-base64 data: uri may have many `,`
+  const meta = url.slice(0, i);
+  url = decodeURIComponent(url.slice(i + 1));
+  url = /(^|;)\s*base64\s*(;|$)/.test(meta) ? atob(url) : url;
+  return /[\x80-\xFF]/.test(url)
+    ? new TextDecoder().decode(string2uint8array(url))
+    : url;
+}
+
 export function string2uint8array(str) {
   const len = str.length;
   const array = new Uint8Array(len);
@@ -272,7 +282,7 @@ export async function request(url, options = {}) {
   if (url.startsWith('file://')) return requestLocalFile(url, options);
   const { body, headers, responseType } = options;
   const isBodyObj = body && body::({}).toString() === '[object Object]';
-  const [, scheme, auth, hostname, urlTail] = url.match(/^([-\w]+:\/\/)([^@/]*@)?([^/]*)(.*)/);
+  const [, scheme, auth, hostname, urlTail] = url.match(/^([-\w]+:\/\/)([^@/]*@)?([^/]*)(.*)|$/);
   const accept = FORCED_ACCEPT[hostname];
   // Not using ...spread because Babel mistakenly adds its polyfill to injected-web
   const init = Object.assign({

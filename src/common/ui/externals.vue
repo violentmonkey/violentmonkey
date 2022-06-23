@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { formatByteLength, string2uint8array } from '#/common';
+import { formatByteLength, dataUri2text } from '#/common';
 import VmCode from '#/common/ui/code';
 import storage from '#/common/storage';
 
@@ -67,7 +67,8 @@ export default {
       if (!url) return;
       const { install } = this;
       const isMain = install && !index;
-      const isReq = !isMain && type === '@require';
+      const isDataUri = url.startsWith('data:');
+      const isReq = !isMain && !isDataUri && type === '@require';
       const depsUrl = `${+!isReq}${url}`;
       let code;
       let contentType;
@@ -76,7 +77,9 @@ export default {
       if (isMain) {
         code = install.code;
       } else {
-        if (install) {
+        if (isDataUri) {
+          raw = url;
+        } else if (install) {
           raw = install.deps[depsUrl];
         } else {
           const key = this.value.custom.pathMap?.[url] || url;
@@ -94,12 +97,10 @@ export default {
             contentType = /^(png|jpe?g|bmp|svgz?|gz|zip)$/i.test(fileExt)
               ? ''
               : `text/${fileExt.toLowerCase()}`;
-            code = raw;
+          } else if (contentType) {
+            contentType = contentType.split(/[:;]/)[1];
           }
-          code = atob(code);
-          if (/[\x80-\xFF]/.test(code)) {
-            code = new TextDecoder().decode(string2uint8array(code));
-          }
+          code = dataUri2text(raw);
         }
       }
       this.img = img;
