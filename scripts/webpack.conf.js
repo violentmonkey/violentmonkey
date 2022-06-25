@@ -7,6 +7,7 @@ const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
 const { addWrapperWithGlobals, getCodeMirrorThemes, getUniqIdB64 } = require('./webpack-util');
 const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
 const projectConfig = require('./plaid.conf');
+const { getVersion } = require('./version-helper');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
 // Avoiding collisions with globals of a content-mode userscript
@@ -14,7 +15,7 @@ const INIT_FUNC_NAME = `Violentmonkey:${getUniqIdB64()}`;
 const VAULT_ID = '__VAULT_ID__';
 const HANDSHAKE_ID = '__HANDSHAKE_ID__';
 // eslint-disable-next-line import/no-dynamic-require
-const VM_VER = require(`${defaultOptions.distDir}/manifest.json`).version;
+const VM_VER = getVersion();
 const WEBPACK_OPTS = {
   node: {
     global: false,

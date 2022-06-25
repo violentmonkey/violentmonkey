@@ -8,8 +8,8 @@ async function readManifest() {
   return data;
 }
 
-async function buildManifest() {
-  const data = await readManifest();
+async function buildManifest(base) {
+  const data = base ? { ...base } : await readManifest();
   data.version = getVersion();
   if (process.env.TARGET === 'selfHosted') {
     data.browser_specific_settings.gecko.update_url = 'https://raw.githubusercontent.com/violentmonkey/violentmonkey/updates/updates.json';
@@ -49,7 +49,7 @@ class ListBackgroundScriptsPlugin {
     compiler.hooks.afterEmit.tap(this.constructor.name, async compilation => {
       const dist = compilation.outputOptions.path;
       const path = `${dist}/manifest.json`;
-      const manifest = JSON.parse(await fs.readFile(path, { encoding: 'utf8' }));
+      const manifest = await buildManifest();
       const bgId = 'background/index';
       const bgEntry = compilation.entrypoints.get(bgId);
       const scripts = bgEntry.chunks.map(c => c.files[0]);
