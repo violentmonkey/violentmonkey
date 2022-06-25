@@ -115,12 +115,14 @@ module.exports = {
     files: [
       '*.js',
       'scripts/*.js',
+      'scripts/*.mjs',
     ],
     env: { node: true },
     rules: {
       'global-require': 0,
       'import/newline-after-import': 0,
       'import/no-extraneous-dependencies': 0, // spits errors in github action
+      'import/extensions': 0,
     }
   }],
   rules: {

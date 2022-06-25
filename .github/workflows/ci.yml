@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 100 # for revision index in version and the `has-changed-path` action
       - uses: actions/setup-node@v2
         with:
-          node-version: '15'
+          node-version: '16'
 
       - name: Build
         env:
