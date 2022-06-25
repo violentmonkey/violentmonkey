@@ -1,0 +1,12 @@
+{
+  "addons": {
+    "{aecec67f-0d10-4fa7-b7c7-609a2db280cf}": {
+      "updates": [
+        {
+          "version": "2.13.0.21",
+          "update_link": "https://github.com/violentmonkey/violentmonkey/releases/download/v2.13.0.21/violentmonkey-2.13.0.21-an+fx.xpi"
+        }
+      ]
+    }
+  }
+}
