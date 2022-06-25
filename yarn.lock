@@ -1548,10 +1548,10 @@ alphanum-sort@^1.0.0:
   resolved "https://registry.yarnpkg.com/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
   integrity sha1-l6ERlkmyEa0zaR2fn0hqjsn74KM=
 
-amo-upload@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/amo-upload/-/amo-upload-0.1.2.tgz#95d8d579bb537f37faa49c081be6161967369aec"
-  integrity sha512-uWv2m/Jn12m0STOhNOP341w9KoAC2UwvVC+NdX4bP+6rx5fhsViqmLMSqRFaZd3I7FxGLZVYLgVvdK22DThlcQ==
+amo-upload@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/amo-upload/-/amo-upload-0.2.0.tgz#d8e5f17b9eec67a4cc9486f2c6049ce93e0ce840"
+  integrity sha512-a2OKJXFEoTrrqxlb0gi1gluGbwIlGl4y0DIMvn9vhbdCKKesp9DNxP5qNAKJK9L4CKWVcALl3SnX59/WJu4l7w==
   dependencies:
     "@babel/runtime" "^7.18.3"
     commander "^9.3.0"

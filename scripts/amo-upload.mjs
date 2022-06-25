@@ -1,8 +1,6 @@
-import { createWriteStream } from 'fs';
 import { rename, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { signAddon } from 'amo-upload';
-import fetch from 'node-fetch';
 import { readManifest, buildUpdatesList } from './manifest-helper.js';
 import { getVersion, isBeta } from './version-helper.js';
 import { hasAsset } from './release-helper.js';
@@ -27,7 +25,8 @@ async function main() {
     pollRetry: 0,
   };
 
-  const file = await signAddon({
+  const tempFile = join(process.env.TEMP_DIR, Math.random().toString(36).slice(2, 8).toString());
+  await signAddon({
     apiKey: process.env.AMO_KEY,
     apiSecret: process.env.AMO_SECRET,
     addonId: manifest.browser_specific_settings.gecko.id,
@@ -37,26 +36,15 @@ async function main() {
       ? join(process.env.TEMP_DIR, process.env.ASSET_SELF_HOSTED_ZIP)
       : join(process.env.ASSETS_DIR, process.env.ASSETS_ZIP),
     sourceFile: join(process.env.TEMP_DIR, process.env.SOURCE_ZIP),
+    output: tempFile,
     ...pollOptions,
   });
 
   const xpiFile = join(process.env.ASSETS_DIR, fileName);
-  await downloadFile(file.download_url, xpiFile);
+  await rename(tempFile, xpiFile);
 
   const updates = await buildUpdatesList(version, url);
   await writeFile(join(process.env.TEMP_DIR, 'updates/updates.json'), JSON.stringify(updates, null, 2), 'utf8');
-}
-
-async function downloadFile(url, file) {
-  const res = await fetch(url);
-  const tempFile = join(process.env.TEMP_DIR, Math.random().toString(36).slice(2, 8).toString());
-  const stream = createWriteStream(tempFile);
-  await new Promise((resolve, reject) => {
-    res.body.pipe(stream);
-    res.body.on('error', reject);
-    stream.on('finish', resolve);
-  });
-  await rename(tempFile, file);
 }
 
 main().catch(err => {
