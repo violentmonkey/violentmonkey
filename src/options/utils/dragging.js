@@ -44,10 +44,6 @@ let xyCache;
 export default function enableDragging(el, { onDrop }) {
   if (!parent) {
     parent = el.parentElement;
-    // pre-FF64 doesn't support `@media (pointer: coarse)`
-    if (isTouch && !matchMedia('(pointer: coarse)').matches) {
-      parent.classList.add('touch');
-    }
   }
   el::on(eventNames.start, isTouch ? onTouchStart : onDragStart);
   el::on(DROP_EVENT_RELAY, () => onDrop(index, lastIndex));
