@@ -226,6 +226,9 @@ footer {
     position: absolute;
     top: 0;
     right: 0;
+    .touch & {
+      display: flex !important;
+    }
   }
   &-button {
     padding: .5rem;

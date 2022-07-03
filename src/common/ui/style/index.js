@@ -72,3 +72,7 @@ Vue.prototype.CalcRows = val => val && (
   val.match(/$/gm).length
   + !val.endsWith('\n')
 );
+
+if ('ontouchstart' in document) {
+  document.documentElement.classList.add('touch');
+}

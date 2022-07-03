@@ -305,11 +305,6 @@ $removedItemHeight: calc(
   border: 1px solid var(--fill-3);
   border-radius: .3rem;
   transition: transform .25s;
-  // added in Chrome 41, FF64
-  @media (pointer: coarse) {
-    transition: none;
-  }
-  // fallback for pre-FF64
   .touch & {
     transition: none;
   }
