@@ -204,7 +204,7 @@ filterScopeName:
   message: 名字
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: 大小
 genericError:
   description: Label for generic error.
   message: 错误
@@ -385,10 +385,10 @@ labelName:
   message: 名字：
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: "在帧中运行:\_"
+  message: "在内联框架中运行:\_"
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: 名字为空
+  message: 名称为空
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
   message: 未找到脚本！
@@ -504,10 +504,13 @@ labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: 同步 $1 模式
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: ''
+  message: >-
+    仅当您有一个脚本需要在页面开始加载前运行，并且目前它运行得太晚时才启用。就像 Tampermonkey
+    中的即时注入模式一样，这个选项使用的是被废弃的同步 XHR，所以在  Chrome/Chromium
+    中，您会在开发者控制台看到警告，尽管您可以安全地忽略它们，因为在这种情况下的不利影响可以忽略不计。 您可以通过右键点击其中一个来永久隐藏这些警告。
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步时间为 $1
@@ -719,10 +722,10 @@ optionUiThemeAuto:
   message: 自动
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: 暗
+  message: 深色
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: 亮
+  message: 浅色
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 区分大小写

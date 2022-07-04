@@ -397,7 +397,7 @@ labelLineNumber:
   message: 'Sem linha.: '
 labelMatch:
   description: Label of @match rules.
-  message: '@match rules'
+  message: '@jogo de regras'
 labelName:
   description: Label of script name.
   message: 'Nome:'
