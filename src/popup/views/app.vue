@@ -103,7 +103,8 @@
                  @contextmenu.exact.stop="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
-          <div class="submenu-buttons" v-show="activeExtras === item || focusedItem === item">
+          <div class="submenu-buttons"
+               v-show="activeExtras === item || focusedItem === item || focusBug">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
             <div class="submenu-button" :tabIndex="tabIndex" @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
@@ -235,6 +236,7 @@ export default {
       options: optionsData,
       activeMenu: 'scripts',
       activeExtras: null,
+      focusBug: false,
       message: null,
       focusedItem: null,
       name: NAME,
@@ -504,6 +506,10 @@ export default {
         condition: '!inputFocus',
       }),
     ];
+  },
+  activated() {
+    // issue #1520: Firefox + Wayland doesn't autofocus the popup so CSS hover doesn't work
+    this.focusBug = !document.hasFocus();
   },
   beforeDestroy() {
     keyboardService.disable();
