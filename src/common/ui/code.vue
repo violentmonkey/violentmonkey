@@ -73,7 +73,7 @@ import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import ToggleButton from '#/common/ui/toggle-button';
-import { debounce, i18n } from '#/common';
+import { debounce, getUniqId, i18n } from '#/common';
 import { deepEqual, forEachEntry, objectPick } from '#/common/object';
 import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
@@ -82,12 +82,15 @@ import storage from '#/common/storage';
 /* eslint-disable no-control-regex */
 let maxDisplayLength;
 // Make sure this is still the longest line in the doc
-const CTRL_OPEN = '\x02'.repeat(256);
+const CTRL_OPEN = getUniqId('\x02'.repeat(256));
 const CTRL_CLOSE = '\x03'.repeat(256);
 const CTRL_RE = new RegExp(`${CTRL_OPEN}(\\d+)${CTRL_CLOSE}`, 'g');
 const PLACEHOLDER_CLS = 'too-long-placeholder';
 // To identify our CodeMirror markers we're using a Symbol since it's always unique
 const PLACEHOLDER_SYM = Symbol(PLACEHOLDER_CLS);
+const TRAIL_KILL_OPTION = 'killTrailingSpaceOnSave';
+const TRAIL_OPTION = 'showTrailingSpace';
+const TRAIL_OVERLAY = 'trailingspace';
 const cmDefaults = {
   continueComments: true,
   styleActiveLine: true,
@@ -104,7 +107,64 @@ const cmDefaults = {
    * 100kB is fast enough for the main editor (moreover such long lines are rare in the main script),
    * and is big enough to include most of popular minified libraries for the `@resource/@require` viewer. */
   maxDisplayLength: 100_000,
+  [TRAIL_KILL_OPTION]: true,
+  [TRAIL_OPTION]: true,
 };
+
+const killTrailingSpaces = (cm, placeholders) => {
+  const text = cm.getValue();
+  const trimmed = cm.options[TRAIL_KILL_OPTION]
+    ? text.replace(/\s+$/gm, '')
+    : text;
+  if (text !== trimmed) {
+    cm.operation(() => {
+      // `*` reuses the same undo record for performance
+      const origin = `*${TRAIL_KILL_OPTION}`;
+      const opts = { origin, scroll: false };
+      const oldSel = cm.doc.sel;
+      const newRanges = [];
+      let line = 0;
+      cm.eachLine(({ text: lineText }) => {
+        const m = /\s+$/.exec(lineText);
+        if (m) {
+          newRanges.push({
+            anchor: { line, ch: m.index },
+            head: { line, ch: lineText.length },
+          });
+        }
+        line += 1;
+      });
+      cm.setSelections(newRanges, 0, opts);
+      cm.replaceSelection('', 'end', origin);
+      cm.setSelections(oldSel.ranges, oldSel.primIndex, { origin });
+    });
+    placeholders.forEach(p => {
+      p.body = p.body.replace(/\s+$/, '');
+    });
+  }
+  return trimmed;
+};
+
+CodeMirror.defineOption(TRAIL_OPTION, false, (cm, val, prev) => {
+  if (prev === CodeMirror.Init) prev = false;
+  if (prev && !val) {
+    cm.removeOverlay(TRAIL_OVERLAY);
+  } else if (!prev && val) {
+    cm.addOverlay({
+      token(stream) {
+        const s = stream.string;
+        const i = /\s*$/.exec(s).index;
+        if (i > stream.pos) {
+          stream.pos = i;
+          return null;
+        }
+        stream.pos = s.length;
+        return TRAIL_OVERLAY;
+      },
+      name: TRAIL_OVERLAY,
+    });
+  }
+});
 
 export default {
   props: {
@@ -193,15 +253,19 @@ export default {
     createPlaceholders(change) {
       const { line } = change.from;
       let res = false;
+      let len;
+      let prefix;
       change.text.forEach((textLine, i) => {
         if (textLine.includes(CTRL_OPEN)) {
           textLine = this.getRealContent(textLine);
         }
-        if (textLine.length > maxDisplayLength) {
+        len = textLine.length - maxDisplayLength;
+        prefix = len > 0 ? textLine.match(/^\s*/)[0] : '';
+        len -= prefix.length;
+        if (len > 0 && len - textLine.match(/\s*$/)[0].length > 0) {
           res = true;
           this.placeholderId += 1;
           const id = this.placeholderId;
-          const prefix = textLine.match(/^\s*/)[0];
           const body = textLine.slice(prefix.length);
           const replaced = `${CTRL_OPEN}${id}${CTRL_CLOSE}`;
           this.placeholders.set(id, {
@@ -482,8 +546,15 @@ export default {
       e.preventDefault();
       e.stopImmediatePropagation();
     },
-    getRealContent(text = this.cm.getValue()) {
-      return text.replace(CTRL_RE, (_, id) => this.placeholders.get(+id)?.body || '');
+    getRealContent(text) {
+      const { placeholders } = this;
+      if (text == null) {
+        text = killTrailingSpaces(this.cm, placeholders);
+      }
+      if (placeholders.size) {
+        text = text.replace(CTRL_RE, (_, id) => placeholders.get(+id)?.body || '');
+      }
+      return text;
     },
     expandKeyMap(res, ...maps) {
       if (!res) {
@@ -625,6 +696,9 @@ $selectionDarkBg: rgba(80, 75, 65, .99);
 
 .cm-matchhighlight {
   background-color: hsla(168, 100%, 50%, 0.15);
+}
+.cm-trailingspace {
+  background: hsla(0, 100%, 50%, 0.15);
 }
 div.CodeMirror span.CodeMirror-matchingbracket { /* the same selector used in codemirror.css */
   color: unset;
