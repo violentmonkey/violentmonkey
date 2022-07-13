@@ -119,25 +119,17 @@ const killTrailingSpaces = (cm, placeholders) => {
     : text;
   if (text !== trimmed) {
     cm.operation(() => {
-      // `*` reuses the same undo record for performance
-      const origin = `*${TRAIL_KILL_OPTION}`;
-      const opts = { origin, scroll: false };
-      const oldSel = cm.doc.sel;
-      const newRanges = [];
       let line = 0;
       cm.eachLine(({ text: lineText }) => {
         const m = /\s+$/.exec(lineText);
         if (m) {
-          newRanges.push({
-            anchor: { line, ch: m.index },
-            head: { line, ch: lineText.length },
-          });
+          cm.replaceRange('',
+            { line, ch: m.index },
+            { line, ch: lineText.length },
+            `*${TRAIL_KILL_OPTION}`); // `*` reuses the same undo record for performance
         }
         line += 1;
       });
-      cm.setSelections(newRanges, 0, opts);
-      cm.replaceSelection('', 'end', origin);
-      cm.setSelections(oldSel.ranges, oldSel.primIndex, { origin });
     });
   }
   if (shouldKill) {
