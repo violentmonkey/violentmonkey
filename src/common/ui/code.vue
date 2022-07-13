@@ -113,7 +113,8 @@ const cmDefaults = {
 
 const killTrailingSpaces = (cm, placeholders) => {
   const text = cm.getValue();
-  const trimmed = cm.options[TRAIL_KILL_OPTION]
+  const shouldKill = cm.options[TRAIL_KILL_OPTION];
+  const trimmed = shouldKill
     ? text.replace(/\s+$/gm, '')
     : text;
   if (text !== trimmed) {
@@ -138,6 +139,9 @@ const killTrailingSpaces = (cm, placeholders) => {
       cm.replaceSelection('', 'end', origin);
       cm.setSelections(oldSel.ranges, oldSel.primIndex, { origin });
     });
+  }
+  if (shouldKill) {
+    // placeholders may have spaces independently from the editable portion of the code
     placeholders.forEach(p => {
       p.body = p.body.replace(/\s+$/, '');
     });
