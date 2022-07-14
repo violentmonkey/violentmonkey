@@ -6,7 +6,8 @@
       <div>
         <setting-check name="autoReload" :label="i18n('labelAutoReloadCurrentTab')" />
       </div>
-      <div>
+      <div class="ml-2c flex flex-col">
+        <!-- ml-2c indents children after the first one for visual grouping -->
         <setting-check name="editorWindow" class="mr-2" ref="EW">
           <tooltip :content="editorWindowHint" :disabled="!editorWindowHint">
             <span v-text="i18n('optionEditorWindow')"></span>
