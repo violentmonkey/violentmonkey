@@ -695,6 +695,9 @@ $selectionDarkBg: rgba(80, 75, 65, .99);
 }
 .cm-trailingspace {
   background: hsla(0, 100%, 50%, 0.15);
+  .CodeMirror-activeline & {
+    background: none;
+  }
 }
 div.CodeMirror span.CodeMirror-matchingbracket { /* the same selector used in codemirror.css */
   color: unset;
