@@ -694,10 +694,7 @@ $selectionDarkBg: rgba(80, 75, 65, .99);
   background-color: hsla(168, 100%, 50%, 0.15);
 }
 .cm-trailingspace {
-  background: hsla(0, 100%, 50%, 0.15);
-  .CodeMirror-activeline & {
-    background: none;
-  }
+  background: radial-gradient(cornflowerblue, transparent 1px) 0 50% / 1ch 1ch repeat-x;
 }
 div.CodeMirror span.CodeMirror-matchingbracket { /* the same selector used in codemirror.css */
   color: unset;
