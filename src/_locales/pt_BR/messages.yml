@@ -346,7 +346,7 @@ labelExclude:
   message: '@excluir regras'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@excluir jogo de regras'
+  message: '@exclude-match rules'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportar dados do script
@@ -397,7 +397,7 @@ labelLineNumber:
   message: 'Sem linha.: '
 labelMatch:
   description: Label of @match rules.
-  message: '@jogo de regras'
+  message: '@match rules'
 labelName:
   description: Label of script name.
   message: 'Nome:'
