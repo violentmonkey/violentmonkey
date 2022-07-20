@@ -38,6 +38,25 @@ const KEY_XHR_INJECT = 'xhrInject';
 const BAD_URL_CHAR = IS_FIREFOX
   ? /[#&',/:;?=+]/g // FF shows `@` fine as ASCII but mangles it as full-width
   : /[#&',/:;?=+@]/g;
+/** Userscript globals that are likely to be used hundreds of times per second */
+const INLINED_GLOBALS = [
+  'Array',
+  'Date',
+  'Boolean',
+  'Math',
+  'Node',
+  'Number',
+  'Object',
+  'Promise',
+  'clearTimeout',
+  'document',
+  'parseFloat',
+  'parseInt',
+  'performance',
+  'queueMicrotask',
+  'requestAnimationFrame',
+  'setTimeout',
+].join(',');
 const expose = {};
 let isApplied;
 let injectInto;
@@ -282,9 +301,17 @@ function prepareScript(script) {
   const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];
   const hasReqs = reqsSlices.length;
   const wrap = !meta.unwrap;
+  const { grant } = meta;
+  const grantNone = grant.length === 1 && grant[0] === 'none';
   const injectedCode = [
+    wrap && `window.${dataKey}=function(scope,${dataKey}){
+      try{
+        with(scope)
+        ${grantNone ? '' : `with(${dataKey})`}
+        ((define,module,exports)=>{
+          ${grantNone ? '' : `delete(${dataKey}); var{${INLINED_GLOBALS}}=this;`}
+    `.replace(/\s+/g, ''),
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    wrap && `window.${dataKey}=function(module,${dataKey}){try{with(module)((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs && wrap && '(()=>{',
