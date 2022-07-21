@@ -40,22 +40,15 @@ const BAD_URL_CHAR = IS_FIREFOX
   : /[#&',/:;?=+@]/g;
 /** Userscript globals that are likely to be used hundreds of times per second */
 const INLINED_GLOBALS = [
-  'Array',
   'Date',
   'Boolean',
   'Math',
   'Node',
   'Number',
   'Object',
-  'Promise',
-  'clearTimeout',
-  'document',
   'parseFloat',
   'parseInt',
   'performance',
-  'queueMicrotask',
-  'requestAnimationFrame',
-  'setTimeout',
 ].join(',');
 const expose = {};
 let isApplied;
