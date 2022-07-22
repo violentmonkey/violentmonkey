@@ -27,7 +27,7 @@ let componentUtils;
 export function makeGmApiWrapper(script) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-  const { dataKey, meta } = script;
+  const { meta } = script;
   const grant = meta.grant;
   let wrapper;
   let numGrants = grant.length;
@@ -42,7 +42,7 @@ export function makeGmApiWrapper(script) {
     id,
     script,
     resources,
-    dataKey,
+    dataKey: script.dataKey,
     resCache: createNullObj(),
   };
   const gmInfo = makeGmInfo(script, resources);
@@ -79,7 +79,9 @@ export function makeGmApiWrapper(script) {
   });
   if (numGrants) {
     wrapper = makeGlobalWrapper(gm);
-    gm[dataKey] = gm;
+    /* Exposing the fast cache of resolved properties,
+     * using a name that'll never be added to the web platform */
+    gm.c = gm;
   }
   return { gm, wrapper };
 }

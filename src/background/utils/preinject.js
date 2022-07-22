@@ -39,6 +39,9 @@ const BAD_URL_CHAR = IS_FIREFOX
   ? /[#&',/:;?=+]/g // FF shows `@` fine as ASCII but mangles it as full-width
   : /[#&',/:;?=+@]/g;
 const BIGINT = 'BigInt';
+const GRANT_NONE_VARS = `{GM,GM_info,unsafeWindow${
+  IS_FIREFOX ? '' : ',cloneInto,createObjectIn,exportFunction'
+}}`;
 /** Userscript globals that are likely to be used hundreds of times per second */
 const INLINED_GLOBALS = [
   BIGINT in global && BIGINT,
@@ -299,14 +302,14 @@ function prepareScript(script) {
   const { grant } = meta;
   const grantNone = grant.length === 1 && grant[0] === 'none';
   const injectedCode = [
-    wrap && `window.${dataKey}=function(scope,${dataKey}){
-      try{
-        with(scope)
-        ${grantNone ? '' : `with(${dataKey})`}
-        ((define,module,exports)=>{
-          ${grantNone ? '' : `delete(${dataKey}); var{${INLINED_GLOBALS}}=this;`}
-    `.replace(/\s+/g, ''),
+    wrap && `window.${dataKey}=function(${
+      // using a shadowed name to avoid scope pollution
+      grantNone ? GRANT_NONE_VARS : 'GM'}${
+      IS_FIREFOX ? `,${dataKey}){try{` : '){'}${
+      // inlining is inside a separate block scope to be fast
+      grantNone ? '' : `with(this)with(c){delete c;{let{${INLINED_GLOBALS}}=this;`
     // hiding module interface from @require'd scripts so they don't mistakenly use it
+    }((${grantNone ? 'define,module,exports' : ''})=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs && wrap && '(()=>{',
@@ -314,7 +317,7 @@ function prepareScript(script) {
     // adding a new line in case the code ends with a line comment
     !code.endsWith('\n') && '\n',
     hasReqs && wrap && '})()',
-    wrap && `})()}catch(e){${dataKey}(e)}}`,
+    wrap && `})()${grantNone ? '' : '}}'}${IS_FIREFOX ? `}catch(e){${dataKey}(e)}` : ''}}`,
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
     IS_FIREFOX && ';0',
     // Firefox lists .user.js among our own content scripts so a space at start will group them
