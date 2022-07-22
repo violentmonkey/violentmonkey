@@ -38,10 +38,12 @@ const KEY_XHR_INJECT = 'xhrInject';
 const BAD_URL_CHAR = IS_FIREFOX
   ? /[#&',/:;?=+]/g // FF shows `@` fine as ASCII but mangles it as full-width
   : /[#&',/:;?=+@]/g;
+const BIGINT = 'BigInt';
 /** Userscript globals that are likely to be used hundreds of times per second */
 const INLINED_GLOBALS = [
-  'Date',
+  BIGINT in global && BIGINT,
   'Boolean',
+  'Date',
   'Math',
   'Node',
   'Number',
@@ -49,7 +51,7 @@ const INLINED_GLOBALS = [
   'parseFloat',
   'parseInt',
   'performance',
-].join(',');
+]::trueJoin(',');
 const expose = {};
 let isApplied;
 let injectInto;
