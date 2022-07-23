@@ -286,7 +286,8 @@ function prepareScript(script) {
   const hasReqs = reqsSlices.length;
   const wrap = !meta.unwrap;
   const { grant } = meta;
-  const grantNone = grant.length === 1 && grant[0] === 'none';
+  const numGrants = grant.length;
+  const grantNone = !numGrants || numGrants === 1 && grant[0] === 'none';
   const injectedCode = [
     wrap && `window.${dataKey}=function(${
       // using a shadowed name to avoid scope pollution
