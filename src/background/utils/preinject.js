@@ -38,9 +38,7 @@ const KEY_XHR_INJECT = 'xhrInject';
 const BAD_URL_CHAR = IS_FIREFOX
   ? /[#&',/:;?=+]/g // FF shows `@` fine as ASCII but mangles it as full-width
   : /[#&',/:;?=+@]/g;
-const GRANT_NONE_VARS = `{GM,GM_info,unsafeWindow${
-  IS_FIREFOX ? '' : ',cloneInto,createObjectIn,exportFunction'
-}}`;
+const GRANT_NONE_VARS = '{GM,GM_info,unsafeWindow,cloneInto,createObjectIn,exportFunction}';
 const expose = {};
 let isApplied;
 let injectInto;
