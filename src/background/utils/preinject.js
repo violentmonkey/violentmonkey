@@ -38,6 +38,9 @@ const KEY_XHR_INJECT = 'xhrInject';
 const BAD_URL_CHAR = IS_FIREFOX
   ? /[#&',/:;?=+]/g // FF shows `@` fine as ASCII but mangles it as full-width
   : /[#&',/:;?=+@]/g;
+const GRANT_NONE_VARS = `{GM,GM_info,unsafeWindow${
+  IS_FIREFOX ? '' : ',cloneInto,createObjectIn,exportFunction'
+}}`;
 const expose = {};
 let isApplied;
 let injectInto;
@@ -282,9 +285,17 @@ function prepareScript(script) {
   const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];
   const hasReqs = reqsSlices.length;
   const wrap = !meta.unwrap;
+  const { grant } = meta;
+  const numGrants = grant.length;
+  const grantNone = !numGrants || numGrants === 1 && grant[0] === 'none';
   const injectedCode = [
+    wrap && `window.${dataKey}=function(${
+      // using a shadowed name to avoid scope pollution
+      grantNone ? GRANT_NONE_VARS : 'GM'}${
+      IS_FIREFOX ? `,${dataKey}){try{` : '){'}${
+      grantNone ? '' : 'with(this)with(c)delete c,'
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    wrap && `window.${dataKey}=function(module,${dataKey}){try{with(module)((define,module,exports)=>{`,
+    }((${grantNone ? 'define,module,exports' : ''})=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs && wrap && '(()=>{',
@@ -292,7 +303,7 @@ function prepareScript(script) {
     // adding a new line in case the code ends with a line comment
     !code.endsWith('\n') && '\n',
     hasReqs && wrap && '})()',
-    wrap && `})()}catch(e){${dataKey}(e)}}`,
+    wrap && `})()${IS_FIREFOX ? `}catch(e){${dataKey}(e)}` : ''}}`,
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
     IS_FIREFOX && ';0',
     // Firefox lists .user.js among our own content scripts so a space at start will group them

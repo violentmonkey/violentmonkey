@@ -29,7 +29,10 @@ export function makeGmApiWrapper(script) {
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const { meta } = script;
   const grant = meta.grant;
-  if (grant.length === 1 && grant[0] === 'none') {
+  let wrapper;
+  let numGrants = grant.length;
+  if (numGrants === 1 && grant[0] === 'none') {
+    numGrants = 0;
     grant.length = 0;
   }
   const { id } = script.props;
@@ -62,7 +65,7 @@ export function makeGmApiWrapper(script) {
   if (grant::indexOf(WINDOW_FOCUS) >= 0) {
     gm.focus = vmOwnFunc(() => bridge.post('TabFocus', 0, context));
   }
-  if (!gmApi && grant.length) gmApi = makeGmApi();
+  if (!gmApi && numGrants) gmApi = makeGmApi();
   grant::forEach((name) => {
     const gm4name = name::slice(0, 3) === 'GM.' && name::slice(3);
     const fn = gmApi[gm4name ? `GM_${GM4_ALIAS[gm4name] || gm4name}` : name];
@@ -74,7 +77,13 @@ export function makeGmApiWrapper(script) {
       }
     }
   });
-  return grant.length ? makeGlobalWrapper(gm) : gm;
+  if (numGrants) {
+    wrapper = makeGlobalWrapper(gm);
+    /* Exposing the fast cache of resolved properties,
+     * using a name that'll never be added to the web platform */
+    gm.c = gm;
+  }
+  return { gm, wrapper };
 }
 
 function makeGmInfo(script, resources) {
