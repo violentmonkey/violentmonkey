@@ -237,7 +237,6 @@ function xhrCallbackWrapper(req) {
     }
   };
   return (evt) => {
-    const type = evt.type;
     if (!contentType) {
       contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream';
     }
@@ -255,9 +254,13 @@ function xhrCallbackWrapper(req) {
         numChunks = chunked && Math.ceil(dataSize / CHUNK_SIZE) || 1;
       }
     }
+    const { type } = evt;
     const shouldNotify = req.eventsToNotify.includes(type);
     // only send response when XHR is complete
     const shouldSendResponse = xhr.readyState === 4 && shouldNotify && !sent;
+    if (!shouldNotify && type !== 'loadend') {
+      return;
+    }
     lastPromise = lastPromise.then(async () => {
       await req.cb({
         blobbed,
