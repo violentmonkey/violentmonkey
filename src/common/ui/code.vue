@@ -115,7 +115,7 @@ const killTrailingSpaces = (cm, placeholders) => {
   const text = cm.getValue();
   const shouldKill = cm.options[TRAIL_KILL_OPTION];
   const trimmed = shouldKill
-    ? text.replace(/\s+$/gm, '')
+    ? text.replace(/\s+$/gm, '\n')
     : text;
   if (text !== trimmed) {
     cm.operation(() => {
