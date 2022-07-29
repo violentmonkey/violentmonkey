@@ -57,7 +57,7 @@ export default {
     indentWithTabs: false,
     indentUnit: 2,
     tabSize: 2,
-    undoDepth: 200,
+    undoDepth: 500,
   },
   editorTheme: '',
   editorThemeName: null,
