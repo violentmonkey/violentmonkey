@@ -321,6 +321,7 @@ async function httpRequest(opts, src, cb) {
   if (!req || req.cb) return;
   req.cb = cb;
   req.anonymous = anonymous;
+  req.url = url;
   const { xhr } = req;
   const vmHeaders = [];
   const vmVerifyName = getUniqId(VM_VERIFY);
