@@ -271,7 +271,7 @@ function xhrCallbackWrapper(req) {
         numChunks,
         type,
         data: shouldNotify && {
-          finalUrl: req.url,
+          finalUrl: req.url || xhr.responseURL,
           ...getResponseHeaders(),
           ...objectPick(xhr, ['readyState', 'status', 'statusText']),
           ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
@@ -321,7 +321,6 @@ async function httpRequest(opts, src, cb) {
   if (!req || req.cb) return;
   req.cb = cb;
   req.anonymous = anonymous;
-  req.url = url;
   const { xhr } = req;
   const vmHeaders = [];
   const vmVerifyName = getUniqId(VM_VERIFY);
