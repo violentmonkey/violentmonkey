@@ -35,9 +35,7 @@ const KEY_EXPOSE = 'expose';
 const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
 const KEY_IS_APPLIED = 'isApplied';
 const KEY_XHR_INJECT = 'xhrInject';
-const BAD_URL_CHAR = IS_FIREFOX
-  ? /[#&',/:;?=+]/g // FF shows `@` fine as ASCII but mangles it as full-width
-  : /[#&',/:;?=+@]/g;
+const BAD_URL_CHAR = /[#/?]/g; // will be encoded to avoid splitting the URL in devtools UI
 const GRANT_NONE_VARS = '{GM,GM_info,unsafeWindow,cloneInto,createObjectIn,exportFunction}';
 const expose = {};
 let isApplied;
