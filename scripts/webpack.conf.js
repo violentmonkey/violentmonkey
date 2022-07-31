@@ -126,6 +126,8 @@ module.exports = Promise.all([
     config.plugins.push(new ListBackgroundScriptsPlugin({
       minify: false, // keeping readable
     }));
+    config.module.rules.find(r => r.loader === 'vue-loader')
+    .options.compiler = require('vue-template-babel-compiler');
   }),
 
   modify('injected', './src/injected', (config) => {

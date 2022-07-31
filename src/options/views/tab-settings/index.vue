@@ -14,7 +14,7 @@
           </tooltip>
         </setting-check>
         <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')"
-                       v-show="($refs.EW || {}).value"/>
+                       v-show="$refs.EW?.value"/>
       </div>
       <div class="ml-2c">
         <label>
@@ -78,6 +78,7 @@
     <vm-sync></vm-sync>
     <details v-for="(obj, key) in {showAdvanced: settings}" :key="key" :open="obj[key]">
       <summary @click.prevent="obj[key] = !obj[key]">
+        <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component -->
         <component v-text="i18n('labelAdvanced')" class="inline-block"
                    :is="obj[key] ? 'h1' : 'h3'"/>
       </summary>
