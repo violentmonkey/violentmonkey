@@ -1,5 +1,4 @@
 import { getActiveTab, noop, sendTabCmd, getFullUrl } from '#/common';
-import { deepCopy } from '#/common/object';
 import ua from '#/common/ua';
 import { extensionRoot } from './init';
 import { commands } from './message';
@@ -11,9 +10,9 @@ Object.assign(commands, {
   /**
    * @param {string} [pathId] - path or id to add to #scripts route in dashboard,
      if absent a new script will be created for active tab's URL
-   * @returns {Promise<{id: number}>}
+   * @returns {Promise<chrome.tabs.Tab>}
    */
-  async OpenEditor(pathId) {
+  async OpenEditor(pathId, src) {
     if (!pathId) {
       const { tab, domain } = await commands.GetTabDomain();
       const id = domain && commands.CacheNewScript({
@@ -26,14 +25,12 @@ Object.assign(commands, {
     // Firefox until v56 doesn't support moz-extension:// pattern in browser.tabs.query()
     for (const view of browser.extension.getViews()) {
       if (view.location.href === url) {
-        // deep-copying to avoid dead objects
-        const tab = deepCopy(await view.browser.tabs.getCurrent());
-        browser.tabs.update(tab.id, { active: true });
-        browser.windows.update(tab.windowId, { focused: true });
-        return tab;
+        const { id: tabId, windowId } = await view.browser.tabs.getCurrent();
+        browser.windows.update(windowId, { focused: true });
+        return browser.tabs.update(tabId, { active: true });
       }
     }
-    return commands.TabOpen({ url, maybeInWindow: true });
+    return commands.TabOpen({ url, maybeInWindow: true }, src);
   },
   /** @return {Promise<{ id: number } | chrome.tabs.Tab>} new tab is returned for internal calls */
   async TabOpen({
