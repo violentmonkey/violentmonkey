@@ -19,6 +19,7 @@ import './utils/icon';
 import './utils/notifications';
 import './utils/script';
 import './utils/tabs';
+import './utils/tab-redirector';
 import './utils/tester';
 import './utils/update';
 
