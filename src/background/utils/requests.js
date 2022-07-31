@@ -5,7 +5,7 @@ import cache from './cache';
 import { commands } from './message';
 import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify,
-} from './requests-api';
+} from './requests-core';
 
 Object.assign(commands, {
   /** @return {void} */

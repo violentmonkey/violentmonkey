@@ -97,9 +97,8 @@ function onHeadersReceived({ responseHeaders: headers, requestId, url }) {
 
 /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
 function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
-  let vmVerifyHeader;
   // only the first call during a redirect/auth chain will have VM-Verify header
-  const reqId = verify[requestId] || (vmVerifyHeader = headers.find(isVmVerify))?.value;
+  const reqId = verify[requestId] || headers.find(isVmVerify)?.value;
   const req = requests[reqId];
   if (req) {
     verify[requestId] = reqId;
@@ -108,9 +107,6 @@ function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
     headers = (req.noNativeCookie ? headers.filter(isNotCookie) : headers)
     .concat(headersToInject[reqId] || [])
     .filter(req.anonymous ? isSendableAnon : isSendable);
-  }
-  if (vmVerifyHeader) {
-    delete verify[vmVerifyHeader.name];
   }
   return { requestHeaders: headers };
 }
