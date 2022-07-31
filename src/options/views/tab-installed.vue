@@ -122,9 +122,8 @@
           :script="script"
           :draggable="!showRecycle && filters.sort.value === 'exec'"
           :visible="index < batchRender.limit"
-          :nameClickable="filters.viewTable"
+          :viewTable="filters.viewTable"
           :hotkeys="scriptHotkeys"
-          @edit="handleActionEdit"
           @remove="handleActionRemove"
           @restore="handleActionRestore"
           @toggle="handleActionToggle"
@@ -508,9 +507,6 @@ export default {
         id: script.props.id,
         removed,
       });
-    },
-    handleActionEdit(script) {
-      this.editScript(script.props.id);
     },
     handleActionRemove(script) {
       this.markRemove(script, 1);

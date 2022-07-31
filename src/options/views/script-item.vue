@@ -13,17 +13,22 @@
     @focus="onFocus"
     @blur="onBlur">
     <div class="script-icon hidden-xs">
-      <a @click="onEdit" :data-hotkey="hotkeys.edit" data-hotkey-table tabIndex="-1">
+      <a :href="url"
+         :data-hotkey="hotkeys.edit" data-hotkey-table tabIndex="-1">
         <img :src="script.safeIcon">
       </a>
     </div>
     <div class="script-info flex ml-1c">
       <span class="script-order" v-text="script.props.position"/>
-      <span
+      <a v-if="viewTable"
+         class="script-name ellipsis flex-auto"
+         v-text="script.$cache.name"
+         :href="url"
+         :tabIndex="tabIndex"
+      />
+      <span v-else
         class="script-name ellipsis flex-auto"
         v-text="script.$cache.name"
-        @click.exact="nameClickable && onEdit()"
-        :tabIndex="nameClickable ? tabIndex : -1"
       />
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
@@ -64,7 +69,8 @@
       <template v-if="canRender">
         <div class="flex-auto flex flex-wrap">
           <tooltip :content="i18n('buttonEdit')" align="start">
-            <a class="btn-ghost" @click="onEdit" :data-hotkey="hotkeys.edit" :tabIndex="tabIndex">
+            <a class="btn-ghost" :data-hotkey="hotkeys.edit" :tabIndex="tabIndex"
+               :href="url">
               <icon name="code"></icon>
             </a>
           </tooltip>
@@ -144,7 +150,7 @@ export default {
     'script',
     'draggable',
     'visible',
-    'nameClickable',
+    'viewTable',
     'focused',
     'hotkeys',
     'showHotkeys',
@@ -212,6 +218,7 @@ export default {
     tabIndex() {
       return this.focused ? 0 : -1;
     },
+    url: vm => `#scripts/${vm.script.props.id}`,
   },
   watch: {
     visible(visible) {
@@ -243,9 +250,6 @@ export default {
     });
   },
   methods: {
-    onEdit() {
-      this.$emit('edit', this.script);
-    },
     onRemove() {
       this.$emit('remove', this.script);
     },
@@ -413,6 +417,7 @@ $removedItemHeight: calc(
   &-name {
     font-weight: 500;
     font-size: $nameFontSize;
+    color: inherit;
     .disabled & {
       color: var(--fill-8);
     }
@@ -506,6 +511,11 @@ $removedItemHeight: calc(
       }
       &-name {
         cursor: pointer;
+        align-self: stretch;
+        display: flex;
+        align-items: center;
+        -moz-user-select: none;
+        user-select: none;
       }
       &-icon {
         width: 2rem;
@@ -516,6 +526,7 @@ $removedItemHeight: calc(
       &-info {
         order: 2;
         flex: 1;
+        align-self: stretch;
         margin-left: .5rem;
         line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
         .size {
