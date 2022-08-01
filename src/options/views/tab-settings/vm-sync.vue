@@ -20,7 +20,7 @@
       </tooltip>
       <p v-if="state" v-text="state.message"/>
     </div>
-    <fieldset class="mt-1c" v-if="state && state.authType === 'password'">
+    <fieldset class="mt-1c" v-if="state?.authType === 'password'">
       <label class="sync-server-url">
         <span v-text="i18n('labelSyncServerUrl')"></span>
         <input
@@ -63,7 +63,7 @@
         />
       </div>
     </fieldset>
-    <div v-if="service && service.name">
+    <div v-if="service?.name">
       <setting-check name="syncScriptStatus" :label="i18n('labelSyncScriptStatus')" />
     </div>
   </section>

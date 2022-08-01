@@ -124,6 +124,11 @@ module.exports = {
       'import/no-extraneous-dependencies': 0, // spits errors in github action
       'import/extensions': 0,
     }
+  }, {
+    files: ['*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 0,
+    },
   }],
   rules: {
     'import/extensions': ['error', 'ignorePackages', {

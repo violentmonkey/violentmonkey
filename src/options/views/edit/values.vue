@@ -46,6 +46,7 @@
          @keydown.down.exact="onUpDown"
          @keydown.up.exact="onUpDown"
          v-if="trash">
+      <!-- eslint-disable-next-line vue/no-unused-vars -->
       <div v-for="([key, val, displayVal, len], trashKey) in trash" :key="trashKey"
            class="edit-values-row flex"
            @click="onRestore(trashKey)">

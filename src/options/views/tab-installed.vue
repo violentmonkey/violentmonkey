@@ -439,6 +439,7 @@ export default {
           limit += step || 1;
         }
         batchRender.limit = limit;
+        // eslint-disable-next-line vue/valid-next-tick
         await new Promise(resolve => this.$nextTick(resolve));
         if (!step && performance.now() - startTime >= MAX_BATCH_DURATION) {
           step = limit * 2; // the first batch is slow to render because it has more work to do

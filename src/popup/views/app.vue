@@ -163,7 +163,7 @@
          @click.prevent="onInjectionFailureFix"/>
     </div>
     <div class="incognito"
-       v-if="store.currentTab && store.currentTab.incognito"
+       v-if="store.currentTab?.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
     <footer>
       <a href="https://violentmonkey.github.io/" :tabIndex="tabIndex" @click.prevent="onVisitWebsite" v-text="i18n('visitWebsite')" />

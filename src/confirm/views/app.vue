@@ -57,7 +57,7 @@
           <button v-text="i18n('buttonClose')" @click="close"/>
           <div class="flex flex-col my-1">
             <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
-                           :data-disabled="isLocal && ($refs.trackLocalFile || {}).value"
+                           :data-disabled="isLocal && $refs.trackLocalFile?.value"
                            ref="closeAfterInstall" />
             <setting-check name="trackLocalFile" @change="trackLocalFile" ref="trackLocalFile"
                            :data-disabled="!isLocal">

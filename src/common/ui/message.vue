@@ -2,6 +2,7 @@
   <div class="message modal-content" :class="{ multiline: /\n/.test(message.text) }">
     <div class="mb-1" v-if="message.text" v-text="message.text"></div>
     <form v-if="message.buttons" @submit.prevent>
+      <!-- eslint-disable-next-line vue/no-mutating-props -->
       <input class="mb-1" type="text" v-if="message.input !== false" v-model="message.input">
       <div class="mr-1c">
         <button
