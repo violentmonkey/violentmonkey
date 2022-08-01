@@ -13,23 +13,16 @@
     @focus="onFocus"
     @blur="onBlur">
     <div class="script-icon hidden-xs">
-      <a :href="url"
-         :data-hotkey="hotkeys.edit" data-hotkey-table tabIndex="-1">
+      <a :href="url" :data-hotkey="hotkeys.edit" data-hotkey-table tabIndex="-1">
         <img :src="script.safeIcon">
       </a>
     </div>
     <div class="script-info flex ml-1c">
       <span class="script-order" v-text="script.props.position"/>
-      <a v-if="viewTable"
-         class="script-name ellipsis flex-auto"
-         v-text="script.$cache.name"
-         :href="url"
-         :tabIndex="tabIndex"
-      />
-      <span v-else
-        class="script-name ellipsis flex-auto"
-        v-text="script.$cache.name"
-      />
+      <!-- eslint-disable-next-line vue/require-component-is -->
+      <component class="script-name ellipsis flex-auto" v-bind="viewTable
+        ? { is: 'a', href: url, tabIndex }
+        : { is: 'span' }">{{script.$cache.name}}</component>
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
                  class="script-author ml-1c hidden-sm"
@@ -44,8 +37,7 @@
           />
           <span class="ellipsis" v-else v-text="author.name" />
         </tooltip>
-        <span class="version ellipsis"
-              v-text="script.meta.version ? `v${script.meta.version}` : ''"/>
+        <span class="version ellipsis" v-text="script.meta.version"/>
         <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end">
           {{ script.$cache.size }}
         </tooltip>
@@ -69,8 +61,7 @@
       <template v-if="canRender">
         <div class="flex-auto flex flex-wrap">
           <tooltip :content="i18n('buttonEdit')" align="start">
-            <a class="btn-ghost" :data-hotkey="hotkeys.edit" :tabIndex="tabIndex"
-               :href="url">
+            <a class="btn-ghost" :href="url" :data-hotkey="hotkeys.edit" :tabIndex="tabIndex">
               <icon name="code"></icon>
             </a>
           </tooltip>
@@ -218,7 +209,9 @@ export default {
     tabIndex() {
       return this.focused ? 0 : -1;
     },
-    url: vm => `#scripts/${vm.script.props.id}`,
+    url() {
+      return `#scripts/${this.script.props.id}`;
+    },
   },
   watch: {
     visible(visible) {
@@ -511,11 +504,9 @@ $removedItemHeight: calc(
       }
       &-name {
         cursor: pointer;
-        align-self: stretch;
         display: flex;
+        align-self: stretch;
         align-items: center;
-        -moz-user-select: none;
-        user-select: none;
       }
       &-icon {
         width: 2rem;
@@ -534,12 +525,15 @@ $removedItemHeight: calc(
           text-align: right;
         }
         .updated, .version {
-          width: 6em;
           text-align: right;
           color: var(--fill-8);
         }
         .updated {
           width: 3em;
+        }
+        .version:not(:empty)::before {
+          width: 6em;
+          content: 'v';
         }
       }
       &-buttons {
