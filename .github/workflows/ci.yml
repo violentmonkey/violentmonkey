@@ -5,7 +5,7 @@ on:
   push:
     branches: [master]
     tags-ignore:
-      - v* # version-tagged commits are releases which have their own workflow
+      - 'v*' # version-tagged commits are releases which have their own workflow
     paths-ignore:
       - '.github/**' # this ci.yml is also excluded so you need to re-run it explicitly if necessary
       - LICENSE
