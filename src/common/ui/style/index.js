@@ -60,8 +60,10 @@ options.hook((changes) => {
   }
   if ((v = changes.customCSS) != null) {
     style = setStyle(v, style);
-    if (localStorage[CACHE_KEY] !== v) {
+    if (v && localStorage[CACHE_KEY] !== v) {
       localStorage[CACHE_KEY] = v;
+    } else if (!v && CACHE_KEY in localStorage) {
+      delete localStorage[CACHE_KEY];
     }
   }
 });
