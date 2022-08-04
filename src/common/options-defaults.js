@@ -24,7 +24,7 @@ export default {
   blacklist: null,
   syncScriptStatus: true,
   sync: null,
-  customCSS: null,
+  customCSS: '',
   importScriptData: true,
   importSettings: true,
   notifyUpdates: false,
@@ -75,9 +75,6 @@ export default {
 // @description {{date}}
 // ==/UserScript==
 `,
-  // Enables automatic updates to the default template with new versions of VM
-  /** @type {?Boolean} this must be |null| for template-hook.js upgrade routine */
-  scriptTemplateEdited: null,
   showAdvanced: true,
   /** @typedef {'' | 'dark' | 'light'} VMUiTheme */
   /** @type VMUiTheme */

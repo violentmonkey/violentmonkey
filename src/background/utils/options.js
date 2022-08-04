@@ -1,7 +1,5 @@
-import {
-  debounce, ensureArray, initHooks, normalizeKeys,
-} from '#/common';
-import { mapEntry, objectGet, objectSet } from '#/common/object';
+import { debounce, ensureArray, initHooks, normalizeKeys } from '#/common';
+import { deepCopy, deepEqual, mapEntry, objectGet, objectSet } from '#/common/object';
 import defaults from '#/common/options-defaults';
 import { preInitialize } from './init';
 import { commands } from './message';
@@ -21,19 +19,36 @@ Object.assign(commands, {
   },
 });
 
-let changes = {};
+const STORAGE_KEY = 'options';
+const VERSION = 'version';
+const TPL_KEY = 'scriptTemplate';
+const TPL_OLD_VAL = `\
+// ==UserScript==
+// @name New Script
+// @namespace Violentmonkey Scripts
+// @match {{url}}
+// @grant none
+// ==/UserScript==
+`;
+const DELAY = 100;
 const hooks = initHooks();
-const callHooksLater = debounce(callHooks, 100);
-
+const callHooksLater = debounce(callHooks, DELAY);
+const writeOptionsLater = debounce(writeOptions, DELAY);
+let changes = {};
 let options = {};
-let initPending = browser.storage.local.get('options')
+let initPending = browser.storage.local.get(STORAGE_KEY)
 .then(({ options: data }) => {
   if (data && typeof data === 'object') options = data;
-  if (process.env.DEBUG) {
-    console.log('options:', options); // eslint-disable-line no-console
+  if (process.env.DEBUG) console.info('options:', options);
+  if (!options[VERSION]) {
+    setOption(VERSION, 1);
   }
-  if (!objectGet(options, 'version')) {
-    setOption('version', 1);
+  if (options[TPL_KEY] === TPL_OLD_VAL) {
+    options[TPL_KEY] = defaults[TPL_KEY]; // will be detected by omitDefaultValue below
+  }
+  if (Object.keys(options).map(omitDefaultValue).some(Boolean)) {
+    delete options[`${TPL_KEY}Edited`]; // TODO: remove this in 2023
+    writeOptionsLater();
   }
   initPending = null;
 });
@@ -56,34 +71,38 @@ function callHooks() {
 export function getOption(key, def) {
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
-  let value = options[mainKey];
-  if (value == null) value = defaults[mainKey];
-  if (value == null) value = def;
+  const value = options[mainKey] ?? deepCopy(defaults[mainKey]) ?? def;
   return keys.length > 1 ? objectGet(value, keys.slice(1), def) : value;
 }
 
-export function setOption(key, value) {
-  if (initPending) {
-    initPending.then(() => {
-      setOption(key, value);
-    });
+export async function setOption(key, value) {
+  if (initPending) await initPending;
+  const keys = normalizeKeys(key);
+  const mainKey = keys[0];
+  if (!defaults::hasOwnProperty(mainKey)) {
+    if (process.env.DEBUG) console.info('Unknown option:', keys.join('.'), value, options);
     return;
   }
-  const keys = normalizeKeys(key);
-  const optionKey = keys.join('.');
-  let optionValue = value;
-  const mainKey = keys[0];
-  if (mainKey in defaults) {
-    if (keys.length > 1) {
-      optionValue = objectSet(getOption(mainKey), keys.slice(1), value);
-    }
-    options[mainKey] = optionValue;
-    browser.storage.local.set({ options });
-    fireChange(keys, value);
-    if (process.env.DEBUG) {
-      console.log('Options updated:', optionKey, value, options); // eslint-disable-line no-console
-    }
+  const subKey = keys.length > 1 && keys.slice(1);
+  const mainVal = getOption([mainKey]);
+  if (deepEqual(value, subKey ? objectGet(mainVal, subKey) : mainVal)) {
+    if (process.env.DEBUG) console.info('Option unchanged:', keys.join('.'), value, options);
+    return;
   }
+  options[mainKey] = subKey ? objectSet(mainVal, subKey, value) : value;
+  omitDefaultValue(mainKey);
+  writeOptionsLater();
+  fireChange(keys, value);
+  if (process.env.DEBUG) console.info('Options updated:', keys.join('.'), value, options);
+}
+
+function writeOptions() {
+  return browser.storage.local.set({ [STORAGE_KEY]: options });
+}
+
+function omitDefaultValue(key) {
+  return deepEqual(options[key], defaults[key])
+    && delete options[key];
 }
 
 export const hookOptions = hooks.hook;

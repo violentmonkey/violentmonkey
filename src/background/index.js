@@ -10,7 +10,6 @@ import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
 import { popupTabs } from './utils/popup-tracker';
 import { getInjectedScripts } from './utils/preinject';
-import { SCRIPT_TEMPLATE, resetScriptTemplate } from './utils/template-hook';
 import { resetValueOpener, addValueOpener } from './utils/values';
 import { clearRequestsByTabId } from './utils/requests';
 import './utils/clipboard';
@@ -26,9 +25,6 @@ import './utils/update';
 hookOptions((changes) => {
   if ('autoUpdate' in changes) {
     autoUpdate();
-  }
-  if (SCRIPT_TEMPLATE in changes) {
-    resetScriptTemplate(changes);
   }
   sendCmd('UpdateOptions', changes);
 });
