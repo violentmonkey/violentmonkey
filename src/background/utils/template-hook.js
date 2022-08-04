@@ -1,5 +1,6 @@
+import defaults from '#/common/options-defaults';
 import { postInitialize } from './init';
-import { getDefaultOption, getOption, setOption } from './options';
+import { getOption, setOption } from './options';
 
 export const SCRIPT_TEMPLATE = 'scriptTemplate';
 const SCRIPT_TEMPLATE_EDITED = `${SCRIPT_TEMPLATE}Edited`;
@@ -23,13 +24,13 @@ postInitialize.push(() => {
     if (edited) setOption(SCRIPT_TEMPLATE_EDITED, true);
     else resetScriptTemplate();
   // When updating VM, update to the new default template
-  } else if (template !== getDefaultOption(SCRIPT_TEMPLATE)) {
+  } else if (template !== defaults[SCRIPT_TEMPLATE]) {
     resetScriptTemplate();
   }
 });
 
 export function resetScriptTemplate(changes = {}) {
-  const defaultTemplate = getDefaultOption(SCRIPT_TEMPLATE);
+  const defaultTemplate = defaults[SCRIPT_TEMPLATE];
   let template = changes[SCRIPT_TEMPLATE];
   if (!template) {
     template = defaultTemplate;

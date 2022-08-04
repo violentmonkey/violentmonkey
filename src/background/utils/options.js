@@ -62,10 +62,6 @@ export function getOption(key, def) {
   return keys.length > 1 ? objectGet(value, keys.slice(1), def) : value;
 }
 
-export function getDefaultOption(key) {
-  return objectGet(defaults, key);
-}
-
 export function setOption(key, value) {
   if (initPending) {
     initPending.then(() => {
