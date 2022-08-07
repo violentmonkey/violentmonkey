@@ -27,17 +27,7 @@ const MAIN_RULES = [
     OPTIONAL,
   ], [
     new RegExp(`var (__webpack_module_cache__|${G.require}) = {};.*?var ${G.exports} =`, 's'),
-    function (src, group1) {
-      let guard = '';
-      if (group1 !== G.require) {
-        // webpack didn't concatenate all modules into one, let's patch the machinery
-        const props = src.match(new RegExp(`(?<=\\b${G.require}\\.)(\\w+)`, 'g'));
-        const uniq = [...new Set(props)].join('');
-        if (uniq) guard = `for (let i = 0, props=${JSON.stringify(uniq)}; i < props.length; i++)
-          defineProperty(${G.require}, props[i], {__proto__: null, value: 0, writable: 1});\n`;
-      }
-      return guard + replace(guard ? BOOTSTRAP_RULES : [OBJ_RULE], src, this);
-    },
+    patchBootstrap,
   ], [
     new RegExp(`(${[
       `${G.definePropertyGetters}\\(${G.exports}, {`,
@@ -65,27 +55,35 @@ class WebpackProtectBootstrapPlugin {
   }
 }
 
+function patchBootstrap(src, group1) {
+  let guard = '';
+  if (group1 !== G.require) {
+    // webpack didn't concatenate all modules into one, let's patch the machinery
+    const props = src.match(new RegExp(`(?<=\\b${G.require}\\.)(\\w+)`, 'g'));
+    const uniq = [...new Set(props)].join('');
+    if (uniq) {
+      guard = `for (let i = 0, props=${JSON.stringify(uniq)}; i < props.length; i++)
+      defineProperty(${G.require}, props[i], {__proto__: null, value: 0, writable: 1});\n`;
+    }
+  }
+  return guard + replace(guard ? BOOTSTRAP_RULES : [OBJ_RULE], src, this);
+}
+
 function replace(rules, src, info) {
-  if (!src) return src;
-  if (src.source) src = src.source();
   let res = src;
   for (const rule of rules) {
-    if (typeof rule === 'function') {
-      res = rule(res);
-    } else {
-      const [from, to, mandatory = true] = rule;
-      const fromRe = typeof from === 'string'
-        ? new RegExp(escapeStringRegexp(from), 'g')
-        : from;
-      const dst = res.replace(fromRe, typeof to === 'function' ? to.bind(info) : to);
-      if (dst === res && mandatory) {
-        const err = `[${WebpackProtectBootstrapPlugin.name}] `
-          + `"${from}" not found in ${info?.chunk.name || 'bootstrap'}`;
-        console.log(`${err}:\n${src}`);
-        throw new Error(err);
-      }
-      res = dst;
+    const [from, to, mandatory = true] = rule;
+    const fromRe = typeof from === 'string'
+      ? new RegExp(escapeStringRegexp(from), 'g')
+      : from;
+    const dst = res.replace(fromRe, to.bind?.(info) || to);
+    if (dst === res && mandatory) {
+      const err = `[${WebpackProtectBootstrapPlugin.name}] `
+        + `"${from}" not found in ${info.chunk.name || 'bootstrap'}`;
+      console.log(`${err}:\n${src}`); // this prints immediately
+      throw new Error(err); // this prints at the end of build
     }
+    res = dst;
   }
   return res;
 }
