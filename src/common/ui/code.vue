@@ -71,13 +71,13 @@ import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
-import Tooltip from 'vueleton/lib/tooltip/bundle';
-import ToggleButton from '#/common/ui/toggle-button';
-import { debounce, getUniqId, i18n } from '#/common';
-import { deepEqual, forEachEntry, objectPick } from '#/common/object';
-import hookSetting from '#/common/hook-setting';
-import options from '#/common/options';
-import storage from '#/common/storage';
+import Tooltip from 'vueleton/lib/tooltip';
+import ToggleButton from '@/common/ui/toggle-button';
+import { debounce, getUniqId, i18n } from '@/common';
+import { deepEqual, forEachEntry, objectPick } from '@/common/object';
+import hookSetting from '@/common/hook-setting';
+import options from '@/common/options';
+import storage from '@/common/storage';
 
 /* eslint-disable no-control-regex */
 let maxDisplayLength;
@@ -630,7 +630,7 @@ export default {
       }
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.onActive(false);
   },
 };

@@ -7,25 +7,27 @@
             :closeAfterClick="true"
             :class="{active: menuNewActive}"
             @stateChange="onStateChange">
-            <tooltip :content="i18n('buttonNew')" placement="bottom" align="start" slot="toggle">
+            <tooltip :content="i18n('buttonNew')" placement="bottom" align="start">
               <a class="btn-ghost" tabindex="0">
                 <icon name="plus"></icon>
               </a>
             </tooltip>
-            <a
-              class="dropdown-menu-item"
-              v-text="i18n('buttonNew')"
-              tabindex="0"
-              @click.prevent="editScript('_new')"
-            />
-            <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank" rel="noopener noreferrer"></a>
-            <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank" rel="noopener noreferrer"></a>
-            <a
-              class="dropdown-menu-item"
-              v-text="i18n('buttonInstallFromURL')"
-              tabindex="0"
-              @click.prevent="installFromURL"
-            />
+            <template #content>
+              <a
+                class="dropdown-menu-item"
+                v-text="i18n('buttonNew')"
+                tabindex="0"
+                @click.prevent="editScript('_new')"
+              />
+              <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank" rel="noopener noreferrer"></a>
+              <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank" rel="noopener noreferrer"></a>
+              <a
+                class="dropdown-menu-item"
+                v-text="i18n('buttonInstallFromURL')"
+                tabindex="0"
+                @click.prevent="installFromURL"
+              />
+            </template>
           </dropdown>
           <tooltip :content="i18n('buttonUpdateAll')" placement="bottom" align="start">
             <a class="btn-ghost" tabindex="0" @click="updateAll">
@@ -47,34 +49,36 @@
           </a>
         </tooltip>
         <dropdown align="right" class="filter-sort">
-          <tooltip :content="i18n('labelSettings')" placement="bottom" slot="toggle">
+          <tooltip :content="i18n('labelSettings')" placement="bottom">
             <a class="btn-ghost" tabindex="0">
               <icon name="cog"/>
             </a>
           </tooltip>
-          <div>
-            <locale-group i18n-key="labelFilterSort">
-              <select :value="filters.sort.value" @change="onOrderChange">
-                <option
-                  v-for="(option, name) in filterOptions.sort"
-                  v-text="option.title"
-                  :key="name"
-                  :value="name">
-                </option>
-              </select>
-            </locale-group>
-          </div>
-          <div v-show="currentSortCompare">
-            <setting-check name="filters.showEnabledFirst"
-                           :label="i18n('optionShowEnabledFirst')" />
-          </div>
-          <div>
-            <setting-check name="filters.showOrder" :label="i18n('labelShowOrder')" />
-          </div>
-          <div class="mr-2c">
-            <setting-check name="filters.viewTable" :label="i18n('labelViewTable')" />
-            <setting-check name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
-          </div>
+          <template #content>
+            <div>
+              <locale-group i18n-key="labelFilterSort">
+                <select :modelValue="filters.sort.value" @update:modelValue="onOrderChange">
+                  <option
+                    v-for="(option, name) in filterOptions.sort"
+                    v-text="option.title"
+                    :key="name"
+                    :value="name">
+                  </option>
+                </select>
+              </locale-group>
+            </div>
+            <div v-show="currentSortCompare">
+              <setting-check name="filters.showEnabledFirst"
+                :label="i18n('optionShowEnabledFirst')" />
+            </div>
+            <div>
+              <setting-check name="filters.showOrder" :label="i18n('labelShowOrder')" />
+            </div>
+            <div class="mr-2c">
+              <setting-check name="filters.viewTable" :label="i18n('labelViewTable')" />
+              <setting-check name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
+            </div>
+          </template>
         </dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
         <form class="filter-search hidden-xs flex" @submit.prevent>
@@ -89,11 +93,12 @@
                 id="installed-search">
               <icon name="search"></icon>
             </label>
-            <pre
-              class="filter-search-tooltip"
-              slot="content"
-              v-text="searchError || i18n('titleSearchHint')">
-            </pre>
+            <template #content>
+              <pre
+                class="filter-search-tooltip"
+                v-text="searchError || i18n('titleSearchHint')"
+              />
+            </template>
           </tooltip>
           <select v-model="filters.searchScope" @change="onScopeChange">
             <option value="name" v-text="i18n('filterScopeName')"/>
@@ -111,8 +116,8 @@
            ref="scriptList"
            :style="`--num-columns:${numColumns}`"
            :data-columns="numColumns"
-           :data-show-order="filters.showOrder"
-           :data-table="filters.viewTable">
+           :data-show-order="filters.showOrder || null"
+           :data-table="filters.viewTable || null">
         <script-item
           v-for="(script, index) in sortedScripts"
           v-show="!search || script.$cache.show !== false"
@@ -130,7 +135,7 @@
           @update="handleActionUpdate"
           @move="moveScript"
           @scrollDelta="handleSmoothScroll"
-          @tiptoggle.native="showHotkeys = !showHotkeys"
+          @tiptoggle="showHotkeys = !showHotkeys"
         />
       </div>
     </div>
@@ -139,23 +144,23 @@
 </template>
 
 <script>
-import Dropdown from 'vueleton/lib/dropdown/bundle';
-import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { i18n, sendCmdDirectly, debounce, makePause } from '#/common';
-import options from '#/common/options';
-import { showConfirmation, showMessage } from '#/common/ui';
-import SettingCheck from '#/common/ui/setting-check';
-import hookSetting from '#/common/hook-setting';
-import Icon from '#/common/ui/icon';
-import LocaleGroup from '#/common/ui/locale-group';
-import { forEachKey } from '#/common/object';
-import { setRoute, lastRoute } from '#/common/router';
-import storage from '#/common/storage';
-import { keyboardService, handleTabNavigation } from '#/common/keyboard';
-import { loadData } from '#/options';
+import Dropdown from 'vueleton/lib/dropdown';
+import Tooltip from 'vueleton/lib/tooltip';
+import { i18n, sendCmdDirectly, debounce, makePause } from '@/common';
+import options from '@/common/options';
+import { showConfirmation, showMessage } from '@/common/ui';
+import SettingCheck from '@/common/ui/setting-check';
+import hookSetting from '@/common/hook-setting';
+import Icon from '@/common/ui/icon';
+import LocaleGroup from '@/common/ui/locale-group';
+import { forEachKey } from '@/common/object';
+import { setRoute, lastRoute } from '@/common/router';
+import storage from '@/common/storage';
+import { keyboardService, handleTabNavigation } from '@/common/keyboard';
+import { loadData } from '@/options';
 import ScriptItem from './script-item';
 import Edit from './edit';
-import { store } from '../utils';
+import { store, installedScripts, removedScripts } from '../utils';
 
 const filterOptions = {
   sort: {
@@ -278,6 +283,8 @@ export default {
         limit: step,
       },
       numColumns: null,
+      scripts: installedScripts,
+      trash: removedScripts,
     };
   },
   watch: {
@@ -317,16 +324,10 @@ export default {
       }
       return null;
     },
-    scripts() {
-      return this.store.installedScripts;
-    },
     searchNeedsCodeIds() {
       return this.search
         && ['code', 'all'].includes(filters.searchScope)
         && this.store.scripts.filter(s => s.$cache.code == null).map(s => s.props.id);
-    },
-    trash() {
-      return this.store.removedScripts;
     },
   },
   methods: {
@@ -362,7 +363,9 @@ export default {
         url = url?.trim();
         if (url) {
           if (!url.includes('://')) url = `https://${url}`;
-          if (new URL(url)) await sendCmdDirectly('ConfirmInstall', { url });
+          // test if URL is valid
+          new URL(url);
+          await sendCmdDirectly('ConfirmInstall', { url });
         }
       } catch (err) {
         if (err) showMessage({ text: err });
@@ -656,7 +659,7 @@ export default {
       ]),
     ];
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.disposeList?.forEach(dispose => {
       dispose();
     });
@@ -684,7 +687,7 @@ export default {
   .vl-dropdown.active .vl-tooltip-wrap {
     display: none;
   }
-  @media (max-width: 500px) { // same size as `hidden-sm` in #/common/ui/style/style.css
+  @media (max-width: 500px) { // same size as `hidden-sm` in @/common/ui/style/style.css
     .vl-dropdown-right .vl-dropdown-menu {
       position: fixed;
       top: auto;

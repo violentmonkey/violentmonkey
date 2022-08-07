@@ -76,7 +76,7 @@
           </label>
         </td>
         <td>
-          <textarea v-model="custom[name]" spellcheck="false" :rows="CalcRows(custom[name])"/>
+          <textarea v-model="custom[name]" spellcheck="false" :rows="calcRows(custom[name])"/>
         </td>
       </tr>
     </table>
@@ -84,8 +84,8 @@
 </template>
 
 <script>
-import { i18n } from '#/common';
-import { objectGet } from '#/common/object';
+import { i18n } from '@/common';
+import { objectGet } from '@/common/object';
 
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
 

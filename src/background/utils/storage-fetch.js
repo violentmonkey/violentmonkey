@@ -1,5 +1,5 @@
-import { request } from '#/common';
-import storage from '#/common/storage';
+import { request } from '@/common';
+import storage from '@/common/storage';
 
 /** @type { function(url, options, check): Promise<void> } or throws on error */
 storage.cache.fetch = cacheOrFetch({

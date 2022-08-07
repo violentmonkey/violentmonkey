@@ -1,5 +1,6 @@
-import Modal from 'vueleton/lib/modal/bundle';
-import { i18n } from '#/common/util';
+import { createApp } from 'vue';
+import Modal from 'vueleton/lib/modal';
+import { i18n } from '@/common/util';
 import Message from './message';
 
 export function showMessage(message) {
@@ -48,4 +49,26 @@ export function showConfirmation(text, { ok, cancel, input = false } = {}) {
       onDismiss: reject, // Esc key
     });
   });
+}
+
+/** @returns {?number} Number of lines + 1 if the last line is not empty */
+export function calcRows(val) {
+  return val && (
+    val.match(/$/gm).length
+      + !val.endsWith('\n')
+  );
+}
+
+export function render(App, el) {
+  const app = createApp(App);
+  Object.assign(app.config.globalProperties, {
+    i18n,
+    calcRows,
+  });
+  if (!el) {
+    el = document.createElement('div');
+    document.body.append(el);
+  }
+  app.mount(el);
+  return app;
 }

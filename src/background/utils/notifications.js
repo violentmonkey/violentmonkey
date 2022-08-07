@@ -1,4 +1,4 @@
-import { i18n, defaultImage, sendTabCmd } from '#/common';
+import { i18n, defaultImage, sendTabCmd } from '@/common';
 import { commands } from './message';
 
 const openers = {};

@@ -1,5 +1,5 @@
-import { isEmpty, makePause, sendTabCmd } from '#/common';
-import { forEachEntry, forEachKey, objectSet } from '#/common/object';
+import { isEmpty, makePause, sendTabCmd } from '@/common';
+import { forEachEntry, forEachKey, objectSet } from '@/common/object';
 import { getScript, getValueStoresByIds, dumpValueStores } from './db';
 import { commands } from './message';
 

@@ -3,6 +3,7 @@
   "description": "Violentmonkey",
   "version": "2.13.0",
   "scripts": {
+    "prepare": "husky install",
     "dev": "gulp dev",
     "prebuild": "yarn ci",
     "build": "cross-env NODE_ENV=production gulp build",
@@ -14,9 +15,8 @@
     "lint:js": "eslint --ext .js,.vue .",
     "lint:yml": "gulp check",
     "svgo": "plaid svgo",
-    "test": "cross-env BABEL_ENV=test tape -r ./test/mock/register \"test/**/*.test.js\" | tap-summary",
-    "ci": "run-s lint test",
-    "transform": "locky yarn yarn",
+    "test": "cross-env BABEL_ENV=test jest test",
+    "ci": "run-p lint test",
     "bumpVersion": "gulp bump",
     "bump": "run-s ci \"bumpVersion --commit\"",
     "preversion": "run-s ci \"bumpVersion --reset\""
@@ -26,34 +26,29 @@
     "@actions/github": "^5.0.3",
     "@babel/helper-plugin-utils": "^7.18.6",
     "@babel/plugin-syntax-function-bind": "^7.18.6",
-    "@babel/register": "^7.18.6",
-    "@babel/runtime": "^7.18.6",
-    "@gera2ld/locky": "^0.1.1",
-    "@gera2ld/plaid": "~1.5.6",
-    "@gera2ld/plaid-vue": "~1.6.5",
-    "@gera2ld/plaid-webpack": "~1.5.5",
+    "@gera2ld/plaid": "~2.5.6",
+    "@gera2ld/plaid-common-ts": "~2.5.1",
+    "@gera2ld/plaid-test": "^2.5.0",
+    "@gera2ld/plaid-webpack": "~2.5.3",
+    "@gera2ld/plaid-webpack-vue3": "~2.5.5",
     "@types/chrome": "^0.0.191",
     "@types/firefox-webext-browser": "94.0.1",
     "amo-upload": "^0.2.0",
     "cross-env": "^7.0.3",
     "cross-spawn": "^7.0.3",
     "del": "^6.1.1",
-    "eslint-plugin-vue": "^9.3.0",
+    "eslint-plugin-jest": "^26.7.0",
     "fancy-log": "^2.0.0",
     "gulp": "^4.0.2",
     "gulp-plumber": "^1.1.0",
-    "husky": "^4.2.3",
+    "husky": "^8.0.1",
     "js-yaml": "^4.1.0",
     "jsdom": "^20.0.0",
-    "npm-run-all": "^4.1.5",
     "plugin-error": "^2.0.0",
+    "postcss-scss": "^4.0.4",
+    "postcss-simple-vars": "^6.0.3",
     "sharp": "^0.30.7",
-    "tap-summary": "^4.0.0",
-    "tape": "^5.5.3",
-    "terser": "^5.14.1",
-    "terser-webpack-plugin": "^4",
     "through2": "^4.0.2",
-    "vue-eslint-parser": "^9.0.3",
     "vinyl": "^2.2.1",
     "wrapper-webpack-plugin": "2.1.0"
   },
@@ -73,20 +68,16 @@
     "codemirror": "^5.65.6",
     "codemirror-js-mixed": "^0.9.2",
     "tldjs": "^2.3.1",
-    "vue": "^2.7.8",
-    "vue-loader": "^15.10.0",
-    "vue-template-babel-compiler": "^2.0.0",
-    "vue-template-compiler": "^2.7.8",
-    "vueleton": "^1.0.6"
+    "vue": "^3.2.37",
+    "vueleton": "^2.0.0-3"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn transform -t",
-      "pre-push": "run-p lint test"
-    }
+  "jest": {
+    "setupFiles": [
+      "./test/mock/index.js"
+    ]
   },
   "beta": 23
 }

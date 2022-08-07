@@ -89,12 +89,12 @@
 </template>
 
 <script>
-import { dumpScriptValue, formatByteLength, isEmpty, sendCmdDirectly } from '#/common';
-import { handleTabNavigation, keyboardService } from '#/common/keyboard';
-import { deepEqual, mapEntry } from '#/common/object';
-import Icon from '#/common/ui/icon';
-import storage from '#/common/storage';
-import { showMessage } from '#/common/ui';
+import { dumpScriptValue, formatByteLength, isEmpty, sendCmdDirectly } from '@/common';
+import { handleTabNavigation, keyboardService } from '@/common/keyboard';
+import { deepEqual, mapEntry } from '@/common/object';
+import Icon from '@/common/ui/icon';
+import storage from '@/common/storage';
+import { showMessage } from '@/common/ui';
 import { store } from '../../utils';
 
 const PAGE_SIZE = 25;

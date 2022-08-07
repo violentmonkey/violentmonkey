@@ -1,6 +1,6 @@
-import { i18n, noop } from '#/common';
-import { INJECTABLE_TAB_URL_RE } from '#/common/consts';
-import { objectPick } from '#/common/object';
+import { i18n, noop } from '@/common';
+import { INJECTABLE_TAB_URL_RE } from '@/common/consts';
+import { objectPick } from '@/common/object';
 import cache from './cache';
 import { postInitialize } from './init';
 import { commands, forEachTab } from './message';

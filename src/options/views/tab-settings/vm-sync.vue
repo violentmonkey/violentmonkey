@@ -70,12 +70,12 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { noop, sendCmd } from '#/common';
-import options from '#/common/options';
-import SettingCheck from '#/common/ui/setting-check';
-import hookSetting from '#/common/hook-setting';
-import Icon from '#/common/ui/icon';
+import Tooltip from 'vueleton/lib/tooltip';
+import { noop, sendCmd } from '@/common';
+import options from '@/common/options';
+import SettingCheck from '@/common/ui/setting-check';
+import hookSetting from '@/common/hook-setting';
+import Icon from '@/common/ui/icon';
 import { store } from '../../utils';
 
 const SYNC_CURRENT = 'sync.current';

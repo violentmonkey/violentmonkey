@@ -1,41 +1,47 @@
-import test from 'tape';
 import {
   isRemote, compareVersion, debounce, throttle,
-} from '#/common';
+} from '@/common';
 import { mocker } from '../mock';
 
-test('isRemote', (t) => {
-  t.notOk(isRemote());
-  t.notOk(isRemote('file:///tmp/file'));
-  t.notOk(isRemote('data:text/plain,hello,world'));
-  t.ok(isRemote('http://www.google.com'));
-  t.ok(isRemote('https://www.google.com'));
-  t.notOk(isRemote('http://localhost/a.user.js'));
-  t.notOk(isRemote('https://localhost/a.user.js'));
-  t.notOk(isRemote('http://127.0.0.1/a.user.js'));
-  t.notOk(isRemote('http://127.0.0.1:5555/a.user.js'));
-  t.notOk(isRemote('http://192.168.1.32/a.user.js'));
-  t.notOk(isRemote('http://172.16.0.1/a.user.js'));
-  t.notOk(isRemote('http://10.0.0.1/a.user.js'));
-  t.notOk(isRemote('http://[::1]/a.user.js'));
-  t.notOk(isRemote('http://[fe80::6996:2ba9:37e6:8762]/a.user.js'));
-  t.notOk(isRemote('http://[fc00::90:90]/a.user.js'));
-  t.notOk(isRemote('http://example.test/a.user.js'));
-  t.notOk(isRemote('https://example.example/a.user.js'));
-  t.notOk(isRemote('http://example.invalid/a.user.js'));
-  t.notOk(isRemote('https://example.localhost/a.user.js'));
-  t.end();
+test('isRemote', () => {
+  [
+    isRemote(),
+    isRemote('file:///tmp/file'),
+    isRemote('data:text/plain,hello,world'),
+    isRemote('http://localhost/a.user.js'),
+    isRemote('https://localhost/a.user.js'),
+    isRemote('http://127.0.0.1/a.user.js'),
+    isRemote('http://127.0.0.1:5555/a.user.js'),
+    isRemote('http://192.168.1.32/a.user.js'),
+    isRemote('http://172.16.0.1/a.user.js'),
+    isRemote('http://10.0.0.1/a.user.js'),
+    isRemote('http://[::1]/a.user.js'),
+    isRemote('http://[fe80::6996:2ba9:37e6:8762]/a.user.js'),
+    isRemote('http://[fc00::90:90]/a.user.js'),
+    isRemote('http://example.test/a.user.js'),
+    isRemote('https://example.example/a.user.js'),
+    isRemote('http://example.invalid/a.user.js'),
+    isRemote('https://example.localhost/a.user.js'),
+  ].forEach(f => {
+    expect(f).toBeFalsy();
+  });
+  [
+    isRemote('http://www.google.com'),
+    isRemote('https://www.google.com'),
+  ].forEach(t => {
+    expect(t).toBeTruthy();
+  });
 });
 
-test('compareVersion', (t) => {
-  t.equal(compareVersion('1.2.3', '1.2.3'), 0);
-  t.equal(compareVersion('1.2.3', '1.2.0'), 1);
-  t.equal(compareVersion('1.2.3', '1.2.4'), -1);
-  t.equal(compareVersion('1.2.0', '1.2'), 0);
-  t.equal(compareVersion('1.2.1', '1.2'), 1);
-  t.equal(compareVersion('1.1.9', '1.2'), -1);
-  t.equal(compareVersion('1.10', '1.9'), 1);
-  t.deepEqual([
+test('compareVersion', () => {
+  expect(compareVersion('1.2.3', '1.2.3')).toEqual(0);
+  expect(compareVersion('1.2.3', '1.2.0')).toEqual(1);
+  expect(compareVersion('1.2.3', '1.2.4')).toEqual(-1);
+  expect(compareVersion('1.2.0', '1.2')).toEqual(0);
+  expect(compareVersion('1.2.1', '1.2')).toEqual(1);
+  expect(compareVersion('1.1.9', '1.2')).toEqual(-1);
+  expect(compareVersion('1.10', '1.9')).toEqual(1);
+  expect([
     '1.2.3',
     '1.2.3-alpha',
     '1.0.0-x.7.z.92',
@@ -57,7 +63,7 @@ test('compareVersion', (t) => {
     '1.0.0-alpha.beta+build',
     '1.0.0-alpha.1',
     '1.0.0-alpha',
-  ].sort(compareVersion), [
+  ].sort(compareVersion)).toEqual([
     '1.0.0-alpha',
     '1.0.0-alpha',
     '1.0.0-alpha.1',
@@ -80,10 +86,9 @@ test('compareVersion', (t) => {
     '10.5.5',
     '11.3.0',
   ]);
-  t.end();
 });
 
-test('debounce', (t) => {
+test('debounce', () => {
   const log = [];
   const fn = debounce((i) => {
     log.push(i);
@@ -97,11 +102,10 @@ test('debounce', (t) => {
     fn(i);
     mocker.clock.tick(600);
   }
-  t.deepEqual(log, [2, 0, 1, 2]);
-  t.end();
+  expect(log).toEqual([2, 0, 1, 2]);
 });
 
-test('debounce with invalid time', (t) => {
+test('debounce with invalid time', () => {
   for (const time of [undefined, -100]) {
     const log = [];
     const fn = debounce((i) => {
@@ -111,12 +115,11 @@ test('debounce with invalid time', (t) => {
       fn(i);
     }
     mocker.clock.tick(500);
-    t.deepEqual(log, [2]);
+    expect(log).toEqual([2]);
   }
-  t.end();
 });
 
-test('throttle', (t) => {
+test('throttle', () => {
   const log = [];
   const fn = throttle((i) => {
     log.push(i);
@@ -130,11 +133,10 @@ test('throttle', (t) => {
     fn(i);
     mocker.clock.tick(600);
   }
-  t.deepEqual(log, [0, 3, 0, 1, 2]);
-  t.end();
+  expect(log).toEqual([0, 3, 0, 1, 2]);
 });
 
-test('throttle with invalid time', (t) => {
+test('throttle with invalid time', () => {
   for (const time of [undefined, -100]) {
     const log = [];
     const fn = throttle((i) => {
@@ -144,7 +146,6 @@ test('throttle with invalid time', (t) => {
       fn(i);
     }
     mocker.clock.tick(500);
-    t.deepEqual(log, [0]);
+    expect(log).toEqual([0]);
   }
-  t.end();
 });

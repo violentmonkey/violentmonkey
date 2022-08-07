@@ -1,5 +1,5 @@
 <template>
-  <div class="page-confirm frame flex flex-col h-100" :class="{ reinstall }">
+  <div class="page-confirm frame flex flex-col h-screen" :class="{ reinstall }">
     <div class="frame-block">
       <div class="flex">
         <div class="image">
@@ -75,7 +75,7 @@
       <vm-externals
         ref="externals"
         v-if="script"
-        v-model="script"
+        :value="script"
         class="abs-full"
         :cm-options="cmOptions"
         :commands="commands"
@@ -86,21 +86,21 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip/bundle';
-import Icon from '#/common/ui/icon';
+import Tooltip from 'vueleton/lib/tooltip';
+import Icon from '@/common/ui/icon';
 import {
   sendCmdDirectly, request, isRemote, getFullUrl, makePause,
   getLocaleString, trueJoin,
-} from '#/common';
-import { keyboardService } from '#/common/keyboard';
-import initCache from '#/common/cache';
-import storage from '#/common/storage';
-import VmExternals from '#/common/ui/externals';
-import SettingCheck from '#/common/ui/setting-check';
-import { loadScriptIcon } from '#/common/load-script-icon';
-import { deepEqual, objectPick } from '#/common/object';
-import { route } from '#/common/router';
-import ua from '#/common/ua';
+} from '@/common';
+import { keyboardService } from '@/common/keyboard';
+import initCache from '@/common/cache';
+import storage from '@/common/storage';
+import VmExternals from '@/common/ui/externals';
+import SettingCheck from '@/common/ui/setting-check';
+import { loadScriptIcon } from '@/common/load-script-icon';
+import { deepEqual, objectPick } from '@/common/object';
+import { route } from '@/common/router';
+import ua from '@/common/ua';
 
 const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;
@@ -201,7 +201,7 @@ export default {
     ];
     keyboardService.enable();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.guard) {
       clearInterval(this.guard);
       this.guard = null;

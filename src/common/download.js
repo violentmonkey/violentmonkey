@@ -1,4 +1,4 @@
-import { makePause } from '#/common';
+import { makePause } from '@/common';
 
 export function downloadBlob(blob, name) {
   const url = URL.createObjectURL(blob);

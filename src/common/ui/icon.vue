@@ -3,7 +3,7 @@
 </template>
 
 <script>
-const requireIcon = require.context('#/resources/svg', false, /\.svg$/);
+const requireIcon = require.context('@/resources/svg', false, /\.svg$/);
 requireIcon.keys().map(key => requireIcon(key));
 
 export default {

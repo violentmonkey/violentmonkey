@@ -1,10 +1,10 @@
 import {
   compareVersion, dataUri2text, i18n,
   getFullUrl, getScriptName, isRemote, sendCmd, trueJoin,
-} from '#/common';
-import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '#/common/consts';
-import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
-import storage from '#/common/storage';
+} from '@/common';
+import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
+import { forEachEntry, forEachKey, forEachValue } from '@/common/object';
+import storage from '@/common/storage';
 import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
 import { testScript, testBlacklist } from './tester';

@@ -9,7 +9,7 @@
       :disabled="disabled"
       :title="parsedData.error"
       :placeholder="placeholder"
-      :rows="rows || CalcRows(value)"
+      :rows="rows || calcRows(value)"
       @change="onChange"
     />
     <button v-if="hasSave" v-text="i18n('buttonSave')" @click="onSave"
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { getUnloadSentry } from '#/common/router';
+import { getUnloadSentry } from '@/common/router';
 import { deepEqual, objectGet } from '../object';
 import options from '../options';
 import defaults from '../options-defaults';
@@ -96,7 +96,7 @@ export default {
       this.value = handle(this.savedValue);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.revoke();
     this.toggleUnloadSentry(false);
   },

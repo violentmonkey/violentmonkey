@@ -1,6 +1,6 @@
-import { blob2base64, sendTabCmd, string2uint8array } from '#/common';
-import { forEachEntry, forEachValue, objectPick } from '#/common/object';
-import ua from '#/common/ua';
+import { blob2base64, sendTabCmd, string2uint8array } from '@/common';
+import { forEachEntry, forEachValue, objectPick } from '@/common/object';
+import ua from '@/common/ua';
 import cache from './cache';
 import { commands } from './message';
 import {

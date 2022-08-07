@@ -41,8 +41,8 @@
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
       <div class="menu-item menu-area menu-find" :tabIndex="tabIndex">
-        <template v-for="(url, text, i) in findUrls">
-          <a :key="url" target="_blank" :class="{ ellipsis: !i, 'mr-1': !i, 'ml-1': i }"
+        <template v-for="(url, text, i) in findUrls" :key="url">
+          <a target="_blank" :class="{ ellipsis: !i, 'mr-1': !i, 'ml-1': i }"
              :href="url" :data-message="url.split('://')[1]">
             <icon name="search" v-if="!i"/>{{text}}
           </a>
@@ -119,7 +119,7 @@
           </div>
           <div v-if="item.excludesValue != null" class="excludes-menu flex flex-col">
             <textarea v-model="item.excludesValue" spellcheck="false"
-                      :rows="CalcRows(item.excludesValue)"/>
+                      :rows="calcRows(item.excludesValue)"/>
             <div>
               <button v-text="i18n('buttonOK')" @click="onExcludeSave(item)"/>
               <button v-text="i18n('buttonCancel')" @click="onExcludeClose(item)"/>
@@ -183,13 +183,13 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { INJECT_AUTO } from '#/common/consts';
-import options from '#/common/options';
-import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
-import { objectPick } from '#/common/object';
-import Icon from '#/common/ui/icon';
-import { keyboardService, isInput } from '#/common/keyboard';
+import Tooltip from 'vueleton/lib/tooltip';
+import { INJECT_AUTO } from '@/common/consts';
+import options from '@/common/options';
+import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '@/common';
+import { objectPick } from '@/common/object';
+import Icon from '@/common/ui/icon';
+import { keyboardService, isInput } from '@/common/keyboard';
 import { mutex, store } from '../utils';
 
 const manifest = browser.runtime.getManifest();
@@ -511,7 +511,7 @@ export default {
     // issue #1520: Firefox + Wayland doesn't autofocus the popup so CSS hover doesn't work
     this.focusBug = !document.hasFocus();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     keyboardService.disable();
     this.disposeList?.forEach(dispose => { dispose(); });
   },

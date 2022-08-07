@@ -1,7 +1,7 @@
-import tldjs from 'tldjs';
+import tldjs from 'tldjs/tld';
 // import { fromUserSettings } from 'tldjs';
 // import Trie from 'tldjs/lib/suffix-trie';
-// import { request } from '#/common';
+// import { request } from '@/common';
 
 // let tldjs;
 

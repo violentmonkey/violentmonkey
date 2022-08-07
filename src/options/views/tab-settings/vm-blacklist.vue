@@ -10,9 +10,9 @@
 </template>
 
 <script>
-import { sendCmd } from '#/common';
-import { showMessage } from '#/common/ui';
-import SettingText from '#/common/ui/setting-text';
+import { sendCmd } from '@/common';
+import { showMessage } from '@/common/ui';
+import SettingText from '@/common/ui/setting-text';
 
 export default {
   components: {

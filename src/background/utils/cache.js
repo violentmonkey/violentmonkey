@@ -1,4 +1,4 @@
-import initCache from '#/common/cache';
+import initCache from '@/common/cache';
 import { commands } from './message';
 
 const cache = initCache({

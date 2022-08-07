@@ -1,4 +1,4 @@
-import { getScriptName, i18n, request, compareVersion, sendCmd, trueJoin } from '#/common';
+import { getScriptName, i18n, request, compareVersion, sendCmd, trueJoin } from '@/common';
 import { fetchResources, getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';

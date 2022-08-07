@@ -1,4 +1,4 @@
-import * as tld from '#/common/tld';
+import * as tld from '@/common/tld';
 import cache from './cache';
 import { postInitialize } from './init';
 import { commands } from './message';
@@ -207,8 +207,8 @@ export function testBlacklist(url) {
   let res = blCache[url];
   if (res === undefined) {
     const rule = blacklistRules.find(({ test }) => test(url));
-    res = rule?.reject && rule.text;
-    updateBlacklistCache(url, res || false);
+    res = rule?.reject && rule.text || false;
+    updateBlacklistCache(url, res);
   }
   return res;
 }

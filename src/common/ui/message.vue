@@ -40,7 +40,7 @@ export default {
       });
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     const i = dismissers.indexOf(this.dismiss);
     if (i >= 0) dismissers.splice(i, 1);
   },

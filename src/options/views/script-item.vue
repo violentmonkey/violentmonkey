@@ -19,10 +19,7 @@
     </div>
     <div class="script-info flex ml-1c">
       <span class="script-order" v-text="script.props.position"/>
-      <!-- eslint-disable-next-line vue/require-component-is -->
-      <component class="script-name ellipsis flex-auto" v-bind="viewTable
-        ? { is: 'a', href: url, tabIndex }
-        : { is: 'span' }">{{script.$cache.name}}</component>
+      <component :is="nameProps.is" class="script-name ellipsis flex-auto" v-bind="nameProps">{{script.$cache.name}}</component>
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
                  class="script-author ml-1c hidden-sm"
@@ -128,10 +125,10 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { getLocaleString, formatTime } from '#/common';
-import Icon from '#/common/ui/icon';
-import { keyboardService, isInput, toggleTip } from '#/common/keyboard';
+import Tooltip from 'vueleton/lib/tooltip';
+import { getLocaleString, formatTime } from '@/common';
+import Icon from '@/common/ui/icon';
+import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
 import enableDragging from '../utils/dragging';
 
 const itemMargin = 8;
@@ -211,6 +208,9 @@ export default {
     },
     url() {
       return `#scripts/${this.script.props.id}`;
+    },
+    nameProps() {
+      return this.viewTable ? { is: 'a', href: this.url, tabIndex: this.tabIndex } : { is: 'span' };
     },
   },
   watch: {

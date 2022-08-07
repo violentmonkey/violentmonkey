@@ -1,8 +1,8 @@
 // Reference:
 // - https://developers.google.com/drive/v3/reference/files
 // - https://github.com/google/google-api-nodejs-client
-import { getUniqId, noop } from '#/common';
-import { objectGet } from '#/common/object';
+import { getUniqId, noop } from '@/common';
+import { objectGet } from '@/common/object';
 import { dumpQuery, notify } from '../utils';
 import {
   getURI, getItemFilename, BaseService, register, isScriptFile,

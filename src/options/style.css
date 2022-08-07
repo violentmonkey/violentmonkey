@@ -3,10 +3,6 @@ $tabPadX: 2rem;
 $tabPadY: 3rem;
 $sectionBorder: 1px solid var(--fill-2);
 
-html,
-body {
-  height: 100%;
-}
 aside {
   position: relative;
   z-index: 1000;

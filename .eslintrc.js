@@ -62,13 +62,9 @@ module.exports = {
   root: true,
   extends: [
     require.resolve('@gera2ld/plaid/eslint'),
-    require.resolve('@gera2ld/plaid-vue/eslint/vue'),
+    require.resolve('@gera2ld/plaid-common-vue/eslint/vue3-js'),
   ],
-  parserOptions: {
-    ecmaFeatures: {
-      legacyDecorators: true,
-    },
-  },
+  plugins: ['jest'],
   overrides: [{
     // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
     // to prevent exposing them to userscripts with `@inject-into content`
@@ -129,12 +125,18 @@ module.exports = {
     rules: {
       'vue/multi-word-component-names': 0,
     },
+  }, {
+    files: ['test/**'],
+    env: {
+      'jest/globals': true,
+    },
   }],
   rules: {
-    'import/extensions': ['error', 'ignorePackages', {
-      js: 'never',
-      vue: 'never',
-    }],
+    'prettier/prettier': 'off',
+    // 'import/extensions': ['error', 'ignorePackages', {
+    //   js: 'never',
+    //   vue: 'never',
+    // }],
     // copied from airbnb-base, replaced 4 with 8
     'object-curly-newline': ['error', {
       ObjectExpression: { minProperties: 8, multiline: true, consistent: true },

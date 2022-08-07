@@ -44,7 +44,7 @@ export default {
     this.revoke = hookSetting(this.name, val => { this.value = val; });
     this.$watch('value', this.onChange);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.revoke) this.revoke();
   },
 };

@@ -309,6 +309,9 @@ li {
   margin-top: .5em;
   margin-bottom: .5em;
 }
+.h-screen {
+  height: 100vh;
+}
 .h-100 {
   height: 100%;
 }

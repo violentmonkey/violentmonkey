@@ -10,10 +10,10 @@
 
 <script>
 export default {
-  props: ['value'],
+  props: ['modelValue'],
   methods: {
     onToggle() {
-      this.$emit('input', !this.value);
+      this.$emit('update:modelValue', !this.value);
     },
   },
 };
