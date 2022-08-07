@@ -25,7 +25,7 @@
     <div class="frame-block flex-auto pos-rel">
       <vm-code
         class="abs-full"
-        v-model="code"
+        :value="code"
         ref="code"
         v-show="nav === 'code'"
         :active="nav === 'code'"
@@ -48,7 +48,7 @@
       <vm-externals
         class="abs-full"
         v-if="nav === 'externals'"
-        v-model="script"
+        :value="script"
       />
       <vm-help
         class="abs-full edit-body"

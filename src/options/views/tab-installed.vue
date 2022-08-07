@@ -144,6 +144,7 @@
 </template>
 
 <script>
+import { reactive } from 'vue';
 import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
 import { i18n, sendCmdDirectly, debounce, makePause } from '@/common';
@@ -428,7 +429,7 @@ export default {
       if (!this.canRenderScripts) return;
       const { length } = this.sortedScripts;
       let limit = 9;
-      const batchRender = { limit };
+      const batchRender = reactive({ limit });
       this.batchRender = batchRender;
       const startTime = performance.now();
       // If we entered a new loop of rendering, this.batchRender will no longer be batchRender

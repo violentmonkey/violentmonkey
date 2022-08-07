@@ -104,7 +104,7 @@
                  @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
           <div class="submenu-buttons"
-               v-show="activeExtras === item || focusedItem === item || focusBug">
+               v-show="showButtons(item)">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
             <div class="submenu-button" :tabIndex="tabIndex" @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
@@ -479,6 +479,9 @@ export default {
     },
     updateMessage() {
       this.message = document.activeElement?.dataset.message || '';
+    },
+    showButtons(item) {
+      return this.activeExtras?.id === item.id || this.focusedItem?.id === item.id || this.focusBug;
     },
   },
   mounted() {

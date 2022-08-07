@@ -131,6 +131,7 @@
 </template>
 
 <script>
+import { reactive } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import { debounce, i18n } from '@/common';
 import { INJECT_AUTO, INJECT_PAGE, INJECT_CONTENT } from '@/common/consts';
@@ -215,7 +216,7 @@ const getItemUpdater = (name, normalize) => (
     if (value !== oldValue) options.set(name, value);
   }, 50)
 );
-const settings = items::mapEntry(() => null);
+const settings = reactive({});
 
 export default {
   components: {
