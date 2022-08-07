@@ -4,3 +4,4 @@ node_modules/
 /stats.json
 /tmp/
 /dist-assets/
+.eslintcache

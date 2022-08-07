@@ -12,7 +12,7 @@
     "i18n": "gulp i18n",
     "copyI18n": "gulp copyI18n",
     "lint": "run-s lint:js lint:yml",
-    "lint:js": "eslint --ext .js,.vue .",
+    "lint:js": "eslint --ext .js,.vue . --cache",
     "lint:yml": "gulp check",
     "svgo": "plaid svgo",
     "test": "cross-env BABEL_ENV=test jest test",
