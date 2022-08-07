@@ -46,7 +46,6 @@ exports.optimization = {
           'node_modules/@?vue',
         ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
         chunks: 'all',
-        minChunks: 2,
         priority: 100,
       },
       common: {
