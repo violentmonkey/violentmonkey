@@ -5,7 +5,7 @@ const TerserPlugin = isProd && require('terser-webpack-plugin');
 const deepmerge = isProd && require('deepmerge');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
 const { addWrapperWithGlobals, getCodeMirrorThemes, getUniqIdB64 } = require('./webpack-util');
-// const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
+const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
 const projectConfig = require('./plaid.conf');
 const { getVersion } = require('./version-helper');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
@@ -125,7 +125,7 @@ module.exports = Promise.all([
   }),
 
   modify('injected', './src/injected', (config) => {
-    // config.plugins.push(new ProtectWebpackBootstrapPlugin());
+    config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapperWithGlobals('injected/content', config, defsObj, getGlobals => ({
       header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
       footer: '}}',
@@ -135,7 +135,7 @@ module.exports = Promise.all([
   modify('injected-web', './src/injected/web', (config) => {
     // TODO: replace WebPack's Object.*, .call(), .apply() with safe calls
     config.output.libraryTarget = 'commonjs2';
-    // config.plugins.push(new ProtectWebpackBootstrapPlugin());
+    config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapperWithGlobals('injected/web', config, defsObj, getGlobals => ({
       header: () => `${skipReinjectionHeader}
         window[INIT_FUNC_NAME] = function (IS_FIREFOX,${HANDSHAKE_ID},${VAULT_ID}) {

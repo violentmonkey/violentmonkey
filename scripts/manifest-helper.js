@@ -52,7 +52,7 @@ class ListBackgroundScriptsPlugin {
       const manifest = await buildManifest();
       const bgId = 'background/index';
       const bgEntry = compilation.entrypoints.get(bgId);
-      const scripts = bgEntry.chunks.map(c => c.files[0]);
+      const scripts = bgEntry.chunks.flatMap(c => [...c.files]);
       if (`${manifest.background.scripts}` !== `${scripts}`) {
         manifest.background.scripts = scripts;
         await fs.writeFile(path,
