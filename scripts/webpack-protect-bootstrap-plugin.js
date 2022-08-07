@@ -70,6 +70,7 @@ function patchBootstrap(src, group1) {
 }
 
 function replace(rules, src, info) {
+  src = src.source?.() || src;
   let res = src;
   for (const rule of rules) {
     const [from, to, mandatory = true] = rule;
