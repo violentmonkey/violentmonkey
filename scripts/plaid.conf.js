@@ -45,8 +45,11 @@ exports.optimization = {
           'node_modules/@violentmonkey/shortcut',
           'node_modules/@?vue',
         ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
-        /** Excluding the background entry because it uses only 4kB of common code */
-        chunks: c => c.name !== 'background/index',
+        chunks: c => ![
+          'background/index', // only 4kB of common code
+          'injected',
+          'injected-web',
+        ].includes(c.name),
       },
       ...splitVendor('codemirror'),
       ...splitVendor('tldjs'),

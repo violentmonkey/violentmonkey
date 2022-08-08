@@ -66,13 +66,15 @@ class WebpackProtectBootstrapPlugin {
 }
 
 function patchBootstrap(src) {
-  const props = src.match(new RegExp(`(?<=\\b${G.require}\\.)(\\w+)`, 'g'));
-  const uniq = [...new Set(props)].join('');
-  const guard = uniq
-    ? `for (let i = 0, props=${JSON.stringify(uniq)}; i < props.length; i++)
+  const props = src.match(new RegExp(`(?<=\\b${G.require}\\.)(\\w+)(?= = )`, 'g'));
+  const guard = props
+    ? `for (let i = 0, props="${[...new Set(props)].join('')}"; i < props.length; i++)
       defineProperty(${G.require}, props[i], {__proto__: null, value: 0, writable: 1});\n`
     : '';
-  return guard + replace(BOOTSTRAP_RULES, src, this);
+  const res = replace(BOOTSTRAP_RULES, src, this);
+  // splicing the guard after the first line to handle `require = {}`
+  const i = res.indexOf('\n');
+  return res.slice(0, i) + guard + res.slice(i);
 }
 
 function replace(rules, src, info) {

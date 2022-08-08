@@ -133,7 +133,6 @@ module.exports = Promise.all([
   }),
 
   modify('injected-web', './src/injected/web', (config) => {
-    // TODO: replace WebPack's Object.*, .call(), .apply() with safe calls
     config.output.libraryTarget = 'commonjs2';
     config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapperWithGlobals('injected/web', config, defsObj, getGlobals => ({
