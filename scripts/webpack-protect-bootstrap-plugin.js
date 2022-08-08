@@ -55,18 +55,15 @@ class WebpackProtectBootstrapPlugin {
   }
 }
 
-function patchBootstrap(src, group1) {
-  let guard = '';
-  if (group1 !== G.require) {
-    // webpack didn't concatenate all modules into one, let's patch the machinery
-    const props = src.match(new RegExp(`(?<=\\b${G.require}\\.)(\\w+)`, 'g'));
-    const uniq = [...new Set(props)].join('');
-    if (uniq) {
-      guard = `for (let i = 0, props=${JSON.stringify(uniq)}; i < props.length; i++)
-      defineProperty(${G.require}, props[i], {__proto__: null, value: 0, writable: 1});\n`;
-    }
-  }
-  return guard + replace(guard ? BOOTSTRAP_RULES : [OBJ_RULE], src, this);
+function patchBootstrap(src) {
+  const props = src.match(new RegExp(`(?<=\\b${G.require}\\.)(\\w+)`, 'g'));
+  const uniq = [...new Set(props)].join('');
+  const guard = uniq
+    ? `for (let i = 0, props=${JSON.stringify(uniq)}; i < props.length; i++)
+      defineProperty(${G.require}, props[i], {__proto__: null, value: 0, writable: 1});\n`
+    : '';
+  const rules = uniq ? BOOTSTRAP_RULES : [OBJ_RULE];
+  return guard + replace(rules, src, this);
 }
 
 function replace(rules, src, info) {
