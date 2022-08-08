@@ -41,18 +41,12 @@ exports.optimization = {
         name: 'common-ui',
         test: new RegExp([
           /\bsvg/,
-          'src/common/(ui|keyboard|load-script-icon)',
+          'src/common/',
           'node_modules/@violentmonkey/shortcut',
           'node_modules/@?vue',
         ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
-        chunks: 'all',
-        priority: 100,
-      },
-      common: {
-        name: 'common',
-        minChunks: 2,
-        enforce: true,
-        chunks: 'all',
+        /** Excluding the background entry because it uses only 4kB of common code */
+        chunks: c => c.name !== 'background/index',
       },
       ...splitVendor('codemirror'),
       ...splitVendor('tldjs'),
