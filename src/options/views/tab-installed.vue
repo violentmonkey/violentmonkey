@@ -57,7 +57,7 @@
           <template #content>
             <div>
               <locale-group i18n-key="labelFilterSort">
-                <select :modelValue="filters.sort" @change="onOrderChange">
+                <select :value="filters.sort" @change="onOrderChange">
                   <option
                     v-for="(option, name) in filterOptions.sort"
                     v-text="option.title"
@@ -204,6 +204,7 @@ const combinedCompare = cmpFunc => (
 filters::forEachKey(key => {
   hookSetting(`filters.${key}`, (val) => {
     filters[key] = val;
+    if (key === 'sort' && !filterOptions.sort[val]) filters[key] = Object.keys(filterOptions.sort)[0];
   });
 });
 
@@ -275,13 +276,7 @@ export default {
   },
   watch: {
     search: 'scheduleSearch',
-    'filters.sort'(value) {
-      if (!filterOptions.sort[value]) {
-        filters.sort = Object.keys(filterOptions.sort)[0];
-        return;
-      }
-      this.updateLater();
-    },
+    'filters.sort': 'updateLater',
     'filters.showEnabledFirst': 'updateLater',
     'filters.viewSingleColumn': 'adjustScriptWidth',
     'filters.viewTable': 'adjustScriptWidth',
