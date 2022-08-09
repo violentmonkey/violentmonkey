@@ -291,7 +291,7 @@ function prepareScript(script) {
       IS_FIREFOX ? `,${dataKey}){try{` : '){'}${
       grantNone ? '' : 'with(this)with(c)delete c,'
     // hiding module interface from @require'd scripts so they don't mistakenly use it
-    }((${grantNone ? 'define,module,exports' : ''})=>{`,
+    }((define,module,exports)=>{`,
     ...reqsSlices,
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs && wrap && '(()=>{',
