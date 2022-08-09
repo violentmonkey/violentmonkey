@@ -19,117 +19,101 @@
       </dl>
     </div>
     <div class="contents pos-rel flex-1">
-      <img v-if="img" :src="img">
-      <vm-code
-        v-show="!img"
+      <img v-if="data.image" :src="data.image">
+      <VmCode
+        v-show="!data.image"
         class="abs-full"
-        :value="code"
+        :value="data.code"
         ref="code"
         readonly
         :cm-options="cmOptions"
-        :mode="mode"
+        :mode="data.mode"
+        :commands="commands"
       />
     </div>
   </div>
 </template>
 
-<script>
-import { formatByteLength, dataUri2text } from '@/common';
+<script setup>
+import { computed, ref, watchEffect, defineProps } from 'vue';
+import { formatByteLength, dataUri2text, i18n } from '@/common';
 import VmCode from '@/common/ui/code';
 import storage from '@/common/storage';
 
-export default {
-  props: ['value', 'cmOptions', 'commands', 'install', 'errors'],
-  components: { VmCode },
-  computed: {
-    all() {
-      const { code, deps = this.deps, url: mainUrl } = this.install || {};
-      const { require = [], resources = {} } = this.value.meta || {};
-      return [
-        ...mainUrl ? [[this.i18n('editNavCode'), mainUrl, code]] : [],
-        ...require.map(url => ['@require', url, deps[`0${url}`]]),
-        ...Object.entries(resources).map(([id, url]) => [`@resource ${id}`, url, deps[`1${url}`]]),
-      ];
-    },
-  },
-  data() {
-    return {
-      code: null,
-      deps: {},
-      img: null,
-      index: null,
-      mode: null,
+const props = defineProps(['value', 'cmOptions', 'commands', 'install']);
+
+const dependencies = {};
+
+const index = ref(0);
+
+const data = ref({});
+
+const all = computed(() => {
+  const { code, deps = dependencies, url: mainUrl } = props.install || {};
+  const { require = [], resources = {} } = props.value.meta || {};
+  return [
+    ...mainUrl ? [[i18n('editNavCode'), mainUrl, code]] : [],
+    ...require.map(url => ['@require', url, deps[`0${url}`]]),
+    ...Object.entries(resources).map(([id, url]) => [`@resource ${id}`, url, deps[`1${url}`]]),
+  ];
+});
+
+watchEffect(update);
+
+async function update() {
+  const { install, value } = props;
+  const isMain = install && !index.value;
+  if (isMain) {
+    data.value = {
+      code: install.code,
     };
-  },
-  watch: {
-    async index(index) {
-      const [type, url] = this.all[index] || [];
-      if (!url) return;
-      const { install } = this;
-      const isMain = install && !index;
-      const isDataUri = url.startsWith('data:');
-      const isReq = !isMain && !isDataUri && type === '@require';
-      const depsUrl = `${+!isReq}${url}`;
-      let code;
-      let contentType;
-      let img;
-      let raw;
-      if (isMain) {
-        code = install.code;
-      } else {
-        if (isDataUri) {
-          raw = url;
-        } else if (install) {
-          raw = install.deps[depsUrl];
-        } else {
-          const key = this.value.custom.pathMap?.[url] || url;
-          raw = await storage[isReq ? 'require' : 'cache'].getOne(key);
-          if (!isReq) raw = storage.cache.makeDataUri(key, raw);
-        }
-        if (isReq || !raw) {
-          code = raw;
-        } else if (raw.startsWith('data:image')) {
-          img = raw;
-        } else {
-          [contentType, code] = raw.split(',');
-          if (code == null) { // workaround for bugs in old VM, see 2e135cf7
-            const fileExt = url.match(/\.(\w+)([#&?]|$)/)?.[1] || '';
-            contentType = /^(png|jpe?g|bmp|svgz?|gz|zip)$/i.test(fileExt)
-              ? ''
-              : `text/${fileExt.toLowerCase()}`;
-          } else if (contentType) {
-            contentType = contentType.split(/[:;]/)[1];
-          }
-          code = dataUri2text(raw);
-        }
-      }
-      this.img = img;
-      this.mode = contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null;
-      this.code = code;
-      this.$set(this.deps, depsUrl, code);
-    },
-    'install.code'(val) {
-      this.code = val;
-    },
-    value() {
-      this.$nextTick(() => {
-        if (this.index >= this.all.length) this.index = 0;
-      });
-    },
-  },
-  async mounted() {
-    this.index = 0;
-  },
-  methods: {
-    formatLength(str, type) {
-      let len = str?.length;
-      if (type.startsWith('@resource')) {
-        len = Math.round((len - str.indexOf(',') - 1) * 6 / 8); // base64 uses 6 bits out of 8
-      }
-      return formatByteLength(len);
-    },
-  },
-};
+    return;
+  }
+  const [type, url] = all.value[index.value];
+  if (!url) return;
+  const isDataUri = url.startsWith('data:');
+  const isReq = !isMain && !isDataUri && type === '@require';
+  const depsUrl = `${+!isReq}${url}`;
+  let raw;
+  if (isDataUri) {
+    raw = url;
+  } else if (install) {
+    raw = install.deps[depsUrl];
+  } else {
+    const key = value.custom.pathMap?.[url] || url;
+    raw = await storage[isReq ? 'require' : 'cache'].getOne(key);
+    if (!isReq) raw = storage.cache.makeDataUri(key, raw);
+  }
+  if (isReq || !raw) {
+    data.value = { code: raw };
+  } else if (raw.startsWith('data:image')) {
+    data.value = { image: raw };
+  } else {
+    let [contentType, code] = raw.split(',');
+    if (code == null) { // workaround for bugs in old VM, see 2e135cf7
+      const fileExt = url.match(/\.(\w+)([#&?]|$)/)?.[1] || '';
+      contentType = /^(png|jpe?g|bmp|svgz?|gz|zip)$/i.test(fileExt)
+        ? ''
+        : `text/${fileExt.toLowerCase()}`;
+    } else if (contentType) {
+      contentType = contentType.split(/[:;]/)[1];
+    }
+    code = dataUri2text(raw);
+    data.value = {
+      mode: contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null,
+      code,
+    };
+    dependencies[depsUrl] = code;
+  }
+}
+
+function formatLength(str, type) {
+  let len = str?.length;
+  if (type.startsWith('@resource')) {
+    len = Math.round((len - str.indexOf(',') - 1) * 6 / 8); // base64 uses 6 bits out of 8
+  }
+  return formatByteLength(len);
+}
 </script>
 
 <style>

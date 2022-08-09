@@ -196,6 +196,11 @@ export default {
   watch: {
     nav(val) {
       keyboardService.setContext('tabCode', val === 'code');
+      if (val === 'code') {
+        this.$nextTick(() => {
+          this.$refs.code.cm.focus();
+        });
+      }
     },
     canSave(val) {
       this.toggleUnloadSentry(val);
@@ -267,7 +272,7 @@ export default {
     this.disposeList = [
       keyboardService.register('a-pageup', this.switchPrevPanel),
       keyboardService.register('a-pagedown', this.switchNextPanel),
-      keyboardService.register(K_SAVE.replace('Ctrl-', 'ctrlcmd-'), this.save),
+      keyboardService.register(K_SAVE.replace(/(?:Ctrl|Cmd)-/i, 'ctrlcmd-'), this.save),
       keyboardService.register('escape', () => { this.nav = 'code'; }, {
         condition: '!tabCode',
       }),
