@@ -57,7 +57,7 @@
           <template #content>
             <div>
               <locale-group i18n-key="labelFilterSort">
-                <select :modelValue="filters.sort.value" @update:modelValue="onOrderChange">
+                <select :modelValue="filters.sort" @change="onOrderChange">
                   <option
                     v-for="(option, name) in filterOptions.sort"
                     v-text="option.title"
@@ -125,7 +125,7 @@
           :focused="selectedScript === script"
           :showHotkeys="showHotkeys"
           :script="script"
-          :draggable="!showRecycle && filters.sort.value === 'exec'"
+          :draggable="!showRecycle && filters.sort === 'exec'"
           :visible="index < batchRender.limit"
           :viewTable="filters.viewTable"
           :hotkeys="scriptHotkeys"
@@ -188,29 +188,14 @@ const filterOptions = {
     },
   },
 };
-const filtersSort = {
-  value: null,
-  title: null,
-};
-const filters = {
+const filters = reactive({
   searchScope: null,
   showEnabledFirst: null,
   showOrder: null,
   viewSingleColumn: null,
   viewTable: null,
-  get sort() {
-    return filtersSort;
-  },
-  set sort(value) {
-    const option = filterOptions.sort[value];
-    if (option) {
-      filtersSort.value = value;
-      filtersSort.title = option.title;
-    } else {
-      filters.sort = Object.keys(filterOptions.sort)[0];
-    }
-  },
-};
+  sort: null,
+});
 const combinedCompare = cmpFunc => (
   filters.showEnabledFirst
     ? ((a, b) => b.config.enabled - a.config.enabled || cmpFunc(a, b))
@@ -290,7 +275,13 @@ export default {
   },
   watch: {
     search: 'scheduleSearch',
-    'filters.sort.value': 'updateLater',
+    'filters.sort'(value) {
+      if (!filterOptions.sort[value]) {
+        filters.sort = Object.keys(filterOptions.sort)[0];
+        return;
+      }
+      this.updateLater();
+    },
     'filters.showEnabledFirst': 'updateLater',
     'filters.viewSingleColumn': 'adjustScriptWidth',
     'filters.viewTable': 'adjustScriptWidth',
@@ -310,7 +301,7 @@ export default {
   },
   computed: {
     currentSortCompare() {
-      return filterOptions.sort[filters.sort.value]?.compare;
+      return filterOptions.sort[filters.sort]?.compare;
     },
     selectedScript() {
       return this.filteredScripts[this.focusedIndex];
