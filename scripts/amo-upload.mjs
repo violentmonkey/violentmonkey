@@ -19,10 +19,13 @@ async function main() {
     return;
   }
 
-  const pollOptions = !beta && {
+  const pollOptions = !beta ? {
     // disable status checking for listed versions since
     // we don't need to download the signed version
     pollRetry: 0,
+  } : {
+    pollInterval: 30000,
+    pollRetry: 30,
   };
 
   const tempFile = join(process.env.TEMP_DIR, Math.random().toString(36).slice(2, 8).toString());
