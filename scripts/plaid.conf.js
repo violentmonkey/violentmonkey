@@ -41,7 +41,7 @@ exports.optimization = {
         name: 'common-ui',
         test: new RegExp([
           /\bsvg/,
-          'src/common/',
+          'src/common/(?!zip|tld)',
           'node_modules/@violentmonkey/shortcut',
           'node_modules/@?vue',
         ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
