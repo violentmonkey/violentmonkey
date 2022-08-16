@@ -213,7 +213,11 @@ export default {
     mode(value) {
       this.cm.setOption('mode', value || cmDefaults.mode);
     },
-    value(value) {
+    value: 'updateValue',
+  },
+  methods: {
+    updateValue() {
+      let { value } = this;
       const hasLongLines = new RegExp(`^\\s*.{${maxDisplayLength},}`, 'm').test(value);
       const { cm } = this;
       if (!cm) return;
@@ -234,8 +238,6 @@ export default {
       cm.on('changes', this.onChanges);
       cm.on('beforeChange', this.onBeforeChange);
     },
-  },
-  methods: {
     onBeforeChange(cm, change) {
       if (this.createPlaceholders(change)) {
         cm.on('change', this.onChange); // triggered before DOM is updated
@@ -633,6 +635,7 @@ export default {
         this.cm.setOption('theme', val);
       }
     });
+    this.updateValue();
   },
   beforeUnmount() {
     this.onActive(false);

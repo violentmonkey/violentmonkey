@@ -197,7 +197,7 @@ export default {
       this.heading = this.reinstall ? this.i18n('labelReinstall') : this.i18n('labelInstall');
     }
     this.disposeList = [
-      keyboardService.register(CONFIRM_HOTKEY, () => this.$refs.confirm.click()),
+      keyboardService.register('ctrlcmd-enter', () => this.$refs.confirm.click()),
     ];
     keyboardService.enable();
   },
