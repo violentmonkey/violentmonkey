@@ -100,7 +100,7 @@ export default {
           } else if (contentType) {
             contentType = contentType.split(/[:;]/)[1];
           }
-          code = dataUri2text(raw);
+          code = dataUri2text(`${contentType};base64,${code}`);
         }
       }
       this.img = img;
