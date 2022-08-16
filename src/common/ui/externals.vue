@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watchEffect, defineProps } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { formatByteLength, dataUri2text, i18n } from '@/common';
 import VmCode from '@/common/ui/code';
 import storage from '@/common/storage';
