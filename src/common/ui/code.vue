@@ -214,15 +214,19 @@ export default {
       this.cm.setOption('mode', value || cmDefaults.mode);
     },
     value(value) {
+      const hasLongLines = new RegExp(`^\\s*.{${maxDisplayLength},}`, 'm').test(value);
       const { cm } = this;
       if (!cm) return;
-      const lines = value.split('\n');
-      const modified = this.createPlaceholders({ text: lines, from: { line: 0 } });
+      if (hasLongLines) {
+        const lines = value.split('\n');
+        this.createPlaceholders({ text: lines, from: { line: 0 } });
+        value = lines.join('\n');
+      }
       cm.off('beforeChange', this.onBeforeChange);
       cm.off('changes', this.onChanges);
       cm.operation(() => {
-        cm.setValue(modified ? lines.join('\n') : value);
-        if (modified) this.renderPlaceholders();
+        cm.setValue(value);
+        if (hasLongLines) this.renderPlaceholders();
       });
       cm.clearHistory();
       cm.markClean();
