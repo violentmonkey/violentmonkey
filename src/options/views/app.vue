@@ -33,10 +33,11 @@ import About from './tab-about';
 
 const SETTINGS = 'settings';
 const SCRIPTS = 'scripts';
+const ABOUT = 'about';
 const tabs = [
   { name: SCRIPTS, comp: Installed, label: i18n('sideMenuInstalled') },
   { name: SETTINGS, comp: Settings, label: i18n('sideMenuSettings') },
-  { name: 'about', comp: About, label: i18n('sideMenuAbout') },
+  { name: ABOUT, comp: About, label: i18n('sideMenuAbout') },
 ];
 const extName = i18n('extName');
 const conditionNotEdit = '!editScript';
@@ -91,7 +92,8 @@ export default {
   },
   created() {
     document.addEventListener('dragover', evt => {
-      if (this.current !== SETTINGS && evt.dataTransfer.types.includes('Files')) {
+      if ([ABOUT, SCRIPTS].includes(window.location.hash.slice(1))
+      && /^application\/(zip|x-zip-compressed)$/.test(evt.dataTransfer.items[0]?.type)) {
         window.location.hash = `#${SETTINGS}`;
       }
     });
