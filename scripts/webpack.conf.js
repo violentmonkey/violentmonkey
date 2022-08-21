@@ -77,6 +77,7 @@ const defsObj = {
     { key: 'SYNC_GOOGLE_CLIENT_SECRET' },
     { key: 'SYNC_ONEDRIVE_CLIENT_ID' },
     { key: 'SYNC_ONEDRIVE_CLIENT_SECRET' },
+    { key: 'SYNC_DROPBOX_CLIENT_ID' },
   ]),
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
   'process.env.VAULT_ID': VAULT_ID,
