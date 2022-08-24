@@ -3,16 +3,19 @@
 // - https://github.com/google/google-api-nodejs-client
 import { getUniqId, noop } from '@/common';
 import { objectGet } from '@/common/object';
-import { dumpQuery, notify } from '../utils';
+import { loadQuery, dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, register, isScriptFile,
   openAuthPage,
+  getCodeVerifier,
+  getCodeChallenge,
 } from './base';
 
 const config = {
-  client_id: process.env.SYNC_GOOGLE_CLIENT_ID,
-  client_secret: process.env.SYNC_GOOGLE_CLIENT_SECRET,
-  redirect_uri: 'https://violentmonkey.github.io/auth_googledrive.html',
+  client_id: process.env.SYNC_GOOGLE_DESKTOP_ID,
+  client_secret: process.env.SYNC_GOOGLE_DESKTOP_SECRET,
+  redirect_uri: 'http://127.0.0.1:45678/',
+  // redirect_uri: 'https://violentmonkey.github.io/auth_googledrive.html',
   scope: 'https://www.googleapis.com/auth/drive.appdata',
 };
 const UNAUTHORIZED = { status: 'UNAUTHORIZED' };
@@ -39,24 +42,6 @@ const GoogleDrive = BaseService.extend({
     });
     return requestUser()
     .then((info) => {
-      // If access was granted with access_type=online, revoke it.
-      if (info.access_type === 'online') {
-        return this.loadData({
-          method: 'POST',
-          url: `https://accounts.google.com/o/oauth2/revoke?token=${this.config.get('token')}`,
-          prefix: '',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        })
-        .then(() => {
-          notify({
-            title: 'Sync Upgraded',
-            body: 'Please reauthorize access to your Google Drive to complete the upgradation.',
-          });
-          return Promise.reject('Online access revoked.');
-        });
-      }
       if (info.scope !== config.scope) return Promise.reject(UNAUTHORIZED);
     })
     .catch((res) => {
@@ -109,28 +94,39 @@ const GoogleDrive = BaseService.extend({
       return Promise.all([gotMeta, remoteData, this.getLocalData()]);
     });
   },
-  authorize() {
+  async authorize() {
+    this.session = {
+      state: getUniqId(),
+      codeVerifier: getCodeVerifier(),
+    };
     const params = {
       response_type: 'code',
-      access_type: 'offline',
       client_id: config.client_id,
       redirect_uri: config.redirect_uri,
       scope: config.scope,
+      state: this.session.state,
+      ...await getCodeChallenge(this.session.codeVerifier),
     };
     if (!this.config.get('refresh_token')) params.prompt = 'consent';
     const url = `https://accounts.google.com/o/oauth2/v2/auth?${dumpQuery(params)}`;
     openAuthPage(url, config.redirect_uri);
   },
   checkAuth(url) {
-    const redirectUri = `${config.redirect_uri}?code=`;
-    if (url.startsWith(redirectUri)) {
-      this.authState.set('authorizing');
-      this.authorized({
-        code: decodeURIComponent(url.split('#')[0].slice(redirectUri.length)),
-      })
-      .then(() => this.checkSync());
-      return true;
-    }
+    const redirectUri = `${config.redirect_uri}?`;
+    if (!url.startsWith(redirectUri)) return;
+    const query = loadQuery(url.slice(redirectUri.length));
+    const { state, codeVerifier } = this.session || {};
+    this.session = null;
+    if (query.state !== state || !query.code) return;
+    this.authState.set('authorizing');
+    this.authorized({
+      code: query.code,
+      code_verifier: codeVerifier,
+      grant_type: 'authorization_code',
+      redirect_uri: config.redirect_uri,
+    })
+    .then(() => this.checkSync());
+    return true;
   },
   revoke() {
     this.config.set({
@@ -150,8 +146,6 @@ const GoogleDrive = BaseService.extend({
       body: dumpQuery(Object.assign({}, {
         client_id: config.client_id,
         client_secret: config.client_secret,
-        redirect_uri: config.redirect_uri,
-        grant_type: 'authorization_code',
       }, params)),
       responseType: 'json',
     })

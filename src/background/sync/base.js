@@ -1,5 +1,5 @@
 import {
-  debounce, normalizeKeys, request, noop, makePause, ensureArray, sendCmd,
+  debounce, normalizeKeys, request, noop, makePause, ensureArray, sendCmd, blob2base64, getUniqId,
 } from '@/common';
 import { TIMEOUT_HOUR } from '@/common/consts';
 import {
@@ -620,3 +620,34 @@ hookOptions((data) => {
   const value = data?.['sync.current'];
   if (value) initialize();
 });
+
+const base64urlMapping = {
+  '+': '-',
+  '/': '_',
+};
+
+async function sha256b64url(code) {
+  const bin = new TextEncoder().encode(code);
+  const buffer = await crypto.subtle.digest('SHA-256', bin);
+  const blob = new Blob([buffer], { type: 'application/octet-binary' });
+  const b64 = await blob2base64(blob);
+  return b64.replace(/[+/=]/g, m => base64urlMapping[m] || '');
+}
+
+/**
+ * Create a unique string between 43 and 128 characters long.
+ *
+ * Ref: RFC 7636
+ */
+export function getCodeVerifier() {
+  return getUniqId(getUniqId(getUniqId()));
+}
+
+export async function getCodeChallenge(codeVerifier) {
+  const method = 'S256';
+  const challenge = await sha256b64url(codeVerifier);
+  return {
+    code_challenge: challenge,
+    code_challenge_method: method,
+  };
+}

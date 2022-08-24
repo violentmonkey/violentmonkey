@@ -1,11 +1,14 @@
+import { getUniqId } from '@/common';
 import { loadQuery, dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
   openAuthPage,
+  getCodeVerifier,
+  getCodeChallenge,
 } from './base';
 
 const config = {
-  client_id: 'f0q12zup2uys5w8',
+  client_id: process.env.SYNC_DROPBOX_CLIENT_ID,
   redirect_uri: 'https://violentmonkey.github.io/auth_dropbox.html',
 };
 
@@ -20,10 +23,25 @@ function jsonStringifySafe(obj) {
 const Dropbox = BaseService.extend({
   name: 'dropbox',
   displayName: 'Dropbox',
+  refreshToken() {
+    const refreshToken = this.config.get('refresh_token');
+    return this.authorized({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    })
+    .then(() => this.prepare());
+  },
   user() {
-    return this.loadData({
+    const requestUser = () => this.loadData({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/users/get_current_account',
+    });
+    return requestUser()
+    .catch((res) => {
+      if (res.status === 401) {
+        return this.refreshToken().then(requestUser);
+      }
+      throw res;
     })
     .catch((err) => {
       if (err.status === 401) {
@@ -94,36 +112,65 @@ const Dropbox = BaseService.extend({
     })
     .then(normalize);
   },
-  authorize() {
+  async authorize() {
+    this.session = {
+      state: getUniqId(),
+      codeVerifier: getCodeVerifier(),
+    };
     const params = {
-      response_type: 'token',
+      response_type: 'code',
+      token_access_type: 'offline',
       client_id: config.client_id,
       redirect_uri: config.redirect_uri,
+      state: this.session.state,
+      ...await getCodeChallenge(this.session.codeVerifier),
     };
     const url = `https://www.dropbox.com/oauth2/authorize?${dumpQuery(params)}`;
     openAuthPage(url, config.redirect_uri);
   },
-  authorized(raw) {
-    const data = loadQuery(raw);
-    if (data.access_token) {
-      this.config.set({
-        uid: data.uid,
-        token: data.access_token,
-      });
-    }
+  async authorized(params) {
+    delete this.headers.Authorization;
+    this.authState.set('authorizing');
+    const data = await this.loadData({
+      method: 'POST',
+      url: 'https://api.dropbox.com/oauth2/token',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: dumpQuery({
+        client_id: config.client_id,
+        ...params,
+      }),
+      responseType: 'json',
+    });
+    if (!data.access_token) throw data;
+    this.config.set({
+      uid: data.account_id,
+      token: data.access_token,
+      refresh_token: data.refresh_token || params.refresh_token,
+    });
   },
   checkAuth(url) {
-    const redirectUri = `${config.redirect_uri}#`;
-    if (url.startsWith(redirectUri)) {
-      this.authorized(url.slice(redirectUri.length));
-      this.checkSync();
-      return true;
-    }
+    const redirectUri = `${config.redirect_uri}?`;
+    if (!url.startsWith(redirectUri)) return;
+    const query = loadQuery(url.slice(redirectUri.length));
+    const { state, codeVerifier } = this.session || {};
+    this.session = null;
+    if (query.state !== state || !query.code) return;
+    this.authorized({
+      code: query.code,
+      code_verifier: codeVerifier,
+      grant_type: 'authorization_code',
+      redirect_uri: config.redirect_uri,
+    })
+    .then(() => this.checkSync());
+    return true;
   },
   revoke() {
     this.config.set({
       uid: null,
       token: null,
+      refresh_token: null,
     });
     return this.prepare();
   },

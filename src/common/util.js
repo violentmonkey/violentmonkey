@@ -73,9 +73,10 @@ export function noop() {}
 
 export function getUniqId(prefix = 'VM') {
   const now = performance.now();
+  // `rnd + 1` to make sure the number is large enough and the string is long enough
   return prefix
-    + Math.floor((now - Math.floor(now)) * 1e12).toString(36)
-    + Math.floor(Math.random() * 1e12).toString(36);
+    + Math.floor((now - Math.floor(now) + 1) * 1e12).toString(36)
+    + Math.floor((Math.random() + 1) * 1e12).toString(36);
 }
 
 /**
