@@ -1107,37 +1107,38 @@
     "@typescript-eslint/parser" "^5.9.0"
     typescript "^4.5.4"
 
-"@gera2ld/plaid-common-vue@^2.5.7-alpha.1+8804900":
-  version "2.5.7-alpha.1"
-  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-common-vue/-/plaid-common-vue-2.5.7-alpha.1.tgz#c5893679c8bd5b93007a6712dbf0cf72d9e91ca8"
-  integrity sha512-wSlIq8+v0Z1j+m18q8dMt084hvyCHZNz11pdClMJpSR5MwIGXzUNXjWLkqwzMFrv48VerWKf5qGTigI+SHmzCQ==
+"@gera2ld/plaid-common-vue@^2.5.7":
+  version "2.5.7"
+  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-common-vue/-/plaid-common-vue-2.5.7.tgz#d2bf78d2630bd1c9598e8e9b69747c53ee0b0b86"
+  integrity sha512-D0UCw71ND3K88C0Ulh2WZZEP2oW1lGJPVBzKIbnQNJoi8FHrPL2+Ce/5PqI/YO8ye+G9cCadyVEoc84RxbpE+g==
   dependencies:
     "@vue/eslint-config-typescript" "^11.0.0"
     eslint-plugin-vue "^9.3.0"
     vue-tsc "^0.40.1"
 
-"@gera2ld/plaid-test@^2.5.0":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-test/-/plaid-test-2.5.0.tgz#4769b250beccb847f3169dff74bec286cfe73cb8"
-  integrity sha512-4xihZbrkmjbpTxKT7L2aD5XNaqGXf5rw1Q4307J/gGa5+kO8FRP+NTJJ7PC5IEcbvKY6yzSb5qSEbhoCg/XG+Q==
+"@gera2ld/plaid-test@^2.5.7":
+  version "2.5.7"
+  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-test/-/plaid-test-2.5.7.tgz#4f7c96d610eaf93acdf4c0b1f18b7df4003d9675"
+  integrity sha512-iJqucqPQ+Fr+uAn5/s+v9MR0+38tmZoPN2lZNb/dYNrfx8eblGdFCpu/ZvlGS26A5x4kQ5QGyqHOUjzCeQGuDg==
   dependencies:
     "@types/jest" "^27.0.3"
     babel-jest "^27.4.5"
+    eslint-plugin-jest "^26.7.0"
     jest "^27.4.5"
 
-"@gera2ld/plaid-webpack-vue3@~2.5.7-alpha.1":
-  version "2.5.7-alpha.1"
-  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-webpack-vue3/-/plaid-webpack-vue3-2.5.7-alpha.1.tgz#70f0a26a68efbaae5f15ebbce03afa2d9a97e5c5"
-  integrity sha512-/OJOx5+WnXFgKU3V+j1wDS7Oy2HyW9TpVYYVAyI3ftwwxhB4jZdhsXJ65bFOe9pGLox7QYfEET1Ysm+CPj7eKg==
+"@gera2ld/plaid-webpack-vue3@~2.5.7":
+  version "2.5.7"
+  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-webpack-vue3/-/plaid-webpack-vue3-2.5.7.tgz#7367f7be437ef7454f94961d9f0ee1b1c2c1c6fd"
+  integrity sha512-dwvJOodhfjL56lBerB+aZt9oXHaQRayJ0vrnmQjAaekBFj7Bg/MkAlH1HdE+mt40GrkrqcUGIVjDg+QoyLtl1Q==
   dependencies:
-    "@gera2ld/plaid-common-vue" "^2.5.7-alpha.1+8804900"
+    "@gera2ld/plaid-common-vue" "^2.5.7"
     "@vue/compiler-sfc" "^3.2.26"
     vue-loader "^17.0.0"
 
-"@gera2ld/plaid-webpack@~2.5.3":
-  version "2.5.3"
-  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-webpack/-/plaid-webpack-2.5.3.tgz#4e35859e15813c1bcbc650d270a1224f92c6307c"
-  integrity sha512-CQixBpKE49lF4e9gJd7v2maSNtyvjExO97LQdpxLDOTYerkI8w0eptoxhAWMzSbp41yNRmdKxBGVsYJpgEk6SQ==
+"@gera2ld/plaid-webpack@~2.5.7":
+  version "2.5.7"
+  resolved "https://registry.yarnpkg.com/@gera2ld/plaid-webpack/-/plaid-webpack-2.5.7.tgz#05b902253bba59705e20459934fa53069f117e49"
+  integrity sha512-H3stOAUou+AFCqYfRNX2T8ISRiGMZ8Y5uolokt0obzgkP6lul1GrOzUrH3oV9acQnCGq6JDbWWvHq4scVxRO0w==
   dependencies:
     babel-loader "^8.2.3"
     css-loader "^6.5.1"
