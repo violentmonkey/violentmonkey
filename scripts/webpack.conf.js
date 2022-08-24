@@ -75,6 +75,8 @@ const defsObj = {
     { key: 'VM_VER', val: VM_VER },
     { key: 'SYNC_GOOGLE_CLIENT_ID' },
     { key: 'SYNC_GOOGLE_CLIENT_SECRET' },
+    { key: 'SYNC_GOOGLE_DESKTOP_ID' },
+    { key: 'SYNC_GOOGLE_DESKTOP_SECRET' },
     { key: 'SYNC_ONEDRIVE_CLIENT_ID' },
     { key: 'SYNC_ONEDRIVE_CLIENT_SECRET' },
     { key: 'SYNC_DROPBOX_CLIENT_ID' },
