@@ -9,7 +9,7 @@ import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
 import { testScript, testBlacklist } from './tester';
 import { preInitialize } from './init';
-import { commands, notify } from './message';
+import { commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
 import './storage-fetch';
@@ -287,7 +287,7 @@ async function getScriptEnv(scripts, isCombined) {
   /** @namespace VMScriptByUrlData */
   const [envStart, envDelayed] = [0, 1].map(() => ({
     ids: [],
-    /** @type {(VMScript & VMInjectedScript)[]} */
+    depsMap: {},
     [ENV_CACHE_KEYS]: [],
     [ENV_REQ_KEYS]: [],
     [ENV_SCRIPTS]: [],
@@ -303,6 +303,7 @@ async function getScriptEnv(scripts, isCombined) {
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
     const env = isCombined || runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
+    const { depsMap } = env;
     env.ids.push(id);
     if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
       env[ENV_VALUE_IDS].push(id);
@@ -315,6 +316,7 @@ async function getScriptEnv(scripts, isCombined) {
         key = pathMap[key] || key;
         if (!envStart[name].includes(key)) {
           env[name].push(key);
+          (depsMap[key] || (depsMap[key] = [])).push(id);
         }
       });
     }
@@ -355,6 +357,7 @@ async function readEnvironmentData(env, isRetry) {
     });
   });
   const data = await storage.base.getMulti(keys);
+  const badScripts = new Set();
   for (const [area, srcIds] of STORAGE_ROUTES) {
     env[area] = {};
     for (const id of env[srcIds]) {
@@ -363,19 +366,31 @@ async function readEnvironmentData(env, isRetry) {
         : data[storage[area].getKey(id)];
       env[area][id] = val;
       if (val == null && area !== 'value' && retriedStorageKeys[area + id] !== 2) {
-        const err = `The "${area}" storage is missing "${id}"!`;
-        const err2 = 'Vacuuming did not help. Please reinstall the affected scripts.';
         retriedStorageKeys[area + id] = isRetry ? 2 : 1;
         if (!isRetry) {
-          console.warn(err, 'Vacuuming...');
-          if (await vacuum()) {
+          console.warn(`The "${area}" storage is missing "${id}"! Vacuuming...`);
+          if ((await vacuum()).fixes) {
             return readEnvironmentData(env, true);
           }
         }
-        console.error(err, err2);
-        notify({ title: err, body: err2 });
+        if (area === 'code') {
+          badScripts.add(id);
+        } else {
+          env.depsMap[id]?.forEach(scriptId => badScripts.add(scriptId));
+        }
       }
     }
+  }
+  if (badScripts.size) {
+    const title = i18n('msgMissingResources');
+    const text = i18n('msgReinstallScripts')
+      + [...badScripts].map(id => `\n#${id}: ${getScriptName(getScriptById(id))}`).join('');
+    console.error(`${title} ${text}`);
+    await commands.Notification({ title, text }, undefined, {
+      onClick() {
+        badScripts.forEach(id => commands.OpenEditor(id));
+      },
+    });
   }
   return env;
 }
@@ -628,7 +643,7 @@ function formatHttpError(e) {
 let _vacuuming;
 /**
  * @param {Object} [data]
- * @return {Promise<number>}
+ * @return {Promise<{errors:string[], fixes:number}>}
  */
 export async function vacuum(data) {
   if (_vacuuming) return _vacuuming;
