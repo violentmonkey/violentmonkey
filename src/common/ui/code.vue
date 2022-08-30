@@ -119,8 +119,12 @@ const killTrailingSpaces = (cm, placeholders) => {
     : text;
   if (text !== trimmed) {
     cm.operation(() => {
-      let line = 0;
+      const cursorLines = cm.doc.sel.ranges.map(r => r.head.line);
+      let line = -1;
       cm.eachLine(({ text: lineText }) => {
+        line += 1;
+        // The saved code is fully trimmed, but we keep the spaces in cursor line(s)
+        if (cursorLines.includes(line)) return;
         const m = /\s+$/.exec(lineText);
         if (m) {
           cm.replaceRange('',
@@ -128,7 +132,6 @@ const killTrailingSpaces = (cm, placeholders) => {
             { line, ch: lineText.length },
             `*${TRAIL_KILL_OPTION}`); // `*` reuses the same undo record for performance
         }
-        line += 1;
       });
     });
   }
