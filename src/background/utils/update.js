@@ -133,7 +133,7 @@ function notify({
   commands.Notification({
     text,
     // FF doesn't show the name of the extension in the title of the notification
-    title: IS_FIREFOX ? `${i18n('titleScriptUpdated')} - ${i18n('extName')}` : '',
+    title: IS_FIREFOX ? i18n('titleScriptUpdated') : '',
   }, undefined, {
     onClick,
   });
