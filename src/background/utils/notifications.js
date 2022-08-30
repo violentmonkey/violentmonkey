@@ -1,16 +1,16 @@
-import { i18n, defaultImage, sendTabCmd } from '@/common';
+import { i18n, defaultImage, sendTabCmd, trueJoin } from '@/common';
 import { commands } from './message';
 
 const openers = {};
 
 Object.assign(commands, {
   /** @return {Promise<string>} */
-  async Notification(data, src, bgExtras) {
+  async Notification({ image, text, title }, src, bgExtras) {
     const notificationId = await browser.notifications.create({
       type: 'basic',
-      title: data.title || (IS_FIREFOX ? i18n('extName') : ''), // Chrome already shows the name
-      message: data.text,
-      iconUrl: data.image || defaultImage,
+      title: [title, IS_FIREFOX && i18n('extName')]::trueJoin(' - '), // Chrome already shows the name
+      message: text,
+      iconUrl: image || defaultImage,
     });
     openers[notificationId] = bgExtras?.onClick || src.tab.id;
     return notificationId;

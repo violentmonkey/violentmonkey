@@ -275,7 +275,7 @@ function prepareScript(script) {
   const name = encodeURIComponent(displayName.replace(BAD_URL_CHAR, replaceWithFullWidthForm));
   const isContent = isContentRealm(script, forceContent);
   const pathMap = custom.pathMap || {};
-  const reqs = meta.require?.map(key => require[pathMap[key] || key]).filter(Boolean);
+  const reqs = meta.require.map(key => require[pathMap[key] || key]).filter(Boolean);
   // trying to avoid progressive string concatenation of potentially huge code slices
   // adding `;` on a new line in case some required script ends with a line comment
   const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];

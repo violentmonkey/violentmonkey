@@ -59,18 +59,18 @@ export function mapEntry(func) {
 }
 
 // invoked as obj::forEachEntry(([key, value], i, allEntries) => {})
-export function forEachEntry(func) {
-  if (this) Object.entries(this).forEach(func);
+export function forEachEntry(func, thisObj) {
+  if (this) Object.entries(this).forEach(func, thisObj);
 }
 
 // invoked as obj::forEachKey(key => {}, i, allKeys)
-export function forEachKey(func) {
-  if (this) Object.keys(this).forEach(func);
+export function forEachKey(func, thisObj) {
+  if (this) Object.keys(this).forEach(func, thisObj);
 }
 
 // invoked as obj::forEachValue(value => {}, i, allValues)
-export function forEachValue(func) {
-  if (this) Object.values(this).forEach(func);
+export function forEachValue(func, thisObj) {
+  if (this) Object.values(this).forEach(func, thisObj);
 }
 
 // Needed for Firefox's browser.storage API which fails on Vue observables
