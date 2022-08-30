@@ -149,9 +149,13 @@ preInitialize.push(async () => {
         custom: { pathMap = {} } = {},
         meta = script.meta = {},
       } = script;
+      const {
+        require = meta.require = [],
+        resources = meta.resources = {},
+      } = meta;
       meta.grant = [...new Set(meta.grant || [])]; // deduplicate
-      meta.require?.forEach(rememberUrl, pathMap);
-      Object.values(meta.resources || {}).forEach(rememberUrl, pathMap);
+      require.forEach(rememberUrl, pathMap);
+      resources::forEachValue(rememberUrl, pathMap);
       pathMap::rememberUrl(meta.icon);
     } else if (key.startsWith(storage.mod.prefix)) {
       mods.push(key.slice(storage.mod.prefix.length));
@@ -414,8 +418,8 @@ export async function getSizes(ids) {
     c: code[id]?.length,
     i: JSON.stringify(scripts[index]).length - 2,
     v: JSON.stringify(value[id] || {}).length - 2,
-    '@require': meta.require?.reduce((len, v) => len + (require[pathMap[v] || v]?.length || 0), 0),
-    '@resource': Object.values(meta.resources || {})
+    '@require': meta.require.reduce((len, v) => len + (require[pathMap[v] || v]?.length || 0), 0),
+    '@resource': Object.values(meta.resources)
     .reduce((len, v) => len + (cache[pathMap[v] || v]?.length || 0), 0),
   }));
 }
