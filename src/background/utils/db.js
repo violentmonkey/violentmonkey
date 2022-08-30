@@ -15,7 +15,16 @@ import { setOption } from './options';
 import './storage-fetch';
 import dataCache from './cache';
 
-const store = {};
+const store = {
+  /** @type VMScript[] */
+  scripts: [],
+  /** @type Object<string,VMScript[]> */
+  scriptMap: {},
+  storeInfo: {
+    id: 0,
+    position: 0,
+  },
+};
 storage.base.setDataCache(dataCache);
 storage.script.onDump = (item) => {
   store.scriptMap[item.props.id] = item;
@@ -94,12 +103,7 @@ preInitialize.push(async () => {
   if (!lastVersion) await patchDB();
   if (version !== lastVersion) browser.storage.local.set({ version });
   const data = await browser.storage.local.get();
-  const scripts = [];
-  const storeInfo = {
-    id: 0,
-    position: 0,
-  };
-  const idMap = {};
+  const { scripts, storeInfo, scriptMap: idMap } = store;
   const uriMap = {};
   const mods = [];
   const resUrls = [];
@@ -154,14 +158,6 @@ preInitialize.push(async () => {
     }
   });
   storage.mod.removeMulti(mods.filter(url => !resUrls.includes(url)));
-  Object.assign(store, {
-    scripts,
-    storeInfo,
-    scriptMap: scripts.reduce((map, item) => {
-      map[item.props.id] = item;
-      return map;
-    }, {}),
-  });
   // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
   if (version !== lastVersion
   && IS_FIREFOX
