@@ -79,6 +79,7 @@ import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
 import storage from '#/common/storage';
 import './code-autocomplete';
+import { killTrailingSpaces } from './code-trailing-spaces';
 
 /* eslint-disable no-control-regex */
 let maxDisplayLength;
@@ -89,9 +90,6 @@ const CTRL_RE = new RegExp(`${CTRL_OPEN}(\\d+)${CTRL_CLOSE}`, 'g');
 const PLACEHOLDER_CLS = 'too-long-placeholder';
 // To identify our CodeMirror markers we're using a Symbol since it's always unique
 const PLACEHOLDER_SYM = Symbol(PLACEHOLDER_CLS);
-const TRAIL_KILL_OPTION = 'killTrailingSpaceOnSave';
-const TRAIL_OPTION = 'showTrailingSpace';
-const TRAIL_OVERLAY = 'trailingspace';
 const cmDefaults = {
   continueComments: true,
   styleActiveLine: true,
@@ -108,63 +106,7 @@ const cmDefaults = {
    * 100kB is fast enough for the main editor (moreover such long lines are rare in the main script),
    * and is big enough to include most of popular minified libraries for the `@resource/@require` viewer. */
   maxDisplayLength: 100_000,
-  [TRAIL_KILL_OPTION]: true,
-  [TRAIL_OPTION]: true,
 };
-
-const killTrailingSpaces = (cm, placeholders) => {
-  const text = cm.getValue();
-  const shouldKill = cm.options[TRAIL_KILL_OPTION];
-  const trimmed = shouldKill
-    ? text.replace(/\s+$/gm, '\n')
-    : text;
-  if (text !== trimmed) {
-    cm.operation(() => {
-      const cursorLines = cm.doc.sel.ranges.map(r => r.head.line);
-      let line = -1;
-      cm.eachLine(({ text: lineText }) => {
-        line += 1;
-        // The saved code is fully trimmed, but we keep the spaces in cursor line(s)
-        if (cursorLines.includes(line)) return;
-        const m = /\s+$/.exec(lineText);
-        if (m) {
-          cm.replaceRange('',
-            { line, ch: m.index },
-            { line, ch: lineText.length },
-            `*${TRAIL_KILL_OPTION}`); // `*` reuses the same undo record for performance
-        }
-      });
-    });
-  }
-  if (shouldKill) {
-    // placeholders may have spaces independently from the editable portion of the code
-    placeholders.forEach(p => {
-      p.body = p.body.replace(/\s+$/, '');
-    });
-  }
-  return trimmed;
-};
-
-CodeMirror.defineOption(TRAIL_OPTION, false, (cm, val, prev) => {
-  if (prev === CodeMirror.Init) prev = false;
-  if (prev && !val) {
-    cm.removeOverlay(TRAIL_OVERLAY);
-  } else if (!prev && val) {
-    cm.addOverlay({
-      token(stream) {
-        const s = stream.string;
-        const i = /\s*$/.exec(s).index;
-        if (i > stream.pos) {
-          stream.pos = i;
-          return null;
-        }
-        stream.pos = s.length;
-        return TRAIL_OVERLAY;
-      },
-      name: TRAIL_OVERLAY,
-    });
-  }
-});
 
 export default {
   props: {
