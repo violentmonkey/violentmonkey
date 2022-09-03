@@ -133,7 +133,7 @@ export default {
       ];
       const opts = {};
       Object.entries({
-        ...(await import('codemirror')).defaults,
+        ...(await import('codemirror')).default.defaults,
         ...(await import('@/common/ui/code')).default.data().cmDefaults,
         ...options.get('editor'),
       })
