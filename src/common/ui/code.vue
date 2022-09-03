@@ -78,6 +78,7 @@ import { deepEqual, forEachEntry, objectPick } from '#/common/object';
 import hookSetting from '#/common/hook-setting';
 import options from '#/common/options';
 import storage from '#/common/storage';
+import './code-autocomplete';
 
 /* eslint-disable no-control-regex */
 let maxDisplayLength;
