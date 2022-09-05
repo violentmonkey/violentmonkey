@@ -647,6 +647,11 @@ msgLoadingData:
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Načítavam závislosti... ($1/$2)
+msgMissingResources:
+  description: >-
+    Notification title shown for a missing @require or other resource when
+    running such scripts.
+  message: Chýbajú požadované zdroje.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -664,6 +669,11 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Nie sú žiadne aktualizácie.
+msgReinstallScripts:
+  description: >-
+    Notification body shown for a missing @require or other resource when
+    running such scripts.
+  message: 'Prosím, znovu uložte alebo nainštalujte tieto skripty:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (kód je rovnaký)
