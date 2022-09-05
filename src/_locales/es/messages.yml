@@ -607,6 +607,11 @@ msgLoadingData:
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: ''
+msgMissingResources:
+  description: >-
+    Notification title shown for a missing @require or other resource when
+    running such scripts.
+  message: ''
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -619,6 +624,11 @@ msgNewVersion:
   message: ''
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
+  message: ''
+msgReinstallScripts:
+  description: >-
+    Notification body shown for a missing @require or other resource when
+    running such scripts.
   message: ''
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.

@@ -226,13 +226,13 @@ genericOn:
   message: 'on'
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: use global setting
+  message: usa impostazione globale
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: Recycle Bin
+  message: Cestino
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'URL Input:'
+  message: 'URL in input:'
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Gli script rimossi sono elencati qui e verranno conservati per 7 giorni.
@@ -241,7 +241,7 @@ hintUseDownloadURL:
   message: Utilizza @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Rimuovi le ridondanze e prova a ricarica le risorse mancanti in cache.
+  message: Scarta le ridondanze e prova a ricaricare le risorse non presenti in cache.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Installa da $1
@@ -250,7 +250,7 @@ installOptionClose:
   message: Chiudo dopo l'installazione
 installOptionTrack:
   description: Option to track the loading local file before window is closed.
-  message: Traccia il file locale prima di chiudere questa finestra
+  message: Traccia il file locale prima che questa finestra venga chiusa
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -267,13 +267,15 @@ labelAdvanced:
   message: Impostazioni avanzate
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Permetti aggiornamenti
+  message: Consenti aggiornamenti
 labelAuthor:
   description: Label of author shown in the details of a script.
   message: 'Autore: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Ricarica la scheda corrente dopo aver spento o acceso uno script dal menu
+  message: >-
+    Ricarica la scheda corrente dopo aver attivato o disattivato uno script dal
+    menu
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
@@ -283,25 +285,27 @@ labelAutoReloadCurrentTabDisabled:
     ricaricherai la scheda
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: Check for script updates every $1 day(s), use 0 to disable
+  message: >-
+    Controlla gli aggiornamenti degli script ogni $1 giorno/i, usa 0 per
+    disabilitare quest'opzione
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
 labelBadge:
   description: Label for option to show number on badge.
-  message: Mostra sull'icona
+  message: 'Mostra sull''icona:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: 'Colori badge:'
+  message: 'Colori icona:'
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: Nulla
+  message: nessuno
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: Il numero di script totali in esecuzione
+  message: numero totale di script in esecuzione
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: Il numero di script unici in esecuzione
+  message: numero di script unici in esecuzione
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Blacklist
@@ -313,7 +317,7 @@ labelCurrentLang:
   message: 'Linguaggio corrente: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Stile Personalizzato
+  message: Stile personalizzato
 labelDataExport:
   description: Section title of data export.
   message: Esportazione Dati
@@ -327,7 +331,7 @@ labelDonate:
   message: Dona
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'URL Download:'
+  message: 'URL di download:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Modifica valore per lo scipt
@@ -339,10 +343,10 @@ labelEditor:
   message: Editor
 labelExclude:
   description: Label of @exclude rules.
-  message: '@exclude rules'
+  message: Regole @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match rules'
+  message: Regole @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Esporta i dati degli script
@@ -650,6 +654,11 @@ msgLoadingData:
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Caricamento dipendenze... ($1/$2)
+msgMissingResources:
+  description: >-
+    Notification title shown for a missing @require or other resource when
+    running such scripts.
+  message: Le risorse necessarie sono assenti.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -667,6 +676,11 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Aggiornamento non trovato.
+msgReinstallScripts:
+  description: >-
+    Notification body shown for a missing @require or other resource when
+    running such scripts.
+  message: 'Per favore salva o installa nuovamente questi script:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (il codice è lo stesso)
