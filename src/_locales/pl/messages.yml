@@ -681,7 +681,7 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Zapisz ponownie lub przeinstaluj te skrypty:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (kod jest taki sam)
