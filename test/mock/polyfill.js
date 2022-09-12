@@ -27,9 +27,11 @@ global.chrome = {
 if (!window.Response) window.Response = { prototype: {} };
 const domProps = Object.getOwnPropertyDescriptors(window);
 for (const k of Object.keys(domProps)) {
-  if (k.endsWith('Storage') || k in global) delete domProps[k];
+  // Skipping ***Storage and native global methods
+  if (k.endsWith('Storage') || /^[a-z]/.test(k) && (k in global)) {
+    delete domProps[k];
+  }
 }
-delete domProps.performance;
 Object.defineProperties(global, domProps);
 global.__VAULT_ID__ = false;
 Object.assign(global, require('#/common/safe-globals'));
