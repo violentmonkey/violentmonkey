@@ -653,6 +653,11 @@ msgLoadingData:
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Lade Abhängigkeiten... ($1/$2)
+msgMissingResources:
+  description: >-
+    Notification title shown for a missing @require or other resource when
+    running such scripts.
+  message: Fehlende benötigte Ressourcen.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -671,6 +676,11 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Keine Aktualisierung gefunden.
+msgReinstallScripts:
+  description: >-
+    Notification body shown for a missing @require or other resource when
+    running such scripts.
+  message: 'Bitte speichern oder installieren Sie diese(s) Skript(e) erneut:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (identischer Code)

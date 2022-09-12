@@ -640,6 +640,11 @@ msgLoadingData:
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Memuat dependensi... ($1/$2)
+msgMissingResources:
+  description: >-
+    Notification title shown for a missing @require or other resource when
+    running such scripts.
+  message: ''
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -653,6 +658,11 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Pembaruan tidak tersedia.
+msgReinstallScripts:
+  description: >-
+    Notification body shown for a missing @require or other resource when
+    running such scripts.
+  message: 'Harap simpan atau pasang ulang skrip ini:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (kode sama)
@@ -728,7 +738,7 @@ optionPopupHideDisabled:
   message: Sembunyikan nonaktif
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Tampilkan skrip nonaktif
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Tampilkan skrip aktif di atas
