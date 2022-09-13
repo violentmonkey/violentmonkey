@@ -1,4 +1,5 @@
 
+const SCRIPT = '.script';
 const SCROLL_GAP = 50;
 // px per one 60fps frame so the max is ~1200px per second (~one page)
 const MAX_SCROLL_SPEED = 20;
@@ -30,6 +31,7 @@ let offsetX;
 let offsetY;
 let original;
 let parent;
+let parentOnDrop;
 let scrollEdgeTop;
 let scrollEdgeBottom;
 let scrollTimer;
@@ -37,20 +39,20 @@ let scrollSpeed;
 let scrollTimestamp;
 let xyCache;
 
-/**
- * @param {Element} el
- * @param {function(from,to)} onDrop
- */
-export default function enableDragging(el, { onDrop }) {
-  if (!parent) {
-    parent = el.parentElement;
-  }
-  el::on(eventNames.start, isTouch ? onTouchStart : onDragStart);
-  el::on(DROP_EVENT_RELAY, () => onDrop(index, lastIndex));
+/** @this {?} TabInstalled */
+export default function toggleDragging(state) {
+  parent = this.$refs.scriptList;
+  parentOnDrop = this.moveScript;
+  parent::(state ? on : off)(eventNames.start, isTouch ? onTouchStart : onDragStart);
+  parent::(state ? on : off)(DROP_EVENT_RELAY, onDrop);
+}
+
+function onDrop() {
+  parentOnDrop(index, lastIndex);
 }
 
 function onTouchStart(e) {
-  original = this;
+  if (!scriptFromEvent(e)) return;
   longPressEvent = e;
   longPressTimer = setTimeout(onTouchMoveDetect, LONGPRESS_DELAY, 'timer');
   document::on(eventNames.move, onTouchMoveDetect);
@@ -76,7 +78,7 @@ function onTouchEndDetect() {
 }
 
 function onDragStart(e) {
-  original = this;
+  if (!scriptFromEvent(e)) return;
   if (e.cancelable) e.preventDefault();
   const { clientX: x, clientY: y } = e.touches?.[0] || e;
   const rect = original.getBoundingClientRect();
@@ -105,7 +107,7 @@ function onDragStart(e) {
 function onDragMouseMove(e) {
   const { clientX: x, clientY: y, target } = e.touches?.[0] || e;
   let moved;
-  const hovered = isTouch ? scriptFromPoint(x, y) : target.closest?.('.script');
+  const hovered = isTouch ? scriptFromPoint(x, y) : target.closest?.(SCRIPT);
   // FF bug: despite placeholder having `pointer-events:none` it's still reported in `target`
   if (hovered && hovered !== original) {
     const rect = hovered.getBoundingClientRect();
@@ -187,6 +189,11 @@ function stopPropagation(e) {
 // touch devices are usually slooooow so touchmove causes jank due to frequent elementFromPoint
 function scriptFromPoint(x, y) {
   const key = `${x}:${y}`;
-  const el = xyCache[key] || (xyCache[key] = document.elementFromPoint(x, y)?.closest('.script'));
+  const el = xyCache[key] || (xyCache[key] = document.elementFromPoint(x, y)?.closest(SCRIPT));
   return el;
+}
+
+function scriptFromEvent(e) {
+  original = e.target.closest(SCRIPT);
+  return original;
 }

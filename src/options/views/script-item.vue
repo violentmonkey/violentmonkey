@@ -9,7 +9,6 @@
       hotkeys: focused && showHotkeys,
     }"
     :tabIndex="tabIndex"
-    :draggable="draggable"
     @focus="onFocus"
     @blur="onBlur">
     <div class="script-icon hidden-xs">
@@ -19,10 +18,8 @@
     </div>
     <div class="script-info flex ml-1c">
       <span class="script-order" v-text="script.props.position"/>
-      <!-- eslint-disable-next-line vue/require-component-is -->
-      <component class="script-name ellipsis flex-auto" v-bind="viewTable
-        ? { is: 'a', href: url, tabIndex }
-        : { is: 'span' }">{{script.$cache.name}}</component>
+      <component :is="nameProps.is" class="script-name ellipsis flex-auto"
+                 v-bind="nameProps">{{script.$cache.name}}</component>
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
                  class="script-author ml-1c hidden-sm"
@@ -132,14 +129,12 @@ import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { getLocaleString, formatTime } from '#/common';
 import Icon from '#/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '#/common/keyboard';
-import enableDragging from '../utils/dragging';
 
 const itemMargin = 8;
 
 export default {
   props: [
     'script',
-    'draggable',
     'visible',
     'viewTable',
     'focused',
@@ -212,6 +207,13 @@ export default {
     url() {
       return `#scripts/${this.script.props.id}`;
     },
+    nameProps() {
+      return this.viewTable
+        /* We disable native dragging on name to avoid confusion with exec re-ordering.
+         * Users who want to open a new tab via dragging the link can use the icon. */
+        ? { is: 'a', href: this.url, tabIndex: this.tabIndex, draggable: false }
+        : { is: 'span' };
+    },
   },
   watch: {
     visible(visible) {
@@ -236,11 +238,6 @@ export default {
         this.$emit('scrollDelta', delta);
       }
     },
-  },
-  mounted() {
-    enableDragging(this.$el, {
-      onDrop: (from, to) => this.$emit('move', { from, to }),
-    });
   },
   methods: {
     onRemove() {
