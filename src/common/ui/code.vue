@@ -271,7 +271,7 @@ export default {
           if (this.search.show) {
             this.clearSearch();
           } else {
-            cm.execCommand('close');
+            cm.execCommand(cm.listSelections()[1] ? 'singleSelection' : 'close');
           }
         },
         commentSelection() {
