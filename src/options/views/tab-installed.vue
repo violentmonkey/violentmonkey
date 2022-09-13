@@ -125,7 +125,7 @@
           :focused="selectedScript === script"
           :showHotkeys="showHotkeys"
           :script="script"
-          :draggable="!showRecycle && filters.sort === 'exec'"
+          :draggable="draggable"
           :visible="index < batchRender.limit"
           :viewTable="filters.viewTable"
           :hotkeys="scriptHotkeys"
@@ -133,7 +133,6 @@
           @restore="handleActionRestore"
           @toggle="handleActionToggle"
           @update="handleActionUpdate"
-          @move="moveScript"
           @scrollDelta="handleSmoothScroll"
           @tiptoggle="showHotkeys = !showHotkeys"
         />
@@ -162,6 +161,7 @@ import { loadData } from '@/options';
 import ScriptItem from './script-item';
 import Edit from './edit';
 import { store, installedScripts, removedScripts } from '../utils';
+import toggleDragging from '../utils/dragging';
 
 const filterOptions = {
   sort: {
@@ -275,6 +275,7 @@ export default {
     };
   },
   watch: {
+    draggable: toggleDragging,
     search: 'scheduleSearch',
     'filters.sort': 'updateLater',
     'filters.showEnabledFirst': 'updateLater',
@@ -295,6 +296,9 @@ export default {
     },
   },
   computed: {
+    draggable() {
+      return !this.showRecycle && filters.sort === 'exec';
+    },
     currentSortCompare() {
       return filterOptions.sort[filters.sort]?.compare;
     },
@@ -358,7 +362,7 @@ export default {
         if (err) showMessage({ text: err });
       }
     },
-    async moveScript({ from, to }) {
+    async moveScript(from, to) {
       if (from === to) return;
       const scripts = this.filteredScripts;
       const allScripts = store.scripts;

@@ -9,7 +9,6 @@
       hotkeys: focused && showHotkeys,
     }"
     :tabIndex="tabIndex"
-    :draggable="draggable"
     @focus="onFocus"
     @blur="onBlur">
     <div class="script-icon hidden-xs">
@@ -129,14 +128,12 @@ import Tooltip from 'vueleton/lib/tooltip';
 import { getLocaleString, formatTime } from '@/common';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
-import enableDragging from '../utils/dragging';
 
 const itemMargin = 8;
 
 export default {
   props: [
     'script',
-    'draggable',
     'visible',
     'viewTable',
     'focused',
@@ -210,7 +207,11 @@ export default {
       return `#scripts/${this.script.props.id}`;
     },
     nameProps() {
-      return this.viewTable ? { is: 'a', href: this.url, tabIndex: this.tabIndex } : { is: 'span' };
+      return this.viewTable
+        /* We disable native dragging on name to avoid confusion with exec re-ordering.
+         * Users who want to open a new tab via dragging the link can use the icon. */
+        ? { is: 'a', href: this.url, tabIndex: this.tabIndex, draggable: false }
+        : { is: 'span' };
     },
   },
   watch: {
@@ -236,11 +237,6 @@ export default {
         this.$emit('scrollDelta', delta);
       }
     },
-  },
-  mounted() {
-    enableDragging(this.$el, {
-      onDrop: (from, to) => this.$emit('move', { from, to }),
-    });
   },
   methods: {
     onRemove() {
