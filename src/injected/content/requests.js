@@ -16,6 +16,7 @@ const fdAppend = SafeFormData[PROTO].append;
 const requests = createNullObj();
 let downloadChain = promiseResolve();
 
+// TODO: extract all prop names used across files into consts.js to ensure sameness
 bridge.addHandlers({
   async HttpRequest(msg, realm) {
     requests[msg.id] = {
@@ -72,10 +73,10 @@ bridge.addBackgroundHandlers({
     if (importing) {
       data.response = req.bin;
     }
-    const fileName = type === 'load' && req.bin && req.fileName;
+    const fileName = type === 'load' && req.fileName;
     if (fileName) {
       req.fileName = '';
-      await downloadBlob(req.bin, fileName);
+      await downloadBlob(IS_FIREFOX ? response : req.bin, fileName);
     }
     bridge.post('HttpRequested', msg, req.realm);
     if (req.gotLoadEnd && req.gotChunks) {
