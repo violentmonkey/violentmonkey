@@ -57,11 +57,12 @@ jobs:
         run: |
           mkdir -p $TEMP_DIR/updates
           if [ "$PRERELEASE" != "true" ]; then
-              # Publish listed version, ignore error since we don't need to download it
-              node scripts/amo-upload.mjs || 0
+            # Publish listed version, ignore error since we don't need to download it
+            node scripts/amo-upload.mjs || 0
+          else
+            # Publish unlisted version
+            BETA=1 node scripts/amo-upload.mjs
           fi
-          # Publish unlisted version
-          BETA=1 node scripts/amo-upload.mjs
         env:
           AMO_KEY: ${{ secrets.AMO_KEY }}
           AMO_SECRET: ${{ secrets.AMO_SECRET }}
@@ -82,9 +83,10 @@ jobs:
           if [ "$PRERELEASE" != "true" ]; then
             # Publish release
             npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_RELEASE --source $ASSETS_DIR/$ASSET_ZIP --auto-publish
+          else
+            # Publish prerelease
+            npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_BETA --source $TEMP_DIR/$ASSET_CWS_BETA_ZIP --auto-publish
           fi
-          # Always publish prerelease
-          npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_BETA --source $TEMP_DIR/$ASSET_CWS_BETA_ZIP --auto-publish
         env:
           EXTENSION_ID_BETA: opokoaglpekkimldnlggpoagmjegichg
           EXTENSION_ID_RELEASE: jinjaccalgkegednnccohejagnlnfdag
