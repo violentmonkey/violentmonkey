@@ -635,7 +635,7 @@ export default {
         ['G', conditionNotSearch, true],
       ]),
       ...registerHotkey(() => {
-        this.handleActionEdit(this.selectedScript);
+        this.editScript(this.selectedScript.props.id);
       }, explodeKeys(scriptHotkeys.edit, conditionScriptFocused, true)),
       ...registerHotkey(() => {
         this.handleActionRemove(this.selectedScript);
