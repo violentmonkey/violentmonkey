@@ -50,7 +50,6 @@
     "sharp": "^0.31.0",
     "through2": "^4.0.2",
     "vinyl": "^2.2.1",
-    "vue-eslint-parser": "^9.0.3",
     "wrapper-webpack-plugin": "2.2.2"
   },
   "author": "Gerald <i@gerald.top>",
