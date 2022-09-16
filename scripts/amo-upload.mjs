@@ -37,7 +37,7 @@ async function main() {
     channel: beta ? 'unlisted' : 'listed',
     distFile: beta
       ? join(process.env.TEMP_DIR, process.env.ASSET_SELF_HOSTED_ZIP)
-      : join(process.env.ASSETS_DIR, process.env.ASSETS_ZIP),
+      : join(process.env.ASSETS_DIR, process.env.ASSET_ZIP),
     sourceFile: join(process.env.TEMP_DIR, process.env.SOURCE_ZIP),
     output: tempFile,
     ...pollOptions,
