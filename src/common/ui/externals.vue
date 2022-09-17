@@ -98,7 +98,7 @@ async function update() {
     } else if (contentType) {
       contentType = contentType.split(/[:;]/)[1];
     }
-    code = dataUri2text(`${contentType};base64,${code}`);
+    code = dataUri2text(isDataUri ? url : `${contentType};base64,${code}`);
     data.value = {
       mode: contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null,
       code,
