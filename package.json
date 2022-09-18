@@ -87,5 +87,6 @@
       "pre-commit": "yarn transform -t",
       "pre-push": "run-p lint test"
     }
-  }
+  },
+  "beta": 1
 }
