@@ -186,7 +186,7 @@
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { INJECT_AUTO } from '#/common/consts';
 import options from '#/common/options';
-import { getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
+import { getScriptHome, getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
 import { objectPick } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import { keyboardService, isInput } from '#/common/keyboard';
@@ -267,15 +267,14 @@ export default {
           list = list.filter(script => script.config.enabled);
         }
         list = list.map((script, i) => {
-          const { config, custom, meta } = script;
           const scriptName = getScriptName(script);
           return {
             id: `${name}/${script.props.id}`,
             name: scriptName,
             data: script,
-            home: custom.homepageURL || meta.homepageURL || meta.homepage,
+            home: getScriptHome(script),
             key: isSorted && `${
-              enabledFirst && +!config.enabled
+              enabledFirst && +!script.config.enabled
             }${
               sort === 'alpha' ? scriptName.toLowerCase() : `${1e6 + i}`.slice(1)
             }`,

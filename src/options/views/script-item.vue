@@ -126,7 +126,7 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { getLocaleString, formatTime } from '#/common';
+import { getLocaleString, getScriptHome, formatTime } from '#/common';
 import Icon from '#/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '#/common/keyboard';
 
@@ -162,8 +162,7 @@ export default {
       );
     },
     homepageURL() {
-      const { script } = this;
-      return script.custom.homepageURL || script.meta.homepageURL || script.meta.homepage;
+      return getScriptHome(this.script) || null;
     },
     author() {
       const text = this.script.meta.author;
