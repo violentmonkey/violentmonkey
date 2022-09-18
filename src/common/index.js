@@ -148,6 +148,21 @@ export function getScriptName(script) {
     || `#${script.props.id ?? i18n('labelNoName')}`;
 }
 
+/**
+ * @param {VMScript} script
+ * @param {boolean} [all] - to return all two urls (1: check, 2: download)
+ * @return {Array<string>|string|void}
+ */
+export function getScriptUpdateUrl(script, all) {
+  if (script.config.shouldUpdate) {
+    const { custom, meta } = script;
+    const downloadURL = custom.downloadURL || meta.downloadURL || custom.lastInstallURL;
+    const updateURL = custom.updateURL || meta.updateURL || downloadURL;
+    const url = downloadURL || updateURL;
+    if (url) return all ? [downloadURL, updateURL] : url;
+  }
+}
+
 export function getFullUrl(url, base) {
   let obj;
   try {

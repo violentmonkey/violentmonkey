@@ -1,6 +1,6 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome,
-  getFullUrl, getScriptName, isRemote, sendCmd, trueJoin,
+  getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
 } from '#/common';
 import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '#/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '#/common/object';
@@ -106,9 +106,9 @@ preInitialize.push(async () => {
   const { scripts, storeInfo, scriptMap: idMap } = store;
   const uriMap = {};
   const mods = [];
-  const resUrls = [];
+  const resUrls = new Set();
   /** @this VMScriptCustom.pathMap */
-  const rememberUrl = function _(url) { resUrls.push(this[url] || url); };
+  const rememberUrl = function _(url) { resUrls.add(this[url] || url); };
   data::forEachEntry(([key, script]) => {
     dataCache.put(key, script);
     if (key.startsWith(storage.script.prefix)) {
@@ -157,11 +157,12 @@ preInitialize.push(async () => {
       require.forEach(rememberUrl, pathMap);
       resources::forEachValue(rememberUrl, pathMap);
       pathMap::rememberUrl(meta.icon);
+      pathMap::rememberUrl(getScriptUpdateUrl(script));
     } else if (key.startsWith(storage.mod.prefix)) {
       mods.push(key.slice(storage.mod.prefix.length));
     }
   });
-  storage.mod.removeMulti(mods.filter(url => !resUrls.includes(url)));
+  storage.mod.removeMulti(mods.filter(url => !resUrls.has(url)));
   // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
   if (version !== lastVersion
   && IS_FIREFOX
