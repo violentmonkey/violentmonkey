@@ -34,7 +34,7 @@
           <span class="ellipsis" v-else v-text="author.name" />
         </tooltip>
         <span class="version ellipsis" v-text="script.meta.version"/>
-        <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end">
+        <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end" v-if="!script.config.removed">
           {{ script.$cache.size }}
         </tooltip>
         <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">
