@@ -314,7 +314,7 @@ async function getScriptEnv(scripts, isCombined) {
     ]) {
       list.forEach(key => {
         key = pathMap[key] || key;
-        if (!envStart[name].includes(key)) {
+        if (key && !envStart[name].includes(key)) {
           env[name].push(key);
           (depsMap[key] || (depsMap[key] = [])).push(id);
         }
@@ -603,8 +603,8 @@ export async function fetchResources(script, resourceCache, reqOptions) {
       : storage[type].fetch(url, reqOptions, validator).catch(err => err);
   };
   const errors = await Promise.all([
-    ...meta.require.map(url => snatch(url, 'require')),
-    ...Object.values(meta.resources).map(url => snatch(url, 'cache')),
+    ...meta.require.map(url => url && snatch(url, 'require')),
+    ...Object.values(meta.resources).map(url => url && snatch(url, 'cache')),
     isRemote(meta.icon) && snatch(meta.icon, 'cache', validateImage),
   ]);
   if (!resourceCache?.ignoreDepsErrors) {
@@ -691,10 +691,10 @@ export async function vacuum(data) {
     if (!script.custom.pathMap) buildPathMap(script);
     const { pathMap } = script.custom;
     script.meta.require.forEach((url) => {
-      touch(requireKeys, pathMap[url] || url, id);
+      if (url) touch(requireKeys, pathMap[url] || url, id);
     });
     script.meta.resources::forEachValue((url) => {
-      touch(cacheKeys, pathMap[url] || url, id);
+      if (url) touch(cacheKeys, pathMap[url] || url, id);
     });
     const { icon } = script.meta;
     if (isRemote(icon)) {
