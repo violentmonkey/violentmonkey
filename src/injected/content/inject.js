@@ -41,8 +41,10 @@ if (IS_FIREFOX) {
       frameEventWnd = evt::getRelatedTarget();
     } else {
       // setupVaultId's second event is the vaultId
-      tellBridgeToWriteVault(evt::getDetail(), frameEventWnd);
-      frameEventWnd::fire(new SafeCustomEvent(VAULT_WRITER_ACK));
+      frameEventWnd::fire(new SafeCustomEvent(VAULT_WRITER_ACK, {
+        __proto__: null,
+        detail: tellBridgeToWriteVault(evt::getDetail(), frameEventWnd),
+      }));
       frameEventWnd = null;
     }
   }, true);
@@ -86,14 +88,14 @@ export function injectPageSandbox(contentId, webId) {
     if (opener && describeProperty(opener.location, 'href').get) {
       // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
       if (IS_FIREFOX) {
-        const setOk = () => { ok = true; };
+        const setOk = evt => { ok = evt::getDetail(); };
         window::on(VAULT_WRITER_ACK, setOk, true);
         opener::fire(new SafeMouseEvent(VAULT_WRITER, { relatedTarget: window }));
         opener::fire(new SafeCustomEvent(VAULT_WRITER, { detail: vaultId }));
         window::off(VAULT_WRITER_ACK, setOk, true);
       } else {
         ok = opener[VAULT_WRITER];
-        if (ok) ok(vaultId, window);
+        ok = ok && ok(vaultId, window);
       }
     }
     return ok;
@@ -339,5 +341,9 @@ function setupContentInvoker(contentId, webId) {
 }
 
 function tellBridgeToWriteVault(vaultId, wnd) {
-  bridge.post('WriteVault', vaultId, INJECT_PAGE, wnd);
+  const { post } = bridge;
+  if (post) { // may be absent if this page doesn't have scripts
+    post('WriteVault', vaultId, INJECT_PAGE, wnd);
+    return true;
+  }
 }
