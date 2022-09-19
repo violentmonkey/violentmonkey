@@ -157,7 +157,7 @@ preInitialize.push(async () => {
       require.forEach(rememberUrl, pathMap);
       resources::forEachValue(rememberUrl, pathMap);
       pathMap::rememberUrl(meta.icon);
-      pathMap::rememberUrl(getScriptUpdateUrl(script));
+      getScriptUpdateUrl(script, true)?.forEach(rememberUrl, pathMap);
     } else if (key.startsWith(storage.mod.prefix)) {
       mods.push(key.slice(storage.mod.prefix.length));
     }

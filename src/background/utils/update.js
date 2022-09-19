@@ -90,7 +90,6 @@ async function downloadUpdate(script, urls) {
   announce(i18n('msgCheckingForUpdate'));
   try {
     const { data } = await requestNewer(updateURL, {
-      // TODO: do a HEAD request first to get ETag header and compare to storage.mod
       cache: 'no-cache',
       headers: { Accept: 'text/x-userscript-meta,*/*' },
     }) || {};
@@ -99,10 +98,13 @@ async function downloadUpdate(script, urls) {
       announce(i18n('msgNoUpdate'), { checking: false });
     } else if (!downloadURL) {
       announce(i18n('msgNewVersion'), { checking: false });
+    } else if (downloadURL === updateURL) {
+      announce(i18n('msgUpdated'));
+      return data;
     } else {
       announce(i18n('msgUpdating'));
       errorMessage = i18n('msgErrorFetchingScript');
-      return (await request(downloadURL, { cache: 'no-cache' })).data;
+      return (await requestNewer(downloadURL, { cache: 'no-cache' })).data;
     }
   } catch (error) {
     if (process.env.DEBUG) console.error(error);
