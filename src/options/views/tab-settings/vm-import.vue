@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { reactive } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import { ensureArray, i18n, sendCmdDirectly } from '@/common';
 import options from '@/common/options';
@@ -25,7 +26,7 @@ import SettingCheck from '@/common/ui/setting-check';
 import loadZipLibrary from '@/common/zip';
 import { showConfirmation, showMessage } from '@/common/ui';
 
-const reports = [];
+const reports = reactive([]);
 
 export default {
   components: {
