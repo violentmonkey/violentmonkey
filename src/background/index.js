@@ -91,7 +91,6 @@ const commandsToSync = [
 const commandsToSyncIfTruthy = [
   'CheckRemove',
   'CheckUpdate',
-  'CheckUpdateAll',
 ];
 
 async function handleCommandMessage(req, src) {
@@ -110,7 +109,7 @@ function autoUpdate() {
   if (!interval) return;
   let elapsed = Date.now() - getOption('lastUpdate');
   if (elapsed >= interval) {
-    handleCommandMessage({ cmd: 'CheckUpdateAll' });
+    handleCommandMessage({ cmd: 'CheckUpdate' });
     elapsed = 0;
   }
   clearTimeout(autoUpdate.timer);

@@ -609,6 +609,10 @@ export async function openAuthPage(url, redirectUri) {
   unregister = () => {
     browser.webRequest.onBeforeRequest.removeListener(handler);
   };
+  // Note: match pattern does not support port number
+  // - In Chrome, the port number is ignored and the pattern still works
+  // - In Firefox, the pattern is ignored and won't match any URL
+  redirectUri = redirectUri.replace(/:\d+/, '');
   browser.webRequest.onBeforeRequest.addListener(handler, {
     // Do not filter by tabId here, see above
     urls: [`${redirectUri}*`],

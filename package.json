@@ -77,5 +77,6 @@
     "setupFiles": [
       "./test/mock/index.js"
     ]
-  }
+  },
+  "beta": 1
 }

@@ -89,8 +89,8 @@
 import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
 import {
-  sendCmdDirectly, request, isRemote, getFullUrl, makePause,
-  getLocaleString, trueJoin,
+  getFullUrl, getLocaleString, getScriptHome, isRemote,
+  makePause, request, sendCmdDirectly, trueJoin,
 } from '@/common';
 import { keyboardService } from '@/common/keyboard';
 import initCache from '@/common/cache';
@@ -160,7 +160,9 @@ export default {
       return !isRemote(this.info.url);
     },
     icons() {
-      const { homepageURL, supportURL } = this.script?.meta || {};
+      const { script } = this;
+      const homepageURL = script && getScriptHome(script);
+      const supportURL = script?.meta.supportURL;
       return [
         homepageURL && [homepageURL, 'home', this.i18n('labelHomepage')],
         supportURL && [supportURL, 'question', this.i18n('buttonSupport')],

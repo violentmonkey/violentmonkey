@@ -129,6 +129,9 @@ function makeGmInfo(script, resources) {
     val[i] = { name, url: resources[name] };
   });
   setOwnProp(metaCopy, 'resources', val);
+  if (!getOwnProp(metaCopy, 'homepageURL') && (val = getOwnProp(metaCopy, 'homepage'))) {
+    setOwnProp(metaCopy, 'homepageURL', val);
+  }
   return {
     // No __proto__:null because it's a standard object for userscripts
     uuid: script.props.uuid,

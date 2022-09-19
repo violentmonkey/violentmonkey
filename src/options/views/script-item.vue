@@ -125,7 +125,7 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip';
-import { getLocaleString, formatTime } from '@/common';
+import { getLocaleString, getScriptHome, getScriptUpdateUrl, formatTime } from '@/common';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
 
@@ -151,18 +151,10 @@ export default {
   },
   computed: {
     canUpdate() {
-      const { script } = this;
-      return script.config.shouldUpdate && (
-        script.custom.updateURL
-        || script.meta.updateURL
-        || script.custom.downloadURL
-        || script.meta.downloadURL
-        || script.custom.lastInstallURL
-      );
+      return getScriptUpdateUrl(this.script);
     },
     homepageURL() {
-      const { script } = this;
-      return script.custom.homepageURL || script.meta.homepageURL || script.meta.homepage;
+      return getScriptHome(this.script) || null;
     },
     author() {
       const text = this.script.meta.author;

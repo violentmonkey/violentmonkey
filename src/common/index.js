@@ -133,13 +133,43 @@ export function getLocaleString(meta, key) {
   return localeMeta || meta[key] || '';
 }
 
+export function getScriptHome({ custom, meta }) {
+  let v = custom.homepageURL || meta.homepageURL || meta.homepage || meta.website || meta.source;
+  if (!v) {
+    v = meta.namespace;
+    v = /^https?:\/\/(?!tampermonkey\.net\/)/.test(v)
+      && getFullUrl(v).replace(/^https?(:\/\/userscripts)(\.org\/users\/\w)/, 'https$1-mirror$2');
+  }
+  return v || '';
+}
+
 export function getScriptName(script) {
   return script.custom.name || getLocaleString(script.meta, 'name')
     || `#${script.props.id ?? i18n('labelNoName')}`;
 }
 
+/**
+ * @param {VMScript} script
+ * @param {boolean} [all] - to return all two urls (1: check, 2: download)
+ * @return {Array<string>|string|void}
+ */
+export function getScriptUpdateUrl(script, all) {
+  if (script.config.shouldUpdate) {
+    const { custom, meta } = script;
+    const downloadURL = custom.downloadURL || meta.downloadURL || custom.lastInstallURL;
+    const updateURL = custom.updateURL || meta.updateURL || downloadURL;
+    const url = downloadURL || updateURL;
+    if (url) return all ? [downloadURL, updateURL] : url;
+  }
+}
+
 export function getFullUrl(url, base) {
-  const obj = new URL(url, base);
+  let obj;
+  try {
+    obj = new URL(url, base);
+  } catch (e) {
+    return `data:,${e.message} ${url}`;
+  }
   // Use protocol whitelist to filter URLs
   if (![
     'http:',

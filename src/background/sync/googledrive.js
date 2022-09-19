@@ -1,6 +1,6 @@
 // Reference:
+// - https://developers.google.com/identity/protocols/oauth2/native-app
 // - https://developers.google.com/drive/v3/reference/files
-// - https://github.com/google/google-api-nodejs-client
 import { getUniqId, noop } from '@/common';
 import { objectGet } from '@/common/object';
 import { loadQuery, dumpQuery } from '../utils';
@@ -14,6 +14,9 @@ import {
 const config = {
   client_id: process.env.SYNC_GOOGLE_DESKTOP_ID,
   client_secret: process.env.SYNC_GOOGLE_DESKTOP_SECRET,
+  // We use native app approach with code challenge for better security.
+  // Google OAuth for native app only allows loopback IP address for callback URL.
+  // The URL will be intercepted and blocked so the port doesn't matter.
   redirect_uri: 'http://127.0.0.1:45678/',
   // redirect_uri: 'https://violentmonkey.github.io/auth_googledrive.html',
   scope: 'https://www.googleapis.com/auth/drive.appdata',

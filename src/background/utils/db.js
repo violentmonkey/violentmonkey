@@ -1,6 +1,6 @@
 import {
-  compareVersion, dataUri2text, i18n,
-  getFullUrl, getScriptName, isRemote, sendCmd, trueJoin,
+  compareVersion, dataUri2text, i18n, getScriptHome,
+  getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
 } from '@/common';
 import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '@/common/object';
@@ -106,9 +106,9 @@ preInitialize.push(async () => {
   const { scripts, storeInfo, scriptMap: idMap } = store;
   const uriMap = {};
   const mods = [];
-  const resUrls = [];
+  const resUrls = new Set();
   /** @this VMScriptCustom.pathMap */
-  const rememberUrl = function _(url) { resUrls.push(this[url] || url); };
+  const rememberUrl = function _(url) { resUrls.add(this[url] || url); };
   data::forEachEntry(([key, script]) => {
     dataCache.put(key, script);
     if (key.startsWith(storage.script.prefix)) {
@@ -157,11 +157,12 @@ preInitialize.push(async () => {
       require.forEach(rememberUrl, pathMap);
       resources::forEachValue(rememberUrl, pathMap);
       pathMap::rememberUrl(meta.icon);
+      pathMap::rememberUrl(getScriptUpdateUrl(script));
     } else if (key.startsWith(storage.mod.prefix)) {
       mods.push(key.slice(storage.mod.prefix.length));
     }
   });
-  storage.mod.removeMulti(mods.filter(url => !resUrls.includes(url)));
+  storage.mod.removeMulti(mods.filter(url => !resUrls.has(url)));
   // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
   if (version !== lastVersion
   && IS_FIREFOX
@@ -314,7 +315,7 @@ async function getScriptEnv(scripts, isCombined) {
     ]) {
       list.forEach(key => {
         key = pathMap[key] || key;
-        if (!envStart[name].includes(key)) {
+        if (key && !envStart[name].includes(key)) {
           env[name].push(key);
           (depsMap[key] || (depsMap[key] = [])).push(id);
         }
@@ -558,7 +559,7 @@ export async function parseScript(src) {
     ...src.props,
   };
   script.meta = meta;
-  if (!meta.homepageURL && !script.custom.homepageURL && isRemote(src.from)) {
+  if (!getScriptHome(script) && isRemote(src.from)) {
     script.custom.homepageURL = src.from;
   }
   if (isRemote(src.url)) script.custom.lastInstallURL = src.url;
@@ -603,8 +604,8 @@ export async function fetchResources(script, resourceCache, reqOptions) {
       : storage[type].fetch(url, reqOptions, validator).catch(err => err);
   };
   const errors = await Promise.all([
-    ...meta.require.map(url => snatch(url, 'require')),
-    ...Object.values(meta.resources).map(url => snatch(url, 'cache')),
+    ...meta.require.map(url => url && snatch(url, 'require')),
+    ...Object.values(meta.resources).map(url => url && snatch(url, 'cache')),
     isRemote(meta.icon) && snatch(meta.icon, 'cache', validateImage),
   ]);
   if (!resourceCache?.ignoreDepsErrors) {
@@ -691,10 +692,10 @@ export async function vacuum(data) {
     if (!script.custom.pathMap) buildPathMap(script);
     const { pathMap } = script.custom;
     script.meta.require.forEach((url) => {
-      touch(requireKeys, pathMap[url] || url, id);
+      if (url) touch(requireKeys, pathMap[url] || url, id);
     });
     script.meta.resources::forEachValue((url) => {
-      touch(cacheKeys, pathMap[url] || url, id);
+      if (url) touch(cacheKeys, pathMap[url] || url, id);
     });
     const { icon } = script.meta;
     if (isRemote(icon)) {

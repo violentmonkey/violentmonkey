@@ -35,27 +35,35 @@ function cacheOrFetch(handlers = {}) {
   async function doFetch(...args) {
     const [url, options] = args;
     try {
-      if (url.startsWith('data:')) return;
-      const res = await request(url, init?.(options) || options);
-      if (await isModified(res, url)) {
+      const res = !url.startsWith('data:')
+        && await requestNewer(url, init ? init(options) : options);
+      if (res) {
         const result = transform ? await transform(res, ...args) : res.data;
         await this.set(url, result);
       }
-    } catch (err) {
-      if (process.env.DEBUG) console.error(`Error fetching: ${url}`, err);
-      throw err;
     } finally {
       delete requests[url];
     }
   }
 }
 
-async function isModified({ headers }, url) {
-  const mod = headers.get('etag')
-  || +new Date(headers.get('last-modified'))
-  || +new Date(headers.get('date'));
-  if (!mod || mod !== await storage.mod.getOne(url)) {
-    if (mod) await storage.mod.set(url, mod);
-    return true;
+export async function requestNewer(url, opts) {
+  const modOld = await storage.mod.getOne(url);
+  for (const get of [0, 1]) {
+    if (modOld || get) {
+      const req = await request(url, !get ? { ...opts, method: 'HEAD' } : opts);
+      const { headers } = req;
+      const mod = headers.get('etag')
+        || +new Date(headers.get('last-modified'))
+        || +new Date(headers.get('date'));
+      if (mod && mod === modOld) {
+        return;
+      }
+      if (get) {
+        if (mod) storage.mod.set(url, mod);
+        else if (modOld) storage.mod.remove(url);
+        return req;
+      }
+    }
   }
 }

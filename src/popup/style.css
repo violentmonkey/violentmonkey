@@ -358,3 +358,12 @@ footer {
   pointer-events: none;
   user-select: none;
 }
+
+[data-upd]::after {
+  content: attr(data-upd);
+  position: absolute;
+  font-size: 10px;
+  bottom: -4px;
+  line-height: 1;
+  color: var(--fill-7);
+}

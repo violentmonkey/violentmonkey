@@ -343,7 +343,7 @@ export default {
       this.debouncedUpdate();
     },
     updateAll() {
-      sendCmdDirectly('CheckUpdateAll');
+      sendCmdDirectly('CheckUpdate');
     },
     async installFromURL() {
       try {

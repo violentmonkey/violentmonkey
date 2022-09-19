@@ -79,8 +79,6 @@ export function parseMeta(code) {
   });
   meta.resources = meta.resource;
   delete meta.resource;
-  // @homepageURL: compatible with @homepage
-  if (!meta.homepageURL && meta.homepage) meta.homepageURL = meta.homepage;
   return meta;
 }
 
