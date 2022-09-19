@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import { i18n } from '#/common';
+import { getScriptHome, i18n } from '#/common';
 import { objectGet } from '#/common/object';
 
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
@@ -102,7 +102,7 @@ export default {
       const { value } = this;
       return {
         name: objectGet(value, 'meta.name'),
-        homepageURL: objectGet(value, 'meta.homepageURL'),
+        homepageURL: getScriptHome(value),
         updateURL: objectGet(value, 'meta.updateURL') || i18n('hintUseDownloadURL'),
         downloadURL: objectGet(value, 'meta.downloadURL') || objectGet(value, 'custom.lastInstallURL'),
       };

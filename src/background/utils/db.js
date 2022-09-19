@@ -1,5 +1,5 @@
 import {
-  compareVersion, dataUri2text, i18n,
+  compareVersion, dataUri2text, i18n, getScriptHome,
   getFullUrl, getScriptName, isRemote, sendCmd, trueJoin,
 } from '#/common';
 import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '#/common/consts';
@@ -558,7 +558,7 @@ export async function parseScript(src) {
     ...src.props,
   };
   script.meta = meta;
-  if (!meta.homepageURL && !script.custom.homepageURL && isRemote(src.from)) {
+  if (!getScriptHome(script) && isRemote(src.from)) {
     script.custom.homepageURL = src.from;
   }
   if (isRemote(src.url)) script.custom.lastInstallURL = src.url;
