@@ -99,6 +99,7 @@
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
             <div class="script-name flex-auto ellipsis" v-text="item.name"
+                 :data-upd="item.upd"
                  @click.ctrl.exact.stop="onEditScript(item)"
                  @contextmenu.exact.stop="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)" />
@@ -177,7 +178,11 @@
       <div v-text="i18n('menuExclude')" tabindex="0" @click="onExclude"/>
       <div v-text="activeExtras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
            tabindex="0"
-           @click="onRemoveScript(activeExtras)"/>
+           @click="onRemoveScript"/>
+      <div v-if="!activeExtras.data.config.removed && canUpdate(activeExtras.data)"
+           v-text="i18n('titleScriptUpdated')"
+           tabindex="0"
+           @click="onUpdateScript"/>
     </div>
   </div>
 </template>
@@ -186,7 +191,10 @@
 import Tooltip from 'vueleton/lib/tooltip/bundle';
 import { INJECT_AUTO } from '#/common/consts';
 import options from '#/common/options';
-import { getScriptHome, getScriptName, i18n, makePause, sendCmd, sendTabCmd } from '#/common';
+import {
+  getScriptHome, getScriptName, getScriptUpdateUrl,
+  i18n, makePause, sendCmd, sendTabCmd,
+} from '#/common';
 import { objectPick } from '#/common/object';
 import Icon from '#/common/ui/icon';
 import { keyboardService, isInput } from '#/common/keyboard';
@@ -279,6 +287,7 @@ export default {
               sort === 'alpha' ? scriptName.toLowerCase() : `${1e6 + i}`.slice(1)
             }`,
             excludesValue: null,
+            upd: null,
           };
         });
         if (isSorted) {
@@ -322,6 +331,7 @@ export default {
     },
   },
   methods: {
+    canUpdate: getScriptUpdateUrl,
     toggleMenu(name) {
       this.activeMenu = this.activeMenu === name ? null : name;
     },
@@ -406,10 +416,21 @@ export default {
       await browser.tabs.reload();
       window.close();
     },
-    onRemoveScript({ data: { config, props: { id } } }) {
+    onRemoveScript() {
+      const { config, props: { id } } = this.activeExtras.data;
       const removed = +!config.removed;
       config.removed = removed;
       sendCmd('MarkRemoved', { id, removed });
+    },
+    async onUpdateScript() {
+      const item = this.activeExtras;
+      const chk = i18n('msgCheckingForUpdate');
+      if (item.upd !== chk) {
+        item.upd = chk;
+        item.upd = await sendCmd('CheckUpdate', item.data.props.id)
+          ? i18n('msgUpdated')
+          : i18n('msgNoUpdate');
+      }
     },
     onExclude() {
       const item = this.activeExtras;
