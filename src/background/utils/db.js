@@ -280,15 +280,16 @@ export async function getScriptsByURL(url, isTop) {
 
 /**
  * @param {VMScript[]} scripts
- * @param {boolean} [isCombined]
+ * @param {boolean} [sizing]
  * @return {Promise<VMScriptByUrlData>}
  */
-async function getScriptEnv(scripts, isCombined) {
+async function getScriptEnv(scripts, sizing) {
   const disabledIds = [];
   /** @namespace VMScriptByUrlData */
   const [envStart, envDelayed] = [0, 1].map(() => ({
     ids: [],
     depsMap: {},
+    sizing,
     [ENV_CACHE_KEYS]: [],
     [ENV_REQ_KEYS]: [],
     [ENV_SCRIPTS]: [],
@@ -296,14 +297,14 @@ async function getScriptEnv(scripts, isCombined) {
   }));
   scripts.forEach((script) => {
     const { id } = script.props;
-    if (!isCombined && !script.config.enabled) {
+    if (!sizing && !script.config.enabled) {
       disabledIds.push(id);
       return;
     }
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
-    const env = isCombined || runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
+    const env = sizing || runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
     const { depsMap } = env;
     env.ids.push(id);
     if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
@@ -322,7 +323,7 @@ async function getScriptEnv(scripts, isCombined) {
       });
     }
     /** @namespace VMInjectedScript */
-    env[ENV_SCRIPTS].push(isCombined ? script : { ...script, runAt });
+    env[ENV_SCRIPTS].push(sizing ? script : { ...script, runAt });
   });
   if (envDelayed.ids.length) {
     envDelayed.promise = readEnvironmentData(envDelayed);
@@ -366,7 +367,7 @@ async function readEnvironmentData(env, isRetry) {
         ? area !== 'require' && id || dataUri2text(id)
         : data[storage[area].getKey(id)];
       env[area][id] = val;
-      if (val == null && area !== 'value' && retriedStorageKeys[area + id] !== 2) {
+      if (val == null && area !== 'value' && !env.sizing && retriedStorageKeys[area + id] !== 2) {
         retriedStorageKeys[area + id] = isRetry ? 2 : 1;
         if (!isRetry) {
           console.warn(`The "${area}" storage is missing "${id}"! Vacuuming...`);
