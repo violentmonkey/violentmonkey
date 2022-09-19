@@ -59,7 +59,6 @@ class ListBackgroundScriptsPlugin {
           JSON.stringify(manifest, null, this.minify ? 0 : 2),
           { encoding: 'utf8' });
       }
-      await fs.unlink(`${dist}/${bgId}.html`).catch(() => {});
     });
   }
 }

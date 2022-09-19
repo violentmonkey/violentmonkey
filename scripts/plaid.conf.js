@@ -14,11 +14,11 @@ exports.pages = [
 ].reduce((res, name) => Object.assign(res, {
   [`${name}/index`]: {
     entry: `./src/${name}`,
-    html: options => ({
+    html: name !== 'background' && (options => ({
       ...options,
       title: 'Violentmonkey',
       injectTo: item => ((item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head'),
-    }),
+    })),
   },
 }), {});
 
