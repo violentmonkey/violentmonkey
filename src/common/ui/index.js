@@ -1,16 +1,14 @@
-import { createApp } from 'vue';
+import { createApp, h } from 'vue';
 import Modal from 'vueleton/lib/modal';
 import { i18n } from '@/common/util';
 import Message from './message';
 
 export function showMessage(message) {
-  const modal = Modal.show(h => h(Message, {
-    props: { message },
-    on: {
-      dismiss() {
-        modal.close();
-        message.onDismiss?.();
-      },
+  const modal = Modal.show(() => h(Message, {
+    message,
+    onDismiss() {
+      modal.close();
+      message.onDismiss?.();
     },
   }), {
     transition: 'in-out',

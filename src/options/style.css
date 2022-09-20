@@ -107,9 +107,9 @@ textarea:not([rows="1"]):not(.h100) {
 }
 
 .in-out {
-  &-appear,
-  &-enter,
-  &-leave-active {
+  &-appear-from,
+  &-enter-from,
+  &-leave-to {
     > .modal-content {
       transform: translateY(-120%);
     }

@@ -1033,7 +1033,7 @@
     "@babel/helper-validator-option" "^7.18.6"
     "@babel/plugin-transform-typescript" "^7.18.6"
 
-"@babel/runtime@^7.11.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.7", "@babel/runtime@^7.17.2", "@babel/runtime@^7.18.3", "@babel/runtime@^7.8.4":
+"@babel/runtime@^7.11.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.7", "@babel/runtime@^7.18.3", "@babel/runtime@^7.19.0", "@babel/runtime@^7.8.4":
   version "7.19.0"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.19.0.tgz#22b11c037b094d27a8a2504ea4dcff00f50e2259"
   integrity sha512-eR8Lo9hnDS7tqkO7NsV+mKvCmv5boaXFSZ70DnfhcgiEne8hv9oCEd36Klw74EtizEqLsy4YnW8UWwpBVolHZA==
@@ -5259,7 +5259,7 @@ globby@^11.0.1, globby@^11.1.0:
     merge2 "^1.4.1"
     slash "^3.0.0"
 
-globby@^13.1.1:
+globby@^13.1.2:
   version "13.1.2"
   resolved "https://registry.yarnpkg.com/globby/-/globby-13.1.2.tgz#29047105582427ab6eca4f905200667b056da515"
   integrity sha512-LKSDZXToac40u8Q1PQtZihbNdTYSNMuWe+K5l+oa6KgDzSvVrHXlJy40hUP522RjAIoNLJYBJi7ow+rbFpIhHQ==
@@ -10352,13 +10352,13 @@ vue@^3.2.37:
     "@vue/server-renderer" "3.2.39"
     "@vue/shared" "3.2.39"
 
-vueleton@^2.0.0-3:
-  version "2.0.0-3"
-  resolved "https://registry.yarnpkg.com/vueleton/-/vueleton-2.0.0-3.tgz#db6806ec7b24b0302e9817d9854236d054e1f2df"
-  integrity sha512-Tjoz6gF13C9kKjro4hzdkC6/i2jDXgyKXC0Gs5Qf/NIBDap9JHWPvFeFh6Jmk5y2GG1Ycy9dvM58Ug7P3fNoZw==
+vueleton@^2.0.0-4:
+  version "2.0.0-4"
+  resolved "https://registry.yarnpkg.com/vueleton/-/vueleton-2.0.0-4.tgz#5391c27dc85434899b6a074b70cfa08ac9e717be"
+  integrity sha512-tAHXbNDcXRbY41sC9KEiuNDMJmFEnwZMKrgAheSHZEMI8HbpEdUW5DCdFex7GtpEZtFcTK5ifJHWFR0m3whrDA==
   dependencies:
-    "@babel/runtime" "^7.17.2"
-    globby "^13.1.1"
+    "@babel/runtime" "^7.19.0"
+    globby "^13.1.2"
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"
