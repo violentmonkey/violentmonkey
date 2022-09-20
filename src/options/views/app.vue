@@ -24,7 +24,6 @@
 
 <script>
 import { i18n } from '#/common';
-import { setRoute } from '#/common/router';
 import Icon from '#/common/ui/icon';
 import { keyboardService } from '#/common/keyboard';
 import { store } from '../utils';
@@ -87,14 +86,14 @@ export default {
     switchTab(step) {
       const index = this.tabs.indexOf(this.current);
       const switchTo = this.tabs[(index + step + this.tabs.length) % this.tabs.length];
-      setRoute(switchTo?.name || '');
+      window.location.hash = switchTo?.name || '';
     },
   },
   created() {
     document.addEventListener('dragover', evt => {
       if (['', ABOUT, SCRIPTS].includes(this.store.route.hash)
       && /^application\/(zip|x-zip-compressed)$/.test(evt.dataTransfer.items[0]?.type)) {
-        setRoute(`#${SETTINGS}`);
+        window.location.hash = `#${SETTINGS}`;
       }
     });
   },
