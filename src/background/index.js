@@ -133,7 +133,7 @@ initialize(() => {
   const api = global.chrome.declarativeContent;
   if (api) {
     // Using declarativeContent to run content scripts earlier than document_start
-    api.onPageChanged.getRules(async ([rule]) => {
+    api.onPageChanged.getRules(/* for old Chrome */ null, async ([rule]) => {
       const id = rule?.id;
       const newId = process.env.INIT_FUNC_NAME;
       if (id === newId) {

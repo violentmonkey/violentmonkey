@@ -398,7 +398,7 @@ export default {
     onHashChange() {
       const [tab, id] = this.store.route.paths;
       if (id === '_new') {
-        this.script = {};
+        sendCmdDirectly('NewScript').then(res => { this.script = res.script; });
       } else {
         const nid = id && +id || null;
         this.script = nid && this.scripts.find(script => script.props.id === nid);
