@@ -26,13 +26,7 @@ let injectedRoot;
 let VMInitInjection = window[INIT_FUNC_NAME];
 /** Avoid running repeatedly due to new `documentElement` or with declarativeContent in Chrome.
  * The prop's mode is overridden to be unforgeable by a userscript in content mode. */
-defineProperty(window, INIT_FUNC_NAME, {
-  __proto__: null,
-  value: 1,
-  configurable: false,
-  enumerable: false,
-  writable: false,
-});
+setOwnProp(window, INIT_FUNC_NAME, 1, false);
 if (IS_FIREFOX) {
   window::on(VAULT_WRITER, evt => {
     evt::stopImmediatePropagation();

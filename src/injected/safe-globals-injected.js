@@ -47,13 +47,13 @@ export const getOwnProp = (obj, key) => {
 /** Workaround for array eavesdropping via prototype setters like '0','1',...
  * on `push` and `arr[i] = 123`, as well as via getters if you read beyond
  * its length or from an unassigned `hole`. */
-export const setOwnProp = (obj, key, value) => (
+export const setOwnProp = (obj, key, value, mutable = true) => (
   defineProperty(obj, key, {
     __proto__: null,
     value,
-    configurable: true,
-    enumerable: true,
-    writable: true,
+    configurable: mutable,
+    enumerable: mutable,
+    writable: mutable,
   })
 );
 
@@ -76,10 +76,7 @@ export const ensureNestedProp = (obj, bucketId, key, defaultValue) => {
 export const promiseResolve = () => (async () => {})();
 
 export const vmOwnFunc = (func, toString) => (
-  defineProperty(func, 'toString', {
-    __proto__: null,
-    value: toString || vmOwnFuncToString,
-  })
+  setOwnProp(func, 'toString', toString || vmOwnFuncToString, false)
 );
 
 // Avoiding the need to safe-guard a bunch of methods so we use just one
