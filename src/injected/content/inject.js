@@ -1,5 +1,5 @@
 import bridge from './bridge';
-import { elemByTag, makeElem, onElement, sendCmd } from './util';
+import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import {
   bindEvents, fireBridgeEvent,
   INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
@@ -312,7 +312,7 @@ async function injectList(runAt) {
   // Not using for-of because we don't know if @@iterator is safe.
   for (let i = 0, item; (item = list[i]); i += 1) {
     if (item.code) {
-      if (runAt === 'idle') await sendCmd('SetTimeout', 0);
+      if (runAt === 'idle') await nextTask();
       if (runAt === 'end') await 0;
       inject(item);
       item.code = '';

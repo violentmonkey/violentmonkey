@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 export { sendCmd } from '#/common';
+export * from './util-task';
 
 /** When looking for documentElement, use '*' to also support XML pages
  * Note that we avoid spoofed prototype getters by using hasOwnProperty, and not using `length`

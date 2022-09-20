@@ -9,10 +9,10 @@ import { bindEvents, INJECT_PAGE, INJECT_CONTENT } from '../util';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 
-const sendSetTimeout = () => bridge.send('SetTimeout', 0);
+const queueMacrotask = cb => bridge.call('NextTask', 0, bridge, 0, cb);
 // Waiting for injection of content mode scripts that don't run on document-start
-let resolvers;
-let waiters;
+let runningQueues;
+let waitingQueues;
 
 export default function initialize(
   webId,
@@ -30,8 +30,8 @@ export default function initialize(
   }
   bridge.dataKey = contentId;
   if (invokeHost) {
-    resolvers = createNullObj();
-    waiters = createNullObj();
+    runningQueues = [];
+    waitingQueues = createNullObj();
     bridge.mode = INJECT_CONTENT;
     bridge.post = (cmd, data, context, node) => {
       invokeHost({ cmd, data, node, dataKey: (context || bridge).dataKey }, INJECT_CONTENT);
@@ -43,7 +43,7 @@ export default function initialize(
     global.chrome = undefined;
     global.browser = undefined;
     bridge.addHandlers({
-      RunAt: name => resolvers[name](),
+      RunAt,
     });
   } else {
     bridge.mode = INJECT_PAGE;
@@ -75,8 +75,8 @@ bridge.addHandlers({
       assign(bridge, info);
     }
     if (items) {
-      if (waiters && runAt !== 'start') {
-        waiters[runAt] = new SafePromise(resolve => { resolvers[runAt] = resolve; });
+      if (waitingQueues && runAt !== 'start') {
+        waitingQueues[runAt] = [];
       }
       items::forEach(createScriptData);
       // FF bug workaround to enable processing of sourceURL in injected page scripts
@@ -121,11 +121,40 @@ async function onCodeSet(item, fn) {
     (wrapper || global)::fn(gm, logging.error);
   };
   const el = document::getCurrentScript();
-  const wait = waiters?.[stage];
-  if (el) el::remove();
-  if (wait) {
-    waiters[stage] = (stage === 'idle' ? wait::then(sendSetTimeout) : wait)::then(run);
+  const queue = waitingQueues?.[stage];
+  if (el) {
+    el::remove();
+  }
+  if (queue) {
+    if (stage === 'idle') safePush(queue, 1);
+    safePush(queue, run);
   } else {
     run();
   }
+}
+
+async function RunAt(name) {
+  if (name) {
+    safePush(runningQueues, waitingQueues[name]);
+    if (runningQueues.length > 1) return;
+  }
+  for (let i = 0, queue; i < runningQueues.length; i += 1) {
+    if ((queue = waitingQueues[i])) {
+      for (let j = 0, fn; j < queue.length; j += 1) {
+        fn = queue[j];
+        if (fn) {
+          queue[j] = null;
+          if (fn === 1) {
+            queueMacrotask(RunAt);
+            return;
+          }
+          await 0;
+          fn();
+        }
+      }
+      queue.length = 0;
+      runningQueues[i] = null;
+    }
+  }
+  runningQueues.length = 0;
 }

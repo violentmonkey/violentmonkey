@@ -116,3 +116,7 @@ export function pickIntoThis(obj, keys) {
 export const safeDefineProperty = (obj, key, desc) => (
   defineProperty(obj, key, assign(createNullObj(), desc))
 );
+
+export const safePush = (arr, val) => (
+  setOwnProp(arr, arr.length, val)
+);

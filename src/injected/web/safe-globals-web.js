@@ -6,6 +6,13 @@
  * `export` is stripped in the final output and is only used for our NodeJS test scripts.
  */
 
+export const {
+  /* We can't use safe Promise from vault because it stops working when iframe is removed,
+   * so we use the unsafe current global - only for userscript API stuff, not internally.
+   * TODO: try reimplementing Promise in our sandbox wrapper if it can work with user code */
+  Promise: UnsafePromise,
+} = global;
+
 export let
   // window
   SafeCustomEvent,
@@ -15,7 +22,6 @@ export let
   SafeKeyboardEvent,
   SafeMouseEvent,
   Object,
-  SafePromise,
   SafeProxy,
   SafeSymbol,
   fire,
@@ -104,7 +110,6 @@ export const VAULT = (() => {
     SafeKeyboardEvent = res[i += 1] || src.KeyboardEvent,
     SafeMouseEvent = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
-    SafePromise = res[i += 1] || src.Promise,
     SafeSymbol = res[i += 1] || src.Symbol,
     // In FF content mode global.Proxy !== window.Proxy
     SafeProxy = res[i += 1] || src.Proxy,
@@ -148,10 +153,7 @@ export const VAULT = (() => {
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    then = res[i += 1] || (
-      // Freezing SafePromise in page context to avoid spoofing via eval on an object from vault
-      src !== global ? SafeObject.freeze(SafePromise[PROTO]) : SafePromise[PROTO]
-    ).then,
+    then = res[i += 1] || src.Promise[PROTO].then,
     // various getters
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
     getDetail = res[i += 1] || describeProperty(SafeCustomEvent[PROTO], 'detail').get,

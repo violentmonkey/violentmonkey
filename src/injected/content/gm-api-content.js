@@ -1,5 +1,5 @@
 import bridge from './bridge';
-import { decodeResource, elemByTag, makeElem, sendCmd } from './util-content';
+import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 
 const menus = createNullObj();
 let setPopupThrottle;
@@ -62,7 +62,7 @@ export async function sendSetPopup(isDelayed) {
     if (isDelayed) {
       if (setPopupThrottle) return;
       // Preventing flicker in popup when scripts re-register menus
-      setPopupThrottle = sendCmd('SetTimeout', 0);
+      setPopupThrottle = nextTask;
       await setPopupThrottle;
       setPopupThrottle = null;
     }
