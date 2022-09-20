@@ -1,5 +1,5 @@
 import bridge from './bridge';
-import { elemByTag, makeElem, onElement, sendCmd } from './util-content';
+import { elemByTag, makeElem, onElement, sendCmd } from './util';
 import {
   bindEvents, fireBridgeEvent,
   INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,

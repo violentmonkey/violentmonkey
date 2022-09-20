@@ -5,7 +5,7 @@ import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
-import { sendCmd } from './util-content';
+import { sendCmd } from './util';
 import { isEmpty, INJECT_CONTENT } from '../util';
 import { Run } from './cmd-run';
 

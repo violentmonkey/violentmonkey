@@ -1,5 +1,5 @@
 import bridge from './bridge';
-import { sendCmd } from './util-content';
+import { sendCmd } from './util';
 
 const notifications = createNullObj();
 

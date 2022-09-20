@@ -1,5 +1,5 @@
 import { INJECT_PAGE, browser } from '../util';
-import { sendCmd } from './util-content';
+import { sendCmd } from './util';
 
 const allowed = createNullObj();
 const dataKeyNameMap = createNullObj();
