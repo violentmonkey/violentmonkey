@@ -1,6 +1,6 @@
 import {
   compareVersion, getScriptName, getScriptUpdateUrl,
-  i18n, request, sendCmd, trueJoin,
+  i18n, sendCmd, trueJoin,
 } from '#/common';
 import { fetchResources, getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
