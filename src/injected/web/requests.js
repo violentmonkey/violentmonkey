@@ -12,7 +12,7 @@ bridge.addHandlers({
 export function onRequestCreate(opts, context, fileName) {
   if (!opts.url) throw new SafeError('Required parameter "url" is missing.');
   const scriptId = context.id;
-  const id = safeGetUniqId(`VMxhr${scriptId}`);
+  const id = safeGetUniqId('VMxhr');
   const req = {
     __proto__: null,
     id,
@@ -95,13 +95,12 @@ function callback(req, msg) {
 
 function start(req, context, fileName) {
   const { id, scriptId } = req;
-  const opts = assign(createNullObj(), req.opts);
+  const opts = createNullObj(req.opts);
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
   const { data, withCredentials = true, anonymous = !withCredentials } = opts;
   idMap[id] = req;
-  bridge.post('HttpRequest', {
-    __proto__: null,
+  bridge.post('HttpRequest', createNullObj({
     id,
     scriptId,
     anonymous,
@@ -111,11 +110,8 @@ function start(req, context, fileName) {
       || (opts.binary || !isObject(data)) && [`${data}`]
       // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
       || IS_FIREFOX && bridge.ua.browserVersion >= 56 && [data]
-      /* Chrome can't directly transfer FormData to isolated world so we explode it,
-       * trusting its iterator is usable because the only reason for a site to break it
-       * is to fight a userscript, which it can do by breaking FormData constructor anyway */
-      // eslint-disable-next-line no-restricted-syntax
-      || (getObjectTypeTag(data) === 'FormData' ? [[...data], 'fd'] : [data, 'bin']),
+      || getFormData(data)
+      || [data, 'bin'],
     eventsToNotify: [
       'abort',
       'error',
@@ -127,7 +123,7 @@ function start(req, context, fileName) {
       'timeout',
     ]::filter(key => isFunction(getOwnProp(opts, `on${key}`))),
     xhrType: getResponseType(opts.responseType),
-  }::pickIntoThis(opts, [
+  }, opts, [
     'headers',
     'method',
     'overrideMimeType',
@@ -136,6 +132,17 @@ function start(req, context, fileName) {
     'url',
     'user',
   ]), context);
+}
+
+/** Chrome can't directly transfer FormData to isolated world so we explode it,
+ * trusting its iterator is usable because the only reason for a site to break it
+ * is to fight a userscript, which it can do by breaking FormData constructor anyway */
+function getFormData(data) {
+  try {
+    return [[...data::formDataEntries()], 'fd']; // eslint-disable-line no-restricted-syntax
+  } catch (e) {
+    /**/
+  }
 }
 
 function getResponseType(responseType = '') {

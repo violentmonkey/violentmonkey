@@ -19,13 +19,9 @@ export const WINDOW_CLOSE = 'window.close';
 export const WINDOW_FOCUS = 'window.focus';
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 export const CALLBACK_ID = '__CBID';
-
-export const getObjectTypeTag = val => {
-  // objectToString may call @@toStringTag getter which may throw
-  try {
-    return val && val::objectToString()::slice(8, -1);
-  } catch (e) { /* NOP */ }
-};
+/** These toString are used to avoid leaking data when converting into a string */
+const { toString: numberToString } = 0;
+const { toString: URLToString } = URL[PROTO];
 
 export const isFunction = val => typeof val === 'function';
 export const isObject = val => val !== null && typeof val === 'object';
@@ -59,8 +55,33 @@ export const setOwnProp = (obj, key, value, mutable = true) => (
 
 export const vmOwnFuncToString = () => '[Violentmonkey property]';
 
-/** Using __proto__ because Object.create(null) may be spoofed */
-export const createNullObj = () => ({ __proto__: null });
+/**
+ * Helps avoid interception via `Object.prototype`.
+ * @param {Object} [dst] - target object to clear the prototype or to pick into
+ * @param {Object} [src] - source object to pick from
+ * @param {string[]} [keys] - all keys will be picked otherwise
+ * @returns {Object} `dst` if it's already without prototype, a new object otherwise
+ */
+export const createNullObj = (dst, src, keys) => {
+  const empty = (!dst || dst.__proto__) && { __proto__: null }; // eslint-disable-line no-proto
+  if (!dst) {
+    dst = empty;
+  } else if (empty) {
+    dst = assign(empty, dst);
+  }
+  if (src) {
+    if (keys) {
+      keys::forEach(key => {
+        if (src::hasOwnProperty(key)) {
+          dst[key] = src[key];
+        }
+      });
+    } else {
+      assign(dst, src);
+    }
+  }
+  return dst;
+};
 
 // WARNING! `obj` must use __proto__:null
 export const ensureNestedProp = (obj, bucketId, key, defaultValue) => {
@@ -79,8 +100,8 @@ export const vmOwnFunc = (func, toString) => (
   setOwnProp(func, 'toString', toString || vmOwnFuncToString, false)
 );
 
-// Avoiding the need to safe-guard a bunch of methods so we use just one
-export const safeGetUniqId = (prefix = 'VM') => `${prefix}${mathRandom()}`;
+// Using just one random() to avoid many methods in vault just for this
+export const safeGetUniqId = (prefix = 'VM') => prefix + mathRandom()::numberToString(36);
 
 /** args is [tags?, ...rest] */
 export const log = (level, ...args) => {
@@ -91,30 +112,12 @@ export const log = (level, ...args) => {
 };
 
 /**
- * Picks into `this`
- * WARNING! `this` must use __proto__:null or already have own properties on the picked keys.
- * @param {Object} obj
- * @param {string[]} keys
- * @returns {Object} same object as `this`
- */
-export function pickIntoThis(obj, keys) {
-  if (obj) {
-    keys::forEach(key => {
-      if (obj::hasOwnProperty(key)) {
-        this[key] = obj[key];
-      }
-    });
-  }
-  return this;
-}
-
-/**
  * Object.defineProperty seems to be inherently broken: it reads inherited props from desc
  * (even though the purpose of this API is to define own props) and then complains when it finds
  * invalid props like an inherited setter when you only provide `{value}`.
  */
 export const safeDefineProperty = (obj, key, desc) => (
-  defineProperty(obj, key, assign(createNullObj(), desc))
+  defineProperty(obj, key, createNullObj(desc))
 );
 
 export const safePush = (arr, val) => (

@@ -67,7 +67,7 @@ export const FastLookup = (hubs = createNullObj()) => {
     clone() {
       const clone = createNullObj();
       for (const group in hubs) { /* proto is null */// eslint-disable-line guard-for-in
-        clone[group] = assign(createNullObj(), hubs[group]);
+        clone[group] = createNullObj(hubs[group]);
       }
       return FastLookup(clone);
     },

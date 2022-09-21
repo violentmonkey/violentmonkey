@@ -19,11 +19,10 @@ let downloadChain = promiseResolve();
 // TODO: extract all prop names used across files into consts.js to ensure sameness
 bridge.addHandlers({
   async HttpRequest(msg, realm) {
-    requests[msg.id] = {
-      __proto__: null,
+    requests[msg.id] = createNullObj({
       realm,
       wantsBlob: msg.xhrType === 'blob',
-    }::pickIntoThis(msg, [
+    }, msg, [
       'eventsToNotify',
       'fileName',
     ]);
@@ -113,7 +112,7 @@ async function revokeBlobAfterTimeout(url) {
 
 /** ArrayBuffer/Blob in Chrome incognito is transferred in string chunks */
 function receiveAllChunks(req, msg) {
-  req::pickIntoThis(msg, ['dataSize', 'contentType']);
+  createNullObj(req, msg, ['dataSize', 'contentType']);
   req.arr = new SafeUint8Array(req.dataSize);
   processChunk(req, msg.data.response, 0);
   return !req.gotChunks

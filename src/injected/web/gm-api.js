@@ -102,7 +102,7 @@ export function makeGmApi() {
       } else if (arg1) {
         name = arg1.name;
         onload = arg1.onload;
-        opts::pickIntoThis(arg1, [
+        createNullObj(opts, arg1, [
           'url',
           'headers',
           'timeout',
@@ -147,12 +147,9 @@ export function makeGmApi() {
       return webAddElement(null, 'style', { textContent: css, id: safeGetUniqId('VMst') }, this);
     },
     GM_openInTab(url, options) {
-      return onTabCreate(
-        isObject(options)
-          ? assign(createNullObj(), options, { url })
-          : { active: !options, url },
-        this,
-      );
+      options = createNullObj(isObject(options) ? options : { active: !options });
+      options.url = url;
+      return onTabCreate(options, this);
     },
     GM_notification(text, title, image, onclick) {
       const options = isObject(text) ? text : {

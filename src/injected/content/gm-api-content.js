@@ -66,7 +66,7 @@ export async function sendSetPopup(isDelayed) {
       await setPopupThrottle;
       setPopupThrottle = null;
     }
-    sendCmd('SetPopup', { menus, __proto__: null }::pickIntoThis(bridge, [
+    sendCmd('SetPopup', createNullObj({ menus }, bridge, [
       'ids',
       'injectInto',
       'runningIds',
