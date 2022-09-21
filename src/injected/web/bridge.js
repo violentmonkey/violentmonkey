@@ -14,11 +14,19 @@ const bridge = {
     if (fn) node::fn(data);
   },
   send(cmd, data, context, node) {
-    return new SafePromise(resolve => {
-      postWithCallback(cmd, data, context, node, resolve);
-    });
+    let cb;
+    let res;
+    try {
+      res = new UnsafePromise(resolve => {
+        cb = resolve;
+      });
+    } catch (e) {
+      // Unavoidable since vault's Promise can't be used after the iframe is removed
+    }
+    postWithCallback(cmd, data, context, node, cb);
+    return res;
   },
-  syncCall: postWithCallback,
+  call: postWithCallback,
 };
 
 function postWithCallback(cmd, data, context, node, cb, customCallbackId) {

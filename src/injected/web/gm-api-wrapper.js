@@ -36,7 +36,7 @@ export function makeGmApiWrapper(script) {
     grant.length = 0;
   }
   const { id } = script.props;
-  const resources = assign(createNullObj(), meta.resources);
+  const resources = createNullObj(meta.resources);
   /** @namespace VMInjectedScript.Context */
   const context = {
     id,

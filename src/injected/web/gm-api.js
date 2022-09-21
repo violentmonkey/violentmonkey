@@ -102,7 +102,7 @@ export function makeGmApi() {
       } else if (arg1) {
         name = arg1.name;
         onload = arg1.onload;
-        opts::pickIntoThis(arg1, [
+        createNullObj(opts, arg1, [
           'url',
           'headers',
           'timeout',
@@ -147,12 +147,9 @@ export function makeGmApi() {
       return webAddElement(null, 'style', { textContent: css, id: safeGetUniqId('VMst') }, this);
     },
     GM_openInTab(url, options) {
-      return onTabCreate(
-        isObject(options)
-          ? assign(createNullObj(), options, { url })
-          : { active: !options, url },
-        this,
-      );
+      options = createNullObj(isObject(options) ? options : { active: !options });
+      options.url = url;
+      return onTabCreate(options, this);
     },
     GM_notification(text, title, image, onclick) {
       const options = isObject(text) ? text : {
@@ -181,7 +178,7 @@ export function makeGmApi() {
 function webAddElement(parent, tag, attrs, context) {
   let el;
   let errorInfo;
-  bridge.syncCall('AddElement', { tag, attrs }, context, parent, function _(res) {
+  bridge.call('AddElement', { tag, attrs }, context, parent, function _(res) {
     el = this;
     errorInfo = res;
   }, 'cbId');
@@ -210,7 +207,7 @@ function getResource(context, name, isBlob) {
   if (key) {
     let res = ensureNestedProp(resCache, bucketKey, key, false);
     if (!res) {
-      bridge.syncCall('GetResource', { id, isBlob, key }, context, null, response => {
+      bridge.call('GetResource', { id, isBlob, key }, context, null, response => {
         res = response;
       });
       if (res !== true && isBlob) {

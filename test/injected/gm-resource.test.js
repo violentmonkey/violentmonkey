@@ -1,5 +1,5 @@
 import { buffer2string } from '@/common';
-import { decodeResource } from '@/injected/content/util-content';
+import { decodeResource } from '@/injected/content/util';
 
 const stringAsBase64 = str => btoa(buffer2string(new TextEncoder().encode(str).buffer));
 

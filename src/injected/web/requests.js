@@ -10,9 +10,24 @@ bridge.addHandlers({
 });
 
 export function onRequestCreate(opts, context, fileName) {
-  if (!opts.url) throw new SafeError('Required parameter "url" is missing.');
+  opts = createNullObj(opts);
+  let { url } = opts;
+  if (url && !isString(url)) { // USVString in XMLHttpRequest spec calls ToString
+    try {
+      url = url::URLToString();
+    } catch (e) {
+      url = getOwnProp(url, 'href'); // `location`
+    }
+    opts.url = url;
+  }
+  if (!url) {
+    const err = new SafeError('Required parameter "url" is missing.');
+    const { onerror } = opts;
+    if (isFunction(onerror)) onerror(err);
+    else throw err;
+  }
   const scriptId = context.id;
-  const id = safeGetUniqId(`VMxhr${scriptId}`);
+  const id = safeGetUniqId('VMxhr');
   const req = {
     __proto__: null,
     id,
@@ -94,14 +109,12 @@ function callback(req, msg) {
 }
 
 function start(req, context, fileName) {
-  const { id, scriptId } = req;
-  const opts = assign(createNullObj(), req.opts);
+  const { id, opts, scriptId } = req;
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
   const { data, withCredentials = true, anonymous = !withCredentials } = opts;
   idMap[id] = req;
-  bridge.post('HttpRequest', {
-    __proto__: null,
+  bridge.post('HttpRequest', createNullObj({
     id,
     scriptId,
     anonymous,
@@ -111,11 +124,8 @@ function start(req, context, fileName) {
       || (opts.binary || !isObject(data)) && [`${data}`]
       // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
       || IS_FIREFOX && bridge.ua.browserVersion >= 56 && [data]
-      /* Chrome can't directly transfer FormData to isolated world so we explode it,
-       * trusting its iterator is usable because the only reason for a site to break it
-       * is to fight a userscript, which it can do by breaking FormData constructor anyway */
-      // eslint-disable-next-line no-restricted-syntax
-      || (getObjectTypeTag(data) === 'FormData' ? [[...data], 'fd'] : [data, 'bin']),
+      || getFormData(data)
+      || [data, 'bin'],
     eventsToNotify: [
       'abort',
       'error',
@@ -127,7 +137,7 @@ function start(req, context, fileName) {
       'timeout',
     ]::filter(key => isFunction(getOwnProp(opts, `on${key}`))),
     xhrType: getResponseType(opts.responseType),
-  }::pickIntoThis(opts, [
+  }, opts, [
     'headers',
     'method',
     'overrideMimeType',
@@ -136,6 +146,17 @@ function start(req, context, fileName) {
     'url',
     'user',
   ]), context);
+}
+
+/** Chrome can't directly transfer FormData to isolated world so we explode it,
+ * trusting its iterator is usable because the only reason for a site to break it
+ * is to fight a userscript, which it can do by breaking FormData constructor anyway */
+function getFormData(data) {
+  try {
+    return [[...data::formDataEntries()], 'fd']; // eslint-disable-line no-restricted-syntax
+  } catch (e) {
+    /**/
+  }
 }
 
 function getResponseType(responseType = '') {

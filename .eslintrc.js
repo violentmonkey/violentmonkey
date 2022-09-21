@@ -2,7 +2,7 @@ const { readGlobalsFile } = require('./scripts/webpack-util');
 
 const FILES_INJECTED = [`src/injected/**/*.js`];
 const FILES_CONTENT = [
-  'src/injected/*.js',
+  'src/injected/index.js',
   'src/injected/content/**/*.js',
 ];
 const FILES_WEB = [`src/injected/web/**/*.js`];

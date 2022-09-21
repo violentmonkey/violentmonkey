@@ -4,7 +4,7 @@ import { FastLookup, safeConcat } from './util-web';
 
 /** The index strings that look exactly like integers can't be forged
  * but for example '011' doesn't look like 11 so it's allowed */
-const isFrameIndex = key => key >= 0 && key <= 0xFFFF_FFFE && key === `${+key}`;
+const isFrameIndex = key => key >= 0 && key <= 0xFFFF_FFFE && key === (+key)::numberToString();
 const scopeSym = SafeSymbol.unscopables;
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
@@ -143,7 +143,7 @@ for (const name in unforgeables) { /* proto is null */// eslint-disable-line gua
   );
   let fn;
   if (info) {
-    info = assign(createNullObj(), info);
+    info = createNullObj(info);
     // currently only `document` and `window`
     if ((fn = info.get)) info.get = fn::bind(thisObj);
     // currently only `location`
@@ -165,7 +165,7 @@ builtinGlobals = null; // eslint-disable-line no-global-assign
  */
 export function makeGlobalWrapper(local) {
   const events = createNullObj();
-  const readonlys = assign(createNullObj(), readonlyKeys);
+  const readonlys = createNullObj(readonlyKeys);
   let globals = globalKeysSet; // will be copied only if modified
   /* Browsers may return [object Object] for Object.prototype.toString(window)
      on our `window` proxy so jQuery libs see it as a plain object and throw
@@ -254,7 +254,11 @@ function makeOwnKeys(local, globals) {
   const names = getOwnPropertyNames(local)::filter(notIncludedIn, globals);
   const symbols = getOwnPropertySymbols(local)::filter(notIncludedIn, globals);
   const frameIndexes = [];
-  for (let i = 0, s; getObjectTypeTag(global[s = `${i}`]) === 'Window'; i += 1) {
+  // No way to verify a cross-origin window is a `Window`, so let's just trust the numbers
+  for (let i = 0, s, w, len = getOwnProp(window, 'length');
+    i < len && isObject(w = window[s = i::numberToString()]) && getOwnProp(w, 'window') === w;
+    i += 1
+  ) {
     if (!(s in local)) {
       setOwnProp(frameIndexes, s, s);
     }

@@ -5,7 +5,7 @@ import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
-import { sendCmd } from './util-content';
+import { nextTask, sendCmd } from './util';
 import { isEmpty, INJECT_CONTENT } from '../util';
 import { Run } from './cmd-run';
 
@@ -33,7 +33,7 @@ async function init() {
       : await dataPromise
   );
   const { allowCmd } = bridge;
-  bridge::pickIntoThis(data, [
+  createNullObj(bridge, data, [
     'ids',
     'injectInto',
   ]);
@@ -44,7 +44,7 @@ async function init() {
   }
   if (data.scripts) {
     bridge.onScripts.forEach(fn => fn(data));
-    allowCmd('SetTimeout', contentId);
+    allowCmd('NextTask', contentId);
     if (IS_FIREFOX) allowCmd('InjectList', contentId);
     await injectScripts(contentId, webId, data, isXml);
   }
@@ -71,7 +71,7 @@ bridge.addBackgroundHandlers({
 
 bridge.addHandlers({
   Run,
-  SetTimeout: true,
+  NextTask: nextTask,
   TabFocus: true,
   UpdateValue: true,
 });

@@ -1,5 +1,5 @@
 import bridge from './bridge';
-import { elemByTag, makeElem, onElement, sendCmd } from './util-content';
+import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import {
   bindEvents, fireBridgeEvent,
   INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
@@ -26,13 +26,7 @@ let injectedRoot;
 let VMInitInjection = window[INIT_FUNC_NAME];
 /** Avoid running repeatedly due to new `documentElement` or with declarativeContent in Chrome.
  * The prop's mode is overridden to be unforgeable by a userscript in content mode. */
-defineProperty(window, INIT_FUNC_NAME, {
-  __proto__: null,
-  value: 1,
-  configurable: false,
-  enumerable: false,
-  writable: false,
-});
+setOwnProp(window, INIT_FUNC_NAME, 1, false);
 if (IS_FIREFOX) {
   window::on(VAULT_WRITER, evt => {
     evt::stopImmediatePropagation();
@@ -318,7 +312,7 @@ async function injectList(runAt) {
   // Not using for-of because we don't know if @@iterator is safe.
   for (let i = 0, item; (item = list[i]); i += 1) {
     if (item.code) {
-      if (runAt === 'idle') await sendCmd('SetTimeout', 0);
+      if (runAt === 'idle') await nextTask();
       if (runAt === 'end') await 0;
       inject(item);
       item.code = '';

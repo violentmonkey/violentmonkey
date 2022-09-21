@@ -156,8 +156,9 @@ async function httpRequest(opts, src, cb) {
   const { xhr } = req;
   const vmHeaders = [];
   // Firefox can send Blob/ArrayBuffer directly
-  const chunked = !IS_FIREFOX && incognito;
-  const blobbed = xhrType && !IS_FIREFOX && !incognito;
+  const willStringifyBinaries = xhrType && !IS_FIREFOX;
+  const chunked = willStringifyBinaries && incognito;
+  const blobbed = willStringifyBinaries && !incognito;
   const [body, contentType] = decodeBody(opts.data);
   // Chrome can't fetch Blob URL in incognito so we use chunks
   req.blobbed = blobbed;
@@ -178,7 +179,7 @@ async function httpRequest(opts, src, cb) {
       shouldSendCookies = !/^cookie$/i.test(name);
     }
   });
-  xhr.responseType = (chunked || blobbed) && 'blob' || xhrType || 'text';
+  xhr.responseType = willStringifyBinaries && 'blob' || xhrType || 'text';
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
   if (shouldSendCookies) {
