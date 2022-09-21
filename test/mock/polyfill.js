@@ -1,7 +1,5 @@
 import tldRules from 'tldjs/rules.json';
-import { JSDOM } from 'jsdom';
 
-global.window = new JSDOM('').window;
 global.browser = {
   storage: {
     local: {

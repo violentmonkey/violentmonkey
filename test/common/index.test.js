@@ -1,7 +1,8 @@
 import {
   isRemote, compareVersion, debounce, throttle,
 } from '@/common';
-import { mocker } from '../mock';
+
+jest.useFakeTimers();
 
 test('isRemote', () => {
   [
@@ -94,14 +95,12 @@ test('debounce', () => {
     log.push(i);
   }, 500);
   for (let i = 0; i < 3; i += 1) {
-    fn(i);
-    mocker.clock.tick(200);
+    setTimeout(fn, 200 * i, i);
   }
-  mocker.clock.tick(500);
   for (let i = 0; i < 3; i += 1) {
-    fn(i);
-    mocker.clock.tick(600);
+    setTimeout(fn, 1200 + 600 * i, i);
   }
+  jest.runAllTimers();
   expect(log).toEqual([2, 0, 1, 2]);
 });
 
@@ -114,7 +113,7 @@ test('debounce with invalid time', () => {
     for (let i = 0; i < 3; i += 1) {
       fn(i);
     }
-    mocker.clock.tick(500);
+    jest.runAllTimers();
     expect(log).toEqual([2]);
   }
 });
@@ -125,14 +124,12 @@ test('throttle', () => {
     log.push(i);
   }, 500);
   for (let i = 0; i < 6; i += 1) {
-    fn(i);
-    mocker.clock.tick(200);
+    setTimeout(fn, 200 * i, i);
   }
-  mocker.clock.tick(500);
   for (let i = 0; i < 3; i += 1) {
-    fn(i);
-    mocker.clock.tick(600);
+    setTimeout(fn, 1200 + 600 * i, i);
   }
+  jest.runAllTimers();
   expect(log).toEqual([0, 3, 0, 1, 2]);
 });
 
@@ -145,7 +142,7 @@ test('throttle with invalid time', () => {
     for (let i = 0; i < 3; i += 1) {
       fn(i);
     }
-    mocker.clock.tick(500);
+    jest.runAllTimers();
     expect(log).toEqual([0]);
   }
 });
