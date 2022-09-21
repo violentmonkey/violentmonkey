@@ -10,7 +10,22 @@ bridge.addHandlers({
 });
 
 export function onRequestCreate(opts, context, fileName) {
-  if (!opts.url) throw new SafeError('Required parameter "url" is missing.');
+  opts = createNullObj(opts);
+  let { url } = opts;
+  if (url && !isString(url)) { // USVString in XMLHttpRequest spec calls ToString
+    try {
+      url = url::URLToString();
+    } catch (e) {
+      url = getOwnProp(url, 'href'); // `location`
+    }
+    opts.url = url;
+  }
+  if (!url) {
+    const err = new SafeError('Required parameter "url" is missing.');
+    const { onerror } = opts;
+    if (isFunction(onerror)) onerror(err);
+    else throw err;
+  }
   const scriptId = context.id;
   const id = safeGetUniqId('VMxhr');
   const req = {
@@ -94,8 +109,7 @@ function callback(req, msg) {
 }
 
 function start(req, context, fileName) {
-  const { id, scriptId } = req;
-  const opts = createNullObj(req.opts);
+  const { id, opts, scriptId } = req;
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
   const { data, withCredentials = true, anonymous = !withCredentials } = opts;
