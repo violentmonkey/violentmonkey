@@ -298,7 +298,7 @@ export default {
           where: {
             id: this.script.props.id,
           },
-          store: current.jsonValue::mapEntry(([, val]) => dumpScriptValue(val) || ''),
+          store: current.jsonValue::mapEntry(val => dumpScriptValue(val) || ''),
         }]);
       } else {
         await this.updateValue(current);

@@ -11,7 +11,7 @@ Object.assign(commands, {
   },
   /** @return {Object} */
   GetOptions(data) {
-    return data::mapEntry(([key]) => getOption(key));
+    return data::mapEntry((_, key) => getOption(key));
   },
   /** @return {void} */
   SetOptions(data) {
@@ -72,7 +72,7 @@ export function getOption(key, def) {
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
   const value = options[mainKey] ?? deepCopy(defaults[mainKey]) ?? def;
-  return keys.length > 1 ? objectGet(value, keys.slice(1), def) : value;
+  return keys.length > 1 ? objectGet(value, keys.slice(1)) ?? def : value;
 }
 
 export async function setOption(key, value) {
