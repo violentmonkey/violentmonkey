@@ -11,6 +11,8 @@ import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_I
 import { extensionRoot, postInitialize } from './init';
 import { commands } from './message';
 import { getOption, hookOptions } from './options';
+import { onStorageChanged } from './storage-cache';
+import { addValueOpener } from './values';
 
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
@@ -58,6 +60,7 @@ Object.assign(commands, {
       if (env) {
         env[FORCE_CONTENT] = forceContent;
         env[ENV_SCRIPTS].map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
+        addValueOpener(src.tab.id, src.frameId, env[ENV_SCRIPTS]);
         return objectPick(env, ['cache', ENV_SCRIPTS]);
       }
     }
@@ -84,8 +87,7 @@ const propsToClear = {
   [storage.value.prefix]: ENV_VALUE_IDS,
 };
 
-browser.storage.onChanged.addListener(async changes => {
-  const dbKeys = Object.keys(changes);
+onStorageChanged(async ({ keys: dbKeys }) => {
   const cacheValues = await Promise.all(cache.getValues());
   const dirty = cacheValues.some(data => data.inject
     && dbKeys.some((key) => {
@@ -133,7 +135,7 @@ function onOptionChanged(changes) {
   });
 }
 
-/** @return {Promise<Object>} */
+/** @return {Promise<VMGetInjectedDataContainer>} */
 export function getInjectedScripts(url, tabId, frameId, forceContent) {
   const key = getKey(url, !frameId);
   return cache.pop(key) || prepare(key, url, tabId, frameId, forceContent);
@@ -224,8 +226,8 @@ function prepare(key, url, tabId, frameId, forceContent) {
 }
 
 async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) {
-  const data = await getScriptsByURL(url, !frameId);
-  const { envDelayed, scripts } = data;
+  const data = getScriptsByURL(url, !frameId);
+  const { envDelayed, scripts } = Object.assign(data, await data.promise);
   const isLate = forceContent != null;
   data[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
   const feedback = scripts.map(prepareScript, data).filter(Boolean);
@@ -254,7 +256,6 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   /** @namespace VMGetInjectedDataContainer */
   Object.assign(res, {
     feedback,
-    valOpIds: [...data[ENV_VALUE_IDS], ...envDelayed[ENV_VALUE_IDS]],
     rcsPromise: !isLate && !xhrInject && IS_FIREFOX
       ? registerScriptDataFF(inject, url, !!frameId)
       : null,
@@ -315,7 +316,7 @@ function prepareScript(script) {
     // code will be `true` if the desired realm is PAGE which is not injectable
     code: isContent ? '' : forceContent || injectedCode,
     metaStr: code.match(METABLOCK_RE)[1] || '',
-    values: value[id] || null,
+    values: id in value ? value[id] || {} : null,
   });
   return isContent && [
     dataKey,

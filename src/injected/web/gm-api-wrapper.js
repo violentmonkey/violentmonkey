@@ -147,9 +147,10 @@ function makeGmInfo(script, resources) {
 
 function makeGmMethodCaller(gmMethod, context, isAsync) {
   // keeping the native console.log intact
-  return gmMethod === gmApi.GM_log ? gmMethod : vmOwnFunc(
-    isAsync
-      ? (async (...args) => gmMethod::apply(context, args))
-      : gmMethod::bind(context),
-  );
+  if (gmMethod === gmApi.GM_log) return gmMethod;
+  if (isAsync) {
+    /** @namespace VMInjectedScript.Context */
+    context = assign({ __proto__: null, async: true }, context);
+  }
+  return vmOwnFunc(gmMethod::bind(context));
 }

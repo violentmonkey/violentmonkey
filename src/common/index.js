@@ -2,7 +2,7 @@
 
 import { browser } from '@/common/consts';
 import { deepCopy } from './object';
-import { i18n, noop } from './util';
+import { blob2base64, i18n, noop } from './util';
 
 export { normalizeKeys } from './object';
 export * from './util';
@@ -216,4 +216,30 @@ export function makePause(ms) {
 
 export function trueJoin(separator) {
   return this.filter(Boolean).join(separator);
+}
+
+/**
+ * @param {string} url
+ * @param {string} raw - raw value in storage.cache
+ * @returns {?string}
+ */
+export function makeDataUri(raw, url) {
+  if (url.startsWith('data:')) return url;
+  if (/^(i,|image\/)/.test(raw)) { // workaround for bugs in old VM, see 2e135cf7
+    const i = raw.lastIndexOf(',');
+    const type = raw.startsWith('image/') ? raw.slice(0, i) : 'image/png';
+    return `data:${type};base64,${raw.slice(i + 1)}`;
+  }
+  return raw;
+}
+
+/**
+ * @param {VMRequestResponse} response
+ * @param {boolean} [noJoin]
+ * @returns {string|string[]}
+ */
+export async function makeRaw(response, noJoin) {
+  const type = (response.headers.get('content-type') || '').split(';')[0] || '';
+  const body = await blob2base64(response.data);
+  return noJoin ? [type, body] : `${type},${body}`;
 }

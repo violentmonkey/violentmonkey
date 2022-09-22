@@ -1,4 +1,4 @@
-import { request } from '@/common';
+import { makeRaw, request } from '@/common';
 import storage from '@/common/storage';
 
 /** @type { function(url, options, check): Promise<void> } or throws on error */
@@ -7,7 +7,7 @@ storage.cache.fetch = cacheOrFetch({
     return { ...options, responseType: 'blob' };
   },
   async transform(response, url, options, check) {
-    const [type, body] = await storage.cache.makeRaw(response, true);
+    const [type, body] = await makeRaw(response, true);
     await check?.(url, response.data, type);
     return `${type},${body}`;
   },
@@ -60,7 +60,7 @@ export async function requestNewer(url, opts) {
         return;
       }
       if (get) {
-        if (mod) storage.mod.set(url, mod);
+        if (mod) storage.mod.setOne(url, mod);
         else if (modOld) storage.mod.remove(url);
         return req;
       }

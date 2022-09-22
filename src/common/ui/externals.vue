@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { formatByteLength, dataUri2text } from '@/common';
+import { dataUri2text, formatByteLength, makeDataUri } from '@/common';
 import VmCode from '@/common/ui/code';
 import storage from '@/common/storage';
 
@@ -84,7 +84,7 @@ export default {
         } else {
           const key = this.value.custom.pathMap?.[url] || url;
           raw = await storage[isReq ? 'require' : 'cache'].getOne(key);
-          if (!isReq) raw = storage.cache.makeDataUri(key, raw);
+          if (!isReq) raw = makeDataUri(raw, key);
         }
         if (isReq || !raw) {
           code = raw;

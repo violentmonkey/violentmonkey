@@ -13,15 +13,13 @@ const dataDecoders = {
 
 bridge.addHandlers({
   UpdatedValues(updates) {
-    const { partial } = updates;
     objectKeys(updates)::forEach(id => {
       const oldData = store.values[id];
       if (oldData) {
         const update = updates[id];
         const keyHooks = changeHooks[id];
         if (keyHooks) changedRemotely(keyHooks, oldData, update);
-        else if (partial) applyPartialUpdate(oldData, update);
-        else store.values[id] = update;
+        else applyPartialUpdate(oldData, update);
       }
     });
   },
@@ -31,12 +29,25 @@ export function loadValues(id) {
   return store.values[id];
 }
 
+/**
+ * @param {number} id
+ * @param {string} key
+ * @param {?} val
+ * @param {?string} raw
+ * @param {?string} oldRaw
+ * @param {VMInjectedScript.Context} context
+ * @return {void|Promise<void>}
+ */
 export function dumpValue(id, key, val, raw, oldRaw, context) {
-  bridge.post('UpdateValue', { id, key, value: raw }, context);
+  let res;
   if (raw !== oldRaw) {
+    res = bridge[context.async ? 'send' : 'post']('UpdateValue', { id, key, raw }, context);
     const hooks = changeHooks[id]?.[key];
     if (hooks) notifyChange(hooks, key, val, raw, oldRaw);
+  } else if (context.async) {
+    res = promiseResolve();
   }
+  return res;
 }
 
 export function decodeValue(raw) {

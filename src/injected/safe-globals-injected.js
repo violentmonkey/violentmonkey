@@ -81,7 +81,6 @@ export const pickIntoNullObj = (dst, src, keys) => {
  * @returns {Object} `base` if it's already without prototype, a new object otherwise
  */
 export const createNullObj = (base, src, keys) => {
-  // eslint-disable-next-line no-proto
   const res = { __proto__: null };
   if (base) {
     assign(res, base);
@@ -105,7 +104,7 @@ export const ensureNestedProp = (obj, bucketId, key, defaultValue) => {
   return val;
 };
 
-export const promiseResolve = () => (async () => {})();
+export const promiseResolve = async val => val;
 
 export const vmOwnFunc = (func, toString) => (
   setOwnProp(func, 'toString', toString || vmOwnFuncToString, false)

@@ -230,7 +230,7 @@ export default {
       rawValue = dumpScriptValue(jsonValue) || '',
     }) {
       const { id } = this.script.props;
-      return sendCmdDirectly('UpdateValue', { id, key, value: rawValue })
+      return sendCmdDirectly('UpdateValue', { id, key, raw: rawValue })
       .then(() => {
         if (rawValue) {
           this.$set(this.values, key, rawValue);
@@ -294,12 +294,9 @@ export default {
       }
       this.current = null;
       if (current.isAll) {
-        await sendCmdDirectly('SetValueStores', [{
-          where: {
-            id: this.script.props.id,
-          },
-          store: current.jsonValue::mapEntry(val => dumpScriptValue(val) || ''),
-        }]);
+        await sendCmdDirectly('SetValueStores', {
+          [this.script.props.id]: current.jsonValue::mapEntry(val => dumpScriptValue(val) || ''),
+        });
       } else {
         await this.updateValue(current);
       }

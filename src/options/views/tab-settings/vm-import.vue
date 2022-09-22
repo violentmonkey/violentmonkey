@@ -82,8 +82,7 @@ async function importBackup(file) {
   await processAll(readScript, '.user.js');
   if (options.get('importScriptData')) {
     await processAll(readScriptStorage, '.storage.json');
-    sendCmdDirectly('SetValueStores',
-      toObjectArray(vm.values, ([uri, store]) => store && ({ where: { uri }, store })));
+    sendCmdDirectly('SetValueStores', vm.values);
   }
   if (options.get('importSettings')) {
     sendCmdDirectly('SetOptions',

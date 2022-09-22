@@ -15,6 +15,7 @@ Object.assign(commands, {
     requests[id] = {
       id,
       tabId,
+      frameId,
       eventsToNotify,
       xhr: new XMLHttpRequest(),
     };
@@ -221,9 +222,9 @@ function clearRequest({ id, coreId }) {
   toggleHeaderInjector(id, false);
 }
 
-export function clearRequestsByTabId(tabId) {
+export function clearRequestsByTabId(tabId, frameId) {
   requests::forEachValue(req => {
-    if (req.tabId === tabId) {
+    if (req.tabId === tabId && (!frameId || req.frameId === frameId)) {
       commands.AbortRequest(req.id);
     }
   });
@@ -245,7 +246,3 @@ function decodeBody([body, type, wasBlob]) {
   }
   return [body, type];
 }
-
-// In Firefox with production code of Violentmonkey, scripts can be injected before `tabs.onUpdated` is fired.
-// Ref: https://github.com/violentmonkey/violentmonkey/issues/1255
-browser.tabs.onRemoved.addListener(clearRequestsByTabId);
