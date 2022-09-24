@@ -316,7 +316,7 @@ async function getScriptEnv(scripts, sizing) {
     ]) {
       list.forEach(key => {
         key = pathMap[key] || key;
-        if (key && !envStart[name].includes(key)) {
+        if (key && !(name === ENV_CACHE_KEYS && envStart[name].includes(key))) {
           env[name].push(key);
           (depsMap[key] || (depsMap[key] = [])).push(id);
         }
