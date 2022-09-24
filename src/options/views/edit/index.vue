@@ -302,11 +302,15 @@ export default {
           isNew: !id,
           message: '',
         });
+        const newId = res?.where?.id;
         savedSettings = deepCopy(settings);
         codeComponent.cm.markClean();
         this.codeDirty = false; // triggers onChange which sets canSave
         this.canSave = false; // ...and set it explicitly in case codeDirty was false
-        if (res?.where?.id) this.script = res.update;
+        if (newId) {
+          this.script = res.update;
+          window.history.replaceState(null, this.scriptName, `#scripts/${newId}`);
+        }
       } catch (err) {
         showConfirmation(`${err.message || err}`, {
           cancel: false,
