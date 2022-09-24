@@ -325,13 +325,15 @@ async function getScriptEnv(scripts, sizing) {
     /** @namespace VMInjectedScript */
     env[ENV_SCRIPTS].push(sizing ? script : { ...script, runAt });
   });
+  // Starting to read it before the potentially huge envDelayed
+  const envStartData = await readEnvironmentData(envStart);
   if (envDelayed.ids.length) {
     envDelayed.promise = readEnvironmentData(envDelayed);
   }
   /** @namespace VMScriptByUrlData */
   return {
     ...envStart,
-    ...await readEnvironmentData(envStart),
+    ...envStartData,
     disabledIds,
     envDelayed,
   };
