@@ -17,7 +17,6 @@ const API_CONFIG = {
   types: ['main_frame', 'sub_frame'],
 };
 const TIME_AFTER_SEND = 10e3; // longer as establishing connection to sites may take time
-const TIME_AFTER_RECEIVE = 1e3; // shorter as response body will be coming very soon
 const TIME_KEEP_DATA = 60e3; // 100ms should be enough but the tab may hang or get paused in debugger
 const cacheCode = initCache({ lifetime: TIME_KEEP_DATA });
 const cache = initCache({
@@ -185,7 +184,7 @@ function onSendHeaders({ url, tabId, frameId }) {
 function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
   const data = xhrInject && cache.get(key);
-  cache.hit(key, TIME_AFTER_RECEIVE);
+  // Proceeding only if prepareScripts has replaced promise in cache with the actual data
   return data?.inject && prepareXhrBlob(info, data);
 }
 
@@ -205,6 +204,7 @@ function prepareXhrBlob({ url, responseHeaders }, data) {
     value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
   });
   setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
+  data.headers = true;
   return { responseHeaders };
 }
 
@@ -260,7 +260,9 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
       : null,
   });
   if (more) cache.put(envKey, more);
-  cache.put(cacheKey, res); // necessary for the synchronous onHeadersReceived
+  if (!isLate && !cache.get(cacheKey)?.headers) {
+    cache.put(cacheKey, res); // synchronous onHeadersReceived needs plain object not a Promise
+  }
   return res;
 }
 
