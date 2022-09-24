@@ -8,8 +8,8 @@
 export {
   dumpScriptValue,
   isEmpty,
-} from '#/common';
-export * from '#/common/consts';
+} from '@/common';
+export * from '@/common/consts';
 
 export const fireBridgeEvent = (eventId, msg, cloneInto) => {
   const detail = cloneInto ? cloneInto(msg, document) : msg;

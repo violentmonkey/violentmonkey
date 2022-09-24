@@ -140,18 +140,18 @@
 <script>
 import Dropdown from 'vueleton/lib/dropdown/bundle';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { i18n, sendCmdDirectly, debounce, makePause } from '#/common';
-import options from '#/common/options';
-import { showConfirmation, showMessage } from '#/common/ui';
-import SettingCheck from '#/common/ui/setting-check';
-import hookSetting from '#/common/hook-setting';
-import Icon from '#/common/ui/icon';
-import LocaleGroup from '#/common/ui/locale-group';
-import { forEachKey } from '#/common/object';
-import { setRoute, lastRoute } from '#/common/router';
-import storage from '#/common/storage';
-import { keyboardService, handleTabNavigation } from '#/common/keyboard';
-import { loadData } from '#/options';
+import { i18n, sendCmdDirectly, debounce, makePause } from '@/common';
+import options from '@/common/options';
+import { showConfirmation, showMessage } from '@/common/ui';
+import SettingCheck from '@/common/ui/setting-check';
+import hookSetting from '@/common/hook-setting';
+import Icon from '@/common/ui/icon';
+import LocaleGroup from '@/common/ui/locale-group';
+import { forEachKey } from '@/common/object';
+import { setRoute, lastRoute } from '@/common/router';
+import storage from '@/common/storage';
+import { keyboardService, handleTabNavigation } from '@/common/keyboard';
+import { loadData } from '@/options';
 import ScriptItem from './script-item';
 import Edit from './edit';
 import { store } from '../utils';
@@ -688,7 +688,7 @@ export default {
   .vl-dropdown.active .vl-tooltip-wrap {
     display: none;
   }
-  @media (max-width: 500px) { // same size as `hidden-sm` in #/common/ui/style/style.css
+  @media (max-width: 500px) { // same size as `hidden-sm` in @/common/ui/style/style.css
     .vl-dropdown-right .vl-dropdown-menu {
       position: fixed;
       top: auto;

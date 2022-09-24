@@ -1,12 +1,12 @@
-import { getScriptName, getUniqId, sendTabCmd, trueJoin } from '#/common';
+import { getScriptName, getUniqId, sendTabCmd, trueJoin } from '@/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
   INJECTABLE_TAB_URL_RE, METABLOCK_RE,
-} from '#/common/consts';
-import initCache from '#/common/cache';
-import { forEachEntry, objectPick, objectSet } from '#/common/object';
-import storage from '#/common/storage';
-import ua from '#/common/ua';
+} from '@/common/consts';
+import initCache from '@/common/cache';
+import { forEachEntry, objectPick, objectSet } from '@/common/object';
+import storage from '@/common/storage';
+import ua from '@/common/ua';
 import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_IDS } from './db';
 import { extensionRoot, postInitialize } from './init';
 import { commands } from './message';

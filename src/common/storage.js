@@ -1,4 +1,4 @@
-import { deepCopy, forEachEntry } from '#/common/object';
+import { deepCopy, forEachEntry } from '@/common/object';
 import { blob2base64, ensureArray } from './util';
 
 /** @type VMCache */

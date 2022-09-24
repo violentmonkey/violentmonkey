@@ -34,9 +34,9 @@
 </template>
 
 <script>
-import { formatByteLength, dataUri2text } from '#/common';
-import VmCode from '#/common/ui/code';
-import storage from '#/common/storage';
+import { formatByteLength, dataUri2text } from '@/common';
+import VmCode from '@/common/ui/code';
+import storage from '@/common/storage';
 
 export default {
   props: ['value', 'cmOptions', 'commands', 'install', 'errors'],

@@ -1,6 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser } from '#/common/consts';
+import { browser } from '@/common/consts';
 import { deepCopy } from './object';
 import { i18n, noop } from './util';
 

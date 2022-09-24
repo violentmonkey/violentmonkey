@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { getUnloadSentry } from '#/common/router';
+import { getUnloadSentry } from '@/common/router';
 import { deepEqual, objectGet } from '../object';
 import options from '../options';
 import defaults from '../options-defaults';

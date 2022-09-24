@@ -1,5 +1,5 @@
 import test from 'tape';
-import { parseMeta } from '#/background/utils/script';
+import { parseMeta } from '@/background/utils/script';
 
 const baseMeta = {
   include: [],

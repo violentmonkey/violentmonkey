@@ -1,4 +1,4 @@
-import { getUniqId } from '#/common';
+import { getUniqId } from '@/common';
 import { loadQuery, dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,

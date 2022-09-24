@@ -1,4 +1,4 @@
-import { sendCmdDirectly } from '#/common/index';
+import { sendCmdDirectly } from '@/common/index';
 
 const KEY = 'safeIcon';
 

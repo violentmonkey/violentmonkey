@@ -1,4 +1,4 @@
-import { defaultImage, i18n, noop } from '#/common';
+import { defaultImage, i18n, noop } from '@/common';
 
 export const commands = {};
 

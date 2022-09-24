@@ -1,5 +1,5 @@
+import storage from '@/common/storage';
 import { parseMeta } from './script';
-import storage from '#/common/storage';
 
 export default () => new Promise((resolve, reject) => {
   console.info('Upgrade database...');

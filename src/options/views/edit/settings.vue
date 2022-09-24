@@ -84,8 +84,8 @@
 </template>
 
 <script>
-import { getScriptHome, i18n } from '#/common';
-import { objectGet } from '#/common/object';
+import { getScriptHome, i18n } from '@/common';
+import { objectGet } from '@/common/object';
 
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
 

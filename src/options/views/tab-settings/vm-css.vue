@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import { showMessage } from '#/common/ui';
-import SettingText from '#/common/ui/setting-text';
+import { showMessage } from '@/common/ui';
+import SettingText from '@/common/ui/setting-text';
 
 export default {
   components: {

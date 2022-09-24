@@ -1,5 +1,5 @@
-import { getActiveTab, noop, sendTabCmd, getFullUrl } from '#/common';
-import ua from '#/common/ua';
+import { getActiveTab, noop, sendTabCmd, getFullUrl } from '@/common';
+import ua from '@/common/ua';
 import { extensionRoot } from './init';
 import { commands } from './message';
 import { getOption } from './options';

@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import '#/common/browser';
-import { formatByteLength, getLocaleString, i18n, sendCmdDirectly, trueJoin } from '#/common';
-import handlers from '#/common/handlers';
-import { loadScriptIcon } from '#/common/load-script-icon';
-import options from '#/common/options';
-import '#/common/ui/style';
+import '@/common/browser';
+import { formatByteLength, getLocaleString, i18n, sendCmdDirectly, trueJoin } from '@/common';
+import handlers from '@/common/handlers';
+import { loadScriptIcon } from '@/common/load-script-icon';
+import options from '@/common/options';
+import '@/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
 

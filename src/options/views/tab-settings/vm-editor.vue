@@ -20,10 +20,10 @@
 </template>
 
 <script>
-import options from '#/common/options';
-import hookSetting from '#/common/hook-setting';
-import { showMessage } from '#/common/ui';
-import SettingText from '#/common/ui/setting-text';
+import options from '@/common/options';
+import hookSetting from '@/common/hook-setting';
+import { showMessage } from '@/common/ui';
+import SettingText from '@/common/ui/setting-text';
 
 const keyThemeCSS = 'editorTheme';
 const keyThemeNAME = 'editorThemeName';
@@ -134,7 +134,7 @@ export default {
       const opts = {};
       Object.entries({
         ...(await import('codemirror')).defaults,
-        ...(await import('#/common/ui/code')).default.data().cmDefaults,
+        ...(await import('@/common/ui/code')).default.data().cmDefaults,
         ...options.get('editor'),
       })
       // sort by keys alphabetically to make it more readable

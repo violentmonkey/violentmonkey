@@ -35,7 +35,7 @@ for (const k of Object.keys(domProps)) {
 Object.defineProperties(global, domProps);
 delete MessagePort.prototype.onmessage; // to avoid hanging
 global.__VAULT_ID__ = false;
-Object.assign(global, require('#/common/safe-globals'));
-Object.assign(global, require('#/injected/safe-globals-injected'));
-Object.assign(global, require('#/injected/content/safe-globals-content'));
-Object.assign(global, require('#/injected/web/safe-globals-web'));
+Object.assign(global, require('@/common/safe-globals'));
+Object.assign(global, require('@/injected/safe-globals-injected'));
+Object.assign(global, require('@/injected/content/safe-globals-content'));
+Object.assign(global, require('@/injected/web/safe-globals-web'));

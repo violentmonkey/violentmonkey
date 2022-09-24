@@ -1,6 +1,6 @@
-import { buffer2string, getUniqId, isEmpty, noop } from '#/common';
-import { forEachEntry } from '#/common/object';
-import ua from '#/common/ua';
+import { buffer2string, getUniqId, isEmpty, noop } from '@/common';
+import { forEachEntry } from '@/common/object';
+import ua from '@/common/ua';
 import { extensionRoot } from './init';
 
 let encoder;

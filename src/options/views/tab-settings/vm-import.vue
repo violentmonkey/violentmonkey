@@ -19,11 +19,11 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { ensureArray, i18n, sendCmdDirectly } from '#/common';
-import options from '#/common/options';
-import SettingCheck from '#/common/ui/setting-check';
-import loadZipLibrary from '#/common/zip';
-import { showConfirmation, showMessage } from '#/common/ui';
+import { ensureArray, i18n, sendCmdDirectly } from '@/common';
+import options from '@/common/options';
+import SettingCheck from '@/common/ui/setting-check';
+import loadZipLibrary from '@/common/zip';
+import { showConfirmation, showMessage } from '@/common/ui';
 
 const reports = [];
 

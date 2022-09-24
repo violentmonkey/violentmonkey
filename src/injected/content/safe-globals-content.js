@@ -8,7 +8,7 @@
 export const {
   Blob: SafeBlob,
   CustomEvent: SafeCustomEvent,
-  Error, // for #/common e.g. in sendMessage
+  Error, // for @/common e.g. in sendMessage
   MouseEvent: SafeMouseEvent,
   Object, // for minification and guarding webpack Object(import) calls
   Promise: SafePromise,

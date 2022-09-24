@@ -32,16 +32,16 @@
 <script>
 import Modal from 'vueleton/lib/modal/bundle';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import Icon from '#/common/ui/icon';
-import { getScriptName, sendCmdDirectly } from '#/common';
-import { formatDate, DATE_FMT } from '#/common/date';
-import { objectGet } from '#/common/object';
-import options from '#/common/options';
-import ua from '#/common/ua';
-import SettingCheck from '#/common/ui/setting-check';
-import SettingText from '#/common/ui/setting-text';
-import { downloadBlob } from '#/common/download';
-import loadZip from '#/common/zip';
+import Icon from '@/common/ui/icon';
+import { getScriptName, sendCmdDirectly } from '@/common';
+import { formatDate, DATE_FMT } from '@/common/date';
+import { objectGet } from '@/common/object';
+import options from '@/common/options';
+import ua from '@/common/ua';
+import SettingCheck from '@/common/ui/setting-check';
+import SettingText from '@/common/ui/setting-text';
+import { downloadBlob } from '@/common/download';
+import loadZip from '@/common/zip';
 import { store } from '../../utils';
 
 /**

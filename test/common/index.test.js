@@ -1,7 +1,7 @@
 import test from 'tape';
 import {
   isRemote, compareVersion, debounce, throttle,
-} from '#/common';
+} from '@/common';
 import { mocker } from '../mock';
 
 test('isRemote', (t) => {

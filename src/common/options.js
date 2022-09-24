@@ -1,4 +1,4 @@
-import defaults from '#/common/options-defaults';
+import defaults from '@/common/options-defaults';
 import { initHooks, sendCmdDirectly } from '.';
 import { forEachEntry, objectGet, objectSet } from './object';
 

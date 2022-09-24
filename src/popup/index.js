@@ -1,11 +1,11 @@
 import Vue from 'vue';
-import '#/common/browser';
-import { sendCmdDirectly } from '#/common';
-import { INJECT_PAGE } from '#/common/consts';
-import handlers from '#/common/handlers';
-import { loadScriptIcon } from '#/common/load-script-icon';
-import { forEachValue, mapEntry } from '#/common/object';
-import '#/common/ui/style';
+import '@/common/browser';
+import { sendCmdDirectly } from '@/common';
+import { INJECT_PAGE } from '@/common/consts';
+import handlers from '@/common/handlers';
+import { loadScriptIcon } from '@/common/load-script-icon';
+import { forEachValue, mapEntry } from '@/common/object';
+import '@/common/ui/style';
 import App from './views/app';
 import { mutex, store } from './utils';
 

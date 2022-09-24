@@ -23,9 +23,9 @@
 </template>
 
 <script>
-import { i18n } from '#/common';
-import Icon from '#/common/ui/icon';
-import { keyboardService } from '#/common/keyboard';
+import { i18n } from '@/common';
+import Icon from '@/common/ui/icon';
+import { keyboardService } from '@/common/keyboard';
 import { store } from '../utils';
 import Installed from './tab-installed';
 import Settings from './tab-settings';

@@ -1,8 +1,8 @@
 // Reference:
 // - https://developers.google.com/identity/protocols/oauth2/native-app
 // - https://developers.google.com/drive/v3/reference/files
-import { getUniqId, noop } from '#/common';
-import { objectGet } from '#/common/object';
+import { getUniqId, noop } from '@/common';
+import { objectGet } from '@/common/object';
 import { loadQuery, dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, register, isScriptFile,

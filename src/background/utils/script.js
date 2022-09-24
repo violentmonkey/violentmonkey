@@ -1,6 +1,6 @@
-import { getUniqId, encodeFilename } from '#/common';
-import { METABLOCK_RE } from '#/common/consts';
-import { mapEntry } from '#/common/object';
+import { getUniqId, encodeFilename } from '@/common';
+import { METABLOCK_RE } from '@/common/consts';
+import { mapEntry } from '@/common/object';
 import { commands } from './message';
 import { getOption } from './options';
 import cache from './cache';

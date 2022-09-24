@@ -1,4 +1,4 @@
-import { getActiveTab, sendTabCmd } from '#/common';
+import { getActiveTab, sendTabCmd } from '@/common';
 import cache from './cache';
 import { getData } from './db';
 import { postInitialize } from './init';

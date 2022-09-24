@@ -87,20 +87,20 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import Icon from '#/common/ui/icon';
+import Icon from '@/common/ui/icon';
 import {
   getFullUrl, getLocaleString, getScriptHome, isRemote,
   makePause, request, sendCmdDirectly, trueJoin,
-} from '#/common';
-import { keyboardService } from '#/common/keyboard';
-import initCache from '#/common/cache';
-import storage from '#/common/storage';
-import VmExternals from '#/common/ui/externals';
-import SettingCheck from '#/common/ui/setting-check';
-import { loadScriptIcon } from '#/common/load-script-icon';
-import { deepEqual, objectPick } from '#/common/object';
-import { route } from '#/common/router';
-import ua from '#/common/ua';
+} from '@/common';
+import { keyboardService } from '@/common/keyboard';
+import initCache from '@/common/cache';
+import storage from '@/common/storage';
+import VmExternals from '@/common/ui/externals';
+import SettingCheck from '@/common/ui/setting-check';
+import { loadScriptIcon } from '@/common/load-script-icon';
+import { deepEqual, objectPick } from '@/common/object';
+import { route } from '@/common/router';
+import ua from '@/common/ua';
 
 const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;

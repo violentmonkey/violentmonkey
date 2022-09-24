@@ -1,4 +1,4 @@
-import { showConfirmation } from '#/common/ui';
+import { showConfirmation } from '@/common/ui';
 import { i18n } from './util';
 
 function parse(hash) {

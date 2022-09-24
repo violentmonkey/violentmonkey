@@ -1,4 +1,4 @@
-import * as tld from '#/common/tld';
+import * as tld from '@/common/tld';
 import cache from './cache';
 import { postInitialize } from './init';
 import { commands } from './message';

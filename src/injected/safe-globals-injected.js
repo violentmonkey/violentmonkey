@@ -4,7 +4,7 @@
  * This file is used by both `injected` and `injected-web` entries.
  * `global` is used instead of WebPack's polyfill which we disable in webpack.conf.js.
  * `export` is stripped in the final output and is only used for our NodeJS test scripts.
- * WARNING! Don't use exported functions from #/common anywhere in injected!
+ * WARNING! Don't use exported functions from @/common anywhere in injected!
  */
 
 const global = (function _() {

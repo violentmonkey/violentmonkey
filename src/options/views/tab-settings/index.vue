@@ -132,15 +132,15 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { debounce, i18n } from '#/common';
-import { INJECT_AUTO, INJECT_PAGE, INJECT_CONTENT } from '#/common/consts';
-import SettingCheck from '#/common/ui/setting-check';
-import { forEachEntry, mapEntry } from '#/common/object';
-import options from '#/common/options';
-import optionsDefaults from '#/common/options-defaults';
-import hookSetting from '#/common/hook-setting';
-import LocaleGroup from '#/common/ui/locale-group';
-import loadZip from '#/common/zip';
+import { debounce, i18n } from '@/common';
+import { INJECT_AUTO, INJECT_PAGE, INJECT_CONTENT } from '@/common/consts';
+import SettingCheck from '@/common/ui/setting-check';
+import { forEachEntry, mapEntry } from '@/common/object';
+import options from '@/common/options';
+import optionsDefaults from '@/common/options-defaults';
+import hookSetting from '@/common/hook-setting';
+import LocaleGroup from '@/common/ui/locale-group';
+import loadZip from '@/common/zip';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';

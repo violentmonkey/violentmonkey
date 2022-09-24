@@ -63,17 +63,17 @@
 import {
   debounce, formatByteLength, getScriptName, i18n, isEmpty,
   sendCmdDirectly, trueJoin,
-} from '#/common';
-import { deepCopy, deepEqual, objectPick } from '#/common/object';
-import { showConfirmation, showMessage } from '#/common/ui';
-import { keyboardService } from '#/common/keyboard';
-import VmCode from '#/common/ui/code';
-import options from '#/common/options';
-import { route, getUnloadSentry } from '#/common/router';
+} from '@/common';
+import { deepCopy, deepEqual, objectPick } from '@/common/object';
+import { showConfirmation, showMessage } from '@/common/ui';
+import { keyboardService } from '@/common/keyboard';
+import VmCode from '@/common/ui/code';
+import VmExternals from '@/common/ui/externals';
+import options from '@/common/options';
+import { route, getUnloadSentry } from '@/common/router';
 import { store } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
-import VmExternals from '#/common/ui/externals';
 import VmHelp from './help';
 
 const CUSTOM_PROPS = {

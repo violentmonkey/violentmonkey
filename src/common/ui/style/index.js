@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { i18n } from '#/common';
+import { i18n } from '@/common';
 import options from '../../options';
 import './style.css';
 

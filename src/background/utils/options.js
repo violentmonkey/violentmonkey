@@ -1,6 +1,6 @@
-import { debounce, ensureArray, initHooks, normalizeKeys } from '#/common';
-import { deepCopy, deepEqual, mapEntry, objectGet, objectSet } from '#/common/object';
-import defaults from '#/common/options-defaults';
+import { debounce, ensureArray, initHooks, normalizeKeys } from '@/common';
+import { deepCopy, deepEqual, mapEntry, objectGet, objectSet } from '@/common/object';
+import defaults from '@/common/options-defaults';
 import { preInitialize } from './init';
 import { commands } from './message';
 

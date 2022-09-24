@@ -1,5 +1,5 @@
-import { request, noop, i18n, getUniqId } from '#/common';
-import ua from '#/common/ua';
+import { request, noop, i18n, getUniqId } from '@/common';
+import ua from '@/common/ua';
 import cache from './cache';
 import { extensionRoot } from './init';
 import { commands } from './message';

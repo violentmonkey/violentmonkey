@@ -189,15 +189,15 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { INJECT_AUTO } from '#/common/consts';
-import options from '#/common/options';
+import { INJECT_AUTO } from '@/common/consts';
+import options from '@/common/options';
 import {
   getScriptHome, getScriptName, getScriptUpdateUrl,
   i18n, makePause, sendCmd, sendTabCmd,
-} from '#/common';
-import { objectPick } from '#/common/object';
-import Icon from '#/common/ui/icon';
-import { keyboardService, isInput } from '#/common/keyboard';
+} from '@/common';
+import { objectPick } from '@/common/object';
+import Icon from '@/common/ui/icon';
+import { keyboardService, isInput } from '@/common/keyboard';
 import { mutex, store } from '../utils';
 
 const manifest = browser.runtime.getManifest();

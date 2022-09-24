@@ -126,9 +126,9 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import { getLocaleString, getScriptHome, getScriptUpdateUrl, formatTime } from '#/common';
-import Icon from '#/common/ui/icon';
-import { keyboardService, isInput, toggleTip } from '#/common/keyboard';
+import { getLocaleString, getScriptHome, getScriptUpdateUrl, formatTime } from '@/common';
+import Icon from '@/common/ui/icon';
+import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
 
 const itemMargin = 8;
 

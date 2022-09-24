@@ -1,6 +1,6 @@
 // Reference: https://dev.onedrive.com/README.htm
-import { noop } from '#/common';
-import { objectGet } from '#/common/object';
+import { noop } from '@/common';
+import { objectGet } from '@/common/object';
 import { dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,

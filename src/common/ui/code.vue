@@ -72,12 +72,12 @@ import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip/bundle';
-import ToggleButton from '#/common/ui/toggle-button';
-import { debounce, getUniqId, i18n } from '#/common';
-import { deepEqual, forEachEntry, objectPick } from '#/common/object';
-import hookSetting from '#/common/hook-setting';
-import options from '#/common/options';
-import storage from '#/common/storage';
+import ToggleButton from '@/common/ui/toggle-button';
+import { debounce, getUniqId, i18n } from '@/common';
+import { deepEqual, forEachEntry, objectPick } from '@/common/object';
+import hookSetting from '@/common/hook-setting';
+import options from '@/common/options';
+import storage from '@/common/storage';
 import './code-autocomplete';
 import { killTrailingSpaces } from './code-trailing-spaces';
 

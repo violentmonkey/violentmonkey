@@ -1,5 +1,5 @@
 import Modal from 'vueleton/lib/modal/bundle';
-import { i18n } from '#/common/util';
+import { i18n } from '@/common/util';
 import Message from './message';
 
 export function showMessage(message) {
