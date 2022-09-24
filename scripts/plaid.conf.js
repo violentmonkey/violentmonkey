@@ -1,4 +1,9 @@
-const { isProd } = require('@gera2ld/plaid/util');
+const path = require('path');
+const { defaultOptions, isProd } = require('@gera2ld/plaid/util');
+
+defaultOptions.alias = {
+  '@': path.resolve('src'),
+};
 
 /**
  * For each entry, `key` is the chunk name, `value` has following properties:

@@ -79,5 +79,5 @@
     ],
     "testEnvironment": "./test/mock/env.js"
   },
-  "beta": 2
+  "beta": 3
 }

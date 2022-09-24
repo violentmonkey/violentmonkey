@@ -6,7 +6,6 @@ const MAX_SCROLL_SPEED = 20;
 const ONE_FRAME_MS = 16;
 // touch-and-hold duration in ms before recognizing dragstart (needed to allow fling-scrolling)
 const LONGPRESS_DELAY = 500;
-const DROP_EVENT_RELAY = 'VM-drop-event-relay';
 
 const isTouch = 'ontouchstart' in document;
 const eventNames = isTouch
@@ -44,7 +43,6 @@ export default function toggleDragging(state) {
   parent = this.$refs.scriptList;
   parentOnDrop = this.moveScript;
   parent::(state ? on : off)(eventNames.start, isTouch ? onTouchStart : onDragStart);
-  parent::(state ? on : off)(DROP_EVENT_RELAY, onDrop);
 }
 
 function onDrop() {
@@ -129,7 +127,7 @@ function onDragMouseUp() {
   dragged.remove();
   if (isTouch) noScroll.remove();
   original.classList.remove('dragging-placeholder');
-  original.dispatchEvent(new Event(DROP_EVENT_RELAY));
+  onDrop();
 }
 
 function animate(hoveredIndex) {
