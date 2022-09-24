@@ -1,10 +1,3 @@
-const path = require('path');
-const { defaultOptions } = require('@gera2ld/plaid/util');
-
-defaultOptions.alias = {
-  '@': path.resolve('src'),
-};
-
 module.exports = {
   extends: require.resolve('@gera2ld/plaid/config/babelrc'),
   presets: [
