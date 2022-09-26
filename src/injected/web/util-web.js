@@ -66,6 +66,7 @@ export const FastLookup = (hubs = createNullObj()) => {
     },
     clone() {
       const clone = createNullObj();
+      if (process.env.DEBUG) throwIfProtoPresent(clone);
       for (const group in hubs) { /* proto is null */// eslint-disable-line guard-for-in
         clone[group] = createNullObj(hubs[group]);
       }

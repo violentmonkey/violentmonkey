@@ -135,6 +135,7 @@ const boundMethods = {
   webkitResolveLocalFileSystemURL: MAYBE,
 };
 
+if (process.env.DEBUG) throwIfProtoPresent(unforgeables);
 for (const name in unforgeables) { /* proto is null */// eslint-disable-line guard-for-in
   let thisObj;
   let info = (
@@ -241,6 +242,7 @@ export function makeGlobalWrapper(local) {
       delete desc.set;
       desc.value = wrapper;
     }
+    if (process.env.DEBUG) throwIfProtoPresent(desc);
     /* proto is already null */// eslint-disable-next-line no-restricted-syntax
     defineProperty(local, name, desc);
   }

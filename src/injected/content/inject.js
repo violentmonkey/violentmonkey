@@ -291,6 +291,7 @@ function inject(item, iframeCb) {
 }
 
 function injectAll(runAt) {
+  if (process.env.DEBUG) throwIfProtoPresent(realms);
   for (const realm in realms) { /* proto is null */// eslint-disable-line guard-for-in
     const realmData = realms[realm];
     const items = realmData.lists[runAt];

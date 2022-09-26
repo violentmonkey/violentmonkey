@@ -33,7 +33,7 @@ async function init() {
       : await dataPromise
   );
   const { allowCmd } = bridge;
-  createNullObj(bridge, data, [
+  pickIntoNullObj(bridge, data, [
     'ids',
     'injectInto',
   ]);

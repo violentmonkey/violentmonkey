@@ -63,6 +63,7 @@ export function makeGmApi() {
     GM_removeValueChangeListener(listenerId) {
       const keyHooks = changeHooks[this.id];
       if (!keyHooks) return;
+      if (process.env.DEBUG) throwIfProtoPresent(keyHooks);
       for (const key in keyHooks) { /* proto is null */// eslint-disable-line guard-for-in
         const hooks = keyHooks[key];
         if (listenerId in hooks) {
@@ -102,7 +103,7 @@ export function makeGmApi() {
       } else if (arg1) {
         name = arg1.name;
         onload = arg1.onload;
-        createNullObj(opts, arg1, [
+        pickIntoNullObj(opts, arg1, [
           'url',
           'headers',
           'timeout',
@@ -124,7 +125,7 @@ export function makeGmApi() {
       return onRequestCreate(opts, this, name);
     },
     GM_xmlhttpRequest(opts) {
-      return onRequestCreate(opts, this);
+      return onRequestCreate(createNullObj(opts), this);
     },
     /**
      * Bypasses site's CSP for inline `style`, `link`, and `script`.
