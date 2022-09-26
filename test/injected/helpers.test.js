@@ -1,5 +1,5 @@
 import test from 'tape';
-import { jsonDump } from '@/injected/web/util-web';
+import { jsonDump } from '@/injected/web/util';
 
 test('jsonDump', (t) => {
   const sameChildObj = { foo: 1 };

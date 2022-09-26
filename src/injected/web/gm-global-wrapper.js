@@ -1,6 +1,6 @@
 import { INJECT_CONTENT } from '../util';
 import bridge from './bridge';
-import { FastLookup, safeConcat } from './util-web';
+import { FastLookup, safeConcat } from './util';
 
 /** The index strings that look exactly like integers can't be forged
  * but for example '011' doesn't look like 11 so it's allowed */

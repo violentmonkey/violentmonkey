@@ -5,7 +5,7 @@ import { onTabCreate } from './tabs';
 import { onRequestCreate } from './requests';
 import { onNotificationCreate } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
-import { jsonDump } from './util-web';
+import { jsonDump } from './util';
 
 export function makeGmApi() {
   return {
