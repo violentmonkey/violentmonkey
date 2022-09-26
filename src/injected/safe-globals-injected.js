@@ -83,8 +83,13 @@ export const pickIntoNullObj = (dst, src, keys) => {
 export const createNullObj = (base, src, keys) => {
   // eslint-disable-next-line no-proto
   const res = { __proto__: null };
-  if (base || src && !keys) assign(res, base, src);
-  if (src && keys) pickIntoNullObj(res, src, keys);
+  if (base) {
+    assign(res, base);
+  }
+  if (src) {
+    if (keys) pickIntoNullObj(res, src, keys);
+    else assign(res, src);
+  }
   return res;
 };
 
