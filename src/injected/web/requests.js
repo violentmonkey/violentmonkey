@@ -9,8 +9,9 @@ bridge.addHandlers({
   },
 });
 
+/** `opts` must already have a null proto */
 export function onRequestCreate(opts, context, fileName) {
-  opts = createNullObj(opts);
+  if (process.env.DEBUG) throwIfProtoPresent(opts);
   let { url } = opts;
   if (url && !isString(url)) { // USVString in XMLHttpRequest spec calls ToString
     try {

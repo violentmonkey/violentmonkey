@@ -23,6 +23,11 @@ export const CALLBACK_ID = '__CBID';
 const { toString: numberToString } = 0;
 const { toString: URLToString } = URL[PROTO];
 
+export const throwIfProtoPresent = process.env.DEBUG && (obj => {
+  if (!obj || obj.__proto__) { // eslint-disable-line no-proto
+    throw 'proto is not null';
+  }
+});
 export const isFunction = val => typeof val === 'function';
 export const isObject = val => val !== null && typeof val === 'object';
 export const isPromise = val => {
@@ -55,36 +60,37 @@ export const setOwnProp = (obj, key, value, mutable = true) => (
 
 export const vmOwnFuncToString = () => '[Violentmonkey property]';
 
-/**
- * Helps avoid interception via `Object.prototype`.
- * @param {Object} [dst] - target object to clear the prototype or to pick into
- * @param {Object} [src] - source object to pick from
- * @param {string[]} [keys] - all keys will be picked otherwise
- * @returns {Object} `dst` if it's already without prototype, a new object otherwise
- */
-export const createNullObj = (dst, src, keys) => {
-  const empty = (!dst || dst.__proto__) && { __proto__: null }; // eslint-disable-line no-proto
-  if (!dst) {
-    dst = empty;
-  } else if (empty) {
-    dst = assign(empty, dst);
-  }
+/** `dst` must have a null proto */
+export const pickIntoNullObj = (dst, src, keys) => {
+  if (process.env.DEBUG) throwIfProtoPresent(dst);
   if (src) {
-    if (keys) {
-      keys::forEach(key => {
-        if (src::hasOwnProperty(key)) {
-          dst[key] = src[key];
-        }
-      });
-    } else {
-      assign(dst, src);
-    }
+    keys::forEach(key => {
+      if (src::hasOwnProperty(key)) {
+        dst[key] = src[key];
+      }
+    });
   }
   return dst;
 };
 
+/**
+ * Helps avoid interception via `Object.prototype`.
+ * @param {Object} [base] - source object to copy as a null-proto object
+ * @param {Object} [src] - source object to pick from
+ * @param {string[]} [keys] - all keys will be picked otherwise
+ * @returns {Object} `base` if it's already without prototype, a new object otherwise
+ */
+export const createNullObj = (base, src, keys) => {
+  // eslint-disable-next-line no-proto
+  const res = { __proto__: null };
+  if (base || src && !keys) assign(res, base, src);
+  if (src && keys) pickIntoNullObj(res, src, keys);
+  return res;
+};
+
 // WARNING! `obj` must use __proto__:null
 export const ensureNestedProp = (obj, bucketId, key, defaultValue) => {
+  if (process.env.DEBUG) throwIfProtoPresent(obj);
   const bucket = obj[bucketId] || (
     obj[bucketId] = createNullObj()
   );

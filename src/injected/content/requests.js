@@ -112,7 +112,7 @@ async function revokeBlobAfterTimeout(url) {
 
 /** ArrayBuffer/Blob in Chrome incognito is transferred in string chunks */
 function receiveAllChunks(req, msg) {
-  createNullObj(req, msg, ['dataSize', 'contentType']);
+  pickIntoNullObj(req, msg, ['dataSize', 'contentType']);
   req.arr = new SafeUint8Array(req.dataSize);
   processChunk(req, msg.data.response, 0);
   return !req.gotChunks

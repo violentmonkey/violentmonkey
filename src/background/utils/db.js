@@ -316,7 +316,7 @@ async function getScriptEnv(scripts, sizing) {
     ]) {
       list.forEach(key => {
         key = pathMap[key] || key;
-        if (key && !envStart[name].includes(key)) {
+        if (key && !(name === ENV_CACHE_KEYS && envStart[name].includes(key))) {
           env[name].push(key);
           (depsMap[key] || (depsMap[key] = [])).push(id);
         }
@@ -325,13 +325,15 @@ async function getScriptEnv(scripts, sizing) {
     /** @namespace VMInjectedScript */
     env[ENV_SCRIPTS].push(sizing ? script : { ...script, runAt });
   });
+  // Starting to read it before the potentially huge envDelayed
+  const envStartData = await readEnvironmentData(envStart);
   if (envDelayed.ids.length) {
     envDelayed.promise = readEnvironmentData(envDelayed);
   }
   /** @namespace VMScriptByUrlData */
   return {
     ...envStart,
-    ...await readEnvironmentData(envStart),
+    ...envStartData,
     disabledIds,
     envDelayed,
   };
