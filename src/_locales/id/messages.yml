@@ -214,7 +214,7 @@ filterScopeName:
   message: Nama
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: ukuran
 genericError:
   description: Label for generic error.
   message: Galat
