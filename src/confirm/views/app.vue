@@ -90,11 +90,10 @@ import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
 import {
   getFullUrl, getLocaleString, getScriptHome, isRemote,
-  makePause, request, sendCmdDirectly, trueJoin,
+  makePause, makeRaw, request, sendCmdDirectly, trueJoin,
 } from '@/common';
 import { keyboardService } from '@/common/keyboard';
 import initCache from '@/common/cache';
-import storage from '@/common/storage';
 import VmExternals from '@/common/ui/externals';
 import SettingCheck from '@/common/ui/setting-check';
 import { loadScriptIcon } from '@/common/load-script-icon';
@@ -336,7 +335,7 @@ export default {
         responseType: isBlob ? 'blob' : null,
       });
       const data = isBlob
-        ? await storage.cache.makeRaw(response)
+        ? await makeRaw(response)
         : response.data;
       if (useCache) cache.put(cacheKey, data);
       return data;

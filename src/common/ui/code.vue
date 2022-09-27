@@ -562,7 +562,7 @@ export default {
     storage.base.getOne('editorSearch').then(prev => {
       const { search } = this;
       const saveSearchLater = debounce(() => {
-        storage.base.set('editorSearch', objectPick(search, ['query', 'replace', 'options']));
+        storage.base.setOne('editorSearch', objectPick(search, ['query', 'replace', 'options']));
       }, 500);
       const searchAgain = () => {
         saveSearchLater();

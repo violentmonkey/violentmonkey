@@ -1,5 +1,5 @@
 import {
-  compareVersion, dataUri2text, i18n, getScriptHome,
+  compareVersion, dataUri2text, i18n, getScriptHome, makeDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
 } from '@/common';
 import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
@@ -12,10 +12,8 @@ import { preInitialize } from './init';
 import { commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
-import './storage-fetch';
-import dataCache from './cache';
 
-const store = {
+export const store = {
   /** @type VMScript[] */
   scripts: [],
   /** @type Object<string,VMScript[]> */
@@ -24,10 +22,6 @@ const store = {
     id: 0,
     position: 0,
   },
-};
-storage.base.setDataCache(dataCache);
-storage.script.onDump = (item) => {
-  store.scriptMap[item.props.id] = item;
 };
 
 Object.assign(commands, {
@@ -75,10 +69,10 @@ Object.assign(commands, {
     const i = store.scripts.indexOf(getScriptById(id));
     if (i >= 0) {
       store.scripts.splice(i, 1);
-      await Promise.all([
-        storage.script.remove(id),
-        storage.code.remove(id),
-        storage.value.remove(id),
+      await storage.base.remove([
+        storage.script.toKey(id),
+        storage.code.toKey(id),
+        storage.value.toKey(id),
       ]);
     }
     return sendCmd('RemoveScript', id);
@@ -98,33 +92,25 @@ Object.assign(commands, {
 });
 
 preInitialize.push(async () => {
-  const { version: lastVersion } = await browser.storage.local.get('version');
+  const lastVersion = await storage.base.getOne('version');
   const version = process.env.VM_VER;
   if (!lastVersion) await patchDB();
-  if (version !== lastVersion) browser.storage.local.set({ version });
-  const data = await browser.storage.local.get();
-  const { scripts, storeInfo, scriptMap: idMap } = store;
+  if (version !== lastVersion) storage.base.set({ version });
+  const data = await storage.base.getMulti();
+  const { scripts, storeInfo, scriptMap } = store;
   const uriMap = {};
   const mods = [];
   const resUrls = new Set();
   /** @this VMScriptCustom.pathMap */
   const rememberUrl = function _(url) { resUrls.add(this[url] || url); };
   data::forEachEntry(([key, script]) => {
-    dataCache.put(key, script);
-    if (key.startsWith(storage.script.prefix)) {
-      // {
-      //   meta,
-      //   custom,
-      //   props: { id, position, uri },
-      //   config: { enabled, shouldUpdate },
-      // }
-      const id = getInt(key.slice(storage.script.prefix.length));
-      if (!id || idMap[id]) {
+    let id = +storage.script.toId(key);
+    if (id) {
+      if (scriptMap[id] && scriptMap[id] !== script) {
         // ID conflicts!
         // Should not happen, discard duplicates.
         return;
       }
-      idMap[id] = script;
       const uri = getNameURI(script);
       if (uriMap[uri]) {
         // Namespace conflicts!
@@ -158,11 +144,11 @@ preInitialize.push(async () => {
       resources::forEachValue(rememberUrl, pathMap);
       pathMap::rememberUrl(meta.icon);
       getScriptUpdateUrl(script, true)?.forEach(rememberUrl, pathMap);
-    } else if (key.startsWith(storage.mod.prefix)) {
-      mods.push(key.slice(storage.mod.prefix.length));
+    } else if ((id = storage.mod.toId(key))) {
+      mods.push(id);
     }
   });
-  storage.mod.removeMulti(mods.filter(url => !resUrls.has(url)));
+  storage.mod.remove(mods.filter(url => !resUrls.has(url)));
   // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
   if (version !== lastVersion
   && IS_FIREFOX
@@ -173,8 +159,8 @@ preInitialize.push(async () => {
   if (process.env.DEBUG) {
     console.log('store:', store); // eslint-disable-line no-console
   }
+  sortScripts();
   vacuum(data);
-  return sortScripts();
 });
 
 /** @return {number} */
@@ -192,20 +178,23 @@ function updateLastModified() {
   setOption('lastModified', Date.now());
 }
 
-/** @return {Promise<number>} */
+/** @return {Promise<boolean>} */
 export async function normalizePosition() {
-  const updates = store.scripts.filter(({ props }, index) => {
+  const updates = store.scripts.reduce((res, script, index) => {
+    const { props } = script;
     const position = index + 1;
-    const res = props.position !== position;
-    if (res) props.position = position;
+    if (props.position !== position) {
+      props.position = position;
+      (res || (res = {}))[props.id] = script;
+    }
     return res;
-  });
+  }, null);
   store.storeInfo.position = store.scripts.length;
-  if (updates.length) {
-    await storage.script.dump(updates);
+  if (updates) {
+    await storage.script.set(updates);
     updateLastModified();
   }
-  return updates.length;
+  return !!updates;
 }
 
 /** @return {Promise<number>} */
@@ -238,26 +227,6 @@ export function getScripts() {
   return store.scripts.filter(script => !script.config.removed);
 }
 
-/**
- * @desc Load values for batch updates.
- * @param {number[]} ids
- * @return {Promise<Object>}
- */
-export function getValueStoresByIds(ids) {
-  return storage.value.getMulti(ids);
-}
-
-/**
- * @desc Dump values for batch updates.
- * @param {Object} valueDict { id1: value1, id2: value2, ... }
- * @return {Promise<Object>}
- */
-export async function dumpValueStores(valueDict) {
-  if (process.env.DEBUG) console.info('Update value stores', valueDict);
-  await storage.value.dump(valueDict);
-  return valueDict;
-}
-
 export const ENV_CACHE_KEYS = 'cacheKeys';
 export const ENV_REQ_KEYS = 'reqKeys';
 export const ENV_SCRIPTS = 'scripts';
@@ -267,7 +236,7 @@ const RUN_AT_RE = /^document-(start|body|end|idle)$/;
 /**
  * @desc Get scripts to be injected to page with specific URL.
  */
-export async function getScriptsByURL(url, isTop) {
+export function getScriptsByURL(url, isTop) {
   const allScripts = testBlacklist(url)
     ? []
     : store.scripts.filter(script => (
@@ -281,9 +250,9 @@ export async function getScriptsByURL(url, isTop) {
 /**
  * @param {VMScript[]} scripts
  * @param {boolean} [sizing]
- * @return {Promise<VMScriptByUrlData>}
+ * @return {VMScriptByUrlData}
  */
-async function getScriptEnv(scripts, sizing) {
+function getScriptEnv(scripts, sizing) {
   const disabledIds = [];
   /** @namespace VMScriptByUrlData */
   const [envStart, envDelayed] = [0, 1].map(() => ({
@@ -325,18 +294,11 @@ async function getScriptEnv(scripts, sizing) {
     /** @namespace VMInjectedScript */
     env[ENV_SCRIPTS].push(sizing ? script : { ...script, runAt });
   });
-  // Starting to read it before the potentially huge envDelayed
-  const envStartData = await readEnvironmentData(envStart);
+  envStart.promise = readEnvironmentData(envStart);
   if (envDelayed.ids.length) {
     envDelayed.promise = readEnvironmentData(envDelayed);
   }
-  /** @namespace VMScriptByUrlData */
-  return {
-    ...envStart,
-    ...envStartData,
-    disabledIds,
-    envDelayed,
-  };
+  return Object.assign(envStart, { disabledIds, envDelayed });
 }
 
 /**
@@ -356,7 +318,7 @@ async function readEnvironmentData(env, isRetry) {
   STORAGE_ROUTES.forEach(([area, srcIds]) => {
     env[srcIds].forEach(id => {
       if (!/^data:/.test(id)) {
-        keys.push(storage[area].getKey(id));
+        keys.push(storage[area].toKey(id));
       }
     });
   });
@@ -367,7 +329,7 @@ async function readEnvironmentData(env, isRetry) {
     for (const id of env[srcIds]) {
       const val = /^data:/.test(id)
         ? area !== 'require' && id || dataUri2text(id)
-        : data[storage[area].getKey(id)];
+        : data[storage[area].toKey(id)];
       env[area][id] = val;
       if (val == null && area !== 'value' && !env.sizing && retriedStorageKeys[area + id] !== 2) {
         retriedStorageKeys[area + id] = isRetry ? 2 : 1;
@@ -421,14 +383,13 @@ function getIconCache(scripts) {
       if (isRemote(icon)) res.push(custom.pathMap?.[icon] || icon);
       return res;
     }, []),
-    undefined,
-    storage.cache.makeDataUri,
+    makeDataUri,
   );
 }
 
 export async function getSizes(ids) {
   const scripts = ids ? ids.map(getScriptById) : store.scripts;
-  const { cache, code, value, require } = await getScriptEnv(scripts, true);
+  const { cache, code, value, require } = await getScriptEnv(scripts, true).promise;
   return scripts.map(({
     meta,
     custom: { pathMap = {} },
@@ -443,20 +404,25 @@ export async function getSizes(ids) {
   }));
 }
 
-/** @return {number} */
+/** @return {?Promise<void>} only if something was removed, otherwise undefined */
 export function checkRemove({ force } = {}) {
   const now = Date.now();
-  const toRemove = store.scripts.filter(script => script.config.removed && (
-    force || now - getInt(script.props.lastModified) > TIMEOUT_WEEK
-  ));
+  const toKeep = [];
+  const toRemove = [];
+  store.scripts.forEach(script => {
+    const { id, lastModified } = script.props;
+    if (script.config.removed && (force || now - getInt(lastModified) > TIMEOUT_WEEK)) {
+      toRemove.push(storage.code.toKey(id),
+        storage.script.toKey(id),
+        storage.value.toKey(id));
+    } else {
+      toKeep.push(script);
+    }
+  });
   if (toRemove.length) {
-    store.scripts = store.scripts.filter(script => !script.config.removed);
-    const ids = toRemove.map(getPropsId);
-    storage.script.removeMulti(ids);
-    storage.code.removeMulti(ids);
-    storage.value.removeMulti(ids);
+    store.scripts = toKeep;
+    return storage.base.remove(toRemove);
   }
-  return toRemove.length;
 }
 
 /** @return {string} */
@@ -510,10 +476,10 @@ async function saveScript(script, code) {
     script.props = props;
     store.scripts.push(script);
   }
-  return Promise.all([
-    storage.script.dump(script),
-    storage.code.set(props.id, code),
-  ]);
+  return storage.base.set({
+    [storage.script.toKey(props.id)]: script,
+    [storage.code.toKey(props.id)]: code,
+  });
 }
 
 /** @return {Promise<void>} */
@@ -523,7 +489,7 @@ export async function updateScriptInfo(id, data) {
   script.props = { ...script.props, ...data.props };
   script.config = { ...script.config, ...data.config };
   script.custom = { ...script.custom, ...data.custom };
-  await storage.script.dump(script);
+  await storage.script.setOne(id, script);
   return sendCmd('UpdateScript', { where: { id }, update: script });
 }
 
@@ -603,7 +569,7 @@ export async function fetchResources(script, resourceCache, reqOptions) {
     url = pathMap[url] || url;
     const contents = resourceCache?.[type]?.[url];
     return contents != null && !validator
-      ? storage[type].set(url, contents) && null
+      ? storage[type].setOne(url, contents) && null
       : storage[type].fetch(url, reqOptions, validator).catch(err => err);
   };
   const errors = await Promise.all([
@@ -669,16 +635,13 @@ export async function vacuum(data) {
     [storage.require, requireKeys],
     [storage.code, codeKeys],
   ];
-  if (!data) data = await browser.storage.local.get();
+  if (!data) data = await storage.base.getMulti();
   data::forEachKey((key) => {
     mappings.some(([substore, map]) => {
-      const { prefix } = substore;
-      if (key.startsWith(prefix)) {
-        // -1 for untouched, 1 for touched, 2 for missing
-        map[key.slice(prefix.length)] = -1;
-        return true;
-      }
-      return false;
+      const id = substore.toId(key);
+      // -1 for untouched, 1 for touched, 2 for missing
+      if (id) map[id] = -1;
+      return id;
     });
   });
   const touch = (obj, key, scriptId) => {
@@ -710,11 +673,11 @@ export async function vacuum(data) {
     map::forEachEntry(([key, value]) => {
       if (value < 0) {
         // redundant value
-        keysToRemove.push(substore.getKey(key));
+        keysToRemove.push(substore.toKey(key));
         numFixes += 1;
       } else if (value >= 2 && substore.fetch) {
         // missing resource
-        keysToRemove.push(storage.mod.getKey(key));
+        keysToRemove.push(storage.mod.toKey(key));
         toFetch.push(substore.fetch(key).catch(err => `${
           getScriptName(getScriptById(value - 2))
         }: ${
@@ -725,7 +688,7 @@ export async function vacuum(data) {
     });
   });
   if (numFixes) {
-    await storage.base.removeMulti(keysToRemove); // Removing `mod` before fetching
+    await storage.base.remove(keysToRemove); // Removing `mod` before fetching
     result.errors = (await Promise.all(toFetch)).filter(Boolean);
   }
   _vacuuming = null;

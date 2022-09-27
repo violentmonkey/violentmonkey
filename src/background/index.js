@@ -42,21 +42,16 @@ Object.assign(commands, {
     const { frameId, tab } = src;
     const tabId = tab.id;
     if (!url) url = src.url || tab.url;
-    if (!frameId) {
-      resetValueOpener(tabId);
-      clearRequestsByTabId(tabId);
-    }
+    clearFrameData(tabId, frameId);
     const res = await getInjectedScripts(url, tabId, frameId, forceContent);
-    const { feedback, inject, valOpIds } = res;
+    const { feedback, inject } = res;
     inject.isPopupShown = popupTabs[tabId];
     // Injecting known content scripts without waiting for InjectionFeedback message.
     // Running in a separate task because it may take a long time to serialize data.
     if (feedback?.length) {
       setTimeout(commands.InjectionFeedback, 0, { feedback }, src);
     }
-    if (valOpIds) {
-      addValueOpener(tabId, frameId, valOpIds);
-    }
+    addValueOpener(tabId, frameId, inject.scripts);
     return inject;
   },
   /** @return {Promise<Object>} */
@@ -115,6 +110,14 @@ function autoUpdate() {
   clearTimeout(autoUpdate.timer);
   autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
 }
+
+function clearFrameData(tabId, frameId) {
+  clearRequestsByTabId(tabId, frameId);
+  resetValueOpener(tabId, frameId);
+}
+
+browser.tabs.onRemoved.addListener((id /* , info */) => clearFrameData(id));
+browser.tabs.onReplaced.addListener((addedId, removedId) => clearFrameData(removedId));
 
 initialize(() => {
   global.handleCommandMessage = handleCommandMessage;

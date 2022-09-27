@@ -1,6 +1,7 @@
 import { debounce, ensureArray, initHooks, normalizeKeys } from '@/common';
 import { deepCopy, deepEqual, mapEntry, objectGet, objectSet } from '@/common/object';
 import defaults from '@/common/options-defaults';
+import storage from '@/common/storage';
 import { preInitialize } from './init';
 import { commands } from './message';
 
@@ -11,7 +12,7 @@ Object.assign(commands, {
   },
   /** @return {Object} */
   GetOptions(data) {
-    return data::mapEntry(([key]) => getOption(key));
+    return data::mapEntry((_, key) => getOption(key));
   },
   /** @return {void} */
   SetOptions(data) {
@@ -36,8 +37,8 @@ const callHooksLater = debounce(callHooks, DELAY);
 const writeOptionsLater = debounce(writeOptions, DELAY);
 let changes = {};
 let options = {};
-let initPending = browser.storage.local.get(STORAGE_KEY)
-.then(({ options: data }) => {
+let initPending = storage.base.getOne(STORAGE_KEY)
+.then(data => {
   if (data && typeof data === 'object') options = data;
   if (process.env.DEBUG) console.info('options:', options);
   if (!options[VERSION]) {
@@ -72,7 +73,7 @@ export function getOption(key, def) {
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
   const value = options[mainKey] ?? deepCopy(defaults[mainKey]) ?? def;
-  return keys.length > 1 ? objectGet(value, keys.slice(1), def) : value;
+  return keys.length > 1 ? objectGet(value, keys.slice(1)) ?? def : value;
 }
 
 export async function setOption(key, value) {
@@ -97,7 +98,7 @@ export async function setOption(key, value) {
 }
 
 function writeOptions() {
-  return browser.storage.local.set({ [STORAGE_KEY]: options });
+  return storage.base.setOne(STORAGE_KEY, options);
 }
 
 function omitDefaultValue(key) {

@@ -205,8 +205,11 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
   assign(bridge.cache, cache);
   let needsInvoker;
   scripts::forEach(script => {
-    const { code, runAt } = script;
+    const { code, runAt, custom: { pathMap } } = script;
     const { id } = script.props;
+    if (pathMap) {
+      bridge.pathMaps[id] = pathMap;
+    }
     if (!code) {
       needsInvoker = true;
       contLists[runAt]::push(script);

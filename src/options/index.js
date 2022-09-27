@@ -84,17 +84,21 @@ export async function loadData() {
   const [
     { cache, scripts, sync },
     sizes,
-  ] = await Promise.all([
-    sendCmdDirectly('GetData', params, { retry: true }),
-    sendCmdDirectly('GetSizes', params, { retry: true }),
-    options.ready,
-  ]);
+  ] = await requestData(params);
   store.cache = cache;
   scripts.forEach(initScript);
   sizes.forEach((sz, i) => initSize(sz, scripts[i]));
   store.scripts = scripts;
   store.sync = sync;
   store.loading = false;
+}
+
+function requestData(ids) {
+  return Promise.all([
+    sendCmdDirectly('GetData', ids, { retry: true }),
+    sendCmdDirectly('GetSizes', ids, { retry: true }),
+    options.ready,
+  ]).catch(ids ? (() => requestData()) : console.error);
 }
 
 function initMain() {

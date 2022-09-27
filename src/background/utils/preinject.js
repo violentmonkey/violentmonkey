@@ -11,13 +11,14 @@ import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_I
 import { extensionRoot, postInitialize } from './init';
 import { commands } from './message';
 import { getOption, hookOptions } from './options';
+import { onStorageChanged } from './storage-cache';
+import { addValueOpener } from './values';
 
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
   types: ['main_frame', 'sub_frame'],
 };
 const TIME_AFTER_SEND = 10e3; // longer as establishing connection to sites may take time
-const TIME_AFTER_RECEIVE = 1e3; // shorter as response body will be coming very soon
 const TIME_KEEP_DATA = 60e3; // 100ms should be enough but the tab may hang or get paused in debugger
 const cacheCode = initCache({ lifetime: TIME_KEEP_DATA });
 const cache = initCache({
@@ -59,6 +60,7 @@ Object.assign(commands, {
       if (env) {
         env[FORCE_CONTENT] = forceContent;
         env[ENV_SCRIPTS].map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
+        addValueOpener(src.tab.id, src.frameId, env[ENV_SCRIPTS]);
         return objectPick(env, ['cache', ENV_SCRIPTS]);
       }
     }
@@ -85,8 +87,7 @@ const propsToClear = {
   [storage.value.prefix]: ENV_VALUE_IDS,
 };
 
-browser.storage.onChanged.addListener(async changes => {
-  const dbKeys = Object.keys(changes);
+onStorageChanged(async ({ keys: dbKeys }) => {
   const cacheValues = await Promise.all(cache.getValues());
   const dirty = cacheValues.some(data => data.inject
     && dbKeys.some((key) => {
@@ -134,7 +135,7 @@ function onOptionChanged(changes) {
   });
 }
 
-/** @return {Promise<Object>} */
+/** @return {Promise<VMGetInjectedDataContainer>} */
 export function getInjectedScripts(url, tabId, frameId, forceContent) {
   const key = getKey(url, !frameId);
   return cache.pop(key) || prepare(key, url, tabId, frameId, forceContent);
@@ -185,7 +186,7 @@ function onSendHeaders({ url, tabId, frameId }) {
 function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
   const data = xhrInject && cache.get(key);
-  cache.hit(key, TIME_AFTER_RECEIVE);
+  // Proceeding only if prepareScripts has replaced promise in cache with the actual data
   return data?.inject && prepareXhrBlob(info, data);
 }
 
@@ -205,6 +206,7 @@ function prepareXhrBlob({ url, responseHeaders }, data) {
     value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
   });
   setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
+  data.headers = true;
   return { responseHeaders };
 }
 
@@ -224,8 +226,8 @@ function prepare(key, url, tabId, frameId, forceContent) {
 }
 
 async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) {
-  const data = await getScriptsByURL(url, !frameId);
-  const { envDelayed, scripts } = data;
+  const data = getScriptsByURL(url, !frameId);
+  const { envDelayed, scripts } = Object.assign(data, await data.promise);
   const isLate = forceContent != null;
   data[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
   const feedback = scripts.map(prepareScript, data).filter(Boolean);
@@ -254,13 +256,14 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   /** @namespace VMGetInjectedDataContainer */
   Object.assign(res, {
     feedback,
-    valOpIds: [...data[ENV_VALUE_IDS], ...envDelayed[ENV_VALUE_IDS]],
     rcsPromise: !isLate && !xhrInject && IS_FIREFOX
       ? registerScriptDataFF(inject, url, !!frameId)
       : null,
   });
   if (more) cache.put(envKey, more);
-  cache.put(cacheKey, res); // necessary for the synchronous onHeadersReceived
+  if (!isLate && !cache.get(cacheKey)?.headers) {
+    cache.put(cacheKey, res); // synchronous onHeadersReceived needs plain object not a Promise
+  }
   return res;
 }
 
@@ -313,7 +316,7 @@ function prepareScript(script) {
     // code will be `true` if the desired realm is PAGE which is not injectable
     code: isContent ? '' : forceContent || injectedCode,
     metaStr: code.match(METABLOCK_RE)[1] || '',
-    values: value[id] || null,
+    values: id in value ? value[id] || {} : null,
   });
   return isContent && [
     dataKey,

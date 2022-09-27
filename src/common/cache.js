@@ -16,9 +16,11 @@ export default function initCache({
   // eslint-disable-next-line no-return-assign
   const getNow = () => batchStarted && batchStartTime || (batchStartTime = performance.now());
   /** @namespace VMCache */
-  return {
+  const exports = {
     batch, get, getValues, pop, put, del, has, hit, destroy,
   };
+  if (process.env.DEV) Object.defineProperty(exports, 'data', { get: () => cache });
+  return exports;
   function batch(enable) {
     batchStarted = enable;
     batchStartTime = 0;

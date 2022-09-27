@@ -65,7 +65,7 @@ const metaOptionalTypes = {
 };
 export function parseMeta(code) {
   // initialize meta
-  const meta = metaTypes::mapEntry(([, value]) => value.default());
+  const meta = metaTypes::mapEntry(value => value.default());
   const metaBody = code.match(METABLOCK_RE)[1] || '';
   metaBody.replace(/(?:^|\n)\s*\/\/\x20(@\S+)(.*)/g, (_match, rawKey, rawValue) => {
     const [keyName, locale] = rawKey.slice(1).split(':');

@@ -7,6 +7,10 @@ import { onNotificationCreate } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
 import { jsonDump } from './util';
 
+const resolveOrReturn = (context, val) => (
+  context.async ? promiseResolve(val) : val
+);
+
 export function makeGmApi() {
   return {
     __proto__: null,
@@ -16,14 +20,14 @@ export function makeGmApi() {
       const oldRaw = values[key];
       delete values[key];
       // using `undefined` to match the documentation and TM for GM_addValueChangeListener
-      dumpValue(id, key, undefined, null, oldRaw, this);
+      return dumpValue(id, key, undefined, null, oldRaw, this);
     },
     GM_getValue(key, def) {
       const raw = loadValues(this.id)[key];
-      return raw ? decodeValue(raw) : def;
+      return resolveOrReturn(this, raw ? decodeValue(raw) : def);
     },
     GM_listValues() {
-      return objectKeys(loadValues(this.id));
+      return resolveOrReturn(this, objectKeys(loadValues(this.id)));
     },
     GM_setValue(key, val) {
       const { id } = this;
@@ -31,7 +35,7 @@ export function makeGmApi() {
       const values = loadValues(id);
       const oldRaw = values[key];
       values[key] = raw;
-      dumpValue(id, key, val, raw, oldRaw, this);
+      return dumpValue(id, key, val, raw, oldRaw, this);
     },
     /**
      * @callback GMValueChangeListener
@@ -217,6 +221,6 @@ function getResource(context, name, isBlob) {
       }
       ensureNestedProp(resCache, bucketKey, key, res);
     }
-    return res === true ? key : res;
+    return resolveOrReturn(context, res === true ? key : res);
   }
 }

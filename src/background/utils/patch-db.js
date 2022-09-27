@@ -26,7 +26,7 @@ export default () => new Promise((resolve, reject) => {
     let processing = 3;
     const done = () => {
       processing -= 1;
-      if (!processing) resolve(browser.storage.local.set(updates));
+      if (!processing) resolve(storage.base.set(updates));
     };
     const getAll = (storeName, callback) => {
       const req = tx.objectStore(storeName).getAll();
@@ -37,27 +37,27 @@ export default () => new Promise((resolve, reject) => {
       const uriMap = {};
       allScripts.forEach((script) => {
         const { code, id, uri } = script;
-        updates[`${storage.script.prefix}${id}`] = transformScript(script);
-        updates[`${storage.code.prefix}${id}`] = code;
+        updates[storage.script.toKey(id)] = transformScript(script);
+        updates[storage.code.toKey(id)] = code;
         uriMap[uri] = id;
       });
       getAll('values', (allValues) => {
         allValues.forEach(({ uri, values }) => {
           const id = uriMap[uri];
-          if (id) updates[`${storage.value.prefix}${id}`] = values;
+          if (id) updates[storage.value.toKey(id)] = values;
         });
         done();
       });
     });
     getAll('cache', (allCache) => {
       allCache.forEach(({ uri, data }) => {
-        updates[`${storage.cache.prefix}${uri}`] = data;
+        updates[storage.cache.toKey(uri)] = data;
       });
       done();
     });
     getAll('require', (allRequire) => {
       allRequire.forEach(({ uri, code }) => {
-        updates[`${storage.require.prefix}${uri}`] = code;
+        updates[storage.require.toKey(uri)] = code;
       });
       done();
     });
