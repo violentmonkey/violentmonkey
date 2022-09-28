@@ -1,6 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser } from '@/common/consts';
+import { browser, ICON_PREFIX } from '@/common/consts';
 import { deepCopy } from './object';
 import { blob2base64, i18n, isDataUri, noop } from './util';
 
@@ -17,7 +17,7 @@ if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
   }
 }
 
-export const defaultImage = '/public/images/icon128.png';
+export const defaultImage = `${ICON_PREFIX}128.png`;
 
 export function initHooks() {
   const hooks = [];

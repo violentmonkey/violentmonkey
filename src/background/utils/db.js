@@ -2,7 +2,7 @@ import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri, makeDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
 } from '@/common';
-import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
+import { ICON_PREFIX, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
 import { forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import storage from '@/common/storage';
 import pluginEvents from '../plugin/events';
@@ -137,9 +137,12 @@ preInitialize.push(async () => {
       scripts.push(script);
       // listing all known resource urls in order to remove unused mod keys
       const {
-        custom: { pathMap = {} } = {},
+        custom,
         meta = script.meta = {},
       } = script;
+      const {
+        pathMap = custom.pathMap = {},
+      } = custom;
       const {
         require = meta.require = [],
         resources = meta.resources = {},
@@ -388,14 +391,21 @@ export async function getData(ids) {
  * @param {VMScript[]} scripts
  * @return {Promise<{}>}
  */
-function getIconCache(scripts) {
-  return storage.cache.getMulti(
-    scripts.reduce((res, { custom, meta: { icon } }) => {
-      if (isRemote(icon)) res.push(custom.pathMap?.[icon] || icon);
-      return res;
-    }, []),
-    makeDataUri,
-  );
+async function getIconCache(scripts) {
+  const urls = [];
+  for (const { custom, meta: { icon } } of scripts) {
+    if (isRemote(icon)) {
+      urls.push(custom.pathMap[icon] || icon);
+    }
+  }
+  // Getting a data uri for own icon to load it instantly in Chrome when there are many images
+  const ownPath = `${ICON_PREFIX}38.png`;
+  const [res, ownUri] = await Promise.all([
+    storage.cache.getMulti(urls, makeDataUri),
+    commands.GetImageData(ownPath),
+  ]);
+  res[ownPath] = ownUri;
+  return res;
 }
 
 export async function getSizes(ids) {
