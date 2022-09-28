@@ -1,13 +1,23 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser } from '@/common/consts';
+import { browser, ICON_PREFIX } from '@/common/consts';
 import { deepCopy } from './object';
 import { blob2base64, i18n, isDataUri, noop } from './util';
 
 export { normalizeKeys } from './object';
 export * from './util';
 
-export const defaultImage = '/public/images/icon128.png';
+if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
+  const get = () => {
+    throw 'Do not use `for-of` with Map/Set. Use forEach or for-of with a [...copy]'
+    + '\n(not supported due to our config of @babel/plugin-transform-for-of).';
+  };
+  for (const obj of [Map, Set, WeakMap, WeakSet]) {
+    Object.defineProperty(obj.prototype, 'length', { get, configurable: true });
+  }
+}
+
+export const defaultImage = `${ICON_PREFIX}128.png`;
 
 export function initHooks() {
   const hooks = [];

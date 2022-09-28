@@ -1,23 +1,19 @@
 import { i18n, noop } from '@/common';
-import { INJECTABLE_TAB_URL_RE } from '@/common/consts';
+import { ICON_PREFIX, INJECTABLE_TAB_URL_RE } from '@/common/consts';
 import { objectPick } from '@/common/object';
-import cache from './cache';
 import { postInitialize } from './init';
 import { commands, forEachTab } from './message';
 import { getOption, hookOptions } from './options';
 import { testBlacklist } from './tester';
 
-// storing in `cache` only for the duration of page load in case there are 2+ identical urls
-const CACHE_DURATION = 1000;
-
 Object.assign(commands, {
-  async GetImageData(url) {
-    const key = `GetImageData:${url}`;
-    return cache.get(key)
-      || cache.put(key, loadImageData(url, { base64: true }).catch(noop), CACHE_DURATION);
-  },
+  GetImageData: async path => (await getOwnIcon(path)).uri,
   SetBadge: setBadge,
 });
+
+/** Caching own icon to improve dashboard loading speed, as well as browserAction API
+ * (e.g. Chrome wastes 40ms in our extension's process to read 4 icons for every tab). */
+const iconCache = {};
 
 // Firefox Android does not support such APIs, use noop
 
@@ -60,10 +56,6 @@ let badgeColorBlocked;
 let titleBlacklisted;
 /** @type string */
 let titleNoninjectable;
-
-// We'll cache the icon data in Chrome as it doesn't cache the data and takes up to 40ms
-// in our background page context to set the 4 icon sizes for each new tab opened
-const iconCache = !IS_FIREFOX && {};
 
 hookOptions((changes) => {
   let v;
@@ -176,21 +168,22 @@ async function setIcon(tab = {}, data = {}) {
   const mod = data.blocked && 'b' || !isApplied && 'w' || '';
   const iconData = {};
   for (const n of [16, 19, 32, 38]) {
-    const path = `/public/images/icon${n}${mod}.png`;
-    let icon = iconCache ? iconCache[path] : path;
-    if (!icon) {
-      icon = await loadImageData(path);
-      iconCache[path] = icon;
-    }
-    iconData[n] = icon;
+    const path = `${ICON_PREFIX}${n}${mod}.png`;
+    const icon = getOwnIcon(path);
+    iconData[n] = (icon.then ? await icon : icon).img;
   }
   browserAction.setIcon({
     tabId: tab.id,
-    [iconCache ? 'imageData' : 'path']: iconData,
+    imageData: iconData,
   });
 }
 
-function loadImageData(path, { base64 } = {}) {
+function getOwnIcon(path) {
+  const icon = iconCache[path] || (iconCache[path] = loadImageData(path));
+  return icon;
+}
+
+function loadImageData(path) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = path;
@@ -205,7 +198,10 @@ function loadImageData(path, { base64 } = {}) {
       canvas.width = width;
       canvas.height = height;
       ctx.drawImage(img, 0, 0, width, height);
-      resolve(base64 ? canvas.toDataURL() : ctx.getImageData(0, 0, width, height));
+      resolve(iconCache[path] = {
+        uri: canvas.toDataURL(),
+        img: ctx.getImageData(0, 0, width, height),
+      });
     };
     img.onerror = reject;
   });

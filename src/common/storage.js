@@ -56,6 +56,9 @@ class StorageArea {
    * @return {Promise<Object>} same object
    */
   async set(data) {
+    if (process.env.DEV && (!data || typeof data !== 'object')) {
+      throw 'StorageArea.set: data is not an object';
+    }
     await api.set(this.prefix
       ? data::mapEntry(null, this.toKey, this)
       : data);
