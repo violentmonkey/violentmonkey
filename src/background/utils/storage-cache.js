@@ -30,6 +30,10 @@ const { hook, fire } = initHooks();
  * so if someone wants to edit the db in devtools they need to restart the background page.
 */
 export const onStorageChanged = hook;
+export const clearStorageCache = () => {
+  cache.destroy();
+  dbKeys.destroy();
+};
 
 storage.api = {
 

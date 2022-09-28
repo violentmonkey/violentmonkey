@@ -8,14 +8,11 @@ import { commands } from './utils';
 import { getData, getSizes, checkRemove } from './utils/db';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
-import { popupTabs } from './utils/popup-tracker';
-import { getInjectedScripts } from './utils/preinject';
-import { resetValueOpener, addValueOpener } from './utils/values';
-import { clearRequestsByTabId } from './utils/requests';
 import './utils/clipboard';
 import './utils/hotkeys';
 import './utils/icon';
 import './utils/notifications';
+import './utils/preinject';
 import './utils/script';
 import './utils/tabs';
 import './utils/tab-redirector';
@@ -37,23 +34,6 @@ Object.assign(commands, {
     return data;
   },
   GetSizes: getSizes,
-  /** @return {Promise<Object>} */
-  async GetInjected({ url, forceContent }, src) {
-    const { frameId, tab } = src;
-    const tabId = tab.id;
-    if (!url) url = src.url || tab.url;
-    clearFrameData(tabId, frameId);
-    const res = await getInjectedScripts(url, tabId, frameId, forceContent);
-    const { feedback, inject } = res;
-    inject.isPopupShown = popupTabs[tabId];
-    // Injecting known content scripts without waiting for InjectionFeedback message.
-    // Running in a separate task because it may take a long time to serialize data.
-    if (feedback?.length) {
-      setTimeout(commands.InjectionFeedback, 0, { feedback }, src);
-    }
-    addValueOpener(tabId, frameId, inject.scripts);
-    return inject;
-  },
   /** @return {Promise<Object>} */
   async GetTabDomain() {
     const tab = await getActiveTab() || {};
@@ -110,14 +90,6 @@ function autoUpdate() {
   clearTimeout(autoUpdate.timer);
   autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
 }
-
-function clearFrameData(tabId, frameId) {
-  clearRequestsByTabId(tabId, frameId);
-  resetValueOpener(tabId, frameId);
-}
-
-browser.tabs.onRemoved.addListener((id /* , info */) => clearFrameData(id));
-browser.tabs.onReplaced.addListener((addedId, removedId) => clearFrameData(removedId));
 
 initialize(() => {
   global.handleCommandMessage = handleCommandMessage;

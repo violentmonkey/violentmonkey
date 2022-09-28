@@ -1,7 +1,7 @@
 import { getScriptName, getUniqId, sendTabCmd, trueJoin } from '@/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
-  INJECTABLE_TAB_URL_RE, METABLOCK_RE,
+  METABLOCK_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
 import { forEachEntry, objectPick, objectSet } from '@/common/object';
@@ -11,24 +11,32 @@ import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_I
 import { extensionRoot, postInitialize } from './init';
 import { commands } from './message';
 import { getOption, hookOptions } from './options';
-import { onStorageChanged } from './storage-cache';
-import { addValueOpener } from './values';
+import { popupTabs } from './popup-tracker';
+import { clearRequestsByTabId } from './requests';
+import { clearStorageCache, onStorageChanged } from './storage-cache';
+import { addValueOpener, clearValueOpener } from './values';
 
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
   types: ['main_frame', 'sub_frame'],
 };
-const TIME_AFTER_SEND = 10e3; // longer as establishing connection to sites may take time
-const TIME_KEEP_DATA = 60e3; // 100ms should be enough but the tab may hang or get paused in debugger
-const cacheCode = initCache({ lifetime: TIME_KEEP_DATA });
+const CSAPI_REG = 'csar';
+const contentScriptsAPI = browser.contentScripts;
+/** In normal circumstances the data will be removed in ~1sec on use,
+ * however connecting may take a long time or the tab may be paused in devtools. */
+const TIME_KEEP_DATA = 5 * 60e3;
 const cache = initCache({
   lifetime: TIME_KEEP_DATA,
-  onDispose: async promise => {
-    const data = await promise;
-    const rcs = await data?.rcsPromise;
-    rcs?.unregister();
-  },
+  onDispose: contentScriptsAPI && (async val => {
+    if (val && typeof val === 'object') {
+      const reg = (CSAPI_REG in val ? val : await val)[CSAPI_REG];
+      if (reg) (await reg).unregister();
+    }
+  }),
 });
+const FEEDBACK = 'feedback';
+const HEADERS = 'headers';
+const INJECT = 'inject';
 const FORCE_CONTENT = 'forceContent';
 const INJECT_INTO = 'injectInto';
 // KEY_XXX for hooked options
@@ -42,6 +50,32 @@ const expose = {};
 let isApplied;
 let injectInto;
 let xhrInject;
+
+Object.assign(commands, {
+  /** @return {Promise<VMGetInjectedData>} */
+  async GetInjected({ url, forceContent }, src) {
+    const { frameId, tab } = src;
+    const tabId = tab.id;
+    if (!url) url = src.url || tab.url;
+    clearFrameData(tabId, frameId);
+    const key = getKey(url, !frameId);
+    const cacheVal = cache.pop(key) || prepare(key, url, tabId, frameId, forceContent);
+    /** @type VMGetInjectedDataContainer */
+    const data = cacheVal[INJECT] ? cacheVal : await cacheVal;
+    const inject = data[INJECT];
+    const feedback = data[FEEDBACK];
+    if (feedback?.length) {
+      // Injecting known content scripts without waiting for InjectionFeedback message.
+      // Running in a separate task because it may take a long time to serialize data.
+      setTimeout(injectionFeedback, 0, { [FEEDBACK]: feedback }, src);
+    }
+    addValueOpener(tabId, frameId, inject[ENV_SCRIPTS]);
+    inject.isPopupShown = popupTabs[tabId];
+    return inject;
+  },
+  InjectionFeedback: injectionFeedback,
+});
+
 hookOptions(onOptionChanged);
 postInitialize.push(() => {
   for (const key of [KEY_EXPOSE, KEY_DEF_INJECT_INTO, KEY_IS_APPLIED, KEY_XHR_INJECT]) {
@@ -49,27 +83,29 @@ postInitialize.push(() => {
   }
 });
 
-Object.assign(commands, {
-  async InjectionFeedback({ feedId, feedback, [FORCE_CONTENT]: forceContent }, src) {
-    feedback.forEach(processFeedback, src);
-    if (feedId) {
-      // cache cleanup when getDataFF outruns GetInjected
-      cache.del(feedId.cacheKey);
-      // envDelayed
-      const env = await cache.pop(feedId.envKey);
-      if (env) {
-        env[FORCE_CONTENT] = forceContent;
-        env[ENV_SCRIPTS].map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
-        addValueOpener(src.tab.id, src.frameId, env[ENV_SCRIPTS]);
-        return objectPick(env, ['cache', ENV_SCRIPTS]);
-      }
+async function injectionFeedback({
+  feedId,
+  [FEEDBACK]: feedback,
+  [FORCE_CONTENT]: forceContent,
+}, src) {
+  feedback.forEach(processFeedback, src);
+  if (feedId) {
+    // cache cleanup when getDataFF outruns GetInjected
+    cache.del(feedId.cacheKey);
+    // envDelayed
+    const env = await cache.pop(feedId.envKey);
+    if (env) {
+      env[FORCE_CONTENT] = forceContent;
+      env[ENV_SCRIPTS].map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
+      addValueOpener(src.tab.id, src.frameId, env[ENV_SCRIPTS]);
+      return objectPick(env, ['cache', ENV_SCRIPTS]);
     }
-  },
-});
+  }
+}
 
 /** @this {chrome.runtime.MessageSender} */
 async function processFeedback([key, runAt, unwrappedId]) {
-  const code = cacheCode.pop(key);
+  const code = cache.pop(key);
   // see TIME_KEEP_DATA comment
   if (runAt && code) {
     const { frameId, tab: { id: tabId } } = this;
@@ -88,8 +124,10 @@ const propsToClear = {
 };
 
 onStorageChanged(async ({ keys: dbKeys }) => {
-  const cacheValues = await Promise.all(cache.getValues());
-  const dirty = cacheValues.some(data => data.inject
+  const raw = cache.getValues();
+  const resolved = !raw.some(val => val?.then);
+  const cacheValues = resolved ? raw : await Promise.all(raw);
+  const dirty = cacheValues.some(data => data[INJECT]
     && dbKeys.some((key) => {
       const prefix = key.slice(0, key.indexOf(':') + 1);
       const prop = propsToClear[prefix];
@@ -135,11 +173,7 @@ function onOptionChanged(changes) {
   });
 }
 
-/** @return {Promise<VMGetInjectedDataContainer>} */
-export function getInjectedScripts(url, tabId, frameId, forceContent) {
-  const key = getKey(url, !frameId);
-  return cache.pop(key) || prepare(key, url, tabId, frameId, forceContent);
-}
+/** @typedef {Promise<VMGetInjectedDataContainer>|VMGetInjectedDataContainer} VMGetInjected */
 
 function getKey(url, isTop) {
   return isTop ? url : `-${url}`;
@@ -155,7 +189,13 @@ function togglePreinject(enable) {
   if (!isApplied || !xhrInject) { // will be registered in toggleXhrInject
     browser.webRequest.onHeadersReceived[onOff](onHeadersReceived, config);
   }
-  cache.destroy();
+  browser.tabs.onRemoved[onOff](onTabRemoved);
+  browser.tabs.onReplaced[onOff](onTabReplaced);
+  if (!enable) {
+    cache.destroy();
+    clearFrameData();
+    clearStorageCache();
+  }
 }
 
 function toggleXhrInject(enable) {
@@ -171,14 +211,13 @@ function toggleXhrInject(enable) {
 }
 
 function onSendHeaders({ url, tabId, frameId }) {
-  if (!INJECTABLE_TAB_URL_RE.test(url)) return;
   const isTop = !frameId;
   const key = getKey(url, isTop);
   if (!cache.has(key)) {
     // GetInjected message will be sent soon by the content script
     // and it may easily happen while getScriptsByURL is still waiting for browser.storage
     // so we'll let GetInjected await this pending data by storing Promise in the cache
-    cache.put(key, prepare(key, url, tabId, frameId), TIME_AFTER_SEND);
+    cache.put(key, prepare(key, url, tabId, frameId), TIME_KEEP_DATA);
   }
 }
 
@@ -187,7 +226,7 @@ function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
   const data = xhrInject && cache.get(key);
   // Proceeding only if prepareScripts has replaced promise in cache with the actual data
-  return data?.inject && prepareXhrBlob(info, data);
+  return data?.[INJECT] && prepareXhrBlob(info, data);
 }
 
 /**
@@ -199,14 +238,14 @@ function prepareXhrBlob({ url, responseHeaders }, data) {
     forceContentInjection(data);
   }
   const blobUrl = URL.createObjectURL(new Blob([
-    JSON.stringify(data.inject),
+    JSON.stringify(data[INJECT]),
   ]));
   responseHeaders.push({
     name: 'Set-Cookie',
     value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
   });
   setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
-  data.headers = true;
+  data[HEADERS] = true;
   return { responseHeaders };
 }
 
@@ -214,7 +253,7 @@ function prepare(key, url, tabId, frameId, forceContent) {
   /** @namespace VMGetInjectedDataContainer */
   const res = {
     /** @namespace VMGetInjectedData */
-    inject: {
+    [INJECT]: {
       expose: !frameId
         && url.startsWith('https://')
         && expose[url.split('/', 3)[2]],
@@ -227,16 +266,16 @@ function prepare(key, url, tabId, frameId, forceContent) {
 
 async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) {
   const data = getScriptsByURL(url, !frameId);
-  const { envDelayed, scripts } = Object.assign(data, await data.promise);
+  const { envDelayed, [ENV_SCRIPTS]: scripts } = Object.assign(data, await data.promise);
   const isLate = forceContent != null;
   data[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
   const feedback = scripts.map(prepareScript, data).filter(Boolean);
   const more = envDelayed.promise;
   const envKey = getUniqId(`${tabId}:${frameId}:`);
-  const { inject } = res;
+  const inject = res[INJECT];
   /** @namespace VMGetInjectedData */
   Object.assign(inject, {
-    scripts,
+    [ENV_SCRIPTS]: scripts,
     [INJECT_INTO]: injectInto,
     [INJECT_PAGE]: !forceContent && (
       scripts.some(isPageRealm, data)
@@ -253,13 +292,9 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
       ua,
     },
   });
-  /** @namespace VMGetInjectedDataContainer */
-  Object.assign(res, {
-    feedback,
-    rcsPromise: !isLate && !xhrInject && IS_FIREFOX
-      ? registerScriptDataFF(inject, url, !!frameId)
-      : null,
-  });
+  res[FEEDBACK] = feedback;
+  res[CSAPI_REG] = contentScriptsAPI && !isLate && !xhrInject
+    && registerScriptDataFF(inject, url, !!frameId);
   if (more) cache.put(envKey, more);
   if (!isLate && !cache.get(cacheKey)?.headers) {
     cache.put(cacheKey, res); // synchronous onHeadersReceived needs plain object not a Promise
@@ -308,7 +343,7 @@ function prepareScript(script) {
     // Firefox lists .user.js among our own content scripts so a space at start will group them
     `\n//# sourceURL=${extensionRoot}${IS_FIREFOX ? '%20' : ''}${name}.user.js#${id}`,
   ]::trueJoin('');
-  cacheCode.put(dataKey, injectedCode, TIME_KEEP_DATA);
+  cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
   /** @namespace VMInjectedScript */
   Object.assign(script, {
     dataKey,
@@ -344,7 +379,7 @@ const resolveDataCodeStr = `(${function _(data) {
 
 // TODO: rework the whole thing to register scripts individually with real `matches`
 function registerScriptDataFF(inject, url, allFrames) {
-  return browser.contentScripts?.register({
+  return contentScriptsAPI.register({
     allFrames,
     js: [{
       code: `${resolveDataCodeStr}(${JSON.stringify(inject)})`,
@@ -370,12 +405,12 @@ function detectStrictCsp(responseHeaders) {
 /** @param {VMGetInjectedDataContainer} data */
 function forceContentInjection(data) {
   /** @type VMGetInjectedData */
-  const inject = data.inject;
+  const inject = data[INJECT];
   inject[FORCE_CONTENT] = true;
-  inject.scripts.forEach(scr => {
+  inject[ENV_SCRIPTS].forEach(scr => {
     // When script wants `page`, the result below will be `true` so the script goes into `failedIds`
     scr.code = !isContentRealm(scr, true) || '';
-    data.feedback.push([scr.dataKey, true]);
+    data[FEEDBACK].push([scr.dataKey, true]);
   });
 }
 
@@ -389,4 +424,17 @@ function isContentRealm(scr, forceContent) {
 /** @this {VMScriptByUrlData} */
 function isPageRealm(scr) {
   return !isContentRealm(scr, this[FORCE_CONTENT]);
+}
+
+function onTabRemoved(id /* , info */) {
+  clearFrameData(id);
+}
+
+function onTabReplaced(addedId, removedId) {
+  clearFrameData(removedId);
+}
+
+function clearFrameData(tabId, frameId) {
+  clearRequestsByTabId(tabId, frameId);
+  clearValueOpener(tabId, frameId);
 }

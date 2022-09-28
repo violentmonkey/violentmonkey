@@ -41,7 +41,10 @@ Object.assign(commands, {
   },
 });
 
-export function resetValueOpener(tabId, frameId) {
+export function clearValueOpener(tabId, frameId) {
+  if (tabId == null) {
+    toSend = {};
+  }
   openers::forEachEntry(([id, tabs]) => {
     const frames = tabs[tabId];
     if (frames) {
@@ -52,7 +55,9 @@ export function resetValueOpener(tabId, frameId) {
         delete tabs[tabId];
       }
     }
-    if (isEmpty(tabs)) delete openers[id];
+    if (tabId == null || isEmpty(tabs)) {
+      delete openers[id];
+    }
   });
 }
 

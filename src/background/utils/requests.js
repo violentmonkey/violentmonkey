@@ -224,7 +224,8 @@ function clearRequest({ id, coreId }) {
 
 export function clearRequestsByTabId(tabId, frameId) {
   requests::forEachValue(req => {
-    if (req.tabId === tabId && (!frameId || req.frameId === frameId)) {
+    if ((tabId == null || req.tabId === tabId)
+    && (!frameId || req.frameId === frameId)) {
       commands.AbortRequest(req.id);
     }
   });
