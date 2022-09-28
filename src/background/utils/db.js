@@ -3,7 +3,7 @@ import {
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
 } from '@/common';
 import { ICON_PREFIX, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
-import { forEachEntry, forEachKey, forEachValue } from '@/common/object';
+import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import storage from '@/common/storage';
 import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
@@ -417,14 +417,15 @@ export async function getSizes(ids) {
     meta,
     custom: { pathMap = {} },
     props: { id },
-  }, index) => /** @namespace VMScriptSizeInfo */ ({
-    c: code[id]?.length,
-    i: JSON.stringify(scripts[index]).length - 2,
-    v: JSON.stringify(value[id] || {}).length - 2,
-    '@require': meta.require.reduce((len, v) => len + (require[pathMap[v] || v]?.length || 0), 0),
-    '@resource': Object.values(meta.resources)
-    .reduce((len, v) => len + (cache[pathMap[v] || v]?.length || 0), 0),
-  }));
+  }, index) => [
+    code[id]?.length,
+    deepSize(scripts[index]),
+    deepSize(value[id]),
+    meta.require.reduce((len, v) => len
+      + (require[pathMap[v] || v]?.length || 0), 0),
+    Object.entries(meta.resources).reduce((len, e) => len
+      + e[0].length + 4 + (cache[pathMap[e[1]] || e[1]]?.length || 0), 0),
+  ]);
 }
 
 /** @return {?Promise<void>} only if something was removed, otherwise undefined */

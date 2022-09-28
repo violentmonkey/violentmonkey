@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import '@/common/browser';
-import { formatByteLength, getLocaleString, i18n, sendCmdDirectly, trueJoin } from '@/common';
+import { formatByteLength, getLocaleString, i18n, makePause, sendCmdDirectly } from '@/common';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import options from '@/common/options';
@@ -8,11 +8,13 @@ import '@/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
 
-const SIZE_TITLES = {
-  c: i18n('editNavCode'),
-  i: i18n('editNavSettings'),
-  v: i18n('editNavValues'),
-};
+const SIZE_TITLES = [
+  i18n('editNavCode'),
+  i18n('editNavSettings'),
+  i18n('editNavValues'),
+  '@require',
+  '@resource',
+];
 
 Object.assign(store, {
   loading: false,
@@ -51,19 +53,18 @@ async function initScript(script) {
 }
 
 /**
- * @param {VMScriptSizeInfo} sz
+ * @param {number[]} sz
  * @param {VMScript} script
  */
 function initSize(sz, { $cache }) {
   let total = 0;
-  $cache.sizes = Object.entries(sz).map(([key, val]) => {
+  let str = '';
+  for (let i = 0, val; i < sz.length; i += 1) {
+    val = sz[i];
     total += val;
-    return val && `${
-      SIZE_TITLES[key] || key
-    }: ${
-      formatByteLength(val).replace(/[^B]$/, '$&B')
-    }.`.replace(/\s/g, '\xA0');
-  })::trueJoin(' ');
+    if (val) str += `${SIZE_TITLES[i]}: ${formatByteLength(val)}\n`;
+  }
+  $cache.sizes = str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B');
   $cache.sizeNum = total;
   $cache.size = formatByteLength(total, true).replace(' ', '');
 }
@@ -88,14 +89,13 @@ async function requestData(ids) {
   const getDataP = sendCmdDirectly('GetData', ids, { retry: true });
   const [data] = await Promise.all([getDataP, options.ready]);
   const { scripts, ...auxData } = data;
+  const getSizesP = sendCmdDirectly('GetSizes', ids, { retry: true })
+  .then(sizes => sizes.forEach((sz, i) => initSize(sz, scripts[i])));
   Object.assign(store, auxData); // initScripts needs `cache` in store
   scripts.forEach(initScript); // modifying scripts without triggering reactivity
+  await Promise.race([makePause(0), getSizesP]); // blocking render for one event loop tick
   store.scripts = scripts; // now we can render
   store.loading = false;
-  setTimeout(async () => { // sizing runs in the same thread, so we'll start it after render
-    (await sendCmdDirectly('GetSizes', ids, { retry: true }))
-    .forEach((sz, i) => initSize(sz, scripts[i]));
-  });
 }
 
 function initMain() {
