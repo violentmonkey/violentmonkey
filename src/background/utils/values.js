@@ -69,7 +69,6 @@ export function addValueOpener(tabId, frameId, injectedScripts) {
   });
 }
 
-/** Caution: may delete keys in `data` */
 function commit(data) {
   storage.value.set(data);
   chain = chain.catch(console.warn).then(broadcast);
