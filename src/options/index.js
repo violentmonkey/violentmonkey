@@ -47,11 +47,7 @@ async function initScript(script) {
   const name = script.custom.name || localeName;
   const lowerName = name.toLowerCase();
   script.$cache = { search, name, lowerName, size: '', sizes: '', sizeNum: 0 };
-  if (!await loadScriptIcon(script, store.cache)) {
-    script.safeIcon = `/public/images/icon${
-      store.HiDPI ? 128 : script.config.removed && 32 || 38
-    }.png`;
-  }
+  loadScriptIcon(script, store.cache, store.HiDPI || -1);
 }
 
 /**
@@ -90,13 +86,16 @@ export function loadData() {
 
 async function requestData(ids) {
   const getDataP = sendCmdDirectly('GetData', ids, { retry: true });
-  const getSizesP = sendCmdDirectly('GetSizes', ids, { retry: true });
   const [data] = await Promise.all([getDataP, options.ready]);
-  const { scripts } = data;
-  scripts.forEach(initScript);
-  getSizesP.then(sizes => sizes.forEach((sz, i) => initSize(sz, scripts[i])));
-  Object.assign(store, data);
+  const { scripts, ...auxData } = data;
+  Object.assign(store, auxData); // initScripts needs `cache` in store
+  scripts.forEach(initScript); // modifying scripts without triggering reactivity
+  store.scripts = scripts; // now we can render
   store.loading = false;
+  setTimeout(async () => { // sizing runs in the same thread, so we'll start it after render
+    (await sendCmdDirectly('GetSizes', ids, { retry: true }))
+    .forEach((sz, i) => initSize(sz, scripts[i]));
+  });
 }
 
 function initMain() {
