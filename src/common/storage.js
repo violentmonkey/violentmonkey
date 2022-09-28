@@ -3,9 +3,9 @@ import { ensureArray } from './util';
 
 let api = browser.storage.local;
 
-/** @namespace VMStorageBase */
-class Area {
+class StorageArea {
   constructor(prefix) {
+    this.name = '';
     this.prefix = prefix;
   }
 
@@ -63,15 +63,21 @@ class Area {
   }
 }
 
-export default {
+const storage = {
   get api() { return api; },
   set api(val) { api = val; },
-  base: new Area(''),
-  cache: new Area('cac:'),
-  code: new Area('code:'),
+  base: new StorageArea(''),
+  cache: new StorageArea('cac:'),
+  code: new StorageArea('code:'),
   /** last-modified HTTP header value per URL */
-  mod: new Area('mod:'),
-  require: new Area('req:'),
-  script: new Area('scr:'),
-  value: new Area('val:'),
+  mod: new StorageArea('mod:'),
+  require: new StorageArea('req:'),
+  script: new StorageArea('scr:'),
+  value: new StorageArea('val:'),
 };
+storage::mapEntry((val, name) => {
+  if (val instanceof StorageArea) {
+    val.name = name;
+  }
+});
+export default storage;

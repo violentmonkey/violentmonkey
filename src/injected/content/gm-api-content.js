@@ -36,9 +36,8 @@ bridge.addHandlers({
     bridge.post('Callback', { id: cbId, data: res }, realm, el);
   },
 
-  GetResource({ id, isBlob, key }) {
-    const path = bridge.pathMaps[id]?.[key] || key;
-    const raw = bridge.cache[path];
+  GetResource({ id, isBlob, key, raw }) {
+    if (!raw) raw = bridge.cache[bridge.pathMaps[id]?.[key] || key];
     return raw ? decodeResource(raw, isBlob) : true;
   },
 

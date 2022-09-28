@@ -1,4 +1,4 @@
-import { makeRaw, request } from '@/common';
+import { isDataUri, makeRaw, request } from '@/common';
 import storage from '@/common/storage';
 
 /** @type { function(url, options, check): Promise<void> } or throws on error */
@@ -25,21 +25,20 @@ storage.require.fetch = cacheOrFetch({
 function cacheOrFetch(handlers = {}) {
   const requests = {};
   const { init, transform } = handlers;
-  /** @this VMStorageBase */
+  /** @this StorageArea */
   return function cacheOrFetchHandler(...args) {
     const [url] = args;
     const promise = requests[url] || (requests[url] = this::doFetch(...args));
     return promise;
   };
-  /** @this VMStorageBase */
+  /** @this StorageArea */
   async function doFetch(...args) {
     const [url, options] = args;
     try {
-      const res = !url.startsWith('data:')
-        && await requestNewer(url, init ? init(options) : options);
+      const res = await requestNewer(url, init ? init(options) : options);
       if (res) {
         const result = transform ? await transform(res, ...args) : res.data;
-        await this.set(url, result);
+        await this.setOne(url, result);
       }
     } finally {
       delete requests[url];
@@ -48,6 +47,9 @@ function cacheOrFetch(handlers = {}) {
 }
 
 export async function requestNewer(url, opts) {
+  if (isDataUri(url)) {
+    return;
+  }
   const modOld = await storage.mod.getOne(url);
   for (const get of [0, 1]) {
     if (modOld || get) {

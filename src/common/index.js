@@ -2,7 +2,7 @@
 
 import { browser } from '@/common/consts';
 import { deepCopy } from './object';
-import { blob2base64, i18n, noop } from './util';
+import { blob2base64, i18n, isDataUri, noop } from './util';
 
 export { normalizeKeys } from './object';
 export * from './util';
@@ -224,7 +224,7 @@ export function trueJoin(separator) {
  * @returns {?string}
  */
 export function makeDataUri(raw, url) {
-  if (url.startsWith('data:')) return url;
+  if (isDataUri(url)) return url;
   if (/^(i,|image\/)/.test(raw)) { // workaround for bugs in old VM, see 2e135cf7
     const i = raw.lastIndexOf(',');
     const type = raw.startsWith('image/') ? raw.slice(0, i) : 'image/png';

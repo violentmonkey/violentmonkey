@@ -1,4 +1,4 @@
-import { sendCmdDirectly } from '@/common/index';
+import { isDataUri, sendCmdDirectly } from '@/common/index';
 
 const KEY = 'safeIcon';
 
@@ -15,7 +15,7 @@ export async function loadScriptIcon(script, cache = {}) {
     script[KEY] = null;
     if (url) {
       script[KEY] = cache[url]
-        || url.startsWith('data:') && url
+        || isDataUri(url) && url
         || await sendCmdDirectly('GetImageData', url)
         || null;
     }

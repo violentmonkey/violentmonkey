@@ -42,7 +42,7 @@ async function initScript(script) {
   ].filter(Boolean).join('\n');
   const name = script.custom.name || localeName;
   const lowerName = name.toLowerCase();
-  script.$cache = { search, name, lowerName };
+  script.$cache = { search, name, lowerName, size: '', sizes: '', sizeNum: 0 };
   if (!await loadScriptIcon(script, store.cache)) {
     script.safeIcon = `/public/images/icon${
       store.HiDPI ? 128 : script.config.removed && 32 || 38
@@ -78,27 +78,21 @@ async function initScriptAndSize(script) {
   return res;
 }
 
-export async function loadData() {
-  const id = store.route.paths[1];
-  const params = id ? [+id].filter(Boolean) : null;
-  const [
-    { cache, scripts, sync },
-    sizes,
-  ] = await requestData(params);
-  store.cache = cache;
-  scripts.forEach(initScript);
-  sizes.forEach((sz, i) => initSize(sz, scripts[i]));
-  store.scripts = scripts;
-  store.sync = sync;
-  store.loading = false;
+export function loadData() {
+  const id = +store.route.paths[1];
+  return requestData(id ? [id] : null)
+  .catch(id ? (() => requestData()) : console.error);
 }
 
-function requestData(ids) {
-  return Promise.all([
-    sendCmdDirectly('GetData', ids, { retry: true }),
-    sendCmdDirectly('GetSizes', ids, { retry: true }),
-    options.ready,
-  ]).catch(ids ? (() => requestData()) : console.error);
+async function requestData(ids) {
+  const getDataP = sendCmdDirectly('GetData', ids, { retry: true });
+  const getSizesP = sendCmdDirectly('GetSizes', ids, { retry: true });
+  const [data] = await Promise.all([getDataP, options.ready]);
+  const { scripts } = data;
+  scripts.forEach(initScript);
+  getSizesP.then(sizes => sizes.forEach((sz, i) => initSize(sz, scripts[i])));
+  Object.assign(store, data);
+  store.loading = false;
 }
 
 function initMain() {
