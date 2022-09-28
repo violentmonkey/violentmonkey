@@ -55,9 +55,12 @@ export async function requestNewer(url, opts) {
     if (modOld || get) {
       const req = await request(url, !get ? { ...opts, method: 'HEAD' } : opts);
       const { headers } = req;
-      const mod = headers.get('etag')
+      // headers does not exist when requesting a local file
+      const mod = headers && (
+        headers.get('etag')
         || +new Date(headers.get('last-modified'))
-        || +new Date(headers.get('date'));
+        || +new Date(headers.get('date'))
+      );
       if (mod && mod === modOld) {
         return;
       }
