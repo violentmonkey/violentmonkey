@@ -1,4 +1,4 @@
-import { makeRaw, request } from '@/common';
+import { isDataUri, makeRaw, request } from '@/common';
 import storage from '@/common/storage';
 
 /** @type { function(url, options, check): Promise<void> } or throws on error */
@@ -35,8 +35,7 @@ function cacheOrFetch(handlers = {}) {
   async function doFetch(...args) {
     const [url, options] = args;
     try {
-      const res = !url.startsWith('data:')
-        && await requestNewer(url, init ? init(options) : options);
+      const res = await requestNewer(url, init ? init(options) : options);
       if (res) {
         const result = transform ? await transform(res, ...args) : res.data;
         await this.set(url, result);
@@ -48,6 +47,9 @@ function cacheOrFetch(handlers = {}) {
 }
 
 export async function requestNewer(url, opts) {
+  if (isDataUri(url)) {
+    return;
+  }
   const modOld = await storage.mod.getOne(url);
   for (const get of [0, 1]) {
     if (modOld || get) {

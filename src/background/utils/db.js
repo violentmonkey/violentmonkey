@@ -1,5 +1,5 @@
 import {
-  compareVersion, dataUri2text, i18n, getScriptHome, makeDataUri,
+  compareVersion, dataUri2text, i18n, getScriptHome, isDataUri, makeDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
 } from '@/common';
 import { INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
@@ -100,9 +100,14 @@ preInitialize.push(async () => {
   const { scripts, storeInfo, scriptMap } = store;
   const uriMap = {};
   const mods = [];
+  const toRemove = [];
   const resUrls = new Set();
   /** @this VMScriptCustom.pathMap */
-  const rememberUrl = function _(url) { resUrls.add(this[url] || url); };
+  const rememberUrl = function _(url) {
+    if (url && !isDataUri(url)) {
+      resUrls.add(this[url] || url);
+    }
+  };
   data::forEachEntry(([key, script]) => {
     let id = +storage.script.toId(key);
     if (id) {
@@ -146,8 +151,11 @@ preInitialize.push(async () => {
       getScriptUpdateUrl(script, true)?.forEach(rememberUrl, pathMap);
     } else if ((id = storage.mod.toId(key))) {
       mods.push(id);
+    } else if (/^\w+:data:/.test(key)) { // VM before 2.13.2 stored them unnecessarily
+      toRemove.push(key);
     }
   });
+  storage.base.remove(toRemove);
   storage.mod.remove(mods.filter(url => !resUrls.has(url)));
   // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
   if (version !== lastVersion
@@ -233,6 +241,19 @@ export const ENV_SCRIPTS = 'scripts';
 export const ENV_VALUE_IDS = 'valueIds';
 const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Value)$/;
 const RUN_AT_RE = /^document-(start|body|end|idle)$/;
+const S_REQUIRE = storage.require.name;
+const S_CACHE = storage.cache.name;
+const S_VALUE = storage.value.name;
+const S_CODE = storage.code.name;
+const STORAGE_ROUTES = {
+  [S_CACHE]: ENV_CACHE_KEYS,
+  [S_CODE]: 'ids',
+  [S_REQUIRE]: ENV_REQ_KEYS,
+  [S_VALUE]: ENV_VALUE_IDS,
+};
+const STORAGE_ROUTES_ENTRIES = Object.entries(STORAGE_ROUTES);
+const retriedStorageKeys = {};
+
 /**
  * @desc Get scripts to be injected to page with specific URL.
  */
@@ -250,20 +271,18 @@ export function getScriptsByURL(url, isTop) {
 /**
  * @param {VMScript[]} scripts
  * @param {boolean} [sizing]
- * @return {VMScriptByUrlData}
  */
 function getScriptEnv(scripts, sizing) {
   const disabledIds = [];
-  /** @namespace VMScriptByUrlData */
   const [envStart, envDelayed] = [0, 1].map(() => ({
-    ids: [],
     depsMap: {},
     sizing,
-    [ENV_CACHE_KEYS]: [],
-    [ENV_REQ_KEYS]: [],
     [ENV_SCRIPTS]: [],
-    [ENV_VALUE_IDS]: [],
   }));
+  for (const [areaName, listName] of STORAGE_ROUTES_ENTRIES) {
+    envStart[areaName] = {}; envDelayed[areaName] = {};
+    envStart[listName] = []; envDelayed[listName] = [];
+  }
   scripts.forEach((script) => {
     const { id } = script.props;
     if (!sizing && !script.config.enabled) {
@@ -279,17 +298,25 @@ function getScriptEnv(scripts, sizing) {
     if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
       env[ENV_VALUE_IDS].push(id);
     }
-    for (const [list, name] of [
-      [meta.require, ENV_REQ_KEYS],
-      [Object.values(meta.resources), ENV_CACHE_KEYS],
+    for (const [list, name, dataUriDecoder] of [
+      [meta.require, S_REQUIRE, dataUri2text],
+      [Object.values(meta.resources), S_CACHE],
     ]) {
-      list.forEach(key => {
-        key = pathMap[key] || key;
-        if (key && !(name === ENV_CACHE_KEYS && envStart[name].includes(key))) {
-          env[name].push(key);
-          (depsMap[key] || (depsMap[key] = [])).push(id);
+      const listName = STORAGE_ROUTES[name];
+      const envCheck = name === S_CACHE ? envStart : env; // envStart cache is reused in injected
+      for (let url of list) {
+        url = pathMap[url] || url;
+        if (url) {
+          if (isDataUri(url)) {
+            if (dataUriDecoder) {
+              env[name][url] = dataUriDecoder(url);
+            }
+          } else if (!envCheck[listName].includes(url)) {
+            env[listName].push(url);
+            (depsMap[url] || (depsMap[url] = [])).push(id);
+          }
         }
-      });
+      }
     }
     /** @namespace VMInjectedScript */
     env[ENV_SCRIPTS].push(sizing ? script : { ...script, runAt });
@@ -301,37 +328,21 @@ function getScriptEnv(scripts, sizing) {
   return Object.assign(envStart, { disabledIds, envDelayed });
 }
 
-/**
- * Object keys == areas in `storage` module.
- * @namespace VMScriptByUrlData
- */
-const STORAGE_ROUTES = Object.entries({
-  cache: ENV_CACHE_KEYS,
-  code: 'ids',
-  require: ENV_REQ_KEYS,
-  value: ENV_VALUE_IDS,
-});
-const retriedStorageKeys = {};
-
 async function readEnvironmentData(env, isRetry) {
   const keys = [];
-  STORAGE_ROUTES.forEach(([area, srcIds]) => {
-    env[srcIds].forEach(id => {
-      if (!/^data:/.test(id)) {
-        keys.push(storage[area].toKey(id));
-      }
-    });
-  });
+  for (const [area, listName] of STORAGE_ROUTES_ENTRIES) {
+    for (const id of env[listName]) {
+      keys.push(storage[area].toKey(id));
+    }
+  }
   const data = await storage.base.getMulti(keys);
   const badScripts = new Set();
-  for (const [area, srcIds] of STORAGE_ROUTES) {
-    env[area] = {};
-    for (const id of env[srcIds]) {
-      const val = /^data:/.test(id)
-        ? area !== 'require' && id || dataUri2text(id)
-        : data[storage[area].toKey(id)];
+  for (const [area, listName] of STORAGE_ROUTES_ENTRIES) {
+    for (const id of env[listName]) {
+      let val = data[storage[area].toKey(id)];
+      if (!val && area === S_VALUE) val = {};
       env[area][id] = val;
-      if (val == null && area !== 'value' && !env.sizing && retriedStorageKeys[area + id] !== 2) {
+      if (val == null && !env.sizing && retriedStorageKeys[area + id] !== 2) {
         retriedStorageKeys[area + id] = isRetry ? 2 : 1;
         if (!isRetry) {
           console.warn(`The "${area}" storage is missing "${id}"! Vacuuming...`);
@@ -339,7 +350,7 @@ async function readEnvironmentData(env, isRetry) {
             return readEnvironmentData(env, true);
           }
         }
-        if (area === 'code') {
+        if (area === S_CODE) {
           badScripts.add(id);
         } else {
           env.depsMap[id]?.forEach(scriptId => badScripts.add(scriptId));
@@ -389,7 +400,9 @@ function getIconCache(scripts) {
 
 export async function getSizes(ids) {
   const scripts = ids ? ids.map(getScriptById) : store.scripts;
-  const { cache, code, value, require } = await getScriptEnv(scripts, true).promise;
+  const {
+    [S_CACHE]: cache, [S_CODE]: code, [S_VALUE]: value, [S_REQUIRE]: require,
+  } = await getScriptEnv(scripts, true).promise;
   return scripts.map(({
     meta,
     custom: { pathMap = {} },
@@ -566,6 +579,7 @@ function buildPathMap(script, base) {
 export async function fetchResources(script, resourceCache, reqOptions) {
   const { custom: { pathMap }, meta } = script;
   const snatch = (url, type, validator) => {
+    if (!url || isDataUri(url)) return;
     url = pathMap[url] || url;
     const contents = resourceCache?.[type]?.[url];
     return contents != null && !validator
@@ -573,9 +587,9 @@ export async function fetchResources(script, resourceCache, reqOptions) {
       : storage[type].fetch(url, reqOptions, validator).catch(err => err);
   };
   const errors = await Promise.all([
-    ...meta.require.map(url => url && snatch(url, 'require')),
-    ...Object.values(meta.resources).map(url => url && snatch(url, 'cache')),
-    isRemote(meta.icon) && snatch(meta.icon, 'cache', validateImage),
+    ...meta.require.map(url => snatch(url, S_REQUIRE)),
+    ...Object.values(meta.resources).map(url => snatch(url, S_CACHE)),
+    isRemote(meta.icon) && snatch(meta.icon, S_CACHE, validateImage),
   ]);
   if (!resourceCache?.ignoreDepsErrors) {
     const error = errors.map(formatHttpError)::trueJoin('\n');
@@ -630,10 +644,10 @@ export async function vacuum(data) {
   const requireKeys = {};
   const codeKeys = {};
   const mappings = [
-    [storage.value, valueKeys],
-    [storage.cache, cacheKeys],
-    [storage.require, requireKeys],
-    [storage.code, codeKeys],
+    [storage[S_VALUE], valueKeys],
+    [storage[S_CACHE], cacheKeys],
+    [storage[S_REQUIRE], requireKeys],
+    [storage[S_CODE], codeKeys],
   ];
   if (!data) data = await storage.base.getMulti();
   data::forEachKey((key) => {

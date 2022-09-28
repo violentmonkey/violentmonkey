@@ -81,8 +81,8 @@ export function makeGmApi() {
     GM_getResourceText(name) {
       return getResource(this, name);
     },
-    GM_getResourceURL(name, isBlobUrl = true) {
-      return getResource(this, name, !!isBlobUrl);
+    GM_getResourceURL(name, isBlobUrl) {
+      return getResource(this, name, !!isBlobUrl, isBlobUrl === undefined);
     },
     GM_registerMenuCommand(cap, func) {
       const { id } = this;
@@ -205,22 +205,23 @@ function webAddElement(parent, tag, attrs, context) {
   ));
 }
 
-function getResource(context, name, isBlob) {
+function getResource(context, name, isBlob, isBlobAuto) {
+  let res;
   const { id, resCache, resources } = context;
   const key = resources[name];
-  const bucketKey = isBlob == null ? 0 : 1 + isBlob;
   if (key) {
-    let res = ensureNestedProp(resCache, bucketKey, key, false);
+    // data URIs aren't cached in bridge, so we'll send them
+    const isData = key::slice(0, 5) === 'data:';
+    const bucketKey = isBlob == null ? 0 : 1 + (isBlob = isBlobAuto ? !isData : isBlob);
+    res = isData && isBlob === false || ensureNestedProp(resCache, bucketKey, key, false);
     if (!res) {
-      bridge.call('GetResource', { id, isBlob, key }, context, null, response => {
-        res = response;
-      });
+      res = bridge.call('GetResource', { id, isBlob, key, raw: isData && key }, context);
       if (res !== true && isBlob) {
         // Creating Blob URL in page context to make it accessible for page userscripts
         res = createObjectURL(res);
       }
       ensureNestedProp(resCache, bucketKey, key, res);
     }
-    return resolveOrReturn(context, res === true ? key : res);
   }
+  return resolveOrReturn(context, res === true ? key : res);
 }

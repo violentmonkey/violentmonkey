@@ -263,6 +263,7 @@ const FORCED_ACCEPT = {
   'greasyfork.org': 'application/javascript, text/plain, text/css',
 };
 
+export const isDataUri = url => /^data:/.test(url);
 export const isRemote = url => url
   && !(/^(file:\/\/|data:|https?:\/\/([^@/]*@)?(localhost|127\.0\.0\.1|(192\.168|172\.16|10\.0)\.[0-9]+\.[0-9]+|\[(::1|(fe80|fc00)::[.:0-9a-f]+)\]|.+\.(test|example|invalid|localhost))(:[0-9]+|\/|$))/i.test(url));
 

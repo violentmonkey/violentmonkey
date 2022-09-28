@@ -6,6 +6,7 @@ let api = browser.storage.local;
 /** @namespace VMStorageBase */
 class Area {
   constructor(prefix) {
+    this.name = '';
     this.prefix = prefix;
   }
 
@@ -63,7 +64,7 @@ class Area {
   }
 }
 
-export default {
+const storage = {
   get api() { return api; },
   set api(val) { api = val; },
   base: new Area(''),
@@ -75,3 +76,9 @@ export default {
   script: new Area('scr:'),
   value: new Area('val:'),
 };
+storage::mapEntry((val, name) => {
+  if (val instanceof Area) {
+    val.name = name;
+  }
+});
+export default storage;

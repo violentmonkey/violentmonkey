@@ -316,7 +316,7 @@ function prepareScript(script) {
     // code will be `true` if the desired realm is PAGE which is not injectable
     code: isContent ? '' : forceContent || injectedCode,
     metaStr: code.match(METABLOCK_RE)[1] || '',
-    values: id in value ? value[id] || {} : null,
+    values: value[id] || null,
   });
   return isContent && [
     dataKey,

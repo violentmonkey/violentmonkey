@@ -29,15 +29,22 @@ const bridge = {
   call: postWithCallback,
 };
 
+let callbackResult;
+
 function postWithCallback(cmd, data, context, node, cb, customCallbackId) {
   const id = safeGetUniqId();
-  callbacks[id] = cb;
+  callbacks[id] = cb || defaultCallback;
   if (customCallbackId) {
     setOwnProp(data, customCallbackId, id);
   } else {
     data = { [CALLBACK_ID]: id, data };
   }
   bridge.post(cmd, data, context, node);
+  if (!cb) return callbackResult;
+}
+
+function defaultCallback(val) {
+  callbackResult = val;
 }
 
 export default bridge;
