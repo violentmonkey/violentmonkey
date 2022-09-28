@@ -86,7 +86,7 @@ const defsObj = {
   'process.env.HANDSHAKE_ID': HANDSHAKE_ID,
   'process.env.HANDSHAKE_ACK': '1',
   'process.env.CODEMIRROR_THEMES': JSON.stringify(getCodeMirrorThemes()),
-  'process.env.DEV': JSON.stringify(process.env.NODE_ENV === 'development'),
+  'process.env.DEV': JSON.stringify(!isProd),
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
