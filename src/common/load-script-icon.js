@@ -13,7 +13,7 @@ const KEY = 'safeIcon';
 export async function loadScriptIcon(script, cache = {}, defSize) {
   const { icon } = script.meta;
   const url = script.custom?.pathMap?.[icon] || icon
-    || defSize && `${ICON_PREFIX}${defSize > 0 || (script.config.removed ? 32 : 38)}.png`;
+    || defSize && `${ICON_PREFIX}${defSize > 0 && defSize || (script.config.removed ? 32 : 38)}.png`;
   if (!url || url !== script[KEY]) {
     // creates an observable property so Vue will see the change after `await`
     if (!(KEY in script)) {
