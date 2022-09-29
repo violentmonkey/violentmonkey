@@ -24,28 +24,34 @@ export const VM_VERIFY = getUniqId('VM-Verify');
 /** @type {Object<string,VMHttpRequest>} */
 export const requests = { __proto__: null };
 export const verify = { __proto__: null };
-export const FORBIDDEN_HEADER_RE = new RegExp(`^(proxy-|sec-|${[
-  'user-agent',
-  // https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name
-  // https://cs.chromium.org/?q=file:cc+symbol:IsForbiddenHeader%5Cb
-  'accept-(charset|encoding)',
-  'access-control-request-(headers|method)',
-  'connection',
-  'content-length',
-  'cookie2?',
-  'date',
-  'dnt',
-  'expect',
-  'host',
-  'keep-alive',
-  'origin',
-  'referer',
-  'te',
-  'trailer',
-  'transfer-encoding',
-  'upgrade',
-  'via',
-].join('|')})$`, 'i');
+export const FORBIDDEN_HEADER_RE = re`/
+^(
+  # prefix matches
+  proxy-|
+  sec-
+)|^(
+  # whole name matches
+  user-agent|
+  # https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name
+  # https://cs.chromium.org/?q=file:cc+symbol:IsForbiddenHeader%5Cb
+  accept-(charset|encoding)|
+  access-control-request-(headers|method)|
+  connection|
+  content-length|
+  cookie2?|
+  date|
+  dnt|
+  expect|
+  host|
+  keep-alive|
+  origin|
+  referer|
+  te|
+  trailer|
+  transfer-encoding|
+  upgrade|
+  via
+)$/ix`;
 /** @type chrome.webRequest.RequestFilter */
 const API_FILTER = {
   urls: ['<all_urls>'],
@@ -62,8 +68,10 @@ const isSendable = header => !isVmVerify(header)
   && !(/^origin$/i.test(header.name) && header.value === extensionOrigin);
 const isSendableAnon = header => isSendable(header) && isNotCookie(header);
 const SET_COOKIE_RE = /^set-cookie2?$/i;
-const SET_COOKIE_VALUE_RE = /^\s*(?:__(Secure|Host)-)?([^=\s]+)\s*=\s*(")?([!#-+\--:<-[\]-~]*)\3(.*)/;
-const SET_COOKIE_ATTR_RE = /\s*;?\s*(\w+)(?:=(")?([!#-+\--:<-[\]-~]*)\2)?/y;
+const SET_COOKIE_VALUE_RE = re`
+  /^\s*  (?:__(Secure|Host)-)?  ([^=\s]+)  \s*=\s*  (")?  ([!#-+\--:<-[\]-~]*)  \3(.*)  /x`;
+const SET_COOKIE_ATTR_RE = re`
+  /\s*  ;?\s*  (\w+)  (?:= (")?  ([!#-+\--:<-[\]-~]*)  \2)?  /xy`;
 const SAME_SITE_MAP = {
   strict: 'strict',
   lax: 'lax',
