@@ -28,8 +28,8 @@ const TIME_KEEP_DATA = 5 * 60e3;
 const cache = initCache({
   lifetime: TIME_KEEP_DATA,
   onDispose: contentScriptsAPI && (async val => {
-    if (val && typeof val === 'object') {
-      const reg = (CSAPI_REG in val ? val : await val)[CSAPI_REG];
+    if (val) {
+      const reg = (val.then ? await val : val)[CSAPI_REG];
       if (reg) (await reg).unregister();
     }
   }),
@@ -60,7 +60,6 @@ Object.assign(commands, {
     clearFrameData(tabId, frameId);
     const key = getKey(url, !frameId);
     const cacheVal = cache.pop(key) || prepare(key, url, tabId, frameId, forceContent);
-    /** @type VMGetInjectedDataContainer */
     const data = cacheVal[INJECT] ? cacheVal : await cacheVal;
     const inject = data[INJECT];
     const feedback = data[FEEDBACK];
