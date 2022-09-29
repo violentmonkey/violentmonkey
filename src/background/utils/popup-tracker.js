@@ -16,6 +16,7 @@ postInitialize.push(() => {
 
 function onPopupOpened(port) {
   const tabId = +port.name;
+  if (!tabId) return;
   popupTabs[tabId] = 1;
   sendTabCmd(tabId, 'PopupShown', true);
   port.onDisconnect.addListener(onPopupClosed);

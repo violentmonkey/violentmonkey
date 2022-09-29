@@ -1,8 +1,8 @@
 import { isEmpty, sendTabCmd } from '@/common';
 import { forEachEntry, objectGet, objectSet } from '@/common/object';
-import storage from '@/common/storage';
 import { getScript } from './db';
 import { commands } from './message';
+import storage from './storage';
 
 const nest = (obj, key) => obj[key] || (obj[key] = {}); // eslint-disable-line no-return-assign
 /** { scriptId: { tabId: { frameId: {key: raw}, ... }, ... } } */

@@ -6,7 +6,7 @@ import * as tld from '@/common/tld';
 import * as sync from './sync';
 import { commands } from './utils';
 import { getData, getSizes, checkRemove } from './utils/db';
-import { initialize } from './utils/init';
+import { extensionOrigin, initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
 import './utils/clipboard';
 import './utils/hotkeys';
@@ -67,10 +67,25 @@ const commandsToSyncIfTruthy = [
   'CheckRemove',
   'CheckUpdate',
 ];
+const commandsForSelf = [
+  // TODO: maybe just add a prefix for all content-exposed commands?
+  ...commandsToSync,
+  ...commandsToSyncIfTruthy,
+  'ExportZip',
+  'GetAllOptions',
+  'GetData',
+  'GetSizes',
+  'GetOptions',
+  'SetOptions',
+  'SetValueStores',
+  'Storage',
+];
 
-async function handleCommandMessage(req, src) {
-  const { cmd } = req;
-  const res = await commands[cmd]?.(req.data, src);
+async function handleCommandMessage({ cmd, data } = {}, src) {
+  if (src && src.origin !== extensionOrigin && commandsForSelf.includes(cmd)) {
+    throw `Command is only allowed in extension context: ${cmd}`;
+  }
+  const res = await commands[cmd]?.(data, src);
   if (commandsToSync.includes(cmd)
   || res && commandsToSyncIfTruthy.includes(cmd)) {
     sync.sync();

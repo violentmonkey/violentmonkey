@@ -34,9 +34,8 @@
 </template>
 
 <script>
-import { dataUri2text, formatByteLength, makeDataUri } from '@/common';
+import { dataUri2text, formatByteLength, makeDataUri, sendCmdDirectly } from '@/common';
 import VmCode from '@/common/ui/code';
-import storage from '@/common/storage';
 
 export default {
   props: ['value', 'cmOptions', 'commands', 'install', 'errors'],
@@ -83,7 +82,7 @@ export default {
           raw = install.deps[depsUrl];
         } else {
           const key = this.value.custom.pathMap?.[url] || url;
-          raw = await storage[isReq ? 'require' : 'cache'].getOne(key);
+          raw = await sendCmdDirectly('Storage', [isReq ? 'require' : 'cache', 'getOne', key]);
           if (!isReq) raw = makeDataUri(raw, key);
         }
         if (isReq || !raw) {

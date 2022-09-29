@@ -1,11 +1,10 @@
 import { buffer2string, getUniqId, isEmpty, noop } from '@/common';
 import { forEachEntry } from '@/common/object';
 import ua from '@/common/ua';
-import { extensionRoot } from './init';
+import { extensionOrigin } from './init';
 
 let encoder;
 
-const VM_ORIGIN = extensionRoot.slice(0, -1);
 export const VM_VERIFY = getUniqId('VM-Verify');
 /** @typedef {{
   anonymous: boolean,
@@ -60,7 +59,7 @@ const headersToInject = {};
 const isVmVerify = header => header.name === VM_VERIFY;
 const isNotCookie = header => !/^cookie2?$/i.test(header.name);
 const isSendable = header => !isVmVerify(header)
-  && !(/^origin$/i.test(header.name) && header.value === VM_ORIGIN);
+  && !(/^origin$/i.test(header.name) && header.value === extensionOrigin);
 const isSendableAnon = header => isSendable(header) && isNotCookie(header);
 const SET_COOKIE_RE = /^set-cookie2?$/i;
 const SET_COOKIE_VALUE_RE = /^\s*(?:__(Secure|Host)-)?([^=\s]+)\s*=\s*(")?([!#-+\--:<-[\]-~]*)\3(.*)/;

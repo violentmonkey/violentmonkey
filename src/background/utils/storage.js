@@ -1,5 +1,6 @@
 import { mapEntry } from '@/common/object';
-import { ensureArray } from './util';
+import { ensureArray } from '@/common/util';
+import { commands } from './message';
 
 let api = browser.storage.local;
 
@@ -84,3 +85,9 @@ storage::mapEntry((val, name) => {
   }
 });
 export default storage;
+
+Object.assign(commands, {
+  Storage([area, method, ...args]) {
+    return storage[area][method](...args);
+  },
+});

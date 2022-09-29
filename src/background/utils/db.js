@@ -4,7 +4,6 @@ import {
 } from '@/common';
 import { ICON_PREFIX, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
-import storage from '@/common/storage';
 import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
 import { testScript, testBlacklist } from './tester';
@@ -12,6 +11,7 @@ import { preInitialize } from './init';
 import { commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
+import storage from './storage';
 
 export const store = {
   /** @type VMScript[] */
@@ -41,7 +41,7 @@ Object.assign(commands, {
   },
   /** @return {Promise<string>} */
   GetScriptCode(id) {
-    return storage.code.getOne(id);
+    return storage.code[Array.isArray(id) ? 'getMulti' : 'getOne'](id);
   },
   GetScriptVer(opts) {
     const script = getScript(opts);
