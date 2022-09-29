@@ -75,7 +75,7 @@
         <icon name="arrow" class="icon-collapse"></icon>
         <div class="flex-auto" v-text="scope.title" :data-totals="scope.totals" />
       </div>
-      <div class="submenu">
+      <div class="submenu" ref="scriptList" tabindex="-1" autofocus>
         <div
           v-for="(item, index) in scope.list"
           :key="index"
@@ -196,6 +196,7 @@ import {
   i18n, makePause, sendCmd, sendTabCmd,
 } from '@/common';
 import { objectPick } from '@/common/object';
+import { focusMe } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput } from '@/common/keyboard';
 import { mutex, store } from '../utils';
@@ -505,6 +506,8 @@ export default {
     },
   },
   mounted() {
+    // Enable scrolling via Home/End/PgUp/PgDn
+    this::focusMe();
     keyboardService.enable();
     this.disposeList = [
       keyboardService.register('escape', () => {

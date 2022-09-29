@@ -114,6 +114,7 @@
       </div>
       <div class="scripts flex-auto"
            ref="scriptList"
+           tabindex="-1"
            :style="`--num-columns:${numColumns}`"
            :data-columns="numColumns"
            :data-show-order="filters.showOrder || null"
@@ -148,7 +149,7 @@ import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
 import { i18n, sendCmdDirectly, debounce, makePause } from '@/common';
 import options from '@/common/options';
-import { showConfirmation, showMessage } from '@/common/ui';
+import { focusMe, showConfirmation, showMessage } from '@/common/ui';
 import SettingCheck from '@/common/ui/setting-check';
 import hookSetting from '@/common/hook-setting';
 import Icon from '@/common/ui/icon';
@@ -532,6 +533,7 @@ export default {
       });
     },
   },
+  activated: focusMe,
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 100);
     this.debouncedRender = debounce(this.renderScripts);

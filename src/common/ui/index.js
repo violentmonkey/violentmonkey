@@ -70,3 +70,11 @@ export function render(App, el) {
   app.mount(el);
   return app;
 }
+
+/** Focus the first tabindex=-1 element or root, to enable scrolling via Home/End/PgUp/PgDn */
+export function focusMe() {
+  setTimeout(() => {
+    const el = this.$el;
+    (el.querySelector('[tabindex="-1"]') || (el.tabIndex = -1, el)).focus();
+  });
+}

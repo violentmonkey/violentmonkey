@@ -13,7 +13,10 @@ const FILES_SHARED = [
   'src/common/consts.js',
 ];
 
-const GLOBALS_COMMON = getGlobals('src/common/safe-globals.js');
+const GLOBALS_COMMON = {
+  ...getGlobals('src/common/safe-globals.js'),
+  re: false, // transform-modern-regexp with useRe option
+};
 const GLOBALS_INJECTED = getGlobals(`src/injected/safe-globals-injected.js`);
 const GLOBALS_CONTENT = {
   INIT_FUNC_NAME: false,

@@ -37,23 +37,20 @@ Object.assign(commands, {
   },
 });
 
-const whitelistRe = new RegExp(`^https://(${
-  [
-    'greasyfork\\.org/scripts/%/code/',
-    'openuserjs\\.org/install/%/',
-    'github\\.com/%/%/raw/%/',
-    'github\\.com/%/%/releases/%/download/',
-    'raw\\.githubusercontent\\.com(/%){3}/',
-    'gist\\.github\\.com/.*?/',
-  ].join('|')
-})%?\\.user\\.js([?#]|$)`.replace(/%/g, '[^/]*'));
-const blacklistRe = new RegExp(`^https://(${
-  [
-    '(gist\\.)?github\\.com',
-    'greasyfork\\.org',
-    'openuserjs\\.org',
-  ].join('|')
-})/`);
+const whitelistRe = re`/^https:\/\/(
+  greasyfork\.org\/scripts\/[^/]*\/code|
+  openuserjs\.org\/install\/[^/]*|
+  github\.com\/[^/]*\/[^/]*\/(
+    raw\/[^/]*|
+    releases\/[^/]*\/download
+  )|
+  raw\.githubusercontent\.com(\/[^/]*){3}|
+  gist\.github\.com\/.*?
+)\/[^/]*?\.user\.js  ([?#]|$)  /ix`;
+const blacklistRe = re`/^https?:\/\/(
+  (gist\\.)?github\\.com|
+  (greasyfork|openuserjs)\\.org
+)\//ix`;
 const resolveVirtualUrl = url => (
   `${extensionRoot}options/index.html#scripts/${+url.split('#')[1]}`
 );
