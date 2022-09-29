@@ -5,7 +5,6 @@ import {
 } from '@/common/consts';
 import initCache from '@/common/cache';
 import { forEachEntry, objectPick, objectSet } from '@/common/object';
-import storage from '@/common/storage';
 import ua from '@/common/ua';
 import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_IDS } from './db';
 import { extensionRoot, postInitialize } from './init';
@@ -13,6 +12,7 @@ import { commands } from './message';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId } from './requests';
+import storage from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
 import { addValueOpener, clearValueOpener } from './values';
 

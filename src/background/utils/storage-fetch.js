@@ -1,5 +1,5 @@
 import { isDataUri, makeRaw, request } from '@/common';
-import storage from '@/common/storage';
+import storage from './storage';
 
 /** @type { function(url, options, check): Promise<void> } or throws on error */
 storage.cache.fetch = cacheOrFetch({

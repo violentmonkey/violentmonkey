@@ -1,9 +1,9 @@
 import { debounce, ensureArray, initHooks, normalizeKeys } from '@/common';
 import { deepCopy, deepEqual, mapEntry, objectGet, objectSet } from '@/common/object';
 import defaults from '@/common/options-defaults';
-import storage from '@/common/storage';
 import { preInitialize } from './init';
 import { commands } from './message';
+import storage from './storage';
 
 Object.assign(commands, {
   /** @return {Object} */

@@ -143,3 +143,13 @@ function deepCopyDiffObjects(src, sample) {
   }
   return res;
 }
+
+export function deepSize(val) {
+  if (val === undefined) return 0;
+  if (val === true || val == null) return 4;
+  if (val === false) return 5;
+  if (typeof val === 'string') return val.length + 2; // not counting escapes for \n\r\t and so on
+  if (typeof val !== 'object') return `${val}`.length; // number and whatever
+  if (Array.isArray(val)) return val.reduce((sum, v) => sum + 1 + deepSize(v), 2);
+  return Object.keys(val).reduce((sum, k) => sum + k.length + 4 + deepSize(val[k]), 2);
+}

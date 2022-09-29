@@ -36,9 +36,8 @@
 
 <script setup>
 import { computed, ref, watchEffect } from 'vue';
-import { dataUri2text, formatByteLength, i18n, makeDataUri } from '@/common';
+import { dataUri2text, formatByteLength, i18n, makeDataUri, sendCmdDirectly } from '@/common';
 import VmCode from '@/common/ui/code';
-import storage from '@/common/storage';
 
 const props = defineProps(['value', 'cmOptions', 'commands', 'install']);
 
@@ -81,7 +80,7 @@ async function update() {
     raw = install.deps[depsUrl];
   } else {
     const key = value.custom.pathMap?.[url] || url;
-    raw = await storage[isReq ? 'require' : 'cache'].getOne(key);
+    raw = await sendCmdDirectly('Storage', [isReq ? 'require' : 'cache', 'getOne', key]);
           if (!isReq) raw = makeDataUri(raw, key);
   }
   if (isReq || !raw) {

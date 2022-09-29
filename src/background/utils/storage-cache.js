@@ -1,13 +1,17 @@
-import { debounce, initHooks, isEmpty } from '@/common';
+import { debounce, ensureArray, initHooks, isEmpty } from '@/common';
 import initCache from '@/common/cache';
+import { WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, forEachEntry } from '@/common/object';
-import storage from '@/common/storage';
 import { store } from './db';
+import storage from './storage';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
  so that we can supersede an earlier chained request if it's obsolete now,
  e.g. in a chain like [GET:foo, SET:foo=bar] `bar` will be used in GET. */
 let valuesToFlush = {};
+/** @type {Object<string,function[]>} */
+let valuesToWatch = {};
+const watchers = {};
 /** Reading the entire db in init/vacuum/sizing shouldn't be cached for long. */
 const TTL_SKIM = 5e3;
 /** Keeping data for long time since chrome.storage.local is insanely slow in Chrome,
@@ -114,6 +118,45 @@ storage.api = {
   },
 };
 
+window[WATCH_STORAGE] = fn => {
+  const id = performance.now();
+  watchers[id] = fn;
+  return id;
+};
+browser.runtime.onConnect.addListener(port => {
+  if (!port.name.startsWith(WATCH_STORAGE)) return;
+  const { id, cfg } = JSON.parse(port.name.slice(WATCH_STORAGE.length));
+  const fn = id ? watchers[id] : port.postMessage.bind(port);
+  watchStorage(fn, cfg);
+  port.onDisconnect.addListener(() => {
+    watchStorage(fn, cfg, false);
+    delete watchers[id];
+  });
+});
+
+function watchStorage(fn, cfg, state = true) {
+  if (state && !valuesToWatch) {
+    valuesToWatch = {};
+  }
+  cfg::forEachEntry(([area, ids]) => {
+    const { prefix } = storage[area];
+    for (const id of ensureArray(ids)) {
+      const key = prefix + id;
+      const list = valuesToWatch[key] || state && (valuesToWatch[key] = []);
+      const i = list ? list.indexOf(fn) : -1;
+      if (i >= 0 && !state) {
+        list.splice(i, 1);
+        if (!list.length) delete valuesToWatch[key];
+      } else if (i < 0 && state) {
+        list.push(fn);
+      }
+    }
+  });
+  if (isEmpty(valuesToWatch)) {
+    valuesToWatch = null;
+  }
+}
+
 function batch(state) {
   cache.batch(state);
   dbKeys.batch(state);
@@ -127,11 +170,28 @@ function updateScriptMap(key, val) {
   }
 }
 
-function flush() {
+async function flush() {
   const keys = Object.keys(valuesToFlush);
   const toRemove = keys.filter(key => !valuesToFlush[key] && delete valuesToFlush[key]);
-  if (!isEmpty(valuesToFlush)) api.set(valuesToFlush);
-  if (toRemove.length) api.remove(toRemove);
+  const toFlush = valuesToFlush;
   valuesToFlush = {};
+  if (!isEmpty(toFlush)) await api.set(toFlush);
+  if (toRemove.length) await api.remove(toRemove);
+  if (valuesToWatch) setTimeout(notifyWatchers, 0, toFlush, toRemove);
   fire({ keys });
+}
+
+function notifyWatchers(toFlush, toRemove) {
+  const byFn = new Map();
+  let newValue;
+  let changes;
+  for (const key in valuesToWatch) {
+    if ((newValue = toFlush[key]) || toRemove.includes(key)) {
+      for (const fn of valuesToWatch[key]) {
+        if (!(changes = byFn.get(fn))) byFn.set(fn, changes = {});
+        changes[key] = { newValue };
+      }
+    }
+  }
+  byFn.forEach((val, fn) => fn(val));
 }

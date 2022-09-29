@@ -73,11 +73,10 @@ import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import Tooltip from 'vueleton/lib/tooltip';
 import ToggleButton from '@/common/ui/toggle-button';
-import { debounce, getUniqId, i18n } from '@/common';
+import { debounce, getUniqId, i18n, sendCmdDirectly } from '@/common';
 import { deepEqual, forEachEntry, objectPick } from '@/common/object';
 import hookSetting from '@/common/hook-setting';
 import options from '@/common/options';
-import storage from '@/common/storage';
 import './code-autocomplete';
 import { killTrailingSpaces } from './code-trailing-spaces';
 
@@ -559,10 +558,11 @@ export default {
       });
       userOpts = newUserOpts;
     });
-    storage.base.getOne('editorSearch').then(prev => {
+    sendCmdDirectly('Storage', ['base', 'getOne', 'editorSearch']).then(prev => {
       const { search } = this;
       const saveSearchLater = debounce(() => {
-        storage.base.setOne('editorSearch', objectPick(search, ['query', 'replace', 'options']));
+        sendCmdDirectly('Storage', ['base', 'setOne', 'editorSearch',
+          objectPick(search, ['query', 'replace', 'options'])]);
       }, 500);
       const searchAgain = () => {
         saveSearchLater();

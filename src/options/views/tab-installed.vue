@@ -155,7 +155,6 @@ import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
 import { forEachKey } from '@/common/object';
 import { setRoute, lastRoute } from '@/common/router';
-import storage from '@/common/storage';
 import { keyboardService, handleTabNavigation } from '@/common/keyboard';
 import { loadData } from '@/options';
 import ScriptItem from './script-item';
@@ -471,7 +470,7 @@ export default {
       this.debouncedUpdate();
     },
     async getCodeFromStorage(ids) {
-      const data = await storage.code.getMulti(ids);
+      const data = await sendCmdDirectly('GetScriptCode', ids);
       this.store.scripts.forEach(({ $cache, props: { id } }) => {
         if (id in data) $cache.code = data[id];
       });

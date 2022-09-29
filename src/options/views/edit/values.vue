@@ -91,16 +91,15 @@
 <script>
 import { dumpScriptValue, formatByteLength, isEmpty, sendCmdDirectly } from '@/common';
 import { handleTabNavigation, keyboardService } from '@/common/keyboard';
-import { deepEqual, mapEntry } from '@/common/object';
+import { deepCopy, deepEqual, mapEntry } from '@/common/object';
+import { WATCH_STORAGE } from '@/common/consts';
 import Icon from '@/common/ui/icon';
-import storage from '@/common/storage';
 import { showMessage } from '@/common/ui';
 import { store } from '../../utils';
 
 const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;
 const MAX_JSON_DURATION = 10; // ms
-let scriptStorageKey;
 let focusedElement;
 
 const reparseJson = (str) => {
@@ -151,12 +150,11 @@ export default {
     active(val) {
       if (val) {
         (this.current ? this.$refs.value : focusedElement)?.focus();
-        storage.value.getOne(this.script.props.id).then(data => {
+        sendCmdDirectly('Storage', ['value', 'getOne', this.script.props.id]).then(data => {
           if (!this.values && this.setData(data) && this.keys.length) {
             this.autofocus(true);
           }
         });
-        scriptStorageKey = storage.value.prefix + this.script?.props.id;
         this.disposeList = [
           keyboardService.register('pageup', () => flipPage(this, -1), conditionNotEdit),
           keyboardService.register('pagedown', () => flipPage(this, 1), conditionNotEdit),
@@ -164,7 +162,21 @@ export default {
       } else {
         this.disposeList?.forEach(dispose => dispose());
       }
-      browser.storage.onChanged[`${val ? 'add' : 'remove'}Listener`](this.onStorageChanged);
+      // toggle storage watcher
+      if (val) {
+        const fn = this.onStorageChanged;
+        const bg = browser.extension.getBackgroundPage();
+        this[WATCH_STORAGE] = browser.runtime.connect({
+          name: WATCH_STORAGE + JSON.stringify({
+            cfg: { value: this.script.props.id },
+            id: bg?.[WATCH_STORAGE](fn),
+          }),
+        });
+        if (!bg) this[WATCH_STORAGE].onMessage.addListener(fn);
+      } else {
+        this[WATCH_STORAGE]?.disconnect();
+        this[WATCH_STORAGE] = null;
+      }
     },
     current(val, oldVal) {
       if (val) {
@@ -222,7 +234,8 @@ export default {
       }
     },
     calcSize() {
-      store.storageSize = this.keys.reduce((sum, key) => sum + this.values[key].length - 1, 0);
+      store.storageSize = this.keys.reduce((sum, key) => sum
+        + key.length + 4 + this.values[key].length + 2, 2);
     },
     updateValue({
       key,
@@ -319,13 +332,13 @@ export default {
       current.jsonPaused = performance.now() - t0 > MAX_JSON_DURATION;
     },
     onStorageChanged(changes) {
-      const data = changes[scriptStorageKey]?.newValue;
+      const data = Object.values(changes)[0].newValue;
       if (data) {
         const { current } = this;
         const currentKey = current?.key;
         const valueGetter = current && (currentKey ? this.getValue : this.getValueAll);
         const oldText = valueGetter && valueGetter(currentKey);
-        this.setData(data);
+        this.setData(data instanceof Object ? data : deepCopy(data));
         if (current) {
           const newText = valueGetter(currentKey);
           const curText = current.value;
@@ -341,7 +354,7 @@ export default {
           }
         }
       } else {
-        store.storageSize = 0;
+        this.setData(data);
       }
     },
     onUpDown(evt) {

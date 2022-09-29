@@ -21,6 +21,7 @@ export const INJECT_MAPPING = {
 export const METABLOCK_RE = /(?:^|\n)\s*\/\/\x20==UserScript==([\s\S]*?\n)\s*\/\/\x20==\/UserScript==|$/;
 export const ICON_PREFIX = '/public/images/icon';
 export const INJECTABLE_TAB_URL_RE = /^(https?|file|ftps?):/;
+export const WATCH_STORAGE = 'watchStorage';
 
 // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
 // to prevent exposing them to userscripts with `@inject-into content`
