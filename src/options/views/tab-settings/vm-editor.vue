@@ -105,7 +105,7 @@ export default {
       showMessage({ text: this.$refs.editor.error || this.i18n('msgSavedEditorOptions') });
     },
     toggleBoolean(event) {
-      const el = /** @type HTMLTextAreaElement */ event.target;
+      const el = /** @type {HTMLTextAreaElement} */ event.target;
       const { selectionStart: start, selectionEnd: end, value } = el;
       const toggled = { false: 'true', true: 'false' }[value.slice(start, end)];
       // FF can't run execCommand on textarea, https://bugzil.la/1220696#c24

@@ -147,7 +147,7 @@ async function importBackup(file) {
     if (!meta || !opts) return;
     const ovr = opts.override || {};
     reports[0].text = 'Tampermonkey';
-    /** @type VMScript */
+    /** @type {VMScript} */
     vm.scripts[name] = {
       config: {
         enabled: settings.enabled !== false ? 1 : 0,

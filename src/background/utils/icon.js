@@ -49,17 +49,17 @@ const KEY_IS_APPLIED = 'isApplied';
 const KEY_SHOW_BADGE = 'showBadge';
 const KEY_BADGE_COLOR = 'badgeColor';
 const KEY_BADGE_COLOR_BLOCKED = 'badgeColorBlocked';
-/** @type boolean */
+/** @type {boolean} */
 let isApplied;
-/** @type VMBadgeMode */
+/** @type {VMBadgeMode} */
 let showBadge;
-/** @type string */
+/** @type {string} */
 let badgeColor;
-/** @type string */
+/** @type {string} */
 let badgeColorBlocked;
-/** @type string */
+/** @type {string} */
 let titleBlacklisted;
-/** @type string */
+/** @type {string} */
 let titleNoninjectable;
 
 hookOptions((changes) => {

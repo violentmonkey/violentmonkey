@@ -64,7 +64,7 @@ export function clearValueOpener(tabId, frameId) {
 /**
  * @param {number} tabId
  * @param {number} frameId
- * @param {VMInjectedScript[]} injectedScripts
+ * @param {VMInjection.Script[]}
  */
 export function addValueOpener(tabId, frameId, injectedScripts) {
   injectedScripts.forEach(script => {

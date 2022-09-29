@@ -52,7 +52,7 @@ let injectInto;
 let xhrInject;
 
 Object.assign(commands, {
-  /** @return {Promise<VMGetInjectedData>} */
+  /** @return {Promise<VMInjection>} */
   async GetInjected({ url, forceContent }, src) {
     const { frameId, tab } = src;
     const tabId = tab.id;
@@ -60,9 +60,10 @@ Object.assign(commands, {
     clearFrameData(tabId, frameId);
     const key = getKey(url, !frameId);
     const cacheVal = cache.pop(key) || prepare(key, url, tabId, frameId, forceContent);
-    const data = cacheVal[INJECT] ? cacheVal : await cacheVal;
-    const inject = data[INJECT];
-    const feedback = data[FEEDBACK];
+    const bag = cacheVal[INJECT] ? cacheVal : await cacheVal;
+    /** @type {VMInjection} */
+    const inject = bag[INJECT];
+    const feedback = bag[FEEDBACK];
     if (feedback?.length) {
       // Injecting known content scripts without waiting for InjectionFeedback message.
       // Running in a separate task because it may take a long time to serialize data.
@@ -126,13 +127,13 @@ onStorageChanged(async ({ keys: dbKeys }) => {
   const raw = cache.getValues();
   const resolved = !raw.some(val => val?.then);
   const cacheValues = resolved ? raw : await Promise.all(raw);
-  const dirty = cacheValues.some(data => data[INJECT]
+  const dirty = cacheValues.some(bag => bag[INJECT]
     && dbKeys.some((key) => {
       const prefix = key.slice(0, key.indexOf(':') + 1);
       const prop = propsToClear[prefix];
       key = key.slice(prefix.length);
       return prop === true
-        || data[prop]?.includes(prefix === storage.value.prefix ? +key : key);
+        || bag[prop]?.includes(prefix === storage.value.prefix ? +key : key);
     }));
   if (dirty) {
     cache.destroy();
@@ -171,8 +172,6 @@ function onOptionChanged(changes) {
     }
   });
 }
-
-/** @typedef {Promise<VMGetInjectedDataContainer>|VMGetInjectedDataContainer} VMGetInjected */
 
 function getKey(url, isTop) {
   return isTop ? url : `-${url}`;
@@ -223,35 +222,34 @@ function onSendHeaders({ url, tabId, frameId }) {
 /** @param {chrome.webRequest.WebResponseHeadersDetails} info */
 function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
-  const data = xhrInject && cache.get(key);
+  const bag = xhrInject && cache.get(key);
   // Proceeding only if prepareScripts has replaced promise in cache with the actual data
-  return data?.[INJECT] && prepareXhrBlob(info, data);
+  return bag?.[INJECT] && prepareXhrBlob(info, bag);
 }
 
 /**
  * @param {chrome.webRequest.WebResponseHeadersDetails} info
- * @param {VMGetInjectedDataContainer} data
+ * @param {VMInjection.Bag} bag
  */
-function prepareXhrBlob({ url, responseHeaders }, data) {
+function prepareXhrBlob({ url, responseHeaders }, bag) {
   if (url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
-    forceContentInjection(data);
+    forceContentInjection(bag);
   }
   const blobUrl = URL.createObjectURL(new Blob([
-    JSON.stringify(data[INJECT]),
+    JSON.stringify(bag[INJECT]),
   ]));
   responseHeaders.push({
     name: 'Set-Cookie',
     value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
   });
   setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
-  data[HEADERS] = true;
+  bag[HEADERS] = true;
   return { responseHeaders };
 }
 
 function prepare(key, url, tabId, frameId, forceContent) {
-  /** @namespace VMGetInjectedDataContainer */
+  /** @type {VMInjection.Bag} */
   const res = {
-    /** @namespace VMGetInjectedData */
     [INJECT]: {
       expose: !frameId
         && url.startsWith('https://')
@@ -263,30 +261,39 @@ function prepare(key, url, tabId, frameId, forceContent) {
     : res;
 }
 
+/**
+ * @param {VMInjection.Bag} res
+ * @param cacheKey
+ * @param url
+ * @param tabId
+ * @param frameId
+ * @param forceContent
+ * @return {Promise<any>}
+ */
 async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) {
-  const data = getScriptsByURL(url, !frameId);
-  const { envDelayed, [ENV_SCRIPTS]: scripts } = Object.assign(data, await data.promise);
+  const bag = getScriptsByURL(url, !frameId);
+  const { envDelayed, [ENV_SCRIPTS]: scripts } = Object.assign(bag, await bag.promise);
   const isLate = forceContent != null;
-  data[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
-  const feedback = scripts.map(prepareScript, data).filter(Boolean);
+  bag[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
+  const feedback = scripts.map(prepareScript, bag).filter(Boolean);
   const more = envDelayed.promise;
   const envKey = getUniqId(`${tabId}:${frameId}:`);
+  /** @type {VMInjection} */
   const inject = res[INJECT];
-  /** @namespace VMGetInjectedData */
   Object.assign(inject, {
     [ENV_SCRIPTS]: scripts,
     [INJECT_INTO]: injectInto,
     [INJECT_PAGE]: !forceContent && (
-      scripts.some(isPageRealm, data)
-      || envDelayed[ENV_SCRIPTS].some(isPageRealm, data)
+      scripts.some(isPageRealm, bag)
+      || envDelayed[ENV_SCRIPTS].some(isPageRealm, bag)
     ),
-    cache: data.cache,
+    cache: bag.cache,
     feedId: {
       cacheKey, // InjectionFeedback cache key for cleanup when getDataFF outruns GetInjected
       envKey, // InjectionFeedback cache key for envDelayed
     },
     hasMore: !!more, // tells content bridge to expect envDelayed
-    ids: data.disabledIds, // content bridge adds the actually running ids and sends via SetPopup
+    ids: bag.disabledIds, // content bridge adds the actually running ids and sends via SetPopup
     info: {
       ua,
     },
@@ -301,7 +308,7 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   return res;
 }
 
-/** @this {VMScriptByUrlData} */
+/** @this {VMInjection.Env} */
 function prepareScript(script) {
   const { custom, meta, props } = script;
   const { id } = props;
@@ -343,7 +350,7 @@ function prepareScript(script) {
     `\n//# sourceURL=${extensionRoot}${IS_FIREFOX ? '%20' : ''}${name}.user.js#${id}`,
   ]::trueJoin('');
   cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
-  /** @namespace VMInjectedScript */
+  /** @type {VMInjection.Script} */
   Object.assign(script, {
     dataKey,
     displayName,
@@ -401,15 +408,14 @@ function detectStrictCsp(responseHeaders) {
   ));
 }
 
-/** @param {VMGetInjectedDataContainer} data */
-function forceContentInjection(data) {
-  /** @type VMGetInjectedData */
-  const inject = data[INJECT];
+/** @param {VMInjection.Bag} bag */
+function forceContentInjection(bag) {
+  const inject = bag[INJECT];
   inject[FORCE_CONTENT] = true;
   inject[ENV_SCRIPTS].forEach(scr => {
     // When script wants `page`, the result below will be `true` so the script goes into `failedIds`
     scr.code = !isContentRealm(scr, true) || '';
-    data[FEEDBACK].push([scr.dataKey, true]);
+    bag[FEEDBACK].push([scr.dataKey, true]);
   });
 }
 
@@ -420,7 +426,7 @@ function isContentRealm(scr, forceContent) {
   return realm === INJECT_CONTENT || forceContent && realm === INJECT_AUTO;
 }
 
-/** @this {VMScriptByUrlData} */
+/** @this {VMInjection.Env} */
 function isPageRealm(scr) {
   return !isContentRealm(scr, this[FORCE_CONTENT]);
 }

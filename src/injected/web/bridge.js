@@ -1,7 +1,7 @@
 const handlers = createNullObj();
 const callbacks = createNullObj();
 /**
- * @property {UAInjected} ua
+ * @property {VMScriptGMInfoPlatform} ua
  */
 const bridge = {
   __proto__: null,

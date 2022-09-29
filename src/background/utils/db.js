@@ -14,9 +14,9 @@ import { setOption } from './options';
 import storage from './storage';
 
 export const store = {
-  /** @type VMScript[] */
+  /** @type {VMScript[]} */
   scripts: [],
-  /** @type Object<string,VMScript[]> */
+  /** @type {Object<string,VMScript[]>} */
   scriptMap: {},
   storeInfo: {
     id: 0,
@@ -102,7 +102,7 @@ preInitialize.push(async () => {
   const mods = [];
   const toRemove = [];
   const resUrls = new Set();
-  /** @this VMScriptCustom.pathMap */
+  /** @this {StringMap} */
   const rememberUrl = function _(url) {
     if (url && !isDataUri(url)) {
       resUrls.add(this[url] || url);
@@ -274,6 +274,7 @@ export function getScriptsByURL(url, isTop) {
 /**
  * @param {VMScript[]} scripts
  * @param {boolean} [sizing]
+ * @return {VMInjection.Env}
  */
 function getScriptEnv(scripts, sizing) {
   const disabledIds = [];
@@ -295,6 +296,7 @@ function getScriptEnv(scripts, sizing) {
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
+    /** @type {VMInjection.Env} */
     const env = sizing || runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
     const { depsMap } = env;
     env.ids.push(id);
@@ -321,7 +323,6 @@ function getScriptEnv(scripts, sizing) {
         }
       }
     }
-    /** @namespace VMInjectedScript */
     env[ENV_SCRIPTS].push(sizing ? script : { ...script, runAt });
   });
   envStart.promise = readEnvironmentData(envStart);
@@ -721,68 +722,3 @@ export async function vacuum(data) {
   resolveSelf(result);
   return result;
 }
-
-/** @typedef VMScript
- * @property {VMScriptConfig} config
- * @property {VMScriptCustom} custom
- * @property {VMScriptMeta} meta
- * @property {VMScriptProps} props
- */
-/** @typedef VMScriptConfig *
- * @property {Boolean} enabled - stored as 0 or 1
- * @property {Boolean} removed - stored as 0 or 1
- * @property {Boolean} shouldUpdate - stored as 0 or 1
- * @property {Boolean | null} notifyUpdates - stored as 0 or 1 or null (default) which means "use global setting"
- */
-/** @typedef VMScriptCustom *
- * @property {string} name
- * @property {string} downloadURL
- * @property {string} homepageURL
- * @property {string} lastInstallURL
- * @property {string} updateURL
- * @property {'auto' | 'page' | 'content'} injectInto
- * @property {null | 1 | 0} noframes - null or absence == default (script's value)
- * @property {string[]} exclude
- * @property {string[]} excludeMatch
- * @property {string[]} include
- * @property {string[]} match
- * @property {boolean} origExclude
- * @property {boolean} origExcludeMatch
- * @property {boolean} origInclude
- * @property {boolean} origMatch
- * @property {Object} pathMap
- * @property {VMScriptRunAt} runAt
- */
-/** @typedef VMScriptMeta *
- * @property {string} description
- * @property {string} downloadURL
- * @property {string[]} exclude
- * @property {string[]} excludeMatch
- * @property {string[]} grant
- * @property {string} homepageURL
- * @property {string} icon
- * @property {string[]} include
- * @property {'auto' | 'page' | 'content'} injectInto
- * @property {string[]} match
- * @property {string} namespace
- * @property {string} name
- * @property {boolean} noframes
- * @property {string[]} require
- * @property {Object} resources
- * @property {VMScriptRunAt} runAt
- * @property {string} supportURL
- * @property {string} version
- */
-/** @typedef VMScriptProps *
- * @property {number} id
- * @property {number} lastModified
- * @property {number} lastUpdated
- * @property {number} position
- * @property {string} uri
- * @property {string} uuid
- */
-/**
- * @typedef {
-   'document-start' | 'document-body' | 'document-end' | 'document-idle'
- } VMScriptRunAt
- */

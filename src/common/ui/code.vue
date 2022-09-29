@@ -360,13 +360,6 @@ export default {
       search.hasResult = !search.query || !!this.doSearchInternal({ ...opts, wrapAround: true });
     },
     /**
-     * @typedef {Object} VMSearchOptions
-     * @property {boolean} [reversed]
-     * @property {boolean} [wrapAround]
-     * @property {boolean} [reuseCursor]
-     * @property {{line:number,ch:number}} [pos]
-     */
-    /**
      * @param {VMSearchOptions} opts
      * @returns {?true}
      */

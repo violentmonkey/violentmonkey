@@ -5,5 +5,8 @@
       "@/*": ["./src/*"]
     }
   },
+  "typeAcquisition": {
+    "include": ["./types.d.ts"]
+  },
   "exclude": ["node_modules", "dist"]
 }
