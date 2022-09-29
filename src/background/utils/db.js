@@ -14,9 +14,9 @@ import { setOption } from './options';
 import storage from './storage';
 
 export const store = {
-  /** @type VMScript[] */
+  /** @type {VM.Script[]} */
   scripts: [],
-  /** @type Object<string,VMScript[]> */
+  /** @type {Object<string,VM.Script[]>} */
   scriptMap: {},
   storeInfo: {
     id: 0,
@@ -27,9 +27,9 @@ export const store = {
 Object.assign(commands, {
   CheckPosition: sortScripts,
   CheckRemove: checkRemove,
-  /** @return {VMScript} */
+  /** @return {VM.Script} */
   GetScript: getScript,
-  /** @return {Promise<{ items: VMScript[], values? }>} */
+  /** @return {Promise<{ items: VM.Script[], values? }>} */
   async ExportZip({ values }) {
     const scripts = getScripts();
     const ids = scripts.map(getPropsId);
@@ -102,7 +102,7 @@ preInitialize.push(async () => {
   const mods = [];
   const toRemove = [];
   const resUrls = new Set();
-  /** @this VMScriptCustom.pathMap */
+  /** @this {StringMap} */
   const rememberUrl = function _(url) {
     if (url && !isDataUri(url)) {
       resUrls.add(this[url] || url);
@@ -216,12 +216,12 @@ export async function sortScripts() {
   return changed;
 }
 
-/** @return {?VMScript} */
+/** @return {?VM.Script} */
 export function getScriptById(id) {
   return store.scriptMap[id];
 }
 
-/** @return {?VMScript} */
+/** @return {?VM.Script} */
 export function getScript({ id, uri, meta }) {
   let script;
   if (id) {
@@ -233,7 +233,7 @@ export function getScript({ id, uri, meta }) {
   return script;
 }
 
-/** @return {VMScript[]} */
+/** @return {VM.Script[]} */
 export function getScripts() {
   return store.scripts.filter(script => !script.config.removed);
 }
@@ -272,8 +272,9 @@ export function getScriptsByURL(url, isTop) {
 }
 
 /**
- * @param {VMScript[]} scripts
+ * @param {VM.Script[]} scripts
  * @param {boolean} [sizing]
+ * @return {VM.Injection.Env}
  */
 function getScriptEnv(scripts, sizing) {
   const disabledIds = [];
@@ -295,6 +296,7 @@ function getScriptEnv(scripts, sizing) {
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
+    /** @type {VM.Injection.Env} */
     const env = sizing || runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
     const { depsMap } = env;
     env.ids.push(id);
@@ -321,7 +323,6 @@ function getScriptEnv(scripts, sizing) {
         }
       }
     }
-    /** @namespace VMInjectedScript */
     env[ENV_SCRIPTS].push(sizing ? script : { ...script, runAt });
   });
   envStart.promise = readEnvironmentData(envStart);
@@ -377,7 +378,7 @@ async function readEnvironmentData(env, isRetry) {
 
 /**
  * @desc Get data for dashboard.
- * @return {Promise<{ scripts: VMScript[], cache: Object }>}
+ * @return {Promise<{ scripts: VM.Script[], cache: Object }>}
  */
 export async function getData(ids) {
   const scripts = ids ? ids.map(getScriptById) : store.scripts;
@@ -388,7 +389,7 @@ export async function getData(ids) {
 }
 
 /**
- * @param {VMScript[]} scripts
+ * @param {VM.Script[]} scripts
  * @return {Promise<{}>}
  */
 async function getIconCache(scripts) {
@@ -462,9 +463,9 @@ function getUUID() {
 }
 
 /**
- * @param {VMScript} script
+ * @param {VM.Script} script
  * @param {string} code
- * @return {Promise<VMScript[]>}
+ * @return {Promise<VM.Script[]>}
  */
 async function saveScript(script, code) {
   const config = script.config || {};
@@ -721,68 +722,3 @@ export async function vacuum(data) {
   resolveSelf(result);
   return result;
 }
-
-/** @typedef VMScript
- * @property {VMScriptConfig} config
- * @property {VMScriptCustom} custom
- * @property {VMScriptMeta} meta
- * @property {VMScriptProps} props
- */
-/** @typedef VMScriptConfig *
- * @property {Boolean} enabled - stored as 0 or 1
- * @property {Boolean} removed - stored as 0 or 1
- * @property {Boolean} shouldUpdate - stored as 0 or 1
- * @property {Boolean | null} notifyUpdates - stored as 0 or 1 or null (default) which means "use global setting"
- */
-/** @typedef VMScriptCustom *
- * @property {string} name
- * @property {string} downloadURL
- * @property {string} homepageURL
- * @property {string} lastInstallURL
- * @property {string} updateURL
- * @property {'auto' | 'page' | 'content'} injectInto
- * @property {null | 1 | 0} noframes - null or absence == default (script's value)
- * @property {string[]} exclude
- * @property {string[]} excludeMatch
- * @property {string[]} include
- * @property {string[]} match
- * @property {boolean} origExclude
- * @property {boolean} origExcludeMatch
- * @property {boolean} origInclude
- * @property {boolean} origMatch
- * @property {Object} pathMap
- * @property {VMScriptRunAt} runAt
- */
-/** @typedef VMScriptMeta *
- * @property {string} description
- * @property {string} downloadURL
- * @property {string[]} exclude
- * @property {string[]} excludeMatch
- * @property {string[]} grant
- * @property {string} homepageURL
- * @property {string} icon
- * @property {string[]} include
- * @property {'auto' | 'page' | 'content'} injectInto
- * @property {string[]} match
- * @property {string} namespace
- * @property {string} name
- * @property {boolean} noframes
- * @property {string[]} require
- * @property {Object} resources
- * @property {VMScriptRunAt} runAt
- * @property {string} supportURL
- * @property {string} version
- */
-/** @typedef VMScriptProps *
- * @property {number} id
- * @property {number} lastModified
- * @property {number} lastUpdated
- * @property {number} position
- * @property {string} uri
- * @property {string} uuid
- */
-/**
- * @typedef {
-   'document-start' | 'document-body' | 'document-end' | 'document-idle'
- } VMScriptRunAt
- */

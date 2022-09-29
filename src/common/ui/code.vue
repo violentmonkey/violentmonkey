@@ -354,20 +354,13 @@ export default {
         search.show = true;
       }
     },
-    /** @param {VMSearchOptions} opts */
+    /** @param {VM.SearchOptions} opts */
     doSearch(opts) {
       const { search } = this;
       search.hasResult = !search.query || !!this.doSearchInternal({ ...opts, wrapAround: true });
     },
     /**
-     * @typedef {Object} VMSearchOptions
-     * @property {boolean} [reversed]
-     * @property {boolean} [wrapAround]
-     * @property {boolean} [reuseCursor]
-     * @property {{line:number,ch:number}} [pos]
-     */
-    /**
-     * @param {VMSearchOptions} opts
+     * @param {VM.SearchOptions} opts
      * @returns {?true}
      */
     doSearchInternal({ reversed, wrapAround, pos, reuseCursor } = {}) {

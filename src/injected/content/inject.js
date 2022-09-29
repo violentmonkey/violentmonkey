@@ -14,12 +14,12 @@ const VAULT_WRITER = `${IS_FIREFOX ? VM_UUID : INIT_FUNC_NAME}VW`;
 const VAULT_WRITER_ACK = `${VAULT_WRITER}+`;
 let contLists;
 let pgLists;
-/** @type {Object<string,VMInjectionRealm>} */
+/** @type {Object<string,VM.Injected.RealmData>} */
 let realms;
 /** @type {?boolean} */
 let pageInjectable;
 let frameEventWnd;
-/** @type ShadowRoot */
+/** @type {ShadowRoot} */
 let injectedRoot;
 
 // https://bugzil.la/1408996
@@ -121,16 +121,14 @@ export function injectPageSandbox(contentId, webId) {
 /**
  * @param {string} contentId
  * @param {string} webId
- * @param {VMGetInjectedData} data
+ * @param {VM.Injection.Sent} data
  * @param {boolean} isXml
  */
 export async function injectScripts(contentId, webId, data, isXml) {
   const { hasMore, info } = data;
   realms = {
     __proto__: null,
-    /** @namespace VMInjectionRealm */
     [INJECT_CONTENT]: {
-      /** @namespace VMRunAtLists */
       lists: contLists = { start: [], body: [], end: [], idle: [] },
       is: 0,
       info,

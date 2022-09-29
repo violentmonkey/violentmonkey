@@ -12,7 +12,7 @@ Object.assign(commands, {
     cache.put(`new-${id}`, newScript(data));
     return id;
   },
-  /** @return {VMScript} */
+  /** @return {VM.Script} */
   NewScript(id) {
     return id && cache.get(`new-${id}`) || newScript();
   },

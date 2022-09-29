@@ -6,7 +6,7 @@ const KEY = 'safeIcon';
 
 /**
  * Sets script's safeIcon property after the image is successfully loaded
- * @param {VMScript} script
+ * @param {VM.Script} script
  * @param {Object} [cache]
  * @param {number} [defSize] - show default icon of this size, -1 = auto, falsy = no
  */

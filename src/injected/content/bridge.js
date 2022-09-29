@@ -50,7 +50,7 @@ const bridge = {
   ids: [], // all ids including the disabled ones for SetPopup
   runningIds: [],
   // userscripts running in the content script context are messaged via invokeGuest
-  /** @type Number[] */
+  /** @type {Number[]} */
   invokableIds: [],
   failedIds: [],
   cache: createNullObj(),
@@ -71,7 +71,7 @@ const bridge = {
     assignHandlers(bgHandlers, obj, force);
   },
   /**
-   * @param {VMInjectedScript | VMScript} script
+   * @param {VM.Injection.Script} script
    */
   allowScript({ dataKey, meta }) {
     allowCmd('Run', dataKey);

@@ -35,7 +35,7 @@ export function loadValues(id) {
  * @param {?} val
  * @param {?string} raw
  * @param {?string} oldRaw
- * @param {VMInjectedScript.Context} context
+ * @param {VM.Injected.Context} context
  * @return {void|Promise<void>}
  */
 export function dumpValue(id, key, val, raw, oldRaw, context) {

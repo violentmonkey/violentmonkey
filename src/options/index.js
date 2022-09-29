@@ -33,7 +33,7 @@ function initialize() {
 }
 
 /**
- * @param {VMScript} script
+ * @param {VM.Script} script
  */
 async function initScript(script) {
   const meta = script.meta || {};
@@ -54,7 +54,7 @@ async function initScript(script) {
 
 /**
  * @param {number[]} sz
- * @param {VMScript} script
+ * @param {VM.Script} script
  */
 function initSize(sz, { $cache }) {
   let total = 0;
@@ -70,7 +70,7 @@ function initSize(sz, { $cache }) {
 }
 
 /**
- * @param {VMScript} script
+ * @param {VM.Script} script
  */
 async function initScriptAndSize(script) {
   const res = initScript(script);

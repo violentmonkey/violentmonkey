@@ -25,7 +25,7 @@ Object.assign(commands, {
       url === from
       || cache.has(`autoclose:${tabId}`)
       || /^(chrome:\/\/(newtab|startpage)\/|about:(home|newtab))$/.test(from));
-    /** @namespace VMConfirmCache */
+    /** @namespace VM.ConfirmCache */
     cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId, ff: ua.firefox });
     const confirmUrl = CONFIRM_URL_BASE + confirmKey;
     const { windowId } = canReplaceCurTab

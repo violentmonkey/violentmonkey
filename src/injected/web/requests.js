@@ -1,15 +1,22 @@
 import bridge from './bridge';
 
+/** @type {Object<string,VM.Xhr.Web>} */
 const idMap = createNullObj();
 
 bridge.addHandlers({
+  /** @param {VM.Xhr.Message.BG} msg */
   HttpRequested(msg) {
     const req = idMap[msg.id];
     if (req) callback(req, msg);
   },
 });
 
-/** `opts` must already have a null proto */
+/**
+ * @param {VM.Xhr.UserOpts} opts - must already have a null proto
+ * @param {VM.Injected.Context} context
+ * @param {string} fileName
+ * @return {VMScriptXHRControl}
+ */
 export function onRequestCreate(opts, context, fileName) {
   if (process.env.DEBUG) throwIfProtoPresent(opts);
   let { url } = opts;
@@ -29,6 +36,7 @@ export function onRequestCreate(opts, context, fileName) {
   }
   const scriptId = context.id;
   const id = safeGetUniqId('VMxhr');
+  /** @type {VM.Xhr.Web} */
   const req = {
     __proto__: null,
     id,
@@ -43,6 +51,11 @@ export function onRequestCreate(opts, context, fileName) {
   };
 }
 
+/**
+ * @param {VM.Xhr.Web} req
+ * @param {VM.Xhr.Message.BG} msg
+ * @returns {string|number|boolean|Array|Object|Document|Blob|ArrayBuffer}
+ */
 function parseData(req, msg) {
   let res = req.raw;
   switch (req.opts.responseType) {
@@ -64,6 +77,7 @@ function parseData(req, msg) {
 /**
  * Not using RegExp because it internally depends on proto stuff that can be easily broken,
  * and safe-guarding all of it is ridiculously disproportional.
+ * @param {VM.Xhr.Message.BG} msg
  */
 function getContentType(msg) {
   const type = msg.contentType || '';
@@ -77,7 +91,11 @@ function getContentType(msg) {
   return type::slice(0, i);
 }
 
-// request object functions
+/**
+ * @param {VM.Xhr.Web} req
+ * @param {VM.Xhr.Message.BG} msg
+ * @returns {*}
+ */
 function callback(req, msg) {
   const { opts } = req;
   const cb = opts[`on${msg.type}`];
@@ -109,12 +127,18 @@ function callback(req, msg) {
   if (msg.type === 'loadend') delete idMap[req.id];
 }
 
+/**
+ * @param {VM.Xhr.Web} req
+ * @param {VM.Injected.Context} context
+ * @param {string} fileName
+ */
 function start(req, context, fileName) {
   const { id, opts, scriptId } = req;
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
   const { data, withCredentials = true, anonymous = !withCredentials } = opts;
   idMap[id] = req;
+  /** @type {VM.Xhr.Message.Web} */
   bridge.post('HttpRequest', createNullObj({
     id,
     scriptId,

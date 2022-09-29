@@ -12,13 +12,19 @@ const getBlobType = describeProperty(SafeBlob[PROTO], 'type').get;
 const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
 const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
 const fdAppend = SafeFormData[PROTO].append;
-
+/** @type {VM.Xhr.Content} */
 const requests = createNullObj();
 let downloadChain = promiseResolve();
 
 // TODO: extract all prop names used across files into consts.js to ensure sameness
 bridge.addHandlers({
+  /**
+   * @param {VM.Xhr.Message.Web} msg
+   * @param {VMScriptInjectInto} realm
+   * @returns {Promise<void>}
+   */
   async HttpRequest(msg, realm) {
+    /** @type {VM.Xhr.Content} */
     requests[msg.id] = createNullObj({
       realm,
       wantsBlob: msg.xhrType === 'blob',
@@ -37,6 +43,10 @@ bridge.addHandlers({
 });
 
 bridge.addBackgroundHandlers({
+  /**
+   * @param {VM.Xhr.Message.BG} msg
+   * @returns {Promise<void>}
+   */
   async HttpRequested(msg) {
     const { id, chunk } = msg;
     const req = requests[id];
@@ -84,6 +94,11 @@ bridge.addBackgroundHandlers({
   },
 });
 
+/**
+ * @param {VM.Xhr.Content} req
+ * @param {string} url
+ * @returns {Promise<Blob|ArrayBuffer>}
+ */
 async function importBlob(req, url) {
   const data = await (await safeFetch(url))::(req.wantsBlob ? getBlob : getArrayBuffer)();
   sendCmd('RevokeBlob', url);
@@ -110,7 +125,12 @@ async function revokeBlobAfterTimeout(url) {
   revokeObjectURL(url);
 }
 
-/** ArrayBuffer/Blob in Chrome incognito is transferred in string chunks */
+/**
+ * ArrayBuffer/Blob in Chrome incognito is transferred in string chunks
+ * @param {VM.Xhr.Content} req
+ * @param {VM.Xhr.Message.BG} msg
+ * @return {Promise<Blob|ArrayBuffer>}
+ */
 function receiveAllChunks(req, msg) {
   pickIntoNullObj(req, msg, ['dataSize', 'contentType']);
   req.arr = new SafeUint8Array(req.dataSize);
@@ -120,6 +140,10 @@ function receiveAllChunks(req, msg) {
     : finishChunks(req);
 }
 
+/**
+ * @param {VM.Xhr.Content} req
+ * @param {VM.Xhr.Message.Chunk} chunk
+ */
 function receiveChunk(req, { data, pos, last }) {
   processChunk(req, data, pos);
   if (last) {
@@ -129,6 +153,11 @@ function receiveChunk(req, { data, pos, last }) {
   }
 }
 
+/**
+ * @param {VM.Xhr.Content} req
+ * @param {string} data
+ * @param {number} pos
+ */
 function processChunk(req, data, pos) {
   const { arr } = req;
   data = safeAtob(data);
@@ -137,6 +166,10 @@ function processChunk(req, data, pos) {
   }
 }
 
+/**
+ * @param {VM.Xhr.Content} req
+ * @return {Blob|ArrayBuffer}
+ */
 function finishChunks(req) {
   const { arr } = req;
   delete req.arr;

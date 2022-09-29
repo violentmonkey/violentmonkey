@@ -10,7 +10,7 @@ export const script = {
   update: commands.ParseScript,
   /**
    * List all available scripts, without script code
-   * @return {Promise<VMScript[]>}
+   * @return {Promise<VM.Script[]>}
    */
   list: async () => getScripts(),
   /**

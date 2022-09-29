@@ -159,7 +159,7 @@ export function getScriptName(script) {
 }
 
 /**
- * @param {VMScript} script
+ * @param {VM.Script} script
  * @param {boolean} [all] - to return all two urls (1: check, 2: download)
  * @return {Array<string>|string|void}
  */
@@ -244,7 +244,7 @@ export function makeDataUri(raw, url) {
 }
 
 /**
- * @param {VMRequestResponse} response
+ * @param {VM.Req.Response} response
  * @param {boolean} [noJoin]
  * @returns {string|string[]}
  */

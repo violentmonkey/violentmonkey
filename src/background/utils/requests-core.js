@@ -6,22 +6,7 @@ import { extensionOrigin } from './init';
 let encoder;
 
 export const VM_VERIFY = getUniqId('VM-Verify');
-/** @typedef {{
-  anonymous: boolean,
-  blobbed: boolean,
-  cb: function(Object),
-  chunked: boolean,
-  coreId: number,
-  eventsToNotify: string[],
-  id: number,
-  noNativeCookie: boolean,
-  responseHeaders: string,
-  storeId: string,
-  tabId: number,
-  url: string,
-  xhr: XMLHttpRequest,
-}} VMHttpRequest */
-/** @type {Object<string,VMHttpRequest>} */
+/** @type {Object<string,VM.Xhr.BG>} */
 export const requests = { __proto__: null };
 export const verify = { __proto__: null };
 export const FORBIDDEN_HEADER_RE = re`/
@@ -52,7 +37,7 @@ export const FORBIDDEN_HEADER_RE = re`/
   upgrade|
   via
 )$/ix`;
-/** @type chrome.webRequest.RequestFilter */
+/** @type {chrome.webRequest.RequestFilter} */
 const API_FILTER = {
   urls: ['<all_urls>'],
   types: ['xmlhttprequest'],
@@ -120,7 +105,7 @@ function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
 
 /**
  * @param {string} headerValue
- * @param {VMHttpRequest} req
+ * @param {VM.Xhr.BG} req
  * @param {string} url
  */
 function setCookieInStore(headerValue, req, url) {

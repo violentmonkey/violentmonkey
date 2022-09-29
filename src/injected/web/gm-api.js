@@ -99,6 +99,7 @@ export function makeGmApi() {
     },
     GM_download(arg1, name) {
       // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
+      /** @type {VMScriptGMDownloadOptions} */
       const opts = createNullObj();
       let onload;
       if (isString(arg1)) {
@@ -205,6 +206,12 @@ function webAddElement(parent, tag, attrs, context) {
   ));
 }
 
+/**
+ * @param {VM.Injected.Context} context
+ * @param name
+ * @param isBlob
+ * @param isBlobAuto
+ */
 function getResource(context, name, isBlob, isBlobAuto) {
   let res;
   const { id, resCache, resources } = context;
