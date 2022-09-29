@@ -139,6 +139,7 @@ import { forEachEntry, mapEntry } from '@/common/object';
 import options from '@/common/options';
 import optionsDefaults from '@/common/options-defaults';
 import hookSetting from '@/common/hook-setting';
+import { focusMe } from '@/common/ui';
 import LocaleGroup from '@/common/ui/locale-group';
 import loadZip from '@/common/zip';
 import VmImport from './vm-import';
@@ -252,6 +253,7 @@ export default {
       });
     },
   },
+  activated: focusMe,
   created() {
     this.revokers = [];
     items::forEachEntry(([name, { normalize = normalizeEnum }]) => {

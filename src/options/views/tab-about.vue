@@ -26,7 +26,7 @@
 </template>
 
 <script>
-
+import { focusMe } from '@/common/ui';
 
 export default {
   data() {
@@ -37,6 +37,7 @@ export default {
       language: browser.i18n.getUILanguage(),
     };
   },
+  activated: focusMe,
 };
 </script>
 
