@@ -233,7 +233,11 @@ export async function requestLocalFile(url, options = {}) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     /** @type {VMReq.Response} */
-    const result = {};
+    const result = {
+      headers: {
+        get: name => xhr.getResponseHeader(name),
+      },
+    };
     const { responseType } = options;
     xhr.open('GET', url, true);
     if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
