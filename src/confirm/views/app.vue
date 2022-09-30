@@ -603,6 +603,7 @@ $infoIconSize: 18px;
     }
     .lists dd {
       max-height: 30vh;
+      display: block;
     }
     .edit-externals {
       border-top: none;
