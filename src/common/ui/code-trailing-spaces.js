@@ -7,12 +7,14 @@ const DEFAULTS = {
   [KILL_OPT]: true,
   [SHOW_OPT]: true,
 };
+/** Regexp's \s minus \r\n */
+const WS_RE = /[\u0020\f\t\v\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]+$/gm;
 
 export const killTrailingSpaces = (cm, placeholders) => {
   const text = cm.getValue();
   const shouldKill = cm.options[KILL_OPT];
   const trimmed = shouldKill
-    ? text.replace(/\s+$/gm, '\n')
+    ? text.replace(WS_RE, '\n')
     : text;
   if (text !== trimmed) {
     cm.operation(() => {
