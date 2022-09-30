@@ -244,7 +244,7 @@ export function makeDataUri(raw, url) {
 }
 
 /**
- * @param {VMRequestResponse} response
+ * @param {VMReq.Response} response
  * @param {boolean} [noJoin]
  * @returns {string|string[]}
  */

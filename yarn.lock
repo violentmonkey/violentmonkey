@@ -2079,6 +2079,11 @@
   dependencies:
     "@babel/runtime" "^7.16.7"
 
+"@violentmonkey/types@0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@violentmonkey/types/-/types-0.1.4.tgz#90411ed402e5ed16ee76cd2cb47c884db59eb348"
+  integrity sha512-ckaN0UbxRYNyJH+UuyeRgTpkwAZWtR5g1VXnd8ufWtQQmJkrlOFPGazIp3F+CuJx/6VhLH4Nn+3GdjyE6WrsUA==
+
 "@volar/code-gen@0.40.13":
   version "0.40.13"
   resolved "https://registry.yarnpkg.com/@volar/code-gen/-/code-gen-0.40.13.tgz#cd69a67b11462b93d79ea2139f9f1e0a76e15111"

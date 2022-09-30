@@ -8,10 +8,15 @@ import {
 } from './requests-core';
 
 Object.assign(commands, {
-  /** @return {void} */
+  /**
+   * @param {GMReq.Message.Web} opts
+   * @param {MessageSender} src
+   * @return {Promise<void>}
+   */
   HttpRequest(opts, src) {
     const { tab: { id: tabId }, frameId } = src;
     const { id, eventsToNotify } = opts;
+    /** @type {GMReq.BG} */
     requests[id] = {
       id,
       tabId,
@@ -55,7 +60,7 @@ function blob2objectUrl(response) {
   return url;
 }
 
-/** @param {VMHttpRequest} req */
+/** @param {GMReq.BG} req */
 function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
   let contentType;
@@ -109,6 +114,7 @@ function xhrCallbackWrapper(req) {
         id,
         numChunks,
         type,
+        /** @type {VMScriptResponseObject} */
         data: shouldNotify && {
           finalUrl: req.url || xhr.responseURL,
           ...getResponseHeaders(),
@@ -142,8 +148,8 @@ function xhrCallbackWrapper(req) {
 }
 
 /**
- * @param {Object} opts
- * @param {chrome.runtime.MessageSender | browser.runtime.MessageSender} src
+ * @param {GMReq.Message.Web} opts
+ * @param {MessageSender} src
  * @param {function} cb
  */
 async function httpRequest(opts, src, cb) {
@@ -215,7 +221,7 @@ async function httpRequest(opts, src, cb) {
   xhr.send(body);
 }
 
-/** @param {VMHttpRequest} req */
+/** @param {GMReq.BG} req */
 function clearRequest({ id, coreId }) {
   delete verify[coreId];
   delete requests[id];

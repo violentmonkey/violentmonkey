@@ -136,7 +136,7 @@ export default {
         close: this.close,
       },
       confirmHotkey: CONFIRM_HOTKEY,
-      /** @type VMConfirmCache */
+      /** @type {VM.ConfirmCache} */
       info: {},
       deps: {}, // combines `this.require` and `this.resources` = all actually loaded deps
       descr: '',
@@ -238,7 +238,7 @@ export default {
       }
     },
     async parseMeta() {
-      /** @type {VMScriptMeta} */
+      /** @type {VMScript.meta} */
       const meta = await sendCmdDirectly('ParseMeta', this.code);
       const name = getLocaleString(meta, 'name');
       document.title = `${name.slice(0, MAX_TITLE_NAME_LEN)}${name.length > MAX_TITLE_NAME_LEN ? '...' : ''} - ${

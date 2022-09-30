@@ -221,12 +221,23 @@ const binaryTypes = [
   'blob',
   'arraybuffer',
 ];
+
+/**
+ * @param {string} url
+ * @param {VMReq.Options} options
+ * @return {Promise<VMReq.Response>}
+ */
 export async function requestLocalFile(url, options = {}) {
   // only GET method is allowed for local files
   // headers is meaningless
   return new Promise((resolve, reject) => {
-    const result = {};
     const xhr = new XMLHttpRequest();
+    /** @type {VMReq.Response} */
+    const result = {
+      headers: {
+        get: name => xhr.getResponseHeader(name),
+      },
+    };
     const { responseType } = options;
     xhr.open('GET', url, true);
     if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
@@ -280,17 +291,11 @@ const isLocalUrlRe = re`/^(
 export const isDataUri = url => /^data:/i.test(url);
 export const isRemote = url => url && !isLocalUrlRe.test(decodeURI(url));
 
-/** @typedef {{
-  url: string,
-  status: number,
-  headers: Headers,
-  data: string|ArrayBuffer|Blob|Object
-}} VMRequestResponse */
 /**
  * Make a request.
  * @param {string} url
- * @param {RequestInit} options
- * @return Promise<VMRequestResponse>
+ * @param {VMReq.Options} options
+ * @return {Promise<VMReq.Response>}
  */
 export async function request(url, options = {}) {
   // fetch does not support local file

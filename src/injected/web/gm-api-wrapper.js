@@ -21,7 +21,7 @@ let gmApi;
 let componentUtils;
 
 /**
- * @param {VMScript & VMInjectedScript} script
+ * @param {VMInjection.Script} script
  * @returns {Object}
  */
 export function makeGmApiWrapper(script) {
@@ -37,7 +37,6 @@ export function makeGmApiWrapper(script) {
   }
   const { id } = script.props;
   const resources = createNullObj(meta.resources);
-  /** @namespace VMInjectedScript.Context */
   const context = {
     id,
     script,
@@ -148,9 +147,6 @@ function makeGmInfo(script, resources) {
 function makeGmMethodCaller(gmMethod, context, isAsync) {
   // keeping the native console.log intact
   if (gmMethod === gmApi.GM_log) return gmMethod;
-  if (isAsync) {
-    /** @namespace VMInjectedScript.Context */
-    context = assign({ __proto__: null, async: true }, context);
-  }
+  if (isAsync) context = assign({ __proto__: null, async: true }, context);
   return vmOwnFunc(gmMethod::bind(context));
 }

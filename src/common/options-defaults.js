@@ -6,8 +6,7 @@ export default {
   // ignoreGrant: false,
   lastUpdate: 0,
   lastModified: 0,
-  /** @typedef {'unique' | 'total' | ''} VMBadgeMode */
-  /** @type VMBadgeMode */
+  /** @type {VMBadgeMode} */
   showBadge: 'unique',
   badgeColor: '#880088',
   badgeColorBlocked: '#888888',
@@ -30,19 +29,19 @@ export default {
   notifyUpdates: false,
   notifyUpdatesGlobal: false, // `true` ignores script.config.notifyUpdates
   version: null,
-  /** @type {'auto' | 'page' | 'content'} */
+  /** @type {VMScriptInjectInto} */
   defaultInjectInto: INJECT_AUTO,
   xhrInject: false,
   filters: {
     /** @type {'name' | 'code' | 'all'} */
     searchScope: 'name',
-    /** @type boolean */
+    /** @type {boolean} */
     showOrder: false,
     /** @type {'exec' | 'alpha' | 'update'} */
     sort: 'exec',
-    /** @type boolean */
+    /** @type {boolean} */
     viewSingleColumn: false,
-    /** @type boolean */
+    /** @type {boolean} */
     viewTable: false,
   },
   filtersPopup: {
@@ -76,7 +75,6 @@ export default {
 // ==/UserScript==
 `,
   showAdvanced: true,
-  /** @typedef {'' | 'dark' | 'light'} VMUiTheme */
-  /** @type VMUiTheme */
+  /** @type {'' | 'dark' | 'light'} */
   uiTheme: '',
 };
