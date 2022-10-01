@@ -19,7 +19,6 @@ export const INJECT_MAPPING = {
 // The SPACE must be on the same line and specifically \x20 as \s would also match \r\n\t
 // Note: when there's no valid metablock, an empty string is matched for convenience
 export const METABLOCK_RE = /(?:^|\n)\s*\/\/\x20==UserScript==([\s\S]*?\n)\s*\/\/\x20==\/UserScript==|$/;
-export const ICON_PREFIX = '/public/images/icon';
 export const INJECTABLE_TAB_URL_RE = /^(https?|file|ftps?):/;
 export const WATCH_STORAGE = 'watchStorage';
 
@@ -32,3 +31,6 @@ export const TIMEOUT_MAX = 0x7FFF_FFFF;
 export const TIMEOUT_HOUR = 60 * 60 * 1000;
 export const TIMEOUT_24HOURS = 24 * 60 * 60 * 1000;
 export const TIMEOUT_WEEK = 7 * 24 * 60 * 60 * 1000;
+
+export const ICON_PREFIX = !process.env.IS_INJECTED
+  && browser.runtime.getURL('/public/images/icon');
