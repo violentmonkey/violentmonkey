@@ -1,9 +1,11 @@
+/* tslint:disable:no-namespace */
 //#region Generic
 
 declare type NumBool = 0 | 1
 /** null means "default" or "inherit from global" */
 declare type NumBoolNull = 0 | 1 | null
 declare type StringMap = { [key: string]: string }
+declare type PlainJSONValue = browser.extensionTypes.PlainJSONValue;
 
 //#endregion Generic
 //#region GM-specific
@@ -28,7 +30,7 @@ declare namespace GMReq {
   interface BG {
     anonymous: boolean;
     blobbed: boolean;
-    cb: Function;
+    cb: (data: GMReq.Message.BG | GMReq.Message.Chunk) => Promise<void>;
     chunked: boolean;
     coreId: number;
     eventsToNotify: string[];
@@ -47,7 +49,7 @@ declare namespace GMReq {
     eventsToNotify: EventType[];
     fileName: string;
     arr?: Uint8Array;
-    resolve?: Function;
+    resolve?: (data: any) => void;
     dataSize?: number;
     contentType?: string;
     gotChunks?: boolean;
@@ -258,7 +260,7 @@ declare namespace VMReq {
     url: string;
     status: number;
     headers: Headers;
-    data: string | ArrayBuffer | Blob | Object;
+    data: string | ArrayBuffer | Blob | PlainJSONValue;
   }
 }
 declare type VMSearchOptions = {
