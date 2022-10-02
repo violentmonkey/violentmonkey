@@ -4,6 +4,7 @@ import { WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
 import { store } from './db';
 import storage, { S_SCRIPT_PRE } from './storage';
+import { clearValueOpener } from './values';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
  so that we can supersede an earlier chained request if it's obsolete now,
@@ -127,10 +128,11 @@ window[WATCH_STORAGE] = fn => {
 };
 browser.runtime.onConnect.addListener(port => {
   if (!port.name.startsWith(WATCH_STORAGE)) return;
-  const { id, cfg } = JSON.parse(port.name.slice(WATCH_STORAGE.length));
+  const { id, cfg, tabId } = JSON.parse(port.name.slice(WATCH_STORAGE.length));
   const fn = id ? watchers[id] : port.postMessage.bind(port);
   watchStorage(fn, cfg);
   port.onDisconnect.addListener(() => {
+    clearValueOpener(tabId || port.sender.tab.id);
     watchStorage(fn, cfg, false);
     delete watchers[id];
   });

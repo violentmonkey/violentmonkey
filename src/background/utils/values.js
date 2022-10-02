@@ -11,6 +11,11 @@ let chain = Promise.resolve();
 let toSend = {};
 
 Object.assign(commands, {
+  async GetValueStore(id, { tab }) {
+    const frames = nest(nest(openers, id), tab.id);
+    const values = frames[0] || (frames[0] = await storage.value.getOne(id));
+    return values;
+  },
   /**
    * @param {Object} data - key can be an id or a uri
    * @return {Promise<void>}
@@ -34,7 +39,7 @@ Object.assign(commands, {
     const values = objectGet(openers, [id, tab.id, frameId]);
     if (values) { // preventing the weird case of message arriving after the page navigated
       if (raw) values[key] = raw; else delete values[key];
-      nest(toSend, id)[key] = raw || null;
+      if (tab.id >= 0) nest(toSend, id)[key] = raw || null;
       commit({ [id]: values });
       return chain;
     }
@@ -64,7 +69,7 @@ export function clearValueOpener(tabId, frameId) {
 /**
  * @param {number} tabId
  * @param {number} frameId
- * @param {VMInjection.Script[]}
+ * @param {VMInjection.Script[]} injectedScripts
  */
 export function addValueOpener(tabId, frameId, injectedScripts) {
   injectedScripts.forEach(script => {

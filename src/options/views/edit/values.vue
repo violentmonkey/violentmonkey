@@ -47,23 +47,24 @@
          @keydown.up.exact="onUpDown"
          v-if="trash">
       <!-- eslint-disable-next-line vue/no-unused-vars -->
-      <div v-for="([key, val, displayVal, len], trashKey) in trash" :key="trashKey"
+      <div v-for="({ key, cut, len }, trashKey) in trash" :key="trashKey"
            class="edit-values-row flex"
            @click="onRestore(trashKey)">
         <a class="ellipsis" v-text="key" tabindex="0"/>
-        <s class="ellipsis flex-auto" v-text="displayVal"/>
+        <s class="ellipsis flex-auto" v-text="cut"/>
         <pre v-text="len"/>
       </div>
     </div>
-    <div class="edit-values-empty mt-1" v-if="!keys.length" v-text="i18n('noValues')"/>
+    <div class="edit-values-empty mt-1" v-if="!loading && !keys.length" v-text="i18n('noValues')"/>
     <div class="edit-values-panel flex flex-col mb-1c" v-if="current">
       <div class="control">
         <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
         <div>
           <button v-text="i18n('editValueSave')" @click="onSave"
+                  class="save"
                   :class="{'has-error': current.error}"
                   :title="current.error"
-                  :disabled="current.error || current.value === initial"/>
+                  :disabled="current.error || !current.dirty"/>
           <button v-text="i18n('editValueCancel')" @click="onCancel"></button>
         </div>
       </div>
@@ -77,12 +78,12 @@
       <label>
         <span v-text="current.isAll ? i18n('valueLabelValueAll') : i18n('valueLabelValue')"/>
         <!-- TODO: use CodeMirror in json mode -->
-        <textarea v-model="current.value"
-                  ref="value"
-                  class="h100 monospace-font"
-                  spellcheck="false"
-                  @input="onChange"
-                  @keydown.esc.exact.stop="onCancel"/>
+        <vm-code v-model="current.value"
+                 ref="value"
+                 class="h-100 mt-1"
+                 mode="application/json"
+                 @code-dirty="onChange"
+                 :commands="{ close: onCancel, save: onSave }"/>
       </label>
     </div>
   </div>
@@ -93,6 +94,7 @@ import { dumpScriptValue, formatByteLength, isEmpty, sendCmdDirectly } from '@/c
 import { handleTabNavigation, keyboardService } from '@/common/keyboard';
 import { deepCopy, deepEqual, mapEntry } from '@/common/object';
 import { WATCH_STORAGE } from '@/common/consts';
+import VmCode from '@/common/ui/code';
 import Icon from '@/common/ui/icon';
 import { showMessage } from '@/common/ui';
 import { store } from '../../utils';
@@ -101,7 +103,8 @@ const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;
 const MAX_JSON_DURATION = 10; // ms
 let focusedElement;
-
+const currentObservables = { error: '', dirty: false };
+const cutLength = s => (s.length > MAX_LENGTH ? s.slice(0, MAX_LENGTH) : s);
 const reparseJson = (str) => {
   try {
     return JSON.stringify(JSON.parse(str), null, '  ');
@@ -114,16 +117,20 @@ const getActiveElement = () => document.activeElement;
 const flipPage = (vm, dir) => {
   vm.page = Math.max(1, Math.min(vm.totalPages, vm.page + dir));
 };
+/** Uses a negative tabId which is recognized in bg::values.js */
+const fakeSender = () => ({ tab: { id: Math.random() - 2 }, frameId: 0 });
 const conditionNotEdit = { condition: '!edit' };
 
 export default {
   props: ['active', 'script'],
   components: {
     Icon,
+    VmCode,
   },
   data() {
     return {
       current: null,
+      loading: true,
       page: null,
       values: null,
       trash: null,
@@ -148,12 +155,15 @@ export default {
   },
   watch: {
     active(val) {
+      const id = this.script.props.id;
       if (val) {
-        (this.current ? this.$refs.value : focusedElement)?.focus();
-        sendCmdDirectly('Storage', ['value', 'getOne', this.script.props.id]).then(data => {
-          if (!this.values && this.setData(data) && this.keys.length) {
+        (this.current ? this.cm : focusedElement)?.focus();
+        sendCmdDirectly('GetValueStore', id, undefined, this.sender = fakeSender()).then(data => {
+          const isFirstTime = !this.values;
+          if (this.setData(data) && isFirstTime && this.keys.length) {
             this.autofocus(true);
           }
+          this.loading = false;
         });
         this.disposeList = [
           keyboardService.register('pageup', () => flipPage(this, -1), conditionNotEdit),
@@ -168,8 +178,9 @@ export default {
         const bg = browser.extension.getBackgroundPage();
         this[WATCH_STORAGE] = browser.runtime.connect({
           name: WATCH_STORAGE + JSON.stringify({
-            cfg: { value: this.script.props.id },
+            cfg: { value: id },
             id: bg?.[WATCH_STORAGE](fn),
+            tabId: this.sender.tab.id,
           }),
         });
         if (!bg) this[WATCH_STORAGE].onMessage.addListener(fn);
@@ -181,11 +192,22 @@ export default {
     current(val, oldVal) {
       if (val) {
         focusedElement = getActiveElement();
-        this.initial = val.value;
         this.$nextTick(() => {
-          const el = this.$refs[val.isNew ? 'key' : 'value'];
-          el.setSelectionRange(0, 0);
-          el.focus();
+          const refs = this.$refs;
+          const vmCode = refs.value;
+          const { cm } = vmCode;
+          this.cm = cm;
+          if (oldVal) {
+            vmCode.updateValue(val.value); // focuses CM, which we may override in isNew below
+          }
+          if (val.isNew) {
+            const el = refs.key;
+            el.setSelectionRange(0, 0);
+            el.focus();
+          } else {
+            cm.setCursor(0, 0);
+            cm.focus();
+          }
         });
       } else if (oldVal) {
         focusedElement?.focus();
@@ -202,20 +224,17 @@ export default {
         this.$refs.editAll[andClick ? 'click' : 'focus']();
       });
     },
-    getLength(key) {
-      const len = this.values[key].length - 1;
+    getLength(key, raw) {
+      const len = (this.values[key] || raw).length - 1;
       return len < 10_000 ? len : formatByteLength(len);
     },
-    getValue(key, sliced) {
-      let value = this.values[key];
+    getValue(key, sliced, raw) {
+      let value = this.values[key] || raw;
       const type = value[0];
       value = value.slice(1);
       if (type === 's') value = JSON.stringify(value);
       else if (!sliced) value = reparseJson(value);
-      if (sliced && value.length > MAX_LENGTH) {
-        value = value.slice(0, MAX_LENGTH);
-      }
-      return value;
+      return sliced ? cutLength(value) : value;
     },
     getValueAll() {
       return `{\n  ${
@@ -243,7 +262,7 @@ export default {
       rawValue = dumpScriptValue(jsonValue) || '',
     }) {
       const { id } = this.script.props;
-      return sendCmdDirectly('UpdateValue', { id, key, raw: rawValue })
+      return sendCmdDirectly('UpdateValue', { id, key, raw: rawValue }, undefined, this.sender)
       .then(() => {
         if (rawValue) {
           this.$set(this.values, key, rawValue);
@@ -258,38 +277,40 @@ export default {
         isNew: true,
         key: '',
         value: '',
+        ...currentObservables,
       };
     },
     async onRemove(key) {
-      (this.trash || (this.trash = {}))[key + Math.random()] = [
+      this.updateValue({ key });
+      (this.trash || (this.trash = {}))[key + Math.random()] = {
         key,
-        this.values[key],
-        this.getValue(key, true),
-        this.getLength(key),
-      ];
-      await this.updateValue({ key });
+        rawValue: this.values[key],
+        cut: this.getValue(key, true),
+        len: this.getLength(key),
+      };
       if (this.current?.key === key) {
         this.current = null;
       }
     },
     onRestore(trashKey) {
       const { trash } = this;
-      const [key, rawValue] = trash[trashKey];
+      const { key, rawValue } = trash[trashKey];
       delete trash[trashKey];
       if (isEmpty(trash)) this.trash = null;
       this.updateValue({ key, rawValue });
     },
     onEdit(key) {
       this.current = {
-        isNew: false,
         key,
         value: this.getValue(key),
+        ...currentObservables,
       };
     },
     onEditAll() {
       this.current = {
         isAll: true,
         value: this.getValueAll(),
+        ...currentObservables,
       };
     },
     async onSave() {
@@ -299,9 +320,10 @@ export default {
         this.onChange();
       }
       if (current.error) {
-        const pos = +current.error.match(/position\s+(\d+)|$/)[1] || 0;
-        this.$refs.value.setSelectionRange(pos, pos + 1);
-        this.$refs.value.focus();
+        const { cm } = this;
+        const pos = current.errorPos;
+        cm.setSelection(pos, { line: pos.line, ch: pos.ch + 1 });
+        cm.focus();
         showMessage({ text: current.error });
         return;
       }
@@ -315,18 +337,35 @@ export default {
       }
     },
     onCancel() {
+      const cur = this.current;
+      if (cur.dirty) {
+        const key = `${cur.key} ${Math.random() * 1e9 | 0}`;
+        const val = this.cm.getValue();
+        const rawValue = dumpScriptValue(val);
+        (this.trash || (this.trash = {}))[key] = {
+          key,
+          rawValue,
+          cut: cutLength(val),
+          len: this.getLength(key, rawValue),
+        };
+      }
       this.current = null;
     },
-    onChange() {
+    onChange(isChanged) {
       const { current } = this;
+      current.dirty = isChanged;
       current.error = null;
       if (current.jsonPaused) return;
+      const { cm } = this;
       const t0 = performance.now();
-      const str = current.value.trim();
       try {
-        current.jsonValue = str ? JSON.parse(str) : undefined;
+        const str = cm.getValue();
+        current.jsonValue = str.trim() ? JSON.parse(str) : undefined;
       } catch (e) {
-        current.error = e.message || e;
+        const re = /(position\s+)(\d+)|$/;
+        const pos = cm.posFromIndex(+`${e}`.match(re)[2] || 0);
+        current.error = `${e}`.replace(re, `$1${pos.line + 1}:${pos.ch + 1}`);
+        current.errorPos = pos;
         current.jsonValue = undefined;
       }
       current.jsonPaused = performance.now() - t0 > MAX_JSON_DURATION;
@@ -336,12 +375,12 @@ export default {
       if (data) {
         const { current } = this;
         const currentKey = current?.key;
-        const valueGetter = current && (currentKey ? this.getValue : this.getValueAll);
+        const valueGetter = current && (current.isAll ? this.getValueAll : this.getValue);
         const oldText = valueGetter && valueGetter(currentKey);
         this.setData(data instanceof Object ? data : deepCopy(data));
         if (current) {
           const newText = valueGetter(currentKey);
-          const curText = current.value;
+          const curText = this.cm.getValue();
           if (curText === newText) {
             current.isNew = false;
           } else if (curText === oldText) {
@@ -367,9 +406,11 @@ export default {
 </script>
 
 <style>
+$lightBorder: 1px solid var(--fill-2);
+
 .edit-values {
   &-row {
-    border: 1px solid var(--fill-2);
+    border: $lightBorder;
     cursor: pointer;
     .main > &:first-child {
       padding: 8px 6px;
@@ -386,7 +427,7 @@ export default {
         max-width: 240px;
       }
       &:not(:first-child) {
-        border-left: 1px solid var(--fill-2);
+        border-left: $lightBorder;
       }
     }
     pre {
@@ -442,21 +483,22 @@ export default {
     label {
       display: flex;
       flex-direction: column;
-      &:last-child,
-      &:last-child textarea {
+      &:last-child {
         flex: auto;
         height: 0;
       }
-      > textarea, input {
+      > input {
         margin: .25em 0;
         padding: .25em;
       }
     }
-    textarea {
-      width: 100%;
-      word-break: break-all;
-      resize: none;
-    }
+  }
+  .save:not([disabled]) {
+    background-color: gold;
+    color: #000;
+  }
+  .CodeMirror {
+    border: $lightBorder;
   }
 }
 </style>
