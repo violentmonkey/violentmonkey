@@ -1,9 +1,9 @@
 import { debounce, ensureArray, initHooks, isEmpty } from '@/common';
 import initCache from '@/common/cache';
 import { WATCH_STORAGE } from '@/common/consts';
-import { deepCopy, deepCopyDiff, forEachEntry } from '@/common/object';
+import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
 import { store } from './db';
-import storage from './storage';
+import storage, { S_SCRIPT_PRE } from './storage';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
  so that we can supersede an earlier chained request if it's obsolete now,
@@ -80,6 +80,7 @@ storage.api = {
           keys.push(key);
           toWrite[key] = val;
           updateScriptMap(key, val);
+          updateScriptSizeContributor(key, val);
         }
       }
     });
@@ -104,6 +105,7 @@ storage.api = {
           ok = false;
         } else {
           updateScriptMap(key);
+          updateScriptSizeContributor(key);
         }
       }
       return ok;
@@ -167,6 +169,13 @@ function updateScriptMap(key, val) {
   if (id) {
     if (val) scriptMap[id] = val;
     else delete scriptMap[id];
+  }
+}
+
+async function updateScriptSizeContributor(key, val) {
+  const area = store.sizesPrefixRe.exec(key);
+  if (area && area[0] !== S_SCRIPT_PRE) {
+    store.sizes[key] = deepSize(val);
   }
 }
 

@@ -11,13 +11,20 @@ import { preInitialize } from './init';
 import { commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
-import storage from './storage';
+import storage, {
+  S_CACHE, S_CODE, S_REQUIRE, S_VALUE,
+  S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
+} from './storage';
 
 export const store = {
   /** @type {VMScript[]} */
   scripts: [],
   /** @type {Object<string,VMScript[]>} */
   scriptMap: {},
+  /** @type {{ [url:string]: number }} */
+  sizes: {},
+  /** Same order as in SIZE_TITLES and getSizes */
+  sizesPrefixRe: RegExp(`^(${S_CODE_PRE}|${S_SCRIPT_PRE}|${S_VALUE_PRE}|${S_REQUIRE_PRE}|${S_CACHE_PRE}${S_MOD_PRE})`),
   storeInfo: {
     id: 0,
     position: 0,
@@ -99,18 +106,9 @@ preInitialize.push(async () => {
   const data = await storage.base.getMulti();
   const { scripts, storeInfo, scriptMap } = store;
   const uriMap = {};
-  const mods = [];
-  const toRemove = [];
-  const resUrls = new Set();
-  /** @this {StringMap} */
-  const rememberUrl = function _(url) {
-    if (url && !isDataUri(url)) {
-      resUrls.add(this[url] || url);
-    }
-  };
   data::forEachEntry(([key, script]) => {
-    let id = +storage.script.toId(key);
-    if (id) {
+    const id = +storage.script.toId(key);
+    if (id && script) {
       if (scriptMap[id] && scriptMap[id] !== script) {
         // ID conflicts!
         // Should not happen, discard duplicates.
@@ -137,29 +135,13 @@ preInitialize.push(async () => {
       scripts.push(script);
       // listing all known resource urls in order to remove unused mod keys
       const {
-        custom,
         meta = script.meta = {},
       } = script;
-      const {
-        pathMap = custom.pathMap = {},
-      } = custom;
-      const {
-        require = meta.require = [],
-        resources = meta.resources = {},
-      } = meta;
+      if (!meta.require) meta.require = [];
+      if (!meta.resources) meta.resources = {};
       meta.grant = [...new Set(meta.grant || [])]; // deduplicate
-      require.forEach(rememberUrl, pathMap);
-      resources::forEachValue(rememberUrl, pathMap);
-      pathMap::rememberUrl(meta.icon);
-      getScriptUpdateUrl(script, true)?.forEach(rememberUrl, pathMap);
-    } else if ((id = storage.mod.toId(key))) {
-      mods.push(id);
-    } else if (/^\w+:data:/.test(key)) { // VM before 2.13.2 stored them unnecessarily
-      toRemove.push(key);
     }
   });
-  storage.base.remove(toRemove);
-  storage.mod.remove(mods.filter(url => !resUrls.has(url)));
   // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
   if (version !== lastVersion
   && IS_FIREFOX
@@ -244,10 +226,6 @@ export const ENV_SCRIPTS = 'scripts';
 export const ENV_VALUE_IDS = 'valueIds';
 const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Value)$/;
 const RUN_AT_RE = /^document-(start|body|end|idle)$/;
-const S_REQUIRE = storage.require.name;
-const S_CACHE = storage.cache.name;
-const S_VALUE = storage.value.name;
-const S_CODE = storage.code.name;
 const STORAGE_ROUTES = {
   [S_CACHE]: ENV_CACHE_KEYS,
   [S_CODE]: 'ids',
@@ -380,11 +358,12 @@ async function readEnvironmentData(env, isRetry) {
  * @desc Get data for dashboard.
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
-export async function getData(ids) {
+export async function getData({ ids, sizes }) {
   const scripts = ids ? ids.map(getScriptById) : store.scripts;
   return {
     scripts,
     cache: await getIconCache(scripts),
+    sizes: sizes && getSizes(ids),
   };
 }
 
@@ -409,24 +388,34 @@ async function getIconCache(scripts) {
   return res;
 }
 
-export async function getSizes(ids) {
+/**
+ * @param {number[]} [ids]
+ * @return {number[][]}
+ */
+export function getSizes(ids) {
   const scripts = ids ? ids.map(getScriptById) : store.scripts;
-  const {
-    [S_CACHE]: cache, [S_CODE]: code, [S_VALUE]: value, [S_REQUIRE]: require,
-  } = await getScriptEnv(scripts, true).promise;
   return scripts.map(({
     meta,
     custom: { pathMap = {} },
     props: { id },
-  }, index) => [
-    code[id]?.length,
-    deepSize(scripts[index]),
-    deepSize(value[id]),
-    meta.require.reduce((len, v) => len
-      + (require[pathMap[v] || v]?.length || 0), 0),
-    Object.entries(meta.resources).reduce((len, e) => len
-      + e[0].length + 4 + (cache[pathMap[e[1]] || e[1]]?.length || 0), 0),
+  }, i) => [
+    // Same order as SIZE_TITLES and sizesPrefixRe
+    store.sizes[S_CODE_PRE + id] || 0,
+    deepSize(scripts[i]),
+    store.sizes[S_VALUE_PRE + id] || 0,
+    meta.require.reduce(getSizeForRequires, { len: 0, pathMap }).len,
+    Object.values(meta.resources).reduce(getSizeForResources, { len: 0, pathMap }).len,
   ]);
+}
+
+function getSizeForRequires(accum, url) {
+  accum.len += (store.sizes[S_REQUIRE_PRE + (accum.pathMap[url] || url)] || 0) + url.length;
+  return accum;
+}
+
+function getSizeForResources(accum, url) {
+  accum.len += (store.sizes[S_CACHE_PRE + (accum.pathMap[url] || url)] || 0) + url.length;
+  return accum;
 }
 
 /** @return {?Promise<void>} only if something was removed, otherwise undefined */
@@ -643,82 +632,82 @@ let _vacuuming;
  */
 export async function vacuum(data) {
   if (_vacuuming) return _vacuuming;
-  let numFixes = 0;
   let resolveSelf;
   _vacuuming = new Promise(r => { resolveSelf = r; });
+  const sizes = {};
   const result = {};
   const toFetch = [];
-  const keysToRemove = [
-    'editorThemeNames', // TODO: remove in 2022
-  ];
-  const valueKeys = {};
-  const cacheKeys = {};
-  const requireKeys = {};
-  const codeKeys = {};
-  const mappings = [
-    [storage[S_VALUE], valueKeys],
-    [storage[S_CACHE], cacheKeys],
-    [storage[S_REQUIRE], requireKeys],
-    [storage[S_CODE], codeKeys],
-  ];
-  if (!data) data = await storage.base.getMulti();
-  data::forEachKey((key) => {
-    mappings.some(([substore, map]) => {
-      const id = substore.toId(key);
-      // -1 for untouched, 1 for touched, 2 for missing
-      if (id) map[id] = -1;
-      return id;
-    });
-  });
-  const touch = (obj, key, scriptId) => {
-    if (obj[key] < 0) {
-      obj[key] = 1;
-    } else if (!obj[key]) {
-      obj[key] = 2 + scriptId;
+  const keysToRemove = [];
+  /** -1=untouched, 1=touched, 2(+scriptId)=missing */
+  const status = {};
+  const prefixRe = RegExp(`^(${S_VALUE_PRE}|${S_CACHE_PRE}|${S_REQUIRE_PRE}|${S_CODE_PRE}${S_MOD_PRE})`);
+  const downloadUrls = {};
+  const touch = (prefix, id, scriptId, pathMap) => {
+    if (!id || pathMap && isDataUri(id)) {
+      return 0;
+    }
+    const key = prefix + (pathMap?.[id] || id);
+    const val = status[key];
+    if (val < 0) {
+      status[key] = 1;
+      if (id !== scriptId) {
+        status[S_MOD_PRE + id] = 1;
+      }
+      if (prefix === S_CACHE_PRE || prefix === S_REQUIRE_PRE || prefix === S_VALUE_PRE) {
+        sizes[key] = deepSize(data[key]) + (prefix === S_VALUE_PRE ? 0 : key.length);
+      }
+    } else if (!val) {
+      status[key] = 2 + scriptId;
     }
   };
-  store.scripts.forEach((script) => {
-    const { id } = script.props;
-    touch(codeKeys, id, id);
-    touch(valueKeys, id, id);
-    if (!script.custom.pathMap) buildPathMap(script);
-    const { pathMap } = script.custom;
-    script.meta.require.forEach((url) => {
-      if (url) touch(requireKeys, pathMap[url] || url, id);
-    });
-    script.meta.resources::forEachValue((url) => {
-      if (url) touch(cacheKeys, pathMap[url] || url, id);
-    });
-    const { icon } = script.meta;
-    if (isRemote(icon)) {
-      const fullUrl = pathMap[icon] || icon;
-      touch(cacheKeys, fullUrl, id);
+  if (!data) data = await storage.base.getMulti();
+  data::forEachKey((key) => {
+    if (prefixRe.test(key)) {
+      status[key] = -1;
     }
   });
-  mappings.forEach(([substore, map]) => {
-    map::forEachEntry(([key, value]) => {
-      if (value < 0) {
-        // redundant value
-        keysToRemove.push(substore.toKey(key));
-        numFixes += 1;
-      } else if (value >= 2 && substore.fetch) {
-        // missing resource
-        keysToRemove.push(storage.mod.toKey(key));
-        toFetch.push(substore.fetch(key).catch(err => `${
-          getScriptName(getScriptById(value - 2))
+  store.sizes = sizes;
+  store.scripts.forEach((script) => {
+    const { meta, props } = script;
+    const { icon } = meta;
+    const { id } = props;
+    const pathMap = script.custom.pathMap || buildPathMap(script);
+    const updUrls = getScriptUpdateUrl(script, true);
+    if (updUrls) {
+      updUrls.forEach(url => touch(S_MOD_PRE, url, id));
+      downloadUrls[id] = updUrls[0];
+    }
+    touch(S_CODE_PRE, id, id);
+    touch(S_VALUE_PRE, id, id);
+    meta.require.forEach(url => touch(S_REQUIRE_PRE, url, id, pathMap));
+    meta.resources::forEachValue(url => touch(S_CACHE_PRE, url, id, pathMap));
+    if (isRemote(icon)) touch(S_CACHE_PRE, icon, id, pathMap);
+  });
+  status::forEachEntry(([key, value]) => {
+    if (value < 0) {
+      // Removing redundant value
+      keysToRemove.push(key);
+    } else if (value >= 2) {
+      // Downloading the missing code or resource
+      const area = storage.forKey(key);
+      const id = area.toId(key);
+      const url = area.name === S_CODE ? downloadUrls[id] : id;
+      if (url && area.fetch) {
+        keysToRemove.push(S_MOD_PRE + url);
+        toFetch.push(area.fetch(url).catch(err => `${
+          getScriptName(getScriptById(+id || value - 2))
         }: ${
           formatHttpError(err)
         }`));
-        numFixes += 1;
       }
-    });
+    }
   });
-  if (numFixes) {
+  if (keysToRemove.length) {
     await storage.base.remove(keysToRemove); // Removing `mod` before fetching
     result.errors = (await Promise.all(toFetch)).filter(Boolean);
   }
   _vacuuming = null;
-  result.fixes = numFixes;
+  result.fixes = toFetch.length + keysToRemove.length;
   resolveSelf(result);
   return result;
 }

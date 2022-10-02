@@ -168,6 +168,8 @@ declare namespace VMScript {
     position: number;
     uri: string;
     uuid: string;
+    /** Added in memory at extension start */
+    sizes?: number[];
   }
 }
 /**
@@ -269,6 +271,12 @@ declare type VMSearchOptions = {
   reuseCursor?: boolean;
   pos?: { line: number, ch: number };
 }
+/** Throws on error */
+declare type VMStorageFetch = (
+  url: string,
+  options?: VMReq.Options,
+  check?: (...args) => void // throws on error
+) => Promise<void>
 declare interface VMUserAgent extends VMScriptGMInfoPlatform {
   /** Chrome/ium version number */
   chrome: number | typeof NaN;

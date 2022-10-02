@@ -32,7 +32,7 @@ async function prefetchSetPopup() {
   const tabId = (await getActiveTab()).id;
   sendTabCmd(tabId, 'PopupShown', true);
   commands.SetPopup = async (data, src) => {
-    Object.assign(data, await getData(data.ids));
+    Object.assign(data, await getData({ ids: data.ids }));
     cache.put('SetPopup', Object.assign({ [src.frameId]: [data, src] }, cache.get('SetPopup')));
   };
 }

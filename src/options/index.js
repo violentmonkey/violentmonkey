@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import '@/common/browser';
-import { formatByteLength, getLocaleString, i18n, makePause, sendCmdDirectly } from '@/common';
+import { formatByteLength, getLocaleString, i18n, sendCmdDirectly } from '@/common';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import options from '@/common/options';
@@ -8,6 +8,7 @@ import '@/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
 
+// Same order as getSizes and sizesPrefixRe
 const SIZE_TITLES = [
   i18n('editNavCode'),
   i18n('editNavSettings'),
@@ -34,8 +35,9 @@ function initialize() {
 
 /**
  * @param {VMScript} script
+ * @param {number[]} sizes
  */
-async function initScript(script) {
+function initScript(script, sizes) {
   const meta = script.meta || {};
   const localeName = getLocaleString(meta, 'name');
   const search = [
@@ -48,35 +50,21 @@ async function initScript(script) {
   ].filter(Boolean).join('\n');
   const name = script.custom.name || localeName;
   const lowerName = name.toLowerCase();
-  script.$cache = { search, name, lowerName, size: '', sizes: '', sizeNum: 0 };
-  loadScriptIcon(script, store.cache, store.HiDPI || -1);
-}
-
-/**
- * @param {number[]} sz
- * @param {VMScript} script
- */
-function initSize(sz, { $cache }) {
   let total = 0;
   let str = '';
-  for (let i = 0, val; i < sz.length; i += 1) {
-    val = sz[i];
+  sizes.forEach((val, i) => {
     total += val;
     if (val) str += `${SIZE_TITLES[i]}: ${formatByteLength(val)}\n`;
-  }
-  $cache.sizes = str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B');
-  $cache.sizeNum = total;
-  $cache.size = formatByteLength(total, true).replace(' ', '');
-}
-
-/**
- * @param {VMScript} script
- */
-async function initScriptAndSize(script) {
-  const res = initScript(script);
-  const [sz] = await sendCmdDirectly('GetSizes', [script.props.id]);
-  initSize(sz, script);
-  return res;
+  });
+  script.$cache = {
+    search,
+    name,
+    lowerName,
+    size: formatByteLength(total, true).replace(' ', ''),
+    sizes: str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B'),
+    sizeNum: total,
+  };
+  loadScriptIcon(script, store.cache, store.HiDPI || -1);
 }
 
 export function loadData() {
@@ -86,14 +74,15 @@ export function loadData() {
 }
 
 async function requestData(ids) {
-  const getDataP = sendCmdDirectly('GetData', ids, { retry: true });
-  const [data] = await Promise.all([getDataP, options.ready]);
-  const { scripts, ...auxData } = data;
-  const getSizesP = sendCmdDirectly('GetSizes', ids, { retry: true })
-  .then(sizes => sizes.forEach((sz, i) => initSize(sz, scripts[i])));
+  const [data] = await Promise.all([
+    sendCmdDirectly('GetData', { ids, sizes: true }, { retry: true }),
+    options.ready,
+  ]);
+  const { scripts, sizes, ...auxData } = data;
   Object.assign(store, auxData); // initScripts needs `cache` in store
-  scripts.forEach(initScript); // modifying scripts without triggering reactivity
-  await Promise.race([makePause(0), getSizesP]); // blocking render for one event loop tick
+  scripts.forEach((script, i) => { // modifying scripts without triggering reactivity
+    initScript(script, sizes[i]);
+  });
   store.scripts = scripts; // now we can render
   store.loading = false;
 }
@@ -110,11 +99,12 @@ function initMain() {
     },
     async UpdateScript({ update, where } = {}) {
       if (!update) return;
+      const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       const { scripts } = store;
       const index = scripts.findIndex(item => item.props.id === where.id);
       const updated = Object.assign({}, scripts[index], update);
       if (updated.error && !update.error) updated.error = null;
-      await initScriptAndSize(updated);
+      initScript(updated, sizes);
       if (index < 0) {
         update.message = '';
         scripts.push(updated);

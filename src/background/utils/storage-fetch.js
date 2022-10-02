@@ -1,7 +1,6 @@
 import { isDataUri, makeRaw, request } from '@/common';
 import storage from './storage';
 
-/** @type { function(url, options, check): Promise<void> } or throws on error */
 storage.cache.fetch = cacheOrFetch({
   init(options) {
     return { ...options, responseType: 'blob' };
@@ -13,7 +12,6 @@ storage.cache.fetch = cacheOrFetch({
   },
 });
 
-/** @type { function(url, options): Promise<void> } or throws on error */
 storage.require.fetch = cacheOrFetch({
   transform: ({ data }, url) => (
     /^\s*</.test(data)
@@ -22,10 +20,12 @@ storage.require.fetch = cacheOrFetch({
   ),
 });
 
+storage.code.fetch = cacheOrFetch();
+
+/** @return {VMStorageFetch} */
 function cacheOrFetch(handlers = {}) {
   const requests = {};
   const { init, transform } = handlers;
-  /** @this StorageArea */
   return function cacheOrFetchHandler(...args) {
     const [url] = args;
     const promise = requests[url] || (requests[url] = this::doFetch(...args));
