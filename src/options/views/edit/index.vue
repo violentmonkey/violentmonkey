@@ -70,7 +70,7 @@ import { keyboardService } from '@/common/keyboard';
 import VmCode from '@/common/ui/code';
 import VmExternals from '@/common/ui/externals';
 import options from '@/common/options';
-import { route, getUnloadSentry } from '@/common/router';
+import { getUnloadSentry } from '@/common/router';
 import { store } from '../../utils';
 import VmSettings from './settings';
 import VmValues from './values';
@@ -144,7 +144,7 @@ const K_NEXT_PANEL = 'Alt-PageDown';
 const compareString = (a, b) => (a < b ? -1 : a > b);
 
 export default {
-  props: ['initial'],
+  props: ['initial', 'initialCode'],
   components: {
     VmCode,
     VmSettings,
@@ -220,14 +220,6 @@ export default {
   async mounted() {
     store.storageSize = 0;
     this.nav = 'code';
-    const id = this.script?.props?.id;
-    if (id) {
-      this.code = await sendCmdDirectly('GetScriptCode', id);
-    } else {
-      const { script, code } = await sendCmdDirectly('NewScript', route.paths[2]);
-      this.script = script;
-      this.code = code;
-    }
     const { custom, config } = this.script;
     const { noframes } = custom;
     this.settings = {
@@ -272,6 +264,7 @@ export default {
         condition: '!tabCode',
       }),
     ];
+    this.code = this.initialCode;
   },
   methods: {
     async save() {

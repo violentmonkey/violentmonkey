@@ -134,7 +134,7 @@
         />
       </div>
     </div>
-    <edit v-if="script" :initial="script" @close="editScript()"></edit>
+    <edit v-if="script" :initial="script" :initial-code="code" @close="editScript()" />
   </div>
 </template>
 
@@ -263,6 +263,7 @@ export default {
       filteredScripts: [],
       focusedIndex: -1,
       script: null,
+      code: '',
       search: null,
       searchError: null,
       modal: null,
@@ -405,14 +406,16 @@ export default {
         setRoute(pathname);
       }
     },
-    onHashChange() {
-      const [tab, id] = this.store.route.paths;
+    async onHashChange() {
+      const [tab, id, cacheId] = this.store.route.paths;
       if (id === '_new') {
-        sendCmdDirectly('NewScript').then(res => { this.script = res.script; });
+        Object.assign(this, await sendCmdDirectly('NewScript', cacheId));
       } else {
         const nid = id && +id || null;
-        this.script = nid && this.scripts.find(script => script.props.id === nid);
-        if (!this.script) {
+        const script = nid && this.scripts.find(s => s.props.id === nid);
+        if (script) {
+          this.code = await sendCmdDirectly('GetScriptCode', id);
+        } else {
           // First time showing the list we need to tell v-if to keep it forever
           if (!this.canRenderScripts) {
             loadData();
@@ -423,6 +426,7 @@ export default {
           // which was hidden to avoid flicker on initial page load directly into the editor.
           if (id) setRoute(tab, true);
         }
+        this.script = script;
       }
     },
     async renderScripts() {
