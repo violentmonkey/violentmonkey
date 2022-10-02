@@ -78,7 +78,7 @@
       <label>
         <span v-text="current.isAll ? i18n('valueLabelValueAll') : i18n('valueLabelValue')"/>
         <!-- TODO: use CodeMirror in json mode -->
-        <vm-code v-model="current.value"
+        <vm-code :value="current.value"
                  ref="value"
                  class="h-100 mt-1"
                  mode="application/json"
@@ -265,9 +265,9 @@ export default {
       return sendCmdDirectly('UpdateValue', { id, key, raw: rawValue }, undefined, this.sender)
       .then(() => {
         if (rawValue) {
-          this.$set(this.values, key, rawValue);
+          this.values[key] = rawValue;
         } else {
-          this.$delete(this.values, key);
+          delete this.values[key];
         }
         this.calcSize();
       });
