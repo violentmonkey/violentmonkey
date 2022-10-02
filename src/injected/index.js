@@ -3,10 +3,12 @@ import { sendCmd } from '@/common'; // eslint-disable-line no-restricted-imports
 import './content';
 
 // Script installation in Firefox as it does not support `onBeforeRequest` for `file:`
-const url = IS_FIREFOX && IS_TOP && global.location.href;
-if (url
-&& /^file:/::regexpTest(url)
-&& /\.user\.js$/::regexpTest(url)) {
+// Using pathname and a case-sensitive check to match webRequest `urls` filter behavior
+if (IS_FIREFOX && IS_TOP
+&& global.location.protocol === 'file:'
+&& global.location.pathname.endsWith('.user.js')
+&& document.contentType === 'application/x-javascript' // FF uses this for file: scheme
+) {
   (async () => {
     const {
       browser,
@@ -15,13 +17,10 @@ if (url
       document: { referrer },
     } = global;
     const { text: getText } = ResponseProto;
-    const fetchOpts = { mode: 'same-origin' };
-    const response = await fetch(url, fetchOpts);
-    if (!/javascript|^text\/plain|^$/::regexpTest(response.headers.get('content-type') || '')) {
-      return;
-    }
+    const url = global.location.href;
+    const fetchCode = async () => (await fetch(url, { mode: 'same-origin' }))::getText();
+    let code = await fetchCode();
     let oldCode;
-    let code = await response::getText();
     if (!/==userscript==/i::regexpTest(code)) {
       return;
     }
@@ -33,7 +32,7 @@ if (url
       browser.runtime.onConnect.addListener(port => {
         if (port.name !== 'FetchSelf') return;
         port.onMessage.addListener(async () => {
-          code = await (await fetch(url, fetchOpts))::getText();
+          code = await fetchCode();
           if (code === oldCode) {
             code = null;
           } else {

@@ -106,6 +106,7 @@ const cmDefaults = {
    * and is big enough to include most of popular minified libraries for the `@resource/@require` viewer. */
   maxDisplayLength: 100_000,
 };
+const cmCommands = CodeMirror.commands;
 
 export default {
   props: {
@@ -161,9 +162,9 @@ export default {
     value: 'updateValue',
   },
   methods: {
-    updateValue() {
-      let { value } = this;
-      const hasLongLines = new RegExp(`^\\s*.{${maxDisplayLength},}`, 'm').test(value);
+    updateValue(value = this.value) {
+      const hasLongLines = value.length > maxDisplayLength
+        && new RegExp(`^\\s*.{${maxDisplayLength},}`, 'm').test(value);
       const { cm } = this;
       if (!cm) return;
       if (hasLongLines) {
@@ -171,8 +172,7 @@ export default {
         this.createPlaceholders({ text: lines, from: { line: 0 } });
         value = lines.join('\n');
       }
-      cm.off('beforeChange', this.onBeforeChange);
-      cm.off('changes', this.onChanges);
+      this.watchCM(false);
       cm.operation(() => {
         cm.setValue(value);
         if (hasLongLines) this.renderPlaceholders();
@@ -180,8 +180,12 @@ export default {
       cm.clearHistory();
       cm.markClean();
       cm.focus();
-      cm.on('changes', this.onChanges);
-      cm.on('beforeChange', this.onBeforeChange);
+      this.watchCM(true);
+    },
+    watchCM(onOff) {
+      onOff = onOff ? 'on' : 'off';
+      this.cm[onOff]('changes', this.onChanges);
+      this.cm[onOff]('beforeChange', this.onBeforeChange);
     },
     onBeforeChange(cm, change) {
       if (this.createPlaceholders(change)) {
@@ -263,8 +267,9 @@ export default {
         replace: () => this.replace(),
         replaceAll: () => this.replace(1),
       }, this.commands);
-      const { insertTab, insertSoftTab } = CodeMirror.commands;
-      Object.assign(CodeMirror.commands, cm.state.commands, {
+      const cmOrigCommands = {};
+      const { insertTab, insertSoftTab } = cmCommands;
+      for (const cmds of [cm.state.commands, {
         autocomplete() {
           cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
         },
@@ -283,7 +288,13 @@ export default {
           (cm.options.indentWithTabs ? insertTab : insertSoftTab)(cm);
         },
         showHelp: this.commands?.showHelp,
-      });
+      }]) {
+        cmds::forEachEntry(([key, val]) => {
+          cmOrigCommands[key] = cmCommands[key];
+          cmCommands[key] = val;
+        });
+      }
+      this.origCommands = cmOrigCommands;
       // these are active in all nav tabs
       cm.setOption('extraKeys', {
         Esc: 'cancel',
@@ -306,6 +317,8 @@ export default {
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
       });
+      if (this.value) this.updateValue();
+      else this.watchCM(true);
       this.$emit('ready', cm);
     },
     onActive(state) {
@@ -577,6 +590,7 @@ export default {
     this.updateValue();
   },
   beforeUnmount() {
+    Object.assign(cmCommands, this.origCommands);
     this.onActive(false);
   },
 };

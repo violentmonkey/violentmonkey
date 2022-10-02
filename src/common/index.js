@@ -58,7 +58,6 @@ const COMMANDS_WITH_SRC = [
   'TabClose',
   'TabFocus',
   'TabOpen',
-  'UpdateValue',
 /*
   These are used only by content scripts where sendCmdDirectly can't be used anyway
   'GetInjected',
@@ -74,10 +73,11 @@ const getBgPage = () => browser.extension.getBackgroundPage?.();
  * Sends the command+data directly so it's synchronous and faster than sendCmd thanks to deepCopy.
  * WARNING! Make sure `cmd` handler doesn't use `src` or `cmd` is listed in COMMANDS_WITH_SRC.
  */
-export function sendCmdDirectly(cmd, data, options) {
+export function sendCmdDirectly(cmd, data, options, fakeSrc) {
   const bg = !COMMANDS_WITH_SRC.includes(cmd) && getBgPage();
-  return bg && bg !== window && bg.deepCopy
-    ? bg.handleCommandMessage(bg.deepCopy({ cmd, data })).then(deepCopy)
+  const bgCopy = bg && bg !== window && bg.deepCopy;
+  return bgCopy
+    ? bg.handleCommandMessage(bgCopy({ cmd, data }), fakeSrc && bgCopy(fakeSrc)).then(deepCopy)
     : sendCmd(cmd, data, options);
 }
 
