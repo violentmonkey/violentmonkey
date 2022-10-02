@@ -56,10 +56,3 @@ exports.optimization = {
     },
   },
 };
-exports.styleOptions = {
-  /* Files in extensions aren't cached so there's no point in extracting separate css,
-   * other than minifying, but the gain is negligible. P.S. Extracting+inlining back in html
-   * doesn't keep the correct order of style elements which breaks appearance when
-   * using style-ext-html-webpack-plugin or html-inline-css-webpack-plugin. */
-  extract: false,
-};
