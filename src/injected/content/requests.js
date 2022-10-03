@@ -2,7 +2,6 @@ import bridge from './bridge';
 import { getFullUrl, makeElem, sendCmd } from './util';
 
 const {
-  cloneInto,
   fetch: safeFetch,
   FileReader: SafeFileReader,
   FormData: SafeFormData,
@@ -34,9 +33,11 @@ bridge.addHandlers({
       'fileName',
     ]);
     msg.url = getFullUrl(msg.url);
-    if (msg.data[1]) {
+    let { data } = msg;
+    if (data[1]) {
       // TODO: support huge data by splitting it to multiple messages
-      msg.data = cloneInto(await encodeBody(msg.data[0], msg.data[1]), msg.data);
+      data = await encodeBody(data[0], data[1]);
+      msg.data = cloneInto ? cloneInto(data, msg) : data;
     }
     sendCmd('HttpRequest', msg);
   },
