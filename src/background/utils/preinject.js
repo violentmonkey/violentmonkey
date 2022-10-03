@@ -271,8 +271,9 @@ function prepare(key, url, tabId, frameId, forceContent) {
  * @return {Promise<any>}
  */
 async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) {
-  const bag = getScriptsByURL(url, !frameId);
-  const { envDelayed, [ENV_SCRIPTS]: scripts } = Object.assign(bag, await bag.promise);
+  const errors = [];
+  const bag = await getScriptsByURL(url, !frameId);
+  const { envDelayed, [ENV_SCRIPTS]: scripts } = bag;
   const isLate = forceContent != null;
   bag[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
   const feedback = scripts.map(prepareScript, bag).filter(Boolean);
