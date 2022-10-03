@@ -1,6 +1,3 @@
-import { INJECT_CONTENT } from '../util';
-import bridge from './bridge';
-
 const isConcatSpreadableSym = SafeSymbol.isConcatSpreadable;
 
 export const safeConcat = (...arrays) => {
