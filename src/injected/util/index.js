@@ -11,13 +11,13 @@ export {
 } from '@/common';
 export * from '@/common/consts';
 
-export const fireBridgeEvent = (eventId, msg, cloneInto) => {
+export const fireBridgeEvent = (eventId, msg) => {
   const detail = cloneInto ? cloneInto(msg, document) : msg;
   const evtMain = new SafeCustomEvent(eventId, { __proto__: null, detail });
   window::fire(evtMain);
 };
 
-export const bindEvents = (srcId, destId, bridge, cloneInto) => {
+export const bindEvents = (srcId, destId, bridge) => {
   /* Using a separate event for `node` because CustomEvent can't transfer nodes,
    * whereas MouseEvent (and some others) can't transfer objects without stringification. */
   let incomingNodeEvent;
@@ -43,7 +43,7 @@ export const bindEvents = (srcId, destId, bridge, cloneInto) => {
   bridge.post = (cmd, data, { dataKey } = bridge, node) => {
     // Constructing the event now so we don't send anything if it throws on invalid `node`
     const evtNode = node && new SafeMouseEvent(destId, { __proto__: null, relatedTarget: node });
-    fireBridgeEvent(destId, { cmd, data, dataKey, node: !!evtNode }, cloneInto);
+    fireBridgeEvent(destId, { cmd, data, dataKey, node: !!evtNode });
     if (evtNode) window::fire(evtNode);
   };
 };

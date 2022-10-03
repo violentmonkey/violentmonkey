@@ -98,10 +98,9 @@ export const FastLookup = (hubs = createNullObj()) => {
  * for compatibility with many [old] scripts that use these utils blindly
  */
 export const makeComponentUtils = () => {
-  const CLONE_INTO = 'cloneInto';
   const CREATE_OBJECT_IN = 'createObjectIn';
   const EXPORT_FUNCTION = 'exportFunction';
-  const src = IS_FIREFOX && bridge.mode === INJECT_CONTENT && global;
+  const src = IS_FIREFOX && !process.env.HANDSHAKE_ID && global;
   const defineIn = !src && ((target, as, val) => {
     if (as && (as = getOwnProp(as, 'defineAs'))) {
       setOwnProp(target, as, val);
@@ -109,7 +108,7 @@ export const makeComponentUtils = () => {
     return val;
   });
   return {
-    [CLONE_INTO]: src && src[CLONE_INTO] || (
+    cloneInto: cloneInto || (
       obj => obj
     ),
     [CREATE_OBJECT_IN]: src && src[CREATE_OBJECT_IN] || (

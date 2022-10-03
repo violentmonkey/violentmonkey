@@ -1,5 +1,10 @@
 const handlers = createNullObj();
-const callbacks = createNullObj();
+const callbacks = {
+  __proto__: null,
+  Error(err) {
+    throw err;
+  },
+};
 /**
  * @property {VMScriptGMInfoPlatform} ua
  */

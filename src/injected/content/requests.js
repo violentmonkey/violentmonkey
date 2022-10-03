@@ -37,7 +37,7 @@ bridge.addHandlers({
       // TODO: support huge data by splitting it to multiple messages
       msg.data = await encodeBody(msg.data[0], msg.data[1]);
     }
-    sendCmd('HttpRequest', msg);
+    return sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,
 });
