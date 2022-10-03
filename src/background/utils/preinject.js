@@ -1,4 +1,4 @@
-import { getScriptName, getUniqId, sendTabCmd, trueJoin } from '@/common';
+import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd, trueJoin } from '@/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
   METABLOCK_RE,
@@ -7,7 +7,7 @@ import initCache from '@/common/cache';
 import { forEachEntry, objectPick, objectSet } from '@/common/object';
 import ua from '@/common/ua';
 import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_IDS } from './db';
-import { extensionRoot, postInitialize } from './init';
+import { postInitialize } from './init';
 import { commands } from './message';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
@@ -44,7 +44,6 @@ const KEY_EXPOSE = 'expose';
 const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
 const KEY_IS_APPLIED = 'isApplied';
 const KEY_XHR_INJECT = 'xhrInject';
-const BAD_URL_CHAR = /[#/?]/g; // will be encoded to avoid splitting the URL in devtools UI
 const GRANT_NONE_VARS = '{GM,GM_info,unsafeWindow,cloneInto,createObjectIn,exportFunction}';
 const expose = {};
 let isApplied;
@@ -317,7 +316,6 @@ function prepareScript(script) {
   const code = this.code[id];
   const dataKey = getUniqId('VMin');
   const displayName = getScriptName(script);
-  const name = encodeURIComponent(displayName.replace(BAD_URL_CHAR, replaceWithFullWidthForm));
   const isContent = isContentRealm(script, forceContent);
   const pathMap = custom.pathMap || {};
   const reqs = meta.require.map(key => require[pathMap[key] || key]).filter(Boolean);
@@ -347,8 +345,7 @@ function prepareScript(script) {
     wrap && `})()${IS_FIREFOX ? `}catch(e){${dataKey}(e)}` : ''}}`,
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
     IS_FIREFOX && ';0',
-    // Firefox lists .user.js among our own content scripts so a space at start will group them
-    `\n//# sourceURL=${extensionRoot}${IS_FIREFOX ? '%20' : ''}${name}.user.js#${id}`,
+    `\n//# sourceURL=${getScriptPrettyUrl(script, displayName)}`,
   ]::trueJoin('');
   cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
   /** @type {VMInjection.Script} */
@@ -365,11 +362,6 @@ function prepareScript(script) {
     script.runAt,
     !wrap && id, // unwrapped scripts need an explicit `Run` message
   ];
-}
-
-function replaceWithFullWidthForm(s) {
-  // fullwidth range starts at 0xFF00, normal range starts at space char code 0x20
-  return String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
 }
 
 const resolveDataCodeStr = `(${function _(data) {

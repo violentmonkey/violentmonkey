@@ -1,7 +1,7 @@
 import { buffer2string, getUniqId, isEmpty, noop } from '@/common';
+import { extensionOrigin } from '@/common/consts';
 import { forEachEntry } from '@/common/object';
 import ua from '@/common/ua';
-import { extensionOrigin } from './init';
 
 let encoder;
 

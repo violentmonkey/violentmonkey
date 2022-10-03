@@ -1,12 +1,12 @@
 import '@/common/browser';
 import { getActiveTab, makePause, sendCmd } from '@/common';
-import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
+import { TIMEOUT_24HOURS, TIMEOUT_MAX, extensionOrigin } from '@/common/consts';
 import { deepCopy } from '@/common/object';
 import * as tld from '@/common/tld';
 import * as sync from './sync';
 import { commands } from './utils';
 import { getData, getSizes, checkRemove } from './utils/db';
-import { extensionOrigin, initialize } from './utils/init';
+import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
 import './utils/clipboard';
 import './utils/hotkeys';
