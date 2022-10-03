@@ -124,7 +124,10 @@ export function injectPageSandbox(contentId, webId) {
  * @param {boolean} isXml
  */
 export async function injectScripts(contentId, webId, data, isXml) {
-  const { hasMore, info } = data;
+  const { errors, hasMore, info } = data;
+  if (errors) {
+    logging.warn(errors);
+  }
   realms = {
     __proto__: null,
     [INJECT_CONTENT]: {

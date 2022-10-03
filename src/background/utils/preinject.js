@@ -271,8 +271,8 @@ function prepare(key, url, tabId, frameId, forceContent) {
  */
 async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) {
   const errors = [];
-  const bag = await getScriptsByURL(url, !frameId);
-  const { envDelayed, [ENV_SCRIPTS]: scripts } = bag;
+  const bag = await getScriptsByURL(url, !frameId, errors);
+  const { envDelayed, disabledIds: ids, [ENV_SCRIPTS]: scripts } = bag;
   const isLate = forceContent != null;
   bag[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
   const feedback = scripts.map(prepareScript, bag).filter(Boolean);
@@ -293,10 +293,11 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
       envKey, // InjectionFeedback cache key for envDelayed
     },
     hasMore: !!more, // tells content bridge to expect envDelayed
-    ids: bag.disabledIds, // content bridge adds the actually running ids and sends via SetPopup
+    ids, // content bridge adds the actually running ids and sends via SetPopup
     info: {
       ua,
     },
+    errors: errors.filter(err => !ids.includes(+err.slice(err.lastIndexOf('#') + 1))).join('\n'),
   });
   res[FEEDBACK] = feedback;
   res[CSAPI_REG] = contentScriptsAPI && !isLate && !xhrInject

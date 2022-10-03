@@ -7,7 +7,7 @@ import { ICON_PREFIX, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/co
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
-import { testScript, testBlacklist } from './tester';
+import { testScript, testBlacklist, testerBatch } from './tester';
 import { preInitialize } from './init';
 import { commands } from './message';
 import patchDB from './patch-db';
@@ -239,7 +239,8 @@ const retriedStorageKeys = {};
 /**
  * @desc Get scripts to be injected to page with specific URL.
  */
-export function getScriptsByURL(url, isTop) {
+export function getScriptsByURL(url, isTop, errors) {
+  testerBatch(errors || true);
   const allScripts = testBlacklist(url)
     ? []
     : store.scripts.filter(script => (
@@ -247,6 +248,7 @@ export function getScriptsByURL(url, isTop) {
       && (isTop || !(script.custom.noframes ?? script.meta.noframes))
       && testScript(url, script)
     ));
+  testerBatch();
   return getScriptEnv(allScripts);
 }
 
