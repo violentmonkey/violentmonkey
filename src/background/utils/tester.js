@@ -104,7 +104,9 @@ function testRules(url, script, ...list) {
             m = builder(rule);
             cache.put(rule, m);
           } catch (err) {
-            if (batchErrors) batchErrors.push(`${err} - ${getScriptPrettyUrl(script)}`);
+            if (batchErrors) {
+              batchErrors.push(url ? `${err} - ${getScriptPrettyUrl(script)}` : `${err}`);
+            }
           }
         }
         if (m && (urlResults[rule] = m.test(url))) {

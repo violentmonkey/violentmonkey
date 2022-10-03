@@ -85,7 +85,14 @@ Object.assign(commands, {
     }
     return sendCmd('RemoveScript', id);
   },
-  ParseMeta: parseMeta,
+  ParseMeta(code) {
+    const meta = parseMeta(code);
+    const errors = [];
+    testerBatch(errors);
+    testScript('', { custom: getDefaultCustom(), meta });
+    testerBatch();
+    return { meta, errors };
+  },
   ParseScript: parseScript,
   /** @return {Promise<void>} */
   UpdateScriptInfo({ id, config, custom }) {

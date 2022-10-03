@@ -16,7 +16,6 @@ Object.assign(commands, {
   NewScript(id) {
     return id && cache.get(`new-${id}`) || newScript();
   },
-  ParseMeta: parseMeta,
 });
 
 export function isUserScript(text) {
