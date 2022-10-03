@@ -35,7 +35,7 @@
             </div>
             <dl v-for="(list, name) in lists" :key="name"
                 :data-type="name" :hidden="!list.length" tabindex="0">
-              <dt v-text="`@${name}`"/>
+              <dt v-text="name ? `@${name}` : i18n('genericError')"/>
               <dd v-text="list" class="ellipsis"/>
             </dl>
           </div>
@@ -238,8 +238,7 @@ export default {
       }
     },
     async parseMeta() {
-      /** @type {VMScript.meta} */
-      const meta = await sendCmdDirectly('ParseMeta', this.code);
+      const { meta, errors } = await sendCmdDirectly('ParseMeta', this.code);
       const name = getLocaleString(meta, 'name');
       document.title = `${name.slice(0, MAX_TITLE_NAME_LEN)}${name.length > MAX_TITLE_NAME_LEN ? '...' : ''} - ${
         basicTitle || (basicTitle = document.title)
@@ -263,6 +262,7 @@ export default {
         .join('\n')
         || ''
       ));
+      this.lists[''] = errors.join('\n');
       this.script = { meta, custom: {}, props: {} };
       this.allDeps = [
         [...new Set(meta.require)],
@@ -469,6 +469,9 @@ $infoIconSize: 18px;
         background: rgba(255, 0, 0, .05);
         padding: 2px 6px;
         max-width: 25em;
+      }
+      &[data-type=""] {
+        color: red;
       }
     }
     dt {

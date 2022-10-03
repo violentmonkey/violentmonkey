@@ -1,12 +1,13 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri, makeDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
+  makePause,
 } from '@/common';
 import { ICON_PREFIX, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
-import { testScript, testBlacklist } from './tester';
+import { testScript, testBlacklist, testerBatch } from './tester';
 import { preInitialize } from './init';
 import { commands } from './message';
 import patchDB from './patch-db';
@@ -84,7 +85,14 @@ Object.assign(commands, {
     }
     return sendCmd('RemoveScript', id);
   },
-  ParseMeta: parseMeta,
+  ParseMeta(code) {
+    const meta = parseMeta(code);
+    const errors = [];
+    testerBatch(errors);
+    testScript('', { custom: getDefaultCustom(), meta });
+    testerBatch();
+    return { meta, errors };
+  },
   ParseScript: parseScript,
   /** @return {Promise<void>} */
   UpdateScriptInfo({ id, config, custom }) {
@@ -238,7 +246,8 @@ const retriedStorageKeys = {};
 /**
  * @desc Get scripts to be injected to page with specific URL.
  */
-export function getScriptsByURL(url, isTop) {
+export function getScriptsByURL(url, isTop, errors) {
+  testerBatch(errors || true);
   const allScripts = testBlacklist(url)
     ? []
     : store.scripts.filter(script => (
@@ -246,19 +255,18 @@ export function getScriptsByURL(url, isTop) {
       && (isTop || !(script.custom.noframes ?? script.meta.noframes))
       && testScript(url, script)
     ));
+  testerBatch();
   return getScriptEnv(allScripts);
 }
 
 /**
  * @param {VMScript[]} scripts
- * @param {boolean} [sizing]
- * @return {VMInjection.Env}
+ * @return {Promise<VMInjection.Env>}
  */
-function getScriptEnv(scripts, sizing) {
+async function getScriptEnv(scripts) {
   const disabledIds = [];
   const [envStart, envDelayed] = [0, 1].map(() => ({
     depsMap: {},
-    sizing,
     [ENV_SCRIPTS]: [],
   }));
   for (const [areaName, listName] of STORAGE_ROUTES_ENTRIES) {
@@ -267,7 +275,7 @@ function getScriptEnv(scripts, sizing) {
   }
   scripts.forEach((script) => {
     const { id } = script.props;
-    if (!sizing && !script.config.enabled) {
+    if (!script.config.enabled) {
       disabledIds.push(id);
       return;
     }
@@ -275,7 +283,7 @@ function getScriptEnv(scripts, sizing) {
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
     /** @type {VMInjection.Env} */
-    const env = sizing || runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
+    const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
     const { depsMap } = env;
     env.ids.push(id);
     if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
@@ -301,11 +309,13 @@ function getScriptEnv(scripts, sizing) {
         }
       }
     }
-    env[ENV_SCRIPTS].push(sizing ? script : { ...script, runAt });
+    env[ENV_SCRIPTS].push({ ...script, runAt });
   });
-  envStart.promise = readEnvironmentData(envStart);
+  if (envStart.ids.length) {
+    Object.assign(envStart, await readEnvironmentData(envStart));
+  }
   if (envDelayed.ids.length) {
-    envDelayed.promise = readEnvironmentData(envDelayed);
+    envDelayed.promise = makePause().then(() => readEnvironmentData(envDelayed));
   }
   return Object.assign(envStart, { disabledIds, envDelayed });
 }
@@ -324,7 +334,7 @@ async function readEnvironmentData(env, isRetry) {
       let val = data[storage[area].toKey(id)];
       if (!val && area === S_VALUE) val = {};
       env[area][id] = val;
-      if (val == null && !env.sizing && retriedStorageKeys[area + id] !== 2) {
+      if (val == null && retriedStorageKeys[area + id] !== 2) {
         retriedStorageKeys[area + id] = isRetry ? 2 : 1;
         if (!isRetry) {
           console.warn(`The "${area}" storage is missing "${id}"! Vacuuming...`);

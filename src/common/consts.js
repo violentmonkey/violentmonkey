@@ -32,5 +32,8 @@ export const TIMEOUT_HOUR = 60 * 60 * 1000;
 export const TIMEOUT_24HOURS = 24 * 60 * 60 * 1000;
 export const TIMEOUT_WEEK = 7 * 24 * 60 * 60 * 1000;
 
-export const ICON_PREFIX = !process.env.IS_INJECTED
-  && browser.runtime.getURL('/public/images/icon');
+export const extensionRoot = !process.env.IS_INJECTED && browser.runtime.getURL('/') || '';
+export const extensionOrigin = extensionRoot.slice(0, -1);
+export const ICON_PREFIX = `${extensionRoot}public/images/icon`;
+export const BLACKLIST = 'blacklist';
+export const BLACKLIST_ERRORS = `${BLACKLIST}Errors`;

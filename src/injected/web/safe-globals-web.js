@@ -12,7 +12,7 @@ export const {
    * TODO: try reimplementing Promise in our sandbox wrapper if it can work with user code */
   Promise: UnsafePromise,
 } = global;
-
+export const cloneInto = process.env.HANDSHAKE_ID ? null : global.cloneInto;
 export let
   // window
   SafeCustomEvent,

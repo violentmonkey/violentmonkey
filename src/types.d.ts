@@ -173,14 +173,20 @@ declare namespace VMScript {
   }
 }
 /**
- * Injection data sent to the content bridge
+ * Injection data sent to the content bridge when injection is disabled
  */
-declare interface VMInjection {
+declare interface VMInjectionDisabled {
   expose: string | false;
+}
+/**
+ * Injection data sent to the content bridge when injection is enabled
+ */
+declare interface VMInjection extends VMInjectionDisabled {
   scripts: VMInjection.Script[];
   injectInto: VMScriptInjectInto;
   injectPage: boolean;
   cache: StringMap;
+  errors: string[];
   feedId: {
     /** InjectionFeedback cache key for cleanup when getDataFF outruns GetInjected */
     cacheKey: string;
@@ -235,6 +241,7 @@ declare namespace VMInjection {
     dataKey: string;
     displayName: string;
     code: string;
+    injectInto: VMScriptInjectInto;
     metaStr: string;
     runAt?: 'start' | 'body' | 'end' | 'idle';
     values?: StringMap;

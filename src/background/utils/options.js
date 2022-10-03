@@ -5,6 +5,10 @@ import { preInitialize } from './init';
 import { commands } from './message';
 import storage from './storage';
 
+let changes;
+let initPending;
+let options = {};
+
 Object.assign(commands, {
   /** @return {Object} */
   GetAllOptions() {
@@ -14,9 +18,16 @@ Object.assign(commands, {
   GetOptions(data) {
     return data::mapEntry((_, key) => getOption(key));
   },
-  /** @return {void} */
-  SetOptions(data) {
-    ensureArray(data).forEach(item => setOption(item.key, item.value));
+  /**
+   * @param {{key:string, value?:PlainJSONValue, reply?:boolean}|Array} data
+   * @return {Promise<void>}
+   * @throws {?} hooks can throw after the option was set */
+  async SetOptions(data) {
+    if (initPending) await initPending;
+    for (const { key, value, reply } of ensureArray(data)) {
+      setOption(key, value, reply);
+    }
+    if (changes) callHooks(); // exceptions will be sent to the caller
   },
 });
 
@@ -35,10 +46,8 @@ const DELAY = 100;
 const hooks = initHooks();
 const callHooksLater = debounce(callHooks, DELAY);
 const writeOptionsLater = debounce(writeOptions, DELAY);
-let changes = {};
-let options = {};
-let initPending = storage.base.getOne(STORAGE_KEY)
-.then(data => {
+
+initPending = storage.base.getOne(STORAGE_KEY).then(data => {
   if (data && typeof data === 'object') options = data;
   if (process.env.DEBUG) console.info('options:', options);
   if (!options[VERSION]) {
@@ -55,18 +64,23 @@ let initPending = storage.base.getOne(STORAGE_KEY)
 });
 preInitialize.push(initPending);
 
-function fireChange(keys, value) {
-  // Flattening key path so the subscribers can update nested values without overwriting the parent
-  const key = keys.join('.');
-  // Ensuring the correct order when updates were mixed like this: foo.bar=1; foo={bar:2}; foo.bar=3
-  delete changes[key];
+/**
+ * @param {!string} key - must be "a.b.c" to allow clients easily set inside existing object trees
+ * @param {PlainJSONValue} [value]
+ * @param {boolean} [silent] - in case you callHooks() directly yourself afterwards
+ */
+function addChange(key, value, silent) {
+  if (!changes) changes = {};
+  else delete changes[key]; // Deleting first to place the new value at the end
   changes[key] = value;
-  callHooksLater();
+  if (!silent) callHooksLater();
 }
 
+/** @throws in option handlers */
 function callHooks() {
-  hooks.fire(changes);
-  changes = {};
+  const tmp = changes;
+  changes = null;
+  hooks.fire(tmp);
 }
 
 export function getOption(key, def) {
@@ -76,25 +90,27 @@ export function getOption(key, def) {
   return keys.length > 1 ? objectGet(value, keys.slice(1)) ?? def : value;
 }
 
-export async function setOption(key, value) {
-  if (initPending) await initPending;
+export function setOption(key, value, silent) {
+  // eslint-disable-next-line prefer-rest-params
+  if (initPending) return initPending.then(() => setOption(...arguments));
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
+  key = keys.join('.'); // must be a string for addChange()
   if (!defaults::hasOwnProperty(mainKey)) {
-    if (process.env.DEBUG) console.info('Unknown option:', keys.join('.'), value, options);
+    if (process.env.DEBUG) console.info('Unknown option:', key, value, options);
     return;
   }
   const subKey = keys.length > 1 && keys.slice(1);
   const mainVal = getOption([mainKey]);
   if (deepEqual(value, subKey ? objectGet(mainVal, subKey) : mainVal)) {
-    if (process.env.DEBUG) console.info('Option unchanged:', keys.join('.'), value, options);
+    if (process.env.DEBUG) console.info('Option unchanged:', key, value, options);
     return;
   }
   options[mainKey] = subKey ? objectSet(mainVal, subKey, value) : value;
   omitDefaultValue(mainKey);
   writeOptionsLater();
-  fireChange(keys, value);
-  if (process.env.DEBUG) console.info('Options updated:', keys.join('.'), value, options);
+  addChange(key, value, silent);
+  if (process.env.DEBUG) console.info('Options updated:', key, value, options);
 }
 
 function writeOptions() {

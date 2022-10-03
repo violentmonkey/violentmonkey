@@ -17,6 +17,7 @@ export const {
   Uint8Array: SafeUint8Array,
   atob: safeAtob,
   addEventListener: on,
+  cloneInto,
   dispatchEvent: fire,
   removeEventListener: off,
 } = global;

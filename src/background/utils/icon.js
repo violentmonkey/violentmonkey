@@ -1,5 +1,5 @@
 import { i18n, makeDataUri, noop } from '@/common';
-import { ICON_PREFIX, INJECTABLE_TAB_URL_RE } from '@/common/consts';
+import { BLACKLIST, ICON_PREFIX, INJECTABLE_TAB_URL_RE } from '@/common/consts';
 import { objectPick } from '@/common/object';
 import { postInitialize } from './init';
 import { commands, forEachTab } from './message';
@@ -78,7 +78,7 @@ hookOptions((changes) => {
   || (v = changes[KEY_BADGE_COLOR_BLOCKED]) && (badgeColorBlocked = v)) {
     jobs.push(updateBadgeColor);
   }
-  if ('blacklist' in changes) {
+  if (BLACKLIST in changes) {
     jobs.push(updateState);
   }
   if (jobs.length) {

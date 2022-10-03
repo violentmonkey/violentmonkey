@@ -15,6 +15,7 @@ export default function initCache({
   let batchStartTime;
   // eslint-disable-next-line no-return-assign
   const getNow = () => batchStarted && batchStartTime || (batchStartTime = performance.now());
+  const OVERRUN = 1000; // in ms, to reduce frequency of calling setTimeout
   const exports = {
     batch, get, getValues, pop, put, del, has, hit, destroy,
   };
@@ -80,12 +81,10 @@ export default function initCache({
       clearTimeout(timer);
     }
     minLifetime = lifetime;
-    timer = setTimeout(trim, lifetime);
+    timer = setTimeout(trim, lifetime + OVERRUN);
   }
   function trim() {
-    // next timer won't be able to run earlier than 10ms
-    // so we'll sweep the upcoming expired entries in this run
-    const now = performance.now() + 10;
+    const now = performance.now();
     let closestExpiry = Number.MAX_SAFE_INTEGER;
     // eslint-disable-next-line guard-for-in
     for (const key in cache) {
@@ -98,7 +97,7 @@ export default function initCache({
     }
     minLifetime = closestExpiry - now;
     timer = closestExpiry < Number.MAX_SAFE_INTEGER
-      ? setTimeout(trim, minLifetime)
+      ? setTimeout(trim, minLifetime + OVERRUN)
       : 0;
   }
 }

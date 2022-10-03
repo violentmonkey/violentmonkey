@@ -57,7 +57,6 @@ bridge.addHandlers({
 
 export function injectPageSandbox(contentId, webId) {
   pageInjectable = false;
-  const { cloneInto } = global;
   const vaultId = safeGetUniqId();
   const handshakeId = safeGetUniqId();
   if (useOpener(window.opener) || useOpener(!IS_TOP && window.parent)) {
@@ -113,8 +112,8 @@ export function injectPageSandbox(contentId, webId) {
   function handshaker(evt) {
     pageInjectable = true;
     evt::stopImmediatePropagation();
-    bindEvents(contentId, webId, bridge, cloneInto);
-    fireBridgeEvent(handshakeId + process.env.HANDSHAKE_ACK, [webId, contentId], cloneInto);
+    bindEvents(contentId, webId, bridge);
+    fireBridgeEvent(handshakeId + process.env.HANDSHAKE_ACK, [webId, contentId]);
   }
 }
 
@@ -125,7 +124,10 @@ export function injectPageSandbox(contentId, webId) {
  * @param {boolean} isXml
  */
 export async function injectScripts(contentId, webId, data, isXml) {
-  const { hasMore, info } = data;
+  const { errors, hasMore, info } = data;
+  if (errors) {
+    logging.warn(errors);
+  }
   realms = {
     __proto__: null,
     [INJECT_CONTENT]: {

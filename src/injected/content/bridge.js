@@ -90,15 +90,21 @@ const bridge = {
       // TODO: maybe remove this check if our VAULT is reliable
       log('info', null, `Invalid command: "${cmd}" from "${dataKeyNameMap[dataKey] || '?'}"`);
     }
-    const callbackId = data && getOwnProp(data, CALLBACK_ID);
+    let callbackId = data && getOwnProp(data, CALLBACK_ID);
     if (callbackId) {
       data = data.data;
     }
-    let res = handle === true
-      ? sendCmd(cmd, data)
-      : node::handle(data, realm || INJECT_PAGE);
-    if (isPromise(res)) {
-      res = await res;
+    let res;
+    try {
+      res = handle === true
+        ? sendCmd(cmd, data)
+        : node::handle(data, realm || INJECT_PAGE);
+      if (isPromise(res)) {
+        res = await res;
+      }
+    } catch (e) {
+      callbackId = 'Error';
+      res = e;
     }
     if (callbackId) {
       bridge.post('Callback', { id: callbackId, data: res }, realm);

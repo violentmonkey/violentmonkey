@@ -1,6 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser, ICON_PREFIX } from '@/common/consts';
+import { browser, extensionRoot, ICON_PREFIX } from '@/common/consts';
 import { deepCopy } from './object';
 import { blob2base64, i18n, isDataUri, noop } from './util';
 
@@ -18,6 +18,10 @@ if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
 }
 
 export const defaultImage = `${ICON_PREFIX}128.png`;
+/** Will be encoded to avoid splitting the URL in devtools UI */
+const BAD_URL_CHAR = /[#/?]/g;
+/** Fullwidth range starts at 0xFF00, normal range starts at space char code 0x20 */
+const replaceWithFullWidthForm = s => String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
 
 export function initHooks() {
   const hooks = [];
@@ -156,6 +160,21 @@ export function getScriptHome({ custom, meta }) {
 export function getScriptName(script) {
   return script.custom.name || getLocaleString(script.meta, 'name')
     || `#${script.props.id ?? i18n('labelNoName')}`;
+}
+
+/** URL that shows the name of the script and opens in devtools sources or in our editor */
+export function getScriptPrettyUrl(script, displayName) {
+  return `${
+    extensionRoot
+  }${
+    // When called from prepareScript, adding a space to group scripts in one block visually
+    displayName && IS_FIREFOX ? '%20' : ''
+  }${
+    encodeURIComponent((displayName || getScriptName(script))
+    .replace(BAD_URL_CHAR, replaceWithFullWidthForm))
+  }.user.js#${
+    script.props.id
+  }`;
 }
 
 /**

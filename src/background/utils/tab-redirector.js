@@ -1,7 +1,7 @@
 import { request, noop, i18n, getUniqId } from '@/common';
+import { extensionRoot } from '@/common/consts';
 import ua from '@/common/ua';
 import cache from './cache';
-import { extensionRoot } from './init';
 import { commands } from './message';
 import { parseMeta, isUserScript } from './script';
 
