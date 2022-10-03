@@ -106,7 +106,7 @@ export default {
       if (!this.hasSave && this.canSave) this.onSave();
     },
     onSave() {
-      options.set(this.name, this.parsedData.value);
+      options.set(this.name, this.parsedData.value).catch(this.bgError);
       this.$emit('save');
     },
     onReset() {
@@ -116,7 +116,7 @@ export default {
       el.focus();
       if (!this.hasSave) {
         // No save button = something rather trivial e.g. the export file name
-        options.set(this.name, this.defaultValue);
+        options.set(this.name, this.defaultValue).catch(this.bgError);
       } else {
         // Save button exists = let the user undo the input
         el.select();
@@ -124,6 +124,9 @@ export default {
           this.value = this.placeholder;
         }
       }
+    },
+    bgError(err) {
+      this.$emit('bg-error', err);
     },
   },
 };
