@@ -57,7 +57,6 @@ bridge.addHandlers({
 
 export function injectPageSandbox(contentId, webId) {
   pageInjectable = false;
-  const { cloneInto } = global;
   const vaultId = safeGetUniqId();
   const handshakeId = safeGetUniqId();
   if (useOpener(window.opener) || useOpener(!IS_TOP && window.parent)) {
@@ -113,8 +112,8 @@ export function injectPageSandbox(contentId, webId) {
   function handshaker(evt) {
     pageInjectable = true;
     evt::stopImmediatePropagation();
-    bindEvents(contentId, webId, bridge, cloneInto);
-    fireBridgeEvent(handshakeId + process.env.HANDSHAKE_ACK, [webId, contentId], cloneInto);
+    bindEvents(contentId, webId, bridge);
+    fireBridgeEvent(handshakeId + process.env.HANDSHAKE_ACK, [webId, contentId]);
   }
 }
 

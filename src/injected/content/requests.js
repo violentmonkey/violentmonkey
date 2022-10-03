@@ -39,7 +39,7 @@ bridge.addHandlers({
       data = await encodeBody(data[0], data[1]);
       msg.data = cloneInto ? cloneInto(data, msg) : data;
     }
-    sendCmd('HttpRequest', msg);
+    return sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,
 });
