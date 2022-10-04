@@ -128,6 +128,9 @@ export async function injectScripts(contentId, webId, data, isXml) {
   if (errors) {
     logging.warn(errors);
   }
+  if (IS_FIREFOX) {
+    IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
+  }
   realms = {
     __proto__: null,
     [INJECT_CONTENT]: {

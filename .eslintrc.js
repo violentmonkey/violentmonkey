@@ -163,6 +163,7 @@ function getGlobals(filename) {
     }) {
       if (name) {
         // const NAME = whatever
+        // We consider `let` immutable too to avoid unintentional reassignment
         res[name] = false;
       } else if (properties) {
         // const { NAME1, prototype: { NAME2: ALIAS2 } } = whatever

@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars, import/no-mutable-exports, prefer-const */
 
 /**
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.
@@ -49,5 +49,5 @@ export const getReadyState = describeProperty(Document[PROTO], 'readyState').get
 export const isDocumentLoading = () => !/^(inter|compl)/::regexpTest(document::getReadyState());
 export const logging = assign(createNullObj(), console);
 export const { chrome } = global;
-export const IS_FIREFOX = !chrome.app;
 export const VM_UUID = chrome.runtime.getURL('');
+export let IS_FIREFOX = !chrome.app;
