@@ -8,7 +8,8 @@ const {
 } = global;
 const { arrayBuffer: getArrayBuffer, blob: getBlob } = ResponseProto;
 const { createObjectURL, revokeObjectURL } = URL;
-const getBlobType = describeProperty(SafeBlob[PROTO], 'type').get;
+const BlobProto = SafeBlob[PROTO];
+const getBlobType = describeProperty(BlobProto, 'type').get;
 const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
 const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
 const fdAppend = SafeFormData[PROTO].append;
@@ -190,7 +191,7 @@ async function encodeBody(body, mode) {
     body::forEach(entry => fd::fdAppend(entry[0], entry[1]));
     body = fd;
   }
-  const wasBlob = body instanceof SafeBlob;
+  const wasBlob = isInstance(body, BlobProto);
   const blob = wasBlob ? body : await new SafeResponse(body)::getBlob();
   const reader = new SafeFileReader();
   return new SafePromise(resolve => {

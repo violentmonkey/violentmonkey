@@ -215,12 +215,12 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
     }
     if (!code) {
       needsInvoker = true;
-      contLists[runAt]::push(script);
+      safePush(contLists[runAt], script);
     } else if (pageInjectable) {
-      pgLists[runAt]::push(script);
+      safePush(pgLists[runAt], script);
     } else {
-      bridge.failedIds::push(id);
-      bridge.ids::push(id);
+      safePush(bridge.failedIds, id);
+      safePush(bridge.ids, id);
     }
   });
   if (document::getReadyState() === 'loading') {

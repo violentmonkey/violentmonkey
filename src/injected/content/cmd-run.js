@@ -9,10 +9,10 @@ let numBadgesSent = 0;
 let bfCacheWired;
 
 export function Run(id, realm) {
-  runningIds::push(id);
-  bridge.ids::push(id);
+  safePush(runningIds, id);
+  safePush(bridge.ids, id);
   if (realm === INJECT_CONTENT) {
-    bridge.invokableIds::push(id);
+    safePush(bridge.invokableIds, id);
   }
   if (!badgePromise) {
     badgePromise = resolvedPromise::then(throttledSetBadge);

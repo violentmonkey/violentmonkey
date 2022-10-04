@@ -29,13 +29,7 @@ export const throwIfProtoPresent = process.env.DEBUG && (obj => {
   }
 });
 export const isFunction = val => typeof val === 'function';
-export const isObject = val => val !== null && typeof val === 'object';
-export const isPromise = val => {
-  // Checking if val is thenable per JS spec
-  if (isObject(val)) {
-    try { return isFunction(val.then); } catch (e) { /* NOP */ }
-  }
-};
+export const isObject = val => val != null && typeof val === 'object';
 export const isString = val => typeof val === 'string';
 
 export const getOwnProp = (obj, key) => {
@@ -130,6 +124,7 @@ export const safeDefineProperty = (obj, key, desc) => (
   defineProperty(obj, key, createNullObj(desc))
 );
 
+/** A safe replacement for ::push() which may call a setter */
 export const safePush = (arr, val) => (
   setOwnProp(arr, arr.length, val)
 );
