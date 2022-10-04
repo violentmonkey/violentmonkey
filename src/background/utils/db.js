@@ -85,14 +85,7 @@ Object.assign(commands, {
     }
     return sendCmd('RemoveScript', id);
   },
-  ParseMeta(code) {
-    const meta = parseMeta(code);
-    const errors = [];
-    testerBatch(errors);
-    testScript('', { custom: getDefaultCustom(), meta });
-    testerBatch();
-    return { meta, errors };
-  },
+  ParseMeta: parseMetaWithErrors,
   ParseScript: parseScript,
   /** @return {Promise<void>} */
   UpdateScriptInfo({ id, config, custom }) {
@@ -517,11 +510,28 @@ export async function updateScriptInfo(id, data) {
   return sendCmd('UpdateScript', { where: { id }, update: script });
 }
 
+/**
+ * @param {string} code
+ * @return {{ meta: VMScript.Meta, errors: string[] }}
+ */
+function parseMetaWithErrors(code) {
+  const meta = parseMeta(code);
+  const errors = [];
+  testerBatch(errors);
+  testScript('', { custom: getDefaultCustom(), meta });
+  testerBatch();
+  return {
+    meta,
+    errors: errors.length ? errors : null,
+  };
+}
+
 /** @return {Promise<{ isNew?, update, where }>} */
 export async function parseScript(src) {
-  const meta = parseMeta(src.code);
+  const { meta, errors } = parseMetaWithErrors(src.code);
   if (!meta.name) throw `${i18n('msgInvalidScript')}\n${i18n('labelNoName')}`;
   const result = {
+    errors,
     update: {
       message: src.message == null ? i18n('msgUpdated') : src.message || '',
     },
