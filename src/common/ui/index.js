@@ -3,10 +3,14 @@ import { i18n } from '@/common/util';
 import Message from './message';
 
 export function showMessage(message) {
+  const activeElement = message.buttons && document.activeElement;
   const modal = Modal.show(h => h(Message, {
     props: { message },
     on: {
       dismiss() {
+        if (activeElement && !document.activeElement.closest('.vl-modal')) {
+          activeElement.focus();
+        }
         modal.close();
         message.onDismiss?.();
       },
