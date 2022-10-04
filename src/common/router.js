@@ -51,12 +51,11 @@ export function setRoute(hash, replace, noConfirm) {
 
 export function getUnloadSentry(onConfirm, onCancel) {
   async function confirmPopState(hash) {
-    try {
+    if (await showConfirmation(i18n('confirmNotSaved'))) {
       // popstate cannot be prevented so we pin current `route` and display a confirmation
-      await showConfirmation(i18n('confirmNotSaved'));
       setRoute(hash, false, true);
       onConfirm?.();
-    } catch {
+    } else {
       onCancel?.();
     }
   }
