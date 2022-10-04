@@ -80,7 +80,7 @@ export function testScript(url, script) {
 function testRules(url, script, ...list) {
   // TODO: combine all non-regex rules in one big smart regexp
   // e.g. lots of `*://foo/*` can be combined into `^https?://(foo|bar|baz)/`
-  for (let i = 0, m, rules, builder, cache, urlResults, res; i < 4; i += 1) {
+  for (let i = 0, m, rules, builder, cache, urlResults, res, err, scriptUrl; i < 4; i += 1) {
     // [matches, matches, includes, includes], some items may be empty
     if ((rules = list[i]).length) {
       if (!cache) { // happens one time for 0 or 1 and another time for 2 or 3
@@ -102,14 +102,20 @@ function testRules(url, script, ...list) {
         if (!(m = cache.get(rule))) {
           try {
             m = builder(rule);
-            cache.put(rule, m);
-          } catch (err) {
-            if (batchErrors) {
-              batchErrors.push(url ? `${err} - ${getScriptPrettyUrl(script)}` : `${err}`);
-            }
+          } catch (e) {
+            m = { err: e };
           }
+          cache.put(rule, m);
         }
-        if (m && (urlResults[rule] = m.test(url))) {
+        if ((err = m.err)) {
+          if (batchErrors) {
+            err = err.message || err;
+            err = url
+              ? `${err} - ${scriptUrl || (scriptUrl = getScriptPrettyUrl(script))}`
+              : err;
+            batchErrors.push(err);
+          }
+        } else if ((urlResults[rule] = m.test(url))) {
           return true;
         }
       }
