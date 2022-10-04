@@ -17,7 +17,8 @@
            v-text="i18n('editHowToHint')"/>
       </div>
       <div class="edit-buttons">
-        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"/>
+        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"
+                :class="{'has-error': errors}" :title="errors"/>
         <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"/>
         <button v-text="i18n('buttonClose')" @click="close"/>
       </div>
@@ -55,6 +56,12 @@
         v-show="nav === 'help'"
         :hotkeys="hotkeys"
       />
+    </div>
+    <div v-if="errors" class="errors my-1c">
+      <p v-for="e in errors" :key="e" v-text="e" class="text-red"/>
+      <p class="my-1">
+        <a :href="urlMatching" target="_blank" rel="noopener noreferrer" v-text="urlMatching"/>
+      </p>
     </div>
   </div>
 </template>
@@ -168,6 +175,8 @@ export default {
         },
       },
       hotkeys: null,
+      errors: null,
+      urlMatching: 'https://violentmonkey.github.io/api/matching/',
     };
   },
   computed: {
@@ -305,9 +314,10 @@ export default {
         codeComponent.cm.markClean();
         this.codeDirty = false; // triggers onChange which sets canSave
         this.canSave = false; // ...and set it explicitly in case codeDirty was false
+        this.errors = res.errors;
         if (newId) {
           this.script = res.update;
-          window.history.replaceState(null, this.scriptName, `#scripts/${newId}`);
+          if (!id) window.history.replaceState(null, this.scriptName, `#scripts/${newId}`);
         }
       } catch (err) {
         showConfirmation(`${err.message || err}`, {
@@ -410,6 +420,10 @@ export default {
         }
       }
     }
+  }
+  .errors {
+    border-top: 2px solid red;
+    padding: .5em 1em;
   }
 }
 

@@ -128,6 +128,9 @@ export async function injectScripts(contentId, webId, data, isXml) {
   if (errors) {
     logging.warn(errors);
   }
+  if (IS_FIREFOX) {
+    IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
+  }
   realms = {
     __proto__: null,
     [INJECT_CONTENT]: {
@@ -212,12 +215,12 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
     }
     if (!code) {
       needsInvoker = true;
-      contLists[runAt]::push(script);
+      safePush(contLists[runAt], script);
     } else if (pageInjectable) {
-      pgLists[runAt]::push(script);
+      safePush(pgLists[runAt], script);
     } else {
-      bridge.failedIds::push(id);
-      bridge.ids::push(id);
+      safePush(bridge.failedIds, id);
+      safePush(bridge.ids, id);
     }
   });
   if (document::getReadyState() === 'loading') {

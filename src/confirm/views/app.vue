@@ -262,7 +262,7 @@ export default {
         .join('\n')
         || ''
       ));
-      this.lists[''] = errors.join('\n');
+      this.lists[''] = errors?.join('\n') || '';
       this.script = { meta, custom: {}, props: {} };
       this.allDeps = [
         [...new Set(meta.require)],

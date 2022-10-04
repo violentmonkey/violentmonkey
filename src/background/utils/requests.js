@@ -237,10 +237,17 @@ export function clearRequestsByTabId(tabId, frameId) {
   });
 }
 
-/** Polyfill for Chrome's inability to send complex types over extension messaging */
+/** Polyfill for browser's inability to send complex types over extension messaging */
 function decodeBody([body, type, wasBlob]) {
   if (type === 'query') {
     type = 'application/x-www-form-urlencoded';
+  } else if (type === 'fd') {
+    // FF supports FormData over messaging
+    // Chrome doesn't - we use this code only with an empty FormData just to create the object
+    const res = new FormData();
+    body.forEach(entry => res.set(...entry));
+    body = res;
+    type = '';
   } else if (type != null) {
     // 5x times faster than fetch() which wastes time on inter-process communication
     const res = string2uint8array(atob(body.slice(body.indexOf(',') + 1)));

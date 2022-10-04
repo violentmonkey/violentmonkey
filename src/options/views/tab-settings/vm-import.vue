@@ -211,14 +211,12 @@ function initDragDrop(targetElement) {
   const onDrop = async evt => {
     evt.preventDefault();
     showAllowedState(false);
-    try {
-      // storing it now because `files` will be null after await
-      const file = evt.dataTransfer.files[0];
-      await showConfirmation(i18n('buttonImportData'));
-      targetElement.disabled = true;
-      await importBackup(file);
-      targetElement.disabled = false;
-    } catch (e) { /* NOP */ }
+    // storing it now because `files` will be null after await
+    const file = evt.dataTransfer.files[0];
+    if (!await showConfirmation(i18n('buttonImportData'))) return;
+    targetElement.disabled = true;
+    await importBackup(file);
+    targetElement.disabled = false;
   };
   return () => {
     const isSettingsTab = window.location.hash === '#settings';

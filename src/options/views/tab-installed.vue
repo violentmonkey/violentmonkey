@@ -481,12 +481,9 @@ export default {
       });
     },
     async emptyRecycleBin() {
-      try {
-        await showConfirmation(i18n('buttonEmptyRecycleBin'));
+      if (await showConfirmation(i18n('buttonEmptyRecycleBin'))) {
         sendCmdDirectly('CheckRemove', { force: true });
         store.scripts = store.scripts.filter(script => !script.config.removed);
-      } catch (e) {
-        // NOP
       }
     },
     adjustScriptWidth() {

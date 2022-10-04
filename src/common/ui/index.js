@@ -32,19 +32,21 @@ export function showMessage(message) {
  * @param {string | false} [cfg.input=false] if not false, shows a text input with this string
  * @param {?Object|false} [cfg.ok] additional props for the Ok button or `false` to remove it
  * @param {?Object|false} [cfg.cancel] same for the Cancel button
- * @return {Promise<?string>} resolves on Ok to `false` or the entered string, rejects otherwise
+ * @return {Promise<?string|true>} resolves on Ok to `true` or the entered string, null otherwise
  */
 export function showConfirmation(text, { ok, cancel, input = false } = {}) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
+    const onCancel = () => resolve(null);
+    const onOk = val => resolve(input === false || val);
     showMessage({
       input,
       text,
       buttons: [
-        ok !== false && { text: i18n('buttonOK'), onClick: resolve, ...ok },
-        cancel !== false && { text: i18n('buttonCancel'), onClick: reject, ...cancel },
+        ok !== false && { text: i18n('buttonOK'), onClick: onOk, ...ok },
+        cancel !== false && { text: i18n('buttonCancel'), onClick: onCancel, ...cancel },
       ].filter(Boolean),
-      onBackdropClick: reject,
-      onDismiss: reject, // Esc key
+      onBackdropClick: onCancel,
+      onDismiss: onCancel, // Esc key
     });
   });
 }

@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars, prefer-const */
 
 /**
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.
@@ -22,11 +22,12 @@ export const {
   removeEventListener: off,
 } = global;
 export const SafeError = Error;
+export const PromiseProto = SafePromise[PROTO];
 export const ResponseProto = SafeResponse[PROTO];
 export const { hasOwnProperty, toString: objectToString } = {};
 export const { apply, call } = hasOwnProperty;
 export const safeCall = call.bind(call);
-export const { forEach, includes, push } = [];
+export const { forEach, includes } = []; // `push` is unsafe as it may call a setter; use safePush()
 export const { createElementNS, getElementsByTagName } = document;
 export const { then } = SafePromise[PROTO];
 export const { charCodeAt, indexOf: stringIndexOf, slice } = '';
@@ -35,6 +36,7 @@ export const {
   assign,
   defineProperty,
   getOwnPropertyDescriptor: describeProperty,
+  getPrototypeOf,
   keys: objectKeys,
 } = Object;
 export const { random: mathRandom } = Math;
@@ -46,8 +48,16 @@ export const { get: getHref } = describeProperty(HTMLAnchorElement[PROTO], 'href
 export const getDetail = describeProperty(SafeCustomEvent[PROTO], 'detail').get;
 export const getRelatedTarget = describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get;
 export const getReadyState = describeProperty(Document[PROTO], 'readyState').get;
-export const isDocumentLoading = () => !/^(inter|compl)/::regexpTest(document::getReadyState());
 export const logging = assign(createNullObj(), console);
 export const { chrome } = global;
-export const IS_FIREFOX = !chrome.app;
 export const VM_UUID = chrome.runtime.getURL('');
+/** Unlike the built-in `instanceof` operator this doesn't call @@hasInstance which may be spoofed */
+export const isInstance = function _(instance, safeOriginalProto) {
+  for (let obj = instance; isObject(obj) && (obj = getPrototypeOf(obj));) {
+    if (obj === safeOriginalProto) {
+      return true;
+    }
+  }
+};
+export const isPromise = val => isInstance(val, PromiseProto);
+export let IS_FIREFOX = !chrome.app;

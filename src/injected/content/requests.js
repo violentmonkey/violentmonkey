@@ -8,7 +8,8 @@ const {
 } = global;
 const { arrayBuffer: getArrayBuffer, blob: getBlob } = ResponseProto;
 const { createObjectURL, revokeObjectURL } = URL;
-const getBlobType = describeProperty(SafeBlob[PROTO], 'type').get;
+const BlobProto = SafeBlob[PROTO];
+const getBlobType = describeProperty(BlobProto, 'type').get;
 const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
 const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
 const fdAppend = SafeFormData[PROTO].append;
@@ -34,7 +35,7 @@ bridge.addHandlers({
     ]);
     msg.url = getFullUrl(msg.url);
     let { data } = msg;
-    if (data[1]) {
+    if (data[1] && !IS_FIREFOX /* in FF FormData is recreated in bg::decodeBody */) {
       // TODO: support huge data by splitting it to multiple messages
       data = await encodeBody(data[0], data[1]);
       msg.data = cloneInto ? cloneInto(data, msg) : data;
@@ -183,11 +184,14 @@ function finishChunks(req) {
 /** Doing it here because vault's SafeResponse+blob() doesn't work in injected-web */
 async function encodeBody(body, mode) {
   if (mode === 'fd') {
+    if (!body.length) { // see decodeBody comments about FormData in Chrome
+      return [body, mode];
+    }
     const fd = new SafeFormData();
     body::forEach(entry => fd::fdAppend(entry[0], entry[1]));
     body = fd;
   }
-  const wasBlob = body instanceof SafeBlob;
+  const wasBlob = isInstance(body, BlobProto);
   const blob = wasBlob ? body : await new SafeResponse(body)::getBlob();
   const reader = new SafeFileReader();
   return new SafePromise(resolve => {

@@ -147,9 +147,10 @@ function start(req, context, fileName) {
     data: data == null && []
       // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
       || (opts.binary || !isObject(data)) && [`${data}`]
-      // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
-      || IS_FIREFOX && bridge.ua.browserVersion >= 56 && [data]
+      // No browser can send FormData directly across worlds
       || getFormData(data)
+      // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
+      || IS_FIREFOX >= 56 && [data]
       || [data, 'bin'],
     eventsToNotify: [
       'abort',
@@ -173,7 +174,7 @@ function start(req, context, fileName) {
   ]), context);
 }
 
-/** Chrome can't directly transfer FormData to isolated world so we explode it,
+/** Chrome/FF can't directly transfer FormData to isolated world so we explode it,
  * trusting its iterator is usable because the only reason for a site to break it
  * is to fight a userscript, which it can do by breaking FormData constructor anyway */
 function getFormData(data) {
