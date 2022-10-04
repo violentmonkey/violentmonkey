@@ -96,27 +96,29 @@ function testRules(url, script, ...list) {
         urlResults = urlResults.get(url) || urlResults.put(url, {});
       }
       for (const rule of rules) {
-        if ((res = urlResults[rule]) != null) {
+        if ((res = urlResults[rule])) {
           return res;
         }
-        if (!(m = cache.get(rule))) {
-          try {
-            m = builder(rule);
-          } catch (e) {
-            m = { err: e };
+        if (res == null) {
+          if (!(m = cache.get(rule))) {
+            try {
+              m = builder(rule);
+            } catch (e) {
+              m = { err: e };
+            }
+            cache.put(rule, m);
           }
-          cache.put(rule, m);
-        }
-        if ((err = m.err)) {
-          if (batchErrors) {
-            err = err.message || err;
-            err = url
-              ? `${err} - ${scriptUrl || (scriptUrl = getScriptPrettyUrl(script))}`
-              : err;
-            batchErrors.push(err);
+          if ((err = m.err)) {
+            if (batchErrors) {
+              err = err.message || err;
+              err = url
+                ? `${err} - ${scriptUrl || (scriptUrl = getScriptPrettyUrl(script))}`
+                : err;
+              batchErrors.push(err);
+            }
+          } else if ((urlResults[rule] = m.test(url))) {
+            return true;
           }
-        } else if ((urlResults[rule] = m.test(url))) {
-          return true;
         }
       }
     }
