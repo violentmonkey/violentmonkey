@@ -511,14 +511,16 @@ export async function updateScriptInfo(id, data) {
 }
 
 /**
- * @param {string} code
+ * @param {string | {code:string, custom:VMScript.Custom}} src
  * @return {{ meta: VMScript.Meta, errors: string[] }}
  */
-function parseMetaWithErrors(code) {
-  const meta = parseMeta(code);
+function parseMetaWithErrors(src) {
+  const isObject = typeof src === 'object';
+  const custom = isObject && src.custom || getDefaultCustom();
+  const meta = parseMeta(isObject ? src.code : src);
   const errors = [];
   testerBatch(errors);
-  testScript('', { custom: getDefaultCustom(), meta });
+  testScript('', { meta, custom });
   testerBatch();
   return {
     meta,
@@ -528,7 +530,7 @@ function parseMetaWithErrors(code) {
 
 /** @return {Promise<{ isNew?, update, where }>} */
 export async function parseScript(src) {
-  const { meta, errors } = parseMetaWithErrors(src.code);
+  const { meta, errors } = parseMetaWithErrors(src);
   if (!meta.name) throw `${i18n('msgInvalidScript')}\n${i18n('labelNoName')}`;
   const result = {
     errors,
