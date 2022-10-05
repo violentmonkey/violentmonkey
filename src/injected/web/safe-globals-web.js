@@ -88,6 +88,7 @@ export const VAULT = (() => {
   let i = -1;
   let call;
   let res;
+  let srcFF;
   let src = global; // FF defines some stuff only on `global` in content mode
   let srcWindow = window;
   if (process.env.VAULT_ID) {
@@ -97,9 +98,12 @@ export const VAULT = (() => {
   if (!res) {
     res = createNullObj();
   } else if (!isFunction(res[0])) {
+    // res is [this, addVaultExports object]
     // injectPageSandbox iframe's `global` is `window` because it's in page mode
     src = res[0];
     srcWindow = src;
+    // In FF some stuff from a detached iframe's doesn't work, so we export it from content
+    srcFF = IS_FIREFOX && res[1];
     res = createNullObj();
   }
   res = [
@@ -151,7 +155,7 @@ export const VAULT = (() => {
      * by the page if it gains access to any Object from the vault e.g. a thrown SafeError. */
     jsonParse = res[i += 1] || src.JSON.parse,
     jsonStringify = res[i += 1] || src.JSON.stringify,
-    logging = res[i += 1] || createNullObj(src.console),
+    logging = res[i += 1] || createNullObj((srcFF || src).console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,

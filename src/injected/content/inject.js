@@ -69,7 +69,7 @@ export function injectPageSandbox(contentId, webId) {
      * is it can be emptied by the opener page, too. */
     inject({ code: `parent["${vaultId}"] = [this]` }, ok => {
       // Skipping page injection in FF if our script element was blocked by site's CSP
-      if (ok && (!IS_FIREFOX || window.wrappedJSObject[vaultId])) {
+      if (ok && (!IS_FIREFOX || (ok = window.wrappedJSObject[vaultId]) && addVaultExports(ok))) {
         startHandshake();
       }
     });
@@ -345,4 +345,17 @@ function tellBridgeToWriteVault(vaultId, wnd) {
     post('WriteVault', vaultId, INJECT_PAGE, wnd);
     return true;
   }
+}
+
+function addVaultExports(vaultSrc) {
+  const exports = cloneInto(createNullObj({}), document);
+  // In FF a detached iframe's `console` doesn't print anything, we'll export it from content
+  const exportedConsole = cloneInto(createNullObj(), document);
+  ['log', 'info', 'warn', 'error', 'debug']::forEach(k => {
+    exportedConsole[k] = exportFunction(logging[k], document); // eslint-disable-line no-undef
+  });
+  exports.console = exportedConsole;
+  // vaultSrc[0] is the iframe's `this`
+  vaultSrc[1] = exports;
+  return true;
 }
