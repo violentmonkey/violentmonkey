@@ -41,14 +41,14 @@ import VmCode from '@/common/ui/code';
 
 const props = defineProps(['value', 'cmOptions', 'commands', 'install']);
 
-const dependencies = {};
+const dependencies = ref({});
 
 const index = ref(0);
 
 const data = ref({});
 
 const all = computed(() => {
-  const { code, deps = dependencies, url: mainUrl } = props.install || {};
+  const { code, deps = dependencies.value, url: mainUrl } = props.install || {};
   const { require = [], resources = {} } = props.value.meta || {};
   return [
     ...mainUrl ? [[i18n('editNavCode'), mainUrl, code]] : [],
@@ -60,50 +60,52 @@ const all = computed(() => {
 watchEffect(update);
 
 async function update() {
-  const { install, value } = props;
-  const isMain = install && !index.value;
-  if (isMain) {
-    data.value = {
-      code: install.code,
-    };
-    return;
-  }
   const [type, url] = all.value[index.value];
   if (!url) return;
+  const { install } = props;
+  const isMain = install && !index.value;
   const isDataUri = url.startsWith('data:');
   const isReq = !isMain && !isDataUri && type === '@require';
   const depsUrl = `${+!isReq}${url}`;
+  let code;
+  let contentType;
+  let img;
   let raw;
-  if (isDataUri) {
-    raw = url;
-  } else if (install) {
-    raw = install.deps[depsUrl];
+  if (isMain) {
+    code = install.code;
   } else {
-    const key = value.custom.pathMap?.[url] || url;
-    raw = await sendCmdDirectly('Storage', [isReq ? 'require' : 'cache', 'getOne', key]);
-          if (!isReq) raw = makeDataUri(raw, key);
-  }
-  if (isReq || !raw) {
-    data.value = { code: raw };
-  } else if (raw.startsWith('data:image')) {
-    data.value = { image: raw };
-  } else {
-    let [contentType, code] = raw.split(',');
-    if (code == null) { // workaround for bugs in old VM, see 2e135cf7
-      const fileExt = url.match(/\.(\w+)([#&?]|$)/)?.[1] || '';
-      contentType = /^(png|jpe?g|bmp|svgz?|gz|zip)$/i.test(fileExt)
-        ? ''
-        : `text/${fileExt.toLowerCase()}`;
-    } else if (contentType) {
-      contentType = contentType.split(/[:;]/)[1];
+    if (isDataUri) {
+      raw = url;
+    } else if (install) {
+      raw = install.deps[depsUrl];
+    } else {
+      const key = props.value.custom.pathMap?.[url] || url;
+      raw = await sendCmdDirectly('Storage', [isReq ? 'require' : 'cache', 'getOne', key]);
+      if (!isReq) raw = makeDataUri(raw, key);
     }
-    code = dataUri2text(isDataUri ? url : `${contentType};base64,${code}`);
-    data.value = {
-      mode: contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null,
-      code,
-    };
-    dependencies[depsUrl] = code;
+    if (isReq || !raw) {
+      code = raw;
+    } else if (raw.startsWith('data:image')) {
+      img = raw;
+    } else {
+      [contentType, code] = raw.split(',');
+      if (code == null) { // workaround for bugs in old VM, see 2e135cf7
+        const fileExt = url.match(/\.(\w+)([#&?]|$)/)?.[1] || '';
+        contentType = /^(png|jpe?g|bmp|svgz?|gz|zip)$/i.test(fileExt)
+          ? ''
+          : `text/${fileExt.toLowerCase()}`;
+      } else if (contentType) {
+        contentType = contentType.split(/[:;]/)[1];
+      }
+      code = dataUri2text(isDataUri ? url : `${contentType};base64,${code}`);
+    }
   }
+  data.value = {
+    img,
+    code,
+    mode: contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null,
+  };
+  dependencies.value[depsUrl] = code;
 }
 
 function formatLength(str, type) {
