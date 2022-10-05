@@ -11,6 +11,9 @@ const assignHandlers = (dest, src, force) => {
     onScripts.push(() => assign(dest, src));
   }
 };
+/**
+ * @property {VMBridgePostFunc} post
+ */
 const bridge = {
   __proto__: null,
   ids: [], // all ids including the disabled ones for SetPopup
