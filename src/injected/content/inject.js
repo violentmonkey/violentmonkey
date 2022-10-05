@@ -348,11 +348,12 @@ function tellBridgeToWriteVault(vaultId, wnd) {
 }
 
 function addVaultExports(vaultSrc) {
-  const exports = cloneInto(createNullObj({}), document);
+  const exports = cloneInto(createNullObj(), document);
   // In FF a detached iframe's `console` doesn't print anything, we'll export it from content
   const exportedConsole = cloneInto(createNullObj(), document);
   ['log', 'info', 'warn', 'error', 'debug']::forEach(k => {
-    exportedConsole[k] = exportFunction(logging[k], document); // eslint-disable-line no-undef
+    exportedConsole[k] = exportFunction(logging[k], document);
+    /* global exportFunction */
   });
   exports.console = exportedConsole;
   // vaultSrc[0] is the iframe's `this`

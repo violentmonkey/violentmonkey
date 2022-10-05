@@ -102,7 +102,7 @@ export const VAULT = (() => {
     // injectPageSandbox iframe's `global` is `window` because it's in page mode
     src = res[0];
     srcWindow = src;
-    // In FF some stuff from a detached iframe's doesn't work, so we export it from content
+    // In FF some stuff from a detached iframe doesn't work, so we export it from content
     srcFF = IS_FIREFOX && res[1];
     res = createNullObj();
   }
