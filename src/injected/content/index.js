@@ -32,20 +32,16 @@ async function init() {
       ? await getDataFF(dataPromise)
       : await dataPromise
   );
-  const { allowCmd } = bridge;
   pickIntoNullObj(bridge, data, [
     'ids',
     'injectInto',
   ]);
   if (data.expose && !isXml && injectPageSandbox(contentId, webId)) {
-    allowCmd('GetScriptVer', contentId);
     bridge.addHandlers({ GetScriptVer: true }, true);
     bridge.post('Expose');
   }
   if (data.scripts) {
     bridge.onScripts.forEach(fn => fn(data));
-    allowCmd('NextTask', contentId);
-    if (IS_FIREFOX) allowCmd('InjectList', contentId);
     await injectScripts(contentId, webId, data, isXml);
   }
   bridge.onScripts = null;
