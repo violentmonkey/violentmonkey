@@ -384,6 +384,23 @@ test('exclude-match', (t) => {
   });
 });
 
+test('@match error reporting', (t) => {
+  t.test('should throw', (q) => {
+    for (const [rule, err] of [
+      ['://*/*', 'missing scheme'],
+      ['foo://*/*', 'unknown scheme in'],
+      ['*//*/*', 'missing "://"'],
+      ['http:/*/', 'missing "://"'],
+      ['htp:*', 'unknown scheme, missing "://"'],
+      ['https://foo*', 'missing "/" for path'],
+    ]) {
+      q.throws(testScript('', buildScript({ meta: { match: [rule] } }),
+        `Bad pattern: ${err} in ${rule}`));
+    }
+    q.end();
+  });
+});
+
 test('custom', (t) => {
   t.test('should ignore original rules', (q) => {
     const script = buildScript({
