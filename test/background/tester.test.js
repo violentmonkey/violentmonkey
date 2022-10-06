@@ -1,4 +1,4 @@
-import { testScript, testBlacklist, resetBlacklist } from '@/background/utils/tester';
+import { MatchTest, resetBlacklist, testScript, testBlacklist } from '@/background/utils/tester';
 import cache from '@/background/utils/cache';
 
 afterEach(cache.destroy);
@@ -416,6 +416,21 @@ describe('exclude-match', () => {
     });
     expect(testScript('https://google.COM/FOO?BAR#HASH', script)).toBeTruthy();
     expect(testScript('https://google.com/foo?bar#hash', script)).toBeFalsy();
+  });
+});
+
+describe('@match error reporting', () => {
+  test('should throw', () => {
+    for (const [rule, err] of [
+      ['://*/*', 'missing scheme'],
+      ['foo://*/*', 'unknown scheme'],
+      ['*//*/*', 'missing "://"'],
+      ['http:/*/', 'missing "://"'],
+      ['htp:*', 'unknown scheme, missing "://"'],
+      ['https://foo*', 'missing "/" for path'],
+    ]) {
+      expect(() => MatchTest.try(rule)).toThrow(`Bad pattern: ${err} in ${rule}`);
+    }
   });
 });
 

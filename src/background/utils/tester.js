@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { getScriptPrettyUrl } from '@/common';
 import { BLACKLIST, BLACKLIST_ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
@@ -11,7 +12,7 @@ Object.assign(commands, {
   TestBlacklist: testBlacklist,
 });
 
-const matchAlways = () => 1;
+const matchAlways = { test: () => 1 };
 /**
  * Using separate caches to avoid memory consumption for thousands of prefixed long urls
  * TODO: switch `cache` to hubs internally and add a prefix parameter or accept an Array for key
@@ -20,13 +21,47 @@ const cacheMat = initCache({ lifetime: 60 * 60e3 });
 const cacheInc = initCache({ lifetime: 60 * 60e3 });
 const cacheResultMat = initCache({ lifetime: 60e3 });
 const cacheResultInc = initCache({ lifetime: 60e3 });
-const RE_MATCH_PARTS = /(.*?):\/\/([^/]*)\/(.*)/;
-const RE_HTTP_OR_HTTPS = /^https?$/i;
+/** Simple matching for valid patterns */
+const RE_MATCH_PARTS = re`/^
+  (\*|http([s*])?|file|ftp|urn):\/\/
+  ([^/]*)\/
+  (.*)
+/x`;
+/** Resilient matching for broken patterns allows reporting errors with a helpful message */
+const RE_MATCH_BAD = re`/^
+  (
+    \*|
+    # allowing the incorrect http* scheme which is the same as *
+    http([s*])?|
+    file|
+    ftp|
+    urn|
+    # detecting an unknown scheme
+    ([^:]*?)(?=:)
+  )
+  # detecting a partially missing ://
+  (:(?:\/(?:\/)?)?)?
+  ([^/]*)
+  # detecting a missing / for path
+  (?:\/(.*))?
+/x`;
+/** Simpler matching for a valid URL */
+const RE_URL_PARTS = /^([^:]*):\/\/([^/]*)\/(.*)/;
+const RE_STR_ANY = '(?:|[^:/]*?\\.)';
+const RE_STR_TLD = '(|(?:\\.[-\\w]+)+)';
 const MAX_BL_CACHE_LENGTH = 100e3;
 let blCache = {};
 let blCacheSize = 0;
 let blacklistRules = [];
+// Context start
 let batchErrors;
+let curUrl;
+let curScheme;
+let curHost;
+let curTail;
+let urlResultsMat;
+let urlResultsInc;
+// Context end
 
 postInitialize.push(resetBlacklist);
 hookOptions((changes) => {
@@ -39,12 +74,92 @@ hookOptions((changes) => {
 });
 tld.initTLD(true);
 
+export class MatchTest {
+  constructor(rule, scheme, httpMod, host, path) {
+    const isWild = scheme === '*' || httpMod === '*';
+    this.scheme = isWild ? 'http' : scheme;
+    this.scheme2 = isWild ? 'https' : null;
+    this.host = host === '*' ? null : hostMatcher(host);
+    this.path = path === '*' ? null : pathMatcher(path);
+  }
+
+  test() {
+    return (this.scheme === curScheme || this.scheme2 === curScheme)
+      && this.host?.test(curHost) !== false
+      && this.path?.test(curTail) !== false;
+  }
+
+  /**
+   * @returns {MatchTest|matchAlways}
+   * @throws {string}
+   */
+  static try(rule) {
+    const parts = rule.match(RE_MATCH_PARTS);
+    if (parts) return new MatchTest(...parts);
+    if (rule === '<all_urls>') return matchAlways; // checking it second as it's super rare
+    throw `Bad pattern: ${MatchTest.fail(rule)} in ${rule}`;
+  }
+
+  static fail(rule) {
+    const parts = rule.match(RE_MATCH_BAD);
+    return (
+      (parts[3] != null ? `${parts[3] ? 'unknown' : 'missing'} scheme, ` : '')
+      + (parts[4] !== '://' ? 'missing "://", ' : '')
+      || (parts[6] == null ? 'missing "/" for path, ' : '')
+    ).slice(0, -2);
+  }
+}
+
+/** For strings without wildcards/tld it's 1.5x faster and much more memory-efficient than RegExp */
+class StringTest {
+  constructor(str, i, ignoreCase) {
+    this.s = ignoreCase ? str.toLowerCase() : str;
+    this.i = !!ignoreCase; // must be boolean to ensure test() returns boolean
+    this.cmp = i < 0 ? '' : (i && 'startsWith' || 'endsWith');
+  }
+
+  test(str) {
+    const { s, cmp } = this;
+    const delta = str.length - s.length;
+    const res = delta >= 0 && (
+      cmp && delta
+        ? str[cmp](s) || this.i && str.toLowerCase()[cmp](s)
+        : str === s || !delta && this.i && str.toLowerCase() === s
+    );
+    return res;
+  }
+
+  /** @returns {?StringTest} */
+  static try(rule, ignoreCase) {
+    // TODO: support *. for domain if it's faster than regex
+    const i = rule.indexOf('*');
+    if (i === rule.length - 1) {
+      rule = rule.slice(0, -1); // prefix*
+    } else if (i === 0 && rule.indexOf('*', 1) < 0) {
+      rule = rule.slice(1); // *suffix
+    } else if (i >= 0) {
+      return; // *wildcards*anywhere*
+    }
+    return new StringTest(rule, i, ignoreCase);
+  }
+}
+
+
 export function testerBatch(arr) {
   cacheMat.batch(arr);
   cacheInc.batch(arr);
   cacheResultMat.batch(arr);
   cacheResultInc.batch(arr);
   batchErrors = Array.isArray(arr) && arr;
+}
+
+function setContext(url) {
+  curUrl = url;
+  [, curScheme, curHost, curTail] = url
+    ? url.match(RE_URL_PARTS)
+    : ['', '', '', '']; // parseMetaWithErrors uses an empty url for tests
+  urlResultsMat = url ? (cacheResultMat.get(url) || cacheResultMat.put(url, {})) : null;
+  urlResultsInc = url ? (cacheResultInc.get(url) || cacheResultInc.put(url, {})) : null;
 }
 
 /**
@@ -78,6 +193,7 @@ export function testScript(url, script) {
 }
 
 function testRules(url, script, ...list) {
+  if (curUrl !== url) setContext(url);
   // TODO: combine all non-regex rules in one big smart regexp
   // e.g. lots of `*://foo/*` can be combined into `^https?://(foo|bar|baz)/`
   for (let i = 0, m, rules, builder, cache, urlResults, res, err, scriptUrl; i < 4; i += 1) {
@@ -85,18 +201,17 @@ function testRules(url, script, ...list) {
     if ((rules = list[i]).length) {
       if (!cache) { // happens one time for 0 or 1 and another time for 2 or 3
         if (i < 2) { // matches1, matches2
-          builder = matchTester;
+          builder = MatchTest.try;
           cache = cacheMat;
-          urlResults = cacheResultMat;
+          urlResults = urlResultsMat;
         } else { // includes1, includes2
           builder = autoReg;
           cache = cacheInc;
-          urlResults = cacheResultInc;
+          urlResults = urlResultsInc;
         }
-        urlResults = urlResults.get(url) || urlResults.put(url, {});
       }
       for (const rule of rules) {
-        if ((res = urlResults[rule])) {
+        if (url && (res = urlResults[rule])) {
           return res;
         }
         if (res == null) {
@@ -116,7 +231,7 @@ function testRules(url, script, ...list) {
                 : err;
               batchErrors.push(err);
             }
-          } else if ((urlResults[rule] = m.test(url))) {
+          } else if (url && (urlResults[rule] = +!!m.test(url))) {
             return true;
           }
         }
@@ -127,8 +242,7 @@ function testRules(url, script, ...list) {
 }
 
 function str2RE(str) {
-  const re = str.replace(/([.?+[\]{}()|^$])/g, '\\$1').replace(/\*/g, '.*?');
-  return re;
+  return str.replace(/[.?+[\]{}()|^$]/g, '\\$&').replace(/\*/g, '.*?');
 }
 
 function autoReg(str) {
@@ -136,115 +250,62 @@ function autoReg(str) {
   if (str.length > 1 && str[0] === '/' && str[str.length - 1] === '/') {
     return new RegExp(str.slice(1, -1), 'i');
   }
-  // glob mode: case-insensitive to match GM4 & Tampermonkey bugged behavior
-  const reStr = str2RE(str.toLowerCase());
-  const reTldStr = reStr.replace('\\.tld/', '((?:\\.[-\\w]+)+)/');
-  if (reStr !== reTldStr) {
-    return { test: matchTld.bind([reTldStr]) };
+  const isTld = str.includes('.tld/');
+  const strTester = !isTld && StringTest.try(str, true);
+  if (strTester) {
+    return strTester;
   }
-  // String with wildcards
-  return RegExp(`^${reStr}$`, 'i');
+  // glob mode: case-insensitive to match GM4 & Tampermonkey bugged behavior
+  const reStr = `^${str2RE(str)}$`;
+  const reTldStr = isTld ? reStr.replace('\\.tld/', '((?:\\.[-\\w]+)+)/') : reStr;
+  const re = RegExp(reTldStr, 'i');
+  if (reStr !== reTldStr) re.test = matchTld;
+  return re;
 }
 
 function matchTld(tstr) {
-  const matches = tstr.toLowerCase().match(this[0]);
-  const suffix = matches?.[1].slice(1);
-  return suffix && tld.getPublicSuffix(suffix) === suffix;
+  const matches = tstr.match(this);
+  const suffix = matches?.[1]?.slice(1).toLowerCase();
+  // Must return a proper boolean
+  return !!suffix && tld.getPublicSuffix(suffix) === suffix;
 }
 
-function matchScheme(rule, data) {
-  // exact match
-  if (rule === data) return 1;
-  // * = http | https
-  // support http*
-  if ((rule === '*' || rule === 'http*') && RE_HTTP_OR_HTTPS.test(data)) return 1;
-  return 0;
-}
-
-const RE_STR_ANY = '(?:|.*?\\.)';
-const RE_STR_TLD = '((?:\\.[-\\w]+)+)';
 function hostMatcher(rule) {
-  // * matches all
-  if (rule === '*') {
-    return matchAlways;
-  }
+  // host matching is case-insensitive
   // *.example.com
   // www.google.*
   // www.google.tld
-  const ruleLC = rule.toLowerCase(); // host matching is case-insensitive
+  const isTld = rule.endsWith('.tld') && tld.isReady();
   let prefix = '';
-  let base = ruleLC;
+  let base = rule;
   let suffix = '';
+  let strTester;
   if (rule.startsWith('*.')) {
     base = base.slice(2);
     prefix = RE_STR_ANY;
+  } else if (!isTld && (strTester = StringTest.try(rule, true))) {
+    return strTester;
   }
-  if (tld.isReady() && rule.endsWith('.tld')) {
+  if (isTld) {
     base = base.slice(0, -4);
     suffix = RE_STR_TLD;
   }
-  const re = new RegExp(`^${prefix}${str2RE(base)}${suffix}$`);
-  return hostMatcherFunc.bind([ruleLC, re]);
+  const re = RegExp(`^${prefix}${str2RE(base)}${suffix}$`, 'i');
+  if (isTld) re.test = matchTld;
+  return re;
 }
 
-function hostMatcherFunc(data) {
-  // exact match, case-insensitive
-  data = data.toLowerCase();
-  if (this[0] === data) return 1;
-  // full check
-  const matches = data.match(this[1]);
-  if (matches) {
-    const [, tldStr] = matches;
-    if (!tldStr) return 1;
-    const tldSuffix = tldStr.slice(1);
-    return tld.getPublicSuffix(tldSuffix) === tldSuffix;
-  }
-  return 0;
-}
-
-function pathMatcher(rule) {
-  const iHash = rule.indexOf('#');
-  let iQuery = rule.indexOf('?');
-  let strRe = str2RE(rule);
-  if (iQuery > iHash) iQuery = -1;
-  if (iHash < 0) {
-    if (iQuery < 0) strRe = `^${strRe}(?:[?#]|$)`;
-    else strRe = `^${strRe}(?:#|$)`;
-  }
-  return RegExp(strRe);
-}
-
-function matchTester(rule) {
-  let test;
-  if (rule === '<all_urls>') {
-    test = matchAlways;
-  } else {
-    const ruleParts = rule.match(RE_MATCH_PARTS);
-    if (ruleParts) {
-      test = matchTesterFunc.bind([
-        ruleParts[1],
-        hostMatcher(ruleParts[2]),
-        pathMatcher(ruleParts[3]),
-      ]);
-    } else {
-      throw `Invalid @match ${rule}`;
-    }
-  }
-  return { test };
-}
-
-function matchTesterFunc(url) {
-  const parts = url.match(RE_MATCH_PARTS);
-  return +!!(parts
-    && matchScheme(this[0], parts[1])
-    && this[1](parts[2])
-    && this[2].test(parts[3])
-  );
+function pathMatcher(tail) {
+  const iQuery = tail.indexOf('?');
+  const hasHash = tail.indexOf('#', iQuery + 1) >= 0;
+  return hasHash && StringTest.try(tail)
+    || RegExp(`^${str2RE(tail)}${hasHash ? '$' : `($|${iQuery >= 0 ? '#' : '[?#]'})`}`);
 }
 
 export function testBlacklist(url) {
   let res = blCache[url];
   if (res === undefined) {
+    if (curUrl !== url) setContext(url);
     const rule = blacklistRules.find(m => m.test(url));
     res = rule?.reject && rule.text;
     updateBlacklistCache(url, res || false);
@@ -269,8 +330,8 @@ export function resetBlacklist(rules = getOption(BLACKLIST)) {
       const rule = mode ? text.slice(mode.length + 1).trim() : text;
       const isInc = mode === '@include';
       const m = (isInc || mode === '@exclude') && emplace(cacheInc, rule, autoReg)
-      || !mode && !rule.includes('/') && emplace(cacheMat, `*://${rule}/*`, matchTester) // domain
-      || emplace(cacheMat, rule, matchTester); // @match and @exclude-match
+      || !mode && !rule.includes('/') && emplace(cacheMat, `*://${rule}/*`, MatchTest.try) // domain
+      || emplace(cacheMat, rule, MatchTest.try); // @match and @exclude-match
       m.reject = !(mode === '@match' || isInc); // @include and @match = whitelist
       m.text = text;
       res.push(m);

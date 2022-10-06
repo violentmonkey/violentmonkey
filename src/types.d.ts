@@ -100,7 +100,12 @@ declare namespace GMReq {
     }
   }
 }
-
+declare type VMBridgePostFunc = (
+  cmd: string,
+  data: PlainJSONValue,
+  context?: { dataKey: string },
+  node?: Node,
+) => void;
 //#endregion Generic
 //#region VM-specific
 

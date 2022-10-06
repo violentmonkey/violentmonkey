@@ -32,12 +32,15 @@ export function showMessage(message) {
  * @param {string | false} [cfg.input=false] if not false, shows a text input with this string
  * @param {?Object|false} [cfg.ok] additional props for the Ok button or `false` to remove it
  * @param {?Object|false} [cfg.cancel] same for the Cancel button
- * @return {Promise<?string|true>} resolves on Ok to `true` or the entered string, null otherwise
+ * @return {Promise<?string|boolean>}
+ *   `input` is false: <boolean> i.e. true on Ok, false otherwise;
+ *   `input` is string: <?string> i.e. string on Ok, null otherwise;
  */
 export function showConfirmation(text, { ok, cancel, input = false } = {}) {
   return new Promise(resolve => {
-    const onCancel = () => resolve(null);
-    const onOk = val => resolve(input === false || val);
+    const hasInput = input !== false;
+    const onCancel = () => resolve(hasInput ? null : false);
+    const onOk = val => resolve(!hasInput || val);
     showMessage({
       input,
       text,

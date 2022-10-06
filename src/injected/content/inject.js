@@ -69,7 +69,7 @@ export function injectPageSandbox(contentId, webId) {
      * is it can be emptied by the opener page, too. */
     inject({ code: `parent["${vaultId}"] = [this]` }, ok => {
       // Skipping page injection in FF if our script element was blocked by site's CSP
-      if (ok && (!IS_FIREFOX || window.wrappedJSObject[vaultId])) {
+      if (ok && (!IS_FIREFOX || (ok = window.wrappedJSObject[vaultId]) && addVaultExports(ok))) {
         startHandshake();
       }
     });
@@ -164,7 +164,6 @@ export async function injectScripts(contentId, webId, data, isXml) {
       realmData.lists[runAt].push(script); // 'start' or 'body' per getScriptsByURL()
       realmData.is = true;
       if (pathMap) bridge.pathMaps[id] = pathMap;
-      bridge.allowScript(script);
     } else {
       bridge.failedIds.push(id);
       bridge.ids.push(id);
@@ -234,7 +233,6 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
   if (needsInvoker && contentId) {
     setupContentInvoker(contentId, webId);
   }
-  scripts::forEach(bridge.allowScript);
   injectAll('end');
   injectAll('idle');
 }
@@ -347,4 +345,18 @@ function tellBridgeToWriteVault(vaultId, wnd) {
     post('WriteVault', vaultId, INJECT_PAGE, wnd);
     return true;
   }
+}
+
+function addVaultExports(vaultSrc) {
+  const exports = cloneInto(createNullObj(), document);
+  // In FF a detached iframe's `console` doesn't print anything, we'll export it from content
+  const exportedConsole = cloneInto(createNullObj(), document);
+  ['log', 'info', 'warn', 'error', 'debug']::forEach(k => {
+    exportedConsole[k] = exportFunction(logging[k], document);
+    /* global exportFunction */
+  });
+  exports.console = exportedConsole;
+  // vaultSrc[0] is the iframe's `this`
+  vaultSrc[1] = exports;
+  return true;
 }
