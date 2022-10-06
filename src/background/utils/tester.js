@@ -74,7 +74,7 @@ hookOptions((changes) => {
 });
 tld.initTLD(true);
 
-class MatchTest {
+export class MatchTest {
   constructor(rule, scheme, httpMod, host, path) {
     const isWild = scheme === '*' || httpMod === '*';
     this.scheme = isWild ? 'http' : scheme;

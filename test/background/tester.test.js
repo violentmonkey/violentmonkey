@@ -1,5 +1,5 @@
 import test from 'tape';
-import { testScript, testBlacklist, resetBlacklist } from '@/background/utils/tester';
+import { MatchTest, resetBlacklist, testScript, testBlacklist } from '@/background/utils/tester';
 import cache from '@/background/utils/cache';
 
 test.onFinish(cache.destroy);
@@ -388,14 +388,15 @@ test('@match error reporting', (t) => {
   t.test('should throw', (q) => {
     for (const [rule, err] of [
       ['://*/*', 'missing scheme'],
-      ['foo://*/*', 'unknown scheme in'],
+      ['foo://*/*', 'unknown scheme'],
       ['*//*/*', 'missing "://"'],
       ['http:/*/', 'missing "://"'],
       ['htp:*', 'unknown scheme, missing "://"'],
       ['https://foo*', 'missing "/" for path'],
     ]) {
-      q.throws(testScript('', buildScript({ meta: { match: [rule] } }),
-        `Bad pattern: ${err} in ${rule}`));
+      // tape can't compare to a string exception, so we use a function
+      const expected = `Bad pattern: ${err} in ${rule}`;
+      q.throws(() => MatchTest.try(rule), e => e === expected, expected);
     }
     q.end();
   });
