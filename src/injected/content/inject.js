@@ -67,7 +67,7 @@ export function injectPageSandbox(contentId, webId) {
      * Content scripts will see `document.opener = null`, not the original opener, so we have
      * to use an iframe to extract the safe globals. Detection via document.referrer won't work
      * is it can be emptied by the opener page, too. */
-    inject({ code: `parent["${vaultId}"] = [this]` }, ok => {
+    inject({ code: `parent["${vaultId}"] = [this, 0]`/* DANGER! See addVaultExports */ }, ok => {
       // Skipping page injection in FF if our script element was blocked by site's CSP
       if (ok && (!IS_FIREFOX || (ok = window.wrappedJSObject[vaultId]) && addVaultExports(ok))) {
         startHandshake();
@@ -357,6 +357,7 @@ function addVaultExports(vaultSrc) {
   });
   exports.console = exportedConsole;
   // vaultSrc[0] is the iframe's `this`
+  // DANGER! vaultSrc[1] must be initialized in injectPageSandbox to prevent prototype hooking
   vaultSrc[1] = exports;
   return true;
 }
