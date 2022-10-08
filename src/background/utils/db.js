@@ -234,7 +234,6 @@ const STORAGE_ROUTES = {
   [S_VALUE]: ENV_VALUE_IDS,
 };
 const STORAGE_ROUTES_ENTRIES = Object.entries(STORAGE_ROUTES);
-const retriedStorageKeys = {};
 
 /**
  * @desc Get scripts to be injected to page with specific URL.
@@ -313,7 +312,7 @@ async function getScriptEnv(scripts) {
   return Object.assign(envStart, { disabledIds, envDelayed });
 }
 
-async function readEnvironmentData(env, isRetry) {
+async function readEnvironmentData(env) {
   const keys = [];
   for (const [area, listName] of STORAGE_ROUTES_ENTRIES) {
     for (const id of env[listName]) {
@@ -327,14 +326,7 @@ async function readEnvironmentData(env, isRetry) {
       let val = data[storage[area].toKey(id)];
       if (!val && area === S_VALUE) val = {};
       env[area][id] = val;
-      if (val == null && retriedStorageKeys[area + id] !== 2) {
-        retriedStorageKeys[area + id] = isRetry ? 2 : 1;
-        if (!isRetry) {
-          console.warn(`The "${area}" storage is missing "${id}"! Vacuuming...`);
-          if ((await vacuum()).fixes) {
-            return readEnvironmentData(env, true);
-          }
-        }
+      if (val == null) {
         if (area === S_CODE) {
           badScripts.add(id);
         } else {
@@ -656,6 +648,7 @@ export async function vacuum(data) {
   if (_vacuuming) return _vacuuming;
   let resolveSelf;
   _vacuuming = new Promise(r => { resolveSelf = r; });
+  const noFetch = !data && [];
   const sizes = {};
   const result = {};
   const toFetch = [];
@@ -720,7 +713,9 @@ export async function vacuum(data) {
       const area = storage.forKey(key);
       const id = area.toId(key);
       const url = area.name === S_CODE ? downloadUrls[id] : id;
-      if (url && area.fetch) {
+      if (noFetch) {
+        noFetch.push(url);
+      } else if (url && area.fetch) {
         keysToRemove.push(S_MOD_PRE + url);
         toFetch.push(area.fetch(url).catch(err => `${
           getScriptName(getScriptById(+id || value - 2))
@@ -733,6 +728,9 @@ export async function vacuum(data) {
   if (keysToRemove.length) {
     await storage.base.remove(keysToRemove); // Removing `mod` before fetching
     result.errors = (await Promise.all(toFetch)).filter(Boolean);
+  }
+  if (noFetch && noFetch.length) {
+    console.warn('Missing required resources. Try vacuuming database in options.', noFetch);
   }
   _vacuuming = null;
   result.fixes = toFetch.length + keysToRemove.length;
