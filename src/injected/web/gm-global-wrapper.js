@@ -2,19 +2,18 @@ import { INJECT_CONTENT } from '../util';
 import bridge from './bridge';
 import { FastLookup, safeConcat } from './util';
 
-/** The index strings that look exactly like integers can't be forged
- * but for example '011' doesn't look like 11 so it's allowed */
-const isFrameIndex = key => key >= 0 && key <= 0xFFFF_FFFE && key === (+key)::numberToString();
+const isFrameIndex = key => +key >= 0 && key < window::getWindowLength();
 const scopeSym = SafeSymbol.unscopables;
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
   const kWrappedJSObject = 'wrappedJSObject';
   const isContentMode = !process.env.HANDSHAKE_ID;
   const names = builtinGlobals[0]; // `window` keys
+  const numFrames = window::getWindowLength();
   // True if `names` is usable as is, but FF is bugged: its names have duplicates
   let ok = !IS_FIREFOX;
   names::forEach(key => {
-    if (isFrameIndex(key)
+    if (+key >= 0 && key < numFrames
       || isContentMode && (
         key === process.env.INIT_FUNC_NAME || key === 'browser' || key === 'chrome'
       )
@@ -28,7 +27,7 @@ const globalKeys = (function makeGlobalKeys() {
      FF content mode: `global` is different, some props e.g. `isFinite` are defined only there */
   if (global !== window) {
     builtinGlobals[1]::forEach(key => {
-      if (!isFrameIndex(key)) {
+      if (!(+key >= 0 && key < numFrames)) { // keep the `!` inversion to avoid safe-guarding isNaN
         globalKeysSet.add(key);
         ok = false;
       }
@@ -256,18 +255,14 @@ function makeOwnKeys(local, globals) {
   const names = getOwnPropertyNames(local)::filter(notIncludedIn, globals);
   const symbols = getOwnPropertySymbols(local)::filter(notIncludedIn, globals);
   const frameIndexes = [];
-  // No way to verify a cross-origin window is a `Window`, so let's just trust the numbers
-  for (let i = 0, s, w, len = getOwnProp(window, 'length');
-    i < len && isObject(w = window[s = i::numberToString()]) && getOwnProp(w, 'window') === w;
-    i += 1
-  ) {
-    if (!(s in local)) {
-      setOwnProp(frameIndexes, s, s);
+  for (let i = 0, len = window::getWindowLength(); i < len; i += 1) {
+    if (!(i in local) && window::hasOwnProperty(i)) {
+      setOwnProp(frameIndexes, i, i);
     }
   }
   return safeConcat(
-    globals === globalKeysSet ? globalKeys : globals.toArray(),
     frameIndexes,
+    globals === globalKeysSet ? globalKeys : globals.toArray(),
     names,
     symbols,
   );
