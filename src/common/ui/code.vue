@@ -163,42 +163,13 @@ export default {
   },
   methods: {
     updateValue(value = this.value) {
-      const len = value.length;
       const { cm } = this;
-      if (!cm) return;
-      let ph = '';
-      let phCopiedIndex = 0
-      if (len > maxDisplayLength) {
-        // Not using split() as it may be very slow in scripts with 100K lines and unnecessary.
-        // Not using RegExp as it throws on super long lines.
-        for (let line = 0, i = 0, j, text;
-            i < len && ((j = value.indexOf('\n', i)) >= 0 || (j = len));
-            i = j + 1, line += 1) {
-          if (j - i > maxDisplayLength) {
-            text = [value.slice(i, j)];
-            if (this.createPlaceholders({ text, from: { line, ch: 0 } })) {
-              // Modern browsers optimize progressive concatenation
-              ph += value.slice(phCopiedIndex, i) + text[0];
-              phCopiedIndex = j;
-            }
-          }
-        }
-        if (ph) value = ph + value.slice(phCopiedIndex);
-      }
-      this.watchCM(false);
-      cm.operation(() => {
+      cm?.operation(() => {
         cm.setValue(value);
-        if (ph) this.renderPlaceholders();
+        cm.clearHistory();
+        cm.markClean();
+        cm.focus();
       });
-      cm.clearHistory();
-      cm.markClean();
-      cm.focus();
-      this.watchCM(true);
-    },
-    watchCM(onOff) {
-      onOff = onOff ? 'on' : 'off';
-      this.cm[onOff]('changes', this.onChanges);
-      this.cm[onOff]('beforeChange', this.onBeforeChange);
     },
     onBeforeChange(cm, change) {
       if (this.createPlaceholders(change)) {
@@ -330,8 +301,9 @@ export default {
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
       });
+      this.cm.on('changes', this.onChanges);
+      this.cm.on('beforeChange', this.onBeforeChange);
       if (this.value) this.updateValue();
-      else this.watchCM(true);
       this.$emit('ready', cm);
     },
     onActive(state) {
