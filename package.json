@@ -1,7 +1,7 @@
 {
   "name": "violentmonkey",
   "description": "Violentmonkey",
-  "version": "2.13.1",
+  "version": "2.13.2",
   "scripts": {
     "dev": "gulp dev",
     "prebuild": "yarn ci",
@@ -89,6 +89,5 @@
       "pre-commit": "yarn transform -t",
       "pre-push": "run-p lint test"
     }
-  },
-  "beta": 5
+  }
 }
