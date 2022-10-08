@@ -105,6 +105,11 @@ const modify = (page, entry, init) => modifyWebpackConfig(
       new TerserPlugin(MIN_OPTS_PUBLIC),
       new TerserPlugin(MIN_OPTS_MAIN),
     ]);
+    config.module.rules.find(rule => {
+      if (typeof rule.test?.test === 'function' && rule.test.test('file.js')) {
+        rule.exclude = file => /node_modules/.test(file) && !/vueleton/.test(file);
+      }
+    });
     if (!entry) init = page;
     if (init) init(config);
     return config;

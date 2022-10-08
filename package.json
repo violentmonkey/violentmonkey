@@ -70,7 +70,7 @@
     "codemirror-js-mixed": "^0.9.2",
     "tldjs": "^2.3.1",
     "vue": "^3.2.37",
-    "vueleton": "^2.0.0-4"
+    "vueleton": "^2.0.0-5"
   },
   "engines": {
     "node": ">=12"
