@@ -12,7 +12,7 @@ export const {
    * TODO: try reimplementing Promise in our sandbox wrapper if it can work with user code */
   Promise: UnsafePromise,
 } = global;
-export const cloneInto = process.env.HANDSHAKE_ID ? null : global.cloneInto;
+export const cloneInto = PAGE_MODE_HANDSHAKE ? null : global.cloneInto;
 export let
   // window
   SafeCustomEvent,
@@ -93,9 +93,9 @@ export const VAULT = (() => {
   let srcFF;
   let src = global; // FF defines some stuff only on `global` in content mode
   let srcWindow = window;
-  if (process.env.VAULT_ID) {
-    res = window[process.env.VAULT_ID];
-    delete window[process.env.VAULT_ID];
+  if (VAULT_ID) {
+    res = window[VAULT_ID];
+    delete window[VAULT_ID];
   }
   if (!res) {
     res = createNullObj();

@@ -97,7 +97,7 @@ export const FastLookup = (hubs = createNullObj()) => {
 export const makeComponentUtils = () => {
   const CREATE_OBJECT_IN = 'createObjectIn';
   const EXPORT_FUNCTION = 'exportFunction';
-  const src = IS_FIREFOX && !process.env.HANDSHAKE_ID && global;
+  const src = IS_FIREFOX && !PAGE_MODE_HANDSHAKE && global;
   const defineIn = !src && ((target, as, val) => {
     if (as && (as = getOwnProp(as, 'defineAs'))) {
       setOwnProp(target, as, val);

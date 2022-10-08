@@ -1,5 +1,3 @@
-import { INJECT_CONTENT } from '../util';
-import bridge from './bridge';
 import { FastLookup, safeConcat } from './util';
 
 const isFrameIndex = key => +key >= 0 && key < window::getWindowLength();
@@ -7,7 +5,7 @@ const scopeSym = SafeSymbol.unscopables;
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
   const kWrappedJSObject = 'wrappedJSObject';
-  const isContentMode = !process.env.HANDSHAKE_ID;
+  const isContentMode = !PAGE_MODE_HANDSHAKE;
   const names = builtinGlobals[0]; // `window` keys
   const numFrames = window::getWindowLength();
   // True if `names` is usable as is, but FF is bugged: its names have duplicates
@@ -35,7 +33,7 @@ const globalKeys = (function makeGlobalKeys() {
   }
   // wrappedJSObject is not included in getOwnPropertyNames so we add it explicitly.
   if (IS_FIREFOX
-    && bridge.mode === INJECT_CONTENT
+    && !PAGE_MODE_HANDSHAKE
     && kWrappedJSObject in global
     && !globalKeysSet.has(kWrappedJSObject)) {
     globalKeysSet.add(kWrappedJSObject);

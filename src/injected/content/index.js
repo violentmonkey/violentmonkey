@@ -5,7 +5,7 @@ import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
-import { nextTask, sendCmd } from './util';
+import { sendCmd } from './util';
 import { isEmpty, INJECT_CONTENT } from '../util';
 import { Run } from './cmd-run';
 
@@ -67,7 +67,6 @@ bridge.addBackgroundHandlers({
 
 bridge.addHandlers({
   Run,
-  NextTask: nextTask,
   TabFocus: true,
   UpdateValue: true,
 });

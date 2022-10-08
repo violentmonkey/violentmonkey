@@ -113,7 +113,7 @@ export function injectPageSandbox(contentId, webId) {
     pageInjectable = true;
     evt::stopImmediatePropagation();
     bindEvents(contentId, webId, bridge);
-    fireBridgeEvent(handshakeId + process.env.HANDSHAKE_ACK, [webId, contentId]);
+    fireBridgeEvent(`${handshakeId}*`, [webId, contentId]);
   }
 }
 

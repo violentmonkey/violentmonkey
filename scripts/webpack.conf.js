@@ -12,8 +12,8 @@ const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
 // Avoiding collisions with globals of a content-mode userscript
 const INIT_FUNC_NAME = `Violentmonkey:${getUniqIdB64()}`;
-const VAULT_ID = '__VAULT_ID__';
-const HANDSHAKE_ID = '__HANDSHAKE_ID__';
+const VAULT_ID = 'VAULT_ID';
+const PAGE_MODE_HANDSHAKE = 'PAGE_MODE_HANDSHAKE';
 const VM_VER = getVersion();
 const WEBPACK_OPTS = {
   node: {
@@ -77,9 +77,6 @@ const defsObj = {
     { key: 'SYNC_DROPBOX_CLIENT_ID' },
   ]),
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
-  'process.env.VAULT_ID': VAULT_ID,
-  'process.env.HANDSHAKE_ID': HANDSHAKE_ID,
-  'process.env.HANDSHAKE_ACK': '1',
   'process.env.CODEMIRROR_THEMES': JSON.stringify(getCodeMirrorThemes()),
   'process.env.DEV': JSON.stringify(!isProd),
 };
@@ -146,7 +143,7 @@ module.exports = Promise.all([
     config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapperWithGlobals('injected/web', config, defsObj, getGlobals => ({
       header: () => `${skipReinjectionHeader}
-        window[INIT_FUNC_NAME] = function (IS_FIREFOX,${HANDSHAKE_ID},${VAULT_ID}) {
+        window[INIT_FUNC_NAME] = function (IS_FIREFOX,${PAGE_MODE_HANDSHAKE},${VAULT_ID}) {
           const module = { __proto__: null };
           ${getGlobals()}`,
       footer: `

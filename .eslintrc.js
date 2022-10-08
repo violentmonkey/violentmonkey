@@ -17,7 +17,11 @@ const GLOBALS_COMMON = {
   ...getGlobals('src/common/safe-globals.js'),
   re: false, // transform-modern-regexp with useRe option
 };
-const GLOBALS_INJECTED = getGlobals(`src/injected/safe-globals-injected.js`);
+const GLOBALS_INJECTED = {
+  ...getGlobals(`src/injected/safe-globals-injected.js`),
+  PAGE_MODE_HANDSHAKE: false,
+  VAULT_ID: false,
+};
 const GLOBALS_CONTENT = {
   INIT_FUNC_NAME: false,
   ...getGlobals(`src/injected/content/safe-globals-content.js`),
