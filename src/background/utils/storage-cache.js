@@ -87,7 +87,7 @@ storage.api = {
     });
     batch(false);
     if (keys.length) {
-      await api.set(toWrite);
+      await api[SET](toWrite);
       fire({ keys });
     }
     if (unflushed) flushLater();
@@ -186,8 +186,8 @@ async function flush() {
   const toRemove = keys.filter(key => !valuesToFlush[key] && delete valuesToFlush[key]);
   const toFlush = valuesToFlush;
   valuesToFlush = {};
-  if (!isEmpty(toFlush)) await api.set(toFlush);
-  if (toRemove.length) await api.remove(toRemove);
+  if (!isEmpty(toFlush)) await api[SET](toFlush);
+  if (toRemove.length) await api[REMOVE](toRemove);
   if (valuesToWatch) setTimeout(notifyWatchers, 0, toFlush, toRemove);
   fire({ keys });
 }

@@ -43,7 +43,7 @@ export default function initialize(
     global.chrome = undefined;
     global.browser = undefined;
     bridge.addHandlers({
-      RunAt,
+      RunAt: doRunAt,
     });
   } else {
     bridge.mode = INJECT_PAGE;
@@ -133,7 +133,7 @@ async function onCodeSet(item, fn) {
   }
 }
 
-async function RunAt(name) {
+async function doRunAt(name) {
   if (name) {
     safePush(runningQueues, waitingQueues[name]);
     if (runningQueues.length > 1) return;
@@ -145,7 +145,7 @@ async function RunAt(name) {
         if (fn) {
           queue[j] = null;
           if (fn === 1) {
-            queueMacrotask(RunAt);
+            queueMacrotask(doRunAt);
             return;
           }
           await 0;

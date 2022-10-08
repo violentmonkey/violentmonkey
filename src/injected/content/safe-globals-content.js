@@ -52,7 +52,7 @@ export const logging = assign(createNullObj(), console);
 export const { chrome } = global;
 export const VM_UUID = chrome.runtime.getURL('');
 /** Unlike the built-in `instanceof` operator this doesn't call @@hasInstance which may be spoofed */
-export const isInstance = function _(instance, safeOriginalProto) {
+export const isInstance = (instance, safeOriginalProto) => {
   for (let obj = instance; isObject(obj) && (obj = getPrototypeOf(obj));) {
     if (obj === safeOriginalProto) {
       return true;

@@ -122,7 +122,7 @@ export const safeDefineProperty = (obj, key, desc) => (
   defineProperty(obj, key, createNullObj(desc))
 );
 
-/** A safe replacement for ::push() which may call a setter */
+/** Unlike ::push() this one doesn't call possibly spoofed Array.prototype setters */
 export const safePush = (arr, val) => (
   setOwnProp(arr, arr.length, val)
 );
