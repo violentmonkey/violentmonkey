@@ -96,9 +96,9 @@ a {
   }
 }
 hr {
-  margin: .5rem;
-  border: none;
-  border-top: 1px solid var(--fill-7);
+  margin: .5rem 0;
+  border-style: solid;
+  border-width: 1px 0 0 0;
 }
 input[type=checkbox] {
   margin-right: .2em;

@@ -22,6 +22,8 @@ export const store = {
   scripts: [],
   /** @type {Object<string,VMScript[]>} */
   scriptMap: {},
+  /** @type {VMScript[]} */
+  removedScripts: [],
   /** @type {{ [url:string]: number }} */
   sizes: {},
   /** Same order as in SIZE_TITLES and getSizes */
@@ -35,7 +37,7 @@ export const store = {
 addPublicCommands({
   GetScriptVer(opts) {
     const script = getScript(opts);
-    return script && !script.config.removed
+    return script
       ? script.meta.version
       : null;
   },
@@ -108,23 +110,26 @@ preInitialize.push(async () => {
   if (!lastVersion) await patchDB();
   if (version !== lastVersion) storage.base.set({ version });
   const data = await storage.base.getMulti();
-  const { scripts, storeInfo, scriptMap } = store;
+  const { scripts, removedScripts, storeInfo, scriptMap } = store;
   const uriMap = {};
   data::forEachEntry(([key, script]) => {
     const id = +storage.script.toId(key);
     if (id && script) {
-      if (scriptMap[id] && scriptMap[id] !== script) {
-        // ID conflicts!
-        // Should not happen, discard duplicates.
-        return;
-      }
       const uri = getNameURI(script);
-      if (uriMap[uri]) {
-        // Namespace conflicts!
-        // Should not happen, discard duplicates.
-        return;
+      // Only check ID/namespace conflicts for scripts not removed
+      if (!script.config.removed) {
+        if (scriptMap[id] && scriptMap[id] !== script) {
+          // ID conflicts!
+          // Should not happen, discard duplicates.
+          return;
+        }
+        if (uriMap[uri]) {
+          // Namespace conflicts!
+          // Should not happen, discard duplicates.
+          return;
+        }
+        uriMap[uri] = script;
       }
-      uriMap[uri] = script;
       script.props = {
         ...script.props,
         id,
@@ -136,7 +141,7 @@ preInitialize.push(async () => {
       };
       storeInfo.id = Math.max(storeInfo.id, id);
       storeInfo.position = Math.max(storeInfo.position, getInt(script.props.position));
-      scripts.push(script);
+      (script.config.removed ? removedScripts : scripts).push(script);
       // listing all known resource urls in order to remove unused mod keys
       const {
         meta = script.meta = {},
@@ -208,20 +213,20 @@ export function getScriptById(id) {
 }
 
 /** @return {?VMScript} */
-export function getScript({ id, uri, meta }) {
+export function getScript({ id, uri, meta, removed }) {
   let script;
   if (id) {
     script = getScriptById(id);
   } else {
     if (!uri) uri = getNameURI({ meta, id: '@@should-have-name' });
-    script = store.scripts.find(({ props }) => uri === props.uri);
+    script = store[removed ? 'removedScripts' : 'scripts'].find(({ props }) => uri === props.uri);
   }
   return script;
 }
 
 /** @return {VMScript[]} */
 export function getScripts() {
-  return store.scripts.filter(script => !script.config.removed);
+  return store.scripts;
 }
 
 export const ENV_CACHE_KEYS = 'cacheKeys';
@@ -254,8 +259,7 @@ export function getScriptsByURL(url, isTop, errors) {
   const allScripts = testBlacklist(url)
     ? []
     : store.scripts.filter(script => (
-      !script.config.removed
-      && (isTop || !(script.custom.noframes ?? script.meta.noframes))
+      (isTop || !(script.custom.noframes ?? script.meta.noframes))
       && testScript(url, script)
     ));
   testerBatch();
@@ -378,12 +382,15 @@ function reportBadScripts(ids) {
  * @desc Get data for dashboard.
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
-export async function getData({ ids, sizes }) {
+export async function getData({ ids, sizes, removed }) {
   const scripts = ids ? ids.map(getScriptById) : store.scripts;
-  scripts.forEach(inferScriptProps);
+  const removedScripts = !ids && removed ? store.removedScripts : null;
+  const allScripts = scripts.concat(removedScripts || []);
+  allScripts.forEach(inferScriptProps);
   return {
     scripts,
-    cache: await getIconCache(scripts),
+    removedScripts,
+    cache: await getIconCache(allScripts),
     sizes: sizes && getSizes(ids),
   };
 }
@@ -444,7 +451,7 @@ export function checkRemove({ force } = {}) {
   const now = Date.now();
   const toKeep = [];
   const toRemove = [];
-  store.scripts.forEach(script => {
+  store.removedScripts.forEach(script => {
     const { id, lastModified } = script.props;
     if (script.config.removed && (force || now - getInt(lastModified) > TIMEOUT_WEEK)) {
       toRemove.push(storage.code.toKey(id),
@@ -455,7 +462,7 @@ export function checkRemove({ force } = {}) {
     }
   });
   if (toRemove.length) {
-    store.scripts = toKeep;
+    store.removedScripts = toKeep;
     return storage.base.remove(toRemove);
   }
 }
@@ -557,7 +564,7 @@ export async function parseScript(src) {
     },
   };
   let script;
-  const oldScript = await getScript({ id: src.id, meta });
+  const oldScript = getScript({ id: src.id, meta });
   if (oldScript) {
     if (src.isNew) throw i18n('msgNamespaceConflict');
     script = { ...oldScript };

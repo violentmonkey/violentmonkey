@@ -35,19 +35,7 @@
             </a>
           </tooltip>
         </div>
-        <div class="flex-auto" v-else
-             v-text="`${i18n('headerRecycleBin')}${trash.length ? ` (${trash.length})` : ''}`" />
-        <tooltip :content="i18n('buttonRecycleBin')" placement="bottom">
-          <a
-            class="btn-ghost trash-button"
-            :class="{ active: showRecycle, filled: trash.length }"
-            @click="showRecycle = !showRecycle"
-            tabindex="0"
-          >
-            <icon name="trash" :class="{ 'trash-animate': removing }"></icon>
-            <b v-if="trash.length" v-text="trash.length"/>
-          </a>
-        </tooltip>
+        <div class="flex-auto" v-else v-text="i18n('headerRecycleBin')" />
         <dropdown align="right" class="filter-sort">
           <tooltip :content="i18n('labelSettings')" placement="bottom">
             <a class="btn-ghost" tabindex="0">
@@ -109,7 +97,7 @@
       </header>
       <div v-if="showRecycle" class="trash-hint mx-1 my-1 flex flex-col">
         <span v-text="i18n('hintRecycleBin')"/>
-        <a v-if="trash.length" v-text="i18n('buttonEmptyRecycleBin')" tabindex="0"
+        <a v-if="store.removedScripts.length" v-text="i18n('buttonEmptyRecycleBin')" tabindex="0"
            @click="emptyRecycleBin"/>
       </div>
       <div class="scripts flex-auto"
@@ -160,7 +148,7 @@ import { keyboardService, handleTabNavigation } from '@/common/keyboard';
 import { loadData } from '@/options';
 import ScriptItem from './script-item';
 import Edit from './edit';
-import { store, installedScripts, removedScripts } from '../utils';
+import { store } from '../utils';
 import toggleDragging from '../utils/dragging';
 
 const filterOptions = {
@@ -260,7 +248,6 @@ export default {
       searchError: null,
       modal: null,
       menuNewActive: false,
-      showRecycle: false,
       sortedScripts: [],
       removing: false,
       showHotkeys: false,
@@ -271,8 +258,6 @@ export default {
         limit: step,
       },
       numColumns: null,
-      scripts: installedScripts,
-      trash: removedScripts,
     };
   },
   watch: {
@@ -282,12 +267,11 @@ export default {
     'filters.showEnabledFirst': 'updateLater',
     'filters.viewSingleColumn': 'adjustScriptWidth',
     'filters.viewTable': 'adjustScriptWidth',
-    showRecycle(value) {
-      keyboardService.setContext('showRecycle', value);
+    showRecycle() {
       this.focusedIndex = -1;
       this.onUpdate();
     },
-    scripts: 'refreshUI',
+    'store.scripts': 'refreshUI',
     'store.route.paths.1': 'onHashChange',
     selectedScript(script) {
       keyboardService.setContext('selectedScript', script);
@@ -297,6 +281,9 @@ export default {
     },
   },
   computed: {
+    showRecycle() {
+      return store.route.paths[0] === 'recycleBin';
+    },
     draggable() {
       return !this.showRecycle && filters.sort === 'exec';
     },
@@ -330,7 +317,7 @@ export default {
       this.onHashChange();
     },
     onUpdate() {
-      const scripts = [...this.showRecycle ? this.trash : this.scripts];
+      const scripts = [...this.showRecycle ? this.store.removedScripts : this.store.scripts];
       const numFound = this.search ? this.performSearch(scripts) : scripts.length;
       const cmp = this.currentSortCompare;
       if (cmp) scripts.sort(combinedCompare(cmp));
@@ -405,7 +392,7 @@ export default {
         Object.assign(this, await sendCmdDirectly('NewScript', cacheId));
       } else {
         const nid = id && +id || null;
-        const script = nid && this.scripts.find(s => s.props.id === nid);
+        const script = nid && this.store.scripts.find(s => s.props.id === nid);
         if (script) {
           this.code = await sendCmdDirectly('GetScriptCode', id);
         } else {
@@ -486,7 +473,7 @@ export default {
     async emptyRecycleBin() {
       if (await showConfirmation(i18n('buttonEmptyRecycleBin'))) {
         sendCmdDirectly('CheckRemove', { force: true });
-        store.scripts = store.scripts.filter(script => !script.config.removed);
+        store.removedScripts = [];
       }
     },
     adjustScriptWidth() {
