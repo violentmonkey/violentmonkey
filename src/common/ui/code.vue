@@ -163,19 +163,32 @@ export default {
   },
   methods: {
     updateValue(value = this.value) {
-      const hasLongLines = value.length > maxDisplayLength
-        && new RegExp(`^\\s*.{${maxDisplayLength},}`, 'm').test(value);
+      const len = value.length;
       const { cm } = this;
       if (!cm) return;
-      if (hasLongLines) {
-        const lines = value.split('\n');
-        this.createPlaceholders({ text: lines, from: { line: 0 } });
-        value = lines.join('\n');
+      let ph = '';
+      let phCopiedIndex = 0
+      if (len > maxDisplayLength) {
+        // Not using split() as it may be very slow in scripts with 100K lines and unnecessary.
+        // Not using RegExp as it throws on super long lines.
+        for (let line = 0, i = 0, j, text;
+            i < len && ((j = value.indexOf('\n', i)) >= 0 || (j = len));
+            i = j + 1, line += 1) {
+          if (j - i > maxDisplayLength) {
+            text = [value.slice(i, j)];
+            if (this.createPlaceholders({ text, from: { line, ch: 0 } })) {
+              // Modern browsers optimize progressive concatenation
+              ph += value.slice(phCopiedIndex, i) + text[0];
+              phCopiedIndex = j;
+            }
+          }
+        }
+        if (ph) value = ph + value.slice(phCopiedIndex);
       }
       this.watchCM(false);
       cm.operation(() => {
         cm.setValue(value);
-        if (hasLongLines) this.renderPlaceholders();
+        if (ph) this.renderPlaceholders();
       });
       cm.clearHistory();
       cm.markClean();
