@@ -81,7 +81,7 @@ const commandsForSelf = [
 ];
 
 async function handleCommandMessage({ cmd, data } = {}, src) {
-  if (src && src.origin !== extensionOrigin && commandsForSelf.includes(cmd)) {
+  if (src && !`${src.url}`.startsWith(extensionOrigin) && commandsForSelf.includes(cmd)) {
     throw `Command is only allowed in extension context: ${cmd}`;
   }
   const res = await commands[cmd]?.(data, src);
