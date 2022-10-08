@@ -202,7 +202,7 @@ export default {
       this.$emit('code-dirty', !cm.isClean());
     },
     createPlaceholders(change) {
-      const { line } = change.from;
+      const { line, ch } = change.from;
       let res = false;
       let len;
       let prefix;
@@ -223,7 +223,7 @@ export default {
             body,
             el: null,
             line: line + i,
-            ch: prefix.length,
+            ch: ch + prefix.length,
             length: replaced.length,
           });
           change.text[i] = `${prefix}${replaced}`;
