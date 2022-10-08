@@ -19,9 +19,6 @@ export const WINDOW_CLOSE = 'window.close';
 export const WINDOW_FOCUS = 'window.focus';
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 export const CALLBACK_ID = '__CBID';
-/** These toString are used to avoid leaking data when converting into a string */
-const { toString: numberToString } = 0;
-const { toString: URLToString } = URL[PROTO];
 
 export const throwIfProtoPresent = process.env.DEBUG && (obj => {
   if (!obj || obj.__proto__) { // eslint-disable-line no-proto
@@ -105,7 +102,7 @@ export const vmOwnFunc = (func, toString) => (
 );
 
 // Using just one random() to avoid many methods in vault just for this
-export const safeGetUniqId = (prefix = 'VM') => prefix + mathRandom()::numberToString(36);
+export const safeGetUniqId = (prefix = 'VM') => prefix + mathRandom();
 
 /** args is [tags?, ...rest] */
 export const log = (level, ...args) => {

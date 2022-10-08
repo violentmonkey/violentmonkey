@@ -25,6 +25,7 @@ export let
   SafeProxy,
   SafeSymbol,
   fire,
+  getWindowLength,
   off,
   on,
   // Symbol
@@ -59,6 +60,7 @@ export let
   // various values
   builtinGlobals,
   // various methods
+  URLToString,
   arrayIsArray,
   createObjectURL,
   formDataEntries,
@@ -147,6 +149,7 @@ export const VAULT = (() => {
     // safeCall
     safeCall = res[i += 1] || (call = SafeObject.call).bind(call),
     // various methods
+    URLToString = res[i += 1] || src.URL[PROTO].toString,
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     formDataEntries = res[i += 1] || src.FormData[PROTO].entries,
     funcToString = res[i += 1] || safeCall.toString,
@@ -164,6 +167,7 @@ export const VAULT = (() => {
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
     getDetail = res[i += 1] || describeProperty(SafeCustomEvent[PROTO], 'detail').get,
     getRelatedTarget = res[i += 1] || describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get,
+    getWindowLength = res[i += 1] || describeProperty(src, 'length').get,
     // various values
     builtinGlobals = res[i += 1] || [
       getOwnPropertyNames(srcWindow),

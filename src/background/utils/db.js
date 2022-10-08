@@ -662,7 +662,13 @@ export async function vacuum(data) {
   const keysToRemove = [];
   /** -1=untouched, 1=touched, 2(+scriptId)=missing */
   const status = {};
-  const prefixRe = RegExp(`^(${S_VALUE_PRE}|${S_CACHE_PRE}|${S_REQUIRE_PRE}|${S_CODE_PRE}${S_MOD_PRE})`);
+  const prefixRe = RegExp(`^(${[
+    S_VALUE_PRE,
+    S_CACHE_PRE,
+    S_REQUIRE_PRE,
+    S_CODE_PRE,
+    S_MOD_PRE,
+  ].join('|')})`);
   const downloadUrls = {};
   const touch = (prefix, id, scriptId, pathMap) => {
     if (!id || pathMap && isDataUri(id)) {
@@ -675,7 +681,7 @@ export async function vacuum(data) {
       if (id !== scriptId) {
         status[S_MOD_PRE + id] = 1;
       }
-      if (prefix === S_CACHE_PRE || prefix === S_REQUIRE_PRE || prefix === S_VALUE_PRE) {
+      if (prefix !== S_MOD_PRE) {
         sizes[key] = deepSize(data[key]) + (prefix === S_VALUE_PRE ? 0 : key.length);
       }
     } else if (!val) {
