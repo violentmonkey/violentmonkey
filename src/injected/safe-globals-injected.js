@@ -29,11 +29,12 @@ export const isFunction = val => typeof val === 'function';
 export const isObject = val => val != null && typeof val === 'object';
 export const isString = val => typeof val === 'string';
 
-export const getOwnProp = (obj, key) => {
+export const getOwnProp = (obj, key, defVal) => {
   // obj may be a Proxy that throws in has() or its getter throws
   try {
-    if (obj::hasOwnProperty(key)) return obj[key];
+    if (obj::hasOwnProperty(key)) defVal = obj[key];
   } catch (e) { /* NOP */ }
+  return defVal;
 };
 
 /** Workaround for array eavesdropping via prototype setters like '0','1',...

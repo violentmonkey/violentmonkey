@@ -255,8 +255,8 @@ function makeOwnKeys(local, globals) {
   const names = getOwnPropertyNames(local)::filter(notIncludedIn, globals);
   const symbols = getOwnPropertySymbols(local)::filter(notIncludedIn, globals);
   const frameIndexes = [];
-  for (let i = 0, len = window::getWindowLength(); i < len; i += 1) {
-    if (!(i in local) && window::hasOwnProperty(i)) {
+  for (let i = 0, len = window::getWindowLength(); i < len && window::hasOwnProperty(i); i += 1) {
+    if (!(i in local)) {
       setOwnProp(frameIndexes, i, i);
     }
   }
