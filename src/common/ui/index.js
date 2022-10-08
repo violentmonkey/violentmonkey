@@ -1,15 +1,14 @@
-import Modal from 'vueleton/lib/modal/bundle';
+import { createApp, h } from 'vue';
+import Modal from 'vueleton/lib/modal';
 import { i18n } from '@/common/util';
 import Message from './message';
 
 export function showMessage(message) {
-  const modal = Modal.show(h => h(Message, {
-    props: { message },
-    on: {
-      dismiss() {
-        modal.close();
-        message.onDismiss?.();
-      },
+  const modal = Modal.show(() => h(Message, {
+    message,
+    onDismiss() {
+      modal.close();
+      message.onDismiss?.();
     },
   }), {
     transition: 'in-out',
@@ -53,6 +52,28 @@ export function showConfirmation(text, { ok, cancel, input = false } = {}) {
       onDismiss: onCancel, // Esc key
     });
   });
+}
+
+/** @returns {?number} Number of lines + 1 if the last line is not empty */
+export function calcRows(val) {
+  return val && (
+    val.match(/$/gm).length
+      + !val.endsWith('\n')
+  );
+}
+
+export function render(App, el) {
+  const app = createApp(App);
+  Object.assign(app.config.globalProperties, {
+    i18n,
+    calcRows,
+  });
+  if (!el) {
+    el = document.createElement('div');
+    document.body.append(el);
+  }
+  app.mount(el);
+  return app;
 }
 
 /** Focus the first tabindex=-1 element or root, to enable scrolling via Home/End/PgUp/PgDn */

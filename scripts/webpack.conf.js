@@ -14,13 +14,10 @@ const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 const INIT_FUNC_NAME = `Violentmonkey:${getUniqIdB64()}`;
 const VAULT_ID = '__VAULT_ID__';
 const HANDSHAKE_ID = '__HANDSHAKE_ID__';
-// eslint-disable-next-line import/no-dynamic-require
 const VM_VER = getVersion();
 const WEBPACK_OPTS = {
   node: {
     global: false,
-    process: false,
-    setImmediate: false,
   },
   performance: {
     maxEntrypointSize: 1e6,
@@ -28,10 +25,8 @@ const WEBPACK_OPTS = {
   },
 };
 const MIN_OPTS = {
-  cache: true,
   extractComments: false,
   parallel: true,
-  sourceMap: true,
   terserOptions: {
     compress: {
       // `terser` often inlines big one-time functions inside a small "hot" function
@@ -97,6 +92,7 @@ const skipReinjectionHeader = `{
 const modify = (page, entry, init) => modifyWebpackConfig(
   (config) => {
     Object.assign(config, WEBPACK_OPTS);
+    config.output.publicPath = '/';
     config.plugins.push(new webpack.DefinePlugin({
       ...defsObj,
       // Conditional compilation to remove unsafe and unused stuff from `injected`
@@ -130,8 +126,6 @@ module.exports = Promise.all([
     config.plugins.push(new ListBackgroundScriptsPlugin({
       minify: false, // keeping readable
     }));
-    config.module.rules.find(r => r.loader === 'vue-loader')
-    .options.compiler = require('vue-template-babel-compiler');
   }),
 
   modify('injected', './src/injected', (config) => {
@@ -143,7 +137,6 @@ module.exports = Promise.all([
   }),
 
   modify('injected-web', './src/injected/web', (config) => {
-    // TODO: replace WebPack's Object.*, .call(), .apply() with safe calls
     config.output.libraryTarget = 'commonjs2';
     config.plugins.push(new ProtectWebpackBootstrapPlugin());
     addWrapperWithGlobals('injected/web', config, defsObj, getGlobals => ({

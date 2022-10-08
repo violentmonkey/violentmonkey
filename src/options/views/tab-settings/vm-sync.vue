@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip/bundle';
+import Tooltip from 'vueleton/lib/tooltip';
 import { noop, sendCmd } from '@/common';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';

@@ -9,7 +9,7 @@
       :disabled="disabled"
       :title="parsedData.error"
       :placeholder="placeholder"
-      :rows="rows || CalcRows(value)"
+      :rows="rows || calcRows(value)"
       @change="onChange"
     />
     <button v-if="hasSave" v-text="i18n('buttonSave')" @click="onSave"
@@ -96,7 +96,7 @@ export default {
       this.value = handle(this.savedValue);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.revoke();
     this.toggleUnloadSentry(false);
   },

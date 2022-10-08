@@ -1,5 +1,5 @@
 <template>
-  <div class="page-options flex h-100">
+  <div class="page-options flex h-screen">
     <aside :class="{ 'show-aside': aside }" v-if="canRenderAside">
       <div class="aside-content">
         <img src="/public/images/icon128.png">
@@ -10,7 +10,7 @@
             :key="tab.name"
             :href="`#${tab.name}`"
             :class="{active: tab === current}"
-            :data-num-scripts="tab.name === 'scripts' && store.installedScripts.length || null"
+            :data-num-scripts="tab.name === 'scripts' && installedScripts.length || null"
             v-text="tab.label"
           />
         </div>
@@ -26,7 +26,7 @@
 import { i18n } from '@/common';
 import Icon from '@/common/ui/icon';
 import { keyboardService } from '@/common/keyboard';
-import { store } from '../utils';
+import { store, installedScripts } from '../utils';
 import Installed from './tab-installed';
 import Settings from './tab-settings';
 import About from './tab-about';
@@ -55,6 +55,7 @@ export default {
       // skip rendering the aside when starting in the editor for a new script.
       canRenderAside: name !== SCRIPTS || (tabFunc !== '_new' && !Number(tabFunc)),
       store,
+      installedScripts,
     };
   },
   computed: {
@@ -109,7 +110,7 @@ export default {
     keyboardService.enable();
     this.updateContext();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.disposeList?.forEach(dispose => {
       dispose();
     });

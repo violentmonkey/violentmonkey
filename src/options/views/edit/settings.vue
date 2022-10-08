@@ -76,7 +76,7 @@
           </label>
         </td>
         <td>
-          <textarea v-model="custom[name]" spellcheck="false" :rows="CalcRows(custom[name])"/>
+          <textarea v-model="custom[name]" spellcheck="false" :rows="calcRows(custom[name])"/>
         </td>
       </tr>
     </table>

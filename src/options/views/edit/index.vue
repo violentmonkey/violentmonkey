@@ -26,7 +26,7 @@
     <div class="frame-block flex-auto pos-rel">
       <vm-code
         class="abs-full"
-        v-model="code"
+        :value="code"
         ref="code"
         v-show="nav === 'code'"
         :active="nav === 'code'"
@@ -49,7 +49,7 @@
       <vm-externals
         class="abs-full"
         v-if="nav === 'externals'"
-        v-model="script"
+        :value="script"
       />
       <vm-help
         class="abs-full edit-body"
@@ -205,6 +205,11 @@ export default {
   watch: {
     nav(val) {
       keyboardService.setContext('tabCode', val === 'code');
+      if (val === 'code') {
+        this.$nextTick(() => {
+          this.$refs.code.cm.focus();
+        });
+      }
     },
     canSave(val) {
       this.toggleUnloadSentry(val);
@@ -268,7 +273,7 @@ export default {
     this.disposeList = [
       keyboardService.register('a-pageup', this.switchPrevPanel),
       keyboardService.register('a-pagedown', this.switchNextPanel),
-      keyboardService.register(K_SAVE.replace('Ctrl-', 'ctrlcmd-'), this.save),
+      keyboardService.register(K_SAVE.replace(/(?:Ctrl|Cmd)-/i, 'ctrlcmd-'), this.save),
       keyboardService.register('escape', () => { this.nav = 'code'; }, {
         condition: '!tabCode',
       }),
@@ -346,7 +351,7 @@ export default {
       this.canSave = this.codeDirty || !deepEqual(this.settings, savedSettings);
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     store.title = null;
     this.toggleUnloadSentry(false);
     this.disposeList?.forEach(dispose => {

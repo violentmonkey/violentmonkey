@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars, import/no-mutable-exports, prefer-const */
+/* eslint-disable no-unused-vars, prefer-const */
 
 /**
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.

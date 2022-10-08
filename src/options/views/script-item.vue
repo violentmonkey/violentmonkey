@@ -18,8 +18,7 @@
     </div>
     <div class="script-info flex ml-1c">
       <span class="script-order" v-text="script.props.position"/>
-      <component :is="nameProps.is" class="script-name ellipsis flex-auto"
-                 v-bind="nameProps">{{script.$cache.name}}</component>
+      <component :is="nameProps.is" class="script-name ellipsis flex-auto" v-bind="nameProps">{{script.$cache.name}}</component>
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
                  class="script-author ml-1c hidden-sm"
@@ -35,7 +34,7 @@
           <span class="ellipsis" v-else v-text="author.name" />
         </tooltip>
         <span class="version ellipsis" v-text="script.meta.version"/>
-        <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end">
+        <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end" v-if="!script.config.removed">
           {{ script.$cache.size }}
         </tooltip>
         <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">
@@ -125,7 +124,7 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip/bundle';
+import Tooltip from 'vueleton/lib/tooltip';
 import { getLocaleString, getScriptHome, getScriptUpdateUrl, formatTime } from '@/common';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '@/common/keyboard';

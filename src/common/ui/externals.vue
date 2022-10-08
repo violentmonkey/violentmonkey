@@ -19,116 +19,102 @@
       </dl>
     </div>
     <div class="contents pos-rel flex-1">
-      <img v-if="img" :src="img">
-      <vm-code
-        v-show="!img"
+      <img v-if="data.image" :src="data.image">
+      <VmCode
+        v-show="!data.image"
         class="abs-full"
-        v-model="code"
+        :value="data.code"
         ref="code"
         readonly
         :cm-options="cmOptions"
-        :mode="mode"
+        :mode="data.mode"
+        :commands="commands"
       />
     </div>
   </div>
 </template>
 
-<script>
-import { dataUri2text, formatByteLength, makeDataUri, sendCmdDirectly } from '@/common';
+<script setup>
+import { computed, ref, watchEffect } from 'vue';
+import { dataUri2text, formatByteLength, i18n, makeDataUri, sendCmdDirectly } from '@/common';
 import VmCode from '@/common/ui/code';
 
-export default {
-  props: ['value', 'cmOptions', 'commands', 'install', 'errors'],
-  components: { VmCode },
-  computed: {
-    all() {
-      const { code, deps = this.deps, url: mainUrl } = this.install || {};
-      const { require = [], resources = {} } = this.value.meta || {};
-      return [
-        ...mainUrl ? [[this.i18n('editNavCode'), mainUrl, code]] : [],
-        ...require.map(url => ['@require', url, deps[`0${url}`]]),
-        ...Object.entries(resources).map(([id, url]) => [`@resource ${id}`, url, deps[`1${url}`]]),
-      ];
-    },
-  },
-  data() {
-    return {
-      code: null,
-      deps: {},
-      img: null,
-      index: null,
-      mode: null,
-    };
-  },
-  watch: {
-    async index(index) {
-      const [type, url] = this.all[index] || [];
-      if (!url) return;
-      const { install } = this;
-      const isMain = install && !index;
-      const isDataUri = url.startsWith('data:');
-      const isReq = !isMain && !isDataUri && type === '@require';
-      const depsUrl = `${+!isReq}${url}`;
-      let code;
-      let contentType;
-      let img;
-      let raw;
-      if (isMain) {
-        code = install.code;
-      } else {
-        if (isDataUri) {
-          raw = url;
-        } else if (install) {
-          raw = install.deps[depsUrl];
-        } else {
-          const key = this.value.custom.pathMap?.[url] || url;
-          raw = await sendCmdDirectly('Storage', [isReq ? 'require' : 'cache', 'getOne', key]);
-          if (!isReq) raw = makeDataUri(raw, key);
-        }
-        if (isReq || !raw) {
-          code = raw;
-        } else if (raw.startsWith('data:image')) {
-          img = raw;
-        } else {
-          [contentType, code] = raw.split(',');
-          if (code == null) { // workaround for bugs in old VM, see 2e135cf7
-            const fileExt = url.match(/\.(\w+)([#&?]|$)/)?.[1] || '';
-            contentType = /^(png|jpe?g|bmp|svgz?|gz|zip)$/i.test(fileExt)
-              ? ''
-              : `text/${fileExt.toLowerCase()}`;
-          } else if (contentType) {
-            contentType = contentType.split(/[:;]/)[1];
-          }
-          code = dataUri2text(isDataUri ? url : `${contentType};base64,${code}`);
-        }
+const props = defineProps(['value', 'cmOptions', 'commands', 'install']);
+
+const dependencies = ref({});
+
+const index = ref(0);
+
+const data = ref({});
+
+const all = computed(() => {
+  const { code, deps = dependencies.value, url: mainUrl } = props.install || {};
+  const { require = [], resources = {} } = props.value.meta || {};
+  return [
+    ...mainUrl ? [[i18n('editNavCode'), mainUrl, code]] : [],
+    ...require.map(url => ['@require', url, deps[`0${url}`]]),
+    ...Object.entries(resources).map(([id, url]) => [`@resource ${id}`, url, deps[`1${url}`]]),
+  ];
+});
+
+watchEffect(update);
+
+async function update() {
+  const [type, url] = all.value[index.value];
+  if (!url) return;
+  const { install } = props;
+  const isMain = install && !index.value;
+  const isDataUri = url.startsWith('data:');
+  const isReq = !isMain && !isDataUri && type === '@require';
+  const depsUrl = `${+!isReq}${url}`;
+  let code;
+  let contentType;
+  let img;
+  let raw;
+  if (isMain) {
+    code = install.code;
+  } else {
+    if (isDataUri) {
+      raw = url;
+    } else if (install) {
+      raw = install.deps[depsUrl];
+    } else {
+      const key = props.value.custom.pathMap?.[url] || url;
+      raw = await sendCmdDirectly('Storage', [isReq ? 'require' : 'cache', 'getOne', key]);
+      if (!isReq) raw = makeDataUri(raw, key);
+    }
+    if (isReq || !raw) {
+      code = raw;
+    } else if (raw.startsWith('data:image')) {
+      img = raw;
+    } else {
+      [contentType, code] = raw.split(',');
+      if (code == null) { // workaround for bugs in old VM, see 2e135cf7
+        const fileExt = url.match(/\.(\w+)([#&?]|$)/)?.[1] || '';
+        contentType = /^(png|jpe?g|bmp|svgz?|gz|zip)$/i.test(fileExt)
+          ? ''
+          : `text/${fileExt.toLowerCase()}`;
+      } else if (contentType) {
+        contentType = contentType.split(/[:;]/)[1];
       }
-      this.img = img;
-      this.mode = contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null;
-      this.code = code;
-      this.$set(this.deps, depsUrl, code);
-    },
-    'install.code'(val) {
-      this.code = val;
-    },
-    value() {
-      this.$nextTick(() => {
-        if (this.index >= this.all.length) this.index = 0;
-      });
-    },
-  },
-  async mounted() {
-    this.index = 0;
-  },
-  methods: {
-    formatLength(str, type) {
-      let len = str?.length;
-      if (type.startsWith('@resource')) {
-        len = Math.round((len - str.indexOf(',') - 1) * 6 / 8); // base64 uses 6 bits out of 8
-      }
-      return formatByteLength(len);
-    },
-  },
-};
+      code = dataUri2text(isDataUri ? url : `${contentType};base64,${code}`);
+    }
+  }
+  data.value = {
+    img,
+    code,
+    mode: contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null,
+  };
+  dependencies.value[depsUrl] = code;
+}
+
+function formatLength(str, type) {
+  let len = str?.length;
+  if (type.startsWith('@resource')) {
+    len = Math.round((len - str.indexOf(',') - 1) * 6 / 8); // base64 uses 6 bits out of 8
+  }
+  return formatByteLength(len);
+}
 </script>
 
 <style>

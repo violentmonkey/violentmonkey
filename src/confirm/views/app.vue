@@ -1,5 +1,5 @@
 <template>
-  <div class="page-confirm frame flex flex-col h-100" :class="{ reinstall }">
+  <div class="page-confirm frame flex flex-col h-screen" :class="{ reinstall }">
     <div class="frame-block">
       <div class="flex">
         <div class="image">
@@ -75,7 +75,7 @@
       <vm-externals
         ref="externals"
         v-if="script"
-        v-model="script"
+        :value="script"
         class="abs-full"
         :cm-options="cmOptions"
         :commands="commands"
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import Tooltip from 'vueleton/lib/tooltip/bundle';
+import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
 import {
   getFullUrl, getLocaleString, getScriptHome, isRemote,
@@ -198,11 +198,11 @@ export default {
       this.heading = this.reinstall ? this.i18n('labelReinstall') : this.i18n('labelInstall');
     }
     this.disposeList = [
-      keyboardService.register(CONFIRM_HOTKEY, () => this.$refs.confirm.click()),
+      keyboardService.register('ctrlcmd-enter', () => this.$refs.confirm.click()),
     ];
     keyboardService.enable();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.guard) {
       clearInterval(this.guard);
       this.guard = null;

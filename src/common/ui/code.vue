@@ -71,7 +71,7 @@ import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
-import Tooltip from 'vueleton/lib/tooltip/bundle';
+import Tooltip from 'vueleton/lib/tooltip';
 import ToggleButton from '@/common/ui/toggle-button';
 import { debounce, getUniqId, i18n, sendCmdDirectly } from '@/common';
 import { deepEqual, forEachEntry, objectPick } from '@/common/object';
@@ -587,8 +587,9 @@ export default {
         this.cm.setOption('theme', val);
       }
     });
+    this.updateValue();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Object.assign(cmCommands, this.origCommands);
     this.onActive(false);
   },

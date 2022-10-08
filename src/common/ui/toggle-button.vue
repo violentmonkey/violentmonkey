@@ -1,5 +1,5 @@
 <template>
-  <div class="toggle-button" :class="{active: value}"
+  <div class="toggle-button" :class="{active: modelValue}"
        tabindex="0"
        @keypress.enter.exact="onToggle"
        @keypress.space.exact="onToggle"
@@ -8,15 +8,13 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ['value'],
-  methods: {
-    onToggle() {
-      this.$emit('input', !this.value);
-    },
-  },
-};
+<script setup>
+const props = defineProps(['modelValue']);
+const emits = defineEmits(['update:modelValue']);
+
+function onToggle() {
+  emits('update:modelValue', !props.modelValue);
+}
 </script>
 
 <style>

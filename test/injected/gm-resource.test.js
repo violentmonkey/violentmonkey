@@ -1,4 +1,3 @@
-import test from 'tape';
 import { buffer2string } from '@/common';
 import { decodeResource } from '@/injected/content/util';
 
@@ -15,9 +14,8 @@ const RESOURCE_TEXT = 'abcd\u1234\u2345\u3456\u4567\u5678\u6789\u789A\u89AB\u9AB
 const DATA = `text/plain,${stringAsBase64(RESOURCE_TEXT)}`;
 const DATA_URL = `data:${DATA.replace(',', ';base64,')}`;
 
-test('@resource decoding', async (t) => {
-  t.equal(decodeResource(DATA), RESOURCE_TEXT, 'GM_getResourceText');
-  t.equal(await blobAsText(decodeResource(DATA, true)), RESOURCE_TEXT, 'GM_getResourceURL');
-  t.equal(decodeResource(DATA, false), DATA_URL, 'GM_getResourceURL as dataUrl');
-  t.end();
+test('@resource decoding', async () => {
+  expect(decodeResource(DATA)).toEqual(RESOURCE_TEXT);
+  expect(await blobAsText(decodeResource(DATA, true))).toEqual(RESOURCE_TEXT);
+  expect(decodeResource(DATA, false)).toEqual(DATA_URL);
 });

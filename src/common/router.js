@@ -1,3 +1,4 @@
+import { reactive } from 'vue';
 import { showConfirmation } from '@/common/ui';
 import { i18n } from './util';
 
@@ -17,7 +18,7 @@ function parse(hash) {
 }
 
 const stack = [];
-export const route = {};
+export const route = reactive({});
 export const lastRoute = () => stack[stack.length - 1] || {};
 
 updateRoute();

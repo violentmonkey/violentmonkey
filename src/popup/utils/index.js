@@ -1,4 +1,6 @@
-export const store = {
+import { reactive } from 'vue';
+
+export const store = reactive({
   scripts: [],
   frameScripts: [],
   scriptIds: [],
@@ -7,7 +9,7 @@ export const store = {
   injectionFailure: null,
   injectable: true,
   blacklisted: false,
-};
+});
 
 export const mutex = {
   init(delay = 100) {

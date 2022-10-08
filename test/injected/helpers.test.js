@@ -1,7 +1,6 @@
-import test from 'tape';
 import { jsonDump } from '@/injected/web/util';
 
-test('jsonDump', (t) => {
+test('jsonDump', () => {
   const sameChildObj = { foo: 1 };
   // eslint-disable-next-line no-restricted-syntax
   for (const obj of [
@@ -29,12 +28,11 @@ test('jsonDump', (t) => {
       sameChild3: [sameChildObj],
     },
   ]) {
-    t.equal(jsonDump(obj), JSON.stringify(obj));
+    expect(jsonDump(obj)).toEqual(JSON.stringify(obj));
   }
-  t.throws(() => {
+  expect(() => {
     const cyclic = {};
     cyclic.foo = [1, 2, 3, { cyclic }];
     jsonDump(cyclic);
-  }, /Converting circular structure to JSON/, 'circular');
-  t.end();
+  }).toThrow(/Converting circular structure to JSON/);
 });

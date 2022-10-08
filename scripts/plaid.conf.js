@@ -1,9 +1,4 @@
-const path = require('path');
-const { defaultOptions, isProd } = require('@gera2ld/plaid/util');
-
-defaultOptions.alias = {
-  '@': path.resolve('src'),
-};
+const { isProd } = require('@gera2ld/plaid/util');
 
 /**
  * For each entry, `key` is the chunk name, `value` has following properties:
@@ -19,11 +14,11 @@ exports.pages = [
 ].reduce((res, name) => Object.assign(res, {
   [`${name}/index`]: {
     entry: `./src/${name}`,
-    html: options => ({
+    html: name !== 'background' && (options => ({
       ...options,
       title: 'Violentmonkey',
       injectTo: item => ((item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head'),
-    }),
+    })),
   },
 }), {});
 
@@ -46,29 +41,18 @@ exports.optimization = {
         name: 'common-ui',
         test: new RegExp([
           /\bsvg/,
-          /src\/common\/(ui|keyboard|load-script-icon)/,
+          'src/common/(?!zip|tld)',
           'node_modules/@violentmonkey/shortcut',
-          'node_modules/vue',
+          'node_modules/@?vue',
         ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
-        chunks: 'all',
-        minChunks: 2,
-        priority: 100,
-      },
-      common: {
-        name: 'common',
-        minChunks: 2,
-        enforce: true,
-        chunks: 'all',
+        chunks: c => ![
+          'background/index', // only 4kB of common code
+          'injected',
+          'injected-web',
+        ].includes(c.name),
       },
       ...splitVendor('codemirror'),
       ...splitVendor('tldjs'),
     },
   },
-};
-exports.styleOptions = {
-  /* Files in extensions aren't cached so there's no point in extracting separate css,
-   * other than minifying, but the gain is negligible. P.S. Extracting+inlining back in html
-   * doesn't keep the correct order of style elements which breaks appearance when
-   * using style-ext-html-webpack-plugin or html-inline-css-webpack-plugin. */
-  extract: false,
 };

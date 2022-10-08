@@ -1,8 +1,7 @@
-import test from 'tape';
 import { MatchTest, resetBlacklist, testScript, testBlacklist } from '@/background/utils/tester';
 import cache from '@/background/utils/cache';
 
-test.onFinish(cache.destroy);
+afterEach(cache.destroy);
 
 function buildScript(props) {
   return Object.assign({
@@ -16,8 +15,8 @@ function buildScript(props) {
   }, props);
 }
 
-test('scheme', (t) => {
-  t.test('should match all', (q) => {
+describe('scheme', () => {
+  test('should match all', () => {
     {
       const script = buildScript({
         meta: {
@@ -26,9 +25,9 @@ test('scheme', (t) => {
           ],
         },
       });
-      q.ok(testScript('http://www.google.com/', script), 'should match `http | https`');
-      q.ok(testScript('https://www.google.com/', script), 'should match `http | https`');
-      q.notOk(testScript('file:///Users/Gerald/file', script), 'should not match `file`');
+      expect(testScript('http://www.google.com/', script)).toBeTruthy();
+      expect(testScript('https://www.google.com/', script)).toBeTruthy();
+      expect(testScript('file:///Users/Gerald/file', script)).toBeFalsy();
     }
     {
       const script = buildScript({
@@ -38,14 +37,13 @@ test('scheme', (t) => {
           ],
         },
       });
-      q.ok(testScript('http://www.google.com/', script), 'should match `http | https`');
-      q.ok(testScript('https://www.google.com/', script), 'should match `http | https`');
-      q.notOk(testScript('file:///Users/Gerald/file', script), 'should not match `file`');
+      expect(testScript('http://www.google.com/', script)).toBeTruthy();
+      expect(testScript('https://www.google.com/', script)).toBeTruthy();
+      expect(testScript('file:///Users/Gerald/file', script)).toBeFalsy();
     }
-    q.end();
   });
 
-  t.test('should match exact', (q) => {
+  test('should match exact', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -55,18 +53,15 @@ test('scheme', (t) => {
         ],
       },
     });
-    q.ok(testScript('http://www.google.com/', script), 'should match `http`');
-    q.notOk(testScript('https://www.google.com/', script), 'should not match `https`');
-    q.ok(testScript('file:///Users/Gerald/file', script), 'should match `file`');
-    q.ok(testScript('ftp://example.com/file', script), 'should match `ftp`');
-    q.end();
+    expect(testScript('http://www.google.com/', script)).toBeTruthy();
+    expect(testScript('https://www.google.com/', script)).toBeFalsy();
+    expect(testScript('file:///Users/Gerald/file', script)).toBeTruthy();
+    expect(testScript('ftp://example.com/file', script)).toBeTruthy();
   });
-
-  t.end();
 });
 
-test('host', (t) => {
-  t.test('should match domain', (q) => {
+describe('host', () => {
+  test('should match domain', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -74,13 +69,12 @@ test('host', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://docs.google.com/', script), 'should match exact domain name');
-    q.notOk(testScript('https://sub.docs.google.com/', script), 'should not match subdomains');
-    q.notOk(testScript('https://docs.google.com.cn/', script), 'should not match suffixed domains');
-    q.end();
+    expect(testScript('https://docs.google.com/', script)).toBeTruthy();
+    expect(testScript('https://sub.docs.google.com/', script)).toBeFalsy();
+    expect(testScript('https://docs.google.com.cn/', script)).toBeFalsy();
   });
 
-  t.test('should match wildcard', (q) => {
+  test('should match wildcard', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -89,17 +83,20 @@ test('host', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/', script), 'should match subdomains');
-    q.ok(testScript('https://a.b.google.com/', script), 'should match subdomains');
-    q.ok(testScript('https://google.com/', script), 'should match specified domain');
-    q.notOk(testScript('https://www.google.com.hk/', script), 'should not match suffixed domains');
-    q.ok(testScript('https://www.example.com/', script), 'should match prefix');
-    q.ok(testScript('https://www.example.com.cn/', script), 'should match prefix');
-    q.ok(testScript('https://www.example.g.com/', script), 'should match prefix');
-    q.end();
+    [
+      'https://www.google.com/',
+      'https://a.b.google.com/',
+      'https://google.com/',
+      'https://www.example.com/',
+      'https://www.example.com.cn/',
+      'https://www.example.g.com/',
+    ].forEach(url => {
+        expect(testScript(url, script)).toBeTruthy();
+      });
+    expect(testScript('https://www.google.com.hk/', script)).toBeFalsy();
   });
 
-  t.test('should match tld', (q) => {
+  test('should match tld', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -108,16 +105,23 @@ test('host', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/', script), 'should match subdomains');
-    q.ok(testScript('https://www.google.com.cn/', script), 'should match subdomains');
-    q.ok(testScript('https://www.google.jp/', script), 'should match tld');
-    q.ok(testScript('https://www.google.no-ip.org/', script), 'should match a hyphened `no-ip.org` from Public Suffix List');
-    q.notOk(testScript('https://www.google.example.com/', script), 'should not match subdomains');
-    q.notOk(testScript('https://www.dummy.com/', script), '`.tld` should be lowercase');
-    q.end();
+    [
+    'https://www.google.com/', // should match subdomains
+    'https://www.google.com.cn/', // should match subdomains
+    'https://www.google.jp/', // should match tld
+    'https://www.google.no-ip.org/', // should match a hyphened `no-ip.org` from Public Suffix List
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeTruthy();
+    });
+    [
+      'https://www.google.example.com/',
+      'https://www.dummy.com/', // `.tld` should be lowercase
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeFalsy();
+    });
   });
 
-  t.test('should ignore case', (q) => {
+  test('should ignore case', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -125,15 +129,12 @@ test('host', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://google.COM/', script), 'should ignore case');
-    q.end();
+    expect(testScript('https://google.COM/', script)).toBeTruthy();
   });
-
-  t.end();
 });
 
-test('path', (t) => {
-  t.test('should match any', (q) => {
+describe('path', () => {
+  test('should match any', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -141,12 +142,15 @@ test('path', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/', script), 'should match `/`');
-    q.ok(testScript('https://www.google.com/hello/world', script), 'should match any');
-    q.end();
+    [
+      'https://www.google.com/',
+      'https://www.google.com/hello/world',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeTruthy();
+    });
   });
 
-  t.test('should match exact', (q) => {
+  test('should match exact', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -154,12 +158,11 @@ test('path', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/a/b/c', script), 'should match exact');
-    q.notOk(testScript('https://www.google.com/a/b/c/d', script), 'should match exact');
-    q.end();
+    expect(testScript('https://www.google.com/a/b/c', script)).toBeTruthy();
+    expect(testScript('https://www.google.com/a/b/c/d', script)).toBeFalsy();
   });
 
-  t.test('should ignore query string and hash', (q) => {
+  test('should ignore query string and hash', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -167,14 +170,17 @@ test('path', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/a', script), 'should match without query and hash');
-    q.ok(testScript('https://www.google.com/a#hash', script), 'should match with hash');
-    q.ok(testScript('https://www.google.com/a?query', script), 'should match with query');
-    q.ok(testScript('https://www.google.com/a?query#hash', script), 'should match with query and hash');
-    q.end();
+    [
+      'https://www.google.com/a', // should match without query and hash
+      'https://www.google.com/a#hash', // should match with hash
+      'https://www.google.com/a?query', // should match with query
+      'https://www.google.com/a?query#hash', // should match with query and hash
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeTruthy();
+    });
   });
 
-  t.test('should match query string and hash if existed in rules', (q) => {
+  test('should match query string and hash if existed in rules', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -184,17 +190,24 @@ test('path', (t) => {
         ],
       },
     });
-    q.notOk(testScript('https://www.google.com/a', script), 'should match query');
-    q.notOk(testScript('https://www.google.com/b', script), 'should match hash');
-    q.ok(testScript('https://www.google.com/a?query', script), 'should match query');
-    q.ok(testScript('https://www.google.com/a?query#hash', script), 'should match query and ignore hash');
-    q.notOk(testScript('https://www.google.com/b?query#hash', script), 'should match query and hash');
-    q.ok(testScript('https://www.google.com/b#hash', script), 'should match hash');
-    q.ok(testScript('https://www.google.com/c?query#hash', script), 'should match query and hash');
-    q.end();
+    [
+      'https://www.google.com/a?query',
+      'https://www.google.com/a?query#hash',
+      'https://www.google.com/b#hash',
+      'https://www.google.com/c?query#hash',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeTruthy();
+    });
+    [
+      'https://www.google.com/a',
+      'https://www.google.com/b',
+      'https://www.google.com/b?query#hash',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeFalsy();
+    });
   });
 
-  t.test('should be case-sensitive', (q) => {
+  test('should be case-sensitive', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -203,18 +216,23 @@ test('path', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/a?Query', script), 'query should be case-sensitive');
-    q.notOk(testScript('https://www.google.com/a?query', script), 'query should be case-sensitive');
-    q.ok(testScript('https://www.google.com/b#Hash', script), 'hash should be case-sensitive');
-    q.notOk(testScript('https://www.google.com/b#hash', script), 'hash should be case-sensitive');
-    q.end();
+    [
+      'https://www.google.com/a?Query',
+      'https://www.google.com/b#Hash',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeTruthy();
+    });
+    [
+      'https://www.google.com/a?query',
+      'https://www.google.com/b#hash',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeFalsy();
+    });
   });
-
-  t.end();
 });
 
-test('include', (t) => {
-  t.test('should include any', (q) => {
+describe('include', () => {
+  test('should include any', () => {
     const script = buildScript({
       meta: {
         include: [
@@ -222,12 +240,15 @@ test('include', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/', script), 'should match `http | https`');
-    q.ok(testScript('file:///Users/Gerald/file', script), 'should match `file`');
-    q.end();
+    [
+      'https://www.google.com/',
+      'file:///Users/Gerald/file'
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeTruthy();
+    });
   });
 
-  t.test('should include by glob', (q) => {
+  test('should include by glob', () => {
     const script = buildScript({
       meta: {
         include: [
@@ -236,13 +257,16 @@ test('include', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/', script), 'should match `/`');
-    q.ok(testScript('https://www.google.com/hello/world', script), 'include by prefix');
-    q.notOk(testScript('https://www.hello.com/', script), 'not include by prefix');
-    q.end();
+    [
+      'https://www.google.com/',
+      'https://www.google.com/hello/world',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeTruthy();
+    });
+    expect(testScript('https://www.hello.com/', script)).toBeFalsy();
   });
 
-  t.test('should include by regexp', (q) => {
+  test('should include by regexp', () => {
     const script = buildScript({
       meta: {
         include: [
@@ -251,12 +275,11 @@ test('include', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/', script), 'should ignore the invalid regexp and match target');
-    q.notOk(testScript('https://www.hello.com/', script), 'should not match nontarget');
-    q.end();
+    expect(testScript('https://www.google.com/', script)).toBeTruthy();
+    expect(testScript('https://www.hello.com/', script)).toBeFalsy();
   });
 
-  t.test('should support magic TLD', (q) => {
+  test('should support magic TLD', () => {
     const script = buildScript({
       meta: {
         include: [
@@ -264,14 +287,17 @@ test('include', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.google.com/', script), 'should match `.com`');
-    q.ok(testScript('https://www.google.com.hk/', script), 'should match `.com.hk`');
-    q.ok(testScript('https://www.google.no-ip.org/', script), 'should match a hyphened `no-ip.org` from Public Suffix List');
-    q.notOk(testScript('https://www.google.example.com/', script), 'should not match subdomains');
-    q.end();
+    [
+      'https://www.google.com/',
+      'https://www.google.com.hk/',
+      'https://www.google.no-ip.org/',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeTruthy();
+    });
+    expect(testScript('https://www.google.example.com/', script)).toBeFalsy();
   });
 
-  t.test('should ignore case', (q) => {
+  test('should ignore case', () => {
     const script = buildScript({
       meta: {
         include: [
@@ -280,14 +306,17 @@ test('include', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://www.GOOGLE.com/', script), 'should ignore case');
-    q.ok(testScript('https://www.REGEXP.com/', script), 'should ignore case');
-    q.end();
+    [
+      'https://www.GOOGLE.com/',
+      'https://www.REGEXP.com/',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeTruthy();
+    });
   });
 });
 
-test('exclude', (t) => {
-  t.test('should exclude any', (q) => {
+describe('exclude', () => {
+  test('should exclude any', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -298,11 +327,10 @@ test('exclude', (t) => {
         ],
       },
     });
-    q.notOk(testScript('https://www.google.com/', script), 'should exclude `http | https`');
-    q.end();
+    expect(testScript('https://www.google.com/', script)).toBeFalsy();
   });
 
-  t.test('should include by glob', (q) => {
+  test('should include by glob', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -314,13 +342,16 @@ test('exclude', (t) => {
         ],
       },
     });
-    q.notOk(testScript('https://www.google.com/', script), 'should exclude `/`');
-    q.notOk(testScript('https://www.google.com/hello/world', script), 'exclude by prefix');
-    q.ok(testScript('https://www.hello.com/', script), 'not exclude by prefix');
-    q.end();
+    [
+      'https://www.google.com/',
+      'https://www.google.com/hello/world',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeFalsy();
+    });
+    expect(testScript('https://www.hello.com/', script)).toBeTruthy();
   });
 
-  t.test('should support magic TLD', (q) => {
+  test('should support magic TLD', () => {
     const script = buildScript({
       meta: {
         exclude: [
@@ -328,16 +359,19 @@ test('exclude', (t) => {
         ],
       },
     });
-    q.notOk(testScript('https://www.google.com/', script), 'should match `.com`');
-    q.notOk(testScript('https://www.google.com.hk/', script), 'should match `.com.hk`');
-    q.notOk(testScript('https://www.google.no-ip.org/', script), 'should match a hyphened `no-ip.org` from Public Suffix List');
-    q.ok(testScript('https://www.google.example.com/', script), 'should not match subdomains');
-    q.end();
+    [
+      'https://www.google.com/',
+      'https://www.google.com.hk/',
+      'https://www.google.no-ip.org/',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeFalsy();
+    });
+    expect(testScript('https://www.google.example.com/', script)).toBeTruthy();
   });
 });
 
-test('exclude-match', (t) => {
-  t.test('should exclude any', (q) => {
+describe('exclude-match', () => {
+  test('should exclude any', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -348,11 +382,10 @@ test('exclude-match', (t) => {
         ],
       },
     });
-    q.notOk(testScript('https://www.google.com/', script), 'should exclude `http | https`');
-    q.end();
+    expect(testScript('https://www.google.com/', script)).toBeFalsy();
   });
 
-  t.test('should include by glob', (q) => {
+  test('should include by glob', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -364,13 +397,16 @@ test('exclude-match', (t) => {
         ],
       },
     });
-    q.notOk(testScript('https://www.google.com/', script), 'should exclude `/`');
-    q.notOk(testScript('https://www.google.com/hello/world', script), 'exclude by prefix');
-    q.ok(testScript('https://www.hello.com/', script), 'not exclude by prefix');
-    q.end();
+    [
+      'https://www.google.com/',
+      'https://www.google.com/hello/world',
+    ].forEach(url => {
+      expect(testScript(url, script)).toBeFalsy();
+    });
+    expect(testScript('https://www.hello.com/', script)).toBeTruthy();
   });
 
-  t.test('should ignore case only in host', (q) => {
+  test('should ignore case only in host', () => {
     const script = buildScript({
       meta: {
         match: [
@@ -378,14 +414,13 @@ test('exclude-match', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://google.COM/FOO?BAR#HASH', script), 'should ignore case in host');
-    q.notOk(testScript('https://google.com/foo?bar#hash', script), 'should ignore case in host only');
-    q.end();
+    expect(testScript('https://google.COM/FOO?BAR#HASH', script)).toBeTruthy();
+    expect(testScript('https://google.com/foo?bar#hash', script)).toBeFalsy();
   });
 });
 
-test('@match error reporting', (t) => {
-  t.test('should throw', (q) => {
+describe('@match error reporting', () => {
+  test('should throw', () => {
     for (const [rule, err] of [
       ['://*/*', 'missing scheme'],
       ['foo://*/*', 'unknown scheme'],
@@ -394,16 +429,13 @@ test('@match error reporting', (t) => {
       ['htp:*', 'unknown scheme, missing "://"'],
       ['https://foo*', 'missing "/" for path'],
     ]) {
-      // tape can't compare to a string exception, so we use a function
-      const expected = `Bad pattern: ${err} in ${rule}`;
-      q.throws(() => MatchTest.try(rule), e => e === expected, expected);
+      expect(() => MatchTest.try(rule)).toThrow(`Bad pattern: ${err} in ${rule}`);
     }
-    q.end();
   });
 });
 
-test('custom', (t) => {
-  t.test('should ignore original rules', (q) => {
+describe('custom', () => {
+  test('should ignore original rules', () => {
     const script = buildScript({
       custom: {
         match: [
@@ -416,43 +448,51 @@ test('custom', (t) => {
         ],
       },
     });
-    q.ok(testScript('https://twitter.com/', script), 'should match custom rules');
-    q.notOk(testScript('https://www.google.com/', script), 'should not match original rules');
-    q.end();
+    expect(testScript('https://twitter.com/', script)).toBeTruthy();
+    expect(testScript('https://www.google.com/', script)).toBeFalsy();
   });
 });
 
-test('blacklist', (t) => {
-  t.test('should exclude match rules', (q) => {
+describe('blacklist', () => {
+  test('should exclude match rules', () => {
     resetBlacklist(`\
 # match rules
 *://www.google.com/*
 `);
-    q.ok(testBlacklist('http://www.google.com/'));
-    q.ok(testBlacklist('https://www.google.com/'));
-    q.notOk(testBlacklist('https://twitter.com/'));
-    q.end();
+    [
+      'http://www.google.com/',
+      'https://www.google.com/',
+    ].forEach(url => {
+      expect(testBlacklist(url)).toBeTruthy();
+    });
+    expect(testBlacklist('https://twitter.com/')).toBeFalsy();
   });
 
-  t.test('should exclude domains', (q) => {
+  test('should exclude domains', () => {
     resetBlacklist(`\
 # domains
 www.google.com
 `);
-    q.ok(testBlacklist('http://www.google.com/'));
-    q.ok(testBlacklist('https://www.google.com/'));
-    q.notOk(testBlacklist('https://twitter.com/'));
-    q.end();
+    [
+      'http://www.google.com/',
+      'https://www.google.com/',
+    ].forEach(url => {
+      expect(testBlacklist(url)).toBeTruthy();
+    });
+    expect(testBlacklist('https://twitter.com/')).toBeFalsy();
   });
 
-  t.test('should support @exclude rules', (q) => {
+  test('should support @exclude rules', () => {
     resetBlacklist(`\
 # @exclude rules
 @exclude https://www.google.com/*
 `);
-    q.ok(testBlacklist('https://www.google.com/'));
-    q.ok(testBlacklist('https://www.google.com/whatever'));
-    q.notOk(testBlacklist('http://www.google.com/'));
-    q.end();
+    [
+      'https://www.google.com/',
+      'https://www.google.com/whatever',
+    ].forEach(url => {
+      expect(testBlacklist(url)).toBeTruthy();
+    });
+    expect(testBlacklist('http://www.google.com/')).toBeFalsy();
   });
 });

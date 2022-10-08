@@ -1,4 +1,3 @@
-import test from 'tape';
 import { parseMeta } from '@/background/utils/script';
 
 const baseMeta = {
@@ -11,8 +10,8 @@ const baseMeta = {
   resources: {},
 };
 
-test('parseMeta', (t) => {
-  t.deepEqual(parseMeta(`\
+test('parseMeta', () => {
+  expect(parseMeta(`\
 // ==UserScript==
 // @name New Script
 // @namespace Violentmonkey Scripts
@@ -21,7 +20,7 @@ test('parseMeta', (t) => {
 // @match *://*/*
 // @grant none
 // ==/UserScript==
-`), Object.assign({}, baseMeta, {
+`)).toEqual(Object.assign({}, baseMeta, {
     name: 'New Script',
     namespace: 'Violentmonkey Scripts',
     description: 'This is a script',
@@ -29,48 +28,46 @@ test('parseMeta', (t) => {
     match: ['*://*/*'],
     grant: ['none'],
   }));
-  t.deepEqual(parseMeta(`\
+  expect(parseMeta(`\
 // ==UserScript==
 // @name New Script
 // @namespace Violentmonkey Scripts
 // @match *://*/*
 // @noframes
 // ==/UserScript==
-`), Object.assign({}, baseMeta, {
+`)).toEqual(Object.assign({}, baseMeta, {
     name: 'New Script',
     namespace: 'Violentmonkey Scripts',
     match: ['*://*/*'],
     noframes: true,
   }));
-  t.end();
 });
 
-test('parseMetaIrregularities', (t) => {
-  t.deepEqual(parseMeta(`\
+test('parseMetaIrregularities', () => {
+  expect(parseMeta(`\
   // ==UserScript==============
 // @name foo
  // @namespace bar
 // ==/UserScript===================
-  `), {
+  `)).toEqual({
     ...baseMeta,
     name: 'foo',
     namespace: 'bar',
   });
-  t.deepEqual(parseMeta(`\
+  expect(parseMeta(`\
 // ==UserScript==
 //@name foo
-// ==/UserScript==`), baseMeta);
-  t.deepEqual(parseMeta(`\
+// ==/UserScript==`)).toEqual(baseMeta);
+  expect(parseMeta(`\
 //==UserScript==
 // @name foo
-//\t==/UserScript==`), baseMeta);
-  t.deepEqual(parseMeta(`\
+//\t==/UserScript==`)).toEqual(baseMeta);
+  expect(parseMeta(`\
 /*
 //
   ==UserScript==
 // @name foo
 //
 ==/UserScript==
-*/`), baseMeta);
-  t.end();
+*/`)).toEqual(baseMeta);
 });

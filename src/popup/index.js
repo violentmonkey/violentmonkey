@@ -1,21 +1,17 @@
-import Vue from 'vue';
 import '@/common/browser';
 import { sendCmdDirectly } from '@/common';
 import { INJECT_PAGE } from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { forEachValue, mapEntry } from '@/common/object';
+import { render } from '@/common/ui';
 import '@/common/ui/style';
 import App from './views/app';
 import { mutex, store } from './utils';
 
 mutex.init();
 
-const vm = new Vue({
-  render: h => h(App),
-})
-.$mount();
-document.body.append(vm.$el);
+render(App);
 
 Object.assign(handlers, {
   async SetPopup(data, src) {

@@ -1,5 +1,3 @@
-import Vue from 'vue';
-import { i18n } from '@/common';
 import options from '../../options';
 import './style.css';
 
@@ -11,7 +9,7 @@ let localStorage = {};
 /* Accessing `localStorage` in may throw in Private Browsing mode or if dom.storage is disabled.
  * Since it allows object-like access, we'll map it to a variable with a fallback to a dummy. */
 try {
-  (localStorage = global.localStorage || {}).foo; // eslint-disable-line babel/no-unused-expressions
+  (localStorage = global.localStorage || {}).foo;
 } catch (e) {
   /* keep the dummy object */
 }
@@ -67,13 +65,6 @@ options.hook((changes) => {
     }
   }
 });
-
-Vue.prototype.i18n = i18n;
-/** @returns {?number} Number of lines + 1 if the last line is not empty */
-Vue.prototype.CalcRows = val => val && (
-  val.match(/$/gm).length
-  + !val.endsWith('\n')
-);
 
 if ('ontouchstart' in document) {
   document.documentElement.classList.add('touch');

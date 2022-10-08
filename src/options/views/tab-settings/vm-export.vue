@@ -30,8 +30,8 @@
 </template>
 
 <script>
-import Modal from 'vueleton/lib/modal/bundle';
-import Tooltip from 'vueleton/lib/tooltip/bundle';
+import Modal from 'vueleton/lib/modal';
+import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
 import { getScriptName, sendCmdDirectly } from '@/common';
 import { formatDate, DATE_FMT } from '@/common/date';
