@@ -34,7 +34,7 @@ Object.assign(handlers, {
       const metas = data.scripts?.filter(({ props: { id } }) => ids.includes(id))
         || (Object.assign(data, await sendCmdDirectly('GetData', { ids }))).scripts;
       metas.forEach(script => {
-        loadScriptIcon(script, data.cache);
+        loadScriptIcon(script, data);
         const { id } = script.props;
         script.runs = data.runningIds.includes(id);
         script.pageUrl = src.url; // each frame has its own URL

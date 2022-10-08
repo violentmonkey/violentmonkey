@@ -60,7 +60,7 @@ function initScript(script, sizes) {
     sizes: str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B'),
     sizeNum: total,
   };
-  loadScriptIcon(script, store.cache, store.HiDPI || -1);
+  loadScriptIcon(script, store);
 }
 
 export function loadData() {

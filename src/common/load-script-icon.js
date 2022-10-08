@@ -7,14 +7,15 @@ const KEY = 'safeIcon';
 /**
  * Sets script's safeIcon property after the image is successfully loaded
  * @param {VMScript} script
- * @param {Object} [cache]
- * @param {number} [defSize] - show default icon of this size, -1 = auto, falsy = no
+ * @param {Object} [cfg]
+ * @param {Object} [cfg.cache]
+ * @param {boolean} [cfg.isHiDPI] - to adjust size of the default icon
  */
-export async function loadScriptIcon(script, cache = {}, defSize) {
+export async function loadScriptIcon(script, { cache = {}, isHiDPI } = {}) {
   let def;
   const { icon } = script.meta;
-  const url = script.custom?.pathMap?.[icon] || icon || defSize && (
-    def = `${ICON_PREFIX}${defSize > 0 && defSize || (script.config.removed ? 32 : 38)}.png`
+  const url = script.custom?.pathMap?.[icon] || icon || (
+    def = `${ICON_PREFIX}${isHiDPI && 128 || (script.config.removed ? 32 : 38)}.png`
   );
   if (!url || url !== script[KEY]) {
     // creates an observable property so Vue will see the change after `await`
@@ -24,7 +25,8 @@ export async function loadScriptIcon(script, cache = {}, defSize) {
     if (url) {
       script[KEY] = cache[url]
         || isDataUri(url) && url
-        || (def || isRemote(url)) && await sendCmdDirectly('GetImageData', url)
+        || isHiDPI && def // Using our big icon directly as its data URI is rendered slower
+        || (def || isRemote(url)) && (cache[url] = await sendCmdDirectly('GetImageData', url))
         || null;
     }
   }

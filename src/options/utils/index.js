@@ -5,7 +5,7 @@ import { isHiDPI } from '@/common/ui/favicon';
 export const store = reactive({
   route,
   scripts: [],
-  HiDPI: isHiDPI,
+  isHiDPI,
   storageSize: 0,
 });
 
