@@ -1,6 +1,9 @@
 buttonCancel:
   description: Cancel button on dialog.
   message: Anuluj
+buttonCheckForUpdates:
+  description: Button to check a script for updates.
+  message: Sprawdź dostępność aktualizacji
 buttonClose:
   description: Button to close window.
   message: Zamknij
@@ -92,8 +95,8 @@ buttonUndo:
   message: Cofnij
   touched: false
 buttonUpdate:
-  description: Check a script for updates.
-  message: Sprawdź dostępność aktualizacji
+  description: Button to update a script.
+  message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Sprawdź aktualizacje dla wszystkich skryptów
@@ -773,6 +776,11 @@ optionUiThemeDark:
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
   message: jasny
+optionUpdate:
+  description: >-
+    Label of the update section in settings and notification title for script
+    updates.
+  message: Aktualizacja
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Rozróżnianie wielkości liter
@@ -796,9 +804,6 @@ titleBadgeColorBlocked:
   message: >-
     Kolor plakietki, kiedy witryna nie nadaje się do wstrzykiwania (jest na
     czarnej liście lub nie jest obsługiwana)
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: Aktualizacja
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-

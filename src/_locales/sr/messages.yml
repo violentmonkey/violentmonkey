@@ -1,6 +1,9 @@
 buttonCancel:
   description: Cancel button on dialog.
   message: Откажи
+buttonCheckForUpdates:
+  description: Button to check a script for updates.
+  message: Провери ажурирања
 buttonClose:
   description: Button to close window.
   message: Затвори
@@ -90,8 +93,8 @@ buttonUndo:
   message: ''
   touched: false
 buttonUpdate:
-  description: Check a script for updates.
-  message: Провери ажурирања
+  description: Button to update a script.
+  message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Провери ажурирања за све
@@ -725,6 +728,11 @@ optionUiThemeDark:
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
   message: ''
+optionUpdate:
+  description: >-
+    Label of the update section in settings and notification title for script
+    updates.
+  message: Ажурирај
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: ''
@@ -746,9 +754,6 @@ titleBadgeColor:
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: ''
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: Ажурирај
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''

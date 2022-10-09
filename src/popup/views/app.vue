@@ -180,7 +180,7 @@
            tabindex="0"
            @click="onRemoveScript"/>
       <div v-if="!activeExtras.data.config.removed && canUpdate(activeExtras.data)"
-           v-text="i18n('titleScriptUpdated')"
+           v-text="i18n('buttonUpdate')"
            tabindex="0"
            @click="onUpdateScript"/>
     </div>

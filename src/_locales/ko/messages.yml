@@ -1,6 +1,9 @@
 buttonCancel:
   description: Cancel button on dialog.
   message: 취소
+buttonCheckForUpdates:
+  description: Button to check a script for updates.
+  message: 업데이트 확인
 buttonClose:
   description: Button to close window.
   message: 닫기
@@ -90,8 +93,8 @@ buttonUndo:
   message: 되돌리기
   touched: false
 buttonUpdate:
-  description: Check a script for updates.
-  message: 업데이트 확인
+  description: Button to update a script.
+  message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: 모두 업데이트 확인
@@ -739,6 +742,11 @@ optionUiThemeDark:
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
   message: 라이트
+optionUpdate:
+  description: >-
+    Label of the update section in settings and notification title for script
+    updates.
+  message: 업데이트
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 대소문자 확인하기
@@ -760,9 +768,6 @@ titleBadgeColor:
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: 주입할 수 없는 사이트의 배지 색상(블랙리스트 또는 지원되지 않음)
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: 업데이트
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-

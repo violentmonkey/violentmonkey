@@ -1,6 +1,9 @@
 buttonCancel:
   description: Cancel button on dialog.
   message: Ακύρωση
+buttonCheckForUpdates:
+  description: Button to check a script for updates.
+  message: Έλεγχος για αναβαθμίσεις
 buttonClose:
   description: Button to close window.
   message: Κλείσιμο
@@ -90,8 +93,8 @@ buttonUndo:
   message: Αναίρεση
   touched: false
 buttonUpdate:
-  description: Check a script for updates.
-  message: Έλεγχος για αναβαθμίσεις
+  description: Button to update a script.
+  message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Έλεγχος όλων για αναβαθμίσεις
@@ -745,6 +748,11 @@ optionUiThemeDark:
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
   message: ''
+optionUpdate:
+  description: >-
+    Label of the update section in settings and notification title for script
+    updates.
+  message: Ενημέρωση
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Διάκριση πεζών-κεφαλαίων
@@ -766,9 +774,6 @@ titleBadgeColor:
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: ''
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: Ενημέρωση
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''
