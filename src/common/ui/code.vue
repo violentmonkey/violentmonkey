@@ -182,8 +182,11 @@ export default {
       cm.off('change', this.onChange);
       this.renderPlaceholders();
     },
-    onChanges(cm) {
-      this.$emit('code-dirty', !cm.isClean());
+    onChanges(cm, [{ origin }]) {
+      // No need to report if changed externally via props.value
+      if (origin !== 'setValue') {
+        this.$emit('code-dirty', !cm.isClean());
+      }
     },
     createPlaceholders(change) {
       const { line, ch } = change.from;
