@@ -13,13 +13,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v2
         with:
           node-version: '16'
       - name: Install deps
         run: yarn
       - name: Update translations
-        run: node scripts/transifex pull
+        run: node scripts/transifex.mjs pull
         env:
           TRANSIFEX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
       - name: Create pull request

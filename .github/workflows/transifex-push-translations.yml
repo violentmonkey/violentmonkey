@@ -15,13 +15,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v2
         with:
           node-version: '16'
       - name: Install deps
         run: yarn
       - name: Upload translations
-        run: node scripts/transifex push
+        run: node scripts/transifex.mjs push
         env:
           TRANSIFEX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
           DIFF_URL: ${{ github.event.pull_request.diff_url }}
