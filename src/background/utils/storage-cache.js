@@ -132,7 +132,7 @@ browser.runtime.onConnect.addListener(port => {
   const fn = id ? watchers[id] : port.postMessage.bind(port);
   watchStorage(fn, cfg);
   port.onDisconnect.addListener(() => {
-    clearValueOpener(tabId || port.sender.tab.id);
+    clearValueOpener(tabId);
     watchStorage(fn, cfg, false);
     delete watchers[id];
   });
