@@ -1,6 +1,9 @@
 buttonCancel:
   description: Cancel button on dialog.
   message: Скасувати
+buttonCheckForUpdates:
+  description: Button to check a script for updates.
+  message: Перевірити оновлення
 buttonClose:
   description: Button to close window.
   message: Закрити
@@ -90,8 +93,8 @@ buttonUndo:
   message: Скасувати
   touched: false
 buttonUpdate:
-  description: Check a script for updates.
-  message: Перевірити оновлення
+  description: Button to update a script.
+  message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Перевірити оновлення скриптів
@@ -727,6 +730,11 @@ optionUiThemeDark:
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
   message: ''
+optionUpdate:
+  description: >-
+    Label of the update section in settings and notification title for script
+    updates.
+  message: Оновлення
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: ''
@@ -748,9 +756,6 @@ titleBadgeColor:
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: ''
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: Оновлення
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''

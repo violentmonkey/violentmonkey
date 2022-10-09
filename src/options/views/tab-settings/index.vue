@@ -56,7 +56,7 @@
       </div>
     </section>
     <section class="mb-1c">
-      <h3 v-text="i18n('titleScriptUpdated')"/>
+      <h3 v-text="i18n('optionUpdate')"/>
       <div>
         <label>
           <locale-group i18n-key="labelAutoUpdate">

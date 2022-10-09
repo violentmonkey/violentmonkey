@@ -72,7 +72,7 @@
           </tooltip>
           <tooltip
             :disabled="!canUpdate || script.checking"
-            :content="i18n('buttonUpdate')"
+            :content="i18n('buttonCheckForUpdates')"
             align="start">
             <a
               class="btn-ghost"

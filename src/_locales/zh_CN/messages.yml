@@ -1,6 +1,9 @@
 buttonCancel:
   description: Cancel button on dialog.
   message: 取消
+buttonCheckForUpdates:
+  description: Button to check a script for updates.
+  message: 查找更新
 buttonClose:
   description: Button to close window.
   message: 关闭
@@ -90,8 +93,8 @@ buttonUndo:
   message: 撤销
   touched: false
 buttonUpdate:
-  description: Check a script for updates.
-  message: 查找更新
+  description: Button to update a script.
+  message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: 全部更新
@@ -736,6 +739,11 @@ optionUiThemeDark:
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
   message: 浅色
+optionUpdate:
+  description: >-
+    Label of the update section in settings and notification title for script
+    updates.
+  message: 更新
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 区分大小写
@@ -757,9 +765,6 @@ titleBadgeColor:
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: 页面无法注入脚本（列入黑名单或不支持）时的徽标颜色
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: 更新
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-

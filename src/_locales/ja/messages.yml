@@ -1,6 +1,9 @@
 buttonCancel:
   description: Cancel button on dialog.
   message: キャンセル
+buttonCheckForUpdates:
+  description: Button to check a script for updates.
+  message: 更新を確認
 buttonClose:
   description: Button to close window.
   message: 閉じる
@@ -90,8 +93,8 @@ buttonUndo:
   message: 元に戻す
   touched: false
 buttonUpdate:
-  description: Check a script for updates.
-  message: 更新を確認
+  description: Button to update a script.
+  message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: すべての更新を確認
@@ -734,6 +737,11 @@ optionUiThemeDark:
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
   message: ''
+optionUpdate:
+  description: >-
+    Label of the update section in settings and notification title for script
+    updates.
+  message: 更新
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 大文字と小文字を区別する
@@ -755,9 +763,6 @@ titleBadgeColor:
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: ブラックリストに登録されている、サポートされていない等の理由でサイトにインジェクションできない場合のバッジの色
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: 更新
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-

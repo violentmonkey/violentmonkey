@@ -1,6 +1,9 @@
 buttonCancel:
   description: Cancel button on dialog.
   message: İptal
+buttonCheckForUpdates:
+  description: Button to check a script for updates.
+  message: Güncellemeleri denetle
 buttonClose:
   description: Button to close window.
   message: Kapat
@@ -92,8 +95,8 @@ buttonUndo:
   message: Geri Al
   touched: false
 buttonUpdate:
-  description: Check a script for updates.
-  message: Güncellemeleri denetle
+  description: Button to update a script.
+  message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Yeni güncellemeleri kontrol et
@@ -764,6 +767,11 @@ optionUiThemeDark:
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
   message: aydınlık
+optionUpdate:
+  description: >-
+    Label of the update section in settings and notification title for script
+    updates.
+  message: Güncelleme
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Büyük/küçük harfe duyarlı
@@ -787,9 +795,6 @@ titleBadgeColorBlocked:
   message: >-
     Site enjekte etmeye kapalı iken rozet rengi (kara listede veya
     desteklenmiyor iken)
-titleScriptUpdated:
-  description: Notification title for script updates.
-  message: Güncelleme
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-

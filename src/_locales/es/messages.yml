@@ -1,6 +1,9 @@
 buttonCancel:
   description: Cancel button on dialog.
   message: ''
+buttonCheckForUpdates:
+  description: Button to check a script for updates.
+  message: ''
 buttonClose:
   description: Button to close window.
   message: ''
@@ -90,7 +93,7 @@ buttonUndo:
   message: ''
   touched: false
 buttonUpdate:
-  description: Check a script for updates.
+  description: Button to update a script.
   message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
@@ -719,6 +722,11 @@ optionUiThemeDark:
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
   message: ''
+optionUpdate:
+  description: >-
+    Label of the update section in settings and notification title for script
+    updates.
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: ''
@@ -739,9 +747,6 @@ titleBadgeColor:
   message: ''
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
-titleScriptUpdated:
-  description: Notification title for script updates.
   message: ''
 titleSearchHint:
   description: Hover title for search icon in dashboard.
