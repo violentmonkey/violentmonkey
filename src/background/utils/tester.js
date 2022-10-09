@@ -4,11 +4,11 @@ import { BLACKLIST, BLACKLIST_ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
 import * as tld from '@/common/tld';
 import { postInitialize } from './init';
-import { commands } from './message';
+import { addOwnCommands } from './message';
 import { getOption, hookOptions } from './options';
 import storage from './storage';
 
-Object.assign(commands, {
+addOwnCommands({
   TestBlacklist: testBlacklist,
 });
 

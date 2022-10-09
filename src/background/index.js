@@ -1,10 +1,10 @@
 import '@/common/browser';
 import { getActiveTab, makePause, sendCmd } from '@/common';
-import { TIMEOUT_24HOURS, TIMEOUT_MAX, extensionOrigin } from '@/common/consts';
+import { TIMEOUT_24HOURS, TIMEOUT_MAX, extensionRoot, extensionOrigin } from '@/common/consts';
 import { deepCopy } from '@/common/object';
 import * as tld from '@/common/tld';
 import * as sync from './sync';
-import { commands } from './utils';
+import { addOwnCommands, addPublicCommands, commands } from './utils';
 import { getData, getSizes, checkRemove } from './utils/db';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
@@ -26,7 +26,7 @@ hookOptions((changes) => {
   sendCmd('UpdateOptions', changes);
 });
 
-Object.assign(commands, {
+addOwnCommands({
   async GetData(opts) {
     const data = await getData(opts);
     data.sync = sync.getStates();
@@ -43,6 +43,9 @@ Object.assign(commands, {
       domain: host && tld.getDomain(host) || host,
     };
   },
+});
+
+addPublicCommands({
   /**
    * Timers in content scripts are shared with the web page so it can clear them.
    * await sendCmd('SetTimeout', 100) in injected/content
@@ -66,31 +69,30 @@ const commandsToSyncIfTruthy = [
   'CheckRemove',
   'CheckUpdate',
 ];
-const commandsForSelf = [
-  // TODO: maybe just add a prefix for all content-exposed commands?
-  ...commandsToSync,
-  ...commandsToSyncIfTruthy,
-  'ExportZip',
-  'GetAllOptions',
-  'GetData',
-  'GetSizes',
-  'GetOptions',
-  'SetOptions',
-  'SetValueStores',
-  'Storage',
-];
 
 async function handleCommandMessage({ cmd, data } = {}, src) {
-  if (src && !`${src.url}`.startsWith(extensionOrigin) && commandsForSelf.includes(cmd)) {
-    throw `Command is only allowed in extension context: ${cmd}`;
+  const func = commands::hasOwnProperty(cmd) && commands[cmd];
+  if (!func) {
+    throw new SafeError(`Unknown command: ${cmd}`);
   }
-  const res = await commands[cmd]?.(data, src);
-  if (commandsToSync.includes(cmd)
-  || res && commandsToSyncIfTruthy.includes(cmd)) {
-    sync.sync();
+  // The `src` is omitted when invoked via sendCmdDirectly unless fakeSrc is set.
+  // The `origin` is Chrome-only, it can't be spoofed by a compromised tab unlike `url`.
+  if (func.isOwn && src && !src.fake
+  && (src.origin ? src.origin !== extensionOrigin : !`${src.url}`.startsWith(extensionRoot))) {
+    throw new SafeError(`Command is only allowed in extension context: ${cmd}`);
   }
-  // `undefined` is not transferable, but `null` is
-  return res ?? null;
+  try {
+    const res = await func(data, src);
+    if (commandsToSync.includes(cmd)
+    || res && commandsToSyncIfTruthy.includes(cmd)) {
+      sync.sync();
+    }
+    // `undefined` is not transferable, but `null` is
+    return res ?? null;
+  } catch (err) {
+    // Adding `stack` info + in FF a rejected Promise value is transferred only for an Error object
+    throw err instanceof SafeError ? err : new SafeError(err);
+  }
 }
 
 function autoUpdate() {
@@ -108,13 +110,7 @@ function autoUpdate() {
 initialize(() => {
   global.handleCommandMessage = handleCommandMessage;
   global.deepCopy = deepCopy;
-  browser.runtime.onMessage.addListener(
-    IS_FIREFOX // in FF a rejected Promise value is transferred only if it's an Error object
-      ? (...args) => handleCommandMessage(...args).catch(e => (
-        Promise.reject(e instanceof Error ? e : new Error(e))
-      )) // Didn't use `throw` to avoid interruption in devtools with pause-on-exception enabled.
-      : handleCommandMessage,
-  );
+  browser.runtime.onMessage.addListener(handleCommandMessage);
   setTimeout(autoUpdate, 2e4);
   sync.initialize();
   checkRemove();

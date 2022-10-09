@@ -2,14 +2,14 @@ import { debounce, ensureArray, initHooks, normalizeKeys } from '@/common';
 import { deepCopy, deepEqual, mapEntry, objectGet, objectSet } from '@/common/object';
 import defaults from '@/common/options-defaults';
 import { preInitialize } from './init';
-import { commands } from './message';
+import { addOwnCommands, commands } from './message';
 import storage from './storage';
 
 let changes;
 let initPending;
 let options = {};
 
-Object.assign(commands, {
+addOwnCommands({
   /** @return {Object} */
   GetAllOptions() {
     return commands.GetOptions(defaults);

@@ -2,17 +2,20 @@ import { i18n, makeDataUri, noop } from '@/common';
 import { BLACKLIST, ICON_PREFIX, INJECTABLE_TAB_URL_RE } from '@/common/consts';
 import { objectPick } from '@/common/object';
 import { postInitialize } from './init';
-import { commands, forEachTab } from './message';
+import { addOwnCommands, addPublicCommands, forEachTab } from './message';
 import { getOption, hookOptions } from './options';
 import { testBlacklist } from './tester';
 import storage from './storage';
 
-Object.assign(commands, {
+addOwnCommands({
   GetImageData: async url => (
     url.startsWith(ICON_PREFIX)
       ? (await getOwnIcon(url)).uri
       : (await storage.cache.fetch(url), makeDataUri(await storage.cache.getOne(url)))
   ),
+});
+
+addPublicCommands({
   SetBadge: setBadge,
 });
 

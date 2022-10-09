@@ -1,12 +1,12 @@
 import { getActiveTab, noop, sendTabCmd, getFullUrl } from '@/common';
 import { extensionRoot } from '@/common/consts';
 import ua from '@/common/ua';
-import { commands } from './message';
+import { addOwnCommands, addPublicCommands, commands } from './message';
 import { getOption } from './options';
 
 const openers = {};
 
-Object.assign(commands, {
+addOwnCommands({
   /**
    * @param {string} [pathId] - path or id to add to #scripts route in dashboard,
      if absent a new script will be created for active tab's URL
@@ -32,6 +32,9 @@ Object.assign(commands, {
     }
     return commands.TabOpen({ url, maybeInWindow: true }, src);
   },
+});
+
+addPublicCommands({
   /** @return {Promise<{ id: number } | chrome.tabs.Tab>} new tab is returned for internal calls */
   async TabOpen({
     url,

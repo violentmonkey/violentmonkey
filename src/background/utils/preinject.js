@@ -8,7 +8,7 @@ import { forEachEntry, objectPick, objectSet } from '@/common/object';
 import ua from '@/common/ua';
 import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_IDS } from './db';
 import { postInitialize } from './init';
-import { commands } from './message';
+import { addPublicCommands } from './message';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId } from './requests';
@@ -50,7 +50,7 @@ let isApplied;
 let injectInto;
 let xhrInject;
 
-Object.assign(commands, {
+addPublicCommands({
   /** @return {Promise<VMInjection>} */
   async GetInjected({ url, forceContent }, src) {
     const { frameId, tab } = src;

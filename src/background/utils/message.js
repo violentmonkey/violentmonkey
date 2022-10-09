@@ -1,6 +1,16 @@
 import { defaultImage, i18n, noop } from '@/common';
+import { forEachEntry } from '@/common/object';
 
 export const commands = {};
+export const addPublicCommands = Object.assign.bind(Object, commands);
+
+/** Commands that can be used only by an extension page i.e. not by a content script */
+export function addOwnCommands(obj) {
+  obj::forEachEntry(([name, fn]) => {
+    commands[name] = fn;
+    fn.isOwn = true;
+  });
+}
 
 export function notify(options) {
   browser.notifications.create(options.id || 'ViolentMonkey', {

@@ -1,9 +1,9 @@
-import { commands } from './message';
+import { addPublicCommands } from './message';
 
 const textarea = document.createElement('textarea');
 let clipboardData;
 
-Object.assign(commands, {
+addPublicCommands({
   SetClipboard(data) {
     clipboardData = data;
     textarea.focus();

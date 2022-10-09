@@ -5,12 +5,12 @@ import {
 import { fetchResources, getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
-import { commands } from './message';
+import { addOwnCommands, commands } from './message';
 import { requestNewer } from './storage-fetch';
 
 const processes = {};
 
-Object.assign(commands, {
+addOwnCommands({
   /**
    * @param {number} [id] - when omitted, all scripts are checked
    * @return {Promise<number>} number of updated scripts

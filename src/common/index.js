@@ -80,9 +80,14 @@ const getBgPage = () => browser.extension.getBackgroundPage?.();
 export function sendCmdDirectly(cmd, data, options, fakeSrc) {
   const bg = !COMMANDS_WITH_SRC.includes(cmd) && getBgPage();
   const bgCopy = bg && bg !== window && bg.deepCopy;
-  return bgCopy
-    ? bg.handleCommandMessage(bgCopy({ cmd, data }), fakeSrc && bgCopy(fakeSrc)).then(deepCopy)
-    : sendCmd(cmd, data, options);
+  if (!bgCopy) {
+    return sendCmd(cmd, data, options);
+  }
+  if (fakeSrc) {
+    fakeSrc = bgCopy(fakeSrc);
+    fakeSrc.fake = true;
+  }
+  return bg.handleCommandMessage(bgCopy({ cmd, data }), fakeSrc).then(deepCopy);
 }
 
 /**

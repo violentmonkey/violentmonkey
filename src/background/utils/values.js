@@ -1,7 +1,7 @@
 import { isEmpty, sendTabCmd } from '@/common';
 import { forEachEntry, objectGet, objectSet } from '@/common/object';
 import { getScript } from './db';
-import { commands } from './message';
+import { addOwnCommands, addPublicCommands } from './message';
 import storage from './storage';
 
 const nest = (obj, key) => obj[key] || (obj[key] = {}); // eslint-disable-line no-return-assign
@@ -10,7 +10,7 @@ const openers = {};
 let chain = Promise.resolve();
 let toSend = {};
 
-Object.assign(commands, {
+addOwnCommands({
   async GetValueStore(id, { tab }) {
     const frames = nest(nest(openers, id), tab.id);
     const values = frames[0] || (frames[0] = await storage.value.getOne(id));
@@ -32,6 +32,9 @@ Object.assign(commands, {
     commit(toWrite);
     return chain;
   },
+});
+
+addPublicCommands({
   /**
    * @return {?Promise<void>}
    */

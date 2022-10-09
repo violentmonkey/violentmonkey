@@ -2,12 +2,12 @@ import { blob2base64, sendTabCmd, string2uint8array } from '@/common';
 import { forEachEntry, forEachValue, objectPick } from '@/common/object';
 import ua from '@/common/ua';
 import cache from './cache';
-import { commands } from './message';
+import { addPublicCommands, commands } from './message';
 import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify,
 } from './requests-core';
 
-Object.assign(commands, {
+addPublicCommands({
   /**
    * @param {GMReq.Message.Web} opts
    * @param {MessageSender} src
