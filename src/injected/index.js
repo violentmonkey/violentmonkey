@@ -17,6 +17,7 @@ if (IS_FIREFOX && IS_TOP
       document: { referrer },
     } = global;
     const { text: getText } = ResponseProto;
+    const isFF68 = 'cookie' in Document[PROTO];
     const url = global.location.href;
     const fetchCode = async () => (await fetch(url, { mode: 'same-origin' }))::getText();
     let code = await fetchCode();
@@ -27,7 +28,7 @@ if (IS_FIREFOX && IS_TOP
     await sendCmd('ConfirmInstall', { code, url, from: referrer });
     // FF68+ doesn't allow extension pages to get file: URLs anymore so we need to track it here
     // (detecting FF68 by a feature because we can't use getBrowserInfo here and UA may be altered)
-    if (browser.storage.managed) {
+    if (isFF68) {
       /** @param {chrome.runtime.Port} */
       browser.runtime.onConnect.addListener(port => {
         if (port.name !== 'FetchSelf') return;

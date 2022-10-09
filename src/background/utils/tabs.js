@@ -5,6 +5,8 @@ import { addOwnCommands, addPublicCommands, commands } from './message';
 import { getOption } from './options';
 
 const openers = {};
+const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
+  || !!window.AbortSignal && !browser.windows; // and FF57+ except mobile
 
 addOwnCommands({
   /**
@@ -94,7 +96,7 @@ addPublicCommands({
         ...canOpenIncognito && {
           windowId,
           ...insert && { index: srcTab.index + 1 },
-          ...ua.openerTabIdSupported && { openerTabId: srcTab.id },
+          ...openerTabIdSupported && { openerTabId: srcTab.id },
         },
       });
     }
@@ -114,17 +116,6 @@ addPublicCommands({
     browser.tabs.update(src.tab.id, { active: true }).catch(noop);
     browser.windows.update(src.tab.windowId, { focused: true }).catch(noop);
   },
-});
-
-// Firefox Android does not support `openerTabId` field, it fails if this field is passed
-// XXX openerTabId seems buggy on Chrome, https://crbug.com/967150
-// It seems to do nothing even set successfully with `browser.tabs.update`.
-ua.ready.then(() => {
-  Object.defineProperties(ua, {
-    openerTabIdSupported: {
-      value: !IS_FIREFOX || ua.firefox >= 57 && ua.os !== 'android',
-    },
-  });
 });
 
 browser.tabs.onRemoved.addListener((id) => {
