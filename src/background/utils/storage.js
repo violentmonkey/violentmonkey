@@ -1,6 +1,6 @@
 import { mapEntry } from '@/common/object';
 import { ensureArray } from '@/common/util';
-import { commands } from './message';
+import { addOwnCommands } from './message';
 
 let api = browser.storage.local;
 
@@ -105,7 +105,7 @@ export const S_SCRIPT = storageByPrefix[S_SCRIPT_PRE].name;
 export const S_VALUE = storageByPrefix[S_VALUE_PRE].name;
 export default storage;
 
-Object.assign(commands, {
+addOwnCommands({
   Storage([area, method, ...args]) {
     return storage[area][method](...args);
   },

@@ -9,7 +9,7 @@ import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
 import { testScript, testBlacklist, testerBatch } from './tester';
 import { preInitialize } from './init';
-import { commands } from './message';
+import { addOwnCommands, commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
 import storage, {
@@ -32,7 +32,7 @@ export const store = {
   },
 };
 
-Object.assign(commands, {
+addOwnCommands({
   CheckPosition: sortScripts,
   CheckRemove: checkRemove,
   /** @return {VMScript} */

@@ -1,11 +1,11 @@
 import initCache from '@/common/cache';
-import { commands } from './message';
+import { addOwnCommands } from './message';
 
 const cache = initCache({
   lifetime: 5 * 60 * 1000,
 });
 
-Object.assign(commands, {
+addOwnCommands({
   CacheLoad(data) {
     return cache.get(data) || null;
   },

@@ -1,9 +1,9 @@
 import { i18n, defaultImage, sendTabCmd, trueJoin } from '@/common';
-import { commands } from './message';
+import { addPublicCommands } from './message';
 
 const openers = {};
 
-Object.assign(commands, {
+addPublicCommands({
   /** @return {Promise<string>} */
   async Notification({ image, text, title }, src, bgExtras) {
     const notificationId = await browser.notifications.create({

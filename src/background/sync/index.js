@@ -10,9 +10,9 @@ import './dropbox';
 import './onedrive';
 import './googledrive';
 import './webdav';
-import { commands } from '../utils/message';
+import { addOwnCommands } from '../utils/message';
 
-Object.assign(commands, {
+addOwnCommands({
   SyncAuthorize: authorize,
   SyncRevoke: revoke,
   SyncStart: sync,

@@ -2,12 +2,12 @@ import { request, noop, i18n, getUniqId } from '@/common';
 import { extensionRoot } from '@/common/consts';
 import ua from '@/common/ua';
 import cache from './cache';
-import { commands } from './message';
+import { addPublicCommands, commands } from './message';
 import { parseMeta, isUserScript } from './script';
 
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 
-Object.assign(commands, {
+addPublicCommands({
   async CheckInstallerTab(tabId, src) {
     const tab = IS_FIREFOX && (src.url || '').startsWith('file:')
       && await browser.tabs.get(tabId).catch(noop);

@@ -2,9 +2,17 @@ import { getActiveTab, sendTabCmd } from '@/common';
 import cache from './cache';
 import { getData } from './db';
 import { postInitialize } from './init';
-import { commands } from './message';
+import { addPublicCommands } from './message';
 
 export const popupTabs = {}; // { tabId: 1 }
+
+addPublicCommands({
+  async SetPopup(data, src) {
+    if (popupTabs[src.tab.id]) return;
+    Object.assign(data, await getData({ ids: data.ids }));
+    cache.put('SetPopup', Object.assign({ [src.frameId]: [data, src] }, cache.get('SetPopup')));
+  },
+});
 
 postInitialize.push(() => {
   browser.runtime.onConnect.addListener(onPopupOpened);
@@ -20,7 +28,6 @@ function onPopupOpened(port) {
   popupTabs[tabId] = 1;
   sendTabCmd(tabId, 'PopupShown', true);
   port.onDisconnect.addListener(onPopupClosed);
-  delete commands.SetPopup;
 }
 
 function onPopupClosed({ name }) {
@@ -31,8 +38,4 @@ function onPopupClosed({ name }) {
 async function prefetchSetPopup() {
   const tabId = (await getActiveTab()).id;
   sendTabCmd(tabId, 'PopupShown', true);
-  commands.SetPopup = async (data, src) => {
-    Object.assign(data, await getData({ ids: data.ids }));
-    cache.put('SetPopup', Object.assign({ [src.frameId]: [data, src] }, cache.get('SetPopup')));
-  };
 }

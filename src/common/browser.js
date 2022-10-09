@@ -95,9 +95,9 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
   // Both result and error must be explicitly specified to avoid prototype eavesdropping
   const wrapError = err => process.env.DEBUG && console.warn(err) || [
     null,
-    err instanceof SafeError
+    err?.[MESSAGE]
       ? [err[MESSAGE], err[STACK]]
-      : [err, ''],
+      : [err, new SafeError()[STACK]],
   ];
   const sendResponseAsync = async (result, sendResponse) => {
     try {
