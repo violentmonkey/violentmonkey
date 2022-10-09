@@ -183,9 +183,17 @@ async function updateScriptSizeContributor(key, val) {
 
 async function flush() {
   const keys = Object.keys(valuesToFlush);
-  const toRemove = keys.filter(key => !valuesToFlush[key] && delete valuesToFlush[key]);
+  const toRemove = [];
   const toFlush = valuesToFlush;
   valuesToFlush = {};
+  keys.forEach(key => {
+    const val = toFlush[key];
+    if (!val) {
+      delete toFlush[key];
+      toRemove.push(key);
+    }
+    updateScriptSizeContributor(key, val);
+  });
   if (!isEmpty(toFlush)) await api[SET](toFlush);
   if (toRemove.length) await api[REMOVE](toRemove);
   if (valuesToWatch) setTimeout(notifyWatchers, 0, toFlush, toRemove);
