@@ -234,6 +234,7 @@ const STORAGE_ROUTES = {
   [S_VALUE]: ENV_VALUE_IDS,
 };
 const STORAGE_ROUTES_ENTRIES = Object.entries(STORAGE_ROUTES);
+const notifiedBadScripts = new Set();
 
 /**
  * @desc Get scripts to be injected to page with specific URL.
@@ -336,17 +337,35 @@ async function readEnvironmentData(env) {
     }
   }
   if (badScripts.size) {
-    const title = i18n('msgMissingResources');
-    const text = i18n('msgReinstallScripts')
-      + [...badScripts].map(id => `\n#${id}: ${getScriptName(getScriptById(id))}`).join('');
-    console.error(`${title} ${text}`);
-    await commands.Notification({ title, text }, undefined, {
+    reportBadScripts(badScripts);
+  }
+  return env;
+}
+
+/** @param {Set<number>} ids */
+function reportBadScripts(ids) {
+  const unnotifiedIds = [];
+  const title = i18n('msgMissingResources');
+  let toLog = i18n('msgReinstallScripts');
+  let toNotify = toLog;
+  let str;
+  ids.forEach(id => {
+    str = `\n#${id}: ${getScriptName(getScriptById(id))}`;
+    toLog += str;
+    if (!notifiedBadScripts.has(id)) {
+      notifiedBadScripts.add(id);
+      unnotifiedIds.push(id);
+      toNotify += str;
+    }
+  });
+  console.error(`${title} ${toLog}`);
+  if (unnotifiedIds.length) {
+    commands.Notification({ title, text: toNotify }, undefined, {
       onClick() {
-        badScripts.forEach(id => commands.OpenEditor(id));
+        unnotifiedIds.forEach(id => commands.OpenEditor(id));
       },
     });
   }
-  return env;
 }
 
 /**
