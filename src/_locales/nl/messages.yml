@@ -94,7 +94,7 @@ buttonUndo:
   touched: false
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Bijwerken
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Alle scripts controleren op updates

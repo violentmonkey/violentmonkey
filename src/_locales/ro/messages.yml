@@ -96,7 +96,7 @@ buttonUndo:
   touched: false
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Actualizează
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Caută actualizări pentru toate
@@ -532,7 +532,7 @@ labelXhrInjectHint:
   message: >-
     Activează doar dacă ai un script care trebuie să ruleze înainte ca pagina să
     înceapă să se încarce și în prezent rulează prea târziu. La fel ca și modul
-    de injectare instantanee din Tampermonkey, această opțiune utilizează XHR
+    de injectare instantanee din Tampermonkey, această opțiune folosește XHR
     sincron, care este perimat, astfel încât în Chrome/Chromium vei vedea
     avertismente în consola devtools, deși le poți ignora în siguranță, deoarece
     efectele adverse sunt neglijabile în acest caz. Poți ascunde definitiv
@@ -662,7 +662,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Lipsesc resursele necesare.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -685,7 +685,7 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Te rugăm să resalvezi sau să reinstalezi acest(e) script(uri):'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (codul este la fel)

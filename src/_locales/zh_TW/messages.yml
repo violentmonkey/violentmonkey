@@ -12,7 +12,7 @@ buttonConfirmInstallation:
   message: 確認安裝
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: ''
+  message: 確認重新安裝
 buttonDisable:
   description: Button to disable a script.
   message: 停用
@@ -94,7 +94,7 @@ buttonUndo:
   touched: false
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: 更新
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: 全部檢查更新
@@ -120,7 +120,12 @@ descCustomCSS:
   message: 這裡可以為管理頁面和腳本安裝頁面設定自訂CSS。如果你不確定它的意思，請不要修改。
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    在 JSON 對像中為 CodeMirror 和附加組件提供自定義選項，如 <code>{"indentUnit":2,
+    "smartIndent":true}</code>，但請注意，其中一些選項在 Violentmonkey 中可能不起作用。 查看<a
+    href="https://codemirror.net/doc/manual.html#config"
+    target="\&quot;_blank\&quot;" rel="\&quot;noopener"
+    noreferrer\"="">完整列表</a>。
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 使用者腳本詮釋資料區塊和 <code>GM</code> API 的文件：
@@ -160,7 +165,7 @@ editValueAll:
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: 展示/編輯腳本的所有數據
 editValueCancel:
   description: Button to cancel modification of a script value.
   message: 取消
@@ -203,7 +208,7 @@ filterScopeName:
   message: 名稱
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: 大小
 genericError:
   description: Label for generic error.
   message: 錯誤
@@ -271,13 +276,13 @@ labelAutoUpdate:
   message: 每 $1 天檢查腳本更新，用 0 停用
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: 備份
 labelBadge:
   description: Label for option to show number on badge.
   message: 在徽章上顯示：
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 徽標顏色：
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: 無
@@ -318,7 +323,7 @@ labelEditValue:
   message: 編輯腳本數值
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: 正在編輯腳本數據
 labelEditor:
   description: Label for Editor settings
   message: 編輯器
@@ -384,7 +389,7 @@ labelName:
   message: 名字：
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: '在內聯框架中運行: '
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: 名字為空
@@ -413,7 +418,7 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: 重新安裝腳本
 labelRelated:
   description: Label of related links.
   message: 相關連結：
@@ -443,7 +448,7 @@ labelSettings:
   message: 設定
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: 顯示執行序號
 labelSync:
   description: Label for sync options.
   message: 同步
@@ -483,7 +488,7 @@ labelSyncUsername:
   message: 使用者名稱：
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: '主題:'
 labelTranslator:
   description: Label of translator.
   message: 翻譯者：
@@ -495,18 +500,21 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: 單列視圖
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: 表格視圖
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: 同步 $1 模式
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: ''
+  message: >-
+    僅當您有一個腳本需要在頁面開始加載前運行，並且目前它運行得太晚時才啟用。就像 Tampermonkey
+    中的即時注入模式一樣，這個選項使用的是被廢棄的同步 XHR，所以在 Chrome/Chromium
+    中，您會在開發者控制台看到警告，盡管您可以安全地忽略它們，因為在這種情況下的不利影響可以忽略不計。 您可以通過右鍵點擊其中一個來永久隱藏這些警告。
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步時間為 $1
@@ -530,7 +538,10 @@ menuExclude:
   message: 排除...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: |-
+    如果你在設置中開啟了相關選項，那麽當前標簽頁將會自動重載。
+    其他標簽頁則需要手動刷新才能應用這些更新。
+    在腳本編輯器中的“設置”頁可以進行更多配置。
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 為此站點查詢腳本
@@ -544,10 +555,10 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: 匹配的禁用腳本
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: 僅在frame中執行的腳本
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: 匹配的腳本
@@ -565,7 +576,7 @@ msgCheckingForUpdate:
   message: 正在檢查更新…
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: 單擊打開 MomentJS 文檔。允許的標記：$1。使用 [方括號] 保護明文文本。
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -621,7 +632,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 依賴的資源缺失。
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -639,10 +650,10 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 請重新保存或安裝這些腳本：
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: （代碼一致）
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: 黑名單已更新。
@@ -672,7 +683,7 @@ msgSyncInitError:
   message: 初始化失敗！
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: 還沒有授權。
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: 即將開始同步…
@@ -701,34 +712,34 @@ optionEditorWindowSimple:
   message: 隱藏網址列
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: 彈出式菜單和圖標
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: 先顯示啟用的腳本
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: 分組禁用的腳本
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: 隱藏停用的腳本
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: 顯示禁用的腳本
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 先顯示啟用的腳本
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: "UI 主題: \_"
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: 自動
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: 深色
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: 浅色
 optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
@@ -751,10 +762,10 @@ sideMenuSettings:
   message: 設定
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: 正常情況下的徽標顏色
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: 頁面無法注入腳本（列入黑名單或不支持）時的徽標顏色
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-
