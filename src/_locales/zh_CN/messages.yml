@@ -3,7 +3,7 @@ buttonCancel:
   message: 取消
 buttonCheckForUpdates:
   description: Button to check a script for updates.
-  message: 查找更新
+  message: 检查更新
 buttonClose:
   description: Button to close window.
   message: 关闭
@@ -94,7 +94,7 @@ buttonUndo:
   touched: false
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: 更新
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: 全部更新
@@ -631,7 +631,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 依赖的资源缺失。
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -649,7 +649,7 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 请重新保存或安装这些脚本：
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: （代码一致）
