@@ -1,7 +1,7 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri, makeDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
-  makePause,
+  getScriptPrettyUrl, makePause,
 } from '@/common';
 import { ICON_PREFIX, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
@@ -667,7 +667,7 @@ export async function vacuum(data) {
   if (_vacuuming) return _vacuuming;
   let resolveSelf;
   _vacuuming = new Promise(r => { resolveSelf = r; });
-  const noFetch = !data && [];
+  const noFetch = data && [];
   const sizes = {};
   const result = {};
   const toFetch = [];
@@ -681,6 +681,10 @@ export async function vacuum(data) {
     S_CODE_PRE,
     S_MOD_PRE,
   ].join('|')})`);
+  const prefixIgnoreMissing = [
+    S_VALUE_PRE,
+    S_MOD_PRE,
+  ];
   const downloadUrls = {};
   const touch = (prefix, id, scriptId, pathMap) => {
     if (!id || pathMap && isDataUri(id)) {
@@ -696,7 +700,7 @@ export async function vacuum(data) {
       if (prefix !== S_MOD_PRE) {
         sizes[key] = deepSize(data[key]) + (prefix === S_VALUE_PRE ? 0 : key.length);
       }
-    } else if (!val) {
+    } else if (!val && !prefixIgnoreMissing.includes(prefix)) {
       status[key] = 2 + scriptId;
     }
   };
@@ -733,7 +737,7 @@ export async function vacuum(data) {
       const id = area.toId(key);
       const url = area.name === S_CODE ? downloadUrls[id] : id;
       if (noFetch) {
-        noFetch.push(url);
+        noFetch.push(url || +id && getScriptPrettyUrl(getScriptById(id)) || key);
       } else if (url && area.fetch) {
         keysToRemove.push(S_MOD_PRE + url);
         toFetch.push(area.fetch(url).catch(err => `${
