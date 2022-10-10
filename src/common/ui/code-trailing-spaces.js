@@ -7,39 +7,40 @@ const DEFAULTS = {
   [KILL_OPT]: true,
   [SHOW_OPT]: true,
 };
-/** Regexp's \s minus \n */
-const WS_RE = /((?!\n)\s)+$/gm;
+if (!''.trimEnd) {
+  // TODO: remove when min_chrome_version>=66, strict_min_version>=61
+  String.prototype.trimEnd = function _() {
+    return this.replace(/\s+$/, '');
+  }
+}
 
 export const killTrailingSpaces = (cm, placeholders) => {
-  const text = cm.getValue();
-  const shouldKill = cm.options[KILL_OPT];
-  const trimmed = shouldKill
-    ? text.replace(WS_RE, '')
-    : text;
-  if (text !== trimmed) {
-    cm.operation(() => {
-      const cursorLines = cm.doc.sel.ranges.map(r => r.head.line);
-      let line = -1;
-      cm.eachLine(({ text: lineText }) => {
-        line += 1;
-        // The saved code is fully trimmed, but we keep the spaces in cursor line(s)
-        if (cursorLines.includes(line)) return;
-        const m = /\s+$/.exec(lineText);
-        if (m) {
-          cm.replaceRange('',
-            { line, ch: m.index },
-            { line, ch: lineText.length },
-            `*${KILL_OPT}`); // `*` reuses the same undo record for performance
-        }
-      });
-    });
+  if (!cm.options[KILL_OPT]) {
+    return cm.getValue();
   }
-  if (shouldKill) {
-    placeholders.forEach(p => {
-      p.body = p.body.replace(/\s+$/, '');
+  const cursorLines = cm.doc.sel.ranges.map(r => r.head.line);
+  let res = ''; // progressive concatenation is efficient in modern browsers
+  let line = 0;
+  cm.operation(() => {
+    cm.eachLine(({ text }) => {
+      const trimmed = text.trimEnd();
+      const len1 = trimmed.length;
+      const len2 = text.length;
+      res += (line ? '\n' : '') + trimmed;
+      // The saved code is fully trimmed, but we keep the spaces in cursor line(s)
+      if (len1 !== len2 && !cursorLines.includes(line)) {
+        cm.replaceRange('',
+          { line, ch: len1 },
+          { line, ch: len2 },
+          `*${KILL_OPT}`); // `*` reuses the same undo record for performance
+      }
+      line += 1;
     });
-  }
-  return trimmed;
+  });
+  placeholders.forEach(p => {
+    p.body = p.body.trimEnd();
+  });
+  return res;
 };
 
 CodeMirror.defineOption(SHOW_OPT, DEFAULTS[SHOW_OPT], (cm, val, prev) => {
