@@ -76,10 +76,16 @@ export function render(App, el) {
   return app;
 }
 
-/** Focus the first tabindex=-1 element or root, to enable scrolling via Home/End/PgUp/PgDn */
-export function focusMe() {
-  setTimeout(() => {
-    const el = this.$el;
-    (el.querySelector('[tabindex="-1"]') || (el.tabIndex = -1, el)).focus();
+/**
+ * Focuses the first element with `focusme` attribute or root, which enables keyboard scrolling.
+ * Not using `autofocus` to avoid warnings in console on page load.
+ * A child component should use this.$nextTick to change focus, which runs later.
+ */
+export async function focusMe() {
+  this.$nextTick(() => {
+    let el = this.$el;
+    el = el.querySelector('[focusme]') || el;
+    el.tabIndex = -1;
+    el.focus();
   });
 }

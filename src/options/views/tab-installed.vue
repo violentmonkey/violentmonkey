@@ -114,7 +114,7 @@
       </div>
       <div class="scripts flex-auto"
            ref="scriptList"
-           tabindex="-1"
+           focusme
            :style="`--num-columns:${numColumns}`"
            :data-columns="numColumns"
            :data-show-order="filters.showOrder || null"
@@ -394,6 +394,9 @@ export default {
         window.history.back();
       } else {
         setRoute(pathname);
+      }
+      if (!id) {
+        this::focusMe();
       }
     },
     async onHashChange() {

@@ -75,7 +75,7 @@
         <icon name="arrow" class="icon-collapse"></icon>
         <div class="flex-auto" v-text="scope.title" :data-totals="scope.totals" />
       </div>
-      <div class="submenu" ref="scriptList" tabindex="-1">
+      <div class="submenu" ref="scriptList" focusme>
         <div
           v-for="(item, index) in scope.list"
           :key="index"
