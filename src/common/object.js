@@ -102,9 +102,10 @@ export function deepEqual(a, b) {
     res = a.length === b.length && a.every((item, i) => deepEqual(item, b[i]));
   } else {
     const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
-    res = keysA.length === keysB.length
-      && keysA.every(key => keysB.includes(key) && deepEqual(a[key], b[key]));
+    /* Not checking hasOwnProperty because 1) we only use own properties and
+     * 2) this can be slow for a large value storage that has thousands of keys */
+    res = keysA.length === Object.keys(b).length
+      && keysA.every(key => deepEqual(a[key], b[key]));
   }
   return res;
 }
@@ -128,7 +129,9 @@ function deepCopyDiffObjects(src, sample) {
   for (let i = 0, key, a, b; i < arr1.length; i += 1) {
     key = isArr ? i : arr1[i];
     a = src[key];
-    b = isArr || arr2.includes(key) ? sample[key] : !a;
+    /* Not checking hasOwnProperty because 1) we only use own properties and
+     * 2) this can be slow for a large value storage that has thousands of keys */
+    b = sample[key];
     if (a && typeof a === 'object') {
       if (b && typeof b === 'object') {
         a = deepCopyDiffObjects(a, b);
