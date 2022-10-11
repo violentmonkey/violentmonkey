@@ -94,8 +94,10 @@ async function broadcast() {
   toSend = {};
   for (const [tabId, frames] of Object.entries(toTabs)) {
     for (const [frameId, toFrame] of Object.entries(frames)) {
-      tasks.push(sendToFrame(+tabId, +frameId, toFrame));
-      if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
+      if (!isEmpty(toFrame)) {
+        tasks.push(sendToFrame(+tabId, +frameId, toFrame));
+        if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
+      }
     }
   }
   await Promise.all(tasks);
