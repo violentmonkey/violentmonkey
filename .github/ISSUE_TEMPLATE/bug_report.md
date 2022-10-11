@@ -1,11 +1,14 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: For bugs that also exist in beta
 title: "[BUG] "
 labels: bug
 assignees: ''
 
 ---
+
+- [ ] The bug is also present in the latest [beta](https://github.com/violentmonkey/violentmonkey/releases).
+   Warning! Do an export in Violentmonkey settings before testing.
 
 - [ ] I have searched for existing issues that already reported this problem and found none
 
@@ -25,8 +28,6 @@ A clear and concise description of what you expected to happen.
 **Actual behavior**
 If applicable, add screenshots to help explain your problem.
 
-**What is the result in the [upcoming release](https://github.com/violentmonkey/violentmonkey/releases)?**
-WARNING! Do an export in settings before testing!
 <!-- If this is a bug report, please also provide logs in the console. -->
 
 **Environment:**
