@@ -40,10 +40,10 @@
       </span>
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
-      <div class="menu-item menu-area menu-find" :tabIndex="tabIndex">
+      <div class="menu-item menu-area menu-find">
         <template v-for="(url, text, i) in findUrls" :key="url">
           <a target="_blank" :class="{ ellipsis: !i, 'mr-1': !i, 'ml-1': i }"
-             :href="url" :data-message="url.split('://')[1]">
+             :href="url" :data-message="url.split('://')[1]" :tabIndex="tabIndex">
             <icon name="search" v-if="!i"/>{{text}}
           </a>
           <template v-if="!i">/</template>
