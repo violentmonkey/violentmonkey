@@ -81,7 +81,7 @@ export function render(App, el) {
  * Not using `autofocus` to avoid warnings in console on page load.
  * A child component should use this.$nextTick to change focus, which runs later.
  */
-export async function focusMe() {
+export function focusMe() {
   this.$nextTick(() => {
     let el = this.$el;
     el = el.querySelector('[focusme]') || el;

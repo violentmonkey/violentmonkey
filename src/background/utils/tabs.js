@@ -6,7 +6,7 @@ import { getOption } from './options';
 
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
-  || !!window.AbortSignal && !browser.windows; // and FF57+ except mobile
+  || !!(window.AbortSignal && browser.windows); // and FF57+ except mobile
 
 addOwnCommands({
   /**
