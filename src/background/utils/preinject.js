@@ -28,8 +28,7 @@ const TIME_KEEP_DATA = 5 * 60e3;
 const cache = initCache({
   lifetime: TIME_KEEP_DATA,
   async onDispose(val, key) {
-    if (val && typeof val === 'object') {
-      val = val.then ? await val : val;
+    if (val && (val = val.then ? await val : val)[ENV_SCRIPTS]) {
       cache.del(val[MORE] || envStartKey[key]);
       delete envStartKey[key];
       val[ENV_SCRIPTS].forEach(script => cache.del(script.dataKey));
