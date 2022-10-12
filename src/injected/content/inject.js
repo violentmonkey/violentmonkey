@@ -69,8 +69,9 @@ export function injectPageSandbox(contentId, webId) {
      * to use an iframe to extract the safe globals. Detection via document.referrer won't work
      * is it can be emptied by the opener page, too. */
     inject({ code: `parent["${vaultId}"] = [this, 0]`/* DANGER! See addVaultExports */ }, () => {
-      if (IS_FIREFOX) addVaultExports(window.wrappedJSObject[vaultId]);
-      startHandshake();
+      if (!IS_FIREFOX || addVaultExports(window.wrappedJSObject[vaultId])) {
+        startHandshake();
+      }
     });
   }
   return pageInjectable;
@@ -347,6 +348,7 @@ function tellBridgeToWriteVault(vaultId, wnd) {
 }
 
 function addVaultExports(vaultSrc) {
+  if (!vaultSrc) return; // blocked by CSP
   const exports = cloneInto(createNullObj(), document);
   // In FF a detached iframe's `console` doesn't print anything, we'll export it from content
   const exportedConsole = cloneInto(createNullObj(), document);
@@ -358,4 +360,5 @@ function addVaultExports(vaultSrc) {
   // vaultSrc[0] is the iframe's `this`
   // DANGER! vaultSrc[1] must be initialized in injectPageSandbox to prevent prototype hooking
   vaultSrc[1] = exports;
+  return true;
 }
