@@ -6,7 +6,7 @@ import './notifications';
 import './requests';
 import './tabs';
 import { sendCmd } from './util';
-import { isEmpty, INJECT_CONTENT } from '../util';
+import { isEmpty, FORCE_CONTENT, INJECT_CONTENT } from '../util';
 import { Run } from './cmd-run';
 
 const { invokableIds } = bridge;
@@ -22,7 +22,7 @@ async function init() {
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
     url: IS_FIREFOX && global.location.href,
     // XML document's appearance breaks when script elements are added
-    forceContent: isXml,
+    [FORCE_CONTENT]: isXml,
     done: !!(xhrData || global.vmData),
   }, {
     retry: true,

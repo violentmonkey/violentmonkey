@@ -145,7 +145,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
     },
   };
   assign(bridge.cache, data.cache);
-  if (isXml) {
+  if (isXml || data[FORCE_CONTENT]) {
     pageInjectable = false;
   }
   if (data[INJECT_PAGE] && pageInjectable == null) {
