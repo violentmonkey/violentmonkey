@@ -93,10 +93,12 @@ async function broadcast() {
   toSend::forEachEntry(groupByTab, toTabs);
   toSend = {};
   for (const [tabId, frames] of Object.entries(toTabs)) {
-    for (const [frameId, toFrame] of Object.entries(frames)) {
-      if (!isEmpty(toFrame)) {
-        tasks.push(sendToFrame(+tabId, +frameId, toFrame));
-        if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
+    if (tabId >= 0) { // negative tabId is the script editor when showing values
+      for (const [frameId, toFrame] of Object.entries(frames)) {
+        if (!isEmpty(toFrame)) {
+          tasks.push(sendToFrame(+tabId, +frameId, toFrame));
+          if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
+        }
       }
     }
   }
