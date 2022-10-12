@@ -192,18 +192,11 @@ declare interface VMInjection extends VMInjectionDisabled {
   injectPage: boolean;
   cache: StringMap;
   errors: string[];
-  feedId: {
-    /** InjectionFeedback cache key for cleanup when getDataFF outruns GetInjected */
-    cacheKey: string;
-    /** InjectionFeedback cache key for envDelayed */
-    envKey: string;
-  }
-  /** tells content bridge to expect envDelayed */
-  hasMore: boolean;
+  /** cache key for envDelayed, which also tells content bridge to expect envDelayed */
+  more: string;
   /** content bridge adds the actually running ids and sends via SetPopup */
   ids: number[];
   info: VMInjection.Info;
-  isPopupShown?: boolean;
 }
 /**
  * Injection paraphernalia in the background script

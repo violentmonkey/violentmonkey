@@ -1,7 +1,7 @@
 import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd, trueJoin } from '@/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
-  METABLOCK_RE,
+  FEEDBACK, FORCE_CONTENT, METABLOCK_RE, MORE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
 import { forEachEntry, objectPick, objectSet } from '@/common/object';
@@ -27,17 +27,18 @@ const contentScriptsAPI = browser.contentScripts;
 const TIME_KEEP_DATA = 5 * 60e3;
 const cache = initCache({
   lifetime: TIME_KEEP_DATA,
-  onDispose: contentScriptsAPI && (async val => {
-    if (val) {
-      const reg = (val.then ? await val : val)[CSAPI_REG];
-      if (reg) (await reg).unregister();
+  async onDispose(val, key) {
+    if (val && typeof val === 'object') {
+      val = val.then ? await val : val;
+      cache.del(val[MORE] || envStartKey[key]);
+      delete envStartKey[key];
+      val[ENV_SCRIPTS].forEach(script => cache.del(script.dataKey));
+      val[CSAPI_REG]?.then(reg => reg.unregister());
     }
-  }),
+  },
 });
-const FEEDBACK = 'feedback';
 const HEADERS = 'headers';
 const INJECT = 'inject';
-const FORCE_CONTENT = 'forceContent';
 const INJECT_INTO = 'injectInto';
 // KEY_XXX for hooked options
 const KEY_EXPOSE = 'expose';
@@ -45,6 +46,7 @@ const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
 const KEY_IS_APPLIED = 'isApplied';
 const KEY_XHR_INJECT = 'xhrInject';
 const GRANT_NONE_VARS = '{GM,GM_info,unsafeWindow,cloneInto,createObjectIn,exportFunction}';
+const envStartKey = {};
 const expose = {};
 let isApplied;
 let injectInto;
@@ -58,7 +60,7 @@ addPublicCommands({
     if (!url) url = src.url || tab.url;
     clearFrameData(tabId, frameId);
     const key = getKey(url, !frameId);
-    const cacheVal = cache.pop(key) || prepare(key, url, tabId, frameId, forceContent);
+    const cacheVal = cache.get(key) || prepare(key, url, tabId, frameId, forceContent);
     const bag = cacheVal[INJECT] ? cacheVal : await cacheVal;
     /** @type {VMInjection} */
     const inject = bag[INJECT];
@@ -85,28 +87,23 @@ postInitialize.push(() => {
 });
 
 async function injectionFeedback({
-  feedId,
+  [MORE]: more,
   [FEEDBACK]: feedback,
   [FORCE_CONTENT]: forceContent,
 }, src) {
   feedback.forEach(processFeedback, src);
-  if (feedId) {
-    // cache cleanup when getDataFF outruns GetInjected
-    cache.del(feedId.cacheKey);
-    // envDelayed
-    const env = await cache.pop(feedId.envKey);
-    if (env) {
-      env[FORCE_CONTENT] = forceContent;
-      env[ENV_SCRIPTS].map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
-      addValueOpener(src.tab.id, src.frameId, env[ENV_SCRIPTS]);
-      return objectPick(env, ['cache', ENV_SCRIPTS]);
-    }
-  }
+  if (!more) return;
+  const env = await cache.get(more);
+  if (!env) throw 'Injection data expired, please reload the tab!';
+  env[FORCE_CONTENT] = forceContent;
+  env[ENV_SCRIPTS].map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
+  addValueOpener(src.tab.id, src.frameId, env[ENV_SCRIPTS]);
+  return objectPick(env, ['cache', ENV_SCRIPTS]);
 }
 
 /** @this {chrome.runtime.MessageSender} */
 async function processFeedback([key, runAt, unwrappedId]) {
-  const code = cache.pop(key);
+  const code = cache.get(key);
   // see TIME_KEEP_DATA comment
   if (runAt && code) {
     const { frameId, tab: { id: tabId } } = this;
@@ -124,22 +121,24 @@ const propsToClear = {
   [storage.value.prefix]: ENV_VALUE_IDS,
 };
 
-onStorageChanged(async ({ keys: dbKeys }) => {
-  const raw = cache.getValues();
-  const resolved = !raw.some(val => val?.then);
-  const cacheValues = resolved ? raw : await Promise.all(raw);
-  const dirty = cacheValues.some(bag => bag[INJECT]
-    && dbKeys.some((key) => {
-      const prefix = key.slice(0, key.indexOf(':') + 1);
-      const prop = propsToClear[prefix];
-      key = key.slice(prefix.length);
-      return prop === true
-        || bag[prop]?.includes(prefix === storage.value.prefix ? +key : key);
-    }));
-  if (dirty) {
-    cache.destroy();
-  }
+onStorageChanged(({ keys }) => {
+  cache.forEach(removeStaleCacheEntry, keys.map((key, i) => [
+    key.slice(0, i = key.indexOf(':') + 1),
+    key.slice(i),
+  ]));
 });
+
+/** @this {string[][]} changed storage keys, already split as [prefix,id] */
+async function removeStaleCacheEntry(val, key) {
+  if (val.then) val = await val;
+  if (!val[ENV_CACHE_KEYS]) return;
+  for (const [prefix, id] of this) {
+    const prop = propsToClear[prefix];
+    if (prop === true || val[prop]?.includes(+id || id)) {
+      cache.del(key);
+    }
+  }
+}
 
 function normalizeRealm(value) {
   return INJECT_MAPPING::hasOwnProperty(value)
@@ -277,9 +276,10 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   const { envDelayed, disabledIds: ids, [ENV_SCRIPTS]: scripts } = bag;
   const isLate = forceContent != null;
   bag[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
+  cache.batch(true);
   const feedback = scripts.map(prepareScript, bag).filter(Boolean);
   const more = envDelayed.promise;
-  const envKey = getUniqId(`${tabId}:${frameId}:`);
+  const moreKey = more && getUniqId('more');
   /** @type {VMInjection} */
   const inject = res[INJECT];
   Object.assign(inject, {
@@ -289,12 +289,8 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
       scripts.some(isPageRealm, bag)
       || envDelayed[ENV_SCRIPTS].some(isPageRealm, bag)
     ),
+    [MORE]: moreKey,
     cache: bag.cache,
-    feedId: {
-      cacheKey, // InjectionFeedback cache key for cleanup when getDataFF outruns GetInjected
-      envKey, // InjectionFeedback cache key for envDelayed
-    },
-    hasMore: !!more, // tells content bridge to expect envDelayed
     ids, // content bridge adds the actually running ids and sends via SetPopup
     info: {
       ua,
@@ -304,10 +300,14 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   res[FEEDBACK] = feedback;
   res[CSAPI_REG] = contentScriptsAPI && !isLate && !xhrInject
     && registerScriptDataFF(inject, url, !!frameId);
-  if (more) cache.put(envKey, more);
+  if (more) {
+    cache.put(moreKey, more);
+    envStartKey[moreKey] = cacheKey;
+  }
   if (!isLate && !cache.get(cacheKey)?.headers) {
     cache.put(cacheKey, res); // synchronous onHeadersReceived needs plain object not a Promise
   }
+  cache.batch(false);
   return res;
 }
 

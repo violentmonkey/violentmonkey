@@ -3,6 +3,7 @@ import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import {
   bindEvents, fireBridgeEvent,
   INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
+  MORE, FEEDBACK, FORCE_CONTENT,
 } from '../util';
 import { Run } from './cmd-run';
 
@@ -122,7 +123,7 @@ export function injectPageSandbox(contentId, webId) {
  * @param {boolean} isXml
  */
 export async function injectScripts(contentId, webId, data, isXml) {
-  const { errors, hasMore, info } = data;
+  const { errors, info, [MORE]: more } = data;
   if (errors) {
     logging.warn(errors);
   }
@@ -173,9 +174,9 @@ export async function injectScripts(contentId, webId, data, isXml) {
     ];
   });
   const moreData = sendCmd('InjectionFeedback', {
-    feedback,
-    feedId: data.feedId,
-    forceContent: !pageInjectable,
+    [FEEDBACK]: feedback,
+    [FORCE_CONTENT]: !pageInjectable,
+    [MORE]: more,
   });
   const hasInvoker = realms[INJECT_CONTENT].is;
   if (hasInvoker) {
@@ -187,7 +188,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
     const onBody = (pgLists.body.length || contLists.body.length)
       && onElement('body', injectAll, 'body');
     // document-end, -idle
-    if (hasMore) {
+    if (more) {
       data = await moreData;
       if (data) await injectDelayedScripts(!hasInvoker && contentId, webId, data);
     }

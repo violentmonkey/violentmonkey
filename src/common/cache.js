@@ -17,7 +17,7 @@ export default function initCache({
   const getNow = () => batchStarted && batchStartTime || (batchStartTime = performance.now());
   const OVERRUN = 1000; // in ms, to reduce frequency of calling setTimeout
   const exports = {
-    batch, get, getValues, pop, put, del, has, hit, destroy,
+    batch, get, forEach, pop, put, del, has, hit, destroy,
   };
   if (process.env.DEV) Object.defineProperty(exports, 'data', { get: () => cache });
   return exports;
@@ -32,8 +32,16 @@ export default function initCache({
     }
     return item ? item.value : def;
   }
-  function getValues() {
-    return Object.values(cache).map(item => item.value);
+  /**
+   * @param {(val:?, key:string) => void} fn
+   * @param {Object} [thisObj]
+   */
+  function forEach(fn, thisObj) {
+    for (const key in cache) {
+      const item = cache[key];
+      if (item) fn.call(thisObj, item.value, key);
+      // Might be already deleted by fn
+    }
   }
   function pop(key, def) {
     const value = get(key, def);
