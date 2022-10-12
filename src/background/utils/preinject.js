@@ -4,7 +4,7 @@ import {
   FEEDBACK, FORCE_CONTENT, METABLOCK_RE, MORE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
-import { forEachEntry, objectPick, objectSet } from '@/common/object';
+import { forEachEntry, forEachValue, objectPick, objectSet } from '@/common/object';
 import ua from '@/common/ua';
 import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_IDS } from './db';
 import { postInitialize } from './init';
@@ -12,7 +12,7 @@ import { addPublicCommands } from './message';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId } from './requests';
-import storage from './storage';
+import { S_CACHE_PRE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE } from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
 import { addValueOpener, clearValueOpener } from './values';
 
@@ -28,15 +28,16 @@ const TIME_KEEP_DATA = 5 * 60e3;
 const cache = initCache({
   lifetime: TIME_KEEP_DATA,
   async onDispose(val, key) {
-    if (val && (val = val.then ? await val : val)[ENV_SCRIPTS]) {
+    if (!val) return;
+    if (val.then) val = await val;
+    val[CSAPI_REG]?.then(reg => reg.unregister());
+    if ((val = val[INJECT] || val)[ENV_SCRIPTS]) {
+      val[ENV_SCRIPTS].forEach(script => cache.del(script.dataKey));
       cache.del(val[MORE] || envStartKey[key]);
       delete envStartKey[key];
-      val[ENV_SCRIPTS].forEach(script => cache.del(script.dataKey));
-      val[CSAPI_REG]?.then(reg => reg.unregister());
     }
   },
 });
-const HEADERS = 'headers';
 const INJECT = 'inject';
 const INJECT_INTO = 'injectInto';
 // KEY_XXX for hooked options
@@ -113,11 +114,11 @@ async function processFeedback([key, runAt, unwrappedId]) {
 }
 
 const propsToClear = {
-  [storage.cache.prefix]: ENV_CACHE_KEYS,
-  [storage.code.prefix]: true,
-  [storage.require.prefix]: ENV_REQ_KEYS,
-  [storage.script.prefix]: true,
-  [storage.value.prefix]: ENV_VALUE_IDS,
+  [S_CACHE_PRE]: ENV_CACHE_KEYS,
+  [S_CODE_PRE]: true,
+  [S_REQUIRE_PRE]: ENV_REQ_KEYS,
+  [S_SCRIPT_PRE]: true,
+  [S_VALUE_PRE]: ENV_VALUE_IDS,
 };
 
 onStorageChanged(({ keys }) => {
@@ -133,7 +134,9 @@ async function removeStaleCacheEntry(val, key) {
   if (!val[ENV_CACHE_KEYS]) return;
   for (const [prefix, id] of this) {
     const prop = propsToClear[prefix];
-    if (prop === true || val[prop]?.includes(+id || id)) {
+    if (prop === true) {
+      cache.destroy(); // TODO: try to patch the cache in-place?
+    } else if (val[prop]?.includes(+id || id)) {
       cache.del(key);
     }
   }
@@ -242,7 +245,6 @@ function prepareXhrBlob({ url, responseHeaders }, bag) {
     value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
   });
   setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
-  bag[HEADERS] = true;
   return { responseHeaders };
 }
 
@@ -273,8 +275,10 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
   const errors = [];
   const bag = await getScriptsByURL(url, !frameId, errors);
   const { envDelayed, disabledIds: ids, [ENV_SCRIPTS]: scripts } = bag;
-  const isLate = forceContent != null;
   bag[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
+  propsToClear::forEachValue(val => {
+    if (val !== true) res[val] = bag[val];
+  });
   cache.batch(true);
   const feedback = scripts.map(prepareScript, bag).filter(Boolean);
   const more = envDelayed.promise;
@@ -297,15 +301,13 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
     errors: errors.filter(err => !ids.includes(+err.slice(err.lastIndexOf('#') + 1))).join('\n'),
   });
   res[FEEDBACK] = feedback;
-  res[CSAPI_REG] = contentScriptsAPI && !isLate && !xhrInject
+  res[CSAPI_REG] = contentScriptsAPI && !xhrInject
     && registerScriptDataFF(inject, url, !!frameId);
   if (more) {
     cache.put(moreKey, more);
     envStartKey[moreKey] = cacheKey;
   }
-  if (!isLate && !cache.get(cacheKey)?.headers) {
-    cache.put(cacheKey, res); // synchronous onHeadersReceived needs plain object not a Promise
-  }
+  cache.put(cacheKey, res); // synchronous onHeadersReceived needs plain object not a Promise
   cache.batch(false);
   return res;
 }

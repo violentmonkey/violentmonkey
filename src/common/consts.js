@@ -23,7 +23,7 @@ export const INJECTABLE_TAB_URL_RE = /^(https?|file|ftps?):/;
 export const WATCH_STORAGE = 'watchStorage';
 export const FEEDBACK = 'feedback';
 export const FORCE_CONTENT = 'forceContent';
-export const MORE = 'envKey';
+export const MORE = 'more';
 // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
 // to prevent exposing them to userscripts with `@inject-into content`
 export const browser = process.env.IS_INJECTED !== 'injected-web' && global.browser;
