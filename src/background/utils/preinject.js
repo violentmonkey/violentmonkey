@@ -232,7 +232,7 @@ function onHeadersReceived(info) {
  * @param {VMInjection.Bag} bag
  */
 function prepareXhrBlob({ url, responseHeaders }, bag) {
-  if (url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
+  if (IS_FIREFOX && url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
     forceContentInjection(bag);
   }
   const blobUrl = URL.createObjectURL(new Blob([
@@ -410,8 +410,13 @@ function forceContentInjection(bag) {
   inject[FORCE_CONTENT] = true;
   inject[ENV_SCRIPTS].forEach(scr => {
     // When script wants `page`, the result below will be `true` so the script goes into `failedIds`
-    scr.code = !isContentRealm(scr, true) || '';
-    bag[FEEDBACK].push([scr.dataKey, true]);
+    const failed = !isContentRealm(scr, true);
+    scr.code = failed || '';
+    bag[FEEDBACK].push([
+      scr.dataKey,
+      !failed && scr.runAt,
+      scr.meta.unwrap && scr.props.id,
+    ]);
   });
 }
 
