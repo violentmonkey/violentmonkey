@@ -60,12 +60,12 @@
       <div class="control">
         <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
         <div>
-          <button v-text="i18n('editValueSave')" @click="onSave"
-                  class="save"
-                  :class="{'has-error': current.error}"
+          <button v-for="(text, idx) in [i18n('buttonOK'), i18n('buttonApply')]" :key="text"
+                  v-text="text" @click="onSave(idx)"
+                  :class="{'has-error': current.error, 'save-beacon': !idx}"
                   :title="current.error"
                   :disabled="current.error || !current.dirty"/>
-          <button v-text="i18n('editValueCancel')" @click="onCancel"></button>
+          <button v-text="i18n('buttonCancel')" @click="onCancel"></button>
         </div>
       </div>
       <label v-show="!current.isAll">
@@ -313,21 +313,25 @@ export default {
         ...currentObservables,
       };
     },
-    async onSave() {
-      const { current } = this;
+    async onSave(buttonIndex) {
+      const { cm, current } = this;
       if (current.jsonPaused) {
         current.jsonPaused = false;
         this.onChange();
       }
       if (current.error) {
-        const { cm } = this;
         const pos = current.errorPos;
         cm.setSelection(pos, { line: pos.line, ch: pos.ch + 1 });
         cm.focus();
         showMessage({ text: current.error });
         return;
       }
-      this.current = null;
+      if (buttonIndex === 1) {
+        cm.markClean();
+        current.dirty = false;
+      } else {
+        this.current = null;
+      }
       if (current.isAll) {
         await sendCmdDirectly('SetValueStores', {
           [this.script.props.id]: current.jsonValue::mapEntry(val => dumpScriptValue(val) || ''),
@@ -493,7 +497,7 @@ $lightBorder: 1px solid var(--fill-2);
       }
     }
   }
-  .save:not([disabled]) {
+  .save-beacon:not([disabled]) {
     background-color: gold;
     color: #000;
   }

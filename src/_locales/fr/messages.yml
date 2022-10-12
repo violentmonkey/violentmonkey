@@ -1,3 +1,6 @@
+buttonApply:
+  description: Apply button on dialog that applies changes without closing the dialog.
+  message: ''
 buttonCancel:
   description: Cancel button on dialog.
   message: Annuler
@@ -179,12 +182,6 @@ editValueAll:
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: Montrer/éditer toutes les données stockées du script
-editValueCancel:
-  description: Button to cancel modification of a script value.
-  message: Annuler
-editValueSave:
-  description: Button to save modification of a script value.
-  message: Sauvegarder
 extDescription:
   description: Description for this extension, will be displayed in web store
   message: Un gestionnaire de scipts utilisateurs qui supporte beaucoup de navigateurs

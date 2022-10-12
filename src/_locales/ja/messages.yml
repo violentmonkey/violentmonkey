@@ -1,3 +1,6 @@
+buttonApply:
+  description: Apply button on dialog that applies changes without closing the dialog.
+  message: ''
 buttonCancel:
   description: Cancel button on dialog.
   message: キャンセル
@@ -166,12 +169,6 @@ editValueAll:
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: スクリプトの値の保存全体を表示／編集する
-editValueCancel:
-  description: Button to cancel modification of a script value.
-  message: キャンセル
-editValueSave:
-  description: Button to save modification of a script value.
-  message: 保存
 extDescription:
   description: Description for this extension, will be displayed in web store
   message: 多くのブラウザをサポートする、オープンソースの UserScript マネージャー

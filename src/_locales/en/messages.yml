@@ -1,3 +1,6 @@
+buttonApply:
+  description: Apply button on dialog that applies changes without closing the dialog.
+  message: Apply
 buttonCancel:
   description: Cancel button on dialog.
   message: Cancel
@@ -168,12 +171,6 @@ editValueAll:
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: Show/edit the entire script value storage
-editValueCancel:
-  description: Button to cancel modification of a script value.
-  message: Cancel
-editValueSave:
-  description: Button to save modification of a script value.
-  message: Save
 extDescription:
   description: Description for this extension, will be displayed in web store
   message: An open source userscript manager that supports a lot of browsers

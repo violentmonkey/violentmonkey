@@ -1,3 +1,6 @@
+buttonApply:
+  description: Apply button on dialog that applies changes without closing the dialog.
+  message: ''
 buttonCancel:
   description: Cancel button on dialog.
   message: Anuluj
@@ -175,12 +178,6 @@ editValueAll:
 editValueAllHint:
   description: Tooltip for the 'all' button.
   message: Pokaż/edytuj całą pamięć wartości skryptu
-editValueCancel:
-  description: Button to cancel modification of a script value.
-  message: Anuluj
-editValueSave:
-  description: Button to save modification of a script value.
-  message: Zapisz
 extDescription:
   description: Description for this extension, will be displayed in web store
   message: >-
