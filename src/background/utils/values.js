@@ -75,7 +75,7 @@ export function clearValueOpener(tabId, frameId) {
  * @param {VMInjection.Script[]} injectedScripts
  */
 export function addValueOpener(tabId, frameId, injectedScripts) {
-  injectedScripts.forEach(script => {
+  injectedScripts?.forEach(script => {
     const { values, props: { id } } = script;
     if (values) objectSet(openers, [id, tabId, frameId], values);
     else delete openers[id];
