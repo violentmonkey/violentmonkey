@@ -17,12 +17,13 @@ async function init() {
   const webId = safeGetUniqId();
   const isXml = document instanceof XMLDocument;
   const xhrData = getXhrInjection();
-  const dataPromise = !xhrData && sendCmd('GetInjected', {
+  const dataPromise = sendCmd('GetInjected', {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
     url: IS_FIREFOX && global.location.href,
     // XML document's appearance breaks when script elements are added
     forceContent: isXml,
+    done: !!(xhrData || global.vmData),
   }, {
     retry: true,
   });

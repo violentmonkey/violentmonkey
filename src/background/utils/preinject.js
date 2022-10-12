@@ -52,7 +52,7 @@ let xhrInject;
 
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
-  async GetInjected({ url, forceContent }, src) {
+  async GetInjected({ url, forceContent, done }, src) {
     const { frameId, tab } = src;
     const tabId = tab.id;
     if (!url) url = src.url || tab.url;
@@ -68,9 +68,11 @@ addPublicCommands({
       // Running in a separate task because it may take a long time to serialize data.
       setTimeout(injectionFeedback, 0, { [FEEDBACK]: feedback }, src);
     }
+    if (popupTabs[tabId]) {
+      setTimeout(sendTabCmd, 0, tabId, 'PopupShown', popupTabs[tabId], { frameId });
+    }
     addValueOpener(tabId, frameId, inject[ENV_SCRIPTS]);
-    inject.isPopupShown = popupTabs[tabId];
-    return inject;
+    return !done && inject;
   },
   InjectionFeedback: injectionFeedback,
 });

@@ -123,7 +123,9 @@ export async function sendMessageRetry(payload, retries = 10) {
   for (; retries > 0; retries -= 1) {
     try {
       const data = await sendMessage(payload);
-      if (data) return data;
+      if (data !== undefined) {
+        return data;
+      }
     } catch (e) {
       if (!`${e}`.includes('Could not establish connection.')) {
         throw e;

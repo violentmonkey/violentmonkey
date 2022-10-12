@@ -5,10 +5,6 @@ const menus = createNullObj();
 let setPopupThrottle;
 let isPopupShown;
 
-bridge.onScripts.push(injection => {
-  isPopupShown = injection.isPopupShown;
-});
-
 bridge.addBackgroundHandlers({
   PopupShown(state) {
     isPopupShown = state;
