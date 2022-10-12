@@ -167,7 +167,7 @@ export const VAULT = (() => {
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
     getDetail = res[i += 1] || describeProperty(SafeCustomEvent[PROTO], 'detail').get,
     getRelatedTarget = res[i += 1] || describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get,
-    getWindowLength = res[i += 1] || describeProperty(src, 'length').get
+    getWindowLength = res[i += 1] || describeProperty(srcWindow, 'length').get
       || (() => getOwnProp(window, 'length', 1e9)), // Chrome<=85 https://crrev.com/793165
     // various values
     builtinGlobals = res[i += 1] || [
