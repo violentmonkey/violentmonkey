@@ -2,6 +2,7 @@
   <div
     class="page-popup"
     @click="activeExtras && toggleExtras(null)"
+    @click.capture.prevent="onOpenUrl"
     @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
     @mouseenter.capture="delegateMouseEnter"
     @mouseleave.capture="delegateMouseLeave"
@@ -167,7 +168,7 @@
        v-if="store.currentTab?.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
     <footer>
-      <a href="https://violentmonkey.github.io/" :tabIndex="tabIndex" @click.prevent="onVisitWebsite" v-text="i18n('visitWebsite')" />
+      <a href="https://violentmonkey.github.io/" target="_blank" :tabIndex="tabIndex" v-text="i18n('visitWebsite')" />
     </footer>
     <div class="message" v-show="message">
       <div v-text="message"></div>
@@ -198,7 +199,7 @@ import {
 import { objectPick } from '@/common/object';
 import { focusMe } from '@/common/ui';
 import Icon from '@/common/ui/icon';
-import { keyboardService, isInput } from '@/common/keyboard';
+import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
 import { mutex, store } from '../utils';
 
 const manifest = browser.runtime.getManifest();
@@ -361,10 +362,10 @@ export default {
       browser.runtime.openOptionsPage();
       window.close();
     },
-    onVisitWebsite() {
-      sendCmd('TabOpen', {
-        url: 'https://violentmonkey.github.io/',
-      });
+    onOpenUrl(e) {
+      const el = e.target.closest('a[href][target=_blank]');
+      if (!el) return;
+      sendCmd('TabOpen', { url: el.href });
       window.close();
     },
     onEditScript(item) {
@@ -520,6 +521,14 @@ export default {
           window.close();
         }
       }),
+      ...IS_FIREFOX ? [
+        keyboardService.register('tab', () => {
+          handleTabNavigation(1);
+        }),
+        keyboardService.register('s-tab', () => {
+          handleTabNavigation(-1);
+        }),
+      ] : [],
       ...['up', 'down', 'left', 'right'].map(key => (
         keyboardService.register(key,
           this.navigate.bind(this, key[0]),
