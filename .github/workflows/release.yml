@@ -57,10 +57,11 @@ jobs:
         run: |
           mkdir -p $TEMP_DIR/updates
           if [ "$PRERELEASE" != "true" ]; then
-            # Publish listed version, ignore error since we don't need to download it
-            node scripts/amo-upload.mjs || 0
+            echo Publish listed version
+            # Ignore error since we don't need to download it
+            node scripts/amo-upload.mjs
           else
-            # Publish unlisted version
+            echo Publish unlisted version
             BETA=1 node scripts/amo-upload.mjs
           fi
         env:
@@ -81,10 +82,10 @@ jobs:
         run: |
           set -x
           if [ "$PRERELEASE" != "true" ]; then
-            # Publish release
+            echo Publish release
             npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_RELEASE --source $ASSETS_DIR/$ASSET_ZIP --auto-publish
           else
-            # Publish prerelease
+            echo Publish prerelease
             npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_BETA --source $TEMP_DIR/$ASSET_CWS_BETA_ZIP --auto-publish
           fi
         env:
