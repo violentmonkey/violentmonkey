@@ -47,7 +47,7 @@ async function uploadAssets() {
   let assets = await readdir(ASSETS_DIR);
   assets = assets.filter(asset => release.assets.every(({ name }) => name !== asset));
   for (const asset of assets) {
-    console.info(`> Upload asset: ${assets}`);
+    console.info(`> Upload asset: ${asset}`);
     await octokit.rest.repos.uploadReleaseAsset({
       ...github.context.repo,
       release_id: release.id,

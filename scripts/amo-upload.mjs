@@ -15,8 +15,8 @@ async function main() {
   const url = `https://github.com/violentmonkey/violentmonkey/releases/download/v${rawVersion}/${fileName}`;
 
   if (await hasAsset(fileName)) {
-    console.info('File already downloaded, skipping');
-    return;
+    // Throw an error so `updates.json` won't be updated in the next step.
+    throw new Error('File already downloaded, skipping');
   }
 
   const pollOptions = !beta ? {
