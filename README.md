@@ -38,9 +38,9 @@ $ yarn dev
 
 Then load the extension from 'dist/'.
 
-### Building
+### Build
 
-After a new (pre)release is created, we should build the project and upload to web stores.
+To release a new version, we must build the assets and upload them to web stores.
 
 ``` sh
 # Build for normal releases
@@ -50,19 +50,9 @@ $ yarn build
 $ yarn build:selfHosted
 ```
 
-## Release
+### Release
 
-Just create a tag and push it.
-
-When a tag is pushed to GitHub, a (pre)release will be created with assets built by GitHub Actions.
-
-```sh
-# Create a prerelease
-$ yarn bump
-
-# Create a patch release
-$ yarn version --patch
-```
+See [RELEASE](RELEASE.md) for the release flow.
 
 ## Related Projects
 
