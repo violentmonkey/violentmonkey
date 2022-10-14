@@ -189,6 +189,7 @@
 </template>
 
 <script>
+import { reactive } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import { INJECT_AUTO } from '@/common/consts';
 import options from '@/common/options';
@@ -207,10 +208,10 @@ const NAME = `${manifest.name} ${manifest.version}`;
 const SCRIPT_CLS = '.script';
 let mousedownElement;
 
-const optionsData = {
+const optionsData = reactive({
   isApplied: options.get('isApplied'),
   filtersPopup: options.get('filtersPopup') || {},
-};
+});
 options.hook((changes) => {
   if ('isApplied' in changes) {
     optionsData.isApplied = changes.isApplied;
