@@ -452,7 +452,7 @@ function selectScript(index) {
   }
 }
 function markRemove(script, removed) {
-  sendCmdDirectly('MarkRemoved', {
+  return sendCmdDirectly('MarkRemoved', {
     id: script.props.id,
     removed,
   });
@@ -464,8 +464,18 @@ function handleActionRemove(script) {
     state.removing = false;
   }, 1000);
 }
-function handleActionRestore(script) {
-  markRemove(script, 0);
+async function handleActionRestore(script) {
+  try {
+    await markRemove(script, 0);
+  } catch (err) {
+    showConfirmation(`\
+${err.message || err}
+
+@namespace ${script.meta.namespace}
+@name ${script.meta.name}`, {
+      cancel: false,
+    });
+  }
 }
 function handleActionToggle(script) {
   sendCmdDirectly('UpdateScriptInfo', {

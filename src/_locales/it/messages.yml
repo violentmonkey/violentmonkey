@@ -676,6 +676,11 @@ msgNamespaceConflict:
 
     Per favore usa un @name e @namespace diverso qui o modifica invece quello
     script.
+msgNamespaceConflictRestore:
+  description: >-
+    Message shown when namespace of the script to restore from recycle bin
+    conflicts with an existent one.
+  message: ''
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no

@@ -17,7 +17,7 @@
       </a>
     </div>
     <div class="script-info flex ml-1c">
-      <span class="script-order" v-text="script.props.position"/>
+      <span class="script-order" v-text="script.props.position" v-if="!script.config.removed" />
       <component :is="nameProps.is" class="script-name ellipsis flex-auto" v-bind="nameProps">{{script.$cache.name}}</component>
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
@@ -195,7 +195,7 @@ export default {
       };
     },
     nameProps() {
-      return this.viewTable
+      return this.viewTable && !this.script.config.removed
         /* We disable native dragging on name to avoid confusion with exec re-ordering.
          * Users who want to open a new tab via dragging the link can use the icon. */
         ? { is: 'a', href: this.url, tabIndex: this.tabIndex, draggable: false }

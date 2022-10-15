@@ -67,7 +67,7 @@ addOwnCommands({
     if (!removed) {
       const script = getScriptById(id);
       const conflict = getScript({ meta: script.meta });
-      if (conflict) throw i18n('msgNamespaceConflict');
+      if (conflict) throw i18n('msgNamespaceConflictRestore');
     }
     await updateScriptInfo(id, {
       config: { removed: removed ? 1 : 0 },

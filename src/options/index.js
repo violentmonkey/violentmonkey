@@ -120,8 +120,8 @@ function initMain() {
       const i = script.config.removed ? i2 : i1;
       if (i < 0) {
         script.message = '';
-        const list = script.config.removed ? store.removedScripts : store.scripts;
-        list.push(script);
+        const list = script.config.removed ? 'removedScripts' : 'scripts';
+        store[list] = [...store[list], script];
       }
     },
     // RemoveScript(id) {

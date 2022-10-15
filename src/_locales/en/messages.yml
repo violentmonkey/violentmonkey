@@ -655,10 +655,15 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    A script like this is already installed or is still in the Recycle Bin.
+    A script like this is already installed.
 
     Please either use a different @name and @namespace here or edit that script
     instead.
+msgNamespaceConflictRestore:
+  description: >-
+    Message shown when namespace of the script to restore from recycle bin
+    conflicts with an existent one.
+  message: A script with the same @name and @namespace is already installed.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no

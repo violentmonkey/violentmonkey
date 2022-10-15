@@ -38,7 +38,7 @@ const tabs = [
   { name: SCRIPTS, comp: Installed, label: i18n('sideMenuInstalled') },
   { name: SETTINGS, comp: Settings, label: i18n('sideMenuSettings') },
   { name: ABOUT, comp: About, label: i18n('sideMenuAbout') },
-  { name: RECYCLE_BIN, comp: Installed, label: 'Recycle Bin' },
+  { name: RECYCLE_BIN, comp: Installed, label: i18n('buttonRecycleBin') },
 ];
 const extName = i18n('extName');
 const conditionNotEdit = '!editScript';

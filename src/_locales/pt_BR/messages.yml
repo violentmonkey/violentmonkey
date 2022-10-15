@@ -673,6 +673,11 @@ msgNamespaceConflict:
   message: |-
     Um script como este já está instalado ou ainda está na Lixeira.
     Por favor, use um @name e @namespace diferente aqui ou edite  esse script.
+msgNamespaceConflictRestore:
+  description: >-
+    Message shown when namespace of the script to restore from recycle bin
+    conflicts with an existent one.
+  message: ''
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no

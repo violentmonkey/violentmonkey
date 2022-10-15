@@ -573,7 +573,7 @@ menuExcludeHint:
     Pour appliquer les changements à tous les autres onglets merci de les
     rafraichir manuellement.
 
-    Utilisez l'onglet "Paramètres" de l'éditeur pour plus de flexibilité. 
+    Utilisez l'onglet "Paramètres" de l'éditeur pour plus de flexibilité.
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
@@ -678,7 +678,12 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Conflit d’espace de nom du script! Veuillez modifier @name et @namespace
+  message: "Conflit d’espace de nom du script\_! Veuillez modifier @name et @namespace"
+msgNamespaceConflictRestore:
+  description: >-
+    Message shown when namespace of the script to restore from recycle bin
+    conflicts with an existent one.
+  message: ''
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
