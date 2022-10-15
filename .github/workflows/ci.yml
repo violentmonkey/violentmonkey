@@ -48,6 +48,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload to Transifex - check src
+        if: github.event_name == 'push' || github.event.pull_request.merged == true
         uses: marceloprado/has-changed-path@v1
         id: changed-path-src
         with:
