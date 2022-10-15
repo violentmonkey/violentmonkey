@@ -330,14 +330,15 @@ function prepareScript(script) {
   const pathMap = custom.pathMap || {};
   // trying to avoid progressive string concatenation of potentially huge code slices
   // adding `;` on a new line in case some required script ends with a line comment
-  const [reqsSlices, reqLinesAdded] = meta.require.reduce((accum, url) => {
+  const reqsSlices = [];
+  const reqLinesAdded = meta.require.reduce((res, url) => {
     const req = require[url = pathMap[url] || url];
     if (req) {
-      accum[0].push(req, NEWLINE_END_RE.test(req) ? ';' : '\n;');
-      accum[1] += extrasCache.get(url) || extrasCache.put(url, countLines(req));
+      reqsSlices.push(req, NEWLINE_END_RE.test(req) ? ';' : '\n;');
+      res += extrasCache.get(url) || extrasCache.put(url, countLines(req));
     }
-    return accum;
-  }, [[], 0]);
+    return res;
+  }, 0);
   const [code, metaStr] = patchCode(this.code[id], reqLinesAdded);
   const hasReqs = reqLinesAdded;
   const wrap = !meta.unwrap;
@@ -515,7 +516,7 @@ function patchCode(code, reqLinesAdded) {
 
 function text2base64(str) {
   if (/[\u0080-\uFFFF]/.test(str)) {
-    // TODO: maybe switch blob2base64, which is ~5x faster in Chrome
+    // TODO: maybe switch to blob2base64, which is ~5x faster in Chrome
     const arr = new TextEncoder().encode(str);
     const CHUNK = 8192;
     str = '';
