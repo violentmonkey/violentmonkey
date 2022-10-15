@@ -1,4 +1,6 @@
-import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd, trueJoin } from '@/common';
+import {
+  dataUri2text, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd, trueJoin,
+} from '@/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
   FEEDBACK, FORCE_CONTENT, METABLOCK_RE, MORE,
@@ -38,6 +40,11 @@ const cache = initCache({
     }
   },
 });
+const extrasCache = initCache({
+  lifetime: 3600e3,
+});
+const NEWLINE_END_RE = /\n((?!\n)\s)*$/;
+const SOURCEMAP_RE = /\s*\/\/[#@]\s+source(?:Mapping)?URL=\s*data:application\/json/y;
 const INJECT = 'inject';
 const INJECT_INTO = 'injectInto';
 // KEY_XXX for hooked options
@@ -317,16 +324,22 @@ function prepareScript(script) {
   const { custom, meta, props } = script;
   const { id } = props;
   const { [FORCE_CONTENT]: forceContent, require, value } = this;
-  const code = this.code[id];
   const dataKey = getUniqId('VMin');
   const displayName = getScriptName(script);
   const isContent = isContentRealm(script, forceContent);
   const pathMap = custom.pathMap || {};
-  const reqs = meta.require.map(key => require[pathMap[key] || key]).filter(Boolean);
   // trying to avoid progressive string concatenation of potentially huge code slices
   // adding `;` on a new line in case some required script ends with a line comment
-  const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];
-  const hasReqs = reqsSlices.length;
+  const [reqsSlices, reqLinesAdded] = meta.require.reduce((accum, url) => {
+    const req = require[url = pathMap[url] || url];
+    if (req) {
+      accum[0].push(req, NEWLINE_END_RE.test(req) ? ';' : '\n;');
+      accum[1] += extrasCache.get(url) || extrasCache.put(url, countLines(req));
+    }
+    return accum;
+  }, [[], 0]);
+  const [code, metaStr] = patchCode(this.code[id], reqLinesAdded);
+  const hasReqs = reqLinesAdded;
   const wrap = !meta.unwrap;
   const { grant } = meta;
   const numGrants = grant.length;
@@ -343,8 +356,6 @@ function prepareScript(script) {
     // adding a nested IIFE to support 'use strict' in the code when there are @requires
     hasReqs && wrap && '(()=>{',
     code,
-    // adding a new line in case the code ends with a line comment
-    !code.endsWith('\n') && '\n',
     hasReqs && wrap && '})()',
     wrap && `})()${IS_FIREFOX ? `}catch(e){${dataKey}(e)}` : ''}}`,
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
@@ -356,9 +367,9 @@ function prepareScript(script) {
   Object.assign(script, {
     dataKey,
     displayName,
+    metaStr,
     // code will be `true` if the desired realm is PAGE which is not injectable
     code: isContent ? '' : forceContent || injectedCode,
-    metaStr: code.match(METABLOCK_RE)[1] || '',
     values: value[id] || null,
   });
   return isContent && [
@@ -444,4 +455,73 @@ function onTabReplaced(addedId, removedId) {
 function clearFrameData(tabId, frameId) {
   clearRequestsByTabId(tabId, frameId);
   clearValueOpener(tabId, frameId);
+}
+
+function countLines(str) {
+  if (!str) return 0;
+  let res = 1;
+  let i = -1;
+  while ((i = str.indexOf('\n', i + 1)) >= 0) {
+    res += 1;
+  }
+  return res;
+}
+
+function patchCode(code, reqLinesAdded) {
+  let m;
+  let extras = extrasCache.get(code);
+  // remember position of metablock comment
+  if (!extras) {
+    extras = {};
+    if ((m = METABLOCK_RE.exec(code) || [])) {
+      extras.m2 = (extras.m1 = m.index) + m[0].length;
+    }
+  }
+  // shift source-mapping data by reqLinesAdded
+  if (reqLinesAdded) {
+    const i2 = extras.i2 || /\s*$/.exec(code).index;
+    let i1 = extras.i1 || Math.max(0, code.lastIndexOf('\n', i2 - 1));
+    if (extras.lines !== reqLinesAdded) {
+      extras.lines = reqLinesAdded;
+      m = extras.map;
+      if (!m && (SOURCEMAP_RE.lastIndex = i1, m = SOURCEMAP_RE.exec(code))) {
+        i1 += m[0].length;
+        try {
+          m = JSON.parse(dataUri2text(code.slice(i1, i2)));
+          extras.map = m;
+          extras.i1 = i1;
+          extras.i2 = i2;
+        } catch (e) {
+          // NOP
+        }
+      }
+      if (m) {
+        m = Object.assign({}, m);
+        m.mappings = ';'.repeat(reqLinesAdded) + m.mappings;
+        extras.url = text2base64(JSON.stringify(m));
+      }
+    }
+    if ((m = extras.url)) {
+      code = code.slice(0, i1) + ';charset=utf-8;base64,' + m + code.slice(i2);
+    }
+  }
+  // adding a new line in case the code ends with a line comment
+  if (!NEWLINE_END_RE.test(code)) {
+    code += '\n';
+  }
+  extrasCache.put(code, extras);
+  return [code, code.slice(extras.m1, extras.m2)];
+}
+
+function text2base64(str) {
+  if (/[\u0080-\uFFFF]/.test(str)) {
+    // TODO: maybe switch blob2base64, which is ~5x faster in Chrome
+    const arr = new TextEncoder().encode(str);
+    const CHUNK = 8192;
+    str = '';
+    for (let i = 0; i < arr.length; i += CHUNK) {
+      str += String.fromCharCode.apply(null, arr.subarray(i, i + CHUNK))
+    }
+  }
+  return btoa(str);
 }
