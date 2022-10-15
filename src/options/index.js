@@ -101,14 +101,12 @@ function initMain() {
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       const { scripts } = store;
       const index = scripts.findIndex(item => item.props.id === where.id);
-      const updated = Object.assign({}, scripts[index], update);
+      const updated = Object.assign(scripts[index] || {}, update);
       if (updated.error && !update.error) updated.error = null;
       initScript(updated, sizes);
       if (index < 0) {
         update.message = '';
         scripts.push(updated);
-      } else {
-        scripts[index] = updated;
       }
     },
     RemoveScript(id) {

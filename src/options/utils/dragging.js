@@ -38,10 +38,9 @@ let scrollSpeed;
 let scrollTimestamp;
 let xyCache;
 
-/** @this {?} TabInstalled */
-export default function toggleDragging(state) {
-  parent = this.$refs.scriptList;
-  parentOnDrop = this.moveScript;
+export default function toggleDragging(listEl, moveScript, state) {
+  parent = listEl;
+  parentOnDrop = moveScript;
   parent::(state ? on : off)(eventNames.start, isTouch ? onTouchStart : onDragStart);
 }
 

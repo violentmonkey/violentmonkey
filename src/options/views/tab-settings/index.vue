@@ -254,7 +254,9 @@ export default {
       });
     },
   },
-  activated: focusMe,
+  activated() {
+    focusMe(this.$el);
+  },
   created() {
     this.revokers = [];
     items::forEachEntry(([name, { normalize = normalizeEnum }]) => {
