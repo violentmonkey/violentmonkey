@@ -11,7 +11,7 @@ export async function initialize(main) {
 
 async function run(init) {
   try {
-    return typeof init === 'function' ? init() : await init;
+    await (typeof init === 'function' ? init() : init);
   } catch (e) {
     console.error(e);
   }
