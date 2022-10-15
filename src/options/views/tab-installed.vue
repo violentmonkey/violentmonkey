@@ -95,11 +95,12 @@
           </select>
         </form>
       </header>
-      <div v-if="showRecycle" class="trash-hint mx-1 my-1 flex flex-col">
+      <div v-if="showRecycle" class="hint mx-1 my-1 flex flex-col">
         <span v-text="i18n('hintRecycleBin')"/>
         <a v-if="store.removedScripts.length" v-text="i18n('buttonEmptyRecycleBin')" tabindex="0"
            @click="handleEmptyRecycleBin"/>
       </div>
+      <div v-else-if="message" class="hint mx-1 my-1 flex flex-col" v-text="message"></div>
       <div class="scripts flex-auto"
         v-focus="!state.script"
         ref="refList"
@@ -267,6 +268,15 @@ const searchNeedsCodeIds = computed(() => state.search
 const debouncedUpdate = debounce(onUpdate, 100);
 const debouncedRender = debounce(renderScripts);
 
+function resetList() {
+  if (!showRecycle.value && store.needRefresh) {
+    // Filter removed scripts when reload installed list
+    store.scripts = store.scripts.filter(script => !script.config.removed);
+    store.needRefresh = false;
+  }
+  state.focusedIndex = -1;
+  onUpdate();
+}
 async function refreshUI() {
   const ids = searchNeedsCodeIds.value;
   if (ids?.length) await getCodeFromStorage(ids);
@@ -596,15 +606,13 @@ export default {
     focus: vFocus,
   },
   setup() {
+    resetList();
+    watch(showRecycle, resetList);
     watch(draggable, state => toggleDragging(refList.value, moveScript, state));
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
     watch(() => [filters.viewSingleColumn, filters.viewTable], adjustScriptWidth);
-    watch(showRecycle, () => {
-      state.focusedIndex = -1;
-      onUpdate();
-    });
-    watch(() => store.scripts, refreshUI);
+    watch(() => showRecycle.value ? store.removedScripts : store.scripts, refreshUI);
     watch(() => store.route.paths[1], onHashChange);
     watch(selectedScript, script => {
       keyboardService.setContext('selectedScript', script);
@@ -644,6 +652,7 @@ export default {
       draggable,
       scriptHotkeys,
       showRecycle,
+      message,
 
       // Methods
       handleStateChange,
@@ -774,7 +783,7 @@ export default {
   }
 }
 
-.trash-hint {
+.hint {
   line-height: 1.5;
   color: var(--fill-6);
   place-items: center;

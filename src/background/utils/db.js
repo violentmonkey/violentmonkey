@@ -63,11 +63,20 @@ addOwnCommands({
     return storage.code[Array.isArray(id) ? 'getMulti' : 'getOne'](id);
   },
   /** @return {Promise<void>} */
-  MarkRemoved({ id, removed }) {
-    return updateScriptInfo(id, {
+  async MarkRemoved({ id, removed }) {
+    if (!removed) {
+      const script = getScriptById(id);
+      const conflict = getScript({ meta: script.meta });
+      if (conflict) throw i18n('msgNamespaceConflict');
+    }
+    await updateScriptInfo(id, {
       config: { removed: removed ? 1 : 0 },
       props: { lastModified: Date.now() },
     });
+    const list = store[removed ? 'scripts' : 'removedScripts'];
+    const i = list.findIndex(script => script.props.id === id);
+    const [script] = list.splice(i, 1);
+    store[removed ? 'removedScripts' : 'scripts'].push(script);
   },
   /** @return {Promise<number>} */
   Move({ id, offset }) {
@@ -78,18 +87,18 @@ addOwnCommands({
     return normalizePosition();
   },
   /** @return {Promise<void>} */
-  async RemoveScript(id) {
-    const i = store.scripts.indexOf(getScriptById(id));
-    if (i >= 0) {
-      store.scripts.splice(i, 1);
-      await storage.base.remove([
-        storage.script.toKey(id),
-        storage.code.toKey(id),
-        storage.value.toKey(id),
-      ]);
-    }
-    return sendCmd('RemoveScript', id);
-  },
+  // async RemoveScript(id) {
+  //   const i = store.scripts.indexOf(getScriptById(id));
+  //   if (i >= 0) {
+  //     store.scripts.splice(i, 1);
+  //     await storage.base.remove([
+  //       storage.script.toKey(id),
+  //       storage.code.toKey(id),
+  //       storage.value.toKey(id),
+  //     ]);
+  //   }
+  //   return sendCmd('RemoveScript', id);
+  // },
   ParseMeta: parseMetaWithErrors,
   ParseScript: parseScript,
   /** @return {Promise<void>} */
@@ -463,6 +472,9 @@ export function checkRemove({ force } = {}) {
   });
   if (toRemove.length) {
     store.removedScripts = toKeep;
+    toRemove.forEach(script => {
+      delete store.scriptMap[script.props.id];
+    });
     return storage.base.remove(toRemove);
   }
 }
