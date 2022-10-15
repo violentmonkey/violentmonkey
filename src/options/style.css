@@ -38,6 +38,7 @@ aside {
     padding-top: .6rem;
     padding-bottom: .6rem;
     color: var(--fill-8);
+    white-space: nowrap;
     &.active,
     &:hover {
       color: var(--fg);
@@ -147,15 +148,20 @@ textarea:not([rows="1"]):not(.h100) {
     width: auto !important;
   }
   .aside-content {
-    display: flex;
+    flex-direction: row;
+    align-items: center;
     width: auto;
     height: $compactHeaderHeight;
     padding: 0;
     border-width: 0 0 1px 0;
+    overflow-x: auto;
     img {
       width: $compactHeaderHeight;
       height: $compactHeaderHeight;
       margin: 0 .5rem 0 1.25rem;
+    }
+    hr {
+      display: none;
     }
     h1 {
       align-self: center;
@@ -163,11 +169,11 @@ textarea:not([rows="1"]):not(.h100) {
       margin: 0;
     }
   }
-  .aside-menu {
+  .aside-menu-item {
     display: flex;
-    border: none;
+    padding: 0 8px;
+    text-align: center;
     a {
-      padding: 0 0 0 1.5rem;
       display: flex;
       flex-direction: column; /* stretch to full height... */
       justify-content: center; /* ...and center vertically */

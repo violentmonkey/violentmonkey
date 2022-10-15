@@ -1,6 +1,6 @@
 <template>
   <div class="page-options flex h-screen">
-    <aside :class="{ 'show-aside': aside }" v-if="canRenderAside">
+    <aside v-if="canRenderAside">
       <div class="aside-content">
         <img src="/public/images/icon128.png">
         <h1 class="hidden-sm" v-text="i18n('extName')"/>
@@ -42,7 +42,6 @@ const tabs = [
 ];
 const extName = i18n('extName');
 const conditionNotEdit = '!editScript';
-let aside = false;
 
 // Speedup and deflicker for initial page load:
 // skip rendering the aside when starting in the editor for a new script.
@@ -113,7 +112,6 @@ export default {
 
     return {
       tabs,
-      aside,
       current,
       numbers,
       canRenderAside,
