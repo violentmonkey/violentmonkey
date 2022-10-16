@@ -238,7 +238,9 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
 }
 
 function inject(item, iframeCb) {
-  const script = makeElem('script', item.code);
+  const { code } = item;
+  const isCodeArray = isObject(code)
+  const script = makeElem('script', !isCodeArray && code);
   // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
   const onError = IS_FIREFOX && !iframeCb && (e => {
     const { stack } = e.error;
@@ -254,6 +256,9 @@ function inject(item, iframeCb) {
       ? div::attachShadow({ mode: 'closed' })
       : div
   );
+  if (isCodeArray) {
+    append::apply(script, code);
+  }
   let iframe;
   let iframeDoc;
   if (iframeCb) {

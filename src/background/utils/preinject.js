@@ -1,7 +1,7 @@
-import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd, trueJoin } from '@/common';
+import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
-  FEEDBACK, FORCE_CONTENT, METABLOCK_RE, MORE,
+  FEEDBACK, FORCE_CONTENT, METABLOCK_RE, MORE, NEWLINE_END_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
 import { forEachEntry, forEachValue, objectPick, objectSet } from '@/common/object';
@@ -108,7 +108,7 @@ async function processFeedback([key, runAt, unwrappedId]) {
   if (runAt && code) {
     const { frameId, tab: { id: tabId } } = this;
     runAt = `document_${runAt === 'body' ? 'start' : runAt}`;
-    browser.tabs.executeScript(tabId, { code, frameId, runAt });
+    browser.tabs.executeScript(tabId, { code: code.join(''), frameId, runAt });
     if (unwrappedId) sendTabCmd(tabId, 'Run', unwrappedId, { frameId });
   }
 }
@@ -322,35 +322,41 @@ function prepareScript(script) {
   const displayName = getScriptName(script);
   const isContent = isContentRealm(script, forceContent);
   const pathMap = custom.pathMap || {};
-  const reqs = meta.require.map(key => require[pathMap[key] || key]).filter(Boolean);
-  // trying to avoid progressive string concatenation of potentially huge code slices
-  // adding `;` on a new line in case some required script ends with a line comment
-  const reqsSlices = reqs ? [].concat(...reqs.map(req => [req, '\n;'])) : [];
-  const hasReqs = reqsSlices.length;
   const wrap = !meta.unwrap;
   const { grant } = meta;
   const numGrants = grant.length;
   const grantNone = !numGrants || numGrants === 1 && grant[0] === 'none';
-  const injectedCode = [
-    wrap && `window.${dataKey}=function(${
+  // Storing slices separately to reuse JS-internalized strings for code in our storage cache
+  const injectedCode = [];
+  let hasReqs;
+  if (wrap) {
+    injectedCode.push(`window.${dataKey}=function(`
       // using a shadowed name to avoid scope pollution
-      grantNone ? GRANT_NONE_VARS : 'GM'}${
-      IS_FIREFOX ? `,${dataKey}){try{` : '){'}${
-      grantNone ? '' : 'with(this)with(c)delete c,'
-    // hiding module interface from @require'd scripts so they don't mistakenly use it
-    }((define,module,exports)=>{`,
-    ...reqsSlices,
-    // adding a nested IIFE to support 'use strict' in the code when there are @requires
-    hasReqs && wrap && '(()=>{',
-    code,
-    // adding a new line in case the code ends with a line comment
-    !code.endsWith('\n') && '\n',
-    hasReqs && wrap && '})()',
-    wrap && `})()${IS_FIREFOX ? `}catch(e){${dataKey}(e)}` : ''}}`,
+      + (grantNone ? GRANT_NONE_VARS : 'GM')
+      + (IS_FIREFOX ? `,${dataKey}){try{` : '){')
+      + (grantNone ? '' : 'with(this)with(c)delete c,')
+      // hiding module interface from @require'd scripts so they don't mistakenly use it
+      + '((define,module,exports)=>{');
+  }
+  for (const url of meta.require) {
+    const req = require[pathMap[url] || url]
+    if (/\S/.test(req)) {
+      injectedCode.push(req, NEWLINE_END_RE.test(req) ? ';' : '\n;');
+      hasReqs = true;
+    }
+  }
+  // adding a nested IIFE to support 'use strict' in the code when there are @requires
+  if (hasReqs && wrap) {
+    injectedCode.push('(()=>{');
+  }
+  injectedCode.push(code);
+  // adding a new line in case the code ends with a line comment
+  injectedCode.push((!NEWLINE_END_RE.test(code) ? '\n' : '')
+    + (hasReqs && wrap ? '})()' : '')
+    + (wrap ? `})()${IS_FIREFOX ? `}catch(e){${dataKey}(e)}` : ''}}` : '')
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
-    IS_FIREFOX && ';0',
-    `\n//# sourceURL=${getScriptPrettyUrl(script, displayName)}`,
-  ]::trueJoin('');
+    + (IS_FIREFOX ? ';0' : '')
+    + `\n//# sourceURL=${getScriptPrettyUrl(script, displayName)}`);
   cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
   /** @type {VMInjection.Script} */
   Object.assign(script, {
