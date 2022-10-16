@@ -317,7 +317,7 @@ export async function request(url, options = {}) {
         accept && { accept })
       : headers,
   });
-  const result = { url, status: -1 };
+  let result = { url, status: -1 };
   try {
     const urlNoAuth = auth ? scheme + hostname + urlTail : url;
     const resp = await fetch(urlNoAuth, init);
@@ -330,7 +330,10 @@ export async function request(url, options = {}) {
     result.status = resp.status || 200;
     result.headers = resp.headers;
     result.data = await resp[loadMethod]();
-  } catch { /* NOP */ }
+  } catch (err) {
+    result = Object.assign(err, result);
+    result.message += '\n' + url;
+  }
   if (result.status < 0 || result.status > 300) throw result;
   return result;
 }
