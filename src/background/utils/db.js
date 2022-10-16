@@ -463,19 +463,21 @@ export function checkRemove({ force } = {}) {
   store.removedScripts.forEach(script => {
     const { id, lastModified } = script.props;
     if (script.config.removed && (force || now - getInt(lastModified) > TIMEOUT_WEEK)) {
-      toRemove.push(storage.code.toKey(id),
-        storage.script.toKey(id),
-        storage.value.toKey(id));
+      toRemove.push(id);
     } else {
       toKeep.push(script);
     }
   });
   if (toRemove.length) {
     store.removedScripts = toKeep;
-    toRemove.forEach(script => {
-      delete store.scriptMap[script.props.id];
+    toRemove.forEach(id => {
+      delete store.scriptMap[id];
     });
-    return storage.base.remove(toRemove);
+    return storage.base.remove(toRemove.flatMap(id => [
+      storage.code.toKey(id),
+      storage.script.toKey(id),
+      storage.value.toKey(id),
+    ]));
   }
 }
 
