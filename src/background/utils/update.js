@@ -2,6 +2,7 @@ import {
   compareVersion, getScriptName, getScriptUpdateUrl,
   i18n, sendCmd, trueJoin,
 } from '@/common';
+import { METABLOCK_RE } from '@/common/consts';
 import { fetchResources, getScriptById, getScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
@@ -91,6 +92,7 @@ async function downloadUpdate(script, urls) {
   try {
     const { data } = await requestNewer(updateURL, {
       cache: 'no-cache',
+      // Smart servers like OUJS send a subset of the metablock without code
       headers: { Accept: 'text/x-userscript-meta,*/*' },
     }) || {};
     const { version } = data ? parseMeta(data) : {};
@@ -98,7 +100,8 @@ async function downloadUpdate(script, urls) {
       announce(i18n('msgNoUpdate'), { checking: false });
     } else if (!downloadURL) {
       announce(i18n('msgNewVersion'), { checking: false });
-    } else if (downloadURL === updateURL) {
+    } else if (downloadURL === updateURL && data?.replace(METABLOCK_RE, '').trim()) {
+      // Code is present, so this is not a smart server, hence the response is the entire script
       announce(i18n('msgUpdated'));
       return data;
     } else {
