@@ -1,12 +1,12 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Zastosuj
 buttonCancel:
   description: Cancel button on dialog.
   message: Anuluj
 buttonCheckForUpdates:
   description: Button to check a script for updates.
-  message: Sprawdź dostępność aktualizacji
+  message: Sprawdź aktualizacje
 buttonClose:
   description: Button to close window.
   message: Zamknij

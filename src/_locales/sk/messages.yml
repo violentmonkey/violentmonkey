@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Použiť
 buttonCancel:
   description: Cancel button on dialog.
   message: Zrušiť
