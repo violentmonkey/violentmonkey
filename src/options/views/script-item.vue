@@ -442,12 +442,14 @@ $removedItemHeight: calc(
   align-content: flex-start;
   padding: 0 0 $itemMargin 0;
   &[data-table] {
-    &[data-columns="1"] .script,
-    &[data-columns="2"] .script:nth-child(odd),
-    &[data-columns="3"] .script:nth-child(3n + 1),
-    &[data-columns="4"] .script:nth-child(4n + 1) {
-      border-left: none;
-      margin-left: 0;
+    // --num-columns is set in tab-installed.vue
+    --w: calc((100% - $itemMargin * (var(--num-columns) - 1)) / var(--num-columns));
+    // when searching for text the items are shuffled so we can't use different margins on columns
+    // TODO: make `sortedScripts` a computed property that only shows visible scripts?
+    justify-content: space-between;
+    &[data-columns="3"]::after { // left-aligning items in the last row
+      width: calc(var(--w) - 1px); // subtracting 1px to match margin of `.script`
+      content: '';
     }
     &[data-columns="1"], &[data-columns="3"] {
       .script:nth-child(even) {
@@ -472,9 +474,8 @@ $removedItemHeight: calc(
       display: flex;
       align-items: center;
       height: 2.5rem;
-      // --num-columns is set in tab-installed.vue
-      width: calc((100% - $itemMargin * (var(--num-columns) - 1)) / var(--num-columns));
-      margin: -1px 0 0 $itemMargin;
+      width: var(--w);
+      margin: -1px 0 0 -1px;
       padding: 0 calc(2 * $itemMargin) 0 $itemMargin;
       border-radius: 0;
       background: none;
@@ -505,6 +506,7 @@ $removedItemHeight: calc(
       &-info {
         order: 2;
         flex: 1;
+        width: 0; // compresses super long author/version
         align-self: stretch;
         margin-left: .5rem;
         line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
