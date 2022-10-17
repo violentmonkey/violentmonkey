@@ -1,12 +1,12 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Appliquer
 buttonCancel:
   description: Cancel button on dialog.
   message: Annuler
 buttonCheckForUpdates:
   description: Button to check a script for updates.
-  message: Vérifier les mises à jour
+  message: Vérifier les mises à jours
 buttonClose:
   description: Button to close window.
   message: Fermer
@@ -15,7 +15,7 @@ buttonConfirmInstallation:
   message: Confirmer l'installation
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: ''
+  message: Confirmer la réinstallation
 buttonDisable:
   description: Button to disable a script.
   message: Désactiver
@@ -99,7 +99,7 @@ buttonUndo:
   touched: false
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Mettre à jour
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Vérifier toutes les mises à jour
@@ -216,7 +216,7 @@ filterScopeName:
   message: Nom
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: taille
 genericError:
   description: Label for generic error.
   message: Erreur
@@ -284,7 +284,9 @@ labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: ''
+  message: >-
+    Les scripts actuels vont continuer à s'exécuter jusqu'à ce que vous
+    rafraîchissez l'onglet
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: >-
@@ -292,13 +294,13 @@ labelAutoUpdate:
     désactiver
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: Backup
 labelBadge:
   description: Label for option to show number on badge.
   message: "Montrer sur le badge\_: "
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 'Couleurs des badges :'
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: Rien
@@ -375,7 +377,7 @@ labelHomepageURL:
   message: "URL de la page d’accueil\_:"
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Importer les données du script
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importer les paramètres
@@ -405,7 +407,7 @@ labelName:
   message: "Nom\_:"
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Exécution dans les fenêtres :'
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Pas de nom
@@ -436,7 +438,7 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: Réinstallation du script
 labelRelated:
   description: Label of related links.
   message: "Liens utiles\_: "
@@ -466,7 +468,7 @@ labelSettings:
   message: Configuration
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Afficher les positions des ordres d'exécution
 labelSync:
   description: Label for sync options.
   message: Synchronisation
@@ -506,7 +508,7 @@ labelSyncUsername:
   message: "Nom d’utilisateur\_: "
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Thème :'
 labelTranslator:
   description: Label of translator.
   message: 'Traducteur·ice·s: '
@@ -518,18 +520,26 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Colonne unique
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Vue du mode tableau
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: Mode $1 synchrone
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: ''
+  message: >-
+    Activez seulement si vous avez un script qui nécessite de se lancer avant
+    que la page commence à charger et qu'il se lance trop tard. Comme le mode
+    Instant Injection sur Tampermonkey, cette option utilisée le XHR synchrone
+    déprécié, donc dans Chrome/Chromium vous verrez des avertissements dans la
+    console des développeurs, bien que vous pouvez sans risques les ignorer car
+    les effets négatifs sont négligeables dans ce cas. Vous pouvez masquer
+    définitivement les avertissements en faisant un clic droit sur l'un d'entre
+    eux.
 lastSync:
   description: Label for last sync timestamp.
   message: Dernière synchronisation le $1
@@ -550,10 +560,17 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Exclure...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    L'onglet actuel va se rafraichir automatiquement si vous avez activé cette
+    option dans les options générales.
+
+    Pour appliquer les changements à tous les autres onglets merci de les
+    rafraichir manuellement.
+
+    Utilisez l'onglet "Paramètres" de l'éditeur pour plus de flexibilité. 
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Chercher des scripts pour ce site
@@ -567,7 +584,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Correspond à un script désactivé
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Scripts uniquement pour les sub-frames
@@ -588,7 +605,9 @@ msgCheckingForUpdate:
   message: Vérification des mises à jour…
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    Cliquez pour ouvrir la documentation de MomentJS. Variables autorisées : $1.
+    Utilisez [les crochets] pour protéger le texte littéral.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -646,7 +665,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Ressources requises manquantes.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -664,10 +683,10 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Merci de réenregistrer ou de réinstaller ce(s) script(s) :'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: (le code est identique)
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Liste noire mise à jour.
@@ -685,7 +704,7 @@ msgScriptUpdated:
   message: "Script [$1] mis à jour\_!"
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Afficher/masquer
 msgSyncError:
   description: Message shown when sync failed.
   message: "Erreur de synchronisation\_!"
@@ -697,7 +716,7 @@ msgSyncInitError:
   message: "Erreur d’initialisation\_!"
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: Pas encore autorisé.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: La synchronisation va bientôt démarrer…
@@ -728,39 +747,39 @@ optionEditorWindowSimple:
   message: Cacher l’omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: Menu et icône popup
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Scripts activés en premier
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Regrouper les scripts désactivés
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Cacher les scripts désactivés
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Afficher les scripts désactivés.
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Montrer les scripts activés en premier
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: 'Thème UI :'
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: automatique
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: sombre
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: clair
 optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
     updates.
-  message: Mise à jour
+  message: Mettre à jour
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Sensible à la casse
@@ -778,10 +797,12 @@ sideMenuSettings:
   message: Configuration
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: Couleur normale du badge
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: >-
+    Couleur du badge lorsque le site est non-injectable (blacklisté ou non pris
+    en charge)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: "* La touche <Enter> ajoute le texte à l'historique d'autocomplétion\n* La syntaxe pour les expressions régulières est supportée\_: /re/ et /re/flags"

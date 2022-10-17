@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Toepassen
 buttonCancel:
   description: Cancel button on dialog.
   message: Annuleren
