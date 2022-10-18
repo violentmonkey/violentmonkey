@@ -50,7 +50,11 @@ export function initHooks() {
  * @param {{retry?: boolean, ignoreError?: boolean}} [options]
  * @return {Promise}
  */
-export function sendCmd(cmd, data, options) {
+export async function sendCmd(cmd, data, options) {
+  // Firefox+Vue3 bug workaround for "Proxy object could not be cloned"
+  if (!process.env.IS_INJECTED && IS_FIREFOX && isObject(data)) {
+    data = deepCopy(data);
+  }
   return sendMessage({ cmd, data }, options);
 }
 
