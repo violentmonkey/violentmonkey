@@ -93,12 +93,10 @@ async function broadcast() {
   toSend::forEachEntry(groupByTab, toTabs);
   toSend = {};
   for (const [tabId, frames] of Object.entries(toTabs)) {
-    if (tabId >= 0) { // negative tabId is the script editor when showing values
-      for (const [frameId, toFrame] of Object.entries(frames)) {
-        if (!isEmpty(toFrame)) {
-          tasks.push(sendToFrame(+tabId, +frameId, toFrame));
-          if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
-        }
+    for (const [frameId, toFrame] of Object.entries(frames)) {
+      if (!isEmpty(toFrame)) {
+        tasks.push(sendToFrame(+tabId, +frameId, toFrame));
+        if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
       }
     }
   }
@@ -109,6 +107,7 @@ async function broadcast() {
 function groupByTab([id, valuesToSend]) {
   const entriesToSend = Object.entries(valuesToSend);
   openers[id]::forEachEntry(([tabId, frames]) => {
+    if (tabId < 0) return; // script values editor watches for changes differently
     const toFrames = nest(this, tabId);
     frames::forEachEntry(([frameId, last]) => {
       const toScript = nest(nest(toFrames, frameId), id);
