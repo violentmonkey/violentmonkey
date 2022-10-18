@@ -13,8 +13,6 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
     || key === 'hasListener'
     || key === 'hasListeners';
   /** API types or enums or literal constants */
-  const isFunction = val => typeof val === 'function';
-  const isObject = val => typeof val === 'object';
   const proxifyValue = (target, key, src, metaVal) => {
     const srcVal = src[key];
     if (srcVal === undefined) return;
@@ -185,7 +183,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
     const { frameId, tab, url } = sender;
     log('on', [msg, { frameId, tab, url }], id);
     const result = listener(msg, sender);
-    (typeof result?.then === 'function' ? result : SafePromise.resolve(result))
+    (isFunction(result?.then) ? result : SafePromise.resolve(result))
     .then(data => log('on', [data], id, true), console.warn);
     return result;
   });

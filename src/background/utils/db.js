@@ -526,9 +526,9 @@ export async function updateScriptInfo(id, data) {
  * @return {{ meta: VMScript.Meta, errors: string[] }}
  */
 function parseMetaWithErrors(src) {
-  const isObject = typeof src === 'object';
-  const custom = isObject && src.custom || getDefaultCustom();
-  const meta = parseMeta(isObject ? src.code : src);
+  const isObj = isObject(src);
+  const custom = isObj && src.custom || getDefaultCustom();
+  const meta = parseMeta(isObj ? src.code : src);
   const errors = [];
   testerBatch(errors);
   testScript('', { meta, custom });

@@ -139,7 +139,7 @@ export default {
       })
       // sort by keys alphabetically to make it more readable
       .sort(([a], [b]) => (a < b ? -1 : a > b))
-      .filter(([key, val]) => !HIDE_OPTS.includes(key) && typeof val !== 'function')
+      .filter(([key, val]) => !HIDE_OPTS.includes(key) && !isFunction(val))
       .forEach(([key, val]) => { opts[key] = val; });
       this.hint = JSON.stringify(opts, null, '  ');
       setTimeout(() => {

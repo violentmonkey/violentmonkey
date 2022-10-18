@@ -60,7 +60,7 @@ class StorageArea {
    * @return {Promise<Object>} same object
    */
   async set(data) {
-    if (process.env.DEV && (!data || typeof data !== 'object')) {
+    if (process.env.DEV && !isObject(data)) {
       throw 'StorageArea.set: data is not an object';
     }
     await api.set(this.prefix

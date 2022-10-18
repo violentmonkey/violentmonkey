@@ -78,7 +78,7 @@ function serviceConfig(name) {
     return syncConfig.get(getKeys(key), def);
   }
   function set(key, val) {
-    if (typeof key === 'object') {
+    if (isObject(key)) {
       key::forEachEntry(([k, v]) => {
         syncConfig.set(getKeys(k), v);
       });
@@ -179,7 +179,7 @@ function objectPurify(obj) {
   // Remove keys with undefined values
   if (Array.isArray(obj)) {
     obj.forEach(objectPurify);
-  } else if (obj && typeof obj === 'object') {
+  } else if (isObject(obj)) {
     obj::forEachEntry(([key, value]) => {
       if (typeof value === 'undefined') delete obj[key];
       else objectPurify(value);

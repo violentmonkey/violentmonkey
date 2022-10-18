@@ -25,7 +25,7 @@ browser.notifications.onClicked.addListener((id) => {
   if (openerId >= 0) {
     sendTabCmd(openerId, 'NotificationClick', id);
   }
-  if (typeof openerId === 'function') {
+  if (isFunction(openerId)) {
     openerId();
   }
 });

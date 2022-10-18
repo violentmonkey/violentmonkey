@@ -48,7 +48,7 @@ const callHooksLater = debounce(callHooks, DELAY);
 const writeOptionsLater = debounce(writeOptions, DELAY);
 
 initPending = storage.base.getOne(STORAGE_KEY).then(data => {
-  if (data && typeof data === 'object') options = data;
+  if (isObject(data)) options = data;
   if (process.env.DEBUG) console.info('options:', options);
   if (!options[VERSION]) {
     setOption(VERSION, 1);
