@@ -380,20 +380,18 @@ export default {
         const { current } = this;
         const currentKey = current?.key;
         const valueGetter = current && (current.isAll ? this.getValueAll : this.getValue);
-        const oldText = valueGetter && valueGetter(currentKey);
         this.setData(data instanceof Object ? data : deepCopy(data));
         if (current) {
           const newText = valueGetter(currentKey);
           const curText = this.cm.getValue();
           if (curText === newText) {
             current.isNew = false;
-          } else if (curText === oldText) {
+            current.dirty = false;
+          } else if (!current.dirty) {
             // Updating the current value only if it wasn't yet changed by the user.
             // Keeping the same this.current to avoid triggering `watch` observer
-            Object.keys(current)
-            .filter(k => k !== 'key' && k !== 'value')
-            .forEach(k => delete current[k]);
             current.value = newText;
+            this.onChange();
           }
         }
       } else {
