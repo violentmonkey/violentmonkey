@@ -42,7 +42,7 @@ addPublicCommands({
     const values = objectGet(openers, [id, tab.id, frameId]);
     if (values) { // preventing the weird case of message arriving after the page navigated
       if (raw) values[key] = raw; else delete values[key];
-      if (tab.id >= 0) nest(toSend, id)[key] = raw || null;
+      nest(toSend, id)[key] = raw || null;
       commit({ [id]: values });
       return chain;
     }
