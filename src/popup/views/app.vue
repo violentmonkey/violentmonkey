@@ -195,7 +195,7 @@ import { INJECT_AUTO } from '@/common/consts';
 import options from '@/common/options';
 import {
   getScriptHome, getScriptName, getScriptUpdateUrl,
-  i18n, makePause, sendCmd, sendTabCmd,
+  i18n, makePause, sendCmdDirectly, sendTabCmd,
 } from '@/common';
 import { objectPick } from '@/common/object';
 import { focusMe } from '@/common/ui';
@@ -366,11 +366,11 @@ export default {
     onOpenUrl(e) {
       const el = e.target.closest('a[href][target=_blank]');
       if (!el) return;
-      sendCmd('TabOpen', { url: el.href });
+      sendCmdDirectly('TabOpen', { url: el.href });
       window.close();
     },
     onEditScript(item) {
-      sendCmd('OpenEditor', item.data.props.id);
+      sendCmdDirectly('OpenEditor', item.data.props.id);
       window.close();
     },
     onCommand(evt) {
@@ -390,7 +390,7 @@ export default {
     onToggleScript(item) {
       const { data } = item;
       const enabled = !data.config.enabled;
-      sendCmd('UpdateScriptInfo', {
+      sendCmdDirectly('UpdateScriptInfo', {
         id: data.props.id,
         config: { enabled },
       })
@@ -409,7 +409,7 @@ export default {
       }
     },
     async onCreateScript() {
-      sendCmd('OpenEditor');
+      sendCmdDirectly('OpenEditor');
       window.close();
     },
     async onInjectionFailureFix() {
@@ -423,14 +423,14 @@ export default {
       const { config, props: { id } } = this.activeExtras.data;
       const removed = +!config.removed;
       config.removed = removed;
-      sendCmd('MarkRemoved', { id, removed });
+      sendCmdDirectly('MarkRemoved', { id, removed });
     },
     async onUpdateScript() {
       const item = this.activeExtras;
       const chk = i18n('msgCheckingForUpdate');
       if (item.upd !== chk) {
         item.upd = chk;
-        item.upd = await sendCmd('CheckUpdate', item.data.props.id)
+        item.upd = await sendCmdDirectly('CheckUpdate', item.data.props.id)
           ? i18n('msgUpdated')
           : i18n('msgNoUpdate');
       }
@@ -451,7 +451,7 @@ export default {
       this.focus(item);
     },
     async onExcludeSave(item) {
-      await sendCmd('UpdateScriptInfo', {
+      await sendCmdDirectly('UpdateScriptInfo', {
         id: item.data.props.id,
         custom: {
           excludeMatch: item.excludesValue.split('\n').map(line => line.trim()).filter(Boolean),

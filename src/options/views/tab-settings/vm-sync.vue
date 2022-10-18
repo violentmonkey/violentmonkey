@@ -71,7 +71,7 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip';
-import { noop, sendCmd } from '@/common';
+import { sendCmdDirectly } from '@/common';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
 import hookSetting from '@/common/hook-setting';
@@ -145,7 +145,7 @@ export default {
   },
   methods: {
     onSaveUserConfig() {
-      sendCmd('SyncSetConfig', this.state.userConfig);
+      sendCmdDirectly('SyncSetConfig', this.state.userConfig);
     },
     onSyncChange(e) {
       const { value } = e.target;
@@ -155,14 +155,14 @@ export default {
       const { service } = this;
       if (['authorized'].includes(service.authState)) {
         // revoke
-        sendCmd('SyncRevoke');
+        sendCmdDirectly('SyncRevoke');
       } else if (['no-auth', 'unauthorized', 'error'].includes(service.authState)) {
         // authorize
-        sendCmd('SyncAuthorize');
+        sendCmdDirectly('SyncAuthorize');
       }
     },
     onSync() {
-      sendCmd('SyncStart');
+      sendCmdDirectly('SyncStart');
     },
     getMessage() {
       const { service } = this;
