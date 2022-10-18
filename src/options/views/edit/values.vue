@@ -225,7 +225,8 @@ export default {
       });
     },
     getLength(key, raw) {
-      const len = (this.values[key] || raw).length - 1;
+      // Showing length as key+val not "key" + : + "raw" to avoid confusing users
+      const len = key.length + (this.values[key] || raw).length - 1;
       return len < 10_000 ? len : formatByteLength(len);
     },
     getValue(key, sliced, raw) {
