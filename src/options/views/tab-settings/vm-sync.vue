@@ -145,7 +145,7 @@ export default {
   },
   methods: {
     onSaveUserConfig() {
-      sendCmd('SyncSetConfig', this.state.userConfig).catch(noop);
+      sendCmd('SyncSetConfig', this.state.userConfig);
     },
     onSyncChange(e) {
       const { value } = e.target;

@@ -2,7 +2,7 @@
 
 import { browser, extensionRoot, ICON_PREFIX } from '@/common/consts';
 import { deepCopy } from './object';
-import { blob2base64, i18n, isDataUri, noop } from './util';
+import { blob2base64, i18n, isDataUri } from './util';
 
 export { normalizeKeys } from './object';
 export * from './util';
@@ -98,16 +98,16 @@ export function sendCmdDirectly(cmd, data, options, fakeSrc) {
  * @return {Promise}
  */
 export function sendTabCmd(tabId, cmd, data, options) {
-  return browser.tabs.sendMessage(tabId, { cmd, data }, options).catch(noop);
+  return browser.tabs.sendMessage(tabId, { cmd, data }, options).catch(ignoreNoReceiver);
 }
 
 // Used by `injected`
 export function sendMessage(payload, { retry } = {}) {
   if (retry) return sendMessageRetry(payload);
   let promise = browser.runtime.sendMessage(payload);
-  // Ignoring errors when sending from the background script because it's a broadcast
-  if (!process.env.IS_INJECTED && window === getBgPage()) {
-    promise = promise.catch(noop);
+  // Ignoring errors when sending from the extension script because it's a broadcast
+  if (!process.env.IS_INJECTED) {
+    promise = promise.catch(ignoreNoReceiver);
   }
   return promise;
 }
@@ -135,6 +135,12 @@ export async function sendMessageRetry(payload, retries = 10) {
     pauseDuration *= 2;
   }
   throw new Error('Violentmonkey cannot connect to the background page.');
+}
+
+export function ignoreNoReceiver(err) {
+  if (!/Receiving end does not exist|The message port closed before/.test(err.message)) {
+    return Promise.reject(err);
+  }
 }
 
 export function leftpad(input, length, pad = '0') {
