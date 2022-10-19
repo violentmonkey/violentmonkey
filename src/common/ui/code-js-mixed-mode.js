@@ -11,6 +11,11 @@ import 'codemirror/mode/htmlmixed/htmlmixed';
 CodeMirror.defineMode('javascript-mixed', (config) => {
   const STYLE_PASS = 'XXX-PASS';
   const IS_END_BACKTICK_RE = /(^|[^\\])`/y;
+  const NEXT_QUOTE_RE = {
+    "'": /.*?'/,
+    '"': /.*?"/,
+    '`': /.*?`/,
+  };
   const kEnsureProperLocalModeStatePostJsExpr = 'ensureProperLocalModeStatePostJsExpr';
   const kInJsExprInStringTemplate = 'inJsExprInStringTemplate';
   const kIndexOfJsExprStart = 'indexOfJsExprStart';
@@ -49,29 +54,27 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     matchClosing: false,
   });
   const [forceHtmlModeToAttrContinuedState, htmlStateForAttrValue] = (() => {
+    const extractInnards = string => {
+      const stream = new StringStream(string, 2, {});
+      const state = htmlmixedMode.startState();
+      const { htmlState } = state;
+      while (stream.current() !== string) {
+        htmlmixedMode.token(stream, state);
+      }
+      return [
+        htmlState.state,
+        htmlState[kTokenize],
+      ];
+    };
     // tried to obtain the states when the tokenizer encounters an *incomplete* attr value
     // (that would end in second line)
-    const dummyStream1a = new StringStream('<p class="someClass', 2, {});
-    const dummyState1a = htmlmixedMode.startState();
-    while (dummyStream1a.current() !== '<p class="someClass') {
-      htmlmixedMode.token(dummyStream1a, dummyState1a);
-    }
-    const attrContinuedStateDoubleQuote = dummyState1a.htmlState.state;
-    const tokenForAttrContinuedDoubleQuote = dummyState1a.htmlState[kTokenize];
-    const dummyStream1b = new StringStream('<p class=\'someClass', 2, {});
-    const dummyState1b = htmlmixedMode.startState();
-    while (dummyStream1b.current() !== '<p class=\'someClass') {
-      htmlmixedMode.token(dummyStream1b, dummyState1b);
-    }
-    const attrContinuedStateSingleQuote = dummyState1b.htmlState.state;
-    const tokenForAttrContinuedSingleQuote = dummyState1b.htmlState[kTokenize];
+    const attrContinuedState = {
+      '"': extractInnards('<p class="someClass'),
+      "'": extractInnards('<p class=\'someClass'),
+    };
     // record the state when the tokenizer encounters a *complete* attr value
-    const dummyStream2 = new StringStream('<p class="otherClass"', 2, {});
-    const dummyState2 = htmlmixedMode.startState();
-    while (dummyStream2.current() !== '<p class="otherClass"') {
-      htmlmixedMode.token(dummyStream2, dummyState2);
-    }
-    const stateForAttrValue = dummyState2.htmlState.state; // single-quote attr val has the same state
+    // single-quote attr val has the same state
+    const stateForAttrValue = extractInnards('<p class="otherClass"')[0];
     /**
      * Force html tokenizer to treat next token as attribute value.
      *
@@ -88,32 +91,26 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
      * which handles tokenizing a single-line string template.
      */
     function forceHtmlModeToAttrContinuedState(stream, htmlState) {
-      // Detect quote type by checking current token last char
-      // (use last char instead of first char, because last char also works for multi-lined char value
-      //  while fist char only works for the first line)
-      switch (stream.string.charAt(stream.pos - 1)) {
-      case '"':
-        htmlState.state = attrContinuedStateDoubleQuote;
-        htmlState[kTokenize] = tokenForAttrContinuedDoubleQuote;
-        break;
-      case "'":
-        htmlState.state = attrContinuedStateSingleQuote;
-        htmlState[kTokenize] = tokenForAttrContinuedSingleQuote;
-        break;
-      default:
-      // case it's part of a multi-lined attr value, and is not the last line yet
-      // (i.e., no quote at the end)
-      // nothing needs to be done as it's already in the proper state.
+      /*
+       * Detect quote type by checking current token last char (use last char instead of
+       * first char, because last char also works for multi-lined char value
+       * while first char only works for the first line)
+       * case it's part of a multi-lined attr value, and is not the last line yet
+       * (i.e., no quote at the end) nothing needs to be done as it's already in the proper state.
+       * OPEN: the logic breaks down if the last character of the line happens to be a quote
+       * , but not the ending quote.
+       * E.g., the single quote in the following example is just part of the value
+       *  <p  title="foo bar
+       *  something '
+       *  def">
+       * To properly handle it, we need to know the quote type for the current attribute value.
+       * However, the quote type is not exposed by the underlying html tokenizer.
+       */
+      const cont = attrContinuedState[stream.string[stream.pos - 1]];
+      if (cont) {
+        htmlState.state = cont[0];
+        htmlState[kTokenize] = cont[1];
       }
-      // OPEN: the logic breaks down if the last character of the line happens to be a quote
-      // , but not the ending quote.
-      // E.g., the single quote in the following example is just part of the value
-      //  <p  title="foo bar
-      //  something '
-      //  def">
-      //
-      // To properly handle it, we need to know the quote type for the current attribute value.
-      // However, the quote type is not exposed by the underlying html tokenizer.
     }
     return [
       forceHtmlModeToAttrContinuedState,
@@ -151,7 +148,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     //  01\\\56  : escaped
     let isEscaped = false;
     for (let i = charPos - 1; i >= stream.start; i -= 1) {
-      if (stream.string.charAt(i) === '\\') {
+      if (stream.string[i] === '\\') {
         isEscaped = !isEscaped;
       } else {
         break;
@@ -220,12 +217,10 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     ctx.style = jsMode.token(ctx.stream, ctx.state[kJsState]);
   }
 
-  function curModeNameOfHtmlmixed(htmlmixedState) {
-    return (!htmlmixedState[kLocalMode]) ? 'html' : htmlmixedState[kLocalMode].name;
-  }
-
   function curModeStateOfHtmlmixed(htmlmixedState) {
-    return (!htmlmixedState[kLocalMode]) ? htmlmixedState.htmlState : htmlmixedState[kLocalState];
+    return htmlmixedState[kLocalMode]
+      ? htmlmixedState[kLocalState]
+      : htmlmixedState.htmlState;
   }
 
   Object.assign(htmlmixedMode, {
@@ -234,24 +229,26 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
      *         current token start position, i.e., stream.start; -1 otherwise.
      */
     [kIndexOfJsExprStart](stream, state) {
-      const modeName = curModeNameOfHtmlmixed(state[kLocalState]);
+      const localState = state[kLocalState];
+      const modeName = localState[kLocalMode]?.name || 'html';
       switch (modeName) {
       case 'html':
         return tokenIndexOfUnescaped(stream, '${');
       case 'css':
         // css state is in the localState of htmlmixed
-        return cssMode[kIndexOfJsExprStart](stream, curModeStateOfHtmlmixed(state[kLocalState]));
+        return cssMode[kIndexOfJsExprStart](stream, curModeStateOfHtmlmixed(localState));
       case 'javascript':
         return -1; // let js mode handle ${ natively
       default:
-        console.error('htmlmixedMode.indexOfJsExprStart() - unrecognized mode:', modeName);
+        console.error('Unrecognized mode:', modeName);
       }
       return -1; // should never reach here
     },
 
     [kEnsureProperLocalModeStatePostJsExpr](stream, state, style) {
-      const modeName = curModeNameOfHtmlmixed(state[kLocalState]);
-      const modeState = curModeStateOfHtmlmixed(state[kLocalState]);
+      const localState = state[kLocalState];
+      const modeName = localState[kLocalMode]?.name || 'html';
+      const modeState = curModeStateOfHtmlmixed(localState);
       switch (modeName) {
       case 'html':
         if (modeState.state === htmlStateForAttrValue) {
@@ -265,7 +262,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
       case 'javascript':
         break; // NO-OP
       default:
-        console.error('htmlmixedMode.ensureProperLocalModeStatePostJsExpr() - unrecognized mode:', modeName);
+        console.error('Unrecognized mode:', modeName);
       }
     },
   });
@@ -274,8 +271,8 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     [kIndexOfJsExprStart](stream) {
       // In most cases, CSS tokenizer treats $ as a single token,
       // detect ${ for those cases
-      if (stream.string.charAt(stream.start) === '$'
-      && stream.string.charAt(stream.start + 1) === '{') {
+      const { string, start } = stream;
+      if (string[start] === '$' && string[start + 1] === '{') {
         return 0;
       }
       // else look for ${ in the entire token.
@@ -287,7 +284,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     [kEnsureProperLocalModeStatePostJsExpr](stream, state, style) {
       // for case quoted string, remember the quote style, to be used in tokenizePostJsExpr
       if (style === 'string') {
-        state[kQuoteCharSurroundJsExpr] = stream.string.charAt(stream.start);
+        state[kQuoteCharSurroundJsExpr] = stream.string[stream.start];
       }
       // Note: we want to force the text after the JS expression be tokenized as string (up till the end quote),
       // but CSS tokenizer does not expose it, not even in the indirect way,
@@ -306,10 +303,9 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
       // Now handle quoted string cases such as content: "suffix${someExpr()}prefix";
       // to return prefix" as a string token in the above case
       // regex: non-greedy match up to the immediate next quote char, to avoid over match
-      const matched = stream.match(new RegExp(`.*?${quoteInUse}`), true);
       // in the unexpected case (likely bugs) that we cannot find end quote, do nothing more
       // and let parent mode tokenizer to do its work
-      return matched ? 'string' : null;
+      return stream.match(NEXT_QUOTE_RE[quoteInUse], true) ? 'string' : null;
     },
   });
 
@@ -328,9 +324,10 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
       // once it reaches back to 0, the logic would let the parent local mode handle the next token
       if ((state[kJsExprDepthInStringTemplate] -= 1) <= 0) {
         state[kInJsExprInStringTemplate] = false;
-        if (state[kLocalMode][kTokenizePostJsExpr]) {
+        const jsExpr = state[kLocalMode][kTokenizePostJsExpr];
+        if (jsExpr) {
           // unless the mode also explicitly specify a tokenizer.
-          state[kTokenizePostJsExpr] = state[kLocalMode][kTokenizePostJsExpr];
+          state[kTokenizePostJsExpr] = jsExpr;
         }
       }
     }
@@ -411,9 +408,10 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
   function tokenInLocalModePlainString(ctx) {
     const {stream, state} = ctx;
     const style = state[kLocalMode].token(stream, state[kLocalState]);
-    if (stream.pos >= state[kLocalState][kLocalHtmlPlainStringEndPos]) {
+    const pos = state[kLocalState][kLocalHtmlPlainStringEndPos];
+    if (stream.pos >= pos) {
       // backUp text beyond the string, plus one to exclude end quote
-      stream.backUp(stream.pos - state[kLocalState][kLocalHtmlPlainStringEndPos] + 1);
+      stream.backUp(stream.pos - pos + 1);
     }
     ctx.style = style;
   }
@@ -687,11 +685,12 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     token: jsToken,
 
     indent(state, textAfter, line) {
-      if (!state[kLocalMode]) {
+      const localMode = state[kLocalMode];
+      if (!localMode) {
         return jsMode.indent(state[kJsState], textAfter, line);
       }
-      if (state[kLocalMode].indent) {
-        return state[kLocalMode].indent(state[kLocalState], textAfter, line);
+      if (localMode.indent) {
+        return localMode.indent(state[kLocalState], textAfter, line);
       }
       return CodeMirror.Pass;
     },
