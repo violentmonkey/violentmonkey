@@ -52,7 +52,6 @@
 
 <script>
 import 'codemirror/lib/codemirror.css';
-import 'codemirror-js-mixed/mode/javascript-mixed/javascript-mixed';
 import 'codemirror/addon/comment/continuecomment';
 import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/edit/matchbrackets';
@@ -78,6 +77,7 @@ import { deepEqual, forEachEntry, objectPick } from '@/common/object';
 import hookSetting from '@/common/hook-setting';
 import options from '@/common/options';
 import './code-autocomplete';
+import './code-js-mixed-mode';
 import { killTrailingSpaces } from './code-trailing-spaces';
 
 /* eslint-disable no-control-regex */
