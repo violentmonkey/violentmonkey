@@ -638,7 +638,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
         // case the token is not relevant semantically, e.g., space or line break;
         // just return, skip local mode match, as such token is not reflected in stream/state
         // so the local mode matcher will end up seeing previous token.
-        return null;
+        return state[kJsState][kTokenize] === jsTokenQuasi ? 'string-2' : null;
       }
     }
     // optimization: short-circuit to skip local mode match when the rules won't cover
