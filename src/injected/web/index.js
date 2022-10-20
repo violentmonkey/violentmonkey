@@ -27,11 +27,10 @@ export default function initialize(
     }, { __proto__: null, once: true, capture: true });
     window::fire(new SafeCustomEvent(PAGE_MODE_HANDSHAKE));
   }
-  bridge.dataKey = contentId;
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;
-    bridge.post = (cmd, data, context, node) => {
-      invokeHost({ cmd, data, node, dataKey: (context || bridge).dataKey }, INJECT_CONTENT);
+    bridge.post = (cmd, data, node) => {
+      invokeHost({ cmd, data, node }, INJECT_CONTENT);
     };
     invokeGuest = (cmd, data, realm, node) => {
       if (process.env.DEBUG) console.info('[bridge.guest.content] received', { cmd, data, node });
@@ -117,7 +116,7 @@ async function onCodeSet(item, fn) {
     log('info', [bridge.mode], item.displayName);
   }
   const run = () => {
-    bridge.post('Run', item.props.id, item);
+    bridge.post('Run', item.props.id);
     const { gm, wrapper } = makeGmApiWrapper(item);
     (wrapper || global)::fn(gm, logging.error);
   };

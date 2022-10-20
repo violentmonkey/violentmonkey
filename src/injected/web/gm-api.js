@@ -88,14 +88,14 @@ export function makeGmApi() {
       const { id } = this;
       const key = `${id}:${cap}`;
       store.commands[key] = func;
-      bridge.post('RegisterMenu', { id, cap }, this);
+      bridge.post('RegisterMenu', { id, cap });
       return cap;
     },
     GM_unregisterMenuCommand(cap) {
       const { id } = this;
       const key = `${id}:${cap}`;
       delete store.commands[key];
-      bridge.post('UnregisterMenu', { id, cap }, this);
+      bridge.post('UnregisterMenu', { id, cap });
     },
     GM_download(arg1, name) {
       // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
@@ -141,8 +141,8 @@ export function makeGmApi() {
      */
     GM_addElement(parent, tag, attributes) {
       return isString(parent)
-        ? webAddElement(null, parent, tag, this)
-        : webAddElement(parent, tag, attributes, this);
+        ? webAddElement(null, parent, tag)
+        : webAddElement(parent, tag, attributes);
     },
     /**
      * Bypasses site's CSP for inline `style`.
@@ -150,12 +150,12 @@ export function makeGmApi() {
      * @returns {HTMLElement} it also has .then() so it should be compatible with TM and old VM
      */
     GM_addStyle(css) {
-      return webAddElement(null, 'style', { textContent: css, id: safeGetUniqId('VMst') }, this);
+      return webAddElement(null, 'style', { textContent: css, id: safeGetUniqId('VMst') });
     },
     GM_openInTab(url, options) {
       options = createNullObj(isObject(options) ? options : { active: !options });
       options.url = url;
-      return onTabCreate(options, this);
+      return onTabCreate(options);
     },
     GM_notification(text, title, image, onclick) {
       const options = isObject(text) ? text : {
@@ -168,23 +168,23 @@ export function makeGmApi() {
       if (!options.text) {
         throw new SafeError('GM_notification: `text` is required!');
       }
-      const id = onNotificationCreate(options, this);
+      const id = onNotificationCreate(options);
       return {
-        remove: vmOwnFunc(() => bridge.send('RemoveNotification', id, this)),
+        remove: vmOwnFunc(() => bridge.send('RemoveNotification', id)),
       };
     },
     GM_setClipboard(data, type) {
-      bridge.post('SetClipboard', { data, type }, this);
+      bridge.post('SetClipboard', { data, type });
     },
     // using the native console.log so the output has a clickable link to the caller's source
     GM_log: logging.log,
   };
 }
 
-function webAddElement(parent, tag, attrs, context) {
+function webAddElement(parent, tag, attrs) {
   let el;
   let errorInfo;
-  bridge.call('AddElement', { tag, attrs }, context, parent, function _(res) {
+  bridge.call('AddElement', { tag, attrs }, parent, function _(res) {
     el = this;
     errorInfo = res;
   }, 'cbId');
@@ -222,7 +222,7 @@ function getResource(context, name, isBlob, isBlobAuto) {
     const bucketKey = isBlob == null ? 0 : 1 + (isBlob = isBlobAuto ? !isData : isBlob);
     res = isData && isBlob === false || ensureNestedProp(resCache, bucketKey, key, false);
     if (!res) {
-      res = bridge.call('GetResource', { id, isBlob, key, raw: isData && key }, context);
+      res = bridge.call('GetResource', { id, isBlob, key, raw: isData && key });
       if (res !== true && isBlob) {
         // Creating Blob URL in page context to make it accessible for page userscripts
         res = createObjectURL(res);

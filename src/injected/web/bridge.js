@@ -19,7 +19,7 @@ const bridge = {
     const fn = handlers[cmd];
     if (fn) node::fn(data);
   },
-  send(cmd, data, context, node) {
+  send(cmd, data, node) {
     let cb;
     let res;
     try {
@@ -29,7 +29,7 @@ const bridge = {
     } catch (e) {
       // Unavoidable since vault's Promise can't be used after the iframe is removed
     }
-    postWithCallback(cmd, data, context, node, cb);
+    postWithCallback(cmd, data, node, cb);
     return res;
   },
   call: postWithCallback,
@@ -37,7 +37,7 @@ const bridge = {
 
 let callbackResult;
 
-function postWithCallback(cmd, data, context, node, cb, customCallbackId) {
+function postWithCallback(cmd, data, node, cb, customCallbackId) {
   const id = safeGetUniqId();
   callbacks[id] = cb || defaultCallback;
   if (customCallbackId) {
@@ -45,7 +45,7 @@ function postWithCallback(cmd, data, context, node, cb, customCallbackId) {
   } else {
     data = { [CALLBACK_ID]: id, data };
   }
-  bridge.post(cmd, data, context, node);
+  bridge.post(cmd, data, node);
   if (!cb) return callbackResult;
 }
 

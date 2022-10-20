@@ -46,7 +46,7 @@ export function onRequestCreate(opts, context, fileName) {
   start(req, context, fileName);
   return {
     abort() {
-      bridge.post('AbortRequest', id, context);
+      bridge.post('AbortRequest', id);
     },
   };
 }
@@ -171,7 +171,7 @@ function start(req, context, fileName) {
     'timeout',
     'url',
     'user',
-  ]), context);
+  ]));
 }
 
 /** Chrome/FF can't directly transfer FormData to isolated world so we explode it,

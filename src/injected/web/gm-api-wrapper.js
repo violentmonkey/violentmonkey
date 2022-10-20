@@ -41,7 +41,6 @@ export function makeGmApiWrapper(script) {
     id,
     script,
     resources,
-    dataKey: script.dataKey,
     resCache: createNullObj(),
   };
   const gmInfo = makeGmInfo(script.gmInfo, meta, resources);
@@ -59,10 +58,10 @@ export function makeGmApiWrapper(script) {
   }
   assign(gm, componentUtils);
   if (grant::indexOf(WINDOW_CLOSE) >= 0) {
-    gm.close = vmOwnFunc(() => bridge.post('TabClose', 0, context));
+    gm.close = vmOwnFunc(() => bridge.post('TabClose'));
   }
   if (grant::indexOf(WINDOW_FOCUS) >= 0) {
-    gm.focus = vmOwnFunc(() => bridge.post('TabFocus', 0, context));
+    gm.focus = vmOwnFunc(() => bridge.post('TabFocus'));
   }
   if (!gmApi && numGrants) gmApi = makeGmApi();
   grant::forEach((name) => {

@@ -15,17 +15,17 @@ bridge.addHandlers({
   },
 });
 
-export function onTabCreate(data, context) {
+export function onTabCreate(data) {
   lastId += 1;
   const key = lastId;
   const item = {
     onclose: null,
     closed: false,
     close() {
-      bridge.post('TabClose', key, context);
+      bridge.post('TabClose', key);
     },
   };
   tabs[key] = item;
-  bridge.post('TabOpen', { key, data }, context);
+  bridge.post('TabOpen', { key, data });
   return item;
 }

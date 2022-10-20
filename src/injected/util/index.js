@@ -40,10 +40,10 @@ export const bindEvents = (srcId, destId, bridge) => {
       incomingNodeEvent = null;
     }
   }, true);
-  bridge.post = (cmd, data, { dataKey } = bridge, node) => {
+  bridge.post = (cmd, data, realm, node) => {
     // Constructing the event now so we don't send anything if it throws on invalid `node`
     const evtNode = node && new SafeMouseEvent(destId, { __proto__: null, relatedTarget: node });
-    fireBridgeEvent(destId, { cmd, data, dataKey, node: !!evtNode });
+    fireBridgeEvent(destId, { cmd, data, node: !!evtNode });
     if (evtNode) window::fire(evtNode);
   };
 };
