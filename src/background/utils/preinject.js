@@ -1,6 +1,6 @@
 import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
 import {
-  INJECT_AUTO, INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
+  INJECT_AUTO, INJECT_CONTENT, INJECT_INTO, INJECT_MAPPING, INJECT_PAGE,
   FEEDBACK, FORCE_CONTENT, METABLOCK_RE, MORE, NEWLINE_END_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
@@ -39,7 +39,6 @@ const cache = initCache({
   },
 });
 const INJECT = 'inject';
-const INJECT_INTO = 'injectInto';
 // KEY_XXX for hooked options
 const KEY_EXPOSE = 'expose';
 const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
@@ -281,7 +280,7 @@ function prepare(key, url, tabId, frameId, forceContent) {
 async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) {
   const errors = [];
   const bag = await getScriptsByURL(url, !frameId, errors);
-  const { envDelayed, disabledIds: ids, [ENV_SCRIPTS]: scripts } = bag;
+  const { envDelayed, allIds, [ENV_SCRIPTS]: scripts } = bag;
   bag[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
   propsToClear::forEachValue(val => {
     if (val !== true) res[val] = bag[val];
@@ -301,11 +300,11 @@ async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) 
     ),
     [MORE]: moreKey,
     cache: bag.cache,
-    ids, // content bridge adds the actually running ids and sends via SetPopup
+    ids: allIds,
     info: {
       ua,
     },
-    errors: errors.filter(err => !ids.includes(+err.slice(err.lastIndexOf('#') + 1))).join('\n'),
+    errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
   });
   res[FEEDBACK] = feedback;
   res[CSAPI_REG] = contentScriptsAPI && !xhrInject
@@ -462,7 +461,7 @@ function forceContentInjection(bag) {
   const inject = bag[INJECT];
   inject[FORCE_CONTENT] = true;
   inject[ENV_SCRIPTS].forEach(scr => {
-    // When script wants `page`, the result below will be `true` so the script goes into `failedIds`
+    // When script wants `page`, the result below will be `true` so the script has a "bad realm" id
     const failed = !isContentRealm(scr, true);
     scr.code = failed || '';
     bag[FEEDBACK].push([

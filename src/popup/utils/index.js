@@ -3,7 +3,7 @@ import { reactive } from 'vue';
 export const store = reactive({
   scripts: [],
   frameScripts: [],
-  scriptIds: [],
+  idMap: {},
   commands: [],
   domain: '',
   injectionFailure: null,

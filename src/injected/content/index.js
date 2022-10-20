@@ -6,10 +6,10 @@ import './notifications';
 import './requests';
 import './tabs';
 import { sendCmd } from './util';
-import { isEmpty, FORCE_CONTENT, INJECT_CONTENT } from '../util';
+import { isEmpty, FORCE_CONTENT, INJECT_CONTENT, INJECT_INTO } from '../util';
 import { Run } from './cmd-run';
 
-const { invokableIds } = bridge;
+const { ids } = bridge;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 async function init() {
@@ -33,10 +33,8 @@ async function init() {
       ? await getDataFF(dataPromise)
       : await dataPromise
   );
-  pickIntoNullObj(bridge, data, [
-    'ids',
-    'injectInto',
-  ]);
+  assign(ids, data.ids);
+  bridge[INJECT_INTO] = data[INJECT_INTO];
   if (data.expose && !isXml && injectPageSandbox(contentId, webId)) {
     bridge.addHandlers({ GetScriptVer: true }, true);
     bridge.post('Expose');
@@ -50,16 +48,13 @@ async function init() {
 }
 
 bridge.addBackgroundHandlers({
-  Command(data) {
-    const realm = invokableIds::includes(data.id) && INJECT_CONTENT;
-    bridge.post('Command', data, realm);
-  },
+  Command: data => bridge.post('Command', data, ids[data.id]),
   Run: id => Run(id, INJECT_CONTENT),
   UpdatedValues(data) {
     const dataPage = createNullObj();
     const dataContent = createNullObj();
     objectKeys(data)::forEach((id) => {
-      (invokableIds::includes(+id) ? dataContent : dataPage)[id] = data[id];
+      (ids[id] === INJECT_CONTENT ? dataContent : dataPage)[id] = data[id];
     });
     if (!isEmpty(dataPage)) bridge.post('UpdatedValues', dataPage);
     if (!isEmpty(dataContent)) bridge.post('UpdatedValues', dataContent, INJECT_CONTENT);

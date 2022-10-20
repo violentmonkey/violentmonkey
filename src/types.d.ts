@@ -212,7 +212,7 @@ declare namespace VMInjection {
     disabledIds?: number[];
     /** Only present in envStart */
     envDelayed?: Env;
-    ids: number[];
+    ids: { [id: string]: NumBool };
     promise: Promise<Env>;
     reqKeys: string[];
     require: StringMap;

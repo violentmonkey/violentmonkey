@@ -257,7 +257,7 @@ export function getScriptsByURL(url, isTop, errors) {
  * @return {Promise<VMInjection.Env>}
  */
 async function getScriptEnv(scripts) {
-  const disabledIds = [];
+  const allIds = {};
   const [envStart, envDelayed] = [0, 1].map(() => ({
     depsMap: {},
     [ENV_SCRIPTS]: [],
@@ -268,8 +268,7 @@ async function getScriptEnv(scripts) {
   }
   scripts.forEach((script) => {
     const { id } = script.props;
-    if (!script.config.enabled) {
-      disabledIds.push(id);
+    if (!(allIds[id] = +!!script.config.enabled)) {
       return;
     }
     const { meta, custom } = script;
@@ -310,7 +309,7 @@ async function getScriptEnv(scripts) {
   if (envDelayed.ids.length) {
     envDelayed.promise = makePause().then(() => readEnvironmentData(envDelayed));
   }
-  return Object.assign(envStart, { disabledIds, envDelayed });
+  return Object.assign(envStart, { allIds, envDelayed });
 }
 
 async function readEnvironmentData(env) {

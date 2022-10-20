@@ -2,7 +2,7 @@ import bridge from './bridge';
 import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import {
   bindEvents, fireBridgeEvent,
-  INJECT_CONTENT, INJECT_MAPPING, INJECT_PAGE,
+  ID_BAD_REALM, ID_INJECTING, INJECT_CONTENT, INJECT_INTO, INJECT_MAPPING, INJECT_PAGE,
   MORE, FEEDBACK, FORCE_CONTENT,
 } from '../util';
 import { Run } from './cmd-run';
@@ -13,6 +13,7 @@ import { Run } from './cmd-run';
  * INIT_FUNC_NAME ids even though we change it now with each release. */
 const VAULT_WRITER = `${IS_FIREFOX ? VM_UUID : INIT_FUNC_NAME}VW`;
 const VAULT_WRITER_ACK = `${VAULT_WRITER}+`;
+const tardyQueue = [];
 let contLists;
 let pgLists;
 /** @type {Object<string,VMRealmData>} */
@@ -153,7 +154,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
   }
   const feedback = data.scripts.map((script) => {
     const { id } = script.props;
-    const realm = INJECT_MAPPING[script.injectInto].find(key => (
+    const realm = INJECT_MAPPING[script[INJECT_INTO]].find(key => (
       key === INJECT_CONTENT || pageInjectable
     ));
     const { runAt } = script;
@@ -165,8 +166,7 @@ export async function injectScripts(contentId, webId, data, isXml) {
       realmData.is = true;
       if (pathMap) bridge.pathMaps[id] = pathMap;
     } else {
-      bridge.failedIds.push(id);
-      bridge.ids.push(id);
+      bridge.ids[id] = ID_BAD_REALM;
     }
     return [
       script.dataKey,
@@ -218,8 +218,7 @@ async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
     } else if (pageInjectable) {
       safePush(pgLists[runAt], script);
     } else {
-      safePush(bridge.failedIds, id);
-      safePush(bridge.ids, id);
+      bridge.ids[id] = ID_BAD_REALM;
     }
   });
   if (document::getReadyState() === 'loading') {
@@ -310,6 +309,8 @@ function injectAll(runAt) {
       if (realm === INJECT_PAGE && !IS_FIREFOX) {
         injectList(runAt);
       }
+      safePush(tardyQueue, items);
+      nextTask()::then(tardyQueueCheck);
     }
   }
   if (runAt !== 'start' && contLists[runAt].length) {
@@ -342,6 +343,20 @@ function setupContentInvoker(contentId, webId) {
       : postViaBridge;
     fn(cmd, params, undefined, node);
   };
+}
+
+/**
+ * Chrome doesn't fire a syntax error event, so we'll mark ids that didn't start yet
+ * as "still starting", so the popup can show them accordingly.
+ */
+function tardyQueueCheck() {
+  for (const items of tardyQueue) {
+    for (const script of items) {
+      const id = script.props.id;
+      if (bridge.ids[id] === 1) bridge.ids[id] = ID_INJECTING;
+    }
+  }
+  tardyQueue.length = 0;
 }
 
 function tellBridgeToWriteVault(vaultId, wnd) {

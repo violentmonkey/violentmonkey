@@ -1,8 +1,9 @@
 import bridge from './bridge';
 import { sendCmd } from './util';
-import { INJECT_CONTENT } from '../util';
+import { INJECT_PAGE } from '../util';
 
-const { runningIds } = bridge;
+const { ids } = bridge;
+const runningIds = [];
 const resolvedPromise = promiseResolve();
 let badgePromise;
 let numBadgesSent = 0;
@@ -10,10 +11,7 @@ let bfCacheWired;
 
 export function Run(id, realm) {
   safePush(runningIds, id);
-  safePush(bridge.ids, id);
-  if (realm === INJECT_CONTENT) {
-    safePush(bridge.invokableIds, id);
-  }
+  ids[id] = realm || INJECT_PAGE;
   if (!badgePromise) {
     badgePromise = resolvedPromise::then(throttledSetBadge);
   }

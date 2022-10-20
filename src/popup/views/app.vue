@@ -402,7 +402,7 @@ export default {
     checkReload() {
       if (options.get('autoReload')) {
         browser.tabs.reload(store.currentTab.id);
-        store.scriptIds.length = 0;
+        store.idMap = {};
         store.scripts.length = 0;
         store.frameScripts.length = 0;
         mutex.init();

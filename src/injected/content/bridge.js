@@ -16,12 +16,11 @@ const assignHandlers = (dest, src, force) => {
  */
 const bridge = {
   __proto__: null,
-  ids: [], // all ids including the disabled ones for SetPopup
-  runningIds: [],
-  // userscripts running in the content script context are messaged via invokeGuest
-  /** @type {Number[]} */
-  invokableIds: [],
-  failedIds: [],
+  /**
+   * -1 = bad realm, 0 = disabled, 1 = enabled, 2 = starting, 'page' | 'content' = running
+   * @type {{ [id: string]: -1 | 0 | 1 | 2 | 'page' | 'content' }}
+   */
+  ids: createNullObj(),
   cache: createNullObj(),
   pathMaps: createNullObj(),
   /** @type {function(VMInjection)[]} */

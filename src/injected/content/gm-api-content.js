@@ -1,5 +1,6 @@
 import bridge from './bridge';
 import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
+import { INJECT_INTO } from '../util';
 
 const menus = createNullObj();
 let setPopupThrottle;
@@ -61,11 +62,6 @@ export async function sendSetPopup(isDelayed) {
       await setPopupThrottle;
       setPopupThrottle = null;
     }
-    sendCmd('SetPopup', createNullObj({ menus }, bridge, [
-      'ids',
-      'injectInto',
-      'runningIds',
-      'failedIds',
-    ]));
+    sendCmd('SetPopup', createNullObj({ menus }, bridge, ['ids', INJECT_INTO]));
   }
 }

@@ -3,7 +3,7 @@
 export const INJECT_AUTO = 'auto';
 export const INJECT_PAGE = 'page';
 export const INJECT_CONTENT = 'content';
-
+export const INJECT_INTO = 'injectInto';
 export const INJECT_MAPPING = {
   __proto__: null,
   // `auto` tries to provide `window` from the real page as `unsafeWindow`
@@ -13,6 +13,8 @@ export const INJECT_MAPPING = {
   // inject into content context only
   [INJECT_CONTENT]: [INJECT_CONTENT],
 };
+export const ID_BAD_REALM = -1;
+export const ID_INJECTING = 2;
 
 // Allow metadata lines to start with WHITESPACE? '//' SPACE
 // Allow anything to follow the predefined text of the metaStart/End

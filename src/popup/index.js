@@ -1,6 +1,8 @@
 import '@/common/browser';
 import { sendCmdDirectly } from '@/common';
-import { INJECT_PAGE } from '@/common/consts';
+import {
+  ID_BAD_REALM, ID_INJECTING, INJECT_CONTENT, INJECT_INTO, INJECT_PAGE,
+} from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { forEachValue, mapEntry } from '@/common/object';
@@ -20,8 +22,9 @@ Object.assign(handlers, {
      * because we only show the iframe menu for unique scripts that don't run in the main page */
     const isTop = src.frameId === 0;
     if (!isTop) await mutex.ready;
-    const ids = data.ids.filter(id => !store.scriptIds.includes(id));
-    store.scriptIds.push(...ids);
+    const idMap = data.ids::mapEntry(null, (id, val) => store.idMap[id] !== val && id);
+    const ids = Object.keys(idMap).map(Number);
+    Object.assign(store.idMap, idMap);
     if (isTop) {
       mutex.resolve();
       store.commands = data.menus::mapEntry(Object.keys);
@@ -36,16 +39,18 @@ Object.assign(handlers, {
       metas.forEach(script => {
         loadScriptIcon(script, data);
         const { id } = script.props;
-        script.runs = data.runningIds.includes(id);
+        const state = idMap[id];
+        const badRealm = state === ID_BAD_REALM;
+        const renderedScript = scope.find(({ props }) => props.id === id);
+        if (renderedScript) script = renderedScript;
+        else scope.push(script);
+        script.runs = state === INJECT_CONTENT || state === INJECT_PAGE;
         script.pageUrl = src.url; // each frame has its own URL
-        if (data.failedIds.includes(id)) {
-          script.failed = true;
-          if (!store.injectionFailure) {
-            store.injectionFailure = { fixable: data.injectInto === INJECT_PAGE };
-          }
+        script.failed = badRealm || state === ID_INJECTING;
+        if (badRealm && !store.injectionFailure) {
+          store.injectionFailure = { fixable: data[INJECT_INTO] === INJECT_PAGE };
         }
       });
-      scope.push(...metas);
     }
   },
 });

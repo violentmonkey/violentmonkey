@@ -2,6 +2,7 @@ import bridge from './bridge';
 import { makeGmApi } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
 import { makeComponentUtils } from './util';
+import { INJECT_INTO } from '../util';
 
 /** Name in Greasemonkey4 -> name in GM */
 const GM4_ALIAS = {
@@ -91,7 +92,7 @@ function makeGmInfo(gmInfo, meta, resources) {
   });
   // No __proto__:null because these are standard objects for userscripts
   setOwnProp(meta, 'resources', resourcesArr);
-  setOwnProp(gmInfo, 'injectInto', bridge.mode);
+  setOwnProp(gmInfo, INJECT_INTO, bridge.mode);
   setOwnProp(gmInfo, 'script', meta);
   return gmInfo;
 }
