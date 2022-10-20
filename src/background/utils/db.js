@@ -302,7 +302,7 @@ async function getScriptEnv(scripts) {
         }
       }
     }
-    env[ENV_SCRIPTS].push({ ...script, runAt });
+    env[ENV_SCRIPTS].push({ ...script, runAt }); // must be a copy because we modify it in preinject
   });
   if (envStart.ids.length) {
     Object.assign(envStart, await readEnvironmentData(envStart));

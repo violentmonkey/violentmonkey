@@ -239,8 +239,11 @@ declare namespace VMInjection {
     dataKey: string;
     displayName: string;
     code: string;
+    // `injectInto` and `script` are added in makeGmApiWrapper
+    gmInfo: VMScriptGMInfoObject;
     injectInto: VMScriptInjectInto;
-    metaStr: string;
+    // `resources` is still an object, converted later in makeGmApiWrapper
+    meta: VMScript.Meta | VMScriptGMInfoScriptMeta;
     runAt?: 'start' | 'body' | 'end' | 'idle';
     values?: StringMap;
   }

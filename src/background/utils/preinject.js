@@ -46,6 +46,13 @@ const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
 const KEY_IS_APPLIED = 'isApplied';
 const KEY_XHR_INJECT = 'xhrInject';
 const GRANT_NONE_VARS = '{GM,GM_info,unsafeWindow,cloneInto,createObjectIn,exportFunction}';
+const META_KEYS_TO_ENSURE = [
+  'description',
+  'name',
+  'namespace',
+  'runAt',
+  'version',
+];
 const envStartKey = {};
 const expose = {};
 let isApplied;
@@ -364,14 +371,53 @@ function prepareScript(script) {
     displayName,
     // code will be `true` if the desired realm is PAGE which is not injectable
     code: isContent ? '' : forceContent || injectedCode,
-    metaStr: code.match(METABLOCK_RE)[1] || '',
     values: value[id] || null,
+    ...prepareGmInfo(script, meta, code),
   });
   return isContent && [
     dataKey,
     script.runAt,
     !wrap && id, // unwrapped scripts need an explicit `Run` message
   ];
+}
+
+function prepareGmInfo(script, meta, code) {
+  const metaCopy = {};
+  meta::forEachEntry(([key, val]) => {
+    switch (key) {
+    case 'match': // -> matches
+    case 'excludeMatch': // -> excludeMatches
+      key += 'e';
+      // fallthrough
+    case 'exclude': // -> excludes
+    case 'include': // -> includes
+      key += 's';
+      break;
+    default:
+    }
+    metaCopy[key] = val;
+  });
+  META_KEYS_TO_ENSURE.forEach((key) => {
+    if (!metaCopy[key]) metaCopy[key] = '';
+  });
+  let key;
+  let val;
+  if (!metaCopy[key = 'homepageURL'] && (val = metaCopy.homepage)) {
+    metaCopy[key] = val;
+  }
+  return {
+    // overwriting existing props is ok because `script` is a copy, see getScriptEnv
+    meta: metaCopy,
+    // `injectInto`, `resources`, `script` will be added in makeGmApiWrapper
+    gmInfo: {
+      platform: ua,
+      scriptHandler: 'Violentmonkey',
+      scriptMetaStr: code.match(METABLOCK_RE)[1] || '',
+      scriptWillUpdate: !!script.config.shouldUpdate,
+      uuid: script.props.uuid,
+      version: process.env.VM_VER,
+    },
+  };
 }
 
 const resolveDataCodeStr = `(${function _(data) {

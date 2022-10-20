@@ -1,7 +1,7 @@
 import bridge from './bridge';
 import { makeGmApi } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
-import { makeComponentUtils, safeConcat } from './util';
+import { makeComponentUtils } from './util';
 
 /** Name in Greasemonkey4 -> name in GM */
 const GM4_ALIAS = {
@@ -44,7 +44,7 @@ export function makeGmApiWrapper(script) {
     dataKey: script.dataKey,
     resCache: createNullObj(),
   };
-  const gmInfo = makeGmInfo(script, resources);
+  const gmInfo = makeGmInfo(script.gmInfo, meta, resources);
   const gm = {
     __proto__: null,
     GM: {
@@ -85,63 +85,16 @@ export function makeGmApiWrapper(script) {
   return { gm, wrapper };
 }
 
-function makeGmInfo(script, resources) {
-  // TODO: move into background.js
-  const { meta } = script;
-  const { ua } = bridge;
-  /* Making a copy with a standard Object prototype.
-   * Not using assign({}, obj) because it can be spoofed/broken via Object prototype.
-   * Not using JSON.stringify+parse as it calls toJSON which may break arrays inside. */
-  const metaCopy = {};
-  const uaCopy = {};
-  objectKeys(ua)::forEach(key => {
-    setOwnProp(uaCopy, key, ua[key]);
+function makeGmInfo(gmInfo, meta, resources) {
+  const resourcesArr = objectKeys(resources);
+  resourcesArr::forEach((name, i) => {
+    resourcesArr[i] = { name, url: resources[name] };
   });
-  let val;
-  objectKeys(meta)::forEach((key) => {
-    val = meta[key];
-    switch (key) {
-    case 'match': // -> matches
-    case 'excludeMatch': // -> excludeMatches
-      key += 'e';
-      // fallthrough
-    case 'exclude': // -> excludes
-    case 'include': // -> includes
-      key += 's';
-      val = safeConcat(val);
-      break;
-    default:
-    }
-    setOwnProp(metaCopy, key, val);
-  });
-  [
-    'description',
-    'name',
-    'namespace',
-    'runAt',
-    'version',
-  ]::forEach((key) => {
-    if (!getOwnProp(metaCopy, key)) setOwnProp(metaCopy, key, '');
-  });
-  val = objectKeys(resources);
-  val::forEach((name, i) => {
-    val[i] = { name, url: resources[name] };
-  });
-  setOwnProp(metaCopy, 'resources', val);
-  if (!getOwnProp(metaCopy, 'homepageURL') && (val = getOwnProp(metaCopy, 'homepage'))) {
-    setOwnProp(metaCopy, 'homepageURL', val);
-  }
-  return {
-    // No __proto__:null because it's a standard object for userscripts
-    uuid: script.props.uuid,
-    scriptMetaStr: script.metaStr,
-    scriptWillUpdate: !!script.config.shouldUpdate,
-    scriptHandler: 'Violentmonkey',
-    version: process.env.VM_VER,
-    injectInto: bridge.mode,
-    platform: uaCopy,
-    script: metaCopy,
-  };
+  // No __proto__:null because these are standard objects for userscripts
+  setOwnProp(meta, 'resources', resourcesArr);
+  setOwnProp(gmInfo, 'injectInto', bridge.mode);
+  setOwnProp(gmInfo, 'script', meta);
+  return gmInfo;
 }
 
 function makeGmMethodCaller(gmMethod, context, isAsync) {
