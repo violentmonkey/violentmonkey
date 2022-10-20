@@ -209,10 +209,10 @@ declare namespace VMInjection {
     /** Dependencies by key to script ids */
     depsMap: { [url: string]: number[] };
     /** Only present in envStart */
-    disabledIds?: number[];
+    allIds?: { [id: string]: NumBool };
     /** Only present in envStart */
     envDelayed?: Env;
-    ids: { [id: string]: NumBool };
+    ids: number[];
     promise: Promise<Env>;
     reqKeys: string[];
     require: StringMap;

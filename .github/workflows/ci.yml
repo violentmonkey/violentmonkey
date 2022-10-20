@@ -8,6 +8,7 @@ on:
       - 'v*' # version-tagged commits are releases which have their own workflow
     paths-ignore:
       - '.github/**' # this ci.yml is also excluded so you need to re-run it explicitly if necessary
+      - src/types.d.ts
       - LICENSE
       - README.md
   pull_request:
