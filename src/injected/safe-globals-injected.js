@@ -119,7 +119,7 @@ export const log = (level, ...args) => {
  * invalid props like an inherited setter when you only provide `{value}`.
  */
 export const safeDefineProperty = (obj, key, desc) => (
-  defineProperty(obj, key, createNullObj(desc))
+  defineProperty(obj, key, getPrototypeOf(desc) ? createNullObj(desc) : desc)
 );
 
 /** Unlike ::push() this one doesn't call possibly spoofed Array.prototype setters */

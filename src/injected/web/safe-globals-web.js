@@ -33,11 +33,11 @@ export let
   // Object
   apply,
   assign,
-  bind,
   defineProperty,
   describeProperty,
   getOwnPropertyNames,
   getOwnPropertySymbols,
+  getPrototypeOf,
   objectKeys,
   objectValues,
   // Object.prototype
@@ -56,6 +56,7 @@ export let
   charCodeAt,
   slice,
   // safeCall
+  safeBind,
   safeCall,
   // various values
   builtinGlobals,
@@ -84,7 +85,6 @@ export let
  * or window[0] before our content script runs at document_start, https://crbug.com/1261964 */
 export const VAULT = (() => {
   let ArrayP;
-  let ElementP;
   let SafeObject;
   let StringP;
   let i = -1;
@@ -128,11 +128,11 @@ export const VAULT = (() => {
     describeProperty = res[i += 1] || SafeObject.getOwnPropertyDescriptor,
     getOwnPropertyNames = res[i += 1] || SafeObject.getOwnPropertyNames,
     getOwnPropertySymbols = res[i += 1] || SafeObject.getOwnPropertySymbols,
+    getPrototypeOf = res[i += 1] || SafeObject.getPrototypeOf,
     assign = res[i += 1] || SafeObject.assign,
     objectKeys = res[i += 1] || SafeObject.keys,
     objectValues = res[i += 1] || SafeObject.values,
     apply = res[i += 1] || SafeObject.apply,
-    bind = res[i += 1] || SafeObject.bind,
     // Object.prototype
     hasOwnProperty = res[i += 1] || SafeObject[PROTO].hasOwnProperty,
     objectToString = res[i += 1] || SafeObject[PROTO].toString,
@@ -142,12 +142,13 @@ export const VAULT = (() => {
     forEach = res[i += 1] || ArrayP.forEach,
     indexOf = res[i += 1] || ArrayP.indexOf,
     // Element.prototype
-    remove = res[i += 1] || (ElementP = src.Element[PROTO]).remove,
+    remove = res[i += 1] || src.Element[PROTO].remove,
     // String.prototype
     charCodeAt = res[i += 1] || (StringP = src.String[PROTO]).charCodeAt,
     slice = res[i += 1] || StringP.slice,
     // safeCall
     safeCall = res[i += 1] || (call = SafeObject.call).bind(call),
+    safeBind = res[i += 1] || call.bind(SafeObject.bind),
     // various methods
     URLToString = res[i += 1] || src.URL[PROTO].toString,
     createObjectURL = res[i += 1] || src.URL.createObjectURL,

@@ -101,5 +101,5 @@ function makeGmMethodCaller(gmMethod, context, isAsync) {
   // keeping the native console.log intact
   if (gmMethod === gmApi.GM_log) return gmMethod;
   if (isAsync) context = assign({ __proto__: null, async: true }, context);
-  return vmOwnFunc(gmMethod::bind(context));
+  return vmOwnFunc(safeBind(gmMethod, context));
 }

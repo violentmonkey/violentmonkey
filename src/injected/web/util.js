@@ -58,9 +58,6 @@ export const jsonDump = (value, stack) => {
 export const FastLookup = (hubs = createNullObj()) => {
   /** @namespace FastLookup */
   return {
-    add(val) {
-      getHub(val, true)[val] = true;
-    },
     clone() {
       const clone = createNullObj();
       if (process.env.DEBUG) throwIfProtoPresent(clone);
@@ -69,18 +66,17 @@ export const FastLookup = (hubs = createNullObj()) => {
       }
       return FastLookup(clone);
     },
-    delete(val) {
-      delete getHub(val)?.[val];
-    },
-    has: val => getHub(val)?.[val],
+    delete: key => delete getHub(key)?.[key],
+    get: key => getHub(key)?.[key],
+    set: (key, val) => (getHub(key, true)[key] = val),
     toArray: () => {
       const values = objectValues(hubs);
       values::forEach((val, i) => { values[i] = objectKeys(val); });
       return safeConcat::apply(null, values);
     },
   };
-  function getHub(val, autoCreate) {
-    const group = val.length ? val[0] : ''; // length is unforgeable, index getters aren't
+  function getHub(key, autoCreate) {
+    const group = key.length ? key[0] : ''; // length is unforgeable, index getters aren't
     const hub = hubs[group] || (
       autoCreate ? (hubs[group] = createNullObj())
         : null
