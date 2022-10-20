@@ -29,7 +29,7 @@ export default function initialize(
   }
   if (invokeHost) {
     bridge.mode = INJECT_CONTENT;
-    bridge.post = (cmd, data, node) => {
+    bridge.post = (cmd, data, realm, node) => {
       invokeHost({ cmd, data, node }, INJECT_CONTENT);
     };
     invokeGuest = (cmd, data, realm, node) => {

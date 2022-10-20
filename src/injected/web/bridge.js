@@ -45,7 +45,7 @@ function postWithCallback(cmd, data, node, cb, customCallbackId) {
   } else {
     data = { [CALLBACK_ID]: id, data };
   }
-  bridge.post(cmd, data, node);
+  bridge.post(cmd, data, undefined, node);
   if (!cb) return callbackResult;
 }
 
