@@ -26,6 +26,7 @@ export let
   SafeSymbol,
   fire,
   getWindowLength,
+  getWindowParent,
   off,
   on,
   // Symbol
@@ -170,6 +171,7 @@ export const VAULT = (() => {
     getRelatedTarget = res[i += 1] || describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get,
     getWindowLength = res[i += 1] || describeProperty(srcWindow, 'length').get
       || (() => getOwnProp(window, 'length', 1e9)), // Chrome<=85 https://crrev.com/793165
+    getWindowParent = res[i += 1] || describeProperty(srcWindow, 'parent').get,
     // various values
     builtinGlobals = res[i += 1] || [
       getOwnPropertyNames(srcWindow),
