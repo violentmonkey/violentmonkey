@@ -15,7 +15,6 @@ declare type PlainJSONValue = browser.extensionTypes.PlainJSONValue;
  */
 declare interface GMContext {
   async?: boolean;
-  dataKey: string;
   id: number;
   resCache: StringMap;
   resources: StringMap;
