@@ -16,19 +16,23 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     '"': /.*?"/,
     '`': /.*?`/,
   };
-  const kEnsureProperLocalModeStatePostJsExpr = 'ensureProperLocalModeStatePostJsExpr';
-  const kInJsExprInStringTemplate = 'inJsExprInStringTemplate';
-  const kIndexOfJsExprStart = 'indexOfJsExprStart';
-  const kJsExprDepthInStringTemplate = 'jsExprDepthInStringTemplate';
-  const kJsState = 'jsState';
-  const kLocalHtmlPlainStringEndPos = 'localHtmlPlainStringEndPos';
-  const kLocalMode = 'localMode';
-  const kLocalState = 'localState';
-  const kMaybeLocalContext = 'maybeLocalContext';
-  const kQuoteCharSurroundJsExpr = 'quoteCharSurroundJsExpr';
+  // Using # to prevent inlining in Terser
+  const kEnsureProperLocalModeStatePostJsExpr = '#ensureProperLocalModeStatePostJsExpr';
+  const kInJsExprInStringTemplate = '#inJsExprInStringTemplate';
+  const kIndexOfJsExprStart = '#indexOfJsExprStart';
+  const kJsExprDepthInStringTemplate = '#jsExprDepthInStringTemplate';
+  const kJsState = '#jsState';
+  const kLocalHtmlPlainStringEndPos = '#localHtmlPlainStringEndPos';
+  const kLocalMode = '#localMode';
+  const kLocalState = '#localState';
+  const kMaybeLocalContext = '#maybeLocalContext';
+  const kQuoteCharSurroundJsExpr = '#quoteCharSurroundJsExpr';
   const kTokenize = 'tokenize';
-  const kTokenizePostJsExpr = 'tokenizePostJsExpr';
+  const kTokenizePostJsExpr = '#tokenizePostJsExpr';
   const { StringStream } = CodeMirror;
+  const cmCopyState = CodeMirror.copyState;
+  const cmStartState = CodeMirror.startState;
+  const cmPass = CodeMirror.Pass;
 
   const jsMode = CodeMirror.getMode(config, { name: 'javascript' });
   const jsTokenQuasi = (() => {
@@ -196,7 +200,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     state[kJsState][kTokenize] = jsTokenQuasi;
     // switch to local mode for subsequent text
     state[kLocalMode] = this.mode;
-    state[kLocalState] = CodeMirror.startState(state[kLocalMode]);
+    state[kLocalState] = cmStartState(state[kLocalMode]);
     state[kInJsExprInStringTemplate] = false;
     state[kJsExprDepthInStringTemplate] = 0;
   }
@@ -391,7 +395,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     stream.backUp(stream.pos - stream.start - 1);
     // switch to local mode for subsequent text
     // and use end quote position to detect the end of the local html mode
-    (state[kLocalState] = CodeMirror.startState(state[kLocalMode] = this.mode))
+    (state[kLocalState] = cmStartState(state[kLocalMode] = this.mode))
       [kLocalHtmlPlainStringEndPos] = oldPos;
   }
 
@@ -660,7 +664,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     startState: () => ({
       [kInJsExprInStringTemplate]: false,
       [kJsExprDepthInStringTemplate]: 0,
-      [kJsState]: CodeMirror.startState(jsMode),
+      [kJsState]: cmStartState(jsMode),
       [kLocalMode]: null,
       [kLocalState]: null,
       [kMaybeLocalContext]: null,
@@ -671,10 +675,10 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     copyState: state => ({
       [kInJsExprInStringTemplate]: state[kInJsExprInStringTemplate],
       [kJsExprDepthInStringTemplate]: state[kJsExprDepthInStringTemplate],
-      [kJsState]: CodeMirror.copyState(jsMode, state[kJsState]),
+      [kJsState]: cmCopyState(jsMode, state[kJsState]),
       [kLocalMode]: state[kLocalMode],
       [kLocalState]: state[kLocalState]
-        ? CodeMirror.copyState(state[kLocalMode], state[kLocalState])
+        ? cmCopyState(state[kLocalMode], state[kLocalState])
         : null,
       [kMaybeLocalContext]: state[kMaybeLocalContext],
       [kQuoteCharSurroundJsExpr]: state[kQuoteCharSurroundJsExpr],
@@ -692,7 +696,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
       if (localMode.indent) {
         return localMode.indent(state[kLocalState], textAfter, line);
       }
-      return CodeMirror.Pass;
+      return cmPass;
     },
 
     innerMode(state) {

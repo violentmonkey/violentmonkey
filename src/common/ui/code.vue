@@ -296,7 +296,7 @@ export default {
       Object.assign(cm.doc.mode, {
         token(stream, state) {
           const res = this::tokenizer(stream, state);
-          return res === 'string-2' && state.jsState.lastType === 'regexp'
+          return res === 'string-2' && state['#jsState'].lastType === 'regexp'
             ? 'string-2 regexp'
             : res;
         },
