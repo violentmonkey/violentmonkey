@@ -73,7 +73,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
           func::apply(thisArg, args);
         } catch (e) {
           if (e[MESSAGE] === 'Extension context invalidated.') {
-            console.error('Please reload the tab to restore Violentmonkey API for userscripts.');
+            console.error(`Please reload the tab to restore ${VIOLENTMONKEY} API for userscripts.`);
           } else {
             throw e;
           }

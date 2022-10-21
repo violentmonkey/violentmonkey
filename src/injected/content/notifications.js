@@ -1,9 +1,9 @@
-import bridge from './bridge';
+import bridge, { addBackgroundHandlers, addHandlers } from './bridge';
 import { sendCmd } from './util';
 
 const notifications = createNullObj();
 
-bridge.addHandlers({
+addHandlers({
   async Notification(options, realm) {
     const nid = await sendCmd('Notification', options);
     notifications[nid] = { id: options.id, realm };
@@ -18,7 +18,7 @@ bridge.addHandlers({
   },
 });
 
-bridge.addBackgroundHandlers({
+addBackgroundHandlers({
   NotificationClick(nid) {
     const n = notifications[nid];
     if (n) bridge.post('NotificationClicked', n.id, n.realm);

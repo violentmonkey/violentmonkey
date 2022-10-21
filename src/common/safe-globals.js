@@ -26,3 +26,4 @@ export const safeCall = Object.call.bind(Object.call);
 export const IS_FIREFOX = !global.chrome.app;
 export const isFunction = val => typeof val === 'function';
 export const isObject = val => val != null && typeof val === 'object';
+export const VIOLENTMONKEY = 'Violentmonkey';

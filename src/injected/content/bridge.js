@@ -3,14 +3,24 @@ import { sendCmd } from './util';
 
 const handlers = createNullObj();
 const bgHandlers = createNullObj();
-const onScripts = [];
-const assignHandlers = (dest, src, force) => {
+/** @type {function(VMInjection)[]} */
+export const onScripts = [];
+const addHandlersImpl = (dest, src, force) => {
   if (force) {
     assign(dest, src);
   } else {
     onScripts.push(() => assign(dest, src));
   }
 };
+/**
+ * Without `force` handlers will be added only when userscripts are about to be injected.
+ * { CommandName: true } will relay the request via sendCmd as is.
+ * @param {Object.<string, MessageFromGuestHandler>} obj
+ * @param {boolean} [force]
+ */
+export const addHandlers = addHandlersImpl.bind({}, handlers);
+export const addBackgroundHandlers = addHandlersImpl.bind({}, bgHandlers);
+
 /**
  * @property {VMBridgePostFunc} post
  */
@@ -23,21 +33,6 @@ const bridge = {
   ids: createNullObj(),
   cache: createNullObj(),
   pathMaps: createNullObj(),
-  /** @type {function(VMInjection)[]} */
-  onScripts,
-  /**
-   * Without `force` handlers will be added only when userscripts are about to be injected.
-   * @param {Object.<string, MessageFromGuestHandler>} obj
-   * @param {boolean} [force]
-   */
-  addHandlers(obj, force) {
-    assignHandlers(handlers, obj, force);
-  },
-  /** { CommandName: true } will relay the request via sendCmd as is.
-   * Without `force` handlers will be added only when userscripts are about to be injected. */
-  addBackgroundHandlers(obj, force) {
-    assignHandlers(bgHandlers, obj, force);
-  },
   // realm is provided when called directly via invokeHost
   async onHandle({ cmd, data, node }, realm) {
     const handle = handlers[cmd];

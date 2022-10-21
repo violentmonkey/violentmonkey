@@ -1,4 +1,4 @@
-import bridge from './bridge';
+import bridge, { addBackgroundHandlers, addHandlers } from './bridge';
 import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 import { INJECT_INTO } from '../util';
 
@@ -6,14 +6,14 @@ const menus = createNullObj();
 let setPopupThrottle;
 let isPopupShown;
 
-bridge.addBackgroundHandlers({
+addBackgroundHandlers({
   PopupShown(state) {
     isPopupShown = state;
     sendSetPopup();
   },
 }, true);
 
-bridge.addHandlers({
+addHandlers({
   /** @this {Node} */
   AddElement({ tag, attrs, cbId }, realm) {
     let el;

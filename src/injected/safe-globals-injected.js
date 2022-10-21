@@ -14,11 +14,12 @@ const global = (function _() {
  * The document's value can change only in about:blank but we don't inject there. */
 const { document, window } = global;
 export const PROTO = 'prototype';
-export const IS_TOP = window.top === window;
+export const IS_TOP = top === window;
 export const WINDOW_CLOSE = 'window.close';
 export const WINDOW_FOCUS = 'window.focus';
 export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 export const CALLBACK_ID = '__CBID';
+export const VIOLENTMONKEY = 'Violentmonkey';
 
 export const throwIfProtoPresent = process.env.DEBUG && (obj => {
   if (!obj || obj.__proto__) { // eslint-disable-line no-proto
@@ -50,7 +51,7 @@ export const setOwnProp = (obj, key, value, mutable = true) => (
   })
 );
 
-export const vmOwnFuncToString = () => '[Violentmonkey property]';
+export const vmOwnFuncToString = () => `[${VIOLENTMONKEY} property]`;
 
 /** `dst` must have a null proto */
 export const pickIntoNullObj = (dst, src, keys) => {
@@ -107,7 +108,7 @@ export const safeGetUniqId = (prefix = 'VM') => prefix + mathRandom();
 
 /** args is [tags?, ...rest] */
 export const log = (level, ...args) => {
-  let s = '[Violentmonkey]';
+  let s = `[${VIOLENTMONKEY}]`;
   if (args[0]) args[0]::forEach(tag => { s += `[${tag}]`; });
   args[0] = s;
   logging[level]::apply(logging, args);

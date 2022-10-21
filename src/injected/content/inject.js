@@ -1,4 +1,4 @@
-import bridge from './bridge';
+import bridge, { addHandlers } from './bridge';
 import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import {
   bindEvents, fireBridgeEvent,
@@ -50,7 +50,7 @@ if (IS_FIREFOX) {
   });
 }
 
-bridge.addHandlers({
+addHandlers({
   /**
    * FF bug workaround to enable processing of sourceURL in injected page scripts
    */
@@ -61,7 +61,7 @@ export function injectPageSandbox(contentId, webId) {
   pageInjectable = false;
   const vaultId = safeGetUniqId();
   const handshakeId = safeGetUniqId();
-  if (useOpener(window.opener) || useOpener(!IS_TOP && window.parent)) {
+  if (useOpener(opener) || useOpener(!IS_TOP && parent)) {
     startHandshake();
   } else {
     /* Sites can do window.open(sameOriginUrl,'iframeNameOrNewWindowName').opener=null, spoof JS

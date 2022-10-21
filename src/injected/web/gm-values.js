@@ -1,4 +1,4 @@
-import bridge from './bridge';
+import bridge, { addHandlers } from './bridge';
 import store from './store';
 
 // Nested objects: scriptId -> keyName -> listenerId -> GMValueChangeListener
@@ -11,7 +11,7 @@ const dataDecoders = {
   b: val => val === 'true',
 };
 
-bridge.addHandlers({
+addHandlers({
   UpdatedValues(updates) {
     objectKeys(updates)::forEach(id => {
       const oldData = store.values[id];

@@ -1,4 +1,4 @@
-import bridge from './bridge';
+import bridge, { addHandlers } from './bridge';
 import store from './store';
 import { makeGmApiWrapper } from './gm-api-wrapper';
 import './gm-values';
@@ -38,7 +38,7 @@ export default function initialize(
     };
     global.chrome = undefined;
     global.browser = undefined;
-    bridge.addHandlers({
+    addHandlers({
       RunAt() {
         // executeScript code may run after <body> appeared
         if (runAtBodyQueue) {
@@ -51,7 +51,7 @@ export default function initialize(
   } else {
     bridge.mode = INJECT_PAGE;
     bindEvents(webId, contentId, bridge);
-    bridge.addHandlers({
+    addHandlers({
       /** @this {Node} contentWindow */
       WriteVault(id) {
         this[id] = VAULT;
@@ -61,7 +61,7 @@ export default function initialize(
   return invokeGuest;
 }
 
-bridge.addHandlers({
+addHandlers({
   Command({ id, cap, evt }) {
     const constructor = evt.key ? SafeKeyboardEvent : SafeMouseEvent;
     const fn = store.commands[`${id}:${cap}`];
@@ -86,7 +86,7 @@ bridge.addHandlers({
     }
   },
   Expose() {
-    window.external.Violentmonkey = {
+    external[VIOLENTMONKEY] = {
       version: process.env.VM_VER,
       isInstalled: (name, namespace) => (
         bridge.send('GetScriptVer', { meta: { name, namespace } })

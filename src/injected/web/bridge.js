@@ -1,4 +1,5 @@
 const handlers = createNullObj();
+export const addHandlers = obj => assign(handlers, obj);
 const callbacks = {
   __proto__: null,
   Error(err) {
@@ -12,9 +13,6 @@ const callbacks = {
 const bridge = {
   __proto__: null,
   callbacks,
-  addHandlers(obj) {
-    assign(handlers, obj);
-  },
   onHandle({ cmd, data, node }) {
     const fn = handlers[cmd];
     if (fn) node::fn(data);

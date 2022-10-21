@@ -1,5 +1,5 @@
 import { getUniqId, encodeFilename } from '@/common';
-import { METABLOCK_RE } from '@/common/consts';
+import { METABLOCK_RE, USERSCRIPT_META_INTRO } from '@/common/consts';
 import { mapEntry } from '@/common/object';
 import { addOwnCommands } from './message';
 import { getOption } from './options';
@@ -20,7 +20,7 @@ addOwnCommands({
 
 export function isUserScript(text) {
   if (/^\s*</.test(text)) return false; // HTML
-  if (text.indexOf('// ==UserScript==') < 0) return false; // Lack of meta block
+  if (text.indexOf(USERSCRIPT_META_INTRO) < 0) return false; // Lack of meta block
   return true;
 }
 

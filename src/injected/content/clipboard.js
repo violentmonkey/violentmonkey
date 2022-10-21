@@ -1,6 +1,6 @@
-import bridge from './bridge';
+import { addHandlers, onScripts } from './bridge';
 
-bridge.onScripts.push(() => {
+onScripts.push(() => {
   let setClipboard;
   if (IS_FIREFOX) {
     let clipboardData;
@@ -8,7 +8,7 @@ bridge.onScripts.push(() => {
     const { execCommand } = document;
     const { setData } = DataTransfer[PROTO];
     const { get: getClipboardData } = describeProperty(ClipboardEvent[PROTO], 'clipboardData');
-    const { preventDefault, stopImmediatePropagation } = Event[PROTO];
+    const { preventDefault } = Event[PROTO];
     const onCopy = e => {
       e::stopImmediatePropagation();
       e::preventDefault();
@@ -24,7 +24,7 @@ bridge.onScripts.push(() => {
       clipboardData = null;
     };
   }
-  bridge.addHandlers({
+  addHandlers({
     SetClipboard: setClipboard || true,
   }, true);
 });

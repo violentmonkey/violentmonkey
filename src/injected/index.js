@@ -1,12 +1,13 @@
 import '@/common/browser'; // eslint-disable-line no-restricted-imports
 import { sendCmd } from '@/common'; // eslint-disable-line no-restricted-imports
+import { USERSCRIPT_META_INTRO } from './util';
 import './content';
 
 // Script installation in Firefox as it does not support `onBeforeRequest` for `file:`
 // Using pathname and a case-sensitive check to match webRequest `urls` filter behavior
 if (IS_FIREFOX && IS_TOP
-&& global.location.protocol === 'file:'
-&& global.location.pathname.endsWith('.user.js')
+&& location.protocol === 'file:'
+&& location.pathname.endsWith('.user.js')
 && document.contentType === 'application/x-javascript' // FF uses this for file: scheme
 ) {
   (async () => {
@@ -14,15 +15,15 @@ if (IS_FIREFOX && IS_TOP
       browser,
       fetch,
       history,
-      document: { referrer },
     } = global;
+    const { referrer } = document;
     const { text: getText } = ResponseProto;
     const isFF68 = 'cookie' in Document[PROTO];
-    const url = global.location.href;
+    const url = location.href;
     const fetchCode = async () => (await fetch(url, { mode: 'same-origin' }))::getText();
     let code = await fetchCode();
     let oldCode;
-    if (!/==userscript==/i::regexpTest(code)) {
+    if (code::stringIndexOf(USERSCRIPT_META_INTRO) < 0) {
       return;
     }
     await sendCmd('ConfirmInstall', { code, url, from: referrer });
@@ -59,5 +60,5 @@ if (IS_FIREFOX && IS_TOP
         sendCmd('TabClose');
       }
     }
-  })().catch(console.error); // FF doesn't show exceptions in content scripts
+  })().catch(logging.error); // FF doesn't show exceptions in content scripts
 }

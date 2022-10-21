@@ -1,9 +1,9 @@
-import bridge from './bridge';
+import bridge, { addHandlers } from './bridge';
 
 let lastId = 0;
 const notifications = createNullObj();
 
-bridge.addHandlers({
+addHandlers({
   NotificationClicked(id) {
     const fn = notifications[id]?.onclick;
     if (fn) fn();

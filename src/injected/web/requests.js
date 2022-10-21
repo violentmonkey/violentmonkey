@@ -1,9 +1,9 @@
-import bridge from './bridge';
+import bridge, { addHandlers } from './bridge';
 
 /** @type {Object<string,GMReq.Web>} */
 const idMap = createNullObj();
 
-bridge.addHandlers({
+addHandlers({
   /** @param {GMReq.Message.BG} msg */
   HttpRequested(msg) {
     const req = idMap[msg.id];

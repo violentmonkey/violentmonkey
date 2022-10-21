@@ -66,7 +66,7 @@ export default {
   scriptTemplate: `\
 // ==UserScript==
 // @name        New script {{name}}
-// @namespace   Violentmonkey Scripts
+// @namespace   ${VIOLENTMONKEY} Scripts
 // @match       {{url}}
 // @grant       none
 // @version     1.0

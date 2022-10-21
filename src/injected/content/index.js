@@ -1,4 +1,4 @@
-import bridge from './bridge';
+import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
 import './clipboard';
 import { sendSetPopup } from './gm-api-content';
 import { injectPageSandbox, injectScripts } from './inject';
@@ -20,7 +20,7 @@ async function init() {
   const dataPromise = sendCmd('GetInjected', {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
-    url: IS_FIREFOX && global.location.href,
+    url: IS_FIREFOX && location.href,
     // XML document's appearance breaks when script elements are added
     [FORCE_CONTENT]: isXml,
     done: !!(xhrData || global.vmData),
@@ -36,18 +36,18 @@ async function init() {
   assign(ids, data.ids);
   bridge[INJECT_INTO] = data[INJECT_INTO];
   if (data.expose && !isXml && injectPageSandbox(contentId, webId)) {
-    bridge.addHandlers({ GetScriptVer: true }, true);
+    addHandlers({ GetScriptVer: true }, true);
     bridge.post('Expose');
   }
   if (data.scripts) {
-    bridge.onScripts.forEach(fn => fn(data));
+    onScripts.forEach(fn => fn(data));
     await injectScripts(contentId, webId, data, isXml);
   }
-  bridge.onScripts = null;
+  onScripts.length = 0;
   sendSetPopup();
 }
 
-bridge.addBackgroundHandlers({
+addBackgroundHandlers({
   Command: data => bridge.post('Command', data, ids[data.id]),
   Run: id => Run(id, INJECT_CONTENT),
   UpdatedValues(data) {
@@ -61,7 +61,7 @@ bridge.addBackgroundHandlers({
   },
 });
 
-bridge.addHandlers({
+addHandlers({
   Run,
   TabFocus: true,
   UpdateValue: true,

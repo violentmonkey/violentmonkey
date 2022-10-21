@@ -209,7 +209,7 @@ export const BaseService = serviceFactory({
   displayName: 'BaseService',
   delayTime: 1000,
   urlPrefix: '',
-  metaFile: 'Violentmonkey',
+  metaFile: VIOLENTMONKEY,
   properties: {
     authType: 'oauth',
   },

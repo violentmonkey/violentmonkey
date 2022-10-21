@@ -410,7 +410,7 @@ function prepareGmInfo(script, meta, code) {
     // `injectInto`, `resources`, `script` will be added in makeGmApiWrapper
     gmInfo: {
       platform: ua,
-      scriptHandler: 'Violentmonkey',
+      scriptHandler: VIOLENTMONKEY,
       scriptMetaStr: code.match(METABLOCK_RE)[1] || '',
       scriptWillUpdate: !!script.config.shouldUpdate,
       uuid: script.props.uuid,

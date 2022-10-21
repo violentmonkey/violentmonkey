@@ -1,4 +1,4 @@
-import bridge from './bridge';
+import bridge, { addBackgroundHandlers, addHandlers } from './bridge';
 import { getFullUrl, makeElem, sendCmd } from './util';
 
 const {
@@ -18,7 +18,7 @@ const requests = createNullObj();
 let downloadChain = promiseResolve();
 
 // TODO: extract all prop names used across files into consts.js to ensure sameness
-bridge.addHandlers({
+addHandlers({
   /**
    * @param {GMReq.Message.Web} msg
    * @param {VMScriptInjectInto} realm
@@ -45,7 +45,7 @@ bridge.addHandlers({
   AbortRequest: true,
 });
 
-bridge.addBackgroundHandlers({
+addBackgroundHandlers({
   /**
    * @param {GMReq.Message.BG} msg
    * @returns {Promise<void>}

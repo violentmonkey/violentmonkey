@@ -1,9 +1,9 @@
-import bridge from './bridge';
+import bridge, { addHandlers } from './bridge';
 
 let lastId = 0;
 const tabs = createNullObj();
 
-bridge.addHandlers({
+addHandlers({
   TabClosed(key) {
     const item = tabs[key];
     if (item) {

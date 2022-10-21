@@ -5,7 +5,7 @@ export default () => new Promise((resolve, reject) => {
   console.info('Upgrade database...');
   init();
   function init() {
-    const req = indexedDB.open('Violentmonkey', 1);
+    const req = indexedDB.open(VIOLENTMONKEY, 1);
     req.onsuccess = () => {
       try {
         transform(req.result);
