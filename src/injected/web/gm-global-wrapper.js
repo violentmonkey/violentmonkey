@@ -59,7 +59,7 @@ const updateGlobalDesc = name => {
   }
 };
 [SafeEventTarget, Object]::forEach(src => {
-  getOwnPropertyNames(src = src[PROTO])::forEach(key => {
+  reflectOwnKeys(src = src[PROTO])::forEach(key => {
     inheritedKeys[key] = src;
   });
 });
@@ -118,8 +118,6 @@ function makeOwnKeys(local, globals) {
   /** Note that arrays can be eavesdropped via prototype setters like '0','1',...
    * on `push` and `arr[i] = 123`, as well as via getters if you read beyond
    * its length or from an unassigned `hole`. */
-  const names = getOwnPropertyNames(local)::filter(notIncludedIn, globals.get);
-  const symbols = getOwnPropertySymbols(local)::filter(notIncludedIn, globals.get);
   const frameIndexes = [];
   for (let i = 0, len = window::getWindowLength(); i < len && window::hasOwnProperty(i); i += 1) {
     if (!(i in local)) {
@@ -129,8 +127,7 @@ function makeOwnKeys(local, globals) {
   return safeConcat(
     frameIndexes,
     globals === globalKeysSet ? globalKeys : globals.toArray(),
-    names,
-    symbols,
+    reflectOwnKeys(local)::filter(notIncludedIn, globals.get),
   );
 }
 

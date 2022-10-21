@@ -36,8 +36,6 @@ export let
   assign,
   defineProperty,
   describeProperty,
-  getOwnPropertyNames,
-  getOwnPropertySymbols,
   getPrototypeOf,
   objectKeys,
   objectValues,
@@ -72,6 +70,7 @@ export let
   logging,
   mathRandom,
   parseFromString, // DOMParser
+  reflectOwnKeys,
   stopImmediatePropagation,
   then,
   // various getters
@@ -127,8 +126,6 @@ export const VAULT = (() => {
     // Object - using SafeObject to pacify eslint without disabling the rule
     defineProperty = (SafeObject = Object) && res[i += 1] || SafeObject.defineProperty,
     describeProperty = res[i += 1] || SafeObject.getOwnPropertyDescriptor,
-    getOwnPropertyNames = res[i += 1] || SafeObject.getOwnPropertyNames,
-    getOwnPropertySymbols = res[i += 1] || SafeObject.getOwnPropertySymbols,
     getPrototypeOf = res[i += 1] || SafeObject.getPrototypeOf,
     assign = res[i += 1] || SafeObject.assign,
     objectKeys = res[i += 1] || SafeObject.keys,
@@ -163,6 +160,7 @@ export const VAULT = (() => {
     logging = res[i += 1] || createNullObj((srcFF || src).console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
+    reflectOwnKeys = res[i += 1] || src.Reflect.ownKeys,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
     then = res[i += 1] || src.Promise[PROTO].then,
     // various getters
@@ -175,8 +173,8 @@ export const VAULT = (() => {
       || (() => getOwnProp(window, 'parent')), // Chrome<=85 https://crrev.com/793165
     // various values
     builtinGlobals = res[i += 1] || [
-      getOwnPropertyNames(srcWindow),
-      src !== srcWindow && getOwnPropertyNames(src),
+      reflectOwnKeys(srcWindow),
+      src !== srcWindow && reflectOwnKeys(src),
     ],
   ];
   // Well-known Symbols are unforgeable
