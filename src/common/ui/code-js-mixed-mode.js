@@ -657,6 +657,10 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     if (maybeLocalStyle !== STYLE_PASS) {
       return maybeLocalStyle;
     }
+    // Differentiate regexps and templates, TODO: remove when implemented in CodeMirror
+    if (tokenStyle === 'string-2' && state[kJsState].lastType === 'regexp') {
+      return 'string-2 regexp';
+    }
     return tokenStyle;
   }
 

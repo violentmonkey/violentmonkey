@@ -291,16 +291,6 @@ export default {
       Object.assign(CodeMirror.keyMap.sublime, {
         'Shift-Ctrl-/': 'commentSelection',
       });
-      // Differentiate regexps and templates, TODO: remove when implemented in CodeMirror
-      const tokenizer = cm.doc.mode.token;
-      Object.assign(cm.doc.mode, {
-        token(stream, state) {
-          const res = this::tokenizer(stream, state);
-          return res === 'string-2' && state['#jsState'].lastType === 'regexp'
-            ? 'string-2 regexp'
-            : res;
-        },
-      });
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
       });
