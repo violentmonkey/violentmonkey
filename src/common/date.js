@@ -57,7 +57,7 @@ export function formatDate(tpl, date = new Date()) {
     }`, 'g');
   }
   return tpl.replace(re, (s, literal) => (
-    DATE_FMT::hasOwnProperty(s)
+    hasOwnProperty(DATE_FMT, s)
       ? DATE_FMT[s](date)
       : literal ?? s
   ));

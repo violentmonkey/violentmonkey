@@ -96,7 +96,7 @@ export function setOption(key, value, silent) {
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
   key = keys.join('.'); // must be a string for addChange()
-  if (!defaults::hasOwnProperty(mainKey)) {
+  if (!hasOwnProperty(defaults, mainKey)) {
     if (process.env.DEBUG) console.info('Unknown option:', key, value, options);
     return;
   }

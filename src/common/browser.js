@@ -5,7 +5,7 @@
 if (!IS_FIREFOX && !global.browser?.runtime) {
   // region Chrome
   const { chrome, Proxy: SafeProxy } = global;
-  const { apply, bind } = SafeProxy;
+  const { bind } = SafeProxy;
   const MESSAGE = 'message';
   const STACK = 'stack';
   const isSyncMethodName = key => key === 'addListener'
@@ -20,7 +20,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
     if (isFunction(metaVal)) {
       res = metaVal(src, srcVal);
     } else if (isFunction(srcVal)) {
-      res = metaVal === 0 || isSyncMethodName(key) || !src::hasOwnProperty(key)
+      res = metaVal === 0 || isSyncMethodName(key) || !hasOwnProperty(src, key)
         ? srcVal::bind(src)
         : wrapAsync(src, srcVal); // eslint-disable-line no-use-before-define
     } else if (isObject(srcVal) && metaVal !== 0) {
@@ -70,7 +70,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
       };
       if (process.env.IS_INJECTED) {
         try {
-          func::apply(thisArg, args);
+          safeApply(func, thisArg, args);
         } catch (e) {
           if (e[MESSAGE] === 'Extension context invalidated.') {
             console.error(`Please reload the tab to restore ${VIOLENTMONKEY} API for userscripts.`);
@@ -79,7 +79,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
           }
         }
       } else {
-        func::apply(thisArg, args);
+        safeApply(func, thisArg, args);
       }
       if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.[MESSAGE] || err));
       return promise;
@@ -110,7 +110,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
     if (process.env.DEBUG) console.info('receive', message);
     try {
       const result = listener(message, sender);
-      if (result && result::objectToString() === '[object Promise]') {
+      if (result && isFunction(result.then)) {
         sendResponseAsync(result, sendResponse);
         return true;
       }

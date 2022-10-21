@@ -71,7 +71,7 @@ const commandsToSyncIfTruthy = [
 ];
 
 async function handleCommandMessage({ cmd, data } = {}, src) {
-  const func = commands::hasOwnProperty(cmd) && commands[cmd];
+  const func = hasOwnProperty(commands, cmd) && commands[cmd];
   if (!func) {
     throw new SafeError(`Unknown command: ${cmd}`);
   }

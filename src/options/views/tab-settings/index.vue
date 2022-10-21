@@ -206,7 +206,7 @@ const items = {
   ...badgeColorEnum::mapEntry(() => badgeColorItem),
 };
 const normalizeEnum = (value, name) => (
-  items[name].enum::hasOwnProperty(value)
+  hasOwnProperty(items[name].enum, value)
     ? value
     : Object.keys(items[name].enum)[0]
 );

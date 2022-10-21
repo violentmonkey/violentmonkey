@@ -32,16 +32,12 @@ export let
   // Symbol
   toStringTagSym,
   // Object
-  apply,
   assign,
   defineProperty,
   describeProperty,
   getPrototypeOf,
   objectKeys,
   objectValues,
-  // Object.prototype
-  hasOwnProperty,
-  objectToString,
   /** Array.prototype can be eavesdropped via setters like '0','1',...
    * on `push` and `arr[i] = 123`, as well as via getters if you read beyond
    * its length or from an unassigned `hole`. */
@@ -55,6 +51,7 @@ export let
   charCodeAt,
   slice,
   // safeCall
+  safeApply,
   safeBind,
   safeCall,
   // various values
@@ -64,7 +61,7 @@ export let
   arrayIsArray,
   createObjectURL,
   formDataEntries,
-  funcToString,
+  hasOwnProperty,
   jsonParse,
   jsonStringify,
   logging,
@@ -85,6 +82,7 @@ export let
  * or window[0] before our content script runs at document_start, https://crbug.com/1261964 */
 export const VAULT = (() => {
   let ArrayP;
+  let Reflect;
   let SafeObject;
   let StringP;
   let i = -1;
@@ -130,10 +128,6 @@ export const VAULT = (() => {
     assign = res[i += 1] || SafeObject.assign,
     objectKeys = res[i += 1] || SafeObject.keys,
     objectValues = res[i += 1] || SafeObject.values,
-    apply = res[i += 1] || SafeObject.apply,
-    // Object.prototype
-    hasOwnProperty = res[i += 1] || SafeObject[PROTO].hasOwnProperty,
-    objectToString = res[i += 1] || SafeObject[PROTO].toString,
     // Array.prototype
     concat = res[i += 1] || (ArrayP = src.Array[PROTO]).concat,
     filter = res[i += 1] || ArrayP.filter,
@@ -145,13 +139,14 @@ export const VAULT = (() => {
     charCodeAt = res[i += 1] || (StringP = src.String[PROTO]).charCodeAt,
     slice = res[i += 1] || StringP.slice,
     // safeCall
+    safeApply = res[i += 1] || (Reflect = src.Reflect).apply,
     safeCall = res[i += 1] || (call = SafeObject.call).bind(call),
     safeBind = res[i += 1] || call.bind(SafeObject.bind),
     // various methods
     URLToString = res[i += 1] || src.URL[PROTO].toString,
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     formDataEntries = res[i += 1] || src.FormData[PROTO].entries,
-    funcToString = res[i += 1] || safeCall.toString,
+    hasOwnProperty = res[i += 1] || Reflect.has,
     arrayIsArray = res[i += 1] || src.Array.isArray,
     /* Exporting JSON methods separately instead of exporting SafeJSON as its props may be broken
      * by the page if it gains access to any Object from the vault e.g. a thrown SafeError. */
@@ -160,7 +155,7 @@ export const VAULT = (() => {
     logging = res[i += 1] || createNullObj((srcFF || src).console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
-    reflectOwnKeys = res[i += 1] || src.Reflect.ownKeys,
+    reflectOwnKeys = res[i += 1] || Reflect.ownKeys,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
     then = res[i += 1] || src.Promise[PROTO].then,
     // various getters

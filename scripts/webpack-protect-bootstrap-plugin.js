@@ -26,7 +26,7 @@ const BOOTSTRAP_RULES = [
     G.definePropertyGetters,
   ], [
     'Object.prototype.hasOwnProperty.call(',
-    'safeCall(hasOwnProperty, ',
+    'hasOwnProperty(',
     G.hasOwnProperty,
   ],
 ];

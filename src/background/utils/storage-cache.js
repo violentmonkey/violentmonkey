@@ -58,7 +58,7 @@ storage.api = {
         cache.put(key, deepCopy(val), !keys && TTL_SKIM);
         updateScriptMap(key, val);
       });
-      keys?.forEach(key => dbKeys.put(key, +res::hasOwnProperty(key)));
+      keys?.forEach(key => dbKeys.put(key, +hasOwnProperty(res, key)));
     }
     batch(false);
     return res;

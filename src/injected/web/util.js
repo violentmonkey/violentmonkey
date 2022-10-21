@@ -7,7 +7,7 @@ export const safeConcat = (...arrays) => {
   setOwnProp(dest, isConcatSpreadableSym, true);
   arrays::forEach(arr => setOwnProp(arr, isConcatSpreadableSym, true));
   // Using a dummy [] is simpler/safer/faster than (getOwnProp(arrays, 0), arrays::slice(1))
-  return concat::apply(dest, arrays);
+  return safeApply(concat, dest, arrays);
 };
 
 /**
@@ -72,7 +72,7 @@ export const FastLookup = (hubs = createNullObj()) => {
     toArray: () => {
       const values = objectValues(hubs);
       values::forEach((val, i) => { values[i] = objectKeys(val); });
-      return safeConcat::apply(null, values);
+      return safeApply(safeConcat, null, values);
     },
   };
   function getHub(key, autoCreate) {

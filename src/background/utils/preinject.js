@@ -149,7 +149,7 @@ async function removeStaleCacheEntry(val, key) {
 }
 
 function normalizeRealm(value) {
-  return INJECT_MAPPING::hasOwnProperty(value)
+  return hasOwnProperty(INJECT_MAPPING, value)
     ? value
     : injectInto || INJECT_AUTO;
 }

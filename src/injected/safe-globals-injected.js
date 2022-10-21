@@ -33,7 +33,7 @@ export const isString = val => typeof val === 'string';
 export const getOwnProp = (obj, key, defVal) => {
   // obj may be a Proxy that throws in has() or its getter throws
   try {
-    if (obj::hasOwnProperty(key)) defVal = obj[key];
+    if (hasOwnProperty(obj, key)) defVal = obj[key];
   } catch (e) { /* NOP */ }
   return defVal;
 };
@@ -58,7 +58,7 @@ export const pickIntoNullObj = (dst, src, keys) => {
   if (process.env.DEBUG) throwIfProtoPresent(dst);
   if (src) {
     keys::forEach(key => {
-      if (src::hasOwnProperty(key)) {
+      if (hasOwnProperty(src, key)) {
         dst[key] = src[key];
       }
     });
@@ -111,7 +111,7 @@ export const log = (level, ...args) => {
   let s = `[${VIOLENTMONKEY}]`;
   if (args[0]) args[0]::forEach(tag => { s += `[${tag}]`; });
   args[0] = s;
-  logging[level]::apply(logging, args);
+  safeApply(logging[level], logging, args);
 };
 
 /**

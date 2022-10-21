@@ -206,7 +206,7 @@ export function formatByteLength(len, noBytes) {
 // Used by `injected`
 export function isEmpty(obj) {
   for (const key in obj) {
-    if (obj::hasOwnProperty(key)) {
+    if (hasOwnProperty(obj, key)) {
       return false;
     }
   }

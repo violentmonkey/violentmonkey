@@ -256,7 +256,7 @@ function inject(item, iframeCb) {
       : div
   );
   if (isCodeArray) {
-    append::apply(script, code);
+    safeApply(append, script, code);
   }
   let iframe;
   let iframeDoc;
