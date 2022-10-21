@@ -31,7 +31,6 @@ const MIN_OPTS = {
     compress: {
       // `terser` often inlines big one-time functions inside a small "hot" function
       reduce_funcs: false,
-      reduce_vars: false,
     },
     output: {
       ascii_only: true,
