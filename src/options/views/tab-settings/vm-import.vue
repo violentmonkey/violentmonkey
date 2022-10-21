@@ -4,8 +4,9 @@
     <tooltip :content="i18n('hintVacuum')">
       <button @click="vacuum" :disabled="vacuuming" v-text="labelVacuum" />
     </tooltip>
-    <div class="mt-1 flex flex-col">
+    <div class="mt-1">
       <setting-check name="importScriptData" :label="i18n('labelImportScriptData')" />
+      <br>
       <setting-check name="importSettings" :label="i18n('labelImportSettings')" />
     </div>
     <table class="import-report">
