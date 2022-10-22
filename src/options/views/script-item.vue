@@ -111,7 +111,9 @@
               <icon name="question"></icon>
             </a>
           </tooltip>
-          <div class="script-message" v-text="script.message" :title="script.error"></div>
+          <!-- Using v-if to actually hide it because FF is slow to apply :not(:empty) CSS -->
+          <div class="script-message" v-if="script.message" v-text="script.message"
+               :title="script.error"/>
         </div>
         <tooltip :content="i18n('buttonRemove')" align="end">
           <a class="btn-ghost" @click="onRemove" :data-hotkey="hotkeys.remove" :tabIndex="tabIndex">
@@ -539,7 +541,7 @@ $removedItemHeight: calc(
       &-author > .ellipsis {
         max-width: 15vw;
       }
-      &-message:not(:empty) {
+      &-message {
         position: absolute;
         right: .5em;
         top: 2em;
