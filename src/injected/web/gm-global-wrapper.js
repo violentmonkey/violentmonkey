@@ -149,24 +149,33 @@ function proxyDescribe(local, name, wrapper, events) {
     // Spoofed String index getters won't be called within length, length itself is unforgeable
     && name.length >= 3 && name[0] === 'o' && name[1] === 'n'
   ) {
-    name = name::slice(2);
-    desc.get = () => events[name] || null;
-    desc.set = fn => {
-      window::off(name, events[name]);
-      if (isFunction(fn)) {
-        // the handler will be unique so that one script couldn't remove something global
-        // like console.log set by another script
-        window::on(name, events[name] = safeBind(fn, wrapper));
-      } else {
-        delete events[name];
-      }
-    };
+    setWindowEvent(desc, name, events, wrapper);
   } else {
     if (get) desc.get = safeBind(get, window);
     if (set) desc.set = safeBind(set, window);
   }
   defineProperty(local, name, desc); /* proto is null */// eslint-disable-line no-restricted-syntax
   return desc;
+}
+
+function setWindowEvent(desc, name, events, wrapper) {
+  name = name::slice(2);
+  desc.get = () => events[name] || null;
+  desc.set = fn => {
+    window::off(name, events[name]);
+    if (isFunction(fn)) {
+      // the handler will be unique so that one script couldn't remove something global
+      // like console.log set by another script
+      window::on(name, events[name] = (
+        // FF chokes on safeBind because the result belongs to Vault's window
+        IS_FIREFOX && PAGE_MODE_HANDSHAKE
+          ? evt => wrapper::fn(evt)
+          : safeBind(fn, wrapper)
+      ));
+    } else {
+      delete events[name];
+    }
+  };
 }
 
 /** @this {FastLookup.get} */

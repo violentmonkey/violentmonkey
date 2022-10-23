@@ -141,6 +141,7 @@ export const VAULT = (() => {
     // safeCall
     safeApply = res[i += 1] || (Reflect = src.Reflect).apply,
     safeCall = res[i += 1] || (call = SafeObject.call).bind(call),
+    // WARNING! In FF bind fails when used with `window` events, see proxyDescribe
     safeBind = res[i += 1] || call.bind(SafeObject.bind),
     // various methods
     URLToString = res[i += 1] || src.URL[PROTO].toString,
