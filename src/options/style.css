@@ -1,6 +1,7 @@
 $compactHeaderHeight: 3rem;
 $tabPadX: 2rem;
 $tabPadY: 3rem;
+$tabPadTopY: 1.5rem;
 $sectionBorder: 1px solid var(--fill-2);
 
 aside {
@@ -79,7 +80,7 @@ textarea:not([rows="1"]):not(.h100) {
       width: calc(50% - $tabPadX * 1.5); // Not using CSS columns due to bugs with overflow-y: auto
     }
     h1 {
-      margin-top: $tabPadY;
+      margin-top: $tabPadTopY;
     }
     details {
       position: absolute;
@@ -97,7 +98,7 @@ textarea:not([rows="1"]):not(.h100) {
 }
 .tab {
   position: relative;
-  padding: $tabPadY $tabPadX 0;
+  padding: $tabPadTopY $tabPadX 0;
   overflow-y: auto;
   background: var(--bg);
 }
