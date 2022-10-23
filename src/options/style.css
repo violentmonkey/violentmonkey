@@ -73,7 +73,7 @@ textarea:not([rows="1"]):not(.h100) {
   max-height: 50vh;
 }
 @media (min-width: 1600px) {
-  .tab-settings[data-show-advanced] {
+  .tab-settings[data-show-advanced=true] {
     padding-top: 0;
     > * {
       width: calc(50% - $tabPadX * 1.5); // Not using CSS columns due to bugs with overflow-y: auto
