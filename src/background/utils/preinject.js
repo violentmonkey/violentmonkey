@@ -20,8 +20,10 @@ const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
   types: ['main_frame', 'sub_frame'],
 };
+const INJECT = 'inject';
 const CSAPI_REG = 'csar';
 const contentScriptsAPI = browser.contentScripts;
+const envStartKey = {};
 /** In normal circumstances the data will be removed in ~1sec on use,
  * however connecting may take a long time or the tab may be paused in devtools. */
 const TIME_KEEP_DATA = 5 * 60e3;
@@ -38,7 +40,6 @@ const cache = initCache({
     }
   },
 });
-const INJECT = 'inject';
 // KEY_XXX for hooked options
 const KEY_EXPOSE = 'expose';
 const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
@@ -52,7 +53,6 @@ const META_KEYS_TO_ENSURE = [
   'runAt',
   'version',
 ];
-const envStartKey = {};
 const expose = {};
 let isApplied;
 let injectInto;

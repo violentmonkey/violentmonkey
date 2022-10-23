@@ -144,6 +144,12 @@ module.exports = {
     //   js: 'never',
     //   vue: 'never',
     // }],
+    'no-use-before-define': ['error', {
+      'functions': false,
+      'classes': true,
+      'variables': true,
+      'allowNamedExports': true,
+    }],
     // copied from airbnb-base, replaced 4 with 8
     'object-curly-newline': ['error', {
       ObjectExpression: { minProperties: 8, multiline: true, consistent: true },
