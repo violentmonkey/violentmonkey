@@ -9,7 +9,7 @@ import pluginEvents from '../plugin/events';
 import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
 import { testScript, testBlacklist, testerBatch } from './tester';
 import { preInitialize } from './init';
-import { addOwnCommands, commands } from './message';
+import { addOwnCommands, addPublicCommands, commands } from './message';
 import patchDB from './patch-db';
 import { setOption } from './options';
 import storage, {
@@ -32,6 +32,15 @@ export const store = {
   },
 };
 
+addPublicCommands({
+  GetScriptVer(opts) {
+    const script = getScript(opts);
+    return script && !script.config.removed
+      ? script.meta.version
+      : null;
+  },
+});
+
 addOwnCommands({
   CheckPosition: sortScripts,
   CheckRemove: checkRemove,
@@ -50,12 +59,6 @@ addOwnCommands({
   /** @return {Promise<string>} */
   GetScriptCode(id) {
     return storage.code[Array.isArray(id) ? 'getMulti' : 'getOne'](id);
-  },
-  GetScriptVer(opts) {
-    const script = getScript(opts);
-    return script && !script.config.removed
-      ? script.meta.version
-      : null;
   },
   /** @return {Promise<void>} */
   MarkRemoved({ id, removed }) {
