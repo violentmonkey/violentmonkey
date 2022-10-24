@@ -52,7 +52,10 @@ const updateGlobalDesc = name => {
       if (typeof name === 'string' && name[0] > 'Z' && typeof desc.value === 'function') {
         desc.value = safeBind(desc.value, src === global ? global : window);
       }
-      globalDesc[name] = desc;
+      // Using `!` to avoid the need to use and safe-guard isNaN
+      if (!(+name >= 0 && name < window::getWindowLength())) {
+        globalDesc[name] = desc;
+      }
       return desc;
     }
   }
