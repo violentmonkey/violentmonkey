@@ -11,7 +11,7 @@ import { Run } from './cmd-run';
  * so we'll use the extension's UUID, which is unique per computer in FF, for messages
  * like VAULT_WRITER to avoid interception by sites that can add listeners for all of our
  * INIT_FUNC_NAME ids even though we change it now with each release. */
-const VAULT_WRITER = `${IS_FIREFOX ? VM_UUID : INIT_FUNC_NAME}VW`;
+const VAULT_WRITER = `${VM_UUID}${INIT_FUNC_NAME}VW`;
 const VAULT_WRITER_ACK = `${VAULT_WRITER}+`;
 const tardyQueue = [];
 let contLists;
