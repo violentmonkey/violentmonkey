@@ -18,6 +18,7 @@ exports.pages = [
       ...options,
       title: 'Violentmonkey',
       injectTo: item => ((item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head'),
+      scriptLoading: 'blocking', // we don't need `defer` and it breaks in some browsers, see #1632
     })),
   },
 }), {});
