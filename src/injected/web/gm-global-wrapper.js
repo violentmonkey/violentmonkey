@@ -1,6 +1,5 @@
 import { FastLookup, safeConcat } from './util';
 
-const CONFIGURABLE = 'configurable';
 const scopeSym = SafeSymbol.unscopables;
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
@@ -73,21 +72,22 @@ export function makeGlobalWrapper(local) {
   /* Browsers may return [object Object] for Object.prototype.toString(window)
      on our `window` proxy so jQuery libs see it as a plain object and throw
      when trying to clone its recursive properties like `self` and `window`. */
-  safeDefineProperty(local, toStringTagSym, { get: () => 'Window' });
+  setOwnProp(local, toStringTagSym, () => 'Window', false, 'get');
   const events = createNullObj();
   const wrapper = new SafeProxy(local, {
     __proto__: null,
     defineProperty(_, name, desc) {
       if (name in local
       || !(_ = globalDesc[name] || updateGlobalDesc(name))
-      || _[CONFIGURABLE]) {
-        return safeDefineProperty(local, name, desc);
+      || _.configurable) {
+        /* It's up to caller to protect proto */// eslint-disable-next-line no-restricted-syntax
+        return defineProperty(local, name, desc);
       }
     },
     deleteProperty(_, name) {
       if ((_ = delete local[name])
       && (_ = globalDesc[name] || updateGlobalDesc(name))
-      && (_ = _[CONFIGURABLE])) {
+      && (_ = _.configurable)) {
         if (globals === globalKeysSet) {
           globals = globalKeysSet.clone();
         }

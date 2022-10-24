@@ -45,9 +45,7 @@ if (IS_FIREFOX) {
     }
   }, true);
 } else {
-  safeDefineProperty(global, VAULT_WRITER, {
-    value: tellBridgeToWriteVault,
-  });
+  setOwnProp(global, VAULT_WRITER, tellBridgeToWriteVault, false);
 }
 
 addHandlers({
