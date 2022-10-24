@@ -211,19 +211,8 @@ filters::forEachKey(key => {
 const MAX_BATCH_DURATION = 100;
 let step = 0;
 
-let columnWidths;
-const COMMENTS_RE = /\/\*([^*]+|\*(?!\/))*\*\//g;
-const COLUMN_VAR_PREFIX = '--columns-';
-const COLUMNS = {
-  cards: '1300, 1900, 2500', // 1366x768, 1920x1080, 2560x1440
-  table: '1600, 2500, 3400', // 1680x1050, 2560x1440, 3440x1440
-};
-const COLUMNS_CSS = `:root{${
-  Object.keys(COLUMNS).map(type => `${COLUMN_VAR_PREFIX}${type}:${COLUMNS[type]};`).join('')
-}}`;
-const COLUMNS_EXTRACT_RE = RegExp(`[^-\\w]${COLUMN_VAR_PREFIX}(${
-  Object.keys(COLUMNS).join('|')
-}):([^;}]+)`, 'g');
+let columnsForTableMode = [];
+let columnsForCardsMode = [];
 
 const conditionAll = 'tabScripts';
 const conditionSearch = `${conditionAll} && inputFocus`;
@@ -501,21 +490,7 @@ export default {
       }
     },
     adjustScriptWidth() {
-      if (!columnWidths) {
-        columnWidths = {};
-        /* Extracting --columns-cards and --columns-table from customCSS.
-         * Not using getComputedStyle to avoid style recalc. */
-        let css = `${options.get('customCSS') || ''}`.replace(COMMENTS_RE, '');
-        while (Object.keys(columnWidths).length < Object.keys(COLUMNS).length) {
-          COLUMNS_EXTRACT_RE.lastIndex = 0;
-          for (let m; (m = COLUMNS_EXTRACT_RE.exec(css));) {
-            columnWidths[m[1]] = columnWidths[m[1]] // preserving first run's result
-              || m[2].split(',').map(Number).filter(Boolean);
-          }
-          css = COLUMNS_CSS;
-        }
-      }
-      const widths = columnWidths[filters.viewTable ? 'table' : 'cards'] || [];
+      const widths = filters.viewTable ? columnsForTableMode : columnsForCardsMode;
       this.numColumns = filters.viewSingleColumn ? 1
         : widths.findIndex(w => window.innerWidth < w) + 1 || widths.length + 1;
     },
@@ -566,24 +541,21 @@ export default {
   created() {
     this.debouncedUpdate = debounce(this.onUpdate, 100);
     this.debouncedRender = debounce(this.renderScripts);
-    // Exposing the vars in CSS only to show the developers how to customize them
-    // Not using document.styleSheets because some browsers are bugged, see #1632
-    document.head.prepend(Object.assign(document.createElement('style'), {
-      textContent: COLUMNS_CSS,
-    }));
   },
   mounted() {
     // Ensure the correct UI is shown when mounted:
     // * on subsequent navigation via history back/forward;
     // * on first initialization in some weird case the scripts got loaded early.
     if (!store.loading) this.refreshUI();
-    global.addEventListener('resize', this.adjustScriptWidth);
+    // Extract --columns-cards and --columns-table from `:root` or `html` selector. CustomCSS may override it.
+    if (!columnsForCardsMode.length) {
+      const style = getComputedStyle(document.documentElement);
+      [columnsForCardsMode, columnsForTableMode] = ['cards', 'table']
+      .map(type => style.getPropertyValue(`--columns-${type}`)?.split(',').map(Number).filter(Boolean) || []);
+      global.addEventListener('resize', this.adjustScriptWidth);
+    }
+    this.adjustScriptWidth();
     this.disposeList = [
-      options.hook(changes => {
-        if ('customCSS' in changes) columnWidths = null;
-        if (!columnWidths) this.adjustScriptWidth();
-      }),
-      () => global.removeEventListener('resize', this.adjustScriptWidth),
       ...IS_FIREFOX ? [
         keyboardService.register('tab', () => {
           handleTabNavigation(1);
@@ -692,6 +664,10 @@ export default {
 </script>
 
 <style>
+:root {
+  --columns-cards: 1300, 1900, 2500; // 1366x768, 1920x1080, 2560x1440
+  --columns-table: 1600, 2500, 3400; // 1680x1050, 2560x1440, 3440x1440
+}
 .tab.tab-installed {
   padding: 0;
   header {
