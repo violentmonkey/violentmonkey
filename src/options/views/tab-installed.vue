@@ -567,7 +567,10 @@ export default {
     this.debouncedUpdate = debounce(this.onUpdate, 100);
     this.debouncedRender = debounce(this.renderScripts);
     // Exposing the vars in CSS only to show the developers how to customize them
-    document.styleSheets[0].insertRule(COLUMNS_CSS, 0);
+    // Not using document.styleSheets because some browsers are bugged, see #1632
+    document.head.prepend(Object.assign(document.createElement('style'), {
+      textContent: COLUMNS_CSS,
+    }));
   },
   mounted() {
     // Ensure the correct UI is shown when mounted:
