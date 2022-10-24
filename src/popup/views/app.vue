@@ -174,7 +174,8 @@
       <div v-text="message"></div>
     </div>
     <div v-if="activeExtras" class="extras-menu" ref="extrasMenu">
-      <a v-if="activeExtras.home" tabindex="0" :href="activeExtras.home" v-text="i18n('buttonHome')"
+      <a v-for="[url, text] in activeLinks"
+         :key="url" :href="url" :data-message="url" tabindex="0" v-text="text"
          rel="noopener noreferrer" target="_blank"/>
       <div v-text="i18n('menuExclude')" tabindex="0" @click="onExclude"/>
       <div v-text="activeExtras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
@@ -254,6 +255,15 @@ export default {
     };
   },
   computed: {
+    activeLinks() {
+      const ae = this.activeExtras;
+      const url1 = ae.home;
+      const url2 = ae.data.meta.supportURL;
+      return [
+        url1 && [url1, i18n('buttonHome')],
+        url2 && url2 !== url1 && [url2, i18n('buttonSupport')],
+      ].filter(Boolean);
+    },
     injectionScopes() {
       const { sort, enabledFirst, hideDisabled } = this.options.filtersPopup;
       const isSorted = sort === 'alpha' || enabledFirst;
