@@ -57,10 +57,10 @@ declare namespace GMReq {
     id: string;
     scriptId: number;
     opts: UserOpts;
-    raw: string | Blob | ArrayBuffer;
-    response: string | Blob | ArrayBuffer;
-    headers: string;
-    text?: string;
+    raw?: string | Blob | ArrayBuffer;
+    response?: string | Blob | ArrayBuffer;
+    kResponseHeaders?: string;
+    kResponseText?: string;
   }
   namespace Message {
     type Chunk = {

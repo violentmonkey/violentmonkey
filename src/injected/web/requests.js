@@ -2,14 +2,108 @@ import bridge, { addHandlers } from './bridge';
 
 /** @type {Object<string,GMReq.Web>} */
 const idMap = createNullObj();
+const kResponse = 'response';
+const kResponseHeaders = 'responseHeaders';
+const kResponseText = 'responseText';
+const kResponseType = 'responseType';
+const kResponseXML = 'responseXML';
+const kDocument = 'document';
+const EVENTS_TO_NOTIFY = [
+  'abort',
+  'error',
+  'load',
+  'loadend',
+  'loadstart',
+  'progress',
+  'readystatechange',
+  'timeout',
+];
+const OPTS_TO_PASS = [
+  'headers',
+  'method',
+  'overrideMimeType',
+  'password',
+  'timeout',
+  'user',
+];
 
 addHandlers({
   /** @param {GMReq.Message.BG} msg */
   HttpRequested(msg) {
     const req = idMap[msg.id];
-    if (req) callback(req, msg);
+    if (!req) {
+      return;
+    }
+    const { type } = msg;
+    const { opts } = req;
+    const cb = opts[`on${type}`];
+    if (type === 'loadend') {
+      delete idMap[req.id];
+    }
+    if (!cb) {
+      return;
+    }
+    const { data } = msg;
+    const {
+      [kResponse]: response,
+      [kResponseHeaders]: headers,
+      [kResponseText]: text,
+    } = data;
+    if (response != null || data.readyState === 4) {
+      req.raw = response;
+    }
+    if (headers != null) {
+      req[kResponseHeaders] = headers;
+    }
+    if (text != null) {
+      req[kResponseText] = getOwnProp(text, 0) === 'same' ? response : text;
+    }
+    setOwnProp(data, 'context', opts.context);
+    setOwnProp(data, kResponseHeaders, req[kResponseHeaders]);
+    setOwnProp(data, kResponseText, req[kResponseText]);
+    setOwnProp(data, kResponseXML, safeBind(parseRaw, data, req, msg, kResponseXML), true, 'get');
+    setOwnProp(data, kResponse, safeBind(parseRaw, data, req, msg, kResponse), true, 'get');
+    cb(data);
   },
 });
+
+/**
+ * `response` is sent only when changed so we need to remember it for response-less events
+ * `raw` is decoded once per `response` change so we reuse the result just like native XHR
+ * @this {VMScriptResponseObject}
+ * @param {GMReq.Web} req
+ * @param {GMReq.Message.BG} msg
+ * @param {string} propName
+ * @returns {string | Blob | ArrayBuffer | null}
+ */
+function parseRaw(req, msg, propName) {
+  const { [kResponseType]: responseType } = req.opts;
+  let res;
+  if ('raw' in req) {
+    res = req.raw;
+    if (responseType === kDocument || !responseType && propName === kResponseXML) {
+      res = new SafeDOMParser()::parseFromString(res, getContentType(msg) || 'text/html');
+    } else if (responseType === 'json') {
+      res = jsonParse(res);
+    }
+    if (responseType === kDocument) {
+      const otherPropName = propName === kResponse ? kResponseXML : kResponse;
+      setOwnProp(this, otherPropName, res);
+      req[otherPropName] = res;
+    }
+    if (responseType) {
+      delete req.raw;
+    }
+    req[propName] = res;
+  } else {
+    res = req[propName];
+  }
+  if (res === undefined) {
+    res = null;
+  }
+  setOwnProp(this, propName, res);
+  return res;
+}
 
 /**
  * @param {GMReq.UserOpts} opts - must already have a null proto
@@ -19,7 +113,7 @@ addHandlers({
  */
 export function onRequestCreate(opts, context, fileName) {
   if (process.env.DEBUG) throwIfProtoPresent(opts);
-  let { url } = opts;
+  let { data, url } = opts;
   if (url && !isString(url)) { // USVString in XMLHttpRequest spec calls ToString
     try {
       url = url::URLToString();
@@ -43,35 +137,34 @@ export function onRequestCreate(opts, context, fileName) {
     scriptId,
     opts,
   };
-  start(req, context, fileName);
+  // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
+  // it's true by default per the standard/historical behavior of gmxhr
+  const { withCredentials = true, anonymous = !withCredentials } = opts;
+  idMap[id] = req;
+  data = data == null && []
+    // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
+    || (opts.binary || !isObject(data)) && [`${data}`]
+    // No browser can send FormData directly across worlds
+    || getFormData(data)
+    // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
+    || IS_FIREFOX >= 56 && [data]
+    || [data, 'bin'];
+  /** @type {GMReq.Message.Web} */
+  bridge.call('HttpRequest', createNullObj({
+    anonymous,
+    data,
+    fileName,
+    id,
+    scriptId,
+    url,
+    eventsToNotify: EVENTS_TO_NOTIFY::filter(key => isFunction(opts[`on${key}`])),
+    xhrType: getResponseType(opts[kResponseType]),
+  }, opts, OPTS_TO_PASS));
   return {
     abort() {
       bridge.post('AbortRequest', id);
     },
   };
-}
-
-/**
- * @param {GMReq.Web} req
- * @param {GMReq.Message.BG} msg
- * @returns {string|number|boolean|Array|Object|Document|Blob|ArrayBuffer}
- */
-function parseData(req, msg) {
-  let res = req.raw;
-  switch (req.opts.responseType) {
-  case 'json':
-    res = jsonParse(res);
-    break;
-  case 'document':
-    res = new SafeDOMParser()::parseFromString(res, getContentType(msg) || 'text/html');
-    break;
-  default:
-  }
-  // `response` is sent only when changed so we need to remember it for response-less events
-  req.response = res;
-  // `raw` is decoded once per `response` change so we reuse the result just like native XHR
-  delete req.raw;
-  return res;
 }
 
 /**
@@ -91,89 +184,6 @@ function getContentType(msg) {
   return type::slice(0, i);
 }
 
-/**
- * @param {GMReq.Web} req
- * @param {GMReq.Message.BG} msg
- * @returns {*}
- */
-function callback(req, msg) {
-  const { opts } = req;
-  const cb = opts[`on${msg.type}`];
-  if (cb) {
-    const { data } = msg;
-    const {
-      response,
-      responseHeaders: headers,
-      responseText: text,
-    } = data;
-    if (response && !('raw' in req)) {
-      req.raw = response;
-    }
-    defineProperty(data, 'response', {
-      __proto__: null,
-      get() {
-        const value = 'raw' in req ? parseData(req, msg) : req.response;
-        defineProperty(this, 'response', { __proto__: null, value });
-        return value;
-      },
-    });
-    if (headers != null) req.headers = headers;
-    if (text != null) req.text = getOwnProp(text, 0) === 'same' ? response : text;
-    setOwnProp(data, 'context', opts.context);
-    setOwnProp(data, 'responseHeaders', req.headers);
-    setOwnProp(data, 'responseText', req.text);
-    cb(data);
-  }
-  if (msg.type === 'loadend') delete idMap[req.id];
-}
-
-/**
- * @param {GMReq.Web} req
- * @param {GMContext} context
- * @param {string} fileName
- */
-function start(req, context, fileName) {
-  const { id, opts, scriptId } = req;
-  // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
-  // it's true by default per the standard/historical behavior of gmxhr
-  const { data, withCredentials = true, anonymous = !withCredentials } = opts;
-  idMap[id] = req;
-  /** @type {GMReq.Message.Web} */
-  bridge.post('HttpRequest', createNullObj({
-    id,
-    scriptId,
-    anonymous,
-    fileName,
-    data: data == null && []
-      // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
-      || (opts.binary || !isObject(data)) && [`${data}`]
-      // No browser can send FormData directly across worlds
-      || getFormData(data)
-      // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
-      || IS_FIREFOX >= 56 && [data]
-      || [data, 'bin'],
-    eventsToNotify: [
-      'abort',
-      'error',
-      'load',
-      'loadend',
-      'loadstart',
-      'progress',
-      'readystatechange',
-      'timeout',
-    ]::filter(key => isFunction(getOwnProp(opts, `on${key}`))),
-    xhrType: getResponseType(opts.responseType),
-  }, opts, [
-    'headers',
-    'method',
-    'overrideMimeType',
-    'password',
-    'timeout',
-    'url',
-    'user',
-  ]));
-}
-
 /** Chrome/FF can't directly transfer FormData to isolated world so we explode it,
  * trusting its iterator is usable because the only reason for a site to break it
  * is to fight a userscript, which it can do by breaking FormData constructor anyway */
@@ -190,13 +200,13 @@ function getResponseType(responseType = '') {
   case 'arraybuffer':
   case 'blob':
     return responseType;
-  case 'document':
+  case kDocument:
   case 'json':
   case 'text':
   case '':
     break;
   default:
-    log('warn', null, `Unknown responseType "${responseType}",`
+    log('warn', null, `Unknown ${kResponseType} "${responseType}",`
       + ' see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.');
   }
   return '';
