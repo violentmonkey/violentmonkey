@@ -34,6 +34,7 @@ export function makeGmApiWrapper(script) {
   const { id } = script.props;
   const resources = createNullObj(meta.resources);
   const context = {
+    __proto__: null, // necessary for optional props like `async`
     id,
     script,
     resources,
