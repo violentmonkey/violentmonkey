@@ -43,6 +43,9 @@ export default {
   props: ['message'],
   setup(props, context) {
     const refInput = ref();
+    const dismiss = () => {
+      context.emit('dismiss');
+    };
     const onButtonClick = button => {
       const { onClick } = button;
       if (onClick) {
@@ -54,9 +57,6 @@ export default {
       if (onBackdropClick) {
         if (onBackdropClick() !== false) dismiss();
       }
-    };
-    const dismiss = () => {
-      context.emit('dismiss');
     };
     const content = computed(() => {
       const { text } = props.message;
