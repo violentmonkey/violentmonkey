@@ -416,6 +416,9 @@ export default {
 $imgSize: 48px;
 $imgGapR: 14px;
 $infoIconSize: 18px;
+// TODO: fix PostCSS calc() which doesn't work here
+$vertLayoutThreshold: 1801px;
+$vertLayoutThresholdMinus1: 1800px;
 
 .page-confirm {
   h1 {
@@ -483,20 +486,23 @@ $infoIconSize: 18px;
       max-height: 10vh;
       min-height: 1.5rem;
       overflow-y: auto;
+      overflow-wrap: anywhere;
     }
   }
   [data-collapsed] {
     dd {
       display: none;
     }
-    dl:focus dd {
-      display: flex;
-      position: absolute;
-      max-height: 50vh;
-      z-index: 100;
-      background: var(--fill-0-5);
-      box-shadow: 1px 3px 9px rgba(128, 128, 128, .5);
-      padding: .5rem;
+    @media (max-width: $vertLayoutThresholdMinus1) {
+      dl:focus dd {
+        display: flex;
+        position: absolute;
+        max-height: 50vh;
+        z-index: 100;
+        background: var(--fill-0-5);
+        box-shadow: 1px 3px 9px rgba(128, 128, 128, .5);
+        padding: .5rem;
+      }
     }
     dt {
       cursor: pointer;
@@ -587,7 +593,7 @@ $infoIconSize: 18px;
       overflow-y: auto;
     }
   }
-  @media (min-width: 1600px) {
+  @media (min-width: $vertLayoutThreshold) {
     flex-direction: row;
     >:first-child {
       min-width: 30em;
