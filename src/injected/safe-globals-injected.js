@@ -15,9 +15,6 @@ const global = (function _() {
 const { document, window } = global;
 export const PROTO = 'prototype';
 export const IS_TOP = top === window;
-export const WINDOW_CLOSE = 'window.close';
-export const WINDOW_FOCUS = 'window.focus';
-export const NS_HTML = 'http://www.w3.org/1999/xhtml';
 export const CALLBACK_ID = '__CBID';
 export const VIOLENTMONKEY = 'Violentmonkey';
 
@@ -59,8 +56,6 @@ export const setOwnProp = (obj, key, value, mutable = true, valueKey) => (
     enumerable: mutable,
   })
 );
-
-export const vmOwnFuncToString = () => `[${VIOLENTMONKEY} property]`;
 
 /** `dst` must have a null proto */
 export const pickIntoNullObj = (dst, src, keys) => {
@@ -107,10 +102,6 @@ export const ensureNestedProp = (obj, bucketId, key, defaultValue) => {
 };
 
 export const promiseResolve = async val => val;
-
-export const vmOwnFunc = (func, toString) => (
-  setOwnProp(func, 'toString', toString || vmOwnFuncToString, false)
-);
 
 // Using just one random() to avoid many methods in vault just for this
 export const safeGetUniqId = (prefix = 'VM') => prefix + mathRandom();

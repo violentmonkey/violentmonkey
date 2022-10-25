@@ -11,8 +11,8 @@ const resolveOrReturn = (context, val) => (
   context.async ? promiseResolve(val) : val
 );
 
-export function makeGmApi() {
-  return {
+export const GM_API = {
+  bound: {
     __proto__: null,
     GM_deleteValue(key) {
       const { id } = this;
@@ -132,6 +132,9 @@ export function makeGmApi() {
     GM_xmlhttpRequest(opts) {
       return onRequestCreate(createNullObj(opts), this);
     },
+  },
+  free: {
+    __proto__: null,
     /**
      * Bypasses site's CSP for inline `style`, `link`, and `script`.
      * @param {Node} [parent]
@@ -170,7 +173,7 @@ export function makeGmApi() {
       }
       const id = onNotificationCreate(options);
       return {
-        remove: vmOwnFunc(() => bridge.send('RemoveNotification', id)),
+        remove: () => bridge.send('RemoveNotification', id),
       };
     },
     GM_setClipboard(data, type) {
@@ -178,8 +181,8 @@ export function makeGmApi() {
     },
     // using the native console.log so the output has a clickable link to the caller's source
     GM_log: logging.log,
-  };
-}
+  },
+};
 
 function webAddElement(parent, tag, attrs) {
   let el;

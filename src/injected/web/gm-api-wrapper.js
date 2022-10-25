@@ -1,5 +1,5 @@
 import bridge from './bridge';
-import { makeGmApi } from './gm-api';
+import { GM_API } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
 import { makeComponentUtils } from './util';
 import { INJECT_INTO } from '../util';
@@ -18,8 +18,9 @@ const GM4_ASYNC = {
   setValue: 1,
   listValues: 1,
 };
-let gmApi;
-let componentUtils;
+const componentUtils = makeComponentUtils();
+const sendTabClose = () => bridge.post('TabClose');
+const sendTabFocus = () => bridge.post('TabFocus');
 
 /**
  * @param {VMInjection.Script} script
@@ -30,12 +31,6 @@ export function makeGmApiWrapper(script) {
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const { meta } = script;
   const grant = meta.grant;
-  let wrapper;
-  let numGrants = grant.length;
-  if (numGrants === 1 && grant[0] === 'none') {
-    numGrants = 0;
-    grant.length = 0;
-  }
   const { id } = script.props;
   const resources = createNullObj(meta.resources);
   const context = {
@@ -45,35 +40,42 @@ export function makeGmApiWrapper(script) {
     resCache: createNullObj(),
   };
   const gmInfo = makeGmInfo(script.gmInfo, meta, resources);
+  const gm4 = {
+    __proto__: null,
+    info: gmInfo,
+  };
   const gm = {
     __proto__: null,
-    GM: {
-      __proto__: null,
-      info: gmInfo,
-    },
+    GM: gm4,
     GM_info: gmInfo,
     unsafeWindow: global,
   };
-  if (!componentUtils) {
-    componentUtils = makeComponentUtils();
+  let contextAsync;
+  let wrapper;
+  let numGrants = grant.length;
+  if (numGrants === 1 && grant[0] === 'none') {
+    numGrants = 0;
   }
   assign(gm, componentUtils);
-  if (grant::indexOf(WINDOW_CLOSE) >= 0) {
-    gm.close = vmOwnFunc(() => bridge.post('TabClose'));
-  }
-  if (grant::indexOf(WINDOW_FOCUS) >= 0) {
-    gm.focus = vmOwnFunc(() => bridge.post('TabFocus'));
-  }
-  if (!gmApi && numGrants) gmApi = makeGmApi();
   grant::forEach((name) => {
-    const gm4name = name::slice(0, 3) === 'GM.' && name::slice(3);
-    const fn = gmApi[gm4name ? `GM_${GM4_ALIAS[gm4name] || gm4name}` : name];
+    const namePrefix = name::slice(0, 3);
+    const gm4name = namePrefix === 'GM.' && name::slice(3);
+    const gmName = gm4name ? `GM_${GM4_ALIAS[name = gm4name] || gm4name}` : name;
+    const fnBound = GM_API.bound[gmName];
+    let fn = fnBound || GM_API.free[gmName];
+    if (fnBound) {
+      fn = safeBind(fn,
+        GM4_ASYNC[gm4name]
+          ? contextAsync || (contextAsync = createNullObj({ async: true }, context))
+          : context);
+    } else if (!fn && (
+      fn = name === 'window.close' && sendTabClose
+        || name === 'window.focus' && sendTabFocus
+    )) {
+      name = name::slice(7); // 'window.'.length
+    }
     if (fn) {
-      if (gm4name) {
-        gm.GM[gm4name] = makeGmMethodCaller(fn, context, GM4_ASYNC[gm4name]);
-      } else {
-        gm[name] = makeGmMethodCaller(fn, context);
-      }
+      (gm4name ? gm4 : gm)[name] = fn;
     }
   });
   if (numGrants) {
@@ -95,11 +97,4 @@ function makeGmInfo(gmInfo, meta, resources) {
   setOwnProp(gmInfo, INJECT_INTO, bridge.mode);
   setOwnProp(gmInfo, 'script', meta);
   return gmInfo;
-}
-
-function makeGmMethodCaller(gmMethod, context, isAsync) {
-  // keeping the native console.log intact
-  if (gmMethod === gmApi.GM_log) return gmMethod;
-  if (isAsync) context = assign({ __proto__: null, async: true }, context);
-  return vmOwnFunc(safeBind(gmMethod, context));
 }

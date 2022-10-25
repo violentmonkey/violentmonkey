@@ -29,7 +29,7 @@ export const onElement = (tag, cb, arg) => new SafePromise(resolve => {
 });
 
 export const makeElem = (tag, attrs) => {
-  const el = document::createElementNS(NS_HTML, tag);
+  const el = document::createElementNS('http://www.w3.org/1999/xhtml', tag);
   if (attrs && isString(attrs)) {
     el::append(attrs);
   } else if (attrs) {
