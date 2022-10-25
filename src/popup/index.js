@@ -78,6 +78,7 @@ Promise.all([
   browser.runtime.connect({ name: `${tab.id}` });
   if (!injectable) {
     store.injectable = false;
+    mutex.resolve();
   } else {
     store.blacklisted = await sendCmdDirectly('TestBlacklist', tab.url);
   }
