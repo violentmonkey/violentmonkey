@@ -26,10 +26,7 @@ export const addBackgroundHandlers = addHandlersImpl.bind({}, bgHandlers);
  */
 const bridge = {
   __proto__: null,
-  /**
-   * -1 = bad realm, 0 = disabled, 1 = enabled, 2 = starting, 'page' | 'content' = running
-   * @type {{ [id: string]: -1 | 0 | 1 | 2 | 'page' | 'content' }}
-   */
+  /** @type {VMBridgeContentIds} */
   ids: createNullObj(),
   cache: createNullObj(),
   pathMaps: createNullObj(),

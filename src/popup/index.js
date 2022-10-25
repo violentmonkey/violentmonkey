@@ -22,7 +22,9 @@ Object.assign(handlers, {
      * because we only show the iframe menu for unique scripts that don't run in the main page */
     const isTop = src.frameId === 0;
     if (!isTop) await mutex.ready;
-    const idMap = data.ids::mapEntry(null, (id, val) => store.idMap[id] !== val && id);
+    const idMap = data.ids::mapEntry(null, (id, val, _) => (_ = store.idMap[id]) !== val
+      && (_ == null || isTop || val === ID_BAD_REALM || val === ID_INJECTING)
+      && id);
     const ids = Object.keys(idMap).map(Number);
     Object.assign(store.idMap, idMap);
     if (isTop) {

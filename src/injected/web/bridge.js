@@ -9,6 +9,7 @@ const callbacks = {
 /**
  * @property {VMScriptGMInfoPlatform} ua
  * @property {VMBridgePostFunc} post
+ * @property {VMBridgeMode} mode
  */
 const bridge = {
   __proto__: null,

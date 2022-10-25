@@ -99,6 +99,11 @@ declare namespace GMReq {
     }
   }
 }
+declare type VMBridgeMode = Exclude<VMScriptInjectInto, 'auto'>;
+declare type VMBridgeContentIds = {
+  /** -1 = bad realm, 0 = disabled, 1 = enabled, 2 = starting, context name = running */
+  [id: string]: -1 | 0 | 1 | 2 | VMBridgeMode;
+}
 declare type VMBridgePostFunc = (
   cmd: string,
   data: PlainJSONValue,
