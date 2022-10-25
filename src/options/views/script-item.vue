@@ -83,32 +83,20 @@
             </a>
           </tooltip>
           <span class="sep"></span>
-          <tooltip :disabled="!homepageURL" :content="i18n('buttonHome')" align="start">
-            <a
-              class="btn-ghost"
-              target="_blank"
-              rel="noopener noreferrer"
-              :href="homepageURL"
-              :tabIndex="homepageURL ? tabIndex : -1">
-              <icon name="home"></icon>
-            </a>
-          </tooltip>
           <tooltip :disabled="!description" :content="description" align="start">
             <a class="btn-ghost" :tabIndex="description ? tabIndex : -1" @click="toggleTip">
               <icon name="info"></icon>
             </a>
           </tooltip>
-          <tooltip
-            :disabled="!script.meta.supportURL"
-            :content="i18n('buttonSupport')"
-            align="start">
+          <tooltip v-for="([title, url], icon) in urls" :key="icon"
+                   :disabled="!url" :content="title" align="start">
             <a
               class="btn-ghost"
               target="_blank"
               rel="noopener noreferrer"
-              :tabIndex="script.meta.supportURL ? tabIndex : -1"
-              :href="script.meta.supportURL">
-              <icon name="question"></icon>
+              :href="url"
+              :tabIndex="url ? tabIndex : -1">
+              <icon :name="icon"/>
             </a>
           </tooltip>
           <!-- Using v-if to actually hide it because FF is slow to apply :not(:empty) CSS -->
@@ -127,7 +115,10 @@
 
 <script>
 import Tooltip from 'vueleton/lib/tooltip';
-import { getLocaleString, getScriptHome, getScriptUpdateUrl, formatTime } from '@/common';
+import {
+  getLocaleString, getScriptHome, getScriptUpdateUrl, formatTime,
+  getScriptSupportUrl, i18n,
+} from '@/common';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
 
@@ -154,9 +145,6 @@ export default {
   computed: {
     canUpdate() {
       return getScriptUpdateUrl(this.script);
-    },
-    homepageURL() {
-      return getScriptHome(this.script) || null;
     },
     author() {
       const text = this.script.meta.author;
@@ -199,6 +187,12 @@ export default {
     },
     url() {
       return `#scripts/${this.script.props.id}`;
+    },
+    urls() {
+      return {
+        home: [i18n('buttonHome'), getScriptHome(this.script)],
+        question: [i18n('buttonSupport'), getScriptSupportUrl(this.script)],
+      };
     },
     nameProps() {
       return this.viewTable

@@ -1,7 +1,7 @@
 import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
 import {
   INJECT_AUTO, INJECT_CONTENT, INJECT_INTO, INJECT_MAPPING, INJECT_PAGE,
-  FEEDBACK, FORCE_CONTENT, METABLOCK_RE, MORE, NEWLINE_END_RE,
+  FEEDBACK, FORCE_CONTENT, HOMEPAGE_URL, METABLOCK_RE, MORE, NEWLINE_END_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
 import { forEachEntry, forEachValue, objectPick, objectSet } from '@/common/object';
@@ -399,10 +399,9 @@ function prepareGmInfo(script, meta, code) {
   META_KEYS_TO_ENSURE.forEach((key) => {
     if (!metaCopy[key]) metaCopy[key] = '';
   });
-  let key;
   let val;
-  if (!metaCopy[key = 'homepageURL'] && (val = metaCopy.homepage)) {
-    metaCopy[key] = val;
+  if (!metaCopy[HOMEPAGE_URL] && (val = metaCopy.homepage)) {
+    metaCopy[HOMEPAGE_URL] = val;
   }
   return {
     // overwriting existing props is ok because `script` is a copy, see getScriptEnv

@@ -3,10 +3,10 @@ import {
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
   getScriptPrettyUrl, makePause,
 } from '@/common';
-import { ICON_PREFIX, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
+import { ICON_PREFIX, INFERRED, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
-import { getNameURI, parseMeta, newScript, getDefaultCustom } from './script';
+import { getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta } from './script';
 import { testScript, testBlacklist, testerBatch } from './tester';
 import { preInitialize } from './init';
 import { addOwnCommands, addPublicCommands, commands } from './message';
@@ -376,6 +376,7 @@ function reportBadScripts(ids) {
  */
 export async function getData({ ids, sizes }) {
   const scripts = ids ? ids.map(getScriptById) : store.scripts;
+  inferScriptProps(scripts);
   return {
     scripts,
     cache: await getIconCache(scripts),
@@ -556,6 +557,7 @@ export async function parseScript(src) {
   if (oldScript) {
     if (src.isNew) throw i18n('msgNamespaceConflict');
     script = { ...oldScript };
+    delete script[INFERRED];
   } else {
     ({ script } = newScript());
     result.isNew = true;

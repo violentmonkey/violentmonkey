@@ -1,6 +1,10 @@
-import { getUniqId, encodeFilename } from '@/common';
-import { METABLOCK_RE, USERSCRIPT_META_INTRO } from '@/common/consts';
-import { mapEntry } from '@/common/object';
+import {
+  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, getUniqId,
+} from '@/common';
+import {
+  HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, USERSCRIPT_META_INTRO,
+} from '@/common/consts';
+import { mapEntry, nest } from '@/common/object';
 import { addOwnCommands } from './message';
 import { getOption } from './options';
 import cache from './cache';
@@ -120,4 +124,69 @@ export function getNameURI(script) {
   let nameURI = encodeFilename(`${ns}\n${name}\n`);
   if (!ns && !name) nameURI += script.props.id || '';
   return nameURI;
+}
+
+/**
+ * @param {VMScript} script
+ * @returns {string | undefined}
+ */
+export function inferScriptHome(script) {
+  let u = script.custom.lastInstallURL;
+  if (u) {
+    u = u.split('/', 6);
+    switch (u[2]) {
+    case 'greasyfork.org':
+      if (u[3] !== 'scripts') u.splice(3, 1);
+      break;
+    case 'raw.githubusercontent.com':
+      u[2] = 'github.com';
+      break;
+    case 'github.com':
+      break;
+    case 'openuserjs.org':
+      u[3] = 'scripts';
+      u[4] = u[4].replace(/(\.min)?\.user\.js$/, '');
+      break;
+    default:
+      u = false;
+    }
+    if (u) {
+      u.length = 5; // scheme + 1 + host + group + name
+      u = u.join('/');
+    }
+  }
+  if (!u) {
+    u = script.meta.namespace;
+    u = /^https?:\/\/(?!tampermonkey\.net\/)/.test(u)
+      && getFullUrl(u).replace(/^https?(:\/\/userscripts)(\.org\/users\/\w)/, 'https$1-mirror$2');
+  }
+  if (u) {
+    nest(script, INFERRED)[HOMEPAGE_URL] = u;
+  }
+  return u || undefined;
+}
+
+/**
+ * @param {VMScript} script
+ * @param {string} [home]
+ * @returns {string}
+ */
+export function inferScriptSupportUrl(script, home = getScriptHome(script)) {
+  const m = home && home.match(re`/
+    ^https:\/\/(?:
+      (?:
+        (g)reasyfork\.org(?:\/(?!scripts)[^/]+)? |
+        openuserjs\.org
+      )(?=\/scripts\/) |
+      github\.com
+    )\/[^/]+\/[^/]+/x`);
+  if (m) return (nest(script, INFERRED)[SUPPORT_URL] = `${m[0]}/${m[1] ? 'feedback' : 'issues'}`);
+}
+
+export function inferScriptProps(scripts) {
+  scripts.forEach(script => {
+    if (!script || script[INFERRED]) return;
+    const home = getScriptHome(script) || inferScriptHome(script);
+    if (!getScriptSupportUrl(script)) inferScriptSupportUrl(script, home);
+  });
 }
