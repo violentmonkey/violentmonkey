@@ -32,7 +32,7 @@ declare namespace GMReq {
     cb: (data: GMReq.Message.BG | GMReq.Message.Chunk) => Promise<void>;
     chunked: boolean;
     coreId: number;
-    eventsToNotify: string[];
+    events: EventType[];
     frameId: number;
     id: string;
     noNativeCookie: boolean;
@@ -45,7 +45,7 @@ declare namespace GMReq {
   interface Content {
     realm: VMScriptInjectInto;
     wantsBlob: boolean;
-    eventsToNotify: EventType[];
+    events: EventType[];
     fileName: string;
     arr?: Uint8Array;
     resolve?: (data: any) => void;
@@ -87,7 +87,7 @@ declare namespace GMReq {
       anonymous: boolean;
       fileName: string;
       data: any[];
-      eventsToNotify: EventType[];
+      events: EventType[];
       headers?: StringMap;
       method?: string;
       overrideMimeType?: string;

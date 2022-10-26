@@ -15,19 +15,24 @@ addPublicCommands({
    */
   HttpRequest(opts, src) {
     const { tab: { id: tabId }, frameId } = src;
-    const { id, eventsToNotify } = opts;
+    const { id, events } = opts;
+    const cb = res => requests[id] && (
+      sendTabCmd(tabId, 'HttpRequested', res, { frameId })
+    );
     /** @type {GMReq.BG} */
     requests[id] = {
       id,
       tabId,
       frameId,
-      eventsToNotify,
+      events,
       xhr: new XMLHttpRequest(),
     };
-    // Returning will show JS exceptions during init phase in the tab console
-    return httpRequest(opts, src, res => requests[id] && (
-      sendTabCmd(tabId, 'HttpRequested', res, { frameId })
-    ));
+    return httpRequest(opts, src, cb)
+    .catch(events.includes('error') && (err => cb({
+      id,
+      error: err.message,
+      type: 'error',
+    })));
   },
   /** @return {void} */
   AbortRequest(id) {
@@ -99,7 +104,7 @@ function xhrCallbackWrapper(req) {
       }
     }
     const { type } = evt;
-    const shouldNotify = req.eventsToNotify.includes(type);
+    const shouldNotify = req.events.includes(type);
     // only send response when XHR is complete
     const shouldSendResponse = xhr.readyState === 4 && shouldNotify && !sent;
     if (!shouldNotify && type !== 'loadend') {
@@ -216,7 +221,7 @@ async function httpRequest(opts, src, cb) {
   }
   toggleHeaderInjector(id, vmHeaders);
   const callback = xhrCallbackWrapper(req);
-  req.eventsToNotify.forEach(evt => { xhr[`on${evt}`] = callback; });
+  req.events.forEach(evt => { xhr[`on${evt}`] = callback; });
   xhr.onloadend = callback; // always send it for the internal cleanup
   xhr.send(body);
 }

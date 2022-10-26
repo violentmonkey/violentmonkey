@@ -43,6 +43,10 @@ addHandlers({
     if (!cb) {
       return;
     }
+    if (hasOwnProperty(msg, 'error')) {
+      cb(new SafeError(msg.error));
+      return;
+    }
     const { data } = msg;
     const {
       [kResponse]: response,
@@ -114,18 +118,23 @@ function parseRaw(req, msg, propName) {
 export function onRequestCreate(opts, context, fileName) {
   if (process.env.DEBUG) throwIfProtoPresent(opts);
   let { data, url } = opts;
-  if (url && !isString(url)) { // USVString in XMLHttpRequest spec calls ToString
-    try {
-      url = url::URLToString();
-    } catch (e) {
-      url = getOwnProp(url, 'href'); // `location`
+  let err, onerror;
+  // XHR spec requires `url` but allows ''/null/non-string
+  if (!url && !('url' in opts)) {
+    err = new SafeError('Required parameter "url" is missing.');
+  } else if (!isString(url)) {
+    if (url === location) { url = url.href; } // safe window.location is unforgeable
+    else {
+      try { url = url::URLToString(); } // safe window.URL getter
+      catch (e) {
+        try { url = `${url}`; } // unsafe toString may throw e.g. for Symbol or if spoofed
+        catch (e) { err = e; }
+      }
     }
-    opts.url = url;
+    if (!err) opts.url = url;
   }
-  if (!url) {
-    const err = new SafeError('Required parameter "url" is missing.');
-    const { onerror } = opts;
-    if (isFunction(onerror)) onerror(err);
+  if (err) {
+    if (isFunction(onerror = opts.onerror)) onerror(err);
     else throw err;
   }
   const scriptId = context.id;
@@ -157,7 +166,7 @@ export function onRequestCreate(opts, context, fileName) {
     id,
     scriptId,
     url,
-    eventsToNotify: EVENTS_TO_NOTIFY::filter(key => isFunction(opts[`on${key}`])),
+    events: EVENTS_TO_NOTIFY::filter(key => isFunction(opts[`on${key}`])),
     xhrType: getResponseType(opts[kResponseType]),
   }, opts, OPTS_TO_PASS));
   return {

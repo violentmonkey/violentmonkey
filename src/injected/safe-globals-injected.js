@@ -13,6 +13,7 @@ const global = (function _() {
 /** These two are unforgeable so we extract them primarily to improve minification.
  * The document's value can change only in about:blank but we don't inject there. */
 const { document, window } = global;
+export const { location } = global;
 export const PROTO = 'prototype';
 export const IS_TOP = top === window;
 export const CALLBACK_ID = '__CBID';

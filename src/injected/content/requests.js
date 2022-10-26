@@ -30,7 +30,7 @@ addHandlers({
       realm,
       wantsBlob: msg.xhrType === 'blob',
     }, msg, [
-      'eventsToNotify',
+      'events',
       'fileName',
     ]);
     msg.url = getFullUrl(msg.url);
@@ -51,11 +51,15 @@ addBackgroundHandlers({
    * @returns {Promise<void>}
    */
   async HttpRequested(msg) {
-    const { id, chunk } = msg;
+    const { id } = msg;
     const req = requests[id];
     if (!req) return;
-    if (chunk) {
-      receiveChunk(req, chunk);
+    if (hasOwnProperty(msg, 'chunk')) {
+      receiveChunk(req, msg.chunk);
+      return;
+    }
+    if (hasOwnProperty(msg, 'error')) {
+      bridge.post('HttpRequested', msg, req.realm);
       return;
     }
     if ((msg.numChunks || 1) === 1) {
@@ -64,7 +68,7 @@ addBackgroundHandlers({
     const { blobbed, data, chunked, type } = msg;
     // only CONTENT realm can read blobs from an extension:// URL
     const response = data
-      && req.eventsToNotify::includes(type)
+      && req.events::includes(type)
       && data.response;
     // messages will come while blob is fetched so we'll temporarily store the Promise
     const importing = response && (blobbed || chunked);
