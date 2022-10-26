@@ -9,8 +9,7 @@ addHandlers({
     if (item) {
       item.closed = true;
       delete tabs[key];
-      const fn = item.onclose;
-      if (fn) fn();
+      item.onclose?.();
     }
   },
 });

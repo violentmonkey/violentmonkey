@@ -5,15 +5,13 @@ const notifications = createNullObj();
 
 addHandlers({
   NotificationClicked(id) {
-    const fn = notifications[id]?.onclick;
-    if (fn) fn();
+    notifications[id]?.onclick?.();
   },
   NotificationClosed(id) {
     const options = notifications[id];
     if (options) {
       delete notifications[id];
-      const fn = options.ondone;
-      if (fn) fn();
+      options.ondone?.();
     }
   },
 });

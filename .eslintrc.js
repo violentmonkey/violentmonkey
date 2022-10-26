@@ -42,10 +42,6 @@ const INJECTED_RULES = {
       selector: 'ObjectExpression > ExperimentalSpreadProperty',
       message: 'Object spread adds a polyfill in injected* even if unused by it',
     }, {
-      selector: 'OptionalCallExpression > MemberExpression',
-      message: 'Optional call on property uses .call(), which may be spoofed/broken in an unsafe environment',
-      // TODO: write a Babel plugin to use safeCall for this.
-    }, {
       selector: 'ArrayPattern',
       message: 'Destructuring via Symbol.iterator may be spoofed/broken in an unsafe environment',
     }, {
