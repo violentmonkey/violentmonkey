@@ -30,7 +30,7 @@ declare namespace GMReq {
   interface BG {
     anonymous: boolean;
     blobbed: boolean;
-    cb: (data: GMReq.Message.BG | GMReq.Message.Chunk) => Promise<void>;
+    cb: (data: GMReq.Message.BGAny) => Promise<void>;
     chunked: boolean;
     coreId: number;
     events: EventType[];
@@ -64,12 +64,8 @@ declare namespace GMReq {
     kResponseText?: string;
   }
   namespace Message {
-    type Chunk = {
-      pos: number;
-      data: string;
-      last: boolean;
-    }
     /** From background */
+    type BGAny = BG | BGChunk | BGError;
     interface BG {
       blobbed: boolean;
       chunked: boolean;
@@ -77,9 +73,21 @@ declare namespace GMReq {
       data: VMScriptResponseObject;
       dataSize: number;
       id: string;
-      numChunks?: number;
       type: EventType;
-      chunk?: Chunk;
+      numChunks: number;
+    }
+    interface BGChunk {
+      id: string;
+      chunk: {
+        pos: number;
+        data: string;
+        last: boolean;
+      };
+    }
+    interface BGError {
+      id: string;
+      type: 'error';
+      error: string;
     }
     /** From web/content bridge */
     interface Web {
@@ -110,7 +118,7 @@ declare type VMBridgeContentIds = {
 
 declare type VMBridgePostFunc = (
   cmd: string,
-  data: PlainJSONValue,
+  data: any, // all types supported by structuredClone algo
   realm?: string,
   node?: Node,
 ) => void;

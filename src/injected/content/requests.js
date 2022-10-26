@@ -55,7 +55,7 @@ addBackgroundHandlers({
     const req = requests[id];
     if (!req) return;
     if (hasOwnProperty(msg, 'chunk')) {
-      receiveChunk(req, msg.chunk);
+      receiveChunk(req, /** @type {BGChunk} */msg);
       return;
     }
     if (hasOwnProperty(msg, 'error')) {
@@ -149,9 +149,9 @@ function receiveAllChunks(req, msg) {
 
 /**
  * @param {GMReq.Content} req
- * @param {GMReq.Message.Chunk} chunk
+ * @param {GMReq.Message.BGChunk} msg
  */
-function receiveChunk(req, { data, pos, last }) {
+function receiveChunk(req, { chunk: { data, pos, last } }) {
   processChunk(req, data, pos);
   if (last) {
     req.gotChunks = true;

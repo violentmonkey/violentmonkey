@@ -70,7 +70,7 @@ function xhrCallbackWrapper(req) {
   let lastPromise = Promise.resolve();
   let contentType;
   let dataSize;
-  let numChunks;
+  let numChunks = 0;
   let response;
   let responseText;
   let responseHeaders;

@@ -44,7 +44,7 @@ addHandlers({
       return;
     }
     if (hasOwnProperty(msg, 'error')) {
-      cb(new SafeError(msg.error));
+      cb(new SafeError((/** @type {BGError} */msg).error));
       return;
     }
     const { data } = msg;
