@@ -20,6 +20,7 @@ declare interface GMContext {
   resources: StringMap;
   script: VMScript;
 }
+
 /**
  * GM_xmlhttpRequest paraphernalia
  */
@@ -99,21 +100,26 @@ declare namespace GMReq {
     }
   }
 }
+
 declare type VMBridgeMode = Exclude<VMScriptInjectInto, 'auto'>;
+
 declare type VMBridgeContentIds = {
   /** -1 = bad realm, 0 = disabled, 1 = enabled, 2 = starting, context name = running */
   [id: string]: -1 | 0 | 1 | 2 | VMBridgeMode;
 }
+
 declare type VMBridgePostFunc = (
   cmd: string,
   data: PlainJSONValue,
   realm?: string,
   node?: Node,
 ) => void;
+
 //#endregion Generic
 //#region VM-specific
 
 declare type VMBadgeMode = 'unique' | 'total' | ''
+
 /**
  * Internal script representation
  */
@@ -123,6 +129,7 @@ declare interface VMScript {
   meta: VMScript.Meta;
   props: VMScript.Props;
 }
+
 declare namespace VMScript {
   type Config = {
     enabled: NumBool;
@@ -181,12 +188,14 @@ declare namespace VMScript {
     sizes?: number[];
   }
 }
+
 /**
  * Injection data sent to the content bridge when injection is disabled
  */
 declare interface VMInjectionDisabled {
   expose: string | false;
 }
+
 /**
  * Injection data sent to the content bridge when injection is enabled
  */
@@ -202,6 +211,7 @@ declare interface VMInjection extends VMInjectionDisabled {
   ids: number[];
   info: VMInjection.Info;
 }
+
 /**
  * Injection paraphernalia in the background script
  */
@@ -252,6 +262,7 @@ declare namespace VMInjection {
     values?: StringMap;
   }
 }
+
 declare interface VMRealmData {
   lists: {
     start: VMScript[];
@@ -262,6 +273,7 @@ declare interface VMRealmData {
   is: boolean;
   info: VMInjection.Info;
 }
+
 /**
  * Internal request()
  */
@@ -277,18 +289,21 @@ declare namespace VMReq {
     data: string | ArrayBuffer | Blob | PlainJSONValue;
   }
 }
+
 declare type VMSearchOptions = {
   reversed?: boolean;
   wrapAround?: chrome.tabs.Tab;
   reuseCursor?: boolean;
   pos?: { line: number, ch: number };
 }
+
 /** Throws on error */
 declare type VMStorageFetch = (
   url: string,
   options?: VMReq.Options,
   check?: (...args) => void // throws on error
 ) => Promise<void>
+
 declare interface VMUserAgent extends VMScriptGMInfoPlatform {
   /** Chrome/ium version number */
   chrome: number | typeof NaN;

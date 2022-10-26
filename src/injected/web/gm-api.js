@@ -14,6 +14,7 @@ const resolveOrReturn = (context, val) => (
 export const GM_API = {
   bound: {
     __proto__: null,
+    /** @this {GMContext} */
     GM_deleteValue(key) {
       const { id } = this;
       const values = loadValues(id);
@@ -22,13 +23,16 @@ export const GM_API = {
       // using `undefined` to match the documentation and TM for GM_addValueChangeListener
       return dumpValue(id, key, undefined, null, oldRaw, this);
     },
+    /** @this {GMContext} */
     GM_getValue(key, def) {
       const raw = loadValues(this.id)[key];
       return resolveOrReturn(this, raw ? decodeValue(raw) : def);
     },
+    /** @this {GMContext} */
     GM_listValues() {
       return resolveOrReturn(this, objectKeys(loadValues(this.id)));
     },
+    /** @this {GMContext} */
     GM_setValue(key, val) {
       const { id } = this;
       const raw = dumpScriptValue(val, jsonDump) || null;
@@ -45,6 +49,7 @@ export const GM_API = {
      * @param {boolean} remote - `true` means value was modified in another tab
      */
     /**
+     * @this {GMContext}
      * @param {String} key - name of the value to monitor
      * @param {GMValueChangeListener} fn - callback
      * @returns {String} listenerId
@@ -62,6 +67,7 @@ export const GM_API = {
       return listenerId;
     },
     /**
+     * @this {GMContext}
      * @param {String} listenerId
      */
     GM_removeValueChangeListener(listenerId) {
@@ -78,12 +84,15 @@ export const GM_API = {
       }
       if (isEmpty(keyHooks)) delete changeHooks[this.id];
     },
+    /** @this {GMContext} */
     GM_getResourceText(name) {
       return getResource(this, name);
     },
+    /** @this {GMContext} */
     GM_getResourceURL(name, isBlobUrl) {
       return getResource(this, name, !!isBlobUrl, isBlobUrl === undefined);
     },
+    /** @this {GMContext} */
     GM_registerMenuCommand(cap, func) {
       const { id } = this;
       const key = `${id}:${cap}`;
@@ -91,12 +100,14 @@ export const GM_API = {
       bridge.post('RegisterMenu', { id, cap });
       return cap;
     },
+    /** @this {GMContext} */
     GM_unregisterMenuCommand(cap) {
       const { id } = this;
       const key = `${id}:${cap}`;
       delete store.commands[key];
       bridge.post('UnregisterMenu', { id, cap });
     },
+    /** @this {GMContext} */
     GM_download(arg1, name) {
       // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
       /** @type {VMScriptGMDownloadOptions} */
@@ -129,6 +140,7 @@ export const GM_API = {
       });
       return onRequestCreate(opts, this, name);
     },
+    /** @this {GMContext} */
     GM_xmlhttpRequest(opts) {
       return onRequestCreate(createNullObj(opts), this);
     },
