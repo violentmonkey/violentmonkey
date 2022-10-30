@@ -131,11 +131,15 @@ export function onRequestCreate(opts, context, fileName) {
         catch (e) { err = e; }
       }
     }
-    if (!err) opts.url = url;
+    opts.url = url;
   }
   if (err) {
-    if (isFunction(onerror = opts.onerror)) onerror(err);
-    else throw err;
+    if (isFunction(onerror = opts.onerror)) {
+      onerror(err);
+      return; // not returning the abort controller as there's no request to abort
+    } else {
+      throw err;
+    }
   }
   const scriptId = context.id;
   const id = safeGetUniqId('VMxhr');
