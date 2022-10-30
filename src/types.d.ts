@@ -60,8 +60,8 @@ declare namespace GMReq {
     opts: UserOpts;
     raw?: string | Blob | ArrayBuffer;
     response?: string | Blob | ArrayBuffer;
-    kResponseHeaders?: string;
-    kResponseText?: string;
+    responseHeaders?: string;
+    responseText?: string;
   }
   namespace Message {
     /** From background */
