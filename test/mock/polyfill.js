@@ -35,6 +35,6 @@ delete MessagePort.prototype.onmessage; // to avoid hanging
 global.PAGE_MODE_HANDSHAKE = 123;
 global.VAULT_ID = false;
 Object.assign(global, require('@/common/safe-globals'));
-Object.assign(global, require('@/injected/safe-globals-injected'));
-Object.assign(global, require('@/injected/content/safe-globals-content'));
-Object.assign(global, require('@/injected/web/safe-globals-web'));
+Object.assign(global, require('@/injected/safe-globals'));
+Object.assign(global, require('@/injected/content/safe-globals'));
+Object.assign(global, require('@/injected/web/safe-globals'));

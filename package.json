@@ -15,7 +15,7 @@
     "lint:js": "eslint --ext .js,.vue . --cache",
     "lint:yml": "gulp check",
     "svgo": "plaid svgo",
-    "test": "cross-env BABEL_ENV=test jest test",
+    "test": "cross-env BABEL_ENV=test TEST=test jest test",
     "ci": "run-p lint test",
     "bumpVersion": "gulp bump",
     "bump": "run-s ci \"bumpVersion --commit\"",

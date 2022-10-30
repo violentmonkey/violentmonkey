@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 /**
- * This file is used by both `injected` and `injected-web` entries.
+ * This file runs before safe-globals of `injected-content` and `injected-web` entries.
  * `global` is used instead of WebPack's polyfill which we disable in webpack.conf.js.
  * `export` is stripped in the final output and is only used for our NodeJS test scripts.
  * WARNING! Don't use exported functions from @/common anywhere in injected!
@@ -58,9 +58,15 @@ export const setOwnProp = (obj, key, value, mutable = true, valueKey) => (
   })
 );
 
-/** `dst` must have a null proto */
-export const pickIntoNullObj = (dst, src, keys) => {
-  if (process.env.DEBUG) throwIfProtoPresent(dst);
+export const nullObjFrom = src => process.env.TEST
+  ? global.Object.assign({ __proto__: null }, src)
+  : assign(createNullObj(), src);
+
+/** If `dst` has a proto, it'll be copied into a new proto:null object */
+export const safePickInto = (dst, src, keys) => {
+  if (getPrototypeOf(dst)) {
+    dst = nullObjFrom(dst);
+  }
   if (src) {
     keys::forEach(key => {
       if (hasOwnProperty(src, key)) {
@@ -69,25 +75,6 @@ export const pickIntoNullObj = (dst, src, keys) => {
     });
   }
   return dst;
-};
-
-/**
- * Helps avoid interception via `Object.prototype`.
- * @param {Object} [base] - source object to copy as a null-proto object
- * @param {Object} [src] - source object to pick from
- * @param {string[]} [keys] - all keys will be picked otherwise
- * @returns {Object} `base` if it's already without prototype, a new object otherwise
- */
-export const createNullObj = (base, src, keys) => {
-  const res = { __proto__: null };
-  if (base) {
-    assign(res, base);
-  }
-  if (src) {
-    if (keys) pickIntoNullObj(res, src, keys);
-    else assign(res, src);
-  }
-  return res;
 };
 
 // WARNING! `obj` must use __proto__:null
@@ -121,7 +108,7 @@ export const log = (level, ...args) => {
  * invalid props like an inherited setter when you only provide `{value}`.
  */
 export const safeDefineProperty = (obj, key, desc) => (
-  defineProperty(obj, key, getPrototypeOf(desc) ? createNullObj(desc) : desc)
+  defineProperty(obj, key, getPrototypeOf(desc) ? nullObjFrom(desc) : desc)
 );
 
 /** Unlike ::push() this one doesn't call possibly spoofed Array.prototype setters */

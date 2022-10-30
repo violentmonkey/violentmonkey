@@ -62,6 +62,6 @@ export async function sendSetPopup(isDelayed) {
       await setPopupThrottle;
       setPopupThrottle = null;
     }
-    sendCmd('SetPopup', createNullObj({ menus }, bridge, ['ids', INJECT_INTO]));
+    sendCmd('SetPopup', safePickInto({ menus }, bridge, ['ids', INJECT_INTO]));
   }
 }

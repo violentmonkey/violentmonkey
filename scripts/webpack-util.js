@@ -4,17 +4,9 @@ const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
 
 // {entryName: path}
 const entryGlobals = {
-  common: [
-    './src/common/safe-globals.js',
-  ],
-  'injected/content': [
-    './src/injected/safe-globals-injected.js',
-    './src/injected/content/safe-globals-content.js',
-  ],
-  'injected/web': [
-    './src/injected/safe-globals-injected.js',
-    './src/injected/web/safe-globals-web.js',
-  ],
+  'common': ['common'],
+  'injected/content': ['injected', 'injected/content'],
+  'injected/web': ['injected', 'injected/web'],
 };
 
 /**
@@ -59,8 +51,9 @@ function getUniqIdB64() {
   ).toString('base64');
 }
 
-function readGlobalsFile(filename, babelOpts = {}) {
+function readGlobalsFile(path, babelOpts = {}) {
   const { ast, code = !ast } = babelOpts;
+  const filename = `./src/${path}/safe-globals.js`;
   const src = fs.readFileSync(filename, { encoding: 'utf8' })
   .replace(/\bexport\s+(function\s+(\w+))/g, 'const $2 = $1')
   .replace(/\bexport\s+(?=(const|let)\s)/g, '');

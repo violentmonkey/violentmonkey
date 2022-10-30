@@ -97,7 +97,7 @@ addHandlers({
 
 function createScriptData(item) {
   const { dataKey } = item;
-  store.values[item.props.id] = createNullObj(item.values);
+  store.values[item.props.id] = nullObjFrom(item.values);
   if (window[dataKey]) { // executeScript ran before GetInjected response
     onCodeSet(item, window[dataKey]);
   } else if (!item.meta.unwrap) {

@@ -59,6 +59,7 @@ export let
   // various methods
   URLToString,
   arrayIsArray,
+  createNullObj,
   createObjectURL,
   formDataEntries,
   hasOwnProperty,
@@ -95,16 +96,17 @@ export const VAULT = (() => {
     res = window[VAULT_ID];
     delete window[VAULT_ID];
   }
-  if (!res) {
-    res = createNullObj();
-  } else if (!isFunction(res[0])) {
+  if (res && !isFunction(res[0])) {
     // res is [this, addVaultExports object]
     // injectPageSandbox iframe's `global` is `window` because it's in page mode
     src = res[0];
     srcWindow = src;
     // In FF some stuff from a detached iframe doesn't work, so we export it from content
     srcFF = IS_FIREFOX && res[1];
-    res = createNullObj();
+    res = false;
+  }
+  if (!res) {
+    res = { __proto__: null };
   }
   res = [
     // window
@@ -145,6 +147,7 @@ export const VAULT = (() => {
     safeBind = res[i += 1] || call.bind(SafeObject.bind),
     // various methods
     URLToString = res[i += 1] || src.URL[PROTO].toString,
+    createNullObj = res[i += 1] || safeBind(SafeObject.create, SafeObject, null),
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     formDataEntries = res[i += 1] || src.FormData[PROTO].entries,
     hasOwnProperty = res[i += 1] || Reflect.has,
@@ -153,7 +156,7 @@ export const VAULT = (() => {
      * by the page if it gains access to any Object from the vault e.g. a thrown SafeError. */
     jsonParse = res[i += 1] || src.JSON.parse,
     jsonStringify = res[i += 1] || src.JSON.stringify,
-    logging = res[i += 1] || createNullObj((srcFF || src).console),
+    logging = res[i += 1] || nullObjFrom((srcFF || src).console),
     mathRandom = res[i += 1] || src.Math.random,
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     reflectOwnKeys = res[i += 1] || Reflect.ownKeys,

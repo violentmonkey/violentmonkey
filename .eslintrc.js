@@ -14,21 +14,21 @@ const FILES_SHARED = [
 ];
 
 const GLOBALS_COMMON = {
-  ...getGlobals('src/common/safe-globals.js'),
+  ...getGlobals('common'),
   re: false, // transform-modern-regexp with useRe option
 };
 const GLOBALS_INJECTED = {
-  ...getGlobals(`src/injected/safe-globals-injected.js`),
+  ...getGlobals('injected'),
   PAGE_MODE_HANDSHAKE: false,
   VAULT_ID: false,
 };
 const GLOBALS_CONTENT = {
   INIT_FUNC_NAME: false,
-  ...getGlobals(`src/injected/content/safe-globals-content.js`),
+  ...getGlobals('injected/content'),
   ...GLOBALS_INJECTED,
 };
 const GLOBALS_WEB = {
-  ...getGlobals(`src/injected/web/safe-globals-web.js`),
+  ...getGlobals('injected/web'),
   ...GLOBALS_INJECTED,
   IS_FIREFOX: false, // passed as a parameter to VMInitInjection in webpack.conf.js
 };
@@ -54,7 +54,7 @@ const INJECTED_RULES = {
     }, {
       selector: `CallExpression[callee.name="defineProperty"]:not(${[
         '[arguments.2.properties.0.key.name="__proto__"]',
-        ':has(CallExpression[callee.name="createNullObj"])'
+        ':has(CallExpression[callee.name="nullObjFrom"])'
       ].join(',')})`,
       message: 'Prototype of descriptor may be spoofed/broken in an unsafe environment',
     }
@@ -156,9 +156,9 @@ module.exports = {
   },
 };
 
-function getGlobals(filename) {
+function getGlobals(path) {
   const res = {};
-  const { ast } = readGlobalsFile(filename, { ast: true });
+  const { ast } = readGlobalsFile(path, { ast: true });
   ast.program.body.forEach(body => {
     const { declarations } = body.declaration || body;
     if (!declarations) return;

@@ -32,7 +32,7 @@ export function makeGmApiWrapper(script) {
   const { meta } = script;
   const grant = meta.grant;
   const { id } = script.props;
-  const resources = createNullObj(meta.resources);
+  const resources = nullObjFrom(meta.resources);
   /** @type {GMContext} */
   const context = {
     __proto__: null, // necessary for optional props like `async`
@@ -68,7 +68,7 @@ export function makeGmApiWrapper(script) {
     if (fnBound) {
       fn = safeBind(fn,
         GM4_ASYNC[gm4name]
-          ? contextAsync || (contextAsync = createNullObj({ async: true }, context))
+          ? contextAsync || (contextAsync = assign({ __proto__: null, async: true }, context))
           : context);
     } else if (!fn && (
       fn = name === 'window.close' && sendTabClose

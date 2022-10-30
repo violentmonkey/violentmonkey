@@ -119,7 +119,7 @@ export const GM_API = {
       } else if (arg1) {
         name = arg1.name;
         onload = arg1.onload;
-        pickIntoNullObj(opts, arg1, [
+        safePickInto(opts, arg1, [
           'url',
           'headers',
           'timeout',
@@ -142,7 +142,7 @@ export const GM_API = {
     },
     /** @this {GMContext} */
     GM_xmlhttpRequest(opts) {
-      return onRequestCreate(createNullObj(opts), this);
+      return onRequestCreate(nullObjFrom(opts), this);
     },
   },
   free: {
@@ -168,7 +168,7 @@ export const GM_API = {
       return webAddElement(null, 'style', { textContent: css, id: safeGetUniqId('VMst') });
     },
     GM_openInTab(url, options) {
-      options = createNullObj(isObject(options) ? options : { active: !options });
+      options = nullObjFrom(isObject(options) ? options : { active: !options });
       options.url = url;
       return onTabCreate(options);
     },

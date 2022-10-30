@@ -48,7 +48,7 @@ const updateGlobalDesc = name => {
   if ((src = inheritedKeys[name])
   || (src = globalKeysSet.get(name)) && (src = src > 0 ? window : global)) {
     if ((desc = describeProperty(src, name))) {
-      desc = createNullObj(desc);
+      desc = nullObjFrom(desc);
       if (typeof name === 'string' && name[0] > 'Z' && typeof desc.value === 'function') {
         desc.value = safeBind(desc.value, src === global ? global : window);
       }

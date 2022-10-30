@@ -78,6 +78,7 @@ const defsObj = {
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
   'process.env.CODEMIRROR_THEMES': JSON.stringify(getCodeMirrorThemes()),
   'process.env.DEV': JSON.stringify(!isProd),
+  'process.env.TEST': JSON.stringify(process.env.BABEL_ENV === 'test'),
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts

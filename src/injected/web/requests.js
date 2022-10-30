@@ -163,7 +163,7 @@ export function onRequestCreate(opts, context, fileName) {
     || IS_FIREFOX >= 56 && [data]
     || [data, 'bin'];
   /** @type {GMReq.Message.Web} */
-  bridge.call('HttpRequest', createNullObj({
+  bridge.call('HttpRequest', safePickInto({
     anonymous,
     data,
     fileName,

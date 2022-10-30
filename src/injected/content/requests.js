@@ -13,6 +13,10 @@ const getBlobType = describeProperty(BlobProto, 'type').get;
 const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
 const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
 const fdAppend = SafeFormData[PROTO].append;
+const PROPS_TO_COPY = [
+  'events',
+  'fileName',
+];
 /** @type {GMReq.Content} */
 const requests = createNullObj();
 let downloadChain = promiseResolve();
@@ -26,13 +30,10 @@ addHandlers({
    */
   async HttpRequest(msg, realm) {
     /** @type {GMReq.Content} */
-    requests[msg.id] = createNullObj({
+    requests[msg.id] = safePickInto({
       realm,
       wantsBlob: msg.xhrType === 'blob',
-    }, msg, [
-      'events',
-      'fileName',
-    ]);
+    }, msg, PROPS_TO_COPY);
     msg.url = getFullUrl(msg.url);
     let { data } = msg;
     if (data[1] && !IS_FIREFOX /* in FF FormData is recreated in bg::decodeBody */) {
@@ -139,7 +140,7 @@ async function revokeBlobAfterTimeout(url) {
  * @return {Promise<Blob|ArrayBuffer>}
  */
 function receiveAllChunks(req, msg) {
-  pickIntoNullObj(req, msg, ['dataSize', 'contentType']);
+  safePickInto(req, msg, ['dataSize', 'contentType']);
   req.arr = new SafeUint8Array(req.dataSize);
   processChunk(req, msg.data.response, 0);
   return !req.gotChunks

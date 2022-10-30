@@ -33,11 +33,14 @@ export const { charCodeAt, indexOf: stringIndexOf, slice } = '';
 export const { append, appendChild, attachShadow, remove, setAttribute } = Element[PROTO];
 export const {
   assign,
+  create: objectCreate,
   defineProperty,
   getOwnPropertyDescriptor: describeProperty,
   getPrototypeOf,
   keys: objectKeys,
 } = Object;
+// eslint-disable-next-line no-restricted-syntax
+export const createNullObj = Object.create.bind(Object, null);
 export const { random: mathRandom } = Math;
 export const regexpTest = RegExp[PROTO].test;
 export const { toStringTag: toStringTagSym } = Symbol; // used by ProtectWebpackBootstrapPlugin
@@ -47,7 +50,7 @@ export const { get: getHref } = describeProperty(HTMLAnchorElement[PROTO], 'href
 export const getDetail = describeProperty(SafeCustomEvent[PROTO], 'detail').get;
 export const getRelatedTarget = describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get;
 export const getReadyState = describeProperty(Document[PROTO], 'readyState').get;
-export const logging = assign(createNullObj(), console);
+export const logging = nullObjFrom(console);
 export const { chrome } = global;
 export const VM_UUID = chrome.runtime.getURL('');
 /** Unlike the built-in `instanceof` operator this doesn't call @@hasInstance which may be spoofed */
