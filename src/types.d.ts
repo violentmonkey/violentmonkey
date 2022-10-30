@@ -136,6 +136,11 @@ declare interface VMScript {
   custom: VMScript.Custom;
   meta: VMScript.Meta;
   props: VMScript.Props;
+  /** Automatically inferred from other props in getData, in-memory only and not in storage */
+  inferred?: {
+    homepageURL?: string;
+    supportURL?: string;
+  },
 }
 
 declare namespace VMScript {
@@ -192,8 +197,6 @@ declare namespace VMScript {
     position: number;
     uri: string;
     uuid: string;
-    /** Added in memory at extension start */
-    sizes?: number[];
   }
 }
 

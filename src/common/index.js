@@ -1,6 +1,8 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser, extensionRoot, ICON_PREFIX } from '@/common/consts';
+import {
+  browser, extensionRoot, HOMEPAGE_URL, ICON_PREFIX, INFERRED, SUPPORT_URL,
+} from '@/common/consts';
 import { deepCopy } from './object';
 import { blob2base64, i18n, isDataUri } from './util';
 
@@ -164,14 +166,26 @@ export function getLocaleString(meta, key) {
   return localeMeta || meta[key] || '';
 }
 
-export function getScriptHome({ custom, meta }) {
-  let v = custom.homepageURL || meta.homepageURL || meta.homepage || meta.website || meta.source;
-  if (!v) {
-    v = meta.namespace;
-    v = /^https?:\/\/(?!tampermonkey\.net\/)/.test(v)
-      && getFullUrl(v).replace(/^https?(:\/\/userscripts)(\.org\/users\/\w)/, 'https$1-mirror$2');
-  }
-  return v || '';
+/**
+ * @param {VMScript} script
+ * @returns {string | undefined}
+ */
+export function getScriptHome(script) {
+  let meta;
+  return script.custom[HOMEPAGE_URL]
+    || (meta = script.meta)[HOMEPAGE_URL]
+    || script[INFERRED]?.[HOMEPAGE_URL]
+    || meta.homepage
+    || meta.website
+    || meta.source;
+}
+
+/**
+ * @param {VMScript} script
+ * @returns {string | undefined}
+ */
+export function getScriptSupportUrl(script) {
+  return script.meta[SUPPORT_URL] || script[INFERRED]?.[SUPPORT_URL];
 }
 
 export function getScriptName(script) {

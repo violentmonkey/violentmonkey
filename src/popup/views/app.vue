@@ -195,7 +195,7 @@ import Tooltip from 'vueleton/lib/tooltip';
 import { INJECT_AUTO } from '@/common/consts';
 import options from '@/common/options';
 import {
-  getScriptHome, getScriptName, getScriptUpdateUrl,
+  getScriptHome, getScriptName, getScriptSupportUrl, getScriptUpdateUrl,
   i18n, makePause, sendCmdDirectly, sendTabCmd,
 } from '@/common';
 import { objectPick } from '@/common/object';
@@ -256,12 +256,12 @@ export default {
   },
   computed: {
     activeLinks() {
-      const ae = this.activeExtras;
-      const url1 = ae.home;
-      const url2 = ae.data.meta.supportURL;
+      const script = this.activeExtras.data;
+      const support = getScriptSupportUrl(script);
+      const home = !support && getScriptHome(script); // not showing homepage if supportURL exists
       return [
-        url1 && [url1, i18n('buttonHome')],
-        url2 && url2 !== url1 && [url2, i18n('buttonSupport')],
+        support && [support, i18n('menuFeedback')],
+        home && [home, i18n('buttonHome')],
       ].filter(Boolean);
     },
     injectionScopes() {
@@ -293,7 +293,6 @@ export default {
             id: `${name}/${script.props.id}`,
             name: scriptName,
             data: script,
-            home: getScriptHome(script),
             key: isSorted && `${
               enabledFirst && +!script.config.enabled
             }${

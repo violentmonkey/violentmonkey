@@ -1,6 +1,6 @@
 import { debounce, ensureArray, initHooks, isEmpty } from '@/common';
 import initCache from '@/common/cache';
-import { WATCH_STORAGE } from '@/common/consts';
+import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
 import { store } from './db';
 import storage, { S_SCRIPT_PRE } from './storage';
@@ -80,7 +80,9 @@ storage.api = {
         } else {
           keys.push(key);
           toWrite[key] = val;
-          updateScriptMap(key, val);
+          if (updateScriptMap(key, val) && val[INFERRED]) {
+            delete (toWrite[key] = { ...val })[INFERRED];
+          }
           updateScriptSizeContributor(key, val);
         }
       }
@@ -171,6 +173,7 @@ function updateScriptMap(key, val) {
   if (id) {
     if (val) scriptMap[id] = val;
     else delete scriptMap[id];
+    return true;
   }
 }
 

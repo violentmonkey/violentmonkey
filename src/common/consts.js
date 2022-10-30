@@ -1,5 +1,9 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
+export const INFERRED = 'inferred';
+export const HOMEPAGE_URL = 'homepageURL';
+export const SUPPORT_URL = 'supportURL';
+
 export const INJECT_AUTO = 'auto';
 export const INJECT_PAGE = 'page';
 export const INJECT_CONTENT = 'content';
