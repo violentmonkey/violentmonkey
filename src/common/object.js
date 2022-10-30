@@ -1,8 +1,6 @@
 /** @type {boolean} */
 let deepDiff;
 
-export const nest = (obj, key) => obj[key] || (obj[key] = {});
-
 export function normalizeKeys(key) {
   if (key == null) return [];
   if (Array.isArray(key)) return key;

@@ -376,7 +376,7 @@ function reportBadScripts(ids) {
  */
 export async function getData({ ids, sizes }) {
   const scripts = ids ? ids.map(getScriptById) : store.scripts;
-  inferScriptProps(scripts);
+  scripts.forEach(inferScriptProps);
   return {
     scripts,
     cache: await getIconCache(scripts),

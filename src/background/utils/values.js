@@ -1,9 +1,10 @@
 import { isEmpty, sendTabCmd } from '@/common';
-import { forEachEntry, nest, objectGet, objectSet } from '@/common/object';
+import { forEachEntry, objectGet, objectSet } from '@/common/object';
 import { getScript } from './db';
 import { addOwnCommands, addPublicCommands } from './message';
 import storage from './storage';
 
+const nest = (obj, key) => obj[key] || (obj[key] = {}); // eslint-disable-line no-return-assign
 /** { scriptId: { tabId: { frameId: {key: raw}, ... }, ... } } */
 const openers = {};
 let chain = Promise.resolve();

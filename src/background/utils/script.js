@@ -4,7 +4,7 @@ import {
 import {
   HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, USERSCRIPT_META_INTRO,
 } from '@/common/consts';
-import { mapEntry, nest } from '@/common/object';
+import { mapEntry } from '@/common/object';
 import { addOwnCommands } from './message';
 import { getOption } from './options';
 import cache from './cache';
@@ -129,8 +129,9 @@ export function getNameURI(script) {
 /**
  * @param {VMScript} script
  * @returns {string | undefined}
+ * Warning! script[INFERRED] must be already created.
  */
-export function inferScriptHome(script) {
+function inferScriptHome(script) {
   let u = script.custom.lastInstallURL;
   if (u) {
     u = u.split('/', 6);
@@ -161,18 +162,19 @@ export function inferScriptHome(script) {
       && getFullUrl(u).replace(/^https?(:\/\/userscripts)(\.org\/users\/\w)/, 'https$1-mirror$2');
   }
   if (u) {
-    nest(script, INFERRED)[HOMEPAGE_URL] = u;
+    script[INFERRED][HOMEPAGE_URL] = u;
+    return u;
   }
-  return u || undefined;
 }
 
 /**
  * @param {VMScript} script
  * @param {string} [home]
- * @returns {string}
+ * @returns {string | undefined}
+ * Warning! script[INFERRED] must be already created.
  */
-export function inferScriptSupportUrl(script, home = getScriptHome(script)) {
-  const m = home && home.match(re`/
+function inferScriptSupportUrl(script, home = getScriptHome(script)) {
+  let u = home && home.match(re`/
     ^https:\/\/(?:
       (?:
         (g)reasyfork\.org(?:\/(?!scripts)[^/]+)? |
@@ -180,13 +182,19 @@ export function inferScriptSupportUrl(script, home = getScriptHome(script)) {
       )(?=\/scripts\/) |
       github\.com
     )\/[^/]+\/[^/]+/x`);
-  if (m) return (nest(script, INFERRED)[SUPPORT_URL] = `${m[0]}/${m[1] ? 'feedback' : 'issues'}`);
+  if (u) {
+    u = `${u[0]}/${u[1] ? 'feedback' : 'issues'}`
+    script[INFERRED][SUPPORT_URL] = u;
+    return u;
+  }
 }
 
-export function inferScriptProps(scripts) {
-  scripts.forEach(script => {
-    if (!script || script[INFERRED]) return;
-    const home = getScriptHome(script) || inferScriptHome(script);
-    if (!getScriptSupportUrl(script)) inferScriptSupportUrl(script, home);
-  });
+export function inferScriptProps(script) {
+  if (!script || script[INFERRED]) return;
+  script[INFERRED] = {}; // to avoid re-trying meaninglessly if we can't infer anything below
+  const home = getScriptHome(script)
+    || inferScriptHome(script);
+  if (!getScriptSupportUrl(script)) {
+    inferScriptSupportUrl(script, home);
+  }
 }
