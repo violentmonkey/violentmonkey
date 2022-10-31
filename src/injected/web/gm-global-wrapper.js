@@ -66,7 +66,8 @@ const updateGlobalDesc = name => {
   });
 });
 builtinGlobals = null; // eslint-disable-line no-global-assign
-globalDesc.eval = describeProperty(window, 'eval'); // must be unbound to allow running in scope
+/** eval must be unbound to allow running in scope */
+globalDesc.eval = nullObjFrom(describeProperty(window, 'eval'));
 
 /**
  * @desc Wrap helpers to prevent unexpected modifications.
