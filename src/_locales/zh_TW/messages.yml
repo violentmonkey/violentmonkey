@@ -539,6 +539,11 @@ menuExcludeHint:
     如果你在設置中開啟了相關選項，那麽當前標簽頁將會自動重載。
     其他標簽頁則需要手動刷新才能應用這些更新。
     在腳本編輯器中的“設置”頁可以進行更多配置。
+menuFeedback:
+  description: >-
+    Menu item in popup to open the selected script's feedback page. Please use a
+    short word in translation to keep the menu narrow.
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 為此站點查詢腳本

@@ -565,6 +565,11 @@ menuExcludeHint:
     manual.
 
     Folosește fila „Setări” a editorului pentru mai multă flexibilitate.
+menuFeedback:
+  description: >-
+    Menu item in popup to open the selected script's feedback page. Please use a
+    short word in translation to keep the menu narrow.
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Găsește scripturi pentru acest site
