@@ -49,7 +49,9 @@ const updateGlobalDesc = name => {
   || (src = globalKeysSet.get(name)) && (src = src > 0 ? window : global)) {
     if ((desc = describeProperty(src, name))) {
       desc = nullObjFrom(desc);
-      if (typeof name === 'string' && name[0] > 'Z' && typeof desc.value === 'function') {
+      /* ~45 enumerable action functions belong to `window` and need to be bound to it,
+       * the non-enum ~10 can be unbound, and `eval` MUST be unbound to run in scope. */
+      if (name >= 'a' && desc.enumerable && typeof desc.value === 'function') {
         desc.value = safeBind(desc.value, src === global ? global : window);
       }
       // Using `!` to avoid the need to use and safe-guard isNaN
@@ -66,8 +68,6 @@ const updateGlobalDesc = name => {
   });
 });
 builtinGlobals = null; // eslint-disable-line no-global-assign
-/** eval must be unbound to allow running in scope */
-globalDesc.eval = nullObjFrom(describeProperty(window, 'eval'));
 
 /**
  * @desc Wrap helpers to prevent unexpected modifications.
