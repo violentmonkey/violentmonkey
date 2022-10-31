@@ -276,6 +276,7 @@ const FORCED_ACCEPT = {
 
 const isLocalUrlRe = re`/^(
   file:\/\/|
+  about:|
   data:|
   https?:\/\/
     ([^@/]*@)?

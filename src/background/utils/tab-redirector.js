@@ -65,9 +65,10 @@ const maybeRedirectVirtualUrlFF = virtualUrlRe && ((tabId, src) => {
 });
 
 async function maybeInstallUserJs(tabId, url) {
+  // Getting the tab now before it navigated
+  const tab = tabId >= 0 && await browser.tabs.get(tabId) || {};
   const { data: code } = await request(url).catch(noop) || {};
   if (code && parseMeta(code).name) {
-    const tab = tabId >= 0 && await browser.tabs.get(tabId) || {};
     commands.ConfirmInstall({ code, url, from: tab.url }, { tab });
   } else {
     cache.put(`bypass:${url}`, true, 10e3);
@@ -107,7 +108,8 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
   if (!cache.has(`bypass:${url}`)
   && (!blacklistRe.test(url) || whitelistRe.test(url))) {
     maybeInstallUserJs(tabId, url);
-    return { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url
+    // Cancelling because redirectUrl: 'javascript:void 0' doesn't work in FF with strict CSP
+    return { cancel: true };
   }
 }, {
   urls: [
