@@ -559,6 +559,11 @@ menuExcludeHint:
     Ak chcete použiť zmeny na všetkých ostatných kartách, obnovte ich ručne.
 
     Pre väčšiu flexibilitu použite kartu „Nastavenia“ editora.
+menuFeedback:
+  description: >-
+    Menu item in popup to open the selected script's feedback page. Please use a
+    short word in translation to keep the menu narrow.
+  message: Spätná väzba
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Vyhľadať skripty pre túto stránku

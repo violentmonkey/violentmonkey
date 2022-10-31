@@ -574,6 +574,11 @@ menuExcludeHint:
     manualmente.
 
     Utiliza la pestaña "Configuración" del editor para mayor flexibilidad.
+menuFeedback:
+  description: >-
+    Menu item in popup to open the selected script's feedback page. Please use a
+    short word in translation to keep the menu narrow.
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Buscar scripts para este sitio

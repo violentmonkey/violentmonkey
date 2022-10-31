@@ -538,6 +538,11 @@ menuExcludeHint:
     如果你在设置中开启了相关选项，那么当前标签页将会自动重载。
     其他标签页则需要手动刷新才能应用这些更新。
     在脚本编辑器中的“设置”页可以进行更多配置。
+menuFeedback:
+  description: >-
+    Menu item in popup to open the selected script's feedback page. Please use a
+    short word in translation to keep the menu narrow.
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 为此站点查找脚本
