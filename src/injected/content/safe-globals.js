@@ -33,7 +33,6 @@ export const { charCodeAt, indexOf: stringIndexOf, slice } = '';
 export const { append, appendChild, attachShadow, remove, setAttribute } = Element[PROTO];
 export const {
   assign,
-  create: objectCreate,
   defineProperty,
   getOwnPropertyDescriptor: describeProperty,
   getPrototypeOf,
