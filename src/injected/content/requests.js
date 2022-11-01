@@ -14,7 +14,6 @@ const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
 const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
 const fdAppend = SafeFormData[PROTO].append;
 const PROPS_TO_COPY = [
-  'events',
   'fileName',
 ];
 /** @type {GMReq.Content} */
@@ -29,10 +28,9 @@ addHandlers({
    * @returns {Promise<void>}
    */
   async HttpRequest(msg, realm) {
-    /** @type {GMReq.Content} */
     requests[msg.id] = safePickInto({
       realm,
-      wantsBlob: msg.xhrType === 'blob',
+      asBlob: msg.xhrType === 'blob',
     }, msg, PROPS_TO_COPY);
     msg.url = getFullUrl(msg.url);
     let { data } = msg;
@@ -52,63 +50,48 @@ addBackgroundHandlers({
    * @returns {Promise<void>}
    */
   async HttpRequested(msg) {
-    const { id } = msg;
+    const { id, data } = msg;
     const req = requests[id];
-    if (!req) return;
+    if (!req) {
+      if (process.env.DEV) console.warn('[HttpRequested][content]: no request for id', id);
+      return;
+    }
     if (hasOwnProperty(msg, 'chunk')) {
-      receiveChunk(req, /** @type {BGChunk} */msg);
+      processChunk(req, data, msg);
       return;
     }
-    if (hasOwnProperty(msg, 'error')) {
-      bridge.post('HttpRequested', msg, req.realm);
-      return;
+    let response = data?.response;
+    if (response && !IS_FIREFOX) {
+      if (msg.blobbed) {
+        response = await importBlob(req, response);
+      }
+      if (msg.chunked) {
+        response = processChunk(req, response);
+        response = req.asBlob
+          ? new SafeBlob([response], { type: msg.contentType })
+          : response.buffer;
+        delete req.arr;
+      }
+      data.response = response;
     }
-    if ((msg.numChunks || 1) === 1) {
-      req.gotChunks = true;
+    if (msg.type === 'load' && req.fileName) {
+      await downloadBlob(response, req.fileName);
     }
-    const { blobbed, data, chunked, type } = msg;
-    // only CONTENT realm can read blobs from an extension:// URL
-    const response = data
-      && req.events::includes(type)
-      && data.response;
-    // messages will come while blob is fetched so we'll temporarily store the Promise
-    const importing = response && (blobbed || chunked);
-    if (importing) {
-      req.bin = blobbed
-        ? importBlob(req, response)
-        : receiveAllChunks(req, msg);
-    }
-    // ...which can be awaited in these subsequent messages
-    if (isPromise(req.bin)) {
-      req.bin = await req.bin;
-    }
-    // If the user in incognito supplied only `onloadend` then it arrives first, followed by chunks
-    // If the user supplied any event before `loadend`, all chunks finish before `loadend` arrives
-    if (type === 'loadend') {
-      req.gotLoadEnd = true;
-    }
-    if (importing) {
-      data.response = req.bin;
-    }
-    const fileName = type === 'load' && req.fileName;
-    if (fileName) {
-      req.fileName = '';
-      await downloadBlob(IS_FIREFOX ? response : req.bin, fileName);
+    if (msg.type === 'loadend') {
+      delete requests[msg.id];
     }
     bridge.post('HttpRequested', msg, req.realm);
-    if (req.gotLoadEnd && req.gotChunks) {
-      delete requests[id];
-    }
   },
 });
 
 /**
+ * Only a content script can read blobs from an extension:// URL
  * @param {GMReq.Content} req
  * @param {string} url
  * @returns {Promise<Blob|ArrayBuffer>}
  */
 async function importBlob(req, url) {
-  const data = await (await safeFetch(url))::(req.wantsBlob ? getBlob : getArrayBuffer)();
+  const data = await (await safeFetch(url))::(req.asBlob ? getBlob : getArrayBuffer)();
   sendCmd('RevokeBlob', url);
   return data;
 }
@@ -134,56 +117,19 @@ async function revokeBlobAfterTimeout(url) {
 }
 
 /**
- * ArrayBuffer/Blob in Chrome incognito is transferred in string chunks
- * @param {GMReq.Content} req
- * @param {GMReq.Message.BG} msg
- * @return {Promise<Blob|ArrayBuffer>}
- */
-function receiveAllChunks(req, msg) {
-  safePickInto(req, msg, ['dataSize', 'contentType']);
-  req.arr = new SafeUint8Array(req.dataSize);
-  processChunk(req, msg.data.response, 0);
-  return !req.gotChunks
-    ? new SafePromise(resolve => { req.resolve = resolve; })
-    : finishChunks(req);
-}
-
-/**
- * @param {GMReq.Content} req
- * @param {GMReq.Message.BGChunk} msg
- */
-function receiveChunk(req, { chunk: { data, pos, last } }) {
-  processChunk(req, data, pos);
-  if (last) {
-    req.gotChunks = true;
-    req.resolve(finishChunks(req));
-    delete req.resolve;
-  }
-}
-
-/**
  * @param {GMReq.Content} req
  * @param {string} data
- * @param {number} pos
+ * @param {GMReq.Message.BGChunk} [msg]
+ * @returns {Uint8Array}
  */
-function processChunk(req, data, pos) {
-  const { arr } = req;
+function processChunk(req, data, msg) {
   data = safeAtob(data);
-  for (let len = data.length, i = 0; i < len; i += 1, pos += 1) {
-    arr[pos] = data::charCodeAt(i);
+  const len = data.length;
+  const arr = req.arr || (req.arr = new SafeUint8Array(msg ? msg.size : len));
+  for (let pos = msg?.chunk || 0, i = 0; i < len;) {
+    arr[pos++] = data::charCodeAt(i++);
   }
-}
-
-/**
- * @param {GMReq.Content} req
- * @return {Blob|ArrayBuffer}
- */
-function finishChunks(req) {
-  const { arr } = req;
-  delete req.arr;
-  return req.wantsBlob
-    ? new SafeBlob([arr], { type: req.contentType })
-    : arr.buffer;
+  return arr;
 }
 
 /** Doing it here because vault's SafeResponse+blob() doesn't work in injected-web */

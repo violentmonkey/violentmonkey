@@ -24,13 +24,13 @@ addPublicCommands({
       id,
       tabId,
       frameId,
-      events,
       xhr: new XMLHttpRequest(),
     };
-    return httpRequest(opts, src, cb)
+    return httpRequest(opts, events, src, cb)
     .catch(events.includes('error') && (err => cb({
       id,
       error: err.message,
+      data: null,
       type: 'error',
     })));
   },
@@ -54,19 +54,27 @@ addPublicCommands({
 /* 1MB takes ~20ms to encode/decode so it doesn't block the process of the extension and web page,
  * which lets us and them be responsive to other events or user input. */
 const CHUNK_SIZE = 1e6;
+const BLOB_LIFE = 60e3;
+const SEND_XHR_PROPS = ['readyState', 'status', 'statusText'];
+const SEND_PROGRESS_PROPS = ['lengthComputable', 'loaded', 'total'];
 
-async function blob2chunk(response, index) {
+function blob2chunk(response, index) {
   return blob2base64(response, index * CHUNK_SIZE, CHUNK_SIZE);
 }
 
 function blob2objectUrl(response) {
   const url = URL.createObjectURL(response);
-  cache.put(`xhrBlob:${url}`, setTimeout(commands.RevokeBlob, 60e3, url), 61e3);
+  cache.put(`xhrBlob:${url}`, setTimeout(URL.revokeObjectURL, BLOB_LIFE, url), BLOB_LIFE);
   return url;
 }
 
-/** @param {GMReq.BG} req */
-function xhrCallbackWrapper(req) {
+/**
+ * @param {GMReq.BG} req
+ * @param {GMReq.EventType[]} events
+ * @param {boolean} blobbed
+ * @param {boolean} chunked
+ */
+function xhrCallbackWrapper(req, events, blobbed, chunked) {
   let lastPromise = Promise.resolve();
   let contentType;
   let dataSize;
@@ -75,7 +83,7 @@ function xhrCallbackWrapper(req) {
   let responseText;
   let responseHeaders;
   let sent = false;
-  const { id, blobbed, chunked, xhr } = req;
+  const { id, xhr } = req;
   // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
   const getChunk = blobbed && blob2objectUrl || chunked && blob2chunk;
   const getResponseHeaders = () => {
@@ -87,7 +95,7 @@ function xhrCallbackWrapper(req) {
   };
   return (evt) => {
     if (!contentType) {
-      contentType = xhr.getResponseHeader('Content-Type') || 'application/octet-stream';
+      contentType = xhr.getResponseHeader('Content-Type') || '';
     }
     if (xhr.response !== response) {
       response = xhr.response;
@@ -104,27 +112,35 @@ function xhrCallbackWrapper(req) {
       }
     }
     const { type } = evt;
-    const shouldNotify = req.events.includes(type);
-    // only send response when XHR is complete
+    const shouldNotify = events.includes(type);
+    // Sending only when XHR is complete. TODO: send partial delta since last time in onprogress?
     const shouldSendResponse = xhr.readyState === 4 && shouldNotify && !sent;
     if (!shouldNotify && type !== 'loadend') {
       return;
     }
     lastPromise = lastPromise.then(async () => {
+      if (shouldSendResponse) {
+        for (let i = 1; i < numChunks; i += 1) {
+          await req.cb({
+            id,
+            chunk: i * CHUNK_SIZE,
+            data: await getChunk(response, i),
+            size: dataSize,
+          });
+        }
+      }
       await req.cb({
         blobbed,
         chunked,
         contentType,
-        dataSize,
         id,
-        numChunks,
         type,
         /** @type {VMScriptResponseObject} */
         data: shouldNotify && {
           finalUrl: req.url || xhr.responseURL,
           ...getResponseHeaders(),
-          ...objectPick(xhr, ['readyState', 'status', 'statusText']),
-          ...('loaded' in evt) && objectPick(evt, ['lengthComputable', 'loaded', 'total']),
+          ...objectPick(xhr, SEND_XHR_PROPS),
+          ...objectPick(evt, SEND_PROGRESS_PROPS),
           response: shouldSendResponse
             ? numChunks && await getChunk(response, 0) || response
             : null,
@@ -133,18 +149,6 @@ function xhrCallbackWrapper(req) {
             : null,
         },
       });
-      if (shouldSendResponse) {
-        for (let i = 1; i < numChunks; i += 1) {
-          await req.cb({
-            id,
-            chunk: {
-              pos: i * CHUNK_SIZE,
-              data: await getChunk(response, i),
-              last: i + 1 === numChunks,
-            },
-          });
-        }
-      }
       if (type === 'loadend') {
         clearRequest(req);
       }
@@ -154,10 +158,12 @@ function xhrCallbackWrapper(req) {
 
 /**
  * @param {GMReq.Message.Web} opts
+ * @param {GMReq.EventType[]} events
  * @param {MessageSender} src
  * @param {function} cb
+ * @returns {Promise<void>}
  */
-async function httpRequest(opts, src, cb) {
+async function httpRequest(opts, events, src, cb) {
   const { tab } = src;
   const { incognito } = tab;
   const { anonymous, id, overrideMimeType, xhrType, url } = opts;
@@ -169,12 +175,10 @@ async function httpRequest(opts, src, cb) {
   const vmHeaders = [];
   // Firefox can send Blob/ArrayBuffer directly
   const willStringifyBinaries = xhrType && !IS_FIREFOX;
+  // Chrome can't fetch Blob URL in incognito so we use chunks
   const chunked = willStringifyBinaries && incognito;
   const blobbed = willStringifyBinaries && !incognito;
   const [body, contentType] = decodeBody(opts.data);
-  // Chrome can't fetch Blob URL in incognito so we use chunks
-  req.blobbed = blobbed;
-  req.chunked = chunked;
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
   let shouldSendCookies = !anonymous && (incognito || IS_FIREFOX);
@@ -220,8 +224,9 @@ async function httpRequest(opts, src, cb) {
     }
   }
   toggleHeaderInjector(id, vmHeaders);
-  const callback = xhrCallbackWrapper(req);
-  req.events.forEach(evt => { xhr[`on${evt}`] = callback; });
+  // Sending as params to avoid storing one-time init data in `requests`
+  const callback = xhrCallbackWrapper(req, events, blobbed, chunked);
+  events.forEach(evt => { xhr[`on${evt}`] = callback; });
   xhr.onloadend = callback; // always send it for the internal cleanup
   xhr.send(body);
 }

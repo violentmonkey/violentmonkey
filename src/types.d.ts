@@ -29,11 +29,8 @@ declare namespace GMReq {
   type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails;
   interface BG {
     anonymous: boolean;
-    blobbed: boolean;
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
-    chunked: boolean;
     coreId: number;
-    events: EventType[];
     frameId: number;
     id: string;
     noNativeCookie: boolean;
@@ -44,15 +41,10 @@ declare namespace GMReq {
     xhr: XMLHttpRequest;
   }
   interface Content {
-    realm: VMScriptInjectInto;
-    wantsBlob: boolean;
-    events: EventType[];
-    fileName: string;
     arr?: Uint8Array;
-    resolve?: (data: any) => void;
-    dataSize?: number;
-    contentType?: string;
-    gotChunks?: boolean;
+    asBlob: boolean;
+    fileName: string;
+    realm: VMScriptInjectInto;
   }
   interface Web {
     id: string;
@@ -71,22 +63,19 @@ declare namespace GMReq {
       chunked: boolean;
       contentType: string;
       data: VMScriptResponseObject;
-      dataSize: number;
       id: string;
       type: EventType;
-      numChunks: number;
     }
     interface BGChunk {
       id: string;
-      chunk: {
-        pos: number;
-        data: string;
-        last: boolean;
-      };
+      chunk: number;
+      data: string;
+      size: number;
     }
     interface BGError {
       id: string;
       type: 'error';
+      data: null; // helps avoid the need for hasOwnProperty in HttpRequested
       error: string;
     }
     /** From web/content bridge */
@@ -119,7 +108,7 @@ declare type VMBridgeContentIds = {
 declare type VMBridgePostFunc = (
   cmd: string,
   data: any, // all types supported by structuredClone algo
-  realm?: string,
+  realm?: VMBridgeMode,
   node?: Node,
 ) => void;
 
