@@ -2,7 +2,7 @@ import { dumpScriptValue, isEmpty } from '../util';
 import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
-import { onRequestCreate } from './requests';
+import { onRequestCreate, onRequestInitError } from './requests';
 import { onNotificationCreate } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
 import { jsonDump } from './util';
@@ -107,33 +107,28 @@ export const GM_API = {
       delete store.commands[key];
       bridge.post('UnregisterMenu', { id, cap });
     },
-    /** @this {GMContext} */
-    GM_download(arg1, name) {
-      // not using ... as it calls Babel's polyfill that calls unsafe Object.xxx
-      /** @type {VMScriptGMDownloadOptions} */
-      const opts = createNullObj();
+    /**
+     * @this {GMContext}
+     * @param {VMScriptGMDownloadOptions|string} opts
+     * @param {string} [name]
+     */
+    GM_download(opts, name) {
       let onload;
-      if (isString(arg1)) {
-        opts.url = arg1;
-        opts.name = name;
-      } else if (arg1) {
-        name = arg1.name;
-        onload = arg1.onload;
-        safePickInto(opts, arg1, [
-          'url',
-          'headers',
-          'timeout',
-          'onerror',
-          'onprogress',
-          'ontimeout',
-        ]);
+      if (isString(opts)) {
+        opts = nullObjFrom({ url: opts, name });
+      } else if (opts) {
+        opts = nullObjFrom(opts);
+        name = opts.name;
+        onload = opts.onload;
       }
-      if (!name || !isString(name)) {
-        throw new SafeError('Required parameter "name" is missing or not a string.');
+      if (!name ? (name = 'missing') : !isString(name) && (name = 'not a string')) {
+        onRequestInitError(opts, new SafeError(`Required parameter "name" is ${name}.`));
+        return;
       }
       assign(opts, {
+        [kResponseType]: 'blob',
+        data: null,
         method: 'GET',
-        responseType: 'blob',
         overrideMimeType: 'application/octet-stream',
         // Must be present and a function to trigger downloadBlob in content bridge
         onload: isFunction(onload) ? onload : (() => {}),
