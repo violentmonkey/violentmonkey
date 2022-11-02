@@ -136,7 +136,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked) {
         id,
         type,
         /** @type {VMScriptResponseObject} */
-        data: shouldNotify && {
+        data: shouldNotify ? {
           finalUrl: req.url || xhr.responseURL,
           ...getResponseHeaders(),
           ...objectPick(xhr, SEND_XHR_PROPS),
@@ -147,7 +147,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked) {
           [kResponseText]: shouldSendResponse
             ? responseText
             : null,
-        },
+        } : null,
       });
       if (type === 'loadend') {
         clearRequest(req);
