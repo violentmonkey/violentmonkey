@@ -27,3 +27,6 @@ export const IS_FIREFOX = !global.chrome.app;
 export const isFunction = val => typeof val === 'function';
 export const isObject = val => val != null && typeof val === 'object';
 export const VIOLENTMONKEY = 'Violentmonkey';
+export const kResponseHeaders = 'responseHeaders';
+export const kResponseText = 'responseText';
+export const kResponseType = 'responseType';

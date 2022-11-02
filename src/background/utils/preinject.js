@@ -210,7 +210,7 @@ function toggleXhrInject(enable) {
   if (enable) {
     browser.webRequest.onHeadersReceived.addListener(onHeadersReceived, API_CONFIG, [
       'blocking',
-      'responseHeaders',
+      kResponseHeaders,
       browser.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS,
     ].filter(Boolean));
   }
@@ -239,7 +239,7 @@ function onHeadersReceived(info) {
  * @param {chrome.webRequest.WebResponseHeadersDetails} info
  * @param {VMInjection.Bag} bag
  */
-function prepareXhrBlob({ url, responseHeaders }, bag) {
+function prepareXhrBlob({ url, [kResponseHeaders]: responseHeaders }, bag) {
   if (IS_FIREFOX && url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
     forceContentInjection(bag);
   }
@@ -251,7 +251,7 @@ function prepareXhrBlob({ url, responseHeaders }, bag) {
     value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
   });
   setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
-  return { responseHeaders };
+  return { [kResponseHeaders]: responseHeaders };
 }
 
 function prepare(key, url, tabId, frameId, forceContent) {

@@ -14,7 +14,7 @@ const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
 const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
 const fdAppend = SafeFormData[PROTO].append;
 const PROPS_TO_COPY = [
-  'fileName',
+  kFileName,
 ];
 /** @type {GMReq.Content} */
 const requests = createNullObj();
@@ -74,8 +74,8 @@ addBackgroundHandlers({
       }
       data.response = response;
     }
-    if (msg.type === 'load' && req.fileName) {
-      await downloadBlob(response, req.fileName);
+    if (msg.type === 'load' && req[kFileName]) {
+      await downloadBlob(response, req[kFileName]);
     }
     if (msg.type === 'loadend') {
       delete requests[msg.id];

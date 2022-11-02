@@ -3,9 +3,6 @@ import bridge, { addHandlers } from './bridge';
 /** @type {Object<string,GMReq.Web>} */
 const idMap = createNullObj();
 const kResponse = 'response';
-const kResponseHeaders = 'responseHeaders';
-const kResponseText = 'responseText';
-const kResponseType = 'responseType';
 const kResponseXML = 'responseXML';
 const kDocument = 'document';
 const EVENTS_TO_NOTIFY = [
@@ -18,6 +15,10 @@ const EVENTS_TO_NOTIFY = [
   'readystatechange',
   'timeout',
 ];
+const OPTS_TO_KEEP = [
+  'context',
+  kResponseType,
+];
 const OPTS_TO_PASS = [
   'headers',
   'method',
@@ -26,6 +27,16 @@ const OPTS_TO_PASS = [
   'timeout',
   'user',
 ];
+const XHR_TYPE_BIN = {
+  arraybuffer: 1,
+  blob: 1,
+};
+const XHR_TYPE_TXT = {
+  [kDocument]: 1,
+  json: 1,
+  text: 1,
+  '': 1,
+};
 
 addHandlers({
   /** @param {GMReq.Message.BG} msg */
@@ -35,8 +46,7 @@ addHandlers({
       return;
     }
     const { type } = msg;
-    const { opts } = req;
-    const cb = opts[`on${type}`];
+    const cb = req.cb[type];
     if (type === 'loadend') {
       delete idMap[req.id];
     }
@@ -62,7 +72,7 @@ addHandlers({
     if (text != null) {
       req[kResponseText] = getOwnProp(text, 0) === 'same' ? response : text;
     }
-    setOwnProp(data, 'context', opts.context);
+    setOwnProp(data, 'context', req.context);
     setOwnProp(data, kResponseHeaders, req[kResponseHeaders]);
     setOwnProp(data, kResponseText, req[kResponseText]);
     setOwnProp(data, kResponseXML, safeBind(parseRaw, data, req, msg, kResponseXML), true, 'get');
@@ -81,7 +91,7 @@ addHandlers({
  * @returns {string | Blob | ArrayBuffer | null}
  */
 function parseRaw(req, msg, propName) {
-  const { [kResponseType]: responseType } = req.opts;
+  const { [kResponseType]: responseType } = req;
   let res;
   if ('raw' in req) {
     res = req.raw;
@@ -118,7 +128,7 @@ function parseRaw(req, msg, propName) {
 export function onRequestCreate(opts, context, fileName) {
   if (process.env.DEBUG) throwIfProtoPresent(opts);
   let { data, url } = opts;
-  let err, onerror;
+  let err;
   // XHR spec requires `url` but allows ''/null/non-string
   if (!url && !('url' in opts)) {
     err = new SafeError('Required parameter "url" is missing.');
@@ -134,22 +144,13 @@ export function onRequestCreate(opts, context, fileName) {
     opts.url = url;
   }
   if (err) {
-    if (isFunction(onerror = opts.onerror)) {
-      onerror(err);
-      return; // not returning the abort controller as there's no request to abort
-    } else {
-      throw err;
-    }
+    onRequestInitError(opts, err);
+    return; // not returning the abort controller as there's no request to abort
   }
   const scriptId = context.id;
   const id = safeGetUniqId('VMxhr');
-  /** @type {GMReq.Web} */
-  const req = {
-    __proto__: null,
-    id,
-    scriptId,
-    opts,
-  };
+  const cb = createNullObj();
+  const req = safePickInto({ cb, id, scriptId }, opts, OPTS_TO_KEEP);
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
   const { withCredentials = true, anonymous = !withCredentials } = opts;
@@ -166,11 +167,11 @@ export function onRequestCreate(opts, context, fileName) {
   bridge.call('HttpRequest', safePickInto({
     anonymous,
     data,
-    fileName,
     id,
     scriptId,
     url,
-    events: EVENTS_TO_NOTIFY::filter(key => isFunction(opts[`on${key}`])),
+    [kFileName]: fileName,
+    events: EVENTS_TO_NOTIFY::filter(key => isFunction(cb[key] = opts[`on${key}`])),
     xhrType: getResponseType(opts[kResponseType]),
   }, opts, OPTS_TO_PASS));
   return {
@@ -178,6 +179,11 @@ export function onRequestCreate(opts, context, fileName) {
       bridge.post('AbortRequest', id);
     },
   };
+}
+
+export function onRequestInitError({ onerror }, err) {
+  if (isFunction(onerror)) onerror(err);
+  else throw err;
 }
 
 /**
@@ -209,18 +215,11 @@ function getFormData(data) {
 }
 
 function getResponseType(responseType = '') {
-  switch (responseType) {
-  case 'arraybuffer':
-  case 'blob':
+  if (hasOwnProperty(XHR_TYPE_BIN, responseType)) {
     return responseType;
-  case kDocument:
-  case 'json':
-  case 'text':
-  case '':
-    break;
-  default:
-    log('warn', null, `Unknown ${kResponseType} "${responseType}",`
-      + ' see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest for more detail.');
+  }
+  if (!hasOwnProperty(XHR_TYPE_TXT, responseType)) {
+    logging.warn(`Unknown ${kResponseType} "${responseType}"`);
   }
   return '';
 }

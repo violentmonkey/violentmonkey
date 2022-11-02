@@ -332,7 +332,7 @@ export default {
         return cache.get(cacheKey);
       }
       const response = await request(url, {
-        responseType: isBlob ? 'blob' : null,
+        [kResponseType]: isBlob ? 'blob' : null,
       });
       const data = isBlob
         ? await makeRaw(response)

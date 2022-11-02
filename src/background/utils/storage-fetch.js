@@ -3,7 +3,7 @@ import storage from './storage';
 
 storage.cache.fetch = cacheOrFetch({
   init(options) {
-    return { ...options, responseType: 'blob' };
+    return { ...options, [kResponseType]: 'blob' };
   },
   async transform(response, url, options, check) {
     const [type, body] = await makeRaw(response, true);

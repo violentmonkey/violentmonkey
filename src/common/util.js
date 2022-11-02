@@ -238,13 +238,13 @@ export async function requestLocalFile(url, options = {}) {
         get: name => xhr.getResponseHeader(name),
       },
     };
-    const { responseType } = options;
+    const { [kResponseType]: responseType } = options;
     xhr.open('GET', url, true);
-    if (binaryTypes.includes(responseType)) xhr.responseType = responseType;
+    if (binaryTypes.includes(responseType)) xhr[kResponseType] = responseType;
     xhr.onload = () => {
       // status for `file:` protocol will always be `0`
       result.status = xhr.status || 200;
-      result.data = binaryTypes.includes(responseType) ? xhr.response : xhr.responseText;
+      result.data = binaryTypes.includes(responseType) ? xhr.response : xhr[kResponseText];
       if (responseType === 'json') {
         try {
           result.data = JSON.parse(result.data);
@@ -301,7 +301,7 @@ export const isRemote = url => url && !isLocalUrlRe.test(decodeURI(url));
 export async function request(url, options = {}) {
   // fetch does not support local file
   if (url.startsWith('file://')) return requestLocalFile(url, options);
-  const { body, headers, responseType } = options;
+  const { body, headers, [kResponseType]: responseType } = options;
   const isBodyObj = body && body::({}).toString() === '[object Object]';
   const [, scheme, auth, hostname, urlTail] = url.match(/^([-\w]+:\/\/)([^@/]*@)?([^/]*)(.*)|$/);
   const accept = FORCED_ACCEPT[hostname];

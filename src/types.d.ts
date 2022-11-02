@@ -49,11 +49,13 @@ declare namespace GMReq {
   interface Web {
     id: string;
     scriptId: number;
-    opts: UserOpts;
+    cb: { [name: EventType]: typeof VMScriptGMXHRDetails.onload };
+    context?: any;
     raw?: string | Blob | ArrayBuffer;
     response?: string | Blob | ArrayBuffer;
     responseHeaders?: string;
     responseText?: string;
+    responseType?: XMLHttpRequestResponseType;
   }
   namespace Message {
     /** From background */

@@ -18,6 +18,10 @@ export const PROTO = 'prototype';
 export const IS_TOP = top === window;
 export const CALLBACK_ID = '__CBID';
 export const VIOLENTMONKEY = 'Violentmonkey';
+export const kFileName = 'fileName';
+export const kResponseHeaders = 'responseHeaders';
+export const kResponseText = 'responseText';
+export const kResponseType = 'responseType';
 
 export const throwIfProtoPresent = process.env.DEBUG && (obj => {
   if (!obj || obj.__proto__) { // eslint-disable-line no-proto

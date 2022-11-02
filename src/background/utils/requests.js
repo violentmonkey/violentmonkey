@@ -87,10 +87,10 @@ function xhrCallbackWrapper(req, events, blobbed, chunked) {
   // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
   const getChunk = blobbed && blob2objectUrl || chunked && blob2chunk;
   const getResponseHeaders = () => {
-    const headers = req.responseHeaders || xhr.getAllResponseHeaders();
+    const headers = req[kResponseHeaders] || xhr.getAllResponseHeaders();
     if (responseHeaders !== headers) {
       responseHeaders = headers;
-      return { responseHeaders };
+      return { [kResponseHeaders]: responseHeaders };
     }
   };
   return (evt) => {
@@ -101,7 +101,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked) {
       response = xhr.response;
       sent = false;
       try {
-        responseText = xhr.responseText;
+        responseText = xhr[kResponseText];
         if (responseText === response) responseText = ['same'];
       } catch (e) {
         // ignore if responseText is unreachable
@@ -144,7 +144,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked) {
           response: shouldSendResponse
             ? numChunks && await getChunk(response, 0) || response
             : null,
-          responseText: shouldSendResponse
+          [kResponseText]: shouldSendResponse
             ? responseText
             : null,
         },
@@ -195,7 +195,7 @@ async function httpRequest(opts, events, src, cb) {
       shouldSendCookies = !/^cookie$/i.test(name);
     }
   });
-  xhr.responseType = willStringifyBinaries && 'blob' || xhrType || 'text';
+  xhr[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
   if (shouldSendCookies) {

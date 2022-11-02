@@ -67,12 +67,12 @@ const API_EVENTS = {
     onBeforeSendHeaders, 'requestHeaders', 'blocking', ...EXTRA_HEADERS,
   ],
   onHeadersReceived: [
-    onHeadersReceived, 'responseHeaders', 'blocking', ...EXTRA_HEADERS,
+    onHeadersReceived, kResponseHeaders, 'blocking', ...EXTRA_HEADERS,
   ],
 };
 
 /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
-function onHeadersReceived({ responseHeaders: headers, requestId, url }) {
+function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
   const req = requests[verify[requestId]];
   if (req) {
     if (req.anonymous || req.storeId) {
@@ -82,8 +82,8 @@ function onHeadersReceived({ responseHeaders: headers, requestId, url }) {
         || setCookieInStore(h.value, req, url)
       ));
     }
-    req.responseHeaders = headers.map(encodeWebRequestHeader).join('');
-    return { responseHeaders: headers };
+    req[kResponseHeaders] = headers.map(encodeWebRequestHeader).join('');
+    return { [kResponseHeaders]: headers };
   }
 }
 

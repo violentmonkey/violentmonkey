@@ -68,7 +68,7 @@ export function makeGmApiWrapper(script) {
     if (fnBound) {
       fn = safeBind(fn,
         GM4_ASYNC[gm4name]
-          ? contextAsync || (contextAsync = assign({ __proto__: null, async: true }, context))
+          ? contextAsync || (contextAsync = assign(createNullObj(), { async: true }, context))
           : context);
     } else if (!fn && (
       fn = name === 'window.close' && sendTabClose
