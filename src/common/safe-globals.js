@@ -18,6 +18,7 @@ const {
   Promise,
   document,
   window,
+  performance,
 } = global;
 export const SafePromise = Promise; // alias used by browser.js
 export const SafeError = Error; // alias used by browser.js

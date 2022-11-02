@@ -24,6 +24,7 @@ export const defaultImage = `${ICON_PREFIX}128.png`;
 const BAD_URL_CHAR = /[#/?]/g;
 /** Fullwidth range starts at 0xFF00, normal range starts at space char code 0x20 */
 const replaceWithFullWidthForm = s => String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
+const PORT_ERROR_RE = /(Receiving end does not exist)|The message port closed before|$/;
 
 export function initHooks() {
   const hooks = [];
@@ -49,7 +50,7 @@ export function initHooks() {
  * Used by `injected`
  * @param {string} cmd
  * @param data
- * @param {{retry?: boolean, ignoreError?: boolean}} [options]
+ * @param {{retry?: boolean}} [options]
  * @return {Promise}
  */
 export function sendCmd(cmd, data, options) {
@@ -124,27 +125,26 @@ export function sendMessage(payload, { retry } = {}) {
  * persistent background script when Chrome starts with a URL via command line
  * or when configured to restore the session, https://crbug.com/314686
  */
-export async function sendMessageRetry(payload, retries = 10) {
-  let pauseDuration = 10;
-  for (; retries > 0; retries -= 1) {
+export async function sendMessageRetry(payload, maxDuration = 10e3) {
+  for (let start = performance.now(); performance.now() - start < maxDuration;) {
     try {
       const data = await sendMessage(payload);
       if (data !== undefined) {
         return data;
       }
     } catch (e) {
-      if (!`${e}`.includes('Could not establish connection.')) {
+      if (!PORT_ERROR_RE.exec(e)[1]) {
         throw e;
       }
     }
-    await makePause(pauseDuration);
-    pauseDuration *= 2;
+    // Not using setTimeout which may be cleared by the web page
+    await browser.storage.local.get(VIOLENTMONKEY);
   }
   throw new Error(VIOLENTMONKEY + ' cannot connect to the background page.');
 }
 
 export function ignoreNoReceiver(err) {
-  if (!/Receiving end does not exist|The message port closed before/.test(err.message)) {
+  if (!PORT_ERROR_RE.exec(err)[0]) {
     return Promise.reject(err);
   }
 }
