@@ -2,7 +2,6 @@ import bridge from './bridge';
 import { GM_API } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
 import { makeComponentUtils } from './util';
-import { INJECT_INTO } from '../util';
 
 /** Name in Greasemonkey4 -> name in GM */
 const GM4_ALIAS = {
@@ -29,9 +28,8 @@ const sendTabFocus = () => bridge.post('TabFocus');
 export function makeGmApiWrapper(script) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-  const { meta } = script;
-  const grant = meta.grant;
-  const { id } = script.props;
+  const { id, meta } = script;
+  const { grant } = meta;
   const resources = nullObjFrom(meta.resources);
   /** @type {GMContext} */
   const context = {
@@ -41,7 +39,7 @@ export function makeGmApiWrapper(script) {
     resources,
     resCache: createNullObj(),
   };
-  const gmInfo = makeGmInfo(script.gmInfo, meta, resources);
+  const gmInfo = makeGmInfo(script.gmi, meta, resources);
   const gm4 = {
     __proto__: null,
     info: gmInfo,
@@ -95,8 +93,19 @@ function makeGmInfo(gmInfo, meta, resources) {
     resourcesArr[i] = { name, url: resources[name] };
   });
   // No __proto__:null because these are standard objects for userscripts
-  setOwnProp(meta, 'resources', resourcesArr);
-  setOwnProp(gmInfo, INJECT_INTO, bridge.mode);
-  setOwnProp(gmInfo, 'script', meta);
-  return gmInfo;
+  meta.resources = resourcesArr;
+  return safeAssign(gmInfo, {
+    [INJECT_INTO]: bridge.mode,
+    platform: safeAssign({}, bridge.ua),
+    script: meta,
+    scriptHandler: VIOLENTMONKEY,
+    version: process.env.VM_VER,
+  });
+}
+
+function safeAssign(dst, src) {
+  for (const key of objectKeys(src)) {
+    setOwnProp(dst, key, src[key]);
+  }
+  return dst;
 }

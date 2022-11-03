@@ -4,34 +4,16 @@ export const INFERRED = 'inferred';
 export const HOMEPAGE_URL = 'homepageURL';
 export const SUPPORT_URL = 'supportURL';
 
-export const INJECT_AUTO = 'auto';
-export const INJECT_PAGE = 'page';
-export const INJECT_CONTENT = 'content';
-export const INJECT_INTO = 'injectInto';
-export const INJECT_MAPPING = {
-  __proto__: null,
-  // `auto` tries to provide `window` from the real page as `unsafeWindow`
-  [INJECT_AUTO]: [INJECT_PAGE, INJECT_CONTENT],
-  // inject into page context
-  [INJECT_PAGE]: [INJECT_PAGE],
-  // inject into content context only
-  [INJECT_CONTENT]: [INJECT_CONTENT],
-};
-export const ID_BAD_REALM = -1;
-export const ID_INJECTING = 2;
-
 // Allow metadata lines to start with WHITESPACE? '//' SPACE
 // Allow anything to follow the predefined text of the metaStart/End
 // The SPACE must be on the same line and specifically \x20 as \s would also match \r\n\t
 // Note: when there's no valid metablock, an empty string is matched for convenience
 export const USERSCRIPT_META_INTRO = '// ==UserScript==';
-export const METABLOCK_RE = /(?:^|\n)\s*\/\/\x20==UserScript==([\s\S]*?\n)\s*\/\/\x20==\/UserScript==|$/;
+export const METABLOCK_RE = /((?:^|\n)\s*\/\/\x20==UserScript==)([\s\S]*?\n)\s*\/\/\x20==\/UserScript==|$/;
+export const META_STR = 'metaStr';
 export const NEWLINE_END_RE = /\n((?!\n)\s)*$/;
 export const INJECTABLE_TAB_URL_RE = /^(https?|file|ftps?):/;
 export const WATCH_STORAGE = 'watchStorage';
-export const FEEDBACK = 'feedback';
-export const FORCE_CONTENT = 'forceContent';
-export const MORE = 'more';
 // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
 // to prevent exposing them to userscripts with `@inject-into content`
 export const browser = process.env.IS_INJECTED !== 'injected-web' && global.browser;

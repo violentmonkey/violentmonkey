@@ -202,36 +202,41 @@ declare interface VMInjectionDisabled {
  * Injection data sent to the content bridge when injection is enabled
  */
 declare interface VMInjection extends VMInjectionDisabled {
-  scripts: VMInjection.Script[];
-  injectInto: VMScriptInjectInto;
-  injectPage: boolean;
   cache: StringMap;
   errors: string[];
-  /** cache key for envDelayed, which also tells content bridge to expect envDelayed */
-  more: string;
+  forceContent?: boolean;
   /** content bridge adds the actually running ids and sends via SetPopup */
   ids: number[];
   info: VMInjection.Info;
+  injectInto: VMScriptInjectInto;
+  /** cache key for envDelayed, which also tells content bridge to expect envDelayed */
+  more: string;
+  /** `page` mode will be necessary */
+  page: boolean;
+  scripts: VMInjection.Script[];
 }
 
 /**
  * Injection paraphernalia in the background script
  */
 declare namespace VMInjection {
+  type RunAt = 'start' | 'body' | 'end' | 'idle';
   interface Env {
+    /** Only present in envStart */
+    allIds?: { [id: string]: NumBool };
     cache: StringMap;
     cacheKeys: string[];
     code: StringMap;
     /** Dependencies by key to script ids */
     depsMap: { [url: string]: number[] };
-    /** Only present in envStart */
-    allIds?: { [id: string]: NumBool };
-    /** Only present in envStart */
-    envDelayed?: Env;
+    forceContent?: boolean;
     ids: number[];
+    /** Only present in envStart */
+    more?: Env;
     promise: Promise<Env>;
     reqKeys: string[];
     require: StringMap;
+    runAt: { [id: string]: RunAt };
     scripts: VMScript[];
     sizing?: boolean;
     value: { [scriptId: string]: StringMap };
@@ -241,9 +246,10 @@ declare namespace VMInjection {
    * Contains the injected data and non-injected auxiliaries
    */
   interface Bag {
-    inject: VMInjection;
-    feedback: (string|number)[] | false;
     csar: Promise<browser.contentScripts.RegisteredContentScript>;
+    forceContent?: boolean;
+    inject: VMInjection;
+    more: Env;
   }
   interface Info {
     ua: VMScriptGMInfoPlatform;
@@ -251,17 +257,21 @@ declare namespace VMInjection {
   /**
    * Script prepared for injection
    */
-  interface Script extends VMScript {
-    dataKey: string;
+  interface Script {
     displayName: string;
-    code: string;
-    // `injectInto` and `script` are added in makeGmApiWrapper
-    gmInfo: VMScriptGMInfoObject;
+    /** -1 ID_BAD_REALM if the desired realm is PAGE which is not injectable */
+    code: string | -1;
+    /** Omitted props are added in makeGmApiWrapper */
+    gmi: Omit<VMScriptGMInfoObject, 'injectInto' | 'resources' | 'script' | 'scriptMetaStr'>;
+    id: number;
     injectInto: VMScriptInjectInto;
-    // `resources` is still an object, converted later in makeGmApiWrapper
+    key: { data: string, win: string };
+    /** `resources` is still an object, converted later in makeGmApiWrapper */
     meta: VMScript.Meta | VMScriptGMInfoScriptMeta;
-    runAt?: 'start' | 'body' | 'end' | 'idle';
-    values?: StringMap;
+    metaStr: (string|number)[];
+    pathMap: StringMap;
+    runAt?: RunAt;
+    val?: StringMap;
   }
 }
 

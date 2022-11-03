@@ -134,7 +134,6 @@
 import { reactive } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import { debounce, i18n } from '@/common';
-import { INJECT_AUTO, INJECT_PAGE, INJECT_CONTENT } from '@/common/consts';
 import SettingCheck from '@/common/ui/setting-check';
 import { forEachEntry, mapEntry } from '@/common/object';
 import options from '@/common/options';

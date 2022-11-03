@@ -1,6 +1,5 @@
 import bridge, { addBackgroundHandlers, addHandlers } from './bridge';
 import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
-import { INJECT_INTO } from '../util';
 
 const menus = createNullObj();
 let setPopupThrottle;

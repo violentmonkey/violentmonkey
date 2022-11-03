@@ -69,7 +69,7 @@ const metaOptionalTypes = {
 export function parseMeta(code) {
   // initialize meta
   const meta = metaTypes::mapEntry(value => value.default());
-  const metaBody = code.match(METABLOCK_RE)[1] || '';
+  const metaBody = code.match(METABLOCK_RE)[2] || '';
   metaBody.replace(/(?:^|\n)\s*\/\/\x20(@\S+)(.*)/g, (_match, rawKey, rawValue) => {
     const [keyName, locale] = rawKey.slice(1).split(':');
     const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());

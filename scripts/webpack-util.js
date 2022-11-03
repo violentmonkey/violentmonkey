@@ -2,12 +2,19 @@ const fs = require('fs');
 const babelCore = require('@babel/core');
 const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
 
-// {entryName: path}
 const entryGlobals = {
-  'common': ['common'],
-  'injected/content': ['injected', 'injected/content'],
-  'injected/web': ['injected', 'injected/web'],
+  'common': [],
+  'injected/content': [],
+  'injected/web': [],
 };
+const entryPathToFilename = path => path === '*'
+  ? `./src/common/safe-globals-shared.js`
+  : `./src/${path}/safe-globals.js`;
+Object.entries(entryGlobals).forEach(([name, val]) => {
+  const parts = name.split('/');
+  if (parts[1]) parts[1] = name;
+  val.push('*', ...parts);
+});
 
 /**
  * Adds a watcher for files in entryGlobals to properly recompile the project on changes.
@@ -17,7 +24,7 @@ function addWrapperWithGlobals(name, config, defsObj, callback) {
     test: new RegExp(`/${name}/.*?\\.js$`.replace(/\//g, /[/\\]/.source)),
     use: [{
       loader: './scripts/fake-dep-loader.js',
-      options: { files: entryGlobals[name] },
+      options: { files: entryGlobals[name].map(entryPathToFilename) },
     }],
   });
   const defsRe = new RegExp(`\\b(${
@@ -53,7 +60,7 @@ function getUniqIdB64() {
 
 function readGlobalsFile(path, babelOpts = {}) {
   const { ast, code = !ast } = babelOpts;
-  const filename = `./src/${path}/safe-globals.js`;
+  const filename = entryPathToFilename(path);
   const src = fs.readFileSync(filename, { encoding: 'utf8' })
   .replace(/\bexport\s+(function\s+(\w+))/g, 'const $2 = $1')
   .replace(/\bexport\s+(?=(const|let)\s)/g, '');

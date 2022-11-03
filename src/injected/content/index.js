@@ -6,15 +6,13 @@ import './notifications';
 import './requests';
 import './tabs';
 import { sendCmd } from './util';
-import { isEmpty, FORCE_CONTENT, INJECT_CONTENT, INJECT_INTO } from '../util';
+import { isEmpty } from '../util';
 import { Run } from './cmd-run';
 
 const { ids } = bridge;
 
 // Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
 async function init() {
-  const contentId = safeGetUniqId();
-  const webId = safeGetUniqId();
   const isXml = document instanceof XMLDocument;
   const xhrData = getXhrInjection();
   const dataPromise = sendCmd('GetInjected', {
@@ -22,7 +20,7 @@ async function init() {
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
     url: IS_FIREFOX && location.href,
     // XML document's appearance breaks when script elements are added
-    [FORCE_CONTENT]: isXml,
+    [INJECT_CONTENT_FORCE]: isXml,
     done: !!(xhrData || global.vmData),
   }, {
     retry: true,
@@ -35,13 +33,13 @@ async function init() {
   );
   assign(ids, data.ids);
   bridge[INJECT_INTO] = data[INJECT_INTO];
-  if (data.expose && !isXml && injectPageSandbox(contentId, webId)) {
+  if (data.expose && !isXml && injectPageSandbox()) {
     addHandlers({ GetScriptVer: true }, true);
     bridge.post('Expose');
   }
   if (data.scripts) {
     onScripts.forEach(fn => fn(data));
-    await injectScripts(contentId, webId, data, isXml);
+    await injectScripts(data, isXml);
   }
   onScripts.length = 0;
   sendSetPopup();

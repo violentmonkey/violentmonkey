@@ -1,10 +1,7 @@
 import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
-import {
-  INJECT_AUTO, INJECT_CONTENT, INJECT_INTO, INJECT_MAPPING, INJECT_PAGE,
-  FEEDBACK, FORCE_CONTENT, HOMEPAGE_URL, METABLOCK_RE, MORE, NEWLINE_END_RE,
-} from '@/common/consts';
+import { HOMEPAGE_URL, METABLOCK_RE, META_STR, NEWLINE_END_RE } from '@/common/consts';
 import initCache from '@/common/cache';
-import { forEachEntry, forEachValue, objectPick, objectSet } from '@/common/object';
+import { forEachEntry, forEachValue, mapEntry, objectSet } from '@/common/object';
 import ua from '@/common/ua';
 import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_IDS } from './db';
 import { postInitialize } from './init';
@@ -12,31 +9,39 @@ import { addPublicCommands } from './message';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId } from './requests';
-import { S_CACHE_PRE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE } from './storage';
+import {
+  S_CACHE, S_CACHE_PRE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
+} from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
 import { addValueOpener, clearValueOpener } from './values';
+
+let isApplied;
+let injectInto;
+let xhrInject;
 
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
   types: ['main_frame', 'sub_frame'],
 };
+const __CODE = Symbol('code'); // will be stripped when messaging
 const INJECT = 'inject';
+/** These are reused by cache entries to reduce memory usage */
+const BAG_NOOP = { [INJECT]: {} };
+const BAG_NOOP_EXPOSE = { [INJECT]: { expose: true } };
 const CSAPI_REG = 'csar';
 const contentScriptsAPI = browser.contentScripts;
 const envStartKey = {};
-/** In normal circumstances the data will be removed in ~1sec on use,
- * however connecting may take a long time or the tab may be paused in devtools. */
-const TIME_KEEP_DATA = 5 * 60e3;
 const cache = initCache({
-  lifetime: TIME_KEEP_DATA,
+  lifetime: 5 * 60e3,
   async onDispose(val, key) {
     if (!val) return;
     if (val.then) val = await val;
-    val[CSAPI_REG]?.then(reg => reg.unregister());
     if ((val = val[INJECT] || val)[ENV_SCRIPTS]) {
-      val[ENV_SCRIPTS].forEach(script => cache.del(script.dataKey));
-      cache.del(val[MORE] || envStartKey[key]);
+      cache.del(val[INJECT_MORE] || envStartKey[key]);
       delete envStartKey[key];
+    }
+    if ((val = val[CSAPI_REG])) {
+      (await val).unregister();
     }
   },
 });
@@ -53,36 +58,86 @@ const META_KEYS_TO_ENSURE = [
   'runAt',
   'version',
 ];
+const META_KEYS_TO_ENSURE_FROM = [
+  [HOMEPAGE_URL, 'homepage'],
+];
+const META_KEYS_TO_PLURALIZE_RE = /^(?:(m|excludeM)atch|(ex|in)clude)$/;
+const pluralizeMetaKey = (s, consonant) => s + (consonant ? 'es' : 's');
+const pluralizeMeta = key => key.replace(META_KEYS_TO_PLURALIZE_RE, pluralizeMetaKey);
+const UNWRAP = 'unwrap';
+const KNOWN_INJECT_INTO = {
+  [INJECT_AUTO]: 1,
+  [INJECT_CONTENT]: 1,
+  [INJECT_PAGE]: 1,
+};
+const propsToClear = {
+  [S_CACHE_PRE]: ENV_CACHE_KEYS,
+  [S_CODE_PRE]: true,
+  [S_REQUIRE_PRE]: ENV_REQ_KEYS,
+  [S_SCRIPT_PRE]: true,
+  [S_VALUE_PRE]: ENV_VALUE_IDS,
+};
 const expose = {};
-let isApplied;
-let injectInto;
-let xhrInject;
+const resolveDataCodeStr = `(${data => {
+  if (self.vmResolve) self.vmResolve(data); // `window` is a const which is inaccessible here
+  else self.vmData = data; // Ran earlier than the main content script so just drop the payload
+}})`;
+const getKey = (url, isTop) => (
+  isTop ? url : `-${url}`
+);
+const normalizeRealm = val => (
+  KNOWN_INJECT_INTO[val] ? val : injectInto || INJECT_AUTO
+);
+const normalizeScriptRealm = (custom, meta) => (
+  normalizeRealm(custom[INJECT_INTO] || meta[INJECT_INTO])
+);
+const isContentRealm = (val, force) => (
+  val === INJECT_CONTENT || val === INJECT_AUTO && force
+);
 
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
-  async GetInjected({ url, forceContent, done }, src) {
+  async GetInjected({ url, [INJECT_CONTENT_FORCE]: forceContent, done }, src) {
     const { frameId, tab } = src;
     const tabId = tab.id;
     if (!url) url = src.url || tab.url;
     clearFrameData(tabId, frameId);
-    const key = getKey(url, !frameId);
-    const cacheVal = cache.get(key) || prepare(key, url, tabId, frameId, forceContent);
-    const bag = cacheVal[INJECT] ? cacheVal : await cacheVal;
+    const isTop = !frameId;
+    const bagKey = getKey(url, isTop);
+    const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop);
+    const bag = bagP[INJECT] ? bagP : await bagP;
     /** @type {VMInjection} */
     const inject = bag[INJECT];
-    const feedback = bag[FEEDBACK];
-    if (feedback?.length) {
-      // Injecting known content scripts without waiting for InjectionFeedback message.
-      // Running in a separate task because it may take a long time to serialize data.
-      setTimeout(injectionFeedback, 0, { [FEEDBACK]: feedback }, src);
+    const scripts = inject[ENV_SCRIPTS];
+    const toContent = triageRealms(scripts, bag[INJECT_CONTENT_FORCE] || forceContent, bag);
+    if (toContent[0]) {
+      // Processing known feedback without waiting for InjectionFeedback message.
+      // Running in a separate task as executeScript may take a long time to serialize code.
+      setTimeout(injectContentRealm, 0, toContent, tabId, frameId);
     }
     if (popupTabs[tabId]) {
       setTimeout(sendTabCmd, 0, tabId, 'PopupShown', popupTabs[tabId], { frameId });
     }
-    addValueOpener(tabId, frameId, inject[ENV_SCRIPTS]);
+    addValueOpener(tabId, frameId, scripts);
     return !done && inject;
   },
-  InjectionFeedback: injectionFeedback,
+  async InjectionFeedback({
+    [INJECT_CONTENT_FORCE]: forceContent,
+    [INJECT_CONTENT]: items,
+    [INJECT_MORE]: moreKey,
+  }, { frameId, tab: { id: tabId } }) {
+    injectContentRealm(items, tabId, frameId);
+    if (!moreKey) return;
+    const more = await cache.get(moreKey); // TODO: rebuild if expired
+    if (!more) throw 'Injection data expired, please reload the tab!';
+    const scripts = prepareScripts(more);
+    injectContentRealm(triageRealms(scripts, forceContent), tabId, frameId);
+    addValueOpener(tabId, frameId, scripts);
+    return {
+      [ENV_SCRIPTS]: scripts,
+      [S_CACHE]: more[S_CACHE],
+    };
+  },
 });
 
 hookOptions(onOptionChanged);
@@ -92,43 +147,8 @@ postInitialize.push(() => {
   }
 });
 
-async function injectionFeedback({
-  [MORE]: more,
-  [FEEDBACK]: feedback,
-  [FORCE_CONTENT]: forceContent,
-}, src) {
-  feedback.forEach(processFeedback, src);
-  if (!more) return;
-  const env = await cache.get(more);
-  if (!env) throw 'Injection data expired, please reload the tab!';
-  env[FORCE_CONTENT] = forceContent;
-  env[ENV_SCRIPTS].map(prepareScript, env).filter(Boolean).forEach(processFeedback, src);
-  addValueOpener(src.tab.id, src.frameId, env[ENV_SCRIPTS]);
-  return objectPick(env, ['cache', ENV_SCRIPTS]);
-}
-
-/** @this {chrome.runtime.MessageSender} */
-async function processFeedback([key, runAt, unwrappedId]) {
-  const code = cache.get(key);
-  // see TIME_KEEP_DATA comment
-  if (runAt && code) {
-    const { frameId, tab: { id: tabId } } = this;
-    runAt = `document_${runAt === 'body' ? 'start' : runAt}`;
-    browser.tabs.executeScript(tabId, { code: code.join(''), frameId, runAt });
-    if (unwrappedId) sendTabCmd(tabId, 'Run', unwrappedId, { frameId });
-  }
-}
-
-const propsToClear = {
-  [S_CACHE_PRE]: ENV_CACHE_KEYS,
-  [S_CODE_PRE]: true,
-  [S_REQUIRE_PRE]: ENV_REQ_KEYS,
-  [S_SCRIPT_PRE]: true,
-  [S_VALUE_PRE]: ENV_VALUE_IDS,
-};
-
 onStorageChanged(({ keys }) => {
-  cache.forEach(removeStaleCacheEntry, keys.map((key, i) => [
+  cache.some(removeStaleCacheEntry, keys.map((key, i) => [
     key.slice(0, i = key.indexOf(':') + 1),
     key.slice(i),
   ]));
@@ -142,16 +162,16 @@ async function removeStaleCacheEntry(val, key) {
     const prop = propsToClear[prefix];
     if (prop === true) {
       cache.destroy(); // TODO: try to patch the cache in-place?
-    } else if (val[prop]?.includes(+id || id)) {
-      cache.del(key);
+      return true; // stops further processing as the cache is clear now
+    }
+    if (val[prop]?.includes(+id || id)) {
+      if (prefix === S_REQUIRE_PRE) {
+        val.depsMap[id].forEach(id => cache.del(S_SCRIPT_PRE + id));
+      } else {
+        cache.del(key); // TODO: try to patch the cache in-place?
+      }
     }
   }
-}
-
-function normalizeRealm(value) {
-  return hasOwnProperty(INJECT_MAPPING, value)
-    ? value
-    : injectInto || INJECT_AUTO;
 }
 
 function onOptionChanged(changes) {
@@ -179,10 +199,6 @@ function onOptionChanged(changes) {
       }
     }
   });
-}
-
-function getKey(url, isTop) {
-  return isTop ? url : `-${url}`;
 }
 
 function togglePreinject(enable) {
@@ -216,14 +232,14 @@ function toggleXhrInject(enable) {
   }
 }
 
-function onSendHeaders({ url, tabId, frameId }) {
+function onSendHeaders({ url, frameId }) {
   const isTop = !frameId;
   const key = getKey(url, isTop);
   if (!cache.has(key)) {
     // GetInjected message will be sent soon by the content script
     // and it may easily happen while getScriptsByURL is still waiting for browser.storage
     // so we'll let GetInjected await this pending data by storing Promise in the cache
-    cache.put(key, prepare(key, url, tabId, frameId), TIME_KEEP_DATA);
+    cache.put(key, prepare(key, url, isTop));
   }
 }
 
@@ -241,7 +257,7 @@ function onHeadersReceived(info) {
  */
 function prepareXhrBlob({ url, [kResponseHeaders]: responseHeaders }, bag) {
   if (IS_FIREFOX && url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
-    forceContentInjection(bag);
+    bag[INJECT_CONTENT_FORCE] = true;
   }
   const blobUrl = URL.createObjectURL(new Blob([
     JSON.stringify(bag[INJECT]),
@@ -250,93 +266,105 @@ function prepareXhrBlob({ url, [kResponseHeaders]: responseHeaders }, bag) {
     name: 'Set-Cookie',
     value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
   });
-  setTimeout(URL.revokeObjectURL, TIME_KEEP_DATA, blobUrl);
+  setTimeout(URL.revokeObjectURL, 60e3, blobUrl);
   return { [kResponseHeaders]: responseHeaders };
 }
 
-function prepare(key, url, tabId, frameId, forceContent) {
-  /** @type {VMInjection.Bag} */
-  const res = {
-    [INJECT]: {
-      expose: !frameId
-        && url.startsWith('https://')
-        && expose[url.split('/', 3)[2]],
-    },
-  };
-  return isApplied
-    ? prepareScripts(res, key, url, tabId, frameId, forceContent)
-    : res;
-}
-
-/**
- * @param {VMInjection.Bag} res
- * @param cacheKey
- * @param url
- * @param tabId
- * @param frameId
- * @param forceContent
- * @return {Promise<any>}
- */
-async function prepareScripts(res, cacheKey, url, tabId, frameId, forceContent) {
+async function prepare(cacheKey, url, isTop) {
+  const shouldExpose = isTop && url.startsWith('https://') && expose[url.split('/', 3)[2]];
+  const bagNoOp = shouldExpose ? BAG_NOOP_EXPOSE : BAG_NOOP;
+  if (!isApplied) {
+    return bagNoOp;
+  }
   const errors = [];
-  const bag = await getScriptsByURL(url, !frameId, errors);
-  const { envDelayed, allIds, [ENV_SCRIPTS]: scripts } = bag;
-  bag[FORCE_CONTENT] = forceContent; // used in prepareScript and isPageRealm
-  propsToClear::forEachValue(val => {
-    if (val !== true) res[val] = bag[val];
-  });
+  // TODO: teach `getScriptEnv` to skip prepared scripts in cache
+  const env = getScriptsByURL(url, isTop, errors);
+  if (!env) {
+    return cache.put(cacheKey, bagNoOp);
+  }
+  Object.assign(env, await env.promise);
   cache.batch(true);
-  const feedback = scripts.map(prepareScript, bag).filter(Boolean);
+  const inject = shouldExpose ? { expose: true } : {};
+  const bag = { [INJECT]: inject };
+  const { allIds, [INJECT_MORE]: envDelayed } = env;
   const more = envDelayed.promise;
   const moreKey = more && getUniqId('more');
-  /** @type {VMInjection} */
-  const inject = res[INJECT];
   Object.assign(inject, {
-    [ENV_SCRIPTS]: scripts,
+    [S_CACHE]: env[S_CACHE],
+    [ENV_SCRIPTS]: prepareScripts(env),
     [INJECT_INTO]: injectInto,
-    [INJECT_PAGE]: !forceContent && (
-      scripts.some(isPageRealm, bag)
-      || envDelayed[ENV_SCRIPTS].some(isPageRealm, bag)
-    ),
-    [MORE]: moreKey,
-    cache: bag.cache,
+    [INJECT_MORE]: moreKey,
     ids: allIds,
-    info: {
-      ua,
-    },
+    info: { ua },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
   });
-  res[FEEDBACK] = feedback;
-  res[CSAPI_REG] = contentScriptsAPI && !xhrInject
-    && registerScriptDataFF(inject, url, !!frameId);
+  propsToClear::forEachValue(val => {
+    if (val !== true) bag[val] = env[val];
+  });
+  bag[INJECT_MORE] = envDelayed;
+  bag[CSAPI_REG] = contentScriptsAPI && !xhrInject
+    && registerScriptDataFF(inject, url, !isTop);
   if (more) {
     cache.put(moreKey, more);
     envStartKey[moreKey] = cacheKey;
   }
-  cache.put(cacheKey, res); // synchronous onHeadersReceived needs plain object not a Promise
+  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
   cache.batch(false);
-  return res;
+  return bag;
 }
 
-/** @this {VMInjection.Env} */
-function prepareScript(script) {
+function prepareScripts(env) {
+  const scripts = env[ENV_SCRIPTS];
+  for (let i = 0, script, key, id; i < scripts.length; i++) {
+    script = scripts[i];
+    if (!(id = script.id)) {
+      id = script.props.id;
+      key = S_SCRIPT_PRE + id;
+      script = cache.get(key) || cache.put(key, prepareScript(script, env));
+      scripts[i] = script;
+    }
+    script.val = env[S_VALUE][id] || null;
+  }
+  return scripts;
+}
+
+/**
+ * @param {VMScript} script
+ * @param {VMInjection.Env} env
+ * @return {VMInjection.Script}
+ */
+function prepareScript(script, env) {
   const { custom, meta, props } = script;
   const { id } = props;
-  const { [FORCE_CONTENT]: forceContent, require, value } = this;
-  const code = this.code[id];
-  const dataKey = getUniqId('VMin');
+  const { require, runAt } = env;
+  const code = env.code[id];
+  const dataKey = getUniqId();
+  const winKey = getUniqId();
+  const key = { data: dataKey, win: winKey };
   const displayName = getScriptName(script);
-  const isContent = isContentRealm(script, forceContent);
   const pathMap = custom.pathMap || {};
-  const wrap = !meta.unwrap;
+  const wrap = !meta[UNWRAP];
   const { grant } = meta;
   const numGrants = grant.length;
   const grantNone = !numGrants || numGrants === 1 && grant[0] === 'none';
   // Storing slices separately to reuse JS-internalized strings for code in our storage cache
   const injectedCode = [];
+  const metaCopy = meta::mapEntry(null, pluralizeMeta);
+  const metaStrMatch = METABLOCK_RE.exec(code);
   let hasReqs;
+  let codeIndex;
+  let tmp;
+  for (const key of META_KEYS_TO_ENSURE) {
+    if (metaCopy[key] == null) metaCopy[key] = '';
+  }
+  for (const [key, from] of META_KEYS_TO_ENSURE_FROM) {
+    if (!metaCopy[key] && (tmp = metaCopy[from])) {
+      metaCopy[key] = tmp;
+    }
+  }
   if (wrap) {
-    injectedCode.push(`window.${dataKey}=function(`
+    // TODO: push winKey/dataKey as separate chunks so we can change them for each injection?
+    injectedCode.push(`window.${winKey}=function ${dataKey}(`
       // using a shadowed name to avoid scope pollution
       + (grantNone ? GRANT_NONE_VARS : 'GM')
       + (IS_FIREFOX ? `,${dataKey}){try{` : '){')
@@ -355,6 +383,7 @@ function prepareScript(script) {
   if (hasReqs && wrap) {
     injectedCode.push('(()=>{');
   }
+  codeIndex = injectedCode.length;
   injectedCode.push(code);
   // adding a new line in case the code ends with a line comment
   injectedCode.push((!NEWLINE_END_RE.test(code) ? '\n' : '')
@@ -363,75 +392,74 @@ function prepareScript(script) {
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
     + (IS_FIREFOX ? ';0' : '')
     + `\n//# sourceURL=${getScriptPrettyUrl(script, displayName)}`);
-  cache.put(dataKey, injectedCode, TIME_KEEP_DATA);
-  /** @type {VMInjection.Script} */
-  Object.assign(script, {
-    dataKey,
-    displayName,
-    // code will be `true` if the desired realm is PAGE which is not injectable
-    code: isContent ? '' : forceContent || injectedCode,
-    values: value[id] || null,
-    ...prepareGmInfo(script, meta, code),
-  });
-  return isContent && [
-    dataKey,
-    script.runAt,
-    !wrap && id, // unwrapped scripts need an explicit `Run` message
-  ];
-}
-
-function prepareGmInfo(script, meta, code) {
-  const metaCopy = {};
-  meta::forEachEntry(([key, val]) => {
-    switch (key) {
-    case 'match': // -> matches
-    case 'excludeMatch': // -> excludeMatches
-      key += 'e';
-      // fallthrough
-    case 'exclude': // -> excludes
-    case 'include': // -> includes
-      key += 's';
-      break;
-    default:
-    }
-    metaCopy[key] = val;
-  });
-  META_KEYS_TO_ENSURE.forEach((key) => {
-    if (!metaCopy[key]) metaCopy[key] = '';
-  });
-  let val;
-  if (!metaCopy[HOMEPAGE_URL] && (val = metaCopy.homepage)) {
-    metaCopy[HOMEPAGE_URL] = val;
-  }
   return {
-    // overwriting existing props is ok because `script` is a copy, see getScriptEnv
-    meta: metaCopy,
-    // `injectInto`, `resources`, `script` will be added in makeGmApiWrapper
-    gmInfo: {
-      platform: ua,
-      scriptHandler: VIOLENTMONKEY,
-      scriptMetaStr: code.match(METABLOCK_RE)[1] || '',
+    code: '',
+    displayName,
+    gmi: {
       scriptWillUpdate: !!script.config.shouldUpdate,
-      uuid: script.props.uuid,
-      version: process.env.VM_VER,
+      uuid: props.uuid,
     },
+    id,
+    key,
+    meta: metaCopy,
+    pathMap,
+    runAt: runAt[id],
+    [__CODE]: injectedCode,
+    [INJECT_INTO]: normalizeScriptRealm(custom, meta),
+    [META_STR]: [
+      '',
+      codeIndex,
+      tmp = (metaStrMatch.index + metaStrMatch[1].length),
+      tmp + metaStrMatch[2].length,
+    ],
   };
 }
 
-const resolveDataCodeStr = `(${function _(data) {
-  /* `function` is required to compile `this`, and `this` is required because our safe-globals
-   * shadows `window` so its name is minified and hence inaccessible here */
-  const { vmResolve } = this;
-  if (vmResolve) {
-    vmResolve(data);
-  } else {
-    // running earlier than the main content script for whatever reason
-    this.vmData = data;
+function triageRealms(scripts, forceContent, bag) {
+  let code;
+  let wantsPage;
+  const envDelayed = bag?.[INJECT_MORE];
+  const toContent = [];
+  for (const scr of scripts) {
+    const metaStr = scr[META_STR];
+    if (isContentRealm(scr[INJECT_INTO], forceContent)) {
+      if (!metaStr[0]) {
+        const [, i, from, to] = metaStr;
+        metaStr[0] = scr[__CODE][i].slice(from, to);
+      }
+      code = '';
+      toContent.push([scr.id, scr.key.data]);
+    } else {
+      metaStr[0] = '';
+      code = forceContent ? ID_BAD_REALM : scr[__CODE];
+      if (!forceContent) wantsPage = true;
+    }
+    scr.code = code;
   }
-}})`;
+  if (bag) {
+    bag[INJECT][INJECT_PAGE] = wantsPage
+      || envDelayed?.[ENV_SCRIPTS].some(isPageRealmScript, forceContent || null);
+  }
+  return toContent;
+}
+
+function injectContentRealm(toContent, tabId, frameId) {
+  for (const [id, dataKey] of toContent) {
+    const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
+    if (!scr || scr.key.data !== dataKey) continue;
+    browser.tabs.executeScript(tabId, {
+      code: scr[__CODE].join(''),
+      runAt: `document_${scr.runAt}`.replace('body', 'start'),
+      frameId,
+    }).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { frameId })));
+  }
+}
 
 // TODO: rework the whole thing to register scripts individually with real `matches`
 function registerScriptDataFF(inject, url, allFrames) {
+  for (const scr of inject[ENV_SCRIPTS]) {
+    scr.code = scr[__CODE];
+  }
   return contentScriptsAPI.register({
     allFrames,
     js: [{
@@ -455,32 +483,9 @@ function detectStrictCsp(responseHeaders) {
   ));
 }
 
-/** @param {VMInjection.Bag} bag */
-function forceContentInjection(bag) {
-  const inject = bag[INJECT];
-  inject[FORCE_CONTENT] = true;
-  inject[ENV_SCRIPTS].forEach(scr => {
-    // When script wants `page`, the result below will be `true` so the script has a "bad realm" id
-    const failed = !isContentRealm(scr, true);
-    scr.code = failed || '';
-    bag[FEEDBACK].push([
-      scr.dataKey,
-      !failed && scr.runAt,
-      scr.meta.unwrap && scr.props.id,
-    ]);
-  });
-}
-
-function isContentRealm(scr, forceContent) {
-  const realm = scr[INJECT_INTO] || (
-    scr[INJECT_INTO] = normalizeRealm(scr.custom[INJECT_INTO] || scr.meta[INJECT_INTO])
-  );
-  return realm === INJECT_CONTENT || forceContent && realm === INJECT_AUTO;
-}
-
-/** @this {VMInjection.Env} */
-function isPageRealm(scr) {
-  return !isContentRealm(scr, this[FORCE_CONTENT]);
+/** @this {?} truthy = forceContent */
+function isPageRealmScript(scr) {
+  return !isContentRealm(scr[INJECT_INTO] || normalizeScriptRealm(scr.custom, scr.meta), this);
 }
 
 function onTabRemoved(id /* , info */) {

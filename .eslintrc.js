@@ -11,9 +11,12 @@ const FILES_WEB = [`src/injected/web/**/*.js`];
 const FILES_SHARED = [
   'src/common/browser.js',
   'src/common/consts.js',
+  'src/common/safe-globals-shared.js',
 ];
 
+const GLOBALS_SHARED = getGlobals('*');
 const GLOBALS_COMMON = {
+  ...GLOBALS_SHARED,
   ...getGlobals('common'),
   re: false, // transform-modern-regexp with useRe option
 };
@@ -24,10 +27,12 @@ const GLOBALS_INJECTED = {
 };
 const GLOBALS_CONTENT = {
   INIT_FUNC_NAME: false,
+  ...GLOBALS_SHARED,
   ...getGlobals('injected/content'),
   ...GLOBALS_INJECTED,
 };
 const GLOBALS_WEB = {
+  ...GLOBALS_SHARED,
   ...getGlobals('injected/web'),
   ...GLOBALS_INJECTED,
   IS_FIREFOX: false, // passed as a parameter to VMInitInjection in webpack.conf.js

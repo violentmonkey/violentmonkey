@@ -3,7 +3,7 @@ import {
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
   getScriptPrettyUrl, makePause,
 } from '@/common';
-import { ICON_PREFIX, INFERRED, INJECT_PAGE, INJECT_AUTO, TIMEOUT_WEEK } from '@/common/consts';
+import { ICON_PREFIX, INFERRED, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import { getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta } from './script';
@@ -241,6 +241,7 @@ const notifiedBadScripts = new Set();
 
 /**
  * @desc Get scripts to be injected to page with specific URL.
+ * @return {VMInjection.Env}
  */
 export function getScriptsByURL(url, isTop, errors) {
   testerBatch(errors || true);
@@ -252,24 +253,18 @@ export function getScriptsByURL(url, isTop, errors) {
       && testScript(url, script)
     ));
   testerBatch();
-  return getScriptEnv(allScripts);
-}
-
-/**
- * @param {VMScript[]} scripts
- * @return {Promise<VMInjection.Env>}
- */
-async function getScriptEnv(scripts) {
+  if (!allScripts[0]) return;
   const allIds = {};
   const [envStart, envDelayed] = [0, 1].map(() => ({
     depsMap: {},
+    runAt: {},
     [ENV_SCRIPTS]: [],
   }));
   for (const [areaName, listName] of STORAGE_ROUTES_ENTRIES) {
     envStart[areaName] = {}; envDelayed[areaName] = {};
     envStart[listName] = []; envDelayed[listName] = [];
   }
-  scripts.forEach((script) => {
+  allScripts.forEach((script) => {
     const { id } = script.props;
     if (!(allIds[id] = +!!script.config.enabled)) {
       return;
@@ -281,6 +276,7 @@ async function getScriptEnv(scripts) {
     const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
     const { depsMap } = env;
     env.ids.push(id);
+    env.runAt[id] = runAt;
     if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
       env[ENV_VALUE_IDS].push(id);
     }
@@ -304,15 +300,15 @@ async function getScriptEnv(scripts) {
         }
       }
     }
-    env[ENV_SCRIPTS].push({ ...script, runAt }); // must be a copy because we modify it in preinject
+    env[ENV_SCRIPTS].push(script);
   });
   if (envStart.ids.length) {
-    Object.assign(envStart, await readEnvironmentData(envStart));
+    envStart.promise = readEnvironmentData(envStart);
   }
   if (envDelayed.ids.length) {
-    envDelayed.promise = makePause().then(() => readEnvironmentData(envDelayed));
+    envDelayed.promise = makePause().then(readEnvironmentData.bind(null, envDelayed));
   }
-  return Object.assign(envStart, { allIds, envDelayed });
+  return Object.assign(envStart, { allIds, [INJECT_MORE]: envDelayed });
 }
 
 async function readEnvironmentData(env) {

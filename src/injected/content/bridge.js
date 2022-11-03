@@ -1,4 +1,4 @@
-import { INJECT_PAGE, browser } from '../util';
+import { browser } from '../util';
 import { sendCmd } from './util';
 
 const handlers = createNullObj();
