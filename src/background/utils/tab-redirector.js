@@ -108,8 +108,9 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
   if (!cache.has(`bypass:${url}`)
   && (!blacklistRe.test(url) || whitelistRe.test(url))) {
     maybeInstallUserJs(tabId, url);
-    // Cancelling because redirectUrl: 'javascript:void 0' doesn't work in FF with strict CSP
-    return { cancel: true };
+    return IS_FIREFOX
+      ? { cancel: true } // for sites with strict CSP in FF
+      : { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url
   }
 }, {
   urls: [
