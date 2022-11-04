@@ -124,10 +124,9 @@ function makeOwnKeys(local, globals) {
    * on `push` and `arr[i] = 123`, as well as via getters if you read beyond
    * its length or from an unassigned `hole`. */
   const frameIndexes = [];
-  for (let i = 0, len = window::getWindowLength(); i < len && hasOwnProperty(window, i); i += 1) {
-    if (!(i in local)) {
-      setOwnProp(frameIndexes, i, i);
-    }
+  const len = window::getWindowLength();
+  for (let i = 0, str; i < len && getOwnProp(window, str = `${i}`); i += 1) {
+    if (!(str in local)) safePush(frameIndexes, str);
   }
   return safeConcat(
     frameIndexes,
