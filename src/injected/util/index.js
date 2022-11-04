@@ -40,7 +40,9 @@ export const bindEvents = (srcId, destId, bridge) => {
       incomingNodeEvent = null;
     }
   }, true);
-  bridge.post = (cmd, data, realm, node) => {
+  /** In Content bridge `pageNode` is `realm` which is wired in setupContentInvoker */
+  bridge.post = (cmd, data, pageNode, contNode) => {
+    const node = bridge.ids ? contNode : pageNode;
     // Constructing the event now so we don't send anything if it throws on invalid `node`
     const evtNode = node && new SafeMouseEvent(destId, { __proto__: null, relatedTarget: node });
     fireBridgeEvent(destId, { cmd, data, node: !!evtNode });
