@@ -9,7 +9,10 @@
           @click="nav = navKey"
         />
       </nav>
-      <div class="edit-name text-center ellipsis flex-1" v-text="scriptName"/>
+      <div class="edit-name text-center ellipsis flex-1">
+        <span class="subtle" v-if="script?.config?.removed" v-text="i18n('headerRecycleBin') + ' / '"></span>
+        {{scriptName}}
+      </div>
       <div class="edit-hint text-right ellipsis">
         <a href="https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/"
            target="_blank"
@@ -27,6 +30,7 @@
       <vm-code
         class="abs-full"
         :value="code"
+        :readOnly="readOnly"
         ref="code"
         v-show="nav === 'code'"
         :active="nav === 'code'"
@@ -36,6 +40,7 @@
       <vm-settings
         class="abs-full edit-body"
         v-show="nav === 'settings'"
+        :readOnly="readOnly"
         :active="nav === 'settings'"
         :settings="settings"
         :value="script"
@@ -43,6 +48,7 @@
       <vm-values
         class="abs-full edit-body"
         v-show="nav === 'values'"
+        :readOnly="readOnly"
         :active="nav === 'values'"
         :script="script"
       />
@@ -151,7 +157,7 @@ const K_NEXT_PANEL = 'Alt-PageDown';
 const compareString = (a, b) => (a < b ? -1 : a > b);
 
 export default {
-  props: ['initial', 'initialCode'],
+  props: ['initial', 'initialCode', 'readOnly'],
   components: {
     VmCode,
     VmSettings,

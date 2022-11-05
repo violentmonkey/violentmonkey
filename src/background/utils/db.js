@@ -391,15 +391,12 @@ function reportBadScripts(ids) {
  * @desc Get data for dashboard.
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
-export async function getData({ ids, sizes, removed }) {
-  const scripts = ids ? ids.map(getScriptById) : store.scripts;
-  const removedScripts = !ids && removed ? store.removedScripts : null;
-  const allScripts = scripts.concat(removedScripts || []);
-  allScripts.forEach(inferScriptProps);
+export async function getData({ ids, sizes }) {
+  const scripts = ids?.map(getScriptById) ?? [...store.scripts, ...store.removedScripts];
+  scripts.forEach(inferScriptProps);
   return {
     scripts,
-    removedScripts,
-    cache: await getIconCache(allScripts),
+    cache: await getIconCache(scripts),
     sizes: sizes && getSizes(ids),
   };
 }
@@ -430,7 +427,7 @@ async function getIconCache(scripts) {
  * @return {number[][]}
  */
 export function getSizes(ids) {
-  const scripts = ids ? ids.map(getScriptById) : store.scripts;
+  const scripts = ids ? ids.map(getScriptById) : [...store.scripts, ...store.removedScripts];
   return scripts.map(({
     meta,
     custom: { pathMap = {} },

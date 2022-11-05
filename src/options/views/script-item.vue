@@ -98,6 +98,11 @@
     </div>
     <div class="script-buttons script-buttons-right">
       <template v-if="canRender">
+        <tooltip :content="i18n('buttonRemove')" align="end">
+          <a class="btn-ghost" :class="{ 'btn-danger': script.config.removed }" @click="onRemove" :data-hotkey="hotkeys.remove" :tabIndex="tabIndex">
+            <icon name="trash"></icon>
+          </a>
+        </tooltip>
         <tooltip :content="i18n('buttonRestore')" placement="left" v-if="script.config.removed">
           <a
             class="btn-ghost"
@@ -105,11 +110,6 @@
             :data-hotkey="hotkeys.restore"
             :tabIndex="tabIndex">
             <icon name="undo"></icon>
-          </a>
-        </tooltip>
-        <tooltip :content="i18n('buttonRemove')" align="end" v-else>
-          <a class="btn-ghost" @click="onRemove" :data-hotkey="hotkeys.remove" :tabIndex="tabIndex">
-            <icon name="trash"></icon>
           </a>
         </tooltip>
       </template>
@@ -190,7 +190,7 @@ export default {
       return this.focused ? 0 : -1;
     },
     url() {
-      return `#scripts/${this.script.props.id}`;
+      return `#${this.script.config.removed ? 'recycleBin' : 'scripts'}/${this.script.props.id}`;
     },
     urls() {
       return {
@@ -199,7 +199,7 @@ export default {
       };
     },
     nameProps() {
-      return this.viewTable && !this.script.config.removed
+      return this.viewTable
         /* We disable native dragging on name to avoid confusion with exec re-ordering.
          * Users who want to open a new tab via dragging the link can use the icon. */
         ? { is: 'a', href: this.url, tabIndex: this.tabIndex, draggable: false }

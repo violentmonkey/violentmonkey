@@ -26,7 +26,7 @@
           <button type="submit">&gt;</button>
         </tooltip>
       </form>
-      <form class="flex-1" @submit.prevent="replace()" v-if="!readonly">
+      <form class="flex-1" @submit.prevent="replace()" v-if="!readOnly">
         <span v-text="i18n('labelReplace')"></span>
         <!-- id is required for the built-in autocomplete using entered values -->
         <input class="flex-1" type="search" id="editor-replace" v-model="search.replace">
@@ -111,7 +111,7 @@ const cmCommands = CodeMirror.commands;
 export default {
   props: {
     active: Boolean,
-    readonly: {
+    readOnly: {
       type: Boolean,
       default: false,
     },
@@ -244,7 +244,7 @@ export default {
       this.placeholders = new Map();
       this.placeholderId = 0;
       maxDisplayLength = cm.options.maxDisplayLength;
-      cm.setOption('readOnly', this.readonly);
+      cm.setOption('readOnly', this.readOnly);
       // these are active only in the code nav tab
       cm.state.commands = Object.assign({
         // call own methods explicitly to strip `cm` parameter passed by CodeMirror

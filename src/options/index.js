@@ -71,15 +71,18 @@ export function loadData() {
 
 async function requestData(ids) {
   const [data] = await Promise.all([
-    sendCmdDirectly('GetData', { ids, sizes: true, removed: true }, { retry: true }),
+    sendCmdDirectly('GetData', { ids, sizes: true }, { retry: true }),
     options.ready,
   ]);
-  const { scripts, removedScripts, sizes, ...auxData } = data;
+  const { scripts: allScripts, sizes, ...auxData } = data;
   Object.assign(store, auxData); // initScripts needs `cache` in store
+  const scripts = [];
+  const removedScripts = [];
   // modifying scripts without triggering reactivity
-  [scripts, removedScripts].forEach(group => group?.forEach((script, i) => {
+  allScripts.forEach((script, i) => {
     initScript(script, sizes[i]);
-  }));
+    (script.config.removed ? removedScripts : scripts).push(script);
+  });
   // now we can render
   store.scripts = scripts;
   store.removedScripts = removedScripts;

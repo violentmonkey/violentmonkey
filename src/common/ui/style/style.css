@@ -220,6 +220,9 @@ button,
     border-color: var(--fill-4);
   }
 }
+.btn-danger {
+  color: #f00;
+}
 
 span:focus,
 a:focus {
@@ -344,6 +347,9 @@ li {
 }
 .scroll-y {
   overflow-y: auto;
+}
+.subtle {
+  color: var(--fill-7);
 }
 
 .frame {

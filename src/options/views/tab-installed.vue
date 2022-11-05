@@ -128,7 +128,13 @@
         />
       </div>
     </div>
-    <edit v-if="state.script" :initial="state.script" :initial-code="state.code" @close="handleEditScript()" />
+    <edit
+      v-if="state.script"
+      :initial="state.script"
+      :initial-code="state.code"
+      :read-only="state.script.config.removed"
+      @close="handleEditScript()"
+    />
   </div>
 </template>
 
@@ -340,7 +346,7 @@ function handleStateChange(active) {
   state.menuNewActive = active;
 }
 function handleEditScript(id) {
-  const pathname = ['scripts', id].filter(Boolean).join('/');
+  const pathname = [showRecycle.value ? 'recycleBin' : 'scripts', id].filter(Boolean).join('/');
   if (!id && pathname === lastRoute().pathname) {
     window.history.back();
   } else {
@@ -355,7 +361,7 @@ async function onHashChange() {
     state.code = code;
   } else {
     const nid = id && +id || null;
-    const script = nid && store.scripts.find(s => s.props.id === nid);
+    const script = nid && (showRecycle.value ? store.removedScripts : store.scripts).find(s => s.props.id === nid);
     if (script) {
       state.code = await sendCmdDirectly('GetScriptCode', id);
     } else {

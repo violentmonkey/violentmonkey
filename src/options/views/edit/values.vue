@@ -1,7 +1,7 @@
 <template>
   <div class="edit-values" ref="container">
     <div class="mb-1">
-      <button @click="onNew">+</button>
+      <button @click="onNew" v-if="!readOnly">+</button>
       <div class="inline-block ml-2" v-if="totalPages > 1">
         <button :disabled="page === 1" @click="page -= 1">&larr;</button>
         <span class="ml-1" v-text="page"/> / <span class="mr-1" v-text="totalPages"/>
@@ -70,7 +70,7 @@
       </div>
       <label v-show="!current.isAll">
         <span v-text="i18n('valueLabelKey')"/>
-        <input type="text" v-model="current.key" :readOnly="!current.isNew"
+        <input type="text" v-model="current.key" :readOnly="!current.isNew || readOnly"
                ref="key"
                spellcheck="false"
                @keydown.esc.exact.stop="onCancel">
@@ -78,12 +78,15 @@
       <label>
         <span v-text="current.isAll ? i18n('valueLabelValueAll') : i18n('valueLabelValue')"/>
         <!-- TODO: use CodeMirror in json mode -->
-        <vm-code :value="current.value"
-                 ref="value"
-                 class="h-100 mt-1"
-                 mode="application/json"
-                 @code-dirty="onChange"
-                 :commands="{ close: onCancel, save: onSave }"/>
+        <vm-code
+          :value="current.value"
+          ref="value"
+          class="h-100 mt-1"
+          mode="application/json"
+          :readOnly="readOnly"
+          @code-dirty="onChange"
+          :commands="{ close: onCancel, save: onSave }"
+        />
       </label>
     </div>
   </div>
@@ -122,7 +125,7 @@ const fakeSender = () => ({ tab: { id: Math.random() - 2 }, frameId: 0 });
 const conditionNotEdit = { condition: '!edit' };
 
 export default {
-  props: ['active', 'script'],
+  props: ['active', 'script', 'readOnly'],
   components: {
     Icon,
     VmCode,
