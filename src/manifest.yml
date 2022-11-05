@@ -52,7 +52,7 @@ commands:
   newScript:
     description: __MSG_menuNewScript__
 
-minimum_chrome_version: '55.0'
+minimum_chrome_version: '57.0'
 
 browser_specific_settings:
   gecko:
