@@ -315,6 +315,15 @@ $removedItemHeight: calc(
     height: $removedItemHeight;
     padding-bottom: $removedItemPadB;
   }
+  &:not(.removed) {
+    .script-buttons-left {
+      min-width: 165px;
+    }
+    .script-buttons-right {
+      min-width: 30px;
+      justify-self: end;
+    }
+  }
   &.focused {
     // bring the focused item to the front so that the box-shadow will not be overlapped
     // by the next item
@@ -335,8 +344,21 @@ $removedItemHeight: calc(
   }
   &-name {
     min-width: 100px;
+    font-weight: 500;
+    font-size: $nameFontSize;
+    .removed & {
+      margin-right: 8px;
+    }
+    > a {
+      color: inherit;
+    }
+    .disabled & > a {
+      color: var(--fill-8);
+    }
   }
   &-buttons {
+    display: flex;
+    align-items: center;
     line-height: 1;
     white-space: nowrap;
     color: hsl(215, 13%, 28%);
@@ -358,11 +380,6 @@ $removedItemHeight: calc(
       .removed & {
         order: 2;
       }
-    }
-  }
-  &-name {
-    .removed & {
-      margin-right: 8px;
     }
   }
   &-info {
@@ -401,14 +418,6 @@ $removedItemHeight: calc(
       grid-row-end: auto;
       width: $iconSizeSmaller;
       height: $iconSizeSmaller;
-    }
-  }
-  &-name {
-    font-weight: 500;
-    font-size: $nameFontSize;
-    color: inherit;
-    .disabled & {
-      color: var(--fill-8);
     }
   }
   &-author {
@@ -504,6 +513,9 @@ $removedItemHeight: calc(
         min-width: 100px;
         align-self: stretch;
         align-items: center;
+        > a {
+          flex: 1;
+        }
       }
       &-icon {
         width: 2rem;
@@ -535,12 +547,14 @@ $removedItemHeight: calc(
       &-buttons {
         order: -1;
         margin: 0;
-        > .flex {
-          width: auto;
+        &-left {
           > :first-child { /* edit button */
             display: none;
           }
         }
+      }
+      &.removed .script-buttons .sep {
+        display: none;
       }
       &-author > .ellipsis {
         max-width: 15vw;
