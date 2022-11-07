@@ -137,7 +137,7 @@ export async function injectScripts(data, isXml) {
     injectPageSandbox();
   }
   const toContent = data.scripts
-    .filter(scr => triageScript(scr, scr[INJECT_INTO]) === INJECT_CONTENT)
+    .filter(scr => triageScript(scr) === INJECT_CONTENT)
     .map(scr => [scr.id, scr.key.data]);
   const moreData = (more || toContent.length)
     && sendCmd('InjectionFeedback', {
@@ -177,7 +177,8 @@ export async function injectScripts(data, isXml) {
   bridgeInfo = contLists = pageLists = VMInitInjection = null;
 }
 
-function triageScript(script, realm) {
+function triageScript(script) {
+  let realm = script[INJECT_INTO];
   realm = (realm === INJECT_AUTO && !pageInjectable) || realm === INJECT_CONTENT
     ? INJECT_CONTENT
     : pageInjectable && INJECT_PAGE;
