@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: 적용
 buttonCancel:
   description: Cancel button on dialog.
   message: 취소
@@ -97,7 +97,7 @@ buttonUndo:
   touched: false
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: 업데이트
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: 모두 업데이트 확인
@@ -543,7 +543,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: 피드백하기
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 이 사이트를 위한 스크립트 찾기
@@ -636,7 +636,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 요구되는 리소스가 손실됨.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -654,7 +654,7 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 스크립트를 재설치하시거나 다시 저장하세요.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (변경 없음)'

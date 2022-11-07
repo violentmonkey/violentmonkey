@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: 应用
 buttonCancel:
   description: Cancel button on dialog.
   message: 取消
@@ -542,7 +542,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: 反馈
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 为此站点查找脚本
