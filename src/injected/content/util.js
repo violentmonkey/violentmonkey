@@ -6,6 +6,13 @@ export * from './util-task';
  * Note that we avoid spoofed prototype getters by using hasOwnProperty, and not using `length`
  * as it searches for ALL matching nodes when this tag wasn't cached internally. */
 export const elemByTag = (tag, i) => getOwnProp(document::getElementsByTagName(tag), i || 0);
+const {
+  TextDecoder: SafeTextDecoder,
+} = global;
+const { createElementNS } = document;
+const tdDecode = SafeTextDecoder[PROTO].decode;
+const getHref = describeProperty(HTMLAnchorElement[PROTO], 'href').get;
+const regexpTest = RegExp[PROTO].test; // Deeply unsafe. TODO: remove.
 
 /**
  * @param {string} tag

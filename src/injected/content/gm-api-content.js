@@ -2,6 +2,8 @@ import bridge, { addBackgroundHandlers, addHandlers } from './bridge';
 import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 
 const menus = createNullObj();
+const HEAD_TAGS = ['script', 'style', 'link', 'meta'];
+const { toLowerCase } = '';
 let setPopupThrottle;
 let isPopupShown;
 
@@ -19,7 +21,7 @@ addHandlers({
     let res;
     try {
       const parent = this
-        || /^(script|style|link|meta)$/i::regexpTest(tag) && elemByTag('head')
+        || HEAD_TAGS::includes(`${tag}`::toLowerCase()) && elemByTag('head')
         || elemByTag('body')
         || elemByTag('*');
       el = makeElem(tag, attrs);
