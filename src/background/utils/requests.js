@@ -249,9 +249,7 @@ export function clearRequestsByTabId(tabId, frameId) {
 
 /** Polyfill for browser's inability to send complex types over extension messaging */
 function decodeBody([body, type, wasBlob]) {
-  if (type === 'query') {
-    type = 'application/x-www-form-urlencoded';
-  } else if (type === 'fd') {
+  if (type === 'fd') {
     // FF supports FormData over messaging
     // Chrome doesn't - we use this code only with an empty FormData just to create the object
     const res = new FormData();

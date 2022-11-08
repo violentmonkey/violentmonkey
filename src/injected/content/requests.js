@@ -10,6 +10,7 @@ const { arrayBuffer: getArrayBuffer, blob: getBlob } = ResponseProto;
 const { createObjectURL, revokeObjectURL } = URL;
 const BlobProto = SafeBlob[PROTO];
 const getBlobType = describeProperty(BlobProto, 'type').get;
+const getTypedArrayBuffer = describeProperty(getPrototypeOf(SafeUint8Array[PROTO]), 'buffer').get;
 const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
 const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
 const fdAppend = SafeFormData[PROTO].append;
@@ -69,7 +70,7 @@ addBackgroundHandlers({
         response = processChunk(req, response);
         response = req.asBlob
           ? new SafeBlob([response], { type: msg.contentType })
-          : response.buffer;
+          : response::getTypedArrayBuffer();
         delete req.arr;
       }
       data.response = response;
@@ -107,7 +108,7 @@ function downloadBlob(blob, fileName) {
     revokeBlobAfterTimeout(url);
   });
   // Frequent downloads are ignored in Chrome and possibly other browsers
-  downloadChain = res::then(sendCmd('SetTimeout', 150));
+  downloadChain = res::then(() => sendCmd('SetTimeout', 150));
   return res;
 }
 
