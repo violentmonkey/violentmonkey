@@ -53,18 +53,18 @@ export const decodeResource = (raw, isBlob) => {
   if (isBlob === false) {
     return `data:${mimeType};base64,${mimeData}`;
   }
-  const bin = safeAtob(mimeData);
-  if (isBlob || /[\x80-\xFF]/::regexpTest(bin)) {
-    const len = bin.length;
+  res = safeAtob(mimeData);
+  // TODO: do the check in BG and cache/store the result because safe-guarding all the stuff
+  // regexp picks from an instance internally is inordinately complicated
+  if (/[\x80-\xFF]/::regexpTest(res)) {
+    const len = res.length;
     const bytes = new SafeUint8Array(len);
     for (let i = 0; i < len; i += 1) {
-      bytes[i] = bin::charCodeAt(i);
+      bytes[i] = safeCharCodeAt(res, i);
     }
-    res = isBlob
-      ? new SafeBlob([bytes], { type: mimeType })
-      : new SafeTextDecoder()::tdDecode(bytes);
-  } else { // pure ASCII
-    res = bin;
+    res = isBlob ? bytes : new SafeTextDecoder()::tdDecode(bytes);
   }
-  return res;
+  return isBlob
+    ? new SafeBlob([res], { type: mimeType })
+    : res;
 };

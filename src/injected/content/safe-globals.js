@@ -29,7 +29,8 @@ export const safeCall = safeApply.call.bind(safeApply.call);
 export const { forEach, includes } = []; // `push` is unsafe as it may call a setter; use safePush()
 export const { createElementNS, getElementsByTagName } = document;
 export const { then } = SafePromise[PROTO];
-export const { charCodeAt, indexOf: stringIndexOf, slice } = '';
+export const { indexOf: stringIndexOf, slice } = '';
+export const safeCharCodeAt = safeApply.call.bind(''.charCodeAt); // faster than str::charCodeAt
 export const { append, appendChild, attachShadow, remove, setAttribute } = Element[PROTO];
 export const {
   assign,

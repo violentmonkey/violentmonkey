@@ -48,7 +48,6 @@ export let
   // Element.prototype
   remove,
   // String.prototype
-  charCodeAt,
   slice,
   // safeCall
   safeApply,
@@ -85,7 +84,6 @@ export const VAULT = (() => {
   let ArrayP;
   let Reflect;
   let SafeObject;
-  let StringP;
   let i = -1;
   let call;
   let res;
@@ -138,8 +136,7 @@ export const VAULT = (() => {
     // Element.prototype
     remove = res[i += 1] || src.Element[PROTO].remove,
     // String.prototype
-    charCodeAt = res[i += 1] || (StringP = src.String[PROTO]).charCodeAt,
-    slice = res[i += 1] || StringP.slice,
+    slice = res[i += 1] || src.String[PROTO].slice,
     // safeCall
     safeApply = res[i += 1] || (Reflect = src.Reflect).apply,
     safeCall = res[i += 1] || (call = SafeObject.call).bind(call),

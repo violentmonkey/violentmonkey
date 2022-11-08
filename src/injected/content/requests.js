@@ -128,7 +128,7 @@ function processChunk(req, data, msg) {
   const len = data.length;
   const arr = req.arr || (req.arr = new SafeUint8Array(msg ? msg.size : len));
   for (let pos = msg?.chunk || 0, i = 0; i < len;) {
-    arr[pos++] = data::charCodeAt(i++);
+    arr[pos++] = safeCharCodeAt(data, i++);
   }
   return arr;
 }
