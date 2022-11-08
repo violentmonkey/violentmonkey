@@ -1,5 +1,5 @@
 import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
-import './clipboard';
+import { onClipboardCopy } from './clipboard';
 import { sendSetPopup } from './gm-api-content';
 import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
@@ -26,6 +26,7 @@ async function init() {
     retry: true,
   });
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
+  /** @type {VMInjection} */
   const data = xhrData || (
     IS_FIREFOX && Event[PROTO].composedPath
       ? await getDataFF(dataPromise)
@@ -36,6 +37,9 @@ async function init() {
   if (data.expose && !isXml && injectPageSandbox()) {
     addHandlers({ GetScriptVer: true }, true);
     bridge.post('Expose');
+  }
+  if (IS_FIREFOX && !data.clipFF) {
+    off('copy', onClipboardCopy, true);
   }
   if (data.scripts) {
     onScripts.forEach(fn => fn(data));

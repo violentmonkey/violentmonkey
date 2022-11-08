@@ -203,6 +203,7 @@ declare interface VMInjectionDisabled {
  */
 declare interface VMInjection extends VMInjectionDisabled {
   cache: StringMap;
+  clipFF?: boolean;
   errors: string[];
   forceContent?: boolean;
   /** content bridge adds the actually running ids and sends via SetPopup */
@@ -223,7 +224,8 @@ declare namespace VMInjection {
   type RunAt = 'start' | 'body' | 'end' | 'idle';
   interface Env {
     /** Only present in envStart */
-    allIds?: { [id: string]: NumBool };
+    allIds?: { [id: string]: number };
+    clipFF?: boolean;
     cache: StringMap;
     cacheKeys: string[];
     code: StringMap;

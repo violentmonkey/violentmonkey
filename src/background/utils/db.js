@@ -228,6 +228,7 @@ export const ENV_CACHE_KEYS = 'cacheKeys';
 export const ENV_REQ_KEYS = 'reqKeys';
 export const ENV_SCRIPTS = 'scripts';
 export const ENV_VALUE_IDS = 'valueIds';
+const GMCLIP_RE = /^GM[_.]setClipboard$/;
 const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Value)$/;
 const RUN_AT_RE = /^document-(start|body|end|idle)$/;
 const STORAGE_ROUTES = {
@@ -254,6 +255,7 @@ export function getScriptsByURL(url, isTop, errors) {
     ));
   testerBatch();
   if (!allScripts[0]) return;
+  let clipboardChecked = !IS_FIREFOX;
   const allIds = {};
   const [envStart, envDelayed] = [0, 1].map(() => ({
     depsMap: {},
@@ -279,6 +281,9 @@ export function getScriptsByURL(url, isTop, errors) {
     env.runAt[id] = runAt;
     if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
       env[ENV_VALUE_IDS].push(id);
+    }
+    if (!clipboardChecked && meta.grant.some(GMCLIP_RE.test, GMCLIP_RE)) {
+      clipboardChecked = envStart.clipFF = true;
     }
     for (const [list, name, dataUriDecoder] of [
       [meta.require, S_REQUIRE, dataUri2text],

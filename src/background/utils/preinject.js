@@ -294,6 +294,7 @@ async function prepare(cacheKey, url, isTop) {
     [ENV_SCRIPTS]: prepareScripts(env),
     [INJECT_INTO]: injectInto,
     [INJECT_MORE]: moreKey,
+    clipFF: env.clipFF,
     ids: allIds,
     info: { ua },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
