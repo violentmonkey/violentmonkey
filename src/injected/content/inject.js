@@ -270,7 +270,7 @@ function injectAll(runAt) {
     const items = lists?.[runAt];
     if (items) {
       bridge.post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
-      delete bridgeInfo[realm];
+      bridgeInfo[realm] = false; // must be a sendable value to have own prop in the receiver
       if (!tardyQueue) tardyQueue = createNullObj();
       for (const { id } of items) tardyQueue[id] = 1;
       if (!inPage) nextTask()::then(tardyQueueCheck);
