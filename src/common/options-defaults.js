@@ -1,5 +1,3 @@
-import { INJECT_AUTO } from './consts';
-
 export default {
   isApplied: true,
   autoUpdate: 1, // days, 0 = disable

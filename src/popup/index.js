@@ -1,8 +1,5 @@
 import '@/common/browser';
 import { sendCmdDirectly } from '@/common';
-import {
-  ID_BAD_REALM, ID_INJECTING, INJECT_CONTENT, INJECT_INTO, INJECT_PAGE,
-} from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { forEachValue, mapEntry } from '@/common/object';

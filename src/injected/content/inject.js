@@ -1,10 +1,6 @@
 import bridge, { addHandlers } from './bridge';
 import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
-import {
-  bindEvents, fireBridgeEvent,
-  ID_BAD_REALM, ID_INJECTING, INJECT_CONTENT, INJECT_INTO, INJECT_MAPPING, INJECT_PAGE,
-  MORE, FEEDBACK, FORCE_CONTENT,
-} from '../util';
+import { bindEvents, fireBridgeEvent, META_STR } from '../util';
 import { Run } from './cmd-run';
 
 /* In FF, content scripts running in a same-origin frame cannot directly call parent's functions
@@ -13,11 +9,11 @@ import { Run } from './cmd-run';
  * INIT_FUNC_NAME ids even though we change it now with each release. */
 const VAULT_WRITER = `${VM_UUID}${INIT_FUNC_NAME}VW`;
 const VAULT_WRITER_ACK = `${VAULT_WRITER}+`;
-const tardyQueue = [];
+const bridgeIds = bridge.ids;
+let tardyQueue;
+let bridgeInfo;
 let contLists;
-let pgLists;
-/** @type {Object<string,VMRealmData>} */
-let realms;
+let pageLists;
 /** @type {?boolean} */
 let pageInjectable;
 let frameEventWnd;
@@ -52,13 +48,15 @@ addHandlers({
   /**
    * FF bug workaround to enable processing of sourceURL in injected page scripts
    */
-  InjectList: IS_FIREFOX && injectList,
+  InjectList: IS_FIREFOX && injectPageList,
 });
 
-export function injectPageSandbox(contentId, webId) {
+export function injectPageSandbox() {
   pageInjectable = false;
   const vaultId = safeGetUniqId();
   const handshakeId = safeGetUniqId();
+  const contentId = safeGetUniqId();
+  const webId = safeGetUniqId();
   if (useOpener(opener) || useOpener(!IS_TOP && parent)) {
     startHandshake();
   } else {
@@ -117,121 +115,88 @@ export function injectPageSandbox(contentId, webId) {
 }
 
 /**
- * @param {string} contentId
- * @param {string} webId
  * @param {VMInjection} data
  * @param {boolean} isXml
  */
-export async function injectScripts(contentId, webId, data, isXml) {
-  const { errors, info, [MORE]: more } = data;
+export async function injectScripts(data, isXml) {
+  const { errors, info, [INJECT_MORE]: more } = data;
+  const CACHE = 'cache';
   if (errors) {
     logging.warn(errors);
   }
   if (IS_FIREFOX) {
     IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
   }
-  realms = {
-    __proto__: null,
-    [INJECT_CONTENT]: {
-      lists: contLists = { start: [], body: [], end: [], idle: [] },
-      is: 0,
-      info,
-    },
-    [INJECT_PAGE]: {
-      lists: pgLists = { start: [], body: [], end: [], idle: [] },
-      is: 0,
-      info,
-    },
-  };
-  assign(bridge.cache, data.cache);
-  if (isXml || data[FORCE_CONTENT]) {
+  bridgeInfo = createNullObj();
+  bridgeInfo[INJECT_PAGE] = info;
+  bridgeInfo[INJECT_CONTENT] = info;
+  assign(bridge[CACHE], data[CACHE]);
+  if (isXml || data[INJECT_CONTENT_FORCE]) {
     pageInjectable = false;
+  } else if (data[INJECT_PAGE] && pageInjectable == null) {
+    injectPageSandbox();
   }
-  if (data[INJECT_PAGE] && pageInjectable == null) {
-    injectPageSandbox(contentId, webId);
-  }
-  const feedback = data.scripts.map((script) => {
-    const { id } = script.props;
-    const realm = INJECT_MAPPING[script[INJECT_INTO]].find(key => (
-      key === INJECT_CONTENT || pageInjectable
-    ));
-    const { runAt } = script;
-    // If the script wants this specific realm, which is unavailable, we won't inject it at all
-    if (realm) {
-      const { pathMap } = script.custom;
-      const realmData = realms[realm];
-      realmData.lists[runAt].push(script); // 'start' or 'body' per getScriptsByURL()
-      realmData.is = true;
-      if (pathMap) bridge.pathMaps[id] = pathMap;
-    } else {
-      bridge.ids[id] = ID_BAD_REALM;
-    }
-    return [
-      script.dataKey,
-      realm === INJECT_CONTENT && runAt,
-      script.meta.unwrap && id,
-    ];
-  });
-  const moreData = sendCmd('InjectionFeedback', {
-    [FEEDBACK]: feedback,
-    [FORCE_CONTENT]: !pageInjectable,
-    [MORE]: more,
-  });
-  const hasInvoker = realms[INJECT_CONTENT].is;
+  const toContent = data.scripts
+    .filter(scr => triageScript(scr) === INJECT_CONTENT)
+    .map(scr => [scr.id, scr.key.data]);
+  const moreData = (more || toContent.length)
+    && sendCmd('InjectionFeedback', {
+      [INJECT_CONTENT_FORCE]: !pageInjectable,
+      [INJECT_CONTENT]: toContent,
+      [INJECT_MORE]: more,
+    });
+  const hasInvoker = contLists;
   if (hasInvoker) {
-    setupContentInvoker(contentId, webId);
+    setupContentInvoker();
   }
   // Using a callback to avoid a microtask tick when the root element exists or appears.
-  await onElement('*', async () => {
-    injectAll('start');
-    const onBody = (pgLists.body.length || contLists.body.length)
-      && onElement('body', injectAll, 'body');
-    // document-end, -idle
-    if (more) {
-      data = await moreData;
-      if (data) await injectDelayedScripts(!hasInvoker && contentId, webId, data);
+  await onElement('*', injectAll, 'start');
+  if (pageLists?.body || contLists?.body) {
+    await onElement('body', injectAll, 'body');
+  }
+  if (more && (data = await moreData)) {
+    assign(bridge[CACHE], data[CACHE]);
+    if (document::getReadyState() === 'loading') {
+      await new SafePromise(resolve => {
+        /* Since most sites listen to DOMContentLoaded on `document`, we let them run first
+         * by listening on `window` which follows `document` when the event bubbles up. */
+        on('DOMContentLoaded', resolve, { once: true });
+      });
+      await 0; // let the site's listeners on `window` run first
     }
-    if (onBody) {
-      await onBody;
+    for (const scr of data.scripts) {
+      triageScript(scr);
     }
-    realms = null;
-    pgLists = null;
-    contLists = null;
-  });
-  VMInitInjection = null; // release for GC
+    if (contLists && !hasInvoker) {
+      setupContentInvoker();
+    }
+    await injectAll('end');
+    await injectAll('idle');
+  }
+  // release for GC
+  bridgeInfo = contLists = pageLists = VMInitInjection = null;
 }
 
-async function injectDelayedScripts(contentId, webId, { cache, scripts }) {
-  assign(bridge.cache, cache);
-  let needsInvoker;
-  scripts::forEach(script => {
-    const { code, runAt, custom: { pathMap } } = script;
-    const { id } = script.props;
-    if (pathMap) {
-      bridge.pathMaps[id] = pathMap;
-    }
-    if (!code) {
-      needsInvoker = true;
-      safePush(contLists[runAt], script);
-    } else if (pageInjectable) {
-      safePush(pgLists[runAt], script);
-    } else {
-      bridge.ids[id] = ID_BAD_REALM;
-    }
-  });
-  if (document::getReadyState() === 'loading') {
-    await new SafePromise(resolve => {
-      /* Since most sites listen to DOMContentLoaded on `document`, we let them run first
-       * by listening on `window` which follows `document` when the event bubbles up. */
-      window::on('DOMContentLoaded', resolve, { once: true });
-    });
-    await 0; // let the site's listeners on `window` run first
+function triageScript(script) {
+  let realm = script[INJECT_INTO];
+  realm = (realm === INJECT_AUTO && !pageInjectable) || realm === INJECT_CONTENT
+    ? INJECT_CONTENT
+    : pageInjectable && INJECT_PAGE;
+  if (realm) {
+    const lists = realm === INJECT_CONTENT
+      ? contLists || (contLists = createNullObj())
+      : pageLists || (pageLists = createNullObj());
+    const { gmi, [META_STR]: metaStr, pathMap, runAt } = script;
+    const list = lists[runAt] || (lists[runAt] = []);
+    safePush(list, script);
+    setOwnProp(gmi, 'scriptMetaStr', metaStr[0]
+      || script.code[metaStr[1]]::slice(metaStr[2], metaStr[3]));
+    delete script[META_STR];
+    if (pathMap) bridge.pathMaps[script.id] = pathMap;
+  } else {
+    bridgeIds[script.id] = ID_BAD_REALM;
   }
-  if (needsInvoker && contentId) {
-    setupContentInvoker(contentId, webId);
-  }
-  injectAll('end');
-  injectAll('idle');
+  return realm;
 }
 
 function inject(item, iframeCb) {
@@ -297,43 +262,41 @@ function inject(item, iframeCb) {
 }
 
 function injectAll(runAt) {
-  if (process.env.DEBUG) throwIfProtoPresent(realms);
-  for (const realm in realms) { /* proto is null */// eslint-disable-line guard-for-in
-    const realmData = realms[realm];
-    const items = realmData.lists[runAt];
-    const { info } = realmData;
-    if (items.length) {
-      bridge.post('ScriptData', { info, items, runAt }, realm);
-      if (realm === INJECT_PAGE && !IS_FIREFOX) {
-        injectList(runAt);
-      }
-      safePush(tardyQueue, items);
-      nextTask()::then(tardyQueueCheck);
+  let res;
+  for (let inPage = 1; inPage >= 0; inPage--) {
+    const realm = inPage ? INJECT_PAGE : INJECT_CONTENT;
+    const lists = inPage ? pageLists : contLists;
+    const items = lists?.[runAt];
+    if (items) {
+      bridge.post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
+      delete bridgeInfo[realm];
+      if (!tardyQueue) tardyQueue = createNullObj();
+      for (const { id } of items) tardyQueue[id] = 1;
+      if (!inPage) nextTask()::then(tardyQueueCheck);
+      else if (!IS_FIREFOX) res = injectPageList(runAt);
     }
   }
-  if (runAt !== 'start' && contLists[runAt].length) {
-    bridge.post('RunAt', runAt, INJECT_CONTENT);
-  }
+  return res;
 }
 
-async function injectList(runAt) {
-  const list = pgLists[runAt];
-  // Not using for-of because we don't know if @@iterator is safe.
-  for (let i = 0, item; (item = list[i]); i += 1) {
-    if (item.code) {
+async function injectPageList(runAt) {
+  const scripts = pageLists[runAt];
+  for (const scr of scripts) {
+    if (scr.code) {
       if (runAt === 'idle') await nextTask();
       if (runAt === 'end') await 0;
-      inject(item);
-      item.code = '';
-      if (item.meta?.unwrap) {
-        Run(item.props.id);
-      }
+      // Exposing window.vmXXX setter just before running the script to avoid interception
+      if (!scr.meta.unwrap) bridge.post('Plant', scr.key);
+      inject(scr);
+      scr.code = '';
+      if (scr.meta.unwrap) Run(scr.id);
     }
   }
+  tardyQueueCheck();
 }
 
-function setupContentInvoker(contentId, webId) {
-  const invokeContent = VMInitInjection(IS_FIREFOX)(webId, contentId, bridge.onHandle);
+function setupContentInvoker() {
+  const invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm, node) => {
     const fn = realm === INJECT_CONTENT
@@ -348,13 +311,10 @@ function setupContentInvoker(contentId, webId) {
  * as "still starting", so the popup can show them accordingly.
  */
 function tardyQueueCheck() {
-  for (const items of tardyQueue) {
-    for (const script of items) {
-      const id = script.props.id;
-      if (bridge.ids[id] === 1) bridge.ids[id] = ID_INJECTING;
-    }
+  for (const id in tardyQueue) {
+    if (bridgeIds[id] === 1) bridgeIds[id] = ID_INJECTING;
   }
-  tardyQueue.length = 0;
+  tardyQueue = null;
 }
 
 function tellBridgeToWriteVault(vaultId, wnd) {

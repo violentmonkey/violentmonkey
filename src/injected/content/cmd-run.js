@@ -1,6 +1,5 @@
 import bridge from './bridge';
 import { sendCmd } from './util';
-import { INJECT_PAGE } from '../util';
 
 const { ids } = bridge;
 const runningIds = [];

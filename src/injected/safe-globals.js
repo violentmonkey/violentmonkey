@@ -2,34 +2,21 @@
 
 /**
  * This file runs before safe-globals of `injected-content` and `injected-web` entries.
- * `global` is used instead of WebPack's polyfill which we disable in webpack.conf.js.
  * `export` is stripped in the final output and is only used for our NodeJS test scripts.
  * WARNING! Don't use exported functions from @/common anywhere in injected!
  */
 
-const global = (function _() {
-  return this || globalThis; // eslint-disable-line no-undef
-}());
-/** These two are unforgeable so we extract them primarily to improve minification.
- * The document's value can change only in about:blank but we don't inject there. */
-const { document, window } = global;
 export const { location } = global;
 export const PROTO = 'prototype';
 export const IS_TOP = top === window;
 export const CALLBACK_ID = '__CBID';
-export const VIOLENTMONKEY = 'Violentmonkey';
 export const kFileName = 'fileName';
-export const kResponseHeaders = 'responseHeaders';
-export const kResponseText = 'responseText';
-export const kResponseType = 'responseType';
 
 export const throwIfProtoPresent = process.env.DEBUG && (obj => {
   if (!obj || obj.__proto__) { // eslint-disable-line no-proto
     throw 'proto is not null';
   }
 });
-export const isFunction = val => typeof val === 'function';
-export const isObject = val => val != null && typeof val === 'object';
 export const isString = val => typeof val === 'string';
 
 export const getOwnProp = (obj, key, defVal) => {

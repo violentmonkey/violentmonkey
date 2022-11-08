@@ -192,7 +192,6 @@
 <script>
 import { reactive } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
-import { INJECT_AUTO } from '@/common/consts';
 import options from '@/common/options';
 import {
   getScriptHome, getScriptName, getScriptSupportUrl, getScriptUpdateUrl,
