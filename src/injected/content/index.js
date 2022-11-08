@@ -64,7 +64,6 @@ addBackgroundHandlers({
 });
 
 addHandlers({
-  Run,
   TabFocus: true,
   UpdateValue: true,
 });
