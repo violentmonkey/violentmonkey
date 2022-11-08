@@ -27,7 +27,7 @@ export default function initialize(invokeHost) {
     });
   } else {
     bridge.mode = INJECT_CONTENT;
-    bridge.post = (cmd, data, realm, node) => {
+    bridge.post = (cmd, data, node) => {
       invokeHost({ cmd, data, node }, INJECT_CONTENT);
     };
     global.chrome = undefined;
