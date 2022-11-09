@@ -41,7 +41,7 @@ export function loadValues(id) {
 export function dumpValue(id, key, val, raw, oldRaw, context) {
   let res;
   if (raw !== oldRaw) {
-    res = bridge[context.async ? 'send' : 'post']('UpdateValue', { id, key, raw }, context);
+    res = bridge[context.async ? 'send' : 'post']('UpdateValue', { id, key, raw });
     const hooks = changeHooks[id]?.[key];
     if (hooks) notifyChange(hooks, key, val, raw, oldRaw);
   } else if (context.async) {
