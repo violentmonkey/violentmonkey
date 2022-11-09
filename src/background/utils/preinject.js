@@ -325,7 +325,7 @@ function prepareScripts(env) {
       script = cache.get(key) || cache.put(key, prepareScript(script, env));
       scripts[i] = script;
     }
-    script.val = env[S_VALUE][id] || null;
+    script[INJECT_VAL] = env[S_VALUE][id] || null;
   }
   return scripts;
 }

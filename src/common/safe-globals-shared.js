@@ -19,6 +19,7 @@ export const INJECT_CONTENT = 'content';
 export const INJECT_CONTENT_FORCE = 'forceContent';
 export const INJECT_INTO = 'injectInto';
 export const INJECT_MORE = 'more';
+export const INJECT_VAL = 'val';
 export const ID_BAD_REALM = -1;
 export const ID_INJECTING = 2;
 export const kResponseHeaders = 'responseHeaders';

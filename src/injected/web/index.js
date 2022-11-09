@@ -71,7 +71,7 @@ addHandlers({
     for (const script of items) {
       const { key } = script;
       toRun[key.data] = script;
-      store.values[script.id] = nullObjFrom(script.val);
+      store.values[script.id] = nullObjFrom(script[INJECT_VAL]);
       if (!PAGE_MODE_HANDSHAKE) {
         const winKey = key.win;
         const data = window[winKey];
