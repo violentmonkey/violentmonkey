@@ -30,19 +30,11 @@ const BAG_NOOP = { [INJECT]: {} };
 const BAG_NOOP_EXPOSE = { [INJECT]: { expose: true } };
 const CSAPI_REG = 'csar';
 const contentScriptsAPI = browser.contentScripts;
-const envStartKey = {};
 const cache = initCache({
   lifetime: 5 * 60e3,
-  async onDispose(val, key) {
-    if (!val) return;
-    if (val.then) val = await val;
-    if ((val = val[INJECT] || val)[ENV_SCRIPTS]) {
-      cache.del(val[INJECT_MORE] || envStartKey[key]);
-      delete envStartKey[key];
-    }
-    if ((val = val[CSAPI_REG])) {
-      (await val).unregister();
-    }
+  onDispose(val) {
+    val[CSAPI_REG]?.then(reg => reg.unregister());
+    cache.del(val[INJECT_MORE]);
   },
 });
 // KEY_XXX for hooked options
@@ -105,8 +97,8 @@ addPublicCommands({
     if (!isApplied) return prepare('', url, isTop);
     clearFrameData(tabId, frameId);
     const bagKey = getKey(url, isTop);
-    const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop);
-    const bag = bagP[INJECT] ? bagP : await bagP;
+    const bagP = cache.get(bagKey) || await prepare(bagKey, url, isTop);
+    const bag = bagP[INJECT] ? bagP : await bagP.promise;
     /** @type {VMInjection} */
     const inject = bag[INJECT];
     const scripts = inject[ENV_SCRIPTS];
@@ -156,8 +148,7 @@ onStorageChanged(({ keys }) => {
 });
 
 /** @this {string[][]} changed storage keys, already split as [prefix,id] */
-async function removeStaleCacheEntry(val, key) {
-  if (val.then) val = await val;
+function removeStaleCacheEntry(val, key) {
   if (!val[ENV_CACHE_KEYS]) return;
   for (const [prefix, id] of this) {
     const prop = propsToClear[prefix];
@@ -236,12 +227,7 @@ function toggleXhrInject(enable) {
 function onSendHeaders({ url, frameId }) {
   const isTop = !frameId;
   const key = getKey(url, isTop);
-  if (!cache.has(key)) {
-    // GetInjected message will be sent soon by the content script
-    // and it may easily happen while getScriptsByURL is still waiting for browser.storage
-    // so we'll let GetInjected await this pending data by storing Promise in the cache
-    cache.put(key, prepare(key, url, isTop));
-  }
+  if (!cache.has(key)) prepare(key, url, isTop);
 }
 
 /** @param {chrome.webRequest.WebResponseHeadersDetails} info */
@@ -280,16 +266,16 @@ async function prepare(cacheKey, url, isTop) {
   const errors = [];
   // TODO: teach `getScriptEnv` to skip prepared scripts in cache
   const env = getScriptsByURL(url, isTop, errors);
+  cache.put(cacheKey, env || bagNoOp)
   if (!env) {
-    return cache.put(cacheKey, bagNoOp);
+    return bagNoOp;
   }
-  Object.assign(env, await env.promise);
+  await env.promise;
   cache.batch(true);
   const inject = shouldExpose ? { expose: true } : {};
   const bag = { [INJECT]: inject };
   const { allIds, [INJECT_MORE]: envDelayed } = env;
-  const more = envDelayed.promise;
-  const moreKey = more && getUniqId('more');
+  const moreKey = envDelayed.promise && getUniqId('more');
   Object.assign(inject, {
     [S_CACHE]: env[S_CACHE],
     [ENV_SCRIPTS]: prepareScripts(env),
@@ -306,9 +292,9 @@ async function prepare(cacheKey, url, isTop) {
   bag[INJECT_MORE] = envDelayed;
   bag[CSAPI_REG] = contentScriptsAPI && !xhrInject
     && registerScriptDataFF(inject, url, !isTop);
-  if (more) {
-    cache.put(moreKey, more);
-    envStartKey[moreKey] = cacheKey;
+  if (moreKey) {
+    cache.put(moreKey, envDelayed);
+    envDelayed[INJECT_MORE] = cacheKey;
   }
   cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
   cache.batch(false);
@@ -332,7 +318,7 @@ function prepareScripts(env) {
 
 /**
  * @param {VMScript} script
- * @param {VMInjection.Env} env
+ * @param {VMInjection.EnvStart} env
  * @return {VMInjection.Script}
  */
 function prepareScript(script, env) {

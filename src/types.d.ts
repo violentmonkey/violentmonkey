@@ -223,26 +223,30 @@ declare interface VMInjection extends VMInjectionDisabled {
 declare namespace VMInjection {
   type RunAt = 'start' | 'body' | 'end' | 'idle';
   interface Env {
-    /** Only present in envStart */
-    allIds?: { [id: string]: NumBool };
-    clipFF?: boolean;
     cache: StringMap;
     cacheKeys: string[];
     code: StringMap;
     /** Dependencies by key to script ids */
     depsMap: { [url: string]: number[] };
-    forceContent?: boolean;
     ids: number[];
-    /** Only present in envStart */
-    more?: Env;
-    promise: Promise<Env>;
     reqKeys: string[];
     require: StringMap;
     runAt: { [id: string]: RunAt };
     scripts: VMScript[];
-    sizing?: boolean;
     value: { [scriptId: string]: StringMap };
     valueIds: number[];
+  }
+  interface EnvStart extends Env {
+    allIds: { [id: string]: NumBool };
+    clipFF?: boolean;
+    forceContent?: boolean;
+    more: EnvDelayed;
+    promise: Promise<EnvStart>;
+  }
+  interface EnvDelayed extends Env {
+    /** cache key for Bag */
+    more: string;
+    promise: Promise<EnvDelayed>;
   }
   /**
    * Contains the injected data and non-injected auxiliaries
@@ -251,7 +255,7 @@ declare namespace VMInjection {
     csar: Promise<browser.contentScripts.RegisteredContentScript>;
     forceContent?: boolean;
     inject: VMInjection;
-    more: Env;
+    more: EnvDelayed;
   }
   interface Info {
     ua: VMScriptGMInfoPlatform;

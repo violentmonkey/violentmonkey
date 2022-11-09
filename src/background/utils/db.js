@@ -228,6 +228,11 @@ export const ENV_CACHE_KEYS = 'cacheKeys';
 export const ENV_REQ_KEYS = 'reqKeys';
 export const ENV_SCRIPTS = 'scripts';
 export const ENV_VALUE_IDS = 'valueIds';
+const makeEnv = () => ({
+  depsMap: {},
+  runAt: {},
+  [ENV_SCRIPTS]: [],
+});
 const GMCLIP_RE = /^GM[_.]setClipboard$/;
 const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Value)$/;
 const RUN_AT_RE = /^document-(start|body|end|idle)$/;
@@ -242,7 +247,7 @@ const notifiedBadScripts = new Set();
 
 /**
  * @desc Get scripts to be injected to page with specific URL.
- * @return {VMInjection.Env}
+ * @return {VMInjection.EnvStart}
  */
 export function getScriptsByURL(url, isTop, errors) {
   testerBatch(errors || true);
@@ -257,11 +262,10 @@ export function getScriptsByURL(url, isTop, errors) {
   if (!allScripts[0]) return;
   let clipboardChecked = !IS_FIREFOX;
   const allIds = {};
-  const [envStart, envDelayed] = [0, 1].map(() => ({
-    depsMap: {},
-    runAt: {},
-    [ENV_SCRIPTS]: [],
-  }));
+  /** @type {VMInjection.EnvStart} */
+  const envStart = makeEnv();
+  /** @type {VMInjection.EnvDelayed} */
+  const envDelayed = makeEnv();
   for (const [areaName, listName] of STORAGE_ROUTES_ENTRIES) {
     envStart[areaName] = {}; envDelayed[areaName] = {};
     envStart[listName] = []; envDelayed[listName] = [];
@@ -274,7 +278,6 @@ export function getScriptsByURL(url, isTop, errors) {
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
-    /** @type {VMInjection.Env} */
     const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
     const { depsMap } = env;
     env.ids.push(id);
