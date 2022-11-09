@@ -100,9 +100,10 @@ addPublicCommands({
   async GetInjected({ url, [INJECT_CONTENT_FORCE]: forceContent, done }, src) {
     const { frameId, tab } = src;
     const tabId = tab.id;
-    if (!url) url = src.url || tab.url;
-    clearFrameData(tabId, frameId);
     const isTop = !frameId;
+    if (!url) url = src.url || tab.url;
+    if (!isApplied) return prepare('', url, isTop);
+    clearFrameData(tabId, frameId);
     const bagKey = getKey(url, isTop);
     const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop);
     const bag = bagP[INJECT] ? bagP : await bagP;
