@@ -121,14 +121,15 @@ addPublicCommands({
   }, { frameId, tab: { id: tabId } }) {
     injectContentRealm(items, tabId, frameId);
     if (!moreKey) return;
-    const more = await cache.get(moreKey); // TODO: rebuild if expired
+    const more = cache.get(moreKey); // TODO: rebuild if expired
     if (!more) throw 'Injection data expired, please reload the tab!';
+    const envCache = more[S_CACHE] || (await more.promise)[S_CACHE];
     const scripts = prepareScripts(more);
     injectContentRealm(triageRealms(scripts, forceContent), tabId, frameId);
     addValueOpener(tabId, frameId, scripts);
     return {
       [ENV_SCRIPTS]: scripts,
-      [S_CACHE]: more[S_CACHE],
+      [S_CACHE]: envCache,
     };
   },
 });
