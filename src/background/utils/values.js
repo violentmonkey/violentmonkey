@@ -76,7 +76,7 @@ export function clearValueOpener(tabId, frameId) {
  */
 export function addValueOpener(tabId, frameId, injectedScripts) {
   injectedScripts?.forEach(script => {
-    const { id, values } = script;
+    const { id, val: values } = script;
     if (values) objectSet(openers, [id, tabId, frameId], values);
     else delete openers[id];
   });
