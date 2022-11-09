@@ -6,7 +6,7 @@ const runningIds = [];
 let pending;
 
 onScripts.push(() => {
-  addHandlers({ Run }, true);
+  addHandlers({ Run });
   // isTrusted is `unforgeable` per DOM spec
   on('pageshow', evt => evt.isTrusted && evt::getPersisted() && sendSetBadge());
 });

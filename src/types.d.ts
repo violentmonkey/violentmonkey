@@ -224,7 +224,7 @@ declare namespace VMInjection {
   type RunAt = 'start' | 'body' | 'end' | 'idle';
   interface Env {
     /** Only present in envStart */
-    allIds?: { [id: string]: number };
+    allIds?: { [id: string]: NumBool };
     clipFF?: boolean;
     cache: StringMap;
     cacheKeys: string[];

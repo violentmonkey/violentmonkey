@@ -3,6 +3,7 @@ import { addHandlers, onScripts } from './bridge';
 export let onClipboardCopy;
 let doCopy;
 let clipboardData;
+let setClipboard;
 
 // Attaching a dummy listener so the page can't prevent us (fwiw h@xx0rz excluded)
 if (IS_FIREFOX) {
@@ -10,7 +11,6 @@ if (IS_FIREFOX) {
 }
 
 onScripts.push(({ clipFF }) => {
-  let setClipboard;
   if (clipFF) {
     const { execCommand } = document;
     const { setData } = DataTransfer[PROTO];
@@ -32,5 +32,5 @@ onScripts.push(({ clipFF }) => {
   }
   addHandlers({
     SetClipboard: setClipboard || true,
-  }, true);
+  });
 });

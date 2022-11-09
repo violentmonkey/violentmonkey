@@ -3,7 +3,6 @@ import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import { bindEvents, fireBridgeEvent, META_STR } from '../util';
 import { Run } from './cmd-run';
 
-const getReadyState = describeProperty(Document[PROTO], 'readyState').get;
 /* In FF, content scripts running in a same-origin frame cannot directly call parent's functions
  * so we'll use the extension's UUID, which is unique per computer in FF, for messages
  * like VAULT_WRITER to avoid interception by sites that can add listeners for all of our
@@ -146,6 +145,7 @@ export async function injectScripts(data, isXml) {
       [INJECT_CONTENT]: toContent,
       [INJECT_MORE]: more,
     });
+  const getReadyState = describeProperty(Document[PROTO], 'readyState').get;
   const hasInvoker = contLists;
   if (hasInvoker) {
     setupContentInvoker();

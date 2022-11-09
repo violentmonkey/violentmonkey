@@ -6,7 +6,7 @@ const bgHandlers = createNullObj();
 /** @type {function(VMInjection)[]} */
 export const onScripts = [];
 const addHandlersImpl = (dest, src, force) => {
-  if (force) {
+  if (force || bridge[INJECT_INTO]) { // eslint-disable-line no-use-before-define
     assign(dest, src);
   } else {
     onScripts.push(() => assign(dest, src));
@@ -23,6 +23,7 @@ export const addBackgroundHandlers = addHandlersImpl.bind({}, bgHandlers);
 
 /**
  * @property {VMBridgePostFunc} post
+ * @property {VMScriptInjectInto} injectInto
  */
 const bridge = {
   __proto__: null,
