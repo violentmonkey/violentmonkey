@@ -251,9 +251,11 @@ function inject(item, iframeCb) {
   if (iframeCb) {
     injectedRoot = divRoot;
     if (IS_FIREFOX) divRoot::appendChild(iframe);
-    iframeDoc = iframe.contentDocument;
-    (iframeDoc ? iframeDoc::getElementsByTagName('*')[0] : divRoot)::appendChild(script);
-    if (iframeDoc) iframeCb();
+    if ((iframeDoc = iframe.contentDocument)) {
+      // Either removed in DOMNodeInserted by a hostile web page or CSP forbids iframes(?)
+      iframeDoc::getElementsByTagName('*')[0]::appendChild(script);
+      iframeCb();
+    }
     iframe::remove();
     injectedRoot = null;
   }
