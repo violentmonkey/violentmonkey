@@ -252,7 +252,7 @@ declare namespace VMInjection {
    * Contains the injected data and non-injected auxiliaries
    */
   interface Bag {
-    csar: Promise<browser.contentScripts.RegisteredContentScript>;
+    csReg: Promise<browser.contentScripts.RegisteredContentScript>;
     forceContent?: boolean;
     inject: VMInjection;
     more: EnvDelayed;
@@ -310,7 +310,7 @@ declare namespace VMReq {
 
 declare type VMSearchOptions = {
   reversed?: boolean;
-  wrapAround?: chrome.tabs.Tab;
+  wrapAround?: boolean;
   reuseCursor?: boolean;
   pos?: { line: number, ch: number };
 }

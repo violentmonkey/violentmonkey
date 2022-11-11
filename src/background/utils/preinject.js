@@ -28,7 +28,7 @@ const INJECT = 'inject';
 /** These are reused by cache entries to reduce memory usage */
 const BAG_NOOP = { [INJECT]: {} };
 const BAG_NOOP_EXPOSE = { [INJECT]: { expose: true } };
-const CSAPI_REG = 'csar';
+const CSAPI_REG = 'csReg';
 const contentScriptsAPI = browser.contentScripts;
 const cache = initCache({
   lifetime: 5 * 60e3,
@@ -94,7 +94,6 @@ addPublicCommands({
     const tabId = tab.id;
     const isTop = !frameId;
     if (!url) url = src.url || tab.url;
-    if (!isApplied) return prepare('', url, isTop);
     clearFrameData(tabId, frameId);
     const bagKey = getKey(url, isTop);
     const bagP = cache.get(bagKey) || await prepare(bagKey, url, isTop);
@@ -102,8 +101,9 @@ addPublicCommands({
     /** @type {VMInjection} */
     const inject = bag[INJECT];
     const scripts = inject[ENV_SCRIPTS];
-    const toContent = triageRealms(scripts, bag[INJECT_CONTENT_FORCE] || forceContent, bag);
-    if (toContent[0]) {
+    const toContent = scripts
+      && triageRealms(scripts, bag[INJECT_CONTENT_FORCE] || forceContent, bag);
+    if (toContent?.[0]) {
       // Processing known feedback without waiting for InjectionFeedback message.
       // Running in a separate task as executeScript may take a long time to serialize code.
       setTimeout(injectContentRealm, 0, toContent, tabId, frameId);
