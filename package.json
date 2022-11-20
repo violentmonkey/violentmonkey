@@ -67,7 +67,7 @@
   "dependencies": {
     "@violentmonkey/shortcut": "^1.2.6",
     "@zip.js/zip.js": "2.4.4",
-    "codemirror": "^5.65.6",
+    "codemirror": "^5.65.10",
     "tldjs": "^2.3.1",
     "vue": "^3.2.37",
     "vueleton": "^2.0.0-5"
