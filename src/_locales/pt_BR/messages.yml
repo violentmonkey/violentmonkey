@@ -1,12 +1,12 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Aplicar
 buttonCancel:
   description: Cancel button on dialog.
   message: Cancelar
 buttonCheckForUpdates:
   description: Button to check a script for updates.
-  message: Verificar se há atualizações
+  message: Verificar atualizações
 buttonClose:
   description: Button to close window.
   message: Fechar
@@ -99,7 +99,7 @@ buttonUndo:
   touched: false
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Atualizar
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Verificar atualizações para todos
@@ -567,7 +567,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: Comentário
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Encontar scripts para este site
@@ -662,7 +662,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Falta recursos necessários.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -682,7 +682,7 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Por favor, salve novamente ou reinstale este(s) script(s):'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (o código é o mesmo)'
@@ -778,7 +778,7 @@ optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
     updates.
-  message: Atualização
+  message: Atualizar
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Respeitar maiúsculas/minúsculas
