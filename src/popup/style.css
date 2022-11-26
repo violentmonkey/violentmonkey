@@ -195,6 +195,7 @@ footer {
     }
   }
   &.expand {
+    overflow-y: auto;
     > .submenu {
       display: block;
       border-color: var(--fill-4);

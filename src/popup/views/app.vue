@@ -1,6 +1,6 @@
 <template>
   <div
-    class="page-popup"
+    class="page-popup flex flex-col"
     @click="activeExtras && toggleExtras(null)"
     @click.capture.prevent="onOpenUrl"
     @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
@@ -62,7 +62,7 @@
     </div>
     <div
       v-for="scope in injectionScopes"
-      class="menu menu-scripts"
+      class="menu menu-scripts flex flex-col"
       :class="{
         expand: activeMenu === scope.name,
         'block-scroll': activeExtras,
@@ -518,6 +518,7 @@ export default {
   mounted() {
     this::focusMe();
     keyboardService.enable();
+    this.$el.style.maxHeight = Math.min(600, screen.availHeight - window.screenY - 8) + 'px';
     this.disposeList = [
       keyboardService.register('escape', () => {
         const item = this.activeExtras;
