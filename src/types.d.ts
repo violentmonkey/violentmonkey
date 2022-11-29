@@ -92,9 +92,11 @@ declare namespace GMReq {
       method?: string;
       overrideMimeType?: string;
       password?: string;
+      responseType: XMLHttpRequestResponseType;
       timeout?: number;
       url: string;
       user?: string;
+      /** responseType to use in the actual XHR */
       xhrType: XMLHttpRequestResponseType;
     }
   }

@@ -27,15 +27,14 @@ const OPTS_TO_PASS = [
   'timeout',
   'user',
 ];
-const XHR_TYPE_BIN = {
+const XHR_TYPE = {
+  __proto__: null,
   arraybuffer: 1,
   blob: 1,
-};
-const XHR_TYPE_TXT = {
-  [kDocument]: 1,
-  json: 1,
-  text: 1,
-  '': 1,
+  json: 0,
+  [kDocument]: 0,
+  text: 0,
+  '': 0,
 };
 
 addHandlers({
@@ -127,7 +126,7 @@ function parseRaw(req, msg, propName) {
  */
 export function onRequestCreate(opts, context, fileName) {
   if (process.env.DEBUG) throwIfProtoPresent(opts);
-  let { data, url } = opts;
+  let { data, url, [kResponseType]: type = '' } = opts;
   let err;
   // XHR spec requires `url` but allows ''/null/non-string
   if (!url && !('url' in opts)) {
@@ -146,6 +145,10 @@ export function onRequestCreate(opts, context, fileName) {
   if (err) {
     onRequestInitError(opts, err);
     return; // not returning the abort controller as there's no request to abort
+  }
+  if (!(type in XHR_TYPE)) {
+    logging.warn(`Unknown ${kResponseType} "${type}"`);
+    type = '';
   }
   const scriptId = context.id;
   const id = safeGetUniqId('VMxhr');
@@ -171,8 +174,9 @@ export function onRequestCreate(opts, context, fileName) {
     scriptId,
     url,
     [kFileName]: fileName,
+    [kResponseType]: type,
     events: EVENTS_TO_NOTIFY::filter(key => isFunction(cb[key] = opts[`on${key}`])),
-    xhrType: getResponseType(opts[kResponseType]),
+    xhrType: XHR_TYPE[type] ? type : '',
   }, opts, OPTS_TO_PASS));
   return {
     abort() {
@@ -212,14 +216,4 @@ function getFormData(data) {
   } catch (e) {
     /**/
   }
-}
-
-function getResponseType(responseType = '') {
-  if (hasOwnProperty(XHR_TYPE_BIN, responseType)) {
-    return responseType;
-  }
-  if (!hasOwnProperty(XHR_TYPE_TXT, responseType)) {
-    logging.warn(`Unknown ${kResponseType} "${responseType}"`);
-  }
-  return '';
 }

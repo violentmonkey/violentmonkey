@@ -73,16 +73,17 @@ function blob2objectUrl(response) {
  * @param {GMReq.EventType[]} events
  * @param {boolean} blobbed
  * @param {boolean} chunked
+ * @param {boolean} isJson
  */
-function xhrCallbackWrapper(req, events, blobbed, chunked) {
+function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
   let lastPromise = Promise.resolve();
   let contentType;
   let dataSize;
   let numChunks = 0;
-  let response;
+  let response = null;
   let responseText;
   let responseHeaders;
-  let sent = false;
+  let sent = true;
   const { id, xhr } = req;
   // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
   const getChunk = blobbed && blob2objectUrl || chunked && blob2chunk;
@@ -113,13 +114,14 @@ function xhrCallbackWrapper(req, events, blobbed, chunked) {
     }
     const { type } = evt;
     const shouldNotify = events.includes(type);
-    // Sending only when XHR is complete. TODO: send partial delta since last time in onprogress?
-    const shouldSendResponse = xhr.readyState === 4 && shouldNotify && !sent;
+    // TODO: send partial delta since last time in onprogress?
+    const shouldSendResponse = shouldNotify && (!isJson || xhr.readyState === 4) && !sent;
     if (!shouldNotify && type !== 'loadend') {
       return;
     }
     lastPromise = lastPromise.then(async () => {
       if (shouldSendResponse) {
+        sent = true;
         for (let i = 1; i < numChunks; i += 1) {
           await req.cb({
             id,
@@ -225,7 +227,7 @@ async function httpRequest(opts, events, src, cb) {
   }
   toggleHeaderInjector(id, vmHeaders);
   // Sending as params to avoid storing one-time init data in `requests`
-  const callback = xhrCallbackWrapper(req, events, blobbed, chunked);
+  const callback = xhrCallbackWrapper(req, events, blobbed, chunked, opts[kResponseType] === 'json');
   events.forEach(evt => { xhr[`on${evt}`] = callback; });
   xhr.onloadend = callback; // always send it for the internal cleanup
   xhr.send(body);
