@@ -1,7 +1,7 @@
 import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
-import { HOMEPAGE_URL, METABLOCK_RE, META_STR, NEWLINE_END_RE } from '@/common/consts';
+import { BLACKLIST, HOMEPAGE_URL, META_STR, METABLOCK_RE, NEWLINE_END_RE } from '@/common/consts';
 import initCache from '@/common/cache';
-import { forEachEntry, forEachValue, mapEntry, objectSet } from '@/common/object';
+import { forEachEntry, forEachKey, forEachValue, mapEntry, objectSet } from '@/common/object';
 import ua from '@/common/ua';
 import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_IDS } from './db';
 import { postInitialize } from './init';
@@ -38,10 +38,6 @@ const cache = initCache({
   },
 });
 // KEY_XXX for hooked options
-const KEY_EXPOSE = 'expose';
-const KEY_DEF_INJECT_INTO = 'defaultInjectInto';
-const KEY_IS_APPLIED = 'isApplied';
-const KEY_XHR_INJECT = 'xhrInject';
 const GRANT_NONE_VARS = '{GM,GM_info,unsafeWindow,cloneInto,createObjectIn,exportFunction}';
 const META_KEYS_TO_ENSURE = [
   'description',
@@ -86,6 +82,23 @@ const normalizeScriptRealm = (custom, meta) => (
 const isContentRealm = (val, force) => (
   val === INJECT_CONTENT || val === INJECT_AUTO && force
 );
+const OPT_HANDLERS = {
+  [BLACKLIST]: cache.destroy,
+  defaultInjectInto(value) {
+    injectInto = normalizeRealm(value);
+    cache.destroy();
+  },
+  xhrInject(value) {
+    toggleXhrInject(value);
+    cache.destroy();
+  },
+  isApplied: togglePreinject,
+  expose(value) {
+    value::forEachEntry(([site, isExposed]) => {
+      expose[decodeURIComponent(site)] = isExposed;
+    });
+  },
+};
 
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
@@ -136,9 +149,9 @@ addPublicCommands({
 
 hookOptions(onOptionChanged);
 postInitialize.push(() => {
-  for (const key of [KEY_EXPOSE, KEY_DEF_INJECT_INTO, KEY_IS_APPLIED, KEY_XHR_INJECT]) {
+  OPT_HANDLERS::forEachKey(key => {
     onOptionChanged({ [key]: getOption(key) });
-  }
+  });
 });
 
 onStorageChanged(({ keys }) => {
@@ -169,27 +182,10 @@ function removeStaleCacheEntry(val, key) {
 
 function onOptionChanged(changes) {
   changes::forEachEntry(([key, value]) => {
-    switch (key) {
-    case KEY_DEF_INJECT_INTO:
-      injectInto = normalizeRealm(value);
-      cache.destroy();
-      break;
-    case KEY_XHR_INJECT:
-      toggleXhrInject(value);
-      cache.destroy();
-      break;
-    case KEY_IS_APPLIED:
-      togglePreinject(value);
-      break;
-    case KEY_EXPOSE:
-      value::forEachEntry(([site, isExposed]) => {
-        expose[decodeURIComponent(site)] = isExposed;
-      });
-      break;
-    default:
-      if (key.includes('.')) { // used by `expose.url`
-        onOptionChanged(objectSet({}, key, value));
-      }
+    if (OPT_HANDLERS[key]) {
+      OPT_HANDLERS[key](value);
+    } else if (key.includes('.')) { // used by `expose.url`
+      onOptionChanged(objectSet({}, key, value));
     }
   });
 }
