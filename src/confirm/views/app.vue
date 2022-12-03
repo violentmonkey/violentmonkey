@@ -489,7 +489,7 @@ $vertLayoutThresholdMinus1: 1800px;
       overflow-wrap: anywhere;
     }
   }
-  [data-collapsed] {
+  [data-collapsed="true"] {
     dd {
       display: none;
     }
