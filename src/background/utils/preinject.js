@@ -287,8 +287,8 @@ async function prepare(cacheKey, url, isTop) {
     if (val !== true) bag[val] = env[val];
   });
   bag[INJECT_MORE] = envDelayed;
-  bag[CSAPI_REG] = contentScriptsAPI && !xhrInject
-    && registerScriptDataFF(inject, url, !isTop);
+  bag[CSAPI_REG] = contentScriptsAPI && !xhrInject && isTop
+    && registerScriptDataFF(inject, url);
   if (moreKey) {
     cache.put(moreKey, envDelayed);
     envDelayed[INJECT_MORE] = cacheKey;
@@ -441,12 +441,12 @@ function injectContentRealm(toContent, tabId, frameId) {
 }
 
 // TODO: rework the whole thing to register scripts individually with real `matches`
-function registerScriptDataFF(inject, url, allFrames) {
+// (this will also allow proper handling of @noframes)
+function registerScriptDataFF(inject, url) {
   for (const scr of inject[ENV_SCRIPTS]) {
     scr.code = scr[__CODE];
   }
   return contentScriptsAPI.register({
-    allFrames,
     js: [{
       code: `${resolveDataCodeStr}(${JSON.stringify(inject)})`,
     }],
