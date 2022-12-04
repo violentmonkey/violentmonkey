@@ -143,7 +143,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
           ...getResponseHeaders(),
           ...objectPick(xhr, SEND_XHR_PROPS),
           ...objectPick(evt, SEND_PROGRESS_PROPS),
-          response: shouldSendResponse
+          [kResponse]: shouldSendResponse
             ? numChunks && await getChunk(response, 0) || response
             : null,
           [kResponseText]: shouldSendResponse

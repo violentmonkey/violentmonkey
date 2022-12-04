@@ -242,7 +242,7 @@ export async function requestLocalFile(url, options = {}) {
     xhr.onload = () => {
       // status for `file:` protocol will always be `0`
       result.status = xhr.status || 200;
-      result.data = binaryTypes.includes(responseType) ? xhr[kResponse] : xhr[kResponseText];
+      result.data = xhr[binaryTypes.includes(responseType) ? kResponse : kResponseText];
       if (responseType === 'json') {
         try {
           result.data = JSON.parse(result.data);
