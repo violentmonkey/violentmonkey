@@ -59,8 +59,12 @@ const bridge = {
 export default bridge;
 
 browser.runtime.onMessage.addListener(async ({ cmd, data }, src) => {
-  const fn = bgHandlers[cmd];
-  if (fn) await fn(data, src); // awaiting to let the sender know when we're done
+  try {
+    const fn = bgHandlers[cmd];
+    if (fn) await fn(data, src); // awaiting to let the sender know when we're done
+  } catch (err) {
+    logging.error(err); // printing here in the tab
+  }
 });
 
 /**
