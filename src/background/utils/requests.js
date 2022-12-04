@@ -98,8 +98,8 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     if (!contentType) {
       contentType = xhr.getResponseHeader('Content-Type') || '';
     }
-    if (xhr.response !== response) {
-      response = xhr.response;
+    if (xhr[kResponse] !== response) {
+      response = xhr[kResponse];
       sent = false;
       try {
         responseText = xhr[kResponseText];

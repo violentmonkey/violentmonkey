@@ -61,7 +61,7 @@ addBackgroundHandlers({
       processChunk(req, data, msg);
       return;
     }
-    let response = data?.response;
+    let response = data?.[kResponse];
     if (response && !IS_FIREFOX) {
       if (msg.blobbed) {
         response = await importBlob(req, response);
@@ -73,10 +73,11 @@ addBackgroundHandlers({
           : response::getTypedArrayBuffer();
         delete req.arr;
       }
-      data.response = response;
+      data[kResponse] = response;
+      req[kResponse] = response;
     }
     if (msg.type === 'load' && req[kFileName]) {
-      await downloadBlob(response, req[kFileName]);
+      await downloadBlob(req[kResponse], req[kFileName]);
     }
     if (msg.type === 'loadend') {
       delete requests[msg.id];

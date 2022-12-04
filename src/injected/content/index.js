@@ -93,7 +93,7 @@ function getXhrInjection() {
       xhr.open('get', url, false); // `false` = synchronous
       xhr.send();
       URL.revokeObjectURL(url);
-      return JSON.parse(xhr.response);
+      return JSON.parse(xhr[kResponse]);
     }
   } catch { /* NOP */ }
 }

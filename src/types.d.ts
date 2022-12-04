@@ -26,6 +26,7 @@ declare interface GMContext {
  */
 declare namespace GMReq {
   type EventType = keyof XMLHttpRequestEventMap;
+  type Response = string | Blob | ArrayBuffer;
   type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails;
   interface BG {
     anonymous: boolean;
@@ -45,14 +46,15 @@ declare namespace GMReq {
     asBlob: boolean;
     fileName: string;
     realm: VMScriptInjectInto;
+    response?: Response;
   }
   interface Web {
     id: string;
     scriptId: number;
     cb: { [name: EventType]: typeof VMScriptGMXHRDetails.onload };
     context?: any;
-    raw?: string | Blob | ArrayBuffer;
-    response?: string | Blob | ArrayBuffer;
+    raw?: Response;
+    response?: Response;
     responseHeaders?: string;
     responseText?: string;
     responseType?: XMLHttpRequestResponseType;
