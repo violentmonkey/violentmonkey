@@ -681,7 +681,7 @@ msgReinstallScripts:
   message: 'Prosím, znovu uložte alebo nainštalujte tieto skripty:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: (kód je rovnaký)
+  message: ' (kód je rovnaký)'
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Aktualizovaná čierna listina.
