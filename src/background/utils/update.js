@@ -37,10 +37,15 @@ function displayNotes(notes) {
   }
 }
 
+/**
+ * @param {Promise[]} jobs
+ * @param {VMScript} script
+ * @returns {Promise[]}
+ */
 function maybeCheckUpdate(jobs, script) {
   const { id } = script.props;
   const urls = getScriptUpdateUrl(script, true);
-  if (urls) {
+  if (urls && (script.config.enabled || !getOption('updateEnabledScriptsOnly'))) {
     jobs.push(processes[id] || (processes[id] = doCheckUpdate(script, urls)));
   }
   return jobs;
