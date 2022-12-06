@@ -83,11 +83,13 @@ function callHooks() {
   hooks.fire(tmp);
 }
 
-export function getOption(key, def) {
+export function getOption(key) {
+  let res = options[key];
+  if (res != null) return res;
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
-  const value = options[mainKey] ?? deepCopy(defaults[mainKey]) ?? def;
-  return keys.length > 1 ? objectGet(value, keys.slice(1)) ?? def : value;
+  const value = options[mainKey] ?? deepCopy(defaults[mainKey]);
+  return keys.length > 1 ? objectGet(value, keys.slice(1)) : value;
 }
 
 export function setOption(key, value, silent) {

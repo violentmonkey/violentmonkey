@@ -49,7 +49,7 @@ function initConfig() {
   function get(key, def) {
     const keys = normalizeKeys(key);
     keys.unshift('sync');
-    return getOption(keys, def);
+    return getOption(keys) ?? def;
   }
   function set(key, value) {
     const keys = normalizeKeys(key);
