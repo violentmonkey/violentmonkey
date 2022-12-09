@@ -88,10 +88,8 @@ const OPT_HANDLERS = {
     injectInto = normalizeRealm(value);
     cache.destroy();
   },
-  xhrInject(value) {
-    toggleXhrInject(value);
-    cache.destroy();
-  },
+  /** WARNING! toggleXhrInject should precede togglePreinject as it sets xhrInject variable */
+  xhrInject: toggleXhrInject,
   isApplied: togglePreinject,
   expose(value) {
     value::forEachEntry(([site, isExposed]) => {
@@ -211,6 +209,7 @@ function togglePreinject(enable) {
 
 function toggleXhrInject(enable) {
   xhrInject = enable;
+  cache.destroy();
   browser.webRequest.onHeadersReceived.removeListener(onHeadersReceived);
   if (enable) {
     browser.webRequest.onHeadersReceived.addListener(onHeadersReceived, API_CONFIG, [
