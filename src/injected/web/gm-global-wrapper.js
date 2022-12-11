@@ -54,10 +54,8 @@ const updateGlobalDesc = name => {
        * the non-enum ~10 can be unbound, and `eval` MUST be unbound to run in scope. */
       if (name >= 'a' && desc.enumerable && isFunction(fn = desc.value)) {
         // TODO: switch to SafeProxy and preserve thisArg when it's not our wrapper or its cache?
-        desc.value = defineProperty(safeBind(fn, src === global ? global : window), 'name', {
-          __proto__: null,
-          value: getOwnProp(fn, 'name'),
-        });
+        fn = safeBind(fn, src === global ? global : window);
+        desc.value = defineProperty(fn, 'name', { __proto__: null, value: name });
       }
       // Using `!` to avoid the need to use and safe-guard isNaN
       if (!(+name >= 0 && name < window::getWindowLength())) {
