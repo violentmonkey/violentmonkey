@@ -45,14 +45,19 @@ const globalDesc = createNullObj();
 const updateGlobalDesc = name => {
   let src;
   let desc;
+  let fn;
   if ((src = inheritedKeys[name])
   || (src = globalKeysSet.get(name)) && (src = src > 0 ? window : global)) {
     if ((desc = describeProperty(src, name))) {
       desc = nullObjFrom(desc);
       /* ~45 enumerable action functions belong to `window` and need to be bound to it,
        * the non-enum ~10 can be unbound, and `eval` MUST be unbound to run in scope. */
-      if (name >= 'a' && desc.enumerable && typeof desc.value === 'function') {
-        desc.value = safeBind(desc.value, src === global ? global : window);
+      if (name >= 'a' && desc.enumerable && isFunction(fn = desc.value)) {
+        // TODO: switch to SafeProxy and preserve thisArg when it's not our wrapper or its cache?
+        desc.value = defineProperty(safeBind(fn, src === global ? global : window), 'name', {
+          __proto__: null,
+          value: getOwnProp(fn, 'name'),
+        });
       }
       // Using `!` to avoid the need to use and safe-guard isNaN
       if (!(+name >= 0 && name < window::getWindowLength())) {
