@@ -147,7 +147,7 @@ export const VAULT = (() => {
     createNullObj = res[i += 1] || safeBind(SafeObject.create, SafeObject, null),
     createObjectURL = res[i += 1] || src.URL.createObjectURL,
     formDataEntries = res[i += 1] || src.FormData[PROTO].entries,
-    hasOwnProperty = res[i += 1] || Reflect.has,
+    hasOwnProperty = res[i += 1] || safeBind(call, SafeObject[PROTO].hasOwnProperty),
     arrayIsArray = res[i += 1] || src.Array.isArray,
     /* Exporting JSON methods separately instead of exporting SafeJSON as its props may be broken
      * by the page if it gains access to any Object from the vault e.g. a thrown SafeError. */

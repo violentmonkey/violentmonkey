@@ -22,7 +22,8 @@ export const {
 } = global;
 export const SafeError = Error;
 export const ResponseProto = SafeResponse[PROTO];
-export const { apply: safeApply, has: hasOwnProperty } = Reflect;
+export const { apply: safeApply } = Reflect;
+export const hasOwnProperty = safeApply.call.bind(({}).hasOwnProperty);
 export const safeCall = safeApply.call.bind(safeApply.call);
 export const { forEach, includes } = []; // `push` is unsafe as it may call a setter; use safePush()
 export const { getElementsByTagName } = document;

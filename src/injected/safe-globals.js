@@ -22,8 +22,7 @@ export const isString = val => typeof val === 'string';
 export const getOwnProp = (obj, key, defVal) => {
   // obj may be a Proxy that throws in has() or its getter throws
   try {
-    // hasOwnProperty is Reflect.has which throws for non-objects
-    if (obj && typeof obj === 'object' && hasOwnProperty(obj, key)) {
+    if (obj && hasOwnProperty(obj, key)) {
       defVal = obj[key];
     }
   } catch (e) { /* NOP */ }
