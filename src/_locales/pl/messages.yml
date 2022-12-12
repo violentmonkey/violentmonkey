@@ -341,6 +341,9 @@ labelEditValueAll:
 labelEditor:
   description: Label for Editor settings
   message: Edytor
+labelEnabledScriptsOnly:
+  description: Sub-option for autoupdate option, begins with a lowercase letter.
+  message: tylko włączone skrypty
 labelExclude:
   description: Label of @exclude rules.
   message: Reguły @exclude

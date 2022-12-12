@@ -337,6 +337,9 @@ labelEditValueAll:
 labelEditor:
   description: Label for Editor settings
   message: Penyunting
+labelEnabledScriptsOnly:
+  description: Sub-option for autoupdate option, begins with a lowercase letter.
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
   message: Aturan @exclude

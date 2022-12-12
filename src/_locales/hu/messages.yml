@@ -340,6 +340,9 @@ labelEditValueAll:
 labelEditor:
   description: Label for Editor settings
   message: Szerkesztő
+labelEnabledScriptsOnly:
+  description: Sub-option for autoupdate option, begins with a lowercase letter.
+  message: csak bekapcsolt szkriptek
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude szabályok'
