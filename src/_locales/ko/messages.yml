@@ -323,6 +323,9 @@ labelEditValueAll:
 labelEditor:
   description: Label for Editor settings
   message: 편집기
+labelEnabledScriptsOnly:
+  description: Sub-option for autoupdate option, begins with a lowercase letter.
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude 규칙'
