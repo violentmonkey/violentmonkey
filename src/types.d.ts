@@ -256,7 +256,7 @@ declare namespace VMInjection {
    * Contains the injected data and non-injected auxiliaries
    */
   interface Bag {
-    csReg: Promise<browser.contentScripts.RegisteredContentScript>;
+    csReg?: Promise<browser.contentScripts.RegisteredContentScript>;
     forceContent?: boolean;
     inject: VMInjection;
     more: EnvDelayed;

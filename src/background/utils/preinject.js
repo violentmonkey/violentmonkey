@@ -286,8 +286,9 @@ async function prepare(cacheKey, url, isTop) {
     if (val !== true) bag[val] = env[val];
   });
   bag[INJECT_MORE] = envDelayed;
-  bag[CSAPI_REG] = contentScriptsAPI && !xhrInject && isTop
-    && registerScriptDataFF(inject, url);
+  if (contentScriptsAPI && !xhrInject && isTop) {
+    bag[CSAPI_REG] = registerScriptDataFF(inject, url);
+  }
   if (moreKey) {
     cache.put(moreKey, envDelayed);
     envDelayed[INJECT_MORE] = cacheKey;
