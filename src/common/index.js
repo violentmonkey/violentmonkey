@@ -216,8 +216,11 @@ export function getScriptPrettyUrl(script, displayName) {
 export function getScriptUpdateUrl(script, all) {
   if (script.config.shouldUpdate) {
     const { custom, meta } = script;
-    const downloadURL = custom.downloadURL || meta.downloadURL || custom.lastInstallURL;
-    const updateURL = custom.updateURL || meta.updateURL || downloadURL;
+    /* URL in meta may be set to an invalid value to enforce disabling of the automatic updates
+     * e.g. GreasyFork sets it to `none` when the user installs an old version.
+     * We'll show such script as non-updatable. */
+    const downloadURL = tryUrl(custom.downloadURL || meta.downloadURL || custom.lastInstallURL);
+    const updateURL = tryUrl(custom.updateURL || meta.updateURL || downloadURL);
     const url = downloadURL || updateURL;
     if (url) return all ? [downloadURL, updateURL] : url;
   }
@@ -276,6 +279,17 @@ export function makePause(ms) {
 
 export function trueJoin(separator) {
   return this.filter(Boolean).join(separator);
+}
+
+/** @returns {string|undefined} */
+export function tryUrl(str) {
+  try {
+    if (str && new URL(str)) {
+      return str; // throws on invalid urls
+    }
+  } catch (e) {
+    // undefined
+  }
 }
 
 /**
