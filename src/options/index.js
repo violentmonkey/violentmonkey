@@ -127,9 +127,8 @@ function initMain() {
         store[list] = [...store[list], script];
       }
     },
-    // RemoveScript(id) {
-    //   const i = store.scripts.findIndex(script => script.props.id === id);
-    //   if (i >= 0) store.scripts.splice(i, 1);
-    // },
+    RemoveScripts(ids) {
+      store.removedScripts = store.removedScripts.filter(script => !ids.includes(script.props.id));
+    },
   });
 }

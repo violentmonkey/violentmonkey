@@ -237,7 +237,6 @@ const refList = ref();
 const state = reactive({
   focusedIndex: -1,
   menuNewActive: false,
-  removing: false,
   showHotkeys: false,
   // Speedup and deflicker for initial page load:
   // skip rendering the script list when starting in the editor.
@@ -463,11 +462,11 @@ function markRemove(script, removed) {
   });
 }
 function handleActionRemove(script) {
-  markRemove(script, 1);
-  state.removing = true;
-  setTimeout(() => {
-    state.removing = false;
-  }, 1000);
+  if (!script.config.removed) {
+    markRemove(script, 1);
+  } else {
+    sendCmdDirectly('RemoveScripts', [script.props.id]);
+  }
 }
 async function handleActionRestore(script) {
   try {

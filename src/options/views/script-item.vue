@@ -98,7 +98,7 @@
     </div>
     <div class="script-buttons script-buttons-right">
       <template v-if="canRender">
-        <tooltip :content="i18n('buttonRemove')" align="end">
+        <tooltip :content="i18n('buttonRemove')" align="end" v-if="showRecycle || !script.config.removed">
           <a class="btn-ghost" :class="{ 'btn-danger': script.config.removed }" @click="onRemove" :data-hotkey="hotkeys.remove" :tabIndex="tabIndex">
             <icon name="trash"></icon>
           </a>
@@ -125,6 +125,7 @@ import {
 } from '@/common';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
+import { store } from '../utils';
 
 const itemMargin = 8;
 
@@ -147,6 +148,9 @@ export default {
     };
   },
   computed: {
+    showRecycle() {
+      return store.route.paths[0] === 'recycleBin';
+    },
     canUpdate() {
       return getScriptUpdateUrl(this.script);
     },

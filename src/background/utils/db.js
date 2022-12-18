@@ -46,6 +46,7 @@ addPublicCommands({
 addOwnCommands({
   CheckPosition: sortScripts,
   CheckRemove: checkRemove,
+  RemoveScripts: removeScripts,
   /** @return {VMScript} */
   GetScript: getScript,
   /** @return {Promise<{ items: VMScript[], values? }>} */
@@ -86,19 +87,6 @@ addOwnCommands({
     store.scripts.splice(index + offset, 0, script);
     return normalizePosition();
   },
-  /** @return {Promise<void>} */
-  // async RemoveScript(id) {
-  //   const i = store.scripts.indexOf(getScriptById(id));
-  //   if (i >= 0) {
-  //     store.scripts.splice(i, 1);
-  //     await storage.base.remove([
-  //       storage.script.toKey(id),
-  //       storage.code.toKey(id),
-  //       storage.value.toKey(id),
-  //     ]);
-  //   }
-  //   return sendCmd('RemoveScript', id);
-  // },
   ParseMeta: parseMetaWithErrors,
   ParseScript: parseScript,
   /** @return {Promise<void>} */
@@ -452,30 +440,35 @@ function getSizeForResources(accum, url) {
   return accum;
 }
 
-/** @return {?Promise<void>} only if something was removed, otherwise undefined */
-export function checkRemove({ force } = {}) {
-  const now = Date.now();
+export async function removeScripts(ids) {
+  // Only those marked as removed can be removed permanently
   const toKeep = [];
   const toRemove = [];
   store.removedScripts.forEach(script => {
-    const { id, lastModified } = script.props;
-    if (script.config.removed && (force || now - getInt(lastModified) > TIMEOUT_WEEK)) {
-      toRemove.push(id);
-    } else {
-      toKeep.push(script);
-    }
+    const { id } = script.props;
+    (ids.includes(id) ? toRemove : toKeep).push(script);
   });
-  if (toRemove.length) {
-    store.removedScripts = toKeep;
-    toRemove.forEach(id => {
-      delete store.scriptMap[id];
-    });
-    return storage.base.remove(toRemove.flatMap(id => [
-      storage.code.toKey(id),
-      storage.script.toKey(id),
-      storage.value.toKey(id),
-    ]));
-  }
+  if (!toRemove.length) return;
+  ids = toRemove.map(script => script.props.id);
+  ids.forEach(id => {
+    delete store.scriptMap[id];
+  });
+  store.removedScripts = toKeep;
+  await storage.base.remove(ids.flatMap(id => [
+    storage.code.toKey(id),
+    storage.script.toKey(id),
+    storage.value.toKey(id),
+  ]));
+  return sendCmd('RemoveScripts', ids);
+}
+
+export function checkRemove({ force } = {}) {
+  const now = Date.now();
+  const ids = store.removedScripts.filter(script => {
+    const { lastModified } = script.props;
+    return script.config.removed && (force || now - getInt(lastModified) > TIMEOUT_WEEK);
+  }).map(script => script.props.id);
+  return removeScripts(ids);
 }
 
 /** @return {string} */
@@ -737,7 +730,7 @@ export async function vacuum(data) {
     }
   });
   store.sizes = sizes;
-  store.scripts.forEach((script) => {
+  [...store.scripts, ...store.removedScripts].forEach((script) => {
     const { meta, props } = script;
     const { icon } = meta;
     const { id } = props;
