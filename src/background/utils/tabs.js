@@ -1,5 +1,4 @@
 import { getActiveTab, noop, sendTabCmd, getFullUrl } from '@/common';
-import { extensionRoot } from '@/common/consts';
 import ua from '@/common/ua';
 import { addOwnCommands, addPublicCommands, commands } from './message';
 import { getOption } from './options';
@@ -12,10 +11,11 @@ addOwnCommands({
   /**
    * @param {string} [pathId] - path or id to add to #scripts route in dashboard,
      if absent a new script will be created for active tab's URL
+     if '' the script list is opened, TODO: move to a new command for clarity?
    * @returns {Promise<chrome.tabs.Tab>}
    */
   async OpenEditor(pathId, src) {
-    if (!pathId) {
+    if (pathId == null) {
       const { tab, domain } = await commands.GetTabDomain();
       const id = domain && commands.CacheNewScript({
         url: (tab.pendingUrl || tab.url).split(/[#?]/)[0],
@@ -23,16 +23,18 @@ addOwnCommands({
       });
       pathId = `_new${id ? `/${id}` : ''}`;
     }
-    const url = `${extensionRoot}options/index.html#scripts/${pathId}`;
+    let url = extensionOptionsPage;
+    if (pathId) url += `${ROUTE_SCRIPTS}/${pathId}`;
     // Firefox until v56 doesn't support moz-extension:// pattern in browser.tabs.query()
     for (const view of browser.extension.getViews()) {
-      if (view.location.href === url) {
+      const viewUrl = view.location.href;
+      if (viewUrl === url || !pathId && viewUrl === url + ROUTE_SCRIPTS) {
         const { id: tabId, windowId } = await view.browser.tabs.getCurrent();
         browser.windows.update(windowId, { focused: true });
         return browser.tabs.update(tabId, { active: true });
       }
     }
-    return commands.TabOpen({ url, maybeInWindow: true }, src);
+    return commands.TabOpen({ url, maybeInWindow: !!pathId }, src);
   },
 });
 

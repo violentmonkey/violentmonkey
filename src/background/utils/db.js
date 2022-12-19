@@ -3,7 +3,7 @@ import {
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
   getScriptPrettyUrl, makePause,
 } from '@/common';
-import { ICON_PREFIX, INFERRED, TIMEOUT_WEEK } from '@/common/consts';
+import { INFERRED, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import { getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta } from './script';

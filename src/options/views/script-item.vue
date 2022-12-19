@@ -194,7 +194,7 @@ export default {
       return this.focused ? 0 : -1;
     },
     url() {
-      return `#${this.script.config.removed ? 'recycleBin' : 'scripts'}/${this.script.props.id}`;
+      return `${this.script.config.removed ? '#recycleBin' : ROUTE_SCRIPTS}/${this.script.props.id}`;
     },
     urls() {
       return {

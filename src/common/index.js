@@ -1,8 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import {
-  browser, extensionRoot, HOMEPAGE_URL, ICON_PREFIX, INFERRED, SUPPORT_URL,
-} from '@/common/consts';
+import { browser, HOMEPAGE_URL, INFERRED, SUPPORT_URL } from './consts';
 import { deepCopy } from './object';
 import { blob2base64, i18n, isDataUri } from './util';
 
@@ -19,7 +17,7 @@ if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
   }
 }
 
-export const defaultImage = `${ICON_PREFIX}128.png`;
+export const defaultImage = !process.env.IS_INJECTED && `${ICON_PREFIX}128.png`;
 /** Will be encoded to avoid splitting the URL in devtools UI */
 const BAD_URL_CHAR = /[#/?]/g;
 /** Fullwidth range starts at 0xFF00, normal range starts at space char code 0x20 */
@@ -216,8 +214,11 @@ export function getScriptPrettyUrl(script, displayName) {
 export function getScriptUpdateUrl(script, all) {
   if (script.config.shouldUpdate) {
     const { custom, meta } = script;
-    const downloadURL = custom.downloadURL || meta.downloadURL || custom.lastInstallURL;
-    const updateURL = custom.updateURL || meta.updateURL || downloadURL;
+    /* URL in meta may be set to an invalid value to enforce disabling of the automatic updates
+     * e.g. GreasyFork sets it to `none` when the user installs an old version.
+     * We'll show such script as non-updatable. */
+    const downloadURL = tryUrl(custom.downloadURL || meta.downloadURL || custom.lastInstallURL);
+    const updateURL = tryUrl(custom.updateURL || meta.updateURL || downloadURL);
     const url = downloadURL || updateURL;
     if (url) return all ? [downloadURL, updateURL] : url;
   }
@@ -276,6 +277,17 @@ export function makePause(ms) {
 
 export function trueJoin(separator) {
   return this.filter(Boolean).join(separator);
+}
+
+/** @returns {string|undefined} */
+export function tryUrl(str) {
+  try {
+    if (str && new URL(str)) {
+      return str; // throws on invalid urls
+    }
+  } catch (e) {
+    // undefined
+  }
 }
 
 /**

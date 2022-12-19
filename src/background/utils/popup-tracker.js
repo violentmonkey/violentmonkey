@@ -17,7 +17,7 @@ addPublicCommands({
 postInitialize.push(() => {
   browser.runtime.onConnect.addListener(onPopupOpened);
   browser.webRequest.onBeforeRequest.addListener(prefetchSetPopup, {
-    urls: [browser.runtime.getURL(browser.runtime.getManifest().browser_action.default_popup)],
+    urls: [extensionRoot + extensionManifest.browser_action.default_popup],
     types: ['main_frame'],
   });
 });

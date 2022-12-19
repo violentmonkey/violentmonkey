@@ -1,4 +1,4 @@
-import '@/common/browser';
+import browser from '@/common/browser';
 import { sendCmdDirectly } from '@/common';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';

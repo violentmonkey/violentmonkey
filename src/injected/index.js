@@ -1,4 +1,4 @@
-import '@/common/browser'; // eslint-disable-line no-restricted-imports
+import browser from '@/common/browser'; // eslint-disable-line no-restricted-imports
 import { sendCmd } from '@/common'; // eslint-disable-line no-restricted-imports
 import { USERSCRIPT_META_INTRO } from './util';
 import './content';
@@ -12,7 +12,6 @@ if (IS_FIREFOX && IS_TOP
 ) {
   (async () => {
     const {
-      browser,
       fetch,
       history,
     } = global;

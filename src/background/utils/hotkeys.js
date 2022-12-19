@@ -7,7 +7,7 @@ postInitialize.push(() => {
       commands.OpenEditor();
     } else {
       const route = cmd === 'settings' ? `#${cmd}` : '';
-      commands.TabOpen({ url: `/options/index.html${route}` });
+      commands.TabOpen({ url: `${extensionOptionsPage}${route}` });
     }
   });
 });

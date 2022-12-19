@@ -1,9 +1,10 @@
+let { browser } = global;
+
 // Since this also runs in a content script we'll guard against implicit global variables
 // for DOM elements with 'id' attribute which is a standard feature, more info:
 // https://github.com/mozilla/webextension-polyfill/pull/153
 // https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
-if (!IS_FIREFOX && !global.browser?.runtime) {
-  // region Chrome
+if (!IS_FIREFOX && !browser?.runtime) {
   const { chrome, Proxy: SafeProxy } = global;
   const { bind } = SafeProxy;
   const MESSAGE = 'message';
@@ -137,7 +138,7 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
    * 0 = non-async method or the entire group
    * function = transformer like (originalObj, originalFunc): function
    */
-  global.browser = proxifyGroup(chrome, {
+  browser = global.browser = proxifyGroup(chrome, {
     extension: 0, // we don't use its async methods
     i18n: 0, // we don't use its async methods
     runtime: {
@@ -156,12 +157,10 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
       sendMessage: wrapSendMessage,
     },
   });
-  // endregion
 } else if (process.env.DEBUG && IS_FIREFOX) {
-  // region Firefox
   /* eslint-disable no-restricted-syntax */// this is a debug-only section
   let counter = 0;
-  const { runtime } = global.browser;
+  const { runtime } = browser;
   const { sendMessage, onMessage } = runtime;
   const log = (type, args, id, isResponse) => console.info(
     `${type}Message#%d${isResponse ? ' response' : ''}`,
@@ -188,7 +187,6 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
     return result;
   });
   /* eslint-enable no-restricted-syntax */
-  // endregion
 }
 
 /**
@@ -197,3 +195,5 @@ if (!IS_FIREFOX && !global.browser?.runtime) {
  * @param {any} response - API callback's response
  * @returns {?string[]} - [errorMessage, errorStack] array on error
  */
+
+export default browser;

@@ -194,8 +194,7 @@ import { reactive } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import options from '@/common/options';
 import {
-  getScriptHome, getScriptName, getScriptSupportUrl, getScriptUpdateUrl,
-  i18n, makePause, sendCmdDirectly, sendTabCmd,
+  getScriptHome, getScriptName, getScriptSupportUrl, getScriptUpdateUrl, i18n, makePause, sendCmdDirectly, sendTabCmd,
 } from '@/common';
 import { objectPick } from '@/common/object';
 import { focusMe } from '@/common/ui';
@@ -203,8 +202,7 @@ import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
 import { mutex, store } from '../utils';
 
-const manifest = browser.runtime.getManifest();
-const NAME = `${manifest.name} ${manifest.version}`;
+const NAME = `${extensionManifest.name} ${process.env.VM_VER}`;
 const SCRIPT_CLS = '.script';
 let mousedownElement;
 
@@ -368,7 +366,7 @@ export default {
       this.checkReload();
     },
     onManage() {
-      browser.runtime.openOptionsPage();
+      sendCmdDirectly('OpenEditor', '');
       window.close();
     },
     onOpenUrl(e) {

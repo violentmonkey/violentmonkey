@@ -30,10 +30,9 @@ import { focusMe } from '@/common/ui';
 
 export default {
   data() {
-    const manifest = browser.runtime.getManifest();
     return {
-      name: manifest.name,
-      version: manifest.version,
+      name: extensionManifest.name,
+      version: extensionManifest.version,
       language: browser.i18n.getUILanguage(),
     };
   },
