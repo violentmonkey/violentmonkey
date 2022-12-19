@@ -366,7 +366,7 @@ export default {
       this.checkReload();
     },
     onManage() {
-      browser.runtime.openOptionsPage();
+      sendCmdDirectly('OpenEditor', '');
       window.close();
     },
     onOpenUrl(e) {
