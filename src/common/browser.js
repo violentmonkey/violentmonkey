@@ -5,7 +5,7 @@ let { browser } = global;
 // https://github.com/mozilla/webextension-polyfill/pull/153
 // https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
 if (!IS_FIREFOX && !browser?.runtime) {
-  const { chrome, Proxy: SafeProxy } = global;
+  const { Proxy: SafeProxy } = global;
   const { bind } = SafeProxy;
   const MESSAGE = 'message';
   const STACK = 'stack';
@@ -32,7 +32,8 @@ if (!IS_FIREFOX && !browser?.runtime) {
     target[key] = res;
     return res;
   };
-  const proxifyGroup = (src, meta) => new SafeProxy({}, {
+  const proxifyGroup = (src, meta) => new SafeProxy({ __proto__: null }, {
+    __proto__: null,
     get: (group, key) => group[key] ?? proxifyValue(group, key, src, meta?.[key]),
   });
   /**
@@ -86,50 +87,33 @@ if (!IS_FIREFOX && !browser?.runtime) {
       return promise;
     }
   );
-  // Both result and error must be explicitly specified to avoid prototype eavesdropping
-  const wrapSuccess = result => [
-    result,
-    null,
-  ];
-  // Both result and error must be explicitly specified to avoid prototype eavesdropping
-  const wrapError = err => process.env.DEBUG && console.warn(err) || [
-    null,
-    err?.[MESSAGE]
-      ? [err[MESSAGE], err[STACK]]
-      : [err, new SafeError()[STACK]],
-  ];
-  const sendResponseAsync = async (result, sendResponse) => {
+  const sendResponseAsync = async (listener, message, sender, sendResponse) => {
+    let result;
+    let error;
     try {
-      result = await result;
+      result = await listener(message, sender);
       if (process.env.DEBUG) console.info('send', result);
-      sendResponse(wrapSuccess(result));
     } catch (err) {
-      sendResponse(wrapError(err));
+      if (process.env.DEBUG) console.warn(err);
+      error = err?.[MESSAGE]
+        ? [err[MESSAGE], err[STACK]]
+        : [err, new SafeError()[STACK]];
     }
+    // `undefined` in arrays is received as `null` in Chrome, but we always use `== null` so it's ok
+    sendResponse([result, error]);
   };
   const onMessageListener = (listener, message, sender, sendResponse) => {
     if (process.env.DEBUG) console.info('receive', message);
-    try {
-      const result = listener(message, sender);
-      if (result && isFunction(result.then)) {
-        sendResponseAsync(result, sendResponse);
-        return true;
-      }
-      // In some browsers (e.g Chrome 56, Vivaldi), the listener in
-      // popup pages are not properly cleared after closed.
-      // They may send `undefined` before the real response is sent.
-      if (result !== undefined) {
-        sendResponse(wrapSuccess(result));
-      }
-    } catch (err) {
-      sendResponse(wrapError(err));
-    }
+    // TODO: use a port with a timeout for each tab/frame to speed up frequent calls to GM API?
+    // Always using async mode because the difference in performance is negligible.
+    sendResponseAsync(listener, message, sender, sendResponse);
+    return true;
   };
   /** @type {WrapAsyncPreprocessorFunc} */
   const unwrapResponse = (resolve, response) => (
     !response && 'null response'
-    || response[1] // error created in wrapError
-    || resolve(response[0]) // result created in wrapSuccess
+    || response[1] // error from sendResponseAsync
+    || resolve(response[0]) // result from sendResponseAsync
   );
   const wrapSendMessage = (runtime, sendMessage) => (
     wrapAsync(runtime, sendMessage, unwrapResponse)
@@ -152,7 +136,7 @@ if (!IS_FIREFOX && !browser?.runtime) {
       },
       sendMessage: wrapSendMessage,
     },
-    tabs: {
+    tabs: !process.env.IS_INJECTED && {
       connect: 0,
       sendMessage: wrapSendMessage,
     },

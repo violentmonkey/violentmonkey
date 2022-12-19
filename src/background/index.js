@@ -115,7 +115,7 @@ initialize(() => {
   sync.initialize();
   checkRemove();
   setInterval(checkRemove, TIMEOUT_24HOURS);
-  const api = global.chrome.declarativeContent;
+  const api = chrome.declarativeContent;
   if (api) {
     // Using declarativeContent to run content scripts earlier than document_start
     api.onPageChanged.getRules(/* for old Chrome */ null, async ([rule]) => {
