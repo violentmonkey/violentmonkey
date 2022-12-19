@@ -1,5 +1,4 @@
 import { request, noop, i18n, getUniqId } from '@/common';
-import { extensionRoot } from '@/common/consts';
 import ua from '@/common/ua';
 import cache from './cache';
 import { addPublicCommands, commands } from './message';
@@ -52,7 +51,7 @@ const blacklistRe = re`/^https?:\/\/(
   (greasyfork|openuserjs)\\.org
 )\//ix`;
 const resolveVirtualUrl = url => (
-  `${extensionRoot}options/index.html#scripts/${+url.split('#')[1]}`
+  `${extensionOptionsPage}${ROUTE_SCRIPTS}/${+url.split('#')[1]}`
 );
 // FF can't intercept virtual .user.js URL via webRequest, so we redirect it explicitly
 const virtualUrlRe = IS_FIREFOX && new RegExp((

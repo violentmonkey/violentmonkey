@@ -317,7 +317,7 @@ export default {
         this.errors = res.errors;
         if (newId) {
           this.script = res.update;
-          if (!id) window.history.replaceState(null, this.scriptName, `#scripts/${newId}`);
+          if (!id) history.replaceState(null, this.scriptName, `${ROUTE_SCRIPTS}/${newId}`);
         }
       } catch (err) {
         showConfirmation(`${err.message || err}`, {

@@ -186,7 +186,7 @@ export default {
       return this.focused ? 0 : -1;
     },
     url() {
-      return `#scripts/${this.script.props.id}`;
+      return `${ROUTE_SCRIPTS}/${this.script.props.id}`;
     },
     urls() {
       return {

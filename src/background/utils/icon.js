@@ -1,5 +1,5 @@
 import { i18n, makeDataUri, noop } from '@/common';
-import { BLACKLIST, ICON_PREFIX, INJECTABLE_TAB_URL_RE } from '@/common/consts';
+import { BLACKLIST, INJECTABLE_TAB_URL_RE } from '@/common/consts';
 import { objectPick } from '@/common/object';
 import { postInitialize } from './init';
 import { addOwnCommands, addPublicCommands, forEachTab } from './message';

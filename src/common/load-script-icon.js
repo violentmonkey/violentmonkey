@@ -1,4 +1,3 @@
-import { ICON_PREFIX } from '@/common/consts';
 import { isDataUri, isRemote, sendCmdDirectly } from '@/common/index';
 
 // TODO: convert this into a component tag e.g. <safe-icon>

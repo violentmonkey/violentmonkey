@@ -1,5 +1,6 @@
 import tldRules from 'tldjs/rules.json';
 
+global.chrome =
 global.browser = {
   storage: {
     local: {
@@ -15,11 +16,7 @@ global.browser = {
   },
   runtime: {
     getURL: path => path,
-  },
-};
-global.chrome = {
-  runtime: {
-    getURL: browser.runtime.getURL,
+    getManifest: () => ({}),
   },
 };
 if (!window.Response) window.Response = { prototype: {} };

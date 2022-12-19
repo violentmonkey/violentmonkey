@@ -1,8 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import {
-  browser, extensionRoot, HOMEPAGE_URL, ICON_PREFIX, INFERRED, SUPPORT_URL,
-} from '@/common/consts';
+import { browser, HOMEPAGE_URL, INFERRED, SUPPORT_URL } from './consts';
 import { deepCopy } from './object';
 import { blob2base64, i18n, isDataUri } from './util';
 
@@ -19,7 +17,7 @@ if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
   }
 }
 
-export const defaultImage = `${ICON_PREFIX}128.png`;
+export const defaultImage = !process.env.IS_INJECTED && `${ICON_PREFIX}128.png`;
 /** Will be encoded to avoid splitting the URL in devtools UI */
 const BAD_URL_CHAR = /[#/?]/g;
 /** Fullwidth range starts at 0xFF00, normal range starts at space char code 0x20 */

@@ -1,5 +1,4 @@
 import { getActiveTab, noop, sendTabCmd, getFullUrl } from '@/common';
-import { extensionRoot } from '@/common/consts';
 import ua from '@/common/ua';
 import { addOwnCommands, addPublicCommands, commands } from './message';
 import { getOption } from './options';
