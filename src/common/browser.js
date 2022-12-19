@@ -55,7 +55,7 @@ if (!IS_FIREFOX && !browser?.runtime) {
       // Make the error messages actually useful by capturing a real stack
       const stackInfo = new SafeError(`callstack before invoking ${func.name || 'chrome API'}:`);
       // A single parameter `result` is fine because we don't use API that return more
-      args[args.length] = result => {
+      const cb = result => {
         const runtimeErr = chrome.runtime.lastError;
         const err = runtimeErr || (
           preprocessorFunc
@@ -71,6 +71,7 @@ if (!IS_FIREFOX && !browser?.runtime) {
         }
       };
       if (process.env.IS_INJECTED) {
+        safePush(args, cb); /* global safePush */
         try {
           safeApply(func, thisArg, args);
         } catch (e) {
@@ -81,7 +82,8 @@ if (!IS_FIREFOX && !browser?.runtime) {
           }
         }
       } else {
-        safeApply(func, thisArg, args);
+        /* Not process.env.IS_INJECTED */// eslint-disable-next-line no-restricted-syntax
+        thisArg::func(...args, cb);
       }
       if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.[MESSAGE] || err));
       return promise;
