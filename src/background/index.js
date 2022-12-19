@@ -1,4 +1,4 @@
-import '@/common/browser';
+import browser from '@/common/browser';
 import { getActiveTab, makePause, sendCmd } from '@/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
 import { deepCopy } from '@/common/object';
