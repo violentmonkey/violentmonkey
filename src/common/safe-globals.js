@@ -25,5 +25,6 @@ export const ROUTE_SCRIPTS = `#scripts`;
 export const extensionRoot = chrome.runtime.getURL('/');
 export const extensionOrigin = extensionRoot.slice(0, -1);
 export const extensionManifest = chrome.runtime.getManifest();
-export const extensionOptionsPage = extensionRoot + extensionManifest.options_page;
-export const ICON_PREFIX = extensionRoot + extensionManifest.icons[16].split('16')[0];
+// Using getURL because in Firefox manifest contains resolved (full) URLs
+export const extensionOptionsPage = chrome.runtime.getURL(extensionManifest.options_page);
+export const ICON_PREFIX = chrome.runtime.getURL(extensionManifest.icons[16].split('16')[0]);

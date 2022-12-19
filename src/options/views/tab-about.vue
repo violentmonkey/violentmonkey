@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       name: extensionManifest.name,
-      version: extensionManifest.version,
+      version: process.env.VM_VER,
       language: browser.i18n.getUILanguage(),
     };
   },
