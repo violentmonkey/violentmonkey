@@ -36,7 +36,10 @@ const MAIN_RULES = [
     'safeCall($1, ',
     false,
   ], [
-    new RegExp(`var (__webpack_module_cache__|${G.require}) = {};.*?var ${G.exports} =`, 's'),
+    new RegExp(`(?:${[
+      '// webpackBootstrap\\s+(?:/\\*+/\\s*)?"use strict";\\s+',
+      `var (__webpack_module_cache__|${G.require}) = {};.*?`,
+    ].join('|')})var ${G.exports} =`, 's'),
     patchBootstrap,
   ], [
     new RegExp(`(${[
@@ -65,7 +68,8 @@ class WebpackProtectBootstrapPlugin {
   }
 }
 
-function patchBootstrap(src) {
+function patchBootstrap(src, moduleCache) {
+  if (!moduleCache) return ' ' + src; // everything was concatenated
   const props = src.match(new RegExp(`(?<=\\b${G.require}\\.)(\\w+)(?= = )`, 'g'));
   const guard = props
     ? `for (let i = 0, props="${[...new Set(props)].join('')}"; i < props.length; i++)
@@ -92,7 +96,7 @@ function replace(rules, src, info) {
     if (dst === res && mandatory) {
       const err = `[${WebpackProtectBootstrapPlugin.name}] `
         + `"${from}" not found in ${info.chunk.name || 'bootstrap'}`;
-      console.log(`${err}:\n${src}`); // this prints immediately
+      console.warn(`${err}:\n${src.slice(0, 500)}`); // this prints immediately
       throw new Error(err); // this prints at the end of build
     }
     res = dst;
