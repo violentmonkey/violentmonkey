@@ -227,7 +227,7 @@ function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
   const bag = xhrInject && cache.get(key);
   // Proceeding only if prepareScripts has replaced promise in cache with the actual data
-  return bag?.[INJECT] && prepareXhrBlob(info, bag);
+  return bag?.[INJECT]?.[ENV_SCRIPTS] && prepareXhrBlob(info, bag);
 }
 
 /**
@@ -235,9 +235,6 @@ function onHeadersReceived(info) {
  * @param {VMInjection.Bag} bag
  */
 function prepareXhrBlob({ url, [kResponseHeaders]: responseHeaders, tabId, frameId }, bag) {
-  if (!bag[INJECT][ENV_SCRIPTS]) {
-    return;
-  }
   if (IS_FIREFOX && url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
     bag[INJECT_CONTENT_FORCE] = true;
   }
