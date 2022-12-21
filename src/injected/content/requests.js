@@ -74,6 +74,8 @@ addBackgroundHandlers({
         delete req.arr;
       }
       data[kResponse] = response;
+    }
+    if (response && req[kFileName]) {
       req[kResponse] = response;
     }
     if (msg.type === 'load' && req[kFileName]) {

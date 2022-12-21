@@ -94,7 +94,8 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
       return { [kResponseHeaders]: responseHeaders };
     }
   };
-  return (evt) => {
+  const eventQueue = [];
+  const sequentialize = async () => {
     if (!contentType) {
       contentType = xhr.getResponseHeader('Content-Type') || '';
     }
@@ -112,6 +113,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
         numChunks = chunked && Math.ceil(dataSize / CHUNK_SIZE) || 1;
       }
     }
+    const evt = eventQueue.shift();
     const { type } = evt;
     const shouldNotify = events.includes(type);
     // TODO: send partial delta since last time in onprogress?
@@ -119,42 +121,44 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     if (!shouldNotify && type !== 'loadend') {
       return;
     }
-    lastPromise = lastPromise.then(async () => {
-      if (shouldSendResponse) {
-        sent = true;
-        for (let i = 1; i < numChunks; i += 1) {
-          await req.cb({
-            id,
-            chunk: i * CHUNK_SIZE,
-            data: await getChunk(response, i),
-            size: dataSize,
-          });
-        }
+    if (shouldSendResponse) {
+      sent = true;
+      for (let i = 1; i < numChunks; i += 1) {
+        await req.cb({
+          id,
+          chunk: i * CHUNK_SIZE,
+          data: await getChunk(response, i),
+          size: dataSize,
+        });
       }
-      await req.cb({
-        blobbed,
-        chunked,
-        contentType,
-        id,
-        type,
-        /** @type {VMScriptResponseObject} */
-        data: shouldNotify ? {
-          finalUrl: req.url || xhr.responseURL,
-          ...getResponseHeaders(),
-          ...objectPick(xhr, SEND_XHR_PROPS),
-          ...objectPick(evt, SEND_PROGRESS_PROPS),
-          [kResponse]: shouldSendResponse
-            ? numChunks && await getChunk(response, 0) || response
-            : null,
-          [kResponseText]: shouldSendResponse
-            ? responseText
-            : null,
-        } : null,
-      });
-      if (type === 'loadend') {
-        clearRequest(req);
-      }
+    }
+    await req.cb({
+      blobbed,
+      chunked,
+      contentType,
+      id,
+      type,
+      /** @type {VMScriptResponseObject} */
+      data: shouldNotify ? {
+        finalUrl: req.url || xhr.responseURL,
+        ...getResponseHeaders(),
+        ...objectPick(xhr, SEND_XHR_PROPS),
+        ...objectPick(evt, SEND_PROGRESS_PROPS),
+        [kResponse]: shouldSendResponse
+          ? numChunks && await getChunk(response, 0) || response
+          : null,
+        [kResponseText]: shouldSendResponse
+          ? responseText
+          : null,
+      } : null,
     });
+    if (type === 'loadend') {
+      clearRequest(req);
+    }
+  };
+  return (evt) => {
+    eventQueue.push(evt);
+    lastPromise = lastPromise.then(sequentialize);
   };
 }
 
