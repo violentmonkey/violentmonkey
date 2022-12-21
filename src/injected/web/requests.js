@@ -62,7 +62,7 @@ addHandlers({
       [kResponseHeaders]: headers,
       [kResponseText]: text,
     } = data;
-    if (response != null || data.readyState === 4) {
+    if (response != null) {
       req.raw = response;
     }
     if (headers != null) {
