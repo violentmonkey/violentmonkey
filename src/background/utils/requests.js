@@ -84,16 +84,10 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
   let responseText;
   let responseHeaders;
   let sent = true;
+  let tmp;
   const { id, xhr } = req;
-  // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
   const getChunk = blobbed && blob2objectUrl || chunked && blob2chunk;
-  const getResponseHeaders = () => {
-    const headers = req[kResponseHeaders] || xhr.getAllResponseHeaders();
-    if (responseHeaders !== headers) {
-      responseHeaders = headers;
-      return { [kResponseHeaders]: responseHeaders };
-    }
-  };
+  const getResponseHeaders = () => req[kResponseHeaders] || xhr.getAllResponseHeaders();
   const eventQueue = [];
   const sequentialize = async () => {
     if (!contentType) {
@@ -132,6 +126,8 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
         });
       }
     }
+    /* WARNING! We send `null` in the mandatory props because Chrome can't send `undefined`,
+     * and for simple destructuring and `prop?.foo` in the receiver without getOwnProp checks. */
     await req.cb({
       blobbed,
       chunked,
@@ -141,11 +137,13 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
       /** @type {VMScriptResponseObject} */
       data: shouldNotify ? {
         finalUrl: req.url || xhr.responseURL,
-        ...getResponseHeaders(),
         ...objectPick(xhr, SEND_XHR_PROPS),
         ...objectPick(evt, SEND_PROGRESS_PROPS),
         [kResponse]: shouldSendResponse
           ? numChunks && await getChunk(response, 0) || response
+          : null,
+        [kResponseHeaders]: responseHeaders !== (tmp = getResponseHeaders())
+          ? (responseHeaders = tmp)
           : null,
         [kResponseText]: shouldSendResponse
           ? responseText
