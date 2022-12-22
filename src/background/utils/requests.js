@@ -1,4 +1,4 @@
-import { blob2base64, sendTabCmd, string2uint8array } from '@/common';
+import { blob2base64, getFullUrl, sendTabCmd, string2uint8array } from '@/common';
 import { forEachEntry, forEachValue, objectPick } from '@/common/object';
 import ua from '@/common/ua';
 import cache from './cache';
@@ -170,7 +170,8 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
 async function httpRequest(opts, events, src, cb) {
   const { tab } = src;
   const { incognito } = tab;
-  const { anonymous, id, overrideMimeType, xhrType, url } = opts;
+  const { anonymous, id, overrideMimeType, xhrType } = opts;
+  const url = getFullUrl(opts.url, src.url);
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;

@@ -11,7 +11,6 @@ const {
 } = global;
 const { createElementNS } = document;
 const tdDecode = SafeTextDecoder[PROTO].decode;
-const getHref = describeProperty(HTMLAnchorElement[PROTO], 'href').get;
 const regexpTest = RegExp[PROTO].test; // Deeply unsafe. TODO: remove.
 
 /**
@@ -47,10 +46,6 @@ export const makeElem = (tag, attrs) => {
   }
   return el;
 };
-
-export const getFullUrl = url => (
-  makeElem('a', { href: url })::getHref()
-);
 
 export const decodeResource = (raw, isBlob) => {
   let res;

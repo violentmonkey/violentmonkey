@@ -1,5 +1,5 @@
 import bridge, { addBackgroundHandlers, addHandlers } from './bridge';
-import { getFullUrl, makeElem, sendCmd } from './util';
+import { makeElem, sendCmd } from './util';
 
 const {
   fetch: safeFetch,
@@ -33,7 +33,6 @@ addHandlers({
       realm,
       asBlob: msg.xhrType === 'blob',
     }, msg, PROPS_TO_COPY);
-    msg.url = getFullUrl(msg.url);
     let { data } = msg;
     if (data[1] && !IS_FIREFOX /* in FF FormData is recreated in bg::decodeBody */) {
       // TODO: support huge data by splitting it to multiple messages
