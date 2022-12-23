@@ -50,14 +50,6 @@ function getCodeMirrorThemes() {
   .filter(Boolean);
 }
 
-function getUniqIdB64() {
-  return Buffer.from(
-    new Uint32Array(2)
-    .map(() => Math.random() * (2 ** 32))
-    .buffer,
-  ).toString('base64');
-}
-
 function readGlobalsFile(path, babelOpts = {}) {
   const { ast, code = !ast } = babelOpts;
   const filename = entryPathToFilename(path);
@@ -75,5 +67,4 @@ function readGlobalsFile(path, babelOpts = {}) {
 
 exports.addWrapperWithGlobals = addWrapperWithGlobals;
 exports.getCodeMirrorThemes = getCodeMirrorThemes;
-exports.getUniqIdB64 = getUniqIdB64;
 exports.readGlobalsFile = readGlobalsFile;

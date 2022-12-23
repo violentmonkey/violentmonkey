@@ -19,6 +19,7 @@ let isApplied;
 let injectInto;
 let xhrInject;
 
+const sessionId = getUniqId();
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
   types: ['main_frame', 'sub_frame'],
@@ -278,6 +279,7 @@ async function prepare(cacheKey, url, isTop) {
     ids: allIds,
     info: { ua },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
+    sessionId,
   });
   propsToClear::forEachValue(val => {
     if (val !== true) bag[val] = env[val];

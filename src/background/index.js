@@ -121,9 +121,6 @@ initialize(() => {
     api.onPageChanged.getRules(/* for old Chrome */ null, async ([rule]) => {
       const id = rule?.id;
       const newId = process.env.INIT_FUNC_NAME;
-      if (id === newId) {
-        return;
-      }
       if (id) {
         await browser.declarativeContent.onPageChanged.removeRules([id]);
       }

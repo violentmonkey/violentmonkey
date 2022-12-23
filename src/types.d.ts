@@ -219,6 +219,7 @@ declare interface VMInjection extends VMInjectionDisabled {
   /** `page` mode will be necessary */
   page: boolean;
   scripts: VMInjection.Script[];
+  sessionId: string;
 }
 
 /**
