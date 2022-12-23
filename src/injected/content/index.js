@@ -34,7 +34,7 @@ async function init() {
   );
   assign(ids, data.ids);
   bridge[INJECT_INTO] = data[INJECT_INTO];
-  if (data.expose && !isXml && injectPageSandbox()) {
+  if (data.expose && !isXml && injectPageSandbox(data)) {
     addHandlers({ GetScriptVer: true });
     bridge.post('Expose');
   }

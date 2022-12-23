@@ -3,12 +3,6 @@ import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import { bindEvents, fireBridgeEvent, META_STR } from '../util';
 import { Run } from './cmd-run';
 
-/* In FF, content scripts running in a same-origin frame cannot directly call parent's functions
- * so we'll use the extension's UUID, which is unique per computer in FF, for messages
- * like VAULT_WRITER to avoid interception by sites that can add listeners for all of our
- * INIT_FUNC_NAME ids even though we change it now with each release. */
-const VAULT_WRITER = `${VM_UUID}${INIT_FUNC_NAME}VW`;
-const VAULT_WRITER_ACK = `${VAULT_WRITER}+`;
 const bridgeIds = bridge.ids;
 let tardyQueue;
 let bridgeInfo;
@@ -25,24 +19,6 @@ let VMInitInjection = window[INIT_FUNC_NAME];
 /** Avoid running repeatedly due to new `documentElement` or with declarativeContent in Chrome.
  * The prop's mode is overridden to be unforgeable by a userscript in content mode. */
 setOwnProp(window, INIT_FUNC_NAME, 1, false);
-if (IS_FIREFOX) {
-  window::on(VAULT_WRITER, evt => {
-    evt::stopImmediatePropagation();
-    if (!frameEventWnd) {
-      // setupVaultId's first event is the frame's contentWindow
-      frameEventWnd = evt::getRelatedTarget();
-    } else {
-      // setupVaultId's second event is the vaultId
-      frameEventWnd::fire(new SafeCustomEvent(VAULT_WRITER_ACK, {
-        __proto__: null,
-        detail: tellBridgeToWriteVault(evt::getDetail(), frameEventWnd),
-      }));
-      frameEventWnd = null;
-    }
-  }, true);
-} else {
-  setOwnProp(global, VAULT_WRITER, tellBridgeToWriteVault, false);
-}
 
 addHandlers({
   /**
@@ -51,12 +27,33 @@ addHandlers({
   InjectList: IS_FIREFOX && injectPageList,
 });
 
-export function injectPageSandbox() {
+export function injectPageSandbox({ sessionId }) {
   pageInjectable = false;
+  const VAULT_WRITER = sessionId + 'VW';
+  const VAULT_WRITER_ACK = VAULT_WRITER + '*';
   const vaultId = safeGetUniqId();
   const handshakeId = safeGetUniqId();
   const contentId = safeGetUniqId();
   const webId = safeGetUniqId();
+  if (IS_FIREFOX) {
+    // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
+    window::on(VAULT_WRITER, evt => {
+      evt::stopImmediatePropagation();
+      if (!frameEventWnd) {
+        // setupVaultId's first event is the frame's contentWindow
+        frameEventWnd = evt::getRelatedTarget();
+      } else {
+        // setupVaultId's second event is the vaultId
+        frameEventWnd::fire(new SafeCustomEvent(VAULT_WRITER_ACK, {
+          __proto__: null,
+          detail: tellBridgeToWriteVault(evt::getDetail(), frameEventWnd),
+        }));
+        frameEventWnd = null;
+      }
+    }, true);
+  } else {
+    setOwnProp(global, VAULT_WRITER, tellBridgeToWriteVault, false);
+  }
   if (useOpener(opener) || useOpener(!IS_TOP && parent)) {
     startHandshake();
   } else {
@@ -134,7 +131,7 @@ export async function injectScripts(data, isXml) {
   if (isXml || data[INJECT_CONTENT_FORCE]) {
     pageInjectable = false;
   } else if (data[INJECT_PAGE] && pageInjectable == null) {
-    injectPageSandbox();
+    injectPageSandbox(data);
   }
   const toContent = data.scripts
     .filter(scr => triageScript(scr) === INJECT_CONTENT)
