@@ -26,9 +26,10 @@ const API_CONFIG = {
 };
 const __CODE = Symbol('code'); // will be stripped when messaging
 const INJECT = 'inject';
-/** These are reused by cache entries to reduce memory usage */
-const BAG_NOOP = { [INJECT]: {} };
-const BAG_NOOP_EXPOSE = { [INJECT]: { expose: true } };
+/** These bags are reused in cache to reduce memory usage,
+ * ENV_CACHE_KEYS is for removeStaleCacheEntry */
+const BAG_NOOP = { [INJECT]: {}, [ENV_CACHE_KEYS]: [], [kSessionId]: sessionId };
+const BAG_NOOP_EXPOSE = { ...BAG_NOOP, [INJECT]: { expose: true } };
 const CSAPI_REG = 'csReg';
 const contentScriptsAPI = browser.contentScripts;
 const cache = initCache({
@@ -115,11 +116,11 @@ addPublicCommands({
     const scripts = inject[ENV_SCRIPTS];
     if (scripts) {
       triageRealms(scripts, bag[INJECT_CONTENT_FORCE] || forceContent, tabId, frameId, bag);
+      addValueOpener(tabId, frameId, scripts);
     }
     if (popupTabs[tabId]) {
       setTimeout(sendTabCmd, 0, tabId, 'PopupShown', popupTabs[tabId], { frameId });
     }
-    addValueOpener(tabId, frameId, scripts);
     return !done && inject;
   },
   async InjectionFeedback({
@@ -275,11 +276,11 @@ async function prepare(cacheKey, url, isTop) {
     [ENV_SCRIPTS]: prepareScripts(env),
     [INJECT_INTO]: injectInto,
     [INJECT_MORE]: moreKey,
+    [kSessionId]: sessionId,
     clipFF: env.clipFF,
     ids: allIds,
     info: { ua },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
-    sessionId,
   });
   propsToClear::forEachValue(val => {
     if (val !== true) bag[val] = env[val];

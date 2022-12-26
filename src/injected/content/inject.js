@@ -27,7 +27,7 @@ addHandlers({
   InjectList: IS_FIREFOX && injectPageList,
 });
 
-export function injectPageSandbox({ sessionId }) {
+export function injectPageSandbox({ [kSessionId]: sessionId }) {
   pageInjectable = false;
   const VAULT_WRITER = sessionId + 'VW';
   const VAULT_WRITER_ACK = VAULT_WRITER + '*';

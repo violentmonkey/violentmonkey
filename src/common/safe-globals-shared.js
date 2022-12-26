@@ -22,6 +22,7 @@ export const INJECT_MORE = 'more';
 export const INJECT_VAL = 'val';
 export const ID_BAD_REALM = -1;
 export const ID_INJECTING = 2;
+export const kSessionId = 'sessionId';
 export const kResponse = 'response';
 export const kResponseHeaders = 'responseHeaders';
 export const kResponseText = 'responseText';
