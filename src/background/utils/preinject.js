@@ -28,8 +28,8 @@ const __CODE = Symbol('code'); // will be stripped when messaging
 const INJECT = 'inject';
 /** These bags are reused in cache to reduce memory usage,
  * ENV_CACHE_KEYS is for removeStaleCacheEntry */
-const BAG_NOOP = { [INJECT]: {}, [ENV_CACHE_KEYS]: [], [kSessionId]: sessionId };
-const BAG_NOOP_EXPOSE = { ...BAG_NOOP, [INJECT]: { expose: true } };
+const BAG_NOOP = { [INJECT]: {}, [ENV_CACHE_KEYS]: [] };
+const BAG_NOOP_EXPOSE = { ...BAG_NOOP, [INJECT]: { expose: true, [kSessionId]: sessionId } };
 const CSAPI_REG = 'csReg';
 const contentScriptsAPI = browser.contentScripts;
 const cache = initCache({
