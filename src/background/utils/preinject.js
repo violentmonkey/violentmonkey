@@ -116,7 +116,7 @@ addPublicCommands({
     const scripts = inject[ENV_SCRIPTS];
     if (scripts) {
       triageRealms(scripts, bag[INJECT_CONTENT_FORCE] || forceContent, tabId, frameId, bag);
-      addValueOpener(tabId, frameId, scripts);
+      addValueOpener(scripts, tabId, frameId);
     }
     if (popupTabs[tabId]) {
       setTimeout(sendTabCmd, 0, tabId, 'PopupShown', popupTabs[tabId], { frameId });
@@ -135,7 +135,7 @@ addPublicCommands({
     const envCache = more[S_CACHE] || (await more.promise)[S_CACHE];
     const scripts = prepareScripts(more);
     triageRealms(scripts, forceContent, tabId, frameId);
-    addValueOpener(tabId, frameId, scripts);
+    addValueOpener(scripts, tabId, frameId);
     return {
       [ENV_SCRIPTS]: scripts,
       [S_CACHE]: envCache,
