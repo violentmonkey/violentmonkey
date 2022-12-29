@@ -6,12 +6,6 @@
  * `export` is stripped in the final output and is only used for our NodeJS test scripts.
  */
 
-export const {
-  /* We can't use safe Promise from vault because it stops working when iframe is removed,
-   * so we use the unsafe current global - only for userscript API stuff, not internally.
-   * TODO: try reimplementing Promise in our sandbox wrapper if it can work with user code */
-  Promise: UnsafePromise,
-} = global;
 export const cloneInto = PAGE_MODE_HANDSHAKE ? null : global.cloneInto;
 export let
   // window
@@ -24,6 +18,7 @@ export let
   Object,
   SafeProxy,
   SafeSymbol,
+  UnsafePromise,
   fire,
   getWindowLength,
   getWindowParent,
@@ -177,3 +172,11 @@ export const VAULT = (() => {
   toStringTagSym = SafeSymbol.toStringTag;
   return res;
 })();
+
+try {
+  /* We can't use safe Promise from vault because it stops working when iframe is removed,
+   * so we use the unsafe current global - only for userscript API stuff, not internally.
+   * Using `try` because the `Promise` global may be an already spoofed getter.
+   * TODO: try reimplementing Promise in our sandbox wrapper if it can work with user code */
+  UnsafePromise = Promise;
+} catch (e) { /**/ }
