@@ -288,6 +288,7 @@ const isLocalUrlRe = re`/^(
     (:\d+|\/|$)
 )/ix`;
 export const isDataUri = url => /^data:/i.test(url);
+export const isHttpOrHttps = url => /^https?:\/\//i.test(url);
 export const isRemote = url => url && !isLocalUrlRe.test(decodeURI(url));
 
 /**

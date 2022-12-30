@@ -1,7 +1,7 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri, makeDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
-  getScriptPrettyUrl, makePause,
+  getScriptPrettyUrl, makePause, isHttpOrHttps,
 } from '@/common';
 import { INFERRED, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
@@ -395,7 +395,7 @@ export async function getData({ ids, sizes }) {
 async function getIconCache(scripts) {
   const urls = [];
   for (const { custom, meta: { icon } } of scripts) {
-    if (isRemote(icon)) {
+    if (isHttpOrHttps(icon)) {
       urls.push(custom.pathMap[icon] || icon);
     }
   }
