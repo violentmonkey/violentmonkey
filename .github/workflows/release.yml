@@ -41,6 +41,9 @@ jobs:
 
           # Build for release, also upload to GitHub assets
           yarn build
+          # Build one more time to make sure the output is the same
+          mv dist $TEMP_DIR/dist && yarn build && diff -qr dist $TEMP_DIR/dist
+
           cd dist && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
 
           # Build for CWS beta, append `BETA` to version name
