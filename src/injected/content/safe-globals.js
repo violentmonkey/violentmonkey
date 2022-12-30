@@ -17,6 +17,7 @@ export const {
   atob: safeAtob,
   addEventListener: on,
   cloneInto,
+  chrome,
   dispatchEvent: fire,
   removeEventListener: off,
 } = global;
@@ -46,7 +47,7 @@ export const { stopImmediatePropagation } = Event[PROTO];
 export const getDetail = describeProperty(SafeCustomEvent[PROTO], 'detail').get;
 export const getRelatedTarget = describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get;
 export const logging = nullObjFrom(console);
-export const VM_UUID = global.chrome.runtime.getURL('');
+export const VM_UUID = chrome.runtime.getURL('');
 /** Unlike the built-in `instanceof` operator this doesn't call @@hasInstance which may be spoofed */
 export const isInstance = (instance, safeOriginalProto) => {
   for (let obj = instance; isObject(obj) && (obj = getPrototypeOf(obj));) {
@@ -56,4 +57,4 @@ export const isInstance = (instance, safeOriginalProto) => {
   }
 };
 export const isPromise = (proto => val => isInstance(val, proto))(SafePromise[PROTO]);
-export let IS_FIREFOX = !global.chrome.app;
+export let IS_FIREFOX = !chrome.app;

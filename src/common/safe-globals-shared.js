@@ -7,7 +7,7 @@
  */
 
 const global = (function _() {
-  return this || globalThis; // eslint-disable-line no-undef
+  return process.env.TEST ? globalThis : this; // eslint-disable-line no-undef
 }());
 /** These two are unforgeable so we extract them primarily to improve minification.
  * The document's value can change only in about:blank but we don't inject there. */
@@ -26,5 +26,6 @@ export const kResponse = 'response';
 export const kResponseHeaders = 'responseHeaders';
 export const kResponseText = 'responseText';
 export const kResponseType = 'responseType';
+export const kSessionId = 'sessionId';
 export const isFunction = val => typeof val === 'function';
 export const isObject = val => val != null && typeof val === 'object';

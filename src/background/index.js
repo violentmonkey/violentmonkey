@@ -116,15 +116,12 @@ initialize(() => {
   sync.initialize();
   checkRemove();
   setInterval(checkRemove, TIMEOUT_24HOURS);
-  const api = global.chrome.declarativeContent;
+  const api = chrome.declarativeContent;
   if (api) {
     // Using declarativeContent to run content scripts earlier than document_start
     api.onPageChanged.getRules(/* for old Chrome */ null, async ([rule]) => {
       const id = rule?.id;
       const newId = process.env.INIT_FUNC_NAME;
-      if (id === newId) {
-        return;
-      }
       if (id) {
         await browser.declarativeContent.onPageChanged.removeRules([id]);
       }

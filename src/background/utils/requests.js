@@ -1,4 +1,4 @@
-import { blob2base64, sendTabCmd, string2uint8array } from '@/common';
+import { blob2base64, getFullUrl, sendTabCmd, string2uint8array } from '@/common';
 import { forEachEntry, forEachValue, objectPick } from '@/common/object';
 import ua from '@/common/ua';
 import cache from './cache';
@@ -84,17 +84,12 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
   let responseText;
   let responseHeaders;
   let sent = true;
+  let tmp;
   const { id, xhr } = req;
-  // Chrome encodes messages to UTF8 so they can grow up to 4x but 64MB is the message size limit
   const getChunk = blobbed && blob2objectUrl || chunked && blob2chunk;
-  const getResponseHeaders = () => {
-    const headers = req[kResponseHeaders] || xhr.getAllResponseHeaders();
-    if (responseHeaders !== headers) {
-      responseHeaders = headers;
-      return { [kResponseHeaders]: responseHeaders };
-    }
-  };
-  return (evt) => {
+  const getResponseHeaders = () => req[kResponseHeaders] || xhr.getAllResponseHeaders();
+  const eventQueue = [];
+  const sequentialize = async () => {
     if (!contentType) {
       contentType = xhr.getResponseHeader('Content-Type') || '';
     }
@@ -112,6 +107,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
         numChunks = chunked && Math.ceil(dataSize / CHUNK_SIZE) || 1;
       }
     }
+    const evt = eventQueue.shift();
     const { type } = evt;
     const shouldNotify = events.includes(type);
     // TODO: send partial delta since last time in onprogress?
@@ -119,42 +115,48 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     if (!shouldNotify && type !== 'loadend') {
       return;
     }
-    lastPromise = lastPromise.then(async () => {
-      if (shouldSendResponse) {
-        sent = true;
-        for (let i = 1; i < numChunks; i += 1) {
-          await req.cb({
-            id,
-            chunk: i * CHUNK_SIZE,
-            data: await getChunk(response, i),
-            size: dataSize,
-          });
-        }
+    if (shouldSendResponse) {
+      sent = true;
+      for (let i = 1; i < numChunks; i += 1) {
+        await req.cb({
+          id,
+          chunk: i * CHUNK_SIZE,
+          data: await getChunk(response, i),
+          size: dataSize,
+        });
       }
-      await req.cb({
-        blobbed,
-        chunked,
-        contentType,
-        id,
-        type,
-        /** @type {VMScriptResponseObject} */
-        data: shouldNotify ? {
-          finalUrl: req.url || xhr.responseURL,
-          ...getResponseHeaders(),
-          ...objectPick(xhr, SEND_XHR_PROPS),
-          ...objectPick(evt, SEND_PROGRESS_PROPS),
-          [kResponse]: shouldSendResponse
-            ? numChunks && await getChunk(response, 0) || response
-            : null,
-          [kResponseText]: shouldSendResponse
-            ? responseText
-            : null,
-        } : null,
-      });
-      if (type === 'loadend') {
-        clearRequest(req);
-      }
+    }
+    /* WARNING! We send `null` in the mandatory props because Chrome can't send `undefined`,
+     * and for simple destructuring and `prop?.foo` in the receiver without getOwnProp checks. */
+    await req.cb({
+      blobbed,
+      chunked,
+      contentType,
+      id,
+      type,
+      /** @type {VMScriptResponseObject} */
+      data: shouldNotify ? {
+        finalUrl: req.url || xhr.responseURL,
+        ...objectPick(xhr, SEND_XHR_PROPS),
+        ...objectPick(evt, SEND_PROGRESS_PROPS),
+        [kResponse]: shouldSendResponse
+          ? numChunks && await getChunk(response, 0) || response
+          : null,
+        [kResponseHeaders]: responseHeaders !== (tmp = getResponseHeaders())
+          ? (responseHeaders = tmp)
+          : null,
+        [kResponseText]: shouldSendResponse
+          ? responseText
+          : null,
+      } : null,
     });
+    if (type === 'loadend') {
+      clearRequest(req);
+    }
+  };
+  return (evt) => {
+    eventQueue.push(evt);
+    lastPromise = lastPromise.then(sequentialize);
   };
 }
 
@@ -168,7 +170,8 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
 async function httpRequest(opts, events, src, cb) {
   const { tab } = src;
   const { incognito } = tab;
-  const { anonymous, id, overrideMimeType, xhrType, url } = opts;
+  const { anonymous, id, overrideMimeType, xhrType } = opts;
+  const url = getFullUrl(opts.url, src.url);
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;

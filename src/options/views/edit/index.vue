@@ -137,7 +137,7 @@ const savePosition = async wnd => {
 /** @param {chrome.windows.Window} _ */
 const setupSavePosition = ({ id: curWndId, tabs }) => {
   if (tabs.length === 1) {
-    const { onBoundsChanged } = global.chrome.windows;
+    const { onBoundsChanged } = chrome.windows;
     if (onBoundsChanged) {
       // triggered on moving/resizing, Chrome 86+
       onBoundsChanged.addListener(wnd => {

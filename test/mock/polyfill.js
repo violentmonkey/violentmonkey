@@ -16,7 +16,9 @@ global.browser = {
   },
   runtime: {
     getURL: path => path,
-    getManifest: () => ({}),
+    getManifest: () => ({
+      icons: { 16: '' },
+    }),
   },
 };
 if (!window.Response) window.Response = { prototype: {} };

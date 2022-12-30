@@ -19,15 +19,17 @@ let isApplied;
 let injectInto;
 let xhrInject;
 
+const sessionId = getUniqId();
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
   types: ['main_frame', 'sub_frame'],
 };
 const __CODE = Symbol('code'); // will be stripped when messaging
 const INJECT = 'inject';
-/** These are reused by cache entries to reduce memory usage */
-const BAG_NOOP = { [INJECT]: {} };
-const BAG_NOOP_EXPOSE = { [INJECT]: { expose: true } };
+/** These bags are reused in cache to reduce memory usage,
+ * ENV_CACHE_KEYS is for removeStaleCacheEntry */
+const BAG_NOOP = { [INJECT]: {}, [ENV_CACHE_KEYS]: [] };
+const BAG_NOOP_EXPOSE = { ...BAG_NOOP, [INJECT]: { expose: true, [kSessionId]: sessionId } };
 const CSAPI_REG = 'csReg';
 const contentScriptsAPI = browser.contentScripts;
 const cache = initCache({
@@ -112,17 +114,13 @@ addPublicCommands({
     /** @type {VMInjection} */
     const inject = bag[INJECT];
     const scripts = inject[ENV_SCRIPTS];
-    const toContent = scripts
-      && triageRealms(scripts, bag[INJECT_CONTENT_FORCE] || forceContent, bag);
-    if (toContent?.[0]) {
-      // Processing known feedback without waiting for InjectionFeedback message.
-      // Running in a separate task as executeScript may take a long time to serialize code.
-      setTimeout(injectContentRealm, 0, toContent, tabId, frameId);
+    if (scripts) {
+      triageRealms(scripts, bag[INJECT_CONTENT_FORCE] || forceContent, tabId, frameId, bag);
+      addValueOpener(scripts, tabId, frameId);
     }
     if (popupTabs[tabId]) {
       setTimeout(sendTabCmd, 0, tabId, 'PopupShown', popupTabs[tabId], { frameId });
     }
-    addValueOpener(tabId, frameId, scripts);
     return !done && inject;
   },
   async InjectionFeedback({
@@ -136,8 +134,8 @@ addPublicCommands({
     if (!more) throw 'Injection data expired, please reload the tab!';
     const envCache = more[S_CACHE] || (await more.promise)[S_CACHE];
     const scripts = prepareScripts(more);
-    injectContentRealm(triageRealms(scripts, forceContent), tabId, frameId);
-    addValueOpener(tabId, frameId, scripts);
+    triageRealms(scripts, forceContent, tabId, frameId);
+    addValueOpener(scripts, tabId, frameId);
     return {
       [ENV_SCRIPTS]: scripts,
       [S_CACHE]: envCache,
@@ -231,17 +229,18 @@ function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
   const bag = xhrInject && cache.get(key);
   // Proceeding only if prepareScripts has replaced promise in cache with the actual data
-  return bag?.[INJECT] && prepareXhrBlob(info, bag);
+  return bag?.[INJECT]?.[ENV_SCRIPTS] && prepareXhrBlob(info, bag);
 }
 
 /**
  * @param {chrome.webRequest.WebResponseHeadersDetails} info
  * @param {VMInjection.Bag} bag
  */
-function prepareXhrBlob({ url, [kResponseHeaders]: responseHeaders }, bag) {
+function prepareXhrBlob({ url, [kResponseHeaders]: responseHeaders, tabId, frameId }, bag) {
   if (IS_FIREFOX && url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
     bag[INJECT_CONTENT_FORCE] = true;
   }
+  triageRealms(bag[INJECT][ENV_SCRIPTS], bag[INJECT_CONTENT_FORCE], tabId, frameId, bag);
   const blobUrl = URL.createObjectURL(new Blob([
     JSON.stringify(bag[INJECT]),
   ]));
@@ -277,6 +276,7 @@ async function prepare(cacheKey, url, isTop) {
     [ENV_SCRIPTS]: prepareScripts(env),
     [INJECT_INTO]: injectInto,
     [INJECT_MORE]: moreKey,
+    [kSessionId]: sessionId,
     clipFF: env.clipFF,
     ids: allIds,
     info: { ua },
@@ -400,7 +400,7 @@ function prepareScript(script, env) {
   };
 }
 
-function triageRealms(scripts, forceContent, bag) {
+function triageRealms(scripts, forceContent, tabId, frameId, bag) {
   let code;
   let wantsPage;
   const envDelayed = bag?.[INJECT_MORE];
@@ -425,7 +425,11 @@ function triageRealms(scripts, forceContent, bag) {
     bag[INJECT][INJECT_PAGE] = wantsPage
       || envDelayed?.[ENV_SCRIPTS].some(isPageRealmScript, forceContent || null);
   }
-  return toContent;
+  if (toContent[0]) {
+    // Processing known feedback without waiting for InjectionFeedback message.
+    // Running in a separate task as executeScript may take a long time to serialize code.
+    setTimeout(injectContentRealm, 0, toContent, tabId, frameId);
+  }
 }
 
 function injectContentRealm(toContent, tabId, frameId) {

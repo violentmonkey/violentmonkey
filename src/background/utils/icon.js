@@ -26,7 +26,6 @@ const iconCache = {};
 // Firefox Android does not support such APIs, use noop
 
 const browserAction = (() => {
-  const { chrome } = global;
   // Using `chrome` namespace in order to skip our browser.js polyfill in Chrome
   const api = chrome.browserAction;
   // Suppress the "no tab id" error when setting an icon/badge as it cannot be reliably prevented

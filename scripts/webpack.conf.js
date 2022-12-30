@@ -4,14 +4,14 @@ const webpack = require('webpack');
 const TerserPlugin = isProd && require('terser-webpack-plugin');
 const deepmerge = isProd && require('deepmerge');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
-const { addWrapperWithGlobals, getCodeMirrorThemes, getUniqIdB64 } = require('./webpack-util');
+const { addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
 const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
 const projectConfig = require('./plaid.conf');
 const { getVersion } = require('./version-helper');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
 // Avoiding collisions with globals of a content-mode userscript
-const INIT_FUNC_NAME = `Violentmonkey:${getUniqIdB64()}`;
+const INIT_FUNC_NAME = '**VMInitInjection**';
 const VAULT_ID = 'VAULT_ID';
 const PAGE_MODE_HANDSHAKE = 'PAGE_MODE_HANDSHAKE';
 const VM_VER = getVersion();

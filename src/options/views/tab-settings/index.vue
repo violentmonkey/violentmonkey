@@ -241,7 +241,7 @@ export default {
   },
   computed: {
     editorWindowHint() {
-      return global.chrome.windows?.onBoundsChanged ? null : this.i18n('optionEditorWindowHint');
+      return chrome.windows?.onBoundsChanged ? null : this.i18n('optionEditorWindowHint');
     },
     isCustomBadgeColor() {
       return badgeColorNames.some(name => settings[name] !== optionsDefaults[name]);

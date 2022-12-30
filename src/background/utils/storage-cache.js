@@ -31,8 +31,8 @@ const flushLater = debounce(flush, 200);
 const { hook, fire } = initHooks();
 
 /**
- * Not using browser.storage.onChanged to improve performance, as it sends data across processes,
- * so if someone wants to edit the db in devtools they need to restart the background page.
+ * Not using browser.storage.onChanged to improve performance, as it sends data across processes.
+ * WARNING: when editing the db directly in devtools, restart the background page via Ctrl-R.
 */
 export const onStorageChanged = hook;
 export const clearStorageCache = () => {

@@ -12,6 +12,7 @@ const {
   Error,
   Object,
   Promise,
+  chrome,
   performance,
 } = global;
 export const SafePromise = Promise; // alias used by browser.js
@@ -19,10 +20,11 @@ export const SafeError = Error; // alias used by browser.js
 export const { apply: safeApply } = Reflect;
 export const hasOwnProperty = safeApply.call.bind(({}).hasOwnProperty);
 export const safeCall = Object.call.bind(Object.call);
-export const IS_FIREFOX = !global.chrome.app;
+export const IS_FIREFOX = !chrome.app;
 export const ROUTE_SCRIPTS = `#scripts`;
-export const extensionRoot = global.chrome.runtime.getURL('/');
+export const extensionRoot = chrome.runtime.getURL('/');
 export const extensionOrigin = extensionRoot.slice(0, -1);
-export const extensionManifest = global.chrome.runtime.getManifest();
-export const extensionOptionsPage = extensionRoot + extensionManifest.options_page;
-export const ICON_PREFIX = `${extensionRoot}public/images/icon`;
+export const extensionManifest = chrome.runtime.getManifest();
+// Using getURL because in Firefox manifest contains resolved (full) URLs
+export const extensionOptionsPage = chrome.runtime.getURL(extensionManifest.options_page);
+export const ICON_PREFIX = chrome.runtime.getURL(extensionManifest.icons[16].split('16')[0]);
