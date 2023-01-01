@@ -209,6 +209,10 @@ export function getScriptById(id) {
   return store.scriptMap[id];
 }
 
+export function getScriptsByIdsOrAll(ids) {
+  return ids?.map(getScriptById) ?? [...store.scripts, ...store.removedScripts];
+}
+
 /** @return {?VMScript} */
 export function getScript({ id, uri, meta, removed }) {
   let script;
@@ -223,7 +227,7 @@ export function getScript({ id, uri, meta, removed }) {
 
 /** @return {VMScript[]} */
 export function getScripts() {
-  return store.scripts;
+  return [...store.scripts];
 }
 
 export const ENV_CACHE_KEYS = 'cacheKeys';
@@ -380,7 +384,7 @@ function reportBadScripts(ids) {
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
 export async function getData({ ids, sizes }) {
-  const scripts = ids?.map(getScriptById) ?? [...store.scripts, ...store.removedScripts];
+  const scripts = getScriptsByIdsOrAll(ids);
   scripts.forEach(inferScriptProps);
   return {
     scripts,
@@ -415,7 +419,7 @@ async function getIconCache(scripts) {
  * @return {number[][]}
  */
 export function getSizes(ids) {
-  const scripts = ids ? ids.map(getScriptById) : [...store.scripts, ...store.removedScripts];
+  const scripts = getScriptsByIdsOrAll(ids);
   return scripts.map(({
     meta,
     custom: { pathMap = {} },
@@ -730,7 +734,7 @@ export async function vacuum(data) {
     }
   });
   store.sizes = sizes;
-  [...store.scripts, ...store.removedScripts].forEach((script) => {
+  getScriptsByIdsOrAll().forEach((script) => {
     const { meta, props } = script;
     const { icon } = meta;
     const { id } = props;
