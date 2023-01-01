@@ -16,9 +16,11 @@
         <img :src="script.safeIcon">
       </a>
     </div>
+    <div class="script-name flex ml-1c">
+      <span class="script-order" v-text="script.props.position" v-if="!script.config.removed" />
+      <component class="ellipsis" :is="nameProps.is" v-bind="nameProps">{{script.$cache.name}}</component>
+    </div>
     <div class="script-info flex ml-1c">
-      <span class="script-order" v-text="script.props.position"/>
-      <component :is="nameProps.is" class="script-name ellipsis flex-auto" v-bind="nameProps">{{script.$cache.name}}</component>
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
                  class="script-author ml-1c hidden-sm"
@@ -40,27 +42,16 @@
         <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">
           {{ updatedAt.show }}
         </tooltip>
-        <div v-if="script.config.removed">
-          <tooltip :content="i18n('buttonRestore')" placement="left">
-            <a
-              class="btn-ghost"
-              @click="onRestore"
-              :data-hotkey="hotkeys.restore"
-              :tabIndex="tabIndex">
-              <icon name="undo"></icon>
-            </a>
-          </tooltip>
-        </div>
       </template>
     </div>
-    <div class="script-buttons flex">
+    <div class="script-buttons script-buttons-left">
       <template v-if="canRender">
-        <div class="flex-auto flex flex-wrap">
-          <tooltip :content="i18n('buttonEdit')" align="start">
-            <a class="btn-ghost" :href="url" :data-hotkey="hotkeys.edit" :tabIndex="tabIndex">
-              <icon name="code"></icon>
-            </a>
-          </tooltip>
+        <tooltip :content="i18n('buttonEdit')" align="start">
+          <a class="btn-ghost" :href="url" :data-hotkey="hotkeys.edit" :tabIndex="tabIndex">
+            <icon name="code"></icon>
+          </a>
+        </tooltip>
+        <template v-if="!script.config.removed">
           <tooltip :content="labelEnable" align="start">
             <a
               class="btn-ghost"
@@ -82,30 +73,43 @@
               <icon name="refresh"></icon>
             </a>
           </tooltip>
-          <span class="sep"></span>
-          <tooltip :disabled="!description" :content="description" align="start">
-            <a class="btn-ghost" :tabIndex="description ? tabIndex : -1" @click="toggleTip">
-              <icon name="info"></icon>
-            </a>
-          </tooltip>
-          <tooltip v-for="([title, url], icon) in urls" :key="icon"
-                   :disabled="!url" :content="title" align="start">
-            <a
-              class="btn-ghost"
-              target="_blank"
-              rel="noopener noreferrer"
-              :href="url"
-              :tabIndex="url ? tabIndex : -1">
-              <icon :name="icon"/>
-            </a>
-          </tooltip>
-          <!-- Using v-if to actually hide it because FF is slow to apply :not(:empty) CSS -->
-          <div class="script-message" v-if="script.message" v-text="script.message"
-               :title="script.error"/>
-        </div>
-        <tooltip :content="i18n('buttonRemove')" align="end">
-          <a class="btn-ghost" @click="onRemove" :data-hotkey="hotkeys.remove" :tabIndex="tabIndex">
+        </template>
+        <span class="sep"></span>
+        <tooltip :disabled="!description" :content="description" align="start">
+          <a class="btn-ghost" :tabIndex="description ? tabIndex : -1" @click="toggleTip">
+            <icon name="info"></icon>
+          </a>
+        </tooltip>
+        <tooltip v-for="([title, url], icon) in urls" :key="icon"
+                 :disabled="!url" :content="title" align="start">
+          <a
+            class="btn-ghost"
+            target="_blank"
+            rel="noopener noreferrer"
+            :href="url"
+            :tabIndex="url ? tabIndex : -1">
+            <icon :name="icon"/>
+          </a>
+        </tooltip>
+        <!-- Using v-if to actually hide it because FF is slow to apply :not(:empty) CSS -->
+        <div class="script-message" v-if="script.message" v-text="script.message"
+             :title="script.error"/>
+      </template>
+    </div>
+    <div class="script-buttons script-buttons-right">
+      <template v-if="canRender">
+        <tooltip :content="i18n('buttonRemove')" align="end" v-if="showRecycle || !script.config.removed">
+          <a class="btn-ghost" :class="{ 'btn-danger': script.config.removed }" @click="onRemove" :data-hotkey="hotkeys.remove" :tabIndex="tabIndex">
             <icon name="trash"></icon>
+          </a>
+        </tooltip>
+        <tooltip :content="i18n('buttonRestore')" placement="left" v-if="script.config.removed">
+          <a
+            class="btn-ghost"
+            @click="onRestore"
+            :data-hotkey="hotkeys.restore"
+            :tabIndex="tabIndex">
+            <icon name="undo"></icon>
           </a>
         </tooltip>
       </template>
@@ -121,6 +125,7 @@ import {
 } from '@/common';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
+import { store } from '../utils';
 
 const itemMargin = 8;
 
@@ -143,6 +148,9 @@ export default {
     };
   },
   computed: {
+    showRecycle() {
+      return store.route.paths[0] === 'recycleBin';
+    },
     canUpdate() {
       return getScriptUpdateUrl(this.script);
     },
@@ -186,7 +194,7 @@ export default {
       return this.focused ? 0 : -1;
     },
     url() {
-      return `${ROUTE_SCRIPTS}/${this.script.props.id}`;
+      return `${this.script.config.removed ? '#recycleBin' : ROUTE_SCRIPTS}/${this.script.props.id}`;
     },
     urls() {
       return {
@@ -281,6 +289,8 @@ $removedItemHeight: calc(
 
 .script {
   position: relative;
+  display: grid;
+  grid-template-columns: $iconSize 1fr auto;
   margin: $itemMargin 0 0 $itemMargin;
   padding: $itemPadT 10px $itemPadB;
   border: 1px solid var(--fill-3);
@@ -298,25 +308,24 @@ $removedItemHeight: calc(
   &:hover {
     border-color: var(--fill-5);
   }
-  .secondary {
-    color: var(--fill-8);
-    font-size: small;
-  }
   &.disabled,
   &.removed {
     background: var(--fill-1);
     color: var(--fill-6);
   }
-  &.disabled {
-    .secondary {
-      color: var(--fill-5);
-    }
-  }
   &.removed {
+    grid-template-columns: $iconSize auto 1fr auto auto;
+    align-items: center;
     height: $removedItemHeight;
     padding-bottom: $removedItemPadB;
-    .secondary {
-      display: none;
+  }
+  &:not(.removed) {
+    .script-buttons-left {
+      min-width: 165px;
+    }
+    .script-buttons-right {
+      min-width: 30px;
+      justify-self: end;
     }
   }
   &.focused {
@@ -337,17 +346,28 @@ $removedItemHeight: calc(
       color: #f00;
     }
   }
+  &-name {
+    min-width: 100px;
+    font-weight: 500;
+    font-size: $nameFontSize;
+    .removed & {
+      margin-right: 8px;
+    }
+    > a {
+      color: inherit;
+    }
+    .disabled & > a {
+      color: var(--fill-8);
+    }
+  }
   &-buttons {
+    display: flex;
+    align-items: center;
     line-height: 1;
+    white-space: nowrap;
     color: hsl(215, 13%, 28%);
     @media (prefers-color-scheme: dark) {
       color: hsl(215, 10%, 55%);
-    }
-    > .flex {
-      align-items: center;
-    }
-    .removed & {
-      display: none;
     }
     .disabled {
       color: var(--fill-2);
@@ -358,12 +378,24 @@ $removedItemHeight: calc(
     .icon {
       display: block;
     }
+    &-right {
+      margin-left: 8px;
+      text-align: right;
+      .removed & {
+        order: 2;
+      }
+    }
   }
   &-info {
-    line-height: $itemLineHeight;
     align-items: center;
+    line-height: $itemLineHeight;
+    margin-left: 8px;
+    .removed & {
+      order: 2;
+    }
   }
   &-icon {
+    grid-row-end: span 2;
     width: $iconSize;
     height: $iconSize;
     float: left;
@@ -387,22 +419,14 @@ $removedItemHeight: calc(
       }
     }
     .removed & {
+      grid-row-end: auto;
       width: $iconSizeSmaller;
       height: $iconSizeSmaller;
-    }
-  }
-  &-name {
-    font-weight: 500;
-    font-size: $nameFontSize;
-    color: inherit;
-    .disabled & {
-      color: var(--fill-8);
     }
   }
   &-author {
     display: flex;
     align-items: center;
-    max-width: 30%;
     > .ellipsis {
       display: inline-block;
       max-width: 100px;
@@ -467,7 +491,7 @@ $removedItemHeight: calc(
       }
     }
     .script {
-      display: flex;
+      grid-template-columns: auto auto $iconSize 1fr auto auto auto;
       align-items: center;
       height: 2.5rem;
       width: var(--w);
@@ -490,19 +514,21 @@ $removedItemHeight: calc(
       &-name {
         cursor: pointer;
         display: flex;
+        min-width: 100px;
         align-self: stretch;
         align-items: center;
+        > a {
+          flex: 1;
+        }
       }
       &-icon {
         width: 2rem;
         height: 2rem;
-        order: 1;
         margin-left: .5rem;
+        grid-row-end: auto;
       }
       &-info {
         order: 2;
-        flex: 1;
-        width: 0; // compresses super long author/version
         align-self: stretch;
         margin-left: .5rem;
         line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
@@ -523,14 +549,16 @@ $removedItemHeight: calc(
         }
       }
       &-buttons {
+        order: -1;
         margin: 0;
-        min-width: 14rem;
-        > .flex {
-          width: auto;
+        &-left {
           > :first-child { /* edit button */
             display: none;
           }
         }
+      }
+      &.removed .script-buttons .sep {
+        display: none;
       }
       &-author > .ellipsis {
         max-width: 15vw;

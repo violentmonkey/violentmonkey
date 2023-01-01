@@ -96,9 +96,9 @@ a {
   }
 }
 hr {
-  margin: .5rem;
-  border: none;
-  border-top: 1px solid var(--fill-7);
+  margin: .5rem 0;
+  border-style: solid;
+  border-width: 1px 0 0 0;
 }
 input[type=checkbox] {
   margin-right: .2em;
@@ -219,6 +219,9 @@ button,
     background: var(--fill-1);
     border-color: var(--fill-4);
   }
+}
+.btn-danger {
+  color: #f00;
 }
 
 span:focus,
@@ -344,6 +347,9 @@ li {
 }
 .scroll-y {
   overflow-y: auto;
+}
+.subtle {
+  color: var(--fill-7);
 }
 
 .frame {

@@ -22,6 +22,8 @@ export const store = {
   scripts: [],
   /** @type {Object<string,VMScript[]>} */
   scriptMap: {},
+  /** @type {VMScript[]} */
+  removedScripts: [],
   /** @type {{ [url:string]: number }} */
   sizes: {},
   /** Same order as in SIZE_TITLES and getSizes */
@@ -35,7 +37,7 @@ export const store = {
 addPublicCommands({
   GetScriptVer(opts) {
     const script = getScript(opts);
-    return script && !script.config.removed
+    return script
       ? script.meta.version
       : null;
   },
@@ -44,6 +46,7 @@ addPublicCommands({
 addOwnCommands({
   CheckPosition: sortScripts,
   CheckRemove: checkRemove,
+  RemoveScripts: removeScripts,
   /** @return {VMScript} */
   GetScript: getScript,
   /** @return {Promise<{ items: VMScript[], values? }>} */
@@ -61,11 +64,20 @@ addOwnCommands({
     return storage.code[Array.isArray(id) ? 'getMulti' : 'getOne'](id);
   },
   /** @return {Promise<void>} */
-  MarkRemoved({ id, removed }) {
-    return updateScriptInfo(id, {
+  async MarkRemoved({ id, removed }) {
+    if (!removed) {
+      const script = getScriptById(id);
+      const conflict = getScript({ meta: script.meta });
+      if (conflict) throw i18n('msgNamespaceConflictRestore');
+    }
+    await updateScriptInfo(id, {
       config: { removed: removed ? 1 : 0 },
       props: { lastModified: Date.now() },
     });
+    const list = store[removed ? 'scripts' : 'removedScripts'];
+    const i = list.findIndex(script => script.props.id === id);
+    const [script] = list.splice(i, 1);
+    store[removed ? 'removedScripts' : 'scripts'].push(script);
   },
   /** @return {Promise<number>} */
   Move({ id, offset }) {
@@ -74,19 +86,6 @@ addOwnCommands({
     store.scripts.splice(index, 1);
     store.scripts.splice(index + offset, 0, script);
     return normalizePosition();
-  },
-  /** @return {Promise<void>} */
-  async RemoveScript(id) {
-    const i = store.scripts.indexOf(getScriptById(id));
-    if (i >= 0) {
-      store.scripts.splice(i, 1);
-      await storage.base.remove([
-        storage.script.toKey(id),
-        storage.code.toKey(id),
-        storage.value.toKey(id),
-      ]);
-    }
-    return sendCmd('RemoveScript', id);
   },
   ParseMeta: parseMetaWithErrors,
   ParseScript: parseScript,
@@ -108,23 +107,26 @@ preInitialize.push(async () => {
   if (!lastVersion) await patchDB();
   if (version !== lastVersion) storage.base.set({ version });
   const data = await storage.base.getMulti();
-  const { scripts, storeInfo, scriptMap } = store;
+  const { scripts, removedScripts, storeInfo, scriptMap } = store;
   const uriMap = {};
   data::forEachEntry(([key, script]) => {
     const id = +storage.script.toId(key);
     if (id && script) {
-      if (scriptMap[id] && scriptMap[id] !== script) {
-        // ID conflicts!
-        // Should not happen, discard duplicates.
-        return;
-      }
       const uri = getNameURI(script);
-      if (uriMap[uri]) {
-        // Namespace conflicts!
-        // Should not happen, discard duplicates.
-        return;
+      // Only check ID/namespace conflicts for scripts not removed
+      if (!script.config.removed) {
+        if (scriptMap[id] && scriptMap[id] !== script) {
+          // ID conflicts!
+          // Should not happen, discard duplicates.
+          return;
+        }
+        if (uriMap[uri]) {
+          // Namespace conflicts!
+          // Should not happen, discard duplicates.
+          return;
+        }
+        uriMap[uri] = script;
       }
-      uriMap[uri] = script;
       script.props = {
         ...script.props,
         id,
@@ -136,7 +138,7 @@ preInitialize.push(async () => {
       };
       storeInfo.id = Math.max(storeInfo.id, id);
       storeInfo.position = Math.max(storeInfo.position, getInt(script.props.position));
-      scripts.push(script);
+      (script.config.removed ? removedScripts : scripts).push(script);
       // listing all known resource urls in order to remove unused mod keys
       const {
         meta = script.meta = {},
@@ -207,21 +209,25 @@ export function getScriptById(id) {
   return store.scriptMap[id];
 }
 
+export function getScriptsByIdsOrAll(ids) {
+  return ids?.map(getScriptById) ?? [...store.scripts, ...store.removedScripts];
+}
+
 /** @return {?VMScript} */
-export function getScript({ id, uri, meta }) {
+export function getScript({ id, uri, meta, removed }) {
   let script;
   if (id) {
     script = getScriptById(id);
   } else {
     if (!uri) uri = getNameURI({ meta, id: '@@should-have-name' });
-    script = store.scripts.find(({ props }) => uri === props.uri);
+    script = store[removed ? 'removedScripts' : 'scripts'].find(({ props }) => uri === props.uri);
   }
   return script;
 }
 
 /** @return {VMScript[]} */
 export function getScripts() {
-  return store.scripts.filter(script => !script.config.removed);
+  return [...store.scripts];
 }
 
 export const ENV_CACHE_KEYS = 'cacheKeys';
@@ -254,8 +260,7 @@ export function getScriptsByURL(url, isTop, errors) {
   const allScripts = testBlacklist(url)
     ? []
     : store.scripts.filter(script => (
-      !script.config.removed
-      && (isTop || !(script.custom.noframes ?? script.meta.noframes))
+      (isTop || !(script.custom.noframes ?? script.meta.noframes))
       && testScript(url, script)
     ));
   testerBatch();
@@ -379,7 +384,7 @@ function reportBadScripts(ids) {
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
 export async function getData({ ids, sizes }) {
-  const scripts = ids ? ids.map(getScriptById) : store.scripts;
+  const scripts = getScriptsByIdsOrAll(ids);
   scripts.forEach(inferScriptProps);
   return {
     scripts,
@@ -414,7 +419,7 @@ async function getIconCache(scripts) {
  * @return {number[][]}
  */
 export function getSizes(ids) {
-  const scripts = ids ? ids.map(getScriptById) : store.scripts;
+  const scripts = getScriptsByIdsOrAll(ids);
   return scripts.map(({
     meta,
     custom: { pathMap = {} },
@@ -439,25 +444,35 @@ function getSizeForResources(accum, url) {
   return accum;
 }
 
-/** @return {?Promise<void>} only if something was removed, otherwise undefined */
-export function checkRemove({ force } = {}) {
-  const now = Date.now();
+export async function removeScripts(ids) {
+  // Only those marked as removed can be removed permanently
   const toKeep = [];
   const toRemove = [];
-  store.scripts.forEach(script => {
-    const { id, lastModified } = script.props;
-    if (script.config.removed && (force || now - getInt(lastModified) > TIMEOUT_WEEK)) {
-      toRemove.push(storage.code.toKey(id),
-        storage.script.toKey(id),
-        storage.value.toKey(id));
-    } else {
-      toKeep.push(script);
-    }
+  store.removedScripts.forEach(script => {
+    const { id } = script.props;
+    (ids.includes(id) ? toRemove : toKeep).push(script);
   });
-  if (toRemove.length) {
-    store.scripts = toKeep;
-    return storage.base.remove(toRemove);
-  }
+  if (!toRemove.length) return;
+  ids = toRemove.map(script => script.props.id);
+  ids.forEach(id => {
+    delete store.scriptMap[id];
+  });
+  store.removedScripts = toKeep;
+  await storage.base.remove(ids.flatMap(id => [
+    storage.code.toKey(id),
+    storage.script.toKey(id),
+    storage.value.toKey(id),
+  ]));
+  return sendCmd('RemoveScripts', ids);
+}
+
+export function checkRemove({ force } = {}) {
+  const now = Date.now();
+  const ids = store.removedScripts.filter(script => {
+    const { lastModified } = script.props;
+    return script.config.removed && (force || now - getInt(lastModified) > TIMEOUT_WEEK);
+  }).map(script => script.props.id);
+  return removeScripts(ids);
 }
 
 /** @return {string} */
@@ -557,7 +572,7 @@ export async function parseScript(src) {
     },
   };
   let script;
-  const oldScript = await getScript({ id: src.id, meta });
+  const oldScript = getScript({ id: src.id, meta });
   if (oldScript) {
     if (src.isNew) throw i18n('msgNamespaceConflict');
     script = { ...oldScript };
@@ -719,7 +734,7 @@ export async function vacuum(data) {
     }
   });
   store.sizes = sizes;
-  store.scripts.forEach((script) => {
+  getScriptsByIdsOrAll().forEach((script) => {
     const { meta, props } = script;
     const { icon } = meta;
     const { id } = props;

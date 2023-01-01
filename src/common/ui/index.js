@@ -1,4 +1,4 @@
-import { createApp, h } from 'vue';
+import { createApp, h, nextTick } from 'vue';
 import Modal from 'vueleton/lib/modal';
 import { i18n } from '@/common/util';
 import Message from './message';
@@ -79,13 +79,42 @@ export function render(App, el) {
 /**
  * Focuses the first element with `focusme` attribute or root, which enables keyboard scrolling.
  * Not using `autofocus` to avoid warnings in console on page load.
- * A child component should use this.$nextTick to change focus, which runs later.
+ * A child component should use nextTick to change focus, which runs later.
  */
-export function focusMe() {
-  this.$nextTick(() => {
-    let el = this.$el;
+export function focusMe(el) {
+  nextTick(() => {
     el = el.querySelector('[focusme]') || el;
     el.tabIndex = -1;
     el.focus();
   });
 }
+
+function vFocusFactory() {
+  const handle = (el, value, oldValue) => {
+    if (value === oldValue) return;
+    if (value == null || value) {
+      el.tabIndex = -1;
+      el.focus();
+    }
+  };
+  return {
+    mounted(el, binding) {
+      handle(el, binding.value, {});
+    },
+    updated(el, binding) {
+      handle(el, binding.value, binding.oldValue);
+    },
+  };
+}
+/**
+ * Usage:
+ *
+ * ```html
+ * <!-- Focus on mounted -->
+ * <div v-focus>...</div>
+ *
+ * <!-- Focus whenever `value` becomes truthy -->
+ * <div v-focus="value">...</div>
+ * ```
+ */
+export const vFocus = vFocusFactory();

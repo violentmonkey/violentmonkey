@@ -1,13 +1,11 @@
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 import { route } from '@/common/router';
-import { isHiDPI } from '@/common/ui/favicon';
 
 export const store = reactive({
   route,
   scripts: [],
-  isHiDPI,
+  removedScripts: [],
+  /** Whether removed scripts need to be filtered from `store.scripts`. */
+  needRefresh: false,
   storageSize: 0,
 });
-
-export const installedScripts = computed(() => store.scripts.filter(script => !script.config.removed));
-export const removedScripts = computed(() => store.scripts.filter(script => script.config.removed));

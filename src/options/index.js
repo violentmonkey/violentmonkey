@@ -74,12 +74,18 @@ async function requestData(ids) {
     sendCmdDirectly('GetData', { ids, sizes: true }, { retry: true }),
     options.ready,
   ]);
-  const { scripts, sizes, ...auxData } = data;
+  const { scripts: allScripts, sizes, ...auxData } = data;
   Object.assign(store, auxData); // initScripts needs `cache` in store
-  scripts.forEach((script, i) => { // modifying scripts without triggering reactivity
+  const scripts = [];
+  const removedScripts = [];
+  // modifying scripts without triggering reactivity
+  allScripts.forEach((script, i) => {
     initScript(script, sizes[i]);
+    (script.config.removed ? removedScripts : scripts).push(script);
   });
-  store.scripts = scripts; // now we can render
+  // now we can render
+  store.scripts = scripts;
+  store.removedScripts = removedScripts;
   store.loading = false;
 }
 
@@ -96,21 +102,33 @@ function initMain() {
     async UpdateScript({ update, where } = {}) {
       if (!update) return;
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
-      const { scripts } = store;
-      const index = scripts.findIndex(item => item.props.id === where.id);
-      const updated = Object.assign({}, scripts[index], update);
-      if (updated.error && !update.error) updated.error = null;
-      initScript(updated, sizes);
-      if (index < 0) {
-        update.message = '';
-        scripts.push(updated);
-      } else {
-        scripts[index] = updated;
+      const i1 = store.scripts.findIndex(item => item.props.id === where.id);
+      const i2 = store.removedScripts.findIndex(item => item.props.id === where.id);
+      const script = Object.assign(store.scripts[i1] || store.removedScripts[i2] || {}, update);
+      if (script.error && !update.error) script.error = null;
+      initScript(script, sizes);
+      if (update.config?.removed != null) {
+        if (update.config.removed) {
+          // Note that we don't update store.scripts even if a script is removed,
+          // because we want to keep the removed script there to allow the user
+          // to undo an accidental removal.
+          // We will update store.scripts when the installed list is rerendered.
+          store.needRefresh = true;
+        } else {
+          // Restored from the recycle bin.
+          store.removedScripts = store.removedScripts.filter(script => script.props.id !== where.id);
+        }
+      }
+      // Update the new list
+      const i = script.config.removed ? i2 : i1;
+      if (i < 0) {
+        script.message = '';
+        const list = script.config.removed ? 'removedScripts' : 'scripts';
+        store[list] = [...store[list], script];
       }
     },
-    RemoveScript(id) {
-      const i = store.scripts.findIndex(script => script.props.id === id);
-      if (i >= 0) store.scripts.splice(i, 1);
+    RemoveScripts(ids) {
+      store.removedScripts = store.removedScripts.filter(script => !ids.includes(script.props.id));
     },
   });
 }

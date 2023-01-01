@@ -514,7 +514,7 @@ export default {
     },
   },
   mounted() {
-    this::focusMe();
+    focusMe(this.$el);
     keyboardService.enable();
     this.$el.style.maxHeight = Math.min(600, screen.availHeight - window.screenY - 8) + 'px';
     this.disposeList = [

@@ -9,10 +9,12 @@ aside {
   z-index: 1000;
 }
 .aside-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   width: 14rem;
   height: 100%;
-  padding: 4rem 1rem 0;
-  text-align: right;
+  padding: 4rem 1rem 1rem;
   border: solid var(--fill-5);
   border-width: 0 1px 0 0;
   @media (prefers-color-scheme: dark) {
@@ -23,19 +25,20 @@ aside {
     width: 5rem;
     height: 5rem;
   }
-}
-.aside-menu {
-  border-top: 1px solid var(--fill-4);
-  @media (prefers-color-scheme: dark) {
-    border-color: var(--fill-3);
+  hr {
+    width: 100%;
+    border-color: inherit;
   }
-  > a {
+}
+.aside-menu-item {
+  font-size: 1rem;
+  font-weight: 500;
+  a {
     display: block;
     padding-top: .6rem;
     padding-bottom: .6rem;
-    font-size: 1rem;
-    font-weight: 500;
     color: var(--fill-8);
+    white-space: nowrap;
     &.active,
     &:hover {
       color: var(--fg);
@@ -43,6 +46,12 @@ aside {
   }
   [data-num-scripts]::before {
     content: '(' attr(data-num-scripts) ') ';
+  }
+  &:nth-last-child(2) {
+    flex: 1;
+  }
+  &:last-child {
+    font-size: .8em;
   }
 }
 .text-red {
@@ -139,15 +148,20 @@ textarea:not([rows="1"]):not(.h100) {
     width: auto !important;
   }
   .aside-content {
-    display: flex;
+    flex-direction: row;
+    align-items: center;
     width: auto;
     height: $compactHeaderHeight;
     padding: 0;
     border-width: 0 0 1px 0;
+    overflow-x: auto;
     img {
       width: $compactHeaderHeight;
       height: $compactHeaderHeight;
       margin: 0 .5rem 0 1.25rem;
+    }
+    hr {
+      display: none;
     }
     h1 {
       align-self: center;
@@ -155,11 +169,11 @@ textarea:not([rows="1"]):not(.h100) {
       margin: 0;
     }
   }
-  .aside-menu {
+  .aside-menu-item {
     display: flex;
-    border: none;
+    padding: 0 8px;
+    text-align: center;
     a {
-      padding: 0 0 0 1.5rem;
       display: flex;
       flex-direction: column; /* stretch to full height... */
       justify-content: center; /* ...and center vertically */

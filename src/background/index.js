@@ -90,6 +90,7 @@ async function handleCommandMessage({ cmd, data } = {}, src) {
     // `undefined` is not transferable, but `null` is
     return res ?? null;
   } catch (err) {
+    console.error(err);
     // Adding `stack` info + in FF a rejected Promise value is transferred only for an Error object
     throw err instanceof SafeError ? err : new SafeError(err);
   }

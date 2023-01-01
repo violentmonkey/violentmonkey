@@ -3,7 +3,7 @@
     <h4 v-text="i18n('editLabelSettings')"></h4>
     <div class="form-group condensed">
       <label>
-        <input type="checkbox" v-model="config.shouldUpdate">
+        <input type="checkbox" v-model="config.shouldUpdate" :disabled="readOnly">
         <span v-text="i18n('labelAllowUpdate')"></span>
       </label>
       <span v-text="i18n('labelNotifyThisUpdated')"/>
@@ -12,7 +12,7 @@
         [i18n('genericOff'), '0'],
         [i18n('genericUseGlobal'), ''],
       ]"><!-- make sure to place the input and span on one line with a space between -->
-        <input type="radio" :value="value" v-model="config.notifyUpdates"> <span v-text="text"/>
+        <input type="radio" :value="value" v-model="config.notifyUpdates" :disabled="readOnly"> <span v-text="text"/>
       </label>
     </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
@@ -26,7 +26,7 @@
           <p v-text="i18n('labelRunAt')"/>
         </td>
         <td>
-          <select v-model="custom.runAt">
+          <select v-model="custom.runAt" :disabled="readOnly">
             <option value="" v-text="i18n('labelRunAtDefault')"></option>
             <option value="document-start">document-start</option>
             <option value="document-body">document-body</option>
@@ -43,7 +43,7 @@
           <p v-text="i18n('labelNoFrames')"/>
         </td>
         <td>
-          <select v-model="custom.noframes">
+          <select v-model="custom.noframes" :disabled="readOnly">
             <option value="" v-text="i18n('labelRunAtDefault')"/>
             <option value="0" v-text="i18n('genericOn')"/>
             <option value="1" v-text="i18n('genericOff')"/>
@@ -58,7 +58,7 @@
           <p v-text="label"/>
         </td>
         <td>
-          <input type="text" v-model="custom[name]" :placeholder="placeholders[name]">
+          <input type="text" v-model="custom[name]" :placeholder="placeholders[name]" :disabled="readOnly">
         </td>
       </tr>
     </table>
@@ -71,12 +71,12 @@
             <span v-text="labelB"/>
           </p>
           <label>
-            <input type="checkbox" v-model="custom[orig]">
+            <input type="checkbox" v-model="custom[orig]" :disabled="readOnly">
             <span v-text="i18n('labelKeepOriginal')"/>
           </label>
         </td>
         <td>
-          <textarea v-model="custom[name]" spellcheck="false" :rows="calcRows(custom[name])"/>
+          <textarea v-model="custom[name]" spellcheck="false" :rows="calcRows(custom[name])" :disabled="readOnly" />
         </td>
       </tr>
     </table>
@@ -90,7 +90,7 @@ import { objectGet } from '@/common/object';
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
 
 export default {
-  props: ['active', 'settings', 'value'],
+  props: ['active', 'settings', 'value', 'readOnly'],
   computed: {
     custom() {
       return this.settings.custom || {};

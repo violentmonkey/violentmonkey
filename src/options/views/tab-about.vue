@@ -36,7 +36,9 @@ export default {
       language: browser.i18n.getUILanguage(),
     };
   },
-  activated: focusMe,
+  activated() {
+    focusMe(this.$el);
+  },
 };
 </script>
 

@@ -25,7 +25,7 @@
         class="abs-full"
         :value="data.code"
         ref="code"
-        readonly
+        readOnly
         :cm-options="cmOptions"
         :mode="data.mode"
         :commands="commands"
