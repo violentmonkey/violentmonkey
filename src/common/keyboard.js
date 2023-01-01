@@ -49,12 +49,6 @@ function bindKeys() {
   }, {
     condition: '!inputFocus',
   });
-  keyboardService.register('?', () => {
-    toggleTip(document.activeElement);
-  }, {
-    condition: '!inputFocus',
-    caseSensitive: true,
-  });
 }
 
 /**

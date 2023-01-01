@@ -124,7 +124,6 @@
           @toggle="handleActionToggle"
           @update="handleActionUpdate"
           @scrollDelta="handleSmoothScroll"
-          @tiptoggle="state.showHotkeys = !state.showHotkeys"
         />
       </div>
     </div>
@@ -208,9 +207,10 @@ const conditionSearch = `${conditionAll} && inputFocus`;
 const conditionNotSearch = `${conditionAll} && !inputFocus`;
 const conditionScriptFocused = `${conditionNotSearch} && selectedScript && !showRecycle`;
 const conditionScriptFocusedRecycle = `${conditionNotSearch} && selectedScript && showRecycle`;
+const conditionScriptFocusedWithoutButton = `${conditionNotSearch} && !buttonFocus`;
 const conditionHotkeys = `${conditionNotSearch} && selectedScript && showHotkeys`;
 const scriptHotkeys = {
-  edit: 'e,Enter',
+  edit: 'e',
   toggle: 'space',
   update: 'r',
   restore: 'r',
@@ -219,11 +219,6 @@ const scriptHotkeys = {
 const registerHotkey = (callback, items) => items.map(([key, condition, caseSensitive]) => (
   keyboardService.register(key, callback, { condition, caseSensitive })
 ));
-const explodeKeys = (multi, ...args) => (
-  multi
-  .split(/\s*,\s*/)
-  .map(key => [key, ...args])
-);
 
 const MAX_BATCH_DURATION = 100;
 let step = 0;
@@ -501,7 +496,12 @@ function handleSmoothScroll(delta) {
   });
 }
 function bindKeys() {
+  const handleFocus = () => {
+    keyboardService.setContext('buttonFocus', document.activeElement?.tabIndex >= 0);
+  };
+  document.addEventListener('focus', handleFocus, true);
   const disposeList = [
+    () => document.removeEventListener('focus', handleFocus, true),
     ...IS_FIREFOX ? [
       keyboardService.register('tab', () => {
         handleTabNavigation(1);
@@ -577,7 +577,11 @@ function bindKeys() {
       ]),
     ...registerHotkey(() => {
       handleEditScript(selectedScript.value.props.id);
-    }, explodeKeys(scriptHotkeys.edit, conditionScriptFocused, true)),
+    }, [
+        [scriptHotkeys.edit, conditionScriptFocused, true],
+        // Enter should only work when no button is focused
+        ['enter', conditionScriptFocusedWithoutButton],
+      ]),
     ...registerHotkey(() => {
       handleActionRemove(selectedScript.value);
     }, [
@@ -598,6 +602,11 @@ function bindKeys() {
       handleActionRestore(selectedScript.value);
     }, [
         [scriptHotkeys.restore, conditionScriptFocusedRecycle, true],
+      ]),
+    ...registerHotkey(() => {
+      state.showHotkeys = !state.showHotkeys;
+    }, [
+        ['?', conditionNotSearch, true],
       ]),
   ];
 
