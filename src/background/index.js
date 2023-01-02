@@ -8,13 +8,13 @@ import { addOwnCommands, addPublicCommands, commands } from './utils';
 import { getData, getSizes, checkRemove } from './utils/db';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
+import { getTabUrl } from './utils/tabs';
 import './utils/clipboard';
 import './utils/hotkeys';
 import './utils/icon';
 import './utils/notifications';
 import './utils/preinject';
 import './utils/script';
-import './utils/tabs';
 import './utils/tab-redirector';
 import './utils/tester';
 import './utils/update';
@@ -36,7 +36,7 @@ addOwnCommands({
   /** @return {Promise<Object>} */
   async GetTabDomain() {
     const tab = await getActiveTab() || {};
-    const url = tab.pendingUrl || tab.url || '';
+    const url = getTabUrl(tab);
     const host = url.match(/^https?:\/\/([^/]+)|$/)[1];
     return {
       tab,

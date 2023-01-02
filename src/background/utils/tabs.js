@@ -6,6 +6,23 @@ import { getOption } from './options';
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
   || !!(window.AbortSignal && browser.windows); // and FF57+ except mobile
+const NEWTAB_URL_RE = re`/
+^(
+  about:newtab # Firefox
+  | (chrome|edge):\/\/(
+    newtab # Chrome, Edge
+    | startpageshared # Opera
+    | vivaldi-webui\/startpage # Vivaldi
+  )\/
+)$
+/x`;
+/**
+ * @param {chrome.tabs.Tab} tab
+ * @returns {string}
+ */
+export const getTabUrl = tab => (
+  tab.pendingUrl || tab.url || ''
+);
 
 addOwnCommands({
   /**
@@ -18,7 +35,7 @@ addOwnCommands({
     if (pathId == null) {
       const { tab, domain } = await commands.GetTabDomain();
       const id = domain && commands.CacheNewScript({
-        url: (tab.pendingUrl || tab.url).split(/[#?]/)[0],
+        url: getTabUrl(tab).split(/[#?]/)[0],
         name: `${getOption('scriptTemplateEdited') ? '' : '- '}${domain}`,
       });
       pathId = `_new${id ? `/${id}` : ''}`;
@@ -55,6 +72,13 @@ addPublicCommands({
     const isInternal = !srcUrl || srcUrl.startsWith(extensionRoot);
     // only incognito storeId may be specified when opening in an incognito window
     const { incognito, windowId } = srcTab;
+    const canOpenIncognito = !incognito || IS_FIREFOX || !/^(chrome[-\w]*):/.test(url);
+    const tabOpts = {
+      // normalizing as boolean because the API requires strict types
+      active: !!active,
+      pinned: !!pinned,
+    };
+    let newTab;
     // Chrome can't open chrome-xxx: URLs in incognito windows
     let storeId = srcTab.cookieStoreId;
     if (storeId && !incognito) {
@@ -67,8 +91,6 @@ addPublicCommands({
         ? browser.runtime.getURL(url)
         : getFullUrl(url, srcUrl);
     }
-    const canOpenIncognito = !incognito || IS_FIREFOX || !/^(chrome[-\w]*):/.test(url);
-    let newTab;
     if (maybeInWindow
         && browser.windows
         && getOption('editorWindow')
@@ -87,13 +109,14 @@ addPublicCommands({
       const wnd = await browser.windows.create({ ...wndOpts, ...pos }).catch(hasPos && noop)
         || hasPos && await browser.windows.create(wndOpts);
       newTab = wnd.tabs[0];
+    } else if (isInternal && canOpenIncognito && NEWTAB_URL_RE.test(getTabUrl(srcTab))) {
+      // Replacing the currently focused start tab page for internal commands
+      newTab = await browser.tabs.update(srcTab.id, { url, ...tabOpts }).catch(noop);
     }
     if (!newTab) {
       newTab = await browser.tabs.create({
         url,
-        // normalizing as boolean because the API requires strict types
-        active: !!active,
-        pinned: !!pinned,
+        ...tabOpts,
         ...storeId,
         ...canOpenIncognito && {
           windowId,
@@ -102,12 +125,13 @@ addPublicCommands({
         },
       });
     }
-    const { id } = newTab;
     if (active && newTab.windowId !== windowId) {
       await browser.windows.update(newTab.windowId, { focused: true });
     }
-    openers[id] = srcTab.id;
-    return isInternal ? newTab : { id };
+    if (!isInternal) {
+      openers[newTab.id] = srcTab.id;
+    }
+    return isInternal ? newTab : { id: newTab.id };
   },
   /** @return {void} */
   TabClose({ id } = {}, src) {

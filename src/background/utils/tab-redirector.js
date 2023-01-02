@@ -3,6 +3,7 @@ import ua from '@/common/ua';
 import cache from './cache';
 import { addPublicCommands, commands } from './message';
 import { parseMeta, isUserScript } from './script';
+import { getTabUrl } from './tabs';
 
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 
@@ -10,7 +11,7 @@ addPublicCommands({
   async CheckInstallerTab(tabId, src) {
     const tab = IS_FIREFOX && (src.url || '').startsWith('file:')
       && await browser.tabs.get(tabId).catch(noop);
-    return tab && (tab.pendingUrl || tab.url || '').startsWith(CONFIRM_URL_BASE);
+    return tab && getTabUrl(tab).startsWith(CONFIRM_URL_BASE);
   },
   async ConfirmInstall({ code, from, url }, { tab = {} }) {
     if (!code) code = (await request(url)).data;
@@ -87,7 +88,7 @@ browser.tabs.onCreated.addListener((tab) => {
   /* Determining if this tab can be auto-closed (replaced, actually).
      FF>=68 allows reading file: URL only in the tab's content script so the tab must stay open. */
   if ((!url.startsWith('file:') || ua.firefox < 68)
-      && /\.user\.js([?#]|$)/.test(tab.pendingUrl || url)) {
+      && /\.user\.js([?#]|$)/.test(getTabUrl(tab))) {
     cache.put(`autoclose:${id}`, true, 10e3);
   }
   if (virtualUrlRe && url === 'about:blank') {

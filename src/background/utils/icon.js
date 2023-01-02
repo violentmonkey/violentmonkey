@@ -4,6 +4,7 @@ import { objectPick } from '@/common/object';
 import { postInitialize } from './init';
 import { addOwnCommands, addPublicCommands, forEachTab } from './message';
 import { getOption, hookOptions } from './options';
+import { getTabUrl } from './tabs';
 import { testBlacklist } from './tester';
 import storage from './storage';
 
@@ -154,7 +155,7 @@ function updateBadgeColor(tab, data = badges[tab.id]) {
 
 // Chrome 79+ uses pendingUrl while the tab connects to the newly navigated URL
 // https://groups.google.com/a/chromium.org/forum/#!topic/chromium-extensions/5zu_PT0arls
-function updateState(tab, url = tab.pendingUrl || tab.url) {
+function updateState(tab, url = getTabUrl(tab)) {
   const tabId = tab.id;
   const injectable = INJECTABLE_TAB_URL_RE.test(url);
   const blacklisted = injectable ? testBlacklist(url) : undefined;
