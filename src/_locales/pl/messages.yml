@@ -681,7 +681,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Skrypt o tym samym @name i @namespace jest już zainstalowany.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no

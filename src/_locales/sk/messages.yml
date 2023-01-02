@@ -664,16 +664,14 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: >-
-    Takýto skript je už nainštalovaný alebo je stále v koši.
-
-    Prosím, buď použite iný @name a @namespace tu, alebo namiesto toho upravte
-    tento skript.
+  message: |-
+    Takýto skript je už nainštalovaný.
+    Buď použite iné @name a @namespace alebo namiesto toho upravte tento skript.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Skript s rovnakým @name a @namespace je už nainštalovaný.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
