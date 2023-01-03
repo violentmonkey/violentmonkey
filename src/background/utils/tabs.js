@@ -10,10 +10,10 @@ const NEWTAB_URL_RE = re`/
 ^(
   about:newtab # Firefox
   | (chrome|edge):\/\/(
-    newtab # Chrome, Edge
-    | startpageshared # Opera
+    newtab\/ # Chrome, Edge
+    | startpageshared\/ # Opera
     | vivaldi-webui\/startpage # Vivaldi
-  )\/
+  )
 )$
 /x`;
 /**
