@@ -5,7 +5,9 @@ let { browser } = global;
 // https://github.com/mozilla/webextension-polyfill/pull/153
 // https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
 if (!IS_FIREFOX && !browser?.runtime) {
-  const { Proxy: SafeProxy } = global;
+  /* WARNING! `chrome` must be extracted here, otherwise it triggers a bug in Chrome:
+   * sendMessage receives [null, null] response instead of the data that was sent back. */
+  const { chrome, Proxy: SafeProxy } = global;
   const { bind } = SafeProxy;
   const MESSAGE = 'message';
   const STACK = 'stack';
@@ -101,8 +103,10 @@ if (!IS_FIREFOX && !browser?.runtime) {
         ? [err[MESSAGE], err[STACK]]
         : [err, new SafeError()[STACK]];
     }
-    // `undefined` in arrays is received as `null` in Chrome, but we always use `== null` so it's ok
-    sendResponse([result, error]);
+    sendResponse([
+      result ?? null,
+      error ?? null,
+    ]);
   };
   const onMessageListener = (listener, message, sender, sendResponse) => {
     if (process.env.DEBUG) console.info('receive', message);
