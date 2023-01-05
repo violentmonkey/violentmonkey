@@ -191,6 +191,7 @@ function getOwnIcon(path) {
   return icon;
 }
 
+/** @throws in Firefox when Canvas is disabled by something in about:config */
 function loadImageData(path) {
   return new Promise((resolve, reject) => {
     const img = new Image();

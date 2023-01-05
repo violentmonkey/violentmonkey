@@ -1,7 +1,7 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri, makeDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
-  getScriptPrettyUrl, makePause, isHttpOrHttps,
+  getScriptPrettyUrl, makePause, isHttpOrHttps, noop,
 } from '@/common';
 import { INFERRED, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
@@ -408,9 +408,9 @@ async function getIconCache(scripts) {
   const ownPath = `${ICON_PREFIX}38.png`;
   const [res, ownUri] = await Promise.all([
     storage.cache.getMulti(urls, makeDataUri),
-    commands.GetImageData(ownPath),
+    commands.GetImageData(ownPath).catch(noop),
   ]);
-  res[ownPath] = ownUri;
+  if (ownUri) res[ownPath] = ownUri;
   return res;
 }
 

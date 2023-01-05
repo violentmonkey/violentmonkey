@@ -1,4 +1,4 @@
-import { isDataUri, isHttpOrHttps, sendCmdDirectly } from '@/common/index';
+import { isDataUri, isHttpOrHttps, noop, sendCmdDirectly } from '@/common/index';
 
 // TODO: convert this into a component tag e.g. <safe-icon>
 const KEY = 'safeIcon';
@@ -25,7 +25,8 @@ export async function loadScriptIcon(script, store, showDefault) {
       script[KEY] = cache[url]
         || isDataUri(url) && url
         || isHiDPI && def // Using our big icon directly as its data URI is rendered slower
-        || (def || isHttpOrHttps(url)) && (cache[url] = await sendCmdDirectly('GetImageData', url))
+        || (def || isHttpOrHttps(url))
+          && (cache[url] = await sendCmdDirectly('GetImageData', url).catch(noop))
         || null;
     }
   }
