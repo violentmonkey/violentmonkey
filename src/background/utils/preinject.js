@@ -287,6 +287,7 @@ async function prepare(cacheKey, url, isTop) {
   });
   bag[INJECT_MORE] = envDelayed;
   if (contentScriptsAPI && !xhrInject && isTop) {
+    inject[INJECT_PAGE] = env[INJECT_PAGE] || triagePageRealm(envDelayed);
     bag[CSAPI_REG] = registerScriptDataFF(inject, url);
   }
   if (moreKey) {
@@ -307,6 +308,9 @@ function prepareScripts(env) {
       key = S_SCRIPT_PRE + id;
       script = cache.get(key) || cache.put(key, prepareScript(script, env));
       scripts[i] = script;
+    }
+    if (script[INJECT_INTO] === INJECT_PAGE) {
+      env[INJECT_PAGE] = true; // for registerScriptDataFF
     }
     script[INJECT_VAL] = env[S_VALUE][id] || null;
   }
@@ -403,7 +407,6 @@ function prepareScript(script, env) {
 function triageRealms(scripts, forceContent, tabId, frameId, bag) {
   let code;
   let wantsPage;
-  const envDelayed = bag?.[INJECT_MORE];
   const toContent = [];
   for (const scr of scripts) {
     const metaStr = scr[META_STR];
@@ -422,14 +425,17 @@ function triageRealms(scripts, forceContent, tabId, frameId, bag) {
     scr.code = code;
   }
   if (bag) {
-    bag[INJECT][INJECT_PAGE] = wantsPage
-      || envDelayed?.[ENV_SCRIPTS].some(isPageRealmScript, forceContent || null);
+    bag[INJECT][INJECT_PAGE] = wantsPage || triagePageRealm(bag[INJECT_MORE]);
   }
   if (toContent[0]) {
     // Processing known feedback without waiting for InjectionFeedback message.
     // Running in a separate task as executeScript may take a long time to serialize code.
     setTimeout(injectContentRealm, 0, toContent, tabId, frameId);
   }
+}
+
+function triagePageRealm(env, forceContent) {
+  return env?.[ENV_SCRIPTS].some(isPageRealmScript, forceContent || null);
 }
 
 function injectContentRealm(toContent, tabId, frameId) {
