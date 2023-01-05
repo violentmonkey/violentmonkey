@@ -366,18 +366,15 @@ export default {
       this.checkReload();
     },
     onManage() {
-      sendCmdDirectly('OpenEditor', '');
-      window.close();
+      sendCmdDirectly('OpenEditor', '').then(close);
     },
     onOpenUrl(e) {
       const el = e.target.closest('a[href][target=_blank]');
       if (!el) return;
-      sendCmdDirectly('TabOpen', { url: el.href });
-      window.close();
+      sendCmdDirectly('TabOpen', { url: el.href }).then(close);
     },
     onEditScript(item) {
-      sendCmdDirectly('OpenEditor', item.data.props.id);
-      window.close();
+      sendCmdDirectly('OpenEditor', item.data.props.id).then(close);
     },
     onCommand(evt) {
       const { type, currentTarget: el } = evt;
@@ -389,8 +386,7 @@ export default {
           ...el.CMD,
           evt: objectPick(evt, ['type', 'button', 'shiftKey', 'altKey', 'ctrlKey', 'metaKey',
             'key', 'keyCode', 'code']),
-        });
-        window.close();
+        }).then(close);
       }
     },
     onToggleScript(item) {
@@ -415,8 +411,7 @@ export default {
       }
     },
     async onCreateScript() {
-      sendCmdDirectly('OpenEditor');
-      window.close();
+      sendCmdDirectly('OpenEditor').then(close);
     },
     async onInjectionFailureFix() {
       // TODO: promisify options.set, resolve on storage write, await it instead of makePause
