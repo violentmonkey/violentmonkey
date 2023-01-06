@@ -118,29 +118,5 @@ initialize(() => {
   sync.initialize();
   checkRemove();
   setInterval(checkRemove, TIMEOUT_24HOURS);
-  const api = chrome.declarativeContent;
-  if (api) {
-    // Using declarativeContent to run content scripts earlier than document_start
-    api.onPageChanged.getRules(/* for old Chrome */ null, async ([rule]) => {
-      const id = rule?.id;
-      const newId = process.env.INIT_FUNC_NAME;
-      if (id) {
-        await browser.declarativeContent.onPageChanged.removeRules([id]);
-      }
-      api.onPageChanged.addRules([{
-        id: newId,
-        conditions: [
-          new api.PageStateMatcher({
-            pageUrl: { urlContains: '://' }, // essentially like <all_urls>
-          }),
-        ],
-        actions: [
-          new api.RequestContentScript({
-            js: extensionManifest.content_scripts[0].js,
-            // Not using `allFrames:true` as there's no improvement in frames
-          }),
-        ],
-      }]);
-    });
-  }
+  chrome.declarativeContent?.onPageChanged.removeRules(); // TODO: remove by the end of 2023
 });
