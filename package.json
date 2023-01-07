@@ -1,7 +1,7 @@
 {
   "name": "violentmonkey",
   "description": "Violentmonkey",
-  "version": "2.13.6",
+  "version": "2.13.7",
   "scripts": {
     "prepare": "husky install",
     "dev": "gulp dev",
