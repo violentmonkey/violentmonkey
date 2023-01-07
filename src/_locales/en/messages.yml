@@ -745,6 +745,9 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Group disabled scripts
+optionPopupGroupRunAt:
+  description: Option to group scripts in popup shown only when sorting by execution order.
+  message: Group by @run-at stage
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Hide disabled scripts

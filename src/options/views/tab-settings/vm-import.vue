@@ -22,6 +22,7 @@
 import { reactive } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import { ensureArray, i18n, sendCmdDirectly } from '@/common';
+import { RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
 import loadZipLibrary from '@/common/zip';
@@ -158,7 +159,7 @@ async function importBackup(file) {
       custom: {
         downloadURL: typeof meta.file_url === 'string' ? meta.file_url : undefined,
         noframes: ovr.noframes == null ? undefined : +!!ovr.noframes,
-        runAt: /^document-(start|body|end|idle)$/.test(opts.run_at) ? opts.run_at : undefined,
+        runAt: RUN_AT_RE.test(opts.run_at) ? opts.run_at : undefined,
         exclude: toStringArray(ovr.use_excludes),
         include: toStringArray(ovr.use_includes),
         match: toStringArray(ovr.use_matches),

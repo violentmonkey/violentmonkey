@@ -47,6 +47,7 @@ export default {
     /** @type {'exec' | 'alpha'} */
     sort: 'exec',
     enabledFirst: false,
+    groupRunAt: true,
     /** @type {'' | 'hide' | 'group'} where '' = show */
     hideDisabled: '',
   },

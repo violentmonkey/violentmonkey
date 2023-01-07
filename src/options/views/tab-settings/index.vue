@@ -25,6 +25,8 @@
             </select>
           </locale-group>
         </label>
+        <setting-check name="filtersPopup.groupRunAt" :label="i18n('optionPopupGroupRunAt')"
+                       v-show="settings['filtersPopup.sort'] === 'exec'" />
         <label>
           <select v-for="opt in ['filtersPopup.hideDisabled']" v-model="settings[opt]" :key="opt">
             <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"

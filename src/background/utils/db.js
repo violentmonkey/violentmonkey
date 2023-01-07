@@ -1,7 +1,7 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri, makeDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
-  getScriptPrettyUrl, makePause, isHttpOrHttps, noop,
+  getScriptPrettyUrl, getScriptRunAt, makePause, isHttpOrHttps, noop,
 } from '@/common';
 import { INFERRED, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
@@ -241,7 +241,6 @@ const makeEnv = () => ({
 });
 const GMCLIP_RE = /^GM[_.]setClipboard$/;
 const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Value)$/;
-const RUN_AT_RE = /^document-(start|body|end|idle)$/;
 const STORAGE_ROUTES = {
   [S_CACHE]: ENV_CACHE_KEYS,
   [S_CODE]: 'ids',
@@ -282,7 +281,7 @@ export function getScriptsByURL(url, isTop, errors) {
     }
     const { meta, custom } = script;
     const { pathMap = buildPathMap(script) } = custom;
-    const runAt = `${custom.runAt || meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
+    const runAt = getScriptRunAt(script);
     const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
     const { depsMap } = env;
     env.ids.push(id);

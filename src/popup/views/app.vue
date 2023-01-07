@@ -194,7 +194,8 @@ import { reactive } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import options from '@/common/options';
 import {
-  getScriptHome, getScriptName, getScriptSupportUrl, getScriptUpdateUrl, i18n, makePause, sendCmdDirectly, sendTabCmd,
+  getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl,
+  i18n, makePause, sendCmdDirectly, sendTabCmd,
 } from '@/common';
 import { objectPick } from '@/common/object';
 import { focusMe } from '@/common/ui';
@@ -202,10 +203,10 @@ import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
 import { mutex, store } from '../utils';
 
+let mousedownElement;
 const NAME = `${extensionManifest.name} ${process.env.VM_VER}`;
 const SCRIPT_CLS = '.script';
-let mousedownElement;
-
+const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
 const optionsData = reactive({
   isApplied: options.get('isApplied'),
   filtersPopup: options.get('filtersPopup') || {},
@@ -262,8 +263,7 @@ export default {
       ].filter(Boolean);
     },
     injectionScopes() {
-      const { sort, enabledFirst, hideDisabled } = this.options.filtersPopup;
-      const isSorted = sort === 'alpha' || enabledFirst;
+      const { sort, enabledFirst, groupRunAt, hideDisabled } = this.options.filtersPopup;
       const { injectable } = store;
       const groupDisabled = hideDisabled === 'group';
       return [
@@ -284,24 +284,25 @@ export default {
         if (hideDisabled === 'hide' || hideDisabled === true) {
           list = list.filter(script => script.config.enabled);
         }
-        list = list.map((script, i) => {
+        list = list.map(script => {
           const scriptName = getScriptName(script);
           return {
             id: `${name}/${script.props.id}`,
             name: scriptName,
             data: script,
-            key: isSorted && `${
+            key: `${
               enabledFirst && +!script.config.enabled
             }${
-              sort === 'alpha' ? scriptName.toLowerCase() : `${1e6 + i}`.slice(1)
+              sort === 'alpha'
+                ? scriptName.toLowerCase()
+                : groupRunAt && RUN_AT_ORDER.indexOf(getScriptRunAt(script))
+            }${
+              1e6 + script.props.position
             }`,
             excludesValue: null,
             upd: null,
           };
-        });
-        if (isSorted) {
-          list.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key));
-        }
+        }).sort((a, b) => (a.key < b.key ? -1 : a.key > b.key));
         return numTotal && {
           name,
           title,

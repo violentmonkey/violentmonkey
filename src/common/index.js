@@ -1,6 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser, HOMEPAGE_URL, INFERRED, SUPPORT_URL } from './consts';
+import { browser, HOMEPAGE_URL, INFERRED, RUN_AT_RE, SUPPORT_URL } from './consts';
 import { deepCopy } from './object';
 import { blob2base64, i18n, isDataUri } from './util';
 
@@ -189,6 +189,11 @@ export function getScriptSupportUrl(script) {
 export function getScriptName(script) {
   return script.custom.name || getLocaleString(script.meta, 'name')
     || `#${script.props.id ?? i18n('labelNoName')}`;
+}
+
+/** @returns {VMInjection.RunAt} without "document-" */
+export function getScriptRunAt(script) {
+  return `${script.custom.runAt || script.meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
 }
 
 /** URL that shows the name of the script and opens in devtools sources or in our editor */
