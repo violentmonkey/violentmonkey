@@ -602,6 +602,7 @@ export async function parseScript(src) {
   }
   if (isRemote(src.url)) script.custom.lastInstallURL = src.url;
   if (src.position) script.props.position = +src.position;
+  if (!src.update) storage.mod.remove(getScriptUpdateUrl(script, true) || []);
   buildPathMap(script, src.url);
   await saveScript(script, src.code);
   fetchResources(script, src);
