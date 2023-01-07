@@ -326,7 +326,7 @@ async function moveScript(from, to) {
     allScripts.splice(aFrom, 1);
     allScripts.splice(aTo, 0, script);
     allScripts.forEach((scr, i) => { scr.props.position = i + 1; });
-    if (state.search) onUpdate();
+    onUpdate();
   }
 }
 function handleOrderChange(e) {
