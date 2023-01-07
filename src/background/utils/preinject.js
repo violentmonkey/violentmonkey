@@ -309,7 +309,7 @@ function prepareScripts(env) {
       script = cache.get(key) || cache.put(key, prepareScript(script, env));
       scripts[i] = script;
     }
-    if (script[INJECT_INTO] === INJECT_PAGE) {
+    if (script[INJECT_INTO] !== INJECT_CONTENT) {
       env[INJECT_PAGE] = true; // for registerScriptDataFF
     }
     script[INJECT_VAL] = env[S_VALUE][id] || null;
