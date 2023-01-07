@@ -5,9 +5,7 @@ let { browser } = global;
 // https://github.com/mozilla/webextension-polyfill/pull/153
 // https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
 if (!IS_FIREFOX && !browser?.runtime) {
-  /* WARNING! `chrome` must be extracted here, otherwise it triggers a bug in Chrome:
-   * sendMessage receives [null, null] response instead of the data that was sent back. */
-  const { chrome, Proxy: SafeProxy } = global;
+  const { Proxy: SafeProxy } = global;
   const { bind } = SafeProxy;
   const MESSAGE = 'message';
   const STACK = 'stack';
@@ -91,35 +89,49 @@ if (!IS_FIREFOX && !browser?.runtime) {
       return promise;
     }
   );
-  const sendResponseAsync = async (listener, message, sender, sendResponse) => {
-    let result;
-    let error;
+  const wrapResponse = (result, error) => {
+    if (process.env.DEBUG) console[error ? 'warn' : 'log']('sendResponse', error || result);
+    return [
+      result,
+      error && (
+        error[MESSAGE]
+          ? [error[MESSAGE], error[STACK]]
+          : [error, new SafeError()[STACK]]
+      ),
+    ];
+  };
+  const sendResponseAsync = async (result, sendResponse) => {
     try {
-      result = await listener(message, sender);
-      if (process.env.DEBUG) console.info('send', result);
+      sendResponse(wrapResponse(await result));
     } catch (err) {
-      if (process.env.DEBUG) console.warn(err);
-      error = err?.[MESSAGE]
-        ? [err[MESSAGE], err[STACK]]
-        : [err, new SafeError()[STACK]];
+      sendResponse(wrapResponse(0, err));
     }
-    sendResponse([
-      result ?? null,
-      error ?? null,
-    ]);
   };
   const onMessageListener = (listener, message, sender, sendResponse) => {
     if (process.env.DEBUG) console.info('receive', message);
-    // TODO: use a port with a timeout for each tab/frame to speed up frequent calls to GM API?
-    // Always using async mode because the difference in performance is negligible.
-    sendResponseAsync(listener, message, sender, sendResponse);
-    return true;
+    try {
+      const result = listener(message, sender);
+      if (result && (
+        process.env.IS_INJECTED
+          ? isPromise(result) /* global isPromise */
+          : result instanceof Promise
+      )) {
+        sendResponseAsync(result, sendResponse);
+        return true;
+      } else if (result !== undefined) {
+        /* WARNING: when using onMessage in extension pages don't use `async`
+         * and make sure to return `undefined` for content messages like GetInjected */
+        sendResponse(wrapResponse(result));
+      }
+    } catch (err) {
+      sendResponse(wrapResponse(0, err));
+    }
   };
   /** @type {WrapAsyncPreprocessorFunc} */
   const unwrapResponse = (resolve, response) => (
     !response && 'null response'
-    || response[1] // error from sendResponseAsync
-    || resolve(response[0]) // result from sendResponseAsync
+    || response[1] // error created in wrapResponse
+    || resolve(response[0]) // result created in wrapResponse
   );
   const wrapSendMessage = (runtime, sendMessage) => (
     wrapAsync(runtime, sendMessage, unwrapResponse)
@@ -137,7 +149,16 @@ if (!IS_FIREFOX && !browser?.runtime) {
       getURL: 0,
       onMessage: {
         addListener: (onMessage, addListener) => (
-          listener => onMessage::addListener(onMessageListener::bind(null, listener))
+          listener => {
+            if (process.env.DEV
+            && !process.env.IS_INJECTED
+            && listener !== global.handleCommandMessage
+            && /^async/.test(listener)) {
+              throw new Error('onMessage listener cannot be async due to GetInjected interference!');
+              // TODO: migrate to addRuntimeListener(fn, commands: object)
+            }
+            return onMessage::addListener(onMessageListener::bind(null, listener));
+          }
         ),
       },
       sendMessage: wrapSendMessage,
