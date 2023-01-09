@@ -767,6 +767,9 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Regrouper les scripts désactivés
+optionPopupGroupRunAt:
+  description: Option to group scripts in popup shown only when sorting by execution order.
+  message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Cacher les scripts désactivés

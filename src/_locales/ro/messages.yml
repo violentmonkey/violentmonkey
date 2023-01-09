@@ -673,16 +673,15 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Un script precum acesta este instalat deja sau se află încă în coșul de
-    reciclare.
+    Un script ca acesta este deja instalat.
 
-    Te rugăm fie să folosești aici un alt @name și @namespace, fie să editezi în
-    schimb scriptul respectiv.
+    Te rugăm fie să folosești un alt @name și @namespace aici, fie editează
+    scriptul respectiv.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Un script cu același @name și @namespace este deja instalat.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -766,6 +765,9 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Grupează scripturile dezactivate
+optionPopupGroupRunAt:
+  description: Option to group scripts in popup shown only when sorting by execution order.
+  message: Grupează după stadiul @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Ascunde scripturile dezactivate

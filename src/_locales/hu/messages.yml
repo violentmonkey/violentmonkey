@@ -675,15 +675,15 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Már van telepítve hasonló szkript, vagy az még a kukában van.
+    Egy ugyanilyen szkript már telepítve van.
 
-    Kérlek vagy használj más @name és @namespace értékeket itt, vagy módosítsd
-    ezeket a másik szkriptben.
+    Kérlek vagy használj más @name, vagy @namespace értékeket itt, vagy
+    szerkeszd a meglévőt.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Egy szkript ugyanezzel a @name és @namespace értékkel már telepítve van.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -767,6 +767,9 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Kikapcsolt szkriptek csoportosítása
+optionPopupGroupRunAt:
+  description: Option to group scripts in popup shown only when sorting by execution order.
+  message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Kikapcsolt szkriptek elrejtése

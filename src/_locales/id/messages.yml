@@ -339,7 +339,7 @@ labelEditor:
   message: Penyunting
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: hanya skrip aktif
 labelExclude:
   description: Label of @exclude rules.
   message: Aturan @exclude
@@ -521,10 +521,17 @@ labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: Mode $1 sinkronis
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: ''
+  message: >-
+    Hanya aktifkan jika Anda memiliki skrip yang perlu dijalankan sebelum
+    halaman mulai dimuat dan saat ini terlambat dijalankan. Seperti mode injeksi
+    instan di Tampermonkey, opsi ini menggunakan XHR sinkronis yang sudah usang,
+    sehingga di Chrome/Chromium Anda akan melihat peringatan di dalam konsol
+    devtool, meskipun Anda masih bisa mengabaikannya dengan aman karena pengaruh
+    buruknya masih bisa diabaikan untuk saat ini. Anda bisa menyembunyikan
+    peringatan ini memlalui klik kanan pada teks tersebut.
 lastSync:
   description: Label for last sync timestamp.
   message: Sinkron terakhir pada $1
@@ -594,7 +601,9 @@ msgCheckingForUpdate:
   message: Memeriksa pembaruan...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    Klik untuk membuka dokumentasi MomentJS. Token yang diizinkan: $1. Gunakan
+    [tanda kurung siku] untuk melindungi teks harfiah.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -657,12 +666,16 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Namespace skrip konflik! Silakan ubah @name dan @namespace.
+  message: >-
+    Skrip ini sudah terpasang.
+
+    Silakan gunakan @name dan @namespace yang berbeda di sini atau sunting skrip
+    tersebut.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Skrip dengan @name dan @namespace yang sama sudah terpasang.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -745,6 +758,9 @@ optionPopupEnabledFirst:
   message: Aktif di atas
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
+  message: Grup skrip nonaktif
+optionPopupGroupRunAt:
+  description: Option to group scripts in popup shown only when sorting by execution order.
   message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
@@ -792,7 +808,9 @@ titleBadgeColor:
   message: Warna lencana normal
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: >-
+    Warna lencana untuk situs yang tidak bisa diinjeksi (daftar hitam atau tidak
+    didukung)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-
@@ -803,10 +821,10 @@ valueLabelKey:
   message: ''
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: Nilai (serialisasi sebagai JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Semua nilai (serialisasi sebagai JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Kunjungi Situs Web
