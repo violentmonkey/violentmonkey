@@ -127,12 +127,18 @@ addPublicCommands({
     [INJECT_CONTENT_FORCE]: forceContent,
     [INJECT_CONTENT]: items,
     [INJECT_MORE]: moreKey,
-  }, { frameId, tab: { id: tabId } }) {
+    url,
+  }, src) {
+    const { frameId, tab } = src;
+    const tabId = tab.id;
     injectContentRealm(items, tabId, frameId);
     if (!moreKey) return;
-    const more = cache.get(moreKey); // TODO: rebuild if expired
-    if (!more) throw 'Injection data expired, please reload the tab!';
-    const envCache = more[S_CACHE] || (await more.promise)[S_CACHE];
+    if (!url) url = src.url || tab.url;
+    let more = cache.get(moreKey)
+      || cache.put(moreKey, getScriptsByURL(url, !frameId));
+    // Caching as Promise to be awaited by other tabs with this moreKey
+    const envCache = more[S_CACHE]
+      || cache.put(moreKey, more = await more)[S_CACHE];
     const scripts = prepareScripts(more);
     triageRealms(scripts, forceContent, tabId, frameId);
     addValueOpener(scripts, tabId, frameId);

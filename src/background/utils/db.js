@@ -252,7 +252,10 @@ const notifiedBadScripts = new Set();
 
 /**
  * @desc Get scripts to be injected to page with specific URL.
- * @return {VMInjection.EnvStart}
+ * @param {string} url
+ * @param {boolean} isTop
+ * @param {Array} [errors] - omit to enable EnvDelayed mode
+ * @return {VMInjection.EnvStart|VMInjection.EnvDelayed}
  */
 export function getScriptsByURL(url, isTop, errors) {
   testerBatch(errors || true);
@@ -314,6 +317,9 @@ export function getScriptsByURL(url, isTop, errors) {
     }
     env[ENV_SCRIPTS].push(script);
   });
+  if (!errors) {
+    return readEnvironmentData(envDelayed);
+  }
   if (envStart.ids.length) {
     envStart.promise = readEnvironmentData(envStart);
   }
