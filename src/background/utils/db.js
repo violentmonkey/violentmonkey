@@ -255,7 +255,7 @@ const notifiedBadScripts = new Set();
  * @param {string} url
  * @param {boolean} isTop
  * @param {Array} [errors] - omit to enable EnvDelayed mode
- * @return {VMInjection.EnvStart|VMInjection.EnvDelayed}
+ * @return {VMInjection.EnvStart|Promise<VMInjection.EnvDelayed>}
  */
 export function getScriptsByURL(url, isTop, errors) {
   testerBatch(errors || true);
