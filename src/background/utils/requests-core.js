@@ -47,10 +47,10 @@ const EXTRA_HEADERS = [
 const headersToInject = {};
 /** @param {chrome.webRequest.HttpHeader} header */
 const isVmVerify = header => header.name === VM_VERIFY;
-const isNotCookie = header => !/^cookie2?$/i.test(header.name);
+export const isCookie = header => /^cookie2?$/i.test(header.name);
 const isSendable = header => !isVmVerify(header)
   && !(/^origin$/i.test(header.name) && header.value === extensionOrigin);
-const isSendableAnon = header => isSendable(header) && isNotCookie(header);
+const isSendableAnon = header => isSendable(header) && !isCookie(header);
 const SET_COOKIE_RE = /^set-cookie2?$/i;
 const SET_COOKIE_VALUE_RE = re`
   /^\s*  (?:__(Secure|Host)-)?  ([^=\s]+)  \s*=\s*  (")?  ([!#-+\--:<-[\]-~]*)  \3(.*)  /x`;
@@ -95,8 +95,15 @@ function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
     verify[requestId] = reqId;
     req.coreId = requestId;
     req.url = url; // remember redirected URL with #hash as it's stripped in XHR.responseURL
-    headers = (req.noNativeCookie ? headers.filter(isNotCookie) : headers)
-    .concat(headersToInject[reqId] || [])
+    const headers2 = headersToInject[reqId] || [];
+    const i = headers.findIndex(isCookie);
+    const j = headers2.findIndex(isCookie);
+    if (req.noNativeCookie) {
+      headers.splice(i, 1);
+    } else if (i >= 0 && j >= 0) {
+      headers[i].value += '; ' + headers2.splice(j, 1)[0].value;
+    }
+    headers = headers.concat(headers2)
     .filter(req.anonymous ? isSendableAnon : isSendable);
   }
   return { requestHeaders: headers };

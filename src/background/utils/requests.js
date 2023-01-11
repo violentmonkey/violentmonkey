@@ -4,7 +4,7 @@ import ua from '@/common/ua';
 import cache from './cache';
 import { addPublicCommands, commands } from './message';
 import {
-  FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify,
+  FORBIDDEN_HEADER_RE, VM_VERIFY, isCookie, requests, toggleHeaderInjector, verify,
 } from './requests-core';
 
 addPublicCommands({
@@ -197,7 +197,7 @@ async function httpRequest(opts, events, src, cb) {
       xhr.setRequestHeader(name, value);
     }
     if (shouldSendCookies) {
-      shouldSendCookies = !/^cookie$/i.test(name);
+      shouldSendCookies = !isCookie({ name });
     }
   });
   xhr[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
