@@ -74,6 +74,7 @@
 
 <script>
 import {
+  browserWindows,
   debounce, formatByteLength, getScriptName, i18n, isEmpty,
   sendCmdDirectly, trueJoin,
 } from '@/common';
@@ -123,7 +124,7 @@ let shouldSavePositionOnSave;
 /** @param {chrome.windows.Window} [wnd] */
 const savePosition = async wnd => {
   if (options.get('editorWindow')) {
-    if (!wnd) wnd = await browser.windows.getCurrent();
+    if (!wnd) wnd = await browserWindows?.getCurrent() || {};
     /* chrome.windows API can't set both the state and coords, so we have to choose:
      * either we save the min/max state and lose the coords on restore,
      * or we lose the min/max state and save the normal coords.

@@ -1,4 +1,4 @@
-import { request, noop, i18n, getUniqId } from '@/common';
+import { browserWindows, request, noop, i18n, getUniqId } from '@/common';
 import ua from '@/common/ua';
 import cache from './cache';
 import { addPublicCommands, commands } from './message';
@@ -32,7 +32,7 @@ addPublicCommands({
       ? await browser.tabs.update(tabId, { url: confirmUrl })
       : await commands.TabOpen({ url: confirmUrl, active: !!active }, { tab });
     if (active && windowId !== tab.windowId) {
-      await browser.windows.update(windowId, { focused: true });
+      await browserWindows?.update(windowId, { focused: true });
     }
   },
 });

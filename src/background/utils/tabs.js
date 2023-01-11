@@ -1,4 +1,4 @@
-import { getActiveTab, noop, sendTabCmd, getFullUrl } from '@/common';
+import { browserWindows, getActiveTab, noop, sendTabCmd, getFullUrl } from '@/common';
 import ua from '@/common/ua';
 import { addOwnCommands, addPublicCommands, commands } from './message';
 import { getOption } from './options';
@@ -47,7 +47,7 @@ addOwnCommands({
       const viewUrl = view.location.href;
       if (viewUrl === url || !pathId && viewUrl === url + ROUTE_SCRIPTS) {
         const { id: tabId, windowId } = await view.browser.tabs.getCurrent();
-        browser.windows.update(windowId, { focused: true });
+        browserWindows?.update(windowId, { focused: true });
         return browser.tabs.update(tabId, { active: true });
       }
     }
@@ -92,7 +92,7 @@ addPublicCommands({
         : getFullUrl(url, srcUrl);
     }
     if (maybeInWindow
-        && browser.windows
+        && browserWindows
         && getOption('editorWindow')
         /* cookieStoreId in windows.create() is supported since FF64 https://bugzil.la/1393570
          * and a workaround is too convoluted to add it for such an ancient version */
@@ -106,8 +106,8 @@ addPublicCommands({
       };
       const pos = getOption('editorWindowPos');
       const hasPos = pos && 'top' in pos;
-      const wnd = await browser.windows.create({ ...wndOpts, ...pos }).catch(hasPos && noop)
-        || hasPos && await browser.windows.create(wndOpts);
+      const wnd = await browserWindows.create({ ...wndOpts, ...pos }).catch(hasPos && noop)
+        || hasPos && await browserWindows.create(wndOpts);
       newTab = wnd.tabs[0];
     } else if (isInternal && canOpenIncognito && NEWTAB_URL_RE.test(getTabUrl(srcTab))) {
       // Replacing the currently focused start tab page for internal commands
@@ -126,7 +126,7 @@ addPublicCommands({
       });
     }
     if (active && newTab.windowId !== windowId) {
-      await browser.windows.update(newTab.windowId, { focused: true });
+      await browserWindows?.update(newTab.windowId, { focused: true });
     }
     if (!isInternal) {
       openers[newTab.id] = srcTab.id;
@@ -140,7 +140,7 @@ addPublicCommands({
   },
   TabFocus(_, src) {
     browser.tabs.update(src.tab.id, { active: true }).catch(noop);
-    browser.windows.update(src.tab.windowId, { focused: true }).catch(noop);
+    browserWindows?.update(src.tab.windowId, { focused: true }).catch(noop);
   },
 });
 

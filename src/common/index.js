@@ -17,6 +17,7 @@ if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
   }
 }
 
+export const browserWindows = browser.windows;
 export const defaultImage = !process.env.IS_INJECTED && `${ICON_PREFIX}128.png`;
 /** Will be encoded to avoid splitting the URL in devtools UI */
 const BAD_URL_CHAR = /[#/?]/g;
@@ -265,11 +266,11 @@ export async function getActiveTab() {
       active: true,
       currentWindow: true,
     })
-  )[0] || (
+  )[0] || browserWindows && (
     // Chrome bug workaround when an undocked devtools window is focused
     await browser.tabs.query({
       active: true,
-      windowId: (await browser.windows.getCurrent()).id,
+      windowId: (await browserWindows.getCurrent()).id,
     })
   )[0];
 }
