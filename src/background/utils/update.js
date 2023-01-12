@@ -3,10 +3,10 @@ import {
   i18n, sendCmd, trueJoin,
 } from '@/common';
 import { METABLOCK_RE } from '@/common/consts';
-import { fetchResources, getScriptById, getScripts, parseScript } from './db';
+import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
-import { addOwnCommands, commands } from './message';
+import { addOwnCommands } from './message';
 import { requestNewer } from './storage-fetch';
 
 const processes = {};
@@ -19,23 +19,18 @@ addOwnCommands({
   async CheckUpdate(id) {
     const scripts = id ? [getScriptById(id)] : getScripts();
     const results = await Promise.all(scripts.reduce(maybeCheckUpdate, []));
-    displayNotes(results.filter(r => r?.text));
+    const problems = results.filter(r => r?.text);
+    if (problems.length) {
+      notifyToOpenScripts(
+        i18n('msgOpenUpdateErrors'),
+        problems.map(p => `* ${p.text}\n`).join(''),
+        problems.map(p => p.script.props.id),
+      );
+    }
     if (!id) setOption('lastUpdate', Date.now());
     return results.reduce((num, r) => num + (r === true), 0);
   },
 });
-
-function displayNotes(notes) {
-  if (notes.length === 1) {
-    notify(notes[0]);
-  } else if (notes.length) {
-    notify({
-      // FF doesn't show notifications of type:'list' so we'll use `text` everywhere
-      text: notes.map(n => n.text).join('\n'),
-      onClick: () => commands.OpenEditor(''),
-    });
-  }
-}
 
 /**
  * @param {Promise[]} jobs
@@ -137,16 +132,3 @@ function canNotify(script) {
     : script.config.notifyUpdates ?? allowed;
 }
 
-function notify({
-  script,
-  text,
-  onClick = () => commands.OpenEditor(script.props.id),
-}) {
-  commands.Notification({
-    text,
-    // FF doesn't show the name of the extension in the title of the notification
-    title: IS_FIREFOX ? i18n('optionUpdate') : '',
-  }, undefined, {
-    onClick,
-  });
-}

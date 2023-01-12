@@ -5,14 +5,15 @@ const openers = {};
 
 addPublicCommands({
   /** @return {Promise<string>} */
-  async Notification({ image, text, title }, src, bgExtras) {
+  async Notification({ image, text, title }, src, bgCallback) {
     const notificationId = await browser.notifications.create({
       type: 'basic',
       title: [title, IS_FIREFOX && i18n('extName')]::trueJoin(' - '), // Chrome already shows the name
       message: text,
       iconUrl: image || defaultImage,
     });
-    openers[notificationId] = bgExtras?.onClick || src.tab.id;
+    const op = bgCallback || src && [src.tab.id, src.frameId];
+    if (op) openers[notificationId] = op;
     return notificationId;
   },
   RemoveNotification(notificationId) {
@@ -21,19 +22,21 @@ addPublicCommands({
 });
 
 browser.notifications.onClicked.addListener((id) => {
-  const openerId = openers[id];
-  if (openerId >= 0) {
-    sendTabCmd(openerId, 'NotificationClick', id);
-  }
-  if (isFunction(openerId)) {
-    openerId();
-  }
+  notifyOpener(id, true);
 });
 
 browser.notifications.onClosed.addListener((id) => {
-  const openerId = openers[id];
+  notifyOpener(id, false);
   delete openers[id];
-  if (openerId >= 0) {
-    sendTabCmd(openerId, 'NotificationClose', id);
-  }
 });
+
+function notifyOpener(id, isClick) {
+  const op = openers[id];
+  if (isFunction(op)) {
+    op(isClick);
+  } else if (op) {
+    sendTabCmd(op[0], isClick ? 'NotificationClick' : 'NotificationClose', id, {
+      frameId: op[1],
+    });
+  }
+}

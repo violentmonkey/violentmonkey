@@ -589,6 +589,9 @@ menuScriptEnabled:
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: Checking for updates...
+msgOpenUpdateErrors:
+  description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
+  message: Error updating scripts. Click to open them.
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
   message: >-

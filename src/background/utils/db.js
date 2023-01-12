@@ -376,12 +376,15 @@ function reportBadScripts(ids) {
   });
   console.error(`${title} ${toLog}`);
   if (unnotifiedIds.length) {
-    commands.Notification({ title, text: toNotify }, undefined, {
-      onClick() {
-        unnotifiedIds.forEach(id => commands.OpenEditor(id));
-      },
-    });
+    notifyToOpenScripts(title, toNotify, unnotifiedIds);
   }
+}
+
+export function notifyToOpenScripts(title, text, ids) {
+  // FF doesn't show notifications of type:'list' so we'll use `text` everywhere
+  commands.Notification({ title, text }, undefined, isClick => {
+    if (isClick) ids.forEach(id => commands.OpenEditor(id));
+  });
 }
 
 /**
