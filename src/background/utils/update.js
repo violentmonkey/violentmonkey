@@ -32,7 +32,7 @@ function displayNotes(notes) {
     notify({
       // FF doesn't show notifications of type:'list' so we'll use `text` everywhere
       text: notes.map(n => n.text).join('\n'),
-      onClick: commands.OpenEditor(''),
+      onClick: () => commands.OpenEditor(''),
     });
   }
 }
