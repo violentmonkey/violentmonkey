@@ -98,10 +98,12 @@ function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
     const headers2 = headersToInject[reqId] || [];
     const i = headers.findIndex(isCookie);
     const j = headers2.findIndex(isCookie);
-    if (req.noNativeCookie) {
-      headers.splice(i, 1);
-    } else if (i >= 0 && j >= 0) {
-      headers[i].value += '; ' + headers2.splice(j, 1)[0].value;
+    if (i >= 0) {
+      if (req.noNativeCookie) {
+        headers.splice(i, 1);
+      } else if (j >= 0) {
+        headers[i].value += '; ' + headers2.splice(j, 1)[0].value;
+      }
     }
     headers = headers.concat(headers2)
     .filter(req.anonymous ? isSendableAnon : isSendable);
