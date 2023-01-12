@@ -8,6 +8,7 @@ const { addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util')
 const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
 const projectConfig = require('./plaid.conf');
 const { getVersion } = require('./version-helper');
+const { configLoader } = require('./config-helper');
 const mergedConfig = shallowMerge(defaultOptions, projectConfig);
 
 // Avoiding collisions with globals of a content-mode userscript
@@ -54,26 +55,37 @@ const MIN_OPTS_MAIN = isProd && deepmerge.all([{}, MIN_OPTS, {
   },
 }]);
 
+configLoader
+  // Default values
+  .add({
+    DEBUG: false,
+  })
+  // Load from `./.env`
+  .envFile()
+  // Load from `process.env`
+  .env()
+  // Override values
+  .add({
+    VM_VER,
+  });
+
 const pickEnvs = (items) => {
-  return Object.assign({}, ...items.map(x => ({
-    [`process.env.${x.key}`]: JSON.stringify(
-      'val' in x ? x.val
-        : process.env[x.key] ?? x.def,
-    ),
+  return Object.assign({}, ...items.map(key => ({
+    [`process.env.${key}`]: JSON.stringify(configLoader.get(key)),
   })));
 };
 
 const defsObj = {
   ...pickEnvs([
-    { key: 'DEBUG', def: false },
-    { key: 'VM_VER', val: VM_VER },
-    { key: 'SYNC_GOOGLE_CLIENT_ID' },
-    { key: 'SYNC_GOOGLE_CLIENT_SECRET' },
-    { key: 'SYNC_GOOGLE_DESKTOP_ID' },
-    { key: 'SYNC_GOOGLE_DESKTOP_SECRET' },
-    { key: 'SYNC_ONEDRIVE_CLIENT_ID' },
-    { key: 'SYNC_ONEDRIVE_CLIENT_SECRET' },
-    { key: 'SYNC_DROPBOX_CLIENT_ID' },
+    'DEBUG',
+    'VM_VER',
+    'SYNC_GOOGLE_CLIENT_ID',
+    'SYNC_GOOGLE_CLIENT_SECRET',
+    'SYNC_GOOGLE_DESKTOP_ID',
+    'SYNC_GOOGLE_DESKTOP_SECRET',
+    'SYNC_ONEDRIVE_CLIENT_ID',
+    'SYNC_ONEDRIVE_CLIENT_SECRET',
+    'SYNC_DROPBOX_CLIENT_ID',
   ]),
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
   'process.env.CODEMIRROR_THEMES': JSON.stringify(getCodeMirrorThemes()),

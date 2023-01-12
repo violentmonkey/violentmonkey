@@ -37,7 +37,8 @@ jobs:
           # Create source zip
           git archive @ --format=zip > $TEMP_DIR/$SOURCE_ZIP
           # Include .env to ensure the output is reproducible
-          export | grep SYNC_ > .env && zip -u $TEMP_DIR/$SOURCE_ZIP .env && rm .env
+          export | grep SYNC_ | sed -e 's/^declare -x //' > .env \
+            && zip -u $TEMP_DIR/$SOURCE_ZIP .env && rm .env
 
           # Build for release, also upload to GitHub assets
           yarn build

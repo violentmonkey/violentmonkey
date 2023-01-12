@@ -40,7 +40,6 @@ async function main() {
       : join(process.env.ASSETS_DIR, process.env.ASSET_ZIP),
     sourceFile: join(process.env.TEMP_DIR, process.env.SOURCE_ZIP),
     approvalNotes: `\
-source .env
 yarn && yarn build
 `,
     output: tempFile,
