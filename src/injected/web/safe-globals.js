@@ -65,6 +65,7 @@ export let
   reflectOwnKeys,
   stopImmediatePropagation,
   then,
+  urlSearchParamsToString,
   // various getters
   getCurrentScript, // Document
   getDetail, // CustomEvent
@@ -154,6 +155,7 @@ export const VAULT = (() => {
     reflectOwnKeys = res[i += 1] || Reflect.ownKeys,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
     then = res[i += 1] || src.Promise[PROTO].then,
+    urlSearchParamsToString = res[i += 1] || src.URLSearchParams[PROTO].toString,
     // various getters
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
     getDetail = res[i += 1] || describeProperty(SafeCustomEvent[PROTO], 'detail').get,

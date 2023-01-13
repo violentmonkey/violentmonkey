@@ -161,7 +161,7 @@ export function onRequestCreate(opts, context, fileName) {
   data = data == null && []
     // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
     || (opts.binary || !isObject(data)) && [`${data}`]
-    // No browser can send FormData directly across worlds
+    // No browser can send FormData/URLSearchParams directly across worlds
     || getFormData(data)
     // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
     || IS_FIREFOX >= 56 && [data]
@@ -213,6 +213,11 @@ function getContentType(msg) {
 function getFormData(data) {
   try {
     return [[...data::formDataEntries()], 'fd']; // eslint-disable-line no-restricted-syntax
+  } catch (e) {
+    /**/
+  }
+  try {
+    return [data::urlSearchParamsToString(), 'usp'];
   } catch (e) {
     /**/
   }

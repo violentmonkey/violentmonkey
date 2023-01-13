@@ -1,5 +1,6 @@
 // Reference: https://dev.onedrive.com/README.htm
 import { noop } from '@/common';
+import { FORM_URLENCODED } from '@/common/consts';
 import { objectGet } from '@/common/object';
 import { dumpQuery } from '../utils';
 import {
@@ -134,7 +135,7 @@ const OneDrive = BaseService.extend({
       url: 'https://login.live.com/oauth20_token.srf',
       prefix: '',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': FORM_URLENCODED,
       },
       body: dumpQuery(Object.assign({}, {
         client_id: config.client_id,

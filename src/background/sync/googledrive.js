@@ -2,6 +2,7 @@
 // - https://developers.google.com/identity/protocols/oauth2/native-app
 // - https://developers.google.com/drive/v3/reference/files
 import { getUniqId, noop } from '@/common';
+import { CHARSET_UTF8, FORM_URLENCODED } from '@/common/consts';
 import { objectGet } from '@/common/object';
 import { loadQuery, dumpQuery } from '../utils';
 import {
@@ -144,7 +145,7 @@ const GoogleDrive = BaseService.extend({
       url: 'https://www.googleapis.com/oauth2/v4/token',
       prefix: '',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': FORM_URLENCODED,
       },
       body: dumpQuery(Object.assign({}, {
         client_id: config.client_id,
@@ -191,7 +192,7 @@ const GoogleDrive = BaseService.extend({
     };
     const body = [
       `--${boundary}`,
-      'Content-Type: application/json; charset=UTF-8',
+      'Content-Type: application/json; ' + CHARSET_UTF8,
       '',
       JSON.stringify(metadata),
       `--${boundary}`,

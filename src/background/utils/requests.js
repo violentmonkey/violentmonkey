@@ -1,4 +1,5 @@
 import { blob2base64, getFullUrl, sendTabCmd, string2uint8array } from '@/common';
+import { CHARSET_UTF8, FORM_URLENCODED } from '@/common/consts';
 import { forEachEntry, forEachValue, objectPick } from '@/common/object';
 import ua from '@/common/ua';
 import cache from './cache';
@@ -261,6 +262,8 @@ function decodeBody([body, type, wasBlob]) {
     body.forEach(entry => res.set(...entry));
     body = res;
     type = '';
+  } else if (type === 'usp') {
+    type = FORM_URLENCODED + ';' + CHARSET_UTF8;
   } else if (type != null) {
     // 5x times faster than fetch() which wastes time on inter-process communication
     const res = string2uint8array(atob(body.slice(body.indexOf(',') + 1)));

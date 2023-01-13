@@ -1,5 +1,7 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
+export const CHARSET_UTF8 = 'charset=UTF-8';
+export const FORM_URLENCODED = 'application/x-www-form-urlencoded';
 export const INFERRED = 'inferred';
 export const HOMEPAGE_URL = 'homepageURL';
 export const SUPPORT_URL = 'supportURL';

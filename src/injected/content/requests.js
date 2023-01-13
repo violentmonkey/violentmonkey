@@ -34,7 +34,8 @@ addHandlers({
       asBlob: msg.xhrType === 'blob',
     }, msg, PROPS_TO_COPY);
     let { data } = msg;
-    if (data[1] && !IS_FIREFOX /* in FF FormData is recreated in bg::decodeBody */) {
+    // In Firefox we recreate FormData in bg::decodeBody
+    if (!IS_FIREFOX && data.length > 1 && data[1] !== 'usp') {
       // TODO: support huge data by splitting it to multiple messages
       data = await encodeBody(data[0], data[1]);
       msg.data = cloneInto ? cloneInto(data, msg) : data;

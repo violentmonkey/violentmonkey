@@ -1,4 +1,5 @@
 import { getUniqId } from '@/common';
+import { FORM_URLENCODED } from '@/common/consts';
 import { loadQuery, dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
@@ -135,7 +136,7 @@ const Dropbox = BaseService.extend({
       method: 'POST',
       url: 'https://api.dropbox.com/oauth2/token',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': FORM_URLENCODED,
       },
       body: dumpQuery({
         client_id: config.client_id,
