@@ -31,9 +31,9 @@
     "@gera2ld/plaid-test": "~2.5.8",
     "@gera2ld/plaid-webpack": "~2.5.7",
     "@gera2ld/plaid-webpack-vue3": "~2.5.7",
-    "@types/chrome": "^0.0.191",
+    "@types/chrome": "^0.0.208",
     "@types/firefox-webext-browser": "94.0.1",
-    "@violentmonkey/types": "0.1.4",
+    "@violentmonkey/types": "0.1.5",
     "amo-upload": "^0.2.1",
     "babel-plugin-transform-modern-regexp": "^0.0.6",
     "cross-env": "^7.0.3",
@@ -69,7 +69,7 @@
     "@zip.js/zip.js": "2.4.4",
     "codemirror": "^5.65.10",
     "tldjs": "^2.3.1",
-    "vue": "^3.2.37",
+    "vue": "^3.2.45",
     "vueleton": "^2.0.0-5"
   },
   "engines": {
