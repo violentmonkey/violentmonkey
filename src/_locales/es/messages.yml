@@ -345,7 +345,7 @@ labelEditor:
   message: Editor
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: solo scripts activos
 labelExclude:
   description: Label of @exclude rules.
   message: Reglas @exclude
@@ -531,113 +531,124 @@ labelXhrInject:
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
-    Habilítalo solo si tienes un script que necesita ejecutarse antes de que la
+    Actívalo solo si tienes un script que necesita ejecutarse antes de que la
     página comience a cargar y actualmente se está ejecutando demasiado tarde.
     Al igual que el modo de inyección instantánea en Tampermonkey, esta opción
     utiliza el obsoleto XHR sincrónico, por lo que en Chrome/Chromium verás
-    advertencias en la consola devtools, aunque puedes ignorarlas con seguridad
+    advertencias en la consola devtools, aunque puedes ignorarlas con seguridad,
     ya que los efectos adversos son insignificantes en este caso. Puedes ocultar
     las advertencias para siempre haciendo clic con el botón derecho del ratón
     en una de ellas.
 lastSync:
   description: Label for last sync timestamp.
-  message: ''
+  message: Última sincronización en $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: Aprende más sobre los patrones de la lista negra.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Aprende más sobre los modos de inyección.
 menuCommands:
   description: Menu item to list script commands.
   message: ''
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: Abrir panel de control
 menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Excluir...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    La pestaña actual se recargará automáticamente si activaste esta opción en
+    la configuración general.
+
+    Para aplicar los cambios a todas las demás pestañas, recargarlas
+    manualmente.
+
+    Utiliza la pestaña "Configuración" del editor para mayor flexibilidad.
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: Comentarios
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: ''
+  message: Buscar scripts para este sitio
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: No se pudieron inyectar algunos scripts.
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
-  message: ''
+  message: Reintentar en modo "automático"
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Scripts coincidentes deshabilitados
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Solo scripts sub-frames
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: ''
+  message: Scripts coincidentes
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Crear un nuevo script
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: ''
+  message: Scripts deshabilitados
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: ''
+  message: Scripts activos
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: ''
+  message: Buscando actualizaciones...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    Haz clic para abrir la documentación de MomentJS. Tokens permitidos: $1.
+    Utiliza [corchetes] para proteger el texto literal.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: ''
+  message: ¡Error al obtener el recurso!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: ''
+  message: ¡Error al obtener el script!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: ''
+  message: No se pudo obtener la información de actualización.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: ''
+  message: Error al cargar los datos del script.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: ''
+  message: Error al cargar dependencias.
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: ''
+  message: $1 elemento(s) importado(s).
 msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: >-
+    Los cambios que realices en el modo incógnito también se aplican a tu perfil
+    principal.
 msgInstalled:
   description: Message shown when a script is installed.
-  message: ''
+  message: Script instalado.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: ''
+  message: ¡Script inválido!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
@@ -650,168 +661,181 @@ msgLoading:
   touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: ''
+  message: Cargando datos del script...
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: ''
+  message: Cargando dependencias... ($1/$2)
 msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Recursos necesarios faltantes.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: ''
+  message: >-
+    Un script como este ya está instalado.
+
+    Por favor, utilice un @name y @namespace diferente aquí o, en su lugar,
+    edite ese script.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Un script con el mismo @name y @namespace ya está instalado.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: ''
+  message: Nueva versión encontrada.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: ''
+  message: No encontraron actualizaciones.
+msgOpenUpdateErrors:
+  description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
+  message: Error al actualizar scripts. Haz clic para abrirlos.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Por favor, vuelva a guardar o reinstalar esto(s) script(s):'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: (el código es el mismo)
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: ''
+  message: Lista negra actualizada.
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: ''
+  message: El estilo personalizado está actualizado.
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: ''
+  message: Las opciones del editor están actualizadas.
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: ''
+  message: La plantilla de script personalizado está actualizada.
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: ¡El script [$1] está actualizado!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Mostrar/ocultar
 msgSyncError:
   description: Message shown when sync failed.
-  message: ''
+  message: ¡Error de sincronización!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: ''
+  message: Inicializando...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: ''
+  message: ¡Error de inicialización!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: No autorizado aún.
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: ''
+  message: La sincronización iniciará pronto...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: ''
+  message: Sincronización en progreso...
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: ''
+  message: Script actualizado.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: ''
+  message: Actualizando...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: No se almacena ningún valor
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: Abrir editor desde una ventana emergente en una ventana nueva
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: >-
+    La posición de la ventana del editor solo se recordará al redimensionar o
+    guardar
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Ocultar omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: Menú emergente e icono
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Activos primero
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Agrupar scripts desactivados
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Agrupar por etapa @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: Esconder scripts desactivados
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Mostrar scripts desactivados
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Mostrar scripts activos primero
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: Tema de la interfaz
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: automático
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: oscuro
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: claro
 optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
     updates.
-  message: ''
+  message: Actualizar
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: 'Distinguir entre mayúsculas y minúsculas '
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Usar expresiones regulares (Regex)
 sideMenuAbout:
   description: 'Side menu: About'
-  message: ''
+  message: Acerca de
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: ''
+  message: Scripts instalados
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: ''
+  message: Configuración
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: Color normal del icono
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: >-
+    Color del icono cuando el sitio no es inyectable (en lista negra o no
+    soportado)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: ''
+  message: |-
+    * La clave <Enter> añade el texto al historial de autocompletar
+    * Soporte para sintaxis RegExp: /re/ y /re/flags
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Clave (cadena)
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: Valor (serializado como JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Todos los valores (serializados como JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: ''
+  message: Visitar Sitio Web

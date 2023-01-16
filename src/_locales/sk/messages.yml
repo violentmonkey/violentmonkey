@@ -680,6 +680,9 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Nie sú žiadne aktualizácie.
+msgOpenUpdateErrors:
+  description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
+  message: ''
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -755,7 +758,7 @@ optionPopupGroupDisabled:
   message: Zoskupiť zakázané skripty
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Zoskupiť podľa @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Skryť zakázané skripty

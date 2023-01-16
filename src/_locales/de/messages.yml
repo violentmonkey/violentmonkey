@@ -340,7 +340,7 @@ labelEditor:
   message: Editor
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: nur bei aktivierten Skripten
 labelExclude:
   description: Label of @exclude rules.
   message: Ausschlussregeln (@exclude)
@@ -671,16 +671,15 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Ein Skript wie dieses ist bereits installiert oder befindet sich noch im
-    Papierkorb.
+    Ein Skript wie dieses ist bereits installiert.
 
-    Bitte wählen Sie hier einen anderen @name und @namespace, oder editieren Sie
+    Bitte wählen Sie hier einen anderen @name und @namespace oder editieren Sie
     stattdessen das existierende Skript.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Ein Skript mit gleichem @name und @namespace ist bereits installiert.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -689,6 +688,9 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Keine Aktualisierung gefunden.
+msgOpenUpdateErrors:
+  description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
+  message: Fehler beim Aktualisieren von Skripten. Anklicken, um sie zu öffnen.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -766,7 +768,7 @@ optionPopupGroupDisabled:
   message: Deaktivierte Skripte gruppieren
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Nach @run-at-Phasen gruppieren
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Deaktivierte Skripte ausblenden
