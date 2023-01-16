@@ -690,6 +690,9 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Nie znaleziono aktualizacji.
+msgOpenUpdateErrors:
+  description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
+  message: ''
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when

@@ -692,6 +692,9 @@ msgNewVersion:
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Nem található frissítés.
+msgOpenUpdateErrors:
+  description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
+  message: Hiba a szkriptek frissítésekor. Kattints a megnyitásukhoz.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -769,7 +772,7 @@ optionPopupGroupDisabled:
   message: Kikapcsolt szkriptek csoportosítása
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Csoportosítás @run-at szerint
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Kikapcsolt szkriptek elrejtése
