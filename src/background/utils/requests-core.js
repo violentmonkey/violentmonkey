@@ -74,13 +74,15 @@ const API_EVENTS = {
 function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
   const req = requests[verify[requestId]];
   if (req) {
-    if (req.anonymous || req.storeId) {
-      headers = headers.filter(h => (
-        !SET_COOKIE_RE.test(h.name)
-        || !req.storeId
-        || setCookieInStore(h.value, req, url)
+    // Hide Set-Cookie headers from the browser, and optionally set them in req.storeId
+    const { storeId } = req;
+    if (req.anonymous || storeId) {
+      headers = headers.filter(h => !SET_COOKIE_RE.test(h.name) || storeId && (
+        setCookieInStore(h.value, storeId, url),
+        false // overriding to allow declaring the function as `async`
       ));
     }
+    // Populate responseHeaders for GM_xhr's `response`
     req[kResponseHeaders] = headers.map(encodeWebRequestHeader).join('');
     return { [kResponseHeaders]: headers };
   }
@@ -113,10 +115,10 @@ function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
 
 /**
  * @param {string} headerValue
- * @param {GMReq.BG} req
+ * @param {string} storeId
  * @param {string} url
  */
-function setCookieInStore(headerValue, req, url) {
+function setCookieInStore(headerValue, storeId, url) {
   let m = SET_COOKIE_VALUE_RE.exec(headerValue);
   if (m) {
     const [, prefix, name, , value, optStr] = m;
@@ -137,7 +139,7 @@ function setCookieInStore(headerValue, req, url) {
       path: isHost ? '/' : opt.path,
       sameSite: SAME_SITE_MAP[sameSite],
       secure: url.startsWith('https:') && (!!prefix || sameSite === 'none' || 'secure' in opt),
-      storeId: req.storeId,
+      storeId,
     });
   }
 }
