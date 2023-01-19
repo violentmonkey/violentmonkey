@@ -91,7 +91,7 @@ async function createIcons() {
     handle(48),
     handle(128),
     ...types.map(handle16),
-    ...[19, 32, 38].flatMap(size => types.map(t => handle(size, ...t))),
+    ...[32, 38].flatMap(size => types.map(t => handle(size, ...t))),
   ]);
 }
 

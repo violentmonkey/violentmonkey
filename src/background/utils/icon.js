@@ -20,6 +20,8 @@ addPublicCommands({
   SetBadge: setBadge,
 });
 
+/** We don't set 19px because FF and Vivaldi scale it down to 16px instead of our own crisp 16px */
+const SIZES = [16, 32];
 /** Caching own icon to improve dashboard loading speed, as well as browserAction API
  * (e.g. Chrome wastes 40ms in our extension's process to read 4 icons for every tab). */
 const iconCache = {};
@@ -172,10 +174,9 @@ function updateState(tab, url = getTabUrl(tab)) {
 }
 
 async function setIcon(tab = {}, data = {}) {
-  // modern Chrome and Firefox use 16/32, other browsers may still use 19/38 (e.g. Vivaldi)
   const mod = data.blocked && 'b' || !isApplied && 'w' || '';
   const iconData = {};
-  for (const n of [16, 19, 32, 38]) {
+  for (const n of SIZES) {
     const path = `${ICON_PREFIX}${n}${mod}.png`;
     const icon = getOwnIcon(path);
     iconData[n] = (icon.then ? await icon : icon).img;
