@@ -82,6 +82,8 @@ export const VAULT = (() => {
   let SafeObject;
   let i = -1;
   let call;
+  /** Precaution against browser bugs: Symbol.toStringTag was exposed on `window` in FF88 */
+  let getOwnPropertyNames;
   let res;
   let srcFF;
   let src = global; // FF defines some stuff only on `global` in content mode
@@ -120,6 +122,7 @@ export const VAULT = (() => {
     // Object - using SafeObject to pacify eslint without disabling the rule
     defineProperty = (SafeObject = Object) && res[i += 1] || SafeObject.defineProperty,
     describeProperty = res[i += 1] || SafeObject.getOwnPropertyDescriptor,
+    getOwnPropertyNames = res[i += 1] || SafeObject.getOwnPropertyNames,
     getPrototypeOf = res[i += 1] || SafeObject.getPrototypeOf,
     assign = res[i += 1] || SafeObject.assign,
     objectKeys = res[i += 1] || SafeObject.keys,
@@ -166,8 +169,8 @@ export const VAULT = (() => {
       || (() => getOwnProp(window, 'parent')), // Chrome<=85 https://crrev.com/793165
     // various values
     builtinGlobals = res[i += 1] || [
-      reflectOwnKeys(srcWindow),
-      src !== srcWindow && reflectOwnKeys(src),
+      getOwnPropertyNames(srcWindow),
+      src !== srcWindow && getOwnPropertyNames(src),
     ],
   ];
   // Well-known Symbols are unforgeable
