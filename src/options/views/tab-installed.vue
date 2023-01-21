@@ -1,6 +1,6 @@
 <template>
-  <div class="tab-installed flex flex-col">
-    <div class="flex flex-col flex-auto" v-if="state.canRenderScripts">
+  <div class="tab-installed">
+    <div v-if="state.canRenderScripts">
       <header class="flex">
         <div class="flex-auto" v-if="!showRecycle">
           <Dropdown
@@ -101,7 +101,7 @@
            @click="handleEmptyRecycleBin"/>
       </div>
       <div v-else-if="message" class="hint mx-1 my-1 flex flex-col" v-text="message"></div>
-      <div class="scripts flex-auto"
+      <div class="scripts"
         v-focus="!state.script"
         ref="refList"
         :style="`--num-columns:${state.numColumns}`"
@@ -127,13 +127,14 @@
         />
       </div>
     </div>
-    <edit
-      v-if="state.script"
-      :initial="state.script"
-      :initial-code="state.code"
-      :read-only="state.script.config.removed"
-      @close="handleEditScript()"
-    />
+    <teleport to="body" v-if="state.script">
+      <edit
+        :initial="state.script"
+        :initial-code="state.code"
+        :read-only="state.script.config.removed"
+        @close="handleEditScript()"
+      />
+    </teleport>
   </div>
 </template>
 
@@ -703,8 +704,14 @@ export default {
   --columns-table: 1600, 2500, 3400; // 1680x1050, 2560x1440, 3440x1440
 }
 .tab.tab-installed {
+  max-height: 100vh;
   padding: 0;
+  overflow: auto;
   header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--fill-0-5);
     height: 4rem;
     align-items: center;
     padding: 0 1rem;

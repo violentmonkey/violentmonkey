@@ -1,5 +1,5 @@
 <template>
-  <div class="edit frame flex flex-col fixed-full">
+  <div class="edit frame flex flex-col abs-full">
     <div class="edit-header flex mr-1c">
       <nav>
         <div
@@ -239,6 +239,7 @@ export default {
     }
   },
   async mounted() {
+    document.body.classList.add('edit-open');
     store.storageSize = 0;
     this.nav = 'code';
     const { custom, config } = this.script;
@@ -359,6 +360,7 @@ export default {
     },
   },
   beforeUnmount() {
+    document.body.classList.remove('edit-open');
     store.title = null;
     this.toggleUnloadSentry(false);
     this.disposeList?.forEach(dispose => {
@@ -437,6 +439,12 @@ export default {
 @media (max-width: 767px) {
   .edit-hint {
     display: none;
+  }
+  .edit {
+    // fixed/absolute doesn't work well with scroll in Firefox Android
+    position: static;
+    // larger than 100vh to force overflow so that the toolbar can be hidden in Firefox Android
+    height: 101vh;
   }
 }
 

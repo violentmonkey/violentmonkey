@@ -10489,10 +10489,10 @@ vue@^3.2.45:
     "@vue/server-renderer" "3.2.45"
     "@vue/shared" "3.2.45"
 
-vueleton@^2.0.0-5:
-  version "2.0.0-5"
-  resolved "https://registry.yarnpkg.com/vueleton/-/vueleton-2.0.0-5.tgz#3f22e5dc4341234db6b2d60bfed4aa499a961d2d"
-  integrity sha512-HA09S7iq+OIwRNrnoB0F4Y9lqWhCEjhjKzoeWl7KmzLs6tZxLiNWf4QchQBRWutuw0aEEQCzp6vvzoDPyoLLAQ==
+vueleton@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/vueleton/-/vueleton-2.0.1.tgz#e0d3cc527f4ede6713731b3db446fdae730e650f"
+  integrity sha512-0pOR4UPj+LJlLdoQxgVKWlYAin4ftU9dJKCBdtZhXH100MJ8WkLyo2DRfMOL1x7ZJ2RIUfHvipleLQ8zdEAzUA==
   dependencies:
     "@babel/runtime" "^7.19.0"
     globby "^13.1.2"
