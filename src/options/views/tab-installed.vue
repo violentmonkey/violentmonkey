@@ -361,7 +361,7 @@ async function onHashChange() {
     } else {
       // First time showing the list we need to tell v-if to keep it forever
       if (!state.canRenderScripts) {
-        loadData();
+        await loadData();
         state.canRenderScripts = true;
       }
       debouncedRender();
