@@ -359,15 +359,17 @@ async function onHashChange() {
     if (script) {
       state.code = await sendCmdDirectly('GetScriptCode', id);
     } else {
-      // First time showing the list we need to tell v-if to keep it forever
-      if (!state.canRenderScripts) {
-        await loadData();
-        state.canRenderScripts = true;
-      }
-      debouncedRender();
       // Strip the invalid id from the URL so |App| can render the aside,
       // which was hidden to avoid flicker on initial page load directly into the editor.
       if (id) setRoute(tab, true);
+      // First time showing the list we need to tell v-if to keep it forever
+      if (!state.canRenderScripts) {
+        state.canRenderScripts = true;
+        renderScripts();
+        loadData();
+      } else {
+        debouncedRender();
+      }
     }
     state.script = script;
   }
