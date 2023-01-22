@@ -1,5 +1,5 @@
 import '@/common/browser';
-import { formatByteLength, getLocaleString, i18n, sendCmdDirectly } from '@/common';
+import { formatByteLength, getLocaleString, i18n, sendCmdDirectly, trueJoin } from '@/common';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import options from '@/common/options';
@@ -43,7 +43,7 @@ function initScript(script, sizes) {
     getLocaleString(meta, 'description'),
     script.custom.name,
     script.custom.description,
-  ].filter(Boolean).join('\n');
+  ]::trueJoin('\n');
   const name = script.custom.name || localeName;
   const lowerName = name.toLowerCase();
   let total = 0;

@@ -139,7 +139,7 @@
 
 <script>
 import { computed, reactive, nextTick, onMounted, watch, ref } from 'vue';
-import { i18n, sendCmdDirectly, debounce, makePause } from '@/common';
+import { i18n, sendCmdDirectly, debounce, makePause, trueJoin } from '@/common';
 import options from '@/common/options';
 import { showConfirmation, showMessage, vFocus } from '@/common/ui';
 import hookSetting from '@/common/hook-setting';
@@ -340,7 +340,7 @@ function handleStateChange(active) {
   state.menuNewActive = active;
 }
 function handleEditScript(id) {
-  const pathname = [showRecycle.value ? 'recycleBin' : 'scripts', id].filter(Boolean).join('/');
+  const pathname = [showRecycle.value ? 'recycleBin' : 'scripts', id]::trueJoin('/');
   if (!id && pathname === lastRoute().pathname) {
     window.history.back();
   } else {

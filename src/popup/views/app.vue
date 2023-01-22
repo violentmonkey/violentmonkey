@@ -195,7 +195,7 @@ import Tooltip from 'vueleton/lib/tooltip';
 import options from '@/common/options';
 import {
   getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl,
-  i18n, makePause, sendCmdDirectly, sendTabCmd,
+  i18n, makePause, sendCmdDirectly, sendTabCmd, trueJoin,
 } from '@/common';
 import { objectPick } from '@/common/object';
 import { focusMe } from '@/common/ui';
@@ -319,7 +319,7 @@ export default {
         store.blacklisted && 'blacklisted',
         // undefined means the data isn't ready yet
         optionsData.isApplied === false && 'scripts-disabled',
-      ].filter(Boolean).join(' ');
+      ]::trueJoin(' ');
     },
     failureReasonText() {
       return (
