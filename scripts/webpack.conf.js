@@ -116,7 +116,7 @@ const modify = (page, entry, init) => modifyWebpackConfig(
     ]);
     config.module.rules.find(rule => {
       if (typeof rule.test?.test === 'function' && rule.test.test('file.js')) {
-        rule.exclude = file => /node_modules/.test(file) && !/vueleton/.test(file);
+        rule.exclude = file => /node_modules/.test(file) && !/vueleton|@vue\/shared/.test(file);
       }
     });
     if (!entry) init = page;
