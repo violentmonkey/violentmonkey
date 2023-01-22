@@ -11,7 +11,7 @@ import storage from './storage';
 addOwnCommands({
   GetImageData: async url => (
     url.startsWith(ICON_PREFIX)
-      ? (await getOwnIcon(url)).uri
+      ? (await getOwnIcon(new URL(url).pathname)).uri
       : (await storage.cache.fetch(url), makeDataUri(await storage.cache.getOne(url)))
   ),
 });
@@ -165,7 +165,8 @@ function updateState(tab, url = getTabUrl(tab)) {
   // if the user unblacklisted this previously blocked tab in settings,
   // but didn't reload the tab yet, we need to restore the icon and the title
   if (title || (badges[tabId] || {}).blocked) {
-    browserAction.setTitle({ title, tabId });
+    // Firefox Android doesn't fall back on empty values
+    browserAction.setTitle({ title: title || i18n('extName'), tabId });
     const data = title ? { blocked: true } : {};
     badges[tabId] = data;
     setIcon(tab, data);
@@ -175,14 +176,18 @@ function updateState(tab, url = getTabUrl(tab)) {
 
 async function setIcon(tab = {}, data = {}) {
   const mod = data.blocked && 'b' || !isApplied && 'w' || '';
+  const pathData = {};
   const iconData = {};
   for (const n of SIZES) {
-    const path = `${ICON_PREFIX}${n}${mod}.png`;
-    const icon = getOwnIcon(path);
-    iconData[n] = (icon.then ? await icon : icon).img;
+    const path = new URL(`${ICON_PREFIX}${n}${mod}.png`).pathname;
+    const icon = await getOwnIcon(path);
+    pathData[n] = path;
+    iconData[n] = icon.img;
   }
+  // imageData doesn't work in Firefox Android, so we also set path here
   browserAction.setIcon({
     tabId: tab.id,
+    path: pathData,
     imageData: iconData,
   });
 }
@@ -192,7 +197,10 @@ function getOwnIcon(path) {
   return icon;
 }
 
-/** @throws in Firefox when Canvas is disabled by something in about:config */
+/**
+ * @param {string} path must be a relative path in Firefox Android
+ * @throws in Firefox when Canvas is disabled by something in about:config
+ */
 function loadImageData(path) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -200,7 +208,7 @@ function loadImageData(path) {
     img.onload = () => {
       const { width, height } = img;
       if (!width) { // FF reports 0 for SVG
-        resolve(path);
+        resolve({ uri: path });
         return;
       }
       const canvas = document.createElement('canvas');
