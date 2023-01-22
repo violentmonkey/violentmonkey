@@ -102,7 +102,7 @@
             <div class="script-name flex-auto ellipsis" v-text="item.name"
                  :data-upd="item.upd"
                  @click.ctrl.exact.stop="onEditScript(item)"
-                 @contextmenu.exact.stop="onEditScript(item)"
+                 @contextmenu.exact.stop.prevent="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)" />
           </div>
           <div class="submenu-buttons"
