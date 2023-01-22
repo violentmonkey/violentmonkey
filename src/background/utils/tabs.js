@@ -8,7 +8,7 @@ const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
   || !!(window.AbortSignal && browser.windows); // and FF57+ except mobile
 const NEWTAB_URL_RE = re`/
 ^(
-  about:newtab # Firefox
+  about:(home|newtab) # Firefox
   | (chrome|edge):\/\/(
     newtab\/ # Chrome, Edge
     | startpageshared\/ # Opera
