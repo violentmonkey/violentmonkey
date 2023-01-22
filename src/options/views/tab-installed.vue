@@ -732,6 +732,10 @@ export default {
       right: auto;
     }
   }
+  @media (max-width: 767px) {
+    max-height: none;
+    overflow: visible;
+  }
 }
 .backdrop {
   text-align: center;
