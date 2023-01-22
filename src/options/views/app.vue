@@ -9,7 +9,7 @@
           <a
             :href="`#${tab.name}`"
             :class="{active: tab === current}"
-            :data-num-scripts="numbers[tab.name] || null"
+            :data-num-scripts="numbers[tab.name]"
             v-text="tab.label"
           />
         </div>

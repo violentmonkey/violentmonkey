@@ -390,6 +390,7 @@ $removedItemHeight: calc(
     align-items: center;
     line-height: $itemLineHeight;
     margin-left: 8px;
+    min-width: 0; /* avoid overflow because grid's min-width is `content` */
     .removed & {
       order: 2;
     }
@@ -427,6 +428,7 @@ $removedItemHeight: calc(
   &-author {
     display: flex;
     align-items: center;
+    min-width: 4em;
     > .ellipsis {
       display: inline-block;
       max-width: 100px;

@@ -1,4 +1,4 @@
-$compactHeaderHeight: 3rem;
+$compactHeaderHeight: 4rem;
 $tabPadX: 2rem;
 $tabPadY: 3rem;
 $tabPadTopY: 1.5rem;
@@ -44,8 +44,17 @@ aside {
       color: var(--fg);
     }
   }
-  [data-num-scripts]::before {
-    content: '(' attr(data-num-scripts) ') ';
+  [data-num-scripts="0"]::before {
+    visibility: hidden;
+  }
+  [data-num-scripts] {
+    &::before {
+      content: '(' attr(data-num-scripts) ')';
+      width: 5.5ch;
+      align-self: center;
+      text-align: right;
+      margin-right: .5ch;
+    }
   }
   &:nth-last-child(2) {
     flex: 1;
@@ -154,11 +163,11 @@ textarea:not([rows="1"]):not(.h100) {
     height: $compactHeaderHeight;
     padding: 0;
     border-width: 0 0 1px 0;
-    overflow-x: auto;
     img {
-      width: $compactHeaderHeight;
-      height: $compactHeaderHeight;
-      margin: 0 .5rem 0 1.25rem;
+      width: calc($compactHeaderHeight - 8px);
+      height: calc($compactHeaderHeight - 8px);
+      margin: 0 .5rem;
+      flex: 0 0 auto;
     }
     hr {
       display: none;
@@ -170,13 +179,10 @@ textarea:not([rows="1"]):not(.h100) {
     }
   }
   .aside-menu-item {
-    display: flex;
     padding: 0 8px;
-    text-align: center;
     a {
       display: flex;
-      flex-direction: column; /* stretch to full height... */
-      justify-content: center; /* ...and center vertically */
+      white-space: normal;
     }
   }
 }
