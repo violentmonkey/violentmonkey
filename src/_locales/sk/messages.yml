@@ -682,7 +682,7 @@ msgNoUpdate:
   message: Nie sú žiadne aktualizácie.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Chyba pri aktualizácii skriptov. Kliknutím ich otvoríte.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
