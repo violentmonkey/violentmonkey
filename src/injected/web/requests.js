@@ -2,6 +2,7 @@ import bridge, { addHandlers } from './bridge';
 
 /** @type {Object<string,GMReq.Web>} */
 const idMap = createNullObj();
+const kContentTextHtml = 'text/html';
 const kResponse = 'response';
 const kResponseXML = 'responseXML';
 const kDocument = 'document';
@@ -26,6 +27,13 @@ const OPTS_TO_PASS = [
   'password',
   'timeout',
   'user',
+];
+const PARSEABLE_TYPES = [
+  'application/xhtml+xml',
+  'application/xml',
+  'image/svg+xml',
+  'text/xml',
+  kContentTextHtml,
 ];
 const XHR_TYPE = {
   __proto__: null,
@@ -91,11 +99,16 @@ addHandlers({
  */
 function parseRaw(req, msg, propName) {
   const { [kResponseType]: responseType } = req;
-  let res;
+  let res, ct;
   if ('raw' in req) {
     res = req.raw;
-    if (responseType === kDocument || !responseType && propName === kResponseXML) {
-      res = new SafeDOMParser()::parseFromString(res, getContentType(msg) || 'text/html');
+    if (responseType === kDocument
+    || !responseType
+      && propName === kResponseXML
+      && PARSEABLE_TYPES::indexOf(ct = getContentType(msg) || kContentTextHtml) >= 0
+    ) {
+      try { res = new SafeDOMParser()::parseFromString(res, ct); }
+      catch (e) { res = null; /* per specification */ }
     } else if (responseType === 'json') {
       res = jsonParse(res);
     }
@@ -104,6 +117,10 @@ function parseRaw(req, msg, propName) {
       setOwnProp(this, otherPropName, res);
       req[otherPropName] = res;
     }
+    // TODO: should we implement this spec behavior?
+    // if (propName === kResponseXML && responseType && responseType !== kDocument) {
+    //   throw new SafeError('responseXML failed: responseType must be "document" or "" or absent.');
+    // }
     if (responseType) {
       delete req.raw;
     }
