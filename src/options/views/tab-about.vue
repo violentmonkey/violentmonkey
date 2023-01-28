@@ -6,9 +6,6 @@
     </h1>
     <p v-text="i18n('extDescription')"></p>
     <div>
-      <a href="https://violentmonkey.github.io/donate/" target="_blank" rel="noopener noreferrer" v-text="i18n('labelDonate')"></a><span class="text-red"> &hearts;</span>
-    </div>
-    <div>
       <label v-text="i18n('labelRelated')"></label>
       <ul>
         <li><a href="https://violentmonkey.github.io" target="_blank" rel="noopener noreferrer" v-text="i18n('labelHomepage')"></a></li>
