@@ -212,7 +212,6 @@ footer {
 .submenu {
   display: none;
   min-height: 2rem;
-  max-height: 30rem;
   overflow-y: auto;
   background: var(--bg);
   border-top: 1px dashed var(--fill-3);

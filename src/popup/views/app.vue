@@ -512,7 +512,8 @@ export default {
   mounted() {
     focusMe(this.$el);
     keyboardService.enable();
-    this.$el.style.maxHeight = Math.min(600, screen.availHeight - window.screenY - 8) + 'px';
+    // innerHeight may be bigger than 600px in a mobile browser which displays the popup as a fullscreen page
+    this.$el.style.maxHeight = Math.min(Math.max(600, innerHeight), screen.availHeight - window.screenY - 8) + 'px';
     this.disposeList = [
       keyboardService.register('escape', () => {
         const item = this.activeExtras;
