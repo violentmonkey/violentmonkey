@@ -26,8 +26,8 @@ class ConfigLoader {
       .map((line) => {
         const i = line.indexOf('=');
         if (i < 0) return [];
-        const key = line.split(0, i).trim();
-        let value = line.split(i + 1).trim();
+        const key = line.slice(0, i).trim();
+        let value = line.slice(i + 1).trim();
         // Note: escaped characters are not supported
         if (/^(['"]).*\1$/.test(value)) value = value.slice(1, -1);
         return [key, value];
