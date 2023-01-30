@@ -316,6 +316,7 @@ labelDataImport:
 labelDonate:
   description: Label of link to donate page.
   message: Donate
+  touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'Download URL:'

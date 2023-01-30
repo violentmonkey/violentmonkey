@@ -308,6 +308,7 @@ labelDataImport:
 labelDonate:
   description: Label of link to donate page.
   message: Підтримати проект фінансово
+  touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'Джерело завантаження:'

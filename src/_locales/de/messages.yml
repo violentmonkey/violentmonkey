@@ -243,8 +243,8 @@ hintUseDownloadURL:
 hintVacuum:
   description: Hint for vacuuming data.
   message: >-
-    Die Redundanz verwerfen und versuchen, die fehlenden Ressourcen im Cache neu
-    zu laden.
+    Die Redundanz verwerfen und versuchen, die fehlenden Ressourcen neu in den
+    Cache zu laden.
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Installiere aus $1
@@ -326,6 +326,7 @@ labelDataImport:
 labelDonate:
   description: Label of link to donate page.
   message: Spenden
+  touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'Download-URL:'

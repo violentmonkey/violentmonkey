@@ -312,6 +312,7 @@ labelDataImport:
 labelDonate:
   description: Label of link to donate page.
   message: 寄付
+  touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: '更新を取得するURL:'
