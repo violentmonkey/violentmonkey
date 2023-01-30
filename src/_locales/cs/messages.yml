@@ -304,6 +304,7 @@ labelDataImport:
 labelDonate:
   description: Label of link to donate page.
   message: Přispět
+  touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'Stažení (URL):'

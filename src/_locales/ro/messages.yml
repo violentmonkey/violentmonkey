@@ -62,7 +62,7 @@ buttonNew:
   message: Nou
 buttonOK:
   description: OK button on dialog.
-  message: Ok
+  message: OK
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Coș de reciclare
@@ -116,7 +116,7 @@ confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
     Modificările nu sunt salvate!
-    Clic pe Ok pentru a le ignora sau Anulează pentru a rămâne.
+    Clic pe OK pentru a le ignora sau Anulează pentru a rămâne.
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: Scripturile nu vor fi injectate în URL-urile corespondente acestei liste.
@@ -330,6 +330,7 @@ labelDataImport:
 labelDonate:
   description: Label of link to donate page.
   message: Donează
+  touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
   message: 'URL pentru descărcare:'
@@ -692,7 +693,7 @@ msgNoUpdate:
   message: Nu au fost găsite actualizări.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Eroare la actualizarea scripturilor. Click pentru a le deschide.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
