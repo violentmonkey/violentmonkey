@@ -7,34 +7,22 @@ assignees: ''
 
 ---
 
-- [ ] The bug is also present in the latest [beta](https://github.com/violentmonkey/violentmonkey/releases).
-   Warning! Do an export in Violentmonkey settings before testing.
+<!-- Please search the existing issues first as the problem may be already reported.
+     Please verify the bug is not fixed in the latest beta:
+     https://github.com/violentmonkey/violentmonkey/releases -->
 
-- [ ] I have searched for existing issues that already reported this problem and found none
-
-**Describe the bug**
-A clear and concise description of what the bug is.
-
-**To Reproduce**
-Note that issues without a reproduction may be closed immediately!
-Steps to reproduce the behavior:
+### Sequence of actions: <!-- e.g. install userscript, open example.com, click page -->
 1.
 2.
 3.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+### Problem: <!-- e.g. error in devtools console -->
 
-**Actual behavior**
-If applicable, add screenshots to help explain your problem.
+### Expected result:  <!-- e.g. "ok" in console or some button appears -->
 
-<!-- If this is a bug report, please also provide logs in the console. -->
+#### Devtools console contents:
 
-**Environment:**
-- OS: [e.g. macOS]
-- Browser: [e.g. chrome, safari]
-- Browser Version: [e.g. 22]
+#### Environment:
+- OS: Windows
+- Browser: Chrome 123 <!-- specify the real version -->
 - Violentmonkey Version:
-
-**Additional context**
-Add any other context about the problem here.
