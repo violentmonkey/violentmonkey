@@ -1,6 +1,7 @@
 <template>
   <div>
-    <button v-text="i18n('buttonImportData')" @click="pickBackup" ref="buttonImport"/>
+    <button v-text="i18n('buttonImportData')" @click="pickBackup" ref="buttonImport"
+            :disabled="store.importing"/>
     <tooltip :content="i18n('hintVacuum')">
       <button @click="vacuum" :disabled="vacuuming" v-text="labelVacuum" />
     </tooltip>
@@ -27,6 +28,7 @@ import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
 import loadZipLibrary from '@/common/zip';
 import { showConfirmation, showMessage } from '@/common/ui';
+import { store } from '../../utils';
 
 const reports = reactive([]);
 
@@ -38,6 +40,7 @@ export default {
   data() {
     return {
       reports,
+      store,
       vacuuming: false,
       labelVacuum: this.i18n('buttonVacuum'),
     };
@@ -68,6 +71,16 @@ export default {
 };
 
 async function importBackup(file) {
+  if (!store.importing) {
+    try {
+      await (store.importing = doImportBackup(file));
+    } finally {
+      store.importing = null;
+    }
+  }
+}
+
+async function doImportBackup(file) {
   if (!file) return;
   reports.length = 0;
   const zip = await loadZipLibrary();
@@ -216,9 +229,7 @@ function initDragDrop(targetElement) {
     // storing it now because `files` will be null after await
     const file = evt.dataTransfer.files[0];
     if (!await showConfirmation(i18n('buttonImportData'))) return;
-    targetElement.disabled = true;
     await importBackup(file);
-    targetElement.disabled = false;
   };
   return () => {
     const isSettingsTab = window.location.hash === '#settings';
