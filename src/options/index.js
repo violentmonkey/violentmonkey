@@ -1,5 +1,7 @@
 import '@/common/browser';
-import { formatByteLength, getLocaleString, i18n, sendCmdDirectly, trueJoin } from '@/common';
+import {
+  formatByteLength, getLocaleString, i18n, makePause, sendCmdDirectly, trueJoin,
+} from '@/common';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import options from '@/common/options';
@@ -16,18 +18,10 @@ const SIZE_TITLES = [
   '@require',
   '@resource',
 ];
+let updateThrottle;
 
-Object.assign(store, {
-  loading: false,
-  sync: [],
-  title: null,
-});
-initialize();
-
-function initialize() {
-  initMain();
-  render(App);
-}
+initMain();
+render(App);
 
 /**
  * @param {VMScript} script
@@ -101,6 +95,12 @@ function initMain() {
     },
     async UpdateScript({ update, where } = {}) {
       if (!update) return;
+      if (updateThrottle
+      || (updateThrottle = store.importing)
+      && (updateThrottle = Promise.race([updateThrottle, makePause(500)]))) {
+        await updateThrottle;
+        updateThrottle = null;
+      }
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       const i1 = store.scripts.findIndex(item => item.props.id === where.id);
       const i2 = store.removedScripts.findIndex(item => item.props.id === where.id);
