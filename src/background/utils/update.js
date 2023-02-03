@@ -24,12 +24,12 @@ addOwnCommands({
         && (processes[curId] || (processes[curId] = doCheckUpdate(script, urls)));
     }).filter(Boolean);
     const results = await Promise.all(jobs);
-    const problems = results.filter(r => r?.text);
-    if (problems.length) {
+    const notes = results.filter(r => r?.text);
+    if (notes.length) {
       notifyToOpenScripts(
-        i18n('msgOpenUpdateErrors'),
-        problems.map(p => `* ${p.text}\n`).join(''),
-        problems.map(p => p.script.props.id),
+        notes.some(n => n.err) ? i18n('msgOpenUpdateErrors') : i18n('optionUpdate'),
+        notes.map(n => `* ${n.text}\n`).join(''),
+        notes.map(n => n.script.props.id),
       );
     }
     if (!id) setOption('lastUpdate', Date.now());
@@ -66,6 +66,7 @@ async function doCheckUpdate(script, urls) {
       res = {
         script,
         text: [msgOk, msgErr]::trueJoin('\n'),
+        err: !!msgErr,
       };
     }
     delete processes[id];
