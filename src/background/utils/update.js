@@ -1,6 +1,5 @@
 import {
-  compareVersion, getScriptName, getScriptUpdateUrl,
-  i18n, sendCmd, trueJoin,
+  compareVersion, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
 } from '@/common';
 import { METABLOCK_RE } from '@/common/consts';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
@@ -18,7 +17,13 @@ addOwnCommands({
    */
   async CheckUpdate(id) {
     const scripts = id ? [getScriptById(id)] : getScripts();
-    const results = await Promise.all(scripts.reduce(maybeCheckUpdate, []));
+    const jobs = scripts.map(script => {
+      const curId = script.props.id;
+      const urls = getScriptUpdateUrl(script, true);
+      return urls && (id || script.config.enabled || !getOption('updateEnabledScriptsOnly'))
+        && (processes[curId] || (processes[curId] = doCheckUpdate(script, urls)));
+    }).filter(Boolean);
+    const results = await Promise.all(jobs);
     const problems = results.filter(r => r?.text);
     if (problems.length) {
       notifyToOpenScripts(
@@ -31,20 +36,6 @@ addOwnCommands({
     return results.reduce((num, r) => num + (r === true), 0);
   },
 });
-
-/**
- * @param {Promise[]} jobs
- * @param {VMScript} script
- * @returns {Promise[]}
- */
-function maybeCheckUpdate(jobs, script) {
-  const { id } = script.props;
-  const urls = getScriptUpdateUrl(script, true);
-  if (urls && (script.config.enabled || !getOption('updateEnabledScriptsOnly'))) {
-    jobs.push(processes[id] || (processes[id] = doCheckUpdate(script, urls)));
-  }
-  return jobs;
-}
 
 async function doCheckUpdate(script, urls) {
   const { id } = script.props;
