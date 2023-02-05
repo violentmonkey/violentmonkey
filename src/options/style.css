@@ -5,7 +5,10 @@ $tabPadTopY: 1.5rem;
 $sectionBorder: 1px solid var(--fill-2);
 
 aside {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
   z-index: 1000;
 }
 .aside-content {
@@ -116,8 +119,9 @@ textarea:not([rows="1"]):not(.h100) {
 }
 .tab {
   position: relative;
+  margin-left: 14rem;
   padding: $tabPadTopY $tabPadX 0;
-  overflow-y: auto;
+  // overflow-y: auto;
   background: var(--bg);
 }
 
@@ -155,6 +159,11 @@ textarea:not([rows="1"]):not(.h100) {
   }
   .tab {
     width: auto !important;
+    margin: 0;
+  }
+  aside {
+    position: sticky;
+    bottom: auto;
   }
   .aside-content {
     flex-direction: row;
@@ -163,6 +172,7 @@ textarea:not([rows="1"]):not(.h100) {
     height: $compactHeaderHeight;
     padding: 0;
     border-width: 0 0 1px 0;
+    overflow: auto hidden;
     img {
       width: calc($compactHeaderHeight - 8px);
       height: calc($compactHeaderHeight - 8px);
@@ -183,6 +193,14 @@ textarea:not([rows="1"]):not(.h100) {
     a {
       display: flex;
       white-space: normal;
+    }
+  }
+
+  .edit-open {
+    // hide other components when edit is open to avoid scroll glitches in Firefox Android
+    .page-options {
+      height: 0;
+      overflow: hidden;
     }
   }
 }

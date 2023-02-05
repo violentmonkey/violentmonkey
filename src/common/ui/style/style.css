@@ -55,7 +55,7 @@
 }
 
 body {
-  overflow: hidden; // avoid flash of viewport caused by tooltip
+  // overflow: hidden; // avoid flash of viewport caused by tooltip
   font-size: 1rem;
   background: var(--bg);
   color: var(--fg);

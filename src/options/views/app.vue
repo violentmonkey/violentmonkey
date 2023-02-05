@@ -1,5 +1,5 @@
 <template>
-  <div class="page-options flex h-screen">
+  <div class="page-options">
     <aside v-if="canRenderAside">
       <div class="aside-content">
         <img src="/public/images/icon128.png">
@@ -16,7 +16,7 @@
       </div>
     </aside>
     <keep-alive>
-      <component :is="current.comp" class="tab flex-auto"/>
+      <component :is="current.comp" class="tab"/>
     </keep-alive>
   </div>
 </template>

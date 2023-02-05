@@ -1,5 +1,5 @@
 <template>
-  <div class="edit frame flex flex-col fixed-full">
+  <div class="edit frame flex flex-col abs-full">
     <div class="edit-header flex mr-1c">
       <nav>
         <div
@@ -26,43 +26,43 @@
         <button v-text="i18n('buttonClose')" @click="close"/>
       </div>
     </div>
-    <div class="frame-block flex-auto pos-rel">
-      <vm-code
-        class="abs-full"
-        :value="code"
-        :readOnly="readOnly"
-        ref="code"
-        v-show="nav === 'code'"
-        :active="nav === 'code'"
-        :commands="commands"
-        @code-dirty="codeDirty = $event"
-      />
-      <vm-settings
-        class="abs-full edit-body"
-        v-show="nav === 'settings'"
-        :readOnly="readOnly"
-        :active="nav === 'settings'"
-        :settings="settings"
-        :value="script"
-      />
-      <vm-values
-        class="abs-full edit-body"
-        v-show="nav === 'values'"
-        :readOnly="readOnly"
-        :active="nav === 'values'"
-        :script="script"
-      />
-      <vm-externals
-        class="abs-full"
-        v-if="nav === 'externals'"
-        :value="script"
-      />
-      <vm-help
-        class="abs-full edit-body"
-        v-show="nav === 'help'"
-        :hotkeys="hotkeys"
-      />
-    </div>
+
+    <vm-code
+      class="flex-auto"
+      :value="code"
+      :readOnly="readOnly"
+      ref="code"
+      v-show="nav === 'code'"
+      :active="nav === 'code'"
+      :commands="commands"
+      @code-dirty="codeDirty = $event"
+    />
+    <vm-settings
+      class="edit-body"
+      v-show="nav === 'settings'"
+      :readOnly="readOnly"
+      :active="nav === 'settings'"
+      :settings="settings"
+      :value="script"
+    />
+    <vm-values
+      class="edit-body"
+      v-show="nav === 'values'"
+      :readOnly="readOnly"
+      :active="nav === 'values'"
+      :script="script"
+    />
+    <vm-externals
+      class="flex-auto"
+      v-if="nav === 'externals'"
+      :value="script"
+    />
+    <vm-help
+      class="edit-body"
+      v-show="nav === 'help'"
+      :hotkeys="hotkeys"
+    />
+
     <div v-if="errors" class="errors my-1c">
       <p v-for="e in errors" :key="e" v-text="e" class="text-red"/>
       <p class="my-1">
@@ -239,6 +239,7 @@ export default {
     }
   },
   async mounted() {
+    document.body.classList.add('edit-open');
     store.storageSize = 0;
     this.nav = 'code';
     const { custom, config } = this.script;
@@ -359,6 +360,7 @@ export default {
     },
   },
   beforeUnmount() {
+    document.body.classList.remove('edit-open');
     store.title = null;
     this.toggleUnloadSentry(false);
     this.disposeList?.forEach(dispose => {
@@ -372,16 +374,20 @@ export default {
 .edit {
   z-index: 2000;
   &-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--fill-3);
+    background: inherit;
   }
   &-name {
     font-weight: bold;
   }
   &-body {
     padding: .5rem 1rem;
-    overflow: auto;
+    // overflow: auto;
     background: var(--bg);
   }
   &-nav-item {
@@ -437,6 +443,12 @@ export default {
 @media (max-width: 767px) {
   .edit-hint {
     display: none;
+  }
+  .edit {
+    // fixed/absolute doesn't work well with scroll in Firefox Android
+    position: static;
+    // larger than 100vh to force overflow so that the toolbar can be hidden in Firefox Android
+    min-height: calc(100vh + 1px);
   }
 }
 
