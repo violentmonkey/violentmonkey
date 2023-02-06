@@ -336,7 +336,7 @@ labelEditor:
   message: Bewerker
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: Alleen ingeschakelde scripts
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude-regels'
@@ -660,16 +660,14 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: >-
-    Er is al een vergelijkbaar script geïnstalleerd of in de prullenbak
-    geplaatst.
-
+  message: |-
+    Er is al een vergelijkbaar script geïnstalleerd.
     Kies een andere @name en @namespace of bewerk het andere script.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Er is al een script met dezelfde @name en @namespace geïnstalleerd.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -680,7 +678,7 @@ msgNoUpdate:
   message: Er is geen nieuwe versie beschikbaar.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: De scripts kunnen niet worden bijgewerkt. Klik om te openen.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -758,7 +756,7 @@ optionPopupGroupDisabled:
   message: Uitgeschakelde scripts groeperen
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Groeperen op @run-at-niveau
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Uitgeschakelde scripts verbergen
