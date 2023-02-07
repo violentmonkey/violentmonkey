@@ -68,9 +68,9 @@ const propsToClear = {
   [S_VALUE_PRE]: ENV_VALUE_IDS,
 };
 const expose = {};
-const resolveDataCodeStr = `(${data => {
-  if (self.vmResolve) self.vmResolve(data); // `window` is a const which is inaccessible here
-  else self.vmData = data; // Ran earlier than the main content script so just drop the payload
+const resolveDataCodeStr = `(${(global, data) => {
+  if (global.vmResolve) global.vmResolve(data); // `window` is a const which is inaccessible here
+  else global.vmData = data; // Ran earlier than the main content script so just drop the payload
 }})`;
 const getKey = (url, isTop) => (
   isTop ? url : `-${url}`
@@ -464,7 +464,7 @@ function registerScriptDataFF(inject, url) {
   }
   return contentScriptsAPI.register({
     js: [{
-      code: `${resolveDataCodeStr}(${JSON.stringify(inject)})`,
+      code: `${resolveDataCodeStr}(this,${JSON.stringify(inject)})`,
     }],
     matches: url.split('#', 1),
     runAt: 'document_start',

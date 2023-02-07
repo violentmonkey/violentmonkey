@@ -71,12 +71,13 @@ addHandlers({
 init().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
 
 async function getDataFF(viaMessaging) {
-  const data = self.vmData || await SafePromise.race([
-    new SafePromise(resolve => { self.vmResolve = resolve; }),
+  // global !== window in FF content scripts
+  const data = global.vmData || await SafePromise.race([
+    new SafePromise(resolve => { global.vmResolve = resolve; }),
     viaMessaging,
   ]);
-  delete self.vmResolve;
-  delete self.vmData;
+  delete global.vmResolve;
+  delete global.vmData;
   return data;
 }
 
