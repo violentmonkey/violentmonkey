@@ -30,6 +30,7 @@ export default {
   version: null,
   /** @type {VMScriptInjectInto} */
   defaultInjectInto: INJECT_AUTO,
+  ffInject: true,
   xhrInject: false,
   filters: {
     /** @type {'name' | 'code' | 'all'} */

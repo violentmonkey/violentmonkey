@@ -114,6 +114,14 @@
               </locale-group>
             </tooltip>
           </label>
+          <label v-if="!settings.xhrInject">
+            <setting-check name="ffInject"/>
+            <tooltip :content="i18n('labelFastFirefoxInjectHint')">
+              <locale-group i18n-key="labelFastFirefoxInject">
+                <code>page</code>
+              </locale-group>
+            </tooltip>
+          </label>
         </div>
         <div>
           <locale-group i18n-key="labelExposeStatus" class="mr-1c">
@@ -204,6 +212,9 @@ const items = {
       dark: i18n('optionUiThemeDark'),
       light: i18n('optionUiThemeLight'),
     },
+  },
+  xhrInject: {
+    normalize: value => value,
   },
   ...badgeColorEnum::mapEntry(() => badgeColorItem),
 };
