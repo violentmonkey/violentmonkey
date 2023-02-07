@@ -99,11 +99,14 @@
             @click="onToggleScript(item)">
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
-            <div class="script-name flex-auto ellipsis" v-text="item.name"
+            <div class="script-name flex-auto ellipsis"
                  :data-upd="item.upd"
                  @click.ctrl.exact.stop="onEditScript(item)"
                  @contextmenu.exact.stop.prevent="onEditScript(item)"
-                 @mousedown.middle.exact.stop="onEditScript(item)" />
+                 @mousedown.middle.exact.stop="onEditScript(item)">
+              <sup class="syntax" v-if="item.data.syntax" v-text="i18n('msgSyntaxError')"/>
+              {{item.name}}
+            </div>
           </div>
           <div class="submenu-buttons"
                v-show="showButtons(item)">

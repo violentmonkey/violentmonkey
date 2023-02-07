@@ -46,6 +46,7 @@ Object.assign(handlers, {
         script.runs = state === INJECT_CONTENT || state === INJECT_PAGE;
         script.pageUrl = src.url; // each frame has its own URL
         script.failed = badRealm || state === ID_INJECTING;
+        script.syntax = state === ID_INJECTING;
         if (badRealm && !store.injectionFailure) {
           store.injectionFailure = { fixable: data[INJECT_INTO] === INJECT_PAGE };
         }

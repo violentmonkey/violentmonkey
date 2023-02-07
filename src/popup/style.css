@@ -367,3 +367,10 @@ footer {
   line-height: 1;
   color: var(--fill-7);
 }
+
+.syntax {
+  font-size: xx-small;
+  position: absolute;
+  top: 2.5em;
+  color: red;
+}
