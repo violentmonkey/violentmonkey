@@ -271,14 +271,12 @@ async function prepare(cacheKey, url, isTop) {
   const errors = [];
   // TODO: teach `getScriptEnv` to skip prepared scripts in cache
   const env = getScriptsByURL(url, isTop, errors);
-  cache.put(cacheKey, env || bagNoOp)
-  if (!env) {
-    return bagNoOp;
-  }
-  await env.promise;
-  cache.batch(true);
+  if (!env) return cache.put(cacheKey, bagNoOp);
   const inject = shouldExpose ? { expose: true } : {};
   const bag = { [INJECT]: inject };
+  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
+  await env.promise;
+  cache.batch(true);
   const { allIds, [INJECT_MORE]: envDelayed } = env;
   const moreKey = envDelayed.promise && getUniqId('more');
   Object.assign(inject, {
@@ -304,7 +302,6 @@ async function prepare(cacheKey, url, isTop) {
     cache.put(moreKey, envDelayed);
     envDelayed[INJECT_MORE] = cacheKey;
   }
-  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
   cache.batch(false);
   return bag;
 }
