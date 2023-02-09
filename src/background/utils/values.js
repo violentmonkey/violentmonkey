@@ -39,6 +39,7 @@ addPublicCommands({
    * @return {?Promise<void>}
    */
   UpdateValue({ id, key, raw }, { tab, frameId }) {
+    if (!tab) return; // FF bug when it sends messages from removed iframes
     const values = objectGet(openers, [id, tab.id, frameId]);
     if (values) { // preventing the weird case of message arriving after the page navigated
       if (raw) values[key] = raw; else delete values[key];

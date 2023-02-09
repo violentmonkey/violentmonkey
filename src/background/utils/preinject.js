@@ -102,11 +102,15 @@ const OPT_HANDLERS = {
 
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
-  async GetInjected({ url, [INJECT_CONTENT_FORCE]: forceContent, done }, src) {
-    const { frameId, tab } = src;
+  async GetInjected({
+    url,
+    done,
+    [INJECT_CONTENT_FORCE]: forceContent,
+  }, { frameId, tab, url: srcUrl }) {
+    if (!tab) return; // FF bug when it sends messages from removed iframes
     const tabId = tab.id;
     const isTop = !frameId;
-    if (!url) url = src.url || tab.url;
+    if (!url) url = srcUrl || tab.url;
     clearFrameData(tabId, frameId);
     const bagKey = getKey(url, isTop);
     const bagP = cache.get(bagKey) || await prepare(bagKey, url, isTop);
@@ -128,12 +132,12 @@ addPublicCommands({
     [INJECT_CONTENT]: items,
     [INJECT_MORE]: moreKey,
     url,
-  }, src) {
-    const { frameId, tab } = src;
+  }, { frameId, tab, url: srcUrl }) {
+    if (!tab) return; // FF bug when it sends messages from removed iframes
     const tabId = tab.id;
     injectContentRealm(items, tabId, frameId);
     if (!moreKey) return;
-    if (!url) url = src.url || tab.url;
+    if (!url) url = srcUrl || tab.url;
     let more = cache.get(moreKey)
       || cache.put(moreKey, getScriptsByURL(url, !frameId));
     // Caching as Promise to be awaited by other tabs with this moreKey
@@ -267,14 +271,12 @@ async function prepare(cacheKey, url, isTop) {
   const errors = [];
   // TODO: teach `getScriptEnv` to skip prepared scripts in cache
   const env = getScriptsByURL(url, isTop, errors);
-  cache.put(cacheKey, env || bagNoOp)
-  if (!env) {
-    return bagNoOp;
-  }
-  await env.promise;
-  cache.batch(true);
+  if (!env) return cache.put(cacheKey, bagNoOp);
   const inject = shouldExpose ? { expose: true } : {};
   const bag = { [INJECT]: inject };
+  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
+  await env.promise;
+  cache.batch(true);
   const { allIds, [INJECT_MORE]: envDelayed } = env;
   const moreKey = envDelayed.promise && getUniqId('more');
   Object.assign(inject, {
@@ -300,7 +302,6 @@ async function prepare(cacheKey, url, isTop) {
     cache.put(moreKey, envDelayed);
     envDelayed[INJECT_MORE] = cacheKey;
   }
-  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
   cache.batch(false);
   return bag;
 }
