@@ -93,8 +93,9 @@ async function handleCommandMessage({ cmd, data } = {}, src) {
     if (process.env.DEBUG) console.error(err);
     // Adding `stack` info + in FF a rejected Promise value is transferred only for an Error object
     throw err instanceof SafeError
-      ? err
-      : new SafeError(isObject(err) ? JSON.stringify(err) : err);
+      ? (IS_FIREFOX && (err.message += ` [${VIOLENTMONKEY}]\n${err.stack}`), err)
+      : new SafeError((isObject(err) ? JSON.stringify(err) : err) +
+        ` in ${cmd}(${data == null ? data : JSON.stringify(data)})`);
   }
 }
 
