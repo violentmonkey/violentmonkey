@@ -102,15 +102,11 @@ const OPT_HANDLERS = {
 
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
-  async GetInjected({
-    url,
-    done,
-    [INJECT_CONTENT_FORCE]: forceContent,
-  }, { frameId, tab, url: srcUrl }) {
-    if (!tab) return; // FF bug when it sends messages from removed iframes
+  async GetInjected({ url, [INJECT_CONTENT_FORCE]: forceContent, done }, src) {
+    const { frameId, tab } = src;
     const tabId = tab.id;
     const isTop = !frameId;
-    if (!url) url = srcUrl || tab.url;
+    if (!url) url = src.url || tab.url;
     clearFrameData(tabId, frameId);
     const bagKey = getKey(url, isTop);
     const bagP = cache.get(bagKey) || await prepare(bagKey, url, isTop);
@@ -132,12 +128,12 @@ addPublicCommands({
     [INJECT_CONTENT]: items,
     [INJECT_MORE]: moreKey,
     url,
-  }, { frameId, tab, url: srcUrl }) {
-    if (!tab) return; // FF bug when it sends messages from removed iframes
+  }, src) {
+    const { frameId, tab } = src;
     const tabId = tab.id;
     injectContentRealm(items, tabId, frameId);
     if (!moreKey) return;
-    if (!url) url = srcUrl || tab.url;
+    if (!url) url = src.url || tab.url;
     let more = cache.get(moreKey)
       || cache.put(moreKey, getScriptsByURL(url, !frameId));
     // Caching as Promise to be awaited by other tabs with this moreKey
