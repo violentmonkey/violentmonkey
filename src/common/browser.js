@@ -76,7 +76,8 @@ if (!IS_FIREFOX && !browser?.runtime) {
           safeApply(func, thisArg, args);
         } catch (e) {
           if (e[MESSAGE] === 'Extension context invalidated.') {
-            console.error(`Please reload the tab to restore ${VIOLENTMONKEY} API for userscripts.`);
+            /* global logging */// only used with process.env.IS_INJECTED=content
+            logging.error(`Please reload the tab to restore ${VIOLENTMONKEY} API for userscripts.`);
           } else {
             throw e;
           }

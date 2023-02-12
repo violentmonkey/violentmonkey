@@ -68,7 +68,7 @@ addHandlers({
   UpdateValue: true,
 });
 
-init().catch(IS_FIREFOX && console.error); // Firefox can't show exceptions in content scripts
+init().catch(IS_FIREFOX && logging.error); // Firefox can't show exceptions in content scripts
 
 async function getDataFF(viaMessaging) {
   // global !== window in FF content scripts
