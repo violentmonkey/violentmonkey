@@ -131,7 +131,7 @@
       <edit
         :initial="state.script"
         :initial-code="state.code"
-        :read-only="state.script.config.removed"
+        :read-only="!!state.script.config.removed"
         @close="handleEditScript()"
       />
     </teleport>
