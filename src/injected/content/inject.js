@@ -286,6 +286,7 @@ async function injectPageList(runAt) {
     if (scr.code) {
       if (runAt === 'idle') await nextTask();
       if (runAt === 'end') await 0;
+      tardyQueueCheck([scr])
       // Exposing window.vmXXX setter just before running the script to avoid interception
       if (!scr.meta.unwrap) bridge.post('Plant', scr.key);
       inject(scr);
@@ -293,7 +294,6 @@ async function injectPageList(runAt) {
       if (scr.meta.unwrap) Run(scr.id);
     }
   }
-  tardyQueueCheck(scripts);
 }
 
 function setupContentInvoker() {

@@ -20,18 +20,18 @@ Object.assign(handlers, {
      * because we only show the iframe menu for unique scripts that don't run in the main page */
     const isTop = frameId === 0;
     if (!isTop) await mutex.ready;
-    const idMap = data.ids::mapEntry(null, (id, val, _) => (_ = store.idMap[id]) !== val
-      && (_ == null || isTop || val === ID_BAD_REALM || val === ID_INJECTING)
-      && id);
-    const ids = Object.keys(idMap).map(Number);
-    Object.assign(store.idMap, idMap);
-    if (isTop) {
-      mutex.resolve();
+    else {
       store.commands = data.menus::mapEntry(Object.keys);
       // executeScript may(?) fail in a discarded or lazy-loaded tab, which is actually injectable
       store.injectable = true;
     }
+    const idMapAllFrames = store.idMap;
+    const idMapMain = idMapAllFrames[0] || (idMapAllFrames[0] = {});
+    const idMapOld = idMapAllFrames[frameId] || (idMapAllFrames[frameId] = {});
+    const idMap = data.ids::mapEntry(null, (id, val) => val !== idMapOld[id] && id);
+    const ids = Object.keys(idMap).map(Number);
     if (ids.length) {
+      Object.assign(idMapOld, idMap);
       // frameScripts may be appended multiple times if iframes have unique scripts
       const scope = store[isTop ? 'scripts' : 'frameScripts'];
       const metas = data.scripts?.filter(({ props: { id } }) => ids.includes(id))
@@ -43,7 +43,14 @@ Object.assign(handlers, {
         const badRealm = state === ID_BAD_REALM;
         const renderedScript = scope.find(({ props }) => props.id === id);
         if (renderedScript) script = renderedScript;
-        else scope.push(script);
+        else if (isTop || !(id in idMapMain)) {
+          scope.push(script);
+          if (isTop) { // removing script from frameScripts if it ran there before the main frame
+            const { frameScripts } = store;
+            const i = frameScripts.findIndex(({ props }) => props.id === id);
+            if (i >= 0) frameScripts.splice(i, 1);
+          }
+        }
         script.runs = state === INJECT_CONTENT || state === INJECT_PAGE;
         script.pageUrl = url; // each frame has its own URL
         script.failed = badRealm || state === ID_INJECTING;
@@ -53,6 +60,7 @@ Object.assign(handlers, {
         }
       });
     }
+    if (isTop) mutex.resolve(); // resolving at the end after all `await` above are settled
   },
 });
 

@@ -1,4 +1,5 @@
 import bridge, { addHandlers, onScripts } from './bridge';
+import { sendSetPopup } from './gm-api-content';
 import { nextTask, sendCmd } from './util';
 
 const getPersisted = describeProperty(PageTransitionEvent[PROTO], 'persisted').get;
@@ -20,5 +21,6 @@ export function Run(id, realm) {
 async function sendSetBadge(numThrottles) {
   while (--numThrottles >= 0) await nextTask();
   sendCmd('SetBadge', runningIds); // not awaiting to clear `pending` immediately
+  sendSetPopup(true);
   pending = false;
 }

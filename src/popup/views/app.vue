@@ -78,8 +78,8 @@
       </div>
       <div class="submenu" ref="scriptList" focusme>
         <div
-          v-for="(item, index) in scope.list"
-          :key="index"
+          v-for="item in scope.list"
+          :key="item.id"
           :class="{
             disabled: !item.data.config.enabled,
             failed: item.data.failed,
@@ -290,7 +290,7 @@ export default {
         list = list.map(script => {
           const scriptName = getScriptName(script);
           return {
-            id: `${name}/${script.props.id}`,
+            id: script.props.id,
             name: scriptName,
             data: script,
             key: `${
