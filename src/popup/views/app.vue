@@ -2,7 +2,7 @@
   <div
     class="page-popup flex flex-col"
     @click="activeExtras && toggleExtras(null)"
-    @click.capture.prevent="onOpenUrl"
+    @click.capture="onOpenUrl"
     @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
     @mouseenter.capture="delegateMouseEnter"
     @mouseleave.capture="delegateMouseLeave"
@@ -99,11 +99,14 @@
             @click="onToggleScript(item)">
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
-            <div class="script-name flex-auto ellipsis" v-text="item.name"
+            <div class="script-name flex-auto ellipsis"
                  :data-upd="item.upd"
                  @click.ctrl.exact.stop="onEditScript(item)"
                  @contextmenu.exact.stop.prevent="onEditScript(item)"
-                 @mousedown.middle.exact.stop="onEditScript(item)" />
+                 @mousedown.middle.exact.stop="onEditScript(item)">
+              <sup class="syntax" v-if="item.data.syntax" v-text="i18n('msgSyntaxError')"/>
+              {{item.name}}
+            </div>
           </div>
           <div class="submenu-buttons"
                v-show="showButtons(item)">
@@ -372,6 +375,7 @@ export default {
     onOpenUrl(e) {
       const el = e.target.closest('a[href][target=_blank]');
       if (!el) return;
+      e.preventDefault();
       sendCmdDirectly('TabOpen', { url: el.href }).then(close);
     },
     onEditScript(item) {

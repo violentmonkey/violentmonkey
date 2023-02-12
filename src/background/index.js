@@ -81,6 +81,10 @@ async function handleCommandMessage({ cmd, data } = {}, src) {
   && (src.origin ? src.origin !== extensionOrigin : !`${src.url}`.startsWith(extensionRoot))) {
     throw new SafeError(`Command is only allowed in extension context: ${cmd}`);
   }
+  if (IS_FIREFOX && !func.isOwn && src && !src.tab) {
+    if (process.env.DEBUG) console.log('No src.tab, ignoring:', ...arguments);
+    return;
+  }
   try {
     const res = await func(data, src);
     if (commandsToSync.includes(cmd)
@@ -93,8 +97,9 @@ async function handleCommandMessage({ cmd, data } = {}, src) {
     if (process.env.DEBUG) console.error(err);
     // Adding `stack` info + in FF a rejected Promise value is transferred only for an Error object
     throw err instanceof SafeError
-      ? err
-      : new SafeError(isObject(err) ? JSON.stringify(err) : err);
+      ? (IS_FIREFOX && (err.message += ` [${VIOLENTMONKEY}]\n${err.stack}`), err)
+      : new SafeError((isObject(err) ? JSON.stringify(err) : err) +
+        ` in ${cmd}(${data == null ? data : JSON.stringify(data)})`);
   }
 }
 

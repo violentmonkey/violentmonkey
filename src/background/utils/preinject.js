@@ -10,7 +10,7 @@ import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId } from './requests';
 import {
-  S_CACHE, S_CACHE_PRE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
+  S_CACHE, S_CACHE_PRE, S_CODE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
 } from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
 import { addValueOpener, clearValueOpener } from './values';
@@ -136,8 +136,11 @@ addPublicCommands({
     injectContentRealm(items, tabId, frameId);
     if (!moreKey) return;
     if (!url) url = src.url || tab.url;
-    let more = cache.get(moreKey)
-      || cache.put(moreKey, getScriptsByURL(url, !frameId));
+    let more = cache.get(moreKey);
+    if (!more || more.ids.some(id => !more[S_CODE][id])) {
+      // Workaround for FF bug(?): the `code` object is mysteriously emptied
+      more = cache.put(moreKey, getScriptsByURL(url, !frameId));
+    }
     // Caching as Promise to be awaited by other tabs with this moreKey
     const envCache = more[S_CACHE]
       || cache.put(moreKey, more = await more)[S_CACHE];
@@ -281,14 +284,12 @@ async function prepare(cacheKey, url, isTop) {
   const errors = [];
   // TODO: teach `getScriptEnv` to skip prepared scripts in cache
   const env = getScriptsByURL(url, isTop, errors);
-  cache.put(cacheKey, env || bagNoOp)
-  if (!env) {
-    return bagNoOp;
-  }
-  await env.promise;
-  cache.batch(true);
+  if (!env) return cache.put(cacheKey, bagNoOp);
   const inject = shouldExpose ? { expose: true } : {};
   const bag = { [INJECT]: inject };
+  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
+  await env.promise;
+  cache.batch(true);
   const { allIds, [INJECT_MORE]: envDelayed } = env;
   const moreKey = envDelayed.promise && getUniqId('more');
   Object.assign(inject, {
@@ -314,7 +315,6 @@ async function prepare(cacheKey, url, isTop) {
     cache.put(moreKey, envDelayed);
     envDelayed[INJECT_MORE] = cacheKey;
   }
-  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
   cache.batch(false);
   return bag;
 }
@@ -323,7 +323,8 @@ function prepareScripts(env) {
   const scripts = env[ENV_SCRIPTS];
   for (let i = 0, script, key, id; i < scripts.length; i++) {
     script = scripts[i];
-    if (!(id = script.id)) {
+    id = script.id;
+    if (!script[__CODE]) {
       id = script.props.id;
       key = S_SCRIPT_PRE + id;
       script = cache.get(key) || cache.put(key, prepareScript(script, env));
@@ -346,7 +347,7 @@ function prepareScript(script, env) {
   const { custom, meta, props } = script;
   const { id } = props;
   const { require, runAt } = env;
-  const code = env.code[id];
+  const code = env[S_CODE][id];
   const dataKey = getUniqId();
   const winKey = getUniqId();
   const key = { data: dataKey, win: winKey };

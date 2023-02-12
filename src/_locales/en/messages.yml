@@ -730,6 +730,9 @@ msgSyncReady:
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Sync in progress...
+msgSyntaxError:
+  description: Shown in popup when a script didn't run and we don't know the exact reason.
+  message: Syntax error?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script updated.

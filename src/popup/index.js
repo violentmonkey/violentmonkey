@@ -13,11 +13,12 @@ mutex.init();
 render(App);
 
 Object.assign(handlers, {
-  async SetPopup(data, src) {
-    if (store.currentTab && store.currentTab.id !== src.tab.id) return;
+  async SetPopup(data, { frameId, tab, url }) {
+    // No `tab` is a FF bug when it sends messages from removed iframes
+    if (!tab || store.currentTab && store.currentTab.id !== tab.id) return;
     /* SetPopup from a sub-frame may come first so we need to wait for the main page
      * because we only show the iframe menu for unique scripts that don't run in the main page */
-    const isTop = src.frameId === 0;
+    const isTop = frameId === 0;
     if (!isTop) await mutex.ready;
     const idMap = data.ids::mapEntry(null, (id, val, _) => (_ = store.idMap[id]) !== val
       && (_ == null || isTop || val === ID_BAD_REALM || val === ID_INJECTING)
@@ -44,8 +45,9 @@ Object.assign(handlers, {
         if (renderedScript) script = renderedScript;
         else scope.push(script);
         script.runs = state === INJECT_CONTENT || state === INJECT_PAGE;
-        script.pageUrl = src.url; // each frame has its own URL
+        script.pageUrl = url; // each frame has its own URL
         script.failed = badRealm || state === ID_INJECTING;
+        script.syntax = state === ID_INJECTING;
         if (badRealm && !store.injectionFailure) {
           store.injectionFailure = { fixable: data[INJECT_INTO] === INJECT_PAGE };
         }

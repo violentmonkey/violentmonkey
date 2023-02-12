@@ -148,6 +148,7 @@ export async function injectScripts(data, isXml) {
   if (hasInvoker) {
     setupContentInvoker();
   }
+  tardyQueue = createNullObj();
   // Using a callback to avoid a microtask tick when the root element exists or appears.
   await onElement('*', injectAll, 'start');
   if (pageLists?.body || contLists?.body) {
@@ -271,9 +272,8 @@ function injectAll(runAt) {
     if (items) {
       bridge.post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
       bridgeInfo[realm] = false; // must be a sendable value to have own prop in the receiver
-      if (!tardyQueue) tardyQueue = createNullObj();
       for (const { id } of items) tardyQueue[id] = 1;
-      if (!inPage) nextTask()::then(tardyQueueCheck);
+      if (!inPage) nextTask()::then(() => tardyQueueCheck(items));
       else if (!IS_FIREFOX) res = injectPageList(runAt);
     }
   }
@@ -293,7 +293,7 @@ async function injectPageList(runAt) {
       if (scr.meta.unwrap) Run(scr.id);
     }
   }
-  tardyQueueCheck();
+  tardyQueueCheck(scripts);
 }
 
 function setupContentInvoker() {
@@ -311,11 +311,13 @@ function setupContentInvoker() {
  * Chrome doesn't fire a syntax error event, so we'll mark ids that didn't start yet
  * as "still starting", so the popup can show them accordingly.
  */
-function tardyQueueCheck() {
-  for (const id in tardyQueue) {
-    if (bridgeIds[id] === 1) bridgeIds[id] = ID_INJECTING;
+function tardyQueueCheck(scripts) {
+  for (const { id } of scripts) {
+    if (tardyQueue[id]) {
+      if (bridgeIds[id] === 1) bridgeIds[id] = ID_INJECTING;
+      delete tardyQueue[id];
+    }
   }
-  tardyQueue = null;
 }
 
 function tellBridgeToWriteVault(vaultId, wnd) {
