@@ -33,13 +33,16 @@ addOwnCommands({
     return data;
   },
   GetSizes: getSizes,
-  /** @return {Promise<Object>} */
-  async GetTabDomain() {
-    const tab = await getActiveTab() || {};
-    const url = getTabUrl(tab);
-    const host = url.match(/^https?:\/\/([^/]+)|$/)[1];
+  /**
+   * @param {string} [url]
+   * @return {Promise<Object>}
+   */
+  async GetTabDomain(url) {
+    const tab = !url && await getActiveTab() || {};
+    const host = new URL(url || getTabUrl(tab)).hostname;
     return {
       tab,
+      host,
       domain: host && tld.getDomain(host) || host,
     };
   },
