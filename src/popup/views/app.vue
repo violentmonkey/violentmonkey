@@ -2,7 +2,7 @@
   <div
     class="page-popup flex flex-col"
     @click="activeExtras && toggleExtras(null)"
-    @click.capture.prevent="onOpenUrl"
+    @click.capture="onOpenUrl"
     @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
     @mouseenter.capture="delegateMouseEnter"
     @mouseleave.capture="delegateMouseLeave"
@@ -375,6 +375,7 @@ export default {
     onOpenUrl(e) {
       const el = e.target.closest('a[href][target=_blank]');
       if (!el) return;
+      e.preventDefault();
       sendCmdDirectly('TabOpen', { url: el.href }).then(close);
     },
     onEditScript(item) {
