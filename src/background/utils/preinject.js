@@ -369,7 +369,7 @@ function prepareScript(script, env) {
       + '((define,module,exports)=>{');
   }
   for (const url of meta.require) {
-    const req = require[pathMap[url] || url]
+    const req = require[pathMap[url] || url];
     if (/\S/.test(req)) {
       injectedCode.push(req, NEWLINE_END_RE.test(req) ? ';' : '\n;');
       hasReqs = true;

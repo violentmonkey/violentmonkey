@@ -11,7 +11,7 @@ if (!''.trimEnd) {
   // TODO: remove when min_chrome_version>=66, strict_min_version>=61
   String.prototype.trimEnd = function _() {
     return this.replace(/\s+$/, '');
-  }
+  };
 }
 
 export const killTrailingSpaces = (cm, placeholders) => {

@@ -201,7 +201,7 @@ function triageScript(script) {
 
 function inject(item, iframeCb) {
   const { code } = item;
-  const isCodeArray = isObject(code)
+  const isCodeArray = isObject(code);
   const script = makeElem('script', !isCodeArray && code);
   // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
   const onError = IS_FIREFOX && !iframeCb && (e => {
@@ -286,7 +286,7 @@ async function injectPageList(runAt) {
     if (scr.code) {
       if (runAt === 'idle') await nextTask();
       if (runAt === 'end') await 0;
-      tardyQueueCheck([scr])
+      tardyQueueCheck([scr]);
       // Exposing window.vmXXX setter just before running the script to avoid interception
       if (!scr.meta.unwrap) bridge.post('Plant', scr.key);
       inject(scr);

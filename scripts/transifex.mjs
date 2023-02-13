@@ -291,7 +291,7 @@ async function batchHandle(handle, allowedLangs) {
       finished += 1;
       showProgress();
     } catch (err) {
-      process.stderr.write(`\nError pulling ${lang}\n`)
+      process.stderr.write(`\nError pulling ${lang}\n`);
       throw err;
     }
   }));

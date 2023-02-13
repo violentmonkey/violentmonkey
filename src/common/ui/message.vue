@@ -65,7 +65,7 @@ export default {
         return { title: text.slice(0, sep), desc: text.slice(sep + 2) };
       }
       return { title: text };
-    })
+    });
 
     onMounted(() => {
       if (refInput.value) {

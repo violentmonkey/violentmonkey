@@ -136,7 +136,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
       Object.defineProperty(this, 'text', { value, configurable: true });
       return value;
     }
-  }
+  };
 
   // a map of all rules, keyed by id/type for quick lookup during matching
   const rulesById = {};

@@ -183,7 +183,7 @@ function inferScriptSupportUrl(script, home = getScriptHome(script)) {
       github\.com
     )\/[^/]+\/[^/]+/x`);
   if (u) {
-    u = `${u[0]}/${u[1] ? 'feedback' : 'issues'}`
+    u = `${u[0]}/${u[1] ? 'feedback' : 'issues'}`;
     script[INFERRED][SUPPORT_URL] = u;
     return u;
   }
