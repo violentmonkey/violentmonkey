@@ -723,6 +723,9 @@ msgSyncReady:
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Bezig met synchroniseren...
+msgSyntaxError:
+  description: Shown in popup when a script didn't run and we don't know the exact reason.
+  message: Syntaxisfout?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Het script is bijgewerkt.

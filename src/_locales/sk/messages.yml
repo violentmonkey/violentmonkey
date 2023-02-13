@@ -728,6 +728,9 @@ msgSyncReady:
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Prebieha synchronizácia...
+msgSyntaxError:
+  description: Shown in popup when a script didn't run and we don't know the exact reason.
+  message: Chyba syntaxe?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Skript aktualizovaný.
