@@ -221,6 +221,8 @@ function toggleFastFirefoxInject(enable) {
         delete val[CSAPI_REG];
       }
     });
+  } else if (!xhrInject) {
+    cache.destroy(); // nuking the cache so that CSAPI_REG is created for subsequent injections
   }
 }
 
@@ -247,7 +249,7 @@ function onSendHeaders({ url, frameId }) {
 function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
   const bag = xhrInject && cache.get(key);
-  // Proceeding only if prepareScripts has replaced promise in cache with the actual data
+  // The INJECT data is normally already in cache if code and values aren't huge
   return bag?.[INJECT]?.[SCRIPTS] && prepareXhrBlob(info, bag);
 }
 
@@ -316,7 +318,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
     cache.put(moreKey, envDelayed);
     envDelayed[MORE] = cacheKey;
   }
-  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
+  cache.put(cacheKey, bag);
   cache.batch(false);
   return bag;
 }
