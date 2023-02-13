@@ -17,6 +17,7 @@ import { addValueOpener, clearValueOpener } from './values';
 
 let isApplied;
 let injectInto;
+let ffInject;
 let xhrInject;
 
 const sessionId = getUniqId();
@@ -99,6 +100,7 @@ const OPT_HANDLERS = {
     });
   },
 };
+if (contentScriptsAPI) OPT_HANDLERS.ffInject = toggleFastFirefoxInject;
 
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
@@ -214,6 +216,18 @@ function togglePreinject(enable) {
   }
 }
 
+function toggleFastFirefoxInject(enable) {
+  ffInject = enable;
+  if (!enable) {
+    cache.some(val => {
+      if (val[CSAPI_REG]) {
+        val[CSAPI_REG].then(reg => reg.unregister());
+        delete val[CSAPI_REG];
+      }
+    });
+  }
+}
+
 function toggleXhrInject(enable) {
   xhrInject = enable;
   cache.destroy();
@@ -293,7 +307,7 @@ async function prepare(cacheKey, url, isTop) {
     if (val !== true) bag[val] = env[val];
   });
   bag[INJECT_MORE] = envDelayed;
-  if (contentScriptsAPI && !xhrInject && isTop) {
+  if (ffInject && contentScriptsAPI && !xhrInject && isTop) {
     inject[INJECT_PAGE] = env[INJECT_PAGE] || triagePageRealm(envDelayed);
     bag[CSAPI_REG] = registerScriptDataFF(inject, url);
   }
