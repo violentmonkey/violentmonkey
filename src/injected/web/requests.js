@@ -102,15 +102,13 @@ function parseRaw(req, msg, propName) {
   let res, ct;
   if ('raw' in req) {
     res = req.raw;
-    if (responseType === kDocument
+    if (responseType === kDocument && (ct = kContentTextHtml)
     || !responseType
       && propName === kResponseXML
       && PARSEABLE_TYPES::indexOf(ct = getContentType(msg) || kContentTextHtml) >= 0
-    ) {
-      try { res = new SafeDOMParser()::parseFromString(res, ct); }
+    || responseType === 'json') {
+      try { res = ct ? new SafeDOMParser()::parseFromString(res, ct) : jsonParse(res); }
       catch (e) { res = null; /* per specification */ }
-    } else if (responseType === 'json') {
-      res = jsonParse(res);
     }
     if (responseType === kDocument) {
       const otherPropName = propName === kResponse ? kResponseXML : kResponse;
