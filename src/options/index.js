@@ -60,7 +60,9 @@ function initScript(script, sizes) {
 export function loadData() {
   const id = +store.route.paths[1];
   return requestData(id ? [id] : null)
-  .catch(id ? (() => requestData()) : console.error);
+  .catch(id && (() => requestData()));
+  /* Catching in order to retry without an id if the id is invalid.
+   * Errors will be shown in showUnhandledError. */
 }
 
 async function requestData(ids) {

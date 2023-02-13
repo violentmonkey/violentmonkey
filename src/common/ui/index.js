@@ -3,6 +3,29 @@ import Modal from 'vueleton/lib/modal';
 import { i18n } from '@/common/util';
 import Message from './message';
 
+/** Showing unexpected errors in UI so that the users can notify us */
+addEventListener('error', e => showUnhandledError(e.error));
+addEventListener('unhandledrejection', e => showUnhandledError(e.reason));
+function showUnhandledError(err) {
+  if (!err) return;
+  const el = document.createElement('pre');
+  // using an inline style because we don't know if our CSS is loaded at this stage
+  el.style.cssText = `\
+    position:fixed;
+    z-index:${1e9};
+    left:0;
+    right:0;
+    bottom:0;
+    background:#000;
+    color:red;
+    padding: 1em;
+  `.replace(/;/g, '!important;');
+  el.textContent = `${IS_FIREFOX && err.message || ''}\n${err.stack || ''}`.trim() || err;
+  // TODO: remove `?.` when strict_min_version>=53
+  el.onclick = () => getSelection().setBaseAndExtent?.(el, 0, el, 1);
+  (document.body || document.documentElement).appendChild(el);
+}
+
 export function showMessage(message) {
   const modal = Modal.show(() => h(Message, {
     message,
