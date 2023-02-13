@@ -114,10 +114,9 @@ const OneDrive = BaseService.extend({
     const redirectUri = `${config.redirect_uri}?code=`;
     if (url.startsWith(redirectUri)) {
       this.authState.set('authorizing');
-      this.authorized({
+      this.checkSync(this.authorized({
         code: url.slice(redirectUri.length),
-      })
-      .then(() => this.checkSync());
+      }));
       return true;
     }
   },

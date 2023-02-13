@@ -158,13 +158,12 @@ const Dropbox = BaseService.extend({
     const { state, codeVerifier } = this.session || {};
     this.session = null;
     if (query.state !== state || !query.code) return;
-    this.authorized({
+    this.checkSync(this.authorized({
       code: query.code,
       code_verifier: codeVerifier,
       grant_type: 'authorization_code',
       redirect_uri: config.redirect_uri,
-    })
-    .then(() => this.checkSync());
+    }));
     return true;
   },
   revoke() {

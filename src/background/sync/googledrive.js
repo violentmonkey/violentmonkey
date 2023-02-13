@@ -123,13 +123,12 @@ const GoogleDrive = BaseService.extend({
     this.session = null;
     if (query.state !== state || !query.code) return;
     this.authState.set('authorizing');
-    this.authorized({
+    this.checkSync(this.authorized({
       code: query.code,
       code_verifier: codeVerifier,
       grant_type: 'authorization_code',
       redirect_uri: config.redirect_uri,
-    })
-    .then(() => this.checkSync());
+    }));
     return true;
   },
   revoke() {

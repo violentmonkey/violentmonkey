@@ -280,9 +280,10 @@ export const BaseService = serviceFactory({
   prepareHeaders() {
     this.headers = {};
   },
-  prepare() {
+  prepare(promise) {
     this.authState.set('initializing');
-    return (this.initToken() ? Promise.resolve(this.user()) : Promise.reject({
+    return Promise.resolve(promise)
+    .then(() => this.initToken() ? this.user() : Promise.reject({
       type: 'no-auth',
     }))
     .then(() => {
@@ -298,8 +299,8 @@ export const BaseService = serviceFactory({
       throw err;
     });
   },
-  checkSync() {
-    return this.prepare()
+  checkSync(promise) {
+    return this.prepare(promise)
     .then(() => this.startSync());
   },
   user: noop,
