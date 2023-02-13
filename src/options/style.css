@@ -94,26 +94,12 @@ textarea:not([rows="1"]):not(.h100) {
   min-height: 2em;
   max-height: 50vh;
 }
-@media (min-width: 1600px) {
+@media (min-width: 1440px) {
   .tab-settings[data-show-advanced=true] {
-    padding-top: 0;
-    > * {
-      width: calc(50% - $tabPadX * 1.5); // Not using CSS columns due to bugs with overflow-y: auto
-    }
-    h1 {
-      margin-top: $tabPadTopY;
-    }
+    columns: 2;
+    column-gap: calc(2 * $tabPadX);
     details {
-      position: absolute;
-      top: 0;
-      right: $tabPadX;
-      &::before {
-        content: '';
-        height: 100%;
-        position: absolute;
-        margin-left: calc(-1 * $tabPadX);
-        border-left: $sectionBorder;
-      }
+      break-inside: avoid;
     }
   }
 }
