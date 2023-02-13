@@ -3,7 +3,7 @@ import { BLACKLIST, HOMEPAGE_URL, META_STR, METABLOCK_RE, NEWLINE_END_RE } from 
 import initCache from '@/common/cache';
 import { forEachEntry, forEachKey, forEachValue, mapEntry, objectSet } from '@/common/object';
 import ua from '@/common/ua';
-import { getScriptsByURL, ENV_CACHE_KEYS, ENV_REQ_KEYS, ENV_SCRIPTS, ENV_VALUE_IDS } from './db';
+import { getScriptsByURL, CACHE_KEYS, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
 import { postInitialize } from './init';
 import { addPublicCommands } from './message';
 import { getOption, hookOptions } from './options';
@@ -28,16 +28,16 @@ const API_CONFIG = {
 const __CODE = Symbol('code'); // will be stripped when messaging
 const INJECT = 'inject';
 /** These bags are reused in cache to reduce memory usage,
- * ENV_CACHE_KEYS is for removeStaleCacheEntry */
-const BAG_NOOP = { [INJECT]: {}, [ENV_CACHE_KEYS]: [] };
-const BAG_NOOP_EXPOSE = { ...BAG_NOOP, [INJECT]: { expose: true, [kSessionId]: sessionId } };
+ * CACHE_KEYS is for removeStaleCacheEntry */
+const BAG_NOOP = { [INJECT]: {}, [CACHE_KEYS]: [] };
+const BAG_NOOP_EXPOSE = { ...BAG_NOOP, [INJECT]: { [EXPOSE]: true, [kSessionId]: sessionId } };
 const CSAPI_REG = 'csReg';
 const contentScriptsAPI = browser.contentScripts;
 const cache = initCache({
   lifetime: 5 * 60e3,
   onDispose(val) {
     val[CSAPI_REG]?.then(reg => reg.unregister());
-    cache.del(val[INJECT_MORE]);
+    cache.del(val[MORE]);
   },
 });
 // KEY_XXX for hooked options
@@ -46,7 +46,7 @@ const META_KEYS_TO_ENSURE = [
   'description',
   'name',
   'namespace',
-  'runAt',
+  [RUN_AT],
   'version',
 ];
 const META_KEYS_TO_ENSURE_FROM = [
@@ -57,16 +57,16 @@ const pluralizeMetaKey = (s, consonant) => s + (consonant ? 'es' : 's');
 const pluralizeMeta = key => key.replace(META_KEYS_TO_PLURALIZE_RE, pluralizeMetaKey);
 const UNWRAP = 'unwrap';
 const KNOWN_INJECT_INTO = {
-  [INJECT_AUTO]: 1,
-  [INJECT_CONTENT]: 1,
-  [INJECT_PAGE]: 1,
+  [AUTO]: 1,
+  [CONTENT]: 1,
+  [PAGE]: 1,
 };
 const propsToClear = {
-  [S_CACHE_PRE]: ENV_CACHE_KEYS,
+  [S_CACHE_PRE]: CACHE_KEYS,
   [S_CODE_PRE]: true,
-  [S_REQUIRE_PRE]: ENV_REQ_KEYS,
+  [S_REQUIRE_PRE]: REQ_KEYS,
   [S_SCRIPT_PRE]: true,
-  [S_VALUE_PRE]: ENV_VALUE_IDS,
+  [S_VALUE_PRE]: VALUE_IDS,
 };
 const expose = {};
 const resolveDataCodeStr = `(${(global, data) => {
@@ -77,13 +77,13 @@ const getKey = (url, isTop) => (
   isTop ? url : `-${url}`
 );
 const normalizeRealm = val => (
-  KNOWN_INJECT_INTO[val] ? val : injectInto || INJECT_AUTO
+  KNOWN_INJECT_INTO[val] ? val : injectInto || AUTO
 );
 const normalizeScriptRealm = (custom, meta) => (
   normalizeRealm(custom[INJECT_INTO] || meta[INJECT_INTO])
 );
 const isContentRealm = (val, force) => (
-  val === INJECT_CONTENT || val === INJECT_AUTO && force
+  val === CONTENT || val === AUTO && force
 );
 const OPT_HANDLERS = {
   [BLACKLIST]: cache.destroy,
@@ -94,7 +94,7 @@ const OPT_HANDLERS = {
   /** WARNING! toggleXhrInject should precede togglePreinject as it sets xhrInject variable */
   xhrInject: toggleXhrInject,
   isApplied: togglePreinject,
-  expose(value) {
+  [EXPOSE](value) {
     value::forEachEntry(([site, isExposed]) => {
       expose[decodeURIComponent(site)] = isExposed;
     });
@@ -104,7 +104,7 @@ if (contentScriptsAPI) OPT_HANDLERS.ffInject = toggleFastFirefoxInject;
 
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
-  async GetInjected({ url, [INJECT_CONTENT_FORCE]: forceContent, done }, src) {
+  async GetInjected({ url, [FORCE_CONTENT]: forceContent, done }, src) {
     const { frameId, tab } = src;
     const tabId = tab.id;
     const isTop = !frameId;
@@ -112,12 +112,12 @@ addPublicCommands({
     clearFrameData(tabId, frameId);
     const bagKey = getKey(url, isTop);
     const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop);
-    const bag = bagP[INJECT] ? bagP : await bagP.promise;
+    const bag = bagP[INJECT] ? bagP : await bagP[PROMISE];
     /** @type {VMInjection} */
     const inject = bag[INJECT];
-    const scripts = inject[ENV_SCRIPTS];
+    const scripts = inject[SCRIPTS];
     if (scripts) {
-      triageRealms(scripts, bag[INJECT_CONTENT_FORCE] || forceContent, tabId, frameId, bag);
+      triageRealms(scripts, bag[FORCE_CONTENT] || forceContent, tabId, frameId, bag);
       addValueOpener(scripts, tabId, frameId);
     }
     if (popupTabs[tabId]) {
@@ -126,9 +126,9 @@ addPublicCommands({
     return !done && inject;
   },
   async InjectionFeedback({
-    [INJECT_CONTENT_FORCE]: forceContent,
-    [INJECT_CONTENT]: items,
-    [INJECT_MORE]: moreKey,
+    [FORCE_CONTENT]: forceContent,
+    [CONTENT]: items,
+    [MORE]: moreKey,
     url,
   }, src) {
     const { frameId, tab } = src;
@@ -139,12 +139,12 @@ addPublicCommands({
     let more = cache.get(moreKey)
       || cache.put(moreKey, getScriptsByURL(url, !frameId));
     const envCache = more[S_CACHE]
-      || cache.put(moreKey, more = await more.promise)[S_CACHE];
+      || cache.put(moreKey, more = await more[PROMISE])[S_CACHE];
     const scripts = prepareScripts(more);
     triageRealms(scripts, forceContent, tabId, frameId);
     addValueOpener(scripts, tabId, frameId);
     return {
-      [ENV_SCRIPTS]: scripts,
+      [SCRIPTS]: scripts,
       [S_CACHE]: envCache,
     };
   },
@@ -166,7 +166,7 @@ onStorageChanged(({ keys }) => {
 
 /** @this {string[][]} changed storage keys, already split as [prefix,id] */
 function removeStaleCacheEntry(val, key) {
-  if (!val[ENV_CACHE_KEYS]) return;
+  if (!val[CACHE_KEYS]) return;
   for (const [prefix, id] of this) {
     const prop = propsToClear[prefix];
     if (prop === true) {
@@ -248,7 +248,7 @@ function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
   const bag = xhrInject && cache.get(key);
   // Proceeding only if prepareScripts has replaced promise in cache with the actual data
-  return bag?.[INJECT]?.[ENV_SCRIPTS] && prepareXhrBlob(info, bag);
+  return bag?.[INJECT]?.[SCRIPTS] && prepareXhrBlob(info, bag);
 }
 
 /**
@@ -257,9 +257,9 @@ function onHeadersReceived(info) {
  */
 function prepareXhrBlob({ url, [kResponseHeaders]: responseHeaders, tabId, frameId }, bag) {
   if (IS_FIREFOX && url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
-    bag[INJECT_CONTENT_FORCE] = true;
+    bag[FORCE_CONTENT] = true;
   }
-  triageRealms(bag[INJECT][ENV_SCRIPTS], bag[INJECT_CONTENT_FORCE], tabId, frameId, bag);
+  triageRealms(bag[INJECT][SCRIPTS], bag[FORCE_CONTENT], tabId, frameId, bag);
   const blobUrl = URL.createObjectURL(new Blob([
     JSON.stringify(bag[INJECT]),
   ]));
@@ -271,7 +271,7 @@ function prepareXhrBlob({ url, [kResponseHeaders]: responseHeaders, tabId, frame
   return { [kResponseHeaders]: responseHeaders };
 }
 
-async function prepare(cacheKey, url, isTop) {
+function prepare(cacheKey, url, isTop) {
   const shouldExpose = isTop && url.startsWith('https://') && expose[url.split('/', 3)[2]];
   const bagNoOp = shouldExpose ? BAG_NOOP_EXPOSE : BAG_NOOP;
   if (!isApplied) {
@@ -281,40 +281,40 @@ async function prepare(cacheKey, url, isTop) {
   // TODO: teach `getScriptEnv` to skip prepared scripts in cache
   const env = getScriptsByURL(url, isTop, errors);
   if (env) {
-    env.promise = prepareBag(cacheKey, url, isTop,
-      env, shouldExpose ? { expose: true } : {}, errors);
+    env[PROMISE] = prepareBag(cacheKey, url, isTop,
+      env, shouldExpose ? { [EXPOSE]: true } : {}, errors);
   }
   return cache.put(cacheKey, env || bagNoOp);
 }
 
 async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
-  await env.promise;
+  await env[PROMISE];
   cache.batch(true);
   const bag = { [INJECT]: inject };
-  const { allIds, [INJECT_MORE]: envDelayed } = env;
-  const moreKey = envDelayed.promise && getUniqId('more');
+  const { allIds, [MORE]: envDelayed } = env;
+  const moreKey = envDelayed[PROMISE] && getUniqId('more');
   Object.assign(inject, {
     [S_CACHE]: env[S_CACHE],
-    [ENV_SCRIPTS]: prepareScripts(env),
+    [SCRIPTS]: prepareScripts(env),
     [INJECT_INTO]: injectInto,
-    [INJECT_MORE]: moreKey,
+    [MORE]: moreKey,
     [kSessionId]: sessionId,
+    [IDS]: allIds,
     clipFF: env.clipFF,
-    ids: allIds,
     info: { ua },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
   });
   propsToClear::forEachValue(val => {
     if (val !== true) bag[val] = env[val];
   });
-  bag[INJECT_MORE] = envDelayed;
+  bag[MORE] = envDelayed;
   if (ffInject && contentScriptsAPI && !xhrInject && isTop) {
-    inject[INJECT_PAGE] = env[INJECT_PAGE] || triagePageRealm(envDelayed);
+    inject[PAGE] = env[PAGE] || triagePageRealm(envDelayed);
     bag[CSAPI_REG] = registerScriptDataFF(inject, url);
   }
   if (moreKey) {
     cache.put(moreKey, envDelayed);
-    envDelayed[INJECT_MORE] = cacheKey;
+    envDelayed[MORE] = cacheKey;
   }
   cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
   cache.batch(false);
@@ -322,7 +322,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
 }
 
 function prepareScripts(env) {
-  const scripts = env[ENV_SCRIPTS];
+  const scripts = env[SCRIPTS];
   for (let i = 0, script, key, id; i < scripts.length; i++) {
     script = scripts[i];
     id = script.id;
@@ -332,10 +332,10 @@ function prepareScripts(env) {
       script = cache.get(key) || cache.put(key, prepareScript(script, env));
       scripts[i] = script;
     }
-    if (script[INJECT_INTO] !== INJECT_CONTENT) {
-      env[INJECT_PAGE] = true; // for registerScriptDataFF
+    if (script[INJECT_INTO] !== CONTENT) {
+      env[PAGE] = true; // for registerScriptDataFF
     }
-    script[INJECT_VAL] = env[S_VALUE][id] || null;
+    script[VALUES] = env[S_VALUE][id] || null;
   }
   return scripts;
 }
@@ -348,7 +348,7 @@ function prepareScripts(env) {
 function prepareScript(script, env) {
   const { custom, meta, props } = script;
   const { id } = props;
-  const { require, runAt } = env;
+  const { require, [RUN_AT]: runAt } = env;
   const code = env[S_CODE][id];
   const dataKey = getUniqId();
   const winKey = getUniqId();
@@ -415,7 +415,6 @@ function prepareScript(script, env) {
     key,
     meta: metaCopy,
     pathMap,
-    runAt: runAt[id],
     [__CODE]: injectedCode,
     [INJECT_INTO]: normalizeScriptRealm(custom, meta),
     [META_STR]: [
@@ -424,6 +423,7 @@ function prepareScript(script, env) {
       tmp = (metaStrMatch.index + metaStrMatch[1].length),
       tmp + metaStrMatch[2].length,
     ],
+    [RUN_AT]: runAt[id],
   };
 }
 
@@ -448,7 +448,7 @@ function triageRealms(scripts, forceContent, tabId, frameId, bag) {
     scr.code = code;
   }
   if (bag) {
-    bag[INJECT][INJECT_PAGE] = wantsPage || triagePageRealm(bag[INJECT_MORE]);
+    bag[INJECT][PAGE] = wantsPage || triagePageRealm(bag[MORE]);
   }
   if (toContent[0]) {
     // Processing known feedback without waiting for InjectionFeedback message.
@@ -458,7 +458,7 @@ function triageRealms(scripts, forceContent, tabId, frameId, bag) {
 }
 
 function triagePageRealm(env, forceContent) {
-  return env?.[ENV_SCRIPTS].some(isPageRealmScript, forceContent || null);
+  return env?.[SCRIPTS].some(isPageRealmScript, forceContent || null);
 }
 
 function injectContentRealm(toContent, tabId, frameId) {
@@ -467,7 +467,7 @@ function injectContentRealm(toContent, tabId, frameId) {
     if (!scr || scr.key.data !== dataKey) continue;
     browser.tabs.executeScript(tabId, {
       code: scr[__CODE].join(''),
-      runAt: `document_${scr.runAt}`.replace('body', 'start'),
+      runAt: `document_${scr[RUN_AT]}`.replace('body', 'start'),
       frameId,
     }).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { frameId })));
   }
@@ -476,7 +476,7 @@ function injectContentRealm(toContent, tabId, frameId) {
 // TODO: rework the whole thing to register scripts individually with real `matches`
 // (this will also allow proper handling of @noframes)
 function registerScriptDataFF(inject, url) {
-  for (const scr of inject[ENV_SCRIPTS]) {
+  for (const scr of inject[SCRIPTS]) {
     scr.code = scr[__CODE];
   }
   return contentScriptsAPI.register({

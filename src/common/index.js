@@ -194,7 +194,7 @@ export function getScriptName(script) {
 
 /** @returns {VMInjection.RunAt} without "document-" */
 export function getScriptRunAt(script) {
-  return `${script.custom.runAt || script.meta.runAt || ''}`.match(RUN_AT_RE)?.[1] || 'end';
+  return `${script.custom[RUN_AT] || script.meta[RUN_AT] || ''}`.match(RUN_AT_RE)?.[1] || 'end';
 }
 
 /** URL that shows the name of the script and opens in devtools sources or in our editor */

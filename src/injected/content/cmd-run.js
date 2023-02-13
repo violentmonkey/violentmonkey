@@ -14,7 +14,7 @@ onScripts.push(() => {
 
 export function Run(id, realm) {
   safePush(runningIds, id);
-  bridge.ids[id] = realm || INJECT_PAGE;
+  bridge[IDS][id] = realm || PAGE;
   if (!pending) pending = sendSetBadge(2);
 }
 

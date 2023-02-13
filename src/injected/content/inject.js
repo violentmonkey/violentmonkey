@@ -3,7 +3,7 @@ import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import { bindEvents, fireBridgeEvent, META_STR } from '../util';
 import { Run } from './cmd-run';
 
-const bridgeIds = bridge.ids;
+const bridgeIds = bridge[IDS];
 let tardyQueue;
 let bridgeInfo;
 let contLists;
@@ -116,7 +116,7 @@ export function injectPageSandbox({ [kSessionId]: sessionId }) {
  * @param {boolean} isXml
  */
 export async function injectScripts(data, isXml) {
-  const { errors, info, [INJECT_MORE]: more } = data;
+  const { errors, info, [MORE]: more } = data;
   const CACHE = 'cache';
   if (errors) {
     logging.warn(errors);
@@ -125,22 +125,22 @@ export async function injectScripts(data, isXml) {
     IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
   }
   bridgeInfo = createNullObj();
-  bridgeInfo[INJECT_PAGE] = info;
-  bridgeInfo[INJECT_CONTENT] = info;
+  bridgeInfo[PAGE] = info;
+  bridgeInfo[CONTENT] = info;
   assign(bridge[CACHE], data[CACHE]);
-  if (isXml || data[INJECT_CONTENT_FORCE]) {
+  if (isXml || data[FORCE_CONTENT]) {
     pageInjectable = false;
-  } else if (data[INJECT_PAGE] && pageInjectable == null) {
+  } else if (data[PAGE] && pageInjectable == null) {
     injectPageSandbox(data);
   }
   const toContent = data.scripts
-    .filter(scr => triageScript(scr) === INJECT_CONTENT)
+    .filter(scr => triageScript(scr) === CONTENT)
     .map(scr => [scr.id, scr.key.data]);
   const moreData = (more || toContent.length)
     && sendCmd('InjectionFeedback', {
-      [INJECT_CONTENT_FORCE]: !pageInjectable,
-      [INJECT_CONTENT]: toContent,
-      [INJECT_MORE]: more,
+      [FORCE_CONTENT]: !pageInjectable,
+      [CONTENT]: toContent,
+      [MORE]: more,
       url: IS_FIREFOX && location.href,
     });
   const getReadyState = describeProperty(Document[PROTO], 'readyState').get;
@@ -179,14 +179,14 @@ export async function injectScripts(data, isXml) {
 
 function triageScript(script) {
   let realm = script[INJECT_INTO];
-  realm = (realm === INJECT_AUTO && !pageInjectable) || realm === INJECT_CONTENT
-    ? INJECT_CONTENT
-    : pageInjectable && INJECT_PAGE;
+  realm = (realm === AUTO && !pageInjectable) || realm === CONTENT
+    ? CONTENT
+    : pageInjectable && PAGE;
   if (realm) {
-    const lists = realm === INJECT_CONTENT
+    const lists = realm === CONTENT
       ? contLists || (contLists = createNullObj())
       : pageLists || (pageLists = createNullObj());
-    const { gmi, [META_STR]: metaStr, pathMap, runAt } = script;
+    const { gmi, [META_STR]: metaStr, pathMap, [RUN_AT]: runAt } = script;
     const list = lists[runAt] || (lists[runAt] = []);
     safePush(list, script);
     setOwnProp(gmi, 'scriptMetaStr', metaStr[0]
@@ -266,7 +266,7 @@ function inject(item, iframeCb) {
 function injectAll(runAt) {
   let res;
   for (let inPage = 1; inPage >= 0; inPage--) {
-    const realm = inPage ? INJECT_PAGE : INJECT_CONTENT;
+    const realm = inPage ? PAGE : CONTENT;
     const lists = inPage ? pageLists : contLists;
     const items = lists?.[runAt];
     if (items) {
@@ -300,7 +300,7 @@ function setupContentInvoker() {
   const invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm, node) => {
-    const fn = realm === INJECT_CONTENT
+    const fn = realm === CONTENT
       ? invokeContent
       : postViaBridge;
     fn(cmd, params, undefined, node);
@@ -323,7 +323,7 @@ function tardyQueueCheck(scripts) {
 function tellBridgeToWriteVault(vaultId, wnd) {
   const { post } = bridge;
   if (post) { // may be absent if this page doesn't have scripts
-    post('WriteVault', vaultId, INJECT_PAGE, wnd);
+    post('WriteVault', vaultId, PAGE, wnd);
     return true;
   }
 }

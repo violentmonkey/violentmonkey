@@ -178,9 +178,9 @@ const items = {
   },
   defaultInjectInto: {
     enum: {
-      [INJECT_AUTO]: '',
-      [INJECT_PAGE]: '',
-      [INJECT_CONTENT]: '',
+      [AUTO]: '',
+      [PAGE]: '',
+      [CONTENT]: '',
     },
   },
   showAdvanced: {
@@ -276,7 +276,7 @@ export default {
       this.revokers.push(hookSetting(name, val => { settings[name] = normalize(val, name); }));
       this.$watch(() => settings[name], getItemUpdater(name, normalize));
     });
-    this.expose = Object.keys(options.get('expose')).map(k => [k, decodeURIComponent(k)]);
+    this.expose = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);
     // Preload zip.js when user visits settings tab
     loadZip();
   },

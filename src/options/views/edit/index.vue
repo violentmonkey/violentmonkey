@@ -92,7 +92,7 @@ import VmHelp from './help';
 
 const CUSTOM_PROPS = {
   name: '',
-  runAt: '',
+  [RUN_AT]: '',
   homepageURL: '',
   updateURL: '',
   downloadURL: '',
@@ -255,7 +255,7 @@ export default {
         ...CUSTOM_PROPS,
         ...objectPick(custom, Object.keys(CUSTOM_PROPS)),
         ...objectPick(custom, CUSTOM_LISTS, fromList),
-        runAt: custom.runAt || '',
+        [RUN_AT]: custom[RUN_AT] || '',
         noframes: noframes == null ? '' : +noframes, // it was boolean in old VM
       },
     };

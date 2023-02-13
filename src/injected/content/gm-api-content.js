@@ -63,6 +63,6 @@ export async function sendSetPopup(isDelayed) {
       await setPopupThrottle;
       setPopupThrottle = null;
     }
-    sendCmd('SetPopup', safePickInto({ menus }, bridge, ['ids', INJECT_INTO]));
+    sendCmd('SetPopup', safePickInto({ menus }, bridge, [IDS, INJECT_INTO]));
   }
 }

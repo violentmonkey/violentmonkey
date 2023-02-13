@@ -1,5 +1,5 @@
 import { parseMeta } from './script';
-import storage from './storage';
+import storage, { S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE } from './storage';
 
 export default () => new Promise((resolve, reject) => {
   console.info('Upgrade database...');
@@ -21,7 +21,7 @@ export default () => new Promise((resolve, reject) => {
     };
   }
   function transform(db) {
-    const tx = db.transaction(['scripts', 'require', 'cache', 'values']);
+    const tx = db.transaction([SCRIPTS, S_REQUIRE, S_CACHE, VALUES]);
     const updates = {};
     let processing = 3;
     const done = () => {
@@ -33,31 +33,31 @@ export default () => new Promise((resolve, reject) => {
       req.onsuccess = () => callback(req.result);
       req.onerror = reject;
     };
-    getAll('scripts', (allScripts) => {
+    getAll(SCRIPTS, (allScripts) => {
       const uriMap = {};
       allScripts.forEach((script) => {
         const { code, id, uri } = script;
-        updates[storage.script.toKey(id)] = transformScript(script);
-        updates[storage.code.toKey(id)] = code;
+        updates[storage[S_SCRIPT].toKey(id)] = transformScript(script);
+        updates[storage[S_CODE].toKey(id)] = code;
         uriMap[uri] = id;
       });
-      getAll('values', (allValues) => {
-        allValues.forEach(({ uri, values }) => {
+      getAll(VALUES, (allValues) => {
+        allValues.forEach(({ uri, [VALUES]: values }) => {
           const id = uriMap[uri];
-          if (id) updates[storage.value.toKey(id)] = values;
+          if (id) updates[storage[S_VALUE].toKey(id)] = values;
         });
         done();
       });
     });
-    getAll('cache', (allCache) => {
+    getAll(S_CACHE, (allCache) => {
       allCache.forEach(({ uri, data }) => {
-        updates[storage.cache.toKey(uri)] = data;
+        updates[storage[S_CACHE].toKey(uri)] = data;
       });
       done();
     });
-    getAll('require', (allRequire) => {
+    getAll(S_REQUIRE, (allRequire) => {
       allRequire.forEach(({ uri, code }) => {
-        updates[storage.require.toKey(uri)] = code;
+        updates[storage[S_REQUIRE].toKey(uri)] = code;
       });
       done();
     });

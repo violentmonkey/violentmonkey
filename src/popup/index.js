@@ -28,7 +28,7 @@ Object.assign(handlers, {
     const idMapAllFrames = store.idMap;
     const idMapMain = idMapAllFrames[0] || (idMapAllFrames[0] = {});
     const idMapOld = idMapAllFrames[frameId] || (idMapAllFrames[frameId] = {});
-    const idMap = data.ids::mapEntry(null, (id, val) => val !== idMapOld[id] && id);
+    const idMap = data[IDS]::mapEntry(null, (id, val) => val !== idMapOld[id] && id);
     const ids = Object.keys(idMap).map(Number);
     if (ids.length) {
       Object.assign(idMapOld, idMap);
@@ -51,12 +51,12 @@ Object.assign(handlers, {
             if (i >= 0) frameScripts.splice(i, 1);
           }
         }
-        script.runs = state === INJECT_CONTENT || state === INJECT_PAGE;
+        script.runs = state === CONTENT || state === PAGE;
         script.pageUrl = url; // each frame has its own URL
         script.failed = badRealm || state === ID_INJECTING;
         script.syntax = state === ID_INJECTING;
         if (badRealm && !store.injectionFailure) {
-          store.injectionFailure = { fixable: data[INJECT_INTO] === INJECT_PAGE };
+          store.injectionFailure = { fixable: data[INJECT_INTO] === PAGE };
         }
       });
     }
@@ -76,7 +76,7 @@ if (!CSS.supports?.('list-style-type', 'disclosure-open')) {
 
 Promise.all([
   sendCmdDirectly('GetTabDomain'),
-  browser.tabs.executeScript({ code: '1', runAt: 'document_start' }).catch(() => []),
+  browser.tabs.executeScript({ code: '1', [RUN_AT]: 'document_start' }).catch(() => []),
 ])
 .then(async ([
   { tab, domain },

@@ -28,7 +28,7 @@ export const addBackgroundHandlers = addHandlersImpl.bind({}, bgHandlers);
 const bridge = {
   __proto__: null,
   /** @type {VMBridgeContentIds} */
-  ids: createNullObj(),
+  [IDS]: createNullObj(),
   cache: createNullObj(),
   pathMaps: createNullObj(),
   // realm is provided when called directly via invokeHost
@@ -42,7 +42,7 @@ const bridge = {
     try {
       res = handle === true
         ? sendCmd(cmd, data)
-        : node::handle(data, realm || INJECT_PAGE);
+        : node::handle(data, realm || PAGE);
       if (isPromise(res)) {
         res = await res;
       }
@@ -70,8 +70,8 @@ browser.runtime.onMessage.addListener(async ({ cmd, data }, src) => {
 /**
  * @callback MessageFromGuestHandler
  * @param {Object} [data]
- * @param {INJECT_CONTENT | INJECT_PAGE} realm -
- *   INJECT_CONTENT when the message is from the content script context,
- *   INJECT_PAGE otherwise. Make sure to specify the same realm when messaging
+ * @param {CONTENT | PAGE} realm -
+ *   CONTENT when the message is from the content script context,
+ *   PAGE otherwise. Make sure to specify the same realm when messaging
  *   the results back otherwise it won't reach the target script.
  */

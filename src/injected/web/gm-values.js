@@ -14,7 +14,7 @@ const dataDecoders = {
 addHandlers({
   UpdatedValues(updates) {
     objectKeys(updates)::forEach(id => {
-      const oldData = store.values[id];
+      const oldData = store[VALUES][id];
       if (oldData) {
         const update = updates[id];
         const keyHooks = changeHooks[id];
@@ -26,7 +26,7 @@ addHandlers({
 });
 
 export function loadValues(id) {
-  return store.values[id];
+  return store[VALUES][id];
 }
 
 /**

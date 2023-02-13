@@ -18,7 +18,7 @@ export default function initialize(invokeHost) {
       bindEvents(e[0], e[1], bridge);
     }, { __proto__: null, once: true, capture: true });
     window::fire(new SafeCustomEvent(PAGE_MODE_HANDSHAKE));
-    bridge.mode = INJECT_PAGE;
+    bridge.mode = PAGE;
     addHandlers({
       /** @this {Node} contentWindow */
       WriteVault(id) {
@@ -26,9 +26,9 @@ export default function initialize(invokeHost) {
       },
     });
   } else {
-    bridge.mode = INJECT_CONTENT;
+    bridge.mode = CONTENT;
     bridge.post = (cmd, data, node) => {
-      invokeHost({ cmd, data, node }, INJECT_CONTENT);
+      invokeHost({ cmd, data, node }, CONTENT);
     };
     global.chrome = undefined;
     global.browser = undefined;
@@ -71,7 +71,7 @@ addHandlers({
     for (const script of items) {
       const { key } = script;
       toRun[key.data] = script;
-      store.values[script.id] = nullObjFrom(script[INJECT_VAL]);
+      store[VALUES][script.id] = nullObjFrom(script[VALUES]);
       if (!PAGE_MODE_HANDSHAKE) {
         const winKey = key.win;
         const data = window[winKey];
@@ -87,7 +87,7 @@ addHandlers({
       }
     }
     if (!PAGE_MODE_HANDSHAKE) toRunNow::forEach(onCodeSet);
-    else if (IS_FIREFOX) bridge.post('InjectList', items[0].runAt);
+    else if (IS_FIREFOX) bridge.post('InjectList', items[0][RUN_AT]);
   },
   Expose() {
     external[VIOLENTMONKEY] = {

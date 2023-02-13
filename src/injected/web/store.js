@@ -1,4 +1,4 @@
 export default {
   commands: createNullObj(),
-  values: createNullObj(),
+  [VALUES]: createNullObj(),
 };

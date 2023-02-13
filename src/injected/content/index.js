@@ -9,9 +9,9 @@ import { sendCmd } from './util';
 import { isEmpty } from '../util';
 import { Run } from './cmd-run';
 
-const { ids } = bridge;
+const { [IDS]: ids } = bridge;
 
-// Make sure to call obj::method() in code that may run after INJECT_CONTENT userscripts
+// Make sure to call obj::method() in code that may run after CONTENT userscripts
 async function init() {
   const isXml = document instanceof XMLDocument;
   const xhrData = getXhrInjection();
@@ -20,7 +20,7 @@ async function init() {
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
     url: IS_FIREFOX && location.href,
     // XML document's appearance breaks when script elements are added
-    [INJECT_CONTENT_FORCE]: isXml,
+    [FORCE_CONTENT]: isXml,
     done: !!(xhrData || global.vmData),
   }, {
     retry: true,
@@ -32,9 +32,9 @@ async function init() {
       ? await getDataFF(dataPromise)
       : await dataPromise
   );
-  assign(ids, data.ids);
+  assign(ids, data[IDS]);
   bridge[INJECT_INTO] = data[INJECT_INTO];
-  if (data.expose && !isXml && injectPageSandbox(data)) {
+  if (data[EXPOSE] && !isXml && injectPageSandbox(data)) {
     addHandlers({ GetScriptVer: true });
     bridge.post('Expose');
   }
@@ -51,15 +51,15 @@ async function init() {
 
 addBackgroundHandlers({
   Command: data => bridge.post('Command', data, ids[data.id]),
-  Run: id => Run(id, INJECT_CONTENT),
+  Run: id => Run(id, CONTENT),
   UpdatedValues(data) {
     const dataPage = createNullObj();
     const dataContent = createNullObj();
     objectKeys(data)::forEach((id) => {
-      (ids[id] === INJECT_CONTENT ? dataContent : dataPage)[id] = data[id];
+      (ids[id] === CONTENT ? dataContent : dataPage)[id] = data[id];
     });
     if (!isEmpty(dataPage)) bridge.post('UpdatedValues', dataPage);
-    if (!isEmpty(dataContent)) bridge.post('UpdatedValues', dataContent, INJECT_CONTENT);
+    if (!isEmpty(dataContent)) bridge.post('UpdatedValues', dataContent, CONTENT);
   },
 });
 

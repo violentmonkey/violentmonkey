@@ -11,7 +11,7 @@ export default {
   badgeColorBlocked: '#888888',
   exportValues: true,
   exportNameTemplate: '[violentmonkey]_YYYY-MM-DD_HH.mm.ss',
-  expose: { // use percent-encoding for '.'
+  [EXPOSE]: { // use percent-encoding for '.'
     'greasyfork%2Eorg': true,
     'sleazyfork%2Eorg': false,
   },
@@ -29,7 +29,7 @@ export default {
   notifyUpdatesGlobal: false, // `true` ignores script.config.notifyUpdates
   version: null,
   /** @type {VMScriptInjectInto} */
-  defaultInjectInto: INJECT_AUTO,
+  defaultInjectInto: AUTO,
   ffInject: true,
   xhrInject: false,
   filters: {

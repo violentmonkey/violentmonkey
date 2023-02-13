@@ -2,8 +2,8 @@ import { debounce, ensureArray, initHooks, isEmpty } from '@/common';
 import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
-import { store } from './db';
-import storage, { S_SCRIPT_PRE } from './storage';
+import { scriptMap, scriptSizes, sizesPrefixRe } from './db';
+import storage, { S_SCRIPT, S_SCRIPT_PRE, S_VALUE } from './storage';
 import { clearValueOpener } from './values';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
@@ -22,7 +22,6 @@ const TTL_MAIN = 3600e3;
 const TTL_TINY = 24 * 3600e3;
 const cache = initCache({ lifetime: TTL_MAIN });
 const dbKeys = initCache({ lifetime: TTL_TINY }); // 1: exists, 0: known to be absent
-const { scriptMap } = store;
 const { api } = storage;
 const GET = 'get';
 const SET = 'set';
@@ -74,7 +73,7 @@ storage.api = {
       if (copy !== undefined) {
         cache.put(key, copy);
         dbKeys.put(key, 1);
-        if (storage.value.toId(key)) {
+        if (storage[S_VALUE].toId(key)) {
           unflushed = true;
           valuesToFlush[key] = copy;
         } else {
@@ -102,7 +101,7 @@ storage.api = {
       if (ok) {
         cache.del(key);
         dbKeys.put(key, 0);
-        if (storage.value.toId(key)) {
+        if (storage[S_VALUE].toId(key)) {
           valuesToFlush[key] = null;
           unflushed = true;
           ok = false;
@@ -169,7 +168,7 @@ function batch(state) {
 }
 
 function updateScriptMap(key, val) {
-  const id = +storage.script.toId(key);
+  const id = +storage[S_SCRIPT].toId(key);
   if (id) {
     if (val) scriptMap[id] = val;
     else delete scriptMap[id];
@@ -178,9 +177,9 @@ function updateScriptMap(key, val) {
 }
 
 async function updateScriptSizeContributor(key, val) {
-  const area = store.sizesPrefixRe.exec(key);
+  const area = sizesPrefixRe.exec(key);
   if (area && area[0] !== S_SCRIPT_PRE) {
-    store.sizes[key] = deepSize(val);
+    scriptSizes[key] = deepSize(val);
   }
 }
 

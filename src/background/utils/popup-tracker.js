@@ -9,7 +9,7 @@ export const popupTabs = {}; // { tabId: 1 }
 addPublicCommands({
   async SetPopup(data, src) {
     if (popupTabs[src.tab.id]) return;
-    Object.assign(data, await getData({ ids: Object.keys(data.ids) }));
+    Object.assign(data, await getData({ [IDS]: Object.keys(data[IDS]) }));
     cache.put('SetPopup', Object.assign({ [src.frameId]: [data, src] }, cache.get('SetPopup')));
   },
 });

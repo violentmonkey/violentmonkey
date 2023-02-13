@@ -24,7 +24,7 @@ export const bindEvents = (srcId, destId, bridge) => {
   window::on(srcId, e => {
     e::stopImmediatePropagation();
     if (process.env.DEBUG) {
-      console.info(`[bridge.${bridge.ids ? 'host' : 'guest.web'}] received`,
+      console.info(`[bridge.${bridge[IDS] ? 'host' : 'guest.web'}] received`,
         incomingNodeEvent ? e::getRelatedTarget() : e::getDetail());
     }
     if (!incomingNodeEvent) {
@@ -42,7 +42,7 @@ export const bindEvents = (srcId, destId, bridge) => {
   }, true);
   /** In Content bridge `pageNode` is `realm` which is wired in setupContentInvoker */
   bridge.post = (cmd, data, pageNode, contNode) => {
-    const node = bridge.ids ? contNode : pageNode;
+    const node = bridge[IDS] ? contNode : pageNode;
     // Constructing the event now so we don't send anything if it throws on invalid `node`
     const evtNode = node && new SafeMouseEvent(destId, { __proto__: null, relatedTarget: node });
     fireBridgeEvent(destId, { cmd, data, node: !!evtNode });

@@ -419,7 +419,7 @@ export default {
     },
     async onInjectionFailureFix() {
       // TODO: promisify options.set, resolve on storage write, await it instead of makePause
-      options.set('defaultInjectInto', INJECT_AUTO);
+      options.set('defaultInjectInto', AUTO);
       await makePause(100);
       await browser.tabs.reload();
       window.close();
