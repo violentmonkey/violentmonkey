@@ -111,7 +111,7 @@ addPublicCommands({
     if (!url) url = src.url || tab.url;
     clearFrameData(tabId, frameId);
     const bagKey = getKey(url, isTop);
-    const bagP = cache.get(bagKey) || await prepare(bagKey, url, isTop);
+    const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop);
     const bag = bagP[INJECT] ? bagP : await bagP.promise;
     /** @type {VMInjection} */
     const inject = bag[INJECT];
@@ -136,14 +136,10 @@ addPublicCommands({
     injectContentRealm(items, tabId, frameId);
     if (!moreKey) return;
     if (!url) url = src.url || tab.url;
-    let more = cache.get(moreKey);
-    if (!more || more.ids.some(id => !more[S_CODE][id])) {
-      // Workaround for FF bug(?): the `code` object is mysteriously emptied
-      more = cache.put(moreKey, getScriptsByURL(url, !frameId));
-    }
-    // Caching as Promise to be awaited by other tabs with this moreKey
+    let more = cache.get(moreKey)
+      || cache.put(moreKey, getScriptsByURL(url, !frameId));
     const envCache = more[S_CACHE]
-      || cache.put(moreKey, more = await more)[S_CACHE];
+      || cache.put(moreKey, more = await more.promise)[S_CACHE];
     const scripts = prepareScripts(more);
     triageRealms(scripts, forceContent, tabId, frameId);
     addValueOpener(scripts, tabId, frameId);
@@ -284,12 +280,17 @@ async function prepare(cacheKey, url, isTop) {
   const errors = [];
   // TODO: teach `getScriptEnv` to skip prepared scripts in cache
   const env = getScriptsByURL(url, isTop, errors);
-  if (!env) return cache.put(cacheKey, bagNoOp);
-  const inject = shouldExpose ? { expose: true } : {};
-  const bag = { [INJECT]: inject };
-  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
+  if (env) {
+    env.promise = prepareBag(cacheKey, url, isTop,
+      env, shouldExpose ? { expose: true } : {}, errors);
+  }
+  return cache.put(cacheKey, env || bagNoOp);
+}
+
+async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
   await env.promise;
   cache.batch(true);
+  const bag = { [INJECT]: inject };
   const { allIds, [INJECT_MORE]: envDelayed } = env;
   const moreKey = envDelayed.promise && getUniqId('more');
   Object.assign(inject, {
@@ -315,6 +316,7 @@ async function prepare(cacheKey, url, isTop) {
     cache.put(moreKey, envDelayed);
     envDelayed[INJECT_MORE] = cacheKey;
   }
+  cache.put(cacheKey, bag); // synchronous onHeadersReceived needs plain object not a Promise
   cache.batch(false);
   return bag;
 }

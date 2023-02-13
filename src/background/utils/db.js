@@ -273,8 +273,7 @@ export function getScriptsByURL(url, isTop, errors) {
   const envStart = makeEnv();
   /** @type {VMInjection.EnvDelayed} */
   const envDelayed = makeEnv();
-  for (const [areaName, listName] of STORAGE_ROUTES_ENTRIES) {
-    envStart[areaName] = {}; envDelayed[areaName] = {};
+  for (const [, listName] of STORAGE_ROUTES_ENTRIES) {
     envStart[listName] = []; envDelayed[listName] = [];
   }
   allScripts.forEach((script) => {
@@ -318,7 +317,8 @@ export function getScriptsByURL(url, isTop, errors) {
     env[ENV_SCRIPTS].push(script);
   });
   if (!errors) {
-    return readEnvironmentData(envDelayed);
+    envDelayed.promise = readEnvironmentData(envDelayed);
+    return envDelayed;
   }
   if (envStart.ids.length) {
     envStart.promise = readEnvironmentData(envStart);
@@ -339,6 +339,7 @@ async function readEnvironmentData(env) {
   const data = await storage.base.getMulti(keys);
   const badScripts = new Set();
   for (const [area, listName] of STORAGE_ROUTES_ENTRIES) {
+    env[area] = {}; // presence of the area object is used to check that `env.promise` is resolved
     for (const id of env[listName]) {
       let val = data[storage[area].toKey(id)];
       if (!val && area === S_VALUE) val = {};
