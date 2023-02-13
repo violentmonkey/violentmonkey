@@ -29,7 +29,8 @@ The following environment variables will be injected at compilation time for som
 
 ### Development
 
-Make sure [Node.js](https://nodejs.org/) greater than v10.0 and Yarn v1.x is installed.
+Install [Node.js](https://nodejs.org/) and Yarn v1.x.  
+The version of Node.js should match `"node"` key in `package.json`.
 
 ``` sh
 # Install dependencies
