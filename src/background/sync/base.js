@@ -1,5 +1,5 @@
 import {
-  debounce, normalizeKeys, request, noop, makePause, ensureArray, sendCmd, blob2base64, getUniqId,
+  debounce, normalizeKeys, request, noop, makePause, ensureArray, sendCmd, blob2base64, getRandomString,
 } from '@/common';
 import { TIMEOUT_HOUR } from '@/common/consts';
 import {
@@ -644,7 +644,7 @@ async function sha256b64url(code) {
  * Ref: RFC 7636
  */
 export function getCodeVerifier() {
-  return getUniqId(getUniqId(getUniqId()));
+  return getRandomString(43, 128);
 }
 
 export async function getCodeChallenge(codeVerifier) {

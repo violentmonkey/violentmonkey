@@ -71,10 +71,14 @@ export function throttle(func, time) {
 
 export function noop() {}
 
-export function getUniqId(prefix = 'VM') {
+export function getRandomString(minLength = 10, maxLength = 0) {
   for (let rnd = ''; (rnd += Math.random().toString(36).slice(2));) {
-    if (rnd.length > 9) return prefix + rnd;
+    if (rnd.length >= minLength) return maxLength ? rnd.slice(0, maxLength) : rnd;
   }
+}
+
+export function getUniqId(prefix = 'VM') {
+  return prefix + getRandomString();
 }
 
 /**
