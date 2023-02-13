@@ -2,7 +2,7 @@
 import { getScriptPrettyUrl } from '@/common';
 import { BLACKLIST, BLACKLIST_ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
-import * as tld from '@/common/tld';
+import { getPublicSuffix } from 'tldjs/tld';
 import { postInitialize } from './init';
 import { addOwnCommands } from './message';
 import { getOption, hookOptions } from './options';
@@ -72,7 +72,6 @@ hookOptions((changes) => {
     if (res) throw res; // will be passed to the UI
   }
 });
-tld.initTLD(true);
 
 export class MatchTest {
   constructor(rule, scheme, httpMod, host, path) {
@@ -267,7 +266,7 @@ function matchTld(tstr) {
   const matches = tstr.match(this);
   const suffix = matches?.[1]?.slice(1).toLowerCase();
   // Must return a proper boolean
-  return !!suffix && tld.getPublicSuffix(suffix) === suffix;
+  return !!suffix && getPublicSuffix(suffix) === suffix;
 }
 
 function hostMatcher(rule) {
@@ -275,7 +274,7 @@ function hostMatcher(rule) {
   // *.example.com
   // www.google.*
   // www.google.tld
-  const isTld = rule.endsWith('.tld') && tld.isReady();
+  const isTld = rule.endsWith('.tld');
   let prefix = '';
   let base = rule;
   let suffix = '';

@@ -42,7 +42,7 @@ exports.optimization = {
         name: 'common-ui',
         test: new RegExp([
           /\bsvg/,
-          'src/common/(?!zip|tld)',
+          'src/common/(?!zip)',
           'node_modules/@violentmonkey/shortcut',
           'node_modules/@?vue',
         ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
@@ -53,7 +53,6 @@ exports.optimization = {
         ].includes(c.name),
       },
       ...splitVendor('codemirror'),
-      ...splitVendor('tldjs'),
     },
   },
 };
