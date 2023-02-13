@@ -86,7 +86,7 @@
             removed: item.data.config.removed,
             runs: item.data.runs,
             'extras-shown': activeExtras === item,
-            'excludes-shown': item.excludesValue,
+            'excludes-shown': item.excludes,
           }"
           class="script">
           <div
@@ -122,25 +122,24 @@
               <icon name="more"/>
             </div>
           </div>
-          <div v-if="item.excludesValue != null" class="excludes-menu flex flex-col">
-            <textarea v-model="item.excludesValue" spellcheck="false"
-                      :rows="calcRows(item.excludesValue)"/>
-            <div>
-              <button v-text="i18n('buttonOK')" @click="onExcludeSave(item)"/>
-              <button v-text="i18n('buttonCancel')" @click="onExcludeClose(item)"/>
-              <!-- not using tooltip to preserve line breaks -->
-              <details>
-                <summary><icon name="info"/></summary>
-                <small>
-                  <span v-text="i18n('menuExcludeHint')"/>
-                  <ul class="monospace-font mt-1">
-                    <li>https://www.foo.com/path/*bar*</li>
-                    <li>*://www.foo.com/*</li>
-                    <li>*://*.foo.com/*</li>
-                  </ul>
-                </small>
-              </details>
-            </div>
+          <div v-if="item.excludes" class="excludes-menu mb-1c mr-1c">
+            <button v-for="(val, key) in item.excludes[1]" :key="key"
+                    v-text="val" class="ellipsis" :title="`*://${val}/*`"
+                    @click="onExcludeSave(item, `*://${val}/*`)"/>
+            <input v-model="item.excludes[0]" spellcheck="false"
+                   @keypress.enter="onExcludeSave(item)"
+                   @keydown.esc.exact.stop.prevent="onExcludeClose(item)"/>
+            <!-- Esc interception works in Chrome not in Firefox -->
+            <button v-text="i18n('buttonOK')" @click="onExcludeSave(item)"/>
+            <button v-text="i18n('buttonCancel')" @click="onExcludeClose(item)"/>
+            <!-- not using tooltip to preserve line breaks -->
+            <details class="mb-1">
+              <summary><icon name="info"/></summary>
+              <small>{{i18n('menuExcludeHint')}} {{i18n('labelRelated')}}<a
+                v-text="i18n('labelExcludeMatch')" target="_blank"
+                href="https://violentmonkey.github.io/api/matching/"/>
+              </small>
+            </details>
           </div>
           <div class="submenu-commands">
             <div
@@ -302,7 +301,7 @@ export default {
             }${
               1e6 + script.props.position
             }`,
-            excludesValue: null,
+            excludes: null,
             upd: null,
           };
         }).sort((a, b) => (a.key < b.key ? -1 : a.key > b.key));
@@ -441,26 +440,30 @@ export default {
           : i18n('msgNoUpdate');
       }
     },
-    onExclude() {
+    async onExclude() {
       const item = this.activeExtras;
-      item.excludesValue = [
-        ...item.data.custom.excludeMatch || [],
-        `${item.data.pageUrl.split('#')[0]}*`,
-      ].join('\n');
-      this.$nextTick(() => {
-        // not using $refs because multiple items may show textareas
-        item.el.querySelector('textarea').focus();
-      });
+      const { data } = item;
+      const url = data.pageUrl;
+      const { host, domain } = await sendCmdDirectly('GetTabDomain', url);
+      item.excludes = [
+        `${url.split('#')[0]}*`,
+        { host, group: `*.${domain}` },
+      ];
+      await makePause(); // $nextTick runs too early
+      item.el.querySelector('input').focus(); // not using $refs as multiple items may show inputs
     },
     onExcludeClose(item) {
-      item.excludesValue = null;
+      item.excludes = null;
       this.focus(item);
     },
-    async onExcludeSave(item) {
+    async onExcludeSave(item, btn) {
       await sendCmdDirectly('UpdateScriptInfo', {
         id: item.data.props.id,
         custom: {
-          excludeMatch: item.excludesValue.split('\n').map(line => line.trim()).filter(Boolean),
+          excludeMatch: [
+            ...item.data.custom.excludeMatch || [],
+            ...[btn || item.excludes[0].trim()].filter(Boolean),
+          ],
         },
       });
       this.onExcludeClose(item);
