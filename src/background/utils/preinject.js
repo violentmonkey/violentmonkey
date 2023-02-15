@@ -136,11 +136,10 @@ addPublicCommands({
     injectContentRealm(items, tabId, frameId);
     if (!moreKey) return;
     if (!url) url = src.url || tab.url;
-    let more = cache.get(moreKey)
+    const env = cache.get(moreKey)
       || cache.put(moreKey, getScriptsByURL(url, !frameId));
-    const envCache = more[S_CACHE]
-      || cache.put(moreKey, more = await more[PROMISE])[S_CACHE];
-    const scripts = prepareScripts(more);
+    const envCache = (env[PROMISE] ? await env[PROMISE] : env)[S_CACHE];
+    const scripts = prepareScripts(env);
     triageRealms(scripts, forceContent, tabId, frameId);
     addValueOpener(scripts, tabId, frameId);
     return {

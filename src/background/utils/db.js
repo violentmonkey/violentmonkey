@@ -271,7 +271,8 @@ export function getScriptsByURL(url, isTop, errors) {
   const envStart = makeEnv();
   /** @type {VMInjection.EnvDelayed} */
   const envDelayed = makeEnv();
-  for (const [, listName] of STORAGE_ROUTES_ENTRIES) {
+  for (const [areaName, listName] of STORAGE_ROUTES_ENTRIES) {
+    envStart[areaName] = {}; envDelayed[areaName] = {};
     envStart[listName] = []; envDelayed[listName] = [];
   }
   allScripts.forEach((script) => {
@@ -337,7 +338,6 @@ async function readEnvironmentData(env) {
   const data = await storage.base.getMulti(keys);
   const badScripts = new Set();
   for (const [area, listName] of STORAGE_ROUTES_ENTRIES) {
-    env[area] = {}; // presence of the area object is used to check that `env[PROMISE]` is resolved
     for (const id of env[listName]) {
       let val = data[storage[area].toKey(id)];
       if (!val && area === S_VALUE) val = {};
@@ -354,6 +354,7 @@ async function readEnvironmentData(env) {
   if (badScripts.size) {
     reportBadScripts(badScripts);
   }
+  env[PROMISE] = null; // indicating it's been processed
   return env;
 }
 

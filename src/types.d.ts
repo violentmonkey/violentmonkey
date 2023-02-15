@@ -246,11 +246,13 @@ declare namespace VMInjection {
     clipFF?: boolean;
     forceContent?: boolean;
     more: EnvDelayed;
+    /** `null` = env was processed and contains data now */
     promise: Promise<EnvStart>;
   }
   interface EnvDelayed extends Env {
     /** cache key for Bag */
     more: string;
+    /** `null` = env was processed and contains data now */
     promise: Promise<EnvDelayed>;
   }
   /**
