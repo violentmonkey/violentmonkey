@@ -453,20 +453,19 @@ function getSizeForResources(accum, url) {
 }
 
 export async function removeScripts(ids) {
+  const idsToRemove = [];
   // Only those marked as removed can be removed permanently
   const newLen = 1 + removedScripts.reduce((iAlive, script, i) => {
     const id = getPropsId(script);
-    if (ids.includes(id)) delete scriptMap[id];
-    else if (++iAlive < i) removedScripts[iAlive] = script;
+    if (ids.includes(id)) {
+      idsToRemove.push(S_CODE_PRE + id, S_SCRIPT_PRE + id, S_VALUE_PRE + id);
+      delete scriptMap[id];
+    } else if (++iAlive < i) removedScripts[iAlive] = script;
     return iAlive;
   }, -1);
   if (removedScripts.length !== newLen) {
     removedScripts.length = newLen; // live scripts were moved to the beginning
-    await storage.base.remove([
-      ...ids.map(storage[S_CODE].toKey),
-      ...ids.map(storage[S_SCRIPT].toKey),
-      ...ids.map(storage[S_VALUE].toKey),
-    ]);
+    await storage.base.remove(idsToRemove);
     return sendCmd('RemoveScripts', ids);
   }
 }
