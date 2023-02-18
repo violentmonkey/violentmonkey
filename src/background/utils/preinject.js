@@ -293,7 +293,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
   cache.batch(true);
   const bag = { [INJECT]: inject };
   const { allIds, [MORE]: envDelayed } = env;
-  const moreKey = envDelayed[PROMISE] && getUniqId('more');
+  const moreKey = envDelayed[IDS].length && getUniqId('more');
   Object.assign(inject, {
     [S_CACHE]: env[S_CACHE],
     [SCRIPTS]: prepareScripts(env),
