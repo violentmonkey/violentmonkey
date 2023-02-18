@@ -1,5 +1,6 @@
 import '@/common/browser';
 import { sendCmdDirectly } from '@/common';
+import { INJECTABLE_TAB_URL_RE } from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { forEachValue, mapEntry } from '@/common/object';
@@ -74,18 +75,12 @@ if (!CSS.supports?.('list-style-type', 'disclosure-open')) {
   document.styleSheets[0].insertRule('.excludes-menu ::-webkit-details-marker {display:none}');
 }
 
-Promise.all([
-  sendCmdDirectly('GetTabDomain'),
-  browser.tabs.executeScript({ code: '1', [RUN_AT]: 'document_start' }).catch(() => []),
-])
-.then(async ([
-  { tab, domain },
-  [injectable],
-]) => {
+sendCmdDirectly('GetTabDomain').then(async ({ tab, domain }) => {
   store.currentTab = tab;
   store.domain = domain;
   browser.runtime.connect({ name: `${tab.id}` });
-  if (!injectable) {
+  if (!INJECTABLE_TAB_URL_RE.test(tab.url) // executeScript runs code in own pages in FF
+  || !await browser.tabs.executeScript({ code: '1', [RUN_AT]: 'document_start' }).catch(() => [])) {
     store.injectable = false;
     mutex.resolve();
   } else {
