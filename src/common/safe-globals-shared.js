@@ -24,6 +24,7 @@ export const INJECT_INTO = 'injectInto';
 export const MORE = 'more';
 export const PAGE = 'page';
 export const RUN_AT = 'runAt';
+export const SCRIPTS = 'scripts';
 export const VALUES = 'values';
 export const kResponse = 'response';
 export const kResponseHeaders = 'responseHeaders';

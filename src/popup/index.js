@@ -34,9 +34,9 @@ Object.assign(handlers, {
     if (ids.length) {
       Object.assign(idMapOld, idMap);
       // frameScripts may be appended multiple times if iframes have unique scripts
-      const scope = store[isTop ? 'scripts' : 'frameScripts'];
-      const metas = data.scripts?.filter(({ props: { id } }) => ids.includes(id))
-        || (Object.assign(data, await sendCmdDirectly('GetData', { ids }))).scripts;
+      const scope = store[isTop ? SCRIPTS : 'frameScripts'];
+      const metas = data[SCRIPTS]?.filter(({ props: { id } }) => ids.includes(id))
+        || (Object.assign(data, await sendCmdDirectly('GetData', { ids })))[SCRIPTS];
       metas.forEach(script => {
         loadScriptIcon(script, data);
         const { id } = script.props;

@@ -133,7 +133,7 @@ export async function injectScripts(data, isXml) {
   } else if (data[PAGE] && pageInjectable == null) {
     injectPageSandbox(data);
   }
-  const toContent = data.scripts
+  const toContent = data[SCRIPTS]
     .filter(scr => triageScript(scr) === CONTENT)
     .map(scr => [scr.id, scr.key.data]);
   const moreData = (more || toContent.length)
@@ -164,7 +164,7 @@ export async function injectScripts(data, isXml) {
       });
       await 0; // let the site's listeners on `window` run first
     }
-    for (const scr of data.scripts) {
+    for (const scr of data[SCRIPTS]) {
       triageScript(scr);
     }
     if (contLists && !hasInvoker) {

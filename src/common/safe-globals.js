@@ -21,7 +21,6 @@ export const { apply: safeApply } = Reflect;
 export const hasOwnProperty = safeApply.call.bind(({}).hasOwnProperty);
 export const safeCall = Object.call.bind(Object.call);
 export const IS_FIREFOX = !chrome.app;
-export const SCRIPTS = 'scripts';
 export const ROUTE_SCRIPTS = '#' + SCRIPTS;
 export const extensionRoot = chrome.runtime.getURL('/');
 export const extensionOrigin = extensionRoot.slice(0, -1);

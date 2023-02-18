@@ -41,7 +41,7 @@ async function init() {
   if (IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);
   }
-  if (data.scripts) {
+  if (data[SCRIPTS]) {
     onScripts.forEach(fn => fn(data));
     await injectScripts(data, isXml);
   }
