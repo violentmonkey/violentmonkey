@@ -704,7 +704,7 @@ export default {
   --columns-table: 1600, 2500, 3400; // 1680x1050, 2560x1440, 3440x1440
 }
 .tab.tab-installed {
-  max-height: 100vh;
+  height: 100vh;
   padding: 0;
   overflow: auto;
   header {
@@ -733,7 +733,7 @@ export default {
     }
   }
   @media (max-width: 767px) {
-    max-height: none;
+    height: auto;
     overflow: visible;
   }
 }
