@@ -40,14 +40,14 @@ addHandlers({
   },
 
   RegisterMenu({ id, cap }) {
-    if (IS_TOP) {
+    if (window === top) {
       ensureNestedProp(menus, id, cap, 1);
       sendSetPopup(true);
     }
   },
 
   UnregisterMenu({ id, cap }) {
-    if (IS_TOP) {
+    if (window === top) {
       delete menus[id]?.[cap];
       sendSetPopup(true);
     }

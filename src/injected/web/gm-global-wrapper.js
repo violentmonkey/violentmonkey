@@ -146,7 +146,7 @@ function proxyDescribe(local, name, wrapper, events) {
     || name === 'window'
     || name === 'self'
     || name === 'globalThis'
-    || name === 'top' && IS_TOP // `top` is unforgeable
+    || name === 'top' && window === top // `top` is unforgeable
     || name === 'parent' && window === window::getWindowParent();
   if (isWindow) {
     desc.value = wrapper;

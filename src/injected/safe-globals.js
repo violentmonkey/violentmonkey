@@ -6,9 +6,7 @@
  * WARNING! Don't use exported functions from @/common anywhere in injected!
  */
 
-export const { location } = global;
 export const PROTO = 'prototype';
-export const IS_TOP = top === window;
 export const CALLBACK_ID = '__CBID';
 export const kFileName = 'fileName';
 

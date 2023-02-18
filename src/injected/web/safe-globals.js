@@ -4,10 +4,15 @@
 /**
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.
  * `export` is stripped in the final output and is only used for our NodeJS test scripts.
+ * To ensure the minified name is 1 char we declare the super frequently used names first.
  */
 
-export const cloneInto = PAGE_MODE_HANDSHAKE ? null : global.cloneInto;
 export let
+  safeCall, // ~50 "::" calls
+  createNullObj, // ~25 calls
+  forEach, // ~15 calls
+  safeApply,
+  safeBind,
   // window
   SafeCustomEvent,
   SafeDOMParser,
@@ -38,22 +43,16 @@ export let
    * its length or from an unassigned `hole`. */
   concat,
   filter,
-  forEach,
   indexOf,
   // Element.prototype
   remove,
   // String.prototype
   slice,
-  // safeCall
-  safeApply,
-  safeBind,
-  safeCall,
   // various values
   builtinGlobals,
   // various methods
   URLToString,
   arrayIsArray,
-  createNullObj,
   createObjectURL,
   formDataEntries,
   hasOwnProperty,
@@ -71,6 +70,7 @@ export let
   getDetail, // CustomEvent
   getRelatedTarget; // MouseEvent
 
+export const cloneInto = PAGE_MODE_HANDSHAKE ? null : global.cloneInto;
 /**
  * VAULT consists of the parent's safe globals to protect our communications/globals
  * from a page that creates an iframe with src = location and modifies its contents

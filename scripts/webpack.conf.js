@@ -92,9 +92,13 @@ const defsObj = {
   'process.env.DEV': JSON.stringify(!isProd),
   'process.env.TEST': JSON.stringify(process.env.BABEL_ENV === 'test'),
 };
+/** `window` and `document` are unforgeable so we extract them primarily to improve minification.
+ * The document's value can change only in about:blank but we don't inject there. */
+const setUnforgeablesHeader = 'const global = this, { document, window } = global;';
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
 const skipReinjectionHeader = `{
+  ${setUnforgeablesHeader}
   const INIT_FUNC_NAME = '${INIT_FUNC_NAME}';
   if (window[INIT_FUNC_NAME] !== 1)`;
 
@@ -133,7 +137,7 @@ const modify = (page, entry, init) => modifyWebpackConfig(
 module.exports = Promise.all([
   modify((config) => {
     addWrapperWithGlobals('common', config, defsObj, getGlobals => ({
-      header: () => `{ ${getGlobals()}`,
+      header: () => `{ ${setUnforgeablesHeader} ${getGlobals()}`,
       footer: '}',
       test: /^(?!injected|public).*\.js$/,
     }));

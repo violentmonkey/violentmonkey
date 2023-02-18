@@ -3,8 +3,11 @@
 /**
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.
  * `export` is stripped in the final output and is only used for our NodeJS test scripts.
+ * To ensure the minified name is 1 char we declare the super frequently used names first.
  */
 
+export const { apply: safeApply } = Reflect;
+export const safeCall = safeApply.call.bind(safeApply.call); // ~75 "::" calls
 export const {
   Blob: SafeBlob,
   CustomEvent: SafeCustomEvent,
@@ -21,11 +24,11 @@ export const {
   dispatchEvent: fire,
   removeEventListener: off,
 } = global;
+// eslint-disable-next-line no-restricted-syntax
+export const createNullObj = Object.create.bind(Object, null); // 25 calls
 export const SafeError = Error;
 export const ResponseProto = SafeResponse[PROTO];
-export const { apply: safeApply } = Reflect;
 export const hasOwnProperty = safeApply.call.bind(({}).hasOwnProperty);
-export const safeCall = safeApply.call.bind(safeApply.call);
 export const { forEach, includes } = []; // `push` is unsafe as it may call a setter; use safePush()
 export const { getElementsByTagName } = document;
 export const { then } = SafePromise[PROTO];
@@ -39,8 +42,6 @@ export const {
   getPrototypeOf,
   keys: objectKeys,
 } = Object;
-// eslint-disable-next-line no-restricted-syntax
-export const createNullObj = Object.create.bind(Object, null);
 export const { random: mathRandom } = Math;
 export const { toStringTag: toStringTagSym } = Symbol; // used by ProtectWebpackBootstrapPlugin
 export const { stopImmediatePropagation } = Event[PROTO];

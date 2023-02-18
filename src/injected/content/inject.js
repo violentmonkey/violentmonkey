@@ -54,7 +54,7 @@ export function injectPageSandbox({ [kSessionId]: sessionId }) {
   } else {
     setOwnProp(global, VAULT_WRITER, tellBridgeToWriteVault, false);
   }
-  if (useOpener(opener) || useOpener(!IS_TOP && parent)) {
+  if (useOpener(opener) || useOpener(window !== top && parent)) {
     startHandshake();
   } else {
     /* Sites can do window.open(sameOriginUrl,'iframeNameOrNewWindowName').opener=null, spoof JS
