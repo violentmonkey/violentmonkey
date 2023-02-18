@@ -38,7 +38,7 @@ addPublicCommands({
 });
 
 const whitelistRe = re`/^https:\/\/(
-  greasyfork\.org\/scripts\/[^/]*\/code|
+  (greas|sleaz)yfork\.org\/scripts\/[^/]*\/code|
   openuserjs\.org\/install\/[^/]*|
   github\.com\/[^/]*\/[^/]*\/(
     raw\/[^/]*|
@@ -49,7 +49,7 @@ const whitelistRe = re`/^https:\/\/(
 )\/[^/]*?\.user\.js  ([?#]|$)  /ix`;
 const blacklistRe = re`/^https?:\/\/(
   (gist\\.)?github\\.com|
-  (greasyfork|openuserjs)\\.org
+  ((greas|sleaz)yfork|openuserjs)\\.org
 )\//ix`;
 const resolveVirtualUrl = url => (
   `${extensionOptionsPage}${ROUTE_SCRIPTS}/${+url.split('#')[1]}`

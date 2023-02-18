@@ -136,6 +136,7 @@ function inferScriptHome(script) {
     u = u.split('/', 6);
     switch (u[2]) {
     case 'greasyfork.org':
+    case 'sleazyfork.org':
       if (u[3] !== 'scripts') u.splice(3, 1);
       break;
     case 'raw.githubusercontent.com':

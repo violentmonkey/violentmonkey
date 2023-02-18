@@ -268,14 +268,6 @@ export async function requestLocalFile(url, options = {}) {
   });
 }
 
-/**
- * Excludes `text/html` to avoid LINK header that Chrome uses to prefetch js and css,
- * because GreasyFork's 404 error response causes CSP violations in console of our page.
- */
-const FORCED_ACCEPT = {
-  'greasyfork.org': 'application/javascript, text/plain, text/css',
-};
-
 const isLocalUrlRe = re`/^(
   file:\/\/|
   about:|
@@ -307,8 +299,10 @@ export async function request(url, options = {}) {
   const { body, headers, [kResponseType]: responseType } = options;
   const isBodyObj = body && body::({}).toString() === '[object Object]';
   const [, scheme, auth, hostname, urlTail] = url.match(/^([-\w]+:\/\/)([^@/]*@)?([^/]*)(.*)|$/);
-  const accept = FORCED_ACCEPT[hostname];
-  // Not using ...spread because Babel mistakenly adds its polyfill to injected-web
+  // Avoiding LINK header prefetch of js in 404 pages which cause CSP violations in our console
+  // TODO: toggle a webRequest/declarativeNetRequest rule to strip LINK headers
+  const accept = (hostname === 'greasyfork.org' || hostname === 'sleazyfork.org')
+    && 'application/javascript, text/plain, text/css';
   const init = Object.assign({
     cache: isRemote(url) ? undefined : 'no-cache',
   }, options, {
