@@ -2,9 +2,12 @@
 
 /**
  * This file is used first by the entire `src` including `injected`.
+ * `global` is used instead of WebPack's polyfill which we disable in webpack.conf.js.
  * Not exporting NodeJS built-in globals as this file is imported in the test scripts.
  */
 
+const global = process.env.TEST ? globalThis : this; // eslint-disable-line no-undef
+const { window } = global; // it's unforgeable so we extract it primarily to improve minification
 export const VIOLENTMONKEY = 'Violentmonkey';
 export const AUTO = 'auto';
 export const CONTENT = 'content';

@@ -30,7 +30,6 @@ export const SafeError = Error;
 export const ResponseProto = SafeResponse[PROTO];
 export const hasOwnProperty = safeApply.call.bind(({}).hasOwnProperty);
 export const { forEach, includes } = []; // `push` is unsafe as it may call a setter; use safePush()
-export const { getElementsByTagName } = document;
 export const { then } = SafePromise[PROTO];
 export const { indexOf: stringIndexOf, slice } = '';
 export const safeCharCodeAt = safeApply.call.bind(''.charCodeAt); // faster than str::charCodeAt
@@ -58,4 +57,8 @@ export const isInstance = (instance, safeOriginalProto) => {
   }
 };
 export const isPromise = (proto => val => isInstance(val, proto))(SafePromise[PROTO]);
+/** It's unforgeable so we extract it primarily to improve minification.
+ * The document's value can change only in about:blank but we don't inject there. */
+const { document } = global;
+export const { getElementsByTagName } = document;
 export let IS_FIREFOX = !chrome.app;

@@ -96,15 +96,11 @@ module.exports = {
 function makeOverrides() {
   /* Note that `injected` uses several more `common` files indirectly, but we check just these
    * two automatically because they are trivial by design and must always pass the check */
-  const GLOBALS_SHARED = {
-    ...getGlobals('*'),
-    global: false, // defined in webpack.conf
-  };
+  const GLOBALS_SHARED = getGlobals('*');
   const GLOBALS_INJECTED = {
     ...getGlobals('injected'),
     PAGE_MODE_HANDSHAKE: false,
     VAULT_ID: false,
-    global: false, // defined in webpack.conf
   };
   function getGlobals(path) {
     const res = {};
