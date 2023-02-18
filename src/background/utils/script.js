@@ -129,7 +129,6 @@ export function getNameURI(script) {
 /**
  * @param {VMScript} script
  * @returns {string | undefined}
- * Warning! script[INFERRED] must be already created.
  */
 function inferScriptHome(script) {
   let u = script.custom.lastInstallURL;
@@ -161,40 +160,39 @@ function inferScriptHome(script) {
     u = /^https?:\/\/(?!tampermonkey\.net\/)/.test(u)
       && getFullUrl(u).replace(/^https?(:\/\/userscripts)(\.org\/users\/\w)/, 'https$1-mirror$2');
   }
-  if (u) {
-    script[INFERRED][HOMEPAGE_URL] = u;
-    return u;
-  }
+  return u;
 }
 
 /**
  * @param {VMScript} script
  * @param {string} [home]
  * @returns {string | undefined}
- * Warning! script[INFERRED] must be already created.
  */
 function inferScriptSupportUrl(script, home = getScriptHome(script)) {
   let u = home && home.match(re`/
     ^https:\/\/(?:
       (?:
-        (g)reasyfork\.org(?:\/(?!scripts)[^/]+)? |
+        (greas|sleaz)yfork\.org(?:\/(?!scripts)[^/]+)? |
         openuserjs\.org
       )(?=\/scripts\/) |
       github\.com
     )\/[^/]+\/[^/]+/x`);
   if (u) {
-    u = `${u[0]}/${u[1] ? 'feedback' : 'issues'}`;
-    script[INFERRED][SUPPORT_URL] = u;
-    return u;
+    return `${u[0]}/${u[1] ? 'feedback' : 'issues'}`;
   }
 }
 
 export function inferScriptProps(script) {
-  if (!script || script[INFERRED]) return;
-  script[INFERRED] = {}; // to avoid re-trying meaninglessly if we can't infer anything below
-  const home = getScriptHome(script)
-    || inferScriptHome(script);
-  if (!getScriptSupportUrl(script)) {
-    inferScriptSupportUrl(script, home);
+  if (!script || hasOwnProperty(script, INFERRED)) {
+    return;
   }
+  let url, res;
+  if (!(url = getScriptHome(script)) && (url = inferScriptHome(script))) {
+    (res || (res = {}))[HOMEPAGE_URL] = url;
+  }
+  if (!getScriptSupportUrl(script) && (url = inferScriptSupportUrl(script, url))) {
+    (res || (res = {}))[SUPPORT_URL] = url;
+  }
+  script[INFERRED] = res;
+  // Setting the key when failed to `undefined` makes it detectable via hasOwnProperty above
 }
