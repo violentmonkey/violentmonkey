@@ -92,7 +92,6 @@ import VmHelp from './help';
 
 const CUSTOM_PROPS = {
   name: '',
-  [RUN_AT]: '',
   homepageURL: '',
   updateURL: '',
   downloadURL: '',
@@ -101,6 +100,8 @@ const CUSTOM_PROPS = {
   origMatch: true,
   origExcludeMatch: true,
 };
+const fromProp = (val, key) => val ?? CUSTOM_PROPS[key];
+const toProp = val => val !== '' ? val : null; // `null` removes the prop from script object
 const CUSTOM_LISTS = [
   'include',
   'match',
@@ -114,10 +115,16 @@ const fromList = list => (
     : ''
 );
 const toList = text => (
-  text.split('\n')
-  .map(line => line.trim())
-  .filter(Boolean)
+  text.trim()
+    ? text.split('\n').map(line => line.trim()).filter(Boolean)
+    : null // `null` removes the prop from script object
 );
+const CUSTOM_ENUM = [
+  INJECT_INTO,
+  RUN_AT,
+];
+const fromEnum = val => val || '';
+const toEnum = val => val || null; // `null` removes the prop from script object
 let savedSettings;
 
 let shouldSavePositionOnSave;
@@ -252,10 +259,9 @@ export default {
       },
       custom: {
         // Adding placeholders for any missing values so deepEqual can work properly
-        ...CUSTOM_PROPS,
-        ...objectPick(custom, Object.keys(CUSTOM_PROPS)),
+        ...objectPick(custom, Object.keys(CUSTOM_PROPS), fromProp),
+        ...objectPick(custom, CUSTOM_ENUM, fromEnum),
         ...objectPick(custom, CUSTOM_LISTS, fromList),
-        [RUN_AT]: custom[RUN_AT] || '',
         noframes: noframes == null ? '' : +noframes, // it was boolean in old VM
       },
     };
@@ -307,8 +313,9 @@ export default {
             notifyUpdates: notifyUpdates ? +notifyUpdates : null,
           },
           custom: {
-            ...objectPick(custom, Object.keys(CUSTOM_PROPS)),
+            ...objectPick(custom, Object.keys(CUSTOM_PROPS), toProp),
             ...objectPick(custom, CUSTOM_LISTS, toList),
+            ...objectPick(custom, CUSTOM_ENUM, toEnum),
             noframes: noframes ? +noframes : null,
           },
           // User created scripts MUST be marked `isNew` so that

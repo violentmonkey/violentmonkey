@@ -586,21 +586,17 @@ export async function parseScript(src) {
     result.isNew = true;
     result.update.message = i18n('msgInstalled');
   }
-  script.config = {
-    ...script.config,
-    ...src.config,
-    removed: 0, // force reset `removed` since this is an installation
-  };
-  script.custom = {
-    ...script.custom,
-    ...src.custom,
-  };
-  script.props = {
-    ...script.props,
-    lastModified: Date.now(),
-    lastUpdated: Date.now(),
-    ...src.props,
-  };
+  // Overwriting inner data by `src`, deleting keys for which `src` specifies `null`
+  for (const key of ['config', 'custom', 'props']) {
+    let dst = script[key];
+    if (!isObject(dst)) dst = script[key] = {};
+    if (key === 'props') dst.lastModified = dst.lastUpdated = Date.now();
+    src[key]::forEachEntry(([srcKey, srcVal]) => {
+      if (srcVal == null) delete dst[srcKey];
+      else dst[srcKey] = srcVal;
+    });
+  }
+  script.config.removed = 0; // force-resetting `removed` since this is an installation
   script.meta = meta;
   if (!getScriptHome(script) && isRemote(src.from)) {
     script.custom.homepageURL = src.from;

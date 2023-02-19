@@ -29,3 +29,9 @@ export const TIMEOUT_WEEK = 7 * 24 * 60 * 60 * 1000;
 export const BLACKLIST = 'blacklist';
 export const BLACKLIST_ERRORS = `${BLACKLIST}Errors`;
 export const RUN_AT_RE = /^document-(start|body|end|idle)$/;
+export const KNOWN_INJECT_INTO = {
+  // Using the default injection order: auto, page, content
+  [AUTO]: 1,
+  [PAGE]: 1,
+  [CONTENT]: 1,
+};
