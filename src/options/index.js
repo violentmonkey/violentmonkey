@@ -6,6 +6,7 @@ import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import options from '@/common/options';
 import { render } from '@/common/ui';
+import '@/common/ui/favicon';
 import '@/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
