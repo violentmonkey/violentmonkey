@@ -21,8 +21,7 @@ function showUnhandledError(err) {
     padding: 1em;
   `.replace(/;/g, '!important;');
   el.textContent = `${IS_FIREFOX && err.message || ''}\n${err.stack || ''}`.trim() || err;
-  // TODO: remove `?.` when strict_min_version>=53
-  el.onclick = () => getSelection().setBaseAndExtent?.(el, 0, el, 1);
+  el.onclick = () => getSelection().setBaseAndExtent(el, 0, el, 1);
   (document.body || document.documentElement).appendChild(el);
 }
 
