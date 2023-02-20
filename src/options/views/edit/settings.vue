@@ -55,12 +55,7 @@
           <code>@inject-into</code>
         </td>
         <td>
-          <p>{{i18n('labelInjectionMode')}}
-            <a href="https://violentmonkey.github.io/posts/inject-into-context/"
-               target="_blank" rel="noopener noreferrer">
-              <icon name="info"/>
-            </a>
-          </p>
+          <p v-text="i18n('labelInjectionMode')"/>
         </td>
         <td>
           <select v-model="custom.injectInto" :disabled="readOnly">
@@ -107,7 +102,6 @@ import { getScriptHome, i18n } from '@/common';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
 import { objectGet } from '@/common/object';
 import { focusMe } from '@/common/ui';
-import Icon from '@/common/ui/icon';
 
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
 
@@ -117,9 +111,6 @@ export default {
     return {
       KII: KNOWN_INJECT_INTO,
     };
-  },
-  components: {
-    Icon,
   },
   computed: {
     custom() {
