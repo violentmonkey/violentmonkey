@@ -84,7 +84,7 @@ async function handleCommandMessage({ cmd, data } = {}, src) {
   && (src.origin ? src.origin !== extensionOrigin : !`${src.url}`.startsWith(extensionRoot))) {
     throw new SafeError(`Command is only allowed in extension context: ${cmd}`);
   }
-  if (IS_FIREFOX && !func.isOwn && src && !src.tab) {
+  if (IS_FIREFOX && !func.isOwn && src && !src.tab && !src.url.startsWith(extensionRoot)) {
     if (process.env.DEBUG) console.log('No src.tab, ignoring:', ...arguments);
     return;
   }
