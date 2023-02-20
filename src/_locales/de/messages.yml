@@ -354,6 +354,17 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Installierte Version auf Benutzerskript-Katalogseiten offenbaren: $1'
+labelFastFirefoxInject:
+  description: (`$1` will be shown as `page`) Option in Advanced settings.
+  message: Alternativer $1-Modus in Firefox
+labelFastFirefoxInjectHint:
+  description: Tooltip hint for the option in Advanced settings.
+  message: >-
+    Ein alternativer Injektionsmodus für <document-start>-Skripte seit Firefox
+    59, schneller als der Standardmodus. Ähnlich wie der "Synchrone Page-Modus"
+    erhöht er den Arbeitsspeicher-Verbrauch, daher sollten Sie ihn unter
+    Umständen deaktivieren, falls Ihre Skripte ohne diese Option korrekt
+    funktionieren.
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback

@@ -336,6 +336,12 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: ''
+labelFastFirefoxInject:
+  description: (`$1` will be shown as `page`) Option in Advanced settings.
+  message: ''
+labelFastFirefoxInjectHint:
+  description: Tooltip hint for the option in Advanced settings.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: Зворотній зв'язок

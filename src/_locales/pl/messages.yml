@@ -359,6 +359,12 @@ labelExposeStatus:
   message: >-
     Pokazuj informację o obecnie zainstalowanej wersji skryptu na jego stronie
     listingu w katalogach: $1
+labelFastFirefoxInject:
+  description: (`$1` will be shown as `page`) Option in Advanced settings.
+  message: Alternatywny tryb $1 w Firefoxie
+labelFastFirefoxInjectHint:
+  description: Tooltip hint for the option in Advanced settings.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: Informacje zwrotne
@@ -693,7 +699,7 @@ msgNoUpdate:
   message: Nie znaleziono aktualizacji.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Błąd podczas aktualizowania skryptów. Kliknij, aby go otworzyć.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -740,7 +746,7 @@ msgSyncing:
   message: Trwa synchronizacja...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: Błąd składni?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Skrypt zaktualizowany.

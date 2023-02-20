@@ -345,6 +345,12 @@ labelExposeStatus:
   message: >-
     Hiển thị phiên bản đã cài đặt trên các trang web danh mục phiên bản người
     dùng: $1
+labelFastFirefoxInject:
+  description: (`$1` will be shown as `page`) Option in Advanced settings.
+  message: ''
+labelFastFirefoxInjectHint:
+  description: Tooltip hint for the option in Advanced settings.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: Phản hồi

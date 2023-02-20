@@ -356,6 +356,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Telepített verzió felfedése userscript katalógus oldalakon: $1'
+labelFastFirefoxInject:
+  description: (`$1` will be shown as `page`) Option in Advanced settings.
+  message: Alternatív $1 módszer Firefox-ban
+labelFastFirefoxInjectHint:
+  description: Tooltip hint for the option in Advanced settings.
+  message: >-
+    Egy alternatív injektálási módszer <document-start> szkriptekhez Firefox
+    59-től, ami gyorsabb, mint az alapértelmezett. A "Szinkron page módhoz"
+    hasonlóan ez is megnöveli a memória használatot, így ha a szkripted enélkül
+    is megfelelően fut, akkor nem tanácsos ezt használni.
 labelFeedback:
   description: Label of link to feedback page.
   message: Visszajelzés
@@ -437,7 +447,7 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: Szkript újratelepítése
+  message: 'Szkript újratelepítése:'
 labelRelated:
   description: Label of related links.
   message: 'Kapcsolódó linkek: '
@@ -700,7 +710,9 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: 'Kérlek mentsd le újra, vagy telepítsd újra ezeket a szkript(ek)et:'
+  message: >-
+    Kérlek mentsd le újra, vagy telepítsd újra ez(eke)t a szkript(ek)et, mert
+    hiányos(ak):
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (a kód azonos)'

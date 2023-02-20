@@ -353,6 +353,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Zobraziť nainštalovanú verziu v katalógoch používateľských skriptov: $1'
+labelFastFirefoxInject:
+  description: (`$1` will be shown as `page`) Option in Advanced settings.
+  message: Alternatívny režim $1 vo Firefoxe
+labelFastFirefoxInjectHint:
+  description: Tooltip hint for the option in Advanced settings.
+  message: >-
+    Alternatívna metóda injektovania pre <document-start> skripty od Firefoxu
+    59, rýchlejšia ako predvolený režim. Podobne ako "Synchrónny režim stránky"
+    tiež zvyšuje spotrebu pamäte, takže ho môžete vypnúť, ak vaše skripty
+    fungujú správne bez tejto možnosti.
 labelFeedback:
   description: Label of link to feedback page.
   message: Spätná väzba

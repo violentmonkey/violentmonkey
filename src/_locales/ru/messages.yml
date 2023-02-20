@@ -347,6 +347,12 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Показывать версию установленного скрипта на сайтах каталогов скриптов: $1'
+labelFastFirefoxInject:
+  description: (`$1` will be shown as `page`) Option in Advanced settings.
+  message: ''
+labelFastFirefoxInjectHint:
+  description: Tooltip hint for the option in Advanced settings.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
