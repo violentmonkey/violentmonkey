@@ -350,10 +350,10 @@ labelFastFirefoxInject:
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    An alternative injection method for <document-start> scripts since Firefox 59,
-    faster than the default mode. Similarly to "Synchronous page mode" it also
-    increases memory consumption, so you may want to disable it if your scripts
-    work correctly without this option.
+    An alternative injection method for <document-start> scripts since Firefox
+    59, faster than the default mode. Similarly to "Synchronous page mode" it
+    also increases memory consumption, so you may want to disable it if your
+    scripts work correctly without this option.
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback

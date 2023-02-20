@@ -349,6 +349,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Geïnstalleerde versies tonen aan gebruikersscriptsites: $1'
+labelFastFirefoxInject:
+  description: (`$1` will be shown as `page`) Option in Advanced settings.
+  message: Alternatieve $1-modus in Firefox
+labelFastFirefoxInjectHint:
+  description: Tooltip hint for the option in Advanced settings.
+  message: >-
+    Een alternatieve injectiemethode voor <document-start>scripts voor Firefox
+    59 en nieuwer. Deze methode is sneller en vergelijkbaar met ‘Synchrone
+    paginamodus’. Hierdoor is het geheugengebruik hoger, dus schakel deze optie
+    uit als scripts ook zonder deze optie werken.
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
