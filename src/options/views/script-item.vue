@@ -13,7 +13,7 @@
     @blur="onBlur">
     <div class="script-icon hidden-xs">
       <a :href="url" :data-hotkey="hotkeys.edit" data-hotkey-table tabIndex="-1">
-        <img :src="script.safeIcon">
+        <img :src="script.safeIcon" :data-no-icon="script.noIcon">
       </a>
     </div>
     <div class="script-name flex ml-1c">
