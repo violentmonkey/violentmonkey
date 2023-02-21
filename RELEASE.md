@@ -16,8 +16,8 @@ Merge everything that is ready to release to the `release` branch and bump versi
 
 ```bash
 $ git checkout release
-$ git merge master # or git merge v2.13.2.2
-$ yarn version --patch
+$ git merge master # or git merge v2.13.2
+$ yarn version --minor
 $ git push origin release --follow-tags
 ```
 
