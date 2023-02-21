@@ -6,12 +6,11 @@ const pkg = require('../package.json');
  * > manifest.version = `${pkg.version}.${pkg.beta}`
  */
 function getVersion() {
-  let version = pkg.version.replace(/-[^.]*/, '');
-  if (pkg.beta) version += `.${pkg.beta}`;
+  return `${pkg.version.match(/\d+\.\d+/)[0]}.${pkg.beta || 0}${
   // Create a beta release with the same code as in stable release.
   // Used in unlisted version.
-  else if (process.env.BETA) version += 'b';
-  return version;
+    process.env.BETA ? 'b' : ''
+  }`;
 }
 
 function isBeta() {
