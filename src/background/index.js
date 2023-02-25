@@ -126,5 +126,4 @@ initialize(() => {
   sync.initialize();
   checkRemove();
   setInterval(checkRemove, TIMEOUT_24HOURS);
-  chrome.declarativeContent?.onPageChanged.removeRules(); // TODO: remove by the end of 2023
 });

@@ -40,7 +40,6 @@ permissions:
   - unlimitedStorage
   - clipboardWrite
   - cookies
-  - declarativeContent
 commands:
   _execute_browser_action: {}
   dashboard:
@@ -55,5 +54,4 @@ minimum_chrome_version: '57.0'
 browser_specific_settings:
   gecko:
     id: '{aecec67f-0d10-4fa7-b7c7-609a2db280cf}'
-    # our browserlistrc uses 53 to skip unnecessary polyfills but we're actually compatible with 52
-    strict_min_version: '52.0'
+    strict_min_version: '57.0'
