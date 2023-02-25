@@ -91,7 +91,7 @@
           <label>
             <locale-group i18n-key="optionUiTheme">
               <select v-for="opt in ['uiTheme']" v-model="settings[opt]" :key="opt">
-                <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
+                <option v-for="(title, value) in items[opt].enum" :key="value"
                         :value="value" v-text="title" />
               </select>
             </locale-group>
@@ -101,8 +101,7 @@
           <label>
             <span v-text="i18n('labelInjectionMode')"></span>
             <select v-for="opt in ['defaultInjectInto']" v-model="settings[opt]" :key="opt">
-              <option v-for="(_, mode) in items[opt].enum" :key="`${opt}:${mode}`"
-                      :value="mode" v-text="mode" />
+              <option v-for="(_, mode) in items[opt].enum" :key="mode" v-text="mode" />
             </select>
             <a class="ml-1" href="https://violentmonkey.github.io/posts/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
           </label>
@@ -145,6 +144,7 @@
 import { reactive } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import { debounce, i18n } from '@/common';
+import { KNOWN_INJECT_INTO } from '@/common/consts';
 import SettingCheck from '@/common/ui/setting-check';
 import { forEachEntry, mapEntry } from '@/common/object';
 import options from '@/common/options';
@@ -177,11 +177,7 @@ const items = {
     normalize: value => Math.max(0, Math.min(365, +value || 0)),
   },
   defaultInjectInto: {
-    enum: {
-      [AUTO]: '',
-      [PAGE]: '',
-      [CONTENT]: '',
-    },
+    enum: KNOWN_INJECT_INTO,
   },
   showAdvanced: {
     normalize: value => value,

@@ -50,6 +50,20 @@
           </select>
         </td>
       </tr>
+      <tr>
+        <td>
+          <code>@inject-into</code>
+        </td>
+        <td>
+          <p v-text="i18n('labelInjectionMode')"/>
+        </td>
+        <td>
+          <select v-model="custom.injectInto" :disabled="readOnly">
+            <option value="" v-text="i18n('labelRunAtDefault')"/>
+            <option v-for="(_, mode) in KII" :key="mode" v-text="mode" />
+          </select>
+        </td>
+      </tr>
       <tr v-for="([ name, label ]) in textInputs" :key="name">
         <td>
           <code v-text="`@${name}`"/>
@@ -85,12 +99,19 @@
 
 <script>
 import { getScriptHome, i18n } from '@/common';
+import { KNOWN_INJECT_INTO } from '@/common/consts';
 import { objectGet } from '@/common/object';
+import { focusMe } from '@/common/ui';
 
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
 
 export default {
   props: ['active', 'settings', 'value', 'readOnly'],
+  data() {
+    return {
+      KII: KNOWN_INJECT_INTO,
+    };
+  },
   computed: {
     custom() {
       return this.settings.custom || {};
@@ -127,7 +148,7 @@ export default {
   watch: {
     active(val) {
       if (val) {
-        this.$refs.container.querySelector('input').focus();
+        focusMe(this.$el);
       }
     },
   },
@@ -178,6 +199,11 @@ $leftColWidth: 12rem;
   code {
     background: none;
     font-weight: bold;
+  }
+  svg {
+    width: 16px;
+    height: 16px;
+    vertical-align: text-bottom;
   }
 }
 </style>

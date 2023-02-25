@@ -1,5 +1,7 @@
 import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
-import { BLACKLIST, HOMEPAGE_URL, META_STR, METABLOCK_RE, NEWLINE_END_RE } from '@/common/consts';
+import {
+  BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
+} from '@/common/consts';
 import initCache from '@/common/cache';
 import { forEachEntry, forEachKey, forEachValue, mapEntry, objectSet } from '@/common/object';
 import ua from '@/common/ua';
@@ -56,11 +58,6 @@ const META_KEYS_TO_PLURALIZE_RE = /^(?:(m|excludeM)atch|(ex|in)clude)$/;
 const pluralizeMetaKey = (s, consonant) => s + (consonant ? 'es' : 's');
 const pluralizeMeta = key => key.replace(META_KEYS_TO_PLURALIZE_RE, pluralizeMetaKey);
 const UNWRAP = 'unwrap';
-const KNOWN_INJECT_INTO = {
-  [AUTO]: 1,
-  [CONTENT]: 1,
-  [PAGE]: 1,
-};
 const propsToClear = {
   [S_CACHE_PRE]: CACHE_KEYS,
   [S_CODE_PRE]: true,
