@@ -387,7 +387,9 @@ labelInclude:
   description: Label of @include rules.
   message: Aturan @include
 labelInjectionMode:
-  description: Label for default option to inject scripts.
+  description: >-
+    Label for option in advanced settings and in script settings. Don't forget
+    the space after ":" if the translated language separates words with spaces.
   message: 'Mode injeksi baku: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
