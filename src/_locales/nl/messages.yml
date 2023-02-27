@@ -387,8 +387,10 @@ labelInclude:
   description: Label of @include rules.
   message: '@include-regels'
 labelInjectionMode:
-  description: Label for default option to inject scripts.
-  message: 'Standaard injectiemodus: '
+  description: >-
+    Label for option in advanced settings and in script settings. Don't forget
+    the space after ":" if the translated language separates words with spaces.
+  message: 'Injectiemodus:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Scriptinstallatie
