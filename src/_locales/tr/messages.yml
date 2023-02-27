@@ -388,7 +388,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: 'Varsayılan enjeksiyon modu:'
+  message: 'Enjeksiyon modu:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Betik yükleniyor
@@ -676,7 +676,7 @@ msgNamespaceConflict:
   message: >-
     Böyle bir betik ya hâlihazırda yüklü ya da geri dönüşüm kutusunda bulunuyor.
     Lütfen farklı bir @name ve @namespace kullanın veya çakışmayı oluşturan
-    betiği düzenleyin.  
+    betiği düzenleyin.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin

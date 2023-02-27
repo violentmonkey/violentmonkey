@@ -384,7 +384,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: 'Режим инъекции по умолчанию: '
+  message: 'Режим инъекции: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта...

@@ -376,7 +376,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: 默认注入模式：
+  message: 注入模式：
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: 安装脚本
