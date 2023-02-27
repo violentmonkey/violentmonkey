@@ -376,7 +376,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: '기본 인젝션 모드: '
+  message: '인젝션 모드: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: 스크립트 설치

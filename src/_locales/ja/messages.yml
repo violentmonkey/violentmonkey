@@ -377,7 +377,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: '既定のインジェクションモード: '
+  message: 'インジェクションモード: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: スクリプトのインストール
@@ -547,7 +547,7 @@ menuExcludeHint:
   message: |2-
      一般設定でこのオプションを有効にすると、現在のタブが自動再ロードされます。
     他のすべてのタブに変更を適用するには、手動で再ロードしてください。
-    柔軟性を高めるには、エディタの「設定」タブを使用します。 
+    柔軟性を高めるには、エディタの「設定」タブを使用します。
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a

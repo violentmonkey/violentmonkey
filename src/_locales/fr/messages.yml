@@ -144,7 +144,7 @@ editHelpDocumention:
   message: 'Documentation on userscript metadata block and <code>GM</code> API:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: "Raccourcis clavier\_:"
+  message: "Raccourcis clavier\_: "
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: "Vous utilisez un autre éditeur de texte\_?"
@@ -234,7 +234,7 @@ headerRecycleBin:
   message: Corbeille
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: "URL source\_:"
+  message: "URL source\_: "
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Les scripts supprimés sont listés ici et conservés pendant 7 jours.
@@ -300,7 +300,7 @@ labelBadge:
   message: "Montrer sur le badge\_: "
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: 'Couleurs des badges :'
+  message: 'Couleurs des badges\_: '
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: Rien
@@ -336,7 +336,7 @@ labelDonate:
   touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: "URL de téléchargement\_:"
+  message: "URL de téléchargement\_: "
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Éditer la valeur du script
@@ -384,7 +384,7 @@ labelHomepage:
   message: Page d’accueil
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: "URL de la page d’accueil\_:"
+  message: "URL de la page d’accueil\_: "
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Importer les données du script
@@ -398,7 +398,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: "Mode d’injection par défaut\_:"
+  message: "Mode d’injection\_: "
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Installation du script
@@ -416,7 +416,7 @@ labelMatch:
   message: Règles @match
 labelName:
   description: Label of script name.
-  message: "Nom\_:"
+  message: "Nom\_: "
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
   message: 'Exécution dans les fenêtres :'
@@ -431,7 +431,7 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ", puis envoyer une notification\_:"
+  message: ", puis envoyer une notification\_: "
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Notification de mise à jour de script
@@ -527,7 +527,7 @@ labelTranslator:
   touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: "URL de mise à jour\_:"
+  message: "URL de mise à jour\_: "
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
@@ -582,7 +582,7 @@ menuExcludeHint:
     Pour appliquer les changements à tous les autres onglets merci de les
     rafraichir manuellement.
 
-    Utilisez l'onglet "Paramètres" de l'éditeur pour plus de flexibilité. 
+    Utilisez l'onglet "Paramètres" de l'éditeur pour plus de flexibilité.
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
