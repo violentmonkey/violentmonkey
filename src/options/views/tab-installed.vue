@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-installed">
+  <div class="tab-installed" ref="scroller">
     <div v-if="state.canRenderScripts">
       <header class="flex">
         <div class="flex-auto" v-if="!showRecycle">
@@ -229,6 +229,7 @@ let columnsForCardsMode = [];
 
 const refSearch = ref();
 const refList = ref();
+const scroller = ref();
 
 const state = reactive({
   focusedIndex: -1,
@@ -265,6 +266,7 @@ const message = computed(() => {
 const searchNeedsCodeIds = computed(() => state.search
         && ['code', 'all'].includes(filters.searchScope)
         && store.scripts.filter(s => s.$cache.code == null).map(s => s.props.id));
+const getCurrentList = () => showRecycle.value ? store.removedScripts : store.scripts;
 
 const debouncedUpdate = debounce(onUpdate, 100);
 const debouncedRender = debounce(renderScripts);
@@ -285,7 +287,7 @@ async function refreshUI() {
   onHashChange();
 }
 function onUpdate() {
-  const scripts = [...showRecycle.value ? store.removedScripts : store.scripts];
+  const scripts = [...getCurrentList()];
   const numFound = state.search ? performSearch(scripts) : scripts.length;
   const cmp = currentSortCompare.value;
   if (cmp) scripts.sort(combinedCompare(cmp));
@@ -350,29 +352,28 @@ function handleEditScript(id) {
 }
 async function onHashChange() {
   const [tab, id, cacheId] = store.route.paths;
-  if (id === '_new') {
-    const { script, code } = await sendCmdDirectly('NewScript', cacheId);
+  const newData = id === '_new' && await sendCmdDirectly('NewScript', cacheId);
+  const script = newData ? newData.script : +id && getCurrentList().find(s => s.props.id === +id);
+  if (script) {
+    state.code = newData ? newData.code : await sendCmdDirectly('GetScriptCode', id);
     state.script = script;
-    state.code = code;
-  } else {
-    const nid = id && +id || null;
-    const script = nid && (showRecycle.value ? store.removedScripts : store.scripts).find(s => s.props.id === nid);
-    if (script) {
-      state.code = await sendCmdDirectly('GetScriptCode', id);
-    } else {
-      // Strip the invalid id from the URL so |App| can render the aside,
-      // which was hidden to avoid flicker on initial page load directly into the editor.
-      if (id) setRoute(tab, true);
-      // First time showing the list we need to tell v-if to keep it forever
-      if (!state.canRenderScripts) {
-        state.canRenderScripts = true;
-        renderScripts();
-        loadData();
-      } else {
-        debouncedRender();
-      }
-    }
-    state.script = script;
+    return;
+  }
+  // Strip the invalid id from the URL so |App| can render the aside,
+  // which was hidden to avoid flicker on initial page load directly into the editor.
+  if (id) setRoute(tab, true);
+  // First time showing the list we need to tell v-if to keep it forever
+  if (!state.canRenderScripts) {
+    state.canRenderScripts = true;
+    loadData();
+  }
+  renderScripts();
+  state.script = null;
+  // Workaround for bug in Chrome, not suppressible via overflow-anchor:none
+  if (!IS_FIREFOX) {
+    const el = scroller.value;
+    const pos = el.scrollTop;
+    nextTick(() => { el.scrollTop = pos; });
   }
 }
 async function renderScripts() {
@@ -638,7 +639,7 @@ export default {
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
     watch(() => [filters.viewSingleColumn, filters.viewTable], adjustScriptWidth);
-    watch(() => showRecycle.value ? store.removedScripts : store.scripts, refreshUI);
+    watch(getCurrentList, refreshUI);
     watch(() => store.route.paths[1], onHashChange);
     watch(selectedScript, script => {
       keyboardService.setContext('selectedScript', script);
@@ -667,6 +668,7 @@ export default {
       // Refs
       refSearch,
       refList,
+      scroller,
 
       // Values
       store,
