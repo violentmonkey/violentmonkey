@@ -127,16 +127,16 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Egyedi CSS a 'lehetőségek' és a 'szkript telepítés' oldalakra. Ha nem vagy
-    biztos benne, hogy ez mire való, akkor kérlek ne módosítsd.
+    Egyedi CSS az itt található, kiegészítőn belüli oldalakra. Ha nem vagy
+    biztos benne, hogy ez mire való akkor kérlek ne módosítsd.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Egyedi beállítások a CodeMirror és bővítményei számára JSON objektumként,
-    mint például: <code>{"indentUnit":2, "smartIndent":true}</code> Viszont
-    megeshet, hogy van amelyik nem működik a Violentmonkey-n belül. Itt
-    megtalálod a <a href="https://codemirror.net/doc/manual.html#config"
-    target="_blank" rel="noopener noreferrer">teljes listát</a>.
+    mint például: <code>{"indentUnit":2, "smartIndent":true}</code> Megeshet,
+    hogy van amelyik nem működik a Violentmonkey-n belül. Itt a <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">teljes lista</a>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentáció a userscript metaadat blokkjához és a <code>GM</code> API-hoz:'

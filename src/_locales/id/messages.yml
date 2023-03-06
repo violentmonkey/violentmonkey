@@ -355,7 +355,7 @@ labelExposeStatus:
   message: 'Bagikan versi skrip terpasang pada situs katalog userscript: $1'
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Mode $1alternatif di Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: ''
@@ -390,7 +390,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: 'Mode injeksi baku: '
+  message: 'Mode injeksi: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Memasang skrip
@@ -589,7 +589,7 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Cocok skrip nonaktif
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Skrip hanya sub-frame
@@ -670,7 +670,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Kehilangan sumber daya yang dibutuhkan.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -742,7 +742,7 @@ msgSyncing:
   message: Dalam proses sinkronisasi...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: Galat sintaksis?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Skrip diperbarui.
@@ -776,7 +776,7 @@ optionPopupGroupDisabled:
   message: Grup skrip nonaktif
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Kelompokkan menurut tahap @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Sembunyikan nonaktif
