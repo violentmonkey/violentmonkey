@@ -341,10 +341,12 @@ labelExposeStatus:
   message: 在用户脚本收录站点上暴露已安装的版本信息：$1
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: 在 Firefox 中切换 $1 模式
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    从 Firefox 59 开始，可以切换到此种比默认方案更快的 <document-start> 注入方式。和“同步 page
+    模式”类似，它也会增加内存消耗，所以如果在不开启此功能的情况下你的脚本依然正常运行，则可以考虑禁用。
 labelFeedback:
   description: Label of link to feedback page.
   message: 反馈
@@ -655,7 +657,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: 已经安装了一个拥有同样的 @name 和 @namespace 的脚本。
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -666,7 +668,7 @@ msgNoUpdate:
   message: 未发现新版本。
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: 更新脚本失败。点击打开他们。
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -713,7 +715,7 @@ msgSyncing:
   message: 正在同步...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: 语法错误？
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: 脚本已更新。
@@ -745,7 +747,7 @@ optionPopupGroupDisabled:
   message: 分组禁用的脚本
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: 按照 @run-at 阶段分组
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: 隐藏禁用的脚本
