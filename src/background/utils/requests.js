@@ -7,6 +7,13 @@ import { addPublicCommands, commands } from './message';
 import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, isCookie, requests, toggleHeaderInjector, verify,
 } from './requests-core';
+import { preInitialize } from './init';
+
+// prefix for firefox cookie store ids
+let store_prefix = null;
+if (IS_FIREFOX)
+  preInitialize.push(async () =>
+    store_prefix = (await browser.cookies.getAllCookieStores())[0].id.split("-")[0]);
 
 addPublicCommands({
   /**
@@ -208,7 +215,7 @@ async function httpRequest(opts, events, src, cb) {
     req.noNativeCookie = true;
     for (const store of await browser.cookies.getAllCookieStores()) {
       if (store.tabIds.includes(tab.id)) {
-        if (IS_FIREFOX ? store.id !== 'firefox-default' : store.id !== '0') {
+        if (IS_FIREFOX ? store.id !== `${store_prefix}-default` : store.id !== '0') {
           /* Cookie routing. For the main store we rely on the browser.
            * The ids are hard-coded as `stores` may omit the main store if no such tabs are open. */
           req.storeId = store.id;

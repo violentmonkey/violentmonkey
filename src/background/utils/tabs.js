@@ -2,6 +2,13 @@ import { browserWindows, getActiveTab, noop, sendTabCmd, getFullUrl } from '@/co
 import ua from '@/common/ua';
 import { addOwnCommands, addPublicCommands, commands } from './message';
 import { getOption } from './options';
+import { preInitialize } from './init';
+
+// prefix for firefox cookie store ids 
+let store_prefix = null;
+if (IS_FIREFOX)
+  preInitialize.push(async () =>
+    store_prefix = (await browser.cookies.getAllCookieStores())[0].id.split("-")[0]);
 
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
@@ -153,6 +160,6 @@ browser.tabs.onRemoved.addListener((id) => {
 });
 
 function getContainerId(index) {
-  return index === 0 && 'firefox-default'
-         || index > 0 && `firefox-container-${index}`;
+  return index === 0 && `${store_prefix}-default`
+         || index > 0 && `${store_prefix}-container-${index}`;
 }
