@@ -29,6 +29,7 @@ async function main() {
   };
 
   const tempFile = join(process.env.TEMP_DIR, Math.random().toString(36).slice(2, 8).toString());
+  const releaseUrl = `https://github.com/violentmonkey/violentmonkey/releases/tag/v${version.replace('b', '')}`;
   await signAddon({
     apiKey: process.env.AMO_KEY,
     apiSecret: process.env.AMO_SECRET,
@@ -42,6 +43,13 @@ async function main() {
     approvalNotes: `\
 yarn && yarn build
 `,
+    releaseNotes: {
+      'en-US': `\
+Please follow the link below to view the change log:
+
+${releaseUrl}
+`,
+    },
     output: tempFile,
     ...pollOptions,
   });
