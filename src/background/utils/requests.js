@@ -208,7 +208,7 @@ async function httpRequest(opts, events, src, cb) {
     req.noNativeCookie = true;
     for (const store of await browser.cookies.getAllCookieStores()) {
       if (store.tabIds.includes(tab.id)) {
-        if (IS_FIREFOX ? store.id !== 'firefox-default' : store.id !== '0') {
+        if (IS_FIREFOX ? !store.id.endsWith('-default') : store.id !== '0') {
           /* Cookie routing. For the main store we rely on the browser.
            * The ids are hard-coded as `stores` may omit the main store if no such tabs are open. */
           req.storeId = store.id;

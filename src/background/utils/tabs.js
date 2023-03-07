@@ -23,6 +23,7 @@ const NEWTAB_URL_RE = re`/
 export const getTabUrl = tab => (
   tab.pendingUrl || tab.url || ''
 );
+let cookieStorePrefix;
 
 addOwnCommands({
   /**
@@ -82,7 +83,14 @@ addPublicCommands({
     // Chrome can't open chrome-xxx: URLs in incognito windows
     let storeId = srcTab.cookieStoreId;
     if (storeId && !incognito) {
-      storeId = getContainerId(isInternal ? 0 : container) || storeId;
+      if (!cookieStorePrefix) {
+        cookieStorePrefix = (await browser.cookies.getAllCookieStores())[0].id.split('-')[0];
+      }
+      if (isInternal || container === 0) {
+        storeId = cookieStorePrefix + '-default';
+      } else if (container > 0) {
+        storeId = `${cookieStorePrefix}-container-${container}`;
+      }
     }
     if (storeId) storeId = { cookieStoreId: storeId };
     // URL needs to be expanded for `canOpenIncognito` below
@@ -151,8 +159,3 @@ browser.tabs.onRemoved.addListener((id) => {
     delete openers[id];
   }
 });
-
-function getContainerId(index) {
-  return index === 0 && 'firefox-default'
-         || index > 0 && `firefox-container-${index}`;
-}
