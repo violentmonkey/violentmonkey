@@ -55,12 +55,14 @@ export default {
     },
     async vacuum() {
       this.vacuuming = true;
-      this.labelVacuum = this.i18n('buttonVacuuming');
+      this.labelVacuum = i18n('buttonVacuuming');
       const { fixes, errors } = await sendCmdDirectly('Vacuum');
       const errorText = errors?.join('\n');
       this.vacuuming = false;
-      this.labelVacuum = this.i18n('buttonVacuumed') + (fixes ? ` (${fixes})` : '');
-      if (errorText) showMessage({ text: errorText });
+      this.labelVacuum = i18n('buttonVacuumed') + (fixes ? ` (${fixes})` : '');
+      if (errorText) {
+        showConfirmation(i18n('msgErrorFetchingResource') + '\n\n' + errorText, { cancel: false });
+      }
     },
   },
   mounted() {
