@@ -8,10 +8,9 @@ import { hasAsset } from './release-helper.js';
 async function main() {
   const manifest = await readManifest();
   const rawVersion = process.env.VERSION;
-  // version may be suffixed for unlisted version
   const version = getVersion();
   const beta = isBeta();
-  const fileName = `violentmonkey-${version}-an+fx.xpi`;
+  const fileName = `violentmonkey-${version}${beta ? 'b' : ''}-an+fx.xpi`;
   const url = `https://github.com/violentmonkey/violentmonkey/releases/download/v${rawVersion}/${fileName}`;
 
   if (await hasAsset(fileName)) {
@@ -29,7 +28,7 @@ async function main() {
   };
 
   const tempFile = join(process.env.TEMP_DIR, Math.random().toString(36).slice(2, 8).toString());
-  const releaseUrl = `https://github.com/violentmonkey/violentmonkey/releases/tag/v${version.replace('b', '')}`;
+  const releaseUrl = `https://github.com/violentmonkey/violentmonkey/releases/tag/v${version}`;
   await signAddon({
     apiKey: process.env.AMO_KEY,
     apiSecret: process.env.AMO_SECRET,
