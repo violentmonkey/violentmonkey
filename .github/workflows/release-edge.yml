@@ -1,0 +1,55 @@
+name: Release for Edge
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v1 # v1 keeps tags
+        with:
+          fetch-depth: 250 # for `action-helper`
+          # persist-credentials: false # not implemented in v1
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Prepare
+        run: yarn && node scripts/action-helper.js
+
+      - name: Build
+        env:
+          SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
+          SYNC_GOOGLE_CLIENT_ID: ${{ secrets.SYNC_GOOGLE_CLIENT_ID }}
+          SYNC_GOOGLE_CLIENT_SECRET: ${{ secrets.SYNC_GOOGLE_CLIENT_SECRET }}
+          SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
+          SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
+          SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
+          SYNC_ONEDRIVE_CLIENT_SECRET: ${{ secrets.SYNC_ONEDRIVE_CLIENT_SECRET }}
+        run: |
+          mkdir -p $ASSETS_DIR
+          yarn build
+          cd dist && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Publish to Edge
+        run: |
+          if [ "$PRERELEASE" != "true" ]; then
+            deno run -A https://raw.githubusercontent.com/violentmonkey/publish-edge-ext/main/main.ts $ASSETS_DIR/$ASSET_ZIP
+          else
+            echo Skip BETA for Edge
+          fi
+        env:
+          ACCESS_TOKEN_URL: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
+          CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.EDGE_CLIENT_SECRET }}
+          PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
