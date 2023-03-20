@@ -348,7 +348,7 @@ labelEditor:
   message: Éditeur
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: Uniquement les scripts activés
 labelExclude:
   description: Label of @exclude rules.
   message: Règles @exclude
@@ -363,10 +363,15 @@ labelExposeStatus:
   message: "Exposer la version installée sur les sites de scripts utilisateurs\_: $1"
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Mode alternatif $1 sur Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Méthode d'injection alternative pour les scripts <document-start> depuis
+    Firefox 59, offrant de meilleures performances que le mode par défaut. Tout
+    comme le mode "page synchrone", cette méthode consomme plus de mémoire, vous
+    voudrez donc peut-être désactiver cette option si vos scripts fonctionnent
+    mieux sans cette option.
 labelFeedback:
   description: Label of link to feedback page.
   message: Retour d’expérience
@@ -587,7 +592,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: Retour d’expérience
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Chercher des scripts pour ce site
@@ -692,7 +697,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Un autre script avec le même nom et le même namespace est déjà installé.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -703,7 +708,7 @@ msgNoUpdate:
   message: Pas de mise à jour trouvée.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Erreur lors de la mise à jour des scripts. Cliquez pour les ouvrir.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -750,7 +755,7 @@ msgSyncing:
   message: Synchronisation en cours…
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: Erreur de syntaxe
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script mis à jour.
@@ -784,7 +789,7 @@ optionPopupGroupDisabled:
   message: Regrouper les scripts désactivés
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Grouper en fonction de l'étape d'exécution (@run-at)
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Cacher les scripts désactivés
