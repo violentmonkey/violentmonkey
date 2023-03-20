@@ -113,8 +113,8 @@ buttonVacuuming:
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    변경사항이 저자오디지 않았습니다!
-    무시하려면 확인버튼을, 계속 머무르려면 취소 버튼을 눌러주세요.
+    변경사항이 저장되지 않았습니다!
+    무시하려면 확인 버튼을, 계속 머무르려면 취소 버튼을 눌러주세요.
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: 이 목록과 일치하는 URL에는 스크립트가 삽입되지 않습니다.
@@ -326,7 +326,7 @@ labelEditor:
   message: 편집기
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: 활성화된 스크립트만
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude 규칙'
@@ -658,7 +658,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: '@name과 @namespace가 동일한 스크립트가 이미 설치되었습니다.'
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -669,7 +669,7 @@ msgNoUpdate:
   message: 업데이트 없음.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: 스크립트 업데이트 오류. 클릭해서 열기.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -716,7 +716,7 @@ msgSyncing:
   message: 동기화 진행중...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: 구문 오류?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: 스크립트 업데이트됨.
