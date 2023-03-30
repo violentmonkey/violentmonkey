@@ -18,7 +18,6 @@ browser_action:
   default_popup: popup/index.html
 background:
   scripts: []
-options_page: options/index.html
 options_ui:
   page: options/index.html
   open_in_tab: true

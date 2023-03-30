@@ -18,6 +18,7 @@ global.browser = {
     getURL: path => path,
     getManifest: () => ({
       icons: { 16: '' },
+      options_ui: {},
     }),
   },
 };
