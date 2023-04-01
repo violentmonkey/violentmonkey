@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-values" ref="container">
+  <div class="edit-values" ref="container" :data-editing="current">
     <div class="mb-1">
       <button @click="onNew" v-if="!readOnly">+</button>
       <div class="inline-block ml-2" v-if="totalPages > 1">
@@ -413,8 +413,12 @@ export default {
 
 <style>
 $lightBorder: 1px solid var(--fill-2);
+$editorWidth: 50%;
 
 .edit-values {
+  &[data-editing] {
+    width: $editorWidth; /* revealing trashcan icons */
+  }
   &-row {
     border: $lightBorder;
     cursor: pointer;
@@ -466,7 +470,7 @@ $lightBorder: 1px solid var(--fill-2);
     position: absolute;
     top: 0;
     right: 0;
-    width: 50%;
+    width: $editorWidth;
     height: 100%;
     padding: 8px;
     box-shadow: -5px 0 5px var(--fill-2);
