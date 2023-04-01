@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-values" ref="container" :data-editing="current">
+  <div class="edit-values" ref="container" :data-editing="current && ''">
     <div class="mb-1">
       <button @click="onNew" v-if="!readOnly">+</button>
       <div class="inline-block ml-2" v-if="totalPages > 1">
@@ -414,10 +414,11 @@ export default {
 <style>
 $lightBorder: 1px solid var(--fill-2);
 $editorWidth: 50%;
+$editorGap: calc(100% - $editorWidth);
 
 .edit-values {
   &[data-editing] {
-    width: $editorWidth; /* revealing trashcan icons */
+    width: $editorGap; /* revealing trashcan icons */
   }
   &-row {
     border: $lightBorder;
