@@ -28,7 +28,7 @@
       <div
         v-for="key in pageKeys"
         :key="key"
-        class="edit-values-row flex"
+        class="edit-values-row flex monospace-font"
         @keydown.delete.ctrl.exact="onRemove(key)"
         @click="onEdit(key)">
         <div class="ellipsis">
@@ -42,7 +42,7 @@
       </div>
     </div>
     <h3 v-text="i18n('headerRecycleBin')" v-if="trash"/>
-    <div class="edit-values-table trash"
+    <div class="edit-values-table trash monospace-font"
          @keydown.down.exact="onUpDown"
          @keydown.up.exact="onUpDown"
          v-if="trash">
