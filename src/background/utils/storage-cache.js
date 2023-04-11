@@ -1,4 +1,4 @@
-import { debounce, ensureArray, initHooks, isEmpty } from '@/common';
+import { ensureArray, initHooks, isEmpty } from '@/common';
 import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
@@ -12,6 +12,7 @@ import { clearValueOpener } from './values';
 let valuesToFlush = {};
 /** @type {Object<string,function[]>} */
 let valuesToWatch = {};
+let flushTimer = 0;
 const watchers = {};
 /** Reading the entire db in init/vacuum/sizing shouldn't be cached for long. */
 const TTL_SKIM = 5e3;
@@ -26,7 +27,10 @@ const { api } = storage;
 const GET = 'get';
 const SET = 'set';
 const REMOVE = 'remove';
-const flushLater = debounce(flush, 200);
+/** Using a simple delay with setTimeout to avoid infinite debouncing due to periodic activity */
+const FLUSH_DELAY = 100;
+const FLUSH_SIZE_STEP = 1e6; // each step increases delay by FLUSH_DELAY
+const FLUSH_MAX_DELAY = 1000; // e.g. when writing more than 10MB for step=1MB and delay=100ms
 const { hook, fire } = initHooks();
 
 /**
@@ -66,7 +70,6 @@ storage.api = {
   async [SET](data) {
     const toWrite = {};
     const keys = [];
-    let unflushed;
     batch(true);
     data::forEachEntry(([key, val]) => {
       const copy = deepCopyDiff(val, cache.get(key));
@@ -74,7 +77,6 @@ storage.api = {
         cache.put(key, copy);
         dbKeys.put(key, 1);
         if (storage[S_VALUE].toId(key)) {
-          unflushed = true;
           valuesToFlush[key] = copy;
         } else {
           keys.push(key);
@@ -91,11 +93,10 @@ storage.api = {
       await api[SET](toWrite);
       fire({ keys });
     }
-    if (unflushed) flushLater();
+    flushLater();
   },
 
   async [REMOVE](keys) {
-    let unflushed;
     keys = keys.filter(key => {
       let ok = dbKeys.get(key) !== 0;
       if (ok) {
@@ -103,7 +104,6 @@ storage.api = {
         dbKeys.put(key, 0);
         if (storage[S_VALUE].toId(key)) {
           valuesToFlush[key] = null;
-          unflushed = true;
           ok = false;
         } else {
           updateScriptMap(key);
@@ -116,9 +116,7 @@ storage.api = {
       await api[REMOVE](keys);
       fire({ keys });
     }
-    if (unflushed) {
-      flushLater();
-    }
+    flushLater();
   },
 };
 
@@ -188,6 +186,7 @@ async function flush() {
   const toRemove = [];
   const toFlush = valuesToFlush;
   valuesToFlush = {};
+  flushTimer = 0;
   keys.forEach(key => {
     const val = toFlush[key];
     if (!val) {
@@ -200,6 +199,13 @@ async function flush() {
   if (toRemove.length) await api[REMOVE](toRemove);
   if (valuesToWatch) setTimeout(notifyWatchers, 0, toFlush, toRemove);
   fire({ keys });
+}
+
+function flushLater() {
+  if (!flushTimer && !isEmpty(valuesToFlush)) {
+    flushTimer = setTimeout(flush,
+      Math.min(FLUSH_MAX_DELAY, FLUSH_DELAY * Math.max(1, deepSize(valuesToFlush) / FLUSH_SIZE_STEP)));
+  }
 }
 
 function notifyWatchers(toFlush, toRemove) {
