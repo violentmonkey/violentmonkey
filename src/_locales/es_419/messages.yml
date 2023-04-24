@@ -755,7 +755,7 @@ msgSyncing:
   message: Sincronización en progreso...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: ¿Error de sintaxis?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script actualizado.
