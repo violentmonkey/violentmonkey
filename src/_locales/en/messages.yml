@@ -425,6 +425,9 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ignore per-script notification ("settings" tab in editor)
+labelQueueUpdates:
+  description: When updating scripts one by one, it can be updated to avoid multiple requests to the same site when there are too many scripts, resulting in inaccessibility.
+  message: Queue Update Script
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Sort scripts in popup by $1

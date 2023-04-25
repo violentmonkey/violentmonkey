@@ -72,6 +72,9 @@
         <setting-check name="notifyUpdatesGlobal" :label="i18n('labelNotifyUpdatesGlobal')"
                        class="ml-2" />
       </div>
+      <div class="ml-2c flex flex-col">
+        <setting-check name="queueUpdates" :label="i18n('labelQueueUpdates')" />
+      </div>
     </section>
     <section class="mb-2c">
       <h3 v-text="i18n('labelBackup')" />

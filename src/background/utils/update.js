@@ -17,13 +17,27 @@ addOwnCommands({
    */
   async CheckUpdate(id) {
     const scripts = id ? [getScriptById(id)] : getScripts();
-    const jobs = scripts.map(script => {
+    let queueUpdates = getOption('queueUpdates');
+    let results = [];
+    let jobs = [];
+    for (let script of scripts) {
       const curId = script.props.id;
       const urls = getScriptUpdateUrl(script, true);
-      return urls && (id || script.config.enabled || !getOption('updateEnabledScriptsOnly'))
-        && (processes[curId] || (processes[curId] = doCheckUpdate(script, urls)));
-    }).filter(Boolean);
-    const results = await Promise.all(jobs);
+      if (urls && (id || script.config.enabled || !getOption('updateEnabledScriptsOnly'))) {
+        if (!processes[curId]) {
+          processes[curId] = doCheckUpdate(script, urls);
+        }
+        if (!queueUpdates) {
+          jobs.push(processes[curId]);
+        } else {
+          let res = await processes[curId];
+          results.push(res);
+        }
+      }
+    }
+    if (!queueUpdates) {
+      results = await Promise.all(jobs);
+    }
     const notes = results.filter(r => r?.text);
     if (notes.length) {
       notifyToOpenScripts(
@@ -65,7 +79,7 @@ async function doCheckUpdate(script, urls) {
     if (canNotify(script) && (msgOk || msgErr)) {
       res = {
         script,
-        text: [msgOk, msgErr]::trueJoin('\n'),
+        text: [msgOk, msgErr]:: trueJoin('\n'),
         err: !!msgErr,
       };
     }

@@ -38,6 +38,7 @@ async function jsProd() {
   return require('@gera2ld/plaid-webpack/bin/build')({
     api: true,
     keep: true,
+    minify: true,
   });
 }
 

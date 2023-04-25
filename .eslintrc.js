@@ -9,6 +9,7 @@ module.exports = {
   ],
   plugins: ['jest'],
   rules: {
+    "no-debugger": "off",
     'prettier/prettier': 'off',
     'no-use-before-define': ['error', {
       'functions': false,
