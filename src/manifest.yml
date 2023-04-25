@@ -39,7 +39,6 @@ permissions:
   - unlimitedStorage
   - clipboardWrite
   - cookies
-  - settingsPrivate
 commands:
   _execute_browser_action: {}
   dashboard:

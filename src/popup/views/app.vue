@@ -521,13 +521,6 @@ export default {
     keyboardService.enable();
     // innerHeight may be bigger than 600px in a mobile browser which displays the popup as a fullscreen page
     this.$el.style.maxHeight = Math.min(Math.max(600, innerHeight), screen.availHeight - window.screenY - 8) + 'px';
-    if (chrome && typeof (chrome["settingsPrivate"]) !== "undefined") { 
-      // If the `settingsPrivate` permission is supported in Chrome, then this may be a third-party modified version of Chromium, and it is reasonable that it may break through the height limit of `Popup`
-      chrome.tabs.query({}, (tabs) => {
-        let height = tabs[0].height;
-        this.$el.style.maxHeight = height + 'px';
-      });
-    }
     this.disposeList = [
       keyboardService.register('escape', () => {
         const item = this.activeExtras;

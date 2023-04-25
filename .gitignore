@@ -7,4 +7,3 @@ node_modules/
 /dist-assets/
 .eslintcache
 .env
-/.idea

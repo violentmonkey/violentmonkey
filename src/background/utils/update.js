@@ -85,7 +85,7 @@ async function doCheckUpdate(script, urls) {
     if (canNotify(script) && (msgOk || msgErr)) {
       res = {
         script,
-        text: [msgOk, msgErr]:: trueJoin('\n'),
+        text: [msgOk, msgErr]::trueJoin('\n'),
         err: !!msgErr,
       };
     }
