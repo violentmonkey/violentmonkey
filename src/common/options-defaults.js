@@ -27,7 +27,8 @@ export default {
   importSettings: true,
   notifyUpdates: false,
   notifyUpdatesGlobal: false, // `true` ignores script.config.notifyUpdates
-  queueUpdates:false,
+  queueUpdates: false,
+  queueUpdatesParallel: 3,
   version: null,
   /** @type {VMScriptInjectInto} */
   defaultInjectInto: AUTO,

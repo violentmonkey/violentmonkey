@@ -20,6 +20,7 @@ addOwnCommands({
     let queueUpdates = getOption('queueUpdates');
     let results = [];
     let jobs = [];
+    let parallel = getOption("queueUpdatesParallel");
     for (let script of scripts) {
       const curId = script.props.id;
       const urls = getScriptUpdateUrl(script, true);
@@ -30,8 +31,13 @@ addOwnCommands({
         if (!queueUpdates) {
           jobs.push(processes[curId]);
         } else {
-          let res = await processes[curId];
-          results.push(res);
+          if (jobs.length < parallel) {
+            jobs.push(processes[curId]);
+          }
+          if (jobs.length === parallel) {
+            results.push(...await Promise.all(jobs));
+            jobs = [];
+          }
         }
       }
     }

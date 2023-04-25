@@ -419,8 +419,11 @@ labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: 忽略每个脚本的提示（编辑器中的“设置”页）
 labelQueueUpdates:
-  description: 更新脚本时逐个进行,可更新避免过多脚本时多次请求相同的站点引致无法访问.
+  description: 更新脚本时逐批次进行,可更新避免过多脚本时多次请求相同的站点引致无法访问.
   message: 排队更新脚本
+labelQueueUpdatesParallel:
+  description: 每一批次更新脚本的数量
+  message: 每批次并行 $1 个进行更新脚本
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: 弹出菜单中的脚本按$1排序

@@ -428,6 +428,9 @@ labelNotifyUpdatesGlobal:
 labelQueueUpdates:
   description: When updating scripts one by one, it can be updated to avoid multiple requests to the same site when there are too many scripts, resulting in inaccessibility.
   message: Queue Update Script
+labelQueueUpdatesParallel:
+  description: The number of update scripts per batch
+  message: Update scripts in parallel $1 per batch
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Sort scripts in popup by $1

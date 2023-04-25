@@ -74,6 +74,11 @@
       </div>
       <div class="ml-2c flex flex-col">
         <setting-check name="queueUpdates" :label="i18n('labelQueueUpdates')" />
+        <label>
+          <locale-group i18n-key="labelQueueUpdatesParallel">
+            <input v-model="settings.queueUpdatesParallel" type="number" min=1 max=365 step=1/>
+          </locale-group>
+        </label>
       </div>
     </section>
     <section class="mb-2c">
@@ -178,6 +183,9 @@ const badgeColorItem = {
 const items = {
   autoUpdate: {
     normalize: value => Math.max(0, Math.min(365, +value || 0)),
+  },
+  queueUpdatesParallel: {
+    normalize: value => Math.max(1, Math.min(365, +value || 1)),
   },
   defaultInjectInto: {
     enum: KNOWN_INJECT_INTO,
