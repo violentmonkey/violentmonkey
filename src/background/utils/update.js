@@ -17,13 +17,55 @@ addOwnCommands({
    */
   async CheckUpdate(id) {
     const scripts = id ? [getScriptById(id)] : getScripts();
-    const jobs = scripts.map(script => {
+    let parallel = getOption('updateParallel');
+    let results = [];
+    let jobs = [];
+    let tasks = {};
+    for (let script of scripts) {
       const curId = script.props.id;
       const urls = getScriptUpdateUrl(script, true);
-      return urls && (id || script.config.enabled || !getOption('updateEnabledScriptsOnly'))
-        && (processes[curId] || (processes[curId] = doCheckUpdate(script, urls)));
-    }).filter(Boolean);
-    const results = await Promise.all(jobs);
+      const host = urls && new URL(urls[0]).host;
+      if (urls && (id || script.config.enabled || !getOption('updateEnabledScriptsOnly'))) {
+        if (parallel === 0) {
+          if (!processes[curId]) {
+            processes[curId] = doCheckUpdate(script, urls);
+          }
+          jobs.push(processes[curId]);
+        } else {
+          if (!tasks[host]) {
+            tasks[host] = [];
+          }
+          tasks[host].push({ curId, script, urls });
+        }
+      }
+    }
+    if (parallel !== 0) {
+      let result = [];
+      for (let host in tasks) {
+        jobs.push((async () => {
+          let Run = [];
+          let hostTasks = tasks[host];
+          for (let i = 0; i < hostTasks.length; i++) {
+            let { curId, script, urls } = hostTasks[i];
+            if (i % parallel === 0) {
+              result.push(await Promise.all(Run));
+              Run = [];
+            }
+            if (!processes[curId]) {
+              processes[curId] = doCheckUpdate(script, urls);
+            }
+            Run.push(processes[curId]);
+          }
+          if (Run.length != 0) {
+            result.push(await Promise.all(Run));
+          }
+          return new Promise((resolve) => {
+            resolve(result);
+          });
+        })());
+      }
+    }
+    results = await Promise.all(jobs);
     const notes = results.filter(r => r?.text);
     if (notes.length) {
       notifyToOpenScripts(

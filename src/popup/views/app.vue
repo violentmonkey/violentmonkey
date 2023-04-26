@@ -519,6 +519,14 @@ export default {
   mounted() {
     focusMe(this.$el);
     keyboardService.enable();
+    sendCmdDirectly('GetAllOptions', null, { retry: true }).then((allOptions) => {
+      if (allOptions.autoPopupHeight) { 
+        chrome.tabs.query({}, (tabs) => {
+          let height = tabs[0].height;
+          this.$el.style.maxHeight = height + 'px';
+        });
+      }
+    });
     // innerHeight may be bigger than 600px in a mobile browser which displays the popup as a fullscreen page
     this.$el.style.maxHeight = Math.min(Math.max(600, innerHeight), screen.availHeight - window.screenY - 8) + 'px';
     this.disposeList = [
