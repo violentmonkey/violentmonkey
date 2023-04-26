@@ -72,6 +72,13 @@
         <setting-check name="notifyUpdatesGlobal" :label="i18n('labelNotifyUpdatesGlobal')"
                        class="ml-2" />
       </div>
+      <div class="ml-2c flex flex-col">
+        <label>
+          <locale-group i18n-key="labelUpdatesParallel">
+            <input v-model="settings.updateParallel" type="number" min=0 max=12 step=1/>
+          </locale-group>
+        </label>
+      </div>
     </section>
     <section class="mb-2c">
       <h3 v-text="i18n('labelBackup')" />
@@ -131,6 +138,9 @@
             </setting-check>
           </locale-group>
         </div>
+        <div class="ml-2c flex flex-col">
+          <setting-check name="autoPopupHeight" :content="i18n('labelAutoPopupHeightHint')" :label="i18n('labelAutoPopupHeight')" />
+        </div>
       </section>
       <vm-editor />
       <vm-template />
@@ -175,6 +185,9 @@ const badgeColorItem = {
 const items = {
   autoUpdate: {
     normalize: value => Math.max(0, Math.min(365, +value || 0)),
+  },
+  updateParallel: {
+    normalize: value => Math.max(0, Math.min(12, +value || 0)),
   },
   defaultInjectInto: {
     enum: KNOWN_INJECT_INTO,
