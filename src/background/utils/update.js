@@ -17,33 +17,55 @@ addOwnCommands({
    */
   async CheckUpdate(id) {
     const scripts = id ? [getScriptById(id)] : getScripts();
-    let queueUpdates = getOption('queueUpdates');
+    let parallel = getOption('updateParallel');
     let results = [];
     let jobs = [];
-    let parallel = getOption("queueUpdatesParallel");
+    let tasks = {};
     for (let script of scripts) {
       const curId = script.props.id;
       const urls = getScriptUpdateUrl(script, true);
+      const host = urls && new URL(urls[0]).host;
       if (urls && (id || script.config.enabled || !getOption('updateEnabledScriptsOnly'))) {
-        if (!processes[curId]) {
-          processes[curId] = doCheckUpdate(script, urls);
-        }
-        if (!queueUpdates) {
+        if (parallel === 0) {
+          if (!processes[curId]) {
+            processes[curId] = doCheckUpdate(script, urls);
+          }
           jobs.push(processes[curId]);
         } else {
-          if (jobs.length < parallel) {
-            jobs.push(processes[curId]);
+          if (!tasks[host]) {
+            tasks[host] = [];
           }
-          if (jobs.length === parallel) {
-            results.push(...await Promise.all(jobs));
-            jobs = [];
-          }
+          tasks[host].push({ curId, script, urls });
         }
       }
     }
-    if (!queueUpdates) {
-      results = await Promise.all(jobs);
+    if (parallel !== 0) {
+      let result = [];
+      for (let host in tasks) {
+        jobs.push((async () => {
+          let Run = [];
+          let hostTasks = tasks[host];
+          for (let i = 0; i < hostTasks.length; i++) {
+            let { curId, script, urls } = hostTasks[i];
+            if (i % parallel === 0) {
+              result.push(await Promise.all(Run));
+              Run = [];
+            }
+            if (!processes[curId]) {
+              processes[curId] = doCheckUpdate(script, urls);
+            }
+            Run.push(processes[curId]);
+          }
+          if (Run.length != 0) {
+            result.push(await Promise.all(Run));
+          }
+          return new Promise((resolve) => {
+            resolve(result);
+          });
+        })());
+      }
     }
+    results = await Promise.all(jobs);
     const notes = results.filter(r => r?.text);
     if (notes.length) {
       notifyToOpenScripts(

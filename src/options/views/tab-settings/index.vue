@@ -73,10 +73,9 @@
                        class="ml-2" />
       </div>
       <div class="ml-2c flex flex-col">
-        <setting-check name="queueUpdates" :label="i18n('labelQueueUpdates')" />
         <label>
-          <locale-group i18n-key="labelQueueUpdatesParallel">
-            <input v-model="settings.queueUpdatesParallel" type="number" min=1 max=365 step=1/>
+          <locale-group i18n-key="labelUpdatesParallel">
+            <input v-model="settings.updateParallel" type="number" min=0 max=12 step=1/>
           </locale-group>
         </label>
       </div>
@@ -139,6 +138,9 @@
             </setting-check>
           </locale-group>
         </div>
+        <div class="ml-2c flex flex-col">
+          <setting-check name="autoPopupHeight" :content="i18n('labelAutoPopupHeightHint')" :label="i18n('labelAutoPopupHeight')" />
+        </div>
       </section>
       <vm-editor />
       <vm-template />
@@ -184,8 +186,8 @@ const items = {
   autoUpdate: {
     normalize: value => Math.max(0, Math.min(365, +value || 0)),
   },
-  queueUpdatesParallel: {
-    normalize: value => Math.max(1, Math.min(365, +value || 1)),
+  updateParallel: {
+    normalize: value => Math.max(0, Math.min(12, +value || 0)),
   },
   defaultInjectInto: {
     enum: KNOWN_INJECT_INTO,
