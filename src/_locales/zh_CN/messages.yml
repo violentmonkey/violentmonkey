@@ -124,7 +124,7 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    在 JSON 对象中为 CodeMirror 和附加组件提供自定义选项，如 <code>{"indentUnit":2,
+    在 JSON 对象中为 CodeMirror 和附加组件提供自定义选项，如 <code>{"indentUnit":2，
     "smartIndent":true}</code>，但请注意，其中一些选项在 Violentmonkey 中可能不起作用。 查看<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">完整列表</a>。
@@ -169,13 +169,13 @@ editValueAllHint:
   description: Tooltip for the 'all' button.
   message: 展示/编辑脚本的所有数据
 extDescription:
-  description: Description for this extension, will be displayed in web store
+  description: Description for this extension， will be displayed in web store
   message: 一个开源的用户脚本管理器，支持很多浏览器
 extName:
   description: Name of this extension.
   message: 暴力猴
 failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+  description: Shown for blacklisted URLs (in the extension icon tooltip， in the popup)
   message: 暴力猴黑名单设置阻止运行
 failureReasonNoninjectable:
   description: >-
@@ -209,10 +209,10 @@ genericError:
   description: Label for generic error.
   message: 错误
 genericOff:
-  description: To indicate something is turned off or disabled, similar to "no".
+  description: To indicate something is turned off or disabled， similar to "no".
   message: 关
 genericOn:
-  description: To indicate something is turned on or enabled, similar to "yes".
+  description: To indicate something is turned on or enabled， similar to "yes".
   message: 开
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
@@ -325,7 +325,7 @@ labelEditor:
   description: Label for Editor settings
   message: 编辑器
 labelEnabledScriptsOnly:
-  description: Sub-option for autoupdate option, begins with a lowercase letter.
+  description: Sub-option for autoupdate option， begins with a lowercase letter.
   message: 仅启用项
 labelExclude:
   description: Label of @exclude rules.
@@ -419,7 +419,7 @@ labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: 忽略每个脚本的提示（编辑器中的“设置”页）
 labelUpdatesParallel:
-  description: 当多个脚本的更新地址为同一个域时,会根据设置的并发数进行分批次更新
+  description: 当多个脚本的更新地址为同一个域时，会根据设置的并发数进行分批次更新
   message: 每个域名并发 $1 个进行更新脚本
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
@@ -567,7 +567,7 @@ menuInjectionFailed:
   description: Injection error.
   message: 部分脚本无法注入。
 menuInjectionFailedFix:
-  description: Injection error fix, shown in case the default mode is "page".
+  description: Injection error fix， shown in case the default mode is "page".
   message: 使用“auto”模式重试
 menuMatchedDisabledScripts:
   description: >-
@@ -584,10 +584,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: 创建新脚本
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of Violentmonkey， when disabled.
   message: 脚本已禁用
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of Violentmonkey， when enabled.
   message: 脚本已启用
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -663,7 +663,7 @@ msgNamespaceConflictRestore:
   message: 已经安装了一个拥有同样的 @name 和 @namespace 的脚本。
 msgNewVersion:
   description: >-
-    Message shown when a new version of script is found by @updateURL, but no
+    Message shown when a new version of script is found by @updateURL， but no
     @downloadURL is provided.
   message: 发现新版本。
 msgNoUpdate:
