@@ -428,12 +428,6 @@ labelNotifyUpdatesGlobal:
 labelUpdatesParallel:
   description: When the update address of multiple scripts is the same domain, it will be updated in batches according to the set concurrency
   message: $1 concurrent update script per domain name
-labelAutoPopupHeight:
-  description: The unofficial Chromium version may not have a height limit for the pop-up window panel. Enable this option to adapt the height of the pop-up window panel, which will be the height of the browser view layer as much as possible
-  message: for third-party Chromium version adapts the height of the pop-up window panel
-labelAutoPopupHeightHint:
-  description: The unofficial Chromium version may not have a height limit for the pop-up window panel. Enable this option to adapt the height of the pop-up window panel, which will be the height of the browser view layer as much as possible
-  message: The unofficial Chromium version may not have a height limit for the pop-up window panel. Enable this option to adapt the height of the pop-up window panel, which will be the height of the browser view layer as much as possible
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Sort scripts in popup by $1

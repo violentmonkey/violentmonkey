@@ -138,9 +138,6 @@
             </setting-check>
           </locale-group>
         </div>
-        <div class="ml-2c flex flex-col">
-          <setting-check name="autoPopupHeight" :content="i18n('labelAutoPopupHeightHint')" :label="i18n('labelAutoPopupHeight')" />
-        </div>
       </section>
       <vm-editor />
       <vm-template />

@@ -28,7 +28,6 @@ export default {
   notifyUpdates: false,
   notifyUpdatesGlobal: false, // `true` ignores script.config.notifyUpdates
   updateParallel: 0,
-  autoPopupHeight: false,
   version: null,
   /** @type {VMScriptInjectInto} */
   defaultInjectInto: AUTO,
