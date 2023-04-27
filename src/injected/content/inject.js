@@ -77,8 +77,10 @@ export function injectPageSandbox({ [kSessionId]: sessionId }) {
       if (IS_FIREFOX) {
         const setOk = evt => { ok = evt::getDetail(); };
         window::on(VAULT_WRITER_ACK, setOk, true);
-        opener::fire(new SafeMouseEvent(VAULT_WRITER, { relatedTarget: window }));
-        opener::fire(new SafeCustomEvent(VAULT_WRITER, { detail: vaultId }));
+        try {
+          opener::fire(new SafeMouseEvent(VAULT_WRITER, { relatedTarget: window }));
+          opener::fire(new SafeCustomEvent(VAULT_WRITER, { detail: vaultId }));
+        } catch (e) { /* FF quirk or bug: opener may reject our fire */ }
         window::off(VAULT_WRITER_ACK, setOk, true);
       } else {
         ok = opener[VAULT_WRITER];
