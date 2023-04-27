@@ -421,12 +421,6 @@ labelNotifyUpdatesGlobal:
 labelUpdatesParallel:
   description: 当多个脚本的更新地址为同一个域时，会根据设置的并发数进行分批次更新
   message: 每个域名并发 $1 个进行更新脚本
-labelAutoPopupHeight:
-  description: 非官方Chromium版本或许对弹窗面板没有高度限制，启用此选项可以自适应弹窗面板高度，将尽可能为浏览器视图层的高度
-  message: 为第三方Chromium版本自适应弹窗面板高度
-labelAutoPopupHeightHint:
-  description: 非官方Chromium版本或许对弹窗面板没有高度限制，启用此选项可以自适应弹窗面板高度，将尽可能为浏览器视图层的高度
-  message: 非官方Chromium版本或许对弹窗面板没有高度限制，启用此选项可以自适应弹窗面板高度，将尽可能为浏览器视图层的高度
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: 弹出菜单中的脚本按$1排序
