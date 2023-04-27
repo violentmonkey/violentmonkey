@@ -59,9 +59,7 @@ addOwnCommands({
           if (Run.length != 0) {
             result.push(await Promise.all(Run));
           }
-          return new Promise((resolve) => {
-            resolve(result);
-          });
+          return Promise.resolve(result);
         })());
       }
     }
