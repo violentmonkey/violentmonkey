@@ -132,9 +132,6 @@ function initMain() {
     },
     RemoveScripts(ids) {
       store.removedScripts = store.removedScripts.filter(script => !ids.includes(script.props.id));
-    },
-    log(obj) {
-      console.log(obj);
     }
   });
 }
