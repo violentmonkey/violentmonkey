@@ -425,9 +425,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ignore per-script notification ("settings" tab in editor)
-labelUpdatesParallel:
-  description: When the update address of multiple scripts is the same domain, it will be updated in batches according to the set concurrency
-  message: $1 concurrent update script per domain name
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Sort scripts in popup by $1
@@ -516,6 +513,11 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Update URL:'
+labelUpdatesParallel:
+  description: >-
+    When the update address of multiple scripts is the same domain, it will be
+    updated in batches according to the set concurrency
+  message: $1 concurrent update script per domain name
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single

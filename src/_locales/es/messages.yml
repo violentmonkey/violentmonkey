@@ -524,6 +524,11 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL de actualización:'
+labelUpdatesParallel:
+  description: >-
+    When the update address of multiple scripts is the same domain, it will be
+    updated in batches according to the set concurrency
+  message: ''
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single

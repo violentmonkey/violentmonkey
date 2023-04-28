@@ -418,9 +418,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: 忽略每个脚本的提示（编辑器中的“设置”页）
-labelUpdatesParallel:
-  description: 当多个脚本的更新地址为同一个域时，会根据设置的并发数进行分批次更新
-  message: 每个域名并发 $1 个进行更新脚本
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: 弹出菜单中的脚本按$1排序
@@ -509,6 +506,11 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 检查更新地址：
+labelUpdatesParallel:
+  description: >-
+    When the update address of multiple scripts is the same domain, it will be
+    updated in batches according to the set concurrency
+  message: 每个域名并发 $1 个进行更新脚本
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
