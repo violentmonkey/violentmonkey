@@ -59,7 +59,7 @@ addOwnCommands({
           if (Run.length != 0) {
             result.push(await Promise.all(Run));
           }
-          return Promise.resolve(result);
+          return result;
         })());
       }
     }
