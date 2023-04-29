@@ -17,7 +17,7 @@ addOwnCommands({
    */
   async CheckUpdate(id) {
     const scripts = id ? [getScriptById(id)] : getScripts();
-    let parallel = 5;
+    let parallel = 2;
     let results = [];
     let jobs = [];
     let tasks = {};
