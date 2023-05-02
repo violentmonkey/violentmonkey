@@ -1,0 +1,39 @@
+// ==UserScript==
+// @name         BEST MooMoo.io Hack / Mod 2022/2023
+// @namespace    T R S A H - M O D Best Mod 2021/2022 Modification by iC3Peak Credits FZ (Super Mod) | DarkWolf ( D4rK Mÿþhîçæł Mõđ ) | WAIT 4 IT ( pancake mod )
+// @version      1.0.2
+// @description  Controls ( End = Mod Menu|Home = Music Menu|Page Up = Police Hat|Page Down = Aniaml Hat|Num Lock 1 = Auto Hat|Num Lock 0 = 360Hit|Num Lock 2 = Auto Insta Kill|Num Lock 3 = Auto Aleatory Hat|Num Lock 5 = Auto WindMill
+// @author       iC3PeaK(Sou Br) | DarkWolf | WAIT 4 IT | FZ
+// @match        *://sandbox.moomoo.io/*
+// @match        *://moomoo.io/*
+// @grant        unsafeWindow
+// @grant        GM.setValue
+// @grant        GM.getValue
+// @grant        GM_addStyle
+// @grant        GM_addValueChangeListener
+// @grant        GM_removeValueChangeListener
+// @require      https://greasyfork.org/scripts/423602-msgpack/code/msgpack.js
+// @icon         https://cdn.discordapp.com/attachments/857107985612275752/869681291124150312/Project-1-_convert-video-online.com_-_1_.png
+// @require      https://greasyfork.org/scripts/410512-sci-js-from-ksw2-center/code/scijs%20(from%20ksw2-center).js
+// @run-at       document-start
+// ==/UserScript==
+
+const windowloc = window.location.host;
+
+if (windowloc.includes("bank") || windowloc.includes("school")) return; //DO NOT COLLECT INFORMATION ON SENSITIVE SITES
+
+(function() {
+    'use strict';
+
+    var ezsound = new Audio("https://cdn.discordapp.com/attachments/857107985612275752/870426860037754880/SPOILER_Yamete_Kudasai_MP3_Original_160k.mp3");
+
+    var kills = 0;
+
+    setInterval(getkills, 1);
+
+    function getkills(){
+        var count = parseInt(document.getElementById("killCounter").innerText);
+        if(count > kills){
+            ezsound.play();
+        }
+        kills = count;
