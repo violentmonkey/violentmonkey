@@ -72,7 +72,13 @@ export function injectPageSandbox({ [kSessionId]: sessionId }) {
 
   function useOpener(opener) {
     let ok;
-    if (opener && describeProperty(opener.location, 'href').get) {
+    try {
+      ok = opener && describeProperty(opener.location, 'href').get;
+    } catch (e) {
+      // Old Chrome throws in sandboxed frames, TODO: remove `try` when minimum_chrome_version >= 86
+    }
+    if (ok) {
+      ok = false;
       // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
       if (IS_FIREFOX) {
         const setOk = evt => { ok = evt::getDetail(); };
