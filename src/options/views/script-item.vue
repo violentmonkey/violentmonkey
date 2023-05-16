@@ -16,10 +16,12 @@
         <img :src="script.safeIcon" :data-no-icon="script.noIcon">
       </a>
     </div>
-    <div class="script-name flex ml-1c">
-      <span class="script-order" v-text="script.props.position" v-if="!script.config.removed" />
-      <component class="ellipsis" :is="nameProps.is" v-bind="nameProps">{{script.$cache.name}}</component>
-    </div>
+    <!-- We disable native dragging on name to avoid confusion with exec re-ordering.
+    Users who want to open a new tab via dragging the link can drag the icon. -->
+    <a class="script-name ellipsis"
+       v-text="script.$cache.name"
+       v-bind="viewTable && { draggable: false, href: url, tabIndex }"
+       :data-order="script.config.removed ? null : script.props.position"/>
     <div class="script-info flex ml-1c">
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
@@ -202,13 +204,6 @@ export default {
         question: [i18n('buttonSupport'), getScriptSupportUrl(this.script)],
       };
     },
-    nameProps() {
-      return this.viewTable
-        /* We disable native dragging on name to avoid confusion with exec re-ordering.
-         * Users who want to open a new tab via dragging the link can use the icon. */
-        ? { is: 'a', href: this.url, tabIndex: this.tabIndex, draggable: false }
-        : { is: 'span' };
-    },
   },
   watch: {
     visible(visible) {
@@ -291,6 +286,7 @@ $removedItemHeight: calc(
   position: relative;
   display: grid;
   grid-template-columns: $iconSize 1fr auto;
+  align-items: center;
   margin: $itemMargin 0 0 $itemMargin;
   padding: $itemPadT 10px $itemPadB;
   border: 1px solid var(--fill-3);
@@ -315,7 +311,6 @@ $removedItemHeight: calc(
   }
   &.removed {
     grid-template-columns: $iconSize auto 1fr auto auto;
-    align-items: center;
     height: $removedItemHeight;
     padding-bottom: $removedItemPadB;
   }
@@ -350,11 +345,10 @@ $removedItemHeight: calc(
     min-width: 100px;
     font-weight: 500;
     font-size: $nameFontSize;
+    color: inherit;
+    padding-left: .5rem;
     .removed & {
       margin-right: 8px;
-    }
-    > a {
-      color: inherit;
     }
     .disabled & > a {
       color: var(--fill-8);
@@ -399,7 +393,6 @@ $removedItemHeight: calc(
     grid-row-end: span 2;
     width: $iconSize;
     height: $iconSize;
-    float: left;
     cursor: pointer;
     a {
       display: block;
@@ -514,14 +507,10 @@ $removedItemHeight: calc(
         z-index: 2;
       }
       &-name {
-        cursor: pointer;
         display: flex;
         min-width: 100px;
         align-self: stretch;
         align-items: center;
-        > a {
-          flex: 1;
-        }
       }
       &-icon {
         width: 2rem;
@@ -587,12 +576,15 @@ $removedItemHeight: calc(
       bottom: 10px;
       right: 40px;
     }
+    .script-icon {
+      align-self: start;
+    }
+    .script-name:hover {
+      text-decoration: none;
+    }
   }
-  &[data-show-order] .script-order::after {
-    content: '. ';
-  }
-  &:not([data-show-order]) .script-order {
-    display: none;
+  &[data-show-order] [data-order]::before {
+    content: attr(data-order) '. ';
   }
 }
 </style>
