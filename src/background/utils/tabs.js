@@ -41,15 +41,14 @@ addOwnCommands({
       });
       pathId = `_new${id ? `/${id}` : ''}`;
     }
-    let url = extensionOptionsPage;
-    if (pathId) url += `${ROUTE_SCRIPTS}/${pathId}`;
+    const url = extensionOptionsPage + (pathId ? `${ROUTE_SCRIPTS}/${pathId}` : '');
+    const urls = pathId ? [url] : [url, url + ROUTE_SCRIPTS];
     // Firefox until v56 doesn't support moz-extension:// pattern in browser.tabs.query()
     for (const view of browser.extension.getViews()) {
-      const viewUrl = view.location.href;
-      if (viewUrl === url || !pathId && viewUrl === url + ROUTE_SCRIPTS) {
-        const { id: tabId, windowId } = await view.browser.tabs.getCurrent();
-        browserWindows?.update(windowId, { focused: true });
-        return browser.tabs.update(tabId, { active: true });
+      let tab; // tab may be null in Vivaldi, see #1824
+      if (urls.includes(view.location.href) && (tab = await view.browser.tabs.getCurrent())) {
+        browserWindows?.update(tab.windowId, { focused: true });
+        return browser.tabs.update(tab.id, { active: true });
       }
     }
     return commands.TabOpen({ url, maybeInWindow: !!pathId }, src);
