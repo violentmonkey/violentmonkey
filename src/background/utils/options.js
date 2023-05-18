@@ -27,7 +27,7 @@ addOwnCommands({
     for (const { key, value, reply } of ensureArray(data)) {
       setOption(key, value, reply);
     }
-    if (changes) callHooks(); // exceptions will be sent to the caller
+    callHooks(); // exceptions will be sent to the caller
   },
 });
 
@@ -78,6 +78,7 @@ function addChange(key, value, silent) {
 
 /** @throws in option handlers */
 function callHooks() {
+  if (!changes) return; // may happen in callHooksLater if callHooks was called earlier
   const tmp = changes;
   changes = null;
   hooks.fire(tmp);
