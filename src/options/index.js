@@ -104,10 +104,12 @@ function initMain() {
         await updateThrottle;
         updateThrottle = null;
       }
-      const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       const i1 = store.scripts.findIndex(item => item.props.id === where.id);
       const i2 = store.removedScripts.findIndex(item => item.props.id === where.id);
-      const script = Object.assign(store.scripts[i1] || store.removedScripts[i2] || {}, update);
+      const script = store.scripts[i1] || store.removedScripts[i2];
+      if (!script) return; // We're in editor that doesn't have data for all scripts
+      const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
+      Object.assign(script, update);
       if (script.error && !update.error) script.error = null;
       initScript(script, sizes);
       if (update.config?.removed != null) {
