@@ -392,7 +392,10 @@ export function notifyToOpenScripts(title, text, ids) {
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
 export async function getData({ ids, sizes }) {
-  const scripts = getScriptsByIdsOrAll(ids);
+  const isPopup = ids && !sizes;
+  const scripts = isPopup // the popup may show a subsequently removed script
+    ? ids.map(id => scriptMap[id] || removedScripts.find(r => r.props.id === id)).filter(Boolean)
+    : getScriptsByIdsOrAll(ids);
   scripts.forEach(inferScriptProps);
   return {
     scripts,
