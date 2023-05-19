@@ -17,7 +17,7 @@ Object.defineProperties(ua, {
     },
   } : {
     chrome: {
-      value: uaData && parseFloat(uaData.brands[0].version) || matchNavUA(true),
+      value: uaData && parseFloat(uaData.brands[0]?.version) || matchNavUA(true),
     },
   },
   ready: {
