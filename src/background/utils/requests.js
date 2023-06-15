@@ -197,8 +197,8 @@ async function httpRequest(opts, events, src, cb) {
     } else {
       xhr.setRequestHeader(name, value);
     }
-    if (shouldSendCookies) {
-      shouldSendCookies = !isCookie({ name });
+    if (shouldSendCookies && isCookie({ name })) {
+      shouldSendCookies = false;
     }
   });
   xhr[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
