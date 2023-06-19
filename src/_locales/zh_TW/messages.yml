@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Apply
 buttonCancel:
   description: Cancel button on dialog.
   message: 取消
@@ -327,7 +327,7 @@ labelEditor:
   message: 編輯器
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: enabled scripts only
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude 規則'
@@ -342,10 +342,14 @@ labelExposeStatus:
   message: 透露已安裝的版本給使用者腳本目錄網站：$1
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Alternative $1 mode in Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    An alternative injection method for <document-start> scripts since Firefox
+    59, faster than the default mode. Similarly to "Synchronous page mode" it
+    also increases memory consumption, so you may want to disable it if your
+    scripts work correctly without this option.
 labelFeedback:
   description: Label of link to feedback page.
   message: 反饋
@@ -555,7 +559,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: Feedback
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 為此站點查詢腳本
@@ -656,7 +660,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: A script with the same @name and @namespace is already installed.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -667,7 +671,7 @@ msgNoUpdate:
   message: 未發現新版本。
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Error updating scripts. Click to open them.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -714,7 +718,7 @@ msgSyncing:
   message: 正在同步…
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: Syntax error?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: 腳本已更新。
@@ -746,7 +750,7 @@ optionPopupGroupDisabled:
   message: 分組禁用的腳本
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Group by @run-at stage
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: 隱藏停用的腳本
