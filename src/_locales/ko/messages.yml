@@ -341,7 +341,7 @@ labelExposeStatus:
   message: '유저스크립트 카탈로그 사이트에 설치된 버전 표시: $1'
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Firefox 에서 대체 $1 모드
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: ''
