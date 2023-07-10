@@ -107,8 +107,9 @@ function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
         headers[i].value += '; ' + headers2.splice(j, 1)[0].value;
       }
     }
-    headers = headers.concat(headers2)
-    .filter(req.anonymous ? isSendableAnon : isSendable);
+    headers = headers
+    .filter(req.anonymous ? isSendableAnon : isSendable)
+    .concat(headers2);
   }
   return { requestHeaders: headers };
 }
