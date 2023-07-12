@@ -47,20 +47,11 @@ const EXTRA_HEADERS = [
 const headersToInject = {};
 /** @param {chrome.webRequest.HttpHeader} header */
 const isVmVerify = header => header.name === VM_VERIFY;
-export const isCookie = header => /^cookie2?$/i.test(header.name);
+const isCookie = header => /^cookie2?$/i.test(header.name);
+const isntSetCookie = header => !/^set-cookie2?$/i.test(header.name);
 const isSendable = header => !isVmVerify(header)
   && !(/^origin$/i.test(header.name) && header.value === extensionOrigin);
 const isSendableAnon = header => isSendable(header) && !isCookie(header);
-const SET_COOKIE_RE = /^set-cookie2?$/i;
-const SET_COOKIE_VALUE_RE = re`
-  /^\s*  (?:__(Secure|Host)-)?  ([^=\s]+)  \s*=\s*  (")?  ([!#-+\--:<-[\]-~]*)  \3(.*)  /x`;
-const SET_COOKIE_ATTR_RE = re`
-  /\s*  ;?\s*  (\w+)  (?:= (")?  ([!#-+\--:<-[\]-~]*)  \2)?  /xy`;
-const SAME_SITE_MAP = {
-  strict: 'strict',
-  lax: 'lax',
-  none: 'no_restriction',
-};
 const API_EVENTS = {
   onBeforeSendHeaders: [
     onBeforeSendHeaders, 'requestHeaders', 'blocking', ...EXTRA_HEADERS,
@@ -71,20 +62,12 @@ const API_EVENTS = {
 };
 
 /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
-function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
+function onHeadersReceived({ [kResponseHeaders]: headers, requestId }) {
   const req = requests[verify[requestId]];
   if (req) {
-    // Hide Set-Cookie headers from the browser, and optionally set them in req.storeId
-    const { storeId } = req;
-    if (req.anonymous || storeId) {
-      headers = headers.filter(h => !SET_COOKIE_RE.test(h.name) || storeId && (
-        setCookieInStore(h.value, storeId, url),
-        false // overriding to allow declaring the function as `async`
-      ));
-    }
     // Populate responseHeaders for GM_xhr's `response`
     req[kResponseHeaders] = headers.map(encodeWebRequestHeader).join('');
-    return { [kResponseHeaders]: headers };
+    return { [kResponseHeaders]: headers.filter(isntSetCookie) };
   }
 }
 
@@ -112,37 +95,6 @@ function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
     .concat(headers2);
   }
   return { requestHeaders: headers };
-}
-
-/**
- * @param {string} headerValue
- * @param {string} storeId
- * @param {string} url
- */
-function setCookieInStore(headerValue, storeId, url) {
-  let m = SET_COOKIE_VALUE_RE.exec(headerValue);
-  if (m) {
-    const [, prefix, name, , value, optStr] = m;
-    const opt = {};
-    const isHost = prefix === 'Host';
-    SET_COOKIE_ATTR_RE.lastIndex = 0;
-    while ((m = SET_COOKIE_ATTR_RE.exec(optStr))) {
-      opt[m[1].toLowerCase()] = m[3];
-    }
-    const sameSite = opt.sameSite?.toLowerCase();
-    browser.cookies.set({
-      url,
-      name,
-      value,
-      domain: isHost ? undefined : opt.domain,
-      expirationDate: Math.max(0, +new Date(opt['max-age'] * 1000 || opt.expires)) || undefined,
-      httpOnly: 'httponly' in opt,
-      path: isHost ? '/' : opt.path,
-      sameSite: SAME_SITE_MAP[sameSite],
-      secure: url.startsWith('https:') && (!!prefix || sameSite === 'none' || 'secure' in opt),
-      storeId,
-    });
-  }
 }
 
 export function toggleHeaderInjector(reqId, headers) {

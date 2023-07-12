@@ -5,7 +5,7 @@ import ua from '@/common/ua';
 import cache from './cache';
 import { addPublicCommands, commands } from './message';
 import {
-  FORBIDDEN_HEADER_RE, VM_VERIFY, isCookie, requests, toggleHeaderInjector, verify,
+  FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify,
 } from './requests-core';
 
 addPublicCommands({
@@ -189,7 +189,7 @@ async function httpRequest(opts, events, src, cb) {
   const [body, contentType] = decodeBody(opts.data);
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
-  let shouldSendCookies = !anonymous && (incognito || IS_FIREFOX);
+  const shouldSendCookies = !anonymous && (incognito || IS_FIREFOX);
   xhr.open(opts.method || 'GET', url, true, opts.user || '', opts.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);
   if (contentType) xhr.setRequestHeader('Content-Type', contentType);
@@ -198,9 +198,6 @@ async function httpRequest(opts, events, src, cb) {
       vmHeaders.push({ name, value });
     } else {
       xhr.setRequestHeader(name, value);
-    }
-    if (shouldSendCookies && isCookie({ name })) {
-      shouldSendCookies = false;
     }
   });
   xhr[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
