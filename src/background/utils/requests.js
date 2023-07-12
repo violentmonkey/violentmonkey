@@ -171,8 +171,10 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
 async function httpRequest(opts, events, src, cb) {
   const { tab } = src;
   const { incognito } = tab;
-  const { anonymous, id, overrideMimeType, xhrType } = opts;
-  const url = getFullUrl(opts.url, src.url);
+  const { anonymous, id, overrideMimeType, xhrType, url: unsafeUrl } = opts;
+  const url = unsafeUrl.startsWith('blob:')
+    ? unsafeUrl // TODO: process blob and data URLs in `injected` without sending anything to bg
+    : getFullUrl(unsafeUrl, src.url);
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;
