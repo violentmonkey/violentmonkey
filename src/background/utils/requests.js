@@ -178,7 +178,6 @@ async function httpRequest(opts, events, src, cb) {
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;
-  req.anonymous = anonymous;
   const { xhr } = req;
   const vmHeaders = [];
   // Firefox can send Blob/ArrayBuffer directly
@@ -190,6 +189,7 @@ async function httpRequest(opts, events, src, cb) {
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
   const shouldSendCookies = !anonymous && (incognito || IS_FIREFOX);
+  req.noNativeCookie = shouldSendCookies || anonymous;
   xhr.open(opts.method || 'GET', url, true, opts.user || '', opts.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);
   if (contentType) xhr.setRequestHeader('Content-Type', contentType);
@@ -204,7 +204,6 @@ async function httpRequest(opts, events, src, cb) {
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
   if (shouldSendCookies) {
-    req.noNativeCookie = true;
     for (const store of await browser.cookies.getAllCookieStores()) {
       if (store.tabIds.includes(tab.id)) {
         if (IS_FIREFOX ? !store.id.endsWith('-default') : store.id !== '0') {

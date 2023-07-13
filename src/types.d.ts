@@ -29,7 +29,6 @@ declare namespace GMReq {
   type Response = string | Blob | ArrayBuffer;
   type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails;
   interface BG {
-    anonymous: boolean;
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
     coreId: number;
     frameId: number;

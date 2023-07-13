@@ -51,7 +51,6 @@ const isCookie = header => /^cookie2?$/i.test(header.name);
 const isntSetCookie = header => !/^set-cookie2?$/i.test(header.name);
 const isSendable = header => !isVmVerify(header)
   && !(/^origin$/i.test(header.name) && header.value === extensionOrigin);
-const isSendableAnon = header => isSendable(header) && !isCookie(header);
 const API_EVENTS = {
   onBeforeSendHeaders: [
     onBeforeSendHeaders, 'requestHeaders', 'blocking', ...EXTRA_HEADERS,
@@ -90,9 +89,7 @@ function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
         headers[i].value += '; ' + headers2.splice(j, 1)[0].value;
       }
     }
-    headers = headers
-    .filter(req.anonymous ? isSendableAnon : isSendable)
-    .concat(headers2);
+    headers = headers.filter(isSendable).concat(headers2);
   }
   return { requestHeaders: headers };
 }
