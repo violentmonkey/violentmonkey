@@ -42,11 +42,10 @@ addOwnCommands({
       pathId = `_new${id ? `/${id}` : ''}`;
     }
     const url = extensionOptionsPage + (pathId ? `${ROUTE_SCRIPTS}/${pathId}` : '');
-    const urls = pathId ? [url] : [url, url + ROUTE_SCRIPTS];
-    // Firefox until v56 doesn't support moz-extension:// pattern in browser.tabs.query()
-    for (const view of browser.extension.getViews()) {
-      let tab; // tab may be null in Vivaldi, see #1824
-      if (urls.includes(view.location.href) && (tab = await view.browser.tabs.getCurrent())) {
+    for (const tab of await browser.tabs.query({url: extensionOptionsPage})) {
+      const tabUrl = tab.url;
+      // query() can't handle #hash so it returns tabs both with #hash and without it
+      if (tabUrl === url || !pathId && tabUrl === url + ROUTE_SCRIPTS) {
         browserWindows?.update(tab.windowId, { focused: true });
         return browser.tabs.update(tab.id, { active: true });
       }
