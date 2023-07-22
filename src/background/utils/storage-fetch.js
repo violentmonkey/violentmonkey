@@ -1,5 +1,8 @@
 import { isDataUri, makeRaw, request } from '@/common';
+import limitConcurrency from '@/common/limit-concurrency';
 import storage from './storage';
+
+const requestLimited = limitConcurrency(request, 4);
 
 storage.cache.fetch = cacheOrFetch({
   init(options) {
@@ -53,7 +56,7 @@ export async function requestNewer(url, opts) {
   const modOld = await storage.mod.getOne(url);
   for (const get of [0, 1]) {
     if (modOld || get) {
-      const req = await request(url, !get ? { ...opts, method: 'HEAD' } : opts);
+      const req = await requestLimited(url, !get ? { ...opts, method: 'HEAD' } : opts);
       const { headers } = req;
       const mod = (
         headers.get('etag')

@@ -2,6 +2,7 @@ import {
   compareVersion, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
 } from '@/common';
 import { METABLOCK_RE } from '@/common/consts';
+import limitConcurrency from '@/common/limit-concurrency';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
 import { parseMeta } from './script';
 import { getOption, setOption } from './options';
@@ -9,6 +10,7 @@ import { addOwnCommands } from './message';
 import { requestNewer } from './storage-fetch';
 
 const processes = {};
+const doCheckUpdateLimited = limitConcurrency(doCheckUpdate, 2, 250);
 
 addOwnCommands({
   /**
@@ -21,7 +23,7 @@ addOwnCommands({
       const curId = script.props.id;
       const urls = getScriptUpdateUrl(script, true);
       return urls && (id || script.config.enabled || !getOption('updateEnabledScriptsOnly'))
-        && (processes[curId] || (processes[curId] = doCheckUpdate(script, urls)));
+        && (processes[curId] || (processes[curId] = doCheckUpdateLimited(script, urls)));
     }).filter(Boolean);
     const results = await Promise.all(jobs);
     const notes = results.filter(r => r?.text);
