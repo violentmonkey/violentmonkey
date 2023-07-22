@@ -3,6 +3,7 @@ import { makePause } from '@/common/index';
 export default function limitConcurrency(fn, concurrency, delay) {
   const all = [];
   const processing = new Set();
+  let lastRun;
   async function enqueue() {
     let token;
     let promise = new Promise(resolve => { token = resolve; });
@@ -20,10 +21,13 @@ export default function limitConcurrency(fn, concurrency, delay) {
   }
   return async function limitConcurrencyRunner(...args) {
     const token = await enqueue();
+    if (delay > 0 && lastRun) {
+      await makePause(delay - (performance.now() - lastRun));
+    }
     try {
       return await fn(...args);
     } finally {
-      if (delay > 0) await makePause(delay);
+      lastRun = performance.now();
       processing.delete(token);
       check();
     }
