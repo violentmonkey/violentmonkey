@@ -635,7 +635,7 @@ export default {
   setup() {
     resetList();
     watch(showRecycle, resetList);
-    watch(() => state.canRenderScripts && draggable.value && refList.value,
+    watch(() => state.canRenderScripts && refList.value && draggable.value,
       state => toggleDragging(refList.value, moveScript, state));
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
