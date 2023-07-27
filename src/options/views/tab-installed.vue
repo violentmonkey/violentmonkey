@@ -635,7 +635,8 @@ export default {
   setup() {
     resetList();
     watch(showRecycle, resetList);
-    watch(draggable, state => toggleDragging(refList.value, moveScript, state));
+    watch(() => state.canRenderScripts && draggable.value && refList.value,
+      state => toggleDragging(refList.value, moveScript, state));
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
     watch(() => [filters.viewSingleColumn, filters.viewTable], adjustScriptWidth);
