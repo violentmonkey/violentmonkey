@@ -244,8 +244,8 @@ installOptionClose:
   description: Option to close confirm window after installation.
   message: Close after installation
 installOptionTrack:
-  description: Option to track the loading local file before window is closed.
-  message: Track local file before this window is closed
+  description: Option to track the loading local file until page is closed.
+  message: Track edits in local file while this page is open
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
