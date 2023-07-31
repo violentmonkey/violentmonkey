@@ -255,7 +255,7 @@ installOptionClose:
   description: Option to close confirm window after installation.
   message: Zamknij po zakończeniu instalacji
 installOptionTrack:
-  description: Option to track the loading local file before window is closed.
+  description: Option to track the loading local file until page is closed.
   message: Śledź plik lokalny przed zamknięciem tego okna
 installOptionTrackTooltip:
   description: >-

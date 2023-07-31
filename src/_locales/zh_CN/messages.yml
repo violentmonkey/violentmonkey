@@ -239,8 +239,8 @@ installOptionClose:
   description: Option to close confirm window after installation.
   message: 安装完成后关闭
 installOptionTrack:
-  description: Option to track the loading local file before window is closed.
-  message: 本窗口关闭前跟踪打开的本地文件同步更新
+  description: Option to track the loading local file until page is closed.
+  message: 本窗口保留的状态下自动同步本地文件的更新
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before

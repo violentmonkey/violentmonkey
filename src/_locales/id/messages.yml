@@ -251,7 +251,7 @@ installOptionClose:
   description: Option to close confirm window after installation.
   message: Tutup setelah pemasangan
 installOptionTrack:
-  description: Option to track the loading local file before window is closed.
+  description: Option to track the loading local file until page is closed.
   message: Menelusuri berkas lokal sebelum jendela ini ditutup
 installOptionTrackTooltip:
   description: >-
@@ -358,7 +358,11 @@ labelFastFirefoxInject:
   message: Mode $1alternatif di Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Metode injeksi alternatif untuk skrip <document-start> sejak Firefox 59,
+    lebih cepat daripada mode default. Sama halnya dengan "Mode halaman
+    sinkron", mode ini juga meningkatkan konsumsi memori, jadi Anda mungkin
+    ingin menonaktifkannya jika skrip Anda bekerja dengan baik tanpa opsi ini.
 labelFeedback:
   description: Label of link to feedback page.
   message: Umpanbalik
@@ -833,7 +837,7 @@ titleSearchHint:
     * Sintaksis RegExp didukung: /re/ dan /re/flags
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Key (string)
 valueLabelValue:
   description: Label for value of a script value.
   message: Nilai (serialisasi sebagai JSON)
