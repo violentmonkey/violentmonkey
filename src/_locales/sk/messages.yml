@@ -253,8 +253,8 @@ installOptionClose:
   description: Option to close confirm window after installation.
   message: Zavrieť po nainštalovaní
 installOptionTrack:
-  description: Option to track the loading local file before window is closed.
-  message: Sledovať lokálne súbory predtým ako sa toto okno zavrie
+  description: Option to track the loading local file until page is closed.
+  message: Sledovať zmeny v lokálnom súbore, keď je táto stránka otvorená
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before

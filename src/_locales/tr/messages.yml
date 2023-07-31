@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Uygula
 buttonCancel:
   description: Cancel button on dialog.
   message: İptal
@@ -15,10 +15,10 @@ buttonConfirmInstallation:
   message: Kurulumu onayla
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: Kurulum tekrarını onayla
+  message: Yeniden kurulumu onayla
 buttonDisable:
   description: Button to disable a script.
-  message: Kapat
+  message: Devre dışı bırak
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
@@ -29,14 +29,14 @@ buttonEdit:
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
   message: >-
-    Aynı zamanda betik isminin üzerine gelip Sağ tıkı, Ctrl-tıklamayı ve fare
-    tekerleğini kullanabilirsin.
+    Ayrıca komut dosyası adına sağ tıklayabilir, Ctrl tuşuna basarak
+    tıklayabilir veya tekerlekle tıklayabilirsiniz.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: Geri dönüşüm kutusunu boşalt!
+  message: Geri dönüşüm kutusunu hemen boşalt!
 buttonEnable:
   description: Button to enable a script.
-  message: Aç
+  message: Etkinleştir
 buttonExportData:
   description: Button to open the data export dialog.
   message: Zip olarak dışarı aktar
@@ -62,7 +62,7 @@ buttonNew:
   message: Yeni
 buttonOK:
   description: OK button on dialog.
-  message: Tamam
+  message: TAMAM
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Geri Dönüşüm Kutusu
@@ -99,7 +99,7 @@ buttonUndo:
   touched: false
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Güncelle
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Yeni güncellemeleri kontrol et
@@ -251,7 +251,7 @@ installOptionClose:
   description: Option to close confirm window after installation.
   message: Yüklemeden sonra kapat
 installOptionTrack:
-  description: Option to track the loading local file before window is closed.
+  description: Option to track the loading local file until page is closed.
   message: Bu pencere kapanmadan önce yerel dosyayı takip et
 installOptionTrackTooltip:
   description: >-
@@ -338,7 +338,7 @@ labelEditor:
   message: Düzenleyici
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: yalnızca etkinleştirilmiş komut dosyaları
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude kuralları'
@@ -353,10 +353,14 @@ labelExposeStatus:
   message: 'Yüklü sürümü kullanıcı betiği katalog sitelerinde göster: $1'
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Firefox'ta alternatif $1 modu
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Firefox 59'dan beri <document-start> komut dosyası için alternatif bir
+    enjeksiyon yöntemi, varsayılan moddan daha hızlı. "Eşzamanlı sayfa modu" ile
+    benzer şekilde bellek tüketimini de artırır, bu nedenle komut dosyalarınız
+    bu seçenek olmadan düzgün çalışıyorsa devre dışı bırakmak isteyebilirsiniz.
 labelFeedback:
   description: Label of link to feedback page.
   message: Geri bildirim
@@ -575,7 +579,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: Geri bildirim
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Bu siteye özel betikleri bul
@@ -668,7 +672,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Gerekli kaynaklar eksik.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -681,7 +685,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Aynı @name ve @namespace'e sahip bir komut dosyası zaten yüklü.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -692,12 +696,12 @@ msgNoUpdate:
   message: Güncelleme bulunamadı.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Komut dosyaları güncellenirken hata oluştu. Açmak için tıklayın.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Lütfen bu komut dosyalarını yeniden kaydedin veya yeniden yükleyin:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (kod aynı)
@@ -739,7 +743,7 @@ msgSyncing:
   message: Eşitleme gerçekleştiriliyor...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: Söz dizimi hatası?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Betik güncellendi.
@@ -773,7 +777,7 @@ optionPopupGroupDisabled:
   message: Kapalı betikleri grupla
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Grup @run-at aşamasına göre
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Kapalı betikleri gizle

@@ -243,7 +243,7 @@ installOptionClose:
   description: Option to close confirm window after installation.
   message: Đóng sau khi cài đặt xong
 installOptionTrack:
-  description: Option to track the loading local file before window is closed.
+  description: Option to track the loading local file until page is closed.
   message: Theo dõi tệp cục bộ trước khi cửa sổ này đóng
 installOptionTrackTooltip:
   description: >-

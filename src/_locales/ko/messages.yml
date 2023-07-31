@@ -239,7 +239,7 @@ installOptionClose:
   description: Option to close confirm window after installation.
   message: 설치 후 닫기
 installOptionTrack:
-  description: Option to track the loading local file before window is closed.
+  description: Option to track the loading local file until page is closed.
   message: 이 창이 닫히기 전에 로컬 파일 추적
 installOptionTrackTooltip:
   description: >-

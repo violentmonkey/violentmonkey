@@ -232,7 +232,7 @@ installOptionClose:
   description: Option to close confirm window after installation.
   message: Sulje asennuksen jälkeen
 installOptionTrack:
-  description: Option to track the loading local file before window is closed.
+  description: Option to track the loading local file until page is closed.
   message: Seuraa paikallista tiedostoa ennen ikkunan sulkemista
 installOptionTrackTooltip:
   description: >-
