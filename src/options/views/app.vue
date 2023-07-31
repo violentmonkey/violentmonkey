@@ -30,15 +30,11 @@ import Installed from './tab-installed';
 import Settings from './tab-settings';
 import About from './tab-about';
 
-const SETTINGS = 'settings';
-const SCRIPTS = 'scripts';
-const ABOUT = 'about';
-const RECYCLE_BIN = 'recycleBin';
 const tabs = [
   { name: SCRIPTS, comp: Installed, label: i18n('sideMenuInstalled') },
-  { name: SETTINGS, comp: Settings, label: i18n('sideMenuSettings') },
-  { name: ABOUT, comp: About, label: i18n('sideMenuAbout') },
-  { name: RECYCLE_BIN, comp: Installed, label: i18n('buttonRecycleBin') },
+  { name: TAB_SETTINGS, comp: Settings, label: i18n('sideMenuSettings') },
+  { name: TAB_ABOUT, comp: About, label: i18n('sideMenuAbout') },
+  { name: TAB_RECYCLE, comp: Installed, label: i18n('buttonRecycleBin') },
 ];
 const extName = i18n('extName');
 const conditionNotEdit = '!editScript';
@@ -54,7 +50,7 @@ const current = computed(() => {
 
 const numbers = computed(() => ({
   [SCRIPTS]: store.scripts.length,
-  [RECYCLE_BIN]: store.removedScripts.length,
+  [TAB_RECYCLE]: store.removedScripts.length,
 }));
 
 function updateContext() {
@@ -62,7 +58,7 @@ function updateContext() {
   const { paths } = store.route;
   keyboardService.setContext('editScript', isScriptsTab && paths[1]);
   keyboardService.setContext('tabScripts', isScriptsTab && !paths[1]);
-  keyboardService.setContext('showRecycle', current.value.name === RECYCLE_BIN);
+  keyboardService.setContext('showRecycle', current.value.name === TAB_RECYCLE);
 }
 
 function switchTab(step) {
@@ -72,9 +68,9 @@ function switchTab(step) {
 }
 
 document.addEventListener('dragover', evt => {
-  if (['', ABOUT, SCRIPTS].includes(store.route.hash)
+  if (['', TAB_ABOUT, SCRIPTS].includes(store.route.hash)
     && /^application\/(zip|x-zip-compressed)$/.test(evt.dataTransfer.items[0]?.type)) {
-    window.location.hash = `#${SETTINGS}`;
+    location.hash = `#${TAB_SETTINGS}`;
   }
 });
 

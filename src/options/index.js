@@ -107,7 +107,7 @@ function initMain() {
       const i1 = store.scripts.findIndex(item => item.props.id === where.id);
       const i2 = store.removedScripts.findIndex(item => item.props.id === where.id);
       const script = store.scripts[i1] || store.removedScripts[i2]
-        || ['scripts', 'recycleBin', ''].includes(store.route.hash) && {}; // newly installed
+        || [SCRIPTS, TAB_RECYCLE, ''].includes(store.route.hash) && {}; // newly installed
       if (!script) return; // We're in editor that doesn't have data for all scripts
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       Object.assign(script, update);
@@ -129,7 +129,7 @@ function initMain() {
       const i = script.config.removed ? i2 : i1;
       if (i < 0) {
         script.message = '';
-        const list = script.config.removed ? 'removedScripts' : 'scripts';
+        const list = script.config.removed ? 'removedScripts' : SCRIPTS;
         store[list] = [...store[list], script];
       }
     },

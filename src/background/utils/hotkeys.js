@@ -6,7 +6,7 @@ postInitialize.push(() => {
     if (cmd === 'newScript') {
       commands.OpenEditor();
     } else {
-      const route = cmd === 'settings' ? `#${cmd}` : '';
+      const route = cmd === TAB_SETTINGS ? `#${cmd}` : '';
       commands.TabOpen({ url: `${extensionOptionsPage}${route}` });
     }
   });

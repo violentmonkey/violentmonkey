@@ -250,7 +250,7 @@ const state = reactive({
   },
 });
 
-const showRecycle = computed(() => store.route.paths[0] === 'recycleBin');
+const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
 const draggable = computed(() => !showRecycle.value && filters.sort === 'exec');
 const currentSortCompare = computed(() => filterOptions.sort[filters.sort]?.compare);
 const selectedScript = computed(() => state.filteredScripts[state.focusedIndex]);
@@ -343,7 +343,7 @@ function handleStateChange(active) {
   state.menuNewActive = active;
 }
 function handleEditScript(id) {
-  const pathname = [showRecycle.value ? 'recycleBin' : 'scripts', id]::trueJoin('/');
+  const pathname = [showRecycle.value ? TAB_RECYCLE : SCRIPTS, id]::trueJoin('/');
   if (!id && pathname === lastRoute().pathname) {
     window.history.back();
   } else {

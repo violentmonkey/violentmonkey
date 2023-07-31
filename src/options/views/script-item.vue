@@ -151,7 +151,7 @@ export default {
   },
   computed: {
     showRecycle() {
-      return store.route.paths[0] === 'recycleBin';
+      return store.route.paths[0] === TAB_RECYCLE;
     },
     canUpdate() {
       return getScriptUpdateUrl(this.script);

@@ -28,3 +28,6 @@ export const extensionManifest = chrome.runtime.getManifest();
 // Using getURL because in Firefox manifest contains resolved (full) URLs
 export const extensionOptionsPage = chrome.runtime.getURL(extensionManifest.options_ui.page);
 export const ICON_PREFIX = chrome.runtime.getURL(extensionManifest.icons[16].replace("16.png", ""));
+export const TAB_SETTINGS = 'settings';
+export const TAB_ABOUT = 'about';
+export const TAB_RECYCLE = 'recycleBin';
