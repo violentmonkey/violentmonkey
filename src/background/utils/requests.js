@@ -92,7 +92,6 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
   let getChunk;
   let fullResponse = null;
   let response;
-  let responseText;
   let responseHeaders;
   let sent = true;
   let sentTextLength = 0;
@@ -107,7 +106,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     const shouldNotify = events.includes(type);
     const isEnd = type === 'loadend';
     const readyState4 = xhr.readyState === 4;
-    if (!shouldNotify && !isEnd || readyState4 && sentReadyState4) {
+    if ((!shouldNotify || readyState4 && sentReadyState4) && !isEnd) {
       return;
     }
     if (readyState4) { // Firefox duplicates it randomly, #1862
@@ -119,12 +118,6 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     if (fullResponse !== xhr[kResponse]) {
       fullResponse = response = xhr[kResponse];
       sent = false;
-      try {
-        responseText = xhr[kResponseText];
-        if (responseText === response) responseText = ['same'];
-      } catch (e) {
-        // ignore if responseText is unreachable
-      }
       if (response) {
         if ((tmp = response.length - sentTextLength)) { // a non-empty text response has `length`
           chunked = tmp > TEXT_CHUNK_SIZE;
@@ -173,9 +166,6 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
           : null,
         [kResponseHeaders]: responseHeaders !== (tmp = getResponseHeaders())
           ? (responseHeaders = tmp)
-          : null,
-        [kResponseText]: shouldSendResponse
-          ? responseText
           : null,
       } : null,
     });

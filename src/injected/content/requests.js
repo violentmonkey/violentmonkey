@@ -68,10 +68,13 @@ addBackgroundHandlers({
         response = await importBlob(req, response);
       } else if (msg.chunked) {
         processChunk(req, response);
-        response = combineChunks(req, msg);
-      } else if (!req[kXhrType]) {
-        if (req[kResponse]) response = (req[kResponse] += response);
-        else req[kResponse] = response;
+        response = req[CHUNKS];
+        delete req[CHUNKS];
+        if (req[kXhrType]) {
+          response = req[kXhrType] === 'blob'
+            ? new SafeBlob([response], { type: msg.contentType })
+            : response::getTypedArrayBuffer();
+        } // else: sending text chunks as-is to avoid memory overflow due to frequent concatenation
       }
       data[kResponse] = response;
     }
@@ -136,27 +139,6 @@ function processChunk(req, data, msg) {
   for (let pos = msg?.chunk || 0, i = 0; i < len;) {
     arr[pos++] = safeCharCodeAt(data, i++);
   }
-}
-
-/**
- * @param {GMReq.Content} req
- * @param {GMReq.Message.BG} msg
- * @returns {Blob|Uint8Array|string}
- */
-function combineChunks(req, msg) {
-  let res;
-  if (req[kXhrType]) {
-    res = req[CHUNKS];
-    res = req[kXhrType] === 'blob'
-      ? new SafeBlob([res], { type: msg.contentType })
-      : res::getTypedArrayBuffer();
-  } else {
-    res = req[kResponse] || '';
-    req[CHUNKS]::forEach(str => res += str);
-    req[kResponse] = res;
-  }
-  delete req[CHUNKS];
-  return res;
 }
 
 /** Doing it here because vault's SafeResponse+blob() doesn't work in injected-web */

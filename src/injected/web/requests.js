@@ -6,6 +6,7 @@ const kContentTextHtml = 'text/html';
 const kResponse = 'response';
 const kResponseXML = 'responseXML';
 const kDocument = 'document';
+const kRaw = 'raw';
 const EVENTS_TO_NOTIFY = [
   'abort',
   'error',
@@ -69,20 +70,31 @@ addHandlers({
     const {
       [kResponse]: response,
       [kResponseHeaders]: headers,
-      [kResponseText]: text,
     } = data;
     if (response != null) {
-      req.raw = response;
+      if (req[kXhrType]) {
+        req[kRaw] = response;
+        setOwnProp(data, kResponseText, null);
+      } else {
+        const raw = req[kRaw] || (req[kRaw] = []);
+        if (isString(response)) {
+          safePush(raw, response);
+        } else {
+          for (const chunk of response) safePush(raw, chunk);
+        }
+        if (raw.length === 1) {
+          setOwnProp(data, kResponseText, raw[0]);
+        } else {
+          setOwnProp(data, kResponseText, safeBind(parseRaw, data, req, msg, kResponseText),
+            true, 'get');
+        }
+      }
     }
     if (headers != null) {
       req[kResponseHeaders] = headers;
     }
-    if (text != null) {
-      req[kResponseText] = getOwnProp(text, 0) === 'same' ? response : text;
-    }
     setOwnProp(data, 'context', req.context);
     setOwnProp(data, kResponseHeaders, req[kResponseHeaders]);
-    setOwnProp(data, kResponseText, req[kResponseText]);
     setOwnProp(data, kResponseXML, safeBind(parseRaw, data, req, msg, kResponseXML), true, 'get');
     setOwnProp(data, kResponse, safeBind(parseRaw, data, req, msg, kResponse), true, 'get');
     cb(data);
@@ -100,9 +112,16 @@ addHandlers({
  */
 function parseRaw(req, msg, propName) {
   const { [kResponseType]: responseType } = req;
-  let res, ct;
-  if ('raw' in req) {
-    res = req.raw;
+  let res, ct, tmp;
+  if (kRaw in req) {
+    res = req[kRaw];
+    if (!req[kXhrType]) {
+      tmp = res;
+      res = '';
+      tmp::forEach(chunk => res += chunk);
+      req[kRaw] = [res];
+      req[kResponseText] = res;
+    }
     if (responseType === kDocument && (ct = kContentTextHtml)
     || !responseType
       && propName === kResponseXML
@@ -121,7 +140,7 @@ function parseRaw(req, msg, propName) {
     //   throw new SafeError('responseXML failed: responseType must be "document" or "" or absent.');
     // }
     if (responseType) {
-      delete req.raw;
+      delete req[kRaw];
     }
     req[propName] = res;
   } else {
@@ -191,7 +210,7 @@ export function onRequestCreate(opts, context, fileName) {
     url,
     [kFileName]: fileName,
     [kResponseType]: type,
-    [kXhrType]: XHR_TYPES[type] ? type : '',
+    [kXhrType]: req[kXhrType] = XHR_TYPES[type] ? type : '',
     events: EVENTS_TO_NOTIFY::filter(key => isFunction(cb[key] = opts[`on${key}`])),
   }, opts, OPTS_TO_PASS));
   return {
