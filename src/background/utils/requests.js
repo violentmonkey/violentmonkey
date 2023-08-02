@@ -85,12 +85,24 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
   let responseText;
   let responseHeaders;
   let sent = true;
+  let sentReadyState4;
   let tmp;
   const { id, xhr } = req;
   const getChunk = blobbed && blob2objectUrl || chunked && blob2chunk;
   const getResponseHeaders = () => req[kResponseHeaders] || xhr.getAllResponseHeaders();
   const eventQueue = [];
   const sequentialize = async () => {
+    const evt = eventQueue.shift();
+    const { type } = evt;
+    const shouldNotify = events.includes(type);
+    const isEnd = type === 'loadend';
+    const readyState4 = xhr.readyState === 4;
+    if (!shouldNotify && !isEnd || readyState4 && sentReadyState4) {
+      return;
+    }
+    if (readyState4) { // Firefox duplicates it randomly, #1862
+      sentReadyState4 = true;
+    }
     if (!contentType) {
       contentType = xhr.getResponseHeader('Content-Type') || '';
     }
@@ -108,14 +120,8 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
         numChunks = chunked && Math.ceil(dataSize / CHUNK_SIZE) || 1;
       }
     }
-    const evt = eventQueue.shift();
-    const { type } = evt;
-    const shouldNotify = events.includes(type);
     // TODO: send partial delta since last time in onprogress?
-    const shouldSendResponse = shouldNotify && (!isJson || xhr.readyState === 4) && !sent;
-    if (!shouldNotify && type !== 'loadend') {
-      return;
-    }
+    const shouldSendResponse = shouldNotify && (!isJson || readyState4) && !sent;
     if (shouldSendResponse) {
       sent = true;
       for (let i = 1; i < numChunks; i += 1) {
@@ -151,7 +157,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
           : null,
       } : null,
     });
-    if (type === 'loadend') {
+    if (isEnd) {
       clearRequest(req);
     }
   };
