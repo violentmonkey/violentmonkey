@@ -35,7 +35,8 @@ const PARSEABLE_TYPES = [
   'text/xml',
   kContentTextHtml,
 ];
-const XHR_TYPE = {
+/** truthy = preserve type (for binary mode), otherwise it's text mode by default */
+const XHR_TYPES = {
   __proto__: null,
   arraybuffer: 1,
   blob: 1,
@@ -161,7 +162,7 @@ export function onRequestCreate(opts, context, fileName) {
     onRequestInitError(opts, err);
     return; // not returning the abort controller as there's no request to abort
   }
-  if (!(type in XHR_TYPE)) {
+  if (!(type in XHR_TYPES)) {
     logging.warn(`Unknown ${kResponseType} "${type}"`);
     type = '';
   }
@@ -190,8 +191,8 @@ export function onRequestCreate(opts, context, fileName) {
     url,
     [kFileName]: fileName,
     [kResponseType]: type,
+    [kXhrType]: XHR_TYPES[type] ? type : '',
     events: EVENTS_TO_NOTIFY::filter(key => isFunction(cb[key] = opts[`on${key}`])),
-    xhrType: XHR_TYPE[type] ? type : '',
   }, opts, OPTS_TO_PASS));
   return {
     abort() {

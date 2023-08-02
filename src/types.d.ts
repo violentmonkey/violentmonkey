@@ -41,11 +41,11 @@ declare namespace GMReq {
     xhr: XMLHttpRequest;
   }
   interface Content {
-    arr?: Uint8Array;
-    asBlob: boolean;
+    chunks?: Uint8Array | string[];
     fileName: string;
     realm: VMScriptInjectInto;
     response?: Response;
+    xhrType: XMLHttpRequestResponseType;
   }
   interface Web {
     id: string;
@@ -71,6 +71,7 @@ declare namespace GMReq {
     }
     interface BGChunk {
       id: string;
+      i: number;
       chunk: number;
       data: string;
       size: number;

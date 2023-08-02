@@ -55,18 +55,25 @@ addPublicCommands({
 /* 1MB takes ~20ms to encode/decode so it doesn't block the process of the extension and web page,
  * which lets us and them be responsive to other events or user input. */
 const CHUNK_SIZE = 1e6;
+const TEXT_CHUNK_SIZE = IS_FIREFOX
+  ? 256e6 // Firefox: max 512MB and string char is 2 bytes (unicode)
+  : 10e6; // Chrome: max 64MB and string char is 6 bytes max (like \u0001 in internal JSON)
 const BLOB_LIFE = 60e3;
 const SEND_XHR_PROPS = ['readyState', 'status', 'statusText'];
 const SEND_PROGRESS_PROPS = ['lengthComputable', 'loaded', 'total'];
 
-function blob2chunk(response, index) {
-  return blob2base64(response, index * CHUNK_SIZE, CHUNK_SIZE);
+function blob2chunk(response, index, size) {
+  return blob2base64(response, index * size, size);
 }
 
 function blob2objectUrl(response) {
   const url = URL.createObjectURL(response);
   cache.put(`xhrBlob:${url}`, setTimeout(URL.revokeObjectURL, BLOB_LIFE, url), BLOB_LIFE);
   return url;
+}
+
+function text2chunk(response, index, size) {
+  return response.substr(index * size, size);
 }
 
 /**
@@ -81,14 +88,17 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
   let contentType;
   let dataSize;
   let numChunks = 0;
-  let response = null;
+  let chunkSize;
+  let getChunk;
+  let fullResponse = null;
+  let response;
   let responseText;
   let responseHeaders;
   let sent = true;
+  let sentTextLength = 0;
   let sentReadyState4;
   let tmp;
   const { id, xhr } = req;
-  const getChunk = blobbed && blob2objectUrl || chunked && blob2chunk;
   const getResponseHeaders = () => req[kResponseHeaders] || xhr.getAllResponseHeaders();
   const eventQueue = [];
   const sequentialize = async () => {
@@ -106,8 +116,8 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     if (!contentType) {
       contentType = xhr.getResponseHeader('Content-Type') || '';
     }
-    if (xhr[kResponse] !== response) {
-      response = xhr[kResponse];
+    if (fullResponse !== xhr[kResponse]) {
+      fullResponse = response = xhr[kResponse];
       sent = false;
       try {
         responseText = xhr[kResponseText];
@@ -115,20 +125,32 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
       } catch (e) {
         // ignore if responseText is unreachable
       }
-      if ((blobbed || chunked) && response) {
-        dataSize = response.size;
-        numChunks = chunked && Math.ceil(dataSize / CHUNK_SIZE) || 1;
+      if (response) {
+        if ((tmp = response.length - sentTextLength)) { // a non-empty text response has `length`
+          chunked = tmp > TEXT_CHUNK_SIZE;
+          chunkSize = TEXT_CHUNK_SIZE;
+          dataSize = tmp;
+          getChunk = text2chunk;
+          response = sentTextLength ? response.slice(sentTextLength) : response;
+          sentTextLength += dataSize;
+        } else {
+          chunkSize = CHUNK_SIZE;
+          dataSize = response.size;
+          getChunk = blobbed ? blob2objectUrl : blob2chunk;
+        }
+        numChunks = chunked ? Math.ceil(dataSize / chunkSize) || 1
+          : blobbed ? 1 : 0;
       }
     }
-    // TODO: send partial delta since last time in onprogress?
     const shouldSendResponse = shouldNotify && (!isJson || readyState4) && !sent;
     if (shouldSendResponse) {
       sent = true;
       for (let i = 1; i < numChunks; i += 1) {
         await req.cb({
           id,
-          chunk: i * CHUNK_SIZE,
-          data: await getChunk(response, i),
+          i,
+          chunk: i * chunkSize,
+          data: await getChunk(response, i, chunkSize),
           size: dataSize,
         });
       }
@@ -147,7 +169,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
         ...objectPick(xhr, SEND_XHR_PROPS),
         ...objectPick(evt, SEND_PROGRESS_PROPS),
         [kResponse]: shouldSendResponse
-          ? numChunks && await getChunk(response, 0) || response
+          ? numChunks && await getChunk(response, 0, chunkSize) || response
           : null,
         [kResponseHeaders]: responseHeaders !== (tmp = getResponseHeaders())
           ? (responseHeaders = tmp)
@@ -177,7 +199,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
 async function httpRequest(opts, events, src, cb) {
   const { tab } = src;
   const { incognito } = tab;
-  const { anonymous, id, overrideMimeType, xhrType, url: unsafeUrl } = opts;
+  const { anonymous, id, overrideMimeType, [kXhrType]: xhrType, url: unsafeUrl } = opts;
   const url = unsafeUrl.startsWith('blob:')
     ? unsafeUrl // TODO: process blob and data URLs in `injected` without sending anything to bg
     : getFullUrl(unsafeUrl, src.url);

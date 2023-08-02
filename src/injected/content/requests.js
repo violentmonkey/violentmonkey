@@ -14,8 +14,10 @@ const getTypedArrayBuffer = describeProperty(getPrototypeOf(SafeUint8Array[PROTO
 const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
 const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
 const fdAppend = SafeFormData[PROTO].append;
+const CHUNKS = 'chunks';
 const PROPS_TO_COPY = [
   kFileName,
+  kXhrType,
 ];
 /** @type {GMReq.Content} */
 const requests = createNullObj();
@@ -31,7 +33,6 @@ addHandlers({
   async HttpRequest(msg, realm) {
     requests[msg.id] = safePickInto({
       realm,
-      asBlob: msg.xhrType === 'blob',
     }, msg, PROPS_TO_COPY);
     let { data } = msg;
     // In Firefox we recreate FormData in bg::decodeBody
@@ -62,16 +63,15 @@ addBackgroundHandlers({
       return;
     }
     let response = data?.[kResponse];
-    if (response && !IS_FIREFOX) {
+    if (response) {
       if (msg.blobbed) {
         response = await importBlob(req, response);
-      }
-      if (msg.chunked) {
-        response = processChunk(req, response);
-        response = req.asBlob
-          ? new SafeBlob([response], { type: msg.contentType })
-          : response::getTypedArrayBuffer();
-        delete req.arr;
+      } else if (msg.chunked) {
+        processChunk(req, response);
+        response = combineChunks(req, msg);
+      } else if (!req[kXhrType]) {
+        if (req[kResponse]) response = (req[kResponse] += response);
+        else req[kResponse] = response;
       }
       data[kResponse] = response;
     }
@@ -95,7 +95,7 @@ addBackgroundHandlers({
  * @returns {Promise<Blob|ArrayBuffer>}
  */
 async function importBlob(req, url) {
-  const data = await (await safeFetch(url))::(req.asBlob ? getBlob : getArrayBuffer)();
+  const data = await (await safeFetch(url))::(req[kXhrType] === 'blob' ? getBlob : getArrayBuffer)();
   sendCmd('RevokeBlob', url);
   return data;
 }
@@ -124,16 +124,39 @@ async function revokeBlobAfterTimeout(url) {
  * @param {GMReq.Content} req
  * @param {string} data
  * @param {GMReq.Message.BGChunk} [msg]
- * @returns {Uint8Array}
  */
 function processChunk(req, data, msg) {
+  if (!req[kXhrType]) {
+    setOwnProp(req[CHUNKS] || (req[CHUNKS] = ['']), msg ? msg.i : 0, data);
+    return;
+  }
   data = safeAtob(data);
   const len = data.length;
-  const arr = req.arr || (req.arr = new SafeUint8Array(msg ? msg.size : len));
+  const arr = req[CHUNKS] || (req[CHUNKS] = new SafeUint8Array(msg ? msg.size : len));
   for (let pos = msg?.chunk || 0, i = 0; i < len;) {
     arr[pos++] = safeCharCodeAt(data, i++);
   }
-  return arr;
+}
+
+/**
+ * @param {GMReq.Content} req
+ * @param {GMReq.Message.BG} msg
+ * @returns {Blob|Uint8Array|string}
+ */
+function combineChunks(req, msg) {
+  let res;
+  if (req[kXhrType]) {
+    res = req[CHUNKS];
+    res = req[kXhrType] === 'blob'
+      ? new SafeBlob([res], { type: msg.contentType })
+      : res::getTypedArrayBuffer();
+  } else {
+    res = req[kResponse] || '';
+    req[CHUNKS]::forEach(str => res += str);
+    req[kResponse] = res;
+  }
+  delete req[CHUNKS];
+  return res;
 }
 
 /** Doing it here because vault's SafeResponse+blob() doesn't work in injected-web */
