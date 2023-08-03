@@ -70,11 +70,13 @@ addBackgroundHandlers({
         processChunk(req, response);
         response = req[CHUNKS];
         delete req[CHUNKS];
-        if (req[kXhrType]) {
-          response = req[kXhrType] === 'blob'
-            ? new SafeBlob([response], { type: msg.contentType })
-            : response::getTypedArrayBuffer();
-        } // else: sending text chunks as-is to avoid memory overflow due to frequent concatenation
+        if (req[kXhrType] === 'blob') {
+          response = new SafeBlob([response], { type: msg.contentType });
+        } else if (req[kXhrType]) {
+          response = response::getTypedArrayBuffer();
+        } else {
+          // sending text chunks as-is to avoid memory overflow due to concatenation
+        }
       }
       data[kResponse] = response;
     }
