@@ -3,7 +3,7 @@ import bridge from './bridge';
 import store from './store';
 import { onTabCreate } from './tabs';
 import { onRequestCreate, onRequestInitError } from './requests';
-import { onNotificationCreate } from './notifications';
+import { createNotification } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
 import { jsonDump } from './util';
 
@@ -167,22 +167,7 @@ export const GM_API = {
       options.url = url;
       return onTabCreate(options);
     },
-    GM_notification(text, title, image, onclick) {
-      const options = isObject(text) ? text : {
-        __proto__: null,
-        text,
-        title,
-        image,
-        onclick,
-      };
-      if (!options.text) {
-        throw new SafeError('GM_notification: `text` is required!');
-      }
-      const id = onNotificationCreate(options);
-      return {
-        remove: () => bridge.send('RemoveNotification', id),
-      };
-    },
+    GM_notification: createNotification,
     GM_setClipboard(data, type) {
       bridge.post('SetClipboard', { data, type });
     },
