@@ -253,7 +253,7 @@ installOptionClose:
   message: Nach der Installation schließen
 installOptionTrack:
   description: Option to track the loading local file until page is closed.
-  message: Lokale Datei tracken, bis dieses Fenster geschlossen wird
+  message: Editierungen in lokaler Datei tracken, solange diese Seite geöffnet ist
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
