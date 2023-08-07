@@ -6,7 +6,7 @@ const openers = {};
 
 addPublicCommands({
   /** @return {Promise<string>} */
-  async Notification({ image, text, title, onclick }, src) {
+  async Notification({ image, text, title, silent, onclick }, src) {
     const notificationId = await browser.notifications.create({
       type: 'basic',
       title: [title, IS_FIREFOX && i18n('extName')]::trueJoin(' - '), // Chrome already shows the name
@@ -15,6 +15,9 @@ addPublicCommands({
       ...!IS_FIREFOX && {
         requireInteraction: !!onclick,
       },
+      ...ua.chrome >= 70 && {
+        silent,
+      }
     });
     const op = isFunction(onclick) ? onclick : src && [src.tab.id, src.frameId];
     if (op) openers[notificationId] = op;
