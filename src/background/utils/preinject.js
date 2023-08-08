@@ -20,13 +20,23 @@ import { addValueOpener, clearValueOpener } from './values';
 let isApplied;
 let injectInto;
 let ffInject;
-let xhrInject;
+let xhrInject = false; // must be initialized for proper comparison when toggling
 
 const sessionId = getUniqId();
+const API_HEADERS_RECEIVED = browser.webRequest.onHeadersReceived;
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
   types: ['main_frame', 'sub_frame'],
 };
+const API_EXTRA = [
+  'blocking', // used for xhrInject and to make Firefox fire the event before GetInjected
+  kResponseHeaders,
+  browser.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS,
+].filter(Boolean);
+const findCspHeader = h => h.name.toLowerCase() === 'content-security-policy';
+const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
+const NONCE_RE = /'nonce-([-+/=\w]+)'/;
+const UNSAFE_INLINE = "'unsafe-inline'";
 const __CODE = Symbol('code'); // will be stripped when messaging
 const INJECT = 'inject';
 /** These bags are reused in cache to reduce memory usage,
@@ -85,8 +95,16 @@ const isContentRealm = (val, force) => (
 const OPT_HANDLERS = {
   [BLACKLIST]: cache.destroy,
   defaultInjectInto(value) {
-    injectInto = normalizeRealm(value);
+    value = normalizeRealm(value);
     cache.destroy();
+    if (injectInto) { // already initialized, so we should update the listener
+      if (value === CONTENT) {
+        API_HEADERS_RECEIVED.removeListener(onHeadersReceived);
+      } else if (isApplied && IS_FIREFOX && !xhrInject) {
+        API_HEADERS_RECEIVED.addListener(onHeadersReceived, API_CONFIG, API_EXTRA);
+      }
+    }
+    injectInto = value;
   },
   /** WARNING! toggleXhrInject should precede togglePreinject as it sets xhrInject variable */
   xhrInject: toggleXhrInject,
@@ -189,6 +207,17 @@ function onOptionChanged(changes) {
   });
 }
 
+function toggleXhrInject(enable) {
+  if (enable) enable = injectInto !== CONTENT;
+  if (xhrInject === enable) return;
+  xhrInject = enable;
+  cache.destroy();
+  API_HEADERS_RECEIVED.removeListener(onHeadersReceived);
+  if (enable) {
+    API_HEADERS_RECEIVED.addListener(onHeadersReceived, API_CONFIG, API_EXTRA);
+  }
+}
+
 function togglePreinject(enable) {
   isApplied = enable;
   // Using onSendHeaders because onHeadersReceived in Firefox fires *after* content scripts.
@@ -196,8 +225,9 @@ function togglePreinject(enable) {
   const onOff = `${enable ? 'add' : 'remove'}Listener`;
   const config = enable ? API_CONFIG : undefined;
   browser.webRequest.onSendHeaders[onOff](onSendHeaders, config);
-  if (!isApplied || !xhrInject) { // will be registered in toggleXhrInject
-    browser.webRequest.onHeadersReceived[onOff](onHeadersReceived, config);
+  if (!isApplied /* remove the listener */
+  || IS_FIREFOX && !xhrInject && injectInto !== CONTENT /* add 'nonce' detector */) {
+    API_HEADERS_RECEIVED[onOff](onHeadersReceived, config, config && API_EXTRA);
   }
   browser.tabs.onRemoved[onOff](onTabRemoved);
   browser.tabs.onReplaced[onOff](onTabReplaced);
@@ -211,27 +241,9 @@ function togglePreinject(enable) {
 function toggleFastFirefoxInject(enable) {
   ffInject = enable;
   if (!enable) {
-    cache.some(val => {
-      if (val[CSAPI_REG]) {
-        val[CSAPI_REG].then(reg => reg.unregister());
-        delete val[CSAPI_REG];
-      }
-    });
+    cache.some(v => { unregisterScriptFF(v); /* must return falsy! */ });
   } else if (!xhrInject) {
     cache.destroy(); // nuking the cache so that CSAPI_REG is created for subsequent injections
-  }
-}
-
-function toggleXhrInject(enable) {
-  xhrInject = enable;
-  cache.destroy();
-  browser.webRequest.onHeadersReceived.removeListener(onHeadersReceived);
-  if (enable) {
-    browser.webRequest.onHeadersReceived.addListener(onHeadersReceived, API_CONFIG, [
-      'blocking',
-      kResponseHeaders,
-      browser.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS,
-    ].filter(Boolean));
   }
 }
 
@@ -244,19 +256,23 @@ function onSendHeaders({ url, frameId }) {
 /** @param {chrome.webRequest.WebResponseHeadersDetails} info */
 function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
-  const bag = xhrInject && cache.get(key);
+  const bag = cache.get(key);
   // The INJECT data is normally already in cache if code and values aren't huge
-  return bag?.[INJECT]?.[SCRIPTS] && prepareXhrBlob(info, bag);
+  if (bag && !bag[FORCE_CONTENT] && bag[INJECT]?.[SCRIPTS]) {
+    if (IS_FIREFOX && info.url.startsWith('https:')) {
+      detectStrictCsp(info, bag);
+    }
+    if (xhrInject) {
+      return prepareXhrBlob(info, bag);
+    }
+  }
 }
 
 /**
  * @param {chrome.webRequest.WebResponseHeadersDetails} info
  * @param {VMInjection.Bag} bag
  */
-function prepareXhrBlob({ url, [kResponseHeaders]: responseHeaders, tabId, frameId }, bag) {
-  if (IS_FIREFOX && url.startsWith('https:') && detectStrictCsp(responseHeaders)) {
-    bag[FORCE_CONTENT] = true;
-  }
+function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, tabId, frameId }, bag) {
   triageRealms(bag[INJECT][SCRIPTS], bag[FORCE_CONTENT], tabId, frameId, bag);
   const blobUrl = URL.createObjectURL(new Blob([
     JSON.stringify(bag[INJECT]),
@@ -486,17 +502,42 @@ function registerScriptDataFF(inject, url) {
   });
 }
 
-/** @param {chrome.webRequest.HttpHeader[]} responseHeaders */
-function detectStrictCsp(responseHeaders) {
-  return responseHeaders.some(({ name, value }) => (
-    /^content-security-policy$/i.test(name)
-    && /^.(?!.*'unsafe-inline')/.test( // true if not empty and without 'unsafe-inline'
-      value.match(/(?:^|;)\s*script-src-elem\s[^;]+/)
-      || value.match(/(?:^|;)\s*script-src\s[^;]+/)
-      || value.match(/(?:^|;)\s*default-src\s[^;]+/)
-      || '',
-    )
-  ));
+function unregisterScriptFF(bag) {
+  const reg = bag[CSAPI_REG];
+  if (reg) {
+    delete bag[CSAPI_REG];
+    return reg.then(r => r.unregister());
+  }
+}
+
+/**
+ * @param {chrome.webRequest.WebResponseHeadersDetails} info
+ * @param {VMInjection.Bag} bag
+ */
+function detectStrictCsp(info, bag) {
+  const h = info[kResponseHeaders].find(findCspHeader);
+  if (!h) return;
+  let tmp = '';
+  let m, scriptSrc, scriptElemSrc, defaultSrc;
+  while ((m = CSP_RE.exec(h.value))) {
+    tmp += m[2] ? (defaultSrc = m[3]) : m[1] ? (scriptElemSrc = m[3]) : (scriptSrc = m[3]);
+  }
+  if (!tmp) return;
+  tmp = tmp.match(NONCE_RE);
+  if (tmp) {
+    bag[INJECT].nonce = tmp[1];
+  } else if (
+    scriptSrc && !scriptSrc.includes(UNSAFE_INLINE) ||
+    scriptElemSrc && !scriptElemSrc.includes(UNSAFE_INLINE) ||
+    !scriptSrc && !scriptElemSrc && defaultSrc && !defaultSrc.includes(UNSAFE_INLINE)
+  ) {
+    bag[FORCE_CONTENT] = bag[INJECT][FORCE_CONTENT] = true;
+  } else {
+    return;
+  }
+  if (unregisterScriptFF(bag)) {
+    registerScriptDataFF(bag[INJECT], info.url);
+  }
 }
 
 /** @this {?} truthy = forceContent */

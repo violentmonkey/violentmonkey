@@ -1,4 +1,5 @@
 import bridge, { addBackgroundHandlers, addHandlers } from './bridge';
+import { addNonceAttribute } from './inject';
 import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 
 const menus = createNullObj();
@@ -25,6 +26,7 @@ addHandlers({
         || elemByTag('body')
         || elemByTag('*');
       el = makeElem(tag, attrs);
+      addNonceAttribute(el);
       parent::appendChild(el);
     } catch (e) {
       // A page-mode userscript can't catch DOM errors in a content script so we pass it explicitly

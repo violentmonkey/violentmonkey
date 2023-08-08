@@ -216,6 +216,7 @@ declare interface VMInjection extends VMInjectionDisabled {
   injectInto: VMScriptInjectInto;
   /** cache key for envDelayed, which also tells content bridge to expect envDelayed */
   more: string;
+  nonce?: string;
   /** `page` mode will be necessary */
   page: boolean;
   scripts: VMInjection.Script[];

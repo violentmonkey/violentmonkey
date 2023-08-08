@@ -13,6 +13,7 @@ let pageInjectable;
 let frameEventWnd;
 /** @type {ShadowRoot} */
 let injectedRoot;
+let nonce;
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
@@ -27,14 +28,15 @@ addHandlers({
   InjectList: IS_FIREFOX && injectPageList,
 });
 
-export function injectPageSandbox({ [kSessionId]: sessionId }) {
+export function injectPageSandbox(data) {
   pageInjectable = false;
-  const VAULT_WRITER = sessionId + 'VW';
+  const VAULT_WRITER = data[kSessionId] + 'VW';
   const VAULT_WRITER_ACK = VAULT_WRITER + '*';
   const vaultId = safeGetUniqId();
   const handshakeId = safeGetUniqId();
   const contentId = safeGetUniqId();
   const webId = safeGetUniqId();
+  nonce = data.nonce;
   if (IS_FIREFOX) {
     // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
     window::on(VAULT_WRITER, evt => {
@@ -229,6 +231,7 @@ function inject(item, iframeCb) {
   if (isCodeArray) {
     safeApply(append, script, code);
   }
+  addNonceAttribute(script);
   let iframe;
   let iframeDoc;
   if (iframeCb) {
@@ -334,6 +337,10 @@ function tellBridgeToWriteVault(vaultId, wnd) {
     post('WriteVault', vaultId, PAGE, wnd);
     return true;
   }
+}
+
+export function addNonceAttribute(script) {
+  if (nonce) script::setAttribute('nonce', nonce);
 }
 
 function addVaultExports(vaultSrc) {
