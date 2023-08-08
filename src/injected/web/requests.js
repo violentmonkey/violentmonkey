@@ -71,24 +71,26 @@ addHandlers({
       [kResponse]: response,
       [kResponseHeaders]: headers,
     } = data;
+    let raw = req[kRaw];
     if (response != null) {
       if (req[kXhrType]) {
         req[kRaw] = response;
-        setOwnProp(data, kResponseText, null);
       } else {
-        const raw = req[kRaw] || (req[kRaw] = []);
+        if (!raw) raw = req[kRaw] = [];
         if (isString(response)) {
           safePush(raw, response);
         } else {
           for (const chunk of response) safePush(raw, chunk);
         }
-        if (raw.length === 1) {
-          setOwnProp(data, kResponseText, raw[0]);
-        } else {
-          setOwnProp(data, kResponseText, safeBind(parseRaw, data, req, msg, kResponseText),
-            true, 'get');
-        }
       }
+    }
+    if (req[kXhrType]) {
+      setOwnProp(data, kResponseText, null);
+    } else if (!raw || raw.length <= 1) {
+      setOwnProp(data, kResponseText, raw && raw[0] || '');
+    } else if (raw.length) {
+      setOwnProp(data, kResponseText, safeBind(parseRaw, data, req, msg, kResponseText),
+        true, 'get');
     }
     if (headers != null) {
       req[kResponseHeaders] = headers;
