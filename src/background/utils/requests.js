@@ -106,12 +106,12 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     const shouldNotify = events.includes(type);
     const isEnd = type === 'loadend';
     const readyState4 = xhr.readyState === 4 || (sentReadyState4 = false); // reset on redirection
-    if (!shouldNotify && !isEnd
-    // Firefox duplicates readystatechange for state=4 randomly, #1862
-    || (tmp = (readyState4 && type === 'readystatechange')) && sentReadyState4) {
+    if (!shouldNotify && !isEnd) {
       return;
     }
-    if (tmp) {
+    // Firefox duplicates readystatechange for state=4 randomly, #1862
+    if (readyState4 && type === 'readystatechange') {
+      if (sentReadyState4) return;
       sentReadyState4 = true;
     }
     if (!contentType) {
