@@ -1,6 +1,6 @@
 import '@/common/browser';
 import { sendCmdDirectly } from '@/common';
-import { INJECTABLE_TAB_URL_RE } from '@/common/consts';
+import { INJECTABLE_URL_RE } from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { forEachValue, mapEntry } from '@/common/object';
@@ -16,7 +16,7 @@ render(App);
 Object.assign(handlers, {
   async SetPopup(data, { frameId, tab, url }) {
     // No `tab` is a FF bug when it sends messages from removed iframes
-    if (!tab || store.currentTab && store.currentTab.id !== tab.id) return;
+    if (!tab || store.tab && store.tab.id !== tab.id) return;
     /* SetPopup from a sub-frame may come first so we need to wait for the main page
      * because we only show the iframe menu for unique scripts that don't run in the main page */
     const isTop = frameId === 0;
@@ -25,6 +25,7 @@ Object.assign(handlers, {
       store.commands = data.menus::mapEntry(Object.keys);
       // executeScript may(?) fail in a discarded or lazy-loaded tab, which is actually injectable
       store.injectable = true;
+      store.skipped = data[INJECT_INTO] === SKIP_SCRIPTS;
     }
     const idMapAllFrames = store.idMap;
     const idMapMain = idMapAllFrames[0] || (idMapAllFrames[0] = {});
@@ -75,11 +76,11 @@ if (!CSS.supports?.('list-style-type', 'disclosure-open')) {
   document.styleSheets[0].insertRule('.excludes-menu ::-webkit-details-marker {display:none}');
 }
 
-sendCmdDirectly('GetTabDomain').then(async ({ tab, domain }) => {
-  store.currentTab = tab;
-  store.domain = domain;
+sendCmdDirectly('GetTabDomain').then(async data => {
+  const {tab} = data;
+  Object.assign(store, data);
   browser.runtime.connect({ name: `${tab.id}` });
-  if (!INJECTABLE_TAB_URL_RE.test(tab.url) // executeScript runs code in own pages in FF
+  if (!INJECTABLE_URL_RE.test(tab.url) // executeScript runs code in own pages in FF
   || !await browser.tabs.executeScript({ code: '1', [RUN_AT]: 'document_start' }).catch(() => [])) {
     store.injectable = false;
     mutex.resolve();

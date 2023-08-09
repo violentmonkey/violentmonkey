@@ -23,6 +23,8 @@ const NEWTAB_URL_RE = re`/
 export const getTabUrl = tab => (
   tab.pendingUrl || tab.url || ''
 );
+export const tabsOnUpdated = browser.tabs.onUpdated;
+export const tabsOnRemoved = browser.tabs.onRemoved;
 let cookieStorePrefix;
 
 addOwnCommands({
@@ -150,7 +152,7 @@ addPublicCommands({
   },
 });
 
-browser.tabs.onRemoved.addListener((id) => {
+tabsOnRemoved.addListener((id) => {
   const openerId = openers[id];
   if (openerId >= 0) {
     sendTabCmd(openerId, 'TabClosed', id);

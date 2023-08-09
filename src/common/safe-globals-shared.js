@@ -28,5 +28,6 @@ export const kResponseText = 'responseText';
 export const kResponseType = 'responseType';
 export const kSessionId = 'sessionId';
 export const kXhrType = 'xhrType';
+export const SKIP_SCRIPTS = 'SkipScripts';
 export const isFunction = val => typeof val === 'function';
 export const isObject = val => val != null && typeof val === 'object';

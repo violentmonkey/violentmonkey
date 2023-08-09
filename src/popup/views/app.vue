@@ -7,21 +7,19 @@
     @mouseenter.capture="delegateMouseEnter"
     @mouseleave.capture="delegateMouseLeave"
     @focus.capture="updateMessage"
-    :data-failure-reason="failureReason">
+    :class="failureReason[0]">
     <div class="flex menu-buttons">
-      <div class="logo" :class="{disabled:!options.isApplied}">
+      <div class="logo">
         <img src="/public/images/icon128.png">
       </div>
-      <div
-        class="flex-1 ext-name"
-        :class="{disabled:!options.isApplied}"
-        v-text="name"
-      />
+      <div class="flex-1 ext-name" v-text="name" />
       <span
         class="menu-area"
-        :class="{disabled:!options.isApplied}"
-        :data-message="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
+        :data-message="options.isApplied
+          ? i18n('menuScriptEnabled') + '\n' + i18n('skipScriptsHint')
+          : i18n('menuScriptDisabled')"
         :tabIndex="tabIndex"
+        @contextmenu.prevent="onSkipTab"
         @click="onToggle">
         <icon :name="getSymbolCheck(options.isApplied)"></icon>
       </span>
@@ -51,13 +49,13 @@
         </template>
       </div>
     </div>
-    <div class="failure-reason" v-if="failureReasonText">
+    <div class="failure-reason" v-if="failureReason[1]">
       <tooltip v-if="injectionScopes[0] && !options.isApplied"
             :content="i18n('labelAutoReloadCurrentTabDisabled')"
             class="reload-hint" align="start" placement="bottom">
         <icon name="info"/>
       </tooltip>
-      <span v-text="failureReasonText"/>
+      <span v-text="failureReason[1]"/>
       <code v-text="store.blacklisted" v-if="store.blacklisted" class="ellipsis inline-block"/>
     </div>
     <div
@@ -167,10 +165,10 @@
          @click.prevent="onInjectionFailureFix"/>
     </div>
     <div class="incognito"
-       v-if="store.currentTab?.incognito"
+       v-if="store.tab?.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
     <footer>
-      <a href="https://violentmonkey.github.io/" target="_blank" :tabIndex="tabIndex" v-text="i18n('visitWebsite')" />
+      <a target="_blank" :href="'https://' + home" :tabIndex="tabIndex" v-text="home" />
     </footer>
     <div class="message" v-show="message">
       <div v-text="message"></div>
@@ -203,7 +201,7 @@ import { objectPick } from '@/common/object';
 import { focusMe } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
-import { mutex, store } from '../utils';
+import { mutex, resetStoredScripts, store } from '../utils';
 
 let mousedownElement;
 const NAME = `${extensionManifest.name} ${process.env.VM_VER}`;
@@ -245,6 +243,7 @@ export default {
   data() {
     return {
       store,
+      home: extensionManifest.homepage_url.split('/')[2],
       options: optionsData,
       activeMenu: 'scripts',
       activeExtras: null,
@@ -316,20 +315,21 @@ export default {
       }).filter(Boolean);
     },
     failureReason() {
+      // TODO: reuse getFailureReason for the text
+      let text = '';
       return [
-        !store.injectable && 'noninjectable',
-        store.blacklisted && 'blacklisted',
-        // undefined means the data isn't ready yet
-        optionsData.isApplied === false && 'scripts-disabled',
-      ]::trueJoin(' ');
-    },
-    failureReasonText() {
-      return (
-        !store.injectable && i18n('failureReasonNoninjectable')
-        || store.blacklisted && i18n('failureReasonBlacklisted')
-        || optionsData.isApplied === false && i18n('menuScriptDisabled')
-        || ''
-      );
+        [ // classes are combined, text is overridden (the last one wins)
+          store.skipped
+            && (text = i18n('skipScriptsMsg'), 'scripts-skipped'),
+          optionsData.isApplied === false // undefined = the data isn't ready yet
+            && (text = i18n('menuScriptDisabled'), 'scripts-disabled'),
+          store.blacklisted
+            && (text = i18n('failureReasonBlacklisted'), 'blacklisted'),
+          !store.injectable
+            && (text = i18n('failureReasonNoninjectable'), 'noninjectable'),
+        ]::trueJoin(' '),
+        text,
+      ];
     },
     findUrls() {
       const query = encodeURIComponent(store.domain);
@@ -364,9 +364,15 @@ export default {
     getSymbolCheck(bool) {
       return `toggle-${bool ? 'on' : 'off'}`;
     },
+    onSkipTab() {
+      sendCmdDirectly(SKIP_SCRIPTS, store.tab);
+      resetStoredScripts();
+      store.skipped = true;
+    },
     onToggle() {
       options.set('isApplied', optionsData.isApplied = !optionsData.isApplied);
       this.checkReload();
+      this.updateMessage();
     },
     onManage() {
       sendCmdDirectly('OpenEditor', '').then(close);
@@ -386,7 +392,7 @@ export default {
         mousedownElement = el;
         evt.preventDefault();
       } else if (type === 'keydown' || mousedownElement === el) {
-        sendTabCmd(store.currentTab.id, 'Command', {
+        sendTabCmd(store.tab.id, 'Command', {
           ...el.CMD,
           evt: objectPick(evt, ['type', 'button', 'shiftKey', 'altKey', 'ctrlKey', 'metaKey',
             'key', 'keyCode', 'code']),
@@ -407,10 +413,8 @@ export default {
     },
     checkReload() {
       if (options.get('autoReload')) {
-        browser.tabs.reload(store.currentTab.id);
-        store.idMap = {};
-        store.scripts.length = 0;
-        store.frameScripts.length = 0;
+        browser.tabs.reload(store.tab.id);
+        resetStoredScripts();
         mutex.init();
       }
     },
@@ -504,6 +508,7 @@ export default {
     delegateMouseEnter(e) {
       const { target } = e;
       if (target.tabIndex >= 0) target.focus();
+      else if (!target.closest('[data-message]')) this.message = '';
     },
     delegateMouseLeave(e) {
       const { target } = e;

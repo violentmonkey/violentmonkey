@@ -62,9 +62,9 @@ footer {
   margin: 0 $logoMLR;
   img {
     width: $logoSize;
-  }
-  &.disabled > img {
-    opacity: .5;
+    .scripts-disabled & {
+      opacity: .5;
+    }
   }
 }
 
@@ -89,10 +89,8 @@ footer {
   }
 }
 
-.ext-name {
-  &.disabled {
-    color: var(--fill-8);
-  }
+.scripts-disabled .ext-name {
+  color: var(--fill-8);
 }
 
 .script-icon {
@@ -279,7 +277,7 @@ footer {
 
 .failure-reason {
   padding: .5rem $itemPaddingX .5rem $leftPaneWidth;
-  [data-failure-reason=""] > & {
+  .page-popup:not(.noninjectable) & {
     // Making the warning noticeable at the bottom of the script list
     background: hsla(30, 100%, 50%, .2);
   }

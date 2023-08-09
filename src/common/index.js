@@ -17,6 +17,7 @@ if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
   }
 }
 
+export const ignoreChromeErrors = () => chrome.runtime.lastError;
 export const browserWindows = browser.windows;
 export const defaultImage = !process.env.IS_INJECTED && `${ICON_PREFIX}128.png`;
 /** Will be encoded to avoid splitting the URL in devtools UI */

@@ -7,7 +7,7 @@ import { forEachEntry, forEachKey, forEachValue, mapEntry, objectSet } from '@/c
 import ua from '@/common/ua';
 import { getScriptsByURL, CACHE_KEYS, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
 import { postInitialize } from './init';
-import { addPublicCommands } from './message';
+import { addOwnCommands, addPublicCommands } from './message';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId } from './requests';
@@ -15,6 +15,7 @@ import {
   S_CACHE, S_CACHE_PRE, S_CODE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
 } from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
+import { tabsOnRemoved } from './tabs';
 import { addValueOpener, clearValueOpener } from './values';
 
 let isApplied;
@@ -38,7 +39,7 @@ const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
 const NONCE_RE = /'nonce-([-+/=\w]+)'/;
 const UNSAFE_INLINE = "'unsafe-inline'";
 const __CODE = Symbol('code'); // will be stripped when messaging
-const INJECT = 'inject';
+export const INJECT = 'inject';
 /** These bags are reused in cache to reduce memory usage,
  * CACHE_KEYS is for removeStaleCacheEntry */
 const BAG_NOOP = { [INJECT]: {}, [CACHE_KEYS]: [] };
@@ -92,6 +93,16 @@ const normalizeScriptRealm = (custom, meta) => (
 const isContentRealm = (val, force) => (
   val === CONTENT || val === AUTO && force
 );
+
+const skippedTabs = {};
+export const reloadAndSkipScripts = async tab => {
+  const tabId = tab.id;
+  const bag = cache.get(getKey(tab.url, true));
+  skippedTabs[tabId] = 1;
+  if (bag) await unregisterScriptFF(bag);
+  await browser.tabs.reload(tabId);
+};
+
 const OPT_HANDLERS = {
   [BLACKLIST]: cache.destroy,
   defaultInjectInto(value) {
@@ -117,6 +128,10 @@ const OPT_HANDLERS = {
 };
 if (contentScriptsAPI) OPT_HANDLERS.ffInject = toggleFastFirefoxInject;
 
+addOwnCommands({
+  [SKIP_SCRIPTS]: reloadAndSkipScripts,
+});
+
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
   async GetInjected({ url, [FORCE_CONTENT]: forceContent, done }, src) {
@@ -125,6 +140,12 @@ addPublicCommands({
     const isTop = !frameId;
     if (!url) url = src.url || tab.url;
     clearFrameData(tabId, frameId);
+    let skip = skippedTabs[tabId];
+    if (skip > 0) { // first time loading the tab after skipScripts was invoked
+      if (isTop) skippedTabs[tabId] = -1; // keeping a phantom for future iframes in this page
+      return { [INJECT_INTO]: SKIP_SCRIPTS };
+    }
+    if (skip) delete skippedTabs[tabId]; // deleting the phantom as we're in a new page
     const bagKey = getKey(url, isTop);
     const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop);
     const bag = bagP[INJECT] ? bagP : await bagP[PROMISE];
@@ -152,7 +173,8 @@ addPublicCommands({
     if (!moreKey) return;
     if (!url) url = src.url || tab.url;
     const env = cache.get(moreKey)
-      || cache.put(moreKey, getScriptsByURL(url, !frameId));
+      || cache.put(moreKey, getScriptsByURL(url, !frameId))
+      || { [SCRIPTS]: [] }; // scripts got removed or the url got blacklisted after GetInjected
     const envCache = (env[PROMISE] ? await env[PROMISE] : env)[S_CACHE];
     const scripts = prepareScripts(env);
     triageRealms(scripts, forceContent, tabId, frameId);
@@ -229,7 +251,7 @@ function togglePreinject(enable) {
   || IS_FIREFOX && !xhrInject && injectInto !== CONTENT /* add 'nonce' detector */) {
     API_HEADERS_RECEIVED[onOff](onHeadersReceived, config, config && API_EXTRA);
   }
-  browser.tabs.onRemoved[onOff](onTabRemoved);
+  tabsOnRemoved[onOff](onTabRemoved);
   browser.tabs.onReplaced[onOff](onTabReplaced);
   if (!enable) {
     cache.destroy();
@@ -247,10 +269,13 @@ function toggleFastFirefoxInject(enable) {
   }
 }
 
-function onSendHeaders({ url, frameId }) {
+/** @param {chrome.webRequest.WebRequestDetails} info */
+function onSendHeaders({ url, frameId, tabId }) {
   const isTop = !frameId;
   const key = getKey(url, isTop);
-  if (!cache.has(key)) prepare(key, url, isTop);
+  if (!cache.has(key) && !skippedTabs[tabId]) {
+    prepare(key, url, isTop);
+  }
 }
 
 /** @param {chrome.webRequest.WebResponseHeadersDetails} info */
@@ -258,7 +283,7 @@ function onHeadersReceived(info) {
   const key = getKey(info.url, !info.frameId);
   const bag = cache.get(key);
   // The INJECT data is normally already in cache if code and values aren't huge
-  if (bag && !bag[FORCE_CONTENT] && bag[INJECT]?.[SCRIPTS]) {
+  if (bag && !bag[FORCE_CONTENT] && bag[INJECT]?.[SCRIPTS] && !skippedTabs[info.tabId]) {
     if (IS_FIREFOX && info.url.startsWith('https:')) {
       detectStrictCsp(info, bag);
     }
@@ -547,10 +572,11 @@ function isPageRealmScript(scr) {
 
 function onTabRemoved(id /* , info */) {
   clearFrameData(id);
+  delete skippedTabs[id];
 }
 
 function onTabReplaced(addedId, removedId) {
-  clearFrameData(removedId);
+  onTabRemoved(removedId);
 }
 
 function clearFrameData(tabId, frameId) {

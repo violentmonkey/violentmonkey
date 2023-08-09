@@ -1,8 +1,10 @@
 import { getActiveTab, sendTabCmd } from '@/common';
 import cache from './cache';
 import { getData } from './db';
+import { badges, BROWSER_ACTION } from './icon';
 import { postInitialize } from './init';
 import { addPublicCommands } from './message';
+import { INJECT } from './preinject';
 
 export const popupTabs = {}; // { tabId: 1 }
 
@@ -17,7 +19,7 @@ addPublicCommands({
 postInitialize.push(() => {
   browser.runtime.onConnect.addListener(onPopupOpened);
   browser.webRequest.onBeforeRequest.addListener(prefetchSetPopup, {
-    urls: [chrome.runtime.getURL(extensionManifest.browser_action.default_popup)],
+    urls: [chrome.runtime.getURL(extensionManifest[BROWSER_ACTION].default_popup)],
     types: ['main_frame'],
   });
 });
@@ -26,16 +28,21 @@ function onPopupOpened(port) {
   const tabId = +port.name;
   if (!tabId) return;
   popupTabs[tabId] = 1;
-  sendTabCmd(tabId, 'PopupShown', true);
+  notifyTab(tabId, true);
   port.onDisconnect.addListener(onPopupClosed);
 }
 
 function onPopupClosed({ name }) {
   delete popupTabs[name];
-  sendTabCmd(+name, 'PopupShown', false);
+  notifyTab(+name, false);
 }
 
 async function prefetchSetPopup() {
-  const tabId = (await getActiveTab()).id;
-  sendTabCmd(tabId, 'PopupShown', true);
+  notifyTab((await getActiveTab()).id, true);
+}
+
+function notifyTab(tabId, data) {
+  if (badges[tabId]?.[INJECT]) {
+    sendTabCmd(tabId, 'PopupShown', data);
+  }
 }

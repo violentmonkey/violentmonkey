@@ -9,6 +9,8 @@ export const store = reactive({
   injectionFailure: null,
   injectable: true,
   blacklisted: false,
+  skipped: false,
+  tab: null,
 });
 
 export const mutex = {
@@ -20,3 +22,9 @@ export const mutex = {
     });
   },
 };
+
+export function resetStoredScripts() {
+  store.idMap = {};
+  store.scripts.length = 0;
+  store.frameScripts.length = 0;
+}

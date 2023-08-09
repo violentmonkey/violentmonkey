@@ -156,3 +156,7 @@ export function deepSize(val) {
   if (Array.isArray(val)) return val.reduce((sum, v) => sum + 1 + deepSize(v), 2);
   return Object.keys(val).reduce((sum, k) => sum + k.length + 4 + deepSize(val[k]), 2);
 }
+
+export function nest(obj, key) {
+  return obj[key] || (obj[key] = createNullObj());
+}

@@ -12,8 +12,8 @@ default_locale: en
 browser_action:
   browser_style: true
   default_icon:
-    '16': public/images/icon16.png
-    '32': public/images/icon32.png
+    '16': public/images/icon16b.png
+    '32': public/images/icon32b.png
   default_title: __MSG_extName__
   default_popup: popup/index.html
 background:
@@ -38,6 +38,7 @@ permissions:
   - storage
   - unlimitedStorage
   - clipboardWrite
+  - contextMenus
   - cookies
 commands:
   _execute_browser_action: {}
@@ -47,6 +48,8 @@ commands:
     description: __MSG_labelSettings__
   newScript:
     description: __MSG_menuNewScript__
+  SkipScripts:
+    description: __MSG_skipScriptsCmd__
 
 minimum_chrome_version: '57.0'
 
