@@ -7,7 +7,7 @@
     }
   },
   "typeAcquisition": {
-    "include": ["./types.d.ts"]
+    "include": ["./types.d.ts", "./types.generated.d.ts"]
   },
   "exclude": ["node_modules", "dist"]
 }

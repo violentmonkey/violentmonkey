@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+SRC=src/_locales/en/messages.yml
+DST=src/types.generated.d.ts
+
+if git diff --cached -- "$SRC"; then
+  . "$(dirname -- "$0")/_/husky.sh"
+  node scripts/generate-types.js "$SRC" "$DST"
+fi

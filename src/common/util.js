@@ -2,6 +2,11 @@
 
 import { browser } from '@/common/consts';
 
+/**
+ * @param {LocaleMessageId} name
+ * @param {string[]} [args]
+ * @return {string}
+ */
 export function i18n(name, args) {
   return browser.i18n.getMessage(name, args) || name;
 }
