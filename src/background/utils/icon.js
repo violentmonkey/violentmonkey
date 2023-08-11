@@ -1,5 +1,5 @@
 import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
-import { BLACKLIST, INJECTABLE_URL_RE } from '@/common/consts';
+import { BLACKLIST } from '@/common/consts';
 import { nest, objectPick } from '@/common/object';
 import { postInitialize } from './init';
 import { addOwnCommands, addPublicCommands, forEachTab } from './message';
@@ -65,6 +65,13 @@ let isApplied;
 let showBadge;
 let badgeColor;
 let badgeColorBlocked;
+let injectableRe = /^(https?|file|ftps?):/;
+
+if (!IS_FIREFOX) {
+  chrome.extension.isAllowedFileSchemeAccess(ok => {
+    if (!ok) injectableRe = /^(ht|f)tps?:/;
+  });
+}
 
 hookOptions((changes) => {
   let v;
@@ -225,7 +232,7 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
 
 /** Omitting `data` = check whether injection is allowed for `url` */
 export function getFailureReason(url, data) {
-  return !INJECTABLE_URL_RE.test(url) ? [titleNoninjectable, INJECT_INTO]
+  return !injectableRe.test(url) ? [titleNoninjectable, INJECT_INTO]
     : ((url = testBlacklist(url))) ? [titleBlacklisted, 'blacklisted', url]
       : !isApplied ? [titleDisabled, IS_APPLIED]
         : !data ? []

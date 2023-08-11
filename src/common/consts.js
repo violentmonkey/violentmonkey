@@ -34,9 +34,3 @@ export const KNOWN_INJECT_INTO = {
   [PAGE]: 1,
   [CONTENT]: 1,
 };
-export let INJECTABLE_URL_RE;
-if (!process.env.IS_INJECTED && !process.env.TEST) {
-  chrome.extension.isAllowedFileSchemeAccess(ok => {
-    INJECTABLE_URL_RE = ok ? /^(https?|file|ftps?):/ : /^(ht|f)tps?:/;
-  });
-}
