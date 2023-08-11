@@ -277,7 +277,7 @@ footer {
 
 .failure-reason {
   padding: .5rem $itemPaddingX .5rem $leftPaneWidth;
-  .page-popup:not(.noninjectable) & {
+  .page-popup:not(.noninjectable):not(.blacklisted) & {
     // Making the warning noticeable at the bottom of the script list
     background: hsla(30, 100%, 50%, .2);
   }

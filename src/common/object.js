@@ -158,5 +158,5 @@ export function deepSize(val) {
 }
 
 export function nest(obj, key) {
-  return obj[key] || (obj[key] = createNullObj());
+  return obj[key] || (obj[key] = {});
 }

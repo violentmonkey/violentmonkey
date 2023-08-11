@@ -1,19 +1,33 @@
 import { getActiveTab, sendTabCmd } from '@/common';
 import cache from './cache';
 import { getData } from './db';
-import { badges, BROWSER_ACTION } from './icon';
+import { badges, BROWSER_ACTION, getFailureReason } from './icon';
 import { postInitialize } from './init';
-import { addPublicCommands } from './message';
+import { addPublicCommands, commands } from './message';
 import { INJECT } from './preinject';
 
 export const popupTabs = {}; // { tabId: 1 }
+const getCacheKey = tabId => 'SetPopup' + tabId;
 
 addPublicCommands({
-  async SetPopup(data, src) {
-    if (popupTabs[src.tab.id]) return;
-    Object.assign(data, await getData({ [IDS]: Object.keys(data[IDS]) }));
-    cache.put('SetPopup', Object.assign({ [src.frameId]: [data, src] }, cache.get('SetPopup')));
+  async InitPopup() {
+    const data = await commands.GetTabDomain();
+    const { url, id: tabId } = data.tab;
+    const cachedSetPopup = cache.pop(getCacheKey(tabId));
+    const badgeData = badges[tabId] || {};
+    let failure = getFailureReason(url, badgeData);
+    if (!failure[0] && !cachedSetPopup && !await isInjectable(tabId, badgeData)) {
+      failure = getFailureReason('');
+    }
+    return [cachedSetPopup, data, failure];
   },
+  async SetPopup(data, src) {
+    const tabId = src.tab.id;
+    const key = getCacheKey(tabId);
+    if (popupTabs[tabId]) return;
+    Object.assign(data, await getData({ [IDS]: Object.keys(data[IDS]) }));
+    (cache.get(key) || cache.put(key, {}))[src.frameId] = [data, src];
+  }
 });
 
 postInitialize.push(() => {
@@ -23,6 +37,15 @@ postInitialize.push(() => {
     types: ['main_frame'],
   });
 });
+
+async function isInjectable(tabId, badgeData) {
+  return badgeData[INJECT]
+    && await sendTabCmd(tabId, VIOLENTMONKEY, null, { frameId: 0 })
+    || (
+      await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
+      .catch(() => [])
+    )[0];
+}
 
 function onPopupOpened(port) {
   const tabId = +port.name;

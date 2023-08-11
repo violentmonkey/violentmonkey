@@ -1,5 +1,5 @@
 export default {
-  isApplied: true,
+  [IS_APPLIED]: true,
   autoUpdate: 1, // days, 0 = disable
   updateEnabledScriptsOnly: true,
   // ignoreGrant: false,

@@ -1,9 +1,8 @@
 import '@/common/browser';
 import { sendCmdDirectly } from '@/common';
-import { INJECTABLE_URL_RE } from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
-import { forEachValue, mapEntry } from '@/common/object';
+import { mapEntry } from '@/common/object';
 import { render } from '@/common/ui';
 import '@/common/ui/style';
 import App from './views/app';
@@ -23,9 +22,6 @@ Object.assign(handlers, {
     if (!isTop) await mutex.ready;
     else {
       store.commands = data.menus::mapEntry(Object.keys);
-      // executeScript may(?) fail in a discarded or lazy-loaded tab, which is actually injectable
-      store.injectable = true;
-      store.skipped = data[INJECT_INTO] === SKIP_SCRIPTS;
     }
     const idMapAllFrames = store.idMap;
     const idMapMain = idMapAllFrames[0] || (idMapAllFrames[0] = {});
@@ -66,25 +62,32 @@ Object.assign(handlers, {
   },
 });
 
-sendCmdDirectly('CachePop', 'SetPopup').then((data) => {
-  data::forEachValue(val => handlers.SetPopup(...val));
-});
-
 /* Since new Chrome prints a warning when ::-webkit-details-marker is used,
  * we add it only for old Chrome, which is detected via feature added in 89. */
 if (!CSS.supports?.('list-style-type', 'disclosure-open')) {
   document.styleSheets[0].insertRule('.excludes-menu ::-webkit-details-marker {display:none}');
 }
 
-sendCmdDirectly('GetTabDomain').then(async data => {
-  const {tab} = data;
-  Object.assign(store, data);
-  browser.runtime.connect({ name: `${tab.id}` });
-  if (!INJECTABLE_URL_RE.test(tab.url) // executeScript runs code in own pages in FF
-  || !await browser.tabs.executeScript({ code: '1', [RUN_AT]: 'document_start' }).catch(() => [])) {
-    store.injectable = false;
-    mutex.resolve();
-  } else {
-    store.blacklisted = await sendCmdDirectly('TestBlacklist', tab.url);
+sendCmdDirectly('InitPopup').then(([cached, data, [failure, reason, reason2]]) => {
+  if (cached) {
+    for (const id in cached) handlers.SetPopup(...cached[id]);
   }
+  if (!reason) {
+    // ignore
+  } else if (reason === INJECT_INTO) {
+    reason = 'noninjectable';
+    data.injectable = false;
+    mutex.resolve();
+  } else if (reason === SKIP_SCRIPTS) {
+    reason = 'scripts-skipped';
+    data.skipped = true;
+  } else if (reason === IS_APPLIED) {
+    reason = 'scripts-disabled';
+  } else { // blacklisted
+    data[reason] = reason2;
+  }
+  data.failure = reason;
+  data.failureText = failure;
+  Object.assign(store, data);
+  browser.runtime.connect({ name: `${data.tab.id}` });
 });

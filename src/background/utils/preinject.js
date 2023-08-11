@@ -119,7 +119,7 @@ const OPT_HANDLERS = {
   },
   /** WARNING! toggleXhrInject should precede togglePreinject as it sets xhrInject variable */
   xhrInject: toggleXhrInject,
-  isApplied: togglePreinject,
+  [IS_APPLIED]: togglePreinject,
   [EXPOSE](value) {
     value::forEachEntry(([site, isExposed]) => {
       expose[decodeURIComponent(site)] = isExposed;
@@ -506,7 +506,7 @@ function injectContentRealm(toContent, tabId, frameId) {
     if (!scr || scr.key.data !== dataKey) continue;
     browser.tabs.executeScript(tabId, {
       code: scr[__CODE].join(''),
-      runAt: `document_${scr[RUN_AT]}`.replace('body', 'start'),
+      [RUN_AT]: `document_${scr[RUN_AT]}`.replace('body', 'start'),
       frameId,
     }).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { frameId })));
   }
@@ -523,7 +523,7 @@ function registerScriptDataFF(inject, url) {
       code: `${resolveDataCodeStr}(this,${JSON.stringify(inject)})`,
     }],
     matches: url.split('#', 1),
-    runAt: 'document_start',
+    [RUN_AT]: 'document_start',
   });
 }
 

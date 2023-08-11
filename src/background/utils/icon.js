@@ -21,16 +21,11 @@ addPublicCommands({
   SetBadge: setBadge,
 });
 
-let isApplied;
-/** @type {VMBadgeMode} */
-let showBadge;
-let badgeColor;
-let badgeColorBlocked;
 /** We don't set 19px because FF and Vivaldi scale it down to 16px instead of our own crisp 16px */
 const SIZES = [16, 32];
 /** Caching own icon to improve dashboard loading speed, as well as browserAction API
  * (e.g. Chrome wastes 40ms in our extension's process to read 4 icons for every tab). */
-const iconCache = createNullObj();
+const iconCache = {};
 // Firefox Android does not support such APIs, use noop
 const browserAction = (() => {
   // Using `chrome` namespace in order to skip our browser.js polyfill in Chrome
@@ -54,9 +49,8 @@ const browserAction = (() => {
 // Promisifying explicitly because this API returns an id in Firefox and not a Promise
 const contextMenus = chrome.contextMenus;
 
-export const badges = createNullObj();
+export const badges = {};
 export const BROWSER_ACTION = 'browser_action';
-const KEY_IS_APPLIED = 'isApplied';
 const KEY_SHOW_BADGE = 'showBadge';
 const KEY_BADGE_COLOR = 'badgeColor';
 const KEY_BADGE_COLOR_BLOCKED = 'badgeColorBlocked';
@@ -66,19 +60,16 @@ const iconDefault = extensionManifest[BROWSER_ACTION].default_icon[16].match(/\d
 const titleDisabled = i18n('menuScriptDisabled');
 const titleNoninjectable = i18n('failureReasonNoninjectable');
 const titleSkipped = i18n('skipScriptsMsg');
-const getFailureReason = (url, data) => !INJECTABLE_URL_RE.test(url) ? titleNoninjectable
-  : testBlacklist(url) ? titleBlacklisted
-    : !isApplied ? titleDisabled
-      : data && (
-        data[INJECT] === SKIP_SCRIPTS
-          ? titleSkipped
-          : titleDefault
-      );
+let isApplied;
+/** @type {VMBadgeMode} */
+let showBadge;
+let badgeColor;
+let badgeColorBlocked;
 
 hookOptions((changes) => {
   let v;
   const jobs = [];
-  if ((v = changes[KEY_IS_APPLIED]) != null) {
+  if ((v = changes[IS_APPLIED]) != null) {
     isApplied = v;
     setIcon(); // change the default icon
     jobs.push(setIcon); // change the current tabs' icons
@@ -101,7 +92,7 @@ hookOptions((changes) => {
 });
 
 postInitialize.push(async () => {
-  isApplied = getOption(KEY_IS_APPLIED);
+  isApplied = getOption(IS_APPLIED);
   showBadge = getOption(KEY_SHOW_BADGE);
   badgeColor = getOption(KEY_BADGE_COLOR);
   badgeColorBlocked = getOption(KEY_BADGE_COLOR_BLOCKED);
@@ -142,7 +133,7 @@ contextMenus?.onClicked.addListener(({ menuItemId: id }, tab) => {
 tabsOnRemoved.addListener(id => delete badges[id]);
 tabsOnUpdated.addListener((tabId, { url }, tab) => {
   if (url) {
-    const title = getFailureReason(url);
+    const [title] = getFailureReason(url);
     if (title) updateState(tab, resetBadgeData(tabId), title);
   }
 }, ...IS_FIREFOX >= 61 ? [{ properties: ['status'] }] : []);
@@ -152,7 +143,7 @@ function resetBadgeData(tabId, isInjected) {
   const data = nest(badges, tabId);
   data.icon = iconDefault;
   data.idMap = new Set();
-  data.totalMap = createNullObj();
+  data.totalMap = {};
   data.total = 0;
   data.unique = 0;
   data[INJECT] = isInjected;
@@ -204,8 +195,7 @@ function updateBadgeColor({ id: tabId }, data = badges[tabId]) {
 function updateState(tab, data, title) {
   const tabId = tab.id;
   if (!data) data = badges[tabId] || resetBadgeData(tabId);
-  if (!title) title = getFailureReason(getTabUrl(tab), data);
-  // data[BLACKLIST] = title === titleBlacklisted;
+  if (!title) [title] = getFailureReason(getTabUrl(tab), data);
   browserAction.setTitle({ tabId, title });
   setIcon(tab, data);
   updateBadge(tab, data);
@@ -231,6 +221,17 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
     path: pathData,
     imageData: iconData,
   });
+}
+
+/** Omitting `data` = check whether injection is allowed for `url` */
+export function getFailureReason(url, data) {
+  return !INJECTABLE_URL_RE.test(url) ? [titleNoninjectable, INJECT_INTO]
+    : ((url = testBlacklist(url))) ? [titleBlacklisted, 'blacklisted', url]
+      : !isApplied ? [titleDisabled, IS_APPLIED]
+        : !data ? []
+          : data[INJECT] === SKIP_SCRIPTS
+            ? [titleSkipped, SKIP_SCRIPTS]
+            : [titleDefault];
 }
 
 function getOwnIcon(path) {

@@ -8,9 +8,6 @@ export const store = reactive({
   domain: '',
   injectionFailure: null,
   injectable: true,
-  blacklisted: false,
-  skipped: false,
-  tab: null,
 });
 
 export const mutex = {

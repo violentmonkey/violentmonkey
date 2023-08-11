@@ -7,7 +7,7 @@
     @mouseenter.capture="delegateMouseEnter"
     @mouseleave.capture="delegateMouseLeave"
     @focus.capture="updateMessage"
-    :class="failureReason[0]">
+    :class="store.failure">
     <div class="flex menu-buttons">
       <div class="logo">
         <img src="/public/images/icon128.png">
@@ -49,13 +49,13 @@
         </template>
       </div>
     </div>
-    <div class="failure-reason" v-if="failureReason[1]">
+    <div class="failure-reason" v-if="store.failure">
       <tooltip v-if="injectionScopes[0] && !options.isApplied"
             :content="i18n('labelAutoReloadCurrentTabDisabled')"
             class="reload-hint" align="start" placement="bottom">
         <icon name="info"/>
       </tooltip>
-      <span v-text="failureReason[1]"/>
+      <span v-text="store.failureText"/>
       <code v-text="store.blacklisted" v-if="store.blacklisted" class="ellipsis inline-block"/>
     </div>
     <div
@@ -195,7 +195,7 @@ import Tooltip from 'vueleton/lib/tooltip';
 import options from '@/common/options';
 import {
   getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl,
-  i18n, makePause, sendCmdDirectly, sendTabCmd, trueJoin,
+  i18n, makePause, sendCmdDirectly, sendTabCmd,
 } from '@/common';
 import { objectPick } from '@/common/object';
 import { focusMe } from '@/common/ui';
@@ -208,12 +208,12 @@ const NAME = `${extensionManifest.name} ${process.env.VM_VER}`;
 const SCRIPT_CLS = '.script';
 const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
 const optionsData = reactive({
-  isApplied: options.get('isApplied'),
+  isApplied: options.get(IS_APPLIED),
   filtersPopup: options.get('filtersPopup') || {},
 });
 options.hook((changes) => {
-  if ('isApplied' in changes) {
-    optionsData.isApplied = changes.isApplied;
+  if (IS_APPLIED in changes) {
+    optionsData[IS_APPLIED] = changes[IS_APPLIED];
   }
   if ('filtersPopup' in changes) {
     optionsData.filtersPopup = {
@@ -314,23 +314,6 @@ export default {
         };
       }).filter(Boolean);
     },
-    failureReason() {
-      // TODO: reuse getFailureReason for the text
-      let text = '';
-      return [
-        [ // classes are combined, text is overridden (the last one wins)
-          store.skipped
-            && (text = i18n('skipScriptsMsg'), 'scripts-skipped'),
-          optionsData.isApplied === false // undefined = the data isn't ready yet
-            && (text = i18n('menuScriptDisabled'), 'scripts-disabled'),
-          store.blacklisted
-            && (text = i18n('failureReasonBlacklisted'), 'blacklisted'),
-          !store.injectable
-            && (text = i18n('failureReasonNoninjectable'), 'noninjectable'),
-        ]::trueJoin(' '),
-        text,
-      ];
-    },
     findUrls() {
       const query = encodeURIComponent(store.domain);
       return {
@@ -370,7 +353,7 @@ export default {
       store.skipped = true;
     },
     onToggle() {
-      options.set('isApplied', optionsData.isApplied = !optionsData.isApplied);
+      options.set(IS_APPLIED, optionsData[IS_APPLIED] = !optionsData[IS_APPLIED]);
       this.checkReload();
       this.updateMessage();
     },

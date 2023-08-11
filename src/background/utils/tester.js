@@ -4,13 +4,8 @@ import { BLACKLIST, BLACKLIST_ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
 import { getPublicSuffix } from 'tldjs/tld';
 import { postInitialize } from './init';
-import { addOwnCommands } from './message';
 import { getOption, hookOptions } from './options';
 import storage from './storage';
-
-addOwnCommands({
-  TestBlacklist: testBlacklist,
-});
 
 const matchAlways = { test: () => 1 };
 /**

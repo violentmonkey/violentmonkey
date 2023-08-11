@@ -63,6 +63,7 @@ initPending = storage.base.getOne(STORAGE_KEY).then(data => {
   initPending = null;
 });
 preInitialize.push(initPending);
+// TODO: call hooks.fire in postInitialize (DANGER! check usages of hookOptions+getOption)
 
 /**
  * @param {!string} key - must be "a.b.c" to allow clients easily set inside existing object trees
