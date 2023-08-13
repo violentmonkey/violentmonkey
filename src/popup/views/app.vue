@@ -1,9 +1,9 @@
 <template>
   <div
     class="page-popup flex flex-col"
-    @click="activeExtras && toggleExtras(null)"
+    @click="extras && toggleExtras(null)"
     @click.capture="onOpenUrl"
-    @contextmenu="activeExtras && (toggleExtras(null), $event.preventDefault())"
+    @contextmenu="extras && (toggleExtras(null), $event.preventDefault())"
     @mouseenter.capture="delegateMouseEnter"
     @mouseleave.capture="delegateMouseLeave"
     @focus.capture="updateMessage"
@@ -15,11 +15,8 @@
       <div class="flex-1 ext-name" v-text="name" />
       <span
         class="menu-area"
-        :data-message="options.isApplied
-          ? i18n('menuScriptEnabled') + '\n' + i18n('skipScriptsHint')
-          : i18n('menuScriptDisabled')"
+        :data-message="options.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
         :tabIndex="tabIndex"
-        @contextmenu.prevent="onSkipTab"
         @click="onToggle">
         <icon :name="getSymbolCheck(options.isApplied)"></icon>
       </span>
@@ -36,6 +33,15 @@
         :tabIndex="tabIndex"
         @click="onCreateScript">
         <icon name="plus"></icon>
+      </span>
+      <span
+        class="menu-area"
+        :tabIndex="tabIndex"
+        @click="topExtras = !topExtras && $event.target">
+        <icon name="more" />
+        <div class="extras-menu" v-show="topExtras">
+          <div v-text="i18n('skipScriptsCmd')" @click="onSkipTab" tabindex="0"/>
+        </div>
       </span>
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
@@ -63,7 +69,7 @@
       class="menu menu-scripts flex flex-col"
       :class="{
         expand: activeMenu === scope.name,
-        'block-scroll': activeExtras,
+        'block-scroll': extras,
       }"
       :data-type="scope.name"
       :key="scope.name">
@@ -83,7 +89,7 @@
             failed: item.data.failed,
             removed: item.data.config.removed,
             runs: item.data.runs,
-            'extras-shown': activeExtras === item,
+            'extras-shown': extras === item,
             'excludes-shown': item.excludes,
           }"
           class="script">
@@ -173,15 +179,15 @@
     <div class="message" v-show="message">
       <div v-text="message"></div>
     </div>
-    <div v-if="activeExtras" class="extras-menu" ref="extrasMenu">
+    <div v-if="extras" class="extras-menu" ref="extrasMenu">
       <a v-for="[url, text] in activeLinks"
          :key="url" :href="url" :data-message="url" tabindex="0" v-text="text"
          rel="noopener noreferrer" target="_blank"/>
       <div v-text="i18n('menuExclude')" tabindex="0" @click="onExclude"/>
-      <div v-text="activeExtras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
+      <div v-text="extras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
            tabindex="0"
            @click="onRemoveScript"/>
-      <div v-if="!activeExtras.data.config.removed && canUpdate(activeExtras.data)"
+      <div v-if="!extras.data.config.removed && canUpdate(extras.data)"
            v-text="i18n('buttonUpdate')"
            tabindex="0"
            @click="onUpdateScript"/>
@@ -201,7 +207,7 @@ import { objectPick } from '@/common/object';
 import { focusMe } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
-import { mutex, resetStoredScripts, store } from '../utils';
+import { store } from '../utils';
 
 let mousedownElement;
 const NAME = `${extensionManifest.name} ${process.env.VM_VER}`;
@@ -246,16 +252,17 @@ export default {
       home: extensionManifest.homepage_url.split('/')[2],
       options: optionsData,
       activeMenu: 'scripts',
-      activeExtras: null,
+      extras: null,
       focusBug: false,
-      message: null,
       focusedItem: null,
+      message: null,
       name: NAME,
+      topExtras: false,
     };
   },
   computed: {
     activeLinks() {
-      const script = this.activeExtras.data;
+      const script = this.extras.data;
       const support = getScriptSupportUrl(script);
       const home = !support && getScriptHome(script); // not showing homepage if supportURL exists
       return [
@@ -322,7 +329,7 @@ export default {
       };
     },
     tabIndex() {
-      return this.activeExtras ? -1 : 0;
+      return (this.extras || this.topExtras) ? -1 : 0;
     },
   },
   methods: {
@@ -331,9 +338,9 @@ export default {
       this.activeMenu = this.activeMenu === name ? null : name;
     },
     toggleExtras(item, evt) {
-      this.activeExtras = this.activeExtras === item ? null : item;
-      keyboardService.setContext('activeExtras', this.activeExtras);
-      if (this.activeExtras) {
+      this.extras = this.extras === item ? null : item;
+      keyboardService.setContext('extras', this.extras);
+      if (this.extras) {
         item.el = evt.target.closest(SCRIPT_CLS);
         this.$nextTick(() => {
           const { extrasMenu } = this.$refs;
@@ -349,8 +356,6 @@ export default {
     },
     onSkipTab() {
       sendCmdDirectly(SKIP_SCRIPTS, store.tab);
-      resetStoredScripts();
-      store.skipped = true;
     },
     onToggle() {
       options.set(IS_APPLIED, optionsData[IS_APPLIED] = !optionsData[IS_APPLIED]);
@@ -397,8 +402,6 @@ export default {
     checkReload() {
       if (options.get('autoReload')) {
         browser.tabs.reload(store.tab.id);
-        resetStoredScripts();
-        mutex.init();
       }
     },
     async onCreateScript() {
@@ -412,13 +415,13 @@ export default {
       window.close();
     },
     onRemoveScript() {
-      const { config, props: { id } } = this.activeExtras.data;
+      const { config, props: { id } } = this.extras.data;
       const removed = +!config.removed;
       config.removed = removed;
       sendCmdDirectly('MarkRemoved', { id, removed });
     },
     async onUpdateScript() {
-      const item = this.activeExtras;
+      const item = this.extras;
       const chk = i18n('msgCheckingForUpdate');
       if (item.upd !== chk) {
         item.upd = chk;
@@ -428,7 +431,7 @@ export default {
       }
     },
     async onExclude() {
-      const item = this.activeExtras;
+      const item = this.extras;
       const { data } = item;
       const url = data.pageUrl;
       const { host, domain } = await sendCmdDirectly('GetTabDomain', url);
@@ -501,7 +504,7 @@ export default {
       this.message = document.activeElement?.dataset.message || '';
     },
     showButtons(item) {
-      return this.activeExtras?.id === item.id || this.focusedItem?.id === item.id || this.focusBug;
+      return this.extras?.id === item.id || this.focusedItem?.id === item.id || this.focusBug;
     },
   },
   mounted() {
@@ -511,7 +514,13 @@ export default {
     this.$el.style.maxHeight = Math.min(Math.max(600, innerHeight), screen.availHeight - window.screenY - 8) + 'px';
     this.disposeList = [
       keyboardService.register('escape', () => {
-        const item = this.activeExtras;
+        let item = this.topExtras;
+        if (item) {
+          item.focus();
+          this.topExtras = false;
+          return;
+        }
+        item = this.extras;
         if (item) {
           this.toggleExtras(null);
           this.focus(item);

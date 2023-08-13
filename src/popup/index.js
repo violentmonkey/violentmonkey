@@ -6,20 +6,27 @@ import { mapEntry } from '@/common/object';
 import { render } from '@/common/ui';
 import '@/common/ui/style';
 import App from './views/app';
-import { mutex, store } from './utils';
+import { emptyStore, store } from './utils';
 
-mutex.init();
+let mutex, mutexResolve, port;
 
+initMutex();
+initialize();
 render(App);
 
 Object.assign(handlers, {
+  SetBadge({ reset }, { frameId, tab }) {
+    // The tab got reloaded so SetBadge+reset comes right before SetPopup, see cmd-run.js
+    if (reset && !frameId && isMyTab(tab)) {
+      initialize();
+    }
+  },
   async SetPopup(data, { frameId, tab, url }) {
-    // No `tab` is a FF bug when it sends messages from removed iframes
-    if (!tab || store.tab && store.tab.id !== tab.id) return;
+    if (!isMyTab(tab)) return;
     /* SetPopup from a sub-frame may come first so we need to wait for the main page
      * because we only show the iframe menu for unique scripts that don't run in the main page */
     const isTop = frameId === 0;
-    if (!isTop) await mutex.ready;
+    if (!isTop) await mutex;
     else {
       store.commands = data.menus::mapEntry(Object.keys);
     }
@@ -58,7 +65,7 @@ Object.assign(handlers, {
         }
       });
     }
-    if (isTop) mutex.resolve(); // resolving at the end after all `await` above are settled
+    if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
   },
 });
 
@@ -68,26 +75,45 @@ if (!CSS.supports?.('list-style-type', 'disclosure-open')) {
   document.styleSheets[0].insertRule('.excludes-menu ::-webkit-details-marker {display:none}');
 }
 
-sendCmdDirectly('InitPopup').then(([cached, data, [failure, reason, reason2]]) => {
-  if (cached) {
-    for (const id in cached) handlers.SetPopup(...cached[id]);
-  }
+function initMutex(delay = 100) {
+  mutex = new Promise(resolve => {
+    mutexResolve = resolve;
+    // pages like Chrome Web Store may forbid injection in main page so we need a timeout
+    setTimeout(resolve, delay);
+  });
+}
+
+async function initialize() {
+  initMutex();
+  Object.assign(store, emptyStore());
+  let [cached, data, [failure, reason, reason2]] = await sendCmdDirectly('InitPopup');
   if (!reason) {
     // ignore
   } else if (reason === INJECT_INTO) {
     reason = 'noninjectable';
     data.injectable = false;
-    mutex.resolve();
+    mutexResolve();
   } else if (reason === SKIP_SCRIPTS) {
     reason = 'scripts-skipped';
-    data.skipped = true;
   } else if (reason === IS_APPLIED) {
     reason = 'scripts-disabled';
   } else { // blacklisted
     data[reason] = reason2;
   }
-  data.failure = reason;
-  data.failureText = failure;
-  Object.assign(store, data);
-  browser.runtime.connect({ name: `${data.tab.id}` });
-});
+  Object.assign(store, data, {
+    failure: reason,
+    failureText: failure,
+  });
+  if (cached) {
+    for (const id in cached) handlers.SetPopup(...cached[id]);
+  }
+  if (!port) {
+    port = browser.runtime.connect({ name: `${data.tab.id}` });
+    port.onMessage.addListener(initialize); // for non-injectable tab
+  }
+}
+
+function isMyTab(tab) {
+  // No `tab` is a FF bug when it sends messages from removed iframes
+  return tab && (!store.tab || store.tab.id === tab.id);
+}

@@ -6,7 +6,8 @@ import { postInitialize } from './init';
 import { addPublicCommands, commands } from './message';
 import { INJECT } from './preinject';
 
-export const popupTabs = {}; // { tabId: 1 }
+/** @type {{[tabId: string]: chrome.runtime.Port}} */
+export const popupTabs = {};
 const getCacheKey = tabId => 'SetPopup' + tabId;
 
 addPublicCommands({
@@ -50,7 +51,7 @@ async function isInjectable(tabId, badgeData) {
 function onPopupOpened(port) {
   const tabId = +port.name;
   if (!tabId) return;
-  popupTabs[tabId] = 1;
+  popupTabs[tabId] = port;
   notifyTab(tabId, true);
   port.onDisconnect.addListener(onPopupClosed);
 }

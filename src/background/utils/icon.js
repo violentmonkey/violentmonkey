@@ -4,6 +4,7 @@ import { nest, objectPick } from '@/common/object';
 import { postInitialize } from './init';
 import { addOwnCommands, addPublicCommands, forEachTab } from './message';
 import { getOption, hookOptions, setOption } from './options';
+import { popupTabs } from './popup-tracker';
 import { INJECT, reloadAndSkipScripts } from './preinject';
 import { getTabUrl, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
@@ -154,6 +155,8 @@ function resetBadgeData(tabId, isInjected) {
   data.total = 0;
   data.unique = 0;
   data[INJECT] = isInjected;
+  // Notify popup about non-injectable tab
+  if (!isInjected) popupTabs[tabId]?.postMessage(null);
   return data;
 }
 
@@ -163,10 +166,9 @@ function resetBadgeData(tabId, isInjected) {
  */
 function setBadge({ [IDS]: ids, reset }, { tab, frameId }) {
   const tabId = tab.id;
-  const data = (frameId || !reset) && badges[tabId] || resetBadgeData(tabId);
-  if (ids === SKIP_SCRIPTS) {
-    data[INJECT] = SKIP_SCRIPTS;
-  } else if (ids) {
+  const injectable = ids === SKIP_SCRIPTS ? SKIP_SCRIPTS : !!ids;
+  const data = (frameId || !reset) && badges[tabId] || resetBadgeData(tabId, injectable);
+  if (ids && ids !== SKIP_SCRIPTS) {
     const { idMap, totalMap } = data;
     // uniques
     ids.forEach(idMap.add, idMap);
@@ -175,8 +177,8 @@ function setBadge({ [IDS]: ids, reset }, { tab, frameId }) {
     let total = totalMap[frameId] = ids.length;
     for (const id in totalMap) if (id !== frameId) total += totalMap[id];
     data.total = total;
-    data[INJECT] = true;
   }
+  data[INJECT] = injectable;
   updateBadgeColor(tab, data);
   updateState(tab, data);
 }

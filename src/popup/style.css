@@ -112,7 +112,10 @@ footer {
   padding: $padding $padding $padding 0;
   background: var(--bg);
   > .menu-area {
-    padding: $padding;
+    padding: $padding calc($padding * .75);
+    &:last-child { /* vertical "..." */
+      margin: 0 calc($padding * -.25);
+    }
   }
   .icon {
     display: block;
