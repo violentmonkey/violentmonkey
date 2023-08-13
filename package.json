@@ -17,6 +17,7 @@
     "svgo": "plaid svgo",
     "test": "cross-env BABEL_ENV=test TEST=test jest test",
     "ci": "run-p lint test",
+    "generate-types": "node scripts/generate-types.js",
     "bumpVersion": "gulp bump",
     "bump": "run-s ci \"bumpVersion --commit\"",
     "preversion": "run-s ci \"bumpVersion --reset\""
