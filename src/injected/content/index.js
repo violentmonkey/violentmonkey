@@ -33,7 +33,7 @@ async function init() {
       : await dataPromise
   );
   assign(ids, data[IDS]);
-  bridge[INJECT_INTO] = data[INJECT_INTO];
+  bridge[INJECT_INTO] = data[INJECT_INTO] || '';
   if (data[EXPOSE] && !isXml && injectPageSandbox(data)) {
     addHandlers({ GetScriptVer: true });
     bridge.post('Expose');
