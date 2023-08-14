@@ -273,7 +273,7 @@ export default {
       message: null,
       name: NAME,
       needsReload: {},
-      topExtras: false,
+      topExtras: null,
     };
   },
   computed: {
@@ -546,7 +546,7 @@ export default {
         let item = this.topExtras;
         if (item) {
           item.focus();
-          this.topExtras = false;
+          this.topExtras = null;
           return;
         }
         item = this.extras;
