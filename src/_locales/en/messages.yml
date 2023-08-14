@@ -793,6 +793,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Update
+reloadTab:
+  description: Label of action to reload the tab
+  message: Reload tab
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Case sensitive
@@ -808,7 +811,7 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Settings
-skipScriptsCmd:
+skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
   message: Reload page without userscripts
 skipScriptsMsg:

@@ -6,6 +6,7 @@
     @mouseenter.capture="delegateMouseEnter"
     @mouseleave.capture="delegateMouseLeave"
     @focus.capture="updateMessage"
+    :data-is-applied="options.isApplied"
     :class="store.failure">
     <div class="flex menu-buttons">
       <div class="logo">
@@ -51,12 +52,7 @@
         </template>
       </div>
     </div>
-    <div class="failure-reason" v-if="store.failure">
-      <tooltip v-if="injectionScopes[0] && !options.isApplied"
-            :content="i18n('labelAutoReloadCurrentTabDisabled')"
-            class="reload-hint" align="start" placement="bottom">
-        <icon name="info"/>
-      </tooltip>
+    <div class="failure-reason" v-if="store.failureText">
       <span v-text="store.failureText"/>
       <code v-text="store.blacklisted" v-if="store.blacklisted" class="ellipsis inline-block"/>
     </div>
@@ -170,7 +166,8 @@
        v-if="store.tab?.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
     <footer>
-      <a target="_blank" :href="'https://' + home" :tabIndex="tabIndex" v-text="home" />
+      <a v-if="reloadHint" v-text="reloadHint" :tabIndex="tabIndex" @click="reloadTab" />
+      <a v-else target="_blank" :href="'https://' + home" :tabIndex="tabIndex" v-text="home" />
     </footer>
     <div class="message" v-show="message">
       <div v-text="message"></div>
@@ -180,7 +177,7 @@
       <div v-text="i18n('updateListedCmd', `${Object.keys(store.updatableScripts).length}`)"
            @click="onUpdateListed" tabindex="0"
            v-if="store.updatableScripts"/>
-      <div v-text="i18n('skipScriptsCmd')" @click="onSkipTab" tabindex="0"/>
+      <div v-text="i18n('skipScripts')" @click="onSkipTab" tabindex="0"/>
     </div>
     <div v-if="extras" ref="extras" class="extras-menu">
       <a v-for="[url, text] in activeLinks"
@@ -200,7 +197,6 @@
 
 <script>
 import { reactive } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
 import options from '@/common/options';
 import {
   getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl,
@@ -257,10 +253,13 @@ function compareBy(...keys) {
   };
 }
 
+function reloadTab() {
+  return browser.tabs.reload(store.tab.id);
+}
+
 export default {
   components: {
     Icon,
-    Tooltip,
   },
   data() {
     return {
@@ -273,6 +272,7 @@ export default {
       focusedItem: null,
       message: null,
       name: NAME,
+      needsReload: {},
       topExtras: false,
     };
   },
@@ -313,13 +313,14 @@ export default {
         list = list.map(script => {
           const scriptName = getScriptName(script);
           const { id } = script.props;
-          const upd = !script.config.removed && getScriptUpdateUrl(script, false, enabledOnly);
+          const { enabled, removed } = script.config;
+          const upd = !removed && getScriptUpdateUrl(script, false, enabledOnly);
           const item = {
             id,
             name: scriptName,
             data: script,
             key: `${
-                enabledFirst && +!script.config.enabled
+                enabledFirst && +!enabled
             }${
                 sort === 'alpha'
                     ? scriptName.toLowerCase()
@@ -352,6 +353,13 @@ export default {
         [`${i18n('menuFindScripts')} (GF)`]: `https://greasyfork.org/scripts/by-site/${query}`,
         OUJS: `https://openuserjs.org/?q=${query}`,
       };
+    },
+    reloadHint() {
+      return (
+        store.failure === 'scripts-skipped' ||
+        IS_APPLIED in store && store[IS_APPLIED] !== optionsData[IS_APPLIED] ||
+        Object.values(this.needsReload).some(Boolean)
+      ) && i18n('reloadTab');
     },
     tabIndex() {
       return this.extras ? -1 : 0;
@@ -413,20 +421,22 @@ export default {
     onToggleScript(item) {
       const { data } = item;
       const enabled = !data.config.enabled;
+      const { id } = data.props;
       sendCmdDirectly('UpdateScriptInfo', {
-        id: data.props.id,
+        id,
         config: { enabled },
       })
       .then(() => {
         data.config.enabled = enabled;
-        this.checkReload();
+        if (!this.checkReload()) this.needsReload[id] = enabled !== data.runs;
       });
     },
     checkReload() {
       if (options.get('autoReload')) {
-        browser.tabs.reload(store.tab.id);
+        return reloadTab();
       }
     },
+    reloadTab,
     async onCreateScript() {
       sendCmdDirectly('OpenEditor').then(close);
     },

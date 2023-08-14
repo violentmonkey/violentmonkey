@@ -55,6 +55,10 @@ footer {
   text-align: center;
   font-size: $fontSize;
   color: var(--fill-6);
+  a:not([href]) {
+    color: var(--fg);
+    font-weight: bold;
+  }
 }
 
 .logo {
@@ -62,7 +66,7 @@ footer {
   margin: 0 $logoMLR;
   img {
     width: $logoSize;
-    .scripts-disabled & {
+    [data-is-applied="false"] & {
       opacity: .5;
     }
   }
@@ -89,7 +93,7 @@ footer {
   }
 }
 
-.scripts-disabled .ext-name {
+[data-is-applied="false"] .ext-name {
   color: var(--fill-8);
 }
 
@@ -287,15 +291,6 @@ footer {
   }
   code {
     max-width: 100%;
-  }
-}
-
-.reload-hint {
-  .icon {
-    position: absolute;
-    left: $findIconML;
-    width: $findIconSize;
-    height: $findIconSize;
   }
 }
 

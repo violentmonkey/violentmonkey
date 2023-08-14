@@ -10,7 +10,6 @@ import { emptyStore, store } from './utils';
 
 let mutex, mutexResolve, port;
 
-initMutex();
 initialize();
 render(App);
 
@@ -29,6 +28,7 @@ Object.assign(handlers, {
     if (!isTop) await mutex;
     else {
       store.commands = data.menus::mapEntry(Object.keys);
+      store[IS_APPLIED] = data[INJECT_INTO] !== 'off'; // isApplied at the time of GetInjected
     }
     const idMapAllFrames = store.idMap;
     const idMapMain = idMapAllFrames[0] || (idMapAllFrames[0] = {});
@@ -88,7 +88,7 @@ async function initialize() {
   Object.assign(store, emptyStore());
   let [cached, data, [failure, reason, reason2]] = await sendCmdDirectly('InitPopup');
   if (!reason) {
-    // ignore
+    failure = '';
   } else if (reason === INJECT_INTO) {
     reason = 'noninjectable';
     data.injectable = false;

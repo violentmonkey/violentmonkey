@@ -118,7 +118,7 @@ postInitialize.push(async () => {
       ))
     ).then(ignoreChromeErrors);
     const badgeChild = { parentId: KEY_SHOW_BADGE, type: 'radio' };
-    await addToIcon(SKIP_SCRIPTS, i18n('skipScriptsCmd'));
+    await addToIcon(SKIP_SCRIPTS, i18n('skipScripts'));
     for (const args of [
       [KEY_SHOW_BADGE, i18n('labelBadge')],
       [`${KEY_SHOW_BADGE}:`, i18n('labelBadgeNone'), badgeChild],

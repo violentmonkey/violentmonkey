@@ -159,7 +159,9 @@ addPublicCommands({
     if (popupTabs[tabId]) {
       setTimeout(sendTabCmd, 0, tabId, 'PopupShown', popupTabs[tabId], { frameId });
     }
-    return !done && inject;
+    return isApplied
+      ? !done && inject
+      : { [INJECT_INTO]: 'off', ...inject };
   },
   async InjectionFeedback({
     [FORCE_CONTENT]: forceContent,

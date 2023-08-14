@@ -49,7 +49,7 @@ commands:
   newScript:
     description: __MSG_menuNewScript__
   SkipScripts:
-    description: __MSG_skipScriptsCmd__
+    description: __MSG_skipScripts__
 
 minimum_chrome_version: '57.0'
 
