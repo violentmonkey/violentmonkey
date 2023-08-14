@@ -100,13 +100,13 @@
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
             <div class="script-name flex-auto ellipsis"
-                 :data-upd="item.upd"
                  @click.ctrl.exact.stop="onEditScript(item)"
                  @contextmenu.exact.stop.prevent="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)">
               <sup class="syntax" v-if="item.data.syntax" v-text="i18n('msgSyntaxError')"/>
               {{item.name}}
             </div>
+            <div class="upd ellipsis" :title="item.upd" :data-error="item.updError"/>
           </div>
           <div class="submenu-buttons"
                v-show="showButtons(item)">
@@ -177,6 +177,9 @@
     </div>
     <div v-show="topExtras" ref="topExtras" class="extras-menu">
       <div v-text="i18n('labelSettings')" @click="onManage('#settings')" tabindex="0"/>
+      <div v-text="i18n('updateListedCmd', `${Object.keys(store.updatableScripts).length}`)"
+           @click="onUpdateListed" tabindex="0"
+           v-if="store.updatableScripts"/>
       <div v-text="i18n('skipScriptsCmd')" @click="onSkipTab" tabindex="0"/>
     </div>
     <div v-if="extras" ref="extras" class="extras-menu">
@@ -187,7 +190,7 @@
       <div v-text="extras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
            tabindex="0"
            @click="onRemoveScript"/>
-      <div v-if="!extras.data.config.removed && canUpdate(extras.data)"
+      <div v-if="'upd' in extras"
            v-text="i18n('buttonUpdate')"
            tabindex="0"
            @click="onUpdateScript"/>
@@ -203,6 +206,7 @@ import {
   getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl,
   i18n, makePause, sendCmdDirectly, sendTabCmd,
 } from '@/common';
+import handlers from '@/common/handlers';
 import { objectPick } from '@/common/object';
 import { focusMe } from '@/common/ui';
 import Icon from '@/common/ui/icon';
@@ -213,20 +217,32 @@ let mousedownElement;
 const NAME = `${extensionManifest.name} ${process.env.VM_VER}`;
 const SCRIPT_CLS = '.script';
 const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
+const kFiltersPopup = 'filtersPopup';
+const kUpdateEnabledScriptsOnly = 'updateEnabledScriptsOnly';
 const optionsData = reactive({
-  isApplied: options.get(IS_APPLIED),
-  filtersPopup: options.get('filtersPopup') || {},
+  [IS_APPLIED]: true,
+  [kFiltersPopup]: {},
+  [kUpdateEnabledScriptsOnly]: true,
 });
 options.hook((changes) => {
-  if (IS_APPLIED in changes) {
-    optionsData[IS_APPLIED] = changes[IS_APPLIED];
+  for (const key in optionsData) {
+    const v = changes[key];
+    if (v != null) {
+      optionsData[key] = v && isObject(v)
+          ? { ...optionsData[key], ...v }
+          : v;
+    }
   }
-  if ('filtersPopup' in changes) {
-    optionsData.filtersPopup = {
-      ...optionsData.filtersPopup,
-      ...changes.filtersPopup,
-    };
-  }
+});
+Object.assign(handlers, {
+  async UpdateScript({ update: { error, message }, where: { id } } = {}) {
+    // TODO: update `item` in injectableScopes for any changed script?
+    const item = store.updatableScripts[id];
+    if (item) {
+      item.upd = error || message;
+      item.updError = error;
+    }
+  },
 });
 
 function compareBy(...keys) {
@@ -271,9 +287,11 @@ export default {
       ].filter(Boolean);
     },
     injectionScopes() {
-      const { sort, enabledFirst, groupRunAt, hideDisabled } = this.options.filtersPopup;
+      const { sort, enabledFirst, groupRunAt, hideDisabled } = this.options[kFiltersPopup];
       const { injectable } = store;
       const groupDisabled = hideDisabled === 'group';
+      const enabledOnly = optionsData[kUpdateEnabledScriptsOnly];
+      let updatableScripts;
       return [
         injectable && ['scripts', i18n('menuMatchedScripts'), groupDisabled || null],
         injectable && groupDisabled && ['disabled', i18n('menuMatchedDisabledScripts'), false],
@@ -294,22 +312,29 @@ export default {
         }
         list = list.map(script => {
           const scriptName = getScriptName(script);
-          return {
-            id: script.props.id,
+          const { id } = script.props;
+          const upd = !script.config.removed && getScriptUpdateUrl(script, false, enabledOnly);
+          const item = {
+            id,
             name: scriptName,
             data: script,
             key: `${
-              enabledFirst && +!script.config.enabled
+                enabledFirst && +!script.config.enabled
             }${
-              sort === 'alpha'
-                ? scriptName.toLowerCase()
-                : groupRunAt && RUN_AT_ORDER.indexOf(getScriptRunAt(script))
+                sort === 'alpha'
+                    ? scriptName.toLowerCase()
+                    : groupRunAt && RUN_AT_ORDER.indexOf(getScriptRunAt(script))
             }${
-              1e6 + script.props.position
+                1e6 + script.props.position
             }`,
             excludes: null,
-            upd: null,
           };
+          if (upd) {
+            if (!updatableScripts) updatableScripts = store.updatableScripts = {};
+            updatableScripts[id] = item;
+            item[upd] = null;
+          }
+          return item;
         }).sort((a, b) => (a.key < b.key ? -1 : a.key > b.key));
         return numTotal && {
           name,
@@ -333,7 +358,6 @@ export default {
     },
   },
   methods: {
-    canUpdate: getScriptUpdateUrl,
     toggleMenu(name) {
       this.activeMenu = this.activeMenu === name ? null : name;
     },
@@ -419,15 +443,11 @@ export default {
       config.removed = removed;
       sendCmdDirectly('MarkRemoved', { id, removed });
     },
-    async onUpdateScript() {
-      const item = this.extras;
-      const chk = i18n('msgCheckingForUpdate');
-      if (item.upd !== chk) {
-        item.upd = chk;
-        item.upd = await sendCmdDirectly('CheckUpdate', item.data.props.id)
-          ? i18n('msgUpdated')
-          : i18n('msgNoUpdate');
-      }
+    onUpdateScript() {
+      sendCmdDirectly('CheckUpdate', this.extras.data.props.id);
+    },
+    onUpdateListed() {
+      sendCmdDirectly('CheckUpdate', Object.keys(store.updatableScripts).map(Number));
     },
     async onExclude() {
       const item = this.extras;

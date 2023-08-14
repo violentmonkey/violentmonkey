@@ -827,6 +827,9 @@ titleSearchHint:
   message: |-
     * <Enter> key adds the text to autocomplete history
     * RegExp syntax is supported: /re/ and /re/flags
+updateListedCmd:
+  description: Command to update scripts e.g. in the extension popup, number of scripts in parentheses.
+  message: Update scripts ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: Key (string)

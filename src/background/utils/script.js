@@ -1,5 +1,5 @@
 import {
-  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, getUniqId,
+  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl,
 } from '@/common';
 import {
   HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, USERSCRIPT_META_INTRO,

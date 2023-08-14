@@ -81,10 +81,10 @@ footer {
   }
   .script:not(.disabled):not(.runs) & .script-name,
   .disabled:not(.runs) > & {
-    color: var(--fill-8);
+    opacity: .65;
     &:hover,
     &:focus {
-      color: var(--fill-2);
+      opacity: 1;
     }
   }
 }
@@ -132,6 +132,7 @@ footer {
   &-item {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     min-height: 2rem;
     padding-left: $itemPaddingX;
@@ -365,13 +366,19 @@ footer {
   user-select: none;
 }
 
-[data-upd]::after {
-  content: attr(data-upd);
-  position: absolute;
+.upd[title] {
+  width: 100%;
+  padding-left: $leftPaneWidth;
   font-size: 10px;
-  bottom: -4px;
+  margin-top: -4px;
   line-height: 1;
-  color: var(--fill-7);
+  color: goldenrod;
+  &[data-error] {
+    color: red;
+  }
+  &::after {
+    content: attr(title);
+  }
 }
 
 .syntax {
