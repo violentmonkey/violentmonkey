@@ -1,9 +1,8 @@
 <template>
   <div
     class="page-popup flex flex-col"
-    @click="extras && toggleExtras(null)"
+    @click="extras = topExtras = null"
     @click.capture="onOpenUrl"
-    @contextmenu="extras && (toggleExtras(null), $event.preventDefault())"
     @mouseenter.capture="delegateMouseEnter"
     @mouseleave.capture="delegateMouseLeave"
     @focus.capture="updateMessage"
@@ -24,7 +23,7 @@
         class="menu-area"
         :data-message="i18n('menuDashboard')"
         :tabIndex="tabIndex"
-        @click="onManage">
+        @click="onManage()">
         <icon name="cog"></icon>
       </span>
       <span
@@ -37,11 +36,8 @@
       <span
         class="menu-area"
         :tabIndex="tabIndex"
-        @click="topExtras = !topExtras && $event.target">
+        @click.stop="toggleExtras('topExtras', $event)">
         <icon name="more" />
-        <div class="extras-menu" v-show="topExtras">
-          <div v-text="i18n('skipScriptsCmd')" @click="onSkipTab" tabindex="0"/>
-        </div>
       </span>
     </div>
     <div class="menu" v-if="store.injectable" v-show="store.domain">
@@ -179,7 +175,11 @@
     <div class="message" v-show="message">
       <div v-text="message"></div>
     </div>
-    <div v-if="extras" class="extras-menu" ref="extrasMenu">
+    <div v-show="topExtras" ref="topExtras" class="extras-menu">
+      <div v-text="i18n('labelSettings')" @click="onManage('#settings')" tabindex="0"/>
+      <div v-text="i18n('skipScriptsCmd')" @click="onSkipTab" tabindex="0"/>
+    </div>
+    <div v-if="extras" ref="extras" class="extras-menu">
       <a v-for="[url, text] in activeLinks"
          :key="url" :href="url" :data-message="url" tabindex="0" v-text="text"
          rel="noopener noreferrer" target="_blank"/>
@@ -329,7 +329,7 @@ export default {
       };
     },
     tabIndex() {
-      return (this.extras || this.topExtras) ? -1 : 0;
+      return this.extras ? -1 : 0;
     },
   },
   methods: {
@@ -337,18 +337,17 @@ export default {
     toggleMenu(name) {
       this.activeMenu = this.activeMenu === name ? null : name;
     },
-    toggleExtras(item, evt) {
-      this.extras = this.extras === item ? null : item;
-      keyboardService.setContext('extras', this.extras);
-      if (this.extras) {
-        item.el = evt.target.closest(SCRIPT_CLS);
-        this.$nextTick(() => {
-          const { extrasMenu } = this.$refs;
-          extrasMenu.style.top = `${
-            Math.min(window.innerHeight - extrasMenu.getBoundingClientRect().height,
-              (evt.currentTarget || evt.target).getBoundingClientRect().top + 16)
-          }px`;
-        });
+    async toggleExtras(item, evt) {
+      const isCustom = typeof item === 'string';
+      const key = isCustom ? item : 'extras';
+      if ((this[key] = this[key] === item ? null : item)) {
+        if (!isCustom) item.el = evt.target.closest(SCRIPT_CLS);
+        await this.$nextTick();
+        const menu = this.$refs[key];
+        menu.style.top = `${
+          Math.min(window.innerHeight - menu.getBoundingClientRect().height,
+            evt.target.getBoundingClientRect().bottom)
+        }px`;
       }
     },
     getSymbolCheck(bool) {
@@ -362,8 +361,8 @@ export default {
       this.checkReload();
       this.updateMessage();
     },
-    onManage() {
-      sendCmdDirectly('OpenEditor', '').then(close);
+    onManage(hash) {
+      sendCmdDirectly('Dashboard', hash).then(close);
     },
     onOpenUrl(e) {
       const el = e.target.closest('a[href][target=_blank]');
@@ -522,7 +521,7 @@ export default {
         }
         item = this.extras;
         if (item) {
-          this.toggleExtras(null);
+          this.extras = this.topExtras = null;
           this.focus(item);
         } else if (document.activeElement?.value) {
           document.activeElement.blur();

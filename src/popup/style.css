@@ -301,6 +301,7 @@ footer {
 .extras-menu {
   position: fixed;
   right: 1rem;
+  max-width: 75vw;
   box-shadow: 1px 1px 10px #0008;
   z-index: 100;
   background: var(--bg);

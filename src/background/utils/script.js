@@ -7,19 +7,9 @@ import {
 import { mapEntry } from '@/common/object';
 import { addOwnCommands } from './message';
 import { getOption } from './options';
-import cache from './cache';
 
 addOwnCommands({
-  /** @return {string} */
-  CacheNewScript(data) {
-    const id = getUniqId();
-    cache.put(`new-${id}`, newScript(data));
-    return id;
-  },
-  /** @return {VMScript} */
-  NewScript(id) {
-    return id && cache.get(`new-${id}`) || newScript();
-  },
+  NewScript: newScript,
 });
 
 export function isUserScript(text) {
