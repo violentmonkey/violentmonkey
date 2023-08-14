@@ -233,7 +233,7 @@ options.hook((changes) => {
 Object.assign(handlers, {
   async UpdateScript({ update: { error, message }, where: { id } } = {}) {
     // TODO: update `item` in injectableScopes for any changed script?
-    const item = store.updatableScripts[id];
+    const item = store.updatableScripts?.[id];
     if (item) {
       item.upd = error || message;
       item.updError = error;

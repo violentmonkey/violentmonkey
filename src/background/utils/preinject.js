@@ -157,7 +157,7 @@ addPublicCommands({
       addValueOpener(scripts, tabId, frameId);
     }
     if (popupTabs[tabId]) {
-      setTimeout(sendTabCmd, 0, tabId, 'PopupShown', popupTabs[tabId], { frameId });
+      setTimeout(sendTabCmd, 0, tabId, 'PopupShown', true, { frameId });
     }
     return isApplied
       ? !done && inject
