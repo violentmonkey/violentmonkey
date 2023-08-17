@@ -34,3 +34,4 @@ export const KNOWN_INJECT_INTO = {
   [PAGE]: 1,
   [CONTENT]: 1,
 };
+export const NO_CACHE = { cache: 'no-cache' };

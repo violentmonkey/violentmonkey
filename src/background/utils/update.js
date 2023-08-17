@@ -1,7 +1,7 @@
 import {
   compareVersion, ensureArray, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
 } from '@/common';
-import { METABLOCK_RE } from '@/common/consts';
+import { METABLOCK_RE, NO_CACHE } from '@/common/consts';
 import limitConcurrency from '@/common/limit-concurrency';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
 import { parseMeta } from './script';
@@ -52,7 +52,7 @@ async function doCheckUpdate(script, urls) {
       update: { checking: false },
     });
     msgOk = i18n('msgScriptUpdated', [getScriptName(update)]);
-    resourceOpts = { cache: 'no-cache' };
+    resourceOpts = { ...NO_CACHE };
     res = true;
   } catch (update) {
     msgErr = update.error;
@@ -85,7 +85,7 @@ async function downloadUpdate(script, urls) {
   announce(i18n('msgCheckingForUpdate'));
   try {
     const { data } = await requestNewer(updateURL, {
-      cache: 'no-cache',
+      ...NO_CACHE,
       // Smart servers like OUJS send a subset of the metablock without code
       headers: { Accept: 'text/x-userscript-meta,*/*' },
     }) || {};
@@ -101,7 +101,7 @@ async function downloadUpdate(script, urls) {
     } else {
       announce(i18n('msgUpdating'));
       errorMessage = i18n('msgErrorFetchingScript');
-      return (await requestNewer(downloadURL, { cache: 'no-cache' })).data;
+      return (await requestNewer(downloadURL, NO_CACHE)).data;
     }
   } catch (error) {
     if (process.env.DEBUG) console.error(error);

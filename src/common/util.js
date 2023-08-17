@@ -1,6 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser } from '@/common/consts';
+import { browser, NO_CACHE } from '@/common/consts';
 
 export function i18n(name, args) {
   return browser.i18n.getMessage(name, args) || name;
@@ -303,9 +303,7 @@ export async function request(url, options = {}) {
   // TODO: toggle a webRequest/declarativeNetRequest rule to strip LINK headers
   const accept = (hostname === 'greasyfork.org' || hostname === 'sleazyfork.org')
     && 'application/javascript, text/plain, text/css';
-  const init = Object.assign({
-    cache: isRemote(url) ? undefined : 'no-cache',
-  }, options, {
+  const init = Object.assign({}, !isRemote(url) && NO_CACHE, options, {
     body: isBodyObj ? JSON.stringify(body) : body,
     headers: isBodyObj || accept || auth
       ? Object.assign({},
