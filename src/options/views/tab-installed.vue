@@ -351,10 +351,10 @@ function handleEditScript(id) {
   }
 }
 async function getNewScriptData(cacheId) {
-  const tab = await browser.tabs.get(+cacheId).catch(noop);
+  const tab = cacheId && await browser.tabs.get(+cacheId).catch(noop);
   const url = tab?.url.split(/[#?]/)[0];
   const { domain } = url && await sendCmdDirectly('GetTabDomain', url) || {};
-  return domain && sendCmdDirectly('NewScript', {
+  return sendCmdDirectly('NewScript', domain && {
     url,
     name: `${options.get('scriptTemplateEdited') ? '' : '- '}${domain}`,
   });
