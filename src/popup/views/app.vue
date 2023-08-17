@@ -37,7 +37,8 @@
       <span
         class="menu-area"
         :tabIndex="tabIndex"
-        @click.stop="toggleExtras('topExtras', $event)">
+        :_item.prop="{}"
+        @click="showExtras">
         <icon name="more" />
       </span>
     </div>
@@ -114,7 +115,8 @@
             <div
               class="submenu-button"
               :tabIndex="tabIndex"
-              @click.stop="toggleExtras(item, $event)">
+              :_item.prop="item"
+              @click="showExtras">
               <icon name="more"/>
             </div>
           </div>
@@ -177,7 +179,9 @@
       <div v-text="i18n('updateListedCmd', `${Object.keys(store.updatableScripts).length}`)"
            @click="onUpdateListed" tabindex="0"
            v-if="store.updatableScripts"/>
-      <div v-text="i18n('skipScripts')" @click="onSkipTab" tabindex="0"/>
+      <div v-text="i18n('skipScripts')" @click="onSkipTab" tabindex="0"
+           v-if="/^(https?|file):/.test(store.tab?.url) /* not reusing `injectable`
+           because iframes may run scripts even in non-injectable pages */"/>
     </div>
     <div v-if="extras" ref="extras" class="extras-menu">
       <a v-for="[url, text] in activeLinks"
@@ -369,17 +373,20 @@ export default {
     toggleMenu(name) {
       this.activeMenu = this.activeMenu === name ? null : name;
     },
-    async toggleExtras(item, evt) {
-      const isCustom = typeof item === 'string';
-      const key = isCustom ? item : 'extras';
-      if ((this[key] = this[key] === item ? null : item)) {
-        if (!isCustom) item.el = evt.target.closest(SCRIPT_CLS);
+    async showExtras(evt) {
+      const el = evt.currentTarget; // get element with @click, not the inner stuff like icon
+      const item = el._item;
+      const key = item.data ? 'extras' : 'topExtras';
+      if (!this[key]) {
+        evt.stopPropagation(); // prevent app's @click from resetting extras and topExtras
+        this[key] = item;
+        item.el = el.closest(SCRIPT_CLS) || el;
         await this.$nextTick();
         const menu = this.$refs[key];
-        menu.style.top = `${
-          Math.min(window.innerHeight - menu.getBoundingClientRect().height,
-            evt.target.getBoundingClientRect().bottom)
-        }px`;
+        const top = Math.min(
+          innerHeight - menu.getBoundingClientRect().height,
+          el.getBoundingClientRect().bottom);
+        menu.style.top = `${top}px`;
       }
     },
     getSymbolCheck(bool) {
@@ -518,7 +525,9 @@ export default {
       items[index]?.el.focus();
     },
     focus(item) {
-      item?.el?.querySelector('.menu-area')?.focus();
+      if (item && (item = item.el)) {
+        (item.querySelector('.menu-area') || item).focus();
+      }
     },
     delegateMouseEnter(e) {
       const { target } = e;
@@ -543,13 +552,7 @@ export default {
     this.$el.style.maxHeight = Math.min(Math.max(600, innerHeight), screen.availHeight - window.screenY - 8) + 'px';
     this.disposeList = [
       keyboardService.register('escape', () => {
-        let item = this.topExtras;
-        if (item) {
-          item.focus();
-          this.topExtras = null;
-          return;
-        }
-        item = this.extras;
+        const item = this.extras || this.topExtras;
         if (item) {
           this.extras = this.topExtras = null;
           this.focus(item);
