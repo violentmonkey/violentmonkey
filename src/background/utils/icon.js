@@ -174,9 +174,9 @@ function setBadge({ [IDS]: ids, reset }, { tab, frameId }) {
     ids.forEach(idMap.add, idMap);
     data.unique = idMap.size;
     // totals
-    let total = totalMap[frameId] = ids.length;
-    for (const id in totalMap) if (id !== frameId) total += totalMap[id];
-    data.total = total;
+    data.total = 0;
+    totalMap[frameId] = ids.length;
+    for (const id in totalMap) data.total += totalMap[id];
   }
   data[INJECT] = injectable;
   updateBadgeColor(tab, data);
