@@ -324,13 +324,13 @@ export default {
             name: scriptName,
             data: script,
             key: `${
-                enabledFirst && +!enabled
+              enabledFirst && +!enabled
             }${
-                sort === 'alpha'
-                    ? scriptName.toLowerCase()
-                    : groupRunAt && RUN_AT_ORDER.indexOf(getScriptRunAt(script))
+              sort === 'alpha'
+                ? scriptName.toLowerCase()
+                : groupRunAt && RUN_AT_ORDER.indexOf(getScriptRunAt(script))
             }${
-                1e6 + script.props.position
+              1e6 + script.props.position
             }`,
             excludes: null,
           };
