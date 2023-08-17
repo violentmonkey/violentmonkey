@@ -1,13 +1,12 @@
 import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
 import { onClipboardCopy } from './clipboard';
-import { sendSetPopup } from './gm-api-content';
 import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
 import { sendCmd } from './util';
 import { isEmpty } from '../util';
-import { Run } from './cmd-run';
+import { Run, sendSkipScripts, sendSetBadge } from './cmd-run';
 
 const { [IDS]: ids } = bridge;
 
@@ -33,23 +32,27 @@ async function init() {
       : await dataPromise
   );
   assign(ids, data[IDS]);
-  bridge[INJECT_INTO] = data[INJECT_INTO] || '';
+  if (IS_FIREFOX && !data.clipFF) {
+    off('copy', onClipboardCopy, true);
+  }
+  if ((bridge[INJECT_INTO] = data[INJECT_INTO]) === SKIP_SCRIPTS) {
+    sendSkipScripts();
+    return;
+  }
   if (data[EXPOSE] && !isXml && injectPageSandbox(data)) {
     addHandlers({ GetScriptVer: true });
     bridge.post('Expose');
-  }
-  if (IS_FIREFOX && !data.clipFF) {
-    off('copy', onClipboardCopy, true);
   }
   if (data[SCRIPTS]) {
     onScripts.forEach(fn => fn(data));
     await injectScripts(data, isXml);
   }
   onScripts.length = 0;
-  sendSetPopup();
+  sendSetBadge(AUTO);
 }
 
 addBackgroundHandlers({
+  [VIOLENTMONKEY]: () => true,
   Command: data => bridge.post('Command', data, ids[data.id]),
   Run: id => Run(id, CONTENT),
   UpdatedValues(data) {

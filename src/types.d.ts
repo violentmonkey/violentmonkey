@@ -213,7 +213,7 @@ declare interface VMInjection extends VMInjectionDisabled {
   /** content bridge adds the actually running ids and sends via SetPopup */
   ids: number[];
   info: VMInjection.Info;
-  injectInto: VMScriptInjectInto;
+  injectInto: VMScriptInjectInto | 'SkipScripts';
   /** cache key for envDelayed, which also tells content bridge to expect envDelayed */
   more: string;
   nonce?: string;

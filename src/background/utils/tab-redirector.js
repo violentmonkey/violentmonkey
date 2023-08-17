@@ -3,7 +3,7 @@ import ua from '@/common/ua';
 import cache from './cache';
 import { addPublicCommands, commands } from './message';
 import { parseMeta, isUserScript } from './script';
-import { getTabUrl } from './tabs';
+import { getTabUrl, tabsOnUpdated } from './tabs';
 
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 
@@ -77,10 +77,12 @@ async function maybeInstallUserJs(tabId, url) {
 }
 
 if (virtualUrlRe) {
-  const listener = (tabId, { url }) => url && maybeRedirectVirtualUrlFF(tabId, url);
-  const apiEvent = browser.tabs.onUpdated;
-  const addListener = apiEvent.addListener.bind(apiEvent, listener);
-  try { addListener({ properties: ['url'] }); } catch (e) { addListener(); }
+  tabsOnUpdated.addListener(
+    (tabId, { url }) => url && maybeRedirectVirtualUrlFF(tabId, url),
+    ...IS_FIREFOX >= 61
+      ? [{ properties: [IS_FIREFOX >= 88 ? 'url' : 'status'] }]
+      : []
+  );
 }
 
 browser.tabs.onCreated.addListener((tab) => {

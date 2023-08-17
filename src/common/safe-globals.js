@@ -20,6 +20,7 @@ export const SafeError = Error; // alias used by browser.js
 export const { apply: safeApply } = Reflect;
 export const hasOwnProperty = safeApply.call.bind(({}).hasOwnProperty);
 export const safeCall = Object.call.bind(Object.call);
+export const IS_APPLIED = 'isApplied';
 export const IS_FIREFOX = !chrome.app;
 export const ROUTE_SCRIPTS = '#' + SCRIPTS;
 export const extensionRoot = chrome.runtime.getURL('/');

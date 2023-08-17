@@ -6,6 +6,7 @@ import { getOption } from './options';
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
   || !!(window.AbortSignal && browser.windows); // and FF57+ except mobile
+const ROUTE_SCRIPTS_SLASH = ROUTE_SCRIPTS + '/';
 const NEWTAB_URL_RE = re`/
 ^(
   about:(home|newtab) # Firefox
@@ -23,34 +24,36 @@ const NEWTAB_URL_RE = re`/
 export const getTabUrl = tab => (
   tab.pendingUrl || tab.url || ''
 );
+export const tabsOnUpdated = browser.tabs.onUpdated;
+export const tabsOnRemoved = browser.tabs.onRemoved;
 let cookieStorePrefix;
 
 addOwnCommands({
   /**
-   * @param {string} [pathId] - path or id to add to #scripts route in dashboard,
-     if absent a new script will be created for active tab's URL
-     if '' the script list is opened, TODO: move to a new command for clarity?
-   * @returns {Promise<chrome.tabs.Tab>}
+   * @param {string} [pathId] - path or id: added to #scripts/ route in dashboard,
+   * falsy: creates a new script for active tab's URL
+   * @param {chrome.runtime.MessageSender} [src]
    */
   async OpenEditor(pathId, src) {
-    if (pathId == null) {
-      const { tab, domain } = await commands.GetTabDomain();
-      const id = domain && commands.CacheNewScript({
-        url: getTabUrl(tab).split(/[#?]/)[0],
-        name: `${getOption('scriptTemplateEdited') ? '' : '- '}${domain}`,
-      });
-      pathId = `_new${id ? `/${id}` : ''}`;
-    }
-    const url = extensionOptionsPage + (pathId ? `${ROUTE_SCRIPTS}/${pathId}` : '');
+    return commands.Dashboard(`${ROUTE_SCRIPTS_SLASH}${
+      pathId || `_new/${src?.tab.id || (await getActiveTab()).id}`
+    }`, src);
+  },
+  /**
+   * @param {string} [route]
+   * @param {chrome.runtime.MessageSender} [src]
+   */
+  async Dashboard(route, src) {
+    const url = extensionOptionsPage + (route || '');
     for (const tab of await browser.tabs.query({url: extensionOptionsPage})) {
       const tabUrl = tab.url;
       // query() can't handle #hash so it returns tabs both with #hash and without it
-      if (tabUrl === url || !pathId && tabUrl === url + ROUTE_SCRIPTS) {
+      if (tabUrl === url || !route && tabUrl === url + ROUTE_SCRIPTS) {
         browserWindows?.update(tab.windowId, { focused: true });
         return browser.tabs.update(tab.id, { active: true });
       }
     }
-    return commands.TabOpen({ url, maybeInWindow: !!pathId }, src);
+    return commands.TabOpen({ url }, src);
   },
 });
 
@@ -61,7 +64,6 @@ addPublicCommands({
     active = true,
     container,
     insert = true,
-    maybeInWindow = false,
     pinned,
   }, src = {}) {
     // src.tab may be absent when invoked from popup (e.g. edit/create buttons)
@@ -97,7 +99,8 @@ addPublicCommands({
         ? browser.runtime.getURL(url)
         : getFullUrl(url, srcUrl);
     }
-    if (maybeInWindow
+    if (isInternal
+        && url.startsWith(extensionOptionsPage + ROUTE_SCRIPTS_SLASH)
         && browserWindows
         && getOption('editorWindow')
         /* cookieStoreId in windows.create() is supported since FF64 https://bugzil.la/1393570
@@ -150,7 +153,7 @@ addPublicCommands({
   },
 });
 
-browser.tabs.onRemoved.addListener((id) => {
+tabsOnRemoved.addListener((id) => {
   const openerId = openers[id];
   if (openerId >= 0) {
     sendTabCmd(openerId, 'TabClosed', id);

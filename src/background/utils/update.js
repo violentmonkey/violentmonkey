@@ -1,5 +1,5 @@
 import {
-  compareVersion, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
+  compareVersion, ensureArray, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
 } from '@/common';
 import { METABLOCK_RE } from '@/common/consts';
 import limitConcurrency from '@/common/limit-concurrency';
@@ -14,16 +14,16 @@ const doCheckUpdateLimited = limitConcurrency(doCheckUpdate, 2, 250);
 
 addOwnCommands({
   /**
-   * @param {number} [id] - when omitted, all scripts are checked
+   * @param {number | number[]} [id] - when omitted, all scripts are checked
    * @return {Promise<number>} number of updated scripts
    */
   async CheckUpdate(id) {
-    const scripts = id ? [getScriptById(id)] : getScripts();
+    const scripts = id ? ensureArray(id).map(getScriptById) : getScripts();
+    const enabledOnly = !id && getOption('updateEnabledScriptsOnly');
     const jobs = scripts.map(script => {
       const curId = script.props.id;
-      const urls = getScriptUpdateUrl(script, true);
-      return urls && (id || script.config.enabled || !getOption('updateEnabledScriptsOnly'))
-        && (processes[curId] || (processes[curId] = doCheckUpdateLimited(script, urls)));
+      const urls = getScriptUpdateUrl(script, true, enabledOnly);
+      return urls && (processes[curId] || (processes[curId] = doCheckUpdateLimited(script, urls)));
     }).filter(Boolean);
     const results = await Promise.all(jobs);
     const notes = results.filter(r => r?.text);

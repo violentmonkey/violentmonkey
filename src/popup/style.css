@@ -55,6 +55,10 @@ footer {
   text-align: center;
   font-size: $fontSize;
   color: var(--fill-6);
+  a:not([href]) {
+    color: var(--fg);
+    font-weight: bold;
+  }
 }
 
 .logo {
@@ -62,9 +66,9 @@ footer {
   margin: 0 $logoMLR;
   img {
     width: $logoSize;
-  }
-  &.disabled > img {
-    opacity: .5;
+    [data-is-applied="false"] & {
+      opacity: .5;
+    }
   }
 }
 
@@ -81,18 +85,16 @@ footer {
   }
   .script:not(.disabled):not(.runs) & .script-name,
   .disabled:not(.runs) > & {
-    color: var(--fill-8);
+    opacity: .65;
     &:hover,
     &:focus {
-      color: var(--fill-2);
+      opacity: 1;
     }
   }
 }
 
-.ext-name {
-  &.disabled {
-    color: var(--fill-8);
-  }
+[data-is-applied="false"] .ext-name {
+  color: var(--fill-8);
 }
 
 .script-icon {
@@ -114,7 +116,10 @@ footer {
   padding: $padding $padding $padding 0;
   background: var(--bg);
   > .menu-area {
-    padding: $padding;
+    padding: $padding calc($padding * .75);
+    &:last-child { /* vertical "..." */
+      margin: 0 calc($padding * -.5);
+    }
   }
   .icon {
     display: block;
@@ -131,6 +136,7 @@ footer {
   &-item {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     min-height: 2rem;
     padding-left: $itemPaddingX;
@@ -279,7 +285,7 @@ footer {
 
 .failure-reason {
   padding: .5rem $itemPaddingX .5rem $leftPaneWidth;
-  [data-failure-reason=""] > & {
+  .page-popup:not(.noninjectable):not(.blacklisted) & {
     // Making the warning noticeable at the bottom of the script list
     background: hsla(30, 100%, 50%, .2);
   }
@@ -288,18 +294,10 @@ footer {
   }
 }
 
-.reload-hint {
-  .icon {
-    position: absolute;
-    left: $findIconML;
-    width: $findIconSize;
-    height: $findIconSize;
-  }
-}
-
 .extras-menu {
   position: fixed;
   right: 1rem;
+  max-width: 75vw;
   box-shadow: 1px 1px 10px #0008;
   z-index: 100;
   background: var(--bg);
@@ -363,13 +361,19 @@ footer {
   user-select: none;
 }
 
-[data-upd]::after {
-  content: attr(data-upd);
-  position: absolute;
+.upd[title] {
+  width: 100%;
+  padding-left: $leftPaneWidth;
   font-size: 10px;
-  bottom: -4px;
+  margin-top: -4px;
   line-height: 1;
-  color: var(--fill-7);
+  color: goldenrod;
+  &[data-error] {
+    color: red;
+  }
+  &::after {
+    content: attr(title);
+  }
 }
 
 .syntax {

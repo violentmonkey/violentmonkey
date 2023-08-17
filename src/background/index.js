@@ -15,6 +15,7 @@ import './utils/icon';
 import './utils/notifications';
 import './utils/preinject';
 import './utils/script';
+import './utils/storage-fetch';
 import './utils/tab-redirector';
 import './utils/tester';
 import './utils/update';
