@@ -39,8 +39,8 @@ browser.notifications.onClosed.addListener((id) => {
 
 function notifyOpener(id, isClick) {
   const op = openers[id];
-  if (isClick && isFunction(op)) {
-    op();
+  if (isFunction(op)) {
+    if (isClick) op();
   } else if (op) {
     sendTabCmd(op[0], isClick ? 'NotificationClick' : 'NotificationClose', id, {
       frameId: op[1],
