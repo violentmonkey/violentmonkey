@@ -280,6 +280,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: Gegenwärtig ausgeführte Skripte bleiben aktiv bis der Tab neu geladen wird
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: >-
@@ -812,6 +813,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Aktualisierung
+reloadTab:
+  description: Label of action to reload the tab
+  message: Tab neu laden
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Groß- und Kleinschreibung beachtend
@@ -827,6 +831,14 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Einstellungen
+skipScripts:
+  description: Title of the hotkey in the browser UI for customizing the hotkeys.
+  message: Seite ohne Benutzerskripte neu laden
+skipScriptsMsg:
+  description: Message shown in the popup if the tab was reloaded without scripts.
+  message: >-
+    Sie haben Benutzerskripte auf dieser Seite deaktiviert. Um sie auszuführen,
+    laden Sie den Tab neu oder navigieren Sie in ihm.
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normale Badge-Farbe
@@ -840,6 +852,11 @@ titleSearchHint:
   message: |-
     * <Enter>-Taste fügt den Text zum Autovervollständigungs-Verlauf hinzu
     * RegExp-Syntax wird unterstützt: /re/ und /re/flags
+updateListedCmd:
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
+  message: Skript(e) aktualisieren ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: Schlüssel (String)
@@ -852,3 +869,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Webseite besuchen
+  touched: false

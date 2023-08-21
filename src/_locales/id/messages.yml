@@ -281,6 +281,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: Skrip konten akan terus berjalan sampai Anda memuat ulang tab
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Periksa pembaruan skrip setiap $1 hari, gunakan 0 untuk menonaktifkan
@@ -807,6 +808,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Perbarui
+reloadTab:
+  description: Label of action to reload the tab
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Sesuai besar kecil huruf
@@ -822,6 +826,12 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Pengaturan
+skipScripts:
+  description: Title of the hotkey in the browser UI for customizing the hotkeys.
+  message: ''
+skipScriptsMsg:
+  description: Message shown in the popup if the tab was reloaded without scripts.
+  message: ''
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Warna lencana normal
@@ -835,6 +845,11 @@ titleSearchHint:
   message: |-
     * <Enter> menambahkan teks ke riwayat autocomplete
     * Sintaksis RegExp didukung: /re/ dan /re/flags
+updateListedCmd:
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: Key (string)
@@ -847,3 +862,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Kunjungi Situs Web
+  touched: false

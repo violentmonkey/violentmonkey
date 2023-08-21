@@ -283,6 +283,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: Os scripts atuais continuarão em execução até que você recarregue a aba
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: >-
@@ -809,6 +810,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Atualizar
+reloadTab:
+  description: Label of action to reload the tab
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Respeitar maiúsculas/minúsculas
@@ -824,6 +828,12 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Configurações
+skipScripts:
+  description: Title of the hotkey in the browser UI for customizing the hotkeys.
+  message: ''
+skipScriptsMsg:
+  description: Message shown in the popup if the tab was reloaded without scripts.
+  message: ''
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Cor normal do emblema
@@ -835,6 +845,11 @@ titleSearchHint:
   message: |-
     * <Enter> chave adiciona ao histórico de texto do preenchimento automático
     * A sintaxe RegExp suportada são: /re/ e /re/flags
+updateListedCmd:
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: Chave (string)
@@ -847,3 +862,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Visite o site
+  touched: false
