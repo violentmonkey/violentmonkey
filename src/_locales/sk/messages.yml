@@ -281,6 +281,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: Aktuálne skripty budú spustené, kým kartu znovu nenačítate
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Kontrolovať aktualizácie skriptu každý $1 deň, pre zakázanie použite 0
@@ -801,6 +802,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Aktualizácia
+reloadTab:
+  description: Label of action to reload the tab
+  message: Znova načítať kartu
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Rozlišovať veľké a malé písmená
@@ -816,6 +820,14 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Nastavenia
+skipScripts:
+  description: Title of the hotkey in the browser UI for customizing the hotkeys.
+  message: Načítať stránku bez používateľských skriptov
+skipScriptsMsg:
+  description: Message shown in the popup if the tab was reloaded without scripts.
+  message: >-
+    Zakázali ste používateľské skripty pre túto stránku. Ak ich chcete znovu
+    spustiť, znovu načítajte alebo prejdite na kartu.
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normálna farba odznaku
@@ -829,6 +841,11 @@ titleSearchHint:
   message: |-
     * kláves <Enter> pridá text do histórie automatického dopĺňania
     * je podporovaná syntax RegExp: /re/ a /re/flags
+updateListedCmd:
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
+  message: Aktualizovať skripty ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: Kľúč (reťazec)
@@ -841,3 +858,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Prejsť na stránku
+  touched: false

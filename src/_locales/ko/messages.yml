@@ -267,6 +267,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: 탭을 새로고침할 때까지 현재 스크립트가 계속 실행됩니다.
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 매 $1 일마다 업데이트합니다. (0 = 비활성화)
@@ -775,6 +776,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: 업데이트
+reloadTab:
+  description: Label of action to reload the tab
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 대소문자 확인하기
@@ -790,6 +794,12 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: 설정
+skipScripts:
+  description: Title of the hotkey in the browser UI for customizing the hotkeys.
+  message: ''
+skipScriptsMsg:
+  description: Message shown in the popup if the tab was reloaded without scripts.
+  message: ''
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: 일반 배지 색상
@@ -801,6 +811,11 @@ titleSearchHint:
   message: |-
     * <Enter>키로 자동완성 내역에 추가할 수 있습니다.
     * 정규표현식을 지원합니다: /re/ 또는 /re/flags
+updateListedCmd:
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: 키 (문자열)
@@ -813,3 +828,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: 웹 사이트 방문
+  touched: false

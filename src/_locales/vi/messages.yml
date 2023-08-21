@@ -271,6 +271,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: Những script hiện tại sẽ vẫn tiếp tục chạy cho đến khi bạn tải lại thẻ
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Kiểm tra cập nhật mỗi  $1 ngày, 0 = tắt
@@ -794,6 +795,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Cập nhật
+reloadTab:
+  description: Label of action to reload the tab
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Phân biệt hoa thường
@@ -809,6 +813,12 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Cài đặt
+skipScripts:
+  description: Title of the hotkey in the browser UI for customizing the hotkeys.
+  message: ''
+skipScriptsMsg:
+  description: Message shown in the popup if the tab was reloaded without scripts.
+  message: ''
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Màu huy hiệu bình thường
@@ -820,6 +830,11 @@ titleBadgeColorBlocked:
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: Nhập chính xác hoặc gần giống nội dung cần tìm
+updateListedCmd:
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: Khóa (chuỗi)
@@ -832,3 +847,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Truy cập trang web
+  touched: false

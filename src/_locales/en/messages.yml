@@ -272,6 +272,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: Current scripts will keep running until you reload the tab
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Check for script updates every $1 day(s), use 0 to disable
@@ -831,7 +832,9 @@ titleSearchHint:
     * <Enter> key adds the text to autocomplete history
     * RegExp syntax is supported: /re/ and /re/flags
 updateListedCmd:
-  description: Command to update scripts e.g. in the extension popup, number of scripts in parentheses.
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
   message: Update scripts ($1)
 valueLabelKey:
   description: Label for key of a script value.
@@ -845,3 +848,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Visit Website
+  touched: false

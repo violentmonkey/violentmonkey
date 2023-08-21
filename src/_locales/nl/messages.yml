@@ -277,6 +277,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: De huidige scripts worden uitgevoerd totdat je het tabblad herlaadt
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Elke $1 dag(en) controleren op updates (0 = uitschakelen)
@@ -798,6 +799,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Bijwerken
+reloadTab:
+  description: Label of action to reload the tab
+  message: Tabblad herladen
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Hoofdlettergevoelig
@@ -813,6 +817,14 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Instellingen
+skipScripts:
+  description: Title of the hotkey in the browser UI for customizing the hotkeys.
+  message: Tabblad herladen zonder gebruikersscripts
+skipScriptsMsg:
+  description: Message shown in the popup if the tab was reloaded without scripts.
+  message: >-
+    Je hebt gebruikersscripts uitgeschakeld op deze pagina. Schakel ze in door
+    te herladen of een link aan te klikken.
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normale embleemkleur
@@ -826,6 +838,11 @@ titleSearchHint:
   message: |-
     * Druk op <Enter> om de tekst toe te voegen aan de auto-aanvulgeschiedenis
     * Ondersteunt reguliere uitdrukkingen: /re/ en /re/flags
+updateListedCmd:
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
+  message: Scrips bĳwerken ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: Sleutel (tekenreeks)
@@ -838,3 +855,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Violentmonkey-website
+  touched: false

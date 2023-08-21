@@ -284,6 +284,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: A jelenlegi szkriptek futni fognak addig, amíg újra nem lesz töltve a lap
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Szkript frissítések keresése $1 naponta. Állítsd 0-ra, hogy kikapcsold.
@@ -817,6 +818,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Frissítés
+reloadTab:
+  description: Label of action to reload the tab
+  message: Lap frissítése
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Kis- és nagybetűk megkülönböztetése
@@ -832,6 +836,14 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Beállítások
+skipScripts:
+  description: Title of the hotkey in the browser UI for customizing the hotkeys.
+  message: Oldal újratöltése userscript-ek nélkül
+skipScriptsMsg:
+  description: Message shown in the popup if the tab was reloaded without scripts.
+  message: >-
+    A userscript-ek le lettek tiltva ezen az oldalon. Hogy futtasd őket
+    frissítsd az oldalt, vagy navigálj egy másikra.
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normál jelvény szín
@@ -847,6 +859,11 @@ titleSearchHint:
     történethez
 
     * RegExp szintaxis támogatott: /re/ és /re/flags
+updateListedCmd:
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
+  message: Szkriptek frissítése ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: Kulcs (sztring)
@@ -859,3 +876,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Látogasd meg a honlapot
+  touched: false

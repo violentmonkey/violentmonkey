@@ -268,6 +268,7 @@ labelAutoReloadCurrentTabDisabled:
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
   message: 目前的腳本會繼續執行，直到您重新載入分頁
+  touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 每 $1 天檢查腳本更新，用 0 停用
@@ -777,6 +778,9 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: 更新
+reloadTab:
+  description: Label of action to reload the tab
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 區分大小寫
@@ -792,6 +796,12 @@ sideMenuInstalled:
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: 設定
+skipScripts:
+  description: Title of the hotkey in the browser UI for customizing the hotkeys.
+  message: ''
+skipScriptsMsg:
+  description: Message shown in the popup if the tab was reloaded without scripts.
+  message: ''
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: 正常情況下的徽標顏色
@@ -803,6 +813,11 @@ titleSearchHint:
   message: |-
     * 按 <Enter> 鍵會將文字加到自動完成記錄中
     * 支援正規表示式語法：/re/ 和 /re/flags
+updateListedCmd:
+  description: >-
+    Command to update scripts e.g. in the extension popup, number of scripts in
+    parentheses.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: 鍵（字串）
@@ -815,3 +830,4 @@ valueLabelValueAll:
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: 訪問網站
+  touched: false
