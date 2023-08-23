@@ -8,7 +8,7 @@ addEventListener('error', e => showUnhandledError(e.error));
 addEventListener('unhandledrejection', e => showUnhandledError(e.reason));
 function showUnhandledError(err) {
   if (!err) return;
-  const el = document.createElement('pre');
+  const el = document.createElement('textarea');
   // using an inline style because we don't know if our CSS is loaded at this stage
   el.style.cssText = `\
     position:fixed;
@@ -18,11 +18,15 @@ function showUnhandledError(err) {
     bottom:0;
     background:#000;
     color:red;
-    padding: 1em;
+    padding: .5em;
+    font-size: 11px;
   `.replace(/;/g, '!important;');
-  el.textContent = `${IS_FIREFOX && err.message || ''}\n${err.stack || ''}`.trim() || err;
-  el.onclick = () => getSelection().setBaseAndExtent(el, 0, el, 1);
-  (document.body || document.documentElement).appendChild(el);
+  el.value = err = `${IS_FIREFOX && err.message || ''}\n${err.stack || ''}`
+    .trim().split(extensionRoot).join('') || err;
+  el.rows = err.match(/^/gm).length - 1;
+  el.spellcheck = false;
+  el.onclick = () => el.select();
+  document.documentElement.appendChild(el);
 }
 
 export function showMessage(message) {
