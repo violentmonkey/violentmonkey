@@ -13,7 +13,7 @@ import storage from './storage';
 addOwnCommands({
   GetImageData: async url => (
     url.startsWith(ICON_PREFIX)
-      ? (await getOwnIcon(new URL(url).pathname)).uri
+      ? (await getOwnIcon(url.slice(extensionOrigin.length))).uri
       : (await storage.cache.fetch(url), makeDataUri(await storage.cache.getOne(url)))
   ),
 });
@@ -219,7 +219,7 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
   const pathData = {};
   const iconData = {};
   for (const n of SIZES) {
-    const path = new URL(`${ICON_PREFIX}${n}${mod}.png`).pathname;
+    const path = `${ICON_PREFIX.slice(extensionOrigin.length)}${n}${mod}.png`;
     const icon = await getOwnIcon(path);
     pathData[n] = path;
     iconData[n] = icon.img;

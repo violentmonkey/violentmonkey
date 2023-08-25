@@ -12,8 +12,8 @@ const getCacheKey = tabId => 'SetPopup' + tabId;
 
 addPublicCommands({
   async InitPopup() {
-    const data = await commands.GetTabDomain();
-    const { url, id: tabId } = data.tab;
+    const { url = '', id: tabId } = await getActiveTab() || {};
+    const data = await commands.GetTabDomain(url);
     const cachedSetPopup = cache.pop(getCacheKey(tabId));
     const badgeData = badges[tabId] || {};
     let failure = getFailureReason(url, badgeData);

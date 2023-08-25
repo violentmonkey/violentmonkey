@@ -1,5 +1,5 @@
 import '@/common/browser';
-import { getActiveTab, makePause, sendCmd } from '@/common';
+import { makePause, sendCmd } from '@/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
 import { deepCopy } from '@/common/object';
 import { getDomain } from 'tldjs/tld';
@@ -8,7 +8,6 @@ import { addOwnCommands, addPublicCommands, commands } from './utils';
 import { getData, getSizes, checkRemove } from './utils/db';
 import { initialize } from './utils/init';
 import { getOption, hookOptions } from './utils/options';
-import { getTabUrl } from './utils/tabs';
 import './utils/clipboard';
 import './utils/hotkeys';
 import './utils/icon';
@@ -35,14 +34,12 @@ addOwnCommands({
   },
   GetSizes: getSizes,
   /**
-   * @param {string} [url]
+   * @param {string?} url
    * @return {Promise<Object>}
    */
   async GetTabDomain(url) {
-    const tab = !url && await getActiveTab() || {};
-    const host = new URL(url || getTabUrl(tab)).hostname;
+    const host = url && new URL(url).hostname;
     return {
-      tab,
       host,
       domain: host && getDomain(host) || host,
     };

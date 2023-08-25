@@ -1,3 +1,4 @@
+import { tryUrl } from '@/common';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
 } from './base';
@@ -119,9 +120,7 @@ const WebDAV = BaseService.extend({
     let url = config.serverUrl?.trim() || '';
     if (!url.includes('://')) url = `http://${url}`;
     if (!url.endsWith('/')) url += '/';
-    try {
-      new URL(url); // eslint-disable-line no-new
-    } catch (e) {
+    if (!tryUrl(url)) {
       this.properties.serverUrl = null;
       return false;
     }
