@@ -12,7 +12,8 @@ const getCacheKey = tabId => 'SetPopup' + tabId;
 
 addPublicCommands({
   async InitPopup() {
-    const { url = '', id: tabId } = await getActiveTab() || {};
+    const tab = await getActiveTab() || {};
+    const { url = '', id: tabId } = tab;
     const data = await commands.GetTabDomain(url);
     const cachedSetPopup = cache.pop(getCacheKey(tabId));
     const badgeData = badges[tabId] || {};
@@ -20,6 +21,7 @@ addPublicCommands({
     if (!failure[0] && !cachedSetPopup && !await isInjectable(tabId, badgeData)) {
       failure = getFailureReason('');
     }
+    data.tab = tab;
     return [cachedSetPopup, data, failure];
   },
   async SetPopup(data, src) {

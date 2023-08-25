@@ -13,6 +13,6 @@ async function run(init) {
   try {
     await (isFunction(init) ? init() : init);
   } catch (e) {
-    console.error(e);
+    console.trace(e);
   }
 }
