@@ -1,4 +1,4 @@
-const { readGlobalsFile } = require('./scripts/webpack-util');
+const { readGlobalsFile, restrictedSyntax } = require('./scripts/webpack-util');
 const ovr = makeOverrides();
 
 module.exports = {
@@ -169,28 +169,7 @@ function makeOverrides() {
           patterns: ['*/common', '*/common/*'],
         }
       ],
-      'no-restricted-syntax': [
-        'error', {
-          selector: 'ObjectExpression > ExperimentalSpreadProperty',
-          message: 'Object spread adds a polyfill in injected* even if unused by it',
-        }, {
-          selector: 'ArrayPattern',
-          message: 'Destructuring via Symbol.iterator may be spoofed/broken in an unsafe environment',
-        }, {
-          selector: ':matches(ArrayExpression, CallExpression) > SpreadElement',
-          message: 'Spreading via Symbol.iterator may be spoofed/broken in an unsafe environment',
-        }, {
-          selector: '[callee.object.name="Object"], MemberExpression[object.name="Object"]',
-          message: 'Using potentially spoofed methods in an unsafe environment',
-          // TODO: auto-generate the rule using GLOBALS
-        }, {
-          selector: `CallExpression[callee.name="defineProperty"]:not(${[
-            '[arguments.2.properties.0.key.name="__proto__"]',
-            ':has(CallExpression[callee.name="nullObjFrom"])'
-          ].join(',')})`,
-          message: 'Prototype of descriptor may be spoofed/broken in an unsafe environment',
-        }
-      ],
+      'no-restricted-syntax': ['error', ...restrictedSyntax],
     },
   };
 }

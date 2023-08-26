@@ -16,6 +16,37 @@ Object.entries(entryGlobals).forEach(([name, val]) => {
   val.push('*', ...parts);
 });
 
+exports.restrictedSyntax = (
+  // Hiding `code` so eslint doesn't complain about invalid schema
+  rules => rules.map(r => (
+    Object.defineProperty(r, 'code', { enumerable: false, value: r.code })
+  ))
+)([{
+  selector: 'ObjectExpression > SpreadElement',
+  message: 'Object spread adds a polyfill in injected* even if unused by it',
+  code: 'open({...{foo:1}})',
+}, {
+  selector: 'ArrayPattern',
+  message: 'Destructuring via Symbol.iterator may be spoofed/broken in an unsafe environment',
+  code: '[window.foo]=[]',
+}, {
+  selector: ':matches(ArrayExpression, CallExpression) > SpreadElement',
+  message: 'Spreading via Symbol.iterator may be spoofed/broken in an unsafe environment',
+  code: 'open([...[]])',
+}, {
+  selector: '[callee.object.name="Object"], MemberExpression[object.name="Object"]',
+  message: 'Using potentially spoofed methods in an unsafe environment',
+  code: 'Object.assign()',
+  // TODO: auto-generate the rule using GLOBALS
+}, {
+  selector: `CallExpression[callee.name="defineProperty"]:not(${[
+    '[arguments.2.properties.0.key.name="__proto__"]',
+    ':has(CallExpression[callee.name="nullObjFrom"])'
+  ].join(',')})`,
+  message: 'Prototype of descriptor may be spoofed/broken in an unsafe environment',
+  code: 'defineProperty(open, "foo", {foo:1})',
+}]);
+
 /**
  * Adds a watcher for files in entryGlobals to properly recompile the project on changes.
  */
