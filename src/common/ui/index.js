@@ -1,5 +1,6 @@
 import { createApp, h, nextTick } from 'vue';
 import Modal from 'vueleton/lib/modal';
+import { trueJoin } from '@/common';
 import { i18n } from '@/common/util';
 import Message from './message';
 
@@ -8,7 +9,19 @@ addEventListener('error', e => showUnhandledError(e.error));
 addEventListener('unhandledrejection', e => showUnhandledError(e.reason));
 function showUnhandledError(err) {
   if (!err) return;
-  const el = document.createElement('textarea');
+  const id = 'unhandledError';
+  const fontSize = 10;
+  const el = document.getElementById(id) || document.createElement('textarea');
+  const text = el.value = [
+    el.value,
+    isObject(err)
+      ? `${IS_FIREFOX && err.message || ''}\n${err.stack || ''}`
+      : `${err}`,
+  ]::trueJoin('\n\n').trim().split(extensionRoot).join('');
+  const height = fontSize * (calcRows(text) + 1) + 'px';
+  const parent = document.body || document.documentElement;
+  el.id = id;
+  el.readOnly = true;
   // using an inline style because we don't know if our CSS is loaded at this stage
   el.style.cssText = `\
     position:fixed;
@@ -18,15 +31,18 @@ function showUnhandledError(err) {
     bottom:0;
     background:#000;
     color:red;
-    padding: .5em;
-    font-size: 11px;
+    padding: ${fontSize / 2}px;
+    font-size: ${fontSize}px;
+    line-height: 1;
+    box-sizing: border-box;
+    height: ${height};
+    border: none;
+    resize: none;
   `.replace(/;/g, '!important;');
-  el.value = err = `${IS_FIREFOX && err.message || ''}\n${err.stack || ''}`
-    .trim().split(extensionRoot).join('') || err;
-  el.rows = err.match(/^/gm).length - 1;
   el.spellcheck = false;
   el.onclick = () => el.select();
-  document.documentElement.appendChild(el);
+  parent.style.minHeight = height;
+  parent.appendChild(el);
 }
 
 export function showMessage(message) {
