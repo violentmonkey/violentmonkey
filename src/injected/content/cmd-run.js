@@ -14,7 +14,7 @@ onScripts.push(() => {
 });
 on('pageshow', onShown);
 if (pending) {
-  document::on('prerenderingchange', onShown.bind(null));
+  document::on('prerenderingchange', onShown.bind(null), { once: true });
   bridge[REIFY] = new Promise(resolve => (resolveOnReify = resolve));
 }
 
@@ -22,6 +22,7 @@ function onShown(evt) {
   // isTrusted is `unforgeable` per DOM spec
   if (evt.isTrusted) {
     if (!this) {
+      topRenderMode = 3; // eslint-disable-line no-import-assign
       sent = bridge[REIFY] = false;
       resolveOnReify();
       report();

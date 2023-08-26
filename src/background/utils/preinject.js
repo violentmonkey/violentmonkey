@@ -11,13 +11,13 @@ import { postInitialize } from './init';
 import { addOwnCommands, addPublicCommands } from './message';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
-import { clearRequestsByTabId } from './requests';
+import { clearRequestsByTabId, reifyRequests } from './requests';
 import {
   S_CACHE, S_CACHE_PRE, S_CODE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
 } from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
-import { getFrameDocId, getFrameDocIdAsObj, getFrameDocIdFromSrc, tabsOnRemoved } from './tabs';
-import { addValueOpener, clearValueOpener } from './values';
+import { getFrameDocId, getFrameDocIdAsObj, tabsOnRemoved } from './tabs';
+import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
 
 let isApplied;
 let injectInto;
@@ -193,9 +193,18 @@ addPublicCommands({
     };
   },
   Run({ [IDS]: ids, reset }, src) {
+    const {
+      [kDocumentId]: docId,
+      [kTop]: isTop,
+      tab: { id: tabId },
+    } = src;
     setBadge(ids, reset, src);
+    if (isTop === 3) {
+      reifyValueOpener(ids, docId);
+      reifyRequests(tabId, docId);
+    }
     if (reset === 'bfcache' && +ids[0]) {
-      addValueOpener(ids, src.tab.id, getFrameDocIdFromSrc(src));
+      addValueOpener(ids, tabId, getFrameDocId(isTop, docId, src[kFrameId]));
     }
   },
 });

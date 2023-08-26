@@ -100,7 +100,7 @@ export function sendCmdDirectly(cmd, data, options, fakeSrc) {
  * @param {number} tabId
  * @param {string} cmd
  * @param data
- * @param {{frameId?: number} | {documentId?: string}} [options]
+ * @param {VMMessageTargetFrame} [options]
  * @return {Promise}
  */
 export function sendTabCmd(tabId, cmd, data, options) {

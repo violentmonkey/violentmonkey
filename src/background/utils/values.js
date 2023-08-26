@@ -1,5 +1,5 @@
 import { isEmpty, sendTabCmd } from '@/common';
-import { forEachEntry, nest, objectGet, objectSet } from '@/common/object';
+import { forEachEntry, forEachValue, nest, objectGet, objectSet } from '@/common/object';
 import { getScript } from './db';
 import { addOwnCommands, addPublicCommands } from './message';
 import storage, { S_VALUE } from './storage';
@@ -82,6 +82,18 @@ export async function addValueOpener(injectedScripts, tabId, frameId) {
     const values = valuesById ? valuesById[id] || null : script[VALUES];
     if (values) objectSet(openers, [id, tabId, frameId], Object.assign({}, values));
     else delete openers[id];
+  }
+}
+
+/** Moves values of a pre-rendered page identified by documentId to frameId:0 */
+export function reifyValueOpener(ids, documentId) {
+  for (const id of ids) {
+    openers[id]::forEachValue(frames => {
+      if (documentId in frames) {
+        frames[0] = frames[documentId];
+        delete frames[documentId];
+      }
+    });
   }
 }
 

@@ -2,6 +2,7 @@
 import { sendMessage } from '@/common';
 
 export * from './util-task';
+export let topRenderMode = window !== top ? 0 : document.prerendering ? 2 : 1;
 
 /** When looking for documentElement, use '*' to also support XML pages
  * Note that we avoid spoofed prototype getters by using hasOwnProperty, and not using `length`
@@ -72,7 +73,6 @@ export const decodeResource = (raw, isBlob) => {
     : res;
 };
 
-export const topRenderMode = window !== top ? 0 : document.prerendering ? 2 : 1;
 /**
  * Used by `injected`
  * @param {string} cmd

@@ -31,6 +31,7 @@ declare namespace GMReq {
   interface BG {
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
     coreId: number;
+    frame: VMMessageTargetFrame;
     frameId: number;
     id: string;
     noNativeCookie: boolean;
@@ -344,5 +345,7 @@ declare interface VMMessageSender extends chrome.runtime.MessageSender {
   /** 0 = frame, 1 = top document, 2 = pre-rendered top document */
   top?: number;
 }
+
+declare type VMMessageTargetFrame = { frameId?: number } | { documentId?: string }
 
 //#endregion Generic

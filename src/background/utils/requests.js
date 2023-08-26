@@ -7,7 +7,7 @@ import { addPublicCommands, commands } from './message';
 import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify,
 } from './requests-core';
-import { getFrameDocIdFromSrc, getFrameDocIdAsObj } from './tabs';
+import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
 
 addPublicCommands({
   /**
@@ -18,18 +18,18 @@ addPublicCommands({
   HttpRequest(opts, src) {
     const tabId = src.tab.id;
     const frameId = getFrameDocIdFromSrc(src);
-    const frameIdObj = getFrameDocIdAsObj(frameId);
     const { id, events } = opts;
-    const cb = res => requests[id] && (
-      sendTabCmd(tabId, 'HttpRequested', res, frameIdObj)
-    );
     /** @type {GMReq.BG} */
-    requests[id] = {
+    const req = requests[id] = {
       id,
       tabId,
       [kFrameId]: frameId,
+      frame: getFrameDocIdAsObj(frameId),
       xhr: new XMLHttpRequest(),
     };
+    const cb = res => requests[id] && (
+      sendTabCmd(tabId, 'HttpRequested', res, req.frame)
+    );
     return httpRequest(opts, events, src, cb)
     .catch(events.includes('error') && (err => cb({
       id,
@@ -270,6 +270,16 @@ export function clearRequestsByTabId(tabId, frameId) {
     if ((tabId == null || req.tabId === tabId)
     && (!frameId || req[kFrameId] === frameId)) {
       commands.AbortRequest(req.id);
+    }
+  });
+}
+
+export function reifyRequests(tabId, documentId) {
+  const frameObj = getFrameDocIdAsObj(0);
+  requests::forEachValue(req => {
+    if (req.tabId === tabId && req[kFrameId] === documentId) {
+      req[kFrameId] = 0;
+      req.frame = frameObj;
     }
   });
 }
