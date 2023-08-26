@@ -6,7 +6,7 @@ import './requests';
 import './tabs';
 import { sendCmd } from './util';
 import { isEmpty } from '../util';
-import { Run, sendSkipScripts, sendSetBadge } from './cmd-run';
+import { Run, finish } from './cmd-run';
 
 const { [IDS]: ids } = bridge;
 
@@ -36,7 +36,7 @@ async function init() {
     off('copy', onClipboardCopy, true);
   }
   if ((bridge[INJECT_INTO] = data[INJECT_INTO]) === SKIP_SCRIPTS) {
-    sendSkipScripts();
+    Run(SKIP_SCRIPTS);
     return;
   }
   if (data[EXPOSE] && !isXml && injectPageSandbox(data)) {
@@ -48,7 +48,7 @@ async function init() {
     await injectScripts(data, isXml);
   }
   onScripts.length = 0;
-  sendSetBadge(AUTO);
+  finish();
 }
 
 addBackgroundHandlers({
@@ -67,8 +67,8 @@ addBackgroundHandlers({
 });
 
 addHandlers({
-  TabFocus: true,
-  UpdateValue: true,
+  TabFocus: REIFY,
+  UpdateValue: REIFY,
 });
 
 init().catch(IS_FIREFOX && logging.error); // Firefox can't show exceptions in content scripts

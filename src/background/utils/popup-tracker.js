@@ -29,7 +29,7 @@ addPublicCommands({
     const key = getCacheKey(tabId);
     if (popupTabs[tabId]) return;
     Object.assign(data, await getData({ [IDS]: Object.keys(data[IDS]) }));
-    (cache.get(key) || cache.put(key, {}))[src.frameId] = [data, src];
+    (cache.get(key) || cache.put(key, {}))[src[kFrameId]] = [data, src];
   }
 });
 
@@ -43,7 +43,7 @@ postInitialize.push(() => {
 
 async function isInjectable(tabId, badgeData) {
   return badgeData[INJECT]
-    && await sendTabCmd(tabId, VIOLENTMONKEY, null, { frameId: 0 })
+    && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })
     || (
       await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
       .catch(() => [])

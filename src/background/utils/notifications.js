@@ -19,7 +19,7 @@ addPublicCommands({
         silent,
       }
     });
-    const op = isFunction(onclick) ? onclick : src && [src.tab.id, src.frameId];
+    const op = isFunction(onclick) ? onclick : src && [src.tab.id, src[kFrameId]];
     if (op) openers[notificationId] = op;
     return notificationId;
   },
@@ -43,7 +43,7 @@ function notifyOpener(id, isClick) {
     if (isClick) op();
   } else if (op) {
     sendTabCmd(op[0], isClick ? 'NotificationClick' : 'NotificationClose', id, {
-      frameId: op[1],
+      [kFrameId]: op[1],
     });
   }
 }

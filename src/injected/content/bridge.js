@@ -15,6 +15,7 @@ const addHandlersImpl = (dest, src, force) => {
 /**
  * Without `force` handlers will be added only when userscripts are about to be injected.
  * { CommandName: true } will relay the request via sendCmd as is.
+ * { CommandName: REIFY } same as `true` but waits until reified when pre-rendered.
  * @param {Object.<string, MessageFromGuestHandler>} obj
  * @param {boolean} [force]
  */
@@ -24,6 +25,7 @@ export const addBackgroundHandlers = addHandlersImpl.bind({}, bgHandlers);
 /**
  * @property {VMBridgePostFunc} [post] - present only when the web bridge was initialized
  * @property {VMScriptInjectInto} [injectInto] - present only after GetInjected received data
+ * @property {Promise<void>} [reify] - present in pre-rendered documents, resolved when it's shown
  */
 const bridge = {
   __proto__: null,
@@ -33,13 +35,18 @@ const bridge = {
   pathMaps: createNullObj(),
   // realm is provided when called directly via invokeHost
   async onHandle({ cmd, data, node }, realm) {
-    const handle = handlers[cmd];
+    let res;
+    let handle = handlers[cmd];
     let callbackId = data && getOwnProp(data, CALLBACK_ID);
     if (callbackId) {
       data = data.data;
     }
-    let res;
     try {
+      if (handle === REIFY) {
+        handle = true;
+        res = bridge[REIFY];
+        if (res) await res;
+      }
       res = handle === true
         ? sendCmd(cmd, data)
         : node::handle(data, realm || PAGE);

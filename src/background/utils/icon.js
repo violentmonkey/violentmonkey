@@ -2,7 +2,7 @@ import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
 import { nest, objectPick } from '@/common/object';
 import { postInitialize } from './init';
-import { addOwnCommands, addPublicCommands, forEachTab } from './message';
+import { addOwnCommands, forEachTab } from './message';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
 import { INJECT, reloadAndSkipScripts } from './preinject';
@@ -16,10 +16,6 @@ addOwnCommands({
       ? (await getOwnIcon(url.slice(extensionOrigin.length))).uri
       : (await storage.cache.fetch(url), makeDataUri(await storage.cache.getOne(url)))
   ),
-});
-
-addPublicCommands({
-  SetBadge: setBadge,
 });
 
 /** We don't set 19px because FF and Vivaldi scale it down to 16px instead of our own crisp 16px */
@@ -161,13 +157,14 @@ function resetBadgeData(tabId, isInjected) {
 }
 
 /**
- * @param {Object} params
- * @param {chrome.runtime.MessageSender} src
+ * @param {number[] | string} ids
+ * @param {boolean} reset
+ * @param {VMMessageSender} src
  */
-function setBadge({ [IDS]: ids, reset }, { tab, frameId }) {
+export function setBadge(ids, reset, { tab, [kFrameId]: frameId, [kTop]: isTop }) {
   const tabId = tab.id;
   const injectable = ids === SKIP_SCRIPTS ? SKIP_SCRIPTS : !!ids;
-  const data = (frameId || !reset) && badges[tabId] || resetBadgeData(tabId, injectable);
+  const data = !(reset && isTop) && badges[tabId] || resetBadgeData(tabId, injectable);
   if (ids && ids !== SKIP_SCRIPTS) {
     const { idMap, totalMap } = data;
     // uniques
@@ -178,7 +175,9 @@ function setBadge({ [IDS]: ids, reset }, { tab, frameId }) {
     totalMap[frameId] = ids.length;
     for (const id in totalMap) data.total += totalMap[id];
   }
-  data[INJECT] = injectable;
+  if (isTop) {
+    data[INJECT] = injectable;
+  }
   updateBadgeColor(tab, data);
   updateState(tab, data);
 }

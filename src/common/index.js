@@ -47,7 +47,6 @@ export function initHooks() {
 }
 
 /**
- * Used by `injected`
  * @param {string} cmd
  * @param data
  * @param {{retry?: boolean}} [options]
@@ -101,7 +100,7 @@ export function sendCmdDirectly(cmd, data, options, fakeSrc) {
  * @param {number} tabId
  * @param {string} cmd
  * @param data
- * @param {{frameId?: number}} [options]
+ * @param {{frameId?: number} | {documentId?: string}} [options]
  * @return {Promise}
  */
 export function sendTabCmd(tabId, cmd, data, options) {

@@ -7,24 +7,27 @@ import { addPublicCommands, commands } from './message';
 import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify,
 } from './requests-core';
+import { getFrameDocIdFromSrc, getFrameDocIdAsObj } from './tabs';
 
 addPublicCommands({
   /**
    * @param {GMReq.Message.Web} opts
-   * @param {MessageSender} src
+   * @param {VMMessageSender} src
    * @return {Promise<void>}
    */
   HttpRequest(opts, src) {
-    const { tab: { id: tabId }, frameId } = src;
+    const tabId = src.tab.id;
+    const frameId = getFrameDocIdFromSrc(src);
+    const frameIdObj = getFrameDocIdAsObj(frameId);
     const { id, events } = opts;
     const cb = res => requests[id] && (
-      sendTabCmd(tabId, 'HttpRequested', res, { frameId })
+      sendTabCmd(tabId, 'HttpRequested', res, frameIdObj)
     );
     /** @type {GMReq.BG} */
     requests[id] = {
       id,
       tabId,
-      frameId,
+      [kFrameId]: frameId,
       xhr: new XMLHttpRequest(),
     };
     return httpRequest(opts, events, src, cb)
@@ -184,7 +187,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
 /**
  * @param {GMReq.Message.Web} opts
  * @param {GMReq.EventType[]} events
- * @param {MessageSender} src
+ * @param {VMMessageSender} src
  * @param {function} cb
  * @returns {Promise<void>}
  */
@@ -265,7 +268,7 @@ function clearRequest({ id, coreId }) {
 export function clearRequestsByTabId(tabId, frameId) {
   requests::forEachValue(req => {
     if ((tabId == null || req.tabId === tabId)
-    && (!frameId || req.frameId === frameId)) {
+    && (!frameId || req[kFrameId] === frameId)) {
       commands.AbortRequest(req.id);
     }
   });

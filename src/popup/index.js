@@ -14,13 +14,13 @@ initialize();
 render(App);
 
 Object.assign(handlers, {
-  SetBadge({ reset }, { frameId, tab }) {
-    // The tab got reloaded so SetBadge+reset comes right before SetPopup, see cmd-run.js
+  Run({ reset }, { [kFrameId]: frameId, tab }) {
+    // The tab got reloaded so Run+reset comes right before SetPopup, see cmd-run.js
     if (reset && !frameId && isMyTab(tab)) {
       initialize();
     }
   },
-  async SetPopup(data, { frameId, tab, url }) {
+  async SetPopup(data, { [kFrameId]: frameId, tab, url }) {
     if (!isMyTab(tab)) return;
     /* SetPopup from a sub-frame may come first so we need to wait for the main page
      * because we only show the iframe menu for unique scripts that don't run in the main page */

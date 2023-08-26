@@ -339,4 +339,10 @@ declare interface VMUserAgent extends VMScriptGMInfoPlatform {
   ready: Promise<void>;
 }
 
+/** Augmented by handleCommandMessage in messages from the content script */
+declare interface VMMessageSender extends chrome.runtime.MessageSender {
+  /** 0 = frame, 1 = top document, 2 = pre-rendered top document */
+  top?: number;
+}
+
 //#endregion Generic

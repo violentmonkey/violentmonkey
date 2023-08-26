@@ -1,11 +1,11 @@
 import browser from '@/common/browser'; // eslint-disable-line no-restricted-imports
-import { sendCmd } from '@/common'; // eslint-disable-line no-restricted-imports
+import { sendCmd, topRenderMode } from './content/util';
 import { USERSCRIPT_META_INTRO } from './util';
 import './content';
 
 // Script installation in Firefox as it does not support `onBeforeRequest` for `file:`
 // Using pathname and a case-sensitive check to match webRequest `urls` filter behavior
-if (IS_FIREFOX && window === top
+if (IS_FIREFOX && topRenderMode === 1
 && location.protocol === 'file:'
 && location.pathname.endsWith('.user.js')
 && document.contentType === 'application/x-javascript' // FF uses this for file: scheme

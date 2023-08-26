@@ -121,7 +121,7 @@ const flipPage = (vm, dir) => {
   vm.page = Math.max(1, Math.min(vm.totalPages, vm.page + dir));
 };
 /** Uses a negative tabId which is recognized in bg::values.js */
-const fakeSender = () => ({ tab: { id: Math.random() - 2 }, frameId: 0 });
+const fakeSender = () => ({ tab: { id: Math.random() - 2 }, [kFrameId]: 0 });
 const conditionNotEdit = { condition: '!edit' };
 
 export default {

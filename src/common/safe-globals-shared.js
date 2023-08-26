@@ -27,6 +27,7 @@ export const kResponseHeaders = 'responseHeaders';
 export const kResponseText = 'responseText';
 export const kResponseType = 'responseType';
 export const kSessionId = 'sessionId';
+export const kTop = 'top';
 export const kXhrType = 'xhrType';
 export const SKIP_SCRIPTS = 'SkipScripts';
 export const isFunction = val => typeof val === 'function';

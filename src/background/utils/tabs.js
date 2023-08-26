@@ -17,6 +17,17 @@ const NEWTAB_URL_RE = re`/
   )
 )$
 /x`;
+/** @returns {string|number} documentId for a pre-rendered top page, frameId otherwise */
+export const getFrameDocId = (isTop, docId, frameId) => (
+  isTop === 2 && docId || frameId
+);
+/** @param {VMMessageSender} src */
+export const getFrameDocIdFromSrc = src => (
+  src[kTop] === 2 && src[kDocumentId] || src[kFrameId]
+);
+export const getFrameDocIdAsObj = id => +id >= 0
+  ? { [kFrameId]: +id }
+  : { [kDocumentId]: id };
 /**
  * @param {chrome.tabs.Tab} tab
  * @returns {string}
@@ -32,7 +43,7 @@ addOwnCommands({
   /**
    * @param {string} [pathId] - path or id: added to #scripts/ route in dashboard,
    * falsy: creates a new script for active tab's URL
-   * @param {chrome.runtime.MessageSender} [src]
+   * @param {VMMessageSender} [src]
    */
   async OpenEditor(pathId, src) {
     return commands.Dashboard(`${ROUTE_SCRIPTS_SLASH}${
@@ -41,7 +52,7 @@ addOwnCommands({
   },
   /**
    * @param {string} [route]
-   * @param {chrome.runtime.MessageSender} [src]
+   * @param {VMMessageSender} [src]
    */
   async Dashboard(route, src) {
     const url = extensionOptionsPage + (route || '');

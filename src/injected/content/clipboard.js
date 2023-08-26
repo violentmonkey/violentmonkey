@@ -1,4 +1,4 @@
-import { addHandlers, onScripts } from './bridge';
+import bridge, { addHandlers, onScripts } from './bridge';
 
 export let onClipboardCopy;
 let doCopy;
@@ -22,7 +22,8 @@ onScripts.push(({ clipFF }) => {
       e::preventDefault();
       e::getClipboardData()::setData(clipboardData.type || 'text/plain', clipboardData.data);
     };
-    setClipboard = params => {
+    setClipboard = async params => {
+      await bridge[REIFY];
       clipboardData = params;
       if (!document::execCommand('copy') && process.env.DEBUG) {
         log('warn', null, 'GM_setClipboard failed!');
@@ -31,6 +32,6 @@ onScripts.push(({ clipFF }) => {
     };
   }
   addHandlers({
-    SetClipboard: setClipboard || true,
+    SetClipboard: setClipboard || REIFY,
   });
 });

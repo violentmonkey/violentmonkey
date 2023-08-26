@@ -2,7 +2,8 @@ import { isEmpty, sendTabCmd } from '@/common';
 import { forEachEntry, nest, objectGet, objectSet } from '@/common/object';
 import { getScript } from './db';
 import { addOwnCommands, addPublicCommands } from './message';
-import storage from './storage';
+import storage, { S_VALUE } from './storage';
+import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
 
 /** { scriptId: { tabId: { frameId: {key: raw}, ... }, ... } } */
 const openers = {};
@@ -12,7 +13,7 @@ let toSend = {};
 addOwnCommands({
   async GetValueStore(id, { tab }) {
     const frames = nest(nest(openers, id), tab.id);
-    const values = frames[0] || (frames[0] = await storage.value.getOne(id));
+    const values = frames[0] || (frames[0] = await storage[S_VALUE].getOne(id));
     return values;
   },
   /**
@@ -37,8 +38,8 @@ addPublicCommands({
   /**
    * @return {?Promise<void>}
    */
-  UpdateValue({ id, key, raw }, { tab, frameId }) {
-    const values = objectGet(openers, [id, tab.id, frameId]);
+  UpdateValue({ id, key, raw }, src) {
+    const values = objectGet(openers, [id, src.tab.id, getFrameDocIdFromSrc(src)]);
     if (values) { // preventing the weird case of message arriving after the page navigated
       if (raw) values[key] = raw; else delete values[key];
       nest(toSend, id)[key] = raw || null;
@@ -69,20 +70,23 @@ export function clearValueOpener(tabId, frameId) {
 }
 
 /**
- * @param {VMInjection.Script[]} injectedScripts
+ * @param {VMInjection.Script[] | number[]} injectedScripts
  * @param {number} tabId
- * @param {number} frameId
+ * @param {number|string} frameId
  */
-export function addValueOpener(injectedScripts, tabId, frameId) {
-  injectedScripts.forEach(script => {
-    const { id, [VALUES]: values } = script;
+export async function addValueOpener(injectedScripts, tabId, frameId) {
+  const valuesById = +injectedScripts[0] // restoring storage for page from bfcache
+    && await storage[S_VALUE].getMulti(injectedScripts);
+  for (const script of injectedScripts) {
+    const id = valuesById ? script : script.id;
+    const values = valuesById ? valuesById[id] || null : script[VALUES];
     if (values) objectSet(openers, [id, tabId, frameId], Object.assign({}, values));
     else delete openers[id];
-  });
+  }
 }
 
 function commit(data) {
-  storage.value.set(data);
+  storage[S_VALUE].set(data);
   chain = chain.catch(console.warn).then(broadcast);
 }
 
@@ -94,7 +98,7 @@ async function broadcast() {
   for (const [tabId, frames] of Object.entries(toTabs)) {
     for (const [frameId, toFrame] of Object.entries(frames)) {
       if (!isEmpty(toFrame)) {
-        tasks.push(sendToFrame(+tabId, +frameId, toFrame));
+        tasks.push(sendToFrame(tabId, frameId, toFrame));
         if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
       }
     }
@@ -121,6 +125,6 @@ function groupByTab([id, valuesToSend]) {
 }
 
 function sendToFrame(tabId, frameId, data) {
-  return sendTabCmd(tabId, 'UpdatedValues', data, { frameId }).catch(console.warn);
+  return sendTabCmd(+tabId, 'UpdatedValues', data, getFrameDocIdAsObj(frameId)).catch(console.warn);
   // must use catch() to keep Promise.all going
 }

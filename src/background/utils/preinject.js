@@ -5,7 +5,8 @@ import {
 import initCache from '@/common/cache';
 import { forEachEntry, forEachKey, forEachValue, mapEntry, objectSet } from '@/common/object';
 import ua from '@/common/ua';
-import { getScriptsByURL, CACHE_KEYS, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
+import { CACHE_KEYS, getScriptsByURL, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
+import { setBadge } from './icon';
 import { postInitialize } from './init';
 import { addOwnCommands, addPublicCommands } from './message';
 import { getOption, hookOptions } from './options';
@@ -15,7 +16,7 @@ import {
   S_CACHE, S_CACHE_PRE, S_CODE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
 } from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
-import { tabsOnRemoved } from './tabs';
+import { getFrameDocId, getFrameDocIdAsObj, getFrameDocIdFromSrc, tabsOnRemoved } from './tabs';
 import { addValueOpener, clearValueOpener } from './values';
 
 let isApplied;
@@ -93,13 +94,17 @@ const normalizeScriptRealm = (custom, meta) => (
 const isContentRealm = (val, force) => (
   val === CONTENT || val === AUTO && force
 );
+/** @param {chrome.webRequest.WebRequestHeadersDetails | chrome.webRequest.WebResponseHeadersDetails} info */
+const isTopFrame = info => info.frameType === 'outermost_frame' || !info[kFrameId];
 
 const skippedTabs = {};
 export const reloadAndSkipScripts = async tab => {
   const tabId = tab.id;
   const bag = cache.get(getKey(tab.url, true));
+  const reg = bag && unregisterScriptFF(bag);
   skippedTabs[tabId] = 1;
-  if (bag) await unregisterScriptFF(bag);
+  if (reg) await reg;
+  clearFrameData(tabId);
   await browser.tabs.reload(tabId);
 };
 
@@ -135,11 +140,11 @@ addOwnCommands({
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
   async GetInjected({ url, [FORCE_CONTENT]: forceContent, done }, src) {
-    const { frameId, tab } = src;
+    const { tab, [kFrameId]: frameId, [kTop]: isTop } = src;
+    const frameDoc = getFrameDocId(isTop, src[kDocumentId], frameId);
     const tabId = tab.id;
-    const isTop = !frameId;
     if (!url) url = src.url || tab.url;
-    clearFrameData(tabId, frameId);
+    clearFrameData(tabId, frameDoc);
     let skip = skippedTabs[tabId];
     if (skip > 0) { // first time loading the tab after skipScripts was invoked
       if (isTop) skippedTabs[tabId] = -1; // keeping a phantom for future iframes in this page
@@ -154,10 +159,10 @@ addPublicCommands({
     const scripts = inject[SCRIPTS];
     if (scripts) {
       triageRealms(scripts, bag[FORCE_CONTENT] || forceContent, tabId, frameId, bag);
-      addValueOpener(scripts, tabId, frameId);
+      addValueOpener(scripts, tabId, frameDoc);
     }
     if (popupTabs[tabId]) {
-      setTimeout(sendTabCmd, 0, tabId, 'PopupShown', true, { frameId });
+      setTimeout(sendTabCmd, 0, tabId, 'PopupShown', true, getFrameDocIdAsObj(frameDoc));
     }
     return isApplied
       ? !done && inject
@@ -169,22 +174,29 @@ addPublicCommands({
     [MORE]: moreKey,
     url,
   }, src) {
-    const { frameId, tab } = src;
+    const { tab, [kFrameId]: frameId } = src;
+    const isTop = src[kTop];
     const tabId = tab.id;
     injectContentRealm(items, tabId, frameId);
     if (!moreKey) return;
     if (!url) url = src.url || tab.url;
     const env = cache.get(moreKey)
-      || cache.put(moreKey, getScriptsByURL(url, !frameId))
+      || cache.put(moreKey, getScriptsByURL(url, isTop))
       || { [SCRIPTS]: [] }; // scripts got removed or the url got blacklisted after GetInjected
     const envCache = (env[PROMISE] ? await env[PROMISE] : env)[S_CACHE];
     const scripts = prepareScripts(env);
     triageRealms(scripts, forceContent, tabId, frameId);
-    addValueOpener(scripts, tabId, frameId);
+    addValueOpener(scripts, tabId, getFrameDocId(isTop, src[kDocumentId], frameId));
     return {
       [SCRIPTS]: scripts,
       [S_CACHE]: envCache,
     };
+  },
+  Run({ [IDS]: ids, reset }, src) {
+    setBadge(ids, reset, src);
+    if (reset === 'bfcache' && +ids[0]) {
+      addValueOpener(ids, src.tab.id, getFrameDocIdFromSrc(src));
+    }
   },
 });
 
@@ -271,9 +283,10 @@ function toggleFastFirefoxInject(enable) {
   }
 }
 
-/** @param {chrome.webRequest.WebRequestDetails} info */
-function onSendHeaders({ url, frameId, tabId }) {
-  const isTop = !frameId;
+/** @param {chrome.webRequest.WebRequestHeadersDetails} info */
+function onSendHeaders(info) {
+  const { url, tabId } = info;
+  const isTop = isTopFrame(info);
   const key = getKey(url, isTop);
   if (!cache.has(key) && !skippedTabs[tabId]) {
     prepare(key, url, isTop);
@@ -282,7 +295,7 @@ function onSendHeaders({ url, frameId, tabId }) {
 
 /** @param {chrome.webRequest.WebResponseHeadersDetails} info */
 function onHeadersReceived(info) {
-  const key = getKey(info.url, !info.frameId);
+  const key = getKey(info.url, isTopFrame(info));
   const bag = cache.get(key);
   // The INJECT data is normally already in cache if code and values aren't huge
   if (bag && !bag[FORCE_CONTENT] && bag[INJECT]?.[SCRIPTS] && !skippedTabs[info.tabId]) {
@@ -299,7 +312,7 @@ function onHeadersReceived(info) {
  * @param {chrome.webRequest.WebResponseHeadersDetails} info
  * @param {VMInjection.Bag} bag
  */
-function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, tabId, frameId }, bag) {
+function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, [kFrameId]: frameId, tabId }, bag) {
   triageRealms(bag[INJECT][SCRIPTS], bag[FORCE_CONTENT], tabId, frameId, bag);
   const blobUrl = URL.createObjectURL(new Blob([
     JSON.stringify(bag[INJECT]),
@@ -509,8 +522,8 @@ function injectContentRealm(toContent, tabId, frameId) {
     browser.tabs.executeScript(tabId, {
       code: scr[__CODE].join(''),
       [RUN_AT]: `document_${scr[RUN_AT]}`.replace('body', 'start'),
-      frameId,
-    }).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { frameId })));
+      [kFrameId]: frameId,
+    }).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
   }
 }
 

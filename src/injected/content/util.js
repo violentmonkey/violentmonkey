@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
-export { sendCmd } from '@/common';
+import { sendMessage } from '@/common';
+
 export * from './util-task';
 
 /** When looking for documentElement, use '*' to also support XML pages
@@ -70,3 +71,15 @@ export const decodeResource = (raw, isBlob) => {
     ? new SafeBlob([res], { type: mimeType })
     : res;
 };
+
+export const topRenderMode = window !== top ? 0 : document.prerendering ? 2 : 1;
+/**
+ * Used by `injected`
+ * @param {string} cmd
+ * @param data
+ * @param {{retry?: boolean}} [options]
+ * @return {Promise}
+ */
+export const sendCmd = (cmd, data, options) => (
+  sendMessage({ cmd, data, [kTop]: topRenderMode }, options)
+);

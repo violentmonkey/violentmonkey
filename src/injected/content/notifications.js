@@ -6,6 +6,7 @@ const relay = (msg, n) => n && bridge.post(msg, n.id, n.realm) && n;
 
 addHandlers({
   async Notification(options, realm) {
+    await bridge[REIFY];
     const nid = await sendCmd('Notification', options);
     notifications[nid] = { id: options.id, realm };
   },

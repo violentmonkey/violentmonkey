@@ -1,45 +1,56 @@
 import bridge, { addHandlers, onScripts } from './bridge';
 import { sendSetPopup } from './gm-api-content';
-import { nextTask, sendCmd } from './util';
+import { nextTask, sendCmd, topRenderMode } from './util';
 
 const getPersisted = describeProperty(PageTransitionEvent[PROTO], 'persisted').get;
+let pending = topRenderMode === 2; // wait until reified if pre-rendered
+let resolveOnReify;
 let runningIds;
-let pending;
 let sent;
 
 onScripts.push(() => {
   addHandlers({ Run });
   runningIds = [];
 });
-on('pageshow', evt => {
-  // isTrusted is `unforgeable` per DOM spec
-  if (evt.isTrusted && evt::getPersisted()) {
-    sent = false;
-    sendSetBadge();
-  }
-});
-
-export function Run(id, realm) {
-  safePush(runningIds, id);
-  bridge[IDS][id] = realm || PAGE;
-  if (!pending) pending = sendSetBadge(2);
+on('pageshow', onShown);
+if (pending) {
+  document::on('prerenderingchange', onShown.bind(null));
+  bridge[REIFY] = new Promise(resolve => (resolveOnReify = resolve));
 }
 
-export async function sendSetBadge(delayed) {
-  if (delayed === AUTO && (pending || sent)) {
+function onShown(evt) {
+  // isTrusted is `unforgeable` per DOM spec
+  if (evt.isTrusted) {
+    if (!this) {
+      sent = bridge[REIFY] = false;
+      resolveOnReify();
+      report();
+    } else if (evt::getPersisted()) {
+      report(0, 'bfcache');
+    }
+  }
+}
+
+export function Run(id, realm) {
+  if (id === SKIP_SCRIPTS) {
+    runningIds = SKIP_SCRIPTS;
+    report();
     return;
   }
-  while (--delayed >= 0) {
-    await nextTask();
-  }
+  safePush(runningIds, id);
+  bridge[IDS][id] = realm || PAGE;
+  if (!pending) pending = report(2);
+}
+
+async function report(delay, reset = !sent) {
+  while (--delay >= 0) await nextTask();
   // not awaiting to clear `pending` immediately
-  sendCmd('SetBadge', { [IDS]: runningIds, reset: !sent });
+  sendCmd('Run', { reset, [IDS]: runningIds });
   sendSetPopup(!!pending);
   pending = false;
   sent = true;
 }
 
-export function sendSkipScripts() {
-  runningIds = SKIP_SCRIPTS;
-  sendSetBadge();
+export function finish() {
+  if (!pending && !sent) report();
 }

@@ -71,7 +71,7 @@ const commandsToSyncIfTruthy = [
   'CheckUpdate',
 ];
 
-async function handleCommandMessage({ cmd, data } = {}, src) {
+async function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
   const func = hasOwnProperty(commands, cmd) && commands[cmd];
   if (!func) {
     throw new SafeError(`Unknown command: ${cmd}`);
@@ -85,6 +85,9 @@ async function handleCommandMessage({ cmd, data } = {}, src) {
   if (IS_FIREFOX && !func.isOwn && src && !src.tab && !src.url.startsWith(extensionRoot)) {
     if (process.env.DEBUG) console.log('No src.tab, ignoring:', ...arguments);
     return;
+  }
+  if (mode && src) {
+    src[kTop] = mode;
   }
   try {
     const res = await func(data, src);

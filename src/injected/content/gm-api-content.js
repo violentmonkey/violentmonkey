@@ -9,7 +9,8 @@ let setPopupThrottle;
 let isPopupShown;
 
 addBackgroundHandlers({
-  PopupShown(state) {
+  async PopupShown(state) {
+    await bridge[REIFY];
     isPopupShown = state;
     sendSetPopup();
   },

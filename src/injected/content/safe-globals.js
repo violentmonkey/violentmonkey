@@ -61,4 +61,5 @@ export const isPromise = (proto => val => isInstance(val, proto))(SafePromise[PR
  * The document's value can change only in about:blank but we don't inject there. */
 const { document } = global;
 export const { getElementsByTagName } = document;
+export const REIFY = 'reify';
 export let IS_FIREFOX = !chrome.app;
