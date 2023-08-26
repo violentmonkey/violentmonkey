@@ -1,5 +1,5 @@
 import { commands } from '../utils/message';
-import { getScripts } from '../utils/db';
+import { getScripts, parseScript } from '../utils/db';
 
 export const script = {
   /**
@@ -7,7 +7,7 @@ export const script = {
    * @param {{ id, code, message, isNew, config, custom, props, update }} data
    * @return {Promise<{ isNew?, update, where }>}
    */
-  update: commands.ParseScript,
+  update: parseScript,
   /**
    * List all available scripts, without script code
    * @return {Promise<VMScript[]>}
