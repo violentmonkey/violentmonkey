@@ -26,6 +26,7 @@ function onShown(evt) {
       sent = bridge[REIFY] = false;
       resolveOnReify();
       report();
+      topRenderMode = 4; // eslint-disable-line no-import-assign
     } else if (evt::getPersisted()) {
       report(0, 'bfcache');
     }

@@ -2,6 +2,7 @@
 import { sendMessage } from '@/common';
 
 export * from './util-task';
+/** @type {VMTopRenderMode} */
 export let topRenderMode = window !== top ? 0 : document.prerendering ? 2 : 1;
 
 /** When looking for documentElement, use '*' to also support XML pages

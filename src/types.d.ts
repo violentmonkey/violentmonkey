@@ -342,10 +342,17 @@ declare interface VMUserAgent extends VMScriptGMInfoPlatform {
 
 /** Augmented by handleCommandMessage in messages from the content script */
 declare interface VMMessageSender extends chrome.runtime.MessageSender {
-  /** 0 = frame, 1 = top document, 2 = pre-rendered top document */
-  top?: number;
+  top?: VMTopRenderMode;
 }
 
 declare type VMMessageTargetFrame = { frameId?: number } | { documentId?: string }
+/**
+ * 0 = frame
+ * 1 = top page
+ * 2 = pre-rendered top page invisible
+ * 3 = pre-rendered top-page reified (the mode is set temporarily just to notify bg)
+ * 4 = pre-rendered top-page post-reification
+ */
+declare type VMTopRenderMode = 0 | 1 | 2 | 3 | 4;
 
 //#endregion Generic
