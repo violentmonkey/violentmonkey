@@ -1,5 +1,6 @@
 import {
-  debounce, normalizeKeys, request, noop, makePause, ensureArray, sendCmd, blob2base64, getRandomString,
+  debounce, normalizeKeys, request, noop, makePause, ensureArray, sendCmd,
+  buffer2string, getRandomString,
 } from '@/common';
 import { TIMEOUT_HOUR } from '@/common/consts';
 import {
@@ -634,8 +635,7 @@ const base64urlMapping = {
 async function sha256b64url(code) {
   const bin = new TextEncoder().encode(code);
   const buffer = await crypto.subtle.digest('SHA-256', bin);
-  const blob = new Blob([buffer], { type: 'application/octet-binary' });
-  const b64 = await blob2base64(blob);
+  const b64 = btoa(buffer2string(buffer));
   return b64.replace(/[+/=]/g, m => base64urlMapping[m] || '');
 }
 
