@@ -169,6 +169,9 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Values
+editReadonly:
+  description: Text of the warning when opening an auto-updated script in the editor.
+  message: To enable editing, disallow updates in the Settings tab and click "Save".
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: All

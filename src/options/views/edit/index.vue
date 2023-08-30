@@ -27,10 +27,13 @@
       </div>
     </div>
 
+    <div v-text="i18n('editReadonly')" class="mx-1 my-1 text-red" v-if="!canEdit"/>
+
     <vm-code
       class="flex-auto"
       :value="code"
-      :readOnly="readOnly"
+      :readOnly="readOnly || script.$canUpdate === 1"
+      v-on="{ keypress: script.$canUpdate === 1 && (() => (this.canEdit = false)) }"
       ref="code"
       v-show="nav === 'code'"
       :active="nav === 'code'"
@@ -176,6 +179,7 @@ export default {
   data() {
     return {
       nav: 'code',
+      canEdit: true,
       canSave: false,
       script: null,
       code: '',
