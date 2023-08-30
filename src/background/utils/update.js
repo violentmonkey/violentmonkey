@@ -18,11 +18,16 @@ addOwnCommands({
    * @return {Promise<number>} number of updated scripts
    */
   async CheckUpdate(id) {
-    const scripts = id ? ensureArray(id).map(getScriptById) : getScripts();
-    const enabledOnly = !id && getOption('updateEnabledScriptsOnly');
+    const isAuto = !id;
+    const scripts = isAuto ? getScripts() : ensureArray(id).map(getScriptById).filter(Boolean);
+    const urlOpts = {
+      all: true,
+      auto: isAuto,
+      enabledOnly: isAuto && getOption('updateEnabledScriptsOnly'),
+    };
     const jobs = scripts.map(script => {
       const curId = script.props.id;
-      const urls = getScriptUpdateUrl(script, true, enabledOnly);
+      const urls = getScriptUpdateUrl(script, urlOpts);
       return urls && (processes[curId] || (processes[curId] = doCheckUpdateLimited(script, urls)));
     }).filter(Boolean);
     const results = await Promise.all(jobs);
@@ -34,7 +39,7 @@ addOwnCommands({
         notes.map(n => n.script.props.id),
       );
     }
-    if (!id) setOption('lastUpdate', Date.now());
+    if (isAuto) setOption('lastUpdate', Date.now());
     return results.reduce((num, r) => num + (r === true), 0);
   },
 });

@@ -317,8 +317,8 @@ export default {
         list = list.map(script => {
           const scriptName = getScriptName(script);
           const { id } = script.props;
-          const { enabled, removed } = script.config;
-          const upd = !removed && getScriptUpdateUrl(script, false, enabledOnly);
+          const { enabled, removed, shouldUpdate } = script.config;
+          const upd = !removed && getScriptUpdateUrl(script, { enabledOnly });
           const item = {
             id,
             name: scriptName,
@@ -334,10 +334,10 @@ export default {
             }`,
             excludes: null,
           };
-          if (upd) {
+          if (upd) item.upd = null;
+          if (upd && shouldUpdate) {
             if (!updatableScripts) updatableScripts = store.updatableScripts = {};
             updatableScripts[id] = item;
-            item[upd] = null;
           }
           return item;
         }).sort((a, b) => (a.key < b.key ? -1 : a.key > b.key));

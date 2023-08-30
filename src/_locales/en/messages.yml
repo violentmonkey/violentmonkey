@@ -110,6 +110,11 @@ buttonVacuumed:
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Vacuuming data...
+confirmManualUpdate:
+  description: Confirm message shown when clicking update button for a single script.
+  message: |-
+    Auto-update is disabled for this script!
+    Click OK to update it anyway.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-

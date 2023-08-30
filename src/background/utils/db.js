@@ -610,7 +610,7 @@ export async function parseScript(src) {
   }
   if (isRemote(src.url)) script.custom.lastInstallURL = src.url;
   if (src.position) script.props.position = +src.position;
-  if (!src.update) storage.mod.remove(getScriptUpdateUrl(script, true) || []);
+  if (!src.update) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
   buildPathMap(script, src.url);
   await saveScript(script, src.code);
   fetchResources(script, src);
@@ -747,7 +747,7 @@ export async function vacuum(data) {
     const { icon } = meta;
     const { id } = props;
     const pathMap = script.custom.pathMap || buildPathMap(script);
-    const updUrls = getScriptUpdateUrl(script, true);
+    const updUrls = getScriptUpdateUrl(script, { all: true });
     if (updUrls) {
       updUrls.forEach(url => touch(S_MOD_PRE, url, id));
       downloadUrls[id] = updUrls[0];

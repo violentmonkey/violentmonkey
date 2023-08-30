@@ -64,15 +64,15 @@
             </a>
           </tooltip>
           <tooltip
-            :disabled="!canUpdate || script.checking"
+            :disabled="!script.$canUpdate || script.checking"
             :content="i18n('buttonCheckForUpdates')"
             align="start">
             <a
               class="btn-ghost"
               @click="onUpdate"
               :data-hotkey="hotkeys.update"
-              :tabIndex="canUpdate ? tabIndex : -1">
-              <icon name="refresh"></icon>
+              :tabIndex="script.$canUpdate ? tabIndex : -1">
+              <icon name="refresh" :invert.attr="script.$canUpdate === -1 ? '' : null" />
             </a>
           </tooltip>
         </template>
@@ -122,9 +122,10 @@
 <script>
 import Tooltip from 'vueleton/lib/tooltip';
 import {
-  getLocaleString, getScriptHome, getScriptUpdateUrl, formatTime,
+  getLocaleString, getScriptHome, formatTime,
   getScriptSupportUrl, i18n,
 } from '@/common';
+import { showConfirmation } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
 import { store } from '../utils';
@@ -152,9 +153,6 @@ export default {
   computed: {
     showRecycle() {
       return store.route.paths[0] === TAB_RECYCLE;
-    },
-    canUpdate() {
-      return getScriptUpdateUrl(this.script);
     },
     author() {
       const text = this.script.meta.author;
@@ -239,7 +237,11 @@ export default {
     onToggle() {
       this.$emit('toggle', this.script);
     },
-    onUpdate() {
+    async onUpdate() {
+      if (this.script.$canUpdate === -1
+      && !await showConfirmation(i18n('confirmManualUpdate'))) {
+        return;
+      }
       this.$emit('update', this.script);
     },
     onFocus() {
@@ -259,6 +261,8 @@ export default {
 @import '../utils/dragging.css';
 
 $rem: 14px;
+// SVG viewport (200px) * .icon width (1rem = 14px) * attenuation factor
+$strokeWidth: calc(200px / 14 * .7);
 // The icon should use the real size we generate in `dist` to ensure crispness
 $iconSize: 38px;
 $iconSizeSmaller: 32px;
@@ -586,5 +590,11 @@ $removedItemHeight: calc(
   &[data-show-order] [data-order]::before {
     content: attr(data-order) '. ';
   }
+}
+
+svg[invert] {
+  fill: transparent;
+  stroke: currentColor;
+  stroke-width: $strokeWidth;
 }
 </style>

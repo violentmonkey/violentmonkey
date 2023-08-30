@@ -214,12 +214,15 @@ export function getScriptPrettyUrl(script, displayName) {
 
 /**
  * @param {VMScript} script
- * @param {boolean} [all] - to return all two urls (1: check, 2: download)
- * @param {boolean} [enabledOnly]
+ * @param {Object} [opts]
+ * @param {boolean} [opts.all] - to return all two urls [checkUrl, downloadUrl]
+ * @param {boolean} [opts.auto] - auto-update mode: check shouldUpdate
+ * @param {boolean} [opts.enabledOnly]
  * @return {string[] | string}
  */
-export function getScriptUpdateUrl(script, all, enabledOnly) {
-  if (script.config.shouldUpdate && (!enabledOnly || script.config.enabled)) {
+export function getScriptUpdateUrl(script, { all, auto, enabledOnly } = {}) {
+  if ((!auto || script.config.shouldUpdate)
+  && (!enabledOnly || script.config.enabled)) {
     const { custom, meta } = script;
     /* URL in meta may be set to an invalid value to enforce disabling of the automatic updates
      * e.g. GreasyFork sets it to `none` when the user installs an old version.
