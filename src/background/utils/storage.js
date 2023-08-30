@@ -6,8 +6,9 @@ let api = browser.storage.local;
 
 /** @prop {VMStorageFetch} [fetch] */
 class StorageArea {
-  constructor(prefix) {
-    this.name = '';
+  constructor(name, prefix) {
+    storageByPrefix[prefix] = this; // eslint-disable-line no-use-before-define
+    this.name = name;
     this.prefix = prefix;
   }
 
@@ -70,39 +71,42 @@ class StorageArea {
   }
 }
 
+export const S_CACHE = 'cache';
 export const S_CACHE_PRE = 'cac:';
+export const S_CODE = 'code';
 export const S_CODE_PRE = 'code:';
+export const S_MOD = 'mod';
 export const S_MOD_PRE = 'mod:';
+export const S_REQUIRE = 'require';
 export const S_REQUIRE_PRE = 'req:';
+export const S_SCRIPT = 'script';
 export const S_SCRIPT_PRE = 'scr:';
+export const S_VALUE = 'value';
 export const S_VALUE_PRE = 'val:';
+/** @type {{ [prefix: string]: StorageArea }} */
+export const storageByPrefix = {};
+/**
+ * @prop {StorageArea} cache
+ * @prop {StorageArea} code
+ * @prop {StorageArea} mod
+ * @prop {StorageArea} require
+ * @prop {StorageArea} script
+ * @prop {StorageArea} value
+ */
 const storage = {
   get api() { return api; },
   set api(val) { api = val; },
   /** @return {?StorageArea} */// eslint-disable-next-line no-use-before-define
   forKey: key => storageByPrefix[/^\w+:|$/.exec(key)[0]],
-  base: new StorageArea(''),
-  cache: new StorageArea(S_CACHE_PRE),
-  code: new StorageArea(S_CODE_PRE),
+  base: new StorageArea('', ''),
+  [S_CACHE]: new StorageArea(S_CACHE, S_CACHE_PRE),
+  [S_CODE]: new StorageArea(S_CODE, S_CODE_PRE),
   /** last-modified HTTP header value per URL */
-  mod: new StorageArea(S_MOD_PRE),
-  require: new StorageArea(S_REQUIRE_PRE),
-  script: new StorageArea(S_SCRIPT_PRE),
-  value: new StorageArea(S_VALUE_PRE),
+  [S_MOD]: new StorageArea(S_MOD, S_MOD_PRE),
+  [S_REQUIRE]: new StorageArea(S_REQUIRE, S_REQUIRE_PRE),
+  [S_SCRIPT]: new StorageArea(S_SCRIPT, S_SCRIPT_PRE),
+  [S_VALUE]: new StorageArea(S_VALUE, S_VALUE_PRE),
 };
-/** @type {{ [prefix: string]: StorageArea }} */
-export const storageByPrefix = storage::mapEntry(null, (name, val) => {
-  if (val instanceof StorageArea) {
-    val.name = name;
-    return val.prefix;
-  }
-});
-export const S_CACHE = storageByPrefix[S_CACHE_PRE].name;
-export const S_CODE = storageByPrefix[S_CODE_PRE].name;
-export const S_MOD = storageByPrefix[S_MOD_PRE].name;
-export const S_REQUIRE = storageByPrefix[S_REQUIRE_PRE].name;
-export const S_SCRIPT = storageByPrefix[S_SCRIPT_PRE].name;
-export const S_VALUE = storageByPrefix[S_VALUE_PRE].name;
 export default storage;
 
 addOwnCommands({
