@@ -203,7 +203,7 @@ addPublicCommands({
       reifyValueOpener(ids, docId);
       reifyRequests(tabId, docId);
     }
-    if (reset === 'bfcache' && +ids[0]) {
+    if (reset === 'bfcache' && +ids?.[0]) {
       addValueOpener(ids, tabId, getFrameDocId(isTop, docId, src[kFrameId]));
     }
   },
