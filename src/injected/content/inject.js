@@ -1,6 +1,6 @@
 import bridge, { addHandlers } from './bridge';
 import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
-import { bindEvents, fireBridgeEvent, META_STR } from '../util';
+import { bindEvents, CONSOLE_METHODS, fireBridgeEvent, META_STR } from '../util';
 import { Run } from './cmd-run';
 
 const bridgeIds = bridge[IDS];
@@ -308,7 +308,7 @@ async function injectPageList(runAt) {
 }
 
 function setupContentInvoker() {
-  const invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle);
+  const invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle, logging);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm, node) => {
     const fn = realm === CONTENT
@@ -348,7 +348,7 @@ function addVaultExports(vaultSrc) {
   const exports = cloneInto(createNullObj(), document);
   // In FF a detached iframe's `console` doesn't print anything, we'll export it from content
   const exportedConsole = cloneInto(createNullObj(), document);
-  ['log', 'info', 'warn', 'error', 'debug']::forEach(k => {
+  CONSOLE_METHODS::forEach(k => {
     exportedConsole[k] = exportFunction(logging[k], document);
     /* global exportFunction */
   });

@@ -11,6 +11,8 @@ export {
 } from '@/common';
 export * from '@/common/consts';
 
+export const CONSOLE_METHODS = ['log', 'info', 'warn', 'error', 'debug'];
+
 export const fireBridgeEvent = (eventId, msg) => {
   const detail = cloneInto ? cloneInto(msg, document) : msg;
   const evtMain = new SafeCustomEvent(eventId, { __proto__: null, detail });

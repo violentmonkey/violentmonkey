@@ -67,6 +67,7 @@ addBackgroundHandlers({
 });
 
 addHandlers({
+  Log: data => safeApply(logging[data[0]], logging, data[1]),
   TabFocus: REIFY,
   UpdateValue: REIFY,
 });

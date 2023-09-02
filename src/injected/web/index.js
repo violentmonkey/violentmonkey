@@ -1,17 +1,19 @@
 import bridge, { addHandlers } from './bridge';
 import store from './store';
+import { GM_API } from './gm-api';
 import { makeGmApiWrapper } from './gm-api-wrapper';
 import './gm-values';
 import './notifications';
 import './requests';
 import './tabs';
-import { bindEvents } from '../util';
+import { bindEvents, CONSOLE_METHODS } from '../util';
+import { safeConcat } from './util';
 
 // Make sure to call safe::methods() in code that may run after userscripts
 
 const toRun = createNullObj();
 
-export default function initialize(invokeHost) {
+export default function initialize(invokeHost, console) {
   if (PAGE_MODE_HANDSHAKE) {
     window::on(PAGE_MODE_HANDSHAKE + '*', e => {
       e = e::getDetail();
@@ -25,6 +27,16 @@ export default function initialize(invokeHost) {
         this[id] = VAULT;
       },
     });
+    /* Can't use a detached `console` in Chrome 109+ due to https://crrev.com/1063194 */
+    if (!IS_FIREFOX) {
+      for (const m of CONSOLE_METHODS) {
+        logging[m] = (...args) => bridge.post('Log', [m, args]);
+      }
+      /** @this {GMContext} */
+      GM_API.bound.GM_log = function (...args) {
+        bridge.post('Log', ['log', safeConcat([`[${this.script.displayName}]`], args)]);
+      };
+    }
   } else {
     bridge.mode = CONTENT;
     bridge.post = (cmd, data, node) => {
@@ -32,6 +44,7 @@ export default function initialize(invokeHost) {
     };
     global.chrome = undefined;
     global.browser = undefined;
+    logging = console; // eslint-disable-line no-global-assign
     return (cmd, data, realm, node) => {
       if (process.env.DEBUG) console.info('[bridge.guest.content] received', { cmd, data, node });
       bridge.onHandle({ cmd, data, node });
