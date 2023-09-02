@@ -497,8 +497,8 @@ export default {
     },
     navigate(dir) {
       const { activeElement } = document;
-      const items = Array.from(this.$el.querySelectorAll('[tabindex="0"]'))
-      .map(el => ({
+      const items = this.$el.querySelectorAll('[tabindex="0"]')
+      ::[].map(el => ({
         el,
         rect: el.getBoundingClientRect(),
       }))

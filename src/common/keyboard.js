@@ -56,8 +56,8 @@ function bindKeys() {
  * Ref: https://stackoverflow.com/a/11713537/4238335
  */
 export function handleTabNavigation(dir) {
-  const els = Array.from(document.querySelectorAll('[tabindex="0"],a[href],button,input,select,textarea'))
-  .filter(el => {
+  const els = document.querySelectorAll('[tabindex="0"],a[href],button,input,select,textarea')
+  ::[].filter(el => {
     if (el.tabIndex < 0) return false;
     const rect = el.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;

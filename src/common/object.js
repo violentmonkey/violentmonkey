@@ -87,9 +87,9 @@ export function forEachValue(func, thisObj) {
 
 export function deepCopy(src) {
   if (!src || typeof src !== 'object') return src;
-  /* Not using `map` because its result belongs to the `window` of the source,
-   * so it becomes "dead object" in Firefox after GC collects it. */
-  if (Array.isArray(src)) return Array.from(src, deepCopy);
+  // Using a literal [] instead of `src.map(deepCopy)` to avoid src `window` leaking.
+  // Using `concat` instead of `for` loop to preserve holes in the array.
+  if (Array.isArray(src)) return [].concat(src).map(deepCopy);
   return src::mapEntry(deepCopy);
 }
 
