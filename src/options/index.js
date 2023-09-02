@@ -112,7 +112,7 @@ function initMain() {
       const i1 = store.scripts.findIndex(item => item.props.id === where.id);
       const i2 = store.removedScripts.findIndex(item => item.props.id === where.id);
       const script = store.scripts[i1] || store.removedScripts[i2]
-        || [SCRIPTS, TAB_RECYCLE, ''].includes(store.route.hash) && {}; // newly installed
+        || store.canRenderScripts && {}; // a new script was just saved or installed
       if (!script) return; // We're in editor that doesn't have data for all scripts
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       Object.assign(script, update);

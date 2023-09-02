@@ -3,6 +3,8 @@ import { route } from '@/common/router';
 
 export const store = reactive({
   route,
+  /** Speedup and deflicker initial page load by not rendering an invisible script list */
+  canRenderScripts: [SCRIPTS, TAB_RECYCLE, ''].includes(route.hash),
   scripts: [],
   removedScripts: [],
   importing: null,

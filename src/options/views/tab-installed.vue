@@ -1,6 +1,6 @@
 <template>
   <div class="tab-installed" ref="scroller">
-    <div v-if="state.canRenderScripts">
+    <div v-if="store.canRenderScripts">
       <header class="flex">
         <div class="flex-auto" v-if="!showRecycle">
           <Dropdown
@@ -235,9 +235,6 @@ const state = reactive({
   focusedIndex: -1,
   menuNewActive: false,
   showHotkeys: false,
-  // Speedup and deflicker for initial page load:
-  // skip rendering the script list when starting in the editor.
-  canRenderScripts: !store.route.paths[1],
   search: '',
   searchError: null,
   sortedScripts: [],
@@ -372,8 +369,8 @@ async function onHashChange() {
   // which was hidden to avoid flicker on initial page load directly into the editor.
   if (id) setRoute(tab, true);
   // First time showing the list we need to tell v-if to keep it forever
-  if (!state.canRenderScripts) {
-    state.canRenderScripts = true;
+  if (!store.canRenderScripts) {
+    store.canRenderScripts = true;
     loadData();
   }
   renderScripts();
@@ -386,7 +383,7 @@ async function onHashChange() {
   }
 }
 async function renderScripts() {
-  if (!state.canRenderScripts) return;
+  if (!store.canRenderScripts) return;
   const { length } = state.sortedScripts;
   let limit = 9;
   const batchRender = reactive({ limit });
@@ -644,7 +641,7 @@ export default {
   setup() {
     resetList();
     watch(showRecycle, resetList);
-    watch(() => state.canRenderScripts && refList.value && draggable.value,
+    watch(() => store.canRenderScripts && refList.value && draggable.value,
       state => toggleDragging(refList.value, moveScript, state));
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
