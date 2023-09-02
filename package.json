@@ -68,7 +68,7 @@
     "@violentmonkey/shortcut": "^1.2.6",
     "@zip.js/zip.js": "2.4.4",
     "codemirror": "^5.65.10",
-    "tldjs": "^2.3.1",
+    "tldts": "^6.0.14",
     "vue": "^3.2.45",
     "vueleton": "^2.0.2"
   },

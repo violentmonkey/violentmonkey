@@ -1,13 +1,9 @@
-import tldRules from 'tldjs/rules.json';
-
 global.chrome =
 global.browser = {
   storage: {
     local: {
       get() {
-        return Promise.resolve({
-          'dat:tldRules': tldRules,
-        });
+        return Promise.resolve({});
       },
       set() {
         return Promise.resolve();

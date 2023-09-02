@@ -2,7 +2,7 @@
 import { getScriptPrettyUrl } from '@/common';
 import { BLACKLIST, BLACKLIST_ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
-import { getPublicSuffix } from 'tldjs/tld';
+import { getPublicSuffix } from 'tldts';
 import { postInitialize } from './init';
 import { getOption, hookOptions } from './options';
 import storage from './storage';
@@ -261,7 +261,7 @@ function matchTld(tstr) {
   const matches = tstr.match(this);
   const suffix = matches?.[1]?.slice(1).toLowerCase();
   // Must return a proper boolean
-  return !!suffix && getPublicSuffix(suffix) === suffix;
+  return !!suffix && getPublicSuffix(suffix, { allowPrivateDomains: true }) === suffix;
 }
 
 function hostMatcher(rule) {

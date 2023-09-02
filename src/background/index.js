@@ -2,7 +2,7 @@ import '@/common/browser';
 import { makePause, sendCmd } from '@/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
 import { deepCopy } from '@/common/object';
-import { getDomain } from 'tldjs/tld';
+import { getDomain } from 'tldts';
 import * as sync from './sync';
 import { addOwnCommands, addPublicCommands, commands } from './utils';
 import { getData, getSizes, checkRemove } from './utils/db';
@@ -41,7 +41,7 @@ addOwnCommands({
     const host = url && new URL(url).hostname;
     return {
       host,
-      domain: host && getDomain(host) || host,
+      domain: host && getDomain(host, { allowPrivateDomains: true }) || host,
     };
   },
 });
