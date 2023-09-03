@@ -261,7 +261,7 @@ function matchTld(tstr) {
   const matches = tstr.match(this);
   const suffix = matches?.[1]?.slice(1).toLowerCase();
   // Must return a proper boolean
-  return !!suffix && getPublicSuffix(suffix, { allowPrivateDomains: true }) === suffix;
+  return !!suffix && getPublicSuffix(suffix) === suffix;
 }
 
 function hostMatcher(rule) {
