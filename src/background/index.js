@@ -2,7 +2,7 @@ import '@/common/browser';
 import { makePause, sendCmd } from '@/common';
 import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
 import { deepCopy } from '@/common/object';
-import { getDomain } from 'tldts';
+import { getDomain } from '@/common/tld';
 import * as sync from './sync';
 import { addOwnCommands, addPublicCommands, commands } from './utils';
 import { getData, getSizes, checkRemove } from './utils/db';

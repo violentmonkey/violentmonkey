@@ -2,7 +2,7 @@
 import { getScriptPrettyUrl } from '@/common';
 import { BLACKLIST, BLACKLIST_ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
-import { getPublicSuffix } from 'tldts';
+import { getPublicSuffix } from '@/common/tld';
 import { postInitialize } from './init';
 import { getOption, hookOptions } from './options';
 import storage from './storage';
