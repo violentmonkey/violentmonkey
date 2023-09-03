@@ -41,7 +41,7 @@ addOwnCommands({
     const host = url && new URL(url).hostname;
     return {
       host,
-      domain: host && getDomain(host, { allowPrivateDomains: true }) || host,
+      domain: host && getDomain(host) || host,
     };
   },
 });
