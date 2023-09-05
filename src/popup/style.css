@@ -379,6 +379,6 @@ footer {
 .syntax {
   font-size: xx-small;
   position: absolute;
-  top: 2.5em;
+  top: -0.2em;
   color: red;
 }

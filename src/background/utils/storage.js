@@ -98,7 +98,7 @@ const storage = {
   set api(val) { api = val; },
   /** @return {?StorageArea} */// eslint-disable-next-line no-use-before-define
   forKey: key => storageByPrefix[/^\w+:|$/.exec(key)[0]],
-  base: new StorageArea('', ''),
+  base: new StorageArea('base', ''),
   [S_CACHE]: new StorageArea(S_CACHE, S_CACHE_PRE),
   [S_CODE]: new StorageArea(S_CODE, S_CODE_PRE),
   /** last-modified HTTP header value per URL */
