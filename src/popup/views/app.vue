@@ -213,6 +213,7 @@ import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
 import { store } from '../utils';
 
+let injectionScopes;
 let mousedownElement;
 const NAME = `${extensionManifest.name} ${process.env.VM_VER}`;
 const SCRIPT_CLS = '.script';
@@ -236,11 +237,14 @@ options.hook((changes) => {
 });
 Object.assign(handlers, {
   async UpdateScript({ update: { error, message }, where: { id } } = {}) {
-    // TODO: update `item` in injectableScopes for any changed script?
-    const item = store.updatableScripts?.[id];
-    if (item) {
-      item.upd = error || message;
-      item.updError = error;
+    for (const { list } of injectionScopes) {
+      for (const item of list) {
+        if (item.id === id) {
+          item.upd = error || message;
+          item.updError = error;
+          return;
+        }
+      }
     }
   },
 });
@@ -296,7 +300,7 @@ export default {
       const groupDisabled = hideDisabled === 'group';
       const enabledOnly = optionsData[kUpdateEnabledScriptsOnly];
       let updatableScripts;
-      return [
+      injectionScopes = [
         injectable && ['scripts', i18n('menuMatchedScripts'), groupDisabled || null],
         injectable && groupDisabled && ['disabled', i18n('menuMatchedDisabledScripts'), false],
         ['frameScripts', i18n('menuMatchedFrameScripts')],
@@ -350,6 +354,7 @@ export default {
             : `${numTotal}`,
         };
       }).filter(Boolean);
+      return injectionScopes;
     },
     findUrls() {
       const query = encodeURIComponent(store.domain);
