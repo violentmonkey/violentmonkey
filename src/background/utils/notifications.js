@@ -3,10 +3,11 @@ import ua from '@/common/ua';
 import { addPublicCommands } from './message';
 
 const openers = {};
+const removeNotification = id => browser.notifications.clear(id);
 
 addPublicCommands({
   /** @return {Promise<string>} */
-  async Notification({ image, text, title, silent, onclick }, src) {
+  async Notification({ image, text, title, silent, onclick, zombieTimeout }, src) {
     const notificationId = await browser.notifications.create({
       type: 'basic',
       title: [title, IS_FIREFOX && i18n('extName')]::trueJoin(' - '), // Chrome already shows the name
@@ -19,13 +20,15 @@ addPublicCommands({
         silent,
       }
     });
-    const op = isFunction(onclick) ? onclick : src && [src.tab.id, src[kFrameId]];
+    const op = isFunction(onclick) ? onclick : src && [
+      src.tab.id,
+      src[kFrameId],
+      +zombieTimeout > 0 ? +zombieTimeout : 0,
+    ];
     if (op) openers[notificationId] = op;
     return notificationId;
   },
-  RemoveNotification(notificationId) {
-    return browser.notifications.clear(notificationId);
-  },
+  RemoveNotification: removeNotification,
 });
 
 browser.notifications.onClicked.addListener((id) => {
@@ -45,5 +48,15 @@ function notifyOpener(id, isClick) {
     sendTabCmd(op[0], isClick ? 'NotificationClick' : 'NotificationClose', id, {
       [kFrameId]: op[1],
     });
+  }
+}
+
+export function clearNotifications(tabId, frameId) {
+  for (const nid in openers) {
+    const op = openers[nid];
+    if (op[0] === tabId && (!frameId || op[1] === frameId)) {
+      if (op[2]) setTimeout(removeNotification, op[2], nid);
+      delete openers[nid];
+    }
   }
 }
