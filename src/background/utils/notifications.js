@@ -56,6 +56,7 @@ export function clearNotifications(tabId, frameId) {
     const op = openers[nid];
     if (op[0] === tabId && (!frameId || op[1] === frameId)) {
       if (op[2]) setTimeout(removeNotification, op[2], nid);
+      else removeNotification(nid);
       delete openers[nid];
     }
   }
