@@ -34,7 +34,7 @@
     "@types/chrome": "^0.0.208",
     "@types/firefox-webext-browser": "94.0.1",
     "@violentmonkey/types": "0.1.5",
-    "amo-upload": "^0.4.0",
+    "amo-upload": "^0.5.1",
     "babel-plugin-transform-modern-regexp": "^0.0.6",
     "cross-env": "^7.0.3",
     "cross-spawn": "^7.0.3",

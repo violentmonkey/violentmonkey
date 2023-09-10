@@ -1,9 +1,9 @@
 import { rename, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { signAddon } from 'amo-upload';
+import { FatalError, signAddon } from 'amo-upload';
 import { readManifest, buildUpdatesList } from './manifest-helper.js';
 import { getVersion, isBeta } from './version-helper.js';
-import { hasAsset } from './release-helper.js';
+import { hasAsset, notifyReleaseStatus } from './release-helper.mjs';
 
 async function main() {
   const manifest = await readManifest();
@@ -60,7 +60,27 @@ ${releaseUrl}
   await writeFile(join(process.env.TEMP_DIR, 'updates/updates.json'), JSON.stringify(updates, null, 2), 'utf8');
 }
 
-main().catch(err => {
+main().then(() => {
+  notifyReleaseStatus({
+    title: `AMO Release Success: ${process.env.RELEASE_NAME}`,
+    description: `See the changelog at https://github.com/violentmonkey/violentmonkey/releases/tag/v${process.env.VERSION}.`,
+  });
+}, err => {
+  // if (err instanceof FatalError) {
+    notifyReleaseStatus({
+      title: `AMO Release Failure: ${process.env.RELEASE_NAME}`,
+      description: [
+        'An error occurred:',
+        '',
+        `> ${err}`,
+        ...process.env.ACTION_BUILD_URL ? [
+          '',
+          `See ${process.env.ACTION_BUILD_URL} for more details.`,
+        ] : [],
+      ].join('\n'),
+      success: false,
+    });
+  // }
   console.error(err);
   process.exitCode = 1;
 });
