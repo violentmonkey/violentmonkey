@@ -336,7 +336,8 @@ function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, [kFrameId]: frame
 
 function prepare(cacheKey, url, isTop) {
   const shouldExpose = isTop && url.startsWith('https://') && expose[url.split('/', 3)[2]];
-  const bagNoOp = shouldExpose ? BAG_NOOP_EXPOSE : BAG_NOOP;
+  const bagNoOp = shouldExpose != null ? BAG_NOOP_EXPOSE : BAG_NOOP;
+  BAG_NOOP_EXPOSE[INJECT][EXPOSE] = shouldExpose;
   if (!isApplied) {
     return bagNoOp;
   }
@@ -345,7 +346,7 @@ function prepare(cacheKey, url, isTop) {
   const env = getScriptsByURL(url, isTop, errors);
   if (env) {
     env[PROMISE] = prepareBag(cacheKey, url, isTop,
-      env, shouldExpose ? { [EXPOSE]: true } : {}, errors);
+      env, shouldExpose != null ? { [EXPOSE]: shouldExpose } : {}, errors);
   }
   return cache.put(cacheKey, env || bagNoOp);
 }

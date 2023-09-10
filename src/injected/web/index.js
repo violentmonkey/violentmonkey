@@ -102,11 +102,13 @@ addHandlers({
     if (!PAGE_MODE_HANDSHAKE) toRunNow::forEach(onCodeSet);
     else if (IS_FIREFOX) bridge.post('InjectList', items[0][RUN_AT]);
   },
-  Expose() {
+  Expose(allowGetScriptVer) {
     external[VIOLENTMONKEY] = {
       version: process.env.VM_VER,
       isInstalled: (name, namespace) => (
-        bridge.send('GetScriptVer', { meta: { name, namespace } })
+        allowGetScriptVer
+          ? bridge.send('GetScriptVer', { meta: { name, namespace } })
+          : promiseResolve()
       ),
     };
   },

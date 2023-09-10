@@ -39,9 +39,9 @@ async function init() {
     Run(SKIP_SCRIPTS);
     return;
   }
-  if (data[EXPOSE] && !isXml && injectPageSandbox(data)) {
+  if (data[EXPOSE] != null && !isXml && injectPageSandbox(data)) {
     addHandlers({ GetScriptVer: true });
-    bridge.post('Expose');
+    bridge.post('Expose', data[EXPOSE]);
   }
   if (data[SCRIPTS]) {
     onScripts.forEach(fn => fn(data));
