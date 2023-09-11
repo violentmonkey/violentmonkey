@@ -134,6 +134,9 @@ export async function injectScripts(data, isXml) {
   if (IS_FIREFOX) {
     IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
   }
+  info.gmi = {
+    isIncognito: chrome.extension.inIncognitoContext,
+  };
   bridgeInfo = createNullObj();
   bridgeInfo[PAGE] = info;
   bridgeInfo[CONTENT] = info;

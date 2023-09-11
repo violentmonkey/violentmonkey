@@ -94,6 +94,7 @@ function makeGmInfo(gmInfo, meta, resources) {
   });
   // No __proto__:null because these are standard objects for userscripts
   meta.resources = resourcesArr;
+  safeAssign(gmInfo, bridge.gmi);
   return safeAssign(gmInfo, {
     [INJECT_INTO]: bridge.mode,
     platform: safeAssign({}, bridge.ua),
