@@ -1,5 +1,5 @@
 import browser from '@/common/browser'; // eslint-disable-line no-restricted-imports
-import { sendCmd, topRenderMode } from './content/util';
+import { sendCmd } from './content/util';
 import { USERSCRIPT_META_INTRO } from './util';
 import './content';
 

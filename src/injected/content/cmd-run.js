@@ -1,6 +1,6 @@
 import bridge, { addHandlers, onScripts } from './bridge';
 import { sendSetPopup } from './gm-api-content';
-import { nextTask, sendCmd, topRenderMode } from './util';
+import { nextTask, sendCmd } from './util';
 
 const getPersisted = describeProperty(PageTransitionEvent[PROTO], 'persisted').get;
 let pending = topRenderMode === 2; // wait until reified if pre-rendered
@@ -22,11 +22,11 @@ function onShown(evt) {
   // isTrusted is `unforgeable` per DOM spec
   if (evt.isTrusted) {
     if (!this) {
-      topRenderMode = 3; // eslint-disable-line no-import-assign
+      topRenderMode = 3; // eslint-disable-line no-global-assign
       sent = bridge[REIFY] = false;
       resolveOnReify();
       report();
-      topRenderMode = 4; // eslint-disable-line no-import-assign
+      topRenderMode = 4; // eslint-disable-line no-global-assign
     } else if (evt::getPersisted()) {
       report(0, 'bfcache');
     }

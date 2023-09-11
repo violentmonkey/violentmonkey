@@ -63,3 +63,5 @@ const { document } = global;
 export const { getElementsByTagName } = document;
 export const REIFY = 'reify';
 export let IS_FIREFOX = !chrome.app;
+/** @type {VMTopRenderMode} */
+export let topRenderMode = window !== top ? 0 : document.prerendering ? 2 : 1;
