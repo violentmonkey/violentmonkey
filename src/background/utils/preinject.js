@@ -9,6 +9,7 @@ import { CACHE_KEYS, getScriptsByURL, PROMISE, REQ_KEYS, VALUE_IDS } from './db'
 import { setBadge } from './icon';
 import { postInitialize } from './init';
 import { addOwnCommands, addPublicCommands } from './message';
+import { clearNotifications } from './notifications';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId, reifyRequests } from './requests';
@@ -202,6 +203,7 @@ addPublicCommands({
     if (isTop === 3) {
       reifyValueOpener(ids, docId);
       reifyRequests(tabId, docId);
+      clearNotifications(tabId);
     }
     if (reset === 'bfcache' && +ids?.[0]) {
       addValueOpener(ids, tabId, getFrameDocId(isTop, docId, src[kFrameId]));
@@ -607,4 +609,5 @@ function onTabReplaced(addedId, removedId) {
 function clearFrameData(tabId, frameId) {
   clearRequestsByTabId(tabId, frameId);
   clearValueOpener(tabId, frameId);
+  clearNotifications(tabId, frameId);
 }
