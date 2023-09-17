@@ -68,7 +68,7 @@ async function prefetchSetPopup() {
 }
 
 function notifyTab(tabId, data) {
-  if (badges[tabId]?.[INJECT]) {
+  if (badges[tabId]?.total) {
     sendTabCmd(tabId, 'PopupShown', data);
   }
 }
