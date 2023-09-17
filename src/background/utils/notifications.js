@@ -7,8 +7,8 @@ const removeNotification = id => browser.notifications.clear(id);
 
 addPublicCommands({
   /** @return {Promise<string>} */
-  async Notification({ image, text, title, silent, onclick, zombieTimeout }, src) {
-    const notificationId = await browser.notifications.create({
+  async Notification({ image, text, tag, title, silent, onclick, zombieTimeout }, src) {
+    const notificationId = await browser.notifications.create(tag, {
       type: 'basic',
       title: [title, IS_FIREFOX && i18n('extName')]::trueJoin(' - '), // Chrome already shows the name
       message: text,

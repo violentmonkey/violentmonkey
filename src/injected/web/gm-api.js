@@ -135,6 +135,7 @@ export const GM_API = {
       });
       return onRequestCreate(opts, this, name);
     },
+    GM_notification: createNotification,
     /** @this {GMContext} */
     GM_xmlhttpRequest(opts) {
       return onRequestCreate(nullObjFrom(opts), this);
@@ -167,7 +168,6 @@ export const GM_API = {
       options.url = url;
       return onTabCreate(options);
     },
-    GM_notification: createNotification,
     GM_setClipboard(data, type) {
       bridge.post('SetClipboard', { data, type });
     },
