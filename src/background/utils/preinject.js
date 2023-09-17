@@ -310,12 +310,10 @@ function onHeadersReceived(info) {
   const bag = cache.get(key);
   // The INJECT data is normally already in cache if code and values aren't huge
   if (bag && !bag[FORCE_CONTENT] && bag[INJECT]?.[SCRIPTS] && !skippedTabs[info.tabId]) {
-    if (IS_FIREFOX && info.url.startsWith('https:')) {
-      detectStrictCsp(info, bag);
-    }
-    if (xhrInject) {
-      return prepareXhrBlob(info, bag);
-    }
+    const ffReg = IS_FIREFOX && info.url.startsWith('https:')
+      && detectStrictCsp(info, bag);
+    const res = xhrInject && prepareXhrBlob(info, bag);
+    return ffReg ? ffReg.then(res && (() => res)) : res;
   }
 }
 
@@ -587,8 +585,13 @@ function detectStrictCsp(info, bag) {
   } else {
     return;
   }
-  if (unregisterScriptFF(bag)) {
-    registerScriptDataFF(bag[INJECT], info.url);
+  m = unregisterScriptFF(bag);
+  if (m && !tmp) {
+    // Registering only without nonce, otherwise FF will incorrectly reuse it on tab reload
+    return Promise.all([
+      m,
+      registerScriptDataFF(bag[INJECT], info.url),
+    ]);
   }
 }
 
