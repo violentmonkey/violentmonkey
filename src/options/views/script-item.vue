@@ -18,10 +18,12 @@
     </div>
     <!-- We disable native dragging on name to avoid confusion with exec re-ordering.
     Users who want to open a new tab via dragging the link can drag the icon. -->
-    <a class="script-name ellipsis"
-       v-text="script.$cache.name"
-       v-bind="viewTable && { draggable: false, href: url, tabIndex }"
-       :data-order="script.config.removed ? null : script.props.position"/>
+    <div class="script-name ellipsis">
+      <!-- Using a nested element to center the text vertically AND apply text-ellipsis -->
+      <a v-text="script.$cache.name" v-bind="viewTable && { draggable: false, href: url, tabIndex }"
+         :data-order="script.config.removed ? null : script.props.position"
+         class="ellipsis" />
+    </div>
     <div class="script-info flex ml-1c">
       <template v-if="canRender">
         <tooltip v-if="author" :content="i18n('labelAuthor') + script.meta.author"
@@ -347,6 +349,8 @@ $removedItemHeight: calc(
   }
   &-name {
     min-width: 100px;
+  }
+  &-name a {
     font-weight: 500;
     font-size: $nameFontSize;
     color: inherit;
@@ -354,7 +358,7 @@ $removedItemHeight: calc(
     .removed & {
       margin-right: 8px;
     }
-    .disabled & > a {
+    .disabled & {
       color: var(--fill-8);
     }
   }
@@ -388,7 +392,6 @@ $removedItemHeight: calc(
     align-items: center;
     line-height: $itemLineHeight;
     margin-left: 8px;
-    min-width: 0; /* avoid overflow because grid's min-width is `content` */
     .removed & {
       order: 2;
     }
@@ -490,7 +493,10 @@ $removedItemHeight: calc(
       }
     }
     .script {
-      grid-template-columns: auto auto $iconSize 1fr auto auto auto;
+      /* Stretching the info instead of name to avoid the space to its right from
+         opening the editor when clicked. Instead we allow it to be clicked and dragged
+         to select the name, e.g. to copy it, as easily as in the card view. */
+      grid-template-columns: auto auto $iconSize auto 1fr auto auto;
       align-items: center;
       height: 2.5rem;
       width: var(--w);
@@ -512,7 +518,6 @@ $removedItemHeight: calc(
       }
       &-name {
         display: flex;
-        min-width: 100px;
         align-self: stretch;
         align-items: center;
       }
@@ -525,6 +530,7 @@ $removedItemHeight: calc(
       &-info {
         order: 2;
         align-self: stretch;
+        justify-content: end;
         margin-left: .5rem;
         line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
         .size {
@@ -582,9 +588,6 @@ $removedItemHeight: calc(
     }
     .script-icon {
       align-self: start;
-    }
-    .script-name:hover {
-      text-decoration: none;
     }
   }
   &[data-show-order] [data-order]::before {

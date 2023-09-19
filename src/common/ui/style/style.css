@@ -231,6 +231,9 @@ a:focus {
 a[tabindex="0"] {
   cursor: pointer;
 }
+a:not([href]):hover {
+  text-decoration: none;
+}
 
 .sep {
   &::after {
