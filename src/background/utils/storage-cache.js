@@ -13,6 +13,8 @@ let valuesToFlush = {};
 /** @type {Object<string,function[]>} */
 let valuesToWatch = {};
 let flushTimer = 0;
+let apiChain;
+const apiQueue = [];
 const watchers = {};
 /** Reading the entire db in init/vacuum/sizing shouldn't be cached for long. */
 const TTL_SKIM = 5e3;
@@ -55,7 +57,7 @@ storage.api = {
       return !ok && dbKeys.get(key) !== 0;
     });
     if (!keys || keys.length) {
-      (await api[GET](keys))::forEachEntry(([key, val]) => {
+      (await apiCall(GET, keys))::forEachEntry(([key, val]) => {
         res[key] = val;
         dbKeys.put(key, 1);
         cache.put(key, deepCopy(val), !keys && TTL_SKIM);
@@ -90,7 +92,7 @@ storage.api = {
     });
     batch(false);
     if (keys.length) {
-      await api[SET](toWrite);
+      await apiCall(SET, toWrite);
       fire({ keys });
     }
     flushLater();
@@ -113,7 +115,7 @@ storage.api = {
       return ok;
     });
     if (keys.length) {
-      await api[REMOVE](keys);
+      await apiCall(REMOVE, keys);
       fire({ keys });
     }
     flushLater();
@@ -195,8 +197,8 @@ async function flush() {
     }
     updateScriptSizeContributor(key, val);
   });
-  if (!isEmpty(toFlush)) await api[SET](toFlush);
-  if (toRemove.length) await api[REMOVE](toRemove);
+  if (!isEmpty(toFlush)) await apiCall(SET, toFlush);
+  if (toRemove.length) await apiCall(REMOVE, toRemove);
   if (valuesToWatch) setTimeout(notifyWatchers, 0, toFlush, toRemove);
   fire({ keys });
 }
@@ -221,4 +223,20 @@ function notifyWatchers(toFlush, toRemove) {
     }
   }
   byFn.forEach((val, fn) => fn(val));
+}
+
+function apiCall(method, data) {
+  apiQueue.push([method, data]);
+  apiChain = apiChain?.catch(console.warn).then(apiChainNext)
+    || apiChainNext();
+  return apiChain;
+}
+
+async function apiChainNext() {
+  try {
+    const [method, data] = apiQueue.shift();
+    return await api[method](data); // awaiting here for `finally`
+  } finally {
+    apiChain = null;
+  }
 }

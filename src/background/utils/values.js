@@ -7,7 +7,7 @@ import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
 
 /** { scriptId: { tabId: { frameId: {key: raw}, ... }, ... } } */
 const openers = {};
-let chain = Promise.resolve();
+let chain;
 let toSend = {};
 
 addOwnCommands({
@@ -99,7 +99,8 @@ export function reifyValueOpener(ids, documentId) {
 
 function commit(data) {
   storage[S_VALUE].set(data);
-  chain = chain.catch(console.warn).then(broadcast);
+  chain = chain?.catch(console.warn).then(broadcast)
+    || broadcast();
 }
 
 async function broadcast() {
@@ -116,6 +117,7 @@ async function broadcast() {
     }
   }
   await Promise.all(tasks);
+  chain = null;
 }
 
 /** @this {Object} accumulator */

@@ -21,6 +21,7 @@ if (IS_FIREFOX && topRenderMode === 1
     const url = location.href;
     const fetchCode = async () => (await fetch(url, { mode: 'same-origin' }))::getText();
     let code = await fetchCode();
+    let busy;
     let oldCode;
     if (code::stringIndexOf(USERSCRIPT_META_INTRO) < 0) {
       return;
@@ -33,7 +34,12 @@ if (IS_FIREFOX && topRenderMode === 1
       browser.runtime.onConnect.addListener(port => {
         if (port.name !== 'FetchSelf') return;
         port.onMessage.addListener(async () => {
-          code = await fetchCode();
+          try {
+            if (busy) await busy;
+            code = await (busy = fetchCode());
+          } finally {
+            busy = false;
+          }
           if (code === oldCode) {
             code = null;
           } else {

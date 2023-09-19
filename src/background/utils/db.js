@@ -574,7 +574,7 @@ function parseMetaWithErrors(src) {
 
 /** @return {Promise<{ isNew?, update, where }>} */
 export async function parseScript(src) {
-  const { meta, errors } = parseMetaWithErrors(src);
+  const { meta, errors } = src.meta ? src : parseMetaWithErrors(src);
   if (!meta.name) throw `${i18n('msgInvalidScript')}\n${i18n('labelNoName')}`;
   const result = {
     errors,
@@ -612,8 +612,10 @@ export async function parseScript(src) {
   if (src.position) script.props.position = +src.position;
   if (!src.update) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
   buildPathMap(script, src.url);
+  const depsPromise = fetchResources(script, src);
+  // Installer has all the deps, so we'll put them in storage first
+  if (src.cache) await depsPromise;
   await saveScript(script, src.code);
-  fetchResources(script, src);
   Object.assign(result.update, script, src.update);
   result.where = { id: script.props.id };
   sendCmd('UpdateScript', result);

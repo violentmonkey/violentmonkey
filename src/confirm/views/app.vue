@@ -238,7 +238,8 @@ export default {
       }
     },
     async parseMeta() {
-      const { meta, errors } = await sendCmdDirectly('ParseMeta', this.code);
+      const res = await sendCmdDirectly('ParseMeta', this.code);
+      const { meta, errors } = res;
       const name = getLocaleString(meta, 'name');
       document.title = `${name.slice(0, MAX_TITLE_NAME_LEN)}${name.length > MAX_TITLE_NAME_LEN ? '...' : ''} - ${
         basicTitle || (basicTitle = document.title)
@@ -268,6 +269,7 @@ export default {
         [...new Set(meta.require)],
         [...new Set(Object.values(meta.resources))],
       ];
+      return res;
     },
     async loadDeps() {
       const { script, allDeps: [require, resource] } = this;
@@ -350,10 +352,11 @@ export default {
         cachedCodePromise = null;
       }
     },
-    async installScript() {
+    async installScript(parsedMeta) {
       this.installable = false;
       try {
         const { update } = await sendCmdDirectly('ParseScript', {
+          ...parsedMeta,
           code: this.code,
           url: this.info.url,
           from: this.info.from,
@@ -384,9 +387,9 @@ export default {
         await makePause(500);
         try {
           await this.loadData(true);
-          await this.parseMeta();
+          const parsedMeta = await this.parseMeta();
           await this.loadDeps();
-          await this.installScript();
+          await this.installScript(parsedMeta);
           this.sameCode = false;
         } catch (e) { /* NOP */ }
       }
@@ -400,8 +403,11 @@ export default {
     },
     createFilePort() {
       filePort = browser.tabs.connect(this.info.tabId, { name: 'FetchSelf' });
-      filePort.onMessage.addListener(code => { filePortResolve(code); });
-      filePort.onDisconnect.addListener(() => { this.tracking = 'stop'; });
+      filePort.onMessage.addListener(filePortResolve);
+      filePort.onDisconnect.addListener(() => {
+        this.tracking = 'stop';
+        filePort = null;
+      });
     },
     pingFilePort(resolve) {
       if (!filePort) this.createFilePort();
