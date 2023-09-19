@@ -464,6 +464,17 @@ $removedItemHeight: calc(
   align-content: flex-start;
   padding: 0 0 $itemMargin 0;
   &[data-table] {
+    /* Copied from @common/ui/style/style.css and changed max-width */
+    @media (max-width: 650px) {
+      .hidden-sm {
+        display: none !important;
+      }
+    }
+    @media (max-width: 400px) {
+      .hidden-xs {
+        display: none !important;
+      }
+    }
     // --num-columns is set in tab-installed.vue
     --w: calc((100% - $itemMargin * (var(--num-columns) - 1)) / var(--num-columns));
     // when searching for text the items are shuffled so we can't use different margins on columns
