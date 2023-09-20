@@ -145,6 +145,12 @@ function deepCopyDiffArrays(src, sample) {
 
 function deepCopyDiffObjects(src, sample) {
   const res = {};
+  for (const key in sample) {
+    if (!hasOwnProperty(src, key)) {
+      deepDiff = true;
+      break;
+    }
+  }
   for (const key in src) {
     /* Not using Object.keys and not checking hasOwnProperty because we only use own properties,
      * and this can be very slow for a large value storage that has thousands of keys */
