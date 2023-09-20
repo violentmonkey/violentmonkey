@@ -105,14 +105,13 @@
             </select>
             <a class="ml-1" href="https://violentmonkey.github.io/posts/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
           </label>
-          <label>
-            <setting-check name="xhrInject"/>
-            <tooltip :content="i18n('labelXhrInjectHint')">
+          <tooltip :content="i18n('labelXhrInjectHint')">
+            <setting-check name="xhrInject">
               <locale-group i18n-key="labelXhrInject">
                 <code>page</code>
-              </locale-group>
-            </tooltip>
-          </label>
+              </locale-group> <ruby v-text="i18n('labelXhrInjectNote')"/>
+            </setting-check>
+          </tooltip>
           <label v-if="!settings.xhrInject">
             <setting-check name="ffInject"/>
             <tooltip :content="i18n('labelFastFirefoxInjectHint')">
@@ -312,6 +311,9 @@ export default {
     h3 {
       margin-top: 0;
     }
+  }
+  ruby {
+    color: var(--fill-8);
   }
 }
 </style>

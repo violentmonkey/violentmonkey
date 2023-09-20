@@ -535,6 +535,9 @@ labelXhrInject:
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
   message: Synchronous $1 mode
+labelXhrInjectNote:
+  description: Shown to the right of "synchronous page mode" in options.
+  message: (except incognito and sites with disabled cookies)
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
