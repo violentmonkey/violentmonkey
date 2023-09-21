@@ -219,6 +219,7 @@ postInitialize.push(() => {
 });
 
 onStorageChanged(({ keys }) => {
+  keys.forEach(cache.del); // individual scripts stored in prepareScripts
   cache.some(removeStaleCacheEntry, keys.map((key, i) => [
     key.slice(0, i = key.indexOf(':') + 1),
     key.slice(i),
