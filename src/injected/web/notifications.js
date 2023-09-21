@@ -1,6 +1,5 @@
 import bridge, { addHandlers } from './bridge';
 
-let lastId = 0;
 const notifications = createNullObj();
 addHandlers({
   NotificationClicked(id) {
@@ -15,11 +14,14 @@ addHandlers({
   },
 });
 
+/** @this {GMContext} */
 export function createNotification(text, title, image, onclick) {
   let options;
+  let tag;
   if (isObject(text)) {
     options = nullObjFrom(text);
     text = options.text;
+    tag = options.tag;
   } else {
     options = createNullObj();
     options.text = text;
@@ -28,7 +30,7 @@ export function createNotification(text, title, image, onclick) {
     options.onclick = onclick;
   }
   if (!text) throw new SafeError('Notification `text` is required!');
-  const id = ++lastId;
+  const id = `${this.id}:${options.tag = tag ?? safeGetUniqId()}`;
   const msg = createNullObj();
   for (const k in options) {
     msg[k] = isFunction(options[k]) ? true : options[k];
