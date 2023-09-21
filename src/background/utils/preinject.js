@@ -86,6 +86,7 @@ const resolveDataCodeStr = `(${(global, data) => {
 const getKey = (url, isTop) => (
   isTop ? url : `-${url}`
 );
+const getPrefixAndId = key => key.split(/^(\w+:)/).slice(1);
 const normalizeRealm = val => (
   KNOWN_INJECT_INTO[val] ? val : injectInto || AUTO
 );
@@ -218,12 +219,17 @@ postInitialize.push(() => {
   });
 });
 
-onStorageChanged(({ keys }) => {
-  keys.forEach(cache.del); // individual scripts stored in prepareScripts
-  cache.some(removeStaleCacheEntry, keys.map((key, i) => [
-    key.slice(0, i = key.indexOf(':') + 1),
-    key.slice(i),
-  ]));
+onStorageChanged((keys, data) => {
+  for (const key of keys) {
+    const [prefix, id] = getPrefixAndId(key);
+    if (prefix === S_SCRIPT_PRE) {
+      cache.del(key);
+    } else if (prefix === S_VALUE_PRE) {
+      const script = cache.get(S_SCRIPT_PRE + id);
+      if (script) script[VALUES] = data?.[key] || {};
+    }
+  }
+  cache.some(removeStaleCacheEntry, keys.map(getPrefixAndId));
 });
 
 /** @this {string[][]} changed storage keys, already split as [prefix,id] */

@@ -78,10 +78,10 @@ storage.api = {
       if (copy !== undefined) {
         cache.put(key, copy);
         dbKeys.put(key, 1);
+        keys.push(key);
         if (storage[S_VALUE].toId(key)) {
           valuesToFlush[key] = copy;
         } else {
-          keys.push(key);
           toWrite[key] = val;
           if (updateScriptMap(key, val) && val[INFERRED]) {
             delete (toWrite[key] = { ...val })[INFERRED];
@@ -91,15 +91,13 @@ storage.api = {
       }
     });
     batch(false);
-    if (keys.length) {
-      await apiCall(SET, toWrite);
-      fire({ keys });
-    }
+    if (!isEmpty(toWrite)) await apiCall(SET, toWrite);
+    if (keys.length) fire(keys, data);
     flushLater();
   },
 
   async [REMOVE](keys) {
-    keys = keys.filter(key => {
+    const toDelete = keys.filter(key => {
       let ok = dbKeys.get(key) !== 0;
       if (ok) {
         cache.del(key);
@@ -114,10 +112,8 @@ storage.api = {
       }
       return ok;
     });
-    if (keys.length) {
-      await apiCall(REMOVE, keys);
-      fire({ keys });
-    }
+    if (toDelete.length) await apiCall(REMOVE, toDelete);
+    if (keys.length) fire(keys);
     flushLater();
   },
 };
@@ -200,7 +196,6 @@ async function flush() {
   if (!isEmpty(toFlush)) await apiCall(SET, toFlush);
   if (toRemove.length) await apiCall(REMOVE, toRemove);
   if (valuesToWatch) setTimeout(notifyWatchers, 0, toFlush, toRemove);
-  fire({ keys });
 }
 
 function flushLater() {
