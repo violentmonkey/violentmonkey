@@ -45,7 +45,6 @@
     "husky": "^8.0.1",
     "jest-environment-jsdom": "^29.0.3",
     "js-yaml": "^4.1.0",
-    "node-fetch": "^3.2.10",
     "plugin-error": "^2.0.0",
     "postcss-scss": "^4.0.4",
     "postcss-simple-vars": "^6.0.3",
@@ -73,7 +72,7 @@
     "vueleton": "^2.0.2"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "jest": {
     "setupFilesAfterEnv": [
