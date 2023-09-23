@@ -42,9 +42,11 @@ let xyCache;
 export default function toggleDragging(listEl, moveScript, state) {
   parent = listEl;
   parentOnDrop = moveScript;
-  state = state ? on : off;
-  parent::state(eventNames.start, isTouch ? onTouchStart : onDragStart);
-  if (!isTouch) parent::state('mousedown', onMouseDown, true);
+  parent::(state ? on : off)(eventNames.start, isTouch ? onTouchStart : onDragStart);
+  if (!isTouch) {
+    parent::(state ? on : off)('mousedown', onMouseDown, true);
+    if (!state) onMouseUp();
+  }
 }
 
 /** @param {MouseEvent} e */
