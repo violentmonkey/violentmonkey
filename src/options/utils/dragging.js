@@ -1,3 +1,4 @@
+import { isTouch } from '@/common/ui';
 
 const SCRIPT = '.script';
 const SCROLL_GAP = 50;
@@ -7,7 +8,6 @@ const ONE_FRAME_MS = 16;
 // touch-and-hold duration in ms before recognizing dragstart (needed to allow fling-scrolling)
 const LONGPRESS_DELAY = 500;
 
-const isTouch = 'ontouchstart' in document;
 const eventNames = isTouch
   ? { start: 'touchstart', move: 'touchmove', end: 'touchend' }
   : { start: 'dragstart', move: 'mousemove', end: 'mouseup' };
@@ -28,6 +28,7 @@ let longPressEvent;
 let longPressTimer;
 let offsetX;
 let offsetY;
+/** @type {HTMLElement} */
 let original;
 let parent;
 let parentOnDrop;
@@ -41,7 +42,20 @@ let xyCache;
 export default function toggleDragging(listEl, moveScript, state) {
   parent = listEl;
   parentOnDrop = moveScript;
-  parent::(state ? on : off)(eventNames.start, isTouch ? onTouchStart : onDragStart);
+  state = state ? on : off;
+  parent::state(eventNames.start, isTouch ? onTouchStart : onDragStart);
+  if (!isTouch) parent::state('mousedown', onMouseDown, true);
+}
+
+/** @param {MouseEvent} e */
+function onMouseDown(e) {
+  if (!e.altKey && scriptFromEvent(e)) original.draggable = true;
+  parent::on('mouseup', onMouseUp, true);
+}
+
+function onMouseUp() {
+  if (original) original.draggable = false;
+  parent::off('mouseup', onMouseUp, true);
 }
 
 function onDrop() {

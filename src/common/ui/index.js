@@ -160,3 +160,4 @@ function vFocusFactory() {
  * ```
  */
 export const vFocus = vFocusFactory();
+export const isTouch = 'ontouchstart' in document;
