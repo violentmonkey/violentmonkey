@@ -153,6 +153,7 @@ import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
+import { findStyleSheetRules } from '@/common/ui/style';
 import { store } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
@@ -226,6 +227,8 @@ let step = 0;
 
 let columnsForTableMode = [];
 let columnsForCardsMode = [];
+/** @type {CSSMediaRule} */
+let narrowMediaRules;
 
 const refSearch = ref();
 const refList = ref();
@@ -448,6 +451,19 @@ async function handleEmptyRecycleBin() {
     store.removedScripts = [];
   }
 }
+function adjustNarrowWidth(val) {
+  adjustScriptWidth();
+  if (val && !narrowMediaRules) {
+    narrowMediaRules = findStyleSheetRules('-width: 76'); // max-width: 767px, min-width: 768px
+    for (const r of narrowMediaRules) r._orig = r.conditionText;
+  }
+  if (narrowMediaRules) {
+    for (const r of narrowMediaRules) {
+      const orig = r._orig;
+      r.media.mediaText = val ? orig.replace(/\d+/, s => +s + 90) : orig;
+    }
+  }
+}
 function adjustScriptWidth() {
   const widths = filters.viewTable ? columnsForTableMode : columnsForCardsMode;
   state.numColumns = filters.viewSingleColumn ? 1
@@ -645,7 +661,8 @@ export default {
       state => toggleDragging(refList.value, moveScript, state));
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
-    watch(() => [filters.viewSingleColumn, filters.viewTable], adjustScriptWidth);
+    watch(() => filters.viewSingleColumn, adjustScriptWidth);
+    watch(() => filters.viewTable, adjustNarrowWidth);
     watch(getCurrentList, refreshUI);
     watch(() => store.route.paths[1], onHashChange);
     watch(selectedScript, script => {

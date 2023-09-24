@@ -28,20 +28,25 @@ const setStyle = (css, elem) => {
   return elem;
 };
 
+export const findStyleSheetRules = darkThemeCondition => {
+  const res = [];
+  for (const sheet of document.styleSheets) {
+    for (const rule of sheet.cssRules) {
+      if (rule.conditionText?.includes(darkThemeCondition)) {
+        res.push(rule);
+      }
+    }
+  }
+  return res;
+};
+
 const setUiTheme = theme => {
   const darkThemeCondition = '(prefers-color-scheme: dark)';
   const mediaText = theme === 'dark' && 'screen'
     || theme === 'light' && 'not all'
     || darkThemeCondition;
   if (!darkMediaRules) {
-    darkMediaRules = [];
-    for (const sheet of document.styleSheets) {
-      for (const rule of sheet.cssRules) {
-        if (rule.conditionText?.includes(darkThemeCondition)) {
-          darkMediaRules.push(rule);
-        }
-      }
-    }
+    darkMediaRules = findStyleSheetRules(darkThemeCondition);
   }
   darkMediaRules.forEach(rule => { rule.media.mediaText = mediaText; });
 };
