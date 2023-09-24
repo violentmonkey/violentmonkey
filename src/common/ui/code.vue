@@ -70,6 +70,7 @@ import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
+import { watchEffect } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import ToggleButton from '@/common/ui/toggle-button';
 import { debounce, getUniqId, i18n, sendCmdDirectly } from '@/common';
@@ -244,7 +245,7 @@ export default {
       this.placeholders = new Map();
       this.placeholderId = 0;
       maxDisplayLength = cm.options.maxDisplayLength;
-      cm.setOption('readOnly', this.readOnly);
+      watchEffect(() => cm.setOption('readOnly', this.readOnly));
       // these are active only in the code nav tab
       cm.state.commands = Object.assign({
         // call own methods explicitly to strip `cm` parameter passed by CodeMirror

@@ -69,9 +69,6 @@ aside {
 .text-red {
   color: red;
 }
-.text-right {
-  text-align: right;
-}
 section {
   padding: 0 0 $tabPadY;
   > h3 {

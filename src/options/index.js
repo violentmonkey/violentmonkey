@@ -10,7 +10,6 @@ import '@/common/ui/favicon';
 import '@/common/ui/style';
 import { store } from './utils';
 import App from './views/app';
-import { watchEffect } from 'vue';
 
 // Same order as getSizes and sizesPrefixRe
 const SIZE_TITLES = [
@@ -56,10 +55,8 @@ function initScript(script, sizes) {
     sizes: str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B'),
     sizeNum: total,
   };
-  watchEffect(() => {
-    script.$canUpdate = getScriptUpdateUrl(script)
-      && (script.config.shouldUpdate ? 1 : -1 /* manual */);
-  });
+  script.$canUpdate = getScriptUpdateUrl(script)
+    && (script.config.shouldUpdate ? 1 : -1 /* manual */);
   loadScriptIcon(script, store, true);
 }
 

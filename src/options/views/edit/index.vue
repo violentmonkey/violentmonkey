@@ -1,5 +1,5 @@
 <template>
-  <div class="edit frame flex flex-col abs-full">
+  <div class="edit frame flex flex-col abs-full" :class="{frozen, readOnly}">
     <div class="edit-header flex mr-1c">
       <nav>
         <div
@@ -10,16 +10,21 @@
         />
       </nav>
       <div class="edit-name text-center ellipsis flex-1">
-        <span class="subtle" v-if="script?.config?.removed" v-text="i18n('headerRecycleBin') + ' / '"></span>
+        <span class="subtle" v-if="script.config.removed" v-text="i18n('headerRecycleBin') + ' / '"/>
         {{scriptName}}
       </div>
-      <div class="edit-hint text-right ellipsis">
+      <a class="frozen-hint text-right text-red" v-text="i18n('readonly')" v-if="frozen"
+         v-bind="script.config.removed ? {} : {
+           tabIndex: 0,
+           onclick: showNote,
+         }"/>
+      <div class="edit-hint text-right ellipsis" v-else>
         <a href="https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/"
            target="_blank"
            rel="noopener noreferrer"
            v-text="i18n('editHowToHint')"/>
       </div>
-      <div class="edit-buttons">
+      <div class="mr-1">
         <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"
                 :class="{'has-error': errors}" :title="errors"/>
         <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"/>
@@ -27,44 +32,47 @@
       </div>
     </div>
 
-    <div v-text="i18n('editReadonly')" class="mx-1 my-1 text-red" v-if="!canEdit"/>
+    <div class="frozen-note mr-2c flex flex-wrap" v-if="note && nav === 'code'">
+      <p v-text="i18n('readonlyNote')"/>
+      <keep-alive>
+        <VMSettingsUpdate class="flex ml-2c" :script="script" @change="onChange"/>
+      </keep-alive>
+    </div>
 
     <vm-code
       class="flex-auto"
       :value="code"
-      :readOnly="readOnly || script.$canUpdate === 1"
-      v-on="{ keypress: script.$canUpdate === 1 && (() => (this.canEdit = false)) }"
+      :readOnly="frozen"
+      :title="frozen ? i18n('readonly') : null"
       ref="code"
       v-show="nav === 'code'"
       :active="nav === 'code'"
       :commands="commands"
       @code-dirty="codeDirty = $event"
     />
+    <keep-alive>
     <vm-settings
       class="edit-body"
-      v-show="nav === 'settings'"
-      :readOnly="readOnly"
-      :active="nav === 'settings'"
-      :settings="settings"
-      :value="script"
+      v-if="nav === 'settings'"
+      v-bind="{readOnly, script}"
+      @input="onChange"
     />
     <vm-values
       class="edit-body"
-      v-show="nav === 'values'"
-      :readOnly="readOnly"
-      :active="nav === 'values'"
-      :script="script"
+      v-else-if="nav === 'values'"
+      v-bind="{readOnly, script}"
     />
     <vm-externals
       class="flex-auto"
-      v-if="nav === 'externals'"
+      v-else-if="nav === 'externals'"
       :value="script"
     />
     <vm-help
       class="edit-body"
-      v-show="nav === 'help'"
+      v-else-if="nav === 'help'"
       :hotkeys="hotkeys"
     />
+    </keep-alive>
 
     <div v-if="errors" class="errors my-1c">
       <p v-for="e in errors" :key="e" v-text="e" class="text-red"/>
@@ -78,7 +86,7 @@
 <script>
 import {
   browserWindows,
-  debounce, formatByteLength, getScriptName, i18n, isEmpty,
+  debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
   sendCmdDirectly, trueJoin,
 } from '@/common';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
@@ -90,6 +98,7 @@ import options from '@/common/options';
 import { getUnloadSentry } from '@/common/router';
 import { store } from '../../utils';
 import VmSettings from './settings';
+import VMSettingsUpdate from './settings-update';
 import VmValues from './values';
 import VmHelp from './help';
 
@@ -103,7 +112,6 @@ const CUSTOM_PROPS = {
   origMatch: true,
   origExcludeMatch: true,
 };
-const fromProp = (val, key) => val ?? CUSTOM_PROPS[key];
 const toProp = val => val !== '' ? val : null; // `null` removes the prop from script object
 const CUSTOM_LISTS = [
   'include',
@@ -111,12 +119,6 @@ const CUSTOM_LISTS = [
   'exclude',
   'excludeMatch',
 ];
-const fromList = list => (
-  list
-    // Adding a new row so the user can click it and type, just like in an empty textarea.
-    ? `${list.join('\n')}${list.length ? '\n' : ''}`
-    : ''
-);
 const toList = text => (
   text.trim()
     ? text.split('\n').map(line => line.trim()).filter(Boolean)
@@ -126,9 +128,7 @@ const CUSTOM_ENUM = [
   INJECT_INTO,
   RUN_AT,
 ];
-const fromEnum = val => val || '';
 const toEnum = val => val || null; // `null` removes the prop from script object
-let savedSettings;
 
 let shouldSavePositionOnSave;
 /** @param {chrome.windows.Window} [wnd] */
@@ -166,12 +166,17 @@ let K_SAVE; // deduced from the current CodeMirror keymap
 const K_PREV_PANEL = 'Alt-PageUp';
 const K_NEXT_PANEL = 'Alt-PageDown';
 const compareString = (a, b) => (a < b ? -1 : a > b);
+/** @param {VMScript.Config} config */
+const collectShouldUpdate = ({ shouldUpdate, _editable }) => (
+  +shouldUpdate && (shouldUpdate + _editable)
+);
 
 export default {
   props: ['initial', 'initialCode', 'readOnly'],
   components: {
     VmCode,
     VmSettings,
+    VMSettingsUpdate,
     VmValues,
     VmExternals,
     VmHelp,
@@ -179,12 +184,10 @@ export default {
   data() {
     return {
       nav: 'code',
-      canEdit: true,
       canSave: false,
       script: null,
       code: '',
       codeDirty: false,
-      settings: {},
       commands: {
         save: this.save,
         close: this.close,
@@ -194,19 +197,21 @@ export default {
       },
       hotkeys: null,
       errors: null,
+      frozen: false,
+      note: false,
       urlMatching: 'https://violentmonkey.github.io/api/matching/',
     };
   },
   computed: {
     navItems() {
-      const { meta, props } = this.script || {};
-      const req = meta?.require.length && '@require';
-      const res = !isEmpty(meta?.resources) && '@resource';
+      const { meta, props } = this.script;
+      const req = meta.require.length && '@require';
+      const res = !isEmpty(meta.resources) && '@resource';
       const size = store.storageSize;
       return {
         code: i18n('editNavCode'),
         settings: i18n('editNavSettings'),
-        ...props?.id && {
+        ...props.id && {
           values: i18n('editNavValues') + (size ? ` (${formatByteLength(size)})` : ''),
         },
         ...(req || res) && { externals: [req, res]::trueJoin('/') },
@@ -239,9 +244,11 @@ export default {
         showMessage({ text: `${this.initial.message}\n\n${error}` });
       }
     },
+    codeDirty: 'onDirty',
+    script: 'onScript',
   },
   created() {
-    this.script = this.initial;
+    this.script = deepCopy(this.initial);
     this.toggleUnloadSentry = getUnloadSentry(null, () => {
       this.$refs.code.cm.focus();
     });
@@ -252,26 +259,6 @@ export default {
   async mounted() {
     document.body.classList.add('edit-open');
     store.storageSize = 0;
-    this.nav = 'code';
-    const { custom, config } = this.script;
-    const { noframes } = custom;
-    this.settings = {
-      config: {
-        notifyUpdates: `${config.notifyUpdates ?? ''}`,
-        // Needs to match Vue model type so deepEqual can work properly
-        shouldUpdate: Boolean(config.shouldUpdate),
-      },
-      custom: {
-        // Adding placeholders for any missing values so deepEqual can work properly
-        ...objectPick(custom, Object.keys(CUSTOM_PROPS), fromProp),
-        ...objectPick(custom, CUSTOM_ENUM, fromEnum),
-        ...objectPick(custom, CUSTOM_LISTS, fromList),
-        noframes: noframes == null ? '' : +noframes, // it was boolean in old VM
-      },
-    };
-    savedSettings = deepCopy(this.settings);
-    this.$watch('codeDirty', this.onChange);
-    this.$watch('settings', this.onChange, { deep: true });
     // hotkeys
     {
       const navLabels = Object.values(this.navItems);
@@ -302,19 +289,19 @@ export default {
     async save() {
       if (!this.canSave) return;
       if (shouldSavePositionOnSave) savePosition();
-      const { settings } = this;
-      const { config, custom } = settings;
+      const script = this.script;
+      const { config, custom } = script;
       const { notifyUpdates } = config;
       const { noframes } = custom;
       try {
         const codeComponent = this.$refs.code;
-        const id = this.script?.props?.id;
+        const id = script.props.id;
         const res = await sendCmdDirectly('ParseScript', {
           id,
           code: codeComponent.getRealContent(),
           config: {
-            ...config,
-            notifyUpdates: notifyUpdates ? +notifyUpdates : null,
+            notifyUpdates: notifyUpdates ? +notifyUpdates : null, // 0, 1, null
+            shouldUpdate: collectShouldUpdate(config), // 0, 1, 2
           },
           custom: {
             ...objectPick(custom, Object.keys(CUSTOM_PROPS), toProp),
@@ -329,14 +316,17 @@ export default {
           message: '',
         });
         const newId = res?.where?.id;
-        savedSettings = deepCopy(settings);
         codeComponent.cm.markClean();
-        this.codeDirty = false; // triggers onChange which sets canSave
+        this.codeDirty = false; // triggers onDirty which sets canSave
         this.canSave = false; // ...and set it explicitly in case codeDirty was false
+        this.note = false;
         this.errors = res.errors;
         if (newId) {
           this.script = res.update;
           if (!id) history.replaceState(null, this.scriptName, `${ROUTE_SCRIPTS}/${newId}`);
+        } else {
+          // storing explicitly since we didn't change `this.script`
+          this.saved = deepCopy(script);
         }
       } catch (err) {
         showConfirmation(`${err.message || err}`, {
@@ -356,6 +346,9 @@ export default {
     saveClose() {
       this.save().then(this.close);
     },
+    showNote() {
+      this.note = true;
+    },
     switchPanel(step) {
       const keys = Object.keys(this.navItems);
       this.nav = keys[(keys.indexOf(this.nav) + step + keys.length) % keys.length];
@@ -366,9 +359,54 @@ export default {
     switchNextPanel() {
       this.switchPanel(1);
     },
-    onChange() {
-      this.canSave = this.codeDirty || !deepEqual(this.settings, savedSettings);
+    onChange(evt) {
+      const { script } = this;
+      const { config } = script;
+      const { removed } = config;
+      const remote = script._remote = !!getScriptUpdateUrl(script);
+      const frozen = !!(
+        removed ||
+        this.readOnly ||
+        remote && (collectShouldUpdate(config) === 1)
+      );
+      if (this.frozen !== frozen) {
+        this.frozen = frozen;
+        if (!removed) {
+          this.$nextTick(() => {
+            this.$refs.code.$el::(frozen ? addEventListener : removeEventListener)(
+              'keypress', this.showNote, {once: true});
+          });
+        }
+      }
+      if (!removed && evt) this.onDirty();
     },
+    onDirty() {
+      this.canSave = this.codeDirty || !deepEqual(this.script, this.saved);
+    },
+    onScript(script) {
+      const { custom, config } = script;
+      const { shouldUpdate } = config;
+      const { noframes } = custom;
+      // Matching Vue model types, so deepEqual can work properly
+      config._editable = shouldUpdate === 2;
+      config.notifyUpdates == `${config.notifyUpdates ?? ''}`;
+      config.shouldUpdate = !!shouldUpdate;
+      custom.noframes = noframes == null ? '' : +noframes; // it was boolean in old VM
+      // Adding placeholders for any missing values so deepEqual can work properly
+      for (const key in CUSTOM_PROPS) {
+        if (custom[key] == null) custom[key] = CUSTOM_PROPS[key];
+      }
+      for (const key of CUSTOM_ENUM) {
+        if (!custom[key]) custom[key] = '';
+      }
+      for (const key of CUSTOM_LISTS) {
+        const val = custom[key];
+        // Adding a new row so the user can click it and type, just like in an empty textarea.
+        custom[key] = val ? `${val.join('\n')}${val.length ? '\n' : ''}` : '';
+      }
+      this.onChange();
+      if (!config.removed) this.saved = deepCopy(script);
+    }
   },
   beforeUnmount() {
     document.body.classList.remove('edit-open');
@@ -383,6 +421,7 @@ export default {
 
 <style>
 .edit {
+  --border: 1px solid var(--fill-3);
   z-index: 2000;
   &-header {
     position: sticky;
@@ -390,7 +429,7 @@ export default {
     z-index: 1;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--fill-3);
+    border-bottom: var(--border);
     background: inherit;
   }
   &-name {
@@ -448,6 +487,23 @@ export default {
   .errors {
     border-top: 2px solid red;
     padding: .5em 1em;
+  }
+  .frozen-note {
+    background: var(--bg);
+    padding: .5em 1em;
+    border-bottom: var(--border);
+  }
+  .frozen-hint {
+    text-transform: uppercase;
+    &[tabindex]:hover {
+      text-decoration: underline;
+    }
+  }
+  &.readOnly &-header button:nth-last-child(n + 2) {
+    display: none;
+  }
+  &.frozen .CodeMirror {
+    background: var(--fill-0-5);
   }
 }
 
