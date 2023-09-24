@@ -32,7 +32,7 @@ import { computed, nextTick, onMounted, ref } from 'vue';
 
 const dismissers = [];
 
-window.addEventListener('keydown', (e) => {
+addEventListener('keydown', (e) => {
   if (e.keyCode === 27 && dismissers.length) {
     e.stopImmediatePropagation();
     dismissers.pop()();

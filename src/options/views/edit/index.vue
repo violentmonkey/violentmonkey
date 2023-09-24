@@ -156,7 +156,7 @@ const setupSavePosition = ({ id: curWndId, tabs }) => {
       });
     } else {
       // triggered on resizing only
-      window.addEventListener('resize', debounce(savePosition, 100));
+      addEventListener('resize', debounce(savePosition, 100));
       shouldSavePositionOnSave = true;
     }
   }

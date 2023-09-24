@@ -35,8 +35,8 @@ function updateRoute(noConfirm) {
 }
 
 // popstate should be the first to ensure hashchange listeners see the correct lastRoute
-window.addEventListener('popstate', () => stack.pop());
-window.addEventListener('hashchange', () => updateRoute(), false);
+addEventListener('popstate', () => stack.pop());
+addEventListener('hashchange', () => updateRoute(), false);
 
 export function setRoute(hash, replace, noConfirm) {
   let hashString = `${hash}`;

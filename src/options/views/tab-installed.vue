@@ -509,9 +509,9 @@ function bindKeys() {
   const handleFocus = () => {
     keyboardService.setContext('buttonFocus', document.activeElement?.tabIndex >= 0);
   };
-  document.addEventListener('focus', handleFocus, true);
+  addEventListener('focus', handleFocus, true);
   const disposeList = [
-    () => document.removeEventListener('focus', handleFocus, true),
+    () => removeEventListener('focus', handleFocus, true),
     ...IS_FIREFOX ? [
       keyboardService.register('tab', () => {
         handleTabNavigation(1);
@@ -665,7 +665,7 @@ export default {
         const style = getComputedStyle(document.documentElement);
         [columnsForCardsMode, columnsForTableMode] = ['cards', 'table']
           .map(type => style.getPropertyValue(`--columns-${type}`)?.split(',').map(Number).filter(Boolean) || []);
-        global.addEventListener('resize', adjustScriptWidth);
+        addEventListener('resize', adjustScriptWidth);
       }
       adjustScriptWidth();
       return bindKeys();

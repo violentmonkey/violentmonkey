@@ -1,3 +1,4 @@
+import { isTouch } from '..';
 import options from '../../options';
 import './style.css';
 
@@ -66,6 +67,6 @@ options.hook((changes) => {
   }
 });
 
-if ('ontouchstart' in document) {
+if (isTouch) {
   document.documentElement.classList.add('touch');
 }

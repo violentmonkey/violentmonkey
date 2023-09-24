@@ -16,7 +16,7 @@ addPublicCommands({
 
 document.body.appendChild(textarea);
 
-document.addEventListener('copy', e => {
+addEventListener('copy', e => {
   e.preventDefault();
   const { type, data } = clipboardData;
   e.clipboardData.setData(type || 'text/plain', data);
