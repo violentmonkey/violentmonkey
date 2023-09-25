@@ -4,9 +4,9 @@
       <label>
         <input type="checkbox" v-model="config.shouldUpdate" v-bind="{disabled}">
         <span v-text="i18n('labelAllowUpdate')"/>
-        <span v-text="i18n('labelNotifyThisUpdated')"/>
+        <span v-text="i18n('labelNotifyThisUpdated')" class="melt"/>
       </label>
-      <label class="ml-1" :key="value" v-for="([text, value]) of [
+      <label class="ml-1 melt" :key="value" v-for="([text, value]) of [
         [i18n('genericOn'), '1'],
         [i18n('genericOff'), '0'],
         [i18n('genericUseGlobal'), ''],
@@ -38,7 +38,7 @@ export default {
 </script>
 
 <style>
-.frozen-note .form-group > :nth-child(n + 2) {
+.frozen-note .melt {
   display: none;
 }
 </style>
