@@ -1,20 +1,7 @@
 <template>
   <div class="edit-settings" ref="container">
     <h4 v-text="i18n('editLabelSettings')"></h4>
-    <div class="form-group condensed">
-      <label>
-        <input type="checkbox" v-model="config.shouldUpdate" :disabled="readOnly">
-        <span v-text="i18n('labelAllowUpdate')"></span>
-      </label>
-      <span v-text="i18n('labelNotifyThisUpdated')"/>
-      <label class="ml-1" :key="value" v-for="([text, value]) of [
-        [i18n('genericOn'), '1'],
-        [i18n('genericOff'), '0'],
-        [i18n('genericUseGlobal'), ''],
-      ]"><!-- make sure to place the input and span on one line with a space between -->
-        <input type="radio" :value="value" v-model="config.notifyUpdates" :disabled="readOnly"> <span v-text="text"/>
-      </label>
-    </div>
+    <VMSettingsUpdate v-bind="{script}"/>
     <h4 v-text="i18n('editLabelMeta')"></h4>
     <!-- Using tables to auto-adjust width, which differs substantially between languages -->
     <table>
@@ -102,11 +89,15 @@ import { getScriptHome, i18n } from '@/common';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
 import { objectGet } from '@/common/object';
 import { focusMe } from '@/common/ui';
+import VMSettingsUpdate from './settings-update';
 
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
 
 export default {
-  props: ['active', 'settings', 'value', 'readOnly'],
+  props: ['script', 'readOnly'],
+  components: {
+    VMSettingsUpdate,
+  },
   data() {
     return {
       KII: KNOWN_INJECT_INTO,
@@ -114,13 +105,13 @@ export default {
   },
   computed: {
     custom() {
-      return this.settings.custom || {};
+      return this.script.custom;
     },
     config() {
-      return this.settings.config || {};
+      return this.script.config;
     },
     placeholders() {
-      const { value } = this;
+      const value = this.script;
       return {
         name: objectGet(value, 'meta.name'),
         homepageURL: getScriptHome(value),
@@ -145,12 +136,8 @@ export default {
       ];
     },
   },
-  watch: {
-    active(val) {
-      if (val) {
-        focusMe(this.$el);
-      }
-    },
+  activated() {
+    focusMe(this.$el);
   },
 };
 </script>

@@ -69,8 +69,8 @@ aside {
 .text-red {
   color: red;
 }
-.text-right {
-  text-align: right;
+.text-upper {
+  text-transform: uppercase;
 }
 section {
   padding: 0 0 $tabPadY;

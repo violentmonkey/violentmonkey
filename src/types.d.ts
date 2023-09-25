@@ -143,7 +143,8 @@ declare namespace VMScript {
   type Config = {
     enabled: NumBool;
     removed: NumBool;
-    shouldUpdate: NumBool;
+    /** 2 = allow updates and local edits */
+    shouldUpdate: NumBool | 2;
     notifyUpdates?: NumBoolNull;
   }
   type Custom = {

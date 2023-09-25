@@ -125,7 +125,7 @@ const fakeSender = () => ({ tab: { id: Math.random() - 2 }, [kFrameId]: 0 });
 const conditionNotEdit = { condition: '!edit' };
 
 export default {
-  props: ['active', 'script', 'readOnly'],
+  props: ['script', 'readOnly'],
   components: {
     Icon,
     VmCode,
@@ -156,42 +156,37 @@ export default {
       keyboardService.setContext('edit', 'selectionEnd' in evt.target);
     });
   },
+  activated() {
+    const id = this.script.props.id;
+    (this.current ? this.cm : focusedElement)?.focus();
+    sendCmdDirectly('GetValueStore', id, undefined, this.sender = fakeSender()).then(data => {
+      const isFirstTime = !this.values;
+      if (this.setData(data) && isFirstTime && this.keys.length) {
+        this.autofocus(true);
+      }
+      this.loading = false;
+    });
+    this.disposeList = [
+      keyboardService.register('pageup', () => flipPage(this, -1), conditionNotEdit),
+      keyboardService.register('pagedown', () => flipPage(this, 1), conditionNotEdit),
+    ];
+    const fn = this.onStorageChanged;
+    const bg = browser.extension.getBackgroundPage();
+    this[WATCH_STORAGE] = browser.runtime.connect({
+      name: WATCH_STORAGE + JSON.stringify({
+        cfg: { value: id },
+        id: bg?.[WATCH_STORAGE](fn),
+        tabId: this.sender.tab.id,
+      }),
+    });
+    if (!bg) this[WATCH_STORAGE].onMessage.addListener(fn);
+  },
+  deactivated() {
+    this.disposeList?.forEach(dispose => dispose());
+    this[WATCH_STORAGE]?.disconnect();
+    this[WATCH_STORAGE] = null;
+  },
   watch: {
-    active(val) {
-      const id = this.script.props.id;
-      if (val) {
-        (this.current ? this.cm : focusedElement)?.focus();
-        sendCmdDirectly('GetValueStore', id, undefined, this.sender = fakeSender()).then(data => {
-          const isFirstTime = !this.values;
-          if (this.setData(data) && isFirstTime && this.keys.length) {
-            this.autofocus(true);
-          }
-          this.loading = false;
-        });
-        this.disposeList = [
-          keyboardService.register('pageup', () => flipPage(this, -1), conditionNotEdit),
-          keyboardService.register('pagedown', () => flipPage(this, 1), conditionNotEdit),
-        ];
-      } else {
-        this.disposeList?.forEach(dispose => dispose());
-      }
-      // toggle storage watcher
-      if (val) {
-        const fn = this.onStorageChanged;
-        const bg = browser.extension.getBackgroundPage();
-        this[WATCH_STORAGE] = browser.runtime.connect({
-          name: WATCH_STORAGE + JSON.stringify({
-            cfg: { value: id },
-            id: bg?.[WATCH_STORAGE](fn),
-            tabId: this.sender.tab.id,
-          }),
-        });
-        if (!bg) this[WATCH_STORAGE].onMessage.addListener(fn);
-      } else {
-        this[WATCH_STORAGE]?.disconnect();
-        this[WATCH_STORAGE] = null;
-      }
-    },
     current(val, oldVal) {
       if (val) {
         focusedElement = getActiveElement();

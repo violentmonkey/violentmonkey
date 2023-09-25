@@ -172,9 +172,6 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Values
-editReadonly:
-  description: Text of the warning when opening an auto-updated script in the editor.
-  message: To enable editing, disallow updates in the Settings tab and click "Save".
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: All
@@ -808,6 +805,18 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Update
+readonly:
+  description: Text in the editor's header for non-editable scripts.
+  message: Read-only
+readonlyNote:
+  description: Warning when trying to type in the editor.
+  message: Auto-updated script is read-only unless you disable updates or allow editing.
+readonlyOpt:
+  description: Option label in the editor, displayed along with readonlyOptWarn.
+  message: Allow edits
+readonlyOptWarn:
+  description: Text next to readonlyOpt label in the editor.
+  message: (next update will overwite them)
 reloadTab:
   description: Label of action to reload the tab
   message: Reload tab

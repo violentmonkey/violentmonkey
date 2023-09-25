@@ -410,6 +410,13 @@ body .vl-tooltip {
   }
 }
 
+.scary-switch:checked {
+  accent-color: red;
+  & + span {
+    color: red;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   input[type="radio"]:not(:checked),
   input[type="checkbox"]:not(:checked) {
