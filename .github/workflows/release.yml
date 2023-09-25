@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - v*
@@ -17,10 +18,13 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: '18'
 
       - name: Prepare
         run: yarn && node scripts/action-helper.js
+        env:
+          ACTION_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          DISCORD_WEBHOOK_RELEASE: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}
 
       - name: Build
         env:
@@ -68,7 +72,7 @@ jobs:
             node scripts/amo-upload.mjs
           else
             echo Publish unlisted version
-            BETA=1 node scripts/amo-upload.mjs
+            DEBUG=amo-upload BETA=1 node scripts/amo-upload.mjs
           fi
         env:
           AMO_KEY: ${{ secrets.AMO_KEY }}
@@ -105,4 +109,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node -e 'require("./scripts/release-helper").uploadAssets()';
+          node -e 'import("./scripts/release-helper.mjs").then(({ uploadAssets }) => uploadAssets())';

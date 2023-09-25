@@ -67,7 +67,7 @@ function switchTab(step) {
   window.location.hash = switchTo?.name || '';
 }
 
-document.addEventListener('dragover', evt => {
+addEventListener('dragover', evt => {
   if (['', TAB_ABOUT, SCRIPTS].includes(store.route.hash)
     && /^application\/(zip|x-zip-compressed)$/.test(evt.dataTransfer.items[0]?.type)) {
     location.hash = `#${TAB_SETTINGS}`;

@@ -17,7 +17,6 @@ const noScroll = isTouch && Object.assign(document.createElement('div'), {
   className: 'dragging-noscroll',
 });
 const eventsToSuppress = ['scroll', 'mouseenter', 'mouseleave'];
-const { addEventListener: on, removeEventListener: off } = EventTarget.prototype;
 
 let dragged;
 let elements;
@@ -40,11 +39,12 @@ let scrollTimestamp;
 let xyCache;
 
 export default function toggleDragging(listEl, moveScript, state) {
+  const onOff = state ? addEventListener : removeEventListener;
   parent = listEl;
   parentOnDrop = moveScript;
-  parent::(state ? on : off)(eventNames.start, isTouch ? onTouchStart : onDragStart);
+  parent::onOff(eventNames.start, isTouch ? onTouchStart : onDragStart);
   if (!isTouch) {
-    parent::(state ? on : off)('mousedown', onMouseDown, true);
+    parent::onOff('mousedown', onMouseDown, true);
     if (!state) onMouseUp();
   }
 }
@@ -52,12 +52,12 @@ export default function toggleDragging(listEl, moveScript, state) {
 /** @param {MouseEvent} e */
 function onMouseDown(e) {
   if (!e.altKey && scriptFromEvent(e)) original.draggable = true;
-  parent::on('mouseup', onMouseUp, true);
+  parent::addEventListener('mouseup', onMouseUp, true);
 }
 
 function onMouseUp() {
   if (original) original.draggable = false;
-  parent::off('mouseup', onMouseUp, true);
+  parent::removeEventListener('mouseup', onMouseUp, true);
 }
 
 function onDrop() {
@@ -68,8 +68,8 @@ function onTouchStart(e) {
   if (!scriptFromEvent(e)) return;
   longPressEvent = e;
   longPressTimer = setTimeout(onTouchMoveDetect, LONGPRESS_DELAY, 'timer');
-  document::on(eventNames.move, onTouchMoveDetect);
-  document::on(eventNames.end, onTouchEndDetect);
+  addEventListener(eventNames.move, onTouchMoveDetect);
+  addEventListener(eventNames.end, onTouchEndDetect);
 }
 
 function onTouchMoveDetect(e) {
@@ -86,8 +86,8 @@ function onTouchMoveDetect(e) {
 
 function onTouchEndDetect() {
   clearTimeout(longPressTimer);
-  document::off(eventNames.move, onTouchMoveDetect);
-  document::off(eventNames.end, onTouchEndDetect);
+  removeEventListener(eventNames.move, onTouchMoveDetect);
+  removeEventListener(eventNames.end, onTouchEndDetect);
 }
 
 function onDragStart(e) {
@@ -113,8 +113,8 @@ function onDragStart(e) {
   dragged.style.width = `${rect.width}px`;
   parent.appendChild(dragged);
   if (isTouch) parent.insertAdjacentElement('afterBegin', noScroll);
-  document::on(eventNames.move, onDragMouseMove);
-  document::on(eventNames.end, onDragMouseUp);
+  addEventListener(eventNames.move, onDragMouseMove);
+  addEventListener(eventNames.end, onDragMouseUp);
 }
 
 function onDragMouseMove(e) {
@@ -136,8 +136,8 @@ function onDragMouseMove(e) {
 }
 
 function onDragMouseUp() {
-  document::off(eventNames.move, onDragMouseMove);
-  document::off(eventNames.end, onDragMouseUp);
+  removeEventListener(eventNames.move, onDragMouseMove);
+  removeEventListener(eventNames.end, onDragMouseUp);
   stopScrolling();
   dragged.remove();
   if (isTouch) noScroll.remove();
@@ -185,11 +185,11 @@ function doScroll() {
 
 function startScrolling() {
   scrollTimer = setInterval(doScroll, ONE_FRAME_MS);
-  eventsToSuppress.forEach(name => window::on(name, stopPropagation, true));
+  eventsToSuppress.forEach(name => addEventListener(name, stopPropagation, true));
 }
 
 function stopScrolling() {
-  eventsToSuppress.forEach(name => window::off(name, stopPropagation, true));
+  eventsToSuppress.forEach(name => removeEventListener(name, stopPropagation, true));
   if (scrollTimer) clearInterval(scrollTimer);
   scrollTimer = 0;
 }

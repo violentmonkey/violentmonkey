@@ -153,6 +153,7 @@ import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
+import { findStyleSheetRules } from '@/common/ui/style';
 import { store } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
@@ -226,6 +227,8 @@ let step = 0;
 
 let columnsForTableMode = [];
 let columnsForCardsMode = [];
+/** @type {CSSMediaRule} */
+let narrowMediaRules;
 
 const refSearch = ref();
 const refList = ref();
@@ -449,6 +452,19 @@ async function handleEmptyRecycleBin() {
     store.removedScripts = [];
   }
 }
+function adjustNarrowWidth(val) {
+  adjustScriptWidth();
+  if (val && !narrowMediaRules) {
+    narrowMediaRules = findStyleSheetRules('-width: 76'); // max-width: 767px, min-width: 768px
+    for (const r of narrowMediaRules) r._orig = r.conditionText;
+  }
+  if (narrowMediaRules) {
+    for (const r of narrowMediaRules) {
+      const orig = r._orig;
+      r.media.mediaText = val ? orig.replace(/\d+/, s => +s + 90) : orig;
+    }
+  }
+}
 function adjustScriptWidth() {
   const widths = filters.viewTable ? columnsForTableMode : columnsForCardsMode;
   state.numColumns = filters.viewSingleColumn ? 1
@@ -510,9 +526,9 @@ function bindKeys() {
   const handleFocus = () => {
     keyboardService.setContext('buttonFocus', document.activeElement?.tabIndex >= 0);
   };
-  document.addEventListener('focus', handleFocus, true);
+  addEventListener('focus', handleFocus, true);
   const disposeList = [
-    () => document.removeEventListener('focus', handleFocus, true),
+    () => removeEventListener('focus', handleFocus, true),
     ...IS_FIREFOX ? [
       keyboardService.register('tab', () => {
         handleTabNavigation(1);
@@ -646,7 +662,8 @@ export default {
       state => toggleDragging(refList.value, moveScript, state));
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
-    watch(() => [filters.viewSingleColumn, filters.viewTable], adjustScriptWidth);
+    watch(() => filters.viewSingleColumn, adjustScriptWidth);
+    watch(() => filters.viewTable, adjustNarrowWidth);
     watch(getCurrentList, refreshUI);
     watch(() => store.route.paths[1], onHashChange);
     watch(selectedScript, script => {
@@ -666,7 +683,7 @@ export default {
         const style = getComputedStyle(document.documentElement);
         [columnsForCardsMode, columnsForTableMode] = ['cards', 'table']
           .map(type => style.getPropertyValue(`--columns-${type}`)?.split(',').map(Number).filter(Boolean) || []);
-        global.addEventListener('resize', adjustScriptWidth);
+        addEventListener('resize', adjustScriptWidth);
       }
       adjustScriptWidth();
       return bindKeys();

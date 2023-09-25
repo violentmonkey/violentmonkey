@@ -69,7 +69,7 @@ export default {
     this.revokers = null;
   },
   async mounted() {
-    this.$refs.editor.$el.addEventListener('dblclick', this.toggleBoolean);
+    this.$refs.editor.$el::addEventListener('dblclick', this.toggleBoolean);
     if (!this.revokers) {
       this.css = makeTextPreview(options.get(keyThemeCSS));
       this.revokers = [

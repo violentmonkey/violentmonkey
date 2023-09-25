@@ -39,8 +39,8 @@ export function toggleTip(el) {
 }
 
 function bindKeys() {
-  document.addEventListener('focus', handleFocus, true);
-  document.addEventListener('blur', handleBlur, true);
+  addEventListener('focus', handleFocus, true);
+  addEventListener('blur', handleBlur, true);
   keyboardService.register('escape', handleEscape);
   keyboardService.register('c-[', handleEscape);
   keyboardService.register('enter', () => {

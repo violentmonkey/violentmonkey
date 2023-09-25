@@ -12,6 +12,7 @@ const {
   Error,
   Object,
   Promise,
+  addEventListener, removeEventListener,
   chrome,
   performance,
 } = global;

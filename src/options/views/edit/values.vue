@@ -152,7 +152,7 @@ export default {
     },
   },
   mounted() {
-    this.$refs.container.addEventListener('focusin', evt => {
+    this.$refs.container::addEventListener('focusin', evt => {
       keyboardService.setContext('edit', 'selectionEnd' in evt.target);
     });
   },

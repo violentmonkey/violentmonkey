@@ -306,7 +306,7 @@ export default {
       if (state) {
         this.cm?.focus();
       } else {
-        window.removeEventListener('keydown', this.onKeyDown);
+        removeEventListener('keydown', this.onKeyDown);
       }
     },
     /* reroute hotkeys back to CM when it isn't focused,
@@ -529,7 +529,7 @@ export default {
     });
     // pressing Tab key inside a line with no selection will reuse indent size
     if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
-    this.$refs.code.addEventListener('copy', this.onCopy);
+    this.$refs.code::addEventListener('copy', this.onCopy);
     this.onActive(true);
     hookSetting('editor', (newUserOpts) => {
       // Use defaults for keys that were present in the old userOpts but got deleted in newUserOpts

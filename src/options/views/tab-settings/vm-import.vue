@@ -67,7 +67,7 @@ export default {
   },
   mounted() {
     const toggleDragDrop = initDragDrop(this.$refs.buttonImport);
-    window.addEventListener('hashchange', toggleDragDrop);
+    addEventListener('hashchange', toggleDragDrop);
     toggleDragDrop();
   },
 };
