@@ -1,5 +1,5 @@
 <template>
-  <div class="edit frame flex flex-col abs-full" :class="{frozen, readOnly}">
+  <div class="edit frame flex flex-col abs-full" :class="{frozen}">
     <div class="edit-header flex mr-1c">
       <nav>
         <div
@@ -21,14 +21,16 @@
            v-text="i18n('editHowToHint')"/>
       </div>
       <div class="mr-1">
-        <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"
-                :class="{'has-error': fatal || errors}" :title="fatal || errors"/>
-        <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"/>
+        <button v-text="i18n('buttonSave')" @click="save"
+                v-show="canSave || !frozen" :disabled="!canSave"
+                :class="{'has-error': $fe = fatal || errors}" :title="$fe"/>
+        <button v-text="i18n('buttonSaveClose')" @click="saveClose"
+                v-show="canSave || !frozen" :disabled="!canSave"/>
         <button v-text="i18n('buttonClose')" @click="close"/>
       </div>
     </div>
 
-    <div class="frozen-note shelf mr-2c flex flex-wrap" v-if="note && nav === 'code'">
+    <div class="frozen-note shelf mr-2c flex flex-wrap" v-if="frozenNote && nav === 'code'">
       <p v-text="i18n('readonlyNote')"/>
       <keep-alive>
         <VMSettingsUpdate class="flex ml-2c" :script="script"/>
@@ -44,7 +46,6 @@
       class="flex-auto"
       :value="code"
       :readOnly="frozen"
-      :title="frozen ? i18n('readonly') : null"
       ref="code"
       v-show="nav === 'code'"
       :active="nav === 'code'"
@@ -200,7 +201,7 @@ export default {
       errors: null,
       fatal: null,
       frozen: false,
-      note: false,
+      frozenNote: false,
       urlMatching: 'https://violentmonkey.github.io/api/matching/',
     };
   },
@@ -324,7 +325,7 @@ export default {
         codeComponent.cm.markClean();
         this.codeDirty = false; // triggers onDirty which sets canSave
         this.canSave = false; // ...and set it explicitly in case codeDirty was false
-        this.note = false;
+        this.frozenNote = false;
         this.errors = res.errors;
         this.script = res.update; // triggers onScript+onChange to handle the new `meta` and `props`
         if (newId && !id) history.replaceState(null, this.scriptName, `${ROUTE_SCRIPTS}/${newId}`);
@@ -363,7 +364,7 @@ export default {
       const remoteMode = remote && collectShouldUpdate(config);
       const frozen = !!(removed || remoteMode === 1 || this.readOnly);
       this.frozen = frozen;
-      this.note = !removed && (frozen || remoteMode >= 1);
+      this.frozenNote = !removed && (frozen || remoteMode >= 1);
       if (!removed && evt) this.onDirty();
     },
     onDirty() {
@@ -484,9 +485,6 @@ export default {
   .shelf {
     padding: .5em 1em;
     border-bottom: var(--border);
-  }
-  &.readOnly &-header button:nth-last-child(n + 2) {
-    display: none;
   }
   &.frozen .CodeMirror {
     background: var(--fill-0-5);
