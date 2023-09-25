@@ -375,7 +375,7 @@ export default {
       const { noframes } = custom;
       // Matching Vue model types, so deepEqual can work properly
       config._editable = shouldUpdate === 2;
-      config.notifyUpdates == `${config.notifyUpdates ?? ''}`;
+      config.notifyUpdates = `${config.notifyUpdates ?? ''}`;
       config.shouldUpdate = !!shouldUpdate;
       custom.noframes = noframes == null ? '' : +noframes; // it was boolean in old VM
       // Adding placeholders for any missing values so deepEqual can work properly

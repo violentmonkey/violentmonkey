@@ -10,6 +10,7 @@ module.exports = {
   plugins: ['jest'],
   rules: {
     'prettier/prettier': 'off',
+    'no-unused-expressions': 2,
     'no-use-before-define': ['error', {
       'functions': false,
       'classes': true,
