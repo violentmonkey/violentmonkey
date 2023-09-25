@@ -807,7 +807,7 @@ readonly:
   message: Read-only
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: Auto-updated script is read-only until you disable updates or allow editing.
+  message: Auto-updated script is read-only unless you disable updates or allow editing.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
   message: Allow edits

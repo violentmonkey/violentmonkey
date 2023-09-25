@@ -13,12 +13,8 @@
         <span class="subtle" v-if="script.config.removed" v-text="i18n('headerRecycleBin') + ' / '"/>
         {{scriptName}}
       </div>
-      <a class="frozen-hint text-right text-red" v-text="i18n('readonly')" v-if="frozen"
-         v-bind="script.config.removed ? {} : {
-           tabIndex: 0,
-           onclick: showNote,
-         }"/>
-      <div class="edit-hint text-right ellipsis" v-else>
+      <p v-if="frozen" class="text-upper text-right text-red" v-text="i18n('readonly')"/>
+      <div v-else class="edit-hint text-right ellipsis">
         <a href="https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/"
            target="_blank"
            rel="noopener noreferrer"
@@ -343,9 +339,6 @@ export default {
     saveClose() {
       this.save().then(this.close);
     },
-    showNote() {
-      this.note = true;
-    },
     switchPanel(step) {
       const keys = Object.keys(this.navItems);
       this.nav = keys[(keys.indexOf(this.nav) + step + keys.length) % keys.length];
@@ -361,20 +354,10 @@ export default {
       const { config } = script;
       const { removed } = config;
       const remote = script._remote = !!getScriptUpdateUrl(script);
-      const frozen = !!(
-        removed ||
-        this.readOnly ||
-        remote && (collectShouldUpdate(config) === 1)
-      );
-      if (this.frozen !== frozen) {
-        this.frozen = frozen;
-        if (!removed) {
-          this.$nextTick(() => {
-            this.$refs.code.$el::(frozen ? addEventListener : removeEventListener)(
-              'keypress', this.showNote, {once: true});
-          });
-        }
-      }
+      const remoteMode = remote && collectShouldUpdate(config);
+      const frozen = !!(removed || remoteMode === 1 || this.readOnly);
+      this.frozen = frozen;
+      this.note = !removed && (frozen || remoteMode >= 1);
       if (!removed && evt) this.onDirty();
     },
     onDirty() {
@@ -489,12 +472,6 @@ export default {
     background: var(--bg);
     padding: .5em 1em;
     border-bottom: var(--border);
-  }
-  .frozen-hint {
-    text-transform: uppercase;
-    &[tabindex]:hover {
-      text-decoration: underline;
-    }
   }
   &.readOnly &-header button:nth-last-child(n + 2) {
     display: none;

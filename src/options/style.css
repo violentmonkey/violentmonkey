@@ -69,6 +69,9 @@ aside {
 .text-red {
   color: red;
 }
+.text-upper {
+  text-transform: uppercase;
+}
 section {
   padding: 0 0 $tabPadY;
   > h3 {
