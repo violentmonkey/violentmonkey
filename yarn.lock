@@ -2577,10 +2577,10 @@ ajv@^8.0.0, ajv@^8.6.0, ajv@^8.8.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-amo-upload@^0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/amo-upload/-/amo-upload-0.5.1.tgz#79364bcc3679bcce0c4f4b45a19b20081e076314"
-  integrity sha512-xcq0WyMrH1PgeoQCqCvWJk3DEpRnZdqZLJHzFmOSNdg+VIUjxRzopNFGEe8MUuJqkv6R7S6PujiEClrWzoA82g==
+amo-upload@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/amo-upload/-/amo-upload-0.5.2.tgz#734f2c62c5c9f2ade78d709ecf5edb9388e0a6ac"
+  integrity sha512-4vBKXlxIp9zteS6xXXXahZ5z2tItf0ddOqu9aGV4wb5Jny+Gmdydqh5lvTO+xkDHJ1D5+SHXBgaMja6nVSZZTw==
   dependencies:
     "@babel/runtime" "^7.22.15"
     commander "^11.0.0"
