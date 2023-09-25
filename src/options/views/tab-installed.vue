@@ -142,7 +142,7 @@
 import { computed, reactive, nextTick, onMounted, watch, ref } from 'vue';
 import { i18n, sendCmdDirectly, debounce, makePause, noop, trueJoin } from '@/common';
 import options from '@/common/options';
-import { showConfirmation, showMessage, vFocus } from '@/common/ui';
+import { isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import hookSetting from '@/common/hook-setting';
 import { forEachKey } from '@/common/object';
 import { setRoute, lastRoute } from '@/common/router';
@@ -251,7 +251,8 @@ const state = reactive({
 });
 
 const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
-const draggable = computed(() => !showRecycle.value && filters.sort === 'exec');
+const draggableRaw = computed(() => !showRecycle.value && filters.sort === 'exec');
+const draggable = computed(() => isTouch && draggableRaw.value);
 const currentSortCompare = computed(() => filterOptions.sort[filters.sort]?.compare);
 const selectedScript = computed(() => state.filteredScripts[state.focusedIndex]);
 const message = computed(() => {
@@ -657,7 +658,7 @@ export default {
   setup() {
     resetList();
     watch(showRecycle, resetList);
-    watch(() => store.canRenderScripts && refList.value && draggable.value,
+    watch(() => store.canRenderScripts && refList.value && draggableRaw.value,
       state => toggleDragging(refList.value, moveScript, state));
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);

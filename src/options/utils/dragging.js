@@ -27,6 +27,7 @@ let longPressEvent;
 let longPressTimer;
 let offsetX;
 let offsetY;
+/** @type {HTMLElement} */
 let original;
 let parent;
 let parentOnDrop;
@@ -38,11 +39,35 @@ let scrollTimestamp;
 let xyCache;
 
 export default function toggleDragging(listEl, moveScript, state) {
+  const onOff = state ? addEventListener : removeEventListener;
   parent = listEl;
   parentOnDrop = moveScript;
-  parent::(state ? addEventListener : removeEventListener)(
-    eventNames.start,
-    isTouch ? onTouchStart : onDragStart);
+  parent::onOff(eventNames.start, isTouch ? onTouchStart : onDragStart);
+  if (!isTouch) {
+    parent::onOff('dblclick', onDblClick, true);
+    parent::onOff('mousedown', onMouseDown, true);
+    if (!state) onMouseUp();
+  }
+}
+
+function onDblClick(evt) {
+  const selection = getSelection();
+  const el = evt.target.closest('.script-name');
+  if (el) {
+    selection.removeAllRanges();
+    selection.selectAllChildren(el);
+  }
+}
+
+/** @param {MouseEvent} e */
+function onMouseDown(e) {
+  if (!e.altKey && scriptFromEvent(e)) original.draggable = true;
+  parent::addEventListener('mouseup', onMouseUp, true);
+}
+
+function onMouseUp() {
+  if (original) original.draggable = false;
+  parent::removeEventListener('mouseup', onMouseUp, true);
 }
 
 function onDrop() {
