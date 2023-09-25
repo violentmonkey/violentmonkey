@@ -44,8 +44,18 @@ export default function toggleDragging(listEl, moveScript, state) {
   parentOnDrop = moveScript;
   parent::onOff(eventNames.start, isTouch ? onTouchStart : onDragStart);
   if (!isTouch) {
+    parent::onOff('dblclick', onDblClick, true);
     parent::onOff('mousedown', onMouseDown, true);
     if (!state) onMouseUp();
+  }
+}
+
+function onDblClick(evt) {
+  const selection = getSelection();
+  const el = evt.target.closest('.script-name');
+  if (el) {
+    selection.removeAllRanges();
+    selection.selectAllChildren(el);
   }
 }
 
