@@ -35,7 +35,7 @@
     <div class="frozen-note mr-2c flex flex-wrap" v-if="note && nav === 'code'">
       <p v-text="i18n('readonlyNote')"/>
       <keep-alive>
-        <VMSettingsUpdate class="flex ml-2c" :script="script" @change="onChangeLater"/>
+        <VMSettingsUpdate class="flex ml-2c" :script="script"/>
       </keep-alive>
     </div>
 
@@ -55,7 +55,6 @@
       class="edit-body"
       v-if="nav === 'settings'"
       v-bind="{readOnly, script}"
-      @input="onChangeLater"
     />
     <vm-values
       class="edit-body"
@@ -170,6 +169,7 @@ const compareString = (a, b) => (a < b ? -1 : a > b);
 const collectShouldUpdate = ({ shouldUpdate, _editable }) => (
   +shouldUpdate && (shouldUpdate + _editable)
 );
+const deepWatchScript = { handler: 'onChange', deep: true };
 
 export default {
   props: ['initial', 'initialCode', 'readOnly'],
@@ -246,9 +246,10 @@ export default {
     },
     codeDirty: 'onDirty',
     script: 'onScript',
+    'script.config': deepWatchScript,
+    'script.custom': deepWatchScript,
   },
   created() {
-    this.onChangeLater = debounce(this.onChange);
     this.script = deepCopy(this.initial);
     this.toggleUnloadSentry = getUnloadSentry(null, () => {
       this.$refs.code.cm.focus();
@@ -322,13 +323,8 @@ export default {
         this.canSave = false; // ...and set it explicitly in case codeDirty was false
         this.note = false;
         this.errors = res.errors;
-        if (newId) {
-          this.script = res.update;
-          if (!id) history.replaceState(null, this.scriptName, `${ROUTE_SCRIPTS}/${newId}`);
-        } else {
-          // storing explicitly since we didn't change `this.script`
-          this.saved = deepCopy(script);
-        }
+        this.script = res.update; // triggers onScript+onChange to handle the new `meta` and `props`
+        if (newId && !id) history.replaceState(null, this.scriptName, `${ROUTE_SCRIPTS}/${newId}`);
       } catch (err) {
         showConfirmation(`${err.message || err}`, {
           cancel: false,
