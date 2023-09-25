@@ -85,6 +85,9 @@ buttonSave:
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: 儲存並關閉
+buttonSaved:
+  description: Button text after saving.
+  message: ''
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: 顯示編輯器狀態
@@ -110,6 +113,9 @@ buttonVacuumed:
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: 正在整理…
+confirmManualUpdate:
+  description: Confirm message shown when clicking update button for a single script.
+  message: ''
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -162,6 +168,9 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: 值
+editReadonly:
+  description: Text of the warning when opening an auto-updated script in the editor.
+  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: 全部
@@ -529,6 +538,9 @@ labelXhrInjectHint:
     僅當您有一個腳本需要在頁面開始加載前運行，並且目前它運行得太晚時才啟用。就像 Tampermonkey
     中的即時注入模式一樣，這個選項使用的是被廢棄的同步 XHR，所以在 Chrome/Chromium
     中，您會在開發者控制台看到警告，盡管您可以安全地忽略它們，因為在這種情況下的不利影響可以忽略不計。 您可以通過右鍵點擊其中一個來永久隱藏這些警告。
+labelXhrInjectNote:
+  description: Shown to the right of "synchronous page mode" in options.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步時間為 $1
@@ -684,15 +696,19 @@ msgSameCode:
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: 黑名單已更新。
+  touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: 自訂樣式已更新。
+  touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: 編輯器選項已更新。
+  touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: 自訂腳本範本已更新。
+  touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 腳本【$1】已更新！

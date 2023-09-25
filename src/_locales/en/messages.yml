@@ -538,9 +538,6 @@ labelXhrInject:
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
   message: Synchronous $1 mode
-labelXhrInjectNote:
-  description: Shown to the right of "synchronous page mode" in options.
-  message: (except incognito and sites with disabled cookies)
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
@@ -550,6 +547,9 @@ labelXhrInjectHint:
     so in Chrome/Chromium you'll see warnings in devtools console, although you
     can safely ignore them as the adverse affects are negligible in this case.
     You can hide the warnings for good by right-clicking one.
+labelXhrInjectNote:
+  description: Shown to the right of "synchronous page mode" in options.
+  message: (except incognito and sites with disabled cookies)
 lastSync:
   description: Label for last sync timestamp.
   message: Last sync at $1
@@ -714,15 +714,19 @@ msgSameCode:
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Blacklist updated.
+  touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Custom style is updated.
+  touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: Editor options are updated.
+  touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Custom script template is updated.
+  touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
   message: Script [$1] is updated!
