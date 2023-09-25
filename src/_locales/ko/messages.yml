@@ -85,6 +85,9 @@ buttonSave:
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: 저장하고 닫기
+buttonSaved:
+  description: Button text after saving.
+  message: ''
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: 편집기 상태 보기
@@ -110,6 +113,9 @@ buttonVacuumed:
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: 데이터를 청소하는 중...
+confirmManualUpdate:
+  description: Confirm message shown when clicking update button for a single script.
+  message: ''
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -161,6 +167,9 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: 값
+editReadonly:
+  description: Text of the warning when opening an auto-updated script in the editor.
+  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: ''
@@ -525,6 +534,9 @@ labelXhrInjectHint:
     Instant injection 모드처럼, 이 옵션은 더 이상 사용되지 않는 동기식 XHR을 사용하므로 Chrome/Chromium에서
     devtools 콘솔에 경고가 표시됩니다, 이 경우 부작용은 무시해도 됩니다. 경고를 마우스 오른쪽 버튼으로 클릭하여 영구적으로 숨길 수
     있습니다.
+labelXhrInjectNote:
+  description: Shown to the right of "synchronous page mode" in options.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: $1에 마지막으로 동기화됨
@@ -682,15 +694,19 @@ msgSameCode:
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: 블랙리스트 업데이트됨.
+  touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: 커스텀 스타일 업데이트됨.
+  touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: 편집기 설정이 업데이트됨.
+  touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: 스크립트 템플릿이 업데이트됨.
+  touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 스크립트 [$1]이(가) 업데이트됨!

@@ -85,6 +85,9 @@ buttonSave:
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Guardar e fechar
+buttonSaved:
+  description: Button text after saving.
+  message: ''
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Mostrar estado do editor
@@ -110,6 +113,9 @@ buttonVacuumed:
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: A otimizar dados...
+confirmManualUpdate:
+  description: Confirm message shown when clicking update button for a single script.
+  message: ''
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -162,6 +168,9 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Valores
+editReadonly:
+  description: Text of the warning when opening an auto-updated script in the editor.
+  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Tudo
@@ -524,6 +533,9 @@ labelXhrInject:
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: ''
+labelXhrInjectNote:
+  description: Shown to the right of "synchronous page mode" in options.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: 'Última sincronização: $1'
@@ -678,15 +690,19 @@ msgSameCode:
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Lista negra atualizada.
+  touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Estilo personalizado atualizado.
+  touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: Opções do editor atualizadas.
+  touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: O modelo de scripts personalizado foi atualizado.
+  touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
   message: $1 foi atualizado!

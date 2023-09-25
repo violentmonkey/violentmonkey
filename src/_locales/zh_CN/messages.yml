@@ -85,6 +85,9 @@ buttonSave:
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: 保存并关闭
+buttonSaved:
+  description: Button text after saving.
+  message: ''
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: 显示编辑器状态
@@ -110,6 +113,11 @@ buttonVacuumed:
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: 正在整理...
+confirmManualUpdate:
+  description: Confirm message shown when clicking update button for a single script.
+  message: |-
+    此脚本的自动更新已被禁用！
+    点击确认继续更新。
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -161,6 +169,9 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: 数据
+editReadonly:
+  description: Text of the warning when opening an auto-updated script in the editor.
+  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: 全部
@@ -526,6 +537,9 @@ labelXhrInjectHint:
     仅当您有一个脚本需要在页面开始加载前运行，并且目前它运行得太晚时才启用。就像 Tampermonkey
     中的即时注入模式一样，这个选项使用的是被废弃的同步 XHR，所以在  Chrome/Chromium
     中，您会在开发者控制台看到警告，尽管您可以安全地忽略它们，因为在这种情况下的不利影响可以忽略不计。 您可以通过右键点击其中一个来永久隐藏这些警告。
+labelXhrInjectNote:
+  description: Shown to the right of "synchronous page mode" in options.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步时间为 $1
@@ -681,15 +695,19 @@ msgSameCode:
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: 黑名单已更新！
+  touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: 自定义样式已更新！
+  touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: 编辑器配置已更新！
+  touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: 自定义脚本模板已更新！
+  touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
   message: 脚本【$1】已更新！

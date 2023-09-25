@@ -87,6 +87,9 @@ buttonSave:
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Zapisz i zamknij
+buttonSaved:
+  description: Button text after saving.
+  message: ''
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Pokaż określenia edytora
@@ -112,6 +115,9 @@ buttonVacuumed:
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Czyszczenie danych...
+confirmManualUpdate:
+  description: Confirm message shown when clicking update button for a single script.
+  message: ''
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -171,6 +177,9 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Wartości
+editReadonly:
+  description: Text of the warning when opening an auto-updated script in the editor.
+  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Wszystko
@@ -550,6 +559,9 @@ labelXhrInjectHint:
     ostrzeżenia w konsoli devtools, chociaż możesz je bezpiecznie zignorować,
     ponieważ niekorzystne skutki są w tym przypadku znikome. Ostrzeżenia można
     ukryć na dobre, klikając je prawym przyciskiem myszy.
+labelXhrInjectNote:
+  description: Shown to the right of "synchronous page mode" in options.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: Ostatnia synchronizacja o $1
@@ -714,15 +726,19 @@ msgSameCode:
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Czarna lista zaktualizowana
+  touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Styl niestandardowy jest aktualizowany.
+  touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: Opcje edytora zostały zaktualizowane.
+  touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Niestandardowy szablon skryptu jest aktualizowany.
+  touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
   message: Skrypt [$1] jest aktualizowany!

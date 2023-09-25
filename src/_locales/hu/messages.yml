@@ -87,6 +87,9 @@ buttonSave:
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Mentés & Bezárás
+buttonSaved:
+  description: Button text after saving.
+  message: ''
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Szerkesztő állapotának mutatása
@@ -112,13 +115,18 @@ buttonVacuumed:
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Adatok feltakarítása...
+confirmManualUpdate:
+  description: Confirm message shown when clicking update button for a single script.
+  message: |-
+    Az automatikus frissítés le van tiltva ennél a szkriptnél.
+    Nyomj az "Oké"-ra, hogy mégis frissítsd.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: >-
     Szerkesztések nincsenek mentve!
 
-    Kattints az Oké gombra, hogy elvesd őket, vagy a Mégse gombra, ha maradni
-    akarsz a szerkesztőben.
+    Kattints az "Oké"-ra, hogy elvesd őket, vagy a "Mégse"-re, ha maradni akarsz
+    a szerkesztőben.
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: >-
@@ -174,6 +182,11 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Értékek
+editReadonly:
+  description: Text of the warning when opening an auto-updated script in the editor.
+  message: >-
+    A szerkesztéshez tiltsd le a frissítéseket a Beállítások fülön és nyomj a
+    "Mentés"-re.
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: ''
@@ -552,6 +565,10 @@ labelXhrInjectHint:
     nyugodtan figyelmen kívül hagyhatod, mivel ebben az esetben ez semmilyen
     valódi kellemetlenséget nem okoz. Tartósan el is rejtheted ezeket a
     figyelmeztetéseket jobb gombbal rájuk kattintva.
+labelXhrInjectNote:
+  description: Shown to the right of "synchronous page mode" in options.
+  message: |
+    (kivéve inkognitóban és oldalakon, ahol le vannak tiltva a sütik)
 lastSync:
   description: Label for last sync timestamp.
   message: 'Utoljára szinkronizálva: $1'
@@ -722,15 +739,19 @@ msgSameCode:
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Feketelista frissítve.
+  touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Egyedi stílus frissítve.
+  touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: Szerkesztő beállítások frissítve.
+  touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Egyedi szkript sablon frissítve.
+  touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
   message: A(z) [$1] szkript frissítve!

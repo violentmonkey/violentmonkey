@@ -87,6 +87,9 @@ buttonSave:
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Kaydet & Kapat
+buttonSaved:
+  description: Button text after saving.
+  message: ''
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Düzenleyici durumunu göster
@@ -112,6 +115,9 @@ buttonVacuumed:
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
   message: Veri içeri aktarılıyor...
+confirmManualUpdate:
+  description: Confirm message shown when clicking update button for a single script.
+  message: ''
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -169,6 +175,9 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Değerler
+editReadonly:
+  description: Text of the warning when opening an auto-updated script in the editor.
+  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: ''
@@ -546,6 +555,9 @@ labelXhrInjectHint:
     devtools konsolunda uyarılar görebilirsiniz, yine de olumsuz etkiler bu
     durumda önemsiz olduğu için bu hataları güvenli bir şekilde görmezden
     gelebilirsiniz. Uyarıları, birine sağ tıklayarak tamamen gizleyebilirsiniz.
+labelXhrInjectNote:
+  description: Shown to the right of "synchronous page mode" in options.
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
   message: Son eşitleme zamanı $1
@@ -709,15 +721,19 @@ msgSameCode:
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Kara liste güncellendi.
+  touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
   message: Özel stil güncellendi.
+  touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
   message: Düzenleyici ayarları kaydedildi.
+  touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
   message: Özelleştirilmiş betik şablonu kaydedildi.
+  touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
   message: Betik [$1] güncellendi!
