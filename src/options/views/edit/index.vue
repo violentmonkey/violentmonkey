@@ -35,7 +35,7 @@
     <div class="frozen-note mr-2c flex flex-wrap" v-if="note && nav === 'code'">
       <p v-text="i18n('readonlyNote')"/>
       <keep-alive>
-        <VMSettingsUpdate class="flex ml-2c" :script="script" @change="onChange"/>
+        <VMSettingsUpdate class="flex ml-2c" :script="script" @change="onChangeLater"/>
       </keep-alive>
     </div>
 
@@ -55,7 +55,7 @@
       class="edit-body"
       v-if="nav === 'settings'"
       v-bind="{readOnly, script}"
-      @input="onChange"
+      @input="onChangeLater"
     />
     <vm-values
       class="edit-body"
@@ -248,6 +248,7 @@ export default {
     script: 'onScript',
   },
   created() {
+    this.onChangeLater = debounce(this.onChange);
     this.script = deepCopy(this.initial);
     this.toggleUnloadSentry = getUnloadSentry(null, () => {
       this.$refs.code.cm.focus();
