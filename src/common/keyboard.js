@@ -6,8 +6,8 @@ export const keyboardService = new KeyboardService();
 
 bindKeys();
 
-export function isInput(el) {
-  return ['input', 'textarea'].includes(el?.tagName?.toLowerCase());
+export function isInput({ localName: n } = {}) {
+  return n === 'input' || n === 'button' || n === 'select' || n === 'textarea';
 }
 
 function handleFocus(e) {

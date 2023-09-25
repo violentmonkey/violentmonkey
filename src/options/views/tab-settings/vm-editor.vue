@@ -12,7 +12,7 @@
       <p v-text="error"/>
     </div>
     <p v-html="i18n('descEditorOptions')" class="my-1"/>
-    <setting-text name="editor" ref="editor" :json="true" :has-reset="true" @save="onSave">
+    <setting-text name="editor" json has-reset @dblclick="toggleBoolean">
       <button v-text="i18n('buttonShowEditorState')" @click="toggleStateHint"/>
     </setting-text>
     <pre v-text="hint" class="monospace-font dim-hint" />
@@ -22,7 +22,6 @@
 <script>
 import options from '@/common/options';
 import hookSetting from '@/common/hook-setting';
-import { showMessage } from '@/common/ui';
 import SettingText from '@/common/ui/setting-text';
 
 const keyThemeCSS = 'editorTheme';
@@ -69,7 +68,6 @@ export default {
     this.revokers = null;
   },
   async mounted() {
-    this.$refs.editor.$el::addEventListener('dblclick', this.toggleBoolean);
     if (!this.revokers) {
       this.css = makeTextPreview(options.get(keyThemeCSS));
       this.revokers = [
@@ -101,13 +99,11 @@ export default {
         this.$nextTick(() => el?.focus());
       }
     },
-    onSave() {
-      showMessage({ text: this.$refs.editor.error || this.i18n('msgSavedEditorOptions') });
-    },
     toggleBoolean(event) {
       const el = /** @type {HTMLTextAreaElement} */ event.target;
       const { selectionStart: start, selectionEnd: end, value } = el;
-      const toggled = { false: 'true', true: 'false' }[value.slice(start, end)];
+      // Ignoring double-clicks outside of <textarea>
+      const toggled = end && { false: 'true', true: 'false' }[value.slice(start, end)];
       // FF can't run execCommand on textarea, https://bugzil.la/1220696#c24
       if (toggled && !document.execCommand('insertText', false, toggled)) {
         el.value = value.slice(0, start) + toggled + value.slice(end);

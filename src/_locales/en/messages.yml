@@ -85,6 +85,9 @@ buttonSave:
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
   message: Save & Close
+buttonSaved:
+  description: Button text after saving.
+  message: Saved
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Show editor state

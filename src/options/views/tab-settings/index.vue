@@ -131,10 +131,21 @@
           </locale-group>
         </div>
       </section>
+
       <vm-editor />
-      <vm-template />
+
+      <section>
+        <h3 v-text="i18n('labelScriptTemplate')"/>
+        <setting-text name="scriptTemplate" has-reset/>
+      </section>
+
       <vm-blacklist />
-      <vm-css />
+
+      <section>
+        <h3 v-text="i18n('labelCustomCSS')"/>
+        <p v-html="i18n('descCustomCSS')"/>
+        <setting-text name="customCSS"/>
+      </section>
     </details>
   </div>
 </template>
@@ -149,16 +160,15 @@ import { forEachEntry, mapEntry } from '@/common/object';
 import options from '@/common/options';
 import optionsDefaults from '@/common/options-defaults';
 import hookSetting from '@/common/hook-setting';
+import { keyboardService } from '@/common/keyboard';
 import { focusMe } from '@/common/ui';
 import LocaleGroup from '@/common/ui/locale-group';
-import loadZip from '@/common/zip';
+import SettingText from '@/common/ui/setting-text';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmSync from './vm-sync';
 import VmEditor from './vm-editor';
-import VmTemplate from './vm-template';
 import VmBlacklist from './vm-blacklist';
-import VmCss from './vm-css';
 
 const badgeColorEnum = {
   badgeColor: i18n('titleBadgeColor'),
@@ -233,10 +243,9 @@ export default {
     VmExport,
     VmSync,
     VmEditor,
-    VmTemplate,
     VmBlacklist,
-    VmCss,
     SettingCheck,
+    SettingText,
     LocaleGroup,
     Tooltip,
   },
@@ -256,6 +265,9 @@ export default {
     },
   },
   methods: {
+    ctrlS() {
+      document.activeElement.dispatchEvent(new Event('ctrl-s'));
+    },
     onResetBadgeColors() {
       badgeColorNames.forEach(name => {
         settings[name] = optionsDefaults[name];
@@ -264,18 +276,16 @@ export default {
   },
   activated() {
     focusMe(this.$el);
-  },
-  created() {
-    this.revokers = [];
+    this.revokers = [
+      keyboardService.register('ctrlcmd-s', this.ctrlS, { condition: 'inputFocus' }),
+    ];
     items::forEachEntry(([name, { normalize = normalizeEnum }]) => {
       this.revokers.push(hookSetting(name, val => { settings[name] = normalize(val, name); }));
       this.$watch(() => settings[name], getItemUpdater(name, normalize));
     });
     this.expose = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);
-    // Preload zip.js when user visits settings tab
-    loadZip();
   },
-  beforeUnmount() {
+  deactivated() {
     this.revokers.forEach((revoke) => { revoke(); });
   },
 };
