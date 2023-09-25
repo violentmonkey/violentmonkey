@@ -22,18 +22,23 @@
       </div>
       <div class="mr-1">
         <button v-text="i18n('buttonSave')" @click="save" :disabled="!canSave"
-                :class="{'has-error': errors}" :title="errors"/>
+                :class="{'has-error': fatal || errors}" :title="fatal || errors"/>
         <button v-text="i18n('buttonSaveClose')" @click="saveClose" :disabled="!canSave"/>
         <button v-text="i18n('buttonClose')" @click="close"/>
       </div>
     </div>
 
-    <div class="frozen-note mr-2c flex flex-wrap" v-if="note && nav === 'code'">
+    <div class="frozen-note shelf mr-2c flex flex-wrap" v-if="note && nav === 'code'">
       <p v-text="i18n('readonlyNote')"/>
       <keep-alive>
         <VMSettingsUpdate class="flex ml-2c" :script="script"/>
       </keep-alive>
     </div>
+
+    <p v-if="fatal" class="shelf fatal">
+      <b v-text="fatal[0]"/>
+      {{fatal[1]}}
+    </p>
 
     <vm-code
       class="flex-auto"
@@ -69,7 +74,7 @@
     />
     </keep-alive>
 
-    <div v-if="errors" class="errors my-1c">
+    <div v-if="errors" class="errors shelf my-1c">
       <p v-for="e in errors" :key="e" v-text="e" class="text-red"/>
       <p class="my-1">
         <a :href="urlMatching" target="_blank" rel="noopener noreferrer" v-text="urlMatching"/>
@@ -85,7 +90,7 @@ import {
   sendCmdDirectly, trueJoin,
 } from '@/common';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
-import { showConfirmation, showMessage } from '@/common/ui';
+import { showMessage } from '@/common/ui';
 import { keyboardService } from '@/common/keyboard';
 import VmCode from '@/common/ui/code';
 import VmExternals from '@/common/ui/externals';
@@ -193,6 +198,7 @@ export default {
       },
       hotkeys: null,
       errors: null,
+      fatal: null,
       frozen: false,
       note: false,
       urlMatching: 'https://violentmonkey.github.io/api/matching/',
@@ -291,6 +297,7 @@ export default {
       const { config, custom } = script;
       const { notifyUpdates } = config;
       const { noframes } = custom;
+      let fatal;
       try {
         const codeComponent = this.$refs.code;
         const id = script.props.id;
@@ -322,10 +329,9 @@ export default {
         this.script = res.update; // triggers onScript+onChange to handle the new `meta` and `props`
         if (newId && !id) history.replaceState(null, this.scriptName, `${ROUTE_SCRIPTS}/${newId}`);
       } catch (err) {
-        showConfirmation(`${err.message || err}`, {
-          cancel: false,
-        });
+        fatal = err.message.split('\n');
       }
+      this.fatal = fatal;
     },
     close(cm) {
       if (cm && this.nav !== 'code') {
@@ -465,11 +471,17 @@ export default {
     }
   }
   .errors {
+    --border: none;
     border-top: 2px solid red;
-    padding: .5em 1em;
+  }
+  .fatal {
+    background: firebrick;
+    color: white;
   }
   .frozen-note {
     background: var(--bg);
+  }
+  .shelf {
     padding: .5em 1em;
     border-bottom: var(--border);
   }
