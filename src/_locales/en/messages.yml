@@ -820,7 +820,7 @@ readonlyOpt:
   message: Allow edits
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: (next update will overwite them)
+  message: (next update will overwrite them)
 reloadTab:
   description: Label of action to reload the tab
   message: Reload tab
