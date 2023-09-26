@@ -86,7 +86,6 @@ const resolveDataCodeStr = `(${(global, data) => {
 const getKey = (url, isTop) => (
   isTop ? url : `-${url}`
 );
-const getPrefixAndId = key => key.split(/^(\w+:)/).slice(1);
 const normalizeRealm = val => (
   KNOWN_INJECT_INTO[val] ? val : injectInto || AUTO
 );
@@ -220,30 +219,41 @@ postInitialize.push(() => {
 });
 
 onStorageChanged((keys, data) => {
+  const toClear = [];
   for (const key of keys) {
-    const [prefix, id] = getPrefixAndId(key);
-    if (prefix === S_SCRIPT_PRE) {
-      cache.del(key);
-    } else if (prefix === S_VALUE_PRE) {
+    const i = key.indexOf(':') + 1;
+    const prefix = key.slice(0, i);
+    const id = key.slice(i);
+    /* TODO: only delete the script's entry if no impactful @key is changed in metablock?
+       Might be beneficial for local file tracking. */
+    if (propsToClear[prefix] === true) {
+      cache.destroy();
+      return;
+    }
+    let values;
+    // Patching cached script's values
+    if (prefix === S_VALUE_PRE) {
       const script = cache.get(S_SCRIPT_PRE + id);
-      if (script) script[VALUES] = data?.[key] || {};
+      if (script) values = script[VALUES] = data?.[key] || null;
+    }
+    // Removing values/require/resource in injection bags
+    if (prefix) {
+      toClear.push([prefix, id, values]);
     }
   }
-  cache.some(removeStaleCacheEntry, keys.map(getPrefixAndId));
+  if (toClear.length) cache.some(removeStaleCacheEntry, toClear);
 });
 
 /** @this {string[][]} changed storage keys, already split as [prefix,id] */
 function removeStaleCacheEntry(val, key) {
   if (!val[CACHE_KEYS]) return;
-  for (const [prefix, id] of this) {
+  for (const [prefix, id, newData] of this) {
     const prop = propsToClear[prefix];
-    if (prop === true) {
-      cache.destroy(); // TODO: try to patch the cache in-place?
-      return true; // stops further processing as the cache is clear now
-    }
     if (val[prop]?.includes(+id || id)) {
       if (prefix === S_REQUIRE_PRE) {
         val.depsMap[id].forEach(id => cache.del(S_SCRIPT_PRE + id));
+      } else if (prefix === S_VALUE_PRE) {
+        val[S_VALUE][id] = newData;
       } else {
         cache.del(key); // TODO: try to patch the cache in-place?
       }
