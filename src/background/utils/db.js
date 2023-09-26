@@ -540,6 +540,7 @@ export async function parseScript(src) {
   let oldScript = getScript({ id, meta });
   if (oldScript) {
     script = oldScript;
+    id = script.props.id;
   } else {
     ({ script } = newScript());
     maxScriptId++;
