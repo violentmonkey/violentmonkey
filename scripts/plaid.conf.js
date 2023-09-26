@@ -42,7 +42,8 @@ exports.optimization = {
         name: 'common-ui',
         test: new RegExp([
           /\bsvg/,
-          'src/common/(?!zip)',
+          // don't extract CSS as it'll change the relative order of rules which breaks appearance
+          'src/common/(?!zip|.*\\.css$)',
           'node_modules/@violentmonkey/shortcut',
           'node_modules/@?vue',
         ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
