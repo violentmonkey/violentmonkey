@@ -487,7 +487,7 @@ export function checkRemove({ force } = {}) {
 }
 
 /** @return {string} */
-function getUUID() {
+const getUUID = crypto.randomUUID ? crypto.randomUUID.bind(crypto) : () => {
   const rnd = new Uint16Array(8);
   window.crypto.getRandomValues(rnd);
   // xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
@@ -496,52 +496,7 @@ function getUUID() {
   rnd[3] = rnd[3] & 0x0FFF | 0x4000; // eslint-disable-line no-bitwise
   rnd[4] = rnd[4] & 0x3FFF | 0x8000; // eslint-disable-line no-bitwise
   return '01-2-3-4-567'.replace(/\d/g, i => (rnd[i] + 0x1_0000).toString(16).slice(-4));
-}
-
-/**
- * @param {VMScript} script
- * @param {string} code
- * @return {Promise<VMScript[]>}
- */
-async function saveScript(script, code) {
-  const config = script.config || {};
-  config.enabled = getInt(config.enabled);
-  config.shouldUpdate = getInt(config.shouldUpdate);
-  const props = script.props || {};
-  let oldScript;
-  if (!props.id) {
-    maxScriptId += 1;
-    props.id = maxScriptId;
-  } else {
-    oldScript = scriptMap[props.id];
-  }
-  props.uri = getNameURI(script);
-  props.uuid = props.uuid || crypto.randomUUID?.() || getUUID();
-  // Do not allow script with same name and namespace
-  if (aliveScripts.some(({ props: { id, uri } = {} }) => props.id !== id && props.uri === uri)) {
-    throw i18n('msgNamespaceConflict');
-  }
-  if (oldScript) {
-    script.config = { ...oldScript.config, ...config };
-    script.props = { ...oldScript.props, ...props };
-    const index = aliveScripts.indexOf(oldScript);
-    aliveScripts[index] = script;
-  } else {
-    if (!props.position) {
-      maxScriptPosition += 1;
-      props.position = maxScriptPosition;
-    } else if (maxScriptPosition < props.position) {
-      maxScriptPosition = props.position;
-    }
-    script.config = config;
-    script.props = props;
-    aliveScripts.push(script);
-  }
-  return storage.base.set({
-    [storage[S_SCRIPT].toKey(props.id)]: script,
-    [storage[S_CODE].toKey(props.id)]: code,
-  });
-}
+};
 
 /** @return {Promise<void>} */
 export async function updateScriptInfo(id, data) {
@@ -576,48 +531,69 @@ function parseMetaWithErrors(src) {
 export async function parseScript(src) {
   const { meta, errors } = src.meta ? src : parseMetaWithErrors(src);
   if (!meta.name) throw `${i18n('msgInvalidScript')}\n${i18n('labelNoName')}`;
-  const result = {
-    errors,
-    update: {
-      message: src.message == null ? i18n('msgUpdated') : src.message || '',
-    },
+  const update = {
+    message: src.message == null ? i18n('msgUpdated') : src.message || '',
   };
+  const result = { errors, update };
+  let { id } = src;
   let script;
-  const oldScript = getScript({ id: src.id, meta });
+  let oldScript = getScript({ id, meta });
   if (oldScript) {
-    if (src.isNew) throw i18n('msgNamespaceConflict');
-    script = { ...oldScript };
-    delete script[INFERRED];
+    script = oldScript;
   } else {
     ({ script } = newScript());
+    maxScriptId++;
+    id = script.props.id = maxScriptId;
     result.isNew = true;
-    result.update.message = i18n('msgInstalled');
+    update.message = i18n('msgInstalled');
+    aliveScripts.push(script);
+  }
+  const { config, props } = script;
+  const uri = getNameURI({ meta, props: {id} });
+  if (oldScript) {
+    // Do not allow script with same name and namespace
+    if (src.isNew || id && aliveScripts.some(({ props: p }) => uri === p.uri && id !== p.id)) {
+      throw i18n('msgNamespaceConflict');
+    }
+    delete script[INFERRED];
   }
   // Overwriting inner data by `src`, deleting keys for which `src` specifies `null`
   for (const key of ['config', 'custom', 'props']) {
-    let dst = script[key];
-    if (!isObject(dst)) dst = script[key] = {};
-    if (key === 'props') dst.lastModified = dst.lastUpdated = Date.now();
+    const dst = script[key];
     src[key]::forEachEntry(([srcKey, srcVal]) => {
       if (srcVal == null) delete dst[srcKey];
       else dst[srcKey] = srcVal;
     });
   }
-  script.config.removed = 0; // force-resetting `removed` since this is an installation
+  const pos = +src.position;
+  if (pos) {
+    props.position = pos;
+    maxScriptPosition = Math.max(maxScriptPosition, pos);
+  } else if (!oldScript) {
+    maxScriptPosition++;
+    props.position = maxScriptPosition;
+  }
+  props.lastModified = props.lastUpdated = Date.now();
+  props.uuid = props.uuid || getUUID();
+  config.enabled = getInt(config.enabled);
+  config.removed = 0; // force-resetting `removed` since this is an installation
+  config.shouldUpdate = getInt(config.shouldUpdate);
   script.meta = meta;
   if (!getScriptHome(script) && isRemote(src.from)) {
     script.custom.homepageURL = src.from;
   }
   if (isRemote(src.url)) script.custom.lastInstallURL = src.url;
-  if (src.position) script.props.position = +src.position;
   if (!src.update) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
   buildPathMap(script, src.url);
   const depsPromise = fetchResources(script, src);
   // Installer has all the deps, so we'll put them in storage first
   if (src.cache) await depsPromise;
-  await saveScript(script, src.code);
-  Object.assign(result.update, script, src.update);
-  result.where = { id: script.props.id };
+  await storage.base.set({
+    [storage[S_SCRIPT].toKey(props.id)]: script,
+    [storage[S_CODE].toKey(props.id)]: src.code,
+  });
+  Object.assign(update, script, src.update);
+  result.where = { id };
   sendCmd('UpdateScript', result);
   pluginEvents.emit('scriptChanged', result);
   return result;
