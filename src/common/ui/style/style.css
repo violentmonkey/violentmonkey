@@ -1,7 +1,10 @@
 * {
   margin: 0;
-  padding: 0;
   box-sizing: border-box;
+}
+*:not(select) {
+  /* SELECT retains sensible minimum padding in Chrome but not in Firefox */
+  padding: 0;
 }
 
 :root {
