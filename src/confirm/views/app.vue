@@ -570,6 +570,7 @@ $vertLayoutThresholdMinus1: 1800px;
       display: block;
       padding: 0 2px 0 4px;
       cursor: default;
+      accent-color: var(--btn);
     }
   }
   .incognito {
