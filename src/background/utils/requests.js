@@ -3,7 +3,7 @@ import { CHARSET_UTF8, FORM_URLENCODED } from '@/common/consts';
 import { forEachEntry, forEachValue, objectPick } from '@/common/object';
 import ua from '@/common/ua';
 import cache from './cache';
-import { addPublicCommands, commands } from './message';
+import { addPublicCommands, commands } from './init';
 import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify,
 } from './requests-core';

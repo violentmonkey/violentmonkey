@@ -1,6 +1,6 @@
 import { browserWindows, getActiveTab, noop, sendTabCmd, getFullUrl } from '@/common';
 import ua from '@/common/ua';
-import { addOwnCommands, addPublicCommands, commands } from './message';
+import { addOwnCommands, addPublicCommands, commands } from './init';
 import { getOption } from './options';
 import { testScript } from './tester';
 
@@ -163,6 +163,19 @@ if (!IS_FIREFOX) {
   chrome.extension.isAllowedFileSchemeAccess(ok => {
     if (!ok) injectableRe = /^(ht|f)tps?:/;
   });
+}
+
+export async function forEachTab(callback) {
+  const tabs = await browser.tabs.query({});
+  let i = 0;
+  for (const tab of tabs) {
+    callback(tab);
+    i += 1;
+    // we'll run at most this many tabs in one event loop cycle
+    // because hundreds of tabs would make our extension process unresponsive,
+    // the same process used by our own pages like the background page, dashboard, or popups
+    if (i % 20 === 0) await new Promise(setTimeout);
+  }
 }
 
 /**

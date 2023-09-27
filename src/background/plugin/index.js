@@ -1,4 +1,4 @@
-import { commands } from '../utils/message';
+import { commands } from '../utils';
 import { getScripts, parseScript } from '../utils/db';
 
 export const script = {

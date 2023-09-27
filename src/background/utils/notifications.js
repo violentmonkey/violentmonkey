@@ -1,6 +1,6 @@
 import { i18n, defaultImage, sendTabCmd, trueJoin } from '@/common';
 import ua from '@/common/ua';
-import { addPublicCommands } from './message';
+import { addPublicCommands } from './init';
 
 const openers = {};
 const removeNotification = id => browser.notifications.clear(id);

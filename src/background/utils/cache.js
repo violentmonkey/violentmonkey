@@ -1,5 +1,5 @@
 import initCache from '@/common/cache';
-import { addOwnCommands } from './message';
+import { addOwnCommands } from './init';
 
 const cache = initCache({
   lifetime: 5 * 60 * 1000,

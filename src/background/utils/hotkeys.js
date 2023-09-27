@@ -1,17 +1,13 @@
-import { getActiveTab } from '@/common';
-import { postInitialize } from './init';
-import { commands } from './message';
+import { commands } from './init';
 import { reloadAndSkipScripts } from './preinject';
+import { openDashboard } from './tabs';
 
-postInitialize.push(() => {
-  browser.commands?.onCommand.addListener((cmd) => {
-    if (cmd === 'newScript') {
-      commands.OpenEditor();
-    } else if (cmd === SKIP_SCRIPTS) {
-      getActiveTab().then(reloadAndSkipScripts);
-    } else {
-      const route = cmd === TAB_SETTINGS ? `#${cmd}` : '';
-      commands.TabOpen({ url: `${extensionOptionsPage}${route}` });
-    }
-  });
+browser.commands?.onCommand.addListener(cmd => {
+  if (cmd === 'newScript') {
+    commands.OpenEditor();
+  } else if (cmd === SKIP_SCRIPTS) {
+    reloadAndSkipScripts();
+  } else {
+    openDashboard(cmd === TAB_SETTINGS ? cmd : '');
+  }
 });

@@ -5,7 +5,7 @@ import {
   HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, USERSCRIPT_META_INTRO,
 } from '@/common/consts';
 import { mapEntry } from '@/common/object';
-import { addOwnCommands } from './message';
+import { addOwnCommands } from './init';
 import { getOption } from './options';
 
 addOwnCommands({

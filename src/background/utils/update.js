@@ -1,16 +1,19 @@
 import {
   compareVersion, ensureArray, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
 } from '@/common';
-import { METABLOCK_RE, NO_CACHE } from '@/common/consts';
+import { METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
 import limitConcurrency from '@/common/limit-concurrency';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
+import { addOwnCommands, commands, init } from './init';
 import { parseMeta } from './script';
-import { getOption, setOption } from './options';
-import { addOwnCommands } from './message';
+import { getOption, hookOptions, setOption } from './options';
 import { requestNewer } from './storage-fetch';
 
 const processes = {};
 const doCheckUpdateLimited = limitConcurrency(doCheckUpdate, 2, 250);
+
+init.then(() => setTimeout(autoUpdate, 20e3));
+hookOptions(changes => 'autoUpdate' in changes && autoUpdate());
 
 addOwnCommands({
   /**
@@ -131,3 +134,14 @@ function canNotify(script) {
     : script.config.notifyUpdates ?? allowed;
 }
 
+function autoUpdate() {
+  const interval = (+getOption('autoUpdate') || 0) * TIMEOUT_24HOURS;
+  if (!interval) return;
+  let elapsed = Date.now() - getOption('lastUpdate');
+  if (elapsed >= interval) {
+    commands.CheckUpdate();
+    elapsed = 0;
+  }
+  clearTimeout(autoUpdate.timer);
+  autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
+}

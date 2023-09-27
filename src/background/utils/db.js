@@ -3,15 +3,14 @@ import {
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
   getScriptPrettyUrl, getScriptRunAt, makePause, isHttpOrHttps, noop,
 } from '@/common';
-import { INFERRED, TIMEOUT_WEEK } from '@/common/consts';
+import { INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import { getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta } from './script';
-import { testScript, testBlacklist, testerBatch } from './tester';
-import { preInitialize } from './init';
-import { addOwnCommands, addPublicCommands, commands } from './message';
+import { resetBlacklist, testBlacklist, testerBatch, testScript } from './tester';
+import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
 import patchDB from './patch-db';
-import { setOption } from './options';
+import { getOption, initOptions, setOption } from './options';
 import storage, {
   S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE,
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
@@ -47,6 +46,7 @@ addOwnCommands({
   RemoveScripts: removeScripts,
   /** @return {VMScript} */
   GetScript: getScript,
+  GetSizes: getSizes,
   /** @return {Promise<{ items: VMScript[], values? }>} */
   async ExportZip({ values }) {
     const scripts = getScripts();
@@ -99,7 +99,7 @@ addOwnCommands({
   Vacuum: vacuum,
 });
 
-preInitialize.push(async () => {
+(async () => {
   const lastVersion = await storage.base.getOne('version');
   const version = process.env.VM_VER;
   if (!lastVersion) await patchDB();
@@ -145,10 +145,11 @@ preInitialize.push(async () => {
       meta.grant = [...new Set(meta.grant || [])]; // deduplicate
     }
   });
+  initOptions(data);
   // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
   if (version !== lastVersion
   && IS_FIREFOX
-  && data.options?.defaultInjectInto === PAGE
+  && getOption('defaultInjectInto') === PAGE
   && compareVersion(lastVersion, '2.12.7') <= 0) {
     setOption('defaultInjectInto', AUTO);
   }
@@ -159,7 +160,11 @@ preInitialize.push(async () => {
   }
   sortScripts();
   vacuum(data);
-});
+  resetBlacklist();
+  checkRemove();
+  setInterval(checkRemove, TIMEOUT_24HOURS);
+  resolveInit();
+})();
 
 /** @return {number} */
 function getInt(val) {

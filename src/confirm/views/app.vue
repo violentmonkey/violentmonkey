@@ -412,9 +412,8 @@ export default {
         this.installable = true;
       }
     },
-    async trackLocalFile(evt) {
+    async trackLocalFile() {
       if (this.tracking || !this.isLocal || !this.installed) {
-        if (evt === false) stopResolve?.(true);
         return;
       }
       cachedCodePromise = null; // always re-read because the file may have changed since then

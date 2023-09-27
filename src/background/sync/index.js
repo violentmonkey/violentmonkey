@@ -10,7 +10,7 @@ import './dropbox';
 import './onedrive';
 import './googledrive';
 import './webdav';
-import { addOwnCommands } from '../utils/message';
+import { addOwnCommands, init } from '../utils';
 
 addOwnCommands({
   SyncAuthorize: authorize,
@@ -19,10 +19,9 @@ addOwnCommands({
   SyncSetConfig: setConfig,
 });
 
+init.then(initialize);
+
 export {
-  initialize,
   sync,
   getStates,
-  authorize,
-  revoke,
 };

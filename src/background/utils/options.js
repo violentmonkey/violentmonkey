@@ -1,12 +1,10 @@
-import { debounce, ensureArray, initHooks, normalizeKeys } from '@/common';
+import { debounce, ensureArray, initHooks, normalizeKeys, sendCmd } from '@/common';
 import { deepCopy, deepEqual, mapEntry, objectGet, objectSet } from '@/common/object';
 import defaults from '@/common/options-defaults';
-import { preInitialize } from './init';
-import { addOwnCommands, commands } from './message';
+import { addOwnCommands, commands, init } from './init';
 import storage from './storage';
 
 let changes;
-let initPending;
 let options = {};
 
 addOwnCommands({
@@ -20,10 +18,9 @@ addOwnCommands({
   },
   /**
    * @param {{key:string, value?:PlainJSONValue, reply?:boolean}|Array} data
-   * @return {Promise<void>}
+   * @return {void}
    * @throws {?} hooks can throw after the option was set */
-  async SetOptions(data) {
-    if (initPending) await initPending;
+  SetOptions(data) {
     for (const { key, value, reply } of ensureArray(data)) {
       setOption(key, value, reply);
     }
@@ -46,8 +43,13 @@ const DELAY = 100;
 const hooks = initHooks();
 const callHooksLater = debounce(callHooks, DELAY);
 const writeOptionsLater = debounce(writeOptions, DELAY);
+export const hookOptions = hooks.hook;
+// TODO: add `keys` parameter to hookOptions
+// TODO: call hooks.fire in init.then (DANGER! check usages of hookOptions+getOption)
+hookOptions(changes => sendCmd('UpdateOptions', changes));
 
-initPending = storage.base.getOne(STORAGE_KEY).then(data => {
+export function initOptions(data) {
+  data = data[STORAGE_KEY] || {};
   if (isObject(data)) options = data;
   if (process.env.DEBUG) console.info('options:', options);
   if (!options[VERSION]) {
@@ -60,10 +62,7 @@ initPending = storage.base.getOne(STORAGE_KEY).then(data => {
     delete options[`${TPL_KEY}Edited`]; // TODO: remove this in 2023
     writeOptionsLater();
   }
-  initPending = null;
-});
-preInitialize.push(initPending);
-// TODO: call hooks.fire in postInitialize (DANGER! check usages of hookOptions+getOption)
+}
 
 /**
  * @param {!string} key - must be "a.b.c" to allow clients easily set inside existing object trees
@@ -95,8 +94,7 @@ export function getOption(key) {
 }
 
 export function setOption(key, value, silent) {
-  // eslint-disable-next-line prefer-rest-params
-  if (initPending) return initPending.then(() => setOption(...arguments));
+  if (init) return init.then(setOption.bind(null, ...arguments));
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
   key = keys.join('.'); // must be a string for addChange()
@@ -125,5 +123,3 @@ function omitDefaultValue(key) {
   return deepEqual(options[key], defaults[key])
     && delete options[key];
 }
-
-export const hookOptions = hooks.hook;

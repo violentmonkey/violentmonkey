@@ -1,12 +1,13 @@
 import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
 import { nest, objectPick } from '@/common/object';
-import { postInitialize } from './init';
-import { addOwnCommands, forEachTab } from './message';
+import { addOwnCommands, init } from './init';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
 import { INJECT, reloadAndSkipScripts } from './preinject';
-import { getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
+import {
+  forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated,
+} from './tabs';
 import { testBlacklist } from './tester';
 import storage from './storage';
 
@@ -47,7 +48,6 @@ const browserAction = (() => {
 const contextMenus = chrome.contextMenus;
 
 export const badges = {};
-export const BROWSER_ACTION = 'browser_action';
 const KEY_SHOW_BADGE = 'showBadge';
 const KEY_BADGE_COLOR = 'badgeColor';
 const KEY_BADGE_COLOR_BLOCKED = 'badgeColorBlocked';
@@ -88,7 +88,7 @@ hookOptions((changes) => {
   }
 });
 
-postInitialize.push(async () => {
+init.then(async () => {
   isApplied = getOption(IS_APPLIED);
   showBadge = getOption(KEY_SHOW_BADGE);
   badgeColor = getOption(KEY_BADGE_COLOR);

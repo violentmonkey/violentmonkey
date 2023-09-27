@@ -1,7 +1,7 @@
 import { browserWindows, request, noop, i18n, getUniqId } from '@/common';
 import ua from '@/common/ua';
 import cache from './cache';
-import { addPublicCommands, commands } from './message';
+import { addPublicCommands, commands } from './init';
 import { parseMeta, isUserScript } from './script';
 import { getTabUrl, tabsOnUpdated } from './tabs';
 

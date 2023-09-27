@@ -1,13 +1,10 @@
 import '@/common/browser';
-import { makePause, sendCmd } from '@/common';
-import { TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
+import { makePause } from '@/common';
 import { deepCopy } from '@/common/object';
 import { getDomain } from '@/common/tld';
 import * as sync from './sync';
-import { addOwnCommands, addPublicCommands, commands } from './utils';
-import { getData, getSizes, checkRemove } from './utils/db';
-import { initialize } from './utils/init';
-import { getOption, hookOptions } from './utils/options';
+import { addOwnCommands, addPublicCommands, commands, init } from './utils';
+import { getData } from './utils/db';
 import './utils/clipboard';
 import './utils/hotkeys';
 import './utils/icon';
@@ -19,20 +16,12 @@ import './utils/tab-redirector';
 import './utils/tester';
 import './utils/update';
 
-hookOptions((changes) => {
-  if ('autoUpdate' in changes) {
-    autoUpdate();
-  }
-  sendCmd('UpdateOptions', changes);
-});
-
 addOwnCommands({
   async GetData(opts) {
     const data = await getData(opts);
     data.sync = sync.getStates();
     return data;
   },
-  GetSizes: getSizes,
   /**
    * @param {string?} url
    * @return {Promise<Object>}
@@ -72,6 +61,9 @@ const commandsToSyncIfTruthy = [
 ];
 
 async function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
+  if (init) {
+    return init.then(handleCommandMessage.bind(this, ...arguments));
+  }
   const func = hasOwnProperty(commands, cmd) && commands[cmd];
   if (!func) {
     throw new SafeError(`Unknown command: ${cmd}`);
@@ -90,6 +82,7 @@ async function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
     src[kTop] = mode;
   }
   try {
+    // `await` is necessary to catch the error here
     const res = await func(data, src);
     if (commandsToSync.includes(cmd)
     || res && commandsToSyncIfTruthy.includes(cmd)) {
@@ -105,24 +98,6 @@ async function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
   }
 }
 
-function autoUpdate() {
-  const interval = (+getOption('autoUpdate') || 0) * TIMEOUT_24HOURS;
-  if (!interval) return;
-  let elapsed = Date.now() - getOption('lastUpdate');
-  if (elapsed >= interval) {
-    handleCommandMessage({ cmd: 'CheckUpdate' });
-    elapsed = 0;
-  }
-  clearTimeout(autoUpdate.timer);
-  autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
-}
-
-initialize(() => {
-  global.handleCommandMessage = handleCommandMessage;
-  global.deepCopy = deepCopy;
-  browser.runtime.onMessage.addListener(handleCommandMessage);
-  setTimeout(autoUpdate, 2e4);
-  sync.initialize();
-  checkRemove();
-  setInterval(checkRemove, TIMEOUT_24HOURS);
-});
+global.handleCommandMessage = handleCommandMessage;
+global.deepCopy = deepCopy;
+browser.runtime.onMessage.addListener(handleCommandMessage);

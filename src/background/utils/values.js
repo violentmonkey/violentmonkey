@@ -1,7 +1,7 @@
 import { isEmpty, sendTabCmd } from '@/common';
 import { forEachEntry, forEachValue, nest, objectGet, objectSet } from '@/common/object';
 import { getScript } from './db';
-import { addOwnCommands, addPublicCommands } from './message';
+import { addOwnCommands, addPublicCommands } from './init';
 import storage, { S_VALUE } from './storage';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
 

@@ -1,6 +1,6 @@
 import { mapEntry } from '@/common/object';
 import { ensureArray } from '@/common/util';
-import { addOwnCommands } from './message';
+import { addOwnCommands } from './init';
 
 let api = browser.storage.local;
 

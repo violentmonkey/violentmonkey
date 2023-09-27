@@ -1,4 +1,4 @@
-import { getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
+import { getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
 import {
   BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
 } from '@/common/consts';
@@ -7,8 +7,7 @@ import { forEachEntry, forEachKey, forEachValue, mapEntry, objectSet } from '@/c
 import ua from '@/common/ua';
 import { CACHE_KEYS, getScriptsByURL, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
 import { setBadge } from './icon';
-import { postInitialize } from './init';
-import { addOwnCommands, addPublicCommands } from './message';
+import { addOwnCommands, addPublicCommands, init } from './init';
 import { clearNotifications } from './notifications';
 import { getOption, hookOptions } from './options';
 import { popupTabs } from './popup-tracker';
@@ -100,6 +99,7 @@ const isTopFrame = info => info.frameType === 'outermost_frame' || !info[kFrameI
 
 const skippedTabs = {};
 export const reloadAndSkipScripts = async tab => {
+  if (!tab) tab = await getActiveTab();
   const tabId = tab.id;
   const bag = cache.get(getKey(tab.url, true));
   const reg = bag && unregisterScriptFF(bag);
@@ -212,7 +212,7 @@ addPublicCommands({
 });
 
 hookOptions(onOptionChanged);
-postInitialize.push(() => {
+init.then(() => {
   OPT_HANDLERS::forEachKey(key => {
     onOptionChanged({ [key]: getOption(key) });
   });

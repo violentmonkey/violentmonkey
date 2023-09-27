@@ -1,9 +1,8 @@
 import { getActiveTab, sendTabCmd } from '@/common';
 import cache from './cache';
 import { getData } from './db';
-import { badges, BROWSER_ACTION, getFailureReason } from './icon';
-import { postInitialize } from './init';
-import { addPublicCommands, commands } from './message';
+import { badges, getFailureReason } from './icon';
+import { addPublicCommands, commands } from './init';
 import { INJECT } from './preinject';
 
 /** @type {{[tabId: string]: chrome.runtime.Port}} */
@@ -33,12 +32,10 @@ addPublicCommands({
   }
 });
 
-postInitialize.push(() => {
-  browser.runtime.onConnect.addListener(onPopupOpened);
-  browser.webRequest.onBeforeRequest.addListener(prefetchSetPopup, {
-    urls: [chrome.runtime.getURL(extensionManifest[BROWSER_ACTION].default_popup)],
-    types: ['main_frame'],
-  });
+browser.runtime.onConnect.addListener(onPopupOpened);
+browser.webRequest.onBeforeRequest.addListener(prefetchSetPopup, {
+  urls: [chrome.runtime.getURL(extensionManifest[BROWSER_ACTION].default_popup)],
+  types: ['main_frame'],
 });
 
 async function isInjectable(tabId, badgeData) {

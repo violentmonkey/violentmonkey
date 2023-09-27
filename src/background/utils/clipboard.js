@@ -1,4 +1,4 @@
-import { addPublicCommands } from './message';
+import { addPublicCommands } from './init';
 
 const textarea = document.createElement('textarea');
 let clipboardData;
