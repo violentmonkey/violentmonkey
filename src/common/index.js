@@ -20,6 +20,8 @@ if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
 export const ignoreChromeErrors = () => chrome.runtime.lastError;
 export const browserWindows = browser.windows;
 export const defaultImage = !process.env.IS_INJECTED && `${ICON_PREFIX}128.png`;
+/** @return {'0' | '1' | ''} treating source as abstract truthy/falsy to ensure consistent result */
+export const nullBool2string = v => v ? '1' : v == null ? '' : '0';
 /** Will be encoded to avoid splitting the URL in devtools UI */
 const BAD_URL_CHAR = /[#/?]/g;
 /** Fullwidth range starts at 0xFF00, normal range starts at space char code 0x20 */

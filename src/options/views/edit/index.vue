@@ -88,7 +88,7 @@
 import {
   browserWindows,
   debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
-  sendCmdDirectly, trueJoin,
+  nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
 import { showMessage } from '@/common/ui';
@@ -373,12 +373,11 @@ export default {
     onScript(script) {
       const { custom, config } = script;
       const { shouldUpdate } = config;
-      const { noframes } = custom;
       // Matching Vue model types, so deepEqual can work properly
       config._editable = shouldUpdate === 2;
-      config.notifyUpdates = `${config.notifyUpdates ?? ''}`;
       config.shouldUpdate = !!shouldUpdate;
-      custom.noframes = noframes == null ? '' : +noframes; // it was boolean in old VM
+      config.notifyUpdates = nullBool2string(config.notifyUpdates);
+      custom.noframes = nullBool2string(custom.noframes);
       // Adding placeholders for any missing values so deepEqual can work properly
       for (const key in CUSTOM_PROPS) {
         if (custom[key] == null) custom[key] = CUSTOM_PROPS[key];
