@@ -50,15 +50,21 @@
             id="confirm"
             ref="confirm"
             :data-hotkey="hotkey[0]"
-            v-text="$main = reinstall ? i18n('reinstall') : i18n('install')"
-            v-bind="$bind = {disabled: !installable, onclick: installScript}"/>
-          <button id="+close" v-bind="$bind" :data-hotkey="hotkey.close"
-                  v-text="`${hotkey.close ? $main + ' +' : '✚'} ${i18n('buttonClose')}`"/>
+            v-text="_verb = reinstall ? i18n('reinstall') : i18n('install')"
+            v-bind="_bind = {disabled: !installable, onclick: installScript}"/>
+          <button
+              id="+close" :data-verb="_verb" :data-hotkey="hotkey.close"
+              v-text="i18n('buttonClose')" v-bind="_bind"/>
           <setting-check
               name="closeAfterInstall" ref="close" class="btn-ghost"
-              :title="$def = i18n('labelRunAtDefault')"
-              :disabled="isLocal && $refs.track?.value"/>
-          <button id="+edit" v-text="`✚ ${i18n('buttonEdit')}`" v-bind="$bind"/>
+              :class="{dim: hotkey.track || hotkey.edit}"
+              :title="i18n('labelRunAtDefault')"/>
+          <button
+              id="+edit" :data-verb="_verb" :data-hotkey="hotkey.edit"
+              v-text="i18n('buttonEdit')" v-bind="_bind"/>
+          <setting-check
+              name="editAfterInstall" ref="edit" class="btn-ghost"
+              :title="i18n('labelRunAtDefault')" :class="{dim: hotkey.track}"/>
           <template v-if="isLocal">
             <button id="+track" @click="installScript"
                     :data-hotkey="hotkey.track"
@@ -164,8 +170,10 @@ export default {
   },
   computed: {
     hotkey() {
-      return this.isLocal && this.$refs.track?.value && { track: CONFIRM_HOTKEY }
-        || this.$refs.close?.value && { close: CONFIRM_HOTKEY }
+      const { $refs } = this;
+      return this.isLocal && $refs.track?.value && { track: CONFIRM_HOTKEY }
+        || $refs.edit?.value && { edit: CONFIRM_HOTKEY }
+        || $refs.close?.value && { close: CONFIRM_HOTKEY }
         || [CONFIRM_HOTKEY];
     },
     isLocal() {
@@ -551,7 +559,7 @@ $vertLayoutThresholdMinus1: 1800px;
       opacity: .3;
     }
   }
-  [data-disabled="true"] {
+  .dim {
     opacity: .4
   }
   .actions {
@@ -569,18 +577,15 @@ $vertLayoutThresholdMinus1: 1800px;
       display: block;
       padding: 0 2px 0 4px;
       accent-color: var(--btn);
-      &:not([disabled]) {
-        border-color: var(--btn-border);
-        background: var(--btn-bg);
-      }
-      &[disabled] {
-        border-color: var(--fill-4);
-        background: var(--fill-1);
-      }
+      border-color: var(--btn-border);
+      background: var(--btn-bg);
       margin-left: -1px;
       input {
         cursor: pointer;
         position: relative;
+        &:not(:checked) {
+          opacity: .6;
+        }
         @supports not (-moz-appearance: none) { /* Chrome */
           top: 1px;
         }
@@ -599,8 +604,14 @@ $vertLayoutThresholdMinus1: 1800px;
       border-color: var(--btn-border-hover);
     }
   }
+  [data-verb]:not([data-hotkey])::before {
+    content: "✚ ";
+  }
   [data-hotkey] {
     font-weight: bold;
+    &[data-verb]::before {
+      content: attr(data-verb) " + ";
+    }
     &::after {
       content: " (" attr(data-hotkey) ")";
       opacity: .75;

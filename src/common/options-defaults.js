@@ -16,6 +16,7 @@ export default {
     'sleazyfork%2Eorg': false,
   },
   closeAfterInstall: false,
+  editAfterInstall: false,
   trackLocalFile: false,
   autoReload: false,
   autoReloadTracked: false,
