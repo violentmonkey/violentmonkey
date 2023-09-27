@@ -581,7 +581,9 @@ $vertLayoutThresholdMinus1: 1800px;
       input {
         cursor: pointer;
         position: relative;
-        top: 1px;
+        @supports not (-moz-appearance: none) { /* Chrome */
+          top: 1px;
+        }
       }
     }
   }
