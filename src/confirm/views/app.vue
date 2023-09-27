@@ -45,11 +45,10 @@
         <div class="image flex">
           <img :src="safeIcon">
         </div>
-        <div class="actions flex flex-wrap">
+        <div class="actions flex flex-wrap ml-1c">
           <button
             id="confirm"
             ref="confirm"
-            class="mr-1"
             :data-hotkey="hotkey[0]"
             v-text="$main = reinstall ? i18n('reinstall') : i18n('install')"
             v-bind="$bind = {disabled: !installable, onclick: installScript}"/>
@@ -59,7 +58,7 @@
               name="closeAfterInstall" ref="close" class="btn-ghost"
               :title="$def = i18n('labelRunAtDefault')"
               :disabled="isLocal && $refs.track?.value"/>
-          <button id="+edit" v-text="`✚ ${i18n('buttonEdit')}`" v-bind="$bind" class="mx-1"/>
+          <button id="+edit" v-text="`✚ ${i18n('buttonEdit')}`" v-bind="$bind"/>
           <template v-if="isLocal">
             <button id="+track" @click="installScript"
                     :data-hotkey="hotkey.track"
@@ -68,13 +67,13 @@
             <setting-check
                 name="trackLocalFile" ref="track" class="btn-ghost" v-show="!tracking"
                 @change="trackLocalFile" :title="$def"/>
-            <setting-check name="autoReloadTracked" class="ml-1" v-show="tracking">
+            <setting-check name="autoReloadTracked" v-show="tracking">
               <tooltip :content="i18n('reloadTabTrackHint')">
                 {{i18n('reloadTab')}}
               </tooltip>
             </setting-check>
           </template>
-          <button v-text="i18n('buttonClose')" @click="close" class="ml-1"/>
+          <button v-text="i18n('buttonClose')" @click="close"/>
           <div v-text="message" v-if="message" :title="error"
                class="status stretch-self flex center-items ml-2"/>
         </div>
@@ -569,8 +568,21 @@ $vertLayoutThresholdMinus1: 1800px;
     .btn-ghost {
       display: block;
       padding: 0 2px 0 4px;
-      cursor: default;
       accent-color: var(--btn);
+      &:not([disabled]) {
+        border-color: var(--btn-border);
+        background: var(--btn-bg);
+      }
+      &[disabled] {
+        border-color: var(--fill-4);
+        background: var(--fill-1);
+      }
+      margin-left: -1px;
+      input {
+        cursor: pointer;
+        position: relative;
+        top: 1px;
+      }
     }
   }
   .incognito {

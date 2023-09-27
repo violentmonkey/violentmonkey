@@ -1,5 +1,5 @@
 <template>
-  <label class="setting-check">
+  <label class="setting-check" :disabled="disabled ? '' : null">
     <input type="checkbox" v-model="value" :disabled="disabled">
     <slot>
       <span v-text="label" />
