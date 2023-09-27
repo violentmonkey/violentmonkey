@@ -6,7 +6,7 @@ import { addOwnCommands, forEachTab } from './message';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
 import { INJECT, reloadAndSkipScripts } from './preinject';
-import { getTabUrl, injectableRe, tabsOnRemoved, tabsOnUpdated } from './tabs';
+import { getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
 import storage from './storage';
 
@@ -117,12 +117,16 @@ postInitialize.push(async () => {
       await addToIcon(...args);
     }
     contextMenus.update(KEY_SHOW_BADGE + ':' + showBadge, { checked: true });
+    // Chrome already adds a built-in "Options" item
+    if (IS_FIREFOX) await addToIcon(TAB_SETTINGS, i18n('labelSettings'));
   }
 });
 
 contextMenus?.onClicked.addListener(({ menuItemId: id }, tab) => {
   if (id === SKIP_SCRIPTS) {
     reloadAndSkipScripts(tab);
+  } else if (id === TAB_SETTINGS) {
+    openDashboard(id);
   } else if (id.startsWith(KEY_SHOW_BADGE)) {
     setOption(KEY_SHOW_BADGE, id.slice(KEY_SHOW_BADGE.length + 1));
   }

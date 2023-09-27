@@ -19,7 +19,7 @@ browser_action:
 background:
   scripts: []
 options_ui:
-  page: options/index.html
+  page: options/index.html#settings
   open_in_tab: true
 content_scripts:
   - js:

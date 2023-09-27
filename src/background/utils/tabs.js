@@ -7,7 +7,7 @@ import { testScript } from './tester';
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
   || !!(window.AbortSignal && browser.windows); // and FF57+ except mobile
-const ROUTE_SCRIPTS_SLASH = ROUTE_SCRIPTS + '/';
+const EDITOR_ROUTE = extensionOptionsPage + ROUTE_SCRIPTS + '/'; // followed by id
 const NEWTAB_URL_RE = re`/
 ^(
   about:(home|newtab) # Firefox
@@ -48,26 +48,11 @@ addOwnCommands({
    * @param {VMMessageSender} [src]
    */
   async OpenEditor(pathId, src) {
-    return commands.Dashboard(`${ROUTE_SCRIPTS_SLASH}${
+    return openDashboard(`${SCRIPTS}/${
       pathId || `_new/${src?.tab.id || (await getActiveTab()).id}`
     }`, src);
   },
-  /**
-   * @param {string} [route]
-   * @param {VMMessageSender} [src]
-   */
-  async Dashboard(route, src) {
-    const url = extensionOptionsPage + (route || '');
-    for (const tab of await browser.tabs.query({url: extensionOptionsPage})) {
-      const tabUrl = tab.url;
-      // query() can't handle #hash so it returns tabs both with #hash and without it
-      if (tabUrl === url || !route && tabUrl === url + ROUTE_SCRIPTS) {
-        browserWindows?.update(tab.windowId, { focused: true });
-        return browser.tabs.update(tab.id, { active: true });
-      }
-    }
-    return commands.TabOpen({ url }, src);
-  },
+  OpenDashboard: openDashboard,
 });
 
 addPublicCommands({
@@ -113,7 +98,7 @@ addPublicCommands({
         : getFullUrl(url, srcUrl);
     }
     if (isInternal
-        && url.startsWith(extensionOptionsPage + ROUTE_SCRIPTS_SLASH)
+        && url.startsWith(EDITOR_ROUTE)
         && browserWindows
         && getOption('editorWindow')
         /* cookieStoreId in windows.create() is supported since FF64 https://bugzil.la/1393570
@@ -178,6 +163,23 @@ if (!IS_FIREFOX) {
   chrome.extension.isAllowedFileSchemeAccess(ok => {
     if (!ok) injectableRe = /^(ht|f)tps?:/;
   });
+}
+
+/**
+ * @param {string} [route] without #
+ * @param {VMMessageSender} [src]
+ */
+export async function openDashboard(route, src) {
+  const url = extensionOptionsPage + (route ? '#' + route : '');
+  for (const tab of await browser.tabs.query({ url: extensionOptionsPage })) {
+    const tabUrl = tab.url;
+    // query() can't handle #hash so it returns tabs both with #hash and without it
+    if (tabUrl === url || !route && tabUrl === url + ROUTE_SCRIPTS) {
+      browserWindows?.update(tab.windowId, { focused: true });
+      return browser.tabs.update(tab.id, { active: true });
+    }
+  }
+  return commands.TabOpen({ url }, src);
 }
 
 /** Reloads the active tab if script matches the URL */

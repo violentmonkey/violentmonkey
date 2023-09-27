@@ -28,7 +28,8 @@ export const extensionRoot = chrome.runtime.getURL('/');
 export const extensionOrigin = extensionRoot.slice(0, -1);
 export const extensionManifest = chrome.runtime.getManifest();
 // Using getURL because in Firefox manifest contains resolved (full) URLs
-export const extensionOptionsPage = chrome.runtime.getURL(extensionManifest.options_ui.page);
+export const extensionOptionsPage = process.env.TEST ? ''
+  : chrome.runtime.getURL(extensionManifest.options_ui.page).split('#', 1)[0];
 export const ICON_PREFIX = chrome.runtime.getURL(extensionManifest.icons[16].replace("16.png", ""));
 export const TAB_SETTINGS = 'settings';
 export const TAB_ABOUT = 'about';

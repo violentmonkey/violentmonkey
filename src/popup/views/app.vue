@@ -24,7 +24,7 @@
         class="menu-area"
         :data-message="i18n('menuDashboard')"
         :tabIndex="tabIndex"
-        @click="onManage()">
+        @click="onManage">
         <icon name="cog"></icon>
       </span>
       <span
@@ -175,7 +175,7 @@
       <div v-text="message"></div>
     </div>
     <div v-show="topExtras" ref="topExtras" class="extras-menu">
-      <div v-text="i18n('labelSettings')" @click="onManage('#settings')" tabindex="0"/>
+      <div v-text="i18n('labelSettings')" @click="onManage(1)" tabindex="0"/>
       <div v-text="i18n('updateListedCmd', `${Object.keys(store.updatableScripts).length}`)"
            @click="onUpdateListed" tabindex="0"
            v-if="store.updatableScripts"/>
@@ -405,8 +405,9 @@ export default {
       this.checkReload();
       this.updateMessage();
     },
-    onManage(hash) {
-      sendCmdDirectly('Dashboard', hash).then(close);
+    /** @param {number | Event} evt - index of tab to open in src/options/views/app.vue */
+    onManage(evt) {
+      sendCmdDirectly('OpenDashboard', evt === 1 ? TAB_SETTINGS : '').then(close);
     },
     onOpenUrl(e) {
       const el = e.target.closest('a[href][target=_blank]');
