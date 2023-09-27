@@ -6,7 +6,7 @@ import { addOwnCommands, forEachTab } from './message';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
 import { INJECT, reloadAndSkipScripts } from './preinject';
-import { getTabUrl, tabsOnRemoved, tabsOnUpdated } from './tabs';
+import { getTabUrl, injectableRe, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
 import storage from './storage';
 
@@ -62,13 +62,6 @@ let isApplied;
 let showBadge;
 let badgeColor;
 let badgeColorBlocked;
-let injectableRe = /^(https?|file|ftps?):/;
-
-if (!IS_FIREFOX) {
-  chrome.extension.isAllowedFileSchemeAccess(ok => {
-    if (!ok) injectableRe = /^(ht|f)tps?:/;
-  });
-}
 
 hookOptions((changes) => {
   let v;

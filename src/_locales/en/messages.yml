@@ -245,15 +245,15 @@ hintUseDownloadURL:
 hintVacuum:
   description: Hint for vacuuming data.
   message: Discard the redundancy and try to reload the missing resources in cache.
+install:
+  description: Label for button to install a script.
+  message: Install
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Install from $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Close after installation
-installOptionTrack:
-  description: Option to track the loading local file until page is closed.
-  message: Track edits in local file while this page is open
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -821,9 +821,17 @@ readonlyOpt:
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
   message: (next update will overwrite them)
+reinstall:
+  description: Button to reinstall a script
+  message: Reinstall
 reloadTab:
   description: Label of action to reload the tab
   message: Reload tab
+reloadTabTrackHint:
+  description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
+  message: >-
+    If enabled, the active tab will be reloaded when changes are detected
+    and this script matches the tab's URL.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Case sensitive
@@ -847,6 +855,9 @@ skipScriptsMsg:
   message: >-
     You disabled userscripts for this page. To run them, reload or navigate the
     tab.
+stopTracking:
+  description: Button in a script installation dialog when actually tracking local file.
+  message: Stop tracking
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normal badge color
@@ -858,6 +869,12 @@ titleSearchHint:
   message: |-
     * <Enter> key adds the text to autocomplete history
     * RegExp syntax is supported: /re/ and /re/flags
+trackEdits:
+  description: Button in a script installation dialog.
+  message: Track external edits
+trackEditsNote:
+  description: Text shown in installer when starting to track a local file.
+  message: Keep this page open to track your edits in local file
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in

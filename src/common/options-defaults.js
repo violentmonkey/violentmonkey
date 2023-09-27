@@ -18,6 +18,7 @@ export default {
   closeAfterInstall: false,
   trackLocalFile: false,
   autoReload: false,
+  autoReloadTracked: false,
   features: null,
   blacklist: null,
   syncScriptStatus: true,

@@ -2,6 +2,7 @@ import { browserWindows, getActiveTab, noop, sendTabCmd, getFullUrl } from '@/co
 import ua from '@/common/ua';
 import { addOwnCommands, addPublicCommands, commands } from './message';
 import { getOption } from './options';
+import { testScript } from './tester';
 
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
@@ -37,6 +38,7 @@ export const getTabUrl = tab => (
 );
 export const tabsOnUpdated = browser.tabs.onUpdated;
 export const tabsOnRemoved = browser.tabs.onRemoved;
+export let injectableRe = /^(https?|file|ftps?):/;
 let cookieStorePrefix;
 
 addOwnCommands({
@@ -171,3 +173,17 @@ tabsOnRemoved.addListener((id) => {
     delete openers[id];
   }
 });
+
+if (!IS_FIREFOX) {
+  chrome.extension.isAllowedFileSchemeAccess(ok => {
+    if (!ok) injectableRe = /^(ht|f)tps?:/;
+  });
+}
+
+/** Reloads the active tab if script matches the URL */
+export async function reloadTabForScript(script) {
+  const { url, id } = await getActiveTab();
+  if (injectableRe.test(url) && testScript(url, script)) {
+    return browser.tabs.reload(id);
+  }
+}

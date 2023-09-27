@@ -16,6 +16,7 @@ import storage, {
   S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE,
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
 } from './storage';
+import { reloadTabForScript } from './tabs';
 
 let maxScriptId = 0;
 let maxScriptPosition = 0;
@@ -597,6 +598,7 @@ export async function parseScript(src) {
   result.where = { id };
   sendCmd('UpdateScript', result);
   pluginEvents.emit('scriptChanged', result);
+  if (src.reloadTab) reloadTabForScript(script);
   return result;
 }
 

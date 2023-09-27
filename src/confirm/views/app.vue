@@ -45,28 +45,38 @@
         <div class="image flex">
           <img :src="safeIcon">
         </div>
-        <div class="actions flex flex-wrap mr-2c">
+        <div class="actions flex flex-wrap">
           <button
             id="confirm"
             ref="confirm"
-            v-text="reinstall
-              ? i18n('buttonConfirmReinstallation')
-              : i18n('buttonConfirmInstallation')"
-            :data-hotkey="confirmHotkey"
-            @click="installScript" :disabled="!installable"/>
-          <button v-text="i18n('buttonClose')" @click="close"/>
-          <div class="flex flex-col my-1">
-            <setting-check name="closeAfterInstall" :label="i18n('installOptionClose')"
-                           :data-disabled="isLocal && !!$refs.trackLocalFile?.value"
-                           ref="closeAfterInstall" />
-            <setting-check name="trackLocalFile" @change="trackLocalFile" ref="trackLocalFile"
-                           :data-disabled="!isLocal">
-              <tooltip :content="trackTooltip" :disabled="!trackTooltip">
-                <span v-text="i18n('installOptionTrack')"/>
+            class="mr-1"
+            :data-hotkey="hotkey[0]"
+            v-text="$main = reinstall ? i18n('reinstall') : i18n('install')"
+            v-bind="$bind = {disabled: !installable, onclick: installScript}"/>
+          <button id="+close" v-bind="$bind" :data-hotkey="hotkey.close"
+                  v-text="`${hotkey.close ? $main + ' +' : '✚'} ${i18n('buttonClose')}`"/>
+          <setting-check
+              name="closeAfterInstall" ref="close" class="btn-ghost"
+              :title="$def = i18n('labelRunAtDefault')"
+              :disabled="isLocal && $refs.track?.value"/>
+          <button id="+edit" v-text="`✚ ${i18n('buttonEdit')}`" v-bind="$bind" class="mx-1"/>
+          <template v-if="isLocal">
+            <button id="+track" @click="installScript"
+                    :data-hotkey="hotkey.track"
+                    :disabled="!tracking && !installable && !installed"
+                    v-text="tracking ? i18n('stopTracking') : `✚ ${i18n('trackEdits')}`"/>
+            <setting-check
+                name="trackLocalFile" ref="track" class="btn-ghost" v-show="!tracking"
+                @change="trackLocalFile" :title="$def"/>
+            <setting-check name="autoReloadTracked" class="ml-1" v-show="tracking">
+              <tooltip :content="i18n('reloadTabTrackHint')">
+                {{i18n('reloadTab')}}
               </tooltip>
             </setting-check>
-          </div>
-          <div v-text="message" v-if="message" :title="error" class="status"/>
+          </template>
+          <button v-text="i18n('buttonClose')" @click="close" class="ml-1"/>
+          <div v-text="message" v-if="message" :title="error"
+               class="status stretch-self flex center-items ml-2"/>
         </div>
       </div>
       <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
@@ -89,15 +99,16 @@
 import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
 import {
-  getFullUrl, getLocaleString, getScriptHome, isRemote,
+  getFullUrl, getLocaleString, getScriptHome, i18n, isRemote,
   makePause, makeRaw, request, sendCmdDirectly, trueJoin,
 } from '@/common';
-import { keyboardService } from '@/common/keyboard';
+import { keyboardService, modifiers } from '@/common/keyboard';
 import initCache from '@/common/cache';
 import VmExternals from '@/common/ui/externals';
 import SettingCheck from '@/common/ui/setting-check';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { deepEqual, objectPick } from '@/common/object';
+import options from '@/common/options';
 import { route } from '@/common/router';
 import ua from '@/common/ua';
 
@@ -105,7 +116,7 @@ const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;
 const RETRY_COUNT = 2;
 const MAX_TITLE_NAME_LEN = 100;
-const CONFIRM_HOTKEY = `${/Mac/.test(navigator.platform) ? 'Cmd' : 'Ctrl'}-Enter`;
+const CONFIRM_HOTKEY = `${modifiers.ctrlcmd === 'm' ? '⌘' : 'Ctrl-'}Enter`;
 const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 /** @type {chrome.runtime.Port} */
 let filePort;
@@ -115,6 +126,7 @@ let filePortResolve;
 let filePortNeeded;
 let basicTitle;
 let cachedCodePromise;
+let stopResolve;
 
 export default {
   components: {
@@ -135,13 +147,12 @@ export default {
       commands: {
         close: this.close,
       },
-      confirmHotkey: CONFIRM_HOTKEY,
       /** @type {VM.ConfirmCache} */
       info: {},
       deps: {}, // combines `this.require` and `this.resources` = all actually loaded deps
       descr: '',
       error: null,
-      heading: this.i18n('msgLoadingData'),
+      heading: i18n('msgLoadingData'),
       lists: null,
       listsShown: true,
       name: '...',
@@ -149,11 +160,14 @@ export default {
       safeIcon: null,
       sameCode: false,
       script: null,
+      tracking: false,
     };
   },
   computed: {
-    trackTooltip() {
-      return ua.firefox >= 68 ? this.i18n('installOptionTrackTooltip') : null;
+    hotkey() {
+      return this.isLocal && this.$refs.track?.value && { track: CONFIRM_HOTKEY }
+        || this.$refs.close?.value && { close: CONFIRM_HOTKEY }
+        || [CONFIRM_HOTKEY];
     },
     isLocal() {
       return !isRemote(this.info.url);
@@ -163,8 +177,8 @@ export default {
       const homepageURL = script && getScriptHome(script);
       const supportURL = script?.meta.supportURL;
       return [
-        homepageURL && [homepageURL, 'home', this.i18n('labelHomepage')],
-        supportURL && [supportURL, 'question', this.i18n('buttonSupport')],
+        homepageURL && [homepageURL, 'home', i18n('labelHomepage')],
+        supportURL && [supportURL, 'question', i18n('buttonSupport')],
       ].filter(Boolean);
     },
   },
@@ -195,10 +209,12 @@ export default {
       })(),
     ]);
     if (this.installable) {
-      this.heading = this.reinstall ? this.i18n('labelReinstall') : this.i18n('labelInstall');
+      this.heading = this.reinstall ? i18n('labelReinstall') : i18n('labelInstall');
     }
     this.disposeList = [
-      keyboardService.register('ctrlcmd-enter', () => this.$refs.confirm.click()),
+      keyboardService.register('ctrlcmd-enter', () => {
+        this.$el.querySelector('[data-hotkey]').click();
+      }),
     ];
     keyboardService.enable();
   },
@@ -290,7 +306,7 @@ export default {
       const startTime = performance.now();
       const updateStatus = () => {
         if (performance.now() - startTime > STATUS_DELAY) {
-          this.message = this.i18n('msgLoadingDependency', [finished, length]);
+          this.message = i18n('msgLoadingDependency', [finished, length]);
         }
       };
       /** @returns {string|undefined} URL in case of error or `undefined` on success */
@@ -316,7 +332,7 @@ export default {
       const error = (await Promise.all(promises))::trueJoin('\n');
       clearTimeout(delayedStatus);
       if (error) {
-        this.message = this.i18n('msgErrorLoadingDependency');
+        this.message = i18n('msgErrorLoadingDependency');
         this.error = error;
       } else {
         this.error = null;
@@ -346,13 +362,20 @@ export default {
       try {
         return cachedCodePromise && await cachedCodePromise || await this.getFile(url);
       } catch (e) {
-        this.message = this.i18n('msgErrorLoadingData');
+        this.message = i18n('msgErrorLoadingData');
         throw url;
       } finally {
         cachedCodePromise = null;
       }
     },
-    async installScript(parsedMeta) {
+    async installScript(evt, parsedMeta) {
+      const btnId = evt?.target.id;
+      const isOk = btnId === 'confirm';
+      const isBtnTrack = btnId === '+track';
+      if (isBtnTrack && this.tracking) {
+        stopResolve?.(true);
+        return;
+      }
       this.installable = false;
       try {
         const { update } = await sendCmdDirectly('ParseScript', {
@@ -362,14 +385,19 @@ export default {
           from: this.info.from,
           require: this.require,
           cache: this.resources,
+          reloadTab: options.get('autoReloadTracked'),
         });
         const time = new Date().toLocaleTimeString(['fr']);
         const time0 = this.confirmedTime || (this.confirmedTime = time);
         this.message = `${update.message} ${time0}${time0 === time ? '' : ` --> ${time}`}`;
         this.installed = true;
-        if (this.isLocal && this.$refs.trackLocalFile.value) {
+        if (isOk ? this.isLocal && this.$refs.track.value : isBtnTrack) {
+          this.message = i18n('trackEditsNote')
+            + (ua.firefox >= 68 ? ' ' + i18n('installOptionTrackTooltip') : '');
           this.trackLocalFile();
-        } else if (this.$refs.closeAfterInstall.value) {
+        } else if (btnId === '+edit') {
+          location.href = extensionOptionsPage + ROUTE_SCRIPTS + '/' + update.props.id;
+        } else if (isOk ? this.$refs.close.value : btnId === '+close') {
           this.close();
         }
       } catch (err) {
@@ -377,19 +405,22 @@ export default {
         this.installable = true;
       }
     },
-    async trackLocalFile() {
+    async trackLocalFile(evt) {
       if (this.tracking || !this.isLocal || !this.installed) {
+        if (evt === false) stopResolve?.(true);
         return;
       }
       cachedCodePromise = null; // always re-read because the file may have changed since then
       this.tracking = true;
-      while (this.$refs.trackLocalFile.value && this.tracking !== 'stop') {
-        await makePause(500);
+      while (this.tracking && !await Promise.race([
+        makePause(500),
+        new Promise(cb => { stopResolve = cb; }),
+      ])) {
         try {
           await this.loadData(true);
           const parsedMeta = await this.parseMeta();
           await this.loadDeps();
-          await this.installScript(parsedMeta);
+          await this.installScript(null, parsedMeta);
           this.sameCode = false;
         } catch (e) { /* NOP */ }
       }
@@ -405,7 +436,7 @@ export default {
       filePort = browser.tabs.connect(this.info.tabId, { name: 'FetchSelf' });
       filePort.onMessage.addListener(filePortResolve);
       filePort.onDisconnect.addListener(() => {
-        this.tracking = 'stop';
+        stopResolve?.(true);
         filePort = null;
       });
     },
@@ -427,6 +458,10 @@ $vertLayoutThreshold: 1801px;
 $vertLayoutThresholdMinus1: 1800px;
 
 .page-confirm {
+  --btn-bg: #d4e2d4;
+  --btn: darkgreen;
+  --btn-border: #75a775;
+  --btn-border-hover: #488148;
   h1 {
     line-height: 1.3;
     margin: .25rem 0;
@@ -527,56 +562,57 @@ $vertLayoutThresholdMinus1: 1800px;
     }
     .status {
       border-left: 5px solid darkorange;
-      padding: .5em;
+      padding: 0 .5em;
       color: #d33a00;
       animation: fade-in .5s 1 both;
+    }
+    .btn-ghost {
+      display: block;
+      padding: 0 2px 0 4px;
+      cursor: default;
     }
   }
   .incognito {
     padding: .25em 0;
     color: red;
   }
-  #confirm {
-    font-weight: bold;
-    background: #d4e2d4;
-    border-color: #75a775;
-    color: darkgreen;
+  button[id] {
+    background: var(--btn-bg);
+    border-color: var(--btn-border);
+    color: var(--btn);
     &:hover {
-      border-color: #488148;
+      border-color: var(--btn-border-hover);
     }
+  }
+  [data-hotkey] {
+    font-weight: bold;
     &::after {
       content: " (" attr(data-hotkey) ")";
       opacity: .75;
       font-weight: normal;
     }
   }
-  &.reinstall #confirm {
-    background: #d1e0ea;
-    border-color: #6699ce;
-    color: #004fc5;
-    &:hover {
-      border-color: #35699f;
-    }
+  &.reinstall {
+    --btn-bg: #d1e0ea;
+    --btn-border: #6699ce;
+    --btn: #004fc5;
+    --btn-border-hover: #35699f;
   }
   @media (prefers-color-scheme: dark) {
     .incognito {
       color: orange;
     }
-    #confirm {
-      background: #3a5d3a;
-      border-color: #598059;
-      color: #9cd89c;
-      &:hover {
-        border-color: #80a980;
-      }
+    &:not(.reinstall) {
+      --btn-bg: #3a5d3a;
+      --btn-border: #598059;
+      --btn: #9cd89c;
+      --btn-border-hover: #80a980;
     }
-    &.reinstall #confirm {
-      background: #224a73;
-      border-color: #3d6996;
-      color: #9fcdfd;
-      &:hover {
-        border-color: #608cb8;
-      }
+    &.reinstall {
+      --btn-bg: #224a73;
+      --btn-border: #3d6996;
+      --btn: #9fcdfd;
+      --btn-border-hover: #608cb8;
     }
     .actions {
       .status {
