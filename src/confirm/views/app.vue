@@ -410,8 +410,8 @@ export default {
       });
     },
     pingFilePort(resolve) {
-      if (!filePort) this.createFilePort();
       filePortResolve = resolve;
+      if (!filePort) this.createFilePort();
       filePort.postMessage(null);
     },
   },
