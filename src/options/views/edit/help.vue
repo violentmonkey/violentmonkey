@@ -15,10 +15,10 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ['hotkeys'],
-};
+<script setup>
+defineProps({
+  hotkeys: Array
+});
 </script>
 
 <style>

@@ -127,13 +127,17 @@
         />
       </div>
     </div>
-    <teleport to="body" v-if="state.script">
+    <teleport to="body">
+      <!-- KeepAlive must be a direct parent of the component, not of teleport -->
+      <KeepAlive :key="store.route.hash" :max="5">
       <edit
+        v-if="state.script"
         :initial="state.script"
         :initial-code="state.code"
         :read-only="!!state.script.config.removed"
         @close="handleEditScript()"
       />
+      </KeepAlive>
     </teleport>
   </div>
 </template>

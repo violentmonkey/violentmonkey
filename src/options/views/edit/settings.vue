@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-settings" ref="container">
+  <div class="edit-settings" ref="$el">
     <h4 v-text="i18n('editLabelSettings')"></h4>
     <VMSettingsUpdate v-bind="{script}"/>
     <h4 v-text="i18n('editLabelMeta')"></h4>
@@ -84,62 +84,52 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, onActivated, ref, shallowRef } from 'vue';
 import { getScriptHome, i18n } from '@/common';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
-import { objectGet } from '@/common/object';
 import { focusMe } from '@/common/ui';
 import VMSettingsUpdate from './settings-update';
 
-const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
+const kDownloadURL = 'downloadURL';
+const kHomepageURL = 'homepageURL';
+const kUpdateURL = 'updateURL';
 
-export default {
-  props: ['script', 'readOnly'],
-  components: {
-    VMSettingsUpdate,
-  },
-  data() {
-    return {
-      KII: KNOWN_INJECT_INTO,
-    };
-  },
-  computed: {
-    custom() {
-      return this.script.custom;
-    },
-    config() {
-      return this.script.config;
-    },
-    placeholders() {
-      const value = this.script;
-      return {
-        name: objectGet(value, 'meta.name'),
-        homepageURL: getScriptHome(value),
-        updateURL: objectGet(value, 'meta.updateURL') || i18n('hintUseDownloadURL'),
-        downloadURL: objectGet(value, 'meta.downloadURL') || objectGet(value, 'custom.lastInstallURL'),
-      };
-    },
-    textInputs() {
-      return [
-        ['name', i18n('labelName')],
-        ['homepageURL', i18n('labelHomepageURL')],
-        ['updateURL', i18n('labelUpdateURL')],
-        ['downloadURL', i18n('labelDownloadURL')],
-      ];
-    },
-    textAreas() {
-      return [
-        ['include', 'origInclude', ...highlightMetaKeys(i18n('labelInclude'))],
-        ['match', 'origMatch', ...highlightMetaKeys(i18n('labelMatch'))],
-        ['exclude', 'origExclude', ...highlightMetaKeys(i18n('labelExclude'))],
-        ['excludeMatch', 'origExcludeMatch', ...highlightMetaKeys(i18n('labelExcludeMatch'))],
-      ];
-    },
-  },
-  activated() {
-    focusMe(this.$el);
-  },
-};
+const props = defineProps({
+  script: Object,
+  readOnly: Boolean,
+});
+const $el = ref();
+const KII = shallowRef(KNOWN_INJECT_INTO);
+
+const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
+const custom = computed(() => props.script.custom);
+const placeholders = computed(() => {
+  const { script } = props;
+  const { meta } = script;
+  return {
+    name: meta.name,
+    [kHomepageURL]: getScriptHome(script),
+    [kUpdateURL]: meta[kUpdateURL] || i18n('hintUseDownloadURL'),
+    [kDownloadURL]: meta[kDownloadURL] || script.custom.lastInstallURL,
+  };
+});
+const textInputs = [
+  ['name', i18n('labelName')],
+  [kHomepageURL, i18n('labelHomepageURL')],
+  [kUpdateURL, i18n('labelUpdateURL')],
+  [kDownloadURL, i18n('labelDownloadURL')],
+];
+const textAreas = [
+  ['include', 'origInclude', ...highlightMetaKeys(i18n('labelInclude'))],
+  ['match', 'origMatch', ...highlightMetaKeys(i18n('labelMatch'))],
+  ['exclude', 'origExclude', ...highlightMetaKeys(i18n('labelExclude'))],
+  ['excludeMatch', 'origExcludeMatch', ...highlightMetaKeys(i18n('labelExcludeMatch'))],
+];
+
+onActivated(() => {
+  focusMe($el.value);
+});
 </script>
 
 <style>

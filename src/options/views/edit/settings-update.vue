@@ -23,18 +23,14 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ['script'],
-  computed: {
-    config() {
-      return this.script.config;
-    },
-    disabled() {
-      return !this.script._remote;
-    },
-  },
-};
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  script: Object,
+});
+const config = computed(() => props.script.config);
+const disabled = computed(() => !props.script._remote);
 </script>
 
 <style>

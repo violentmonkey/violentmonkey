@@ -118,6 +118,11 @@ const modify = (page, entry, init) => modifyWebpackConfig(
       if (typeof rule.test?.test === 'function' && rule.test.test('file.js')) {
         rule.exclude = file => /node_modules/.test(file) && !/vueleton|@vue[/\\]shared/.test(file);
       }
+      const vueOpts = rule.test?.source.includes('.vue') && rule.options;
+      if (vueOpts) {
+        const arr = vueOpts.babelParserPlugins || (vueOpts.babelParserPlugins = []);
+        if (!arr.includes('functionBind')) arr.push('functionBind');
+      }
     });
     if (!entry) init = page;
     if (init) init(config);

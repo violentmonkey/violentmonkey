@@ -13,7 +13,8 @@
         <span class="subtle" v-if="script.config.removed" v-text="i18n('headerRecycleBin') + ' / '"/>
         {{scriptName}}
       </div>
-      <p v-if="frozen" class="text-upper text-right text-red" v-text="i18n('readonly')"/>
+      <p v-if="frozen && nav === 'code'" v-text="i18n('readonly')"
+         class="text-upper text-right text-red"/>
       <div v-else class="edit-hint text-right ellipsis">
         <a href="https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/"
            target="_blank"
@@ -46,7 +47,7 @@
       class="flex-auto"
       :value="code"
       :readOnly="frozen"
-      ref="code"
+      ref="$code"
       v-show="nav === 'code'"
       :active="nav === 'code'"
       :commands="commands"
@@ -84,7 +85,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
 import {
   browserWindows,
   debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
@@ -102,6 +104,74 @@ import VmSettings from './settings';
 import VMSettingsUpdate from './settings-update';
 import VmValues from './values';
 import VmHelp from './help';
+
+let CM;
+let $codeComp;
+let disposeList;
+let K_SAVE; // deduced from the current CodeMirror keymap
+let savedCopy;
+let shouldSavePositionOnSave;
+let toggleUnloadSentry;
+
+const emit = defineEmits(['close']);
+const props = defineProps({
+  /** @type {VMScript} */
+  initial: Object,
+  initialCode: String,
+  readOnly: Boolean,
+});
+
+const $code = ref();
+const nav = ref('code');
+const canSave = ref(false);
+const script = ref();
+const code = ref('');
+const codeDirty = ref(false);
+const commands = {
+  save,
+  close,
+  showHelp: () => { nav.value = 'help'; },
+};
+const hotkeys = ref();
+const errors = ref();
+const fatal = ref();
+const frozen = ref(false);
+const frozenNote = ref(false);
+const urlMatching = ref('https://violentmonkey.github.io/api/matching/');
+
+const navItems = computed(() => {
+  const { meta, props: { id } } = script.value;
+  const req = meta.require.length && '@require';
+  const res = !isEmpty(meta.resources) && '@resource';
+  const size = store.storageSize;
+  return {
+    code: i18n('editNavCode'),
+    settings: i18n('editNavSettings'),
+    ...id && {
+      values: i18n('editNavValues') + (size ? ` (${formatByteLength(size)})` : ''),
+    },
+    ...(req || res) && { externals: [req, res]::trueJoin('/') },
+    help: '?',
+  };
+});
+const scriptName = computed(() => (store.title = getScriptName(script.value)));
+
+watch(nav, val => {
+  keyboardService.setContext('tabCode', val === 'code');
+  if (val === 'code') nextTick(() => CM.focus());
+});
+watch(canSave, val => {
+  toggleUnloadSentry(val);
+  keyboardService.setContext('canSave', val);
+});
+// usually errors for resources
+watch(() => props.initial.error, error => {
+  if (error) {
+    showMessage({ text: `${props.initial.message}\n\n${error}` });
+  }
+});
+watch(codeDirty, onDirty);
+watch(script, onScript);
 
 const CUSTOM_PROPS = {
   name: '',
@@ -130,10 +200,168 @@ const CUSTOM_ENUM = [
   RUN_AT,
 ];
 const toEnum = val => val || null; // `null` removes the prop from script object
+const K_PREV_PANEL = 'Alt-PageUp';
+const K_NEXT_PANEL = 'Alt-PageDown';
+const compareString = (a, b) => (a < b ? -1 : a > b);
+/** @param {VMScript.Config} config */
+const collectShouldUpdate = ({ shouldUpdate, _editable }) => (
+  +shouldUpdate && (shouldUpdate + _editable)
+);
 
-let shouldSavePositionOnSave;
+{
+  // The eslint rule is bugged as this is a block scope, not a global scope.
+  const src = props.initial; // eslint-disable-line vue/no-setup-props-destructure
+  code.value = props.initialCode; // eslint-disable-line vue/no-setup-props-destructure
+  script.value = deepCopy(src);
+  watch(() => script.value.config, onChange, { deep: true });
+  watch(() => script.value.custom, onChange, { deep: true });
+}
+
+onMounted(() => {
+  $codeComp = $code.value;
+  CM = $codeComp.cm;
+  toggleUnloadSentry = getUnloadSentry(null, () => CM.focus());
+  if (options.get('editorWindow') && global.history.length === 1) {
+    browser.windows?.getCurrent({ populate: true }).then(setupSavePosition);
+  }
+  store.storageSize = 0;
+  // hotkeys
+  const navLabels = Object.values(navItems.value);
+  const hk = hotkeys.value = [
+    [K_PREV_PANEL, ` ${navLabels.join(' < ')}`],
+    [K_NEXT_PANEL, ` ${navLabels.join(' > ')}`],
+    ...Object.entries($codeComp.expandKeyMap())
+    .sort((a, b) => compareString(a[1], b[1]) || compareString(a[0], b[0])),
+  ];
+  K_SAVE = hk.find(([, cmd]) => cmd === 'save')?.[0];
+  if (!K_SAVE) {
+    K_SAVE = 'Ctrl-S';
+    hk.unshift([K_SAVE, 'save']);
+  }
+});
+
+onActivated(() => {
+  document.body.classList.add('edit-open');
+  disposeList = [
+    keyboardService.register('a-pageup', switchPrevPanel),
+    keyboardService.register('a-pagedown', switchNextPanel),
+    keyboardService.register(K_SAVE.replace(/(?:Ctrl|Cmd)-/i, 'ctrlcmd-'), save),
+    keyboardService.register('escape', () => { nav.value = 'code'; }, {
+      condition: '!tabCode',
+    }),
+  ];
+  store.title = scriptName.value;
+});
+
+onDeactivated(() => {
+  document.body.classList.remove('edit-open');
+  store.title = null;
+  toggleUnloadSentry(false);
+  disposeList?.forEach(dispose => dispose());
+});
+
+async function save() {
+  if (!canSave.value) return;
+  if (shouldSavePositionOnSave) savePosition();
+  const scr = script.value;
+  const { config, custom } = scr;
+  const { notifyUpdates } = config;
+  const { noframes } = custom;
+  try {
+    const id = scr.props.id;
+    const res = await sendCmdDirectly('ParseScript', {
+      id,
+      code: $codeComp.getRealContent(),
+      config: {
+        notifyUpdates: notifyUpdates ? +notifyUpdates : null, // 0, 1, null
+        shouldUpdate: collectShouldUpdate(config), // 0, 1, 2
+      },
+      custom: {
+        ...objectPick(custom, Object.keys(CUSTOM_PROPS), toProp),
+        ...objectPick(custom, CUSTOM_LISTS, toList),
+        ...objectPick(custom, CUSTOM_ENUM, toEnum),
+        noframes: noframes ? +noframes : null,
+      },
+      // User created scripts MUST be marked `isNew` so that
+      // the backend is able to check namespace conflicts,
+      // otherwise the script with same namespace will be overridden
+      isNew: !id,
+      message: '',
+    });
+    const newId = res?.where?.id;
+    CM.markClean();
+    codeDirty.value = false; // triggers onDirty which sets canSave
+    canSave.value = false; // ...and set it explicitly in case codeDirty was false
+    frozenNote.value = false;
+    errors.value = res.errors;
+    script.value = res.update; // triggers onScript+onChange to handle the new `meta` and `props`
+    if (newId && !id) history.replaceState(null, scriptName.value, `${ROUTE_SCRIPTS}/${newId}`);
+    fatal.value = null;
+  } catch (err) {
+    fatal.value = err.message.split('\n');
+  }
+}
+function close(cm) {
+  if (cm && nav.value !== 'code') {
+    nav.value = 'code';
+  } else {
+    emit('close');
+    // FF doesn't emit `blur` when CodeMirror's textarea is removed
+    if (IS_FIREFOX) document.activeElement?.blur();
+  }
+}
+function saveClose() {
+  save().then(close);
+}
+function switchPanel(step) {
+  const keys = Object.keys(navItems.value);
+  nav.value = keys[(keys.indexOf(nav.value) + step + keys.length) % keys.length];
+}
+function switchPrevPanel() {
+  switchPanel(-1);
+}
+function switchNextPanel() {
+  switchPanel(1);
+}
+function onChange(evt) {
+  const scr = script.value;
+  const { config } = scr;
+  const { removed } = config;
+  const remote = scr._remote = !!getScriptUpdateUrl(scr);
+  const remoteMode = remote && collectShouldUpdate(config);
+  const fz = !!(removed || remoteMode === 1 || props.readOnly);
+  frozen.value = fz;
+  frozenNote.value = !removed && (fz || remoteMode >= 1);
+  if (!removed && evt) onDirty();
+}
+function onDirty() {
+  canSave.value = codeDirty.value || !deepEqual(script.value, savedCopy);
+}
+function onScript(scr) {
+  const { custom, config } = scr;
+  const { shouldUpdate } = config;
+  // Matching Vue model types, so deepEqual can work properly
+  config._editable = shouldUpdate === 2;
+  config.shouldUpdate = !!shouldUpdate;
+  config.notifyUpdates = nullBool2string(config.notifyUpdates);
+  custom.noframes = nullBool2string(custom.noframes);
+  // Adding placeholders for any missing values so deepEqual can work properly
+  for (const key in CUSTOM_PROPS) {
+    if (custom[key] == null) custom[key] = CUSTOM_PROPS[key];
+  }
+  for (const key of CUSTOM_ENUM) {
+    if (!custom[key]) custom[key] = '';
+  }
+  for (const key of CUSTOM_LISTS) {
+    const val = custom[key];
+    // Adding a new row so the user can click it and type, just like in an empty textarea.
+    custom[key] = val ? `${val.join('\n')}${val.length ? '\n' : ''}` : '';
+  }
+  onChange();
+  if (!config.removed) savedCopy = deepCopy(scr);
+}
 /** @param {chrome.windows.Window} [wnd] */
-const savePosition = async wnd => {
+async function savePosition(wnd) {
   if (options.get('editorWindow')) {
     if (!wnd) wnd = await browserWindows?.getCurrent() || {};
     /* chrome.windows API can't set both the state and coords, so we have to choose:
@@ -145,9 +373,10 @@ const savePosition = async wnd => {
       options.set('editorWindowPos', objectPick(wnd, ['left', 'top', 'width', 'height']));
     }
   }
-};
+}
+
 /** @param {chrome.windows.Window} _ */
-const setupSavePosition = ({ id: curWndId, tabs }) => {
+function setupSavePosition({ id: curWndId, tabs }) {
   if (tabs.length === 1) {
     const { onBoundsChanged } = chrome.windows;
     if (onBoundsChanged) {
@@ -161,248 +390,7 @@ const setupSavePosition = ({ id: curWndId, tabs }) => {
       shouldSavePositionOnSave = true;
     }
   }
-};
-
-let K_SAVE; // deduced from the current CodeMirror keymap
-const K_PREV_PANEL = 'Alt-PageUp';
-const K_NEXT_PANEL = 'Alt-PageDown';
-const compareString = (a, b) => (a < b ? -1 : a > b);
-/** @param {VMScript.Config} config */
-const collectShouldUpdate = ({ shouldUpdate, _editable }) => (
-  +shouldUpdate && (shouldUpdate + _editable)
-);
-const deepWatchScript = { handler: 'onChange', deep: true };
-
-export default {
-  props: ['initial', 'initialCode', 'readOnly'],
-  components: {
-    VmCode,
-    VmSettings,
-    VMSettingsUpdate,
-    VmValues,
-    VmExternals,
-    VmHelp,
-  },
-  data() {
-    return {
-      nav: 'code',
-      canSave: false,
-      script: null,
-      code: '',
-      codeDirty: false,
-      commands: {
-        save: this.save,
-        close: this.close,
-        showHelp: () => {
-          this.nav = 'help';
-        },
-      },
-      hotkeys: null,
-      errors: null,
-      fatal: null,
-      frozen: false,
-      frozenNote: false,
-      urlMatching: 'https://violentmonkey.github.io/api/matching/',
-    };
-  },
-  computed: {
-    navItems() {
-      const { meta, props } = this.script;
-      const req = meta.require.length && '@require';
-      const res = !isEmpty(meta.resources) && '@resource';
-      const size = store.storageSize;
-      return {
-        code: i18n('editNavCode'),
-        settings: i18n('editNavSettings'),
-        ...props.id && {
-          values: i18n('editNavValues') + (size ? ` (${formatByteLength(size)})` : ''),
-        },
-        ...(req || res) && { externals: [req, res]::trueJoin('/') },
-        help: '?',
-      };
-    },
-    scriptName() {
-      const { script } = this;
-      const scriptName = script?.meta && getScriptName(script);
-      store.title = scriptName;
-      return scriptName;
-    },
-  },
-  watch: {
-    nav(val) {
-      keyboardService.setContext('tabCode', val === 'code');
-      if (val === 'code') {
-        this.$nextTick(() => {
-          this.$refs.code.cm.focus();
-        });
-      }
-    },
-    canSave(val) {
-      this.toggleUnloadSentry(val);
-      keyboardService.setContext('canSave', val);
-    },
-    // usually errors for resources
-    'initial.error'(error) {
-      if (error) {
-        showMessage({ text: `${this.initial.message}\n\n${error}` });
-      }
-    },
-    codeDirty: 'onDirty',
-    script: 'onScript',
-    'script.config': deepWatchScript,
-    'script.custom': deepWatchScript,
-  },
-  created() {
-    this.script = deepCopy(this.initial);
-    this.toggleUnloadSentry = getUnloadSentry(null, () => {
-      this.$refs.code.cm.focus();
-    });
-    if (options.get('editorWindow') && global.history.length === 1) {
-      browser.windows?.getCurrent({ populate: true }).then(setupSavePosition);
-    }
-  },
-  async mounted() {
-    document.body.classList.add('edit-open');
-    store.storageSize = 0;
-    // hotkeys
-    {
-      const navLabels = Object.values(this.navItems);
-      const hotkeys = [
-        [K_PREV_PANEL, ` ${navLabels.join(' < ')}`],
-        [K_NEXT_PANEL, ` ${navLabels.join(' > ')}`],
-        ...Object.entries(this.$refs.code.expandKeyMap())
-        .sort((a, b) => compareString(a[1], b[1]) || compareString(a[0], b[0])),
-      ];
-      K_SAVE = hotkeys.find(([, cmd]) => cmd === 'save')?.[0];
-      if (!K_SAVE) {
-        K_SAVE = 'Ctrl-S';
-        hotkeys.unshift([K_SAVE, 'save']);
-      }
-      this.hotkeys = hotkeys;
-    }
-    this.disposeList = [
-      keyboardService.register('a-pageup', this.switchPrevPanel),
-      keyboardService.register('a-pagedown', this.switchNextPanel),
-      keyboardService.register(K_SAVE.replace(/(?:Ctrl|Cmd)-/i, 'ctrlcmd-'), this.save),
-      keyboardService.register('escape', () => { this.nav = 'code'; }, {
-        condition: '!tabCode',
-      }),
-    ];
-    this.code = this.initialCode;
-  },
-  methods: {
-    async save() {
-      if (!this.canSave) return;
-      if (shouldSavePositionOnSave) savePosition();
-      const script = this.script;
-      const { config, custom } = script;
-      const { notifyUpdates } = config;
-      const { noframes } = custom;
-      let fatal;
-      try {
-        const codeComponent = this.$refs.code;
-        const id = script.props.id;
-        const res = await sendCmdDirectly('ParseScript', {
-          id,
-          code: codeComponent.getRealContent(),
-          config: {
-            notifyUpdates: notifyUpdates ? +notifyUpdates : null, // 0, 1, null
-            shouldUpdate: collectShouldUpdate(config), // 0, 1, 2
-          },
-          custom: {
-            ...objectPick(custom, Object.keys(CUSTOM_PROPS), toProp),
-            ...objectPick(custom, CUSTOM_LISTS, toList),
-            ...objectPick(custom, CUSTOM_ENUM, toEnum),
-            noframes: noframes ? +noframes : null,
-          },
-          // User created scripts MUST be marked `isNew` so that
-          // the backend is able to check namespace conflicts,
-          // otherwise the script with same namespace will be overridden
-          isNew: !id,
-          message: '',
-        });
-        const newId = res?.where?.id;
-        codeComponent.cm.markClean();
-        this.codeDirty = false; // triggers onDirty which sets canSave
-        this.canSave = false; // ...and set it explicitly in case codeDirty was false
-        this.frozenNote = false;
-        this.errors = res.errors;
-        this.script = res.update; // triggers onScript+onChange to handle the new `meta` and `props`
-        if (newId && !id) history.replaceState(null, this.scriptName, `${ROUTE_SCRIPTS}/${newId}`);
-      } catch (err) {
-        fatal = err.message.split('\n');
-      }
-      this.fatal = fatal;
-    },
-    close(cm) {
-      if (cm && this.nav !== 'code') {
-        this.nav = 'code';
-      } else {
-        this.$emit('close');
-        // FF doesn't emit `blur` when CodeMirror's textarea is removed
-        if (IS_FIREFOX) document.activeElement?.blur();
-      }
-    },
-    saveClose() {
-      this.save().then(this.close);
-    },
-    switchPanel(step) {
-      const keys = Object.keys(this.navItems);
-      this.nav = keys[(keys.indexOf(this.nav) + step + keys.length) % keys.length];
-    },
-    switchPrevPanel() {
-      this.switchPanel(-1);
-    },
-    switchNextPanel() {
-      this.switchPanel(1);
-    },
-    onChange(evt) {
-      const { script } = this;
-      const { config } = script;
-      const { removed } = config;
-      const remote = script._remote = !!getScriptUpdateUrl(script);
-      const remoteMode = remote && collectShouldUpdate(config);
-      const frozen = !!(removed || remoteMode === 1 || this.readOnly);
-      this.frozen = frozen;
-      this.frozenNote = !removed && (frozen || remoteMode >= 1);
-      if (!removed && evt) this.onDirty();
-    },
-    onDirty() {
-      this.canSave = this.codeDirty || !deepEqual(this.script, this.saved);
-    },
-    onScript(script) {
-      const { custom, config } = script;
-      const { shouldUpdate } = config;
-      // Matching Vue model types, so deepEqual can work properly
-      config._editable = shouldUpdate === 2;
-      config.shouldUpdate = !!shouldUpdate;
-      config.notifyUpdates = nullBool2string(config.notifyUpdates);
-      custom.noframes = nullBool2string(custom.noframes);
-      // Adding placeholders for any missing values so deepEqual can work properly
-      for (const key in CUSTOM_PROPS) {
-        if (custom[key] == null) custom[key] = CUSTOM_PROPS[key];
-      }
-      for (const key of CUSTOM_ENUM) {
-        if (!custom[key]) custom[key] = '';
-      }
-      for (const key of CUSTOM_LISTS) {
-        const val = custom[key];
-        // Adding a new row so the user can click it and type, just like in an empty textarea.
-        custom[key] = val ? `${val.join('\n')}${val.length ? '\n' : ''}` : '';
-      }
-      this.onChange();
-      if (!config.removed) this.saved = deepCopy(script);
-    }
-  },
-  beforeUnmount() {
-    document.body.classList.remove('edit-open');
-    store.title = null;
-    this.toggleUnloadSentry(false);
-    this.disposeList?.forEach(dispose => {
-      dispose();
-    });
-  },
-};
+}
 </script>
 
 <style>
