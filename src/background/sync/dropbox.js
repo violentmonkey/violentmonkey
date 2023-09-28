@@ -1,6 +1,5 @@
-import { getUniqId } from '@/common';
+import { dumpQuery, getUniqId, loadQuery } from '@/common';
 import { FORM_URLENCODED } from '@/common/consts';
-import { loadQuery, dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
   openAuthPage,

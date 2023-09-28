@@ -1,8 +1,7 @@
 // Reference: https://dev.onedrive.com/README.htm
-import { noop } from '@/common';
+import { dumpQuery, noop } from '@/common';
 import { FORM_URLENCODED } from '@/common/consts';
 import { objectGet } from '@/common/object';
-import { dumpQuery } from '../utils';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
   openAuthPage,

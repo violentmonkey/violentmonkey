@@ -327,3 +327,17 @@ export async function makeRaw(response, noJoin) {
   const body = await blob2base64(response.data);
   return noJoin ? [type, body] : `${type},${body}`;
 }
+
+export function loadQuery(string) {
+  const res = {};
+  if (string) {
+    new URLSearchParams(string).forEach((val, key) => {
+      res[key] = val;
+    });
+  }
+  return res;
+}
+
+export function dumpQuery(dict) {
+  return `${new URLSearchParams(dict)}`;
+}

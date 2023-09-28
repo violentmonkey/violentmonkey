@@ -51,7 +51,11 @@ commands:
   SkipScripts:
     description: __MSG_skipScripts__
 
-minimum_chrome_version: '57.0'
+minimum_chrome_version: '61.0'
+# 61: URLSearchParams(obj)
+# 61: scrollIntoView({ behavior: 'smooth' })
+# 60: {...spreadOrRest}
+# 60: CSS :focus-within
 
 browser_specific_settings:
   gecko:

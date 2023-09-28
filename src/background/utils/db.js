@@ -201,7 +201,7 @@ export async function normalizePosition() {
   return !!updates;
 }
 
-/** @return {Promise<number>} */
+/** @return {Promise<Boolean>} */
 export async function sortScripts() {
   aliveScripts.sort((a, b) => getInt(a.props.position) - getInt(b.props.position));
   const changed = await normalizePosition();

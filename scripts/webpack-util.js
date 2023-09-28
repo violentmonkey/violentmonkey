@@ -22,10 +22,6 @@ exports.restrictedSyntax = (
     Object.defineProperty(r, 'code', { enumerable: false, value: r.code })
   ))
 )([{
-  selector: 'ObjectExpression > SpreadElement',
-  message: 'Object spread adds a polyfill in injected* even if unused by it',
-  code: 'open({...{foo:1}})',
-}, {
   selector: 'ArrayPattern',
   message: 'Destructuring via Symbol.iterator may be spoofed/broken in an unsafe environment',
   code: '[window.foo]=[]',

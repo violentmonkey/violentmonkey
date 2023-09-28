@@ -6,6 +6,8 @@ module.exports = {
         modules: false,
       },
       useBuiltIns: false,
+      bugfixes: true,
+      // debug: true,
       loose: true,
     }],
   ],
