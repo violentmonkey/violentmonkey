@@ -10,7 +10,7 @@ import './dropbox';
 import './onedrive';
 import './googledrive';
 import './webdav';
-import { addOwnCommands, hookOptions, init } from '../utils';
+import { addOwnCommands, hookOptionsInit } from '../utils';
 import { S_CODE_PRE, S_SCRIPT_PRE } from '../utils/storage';
 import { onStorageChanged } from '../utils/storage-cache';
 
@@ -20,9 +20,8 @@ const keysToSyncRe = new RegExp(`^(?:${[
 ].join('|')})`);
 let unwatch;
 
-init.then(reconfigure);
-hookOptions((data) => {
-  if ('sync.current' in data) reconfigure();
+hookOptionsInit((changes, firstRun) => {
+  if ('sync.current' in changes || firstRun) reconfigure();
 });
 
 addOwnCommands({

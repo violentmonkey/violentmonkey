@@ -1,20 +1,15 @@
 import { debounce, ensureArray, initHooks, normalizeKeys, sendCmd } from '@/common';
-import { deepCopy, deepEqual, mapEntry, objectGet, objectSet } from '@/common/object';
+import { deepCopy, deepEqual, objectGet, objectSet } from '@/common/object';
 import defaults from '@/common/options-defaults';
-import { addOwnCommands, commands, init } from './init';
+import { addOwnCommands, init } from './init';
 import storage from './storage';
 
 let changes;
-let options = {};
 
 addOwnCommands({
   /** @return {Object} */
   GetAllOptions() {
-    return commands.GetOptions(defaults);
-  },
-  /** @return {Object} */
-  GetOptions(data) {
-    return data::mapEntry((_, key) => getOption(key));
+    return Object.assign({}, defaults, options); // eslint-disable-line no-use-before-define
   },
   /**
    * @param {{key:string, value?:PlainJSONValue, reply?:boolean}|Array} data
@@ -28,6 +23,7 @@ addOwnCommands({
   },
 });
 
+const options = {};
 const STORAGE_KEY = 'options';
 const VERSION = 'version';
 const TPL_KEY = 'scriptTemplate';
@@ -43,14 +39,13 @@ const DELAY = 100;
 const hooks = initHooks();
 const callHooksLater = debounce(callHooks, DELAY);
 const writeOptionsLater = debounce(writeOptions, DELAY);
+const optProxy = new Proxy(defaults, { get: (_, key) => getOption(key) });
 export const hookOptions = hooks.hook;
-// TODO: add `keys` parameter to hookOptions
-// TODO: call hooks.fire in init.then (DANGER! check usages of hookOptions+getOption)
 hookOptions(changes => sendCmd('UpdateOptions', changes));
 
 export function initOptions(data) {
   data = data[STORAGE_KEY] || {};
-  if (isObject(data)) options = data;
+  Object.assign(options, data);
   if (process.env.DEBUG) console.info('options:', options);
   if (!options[VERSION]) {
     setOption(VERSION, 1);
@@ -82,6 +77,13 @@ function callHooks() {
   const tmp = changes;
   changes = null;
   hooks.fire(tmp);
+}
+
+/** Hooks and calls the callback with a copy of all options when init is resolved */
+export function hookOptionsInit(cb) {
+  if (init) init.then(() => cb(optProxy, true));
+  else cb(optProxy, true);
+  return hookOptions(cb);
 }
 
 export function getOption(key) {

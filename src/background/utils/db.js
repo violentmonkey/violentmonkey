@@ -7,7 +7,7 @@ import { INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import { getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta } from './script';
-import { resetBlacklist, testBlacklist, testerBatch, testScript } from './tester';
+import { testBlacklist, testerBatch, testScript } from './tester';
 import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
 import patchDB from './patch-db';
 import { getOption, initOptions, setOption } from './options';
@@ -161,7 +161,6 @@ addOwnCommands({
   }
   sortScripts();
   vacuum(data);
-  resetBlacklist();
   checkRemove();
   setInterval(checkRemove, TIMEOUT_24HOURS);
   resolveInit();

@@ -3,7 +3,7 @@ import { getScriptPrettyUrl } from '@/common';
 import { BLACKLIST, BLACKLIST_ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
 import { getPublicSuffix } from '@/common/tld';
-import { getOption, hookOptions } from './options';
+import { getOption, hookOptionsInit } from './options';
 import storage from './storage';
 
 const matchAlways = { test: () => 1 };
@@ -57,7 +57,7 @@ let urlResultsMat;
 let urlResultsInc;
 // Context end
 
-hookOptions((changes) => {
+hookOptionsInit((changes) => {
   if (BLACKLIST in changes) {
     const errors = resetBlacklist(changes[BLACKLIST] || []);
     const res = errors.length ? errors : null;

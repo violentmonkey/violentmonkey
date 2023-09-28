@@ -3,13 +3,13 @@ import {
   BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
-import { forEachEntry, forEachKey, forEachValue, mapEntry, objectSet } from '@/common/object';
+import { forEachEntry, forEachValue, mapEntry, objectSet } from '@/common/object';
 import ua from '@/common/ua';
 import { CACHE_KEYS, getScriptsByURL, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
 import { setBadge } from './icon';
-import { addOwnCommands, addPublicCommands, init } from './init';
+import { addOwnCommands, addPublicCommands } from './init';
 import { clearNotifications } from './notifications';
-import { getOption, hookOptions } from './options';
+import { hookOptionsInit } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId, reifyRequests } from './requests';
 import {
@@ -211,12 +211,7 @@ addPublicCommands({
   },
 });
 
-hookOptions(onOptionChanged);
-init.then(() => {
-  OPT_HANDLERS::forEachKey(key => {
-    onOptionChanged({ [key]: getOption(key) });
-  });
-});
+hookOptionsInit(onOptionChanged);
 
 onStorageChanged((keys, data) => {
   const toClear = [];
@@ -262,13 +257,15 @@ function removeStaleCacheEntry(val, key) {
 }
 
 function onOptionChanged(changes) {
-  changes::forEachEntry(([key, value]) => {
-    if (OPT_HANDLERS[key]) {
-      OPT_HANDLERS[key](value);
-    } else if (key.includes('.')) { // used by `expose.url`
-      onOptionChanged(objectSet({}, key, value));
+  // DANGER! Must initialize in the specified order
+  for (const key in OPT_HANDLERS) {
+    if (key in changes) OPT_HANDLERS[key](changes[key]);
+  }
+  for (const key in changes) {
+    if (key.includes('.')) { // used by `expose.url`
+      onOptionChanged(objectSet({}, key, changes[key]));
     }
-  });
+  }
 }
 
 function toggleXhrInject(enable) {
