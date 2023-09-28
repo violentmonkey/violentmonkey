@@ -2,9 +2,8 @@ import '@/common/browser';
 import { makePause } from '@/common';
 import { deepCopy } from '@/common/object';
 import { getDomain } from '@/common/tld';
-import * as sync from './sync';
 import { addOwnCommands, addPublicCommands, commands, init } from './utils';
-import { getData } from './utils/db';
+import './sync';
 import './utils/clipboard';
 import './utils/hotkeys';
 import './utils/icon';
@@ -17,11 +16,6 @@ import './utils/tester';
 import './utils/update';
 
 addOwnCommands({
-  async GetData(opts) {
-    const data = await getData(opts);
-    data.sync = sync.getStates();
-    return data;
-  },
   /**
    * @param {string?} url
    * @return {Promise<Object>}
@@ -45,20 +39,6 @@ addPublicCommands({
     return ms > 0 && makePause(ms);
   },
 });
-
-// commands to sync unconditionally regardless of the returned value from the handler
-const commandsToSync = [
-  'MarkRemoved',
-  'Move',
-  'ParseScript',
-  'RemoveScript',
-  'UpdateScriptInfo',
-];
-// commands to sync only if the handler returns a truthy value
-const commandsToSyncIfTruthy = [
-  'CheckRemove',
-  'CheckUpdate',
-];
 
 async function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
   if (init) {
@@ -84,10 +64,6 @@ async function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
   try {
     // `await` is necessary to catch the error here
     const res = await func(data, src);
-    if (commandsToSync.includes(cmd)
-    || res && commandsToSyncIfTruthy.includes(cmd)) {
-      sync.sync();
-    }
     // `undefined` is not transferable, but `null` is
     return res ?? null;
   } catch (err) {

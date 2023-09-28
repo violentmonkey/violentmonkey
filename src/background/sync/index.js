@@ -10,18 +10,47 @@ import './dropbox';
 import './onedrive';
 import './googledrive';
 import './webdav';
-import { addOwnCommands, init } from '../utils';
+import { addOwnCommands, hookOptions, init } from '../utils';
+import { S_CODE_PRE, S_SCRIPT_PRE } from '../utils/storage';
+import { onStorageChanged } from '../utils/storage-cache';
+
+const keysToSyncRe = new RegExp(`^(?:${[
+  S_SCRIPT_PRE,
+  S_CODE_PRE,
+].join('|')})`);
+let unwatch;
+
+init.then(reconfigure);
+hookOptions((data) => {
+  if ('sync.current' in data) reconfigure();
+});
 
 addOwnCommands({
   SyncAuthorize: authorize,
+  SyncGetStates: getStates,
   SyncRevoke: revoke,
-  SyncStart: sync,
   SyncSetConfig: setConfig,
+  SyncStart: sync,
 });
 
-init.then(initialize);
+function reconfigure() {
+  if (initialize()) {
+    if (!unwatch) {
+      unwatch = onStorageChanged(dbSentry);
+    }
+  } else {
+    if (unwatch) {
+      unwatch();
+      unwatch = null;
+    }
+  }
+}
 
-export {
-  sync,
-  getStates,
-};
+function dbSentry({ keys }) {
+  for (const k of keys) {
+    if (keysToSyncRe.test(k)) {
+      sync();
+      break;
+    }
+  }
+}

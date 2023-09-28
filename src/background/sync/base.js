@@ -7,7 +7,7 @@ import {
   forEachEntry, objectSet, objectPick,
 } from '@/common/object';
 import {
-  getEventEmitter, getOption, setOption, hookOptions,
+  getEventEmitter, getOption, setOption,
 } from '../utils';
 import {
   sortScripts,
@@ -556,7 +556,7 @@ export function initialize() {
       services[name] = service;
     });
   }
-  sync();
+  return sync();
 }
 
 function syncOne(service) {
@@ -621,11 +621,6 @@ export async function openAuthPage(url, redirectUri) {
     types: ['main_frame', 'xmlhttprequest'], // fetch request in service worker
   }, ['blocking']);
 }
-
-hookOptions((data) => {
-  const value = data?.['sync.current'];
-  if (value) initialize();
-});
 
 const base64urlMapping = {
   '+': '-',

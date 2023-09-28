@@ -44,6 +44,7 @@ addOwnCommands({
   CheckPosition: sortScripts,
   CheckRemove: checkRemove,
   RemoveScripts: removeScripts,
+  GetData: getData,
   /** @return {VMScript} */
   GetScript: getScript,
   GetSizes: getSizes,
@@ -411,6 +412,7 @@ export async function getData({ ids, sizes }) {
     scripts,
     cache: await getIconCache(scripts),
     sizes: sizes && getSizes(ids),
+    sync: sizes && commands.SyncGetStates(),
   };
 }
 
