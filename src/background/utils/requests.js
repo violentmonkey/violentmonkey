@@ -1,13 +1,13 @@
 import { blob2base64, getFullUrl, sendTabCmd, string2uint8array } from '@/common';
 import { CHARSET_UTF8, FORM_URLENCODED } from '@/common/consts';
 import { forEachEntry, forEachValue, objectPick } from '@/common/object';
-import ua from '@/common/ua';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify,
 } from './requests-core';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
+import { FIREFOX } from './ua';
 
 addPublicCommands({
   /**
@@ -241,7 +241,7 @@ async function httpRequest(opts, events, src, cb) {
     const cookies = (await browser.cookies.getAll({
       url,
       storeId: req.storeId,
-      ...ua.firefox >= 59 && { firstPartyDomain: null },
+      ...FIREFOX >= 59 && { firstPartyDomain: null },
     })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
     if (cookies.length) {
       vmHeaders.push({

@@ -37,3 +37,4 @@ export const TAB_RECYCLE = 'recycleBin';
 export const BROWSER_ACTION = 'browser_action';
 export const kDocumentId = 'documentId';
 export const kFrameId = 'frameId';
+export const INJECT = 'inject';

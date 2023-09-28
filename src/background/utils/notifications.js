@@ -1,6 +1,6 @@
 import { i18n, defaultImage, sendTabCmd, trueJoin } from '@/common';
-import ua from '@/common/ua';
 import { addPublicCommands } from './init';
+import { CHROME } from './ua';
 
 const openers = {};
 const removeNotification = id => browser.notifications.clear(id);
@@ -16,7 +16,7 @@ addPublicCommands({
       ...!IS_FIREFOX && {
         requireInteraction: !!onclick,
       },
-      ...ua.chrome >= 70 && {
+      ...CHROME >= 70 && {
         silent,
       }
     });

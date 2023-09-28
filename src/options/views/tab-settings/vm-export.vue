@@ -37,7 +37,6 @@ import { getScriptName, sendCmdDirectly } from '@/common';
 import { formatDate, DATE_FMT } from '@/common/date';
 import { objectGet } from '@/common/object';
 import options from '@/common/options';
-import ua from '@/common/ua';
 import SettingCheck from '@/common/ui/setting-check';
 import SettingText from '@/common/ui/setting-text';
 import { downloadBlob } from '@/common/download';
@@ -49,6 +48,7 @@ import { store } from '../../utils';
  * - Firefox does not support multiline <select>
  */
 if (IS_FIREFOX) store.ffDownload = {};
+let ua;
 
 export default {
   components: {
@@ -69,6 +69,7 @@ export default {
     async handleExport() {
       try {
         this.exporting = true;
+        if (IS_FIREFOX && !ua) ua = await sendCmdDirectly('UA');
         download(await exportData(), this.getFileName());
       } finally {
         this.exporting = false;
@@ -86,8 +87,8 @@ function download(blob, fileName) {
    * v56 in Windows https://bugzil.la/1357486
    * v61 in MacOS https://bugzil.la/1385403
    * v63 in Linux https://bugzil.la/1357487 */
-  const FF = IS_FIREFOX;
-  // eslint-disable-next-line no-nested-ternary
+  // TODO: remove when strict_min_version >= 63
+  const FF = IS_FIREFOX && parseFloat(ua.version);
   if (FF && (ua.os === 'win' ? FF < 56 : ua.os === 'mac' ? FF < 61 : FF < 63)) {
     const reader = new FileReader();
     reader.onload = () => {

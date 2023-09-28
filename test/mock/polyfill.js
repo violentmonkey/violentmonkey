@@ -16,6 +16,12 @@ global.browser = {
       icons: { 16: '' },
       options_ui: {},
     }),
+    getPlatformInfo: async () => ({}),
+  },
+  tabs: {
+    onRemoved: { addListener: () => {} },
+    onReplaced: { addListener: () => {} },
+    onUpdated: { addListener: () => {} },
   },
 };
 if (!window.Response) window.Response = { prototype: {} };

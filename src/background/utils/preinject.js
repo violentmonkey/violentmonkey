@@ -4,7 +4,6 @@ import {
 } from '@/common/consts';
 import initCache from '@/common/cache';
 import { forEachEntry, forEachValue, mapEntry, objectSet } from '@/common/object';
-import ua from '@/common/ua';
 import { CACHE_KEYS, getScriptsByURL, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
 import { setBadge } from './icon';
 import { addOwnCommands, addPublicCommands } from './init';
@@ -18,6 +17,7 @@ import {
 import { clearStorageCache, onStorageChanged } from './storage-cache';
 import { getFrameDocId, getFrameDocIdAsObj, tabsOnRemoved } from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
+import { ua } from './ua';
 
 let isApplied;
 let injectInto;

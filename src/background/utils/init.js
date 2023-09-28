@@ -8,5 +8,8 @@ export const addOwnCommands = obj => {
 };
 
 export let resolveInit;
-export let init = new Promise(r => (resolveInit = r));
+export let init = new Promise(r => {
+  resolveInit = () => Promise.all(init.deps).then(r);
+});
+init.deps = [];
 init.then(() => (init = null));

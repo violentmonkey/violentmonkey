@@ -115,7 +115,6 @@ import { loadScriptIcon } from '@/common/load-script-icon';
 import { deepEqual, objectPick } from '@/common/object';
 import options from '@/common/options';
 import { route } from '@/common/router';
-import ua from '@/common/ua';
 
 const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;
@@ -400,7 +399,7 @@ export default {
         this.installed = true;
         if (isOk ? this.isLocal && this.$refs.track.value : isBtnTrack) {
           this.message = i18n('trackEditsNote')
-            + (ua.firefox >= 68 ? ' ' + i18n('installOptionTrackTooltip') : '');
+            + (this.info.ff >= 68 ? ' ' + i18n('installOptionTrackTooltip') : '');
           this.trackLocalFile();
         } else if (btnId === '+edit') {
           location.href = extensionOptionsPage + ROUTE_SCRIPTS + '/' + update.props.id;

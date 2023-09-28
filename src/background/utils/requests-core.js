@@ -1,6 +1,6 @@
 import { buffer2string, getUniqId, isEmpty, noop } from '@/common';
 import { forEachEntry } from '@/common/object';
-import ua from '@/common/ua';
+import { CHROME } from './ua';
 
 let encoder;
 
@@ -137,6 +137,6 @@ function string2byteString(str) {
 
 // Chrome 74-91 needs an extraHeaders listener at tab load start, https://crbug.com/1074282
 // We're attaching a no-op in non-blocking mode so it's very lightweight and fast.
-if (ua.chrome >= 74 && ua.chrome <= 91) {
+if (CHROME >= 74 && CHROME <= 91) {
   browser.webRequest.onBeforeSendHeaders.addListener(noop, API_FILTER, EXTRA_HEADERS);
 }

@@ -1,9 +1,9 @@
 import { browserWindows, request, noop, i18n, getUniqId } from '@/common';
-import ua from '@/common/ua';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { parseMeta, isUserScript } from './script';
 import { getTabUrl, tabsOnUpdated } from './tabs';
+import { FIREFOX } from './ua';
 
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 
@@ -26,7 +26,7 @@ addPublicCommands({
       || cache.has(`autoclose:${tabId}`)
       || /^(chrome:\/\/(newtab|startpage)\/|about:(home|newtab))$/.test(from));
     /** @namespace VM.ConfirmCache */
-    cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId, ff: ua.firefox });
+    cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId, ff: FIREFOX });
     const confirmUrl = CONFIRM_URL_BASE + confirmKey;
     const { windowId } = canReplaceCurTab
       ? await browser.tabs.update(tabId, { url: confirmUrl })
@@ -89,7 +89,7 @@ browser.tabs.onCreated.addListener((tab) => {
   const { id, title, url } = tab;
   /* Determining if this tab can be auto-closed (replaced, actually).
      FF>=68 allows reading file: URL only in the tab's content script so the tab must stay open. */
-  if ((!url.startsWith('file:') || ua.firefox < 68)
+  if ((!url.startsWith('file:') || FIREFOX < 68)
       && /\.user\.js([?#]|$)/.test(getTabUrl(tab))) {
     cache.put(`autoclose:${id}`, true, 10e3);
   }

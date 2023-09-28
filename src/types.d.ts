@@ -332,15 +332,6 @@ declare type VMStorageFetch = (
   check?: (...args) => void // throws on error
 ) => Promise<void>
 
-declare interface VMUserAgent extends VMScriptGMInfoPlatform {
-  /** Chrome/ium version number */
-  chrome: number | typeof NaN;
-  /** derived from UA string initially, a real number when `ready` */
-  firefox: number | typeof NaN;
-  /** resolves when `browser` API returns real versions */
-  ready: Promise<void>;
-}
-
 /** Augmented by handleCommandMessage in messages from the content script */
 declare interface VMMessageSender extends chrome.runtime.MessageSender {
   top?: VMTopRenderMode;
