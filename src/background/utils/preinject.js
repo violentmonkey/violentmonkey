@@ -245,7 +245,7 @@ function removeStaleCacheEntry(val, key) {
     const prop = propsToClear[prefix];
     if (val[prop]?.includes(+id || id)) {
       if (prefix === S_REQUIRE_PRE) {
-        val.depsMap[id].forEach(id => cache.del(S_SCRIPT_PRE + id));
+        val.depsMap[id].forEach(scriptId => cache.del(S_SCRIPT_PRE + scriptId));
       } else if (prefix === S_VALUE_PRE) {
         val[S_VALUE][id] = newData;
       } else {
@@ -429,7 +429,7 @@ function prepareScript(script, env) {
   const code = env[S_CODE][id];
   const dataKey = getUniqId();
   const winKey = getUniqId();
-  const key = { data: dataKey, win: winKey };
+  const plantKey = { data: dataKey, win: winKey };
   const displayName = getScriptName(script);
   const pathMap = custom.pathMap || {};
   const wrap = !meta[UNWRAP];
@@ -489,7 +489,7 @@ function prepareScript(script, env) {
       uuid: props.uuid,
     },
     id,
-    key,
+    key: plantKey,
     meta: metaCopy,
     pathMap,
     [__CODE]: injectedCode,

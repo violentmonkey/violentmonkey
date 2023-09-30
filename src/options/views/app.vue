@@ -39,10 +39,6 @@ const tabs = [
 const extName = i18n('extName');
 const conditionNotEdit = '!editScript';
 
-// Speedup and deflicker for initial page load:
-// skip rendering the aside when starting in the editor for a new script.
-const [name, tabFunc] = store.route.paths;
-
 const current = computed(() => {
   const name = store.route.paths[0];
   return tabs.find(tab => tab.name === name) || tabs[0];
@@ -76,6 +72,9 @@ addEventListener('dragover', evt => {
 
 export default {
   setup() {
+    // Speedup and deflicker for initial page load:
+    // skip rendering the aside when starting in the editor for a new script.
+    const [name, tabFunc] = store.route.paths;
     const canRenderAside = ref(name !== SCRIPTS || (tabFunc !== '_new' && !Number(tabFunc)));
 
     watchEffect(() => {

@@ -94,7 +94,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
      * The use case and the solution are both analogous to forceJsModeToQuasi(),
      * which handles tokenizing a single-line string template.
      */
-    function forceHtmlModeToAttrContinuedState(stream, htmlState) {
+    function _forceHtmlModeToAttrContinuedState(stream, htmlState) {
       /*
        * Detect quote type by checking current token last char (use last char instead of
        * first char, because last char also works for multi-lined char value
@@ -117,7 +117,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
       }
     }
     return [
-      forceHtmlModeToAttrContinuedState,
+      _forceHtmlModeToAttrContinuedState,
       stateForAttrValue,
     ];
   })();

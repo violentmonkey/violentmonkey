@@ -53,10 +53,8 @@ export default {
       }
     };
     const onBackdropClick = () => {
-      const { onBackdropClick } = props.message;
-      if (onBackdropClick) {
-        if (onBackdropClick() !== false) dismiss();
-      }
+      const cb = props.message.onBackdropClick;
+      if (cb && cb() !== false) dismiss();
     };
     const content = computed(() => {
       const { text } = props.message;

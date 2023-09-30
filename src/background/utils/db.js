@@ -307,6 +307,7 @@ export function getScriptsByURL(url, isTop, errors) {
     ]) {
       const listName = STORAGE_ROUTES[name];
       const envCheck = name === S_CACHE ? envStart : env; // envStart cache is reused in injected
+      // eslint-disable-next-line no-shadow
       for (let url of list) {
         url = pathMap[url] || url;
         if (url) {

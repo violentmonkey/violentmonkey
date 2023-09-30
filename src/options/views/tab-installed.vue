@@ -659,7 +659,7 @@ export default {
     resetList();
     watch(showRecycle, resetList);
     watch(() => store.canRenderScripts && refList.value && draggableRaw.value,
-      state => toggleDragging(refList.value, moveScript, state));
+      dr => toggleDragging(refList.value, moveScript, dr));
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
     watch(() => filters.viewSingleColumn, adjustScriptWidth);

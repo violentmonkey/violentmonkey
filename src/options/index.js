@@ -124,7 +124,7 @@ function initMain() {
           store.needRefresh = true;
         } else {
           // Restored from the recycle bin.
-          store.removedScripts = store.removedScripts.filter(script => script.props.id !== where.id);
+          store.removedScripts = store.removedScripts.filter(rs => rs.props.id !== where.id);
         }
       }
       // Update the new list

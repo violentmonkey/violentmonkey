@@ -41,7 +41,7 @@ const callHooksLater = debounce(callHooks, DELAY);
 const writeOptionsLater = debounce(writeOptions, DELAY);
 const optProxy = new Proxy(defaults, { get: (_, key) => getOption(key) });
 export const hookOptions = hooks.hook;
-hookOptions(changes => sendCmd('UpdateOptions', changes));
+hookOptions(data => sendCmd('UpdateOptions', data));
 
 export function initOptions(data) {
   data = data[STORAGE_KEY] || {};

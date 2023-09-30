@@ -174,7 +174,7 @@ export function onRequestCreate(opts, context, fileName) {
       try { url = url::URLToString(); } // safe window.URL getter
       catch (e) {
         try { url = `${url}`; } // unsafe toString may throw e.g. for Symbol or if spoofed
-        catch (e) { err = e; }
+        catch (e2) { err = e2; }
       }
     }
     opts.url = url;
