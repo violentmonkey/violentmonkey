@@ -850,6 +850,9 @@ export default {
   line-height: 1.5;
   color: var(--fill-6);
   place-items: center;
+  & + .scripts {
+    border-top: 1px solid var(--fill-5);
+  }
 }
 
 .trash-animate {
