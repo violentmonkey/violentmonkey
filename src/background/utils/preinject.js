@@ -40,7 +40,6 @@ const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
 const NONCE_RE = /'nonce-([-+/=\w]+)'/;
 const UNSAFE_INLINE = "'unsafe-inline'";
 const __CODE = Symbol('code'); // will be stripped when messaging
-export const INJECT = 'inject';
 /** These bags are reused in cache to reduce memory usage,
  * CACHE_KEYS is for removeStaleCacheEntry */
 const BAG_NOOP = { [INJECT]: {}, [CACHE_KEYS]: [] };

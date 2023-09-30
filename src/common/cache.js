@@ -62,7 +62,7 @@ export default function initCache({
     }
   }
   function has(key) {
-    return cache[key];
+    return key in cache;
   }
   function hit(key, lifetime) {
     const entry = cache[key];

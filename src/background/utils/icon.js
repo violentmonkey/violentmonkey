@@ -1,29 +1,21 @@
 import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
 import { nest, objectPick } from '@/common/object';
-import { addOwnCommands, init } from './init';
+import { addOwnCommands, commands, init } from './init';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
-import { INJECT, reloadAndSkipScripts } from './preinject';
-import {
-  forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated,
-} from './tabs';
-import { testBlacklist } from './tester';
 import storage from './storage';
-
-addOwnCommands({
-  GetImageData: async url => (
-    url.startsWith(ICON_PREFIX)
-      ? (await getOwnIcon(url.slice(extensionOrigin.length))).uri
-      : (await storage.cache.fetch(url), makeDataUri(await storage.cache.getOne(url)))
-  ),
-});
+import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
+import { testBlacklist } from './tester';
 
 /** We don't set 19px because FF and Vivaldi scale it down to 16px instead of our own crisp 16px */
 const SIZES = [16, 32];
 /** Caching own icon to improve dashboard loading speed, as well as browserAction API
  * (e.g. Chrome wastes 40ms in our extension's process to read 4 icons for every tab). */
 const iconCache = {};
+const iconDataCache = {};
+/** @return {string | Promise<string>} */
+export const getImageData = url => iconCache[url] || (iconCache[url] = loadIcon(url));
 // Firefox Android does not support such APIs, use noop
 const browserAction = (() => {
   // Using `chrome` namespace in order to skip our browser.js polyfill in Chrome
@@ -62,6 +54,10 @@ let isApplied;
 let showBadge;
 let badgeColor;
 let badgeColorBlocked;
+
+addOwnCommands({
+  GetImageData: getImageData,
+});
 
 hookOptions((changes) => {
   let v;
@@ -124,7 +120,7 @@ init.then(async () => {
 
 contextMenus?.onClicked.addListener(({ menuItemId: id }, tab) => {
   if (id === SKIP_SCRIPTS) {
-    reloadAndSkipScripts(tab);
+    commands[SKIP_SCRIPTS](tab);
   } else if (id === TAB_SETTINGS) {
     openDashboard(id);
   } else if (id.startsWith(KEY_SHOW_BADGE)) {
@@ -215,10 +211,10 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
   const pathData = {};
   const iconData = {};
   for (const n of SIZES) {
-    const path = `${ICON_PREFIX.slice(extensionOrigin.length)}${n}${mod}.png`;
-    const icon = await getOwnIcon(path);
-    pathData[n] = path;
-    iconData[n] = icon.img;
+    const url = `${ICON_PREFIX}${n}${mod}.png`;
+    pathData[n] = url;
+    iconData[n] = iconDataCache[url]
+      || await (iconCache[url] || (iconCache[url] = loadIcon(url))) && iconDataCache[url];
   }
   // imageData doesn't work in Firefox Android, so we also set path here
   browserAction.setIcon({
@@ -239,35 +235,38 @@ export function getFailureReason(url, data) {
             : [titleDefault];
 }
 
-function getOwnIcon(path) {
-  const icon = iconCache[path] || (iconCache[path] = loadImageData(path));
-  return icon;
+async function loadIcon(url) {
+  const img = new Image();
+  const isOwn = url.startsWith(ICON_PREFIX);
+  img.src = isOwn ? url.slice(ICON_PREFIX) // must be a relative path in Firefox Android
+    : url.startsWith('data:') ? url
+      : makeDataUri(url[0] === 'i' ? url : await storage.cache.getOne(url));
+  await new Promise((resolve) => {
+    img.onload = resolve;
+    img.onerror = resolve;
+  });
+  const [uri = url, data] = loadIconData(img, !isOwn && (2 * 38)); // dashboard icon size for 2xDPI
+  if (data) iconDataCache[url] = data;
+  return (iconCache[url] = uri);
 }
 
-/**
- * @param {string} path must be a relative path in Firefox Android
- * @throws in Firefox when Canvas is disabled by something in about:config
- */
-function loadImageData(path) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.src = path;
-    img.onload = () => {
-      const { width, height } = img;
-      if (!width) { // FF reports 0 for SVG
-        resolve({ uri: path });
-        return;
-      }
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
-      resolve(iconCache[path] = {
-        uri: canvas.toDataURL(),
-        img: ctx.getImageData(0, 0, width, height),
-      });
-    };
-    img.onerror = reject;
-  });
+function loadIconData(img, maxSize) {
+  let { width, height } = img;
+  if (!width || !height) {
+    return []; // FF reports 0 for SVG
+  }
+  if (maxSize && (width > maxSize || height > maxSize)) {
+    maxSize /= width > height ? width : height;
+    width = Math.round(width * maxSize);
+    height = Math.round(height * maxSize);
+  }
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = width;
+  canvas.height = height;
+  ctx.drawImage(img, 0, 0, width, height);
+  return [
+    canvas.toDataURL(),
+    !maxSize && ctx.getImageData(0, 0, width, height),
+  ];
 }

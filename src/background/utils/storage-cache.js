@@ -44,6 +44,7 @@ export const clearStorageCache = () => {
   cache.destroy();
   dbKeys.destroy();
 };
+export const storageCacheHas = cache.has;
 
 storage.api = {
 

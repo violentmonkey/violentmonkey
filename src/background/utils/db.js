@@ -1,13 +1,14 @@
 import {
-  compareVersion, dataUri2text, i18n, getScriptHome, isDataUri, makeDataUri,
+  compareVersion, dataUri2text, i18n, getScriptHome, isDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
-  getScriptPrettyUrl, getScriptRunAt, makePause, isHttpOrHttps, noop,
+  getScriptPrettyUrl, getScriptRunAt, makePause, isHttpOrHttps,
 } from '@/common';
 import { INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import { getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta } from './script';
 import { testBlacklist, testerBatch, testScript } from './tester';
+import { getImageData } from './icon';
 import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
 import patchDB from './patch-db';
 import { getOption, initOptions, setOption } from './options';
@@ -15,6 +16,7 @@ import storage, {
   S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE,
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
 } from './storage';
+import { storageCacheHas } from './storage-cache';
 import { reloadTabForScript } from './tabs';
 
 let maxScriptId = 0;
@@ -420,19 +422,31 @@ export async function getData({ ids, sizes }) {
  * @return {Promise<{}>}
  */
 async function getIconCache(scripts) {
-  const urls = [];
-  for (const { custom, meta: { icon } } of scripts) {
+  // data uri for own icon to load it instantly in Chrome when there are many images
+  const toGet = [`${ICON_PREFIX}38.png`];
+  const toPrime = [];
+  const toResolve = [];
+  const res = {};
+  for (let { custom, meta: { icon } } of scripts) {
     if (isHttpOrHttps(icon)) {
-      urls.push(custom.pathMap[icon] || icon);
+      icon = custom.pathMap[icon] || icon;
+      toGet.push(icon);
+      if (!storageCacheHas(S_CACHE_PRE + icon)) toPrime.push(icon);
     }
   }
-  // Getting a data uri for own icon to load it instantly in Chrome when there are many images
-  const ownPath = `${ICON_PREFIX}38.png`;
-  const [res, ownUri] = await Promise.all([
-    storage[S_CACHE].getMulti(urls, makeDataUri),
-    commands.GetImageData(ownPath).catch(noop),
-  ]);
-  if (ownUri) res[ownPath] = ownUri;
+  if (toPrime.length) {
+    await storage[S_CACHE].getMulti(toPrime);
+  }
+  for (const url of toGet) {
+    const d = getImageData(url);
+    if (isObject(d)) toResolve.push(d);
+    else { res[url] = d; toResolve.push(0); }
+  }
+  if (toResolve.some(Boolean)) {
+    (await Promise.all(toResolve)).forEach((dataUri, i) => {
+      if (dataUri) res[toGet[i]] = dataUri;
+    });
+  }
   return res;
 }
 

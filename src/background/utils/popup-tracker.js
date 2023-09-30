@@ -3,7 +3,6 @@ import cache from './cache';
 import { getData } from './db';
 import { badges, getFailureReason } from './icon';
 import { addPublicCommands, commands } from './init';
-import { INJECT } from './preinject';
 
 /** @type {{[tabId: string]: chrome.runtime.Port}} */
 export const popupTabs = {};
