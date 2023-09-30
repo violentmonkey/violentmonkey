@@ -504,10 +504,12 @@ $removedItemHeight: calc(
       }
     }
     .script {
-      /* Stretching the info instead of name to avoid the space to its right from
-         opening the editor when clicked. Instead we allow it to be clicked and dragged
-         to select the name, e.g. to copy it, as easily as in the card view. */
-      grid-template-columns: auto auto $iconSize auto 1fr auto auto;
+      grid-template-columns:
+        auto /* main icons */
+        auto /* trash icon */
+        $iconSize /* script icon */
+        1fr /* name */
+        auto /* info */;
       align-items: center;
       height: 2.5rem;
       width: var(--w);
