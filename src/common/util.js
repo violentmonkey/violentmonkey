@@ -1,32 +1,21 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser, NO_CACHE } from '@/common/consts';
+import { NO_CACHE } from '@/common/consts';
 
-export function i18n(name, args) {
-  return browser.i18n.getMessage(name, args) || name;
-}
+export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
 
-export function toString(param) {
-  if (param == null) return '';
-  return `${param}`;
-}
-
-export function memoize(func, resolver = toString) {
-  const cacheMap = {};
+export function memoize(func) {
+  const cacheMap = Object.create(null);
   function memoized(...args) {
-    // Used in safe context
-    // eslint-disable-next-line no-restricted-syntax
-    const key = resolver(...args);
-    let cache = cacheMap[key];
-    if (!cache) {
-      cache = {
-        value: func.apply(this, args),
-      };
-      cacheMap[key] = cache;
-    }
-    return cache.value;
+    const key = args.length === 1 ? `${args[0]}` : JSON.stringify(args);
+    const res = cacheMap[key];
+    return res !== undefined || hasOwnProperty(cacheMap, key)
+      ? res
+      : (cacheMap[key] = safeApply(func, this, args));
   }
-  return memoized;
+  return process.env.DEV
+    ? Object.defineProperty(memoized, 'name', { value: func.name + ':memoized' })
+    : memoized;
 }
 
 export function debounce(func, time) {
