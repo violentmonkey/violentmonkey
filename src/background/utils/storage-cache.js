@@ -57,10 +57,12 @@ storage.api = {
       return !ok && dbKeys.get(key) !== 0;
     });
     if (!keys || keys.length) {
+      let lifetime;
+      if (!keys) lifetime = TTL_SKIM; // DANGER! Must be `undefined` otherwise.
       (await apiCall(GET, keys))::forEachEntry(([key, val]) => {
         res[key] = val;
         dbKeys.put(key, 1);
-        cache.put(key, deepCopy(val), !keys && TTL_SKIM);
+        cache.put(key, deepCopy(val), lifetime);
         updateScriptMap(key, val);
       });
       keys?.forEach(key => dbKeys.put(key, +hasOwnProperty(res, key)));
