@@ -34,7 +34,7 @@ Object.defineProperties(ua, {
         arch,
         os,
         browserBrand: brands?.map(({ brand: b }) => (
-          b === 'Not)A;Brand' ? '4' :
+          /Not[^a-z]*A[^a-z]*Brand/i.test(b) ? '4' :
             b === 'Chromium' ? '3' + b :
               b === 'Google Chrome' ? '2' + b :
                 '1' + b
