@@ -13,9 +13,11 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: 确认安装
+  touched: false
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
   message: 确认重新安装
+  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: 禁用
@@ -169,9 +171,6 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: 数据
-editReadonly:
-  description: Text of the warning when opening an auto-updated script in the editor.
-  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: 全部
@@ -243,15 +242,16 @@ hintUseDownloadURL:
 hintVacuum:
   description: Hint for vacuuming data.
   message: 丢弃多余的数据，并尝试重新获取缺失的资源。
+install:
+  description: Label for button to install a script.
+  message: ''
 installFrom:
   description: Label for button to install script from a userscript site.
   message: 从$1安装
 installOptionClose:
   description: Option to close confirm window after installation.
   message: 安装完成后关闭
-installOptionTrack:
-  description: Option to track the loading local file until page is closed.
-  message: 本窗口保留的情况下自动同步本地文件的更新
+  touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -793,9 +793,27 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: 更新
+readonly:
+  description: Text in the editor's header for non-editable scripts.
+  message: ''
+readonlyNote:
+  description: Warning when trying to type in the editor.
+  message: ''
+readonlyOpt:
+  description: Option label in the editor, displayed along with readonlyOptWarn.
+  message: ''
+readonlyOptWarn:
+  description: Text next to readonlyOpt label in the editor.
+  message: ''
+reinstall:
+  description: Button to reinstall a script
+  message: ''
 reloadTab:
   description: Label of action to reload the tab
   message: 刷新标签页
+reloadTabTrackHint:
+  description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
+  message: 如果勾选，则在检测到脚本更新且匹配当前标签页的 URL 时，将自动刷新当前标签页。
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 区分大小写
@@ -817,6 +835,9 @@ skipScripts:
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: 你已在当前页面禁用用户脚本，刷新或跳转页面后将会重新启用。
+stopTracking:
+  description: Button in a script installation dialog when actually tracking local file.
+  message: ''
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: 正常情况下的徽标颜色
@@ -828,6 +849,12 @@ titleSearchHint:
   message: |-
     * <Enter> 键把文本加入自动补全历史
     * 支持正则表达式：/re/ 和 /re/flags
+trackEdits:
+  description: Button in a script installation dialog.
+  message: ''
+trackEditsNote:
+  description: Text shown in installer when starting to track a local file.
+  message: ''
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in

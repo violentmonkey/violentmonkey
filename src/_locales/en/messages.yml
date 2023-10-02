@@ -13,9 +13,11 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Confirm installation
+  touched: false
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
   message: Confirm re-installation
+  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: Disable
@@ -254,6 +256,7 @@ installFrom:
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Close after installation
+  touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -814,7 +817,9 @@ readonly:
   message: Read-only
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: Auto-updated script is read-only unless you disable updates or allow editing.
+  message: >-
+    Auto-updated script is read-only unless you disable updates or allow
+    editing.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
   message: Allow edits
@@ -830,8 +835,8 @@ reloadTab:
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: >-
-    If enabled, the active tab will be reloaded when changes are detected
-    and this script matches the tab's URL.
+    If enabled, the active tab will be reloaded when changes are detected and
+    this script matches the tab's URL.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Case sensitive
