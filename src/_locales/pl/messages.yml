@@ -13,9 +13,11 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Potwierdź instalację
+  touched: false
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
   message: Potwierdź ponowną instalację
+  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: Wyłącz
@@ -177,9 +179,6 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Wartości
-editReadonly:
-  description: Text of the warning when opening an auto-updated script in the editor.
-  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Wszystko
@@ -257,15 +256,16 @@ hintVacuum:
   message: >-
     Usuń nadmiarowość i spróbuj przeładować brakujące zasoby w pamięci
     podręcznej.
+install:
+  description: Label for button to install a script.
+  message: ''
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Zainstaluj z $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Zamknij po zakończeniu instalacji
-installOptionTrack:
-  description: Option to track the loading local file until page is closed.
-  message: Śledź plik lokalny przed zamknięciem tego okna
+  touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -826,8 +826,26 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Aktualizacja
+readonly:
+  description: Text in the editor's header for non-editable scripts.
+  message: ''
+readonlyNote:
+  description: Warning when trying to type in the editor.
+  message: ''
+readonlyOpt:
+  description: Option label in the editor, displayed along with readonlyOptWarn.
+  message: ''
+readonlyOptWarn:
+  description: Text next to readonlyOpt label in the editor.
+  message: ''
+reinstall:
+  description: Button to reinstall a script
+  message: ''
 reloadTab:
   description: Label of action to reload the tab
+  message: ''
+reloadTabTrackHint:
+  description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
@@ -850,6 +868,9 @@ skipScripts:
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: ''
+stopTracking:
+  description: Button in a script installation dialog when actually tracking local file.
+  message: ''
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Kolor normalnej odznaki
@@ -863,6 +884,12 @@ titleSearchHint:
   message: |-
     * Klawisz <Enter> dodaje tekst do historii auto-uzupełnienia
     * Obsługiwana jest składnia RegExp: /re/ i /re/flags
+trackEdits:
+  description: Button in a script installation dialog.
+  message: ''
+trackEditsNote:
+  description: Text shown in installer when starting to track a local file.
+  message: ''
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in

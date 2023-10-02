@@ -13,9 +13,11 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Telepítés megerősítése
+  touched: false
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
   message: Újratelepítés megerősítése
+  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: Kikapcsol
@@ -89,7 +91,7 @@ buttonSaveClose:
   message: Mentés & Bezárás
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Elmentve
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Szerkesztő állapotának mutatása
@@ -123,7 +125,7 @@ confirmManualUpdate:
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: >-
-    Szerkesztések nincsenek mentve!
+    A módosítások nincsenek mentve!
 
     Kattints az "Oké"-ra, hogy elvesd őket, vagy a "Mégse"-re, ha maradni akarsz
     a szerkesztőben.
@@ -182,11 +184,6 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Értékek
-editReadonly:
-  description: Text of the warning when opening an auto-updated script in the editor.
-  message: >-
-    A szerkesztéshez tiltsd le a frissítéseket a Beállítások fülön és nyomj a
-    "Mentés"-re.
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: ''
@@ -260,15 +257,16 @@ hintUseDownloadURL:
 hintVacuum:
   description: Hint for vacuuming data.
   message: Redundanciák elhagyása és a gyorsítótárból hiányzó erőforrások újratöltése.
+install:
+  description: Label for button to install a script.
+  message: Telepítés
 installFrom:
   description: Label for button to install script from a userscript site.
   message: 'Telepítés innen: $1'
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Bezárás telepítés után
-installOptionTrack:
-  description: Option to track the loading local file until page is closed.
-  message: Módosítások követése a helyi fájlban, amíg ez a lap nyitva van
+  touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -567,8 +565,7 @@ labelXhrInjectHint:
     figyelmeztetéseket jobb gombbal rájuk kattintva.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: |
-    (kivéve inkognitóban és oldalakon, ahol le vannak tiltva a sütik)
+  message: (kivéve inkognitóban és oldalakon, ahol le vannak tiltva a sütik)
 lastSync:
   description: Label for last sync timestamp.
   message: 'Utoljára szinkronizálva: $1'
@@ -839,9 +836,31 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Frissítés
+readonly:
+  description: Text in the editor's header for non-editable scripts.
+  message: Csak olvasható
+readonlyNote:
+  description: Warning when trying to type in the editor.
+  message: >-
+    Az automatikusan frissülő szkriptek csak olvashatóak, hacsak nem tiltod a
+    frissítéseket, vagy engedélyezed a szerkesztést.
+readonlyOpt:
+  description: Option label in the editor, displayed along with readonlyOptWarn.
+  message: Szerkesztés engedélyezése
+readonlyOptWarn:
+  description: Text next to readonlyOpt label in the editor.
+  message: (a következő frissítés felül fogja írni)
+reinstall:
+  description: Button to reinstall a script
+  message: Újratelepítés
 reloadTab:
   description: Label of action to reload the tab
   message: Lap frissítése
+reloadTabTrackHint:
+  description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
+  message: >-
+    Ha engedélyezve van, akkor az aktív lap frissülni fog változások
+    észlelésekor, hogyha az URL-e összeillik a szkripttel.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Kis- és nagybetűk megkülönböztetése
@@ -865,6 +884,9 @@ skipScriptsMsg:
   message: >-
     A userscript-ek le lettek tiltva ezen az oldalon. Hogy futtasd őket
     frissítsd az oldalt, vagy navigálj egy másikra.
+stopTracking:
+  description: Button in a script installation dialog when actually tracking local file.
+  message: Nyomon követés leállítása
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normál jelvény szín
@@ -880,6 +902,12 @@ titleSearchHint:
     történethez
 
     * RegExp szintaxis támogatott: /re/ és /re/flags
+trackEdits:
+  description: Button in a script installation dialog.
+  message: Külső módosítások nyomon követése
+trackEditsNote:
+  description: Text shown in installer when starting to track a local file.
+  message: Tartsd nyitva ezt az oldalt a helyi fájl módosításainak követéséhez
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in

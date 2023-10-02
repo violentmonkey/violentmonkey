@@ -13,9 +13,11 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Potvrdiť inštaláciu
+  touched: false
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
   message: Potvrdiť preinštalovanie
+  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: Zakázať
@@ -89,7 +91,7 @@ buttonSaveClose:
   message: Uložiť & Zavrieť
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Uložené
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Zobraziť stav editora
@@ -177,11 +179,6 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Hodnoty
-editReadonly:
-  description: Text of the warning when opening an auto-updated script in the editor.
-  message: >-
-    Ak chcete povoliť úpravy, zakážte aktualizácie na karte Nastavenia a
-    kliknite na "Uložiť".
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Všetko
@@ -259,15 +256,16 @@ hintVacuum:
   message: >-
     Zruší redundanciu a skúsi znova načítať chýbajúce zdroje do vyrovnávacej
     pamäte.
+install:
+  description: Label for button to install a script.
+  message: Inštalovať
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Inštalovať z $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Zavrieť po nainštalovaní
-installOptionTrack:
-  description: Option to track the loading local file until page is closed.
-  message: Sledovať zmeny v lokálnom súbore, keď je táto stránka otvorená
+  touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -822,9 +820,31 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Aktualizácia
+readonly:
+  description: Text in the editor's header for non-editable scripts.
+  message: Iba na čítanie
+readonlyNote:
+  description: Warning when trying to type in the editor.
+  message: >-
+    Automaticky aktualizovaný skript je určený len na čítanie, pokiaľ nezakážete
+    aktualizácie alebo nepovolíte úpravy.
+readonlyOpt:
+  description: Option label in the editor, displayed along with readonlyOptWarn.
+  message: Povoliť úpravy
+readonlyOptWarn:
+  description: Text next to readonlyOpt label in the editor.
+  message: (ďalšia aktualizácia ich prepíše)
+reinstall:
+  description: Button to reinstall a script
+  message: Preinštalovať
 reloadTab:
   description: Label of action to reload the tab
   message: Znova načítať kartu
+reloadTabTrackHint:
+  description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
+  message: >-
+    Ak je povolené, aktívna karta sa znovu načíta, keď sa zistia zmeny a tento
+    skript sa zhoduje s adresou URL karty.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Rozlišovať veľké a malé písmená
@@ -848,6 +868,9 @@ skipScriptsMsg:
   message: >-
     Zakázali ste používateľské skripty pre túto stránku. Ak ich chcete znovu
     spustiť, znovu načítajte alebo prejdite na kartu.
+stopTracking:
+  description: Button in a script installation dialog when actually tracking local file.
+  message: Zastaviť sledovanie
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normálna farba odznaku
@@ -861,6 +884,14 @@ titleSearchHint:
   message: |-
     * kláves <Enter> pridá text do histórie automatického dopĺňania
     * je podporovaná syntax RegExp: /re/ a /re/flags
+trackEdits:
+  description: Button in a script installation dialog.
+  message: Sledovať externé úpravy
+trackEditsNote:
+  description: Text shown in installer when starting to track a local file.
+  message: >-
+    Nechajte túto stránku otvorenú, aby ste mohli sledovať svoje úpravy v
+    lokálnom súbore
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in

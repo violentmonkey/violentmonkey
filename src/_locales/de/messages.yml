@@ -13,9 +13,11 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Installation bestätigen
+  touched: false
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
   message: Re-Installation bestätigen
+  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: Deaktivieren
@@ -87,7 +89,7 @@ buttonSaveClose:
   message: Speichern & Schließen
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Gespeichert
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Editorstatus anzeigen
@@ -116,7 +118,7 @@ buttonVacuuming:
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
   message: |-
-    Auto-Update ist für dieses Skript deaktiviert!
+    Automatische Aktualisierung ist für dieses Skript deaktiviert!
     OK klicken, um es dennoch zu aktualisieren.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
@@ -178,11 +180,6 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Werte
-editReadonly:
-  description: Text of the warning when opening an auto-updated script in the editor.
-  message: >-
-    Um das Bearbeiten zu ermöglichen, deaktivieren Sie Aktualisierungen im
-    Einstellungen-Tab und klicken Sie "Speichern".
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Alles
@@ -258,15 +255,16 @@ hintVacuum:
   message: >-
     Die Redundanz verwerfen und versuchen, die fehlenden Ressourcen neu in den
     Cache zu laden.
+install:
+  description: Label for button to install a script.
+  message: Installieren
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Installiere aus $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Nach der Installation schließen
-installOptionTrack:
-  description: Option to track the loading local file until page is closed.
-  message: Editierungen in lokaler Datei tracken, solange diese Seite geöffnet ist
+  touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -833,9 +831,31 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Aktualisierung
+readonly:
+  description: Text in the editor's header for non-editable scripts.
+  message: Schreibgeschützt
+readonlyNote:
+  description: Warning when trying to type in the editor.
+  message: >-
+    Skript mit automatischen Aktualisierungen ist schreibgeschützt, außer Sie
+    deaktivieren diese oder erlauben das Bearbeiten.
+readonlyOpt:
+  description: Option label in the editor, displayed along with readonlyOptWarn.
+  message: Bearbeitungen erlauben
+readonlyOptWarn:
+  description: Text next to readonlyOpt label in the editor.
+  message: (nächstes Update wird sie überschreiben)
+reinstall:
+  description: Button to reinstall a script
+  message: Reinstallieren
 reloadTab:
   description: Label of action to reload the tab
   message: Tab neu laden
+reloadTabTrackHint:
+  description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
+  message: >-
+    Falls aktiviert, wird der aktive Tab bei erkannten Veränderungen neu
+    geladen, wenn dieses Skript mit der Tab-URL übereinstimmt.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Groß- und Kleinschreibung beachtend
@@ -859,6 +879,9 @@ skipScriptsMsg:
   message: >-
     Sie haben Benutzerskripte auf dieser Seite deaktiviert. Um sie auszuführen,
     laden Sie den Tab neu oder navigieren Sie in ihm.
+stopTracking:
+  description: Button in a script installation dialog when actually tracking local file.
+  message: Tracking stoppen
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normale Badge-Farbe
@@ -872,6 +895,14 @@ titleSearchHint:
   message: |-
     * <Enter>-Taste fügt den Text zum Autovervollständigungs-Verlauf hinzu
     * RegExp-Syntax wird unterstützt: /re/ und /re/flags
+trackEdits:
+  description: Button in a script installation dialog.
+  message: Externe Bearbeitungen tracken
+trackEditsNote:
+  description: Text shown in installer when starting to track a local file.
+  message: >-
+    Lassen Sie diese Seite geöffnet, um Ihre Bearbeitungen der lokalen Datei zu
+    tracken
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in

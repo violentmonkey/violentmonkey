@@ -13,9 +13,11 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Confirmă instalarea
+  touched: false
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
   message: Confirmă reinstalarea
+  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: Dezactivează
@@ -178,9 +180,6 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Valori
-editReadonly:
-  description: Text of the warning when opening an auto-updated script in the editor.
-  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Toate
@@ -256,15 +255,16 @@ hintVacuum:
   message: >-
     Înlătură datele redundante și încearcă să reîncarce resursele lipsă din
     cache.
+install:
+  description: Label for button to install a script.
+  message: ''
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Instalează de pe $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Închide după instalare
-installOptionTrack:
-  description: Option to track the loading local file until page is closed.
-  message: Urmărește fișierul local înainte de închiderea acestei ferestre
+  touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -831,8 +831,26 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Actualizare
+readonly:
+  description: Text in the editor's header for non-editable scripts.
+  message: ''
+readonlyNote:
+  description: Warning when trying to type in the editor.
+  message: ''
+readonlyOpt:
+  description: Option label in the editor, displayed along with readonlyOptWarn.
+  message: ''
+readonlyOptWarn:
+  description: Text next to readonlyOpt label in the editor.
+  message: ''
+reinstall:
+  description: Button to reinstall a script
+  message: ''
 reloadTab:
   description: Label of action to reload the tab
+  message: ''
+reloadTabTrackHint:
+  description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
@@ -855,6 +873,9 @@ skipScripts:
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: ''
+stopTracking:
+  description: Button in a script installation dialog when actually tracking local file.
+  message: ''
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Culoare normală a insignei
@@ -868,6 +889,12 @@ titleSearchHint:
   message: |-
     * Tasta <Enter> adaugă textul în istoricul completării automate
     * Sintaxa RegExp este suportată: /re/ și /re/flags
+trackEdits:
+  description: Button in a script installation dialog.
+  message: ''
+trackEditsNote:
+  description: Text shown in installer when starting to track a local file.
+  message: ''
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in

@@ -13,9 +13,11 @@ buttonClose:
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: Installatie bevestigen
+  touched: false
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
   message: Herinstallatie bevestigen
+  touched: false
 buttonDisable:
   description: Button to disable a script.
   message: Uitschakelen
@@ -87,7 +89,7 @@ buttonSaveClose:
   message: Opslaan en sluiten
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Opgeslagen
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Bewerkstatus tonen
@@ -177,11 +179,6 @@ editNavSettings:
 editNavValues:
   description: Label of values tab in script editor.
   message: Waarden
-editReadonly:
-  description: Text of the warning when opening an auto-updated script in the editor.
-  message: >-
-    Bewerken kan worden ingeschakeld door updates in de instellingen uit te
-    schakelen en op opslaan te klikken.
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: Alles
@@ -255,15 +252,16 @@ hintUseDownloadURL:
 hintVacuum:
   description: Hint for vacuuming data.
   message: Wis de overbodige gegevens en probeer de ontbrekende bronnen te herladen.
+install:
+  description: Label for button to install a script.
+  message: Installeren
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Installeren van $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: Sluiten na installatie
-installOptionTrack:
-  description: Option to track the loading local file until page is closed.
-  message: Bewerkingen in lokaal bestand bĳhouden zolang pagina geopend is
+  touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
@@ -819,9 +817,31 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Bijwerken
+readonly:
+  description: Text in the editor's header for non-editable scripts.
+  message: Alleen-lezen
+readonlyNote:
+  description: Warning when trying to type in the editor.
+  message: >-
+    Het automatisch bijgewerkte script is alleen-lezen, tenzij je updates
+    uitschakelt of bewerken toestaat.
+readonlyOpt:
+  description: Option label in the editor, displayed along with readonlyOptWarn.
+  message: Bewerken toestaan
+readonlyOptWarn:
+  description: Text next to readonlyOpt label in the editor.
+  message: (de volgende update overschrijft ze)
+reinstall:
+  description: Button to reinstall a script
+  message: Opnieuw installeren
 reloadTab:
   description: Label of action to reload the tab
   message: Tabblad herladen
+reloadTabTrackHint:
+  description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
+  message: >-
+    Schakel in om het actieve tabblad te herladen als er wijzigingen zijn
+    aangetroffen en het script overeenkomt met de url.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Hoofdlettergevoelig
@@ -845,6 +865,9 @@ skipScriptsMsg:
   message: >-
     Je hebt gebruikersscripts uitgeschakeld op deze pagina. Schakel ze in door
     te herladen of een link aan te klikken.
+stopTracking:
+  description: Button in a script installation dialog when actually tracking local file.
+  message: Bijhouden stoppen
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normale embleemkleur
@@ -858,6 +881,12 @@ titleSearchHint:
   message: |-
     * Druk op <Enter> om de tekst toe te voegen aan de auto-aanvulgeschiedenis
     * Ondersteunt reguliere uitdrukkingen: /re/ en /re/flags
+trackEdits:
+  description: Button in a script installation dialog.
+  message: Externe bewerkingen bijhouden
+trackEditsNote:
+  description: Text shown in installer when starting to track a local file.
+  message: Houd deze pagina geopend om bewerkingen in het lokale bestand bij te houden
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
