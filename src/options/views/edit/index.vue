@@ -478,15 +478,16 @@ function setupSavePosition({ id: curWndId, tabs }) {
   }
 }
 
+.touch .edit {
+  // fixed/absolute doesn't work well with scroll in Firefox Android
+  position: static;
+  // larger than 100vh to force overflow so that the toolbar can be hidden in Firefox Android
+  min-height: calc(100vh + 1px);
+}
+
 @media (max-width: 767px) {
   .edit-hint {
     display: none;
-  }
-  .edit {
-    // fixed/absolute doesn't work well with scroll in Firefox Android
-    position: static;
-    // larger than 100vh to force overflow so that the toolbar can be hidden in Firefox Android
-    min-height: calc(100vh + 1px);
   }
 }
 
