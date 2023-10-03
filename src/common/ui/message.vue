@@ -4,10 +4,9 @@
       <p v-text="content.title"></p>
       <p v-text="content.desc" v-if="content.desc"></p>
     </div>
-    <form v-if="message.buttons" @submit.prevent>
+    <form v-if="message.buttons" @submit.prevent ref="refForm">
       <!-- eslint-disable vue/no-mutating-props -->
       <input
-        ref="refInput"
         class="mb-1"
         type="text"
         v-if="message.input !== false"
@@ -33,7 +32,8 @@ import { computed, nextTick, onMounted, ref } from 'vue';
 const dismissers = [];
 
 addEventListener('keydown', (e) => {
-  if (e.keyCode === 27 && dismissers.length) {
+  if (e.key === 'Escape' && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey
+      && dismissers.length) {
     e.stopImmediatePropagation();
     dismissers.pop()();
   }
@@ -42,8 +42,9 @@ addEventListener('keydown', (e) => {
 export default {
   props: ['message'],
   setup(props, context) {
-    const refInput = ref();
+    const refForm = ref();
     const dismiss = () => {
+      dismissers.length = 0;
       context.emit('dismiss');
     };
     const onButtonClick = button => {
@@ -66,11 +67,8 @@ export default {
     });
 
     onMounted(() => {
-      if (refInput.value) {
-        nextTick(() => {
-          refInput.value.focus();
-        });
-      }
+      const el = refForm.value.querySelector('input, button');
+      if (el) nextTick(() => el.focus());
       dismissers.push(dismiss);
       return () => {
         const i = dismissers.indexOf(dismiss);
@@ -79,7 +77,7 @@ export default {
     });
 
     return {
-      refInput,
+      refForm,
       content,
       onButtonClick,
       onBackdropClick,

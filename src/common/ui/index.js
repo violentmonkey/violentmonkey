@@ -55,10 +55,7 @@ export function showMessage(message) {
   }), {
     transition: 'in-out',
   });
-  if (message.buttons) {
-    // TODO: implement proper keyboard navigation, autofocus, and Enter/Esc in Modal module
-    document.querySelector('.vl-modal button').focus();
-  } else {
+  if (!message.buttons) {
     const timer = setInterval(() => {
       if (!document.querySelector('.vl-modal .modal-content:hover')) {
         clearInterval(timer);
