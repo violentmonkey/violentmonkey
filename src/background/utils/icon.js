@@ -238,7 +238,7 @@ export function getFailureReason(url, data) {
 async function loadIcon(url) {
   const img = new Image();
   const isOwn = url.startsWith(ICON_PREFIX);
-  img.src = isOwn ? url.slice(ICON_PREFIX) // must be a relative path in Firefox Android
+  img.src = isOwn ? url.slice(extensionOrigin.length) // must be a relative path in Firefox Android
     : url.startsWith('data:') ? url
       : makeDataUri(url[0] === 'i' ? url : await storage.cache.getOne(url));
   await new Promise((resolve) => {
