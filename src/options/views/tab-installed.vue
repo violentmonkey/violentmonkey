@@ -157,7 +157,7 @@ import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
-import { findStyleSheetRules } from '@/common/ui/style';
+import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
 import { store } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
@@ -248,7 +248,7 @@ const state = reactive({
   filteredScripts: [],
   script: null,
   code: '',
-  numColumns: 0,
+  numColumns: 1,
   batchRender: {
     limit: step,
   },
@@ -465,7 +465,7 @@ function adjustNarrowWidth(val) {
   if (narrowMediaRules) {
     for (const r of narrowMediaRules) {
       const orig = r._orig;
-      r.media.mediaText = val ? orig.replace(/\d+/, s => +s + 90) : orig;
+      r.media.mediaText = val ? orig.replace(/\d+/g, s => +s + 90 / devicePixelRatio) : orig;
     }
   }
 }
@@ -666,8 +666,10 @@ export default {
       dr => toggleDragging(refList.value, moveScript, dr));
     watch(() => state.search, scheduleSearch);
     watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
-    watch(() => filters.viewSingleColumn, adjustScriptWidth);
-    watch(() => filters.viewTable, adjustNarrowWidth);
+    if (screen.availWidth > 767) {
+      watch(() => filters.viewSingleColumn, adjustScriptWidth);
+      watch(() => filters.viewTable, adjustNarrowWidth);
+    }
     watch(getCurrentList, refreshUI);
     watch(() => store.route.paths[1], onHashChange);
     watch(selectedScript, script => {
@@ -684,9 +686,20 @@ export default {
       if (!store.loading) refreshUI();
       // Extract --columns-cards and --columns-table from `:root` or `html` selector. CustomCSS may override it.
       if (!columnsForCardsMode.length) {
-        const style = getComputedStyle(document.documentElement);
-        [columnsForCardsMode, columnsForTableMode] = ['cards', 'table']
-          .map(type => style.getPropertyValue(`--columns-${type}`)?.split(',').map(Number).filter(Boolean) || []);
+        const style = customCssElem?.textContent.match(/--columns-(cards|table)\b/)
+          && getComputedStyle(document.documentElement);
+        if (style) {
+          for (const [type, arr] of [
+            ['cards', columnsForCardsMode],
+            ['table', columnsForTableMode],
+          ]) {
+            const val = style.getPropertyValue(`--columns-${type}`);
+            if (val) arr.push(...val.split(',').map(Number).filter(Boolean));
+          }
+        } else {
+          columnsForCardsMode.push(1300, 1900, 2500); // 1366x768, 1920x1080, 2560x1440
+          columnsForTableMode.push(1600, 2500, 3400); // 1680x1050, 2560x1440, 3440x1440
+        }
         addEventListener('resize', adjustScriptWidth);
       }
       adjustScriptWidth();
@@ -730,10 +743,6 @@ export default {
 </script>
 
 <style>
-:root {
-  --columns-cards: 1300, 1900, 2500; // 1366x768, 1920x1080, 2560x1440
-  --columns-table: 1600, 2500, 3400; // 1680x1050, 2560x1440, 3440x1440
-}
 .tab.tab-installed {
   height: 100vh;
   padding: 0;

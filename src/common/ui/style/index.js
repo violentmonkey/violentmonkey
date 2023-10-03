@@ -2,7 +2,7 @@ import { isTouch } from '..';
 import options from '../../options';
 import './style.css';
 
-let style;
+export let customCssElem;
 let styleTheme;
 /** @type {CSSMediaRule[]} */
 let darkMediaRules;
@@ -51,7 +51,7 @@ const setUiTheme = theme => {
   darkMediaRules.forEach(rule => { rule.media.mediaText = mediaText; });
 };
 
-style = setStyle(localStorage[CACHE_KEY] || '');
+customCssElem = setStyle(localStorage[CACHE_KEY] || '');
 
 options.hook((changes) => {
   let v;
@@ -63,7 +63,7 @@ options.hook((changes) => {
     setUiTheme(v);
   }
   if ((v = changes.customCSS) != null) {
-    style = setStyle(v, style);
+    customCssElem = setStyle(v, customCssElem);
     if (v && localStorage[CACHE_KEY] !== v) {
       localStorage[CACHE_KEY] = v;
     } else if (!v && CACHE_KEY in localStorage) {
