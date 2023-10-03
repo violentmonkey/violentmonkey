@@ -29,23 +29,17 @@ const replaceWithFullWidthForm = s => String.fromCharCode(s.charCodeAt(0) - 0x20
 const PORT_ERROR_RE = /(Receiving end does not exist)|The message port closed before|$/;
 
 export function initHooks() {
-  const hooks = [];
-
-  function fire(data) {
-    hooks.slice().forEach((cb) => {
-      cb(data);
-    });
-  }
-
-  function hook(callback) {
-    hooks.push(callback);
-    return () => {
-      const i = hooks.indexOf(callback);
-      if (i >= 0) hooks.splice(i, 1);
-    };
-  }
-
-  return { hook, fire };
+  const hooks = new Set();
+  return {
+    hook(cb) {
+      hooks.add(cb);
+      return () => hooks.delete(cb);
+    },
+    fire(...data) {
+      // Set#forEach correctly iterates the remainder even if current callback unhooks itself
+      hooks.forEach(cb => cb(...data));
+    },
+  };
 }
 
 /**
