@@ -31,8 +31,7 @@ async function init() {
       ? await getDataFF(dataPromise)
       : await dataPromise
   );
-  const matchingIds = data[IDS];
-  assign(matchingIds, matchingIds);
+  assign(ids, data[IDS]);
   if (IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);
   }
@@ -44,7 +43,7 @@ async function init() {
     addHandlers({ GetScriptVer: true });
     bridge.post('Expose', data[EXPOSE]);
   }
-  if (matchingIds?.length) {
+  if (objectKeys(ids).length) {
     onScripts.forEach(fn => fn(data));
     await injectScripts(data, isXml);
   }
