@@ -16,10 +16,13 @@ const addHandlersImpl = (dest, src, force) => {
  * Without `force` handlers will be added only when userscripts are about to be injected.
  * { CommandName: true } will relay the request via sendCmd as is.
  * { CommandName: REIFY } same as `true` but waits until reified when pre-rendered.
+ * @callback AddHandlers
  * @param {Object.<string, MessageFromGuestHandler>} obj
  * @param {boolean} [force]
  */
+/** @type {AddHandlers} */
 export const addHandlers = addHandlersImpl.bind({}, handlers);
+/** @type {AddHandlers} */
 export const addBackgroundHandlers = addHandlersImpl.bind({}, bgHandlers);
 
 /**
