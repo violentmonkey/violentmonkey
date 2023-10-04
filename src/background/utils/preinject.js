@@ -23,6 +23,7 @@ let isApplied;
 let injectInto;
 let ffInject;
 let xhrInject = false; // must be initialized for proper comparison when toggling
+let vivaldiChecked = IS_FIREFOX;
 
 const sessionId = getUniqId();
 const API_HEADERS_RECEIVED = browser.webRequest.onHeadersReceived;
@@ -144,6 +145,7 @@ addPublicCommands({
     const frameDoc = getFrameDocId(isTop, src[kDocumentId], frameId);
     const tabId = tab.id;
     if (!url) url = src.url || tab.url;
+    if (!vivaldiChecked) checkVivaldi(tab);
     clearFrameData(tabId, frameDoc);
     let skip = skippedTabs[tabId];
     if (skip > 0) { // first time loading the tab after skipScripts was invoked
@@ -626,4 +628,11 @@ function clearFrameData(tabId, frameId) {
   clearRequestsByTabId(tabId, frameId);
   clearValueOpener(tabId, frameId);
   clearNotifications(tabId, frameId);
+}
+
+function checkVivaldi(tab) {
+  vivaldiChecked = true;
+  if (tab.vivExtData/*new*/ || tab.extData/*old*/) {
+    ua.brand = ua.browserBrand = 'Vivaldi';
+  }
 }
