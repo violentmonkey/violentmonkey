@@ -130,7 +130,6 @@ const codeDirty = ref(false);
 const commands = {
   save,
   close,
-  showHelp: () => { nav.value = 'help'; },
 };
 const hotkeys = ref();
 const errors = ref();
@@ -159,7 +158,7 @@ const scriptName = computed(() => (store.title = getScriptName(script.value)));
 watch(nav, val => {
   keyboardService.setContext('tabCode', val === 'code');
   if (val === 'code') nextTick(() => CM.focus());
-});
+}, { immediate: true });
 watch(canSave, val => {
   toggleUnloadSentry(val);
   keyboardService.setContext('canSave', val);
@@ -249,6 +248,7 @@ onActivated(() => {
     keyboardService.register('escape', () => { nav.value = 'code'; }, {
       condition: '!tabCode',
     }),
+    keyboardService.register('f1', () => { nav.value = 'help'; }),
   ];
   store.title = scriptName.value;
 });

@@ -86,6 +86,7 @@
           :readOnly="readOnly"
           @code-dirty="onChange"
           :commands="{ close: onCancel, save: onSave }"
+          :active="isActive"
         />
       </label>
     </div>
@@ -112,6 +113,7 @@ const $el = ref();
 const $editAll = ref();
 const $key = ref();
 const $value = ref();
+const isActive = ref();
 const current = ref();
 const loading = ref(true);
 const page = ref();
@@ -176,9 +178,11 @@ onActivated(() => {
     }),
   });
   if (!bg) storageSentry.onMessage.addListener(onStorageChanged);
+  isActive.value = true;
 });
 
 onDeactivated(() => {
+  isActive.value = false;
   disposeList?.forEach(dispose => dispose());
   storageSentry?.disconnect();
   disposeList = storageSentry = null;

@@ -108,6 +108,8 @@ const cmDefaults = {
   maxDisplayLength: 100_000,
 };
 const cmCommands = CodeMirror.commands;
+const cmOrigCommands = Object.assign({}, cmCommands);
+const { insertTab, insertSoftTab } = cmCommands;
 
 export default {
   props: {
@@ -246,18 +248,13 @@ export default {
       this.placeholderId = 0;
       maxDisplayLength = cm.options.maxDisplayLength;
       watchEffect(() => cm.setOption('readOnly', this.readOnly));
-      // these are active only in the code nav tab
-      cm.state.commands = Object.assign({
+      this.customCommands = Object.assign({
         // call own methods explicitly to strip `cm` parameter passed by CodeMirror
         find: () => this.find(),
         findNext: () => this.findNext(),
         findPrev: () => this.findNext(1),
         replace: () => this.replace(),
         replaceAll: () => this.replace(1),
-      }, this.commands);
-      const cmOrigCommands = {};
-      const { insertTab, insertSoftTab } = cmCommands;
-      for (const cmds of [cm.state.commands, {
         autocomplete() {
           cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
         },
@@ -275,14 +272,7 @@ export default {
           // pressing Tab key inside a line with no selection will reuse indent type (tabs/spaces)
           (cm.options.indentWithTabs ? insertTab : insertSoftTab)(cm);
         },
-        showHelp: this.commands?.showHelp,
-      }]) {
-        cmds::forEachEntry(([key, val]) => {
-          cmOrigCommands[key] = cmCommands[key];
-          cmCommands[key] = val;
-        });
-      }
-      this.origCommands = cmOrigCommands;
+      }, this.commands);
       // these are active in all nav tabs
       cm.setOption('extraKeys', {
         Esc: 'cancel',
@@ -295,18 +285,24 @@ export default {
       cm.on('keyHandled', (_cm, _name, e) => {
         e.stopPropagation();
       });
-      this.cm.on('changes', this.onChanges);
-      this.cm.on('beforeChange', this.onBeforeChange);
+      cm.on('changes', this.onChanges);
+      cm.on('beforeChange', this.onBeforeChange);
       if (this.value) this.updateValue();
       this.$emit('ready', cm);
     },
     onActive(state) {
       const onOff = state ? 'on' : 'off';
-      this.cm[onOff]('blur', this.onKeyDownToggler);
-      this.cm[onOff]('focus', this.onKeyDownToggler);
+      const { cm, onKeyDownToggler } = this;
+      cm[onOff]('blur', onKeyDownToggler);
+      cm[onOff]('focus', onKeyDownToggler);
       if (state) {
-        this.cm?.focus();
+        Object.assign(cmCommands, this.customCommands);
+        cm.focus();
       } else {
+        Object.assign(cmCommands, cmOrigCommands);
+        for (const id in cmCommands) {
+          if (!cmOrigCommands[id]) delete cmCommands[id];
+        }
         removeEventListener('keydown', this.onKeyDown);
       }
     },
@@ -314,26 +310,19 @@ export default {
        but ignore `window` blur (`evt` param is absent) */
     onKeyDownToggler(cm, evt) {
       if (evt) {
-        window[`${evt.type === 'blur' ? 'add' : 'remove'}EventListener`]('keydown', this.onKeyDown);
+        /* DANGER! Using body to precede KeyboardService's target in the bubbling phase.
+         * Mainly to prioritize our custom Esc handler. */
+        document.body::(evt.type === 'blur' ? addEventListener : removeEventListener)(
+          'keydown', this.onKeyDown);
       }
     },
     onKeyDown(e) {
-      const name = CodeMirror.keyName(e);
-      if (!this.cm) return;
-      [
-        this.cm.options.extraKeys,
-        this.cm.options.keyMap,
-      ].some(keyMap => keyMap && this.lookupKey(name, keyMap, e) === 'handled');
-    },
-    lookupKey(name, keyMap, e) {
-      return CodeMirror.lookupKey(name, keyMap, (b) => {
-        if (keyMap === this.cm.options.extraKeys || this.cm.state.commands[b]) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.cm.execCommand(b);
-          return true;
-        }
-      }, this.cm);
+      const cmd = this.reroutedKeys[CodeMirror.keyName(e)];
+      if (cmd && cmCommands[cmd]) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.cm.execCommand(cmd);
+      }
     },
     findFillQuery(force) {
       const { cm, search } = this;
@@ -518,20 +507,26 @@ export default {
       ...internalOpts, // internal options passed via `props` have the highest priority
       mode: this.mode || cmDefaults.mode,
     };
+    const { tooltip } = this;
+    const reroutedKeys = this.reroutedKeys = {
+      Esc: 'cancel',
+    };
     CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
       const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
       // fallback to anyword if default returns nothing (or no default)
       return result?.list.length ? result : CodeMirror.hint.anyword(cm, ...args);
     });
     this.initialize(CodeMirror(this.$refs.code, opts));
+    this.onActive(true); // DANGER! Must precede expandKeyMap.
     this.expandKeyMap()::forEachEntry(([key, cmd]) => {
-      const tt = this.tooltip[cmd];
-      if (tt != null) this.tooltip[cmd] += `${tt ? ', ' : ''}${key}`;
+      if (cmd in tooltip) {
+        tooltip[cmd] += `${tooltip[cmd] ? ', ' : ''}${key}`;
+        reroutedKeys[key] = cmd;
+      }
     });
     // pressing Tab key inside a line with no selection will reuse indent size
     if (!opts.tabSize) this.cm.options.tabSize = this.cm.options.indentUnit;
     this.$refs.code::addEventListener('copy', this.onCopy);
-    this.onActive(true);
     hookSetting('editor', (newUserOpts) => {
       // Use defaults for keys that were present in the old userOpts but got deleted in newUserOpts
       ({ ...cmDefaults, ...newUserOpts })::forEachEntry(([key, val]) => {
@@ -569,7 +564,6 @@ export default {
     this.updateValue();
   },
   beforeUnmount() {
-    Object.assign(cmCommands, this.origCommands);
     this.onActive(false);
   },
 };

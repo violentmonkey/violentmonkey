@@ -27,10 +27,6 @@ function handleBlur(e) {
   }
 }
 
-function handleEscape() {
-  document.activeElement.blur();
-}
-
 export function toggleTip(el) {
   const event = new CustomEvent('tiptoggle', {
     bubbles: true,
@@ -41,8 +37,6 @@ export function toggleTip(el) {
 function bindKeys() {
   addEventListener('focus', handleFocus, true);
   addEventListener('blur', handleBlur, true);
-  keyboardService.register('escape', handleEscape);
-  keyboardService.register('c-[', handleEscape);
   keyboardService.register('enter', () => {
     const { activeElement } = document;
     activeElement.click();
