@@ -2,8 +2,8 @@ import { ensureArray, initHooks, isEmpty } from '@/common';
 import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
-import { scriptMap, scriptSizes, sizesPrefixRe } from './db';
-import storage, { S_SCRIPT, S_SCRIPT_PRE, S_VALUE } from './storage';
+import { scriptSizes, sizesPrefixRe, updateScriptMap } from './db';
+import storage, { S_SCRIPT_PRE, S_VALUE } from './storage';
 import { clearValueOpener } from './values';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
@@ -164,15 +164,6 @@ function watchStorage(fn, cfg, state = true) {
 function batch(state) {
   cache.batch(state);
   dbKeys.batch(state);
-}
-
-function updateScriptMap(key, val) {
-  const id = +storage[S_SCRIPT].toId(key);
-  if (id) {
-    if (val) scriptMap[id] = val;
-    else delete scriptMap[id];
-    return true;
-  }
 }
 
 async function updateScriptSizeContributor(key, val) {

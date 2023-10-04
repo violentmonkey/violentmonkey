@@ -23,8 +23,8 @@ let maxScriptId = 0;
 let maxScriptPosition = 0;
 /** @type {{ [url:string]: number }} */
 export let scriptSizes = {};
-/** @type {Object<string,VMScript[]>} */
-export const scriptMap = {};
+/** @type {{ [id: string]: VMScript }} */
+const scriptMap = {};
 /** @type {VMScript[]} */
 const aliveScripts = [];
 /** @type {VMScript[]} */
@@ -181,6 +181,22 @@ function getPropsId(script) {
 /** @return {void} */
 function updateLastModified() {
   setOption('lastModified', Date.now());
+}
+
+export function updateScriptMap(key, val) {
+  const id = +storage[S_SCRIPT].toId(key);
+  if (!id) return;
+  if (val) {
+    const oldScript = scriptMap[id];
+    const i1 = aliveScripts.indexOf(oldScript);
+    const i2 = removedScripts.indexOf(oldScript);
+    if (i1 >= 0) aliveScripts[i1] = val;
+    if (i2 >= 0) removedScripts[i2] = val;
+    scriptMap[id] = val;
+  } else {
+    delete scriptMap[id];
+  }
+  return true;
 }
 
 /** @return {Promise<boolean>} */
