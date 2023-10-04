@@ -580,6 +580,8 @@ export async function parseScript(src) {
     }
     delete script[INFERRED];
   }
+  props.lastModified = props.lastUpdated = src.lastModified;
+  props.uuid = props.uuid || getUUID();
   // Overwriting inner data by `src`, deleting keys for which `src` specifies `null`
   for (const key of ['config', 'custom', 'props']) {
     const dst = script[key];
@@ -596,8 +598,6 @@ export async function parseScript(src) {
     maxScriptPosition++;
     props.position = maxScriptPosition;
   }
-  props.lastModified = props.lastUpdated = Date.now();
-  props.uuid = props.uuid || getUUID();
   config.enabled = getInt(config.enabled);
   config.removed = 0; // force-resetting `removed` since this is an installation
   config.shouldUpdate = getInt(config.shouldUpdate);
