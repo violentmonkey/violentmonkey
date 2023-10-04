@@ -9,18 +9,18 @@
           <icon name="info"/>
         </a>
       </tooltip>
-      <span hidden v-text="getFileName()"/>
+      <span hidden v-text="fileName"/>
     </div>
     <div class="mt-1">
       <setting-check name="exportValues" :label="i18n('labelExportScriptData')" />
     </div>
     <modal
-      v-if="store.ffDownload"
+      v-if="ffDownload"
       transition="in-out"
-      :visible="!!store.ffDownload.url"
-      @close="store.ffDownload = {}">
+      :visible="!!ffDownload.url"
+      @close="ffDownload = {}">
       <div class="modal-content">
-        <a :download="store.ffDownload.name" :href="store.ffDownload.url">
+        <a :download="ffDownload.name" :href="ffDownload.url">
           Right click and save as<br />
           <strong>scripts.zip</strong>
         </a>
@@ -29,7 +29,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue';
 import Modal from 'vueleton/lib/modal';
 import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
@@ -41,65 +42,48 @@ import SettingCheck from '@/common/ui/setting-check';
 import SettingText from '@/common/ui/setting-text';
 import { downloadBlob } from '@/common/download';
 import loadZip from '@/common/zip';
-import { store } from '../../utils';
 
-/**
- * Note:
- * - Firefox does not support multiline <select>
- */
-if (IS_FIREFOX) store.ffDownload = {};
 let ua;
 
-export default {
-  components: {
-    SettingCheck,
-    SettingText,
-    Icon,
-    Modal,
-    Tooltip,
-  },
-  data() {
-    return {
-      store,
-      dateTokens: Object.keys(DATE_FMT).join(', '),
-      exporting: false,
-    };
-  },
-  methods: {
-    async handleExport() {
-      try {
-        this.exporting = true;
-        if (IS_FIREFOX && !ua) ua = await sendCmdDirectly('UA');
-        download(await exportData(), this.getFileName());
-      } finally {
-        this.exporting = false;
-      }
-    },
-    getFileName() {
-      const { tpl } = this.$refs;
-      return tpl && `${formatDate(tpl.value?.trim() || tpl.defaultValue)}.zip`;
-    },
-  },
-};
+const tpl = ref();
+const dateTokens = ref(Object.keys(DATE_FMT).join(', '));
+const exporting = ref(false);
+const ffDownload = ref(IS_FIREFOX && {});
+const fileName = computed(() => {
+  const tplComp = tpl.value;
+  const text = tplComp?.text.trim();
+  return text && `${formatDate(text || tplComp.defaultValue)}.zip`;
+});
 
-function download(blob, fileName) {
+async function handleExport() {
+  try {
+    exporting.value = true;
+    if (IS_FIREFOX && !ua) ua = await sendCmdDirectly('UA');
+    download(await exportData());
+  } finally {
+    exporting.value = false;
+  }
+}
+
+function download(blob) {
   /* Old FF can't download blobs https://bugzil.la/1420419, fixed by enabling OOP:
    * v56 in Windows https://bugzil.la/1357486
    * v61 in MacOS https://bugzil.la/1385403
    * v63 in Linux https://bugzil.la/1357487 */
   // TODO: remove when strict_min_version >= 63
   const FF = IS_FIREFOX && parseFloat(ua.version);
+  const name = fileName.value;
   if (FF && (ua.os === 'win' ? FF < 56 : ua.os === 'mac' ? FF < 61 : FF < 63)) {
     const reader = new FileReader();
     reader.onload = () => {
-      store.ffDownload = {
-        name: fileName,
+      ffDownload.value = {
+        name,
         url: reader.result,
       };
     };
     reader.readAsDataURL(blob);
   } else {
-    downloadBlob(blob, fileName);
+    downloadBlob(blob, name);
   }
 }
 
@@ -148,7 +132,7 @@ async function exportData() {
   });
   files.push({
     name: 'violentmonkey',
-    content: JSON.stringify(vm),
+    content: JSON.stringify(vm, null, 2), // prettify to help users diff or view it
   });
   const zip = await loadZip();
   const blobWriter = new zip.BlobWriter('application/zip');

@@ -6,9 +6,9 @@
       <button @click="vacuum" :disabled="vacuuming" v-text="labelVacuum" />
     </tooltip>
     <div class="mt-1">
-      <setting-check name="importScriptData" :label="i18n('labelImportScriptData')" />
+      <setting-check name="importScriptData" :label="labelImportScriptData" />
       <br>
-      <setting-check name="importSettings" :label="i18n('labelImportSettings')" />
+      <setting-check name="importSettings" :label="labelImportSettings" />
     </div>
     <table class="import-report">
       <tr v-for="({ type, name, text }, i) in reports" :key="i" :data-type="type">
@@ -19,10 +19,10 @@
   </div>
 </template>
 
-<script>
-import { reactive } from 'vue';
+<script setup>
+import { onMounted, reactive, ref } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
-import { ensureArray, i18n, sendCmdDirectly } from '@/common';
+import { ensureArray, i18n, sendCmdDirectly, trueJoin } from '@/common';
 import { RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
@@ -31,46 +31,37 @@ import { showConfirmation, showMessage } from '@/common/ui';
 import { store } from '../../utils';
 
 const reports = reactive([]);
+const buttonImport = ref();
+const vacuuming = ref(false);
+const labelImportScriptData = i18n('labelImportScriptData');
+const labelImportSettings = i18n('labelImportSettings');
+const labelVacuum = ref(i18n('buttonVacuum'));
 
-export default {
-  components: {
-    SettingCheck,
-    Tooltip,
-  },
-  data() {
-    return {
-      reports,
-      store,
-      vacuuming: false,
-      labelVacuum: this.i18n('buttonVacuum'),
-    };
-  },
-  methods: {
-    pickBackup() {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.zip';
-      input.onchange = () => importBackup(input.files?.[0]);
-      input.click();
-    },
-    async vacuum() {
-      this.vacuuming = true;
-      this.labelVacuum = i18n('buttonVacuuming');
-      const { fixes, errors } = await sendCmdDirectly('Vacuum');
-      const errorText = errors?.join('\n');
-      this.vacuuming = false;
-      this.labelVacuum = i18n('buttonVacuumed') + (fixes ? ` (${fixes})` : '');
-      if (errorText) {
-        showConfirmation(i18n('msgErrorFetchingResource') + '\n\n' + errorText, { cancel: false });
-      }
-    },
-  },
-  mounted() {
-    const toggleDragDrop = initDragDrop(this.$refs.buttonImport);
-    addEventListener('hashchange', toggleDragDrop);
-    toggleDragDrop();
-  },
-};
+onMounted(() => {
+  const toggleDragDrop = initDragDrop(buttonImport.value);
+  addEventListener('hashchange', toggleDragDrop);
+  toggleDragDrop();
+});
+
+function pickBackup() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.zip';
+  input.onchange = () => importBackup(input.files?.[0]);
+  input.click();
+}
+
+async function vacuum() {
+  vacuuming.value = true;
+  labelVacuum.value = i18n('buttonVacuuming');
+  const { fixes, errors } = await sendCmdDirectly('Vacuum');
+  const errorText = errors?.join('\n');
+  vacuuming.value = false;
+  labelVacuum.value = i18n('buttonVacuumed') + (fixes ? ` (${fixes})` : '');
+  if (errorText) {
+    showConfirmation(i18n('msgErrorFetchingResource') + '\n\n' + errorText, { cancel: false });
+  }
+}
 
 async function importBackup(file) {
   if (!store.importing) {
@@ -85,6 +76,8 @@ async function importBackup(file) {
 async function doImportBackup(file) {
   if (!file) return;
   reports.length = 0;
+  const importScriptData = options.get('importScriptData');
+  const importSettings = options.get('importSettings');
   const zip = await loadZipLibrary();
   const reader = new zip.ZipReader(new zip.BlobReader(file));
   const entries = await reader.getEntries().catch(report) || [];
@@ -98,16 +91,22 @@ async function doImportBackup(file) {
   if (!vm.values) vm.values = {};
   await processAll(readScriptOptions, '.options.json');
   await processAll(readScript, '.user.js');
-  if (options.get('importScriptData')) {
+  if (importScriptData) {
     await processAll(readScriptStorage, '.storage.json');
     sendCmdDirectly('SetValueStores', vm.values);
   }
-  if (options.get('importSettings')) {
+  if (importSettings) {
     sendCmdDirectly('SetOptions',
       toObjectArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
   }
   sendCmdDirectly('CheckPosition');
-  showMessage({ text: reportProgress() });
+  showMessage({
+    text: [
+      reportProgress(),
+      importScriptData ? '✔' + labelImportScriptData : '',
+      importSettings ? '✔' + labelImportSettings : '',
+    ]::trueJoin('\n'),
+  });
   await reader.close();
 
   function parseJson(text, entry) {
@@ -234,12 +233,12 @@ function initDragDrop(targetElement) {
     await importBackup(file);
   };
   return () => {
-    const isSettingsTab = window.location.hash === '#settings';
-    const onOff = document[`${isSettingsTab ? 'add' : 'remove'}EventListener`];
-    document::onOff('dragend', onDragEnd);
-    document::onOff('dragleave', onDragLeave);
-    document::onOff('dragover', onDragOver);
-    document::onOff('drop', onDrop);
+    const isSettingsTab = store.route.hash === TAB_SETTINGS;
+    const onOff = isSettingsTab ? addEventListener : removeEventListener;
+    onOff('dragend', onDragEnd);
+    onOff('dragleave', onDragLeave);
+    onOff('dragover', onDragOver);
+    onOff('drop', onDrop);
   };
 }
 </script>
