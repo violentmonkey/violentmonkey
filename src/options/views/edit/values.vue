@@ -326,7 +326,7 @@ async function onSave(buttonIndex) {
     cm.markClean();
     cur.dirty = false;
   } else {
-    cur.value = null;
+    current.value = null;
   }
   if (cur.isAll) {
     await sendCmdDirectly('SetValueStores', {
