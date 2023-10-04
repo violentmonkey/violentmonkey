@@ -1,4 +1,4 @@
-import { getActiveTab, sendTabCmd } from '@/common';
+import { getActiveTab, isEmpty, sendTabCmd } from '@/common';
 import cache from './cache';
 import { getData } from './db';
 import { badges, getFailureReason } from './icon';
@@ -64,7 +64,8 @@ async function prefetchSetPopup() {
 }
 
 function notifyTab(tabId, data) {
-  if (badges[tabId]?.total) {
+  const badge = badges[tabId];
+  if (badge && !isEmpty(badge.totalMap)) {
     sendTabCmd(tabId, 'PopupShown', data);
   }
 }
