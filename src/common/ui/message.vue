@@ -67,7 +67,7 @@ export default {
     });
 
     onMounted(() => {
-      const el = refForm.value.querySelector('input, button');
+      const el = refForm.value?.querySelector('input, button');
       if (el) nextTick(() => el.focus());
       dismissers.push(dismiss);
       return () => {
