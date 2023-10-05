@@ -22,7 +22,7 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
-import { ensureArray, i18n, sendCmdDirectly, trueJoin } from '@/common';
+import { ensureArray, i18n, isEmpty, sendCmdDirectly, trueJoin } from '@/common';
 import { RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
@@ -88,14 +88,14 @@ async function doImportBackup(file) {
   const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
   const vm = vmEntry && await readContents(vmEntry) || {};
   const undoPort = chrome.runtime.connect({ name: 'undoImport' });
+  const scripts = vm.scripts || {};
+  const values = vm.values || {};
   await new Promise(resolveOnUndoMessage);
-  if (!vm.scripts) vm.scripts = {};
-  if (!vm.values) vm.values = {};
   await processAll(readScriptOptions, '.options.json');
   await processAll(readScript, '.user.js');
   if (importScriptData) {
     await processAll(readScriptStorage, '.storage.json');
-    sendCmdDirectly('SetValueStores', vm.values);
+    sendCmdDirectly('SetValueStores', values);
   }
   if (importSettings) {
     sendCmdDirectly('SetOptions',
@@ -105,7 +105,7 @@ async function doImportBackup(file) {
   await reader.close();
   if (await showConfirmation([
     reportProgress(),
-    importScriptData ? '✔' + labelImportScriptData : '',
+    importScriptData && !isEmpty(values) ? '✔' + labelImportScriptData : '',
     importSettings ? '✔' + labelImportSettings : '',
   ]::trueJoin('\n'), {
     cancel: { text: i18n('buttonUndo'), class: 'has-error' },
@@ -144,7 +144,7 @@ async function doImportBackup(file) {
   }
   async function readScript(entry, code, name) {
     const { filename } = entry;
-    const more = vm.scripts[name];
+    const more = scripts[name];
     const data = {
       code,
       ...more && {
@@ -178,7 +178,7 @@ async function doImportBackup(file) {
     const ovr = opts.override || {};
     reports[0].text = 'Tampermonkey';
     /** @type {VMScript} */
-    vm.scripts[name] = {
+    scripts[name] = {
       config: {
         enabled: settings.enabled !== false ? 1 : 0,
         shouldUpdate: opts.check_for_updates ? 1 : 0,
@@ -203,7 +203,7 @@ async function doImportBackup(file) {
   }
   async function readScriptStorage(entry, json, name) {
     reports[0].text = 'Tampermonkey';
-    vm.values[uriMap[name]] = json.data;
+    values[uriMap[name]] = json.data;
   }
   function report(text, name, type = 'critical') {
     reports.push({ text, name, type });
