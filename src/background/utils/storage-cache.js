@@ -256,8 +256,7 @@ async function undoImport(port) {
     if (toRemove.length) await cachedApi[REMOVE](toRemove);
     await cachedApi[SET](old);
     port.postMessage(true);
-    await sendCmd('Reload',
-      delay);
+    await sendCmd('Reload', delay);
     location.reload();
   });
   old = await api.get();

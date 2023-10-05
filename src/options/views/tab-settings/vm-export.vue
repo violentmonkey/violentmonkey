@@ -51,8 +51,7 @@ const exporting = ref(false);
 const ffDownload = ref(IS_FIREFOX && {});
 const fileName = computed(() => {
   const tplComp = tpl.value;
-  const text = tplComp?.text.trim();
-  return text && `${formatDate(text || tplComp.defaultValue)}.zip`;
+  return tplComp && `${formatDate(tplComp.text.trim() || tplComp.defaultValue)}.zip`;
 });
 
 async function handleExport() {
