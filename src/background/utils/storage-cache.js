@@ -1,4 +1,4 @@
-import { ensureArray, ignoreChromeErrors, initHooks, isEmpty } from '@/common';
+import { ensureArray, ignoreChromeErrors, initHooks, isEmpty, sendCmd } from '@/common';
 import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
@@ -14,6 +14,7 @@ let valuesToFlush = {};
 let valuesToWatch = {};
 let flushTimer = 0;
 let apiChain;
+let undoing;
 const apiQueue = [];
 const watchers = {};
 /** Reading the entire db in init/vacuum/sizing shouldn't be cached for long. */
@@ -46,7 +47,7 @@ export const clearStorageCache = () => {
 };
 export const storageCacheHas = cache.has;
 
-storage.api = {
+const cachedApi = storage.api = {
 
   async [GET](keys) {
     const res = {};
@@ -82,6 +83,10 @@ storage.api = {
         cache.put(key, copy);
         dbKeys.put(key, 1);
         keys.push(key);
+        if (undoing) {
+          toWrite[key] = val;
+          return;
+        }
         if (storage[S_VALUE].toId(key)) {
           valuesToFlush[key] = copy;
         } else {
@@ -95,6 +100,7 @@ storage.api = {
     });
     batch(false);
     if (!isEmpty(toWrite)) await apiCall(SET, toWrite);
+    if (undoing) return;
     if (keys.length) fire(keys, data);
     flushLater();
   },
@@ -105,6 +111,7 @@ storage.api = {
       if (ok) {
         cache.del(key);
         dbKeys.put(key, 0);
+        if (undoing) return ok;
         if (storage[S_VALUE].toId(key)) {
           valuesToFlush[key] = null;
           ok = false;
@@ -116,6 +123,7 @@ storage.api = {
       return ok;
     });
     if (toDelete.length) await apiCall(REMOVE, toDelete);
+    if (undoing) return;
     if (keys.length) fire(keys);
     flushLater();
   },
@@ -240,11 +248,17 @@ async function undoImport(port) {
   });
   port.onMessage.addListener(async () => {
     valuesToFlush = {};
-    const cur = await apiCall(GET);
+    if (apiChain) await apiChain;
+    const cur = await cachedApi[GET]();
     const toRemove = Object.keys(cur).filter(k => !(k in old));
-    if (toRemove.length) await apiCall(REMOVE, toRemove);
-    await apiCall(SET, old);
+    const delay = Math.max(50, Math.min(500, performance.getEntries()[0]?.duration || 200));
+    undoing = true;
+    if (toRemove.length) await cachedApi[REMOVE](toRemove);
+    await cachedApi[SET](old);
     port.postMessage(true);
+    await sendCmd('Reload',
+      delay);
+    location.reload();
   });
   old = await api.get();
   if (!drop) port.postMessage(true);

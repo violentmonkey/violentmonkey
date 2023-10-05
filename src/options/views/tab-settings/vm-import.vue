@@ -114,10 +114,6 @@ async function doImportBackup(file) {
   } else {
     undoPort.postMessage(true);
     await new Promise(resolveOnUndoMessage);
-    for (const wnd of chrome.extension.getViews()) {
-      if (wnd !== window) wnd.location.reload();
-    }
-    location.reload();
   }
 
   function resolveOnUndoMessage(resolve) {

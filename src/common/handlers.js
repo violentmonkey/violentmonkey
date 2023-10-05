@@ -1,6 +1,9 @@
 import options from './options';
 
 const handlers = {
+  Reload(delay) {
+    setTimeout(() => location.reload(), delay);
+  },
   UpdateOptions(data) {
     options.update(data);
   },

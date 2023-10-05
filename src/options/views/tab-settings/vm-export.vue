@@ -17,7 +17,7 @@
     <modal
       v-if="ffDownload"
       transition="in-out"
-      :visible="!!ffDownload.url"
+      :show="!!ffDownload.url"
       @close="ffDownload = {}">
       <div class="modal-content">
         <a :download="ffDownload.name" :href="ffDownload.url">
