@@ -15,11 +15,12 @@
       <!-- eslint-enable vue/no-mutating-props -->
       <div class="mr-1c">
         <button
-          v-for="(button, index) in message.buttons"
+          v-for="({text, type, onClick, ...extras}, index) in message.buttons"
           :key="index"
-          :type="button.type || 'button'"
-          v-text="button.text"
-          @click="onButtonClick(button)"
+          :type="type || 'button'"
+          v-text="text"
+          v-bind="extras"
+          @click="onButtonClick(onClick)"
         />
       </div>
     </form>
@@ -47,8 +48,7 @@ export default {
       dismissers.length = 0;
       context.emit('dismiss');
     };
-    const onButtonClick = button => {
-      const { onClick } = button;
+    const onButtonClick = onClick => {
       if (onClick) {
         if (onClick(props.message.input) !== false) dismiss();
       }
