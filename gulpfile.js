@@ -31,13 +31,21 @@ function watch() {
 }
 
 async function jsDev() {
-  require('@gera2ld/plaid-webpack/bin/develop')();
+  return runCommand('webpack-cli', ['-w', '--config', 'scripts/webpack.conf.js']);
 }
 
 async function jsProd() {
-  return require('@gera2ld/plaid-webpack/bin/build')({
-    api: true,
-    keep: true,
+  return runCommand('webpack-cli', ['--config', 'scripts/webpack.conf.js']);
+}
+
+function runCommand(command, args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      stdio: 'inherit',
+    });
+    child.on('close', (code, signal) => {
+      (code ? reject : resolve)(signal);
+    });
   });
 }
 

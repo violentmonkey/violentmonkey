@@ -4,9 +4,20 @@ const ovr = makeOverrides();
 module.exports = {
   root: true,
   extends: [
-    require.resolve('@gera2ld/plaid/eslint'),
-    require.resolve('@gera2ld/plaid-common-vue/eslint/vue3-js'),
+    'eslint:recommended',
+    'plugin:vue/vue3-essential',
+    'prettier',
   ],
+  env: {
+    browser: true,
+    node: true,
+    es2021: true,
+  },
+  parserOptions: {
+    parser: '@babel/eslint-parser',
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+  },
   plugins: ['jest'],
   rules: {
     'prettier/prettier': 'off',

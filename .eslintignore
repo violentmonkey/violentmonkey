@@ -4,7 +4,6 @@
 !scripts/action-helper.js
 !scripts/fake-dep-loader.js
 !scripts/manifest-helper.js
-!scripts/plaid.conf.js
 !scripts/webpack.conf.js
 !scripts/webpack-protect-bootstrap-plugin.js
 !scripts/webpack-util.js

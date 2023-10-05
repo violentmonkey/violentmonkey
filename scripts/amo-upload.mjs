@@ -10,7 +10,7 @@ async function main() {
   const rawVersion = process.env.VERSION;
   const version = getVersion();
   const beta = isBeta();
-  const fileName = `violentmonkey-${version}${beta ? 'b' : ''}-an+fx.xpi`;
+  const fileName = `violentmonkey-${version}${beta ? 'b' : ''}.xpi`;
   const url = `https://github.com/violentmonkey/violentmonkey/releases/download/v${rawVersion}/${fileName}`;
 
   if (await hasAsset(fileName)) {
