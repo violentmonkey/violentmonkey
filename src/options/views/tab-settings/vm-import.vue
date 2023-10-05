@@ -27,7 +27,7 @@ import { RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
 import loadZipLibrary from '@/common/zip';
-import { showConfirmation, showMessage } from '@/common/ui';
+import { showConfirmation } from '@/common/ui';
 import { store } from '../../utils';
 
 const reports = reactive([]);
@@ -87,6 +87,8 @@ async function doImportBackup(file) {
   const total = entries.reduce((n, entry) => n + entry.filename?.endsWith('.user.js'), 0);
   const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
   const vm = vmEntry && await readContents(vmEntry) || {};
+  const undoPort = chrome.runtime.connect({ name: 'undoImport' });
+  await new Promise(resolveOnUndoMessage);
   if (!vm.scripts) vm.scripts = {};
   if (!vm.values) vm.values = {};
   await processAll(readScriptOptions, '.options.json');
@@ -100,15 +102,30 @@ async function doImportBackup(file) {
       toObjectArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
   }
   sendCmdDirectly('CheckPosition');
-  showMessage({
-    text: [
-      reportProgress(),
-      importScriptData ? '✔' + labelImportScriptData : '',
-      importSettings ? '✔' + labelImportSettings : '',
-    ]::trueJoin('\n'),
-  });
   await reader.close();
+  if (await showConfirmation([
+    reportProgress(),
+    importScriptData ? '✔' + labelImportScriptData : '',
+    importSettings ? '✔' + labelImportSettings : '',
+  ]::trueJoin('\n'), {
+    cancel: { text: i18n('buttonUndo'), class: 'has-error' },
+  })) {
+    undoPort.disconnect();
+  } else {
+    undoPort.postMessage(true);
+    await new Promise(resolveOnUndoMessage);
+    for (const wnd of chrome.extension.getViews()) {
+      if (wnd !== window) wnd.location.reload();
+    }
+    location.reload();
+  }
 
+  function resolveOnUndoMessage(resolve) {
+    undoPort.onMessage.addListener(function fn() {
+      undoPort.onMessage.removeListener(fn);
+      resolve();
+    });
+  }
   function parseJson(text, entry) {
     try {
       return JSON.parse(text);

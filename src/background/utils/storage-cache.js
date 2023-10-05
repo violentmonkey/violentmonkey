@@ -1,4 +1,4 @@
-import { ensureArray, initHooks, isEmpty } from '@/common';
+import { ensureArray, ignoreChromeErrors, initHooks, isEmpty } from '@/common';
 import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
@@ -127,6 +127,7 @@ window[WATCH_STORAGE] = fn => {
   return id;
 };
 browser.runtime.onConnect.addListener(port => {
+  if (port.name === 'undoImport') return undoImport(port);
   if (!port.name.startsWith(WATCH_STORAGE)) return;
   const { id, cfg, tabId } = JSON.parse(port.name.slice(WATCH_STORAGE.length));
   const fn = id ? watchers[id] : port.postMessage.bind(port);
@@ -228,4 +229,23 @@ async function apiChainNext() {
   } finally {
     apiChain = null;
   }
+}
+
+async function undoImport(port) {
+  let drop;
+  let old;
+  port.onDisconnect.addListener(() => {
+    ignoreChromeErrors();
+    drop = true;
+  });
+  port.onMessage.addListener(async () => {
+    valuesToFlush = {};
+    const cur = await apiCall(GET);
+    const toRemove = Object.keys(cur).filter(k => !(k in old));
+    if (toRemove.length) await apiCall(REMOVE, toRemove);
+    await apiCall(SET, old);
+    port.postMessage(true);
+  });
+  old = await api.get();
+  if (!drop) port.postMessage(true);
 }

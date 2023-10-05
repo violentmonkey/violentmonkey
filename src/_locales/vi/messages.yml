@@ -99,7 +99,6 @@ buttonSupport:
 buttonUndo:
   description: Button to undo removement of a script.
   message: Hoàn tác
-  touched: false
 buttonUpdate:
   description: Button to update a script.
   message: ''

@@ -99,7 +99,6 @@ buttonSupport:
 buttonUndo:
   description: Button to undo removement of a script.
   message: 復原
-  touched: false
 buttonUpdate:
   description: Button to update a script.
   message: 更新

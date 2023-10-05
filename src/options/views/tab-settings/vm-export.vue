@@ -46,7 +46,7 @@ import loadZip from '@/common/zip';
 let ua;
 
 const tpl = ref();
-const dateTokens = ref(Object.keys(DATE_FMT).join(', '));
+const dateTokens = Object.keys(DATE_FMT).join(', ');
 const exporting = ref(false);
 const ffDownload = ref(IS_FIREFOX && {});
 const fileName = computed(() => {

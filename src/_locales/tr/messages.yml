@@ -101,7 +101,6 @@ buttonSupport:
 buttonUndo:
   description: Button to undo removement of a script.
   message: Geri Al
-  touched: false
 buttonUpdate:
   description: Button to update a script.
   message: Güncelle
