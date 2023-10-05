@@ -596,7 +596,7 @@ export async function parseScript(src) {
     }
     delete script[INFERRED];
   }
-  props.lastModified = props.lastUpdated = src.lastModified;
+  props.lastModified = props.lastUpdated = src.lastModified || Date.now();
   props.uuid = props.uuid || getUUID();
   // Overwriting inner data by `src`, deleting keys for which `src` specifies `null`
   for (const key of ['config', 'custom', 'props']) {
