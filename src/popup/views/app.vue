@@ -554,11 +554,10 @@ export default {
   mounted() {
     focusMe(this.$el);
     keyboardService.enable();
-    const rat = devicePixelRatio;
     this.$el.style.maxHeight = Math.min(
       // innerHeight may exceed 600px in a mobile browser which displays the popup as a fullscreen page
-      Math.max(600 / rat, innerHeight),
-      screen.availHeight - screenY - 8 / rat
+      Math.max(600, innerHeight),
+      screen.availHeight - screenY - 8
     ) + 'px';
     this.disposeList = [
       keyboardService.register('escape', () => {
