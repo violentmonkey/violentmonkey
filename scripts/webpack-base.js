@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const deepmerge = require('deepmerge');
+const GroupAssetsPlugin = require('./webpack-group-assets-plugin');
 const { alias, extensions, isProd } = require('./common');
 
 const defaultHtmlOptions = {
@@ -18,8 +19,6 @@ const defaultHtmlOptions = {
     removeStyleLinkTypeAttributes: true,
   },
   meta: { viewport: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0' },
-  css: [],
-  js: [],
 };
 const MIN_OPTS = {
   extractComments: false,
@@ -63,8 +62,9 @@ const createHtmlPage = key => new HtmlWebpackPlugin({
   filename: `${key}/index.html`,
   chunks: [`${key}/index`],
   title: 'Violentmonkey',
-  inject: 'body',
   scriptLoading: 'blocking', // we don't need `defer` and it breaks in some browsers, see #1632
+  // For GroupAssetsPlugin, inject only `index.js` into `body` to avoid FOUC
+  injectTo: item => ((item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head'),
 });
 
 const splitVendor = prefix => ({
@@ -218,6 +218,7 @@ const getBaseConfig = () => ({
   },
   plugins: [
     new VueLoaderPlugin(),
+    new GroupAssetsPlugin(),
     ...styleOptions.extract ? [new MiniCssExtractPlugin({
       filename: '[name].css',
     })] : [],
