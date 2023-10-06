@@ -618,6 +618,7 @@ export async function parseScript(src) {
   config.removed = 0; // force-resetting `removed` since this is an installation
   config.shouldUpdate = getInt(config.shouldUpdate);
   script.meta = meta;
+  props.uri = getNameURI(script); // DANGER! Must be after props.position and meta assignments.
   if (!getScriptHome(script) && isRemote(src.from)) {
     script.custom.homepageURL = src.from;
   }
