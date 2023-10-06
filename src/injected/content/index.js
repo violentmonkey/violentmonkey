@@ -31,13 +31,10 @@ async function init() {
       ? await getDataFF(dataPromise)
       : await dataPromise
   );
+  const injectInto = bridge[INJECT_INTO] = data[INJECT_INTO];
   assign(ids, data[IDS]);
   if (IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);
-  }
-  if ((bridge[INJECT_INTO] = data[INJECT_INTO]) === SKIP_SCRIPTS) {
-    Run(SKIP_SCRIPTS);
-    return;
   }
   if (data[EXPOSE] != null && !isXml && injectPageSandbox(data)) {
     addHandlers({ GetScriptVer: true });
@@ -48,7 +45,7 @@ async function init() {
     await injectScripts(data, isXml);
   }
   onScripts.length = 0;
-  finish();
+  finish(injectInto);
 }
 
 addBackgroundHandlers({

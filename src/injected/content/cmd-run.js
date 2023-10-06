@@ -34,11 +34,6 @@ function onShown(evt) {
 }
 
 export function Run(id, realm) {
-  if (id === SKIP_SCRIPTS) {
-    runningIds = SKIP_SCRIPTS;
-    report();
-    return;
-  }
   safePush(runningIds, id);
   bridge[IDS][id] = realm || PAGE;
   if (!pending) pending = report(2);
@@ -53,6 +48,10 @@ async function report(delay, reset = !sent) {
   sent = true;
 }
 
-export function finish() {
-  if (!pending && !sent) report();
+export function finish(injectInto) {
+  if (pending || sent) return;
+  if (injectInto === SKIP_SCRIPTS || injectInto === 'off') {
+    runningIds = injectInto;
+  }
+  report();
 }

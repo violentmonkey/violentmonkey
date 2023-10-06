@@ -20,6 +20,7 @@ addPublicCommands({
       failure = getFailureReason('');
     }
     data.tab = tab;
+    data[IS_APPLIED] = badgeData[INJECT] !== 'off'; // will be used by reloadHint in popup
     return [cachedSetPopup, data, failure];
   },
   async SetPopup(data, src) {

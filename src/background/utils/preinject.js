@@ -200,13 +200,14 @@ addPublicCommands({
       [kTop]: isTop,
       tab: { id: tabId },
     } = src;
+    const hasIds = +ids?.[0];
     setBadge(ids, reset, src);
     if (isTop === 3) {
-      reifyValueOpener(ids, docId);
+      if (hasIds) reifyValueOpener(ids, docId);
       reifyRequests(tabId, docId);
       clearNotifications(tabId);
     }
-    if (reset === 'bfcache' && +ids?.[0]) {
+    if (reset === 'bfcache' && hasIds) {
       addValueOpener(ids, tabId, getFrameDocId(isTop, docId, src[kFrameId]));
     }
   },

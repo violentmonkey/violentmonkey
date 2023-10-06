@@ -156,9 +156,9 @@ function resetBadgeData(tabId, isInjected) {
  */
 export function setBadge(ids, reset, { tab, [kFrameId]: frameId, [kTop]: isTop }) {
   const tabId = tab.id;
-  const injectable = ids === SKIP_SCRIPTS ? SKIP_SCRIPTS : !!ids;
+  const injectable = ids === SKIP_SCRIPTS || ids === 'off' ? ids : !!ids;
   const data = !(reset && isTop) && badges[tabId] || resetBadgeData(tabId, injectable);
-  if (ids && ids !== SKIP_SCRIPTS) {
+  if (Array.isArray(ids)) {
     const { idMap, totalMap } = data;
     // uniques
     ids.forEach(idMap.add, idMap);
@@ -228,7 +228,7 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
 export function getFailureReason(url, data) {
   return !injectableRe.test(url) ? [titleNoninjectable, INJECT_INTO]
     : ((url = testBlacklist(url))) ? [titleBlacklisted, 'blacklisted', url]
-      : !isApplied ? [titleDisabled, IS_APPLIED]
+      : !isApplied || data?.[INJECT] === 'off' ? [titleDisabled, IS_APPLIED]
         : !data ? []
           : data[INJECT] === SKIP_SCRIPTS
             ? [titleSkipped, SKIP_SCRIPTS]
