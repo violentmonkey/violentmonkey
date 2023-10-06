@@ -2,7 +2,8 @@ import { isEmpty, sendTabCmd } from '@/common';
 import { forEachEntry, forEachValue, nest, objectGet, objectSet } from '@/common/object';
 import { getScript } from './db';
 import { addOwnCommands, addPublicCommands } from './init';
-import storage, { S_VALUE } from './storage';
+import storage, { S_VALUE, S_VALUE_PRE } from './storage';
+import { cachedStorageApi } from './storage-cache';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
 
 /** { scriptId: { tabId: { frameId: {key: raw}, ... }, ... } } */
@@ -25,11 +26,11 @@ addOwnCommands({
     data::forEachEntry(([id, store = {}]) => {
       id = getScript({ id: +id, uri: id })?.props.id;
       if (id) {
-        toWrite[id] = store;
+        toWrite[S_VALUE_PRE + id] = store;
         toSend[id] = store;
       }
     });
-    commit(toWrite);
+    commit(toWrite, cachedStorageApi);
     return chain;
   },
 });
@@ -97,8 +98,8 @@ export function reifyValueOpener(ids, documentId) {
   }
 }
 
-function commit(data) {
-  storage[S_VALUE].set(data);
+function commit(data, api) {
+  (api || storage[S_VALUE]).set(data, !!api);
   chain = chain?.catch(console.warn).then(broadcast)
     || broadcast();
 }

@@ -3,7 +3,7 @@ import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
 import { scriptSizes, sizesPrefixRe, updateScriptMap } from './db';
-import storage, { S_SCRIPT_PRE, S_VALUE } from './storage';
+import storage, { S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE } from './storage';
 import { clearValueOpener } from './values';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
@@ -13,9 +13,7 @@ let valuesToFlush = {};
 /** @type {Object<string,function[]>} */
 let valuesToWatch = {};
 let flushTimer = 0;
-let apiChain;
 let undoing;
-const apiQueue = [];
 const watchers = {};
 /** Reading the entire db in init/vacuum/sizing shouldn't be cached for long. */
 const TTL_SKIM = 5e3;
@@ -26,10 +24,7 @@ const TTL_MAIN = 3600e3;
 const TTL_TINY = 24 * 3600e3;
 const cache = initCache({ lifetime: TTL_MAIN });
 const dbKeys = initCache({ lifetime: TTL_TINY }); // 1: exists, 0: known to be absent
-const { api } = storage;
-const GET = 'get';
-const SET = 'set';
-const REMOVE = 'remove';
+const api = /** @type {browser.storage.StorageArea} */ storage.api;
 /** Using a simple delay with setTimeout to avoid infinite debouncing due to periodic activity */
 const FLUSH_DELAY = 100;
 const FLUSH_SIZE_STEP = 1e6; // each step increases delay by FLUSH_DELAY
@@ -47,9 +42,9 @@ export const clearStorageCache = () => {
 };
 export const storageCacheHas = cache.has;
 
-const cachedApi = storage.api = {
+export const cachedStorageApi = storage.api = {
 
-  async [GET](keys) {
+  async get(keys) {
     const res = {};
     batch(true);
     keys = keys?.filter(key => {
@@ -61,7 +56,7 @@ const cachedApi = storage.api = {
     if (!keys || keys.length) {
       let lifetime;
       if (!keys) lifetime = TTL_SKIM; // DANGER! Must be `undefined` otherwise.
-      (await apiCall(GET, keys))::forEachEntry(([key, val]) => {
+      (await api.get(keys))::forEachEntry(([key, val]) => {
         res[key] = val;
         dbKeys.put(key, 1);
         cache.put(key, deepCopy(val), lifetime);
@@ -73,7 +68,7 @@ const cachedApi = storage.api = {
     return res;
   },
 
-  async [SET](data) {
+  async set(data, flushNow) {
     const toWrite = {};
     const keys = [];
     batch(true);
@@ -87,7 +82,7 @@ const cachedApi = storage.api = {
           toWrite[key] = val;
           return;
         }
-        if (storage[S_VALUE].toId(key)) {
+        if (!flushNow && key.startsWith(S_VALUE_PRE)) {
           valuesToFlush[key] = copy;
         } else {
           toWrite[key] = val;
@@ -99,13 +94,13 @@ const cachedApi = storage.api = {
       }
     });
     batch(false);
-    if (!isEmpty(toWrite)) await apiCall(SET, toWrite);
+    if (!isEmpty(toWrite)) await api.set(toWrite);
     if (undoing) return;
     if (keys.length) fire(keys, data);
     flushLater();
   },
 
-  async [REMOVE](keys) {
+  async remove(keys) {
     const toDelete = keys.filter(key => {
       let ok = dbKeys.get(key) !== 0;
       if (ok) {
@@ -122,7 +117,7 @@ const cachedApi = storage.api = {
       }
       return ok;
     });
-    if (toDelete.length) await apiCall(REMOVE, toDelete);
+    if (toDelete.length) await api.remove(toDelete);
     if (undoing) return;
     if (keys.length) fire(keys);
     flushLater();
@@ -196,8 +191,8 @@ async function flush() {
     }
     updateScriptSizeContributor(key, val);
   });
-  if (!isEmpty(toFlush)) await apiCall(SET, toFlush);
-  if (toRemove.length) await apiCall(REMOVE, toRemove);
+  if (!isEmpty(toFlush)) await api.set(toFlush);
+  if (toRemove.length) await api.remove(toRemove);
   if (valuesToWatch) setTimeout(notifyWatchers, 0, toFlush, toRemove);
 }
 
@@ -223,22 +218,6 @@ function notifyWatchers(toFlush, toRemove) {
   byFn.forEach((val, fn) => fn(val));
 }
 
-function apiCall(method, data) {
-  apiQueue.push([method, data]);
-  apiChain = apiChain?.catch(console.warn).then(apiChainNext)
-    || apiChainNext();
-  return apiChain;
-}
-
-async function apiChainNext() {
-  try {
-    const [method, data] = apiQueue.shift();
-    return await api[method](data); // awaiting here for `finally`
-  } finally {
-    apiChain = null;
-  }
-}
-
 async function undoImport(port) {
   let drop;
   let old;
@@ -248,13 +227,12 @@ async function undoImport(port) {
   });
   port.onMessage.addListener(async () => {
     valuesToFlush = {};
-    if (apiChain) await apiChain;
-    const cur = await cachedApi[GET]();
+    const cur = await cachedStorageApi.get();
     const toRemove = Object.keys(cur).filter(k => !(k in old));
     const delay = Math.max(50, Math.min(500, performance.getEntries()[0]?.duration || 200));
     undoing = true;
-    if (toRemove.length) await cachedApi[REMOVE](toRemove);
-    await cachedApi[SET](old);
+    if (toRemove.length) await cachedStorageApi.remove(toRemove);
+    await cachedStorageApi.set(old);
     port.postMessage(true);
     await sendCmd('Reload', delay);
     location.reload();
