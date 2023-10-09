@@ -124,7 +124,6 @@ const CONFIRM_HOTKEY = `${modifiers.ctrlcmd === 'm' ? '⌘' : 'Ctrl-'}Enter`;
 const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 /** @type {chrome.runtime.Port} */
 let filePort;
-/** @type {function()} */
 let filePortResolve;
 /** @type {boolean} */
 let filePortNeeded;
@@ -439,7 +438,8 @@ export default {
     },
     createFilePort() {
       filePort = browser.tabs.connect(this.info.tabId, { name: 'FetchSelf' });
-      filePort.onMessage.addListener(filePortResolve);
+      // DANGER! Don't use filePortResolve directly as it perpetually changes
+      filePort.onMessage.addListener(val => filePortResolve(val));
       filePort.onDisconnect.addListener(() => {
         stopResolve?.(true);
         filePort = null;
