@@ -6,17 +6,11 @@
   </span>
 </template>
 
-<script>
+<script setup>
+import { computed } from 'vue';
 import { i18n } from '@/common';
 
 const SEP = '\x02';
-
-export default {
-  props: ['i18nKey'],
-  computed: {
-    parts() {
-      return i18n(this.i18nKey, [SEP]).split(SEP);
-    },
-  },
-};
+const props = defineProps(['i18nKey']);
+const parts = computed(() => i18n(props.i18nKey, [SEP]).split(SEP));
 </script>

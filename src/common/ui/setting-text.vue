@@ -1,7 +1,7 @@
 <template>
   <div class="setting-text">
     <textarea
-      ref="text"
+      ref="$text"
       class="monospace-font"
       :class="{'has-error': error}"
       spellcheck="false"
@@ -22,7 +22,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { i18n } from '@/common';
 import { getUnloadSentry } from '@/common/router';
 import { modifiers } from '@violentmonkey/shortcut';
@@ -31,117 +32,102 @@ import options from '../options';
 import defaults from '../options-defaults';
 import hookSetting from '../hook-setting';
 
+const props = defineProps({
+  name: String,
+  json: Boolean,
+  disabled: Boolean,
+  hasSave: {
+    type: Boolean,
+    default: true,
+  },
+  hasReset: Boolean,
+  rows: Number,
+});
+const emit = defineEmits(['bg-error', 'save']);
 const ctrlS = modifiers.ctrlcmd === 'm' ? '⌘S' : 'Ctrl-S';
+const $text = ref();
+const error = ref();
+const savedValue = ref();
+const saved = ref('');
+const text = ref('');
+const value = ref();
 
-export default {
-  props: {
-    name: String,
-    json: Boolean,
-    disabled: Boolean,
-    hasSave: {
-      type: Boolean,
-      default: true,
-    },
-    hasReset: Boolean,
-    rows: Number,
-  },
-  data() {
-    return {
-      ctrlS,
-      error: null,
-      placeholder: null,
-      savedValue: null,
-      saved: '',
-      text: '',
-      value: null,
-    };
-  },
-  computed: {
-    isDirty() {
-      return !deepEqual(this.value, this.savedValue || '');
-    },
-    canSave() {
-      return !this.error && this.isDirty;
-    },
-    canReset() {
-      return !deepEqual(this.value, this.defaultValue || '');
-    },
-  },
-  watch: {
-    isDirty(state) {
-      this.toggleUnloadSentry(state);
-    },
-    text(str) {
-      let value;
-      let error;
-      if (this.json) {
-        try {
-          value = JSON.parse(str);
-        } catch (e) {
-          error = e.message;
-        }
-        this.error = error;
-      } else {
-        value = str;
-      }
-      this.value = value;
-      this.saved = '';
-    },
-  },  created() {
-    const handle = this.json
-      ? (value => JSON.stringify(value, null, '  '))
-      // XXX compatible with old data format
-      : (value => (Array.isArray(value) ? value.join('\n') : value || ''));
-    const defaultValue = objectGet(defaults, this.name);
-    this.revoke = hookSetting(this.name, val => {
-      this.savedValue = val;
-      this.text = handle(val);
-    });
-    this.defaultValue = defaultValue;
-    this.placeholder = handle(defaultValue);
-    this.toggleUnloadSentry = getUnloadSentry(() => {
-      // Reset to saved value after confirming loss of data.
-      // The component won't be destroyed on tab change, so the changes are actually kept.
-      // Here we reset it to make sure the user loses the changes when leaving the settings tab.
-      // Otherwise the user may be confused about where the changes are after switching back.
-      this.text = handle(this.savedValue);
-    });
-  },
-  beforeUnmount() {
-    this.revoke();
-    this.toggleUnloadSentry(false);
-  },
-  methods: {
-    onChange() {
-      // Auto save if there is no `Save` button
-      if (!this.hasSave && this.canSave) this.onSave();
-    },
-    onSave() {
-      options.set(this.name, this.value).catch(this.bgError);
-      this.saved = i18n('buttonSaved');
-      this.$emit('save');
-    },
-    onReset() {
-      const el = this.$refs.text;
-      /* Focusing to allow quick Ctrl-Z to undo.
-       * Focusing also prevents layout shift when `reset` button auto-hides. */
-      el.focus();
-      if (!this.hasSave) {
-        // No save button = something rather trivial e.g. the export file name
-        options.set(this.name, this.defaultValue).catch(this.bgError);
-      } else {
-        // Save button exists = let the user undo the input
-        el.select();
-        if (!document.execCommand('insertText', false, this.placeholder)) {
-          this.value = this.placeholder;
-        }
-      }
-    },
-    bgError(err) {
-      this.$emit('bg-error', err);
-    },
-  },
-};
+const handle = props.json
+  ? (val => JSON.stringify(val, null, '  '))
+  // XXX compatible with old data format
+  : (val => (Array.isArray(val) ? val.join('\n') : val || ''));
+const defaultValue = objectGet(defaults, props.name);
+const placeholder = handle(defaultValue);
+const toggleUnloadSentry = getUnloadSentry(() => {
+  /* Reset to saved value after confirming loss of data.
+     The component won't be destroyed on tab change, so the changes are actually kept.
+     Here we reset it to make sure the user loses the changes when leaving the settings tab.
+     Otherwise the user may be confused about where the changes are after switching back. */
+  text.value = handle(savedValue.value);
+});
+const revoke = hookSetting(props.name, val => {
+  savedValue.value = val;
+  text.value = handle(val);
+});
+const isDirty = computed(() => !deepEqual(value.value, savedValue.value || ''));
+const canSave = computed(() => !error.value && isDirty.value);
+const canReset = computed(() => !deepEqual(value.value, defaultValue || ''));
+
+defineExpose({
+  defaultValue,
+  text,
+  value,
+});
+watch(isDirty, toggleUnloadSentry);
+watch(text, str => {
+  let val;
+  let err;
+  if (props.json) {
+    try {
+      val = JSON.parse(str);
+    } catch (e) {
+      err = e.message;
+    }
+    error.value = err;
+  } else {
+    val = str;
+  }
+  value.value = val;
+  saved.value = '';
+});
+onBeforeUnmount(() => {
+  revoke();
+  toggleUnloadSentry(false);
+});
+
+function onChange() {
+  // Auto save if there is no `Save` button
+  if (!props.hasSave && canSave.value) onSave();
+}
+function onSave() {
+  options.set(props.name, value.value).catch(bgError);
+  saved.value = i18n('buttonSaved');
+  emit('save');
+}
+function onReset() {
+  const el = $text.value;
+  /* Focusing to allow quick Ctrl-Z to undo.
+   * Focusing also prevents layout shift when `reset` button auto-hides. */
+  el.focus();
+  if (!props.hasSave) {
+    // No save button = something rather trivial e.g. the export file name
+    options.set(props.name, defaultValue).catch(bgError);
+  } else {
+    // Save button exists = let the user undo the input
+    el.select();
+    if (!document.execCommand('insertText', false, placeholder.value)) {
+      value.value = placeholder.value;
+    }
+  }
+}
+function bgError(err) {
+  emit('bg-error', err);
+}
 </script>
 
 <style>

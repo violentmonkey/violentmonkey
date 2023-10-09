@@ -11,7 +11,7 @@
 <script setup>
 const props = defineProps(['modelValue']);
 const emits = defineEmits(['update:modelValue']);
-
+// TODO: switch to defineModel() when it's not experimental
 function onToggle() {
   emits('update:modelValue', !props.modelValue);
 }
