@@ -168,6 +168,8 @@ const icons = computed(() => {
   ].filter(Boolean);
 });
 
+/** @type {FileSystemFileHandle} */
+let fileHandle;
 /** @type {chrome.runtime.Port} */
 let filePort;
 let filePortResolve;
@@ -187,14 +189,21 @@ let resourceCache, resourceUrls;
 onMounted(async () => {
   const id = route.paths[0];
   const key = `confirm-${id}`;
-  info.value = infoVal = await sendCmdDirectly('CacheLoad', key);
+  const { filePromise } = window;
+  if (filePromise) try { fileHandle = await filePromise; } catch (e) {/*noop*/}
+  infoVal = fileHandle
+    ? { url: `file:///*drag-n-drop*/${fileHandle.name}` }
+    : await sendCmdDirectly('CacheLoad', key);
   if (!infoVal) {
     closeTab();
     return;
   }
-  filePortNeeded = infoVal.ff >= 68 && infoVal.url.startsWith('file:');
-  cachedCodePromise = sendCmdDirectly('CachePop', infoVal.url);
-  guard = setInterval(sendCmdDirectly, KEEP_INFO_DELAY, 'CacheHit', { key });
+  info.value = infoVal;
+  if (!fileHandle) {
+    filePortNeeded = infoVal.ff >= 68 && infoVal.url.startsWith('file:');
+    cachedCodePromise = sendCmdDirectly('CachePop', infoVal.url);
+    guard = setInterval(sendCmdDirectly, KEEP_INFO_DELAY, 'CacheHit', { key });
+  }
   await loadData();
   await parseMeta();
   await Promise.all([
@@ -345,7 +354,9 @@ async function getFile(url, { isBlob, useCache } = {}) {
 }
 async function getScript(url) {
   try {
-    return cachedCodePromise && await cachedCodePromise || await getFile(url);
+    return fileHandle
+      ? await (await fileHandle.getFile()).text()
+      : cachedCodePromise && await cachedCodePromise || await getFile(url);
   } catch (e) {
     message.value = i18n('msgErrorLoadingData');
     throw url;
