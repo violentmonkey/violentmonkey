@@ -100,7 +100,7 @@ buttonSupport:
   message: Támogatói oldal
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Visszavonás
 buttonUpdate:
   description: Button to update a script.
   message: Frissítés

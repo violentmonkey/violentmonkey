@@ -98,7 +98,7 @@ buttonSupport:
   message: Ondersteuningspagina
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Ongedaan maken
 buttonUpdate:
   description: Button to update a script.
   message: Bijwerken
