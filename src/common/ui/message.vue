@@ -29,12 +29,12 @@
 
 <script>
 import { computed, nextTick, onMounted, ref } from 'vue';
+import { hasKeyModifiers } from '@/common/ui/index';
 
 const dismissers = [];
 
 addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey
-      && dismissers.length) {
+  if (e.key === 'Escape' && dismissers.length && !hasKeyModifiers(e)) {
     e.stopImmediatePropagation();
     dismissers.pop()();
   }
