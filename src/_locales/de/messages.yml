@@ -98,7 +98,7 @@ buttonSupport:
   message: Support-Seite
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Rückgängig machen
+  message: Rückgängig
 buttonUpdate:
   description: Button to update a script.
   message: Aktualisierung
