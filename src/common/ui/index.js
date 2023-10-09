@@ -158,3 +158,30 @@ function vFocusFactory() {
  */
 export const vFocus = vFocusFactory();
 export const isTouch = 'ontouchstart' in document;
+/** @param {MouseEvent|KeyboardEvent} e */
+export const hasKeyModifiers = e => e.shiftKey || e.ctrlKey || e.metaKey || e.altKey;
+
+if (DataTransferItem.prototype.getAsFileSystemHandle) {
+  /**
+   * @param {DragEvent} evt
+   * @param {boolean} [asHandle]
+   * @return {boolean|Promise<FileSystemHandle>}
+   */
+  const getItem = ({ dataTransfer: { items: [item] } }, asHandle) => (
+    item.type === 'text/javascript' && (!asHandle || item.getAsFileSystemHandle())
+  );
+  addEventListener('dragover', evt => {
+    if (getItem(evt)) evt.preventDefault();
+  }, true);
+  addEventListener('drop', evt => {
+    const promise = getItem(evt, true);
+    if (!promise) return;
+    evt.preventDefault();
+    evt.stopPropagation();
+    const path = '/confirm/index.html';
+    const wnd = hasKeyModifiers(evt) || location.pathname !== path
+      ? window.open(path)
+      : window;
+    wnd.fshPromise = promise;
+  }, true);
+}

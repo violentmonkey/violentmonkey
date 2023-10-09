@@ -121,6 +121,7 @@ const RETRY_DELAY = 3000;
 const RETRY_COUNT = 2;
 const MAX_TITLE_NAME_LEN = 100;
 const CONFIRM_HOTKEY = `${modifiers.ctrlcmd === 'm' ? '⌘' : 'Ctrl-'}Enter`;
+const DROP_PREFIX = `file:///*drag-n-drop*/`;
 const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 const labelDefault = i18n('labelRunAtDefault');
 
@@ -185,25 +186,31 @@ let guard;
 let infoVal;
 let requireCache, requireUrls;
 let resourceCache, resourceUrls;
+let trackingPromise;
 
 onMounted(async () => {
   const id = route.paths[0];
   const key = `confirm-${id}`;
-  const { filePromise } = window;
-  if (filePromise) try { fileHandle = await filePromise; } catch (e) {/*noop*/}
-  infoVal = fileHandle
-    ? { url: `file:///*drag-n-drop*/${fileHandle.name}` }
+  const fshPromise = window.fshPromise;
+  if (fshPromise) try { fileHandle = await fshPromise; } catch (e) {/*noop*/}
+  Object.defineProperty(window, 'fshPromise', { set: loadNewFileHandle });
+  infoVal = info.value = fileHandle
+    ? { url: DROP_PREFIX + fileHandle.name }
     : await sendCmdDirectly('CacheLoad', key);
   if (!infoVal) {
     closeTab();
     return;
   }
-  info.value = infoVal;
   if (!fileHandle) {
     filePortNeeded = infoVal.ff >= 68 && infoVal.url.startsWith('file:');
     cachedCodePromise = sendCmdDirectly('CachePop', infoVal.url);
     guard = setInterval(sendCmdDirectly, KEEP_INFO_DELAY, 'CacheHit', { key });
   }
+  await initScript();
+  initKeys();
+});
+
+async function initScript() {
   await loadData();
   await parseMeta();
   await Promise.all([
@@ -219,19 +226,31 @@ onMounted(async () => {
   if (installable.value) {
     heading.value = reinstall.value ? i18n('labelReinstall') : i18n('labelInstall');
   }
+}
+function initKeys() {
   disposeList = [
     keyboardService.register('ctrlcmd-enter', () => {
       $buttons.value.querySelector('[data-hotkey]').click();
     }),
   ];
   keyboardService.enable();
-});
+}
 
 onBeforeUnmount(() => {
   clearInterval(guard);
   disposeList?.forEach(dispose => dispose());
 });
 
+async function loadNewFileHandle(promise) {
+  installable.value = tracking.value = false;
+  stopResolve?.();
+  await trackingPromise;
+  await nextTick();
+  fileHandle = await promise;
+  infoVal = info.value = { url: DROP_PREFIX + fileHandle.name };
+  error.value = safeIcon.value = message.value = requireCache = resourceCache = null;
+  await initScript();
+}
 async function loadData(changedOnly) {
   installable.value = false;
   const newCode = filePortNeeded
@@ -409,7 +428,7 @@ async function trackLocalFile() {
   tracking.value = true;
   while (tracking.value && !await Promise.race([
     makePause(500),
-    new Promise(cb => { stopResolve = cb; }),
+    trackingPromise = new Promise(cb => { stopResolve = cb; }),
   ])) {
     try {
       await loadData(true);
@@ -418,8 +437,9 @@ async function trackLocalFile() {
       await installScript(null, parsedMeta);
       sameCode.value = false;
     } catch (e) { /* NOP */ }
+    stopResolve();
   }
-  tracking.value = false;
+  trackingPromise = tracking.value = false;
 }
 async function checkSameCode() {
   const { name, namespace } = script.value.meta || {};

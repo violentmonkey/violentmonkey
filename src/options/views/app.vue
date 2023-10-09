@@ -70,23 +70,6 @@ addEventListener('dragover', evt => {
   }
 }, true);
 
-if (DataTransferItem.prototype.getAsFileSystemHandle) {
-  const getItem = ({ dataTransfer: { items: [item] } }, handle) => (
-    item.type === 'text/javascript' && (!handle || item.getAsFileSystemHandle())
-  );
-  addEventListener('dragover', evt => {
-    if (getItem(evt)) evt.preventDefault();
-  }, true);
-  addEventListener('drop', evt => {
-    const promise = getItem(evt, true);
-    if (promise) {
-      evt.preventDefault();
-      evt.stopPropagation();
-      window.open('/confirm/index.html').filePromise = promise;
-    }
-  }, true);
-}
-
 export default {
   setup() {
     // Speedup and deflicker for initial page load:
