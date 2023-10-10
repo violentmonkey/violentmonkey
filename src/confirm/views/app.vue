@@ -275,7 +275,7 @@ async function loadData(changedOnly) {
   if (newCode == null || changedOnly && code.value === newCode) {
     throw 0;
   }
-  const cm = $externals.value?.$refs.code?.cm;
+  const cm = $externals.value?.$code.cm;
   const lines = cm && newCode.split(/\r?\n/);
   let i = -1;
   let isDiff;

@@ -26,6 +26,7 @@
         v-else
         class="abs-full"
         :value="data.code"
+        ref="$code"
         readOnly
         :cm-options="cmOptions"
         :mode="data.mode"
@@ -45,6 +46,7 @@ import { focusMe, hasKeyModifiers } from '@/common/ui/index';
 
 const props = defineProps(['value', 'cmOptions', 'commands', 'install']);
 const $body = ref();
+const $code = ref();
 const $list = ref();
 const isActive = ref();
 const dependencies = ref({});
@@ -80,6 +82,9 @@ const scrollIntoViewIfNeeded = Element.prototype.scrollIntoViewIfNeeded
 };
 let listScrollTop;
 
+defineExpose({
+  $code, // used by parent
+});
 onActivated(() => {
   isActive.value = true;
   ($list.value || {}).scrollTop = listScrollTop || 0;
