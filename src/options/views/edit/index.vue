@@ -485,6 +485,11 @@ function setupSavePosition({ id: curWndId, tabs }) {
   min-height: calc(100vh + 1px);
 }
 
+.edit-open {
+  /* TODO: fix vueleton's tooltip to not destroy layout at right bottom window corner */
+  overflow: hidden;
+}
+
 @media (max-width: 767px) {
   .edit-hint {
     display: none;
