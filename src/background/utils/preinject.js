@@ -12,7 +12,8 @@ import { hookOptionsInit } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId, reifyRequests } from './requests';
 import {
-  S_CACHE, S_CACHE_PRE, S_CODE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
+  S_CACHE, S_CACHE_PRE, S_CODE, S_CODE_PRE, S_REQUIRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE,
+  S_VALUE_PRE,
 } from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
 import { getFrameDocId, getFrameDocIdAsObj, tabsOnRemoved } from './tabs';
@@ -250,10 +251,20 @@ function removeStaleCacheEntry(val, key) {
       if (prefix === S_REQUIRE_PRE) {
         val.depsMap[id].forEach(scriptId => cache.del(S_SCRIPT_PRE + scriptId));
       } else if (prefix === S_VALUE_PRE) {
-        val[S_VALUE][id] = newData;
-      } else {
-        cache.del(key); // TODO: try to patch the cache in-place?
+        if (val[S_VALUE]) val[S_VALUE][id] = newData; // envDelayed
+        setBaggedScriptProp(val, +id, VALUES, newData);
+        continue;
       }
+      cache.del(key); // TODO: try to patch the cache in-place?
+    }
+  }
+}
+
+function setBaggedScriptProp(bag, id, key, val) {
+  for (const /** @type {VMInjection.Script} */scr of (bag[INJECT] || bag)[SCRIPTS]) {
+    if (scr.id === id) {
+      scr[key] = val;
+      return true;
     }
   }
 }
@@ -428,7 +439,7 @@ function prepareScripts(env) {
 function prepareScript(script, env) {
   const { custom, meta, props } = script;
   const { id } = props;
-  const { require, [RUN_AT]: runAt } = env;
+  const { [S_REQUIRE]: require, [RUN_AT]: runAt } = env;
   const code = env[S_CODE][id];
   const dataKey = getUniqId();
   const winKey = getUniqId();
@@ -464,7 +475,7 @@ function prepareScript(script, env) {
       // hiding module interface from @require'd scripts so they don't mistakenly use it
       + '((define,module,exports)=>{');
   }
-  for (const url of meta.require) {
+  for (const url of meta[S_REQUIRE]) {
     const req = require[pathMap[url] || url];
     if (/\S/.test(req)) {
       injectedCode.push(req, NEWLINE_END_RE.test(req) ? ';' : '\n;');

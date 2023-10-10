@@ -287,7 +287,7 @@ declare namespace VMInjection {
     metaStr: (string|number)[];
     pathMap: StringMap;
     runAt?: RunAt;
-    val?: StringMap;
+    values?: StringMap;
   }
 }
 
