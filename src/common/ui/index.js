@@ -163,26 +163,25 @@ export const externalEditorInfoUrl =
 const { getAsFileSystemHandle } = DataTransferItem.prototype;
 
 if (getAsFileSystemHandle) {
+  const { find } = [];
   /**
    * @param {DragEvent} evt
-   * @param {boolean} [asHandle]
-   * @return {boolean|Promise<FileSystemHandle>}
+   * @return {?DataTransferItem}
    */
-  const getItem = ({ dataTransfer: { items: [item] } }, asHandle) => (
-    item.type === 'text/javascript' && (!asHandle || item::getAsFileSystemHandle())
-  );
+  const getItem = evt => evt.dataTransfer.items::find(v => v.type === 'text/javascript');
   addEventListener('dragover', evt => {
     if (getItem(evt)) evt.preventDefault();
   }, true);
   addEventListener('drop', evt => {
-    const promise = getItem(evt, true);
-    if (!promise) return;
+    const item = getItem(evt);
+    if (!item) return;
     evt.preventDefault();
     evt.stopPropagation();
     const path = '/confirm/index.html';
     const wnd = hasKeyModifiers(evt) || location.pathname !== path
       ? window.open(path)
       : window;
-    wnd.fshPromise = promise;
+    // Some apps provide the file's URL in a text dataTransfer item.
+    (wnd.fshPromise = item::getAsFileSystemHandle()).url = evt.dataTransfer.getData('text');
   }, true);
 }

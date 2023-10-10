@@ -206,7 +206,7 @@ onMounted(async () => {
   if (fshPromise) try { fileHandle = await fshPromise; } catch (e) {/*noop*/}
   Object.defineProperty(window, 'fshPromise', { set: loadNewFileHandle });
   infoVal = info.value = fileHandle
-    ? { url: DROP_PREFIX + fileHandle.name }
+    ? { url: fshPromise.url || DROP_PREFIX + fileHandle.name }
     : await sendCmdDirectly('CacheLoad', key);
   if (!infoVal) {
     closeTab();
@@ -227,7 +227,7 @@ onMounted(async () => {
 
 async function initScript() {
   await loadData();
-  await parseMeta();
+  if (!await parseMeta()) return;
   await Promise.all([
     checkSameCode(),
     (async () => {
@@ -262,7 +262,7 @@ async function loadNewFileHandle(promise) {
   await trackingPromise;
   await nextTick();
   fileHandle = await promise;
-  infoVal = info.value = { url: DROP_PREFIX + fileHandle.name };
+  infoVal = info.value = { url: promise.url || DROP_PREFIX + fileHandle.name };
   error.value = safeIcon.value = message.value = requireCache = resourceCache = null;
   await initScript();
   if (!disposeList) initKeys();
@@ -291,13 +291,17 @@ async function parseMeta() {
   const res = await sendCmdDirectly('ParseMeta', code.value);
   const { meta, errors } = res;
   const name = getLocaleString(meta, 'name');
-  document.title = `${name.slice(0, MAX_TITLE_NAME_LEN)}${name.length > MAX_TITLE_NAME_LEN ? '...' : ''} - ${
+  document.title = `${
+    name.slice(0, MAX_TITLE_NAME_LEN) || errors[0] // no name error
+  }${
+    name.length > MAX_TITLE_NAME_LEN ? '...' : ''
+  } - ${
     basicTitle || (basicTitle = document.title)
   }`;
   scriptName.value = [name, meta.version]::trueJoin(', ');
   descr.value = getLocaleString(meta, 'description');
   lists.value = Object.assign(
-    objectPick(meta, [
+    !meta ? {} : objectPick(meta, [
       'antifeature',
       'grant',
       'match',
@@ -314,10 +318,14 @@ async function parseMeta() {
     ), {
       '': errors?.join('\n') || '',
     });
-  script.value = { meta, custom: {}, props: {} };
-  requireUrls = [...new Set(meta.require)];
-  resourceUrls = [...new Set(Object.values(meta.resources))];
-  return res;
+  // Creating a script even if meta is invalid to show the code to the user.
+  script.value = { meta: meta || {}, custom: {}, props: {} };
+  if (meta) {
+    requireUrls = [...new Set(meta.require)];
+    resourceUrls = [...new Set(Object.values(meta.resources))];
+  }
+  if (!name) heading.value = i18n('msgInvalidScript');
+  else return res;
 }
 async function loadDeps() {
   if (!safeIcon.value) {
