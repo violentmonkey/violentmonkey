@@ -241,7 +241,7 @@ export function getScript({ id, uri, meta, removed }) {
   if (id) {
     script = getScriptById(id);
   } else {
-    if (!uri) uri = getNameURI({ meta, id: '@@should-have-name' });
+    if (!uri) uri = getNameURI({ meta, props: { id: '@@should-have-name' } });
     script = (removed ? removedScripts : aliveScripts).find(({ props }) => uri === props.uri);
   }
   return script;
@@ -556,9 +556,13 @@ function parseMetaWithErrors(src) {
   const custom = isObj && src.custom || getDefaultCustom();
   const meta = parseMeta(isObj ? src.code : src);
   const errors = [];
-  testerBatch(errors);
-  testScript('', { meta, custom });
-  testerBatch();
+  if (meta) {
+    testerBatch(errors);
+    testScript('', { meta, custom });
+    testerBatch();
+  } else {
+    errors.push(i18n('labelNoName')); // used by confirm app
+  }
   return {
     meta,
     errors: errors.length ? errors : null,

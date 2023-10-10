@@ -61,7 +61,7 @@ test('parseMetaIrregularities', () => {
   expect(parseMeta(`\
 //==UserScript==
 // @name foo
-//\t==/UserScript==`)).toEqual(baseMeta);
+//\t==/UserScript==`)).toBeFalsy();
   expect(parseMeta(`\
 /*
 //
@@ -69,5 +69,5 @@ test('parseMetaIrregularities', () => {
 // @name foo
 //
 ==/UserScript==
-*/`)).toEqual(baseMeta);
+*/`)).toBeFalsy();
 });

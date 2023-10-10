@@ -59,7 +59,8 @@ const metaOptionalTypes = {
 export function parseMeta(code) {
   // initialize meta
   const meta = metaTypes::mapEntry(value => value.default());
-  const metaBody = code.match(METABLOCK_RE)[2] || '';
+  const metaBody = code.match(METABLOCK_RE)[2];
+  if (!metaBody) return false; // TODO: `return;` + null check in all callers?
   metaBody.replace(/(?:^|\n)\s*\/\/\x20(@\S+)(.*)/g, (_match, rawKey, rawValue) => {
     const [keyName, locale] = rawKey.slice(1).split(':');
     const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
