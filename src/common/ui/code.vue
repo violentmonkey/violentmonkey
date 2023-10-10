@@ -1,7 +1,8 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col" @focus="cm?.focus()">
     <div class="editor-code flex-auto" ref="code"></div>
-    <div class="frame-block editor-search flex" v-show="search.show">
+    <div class="frame-block editor-search flex" v-show="search.show"
+         @keydown.esc.exact.stop="clearSearch">
       <form @submit.prevent="goToLine()">
         <span v-text="i18n('labelLineNumber')"></span>
         <input type="text" class="w-1" v-model="jumpPos">
@@ -171,7 +172,6 @@ export default {
         cm.setValue(value);
         cm.clearHistory();
         cm.markClean();
-        cm.focus();
       });
     },
     onBeforeChange(cm, change) {
@@ -292,19 +292,20 @@ export default {
     },
     onActive(state) {
       const onOff = state ? 'on' : 'off';
-      const { cm, onKeyDownToggler } = this;
+      const { cm, customCommands, onKeyDownToggler } = this;
       cm[onOff]('blur', onKeyDownToggler);
       cm[onOff]('focus', onKeyDownToggler);
       if (state) {
-        Object.assign(cmCommands, this.customCommands);
-        cm.focus();
+        Object.assign(cmCommands, customCommands);
       } else {
-        Object.assign(cmCommands, cmOrigCommands);
-        for (const id in cmCommands) {
-          if (!cmOrigCommands[id]) delete cmCommands[id];
+        for (const id in customCommands) {
+          // DANGER! Checking first as another code component may have activated already
+          if (cmCommands[id] === customCommands[id]) {
+            cmCommands[id] = cmOrigCommands[id];
+          }
         }
-        removeEventListener('keydown', this.onKeyDown);
       }
+      onKeyDownToggler(cm, { type: state ? 'blur' : '' });
     },
     /* reroute hotkeys back to CM when it isn't focused,
        but ignore `window` blur (`evt` param is absent) */
@@ -508,9 +509,7 @@ export default {
       mode: this.mode || cmDefaults.mode,
     };
     const { tooltip } = this;
-    const reroutedKeys = this.reroutedKeys = {
-      Esc: 'cancel',
-    };
+    const reroutedKeys = this.reroutedKeys = {};
     CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
       const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
       // fallback to anyword if default returns nothing (or no default)

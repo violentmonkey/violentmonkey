@@ -22,21 +22,10 @@
   </div>
 </template>
 
-<script>
-import { focusMe } from '@/common/ui';
-
-export default {
-  data() {
-    return {
-      name: extensionManifest.name,
-      version: process.env.VM_VER,
-      language: browser.i18n.getUILanguage(),
-    };
-  },
-  activated() {
-    focusMe(this.$el);
-  },
-};
+<script setup>
+const name = extensionManifest.name;
+const version = process.env.VM_VER;
+const language = browser.i18n.getUILanguage();
 </script>
 
 <style>

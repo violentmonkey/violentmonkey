@@ -87,6 +87,7 @@
           @code-dirty="onChange"
           :commands="{ close: onCancel, save: onSave }"
           :active="isActive"
+          focusme
         />
       </label>
     </div>

@@ -53,7 +53,7 @@
       :commands="commands"
       @code-dirty="codeDirty = $event"
     />
-    <keep-alive>
+    <keep-alive ref="$tabBody">
     <vm-settings
       class="edit-body"
       v-if="nav === 'settings'"
@@ -93,7 +93,7 @@ import {
   nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
-import { showMessage } from '@/common/ui';
+import { focusMe, showMessage } from '@/common/ui';
 import { keyboardService } from '@/common/keyboard';
 import VmCode from '@/common/ui/code';
 import VmExternals from '@/common/ui/externals';
@@ -122,6 +122,7 @@ const props = defineProps({
 });
 
 const $code = ref();
+const $tabBody = ref();
 const nav = ref('code');
 const canSave = ref(false);
 const script = ref();
@@ -155,9 +156,10 @@ const navItems = computed(() => {
 });
 const scriptName = computed(() => (store.title = getScriptName(script.value)));
 
-watch(nav, val => {
-  keyboardService.setContext('tabCode', val === 'code');
-  if (val === 'code') nextTick(() => CM.focus());
+watch(nav, async val => {
+  await nextTick();
+  if (val === 'code') CM.focus();
+  else focusMe($tabBody.value.$el);
 }, { immediate: true });
 watch(canSave, val => {
   toggleUnloadSentry(val);
@@ -245,9 +247,7 @@ onActivated(() => {
     keyboardService.register('a-pageup', switchPrevPanel),
     keyboardService.register('a-pagedown', switchNextPanel),
     keyboardService.register(K_SAVE.replace(/(?:Ctrl|Cmd)-/i, 'ctrlcmd-'), save),
-    keyboardService.register('escape', () => { nav.value = 'code'; }, {
-      condition: '!tabCode',
-    }),
+    keyboardService.register('escape', close),
     keyboardService.register('f1', () => { nav.value = 'help'; }),
   ];
   store.title = scriptName.value;
@@ -301,8 +301,8 @@ async function save() {
     fatal.value = err.message.split('\n');
   }
 }
-function close(cm) {
-  if (cm && nav.value !== 'code') {
+function close() {
+  if (nav.value !== 'code') {
     nav.value = 'code';
   } else {
     emit('close');

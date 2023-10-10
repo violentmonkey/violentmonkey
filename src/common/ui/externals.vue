@@ -1,6 +1,7 @@
 <template>
   <div class="edit-externals flex flex-col">
     <div v-if="!install || all.length > 1" class="select"
+         ref="$list" focusme @keydown="moveIndex" @scroll="saveScroll"
          :data-has-main="install ? '' : null">
       <dl v-for="([type, url, contents], i) of all" :key="i"
           class="flex"
@@ -19,32 +20,35 @@
       </dl>
     </div>
     <div class="contents pos-rel flex-1">
-      <img v-if="data.image" :src="data.image">
+      <KeepAlive :key="data.key" :max="10" ref="$body">
+      <img v-if="data.img" :src="data.img">
       <VmCode
-        v-show="!data.image"
+        v-else
         class="abs-full"
         :value="data.code"
-        ref="code"
         readOnly
         :cm-options="cmOptions"
         :mode="data.mode"
-        :commands="commands"
+        :commands="{...commands, close: () => $list.focus() }"
+        :active="isActive && !data.img"
       />
+      </KeepAlive>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watchEffect } from 'vue';
+import { computed, nextTick, onActivated, onDeactivated, ref, watchEffect } from 'vue';
 import { dataUri2text, formatByteLength, i18n, makeDataUri, sendCmdDirectly } from '@/common';
 import VmCode from '@/common/ui/code';
+import { focusMe, hasKeyModifiers } from '@/common/ui/index';
 
 const props = defineProps(['value', 'cmOptions', 'commands', 'install']);
-
+const $body = ref();
+const $list = ref();
+const isActive = ref();
 const dependencies = ref({});
-
 const index = ref(0);
-
 const data = ref({});
 
 const all = computed(() => {
@@ -57,6 +61,32 @@ const all = computed(() => {
   ];
 });
 
+const MOVEMENT = {
+  ArrowDown: 1,
+  ArrowUp: -1,
+  PageDown: 10,
+  PageUp: -10,
+  Home: -1e9,
+  End: 1e9,
+  Enter: 0,
+};
+const scrollIntoViewIfNeeded = Element.prototype.scrollIntoViewIfNeeded
+|| function (center = true) {
+  const parent = this.parentElement.getBoundingClientRect();
+  const me = this.getBoundingClientRect();
+  if (me.bottom > parent.bottom || me.top < parent.top) {
+    this.scrollIntoView(center ? { block: 'center' } : undefined);
+  }
+};
+let listScrollTop;
+
+onActivated(() => {
+  isActive.value = true;
+  ($list.value || {}).scrollTop = listScrollTop || 0;
+});
+onDeactivated(() => {
+  isActive.value = false;
+});
 watchEffect(update);
 
 async function update() {
@@ -103,9 +133,10 @@ async function update() {
   data.value = {
     img,
     code,
+    key: depsUrl,
     mode: contentType === 'text/css' || /\.css([#&?]|$)/i.test(url) ? 'css' : null,
   };
-  dependencies.value[depsUrl] = code;
+  dependencies.value[depsUrl] = img || code;
 }
 
 function formatLength(str, type) {
@@ -114,6 +145,23 @@ function formatLength(str, type) {
     len = Math.round((len - str.indexOf(',') - 1) * 6 / 8); // base64 uses 6 bits out of 8
   }
   return formatByteLength(len);
+}
+async function moveIndex(evt) {
+  if (hasKeyModifiers(evt)) return;
+  const delta = MOVEMENT[evt.key];
+  if (delta === 0 && !data.value.img) focusMe($body.value.$el);
+  if (!delta) return;
+  evt.preventDefault();
+  const i = index.value + delta;
+  const len = all.value.length;
+  index.value = delta < -1 || delta > 1
+      ? Math.max(0, Math.min(len - 1, i))
+      : (i + len) % len;
+  await nextTick();
+  $list.value.querySelector('.active')::scrollIntoViewIfNeeded();
+}
+function saveScroll() {
+  listScrollTop = $list.value.scrollTop;
 }
 </script>
 
@@ -129,6 +177,9 @@ $mainEntryBorder: 6px double;
     overflow-y: auto;
     border-bottom: 2px solid var(--fill-3);
     padding-bottom: calc($outerPadX/2);
+    &:focus .active span {
+      text-decoration: underline;
+    }
     &[data-has-main] dl:first-child {
       padding-top: .5em;
       padding-bottom: .5em;

@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-settings" ref="$el">
+  <div class="edit-settings">
     <h4 v-text="i18n('editLabelSettings')"></h4>
     <VMSettingsUpdate v-bind="{script}"/>
     <h4 v-text="i18n('editLabelMeta')"></h4>
@@ -85,10 +85,9 @@
 </template>
 
 <script setup>
-import { computed, onActivated, ref, shallowRef } from 'vue';
+import { computed, shallowRef } from 'vue';
 import { getScriptHome, i18n } from '@/common';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
-import { focusMe } from '@/common/ui';
 import VMSettingsUpdate from './settings-update';
 
 const kDownloadURL = 'downloadURL';
@@ -99,7 +98,6 @@ const props = defineProps({
   script: Object,
   readOnly: Boolean,
 });
-const $el = ref();
 const KII = shallowRef(KNOWN_INJECT_INTO);
 
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
@@ -126,10 +124,6 @@ const textAreas = [
   ['exclude', 'origExclude', ...highlightMetaKeys(i18n('labelExclude'))],
   ['excludeMatch', 'origExcludeMatch', ...highlightMetaKeys(i18n('labelExcludeMatch'))],
 ];
-
-onActivated(() => {
-  focusMe($el.value);
-});
 </script>
 
 <style>

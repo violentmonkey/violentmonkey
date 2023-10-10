@@ -1,4 +1,4 @@
-import { createApp, h, nextTick } from 'vue';
+import { createApp, h } from 'vue';
 import Modal from 'vueleton/lib/modal';
 import { trueJoin } from '@/common';
 import { i18n } from '@/common/util';
@@ -121,11 +121,9 @@ export function render(App, el) {
  * A child component should use nextTick to change focus, which runs later.
  */
 export function focusMe(el) {
-  nextTick(() => {
-    el = el.querySelector('[focusme]') || el;
-    el.tabIndex = -1;
-    el.focus();
-  });
+  el = el.querySelector('[focusme]') || el;
+  el.tabIndex = -1;
+  el.focus();
 }
 
 function vFocusFactory() {
