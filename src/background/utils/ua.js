@@ -24,12 +24,14 @@ const info = (() => {
 
 /** @type {VMScriptGMInfoPlatform} */
 export const ua = {};
-/** @type {number} This value can be trusted because the only way to spoof it in Chrome/ium
- * is to manually open devtools for the background page in device emulation mode. */
+/** @type {number|void} This value can be trusted because the only way to spoof it in Chrome/ium
+ * is to manually open devtools for the background page in device emulation mode.
+ * Using `void` for numeric comparisons like CHROME < 100 to be false in Firefox */
 export const CHROME = info.CH;
-/** @type {number} DANGER! Until init is done the only sure thing about this value
- * is whether it's truthy, because UA can be overridden by about:config */
-export let FIREFOX = info.FF || +IS_FIREFOX;
+/** @type {number|void} DANGER! Until init is done the only sure thing about this value
+ * is whether it's truthy, because UA can be overridden by about:config.
+ * Using `void` for numeric comparisons like FIREFOX < 100 to be false in Chrome */
+export let FIREFOX = info.FF;
 
 addOwnCommands({
   UA: () => ua,

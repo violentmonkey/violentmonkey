@@ -2,7 +2,7 @@ import { browserWindows, request, noop, i18n, getUniqId } from '@/common';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { parseMeta, isUserScript } from './script';
-import { getTabUrl, tabsOnUpdated } from './tabs';
+import { fileSchemeRequestable, getTabUrl, tabsOnUpdated } from './tabs';
 import { FIREFOX } from './ua';
 
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
@@ -13,11 +13,13 @@ addPublicCommands({
       && await browser.tabs.get(tabId).catch(noop);
     return tab && getTabUrl(tab).startsWith(CONFIRM_URL_BASE);
   },
-  async ConfirmInstall({ code, from, url }, { tab = {} }) {
-    if (!code) code = (await request(url)).data;
-    // TODO: display the error in UI
-    if (!isUserScript(code)) throw i18n('msgInvalidScript');
-    cache.put(url, code, 3000);
+  async ConfirmInstall({ code, from, url, fs }, { tab = {} }) {
+    if (!fs) {
+      if (!code) code = (await request(url)).data;
+      // TODO: display the error in UI
+      if (!isUserScript(code)) throw i18n('msgInvalidScript');
+      cache.put(url, code, 3000);
+    }
     const confirmKey = getUniqId();
     const { active, id: tabId, incognito } = tab;
     // Not testing tab.pendingUrl because it will be always equal to `url`
@@ -26,7 +28,7 @@ addPublicCommands({
       || cache.has(`autoclose:${tabId}`)
       || /^(chrome:\/\/(newtab|startpage)\/|about:(home|newtab))$/.test(from));
     /** @namespace VM.ConfirmCache */
-    cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId, ff: FIREFOX });
+    cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId, fs, ff: FIREFOX });
     const confirmUrl = CONFIRM_URL_BASE + confirmKey;
     const { windowId } = canReplaceCurTab
       ? await browser.tabs.update(tabId, { url: confirmUrl })
@@ -86,15 +88,20 @@ if (virtualUrlRe) {
 }
 
 browser.tabs.onCreated.addListener((tab) => {
-  const { id, title, url } = tab;
+  const { id, title } = tab;
+  const url = getTabUrl(tab);
+  const isFile = url.startsWith('file:');
   /* Determining if this tab can be auto-closed (replaced, actually).
      FF>=68 allows reading file: URL only in the tab's content script so the tab must stay open. */
-  if ((!url.startsWith('file:') || FIREFOX < 68)
+  if ((!isFile || FIREFOX < 68)
       && /\.user\.js([?#]|$)/.test(getTabUrl(tab))) {
     cache.put(`autoclose:${id}`, true, 10e3);
   }
   if (virtualUrlRe && url === 'about:blank') {
     maybeRedirectVirtualUrlFF(id, title);
+  }
+  if (isFile && !fileSchemeRequestable && !IS_FIREFOX) {
+    commands.ConfirmInstall({ url, fs: true }, { tab });
   }
 });
 

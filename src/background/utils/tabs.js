@@ -39,6 +39,7 @@ export const getTabUrl = tab => (
 export const tabsOnUpdated = browser.tabs.onUpdated;
 export const tabsOnRemoved = browser.tabs.onRemoved;
 export let injectableRe = /^(https?|file|ftps?):/;
+export let fileSchemeRequestable;
 let cookieStorePrefix;
 
 addOwnCommands({
@@ -163,6 +164,7 @@ tabsOnRemoved.addListener((id) => {
   // FF68+ can't fetch file:// from extension context but it runs content scripts in file:// tabs
   const fileScheme = IS_FIREFOX
     || await new Promise(r => chrome.extension.isAllowedFileSchemeAccess(r));
+  fileSchemeRequestable = FIREFOX < 68 || !IS_FIREFOX && fileScheme;
   // Since users in FF can override UA we detect FF 90 via feature
   if (IS_FIREFOX && [].at || CHROME >= 88) {
     injectableRe = fileScheme ? /^(https?|file):/ : /^https?:/;

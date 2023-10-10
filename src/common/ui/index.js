@@ -158,15 +158,18 @@ export const vFocus = vFocusFactory();
 export const isTouch = 'ontouchstart' in document;
 /** @param {MouseEvent|KeyboardEvent} e */
 export const hasKeyModifiers = e => e.shiftKey || e.ctrlKey || e.metaKey || e.altKey;
+export const externalEditorInfoUrl =
+  'https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/';
+const { getAsFileSystemHandle } = DataTransferItem.prototype;
 
-if (DataTransferItem.prototype.getAsFileSystemHandle) {
+if (getAsFileSystemHandle) {
   /**
    * @param {DragEvent} evt
    * @param {boolean} [asHandle]
    * @return {boolean|Promise<FileSystemHandle>}
    */
   const getItem = ({ dataTransfer: { items: [item] } }, asHandle) => (
-    item.type === 'text/javascript' && (!asHandle || item.getAsFileSystemHandle())
+    item.type === 'text/javascript' && (!asHandle || item::getAsFileSystemHandle())
   );
   addEventListener('dragover', evt => {
     if (getItem(evt)) evt.preventDefault();

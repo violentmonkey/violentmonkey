@@ -16,7 +16,7 @@
       <p v-if="frozen && nav === 'code'" v-text="i18n('readonly')"
          class="text-upper text-right text-red"/>
       <div v-else class="edit-hint text-right ellipsis">
-        <a href="https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/"
+        <a :href="externalEditorInfoUrl"
            target="_blank"
            rel="noopener noreferrer"
            v-text="i18n('editHowToHint')"/>
@@ -93,7 +93,7 @@ import {
   nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
-import { focusMe, showMessage } from '@/common/ui';
+import { externalEditorInfoUrl, focusMe, showMessage } from '@/common/ui';
 import { keyboardService } from '@/common/keyboard';
 import VmCode from '@/common/ui/code';
 import VmExternals from '@/common/ui/externals';

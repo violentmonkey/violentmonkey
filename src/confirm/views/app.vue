@@ -1,5 +1,14 @@
 <template>
   <div class="page-confirm frame flex flex-col h-screen" :class="{ reinstall }">
+    <div v-if="info.fs" id="wall">
+      <b v-text="info.fs[0]"/>
+      <ol>
+        <li v-for="(str, i) in info.fs.slice(1)" :key="i" v-text="str" class="mt-1"/>
+      </ol>
+      <hr>
+      <a class="mt-1" :href="externalEditorInfoUrl" v-text="externalEditorInfoUrl"/>
+    </div>
+    <template v-else>
     <div class="frame-block">
       <div class="flex">
         <div class="image">
@@ -96,6 +105,7 @@
         :install="{ code, deps, url: info.url }"
       />
     </div>
+    </template>
   </div>
 </template>
 
@@ -115,6 +125,7 @@ import { loadScriptIcon } from '@/common/load-script-icon';
 import { deepEqual, objectPick } from '@/common/object';
 import options from '@/common/options';
 import { route } from '@/common/router';
+import { externalEditorInfoUrl } from '@/common/ui';
 
 const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;
@@ -126,9 +137,9 @@ const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 const labelDefault = i18n('labelRunAtDefault');
 
 const $buttons = ref();
-const $close = ref({}); // using {} to simplify `hotkey` computation
-const $edit = ref({});
-const $track = ref({});
+const $close = ref();
+const $edit = ref();
+const $track = ref();
 const $externals = ref();
 
 const cmOptions = ref({ lineWrapping: true });
@@ -153,9 +164,9 @@ const script = ref();
 const tracking = ref(false);
 
 const hotkey = computed(() => ({
-  [isLocal.value && $track.value.value ? 'track'
-    : $edit.value.value ? 'edit'
-    : $close.value.value ? 'close'
+  [isLocal.value && $track.value?.value ? 'track'
+    : $edit.value?.value ? 'edit'
+    : $close.value?.value ? 'close'
     : 0
   ]: CONFIRM_HOTKEY
 }));
@@ -201,6 +212,10 @@ onMounted(async () => {
     closeTab();
     return;
   }
+  if (infoVal.fs) {
+    info.value.fs = i18n('fileInstallBlocked').split(/<\d+>/);
+    return;
+  }
   if (!fileHandle) {
     filePortNeeded = infoVal.ff >= 68 && infoVal.url.startsWith('file:');
     cachedCodePromise = sendCmdDirectly('CachePop', infoVal.url);
@@ -242,7 +257,7 @@ onBeforeUnmount(() => {
 });
 
 async function loadNewFileHandle(promise) {
-  installable.value = tracking.value = false;
+  info.value.fs = installable.value = tracking.value = false;
   stopResolve?.();
   await trackingPromise;
   await nextTick();
@@ -250,6 +265,7 @@ async function loadNewFileHandle(promise) {
   infoVal = info.value = { url: DROP_PREFIX + fileHandle.name };
   error.value = safeIcon.value = message.value = requireCache = resourceCache = null;
   await initScript();
+  if (!disposeList) initKeys();
 }
 async function loadData(changedOnly) {
   installable.value = false;
@@ -658,6 +674,9 @@ $vertLayoutThresholdMinus1: 1800px;
     &[style] {
       max-height: 80%;
     }
+  }
+  #wall {
+    padding: 2rem;
   }
   @media (max-width: 1599px) {
     >:first-child {
