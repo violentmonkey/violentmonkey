@@ -256,7 +256,7 @@ function removeStaleCacheEntry(val, key) {
       } else if (prefix === S_VALUE_PRE) {
         if (val[S_VALUE]) val[S_VALUE][id] = newData; // envDelayed
         setBaggedScriptValues(val, +id, newData);
-        continue;
+        if (!val[CSAPI_REG]) continue;
       }
       cache.del(key); // TODO: try to patch the cache in-place?
     }
