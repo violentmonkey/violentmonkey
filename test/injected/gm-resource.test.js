@@ -16,6 +16,6 @@ const DATA_URL = `data:${DATA.replace(',', ';base64,')}`;
 
 test('@resource decoding', async () => {
   expect(decodeResource(DATA)).toEqual(RESOURCE_TEXT);
-  expect(await blobAsText(decodeResource(DATA, true))).toEqual(RESOURCE_TEXT);
+  expect(await blobAsText(URL.blobCache[decodeResource(DATA, true)])).toEqual(RESOURCE_TEXT);
   expect(decodeResource(DATA, false)).toEqual(DATA_URL);
 });

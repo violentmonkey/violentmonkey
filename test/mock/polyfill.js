@@ -36,6 +36,14 @@ Object.defineProperties(global, domProps);
 delete MessagePort.prototype.onmessage; // to avoid hanging
 global.PAGE_MODE_HANDSHAKE = 123;
 global.VAULT_ID = false;
+Object.assign(URL, {
+  blobCache: {},
+  createObjectURL(blob) {
+    const blobUrl = `blob:${Math.random()}`;
+    URL.blobCache[blobUrl] = blob;
+    return blobUrl;
+  },
+});
 Object.assign(global, require('@/common/safe-globals-shared'));
 Object.assign(global, require('@/common/safe-globals'));
 Object.assign(global, require('@/injected/safe-globals'));

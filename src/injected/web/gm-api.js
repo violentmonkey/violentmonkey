@@ -218,10 +218,6 @@ function getResource(context, name, isBlob, isBlobAuto) {
     res = isData && isBlob === false || ensureNestedProp(resCache, bucketKey, key, false);
     if (!res) {
       res = bridge.call('GetResource', { id, isBlob, key, raw: isData && key });
-      if (res !== true && isBlob) {
-        // Creating Blob URL in page context to make it accessible for page userscripts
-        res = createObjectURL(res);
-      }
       ensureNestedProp(resCache, bucketKey, key, res);
     }
   }

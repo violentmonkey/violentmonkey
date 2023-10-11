@@ -13,6 +13,7 @@ const {
 const { createElementNS } = document;
 const tdDecode = SafeTextDecoder[PROTO].decode;
 const regexpTest = RegExp[PROTO].test; // Deeply unsafe. TODO: remove.
+const { createObjectURL } = URL;
 
 /**
  * @param {string} tag
@@ -68,7 +69,7 @@ export const decodeResource = (raw, isBlob) => {
     res = isBlob ? bytes : new SafeTextDecoder()::tdDecode(bytes);
   }
   return isBlob
-    ? new SafeBlob([res], { type: mimeType })
+    ? createObjectURL(new SafeBlob([res], { type: mimeType }))
     : res;
 };
 

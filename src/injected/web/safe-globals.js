@@ -53,7 +53,6 @@ export let
   // various methods
   URLToString,
   arrayIsArray,
-  createObjectURL,
   formDataEntries,
   hasOwnProperty,
   jsonParse,
@@ -144,7 +143,6 @@ export const VAULT = (() => {
     // various methods
     URLToString = res[i += 1] || src.URL[PROTO].toString,
     createNullObj = res[i += 1] || safeBind(SafeObject.create, SafeObject, null),
-    createObjectURL = res[i += 1] || src.URL.createObjectURL,
     formDataEntries = res[i += 1] || src.FormData[PROTO].entries,
     hasOwnProperty = res[i += 1] || safeBind(call, SafeObject[PROTO].hasOwnProperty),
     arrayIsArray = res[i += 1] || src.Array.isArray,
