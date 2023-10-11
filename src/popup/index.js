@@ -27,7 +27,7 @@ Object.assign(handlers, {
     const isTop = frameId === 0;
     if (!isTop) await mutex;
     else {
-      store.commands = data.menus::mapEntry(Object.keys);
+      store.commands = data.menus;
       store[IS_APPLIED] = data[INJECT_INTO] !== 'off'; // isApplied at the time of GetInjected
     }
     const idMapAllFrames = store.idMap;

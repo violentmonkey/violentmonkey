@@ -142,17 +142,17 @@
           <div class="submenu-commands">
             <div
               class="menu-item menu-area"
-              v-for="(cap, i) in store.commands[item.data.props.id]"
-              :key="i"
+              v-for="({ autoClose = true, text, title }, key) in store.commands[item.id]"
+              :key="key"
               :tabIndex="tabIndex"
-              :CMD.prop="{ id: item.data.props.id, cap }"
-              :data-message="cap"
+              :cmd.prop="[item.id, key, autoClose]"
+              :data-message="title || text"
               @mousedown="onCommand"
               @mouseup="onCommand"
               @keydown.enter="onCommand"
               @keydown.space="onCommand">
               <icon name="command" />
-              <div class="flex-auto ellipsis" v-text="cap" />
+              <div class="flex-auto ellipsis" v-text="text" />
             </div>
           </div>
         </div>
@@ -424,11 +424,13 @@ export default {
         mousedownElement = el;
         evt.preventDefault();
       } else if (type === 'keydown' || mousedownElement === el) {
+        const [id, key, autoClose] = el.cmd;
         sendTabCmd(store.tab.id, 'Command', {
-          ...el.CMD,
+          id,
+          key,
           evt: objectPick(evt, ['type', 'button', 'shiftKey', 'altKey', 'ctrlKey', 'metaKey',
             'key', 'keyCode', 'code']),
-        }).then(close);
+        }).then(autoClose && close);
       }
     },
     onToggleScript(item) {
