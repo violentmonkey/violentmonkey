@@ -3,8 +3,8 @@
     "{aecec67f-0d10-4fa7-b7c7-609a2db280cf}": {
       "updates": [
         {
-          "version": "2.15.7",
-          "update_link": "https://github.com/violentmonkey/violentmonkey/releases/download/v2.15.7/violentmonkey-2.15.7b-an+fx.xpi"
+          "version": "2.15.8",
+          "update_link": "https://github.com/violentmonkey/violentmonkey/releases/download/v2.15.8/violentmonkey-2.15.8b.xpi"
         }
       ]
     }
