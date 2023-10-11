@@ -3,7 +3,7 @@ import {
   BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
-import { forEachEntry, forEachValue, mapEntry, objectSet } from '@/common/object';
+import { deepCopy, forEachEntry, forEachValue, mapEntry, objectSet } from '@/common/object';
 import { CACHE_KEYS, getScriptsByURL, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
 import { setBadge } from './icon';
 import { addOwnCommands, addPublicCommands } from './init';
@@ -228,11 +228,14 @@ onStorageChanged((keys, data) => {
       cache.destroy();
       return;
     }
-    let values;
+    let script, values;
     // Patching cached script's values
     if (prefix === S_VALUE_PRE) {
-      const script = cache.get(S_SCRIPT_PRE + id);
-      if (script) values = script[VALUES] = data?.[key] || null;
+      values = data?.[key];
+      if ((script = cache.get(S_SCRIPT_PRE + id))) {
+        script[VALUES] = values = deepCopy(values) || script[VALUES] && {};
+        // {} enables tracking in addValueOpener
+      }
     }
     // Removing values/require/resource in injection bags
     if (prefix) {
@@ -252,7 +255,7 @@ function removeStaleCacheEntry(val, key) {
         val.depsMap[id].forEach(scriptId => cache.del(S_SCRIPT_PRE + scriptId));
       } else if (prefix === S_VALUE_PRE) {
         if (val[S_VALUE]) val[S_VALUE][id] = newData; // envDelayed
-        setBaggedScriptProp(val, +id, VALUES, newData);
+        setBaggedScriptValues(val, +id, newData);
         continue;
       }
       cache.del(key); // TODO: try to patch the cache in-place?
@@ -260,10 +263,11 @@ function removeStaleCacheEntry(val, key) {
   }
 }
 
-function setBaggedScriptProp(bag, id, key, val) {
+function setBaggedScriptValues(bag, id, val) {
   for (const /** @type {VMInjection.Script} */scr of (bag[INJECT] || bag)[SCRIPTS]) {
     if (scr.id === id) {
-      scr[key] = val;
+      scr[VALUES] = val || scr[VALUES] && {};
+      // {} enables tracking in addValueOpener
       return true;
     }
   }

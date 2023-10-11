@@ -366,6 +366,7 @@ async function readEnvironmentData(env) {
     for (const id of env[listName]) {
       let val = data[storage[area].toKey(id)];
       if (!val && area === S_VALUE) val = {};
+      // {} enables tracking in addValueOpener
       env[area][id] = val;
       if (val == null) {
         if (area === S_CODE) {
