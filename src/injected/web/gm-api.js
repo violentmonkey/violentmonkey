@@ -1,6 +1,6 @@
 import { dumpScriptValue, isEmpty } from '../util';
 import bridge from './bridge';
-import store from './store';
+import { commands } from './store';
 import { onTabCreate } from './tabs';
 import { onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
@@ -93,19 +93,25 @@ export const GM_API = {
       return getResource(this, name, !!isBlobUrl, isBlobUrl === undefined);
     },
     /** @this {GMContext} */
-    GM_registerMenuCommand(cap, func) {
+    GM_registerMenuCommand(text, cb, opts) {
+      opts = nullObjFrom(opts);
+      opts.text = text;
       const { id } = this;
-      const key = `${id}:${cap}`;
-      store.commands[key] = func;
-      bridge.post('RegisterMenu', { id, cap });
-      return cap;
+      const key = opts.id || (opts.id = safeGetUniqId());
+      const cmd = ensureNestedProp(commands, id, key);
+      cmd.cb = cb;
+      cmd.text = text;
+      bridge.post('RegisterMenu', { id, key, val: opts });
+      return key;
     },
     /** @this {GMContext} */
-    GM_unregisterMenuCommand(cap) {
+    GM_unregisterMenuCommand(key) {
       const { id } = this;
-      const key = `${id}:${cap}`;
-      delete store.commands[key];
-      bridge.post('UnregisterMenu', { id, cap });
+      const hub = commands[id];
+      if (hub && (hub[key] || (key = findCommandIdByText(key, hub)))) {
+        delete hub[key];
+        bridge.post('UnregisterMenu', { id, key });
+      }
     },
     /**
      * @this {GMContext}
@@ -222,4 +228,12 @@ function getResource(context, name, isBlob, isBlobAuto) {
     }
   }
   return resolveOrReturn(context, res === true ? key : res);
+}
+
+function findCommandIdByText(text, hub) {
+  for (const id in hub) {
+    if (hub[id].text === text) {
+      return id;
+    }
+  }
 }

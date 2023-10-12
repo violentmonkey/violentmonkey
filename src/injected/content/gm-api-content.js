@@ -42,16 +42,16 @@ addHandlers({
     return raw ? decodeResource(raw, isBlob) : true;
   },
 
-  RegisterMenu({ id, cap }) {
+  RegisterMenu({ id, key, val }) {
     if (window === top) {
-      ensureNestedProp(menus, id, cap, 1);
+      (menus[id] || (menus[id] = createNullObj()))[key] = val;
       sendSetPopup(true);
     }
   },
 
-  UnregisterMenu({ id, cap }) {
+  UnregisterMenu({ id, key }) {
     if (window === top) {
-      delete menus[id]?.[cap];
+      delete menus[id]?.[key];
       sendSetPopup(true);
     }
   },

@@ -1,5 +1,5 @@
 import bridge, { addHandlers } from './bridge';
-import store from './store';
+import { commands, storages } from './store';
 import { GM_API } from './gm-api';
 import { makeGmApiWrapper } from './gm-api-wrapper';
 import './gm-values';
@@ -53,10 +53,12 @@ export default function initialize(invokeHost, console) {
 }
 
 addHandlers({
-  Command({ id, cap, evt }) {
-    const constructor = evt.key ? SafeKeyboardEvent : SafeMouseEvent;
-    const fn = store.commands[`${id}:${cap}`];
-    if (fn) fn(new constructor(evt.type, evt));
+  Command({ id, key, evt }) {
+    commands[id]?.[key]?.cb(
+      new (evt.key ? SafeKeyboardEvent : SafeMouseEvent)(
+        evt.type, evt
+      )
+    );
   },
   /** @this {Node} */
   Callback({ id, data }) {
@@ -84,7 +86,7 @@ addHandlers({
     for (const script of items) {
       const { key } = script;
       toRun[key.data] = script;
-      store[VALUES][script.id] = nullObjFrom(script[VALUES]);
+      storages[script.id] = nullObjFrom(script[VALUES]);
       if (!PAGE_MODE_HANDSHAKE) {
         const winKey = key.win;
         const data = window[winKey];
