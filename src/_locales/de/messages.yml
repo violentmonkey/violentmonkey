@@ -204,6 +204,17 @@ failureReasonNoninjectable:
 
     (gewöhnliche Beispiele: Browser-UI, eine Erweiterung, durch Richtlinien
     blockiert, eine Suchmaschinen-Seite in Opera)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: >-
+    Es gibt mehrere Methoden um eine lokale Datei zu installieren oder
+    Bearbeitungen in dieser zu tracken: <1> Drag-and-Drop der Datei in eine
+    geöffnete Violentmonkey-Seite oder -Popup, inklusive diesem. <2> Einen
+    lokalen HTTP-Server für die Datei installieren und diese via
+    http://localhost öffnen. <3> In den Violentmonkey-Details auf der
+    chrome://extensions-Seite "Zugriff auf Dateipfade zulassen" aktivieren. Dies
+    ist potenziell gefährlich, da dies jedem Benutzerskript ermöglicht jede
+    lokale Datei zu lesen.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: Alphabetischer Reihenfolge

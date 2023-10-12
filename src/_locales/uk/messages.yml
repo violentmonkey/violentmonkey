@@ -205,6 +205,9 @@ failureReasonNoninjectable:
 
     (типові приклади: інтерфейс браузера, розширення, заблоковані через
     політики, пошуковий двигун в Opera)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: алфавіту

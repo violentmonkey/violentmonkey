@@ -199,6 +199,9 @@ failureReasonNoninjectable:
 
     (например: UI браузера, расширение, блокировка настройками политики,
     поисковой сайт в Opera)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: алфавитному порядку

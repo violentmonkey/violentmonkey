@@ -192,6 +192,9 @@ failureReasonNoninjectable:
   message: |-
     O Violentmonkey não pode executar scripts de utilizador nesta página
     (exemplos comuns: interface do navegador ou uma extensão)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordem alfabética

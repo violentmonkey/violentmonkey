@@ -205,6 +205,16 @@ failureReasonNoninjectable:
 
     (najčastejší prípad: rozhranie prehliadača alebo rozšírenia, blokované cez
     politiku, web vyhľadávača v Opere)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: >-
+    Existuje niekoľko metód na inštaláciu alebo sledovanie úprav v lokálnom
+    súbore: <1> Pretiahnite súbor do otvorenej stránky alebo vyskakovacieho okna
+    Violentmonkey, vrátane tejto. <2> Nainštalujte lokálny HTTP server pre tento
+    súbor a otvorte ho cez stránku http://localhost. <3> V podrobnostiach pre
+    Violentmonkey na stránke chrome://extensions povoľte možnosť "Povoliť
+    prístup k webovým adresám súboru". Je to nebezpečné, pretože akýkoľvek
+    používateľský skript môže čítať akýkoľvek lokálny súbor.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: abecedy

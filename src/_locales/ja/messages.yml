@@ -192,6 +192,9 @@ failureReasonNoninjectable:
   message: |-
     Violentmonkeyはこのページでユーザースクリプトを実行できません
     (一般的な例: ブラウザーUI、拡張機能、ポリシーによってブロックされている、検索サイト(Opera)など)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: アルファベット順

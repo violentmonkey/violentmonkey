@@ -91,7 +91,7 @@ buttonSaveClose:
   message: Kaydet & Kapat
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Kaydedildi
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Düzenleyici durumunu göster
@@ -100,7 +100,7 @@ buttonSupport:
   message: Destek sayfası
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Geri Al
+  message: Geri al
 buttonUpdate:
   description: Button to update a script.
   message: Güncelle
@@ -118,7 +118,10 @@ buttonVacuuming:
   message: Veri içeri aktarılıyor...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Bu komut dosyası için otomatik güncelleme devre dışı bırakıldı!
+
+    Yine de güncellemek için Tamam'a tıklayın.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -203,6 +206,18 @@ failureReasonNoninjectable:
 
     (olağan şüpheliler: tarayıcı arayüzü, bir başka eklenti, poliçe sebebiyle
     bloklama, Opera'da bir arama motoru sayfası)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: >-
+    Yerel bir dosyadaki düzenlemeleri yüklemek veya izlemek için birkaç yöntem
+    vardır: 
+
+    <1>Dosyayı, bu da dahil olmak üzere açık bir Violentmonkey sayfasına veya
+    açılır penceresine sürükleyip bırakın. <2>Bu dosya için yerel bir HTTP
+    sunucusu kurun ve http://localhost üzerinden açın. <3>chrome://extensions
+    sayfasındaki Violentmonkey ayrıntılarında "Dosya URL'lerine erişime izin
+    ver" seçeneğini etkinleştirin. Bu tehlikelidir çünkü herhangi bir kullanıcı
+    betiği herhangi bir yerel dosyayı okuyabilir.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabetik sıra
@@ -253,7 +268,7 @@ hintVacuum:
   message: Fazlalığı atın ve eksik kaynakları önbellekte yeniden yüklemeyi deneyin.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Yükle
 installFrom:
   description: Label for button to install script from a userscript site.
   message: $1 ile yüklendi
@@ -556,7 +571,7 @@ labelXhrInjectHint:
     gelebilirsiniz. Uyarıları, birine sağ tıklayarak tamamen gizleyebilirsiniz.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (gizli ve çerezleri devre dışı bırakılmış siteler hariç)
 lastSync:
   description: Label for last sync timestamp.
   message: Son eşitleme zamanı $1
@@ -822,13 +837,15 @@ optionUpdate:
   message: Güncelleme
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Salt okunur
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Güncellemeleri devre dışı bırakmadığınız veya düzenlemeye izin vermediğiniz
+    sürece otomatik olarak güncellenen komut dosyası salt okunurdur.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Düzenlemelere izin ver
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
   message: ''
