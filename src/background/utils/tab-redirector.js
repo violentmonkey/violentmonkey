@@ -1,6 +1,7 @@
 import { browserWindows, request, noop, i18n, getUniqId } from '@/common';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
+import { getOption } from './options';
 import { parseMeta, isUserScript } from './script';
 import { fileSchemeRequestable, getTabUrl, tabsOnUpdated } from './tabs';
 import { FIREFOX } from './ua';
@@ -91,16 +92,17 @@ browser.tabs.onCreated.addListener((tab) => {
   const { id, title } = tab;
   const url = getTabUrl(tab);
   const isFile = url.startsWith('file:');
+  const isUserJS = /\.user\.js([?#]|$)/.test(url);
   /* Determining if this tab can be auto-closed (replaced, actually).
      FF>=68 allows reading file: URL only in the tab's content script so the tab must stay open. */
-  if ((!isFile || FIREFOX < 68)
-      && /\.user\.js([?#]|$)/.test(getTabUrl(tab))) {
+  if (isUserJS && (!isFile || FIREFOX < 68)) {
     cache.put(`autoclose:${id}`, true, 10e3);
   }
   if (virtualUrlRe && url === 'about:blank') {
     maybeRedirectVirtualUrlFF(id, title);
   }
-  if (isFile && !fileSchemeRequestable && !IS_FIREFOX) {
+  if (isUserJS && isFile && !fileSchemeRequestable && !IS_FIREFOX
+  && getOption('helpForLocalFile')) {
     commands.ConfirmInstall({ url, fs: true }, { tab });
   }
 });

@@ -17,6 +17,7 @@ export default {
   },
   closeAfterInstall: false,
   editAfterInstall: false,
+  helpForLocalFile: true,
   trackLocalFile: false,
   autoReload: false,
   autoReloadTracked: false,

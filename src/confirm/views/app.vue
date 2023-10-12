@@ -7,6 +7,8 @@
       </ol>
       <hr>
       <a class="mt-1" :href="externalEditorInfoUrl" v-text="externalEditorInfoUrl"/>
+      <hr>
+      <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
     </div>
     <template v-else>
     <div class="frame-block">

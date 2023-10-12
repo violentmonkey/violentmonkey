@@ -122,14 +122,15 @@
           </label>
         </div>
         <div>
-          <locale-group i18n-key="labelExposeStatus" class="mr-1c">
+          <locale-group i18n-key="labelExposeStatus" class="flex flex-col">
             <setting-check v-for="([key, host]) in expose" :key="host"
-                           :name="`expose.${key}`" class="mr-1c valign-tb">
+                           :name="`expose.${key}`" class="ml-2 mr-1c valign-tb">
               <span v-text="host" />
               <a :href="`https://${host}`" target="_blank" rel="noopener noreferrer">&nearr;</a>
             </setting-check>
           </locale-group>
         </div>
+        <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
       </section>
 
       <vm-editor />
