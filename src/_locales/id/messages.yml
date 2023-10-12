@@ -203,6 +203,9 @@ failureReasonNoninjectable:
   message: |-
     Violentmonkey tidak bisa menjalankan userscript di halaman ini
     (contoh: UI peramban atau ekstensi)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: urutan abjad

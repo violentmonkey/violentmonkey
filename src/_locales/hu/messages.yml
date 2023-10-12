@@ -208,6 +208,16 @@ failureReasonNoninjectable:
 
     (gyakori példák erre: böngésző felhasználói felülete, egy bővítményé,
     házirend által blokkolt, keresőmotor oldala Opera-ban)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: >-
+    Több módja is létezik helyi fájloknak a telepítésére, vagy szerkesztésük
+    követésére: <1> Húzd a fájlt egy megnyitott Violentmonkey oldalra vagy
+    felugró menüre, beleértve ezt is. <2> Telepíts egy helyi HTTP szervert ehhez
+    a fájlhoz és nyisd meg azt a http://localhost-on keresztül. <3> Engedélyezd
+    a "Fájl URL-ek elérése"-t a Violentmonkey részleteiben a böngésző
+    Kiegészítők oldalán. Ez veszélyes, mert így bármelyik szkript elérhet
+    bármilyen helyi fájlt.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ábécésorrend szerint

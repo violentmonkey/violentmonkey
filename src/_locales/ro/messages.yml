@@ -204,6 +204,9 @@ failureReasonNoninjectable:
 
     (exemple uzuale: interfața de utilizator a browserului, o extensie, blocat
     via politici, un site al unui motor de căutare în Opera)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordinea alfabetică

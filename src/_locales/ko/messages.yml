@@ -191,6 +191,9 @@ failureReasonNoninjectable:
   message: |-
     Violentmonkey가 이 페이지의 유저스크립트를 실행하지 못했습니다
     (대표적인 예: 브라우저 UI 또는 확장 기능)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 가나다 순

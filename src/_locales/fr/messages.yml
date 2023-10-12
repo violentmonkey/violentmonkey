@@ -203,6 +203,9 @@ failureReasonNoninjectable:
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: "Violentmonkey ne peut pas lancer de scripts utilisateurs\nsur cette page (exemples courants\_: page du navigateur\nou d’une extension)"
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordre alphabétique

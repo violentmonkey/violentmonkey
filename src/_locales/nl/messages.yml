@@ -203,6 +203,16 @@ failureReasonNoninjectable:
 
     (bijv. interne of extensiepagina's, of vanwege een blokkadebeleid of
     bepaalde Opera-zoekmachine)
+fileInstallBlocked:
+  description: Text in the installer when a local file is dropped into the browser window.
+  message: >-
+    Er zijn verschillende manieren op bewerkingen in een lokaal bestand op te
+    nemen of bij te houden: <1> Sleep het bestand naar een geopende
+    Violentmonkey-pagina of -pop-up, zoals deze. <2> Installeer een lokale
+    http-server voor dit bestand en open via http://localhost. <3> Schakel
+    toegang tot bestands-url's in voor Violentmonkey op chrome://extensions. Let
+    op: dit wordt afgeraden, omdat elk gebruikersscript lokale bestanden kan
+    uitlezen.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabetische volgorde
