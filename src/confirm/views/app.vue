@@ -52,7 +52,7 @@
           </div>
         </div>
       </div>
-      <div class="flex">
+      <div class="flex" v-if="script">
         <div class="image flex">
           <img :src="safeIcon">
         </div>
@@ -204,11 +204,11 @@ let trackingPromise;
 onMounted(async () => {
   const id = route.paths[0];
   const key = `confirm-${id}`;
-  const fshPromise = window.fshPromise;
-  if (fshPromise) try { fileHandle = await fshPromise; } catch (e) {/*noop*/}
-  Object.defineProperty(window, 'fshPromise', { set: loadNewFileHandle });
+  const FSH = 'fsh';
+  fileHandle = window[FSH];
+  Object.defineProperty(window, FSH, { set: loadNewFileHandle });
   infoVal = info.value = fileHandle
-    ? { url: fshPromise.url || DROP_PREFIX + fileHandle.name }
+    ? { url: fileHandle._url || DROP_PREFIX + fileHandle.name }
     : await sendCmdDirectly('CacheLoad', key);
   if (!infoVal) {
     closeTab();
@@ -258,13 +258,13 @@ onBeforeUnmount(() => {
   disposeList?.forEach(dispose => dispose());
 });
 
-async function loadNewFileHandle(promise) {
+async function loadNewFileHandle(fh) {
   info.value.fs = installable.value = tracking.value = false;
   stopResolve?.();
   await trackingPromise;
   await nextTick();
-  fileHandle = await promise;
-  infoVal = info.value = { url: promise.url || DROP_PREFIX + fileHandle.name };
+  fileHandle = fh;
+  infoVal = info.value = { url: fh._url || DROP_PREFIX + fh.name };
   error.value = safeIcon.value = message.value = requireCache = resourceCache = null;
   await initScript();
   if (!disposeList) initKeys();

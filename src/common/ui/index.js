@@ -172,16 +172,19 @@ if (getAsFileSystemHandle) {
   addEventListener('dragover', evt => {
     if (getItem(evt)) evt.preventDefault();
   }, true);
-  addEventListener('drop', evt => {
+  addEventListener('drop', async evt => {
     const item = getItem(evt);
     if (!item) return;
     evt.preventDefault();
     evt.stopPropagation();
     const path = '/confirm/index.html';
-    const wnd = hasKeyModifiers(evt) || location.pathname !== path
-      ? window.open(path)
-      : window;
     // Some apps provide the file's URL in a text dataTransfer item.
-    (wnd.fshPromise = item::getAsFileSystemHandle()).url = evt.dataTransfer.getData('text');
+    const url = evt.dataTransfer.getData('text');
+    const handle = await item::getAsFileSystemHandle();
+    const isNewWindow = hasKeyModifiers(evt) || location.pathname !== path;
+    const wnd = isNewWindow ? window.open(path) : window;
+    // Transfer the handle to the new window (required in some versions of Chrome)
+    const structuredClone = isNewWindow && wnd.structuredClone; // Chrome 98+
+    (wnd.fsh = structuredClone ? structuredClone(handle) : handle)._url = url;
   }, true);
 }
