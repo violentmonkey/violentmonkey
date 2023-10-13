@@ -18,7 +18,7 @@ if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
 }
 
 export const ignoreChromeErrors = () => chrome.runtime.lastError;
-export const browserWindows = browser.windows;
+export const browserWindows = !process.env.IS_INJECTED && browser.windows;
 export const defaultImage = !process.env.IS_INJECTED && `${ICON_PREFIX}128.png`;
 /** @return {'0' | '1' | ''} treating source as abstract truthy/falsy to ensure consistent result */
 export const nullBool2string = v => v ? '1' : v == null ? '' : '0';

@@ -5,7 +5,7 @@ import { NO_CACHE } from '@/common/consts';
 export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
 
 export function memoize(func) {
-  const cacheMap = Object.create(null);
+  const cacheMap = /*@__PURE__*/Object.create(null);
   function memoized(...args) {
     const key = args.length === 1 ? `${args[0]}` : JSON.stringify(args);
     const res = cacheMap[key];
