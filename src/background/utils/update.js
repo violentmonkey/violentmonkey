@@ -1,7 +1,7 @@
 import {
   compareVersion, ensureArray, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
 } from '@/common';
-import { METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
+import { __CODE, METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
 import limitConcurrency from '@/common/limit-concurrency';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
 import { addOwnCommands, commands, init } from './init';
@@ -11,6 +11,11 @@ import { requestNewer } from './storage-fetch';
 
 const processes = {};
 const doCheckUpdateLimited = limitConcurrency(doCheckUpdate, 2, 250);
+const FAST_CHECK = {
+  ...NO_CACHE,
+  // Smart servers like OUJS send a subset of the metablock without code
+  headers: { Accept: 'text/x-userscript-meta,*/*' },
+};
 
 init.then(() => setTimeout(autoUpdate, 20e3));
 hookOptions(changes => 'autoUpdate' in changes && autoUpdate());
@@ -31,7 +36,11 @@ addOwnCommands({
     const jobs = scripts.map(script => {
       const curId = script.props.id;
       const urls = getScriptUpdateUrl(script, urlOpts);
-      return urls && (processes[curId] || (processes[curId] = doCheckUpdateLimited(script, urls)));
+      return urls && (
+        processes[curId] || (
+          processes[curId] = doCheckUpdateLimited(script, urls, !isAuto)
+        )
+      );
     }).filter(Boolean);
     const results = await Promise.all(jobs);
     const notes = results.filter(r => r?.text);
@@ -47,7 +56,7 @@ addOwnCommands({
   },
 });
 
-async function doCheckUpdate(script, urls) {
+async function doCheckUpdate(script, urls, force) {
   const { id } = script.props;
   let res;
   let msgOk;
@@ -56,7 +65,7 @@ async function doCheckUpdate(script, urls) {
   try {
     const { update } = await parseScript({
       id,
-      code: await downloadUpdate(script, urls),
+      code: await downloadUpdate(script, urls, force),
       update: { checking: false },
     });
     msgOk = i18n('msgScriptUpdated', [getScriptName(update)]);
@@ -84,7 +93,7 @@ async function doCheckUpdate(script, urls) {
   return res;
 }
 
-async function downloadUpdate(script, urls) {
+async function downloadUpdate(script, urls, force) {
   let errorMessage;
   const { meta, props: { id } } = script;
   const [downloadURL, updateURL] = urls;
@@ -92,12 +101,8 @@ async function downloadUpdate(script, urls) {
   const result = { update, where: { id } };
   announce(i18n('msgCheckingForUpdate'));
   try {
-    const { data } = await requestNewer(updateURL, {
-      ...NO_CACHE,
-      // Smart servers like OUJS send a subset of the metablock without code
-      headers: { Accept: 'text/x-userscript-meta,*/*' },
-    }) || {};
-    const { version } = data ? parseMeta(data) : {};
+    const { data } = await requestNewer(updateURL, FAST_CHECK, force) || {};
+    const { version, [__CODE]: metaStr } = data ? parseMeta(data, true) : {};
     if (compareVersion(meta.version, version) >= 0) {
       announce(i18n('msgNoUpdate'), { checking: false });
     } else if (!downloadURL) {
@@ -109,7 +114,9 @@ async function downloadUpdate(script, urls) {
     } else {
       announce(i18n('msgUpdating'));
       errorMessage = i18n('msgErrorFetchingScript');
-      return (await requestNewer(downloadURL, NO_CACHE)).data;
+      return downloadURL === updateURL && metaStr.trim() !== data.trim()
+        ? data
+        : (await requestNewer(downloadURL, NO_CACHE, force)).data;
     }
   } catch (error) {
     if (process.env.DEBUG) console.error(error);

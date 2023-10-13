@@ -2,6 +2,7 @@ import {
   encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl,
 } from '@/common';
 import {
+  __CODE,
   HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, USERSCRIPT_META_INTRO,
 } from '@/common/consts';
 import { mapEntry } from '@/common/object';
@@ -56,10 +57,11 @@ const metaOptionalTypes = {
   noframes: booleanType,
   unwrap: booleanType,
 };
-export function parseMeta(code) {
+export function parseMeta(code, includeMatchedString) {
   // initialize meta
   const meta = metaTypes::mapEntry(value => value.default());
-  const metaBody = code.match(METABLOCK_RE)[2];
+  const match = code.match(METABLOCK_RE);
+  const metaBody = match[2];
   if (!metaBody) return false; // TODO: `return;` + null check in all callers?
   metaBody.replace(/(?:^|\n)\s*\/\/\x20(@\S+)(.*)/g, (_match, rawKey, rawValue) => {
     const [keyName, locale] = rawKey.slice(1).split(':');
@@ -73,6 +75,7 @@ export function parseMeta(code) {
   });
   meta.resources = meta.resource;
   delete meta.resource;
+  if (includeMatchedString) meta[__CODE] = match[0];
   return meta;
 }
 

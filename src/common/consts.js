@@ -35,3 +35,4 @@ export const KNOWN_INJECT_INTO = {
   [CONTENT]: 1,
 };
 export const NO_CACHE = { cache: 'no-cache' };
+export const __CODE = Symbol('code'); // not enumerable and stripped when messaging/storing

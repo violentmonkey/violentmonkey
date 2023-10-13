@@ -50,12 +50,12 @@ function cacheOrFetch(handlers = {}) {
   }
 }
 
-export async function requestNewer(url, opts) {
+export async function requestNewer(url, opts, force) {
   if (isDataUri(url)) {
     return;
   }
-  const modOld = await storage.mod.getOne(url);
-  for (const get of [0, 1]) {
+  const modOld = !force && await storage.mod.getOne(url);
+  for (const get of force ? [1] : [0, 1]) {
     if (modOld || get) {
       const req = await requestLimited(url,
         get ? opts

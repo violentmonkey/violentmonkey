@@ -1,5 +1,6 @@
 import { getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
 import {
+  __CODE,
   BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
@@ -41,7 +42,6 @@ const findCspHeader = h => h.name.toLowerCase() === 'content-security-policy';
 const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
 const NONCE_RE = /'nonce-([-+/=\w]+)'/;
 const UNSAFE_INLINE = "'unsafe-inline'";
-const __CODE = Symbol('code'); // will be stripped when messaging
 /** These bags are reused in cache to reduce memory usage,
  * CACHE_KEYS is for removeStaleCacheEntry */
 const BAG_NOOP = { [INJECT]: {}, [CACHE_KEYS]: [] };
