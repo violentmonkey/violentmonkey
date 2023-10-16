@@ -251,6 +251,9 @@ genericUseGlobal:
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Kôš
+helpForLocalFile:
+  description: Label of the checkbox.
+  message: Zobraziť pokyny pre pretiahnuté lokálne skripty
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Vložte adresu:'

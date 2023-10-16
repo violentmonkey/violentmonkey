@@ -230,6 +230,9 @@ genericUseGlobal:
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: 휴지통
+helpForLocalFile:
+  description: Label of the checkbox.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL 입력:'
