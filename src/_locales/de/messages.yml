@@ -251,6 +251,9 @@ genericUseGlobal:
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Papierkorb
+helpForLocalFile:
+  description: Label of the checkbox.
+  message: Anleitung für per Drag-and-Drop hinzugefügte lokale Skripte anzeigen
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL eingeben:'

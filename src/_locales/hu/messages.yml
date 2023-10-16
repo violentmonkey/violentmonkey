@@ -216,7 +216,7 @@ fileInstallBlocked:
     felugró menüre, beleértve ezt is. <2> Telepíts egy helyi HTTP szervert ehhez
     a fájlhoz és nyisd meg azt a http://localhost-on keresztül. <3> Engedélyezd
     a "Fájl URL-ek elérése"-t a Violentmonkey részleteiben a böngésző
-    Kiegészítők oldalán. Ez veszélyes, mert így bármelyik szkript elérhet
+    'Kiegészítők' oldalán. Ez veszélyes, mert így bármelyik szkript elérhet
     bármilyen helyi fájlt.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
@@ -254,6 +254,9 @@ genericUseGlobal:
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Kuka
+helpForLocalFile:
+  description: Label of the checkbox.
+  message: Az oldalra húzott helyi szkriptekre vonatkozó instrukciók mutatása
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Add meg az URL-t:'
