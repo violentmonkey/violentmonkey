@@ -110,10 +110,7 @@ input[type=checkbox] {
   }
 }
 button,
-input[type="text"],
-input[type="search"],
-input[type="number"],
-input[type="password"],
+input,
 select,
 textarea {
   border: 1px solid var(--fill-3);
@@ -129,7 +126,6 @@ input[type=url],
 input[type=search],
 input[type=number],
 input[type=password] {
-  line-height: 1.5rem;
   &[disabled] {
     background: var(--fill-1);
     cursor: not-allowed;
@@ -145,7 +141,7 @@ input[type=search],
 input[type=number],
 input[type=password],
 textarea {
-  padding: 0 .5rem;
+  padding: 0 .2em;
 }
 code {
   padding: 0 .2em;
