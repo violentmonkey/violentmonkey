@@ -2,7 +2,7 @@
   <div class="tab-installed" ref="scroller">
     <div v-if="store.canRenderScripts">
       <header class="flex">
-        <div class="flex-auto" v-if="!showRecycle">
+        <div class="flex flex-auto" v-if="!showRecycle">
           <Dropdown
             :closeAfterClick="true"
             :class="{active: state.menuNewActive}"
@@ -36,6 +36,16 @@
           </Tooltip>
         </div>
         <div class="flex-auto" v-else v-text="i18n('headerRecycleBin')" />
+        <LocaleGroup i18n-key="labelFilterSort">
+          <select :value="filters.sort" @change="handleOrderChange" class="h-100">
+            <option
+              v-for="(option, name) in filterOptions.sort"
+              v-text="option.title"
+              :key="name"
+              :value="name">
+            </option>
+          </select>
+        </LocaleGroup>
         <Dropdown align="right" class="filter-sort">
           <Tooltip :content="i18n('labelSettings')" placement="bottom">
             <a class="btn-ghost" tabindex="0">
@@ -43,18 +53,6 @@
             </a>
           </Tooltip>
           <template #content>
-            <div>
-              <LocaleGroup i18n-key="labelFilterSort">
-                <select :value="filters.sort" @change="handleOrderChange">
-                  <option
-                    v-for="(option, name) in filterOptions.sort"
-                    v-text="option.title"
-                    :key="name"
-                    :value="name">
-                  </option>
-                </select>
-              </LocaleGroup>
-            </div>
             <div v-show="currentSortCompare">
               <SettingCheck name="filters.showEnabledFirst"
                 :label="i18n('optionShowEnabledFirst')" />
@@ -743,6 +741,7 @@ export default {
 </script>
 
 <style>
+$iconSize: 2rem; // from .icon in ui/style.css
 .tab.tab-installed {
   height: 100vh;
   padding: 0;
@@ -757,6 +756,9 @@ export default {
     padding: 0 1rem;
     line-height: 1;
     border-bottom: 1px solid var(--fill-5);
+    .btn-ghost, select {
+      height: $iconSize;
+    }
   }
   .vl-dropdown-menu {
     white-space: nowrap;
@@ -813,7 +815,6 @@ export default {
   }
 }
 .filter-search {
-  height: 2rem;
   label {
     position: relative;
   }
