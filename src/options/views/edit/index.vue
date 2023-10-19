@@ -474,7 +474,7 @@ function setupSavePosition({ id: curWndId, tabs }) {
     border-bottom: var(--border);
   }
   &.frozen .CodeMirror {
-    background: var(--fill-0-5);
+    opacity: .75; /* opacity plays well with custom editor colors */
   }
 }
 
