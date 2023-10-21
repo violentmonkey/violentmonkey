@@ -16,9 +16,9 @@ jobs:
           fetch-depth: 250 # for `action-helper`
           # persist-credentials: false # not implemented in v1
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Prepare
         run: yarn && node scripts/action-helper.js

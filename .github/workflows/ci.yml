@@ -23,9 +23,9 @@ jobs:
         uses: actions/checkout@v1 # v1 keeps tags
         with:
           fetch-depth: 100 # for revision index in version and the `has-changed-path` action
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Build
         env:
@@ -41,7 +41,7 @@ jobs:
       - name: Get version and SHA
         run: node scripts/action-helper.js ci
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         continue-on-error: true
         with:
           name: 'Violentmonkey-test-webext-${{ env.GIT_DESCRIBE }}'
