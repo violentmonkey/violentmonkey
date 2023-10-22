@@ -45,6 +45,7 @@
 
     <vm-code
       class="flex-auto"
+      :class="{ readonly: frozen }"
       :value="code"
       :readOnly="frozen"
       ref="$code"
@@ -473,7 +474,7 @@ function setupSavePosition({ id: curWndId, tabs }) {
     padding: .5em 1em;
     border-bottom: var(--border);
   }
-  &.frozen .CodeMirror {
+  .readonly {
     opacity: .75; /* opacity plays well with custom editor colors */
   }
 }
