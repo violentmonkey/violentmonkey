@@ -256,7 +256,7 @@ headerRecycleBin:
   message: Geri Dönüşüm Kutusu
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Sürükle ve bırak yerel komut dosyaları için talimatları göster
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL Girdisi:'
@@ -851,16 +851,18 @@ readonlyOpt:
   message: Düzenlemelere izin ver
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (bir sonraki güncelleme bunların üzerine yazacaktır)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Tekrar indir
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Sekmeyi yeniden yükle
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Etkinleştirilirse, değişiklikler algılandığında ve bu kod sekmenin URL'siyle
+    eşleştiğinde etkin sekme yeniden yüklenir.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Büyük/küçük harfe duyarlı
@@ -878,13 +880,15 @@ sideMenuSettings:
   message: Ayarlar
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Kullanıcı betikleri olmadan sayfayı yeniden yükle
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Bu sayfa için kullanıcı betiklerini devre dışı bıraktınız. Bunları
+    çalıştırmak için sekmeyi yeniden yükleyin veya sekmede gezinin.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: İzlemeyi durdur
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normal rozet rengi
@@ -900,24 +904,24 @@ titleSearchHint:
     * RegExp sözdizimi desteklenmektedir: /re/ ve /re/flags
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Harici düzenlemeleri takip edin
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: Düzenlemelerinizi yerel dosyada takip etmek için bu sayfayı açık tutun
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Betikleri güncelle ($1)
 valueLabelKey:
   description: Label for key of a script value.
-  message: Anahtar (string)
+  message: Anahtar (metin)
 valueLabelValue:
   description: Label for value of a script value.
-  message: Değer (JSON şeklinde serileştirilmiş)
+  message: Değer (JSON formatında serileştirilmiş)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: Tüm değerler (JSON şeklinde serileştirilmiş)
+  message: Tüm değerler (JSON formatında serileştirilmiş)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Siteyi ziyaret et

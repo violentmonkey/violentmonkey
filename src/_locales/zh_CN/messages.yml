@@ -89,7 +89,7 @@ buttonSaveClose:
   message: 保存并关闭
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: 已保存
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: 显示编辑器状态
@@ -195,7 +195,10 @@ failureReasonNoninjectable:
     （常见原因：浏览器/扩展内置页面、被策略屏蔽、Opera 下的搜索页面需要特殊设置）
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    有几种方法可以在本地文件中安装或跟踪编辑： <1> 将文件拖放到打开的暴力猴页面或弹出窗口中，包括此页面。 <2>为此文件安装本地 HTTP
+    服务器并通过 http://localhost 打开它。 <3> 在 chrome://extensions 页面中为暴力猴启用“允许访问文件
+    URL”。但这是危险的，因为任何用户脚本都可以读取任何本地文件。
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 字母顺序
@@ -234,7 +237,7 @@ headerRecycleBin:
   message: 回收站
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: 显示拖放本地脚本的详细说明
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 请输入地址：
@@ -249,7 +252,7 @@ hintVacuum:
   message: 丢弃多余的数据，并尝试重新获取缺失的资源。
 install:
   description: Label for button to install a script.
-  message: ''
+  message: 安装
 installFrom:
   description: Label for button to install script from a userscript site.
   message: 从$1安装
@@ -544,7 +547,7 @@ labelXhrInjectHint:
     中，您会在开发者控制台看到警告，尽管您可以安全地忽略它们，因为在这种情况下的不利影响可以忽略不计。 您可以通过右键点击其中一个来永久隐藏这些警告。
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: （隐身模式和禁用 Cookie 的网站除外）
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步时间为 $1
@@ -800,19 +803,19 @@ optionUpdate:
   message: 更新
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: 只读
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: 除非禁用更新或允许编辑，否则自动更新的脚本是只读的。
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: 允许编辑
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: （下次更新将覆盖它们）
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: 重装
 reloadTab:
   description: Label of action to reload the tab
   message: 刷新标签页
@@ -842,7 +845,7 @@ skipScriptsMsg:
   message: 你已在当前页面禁用用户脚本，刷新或跳转页面后将会重新启用。
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: 停止跟踪
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: 正常情况下的徽标颜色
@@ -856,10 +859,10 @@ titleSearchHint:
     * 支持正则表达式：/re/ 和 /re/flags
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: 跟踪外部编辑
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: 保持此页面打开以跟踪本地文件中所做的编辑
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
