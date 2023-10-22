@@ -258,7 +258,7 @@ export async function requestLocalFile(url, options = {}) {
 }
 
 const isLocalUrlRe = re`/^(
-  file:\/\/|
+  file:|
   about:|
   data:|
   https?:\/\/
@@ -284,7 +284,7 @@ export const isRemote = url => url && !isLocalUrlRe.test(decodeURI(url));
  */
 export async function request(url, options = {}) {
   // fetch does not support local file
-  if (url.startsWith('file://')) return requestLocalFile(url, options);
+  if (url.startsWith('file:')) return requestLocalFile(url, options);
   const { body, headers, [kResponseType]: responseType } = options;
   const isBodyObj = body && body::({}).toString() === '[object Object]';
   const [, scheme, auth, hostname, urlTail] = url.match(/^([-\w]+:\/\/)([^@/]*@)?([^/]*)(.*)|$/);
