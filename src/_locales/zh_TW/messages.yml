@@ -237,7 +237,7 @@ headerRecycleBin:
   message: 資源回收桶
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: 顯示如何透過「拖放」來新增本機腳本的詳細步驟指導
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 請輸入網址：
