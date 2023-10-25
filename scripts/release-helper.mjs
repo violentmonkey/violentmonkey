@@ -1,6 +1,7 @@
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import github from '@actions/github';
+import { exec } from './common.js';
 
 const { VERSION, ASSETS_DIR, GITHUB_TOKEN } = process.env;
 const tag = `v${VERSION}`;
@@ -24,13 +25,47 @@ export async function getRelease() {
   }
 }
 
+function listCommits() {
+  const thisTag = exec('git describe --abbrev=0 --tags');
+  const prevTag = exec(`git describe --abbrev=0 --tags "${thisTag}^"`);
+  const tagRange = `${prevTag}...${thisTag}`;
+  const list = exec(`git log --oneline --skip=1 --reverse "${tagRange}"`)
+  .replace(/</g, '\\<')
+  .split('\n')
+  .map((str, i) => `${str.split(/\s/, 2)[1]}${10000 + i}\n* ${str}`)
+  .sort()
+  .map(str => str.split('\n')[1])
+  .join('\n');
+  return `${list}\n\nCommit log: ${
+    process.env.GITHUB_SERVER_URL || 'https://github.com'
+  }/${
+    process.env.GITHUB_REPOSITORY || 'violentmonkey/violentmonkey'
+  }/compare/${tagRange}`;
+}
+
+function getReleaseNote() {
+  const { PRERELEASE } = process.env;
+  return PRERELEASE ? `\
+**This is a beta release of Violentmonkey (also in [WebStore](\
+https://chrome.google.com/webstore/detail/violentmonkey-beta/opokoaglpekkimldnlggpoagmjegichg\
+)), use it at your own risk.**<br>\
+If you already use Violentmonkey, click \`Export to zip\` in settings before installing the beta.
+
+Notable changes:
+
+${listCommits()}
+` : `\
+See <https://violentmonkey.github.io/> for more details.
+`;
+}
+
 export async function createRelease() {
   console.info('Create release:', tag);
   const result = await getOctokit().rest.repos.createRelease({
     ...github.context.repo,
     tag_name: tag,
     name: process.env.RELEASE_NAME,
-    body: process.env.RELEASE_NOTE,
+    body: getReleaseNote(),
     prerelease: process.env.PRERELEASE == 'true',
   });
   return result.data;
