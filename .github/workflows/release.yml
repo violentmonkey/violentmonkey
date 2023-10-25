@@ -62,7 +62,6 @@ jobs:
           cd dist && zip -r ../$TEMP_DIR/$ASSET_SELF_HOSTED_ZIP . && cd ..
 
       - name: Publish to AMO
-        id: signAMO
         continue-on-error: true
         run: |
           mkdir -p $TEMP_DIR/updates
@@ -78,14 +77,8 @@ jobs:
           AMO_KEY: ${{ secrets.AMO_KEY }}
           AMO_SECRET: ${{ secrets.AMO_SECRET }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update updates.json
-        uses: JamesIves/github-pages-deploy-action@4.1.0
-        if: steps.signAMO.outcome == 'success'
-        with:
-          branch: updates
-          folder: ${{ env.TEMP_DIR }}/updates
-          commit-message: Update to ${{ env.VERSION }} 🚀
+          # Try to publish if not exist
+          AMO_PUBLISH: true
 
       - name: Publish to CWS
         continue-on-error: true
@@ -109,4 +102,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node -e 'import("./scripts/release-helper.mjs").then(({ uploadAssets }) => uploadAssets())';
+          node -e 'import("./scripts/release-helper.mjs").then(({ ensureRelease }) => ensureRelease())';

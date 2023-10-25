@@ -1,0 +1,51 @@
+name: Download AMO signed unlisted package
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        required: true
+  repository_dispatch:
+    types:
+      - amo_download
+
+jobs:
+  amo-download:
+    if: ${{ github.event.client_payload.ref || github.event.inputs.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.ref || github.event.inputs.ref }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Prepare
+        run: yarn && node scripts/action-helper.js
+        env:
+          ACTION_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          DISCORD_WEBHOOK_RELEASE: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}
+
+      - name: Download signed file and upload to GitHub release
+        run: |
+          mkdir -p $TEMP_DIR/updates
+          DEBUG=amo-upload BETA=1 node scripts/amo-upload.mjs
+        env:
+          AMO_KEY: ${{ secrets.AMO_KEY }}
+          AMO_SECRET: ${{ secrets.AMO_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update updates.json
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          branch: updates
+          folder: ${{ env.TEMP_DIR }}/updates
+          commit-message: Update to ${{ env.VERSION }} 🚀
+
+      - name: Upload assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node -e 'import("./scripts/release-helper.mjs").then(({ uploadAssets }) => uploadAssets())';

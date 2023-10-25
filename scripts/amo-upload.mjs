@@ -1,33 +1,26 @@
 import { rename, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { FatalError, signAddon } from 'amo-upload';
+import { signAddon } from 'amo-upload';
 import { readManifest, buildUpdatesList } from './manifest-helper.js';
 import { getVersion, isBeta } from './version-helper.js';
 import { hasAsset, notifyReleaseStatus } from './release-helper.mjs';
 
 async function main() {
   const manifest = await readManifest();
-  const rawVersion = process.env.VERSION;
   const version = getVersion();
   const beta = isBeta();
   const fileName = `violentmonkey-${version}${beta ? 'b' : ''}.xpi`;
-  const url = `https://github.com/violentmonkey/violentmonkey/releases/download/v${rawVersion}/${fileName}`;
+  const url = `https://github.com/violentmonkey/violentmonkey/releases/download/v${version}/${fileName}`;
 
   if (await hasAsset(fileName)) {
     // Throw an error so `updates.json` won't be updated in the next step.
     throw new Error('File already downloaded, skipping');
   }
 
-  const pollOptions = !beta ? {
-    // disable status checking for listed versions since
-    // we don't need to download the signed version
-    pollRetry: 0,
-  } : {
-    pollInterval: 30000,
-    pollRetry: 30,
-  };
-
-  const tempFile = join(process.env.TEMP_DIR, Math.random().toString(36).slice(2, 8).toString());
+  const tempFile = join(
+    process.env.TEMP_DIR,
+    Math.random().toString(36).slice(2, 8).toString(),
+  );
   const releaseUrl = `https://github.com/violentmonkey/violentmonkey/releases/tag/v${version}`;
   await signAddon({
     apiKey: process.env.AMO_KEY,
@@ -35,52 +28,64 @@ async function main() {
     addonId: manifest.browser_specific_settings.gecko.id,
     addonVersion: version,
     channel: beta ? 'unlisted' : 'listed',
-    distFile: beta
-      ? join(process.env.TEMP_DIR, process.env.ASSET_SELF_HOSTED_ZIP)
-      : join(process.env.ASSETS_DIR, process.env.ASSET_ZIP),
-    sourceFile: join(process.env.TEMP_DIR, process.env.SOURCE_ZIP),
-    approvalNotes: `\
+    ...(process.env.AMO_PUBLISH
+      ? {
+          distFile: beta
+            ? join(process.env.TEMP_DIR, process.env.ASSET_SELF_HOSTED_ZIP)
+            : join(process.env.ASSETS_DIR, process.env.ASSET_ZIP),
+          sourceFile: join(process.env.TEMP_DIR, process.env.SOURCE_ZIP),
+          approvalNotes: `\
 yarn && yarn build
 `,
-    releaseNotes: {
-      'en-US': `\
+          releaseNotes: {
+            'en-US': `\
 Please follow the link below to view the change log:
 
 ${releaseUrl}
 `,
-    },
+          },
+        }
+      : {}),
     output: tempFile,
-    ...pollOptions,
+
+    // Don't poll since the review process takes quite a long time
+    pollRetry: 0,
   });
 
   const xpiFile = join(process.env.ASSETS_DIR, fileName);
   await rename(tempFile, xpiFile);
 
   const updates = await buildUpdatesList(version, url);
-  await writeFile(join(process.env.TEMP_DIR, 'updates/updates.json'), JSON.stringify(updates, null, 2), 'utf8');
+  await writeFile(
+    join(process.env.TEMP_DIR, 'updates/updates.json'),
+    JSON.stringify(updates, null, 2),
+    'utf8',
+  );
 }
 
-main().then(() => {
-  notifyReleaseStatus({
-    title: `AMO Release Success: ${process.env.RELEASE_NAME}`,
-    description: `See the changelog at https://github.com/violentmonkey/violentmonkey/releases/tag/v${process.env.VERSION}.`,
-  });
-}, err => {
-  // if (err instanceof FatalError) {
+main().then(
+  () => {
+    notifyReleaseStatus({
+      title: `AMO Release Success: ${process.env.RELEASE_NAME}`,
+      description: `See the changelog at https://github.com/violentmonkey/violentmonkey/releases/tag/v${process.env.VERSION}.`,
+    });
+  },
+  (err) => {
+    // if (err instanceof FatalError) {
     notifyReleaseStatus({
       title: `AMO Release Failure: ${process.env.RELEASE_NAME}`,
       description: [
         'An error occurred:',
         '',
         `> ${err}`,
-        ...process.env.ACTION_BUILD_URL ? [
-          '',
-          `See ${process.env.ACTION_BUILD_URL} for more details.`,
-        ] : [],
+        ...(process.env.ACTION_BUILD_URL
+          ? ['', `See ${process.env.ACTION_BUILD_URL} for more details.`]
+          : []),
       ].join('\n'),
       success: false,
     });
-  // }
-  console.error(err);
-  process.exitCode = 1;
-});
+    // }
+    console.error(err);
+    process.exitCode = 1;
+  },
+);
