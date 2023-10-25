@@ -112,7 +112,7 @@ async function bump() {
   } else {
     pkg.beta = (+pkg.beta || 0) + 1;
   }
-  await fs.writeFile('package.json', JSON.stringify(pkg, null, 2), 'utf8');
+  await fs.writeFile('package.json', JSON.stringify(pkg, null, 2) + '\n', 'utf8');
   if (process.argv.includes('--commit')) {
     const version = `v${getVersion()}`;
     spawn.sync('git', ['commit', '-am', version]);
