@@ -2,8 +2,9 @@ import { i18n, defaultImage, sendTabCmd, trueJoin, getFullUrl } from '@/common';
 import { addPublicCommands, commands } from './init';
 import { CHROME } from './ua';
 
-/** @type {{ [nid: string]: browser.runtime.MessageSender | function }} */
+/** @type {{ [nid: string]: browser.runtime.MessageSender | function | number }} */
 const openers = {};
+const kZombie = 'zombie';
 const kZombieTimeout = 'zombieTimeout';
 const kZombieUrl = 'zombieUrl';
 
@@ -19,6 +20,7 @@ addPublicCommands({
     [kZombieUrl]: zombieUrl,
     [kZombieTimeout]: zombieTimeout,
   }, src) {
+    if (tag) clearZombieTimer(openers[tag]);
     const notificationId = await browser.notifications.create(tag, {
       type: 'basic',
       title: [title, IS_FIREFOX && i18n('extName')]::trueJoin(' - '), // Chrome already shows the name
@@ -40,7 +42,10 @@ addPublicCommands({
     }
     return notificationId;
   },
-  RemoveNotification: removeNotification,
+  RemoveNotification(nid) {
+    clearZombieTimer(openers[nid]);
+    removeNotification(nid);
+  },
 });
 
 browser.notifications.onClicked.addListener((id) => {
@@ -57,7 +62,9 @@ function notifyOpener(id, isClick) {
   if (!op) return;
   if (isFunction(op)) {
     if (isClick) op();
-  } else if (op[kZombieTimeout] === -1) {
+  } else if (op > 0) {
+    if (isClick) clearZombieTimer(op);
+  } else if (op[kZombie]) {
     if (isClick) commands.TabOpen({ url: op[kZombieUrl] }, op);
   } else {
     sendTabCmd(op.tab.id, isClick ? 'NotificationClick' : 'NotificationClose', id, {
@@ -69,16 +76,22 @@ function notifyOpener(id, isClick) {
 export function clearNotifications(tabId, frameId) {
   for (const nid in openers) {
     const op = openers[nid];
-    if (op.tab.id === tabId && (!frameId || op[kFrameId] === frameId)) {
+    if (isObject(op)
+    && op.tab.id === tabId
+    && (!frameId || op[kFrameId] === frameId)
+    && !op[kZombie]) {
       if (op[kZombieTimeout]) {
-        setTimeout(removeNotification, op[kZombieTimeout], nid);
-        if (op[kZombieUrl]) op[kZombieTimeout] = -1;
-        else delete openers[nid];
+        op[kZombie] = setTimeout(removeNotification, op[kZombieTimeout], nid);
+        if (!op[kZombieUrl]) openers[nid] = op[kZombie];
       } else {
         removeNotification(nid);
       }
     }
   }
+}
+
+function clearZombieTimer(op) {
+  if (op > 0) clearTimeout(op);
 }
 
 function removeNotification(nid) {
