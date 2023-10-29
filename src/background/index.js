@@ -1,8 +1,7 @@
 import '@/common/browser';
 import { makePause } from '@/common';
 import { deepCopy } from '@/common/object';
-import { getDomain } from '@/common/tld';
-import { addOwnCommands, addPublicCommands, commands, init } from './utils';
+import { addPublicCommands, commands, init } from './utils';
 import './sync';
 import './utils/clipboard';
 import './utils/hotkeys';
@@ -14,20 +13,6 @@ import './utils/storage-fetch';
 import './utils/tab-redirector';
 import './utils/tester';
 import './utils/update';
-
-addOwnCommands({
-  /**
-   * @param {string?} url
-   * @return {Promise<Object>}
-   */
-  async GetTabDomain(url) {
-    const host = url && new URL(url).hostname;
-    return {
-      host,
-      domain: host && getDomain(host) || host,
-    };
-  },
-});
 
 addPublicCommands({
   /**

@@ -142,7 +142,7 @@
 
 <script>
 import { computed, reactive, nextTick, onMounted, watch, ref } from 'vue';
-import { i18n, sendCmdDirectly, debounce, makePause, noop, trueJoin } from '@/common';
+import { i18n, sendCmdDirectly, debounce, makePause, trueJoin } from '@/common';
 import options from '@/common/options';
 import { isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import hookSetting from '@/common/hook-setting';
@@ -353,18 +353,9 @@ function handleEditScript(id) {
     setRoute(pathname);
   }
 }
-async function getNewScriptData(cacheId) {
-  const tab = cacheId && await browser.tabs.get(+cacheId).catch(noop);
-  const url = tab?.url.split(/[#?]/)[0];
-  const { domain } = url && await sendCmdDirectly('GetTabDomain', url) || {};
-  return sendCmdDirectly('NewScript', domain && {
-    url,
-    name: `${options.get('scriptTemplateEdited') ? '' : '- '}${domain}`,
-  });
-}
 async function onHashChange() {
   const [tab, id, cacheId] = store.route.paths;
-  const newData = id === '_new' && await getNewScriptData(cacheId);
+  const newData = id === '_new' && await sendCmdDirectly('NewScript', +cacheId);
   const script = newData ? newData.script : +id && getCurrentList().find(s => s.props.id === +id);
   if (script) {
     state.code = newData ? newData.code : await sendCmdDirectly('GetScriptCode', id);

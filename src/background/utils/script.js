@@ -1,16 +1,25 @@
 import {
-  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl,
+  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, noop,
 } from '@/common';
 import {
   __CODE,
   HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, USERSCRIPT_META_INTRO,
 } from '@/common/consts';
 import { mapEntry } from '@/common/object';
-import { addOwnCommands } from './init';
+import { addOwnCommands, commands } from './init';
 import { getOption } from './options';
+import { injectableRe } from './tabs';
 
 addOwnCommands({
-  NewScript: newScript,
+  async NewScript(tabId) {
+    const tabUrl = (tabId >= 0 && await browser.tabs.get(tabId).catch(noop) || {}).url;
+    const url = injectableRe.test(tabUrl) && `${tabUrl.split(/[#?]/)[0]}*`;
+    const { host = 'example.org', domain } = url ? commands.GetTabDomain(url) : {};
+    return newScript({
+      url: url || `*://${host}/*`,
+      name: domain || '',
+    });
+  },
 });
 
 export function isUserScript(text) {

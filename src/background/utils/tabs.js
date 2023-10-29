@@ -1,4 +1,5 @@
 import { browserWindows, getActiveTab, noop, sendTabCmd, getFullUrl } from '@/common';
+import { getDomain } from '@/common/tld';
 import { addOwnCommands, addPublicCommands, commands } from './init';
 import { getOption } from './options';
 import { testScript } from './tester';
@@ -43,6 +44,13 @@ export let fileSchemeRequestable;
 let cookieStorePrefix;
 
 addOwnCommands({
+  GetTabDomain(url) {
+    const host = url && new URL(url).hostname;
+    return {
+      host,
+      domain: host && getDomain(host) || host,
+    };
+  },
   /**
    * @param {string} [pathId] - path or id: added to #scripts/ route in dashboard,
    * falsy: creates a new script for active tab's URL

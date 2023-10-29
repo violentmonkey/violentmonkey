@@ -12,7 +12,7 @@ addPublicCommands({
   async InitPopup() {
     const tab = await getActiveTab() || {};
     const { url = '', id: tabId } = tab;
-    const data = await commands.GetTabDomain(url);
+    const data = commands.GetTabDomain(url);
     const cachedSetPopup = cache.pop(getCacheKey(tabId));
     const badgeData = badges[tabId] || {};
     let failure = getFailureReason(url, badgeData);
