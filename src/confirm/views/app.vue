@@ -411,9 +411,7 @@ async function getScript(url) {
 }
 async function installScript(evt, parsedMeta) {
   const btnId = evt?.target.id;
-  const isOk = btnId === 'confirm';
-  const isBtnTrack = btnId === '+track';
-  if (isBtnTrack && tracking.value) {
+  if (btnId === '+track' && tracking.value) {
     stopResolve?.(true);
     return;
   }
@@ -432,13 +430,13 @@ async function installScript(evt, parsedMeta) {
     const time0 = confirmedTime || (confirmedTime = time);
     message.value = `${update.message} ${time0}${time0 === time ? '' : ` --> ${time}`}`;
     installed.value = true;
-    if (isOk ? isLocal.value && $track.value.value : isBtnTrack) {
+    if (btnId === '+track') {
       message.value = i18n('trackEditsNote')
         + (infoVal.ff >= 68 ? ' ' + i18n('installOptionTrackTooltip') : '');
       trackLocalFile();
     } else if (btnId === '+edit') {
       location.href = extensionOptionsPage + ROUTE_SCRIPTS + '/' + update.props.id;
-    } else if (isOk ? $close.value.value : btnId === '+close') {
+    } else if (btnId === '+close') {
       closeTab();
     }
   } catch (err) {
